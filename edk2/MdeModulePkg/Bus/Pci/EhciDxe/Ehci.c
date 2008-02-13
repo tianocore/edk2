@@ -81,7 +81,7 @@ EhcGetCapability (
   *PortNumber     = (UINT8) (Ehc->HcStructParams & HCSP_NPORTS);
   *Is64BitCapable = (UINT8) (Ehc->HcCapParams & HCCP_64BIT);
 
-  EHC_DEBUG (("EhcGetCapability: %d ports, 64 bit %d\n", *PortNumber, *Is64BitCapable));
+  DEBUG ((EFI_D_INFO, "EhcGetCapability: %d ports, 64 bit %d\n", *PortNumber, *Is64BitCapable));
 
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
@@ -161,7 +161,7 @@ EhcReset (
   }
 
 ON_EXIT:
-  EHC_DEBUG (("EhcReset: exit status %r\n", Status));
+  DEBUG ((EFI_D_INFO, "EhcReset: exit status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
@@ -206,7 +206,7 @@ EhcGetState (
 
   gBS->RestoreTPL (OldTpl);
 
-  EHC_DEBUG (("EhcGetState: current state %d\n", *State));
+  DEBUG ((EFI_D_INFO, "EhcGetState: current state %d\n", *State));
   return EFI_SUCCESS;
 }
 
@@ -281,7 +281,7 @@ EhcSetState (
     Status = EFI_INVALID_PARAMETER;
   }
 
-  EHC_DEBUG (("EhcSetState: exit status %r\n", Status));
+  DEBUG ((EFI_D_INFO, "EhcSetState: exit status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
@@ -450,7 +450,7 @@ EhcSetRootHubPortFeature (
       Status = EhcRunHC (Ehc, EHC_GENERIC_TIMEOUT);
 
       if (EFI_ERROR (Status)) {
-        EHC_DEBUG (("EhcSetRootHubPortFeature :failed to start HC - %r\n", Status));
+        DEBUG ((EFI_D_INFO, "EhcSetRootHubPortFeature :failed to start HC - %r\n", Status));
         break;
       }
     }
@@ -480,7 +480,7 @@ EhcSetRootHubPortFeature (
   }
 
 ON_EXIT:
-  EHC_DEBUG (("EhcSetRootHubPortFeature: exit status %r\n", Status));
+  DEBUG ((EFI_D_INFO, "EhcSetRootHubPortFeature: exit status %r\n", Status));
 
   gBS->RestoreTPL (OldTpl);
   return Status;
@@ -608,7 +608,7 @@ EhcClearRootHubPortFeature (
   }
 
 ON_EXIT:
-  EHC_DEBUG (("EhcClearRootHubPortFeature: exit status %r\n", Status));
+  DEBUG ((EFI_D_INFO, "EhcClearRootHubPortFeature: exit status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
@@ -700,7 +700,7 @@ EhcControlTransfer (
   *TransferResult = EFI_USB_ERR_SYSTEM;
 
   if (EhcIsHalt (Ehc) || EhcIsSysError (Ehc)) {
-    EHC_ERROR (("EhcControlTransfer: HC halted at entrance\n"));
+    DEBUG ((EFI_D_ERROR, "EhcControlTransfer: HC halted at entrance\n"));
 
     EhcAckAllInterrupt (Ehc);
     goto ON_EXIT;
@@ -736,7 +736,7 @@ EhcControlTransfer (
           );
 
   if (Urb == NULL) {
-    EHC_ERROR (("EhcControlTransfer: failed to create URB"));
+    DEBUG ((EFI_D_ERROR, "EhcControlTransfer: failed to create URB"));
 
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -765,7 +765,7 @@ ON_EXIT:
   gBS->RestoreTPL (OldTpl);
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcControlTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((EFI_D_ERROR, "EhcControlTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   return Status;
@@ -851,7 +851,7 @@ EhcBulkTransfer (
   Status          = EFI_DEVICE_ERROR;
 
   if (EhcIsHalt (Ehc) || EhcIsSysError (Ehc)) {
-    EHC_ERROR (("EhcBulkTransfer: HC is halted\n"));
+    DEBUG ((EFI_D_ERROR, "EhcBulkTransfer: HC is halted\n"));
 
     EhcAckAllInterrupt (Ehc);
     goto ON_EXIT;
@@ -881,7 +881,7 @@ EhcBulkTransfer (
           );
 
   if (Urb == NULL) {
-    EHC_ERROR (("EhcBulkTransfer: failed to create URB\n"));
+    DEBUG ((EFI_D_ERROR, "EhcBulkTransfer: failed to create URB\n"));
 
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -907,7 +907,7 @@ ON_EXIT:
   gBS->RestoreTPL (OldTpl);
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((EFI_D_ERROR, "EhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   return Status;
@@ -998,14 +998,14 @@ EhcAsyncInterruptTransfer (
   if (!IsNewTransfer) {
     Status = EhciDelAsyncIntTransfer (Ehc, DeviceAddress, EndPointAddress, DataToggle);
 
-    EHC_DEBUG (("EhcAsyncInterruptTransfer: remove old transfer - %r\n", Status));
+    DEBUG ((EFI_D_INFO, "EhcAsyncInterruptTransfer: remove old transfer - %r\n", Status));
     goto ON_EXIT;
   }
 
   Status = EFI_SUCCESS;
 
   if (EhcIsHalt (Ehc) || EhcIsSysError (Ehc)) {
-    EHC_ERROR (("EhcAsyncInterruptTransfer: HC is halt\n"));
+    DEBUG ((EFI_D_ERROR, "EhcAsyncInterruptTransfer: HC is halt\n"));
     EhcAckAllInterrupt (Ehc);
 
     Status = EFI_DEVICE_ERROR;
@@ -1017,7 +1017,7 @@ EhcAsyncInterruptTransfer (
   Data = AllocatePool (DataLength);
 
   if (Data == NULL) {
-    EHC_ERROR (("EhcAsyncInterruptTransfer: failed to allocate buffer\n"));
+    DEBUG ((EFI_D_ERROR, "EhcAsyncInterruptTransfer: failed to allocate buffer\n"));
 
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -1041,7 +1041,7 @@ EhcAsyncInterruptTransfer (
           );
 
   if (Urb == NULL) {
-    EHC_ERROR (("EhcAsyncInterruptTransfer: failed to create URB\n"));
+    DEBUG ((EFI_D_ERROR, "EhcAsyncInterruptTransfer: failed to create URB\n"));
 
     gBS->FreePool (Data);
     Status = EFI_OUT_OF_RESOURCES;
@@ -1141,7 +1141,7 @@ EhcSyncInterruptTransfer (
   Status          = EFI_DEVICE_ERROR;
 
   if (EhcIsHalt (Ehc) || EhcIsSysError (Ehc)) {
-    EHC_ERROR (("EhcSyncInterruptTransfer: HC is halt\n"));
+    DEBUG ((EFI_D_ERROR, "EhcSyncInterruptTransfer: HC is halt\n"));
 
     EhcAckAllInterrupt (Ehc);
     goto ON_EXIT;
@@ -1167,7 +1167,7 @@ EhcSyncInterruptTransfer (
           );
 
   if (Urb == NULL) {
-    EHC_ERROR (("EhcSyncInterruptTransfer: failed to create URB\n"));
+    DEBUG ((EFI_D_ERROR, "EhcSyncInterruptTransfer: failed to create URB\n"));
 
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -1190,7 +1190,7 @@ ON_EXIT:
   gBS->RestoreTPL (OldTpl);
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcSyncInterruptTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((EFI_D_ERROR, "EhcSyncInterruptTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   return Status;
@@ -1448,7 +1448,7 @@ EhcCreateUsb2Hc (
   Ehc->HcCapParams    = EhcReadCapRegister (Ehc, EHC_HCCPARAMS_OFFSET);
   Ehc->CapLen         = EhcReadCapRegister (Ehc, EHC_CAPLENGTH_OFFSET) & 0x0FF;
 
-  EHC_DEBUG (("EhcCreateUsb2Hc: capability length %d\n", Ehc->CapLen));
+  DEBUG ((EFI_D_INFO, "EhcCreateUsb2Hc: capability length %d\n", Ehc->CapLen));
 
   //
   // Create AsyncRequest Polling Timer
@@ -1511,7 +1511,7 @@ EhcDriverBindingStart (
                   );
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcDriverBindingStart: failed to open PCI_IO\n"));
+    DEBUG ((EFI_D_ERROR, "EhcDriverBindingStart: failed to open PCI_IO\n"));
     return EFI_DEVICE_ERROR;
   }
 
@@ -1548,7 +1548,7 @@ EhcDriverBindingStart (
   }
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcDriverBindingStart: failed to enable controller\n"));
+    DEBUG ((EFI_D_ERROR, "EhcDriverBindingStart: failed to enable controller\n"));
     goto CLOSE_PCIIO;
   }
 
@@ -1558,7 +1558,7 @@ EhcDriverBindingStart (
   Ehc = EhcCreateUsb2Hc (PciIo, OriginalPciAttributes);
 
   if (Ehc == NULL) {
-    EHC_ERROR (("EhcDriverBindingStart: failed to create USB2_HC\n"));
+    DEBUG ((EFI_D_ERROR, "EhcDriverBindingStart: failed to create USB2_HC\n"));
 
     Status = EFI_OUT_OF_RESOURCES;
     goto CLOSE_PCIIO;
@@ -1572,7 +1572,7 @@ EhcDriverBindingStart (
                   );
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcDriverBindingStart: failed to install USB2_HC Protocol\n"));
+    DEBUG ((EFI_D_ERROR, "EhcDriverBindingStart: failed to install USB2_HC Protocol\n"));
     goto FREE_POOL;
   }
 
@@ -1585,7 +1585,7 @@ EhcDriverBindingStart (
   Status = EhcInitHC (Ehc);
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcDriverBindingStart: failed to init host controller\n"));
+    DEBUG ((EFI_D_ERROR, "EhcDriverBindingStart: failed to init host controller\n"));
     goto UNINSTALL_USBHC;
   }
 
@@ -1595,7 +1595,7 @@ EhcDriverBindingStart (
   Status = gBS->SetTimer (Ehc->PollTimer, TimerPeriodic, EHC_ASYNC_POLL_INTERVAL);
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcDriverBindingStart: failed to start async interrupt monitor\n"));
+    DEBUG ((EFI_D_ERROR, "EhcDriverBindingStart: failed to start async interrupt monitor\n"));
 
     EhcHaltHC (Ehc, EHC_GENERIC_TIMEOUT);
     goto UNINSTALL_USBHC;
@@ -1621,7 +1621,7 @@ EhcDriverBindingStart (
     );
 
 
-  EHC_DEBUG (("EhcDriverBindingStart: EHCI started for controller @ %x\n", Controller));
+  DEBUG ((EFI_D_INFO, "EhcDriverBindingStart: EHCI started for controller @ %x\n", Controller));
   return EFI_SUCCESS;
 
 UNINSTALL_USBHC:

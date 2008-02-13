@@ -62,7 +62,7 @@ enum {
   USB_MASS_STORE_RBC      = 0x01, // Reduced Block Commands
   USB_MASS_STORE_8020I    = 0x02, // SFF-8020i, typically a CD/DVD device
   USB_MASS_STORE_QIC      = 0x03, // Typically a tape device
-  USB_MASS_STORE_UFI      = 0x04, // Typically a floopy disk driver device
+  USB_MASS_STORE_UFI      = 0x04, // Typically a floppy disk driver device
   USB_MASS_STORE_8070I    = 0x05, // SFF-8070i, typically a floppy disk driver device.
   USB_MASS_STORE_SCSI     = 0x06, // SCSI transparent command set
 
@@ -138,6 +138,4 @@ UsbClearEndpointStall (
   IN UINT8                    EndpointAddress
   );
 
-extern UINTN mUsbMscInfo;
-extern UINTN mUsbMscError;
 #endif

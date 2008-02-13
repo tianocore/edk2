@@ -24,9 +24,6 @@ Revision History
 #include "Ehci.h"
 
 
-UINTN mUsbHcDebugLevel = DEBUG_INFO;
-
-
 /**
   Allocate a block of memory to be used by the buffer pool
 
@@ -116,9 +113,6 @@ UsbHcAllocMemBlock (
   Block->BufHost  = BufHost;
   Block->Buf      = (UINT8 *) ((UINTN) MappedAddr);
   Block->Mapping  = Mapping;
-
-  DEBUG ((mUsbHcDebugLevel, "UsbHcAllocMemBlock: block %x created with buffer %x\n",
-                          Block, Block->Buf));
 
   return Block;
 
@@ -455,7 +449,7 @@ UsbHcAllocateMem (
   NewBlock = UsbHcAllocMemBlock (Pool, Pages);
 
   if (NewBlock == NULL) {
-    DEBUG ((mUsbHcDebugLevel, "UsbHcAllocateMem: failed to allocate block\n"));
+    DEBUG ((EFI_D_INFO, "UsbHcAllocateMem: failed to allocate block\n"));
     return NULL;
   }
 
@@ -539,8 +533,6 @@ UsbHcFreeMem (
   // Release the current memory block if it is empty and not the head
   //
   if ((Block != Head) && UsbHcIsMemBlockEmpty (Block)) {
-    DEBUG ((mUsbHcDebugLevel, "UsbHcFreeMem: block %x is empty, recycle\n", Block));
-
     UsbHcUnlinkMemBlock (Head, Block);
     UsbHcFreeMemBlock (Pool, Block);
   }

@@ -121,11 +121,7 @@ UhciInitFrameList (
   // in supporting the full speed bandwidth reclamation in the previous
   // mentioned form. Most new platforms don't suffer it.
   //
-#ifdef UHCI_NO_BW_RECLAMATION
-  Uhc->BulkQh->QhHw.HorizonLink     = QH_HLINK (NULL, TRUE);
-#else
   Uhc->BulkQh->QhHw.HorizonLink     = QH_HLINK (Uhc->BulkQh, FALSE);
-#endif
 
   Uhc->BulkQh->NextQh               = NULL;
 
@@ -515,7 +511,7 @@ UhciCheckTdStatus (
       // terminate the transfer
       //
       if (!IsLow && (TdHw->ShortPacket == 1) && (Len < Td->DataLen)) {
-        UHCI_DEBUG (("UhciCheckTdStatus: short packet read occured\n"));
+        DEBUG ((EFI_D_INFO, "UhciCheckTdStatus: short packet read occured\n"));
 
         Finished = TRUE;
         goto ON_EXIT;
@@ -576,7 +572,7 @@ UhciExecuteTransfer (
   Finished = FALSE;
   Status   = EFI_SUCCESS;
   Delay    = (TimeOut * UHC_1_MILLISECOND / UHC_SYNC_POLL_INTERVAL) + 1;
-  
+
   for (Index = 0; Index < Delay; Index++) {
     Finished = UhciCheckTdStatus (Uhc, Td, IsLow, QhResult);
 
@@ -591,16 +587,16 @@ UhciExecuteTransfer (
   }
 
   if (!Finished) {
-    UHCI_ERROR (("UhciExecuteTransfer: execution not finished for %dms\n", TimeOut));
-    UHCI_DUMP_QH  ((Qh));
-    UHCI_DUMP_TDS ((Td));
+    DEBUG ((EFI_D_ERROR, "UhciExecuteTransfer: execution not finished for %dms\n", TimeOut));
+    UhciDumpQh (Qh);
+    UhciDumpTds (Td);
 
     Status = EFI_TIMEOUT;
 
   } else if (QhResult->Result != EFI_USB_NOERROR) {
-    UHCI_ERROR (("UhciExecuteTransfer: execution failed with result %x\n", QhResult->Result));
-    UHCI_DUMP_QH  ((Qh));
-    UHCI_DUMP_TDS ((Td));
+    DEBUG ((EFI_D_ERROR, "UhciExecuteTransfer: execution failed with result %x\n", QhResult->Result));
+    UhciDumpQh (Qh);
+    UhciDumpTds (Td);
 
     Status = EFI_DEVICE_ERROR;
   }

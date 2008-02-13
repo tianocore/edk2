@@ -345,7 +345,7 @@ EhcUnlinkQhFromAsync (
   Status = EhcSetAndWaitDoorBell (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
-    EHC_ERROR (("EhcUnlinkQhFromAsync: Failed to synchronize with doorbell\n"));
+    DEBUG ((EFI_D_ERROR, "EhcUnlinkQhFromAsync: Failed to synchronize with doorbell\n"));
   }
 }
 
@@ -598,7 +598,7 @@ EhcCheckUrbResult (
       }
 
       if ((QtdHw->TotalBytes != 0) && (QtdHw->Pid == QTD_PID_INPUT)) {
-        EHC_DUMP_QH ((Urb->Qh, "Short packet read", FALSE));
+        EhcDumpQh (Urb->Qh, "Short packet read", FALSE);
 
         //
         // Short packet read condition. If it isn't a setup transfer,
@@ -607,13 +607,13 @@ EhcCheckUrbResult (
         // Status Stage of the setup transfer to get the finial result
         //
         if (QtdHw->AltNext == QTD_LINK (Ehc->ShortReadStop, FALSE)) {
-          EHC_DEBUG (("EhcCheckUrbResult: Short packet read, break\n"));
+          DEBUG ((EFI_D_INFO, "EhcCheckUrbResult: Short packet read, break\n"));
 
           Finished = TRUE;
           goto ON_EXIT;
         }
 
-        EHC_DEBUG (("EhcCheckUrbResult: Short packet read, continue\n"));
+        DEBUG ((EFI_D_INFO, "EhcCheckUrbResult: Short packet read, continue\n"));
       }
     }
   }
@@ -673,14 +673,14 @@ EhcExecTransfer (
   }
 
   if (!Finished) {
-    EHC_ERROR (("EhcExecTransfer: transfer not finished in %dms\n", TimeOut));
-    EHC_DUMP_QH ((Urb->Qh, NULL, FALSE));
+    DEBUG ((EFI_D_ERROR, "EhcExecTransfer: transfer not finished in %dms\n", TimeOut));
+    EhcDumpQh (Urb->Qh, NULL, FALSE);
 
     Status = EFI_TIMEOUT;
 
   } else if (Urb->Result != EFI_USB_NOERROR) {
-    EHC_ERROR (("EhcExecTransfer: transfer failed with %x\n", Urb->Result));
-    EHC_DUMP_QH ((Urb->Qh, NULL, FALSE));
+    DEBUG ((EFI_D_ERROR, "EhcExecTransfer: transfer failed with %x\n", Urb->Result));
+    EhcDumpQh (Urb->Qh, NULL, FALSE);
 
     Status = EFI_DEVICE_ERROR;
   }
@@ -781,14 +781,14 @@ EhcFlushAsyncIntMap (
 
 Routine Description:
 
-  Flush data from PCI controller specific address to mapped system 
+  Flush data from PCI controller specific address to mapped system
   memory address.
 
 Arguments:
 
   Ehc         - The EHCI device
   Urb         - The URB to unmap
-  
+
 Returns:
 
   EFI_SUCCESS      - Success to flush data to mapped system memory
@@ -811,7 +811,7 @@ Returns:
   } else {
     MapOp = EfiPciIoOperationBusMasterRead;
   }
-  
+
   Status = PciIo->Unmap (PciIo, Urb->DataMap);
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
@@ -953,14 +953,14 @@ EhcMoniteAsyncRequests (
     }
 
     //
-    // Flush any PCI posted write transactions from a PCI host 
+    // Flush any PCI posted write transactions from a PCI host
     // bridge to system memory.
     //
     Status = EhcFlushAsyncIntMap (Ehc, Urb);
     if (EFI_ERROR (Status)) {
-      EHC_ERROR (("EhcMoniteAsyncRequests: Fail to Flush AsyncInt Mapped Memeory\n"));
+      DEBUG ((EFI_D_ERROR, "EhcMoniteAsyncRequests: Fail to Flush AsyncInt Mapped Memeory\n"));
     }
-    
+
     //
     // Allocate a buffer then copy the transferred data for user.
     // If failed to allocate the buffer, update the URB for next

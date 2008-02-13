@@ -27,9 +27,6 @@ Revision History
 #include "UsbMass.h"
 #include "UsbMassCbi.h"
 
-UINTN mUsbCbiInfo  = DEBUG_INFO;
-UINTN mUsbCbiError = DEBUG_ERROR;
-
 STATIC
 EFI_STATUS
 UsbCbiResetDevice (
@@ -450,7 +447,7 @@ UsbCbiExecCommand (
   //
   Status = UsbCbiSendCommand (UsbCbi, Cmd, CmdLen, Timeout);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbCbiError, "UsbCbiExecCommand: UsbCbiSendCommand (%r)\n",Status));
+    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiSendCommand (%r)\n",Status));
     return Status;
   }
 
@@ -462,7 +459,7 @@ UsbCbiExecCommand (
 
   Status   = UsbCbiDataTransfer (UsbCbi, DataDir, Data, &TransLen, Timeout);
   if (UsbCbi->InterruptEndpoint == NULL) {
-    DEBUG ((mUsbCbiError, "UsbCbiExecCommand: UsbCbiDataTransfer (%r)\n",Status));
+    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiDataTransfer (%r)\n",Status));
     return Status;
   }
 
@@ -471,7 +468,7 @@ UsbCbiExecCommand (
   //
   Status = UsbCbiGetStatus (UsbCbi, Timeout, &Result);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbCbiError, "UsbCbiExecCommand: UsbCbiGetStatus (%r)\n",Status));
+    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiGetStatus (%r)\n",Status));
     return EFI_DEVICE_ERROR;
   }
 

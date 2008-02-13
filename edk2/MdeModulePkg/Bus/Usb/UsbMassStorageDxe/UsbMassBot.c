@@ -25,9 +25,6 @@ Revision History
 #include "UsbMass.h"
 #include "UsbMassBot.h"
 
-UINTN mUsbBotInfo  = DEBUG_INFO;
-UINTN mUsbBotError = DEBUG_ERROR;
-
 STATIC
 EFI_STATUS
 UsbBotResetDevice (
@@ -83,7 +80,7 @@ UsbBotInit (
   Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &UsbBot->Interface);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbBotError, "UsbBotInit: Get invalid BOT interface (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBotInit: Get invalid BOT interface (%r)\n", Status));
     goto ON_ERROR;
   }
 
@@ -120,7 +117,7 @@ UsbBotInit (
   }
 
   if ((UsbBot->BulkInEndpoint == NULL) || (UsbBot->BulkOutEndpoint == NULL)) {
-    DEBUG ((mUsbBotError, "UsbBotInit: In/Out Endpoint invalid\n"));
+    DEBUG ((EFI_D_ERROR, "UsbBotInit: In/Out Endpoint invalid\n"));
     Status = EFI_UNSUPPORTED;
     goto ON_ERROR;
   }
@@ -277,9 +274,9 @@ UsbBotDataTransfer (
                             &Result
                             );
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbBotError, "UsbBotDataTransfer: (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBotDataTransfer: (%r)\n", Status));
     if (USB_IS_ERROR (Result, EFI_USB_ERR_STALL)) {
-      DEBUG ((mUsbBotError, "UsbBotDataTransfer: DataIn Stall\n"));
+      DEBUG ((EFI_D_ERROR, "UsbBotDataTransfer: DataIn Stall\n"));
       UsbClearEndpointStall (UsbBot->UsbIo, Endpoint->EndpointAddress);
     } else if (USB_IS_ERROR (Result, EFI_USB_ERR_NAK)) {
       Status = EFI_NOT_READY;
@@ -323,7 +320,7 @@ UsbBotGetStatus (
   EFI_USB_IO_PROTOCOL       *UsbIo;
   UINT32                    Index;
   UINTN                     Timeout;
-  
+
   *CmdStatus = USB_BOT_COMMAND_ERROR;
   Status     = EFI_DEVICE_ERROR;
   Endpoint   = UsbBot->BulkInEndpoint->EndpointAddress;
@@ -346,9 +343,9 @@ UsbBotGetStatus (
                       &Result
                       );
     if (EFI_ERROR(Status)) {
-      DEBUG ((mUsbBotError, "UsbBotGetStatus (%r)\n", Status));
+      DEBUG ((EFI_D_ERROR, "UsbBotGetStatus (%r)\n", Status));
       if (USB_IS_ERROR (Result, EFI_USB_ERR_STALL)) {
-        DEBUG ((mUsbBotError, "UsbBotGetStatus: DataIn Stall\n"));
+        DEBUG ((EFI_D_ERROR, "UsbBotGetStatus: DataIn Stall\n"));
         UsbClearEndpointStall (UsbIo, Endpoint);
       }
       continue;
@@ -358,13 +355,13 @@ UsbBotGetStatus (
       //
       // Invalid Csw need perform reset recovery
       //
-      DEBUG ((mUsbBotError, "UsbBotGetStatus: Device return a invalid signature\n"));
+      DEBUG ((EFI_D_ERROR, "UsbBotGetStatus: Device return a invalid signature\n"));
       Status = UsbBotResetDevice (UsbBot, FALSE);
     } else if (Csw.CmdStatus == USB_BOT_COMMAND_ERROR) {
       //
       // Respond phase error need perform reset recovery
       //
-      DEBUG ((mUsbBotError, "UsbBotGetStatus: Device return a phase error\n"));
+      DEBUG ((EFI_D_ERROR, "UsbBotGetStatus: Device return a phase error\n"));
       Status = UsbBotResetDevice (UsbBot, FALSE);
     } else {
 
@@ -426,7 +423,7 @@ UsbBotExecCommand (
   //
   Status = UsbBotSendCommand (UsbBot, Cmd, CmdLen, DataDir, DataLen);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbBotError, "UsbBotExecCommand: UsbBotSendCommand (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBotExecCommand: UsbBotSendCommand (%r)\n", Status));
     return Status;
   }
 
@@ -443,7 +440,7 @@ UsbBotExecCommand (
   //
   Status = UsbBotGetStatus (UsbBot, DataLen, &Result);
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbBotError, "UsbBotExecCommand: UsbBotGetStatus (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBotExecCommand: UsbBotGetStatus (%r)\n", Status));
     return Status;
   }
 
@@ -512,7 +509,7 @@ UsbBotResetDevice (
                             );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((mUsbBotError, "UsbBotResetDevice: (%r)\n", Status));
+    DEBUG ((EFI_D_ERROR, "UsbBotResetDevice: (%r)\n", Status));
     return Status;
   }
 
