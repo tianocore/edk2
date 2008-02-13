@@ -157,9 +157,9 @@ GetEdkToolsPathBinDirectory() {
   #
   BIN_SUB_DIR=`GetBaseToolsBinSubDir`
 
-  if [ -e $EDK_TOOLS_PATH/PseudoBin/$BIN_SUB_DIR ]
+  if [ -e $EDK_TOOLS_PATH/BinWrappers/$BIN_SUB_DIR ]
   then
-    EDK_TOOLS_PATH_BIN=$EDK_TOOLS_PATH/PseudoBin/$BIN_SUB_DIR
+    EDK_TOOLS_PATH_BIN=$EDK_TOOLS_PATH/BinWrappers/$BIN_SUB_DIR
   else
     EDK_TOOLS_PATH_BIN=$EDK_TOOLS_PATH/Bin/$BIN_SUB_DIR
   fi
