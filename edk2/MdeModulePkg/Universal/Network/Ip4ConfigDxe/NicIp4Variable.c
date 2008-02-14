@@ -129,7 +129,7 @@ Ip4ConfigReadVariable (
     goto REMOVE_VARIABLE;
   }
 
-  Variable = NetAllocatePool (Size);
+  Variable = AllocatePool (Size);
 
   if (Variable == NULL) {
     return NULL;
@@ -167,7 +167,7 @@ REMOVE_VARIABLE:
 
 ON_ERROR:
   if (Variable != NULL) {
-    NetFreePool (Variable);
+    gBS->FreePool (Variable);
   }
 
   return NULL;
@@ -234,7 +234,7 @@ Ip4ConfigFindNicVariable (
     //
     // Copy the data to Temp to avoid the alignment problems
     //
-    NetCopyMem (&Temp, Cur, sizeof (NIC_IP4_CONFIG_INFO));
+    CopyMem (&Temp, Cur, sizeof (NIC_IP4_CONFIG_INFO));
     Len = SIZEOF_NIC_IP4_CONFIG_INFO (&Temp);
 
     //
@@ -242,13 +242,13 @@ Ip4ConfigFindNicVariable (
     // a block of memory then copy it out.
     //
     if (NIC_ADDR_EQUAL (&Temp.NicAddr, NicAddr)) {
-      Config = NetAllocatePool (Len);
+      Config = AllocatePool (Len);
 
       if (Config == NULL) {
         return NULL;
       }
 
-      NetCopyMem (Config, Cur, Len);
+      CopyMem (Config, Cur, Len);
       return Config;
     }
 
@@ -311,7 +311,7 @@ Ip4ConfigModifyVariable (
 
     if (Old != NULL) {
       TotalLen -= SIZEOF_NIC_IP4_CONFIG_INFO (Old);
-      NetFreePool (Old);
+      gBS->FreePool (Old);
     }
 
     if (Config != NULL) {
@@ -338,7 +338,7 @@ Ip4ConfigModifyVariable (
 
   ASSERT (TotalLen >= sizeof (IP4_CONFIG_VARIABLE));
 
-  NewVar = NetAllocateZeroPool (TotalLen);
+  NewVar = AllocateZeroPool (TotalLen);
 
   if (NewVar == NULL) {
     return NULL;
@@ -352,11 +352,11 @@ Ip4ConfigModifyVariable (
   Next = (UINT8 *)&NewVar->ConfigInfo;
 
   for (Index = 0; Index < Count; Index++) {
-    NetCopyMem (&Temp, Cur, sizeof (NIC_IP4_CONFIG_INFO));
+    CopyMem (&Temp, Cur, sizeof (NIC_IP4_CONFIG_INFO));
     Len = SIZEOF_NIC_IP4_CONFIG_INFO (&Temp);
 
     if (!NIC_ADDR_EQUAL (&Temp.NicAddr, NicAddr)) {
-      NetCopyMem (Next, Cur, Len);
+      CopyMem (Next, Cur, Len);
       Next += Len;
       NewVar->Count++;
     }
@@ -372,7 +372,7 @@ Ip4ConfigModifyVariable (
   if (Config != NULL) {
     Len = SIZEOF_NIC_IP4_CONFIG_INFO (Config);
 
-    NetCopyMem (Next, Config, Len);
+    CopyMem (Next, Config, Len);
     NewVar->Count++;
   }
 

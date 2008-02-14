@@ -108,7 +108,7 @@ Ip4ProcessIcmpRedirect (
   IN IP4_ICMP_ERROR_HEAD    *Icmp
   )
 {
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IP4_PROTOCOL              *Ip4Instance;
   IP4_ROUTE_CACHE_ENTRY     *CacheEntry;
   IP4_INTERFACE             *IpIf;

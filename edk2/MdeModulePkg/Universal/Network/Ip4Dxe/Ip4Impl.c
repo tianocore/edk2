@@ -57,7 +57,7 @@ EfiIp4GetModeData (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl     = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl     = gBS->RaiseTPL (TPL_CALLBACK);
   IpInstance = IP4_INSTANCE_FROM_PROTOCOL (This);
   IpSb       = IpInstance->Service;
 
@@ -89,10 +89,10 @@ EfiIp4GetModeData (
       Config  = &Ip4ModeData->ConfigData;
 
       Ip = HTONL (IpInstance->Interface->Ip);
-      NetCopyMem (&Config->StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Config->StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
       Ip = HTONL (IpInstance->Interface->SubnetMask);
-      NetCopyMem (&Config->SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Config->SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
       Ip4ModeData->IsConfigured = IpInstance->Interface->Configured;
 
@@ -102,7 +102,7 @@ EfiIp4GetModeData (
       Status = Ip4BuildEfiRouteTable (IpInstance);
 
       if (EFI_ERROR (Status)) {
-        NET_RESTORE_TPL (OldTpl);
+        gBS->RestoreTPL (OldTpl);
         return Status;
       }
 
@@ -119,7 +119,7 @@ EfiIp4GetModeData (
     CopyMem (SnpModeData, &IpSb->SnpMode, sizeof (*SnpModeData));
   }
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 }
 
@@ -148,8 +148,8 @@ Ip4ServiceConfigMnp (
   IN BOOLEAN                Force
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *ProtoEntry;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *ProtoEntry;
   IP4_INTERFACE             *IpIf;
   IP4_PROTOCOL              *IpInstance;
   BOOLEAN                   Reconfig;
@@ -271,7 +271,7 @@ Ip4AutoConfigCallBackDpc (
       Ip4FreeRouteTable (IpSb->DefaultRouteTable);
 
       IpSb->DefaultInterface  = IpIf;
-      NetListInsertHead (&IpSb->Interfaces, &IpIf->Link);
+      InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
 
       IpSb->DefaultRouteTable = RouteTable;
       Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
@@ -291,7 +291,7 @@ Ip4AutoConfigCallBackDpc (
     return ;
   }
 
-  Data = NetAllocatePool (Len);
+  Data = AllocatePool (Len);
 
   if (Data == NULL) {
     return ;
@@ -355,7 +355,7 @@ Ip4AutoConfigCallBackDpc (
   Ip4SetVariableData (IpSb);
 
 ON_EXIT:
-  NetFreePool (Data);
+  gBS->FreePool (Data);
 }
 
 VOID
@@ -421,7 +421,7 @@ Ip4StartAutoConfig (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_LOCK,
+                  TPL_CALLBACK,
                   Ip4AutoConfigCallBack,
                   IpSb,
                   &IpSb->DoneEvent
@@ -433,7 +433,7 @@ Ip4StartAutoConfig (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   Ip4AutoConfigCallBack,
                   IpSb,
                   &IpSb->ReconfigEvent
@@ -506,21 +506,21 @@ Ip4InitProtocol (
 {
   ASSERT ((IpSb != NULL) && (IpInstance != NULL));
 
-  NetZeroMem (IpInstance, sizeof (IP4_PROTOCOL));
+  ZeroMem (IpInstance, sizeof (IP4_PROTOCOL));
 
   IpInstance->Signature = IP4_PROTOCOL_SIGNATURE;
   CopyMem (&IpInstance->Ip4Proto, &mEfiIp4ProtocolTemplete, sizeof (IpInstance->Ip4Proto));
   IpInstance->State     = IP4_STATE_UNCONFIGED;
   IpInstance->Service   = IpSb;
 
-  NetListInit (&IpInstance->Link);
+  InitializeListHead (&IpInstance->Link);
   NetMapInit  (&IpInstance->RxTokens);
   NetMapInit  (&IpInstance->TxTokens);
-  NetListInit (&IpInstance->Received);
-  NetListInit (&IpInstance->Delivered);
-  NetListInit (&IpInstance->AddrLink);
+  InitializeListHead (&IpInstance->Received);
+  InitializeListHead (&IpInstance->Delivered);
+  InitializeListHead (&IpInstance->AddrLink);
 
-  NET_RECYCLE_LOCK_INIT (&IpInstance->RecycleLock);
+  EfiInitializeLock (&IpInstance->RecycleLock, TPL_NOTIFY);
 }
 
 
@@ -589,8 +589,8 @@ Ip4ConfigProtocol (
   //
   // Set up the interface.
   //
-  NetCopyMem (&Ip, &Config->StationAddress, sizeof (IP4_ADDR));
-  NetCopyMem (&Netmask, &Config->SubnetMask, sizeof (IP4_ADDR));
+  CopyMem (&Ip, &Config->StationAddress, sizeof (IP4_ADDR));
+  CopyMem (&Netmask, &Config->SubnetMask, sizeof (IP4_ADDR));
 
   Ip      = NTOHL (Ip);
   Netmask = NTOHL (Netmask);
@@ -621,7 +621,7 @@ Ip4ConfigProtocol (
         goto ON_ERROR;
       }
 
-      NetListInsertTail (&IpSb->Interfaces, &IpIf->Link);
+      InsertTailList (&IpSb->Interfaces, &IpIf->Link);
     }
 
     //
@@ -657,7 +657,7 @@ Ip4ConfigProtocol (
   }
 
   IpInstance->Interface = IpIf;
-  NetListInsertTail (&IpIf->IpInstances, &IpInstance->AddrLink);
+  InsertTailList (&IpIf->IpInstances, &IpInstance->AddrLink);
 
   CopyMem (&IpInstance->ConfigData, Config, sizeof (IpInstance->ConfigData));
   IpInstance->State       = IP4_STATE_CONFIGED;
@@ -707,12 +707,12 @@ Ip4CleanProtocol (
   // user forgets to recycle the packets, or because the callback
   // hasn't been called. Just leave it alone.
   //
-  if (!NetListIsEmpty (&IpInstance->Delivered)) {
+  if (!IsListEmpty (&IpInstance->Delivered)) {
     ;
   }
 
   if (IpInstance->Interface != NULL) {
-    NetListRemoveEntry (&IpInstance->AddrLink);
+    RemoveEntryList (&IpInstance->AddrLink);
     Ip4FreeInterface (IpInstance->Interface, IpInstance);
     IpInstance->Interface = NULL;
   }
@@ -727,13 +727,13 @@ Ip4CleanProtocol (
   }
 
   if (IpInstance->EfiRouteTable != NULL) {
-    NetFreePool (IpInstance->EfiRouteTable);
+    gBS->FreePool (IpInstance->EfiRouteTable);
     IpInstance->EfiRouteTable = NULL;
     IpInstance->EfiRouteCount = 0;
   }
 
   if (IpInstance->Groups != NULL) {
-    NetFreePool (IpInstance->Groups);
+    gBS->FreePool (IpInstance->Groups);
     IpInstance->Groups      = NULL;
     IpInstance->GroupCount  = 0;
   }
@@ -845,7 +845,7 @@ EfiIp4Configure (
   }
 
   IpInstance = IP4_INSTANCE_FROM_PROTOCOL (This);
-  OldTpl     = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl     = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Validate the configuration first.
@@ -860,8 +860,8 @@ EfiIp4Configure (
     }
 
 
-    NetCopyMem (&IpAddress, &IpConfigData->StationAddress, sizeof (IP4_ADDR));
-    NetCopyMem (&SubnetMask, &IpConfigData->SubnetMask, sizeof (IP4_ADDR));
+    CopyMem (&IpAddress, &IpConfigData->StationAddress, sizeof (IP4_ADDR));
+    CopyMem (&SubnetMask, &IpConfigData->SubnetMask, sizeof (IP4_ADDR));
 
     IpAddress  = NTOHL (IpAddress);
     SubnetMask = NTOHL (SubnetMask);
@@ -935,7 +935,7 @@ EfiIp4Configure (
   Ip4SetVariableData (IpInstance->Service);
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 
 }
@@ -973,7 +973,7 @@ Ip4Groups (
   // host byte order
   //
   if (JoinFlag) {
-    NetCopyMem (&Group, GroupAddress, sizeof (IP4_ADDR));
+    CopyMem (&Group, GroupAddress, sizeof (IP4_ADDR));
 
     for (Index = 0; Index < IpInstance->GroupCount; Index++) {
       if (IpInstance->Groups[Index] == Group) {
@@ -988,12 +988,12 @@ Ip4Groups (
     }
 
     if (EFI_ERROR (Ip4JoinGroup (IpInstance, NTOHL (Group)))) {
-      NetFreePool (Members);
+      gBS->FreePool (Members);
       return EFI_DEVICE_ERROR;
     }
 
     if (IpInstance->Groups != NULL) {
-      NetFreePool (IpInstance->Groups);
+      gBS->FreePool (IpInstance->Groups);
     }
 
     IpInstance->Groups = Members;
@@ -1021,7 +1021,7 @@ Ip4Groups (
       if (IpInstance->GroupCount == 0) {
         ASSERT (Index == 1);
 
-        NetFreePool (IpInstance->Groups);
+        gBS->FreePool (IpInstance->Groups);
         IpInstance->Groups = NULL;
       }
 
@@ -1069,7 +1069,7 @@ EfiIp4Groups (
   }
 
   if (GroupAddress != NULL) {
-    NetCopyMem (&McastIp, GroupAddress, sizeof (IP4_ADDR));
+    CopyMem (&McastIp, GroupAddress, sizeof (IP4_ADDR));
 
     if (!IP4_IS_MULTICAST (NTOHL (McastIp))) {
       return EFI_INVALID_PARAMETER;
@@ -1077,7 +1077,7 @@ EfiIp4Groups (
   }
 
   IpInstance = IP4_INSTANCE_FROM_PROTOCOL (This);
-  OldTpl     = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl     = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (IpInstance->State != IP4_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
@@ -1092,7 +1092,7 @@ EfiIp4Groups (
   Status = Ip4Groups (IpInstance, JoinFlag, GroupAddress);
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -1140,7 +1140,7 @@ EfiIp4Routes (
   }
 
   IpInstance = IP4_INSTANCE_FROM_PROTOCOL (This);
-  OldTpl     = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl     = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (IpInstance->State != IP4_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
@@ -1152,9 +1152,9 @@ EfiIp4Routes (
     goto ON_EXIT;
   }
 
-  NetCopyMem (&Dest, SubnetAddress, sizeof (IP4_ADDR));
-  NetCopyMem (&Netmask, SubnetMask, sizeof (IP4_ADDR));
-  NetCopyMem (&Nexthop, GatewayAddress, sizeof (IP4_ADDR));
+  CopyMem (&Dest, SubnetAddress, sizeof (IP4_ADDR));
+  CopyMem (&Netmask, SubnetMask, sizeof (IP4_ADDR));
+  CopyMem (&Nexthop, GatewayAddress, sizeof (IP4_ADDR));
 
   Dest    = NTOHL (Dest);
   Netmask = NTOHL (Netmask);
@@ -1185,7 +1185,7 @@ EfiIp4Routes (
   }
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -1301,8 +1301,8 @@ Ip4TxTokenValid (
   if (TxData->OverrideData) {
     Override = TxData->OverrideData;
 
-    NetCopyMem (&Src, &Override->SourceAddress, sizeof (IP4_ADDR));
-    NetCopyMem (&Gateway, &Override->GatewayAddress, sizeof (IP4_ADDR));
+    CopyMem (&Src, &Override->SourceAddress, sizeof (IP4_ADDR));
+    CopyMem (&Gateway, &Override->GatewayAddress, sizeof (IP4_ADDR));
 
     Src     = NTOHL (Src);
     Gateway = NTOHL (Gateway);
@@ -1395,7 +1395,7 @@ Ip4FreeTxToken (
     NetLibDispatchDpc ();
   }
 
-  NetFreePool (Wrap);
+  gBS->FreePool (Wrap);
 }
 
 
@@ -1490,7 +1490,7 @@ EfiIp4Transmit (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl  = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
 
   IpSb    = IpInstance->Service;
   IpIf    = IpInstance->Interface;
@@ -1524,7 +1524,7 @@ EfiIp4Transmit (
   //
   TxData = Token->Packet.TxData;
 
-  NetCopyMem (&Head.Dst, &TxData->DestinationAddress, sizeof (IP4_ADDR));
+  CopyMem (&Head.Dst, &TxData->DestinationAddress, sizeof (IP4_ADDR));
   Head.Dst = NTOHL (Head.Dst);
 
   if (TxData->OverrideData) {
@@ -1534,8 +1534,8 @@ EfiIp4Transmit (
     Head.Ttl      = Override->TimeToLive;
     DontFragment  = Override->DoNotFragment;
 
-    NetCopyMem (&Head.Src, &Override->SourceAddress, sizeof (IP4_ADDR));
-    NetCopyMem (&GateWay, &Override->GatewayAddress, sizeof (IP4_ADDR));
+    CopyMem (&Head.Src, &Override->SourceAddress, sizeof (IP4_ADDR));
+    CopyMem (&GateWay, &Override->GatewayAddress, sizeof (IP4_ADDR));
 
     Head.Src = NTOHL (Head.Src);
     GateWay  = NTOHL (GateWay);
@@ -1564,7 +1564,7 @@ EfiIp4Transmit (
   // a IP4_TXTOKEN_WRAP and the data in a netbuf
   //
   Status = EFI_OUT_OF_RESOURCES;
-  Wrap   = NetAllocatePool (sizeof (IP4_TXTOKEN_WRAP));
+  Wrap   = AllocatePool (sizeof (IP4_TXTOKEN_WRAP));
   if (Wrap == NULL) {
     goto ON_EXIT;
   }
@@ -1583,7 +1583,7 @@ EfiIp4Transmit (
                         );
 
   if (Wrap->Packet == NULL) {
-    NetFreePool (Wrap);
+    gBS->FreePool (Wrap);
     goto ON_EXIT;
   }
 
@@ -1623,7 +1623,7 @@ EfiIp4Transmit (
   }
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -1665,24 +1665,12 @@ EfiIp4Receive (
 
   IpInstance = IP4_INSTANCE_FROM_PROTOCOL (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (IpInstance->State != IP4_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
-
-  //
-  // Current Udp implementation creates an IP child for each Udp child.
-  // It initates a asynchronous receive immediately no matter whether
-  // there is no mapping or not. Disable this for now.
-  //
-#if 0
-  if (Config->UseDefaultAddress && IP4_NO_MAPPING (IpInstance)) {
-    Status = EFI_NO_MAPPING;
-    goto ON_EXIT;
-  }
-#endif
 
   //
   // Check whether the toke is already on the receive queue.
@@ -1712,7 +1700,7 @@ EfiIp4Receive (
   NetLibDispatchDpc ();
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -1931,7 +1919,7 @@ EfiIp4Cancel (
 
   IpInstance = IP4_INSTANCE_FROM_PROTOCOL (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (IpInstance->State != IP4_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
@@ -1946,7 +1934,7 @@ EfiIp4Cancel (
   Status = Ip4Cancel (IpInstance, Token);
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 

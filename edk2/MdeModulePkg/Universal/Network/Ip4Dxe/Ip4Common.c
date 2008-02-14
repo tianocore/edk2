@@ -80,7 +80,7 @@ Ip4GetHostCast (
   IN  IP4_ADDR          Src
   )
 {
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   IP4_INTERFACE         *IpIf;
   INTN                  Type;
   INTN                  Class;
@@ -146,7 +146,7 @@ Ip4FindInterface (
   IN IP4_ADDR           Ip
   )
 {
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   IP4_INTERFACE         *IpIf;
 
   NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
@@ -176,7 +176,7 @@ Ip4FindNet (
   IN IP4_ADDR           Ip
   )
 {
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   IP4_INTERFACE         *IpIf;
 
   NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
@@ -208,7 +208,7 @@ Ip4FindStationAddress (
   IN IP4_ADDR           Netmask
   )
 {
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *Entry;
   IP4_INTERFACE   *IpIf;
 
   NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
@@ -290,7 +290,7 @@ Ip4SetVariableData (
   )
 {
   UINT32                 NumConfiguredInstance;
-  NET_LIST_ENTRY         *Entry;
+  LIST_ENTRY             *Entry;
   UINTN                  VariableDataSize;
   EFI_IP4_VARIABLE_DATA  *Ip4VariableData;
   EFI_IP4_ADDRESS_PAIR   *Ip4AddressPair;
@@ -322,7 +322,7 @@ Ip4SetVariableData (
     VariableDataSize += sizeof (EFI_IP4_ADDRESS_PAIR) * (NumConfiguredInstance - 1);
   }
 
-  Ip4VariableData = NetAllocatePool (VariableDataSize);
+  Ip4VariableData = AllocatePool (VariableDataSize);
   if (Ip4VariableData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -372,7 +372,7 @@ Ip4SetVariableData (
              );
     }
 
-    NetFreePool (IpSb->MacString);
+    gBS->FreePool (IpSb->MacString);
   }
 
   IpSb->MacString = NewMacString;
@@ -387,7 +387,7 @@ Ip4SetVariableData (
 
 ON_ERROR:
 
-  NetFreePool (Ip4VariableData);
+  gBS->FreePool (Ip4VariableData);
 
   return Status;
 }
@@ -416,6 +416,6 @@ Ip4ClearVariableData (
          NULL
          );
 
-  NetFreePool (IpSb->MacString);
+  gBS->FreePool (IpSb->MacString);
   IpSb->MacString = NULL;
 }

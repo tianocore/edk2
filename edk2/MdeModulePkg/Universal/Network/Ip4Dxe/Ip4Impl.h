@@ -103,7 +103,7 @@ typedef struct {
 // fragments will be freed at last.
 //
 typedef struct {
-  NET_LIST_ENTRY            Link;
+  LIST_ENTRY                Link;
   IP4_PROTOCOL              *IpInstance;
   NET_BUF                   *Packet;
   EFI_IP4_RECEIVE_DATA      RxData;
@@ -117,15 +117,15 @@ struct _IP4_PROTOCOL {
   INTN                      State;
 
   IP4_SERVICE               *Service;
-  NET_LIST_ENTRY            Link; // Link to all the IP protocol from the service
+  LIST_ENTRY                Link; // Link to all the IP protocol from the service
 
   //
   // User's transmit/receive tokens, and received/deliverd packets
   //
   NET_MAP                   RxTokens;
   NET_MAP                   TxTokens;   // map between (User's Token, IP4_TXTOKE_WRAP)
-  NET_LIST_ENTRY            Received;   // Received but not delivered packet
-  NET_LIST_ENTRY            Delivered;  // Delivered and to be recycled packets
+  LIST_ENTRY                Received;   // Received but not delivered packet
+  LIST_ENTRY                Delivered;  // Delivered and to be recycled packets
   EFI_LOCK                  RecycleLock;
 
   //
@@ -134,7 +134,7 @@ struct _IP4_PROTOCOL {
   // is used to communicate the current route info to the upper layer.
   //
   IP4_INTERFACE             *Interface;
-  NET_LIST_ENTRY            AddrLink;   // Ip instances with the same IP address.
+  LIST_ENTRY                AddrLink;   // Ip instances with the same IP address.
   IP4_ROUTE_TABLE           *RouteTable;
 
   EFI_IP4_ROUTE_TABLE       *EfiRouteTable;
@@ -161,9 +161,9 @@ struct _IP4_SERVICE {
   // interface and route table and caches.
   //
   UINTN                           NumChildren;
-  NET_LIST_ENTRY                  Children;
+  LIST_ENTRY                      Children;
 
-  NET_LIST_ENTRY                  Interfaces;
+  LIST_ENTRY                      Interfaces;
 
   IP4_INTERFACE                   *DefaultInterface;
   IP4_ROUTE_TABLE                 *DefaultRouteTable;

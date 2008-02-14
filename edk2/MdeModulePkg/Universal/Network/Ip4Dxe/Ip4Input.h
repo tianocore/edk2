@@ -54,7 +54,7 @@ typedef struct {
 // Structure used to assemble IP packets.
 //
 typedef struct {
-  NET_LIST_ENTRY            Link;
+  LIST_ENTRY                Link;
 
   //
   // Identity of one IP4 packet. Each fragment of a packet has
@@ -67,7 +67,7 @@ typedef struct {
 
   INTN                      TotalLen;
   INTN                      CurLen;
-  NET_LIST_ENTRY            Fragments;  // List of all the fragments of this packet
+  LIST_ENTRY                Fragments;  // List of all the fragments of this packet
 
   IP4_HEAD                  *Head;      // IP head of the first fragment
   IP4_CLIP_INFO             *Info;      // Per packet info of the first fragment
@@ -80,7 +80,7 @@ typedef struct {
 // as hash table.
 //
 typedef struct {
-  NET_LIST_ENTRY  Bucket[IP4_ASSEMLE_HASH_SIZE];
+  LIST_ENTRY      Bucket[IP4_ASSEMLE_HASH_SIZE];
 } IP4_ASSEMBLE_TABLE;
 
 #define IP4_GET_CLIP_INFO(Packet) ((IP4_CLIP_INFO *) ((Packet)->ProtoData))

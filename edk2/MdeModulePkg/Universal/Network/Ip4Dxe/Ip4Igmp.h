@@ -38,7 +38,7 @@ typedef struct {
 // "idle member" state.
 //
 typedef struct {
-  NET_LIST_ENTRY          Link;
+  LIST_ENTRY              Link;
   INTN                    RefCnt;
   IP4_ADDR                Address;
   INTN                    DelayTime;
@@ -53,7 +53,7 @@ typedef struct {
 //
 typedef struct {
   INTN                    Igmpv1QuerySeen;
-  NET_LIST_ENTRY          Groups;
+  LIST_ENTRY              Groups;
 } IGMP_SERVICE_DATA;
 
 enum {

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -142,7 +142,7 @@ ArpCreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   ArpOnFrameRcvd,
                   ArpService,
                   &ArpService->RxToken.Event
@@ -156,7 +156,7 @@ ArpCreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   ArpTimerHandler,
                   ArpService,
                   &ArpService->PeriodicTimer
@@ -180,10 +180,10 @@ ArpCreateService (
   //
   // Init the lists.
   //
-  NetListInit (&ArpService->ChildrenList);
-  NetListInit (&ArpService->PendingRequestTable);
-  NetListInit (&ArpService->DeniedCacheTable);
-  NetListInit (&ArpService->ResolvedCacheTable);
+  InitializeListHead (&ArpService->ChildrenList);
+  InitializeListHead (&ArpService->PendingRequestTable);
+  InitializeListHead (&ArpService->DeniedCacheTable);
+  InitializeListHead (&ArpService->ResolvedCacheTable);
 
 ERROR_EXIT:
 
@@ -332,7 +332,7 @@ ArpDriverBindingStart (
   //
   // Allocate a zero pool for ArpService.
   //
-  ArpService = NetAllocateZeroPool (sizeof(ARP_SERVICE_DATA));
+  ArpService = AllocateZeroPool (sizeof(ARP_SERVICE_DATA));
   if (ArpService == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -374,7 +374,7 @@ ERROR:
   // On error, clean the arp service context data, and free the memory allocated.
   //
   ArpCleanService (ArpService);
-  NetFreePool (ArpService);
+  gBS->FreePool (ArpService);
 
   return Status;
 }
@@ -428,7 +428,7 @@ ArpDriverBindingStop (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    ARP_DEBUG_ERROR (("ArpDriverBindingStop: Open ArpSb failed, %r.\n", Status));
+    DEBUG ((EFI_D_ERROR, "ArpDriverBindingStop: Open ArpSb failed, %r.\n", Status));
     return EFI_DEVICE_ERROR;
   }
 
@@ -450,18 +450,18 @@ ArpDriverBindingStop (
     //
     ArpCleanService (ArpService);
 
-    NetFreePool (ArpService);
+    gBS->FreePool (ArpService);
   } else {
 
-    while (!NetListIsEmpty (&ArpService->ChildrenList)) {
+    while (!IsListEmpty (&ArpService->ChildrenList)) {
       Instance = NET_LIST_HEAD (&ArpService->ChildrenList, ARP_INSTANCE_DATA, List);
 
       ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
     }
 
-    ASSERT (NetListIsEmpty (&ArpService->PendingRequestTable));
-    ASSERT (NetListIsEmpty (&ArpService->DeniedCacheTable));
-    ASSERT (NetListIsEmpty (&ArpService->ResolvedCacheTable));
+    ASSERT (IsListEmpty (&ArpService->PendingRequestTable));
+    ASSERT (IsListEmpty (&ArpService->DeniedCacheTable));
+    ASSERT (IsListEmpty (&ArpService->ResolvedCacheTable));
   }
 
   return EFI_SUCCESS;
@@ -505,9 +505,9 @@ ArpServiceBindingCreateChild (
   //
   // Allocate memory for the instance context data.
   //
-  Instance = NetAllocateZeroPool (sizeof(ARP_INSTANCE_DATA));
+  Instance = AllocateZeroPool (sizeof(ARP_INSTANCE_DATA));
   if (Instance == NULL) {
-    ARP_DEBUG_ERROR (("ArpSBCreateChild: Failed to allocate memory for Instance.\n"));
+    DEBUG ((EFI_D_ERROR, "ArpSBCreateChild: Failed to allocate memory for Instance.\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
@@ -527,9 +527,9 @@ ArpServiceBindingCreateChild (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    ARP_DEBUG_ERROR (("ArpSBCreateChild: faild to install ARP protocol, %r.\n", Status));
+    DEBUG ((EFI_D_ERROR, "ArpSBCreateChild: faild to install ARP protocol, %r.\n", Status));
 
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
     return Status;
   }
 
@@ -553,15 +553,15 @@ ArpServiceBindingCreateChild (
     goto ERROR;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Insert the instance into children list managed by the arp service context data.
   //
-  NetListInsertTail (&ArpService->ChildrenList, &Instance->List);
+  InsertTailList (&ArpService->ChildrenList, &Instance->List);
   ArpService->ChildrenNumber++;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
 ERROR:
 
@@ -584,7 +584,7 @@ ERROR:
     //
     // Free the allocated memory.
     //
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
   }
 
   return Status;
@@ -672,14 +672,14 @@ ArpServiceBindingDestroyChild (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    ARP_DEBUG_ERROR (("ArpSBDestroyChild: Failed to uninstall the arp protocol, %r.\n",
+    DEBUG ((EFI_D_ERROR, "ArpSBDestroyChild: Failed to uninstall the arp protocol, %r.\n",
       Status));
 
     Instance->Destroyed = FALSE;
     return Status;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (Instance->Configured) {
     //
@@ -696,12 +696,12 @@ ArpServiceBindingDestroyChild (
   //
   // Remove this instance from the ChildrenList.
   //
-  NetListRemoveEntry (&Instance->List);
+  RemoveEntryList (&Instance->List);
   ArpService->ChildrenNumber--;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
-  NetFreePool (Instance);
+  gBS->FreePool (Instance);
 
   return Status;
 }

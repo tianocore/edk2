@@ -80,7 +80,7 @@ Udp4GetModeData (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (Udp4ConfigData != NULL) {
     //
@@ -96,7 +96,7 @@ Udp4GetModeData (
   //
   Status = Ip->GetModeData (Ip, Ip4ModeData, MnpConfigData, SnpModeData);
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -169,13 +169,13 @@ Udp4Configure (
   Udp4Service = Instance->Udp4Service;
   Status      = EFI_SUCCESS;
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (UdpConfigData != NULL) {
 
-    NetCopyMem (&StationAddress, &UdpConfigData->StationAddress, sizeof (IP4_ADDR));
-    NetCopyMem (&SubnetMask, &UdpConfigData->SubnetMask, sizeof (IP4_ADDR));
-    NetCopyMem (&RemoteAddress, &UdpConfigData->RemoteAddress, sizeof (IP4_ADDR));
+    CopyMem (&StationAddress, &UdpConfigData->StationAddress, sizeof (IP4_ADDR));
+    CopyMem (&SubnetMask, &UdpConfigData->SubnetMask, sizeof (IP4_ADDR));
+    CopyMem (&RemoteAddress, &UdpConfigData->RemoteAddress, sizeof (IP4_ADDR));
 
     StationAddress = NTOHL (StationAddress);
     SubnetMask     = NTOHL (SubnetMask);
@@ -258,8 +258,8 @@ Udp4Configure (
       //
       // Pre calculate the checksum for the pseudo head, ignore the UDP length first.
       //
-      NetCopyMem (&LocalAddr, &Instance->ConfigData.StationAddress, sizeof (IP4_ADDR));
-      NetCopyMem (&RemoteAddr, &Instance->ConfigData.RemoteAddress, sizeof (IP4_ADDR));
+      CopyMem (&LocalAddr, &Instance->ConfigData.StationAddress, sizeof (IP4_ADDR));
+      CopyMem (&RemoteAddr, &Instance->ConfigData.RemoteAddress, sizeof (IP4_ADDR));
       Instance->HeadSum = NetPseudoHeadChecksum (
                             LocalAddr,
                             RemoteAddr,
@@ -291,14 +291,14 @@ Udp4Configure (
     //
     Udp4FlushRcvdDgram (Instance);
 
-    ASSERT (NetListIsEmpty (&Instance->DeliveredDgramQue));
+    ASSERT (IsListEmpty (&Instance->DeliveredDgramQue));
   }
 
   Udp4SetVariableData (Instance->Udp4Service);
 
 ON_EXIT:
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -351,7 +351,7 @@ Udp4Groups (
 
   McastIp = 0;
   if (JoinFlag) {
-    NetCopyMem (&McastIp, MulticastAddress, sizeof (IP4_ADDR));
+    CopyMem (&McastIp, MulticastAddress, sizeof (IP4_ADDR));
 
     if (!IP4_IS_MULTICAST (NTOHL (McastIp))) {
       return EFI_INVALID_PARAMETER;
@@ -370,7 +370,7 @@ Udp4Groups (
 
   Ip = Instance->IpInfo->Ip;
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Invoke the Ip instance the Udp4 instance consumes to do the group operation.
@@ -397,7 +397,7 @@ Udp4Groups (
 
 ON_EXIT:
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -543,7 +543,7 @@ Udp4Transmit (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Validate the Token, if the token is invalid return the error code.
@@ -607,7 +607,7 @@ Udp4Transmit (
     // UdpSessionData.
     //
     if (!EFI_IP4_EQUAL (&UdpSessionData->SourceAddress, &mZeroIp4Addr)) {
-      NetCopyMem (&Override.SourceAddress, &UdpSessionData->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Override.SourceAddress, &UdpSessionData->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
     }
 
     if (UdpSessionData->SourcePort != 0) {
@@ -618,8 +618,8 @@ Udp4Transmit (
       Udp4Header->DstPort = HTONS (UdpSessionData->DestinationPort);
     }
 
-    NetCopyMem (&Source, &Override.SourceAddress, sizeof (IP4_ADDR));
-    NetCopyMem (&Destination, &UdpSessionData->DestinationAddress, sizeof (IP4_ADDR));
+    CopyMem (&Source, &Override.SourceAddress, sizeof (IP4_ADDR));
+    CopyMem (&Destination, &UdpSessionData->DestinationAddress, sizeof (IP4_ADDR));
 
     //
     // calculate the pseudo head checksum using the overridden parameters.
@@ -634,7 +634,7 @@ Udp4Transmit (
     //
     // UdpSessionData is NULL, use the address and port information previously configured.
     //
-    NetCopyMem (&Destination, &ConfigData->RemoteAddress, sizeof (IP4_ADDR));
+    CopyMem (&Destination, &ConfigData->RemoteAddress, sizeof (IP4_ADDR));
 
     HeadSum = Instance->HeadSum;
   }
@@ -654,9 +654,9 @@ Udp4Transmit (
   // Fill the IpIo Override data.
   //
   if (TxData->GatewayAddress != NULL) {
-    NetCopyMem (&Override.GatewayAddress, TxData->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Override.GatewayAddress, TxData->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
   } else {
-    NetZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    ZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
   }
 
   Override.Protocol                 = EFI_IP_PROTO_UDP;
@@ -697,7 +697,7 @@ FREE_PACKET:
 
 ON_EXIT:
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -755,7 +755,7 @@ Udp4Receive (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (EFI_ERROR (NetMapIterate (&Instance->RxTokens, Udp4TokenExist, Token))||
     EFI_ERROR (NetMapIterate (&Instance->TxTokens, Udp4TokenExist, Token))) {
@@ -795,7 +795,7 @@ Udp4Receive (
 
 ON_EXIT:
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -848,7 +848,7 @@ Udp4Cancel (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Cancle the tokens specified by Token for this instance.
@@ -860,7 +860,7 @@ Udp4Cancel (
   //
   NetLibDispatchDpc ();
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }

@@ -118,11 +118,11 @@ Tcp4GetMode (
 
     AccessPoint->UseDefaultAddress  = Tcb->UseDefaultAddr;
 
-    NetCopyMem (&AccessPoint->StationAddress, &Tcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&AccessPoint->StationAddress, &Tcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
     AccessPoint->SubnetMask         = Tcb->SubnetMask;
     AccessPoint->StationPort        = NTOHS (Tcb->LocalEnd.Port);
 
-    NetCopyMem (&AccessPoint->RemoteAddress, &Tcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&AccessPoint->RemoteAddress, &Tcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
     AccessPoint->RemotePort         = NTOHS (Tcb->RemoteEnd.Port);
     AccessPoint->ActiveFlag         = (BOOLEAN) (Tcb->State != TCP_LISTEN);
 
@@ -203,7 +203,7 @@ Tcp4Bind (
       if (mTcp4RandomPort <= TCP4_PORT_KNOWN) {
 
         if (Cycle) {
-          TCP4_DEBUG_ERROR (("Tcp4Bind: no port can be allocated "
+          DEBUG ((EFI_D_ERROR, "Tcp4Bind: no port can be allocated "
             "for this pcb\n"));
 
           return EFI_OUT_OF_RESOURCES;
@@ -246,7 +246,7 @@ Tcp4FlushPcb (
   TcpProto = (TCP4_PROTO_DATA *) Sock->ProtoReserved;
 
   if (SOCK_IS_CONFIGURED (Sock)) {
-    NetListRemoveEntry (&Tcb->List);
+    RemoveEntryList (&Tcb->List);
 
     //
     // Uninstall the device path protocl.
@@ -256,7 +256,7 @@ Tcp4FlushPcb (
            &gEfiDevicePathProtocolGuid,
            Sock->DevicePath
            );
-    NetFreePool (Sock->DevicePath);
+    gBS->FreePool (Sock->DevicePath);
 
     TcpSetVariableData (TcpProto->TcpService);
   }
@@ -275,11 +275,11 @@ Tcp4AttachPcb (
   TCP4_PROTO_DATA   *ProtoData;
   IP_IO             *IpIo;
 
-  Tcb = NetAllocateZeroPool (sizeof (TCP_CB));
+  Tcb = AllocateZeroPool (sizeof (TCP_CB));
 
   if (Tcb == NULL) {
 
-    TCP4_DEBUG_ERROR (("Tcp4ConfigurePcb: failed to allocate a TCB\n"));
+    DEBUG ((EFI_D_ERROR, "Tcp4ConfigurePcb: failed to allocate a TCB\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
@@ -293,13 +293,13 @@ Tcp4AttachPcb (
   Tcb->IpInfo = IpIoAddIp (IpIo);
   if (Tcb->IpInfo == NULL) {
 
-    NetFreePool (Tcb);
+    gBS->FreePool (Tcb);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NetListInit (&Tcb->List);
-  NetListInit (&Tcb->SndQue);
-  NetListInit (&Tcb->RcvQue);
+  InitializeListHead (&Tcb->List);
+  InitializeListHead (&Tcb->SndQue);
+  InitializeListHead (&Tcb->RcvQue);
 
   Tcb->State        = TCP_CLOSED;
   Tcb->Sk           = Sk;
@@ -326,7 +326,7 @@ Tcp4DetachPcb (
 
   IpIoRemoveIp (ProtoData->TcpService->IpIo, Tcb->IpInfo);
 
-  NetFreePool (Tcb);
+  gBS->FreePool (Tcb);
 
   ProtoData->TcpPcb = NULL;
 }
@@ -397,7 +397,7 @@ Tcp4ConfigurePcb (
   Status = Tcp4Bind (&(CfgData->AccessPoint));
 
   if (EFI_ERROR (Status)) {
-    TCP4_DEBUG_ERROR (("Tcp4ConfigurePcb: Bind endpoint failed "
+    DEBUG ((EFI_D_ERROR, "Tcp4ConfigurePcb: Bind endpoint failed "
       "with %r\n", Status));
 
     goto OnExit;
@@ -407,8 +407,8 @@ Tcp4ConfigurePcb (
   // Initalize the operating information in this Tcb
   //
   ASSERT (Tcb->State == TCP_CLOSED &&
-    NetListIsEmpty (&Tcb->SndQue) &&
-    NetListIsEmpty (&Tcb->RcvQue));
+    IsListEmpty (&Tcb->SndQue) &&
+    IsListEmpty (&Tcb->RcvQue));
 
   TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_NO_KEEPALIVE);
   Tcb->State            = TCP_CLOSED;
@@ -440,12 +440,12 @@ Tcp4ConfigurePcb (
 
   Tcb->UseDefaultAddr = CfgData->AccessPoint.UseDefaultAddress;
 
-  NetCopyMem (&Tcb->LocalEnd.Ip, &CfgData->AccessPoint.StationAddress, sizeof (IP4_ADDR));
+  CopyMem (&Tcb->LocalEnd.Ip, &CfgData->AccessPoint.StationAddress, sizeof (IP4_ADDR));
   Tcb->LocalEnd.Port  = HTONS (CfgData->AccessPoint.StationPort);
   Tcb->SubnetMask     = CfgData->AccessPoint.SubnetMask;
 
   if (CfgData->AccessPoint.ActiveFlag) {
-    NetCopyMem (&Tcb->RemoteEnd.Ip, &CfgData->AccessPoint.RemoteAddress, sizeof (IP4_ADDR));
+    CopyMem (&Tcb->RemoteEnd.Ip, &CfgData->AccessPoint.RemoteAddress, sizeof (IP4_ADDR));
     Tcb->RemoteEnd.Port = HTONS (CfgData->AccessPoint.RemotePort);
   } else {
     Tcb->RemoteEnd.Ip   = 0;

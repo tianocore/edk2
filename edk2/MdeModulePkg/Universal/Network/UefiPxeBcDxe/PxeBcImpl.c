@@ -193,7 +193,7 @@ EfiPxeBcDhcp (
   //
   // Set the DHCP4 config data.
   //
-  NetZeroMem (&Dhcp4CfgData, sizeof (EFI_DHCP4_CONFIG_DATA));
+  ZeroMem (&Dhcp4CfgData, sizeof (EFI_DHCP4_CONFIG_DATA));
   Dhcp4CfgData.OptionCount      = OptCount;
   Dhcp4CfgData.OptionList       = OptList;
   Dhcp4CfgData.Dhcp4Callback    = PxeBcDhcpCallBack;
@@ -216,8 +216,8 @@ EfiPxeBcDhcp (
     //
     Private->NumOffers   = 0;
     Private->BootpIndex  = 0;
-    NetZeroMem (Private->ServerCount, sizeof (Private->ServerCount));
-    NetZeroMem (Private->ProxyIndex, sizeof (Private->ProxyIndex));
+    ZeroMem (Private->ServerCount, sizeof (Private->ServerCount));
+    ZeroMem (Private->ProxyIndex, sizeof (Private->ProxyIndex));
 
     Status = Dhcp4->Start (Dhcp4, NULL);
     if (EFI_ERROR (Status)) {
@@ -241,9 +241,9 @@ EfiPxeBcDhcp (
 
     ASSERT (Dhcp4Mode.State == Dhcp4Bound);
 
-    NetCopyMem (&Private->StationIp, &Dhcp4Mode.ClientAddress, sizeof (EFI_IPv4_ADDRESS));
-    NetCopyMem (&Private->SubnetMask, &Dhcp4Mode.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-    NetCopyMem (&Private->GatewayIp, &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Private->StationIp, &Dhcp4Mode.ClientAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Private->SubnetMask, &Dhcp4Mode.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Private->GatewayIp, &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
 
     //
     // Check the selected offer to see whether BINL is required, if no or BINL is
@@ -262,7 +262,7 @@ EfiPxeBcDhcp (
     //
     // Remove the previously configured option list and callback function
     //
-    NetZeroMem (&Dhcp4CfgData, sizeof (EFI_DHCP4_CONFIG_DATA));
+    ZeroMem (&Dhcp4CfgData, sizeof (EFI_DHCP4_CONFIG_DATA));
     Dhcp4->Configure (Dhcp4, &Dhcp4CfgData);
 
     Private->AddressIsOk = TRUE;
@@ -385,7 +385,7 @@ EfiPxeBcDiscover (
       //
       // Get the multicast discover ip address from vendor option.
       //
-      NetCopyMem (&DefaultInfo.ServerMCastIp.Addr, &VendorOpt->DiscoverMcastIp, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&DefaultInfo.ServerMCastIp.Addr, &VendorOpt->DiscoverMcastIp, sizeof (EFI_IPv4_ADDRESS));
     }
 
     DefaultInfo.IpCnt = 0;
@@ -444,7 +444,7 @@ EfiPxeBcDiscover (
       if (BootSvrEntry == NULL) {
         Private->ServerIp.Addr[0] = SrvList[Index].IpAddr.Addr[0];
       } else {
-        NetCopyMem (&Private->ServerIp, &BootSvrEntry->IpAddr[Index], sizeof (EFI_IPv4_ADDRESS));
+        CopyMem (&Private->ServerIp, &BootSvrEntry->IpAddr[Index], sizeof (EFI_IPv4_ADDRESS));
       }
 
       Status = PxeBcDiscvBootService (
@@ -497,7 +497,7 @@ EfiPxeBcDiscover (
   }
 
   if (Mode->PxeBisReplyReceived) {
-    NetCopyMem (&Private->ServerIp, &Mode->PxeReply.Dhcpv4.BootpSiAddr, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Private->ServerIp, &Mode->PxeReply.Dhcpv4.BootpSiAddr, sizeof (EFI_IPv4_ADDRESS));
   }
 
   return Status;
@@ -568,10 +568,10 @@ EfiPxeBcMtftp (
   Mtftp4Config.TimeoutValue      = PXEBC_MTFTP_TIMEOUT;
   Mtftp4Config.TryCount          = PXEBC_MTFTP_RETRIES;
 
-  NetCopyMem (&Mtftp4Config.StationIp, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Mtftp4Config.SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Mtftp4Config.GatewayIp, &Private->GatewayIp, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Mtftp4Config.ServerIp, ServerIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Mtftp4Config.StationIp, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Mtftp4Config.SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Mtftp4Config.GatewayIp, &Private->GatewayIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Mtftp4Config.ServerIp, ServerIp, sizeof (EFI_IPv4_ADDRESS));
 
   switch (Operation) {
 
@@ -769,13 +769,13 @@ EfiPxeBcUdpWrite (
   ZeroMem (&Token, sizeof (EFI_UDP4_COMPLETION_TOKEN));
   ZeroMem (&Udp4Session, sizeof (EFI_UDP4_SESSION_DATA));
 
-  NetCopyMem (&Udp4Session.DestinationAddress, DestIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Udp4Session.DestinationAddress, DestIp, sizeof (EFI_IPv4_ADDRESS));
   Udp4Session.DestinationPort = *DestPort;
-  NetCopyMem (&Udp4Session.SourceAddress, SrcIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Udp4Session.SourceAddress, SrcIp, sizeof (EFI_IPv4_ADDRESS));
   Udp4Session.SourcePort = *SrcPort;
 
   FragCount = (HeaderSize != NULL) ? 2 : 1;
-  Udp4TxData = (EFI_UDP4_TRANSMIT_DATA *) NetAllocatePool (sizeof (EFI_UDP4_TRANSMIT_DATA) + (FragCount - 1) * sizeof (EFI_UDP4_FRAGMENT_DATA));
+  Udp4TxData = (EFI_UDP4_TRANSMIT_DATA *) AllocatePool (sizeof (EFI_UDP4_TRANSMIT_DATA) + (FragCount - 1) * sizeof (EFI_UDP4_FRAGMENT_DATA));
   if (Udp4TxData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -799,7 +799,7 @@ EfiPxeBcUdpWrite (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   PxeBcCommonNotify,
                   &IsDone,
                   &Token.Event
@@ -826,7 +826,7 @@ ON_EXIT:
     gBS->CloseEvent (Token.Event);
   }
 
-  NetFreePool (Udp4TxData);
+  gBS->FreePool (Udp4TxData);
 
   return Status;
 }
@@ -928,7 +928,7 @@ EfiPxeBcUdpRead (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   PxeBcCommonNotify,
                   &IsDone,
                   &Token.Event
@@ -968,7 +968,7 @@ EfiPxeBcUdpRead (
       Matched = TRUE;
 
       if (DestIp != NULL) {
-        NetCopyMem (DestIp, &Session->DestinationAddress, sizeof (EFI_IPv4_ADDRESS));
+        CopyMem (DestIp, &Session->DestinationAddress, sizeof (EFI_IPv4_ADDRESS));
       }
     } else {
       if (DestIp != NULL) {
@@ -1006,7 +1006,7 @@ EfiPxeBcUdpRead (
       if (OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP) {
 
         if (SrcIp != NULL) {
-          NetCopyMem (SrcIp, &Session->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
+          CopyMem (SrcIp, &Session->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
         }
       } else {
 
@@ -1039,7 +1039,7 @@ EfiPxeBcUdpRead (
 
       if (HeaderSize != NULL) {
         CopyLen = MIN (*HeaderSize, RxData->DataLength);
-        NetCopyMem (HeaderPtr, RxData->FragmentTable[0].FragmentBuffer, CopyLen);
+        CopyMem (HeaderPtr, RxData->FragmentTable[0].FragmentBuffer, CopyLen);
         *HeaderSize = CopyLen;
       }
 
@@ -1049,7 +1049,7 @@ EfiPxeBcUdpRead (
       } else {
 
         *BufferSize = RxData->DataLength - CopyLen;
-        NetCopyMem (BufferPtr, (UINT8 *) RxData->FragmentTable[0].FragmentBuffer + CopyLen, *BufferSize);
+        CopyMem (BufferPtr, (UINT8 *) RxData->FragmentTable[0].FragmentBuffer + CopyLen, *BufferSize);
       }
     } else {
 
@@ -1397,27 +1397,27 @@ EfiPxeBcSetPackets (
   }
 
   if (NewDhcpDiscover != NULL) {
-    NetCopyMem (&Mode->DhcpDiscover, NewDhcpDiscover, sizeof (EFI_PXE_BASE_CODE_PACKET));
+    CopyMem (&Mode->DhcpDiscover, NewDhcpDiscover, sizeof (EFI_PXE_BASE_CODE_PACKET));
   }
 
   if (NewDhcpAck != NULL) {
-    NetCopyMem (&Mode->DhcpAck, NewDhcpAck, sizeof (EFI_PXE_BASE_CODE_PACKET));
+    CopyMem (&Mode->DhcpAck, NewDhcpAck, sizeof (EFI_PXE_BASE_CODE_PACKET));
   }
 
   if (NewProxyOffer != NULL) {
-    NetCopyMem (&Mode->ProxyOffer, NewProxyOffer, sizeof (EFI_PXE_BASE_CODE_PACKET));
+    CopyMem (&Mode->ProxyOffer, NewProxyOffer, sizeof (EFI_PXE_BASE_CODE_PACKET));
   }
 
   if (NewPxeDiscover != NULL) {
-    NetCopyMem (&Mode->PxeDiscover, NewPxeDiscover, sizeof (EFI_PXE_BASE_CODE_PACKET));
+    CopyMem (&Mode->PxeDiscover, NewPxeDiscover, sizeof (EFI_PXE_BASE_CODE_PACKET));
   }
 
   if (NewPxeReply != NULL) {
-    NetCopyMem (&Mode->PxeReply, NewPxeReply, sizeof (EFI_PXE_BASE_CODE_PACKET));
+    CopyMem (&Mode->PxeReply, NewPxeReply, sizeof (EFI_PXE_BASE_CODE_PACKET));
   }
 
   if (NewPxeBisReply != NULL) {
-    NetCopyMem (&Mode->PxeBisReply, NewPxeBisReply, sizeof (EFI_PXE_BASE_CODE_PACKET));
+    CopyMem (&Mode->PxeBisReply, NewPxeBisReply, sizeof (EFI_PXE_BASE_CODE_PACKET));
   }
 
   return EFI_SUCCESS;
@@ -1623,12 +1623,12 @@ DiscoverBootFile (
     Packet = &Private->Dhcp4Ack;
   }
 
-  NetCopyMem (&Private->ServerIp, &Packet->Packet.Offer.Dhcp4.Header.ServerAddr, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Private->ServerIp, &Packet->Packet.Offer.Dhcp4.Header.ServerAddr, sizeof (EFI_IPv4_ADDRESS));
   if (Private->ServerIp.Addr[0] == 0) {
     //
     // next server ip address is zero, use option 54 instead
     //
-    NetCopyMem (
+    CopyMem (
       &Private->ServerIp,
       Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID]->Data,
       sizeof (EFI_IPv4_ADDRESS)
@@ -1646,7 +1646,7 @@ DiscoverBootFile (
     //
     // Already have the bootfile length option, compute the file size
     //
-    NetCopyMem (&Value, Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_BOOTFILE_LEN]->Data, sizeof (Value));
+    CopyMem (&Value, Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_BOOTFILE_LEN]->Data, sizeof (Value));
     Value       = NTOHS (Value);
     *BufferSize = 512 * Value;
     Status      = EFI_BUFFER_TOO_SMALL;

@@ -107,11 +107,11 @@ typedef struct _IP_IO {
   //
   // the node used to link this IpIo to the active IpIo list.
   //
-  NET_LIST_ENTRY                Entry;
+  LIST_ENTRY                    Entry;
 
   // the list used to maintain the IP instance for different sending purpose.
   //
-  NET_LIST_ENTRY                IpList;
+  LIST_ENTRY                    IpList;
 
   //
   // the ip instance consumed by this IP IO
@@ -135,7 +135,7 @@ typedef struct _IP_IO {
   //
   // list entry used to link the token passed to IP_IO
   //
-  NET_LIST_ENTRY                PendingSndList;
+  LIST_ENTRY                    PendingSndList;
 
   //
   // User interface used to get notify from IP_IO
@@ -155,7 +155,7 @@ typedef struct _IP_IO_OPEN_DATA {
 } IP_IO_OPEN_DATA;
 
 typedef struct _IP_IO_SEND_ENTRY {
-  NET_LIST_ENTRY            Entry;
+  LIST_ENTRY                Entry;
   IP_IO                     *IpIo;
   VOID                      *Context;
   VOID                      *NotifyData;
@@ -169,7 +169,7 @@ typedef EFI_IP4_OVERRIDE_DATA IP_IO_OVERRIDE;
 typedef struct _IP_IO_IP_INFO {
   IP4_ADDR                  Addr;
   IP4_ADDR                  SubnetMask;
-  NET_LIST_ENTRY            Entry;
+  LIST_ENTRY                Entry;
   EFI_HANDLE                ChildHandle;
   EFI_IP4_PROTOCOL          *Ip;
   EFI_IP4_COMPLETION_TOKEN  DummyRcvToken;

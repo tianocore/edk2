@@ -43,7 +43,7 @@ Returns:
 
 --*/
 {
-  NetListInsertTail (&Session->Conns, &Conn->Link);
+  InsertTailList (&Session->Conns, &Conn->Link);
   Conn->Session = Session;
   Session->NumConns++;
 }
@@ -68,7 +68,7 @@ Returns:
 
 --*/
 {
-  NetListRemoveEntry (&Conn->Link);
+  RemoveEntryList (&Conn->Link);
   Conn->Session->NumConns--;
   Conn->Session = NULL;
 }
@@ -259,7 +259,7 @@ Returns:
   TCP4_IO_CONFIG_DATA Tcp4IoConfig;
   EFI_STATUS          Status;
 
-  Conn = NetAllocatePool (sizeof (ISCSI_CONNECTION));
+  Conn = AllocatePool (sizeof (ISCSI_CONNECTION));
   if (Conn == NULL) {
     return NULL;
   }
@@ -276,13 +276,13 @@ Returns:
 
   Status = gBS->CreateEvent (
                   EFI_EVENT_TIMER,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   NULL,
                   NULL,
                   &Conn->TimeoutEvent
                   );
   if (EFI_ERROR (Status)) {
-    NetFreePool (Conn);
+    gBS->FreePool (Conn);
     return NULL;
   }
 
@@ -295,10 +295,10 @@ Returns:
   Conn->HeaderDigest              = ISCSI_DIGEST_NONE;
   Conn->DataDigest                = ISCSI_DIGEST_NONE;
 
-  NetCopyMem (&Tcp4IoConfig.LocalIp, &Session->ConfigData.NvData.LocalIp, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Tcp4IoConfig.SubnetMask, &Session->ConfigData.NvData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Tcp4IoConfig.Gateway, &Session->ConfigData.NvData.Gateway, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Tcp4IoConfig.RemoteIp, &Session->ConfigData.NvData.TargetIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Tcp4IoConfig.LocalIp, &Session->ConfigData.NvData.LocalIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Tcp4IoConfig.SubnetMask, &Session->ConfigData.NvData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Tcp4IoConfig.Gateway, &Session->ConfigData.NvData.Gateway, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Tcp4IoConfig.RemoteIp, &Session->ConfigData.NvData.TargetIp, sizeof (EFI_IPv4_ADDRESS));
 
   Tcp4IoConfig.RemotePort = Session->ConfigData.NvData.TargetPort;
 
@@ -313,7 +313,7 @@ Returns:
             );
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (Conn->TimeoutEvent);
-    NetFreePool (Conn);
+    gBS->FreePool (Conn);
     Conn = NULL;
   }
 
@@ -343,7 +343,7 @@ Returns:
   Tcp4IoDestroySocket (&Conn->Tcp4Io);
   NetbufQueFlush (&Conn->RspQue);
   gBS->CloseEvent (Conn->TimeoutEvent);
-  NetFreePool (Conn);
+  gBS->FreePool (Conn);
 }
 
 EFI_STATUS
@@ -553,7 +553,7 @@ Returns:
   //
   // Add the key.
   //
-  NetCopyMem (Data, Key, KeyLen);
+  CopyMem (Data, Key, KeyLen);
   Data += KeyLen;
 
   *Data = '=';
@@ -562,7 +562,7 @@ Returns:
   //
   // Add the value.
   //
-  NetCopyMem (Data, Value, ValueLen);
+  CopyMem (Data, Value, ValueLen);
   Data += ValueLen;
 
   *Data = '\0';
@@ -608,7 +608,7 @@ Returns:
   }
 
   LoginReq = (ISCSI_LOGIN_REQUEST *) NetbufAllocSpace (Nbuf, sizeof (ISCSI_LOGIN_REQUEST), NET_BUF_TAIL);
-  NetZeroMem (LoginReq, sizeof (ISCSI_LOGIN_REQUEST));
+  ZeroMem (LoginReq, sizeof (ISCSI_LOGIN_REQUEST));
 
   //
   // Init the login request pdu
@@ -630,7 +630,7 @@ Returns:
   // with their increasing StatSN values.
   //
   LoginReq->ExpStatSN = HTONL (Conn->ExpStatSN);
-  NetCopyMem (LoginReq->ISID, Session->ISID, sizeof (LoginReq->ISID));
+  CopyMem (LoginReq->ISID, Session->ISID, sizeof (LoginReq->ISID));
 
   if (Conn->PartialRspRcvd) {
     //
@@ -777,7 +777,7 @@ Returns:
       (CurrentStage != Conn->CurrentStage) ||
       (!Conn->TransitInitiated && Transit) ||
       (Transit && (NextStage != Conn->NextStage)) ||
-      (NetCompareMem (Session->ISID, LoginRsp->ISID, sizeof (LoginRsp->ISID)) != 0) ||
+      (CompareMem (Session->ISID, LoginRsp->ISID, sizeof (LoginRsp->ISID)) != 0) ||
       (LoginRsp->InitiatorTaskTag != Session->InitiatorTaskTag)
       ) {
     //
@@ -913,7 +913,7 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY  *KeyValueList;
+  LIST_ENTRY      *KeyValueList;
   CHAR8           *TargetAddress;
   CHAR8           *IpStr;
   EFI_STATUS      Status;
@@ -1011,8 +1011,8 @@ Returns:
 {
   ASSERT (Arg != NULL);
 
-  NetbufFreeList ((NET_LIST_ENTRY *) Arg);
-  NetFreePool (Arg);
+  NetbufFreeList ((LIST_ENTRY     *) Arg);
+  gBS->FreePool (Arg);
 }
 
 VOID
@@ -1072,7 +1072,7 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY  *NbufList;
+  LIST_ENTRY      *NbufList;
   UINT32          Len;
   NET_BUF         *PduHdr;
   UINT8           *Header;
@@ -1084,12 +1084,12 @@ Returns:
   NET_BUF         *DataSeg;
   UINT32          PadAndCRC32[2];
 
-  NbufList = NetAllocatePool (sizeof (NET_LIST_ENTRY));
+  NbufList = AllocatePool (sizeof (LIST_ENTRY    ));
   if (NbufList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NetListInit (NbufList);
+  InitializeListHead (NbufList);
 
   //
   // The header digest will be received together with the PDU header if exists.
@@ -1102,7 +1102,7 @@ Returns:
   }
 
   Header = NetbufAllocSpace (PduHdr, Len, NET_BUF_TAIL);
-  NetListInsertTail (NbufList, &PduHdr->List);
+  InsertTailList (NbufList, &PduHdr->List);
 
   //
   // First step, receive the BHS of the PDU.
@@ -1197,7 +1197,7 @@ Returns:
     goto ON_EXIT;
   }
 
-  NetListInsertTail (NbufList, &DataSeg->List);
+  InsertTailList (NbufList, &DataSeg->List);
 
   //
   // Receive the data segment with the data digest if any.
@@ -1266,7 +1266,7 @@ Returns:
 --*/
 {
   EFI_STATUS      Status;
-  NET_LIST_ENTRY  *KeyValueList;
+  LIST_ENTRY      *KeyValueList;
   CHAR8           *Data;
   UINT32          Len;
   ISCSI_SESSION   *Session;
@@ -1278,7 +1278,7 @@ Returns:
   Session = Conn->Session;
 
   Len     = Conn->RspQue.BufSize;
-  Data    = NetAllocatePool (Len);
+  Data    = AllocatePool (Len);
   if (Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1292,7 +1292,7 @@ Returns:
   //
   KeyValueList = IScsiBuildKeyValueList (Data, Len);
   if (KeyValueList == NULL) {
-    NetFreePool (Data);
+    gBS->FreePool (Data);
     return Status;
   }
   //
@@ -1488,7 +1488,7 @@ Returns:
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_TARGET_ALIAS);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_TARGET_PORTAL_GROUP_TAG);
 
-  if (NetListIsEmpty (KeyValueList)) {
+  if (IsListEmpty (KeyValueList)) {
     //
     // Succeed if no more keys in the list.
     //
@@ -1499,7 +1499,7 @@ ON_ERROR:
 
   IScsiFreeKeyValueList (KeyValueList);
 
-  NetFreePool (Data);
+  gBS->FreePool (Data);
 
   return Status;
 }
@@ -1612,13 +1612,13 @@ Returns:
       return EFI_OUT_OF_RESOURCES;
     }
 
-    NetZeroMem (Data, PadLen);
+    ZeroMem (Data, PadLen);
   }
 
   return EFI_SUCCESS;
 }
 
-NET_LIST_ENTRY *
+LIST_ENTRY     *
 IScsiBuildKeyValueList (
   IN CHAR8  *Data,
   IN UINT32 Len
@@ -1640,23 +1640,23 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY        *ListHead;
+  LIST_ENTRY            *ListHead;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
 
-  ListHead = NetAllocatePool (sizeof (NET_LIST_ENTRY));
+  ListHead = AllocatePool (sizeof (LIST_ENTRY    ));
   if (ListHead == NULL) {
     return NULL;
   }
 
-  NetListInit (ListHead);
+  InitializeListHead (ListHead);
 
   while (Len > 0) {
-    KeyValuePair = NetAllocatePool (sizeof (ISCSI_KEY_VALUE_PAIR));
+    KeyValuePair = AllocatePool (sizeof (ISCSI_KEY_VALUE_PAIR));
     if (KeyValuePair == NULL) {
       goto ON_ERROR;
     }
 
-    NetListInit (&KeyValuePair->List);
+    InitializeListHead (&KeyValuePair->List);
 
     KeyValuePair->Key = Data;
 
@@ -1671,13 +1671,13 @@ Returns:
       Data++;
       Len--;
     } else {
-      NetFreePool (KeyValuePair);
+      gBS->FreePool (KeyValuePair);
       goto ON_ERROR;
     }
 
     KeyValuePair->Value = Data;
 
-    NetListInsertTail (ListHead, &KeyValuePair->List);;
+    InsertTailList (ListHead, &KeyValuePair->List);;
 
     Data += AsciiStrLen (KeyValuePair->Value) + 1;
     Len -= (UINT32) AsciiStrLen (KeyValuePair->Value) + 1;
@@ -1694,7 +1694,7 @@ ON_ERROR:
 
 CHAR8 *
 IScsiGetValueByKeyFromList (
-  IN NET_LIST_ENTRY  *KeyValueList,
+  IN LIST_ENTRY      *KeyValueList,
   IN CHAR8           *Key
   )
 /*++
@@ -1715,7 +1715,7 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
   CHAR8                 *Value;
 
@@ -1727,8 +1727,8 @@ Returns:
     if (AsciiStrCmp (KeyValuePair->Key, Key) == 0) {
       Value = KeyValuePair->Value;
 
-      NetListRemoveEntry (&KeyValuePair->List);
-      NetFreePool (KeyValuePair);
+      RemoveEntryList (&KeyValuePair->List);
+      gBS->FreePool (KeyValuePair);
       break;
     }
   }
@@ -1738,7 +1738,7 @@ Returns:
 
 VOID
 IScsiFreeKeyValueList (
-  IN NET_LIST_ENTRY  *KeyValueList
+  IN LIST_ENTRY      *KeyValueList
   )
 /*++
 
@@ -1756,17 +1756,17 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
 
-  while (!NetListIsEmpty (KeyValueList)) {
+  while (!IsListEmpty (KeyValueList)) {
     Entry         = NetListRemoveHead (KeyValueList);
     KeyValuePair  = NET_LIST_USER_STRUCT (Entry, ISCSI_KEY_VALUE_PAIR, List);
 
-    NetFreePool (KeyValuePair);
+    gBS->FreePool (KeyValuePair);
   }
 
-  NetFreePool (KeyValueList);
+  gBS->FreePool (KeyValueList);
 }
 
 EFI_STATUS
@@ -1816,7 +1816,7 @@ Returns:
     }
   }
 
-  if ((Len < 4) || (NetCompareMem (Name, "iqn.", 4) != 0)) {
+  if ((Len < 4) || (CompareMem (Name, "iqn.", 4) != 0)) {
     //
     // Only IQN format is accepted now.
     //
@@ -1860,19 +1860,19 @@ Returns:
     return EFI_NOT_READY;
   }
 
-  NewTcb = NetAllocateZeroPool (sizeof (ISCSI_TCB));
+  NewTcb = AllocateZeroPool (sizeof (ISCSI_TCB));
   if (NewTcb == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NetListInit (&NewTcb->Link);
+  InitializeListHead (&NewTcb->Link);
 
   NewTcb->SoFarInOrder      = TRUE;
   NewTcb->InitiatorTaskTag  = Session->InitiatorTaskTag;
   NewTcb->CmdSN             = Session->CmdSN;
   NewTcb->Conn              = Conn;
 
-  NetListInsertTail (&Session->TcbList, &NewTcb->Link);
+  InsertTailList (&Session->TcbList, &NewTcb->Link);
 
   //
   // Advance the initiator task tag.
@@ -1905,14 +1905,14 @@ Returns:
 
 --*/
 {
-  NetListRemoveEntry (&Tcb->Link);
+  RemoveEntryList (&Tcb->Link);
 
-  NetFreePool (Tcb);
+  gBS->FreePool (Tcb);
 }
 
 ISCSI_TCB *
 IScsiFindTcbByITT (
-  IN NET_LIST_ENTRY  *TcbList,
+  IN LIST_ENTRY      *TcbList,
   IN UINT32          InitiatorTaskTag
   )
 /*++
@@ -1933,7 +1933,7 @@ Returns:
 --*/
 {
   ISCSI_TCB       *Tcb;
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *Entry;
 
   Tcb = NULL;
 
@@ -2022,7 +2022,7 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY                  *NbufList;
+  LIST_ENTRY                      *NbufList;
   NET_BUF                         *Pdu;
   NET_BUF                         *PduHeader;
   NET_BUF                         *DataSeg;
@@ -2060,7 +2060,7 @@ Returns:
   ScsiCmd = (SCSI_COMMAND *) NetbufAllocSpace (PduHeader, Length, NET_BUF_TAIL);
   Header  = (ISCSI_ADDITIONAL_HEADER *) (ScsiCmd + 1);
 
-  NetZeroMem (ScsiCmd, Length);
+  ZeroMem (ScsiCmd, Length);
 
   ISCSI_SET_OPCODE (ScsiCmd, ISCSI_OPCODE_SCSI_CMD, 0);
   ISCSI_SET_FLAG (ScsiCmd, ISCSI_TASK_ATTR_SIMPLE);
@@ -2097,18 +2097,18 @@ Returns:
   }
 
   ScsiCmd->TotalAHSLength = AHSLength;
-  NetCopyMem (ScsiCmd->Lun, &Lun, sizeof (ScsiCmd->Lun));
+  CopyMem (ScsiCmd->Lun, &Lun, sizeof (ScsiCmd->Lun));
   ScsiCmd->InitiatorTaskTag = NTOHL (Tcb->InitiatorTaskTag);
   ScsiCmd->CmdSN            = NTOHL (Tcb->CmdSN);
   ScsiCmd->ExpStatSN        = NTOHL (Tcb->Conn->ExpStatSN);
 
-  NetCopyMem (ScsiCmd->CDB, Packet->Cdb, sizeof (ScsiCmd->CDB));
+  CopyMem (ScsiCmd->CDB, Packet->Cdb, sizeof (ScsiCmd->CDB));
 
   if (Packet->CdbLength > 16) {
     Header->Length  = NTOHS (Packet->CdbLength - 15);
     Header->Type    = ISCSI_AHS_TYPE_EXT_CDB;
 
-    NetCopyMem (Header + 1, (UINT8 *) Packet->Cdb + 16, Packet->CdbLength - 16);
+    CopyMem (Header + 1, (UINT8 *) Packet->Cdb + 16, Packet->CdbLength - 16);
   }
 
   Pdu               = PduHeader;
@@ -2139,7 +2139,7 @@ Returns:
       goto ON_EXIT;
     }
 
-    NbufList = NetAllocatePool (sizeof (NET_LIST_ENTRY));
+    NbufList = AllocatePool (sizeof (LIST_ENTRY    ));
     if (NbufList == NULL) {
       NetbufFree (PduHeader);
       NetbufFree (DataSeg);
@@ -2148,9 +2148,9 @@ Returns:
       goto ON_EXIT;
     }
 
-    NetListInit (NbufList);
-    NetListInsertTail (NbufList, &PduHeader->List);
-    NetListInsertTail (NbufList, &DataSeg->List);
+    InitializeListHead (NbufList);
+    InsertTailList (NbufList, &PduHeader->List);
+    InsertTailList (NbufList, &DataSeg->List);
 
     Pdu = NetbufFromBufList (NbufList, 0, 0, IScsiFreeNbufList, NbufList);
     if (Pdu == NULL) {
@@ -2205,37 +2205,37 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY      *NbufList;
+  LIST_ENTRY          *NbufList;
   NET_BUF             *PduHdr;
   NET_BUF             *DataSeg;
   NET_BUF             *Pdu;
   ISCSI_SCSI_DATA_OUT *DataOutHdr;
   ISCSI_XFER_CONTEXT  *XferContext;
 
-  NbufList = NetAllocatePool (sizeof (NET_LIST_ENTRY));
+  NbufList = AllocatePool (sizeof (LIST_ENTRY    ));
   if (NbufList == NULL) {
     return NULL;
   }
 
-  NetListInit (NbufList);
+  InitializeListHead (NbufList);
 
   //
   // Allocate memory for the BHS.
   //
   PduHdr = NetbufAlloc (sizeof (ISCSI_SCSI_DATA_OUT));
   if (PduHdr == NULL) {
-    NetFreePool (NbufList);
+    gBS->FreePool (NbufList);
     return NULL;
   }
   //
   // Insert the BHS into the buffer list.
   //
-  NetListInsertTail (NbufList, &PduHdr->List);
+  InsertTailList (NbufList, &PduHdr->List);
 
   DataOutHdr  = (ISCSI_SCSI_DATA_OUT *) NetbufAllocSpace (PduHdr, sizeof (ISCSI_SCSI_DATA_OUT), NET_BUF_TAIL);
   XferContext = &Tcb->XferContext;
 
-  NetZeroMem (DataOutHdr, sizeof (ISCSI_SCSI_DATA_OUT));
+  ZeroMem (DataOutHdr, sizeof (ISCSI_SCSI_DATA_OUT));
 
   //
   // Set the flags and fields of the Data Out PDU BHS.
@@ -2250,7 +2250,7 @@ Returns:
   DataOutHdr->BufferOffset      = HTONL (XferContext->Offset);
 
   if (XferContext->TargetTransferTag != ISCSI_RESERVED_TAG) {
-    NetCopyMem (&DataOutHdr->Lun, &Lun, sizeof (DataOutHdr->Lun));
+    CopyMem (&DataOutHdr->Lun, &Lun, sizeof (DataOutHdr->Lun));
   }
   //
   // Build the data segment for this Data Out PDU.
@@ -2264,7 +2264,7 @@ Returns:
   // Put the data segment into the buffer list and combine it with the BHS
   // into a full Data Out PDU.
   //
-  NetListInsertTail (NbufList, &DataSeg->List);
+  InsertTailList (NbufList, &DataSeg->List);
   Pdu = NetbufFromBufList (NbufList, 0, 0, IScsiFreeNbufList, NbufList);
   if (Pdu == NULL) {
     IScsiFreeNbufList (NbufList);
@@ -2273,7 +2273,7 @@ Returns:
   return Pdu;
 }
 
-NET_LIST_ENTRY *
+LIST_ENTRY     *
 IScsiGenerateDataOutPduSequence (
   IN UINT8      *Data,
   IN ISCSI_TCB  *Tcb,
@@ -2297,19 +2297,19 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY      *PduList;
+  LIST_ENTRY          *PduList;
   UINT32              DataSN;
   UINT32              DataLen;
   NET_BUF             *DataOutPdu;
   ISCSI_CONNECTION    *Conn;
   ISCSI_XFER_CONTEXT  *XferContext;
 
-  PduList = NetAllocatePool (sizeof (NET_LIST_ENTRY));
+  PduList = AllocatePool (sizeof (LIST_ENTRY    ));
   if (PduList == NULL) {
     return NULL;
   }
 
-  NetListInit (PduList);
+  InitializeListHead (PduList);
 
   DataSN      = 0;
   Conn        = Tcb->Conn;
@@ -2334,7 +2334,7 @@ Returns:
       goto ON_EXIT;
     }
 
-    NetListInsertTail (PduList, &DataOutPdu->List);
+    InsertTailList (PduList, &DataOutPdu->List);
 
     //
     // Update the context and DataSN.
@@ -2378,8 +2378,8 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY  *DataOutPduList;
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *DataOutPduList;
+  LIST_ENTRY      *Entry;
   NET_BUF         *Pdu;
   EFI_STATUS      Status;
 
@@ -2671,7 +2671,7 @@ Returns:
 
     Packet->SenseDataLength = (UINT8) MIN (SenseData->Length, Packet->SenseDataLength);
     if (Packet->SenseDataLength != 0) {
-      NetCopyMem (Packet->SenseData, &SenseData->Data[0], Packet->SenseDataLength);
+      CopyMem (Packet->SenseData, &SenseData->Data[0], Packet->SenseDataLength);
     }
   } else {
     Packet->SenseDataLength = 0;
@@ -2999,8 +2999,8 @@ Returns:
     Session->ISID[4]    = (UINT8) Random;
     Session->ISID[5]    = (UINT8) (Random >> 8);
 
-    NetListInit (&Session->Conns);
-    NetListInit (&Session->TcbList);
+    InitializeListHead (&Session->Conns);
+    InitializeListHead (&Session->TcbList);
   }
 
   Session->TSIH                 = 0;
@@ -3051,11 +3051,11 @@ Returns:
     return EFI_SUCCESS;
   }
 
-  ASSERT (!NetListIsEmpty (&Session->Conns));
+  ASSERT (!IsListEmpty (&Session->Conns));
 
   Private = ISCSI_DRIVER_DATA_FROM_SESSION (Session);
 
-  while (!NetListIsEmpty (&Session->Conns)) {
+  while (!IsListEmpty (&Session->Conns)) {
     Conn = NET_LIST_USER_STRUCT_S (
             Session->Conns.ForwardLink,
             ISCSI_CONNECTION,

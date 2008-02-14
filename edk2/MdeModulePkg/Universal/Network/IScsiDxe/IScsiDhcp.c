@@ -62,7 +62,7 @@ Returns:
   //
   IScsiRootPathIdLen = (UINT8) AsciiStrLen (ISCSI_ROOT_PATH_ID);
 
-  if ((Length <= IScsiRootPathIdLen) || (NetCompareMem (RootPath, ISCSI_ROOT_PATH_ID, IScsiRootPathIdLen) != 0)) {
+  if ((Length <= IScsiRootPathIdLen) || (CompareMem (RootPath, ISCSI_ROOT_PATH_ID, IScsiRootPathIdLen) != 0)) {
     return EFI_NOT_FOUND;
   }
   //
@@ -71,17 +71,17 @@ Returns:
   RootPath += IScsiRootPathIdLen;
   Length  = (UINT8) (Length - IScsiRootPathIdLen);
 
-  TmpStr  = (CHAR8 *) NetAllocatePool (Length + 1);
+  TmpStr  = (CHAR8 *) AllocatePool (Length + 1);
   if (TmpStr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NetCopyMem (TmpStr, RootPath, Length);
+  CopyMem (TmpStr, RootPath, Length);
   TmpStr[Length]  = '\0';
 
   Index           = 0;
   FieldIndex      = 0;
-  NetZeroMem (&Fields[0], sizeof (Fields));
+  ZeroMem (&Fields[0], sizeof (Fields));
 
   //
   // Extract the fields in the Root Path option string.
@@ -155,7 +155,7 @@ Returns:
       goto ON_EXIT;
     }
   } else {
-    NetZeroMem (ConfigNvData->BootLun, sizeof (ConfigNvData->BootLun));
+    ZeroMem (ConfigNvData->BootLun, sizeof (ConfigNvData->BootLun));
   }
   //
   // Get the target iSCSI Name.
@@ -178,7 +178,7 @@ Returns:
 
 ON_EXIT:
 
-  NetFreePool (TmpStr);
+  gBS->FreePool (TmpStr);
 
   return Status;
 }
@@ -233,14 +233,14 @@ Returns:
     return EFI_NOT_READY;
   }
 
-  OptionList = NetAllocatePool (OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *));
+  OptionList = AllocatePool (OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *));
   if (OptionList == NULL) {
     return EFI_NOT_READY;
   }
 
   Status = This->Parse (This, Packet, &OptionCount, OptionList);
   if (EFI_ERROR (Status)) {
-    NetFreePool (OptionList);
+    gBS->FreePool (OptionList);
     return EFI_NOT_READY;
   }
 
@@ -262,7 +262,7 @@ Returns:
     Status = EFI_NOT_READY;
   }
 
-  NetFreePool (OptionList);
+  gBS->FreePool (OptionList);
 
   return Status;
 }
@@ -307,9 +307,9 @@ Returns:
     return EFI_NO_MAPPING;
   }
 
-  NetCopyMem (&ConfigData->NvData.LocalIp, &Dhcp4ModeData.ClientAddress, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&ConfigData->NvData.SubnetMask, &Dhcp4ModeData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&ConfigData->NvData.Gateway, &Dhcp4ModeData.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&ConfigData->NvData.LocalIp, &Dhcp4ModeData.ClientAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&ConfigData->NvData.SubnetMask, &Dhcp4ModeData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&ConfigData->NvData.Gateway, &Dhcp4ModeData.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
 
   OptionCount = 0;
   OptionList  = NULL;
@@ -319,14 +319,14 @@ Returns:
     return EFI_DEVICE_ERROR;
   }
 
-  OptionList = NetAllocatePool (OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *));
+  OptionList = AllocatePool (OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *));
   if (OptionList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   Status = Dhcp4->Parse (Dhcp4, Dhcp4ModeData.ReplyPacket, &OptionCount, OptionList);
   if (EFI_ERROR (Status)) {
-    NetFreePool (OptionList);
+    gBS->FreePool (OptionList);
     return EFI_DEVICE_ERROR;
   }
 
@@ -343,13 +343,13 @@ Returns:
       //
       // Primary DNS server address.
       //
-      NetCopyMem (&ConfigData->PrimaryDns, &OptionList[Index]->Data[0], sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&ConfigData->PrimaryDns, &OptionList[Index]->Data[0], sizeof (EFI_IPv4_ADDRESS));
 
       if (OptionList[Index]->Length > 4) {
         //
         // Secondary DNS server address
         //
-        NetCopyMem (&ConfigData->SecondaryDns, &OptionList[Index]->Data[4], sizeof (EFI_IPv4_ADDRESS));
+        CopyMem (&ConfigData->SecondaryDns, &OptionList[Index]->Data[4], sizeof (EFI_IPv4_ADDRESS));
       }
     } else if (OptionList[Index]->OpCode == DHCP4_TAG_SERVER_ID) {
       if (OptionList[Index]->Length != 4) {
@@ -357,11 +357,11 @@ Returns:
         break;
       }
 
-      NetCopyMem (&ConfigData->DhcpServer, &OptionList[Index]->Data[0], sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&ConfigData->DhcpServer, &OptionList[Index]->Data[0], sizeof (EFI_IPv4_ADDRESS));
     }
   }
 
-  NetFreePool (OptionList);
+  gBS->FreePool (OptionList);
 
   return Status;
 }
@@ -428,7 +428,7 @@ Returns:
     goto ON_EXIT;
   }
 
-  ParaList = NetAllocatePool (sizeof (EFI_DHCP4_PACKET_OPTION) + 3);
+  ParaList = AllocatePool (sizeof (EFI_DHCP4_PACKET_OPTION) + 3);
   if (ParaList == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -443,7 +443,7 @@ Returns:
   ParaList->Data[2] = DHCP4_TAG_DNS;
   ParaList->Data[3] = DHCP4_TAG_ROOT_PATH;
 
-  NetZeroMem (&Dhcp4ConfigData, sizeof (EFI_DHCP4_CONFIG_DATA));
+  ZeroMem (&Dhcp4ConfigData, sizeof (EFI_DHCP4_CONFIG_DATA));
   Dhcp4ConfigData.OptionCount = 1;
   Dhcp4ConfigData.OptionList  = &ParaList;
 
@@ -472,7 +472,7 @@ Returns:
 ON_EXIT:
 
   if (ParaList != NULL) {
-    NetFreePool (ParaList);
+    gBS->FreePool (ParaList);
   }
 
   if (Dhcp4 != NULL) {

@@ -141,9 +141,9 @@ DhcpConfigUdpIo (
   UdpConfigData.StationPort               = DHCP_CLIENT_PORT;
   UdpConfigData.RemotePort                = DHCP_SERVER_PORT;
 
-  NetZeroMem (&UdpConfigData.StationAddress, sizeof (EFI_IPv4_ADDRESS));
-  NetZeroMem (&UdpConfigData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-  NetZeroMem (&UdpConfigData.RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
+  ZeroMem (&UdpConfigData.StationAddress, sizeof (EFI_IPv4_ADDRESS));
+  ZeroMem (&UdpConfigData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+  ZeroMem (&UdpConfigData.RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
 
   return UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfigData);;
 }
@@ -208,7 +208,7 @@ Dhcp4CreateService (
   EFI_STATUS                Status;
 
   *Service  = NULL;
-  DhcpSb    = NetAllocateZeroPool (sizeof (DHCP_SERVICE));
+  DhcpSb    = AllocateZeroPool (sizeof (DHCP_SERVICE));
 
   if (DhcpSb == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -220,7 +220,7 @@ Dhcp4CreateService (
   DhcpSb->InDestory       = FALSE;
   DhcpSb->Controller      = Controller;
   DhcpSb->Image           = ImageHandle;
-  NetListInit (&DhcpSb->Children);
+  InitializeListHead (&DhcpSb->Children);
   DhcpSb->DhcpState       = Dhcp4Stopped;
   DhcpSb->Xid             = NET_RANDOM (NetRandomInitSeed ());
 
@@ -229,7 +229,7 @@ Dhcp4CreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   DhcpOnTimerTick,
                   DhcpSb,
                   &DhcpSb->Timer
@@ -255,7 +255,7 @@ Dhcp4CreateService (
 
 ON_ERROR:
   Dhcp4CloseService (DhcpSb);
-  NetFreePool (DhcpSb);
+  gBS->FreePool (DhcpSb);
 
   return Status;
 }
@@ -331,7 +331,7 @@ Dhcp4DriverBindingStart (
 
 ON_ERROR:
   Dhcp4CloseService (DhcpSb);
-  NetFreePool (DhcpSb);
+  gBS->FreePool (DhcpSb);
   return Status;
 }
 
@@ -394,7 +394,7 @@ Dhcp4DriverBindingStop (
     return EFI_SUCCESS;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (NumberOfChildren == 0) {
 
@@ -409,13 +409,13 @@ Dhcp4DriverBindingStop (
 
     Dhcp4CloseService (DhcpSb);
 
-    NetFreePool (DhcpSb);
+    gBS->FreePool (DhcpSb);
   } else {
     //
     // Don't use NET_LIST_FOR_EACH_SAFE here, Dhcp4ServiceBindingDestoryChild
     // may cause other child to be deleted.
     //
-    while (!NetListIsEmpty (&DhcpSb->Children)) {
+    while (!IsListEmpty (&DhcpSb->Children)) {
       Instance = NET_LIST_HEAD (&DhcpSb->Children, DHCP_PROTOCOL, Link);
       ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
     }
@@ -425,7 +425,7 @@ Dhcp4DriverBindingStop (
     }
   }
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -448,7 +448,7 @@ DhcpInitProtocol (
 {
   Instance->Signature         = DHCP_PROTOCOL_SIGNATURE;
   CopyMem (&Instance->Dhcp4Protocol, &mDhcp4ProtocolTemplate, sizeof (Instance->Dhcp4Protocol));
-  NetListInit (&Instance->Link);
+  InitializeListHead (&Instance->Link);
   Instance->Handle            = NULL;
   Instance->Service           = DhcpSb;
   Instance->InDestory         = FALSE;
@@ -492,7 +492,7 @@ Dhcp4ServiceBindingCreateChild (
     return EFI_INVALID_PARAMETER;
   }
 
-  Instance = NetAllocatePool (sizeof (*Instance));
+  Instance = AllocatePool (sizeof (*Instance));
 
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -512,7 +512,7 @@ Dhcp4ServiceBindingCreateChild (
                   );
 
   if (EFI_ERROR (Status)) {
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
     return Status;
   }
 
@@ -537,16 +537,16 @@ Dhcp4ServiceBindingCreateChild (
            NULL
            );
 
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
     return Status;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  NetListInsertTail (&DhcpSb->Children, &Instance->Link);
+  InsertTailList (&DhcpSb->Children, &Instance->Link);
   DhcpSb->NumChildren++;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }
@@ -617,7 +617,7 @@ Dhcp4ServiceBindingDestroyChild (
     return EFI_SUCCESS;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   Instance->InDestory = TRUE;
 
   //
@@ -642,7 +642,7 @@ Dhcp4ServiceBindingDestroyChild (
   if (EFI_ERROR (Status)) {
     Instance->InDestory = FALSE;
 
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
     return Status;
   }
 
@@ -650,11 +650,11 @@ Dhcp4ServiceBindingDestroyChild (
     DhcpYieldControl (DhcpSb);
   }
 
-  NetListRemoveEntry (&Instance->Link);
+  RemoveEntryList (&Instance->Link);
   DhcpSb->NumChildren--;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
-  NetFreePool (Instance);
+  gBS->FreePool (Instance);
   return EFI_SUCCESS;
 }

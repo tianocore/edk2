@@ -56,7 +56,7 @@ EfiMtftp4GetModeData (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Instance                         = MTFTP4_PROTOCOL_FROM_THIS (This);
   CopyMem(&ModeData->ConfigData, &Instance->Config, sizeof (Instance->Config));
@@ -65,7 +65,7 @@ EfiMtftp4GetModeData (
   ModeData->UnsupportedOptionCount = 0;
   ModeData->UnsupportedOptoins     = NULL;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }
@@ -87,8 +87,8 @@ Mtftp4CleanOperation (
   IN EFI_STATUS             Result
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   MTFTP4_BLOCK_RANGE        *Block;
   EFI_MTFTP4_TOKEN          *Token;
 
@@ -122,11 +122,11 @@ Mtftp4CleanOperation (
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &Instance->Blocks) {
     Block = NET_LIST_USER_STRUCT (Entry, MTFTP4_BLOCK_RANGE, Link);
-    NetListRemoveEntry (Entry);
-    NetFreePool (Block);
+    RemoveEntryList (Entry);
+    gBS->FreePool (Block);
   }
 
-  NetZeroMem (&Instance->RequestOption, sizeof (MTFTP4_OPTION));
+  ZeroMem (&Instance->RequestOption, sizeof (MTFTP4_OPTION));
 
   Instance->Operation     = 0;
 
@@ -183,22 +183,22 @@ EfiMtftp4Configure (
     //
     // Reset the operation if ConfigData is NULL
     //
-    OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
     Mtftp4CleanOperation (Instance, EFI_ABORTED);
-    NetZeroMem (&Instance->Config, sizeof (EFI_MTFTP4_CONFIG_DATA));
+    ZeroMem (&Instance->Config, sizeof (EFI_MTFTP4_CONFIG_DATA));
     Instance->State = MTFTP4_STATE_UNCONFIGED;
 
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
 
   } else {
     //
     // Configure the parameters for new operation.
     //
-    NetCopyMem (&Ip, &ConfigData->StationIp, sizeof (IP4_ADDR));
-    NetCopyMem (&Netmask, &ConfigData->SubnetMask, sizeof (IP4_ADDR));
-    NetCopyMem (&Gateway, &ConfigData->GatewayIp, sizeof (IP4_ADDR));
-    NetCopyMem (&ServerIp, &ConfigData->ServerIp, sizeof (IP4_ADDR));
+    CopyMem (&Ip, &ConfigData->StationIp, sizeof (IP4_ADDR));
+    CopyMem (&Netmask, &ConfigData->SubnetMask, sizeof (IP4_ADDR));
+    CopyMem (&Gateway, &ConfigData->GatewayIp, sizeof (IP4_ADDR));
+    CopyMem (&ServerIp, &ConfigData->ServerIp, sizeof (IP4_ADDR));
 
     Ip       = NTOHL (Ip);
     Netmask  = NTOHL (Netmask);
@@ -221,17 +221,17 @@ EfiMtftp4Configure (
       return EFI_INVALID_PARAMETER;
     }
 
-    OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
     if ((Instance->State == MTFTP4_STATE_CONFIGED) && (Instance->Operation != 0)) {
-      NET_RESTORE_TPL (OldTpl);
+      gBS->RestoreTPL (OldTpl);
       return EFI_ACCESS_DENIED;
     }
 
     CopyMem(&Instance->Config, ConfigData, sizeof (*ConfigData));;
     Instance->State = MTFTP4_STATE_CONFIGED;
 
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
   }
 
   return EFI_SUCCESS;
@@ -287,7 +287,7 @@ Mtftp4GetInfoCheckPacket (
 
   //
   // Allocate buffer then copy the packet over. Use gBS->AllocatePool
-  // in case NetAllocatePool will implements something tricky.
+  // in case AllocatePool will implements something tricky.
   //
   Status = gBS->AllocatePool (EfiBootServicesData, PacketLen, (VOID **) State->Packet);
 
@@ -297,7 +297,7 @@ Mtftp4GetInfoCheckPacket (
   }
 
   *(State->PacketLen) = PacketLen;
-  NetCopyMem (*(State->Packet), Packet, PacketLen);
+  CopyMem (*(State->Packet), Packet, PacketLen);
 
   return EFI_ABORTED;
 }
@@ -456,19 +456,19 @@ Mtftp4OverrideValid (
   IP4_ADDR                  Netmask;
   IP4_ADDR                  Gateway;
 
-  NetCopyMem (&Ip, &Override->ServerIp, sizeof (IP4_ADDR));
+  CopyMem (&Ip, &Override->ServerIp, sizeof (IP4_ADDR));
   if (!Ip4IsUnicast (NTOHL (Ip), 0)) {
     return FALSE;
   }
 
   Config = &Instance->Config;
 
-  NetCopyMem (&Gateway, &Override->GatewayIp, sizeof (IP4_ADDR));
+  CopyMem (&Gateway, &Override->GatewayIp, sizeof (IP4_ADDR));
   Gateway = NTOHL (Gateway);
 
   if (!Config->UseDefaultSetting && (Gateway != 0)) {
-    NetCopyMem (&Netmask, &Config->SubnetMask, sizeof (IP4_ADDR));
-    NetCopyMem (&Ip, &Config->StationIp, sizeof (IP4_ADDR));
+    CopyMem (&Netmask, &Config->SubnetMask, sizeof (IP4_ADDR));
+    CopyMem (&Ip, &Config->StationIp, sizeof (IP4_ADDR));
 
     Netmask = NTOHL (Netmask);
     Ip      = NTOHL (Ip);
@@ -577,7 +577,7 @@ Mtftp4ConfigUnicastPort (
   UdpConfig.RemotePort         = 0;
 
   Ip = HTONL (Instance->ServerIp);
-  NetCopyMem (&UdpConfig.RemoteAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&UdpConfig.RemoteAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   Status = UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfig);
 
@@ -654,7 +654,7 @@ Mtftp4Start (
   Instance = MTFTP4_PROTOCOL_FROM_THIS (This);
 
   Status = EFI_SUCCESS;
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (Instance->State != MTFTP4_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
@@ -665,7 +665,7 @@ Mtftp4Start (
   }
 
   if (EFI_ERROR (Status)) {
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
     return Status;
   }
 
@@ -701,13 +701,13 @@ Mtftp4Start (
   Instance->Token         = Token;
   Instance->BlkSize       = MTFTP4_DEFAULT_BLKSIZE;
 
-  NetCopyMem (&Instance->ServerIp, &Config->ServerIp, sizeof (IP4_ADDR));
+  CopyMem (&Instance->ServerIp, &Config->ServerIp, sizeof (IP4_ADDR));
   Instance->ServerIp      = NTOHL (Instance->ServerIp);
 
   Instance->ListeningPort = Config->InitialServerPort;
   Instance->ConnectedPort = 0;
 
-  NetCopyMem (&Instance->Gateway, &Config->GatewayIp, sizeof (IP4_ADDR));
+  CopyMem (&Instance->Gateway, &Config->GatewayIp, sizeof (IP4_ADDR));
   Instance->Gateway       = NTOHL (Instance->Gateway);
 
   Instance->MaxRetry      = Config->TryCount;
@@ -715,8 +715,8 @@ Mtftp4Start (
   Instance->Master        = TRUE;
 
   if (Override != NULL) {
-    NetCopyMem (&Instance->ServerIp, &Override->ServerIp, sizeof (IP4_ADDR));
-    NetCopyMem (&Instance->Gateway, &Override->GatewayIp, sizeof (IP4_ADDR));
+    CopyMem (&Instance->ServerIp, &Override->ServerIp, sizeof (IP4_ADDR));
+    CopyMem (&Instance->Gateway, &Override->GatewayIp, sizeof (IP4_ADDR));
 
     Instance->ServerIp      = NTOHL (Instance->ServerIp);
     Instance->Gateway       = NTOHL (Instance->Gateway);
@@ -756,7 +756,7 @@ Mtftp4Start (
     Status = Mtftp4RrqStart (Instance, Operation);
   }
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
@@ -779,7 +779,7 @@ Mtftp4Start (
 
 ON_ERROR:
   Mtftp4CleanOperation (Instance, Status);
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }

@@ -883,31 +883,6 @@ Returns:
   //
   // Wait for packet(s)...
   //
-#if 0
-  if (!client_ip) {
-    Aprint ("client_ip == NULL    ");
-  } else {
-    Aprint (
-      "client_ip == %d.%d.%d.%d    ",
-      client_ip->v4.Addr[0],
-      client_ip->v4.Addr[1],
-      client_ip->v4.Addr[2],
-      client_ip->v4.Addr[3]
-      );
-  }
-
-  if (!ServerIp) {
-    Aprint ("ServerIp == NULL\n");
-  } else {
-    Aprint (
-      "ServerIp == %d.%d.%d.%d\n",
-      ServerIp->v4.Addr[0],
-      ServerIp->v4.Addr[1],
-      ServerIp->v4.Addr[2],
-      ServerIp->v4.Addr[3]
-      );
-  }
-#endif
 
   done_flag   = FALSE;
   got_packet  = FALSE;

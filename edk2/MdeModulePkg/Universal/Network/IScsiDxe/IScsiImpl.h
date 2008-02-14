@@ -57,10 +57,10 @@ struct _ISCSI_SESSION {
   UINT32                    InitiatorTaskTag;
   UINT16                    NextCID;
 
-  NET_LIST_ENTRY            Conns;
+  LIST_ENTRY                Conns;
   UINT32                    NumConns;
 
-  NET_LIST_ENTRY            TcbList;
+  LIST_ENTRY                TcbList;
 
   //
   // session-wide parameters
@@ -83,7 +83,7 @@ struct _ISCSI_SESSION {
 
 struct _ISCSI_CONNECTION {
   UINT32            Signature;
-  NET_LIST_ENTRY    Link;
+  LIST_ENTRY        Link;
 
   EFI_EVENT         TimeoutEvent;
 

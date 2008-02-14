@@ -141,7 +141,7 @@ PxeBcDriverBindingStart (
   UINTN               Index;
   EFI_STATUS          Status;
 
-  Private = NetAllocateZeroPool (sizeof (PXEBC_PRIVATE_DATA));
+  Private = AllocateZeroPool (sizeof (PXEBC_PRIVATE_DATA));
   if (Private == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -246,7 +246,7 @@ PxeBcDriverBindingStart (
     goto ON_ERROR;
   }
 
-  NetZeroMem (&Private->Udp4CfgData, sizeof (EFI_UDP4_CONFIG_DATA));
+  ZeroMem (&Private->Udp4CfgData, sizeof (EFI_UDP4_CONFIG_DATA));
   Private->Udp4CfgData.AcceptBroadcast    = TRUE;
   Private->Udp4CfgData.AcceptPromiscuous  = FALSE;
   Private->Udp4CfgData.AcceptAnyPort      = FALSE;
@@ -322,7 +322,7 @@ ON_ERROR:
       );
   }
 
-  NetFreePool (Private);
+  gBS->FreePool (Private);
 
   return Status;
 }
@@ -433,7 +433,7 @@ PxeBcDriverBindingStop (
       Private->Mtftp4Child
       );
 
-    NetFreePool (Private);
+    gBS->FreePool (Private);
   }
 
   return Status;

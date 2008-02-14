@@ -155,7 +155,7 @@ Returns:
   //
   // Copy MD5 states to S
   //
-  NetCopyMem (S, Md5Ctx->States, MD5_HASHSIZE);
+  CopyMem (S, Md5Ctx->States, MD5_HASHSIZE);
 
   t = 0;
   for (i = 0; i < 4; i++) {
@@ -205,7 +205,7 @@ Returns:
   UINTN Limit;
 
   for (Limit = 64 - Md5Ctx->Count; DataLen >= 64 - Md5Ctx->Count; Limit = 64) {
-    NetCopyMem (Md5Ctx->M + Md5Ctx->Count, (VOID *)Data, Limit);
+    CopyMem (Md5Ctx->M + Md5Ctx->Count, (VOID *)Data, Limit);
     MD5Transform (Md5Ctx);
     
     Md5Ctx->Count = 0;
@@ -213,7 +213,7 @@ Returns:
     DataLen      -= Limit;
   }
 
-  NetCopyMem (Md5Ctx->M + Md5Ctx->Count, (VOID *)Data, DataLen);
+  CopyMem (Md5Ctx->M + Md5Ctx->Count, (VOID *)Data, DataLen);
   Md5Ctx->Count += DataLen;
 }
 
@@ -237,7 +237,7 @@ Returns:
 
 --*/
 {
-  NetZeroMem (Md5Ctx, sizeof (*Md5Ctx));
+  ZeroMem (Md5Ctx, sizeof (*Md5Ctx));
 
   //
   // Set magic initialization constants.
@@ -311,8 +311,8 @@ Returns:
     //
     // Store Hashed value & Zeroize sensitive context information.
     //
-    NetCopyMem (HashVal, (UINT8 *) Md5Ctx->States, MD5_HASHSIZE);
-    NetZeroMem ((UINT8 *)Md5Ctx, sizeof (*Md5Ctx));
+    CopyMem (HashVal, (UINT8 *) Md5Ctx->States, MD5_HASHSIZE);
+    ZeroMem ((UINT8 *)Md5Ctx, sizeof (*Md5Ctx));
     
     return EFI_SUCCESS;
   }
@@ -327,7 +327,7 @@ Returns:
   Md5Ctx->Length = LShiftU64 (Md5Ctx->Length, 3);
   MD5UpdateBlock (Md5Ctx, (CONST UINT8 *) &Md5Ctx->Length, 8);
 
-  NetZeroMem (Md5Ctx->M, sizeof (Md5Ctx->M));
+  ZeroMem (Md5Ctx->M, sizeof (Md5Ctx->M));
   Md5Ctx->Length  = 0;
   Md5Ctx->Status  = EFI_ALREADY_STARTED;
   return MD5Final (Md5Ctx, HashVal);

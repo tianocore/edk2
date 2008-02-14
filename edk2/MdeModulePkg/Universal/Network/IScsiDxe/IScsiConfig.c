@@ -24,7 +24,7 @@ BOOLEAN         mIScsiDeviceListUpdated = FALSE;
 UINTN           mNumberOfIScsiDevices   = 0;
 ISCSI_FORM_CALLBACK_INFO  *mCallbackInfo;
 
-NET_LIST_ENTRY  mIScsiConfigFormList = {
+LIST_ENTRY      mIScsiConfigFormList = {
   &mIScsiConfigFormList,
   &mIScsiConfigFormList
 };
@@ -138,7 +138,7 @@ Returns:
                   NULL
                   );
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    DeviceList = (ISCSI_DEVICE_LIST *) NetAllocatePool (DataSize);
+    DeviceList = (ISCSI_DEVICE_LIST *) AllocatePool (DataSize);
 
     gRT->GetVariable (
           L"iSCSIDeviceList",
@@ -168,9 +168,9 @@ Returns:
             // Swap the current MAC address entry with the one indexed by
             // LastDeviceIndex.
             //
-            NetCopyMem (&TempMacInfo, CurMacInfo, sizeof (ISCSI_MAC_INFO));
-            NetCopyMem (CurMacInfo, &DeviceList->MacInfo[LastDeviceIndex], sizeof (ISCSI_MAC_INFO));
-            NetCopyMem (&DeviceList->MacInfo[LastDeviceIndex], &TempMacInfo, sizeof (ISCSI_MAC_INFO));
+            CopyMem (&TempMacInfo, CurMacInfo, sizeof (ISCSI_MAC_INFO));
+            CopyMem (CurMacInfo, &DeviceList->MacInfo[LastDeviceIndex], sizeof (ISCSI_MAC_INFO));
+            CopyMem (&DeviceList->MacInfo[LastDeviceIndex], &TempMacInfo, sizeof (ISCSI_MAC_INFO));
           }
 
           LastDeviceIndex++;
@@ -192,16 +192,16 @@ Returns:
       gRT->SetVariable (MacString, &mIScsiCHAPAuthInfoGuid, 0, 0, NULL);
     }
 
-    NetFreePool (DeviceList);
+    gBS->FreePool (DeviceList);
   } else if (Status != EFI_NOT_FOUND) {
-    NetFreePool (Handles);
+    gBS->FreePool (Handles);
     return Status;
   }
   //
   // Construct the new iSCSI device list.
   //
   DeviceListSize        = sizeof (ISCSI_DEVICE_LIST) + (NumHandles - 1) * sizeof (ISCSI_MAC_INFO);
-  DeviceList            = (ISCSI_DEVICE_LIST *) NetAllocatePool (DeviceListSize);
+  DeviceList            = (ISCSI_DEVICE_LIST *) AllocatePool (DeviceListSize);
   DeviceList->NumDevice = (UINT8) NumHandles;
 
   for (Index = 0; Index < NumHandles; Index++) {
@@ -209,7 +209,7 @@ Returns:
     Mode        = Snp->Mode;
 
     CurMacInfo  = &DeviceList->MacInfo[Index];
-    NetCopyMem (&CurMacInfo->Mac, &Mode->PermanentAddress, Mode->HwAddressSize);
+    CopyMem (&CurMacInfo->Mac, &Mode->PermanentAddress, Mode->HwAddressSize);
     CurMacInfo->Len = (UINT8) Mode->HwAddressSize;
   }
 
@@ -221,7 +221,7 @@ Returns:
         DeviceList
         );
 
-  NetFreePool (DeviceList);
+  gBS->FreePool (DeviceList);
 
   return Status;
 }
@@ -248,7 +248,7 @@ Returns:
 --*/
 {
   UINT32                  CurrentIndex;
-  NET_LIST_ENTRY          *Entry;
+  LIST_ENTRY              *Entry;
   ISCSI_CONFIG_FORM_ENTRY *ConfigFormEntry;
 
   CurrentIndex    = 0;
@@ -402,7 +402,7 @@ IScsiFormExtractConfig (
                                Results,
                                Progress
                                );
-  NetFreePool (IfrNvData);
+  gBS->FreePool (IfrNvData);
   return Status;
 }
 
@@ -516,7 +516,7 @@ IScsiFormCallback (
       PopUpInvalidNotify (L"Invalid IP address!");
       Status = EFI_INVALID_PARAMETER;
     } else {
-      NetCopyMem (&Private->Current->SessionConfigData.LocalIp, &HostIp.v4, sizeof (HostIp.v4));
+      CopyMem (&Private->Current->SessionConfigData.LocalIp, &HostIp.v4, sizeof (HostIp.v4));
     }
 
     break;
@@ -528,7 +528,7 @@ IScsiFormCallback (
       PopUpInvalidNotify (L"Invalid Subnet Mask!");
       Status = EFI_INVALID_PARAMETER;
     } else {
-      NetCopyMem (&Private->Current->SessionConfigData.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
+      CopyMem (&Private->Current->SessionConfigData.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
     }
 
     break;
@@ -540,7 +540,7 @@ IScsiFormCallback (
       PopUpInvalidNotify (L"Invalid Gateway!");
       Status = EFI_INVALID_PARAMETER;
     } else {
-      NetCopyMem (&Private->Current->SessionConfigData.Gateway, &Gateway.v4, sizeof (Gateway.v4));
+      CopyMem (&Private->Current->SessionConfigData.Gateway, &Gateway.v4, sizeof (Gateway.v4));
     }
 
     break;
@@ -552,7 +552,7 @@ IScsiFormCallback (
       PopUpInvalidNotify (L"Invalid IP address!");
       Status = EFI_INVALID_PARAMETER;
     } else {
-      NetCopyMem (&Private->Current->SessionConfigData.TargetIp, &HostIp.v4, sizeof (HostIp.v4));
+      CopyMem (&Private->Current->SessionConfigData.TargetIp, &HostIp.v4, sizeof (HostIp.v4));
     }
 
     break;
@@ -581,7 +581,7 @@ IScsiFormCallback (
     if (EFI_ERROR (Status)) {
       PopUpInvalidNotify (L"Invalid LUN string!");
     } else {
-      NetCopyMem (Private->Current->SessionConfigData.BootLun, &Lun, sizeof (Lun));
+      CopyMem (Private->Current->SessionConfigData.BootLun, &Lun, sizeof (Lun));
     }
 
     break;
@@ -625,9 +625,9 @@ IScsiFormCallback (
       // deployed.
       //
       if (!Private->Current->SessionConfigData.InitiatorInfoFromDhcp) {
-        NetCopyMem (&HostIp.v4, &Private->Current->SessionConfigData.LocalIp, sizeof (HostIp.v4));
-        NetCopyMem (&SubnetMask.v4, &Private->Current->SessionConfigData.SubnetMask, sizeof (SubnetMask.v4));
-        NetCopyMem (&Gateway.v4, &Private->Current->SessionConfigData.Gateway, sizeof (Gateway.v4));
+        CopyMem (&HostIp.v4, &Private->Current->SessionConfigData.LocalIp, sizeof (HostIp.v4));
+        CopyMem (&SubnetMask.v4, &Private->Current->SessionConfigData.SubnetMask, sizeof (SubnetMask.v4));
+        CopyMem (&Gateway.v4, &Private->Current->SessionConfigData.Gateway, sizeof (Gateway.v4));
 
         if ((Gateway.Addr[0] != 0)) {
           if (SubnetMask.Addr[0] == 0) {
@@ -645,7 +645,7 @@ IScsiFormCallback (
       // Validate target configuration if DHCP isn't deployed.
       //
       if (!Private->Current->SessionConfigData.TargetInfoFromDhcp) {
-        NetCopyMem (&HostIp.v4, &Private->Current->SessionConfigData.TargetIp, sizeof (HostIp.v4));
+        CopyMem (&HostIp.v4, &Private->Current->SessionConfigData.TargetIp, sizeof (HostIp.v4));
         if (!Ip4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
           PopUpInvalidNotify (L"Target IP is invalid!");
           Status = EFI_INVALID_PARAMETER;
@@ -718,7 +718,7 @@ IScsiFormCallback (
     Status = SetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData, NULL);
   }
 
-  NetFreePool (IfrNvData);
+  gBS->FreePool (IfrNvData);
   return Status;
 }
 
@@ -749,7 +749,7 @@ Returns:
 
 --*/
 {
-  NET_LIST_ENTRY              *Entry;
+  LIST_ENTRY                  *Entry;
   ISCSI_CONFIG_FORM_ENTRY     *ConfigFormEntry;
   BOOLEAN                     EntryExisted;
   EFI_STATUS                  Status;
@@ -779,12 +779,12 @@ Returns:
       //
       // Add a new form.
       //
-      ConfigFormEntry = (ISCSI_CONFIG_FORM_ENTRY *) NetAllocateZeroPool (sizeof (ISCSI_CONFIG_FORM_ENTRY));
+      ConfigFormEntry = (ISCSI_CONFIG_FORM_ENTRY *) AllocateZeroPool (sizeof (ISCSI_CONFIG_FORM_ENTRY));
       if (ConfigFormEntry == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
 
-      NetListInit (&ConfigFormEntry->Link);
+      InitializeListHead (&ConfigFormEntry->Link);
       ConfigFormEntry->Controller = Controller;
 
       //
@@ -812,7 +812,7 @@ Returns:
                       &ConfigFormEntry->SessionConfigData
                       );
       if (EFI_ERROR (Status)) {
-        NetZeroMem (&ConfigFormEntry->SessionConfigData, sizeof (ConfigFormEntry->SessionConfigData));
+        ZeroMem (&ConfigFormEntry->SessionConfigData, sizeof (ConfigFormEntry->SessionConfigData));
       }
       //
       // Get the CHAP authentication configuration data.
@@ -826,7 +826,7 @@ Returns:
                       &ConfigFormEntry->AuthConfigData
                       );
       if (EFI_ERROR (Status)) {
-        NetZeroMem (&ConfigFormEntry->AuthConfigData, sizeof (ConfigFormEntry->AuthConfigData));
+        ZeroMem (&ConfigFormEntry->AuthConfigData, sizeof (ConfigFormEntry->AuthConfigData));
       }
       //
       // Compose the Port string and create a new STRING_REF.
@@ -840,21 +840,21 @@ Returns:
       UnicodeSPrint (PortString, 128, L"Set the iSCSI parameters on port %s", ConfigFormEntry->MacString);
       HiiLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleHelpToken, PortString);
 
-      NetListInsertTail (&mIScsiConfigFormList, &ConfigFormEntry->Link);
+      InsertTailList (&mIScsiConfigFormList, &ConfigFormEntry->Link);
       mNumberOfIScsiDevices++;
     }
   } else {
     ASSERT (EntryExisted);
 
     mNumberOfIScsiDevices--;
-    NetListRemoveEntry (&ConfigFormEntry->Link);
-    NetFreePool (ConfigFormEntry);
+    RemoveEntryList (&ConfigFormEntry->Link);
+    gBS->FreePool (ConfigFormEntry);
   }
   //
   // Allocate space for creation of Buffer
   //
   UpdateData.BufferSize = 0x1000;
-  UpdateData.Data = NetAllocateZeroPool (0x1000);
+  UpdateData.Data = AllocateZeroPool (0x1000);
   UpdateData.Offset = 0;
 
   FormIndex = 0;
@@ -882,7 +882,7 @@ Returns:
     &UpdateData
     );
 
-  NetFreePool (UpdateData.Data);
+  gBS->FreePool (UpdateData.Data);
 
   return EFI_SUCCESS;
 }
@@ -918,7 +918,7 @@ Returns:
     return Status;
   }
 
-  CallbackInfo = (ISCSI_FORM_CALLBACK_INFO *) NetAllocatePool (sizeof (ISCSI_FORM_CALLBACK_INFO));
+  CallbackInfo = (ISCSI_FORM_CALLBACK_INFO *) AllocatePool (sizeof (ISCSI_FORM_CALLBACK_INFO));
   if (CallbackInfo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -967,7 +967,7 @@ Returns:
                            CallbackInfo->DriverHandle,
                            &CallbackInfo->RegisteredHandle
                            );
-  NetFreePool (PackageList);
+  gBS->FreePool (PackageList);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1002,7 +1002,7 @@ Returns:
 {
   ISCSI_CONFIG_FORM_ENTRY     *ConfigFormEntry;
 
-  while (!NetListIsEmpty (&mIScsiConfigFormList)) {
+  while (!IsListEmpty (&mIScsiConfigFormList)) {
     //
     // Uninstall the device forms as the iSCSI driver instance may fail to
     // control the controller but still install the device configuration form.
@@ -1032,7 +1032,7 @@ Returns:
         );
   HiiLibDestroyHiiDriverHandle (mCallbackInfo->DriverHandle);
 
-  NetFreePool (mCallbackInfo);
+  gBS->FreePool (mCallbackInfo);
 
   return EFI_SUCCESS;
 }

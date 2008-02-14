@@ -358,12 +358,12 @@ DhcpConfigLeaseIoPort (
   UdpConfigData.RemotePort          = DHCP_SERVER_PORT;
 
   Ip = HTONL (DhcpSb->ClientAddr);
-  NetCopyMem (&UdpConfigData.StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&UdpConfigData.StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   Ip = HTONL (DhcpSb->Netmask);
-  NetCopyMem (&UdpConfigData.SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&UdpConfigData.SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
-  NetZeroMem (&UdpConfigData.RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
+  ZeroMem (&UdpConfigData.RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
 
   Status = UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfigData);
 
@@ -375,10 +375,10 @@ DhcpConfigLeaseIoPort (
   // Add a default route if received from the server.
   //
   if ((DhcpSb->Para != NULL) && (DhcpSb->Para->Router != 0)) {
-    NetZeroMem (&Subnet, sizeof (EFI_IPv4_ADDRESS));
+    ZeroMem (&Subnet, sizeof (EFI_IPv4_ADDRESS));
 
     Ip = HTONL (DhcpSb->Para->Router);
-    NetCopyMem (&Gateway, &Ip, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Gateway, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
     UdpIo->Udp->Routes (UdpIo->Udp, FALSE, &Subnet, &Subnet, &Gateway);
   }
@@ -465,17 +465,17 @@ DhcpCleanLease (
   DhcpSb->ServerAddr  = 0;
 
   if (DhcpSb->LastOffer != NULL) {
-    NetFreePool (DhcpSb->LastOffer);
+    gBS->FreePool (DhcpSb->LastOffer);
     DhcpSb->LastOffer = NULL;
   }
 
   if (DhcpSb->Selected != NULL) {
-    NetFreePool (DhcpSb->Selected);
+    gBS->FreePool (DhcpSb->Selected);
     DhcpSb->Selected = NULL;
   }
 
   if (DhcpSb->Para != NULL) {
-    NetFreePool (DhcpSb->Para);
+    gBS->FreePool (DhcpSb->Para);
     DhcpSb->Para = NULL;
   }
 
@@ -545,10 +545,10 @@ DhcpChooseOffer (
   Selected = DhcpSb->LastOffer;
 
   if ((NewPacket != NULL) && !EFI_ERROR (DhcpValidateOptions (NewPacket, NULL))) {
-    TempPacket = (EFI_DHCP4_PACKET *) NetAllocatePool (NewPacket->Size);
+    TempPacket = (EFI_DHCP4_PACKET *) AllocatePool (NewPacket->Size);
     if (TempPacket != NULL) {
-      NetCopyMem (TempPacket, NewPacket, NewPacket->Size);
-      NetFreePool (Selected);
+      CopyMem (TempPacket, NewPacket, NewPacket->Size);
+      gBS->FreePool (Selected);
       Selected = TempPacket;
     }
   }
@@ -664,7 +664,7 @@ DhcpHandleSelect (
 
   if (Status == EFI_SUCCESS) {
     if (DhcpSb->LastOffer != NULL) {
-      NetFreePool (DhcpSb->LastOffer);
+      gBS->FreePool (DhcpSb->LastOffer);
     }
 
     DhcpSb->LastOffer = Packet;
@@ -673,7 +673,7 @@ DhcpHandleSelect (
 
   } else if (Status == EFI_NOT_READY) {
     if (DhcpSb->LastOffer != NULL) {
-      NetFreePool (DhcpSb->LastOffer);
+      gBS->FreePool (DhcpSb->LastOffer);
     }
 
     DhcpSb->LastOffer = Packet;
@@ -689,7 +689,7 @@ DhcpHandleSelect (
   return EFI_SUCCESS;
 
 ON_EXIT:
-  NetFreePool (Packet);
+  gBS->FreePool (Packet);
   return Status;
 }
 
@@ -775,14 +775,14 @@ DhcpHandleRequest (
   DhcpSb->IoStatus = EFI_SUCCESS;
   DhcpNotifyUser (DhcpSb, DHCP_NOTIFY_COMPLETION);
 
-  NetFreePool (Packet);
+  gBS->FreePool (Packet);
   return EFI_SUCCESS;
 
 REJECT:
   DhcpSendMessage (DhcpSb, DhcpSb->Selected, DhcpSb->Para, DHCP_MSG_DECLINE, Message);
 
 ON_EXIT:
-  NetFreePool (Packet);
+  gBS->FreePool (Packet);
   return Status;
 }
 
@@ -866,7 +866,7 @@ DhcpHandleRenewRebind (
   }
 
 ON_EXIT:
-  NetFreePool (Packet);
+  gBS->FreePool (Packet);
   return Status;
 }
 
@@ -935,7 +935,7 @@ DhcpHandleReboot (
   //
   // OK, get the parameter from server, record the lease
   //
-  DhcpSb->Para = NetAllocatePool (sizeof (DHCP_PARAMETER));
+  DhcpSb->Para = AllocatePool (sizeof (DHCP_PARAMETER));
 
   if (DhcpSb->Para == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -956,7 +956,7 @@ DhcpHandleReboot (
   return EFI_SUCCESS;
 
 ON_EXIT:
-  NetFreePool (Packet);
+  gBS->FreePool (Packet);
   return Status;
 }
 
@@ -1018,7 +1018,7 @@ DhcpInput (
   // Copy the DHCP message to a continuous memory block
   //
   Len     = sizeof (EFI_DHCP4_PACKET) + UdpPacket->TotalSize - sizeof (EFI_DHCP4_HEADER);
-  Packet  = (EFI_DHCP4_PACKET *) NetAllocatePool (Len);
+  Packet  = (EFI_DHCP4_PACKET *) AllocatePool (Len);
 
   if (Packet == NULL) {
     goto RESTART;
@@ -1078,7 +1078,7 @@ DhcpInput (
     //
     // Ignore the packet in INITREBOOT, INIT and BOUND states
     //
-    NetFreePool (Packet);
+    gBS->FreePool (Packet);
     Status = EFI_SUCCESS;
     break;
 
@@ -1093,7 +1093,7 @@ DhcpInput (
   }
 
   if (Para != NULL) {
-    NetFreePool (Para);
+    gBS->FreePool (Para);
   }
 
   Packet = NULL;
@@ -1108,7 +1108,7 @@ RESTART:
   NetbufFree (UdpPacket);
 
   if (Packet != NULL) {
-    NetFreePool (Packet);
+    gBS->FreePool (Packet);
   }
 
   Status = UdpIoRecvDatagram (DhcpSb->UdpIo, DhcpInput, DhcpSb, 0);
@@ -1132,7 +1132,7 @@ DhcpReleasePacket (
   IN VOID                   *Arg
   )
 {
-  NetFreePool (Arg);
+  gBS->FreePool (Arg);
 }
 
 
@@ -1212,7 +1212,7 @@ DhcpSendMessage (
     Len += (UINT32)AsciiStrLen ((CHAR8 *) Msg);
   }
 
-  Packet = NetAllocatePool (Len);
+  Packet = AllocatePool (Len);
 
   if (Packet == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1232,7 +1232,7 @@ DhcpSendMessage (
   }
 
   Head = &Packet->Dhcp4.Header;
-  NetZeroMem (Head, sizeof (EFI_DHCP4_HEADER));
+  ZeroMem (Head, sizeof (EFI_DHCP4_HEADER));
 
   Head->OpCode       = BOOTP_REQUEST;
   Head->HwType       = DhcpSb->HwType;
@@ -1241,7 +1241,7 @@ DhcpSendMessage (
   Head->Reserved     = HTONS (0x8000);  //Server, broadcast the message please.
 
   EFI_IP4 (Head->ClientAddr) = HTONL (DhcpSb->ClientAddr);
-  NetCopyMem (Head->ClientHwAddr, DhcpSb->Mac.Addr, DhcpSb->HwLen);
+  CopyMem (Head->ClientHwAddr, DhcpSb->Mac.Addr, DhcpSb->HwLen);
 
   //
   // Append the DHCP message type
@@ -1352,12 +1352,12 @@ DhcpSendMessage (
   }
 
   if (EFI_ERROR (Status)) {
-    NetFreePool (Packet);
+    gBS->FreePool (Packet);
     return Status;
   }
 
   if (NewPacket != NULL) {
-    NetFreePool (Packet);
+    gBS->FreePool (Packet);
     Packet = NewPacket;
   }
 
@@ -1369,7 +1369,7 @@ DhcpSendMessage (
   Wrap      = NetbufFromExt (&Frag, 1, 0, 0, DhcpReleasePacket, Packet);
 
   if (Wrap == NULL) {
-    NetFreePool (Packet);
+    gBS->FreePool (Packet);
     return EFI_OUT_OF_RESOURCES;
   }
 

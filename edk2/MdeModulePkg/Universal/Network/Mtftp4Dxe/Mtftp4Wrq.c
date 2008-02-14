@@ -131,7 +131,7 @@ Mtftp4WrqSendBlock (
 
     if (DataLen > 0) {
       NetbufAllocSpace (UdpPacket, DataLen, FALSE);
-      NetCopyMem (Packet->Data.Data, (UINT8 *) Token->Buffer + Start, DataLen);
+      CopyMem (Packet->Data.Data, (UINT8 *) Token->Buffer + Start, DataLen);
     }
 
   } else {
@@ -162,7 +162,7 @@ Mtftp4WrqSendBlock (
 
     if (DataLen > 0) {
       NetbufAllocSpace (UdpPacket, DataLen, FALSE);
-      NetCopyMem (Packet->Data.Data, DataBuf, DataLen);
+      CopyMem (Packet->Data.Data, DataBuf, DataLen);
       gBS->FreePool (DataBuf);
     }
   }
@@ -327,7 +327,7 @@ Mtftp4WrqHandleOack (
   //
   // Parse and validate the options from server
   //
-  NetZeroMem (&Reply, sizeof (MTFTP4_OPTION));
+  ZeroMem (&Reply, sizeof (MTFTP4_OPTION));
   Status = Mtftp4ParseOptionOack (Packet, Len, &Reply);
 
   if (EFI_ERROR (Status) || !Mtftp4WrqOackValid (&Reply, &Instance->RequestOption)) {
@@ -428,7 +428,7 @@ Mtftp4WrqInput (
   Len = UdpPacket->TotalSize;
 
   if (UdpPacket->BlockOpNum > 1) {
-    Packet = NetAllocatePool (Len);
+    Packet = AllocatePool (Len);
 
     if (Packet == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -502,7 +502,7 @@ ON_EXIT:
   // restart the receive, otherwise end the session.
   //
   if ((Packet != NULL) && (UdpPacket->BlockOpNum > 1)) {
-    NetFreePool (Packet);
+    gBS->FreePool (Packet);
   }
 
   if (UdpPacket != NULL) {

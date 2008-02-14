@@ -36,7 +36,7 @@
 [Sources.common]
   DxeNetLib.c
   NetBuffer.c
-  NetDebug.c
+
 
 [Packages]
   MdePkg/MdePkg.dec

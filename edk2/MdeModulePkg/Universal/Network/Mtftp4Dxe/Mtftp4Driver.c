@@ -151,7 +151,7 @@ Mtftp4CreateService (
   EFI_STATUS                Status;
 
   *Service  = NULL;
-  MtftpSb   = NetAllocatePool (sizeof (MTFTP4_SERVICE));
+  MtftpSb   = AllocatePool (sizeof (MTFTP4_SERVICE));
 
   if (MtftpSb == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -161,7 +161,7 @@ Mtftp4CreateService (
   MtftpSb->ServiceBinding = gMtftp4ServiceBindingTemplete;
   MtftpSb->InDestory      = FALSE;
   MtftpSb->ChildrenNum    = 0;
-  NetListInit (&MtftpSb->Children);
+  InitializeListHead (&MtftpSb->Children);
 
   MtftpSb->Timer          = NULL;
   MtftpSb->TimerToGetMap  = NULL;
@@ -174,14 +174,14 @@ Mtftp4CreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   Mtftp4OnTimerTick,
                   MtftpSb,
                   &MtftpSb->Timer
                   );
 
   if (EFI_ERROR (Status)) {
-    NetFreePool (MtftpSb);
+    gBS->FreePool (MtftpSb);
     return Status;
   }
 
@@ -191,14 +191,14 @@ Mtftp4CreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   NULL,
                   NULL,
                   &MtftpSb->TimerToGetMap
                   );
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (MtftpSb->Timer);
-    NetFreePool (MtftpSb);
+    gBS->FreePool (MtftpSb);
     return Status;
   }
 
@@ -207,7 +207,7 @@ Mtftp4CreateService (
   if (MtftpSb->ConnectUdp == NULL) {
     gBS->CloseEvent (MtftpSb->TimerToGetMap);
     gBS->CloseEvent (MtftpSb->Timer);
-    NetFreePool (MtftpSb);
+    gBS->FreePool (MtftpSb);
     return EFI_DEVICE_ERROR;
   }
 
@@ -306,7 +306,7 @@ Mtftp4DriverBindingStart (
 
 ON_ERROR:
   Mtftp4CleanService (MtftpSb);
-  NetFreePool (MtftpSb);
+  gBS->FreePool (MtftpSb);
 
   return Status;
 }
@@ -370,7 +370,7 @@ Mtftp4DriverBindingStop (
     return EFI_SUCCESS;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (NumberOfChildren == 0) {
 
@@ -384,10 +384,10 @@ Mtftp4DriverBindingStop (
 
     Mtftp4CleanService (MtftpSb);
 
-    NetFreePool (MtftpSb);
+    gBS->FreePool (MtftpSb);
   } else {
 
-    while (!NetListIsEmpty (&MtftpSb->Children)) {
+    while (!IsListEmpty (&MtftpSb->Children)) {
       Instance = NET_LIST_HEAD (&MtftpSb->Children, MTFTP4_PROTOCOL, Link);
       Mtftp4ServiceBindingDestroyChild (ServiceBinding, Instance->Handle);
     }
@@ -397,7 +397,7 @@ Mtftp4DriverBindingStop (
     }
   }
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -417,16 +417,16 @@ Mtftp4InitProtocol (
   IN MTFTP4_PROTOCOL        *Instance
   )
 {
-  NetZeroMem (Instance, sizeof (MTFTP4_PROTOCOL));
+  ZeroMem (Instance, sizeof (MTFTP4_PROTOCOL));
 
   Instance->Signature = MTFTP4_PROTOCOL_SIGNATURE;
-  NetListInit (&Instance->Link);
+  InitializeListHead (&Instance->Link);
   CopyMem (&Instance->Mtftp4, &gMtftp4ProtocolTemplate, sizeof (Instance->Mtftp4));
   Instance->State     = MTFTP4_STATE_UNCONFIGED;
   Instance->Indestory = FALSE;
   Instance->Service   = MtftpSb;
 
-  NetListInit (&Instance->Blocks);
+  InitializeListHead (&Instance->Blocks);
 }
 
 
@@ -458,7 +458,7 @@ Mtftp4ServiceBindingCreateChild (
     return EFI_INVALID_PARAMETER;
   }
 
-  Instance = NetAllocatePool (sizeof (*Instance));
+  Instance = AllocatePool (sizeof (*Instance));
 
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -476,7 +476,7 @@ Mtftp4ServiceBindingCreateChild (
                             );
 
   if (Instance->UnicastPort == NULL) {
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -521,18 +521,18 @@ Mtftp4ServiceBindingCreateChild (
   //
   // Add it to the parent's child list.
   //
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  NetListInsertTail (&MtftpSb->Children, &Instance->Link);
+  InsertTailList (&MtftpSb->Children, &Instance->Link);
   MtftpSb->ChildrenNum++;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
 ON_ERROR:
 
   if (EFI_ERROR (Status)) {
     UdpIoFreePort (Instance->UnicastPort);
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
   }
 
   return Status;
@@ -620,16 +620,16 @@ Mtftp4ServiceBindingDestroyChild (
     return Status;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Mtftp4CleanOperation (Instance, EFI_DEVICE_ERROR);
   UdpIoFreePort (Instance->UnicastPort);
 
-  NetListRemoveEntry (&Instance->Link);
+  RemoveEntryList (&Instance->Link);
   MtftpSb->ChildrenNum--;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
-  NetFreePool (Instance);
+  gBS->FreePool (Instance);
   return EFI_SUCCESS;
 }

@@ -85,7 +85,7 @@ typedef struct {
 //
 typedef struct {
   UINT32                    Signature;
-  NET_LIST_ENTRY            Link;
+  LIST_ENTRY                Link;
   UDP_IO_PORT               *UdpIo;
 
   UDP_IO_CALLBACK           CallBack;
@@ -101,7 +101,7 @@ typedef struct {
 
 struct _UDP_IO_PORT {
   UINT32                    Signature;
-  NET_LIST_ENTRY            Link;
+  LIST_ENTRY                Link;
   INTN                      RefCnt;
 
   //
@@ -115,7 +115,7 @@ struct _UDP_IO_PORT {
   EFI_UDP4_CONFIG_DATA      UdpConfig;
   EFI_SIMPLE_NETWORK_MODE   SnpMode;
 
-  NET_LIST_ENTRY            SentDatagram;
+  LIST_ENTRY                SentDatagram;
   UDP_RX_TOKEN              *RecvRequest;
 };
 

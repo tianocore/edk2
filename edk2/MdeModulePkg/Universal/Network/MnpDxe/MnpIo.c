@@ -58,7 +58,7 @@ MnpIsValidTxToken (
     // The token is invalid if the Event is NULL, or the TxData is NULL, or
     // the fragment count is zero.
     //
-    MNP_DEBUG_WARN (("MnpIsValidTxToken: Invalid Token.\n"));
+    DEBUG ((EFI_D_WARN, "MnpIsValidTxToken: Invalid Token.\n"));
     return FALSE;
   }
 
@@ -67,7 +67,7 @@ MnpIsValidTxToken (
     // The token is invalid if the HeaderLength isn't zero while the DestinationAddress
     // is NULL (The destination address is already put into the packet).
     //
-    MNP_DEBUG_WARN (("MnpIsValidTxToken: DestinationAddress isn't NULL, HeaderLength must be 0.\n"));
+    DEBUG ((EFI_D_WARN, "MnpIsValidTxToken: DestinationAddress isn't NULL, HeaderLength must be 0.\n"));
     return FALSE;
   }
 
@@ -79,7 +79,7 @@ MnpIsValidTxToken (
       //
       // The token is invalid if any FragmentLength is zero or any FragmentBuffer is NULL.
       //
-      MNP_DEBUG_WARN (("MnpIsValidTxToken: Invalid FragmentLength or FragmentBuffer.\n"));
+      DEBUG ((EFI_D_WARN, "MnpIsValidTxToken: Invalid FragmentLength or FragmentBuffer.\n"));
       return FALSE;
     }
 
@@ -98,7 +98,7 @@ MnpIsValidTxToken (
     // The length calculated from the fragment information doesn't equal to the
     // sum of the DataLength and the HeaderLength.
     //
-    MNP_DEBUG_WARN (("MnpIsValidTxData: Invalid Datalength compared with the sum of fragment length.\n"));
+    DEBUG ((EFI_D_WARN, "MnpIsValidTxData: Invalid Datalength compared with the sum of fragment length.\n"));
     return FALSE;
   }
 
@@ -106,7 +106,7 @@ MnpIsValidTxToken (
     //
     // The total length is larger than the MTU.
     //
-    MNP_DEBUG_WARN (("MnpIsValidTxData: TxData->DataLength exceeds Mtu.\n"));
+    DEBUG ((EFI_D_WARN, "MnpIsValidTxData: TxData->DataLength exceeds Mtu.\n"));
     return FALSE;
   }
 
@@ -169,7 +169,7 @@ MnpBuildTxPacket (
       //
       // Copy the data.
       //
-      NetCopyMem (
+      CopyMem (
         DstPos,
         TxData->FragmentTable[Index].FragmentBuffer,
         TxData->FragmentTable[Index].FragmentLength
@@ -329,7 +329,7 @@ MnpInstanceDeliverPacket (
   MnpServiceData = Instance->MnpServiceData;
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
 
-  if (NetMapIsEmpty (&Instance->RxTokenMap) || NetListIsEmpty (&Instance->RcvdPacketQueue)) {
+  if (NetMapIsEmpty (&Instance->RxTokenMap) || IsListEmpty (&Instance->RcvdPacketQueue)) {
     //
     // No pending received data or no available receive token, return.
     //
@@ -346,7 +346,7 @@ MnpInstanceDeliverPacket (
     //
     DupNbuf = MnpAllocNbuf (MnpServiceData);
     if (DupNbuf == NULL) {
-      MNP_DEBUG_WARN (("MnpDeliverPacket: Failed to allocate a free Nbuf.\n"));
+      DEBUG ((EFI_D_WARN, "MnpDeliverPacket: Failed to allocate a free Nbuf.\n"));
 
       return EFI_OUT_OF_RESOURCES;
     }
@@ -379,7 +379,7 @@ MnpInstanceDeliverPacket (
   //
   // Insert this RxDataWrap into the delivered queue.
   //
-  NetListInsertTail (&Instance->RxDeliveredPacketQueue, &RxDataWrap->WrapEntry);
+  InsertTailList (&Instance->RxDeliveredPacketQueue, &RxDataWrap->WrapEntry);
 
   //
   // Get the receive token from the RxTokenMap.
@@ -411,7 +411,7 @@ MnpDeliverPacket (
   IN MNP_SERVICE_DATA  *MnpServiceData
   )
 {
-  NET_LIST_ENTRY    *Entry;
+  LIST_ENTRY        *Entry;
   MNP_INSTANCE_DATA *Instance;
 
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
@@ -472,9 +472,9 @@ MnpRecycleRxData (
   //
   // Remove this Wrap entry from the list.
   //
-  NetListRemoveEntry (&RxDataWrap->WrapEntry);
+  RemoveEntryList (&RxDataWrap->WrapEntry);
 
-  NetFreePool (RxDataWrap);
+  gBS->FreePool (RxDataWrap);
 }
 
 
@@ -505,7 +505,7 @@ MnpQueueRcvdPacket (
   //
   if (Instance->RcvdPacketQueueSize == MNP_MAX_RCVD_PACKET_QUE_SIZE) {
 
-    MNP_DEBUG_WARN (("MnpQueueRcvdPacket: Drop one packet bcz queue size limit reached.\n"));
+    DEBUG ((EFI_D_WARN, "MnpQueueRcvdPacket: Drop one packet bcz queue size limit reached.\n"));
 
     //
     // Get the oldest packet.
@@ -531,7 +531,7 @@ MnpQueueRcvdPacket (
   //
   // Insert this Wrap into the instance queue.
   //
-  NetListInsertTail (&Instance->RcvdPacketQueue, &RxDataWrap->WrapEntry);
+  InsertTailList (&Instance->RcvdPacketQueue, &RxDataWrap->WrapEntry);
   Instance->RcvdPacketQueueSize++;
 }
 
@@ -560,7 +560,7 @@ MnpMatchPacket (
   )
 {
   EFI_MANAGED_NETWORK_CONFIG_DATA *ConfigData;
-  NET_LIST_ENTRY                  *Entry;
+  LIST_ENTRY                      *Entry;
   MNP_GROUP_CONTROL_BLOCK         *GroupCtrlBlk;
 
   NET_CHECK_SIGNATURE (Instance, MNP_INSTANCE_DATA_SIGNATURE);
@@ -644,7 +644,7 @@ MnpAnalysePacket (
 {
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
   UINT8                   *BufPtr;
-  NET_LIST_ENTRY          *Entry;
+  LIST_ENTRY              *Entry;
 
   SnpMode = MnpServiceData->Snp->Mode;
 
@@ -707,7 +707,7 @@ MnpAnalysePacket (
     }
   }
 
-  NetZeroMem (&RxData->Timestamp, sizeof (EFI_TIME));
+  ZeroMem (&RxData->Timestamp, sizeof (EFI_TIME));
 
   //
   // Fill the common parts of RxData.
@@ -742,9 +742,9 @@ MnpWrapRxData (
   //
   // Allocate memory.
   //
-  RxDataWrap = NetAllocatePool (sizeof (MNP_RXDATA_WRAP));
+  RxDataWrap = AllocatePool (sizeof (MNP_RXDATA_WRAP));
   if (RxDataWrap == NULL) {
-    MNP_DEBUG_ERROR (("MnpDispatchPacket: Failed to allocate a MNP_RXDATA_WRAP.\n"));
+    DEBUG ((EFI_D_ERROR, "MnpDispatchPacket: Failed to allocate a MNP_RXDATA_WRAP.\n"));
     return NULL;
   }
 
@@ -760,15 +760,15 @@ MnpWrapRxData (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_RECYCLE,
+                  TPL_NOTIFY,
                   MnpRecycleRxData,
                   RxDataWrap,
                   &RxDataWrap->RxData.RecycleEvent
                   );
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (("MnpDispatchPacket: gBS->CreateEvent failed, %r.\n", Status));
-    NetFreePool (RxDataWrap);
+    DEBUG ((EFI_D_ERROR, "MnpDispatchPacket: gBS->CreateEvent failed, %r.\n", Status));
+    gBS->FreePool (RxDataWrap);
     return NULL;
   }
 
@@ -794,7 +794,7 @@ MnpEnqueuePacket (
   IN NET_BUF            *Nbuf
   )
 {
-  NET_LIST_ENTRY                    *Entry;
+  LIST_ENTRY                        *Entry;
   MNP_INSTANCE_DATA                 *Instance;
   EFI_MANAGED_NETWORK_RECEIVE_DATA  RxData;
   UINT8                             PktAttr;
@@ -889,7 +889,7 @@ MnpReceivePacket (
     return EFI_NOT_STARTED;
   }
 
-  if (NetListIsEmpty (&MnpServiceData->ChildrenList)) {
+  if (IsListEmpty (&MnpServiceData->ChildrenList)) {
     //
     // There is no child, no need to receive packets.
     //
@@ -929,7 +929,7 @@ MnpReceivePacket (
 
     DEBUG_CODE (
       if (Status != EFI_NOT_READY) {
-      MNP_DEBUG_ERROR (("MnpReceivePacket: Snp->Receive() = %r.\n", Status));
+      DEBUG ((EFI_D_ERROR, "MnpReceivePacket: Snp->Receive() = %r.\n", Status));
     }
     );
 
@@ -941,8 +941,9 @@ MnpReceivePacket (
   //
   if ((HeaderSize != Snp->Mode->MediaHeaderSize) || (BufLen < HeaderSize)) {
 
-    MNP_DEBUG_WARN (
-      ("MnpReceivePacket: Size error, HL:TL = %d:%d.\n",
+    DEBUG (
+      (EFI_D_WARN,
+      "MnpReceivePacket: Size error, HL:TL = %d:%d.\n",
       HeaderSize,
       BufLen)
       );
@@ -973,7 +974,7 @@ MnpReceivePacket (
     Nbuf                        = MnpAllocNbuf (MnpServiceData);
     MnpServiceData->RxNbufCache = Nbuf;
     if (Nbuf == NULL) {
-      MNP_DEBUG_ERROR (("MnpReceivePacket: Alloc packet for receiving cache failed.\n"));
+      DEBUG ((EFI_D_ERROR, "MnpReceivePacket: Alloc packet for receiving cache failed.\n"));
       return EFI_DEVICE_ERROR;
     }
 
@@ -1024,9 +1025,9 @@ MnpCheckPacketTimeout (
   )
 {
   MNP_SERVICE_DATA  *MnpServiceData;
-  NET_LIST_ENTRY    *Entry;
-  NET_LIST_ENTRY    *RxEntry;
-  NET_LIST_ENTRY    *NextEntry;
+  LIST_ENTRY        *Entry;
+  LIST_ENTRY        *RxEntry;
+  LIST_ENTRY        *NextEntry;
   MNP_INSTANCE_DATA *Instance;
   MNP_RXDATA_WRAP   *RxDataWrap;
   EFI_TPL           OldTpl;
@@ -1047,7 +1048,7 @@ MnpCheckPacketTimeout (
       continue;
     }
 
-    OldTpl = NET_RAISE_TPL (NET_TPL_RECYCLE);
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
     NET_LIST_FOR_EACH_SAFE (RxEntry, NextEntry, &Instance->RcvdPacketQueue) {
 
@@ -1060,13 +1061,13 @@ MnpCheckPacketTimeout (
         //
         // Drop the timeout packet.
         //
-        MNP_DEBUG_WARN (("MnpCheckPacketTimeout: Received packet timeout.\n"));
+        DEBUG ((EFI_D_WARN, "MnpCheckPacketTimeout: Received packet timeout.\n"));
         MnpRecycleRxData (NULL, RxDataWrap);
         Instance->RcvdPacketQueueSize--;
       }
     }
 
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
   }
 }
 

@@ -162,10 +162,10 @@ TcpGetMaxSndNxt (
   IN TCP_CB *Tcb
   )
 {
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *Entry;
   NET_BUF         *Nbuf;
 
-  if (NetListIsEmpty (&Tcb->SndQue)) {
+  if (IsListEmpty (&Tcb->SndQue)) {
     return Tcb->SndNxt;
   }
 
@@ -271,8 +271,9 @@ TcpDataToSend (
 SetPersistTimer:
   if (!TCP_TIMER_ON (Tcb->EnabledTimer, TCP_TIMER_REXMIT)) {
 
-    TCP4_DEBUG_WARN (
-      ("TcpDataToSend: enter persistent state for TCB %x\n",
+    DEBUG (
+      (EFI_D_WARN,
+      "TcpDataToSend: enter persistent state for TCB %x\n",
       Tcb)
       );
 
@@ -425,8 +426,8 @@ TcpGetSegmentSndQue (
   IN UINT32    Len
   )
 {
-  NET_LIST_ENTRY  *Head;
-  NET_LIST_ENTRY  *Cur;
+  LIST_ENTRY      *Head;
+  LIST_ENTRY      *Cur;
   NET_BUF         *Node;
   TCP_SEG         *Seg;
   NET_BUF         *Nbuf;
@@ -538,7 +539,7 @@ TcpGetSegmentSndQue (
     }
   }
 
-  NetCopyMem (TCPSEG_NETBUF (Nbuf), Seg, sizeof (TCP_SEG));
+  CopyMem (TCPSEG_NETBUF (Nbuf), Seg, sizeof (TCP_SEG));
 
   TCPSEG_NETBUF (Nbuf)->Seq   = Seq;
   TCPSEG_NETBUF (Nbuf)->End   = End;
@@ -578,7 +579,7 @@ TcpGetSegmentSock (
   Nbuf = NetbufAlloc (Len + TCP_MAX_HEAD);
 
   if (Nbuf == NULL) {
-    TCP4_DEBUG_ERROR (("TcpGetSegmentSock: failed to allocate "
+    DEBUG ((EFI_D_ERROR, "TcpGetSegmentSock: failed to allocate "
       "a netbuf for TCB %x\n",Tcb));
 
     return NULL;
@@ -603,7 +604,7 @@ TcpGetSegmentSock (
   TCPSEG_NETBUF (Nbuf)->Seq = Seq;
   TCPSEG_NETBUF (Nbuf)->End = Seq + Len;
 
-  NetListInsertTail (&(Tcb->SndQue), &(Nbuf->List));
+  InsertTailList (&(Tcb->SndQue), &(Nbuf->List));
 
   if (DataGet != 0) {
 
@@ -679,7 +680,7 @@ TcpRetransmit (
   // 3. will not change the boundaries of queued segments.
   //
   if (TCP_SEQ_LT (Tcb->SndWl2 + Tcb->SndWnd, Seq)) {
-    TCP4_DEBUG_WARN (("TcpRetransmit: retransmission cancelled "
+    DEBUG ((EFI_D_WARN, "TcpRetransmit: retransmission cancelled "
       "because send window too small for TCB %x\n", Tcb));
 
     return 0;
@@ -780,8 +781,9 @@ SEND_AGAIN:
   Nbuf = TcpGetSegment (Tcb, Seq, Len);
 
   if (Nbuf == NULL) {
-    TCP4_DEBUG_ERROR (
-      ("TcpToSendData: failed to get a segment for TCB %x\n",
+    DEBUG (
+      (EFI_D_ERROR,
+      "TcpToSendData: failed to get a segment for TCB %x\n",
       Tcb)
       );
 
@@ -809,7 +811,7 @@ SEND_AGAIN:
         TCP_SEQ_LT (End + 1, Tcb->SndWnd + Tcb->SndWl2)
           ) {
 
-      TCP4_DEBUG_TRACE (("TcpToSendData: send FIN "
+      DEBUG ((EFI_D_INFO, "TcpToSendData: send FIN "
         "to peer for TCB %x in state %d\n", Tcb, Tcb->State));
 
       End++;
@@ -829,7 +831,7 @@ SEND_AGAIN:
   // don't send an empty segment here.
   //
   if (Seg->End == Seg->Seq) {
-    TCP4_DEBUG_WARN (("TcpToSendData: created a empty"
+    DEBUG ((EFI_D_WARN, "TcpToSendData: created a empty"
       " segment for TCB %x, free it now\n", Tcb));
 
     NetbufFree (Nbuf);
@@ -886,7 +888,7 @@ SEND_AGAIN:
   if ((Tcb->CongestState == TCP_CONGEST_OPEN) &&
       !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RTT_ON)) {
 
-    TCP4_DEBUG_TRACE (("TcpToSendData: set RTT measure "
+    DEBUG ((EFI_D_INFO, "TcpToSendData: set RTT measure "
       "sequence %d for TCB %x\n", Seq, Tcb));
 
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_RTT_ON);
@@ -1020,7 +1022,7 @@ TcpToSendAck (
     return;
   }
 
-  TCP4_DEBUG_TRACE (("TcpToSendAck: scheduled a delayed"
+  DEBUG ((EFI_D_INFO, "TcpToSendAck: scheduled a delayed"
     " ACK for TCB %x\n", Tcb));
 
   //
@@ -1182,14 +1184,14 @@ TcpVerifySegment (
 **/
 INTN
 TcpCheckSndQue (
-  IN NET_LIST_ENTRY *Head
+  IN LIST_ENTRY     *Head
   )
 {
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *Entry;
   NET_BUF         *Nbuf;
   TCP_SEQNO       Seq;
 
-  if (NetListIsEmpty (Head)) {
+  if (IsListEmpty (Head)) {
     return 1;
   }
   //

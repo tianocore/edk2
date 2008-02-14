@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2007, Intel Corporation                                                         
+Copyright (c) 2005 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -49,14 +49,14 @@ Ip4CreateAssembleEntry (
 
   IP4_ASSEMBLE_ENTRY        *Assemble;
 
-  Assemble = NetAllocatePool (sizeof (IP4_ASSEMBLE_ENTRY));
+  Assemble = AllocatePool (sizeof (IP4_ASSEMBLE_ENTRY));
 
   if (Assemble == NULL) {
     return NULL;
   }
 
-  NetListInit (&Assemble->Link);
-  NetListInit (&Assemble->Fragments);
+  InitializeListHead (&Assemble->Link);
+  InitializeListHead (&Assemble->Fragments);
 
   Assemble->Dst      = Dst;
   Assemble->Src      = Src;
@@ -86,18 +86,18 @@ Ip4FreeAssembleEntry (
   IN IP4_ASSEMBLE_ENTRY     *Assemble
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   NET_BUF                   *Fragment;
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &Assemble->Fragments) {
     Fragment = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
 
-    NetListRemoveEntry (Entry);
+    RemoveEntryList (Entry);
     NetbufFree (Fragment);
   }
 
-  NetFreePool (Assemble);
+  gBS->FreePool (Assemble);
 }
 
 
@@ -118,7 +118,7 @@ Ip4InitAssembleTable (
   UINT32                    Index;
 
   for (Index = 0; Index < IP4_ASSEMLE_HASH_SIZE; Index++) {
-    NetListInit (&Table->Bucket[Index]);
+    InitializeListHead (&Table->Bucket[Index]);
   }
 }
 
@@ -137,8 +137,8 @@ Ip4CleanAssembleTable (
   IN IP4_ASSEMBLE_TABLE     *Table
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_ASSEMBLE_ENTRY        *Assemble;
   UINT32                    Index;
 
@@ -146,7 +146,7 @@ Ip4CleanAssembleTable (
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &Table->Bucket[Index]) {
       Assemble = NET_LIST_USER_STRUCT (Entry, IP4_ASSEMBLE_ENTRY, Link);
 
-      NetListRemoveEntry (Entry);
+      RemoveEntryList (Entry);
       Ip4FreeAssembleEntry (Assemble);
     }
   }
@@ -242,9 +242,9 @@ Ip4Reassemble (
   IP4_CLIP_INFO             *This;
   IP4_CLIP_INFO             *Node;
   IP4_ASSEMBLE_ENTRY        *Assemble;
-  NET_LIST_ENTRY            *Head;
-  NET_LIST_ENTRY            *Prev;
-  NET_LIST_ENTRY            *Cur;
+  LIST_ENTRY                *Head;
+  LIST_ENTRY                *Prev;
+  LIST_ENTRY                *Cur;
   NET_BUF                   *Fragment;
   NET_BUF                   *NewPacket;
   INTN                      Index;
@@ -284,7 +284,7 @@ Ip4Reassemble (
       goto DROP;
     }
 
-    NetListInsertHead (&Table->Bucket[Index], &Assemble->Link);
+    InsertHeadList (&Table->Bucket[Index], &Assemble->Link);
   }
 
   //
@@ -344,7 +344,7 @@ Ip4Reassemble (
     if (Node->End <= This->End) {
       Cur = Cur->ForwardLink;
 
-      NetListRemoveEntry (&Fragment->List);
+      RemoveEntryList (&Fragment->List);
       Assemble->CurLen -= Node->Length;
 
       NetbufFree (Fragment);
@@ -359,7 +359,7 @@ Ip4Reassemble (
     //
     if (Node->Start < This->End) {
       if (This->Start == Node->Start) {
-        NetListRemoveEntry (&Packet->List);
+        RemoveEntryList (&Packet->List);
         goto DROP;
       }
 
@@ -404,7 +404,7 @@ Ip4Reassemble (
   //
   if ((Assemble->TotalLen != 0) && (Assemble->CurLen >= Assemble->TotalLen)) {
 
-    NetListRemoveEntry (&Assemble->Link);
+    RemoveEntryList (&Assemble->Link);
 
     //
     // If the packet is properly formated, the last fragment's End
@@ -779,7 +779,7 @@ Ip4InstanceEnquePacket (
   Info        = IP4_GET_CLIP_INFO (Clone);
   Info->Life  = IP4_US_TO_SEC (IpInstance->ConfigData.ReceiveTimeout);
 
-  NetListInsertTail (&IpInstance->Received, &Clone->List);
+  InsertTailList (&IpInstance->Received, &Clone->List);
   return EFI_SUCCESS;
 }
 
@@ -807,15 +807,15 @@ Ip4OnRecyclePacket (
 
   Wrap = (IP4_RXDATA_WRAP *) Context;
 
-  NET_TRYLOCK (&Wrap->IpInstance->RecycleLock);
-  NetListRemoveEntry (&Wrap->Link);
-  NET_UNLOCK (&Wrap->IpInstance->RecycleLock);
+  EfiAcquireLockOrFail (&Wrap->IpInstance->RecycleLock);
+  RemoveEntryList (&Wrap->Link);
+  EfiReleaseLock (&Wrap->IpInstance->RecycleLock);
 
   ASSERT (!NET_BUF_SHARED (Wrap->Packet));
   NetbufFree (Wrap->Packet);
 
   gBS->CloseEvent (Wrap->RxData.RecycleSignal);
-  NetFreePool (Wrap);
+  gBS->FreePool (Wrap);
 }
 
 
@@ -843,30 +843,30 @@ Ip4WrapRxData (
   EFI_IP4_RECEIVE_DATA      *RxData;
   EFI_STATUS                Status;
 
-  Wrap = NetAllocatePool (IP4_RXDATA_WRAP_SIZE (Packet->BlockOpNum));
+  Wrap = AllocatePool (IP4_RXDATA_WRAP_SIZE (Packet->BlockOpNum));
 
   if (Wrap == NULL) {
     return NULL;
   }
 
-  NetListInit (&Wrap->Link);
+  InitializeListHead (&Wrap->Link);
 
   Wrap->IpInstance  = IpInstance;
   Wrap->Packet      = Packet;
   RxData            = &Wrap->RxData;
 
-  NetZeroMem (&RxData->TimeStamp, sizeof (EFI_TIME));
+  ZeroMem (&RxData->TimeStamp, sizeof (EFI_TIME));
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_RECYCLE,
+                  TPL_NOTIFY,
                   Ip4OnRecyclePacket,
                   Wrap,
                   &RxData->RecycleSignal
                   );
 
   if (EFI_ERROR (Status)) {
-    NetFreePool (Wrap);
+    gBS->FreePool (Wrap);
     return NULL;
   }
 
@@ -925,7 +925,7 @@ Ip4InstanceDeliverPacket (
   //
   // Deliver a packet if there are both a packet and a receive token.
   //
-  while (!NetListIsEmpty (&IpInstance->Received) &&
+  while (!IsListEmpty (&IpInstance->Received) &&
          !NetMapIsEmpty (&IpInstance->RxTokens)) {
 
     Packet = NET_LIST_HEAD (&IpInstance->Received, NET_BUF, List);
@@ -940,7 +940,7 @@ Ip4InstanceDeliverPacket (
         return EFI_OUT_OF_RESOURCES;
       }
 
-      NetListRemoveEntry (&Packet->List);
+      RemoveEntryList (&Packet->List);
 
     } else {
       //
@@ -960,7 +960,7 @@ Ip4InstanceDeliverPacket (
       Head    = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
       Dup->Ip = (IP4_HEAD *) Head;
 
-      NetCopyMem (Head, Packet->Ip, Packet->Ip->HeadLen << 2);
+      CopyMem (Head, Packet->Ip, Packet->Ip->HeadLen << 2);
       NetbufTrim (Dup, IP4_MAX_HEADLEN, TRUE);
 
       Wrap = Ip4WrapRxData (IpInstance, Dup);
@@ -970,7 +970,7 @@ Ip4InstanceDeliverPacket (
         return EFI_OUT_OF_RESOURCES;
       }
 
-      NetListRemoveEntry (&Packet->List);
+      RemoveEntryList (&Packet->List);
       NetbufFree (Packet);
 
       Packet = Dup;
@@ -980,9 +980,9 @@ Ip4InstanceDeliverPacket (
     // Insert it into the delivered packet, then get a user's
     // receive token, pass the wrapped packet up.
     //
-    NET_TRYLOCK (&IpInstance->RecycleLock);
-    NetListInsertHead (&IpInstance->Delivered, &Wrap->Link);
-    NET_UNLOCK (&IpInstance->RecycleLock);
+    EfiAcquireLockOrFail (&IpInstance->RecycleLock);
+    InsertHeadList (&IpInstance->Delivered, &Wrap->Link);
+    EfiReleaseLock (&IpInstance->RecycleLock);
 
     Token                = NetMapRemoveHead (&IpInstance->RxTokens, NULL);
     Token->Status        = IP4_GET_CLIP_INFO (Packet)->Status;
@@ -1017,7 +1017,7 @@ Ip4InterfaceEnquePacket (
 {
   IP4_PROTOCOL              *IpInstance;
   IP4_CLIP_INFO             *Info;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   INTN                      Enqueued;
   INTN                      LocalType;
   INTN                      SavedType;
@@ -1103,7 +1103,7 @@ Ip4InterfaceDeliverPacket (
   )
 {
   IP4_PROTOCOL              *Ip4Instance;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
 
   NET_LIST_FOR_EACH (Entry, &IpIf->IpInstances) {
     Ip4Instance = NET_LIST_USER_STRUCT (Entry, IP4_PROTOCOL, AddrLink);
@@ -1139,7 +1139,7 @@ Ip4Demultiplex (
   IN NET_BUF                *Packet
   )
 {
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IP4_INTERFACE             *IpIf;
   INTN                      Enqueued;
 
@@ -1193,9 +1193,9 @@ Ip4PacketTimerTicking (
   IN IP4_SERVICE            *IpSb
   )
 {
-  NET_LIST_ENTRY            *InstanceEntry;
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *InstanceEntry;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_PROTOCOL              *IpInstance;
   IP4_ASSEMBLE_ENTRY        *Assemble;
   NET_BUF                   *Packet;
@@ -1211,7 +1211,7 @@ Ip4PacketTimerTicking (
       Assemble = NET_LIST_USER_STRUCT (Entry, IP4_ASSEMBLE_ENTRY, Link);
 
       if ((Assemble->Life > 0) && (--Assemble->Life == 0)) {
-        NetListRemoveEntry (Entry);
+        RemoveEntryList (Entry);
         Ip4FreeAssembleEntry (Assemble);
       }
     }
@@ -1228,7 +1228,7 @@ Ip4PacketTimerTicking (
       Info   = IP4_GET_CLIP_INFO (Packet);
 
       if ((Info->Life > 0) && (--Info->Life == 0)) {
-        NetListRemoveEntry (Entry);
+        RemoveEntryList (Entry);
         NetbufFree (Packet);
       }
     }

@@ -144,9 +144,9 @@ Returns:
   AccessPoint->RemotePort = ConfigData->RemotePort;
   AccessPoint->ActiveFlag = TRUE;
 
-  NetCopyMem (&AccessPoint->StationAddress, &ConfigData->LocalIp, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&AccessPoint->SubnetMask, &ConfigData->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&AccessPoint->RemoteAddress, &ConfigData->RemoteIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&AccessPoint->StationAddress, &ConfigData->LocalIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&AccessPoint->SubnetMask, &ConfigData->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&AccessPoint->RemoteAddress, &ConfigData->RemoteIp, sizeof (EFI_IPv4_ADDRESS));
 
   //
   // Configure the TCP4 protocol.
@@ -170,7 +170,7 @@ Returns:
   //
   Status = gBS->CreateEvent (
                   EFI_EVENT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   Tcp4IoCommonNotify,
                   &Tcp4Io->IsConnDone,
                   &Tcp4Io->ConnToken.CompletionToken.Event
@@ -181,7 +181,7 @@ Returns:
 
   Status = gBS->CreateEvent (
                   EFI_EVENT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   Tcp4IoCommonNotify,
                   &Tcp4Io->IsTxDone,
                   &Tcp4Io->TxToken.CompletionToken.Event
@@ -192,7 +192,7 @@ Returns:
 
   Status = gBS->CreateEvent (
                   EFI_EVENT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   Tcp4IoCommonNotify,
                   &Tcp4Io->IsRxDone,
                   &Tcp4Io->RxToken.CompletionToken.Event
@@ -203,7 +203,7 @@ Returns:
 
   Status = gBS->CreateEvent (
                   EFI_EVENT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   Tcp4IoCommonNotify,
                   &Tcp4Io->IsCloseDone,
                   &Tcp4Io->CloseToken.CompletionToken.Event
@@ -406,7 +406,7 @@ Returns:
   EFI_TCP4_PROTOCOL       *Tcp4;
   EFI_STATUS              Status;
 
-  TxData = NetAllocatePool (sizeof (EFI_TCP4_TRANSMIT_DATA) + (Packet->BlockOpNum - 1) * sizeof (EFI_TCP4_FRAGMENT_DATA));
+  TxData = AllocatePool (sizeof (EFI_TCP4_TRANSMIT_DATA) + (Packet->BlockOpNum - 1) * sizeof (EFI_TCP4_FRAGMENT_DATA));
   if (TxData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -442,7 +442,7 @@ Returns:
 
 ON_EXIT:
 
-  NetFreePool (TxData);
+  gBS->FreePool (TxData);
 
   return Status;
 }
@@ -485,7 +485,7 @@ Returns:
   UINT32                CurrentFragment;
 
   FragmentCount = Packet->BlockOpNum;
-  Fragment      = NetAllocatePool (FragmentCount * sizeof (NET_FRAGMENT));
+  Fragment      = AllocatePool (FragmentCount * sizeof (NET_FRAGMENT));
   if (Fragment == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -544,7 +544,7 @@ Returns:
 
 ON_EXIT:
 
-  NetFreePool (Fragment);
+  gBS->FreePool (Fragment);
 
   return Status;
 }

@@ -526,7 +526,7 @@ DhcpFillOption (
     Options[Index].Data = Buf + OptCount[Tag].Offset;
   }
 
-  NetCopyMem (Buf + OptCount[Tag].Offset, Data, Len);
+  CopyMem (Buf + OptCount[Tag].Offset, Data, Len);
 
   OptCount[Tag].Offset  = (UINT16) (OptCount[Tag].Offset + Len);
   Options[Index].Len    = (UINT16) (Options[Index].Len + Len);
@@ -582,7 +582,7 @@ DhcpParseOption (
   // First compute how many options and how long each option is
   // with the "Key indexed counting" algorithms.
   //
-  OptCount = NetAllocateZeroPool (DHCP_MAX_OPTIONS * sizeof (DHCP_OPTION_COUNT));
+  OptCount = AllocateZeroPool (DHCP_MAX_OPTIONS * sizeof (DHCP_OPTION_COUNT));
 
   if (OptCount == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -624,7 +624,7 @@ DhcpParseOption (
   // Allocate a buffer to hold the DHCP options, and after that, a
   // continuous buffer to put all the options' data.
   //
-  Options = NetAllocateZeroPool (OptNum * sizeof (DHCP_OPTION) + TotalLen);
+  Options = AllocateZeroPool (OptNum * sizeof (DHCP_OPTION) + TotalLen);
 
   if (Options == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -638,14 +638,14 @@ DhcpParseOption (
   Status          = DhcpIterateOptions (Packet, DhcpFillOption, &Context);
 
   if (EFI_ERROR (Status)) {
-    NetFreePool (Options);
+    gBS->FreePool (Options);
     goto ON_EXIT;
   }
 
   *OptionPoint = Options;
 
 ON_EXIT:
-  NetFreePool (OptCount);
+  gBS->FreePool (OptCount);
   return Status;
 }
 
@@ -689,7 +689,7 @@ DhcpValidateOptions (
   }
 
   Updated = FALSE;
-  NetZeroMem (&Parameter, sizeof (Parameter));
+  ZeroMem (&Parameter, sizeof (Parameter));
 
   for (Index = 0; Index < Count; Index++) {
     Option = &AllOption[Index];
@@ -722,7 +722,7 @@ DhcpValidateOptions (
   }
 
   if (Updated && (Para != NULL)) {
-    if ((*Para = NetAllocatePool (sizeof (DHCP_PARAMETER))) == NULL) {
+    if ((*Para = AllocatePool (sizeof (DHCP_PARAMETER))) == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
@@ -731,7 +731,7 @@ DhcpValidateOptions (
   }
 
 ON_EXIT:
-  NetFreePool (AllOption);
+  gBS->FreePool (AllOption);
   return Status;
 }
 
@@ -767,7 +767,7 @@ DhcpAppendOption (
 
     *(Buf++) = Tag;
     *(Buf++) = (UINT8) Len;
-    NetCopyMem (Buf, Data + Index * 255, Len);
+    CopyMem (Buf, Data + Index * 255, Len);
 
     Buf     += Len;
   }
@@ -815,7 +815,7 @@ DhcpBuild (
   // Use an array of DHCP_OPTION to mark the existance
   // and position of each valid options.
   //
-  Mark = NetAllocatePool (sizeof (DHCP_OPTION) * DHCP_MAX_OPTIONS);
+  Mark = AllocatePool (sizeof (DHCP_OPTION) * DHCP_MAX_OPTIONS);
 
   if (Mark == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -871,7 +871,7 @@ DhcpBuild (
   }
 
   Status  = EFI_OUT_OF_RESOURCES;
-  Packet  = (EFI_DHCP4_PACKET *) NetAllocatePool (Len);
+  Packet  = (EFI_DHCP4_PACKET *) AllocatePool (Len);
 
   if (Packet == NULL) {
     goto ON_ERROR;
@@ -898,9 +898,9 @@ DhcpBuild (
 
 ON_ERROR:
   if (SeedOptions != NULL) {
-    NetFreePool (SeedOptions);
+    gBS->FreePool (SeedOptions);
   }
 
-  NetFreePool (Mark);
+  gBS->FreePool (Mark);
   return Status;
 }

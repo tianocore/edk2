@@ -20,7 +20,6 @@ Abstract:
 
 
 #include "ArpImpl.h"
-#include "ArpDebug.h"
 
 EFI_ARP_PROTOCOL  mEfiArpProtocolTemplate = {
   ArpConfigure,
@@ -59,7 +58,7 @@ ArpInitInstance (
   Instance->Configured = FALSE;
   Instance->Destroyed  = FALSE;
 
-  NetListInit (&Instance->List);
+  InitializeListHead (&Instance->List);
 }
 
 
@@ -85,7 +84,7 @@ ArpOnFrameRcvdDpc (
   ARP_HEAD                              *Head;
   ARP_ADDRESS                           ArpAddress;
   ARP_CACHE_ENTRY                       *CacheEntry;
-  NET_LIST_ENTRY                        *Entry;
+  LIST_ENTRY                            *Entry;
   ARP_INSTANCE_DATA                     *Instance;
   EFI_ARP_CONFIG_DATA                   *ConfigData;
   NET_ARP_ADDRESS                       SenderAddress[2];
@@ -186,7 +185,7 @@ ArpOnFrameRcvdDpc (
       // The protocol type is matched for the received arp packet.
       //
       ProtoMatched = TRUE;
-      if (0 == NetCompareMem (
+      if (0 == CompareMem (
                  (VOID *)ArpAddress.TargetProtoAddr,
                  ConfigData->StationAddress,
                  ConfigData->SwAddressLength
@@ -257,7 +256,7 @@ ArpOnFrameRcvdDpc (
     }
 
     if (!IsListEmpty (&CacheEntry->List)) {
-      NetListRemoveEntry (&CacheEntry->List);
+      RemoveEntryList (&CacheEntry->List);
     }
 
     //
@@ -277,7 +276,7 @@ ArpOnFrameRcvdDpc (
     //
     // Add this entry into the ResolvedCacheTable
     //
-    NetListInsertHead (&ArpService->ResolvedCacheTable, &CacheEntry->List);
+    InsertHeadList (&ArpService->ResolvedCacheTable, &CacheEntry->List);
   }
 
   if (Head->OpCode == ARP_OPCODE_REQUEST) {
@@ -304,7 +303,7 @@ RESTART_RECEIVE:
 
   DEBUG_CODE (
     if (EFI_ERROR (Status)) {
-      ARP_DEBUG_ERROR (("ArpOnFrameRcvd: ArpService->Mnp->Receive "
+      DEBUG ((EFI_D_ERROR, "ArpOnFrameRcvd: ArpService->Mnp->Receive "
         "failed, %r\n.", Status));
     }
   );
@@ -358,17 +357,17 @@ ArpOnFrameSentDpc (
 
   DEBUG_CODE (
     if (EFI_ERROR (TxToken->Status)) {
-      ARP_DEBUG_ERROR (("ArpOnFrameSent: TxToken->Status, %r.\n", TxToken->Status));
+      DEBUG ((EFI_D_ERROR, "ArpOnFrameSent: TxToken->Status, %r.\n", TxToken->Status));
     }
   );
 
   //
   // Free the allocated memory and close the event.
   //
-  NetFreePool (TxData->FragmentTable[0].FragmentBuffer);
-  NetFreePool (TxData);
+  gBS->FreePool (TxData->FragmentTable[0].FragmentBuffer);
+  gBS->FreePool (TxData);
   gBS->CloseEvent (TxToken->Event);
-  NetFreePool (TxToken);
+  gBS->FreePool (TxToken);
 }
 
 /**
@@ -413,9 +412,9 @@ ArpTimerHandler (
   )
 {
   ARP_SERVICE_DATA      *ArpService;
-  NET_LIST_ENTRY        *Entry;
-  NET_LIST_ENTRY        *NextEntry;
-  NET_LIST_ENTRY        *ContextEntry;
+  LIST_ENTRY            *Entry;
+  LIST_ENTRY            *NextEntry;
+  LIST_ENTRY            *ContextEntry;
   ARP_CACHE_ENTRY       *CacheEntry;
   USER_REQUEST_CONTEXT  *RequestContext;
 
@@ -439,15 +438,15 @@ ArpTimerHandler (
         // Abort this request.
         //
         ArpAddressResolved (CacheEntry, NULL, NULL);
-        ASSERT (NetListIsEmpty (&CacheEntry->UserRequestList));
+        ASSERT (IsListEmpty (&CacheEntry->UserRequestList));
 
-        NetListRemoveEntry (&CacheEntry->List);
-        NetFreePool (CacheEntry);
+        RemoveEntryList (&CacheEntry->List);
+        gBS->FreePool (CacheEntry);
       } else {
         //
         // resend the ARP request.
         //
-        ASSERT (!NetListIsEmpty(&CacheEntry->UserRequestList));
+        ASSERT (!IsListEmpty(&CacheEntry->UserRequestList));
 
         ContextEntry   = CacheEntry->UserRequestList.ForwardLink;
         RequestContext = NET_LIST_USER_STRUCT (ContextEntry, USER_REQUEST_CONTEXT, List);
@@ -470,7 +469,7 @@ ArpTimerHandler (
   //
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &ArpService->DeniedCacheTable) {
     CacheEntry = NET_LIST_USER_STRUCT (Entry, ARP_CACHE_ENTRY, List);
-    ASSERT (NetListIsEmpty (&CacheEntry->UserRequestList));
+    ASSERT (IsListEmpty (&CacheEntry->UserRequestList));
 
     if (CacheEntry->DefaultDecayTime == 0) {
       //
@@ -483,8 +482,8 @@ ArpTimerHandler (
       //
       // Time out, remove it.
       //
-      NetListRemoveEntry (&CacheEntry->List);
-      NetFreePool (CacheEntry);
+      RemoveEntryList (&CacheEntry->List);
+      gBS->FreePool (CacheEntry);
     } else {
       //
       // Update the DecayTime.
@@ -498,7 +497,7 @@ ArpTimerHandler (
   //
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &ArpService->ResolvedCacheTable) {
     CacheEntry = NET_LIST_USER_STRUCT (Entry, ARP_CACHE_ENTRY, List);
-    ASSERT (NetListIsEmpty (&CacheEntry->UserRequestList));
+    ASSERT (IsListEmpty (&CacheEntry->UserRequestList));
 
     if (CacheEntry->DefaultDecayTime == 0) {
       //
@@ -511,8 +510,8 @@ ArpTimerHandler (
       //
       // Time out, remove it.
       //
-      NetListRemoveEntry (&CacheEntry->List);
-      NetFreePool (CacheEntry);
+      RemoveEntryList (&CacheEntry->List);
+      gBS->FreePool (CacheEntry);
     } else {
       //
       // Update the DecayTime.
@@ -548,7 +547,7 @@ ArpMatchAddress (
   }
 
   if ((AddressOne->AddressPtr != NULL) &&
-    (NetCompareMem (
+    (CompareMem (
       AddressOne->AddressPtr,
       AddressTwo->AddressPtr,
       AddressOne->Length
@@ -578,14 +577,14 @@ ArpMatchAddress (
 **/
 ARP_CACHE_ENTRY *
 ArpFindNextCacheEntryInTable (
-  IN NET_LIST_ENTRY    *CacheTable,
-  IN NET_LIST_ENTRY    *StartEntry,
+  IN LIST_ENTRY        *CacheTable,
+  IN LIST_ENTRY        *StartEntry,
   IN FIND_OPTYPE       FindOpType,
   IN NET_ARP_ADDRESS   *ProtocolAddress OPTIONAL,
   IN NET_ARP_ADDRESS   *HardwareAddress OPTIONAL
   )
 {
-  NET_LIST_ENTRY   *Entry;
+  LIST_ENTRY       *Entry;
   ARP_CACHE_ENTRY  *CacheEntry;
 
   if (StartEntry == NULL) {
@@ -716,7 +715,7 @@ ArpAllocCacheEntry (
   //
   // Allocate memory for the cache entry.
   //
-  CacheEntry = NetAllocatePool (sizeof (ARP_CACHE_ENTRY));
+  CacheEntry = AllocatePool (sizeof (ARP_CACHE_ENTRY));
   if (CacheEntry == NULL) {
     return NULL;
   }
@@ -724,8 +723,8 @@ ArpAllocCacheEntry (
   //
   // Init the lists.
   //
-  NetListInit (&CacheEntry->List);
-  NetListInit (&CacheEntry->UserRequestList);
+  InitializeListHead (&CacheEntry->List);
+  InitializeListHead (&CacheEntry->UserRequestList);
 
   for (Index = 0; Index < 2; Index++) {
     //
@@ -738,7 +737,7 @@ ArpAllocCacheEntry (
   //
   // Zero the hardware address first.
   //
-  NetZeroMem (CacheEntry->Addresses[Hardware].AddressPtr, ARP_MAX_HARDWARE_ADDRESS_LEN);
+  ZeroMem (CacheEntry->Addresses[Hardware].AddressPtr, ARP_MAX_HARDWARE_ADDRESS_LEN);
 
   if (Instance != NULL) {
     //
@@ -780,8 +779,8 @@ ArpAddressResolved (
   IN EFI_EVENT          UserEvent OPTIONAL
   )
 {
-  NET_LIST_ENTRY        *Entry;
-  NET_LIST_ENTRY        *NextEntry;
+  LIST_ENTRY            *Entry;
+  LIST_ENTRY            *NextEntry;
   USER_REQUEST_CONTEXT  *Context;
   UINTN                 Count;
 
@@ -798,7 +797,7 @@ ArpAddressResolved (
       //
       // Copy the address to the user-provided buffer and notify the user.
       //
-      NetCopyMem (
+      CopyMem (
         Context->UserHwAddrBuffer,
         CacheEntry->Addresses[Hardware].AddressPtr,
         CacheEntry->Addresses[Hardware].Length
@@ -808,8 +807,8 @@ ArpAddressResolved (
       //
       // Remove this user request and free the context data.
       //
-      NetListRemoveEntry (&Context->List);
-      NetFreePool (Context);
+      RemoveEntryList (&Context->List);
+      gBS->FreePool (Context);
 
       Count++;
     }
@@ -863,7 +862,7 @@ ArpFillAddressInCacheEntry (
         //
         // Copy it if the AddressPtr points to some buffer.
         //
-        NetCopyMem (
+        CopyMem (
           CacheAddress->AddressPtr,
           Address[Index]->AddressPtr,
           CacheAddress->Length
@@ -872,7 +871,7 @@ ArpFillAddressInCacheEntry (
         //
         // Zero the corresponding address buffer in the CacheEntry.
         //
-        NetZeroMem (CacheAddress->AddressPtr, CacheAddress->Length);
+        ZeroMem (CacheAddress->AddressPtr, CacheAddress->Length);
       }
     }
   }
@@ -916,7 +915,7 @@ ArpConfigureInstance (
       //
       if ((OldConfigData->SwAddressType != ConfigData->SwAddressType) ||
         (OldConfigData->SwAddressLength != ConfigData->SwAddressLength) ||
-        (NetCompareMem (
+        (CompareMem (
            OldConfigData->StationAddress,
            ConfigData->StationAddress,
            OldConfigData->SwAddressLength
@@ -932,7 +931,7 @@ ArpConfigureInstance (
       //
 
       if (ConfigData->SwAddressType == IPv4_ETHER_PROTO_TYPE) {
-        NetCopyMem (&Ip, ConfigData->StationAddress, sizeof (IP4_ADDR));
+        CopyMem (&Ip, ConfigData->StationAddress, sizeof (IP4_ADDR));
 
         if (!Ip4IsUnicast (NTOHL (Ip), 0)) {
           //
@@ -947,9 +946,9 @@ ArpConfigureInstance (
       //
       CopyMem (OldConfigData, ConfigData, sizeof (*OldConfigData));
 
-      OldConfigData->StationAddress = NetAllocatePool (OldConfigData->SwAddressLength);
+      OldConfigData->StationAddress = AllocatePool (OldConfigData->SwAddressLength);
       if (OldConfigData->StationAddress == NULL) {
-        ARP_DEBUG_ERROR (("ArpConfigInstance: NetAllocatePool for the StationAddress "
+        DEBUG ((EFI_D_ERROR, "ArpConfigInstance: AllocatePool for the StationAddress "
           "failed.\n"));
         return EFI_OUT_OF_RESOURCES;
       }
@@ -957,7 +956,7 @@ ArpConfigureInstance (
       //
       // Save the StationAddress.
       //
-      NetCopyMem (
+      CopyMem (
         OldConfigData->StationAddress,
         ConfigData->StationAddress,
         OldConfigData->SwAddressLength
@@ -994,7 +993,7 @@ ArpConfigureInstance (
       //
       // Free the buffer previously allocated to hold the station address.
       //
-      NetFreePool (OldConfigData->StationAddress);
+      gBS->FreePool (OldConfigData->StationAddress);
     }
 
     Instance->Configured = FALSE;
@@ -1039,9 +1038,9 @@ ArpSendFrame (
   //
   // Allocate memory for the TxToken.
   //
-  TxToken = NetAllocatePool (sizeof(EFI_MANAGED_NETWORK_COMPLETION_TOKEN));
+  TxToken = AllocatePool (sizeof(EFI_MANAGED_NETWORK_COMPLETION_TOKEN));
   if (TxToken == NULL) {
-    ARP_DEBUG_ERROR (("ArpSendFrame: Allocate memory for TxToken failed.\n"));
+    DEBUG ((EFI_D_ERROR, "ArpSendFrame: Allocate memory for TxToken failed.\n"));
     return;
   }
 
@@ -1054,22 +1053,22 @@ ArpSendFrame (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   ArpOnFrameSent,
                   (VOID *)TxToken,
                   &TxToken->Event
                   );
   if (EFI_ERROR (Status)) {
-    ARP_DEBUG_ERROR (("ArpSendFrame: CreateEvent failed for TxToken->Event.\n"));
+    DEBUG ((EFI_D_ERROR, "ArpSendFrame: CreateEvent failed for TxToken->Event.\n"));
     goto CLEAN_EXIT;
   }
 
   //
   // Allocate memory for the TxData used in the TxToken.
   //
-  TxData = NetAllocatePool (sizeof(EFI_MANAGED_NETWORK_TRANSMIT_DATA));
+  TxData = AllocatePool (sizeof(EFI_MANAGED_NETWORK_TRANSMIT_DATA));
   if (TxData == NULL) {
-    ARP_DEBUG_ERROR (("ArpSendFrame: Allocate memory for TxData failed.\n"));
+    DEBUG ((EFI_D_ERROR, "ArpSendFrame: Allocate memory for TxData failed.\n"));
     goto CLEAN_EXIT;
   }
 
@@ -1086,9 +1085,9 @@ ArpSendFrame (
   //
   // Allocate buffer for the arp frame.
   //
-  Packet = NetAllocatePool (TotalLength);
+  Packet = AllocatePool (TotalLength);
   if (Packet == NULL) {
-    ARP_DEBUG_ERROR (("ArpSendFrame: Allocate memory for Packet failed.\n"));
+    DEBUG ((EFI_D_ERROR, "ArpSendFrame: Allocate memory for Packet failed.\n"));
   }
 
   TmpPtr = Packet;
@@ -1097,9 +1096,9 @@ ArpSendFrame (
   // The destination MAC address.
   //
   if (ArpOpCode == ARP_OPCODE_REQUEST) {
-    NetCopyMem (TmpPtr, &SnpMode->BroadcastAddress, SnpMode->HwAddressSize);
+    CopyMem (TmpPtr, &SnpMode->BroadcastAddress, SnpMode->HwAddressSize);
   } else {
-    NetCopyMem (
+    CopyMem (
       TmpPtr,
       CacheEntry->Addresses[Hardware].AddressPtr,
       SnpMode->HwAddressSize
@@ -1110,7 +1109,7 @@ ArpSendFrame (
   //
   // The source MAC address.
   //
-  NetCopyMem (TmpPtr, &SnpMode->CurrentAddress, SnpMode->HwAddressSize);
+  CopyMem (TmpPtr, &SnpMode->CurrentAddress, SnpMode->HwAddressSize);
   TmpPtr += SnpMode->HwAddressSize;
 
   //
@@ -1133,19 +1132,19 @@ ArpSendFrame (
   //
   // The sender hardware address.
   //
-  NetCopyMem (TmpPtr, &SnpMode->CurrentAddress, SnpMode->HwAddressSize);
+  CopyMem (TmpPtr, &SnpMode->CurrentAddress, SnpMode->HwAddressSize);
   TmpPtr += SnpMode->HwAddressSize;
 
   //
   // The sender protocol address.
   //
-  NetCopyMem (TmpPtr, ConfigData->StationAddress, ConfigData->SwAddressLength);
+  CopyMem (TmpPtr, ConfigData->StationAddress, ConfigData->SwAddressLength);
   TmpPtr += ConfigData->SwAddressLength;
 
   //
   // The target hardware address.
   //
-  NetCopyMem (
+  CopyMem (
     TmpPtr,
     CacheEntry->Addresses[Hardware].AddressPtr,
     SnpMode->HwAddressSize
@@ -1155,7 +1154,7 @@ ArpSendFrame (
   //
   // The target protocol address.
   //
-  NetCopyMem (
+  CopyMem (
     TmpPtr,
     CacheEntry->Addresses[Protocol].AddressPtr,
     ConfigData->SwAddressLength
@@ -1185,7 +1184,7 @@ ArpSendFrame (
   //
   Status = ArpService->Mnp->Transmit (ArpService->Mnp, TxToken);
   if (EFI_ERROR (Status)) {
-    ARP_DEBUG_ERROR (("Mnp->Transmit failed, %r.\n", Status));
+    DEBUG ((EFI_D_ERROR, "Mnp->Transmit failed, %r.\n", Status));
     goto CLEAN_EXIT;
   }
 
@@ -1194,18 +1193,18 @@ ArpSendFrame (
 CLEAN_EXIT:
 
   if (Packet != NULL) {
-    NetFreePool (Packet);
+    gBS->FreePool (Packet);
   }
 
   if (TxData != NULL) {
-    NetFreePool (TxData);
+    gBS->FreePool (TxData);
   }
 
   if (TxToken->Event != NULL) {
     gBS->CloseEvent (TxToken->Event);
   }
 
-  NetFreePool (TxToken);
+  gBS->FreePool (TxToken);
 }
 
 
@@ -1228,15 +1227,15 @@ CLEAN_EXIT:
 STATIC
 UINTN
 ArpDeleteCacheEntryInTable (
-  IN NET_LIST_ENTRY  *CacheTable,
+  IN LIST_ENTRY      *CacheTable,
   IN BOOLEAN         BySwAddress,
   IN UINT16          SwAddressType,
   IN UINT8           *AddressBuffer OPTIONAL,
   IN BOOLEAN         Force
   )
 {
-  NET_LIST_ENTRY   *Entry;
-  NET_LIST_ENTRY   *NextEntry;
+  LIST_ENTRY       *Entry;
+  LIST_ENTRY       *NextEntry;
   ARP_CACHE_ENTRY  *CacheEntry;
   UINTN            Count;
 
@@ -1258,7 +1257,7 @@ ArpDeleteCacheEntryInTable (
         // Protocol address type matched. Check the address.
         //
         if ((AddressBuffer == NULL) ||
-          (NetCompareMem (
+          (CompareMem (
              AddressBuffer,
              CacheEntry->Addresses[Protocol].AddressPtr,
              CacheEntry->Addresses[Protocol].Length
@@ -1271,7 +1270,7 @@ ArpDeleteCacheEntryInTable (
       }
     } else {
       if ((AddressBuffer == NULL) ||
-        (NetCompareMem (
+        (CompareMem (
            AddressBuffer,
            CacheEntry->Addresses[Hardware].AddressPtr,
            CacheEntry->Addresses[Hardware].Length
@@ -1290,9 +1289,9 @@ MATCHED:
     //
     // Delete this entry.
     //
-    NetListRemoveEntry (&CacheEntry->List);
-    ASSERT (NetListIsEmpty (&CacheEntry->UserRequestList));
-    NetFreePool (CacheEntry);
+    RemoveEntryList (&CacheEntry->List);
+    ASSERT (IsListEmpty (&CacheEntry->UserRequestList));
+    gBS->FreePool (CacheEntry);
 
     Count++;
   }
@@ -1375,8 +1374,8 @@ ArpCancelRequest (
   )
 {
   ARP_SERVICE_DATA  *ArpService;
-  NET_LIST_ENTRY    *Entry;
-  NET_LIST_ENTRY    *NextEntry;
+  LIST_ENTRY        *Entry;
+  LIST_ENTRY        *NextEntry;
   ARP_CACHE_ENTRY   *CacheEntry;
   UINTN             Count;
 
@@ -1389,7 +1388,7 @@ ArpCancelRequest (
     CacheEntry = NET_LIST_USER_STRUCT (Entry, ARP_CACHE_ENTRY, List);
 
     if ((TargetSwAddress == NULL) ||
-      (NetCompareMem (
+      (CompareMem (
          TargetSwAddress,
          CacheEntry->Addresses[Protocol].AddressPtr,
          CacheEntry->Addresses[Protocol].Length
@@ -1400,12 +1399,12 @@ ArpCancelRequest (
       //
       Count += ArpAddressResolved (CacheEntry, Instance, UserEvent);
 
-      if (NetListIsEmpty (&CacheEntry->UserRequestList)) {
+      if (IsListEmpty (&CacheEntry->UserRequestList)) {
         //
         // No user requests any more, remove this request cache entry.
         //
-        NetListRemoveEntry (&CacheEntry->List);
-        NetFreePool (CacheEntry);
+        RemoveEntryList (&CacheEntry->List);
+        gBS->FreePool (CacheEntry);
       }
     }
   }
@@ -1452,12 +1451,12 @@ ArpFindCacheEntry (
   ARP_SERVICE_DATA   *ArpService;
   NET_ARP_ADDRESS    MatchAddress;
   FIND_OPTYPE        FindOpType;
-  NET_LIST_ENTRY     *StartEntry;
+  LIST_ENTRY         *StartEntry;
   ARP_CACHE_ENTRY    *CacheEntry;
   NET_MAP            FoundEntries;
   UINT32             FoundCount;
   EFI_ARP_FIND_DATA  *FindData;
-  NET_LIST_ENTRY     *CacheTable;
+  LIST_ENTRY         *CacheTable;
 
   ArpService = Instance->ArpService;
 
@@ -1596,9 +1595,9 @@ ArpFindCacheEntry (
   //
   // Allocate buffer to copy the found entries.
   //
-  FindData = NetAllocatePool (FoundCount * (*EntryLength));
+  FindData = AllocatePool (FoundCount * (*EntryLength));
   if (FindData == NULL) {
-    ARP_DEBUG_ERROR (("ArpFindCacheEntry: Failed to allocate memory.\n"));
+    DEBUG ((EFI_D_ERROR, "ArpFindCacheEntry: Failed to allocate memory.\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto CLEAN_EXIT;
   }
@@ -1631,7 +1630,7 @@ ArpFindCacheEntry (
     //
     // Copy the software address.
     //
-    NetCopyMem (
+    CopyMem (
       FindData + 1,
       CacheEntry->Addresses[Protocol].AddressPtr,
       FindData->SwAddressLength
@@ -1640,7 +1639,7 @@ ArpFindCacheEntry (
     //
     // Copy the hardware address.
     //
-    NetCopyMem (
+    CopyMem (
       (UINT8 *)(FindData + 1) + FindData->SwAddressLength,
       CacheEntry->Addresses[Hardware].AddressPtr,
       FindData->HwAddressLength

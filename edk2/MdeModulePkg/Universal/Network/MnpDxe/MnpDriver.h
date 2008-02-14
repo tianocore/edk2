@@ -35,8 +35,6 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
 
-#include "MnpDebug.h"
-
 //
 // Required Global Variables
 //
@@ -56,11 +54,11 @@ typedef struct _MNP_SERVICE_DATA {
 
   UINT32                        Mtu;
 
-  NET_LIST_ENTRY                ChildrenList;
+  LIST_ENTRY                    ChildrenList;
   UINTN                         ChildrenNumber;
   UINTN                         ConfiguredChildrenNumber;
 
-  NET_LIST_ENTRY                GroupAddressList;
+  LIST_ENTRY                    GroupAddressList;
   UINT32                        GroupAddressCount;
 
   EFI_EVENT                     TxTimeoutEvent;

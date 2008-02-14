@@ -33,7 +33,6 @@ Abstract:
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
-#include "ArpDebug.h"
 
 //
 // Global variables

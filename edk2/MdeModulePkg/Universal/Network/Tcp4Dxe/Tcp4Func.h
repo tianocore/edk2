@@ -158,7 +158,7 @@ TcpVerifySegment (
 
 INTN
 TcpCheckSndQue (
-  IN NET_LIST_ENTRY *Head
+  IN LIST_ENTRY     *Head
   );
 
 NET_BUF *

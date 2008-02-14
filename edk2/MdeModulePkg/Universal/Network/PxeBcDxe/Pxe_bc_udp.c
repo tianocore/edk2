@@ -320,14 +320,6 @@ UdpRead (
     CopyMem (&TmpDestIp, &Private->EfiBc.Mode->StationIp, sizeof (EFI_IP_ADDRESS));
   }
 
-#if SUPPORT_IPV6
-  if (Private->EfiBc.Mode->UsingIpv6) {
-    //
-    // %%TBD
-    //
-  }
-#endif
-
   for (;;) {
     *BufferSizeptr = BufferSize;
 

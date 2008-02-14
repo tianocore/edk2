@@ -66,14 +66,14 @@ ArpConfigure (
 
   Instance = ARP_INSTANCE_DATA_FROM_THIS (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Configure this instance, the ConfigData has already passed the basic checks.
   //
   Status = ArpConfigureInstance (Instance, ConfigData);
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -166,7 +166,7 @@ ArpAdd (
   MatchAddress[Protocol].Length     = Instance->ConfigData.SwAddressLength;
   MatchAddress[Protocol].AddressPtr = TargetSwAddress;
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // See whether the entry to add exists. Check the DeinedCacheTable first.
@@ -215,7 +215,7 @@ ArpAdd (
     //
     // Remove it from the Table.
     //
-    NetListRemoveEntry (&CacheEntry->List);
+    RemoveEntryList (&CacheEntry->List);
   } else {
     //
     // It's a new entry, allocate memory for the entry.
@@ -223,7 +223,7 @@ ArpAdd (
     CacheEntry = ArpAllocCacheEntry (Instance);
 
     if (CacheEntry == NULL) {
-      ARP_DEBUG_ERROR (("ArpAdd: Failed to allocate pool for CacheEntry.\n"));
+      DEBUG ((EFI_D_ERROR, "ArpAdd: Failed to allocate pool for CacheEntry.\n"));
       Status = EFI_OUT_OF_RESOURCES;
       goto UNLOCK_EXIT;
     }
@@ -253,14 +253,14 @@ ArpAdd (
   // Add this CacheEntry to the corresponding CacheTable.
   //
   if (DenyFlag) {
-    NetListInsertHead (&ArpService->DeniedCacheTable, &CacheEntry->List);
+    InsertHeadList (&ArpService->DeniedCacheTable, &CacheEntry->List);
   } else {
-    NetListInsertHead (&ArpService->ResolvedCacheTable, &CacheEntry->List);
+    InsertHeadList (&ArpService->ResolvedCacheTable, &CacheEntry->List);
   }
 
 UNLOCK_EXIT:
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -321,7 +321,7 @@ ArpFind (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // All the check passed, find the cache entries now.
@@ -336,7 +336,7 @@ ArpFind (
              Refresh
              );
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -381,14 +381,14 @@ ArpDelete (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Delete the specified cache entries.
   //
   Count = ArpDeleteCacheEntry (Instance, BySwAddress, AddressBuffer, TRUE);
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return (Count == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
 }
@@ -426,14 +426,14 @@ ArpFlush (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Delete the dynamic entries from the cache table.
   //
   Count = ArpDeleteCacheEntry (Instance, FALSE, NULL, FALSE);
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return (Count == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
 }
@@ -500,7 +500,7 @@ ArpRequest (
     //
     // Return the hardware broadcast address.
     //
-    NetCopyMem (TargetHwAddress, &SnpMode->BroadcastAddress, SnpMode->HwAddressSize);
+    CopyMem (TargetHwAddress, &SnpMode->BroadcastAddress, SnpMode->HwAddressSize);
 
     goto SIGNAL_USER;
   }
@@ -531,9 +531,9 @@ ArpRequest (
   //
   // Initialize the TargetHwAddrss to a zero address.
   //
-  NetZeroMem (TargetHwAddress, SnpMode->HwAddressSize);
+  ZeroMem (TargetHwAddress, SnpMode->HwAddressSize);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Check whether the software address is in the denied table.
@@ -558,7 +558,7 @@ ArpRequest (
     //
     // Resolved, copy the address into the user buffer.
     //
-    NetCopyMem (
+    CopyMem (
       TargetHwAddress,
       CacheEntry->Addresses[Hardware].AddressPtr,
       CacheEntry->Addresses[Hardware].Length
@@ -575,9 +575,9 @@ ArpRequest (
   //
   // Create a request context for this arp request.
   //
-  RequestContext = NetAllocatePool (sizeof(USER_REQUEST_CONTEXT));
+  RequestContext = AllocatePool (sizeof(USER_REQUEST_CONTEXT));
   if (RequestContext == NULL) {
-    ARP_DEBUG_ERROR (("ArpRequest: Allocate memory for RequestContext failed.\n"));
+    DEBUG ((EFI_D_ERROR, "ArpRequest: Allocate memory for RequestContext failed.\n"));
 
     Status = EFI_OUT_OF_RESOURCES;
     goto UNLOCK_EXIT;
@@ -586,7 +586,7 @@ ArpRequest (
   RequestContext->Instance         = Instance;
   RequestContext->UserRequestEvent = ResolvedEvent;
   RequestContext->UserHwAddrBuffer = TargetHwAddress;
-  NetListInit (&RequestContext->List);
+  InitializeListHead (&RequestContext->List);
 
   //
   // Check whether there is a same request.
@@ -608,8 +608,8 @@ ArpRequest (
     //
     CacheEntry = ArpAllocCacheEntry (Instance);
     if (CacheEntry == NULL) {
-      ARP_DEBUG_ERROR (("ArpRequest: Allocate memory for CacheEntry failed.\n"));
-      NetFreePool (RequestContext);
+      DEBUG ((EFI_D_ERROR, "ArpRequest: Allocate memory for CacheEntry failed.\n"));
+      gBS->FreePool (RequestContext);
 
       Status = EFI_OUT_OF_RESOURCES;
       goto UNLOCK_EXIT;
@@ -623,13 +623,13 @@ ArpRequest (
     //
     // Add this entry into the PendingRequestTable.
     //
-    NetListInsertTail (&ArpService->PendingRequestTable, &CacheEntry->List);
+    InsertTailList (&ArpService->PendingRequestTable, &CacheEntry->List);
   }
 
   //
   // Link this request context into the cache entry.
   //
-  NetListInsertHead (&CacheEntry->UserRequestList, &RequestContext->List);
+  InsertHeadList (&CacheEntry->UserRequestList, &RequestContext->List);
 
   //
   // Send out the ARP Request frame.
@@ -639,7 +639,7 @@ ArpRequest (
 
 UNLOCK_EXIT:
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
 SIGNAL_USER:
 
@@ -701,7 +701,7 @@ ArpCancel (
     return EFI_NOT_STARTED;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Cancel the specified request.
@@ -714,7 +714,7 @@ ArpCancel (
   //
   NetLibDispatchDpc ();
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return (Count == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
 }

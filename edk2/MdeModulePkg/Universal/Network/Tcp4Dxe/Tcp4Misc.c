@@ -25,12 +25,12 @@ Abstract:
 
 #include <Library/DevicePathLib.h>
 
-NET_LIST_ENTRY  mTcpRunQue = {
+LIST_ENTRY      mTcpRunQue = {
   &mTcpRunQue,
   &mTcpRunQue
 };
 
-NET_LIST_ENTRY  mTcpListenQue = {
+LIST_ENTRY      mTcpListenQue = {
   &mTcpListenQue,
   &mTcpListenQue
 };
@@ -193,7 +193,7 @@ TcpLocateListenTcb (
   IN TCP_PEER *Remote
   )
 {
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *Entry;
   TCP_CB          *Node;
   TCP_CB          *Match;
   INTN            Last;
@@ -259,7 +259,7 @@ TcpFindTcbByPeer (
   )
 {
   TCP_PORTNO      LocalPort;
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *Entry;
   TCP_CB          *Tcb;
 
   ASSERT ((Addr != NULL) && (Port != 0));
@@ -314,7 +314,7 @@ TcpLocateTcb (
 {
   TCP_PEER        Local;
   TCP_PEER        Remote;
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *Entry;
   TCP_CB          *Tcb;
 
   Local.Port  = LocalPort;
@@ -332,8 +332,8 @@ TcpLocateTcb (
     if (TCP_PEER_EQUAL (&Remote, &Tcb->RemoteEnd) &&
         TCP_PEER_EQUAL (&Local, &Tcb->LocalEnd)) {
 
-      NetListRemoveEntry (&Tcb->List);
-      NetListInsertHead (&mTcpRunQue, &Tcb->List);
+      RemoveEntryList (&Tcb->List);
+      InsertHeadList (&mTcpRunQue, &Tcb->List);
 
       return Tcb;
     }
@@ -364,8 +364,8 @@ TcpInsertTcb (
   IN TCP_CB *Tcb
   )
 {
-  NET_LIST_ENTRY   *Entry;
-  NET_LIST_ENTRY   *Head;
+  LIST_ENTRY       *Entry;
+  LIST_ENTRY       *Head;
   TCP_CB           *Node;
   TCP4_PROTO_DATA  *TcpProto;
 
@@ -402,7 +402,7 @@ TcpInsertTcb (
     }
   }
 
-  NetListInsertHead (Head, &Tcb->List);
+  InsertHeadList (Head, &Tcb->List);
 
   TcpProto = (TCP4_PROTO_DATA *) Tcb->Sk->ProtoReserved;
   TcpSetVariableData (TcpProto->TcpService);
@@ -426,28 +426,28 @@ TcpCloneTcb (
 {
   TCP_CB               *Clone;
 
-  Clone = NetAllocatePool (sizeof (TCP_CB));
+  Clone = AllocatePool (sizeof (TCP_CB));
 
   if (Clone == NULL) {
     return NULL;
 
   }
 
-  NetCopyMem (Clone, Tcb, sizeof (TCP_CB));
+  CopyMem (Clone, Tcb, sizeof (TCP_CB));
 
   //
   // Increate the reference count of the shared IpInfo.
   //
   NET_GET_REF (Tcb->IpInfo);
 
-  NetListInit (&Clone->List);
-  NetListInit (&Clone->SndQue);
-  NetListInit (&Clone->RcvQue);
+  InitializeListHead (&Clone->List);
+  InitializeListHead (&Clone->SndQue);
+  InitializeListHead (&Clone->RcvQue);
 
   Clone->Sk = SockClone (Tcb->Sk);
   if (Clone->Sk == NULL) {
-    TCP4_DEBUG_ERROR (("TcpCloneTcb: failed to clone a sock\n"));
-    NetFreePool (Clone);
+    DEBUG ((EFI_D_ERROR, "TcpCloneTcb: failed to clone a sock\n"));
+    gBS->FreePool (Clone);
     return NULL;
   }
 
@@ -519,8 +519,9 @@ TcpSetState (
   IN UINT8  State
   )
 {
-  TCP4_DEBUG_TRACE (
-    ("Tcb (%x) state %s --> %s\n",
+  DEBUG (
+    (EFI_D_INFO,
+    "Tcb (%x) state %s --> %s\n",
     Tcb,
     mTcpStateName[Tcb->State],
     mTcpStateName[State])
@@ -722,9 +723,9 @@ TcpOnAppClose (
 {
   ASSERT (Tcb);
 
-  if (!NetListIsEmpty (&Tcb->RcvQue) || GET_RCV_DATASIZE (Tcb->Sk)) {
+  if (!IsListEmpty (&Tcb->RcvQue) || GET_RCV_DATASIZE (Tcb->Sk)) {
 
-    TCP4_DEBUG_WARN (("TcpOnAppClose: connection reset "
+    DEBUG ((EFI_D_WARN, "TcpOnAppClose: connection reset "
       "because data is lost for TCB %x\n", Tcb));
 
     TcpResetConnection (Tcb);
@@ -839,13 +840,13 @@ TcpOnAppConsume (
 
       if (TcpOld < Tcb->RcvMss) {
 
-        TCP4_DEBUG_TRACE (("TcpOnAppConsume: send a window"
+        DEBUG ((EFI_D_INFO, "TcpOnAppConsume: send a window"
           " update for a window closed Tcb(%x)\n", Tcb));
 
         TcpSendAck (Tcb);
       } else if (Tcb->DelayedAck == 0) {
 
-        TCP4_DEBUG_TRACE (("TcpOnAppConsume: scheduled a delayed"
+        DEBUG ((EFI_D_INFO, "TcpOnAppConsume: scheduled a delayed"
           " ACK to update window for Tcb(%x)\n", Tcb));
 
         Tcb->DelayedAck = 1;
@@ -885,7 +886,7 @@ TcpOnAppAbort (
   IN TCP_CB *Tcb
   )
 {
-  TCP4_DEBUG_WARN (("TcpOnAppAbort: connection reset "
+  DEBUG ((EFI_D_WARN, "TcpOnAppAbort: connection reset "
     "issued by application for TCB %x\n", Tcb));
 
   switch (Tcb->State) {
@@ -917,7 +918,7 @@ TcpSetVariableData (
   )
 {
   UINT32                  NumConfiguredInstance;
-  NET_LIST_ENTRY          *Entry;
+  LIST_ENTRY              *Entry;
   TCP_CB                  *TcpPcb;
   TCP4_PROTO_DATA         *TcpProto;
   UINTN                   VariableDataSize;
@@ -971,7 +972,7 @@ TcpSetVariableData (
     VariableDataSize += sizeof (EFI_TCP4_SERVICE_POINT) * (NumConfiguredInstance - 1);
   }
 
-  Tcp4VariableData = NetAllocatePool (VariableDataSize);
+  Tcp4VariableData = AllocatePool (VariableDataSize);
   if (Tcp4VariableData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -994,9 +995,9 @@ TcpSetVariableData (
       // This tcp instance belongs to the Tcp4Service.
       //
       Tcp4ServicePoint->InstanceHandle          = TcpPcb->Sk->SockHandle;
-      NetCopyMem (&Tcp4ServicePoint->LocalAddress, &TcpPcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Tcp4ServicePoint->LocalAddress, &TcpPcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
       Tcp4ServicePoint->LocalPort               = NTOHS (TcpPcb->LocalEnd.Port);
-      NetCopyMem (&Tcp4ServicePoint->RemoteAddress, &TcpPcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Tcp4ServicePoint->RemoteAddress, &TcpPcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
       Tcp4ServicePoint->RemotePort              = NTOHS (TcpPcb->RemoteEnd.Port);
 
       Tcp4ServicePoint++;
@@ -1016,9 +1017,9 @@ TcpSetVariableData (
       // This tcp instance belongs to the Tcp4Service.
       //
       Tcp4ServicePoint->InstanceHandle          = TcpPcb->Sk->SockHandle;
-      NetCopyMem (&Tcp4ServicePoint->LocalAddress, &TcpPcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Tcp4ServicePoint->LocalAddress, &TcpPcb->LocalEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
       Tcp4ServicePoint->LocalPort               = NTOHS (TcpPcb->LocalEnd.Port);
-      NetCopyMem (&Tcp4ServicePoint->RemoteAddress, &TcpPcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Tcp4ServicePoint->RemoteAddress, &TcpPcb->RemoteEnd.Ip, sizeof (EFI_IPv4_ADDRESS));
       Tcp4ServicePoint->RemotePort              = NTOHS (TcpPcb->RemoteEnd.Port);
 
       Tcp4ServicePoint++;
@@ -1054,7 +1055,7 @@ TcpSetVariableData (
              );
     }
 
-    NetFreePool (Tcp4Service->MacString);
+    gBS->FreePool (Tcp4Service->MacString);
   }
 
   Tcp4Service->MacString = NewMacString;
@@ -1069,7 +1070,7 @@ TcpSetVariableData (
 
 ON_ERROR:
 
-  NetFreePool (Tcp4VariableData);
+  gBS->FreePool (Tcp4VariableData);
 
   return Status;
 }
@@ -1098,7 +1099,7 @@ TcpClearVariableData (
          NULL
          );
 
-  NetFreePool (Tcp4Service->MacString);
+  gBS->FreePool (Tcp4Service->MacString);
   Tcp4Service->MacString = NULL;
 }
 
@@ -1159,7 +1160,7 @@ Returns:
                   Sock->DevicePath
                   );
   if (EFI_ERROR (Status)) {
-    NetFreePool (Sock->DevicePath);
+    gBS->FreePool (Sock->DevicePath);
   }
 
   return Status;

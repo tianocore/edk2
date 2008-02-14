@@ -114,7 +114,7 @@ Ip4WrapLinkTxToken (
   EFI_STATUS                            Status;
   UINT32                                Count;
 
-  Token = NetAllocatePool (sizeof (IP4_LINK_TX_TOKEN) + \
+  Token = AllocatePool (sizeof (IP4_LINK_TX_TOKEN) + \
             (Packet->BlockOpNum - 1) * sizeof (EFI_MANAGED_NETWORK_FRAGMENT_DATA));
 
   if (Token == NULL) {
@@ -122,7 +122,7 @@ Ip4WrapLinkTxToken (
   }
 
   Token->Signature = IP4_FRAME_TX_SIGNATURE;
-  NetListInit (&Token->Link);
+  InitializeListHead (&Token->Link);
 
   Token->Interface  = Interface;
   Token->IpInstance = IpInstance;
@@ -137,14 +137,14 @@ Ip4WrapLinkTxToken (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   Ip4OnFrameSent,
                   Token,
                   &MnpToken->Event
                   );
 
   if (EFI_ERROR (Status)) {
-    NetFreePool (Token);
+    gBS->FreePool (Token);
     return NULL;
   }
 
@@ -184,7 +184,7 @@ Ip4FreeLinkTxToken (
   NET_CHECK_SIGNATURE (Token, IP4_FRAME_TX_SIGNATURE);
 
   gBS->CloseEvent (Token->MnpToken.Event);
-  NetFreePool (Token);
+  gBS->FreePool (Token);
 }
 
 
@@ -208,28 +208,28 @@ Ip4CreateArpQue (
   IP4_ARP_QUE               *ArpQue;
   EFI_STATUS                Status;
 
-  ArpQue = NetAllocatePool (sizeof (IP4_ARP_QUE));
+  ArpQue = AllocatePool (sizeof (IP4_ARP_QUE));
 
   if (ArpQue == NULL) {
     return NULL;
   }
 
   ArpQue->Signature = IP4_FRAME_ARP_SIGNATURE;
-  NetListInit (&ArpQue->Link);
+  InitializeListHead (&ArpQue->Link);
 
-  NetListInit (&ArpQue->Frames);
+  InitializeListHead (&ArpQue->Frames);
   ArpQue->Interface = Interface;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   Ip4OnArpResolved,
                   ArpQue,
                   &ArpQue->OnResolved
                   );
 
   if (EFI_ERROR (Status)) {
-    NetFreePool (ArpQue);
+    gBS->FreePool (ArpQue);
     return NULL;
   }
 
@@ -265,7 +265,7 @@ Ip4FreeArpQue (
   Ip4CancelFrameArp (ArpQue, IoStatus, NULL, NULL);
 
   gBS->CloseEvent (ArpQue->OnResolved);
-  NetFreePool (ArpQue);
+  gBS->FreePool (ArpQue);
 }
 
 
@@ -294,7 +294,7 @@ Ip4CreateLinkRxToken (
   IP4_LINK_RX_TOKEN                     *Token;
   EFI_STATUS                            Status;
 
-  Token = NetAllocatePool (sizeof (IP4_LINK_RX_TOKEN));
+  Token = AllocatePool (sizeof (IP4_LINK_RX_TOKEN));
   if (Token == NULL) {
     return NULL;
   }
@@ -310,14 +310,14 @@ Ip4CreateLinkRxToken (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   Ip4OnFrameReceived,
                   Token,
                   &MnpToken->Event
                   );
 
   if (EFI_ERROR (Status)) {
-    NetFreePool (Token);
+    gBS->FreePool (Token);
     return NULL;
   }
 
@@ -345,7 +345,7 @@ Ip4FreeFrameRxToken (
   NET_CHECK_SIGNATURE (Token, IP4_FRAME_RX_SIGNATURE);
 
   gBS->CloseEvent (Token->MnpToken.Event);
-  NetFreePool (Token);
+  gBS->FreePool (Token);
 }
 
 
@@ -371,15 +371,15 @@ Ip4CancelFrameArp (
   IN VOID                   *Context
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_LINK_TX_TOKEN         *Token;
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &ArpQue->Frames) {
     Token = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
 
     if ((FrameToCancel == NULL) || FrameToCancel (Token, Context)) {
-      NetListRemoveEntry (Entry);
+      RemoveEntryList (Entry);
 
       Token->CallBack (Token->IpInstance, Token->Packet, IoStatus, 0, Token->Context);
       Ip4FreeLinkTxToken (Token);
@@ -411,8 +411,8 @@ Ip4CancelFrames (
   IN VOID                   *Context
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_ARP_QUE               *ArpQue;
   IP4_LINK_TX_TOKEN         *Token;
 
@@ -424,7 +424,7 @@ Ip4CancelFrames (
 
     Ip4CancelFrameArp (ArpQue, IoStatus, FrameToCancel, Context);
 
-    if (NetListIsEmpty (&ArpQue->Frames)) {
+    if (IsListEmpty (&ArpQue->Frames)) {
       Interface->Arp->Cancel (Interface->Arp, &ArpQue->Ip, ArpQue->OnResolved);
     }
   }
@@ -466,14 +466,14 @@ Ip4CreateInterface (
   IP4_INTERFACE             *Interface;
   EFI_SIMPLE_NETWORK_MODE   SnpMode;
 
-  Interface = NetAllocatePool (sizeof (IP4_INTERFACE));
+  Interface = AllocatePool (sizeof (IP4_INTERFACE));
 
   if ((Interface == NULL) || (Mnp == NULL)) {
     return NULL;
   }
 
   Interface->Signature = IP4_INTERFACE_SIGNATURE;
-  NetListInit (&Interface->Link);
+  InitializeListHead (&Interface->Link);
   Interface->RefCnt     = 1;
 
   Interface->Ip         = IP4_ALLZERO_ADDRESS;
@@ -486,8 +486,8 @@ Ip4CreateInterface (
   Interface->Arp        = NULL;
   Interface->ArpHandle  = NULL;
 
-  NetListInit (&Interface->ArpQues);
-  NetListInit (&Interface->SentFrames);
+  InitializeListHead (&Interface->ArpQues);
+  InitializeListHead (&Interface->SentFrames);
 
   Interface->RecvRequest = NULL;
 
@@ -495,7 +495,7 @@ Ip4CreateInterface (
   // Get the interface's Mac address and broadcast mac address from SNP
   //
   if (EFI_ERROR (Mnp->GetModeData (Mnp, NULL, &SnpMode))) {
-    NetFreePool (Interface);
+    gBS->FreePool (Interface);
     return NULL;
   }
 
@@ -503,7 +503,7 @@ Ip4CreateInterface (
   CopyMem (&Interface->BroadcastMac, &SnpMode.BroadcastAddress, sizeof (Interface->BroadcastMac));
   Interface->HwaddrLen    = SnpMode.HwAddressSize;
 
-  NetListInit (&Interface->IpInstances);
+  InitializeListHead (&Interface->IpInstances);
   Interface->PromiscRecv = FALSE;
 
   return Interface;
@@ -677,12 +677,12 @@ Ip4CancelReceive (
   IP4_LINK_RX_TOKEN         *Token;
 
   if ((Token = Interface->RecvRequest) != NULL) {
-    OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
     Interface->RecvRequest = NULL;
     Interface->Mnp->Cancel (Interface->Mnp, &Token->MnpToken);
 
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
   }
 }
 
@@ -728,9 +728,9 @@ Ip4FreeInterface (
   Ip4CancelFrames (Interface, EFI_ABORTED, Ip4CancelInstanceFrame, NULL);
   Ip4CancelReceive (Interface);
 
-  ASSERT (NetListIsEmpty (&Interface->IpInstances));
-  ASSERT (NetListIsEmpty (&Interface->ArpQues));
-  ASSERT (NetListIsEmpty (&Interface->SentFrames));
+  ASSERT (IsListEmpty (&Interface->IpInstances));
+  ASSERT (IsListEmpty (&Interface->ArpQues));
+  ASSERT (IsListEmpty (&Interface->SentFrames));
 
   if (Interface->Arp != NULL) {
     gBS->CloseProtocol (
@@ -748,8 +748,8 @@ Ip4FreeInterface (
       );
   }
 
-  NetListRemoveEntry (&Interface->Link);
-  NetFreePool (Interface);
+  RemoveEntryList (&Interface->Link);
+  gBS->FreePool (Interface);
 
   return EFI_SUCCESS;
 }
@@ -773,8 +773,8 @@ Ip4OnArpResolvedDpc (
   IN VOID                   *Context
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_ARP_QUE               *ArpQue;
   IP4_INTERFACE             *Interface;
   IP4_LINK_TX_TOKEN         *Token;
@@ -783,7 +783,7 @@ Ip4OnArpResolvedDpc (
   ArpQue = (IP4_ARP_QUE *) Context;
   NET_CHECK_SIGNATURE (ArpQue, IP4_FRAME_ARP_SIGNATURE);
 
-  NetListRemoveEntry (&ArpQue->Link);
+  RemoveEntryList (&ArpQue->Link);
 
   //
   // ARP resolve failed for some reason. Release all the frame
@@ -804,7 +804,7 @@ Ip4OnArpResolvedDpc (
   Interface = ArpQue->Interface;
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &ArpQue->Frames) {
-    NetListRemoveEntry (Entry);
+    RemoveEntryList (Entry);
 
     Token         = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
     CopyMem (&Token->DstMac, &ArpQue->Mac, sizeof (Token->DstMac));
@@ -816,11 +816,11 @@ Ip4OnArpResolvedDpc (
     // Status of Mnp->Transmit is not EFI_SUCCESS as in this case the
     // FrameSentDpc won't be queued.
     //
-    NetListInsertTail (&Interface->SentFrames, &Token->Link);
+    InsertTailList (&Interface->SentFrames, &Token->Link);
 
     Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
     if (EFI_ERROR (Status)) {
-      NetListRemoveEntry (Entry);
+      RemoveEntryList (Entry);
       Token->CallBack (Token->IpInstance, Token->Packet, Status, 0, Token->Context);
 
       Ip4FreeLinkTxToken (Token);
@@ -884,7 +884,7 @@ Ip4OnFrameSentDpc (
   Token = (IP4_LINK_TX_TOKEN *) Context;
   NET_CHECK_SIGNATURE (Token, IP4_FRAME_TX_SIGNATURE);
 
-  NetListRemoveEntry (&Token->Link);
+  RemoveEntryList (&Token->Link);
 
   Token->CallBack (
           Token->IpInstance,
@@ -961,7 +961,7 @@ Ip4SendFrame (
   )
 {
   IP4_LINK_TX_TOKEN         *Token;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IP4_ARP_QUE               *ArpQue;
   EFI_ARP_PROTOCOL          *Arp;
   EFI_STATUS                Status;
@@ -1034,7 +1034,7 @@ Ip4SendFrame (
   // Found a pending ARP request, enqueue the frame then return
   //
   if (Entry != &Interface->ArpQues) {
-    NetListInsertTail (&ArpQue->Frames, &Token->Link);
+    InsertTailList (&ArpQue->Frames, &Token->Link);
     return EFI_SUCCESS;
   }
 
@@ -1055,8 +1055,8 @@ Ip4SendFrame (
     goto ON_ERROR;
   }
 
-  NetListInsertHead (&ArpQue->Frames, &Token->Link);
-  NetListInsertHead (&Interface->ArpQues, &ArpQue->Link);
+  InsertHeadList (&ArpQue->Frames, &Token->Link);
+  InsertHeadList (&Interface->ArpQues, &ArpQue->Link);
   return EFI_SUCCESS;
 
 SEND_NOW:
@@ -1064,10 +1064,10 @@ SEND_NOW:
   // Insert the tx token into the SentFrames list before calling Mnp->Transmit.
   // Remove it if the returned status is not EFI_SUCCESS.
   //
-  NetListInsertTail (&Interface->SentFrames, &Token->Link);
+  InsertTailList (&Interface->SentFrames, &Token->Link);
   Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
   if (EFI_ERROR (Status)) {
-    NetListRemoveEntry (&Interface->SentFrames);
+    RemoveEntryList (&Interface->SentFrames);
     goto ON_ERROR;
   }
 

@@ -36,7 +36,7 @@ Udp4CheckTimeout (
 STATIC
 BOOLEAN
 Udp4FindInstanceByPort (
-  IN NET_LIST_ENTRY    *InstanceList,
+  IN LIST_ENTRY        *InstanceList,
   IN EFI_IPv4_ADDRESS  *Address,
   IN UINT16            Port
   );
@@ -153,7 +153,7 @@ Udp4CreateService (
   EFI_STATUS       Status;
   IP_IO_OPEN_DATA  OpenData;
 
-  NetZeroMem (Udp4Service, sizeof (UDP4_SERVICE_DATA));
+  ZeroMem (Udp4Service, sizeof (UDP4_SERVICE_DATA));
 
   Udp4Service->Signature        = UDP4_SERVICE_DATA_SIGNATURE;
   Udp4Service->ServiceBinding   = mUdp4ServiceBinding;
@@ -161,7 +161,7 @@ Udp4CreateService (
   Udp4Service->ControllerHandle = ControllerHandle;
   Udp4Service->ChildrenNumber   = 0;
 
-  NetListInit (&Udp4Service->ChildrenList);
+  InitializeListHead (&Udp4Service->ChildrenList);
 
   //
   // Create the IpIo for this service context.
@@ -194,7 +194,7 @@ Udp4CreateService (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   Udp4CheckTimeout,
                   Udp4Service,
                   &Udp4Service->TimeoutEvent
@@ -279,10 +279,10 @@ Udp4CheckTimeout (
   )
 {
   UDP4_SERVICE_DATA   *Udp4Service;
-  NET_LIST_ENTRY      *Entry;
+  LIST_ENTRY          *Entry;
   UDP4_INSTANCE_DATA  *Instance;
-  NET_LIST_ENTRY      *WrapEntry;
-  NET_LIST_ENTRY      *NextEntry;
+  LIST_ENTRY          *WrapEntry;
+  LIST_ENTRY          *NextEntry;
   UDP4_RXDATA_WRAP    *Wrap;
 
   Udp4Service = (UDP4_SERVICE_DATA *) Context;
@@ -344,9 +344,9 @@ Udp4InitInstance (
   //
   // Init the lists.
   //
-  NetListInit (&Instance->Link);
-  NetListInit (&Instance->RcvdDgramQue);
-  NetListInit (&Instance->DeliveredDgramQue);
+  InitializeListHead (&Instance->Link);
+  InitializeListHead (&Instance->RcvdDgramQue);
+  InitializeListHead (&Instance->DeliveredDgramQue);
 
   //
   // Init the NET_MAPs.
@@ -400,12 +400,12 @@ Udp4CleanInstance (
 STATIC
 BOOLEAN
 Udp4FindInstanceByPort (
-  IN NET_LIST_ENTRY    *InstanceList,
+  IN LIST_ENTRY        *InstanceList,
   IN EFI_IPv4_ADDRESS  *Address,
   IN UINT16            Port
   )
 {
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   UDP4_INSTANCE_DATA    *Instance;
   EFI_UDP4_CONFIG_DATA  *ConfigData;
 
@@ -457,7 +457,7 @@ Udp4FindInstanceByPort (
 **/
 EFI_STATUS
 Udp4Bind (
-  IN NET_LIST_ENTRY        *InstanceList,
+  IN LIST_ENTRY            *InstanceList,
   IN EFI_UDP4_CONFIG_DATA  *ConfigData
   )
 {
@@ -701,7 +701,7 @@ Udp4ValidateTxToken (
   }
 
   if (TxData->GatewayAddress != NULL) {
-    NetCopyMem (&GatewayAddress, TxData->GatewayAddress, sizeof (IP4_ADDR));
+    CopyMem (&GatewayAddress, TxData->GatewayAddress, sizeof (IP4_ADDR));
 
     if (!Ip4IsUnicast (NTOHL (GatewayAddress), 0)) {
       //
@@ -716,7 +716,7 @@ Udp4ValidateTxToken (
 
   if (UdpSessionData != NULL) {
 
-    NetCopyMem (&SourceAddress, &UdpSessionData->SourceAddress, sizeof (IP4_ADDR));
+    CopyMem (&SourceAddress, &UdpSessionData->SourceAddress, sizeof (IP4_ADDR));
 
     if ((SourceAddress != 0) && !Ip4IsUnicast (HTONL (SourceAddress), 0)) {
       //
@@ -1069,7 +1069,7 @@ Udp4FlushRcvdDgram (
 {
   UDP4_RXDATA_WRAP  *Wrap;
 
-  while (!NetListIsEmpty (&Instance->RcvdDgramQue)) {
+  while (!IsListEmpty (&Instance->RcvdDgramQue)) {
     //
     // Iterate all the Wraps in the RcvdDgramQue.
     //
@@ -1190,7 +1190,7 @@ Udp4MatchDgram (
     return TRUE;
   }
 
-  NetCopyMem (&Destination, &Udp4Session->DestinationAddress, sizeof (IP4_ADDR));
+  CopyMem (&Destination, &Udp4Session->DestinationAddress, sizeof (IP4_ADDR));
 
   if (IP4_IS_LOCAL_BROADCAST (Destination) && ConfigData->AcceptBroadcast) {
     //
@@ -1235,7 +1235,7 @@ Udp4RecycleRxDataWrap (
   //
   // Remove the Wrap from the list it belongs to.
   //
-  NetListRemoveEntry (&Wrap->Link);
+  RemoveEntryList (&Wrap->Link);
 
   //
   // Free the Packet associated with this Wrap.
@@ -1247,7 +1247,7 @@ Udp4RecycleRxDataWrap (
   //
   gBS->CloseEvent (Wrap->RxData.RecycleSignal);
 
-  NetFreePool (Wrap);
+  gBS->FreePool (Wrap);
 }
 
 
@@ -1277,13 +1277,13 @@ Udp4WrapRxData (
   //
   // Allocate buffer for the Wrap.
   //
-  Wrap = NetAllocatePool (sizeof (UDP4_RXDATA_WRAP) +
+  Wrap = AllocatePool (sizeof (UDP4_RXDATA_WRAP) +
          (Packet->BlockOpNum - 1) * sizeof (EFI_UDP4_FRAGMENT_DATA));
   if (Wrap == NULL) {
     return NULL;
   }
 
-  NetListInit (&Wrap->Link);
+  InitializeListHead (&Wrap->Link);
 
   CopyMem (&Wrap->RxData, RxData, sizeof (Wrap->RxData));
 
@@ -1292,13 +1292,13 @@ Udp4WrapRxData (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_RECYCLE,
+                  TPL_NOTIFY,
                   Udp4RecycleRxDataWrap,
                   Wrap,
                   &Wrap->RxData.RecycleSignal
                   );
   if (EFI_ERROR (Status)) {
-    NetFreePool (Wrap);
+    gBS->FreePool (Wrap);
     return NULL;
   }
 
@@ -1329,7 +1329,7 @@ Udp4EnqueueDgram (
   IN EFI_UDP4_RECEIVE_DATA  *RxData
   )
 {
-  NET_LIST_ENTRY      *Entry;
+  LIST_ENTRY          *Entry;
   UDP4_INSTANCE_DATA  *Instance;
   UDP4_RXDATA_WRAP    *Wrap;
   UINTN               Enqueued;
@@ -1357,7 +1357,7 @@ Udp4EnqueueDgram (
 
       NET_GET_REF (Packet);
 
-      NetListInsertTail (&Instance->RcvdDgramQue, &Wrap->Link);
+      InsertTailList (&Instance->RcvdDgramQue, &Wrap->Link);
 
       Enqueued++;
     }
@@ -1386,7 +1386,7 @@ Udp4InstanceDeliverDgram (
   EFI_UDP4_RECEIVE_DATA      *RxData;
   EFI_TPL                    OldTpl;
 
-  if (!NetListIsEmpty (&Instance->RcvdDgramQue) &&
+  if (!IsListEmpty (&Instance->RcvdDgramQue) &&
     !NetMapIsEmpty (&Instance->RxTokens)) {
 
     Wrap = NET_LIST_HEAD (&Instance->RcvdDgramQue, UDP4_RXDATA_WRAP, Link);
@@ -1424,9 +1424,9 @@ Udp4InstanceDeliverDgram (
     Token->Status        = EFI_SUCCESS;
     Token->Packet.RxData = &Wrap->RxData;
 
-    OldTpl = NET_RAISE_TPL (NET_TPL_RECYCLE);
-    NetListInsertTail (&Instance->DeliveredDgramQue, &Wrap->Link);
-    NET_RESTORE_TPL (OldTpl);
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    InsertTailList (&Instance->DeliveredDgramQue, &Wrap->Link);
+    gBS->RestoreTPL (OldTpl);
 
     gBS->SignalEvent (Token->Event);
   }
@@ -1447,7 +1447,7 @@ Udp4DeliverDgram (
   IN UDP4_SERVICE_DATA  *Udp4Service
   )
 {
-  NET_LIST_ENTRY      *Entry;
+  LIST_ENTRY          *Entry;
   UDP4_INSTANCE_DATA  *Instance;
 
   NET_LIST_FOR_EACH (Entry, &Udp4Service->ChildrenList) {
@@ -1524,8 +1524,8 @@ Udp4Demultiplex (
   Udp4Session->SourcePort      = NTOHS (Udp4Header->SrcPort);
   Udp4Session->DestinationPort = NTOHS (Udp4Header->DstPort);
 
-  NetCopyMem (&Udp4Session->SourceAddress, &NetSession->Source, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Udp4Session->DestinationAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Udp4Session->SourceAddress, &NetSession->Source, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Udp4Session->DestinationAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
 
   //
   // Trim the UDP header.
@@ -1629,13 +1629,13 @@ Udp4SendPortUnreach (
   //
   // Copy the IP header of the datagram tragged the error.
   //
-  NetCopyMem (&IcmpErrHdr->IpHead, IpHdr, EFI_IP4_HEADER_LEN (IpHdr));
+  CopyMem (&IcmpErrHdr->IpHead, IpHdr, EFI_IP4_HEADER_LEN (IpHdr));
 
   //
   // Copy the UDP header.
   //
   Ptr = (UINT8 *) &IcmpErrHdr->IpHead + EFI_IP4_HEADER_LEN (IpHdr);
-  NetCopyMem (Ptr, Udp4Header, ICMP_ERROR_PACKET_LENGTH);
+  CopyMem (Ptr, Udp4Header, ICMP_ERROR_PACKET_LENGTH);
 
   //
   // Calculate the checksum.
@@ -1650,8 +1650,8 @@ Udp4SendPortUnreach (
   Override.TimeToLive    = 255;
   Override.Protocol      = EFI_IP_PROTO_ICMP;
 
-  NetCopyMem (&Override.SourceAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
-  NetZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Override.SourceAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
+  ZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
 
   //
   // Send out this icmp packet.
@@ -1686,13 +1686,13 @@ Udp4IcmpHandler (
 {
   EFI_UDP4_HEADER        *Udp4Header;
   EFI_UDP4_SESSION_DATA  Udp4Session;
-  NET_LIST_ENTRY         *Entry;
+  LIST_ENTRY             *Entry;
   UDP4_INSTANCE_DATA     *Instance;
 
   Udp4Header = (EFI_UDP4_HEADER *) NetbufGetByte (Packet, 0, NULL);
 
-  NetCopyMem (&Udp4Session.SourceAddress, &NetSession->Source, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Udp4Session.DestinationAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Udp4Session.SourceAddress, &NetSession->Source, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Udp4Session.DestinationAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
 
   Udp4Session.SourcePort      = NTOHS (Udp4Header->DstPort);
   Udp4Session.DestinationPort = NTOHS (Udp4Header->SrcPort);
@@ -1815,7 +1815,7 @@ Udp4SetVariableData (
   )
 {
   UINT32                  NumConfiguredInstance;
-  NET_LIST_ENTRY          *Entry;
+  LIST_ENTRY              *Entry;
   UINTN                   VariableDataSize;
   EFI_UDP4_VARIABLE_DATA  *Udp4VariableData;
   EFI_UDP4_SERVICE_POINT  *Udp4ServicePoint;
@@ -1852,7 +1852,7 @@ Udp4SetVariableData (
     VariableDataSize += sizeof (EFI_UDP4_SERVICE_POINT) * (NumConfiguredInstance - 1);
   }
 
-  Udp4VariableData = NetAllocatePool (VariableDataSize);
+  Udp4VariableData = AllocatePool (VariableDataSize);
   if (Udp4VariableData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1913,7 +1913,7 @@ Udp4SetVariableData (
              );
     }
 
-    NetFreePool (Udp4Service->MacString);
+    gBS->FreePool (Udp4Service->MacString);
   }
 
   Udp4Service->MacString = NewMacString;
@@ -1928,7 +1928,7 @@ Udp4SetVariableData (
 
 ON_ERROR:
 
-  NetFreePool (Udp4VariableData);
+  gBS->FreePool (Udp4VariableData);
 
   return Status;
 }
@@ -1957,6 +1957,6 @@ Udp4ClearVariableData (
          NULL
          );
 
-  NetFreePool (Udp4Service->MacString);
+  gBS->FreePool (Udp4Service->MacString);
   Udp4Service->MacString = NULL;
 }

@@ -142,7 +142,7 @@ MnpAddFreeNbuf (
     Nbuf = NetbufAlloc (MnpServiceData->BufferLength + MnpServiceData->PaddingSize);
     if (Nbuf == NULL) {
 
-      MNP_DEBUG_ERROR (("MnpAddFreeNbuf: NetBufAlloc failed.\n"));
+      DEBUG ((EFI_D_ERROR, "MnpAddFreeNbuf: NetBufAlloc failed.\n"));
       Status = EFI_OUT_OF_RESOURCES;
       break;
     }
@@ -188,7 +188,7 @@ MnpAllocNbuf (
 
   FreeNbufQue = &MnpServiceData->FreeNbufQue;
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_RECYCLE);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   //
   // Check whether there are available buffers, or else try to add some.
@@ -197,8 +197,9 @@ MnpAllocNbuf (
 
     if ((MnpServiceData->NbufCnt + MNP_NET_BUFFER_INCREASEMENT) > MNP_MAX_NET_BUFFER_NUM) {
 
-      MNP_DEBUG_ERROR (
-        ("MnpAllocNbuf: The maximum NET_BUF size is reached for MNP driver instance %p.\n",
+      DEBUG (
+        (EFI_D_ERROR,
+        "MnpAllocNbuf: The maximum NET_BUF size is reached for MNP driver instance %p.\n",
         MnpServiceData)
         );
 
@@ -209,8 +210,9 @@ MnpAllocNbuf (
     Status = MnpAddFreeNbuf (MnpServiceData, MNP_NET_BUFFER_INCREASEMENT);
     if (EFI_ERROR (Status)) {
 
-      MNP_DEBUG_ERROR (
-        ("MnpAllocNbuf: Failed to add NET_BUFs into the FreeNbufQue, %r.\n",
+      DEBUG (
+        (EFI_D_ERROR,
+        "MnpAllocNbuf: Failed to add NET_BUFs into the FreeNbufQue, %r.\n",
         Status)
         );
       //
@@ -230,7 +232,7 @@ MnpAllocNbuf (
   }
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Nbuf;
 }
@@ -256,7 +258,7 @@ MnpFreeNbuf (
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
   ASSERT (Nbuf->RefCnt > 1);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_RECYCLE);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   NET_PUT_REF (Nbuf);
 
@@ -268,7 +270,7 @@ MnpFreeNbuf (
     NetbufQueAppend (&MnpServiceData->FreeNbufQue, Nbuf);
   }
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 }
 
 
@@ -327,8 +329,8 @@ MnpInitializeServiceData (
   //
   // Initialize the lists.
   //
-  NetListInit (&MnpServiceData->GroupAddressList);
-  NetListInit (&MnpServiceData->ChildrenList);
+  InitializeListHead (&MnpServiceData->GroupAddressList);
+  InitializeListHead (&MnpServiceData->ChildrenList);
 
   //
   // Get the buffer length used to allocate NET_BUF to hold data received
@@ -337,7 +339,7 @@ MnpInitializeServiceData (
   MnpServiceData->BufferLength = MnpServiceData->Mtu + SnpMode->MediaHeaderSize + NET_ETHER_FCS_SIZE;
 
   //
-  // Make sure the protocol headers immediately following the media header 
+  // Make sure the protocol headers immediately following the media header
   // 4-byte aligned
   //
   MnpServiceData->PaddingSize = (4 - SnpMode->MediaHeaderSize) & 0x3;
@@ -349,7 +351,7 @@ MnpInitializeServiceData (
   Status = MnpAddFreeNbuf (MnpServiceData, MNP_INIT_NET_BUFFER_NUM);
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (("MnpInitializeServiceData: MnpAddFreeNbuf failed, %r.\n", Status));
+    DEBUG ((EFI_D_ERROR, "MnpInitializeServiceData: MnpAddFreeNbuf failed, %r.\n", Status));
     goto ERROR;
   }
   //
@@ -365,10 +367,10 @@ MnpInitializeServiceData (
   //
   // Allocate buffer pool for tx.
   //
-  MnpServiceData->TxBuf = NetAllocatePool (MnpServiceData->Mtu + SnpMode->MediaHeaderSize);
+  MnpServiceData->TxBuf = AllocatePool (MnpServiceData->Mtu + SnpMode->MediaHeaderSize);
   if (MnpServiceData->TxBuf == NULL) {
 
-    MNP_DEBUG_ERROR (("MnpInitializeServiceData: NetAllocatePool failed.\n"));
+    DEBUG ((EFI_D_ERROR, "MnpInitializeServiceData: AllocatePool failed.\n"));
     Status = EFI_OUT_OF_RESOURCES;
 
     goto ERROR;
@@ -379,14 +381,14 @@ MnpInitializeServiceData (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  NET_TPL_LOCK,
+                  TPL_CALLBACK,
                   MnpSystemPoll,
                   MnpServiceData,
                   &MnpServiceData->PollTimer
                   );
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (("MnpInitializeServiceData: CreateEvent for poll timer failed.\n"));
+    DEBUG ((EFI_D_ERROR, "MnpInitializeServiceData: CreateEvent for poll timer failed.\n"));
     goto ERROR;
   }
 
@@ -395,14 +397,14 @@ MnpInitializeServiceData (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   MnpCheckPacketTimeout,
                   MnpServiceData,
                   &MnpServiceData->TimeoutCheckTimer
                   );
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (("MnpInitializeServiceData: CreateEvent for packet timeout check failed.\n"));
+    DEBUG ((EFI_D_ERROR, "MnpInitializeServiceData: CreateEvent for packet timeout check failed.\n"));
     goto ERROR;
   }
 
@@ -411,14 +413,14 @@ MnpInitializeServiceData (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   NULL,
                   NULL,
                   &MnpServiceData->TxTimeoutEvent
                   );
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (("MnpInitializeServiceData: CreateEvent for tx timeout event failed.\n"));
+    DEBUG ((EFI_D_ERROR, "MnpInitializeServiceData: CreateEvent for tx timeout event failed.\n"));
   }
 
 ERROR:
@@ -439,7 +441,7 @@ ERROR:
 
     if (MnpServiceData->TxBuf != NULL) {
 
-      NetFreePool (MnpServiceData->TxBuf);
+      gBS->FreePool (MnpServiceData->TxBuf);
     }
 
     if (MnpServiceData->RxNbufCache != NULL) {
@@ -475,7 +477,7 @@ MnpFlushServiceData (
   //
   // The GroupAddressList must be empty.
   //
-  ASSERT (NetListIsEmpty (&MnpServiceData->GroupAddressList));
+  ASSERT (IsListEmpty (&MnpServiceData->GroupAddressList));
 
   //
   // Close the event.
@@ -487,7 +489,7 @@ MnpFlushServiceData (
   //
   // Free the tx buffer.
   //
-  NetFreePool (MnpServiceData->TxBuf);
+  gBS->FreePool (MnpServiceData->TxBuf);
 
   //
   // Free the RxNbufCache.
@@ -502,9 +504,9 @@ MnpFlushServiceData (
 
   DEBUG_CODE (
 
-    if (MnpServiceData->NbufCnt != 0) {
+  if (MnpServiceData->NbufCnt != 0) {
 
-    MNP_DEBUG_WARN (("MnpFlushServiceData: Memory leak, MnpServiceData->NbufCnt != 0.\n"));
+    DEBUG ((EFI_D_WARN, "MnpFlushServiceData: Memory leak, MnpServiceData->NbufCnt != 0.\n"));
   }
   );
 }
@@ -547,9 +549,9 @@ MnpInitializeInstanceData (
   //
   // Initialize the lists.
   //
-  NetListInit (&Instance->GroupCtrlBlkList);
-  NetListInit (&Instance->RcvdPacketQueue);
-  NetListInit (&Instance->RxDeliveredPacketQueue);
+  InitializeListHead (&Instance->GroupCtrlBlkList);
+  InitializeListHead (&Instance->RcvdPacketQueue);
+  InitializeListHead (&Instance->RxDeliveredPacketQueue);
 
   //
   // Initialize the RxToken Map.
@@ -769,7 +771,7 @@ MnpStart (
       Status = MnpStartSnp (MnpServiceData->Snp);
       if (EFI_ERROR (Status)) {
 
-        MNP_DEBUG_ERROR (("MnpStart: MnpStartSnp failed, %r.\n", Status));
+        DEBUG ((EFI_D_ERROR, "MnpStart: MnpStartSnp failed, %r.\n", Status));
         goto ErrorExit;
       }
 
@@ -783,8 +785,9 @@ MnpStart (
                       );
       if (EFI_ERROR (Status)) {
 
-        MNP_DEBUG_ERROR (
-          ("MnpStart, gBS->SetTimer for TimeoutCheckTimer %r.\n",
+        DEBUG (
+          (EFI_D_ERROR,
+          "MnpStart, gBS->SetTimer for TimeoutCheckTimer %r.\n",
           Status)
           );
         goto ErrorExit;
@@ -802,7 +805,7 @@ MnpStart (
     Status      = gBS->SetTimer (MnpServiceData->PollTimer, TimerOpType, MNP_SYS_POLL_INTERVAL);
     if (EFI_ERROR (Status)) {
 
-      MNP_DEBUG_ERROR (("MnpStart: gBS->SetTimer for PollTimer failed, %r.\n", Status));
+      DEBUG ((EFI_D_ERROR, "MnpStart: gBS->SetTimer for PollTimer failed, %r.\n", Status));
       goto ErrorExit;
     }
 
@@ -902,9 +905,9 @@ MnpFlushRcvdDataQueue (
 
   NET_CHECK_SIGNATURE (Instance, MNP_INSTANCE_DATA_SIGNATURE);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_RECYCLE);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  while (!NetListIsEmpty (&Instance->RcvdPacketQueue)) {
+  while (!IsListEmpty (&Instance->RcvdPacketQueue)) {
     //
     // Remove all the Wraps.
     //
@@ -919,7 +922,7 @@ MnpFlushRcvdDataQueue (
 
   ASSERT (Instance->RcvdPacketQueueSize == 0);
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 }
 
 
@@ -1086,7 +1089,7 @@ MnpConfigReceiveFilters (
   UINT32                      EnableFilterBits;
   UINT32                      DisableFilterBits;
   BOOLEAN                     ResetMCastFilters;
-  NET_LIST_ENTRY              *Entry;
+  LIST_ENTRY                  *Entry;
   UINT32                      Index;
   MNP_GROUP_ADDRESS           *GroupAddress;
 
@@ -1138,10 +1141,10 @@ MnpConfigReceiveFilters (
       // Allocate pool for the mulicast addresses.
       //
       MCastFilterCnt  = MnpServiceData->GroupAddressCount;
-      MCastFilter     = NetAllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
+      MCastFilter     = AllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
       if (MCastFilter == NULL) {
 
-        MNP_DEBUG_ERROR (("MnpConfigReceiveFilters: Failed to allocate memory resource for MCastFilter.\n"));
+        DEBUG ((EFI_D_ERROR, "MnpConfigReceiveFilters: Failed to allocate memory resource for MCastFilter.\n"));
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -1202,8 +1205,9 @@ MnpConfigReceiveFilters (
   DEBUG_CODE (
     if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (
-      ("MnpConfigReceiveFilters: Snp->ReceiveFilters failed, %r.\n",
+    DEBUG (
+      (EFI_D_ERROR,
+      "MnpConfigReceiveFilters: Snp->ReceiveFilters failed, %r.\n",
       Status)
       );
   }
@@ -1213,7 +1217,7 @@ MnpConfigReceiveFilters (
     //
     // Free the buffer used to hold the group addresses.
     //
-    NetFreePool (MCastFilter);
+    gBS->FreePool (MCastFilter);
   }
 
   return Status;
@@ -1258,17 +1262,17 @@ MnpGroupOpAddCtrlBlk (
     //
     // Allocate a new GroupAddress to be added into MNP's GroupAddressList.
     //
-    GroupAddress = NetAllocatePool (sizeof (MNP_GROUP_ADDRESS));
+    GroupAddress = AllocatePool (sizeof (MNP_GROUP_ADDRESS));
     if (GroupAddress == NULL) {
 
-      MNP_DEBUG_ERROR (("MnpGroupOpFormCtrlBlk: Failed to allocate memory resource.\n"));
+      DEBUG ((EFI_D_ERROR, "MnpGroupOpFormCtrlBlk: Failed to allocate memory resource.\n"));
 
       return EFI_OUT_OF_RESOURCES;
     }
 
     CopyMem (&GroupAddress->Address, MacAddress, sizeof (GroupAddress->Address));
     GroupAddress->RefCnt  = 0;
-    NetListInsertTail (
+    InsertTailList (
       &MnpServiceData->GroupAddressList,
       &GroupAddress->AddrEntry
       );
@@ -1284,7 +1288,7 @@ MnpGroupOpAddCtrlBlk (
   // Add the CtrlBlk into the instance's GroupCtrlBlkList.
   //
   CtrlBlk->GroupAddress = GroupAddress;
-  NetListInsertTail (&Instance->GroupCtrlBlkList, &CtrlBlk->CtrlBlkEntry);
+  InsertTailList (&Instance->GroupCtrlBlkList, &CtrlBlk->CtrlBlkEntry);
 
   return EFI_SUCCESS;
 }
@@ -1319,8 +1323,8 @@ MnpGroupOpDelCtrlBlk (
   // Remove and free the CtrlBlk.
   //
   GroupAddress = CtrlBlk->GroupAddress;
-  NetListRemoveEntry (&CtrlBlk->CtrlBlkEntry);
-  NetFreePool (CtrlBlk);
+  RemoveEntryList (&CtrlBlk->CtrlBlkEntry);
+  gBS->FreePool (CtrlBlk);
 
   ASSERT (GroupAddress->RefCnt > 0);
 
@@ -1334,8 +1338,8 @@ MnpGroupOpDelCtrlBlk (
     // Free this GroupAddress entry if no instance uses it.
     //
     MnpServiceData->GroupAddressCount--;
-    NetListRemoveEntry (&GroupAddress->AddrEntry);
-    NetFreePool (GroupAddress);
+    RemoveEntryList (&GroupAddress->AddrEntry);
+    gBS->FreePool (GroupAddress);
 
     return TRUE;
   }
@@ -1367,8 +1371,8 @@ MnpGroupOp (
   )
 {
   MNP_SERVICE_DATA        *MnpServiceData;
-  NET_LIST_ENTRY          *Entry;
-  NET_LIST_ENTRY          *NextEntry;
+  LIST_ENTRY              *Entry;
+  LIST_ENTRY              *NextEntry;
   MNP_GROUP_ADDRESS       *GroupAddress;
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
   MNP_GROUP_CONTROL_BLOCK *NewCtrlBlk;
@@ -1392,10 +1396,10 @@ MnpGroupOp (
     //
     // Allocate memory for the control block.
     //
-    NewCtrlBlk    = NetAllocatePool (sizeof (MNP_GROUP_CONTROL_BLOCK));
+    NewCtrlBlk    = AllocatePool (sizeof (MNP_GROUP_CONTROL_BLOCK));
     if (NewCtrlBlk == NULL) {
 
-      MNP_DEBUG_ERROR (("MnpGroupOp: Failed to allocate memory resource.\n"));
+      DEBUG ((EFI_D_ERROR, "MnpGroupOp: Failed to allocate memory resource.\n"));
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -1404,7 +1408,7 @@ MnpGroupOp (
       // Check whether the MacAddress is already joined by other instances.
       //
       GroupAddress = NET_LIST_USER_STRUCT (Entry, MNP_GROUP_ADDRESS, AddrEntry);
-      if (0 == NetCompareMem (
+      if (0 == CompareMem (
                 MacAddress,
                 &GroupAddress->Address,
                 SnpMode->HwAddressSize

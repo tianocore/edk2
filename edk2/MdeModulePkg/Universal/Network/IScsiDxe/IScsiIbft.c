@@ -42,7 +42,7 @@ Returns:
 
 --*/
 {
-  NetZeroMem (Header, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER));
+  ZeroMem (Header, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER));
 
   Header->Signature = EFI_ACPI_3_0_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE;
   Header->Length    = IBFT_HEAP_OFFSET;
@@ -85,7 +85,7 @@ Returns:
 
   Control = (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE *) (Table + 1);
 
-  NetZeroMem (Control, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE));
+  ZeroMem (Control, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE));
 
   Control->Header.StructureId = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_ID;
   Control->Header.Version     = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_VERSION;
@@ -136,7 +136,7 @@ Returns:
   //
   *Heap -= Len + 1;
 
-  NetCopyMem (*Heap, Data, Len);
+  CopyMem (*Heap, Data, Len);
   *(*Heap + Len) = 0;
 }
 
@@ -181,7 +181,7 @@ Returns:
 
   Control->InitiatorOffset = (UINT16) ((UINTN) Initiator - (UINTN) Table);
 
-  NetZeroMem (Initiator, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE));
+  ZeroMem (Initiator, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE));
 
   Initiator->Header.StructureId = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_ID;
   Initiator->Header.Version     = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_VERSION;
@@ -234,7 +234,7 @@ Returns:
 {
   UINTN Index;
 
-  NetZeroMem (V6, sizeof (EFI_IPv6_ADDRESS));
+  ZeroMem (V6, sizeof (EFI_IPv6_ADDRESS));
 
   V6->Addr[10]  = 0xff;
   V6->Addr[11]  = 0xff;
@@ -405,7 +405,7 @@ Returns:
     //
     // Fill the Nic section.
     //
-    NetZeroMem (Nic, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE));
+    ZeroMem (Nic, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE));
 
     Nic->Header.StructureId = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_ID;
     Nic->Header.Version     = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_VERSION;
@@ -435,7 +435,7 @@ Returns:
     IScsiMapV4ToV6Addr (&SessionConfigData->DhcpServer, &Nic->DhcpServer);
 
     Mac = IScsiGetMacAddress (DriverData->Controller);
-    NetCopyMem (Nic->Mac, Mac, sizeof (Nic->Mac));
+    CopyMem (Nic->Mac, Mac, sizeof (Nic->Mac));
 
     //
     // Get the PCI location of the Nic.
@@ -448,7 +448,7 @@ Returns:
     //
     // Fill the Target section.
     //
-    NetZeroMem (Target, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE));
+    ZeroMem (Target, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE));
 
     Target->Header.StructureId  = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_ID;
     Target->Header.Version      = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_VERSION;
@@ -460,7 +460,7 @@ Returns:
     Target->NicIndex            = (UINT8) Index;
 
     IScsiMapV4ToV6Addr (&SessionConfigData->NvData.TargetIp, &Target->Ip);
-    NetCopyMem (Target->BootLun, SessionConfigData->NvData.BootLun, sizeof (Target->BootLun));
+    CopyMem (Target->BootLun, SessionConfigData->NvData.BootLun, sizeof (Target->BootLun));
 
     //
     // Target iSCSI Name, CHAP name/secret, reverse CHAP name/secret.
@@ -572,7 +572,7 @@ Returns:
     }
 
     Signature = Table->Signature;
-    NetFreePool (Table);
+    gBS->FreePool (Table);
 
     if (Signature == EFI_ACPI_3_0_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE) {
       //
@@ -608,7 +608,7 @@ Returns:
   //
   // Allocate 4k bytes to hold the ACPI table.
   //
-  Table = NetAllocatePool (IBFT_MAX_SIZE);
+  Table = AllocatePool (IBFT_MAX_SIZE);
   if (Table == NULL) {
     return ;
   }
@@ -623,7 +623,7 @@ Returns:
   IScsiFillInitiatorSection (Table, &Heap, HandleBuffer[0]);
   IScsiFillNICAndTargetSections (Table, &Heap, HandleCount, HandleBuffer);
 
-  NetFreePool (HandleBuffer);
+  gBS->FreePool (HandleBuffer);
 
   TableHandle = 0;
 
@@ -641,5 +641,5 @@ Returns:
     AcpiSupport->PublishTables (AcpiSupport, EFI_ACPI_TABLE_VERSION_3_0);
   }
 
-  NetFreePool (Table);
+  gBS->FreePool (Table);
 }

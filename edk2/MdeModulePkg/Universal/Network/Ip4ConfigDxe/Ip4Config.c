@@ -62,7 +62,7 @@ EfiNicIp4ConfigGetName (
   Instance = IP4_CONFIG_INSTANCE_FROM_NIC_IP4CONFIG (This);
 
   if (Name != NULL) {
-    NetCopyMem (Name, Instance->NicName, IP4_NIC_NAME_LENGTH);
+    CopyMem (Name, Instance->NicName, IP4_NIC_NAME_LENGTH);
   }
 
   if (NicAddr != NULL) {
@@ -105,7 +105,7 @@ Ip4ConfigGetNicInfo (
   Config = Ip4ConfigFindNicVariable (Variable, NicAddr);
 
   if (Config == NULL) {
-    NetFreePool (Variable);
+    gBS->FreePool (Variable);
     return NULL;
   }
 
@@ -118,14 +118,14 @@ Ip4ConfigGetNicInfo (
     Ip4ConfigWriteVariable (NewVariable);
 
     if (NewVariable != NULL) {
-      NetFreePool (NewVariable);
+      gBS->FreePool (NewVariable);
     };
 
-    NetFreePool (Config);
+    gBS->FreePool (Config);
     Config = NULL;
   }
 
-  NetFreePool (Variable);
+  gBS->FreePool (Variable);
   return Config;
 }
 
@@ -179,12 +179,12 @@ EfiNicIp4ConfigGetInfo (
     Status = EFI_BUFFER_TOO_SMALL;
   } else {
     Status = EFI_SUCCESS;
-    NetCopyMem (NicConfig, Config, Len);
+    CopyMem (NicConfig, Config, Len);
   }
 
   *ConfigLen = Len;
 
-  NetFreePool (Config);
+  gBS->FreePool (Config);
   return Status;
 }
 
@@ -253,14 +253,14 @@ EfiNicIp4ConfigSetInfo (
   Status      = Ip4ConfigWriteVariable (NewVariable);
 
   if (NewVariable != NULL) {
-    NetFreePool (NewVariable);
+    gBS->FreePool (NewVariable);
   }
 
   //
   // Variable is NULL when saving the first configure parameter
   //
   if (Variable != NULL) {
-    NetFreePool (Variable);
+    gBS->FreePool (Variable);
   }
 
   if (EFI_ERROR (Status)) {
@@ -313,7 +313,7 @@ EfiIp4ConfigStart (
 
   Instance = IP4_CONFIG_INSTANCE_FROM_IP4CONFIG (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (Instance->State != IP4_CONFIG_STATE_IDLE) {
     Status = EFI_ALREADY_STARTED;
@@ -415,7 +415,7 @@ EfiIp4ConfigStart (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_LOCK,
+                  TPL_CALLBACK,
                   Ip4ConfigOnDhcp4Complete,
                   Instance,
                   &Instance->Dhcp4Event
@@ -440,7 +440,7 @@ ON_ERROR:
   }
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -473,7 +473,7 @@ EfiIp4ConfigStop (
   Instance = IP4_CONFIG_INSTANCE_FROM_IP4CONFIG (This);
 
   Status = EFI_SUCCESS;
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (Instance->State == IP4_CONFIG_STATE_IDLE) {
     Status = EFI_NOT_STARTED;
@@ -488,7 +488,7 @@ EfiIp4ConfigStop (
   Ip4ConfigCleanConfig (Instance);
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -528,7 +528,7 @@ EfiIp4ConfigGetData (
   Instance  = IP4_CONFIG_INSTANCE_FROM_IP4CONFIG (This);
 
   Status = EFI_SUCCESS;
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (Instance->State == IP4_CONFIG_STATE_IDLE) {
     Status = EFI_NOT_STARTED;
@@ -554,14 +554,14 @@ EfiIp4ConfigGetData (
     if ((*ConfigDataSize < Len) || (ConfigData == NULL)) {
       Status = EFI_BUFFER_TOO_SMALL;
     } else {
-      NetCopyMem (ConfigData, &NicConfig->Ip4Info, Len);
+      CopyMem (ConfigData, &NicConfig->Ip4Info, Len);
     }
 
     *ConfigDataSize = Len;
   }
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -619,10 +619,10 @@ Ip4ConfigOnDhcp4Complete (
     if (Instance->NicConfig != NULL) {
       ASSERT (Instance->NicConfig->Source == IP4_CONFIG_SOURCE_DHCP);
       Perment = Instance->NicConfig->Perment;
-      NetFreePool (Instance->NicConfig);
+      gBS->FreePool (Instance->NicConfig);
     }
 
-    Instance->NicConfig = NetAllocatePool (sizeof (NIC_IP4_CONFIG_INFO) + 2* sizeof (EFI_IP4_ROUTE_TABLE));
+    Instance->NicConfig = AllocatePool (sizeof (NIC_IP4_CONFIG_INFO) + 2* sizeof (EFI_IP4_ROUTE_TABLE));
 
     if (Instance->NicConfig == NULL) {
       Instance->Result = EFI_OUT_OF_RESOURCES;
@@ -644,14 +644,14 @@ Ip4ConfigOnDhcp4Complete (
     //
     Ip4Config->RouteTableSize    = 1;
 
-    NetCopyMem (&Ip1, &Dhcp4Mode.ClientAddress, sizeof (IP4_ADDR));
-    NetCopyMem (&Ip2, &Dhcp4Mode.SubnetMask, sizeof (IP4_ADDR));
+    CopyMem (&Ip1, &Dhcp4Mode.ClientAddress, sizeof (IP4_ADDR));
+    CopyMem (&Ip2, &Dhcp4Mode.SubnetMask, sizeof (IP4_ADDR));
 
     Subnet = Ip1 & Ip2;
 
-    NetCopyMem (&Ip4Config->RouteTable[0].SubnetAddress, &Subnet, sizeof (EFI_IPv4_ADDRESS));
-    NetCopyMem (&Ip4Config->RouteTable[0].SubnetMask, &Dhcp4Mode.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-    NetZeroMem (&Ip4Config->RouteTable[0].GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Ip4Config->RouteTable[0].SubnetAddress, &Subnet, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Ip4Config->RouteTable[0].SubnetMask, &Dhcp4Mode.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    ZeroMem (&Ip4Config->RouteTable[0].GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
 
     //
     // Create a route if there is a default router.
@@ -659,9 +659,9 @@ Ip4ConfigOnDhcp4Complete (
     if (!EFI_IP4_EQUAL (&Dhcp4Mode.RouterAddress, &mZeroIp4Addr)) {
       Ip4Config->RouteTableSize = 2;
 
-      NetZeroMem (&Ip4Config->RouteTable[1].SubnetAddress, sizeof (EFI_IPv4_ADDRESS));
-      NetZeroMem (&Ip4Config->RouteTable[1].SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-      NetCopyMem (&Ip4Config->RouteTable[1].GatewayAddress, &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
+      ZeroMem (&Ip4Config->RouteTable[1].SubnetAddress, sizeof (EFI_IPv4_ADDRESS));
+      ZeroMem (&Ip4Config->RouteTable[1].SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Ip4Config->RouteTable[1].GatewayAddress, &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
     }
 
     Instance->Result = EFI_SUCCESS;
@@ -738,7 +738,7 @@ Ip4ConfigCleanConfig (
   )
 {
   if (Instance->NicConfig != NULL) {
-    NetFreePool (Instance->NicConfig);
+    gBS->FreePool (Instance->NicConfig);
     Instance->NicConfig = NULL;
   }
 

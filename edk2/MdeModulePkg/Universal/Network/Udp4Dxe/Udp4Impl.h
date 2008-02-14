@@ -71,7 +71,7 @@ typedef struct _UDP4_SERVICE_DATA_ {
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
   EFI_HANDLE                    ImageHandle;
   EFI_HANDLE                    ControllerHandle;
-  NET_LIST_ENTRY                ChildrenList;
+  LIST_ENTRY                    ChildrenList;
   UINTN                         ChildrenNumber;
   IP_IO                         *IpIo;
 
@@ -92,7 +92,7 @@ typedef struct _UDP4_SERVICE_DATA_ {
 
 typedef struct _UDP4_INSTANCE_DATA_ {
   UINT32                Signature;
-  NET_LIST_ENTRY        Link;
+  LIST_ENTRY            Link;
 
   UDP4_SERVICE_DATA     *Udp4Service;
   EFI_UDP4_PROTOCOL     Udp4Proto;
@@ -106,8 +106,8 @@ typedef struct _UDP4_INSTANCE_DATA_ {
 
   NET_MAP               McastIps;
 
-  NET_LIST_ENTRY        RcvdDgramQue;
-  NET_LIST_ENTRY        DeliveredDgramQue;
+  LIST_ENTRY            RcvdDgramQue;
+  LIST_ENTRY            DeliveredDgramQue;
 
   UINT16                HeadSum;
 
@@ -119,7 +119,7 @@ typedef struct _UDP4_INSTANCE_DATA_ {
 } UDP4_INSTANCE_DATA;
 
 typedef struct _UDP4_RXDATA_WRAP_ {
-  NET_LIST_ENTRY         Link;
+  LIST_ENTRY             Link;
   NET_BUF                *Packet;
   UINT32                 TimeoutTick;
   EFI_UDP4_RECEIVE_DATA  RxData;
@@ -212,7 +212,7 @@ Udp4CleanInstance (
 
 EFI_STATUS
 Udp4Bind (
-  IN NET_LIST_ENTRY        *InstanceList,
+  IN LIST_ENTRY            *InstanceList,
   IN EFI_UDP4_CONFIG_DATA  *ConfigData
   );
 

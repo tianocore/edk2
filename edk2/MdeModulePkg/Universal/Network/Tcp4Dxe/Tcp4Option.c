@@ -29,7 +29,7 @@ TcpGetUint16 (
   )
 {
   UINT16  Value;
-  NetCopyMem (&Value, Buf, sizeof (UINT16));
+  CopyMem (&Value, Buf, sizeof (UINT16));
   return NTOHS (Value);
 }
 
@@ -41,7 +41,7 @@ TcpPutUint16 (
   )
 {
   Data = HTONS (Data);
-  NetCopyMem (Buf, &Data, sizeof (UINT16));
+  CopyMem (Buf, &Data, sizeof (UINT16));
 }
 
 STATIC
@@ -51,7 +51,7 @@ TcpGetUint32 (
   )
 {
   UINT32  Value;
-  NetCopyMem (&Value, Buf, sizeof (UINT32));
+  CopyMem (&Value, Buf, sizeof (UINT32));
   return NTOHL (Value);
 }
 
@@ -63,7 +63,7 @@ TcpPutUint32 (
   )
 {
   Data = HTONL (Data);
-  NetCopyMem (Buf, &Data, sizeof (UINT32));
+  CopyMem (Buf, &Data, sizeof (UINT32));
 }
 
 

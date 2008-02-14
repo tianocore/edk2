@@ -198,8 +198,8 @@ Returns:
   CHAR8   Digit;
   UINTN   Temp;
 
-  NetZeroMem (Lun, 8);
-  NetZeroMem (LunUnitStr, sizeof (LunUnitStr));
+  ZeroMem (Lun, 8);
+  ZeroMem (LunUnitStr, sizeof (LunUnitStr));
 
   Index         = 0;
   LunUnitStr[0] = Str;
@@ -667,7 +667,7 @@ Returns:
   ISCSI_DRIVER_DATA *Private;
   EFI_STATUS        Status;
 
-  Private = NetAllocateZeroPool (sizeof (ISCSI_DRIVER_DATA));
+  Private = AllocateZeroPool (sizeof (ISCSI_DRIVER_DATA));
   if (Private == NULL) {
     return NULL;
   }
@@ -688,11 +688,11 @@ Returns:
                   &Private->ExitBootServiceEvent
                   );
   if (EFI_ERROR (Status)) {
-    NetFreePool (Private);
+    gBS->FreePool (Private);
     return NULL;
   }
 
-  NetCopyMem(&Private->IScsiExtScsiPassThru, &gIScsiExtScsiPassThruProtocolTemplate, sizeof(EFI_EXT_SCSI_PASS_THRU_PROTOCOL));
+  CopyMem(&Private->IScsiExtScsiPassThru, &gIScsiExtScsiPassThruProtocolTemplate, sizeof(EFI_EXT_SCSI_PASS_THRU_PROTOCOL));
 
   //
   // 0 is designated to the TargetId, so use another value for the AdapterId.
@@ -713,7 +713,7 @@ Returns:
                   );
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (Private->ExitBootServiceEvent);
-    NetFreePool (Private);
+    gBS->FreePool (Private);
 
     return NULL;
   }
@@ -750,7 +750,7 @@ Returns:
           Private->DevicePath
           );
 
-    NetFreePool (Private->DevicePath);
+    gBS->FreePool (Private->DevicePath);
   }
 
   if (Private->ExtScsiPassThruHandle != NULL) {
@@ -763,7 +763,7 @@ Returns:
 
   gBS->CloseEvent (Private->ExitBootServiceEvent);
 
-  NetFreePool (Private);
+  gBS->FreePool (Private);
 }
 
 EFI_STATUS
