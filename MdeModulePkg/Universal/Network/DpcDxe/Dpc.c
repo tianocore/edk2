@@ -45,14 +45,14 @@ UINTN  mMaxDpcQueueDepth = 0;
 // If the free list is empty and a DPC is queued, the free list is grown by allocating
 // an additional set of DPC entries.
 //
-LIST_ENTRY  mDpcEntryFreeList = INITIALIZE_LIST_HEAD_VARIABLE(mDpcEntryFreeList);
+LIST_ENTRY      mDpcEntryFreeList = INITIALIZE_LIST_HEAD_VARIABLE(mDpcEntryFreeList);
 
 //
 // An array of DPC queues.  A DPC queue is allocated for every leval EFI_TPL value.
 // As DPCs are queued, they are added to the end of the linked list.
 // As DPCs are dispatched, they are removed from the beginning of the linked list.
 //
-LIST_ENTRY  mDpcQueue[TPL_HIGH_LEVEL + 1];
+LIST_ENTRY      mDpcQueue[TPL_HIGH_LEVEL + 1];
 
 /**
   Add a Deferred Procedure Call to the end of the DPC queue.

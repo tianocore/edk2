@@ -37,7 +37,6 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-#include "ArpDebug.h"
 
 #define ARP_ETHER_PROTO_TYPE         0x0806
 #define IPv4_ETHER_PROTO_TYPE        0x0800
@@ -95,7 +94,7 @@ typedef struct _ARP_INSTANCE_DATA {
   ARP_SERVICE_DATA     *ArpService;
   EFI_HANDLE           Handle;
   EFI_ARP_PROTOCOL     ArpProto;
-  NET_LIST_ENTRY       List;
+  LIST_ENTRY           List;
   EFI_ARP_CONFIG_DATA  ConfigData;
   BOOLEAN              Configured;
   BOOLEAN              Destroyed;
@@ -126,17 +125,17 @@ struct _ARP_SERVICE_DATA {
   EFI_SIMPLE_NETWORK_MODE          SnpMode;
 
   UINTN                            ChildrenNumber;
-  NET_LIST_ENTRY                   ChildrenList;
+  LIST_ENTRY                       ChildrenList;
 
-  NET_LIST_ENTRY                   PendingRequestTable;
-  NET_LIST_ENTRY                   DeniedCacheTable;
-  NET_LIST_ENTRY                   ResolvedCacheTable;
+  LIST_ENTRY                       PendingRequestTable;
+  LIST_ENTRY                       DeniedCacheTable;
+  LIST_ENTRY                       ResolvedCacheTable;
 
   EFI_EVENT                        PeriodicTimer;
 };
 
 typedef struct _USER_REQUEST_CONTEXT {
-  NET_LIST_ENTRY     List;
+  LIST_ENTRY         List;
   ARP_INSTANCE_DATA  *Instance;
   EFI_EVENT          UserRequestEvent;
   VOID               *UserHwAddrBuffer;
@@ -161,7 +160,7 @@ typedef enum {
 } ARP_ADDRESS_TYPE;
 
 typedef struct _ARP_CACHE_ENTRY {
-  NET_LIST_ENTRY  List;
+  LIST_ENTRY      List;
 
   UINT32          RetryCount;
   UINT32          DefaultDecayTime;
@@ -170,7 +169,7 @@ typedef struct _ARP_CACHE_ENTRY {
 
   NET_ARP_ADDRESS  Addresses[2];
 
-  NET_LIST_ENTRY  UserRequestList;
+  LIST_ENTRY      UserRequestList;
 } ARP_CACHE_ENTRY;
 
 EFI_STATUS
@@ -249,8 +248,8 @@ ArpFindDeniedCacheEntry (
 
 ARP_CACHE_ENTRY *
 ArpFindNextCacheEntryInTable (
-  IN NET_LIST_ENTRY    *CacheTable,
-  IN NET_LIST_ENTRY    *StartEntry,
+  IN LIST_ENTRY        *CacheTable,
+  IN LIST_ENTRY        *StartEntry,
   IN FIND_OPTYPE       FindOpType,
   IN NET_ARP_ADDRESS   *ProtocolAddress OPTIONAL,
   IN NET_ARP_ADDRESS   *HardwareAddress OPTIONAL

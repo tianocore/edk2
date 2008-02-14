@@ -32,8 +32,6 @@ Abstract:
 #include <Protocol/DriverDiagnostics.h>
 #include <Protocol/Dpc.h>
 
-#define EFI_NET_LITTLE_ENDIAN
-
 typedef UINT32          IP4_ADDR;
 typedef UINT32          TCP_SEQNO;
 typedef UINT16          TCP_PORTNO;
@@ -77,13 +75,8 @@ typedef struct {
 // directly. This is why there is an internal representation.
 //
 typedef struct {
-#ifdef EFI_NET_LITTLE_ENDIAN
   UINT8                 HeadLen : 4;
   UINT8                 Ver     : 4;
-#else
-  UINT8                 Ver     : 4;
-  UINT8                 HeadLen : 4;
-#endif
   UINT8                 Tos;
   UINT16                TotalLen;
   UINT16                Id;
@@ -138,13 +131,8 @@ typedef struct {
   TCP_PORTNO            DstPort;
   TCP_SEQNO             Seq;
   TCP_SEQNO             Ack;
-#ifdef EFI_NET_LITTLE_ENDIAN
   UINT8                 Res     : 4;
   UINT8                 HeadLen : 4;
-#else
-  UINT8                 HeadLen : 4;
-  UINT8                 Res     : 4;
-#endif
   UINT8                 Flag;
   UINT16                Wnd;
   UINT16                Checksum;
@@ -154,12 +142,11 @@ typedef struct {
 #pragma pack()
 
 #define NET_MAC_EQUAL(pMac1, pMac2, Len)     \
-    (NetCompareMem ((pMac1), (pMac2), Len) == 0)
+    (CompareMem ((pMac1), (pMac2), Len) == 0)
 
 #define NET_MAC_IS_MULTICAST(Mac, BMac, Len) \
     (((*((UINT8 *) Mac) & 0x01) == 0x01) && (!NET_MAC_EQUAL (Mac, BMac, Len)))
 
-#ifdef EFI_NET_LITTLE_ENDIAN
 #define NTOHL(x) (UINT32)((((UINT32) (x) & 0xff)     << 24) | \
                           (((UINT32) (x) & 0xff00)   << 8)  | \
                           (((UINT32) (x) & 0xff0000) >> 8)  | \
@@ -171,12 +158,6 @@ typedef struct {
                            (((UINT16) (x) & 0xff00) >> 8))
 
 #define HTONS(x)  NTOHS(x)
-#else
-#define NTOHL(x)  (UINT32)(x)
-#define HTONL(x)  (UINT32)(x)
-#define NTOHS(x)  (UINT16)(x)
-#define HTONS(x)  (UINT16)(x)
-#endif
 
 //
 // Test the IP's attribute, All the IPs are in host byte order.
@@ -191,7 +172,7 @@ typedef struct {
 //
 #define EFI_IP4(EfiIpAddr)       (*(IP4_ADDR *) ((EfiIpAddr).Addr))
 #define EFI_NTOHL(EfiIp)         (NTOHL (EFI_IP4 ((EfiIp))))
-#define EFI_IP4_EQUAL(Ip1, Ip2)  (NetCompareMem ((Ip1), (Ip2), sizeof (EFI_IPv4_ADDRESS)) == 0)
+#define EFI_IP4_EQUAL(Ip1, Ip2)  (CompareMem ((Ip1), (Ip2), sizeof (EFI_IPv4_ADDRESS)) == 0)
 
 INTN
 NetGetMaskLength (
@@ -220,33 +201,22 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 #define NET_IS_UPPER_CASE_CHAR(Ch)  (('A' <= (Ch)) && ((Ch) <= 'Z'))
 
 //
-// Wrap functions to ease the impact of EFI library changes.
-//
-#define NetAllocateZeroPool     AllocateZeroPool
-#define NetAllocatePool         AllocatePool
-#define NetFreePool             gBS->FreePool
-#define NetCopyMem              CopyMem
-#define NetSetMem               SetMem
-#define NetZeroMem(Dest, Len)   SetMem ((Dest), (Len), 0)
-#define NetCompareMem           CompareMem
-
-//
 // Lock primitives: the stack implements its lock primitives according
 // to the standard EFI enviornment. It will NOT consider multiprocessor.
 //
-#define NET_TPL_LOCK            TPL_CALLBACK
-#define NET_TPL_EVENT           TPL_NOTIFY
-#define NET_TPL_RECYCLE         TPL_NOTIFY
-#define NET_TPL_TIMER           NET_TPL_LOCK
+//#define NET_TPL_LOCK            TPL_CALLBACK
+//#define NET_TPL_EVENT           TPL_NOTIFY
+//#define NET_TPL_RECYCLE         TPL_NOTIFY
+//#define NET_TPL_TIMER           NET_TPL_LOCK
 
-#define NET_LOCK                 EFI_LOCK
-#define NET_LOCK_INIT(x)         EfiInitializeLock (x, NET_TPL_LOCK)
-#define NET_RECYCLE_LOCK_INIT(x) EfiInitializeLock (x, NET_TPL_RECYCLE)
-#define NET_TRYLOCK(x)           EfiAcquireLockOrFail (x)
-#define NET_UNLOCK(x)            EfiReleaseLock (x)
+//#define NET_LOCK                 EFI_LOCK
+//#define NET_LOCK_INIT(x)         EfiInitializeLock (x, NET_TPL_LOCK)
+//#define NET_RECYCLE_LOCK_INIT(x) EfiInitializeLock (x, NET_TPL_RECYCLE)
+//#define NET_TRYLOCK(x)           EfiAcquireLockOrFail (x)
+//#define NET_UNLOCK(x)            EfiReleaseLock (x)
 
-#define NET_RAISE_TPL(x)        (gBS->RaiseTPL (x))
-#define NET_RESTORE_TPL(x)      (gBS->RestoreTPL (x))
+//#define NET_RAISE_TPL(x)        (gBS->RaiseTPL (x))
+//#define NET_RESTORE_TPL(x)      (gBS->RestoreTPL (x))
 
 #define TICKS_PER_MS            10000U
 #define TICKS_PER_SECOND        10000000U
@@ -275,12 +245,12 @@ NetRandomInitSeed (
 // Double linked list entry functions, this extends the
 // EFI list functions.
 //
-typedef LIST_ENTRY      NET_LIST_ENTRY;
+//typedef LIST_ENTRY      LIST_ENTRY;
 
-#define NetListInit(Head)              InitializeListHead(Head)
-#define NetListInsertHead(Head, Entry) InsertHeadList((Head), (Entry))
-#define NetListInsertTail(Head, Entry) InsertTailList((Head), (Entry))
-#define NetListIsEmpty(List)           IsListEmpty(List)
+//#define NetListInit(Head)              InitializeListHead(Head)
+//#define NetListInsertHead(Head, Entry) InsertHeadList((Head), (Entry))
+//#define NetListInsertTail(Head, Entry) InsertTailList((Head), (Entry))
+//#define NetListIsEmpty(List)           IsListEmpty(List)
 
 #define NET_LIST_USER_STRUCT(Entry, Type, Field)        \
           _CR(Entry, Type, Field)
@@ -315,28 +285,28 @@ typedef LIST_ENTRY      NET_LIST_ENTRY;
 #define NET_LIST_TAIL(ListHead, Type, Field)  \
           NET_LIST_USER_STRUCT((ListHead)->BackLink, Type, Field)
 
-#define NetListRemoveEntry(Entry) RemoveEntryList (Entry)
+//#define NetListRemoveEntry(Entry) RemoveEntryList (Entry)
 
-NET_LIST_ENTRY*
+LIST_ENTRY*
 NetListRemoveHead (
-  NET_LIST_ENTRY            *Head
+  LIST_ENTRY            *Head
   );
 
-NET_LIST_ENTRY*
+LIST_ENTRY*
 NetListRemoveTail (
-  NET_LIST_ENTRY            *Head
+  LIST_ENTRY            *Head
   );
 
 VOID
 NetListInsertAfter (
-  IN NET_LIST_ENTRY         *PrevEntry,
-  IN NET_LIST_ENTRY         *NewEntry
+  IN LIST_ENTRY         *PrevEntry,
+  IN LIST_ENTRY         *NewEntry
   );
 
 VOID
 NetListInsertBefore (
-  IN NET_LIST_ENTRY         *PostEntry,
-  IN NET_LIST_ENTRY         *NewEntry
+  IN LIST_ENTRY         *PostEntry,
+  IN LIST_ENTRY         *NewEntry
   );
 
 
@@ -345,14 +315,14 @@ NetListInsertBefore (
 // tokens. The drivers can share code to manage those objects.
 //
 typedef struct {
-  NET_LIST_ENTRY            Link;
+  LIST_ENTRY                Link;
   VOID                      *Key;
   VOID                      *Value;
 } NET_MAP_ITEM;
 
 typedef struct {
-  NET_LIST_ENTRY            Used;
-  NET_LIST_ENTRY            Recycled;
+  LIST_ENTRY                Used;
+  LIST_ENTRY                Recycled;
   UINTN                     Count;
 } NET_MAP;
 
@@ -570,7 +540,7 @@ typedef struct {
 typedef struct {
   UINT32              Signature;
   INTN                RefCnt;
-  NET_LIST_ENTRY      List;       // The List this NET_BUF is on
+  LIST_ENTRY          List;       // The List this NET_BUF is on
 
   IP4_HEAD            *Ip;        // Network layer header, for fast access
   TCP_HEAD            *Tcp;       // Transport layer header, for fast access
@@ -591,9 +561,9 @@ typedef struct {
 typedef struct {
   UINT32              Signature;
   INTN                RefCnt;
-  NET_LIST_ENTRY      List;       // The List this buffer queue is on
+  LIST_ENTRY          List;       // The List this buffer queue is on
 
-  NET_LIST_ENTRY      BufList;    // list of queued buffers
+  LIST_ENTRY          BufList;    // list of queued buffers
   UINT32              BufSize;    // total length of DATA in the buffers
   UINT32              BufNum;     // total number of buffers on the chain
 } NET_BUF_QUEUE;
@@ -725,7 +695,7 @@ NetbufBuildExt (
 
 NET_BUF  *
 NetbufFromBufList (
-  IN NET_LIST_ENTRY         *BufList,
+  IN LIST_ENTRY             *BufList,
   IN UINT32                 HeadSpace,
   IN UINT32                 HeaderLen,
   IN NET_VECTOR_EXT_FREE    ExtFree,
@@ -734,7 +704,7 @@ NetbufFromBufList (
 
 VOID
 NetbufFreeList (
-  IN NET_LIST_ENTRY         *Head
+  IN LIST_ENTRY             *Head
   );
 
 VOID
@@ -807,78 +777,4 @@ NetPseudoHeadChecksum (
   IN UINT16                 Len
   );
 
-//
-// The debug level definition. This value is also used as the
-// syslog's servity level. Don't change it.
-//
-enum {
-  NETDEBUG_LEVEL_TRACE   = 5,
-  NETDEBUG_LEVEL_WARNING = 4,
-  NETDEBUG_LEVEL_ERROR   = 3,
-};
-
-#ifdef EFI_NETWORK_STACK_DEBUG
-
-//
-// The debug output expects the ASCII format string, Use %a to print ASCII
-// string, and %s to print UNICODE string. PrintArg must be enclosed in ().
-// For example: NET_DEBUG_TRACE ("Tcp", ("State transit to %a\n", Name));
-//
-#define NET_DEBUG_TRACE(Module, PrintArg) \
-  NetDebugOutput ( \
-    NETDEBUG_LEVEL_TRACE, \
-    Module, \
-    __FILE__, \
-    __LINE__, \
-    NetDebugASPrint PrintArg \
-    )
-
-#define NET_DEBUG_WARNING(Module, PrintArg) \
-  NetDebugOutput ( \
-    NETDEBUG_LEVEL_WARNING, \
-    Module, \
-    __FILE__, \
-    __LINE__, \
-    NetDebugASPrint PrintArg \
-    )
-
-#define NET_DEBUG_ERROR(Module, PrintArg) \
-  NetDebugOutput ( \
-    NETDEBUG_LEVEL_ERROR, \
-    Module, \
-    __FILE__, \
-    __LINE__, \
-    NetDebugASPrint PrintArg \
-    )
-
-#else
-#define NET_DEBUG_TRACE(Module, PrintString)
-#define NET_DEBUG_WARNING(Module, PrintString)
-#define NET_DEBUG_ERROR(Module, PrintString)
-#endif
-
-UINT8 *
-NetDebugASPrint (
-  UINT8                     *Format,
-  ...
-  );
-
-EFI_STATUS
-NetDebugOutput (
-  UINT32                    Level,
-  UINT8                     *Module,
-  UINT8                     *File,
-  UINT32                    Line,
-  UINT8                     *Message
-  );
-
-//
-// Network debug message is sent out as syslog.
-//
-enum {
-  NET_SYSLOG_FACILITY       = 16,             // Syslog local facility local use
-  NET_SYSLOG_PACKET_LEN     = 512,
-  NET_DEBUG_MSG_LEN         = 470,            // 512 - (ether+ip+udp head length)
-  NET_SYSLOG_TX_TIMEOUT     = 500 *1000 *10,  // 500ms
-};
 #endif

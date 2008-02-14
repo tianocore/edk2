@@ -22,7 +22,6 @@ Abstract:
 #define _MNP_IMPL_H_
 
 #include "MnpDriver.h"
-#include "MnpDebug.h"
 
 #define NET_ETHER_FCS_SIZE            4
 
@@ -58,19 +57,19 @@ typedef struct _MNP_INSTANCE_DATA {
 
   EFI_HANDLE                      Handle;
 
-  NET_LIST_ENTRY                  InstEntry;
+  LIST_ENTRY                      InstEntry;
 
   EFI_MANAGED_NETWORK_PROTOCOL    ManagedNetwork;
 
   BOOLEAN                         Configured;
   BOOLEAN                         Destroyed;
 
-  NET_LIST_ENTRY                  GroupCtrlBlkList;
+  LIST_ENTRY                      GroupCtrlBlkList;
 
   NET_MAP                         RxTokenMap;
 
-  NET_LIST_ENTRY                  RxDeliveredPacketQueue;
-  NET_LIST_ENTRY                  RcvdPacketQueue;
+  LIST_ENTRY                      RxDeliveredPacketQueue;
+  LIST_ENTRY                      RcvdPacketQueue;
   UINTN                           RcvdPacketQueueSize;
 
   EFI_MANAGED_NETWORK_CONFIG_DATA ConfigData;
@@ -79,18 +78,18 @@ typedef struct _MNP_INSTANCE_DATA {
 } MNP_INSTANCE_DATA;
 
 typedef struct _MNP_GROUP_ADDRESS {
-  NET_LIST_ENTRY  AddrEntry;
+  LIST_ENTRY      AddrEntry;
   EFI_MAC_ADDRESS Address;
   INTN            RefCnt;
 } MNP_GROUP_ADDRESS;
 
 typedef struct _MNP_GROUP_CONTROL_BLOCK {
-  NET_LIST_ENTRY    CtrlBlkEntry;
+  LIST_ENTRY        CtrlBlkEntry;
   MNP_GROUP_ADDRESS *GroupAddress;
 } MNP_GROUP_CONTROL_BLOCK;
 
 typedef struct _MNP_RXDATA_WRAP {
-  NET_LIST_ENTRY                    WrapEntry;
+  LIST_ENTRY                        WrapEntry;
   MNP_INSTANCE_DATA                 *Instance;
   EFI_MANAGED_NETWORK_RECEIVE_DATA  RxData;
   NET_BUF                           *Nbuf;

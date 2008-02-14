@@ -44,13 +44,13 @@ Ip4CreateRouteEntry (
 {
   IP4_ROUTE_ENTRY           *RtEntry;
 
-  RtEntry = NetAllocatePool (sizeof (IP4_ROUTE_ENTRY));
+  RtEntry = AllocatePool (sizeof (IP4_ROUTE_ENTRY));
 
   if (RtEntry == NULL) {
     return NULL;
   }
 
-  NetListInit (&RtEntry->Link);
+  InitializeListHead (&RtEntry->Link);
 
   RtEntry->RefCnt  = 1;
   RtEntry->Dest    = Dest;
@@ -79,7 +79,7 @@ Ip4FreeRouteEntry (
   ASSERT (RtEntry->RefCnt > 0);
 
   if (--RtEntry->RefCnt == 0) {
-    NetFreePool (RtEntry);
+    gBS->FreePool (RtEntry);
   }
 }
 
@@ -108,13 +108,13 @@ Ip4CreateRouteCacheEntry (
 {
   IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
 
-  RtCacheEntry = NetAllocatePool (sizeof (IP4_ROUTE_CACHE_ENTRY));
+  RtCacheEntry = AllocatePool (sizeof (IP4_ROUTE_CACHE_ENTRY));
 
   if (RtCacheEntry == NULL) {
     return NULL;
   }
 
-  NetListInit (&RtCacheEntry->Link);
+  InitializeListHead (&RtCacheEntry->Link);
 
   RtCacheEntry->RefCnt  = 1;
   RtCacheEntry->Dest    = Dst;
@@ -142,7 +142,7 @@ Ip4FreeRouteCacheEntry (
   ASSERT (RtCacheEntry->RefCnt > 0);
 
   if (--RtCacheEntry->RefCnt == 0) {
-    NetFreePool (RtCacheEntry);
+    gBS->FreePool (RtCacheEntry);
   }
 }
 
@@ -163,7 +163,7 @@ Ip4InitRouteCache (
   UINT32                    Index;
 
   for (Index = 0; Index < IP4_ROUTE_CACHE_HASH; Index++) {
-    NetListInit (&(RtCache->CacheBucket[Index]));
+    InitializeListHead (&(RtCache->CacheBucket[Index]));
   }
 }
 
@@ -182,8 +182,8 @@ Ip4CleanRouteCache (
   IN IP4_ROUTE_CACHE        *RtCache
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
   UINT32                    Index;
 
@@ -191,7 +191,7 @@ Ip4CleanRouteCache (
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &(RtCache->CacheBucket[Index])) {
       RtCacheEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_CACHE_ENTRY, Link);
 
-      NetListRemoveEntry (Entry);
+      RemoveEntryList (Entry);
       Ip4FreeRouteCacheEntry (RtCacheEntry);
     }
   }
@@ -216,7 +216,7 @@ Ip4CreateRouteTable (
   IP4_ROUTE_TABLE           *RtTable;
   UINT32                    Index;
 
-  RtTable = NetAllocatePool (sizeof (IP4_ROUTE_TABLE));
+  RtTable = AllocatePool (sizeof (IP4_ROUTE_TABLE));
 
   if (RtTable == NULL) {
     return NULL;
@@ -226,7 +226,7 @@ Ip4CreateRouteTable (
   RtTable->TotalNum = 0;
 
   for (Index = 0; Index < IP4_MASK_NUM; Index++) {
-    NetListInit (&(RtTable->RouteArea[Index]));
+    InitializeListHead (&(RtTable->RouteArea[Index]));
   }
 
   RtTable->Next = NULL;
@@ -250,8 +250,8 @@ Ip4FreeRouteTable (
   IN IP4_ROUTE_TABLE        *RtTable
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_ROUTE_ENTRY           *RtEntry;
   UINT32                    Index;
 
@@ -268,14 +268,14 @@ Ip4FreeRouteTable (
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &(RtTable->RouteArea[Index])) {
       RtEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_ENTRY, Link);
 
-      NetListRemoveEntry (Entry);
+      RemoveEntryList (Entry);
       Ip4FreeRouteEntry (RtEntry);
     }
   }
 
   Ip4CleanRouteCache (&RtTable->Cache);
 
-  NetFreePool (RtTable);
+  gBS->FreePool (RtTable);
 }
 
 
@@ -299,8 +299,8 @@ Ip4PurgeRouteCache (
   IN UINTN                  Tag
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
   UINT32                    Index;
 
@@ -310,7 +310,7 @@ Ip4PurgeRouteCache (
       RtCacheEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_CACHE_ENTRY, Link);
 
       if (RtCacheEntry->Tag == Tag) {
-        NetListRemoveEntry (Entry);
+        RemoveEntryList (Entry);
         Ip4FreeRouteCacheEntry (RtCacheEntry);
       }
     }
@@ -340,8 +340,8 @@ Ip4AddRoute (
   IN IP4_ADDR               Gateway
   )
 {
-  NET_LIST_ENTRY            *Head;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Head;
+  LIST_ENTRY                *Entry;
   IP4_ROUTE_ENTRY           *RtEntry;
 
   //
@@ -374,7 +374,7 @@ Ip4AddRoute (
     RtEntry->Flag = IP4_DIRECT_ROUTE;
   }
 
-  NetListInsertHead (Head, &RtEntry->Link);
+  InsertHeadList (Head, &RtEntry->Link);
   RtTable->TotalNum++;
 
   return EFI_SUCCESS;
@@ -402,9 +402,9 @@ Ip4DelRoute (
   IN IP4_ADDR             Gateway
   )
 {
-  NET_LIST_ENTRY            *Head;
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Head;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_ROUTE_ENTRY           *RtEntry;
 
   Head = &(RtTable->RouteArea[NetGetMaskLength (Netmask)]);
@@ -414,7 +414,7 @@ Ip4DelRoute (
 
     if (IP4_NET_EQUAL (RtEntry->Dest, Dest, Netmask) && (RtEntry->NextHop == Gateway)) {
       Ip4PurgeRouteCache (&RtTable->Cache, (UINTN) RtEntry);
-      NetListRemoveEntry (Entry);
+      RemoveEntryList (Entry);
       Ip4FreeRouteEntry  (RtEntry);
 
       RtTable->TotalNum--;
@@ -447,7 +447,7 @@ Ip4FindRouteCache (
   IN IP4_ADDR               Src
   )
 {
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
   UINT32                    Index;
 
@@ -489,7 +489,7 @@ Ip4FindRouteEntry (
   IN IP4_ADDR               Dst
   )
 {
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IP4_ROUTE_ENTRY           *RtEntry;
   IP4_ROUTE_TABLE           *Table;
   INTN                      Index;
@@ -533,9 +533,9 @@ Ip4Route (
   IN IP4_ADDR               Src
   )
 {
-  NET_LIST_ENTRY            *Head;
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Head;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
   IP4_ROUTE_CACHE_ENTRY     *Cache;
   IP4_ROUTE_ENTRY           *RtEntry;
@@ -551,8 +551,8 @@ Ip4Route (
   // If found, promote the cache entry to the head of the hash bucket. LRU
   //
   if (RtCacheEntry != NULL) {
-    NetListRemoveEntry (&RtCacheEntry->Link);
-    NetListInsertHead (Head, &RtCacheEntry->Link);
+    RemoveEntryList (&RtCacheEntry->Link);
+    InsertHeadList (Head, &RtCacheEntry->Link);
     return RtCacheEntry;
   }
 
@@ -588,7 +588,7 @@ Ip4Route (
     return NULL;
   }
 
-  NetListInsertHead (Head, &RtCacheEntry->Link);
+  InsertHeadList (Head, &RtCacheEntry->Link);
   NET_GET_REF (RtCacheEntry);
 
   //
@@ -604,7 +604,7 @@ Ip4Route (
 
     Cache = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_CACHE_ENTRY, Link);
 
-    NetListRemoveEntry (Entry);
+    RemoveEntryList (Entry);
     Ip4FreeRouteCacheEntry (Cache);
   }
 
@@ -628,7 +628,7 @@ Ip4BuildEfiRouteTable (
   IN IP4_PROTOCOL           *IpInstance
   )
 {
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IP4_ROUTE_TABLE           *RtTable;
   IP4_ROUTE_ENTRY           *RtEntry;
   EFI_IP4_ROUTE_TABLE       *Table;
@@ -638,7 +638,7 @@ Ip4BuildEfiRouteTable (
   RtTable = IpInstance->RouteTable;
 
   if (IpInstance->EfiRouteTable != NULL) {
-    NetFreePool (IpInstance->EfiRouteTable);
+    gBS->FreePool (IpInstance->EfiRouteTable);
 
     IpInstance->EfiRouteTable = NULL;
     IpInstance->EfiRouteCount = 0;
@@ -654,7 +654,7 @@ Ip4BuildEfiRouteTable (
     return EFI_SUCCESS;
   }
 
-  Table = NetAllocatePool (sizeof (EFI_IP4_ROUTE_TABLE) * Count);
+  Table = AllocatePool (sizeof (EFI_IP4_ROUTE_TABLE) * Count);
 
   if (Table == NULL) {
     return EFI_OUT_OF_RESOURCES;

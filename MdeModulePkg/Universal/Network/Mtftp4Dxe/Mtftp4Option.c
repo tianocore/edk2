@@ -167,7 +167,7 @@ Mtftp4ExtractOptions (
     return EFI_SUCCESS;
   }
 
-  *OptionList = NetAllocatePool (*OptionCount * sizeof (EFI_MTFTP4_OPTION));
+  *OptionList = AllocatePool (*OptionCount * sizeof (EFI_MTFTP4_OPTION));
 
   if (*OptionList == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -537,6 +537,6 @@ Mtftp4ParseOptionOack (
 
   Status = Mtftp4ParseOption (OptionList, Count, FALSE, MtftpOption);
 
-  NetFreePool (OptionList);
+  gBS->FreePool (OptionList);
   return Status;
 }

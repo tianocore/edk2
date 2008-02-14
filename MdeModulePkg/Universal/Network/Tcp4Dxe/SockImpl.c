@@ -262,7 +262,7 @@ SockProcessTcpSndData (
               );
 
   if (NULL == SndData) {
-    SOCK_DEBUG_ERROR (("SockKProcessSndData: Failed to"
+    DEBUG ((EFI_D_ERROR, "SockKProcessSndData: Failed to"
       " call NetBufferFromExt\n"));
 
     return EFI_OUT_OF_RESOURCES;
@@ -316,7 +316,7 @@ STATIC
 VOID
 SockFlushPendingToken (
   IN SOCKET         *Sock,
-  IN NET_LIST_ENTRY *PendingTokenList
+  IN LIST_ENTRY     *PendingTokenList
   )
 {
   SOCK_TOKEN            *SockToken;
@@ -324,7 +324,7 @@ SockFlushPendingToken (
 
   ASSERT (Sock && PendingTokenList);
 
-  while (!NetListIsEmpty (PendingTokenList)) {
+  while (!IsListEmpty (PendingTokenList)) {
     SockToken = NET_LIST_HEAD (
                   PendingTokenList,
                   SOCK_TOKEN,
@@ -334,8 +334,8 @@ SockFlushPendingToken (
     Token = SockToken->Token;
     SIGNAL_TOKEN (Token, Sock->SockError);
 
-    NetListRemoveEntry (&(SockToken->TokenList));
-    NetFreePool (SockToken);
+    RemoveEntryList (&(SockToken->TokenList));
+    gBS->FreePool (SockToken);
   }
 }
 
@@ -392,7 +392,7 @@ SockWakeListenToken (
 
   ASSERT (Parent && SOCK_IS_LISTENING (Parent) && SOCK_IS_CONNECTED (Sock));
 
-  if (!NetListIsEmpty (&Parent->ListenTokenList)) {
+  if (!IsListEmpty (&Parent->ListenTokenList)) {
     SockToken = NET_LIST_HEAD (
                   &Parent->ListenTokenList,
                   SOCK_TOKEN,
@@ -404,14 +404,13 @@ SockWakeListenToken (
 
     SIGNAL_TOKEN (&(ListenToken->CompletionToken), EFI_SUCCESS);
 
-    NetListRemoveEntry (&SockToken->TokenList);
-    NetFreePool (SockToken);
+    RemoveEntryList (&SockToken->TokenList);
+    gBS->FreePool (SockToken);
 
-    NetListRemoveEntry (&Sock->ConnectionList);
+    RemoveEntryList (&Sock->ConnectionList);
 
     Parent->ConnCnt--;
-    SOCK_DEBUG_WARN (("SockWakeListenToken: accept a socket,"
-      "now conncnt is %d", Parent->ConnCnt));
+    DEBUG ((EFI_D_WARN, "SockWakeListenToken: accept a socket, now conncnt is %d", Parent->ConnCnt));
 
     Sock->Parent = NULL;
   }
@@ -443,7 +442,7 @@ SockWakeRcvToken (
 
   ASSERT (RcvdBytes > 0);
 
-  while (RcvdBytes > 0 && !NetListIsEmpty (&Sock->RcvTokenList)) {
+  while (RcvdBytes > 0 && !IsListEmpty (&Sock->RcvTokenList)) {
 
     SockToken = NET_LIST_HEAD (
                   &Sock->RcvTokenList,
@@ -458,8 +457,8 @@ SockWakeRcvToken (
       return ;
     }
 
-    NetListRemoveEntry (&(SockToken->TokenList));
-    NetFreePool (SockToken);
+    RemoveEntryList (&(SockToken->TokenList));
+    gBS->FreePool (SockToken);
     RcvdBytes -= TokenRcvdBytes;
   }
 }
@@ -495,7 +494,7 @@ SockProcessSndToken (
   // socket layer flow control policy
   //
   while ((FreeSpace >= Sock->SndBuffer.LowWater) &&
-         !NetListIsEmpty (&Sock->SndTokenList)) {
+         !IsListEmpty (&Sock->SndTokenList)) {
 
     SockToken = NET_LIST_HEAD (
                   &(Sock->SndTokenList),
@@ -506,8 +505,8 @@ SockProcessSndToken (
     //
     // process this token
     //
-    NetListRemoveEntry (&(SockToken->TokenList));
-    NetListInsertTail (
+    RemoveEntryList (&(SockToken->TokenList));
+    InsertTailList (
       &(Sock->ProcessingSndTokenList),
       &(SockToken->TokenList)
       );
@@ -538,9 +537,9 @@ SockProcessSndToken (
 
 OnError:
 
-  NetListRemoveEntry (&SockToken->TokenList);
+  RemoveEntryList (&SockToken->TokenList);
   SIGNAL_TOKEN (SockToken->Token, Status);
-  NetFreePool (SockToken);
+  gBS->FreePool (SockToken);
 }
 
 
@@ -568,8 +567,9 @@ SockCreate (
   Parent = SockInitData->Parent;
 
   if (Parent && (Parent->ConnCnt == Parent->BackLog)) {
-    SOCK_DEBUG_ERROR (
-      ("SockCreate: Socket parent has "
+    DEBUG (
+      (EFI_D_ERROR,
+      "SockCreate: Socket parent has "
       "reached its connection limit with %d ConnCnt and %d BackLog\n",
       Parent->ConnCnt,
       Parent->BackLog)
@@ -578,25 +578,25 @@ SockCreate (
     return NULL;
   }
 
-  Sock = NetAllocateZeroPool (sizeof (SOCKET));
+  Sock = AllocateZeroPool (sizeof (SOCKET));
   if (NULL == Sock) {
 
-    SOCK_DEBUG_ERROR (("SockCreate: No resource to create a new socket\n"));
+    DEBUG ((EFI_D_ERROR, "SockCreate: No resource to create a new socket\n"));
     return NULL;
   }
 
-  NetListInit (&Sock->Link);
-  NetListInit (&Sock->ConnectionList);
-  NetListInit (&Sock->ListenTokenList);
-  NetListInit (&Sock->RcvTokenList);
-  NetListInit (&Sock->SndTokenList);
-  NetListInit (&Sock->ProcessingSndTokenList);
+  InitializeListHead (&Sock->Link);
+  InitializeListHead (&Sock->ConnectionList);
+  InitializeListHead (&Sock->ListenTokenList);
+  InitializeListHead (&Sock->RcvTokenList);
+  InitializeListHead (&Sock->SndTokenList);
+  InitializeListHead (&Sock->ProcessingSndTokenList);
 
-  NET_LOCK_INIT (&(Sock->Lock));
+  EfiInitializeLock (&(Sock->Lock), TPL_CALLBACK);
 
   Sock->SndBuffer.DataQueue = NetbufQueAlloc ();
   if (NULL == Sock->SndBuffer.DataQueue) {
-    SOCK_DEBUG_ERROR (("SockCreate: No resource to allocate"
+    DEBUG ((EFI_D_ERROR, "SockCreate: No resource to allocate"
       " SndBuffer for new socket\n"));
 
     goto OnError;
@@ -604,7 +604,7 @@ SockCreate (
 
   Sock->RcvBuffer.DataQueue = NetbufQueAlloc ();
   if (NULL == Sock->RcvBuffer.DataQueue) {
-    SOCK_DEBUG_ERROR (("SockCreate: No resource to allocate "
+    DEBUG ((EFI_D_ERROR, "SockCreate: No resource to allocate "
       "RcvBuffer for new socket\n"));
 
     goto OnError;
@@ -631,7 +631,7 @@ SockCreate (
   //
   // Install protocol on Sock->SockHandle
   //
-  NetCopyMem (
+  CopyMem (
     &(Sock->NetProtocol.TcpProtocol),
     SockInitData->Protocol,
     sizeof (EFI_TCP4_PROTOCOL)
@@ -640,7 +640,7 @@ SockCreate (
   //
   // copy the protodata into socket
   //
-  NetCopyMem (Sock->ProtoReserved, SockInitData->ProtoData, SockInitData->DataSize);
+  CopyMem (Sock->ProtoReserved, SockInitData->ProtoData, SockInitData->DataSize);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Sock->SockHandle,
@@ -650,7 +650,7 @@ SockCreate (
                   );
 
   if (EFI_ERROR (Status)) {
-    SOCK_DEBUG_ERROR (("SockCreate: Install TCP protocol in "
+    DEBUG ((EFI_D_ERROR, "SockCreate: Install TCP protocol in "
       "socket failed with %r\n", Status));
 
     goto OnError;
@@ -666,10 +666,13 @@ SockCreate (
     //
     Parent->ConnCnt++;
 
-    SOCK_DEBUG_WARN (("SockCreate: Create a new socket and"
-      "add to parent, now conncnt is %d\n", Parent->ConnCnt));
+    DEBUG (
+      (EFI_D_WARN,
+      "SockCreate: Create a new socket and add to parent, now conncnt is %d\n",
+      Parent->ConnCnt)
+      );
 
-    NetListInsertTail (&Parent->ConnectionList, &Sock->ConnectionList);
+    InsertTailList (&Parent->ConnectionList, &Sock->ConnectionList);
   }
 
   if (Sock->CreateCallback != NULL) {
@@ -700,7 +703,7 @@ OnError:
     NetbufQueFree (Sock->RcvBuffer.DataQueue);
   }
 
-  NetFreePool (Sock);
+  gBS->FreePool (Sock);
 
   return NULL;
 }
@@ -751,11 +754,15 @@ SockDestroy (
   //
   if (Sock->Parent) {
 
-    NetListRemoveEntry (&(Sock->ConnectionList));
+    RemoveEntryList (&(Sock->ConnectionList));
     (Sock->Parent->ConnCnt)--;
 
-    SOCK_DEBUG_WARN (("SockDestory: Delete a unaccepted socket from parent"
-      "now conncnt is %d\n", Sock->Parent->ConnCnt));
+    DEBUG (
+      (EFI_D_WARN,
+      "SockDestory: Delete a unaccepted socket from parent"
+      "now conncnt is %d\n",
+      Sock->Parent->ConnCnt)
+      );
 
     Sock->Parent = NULL;
   }
@@ -780,7 +787,7 @@ SockDestroy (
 
   if (EFI_ERROR (Status)) {
 
-    SOCK_DEBUG_ERROR (("SockDestroy: Open protocol installed "
+    DEBUG ((EFI_D_ERROR, "SockDestroy: Open protocol installed "
       "on socket failed with %r\n", Status));
 
     goto FreeSock;
@@ -798,7 +805,7 @@ SockDestroy (
         );
 
 FreeSock:
-  NetFreePool (Sock);
+  gBS->FreePool (Sock);
   return ;
 }
 
@@ -853,7 +860,7 @@ SockConnFlush (
   // Destroy the pending connection, if it is a listening socket
   //
   if (SOCK_IS_LISTENING (Sock)) {
-    while (!NetListIsEmpty (&Sock->ConnectionList)) {
+    while (!IsListEmpty (&Sock->ConnectionList)) {
       Child = NET_LIST_HEAD (
                 &Sock->ConnectionList,
                 SOCKET,
@@ -924,7 +931,7 @@ SockClone (
   ClonedSock              = SockCreate (&InitData);
 
   if (NULL == ClonedSock) {
-    SOCK_DEBUG_ERROR (("SockClone: no resource to create a cloned sock\n"));
+    DEBUG ((EFI_D_ERROR, "SockClone: no resource to create a cloned sock\n"));
     return NULL;
   }
 
@@ -1019,7 +1026,7 @@ SockDataSent (
   SOCK_TOKEN            *SockToken;
   SOCK_COMPLETION_TOKEN *SndToken;
 
-  ASSERT (!NetListIsEmpty (&Sock->ProcessingSndTokenList));
+  ASSERT (!IsListEmpty (&Sock->ProcessingSndTokenList));
   ASSERT (Count <= (Sock->SndBuffer.DataQueue)->BufSize);
 
   NetbufQueTrim (Sock->SndBuffer.DataQueue, Count);
@@ -1038,10 +1045,10 @@ SockDataSent (
 
     if (SockToken->RemainDataLen <= Count) {
 
-      NetListRemoveEntry (&(SockToken->TokenList));
+      RemoveEntryList (&(SockToken->TokenList));
       SIGNAL_TOKEN (SndToken, EFI_SUCCESS);
       Count -= SockToken->RemainDataLen;
-      NetFreePool (SockToken);
+      gBS->FreePool (SockToken);
     } else {
 
       SockToken->RemainDataLen -= Count;
@@ -1181,7 +1188,7 @@ SockRcvdErr (
 {
   SOCK_TOKEN  *SockToken;
 
-  if (!NetListIsEmpty (&Sock->RcvTokenList)) {
+  if (!IsListEmpty (&Sock->RcvTokenList)) {
 
     SockToken = NET_LIST_HEAD (
                   &Sock->RcvTokenList,
@@ -1189,11 +1196,11 @@ SockRcvdErr (
                   TokenList
                   );
 
-    NetListRemoveEntry (&SockToken->TokenList);
+    RemoveEntryList (&SockToken->TokenList);
 
     SIGNAL_TOKEN (SockToken->Token, Error);
 
-    NetFreePool (SockToken);
+    gBS->FreePool (SockToken);
   } else {
 
     SOCK_ERROR (Sock, Error);
@@ -1222,7 +1229,7 @@ SockNoMoreData (
 
   SOCK_NO_MORE_DATA (Sock);
 
-  if (!NetListIsEmpty (&Sock->RcvTokenList)) {
+  if (!IsListEmpty (&Sock->RcvTokenList)) {
 
     ASSERT (0 == GET_RCV_DATASIZE (Sock));
 
@@ -1252,11 +1259,11 @@ SockBufFirst (
   IN SOCK_BUFFER *Sockbuf
   )
 {
-  NET_LIST_ENTRY  *NetbufList;
+  LIST_ENTRY      *NetbufList;
 
   NetbufList = &(Sockbuf->DataQueue->BufList);
 
-  if (NetListIsEmpty (NetbufList)) {
+  if (IsListEmpty (NetbufList)) {
     return NULL;
   }
 
@@ -1280,7 +1287,7 @@ SockBufNext (
   IN NET_BUF     *SockEntry
   )
 {
-  NET_LIST_ENTRY  *NetbufList;
+  LIST_ENTRY      *NetbufList;
 
   NetbufList = &(Sockbuf->DataQueue->BufList);
 

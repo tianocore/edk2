@@ -101,17 +101,17 @@ Returns:
   Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
   ConfigNvData  = &Private->Session.ConfigData.NvData;
 
-  if ((*Target)[0] == 0 && (NetCompareMem (Lun, ConfigNvData->BootLun, sizeof (UINT64)) == 0)) {
+  if ((*Target)[0] == 0 && (CompareMem (Lun, ConfigNvData->BootLun, sizeof (UINT64)) == 0)) {
     //
     // Only one <Target, Lun> pair per iSCSI Driver instance.
     //
     return EFI_NOT_FOUND;
   }
 
-  NetSetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
-  if (NetCompareMem (*Target, TargetId, TARGET_MAX_BYTES) == 0) {
+  SetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
+  if (CompareMem (*Target, TargetId, TARGET_MAX_BYTES) == 0) {
     (*Target)[0] = 0;
-    NetCopyMem (Lun, ConfigNvData->BootLun, sizeof (UINT64));
+    CopyMem (Lun, ConfigNvData->BootLun, sizeof (UINT64));
 
     return EFI_SUCCESS;
   }
@@ -181,12 +181,12 @@ Returns:
   ConfigNvData  = &Session->ConfigData.NvData;
   AuthConfig    = &Session->AuthData.AuthConfig;
 
-  if (NetCompareMem (&Lun, ConfigNvData->BootLun, sizeof (UINT64)) != 0) {
+  if (CompareMem (&Lun, ConfigNvData->BootLun, sizeof (UINT64)) != 0) {
     return EFI_NOT_FOUND;
   }
 
   DevPathNodeLen  = sizeof (ISCSI_DEVICE_PATH) + AsciiStrLen (ConfigNvData->TargetName) + 1;
-  Node            = NetAllocatePool (DevPathNodeLen);
+  Node            = AllocatePool (DevPathNodeLen);
   if (Node == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -214,7 +214,7 @@ Returns:
     break;
   }
 
-  NetCopyMem (&Node->Iscsi.Lun, ConfigNvData->BootLun, sizeof (UINT64));
+  CopyMem (&Node->Iscsi.Lun, ConfigNvData->BootLun, sizeof (UINT64));
   Node->Iscsi.TargetPortalGroupTag = Session->TargetPortalGroupTag;
   AsciiStrCpy ((CHAR8 *) Node + sizeof (ISCSI_DEVICE_PATH), ConfigNvData->TargetName);
 
@@ -276,13 +276,13 @@ Returns:
   Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
   ConfigNvData  = &Private->Session.ConfigData.NvData;
 
-  NetZeroMem (*Target, TARGET_MAX_BYTES);
+  ZeroMem (*Target, TARGET_MAX_BYTES);
 
   if (AsciiStrCmp (ConfigNvData->TargetName, (CHAR8 *) DevicePath + sizeof (ISCSI_DEVICE_PATH)) != 0) {
     return EFI_UNSUPPORTED;
   }
 
-  NetCopyMem (Lun, ConfigNvData->BootLun, sizeof (UINT64));
+  CopyMem (Lun, ConfigNvData->BootLun, sizeof (UINT64));
 
   return EFI_SUCCESS;
 }
@@ -377,9 +377,9 @@ Returns:
 {
   UINT8 TargetId[TARGET_MAX_BYTES];
 
-  NetSetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
+  SetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
 
-  if (NetCompareMem (*Target, TargetId, TARGET_MAX_BYTES) == 0) {
+  if (CompareMem (*Target, TargetId, TARGET_MAX_BYTES) == 0) {
     (*Target)[0] = 0;
     return EFI_SUCCESS;
   } else if ((*Target)[0] == 0) {

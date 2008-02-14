@@ -183,7 +183,7 @@ Mtftp4RrqSaveBlock (
     Start = MultU64x32 (Block - 1, Instance->BlkSize);
 
     if (Start + DataLen <= Token->BufferSize) {
-      NetCopyMem ((UINT8 *) Token->Buffer + Start, Packet->Data.Data, DataLen);
+      CopyMem ((UINT8 *) Token->Buffer + Start, Packet->Data.Data, DataLen);
 
       //
       // Update the file size when received the last block
@@ -404,7 +404,7 @@ Mtftp4RrqConfigMcastPort (
   UdpConfig.RemotePort         = 0;
 
   Ip = HTONL (Instance->ServerIp);
-  NetCopyMem (&UdpConfig.RemoteAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&UdpConfig.RemoteAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   Status = McastIo->Udp->Configure (McastIo->Udp, &UdpConfig);
 
@@ -428,7 +428,7 @@ Mtftp4RrqConfigMcastPort (
   // join the multicast group
   //
   Ip = HTONL (Instance->McastIp);
-  NetCopyMem (&Group, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Group, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   return McastIo->Udp->Groups (McastIo->Udp, TRUE, &Group);
 }
@@ -479,7 +479,7 @@ Mtftp4RrqHandleOack (
   //
   // Parse and validate the options from server
   //
-  NetZeroMem (&Reply, sizeof (MTFTP4_OPTION));
+  ZeroMem (&Reply, sizeof (MTFTP4_OPTION));
 
   Status = Mtftp4ParseOptionOack (Packet, Len, &Reply);
 
@@ -650,7 +650,7 @@ Mtftp4RrqInput (
   Len = UdpPacket->TotalSize;
 
   if (UdpPacket->BlockOpNum > 1) {
-    Packet = NetAllocatePool (Len);
+    Packet = AllocatePool (Len);
 
     if (Packet == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -726,7 +726,7 @@ ON_EXIT:
   // receive, otherwise end the session.
   //
   if ((Packet != NULL) && (UdpPacket->BlockOpNum > 1)) {
-    NetFreePool (Packet);
+    gBS->FreePool (Packet);
   }
 
   if (UdpPacket != NULL) {

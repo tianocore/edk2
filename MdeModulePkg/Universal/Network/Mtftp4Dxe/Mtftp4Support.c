@@ -42,13 +42,13 @@ Mtftp4AllocateRange (
 {
   MTFTP4_BLOCK_RANGE        *Range;
 
-  Range = NetAllocatePool (sizeof (MTFTP4_BLOCK_RANGE));
+  Range = AllocatePool (sizeof (MTFTP4_BLOCK_RANGE));
 
   if (Range == NULL) {
     return NULL;
   }
 
-  NetListInit (&Range->Link);
+  InitializeListHead (&Range->Link);
   Range->Start  = Start;
   Range->End    = End;
 
@@ -78,7 +78,7 @@ Mtftp4AllocateRange (
 **/
 EFI_STATUS
 Mtftp4InitBlockRange (
-  IN NET_LIST_ENTRY         *Head,
+  IN LIST_ENTRY             *Head,
   IN UINT16                 Start,
   IN UINT16                 End
   )
@@ -91,7 +91,7 @@ Mtftp4InitBlockRange (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NetListInsertTail (Head, &Range->Link);
+  InsertTailList (Head, &Range->Link);
   return EFI_SUCCESS;
 }
 
@@ -106,12 +106,12 @@ Mtftp4InitBlockRange (
 **/
 INTN
 Mtftp4GetNextBlockNum (
-  IN NET_LIST_ENTRY         *Head
+  IN LIST_ENTRY             *Head
   )
 {
   MTFTP4_BLOCK_RANGE  *Range;
 
-  if (NetListIsEmpty (Head)) {
+  if (IsListEmpty (Head)) {
     return -1;
   }
 
@@ -135,7 +135,7 @@ Mtftp4GetNextBlockNum (
 **/
 VOID
 Mtftp4SetLastBlockNum (
-  IN NET_LIST_ENTRY         *Head,
+  IN LIST_ENTRY             *Head,
   IN UINT16                 Last
   )
 {
@@ -145,12 +145,12 @@ Mtftp4SetLastBlockNum (
   // Iterate from the tail to head to remove the block number
   // after the last.
   //
-  while (!NetListIsEmpty (Head)) {
+  while (!IsListEmpty (Head)) {
     Range = NET_LIST_TAIL (Head, MTFTP4_BLOCK_RANGE, Link);
 
     if (Range->Start > Last) {
-      NetListRemoveEntry (&Range->Link);
-      NetFreePool (Range);
+      RemoveEntryList (&Range->Link);
+      gBS->FreePool (Range);
       continue;
     }
 
@@ -176,13 +176,13 @@ Mtftp4SetLastBlockNum (
 **/
 EFI_STATUS
 Mtftp4RemoveBlockNum (
-  IN NET_LIST_ENTRY         *Head,
+  IN LIST_ENTRY             *Head,
   IN UINT16                 Num
   )
 {
   MTFTP4_BLOCK_RANGE        *Range;
   MTFTP4_BLOCK_RANGE        *NewRange;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
 
   NET_LIST_FOR_EACH (Entry, Head) {
 
@@ -219,8 +219,8 @@ Mtftp4RemoveBlockNum (
       Range->Start++;
 
       if (Range->Start > Range->End) {
-        NetListRemoveEntry (&Range->Link);
-        NetFreePool (Range);
+        RemoveEntryList (&Range->Link);
+        gBS->FreePool (Range);
       }
 
       return EFI_SUCCESS;
@@ -554,8 +554,8 @@ Mtftp4OnTimerTick (
   )
 {
   MTFTP4_SERVICE            *MtftpSb;
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   MTFTP4_PROTOCOL           *Instance;
   EFI_MTFTP4_TOKEN          *Token;
 

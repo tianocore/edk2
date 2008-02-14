@@ -56,7 +56,7 @@ Ip4InitIgmp (
   //
   // Configure MNP to receive ALL_SYSTEM multicast
   //
-  Group    = NetAllocatePool (sizeof (IGMP_GROUP));
+  Group    = AllocatePool (sizeof (IGMP_GROUP));
 
   if (Group == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -81,11 +81,11 @@ Ip4InitIgmp (
     goto ON_ERROR;
   }
 
-  NetListInsertHead (&IgmpCtrl->Groups, &Group->Link);
+  InsertHeadList (&IgmpCtrl->Groups, &Group->Link);
   return EFI_SUCCESS;
 
 ON_ERROR:
-  NetFreePool (Group);
+  gBS->FreePool (Group);
   return Status;
 }
 
@@ -108,7 +108,7 @@ Ip4FindGroup (
   IN IP4_ADDR               Address
   )
 {
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IGMP_GROUP                *Group;
 
   NET_LIST_FOR_EACH (Entry, &IgmpCtrl->Groups) {
@@ -141,7 +141,7 @@ Ip4FindMac (
   IN EFI_MAC_ADDRESS        *Mac
   )
 {
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IGMP_GROUP                *Group;
   INTN                      Count;
 
@@ -298,7 +298,7 @@ Ip4JoinGroup (
   // Otherwise, create a new IGMP_GROUP,  Get the multicast's MAC address,
   // send a report, then direct MNP to receive the multicast.
   //
-  Group = NetAllocatePool (sizeof (IGMP_GROUP));
+  Group = AllocatePool (sizeof (IGMP_GROUP));
 
   if (Group == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -327,11 +327,11 @@ Ip4JoinGroup (
     goto ON_ERROR;
   }
 
-  NetListInsertHead (&IgmpCtrl->Groups, &Group->Link);
+  InsertHeadList (&IgmpCtrl->Groups, &Group->Link);
   return EFI_SUCCESS;
 
 ON_ERROR:
-  NetFreePool (Group);
+  gBS->FreePool (Group);
   return Status;
 }
 
@@ -399,8 +399,8 @@ Ip4LeaveGroup (
     Ip4SendIgmpMessage (IpSb, IP4_ALLROUTER_ADDRESS, IGMP_LEAVE_GROUP, Group->Address);
   }
 
-  NetListRemoveEntry (&Group->Link);
-  NetFreePool (Group);
+  RemoveEntryList (&Group->Link);
+  gBS->FreePool (Group);
 
   return EFI_SUCCESS;
 }
@@ -428,7 +428,7 @@ Ip4IgmpHandle (
   IGMP_HEAD                 Igmp;
   IGMP_GROUP                *Group;
   IP4_ADDR                  Address;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
 
   IgmpCtrl = &IpSb->IgmpCtrl;
 
@@ -526,7 +526,7 @@ Ip4IgmpTicking (
   )
 {
   IGMP_SERVICE_DATA         *IgmpCtrl;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   IGMP_GROUP                *Group;
 
   IgmpCtrl = &IpSb->IgmpCtrl;
@@ -578,13 +578,13 @@ Ip4CombineGroups (
 {
   IP4_ADDR                  *Groups;
 
-  Groups = NetAllocatePool (sizeof (IP4_ADDR) * (Count + 1));
+  Groups = AllocatePool (sizeof (IP4_ADDR) * (Count + 1));
 
   if (Groups == NULL) {
     return NULL;
   }
 
-  NetCopyMem (Groups, Source, Count * sizeof (IP4_ADDR));
+  CopyMem (Groups, Source, Count * sizeof (IP4_ADDR));
   Groups[Count] = Addr;
 
   return Groups;

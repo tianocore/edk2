@@ -23,9 +23,6 @@ Abstract:
 
 #include "Socket.h"
 
-#define SOCK_DEBUG_ERROR(PrintArg) NET_DEBUG_ERROR("Sock", PrintArg)
-#define SOCK_DEBUG_WARN(PrintArg)  NET_DEBUG_WARNING("Sock", PrintArg)
-#define SOCK_DEBUG_TRACE(PrintArg) NET_DEBUG_TRACE("Sock", PrintArg)
 
 #define SOCK_TRIM_RCV_BUFF(Sock, Len) \
   (NetbufQueTrim ((Sock)->RcvBuffer.DataQueue, (Len)))

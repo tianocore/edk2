@@ -62,7 +62,7 @@ MnpGetModeData (
 
   Instance = MNP_INSTANCE_DATA_FROM_THIS (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (MnpConfigData != NULL) {
     //
@@ -85,7 +85,7 @@ MnpGetModeData (
     Status = EFI_SUCCESS;
   }
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -133,7 +133,7 @@ MnpConfigure (
 
   Instance = MNP_INSTANCE_DATA_FROM_THIS (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if ((MnpConfigData == NULL) && (!Instance->Configured)) {
     //
@@ -149,7 +149,7 @@ MnpConfigure (
   Status = MnpConfigureInstance (Instance, MnpConfigData);
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -210,7 +210,7 @@ MnpMcastIpToMac (
 
   Instance = MNP_INSTANCE_DATA_FROM_THIS (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
 
@@ -247,7 +247,7 @@ MnpMcastIpToMac (
   }
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -285,7 +285,7 @@ MnpGroups (
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
   MNP_GROUP_CONTROL_BLOCK *GroupCtrlBlk;
   MNP_GROUP_ADDRESS       *GroupAddress;
-  NET_LIST_ENTRY          *ListEntry;
+  LIST_ENTRY              *ListEntry;
   BOOLEAN                 AddressExist;
   EFI_TPL                 OldTpl;
   EFI_STATUS              Status;
@@ -300,7 +300,7 @@ MnpGroups (
   Instance  = MNP_INSTANCE_DATA_FROM_THIS (This);
   SnpMode   = Instance->MnpServiceData->Snp->Mode;
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
 
@@ -334,7 +334,7 @@ MnpGroups (
                       CtrlBlkEntry
                       );
       GroupAddress = GroupCtrlBlk->GroupAddress;
-      if (0 == NetCompareMem (
+      if (0 == CompareMem (
                 MacAddress,
                 &GroupAddress->Address,
                 SnpMode->HwAddressSize
@@ -364,7 +364,7 @@ MnpGroups (
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
-  } else if (NetListIsEmpty (&Instance->GroupCtrlBlkList)) {
+  } else if (IsListEmpty (&Instance->GroupCtrlBlkList)) {
     //
     // The MacAddress is NULL and there is no configured multicast mac address,
     // just return.
@@ -378,7 +378,7 @@ MnpGroups (
   Status = MnpGroupOp (Instance, JoinFlag, MacAddress, GroupCtrlBlk);
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -427,7 +427,7 @@ MnpTransmit (
 
   Instance = MNP_INSTANCE_DATA_FROM_THIS (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
 
@@ -457,7 +457,7 @@ MnpTransmit (
   Status = MnpSyncSendPacket (MnpServiceData, PktBuf, PktLen, Token);
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -504,7 +504,7 @@ MnpReceive (
 
   Instance = MNP_INSTANCE_DATA_FROM_THIS (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
 
@@ -539,7 +539,7 @@ MnpReceive (
   }
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -583,7 +583,7 @@ MnpCancel (
 
   Instance = MNP_INSTANCE_DATA_FROM_THIS (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
 
@@ -607,7 +607,7 @@ MnpCancel (
   NetLibDispatchDpc ();
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
@@ -646,7 +646,7 @@ MnpPoll (
 
   Instance = MNP_INSTANCE_DATA_FROM_THIS (This);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
     Status = EFI_NOT_STARTED;
@@ -661,7 +661,7 @@ MnpPoll (
   NetLibDispatchDpc ();
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }

@@ -62,11 +62,11 @@ PxeBcInitSeedPacket (
 
   Header        = &Seed->Dhcp4.Header;
 
-  NetZeroMem (Header, sizeof (EFI_DHCP4_HEADER));
+  ZeroMem (Header, sizeof (EFI_DHCP4_HEADER));
   Header->OpCode    = PXEBC_DHCP4_OPCODE_REQUEST;
   Header->HwType    = Mode.IfType;
   Header->HwAddrLen = (UINT8) Mode.HwAddressSize;
-  NetCopyMem (Header->ClientHwAddr, &Mode.CurrentAddress, Header->HwAddrLen);
+  CopyMem (Header->ClientHwAddr, &Mode.CurrentAddress, Header->HwAddrLen);
 
   Seed->Dhcp4.Magik     = PXEBC_DHCP4_MAGIC;
   Seed->Dhcp4.Option[0] = PXEBC_DHCP4_TAG_EOP;
@@ -90,7 +90,7 @@ PxeBcCopyEfiDhcp4Packet (
 {
   ASSERT (Dst->Size >= Src->Length);
 
-  NetCopyMem (&Dst->Dhcp4, &Src->Dhcp4, Src->Length);
+  CopyMem (&Dst->Dhcp4, &Src->Dhcp4, Src->Length);
   Dst->Length = Src->Length;
 }
 
@@ -119,7 +119,7 @@ PxeBcCopyProxyOffer (
   Offer = &Private->Dhcp4Offers[OfferIndex].Packet.Offer;
 
   PxeBcCopyEfiDhcp4Packet (&Private->ProxyOffer.Packet.Offer, Offer);
-  NetCopyMem (&Mode->ProxyOffer, &Offer->Dhcp4, Offer->Length);
+  CopyMem (&Mode->ProxyOffer, &Offer->Dhcp4, Offer->Length);
   Mode->ProxyOfferReceived = TRUE;
 
   PxeBcParseCachedDhcpPacket (&Private->ProxyOffer);
@@ -147,8 +147,8 @@ PxeBcParseCachedDhcpPacket (
   UINTN                   Index;
 
   CachedPacket->IsPxeOffer = FALSE;
-  NetZeroMem (CachedPacket->Dhcp4Option, sizeof (CachedPacket->Dhcp4Option));
-  NetZeroMem (&CachedPacket->PxeVendorOption, sizeof (CachedPacket->PxeVendorOption));
+  ZeroMem (CachedPacket->Dhcp4Option, sizeof (CachedPacket->Dhcp4Option));
+  ZeroMem (&CachedPacket->PxeVendorOption, sizeof (CachedPacket->PxeVendorOption));
 
   Offer   = &CachedPacket->Packet.Offer;
   Options = CachedPacket->Dhcp4Option;
@@ -169,7 +169,7 @@ PxeBcParseCachedDhcpPacket (
   //
   Option = Options[PXEBC_DHCP4_TAG_INDEX_CLASS_ID];
   if ((Option != NULL) && (Option->Length >= 9) &&
-    (NetCompareMem (Option->Data, DEFAULT_CLASS_ID_DATA, 9) == 0)) {
+    (CompareMem (Option->Data, DEFAULT_CLASS_ID_DATA, 9) == 0)) {
 
     CachedPacket->IsPxeOffer = TRUE;
   }
@@ -241,19 +241,6 @@ PxeBcParseCachedDhcpPacket (
       // return false since mtftp not supported currently.
       //
       return FALSE;
-#if 0
-      //
-      // WFM11A, make sure bootfile is present
-      //
-      if (CachedPacket->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL) {
-        //
-        // Discard this offer.
-        //
-        return ;
-      }
-
-      OfferType = DHCP4_PACKET_TYPE_WFM11A;
-#endif
     } else {
       //
       // If the binl offer with only PXEClient.
@@ -296,7 +283,7 @@ PxeBcTryBinl (
     //
     // next server ip address is zero, use server id option instead.
     //
-    NetCopyMem (
+    CopyMem (
       &ServerIp.Addr[0],
       Private->Dhcp4Offers[Index].Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID]->Data,
       sizeof (EFI_IPv4_ADDRESS)
@@ -305,7 +292,7 @@ PxeBcTryBinl (
     //
     // use next server ip address.
     //
-    NetCopyMem (&ServerIp.Addr[0], &Offer->Dhcp4.Header.ServerAddr, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&ServerIp.Addr[0], &Offer->Dhcp4.Header.ServerAddr, sizeof (EFI_IPv4_ADDRESS));
   }
 
   CachedPacket = &Private->ProxyOffer;
@@ -340,7 +327,7 @@ PxeBcTryBinl (
   }
 
   Private->PxeBc.Mode->ProxyOfferReceived = TRUE;
-  NetCopyMem (&Private->PxeBc.Mode->ProxyOffer, &Reply->Dhcp4, Reply->Length);
+  CopyMem (&Private->PxeBc.Mode->ProxyOffer, &Reply->Dhcp4, Reply->Length);
 
   return TRUE;
 }
@@ -511,7 +498,7 @@ PxeBcCheckSelectedOffer (
     //
     // Copy the dhcp ack.
     //
-    NetCopyMem (&Mode->DhcpAck, &Ack->Dhcp4, Ack->Length);
+    CopyMem (&Mode->DhcpAck, &Ack->Dhcp4, Ack->Length);
   }
 
   return Status;
@@ -789,7 +776,7 @@ PxeBcDhcpCallBack (
                 );
   if (MaxMsgSize != NULL) {
     Value = HTONS (PXEBC_DHCP4_MAX_PACKET_SIZE);
-    NetCopyMem (MaxMsgSize->Data, &Value, sizeof (Value));
+    CopyMem (MaxMsgSize->Data, &Value, sizeof (Value));
   }
 
   if ((Dhcp4Event != Dhcp4SelectOffer) && (Callback != NULL)) {
@@ -814,7 +801,7 @@ PxeBcDhcpCallBack (
     //
     // Cache the dhcp discover packet, of which some information will be used later.
     //
-    NetCopyMem (Mode->DhcpDiscover.Raw, &Packet->Dhcp4, Packet->Length);
+    CopyMem (Mode->DhcpDiscover.Raw, &Packet->Dhcp4, Packet->Length);
 
     break;
 
@@ -901,7 +888,7 @@ PxeBcBuildDhcpOptions (
     OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE);
     OptEnt.MaxMesgSize      = (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE *) OptList[Index]->Data;
     Value                   = NTOHS (PXEBC_DHCP4_MAX_PACKET_SIZE);
-    NetCopyMem (&OptEnt.MaxMesgSize->Size, &Value, sizeof (UINT16));
+    CopyMem (&OptEnt.MaxMesgSize->Size, &Value, sizeof (UINT16));
     Index++;
     OptList[Index]          = GET_NEXT_DHCP_OPTION (OptList[Index - 1]);
   }
@@ -988,7 +975,7 @@ PxeBcBuildDhcpOptions (
   OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_ARCH);
   OptEnt.Arch             = (PXEBC_DHCP4_OPTION_ARCH *) OptList[Index]->Data;
   Value                   = HTONS (SYS_ARCH);
-  NetCopyMem (&OptEnt.Arch->Type, &Value, sizeof (UINT16));
+  CopyMem (&OptEnt.Arch->Type, &Value, sizeof (UINT16));
   Index++;
   OptList[Index]          = GET_NEXT_DHCP_OPTION (OptList[Index - 1]);
 
@@ -998,9 +985,9 @@ PxeBcBuildDhcpOptions (
   OptList[Index]->OpCode  = PXEBC_DHCP4_TAG_CLASS_ID;
   OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_CLID);
   OptEnt.Clid             = (PXEBC_DHCP4_OPTION_CLID *) OptList[Index]->Data;
-  NetCopyMem (OptEnt.Clid, DEFAULT_CLASS_ID_DATA, sizeof (PXEBC_DHCP4_OPTION_CLID));
+  CopyMem (OptEnt.Clid, DEFAULT_CLASS_ID_DATA, sizeof (PXEBC_DHCP4_OPTION_CLID));
   CvtNum (SYS_ARCH, OptEnt.Clid->ArchitectureType, sizeof (OptEnt.Clid->ArchitectureType));
-  NetCopyMem (OptEnt.Clid->InterfaceName, Private->Nii->StringId, sizeof (OptEnt.Clid->InterfaceName));
+  CopyMem (OptEnt.Clid->InterfaceName, Private->Nii->StringId, sizeof (OptEnt.Clid->InterfaceName));
   CvtNum (Private->Nii->MajorVer, OptEnt.Clid->UndiMajor, sizeof (OptEnt.Clid->UndiMajor));
   CvtNum (Private->Nii->MinorVer, OptEnt.Clid->UndiMinor, sizeof (OptEnt.Clid->UndiMinor));
   Index++;
@@ -1080,7 +1067,7 @@ PxeBcDiscvBootService (
     // Add vendor option of PXE_BOOT_ITEM
     //
     VendorOptLen      = (sizeof (EFI_DHCP4_PACKET_OPTION) - 1) * 2 + sizeof (PXEBC_OPTION_BOOT_ITEM) + 1;
-    OptList[OptCount] = NetAllocatePool (VendorOptLen);
+    OptList[OptCount] = AllocatePool (VendorOptLen);
     if (OptList[OptCount] == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1101,7 +1088,7 @@ PxeBcDiscvBootService (
   Status = Dhcp4->Build (Dhcp4, &Private->SeedPacket, 0, NULL, OptCount, OptList, &Token.Packet);
 
   if (IsDiscv) {
-    NetFreePool (OptList[OptCount - 1]);
+    gBS->FreePool (OptList[OptCount - 1]);
   }
 
   if (EFI_ERROR (Status)) {
@@ -1110,24 +1097,24 @@ PxeBcDiscvBootService (
 
   Token.Packet->Dhcp4.Header.Xid      = NET_RANDOM (NetRandomInitSeed ());
   Token.Packet->Dhcp4.Header.Reserved = (UINT16) ((IsBCast) ? 0xf000 : 0x0);
-  NetCopyMem (&Token.Packet->Dhcp4.Header.ClientAddr, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Token.Packet->Dhcp4.Header.ClientAddr, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
 
   Token.RemotePort = Sport;
 
   if (DestIp == NULL) {
-    NetSetMem (&Token.RemoteAddress, sizeof (EFI_IPv4_ADDRESS), 0xff);
+    SetMem (&Token.RemoteAddress, sizeof (EFI_IPv4_ADDRESS), 0xff);
   } else {
-    NetCopyMem (&Token.RemoteAddress, DestIp, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Token.RemoteAddress, DestIp, sizeof (EFI_IPv4_ADDRESS));
   }
 
-  NetCopyMem (&Token.GatewayAddress, &Private->GatewayIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Token.GatewayAddress, &Private->GatewayIp, sizeof (EFI_IPv4_ADDRESS));
 
   if (!IsBCast) {
     Token.ListenPointCount            = 1;
     Token.ListenPoints                = &ListenPoint;
     Token.ListenPoints[0].ListenPort  = PXEBC_BS_DISCOVER_PORT;
-    NetCopyMem (&Token.ListenPoints[0].ListenAddress, &Private->StationIp, sizeof(EFI_IPv4_ADDRESS));
-    NetCopyMem (&Token.ListenPoints[0].SubnetMask, &Private->SubnetMask, sizeof(EFI_IPv4_ADDRESS));
+    CopyMem (&Token.ListenPoints[0].ListenAddress, &Private->StationIp, sizeof(EFI_IPv4_ADDRESS));
+    CopyMem (&Token.ListenPoints[0].SubnetMask, &Private->SubnetMask, sizeof(EFI_IPv4_ADDRESS));
   }
   //
   // Send Pxe Discover
@@ -1183,10 +1170,10 @@ PxeBcDiscvBootService (
       }
 
       if (IsDiscv) {
-        NetCopyMem (&(Mode->PxeDiscover), &(Token.Packet->Dhcp4), Token.Packet->Length);
+        CopyMem (&(Mode->PxeDiscover), &(Token.Packet->Dhcp4), Token.Packet->Length);
         Mode->PxeDiscoverValid = TRUE;
 
-        NetCopyMem (Mode->PxeReply.Raw, &Response->Dhcp4, Response->Length);
+        CopyMem (Mode->PxeReply.Raw, &Response->Dhcp4, Response->Length);
         Mode->PxeReplyReceived = TRUE;
       }
     } else {
@@ -1196,12 +1183,12 @@ PxeBcDiscvBootService (
     //
     // free the responselist
     //
-    NetFreePool (Token.ResponseList);
+    gBS->FreePool (Token.ResponseList);
   }
   //
   // Free the dhcp packet
   //
-  NetFreePool (Token.Packet);
+  gBS->FreePool (Token.Packet);
 
   return Status;
 }
@@ -1284,17 +1271,17 @@ PxeBcParseVendorOptions (
 
     case PXEBC_VENDOR_TAG_MTFTP_IP:
 
-      NetCopyMem (&VendorOption->MtftpIp, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&VendorOption->MtftpIp, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
       break;
 
     case PXEBC_VENDOR_TAG_MTFTP_CPORT:
 
-      NetCopyMem (&VendorOption->MtftpCPort, PxeOption->Data, sizeof (VendorOption->MtftpCPort));
+      CopyMem (&VendorOption->MtftpCPort, PxeOption->Data, sizeof (VendorOption->MtftpCPort));
       break;
 
     case PXEBC_VENDOR_TAG_MTFTP_SPORT:
 
-      NetCopyMem (&VendorOption->MtftpSPort, PxeOption->Data, sizeof (VendorOption->MtftpSPort));
+      CopyMem (&VendorOption->MtftpSPort, PxeOption->Data, sizeof (VendorOption->MtftpSPort));
       break;
 
     case PXEBC_VENDOR_TAG_MTFTP_TIMEOUT:
@@ -1314,7 +1301,7 @@ PxeBcParseVendorOptions (
 
     case PXEBC_VENDOR_TAG_DISCOVER_MCAST:
 
-      NetCopyMem (&VendorOption->DiscoverMcastIp, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&VendorOption->DiscoverMcastIp, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
       break;
 
     case PXEBC_VENDOR_TAG_BOOT_SERVERS:
@@ -1337,9 +1324,9 @@ PxeBcParseVendorOptions (
 
     case PXEBC_VENDOR_TAG_MCAST_ALLOC:
 
-      NetCopyMem (&VendorOption->McastIpBase, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
-      NetCopyMem (&VendorOption->McastIpBlock, PxeOption->Data + 4, sizeof (VendorOption->McastIpBlock));
-      NetCopyMem (&VendorOption->McastIpRange, PxeOption->Data + 6, sizeof (VendorOption->McastIpRange));
+      CopyMem (&VendorOption->McastIpBase, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&VendorOption->McastIpBlock, PxeOption->Data + 4, sizeof (VendorOption->McastIpBlock));
+      CopyMem (&VendorOption->McastIpRange, PxeOption->Data + 6, sizeof (VendorOption->McastIpRange));
       break;
 
     case PXEBC_VENDOR_TAG_CREDENTIAL_TYPES:
@@ -1350,8 +1337,8 @@ PxeBcParseVendorOptions (
 
     case PXEBC_VENDOR_TAG_BOOT_ITEM:
 
-      NetCopyMem (&VendorOption->BootSrvType, PxeOption->Data, sizeof (VendorOption->BootSrvType));
-      NetCopyMem (&VendorOption->BootSrvLayer, PxeOption->Data + 2, sizeof (VendorOption->BootSrvLayer));
+      CopyMem (&VendorOption->BootSrvType, PxeOption->Data, sizeof (VendorOption->BootSrvType));
+      CopyMem (&VendorOption->BootSrvLayer, PxeOption->Data + 2, sizeof (VendorOption->BootSrvLayer));
       break;
     }
 

@@ -1127,11 +1127,7 @@ MtftpDownload (
     // test of MTFTP server to make sure it handles mulitple opens correctly.
     // This code should NOT be enabled normally.
     //
-#ifdef SpecialNowaitVersion
-#pragma message ("This is special version for MTFTP regression test")
-    if (StartBlock || !LastBlock)
-#endif
-      if (((Status = MtftpListen (
+    if (((Status = MtftpListen (
                       Private,
                       &BufferSize,
                       BufferPtrLocal,
@@ -1148,7 +1144,7 @@ MtftpDownload (
         //
         // failed
         //
-      }
+    }
     //
     // if none were received, start block is not reset
     //

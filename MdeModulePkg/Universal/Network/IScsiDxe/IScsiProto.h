@@ -608,7 +608,7 @@ typedef struct _ISCSI_IN_BUFFER_CONTEXT {
 } ISCSI_IN_BUFFER_CONTEXT;
 
 typedef struct _ISCSI_TCB {
-  NET_LIST_ENTRY      Link;
+  LIST_ENTRY          Link;
 
   BOOLEAN             SoFarInOrder;
   UINT32              ExpDataSN;
@@ -627,7 +627,7 @@ typedef struct _ISCSI_TCB {
 } ISCSI_TCB;
 
 typedef struct _ISCSI_KEY_VALUE_PAIR {
-  NET_LIST_ENTRY  List;
+  LIST_ENTRY      List;
 
   CHAR8           *Key;
   CHAR8           *Value;
@@ -736,7 +736,7 @@ IScsiPadSegment (
   IN UINT32   Len
   );
 
-NET_LIST_ENTRY    *
+LIST_ENTRY        *
 IScsiBuildKeyValueList (
   IN CHAR8  *Data,
   IN UINT32 Len
@@ -744,13 +744,13 @@ IScsiBuildKeyValueList (
 
 CHAR8             *
 IScsiGetValueByKeyFromList (
-  IN NET_LIST_ENTRY  *KeyValueList,
+  IN LIST_ENTRY      *KeyValueList,
   IN CHAR8           *Key
   );
 
 VOID
 IScsiFreeKeyValueList (
-  IN NET_LIST_ENTRY  *KeyValueList
+  IN LIST_ENTRY      *KeyValueList
   );
 
 EFI_STATUS

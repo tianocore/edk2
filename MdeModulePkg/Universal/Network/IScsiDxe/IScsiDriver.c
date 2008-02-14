@@ -362,7 +362,7 @@ Returns:
     }
 
     if (DeviceHandleBuffer != NULL) {
-      NetFreePool (DeviceHandleBuffer);
+      gBS->FreePool (DeviceHandleBuffer);
     }
   }
   //

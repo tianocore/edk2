@@ -58,7 +58,7 @@ EfiDhcp4GetModeData (
 
   Instance = DHCP_INSTANCE_FROM_THIS (This);
   
-  OldTpl  = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   DhcpSb  = Instance->Service;
 
   //
@@ -70,28 +70,28 @@ EfiDhcp4GetModeData (
   CopyMem (&Dhcp4ModeData->ClientMacAddress, &DhcpSb->Mac, sizeof (Dhcp4ModeData->ClientMacAddress));
 
   Ip = HTONL (DhcpSb->ClientAddr);
-  NetCopyMem (&Dhcp4ModeData->ClientAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Dhcp4ModeData->ClientAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   Ip = HTONL (DhcpSb->Netmask);
-  NetCopyMem (&Dhcp4ModeData->SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Dhcp4ModeData->SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   Ip = HTONL (DhcpSb->ServerAddr);
-  NetCopyMem (&Dhcp4ModeData->ServerAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Dhcp4ModeData->ServerAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   Para = DhcpSb->Para;
 
   if (Para != NULL) {
     Ip = HTONL (Para->Router);
-    NetCopyMem (&Dhcp4ModeData->RouterAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Dhcp4ModeData->RouterAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
     Dhcp4ModeData->LeaseTime               = Para->Lease;
   } else {
-    NetZeroMem (&Dhcp4ModeData->RouterAddress, sizeof (EFI_IPv4_ADDRESS));
+    ZeroMem (&Dhcp4ModeData->RouterAddress, sizeof (EFI_IPv4_ADDRESS));
     Dhcp4ModeData->LeaseTime               = 0xffffffff;
   }
 
   Dhcp4ModeData->ReplyPacket = DhcpSb->Selected;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 }
 
@@ -114,24 +114,24 @@ DhcpCleanConfigure (
   UINT32                    Index;
 
   if (Config->DiscoverTimeout != NULL) {
-    NetFreePool (Config->DiscoverTimeout);
+    gBS->FreePool (Config->DiscoverTimeout);
   }
 
   if (Config->RequestTimeout != NULL) {
-    NetFreePool (Config->RequestTimeout);
+    gBS->FreePool (Config->RequestTimeout);
   }
 
   if (Config->OptionList != NULL) {
     for (Index = 0; Index < Config->OptionCount; Index++) {
       if (Config->OptionList[Index] != NULL) {
-        NetFreePool (Config->OptionList[Index]);
+        gBS->FreePool (Config->OptionList[Index]);
       }
     }
 
-    NetFreePool (Config->OptionList);
+    gBS->FreePool (Config->OptionList);
   }
 
-  NetZeroMem (Config, sizeof (EFI_DHCP4_CONFIG_DATA));
+  ZeroMem (Config, sizeof (EFI_DHCP4_CONFIG_DATA));
 }
 
 
@@ -167,7 +167,7 @@ DhcpCopyConfigure (
   //
   if (Src->DiscoverTimeout != NULL) {
     Len                   = Src->DiscoverTryCount * sizeof (UINT32);
-    Dst->DiscoverTimeout  = NetAllocatePool (Len);
+    Dst->DiscoverTimeout  = AllocatePool (Len);
 
     if (Dst->DiscoverTimeout == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -183,7 +183,7 @@ DhcpCopyConfigure (
   //
   if (Src->RequestTimeout != NULL) {
     Len                 = Src->RequestTryCount * sizeof (UINT32);
-    Dst->RequestTimeout = NetAllocatePool (Len);
+    Dst->RequestTimeout = AllocatePool (Len);
 
     if (Dst->RequestTimeout == NULL) {
       goto ON_ERROR;
@@ -200,7 +200,7 @@ DhcpCopyConfigure (
   //
   if (Src->OptionList != NULL) {
     Len             = Src->OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *);
-    Dst->OptionList = NetAllocateZeroPool (Len);
+    Dst->OptionList = AllocateZeroPool (Len);
 
     if (Dst->OptionList == NULL) {
       goto ON_ERROR;
@@ -212,13 +212,13 @@ DhcpCopyConfigure (
     for (Index = 0; Index < Src->OptionCount; Index++) {
       Len = sizeof (EFI_DHCP4_PACKET_OPTION) + MAX (SrcOptions[Index]->Length - 1, 0);
 
-      DstOptions[Index] = NetAllocatePool (Len);
+      DstOptions[Index] = AllocatePool (Len);
 
       if (DstOptions[Index] == NULL) {
         goto ON_ERROR;
       }
 
-      NetCopyMem (DstOptions[Index], SrcOptions[Index], Len);
+      CopyMem (DstOptions[Index], SrcOptions[Index], Len);
     }
   }
 
@@ -253,14 +253,14 @@ DhcpYieldControl (
   DhcpSb->ActiveChild   = NULL;
 
   if (Config->DiscoverTimeout != NULL) {
-    NetFreePool (Config->DiscoverTimeout);
+    gBS->FreePool (Config->DiscoverTimeout);
 
     Config->DiscoverTryCount  = 0;
     Config->DiscoverTimeout   = NULL;
   }
 
   if (Config->RequestTimeout != NULL) {
-    NetFreePool (Config->RequestTimeout);
+    gBS->FreePool (Config->RequestTimeout);
 
     Config->RequestTryCount = 0;
     Config->RequestTimeout  = NULL;
@@ -322,7 +322,7 @@ EfiDhcp4Configure (
       return EFI_INVALID_PARAMETER;
     }
 
-    NetCopyMem (&Ip, &Dhcp4CfgData->ClientAddress, sizeof (IP4_ADDR));
+    CopyMem (&Ip, &Dhcp4CfgData->ClientAddress, sizeof (IP4_ADDR));
 
     if ((Ip != 0) && !Ip4IsUnicast (NTOHL (Ip), 0)) {
 
@@ -336,7 +336,7 @@ EfiDhcp4Configure (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl  = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
 
   DhcpSb  = Instance->Service;
   Config  = &DhcpSb->ActiveConfig;
@@ -390,7 +390,7 @@ EfiDhcp4Configure (
   }
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -433,7 +433,7 @@ EfiDhcp4Start (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl  = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   DhcpSb  = Instance->Service;
 
   if (DhcpSb->DhcpState == Dhcp4Stopped) {
@@ -464,9 +464,9 @@ EfiDhcp4Start (
   Instance->CompletionEvent = CompletionEvent;
 
   //
-  // Restore the TPL now, don't call poll function at NET_TPL_LOCK.
+  // Restore the TPL now, don't call poll function at TPL_CALLBACK.
   //
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   if (CompletionEvent == NULL) {
     while (DhcpSb->IoStatus == EFI_ALREADY_STARTED) {
@@ -479,7 +479,7 @@ EfiDhcp4Start (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -524,7 +524,7 @@ EfiDhcp4RenewRebind (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl  = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   DhcpSb  = Instance->Service;
 
   if (DhcpSb->DhcpState == Dhcp4Stopped) {
@@ -567,7 +567,7 @@ EfiDhcp4RenewRebind (
   DhcpSb->IoStatus            = EFI_ALREADY_STARTED;
   Instance->RenewRebindEvent  = CompletionEvent;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   if (CompletionEvent == NULL) {
     while (DhcpSb->IoStatus == EFI_ALREADY_STARTED) {
@@ -580,7 +580,7 @@ EfiDhcp4RenewRebind (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -623,7 +623,7 @@ EfiDhcp4Release (
   }
 
   Status  = EFI_SUCCESS;
-  OldTpl  = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   DhcpSb  = Instance->Service;
 
   if ((DhcpSb->DhcpState != Dhcp4InitReboot) && (DhcpSb->DhcpState != Dhcp4Bound)) {
@@ -649,7 +649,7 @@ EfiDhcp4Release (
   DhcpCleanLease (DhcpSb);
 
 ON_EXIT:
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -688,7 +688,7 @@ EfiDhcp4Stop (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl  = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   DhcpSb  = Instance->Service;
 
   DhcpCleanLease (DhcpSb);
@@ -696,7 +696,7 @@ EfiDhcp4Stop (
   DhcpSb->DhcpState     = Dhcp4Stopped;
   DhcpSb->ServiceState  = DHCP_UNCONFIGED;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 }
 
@@ -779,7 +779,7 @@ Dhcp4InstanceConfigUdpIo (
   DhcpSb   = Instance->Service;
   Token    = Instance->Token;
 
-  NetZeroMem (&UdpConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
+  ZeroMem (&UdpConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
 
   UdpConfigData.AcceptBroadcast    = TRUE;
   UdpConfigData.AllowDuplicatePort = TRUE;
@@ -787,10 +787,10 @@ Dhcp4InstanceConfigUdpIo (
   UdpConfigData.DoNotFragment      = TRUE;
 
   Ip = HTONL (DhcpSb->ClientAddr);
-  NetCopyMem (&UdpConfigData.StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&UdpConfigData.StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   Ip = HTONL (DhcpSb->Netmask);
-  NetCopyMem (&UdpConfigData.SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&UdpConfigData.SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   if ((Token->ListenPointCount == 0) || (Token->ListenPoints[0].ListenPort == 0)) {
     UdpConfigData.StationPort = DHCP_CLIENT_PORT;
@@ -951,7 +951,7 @@ PxeDhcpDone (
 
   Token->ResponseCount = Instance->ResponseQueue.BufNum;
   if (Token->ResponseCount != 0) {
-    Token->ResponseList = (EFI_DHCP4_PACKET *) NetAllocatePool (Instance->ResponseQueue.BufSize);
+    Token->ResponseList = (EFI_DHCP4_PACKET *) AllocatePool (Instance->ResponseQueue.BufSize);
     if (Token->ResponseList == NULL) {
       Token->Status = EFI_OUT_OF_RESOURCES;
       goto SIGNAL_USER;
@@ -1045,7 +1045,7 @@ EfiDhcp4TransmitReceive (
     return EFI_NO_MAPPING;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Save the token and the timeout value.
@@ -1081,7 +1081,7 @@ EfiDhcp4TransmitReceive (
   //
   // Set the destination address and destination port.
   //
-  NetCopyMem (&Ip, &Token->RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Ip, &Token->RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
   EndPoint.RemoteAddr = NTOHL (Ip);
 
   if (Token->RemotePort == 0) {
@@ -1096,7 +1096,7 @@ EfiDhcp4TransmitReceive (
   SubnetMask = DhcpSb->Netmask;
   Gateway    = 0;
   if (!IP4_NET_EQUAL (DhcpSb->ClientAddr, EndPoint.RemoteAddr, SubnetMask)) {
-    NetCopyMem (&Gateway, &Token->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Gateway, &Token->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
     Gateway = NTOHL (Gateway);
   }
 
@@ -1126,7 +1126,7 @@ ON_ERROR:
     Instance->Token = NULL;
   }
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   if (!EFI_ERROR (Status) && (Token->CompletionEvent == NULL)) {
     //
@@ -1228,7 +1228,7 @@ EfiDhcp4Parse (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  NetZeroMem (PacketOptionList, *OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *));
+  ZeroMem (PacketOptionList, *OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *));
 
   Context.Option      = PacketOptionList;
   Context.OptionCount = *OptionCount;

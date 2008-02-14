@@ -33,7 +33,6 @@
 #
 
 [Sources.common]
-  MnpDebug.h
   MnpMain.c
   MnpIo.c
   MnpDriver.h

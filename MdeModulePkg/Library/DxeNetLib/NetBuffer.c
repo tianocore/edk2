@@ -56,7 +56,7 @@ NetbufAllocStruct (
   //
   // Allocate three memory blocks.
   //
-  Nbuf = NetAllocateZeroPool (NET_BUF_SIZE (BlockOpNum));
+  Nbuf = AllocateZeroPool (NET_BUF_SIZE (BlockOpNum));
 
   if (Nbuf == NULL) {
     return NULL;
@@ -65,10 +65,10 @@ NetbufAllocStruct (
   Nbuf->Signature           = NET_BUF_SIGNATURE;
   Nbuf->RefCnt              = 1;
   Nbuf->BlockOpNum          = BlockOpNum;
-  NetListInit (&Nbuf->List);
+  InitializeListHead (&Nbuf->List);
 
   if (BlockNum != 0) {
-    Vector = NetAllocateZeroPool (NET_VECTOR_SIZE (BlockNum));
+    Vector = AllocateZeroPool (NET_VECTOR_SIZE (BlockNum));
 
     if (Vector == NULL) {
       goto FreeNbuf;
@@ -84,7 +84,7 @@ NetbufAllocStruct (
 
 FreeNbuf:
 
-  NetFreePool (Nbuf);
+  gBS->FreePool (Nbuf);
   return NULL;
 }
 
@@ -116,7 +116,7 @@ NetbufAlloc (
     return NULL;
   }
 
-  Bulk = NetAllocatePool (Len);
+  Bulk = AllocatePool (Len);
 
   if (Bulk == NULL) {
     goto FreeNBuf;
@@ -138,7 +138,7 @@ NetbufAlloc (
   return Nbuf;
 
 FreeNBuf:
-  NetFreePool (Nbuf);
+  gBS->FreePool (Nbuf);
   return NULL;
 }
 
@@ -175,7 +175,7 @@ NetbufFreeVector (
     // first block since it is allocated by us
     //
     if (Vector->Flag & NET_VECTOR_OWN_FIRST) {
-      NetFreePool (Vector->Block[0].Bulk);
+      gBS->FreePool (Vector->Block[0].Bulk);
     }
 
     Vector->Free (Vector->Arg);
@@ -185,11 +185,11 @@ NetbufFreeVector (
     // Free each memory block associated with the Vector
     //
     for (Index = 0; Index < Vector->BlockNum; Index++) {
-      NetFreePool (Vector->Block[Index].Bulk);
+      gBS->FreePool (Vector->Block[Index].Bulk);
     }
   }
 
-  NetFreePool (Vector);
+  gBS->FreePool (Vector);
 }
 
 
@@ -217,7 +217,7 @@ NetbufFree (
     // all the sharing of Nbuf increse Vector's RefCnt by one
     //
     NetbufFreeVector (Nbuf->Vector);
-    NetFreePool (Nbuf);
+    gBS->FreePool (Nbuf);
   }
 }
 
@@ -239,7 +239,7 @@ NetbufClone (
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
-  Clone = NetAllocatePool (NET_BUF_SIZE (Nbuf->BlockOpNum));
+  Clone = AllocatePool (NET_BUF_SIZE (Nbuf->BlockOpNum));
 
   if (Clone == NULL) {
     return NULL;
@@ -247,19 +247,19 @@ NetbufClone (
 
   Clone->Signature  = NET_BUF_SIGNATURE;
   Clone->RefCnt     = 1;
-  NetListInit (&Clone->List);
+  InitializeListHead (&Clone->List);
 
   Clone->Ip   = Nbuf->Ip;
   Clone->Tcp  = Nbuf->Tcp;
 
-  NetCopyMem (Clone->ProtoData, Nbuf->ProtoData, NET_PROTO_DATA);
+  CopyMem (Clone->ProtoData, Nbuf->ProtoData, NET_PROTO_DATA);
 
   NET_GET_REF (Nbuf->Vector);
 
   Clone->Vector     = Nbuf->Vector;
   Clone->BlockOpNum = Nbuf->BlockOpNum;
   Clone->TotalSize  = Nbuf->TotalSize;
-  NetCopyMem (Clone->BlockOp, Nbuf->BlockOp, sizeof (NET_BLOCK_OP) * Nbuf->BlockOpNum);
+  CopyMem (Clone->BlockOp, Nbuf->BlockOp, sizeof (NET_BLOCK_OP) * Nbuf->BlockOpNum);
 
   return Clone;
 }
@@ -300,7 +300,7 @@ NetbufDuplicate (
   // Don't set the IP and TCP head point, since it is most
   // like that they are pointing to the memory of Nbuf.
   //
-  NetCopyMem (Duplicate->ProtoData, Nbuf->ProtoData, NET_PROTO_DATA);
+  CopyMem (Duplicate->ProtoData, Nbuf->ProtoData, NET_PROTO_DATA);
   NetbufReserve (Duplicate, HeadSpace);
 
   Dst = NetbufAllocSpace (Duplicate, Nbuf->TotalSize, NET_BUF_TAIL);
@@ -320,11 +320,11 @@ NetbufDuplicate (
 **/
 VOID
 NetbufFreeList (
-  IN NET_LIST_ENTRY         *Head
+  IN LIST_ENTRY             *Head
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   NET_BUF                   *Nbuf;
 
   Entry = Head->ForwardLink;
@@ -333,11 +333,11 @@ NetbufFreeList (
     Nbuf = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
     NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
-    NetListRemoveEntry (Entry);
+    RemoveEntryList (Entry);
     NetbufFree (Nbuf);
   }
 
-  ASSERT (NetListIsEmpty (Head));
+  ASSERT (IsListEmpty (Head));
 }
 
 
@@ -609,7 +609,7 @@ NetbufGetFragment (
       return NULL;
     }
 
-    FirstBulk = NetAllocatePool (HeadSpace);
+    FirstBulk = AllocatePool (HeadSpace);
 
     if (FirstBulk == NULL) {
       goto FreeChild;
@@ -653,7 +653,7 @@ NetbufGetFragment (
     CurBlockOp++
     );
 
-  for (Index = First + 1; Index <= Last - 1 ; Index++) {
+  for (Index = First + 1; Index < Last; Index++) {
     NetbufSetBlockOp (
       Child,
       BlockOp[Index].Head,
@@ -671,12 +671,12 @@ NetbufGetFragment (
       );
   }
 
-  NetCopyMem (Child->ProtoData, Nbuf->ProtoData, NET_PROTO_DATA);
+  CopyMem (Child->ProtoData, Nbuf->ProtoData, NET_PROTO_DATA);
   return Child;
 
 FreeChild:
 
-  NetFreePool (Child);
+  gBS->FreePool (Child);
   return NULL;
 }
 
@@ -751,7 +751,7 @@ NetbufFromExt (
   //
   if ((HeadSpace != 0) || (HeadLen != 0)) {
     FirstBlockLen = HeadLen + HeadSpace;
-    FirstBlock    = NetAllocatePool (FirstBlockLen);
+    FirstBlock    = AllocatePool (FirstBlockLen);
 
     if (FirstBlock == NULL) {
       return NULL;
@@ -771,7 +771,7 @@ NetbufFromExt (
 
     for (Index = 0; Index < ExtNum; Index++) {
       if (Len >= ExtFragment[Index].Len) {
-        NetCopyMem (Header, ExtFragment[Index].Bulk, ExtFragment[Index].Len);
+        CopyMem (Header, ExtFragment[Index].Bulk, ExtFragment[Index].Len);
 
         Copied    += ExtFragment[Index].Len;
         Len       -= ExtFragment[Index].Len;
@@ -789,7 +789,7 @@ NetbufFromExt (
         }
 
       } else {
-        NetCopyMem (Header, ExtFragment[Index].Bulk, Len);
+        CopyMem (Header, ExtFragment[Index].Bulk, Len);
 
         Copied    += Len;
         TotalLen  += Len;
@@ -851,7 +851,7 @@ NetbufFromExt (
   return Nbuf;
 
 FreeFirstBlock:
-  NetFreePool (FirstBlock);
+  gBS->FreePool (FirstBlock);
   return NULL;
 }
 
@@ -916,7 +916,7 @@ NetbufBuildExt (
 **/
 NET_BUF  *
 NetbufFromBufList (
-  IN NET_LIST_ENTRY         *BufList,
+  IN LIST_ENTRY             *BufList,
   IN UINT32                 HeadSpace,
   IN UINT32                 HeaderLen,
   IN NET_VECTOR_EXT_FREE    ExtFree,
@@ -925,7 +925,7 @@ NetbufFromBufList (
 {
   NET_FRAGMENT              *Fragment;
   UINT32                    FragmentNum;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   NET_BUF                   *Nbuf;
   UINT32                    Index;
   UINT32                    Current;
@@ -944,7 +944,7 @@ NetbufFromBufList (
   //
   //Allocate and copy block points
   //
-  Fragment = NetAllocatePool (sizeof (NET_FRAGMENT) * FragmentNum);
+  Fragment = AllocatePool (sizeof (NET_FRAGMENT) * FragmentNum);
 
   if (Fragment == NULL) {
     return NULL;
@@ -966,7 +966,7 @@ NetbufFromBufList (
   }
 
   Nbuf = NetbufFromExt (Fragment, Current, HeadSpace, HeaderLen, ExtFree, Arg);
-  NetFreePool (Fragment);
+  gBS->FreePool (Fragment);
 
   return Nbuf;
 }
@@ -1261,11 +1261,11 @@ NetbufCopy (
   Left  = BlockOp[Index].Size - Skip;
 
   if (Len <= Left) {
-    NetCopyMem (Dest, BlockOp[Index].Head + Skip, Len);
+    CopyMem (Dest, BlockOp[Index].Head + Skip, Len);
     return Len;
   }
 
-  NetCopyMem (Dest, BlockOp[Index].Head + Skip, Left);
+  CopyMem (Dest, BlockOp[Index].Head + Skip, Left);
 
   Dest  += Left;
   Len   -= Left;
@@ -1278,11 +1278,11 @@ NetbufCopy (
       Len    -= BlockOp[Index].Size;
       Copied += BlockOp[Index].Size;
 
-      NetCopyMem (Dest, BlockOp[Index].Head, BlockOp[Index].Size);
+      CopyMem (Dest, BlockOp[Index].Head, BlockOp[Index].Size);
       Dest   += BlockOp[Index].Size;
     } else {
       Copied += Len;
-      NetCopyMem (Dest, BlockOp[Index].Head, Len);
+      CopyMem (Dest, BlockOp[Index].Head, Len);
       break;
     }
   }
@@ -1306,9 +1306,9 @@ NetbufQueInit (
 {
   NbufQue->Signature  = NET_QUE_SIGNATURE;
   NbufQue->RefCnt     = 1;
-  NetListInit (&NbufQue->List);
+  InitializeListHead (&NbufQue->List);
 
-  NetListInit (&NbufQue->BufList);
+  InitializeListHead (&NbufQue->BufList);
   NbufQue->BufSize  = 0;
   NbufQue->BufNum   = 0;
 }
@@ -1329,7 +1329,7 @@ NetbufQueAlloc (
 {
   NET_BUF_QUEUE             *NbufQue;
 
-  NbufQue = NetAllocatePool (sizeof (NET_BUF_QUEUE));
+  NbufQue = AllocatePool (sizeof (NET_BUF_QUEUE));
   if (NbufQue == NULL) {
     return NULL;
   }
@@ -1359,7 +1359,7 @@ NetbufQueFree (
 
   if (NbufQue->RefCnt == 0) {
     NetbufQueFlush (NbufQue);
-    NetFreePool (NbufQue);
+    gBS->FreePool (NbufQue);
   }
 }
 
@@ -1382,7 +1382,7 @@ NetbufQueAppend (
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
-  NetListInsertTail (&NbufQue->BufList, &Nbuf->List);
+  InsertTailList (&NbufQue->BufList, &Nbuf->List);
 
   NbufQue->BufSize += Nbuf->TotalSize;
   NbufQue->BufNum++;
@@ -1440,7 +1440,7 @@ NetbufQueCopy (
   IN UINT8                  *Dest
   )
 {
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
   NET_BUF                   *Nbuf;
   UINT32                    Skip;
   UINT32                    Left;
@@ -1533,8 +1533,8 @@ NetbufQueTrim (
   IN UINT32                 Len
   )
 {
-  NET_LIST_ENTRY            *Entry;
-  NET_LIST_ENTRY            *Next;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
   NET_BUF                   *Nbuf;
   UINT32                    Trimmed;
 
@@ -1558,7 +1558,7 @@ NetbufQueTrim (
       Trimmed += Nbuf->TotalSize;
       Len -= Nbuf->TotalSize;
 
-      NetListRemoveEntry (Entry);
+      RemoveEntryList (Entry);
       NetbufFree (Nbuf);
 
       NbufQue->BufNum--;
@@ -1748,7 +1748,7 @@ NetPseudoHeadChecksum (
   //
   // Zero the memory to relieve align problems
   //
-  NetZeroMem (&Hdr, sizeof (Hdr));
+  ZeroMem (&Hdr, sizeof (Hdr));
 
   Hdr.SrcIp     = Src;
   Hdr.DstIp     = Dst;

@@ -118,7 +118,7 @@ Ip4SelectInterface (
 {
   IP4_INTERFACE             *IpIf;
   IP4_INTERFACE             *Selected;
-  NET_LIST_ENTRY            *Entry;
+  LIST_ENTRY                *Entry;
 
   //
   // Select the interface the Dst is on if one of the connected

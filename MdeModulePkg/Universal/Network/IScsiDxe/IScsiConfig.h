@@ -62,7 +62,7 @@ typedef struct _ISCSI_DEVICE_LIST {
 #pragma pack()
 
 typedef struct _ISCSI_CONFIG_FORM_ENTRY {
-  NET_LIST_ENTRY                Link;
+  LIST_ENTRY                    Link;
   EFI_HANDLE                    Controller;
   CHAR16                        MacString[95];
   STRING_REF                    PortTitleToken;

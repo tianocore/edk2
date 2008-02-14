@@ -43,7 +43,7 @@ enum {
 // enties of the connected network have the flag on.
 //
 typedef struct {
-  NET_LIST_ENTRY            Link;
+  LIST_ENTRY                Link;
   INTN                      RefCnt;
   IP4_ADDR                  Dest;
   IP4_ADDR                  Netmask;
@@ -62,7 +62,7 @@ typedef struct {
 // to-be-deleted route entry.
 //
 typedef struct {
-  NET_LIST_ENTRY            Link;
+  LIST_ENTRY                Link;
   INTN                      RefCnt;
   IP4_ADDR                  Dest;
   IP4_ADDR                  Src;
@@ -78,7 +78,7 @@ typedef struct {
 // detach them later.
 //
 typedef struct {
-  NET_LIST_ENTRY            CacheBucket[IP4_ROUTE_CACHE_HASH];
+  LIST_ENTRY                CacheBucket[IP4_ROUTE_CACHE_HASH];
 } IP4_ROUTE_CACHE;
 
 //
@@ -94,7 +94,7 @@ typedef struct _IP4_ROUTE_TABLE IP4_ROUTE_TABLE;
 struct _IP4_ROUTE_TABLE {
   INTN                      RefCnt;
   UINT32                    TotalNum;
-  NET_LIST_ENTRY            RouteArea[IP4_MASK_NUM];
+  LIST_ENTRY                RouteArea[IP4_MASK_NUM];
   IP4_ROUTE_TABLE           *Next;
   IP4_ROUTE_CACHE           Cache;
 };

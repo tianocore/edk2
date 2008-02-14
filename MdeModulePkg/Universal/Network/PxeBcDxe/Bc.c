@@ -1201,7 +1201,6 @@ BcStart (
     return EFI_ALREADY_STARTED;
   }
 
-#if !SUPPORT_IPV6
   //
   // Fail if IPv6 is requested and not supported.
   //
@@ -1210,7 +1209,6 @@ BcStart (
     EfiReleaseLock (&Private->Lock);
     return EFI_UNSUPPORTED;
   }
-#endif
   //
   // Setup shortcuts to SNP protocol and data structure.
   //
@@ -2174,7 +2172,7 @@ PxeBcDriverStart (
   if (EFI_ERROR (Status)) {
     goto PxeBcError;
   }
-  
+
   //
   // Get the Snp interface
   //
@@ -2223,12 +2221,8 @@ PxeBcDriverStart (
   // implementation supports IPv6.
   //
   Private->EfiBc.Mode->Ipv6Supported = SUPPORT_IPV6;
-
-#if SUPPORT_IPV6
-  Private->EfiBc.Mode->Ipv6Available = Private->NiiPtr->Ipv6Supported;
-#else
   Private->EfiBc.Mode->Ipv6Available = FALSE;
-#endif
+
   //
   // Set to TRUE by the BC constructor if this BC
   // implementation supports BIS.

@@ -37,7 +37,6 @@
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>ArpDriver.c</Filename>
-    <Filename>ArpDebug.h</Filename>
     <Filename>ArpImpl.c</Filename>
     <Filename>ArpImpl.h</Filename>
     <Filename>ComponentName.c</Filename>

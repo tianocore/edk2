@@ -36,7 +36,7 @@ Abstract:
 #define ICMP_ERRLEN(IpHdr) \
   (sizeof(IP4_ICMP_HEAD) + EFI_IP4_HEADER_LEN(IpHdr) + 8)
 
-NET_LIST_ENTRY  mActiveIpIoList = {
+LIST_ENTRY  mActiveIpIoList = {
   &mActiveIpIoList,
   &mActiveIpIoList
 };
@@ -388,7 +388,7 @@ IpIoCreateSndEntry (
   //
   // Allocate resource for SndEntry
   //
-  SndEntry = NetAllocatePool (sizeof (IP_IO_SEND_ENTRY));
+  SndEntry = AllocatePool (sizeof (IP_IO_SEND_ENTRY));
   if (NULL == SndEntry) {
     return NULL;
   }
@@ -396,14 +396,14 @@ IpIoCreateSndEntry (
   //
   // Allocate resource for SndToken
   //
-  SndToken = NetAllocatePool (sizeof (EFI_IP4_COMPLETION_TOKEN));
+  SndToken = AllocatePool (sizeof (EFI_IP4_COMPLETION_TOKEN));
   if (NULL == SndToken) {
     goto ReleaseSndEntry;
   }
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   IpIoTransmitHandler,
                   SndEntry,
                   &(SndToken->Event)
@@ -415,7 +415,7 @@ IpIoCreateSndEntry (
   //
   // Allocate resource for TxData
   //
-  TxData = NetAllocatePool (
+  TxData = AllocatePool (
     sizeof (EFI_IP4_TRANSMIT_DATA) +
     sizeof (EFI_IP4_FRAGMENT_DATA) * (Pkt->BlockOpNum - 1)
     );
@@ -430,7 +430,7 @@ IpIoCreateSndEntry (
   OverrideData = NULL;
   if (NULL != Override) {
 
-    OverrideData = NetAllocatePool (sizeof (EFI_IP4_OVERRIDE_DATA));
+    OverrideData = AllocatePool (sizeof (EFI_IP4_OVERRIDE_DATA));
     if (NULL == OverrideData) {
       goto ReleaseResource;
     }
@@ -443,7 +443,7 @@ IpIoCreateSndEntry (
   //
   // Set the fields of TxData
   //
-  NetCopyMem (&TxData->DestinationAddress, &Dest, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&TxData->DestinationAddress, &Dest, sizeof (EFI_IPv4_ADDRESS));
   TxData->OverrideData                  = OverrideData;
   TxData->OptionsLength                 = 0;
   TxData->OptionsBuffer                 = NULL;
@@ -474,21 +474,21 @@ IpIoCreateSndEntry (
 
   SndEntry->SndToken = SndToken;
 
-  NetListInsertTail (&IpIo->PendingSndList, &SndEntry->Entry);
+  InsertTailList (&IpIo->PendingSndList, &SndEntry->Entry);
 
   return SndEntry;
 
 ReleaseResource:
-  NetFreePool (TxData);
+  gBS->FreePool (TxData);
 
 ReleaseEvent:
   gBS->CloseEvent (SndToken->Event);
 
 ReleaseSndToken:
-  NetFreePool (SndToken);
+  gBS->FreePool (SndToken);
 
 ReleaseSndEntry:
-  NetFreePool (SndEntry);
+  gBS->FreePool (SndEntry);
 
   return NULL;
 }
@@ -513,17 +513,17 @@ IpIoDestroySndEntry (
   TxData = SndEntry->SndToken->Packet.TxData;
 
   if (NULL != TxData->OverrideData) {
-    NetFreePool (TxData->OverrideData);
+    gBS->FreePool (TxData->OverrideData);
   }
 
-  NetFreePool (TxData);
+  gBS->FreePool (TxData);
   NetbufFree (SndEntry->Pkt);
   gBS->CloseEvent (SndEntry->SndToken->Event);
 
-  NetFreePool (SndEntry->SndToken);
-  NetListRemoveEntry (&SndEntry->Entry);
+  gBS->FreePool (SndEntry->SndToken);
+  RemoveEntryList (&SndEntry->Entry);
 
-  NetFreePool (SndEntry);
+  gBS->FreePool (SndEntry);
 }
 
 
@@ -791,19 +791,19 @@ IpIoCreate (
   EFI_STATUS  Status;
   IP_IO       *IpIo;
 
-  IpIo = NetAllocateZeroPool (sizeof (IP_IO));
+  IpIo = AllocateZeroPool (sizeof (IP_IO));
   if (NULL == IpIo) {
     return NULL;
   }
 
-  NetListInit (&(IpIo->PendingSndList));
-  NetListInit (&(IpIo->IpList));
+  InitializeListHead (&(IpIo->PendingSndList));
+  InitializeListHead (&(IpIo->IpList));
   IpIo->Controller  = Controller;
   IpIo->Image       = Image;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   IpIoListenHandler,
                   IpIo,
                   &(IpIo->RcvToken.Event)
@@ -833,7 +833,7 @@ ReleaseIpIo:
     gBS->CloseEvent (IpIo->RcvToken.Event);
   }
 
-  NetFreePool (IpIo);
+  gBS->FreePool (IpIo);
 
   return NULL;
 }
@@ -902,7 +902,7 @@ IpIoOpen (
   }
 
   IpIo->IsConfigured = TRUE;
-  NetListInsertTail (&mActiveIpIoList, &IpIo->Entry);
+  InsertTailList (&mActiveIpIoList, &IpIo->Entry);
 
 ErrorExit:
 
@@ -935,7 +935,7 @@ IpIoStop (
   //
   // Remove the IpIo from the active IpIo list.
   //
-  NetListRemoveEntry (&IpIo->Entry);
+  RemoveEntryList (&IpIo->Entry);
 
   Ip = IpIo->Ip;
 
@@ -953,7 +953,7 @@ IpIoStop (
   // Detroy the Ip List used by IpIo
   //
 
-  while (!NetListIsEmpty (&(IpIo->IpList))) {
+  while (!IsListEmpty (&(IpIo->IpList))) {
     IpInfo = NET_LIST_HEAD (&(IpIo->IpList), IP_IO_IP_INFO, Entry);
 
     IpIoRemoveIp (IpIo, IpInfo);
@@ -962,7 +962,7 @@ IpIoStop (
   //
   // All pending snd tokens should be flushed by reseting the IP instances.
   //
-  ASSERT (NetListIsEmpty (&IpIo->PendingSndList));
+  ASSERT (IsListEmpty (&IpIo->PendingSndList));
 
   //
   // Close the receive event.
@@ -998,7 +998,7 @@ IpIoDestroy (
   //
   IpIoCloseProtocolDestroyIpChild (IpIo->Controller, IpIo->Image, IpIo->ChildHandle);
 
-  NetFreePool (IpIo);
+  gBS->FreePool (IpIo);
 
   return EFI_SUCCESS;
 }
@@ -1077,7 +1077,7 @@ IpIoCancelTxToken (
   IN VOID   *Packet
   )
 {
-  NET_LIST_ENTRY    *Node;
+  LIST_ENTRY        *Node;
   IP_IO_SEND_ENTRY  *SndEntry;
   EFI_IP4_PROTOCOL  *Ip;
 
@@ -1118,7 +1118,7 @@ IpIoAddIp (
 
   ASSERT (IpIo);
 
-  IpInfo = NetAllocatePool (sizeof (IP_IO_IP_INFO));
+  IpInfo = AllocatePool (sizeof (IP_IO_IP_INFO));
   if (IpInfo == NULL) {
     return IpInfo;
   }
@@ -1127,7 +1127,7 @@ IpIoAddIp (
   // Init this IpInfo, set the Addr and SubnetMask to 0 before we configure the IP
   // instance.
   //
-  NetListInit (&IpInfo->Entry);
+  InitializeListHead (&IpInfo->Entry);
   IpInfo->ChildHandle = NULL;
   IpInfo->Addr        = 0;
   IpInfo->SubnetMask  = 0;
@@ -1151,7 +1151,7 @@ IpIoAddIp (
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  NET_TPL_EVENT,
+                  TPL_NOTIFY,
                   IpIoDummyHandler,
                   IpInfo,
                   &IpInfo->DummyRcvToken.Event
@@ -1163,7 +1163,7 @@ IpIoAddIp (
   //
   // Link this IpInfo into the IpIo.
   //
-  NetListInsertTail (&IpIo->IpList, &IpInfo->Entry);
+  InsertTailList (&IpIo->IpList, &IpInfo->Entry);
 
   return IpInfo;
 
@@ -1177,7 +1177,7 @@ ReleaseIpChild:
 
 ReleaseIpInfo:
 
-  NetFreePool (IpInfo);
+  gBS->FreePool (IpInfo);
 
   return NULL;
 }
@@ -1236,8 +1236,8 @@ IpIoConfigIp (
       Ip4ConfigData->SubnetMask     = Ip4ModeData.ConfigData.SubnetMask;
     }
 
-    NetCopyMem (&IpInfo->Addr, &Ip4ConfigData->StationAddress, sizeof (IP4_ADDR));
-    NetCopyMem (&IpInfo->SubnetMask, &Ip4ConfigData->SubnetMask, sizeof (IP4_ADDR));
+    CopyMem (&IpInfo->Addr, &Ip4ConfigData->StationAddress, sizeof (IP4_ADDR));
+    CopyMem (&IpInfo->SubnetMask, &Ip4ConfigData->SubnetMask, sizeof (IP4_ADDR));
 
     Status = Ip->Receive (Ip, &IpInfo->DummyRcvToken);
     if (EFI_ERROR (Status)) {
@@ -1283,7 +1283,7 @@ IpIoRemoveIp (
     return;
   }
 
-  NetListRemoveEntry (&IpInfo->Entry);
+  RemoveEntryList (&IpInfo->Entry);
 
   IpInfo->Ip->Configure (IpInfo->Ip, NULL);
 
@@ -1291,7 +1291,7 @@ IpIoRemoveIp (
 
   gBS->CloseEvent (IpInfo->DummyRcvToken.Event);
 
-  NetFreePool (IpInfo);
+  gBS->FreePool (IpInfo);
 }
 
 
@@ -1312,9 +1312,9 @@ IpIoFindSender (
   IN     IP4_ADDR  Src
   )
 {
-  NET_LIST_ENTRY  *IpIoEntry;
+  LIST_ENTRY      *IpIoEntry;
   IP_IO           *IpIoPtr;
-  NET_LIST_ENTRY  *IpInfoEntry;
+  LIST_ENTRY      *IpInfoEntry;
   IP_IO_IP_INFO   *IpInfo;
 
   NET_LIST_FOR_EACH (IpIoEntry, &mActiveIpIoList) {

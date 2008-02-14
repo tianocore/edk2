@@ -85,7 +85,7 @@ IScsiCHAPAuthTarget (
             VerifyRsp
             );
 
-  if (NetCompareMem (VerifyRsp, TargetResponse, ISCSI_CHAP_RSP_LEN)) {
+  if (CompareMem (VerifyRsp, TargetResponse, ISCSI_CHAP_RSP_LEN)) {
     Status = EFI_SECURITY_VIOLATION;
   }
 
@@ -123,7 +123,7 @@ Returns:
   CHAR8                     *Value;
   UINT8                     *Data;
   UINT32                    Len;
-  NET_LIST_ENTRY            *KeyValueList;
+  LIST_ENTRY                *KeyValueList;
   UINTN                     Algorithm;
   CHAR8                     *Identifier;
   CHAR8                     *Challenge;
@@ -139,7 +139,7 @@ Returns:
   AuthData    = &Session->AuthData;
 
   Len         = Conn->RspQue.BufSize;
-  Data        = NetAllocatePool (Len);
+  Data        = AllocatePool (Len);
   if (Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -283,7 +283,7 @@ ON_EXIT:
 
   IScsiFreeKeyValueList (KeyValueList);
 
-  NetFreePool (Data);
+  gBS->FreePool (Data);
 
   return Status;
 }
@@ -333,13 +333,13 @@ Returns:
   Status      = EFI_SUCCESS;
 
   RspLen      = 2 * ISCSI_CHAP_RSP_LEN + 3;
-  Response    = NetAllocatePool (RspLen);
+  Response    = AllocatePool (RspLen);
   if (Response == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   ChallengeLen  = 2 * ISCSI_CHAP_RSP_LEN + 3;
-  Challenge     = NetAllocatePool (ChallengeLen);
+  Challenge     = AllocatePool (ChallengeLen);
   if (Challenge == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -418,8 +418,8 @@ Returns:
     break;
   }
 
-  NetFreePool (Response);
-  NetFreePool (Challenge);
+  gBS->FreePool (Response);
+  gBS->FreePool (Challenge);
 
   return Status;
 }

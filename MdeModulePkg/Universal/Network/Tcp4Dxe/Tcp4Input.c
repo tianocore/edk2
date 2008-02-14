@@ -84,7 +84,7 @@ TcpFastRecover (
     TcpRetransmit (Tcb, Tcb->SndUna);
     Tcb->CWnd = Tcb->Ssthresh + 3 * Tcb->SndMss;
 
-    TCP4_DEBUG_TRACE (("TcpFastRecover: enter fast retransmission"
+    DEBUG ((EFI_D_INFO, "TcpFastRecover: enter fast retransmission"
       " for TCB %x, recover point is %d\n", Tcb, Tcb->Recover));
     return;
   }
@@ -103,7 +103,7 @@ TcpFastRecover (
     // by TcpToSendData
     //
     Tcb->CWnd += Tcb->SndMss;
-    TCP4_DEBUG_TRACE (("TcpFastRecover: received another"
+    DEBUG ((EFI_D_INFO, "TcpFastRecover: received another"
       " duplicated ACK (%d) for TCB %x\n", Seg->Ack, Tcb));
 
   } else {
@@ -123,7 +123,7 @@ TcpFastRecover (
       Tcb->CWnd         = MIN (Tcb->Ssthresh, FlightSize + Tcb->SndMss);
 
       Tcb->CongestState = TCP_CONGEST_OPEN;
-      TCP4_DEBUG_TRACE (("TcpFastRecover: received a full ACK(%d)"
+      DEBUG ((EFI_D_INFO, "TcpFastRecover: received a full ACK(%d)"
         " for TCB %x, exit fast recovery\n", Seg->Ack, Tcb));
 
     } else {
@@ -148,7 +148,7 @@ TcpFastRecover (
 
       Tcb->CWnd -= Acked;
 
-      TCP4_DEBUG_TRACE (("TcpFastRecover: received a partial"
+      DEBUG ((EFI_D_INFO, "TcpFastRecover: received a partial"
         " ACK(%d) for TCB %x\n", Seg->Ack, Tcb));
 
     }
@@ -185,7 +185,7 @@ TcpFastLossRecover (
       Tcb->LossTimes    = 0;
       Tcb->CongestState = TCP_CONGEST_OPEN;
 
-      TCP4_DEBUG_TRACE (("TcpFastLossRecover: received a "
+      DEBUG ((EFI_D_INFO, "TcpFastLossRecover: received a "
         "full ACK(%d) for TCB %x\n", Seg->Ack, Tcb));
 
     } else {
@@ -195,7 +195,7 @@ TcpFastLossRecover (
       // fast retransmit the first unacknowledge field.
       //
       TcpRetransmit (Tcb, Seg->Ack);
-      TCP4_DEBUG_TRACE (("TcpFastLossRecover: received a "
+      DEBUG ((EFI_D_INFO, "TcpFastLossRecover: received a "
         "partial ACK(%d) for TCB %x\n", Seg->Ack, Tcb));
     }
   }
@@ -256,7 +256,7 @@ TcpComputeRtt (
 
   }
 
-  TCP4_DEBUG_TRACE (("TcpComputeRtt: new RTT for TCB %x"
+  DEBUG ((EFI_D_INFO, "TcpComputeRtt: new RTT for TCB %x"
     " computed SRTT: %d RTTVAR: %d RTO: %d\n",
     Tcb, Tcb->SRtt, Tcb->RttVar, Tcb->Rto));
 
@@ -392,7 +392,7 @@ TcpDeliverData (
   IN TCP_CB *Tcb
   )
 {
-  NET_LIST_ENTRY  *Entry;
+  LIST_ENTRY      *Entry;
   NET_BUF         *Nbuf;
   TCP_SEQNO       Seq;
   TCP_SEG         *Seg;
@@ -404,7 +404,7 @@ TcpDeliverData (
   // make sure there is some data queued,
   // and TCP is in a proper state
   //
-  if (NetListIsEmpty (&Tcb->RcvQue) || !TCP_CONNECTED (Tcb->State)) {
+  if (IsListEmpty (&Tcb->RcvQue) || !TCP_CONNECTED (Tcb->State)) {
 
     return 0;
   }
@@ -430,7 +430,7 @@ TcpDeliverData (
     Seq         = Seg->End;
     Tcb->RcvNxt = Seq;
 
-    NetListRemoveEntry (&Nbuf->List);
+    RemoveEntryList (&Nbuf->List);
 
     //
     // RFC793 Eighth step: process FIN in sequence
@@ -441,15 +441,15 @@ TcpDeliverData (
       // The peer sends to us junky data after FIN,
       // reset the connection.
       //
-      if (!NetListIsEmpty (&Tcb->RcvQue)) {
-        TCP4_DEBUG_ERROR (("TcpDeliverData: data received after"
+      if (!IsListEmpty (&Tcb->RcvQue)) {
+        DEBUG ((EFI_D_ERROR, "TcpDeliverData: data received after"
           " FIN from peer of TCB %x, reset connection\n", Tcb));
 
         NetbufFree (Nbuf);
         return -1;
       }
 
-      TCP4_DEBUG_TRACE (("TcpDeliverData: processing FIN "
+      DEBUG ((EFI_D_INFO, "TcpDeliverData: processing FIN "
         "from peer of TCB %x\n", Tcb));
 
       switch (Tcb->State) {
@@ -480,7 +480,7 @@ TcpDeliverData (
           TcpSetTimer (Tcb, TCP_TIMER_2MSL, Tcb->TimeWaitTimeout);
         } else {
 
-          TCP4_DEBUG_WARN (("Connection closed immediately "
+          DEBUG ((EFI_D_WARN, "Connection closed immediately "
             "because app disables TIME_WAIT timer for %x\n", Tcb));
 
           TcpSendAck (Tcb);
@@ -558,9 +558,9 @@ TcpQueueData (
   )
 {
   TCP_SEG         *Seg;
-  NET_LIST_ENTRY  *Head;
-  NET_LIST_ENTRY  *Prev;
-  NET_LIST_ENTRY  *Cur;
+  LIST_ENTRY      *Head;
+  LIST_ENTRY      *Prev;
+  LIST_ENTRY      *Cur;
   NET_BUF         *Node;
 
   ASSERT (Tcb && Nbuf && (Nbuf->Tcp == NULL));
@@ -574,9 +574,9 @@ TcpQueueData (
   // Fast path to process normal case. That is,
   // no out-of-order segments are received.
   //
-  if (NetListIsEmpty (Head)) {
+  if (IsListEmpty (Head)) {
 
-    NetListInsertTail (Head, &Nbuf->List);
+    InsertTailList (Head, &Nbuf->List);
     return ;
   }
 
@@ -613,7 +613,7 @@ TcpQueueData (
     }
   }
 
-  NetListInsertHead (Prev, &Nbuf->List);
+  InsertHeadList (Prev, &Nbuf->List);
 
   TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
 
@@ -627,7 +627,7 @@ TcpQueueData (
 
       Cur = Cur->ForwardLink;
 
-      NetListRemoveEntry (&Node->List);
+      RemoveEntryList (&Node->List);
       NetbufFree (Node);
       continue;
     }
@@ -636,7 +636,7 @@ TcpQueueData (
 
       if (TCP_SEQ_LEQ (TCPSEG_NETBUF (Node)->Seq, Seg->Seq)) {
 
-        NetListRemoveEntry (&Nbuf->List);
+        RemoveEntryList (&Nbuf->List);
         NetbufFree (Nbuf);
         return ;
       }
@@ -665,8 +665,8 @@ TcpAdjustSndQue (
   IN TCP_SEQNO Ack
   )
 {
-  NET_LIST_ENTRY  *Head;
-  NET_LIST_ENTRY  *Cur;
+  LIST_ENTRY      *Head;
+  LIST_ENTRY      *Cur;
   NET_BUF         *Node;
   TCP_SEG         *Seg;
 
@@ -687,7 +687,7 @@ TcpAdjustSndQue (
     if (TCP_SEQ_LEQ (Seg->End, Ack)) {
       Cur = Cur->ForwardLink;
 
-      NetListRemoveEntry (&Node->List);
+      RemoveEntryList (&Node->List);
       NetbufFree (Node);
       continue;
     }
@@ -738,7 +738,7 @@ TcpInput (
   if ((Head->HeadLen < 5) || (Len < 0) ||
       TcpChecksum (Nbuf, NetPseudoHeadChecksum (Src, Dst, 6, 0))) {
 
-    TCP4_DEBUG_TRACE (("TcpInput: received an mal-formated packet\n"));
+    DEBUG ((EFI_D_INFO, "TcpInput: received an mal-formated packet\n"));
     goto DISCARD;
   }
 
@@ -759,7 +759,7 @@ TcpInput (
           );
 
   if ((Tcb == NULL) || (Tcb->State == TCP_CLOSED)) {
-    TCP4_DEBUG_TRACE (("TcpInput: send reset because no TCB find\n"));
+    DEBUG ((EFI_D_INFO, "TcpInput: send reset because no TCB find\n"));
 
     Tcb = NULL;
     goto SEND_RESET;
@@ -772,7 +772,7 @@ TcpInput (
   // (in fact, an illegal option length) is reset.
   //
   if (TcpParseOption (Nbuf->Tcp, &Option) == -1) {
-    TCP4_DEBUG_ERROR (("TcpInput: reset the peer because"
+    DEBUG ((EFI_D_ERROR, "TcpInput: reset the peer because"
       " of mal-format option for Tcb %x\n", Tcb));
 
     goto SEND_RESET;
@@ -796,7 +796,7 @@ TcpInput (
     // First step: Check RST
     //
     if (TCP_FLG_ON (Seg->Flag, TCP_FLG_RST)) {
-      TCP4_DEBUG_WARN (("TcpInput: discard a reset segment "
+      DEBUG ((EFI_D_WARN, "TcpInput: discard a reset segment "
         "for TCB %x in listening\n", Tcb));
 
       goto DISCARD;
@@ -807,7 +807,7 @@ TcpInput (
     // Any ACK sent to TCP in LISTEN is reseted.
     //
     if (TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK)) {
-      TCP4_DEBUG_WARN (("TcpInput: send reset because of"
+      DEBUG ((EFI_D_WARN, "TcpInput: send reset because of"
         " segment with ACK for TCB %x in listening\n", Tcb));
 
       goto SEND_RESET;
@@ -824,13 +824,13 @@ TcpInput (
 
       Tcb     = TcpCloneTcb (Parent);
       if (Tcb == NULL) {
-        TCP4_DEBUG_ERROR (("TcpInput: discard a segment because"
+        DEBUG ((EFI_D_ERROR, "TcpInput: discard a segment because"
           "failed to clone a child for TCB%x\n", Tcb));
 
         goto DISCARD;
       }
 
-      TCP4_DEBUG_TRACE (("TcpInput: create a child for TCB %x"
+      DEBUG ((EFI_D_INFO, "TcpInput: create a child for TCB %x"
         " in listening\n", Tcb));
 
       //
@@ -859,7 +859,7 @@ TcpInput (
     //
     if (TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK) && (Seg->Ack != Tcb->Iss + 1)) {
 
-      TCP4_DEBUG_WARN (("TcpInput: send reset because of "
+      DEBUG ((EFI_D_WARN, "TcpInput: send reset because of "
         "wrong ACK received for TCB %x in SYN_SENT\n", Tcb));
 
       goto SEND_RESET;
@@ -872,14 +872,14 @@ TcpInput (
 
       if (TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK)) {
 
-        TCP4_DEBUG_WARN (("TcpInput: connection reset by"
+        DEBUG ((EFI_D_WARN, "TcpInput: connection reset by"
           " peer for TCB%x in SYN_SENT\n", Tcb));
 
         SOCK_ERROR (Tcb->Sk, EFI_CONNECTION_RESET);
         goto DROP_CONNECTION;
       } else {
 
-        TCP4_DEBUG_WARN (("TcpInput: discard a reset segment "
+        DEBUG ((EFI_D_WARN, "TcpInput: discard a reset segment "
           "because of no ACK for TCB%x in SYN_SENT\n", Tcb));
 
         goto DISCARD;
@@ -922,7 +922,7 @@ TcpInput (
 
         TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
 
-        TCP4_DEBUG_TRACE (("TcpInput: connection established"
+        DEBUG ((EFI_D_INFO, "TcpInput: connection established"
           " for TCB %x in SYN_SENT\n", Tcb));
 
         goto StepSix;
@@ -937,7 +937,7 @@ TcpInput (
 
         TcpTrimInWnd (Tcb, Nbuf);
 
-        TCP4_DEBUG_WARN (("TcpInput: simultanous open "
+        DEBUG ((EFI_D_WARN, "TcpInput: simultanous open "
           "for TCB %x in SYN_SENT\n", Tcb));
 
         goto StepSix;
@@ -955,7 +955,7 @@ TcpInput (
   // First step: Check whether SEG.SEQ is acceptable
   //
   if (!TcpSeqAcceptable (Tcb, Seg)) {
-    TCP4_DEBUG_WARN (("TcpInput: sequence acceptance"
+    DEBUG ((EFI_D_WARN, "TcpInput: sequence acceptance"
       " test failed for segment of TCB %x\n", Tcb));
 
     if (!TCP_FLG_ON (Seg->Flag, TCP_FLG_RST)) {
@@ -977,7 +977,7 @@ TcpInput (
   //
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_RST)) {
 
-    TCP4_DEBUG_WARN (("TcpInput: connection reset for TCB %x\n", Tcb));
+    DEBUG ((EFI_D_WARN, "TcpInput: connection reset for TCB %x\n", Tcb));
 
     if (Tcb->State == TCP_SYN_RCVD) {
 
@@ -1020,7 +1020,7 @@ TcpInput (
   //
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_SYN)) {
 
-    TCP4_DEBUG_WARN (("TcpInput: connection reset "
+    DEBUG ((EFI_D_WARN, "TcpInput: connection reset "
       "because received extra SYN for TCB %x\n", Tcb));
 
     SOCK_ERROR (Tcb->Sk, EFI_CONNECTION_RESET);
@@ -1031,7 +1031,7 @@ TcpInput (
   // Fifth step: Check the ACK
   //
   if (!TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK)) {
-    TCP4_DEBUG_WARN (("TcpInput: segment discard because"
+    DEBUG ((EFI_D_WARN, "TcpInput: segment discard because"
       " of no ACK for connected TCB %x\n", Tcb));
 
     goto DISCARD;
@@ -1052,14 +1052,14 @@ TcpInput (
       TcpClearTimer (Tcb, TCP_TIMER_CONNECT);
       TcpDeliverData (Tcb);
 
-      TCP4_DEBUG_TRACE (("TcpInput: connection established "
+      DEBUG ((EFI_D_INFO, "TcpInput: connection established "
         " for TCB %x in SYN_RCVD\n", Tcb));
 
       //
       // Continue the process as ESTABLISHED state
       //
     } else {
-      TCP4_DEBUG_WARN (("TcpInput: send reset because of"
+      DEBUG ((EFI_D_WARN, "TcpInput: send reset because of"
         " wrong ACK for TCB %x in SYN_RCVD\n", Tcb));
 
       goto SEND_RESET;
@@ -1068,14 +1068,14 @@ TcpInput (
 
   if (TCP_SEQ_LT (Seg->Ack, Tcb->SndUna)) {
 
-    TCP4_DEBUG_WARN (("TcpInput: ignore the out-of-data"
+    DEBUG ((EFI_D_WARN, "TcpInput: ignore the out-of-data"
       " ACK for connected TCB %x\n", Tcb));
 
     goto StepSix;
 
   } else if (TCP_SEQ_GT (Seg->Ack, Tcb->SndNxt)) {
 
-    TCP4_DEBUG_WARN (("TcpInput: discard segment for "
+    DEBUG ((EFI_D_WARN, "TcpInput: discard segment for "
       "future ACK for connected TCB %x\n", Tcb));
 
     TcpSendAck (Tcb);
@@ -1186,7 +1186,7 @@ TcpInput (
         goto NO_UPDATE;
       }
 
-      TCP4_DEBUG_WARN (("TcpInput: peer shrinks the"
+      DEBUG ((EFI_D_WARN, "TcpInput: peer shrinks the"
         " window  for connected TCB %x\n", Tcb));
 
       if ((Tcb->CongestState == TCP_CONGEST_RECOVER) &&
@@ -1224,7 +1224,7 @@ NO_UPDATE:
   if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_FIN_SENT) &&
       (Tcb->SndUna == Tcb->SndNxt)) {
 
-    TCP4_DEBUG_TRACE (("TcpInput: local FIN is ACKed by"
+    DEBUG ((EFI_D_INFO, "TcpInput: local FIN is ACKed by"
       " peer for connected TCB %x\n", Tcb));
 
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_FIN_ACKED);
@@ -1264,7 +1264,7 @@ NO_UPDATE:
         TcpSetTimer (Tcb, TCP_TIMER_2MSL, Tcb->TimeWaitTimeout);
       } else {
 
-        TCP4_DEBUG_WARN (("Connection closed immediately "
+        DEBUG ((EFI_D_WARN, "Connection closed immediately "
           "because app disables TIME_WAIT timer for %x\n", Tcb));
 
         TcpClose (Tcb);
@@ -1290,7 +1290,7 @@ NO_UPDATE:
       TcpSetTimer (Tcb, TCP_TIMER_2MSL, Tcb->TimeWaitTimeout);
     } else {
 
-      TCP4_DEBUG_WARN (("Connection closed immediately "
+      DEBUG ((EFI_D_WARN, "Connection closed immediately "
         "because app disables TIME_WAIT timer for %x\n", Tcb));
 
       TcpClose (Tcb);
@@ -1315,7 +1315,7 @@ StepSix:
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_URG) &&
       !TCP_FIN_RCVD (Tcb->State)) {
 
-    TCP4_DEBUG_TRACE (("TcpInput: received urgent data "
+    DEBUG ((EFI_D_INFO, "TcpInput: received urgent data "
       "from peer for connected TCB %x\n", Tcb));
 
     Urg = Seg->Seq + Seg->Urg;
@@ -1338,14 +1338,14 @@ StepSix:
 
     if (TCP_FIN_RCVD (Tcb->State)) {
 
-      TCP4_DEBUG_WARN (("TcpInput: connection reset because"
+      DEBUG ((EFI_D_WARN, "TcpInput: connection reset because"
         " data is lost for connected TCB %x\n", Tcb));
 
       goto RESET_THEN_DROP;
     }
 
     if (TCP_LOCAL_CLOSED (Tcb->State) && (Nbuf->TotalSize != 0)) {
-      TCP4_DEBUG_WARN (("TcpInput: connection reset because"
+      DEBUG ((EFI_D_WARN, "TcpInput: connection reset because"
         " data is lost for connected TCB %x\n", Tcb));
 
       goto RESET_THEN_DROP;
@@ -1356,7 +1356,7 @@ StepSix:
       goto RESET_THEN_DROP;
     }
 
-    if (!NetListIsEmpty (&Tcb->RcvQue)) {
+    if (!IsListEmpty (&Tcb->RcvQue)) {
       TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
     }
   }
@@ -1407,7 +1407,7 @@ DISCARD:
   //
   // Tcb is a child of Parent, and it doesn't survive
   //
-  TCP4_DEBUG_WARN (("Tcp4Input: Discard a packet\n"));
+  DEBUG ((EFI_D_WARN, "Tcp4Input: Discard a packet\n"));
   NetbufFree (Nbuf);
 
   if (Parent && Tcb) {

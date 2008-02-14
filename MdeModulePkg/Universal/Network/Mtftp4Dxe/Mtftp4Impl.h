@@ -71,7 +71,7 @@ struct _MTFTP4_SERVICE {
   BOOLEAN                       InDestory;
 
   UINT16                        ChildrenNum;
-  NET_LIST_ENTRY                Children;
+  LIST_ENTRY                    Children;
 
   EFI_EVENT                     Timer;  // Ticking timer for all the MTFTP clients
   EFI_EVENT                     TimerToGetMap;
@@ -94,7 +94,7 @@ typedef struct {
 
 struct _MTFTP4_PROTOCOL {
   UINT32                        Signature;
-  NET_LIST_ENTRY                Link;
+  LIST_ENTRY                    Link;
   EFI_MTFTP4_PROTOCOL           Mtftp4;
 
   INTN                          State;
@@ -118,7 +118,7 @@ struct _MTFTP4_PROTOCOL {
   //
   UINT16                        BlkSize;
   UINT16                        LastBlock;
-  NET_LIST_ENTRY                Blocks;
+  LIST_ENTRY                    Blocks;
 
   //
   // The server's communication end point: IP and two ports. one for

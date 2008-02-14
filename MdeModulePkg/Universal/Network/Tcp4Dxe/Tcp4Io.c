@@ -88,7 +88,7 @@ TcpSendIpPacket (
     IpSender = IpIoFindSender (&IpIo, Src);
 
     if (IpSender == NULL) {
-      TCP4_DEBUG_WARN (("TcpSendIpPacket: No appropriate IpSender.\n"));
+      DEBUG ((EFI_D_WARN, "TcpSendIpPacket: No appropriate IpSender.\n"));
       return -1;
     }
   } else {
@@ -103,13 +103,13 @@ TcpSendIpPacket (
   Override.TimeToLive               = 255;
   Override.DoNotFragment            = FALSE;
   Override.Protocol                 = EFI_IP_PROTO_TCP;
-  NetZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
-  NetCopyMem (&Override.SourceAddress, &Src, sizeof (EFI_IPv4_ADDRESS));
+  ZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Override.SourceAddress, &Src, sizeof (EFI_IPv4_ADDRESS));
 
   Status = IpIoSend (IpIo, Nbuf, IpSender, NULL, NULL, Dest, &Override);
 
   if (EFI_ERROR (Status)) {
-    TCP4_DEBUG_ERROR (("TcpSendIpPacket: return %r error\n", Status));
+    DEBUG ((EFI_D_ERROR, "TcpSendIpPacket: return %r error\n", Status));
     return -1;
   }
 

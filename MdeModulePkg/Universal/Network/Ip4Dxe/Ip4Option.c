@@ -181,7 +181,7 @@ Ip4CopyOption (
       // don't copy options that is only valid for the first fragment
       //
       if (FirstFragment || (Type & IP4_OPTION_COPY_MASK)) {
-        NetCopyMem (OptBuf + Next, Option + Cur, Len);
+        CopyMem (OptBuf + Next, Option + Cur, Len);
         Next += Len;
       }
 
@@ -224,8 +224,8 @@ Ip4CopyOption (
   // Copy the option to the Buf, zero the buffer first to pad
   // the options with NOP to align to 4 bytes.
   //
-  NetZeroMem (Buf, Len);
-  NetCopyMem (Buf, OptBuf, Next);
+  ZeroMem (Buf, Len);
+  CopyMem (Buf, OptBuf, Next);
   *BufLen = Len;
   return EFI_SUCCESS;
 }

@@ -166,15 +166,15 @@ typedef struct _TCP_PEER {
 // tcp control block, it includes various states
 //
 struct _TCP_CB {
-  NET_LIST_ENTRY    List;
+  LIST_ENTRY        List;
   TCP_CB            *Parent;
 
   SOCKET            *Sk;
   TCP_PEER          LocalEnd;
   TCP_PEER          RemoteEnd;
 
-  NET_LIST_ENTRY    SndQue;   // retxmission queue
-  NET_LIST_ENTRY    RcvQue;   // reassemble queue
+  LIST_ENTRY        SndQue;   // retxmission queue
+  LIST_ENTRY        RcvQue;   // reassemble queue
   UINT32            CtrlFlag; // control flags, such as NO_NAGLE
   INT32             Error;    // soft error status,TCP_CONNECT_RESET...
 
@@ -271,8 +271,8 @@ struct _TCP_CB {
   IP_IO_IP_INFO     *IpInfo;
 };
 
-extern NET_LIST_ENTRY mTcpRunQue;
-extern NET_LIST_ENTRY mTcpListenQue;
+extern LIST_ENTRY     mTcpRunQue;
+extern LIST_ENTRY     mTcpListenQue;
 extern TCP_SEQNO      mTcpGlobalIss;
 extern UINT32         mTcpTick;
 

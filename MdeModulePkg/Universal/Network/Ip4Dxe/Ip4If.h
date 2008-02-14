@@ -79,7 +79,7 @@ typedef struct {
 //
 typedef struct {
   UINT32                                Signature;
-  NET_LIST_ENTRY                        Link;
+  LIST_ENTRY                            Link;
 
   IP4_INTERFACE                         *Interface;
 
@@ -103,9 +103,9 @@ typedef struct {
 //
 typedef struct {
   UINT32                  Signature;
-  NET_LIST_ENTRY          Link;
+  LIST_ENTRY              Link;
 
-  NET_LIST_ENTRY          Frames;
+  LIST_ENTRY              Frames;
   IP4_INTERFACE           *Interface;
 
   //
@@ -136,7 +136,7 @@ BOOLEAN
 //
 struct _IP4_INTERFACE {
   UINT32                        Signature;
-  NET_LIST_ENTRY                Link;
+  LIST_ENTRY                    Link;
   INTN                          RefCnt;
 
   //
@@ -164,8 +164,8 @@ struct _IP4_INTERFACE {
   //
   // Queues to keep the frames sent and waiting ARP request.
   //
-  NET_LIST_ENTRY                ArpQues;
-  NET_LIST_ENTRY                SentFrames;
+  LIST_ENTRY                    ArpQues;
+  LIST_ENTRY                    SentFrames;
   IP4_LINK_RX_TOKEN             *RecvRequest;
 
   //
@@ -180,7 +180,7 @@ struct _IP4_INTERFACE {
   // together through IpInstances. If any of the instance enables
   // promiscuous receive, PromiscRecv is true.
   //
-  NET_LIST_ENTRY                IpInstances;
+  LIST_ENTRY                    IpInstances;
   BOOLEAN                       PromiscRecv;
 };
 

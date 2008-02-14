@@ -161,7 +161,7 @@ Ip4CreateService (
   // empty resources, so if any thing goes wrong when allocating
   // resources, Ip4CleanService can be called to clean it up.
   //
-  IpSb = NetAllocatePool (sizeof (IP4_SERVICE));
+  IpSb = AllocatePool (sizeof (IP4_SERVICE));
 
   if (IpSb == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -174,16 +174,16 @@ Ip4CreateService (
   IpSb->InDestory                   = FALSE;
 
   IpSb->NumChildren                 = 0;
-  NetListInit (&IpSb->Children);
+  InitializeListHead (&IpSb->Children);
 
-  NetListInit (&IpSb->Interfaces);
+  InitializeListHead (&IpSb->Interfaces);
   IpSb->DefaultInterface            = NULL;
   IpSb->DefaultRouteTable           = NULL;
 
   Ip4InitAssembleTable (&IpSb->Assemble);
 
   IpSb->IgmpCtrl.Igmpv1QuerySeen    = 0;
-  NetListInit (&IpSb->IgmpCtrl.Groups);
+  InitializeListHead (&IpSb->IgmpCtrl.Groups);
 
   IpSb->Image                       = ImageHandle;
   IpSb->Controller                  = Controller;
@@ -202,7 +202,7 @@ Ip4CreateService (
   IpSb->MnpConfigData.EnableReceiveTimestamps   = FALSE;
   IpSb->MnpConfigData.DisableBackgroundPolling  = FALSE;
 
-  NetZeroMem (&IpSb->SnpMode, sizeof (EFI_SIMPLE_NETWORK_MODE));
+  ZeroMem (&IpSb->SnpMode, sizeof (EFI_SIMPLE_NETWORK_MODE));
 
   IpSb->Timer                       = NULL;
   IpSb->Ip4Config                   = NULL;
@@ -224,7 +224,7 @@ Ip4CreateService (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  NET_TPL_TIMER,
+                  TPL_CALLBACK,
                   Ip4TimerTicking,
                   IpSb,
                   &IpSb->Timer
@@ -283,7 +283,7 @@ Ip4CreateService (
     goto ON_ERROR;
   }
 
-  NetListInsertHead (&IpSb->Interfaces, &IpSb->DefaultInterface->Link);
+  InsertHeadList (&IpSb->Interfaces, &IpSb->DefaultInterface->Link);
 
   IpSb->MacString = NULL;
 
@@ -292,7 +292,7 @@ Ip4CreateService (
 
 ON_ERROR:
   Ip4CleanService (IpSb);
-  NetFreePool (IpSb);
+  gBS->FreePool (IpSb);
 
   return Status;
 }
@@ -477,7 +477,7 @@ UNINSTALL_PROTOCOL:
 
 FREE_SERVICE:
   Ip4CleanService (IpSb);
-  NetFreePool (IpSb);
+  gBS->FreePool (IpSb);
 
   return Status;
 }
@@ -555,7 +555,7 @@ Ip4DriverBindingStop (
 
     IpSb = IP4_SERVICE_FROM_PROTOCOL (ServiceBinding);
 
-    OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
     if (IpSb->Ip4Config && (IpSb->State != IP4_SERVICE_DESTORY)) {
 
@@ -569,7 +569,7 @@ Ip4DriverBindingStop (
                       );
 
       if (EFI_ERROR (Status)) {
-        NET_RESTORE_TPL (OldTpl);
+        gBS->RestoreTPL (OldTpl);
         return Status;
       }
 
@@ -585,7 +585,7 @@ Ip4DriverBindingStop (
       gBS->CloseEvent (IpSb->ReconfigEvent);
     }
 
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
 
@@ -625,15 +625,15 @@ Ip4DriverBindingStop (
 
   IpSb   = IP4_SERVICE_FROM_PROTOCOL (ServiceBinding);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (IpSb->InDestory) {
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
 
   if (IsArp) {
-    while (!NetListIsEmpty (&IpSb->Children)) {
+    while (!IsListEmpty (&IpSb->Children)) {
       IpInstance = NET_LIST_HEAD (&IpSb->Children, IP4_PROTOCOL, Link);
 
       ServiceBinding->DestroyChild (ServiceBinding, IpInstance->Handle);
@@ -670,7 +670,7 @@ Ip4DriverBindingStop (
            ServiceBinding
            );
 
-    NetFreePool (IpSb);
+    gBS->FreePool (IpSb);
   } else if (NumberOfChildren == 0) {
     IpSb->InDestory = TRUE;
 
@@ -698,10 +698,10 @@ Ip4DriverBindingStop (
            ServiceBinding
            );
 
-    NetFreePool (IpSb);
+    gBS->FreePool (IpSb);
   } else {
 
-    while (!NetListIsEmpty (&IpSb->Children)) {
+    while (!IsListEmpty (&IpSb->Children)) {
       IpInstance = NET_LIST_HEAD (&IpSb->Children, IP4_PROTOCOL, Link);
 
       ServiceBinding->DestroyChild (ServiceBinding, IpInstance->Handle);
@@ -714,7 +714,7 @@ Ip4DriverBindingStop (
 
 ON_ERROR:
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -752,7 +752,7 @@ Ip4ServiceBindingCreateChild (
   }
 
   IpSb       = IP4_SERVICE_FROM_PROTOCOL (This);
-  IpInstance = NetAllocatePool (sizeof (IP4_PROTOCOL));
+  IpInstance = AllocatePool (sizeof (IP4_PROTOCOL));
 
   if (IpInstance == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -801,12 +801,12 @@ Ip4ServiceBindingCreateChild (
   //
   // Insert it into the service binding instance.
   //
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  NetListInsertTail (&IpSb->Children, &IpInstance->Link);
+  InsertTailList (&IpSb->Children, &IpInstance->Link);
   IpSb->NumChildren++;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
 ON_ERROR:
 
@@ -814,7 +814,7 @@ ON_ERROR:
 
     Ip4CleanProtocol (IpInstance);
 
-    NetFreePool (IpInstance);
+    gBS->FreePool (IpInstance);
   }
 
   return Status;
@@ -879,7 +879,7 @@ Ip4ServiceBindingDestroyChild (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // A child can be destoried more than once. For example,
@@ -888,7 +888,7 @@ Ip4ServiceBindingDestroyChild (
   // the IP child it opens.
   //
   if (IpInstance->State == IP4_STATE_DESTORY) {
-    NET_RESTORE_TPL (OldTpl);
+    gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
 
@@ -944,17 +944,17 @@ Ip4ServiceBindingDestroyChild (
     goto ON_ERROR;
   }
 
-  NetListRemoveEntry (&IpInstance->Link);
+  RemoveEntryList (&IpInstance->Link);
   IpSb->NumChildren--;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
-  NetFreePool (IpInstance);
+  gBS->FreePool (IpInstance);
   return EFI_SUCCESS;
 
 ON_ERROR:
   IpInstance->State = State;
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }

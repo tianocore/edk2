@@ -214,7 +214,7 @@ Ip4ConfigDriverBindingStart (
   //
   // Allocate an instance then initialize it
   //
-  Instance = NetAllocatePool (sizeof (IP4_CONFIG_INSTANCE));
+  Instance = AllocatePool (sizeof (IP4_CONFIG_INSTANCE));
 
   if (Instance == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -332,7 +332,7 @@ Ip4ConfigDriverBindingStart (
     NewVariable = Ip4ConfigModifyVariable (Variable, &Instance->NicAddr, NULL);
 
   } else if (NicConfig->Source == IP4_CONFIG_SOURCE_DHCP) {
-    NetZeroMem (&NicConfig->Ip4Info, sizeof (EFI_IP4_IPCONFIG_DATA));
+    ZeroMem (&NicConfig->Ip4Info, sizeof (EFI_IP4_IPCONFIG_DATA));
     NewVariable = Ip4ConfigModifyVariable (Variable, &Instance->NicAddr, NicConfig);
 
   }
@@ -340,21 +340,21 @@ Ip4ConfigDriverBindingStart (
   Ip4ConfigWriteVariable (NewVariable);
 
   if (NewVariable != NULL) {
-    NetFreePool (NewVariable);
+    gBS->FreePool (NewVariable);
   }
 
 ON_EXIT:
-  NetFreePool (Variable);
+  gBS->FreePool (Variable);
 
   if (NicConfig != NULL) {
-    NetFreePool (NicConfig);
+    gBS->FreePool (NicConfig);
   }
 
   return EFI_SUCCESS;
 
 ON_ERROR:
   if (Instance != NULL) {
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
   }
 
   if (Mnp != NULL) {
@@ -511,7 +511,7 @@ Ip4ConfigDriverBindingStop (
 
   Ip4ConfigCleanConfig (Instance);
   mIp4ConfigNicList[Instance->NicIndex] = NULL;
-  NetFreePool (Instance);
+  gBS->FreePool (Instance);
 
   return EFI_SUCCESS;
 }

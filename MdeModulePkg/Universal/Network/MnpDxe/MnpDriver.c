@@ -19,7 +19,6 @@ Abstract:
 **/
 
 #include "MnpDriver.h"
-#include "MnpDebug.h"
 #include "MnpImpl.h"
 
 
@@ -116,10 +115,9 @@ MnpDriverBindingStart (
 
   MnpInitialized  = FALSE;
 
-  MnpServiceData  = NetAllocateZeroPool (sizeof (MNP_SERVICE_DATA));
+  MnpServiceData  = AllocateZeroPool (sizeof (MNP_SERVICE_DATA));
   if (MnpServiceData == NULL) {
-    MNP_DEBUG_ERROR (("MnpDriverBindingStart(): Failed to allocate the "
-      L"Mnp Service Data.\n"));
+    DEBUG ((EFI_D_ERROR, "MnpDriverBindingStart(): Failed to allocate the Mnp Service Data.\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
@@ -130,8 +128,7 @@ MnpDriverBindingStart (
   Status = MnpInitializeServiceData (MnpServiceData, This->DriverBindingHandle, ControllerHandle);
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (("MnpDriverBindingStart: MnpInitializeServiceData "
-      L"failed, %r.\n",Status));
+    DEBUG ((EFI_D_ERROR, "MnpDriverBindingStart: MnpInitializeServiceData failed, %r.\n",Status));
     goto ErrorExit;
   }
 
@@ -168,7 +165,7 @@ ErrorExit:
           ControllerHandle
           );
 
-    NetFreePool (MnpServiceData);
+    gBS->FreePool (MnpServiceData);
   }
 
   return Status;
@@ -215,8 +212,9 @@ MnpDriverBindingStop (
                   );
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (
-      ("MnpDriverBindingStop: Locate MNP Service Binding Protocol failed, %r.\n",
+    DEBUG (
+      (EFI_D_ERROR,
+      "MnpDriverBindingStop: Locate MNP Service Binding Protocol failed, %r.\n",
       Status)
       );
     return EFI_DEVICE_ERROR;
@@ -250,9 +248,9 @@ MnpDriverBindingStop (
     //
     MnpFlushServiceData (MnpServiceData);
 
-    NetFreePool (MnpServiceData);
+    gBS->FreePool (MnpServiceData);
   } else {
-    while (!NetListIsEmpty (&MnpServiceData->ChildrenList)) {
+    while (!IsListEmpty (&MnpServiceData->ChildrenList)) {
       //
       // Don't use NetListRemoveHead here, the remove opreration will be done
       // in ServiceBindingDestroyChild.
@@ -310,10 +308,10 @@ MnpServiceBindingCreateChild (
   //
   // Allocate buffer for the new instance.
   //
-  Instance = NetAllocateZeroPool (sizeof (MNP_INSTANCE_DATA));
+  Instance = AllocateZeroPool (sizeof (MNP_INSTANCE_DATA));
   if (Instance == NULL) {
 
-    MNP_DEBUG_ERROR (("MnpServiceBindingCreateChild: Faild to allocate memory for the new instance.\n"));
+    DEBUG ((EFI_D_ERROR, "MnpServiceBindingCreateChild: Faild to allocate memory for the new instance.\n"));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -330,8 +328,9 @@ MnpServiceBindingCreateChild (
                   );
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (
-      ("MnpServiceBindingCreateChild: Failed to install the MNP protocol, %r.\n",
+    DEBUG (
+      (EFI_D_ERROR,
+      "MnpServiceBindingCreateChild: Failed to install the MNP protocol, %r.\n",
       Status)
       );
     goto ErrorExit;
@@ -357,12 +356,12 @@ MnpServiceBindingCreateChild (
   //
   // Add the child instance into ChildrenList.
   //
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  NetListInsertTail (&MnpServiceData->ChildrenList, &Instance->InstEntry);
+  InsertTailList (&MnpServiceData->ChildrenList, &Instance->InstEntry);
   MnpServiceData->ChildrenNumber++;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
 ErrorExit:
 
@@ -377,7 +376,7 @@ ErrorExit:
             );
     }
 
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
   }
 
   return Status;
@@ -472,8 +471,9 @@ MnpServiceBindingDestroyChild (
                   );
   if (EFI_ERROR (Status)) {
 
-    MNP_DEBUG_ERROR (
-      ("MnpServiceBindingDestroyChild: Failed to uninstall the ManagedNetwork protocol, %r.\n",
+    DEBUG (
+      (EFI_D_ERROR,
+      "MnpServiceBindingDestroyChild: Failed to uninstall the ManagedNetwork protocol, %r.\n",
       Status)
       );
 
@@ -481,7 +481,7 @@ MnpServiceBindingDestroyChild (
     return Status;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Reset the configuration.
@@ -501,12 +501,12 @@ MnpServiceBindingDestroyChild (
   //
   // Remove this instance from the ChildrenList.
   //
-  NetListRemoveEntry (&Instance->InstEntry);
+  RemoveEntryList (&Instance->InstEntry);
   MnpServiceData->ChildrenNumber--;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
-  NetFreePool (Instance);
+  gBS->FreePool (Instance);
 
   return Status;
 }

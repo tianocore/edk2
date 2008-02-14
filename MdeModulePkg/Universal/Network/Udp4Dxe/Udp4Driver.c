@@ -116,14 +116,14 @@ Udp4DriverBindingStart (
   //
   // Allocate Private Context Data Structure.
   //
-  Udp4Service = NetAllocatePool (sizeof (UDP4_SERVICE_DATA));
+  Udp4Service = AllocatePool (sizeof (UDP4_SERVICE_DATA));
   if (Udp4Service == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   Status = Udp4CreateService (Udp4Service, This->DriverBindingHandle, ControllerHandle);
   if (EFI_ERROR (Status)) {
-    NetFreePool (Udp4Service);
+    gBS->FreePool (Udp4Service);
     return Status;
   }
 
@@ -138,7 +138,7 @@ Udp4DriverBindingStart (
                   );
   if (EFI_ERROR (Status)) {
     Udp4CleanService (Udp4Service);
-    NetFreePool (Udp4Service);
+    gBS->FreePool (Udp4Service);
   } else {
     Udp4SetVariableData (Udp4Service);
   }
@@ -213,10 +213,10 @@ Udp4DriverBindingStop (
 
     Udp4CleanService (Udp4Service);
 
-    NetFreePool (Udp4Service);
+    gBS->FreePool (Udp4Service);
   } else {
 
-    while (!NetListIsEmpty (&Udp4Service->ChildrenList)) {
+    while (!IsListEmpty (&Udp4Service->ChildrenList)) {
       Instance = NET_LIST_HEAD (&Udp4Service->ChildrenList, UDP4_INSTANCE_DATA, Link);
 
       ServiceBinding->DestroyChild (ServiceBinding, Instance->ChildHandle);
@@ -264,7 +264,7 @@ Udp4ServiceBindingCreateChild (
   //
   // Allocate the instance private data structure.
   //
-  Instance = NetAllocateZeroPool (sizeof (UDP4_INSTANCE_DATA));
+  Instance = AllocateZeroPool (sizeof (UDP4_INSTANCE_DATA));
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -310,15 +310,15 @@ Udp4ServiceBindingCreateChild (
     goto ON_ERROR;
   }
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Link this instance into the service context data and increase the ChildrenNumber.
   //
-  NetListInsertTail (&Udp4Service->ChildrenList, &Instance->Link);
+  InsertTailList (&Udp4Service->ChildrenList, &Instance->Link);
   Udp4Service->ChildrenNumber++;
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 
@@ -339,7 +339,7 @@ ON_ERROR:
 
   Udp4CleanInstance (Instance);
 
-  NetFreePool (Instance);
+  gBS->FreePool (Instance);
 
   return Status;
 }
@@ -440,12 +440,12 @@ Udp4ServiceBindingDestroyChild (
   //
   IpIoRemoveIp (Udp4Service->IpIo, Instance->IpInfo);
 
-  OldTpl = NET_RAISE_TPL (NET_TPL_LOCK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Remove this instance from the service context data's ChildrenList.
   //
-  NetListRemoveEntry (&Instance->Link);
+  RemoveEntryList (&Instance->Link);
   Udp4Service->ChildrenNumber--;
 
   //
@@ -453,9 +453,9 @@ Udp4ServiceBindingDestroyChild (
   //
   Udp4CleanInstance (Instance);
 
-  NET_RESTORE_TPL (OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
-  NetFreePool (Instance);
+  gBS->FreePool (Instance);
 
   return EFI_SUCCESS;
 }

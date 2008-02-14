@@ -29,7 +29,7 @@ Abstract:
 // the holes are filled in, then the download or upload has completed.
 //
 typedef struct {
-  NET_LIST_ENTRY            Link;
+  LIST_ENTRY                Link;
   INTN                      Start;
   INTN                      End;
 } MTFTP4_BLOCK_RANGE;
@@ -37,25 +37,25 @@ typedef struct {
 
 EFI_STATUS
 Mtftp4InitBlockRange (
-  IN NET_LIST_ENTRY         *Head,
+  IN LIST_ENTRY             *Head,
   IN UINT16                 Start,
   IN UINT16                 End
   );
 
 INTN
 Mtftp4GetNextBlockNum (
-  IN NET_LIST_ENTRY         *Head
+  IN LIST_ENTRY             *Head
   );
 
 VOID
 Mtftp4SetLastBlockNum (
-  IN NET_LIST_ENTRY         *Head,
+  IN LIST_ENTRY             *Head,
   IN UINT16                 Last
   );
 
 EFI_STATUS
 Mtftp4RemoveBlockNum (
-  IN NET_LIST_ENTRY         *Head,
+  IN LIST_ENTRY             *Head,
   IN UINT16                 Num
   );
 

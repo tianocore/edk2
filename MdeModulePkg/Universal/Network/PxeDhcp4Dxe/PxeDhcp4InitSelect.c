@@ -330,13 +330,6 @@ PxeDhcp4Init (
     return EFI_NOT_READY;
   }
 
-#if 0
-  if (!is_good_discover (&This->Data->Discover)) {
-    //
-    // %%TBD - check discover packet fields
-    //
-  }
-#endif
   //
   // Get pointer to our instance data.
   //
@@ -475,13 +468,6 @@ PxeDhcp4Select (
     return EFI_DEVICE_ERROR;
   }
 
-#if 0
-  if (!is_good_discover (&This->Data->Discover)) {
-    //
-    // %%TBD - check discover packet fields
-    //
-  }
-#endif
   //
   // Setup useful variables...
   //
