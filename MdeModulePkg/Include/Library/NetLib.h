@@ -200,24 +200,6 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 #define NET_IS_LOWER_CASE_CHAR(Ch)  (('a' <= (Ch)) && ((Ch) <= 'z'))
 #define NET_IS_UPPER_CASE_CHAR(Ch)  (('A' <= (Ch)) && ((Ch) <= 'Z'))
 
-//
-// Lock primitives: the stack implements its lock primitives according
-// to the standard EFI enviornment. It will NOT consider multiprocessor.
-//
-//#define NET_TPL_LOCK            TPL_CALLBACK
-//#define NET_TPL_EVENT           TPL_NOTIFY
-//#define NET_TPL_RECYCLE         TPL_NOTIFY
-//#define NET_TPL_TIMER           NET_TPL_LOCK
-
-//#define NET_LOCK                 EFI_LOCK
-//#define NET_LOCK_INIT(x)         EfiInitializeLock (x, NET_TPL_LOCK)
-//#define NET_RECYCLE_LOCK_INIT(x) EfiInitializeLock (x, NET_TPL_RECYCLE)
-//#define NET_TRYLOCK(x)           EfiAcquireLockOrFail (x)
-//#define NET_UNLOCK(x)            EfiReleaseLock (x)
-
-//#define NET_RAISE_TPL(x)        (gBS->RaiseTPL (x))
-//#define NET_RESTORE_TPL(x)      (gBS->RestoreTPL (x))
-
 #define TICKS_PER_MS            10000U
 #define TICKS_PER_SECOND        10000000U
 
@@ -240,17 +222,6 @@ NetRandomInitSeed (
   VOID
   );
 
-
-//
-// Double linked list entry functions, this extends the
-// EFI list functions.
-//
-//typedef LIST_ENTRY      LIST_ENTRY;
-
-//#define NetListInit(Head)              InitializeListHead(Head)
-//#define NetListInsertHead(Head, Entry) InsertHeadList((Head), (Entry))
-//#define NetListInsertTail(Head, Entry) InsertTailList((Head), (Entry))
-//#define NetListIsEmpty(List)           IsListEmpty(List)
 
 #define NET_LIST_USER_STRUCT(Entry, Type, Field)        \
           _CR(Entry, Type, Field)
@@ -285,14 +256,13 @@ NetRandomInitSeed (
 #define NET_LIST_TAIL(ListHead, Type, Field)  \
           NET_LIST_USER_STRUCT((ListHead)->BackLink, Type, Field)
 
-//#define NetListRemoveEntry(Entry) RemoveEntryList (Entry)
 
-LIST_ENTRY*
+LIST_ENTRY *
 NetListRemoveHead (
   LIST_ENTRY            *Head
   );
 
-LIST_ENTRY*
+LIST_ENTRY *
 NetListRemoveTail (
   LIST_ENTRY            *Head
   );
