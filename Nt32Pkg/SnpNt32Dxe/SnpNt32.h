@@ -145,14 +145,14 @@ typedef struct _SNPNT32_GLOBAL_DATA {
   //
   //  List for all the fake SNP instance
   //
-  NET_LIST_ENTRY                    InstanceList;
+  LIST_ENTRY                        InstanceList;
 
   EFI_WIN_NT_THUNK_PROTOCOL         *WinNtThunk;
   HMODULE                           NetworkLibraryHandle;
 
   NT_NET_UTILITY_TABLE              NtNetUtilityTable;
 
-  NET_LOCK                          Lock;
+  EFI_LOCK                          Lock;
 
   //
   //  Private functions
@@ -173,7 +173,7 @@ typedef struct _SNPNT32_INSTANCE_DATA {
   //
   //  List entry use for linking with other instance
   //
-  NET_LIST_ENTRY              Entry;
+  LIST_ENTRY                  Entry;
 
   SNPNT32_GLOBAL_DATA         *GlobalData;
 
