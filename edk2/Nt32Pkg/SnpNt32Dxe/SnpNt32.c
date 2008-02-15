@@ -75,7 +75,7 @@ SnpNt32DriverBindingSupported (
 {
 
   SNPNT32_GLOBAL_DATA   *GlobalData;
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   SNPNT32_INSTANCE_DATA *Instance;
 
   GlobalData = &gSnpNt32GlobalData;
@@ -268,7 +268,7 @@ SnpNt32ReceiveFilters (
 
   GlobalData  = Instance->GlobalData;
 
-  if (EFI_ERROR (NET_TRYLOCK (&GlobalData->Lock))) {
+  if (EFI_ERROR (EfiAcquireLockOrFail (&GlobalData->Lock))) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -279,7 +279,7 @@ SnpNt32ReceiveFilters (
                                                 McastFilter
                                                 );
 
-  NET_UNLOCK (&GlobalData->Lock);
+  EfiReleaseLock (&GlobalData->Lock);
 
   if (ReturnValue <= 0) {
     return EFI_DEVICE_ERROR;
@@ -459,7 +459,7 @@ SnpNt32Transmit (
     SrcAddr = &Instance->Mode.CurrentAddress;
   }
 
-  if (EFI_ERROR (NET_TRYLOCK (&GlobalData->Lock))) {
+  if (EFI_ERROR (EfiAcquireLockOrFail (&GlobalData->Lock))) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -473,7 +473,7 @@ SnpNt32Transmit (
                                                 Protocol
                                                 );
 
-  NET_UNLOCK (&GlobalData->Lock);
+  EfiReleaseLock (&GlobalData->Lock);
 
   if (ReturnValue < 0) {
     return EFI_DEVICE_ERROR;
@@ -526,7 +526,7 @@ SnpNt32Receive (
 
   ASSERT (GlobalData->NtNetUtilityTable.Receive != NULL);
 
-  if (EFI_ERROR (NET_TRYLOCK (&GlobalData->Lock))) {
+  if (EFI_ERROR (EfiAcquireLockOrFail (&GlobalData->Lock))) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -536,7 +536,7 @@ SnpNt32Receive (
                                                 Buffer
                                                 );
 
-  NET_UNLOCK (&GlobalData->Lock);
+  EfiReleaseLock (&GlobalData->Lock);
 
   if (ReturnValue < 0) {
     if (ReturnValue == -100) {
@@ -553,13 +553,13 @@ SnpNt32Receive (
   }
 
   if (SourceAddr != NULL) {
-    NetZeroMem (SourceAddr, sizeof (EFI_MAC_ADDRESS));
-    NetCopyMem (SourceAddr, ((UINT8 *) Buffer) + 6, 6);
+    ZeroMem (SourceAddr, sizeof (EFI_MAC_ADDRESS));
+    CopyMem (SourceAddr, ((UINT8 *) Buffer) + 6, 6);
   }
 
   if (DestinationAddr != NULL) {
-    NetZeroMem (DestinationAddr, sizeof (EFI_MAC_ADDRESS));
-    NetCopyMem (DestinationAddr, ((UINT8 *) Buffer), 6);
+    ZeroMem (DestinationAddr, sizeof (EFI_MAC_ADDRESS));
+    CopyMem (DestinationAddr, ((UINT8 *) Buffer), 6);
   }
 
   if (Protocol != NULL) {
@@ -652,7 +652,7 @@ SnpNt32InitializeGlobalData (
   BOOLEAN               NetUtilityLibInitDone;
   NT_NET_INTERFACE_INFO NetInterfaceInfoBuffer[MAX_INTERFACE_INFO_NUMBER];
   SNPNT32_INSTANCE_DATA *Instance;
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   UINT32                InterfaceCount;
 
   ASSERT (This != NULL);
@@ -660,8 +660,8 @@ SnpNt32InitializeGlobalData (
   NetUtilityLibInitDone = FALSE;
   InterfaceCount        = MAX_INTERFACE_INFO_NUMBER;
 
-  NetListInit (&This->InstanceList);
-  NET_LOCK_INIT (&This->Lock);
+  InitializeListHead (&This->InstanceList);
+  EfiInitializeLock (&This->Lock, TPL_CALLBACK);
 
   //
   //  Get the WinNT thunk
@@ -755,7 +755,7 @@ SnpNt32InitializeGlobalData (
   //
   for (Index = 0; Index < InterfaceCount; Index++) {
 
-    Instance = NetAllocatePool (sizeof (SNPNT32_INSTANCE_DATA));
+    Instance = AllocatePool (sizeof (SNPNT32_INSTANCE_DATA));
 
     if (NULL == Instance) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -764,7 +764,7 @@ SnpNt32InitializeGlobalData (
     //
     //  Copy the content from a template
     //
-    NetCopyMem (Instance, &gSnpNt32InstanceTemplate, sizeof (SNPNT32_INSTANCE_DATA));
+    CopyMem (Instance, &gSnpNt32InstanceTemplate, sizeof (SNPNT32_INSTANCE_DATA));
 
     //
     //  Set the interface information.
@@ -776,29 +776,29 @@ SnpNt32InitializeGlobalData (
     Status = This->InitializeInstanceData (This, Instance);
     if (EFI_ERROR (Status)) {
 
-      NetFreePool (Instance);
+      gBS->FreePool (Instance);
       goto ErrorReturn;
     }
     //
     //  Insert this instance into the instance list
     //
-    NetListInsertTail (&This->InstanceList, &Instance->Entry);
+    InsertTailList (&This->InstanceList, &Instance->Entry);
   }
 
   return EFI_SUCCESS;
 
 ErrorReturn:
 
-  while (!NetListIsEmpty (&This->InstanceList)) {
+  while (!IsListEmpty (&This->InstanceList)) {
 
     Entry     = This->InstanceList.ForwardLink;
 
     Instance  = NET_LIST_USER_STRUCT_S (Entry, SNPNT32_INSTANCE_DATA, Entry, SNP_NT32_INSTANCE_SIGNATURE);
 
-    NetListRemoveEntry (Entry);
+    RemoveEntryList (Entry);
 
     This->CloseInstance (This, Instance);
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
   }
 
   if (NetUtilityLibInitDone) {
@@ -857,13 +857,13 @@ SnpNt32InitializeInstanceData (
   //
   //  Create a fake device path for the instance
   //
-  NetZeroMem (&Node, sizeof (Node));
+  ZeroMem (&Node, sizeof (Node));
 
   Node.DevPath.Type     = MESSAGING_DEVICE_PATH;
   Node.DevPath.SubType  = MSG_MAC_ADDR_DP;
   SetDevicePathNodeLength (&Node.DevPath, sizeof (MAC_ADDR_DEVICE_PATH));
 
-  NetCopyMem (
+  CopyMem (
     &Node.MacAddr.MacAddress,
     &Instance->Mode.CurrentAddress,
     sizeof (EFI_MAC_ADDRESS)
@@ -952,7 +952,7 @@ SnpNt32Unload (
 {
   EFI_STATUS            Status;
   SNPNT32_GLOBAL_DATA   *This;
-  NET_LIST_ENTRY        *Entry;
+  LIST_ENTRY            *Entry;
   SNPNT32_INSTANCE_DATA *Instance;
 
   This    = &gSnpNt32GlobalData;
@@ -963,7 +963,7 @@ SnpNt32Unload (
     return Status;
   }
 
-  while (!NetListIsEmpty (&This->InstanceList)) {
+  while (!IsListEmpty (&This->InstanceList)) {
     //
     //  Walkthrough the interfaces and remove all the SNP instance
     //
@@ -971,10 +971,10 @@ SnpNt32Unload (
 
     Instance  = NET_LIST_USER_STRUCT_S (Entry, SNPNT32_INSTANCE_DATA, Entry, SNP_NT32_INSTANCE_SIGNATURE);
 
-    NetListRemoveEntry (Entry);
+    RemoveEntryList (Entry);
 
     This->CloseInstance (This, Instance);
-    NetFreePool (Instance);
+    gBS->FreePool (Instance);
   }
 
   if (This->NtNetUtilityTable.Finalize != NULL) {
