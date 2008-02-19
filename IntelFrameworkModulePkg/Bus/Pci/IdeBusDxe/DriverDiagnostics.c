@@ -163,7 +163,7 @@ IDEBusDriverDiagnosticsRunDiagnostics (
                     EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                     );
     if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
+      return Status;
     }
 
     Status = gBS->OpenProtocol (
@@ -202,7 +202,7 @@ IDEBusDriverDiagnosticsRunDiagnostics (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
+    return Status;
   }
 
   IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (BlkIo);
