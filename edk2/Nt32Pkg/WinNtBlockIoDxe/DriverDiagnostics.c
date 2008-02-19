@@ -185,6 +185,13 @@ WinNtBlockIoDriverDiagnosticsRunDiagnostics (
   }
 
   //
+  // This is a device driver, so ChildHandle must be NULL.
+  //
+  if (ChildHandle != NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
   // Validate controller handle
   //
   Status = gBS->OpenProtocol (
@@ -207,6 +214,7 @@ WinNtBlockIoDriverDiagnosticsRunDiagnostics (
     return EFI_UNSUPPORTED;
   }
 
+  
   if (Status == EFI_UNSUPPORTED) {
     return Status;
   } else if (Status != EFI_ALREADY_STARTED) {
