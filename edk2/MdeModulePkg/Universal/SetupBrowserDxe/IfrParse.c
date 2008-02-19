@@ -353,7 +353,7 @@ InitializeRequestElement (
     //
     // Old String buffer is not sufficient for RequestElement, allocate a new one
     //
-    StringSize = (Storage->ConfigRequest != NULL) ? StrSize (Storage->ConfigRequest) : 0;
+    StringSize = (Storage->ConfigRequest != NULL) ? StrSize (Storage->ConfigRequest) : sizeof (CHAR16);
     NewStr = AllocateZeroPool (StringSize + CONFIG_REQUEST_STRING_INCREMENTAL * sizeof (CHAR16));
     if (Storage->ConfigRequest != NULL) {
       CopyMem (NewStr, Storage->ConfigRequest, StringSize);
