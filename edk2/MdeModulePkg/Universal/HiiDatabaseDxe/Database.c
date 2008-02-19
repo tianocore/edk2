@@ -2321,6 +2321,11 @@ AddPackages (
   UINT32                               OldPackageListLen;
 
   //
+  // Initialize Variables
+  //
+  FontPackage = NULL;
+
+  //
   // Process the package list header
   //
   OldPackageListLen = DatabaseRecord->PackageList->PackageListHdr.PackageLength;
