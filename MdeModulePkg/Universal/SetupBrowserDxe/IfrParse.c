@@ -341,7 +341,7 @@ InitializeRequestElement (
   if ((Question->Operand == EFI_IFR_PASSWORD_OP) && (Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK)) {
     //
     // Password with CALLBACK flag is stored in encoded format,
-    // so don't need to append it to <ConfigRequest>\
+    // so don't need to append it to <ConfigRequest>
     //
     return EFI_SUCCESS;
   }
