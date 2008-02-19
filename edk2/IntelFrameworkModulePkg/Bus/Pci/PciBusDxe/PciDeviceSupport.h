@@ -244,8 +244,7 @@ Returns:
 
 EFI_STATUS
 StartPciDevices (
-  IN EFI_HANDLE                         Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL           *RemainingDevicePath
+  IN EFI_HANDLE                         Controller
   )
 /*++
 
@@ -256,7 +255,6 @@ Routine Description:
 Arguments:
 
   Controller          - TODO: add argument description
-  RemainingDevicePath - TODO: add argument description
 
 Returns:
 
