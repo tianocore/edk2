@@ -245,13 +245,11 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
+  
   //
-  // Enable PCI device specified by remaining device path. BDS or other driver can call the
-  // start more than once.
+  // Start all the devices under the entire host bridge.
   //
-
-  StartPciDevices (Controller, RemainingDevicePath);
+  StartPciDevices (Controller);
 
   return EFI_SUCCESS;
 }

@@ -335,44 +335,48 @@ Returns:
   PciIoWrite (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
 
   //
-  // Process Platform OpRom
+  // Process OpRom
   //
-  if (gPciPlatformProtocol != NULL && !PciIoDevice->AllOpRomProcessed) {
+  if (!PciIoDevice->AllOpRomProcessed) {
     PciIoDevice->AllOpRomProcessed = TRUE;
 
-    Status = gPciPlatformProtocol->GetPciRom (
-                                     gPciPlatformProtocol,
-                                     PciIoDevice->Handle,
-                                     &PlatformOpRomBuffer,
-                                     &PlatformOpRomSize
-                                     );
+    //
+    // Get the OpRom provided by platform
+    //
+    if (gPciPlatformProtocol != NULL) {
+      Status = gPciPlatformProtocol->GetPciRom (
+                                       gPciPlatformProtocol,
+                                       PciIoDevice->Handle,
+                                       &PlatformOpRomBuffer,
+                                       &PlatformOpRomSize
+                                       );
+      if (!EFI_ERROR (Status)) {
+        PciIoDevice->RomSize        = PlatformOpRomSize;
+        PciIoDevice->PciIo.RomSize  = PlatformOpRomSize;
+        PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;
+        //
+        // For OpROM read from gPciPlatformProtocol:
+        //   Add the Rom Image to internal database for later PCI light enumeration
+        //
+        PciRomAddImageMapping (
+          NULL,
+          PciIoDevice->PciRootBridgeIo->SegmentNumber,
+          PciIoDevice->BusNumber,
+          PciIoDevice->DeviceNumber,
+          PciIoDevice->FunctionNumber,
+          (UINT64) (UINTN) PciIoDevice->PciIo.RomImage,
+          PciIoDevice->PciIo.RomSize
+          );
+        
+      }
+    }
 
-    if (!EFI_ERROR (Status)) {
-
-      //
-      // Have Platform OpRom
-      //
-      PciIoDevice->RomSize        = PlatformOpRomSize;
-      PciIoDevice->PciIo.RomSize  = PlatformOpRomSize;
-      PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;
-
-      //
-      // For OpROM read from gPciPlatformProtocol:
-      //     Add the Rom Image to internal database for later PCI light enumeration
-      //
-      PciRomAddImageMapping (
-        NULL,
-        PciIoDevice->PciRootBridgeIo->SegmentNumber,
-        PciIoDevice->BusNumber,
-        PciIoDevice->DeviceNumber,
-        PciIoDevice->FunctionNumber,
-        (UINT64) (UINTN) PciIoDevice->PciIo.RomImage,
-        PciIoDevice->PciIo.RomSize
-        );
-
-      //
-      // Process Image
-      //
+    //
+    // Dispatch the EFI OpRom for the PCI device.
+    // The OpRom is got from platform in the above code
+    //   or loaded from device in previous bus enumeration
+    //
+    if (PciIoDevice->RomSize > 0) {
       ProcessOpRomImage (PciIoDevice);
     }
   }
@@ -659,7 +663,6 @@ Returns:
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 {
-  PCI_IO_DEVICE             *Temp;
   PCI_IO_DEVICE             *PciIoDevice;
   EFI_DEV_PATH_PTR          Node;
   EFI_DEVICE_PATH_PROTOCOL  *CurrentDevicePath;
@@ -671,13 +674,13 @@ Returns:
 
   while (CurrentLink && CurrentLink != &RootBridge->ChildList) {
 
-    Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    PciIoDevice = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (RemainingDevicePath != NULL) {
 
       Node.DevPath = RemainingDevicePath;
 
-      if (Node.Pci->Device != Temp->DeviceNumber ||
-          Node.Pci->Function != Temp->FunctionNumber) {
+      if (Node.Pci->Device != PciIoDevice->DeviceNumber || 
+          Node.Pci->Function != PciIoDevice->FunctionNumber) {
         CurrentLink = CurrentLink->ForwardLink;
         continue;
       }
@@ -685,30 +688,28 @@ Returns:
       //
       // Check if the device has been assigned with required resource
       //
-      if (!Temp->Allocated) {
+      if (!PciIoDevice->Allocated) {
         return EFI_NOT_READY;
       }
-
+      
       //
       // Check if the current node has been registered before
       // If it is not, register it
       //
-      if (!Temp->Registered) {
-        PciIoDevice = Temp;
-
+      if (!PciIoDevice->Registered) {
         Status = RegisterPciDevice (
-                  Controller,
-                  PciIoDevice,
-                  NULL
-                  );
+                   Controller,
+                   PciIoDevice,
+                   NULL
+                   );
 
       }
 
-      if (NumberOfChildren != NULL && ChildHandleBuffer != NULL && Temp->Registered) {
-        ChildHandleBuffer[*NumberOfChildren] = Temp->Handle;
+      if (NumberOfChildren != NULL && ChildHandleBuffer != NULL && PciIoDevice->Registered) {
+        ChildHandleBuffer[*NumberOfChildren] = PciIoDevice->Handle;
         (*NumberOfChildren)++;
       }
-
+      
       //
       // Get the next device path
       //
@@ -720,28 +721,28 @@ Returns:
       //
       // If it is a PPB
       //
-      if (!IsListEmpty (&Temp->ChildList)) {
+      if (!IsListEmpty (&PciIoDevice->ChildList)) {
         Status = StartPciDevicesOnBridge (
-                  Controller,
-                  Temp,
-                  CurrentDevicePath,
-                  NumberOfChildren,
-                  ChildHandleBuffer
-                  );
+                   Controller,
+                   PciIoDevice,
+                   CurrentDevicePath,
+                   NumberOfChildren,
+                   ChildHandleBuffer
+                   );
 
-        Temp->PciIo.Attributes (
-                      &(Temp->PciIo),
-                      EfiPciIoAttributeOperationSupported,
-                      0,
-                      &Supports
-                      );
+        PciIoDevice->PciIo.Attributes (
+                             &(PciIoDevice->PciIo),
+                             EfiPciIoAttributeOperationSupported,
+                             0,
+                             &Supports
+                             );
         Supports &= EFI_PCI_DEVICE_ENABLE;
-        Temp->PciIo.Attributes (
-                      &(Temp->PciIo),
-                      EfiPciIoAttributeOperationEnable,
-                      Supports,
-                      NULL
-                      );
+        PciIoDevice->PciIo.Attributes (
+                             &(PciIoDevice->PciIo),
+                             EfiPciIoAttributeOperationEnable,
+                             Supports,
+                             NULL
+                             );
 
         return Status;
       } else {
@@ -759,50 +760,46 @@ Returns:
       // try to enable all the pci devices under this bridge
       //
 
-      if (!Temp->Registered && Temp->Allocated) {
-
-        PciIoDevice = Temp;
-
+      if (!PciIoDevice->Registered && PciIoDevice->Allocated) {
         Status = RegisterPciDevice (
-                  Controller,
-                  PciIoDevice,
-                  NULL
-                  );
+                   Controller,
+                   PciIoDevice,
+                   NULL
+                   );
 
       }
 
-      if (NumberOfChildren != NULL && ChildHandleBuffer != NULL && Temp->Registered) {
-        ChildHandleBuffer[*NumberOfChildren] = Temp->Handle;
+      if (NumberOfChildren != NULL && ChildHandleBuffer != NULL && PciIoDevice->Registered) {
+        ChildHandleBuffer[*NumberOfChildren] = PciIoDevice->Handle;
         (*NumberOfChildren)++;
       }
 
-      if (!IsListEmpty (&Temp->ChildList)) {
+      if (!IsListEmpty (&PciIoDevice->ChildList)) {
         Status = StartPciDevicesOnBridge (
-                  Controller,
-                  Temp,
-                  RemainingDevicePath,
-                  NumberOfChildren,
-                  ChildHandleBuffer
-                  );
+                   Controller,
+                   PciIoDevice,
+                   RemainingDevicePath,
+                   NumberOfChildren,
+                   ChildHandleBuffer
+                   );
 
-        Temp->PciIo.Attributes (
-                      &(Temp->PciIo),
-                      EfiPciIoAttributeOperationSupported,
-                      0,
-                      &Supports
-                      );
+        PciIoDevice->PciIo.Attributes (
+                             &(PciIoDevice->PciIo),
+                             EfiPciIoAttributeOperationSupported,
+                             0,
+                             &Supports
+                             );
         Supports &= EFI_PCI_DEVICE_ENABLE;
-        Temp->PciIo.Attributes (
-                      &(Temp->PciIo),
-                      EfiPciIoAttributeOperationEnable,
-                      Supports,
-                      NULL
-                      );
+        PciIoDevice->PciIo.Attributes (
+                             &(PciIoDevice->PciIo),
+                             EfiPciIoAttributeOperationEnable,
+                             Supports,
+                             NULL
+                             );
 
       }
 
       CurrentLink = CurrentLink->ForwardLink;
-      continue;
     }
   }
 
@@ -811,46 +808,31 @@ Returns:
 
 EFI_STATUS
 StartPciDevices (
-  IN EFI_HANDLE                         Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL           *RemainingDevicePath
+  IN EFI_HANDLE                         Controller
   )
 /*++
 
 Routine Description:
 
-  Start to manage the PCI device according to RemainingDevicePath
-  If RemainingDevicePath == NULL, the PCI bus driver will start
-  to manage all the PCI devices it found previously
+  Start to manage all the PCI devices it found previously under 
+  the entire host bridge.
 
 Arguments:
-  Controller          - An efi handle.
-  RemainingDevicePath - A pointer to the EFI_DEVICE_PATH_PROTOCOL.
+  Controller          - root bridge handle.
 
 Returns:
 
   None
 
 --*/
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
-  EFI_DEV_PATH_PTR  Node;
   PCI_IO_DEVICE     *RootBridge;
+  EFI_HANDLE        ThisHostBridge;
   LIST_ENTRY        *CurrentLink;
 
-  if (RemainingDevicePath != NULL) {
-
-    //
-    // Check if the RemainingDevicePath is valid
-    //
-    Node.DevPath = RemainingDevicePath;
-    if ((Node.DevPath->Type != HARDWARE_DEVICE_PATH) ||
-        ((Node.DevPath->SubType != HW_PCI_DP)         &&
-         (DevicePathNodeLength (Node.DevPath) != sizeof (PCI_DEVICE_PATH)))
-        ) {
-      return EFI_UNSUPPORTED;
-    }
-  }
+  RootBridge = GetRootBridgeByHandle (Controller);
+  ASSERT (RootBridge != NULL);
+  ThisHostBridge = RootBridge->PciRootBridgeIo->ParentHandle;
 
   CurrentLink = gPciDevicePool.ForwardLink;
 
@@ -860,11 +842,11 @@ Returns:
     //
     // Locate the right root bridge to start
     //
-    if (RootBridge->Handle == Controller) {
+    if (RootBridge->PciRootBridgeIo->ParentHandle == ThisHostBridge) {
       StartPciDevicesOnBridge (
-        Controller,
+        RootBridge->Handle,
         RootBridge,
-        RemainingDevicePath,
+        NULL,
         NULL,
         NULL
         );
@@ -1005,40 +987,6 @@ Returns:
   }
 
   return NULL;
-}
-
-BOOLEAN
-RootBridgeExisted (
-  IN EFI_HANDLE RootBridgeHandle
-  )
-/*++
-
-Routine Description:
-
-  This function searches if RootBridgeHandle has already existed
-  in current device pool.
-
-  If so, it means the given root bridge has been already enumerated.
-
-Arguments:
-
-  RootBridgeHandle   - An efi handle.
-
-Returns:
-
-  None
-
---*/
-{
-  PCI_IO_DEVICE *Bridge;
-
-  Bridge = GetRootBridgeByHandle (RootBridgeHandle);
-
-  if (Bridge != NULL) {
-    return TRUE;
-  }
-
-  return FALSE;
 }
 
 BOOLEAN

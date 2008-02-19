@@ -53,13 +53,6 @@ Returns:
   }
 
   //
-  // If this host bridge has been already enumerated, then return successfully
-  //
-  if (RootBridgeExisted (Controller)) {
-    return EFI_SUCCESS;
-  }
-
-  //
   // Get the rootbridge Io protocol to find the host bridge handle
   //
   Status = gBS->OpenProtocol (
@@ -277,7 +270,6 @@ Returns:
 {
   LIST_ENTRY      *CurrentLink;
   PCI_IO_DEVICE   *Temp;
-  EFI_STATUS      Status;
 
   //
   // Go through bridges to reach all devices
@@ -290,7 +282,7 @@ Returns:
       //
       // Go further to process the option rom under this bridge
       //
-      Status = ProcessOptionRom (Temp, RomBase, MaxLength);
+      ProcessOptionRom (Temp, RomBase, MaxLength);
     }
 
     if (Temp->RomSize != 0 && Temp->RomSize <= MaxLength) {
@@ -298,10 +290,7 @@ Returns:
       //
       // Load and process the option rom
       //
-      Status = LoadOpRomImage (Temp, RomBase);
-      if (Status == EFI_SUCCESS) {
-        Status = ProcessOpRomImage (Temp);
-      }
+      LoadOpRomImage (Temp, RomBase);
     }
 
     CurrentLink = CurrentLink->ForwardLink;
