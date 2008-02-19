@@ -70,3 +70,9 @@ MULTIPLE_THREAD       = Enable
 #                                                 set this value to one more than the number of your compurter
 #                                                 cores or CPUs.
 MAX_CONCURRENT_THREAD_NUMBER = 1
+
+# Build rules definition
+#
+#
+BUILD_RULE_CONF = Conf/build_rule.txt
+
