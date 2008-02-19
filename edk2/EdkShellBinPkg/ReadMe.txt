@@ -1,12 +1,12 @@
 The binaries of EdkShellBinPkg are generated with EDK-Shell 1.04 release and build with Edk Compatibility & BaseTools Package
 (r4631)
 
-The following steps are can help to re-generate these binaries for customization:
+The following steps can help to re-generate these binaries for customization:
 1. Check out EdkCompatibilityPkg (r4631) to a directory EdkCompatibilityPkg in workspace (svn https://edk2.tianocore.org/svn/edk2/trunk/edk2/EdkCompatibilityPkg). 
 2. Update to the newest BaseTools package.
 2. Download EfiShell 1.04.zip from EDK Shell official release https://efi-shell.tianocore.org/servlets/ProjectDocumentList?folderID=52&expandFolder=52&folderID=45
-3. Unzip it to the directory in EdkCompatibilityPkg , e.g. c:\EdkII\EdkCompatibilityPkg\Shell
-4. Workaround an issue in EdkCompatibilityPkg\Shell\ver\Ver.inf to spit:
+3. Unzip it to be a sub-directory in EdkCompatibilityPkg , i.e. c:\EdkII\EdkCompatibilityPkg\Shell
+4. Work around an issue in EdkCompatibilityPkg\Shell\ver\Ver.inf to split:
   [sources.ia32|x64]
     ia32\ver32.c
 
@@ -17,17 +17,17 @@ The following steps are can help to re-generate these binaries for customization
   [sources.x64]
     ia32\ver32.c
 
-   since current build tools (r4630) does not support this syntax in EDK inf.
+   since current build tools (r4631) do not support this syntax in EDK INF format.
 
-5. Under workspace directory, exectute:
+5. Under workspace directory (i.e. c:\EdkII), execute:
    build -a IA32 -a X64 -a IPF -p EdkShellBinPkg\GenBin\EdkShellPkg.dsc -t WINDDK3790x1830
    The use of WINDDK instead of MYTOOLS is due to the fact that EDK shell source 1.04 is not
    VS2005 clean.
 
 6. Copy the binaries from Build directory to this package. Typically the EFI binary
-   of EdkCompatibility\Shell\$(INF_BASENAME).inf is generaged at:
+   of EdkCompatibility\Shell\$(INF_BASENAME).inf is generated at:
    Build\EdkShellPkg\DEBUG_WINDDK3790x1830\$(ARCH)\EdkCompatibility\Shell\$(INF_BASENAME)\OUTPUT\$(BASENAME).efi
-   for example:
+   For example:
    The x64 EFI image of EdkCompatibility\Shell\ver\ver.inf is generated at:
    Build\EdkShellPkg\DEBUG_WINDDK3790x1830\X64\EdkCompatibilityPkg\Shell\ver\Ver\OUTPUT\ver.efi
 
