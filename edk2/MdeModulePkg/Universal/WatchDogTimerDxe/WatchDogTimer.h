@@ -33,7 +33,7 @@ Revision History
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/PcdLib.h>
-#include <Protocol/WatchDogTimer.h>
+#include <Protocol/WatchdogTimer.h>
 
 
 //
