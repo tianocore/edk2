@@ -314,7 +314,7 @@
   MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 
-  MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
+  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/DebugPortDxe/DebugPortDxe.inf
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf
