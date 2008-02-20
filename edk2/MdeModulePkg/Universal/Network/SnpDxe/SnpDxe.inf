@@ -33,24 +33,24 @@
 #
 
 [Sources.common]
-  receive.c
-  snp.h
-  nvdata.c
-  get_status.c
-  start.c
-  snp.c
-  stop.c
-  statistics.c
-  reset.c
-  shutdown.c
-  mcast_ip_to_mac.c
-  transmit.c
+  Receive.c
+  Snp.h
+  Nvdata.c
+  Get_status.c
+  Start.c
+  Snp.c
+  Stop.c
+  Statistics.c
+  Reset.c
+  Shutdown.c
+  Mcast_ip_to_mac.c
+  Transmit.c
   WaitForPacket.c
-  receive_filters.c
-  initialize.c
+  Receive_filters.c
+  Iitialize.c
   ComponentName.c
-  callback.c
-  station_address.c
+  Callback.c
+  Station_address.c
 
 
 [Packages]
