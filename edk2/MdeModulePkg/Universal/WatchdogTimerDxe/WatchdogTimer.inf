@@ -1,5 +1,5 @@
 #/** @file
-# Component description file for WatchDogTimer module.
+# Component description file for WatchdogTimer module.
 #
 # Generic watchdog timer implemenetation using EFI APIs.
 # Copyright (c) 2006 - 2007, Intel Corporation
@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = WatchDogTimer
+  BASE_NAME                      = WatchdogTimer
   FILE_GUID                      = F099D67F-71AE-4c36-B2A3-DCEB0EB2B7D8
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -35,8 +35,8 @@
   MdePkg/MdePkg.dec
 
 [Sources.common]
-  WatchDogTimer.h
-  WatchDogTimer.c
+  WatchdogTimer.h
+  WatchdogTimer.c
 
 [LibraryClasses]
   UefiRuntimeServicesTableLib

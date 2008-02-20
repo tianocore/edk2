@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  WatchDogTimer.c
+  WatchdogTimer.c
 
 Abstract:
 
@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "WatchDogTimer.h"
+#include "WatchdogTimer.h"
 
 //
 // Handle for the Watchdog Timer Architectural Protocol instance produced by this driver
