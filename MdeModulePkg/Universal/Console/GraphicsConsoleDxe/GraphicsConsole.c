@@ -86,16 +86,11 @@ GRAPHICS_CONSOLE_DEV        mGraphicsConsoleDevTemplate = {
   (EFI_HII_HANDLE ) 0
 };
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
 EFI_HII_DATABASE_PROTOCOL   *mHiiDatabase;
 EFI_HII_FONT_PROTOCOL       *mHiiFont;
 BOOLEAN                     mFirstAccessFlag = TRUE;
 
 STATIC EFI_GUID             mFontPackageListGuid = {0xf5f219d3, 0x7006, 0x4648, 0xac, 0x8d, 0xd6, 0x1d, 0xfb, 0x7b, 0xc6, 0xad};
-
-#else
-EFI_HII_PROTOCOL            *mHii;
-#endif
 
 static CHAR16               mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
@@ -697,8 +692,6 @@ EfiLocateHiiProtocol (
   UINTN       Size;
   EFI_STATUS  Status;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
-
   //
   // There should only be one - so buffer size is this
   //
@@ -732,33 +725,6 @@ EfiLocateHiiProtocol (
                   (VOID **) &mHiiFont
                   );
   return Status;
-#else
-
-  //
-  // There should only be one - so buffer size is this
-  //
-  Size = sizeof (EFI_HANDLE);
-
-  Status = gBS->LocateHandle (
-                  ByProtocol,
-                  &gEfiHiiProtocolGuid,
-                  NULL,
-                  &Size,
-                  &Handle
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->HandleProtocol (
-                  Handle,
-                  &gEfiHiiProtocolGuid,
-                  &mHii
-                  );
-
-  return Status;
-#endif
 }
 
 //
@@ -1138,18 +1104,11 @@ GraphicsConsoleConOutTestString (
   EFI_STATUS            Status;
   UINT16                Count;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
   EFI_IMAGE_OUTPUT      *Blt = NULL;
-#else
-  UINT16                GlyphWidth;
-  UINT32                GlyphStatus = 0;
-  GLYPH_UNION           *Glyph;  
-#endif
 
   Count = 0;
 
   while (WString[Count] != 0) {
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
     Status = mHiiFont->GetGlyph (
                          mHiiFont,
                          WString[Count],
@@ -1160,16 +1119,7 @@ GraphicsConsoleConOutTestString (
     SafeFreePool (Blt);
     Blt = NULL;
     Count++;
-#else
-    Status = mHii->GetGlyph (
-                    mHii,
-                    WString,
-                    &Count,
-                    (UINT8 **) &Glyph,
-                    &GlyphWidth,
-                    &GlyphStatus
-                    );
-#endif
+
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
@@ -1716,7 +1666,6 @@ GetTextColors (
   return EFI_SUCCESS;
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
 EFI_STATUS
 DrawUnicodeWeightAtCursorN (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
@@ -1729,13 +1678,11 @@ DrawUnicodeWeightAtCursorN (
   EFI_IMAGE_OUTPUT                  *Blt;
   EFI_STRING                        String;
   EFI_FONT_DISPLAY_INFO             *FontInfo;
+  EFI_UGA_DRAW_PROTOCOL             *UgaDraw;
+  EFI_HII_ROW_INFO                  *RowInfoArray;
+  UINTN                             RowInfoArraySize;
 
   Private = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
-  //
-  // GOP protocol is required in UEFI mode.
-  //
-  ASSERT (Private->GraphicsOutput != NULL);
-
   Blt = (EFI_IMAGE_OUTPUT *) AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
   if (Blt == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1743,7 +1690,6 @@ DrawUnicodeWeightAtCursorN (
 
   Blt->Width        = (UINT16) (Private->ModeData[This->Mode->Mode].GopWidth);
   Blt->Height       = (UINT16) (Private->ModeData[This->Mode->Mode].GopHeight);
-  Blt->Image.Screen = Private->GraphicsOutput;
 
   String = AllocateCopyPool ((Count + 1) * sizeof (CHAR16), UnicodeWeight);
   if (String == NULL) {
@@ -1760,166 +1706,83 @@ DrawUnicodeWeightAtCursorN (
   }
   GetTextColors (This, &FontInfo->ForegroundColor, &FontInfo->BackgroundColor);
 
-  Status = mHiiFont->StringToImage (
-                       mHiiFont,
-                       EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_DIRECT_TO_SCREEN,
-                       String,
-                       FontInfo,
-                       &Blt,
-                       This->Mode->CursorColumn * GLYPH_WIDTH + Private->ModeData[This->Mode->Mode].DeltaX,
-                       This->Mode->CursorRow * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
-                       NULL,
-                       NULL,
-                       NULL
-                       );
+  if (Private->GraphicsOutput != NULL) {
+    Blt->Image.Screen = Private->GraphicsOutput;
+
+    Status = mHiiFont->StringToImage (
+                         mHiiFont,
+                         EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_DIRECT_TO_SCREEN,
+                         String,
+                         FontInfo,
+                         &Blt,
+                         This->Mode->CursorColumn * GLYPH_WIDTH + Private->ModeData[This->Mode->Mode].DeltaX,
+                         This->Mode->CursorRow * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
+                         NULL,
+                         NULL,
+                         NULL
+                         );
+
+  } else {
+    ASSERT (Private->UgaDraw!= NULL);
+
+    UgaDraw = Private->UgaDraw;
+
+    Blt->Image.Bitmap = AllocateZeroPool (Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+    if (Blt->Image.Bitmap == NULL) {
+      SafeFreePool (Blt);
+      SafeFreePool (String);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    RowInfoArray = NULL;
+    //
+    //  StringToImage only support blt'ing image to device using GOP protocol. If GOP is not supported in this platform,
+    //  we ask StringToImage to print the string to blt buffer, then blt to device using UgaDraw.
+    //
+    Status = mHiiFont->StringToImage (
+                          mHiiFont,
+                          EFI_HII_IGNORE_IF_NO_GLYPH,
+                          String,
+                          FontInfo,
+                          &Blt,
+                          This->Mode->CursorColumn * GLYPH_WIDTH + Private->ModeData[This->Mode->Mode].DeltaX,
+                          This->Mode->CursorRow * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
+                          &RowInfoArray,
+                          &RowInfoArraySize,
+                          NULL
+                          );
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // Line breaks are handled by caller of DrawUnicodeWeightAtCursorN, so the updated parameter RowInfoArraySize by StringToImage will
+      // always be 1. ASSERT here to make sure.
+      //
+      ASSERT (RowInfoArraySize == 1);
+      
+      Status = UgaDraw->Blt (
+                          UgaDraw,
+                          (EFI_UGA_PIXEL *) Blt->Image.Bitmap,
+                          EfiUgaBltBufferToVideo,
+                          This->Mode->CursorColumn * GLYPH_WIDTH  + Private->ModeData[This->Mode->Mode].DeltaX,
+                          (This->Mode->CursorRow) * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
+                          This->Mode->CursorColumn * GLYPH_WIDTH  + Private->ModeData[This->Mode->Mode].DeltaX,
+                          (This->Mode->CursorRow) * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
+                          RowInfoArray[0].LineWidth,
+                          RowInfoArray[0].LineHeight,
+                          Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                          );
+    }
+
+    SafeFreePool (RowInfoArray);
+    SafeFreePool (Blt->Image.Bitmap);
+  }
 
   SafeFreePool (Blt);
   SafeFreePool (String);
   SafeFreePool (FontInfo);
   return Status;
 }
-#else
-STATIC
-EFI_STATUS
-DrawUnicodeWeightAtCursorN (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
-  IN  CHAR16                           *UnicodeWeight,
-  IN  UINTN                            Count
-  )
-{
-  GRAPHICS_CONSOLE_DEV  *Private;
-  EFI_STATUS            Status;
-  EFI_STATUS            ReturnStatus;
-  GLYPH_UNION           *Glyph;
-  GLYPH_UNION           GlyphData;
-  INTN                  GlyphX;
-  INTN                  GlyphY;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL *UgaDraw;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
-  UINTN                 Index;
-  UINTN                 ArrayIndex;
-  UINTN                 Counts;
-  UINT16                GlyphWidth;
-  UINT32                GlyphStatus;
 
-  Private       = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
-
-  ReturnStatus  = EFI_SUCCESS;
-  GlyphStatus   = 0;
-  GlyphWidth    = 0x08;
-
-  GetTextColors (This, &Foreground, &Background);
-
-  Index       = 0;
-  ArrayIndex  = 0;
-  while (Index < Count) {
-    if (This->Mode->Attribute & EFI_WIDE_ATTRIBUTE) {
-      GlyphStatus = WIDE_CHAR;
-    } else {
-      GlyphStatus = NARROW_CHAR;
-    }
-
-    Status = mHii->GetGlyph (
-                    mHii,
-                    UnicodeWeight,
-                    (UINT16 *) &Index,
-                    (UINT8 **) &Glyph,
-                    &GlyphWidth,
-                    &GlyphStatus
-                    );
-    if (EFI_ERROR (Status)) {
-      ReturnStatus = Status;
-    }
-
-    Counts = 0;
-
-    CopyMem (&GlyphData, Glyph, sizeof (GLYPH_UNION));
-
-    do {
-      //
-      // We are creating the second half of the wide character's BLT buffer
-      //
-      if (GlyphWidth == 0x10 && Counts == 1) {
-        CopyMem (&GlyphData.NarrowGlyph.GlyphCol1, &Glyph->WideGlyph.GlyphCol2, sizeof (Glyph->WideGlyph.GlyphCol2));
-      }
-
-      Counts++;
-
-      if (GlyphWidth == 0x10) {
-        mHii->GlyphToBlt (
-                mHii,
-                (UINT8 *) &GlyphData,
-                Foreground,
-                Background,
-                Count * 2,
-                GLYPH_WIDTH,
-                GLYPH_HEIGHT,
-                &Private->LineBuffer[ArrayIndex * GLYPH_WIDTH]
-                );
-      } else {
-        mHii->GlyphToBlt (
-                mHii,
-                (UINT8 *) &GlyphData,
-                Foreground,
-                Background,
-                Count,
-                GLYPH_WIDTH,
-                GLYPH_HEIGHT,
-                &Private->LineBuffer[ArrayIndex * GLYPH_WIDTH]
-                );
-      }
-
-      ArrayIndex++;
-
-    } while (Counts < 2 && GlyphWidth == 0x10);
-
-  }
-  //
-  // If we are printing Wide characters, treat the BLT as if it is twice as many characters
-  //
-  if (GlyphWidth == 0x10) {
-    Count = Count * 2;
-  }
-  //
-  // Blt a character to the screen
-  //
-  GlyphX  = This->Mode->CursorColumn * GLYPH_WIDTH;
-  GlyphY  = This->Mode->CursorRow * GLYPH_HEIGHT;
-  GraphicsOutput = Private->GraphicsOutput;
-  UgaDraw = Private->UgaDraw;
-  if (GraphicsOutput != NULL) {
-    GraphicsOutput->Blt (
-              GraphicsOutput,
-              Private->LineBuffer,
-              EfiBltBufferToVideo,
-              0,
-              0,
-              GlyphX + Private->ModeData[This->Mode->Mode].DeltaX,
-              GlyphY + Private->ModeData[This->Mode->Mode].DeltaY,
-              GLYPH_WIDTH * Count,
-              GLYPH_HEIGHT,
-              GLYPH_WIDTH * Count * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
-              );
-  } else {
-    UgaDraw->Blt (
-              UgaDraw,
-              (EFI_UGA_PIXEL *) (UINTN) Private->LineBuffer,
-              EfiUgaBltBufferToVideo,
-              0,
-              0,
-              GlyphX + Private->ModeData[This->Mode->Mode].DeltaX,
-              GlyphY + Private->ModeData[This->Mode->Mode].DeltaY,
-              GLYPH_WIDTH * Count,
-              GLYPH_HEIGHT,
-              GLYPH_WIDTH * Count * sizeof (EFI_UGA_PIXEL)
-              );
-  }
-
-  return ReturnStatus;
-}
-#endif
 
 STATIC
 EFI_STATUS
@@ -2064,4 +1927,5 @@ InitializeGraphicsConsole (
 
   return Status;
 }
+
 
