@@ -47,7 +47,7 @@
   Transmit.c
   WaitForPacket.c
   Receive_filters.c
-  Iitialize.c
+  Initialize.c
   ComponentName.c
   Callback.c
   Station_address.c
