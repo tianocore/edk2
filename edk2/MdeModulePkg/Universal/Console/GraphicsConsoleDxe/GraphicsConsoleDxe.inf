@@ -44,7 +44,6 @@
   MdePkg/MdePkg.dec
   # currently use Hii for glyph lookup, need to change to UEFI scheme
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -62,4 +61,4 @@
   gEfiUgaDrawProtocolGuid                       # PROTOCOL TO_START
   gEfiHiiFontProtocolGuid
   gEfiHiiDatabaseProtocolGuid
-
+  
