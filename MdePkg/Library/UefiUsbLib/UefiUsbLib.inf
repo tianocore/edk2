@@ -31,7 +31,7 @@
 
 [Sources.common]
   UefiUsbLibInternal.h
-  hid.c
+  Hid.c
   UsbDxeLib.c
 
 [Packages]
