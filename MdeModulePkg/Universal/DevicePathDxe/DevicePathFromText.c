@@ -2080,7 +2080,7 @@ DevPathFromTextiSCSI (
   iSCSI             = (ISCSI_DEVICE_PATH_WITH_NAME *) CreateDeviceNode (
                                                         MESSAGING_DEVICE_PATH,
                                                         MSG_ISCSI_DP,
-                                                        (UINT16) (sizeof (ISCSI_DEVICE_PATH_WITH_NAME) + StrLen (NameStr) * 2)
+                                                        (UINT16) (sizeof (ISCSI_DEVICE_PATH_WITH_NAME) + StrLen (NameStr))
                                                         );
 
   AsciiStr = iSCSI->iSCSITargetName;
