@@ -115,9 +115,12 @@ Returns:
   if (!mCancelTimerThread) {
   
     //
-    //  Suspend the main thread until we are done
+    // Suspend the main thread until we are done.
+    // Enter the critical section before suspending
+    // and leave the critical section after resuming
+    // to avoid deadlock between main and timer thread.
     //
-
+    gWinNt->EnterCriticalSection (&mNtCriticalSection);
     gWinNt->SuspendThread (mNtMainThreadHandle);
 
     //
@@ -127,6 +130,7 @@ Returns:
     //
     if (mCancelTimerThread) {
       gWinNt->ResumeThread (mNtMainThreadHandle);
+      gWinNt->LeaveCriticalSection (&mNtCriticalSection);
       gWinNt->timeKillEvent (wTimerID);
       mMMTimerThreadID = 0;
       return ;
@@ -138,6 +142,7 @@ Returns:
       //  Resume the main thread
       //
       gWinNt->ResumeThread (mNtMainThreadHandle);
+      gWinNt->LeaveCriticalSection (&mNtCriticalSection);
 
       //
       //  Wait for interrupts to be enabled.
@@ -151,6 +156,7 @@ Returns:
       //
       //  Suspend the main thread until we are done
       //
+      gWinNt->EnterCriticalSection (&mNtCriticalSection);
       gWinNt->SuspendThread (mNtMainThreadHandle);
       mCpu->GetInterruptState (mCpu, &InterruptState);
     }
@@ -174,9 +180,7 @@ Returns:
       //  expired since the last call is 10,000 times the number
       //  of ms.  (or 100ns units)
       //
-      gWinNt->EnterCriticalSection (&mNtCriticalSection);
       CallbackFunction = mTimerNotifyFunction;
-      gWinNt->LeaveCriticalSection (&mNtCriticalSection);
 
       //
       // Only invoke the callback function if a Non-NULL handler has been
@@ -194,6 +198,7 @@ Returns:
     //  Resume the main thread
     //
     gWinNt->ResumeThread (mNtMainThreadHandle);
+    gWinNt->LeaveCriticalSection (&mNtCriticalSection);
   } else {
     gWinNt->timeKillEvent (wTimerID);
     mMMTimerThreadID = 0;
