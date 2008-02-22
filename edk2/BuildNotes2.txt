@@ -32,8 +32,12 @@ In a command window, change to the top-level directory of the EDK II source.
 
 First, set up your workspace. If you have had a setup, please make sure that
 you don't have newer *.template in WORKSPACE\BaseTools\Conf. Otherwise remove
-*.txt files in WORKSPACE\Conf in advance.
-    c:\MyWork\edk2\> edksetup newbuild
+*.txt files in WORKSPACE\Conf in advance.  For the reference build of the Nt32
+Platform emulation environment, use the --nt32 option for edksetup.  Building
+other platforms or modules do not require this option, as Visual Studio standard
+includes, libraries and/or dlls are not required for normal development.
+
+    c:\MyWork\edk2\> edksetup --nt32
 
 Second, go to the module directory (For example, MdeModulePkg\Application\HelloWorld),
 and then begin to build
@@ -99,7 +103,7 @@ have the Python interpreter (version 2.5) installed. The source of Python code i
 		AutoGen/AutoGen.py  - Generate AutoGen.c/.h and makefile only
 
 	"build.py" steps:
-		1. Run "edksetup.bat newbuild"
+		1. Run "edksetup.bat"
         2. set PYTHONPATH to the local directory of above source (BaseTools/Source/Python)
 		3. Set ACTIVE_PLATFORM in WORKSPACE\Conf
 		4. Go to platform or module directory
@@ -107,7 +111,7 @@ have the Python interpreter (version 2.5) installed. The source of Python code i
 		   directly.
 
 	"AutoGen.py" steps:
-		1. Run "edksetup.bat newbuild"
+		1. Run "edksetup.bat"
         2. set PYTHONPATH to the local directory of above source (BaseTools/Source/Python)
 		3. Set ACTIVE_PLATFORM in WORKSPACE\Conf
 		4. Run "<python_interpreter.exe> <python_source_dir>/AutoGen/AutoGen.py" or "<python_source_dir>/AutoGen/AutoGen.py"
