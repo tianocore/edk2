@@ -224,7 +224,7 @@
       <TR>
       </TR>
 		</TABLE>
-    <BR>
+    <P>________________________</P>
     <P ALIGN=LEFT>
           <FONT SIZE="2"><sup>1</sup>&nbsp;Instructions for installation of GCC are included in the BaseTools\gcc directory.</FONT><BR>
           <FONT SIZE="2"><sup>2</sup>&nbsp;The default tool chain for the IA32 and X64 builds.</FONT><BR>
@@ -247,6 +247,7 @@
 		install it in &quot;Unix&quot; mode. The gcc tool chain will not
 		compile in &quot;DOS&quot; mode.</P>
 
+    <P>________________________</P>
     <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
 		<H2 CLASS="heading-2"><A NAME="EnvVars"></A>Environment Variables</H2>
 		<P>Environment variables are <B>case sensitive</B>. You must use
@@ -260,6 +261,7 @@
 		above into a script that you can launch each time you begin to do
 		development in your EDK II workspace.</P>
 
+    <P>________________________</P>
     <P><A HREF="#Top"><IMG SRC="top_arrow.jpg" BORDER="0"></A>&nbsp;<A HREF="#Top">Back to Top</A></P>
 		<H2 CLASS="heading-2"><A NAME="FirstBuild"></A>First Build</H2>
 		<P>You will need to edit the text file, tools_def.txt which is created
@@ -274,7 +276,7 @@
     </P>
 		<OL>
 			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>cd %WORKSPACE%</FONT>
-			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>edksetup.bat --nt32 newbuild</FONT>
+			<LI><FONT STYLE="margin-bottom: 0in;" FACE="courier, 'courier new', monospace" color='#771100'>edksetup.bat --nt32</FONT>
       <UL>This will set the PATH to point to the directory containing the 
       Win32 binaries of the EDK II tools used in edk2 development. It will
 			fail if the external tools above are not properly installed.<BR>
@@ -289,6 +291,7 @@
       <P>The default build output directory is: %WORKSPACE%\Build\NT32\DEBUG_MYTOOLS\ </P>
 		</OL>
 	</DIV>
+  <P>________________________</P>
   <P><FONT SIZE="2"><sup>7</sup>&nbsp;The first time the edksetup script is executed, it
   creates three files in the %WORKSPACE%\Conf directory.  The files tools_def.txt, target.txt and
   build_rule.txt are only created if they do not exist, if they exist, then they are 
