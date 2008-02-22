@@ -226,7 +226,7 @@ goto end
     echo tested versions of the tools have been tested and included in the
     echo EDK II repository.
     echo.
-    echo If you really want to build the tools, use the FORCE_REBUILD option.
+    echo If you really want to build the tools, use the ForceRebuild option.
     echo.
     goto end
   )
