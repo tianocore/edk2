@@ -39,5 +39,5 @@
 
 [LibraryClasses]
   BaseMemoryLib
-
+  DebugLib
 

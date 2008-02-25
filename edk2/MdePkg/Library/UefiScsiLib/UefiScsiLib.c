@@ -14,6 +14,7 @@
 
 
 #include <PiDxe.h>
+#include <Library/DebugLib.h>
 #include <Library/ScsiLib.h>
 #include <Library/BaseMemoryLib.h>
 
