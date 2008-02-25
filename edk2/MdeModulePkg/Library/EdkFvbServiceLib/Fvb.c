@@ -355,9 +355,12 @@ EfiFvbReadBlock (
   IN EFI_LBA                                      Lba,
   IN UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
-  IN UINT8                                        *Buffer
+  OUT UINT8                                       *Buffer
   )
 {
+  ASSERT (NumBytes != NULL);
+  ASSERT (Buffer != NULL);
+  
   if (Instance >= mFvbCount) {
     return EFI_INVALID_PARAMETER;
   }
@@ -394,6 +397,8 @@ EfiFvbWriteBlock (
   IN UINT8                                        *Buffer
   )
 {
+  ASSERT (NumBytes != NULL);
+  
   if (Instance >= mFvbCount) {
     return EFI_INVALID_PARAMETER;
   }
@@ -449,6 +454,8 @@ EfiFvbGetVolumeAttributes (
   OUT EFI_FVB_ATTRIBUTES                  *Attributes
   )
 {
+  ASSERT (Attributes != NULL);
+  
   if (Instance >= mFvbCount) {
     return EFI_INVALID_PARAMETER;
   }
@@ -481,6 +488,8 @@ EfiFvbSetVolumeAttributes (
   IN OUT EFI_FVB_ATTRIBUTES                   *Attributes
   )
 {
+  ASSERT (Attributes != NULL);
+  
   if (Instance >= mFvbCount) {
     return EFI_INVALID_PARAMETER;
   }
@@ -511,6 +520,8 @@ EfiFvbGetPhysicalAddress (
   OUT EFI_PHYSICAL_ADDRESS                *BaseAddress
   )
 {
+  ASSERT (BaseAddress != NULL);
+  
   if (Instance >= mFvbCount) {
     return EFI_INVALID_PARAMETER;
   }
@@ -547,6 +558,9 @@ EfiFvbGetBlockSize (
   OUT UINTN                                       *NumOfBlocks
   )
 {
+  ASSERT (BlockSize != NULL);
+  ASSERT (NumOfBlocks != NULL);
+  
   if (Instance >= mFvbCount) {
     return EFI_INVALID_PARAMETER;
   }
