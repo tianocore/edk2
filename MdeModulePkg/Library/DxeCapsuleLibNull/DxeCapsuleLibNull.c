@@ -17,6 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Those capsules supported by the firmwares.
   
+  @param  CapsuleHeader    Point to the UEFI capsule image to be checked.
+  
   @retval EFI_SUCESS       Input capsule is supported by firmware.
   @retval EFI_UNSUPPORTED  Input capsule is not supported by the firmware.
 **/
@@ -32,6 +34,8 @@ SupportCapsuleImage (
 /**
   The firmware implements to process the capsule image.
   
+  @param  CapsuleHeader    Point to the UEFI capsule image to be processed. 
+   
   @retval EFI_SUCESS       Process Capsule Image successfully. 
   @retval EFI_UNSUPPORTED  Capsule image is not supported by the firmware.
 **/
