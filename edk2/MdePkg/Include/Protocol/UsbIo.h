@@ -99,10 +99,10 @@ EFI_STATUS
   @param  Request               A pointer to the USB device request that will be sent to the USB
                                 device.
   @param  Direction             Indicates the data direction.
-  @param  Data                  A pointer to the buffer of data that will be transmitted to USB
-                                device or received from USB device.
   @param  Timeout               Indicating the transfer should be completed within this time frame.
                                 The units are in milliseconds.
+  @param  Data                  A pointer to the buffer of data that will be transmitted to USB
+                                device or received from USB device.
   @param  DataLength            The size, in bytes, of the data buffer specified by Data.
   @param  Status                A pointer to the result of the USB transfer.
 

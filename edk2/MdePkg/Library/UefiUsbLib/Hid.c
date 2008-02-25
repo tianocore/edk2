@@ -38,6 +38,10 @@ UsbGetHidDescriptor (
   UINT32                  Status;
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
+  
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Request.RequestType = 0x81;
   Request.Request     = 0x06;
@@ -88,6 +92,9 @@ UsbGetReportDescriptor (
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
 
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Fill Device request packet
   //
@@ -137,6 +144,9 @@ UsbGetProtocolRequest (
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
 
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Fill Device request packet
   //
@@ -187,6 +197,9 @@ UsbSetProtocolRequest (
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
 
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Fill Device request packet
   //
@@ -238,6 +251,9 @@ UsbSetIdleRequest (
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
 
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Fill Device request packet
   //
@@ -287,7 +303,10 @@ UsbGetIdleRequest (
   UINT32                  Status;
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
-
+  
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Fill Device request packet
   //
@@ -344,6 +363,9 @@ UsbSetReportRequest (
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
 
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Fill Device request packet
   //
@@ -399,6 +421,9 @@ UsbGetReportRequest (
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
 
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Fill Device request packet
   //

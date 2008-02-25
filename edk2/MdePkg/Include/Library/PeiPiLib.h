@@ -23,7 +23,7 @@
     The function allocate the EFI_PEI_PPI_DESCRIPTOR structure and update the fields accordingly to parameter passed
     in and install the PPI.
     
-    @param  FvStart              Unique identifier of the format of the memory-mapped firmware volume. If NULL is specified,
+    @param  FvFormat             Unique identifier of the format of the memory-mapped firmware volume. If NULL is specified,
                                          EFI_FIRMWARE_FILE_SYSTEM2_GUID is used as the Format GUID.
     @param  FvInfo               Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to
                                          process the volume. The format of this buffer is specific to the FvFormat. For
