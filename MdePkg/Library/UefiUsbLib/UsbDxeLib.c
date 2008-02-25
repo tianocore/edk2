@@ -527,6 +527,10 @@ UsbClearEndpointHalt (
   EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
   UINT8                         Index;
 
+  if (UsbIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ZeroMem (&EndpointDescriptor, sizeof (EFI_USB_ENDPOINT_DESCRIPTOR));
   //
   // First seach the endpoint descriptor for that endpoint addr

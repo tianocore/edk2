@@ -32,6 +32,27 @@ CONST EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
   NULL //ParentFileName;
 };
 
+/**
+    Install a EFI_PEI_FIRMWARE_VOLUME_INFO PPI to inform PEI core about the existence of a new Firmware Volume.
+  
+    The function allocate the EFI_PEI_PPI_DESCRIPTOR structure and update the fields accordingly to parameter passed
+    in and install the PPI.
+    
+    @param  FvFormat             Unique identifier of the format of the memory-mapped firmware volume. If NULL is specified,
+                                         EFI_FIRMWARE_FILE_SYSTEM2_GUID is used as the Format GUID.
+    @param  FvInfo               Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to
+                                         process the volume. The format of this buffer is specific to the FvFormat. For
+                                         memory-mapped firmware volumes, this typically points to the first byte of the
+                                         firmware volume.
+    @param  FvInfoSize          Size of the data provided by FvInfo. For memory-mapped firmware volumes, this is
+                                         typically the size of the firmware volume.
+    @param  ParentFvName, ParentFileName      If the firmware volume originally came from a firmware file, then these point to the
+                                          parent firmware volume name and firmware volume file. If it did not originally come
+                                          from a firmware file, these should be NULL
+  
+    @retval  VOID
+  
+**/
 VOID
 EFIAPI
 PiLibInstallFvInfoPpi (
