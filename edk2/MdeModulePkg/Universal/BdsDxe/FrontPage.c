@@ -919,6 +919,7 @@ Returns:
   EFI_STATUS                    Status;
   EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
 
+  PERF_START (0, "BdsTimeOut", "BDS", 0);
   //
   // Indicate if we need connect all in the platform setup
   //
@@ -949,9 +950,7 @@ Returns:
     UpdateFrontPageStrings ();
 
     gCallbackKey = 0;
-    PERF_START (0, "BdsTimeOut", "BDS", 0);
     Status = CallFrontPage ();
-    PERF_END (0, "BdsTimeOut", "BDS", 0);
 
     //
     // If gCallbackKey is greater than 1 and less or equal to 5,
@@ -1029,6 +1028,7 @@ Exit:
   // Note: The following lines of code only execute when Auto boot
   // takes affect
   //
+  PERF_END (0, "BdsTimeOut", "BDS", 0);
   Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
   ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
 
