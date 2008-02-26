@@ -984,13 +984,18 @@ SIGNAL_USER:
 
 
 /**
-  Transmit and receive a packet through this DHCP service.
-  This is unsupported.
+  Transmits a DHCP formatted packet and optionally waits for responses.
 
-  @param  This                   The DHCP protocol instance
-  @param  Token                  The transmit and receive instance
+  @param  This    Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Token   Pointer to the EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN structure.
 
-  @retval EFI_UNSUPPORTED        It always returns unsupported.
+  @retval EFI_SUCCESS           The packet was successfully queued for transmission.
+  @retval EFI_INVALID_PARAMETER Some parameter is NULL.
+  @retval EFI_NOT_READY         The previous call to this function has not finished yet. Try to call
+                                this function after collection process completes.
+  @retval EFI_NO_MAPPING        The default station address is not available yet.
+  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval Others                Some other unexpected error occurred.
 
 **/
 STATIC

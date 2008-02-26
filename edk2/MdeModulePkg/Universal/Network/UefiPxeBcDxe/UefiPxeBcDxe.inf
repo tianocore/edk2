@@ -83,9 +83,9 @@
   gEfiMtftp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiUdp4ServiceBindingProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
   gEfiDhcp4ServiceBindingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiPxeBaseCodeCallbackProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiPxeBaseCodeProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadFileProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiPxeBaseCodeCallbackProtocolGuid              # PROTOCOL ALWAYS_PRODUCED
+  gEfiPxeBaseCodeProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
+  gEfiLoadFileProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
   gEfiDhcp4ProtocolGuid                            # PROTOCOL ALWAYS_CONSUMED
   gEfiUdp4ProtocolGuid                             # PROTOCOL ALWAYS_CONSUMED
   gEfiNetworkInterfaceIdentifierProtocolGuid_31    # PROTOCOL ALWAYS_CONSUMED

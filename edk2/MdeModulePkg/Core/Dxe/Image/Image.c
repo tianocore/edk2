@@ -74,7 +74,7 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
   0,                          // Machine
   NULL,                       // Ebc
   NULL,                       // RuntimeData
-  NULL,                       // DeviceHandleDevicePath
+  NULL                        // LoadedImageDevicePath
 };
 
 
@@ -714,7 +714,6 @@ Returns:
   if (!EFI_ERROR (Status)) {
     FilePathSize = CoreDevicePathSize (HandleFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
     FilePath = (EFI_DEVICE_PATH_PROTOCOL *) ( ((UINT8 *)FilePath) + FilePathSize );
-    Image->DeviceHandleDevicePath = CoreDuplicateDevicePath (HandleFilePath);
   }
 
   //
@@ -782,6 +781,26 @@ Returns:
     goto Done;
   }
 
+  //
+  // If DevicePath parameter to the LoadImage() is not NULL, then make a copy of DevicePath,
+  // otherwise Loaded Image Device Path Protocol is installed with a NULL interface pointer.
+  //
+  if (OriginalFilePath != NULL) {
+    Image->LoadedImageDevicePath = CoreDuplicateDevicePath (OriginalFilePath);
+  }
+
+  //
+  // Install Loaded Image Device Path Protocol onto the image handle of a PE/COFE image
+  //
+  Status = CoreInstallProtocolInterface (
+            &Image->Handle,
+            &gEfiLoadedImageDevicePathProtocolGuid,
+            EFI_NATIVE_INTERFACE,
+            Image->LoadedImageDevicePath
+            );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
 
   //
   // Success.  Return the image handle
@@ -1210,9 +1229,16 @@ Returns:
 
     Status = CoreUninstallProtocolInterface (
                Image->Handle,
+               &gEfiLoadedImageDevicePathProtocolGuid,
+               Image->LoadedImageDevicePath
+               );
+
+    Status = CoreUninstallProtocolInterface (
+               Image->Handle,
                &gEfiLoadedImageProtocolGuid,
                &Image->Info
                );
+
   }
 
   if (Image->RuntimeData != NULL) {
@@ -1239,8 +1265,8 @@ Returns:
     CoreFreePool (Image->Info.FilePath);
   }
 
-  if (Image->DeviceHandleDevicePath != NULL) {
-    CoreFreePool (Image->DeviceHandleDevicePath);
+  if (Image->LoadedImageDevicePath != NULL) {
+    CoreFreePool (Image->LoadedImageDevicePath);
   }
 
   if (Image->FixupData != NULL) {
