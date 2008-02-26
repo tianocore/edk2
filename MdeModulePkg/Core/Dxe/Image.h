@@ -55,7 +55,7 @@ typedef struct {
 
     EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   // Runtime image list
 
-    EFI_DEVICE_PATH_PROTOCOL      *DeviceHandleDevicePath;
+    EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  // Pointer to Loaded Image Device Path Protocl
 
     PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; // PeCoffLoader ImageContext
 

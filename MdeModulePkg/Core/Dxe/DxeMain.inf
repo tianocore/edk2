@@ -134,6 +134,7 @@
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
   gEfiEbcProtocolGuid                           # PROTOCOL SOMETIMES_CONSUMED
   gEfiTcgPlatformProtocolGuid
+  gEfiLoadedImageDevicePathProtocolGuid         # PROTOCOL ALWAYS_PRODUCED
 
 [FixedPcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreEntry | 0x3041000          # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_ENTRY_POINT

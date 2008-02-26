@@ -81,8 +81,8 @@
 
 [Protocols]
   gEfiBisProtocolGuid                             # PROTOCOL ALWAYS_CONSUMED
-  gEfiPxeBaseCodeCallbackProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiPxeBaseCodeProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiPxeBaseCodeCallbackProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
+  gEfiPxeBaseCodeProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
   gEfiLoadFileProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleNetworkProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
