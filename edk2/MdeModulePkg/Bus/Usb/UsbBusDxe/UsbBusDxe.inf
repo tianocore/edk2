@@ -35,14 +35,14 @@
   UsbDesc.c
   UsbEnumer.c
   UsbEnumer.h
-  usbbus.c
+  UsbBus.c
   UsbHub.c
   ComponentName.c
   UsbUtility.h
   UsbHub.h
   UsbUtility.c
   UsbDesc.h
-  usbbus.h
+  UsbBus.h
 
 [Packages]
   MdePkg/MdePkg.dec
