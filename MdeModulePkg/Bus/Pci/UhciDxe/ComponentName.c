@@ -18,7 +18,7 @@ Abstract:
 
 **/
 
-#include "uhci.h"
+#include "Uhci.h"
 
 //
 // EFI Component Name Functions
