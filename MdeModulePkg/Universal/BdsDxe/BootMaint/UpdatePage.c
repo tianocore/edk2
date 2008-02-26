@@ -21,10 +21,6 @@ Abstract:
 
 #include "BootMaint.h"
 
-EFI_GUID gTerminalDriverGuid = {
-  0x10634d8e, 0x1c05, 0x46cb, {0xbb, 0xc, 0x5a, 0xfd, 0xc8, 0x29, 0xa8, 0xc8}
-};
-
 VOID
 RefreshUpdateData (
   VOID
@@ -179,27 +175,23 @@ UpdateConCOMPage (
 {
   BM_MENU_ENTRY *NewMenuEntry;
   UINT16        Index;
-  EFI_STATUS    Status;
-  VOID          *Interface;
 
   CallbackData->BmmAskSaveOrNot = FALSE;
 
   UpdatePageStart (CallbackData);
 
-  Status = EfiLibLocateProtocol (&gTerminalDriverGuid, (VOID **) &Interface);
-  if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
-      NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Index);
 
-      CreateGotoOpCode (
-        FORM_CON_COM_SETUP_ID,
-        NewMenuEntry->DisplayStringToken,
-        STRING_TOKEN (STR_NULL_STRING),
-        EFI_IFR_FLAG_CALLBACK,
-        (UINT16) (TERMINAL_OPTION_OFFSET + Index),
-        &gUpdateData
-        );
-    }
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Index);
+
+    CreateGotoOpCode (
+      FORM_CON_COM_SETUP_ID,
+      NewMenuEntry->DisplayStringToken,
+      STRING_TOKEN (STR_NULL_STRING),
+      EFI_IFR_FLAG_CALLBACK,
+      (UINT16) (TERMINAL_OPTION_OFFSET + Index),
+      &gUpdateData
+      );
   }
 
   UpdatePageEnd (CallbackData);
@@ -384,9 +376,7 @@ UpdateConsolePage (
   UINT16              Index;
   UINT16              Index2;
   UINT8               CheckFlags;
-  EFI_STATUS          Status;
-  VOID                *Interface;
-
+ 
   CallbackData->BmmAskSaveOrNot = TRUE;
 
   UpdatePageStart (CallbackData);
@@ -414,36 +404,33 @@ UpdateConsolePage (
       );
   }
 
-  Status = EfiLibLocateProtocol (&gTerminalDriverGuid, (VOID **) &Interface);
-  if (!EFI_ERROR (Status)) {
-    for (Index2 = 0; Index2 < TerminalMenu.MenuNumber; Index2++) {
-      CheckFlags          = 0;
-      NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, Index2);
-      NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+  for (Index2 = 0; Index2 < TerminalMenu.MenuNumber; Index2++) {
+    CheckFlags          = 0;
+    NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, Index2);
+    NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
 
-      if ((NewTerminalContext->IsConIn && (UpdatePageId == FORM_CON_IN_ID)) ||
-          (NewTerminalContext->IsConOut && (UpdatePageId == FORM_CON_OUT_ID)) ||
-          (NewTerminalContext->IsStdErr && (UpdatePageId == FORM_CON_ERR_ID))
-          ) {
-        CheckFlags |= EFI_IFR_CHECKBOX_DEFAULT;
-        CallbackData->BmmFakeNvData.ConsoleCheck[Index] = TRUE;
-      } else {
-        CallbackData->BmmFakeNvData.ConsoleCheck[Index] = FALSE;
-      }
-
-      CreateCheckBoxOpCode (
-        (EFI_QUESTION_ID) (CON_DEVICE_QUESTION_ID + Index),
-        VARSTORE_ID_BOOT_MAINT,
-        (UINT16) (CON_DEVICE_VAR_OFFSET + Index),
-        NewMenuEntry->DisplayStringToken,
-        NewMenuEntry->HelpStringToken,
-        0,
-        CheckFlags,
-        &gUpdateData
-        );
-
-      Index++;
+    if ((NewTerminalContext->IsConIn && (UpdatePageId == FORM_CON_IN_ID)) ||
+        (NewTerminalContext->IsConOut && (UpdatePageId == FORM_CON_OUT_ID)) ||
+        (NewTerminalContext->IsStdErr && (UpdatePageId == FORM_CON_ERR_ID))
+        ) {
+      CheckFlags |= EFI_IFR_CHECKBOX_DEFAULT;
+      CallbackData->BmmFakeNvData.ConsoleCheck[Index] = TRUE;
+    } else {
+      CallbackData->BmmFakeNvData.ConsoleCheck[Index] = FALSE;
     }
+
+    CreateCheckBoxOpCode (
+      (EFI_QUESTION_ID) (CON_DEVICE_QUESTION_ID + Index),
+      VARSTORE_ID_BOOT_MAINT,
+      (UINT16) (CON_DEVICE_VAR_OFFSET + Index),
+      NewMenuEntry->DisplayStringToken,
+      NewMenuEntry->HelpStringToken,
+      0,
+      CheckFlags,
+      &gUpdateData
+      );
+
+    Index++;
   }
 
   UpdatePageEnd (CallbackData);
