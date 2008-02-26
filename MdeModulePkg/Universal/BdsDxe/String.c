@@ -63,7 +63,7 @@ Returns:
     return Status;
   }
 
-  PackageList = HiiLibPreparePackageList (1, &mBdsStringPackGuid, &BdsStrings);
+  PackageList = HiiLibPreparePackageList (1, &mBdsStringPackGuid, &BdsDxeStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (

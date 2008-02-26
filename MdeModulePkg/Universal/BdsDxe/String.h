@@ -33,7 +33,7 @@ extern EFI_HII_HANDLE gStringPackHandle;
 // string identifiers.
 //
 
-extern UINT8  BdsStrings[];
+extern UINT8  BdsDxeStrings[];
 
 //
 // String Definition Guid for BDS Platform
