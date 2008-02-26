@@ -885,7 +885,7 @@ Returns:
   //
   // Post our Boot Maint VFR binnary to the HII database.
   //
-  PackageList = HiiLibPreparePackageList (2, &mBootMaintGuid, BmBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mBootMaintGuid, BmBin, BdsDxeStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (
@@ -899,7 +899,7 @@ Returns:
   //
   // Post our File Explorer VFR binary to the HII database.
   //
-  PackageList = HiiLibPreparePackageList (2, &mFileExplorerGuid, FEBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mFileExplorerGuid, FEBin, BdsDxeStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (

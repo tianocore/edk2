@@ -162,7 +162,7 @@ Returns:
   //
   // Publish our HII data
   //
-  PackageList = HiiLibPreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsDxeStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (
@@ -413,7 +413,7 @@ Returns:
   // Cleanup dynamic created strings in HII database by reinstall the packagelist
   //
   gHiiDatabase->RemovePackageList (gHiiDatabase, HiiHandle);
-  PackageList = HiiLibPreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsDxeStrings);
   ASSERT (PackageList != NULL);
   Status = gHiiDatabase->NewPackageList (
                            gHiiDatabase,

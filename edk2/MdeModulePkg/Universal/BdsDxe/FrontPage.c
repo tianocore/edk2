@@ -335,7 +335,7 @@ Returns:
     //
     // Publish our HII data
     //
-    PackageList = HiiLibPreparePackageList (2, &mFrontPageGuid, FrontPageVfrBin, BdsStrings);
+    PackageList = HiiLibPreparePackageList (2, &mFrontPageGuid, FrontPageVfrBin, BdsDxeStrings);
     ASSERT (PackageList != NULL);
 
     Status = gHiiDatabase->NewPackageList (

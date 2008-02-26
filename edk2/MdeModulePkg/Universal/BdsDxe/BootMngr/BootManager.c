@@ -151,7 +151,7 @@ Returns:
   //
   // Publish our HII data
   //
-  PackageList = HiiLibPreparePackageList (2, &mBootManagerGuid, BootManagerVfrBin, BdsStrings);
+  PackageList = HiiLibPreparePackageList (2, &mBootManagerGuid, BootManagerVfrBin, BdsDxeStrings);
   ASSERT (PackageList != NULL);
 
   Status = gHiiDatabase->NewPackageList (
