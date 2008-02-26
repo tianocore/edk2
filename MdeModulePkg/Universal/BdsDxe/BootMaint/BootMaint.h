@@ -313,6 +313,7 @@ typedef struct {
   UINT16  StringToken;
 } COM_ATTR;
 
+#pragma pack(1)
 typedef struct {
   BBS_TYPE  BbsType;
   //
@@ -321,6 +322,7 @@ typedef struct {
   UINT16    Length;
   UINT16    *Data;
 } BM_LEGACY_DEV_ORDER_CONTEXT;
+#pragma pack()
 
 typedef struct {
   UINT64                    BaudRate;
@@ -433,7 +435,7 @@ typedef struct {
   BM_LOAD_CONTEXT                *LoadContext;
   BM_TERMINAL_CONTEXT            *TerminalContext;
   UINTN                          CurrentTerminal;
-  UINT8                          BbsType;
+  BBS_TYPE                       BbsType;
 
   //
   // BMM main formset callback data.
