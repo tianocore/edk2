@@ -195,8 +195,6 @@ INF  Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
 INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
-INF  RichfordPlatformPkg/SetupDxe/SetupDxe.inf
-
 ################################################################################
 #
 # FILE statements are provided so that a platform integrator can include
