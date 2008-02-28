@@ -201,7 +201,6 @@
   ScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   WinNtLib|Nt32Pkg/Library/DxeWinNtLib/DxeWinNtLib.inf
   OemHookStatusCodeLib|Nt32Pkg/Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
-  EdkGenericBdsLib|Nt32Pkg/Library/EdkGenericBdsLib/EdkGenericBdsLib.inf
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
