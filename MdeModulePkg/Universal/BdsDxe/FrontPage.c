@@ -832,6 +832,8 @@ Returns:
     return EFI_TIMEOUT;
   }
 
+  DEBUG ((EFI_D_INFO, "\n\nStart showing progress bar... Press any key to stop it! ...Zzz....\n"));
+  
   SetMem (&Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
   SetMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
   SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
@@ -846,6 +848,8 @@ Returns:
 
   TimeoutRemain = TimeoutDefault;
   while (TimeoutRemain != 0) {
+    DEBUG ((EFI_D_INFO, "Showing progress bar...Remaining %d second!\n", TimeoutRemain));
+    
     Status = WaitForSingleEvent (gST->ConIn->WaitForKey, ONE_SECOND);
     if (Status != EFI_TIMEOUT) {
       break;
