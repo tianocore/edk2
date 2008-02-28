@@ -304,7 +304,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
 
@@ -470,6 +470,8 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
+
+  RichfordPlatformPkg/SetupDxe/SetupDxe.inf
   
 [BuildOptions]
   DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /ALIGN:4096 /SUBSYSTEM:CONSOLE
