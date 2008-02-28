@@ -54,3 +54,11 @@ EDK_3896-3898: Compatible: qhuang8
     1) To produce the component name 2 protocol, platform DSC file needs to set feature
        flag 'PcdComponentName2Disable' to 'FALSE'
 
+==========================================================================================
+EDK_4776: Compatible: qwang12
+
+Remove the following modules.
+
+  IntelFrameworkModulePkg/Universal/HiiDataBaseDxe/HiiDatabase.inf
+  IntelFrameworkModulePkg/Universal/SetupBrowserDxe/SetupBrowser.inf
+  IntelFrameworkModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
