@@ -96,12 +96,18 @@
   gEfiPeiFirmwareVolumeInfoPpiGuid
   gEfiPeiLoadFilePpiGuid
   gEfiPeiSecurity2PpiGuid
+  gEfiTemporaryRamSupportPpiGuid
 
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize
+
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst
+
+[BuildOptions.common]
+  MSFT:*_*_*_CC_FLAGS = /Fa$* /FAsc /FR$(@R).SBR

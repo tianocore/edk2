@@ -239,6 +239,7 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize|0x20000
 
 
 [PcdsFixedAtBuild.IPF]

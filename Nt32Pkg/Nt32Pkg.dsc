@@ -247,6 +247,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|TRUE
 
 [PcdsFixedAtBuild.IA32]
+  #gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize|0x20000
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|12

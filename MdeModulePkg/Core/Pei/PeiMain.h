@@ -35,6 +35,7 @@ Revision History
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/LoadFile.h>
 #include <Ppi/Security2.h>
+#include <Ppi/TemporaryRamSupport.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -66,9 +67,7 @@ typedef union {
   VOID                        *Raw;
 } PEI_PPI_LIST_POINTERS;
 
-#define PEI_STACK_SIZE 0x20000
-
-#define MAX_PPI_DESCRIPTORS 128
+#define MAX_PPI_DESCRIPTORS 64
 
 typedef struct {
   INTN                    PpiListEnd;
@@ -135,9 +134,14 @@ typedef struct{
   VOID                               *CpuIo;
   EFI_PEI_SECURITY2_PPI              *PrivateSecurityPpi;
   EFI_PEI_SERVICES                   ServiceTableShadow;
+  UINTN                              SizeOfTemporaryMemory;
   UINTN                              SizeOfCacheAsRam;
   VOID                               *MaxTopOfCarHeap;
   EFI_PEI_PPI_DESCRIPTOR             *XipLoadFile;
+  EFI_PHYSICAL_ADDRESS               PhysicalMemoryBegin;
+  UINT64                             PhysicalMemoryLength;
+  EFI_PHYSICAL_ADDRESS               FreePhysicalMemoryTop;
+  VOID*                              ShadowedPeiCore;
   CACHE_SECTION_DATA                 CacheSection;
 } PEI_CORE_INSTANCE;
 
@@ -307,6 +311,35 @@ Returns:
 ;
 
 
+EFI_STATUS
+FindNextPeim (
+  IN EFI_PEI_SERVICES            **PeiServices,
+  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
+  IN OUT EFI_FFS_FILE_HEADER     **PeimFileHeader
+  )
+/*++
+
+Routine Description:
+    Given the input file pointer, search for the next matching file in the
+    FFS volume. The search starts from FileHeader inside
+    the Firmware Volume defined by FwVolHeader.
+
+Arguments:
+    PeiServices - Pointer to the PEI Core Services Table.
+
+    FwVolHeader - Pointer to the FV header of the volume to search.
+                     This parameter must point to a valid FFS volume.
+
+    PeimFileHeader  - Pointer to the current file from which to begin searching.
+                  This pointer will be updated upon return to reflect the file found.
+
+Returns:
+    EFI_NOT_FOUND - No files matching the search criteria were found
+    EFI_SUCCESS
+
+--*/
+;
+
 BOOLEAN
 Dispatched (
   IN UINT8  CurrentPeim,
@@ -439,8 +472,9 @@ Returns:
 
 VOID
 ConvertPpiPointers (
-  IN CONST EFI_PEI_SERVICES              **PeiServices,
-  IN EFI_HOB_HANDOFF_INFO_TABLE    *OldHandOffHob,
+  IN CONST EFI_PEI_SERVICES                     **PeiServices,
+  IN UINTN                         OldCheckingBottom,
+  IN UINTN                         OldCheckingTop,
   IN EFI_HOB_HANDOFF_INFO_TABLE    *NewHandOffHob
   )
 /*++
@@ -451,9 +485,10 @@ Routine Description:
 
 Arguments:
 
-  PeiServices   - The PEI core services table.
-  OldHandOffHob - The old handoff HOB list.
-  NewHandOffHob - The new handoff HOB list.
+  PeiServices       - The PEI core services table.
+  OldCheckingBottom - The old checking bottom.
+  OldCheckingTop    - The old checking top.
+  NewHandOffHob     - The new handoff HOB list.
 
 Returns:
 

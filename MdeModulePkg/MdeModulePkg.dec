@@ -136,6 +136,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6|UINT32|0x00010030
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32|UINT32|0x00010031
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize|0x20000|UINT32|0x00010032
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400|UINT32|0x30000003

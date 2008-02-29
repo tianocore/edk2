@@ -21,6 +21,12 @@ Abstract:
 
 #include <PeiMain.h>
 
+static EFI_PEI_PPI_DESCRIPTOR mMemoryDiscoveredPpi = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiMemoryDiscoveredPpiGuid,
+  NULL
+};
+
 VOID
 InitializeMemoryServices (
   IN PEI_CORE_INSTANCE           *PrivateData,
@@ -49,15 +55,18 @@ Returns:
 
 --*/
 {
-  PrivateData->SwitchStackSignal = FALSE;
+  
+  PrivateData->SwitchStackSignal      = FALSE;
 
   if (OldCoreData == NULL) {
 
     PrivateData->PeiMemoryInstalled = FALSE;
 
-    PrivateData->BottomOfCarHeap = SecCoreData->PeiTemporaryRamBase; 
-    PrivateData->TopOfCarHeap = (VOID *)((UINTN)(PrivateData->BottomOfCarHeap) + SecCoreData->PeiTemporaryRamSize);
- 
+    PrivateData->BottomOfCarHeap        = SecCoreData->PeiTemporaryRamBase; 
+    PrivateData->TopOfCarHeap           = (VOID *)((UINTN)(PrivateData->BottomOfCarHeap) + SecCoreData->PeiTemporaryRamSize);
+    PrivateData->SizeOfTemporaryMemory  = SecCoreData->TemporaryRamSize;
+    PrivateData->StackSize              = (UINT64) SecCoreData->StackSize;
+    
     DEBUG_CODE_BEGIN ();
       PrivateData->SizeOfCacheAsRam = SecCoreData->PeiTemporaryRamSize + SecCoreData->StackSize;
       PrivateData->MaxTopOfCarHeap  = (VOID *) ((UINTN) PrivateData->BottomOfCarHeap + (UINTN) PrivateData->SizeOfCacheAsRam);
@@ -85,9 +94,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeiInstallPeiMemory (
-  IN CONST EFI_PEI_SERVICES      **PeiServices,
-  IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
-  IN UINT64                MemoryLength
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
+  IN EFI_PHYSICAL_ADDRESS    MemoryBegin,
+  IN UINT64                  MemoryLength
   )
 /*++
 
@@ -109,72 +118,15 @@ Returns:
 --*/
 {
   PEI_CORE_INSTANCE                     *PrivateData;
-  EFI_HOB_HANDOFF_INFO_TABLE            *OldHandOffHob;
-  EFI_HOB_HANDOFF_INFO_TABLE            *NewHandOffHob;
-  UINT64                                PeiStackSize;
-  UINT64                                EfiFreeMemorySize;
-  EFI_PHYSICAL_ADDRESS                  PhysicalAddressOfOldHob;
 
-  if (MemoryLength > (MAX_ADDRESS - MemoryBegin + 1))
-    return EFI_INVALID_PARAMETER;
-    
-   
   DEBUG ((EFI_D_INFO, "PeiInstallPeiMemory MemoryBegin 0x%LX, MemoryLength 0x%LX\n", MemoryBegin, MemoryLength));
-  
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
-  PrivateData->SwitchStackSignal = TRUE;
-  PrivateData->PeiMemoryInstalled = TRUE;
-  
-  //
-  // Ensure the stack base is in page alignment 
-  //
-  PrivateData->StackBase = ((UINTN)MemoryBegin + EFI_PAGE_MASK) & ~EFI_PAGE_MASK;
-  PeiStackSize = (RShiftU64 (MemoryLength, 1) + EFI_PAGE_MASK) & ~EFI_PAGE_MASK;
-  
-  if (PEI_STACK_SIZE > PeiStackSize) {
-    PrivateData->StackSize = PeiStackSize;
-  } else {
-    PrivateData->StackSize = PEI_STACK_SIZE;
-  }
-
-  OldHandOffHob = PrivateData->HobList.HandoffInformationTable;
-
-  PrivateData->HobList.Raw = (VOID *)((UINTN)(PrivateData->StackBase + PrivateData->StackSize));
-  NewHandOffHob = PrivateData->HobList.HandoffInformationTable;
-  PhysicalAddressOfOldHob = (EFI_PHYSICAL_ADDRESS) (UINTN) OldHandOffHob;
-
-  EfiFreeMemorySize = OldHandOffHob->EfiFreeMemoryBottom - PhysicalAddressOfOldHob;
-  
-  DEBUG ((EFI_D_INFO, "HOBLIST address before memory init = 0x%p\n",  OldHandOffHob));
-  DEBUG ((EFI_D_INFO, "HOBLIST address after memory init = 0x%p\n", NewHandOffHob));
-
-  CopyMem (
-    NewHandOffHob,
-    OldHandOffHob,
-    (UINTN)EfiFreeMemorySize
-    );
-
-  NewHandOffHob->EfiMemoryTop     = MemoryBegin + MemoryLength;
-  NewHandOffHob->EfiFreeMemoryTop = NewHandOffHob->EfiMemoryTop;
-  NewHandOffHob->EfiMemoryBottom  = MemoryBegin;
-  
-  NewHandOffHob->EfiFreeMemoryBottom = (UINTN)NewHandOffHob + EfiFreeMemorySize;                                     
-                                       
-  NewHandOffHob->EfiEndOfHobList     = (UINTN)NewHandOffHob +
-                                       (OldHandOffHob->EfiEndOfHobList -
-                                        PhysicalAddressOfOldHob);
-  
-  //
-  // For IPF in CAR mode the real memory access is uncached,in InstallPeiMemory()
-  //  the 63-bit of address is set to 1.
-  //
-  SWITCH_TO_CACHE_MODE (PrivateData);
-  
-  ConvertPpiPointers (PeiServices, OldHandOffHob, NewHandOffHob);
-
-  BuildStackHob (PrivateData->StackBase, PrivateData->StackSize);
-  
+  PrivateData->PhysicalMemoryBegin   = MemoryBegin;
+  PrivateData->PhysicalMemoryLength  = MemoryLength;
+  PrivateData->FreePhysicalMemoryTop = MemoryBegin + MemoryLength;
+   
+  PrivateData->SwitchStackSignal      = TRUE;
 
   return EFI_SUCCESS;   
 }
@@ -214,56 +166,70 @@ Returns:
   PEI_CORE_INSTANCE                       *PrivateData;
   EFI_PEI_HOB_POINTERS                    Hob;
   EFI_PHYSICAL_ADDRESS                    Offset;
+  EFI_PHYSICAL_ADDRESS                    *FreeMemoryTop;
+  EFI_PHYSICAL_ADDRESS                    *FreeMemoryBottom;
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
-
+  Hob.Raw     = PrivateData->HobList.Raw;
+  
   //
   // Check if Hob already available
   //
   if (!PrivateData->PeiMemoryInstalled) {
-    return EFI_NOT_AVAILABLE_YET;
+    //
+    // When PeiInstallMemory is called but CAR has *not* been moved to temporary memory,
+    // the AllocatePage will dependent the field of PEI_CORE_INSTANCE structure.
+    //
+    if (!PrivateData->SwitchStackSignal) {
+      return EFI_NOT_AVAILABLE_YET;
+    } else {
+      FreeMemoryTop     = &(PrivateData->FreePhysicalMemoryTop);
+      FreeMemoryBottom  = &(PrivateData->PhysicalMemoryBegin);
+    }
+  } else {
+    FreeMemoryTop     = &(Hob.HandoffInformationTable->EfiFreeMemoryTop);
+    FreeMemoryBottom  = &(Hob.HandoffInformationTable->EfiFreeMemoryBottom);
   }
 
-  Hob.Raw = PrivateData->HobList.Raw;
+  
 
   //
   // Check to see if on 4k boundary
   //
-  Offset = Hob.HandoffInformationTable->EfiFreeMemoryTop & 0xFFF;
-
+  Offset = *(FreeMemoryTop) & 0xFFF;
+  
   //
   // If not aligned, make the allocation aligned.
   //
   if (Offset != 0) {
-    Hob.HandoffInformationTable->EfiFreeMemoryTop -= Offset;
+    *(FreeMemoryTop) -= Offset;
   }
-
-  ASSERT (Hob.HandoffInformationTable->EfiFreeMemoryTop >= Hob.HandoffInformationTable->EfiFreeMemoryBottom);
+  
   //
   // Verify that there is sufficient memory to satisfy the allocation
   //
-  if (Hob.HandoffInformationTable->EfiFreeMemoryTop - ((Pages * EFI_PAGE_SIZE) + sizeof (EFI_HOB_MEMORY_ALLOCATION)) < 
-      Hob.HandoffInformationTable->EfiFreeMemoryBottom) {
+  if (*(FreeMemoryTop) - ((Pages * EFI_PAGE_SIZE) + sizeof (EFI_HOB_MEMORY_ALLOCATION)) < 
+      *(FreeMemoryBottom)) {
     DEBUG ((EFI_D_ERROR, "AllocatePages failed: No 0x%x Pages is available.\n", Pages));
     DEBUG ((EFI_D_ERROR, "There is only left 0x%x pages memory resource to be allocated.\n", \
-    EFI_SIZE_TO_PAGES ((UINTN) (Hob.HandoffInformationTable->EfiFreeMemoryTop - Hob.HandoffInformationTable->EfiFreeMemoryBottom))));
+    EFI_SIZE_TO_PAGES ((UINTN) (*(FreeMemoryTop) - *(FreeMemoryBottom)))));
     return  EFI_OUT_OF_RESOURCES;
   } else {
     //
     // Update the PHIT to reflect the memory usage
     //
-    Hob.HandoffInformationTable->EfiFreeMemoryTop -= Pages * EFI_PAGE_SIZE;
+    *(FreeMemoryTop) -= Pages * EFI_PAGE_SIZE;
 
     //
     // Update the value for the caller
     //
-    *Memory = Hob.HandoffInformationTable->EfiFreeMemoryTop;
+    *Memory = *(FreeMemoryTop);
 
     //
     // Create a memory allocation HOB.
     //
     BuildMemoryAllocationHob (
-      Hob.HandoffInformationTable->EfiFreeMemoryTop,
+      *(FreeMemoryTop),
       Pages * EFI_PAGE_SIZE,
       MemoryType
       );
