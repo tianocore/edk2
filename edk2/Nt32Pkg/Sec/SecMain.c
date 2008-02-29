@@ -58,6 +58,7 @@ EFI_PEI_PROGRESS_CODE_PPI                 mSecStatusCodePpi     = { SecPeiReport
 
 NT_FWH_PPI                                mSecFwhInformationPpi = { SecWinNtFdAddress };
 
+TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
 
 EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
   {
@@ -84,6 +85,11 @@ EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiPeiStatusCodePpiGuid,
     &mSecStatusCodePpi
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &gEfiTemporaryRamSupportPpiGuid,
+    &mSecTemporaryRamSupportPpi
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
@@ -116,7 +122,12 @@ UINTN                   mPdbNameModHandleArraySize = 0;
 PDB_NAME_TO_MOD_HANDLE  *mPdbNameModHandleArray = NULL;
 
 
-
+VOID
+EFIAPI
+SecSwitchStack (
+  UINT32   TemporaryMemoryBase,
+  UINT32   PermenentMemoryBase
+  );
 
 INTN
 EFIAPI
@@ -566,18 +577,31 @@ Returns:
   EFI_PHYSICAL_ADDRESS        PeiCoreEntryPoint;
   EFI_PHYSICAL_ADDRESS        PeiImageAddress;
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
+  UINTN                       PeiStackSize;
 
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
   //
-  TopOfMemory = LargestRegion + LargestRegionSize;
+  TopOfMemory  = LargestRegion + LargestRegionSize;
+  PeiStackSize = (UINTN)RShiftU64((UINT64)STACK_SIZE,1);
 
   //
-  // Allocate 128KB for the Stack
+  // |-----------| <---- TemporaryRamBase + TemporaryRamSize
+  // |   Heap    |
+  // |           |
+  // |-----------| <---- StackBase / PeiTemporaryMemoryBase
+  // |           |
+  // |  Stack    |
+  // |-----------| <---- TemporaryRamBase
+  // 
+  TopOfStack  = (VOID *)(LargestRegion + PeiStackSize);
+  TopOfMemory = LargestRegion + PeiStackSize;
+
   //
-  TopOfStack  = (VOID *)((UINTN)TopOfMemory - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
+  // Reservet space for storing PeiCore's parament in stack.
+  // 
+  TopOfStack  = (VOID *)((UINTN)TopOfStack - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
   TopOfStack  = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
-  TopOfMemory = TopOfMemory - STACK_SIZE;
 
   //
   // Patch value in dispatch table values
@@ -591,12 +615,12 @@ Returns:
   SecCoreData->DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
   SecCoreData->BootFirmwareVolumeBase = (VOID*)BootFirmwareVolumeBase;
   SecCoreData->BootFirmwareVolumeSize = FixedPcdGet32(PcdWinNtFirmwareFdSize);
-  SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)TopOfMemory; 
+  SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)LargestRegion; 
   SecCoreData->TemporaryRamSize       = STACK_SIZE;
-  SecCoreData->PeiTemporaryRamBase    = SecCoreData->TemporaryRamBase;
-  SecCoreData->PeiTemporaryRamSize    = (UINTN)RShiftU64((UINT64)STACK_SIZE,1);
-  SecCoreData->StackBase              = (VOID*)((UINTN)SecCoreData->TemporaryRamBase + (UINTN)SecCoreData->TemporaryRamSize);
-  SecCoreData->StackSize              = (UINTN)RShiftU64((UINT64)STACK_SIZE,1);
+  SecCoreData->StackBase              = (VOID*) ((UINTN) SecCoreData->TemporaryRamBase + PeiStackSize);
+  SecCoreData->StackSize              = PeiStackSize;
+  SecCoreData->PeiTemporaryRamBase    = SecCoreData->StackBase;
+  SecCoreData->PeiTemporaryRamSize    = STACK_SIZE - PeiStackSize;
 
   //
   // Load the PEI Core from a Firmware Volume
@@ -1207,5 +1231,46 @@ _ModuleEntryPoint (
   VOID
   )
 {
+}
+
+EFI_STATUS
+EFIAPI
+SecTemporaryRamSupport (
+  IN CONST EFI_PEI_SERVICES   **PeiServices,
+  IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
+  IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
+  IN UINTN                    CopySize
+  )
+{
+  //
+  // Migrate the whole temporary memory to permenent memory.
+  // 
+  CopyMem (
+    (VOID*)(UINTN)PermanentMemoryBase, 
+    (VOID*)(UINTN)TemporaryMemoryBase, 
+    CopySize
+    );
+
+  //
+  // SecSwitchStack function must be invoked after the memory migration
+  // immediatly, also we need fixup the stack change caused by new call into 
+  // permenent memory.
+  // 
+  SecSwitchStack (
+    (UINT32) TemporaryMemoryBase,
+    (UINT32) PermanentMemoryBase
+    );
+
+  //
+  // We need *not* fix the return address because currently, 
+  // The PeiCore is excuted in flash.
+  //
+
+  //
+  // Simulate to invalid CAR, terminate CAR
+  // 
+  //ZeroMem ((VOID*)(UINTN)TemporaryMemoryBase, CopySize);
+  
+  return EFI_SUCCESS;
 }
 

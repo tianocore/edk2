@@ -360,7 +360,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd|0x3040003|UINT32|0x30001014              # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END
 
 [PcdsFixedAtBuild.IPF]
-  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f
+  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f  # comments
 
 [PcdsPatchableInModule.common]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a

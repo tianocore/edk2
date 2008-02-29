@@ -122,6 +122,7 @@ Returns:
   PEI_CORE_INSTANCE                                     *OldCoreData;
   EFI_PEI_CPU_IO_PPI                                    *CpuIo;
   EFI_PEI_PCI_CFG2_PPI                                  *PciCfg;
+  PEI_CORE_ENTRY_POINT                                  ShadowedPeiCore;
 
   mTick = 0;
   OldCoreData = (PEI_CORE_INSTANCE *) Data;
@@ -133,6 +134,16 @@ Returns:
   }
 
   if (OldCoreData != NULL) {
+    ShadowedPeiCore = (PEI_CORE_ENTRY_POINT) (UINTN) OldCoreData->ShadowedPeiCore;
+    if (ShadowedPeiCore != NULL) {
+      OldCoreData->ShadowedPeiCore = NULL;
+      ShadowedPeiCore (
+        SecCoreData,
+        PpiList,
+        OldCoreData
+        );
+    }
+
     CopyMem (&PrivateData, OldCoreData, sizeof (PEI_CORE_INSTANCE));
     
     CpuIo = (VOID*)PrivateData.ServiceTableShadow.CpuIo;
@@ -181,8 +192,8 @@ Returns:
       UINTN  StackValue;
 
       StackValue = INIT_CAR_VALUE;
-      for (StackPointer = (UINTN *) OldCoreData->TopOfCarHeap;
-           ((UINTN) StackPointer < ((UINTN) OldCoreData->MaxTopOfCarHeap))
+      for (StackPointer = (UINTN *) OldCoreData->MaxTopOfCarHeap;
+           ((UINTN) StackPointer < ((UINTN) OldCoreData->BottomOfCarHeap + OldCoreData->SizeOfCacheAsRam))
            && StackValue == INIT_CAR_VALUE;
            StackPointer++) {
         StackValue = *StackPointer;
@@ -190,7 +201,7 @@ Returns:
       
       DEBUG ((EFI_D_INFO, "Total Cache as RAM:    %d bytes.\n", OldCoreData->SizeOfCacheAsRam));
       DEBUG ((EFI_D_INFO, "  CAR stack ever used: %d bytes.\n",
-        ((UINTN) OldCoreData->MaxTopOfCarHeap - (UINTN) StackPointer)
+        ((UINTN) OldCoreData->TopOfCarHeap - (UINTN) StackPointer)
         ));
       DEBUG ((EFI_D_INFO, "  CAR heap used:       %d bytes.\n",
         ((UINTN) OldCoreData->HobList.HandoffInformationTable->EfiFreeMemoryBottom -

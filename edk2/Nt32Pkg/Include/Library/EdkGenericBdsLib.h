@@ -1,4 +1,7 @@
-/*++
+/*! \addtogroup Library EdkGenericBdsLib */
+/*@{ */
+/**@file 
+  BDS library definition, include the file and data structure
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials                          
@@ -9,15 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  BdsLib.h
-
-Abstract:
-
-  BDS library definition, include the file and data structure
-
---*/
+**/
 
 #ifndef _BDS_LIB_H_
 #define _BDS_LIB_H_
@@ -110,6 +105,11 @@ BdsLibBootNext (
   VOID
   );
 
+/*!
+ \fn BdsLibBootViaBootOption
+ \param BDS_COMMON_OPTION
+ \param EFI_DEVICE_PATH_PROTOCOL
+*/
 EFI_STATUS
 BdsLibBootViaBootOption (
   IN  BDS_COMMON_OPTION             * Option,
@@ -394,3 +394,4 @@ BdsLibGetHiiHandles (
   );
 
 #endif // _BDS_LIB_H_
+/*@} */

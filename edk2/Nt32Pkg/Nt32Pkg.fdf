@@ -162,9 +162,9 @@ INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
 INF  Nt32Pkg/BootModePei/BootModePei.inf
 INF  Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
 INF  MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
-INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 INF  Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
 INF  Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
+INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 INF  Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocolPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 

@@ -74,20 +74,9 @@ SetPeiServicesTablePointer (
   EFI_PEI_SERVICES ** PeiServicesTablePointer
   )
 {
+  AsmWriteKr7 ((UINT64)(UINTN)PeiServicesTablePointer);
 }
   
-/**
-  After memory initialization in PEI phase, the IDT table in temporary memory should 
-  be migrated to memory, and the address of PeiServicesPointer also need to be updated  
-  immediately preceding the new IDT table.
-  
-  @param    PeiServices   The address of PeiServices pointer.
-**/
-VOID
-MigrateIdtTable (
-  IN EFI_PEI_SERVICES  **PeiServices
-  )
-{
-}
+
 
 
