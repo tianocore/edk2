@@ -326,7 +326,7 @@ Returns:
   Private->CapsLock                = FALSE;
   Private->NumLock                 = FALSE;
   Private->ScrollLock              = FALSE;
-  
+ 
   Private->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
   Private->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
 
@@ -734,9 +734,9 @@ WinNtGopSimpleTextInExRegisterKeyNotify (
   LIST_ENTRY                         *Link;
   WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY *NewNotify;      
 
-  if (KeyData == NULL || NotifyHandle == NULL) {
+  if (KeyData == NULL || KeyNotificationFunction == NULL || NotifyHandle == NULL) {
     return EFI_INVALID_PARAMETER;
-  }  
+  }
 
   Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
 
