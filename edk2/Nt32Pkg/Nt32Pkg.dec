@@ -50,8 +50,6 @@
 ################################################################################
 [LibraryClasses.common]
   WinNtLib|Include/Library/WinNtLib.h
-  EdkGenericBdsLib|Include/Library/EdkGenericBdsLib.h
-
 
 ################################################################################
 #
