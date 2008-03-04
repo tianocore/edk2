@@ -1432,7 +1432,7 @@ Returns:
   //
   // Build the map
   //
-  ZeroMem (MemoryMap, Size);
+  ZeroMem (MemoryMap, BufferSize);
   for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
     Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
     ASSERT (Entry->VirtualStart == 0);
