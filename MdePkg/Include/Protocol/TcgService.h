@@ -196,7 +196,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TCG_HASH_LOG_EXTEND_EVENT) (
   IN      EFI_TCG_PROTOCOL          *This,
-  IN      UINT8                     *HashData,
+  IN      EFI_PHYSICAL_ADDRESS      HashData,
   IN      UINT64                    HashDataLen,
   IN      TCG_ALGORITHM_ID          AlgorithmId,
   IN OUT  TCG_PCR_EVENT             *TCGLogData,
