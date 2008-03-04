@@ -2473,6 +2473,9 @@ Returns:
       if (MemorySpaceMap[Index].ImageHandle == NULL) {
         BaseAddress  = PageAlignAddress (MemorySpaceMap[Index].BaseAddress);
         Length       = PageAlignLength  (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length - BaseAddress);
+        if (Length == 0 || MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length < BaseAddress) {
+          continue;
+        }
         CoreAddMemoryDescriptor (
           EfiConventionalMemory,
           BaseAddress,
