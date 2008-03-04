@@ -208,7 +208,9 @@ Returns:
   UINTN                     Size;
   UINTN                     LinkTimeBase;
   EFI_TCG_PLATFORM_PROTOCOL *TcgPlatformProtocol;
+  IMAGE_FILE_HANDLE         *FHandle;
 
+  FHandle = NULL;
   ZeroMem (&Image->ImageContext, sizeof (Image->ImageContext));
 
   Image->ImageContext.Handle    = Pe32Handle;
@@ -362,17 +364,18 @@ Returns:
              NULL,
              (VOID **) &TcgPlatformProtocol
              );
-  if (!EFI_ERROR (Status)) {    
+  if (!EFI_ERROR (Status)) {
+    FHandle = (IMAGE_FILE_HANDLE *) Image->ImageContext.Handle;
     Status = TcgPlatformProtocol->MeasurePeImage (
                                     BootPolicy,
-                                    Image->ImageContext.ImageAddress,
-                                    (UINTN) Image->ImageContext.ImageSize,
+                                    (EFI_PHYSICAL_ADDRESS) (UINTN) FHandle->Source,
+                                    FHandle->SourceSize,
                                     LinkTimeBase,
                                     Image->ImageContext.ImageType,
                                     Image->Info.DeviceHandle,
                                     Image->Info.FilePath
                                     );
-    
+
     ASSERT_EFI_ERROR (Status);
   }
 
