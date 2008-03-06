@@ -114,6 +114,7 @@
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolumeDispatchProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault

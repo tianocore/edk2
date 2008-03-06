@@ -42,6 +42,7 @@ Abstract:
 #include <Protocol/PciIo.h>
 #include <Protocol/AcpiS3Save.h>
 #include <Protocol/Performance.h>
+#include <Protocol/FirmwareVolumeDispatch.h>
 
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FileInfo.h>
