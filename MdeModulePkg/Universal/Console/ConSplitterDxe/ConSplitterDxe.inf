@@ -52,6 +52,7 @@
 
 [LibraryClasses]
   UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
   MemoryAllocationLib
   BaseMemoryLib
   BaseLib
@@ -68,6 +69,7 @@
   gEfiPrimaryConsoleInDeviceGuid                # ALWAYS_PRODUCED
   gEfiPrimaryStandardErrorDeviceGuid            # ALWAYS_PRODUCED
   gSimpleTextInExNotifyGuid                     # ALWAYS_PRODUCED
+  gEfiGenericPlatformVariableGuid               # ALWAYS_CONSUMED
 
 [Protocols]
   gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
