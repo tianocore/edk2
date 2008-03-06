@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/PrimaryConsoleOutDevice.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Guid/PrimaryConsoleInDevice.h>
+#include <Guid/GenericPlatformVariable.h>
 #include <Protocol/SimplePointer.h>
 #include <Protocol/AbsolutePointer.h>
 #include <Protocol/SimpleTextOut.h>
@@ -38,6 +39,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+
 
 //
 // Driver Binding Externs
@@ -72,6 +75,13 @@ extern EFI_GUID                     gSimpleTextInExNotifyGuid;
 #define CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT  32
 #define CONSOLE_SPLITTER_MODES_ALLOC_UNIT     32
 #define MAX_STD_IN_PASSWORD                   80
+
+#define VarConOutMode L"ConOutMode"
+
+typedef struct {
+  UINTN   Column;
+  UINTN   Row;
+} CONSOLE_OUT_MODE;
 
 typedef struct {
   UINTN Columns;

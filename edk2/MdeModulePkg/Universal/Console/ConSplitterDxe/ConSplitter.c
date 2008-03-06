@@ -683,6 +683,12 @@ ConSplitterTextOutConstructor (
   //
   ConOutPrivate->TextOut.Mode = &ConOutPrivate->TextOutMode;
 
+  //
+  // When new console device is added, the new mode will be set later,
+  // so put current mode back to init state.
+  //  
+  ConOutPrivate->TextOutMode.Mode = 0xFF;
+
   Status = ConSplitterGrowBuffer (
             sizeof (TEXT_OUT_AND_GOP_DATA),
             &ConOutPrivate->TextOutListCount,
@@ -1258,6 +1264,13 @@ Returns:
   if (EFI_ERROR (Status)) {
     UgaDraw = NULL;
   }
+
+  //
+  // When new console device is added, the new mode will be set later,
+  // so put current mode back to init state.
+  //
+  mConOut.TextOutMode.Mode = 0xFF;
+  
   //
   // If both ConOut and StdErr incorporate the same Text Out device,
   // their MaxMode and QueryData should be the intersection of both.
@@ -1319,6 +1332,13 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  
+  //
+  // When new console device is added, the new mode will be set later,
+  // so put current mode back to init state.
+  //
+  mStdErr.TextOutMode.Mode = 0xFF;
+  
   //
   // If both ConOut and StdErr incorporate the same Text Out device,
   // their MaxMode and QueryData should be the intersection of both.
@@ -2761,6 +2781,112 @@ Done:
   return Status;
 }
 
+VOID
+ConsplitterSetConsoleOutMode (
+  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
+  )
+/*++
+
+Routine Description:
+
+  This routine will get the current console mode information (column, row)
+  from ConsoleOutMode variable and set it; if the variable does not exist,
+  set to user defined console mode.
+
+Arguments:
+
+  None
+
+Returns:
+
+  None
+
+--*/  
+{
+  UINTN                         Col;
+  UINTN                         Row;
+  UINTN                         Mode;
+  UINTN                         PreferMode;
+  UINTN                         BaseMode;
+  UINTN                         ModeInfoSize;
+  UINTN                         MaxMode;
+  EFI_STATUS                    Status;
+  CONSOLE_OUT_MODE              *ModeInfo;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
+  
+  PreferMode   = 0xFF;
+  BaseMode     = 0xFF;
+  TextOut      = &Private->TextOut;
+  MaxMode      = (UINTN) (TextOut->Mode->MaxMode);
+  ModeInfoSize = sizeof (CONSOLE_OUT_MODE);
+
+  ModeInfo = AllocateZeroPool (sizeof(CONSOLE_OUT_MODE));
+  ASSERT(ModeInfo != NULL);
+
+  Status = gRT->GetVariable (
+                   VarConOutMode,
+                   &gEfiGenericPlatformVariableGuid,
+                   NULL,
+                   &ModeInfoSize,
+                   ModeInfo
+                   );
+
+  //
+  // Set to the default mode 80 x 25 required by EFI/UEFI spec; 
+  // user can also define other valid default console mode here.
+  //            
+  if (EFI_ERROR(Status)) {
+    ModeInfo->Column = 80;
+    ModeInfo->Row    = 25;
+    Status = gRT->SetVariable (
+                    VarConOutMode,
+                    &gEfiGenericPlatformVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    sizeof (CONSOLE_OUT_MODE),
+                    ModeInfo
+                    );    
+  }
+  
+  for (Mode = 0; Mode < MaxMode; Mode++) {
+    Status = TextOut->QueryMode (TextOut, Mode, &Col, &Row);
+    if (!EFI_ERROR(Status)) {
+      if (Col == ModeInfo->Column && Row == ModeInfo->Row) {
+        PreferMode = Mode;
+      }
+      if (Col == 80 && Row == 25) {
+        BaseMode = Mode;
+      }
+    }
+  }
+  
+  Status = TextOut->SetMode (TextOut, PreferMode);
+  
+  //
+  // if current mode setting is failed, default 80x25 mode will be set.
+  //
+  if (EFI_ERROR(Status)) {
+    Status = TextOut->SetMode (TextOut, BaseMode);
+    ASSERT(!EFI_ERROR(Status));
+    
+    ModeInfo->Column = 80;
+    ModeInfo->Row    = 25;
+    
+    //
+    // Update ConOutMode variable
+    //
+    Status = gRT->SetVariable (
+                    VarConOutMode,
+                    &gEfiGenericPlatformVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    sizeof (CONSOLE_OUT_MODE),
+                    ModeInfo
+                    );     
+  }
+
+  gBS->FreePool (ModeInfo);
+}
+
+
 EFI_STATUS
 ConSplitterTextOutAddDevice (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA     *Private,
@@ -2915,6 +3041,12 @@ Returns:
     //
     Private->TextOut.SetMode (&Private->TextOut, 0);
   }
+
+  //
+  // After adding new console device, all existing console devices should be 
+  // synced to the current shared mode.
+  //
+  ConsplitterSetConsoleOutMode (Private);
 
   return Status;
 }

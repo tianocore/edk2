@@ -1373,7 +1373,7 @@ DevNullTextOutSetMode (
     return EFI_UNSUPPORTED;
   }
 
-  if (Private->DevNullColumns != Column || Private->DevNullRows != Row) {
+  if (Private->TextOutMode.Mode != (INT32) ModeNumber) {
 
     Private->TextOutMode.Mode = (INT32) ModeNumber;
     Private->DevNullColumns   = Column;
