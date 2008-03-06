@@ -617,9 +617,9 @@ Returns:
   SecCoreData->BootFirmwareVolumeSize = FixedPcdGet32(PcdWinNtFirmwareFdSize);
   SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)LargestRegion; 
   SecCoreData->TemporaryRamSize       = STACK_SIZE;
-  SecCoreData->StackBase              = (VOID*) ((UINTN) SecCoreData->TemporaryRamBase + PeiStackSize);
+  SecCoreData->StackBase              = SecCoreData->TemporaryRamBase;
   SecCoreData->StackSize              = PeiStackSize;
-  SecCoreData->PeiTemporaryRamBase    = SecCoreData->StackBase;
+  SecCoreData->PeiTemporaryRamBase    = (VOID*) ((UINTN) SecCoreData->TemporaryRamBase + PeiStackSize);
   SecCoreData->PeiTemporaryRamSize    = STACK_SIZE - PeiStackSize;
 
   //
