@@ -255,7 +255,6 @@ Returns:
   UINT32                              Index2;
   EFI_PEI_SERVICES                    **PeiServices;
   EFI_PEI_FV_HANDLE                   VolumeHandle;
-  //EFI_PHYSICAL_ADDRESS                PeiCoreFileHandle;
   EFI_PEI_FILE_HANDLE                 PeimFileHandle;
   UINTN                               FvCount;
   UINTN                               PeimCount;
@@ -584,33 +583,6 @@ Returns:
               // Shadow PEI Core. When permanent memory is avaiable, shadow
               // PEI Core and PEIMs to get high performance.
               //
-              //PeiCoreFileHandle = 0;
-              //
-              // Find the PEI Core in the BFV
-              //
-              //Status = PeiFindFileEx (
-              //          (EFI_PEI_FV_HANDLE)PrivateInMem->Fv[0].FvHeader,
-              //          NULL,
-               //         EFI_FV_FILETYPE_PEI_CORE,
-              //          (EFI_PEI_FILE_HANDLE*)&PeiCoreFileHandle,
-              //          NULL
-              //          );
-              //ASSERT_EFI_ERROR (Status);
-
-              //
-              // Shadow PEI Core into memory so it will run faster
-              //
-              //Status = PeiLoadImage (
-              //           PeiServices,
-              //           *((EFI_PEI_FILE_HANDLE*)&PeiCoreFileHandle),
-              //           &EntryPoint,
-               //          &AuthenticationState
-               //          );
-              //ASSERT_EFI_ERROR (Status);
-
-              //PrivateInMem->ShadowedPeiCore = (VOID*) ((UINTN) EntryPoint +
-              //                                         (UINTN) PeiCore    -
-              //                                         (UINTN) _ModuleEntryPoint);
               PrivateInMem->ShadowedPeiCore = ShadowPeiCore (
                                                 PeiServices,
                                                 PrivateInMem
@@ -625,12 +597,6 @@ Returns:
               // Entry PEI Phase 2
               //
               PeiCore (SecCoreData, NULL, PrivateInMem);
-
-              //((PEI_CORE_ENTRY_POINT) (UINTN) PrivateInMem->ShadowedPeiCore) (
-              //                                        SecCoreData,
-              //                                        NULL,
-              //                                        PrivateInMem
-              //                                        );
 
               //
               // Code should not come here
