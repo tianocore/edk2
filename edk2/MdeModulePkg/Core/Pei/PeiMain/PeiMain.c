@@ -182,34 +182,6 @@ Returns:
     PERF_START (NULL,"PostMem", NULL, 0);
 
     //
-    // The following code dumps out interesting cache as RAM usage information
-    // so we can keep tabs on how the cache as RAM is being utilized.  The
-    // DEBUG_CODE_BEGIN macro is used to prevent this code from being compiled
-    // on a debug build.
-    //
-    DEBUG_CODE_BEGIN ();
-      UINTN  *StackPointer;
-      UINTN  StackValue;
-
-      StackValue = INIT_CAR_VALUE;
-      for (StackPointer = (UINTN *) OldCoreData->MaxTopOfCarHeap;
-           ((UINTN) StackPointer < ((UINTN) OldCoreData->BottomOfCarHeap + OldCoreData->SizeOfCacheAsRam))
-           && StackValue == INIT_CAR_VALUE;
-           StackPointer++) {
-        StackValue = *StackPointer;
-      }
-      
-      DEBUG ((EFI_D_INFO, "Total Cache as RAM:    %d bytes.\n", OldCoreData->SizeOfCacheAsRam));
-      DEBUG ((EFI_D_INFO, "  CAR stack ever used: %d bytes.\n",
-        ((UINTN) OldCoreData->TopOfCarHeap - (UINTN) StackPointer)
-        ));
-      DEBUG ((EFI_D_INFO, "  CAR heap used:       %d bytes.\n",
-        ((UINTN) OldCoreData->HobList.HandoffInformationTable->EfiFreeMemoryBottom -
-        (UINTN) OldCoreData->HobList.Raw)
-        ));
-    DEBUG_CODE_END ();
-
-    //
     // Alert any listeners that there is permanent memory available
     //
     

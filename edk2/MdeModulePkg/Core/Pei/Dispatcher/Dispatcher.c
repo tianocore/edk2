@@ -23,6 +23,8 @@ Revision History
 
 #include <PeiMain.h>
 
+#define INIT_CAR_VALUE 0x5AA55AA5
+
 typedef struct {
   EFI_STATUS_CODE_DATA  DataHeader;
   EFI_HANDLE            Handle;
@@ -437,7 +439,28 @@ Returns:
             }
 
             if (Private->SwitchStackSignal) {
-
+              //
+              // Before switch stack from CAR to permenent memory, caculate the heap and stack
+              // usage in temporary memory for debuging.
+              //
+              DEBUG_CODE_BEGIN ();
+                UINTN  *StackPointer;
+                
+                for (StackPointer = (UINTN*)SecCoreData->StackBase;
+                     (StackPointer < (UINTN*)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
+                     && (*StackPointer == INIT_CAR_VALUE);
+                     StackPointer ++);
+                     
+                DEBUG ((EFI_D_INFO, "Total Cache as RAM:    %d bytes.\n", SecCoreData->TemporaryRamSize));
+                DEBUG ((EFI_D_INFO, "  CAR stack ever used: %d bytes.\n",
+                       (SecCoreData->StackSize - ((UINTN) StackPointer - (UINTN)SecCoreData->StackBase))
+                      ));
+                DEBUG ((EFI_D_INFO, "  CAR heap used:       %d bytes.\n",
+                       ((UINTN) Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom -
+                       (UINTN) Private->HobList.Raw)
+                      ));
+              DEBUG_CODE_END ();
+              
               //
               // Reserve the size of new stack at bottom of physical memory
               //
