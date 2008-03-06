@@ -360,9 +360,7 @@ BdsLibConnectUsbDevByShortFormDP(
 
   if ((DevicePathType (RemainingDevicePath) != MESSAGING_DEVICE_PATH) ||
       ((DevicePathSubType (RemainingDevicePath) != MSG_USB_CLASS_DP)
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
       && (DevicePathSubType (RemainingDevicePath) != MSG_USB_WWID_DP)
-#endif
       )) {
     return EFI_INVALID_PARAMETER;
   }

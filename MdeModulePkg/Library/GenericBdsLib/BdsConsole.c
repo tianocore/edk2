@@ -21,7 +21,6 @@ Abstract:
 **/
 
 #include "InternalBdsLib.h"
-//@MT:#include "EfiPrintLib.h"
 
 BOOLEAN
 IsNvNeed (
@@ -228,9 +227,7 @@ BdsLibConnectConsoleVariable (
     //
     if ((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
        ((DevicePathSubType (Instance) == MSG_USB_CLASS_DP)
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
        || (DevicePathSubType (Instance) == MSG_USB_WWID_DP)
-#endif
        )) {
       //
       // Check the Usb console in Usb2.0 bus firstly, then Usb1.1 bus

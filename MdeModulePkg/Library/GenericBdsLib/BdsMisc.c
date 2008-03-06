@@ -269,7 +269,7 @@ BdsLibRegisterNewOption (
   EFI_DEVICE_PATH_PROTOCOL  *OptionDevicePath;
   CHAR16                    *Description;
   CHAR16                    OptionName[10];
-  BOOLEAN                   UpdateBootDevicePath;
+  BOOLEAN                   UpdateDescription;
   UINT16                    BootOrderEntry;
   UINTN                     OrderItemNum;
 
@@ -280,7 +280,7 @@ BdsLibRegisterNewOption (
   OptionDevicePath      = NULL;
   Description           = NULL;
   OptionOrderPtr        = NULL;
-  UpdateBootDevicePath  = FALSE;
+  UpdateDescription     = FALSE;
   ZeroMem (OptionName, sizeof (OptionName));
 
   TempOptionSize = 0;
@@ -318,8 +318,8 @@ BdsLibRegisterNewOption (
     //
     // Notes: the description may will change base on the GetStringToken
     //
-    if (CompareMem (Description, String, StrSize (Description)) == 0) {
-      if (CompareMem (OptionDevicePath, DevicePath, GetDevicePathSize (OptionDevicePath)) == 0) {
+    if (CompareMem (OptionDevicePath, DevicePath, GetDevicePathSize (OptionDevicePath)) == 0) {
+      if (CompareMem (Description, String, StrSize (Description)) == 0) { 
         //
         // Got the option, so just return
         //
@@ -328,9 +328,10 @@ BdsLibRegisterNewOption (
         return EFI_SUCCESS;
       } else {
         //
-        // Boot device path changed, need update.
+        // Option description changed, need update.
         //
-        UpdateBootDevicePath = TRUE;
+        UpdateDescription = TRUE;
+        gBS->FreePool (OptionPtr);
         break;
       }
     }
@@ -350,7 +351,7 @@ BdsLibRegisterNewOption (
   TempPtr += StrSize (String);
   CopyMem (TempPtr, DevicePath, GetDevicePathSize (DevicePath));
 
-  if (UpdateBootDevicePath) {
+  if (UpdateDescription) {
     //
     // The number in option#### to be updated
     //
@@ -375,7 +376,10 @@ BdsLibRegisterNewOption (
                   OptionSize,
                   OptionPtr
                   );
-  if (EFI_ERROR (Status) || UpdateBootDevicePath) {
+  //
+  // Return if only need to update a changed description or fail to set option.
+  //
+  if (EFI_ERROR (Status) || UpdateDescription) {
     gBS->FreePool (OptionPtr);
     gBS->FreePool (TempOptionPtr);
     return Status;
@@ -388,7 +392,7 @@ BdsLibRegisterNewOption (
   //
 
   //
-  // If no BootOrder
+  // If no option order
   //
   if (TempOptionSize == 0) {
     BootOrderEntry = 0;
@@ -406,18 +410,12 @@ BdsLibRegisterNewOption (
     return EFI_SUCCESS;
   }
 
-  if (UpdateBootDevicePath) {
-    //
-    // If just update a old option, the new optionorder size not change
-    //
-    OrderItemNum = (TempOptionSize / sizeof (UINT16)) ;
-    OptionOrderPtr = AllocateZeroPool ( OrderItemNum * sizeof (UINT16));
-    CopyMem (OptionOrderPtr, TempOptionPtr, OrderItemNum * sizeof (UINT16));
-  } else {
-    OrderItemNum = (TempOptionSize / sizeof (UINT16)) + 1 ;
-    OptionOrderPtr = AllocateZeroPool ( OrderItemNum * sizeof (UINT16));
-    CopyMem (OptionOrderPtr, TempOptionPtr, (OrderItemNum - 1) * sizeof (UINT16));
-  }
+  //
+  // Append the new option number to the original option order
+  //
+  OrderItemNum = (TempOptionSize / sizeof (UINT16)) + 1 ;
+  OptionOrderPtr = AllocateZeroPool ( OrderItemNum * sizeof (UINT16));
+  CopyMem (OptionOrderPtr, TempOptionPtr, (OrderItemNum - 1) * sizeof (UINT16));
 
   OptionOrderPtr[Index] = RegisterOptionNumber;
 
@@ -995,10 +993,6 @@ SetupResetReminder (
   VOID
   )
 {
-#if (EFI_SPECIFICATION_VERSION < 0x0002000A)
-  EFI_STATUS                    Status;
-  EFI_FORM_BROWSER_PROTOCOL     *Browser;
-#endif
   EFI_INPUT_KEY                 Key;
   CHAR16                        *StringBuffer1;
   CHAR16                        *StringBuffer2;
@@ -1010,14 +1004,6 @@ SetupResetReminder (
   if (IsResetReminderFeatureEnable ()) {
     if (IsResetRequired ()) {
 
-#if (EFI_SPECIFICATION_VERSION < 0x0002000A)
-      Status = gBS->LocateProtocol (
-                      &gEfiFormBrowserProtocolGuid,
-                      NULL,
-                      &Browser
-                      );
-#endif
-
       StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
       ASSERT (StringBuffer1 != NULL);
       StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
@@ -1028,11 +1014,7 @@ SetupResetReminder (
       // Popup a menu to notice user
       //
       do {
-#if (EFI_SPECIFICATION_VERSION < 0x0002000A)
-        Browser->CreatePopUp (2, TRUE, 0, NULL, &Key, StringBuffer1, StringBuffer2);
-#else
         IfrLibCreatePopUp (2, &Key, StringBuffer1, StringBuffer2);
-#endif
       } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
 
       gBS->FreePool (StringBuffer1);
@@ -1186,61 +1168,6 @@ BdsLibGetImageHeader (
   }
   return Status;
 }
-
-#if (EFI_SPECIFICATION_VERSION < 0x0002000A)
-EFI_STATUS
-BdsLibGetHiiHandles (
-  IN     EFI_HII_PROTOCOL *Hii,
-  IN OUT UINT16           *HandleBufferLength,
-  OUT    EFI_HII_HANDLE   **HiiHandleBuffer
-  )
-/*++
-
-Routine Description:
-
-  Determines the handles that are currently active in the database.
-  It's the caller's responsibility to free handle buffer.
-
-Arguments:
-
-  This                  - A pointer to the EFI_HII_PROTOCOL instance.
-  HandleBufferLength    - On input, a pointer to the length of the handle buffer. On output,
-                          the length of the handle buffer that is required for the handles found.
-  HiiHandleBuffer       - Pointer to an array of EFI_HII_PROTOCOL instances returned.
-
-Returns:
-
-  EFI_SUCCESS           - Get an array of EFI_HII_PROTOCOL instances successfully.
-  EFI_INVALID_PARAMETER - Hii is NULL.
-  EFI_NOT_FOUND         - Database not found.
-
---*/
-{
-  UINT16      TempBufferLength;
-  EFI_STATUS  Status;
-
-  TempBufferLength = 0;
-
-  //
-  // Try to find the actual buffer size for HiiHandle Buffer.
-  //
-  Status = Hii->FindHandles (Hii, &TempBufferLength, *HiiHandleBuffer);
-
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-      *HiiHandleBuffer = AllocateZeroPool (TempBufferLength);
-      Status = Hii->FindHandles (Hii, &TempBufferLength, *HiiHandleBuffer);
-      //
-      // we should not fail here.
-      //
-      ASSERT_EFI_ERROR (Status);
-  }
-
-  *HandleBufferLength = TempBufferLength;
-
-  return Status;
-
-}
-#endif
 
 VOID
 EFIAPI

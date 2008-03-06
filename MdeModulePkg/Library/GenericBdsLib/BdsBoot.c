@@ -830,11 +830,7 @@ BdsLibEnumerateAllBootOption (
   UINTN                         Size;
   EFI_FV_FILE_ATTRIBUTES        Attributes;
   UINT32                        AuthenticationStatus;
-#if (PI_SPECIFICATION_VERSION < 0x00010000)
-  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
-#else
   EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
-#endif
   EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
   UINTN                         DevicePathType;
   CHAR16                        Buffer[40];
@@ -1046,23 +1042,27 @@ BdsLibEnumerateAllBootOption (
   //
   gBS->LocateHandleBuffer (
         ByProtocol,
-     #if (PI_SPECIFICATION_VERSION < 0x00010000)
-        &gEfiFirmwareVolumeProtocolGuid,
-     #else
         &gEfiFirmwareVolume2ProtocolGuid,
-     #endif
         NULL,
         &FvHandleCount,
         &FvHandleBuffer
         );
   for (Index = 0; Index < FvHandleCount; Index++) {
+    //
+    // Only care the dispatched FV. If no dispatch protocol on the FV, it is not dispatched, then skip it.
+    //
+    Status = gBS->HandleProtocol (
+                    FvHandleBuffer[Index],
+                    &gEfiFirmwareVolumeDispatchProtocolGuid,
+                    (VOID **) &Fv
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+    
     gBS->HandleProtocol (
           FvHandleBuffer[Index],
-       #if (PI_SPECIFICATION_VERSION < 0x00010000)
-          &gEfiFirmwareVolumeProtocolGuid,
-       #else
           &gEfiFirmwareVolume2ProtocolGuid,
-       #endif
           (VOID **) &Fv
           );
 
@@ -1731,11 +1731,7 @@ BdsLibUpdateFvFileDevicePath (
   UINT32                        AuthenticationStatus;
   BOOLEAN                       FindFvFile;
   EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
-#if (PI_SPECIFICATION_VERSION < 0x00010000)
-  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
-#else
   EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
-#endif
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH FvFileNode;
   EFI_HANDLE                    FoundFvHandle;
   EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
@@ -1777,22 +1773,14 @@ BdsLibUpdateFvFileDevicePath (
   TempDevicePath = *DevicePath;
   FoundFvHandle = NULL;
   Status = gBS->LocateDevicePath (
-                #if (PI_SPECIFICATION_VERSION < 0x00010000)
-                  &gEfiFirmwareVolumeProtocolGuid,
-                #else
                   &gEfiFirmwareVolume2ProtocolGuid,
-                #endif
                   &TempDevicePath,
                   &FoundFvHandle
                   );
   if (!EFI_ERROR (Status)) {
     Status = gBS->HandleProtocol (
                     FoundFvHandle,
-                  #if (PI_SPECIFICATION_VERSION < 0x00010000)
-                    &gEfiFirmwareVolumeProtocolGuid,
-                  #else
                     &gEfiFirmwareVolume2ProtocolGuid,
-                  #endif
                     (VOID **) &Fv
                     );
     if (!EFI_ERROR (Status)) {
@@ -1828,11 +1816,7 @@ BdsLibUpdateFvFileDevicePath (
   if (!EFI_ERROR (Status)) {
     Status = gBS->HandleProtocol (
                     LoadedImage->DeviceHandle,
-                  #if (PI_SPECIFICATION_VERSION < 0x00010000)
-                    &gEfiFirmwareVolumeProtocolGuid,
-                  #else
                     &gEfiFirmwareVolume2ProtocolGuid,
-                  #endif
                     (VOID **) &Fv
                     );
     if (!EFI_ERROR (Status)) {
@@ -1857,11 +1841,7 @@ BdsLibUpdateFvFileDevicePath (
   if (!FindFvFile) {
     gBS->LocateHandleBuffer (
           ByProtocol,
-       #if (PI_SPECIFICATION_VERSION < 0x00010000)
-          &gEfiFirmwareVolumeProtocolGuid,
-       #else
           &gEfiFirmwareVolume2ProtocolGuid,
-       #endif
           NULL,
           &FvHandleCount,
           &FvHandleBuffer
@@ -1869,11 +1849,7 @@ BdsLibUpdateFvFileDevicePath (
     for (Index = 0; Index < FvHandleCount; Index++) {
       gBS->HandleProtocol (
             FvHandleBuffer[Index],
-         #if (PI_SPECIFICATION_VERSION < 0x00010000)
-            &gEfiFirmwareVolumeProtocolGuid,
-         #else
             &gEfiFirmwareVolume2ProtocolGuid,
-         #endif
             (VOID **) &Fv
             );
 

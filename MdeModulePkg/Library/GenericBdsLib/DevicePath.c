@@ -622,7 +622,6 @@ DevPathUsb (
   CatPrint (Str, L"Usb(%x,%x)", (UINTN) Usb->ParentPortNumber, (UINTN) Usb->InterfaceNumber);
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 VOID
 DevPathUsbWWID (
   IN OUT POOL_PRINT       *Str,
@@ -652,7 +651,6 @@ DevPathLogicalUnit (
   LogicalUnit = DevPath;
   CatPrint (Str, L"Unit(%x)", (UINTN) LogicalUnit->Lun);
 }
-#endif
 
 VOID
 DevPathUsbClass (
@@ -876,7 +874,6 @@ DevPathUart (
   }
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 VOID
 DevPathiSCSI (
   IN OUT POOL_PRINT       *Str,
@@ -912,7 +909,6 @@ DevPathiSCSI (
 
   CatPrint (Str, L"%s)", (iSCSI->NetworkProtocol == 0) ? L"TCP" : L"reserved");
 }
-#endif
 
 VOID
 DevPathHardDrive (
@@ -1106,14 +1102,12 @@ DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
   MESSAGING_DEVICE_PATH,
   MSG_USB_DP,
   DevPathUsb,
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   MESSAGING_DEVICE_PATH,
   MSG_USB_WWID_DP,
   DevPathUsbWWID,
   MESSAGING_DEVICE_PATH,
   MSG_DEVICE_LOGICAL_UNIT_DP,
   DevPathLogicalUnit,
-#endif
   MESSAGING_DEVICE_PATH,
   MSG_USB_CLASS_DP,
   DevPathUsbClass,
@@ -1141,11 +1135,9 @@ DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
   MESSAGING_DEVICE_PATH,
   MSG_VENDOR_DP,
   DevPathVendor,
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   MESSAGING_DEVICE_PATH,
   MSG_ISCSI_DP,
   DevPathiSCSI,
-#endif
   MEDIA_DEVICE_PATH,
   MEDIA_HARDDRIVE_DP,
   DevPathHardDrive,
@@ -1161,11 +1153,9 @@ DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
   MEDIA_DEVICE_PATH,
   MEDIA_PROTOCOL_DP,
   DevPathMediaProtocol,
-#if (EFI_SPECIFICATION_VERSION != 0x00020000)
   MEDIA_DEVICE_PATH,
   MEDIA_PIWG_FW_FILE_DP,
   DevPathFvFilePath,
-#endif
   BBS_DEVICE_PATH,
   BBS_BBS_DP,
   DevPathBssBss,
