@@ -412,38 +412,6 @@ Returns:
 --*/
 ;
 
-#if   defined (MDE_CPU_IPF)
-  //
-  // In Ipf we should make special changes for the PHIT pointers to support
-  // recovery boot in cache mode.
-  //
-#define  SWITCH_TO_CACHE_MODE(CoreData)  SwitchToCacheMode(CoreData)
-#define  CACHE_MODE_ADDRESS_MASK         0x7FFFFFFFFFFFFFFFULL
-VOID
-SwitchToCacheMode (
-  IN PEI_CORE_INSTANCE           *CoreData
-)
-/*++
-
-Routine Description:
-
- Switch the PHIT pointers to cache mode after InstallPeiMemory in CAR.
-
-Arguments:
-
-  CoreData   - The PEI core Private Data
-
-Returns:
-
---*/
-;
-
-#else
-
-#define  SWITCH_TO_CACHE_MODE(CoreData)
-
-#endif
-
 //
 // PPI support functions
 //
@@ -1335,38 +1303,6 @@ PeiRegisterForShadow (
   IN EFI_PEI_FILE_HANDLE       FileHandle
   )
 ;
-
-/**
-  Transfers control to a function starting with a new stack.
-
-  Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
-
-  If EntryPoint is NULL, then ASSERT().
-  If NewStack is NULL, then ASSERT().
-
-  @param  EntryPoint  A pointer to function to call with the new stack.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function.
-  @param  NewBsp      A pointer to the new BSP for the EntryPoint on IPF. It's
-                      Reserved on other architectures.
-
-**/
-VOID
-EFIAPI
-PeiSwitchStacks (
-  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *NewStack,
-  IN      VOID                      *NewBsp
-  );
 
 EFI_STATUS
 PeiFindFileEx (

@@ -47,21 +47,6 @@
   BootMode/BootMode.c
   PeiMain.h
 
-[Sources.Ia32]
-  Dispatcher/Stack.c
-
-[Sources.X64]
-  Dispatcher/Stack.c
-
-[Sources.IPF]
-  Ipf/Stack.c
-  Ipf/IpfPeiMain.h
-  Ipf/IpfCpuCore.s
-  Ipf/SwitchToCacheMode.c
-
-[Sources.EBC]
-  Dispatcher/Stack.c
-
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
