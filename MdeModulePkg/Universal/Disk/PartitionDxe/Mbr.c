@@ -267,7 +267,7 @@ Returns:
         goto Done;
       }
 
-      if (Mbr->Partition[0].OSIndicator == 0) {
+      if (UNPACK_UINT32 (Mbr->Partition[0].SizeInLBA) == 0) {
         break;
       }
 
