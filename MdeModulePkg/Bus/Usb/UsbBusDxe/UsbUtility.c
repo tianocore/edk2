@@ -956,8 +956,8 @@ MatchUsbClass (
     //
     // If class or subclass or protocol is 0, the counterparts in interface should be checked.
     //
-    if (DevDesc->DeviceClass == 0 &&
-        DevDesc->DeviceSubClass == 0 &&
+    if (DevDesc->DeviceClass == 0 ||
+        DevDesc->DeviceSubClass == 0 ||
         DevDesc->DeviceProtocol == 0) {
 
       if ((UsbClassDevicePathPtr->DeviceClass == ActIfDesc->InterfaceClass ||
@@ -969,7 +969,7 @@ MatchUsbClass (
         return TRUE;
       }
 
-    } else if ((UsbClassDevicePathPtr->DeviceClass != DevDesc->DeviceClass ||
+    } else if ((UsbClassDevicePathPtr->DeviceClass == DevDesc->DeviceClass ||
                                          UsbClassDevicePathPtr->DeviceClass == 0xff) &&
                (UsbClassDevicePathPtr->DeviceSubClass == DevDesc->DeviceSubClass ||
                                       UsbClassDevicePathPtr->DeviceSubClass == 0xff) &&
