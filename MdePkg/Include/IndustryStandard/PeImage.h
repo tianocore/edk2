@@ -305,7 +305,7 @@ typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
 //
 // @bug - Remove me when other package updated. 
 //
-typedef EFI_IMAGE_NT_HEADERS32    EFI_IMAGE_NT_HEADERS;
+typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
 
 #elif defined (MDE_CPU_EBC)
 
