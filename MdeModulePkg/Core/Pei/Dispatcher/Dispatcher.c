@@ -443,10 +443,10 @@ Returns:
               // usage in temporary memory for debuging.
               //
               DEBUG_CODE_BEGIN ();
-                UINTN  *StackPointer;
+                UINT32  *StackPointer;
                 
-                for (StackPointer = (UINTN*)SecCoreData->StackBase;
-                     (StackPointer < (UINTN*)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
+                for (StackPointer = (UINT32*)SecCoreData->StackBase;
+                     (StackPointer < (UINT32*)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
                      && (*StackPointer == INIT_CAR_VALUE);
                      StackPointer ++);
                      
