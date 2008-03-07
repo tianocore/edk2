@@ -23,6 +23,9 @@ Revision History
 
 #include <PeiMain.h>
 
+//
+//CAR is filled with this initial value during SEC phase
+//
 #define INIT_CAR_VALUE 0x5AA55AA5
 
 typedef struct {

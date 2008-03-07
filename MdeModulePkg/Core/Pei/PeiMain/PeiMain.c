@@ -23,11 +23,6 @@ Revision History
 
 #include <PeiMain.h>
 
-//
-//CAR is filled with this initial value during SEC phase
-//
-#define INIT_CAR_VALUE 0x5AA55AA5
-
 static EFI_PEI_PPI_DESCRIPTOR mMemoryDiscoveredPpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiMemoryDiscoveredPpiGuid,
