@@ -1256,12 +1256,10 @@ Returns:
 {
   UINTN                       BufferSize;
   EFI_IMAGE_DOS_HEADER        DosHdr;
-  EFI_IMAGE_NT_HEADERS        PeHdr;
-  EFI_IMAGE_OPTIONAL_HEADER32 *PeOpt32;
-  EFI_IMAGE_OPTIONAL_HEADER64 *PeOpt64;
   UINT16                      Subsystem;
   EFI_FILE_HANDLE             File;
   EFI_STATUS                  Status;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION PeHdr;
 
   Status = Dir->Open (Dir, &File, FileName, EFI_FILE_MODE_READ, 0);
 
@@ -1277,25 +1275,19 @@ Returns:
   }
 
   File->SetPosition (File, DosHdr.e_lfanew);
-  BufferSize = sizeof (EFI_IMAGE_NT_HEADERS);
+  BufferSize = sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION);
   File->Read (File, &BufferSize, &PeHdr);
-  if (PeHdr.Signature != EFI_IMAGE_NT_SIGNATURE) {
+  if (PeHdr.Pe32.Signature != EFI_IMAGE_NT_SIGNATURE) {
     File->Close (File);
     return FALSE;
   }
   //
   // Determine PE type and read subsytem
-  // BugBug : We should be using EFI_IMAGE_MACHINE_TYPE_SUPPORTED (machine)
-  // macro to detect the machine type.
-  // We should not be using  EFI_IMAGE_OPTIONAL_HEADER32 and
-  // EFI_IMAGE_OPTIONAL_HEADER64
   //
-  if (PeHdr.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    PeOpt32   = (EFI_IMAGE_OPTIONAL_HEADER32 *) &(PeHdr.OptionalHeader);
-    Subsystem = PeOpt32->Subsystem;
-  } else if (PeHdr.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
-    PeOpt64   = (EFI_IMAGE_OPTIONAL_HEADER64 *) &(PeHdr.OptionalHeader);
-    Subsystem = PeOpt64->Subsystem;
+  if (PeHdr.Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    Subsystem = PeHdr.Pe32.OptionalHeader.Subsystem;
+  } else if (PeHdr.Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+    Subsystem = PeHdr.Pe32Plus.OptionalHeader.Subsystem;
   } else {
     return FALSE;
   }
