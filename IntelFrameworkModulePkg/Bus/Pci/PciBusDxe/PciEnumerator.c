@@ -1046,8 +1046,12 @@ Returns:
     //
     for (DevIndex = 0; DevIndex < RemovedPciDevNum; DevIndex++) {
       if (PciResNode->PciDev == RemovedPciDev[DevIndex]) {
-        continue;
+        break;
       }
+    }
+
+    if (DevIndex != RemovedPciDevNum) {
+      continue;
     }
 
     //
