@@ -19,7 +19,7 @@ Abstract:
 
 **/
 
-#include "mousehid.h"
+#include "MouseHid.h"
 
 
 //
