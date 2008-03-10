@@ -21,12 +21,6 @@ Abstract:
 
 #include <PeiMain.h>
 
-static EFI_PEI_PPI_DESCRIPTOR mMemoryDiscoveredPpi = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gEfiPeiMemoryDiscoveredPpiGuid,
-  NULL
-};
-
 VOID
 InitializeMemoryServices (
   IN PEI_CORE_INSTANCE           *PrivateData,
