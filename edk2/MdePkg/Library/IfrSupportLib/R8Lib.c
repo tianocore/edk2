@@ -128,7 +128,7 @@ R8_BufToHexString (
 EFI_STATUS
 R8_HexStringToBuf (
   IN OUT UINT8                     *Buf,
-  IN OUT UINTN                    *Len,
+  IN OUT UINTN                     *Len,
   IN     CHAR16                    *Str,
   OUT    UINTN                     *ConvertedStrLen  OPTIONAL
   )
@@ -145,6 +145,7 @@ R8_HexStringToBuf (
   UINT8       Digit;
   UINT8       Byte;
 
+  Digit = 0;
   //
   // Find out how many hex characters the string has.
   //
