@@ -35,6 +35,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #include <Protocol/LoadFile.h>
 #include <Protocol/NetworkInterfaceIdentifier.h>
 #include <Protocol/PxeBaseCodeCallBack.h>
+#include <Protocol/Arp.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -58,6 +59,7 @@ struct _PXEBC_PRIVATE_DATA {
   UINT32                                    Signature;
   EFI_HANDLE                                Controller;
   EFI_HANDLE                                Image;
+  EFI_HANDLE                                ArpChild;
   EFI_HANDLE                                Dhcp4Child;
   EFI_HANDLE                                Mtftp4Child;
   EFI_HANDLE                                Udp4Child;
@@ -68,6 +70,7 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_LOAD_FILE_PROTOCOL                    LoadFile;
   EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL       LoadFileCallback;
   EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL       *PxeBcCallback;
+  EFI_ARP_PROTOCOL                          *Arp;
   EFI_DHCP4_PROTOCOL                        *Dhcp4;
   EFI_MTFTP4_PROTOCOL                       *Mtftp4;
   EFI_UDP4_PROTOCOL                         *Udp4;

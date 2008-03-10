@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -128,6 +128,11 @@ EfiPxeBcStop (
 
   Mode->Started = FALSE;
 
+  //
+  // Reset and leave joined groups
+  //
+  Private->Udp4->Groups (Private->Udp4, FALSE, NULL);
+
   Private->Udp4->Configure (Private->Udp4, NULL);
 
   Private->Dhcp4->Stop (Private->Dhcp4);
@@ -170,6 +175,7 @@ EfiPxeBcDhcp (
   UINT32                  DiscoverTimeout;
   UINTN                   Index;
   EFI_STATUS              Status;
+  EFI_ARP_CONFIG_DATA     ArpConfigData;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -266,6 +272,21 @@ EfiPxeBcDhcp (
     Dhcp4->Configure (Dhcp4, &Dhcp4CfgData);
 
     Private->AddressIsOk = TRUE;
+
+    if (!Mode->UsingIpv6) {
+      //
+      // If in IPv4 mode, configure the corresponding ARP with this new
+      // station IP address.
+      //
+      ZeroMem (&ArpConfigData, sizeof (EFI_ARP_CONFIG_DATA));
+
+      ArpConfigData.SwAddressType   = 0x0800;
+      ArpConfigData.SwAddressLength = sizeof (EFI_IPv4_ADDRESS);
+      ArpConfigData.StationAddress  = &Private->StationIp.v4;
+
+      Private->Arp->Configure (Private->Arp, NULL);
+      Private->Arp->Configure (Private->Arp, &ArpConfigData);
+    }
   }
 
   return Status;
@@ -831,6 +852,62 @@ ON_EXIT:
   return Status;
 }
 
+/**
+  Validate IP packages by IP filter settings
+
+  @param  PxeBcMode          Pointer to EFI_PXEBC_MODE
+
+  @param  Session            Received UDP session
+
+  @retval TRUE               The UDP package matches IP filters
+
+  @retval FLASE              The UDP package doesn't matches IP filters
+
+**/
+STATIC
+BOOLEAN
+CheckIpByFilter (
+  EFI_PXE_BASE_CODE_MODE    *PxeBcMode,
+  EFI_UDP4_SESSION_DATA     *Session
+  )
+{
+  UINTN                   Index;
+  EFI_IPv4_ADDRESS        Ip4Address;
+  EFI_IPv4_ADDRESS        DestIp4Address;
+
+  if (PxeBcMode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS) {
+    return TRUE;
+  }
+
+  CopyMem (&DestIp4Address, &Session->DestinationAddress, sizeof (DestIp4Address));
+  if ((PxeBcMode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST) &&
+      IP4_IS_MULTICAST (NTOHL (EFI_IP4 (DestIp4Address)))
+      ) {
+    return TRUE;
+  }
+
+  if ((PxeBcMode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_BROADCAST) &&
+      IP4_IS_LOCAL_BROADCAST (EFI_NTOHL (DestIp4Address))
+      ) {
+    return TRUE;
+  }
+
+  CopyMem (&Ip4Address, &PxeBcMode->StationIp.v4, sizeof (Ip4Address));
+  if ((PxeBcMode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) &&
+      EFI_IP4_EQUAL (&PxeBcMode->StationIp.v4, &DestIp4Address)
+      ) {
+    return TRUE;
+  }
+
+  for (Index = 0; Index < PxeBcMode->IpFilter.IpCnt; ++Index) {
+    CopyMem (&Ip4Address, &PxeBcMode->IpFilter.IpList[Index].v4, sizeof (Ip4Address));
+    if (EFI_IP4_EQUAL (&Ip4Address, &DestIp4Address)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
 
 /**
   GC_NOTO: Add function description
@@ -900,10 +977,6 @@ EfiPxeBcUdpRead (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_USE_FILTER) {
-    return EFI_UNSUPPORTED;
-  }
-
   if ((!(OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_PORT) && (DestPort == NULL)) ||
       (!(OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_PORT) && (SrcIp == NULL)) ||
       (!(OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_PORT) && (SrcPort == NULL))) {
@@ -961,23 +1034,34 @@ EfiPxeBcUdpRead (
 
     Matched = FALSE;
 
-    //
-    // Match the destination ip of the received udp dgram
-    //
-    if (OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_IP) {
-      Matched = TRUE;
-
-      if (DestIp != NULL) {
-        CopyMem (DestIp, &Session->DestinationAddress, sizeof (EFI_IPv4_ADDRESS));
+    if (OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_USE_FILTER) {
+      //
+      // Check UDP package by IP filter settings
+      //
+      if (CheckIpByFilter (Mode, Session)) {
+        Matched = TRUE;
       }
-    } else {
-      if (DestIp != NULL) {
-        if (EFI_IP4_EQUAL (DestIp, &Session->DestinationAddress)) {
-          Matched = TRUE;
+    }
+
+    if (Matched) {
+      //
+      // Match the destination ip of the received udp dgram
+      //
+      if (OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_IP) {
+        Matched = TRUE;
+
+        if (DestIp != NULL) {
+          CopyMem (DestIp, &Session->DestinationAddress, sizeof (EFI_IPv4_ADDRESS));
         }
       } else {
-        if (EFI_IP4_EQUAL (&Private->StationIp, &Session->DestinationAddress)) {
-          Matched = TRUE;
+        if (DestIp != NULL) {
+          if (EFI_IP4_EQUAL (DestIp, &Session->DestinationAddress)) {
+            Matched = TRUE;
+          }
+        } else {
+          if (EFI_IP4_EQUAL (&Private->StationIp, &Session->DestinationAddress)) {
+            Matched = TRUE;
+          }
         }
       }
     }
@@ -1091,7 +1175,120 @@ EfiPxeBcSetIpFilter (
   IN EFI_PXE_BASE_CODE_IP_FILTER      *NewFilter
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                Status;
+  PXEBC_PRIVATE_DATA        *Private;
+  EFI_PXE_BASE_CODE_MODE    *Mode;
+  UINTN                     Index;
+  BOOLEAN                   PromiscuousNeed;
+
+  if (This == NULL) {
+    DEBUG ((EFI_D_ERROR, "BC *This pointer == NULL.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
+  Mode = Private->PxeBc.Mode;
+
+  if (Private == NULL) {
+    DEBUG ((EFI_D_ERROR, "PXEBC_PRIVATE_DATA poiner == NULL.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (NewFilter == NULL) {
+    DEBUG ((EFI_D_ERROR, "IP Filter *NewFilter == NULL.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!Mode->Started) {
+    DEBUG ((EFI_D_ERROR, "BC was not started.\n"));
+    return EFI_NOT_STARTED;
+  }
+
+  PromiscuousNeed = FALSE;
+  for (Index = 0; Index < NewFilter->IpCnt; ++Index) {
+    if (IP4_IS_LOCAL_BROADCAST (EFI_IP4 (NewFilter->IpList[Index].v4))) {
+      //
+      // The IP is a broadcast address.
+      //
+      DEBUG ((EFI_D_ERROR, "There is broadcast address in NewFilter.\n"));
+      return EFI_INVALID_PARAMETER;
+    }
+    if (Ip4IsUnicast (EFI_IP4 (NewFilter->IpList[Index].v4), 0) &&
+        (NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP)
+       ) {
+      //
+      // If EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP is set and IP4 address is in IpList,
+      // promiscuous mode is needed.
+      //
+      PromiscuousNeed = TRUE;
+    }
+  }
+
+  //
+  // Clear the UDP instance configuration, all joined groups will be left
+  // during the operation.
+  //
+  Private->Udp4->Configure (Private->Udp4, NULL);
+  Private->Udp4CfgData.AcceptPromiscuous  = FALSE;
+  Private->Udp4CfgData.AcceptBroadcast    = FALSE;
+
+  if (PromiscuousNeed ||
+      NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS ||
+      NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST
+     ) {
+    //
+    // Configure the udp4 filter to receive all packages
+    //
+    Private->Udp4CfgData.AcceptPromiscuous  = TRUE;
+
+    //
+    // Configure the UDP instance with the new configuration.
+    //
+    Status = Private->Udp4->Configure (Private->Udp4, &Private->Udp4CfgData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+  } else {
+
+    if (NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_BROADCAST) {
+      //
+      // Configure the udp4 filter to receive all broadcast packages
+      //
+      Private->Udp4CfgData.AcceptBroadcast    = TRUE;
+    }
+
+    //
+    // Configure the UDP instance with the new configuration.
+    //
+    Status = Private->Udp4->Configure (Private->Udp4, &Private->Udp4CfgData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) {
+
+      for (Index = 0; Index < NewFilter->IpCnt; ++Index) {
+        if (IP4_IS_MULTICAST (EFI_NTOHL (NewFilter->IpList[Index].v4))) {
+          //
+          // Join the mutilcast group
+          //
+          Status = Private->Udp4->Groups (Private->Udp4, TRUE, &NewFilter->IpList[Index].v4);
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
+        }
+      }
+    }
+  }
+
+
+  //
+  // Save the new filter.
+  //
+  CopyMem (&Mode->IpFilter, NewFilter, sizeof (Mode->IpFilter));
+
+  return EFI_SUCCESS;
 }
 
 
@@ -1117,8 +1314,42 @@ EfiPxeBcArp (
   IN EFI_MAC_ADDRESS                  * MacAddr OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  PXEBC_PRIVATE_DATA      *Private;
+  EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_STATUS              Status;
+  EFI_MAC_ADDRESS         TempMacAddr;
+
+  if (This == NULL || IpAddr == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
+  Mode    = Private->PxeBc.Mode;
+
+  if (!Mode->Started) {
+    return EFI_NOT_STARTED;
+  }
+
+  if (!Private->AddressIsOk || Mode->UsingIpv6) {
+    //
+    // We can't resolve the IP address if we don't have a local address now.
+    // Don't have ARP for IPv6.
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = Private->Arp->Request (Private->Arp, &IpAddr->v4, NULL, &TempMacAddr);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (MacAddr != NULL) {
+    CopyMem (MacAddr, &TempMacAddr, sizeof (EFI_MAC_ADDRESS));
+  }
+
+  return EFI_SUCCESS;
 }
+
 
 
 /**
@@ -1266,6 +1497,7 @@ EfiPxeBcSetStationIP (
 {
   PXEBC_PRIVATE_DATA      *Private;
   EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_ARP_CONFIG_DATA     ArpConfigData;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1295,6 +1527,21 @@ EfiPxeBcSetStationIP (
   }
 
   Private->AddressIsOk = TRUE;
+
+  if (!Mode->UsingIpv6) {
+    //
+    // If in IPv4 mode, configure the corresponding ARP with this new
+    // station IP address.
+    //
+    ZeroMem (&ArpConfigData, sizeof (EFI_ARP_CONFIG_DATA));
+
+    ArpConfigData.SwAddressType   = 0x0800;
+    ArpConfigData.SwAddressLength = sizeof (EFI_IPv4_ADDRESS);
+    ArpConfigData.StationAddress  = &Private->StationIp.v4;
+
+    Private->Arp->Configure (Private->Arp, NULL);
+    Private->Arp->Configure (Private->Arp, &ArpConfigData);
+  }
 
   return EFI_SUCCESS;
 }

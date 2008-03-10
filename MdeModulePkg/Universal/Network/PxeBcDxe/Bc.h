@@ -32,6 +32,7 @@ Abstract:
 #include <Protocol/LoadFile.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/Tcp.h>
+#include <Protocol/LoadedImage.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
