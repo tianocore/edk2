@@ -550,7 +550,7 @@ Returns:
               // Update HandOffHob for new installed permenent memory
               //
               NewHandOffTable->EfiEndOfHobList =
-                (EFI_PHYSICAL_ADDRESS)(VOID*)((UINTN) NewHandOffTable->EfiEndOfHobList + Offset);
+                (EFI_PHYSICAL_ADDRESS)((UINTN) NewHandOffTable->EfiEndOfHobList + Offset);
               NewHandOffTable->EfiMemoryTop        = PrivateInMem->PhysicalMemoryBegin +
                                                      PrivateInMem->PhysicalMemoryLength;
               NewHandOffTable->EfiMemoryBottom     = PrivateInMem->PhysicalMemoryBegin;

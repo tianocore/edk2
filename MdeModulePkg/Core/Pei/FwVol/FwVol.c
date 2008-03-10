@@ -774,6 +774,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  VolumeHandle = 0;
   //
   // Retrieve the FirmwareVolume which the file resides in.
   //
