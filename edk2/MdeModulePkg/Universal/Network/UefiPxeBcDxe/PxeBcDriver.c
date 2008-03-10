@@ -394,15 +394,21 @@ PxeBcDriverBindingStop (
   EFI_HANDLE                  NicHandle;
   EFI_STATUS                  Status;
 
-  NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiDhcp4ProtocolGuid);
+  NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiArpProtocolGuid);
 
   if (NicHandle == NULL) {
 
-    NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiMtftp4ProtocolGuid);
+    NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiDhcp4ProtocolGuid);
 
     if (NicHandle == NULL) {
 
-      return EFI_DEVICE_ERROR;
+      NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiMtftp4ProtocolGuid);
+
+      if (NicHandle == NULL) {
+
+        return EFI_DEVICE_ERROR;
+
+      }
     }
   }
 
