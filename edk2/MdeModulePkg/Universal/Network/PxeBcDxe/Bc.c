@@ -2344,6 +2344,41 @@ PxeBcDriverStop (
   return Status;
 }
 
+EFI_STATUS
+EFIAPI
+PxeBcUnload (
+  IN EFI_HANDLE  ImageHandle
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       DeviceHandleCount;
+  EFI_HANDLE  *DeviceHandleBuffer;
+  UINTN       Index;
+
+  Status = gBS->LocateHandleBuffer (
+                  AllHandles,
+                  NULL,
+                  NULL,
+                  &DeviceHandleCount,
+                  &DeviceHandleBuffer
+                  );
+  if (!EFI_ERROR (Status)) {
+    for (Index = 0; Index < DeviceHandleCount; Index++) {
+      Status = gBS->DisconnectController (
+                      DeviceHandleBuffer[Index],
+                      mPxeBcDriverBinding.DriverBindingHandle,
+                      NULL
+                      );
+    }
+
+    if (DeviceHandleBuffer != NULL) {
+      gBS->FreePool (DeviceHandleBuffer);
+    }
+  }
+
+  return Status;
+}
+
 
 /**
   Initialize the base code drivers and install the driver binding
@@ -2360,7 +2395,8 @@ InitializeBCDriver (
   IN EFI_SYSTEM_TABLE *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                 Status;
+  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
 
   //
   // Initialize EFI library
@@ -2373,6 +2409,17 @@ InitializeBCDriver (
              &gPxeBcComponentName,
              &gPxeBcComponentName2
              );
+
+  Status = gBS->HandleProtocol (
+                  ImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **) &LoadedImage
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  } else {
+    LoadedImage->Unload = PxeBcUnload;
+  }
 
   InitArpHeader ();
   OptionsStrucInit ();

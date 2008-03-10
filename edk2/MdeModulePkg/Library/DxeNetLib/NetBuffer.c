@@ -653,7 +653,7 @@ NetbufGetFragment (
     CurBlockOp++
     );
 
-  for (Index = First + 1; Index < Last; Index++) {
+  for (Index = First + 1; Index <= Last - 1 ; Index++) {
     NetbufSetBlockOp (
       Child,
       BlockOp[Index].Head,

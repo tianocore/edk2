@@ -141,6 +141,7 @@ PxeBcDriverBindingStart (
   UINTN               Index;
   EFI_STATUS          Status;
 
+  CpuDeadLoop ();
   Private = AllocateZeroPool (sizeof (PXEBC_PRIVATE_DATA));
   if (Private == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -171,6 +172,28 @@ PxeBcDriverBindingStart (
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  Status = NetLibCreateServiceChild (
+            ControllerHandle,
+            This->DriverBindingHandle,
+            &gEfiArpServiceBindingProtocolGuid,
+            &Private->ArpChild
+            );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  Status = gBS->OpenProtocol (
+                  Private->ArpChild,
+                  &gEfiArpProtocolGuid,
+                  (VOID **) &Private->Arp,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
@@ -247,7 +270,7 @@ PxeBcDriverBindingStart (
   }
 
   ZeroMem (&Private->Udp4CfgData, sizeof (EFI_UDP4_CONFIG_DATA));
-  Private->Udp4CfgData.AcceptBroadcast    = TRUE;
+  Private->Udp4CfgData.AcceptBroadcast    = FALSE;
   Private->Udp4CfgData.AcceptPromiscuous  = FALSE;
   Private->Udp4CfgData.AcceptAnyPort      = FALSE;
   Private->Udp4CfgData.AllowDuplicatePort = TRUE;
@@ -319,6 +342,22 @@ ON_ERROR:
       This->DriverBindingHandle,
       &gEfiDhcp4ServiceBindingProtocolGuid,
       Private->Dhcp4Child
+      );
+  }
+
+  if (Private->ArpChild != NULL) {
+    gBS->CloseProtocol (
+          Private->ArpChild,
+          &gEfiArpProtocolGuid,
+          This->DriverBindingHandle,
+          ControllerHandle
+          );
+
+    NetLibDestroyServiceChild (
+      ControllerHandle,
+      This->DriverBindingHandle,
+      &gEfiArpServiceBindingProtocolGuid,
+      Private->ArpChild
       );
   }
 
@@ -431,6 +470,19 @@ PxeBcDriverBindingStop (
       This->DriverBindingHandle,
       &gEfiMtftp4ServiceBindingProtocolGuid,
       Private->Mtftp4Child
+      );
+
+    gBS->CloseProtocol (
+          Private->ArpChild,
+          &gEfiArpProtocolGuid,
+          This->DriverBindingHandle,
+          NicHandle
+          );
+    NetLibDestroyServiceChild (
+      NicHandle,
+      This->DriverBindingHandle,
+      &gEfiArpServiceBindingProtocolGuid,
+      Private->ArpChild
       );
 
     gBS->FreePool (Private);

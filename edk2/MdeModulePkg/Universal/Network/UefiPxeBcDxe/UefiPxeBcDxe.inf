@@ -79,6 +79,8 @@
 
 
 [Protocols]
+  gEfiArpServiceBindingProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiArpProtocolGuid                              # PROTOCOL ALWAYS_CONSUMED
   gEfiMtftp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
   gEfiMtftp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiUdp4ServiceBindingProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
@@ -89,5 +91,4 @@
   gEfiDhcp4ProtocolGuid                            # PROTOCOL ALWAYS_CONSUMED
   gEfiUdp4ProtocolGuid                             # PROTOCOL ALWAYS_CONSUMED
   gEfiNetworkInterfaceIdentifierProtocolGuid_31    # PROTOCOL ALWAYS_CONSUMED
-
 
