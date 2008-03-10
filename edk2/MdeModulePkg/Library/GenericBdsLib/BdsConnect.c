@@ -339,7 +339,7 @@ BdsLibConnectAllDriversToAllControllers (
 **/
 EFI_STATUS
 BdsLibConnectUsbDevByShortFormDP(
-  IN CHAR8                      HostControllerPI,
+  IN UINT8                      HostControllerPI,
   IN EFI_DEVICE_PATH_PROTOCOL   *RemainingDevicePath
   )
 {
