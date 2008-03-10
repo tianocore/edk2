@@ -98,8 +98,8 @@ ASM_PFX(ToUserCode):
     call    L_Base                      # push eip
 L_Base:
     popw    %bp                         # ebp <- offset L_Base
-    addr16  pushl 36(%si)
-    .byte   0x36
+    .byte   0x67;                       # address size override
+    push    54(%esp)
     lea     0xc(%esi), %eax
     push    %eax
     lret
