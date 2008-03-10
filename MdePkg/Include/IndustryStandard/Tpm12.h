@@ -26,8 +26,7 @@
 // Structures are all packed on 1-byte alignment
 //
 
-#pragma pack (push)
-#pragma pack (1)
+#pragma pack (push, 1)
 
 //
 // Part 2, section 2.2: Basic types & Helper redefinitions
