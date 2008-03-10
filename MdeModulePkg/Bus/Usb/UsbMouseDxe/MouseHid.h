@@ -21,7 +21,7 @@ Abstract:
 #ifndef __MOUSE_HID_H
 #define __MOUSE_HID_H
 
-#include "usbmouse.h"
+#include "UsbMouse.h"
 
 //
 // HID Item general structure

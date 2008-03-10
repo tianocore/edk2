@@ -33,11 +33,11 @@
 #
 
 [Sources.common]
-  mousehid.h
   ComponentName.c
-  usbmouse.c
-  mousehid.c
-  usbmouse.h
+  MouseHid.c
+  MouseHid.h
+  UsbMouse.c
+  UsbMouse.h
 
 [Packages]
   MdePkg/MdePkg.dec

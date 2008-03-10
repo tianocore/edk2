@@ -24,8 +24,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Usb.h>
 
 
-#include "usbmouse.h"
-#include "mousehid.h"
+#include "UsbMouse.h"
+#include "MouseHid.h"
 
 //
 // Prototypes
