@@ -141,7 +141,6 @@ PxeBcDriverBindingStart (
   UINTN               Index;
   EFI_STATUS          Status;
 
-  CpuDeadLoop ();
   Private = AllocateZeroPool (sizeof (PXEBC_PRIVATE_DATA));
   if (Private == NULL) {
     return EFI_OUT_OF_RESOURCES;
