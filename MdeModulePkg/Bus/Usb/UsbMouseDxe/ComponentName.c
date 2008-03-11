@@ -18,7 +18,7 @@ Abstract:
 
 **/
 
-#include "usbmouse.h"
+#include "UsbMouse.h"
 #include <Library/DebugLib.h>
 
 //
