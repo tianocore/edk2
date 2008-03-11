@@ -839,6 +839,9 @@ PxeBcDhcpCallBack (
 
     PxeBcCopyEfiDhcp4Packet (&Private->Dhcp4Ack.Packet.Ack, Packet);
     break;
+
+  default:
+    break;
   }
 
   return Status;
