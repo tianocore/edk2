@@ -23,7 +23,7 @@ Abstract:
 #include <PiDxe.h>
 
 #include <Guid/SmBios.h>
-#include <IndustryStandard/Smbios.h>
+#include <IndustryStandard/SmBios.h>
 #include <Protocol/Bis.h>
 #include <Protocol/PxeBaseCode.h>
 #include <Protocol/PxeBaseCodeCallBack.h>
@@ -439,9 +439,9 @@ PxeBcLibGetSmbiosSystemGuidAndSerialNumber (
   )
 ;
 
-#include "ip.h"
-#include "dhcp.h"
-#include "tftp.h"
+#include "Ip.h"
+#include "Dhcp.h"
+#include "Tftp.h"
 
 #endif /* _BC_H */
 
