@@ -24,7 +24,7 @@ Abstract:
 #ifndef __EFI_IP4_ROUTE_H__
 #define __EFI_IP4_ROUTE_H__
 
-#include "IP4Common.h"
+#include "Ip4Common.h"
 
 enum {
   IP4_DIRECT_ROUTE      = 0x00000001,
