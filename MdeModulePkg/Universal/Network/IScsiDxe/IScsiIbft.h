@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,9 +22,9 @@ Abstract:
 #ifndef _ISCSI_IBFT_H_
 #define _ISCSI_IBFT_H_
 
-#include <industrystandard/IScsiBootFirmwareTable.h>
-#include <protocol/AcpiSupport.h>
-#include <protocol/PciIo.h>
+#include <IndustryStandard/IScsiBootFirmwareTable.h>
+#include <Protocol/AcpiSupport.h>
+#include <Protocol/PciIo.h>
 
 #define IBFT_TABLE_VAR_NAME L"iBFT"
 #define IBFT_MAX_SIZE       4096
