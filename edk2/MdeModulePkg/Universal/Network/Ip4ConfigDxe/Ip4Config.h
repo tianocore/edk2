@@ -26,7 +26,7 @@ Abstract:
 #include <PiDxe.h>
 
 #include <Protocol/Dhcp4.h>
-#include <Protocol/IP4Config.h>
+#include <Protocol/Ip4Config.h>
 #include <Protocol/ManagedNetwork.h>
 
 #include <Library/DebugLib.h>
