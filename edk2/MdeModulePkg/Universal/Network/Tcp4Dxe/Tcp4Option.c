@@ -33,16 +33,16 @@ TcpGetUint16 (
   return NTOHS (Value);
 }
 
-STATIC
-VOID
-TcpPutUint16 (
-  IN UINT8  *Buf,
-  IN UINT16 Data
-  )
-{
-  Data = HTONS (Data);
-  CopyMem (Buf, &Data, sizeof (UINT16));
-}
+// STATIC
+// VOID
+// TcpPutUint16 (
+//   IN UINT8  *Buf,
+//   IN UINT16 Data
+//   )
+// {
+//   Data = HTONS (Data);
+//   CopyMem (Buf, &Data, sizeof (UINT16));
+// }
 
 STATIC
 UINT32
