@@ -568,6 +568,8 @@ Returns:
   UINT8   Digit;
   UINT8   Byte;
 
+  Digit = 0;
+
   //
   // Find out how many hex characters the string has.
   //
