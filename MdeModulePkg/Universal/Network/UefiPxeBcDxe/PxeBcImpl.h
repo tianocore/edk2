@@ -27,7 +27,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #include <PiDxe.h>
 
 #include <Guid/SmBios.h>
-#include <IndustryStandard/Smbios.h>
+#include <IndustryStandard/SmBios.h>
 #include <Protocol/Dhcp4.h>
 #include <Protocol/PxeBaseCode.h>
 #include <Protocol/Mtftp4.h>
