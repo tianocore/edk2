@@ -24,7 +24,7 @@ Abstract:
 
 VOID *TokenContext = NULL;
 
-UINT8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
+CHAR8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
   "blksize",
   "timeout",
   "tsize",
@@ -129,12 +129,12 @@ PxeBcTftpGetFileSize (
     return Status;
   }
 
-  ReqOpt[0].OptionStr = mMtftpOptions[PXE_MTFTP_OPTION_TSIZE_INDEX];
+  ReqOpt[0].OptionStr = (UINT8*)mMtftpOptions[PXE_MTFTP_OPTION_TSIZE_INDEX];
   UtoA10 (0, (CHAR8 *) OptBuf);
   ReqOpt[0].ValueStr = OptBuf;
 
   if (BlockSize != NULL) {
-    ReqOpt[1].OptionStr = mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[1].OptionStr = (UINT8*)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[1].ValueStr  = ReqOpt[0].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[0].ValueStr) + 1;
     UtoA10 (*BlockSize, (CHAR8 *) ReqOpt[1].ValueStr);
     OptCnt++;
@@ -244,7 +244,7 @@ PxeBcTftpReadFile (
 
   if (BlockSize != NULL) {
 
-    ReqOpt[0].OptionStr = mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[0].OptionStr = (UINT8*)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[0].ValueStr  = OptBuf;
     UtoA10 (*BlockSize, (CHAR8 *) ReqOpt[0].ValueStr);
     OptCnt++;
@@ -326,7 +326,7 @@ PxeBcTftpWriteFile (
 
   if (BlockSize != NULL) {
 
-    ReqOpt[0].OptionStr = mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[0].OptionStr = (UINT8*)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[0].ValueStr  = OptBuf;
     UtoA10 (*BlockSize, (CHAR8 *) ReqOpt[0].ValueStr);
     OptCnt++;
@@ -400,7 +400,7 @@ PxeBcTftpReadDirectory (
 
   if (BlockSize != NULL) {
 
-    ReqOpt[0].OptionStr = mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[0].OptionStr = (UINT8*)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[0].ValueStr  = OptBuf;
     UtoA10 (*BlockSize, (CHAR8 *) ReqOpt[0].ValueStr);
     OptCnt++;
