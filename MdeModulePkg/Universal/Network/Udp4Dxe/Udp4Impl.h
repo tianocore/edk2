@@ -25,7 +25,7 @@ Abstract:
 
 #include <PiDxe.h>
 
-#include <Protocol/IP4.h>
+#include <Protocol/Ip4.h>
 #include <Protocol/Udp4.h>
 
 #include <Library/IpIoLib.h>
