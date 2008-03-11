@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,7 +23,7 @@ Abstract:
 #define _ISCSI_TCP4_IO_H_
 
 #include <Library/NetLib.h>
-#include <protocol/Tcp4.h>
+#include <Protocol/Tcp4.h>
 
 typedef struct _TCP4_IO_CONFIG_DATA {
   EFI_IPv4_ADDRESS  LocalIp;

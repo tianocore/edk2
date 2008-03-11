@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@ Abstract:
 #ifndef _ISCSI_DHCP_H_
 #define _ISCSI_DHCP_H_
 
-#include <protocol/Dhcp4.h>
+#include <Protocol/Dhcp4.h>
 
 #define DHCP4_TAG_PARA_LIST             55
 #define DHCP4_TAG_NETMASK               1
