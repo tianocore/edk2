@@ -1,8 +1,8 @@
 /** 
-	@file   
-	ACPI 3.0 definitions from the ACPI Specification Revision 3.0 September 2, 2004
+    @file   
+    ACPI 3.0 definitions from the ACPI Specification Revision 3.0 September 2, 2004
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -664,6 +664,11 @@ typedef struct {
 // "WDRT" Watchdog Resource Table
 //
 #define EFI_ACPI_3_0_WATCHDOG_RESOURCE_TABLE_SIGNATURE 0x54524457
+
+//
+// "WDAT" Watchdog Action Table
+//
+#define EFI_ACPI_3_0_WATCHDOG_ACTION_TABLE_SIGNATURE 0x54414457
 
 //
 // "iBFT" iSCSI Boot Firmware Table
