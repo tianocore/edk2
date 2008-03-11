@@ -26,7 +26,7 @@ Abstract:
 #include <Protocol/PxeBaseCode.h>
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/PxeDhcp4.h>
-#include <Protocol/PxeDhcp4Callback.h>
+#include <Protocol/PxeDhcp4CallBack.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
