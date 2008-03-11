@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _IP_H_
 #define _IP_H_
 
-#include "hton.h"
+#include "Hton.h"
 
 //
 // portability macros
