@@ -176,7 +176,7 @@ enum {
 #define IS_ENABLE_USE_SERVER_LIST(x)    (((x) & BIT (2)) == BIT (2))
 #define IS_ENABLE_BOOT_FILE_NAME(x)     (((x) & BIT (3)) == BIT (3))
 
-#define SET_VENDOR_OPTION_BIT_MAP(x, y) ((UINT32) ((x)[(y) / 32]) = (UINT32) ((x)[(y) / 32]) | BIT ((y) % 32))
+#define SET_VENDOR_OPTION_BIT_MAP(x, y) (((x)[(y) / 32]) = (UINT32) ((x)[(y) / 32]) | BIT ((y) % 32))
 
 #pragma pack(1)
 typedef struct {
