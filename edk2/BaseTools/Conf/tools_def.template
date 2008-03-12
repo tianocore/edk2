@@ -428,7 +428,8 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_UNIXGCC_IA32_PP_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
 *_UNIXGCC_IA32_VFRPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
 
-*_UNIXGCC_IA32_CC_FLAGS                  = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include AutoGen.h
+*_UNIXGCC_IA32_CC_FLAGS                  = -Os -fno-builtin -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include AutoGen.h
+*_UNIXGCC_IA32_DLINK_FLAGS               = -M
 
 ##################
 # X64 definitions
