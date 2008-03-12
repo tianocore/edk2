@@ -909,7 +909,7 @@ ParseOpCodes (
 
       case EFI_IFR_ONES_OP:
         Value->Type = EFI_IFR_TYPE_NUM_SIZE_64;
-        Value->Value.u64 = 0xffffffffffffffff;
+        Value->Value.u64 = 0xffffffffffffffffULL;
         break;
 
       case EFI_IFR_UINT8_OP:

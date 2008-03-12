@@ -859,10 +859,10 @@ IfrFind (
 
   Result->Type = EFI_IFR_TYPE_NUM_SIZE_64;
   if (Base >= StrLen (String[1])) {
-    Result->Value.u64 = 0xFFFFFFFFFFFFFFFF;
+    Result->Value.u64 = 0xFFFFFFFFFFFFFFFFULL;
   } else {
     StringPtr = StrStr (String[1] + Base, String[0]);
-    Result->Value.u64 = (StringPtr == NULL) ? 0xFFFFFFFFFFFFFFFF : (StringPtr - String[1]);
+    Result->Value.u64 = (StringPtr == NULL) ? 0xFFFFFFFFFFFFFFFFULL : (StringPtr - String[1]);
   }
 
 Done:
