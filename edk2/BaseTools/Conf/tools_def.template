@@ -412,7 +412,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 #   UINIXGCC         - UINIX GCC
 *_UNIXGCC_*_*_FAMILY               = GCC
 
-*_UNIXGCC_*_DLINK_FLAGS                  = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20
+*_UNIXGCC_*_DLINK_FLAGS                  = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 *_UNIXGCC_*_ASM_FLAGS                    = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_UNIXGCC_*_PP_FLAGS                     = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_UNIXGCC_*_VFRPP_FLAGS                  = -x c -E -P -DVFRCOMPILE --include AutoGen.h
@@ -428,8 +428,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_UNIXGCC_IA32_PP_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
 *_UNIXGCC_IA32_VFRPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
 
-*_UNIXGCC_IA32_CC_FLAGS                  = -Os -fno-builtin -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include AutoGen.h
-*_UNIXGCC_IA32_DLINK_FLAGS               = -M
+*_UNIXGCC_IA32_CC_FLAGS                  = -O2 -falign-functions -falign-jumps -falign-loops -freorder-blocks -freorder-blocks-and-partition -falign-labels -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include AutoGen.h
 
 ##################
 # X64 definitions
