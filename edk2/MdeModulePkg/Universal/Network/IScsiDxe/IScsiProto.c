@@ -2321,7 +2321,6 @@ Returns:
     // Determine the length of data this Data Out PDU can carry.
     //
     DataLen = MIN (XferContext->DesiredLength, Conn->MaxRecvDataSegmentLength);
-    Data += DataLen;
 
     //
     // Create a Data Out PDU.
@@ -2342,6 +2341,7 @@ Returns:
     XferContext->Offset += DataLen;
     XferContext->DesiredLength -= DataLen;
     DataSN++;
+    Data += DataLen;
   }
   //
   // Set the F bit for the last data out PDU in this sequence.
