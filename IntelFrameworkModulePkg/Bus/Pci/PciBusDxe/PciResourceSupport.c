@@ -653,6 +653,13 @@ Returns:
   Node->PciDev        = PciDev;
   Node->Length        = Length;
   Node->Alignment     = Alignment;
+  if(((ResType == PciBarTypeIo16) || (ResType == PciBarTypeIo32)) && ( Alignment == 0x0FFF))
+  {
+    if((PciDev->Decodes & EFI_BRIDGE_IOEN1K_DECODE_SUPPORTED) == EFI_BRIDGE_IOEN1K_DECODE_SUPPORTED)
+      Node->Alignment = 0x3FF;
+    else
+      Node->Alignment = 0xFFF;
+  }
   Node->Bar           = Bar;
   Node->ResType       = ResType;
   Node->Reserved      = FALSE;
@@ -1013,7 +1020,10 @@ Returns:
     //
     // if no PMem32 request, still keep PMem64. Otherwise degrade to PMem32
     //
-    if (PMem32Node != NULL) {
+    if (PMem32Node != NULL && PMem32Node->Length != 0 && Bridge->Parent != NULL ) { 
+      //
+      // Fixed the issue that there is no resource for 64-bit (above 4G)
+      //
       MergeResourceTree (
         PMem32Node,
         PMem64Node,
