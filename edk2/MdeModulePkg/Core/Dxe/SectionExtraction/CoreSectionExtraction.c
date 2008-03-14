@@ -581,11 +581,13 @@ Returns:
   }
   
   if (IsListEmpty (&SourceStream->Children) && 
-                   SourceStream->StreamLength > sizeof (EFI_COMMON_SECTION_HEADER)) {
+                   SourceStream->StreamLength >= sizeof (EFI_COMMON_SECTION_HEADER)) {
     //
     // This occurs when a section stream exists, but no child sections
     // have been parsed out yet.  Therefore, extract the first child and add it
     // to the list of children so we can get started.
+    // Section stream may contain an array of zero or more bytes. 
+    // So, its size should be >= the size of commen section header.
     //
     Status = CreateChildNode (SourceStream, 0, &CurrentChildNode);
     if (EFI_ERROR (Status)) {
