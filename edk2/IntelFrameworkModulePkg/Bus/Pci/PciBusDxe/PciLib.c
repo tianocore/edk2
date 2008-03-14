@@ -4,14 +4,14 @@
   It abstracts some functions that can be different
   between light PCI bus driver and full PCI bus driver
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -1297,7 +1297,7 @@ Returns:
         //
         // Add feature to support customized secondary bus number
         //
-       	if (*SubBusNumber == 0) {        
+       	if (*SubBusNumber == 0) {
           *SubBusNumber   = *PaddedBusRange;
           *PaddedBusRange = 0;
         }
@@ -1481,7 +1481,7 @@ Returns:
       }
 
       DEBUG((EFI_D_ERROR, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func ));
-      
+
       //
       // Get the PCI device information
       //
@@ -1594,7 +1594,7 @@ Returns:
         //
         // Add feature to support customized secondary bus number
         //
-       	if (*SubBusNumber == 0) {        
+       	if (*SubBusNumber == 0) {
           *SubBusNumber   = *PaddedBusRange;
           *PaddedBusRange = 0;
         }
@@ -1860,8 +1860,14 @@ Returns:
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   *PciRootBridgeIo;
   UINT16                            MinBus;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptors;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *pConfiguration;
+  UINT8                             StartBusNumber;
+  LIST_ENTRY                        RootBridgeList;
+  LIST_ENTRY                        *Link;
 
   InitializeHotPlugSupport ();
+
+  InitializeListHead (&RootBridgeList);
 
   //
   // Notify the bus allocation phase is about to start
@@ -1891,7 +1897,11 @@ Returns:
               RootBridgeDev
               );
 
-    DestroyRootBridge (RootBridgeDev);
+    if (gPciHotPlugInit != NULL) {
+      InsertTailList (&RootBridgeList, &(RootBridgeDev->Link));
+    } else {
+      DestroyRootBridge (RootBridgeDev);
+    }
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1906,8 +1916,43 @@ Returns:
 
     if (gPciHotPlugInit != NULL) {
       //
-      // Wait for all HPC initialized
+      // Reset all assigned PCI bus number in all PPB
       //
+      RootBridgeHandle = NULL;
+      Link = GetFirstNode (&RootBridgeList);
+      while ((PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) &&
+        (!IsNull (&RootBridgeList, Link))) {
+        RootBridgeDev = PCI_IO_DEVICE_FROM_LINK (Link);
+        //
+        // Get the Bus information
+        //
+        Status = PciResAlloc->StartBusEnumeration (
+                                PciResAlloc,
+                                RootBridgeHandle,
+                                (VOID **) &pConfiguration
+                                );
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+
+        //
+        // Get the bus number to start with
+        //
+        StartBusNumber  = (UINT8) (pConfiguration->AddrRangeMin);
+
+        ResetAllPpbBusNumber (
+          RootBridgeDev,
+          StartBusNumber
+        );
+
+        gBS->FreePool (pConfiguration);
+        Link = GetNextNode (&RootBridgeList, Link);
+        DestroyRootBridge (RootBridgeDev);
+      }
+
+      //
+      // Wait for all HPC initialized
+     //
       Status = AllRootHPCInitialized (STALL_1_SECOND * 15);
 
       if (EFI_ERROR (Status)) {
@@ -1919,7 +1964,7 @@ Returns:
       //
       NotifyPhase (PciResAlloc, EfiPciHostBridgeBeginBusAllocation);
 
-      DEBUG((EFI_D_ERROR, "PCI Bus Second Scanning\n"));  
+      DEBUG((EFI_D_ERROR, "PCI Bus Second Scanning\n"));
       RootBridgeHandle = NULL;
       while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
 

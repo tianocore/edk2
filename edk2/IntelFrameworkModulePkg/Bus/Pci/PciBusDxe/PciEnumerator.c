@@ -236,7 +236,9 @@ Returns:
                           RootBridgeHandle,
                           pConfiguration
                           );
-
+  
+  gBS->FreePool (pConfiguration);
+  
   if (EFI_ERROR (Status)) {
     return Status;
   }
