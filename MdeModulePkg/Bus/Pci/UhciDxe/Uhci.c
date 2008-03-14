@@ -1654,7 +1654,11 @@ UhciDriverBindingStart (
   }
   PciAttributesSaved = TRUE;
 
-  UhciTurnOffUsbEmulation (PciIo);
+  //
+  // Robustnesss improvement such as for UoL
+  // Default is not required.
+  //
+  // UhciTurnOffUsbEmulation (PciIo);
 
   Status = PciIo->Attributes (
                     PciIo,
