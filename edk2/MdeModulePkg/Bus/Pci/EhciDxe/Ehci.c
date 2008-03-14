@@ -1578,8 +1578,9 @@ EhcDriverBindingStart (
 
   //
   // Robustnesss improvement such as for UoL
+  // Default is not required.
   //
-  EhcClearLegacySupport (Ehc);
+  // EhcClearLegacySupport (Ehc);
   EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
 
   Status = EhcInitHC (Ehc);
