@@ -1,4 +1,4 @@
-/** @file
+  /** @file
   This file defines GUIDs and associated data structures for records posted to the Data Hub.
   The producers of these records use these definitions to construct records.
   The consumers of these records use these definitions to retrieve, filter and parse records.
@@ -1538,43 +1538,38 @@ typedef struct {
 //
 // Portable Battery - SMBIOS Type 22
 //
-#define EFI_MISC_BATTERY_LOCATION_RECORD_NUMBER  0x00000010
+#define EFI_MISC_PORTABLE_BATTERY_RECORD_NUMBER 0x00000010
 
-typedef enum {
-  EfiBatteryDeviceChemistryTypeOther               = 0x01,
-  EfiBatteryDeviceChemistryTypeUnknown             = 0x02,
-  EfiBatteryDeviceChemistryTypeLeadAcid            = 0x03,
-  EfiBatteryDeviceChemistryTypeNickelCadmium       = 0x04,
-  EfiBatteryDeviceChemistryTypeNickelMetalHydride  = 0x05,
-  EfiBatteryDeviceChemistryTypeLithiumIon          = 0x06,
-  EfiBatteryDeviceChemistryTypeZincAir             = 0x07,
-  EfiBatteryDeviceChemistryTypeLithiumPolymer      = 0x08,
-} EFI_MISC_BATTERY_DEVICE_CHEMISTRY;
-
-typedef struct  {
-  UINT32 Date              :5;
-  UINT32 Month             :4;
-  UINT32 Year              :7;
-  UINT32 Reserved          :16;
-} EFI_MISC_BATTERY_SBDS_MANUFACTURE_DATE;
+typedef enum {  
+  EfiPortableBatteryDeviceChemistryOther = 1,
+  EfiPortableBatteryDeviceChemistryUnknown = 2,
+  EfiPortableBatteryDeviceChemistryLeadAcid = 3,
+  EfiPortableBatteryDeviceChemistryNickelCadmium = 4,
+  EfiPortableBatteryDeviceChemistryNickelMetalHydride = 5,
+  EfiPortableBatteryDeviceChemistryLithiumIon = 6,
+  EfiPortableBatteryDeviceChemistryZincAir = 7,
+  EfiPortableBatteryDeviceChemistryLithiumPolymer = 8,
+} EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY;
 
 typedef struct {
-  STRING_REF                         BatteryLocation;
-  STRING_REF                         BatteryManufacturer;
-  STRING_REF                         BatteryManufactureDate;
-  STRING_REF                         BatterySerialNumber;
-  STRING_REF                         BatteryDeviceName;
-  STRING_REF                         BatterySbdsVersionNumber;
-  STRING_REF                         BatterySbdsDeviceChemistry;
-  EFI_MISC_BATTERY_DEVICE_CHEMISTRY  BatteryDeviceChemistry;
-  EFI_EXP_BASE10_DATA                BatteryDesignCapacity;
-  EFI_EXP_BASE10_DATA                BatteryDesignVoltage;
-  UINT16                             BatteryMaximumError;
-  UINT16                             BatterySbdsSerialNumber;
-  EFI_MISC_BATTERY_SBDS_MANUFACTURE_DATE
-                                     BatterySbdsManufacturingDate;
-  UINT32                             BatteryOemSpecific;
-} EFI_MISC_BATTERY_LOCATION_DATA;
+  STRING_REF                                  Location;
+  STRING_REF                                  Manufacturer;
+  STRING_REF                                  ManufactureDate;
+  STRING_REF                                  SerialNumber;
+  STRING_REF                                  DeviceName;
+  EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY  DeviceChemistry;
+  UINT16                                      DesignCapacity;
+  UINT16                                      DesignVoltage;
+  STRING_REF                                  SBDSVersionNumber;
+  UINT8                                       MaximumError;
+  UINT16                                      SBDSSerialNumber;
+  UINT16                                      SBDSManufactureDate;
+  STRING_REF                                  SBDSDeviceChemistry;
+  UINT8                                       DesignCapacityMultiplier;
+  UINT32                                      OEMSpecific;  
+  UINT8                                       BatteryNumber; // Temporary   
+  BOOLEAN                                     Valid; // Is entry valid - Temporary
+} EFI_MISC_PORTABLE_BATTERY;
 
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -1921,7 +1916,7 @@ typedef struct {
 } POWER_SUPPLY_CHARACTERISTICS;
 
 typedef struct {
-  UINT8                           PowerUnitGroup;
+  UINT16                          PowerUnitGroup;
   STRING_REF                      PowerSupplyLocation;
   STRING_REF                      PowerSupplyDeviceName;
   STRING_REF                      PowerSupplyManufacturer;
@@ -2025,6 +2020,14 @@ typedef EFI_MISC_BIS_ENTRY_POINT_DATA                     EFI_MISC_BIS_ENTRY_POI
 typedef EFI_MISC_BOOT_INFORMATION_STATUS_DATA             EFI_MISC_BOOT_INFORMATION_STATUS;
 typedef EFI_MISC_SYSTEM_POWER_SUPPLY_DATA                 EFI_MISC_SYSTEM_POWER_SUPPLY;
 typedef EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA         EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION;
+typedef EFI_MISC_SCHEDULED_POWER_ON_MONTH_DATA            EFI_MISC_SCHEDULED_POWER_ON_MONTH;
+typedef EFI_MISC_VOLTAGE_PROBE_DESCRIPTION_DATA           EFI_MISC_VOLTAGE_PROBE_DESCRIPTION;
+typedef EFI_MISC_COOLING_DEVICE_TEMP_LINK_DATA            EFI_MISC_COOLING_DEVICE_TEMP_LINK;
+typedef EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION_DATA       EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION;
+typedef EFI_MISC_REMOTE_ACCESS_MANUFACTURER_DESCRIPTION_DATA 
+                                                          EFI_MISC_REMOTE_ACCESS_MANUFACTURER_DESCRIPTION;
+typedef EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION_DATA       EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION;
+typedef EFI_MISC_ELECTRICAL_CURRENT_PROBE_DESCRIPTION_DATA EFI_MISC_ELECTRICAL_CURRENT_PROBE_DESCRIPTION;
 
 typedef union {
   EFI_MISC_LAST_PCI_BUS_DATA                         LastPciBus;
