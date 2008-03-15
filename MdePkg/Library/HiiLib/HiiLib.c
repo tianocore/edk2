@@ -167,52 +167,6 @@ HiiLibAddPackages (
   return Status;
 }
 
-EFI_STATUS
-EFIAPI
-HiiLibAddFontPackageToHiiDatabase (
-  IN       UINTN               FontSize,
-  IN CONST UINT8               *FontBinary,
-  IN CONST EFI_GUID            *GuidId,
-  OUT      EFI_HII_HANDLE      *HiiHandle OPTIONAL
-  )
-{
-  EFI_STATUS                           Status;
-  UINT8                                *Location;
-  EFI_HII_SIMPLE_FONT_PACKAGE_HDR      *SimplifiedFont;
-  UINTN                                PackageLength;
-  EFI_HII_PACKAGE_LIST_HEADER          *PackageList;
-  UINT8                                *Package;
-
-  //
-  // Add 4 bytes to the header for entire length for HiiLibPreparePackageList use only.
-  // Looks ugly. Might be updated when font tool is ready.
-  //
-  PackageLength   = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + FontSize + 4;
-  Package = AllocateZeroPool (PackageLength);
-  if (Package == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  CopyMem (Package, &PackageLength, 4);
-  SimplifiedFont = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR*) (Package + 4);
-  SimplifiedFont->Header.Length        = (UINT32) (PackageLength - 4);
-  SimplifiedFont->Header.Type          = EFI_HII_PACKAGE_SIMPLE_FONTS;
-  SimplifiedFont->NumberOfNarrowGlyphs = (UINT16) (FontSize / sizeof (EFI_NARROW_GLYPH));
-  
-  Location = (UINT8 *) (&SimplifiedFont->NumberOfWideGlyphs + 1);
-  CopyMem (Location, FontBinary, FontSize);
-  
-  //
-  // Add this simplified font package to a package list then install it.
-  //
-  PackageList = HiiLibPreparePackageList (1, GuidId, Package);
-  Status = mHiiDatabaseProt->NewPackageList (mHiiDatabaseProt, PackageList, NULL, HiiHandle);
-  ASSERT_EFI_ERROR (Status);
-  SafeFreePool (PackageList);
-  SafeFreePool (Package);    
-
-  return EFI_SUCCESS;
-}
-
 VOID
 EFIAPI
 HiiLibRemovePackages (
