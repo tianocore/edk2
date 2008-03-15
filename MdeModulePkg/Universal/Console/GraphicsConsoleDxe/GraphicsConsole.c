@@ -263,6 +263,11 @@ GraphicsConsoleControllerDriverStart (
   UINTN                                Columns;
   UINTN                                Rows;
   UINT32                               ModeNumber;
+  EFI_HII_SIMPLE_FONT_PACKAGE_HDR      *SimplifiedFont;
+  UINTN                                PackageLength;
+  EFI_HII_PACKAGE_LIST_HEADER          *PackageList;
+  UINT8                                *Package;
+  UINT8                                *Location;
 
   ModeNumber = 0;
 
@@ -305,34 +310,36 @@ GraphicsConsoleControllerDriverStart (
 
   NarrowFontSize  = ReturnNarrowFontSize ();
 
-#if 1
   if (mFirstAccessFlag) {
-    HiiLibAddFontPackageToHiiDatabase (NarrowFontSize, (UINT8 *) UsStdNarrowGlyphData, &mFontPackageListGuid, &(Private->HiiHandle));
+    //
+    // Add 4 bytes to the header for entire length for HiiLibPreparePackageList use only.
+    // Looks ugly. Might be updated when font tool is ready.
+    //
+    PackageLength   = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + NarrowFontSize + 4;
+    Package = AllocateZeroPool (PackageLength);
+    if (Package == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    CopyMem (Package, &PackageLength, 4);
+    SimplifiedFont = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR*) (Package + 4);
+    SimplifiedFont->Header.Length        = (UINT32) (PackageLength - 4);
+    SimplifiedFont->Header.Type          = EFI_HII_PACKAGE_SIMPLE_FONTS;
+    SimplifiedFont->NumberOfNarrowGlyphs = (UINT16) (NarrowFontSize / sizeof (EFI_NARROW_GLYPH));
+    
+    Location = (UINT8 *) (&SimplifiedFont->NumberOfWideGlyphs + 1);
+    CopyMem (Location, UsStdNarrowGlyphData, NarrowFontSize);
+    
+    //
+    // Add this simplified font package to a package list then install it.
+    //
+    PackageList = HiiLibPreparePackageList (1, &mFontPackageListGuid, Package);
+    Status = mHiiDatabase->NewPackageList (mHiiDatabase, PackageList, NULL, &(Private->HiiHandle));
+    ASSERT_EFI_ERROR (Status);
+    SafeFreePool (PackageList);
+    SafeFreePool (Package);    
+
     mFirstAccessFlag = FALSE;
   }
-#else
-  FontPack        = AllocateZeroPool (sizeof (EFI_HII_FONT_PACK) + NarrowFontSize);
-  ASSERT (FontPack);
-
-  FontPack->Header.Length         = (UINT32) (sizeof (EFI_HII_FONT_PACK) + NarrowFontSize);
-  FontPack->Header.Type           = EFI_HII_FONT;
-  FontPack->NumberOfNarrowGlyphs  = (UINT16) (NarrowFontSize / sizeof (EFI_NARROW_GLYPH));
-
-  Location                        = (UINT8 *) (&FontPack->NumberOfWideGlyphs + sizeof (UINT8));
-  CopyMem (Location, UsStdNarrowGlyphData, NarrowFontSize);
-
-  //
-  // Register our Fonts into the global database
-  //
-  Package = PreparePackages (1, NULL, FontPack);
-  mHii->NewPack (mHii, Package, &(Private->HiiHandle));
-  FreePool (Package);
-
-  //
-  // Free the font database
-  //
-  FreePool (FontPack);
-#endif
   //
   // If the current mode information can not be retrieved, then attemp to set the default mode
   // of 800x600, 32 bit colot, 60 Hz refresh.
