@@ -81,16 +81,6 @@ HiiLibAddPackages (
   )
 ;
 
-EFI_STATUS
-EFIAPI
-HiiLibAddFontPackageToHiiDatabase (
-  IN       UINTN               FontSize,
-  IN CONST UINT8               *FontBinary,
-  IN CONST EFI_GUID            *GuidId,
-  OUT      EFI_HII_HANDLE      *HiiHandle OPTIONAL
-  )
-;
-
 /**
   Removes a package list from the default HII database.
 
