@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -21,12 +21,6 @@ Abstract:
 
 #ifndef _GENERIC_BDS_LIB_H_
 #define _GENERIC_BDS_LIB_H_
-
-//
-// WQBugBug: These Macro will be handled properly later.
-//
-//#undef EFI_SPECIFICATION_VERSION
-//#define EFI_SPECIFICATION_VERSION 0x0002000A
 
 #define PI_SPECIFICATION_VERSION 0x00010000
 
@@ -62,7 +56,6 @@ extern EFI_HANDLE mBdsImageHandle;
 #define LOAD_OPTION_ACTIVE              0x00000001
 #define LOAD_OPTION_FORCE_RECONNECT     0x00000002
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
 #define LOAD_OPTION_HIDDEN              0x00000008
 #define LOAD_OPTION_CATEGORY            0x00001F00
 
@@ -71,7 +64,6 @@ extern EFI_HANDLE mBdsImageHandle;
 
 #define EFI_BOOT_OPTION_SUPPORT_KEY     0x00000001
 #define EFI_BOOT_OPTION_SUPPORT_APP     0x00000002
-#endif
 
 #define IS_LOAD_OPTION_TYPE(_c, _Mask)  (BOOLEAN) (((_c) & (_Mask)) != 0)
 
@@ -319,7 +311,6 @@ typedef struct {
   UINT8                     VendorDefinedData[1];
 } VENDOR_DEVICE_PATH_WITH_DATA;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 
 extern EFI_GUID mEfiDevicePathMessagingSASGuid;
 
@@ -332,7 +323,6 @@ typedef struct {
   CHAR16                    iSCSITargetName[1];
 } ISCSI_DEVICE_PATH_WITH_NAME;
 
-#endif
 
 //
 // Internal functions
@@ -447,11 +437,7 @@ BdsLibGetImageHeader (
 
 EFI_STATUS
 BdsLibGetHiiHandles (
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
   IN     EFI_HII_DATABASE_PROTOCOL *HiiDatabase,
-#else
-  IN     EFI_HII_PROTOCOL          *Hii,
-#endif
   IN OUT UINT16                    *HandleBufferLength,
   OUT    EFI_HII_HANDLE            **HiiHandleBuffer
   );
@@ -562,4 +548,5 @@ CatPrint (
   ...
   )
 ;
-#endif // _BDS_LIB_H_
+#endif
+
