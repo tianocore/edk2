@@ -159,42 +159,6 @@ HiiLibAddPackages (
   return Status;
 }
 
-EFI_STATUS
-EFIAPI
-HiiLibAddFontPackageToHiiDatabase (
-  IN       UINTN               FontSize,
-  IN CONST UINT8               *FontBinary,
-  IN CONST EFI_GUID            *GuidId,
-  OUT      EFI_HII_HANDLE      *HiiHandle OPTIONAL
-  )
-{
-  EFI_STATUS            Status;
-  EFI_HII_FONT_PACK     *FontPack;
-  UINT8                 *Location;
-
-  FontPack        = AllocateZeroPool (sizeof (EFI_HII_FONT_PACK) + FontSize);
-  ASSERT (FontPack != NULL);
-
-  FontPack->Header.Length         = (UINT32) (sizeof (EFI_HII_FONT_PACK) + FontSize);
-  FontPack->Header.Type           = EFI_HII_FONT;
-  FontPack->NumberOfNarrowGlyphs  = (UINT16) (FontSize / sizeof (EFI_NARROW_GLYPH));
-
-  Location                        = (UINT8 *) (&FontPack->NumberOfWideGlyphs + sizeof (UINT8));
-  CopyMem (Location, FontBinary, FontSize);
-
-
-  //
-  // Register our Fonts into the global database
-  //
-  Status = HiiLibAddPackages (1, NULL, HiiHandle, NULL, FontPack);
-  //
-  // Free the font database
-  //
-  FreePool (FontPack);
-
-  return Status;  
-}
-
 VOID
 EFIAPI
 HiiLibRemovePackages (
