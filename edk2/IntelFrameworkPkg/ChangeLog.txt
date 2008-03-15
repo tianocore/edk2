@@ -38,5 +38,11 @@ EDK_0000: Compatible: owner
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
 
+==========================================================================================
+EDK_4853: Non-Compatible: qwang12
 
+	  remove the definition of EFI_DISPATCH_OPROM_TABLE from IntelFrameworkPkg\Include\Framework\Legacy16.h 
+	  as it is not defined in any Intel Framework spec.
 
+		Possible Impacts:
+		1) Modules that may reference this structure.
