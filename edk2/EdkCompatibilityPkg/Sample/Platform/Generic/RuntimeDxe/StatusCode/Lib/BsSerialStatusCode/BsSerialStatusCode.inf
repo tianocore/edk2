@@ -42,6 +42,6 @@ COMPONENT_TYPE       = LIBRARY
   $(EDK_SOURCE)\Foundation\Include\Pei
   $(EDK_SOURCE)\Foundation\Library\Pei\Include
 
-[libraries.platform]
+[libraries.common]
 
 [nmake.common]

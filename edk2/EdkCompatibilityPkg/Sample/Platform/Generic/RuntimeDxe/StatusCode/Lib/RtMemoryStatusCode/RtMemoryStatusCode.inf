@@ -43,7 +43,7 @@ COMPONENT_TYPE       = LIBRARY
   $(EDK_SOURCE)\Foundation\Library\Pei\Include
 
 
-[libraries.platform]
+[libraries.common]
   EdkPpiLib
 
 [nmake.common]

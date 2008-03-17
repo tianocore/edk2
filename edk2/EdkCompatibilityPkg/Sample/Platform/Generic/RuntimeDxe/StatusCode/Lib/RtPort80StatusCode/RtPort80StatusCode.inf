@@ -39,6 +39,6 @@ COMPONENT_TYPE       = LIBRARY
   $(EDK_SOURCE)\Foundation\Core\Dxe
   $(EDK_SOURCE)\Foundation\Library\Dxe\Include
 
-[libraries.platform]
+[libraries.common]
 
 [nmake.common]
