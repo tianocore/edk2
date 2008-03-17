@@ -43,7 +43,7 @@ COMPONENT_TYPE       = LIBRARY
   $(EDK_SOURCE)\Sample\Platform\Generic\MonoStatusCode\Pei
   $(EDK_SOURCE)\Sample\Platform\Generic\MonoStatusCode\Library\Pei\Include
 
-[libraries.platform]
+[libraries.common]
   EdkPpiLib
   EdkFrameworkPpiLib
 
