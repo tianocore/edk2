@@ -456,7 +456,10 @@ Returns:
   Badging = NULL;
   Status  = gBS->LocateProtocol (&gEfiOEMBadgingProtocolGuid, NULL, (VOID**)&Badging);
 
-  ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
+  Status = ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
 
   if (GraphicsOutput != NULL) {
     SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
