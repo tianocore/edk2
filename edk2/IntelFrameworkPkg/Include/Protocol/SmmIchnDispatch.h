@@ -1,7 +1,7 @@
 /** @file
   This file declares EFI Smm ICH [N] Specific Smi Child Protocol
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -86,6 +86,11 @@ typedef enum {
   IchnIoTrap2,
   IchnIoTrap1,
   IchnIoTrap0,
+  IchnPciExpress,
+  IchnMonitor,
+  IchnSpi,
+  IchnQRT,
+  IchnGpioUnlock,
   //
   // INSERT NEW ITEMS JUST BEFORE THIS LINE
   //
