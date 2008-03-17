@@ -33,19 +33,19 @@ COMPONENT_TYPE  = LIBRARY
   LinkedList.c
 
 [sources.ia32]
-  Ia32\EfiCopyMemRep1.c
-  Ia32\EfiSetMemRep4.c
-  Ia32\EfiZeroMemRep4.c
-#  Ia32\EfiCopyMem.c
-#  Ia32\EfiSetMem.c
-#  Ia32\EfiZeroMem.c
-  Ia32\LShiftU64.c
-  Ia32\RShiftU64.c
-  Ia32\MultU64x32.c
-  Ia32\DivU64x32.c
-  Ia32\Power10U64.c
-  Ia32\Log2.c
-  Ia32\GetPowerOfTwo.c
+  Ia32/EfiCopyMemRep1.c
+  Ia32/EfiSetMemRep4.c
+  Ia32/EfiZeroMemRep4.c
+#  Ia32/EfiCopyMem.c
+#  Ia32/EfiSetMem.c
+#  Ia32/EfiZeroMem.c
+  Ia32/LShiftU64.c
+  Ia32/RShiftU64.c
+  Ia32/MultU64x32.c
+  Ia32/DivU64x32.c
+  Ia32/Power10U64.c
+  Ia32/Log2.c
+  Ia32/GetPowerOfTwo.c
 
 [sources.ipf]
   EfiCopyMem.c
@@ -60,29 +60,29 @@ COMPONENT_TYPE  = LIBRARY
   Math.c
   
 [sources.x64]
-  x64\EfiCopyMemRep1.asm
-  x64\EfiSetMemRep4.asm
-  x64\EfiZeroMemRep4.asm
-#  x64\EfiCopyMem.asm
-#  x64\EfiSetMem.asm
-#  x64\EfiZeroMem.asm
+  x64/EfiCopyMemRep1.asm
+  x64/EfiSetMemRep4.asm
+  x64/EfiZeroMemRep4.asm
+#  x64/EfiCopyMem.asm
+#  x64/EfiSetMem.asm
+#  x64/EfiZeroMem.asm
   Math.c
 
 [includes.common]
-  $(EDK_SOURCE)\Foundation
-  $(EDK_SOURCE)\Foundation\Framework
-  $(EDK_SOURCE)\Foundation\Efi
-  $(EDK_SOURCE)\Foundation\Include
-  $(EDK_SOURCE)\Foundation\Efi\Include
-  $(EDK_SOURCE)\Foundation\Framework\Include
-  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
+  $(EDK_SOURCE)/Foundation
+  $(EDK_SOURCE)/Foundation/Framework
+  $(EDK_SOURCE)/Foundation/Efi
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
   $(EDK_SOURCE)
-  $(EDK_SOURCE)\Foundation\Core\Dxe
-  $(EDK_SOURCE)\Foundation\Library\Dxe\Include
-  $(EDK_SOURCE)\Foundation\Include\Pei
-  $(EDK_SOURCE)\Foundation\Library\Pei\Include
-  $(EDK_SOURCE)\Foundation\Framework\Ppi\CpuIo
-  $(EDK_SOURCE)\Foundation\Framework
+  $(EDK_SOURCE)/Foundation/Core/Dxe
+  $(EDK_SOURCE)/Foundation/Library/Dxe/Include
+  $(EDK_SOURCE)/Foundation/Include/Pei
+  $(EDK_SOURCE)/Foundation/Library/Pei/Include
+  $(EDK_SOURCE)/Foundation/Framework/Ppi/CpuIo
+  $(EDK_SOURCE)/Foundation/Framework
   
 [libraries.common]
   EdkFrameworkGuidLib

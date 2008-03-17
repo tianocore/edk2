@@ -28,38 +28,38 @@ COMPONENT_TYPE  = LIBRARY
 [sources.common]
 
 [sources.ia32]
-  Common\RuntimeLib.c
-  Common\RuntimeService.c
+  Common/RuntimeLib.c
+  Common/RuntimeService.c
 
 [sources.x64]
-  Common\RuntimeLib.c
-  Common\RuntimeService.c
+  Common/RuntimeLib.c
+  Common/RuntimeService.c
 
 [sources.ipf]
-  Ipf\RuntimeLib.c
-  Ipf\RuntimeService.c
+  Ipf/RuntimeLib.c
+  Ipf/RuntimeService.c
 
 [sources.ebc]
-  Common\RuntimeLib.c
-  Common\RuntimeService.c
+  Common/RuntimeLib.c
+  Common/RuntimeService.c
   
 
 [includes.common]
   .
-  ..\..\Include
-  ..\..\include\Library
-  $(EDK_SOURCE)\Foundation
-  $(EDK_SOURCE)\Foundation\Framework
-  $(EDK_SOURCE)\Foundation\Efi
-  $(EDK_SOURCE)\Foundation\Include
-  $(EDK_SOURCE)\Foundation\Efi\Include
-  $(EDK_SOURCE)\Foundation\Framework\Include
-  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
-  $(EDK_SOURCE)\Foundation\Core\Dxe
-  $(EDK_SOURCE)\Foundation\Library\Dxe\Include
-  $(EDK_SOURCE)\Foundation\Cpu\Pentium\Include
-  $(EDK_SOURCE)\Foundation\Framework\Guid\DataHubRecords
-  $(EDK_SOURCE)\Foundation\Framework\Guid\StatusCodeDataTypeId
+  ../../Include
+  ../../include/Library
+  $(EDK_SOURCE)/Foundation
+  $(EDK_SOURCE)/Foundation/Framework
+  $(EDK_SOURCE)/Foundation/Efi
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
+  $(EDK_SOURCE)/Foundation/Core/Dxe
+  $(EDK_SOURCE)/Foundation/Library/Dxe/Include
+  $(EDK_SOURCE)/Foundation/Cpu/Pentium/Include
+  $(EDK_SOURCE)/Foundation/Framework/Guid/DataHubRecords
+  $(EDK_SOURCE)/Foundation/Framework/Guid/StatusCodeDataTypeId
 
 [libraries.common]
   EdkIIGlueUefiLib

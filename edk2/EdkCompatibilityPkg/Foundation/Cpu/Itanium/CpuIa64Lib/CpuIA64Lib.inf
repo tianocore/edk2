@@ -26,12 +26,12 @@ COMPONENT_TYPE  = LIBRARY
 [sources.common]
 
 [sources.ipf]
-  Ipf\CpuIA64.s
+  Ipf/CpuIa64.s
 
 [includes.common]
-  $(EDK_SOURCE)\Foundation\Efi
+  $(EDK_SOURCE)/Foundation/Efi
   .
-  $(EDK_SOURCE)\Foundation\Cpu\Itanium\Include
-  $(EDK_SOURCE)\Foundation\include
+  $(EDK_SOURCE)/Foundation/Cpu/Itanium/Include
+  $(EDK_SOURCE)/Foundation/include
 
 [nmake.common]

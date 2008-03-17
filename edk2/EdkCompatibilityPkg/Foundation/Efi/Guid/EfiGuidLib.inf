@@ -24,36 +24,36 @@ BASE_NAME=   EfiGuidLib
 COMPONENT_TYPE=   LIBRARY
 
 [includes.common]
-  $(EDK_SOURCE)\Foundation\Efi
-  $(EDK_SOURCE)\Foundation\Include
-  $(EDK_SOURCE)\Foundation\Efi\Include
-  $(EDK_SOURCE)\Foundation\Framework\Include
-  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
-  $(EDK_SOURCE)\Foundation\Core\Dxe
-  $(EDK_SOURCE)\Foundation\Include\Pei
-  $(EDK_SOURCE)\Foundation\Library\Pei\Include
+  $(EDK_SOURCE)/Foundation/Efi
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
+  $(EDK_SOURCE)/Foundation/Core/Dxe
+  $(EDK_SOURCE)/Foundation/Include/Pei
+  $(EDK_SOURCE)/Foundation/Library/Pei/Include
 
 [nmake.common]
 
 [sources.common]
-  Acpi\Acpi.h
-  Acpi\Acpi.c
-  DebugImageInfoTable\DebugImageInfoTable.h
-  DebugImageInfoTable\DebugImageInfoTable.c
-  EventGroup\EventGroup.h
-  EventGroup\EventGroup.c
-  GlobalVariable\GlobalVariable.h
-  GlobalVariable\GlobalVariable.c
-  Gpt\Gpt.h
-  Gpt\Gpt.c
-  HardwareErrorVariable\HardwareErrorVariable.h
-  HardwareErrorVariable\HardwareErrorVariable.c
-  Mps\Mps.h
-  Mps\Mps.c
-  PcAnsi\PcAnsi.h
-  PcAnsi\PcAnsi.c
-  SmBios\SmBios.h
-  SmBios\SmBios.c
+  Acpi/Acpi.h
+  Acpi/Acpi.c
+  DebugImageInfoTable/DebugImageInfoTable.h
+  DebugImageInfoTable/DebugImageInfoTable.c
+  EventGroup/EventGroup.h
+  EventGroup/EventGroup.c
+  GlobalVariable/GlobalVariable.h
+  GlobalVariable/GlobalVariable.c
+  Gpt/Gpt.h
+  Gpt/Gpt.c
+  HardwareErrorVariable/HardwareErrorVariable.h
+  HardwareErrorVariable/HardwareErrorVariable.c
+  Mps/Mps.h
+  Mps/Mps.c
+  PcAnsi/PcAnsi.h
+  PcAnsi/PcAnsi.c
+  SmBios/SmBios.h
+  SmBios/SmBios.c
 [sources.ipf]
-  SalSystemTable\SalSystemTable.h
-  SalSystemTable\SalSystemTable.c
+  SalSystemTable/SalSystemTable.h
+  SalSystemTable/SalSystemTable.c
