@@ -50,102 +50,102 @@
 [Components.Common]
 
 # All Libraries Instances listed in Alphabetic Order
-  EdkCompatibilityPkg\Foundation\Core\Dxe\ArchProtocol\ArchProtocolLib.inf
-  EdkCompatibilityPkg\Foundation\Efi\Guid\EfiGuidLib.inf
-  EdkCompatibilityPkg\Foundation\Efi\Protocol\EfiProtocolLib.inf
-  EdkCompatibilityPkg\Foundation\Framework\Guid\EdkFrameworkGuidLib.inf
-  EdkCompatibilityPkg\Foundation\Framework\Ppi\EdkFrameworkPpiLib.inf
-  EdkCompatibilityPkg\Foundation\Framework\Protocol\EdkFrameworkProtocolLib.inf
-  EdkCompatibilityPkg\Foundation\Guid\EdkGuidLib.inf
+  EdkCompatibilityPkg/Foundation/Core/Dxe/ArchProtocol/ArchProtocolLib.inf
+  EdkCompatibilityPkg/Foundation/Efi/Guid/EfiGuidLib.inf
+  EdkCompatibilityPkg/Foundation/Efi/Protocol/EfiProtocolLib.inf
+  EdkCompatibilityPkg/Foundation/Framework/Guid/EdkFrameworkGuidLib.inf
+  EdkCompatibilityPkg/Foundation/Framework/Ppi/EdkFrameworkPpiLib.inf
+  EdkCompatibilityPkg/Foundation/Framework/Protocol/EdkFrameworkProtocolLib.inf
+  EdkCompatibilityPkg/Foundation/Guid/EdkGuidLib.inf
 
   #
   # BugBug: Can't pass IPF build. Will investigate and add back later.
   #
-#  EdkCompatibilityPkg\Foundation\Library\CompilerStub\CompilerStubLib.inf
-  EdkCompatibilityPkg\Foundation\Library\CustomizedDecompress\CustomizedDecompress.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiDriverLib\EfiDriverLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiIfrSupportLib\EfiIfrSupportLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiScriptLib\EfiScriptLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiUiLib\EfiUiLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\Graphics\Graphics.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\GraphicsLite\Graphics.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\Hob\HobLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\Print\PrintLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\PrintLite\PrintLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Dxe\UefiEfiIfrSupportLib\UefiEfiIfrSupportLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BaseCacheMaintenanceLib\BaseCacheMaintenanceLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BaseDebugLibNull\BaseDebugLibNull.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BaseIoLibIntrinsic\BaseIoLibIntrinsic.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BaseLib\BaseLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BaseMemoryLib\BaseMemoryLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePciCf8Lib\BasePciCf8Lib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePciExpressLib\BasePciExpressLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePciLibCf8\BasePciLibCf8.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePciLibPciExpress\BasePciLibPciExpress.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePeCoffGetEntryPointLib\BasePeCoffGetEntryPointLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePeCoffLib\BasePeCoffLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePostCodeLibDebug\BasePostCodeLibDebug.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePostCodeLibPort80\BasePostCodeLibPort80.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BasePrintLib\BasePrintLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BaseTimerLibLocalApic\BaseTimerLibLocalApic.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\BaseUefiDecompressLib\BaseUefiDecompressLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\DxeHobLib\DxeHobLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\DxeIoLibCpuIo\DxeIoLibCpuIo.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\DxeMemoryAllocationLib\DxeMemoryAllocationLib.inf
+#  EdkCompatibilityPkg/Foundation/Library/CompilerStub/CompilerStubLib.inf
+  EdkCompatibilityPkg/Foundation/Library/CustomizedDecompress/CustomizedDecompress.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/EfiDriverLib/EfiDriverLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/EfiIfrSupportLib/EfiIfrSupportLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/EfiScriptLib/EfiScriptLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/EfiUiLib/EfiUiLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/Graphics/Graphics.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/GraphicsLite/Graphics.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/Hob/HobLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/Print/PrintLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/PrintLite/PrintLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Dxe/UefiEfiIfrSupportLib/UefiEfiIfrSupportLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseLib/BaseLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseMemoryLib/BaseMemoryLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePciCf8Lib/BasePciCf8Lib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePciExpressLib/BasePciExpressLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePciLibCf8/BasePciLibCf8.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePeCoffLib/BasePeCoffLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BasePrintLib/BasePrintLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseTimerLibLocalApic/BaseTimerLibLocalApic.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeHobLib/DxeHobLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
 
   #
   # BugBug: Can't pass IPF build. Will investigate and add back later.
   #
-# EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\DxePerformanceLib\DxePerformanceLib.inf
+# EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxePerformanceLib/DxePerformanceLib.inf
 
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\DxeReportStatusCodeLib\DxeReportStatusCodeLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\DxeServicesTableLib\DxeServicesTableLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\DxeSmbusLib\DxeSmbusLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\EdkDxeRuntimeDriverLib\EdkDxeRuntimeDriverLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\HiiLib\HiiLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiDxeDebugLibReportStatusCode\PeiDxeDebugLibReportStatusCode.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiDxePostCodeLibReportStatusCode\PeiDxePostCodeLibReportStatusCode.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiHobLib\PeiHobLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiMemoryAllocationLib\PeiMemoryAllocationLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxeSmbusLib/DxeSmbusLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/EdkDxeRuntimeDriverLib/EdkDxeRuntimeDriverLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/HiiLib/HiiLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiHobLib/PeiHobLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   #
   # BugBug: Can't pass IPF build. Will investigate and add back later.
   #
-# EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiPerformanceLib\PeiPerformanceLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiReportStatusCodeLib\PeiReportStatusCodeLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiResourcePublicationLib\PeiResourcePublicationLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiServicesLib\PeiServicesLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiServicesTablePointerLib\PeiServicesTablePointerLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiSmbusLib\PeiSmbusLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\UefiBootServicesTableLib\UefiBootServicesTableLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\UefiDevicePathLib\UefiDevicePathLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\UefiDriverModelLib\UefiDriverModelLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\UefiLib\UefiLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\UefiRuntimeServicesTableLib\UefiRuntimeServicesTableLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EfiCommonLib\EfiCommonLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Pei\Hob\PeiHobLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Pei\PeiLib\PeiLib.inf
-  EdkCompatibilityPkg\Foundation\Library\RuntimeDxe\EfiRuntimeLib\EfiRuntimeLib.inf
-  EdkCompatibilityPkg\Foundation\Library\Thunk16\Thunk16Lib.inf
-  EdkCompatibilityPkg\Foundation\Ppi\EdkPpiLib.inf
-  EdkCompatibilityPkg\Foundation\Protocol\EdkProtocolLib.inf
-  EdkCompatibilityPkg\Sample\Platform\Generic\MonoStatusCode\Library\Pei\MemoryStatusCode\MemoryStatusCode.inf
-  EdkCompatibilityPkg\Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\BsDataHubStatusCode\BsDataHubStatusCode.inf
-  EdkCompatibilityPkg\Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\BsSerialStatusCode\BsSerialStatusCode.inf
-  EdkCompatibilityPkg\Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\RtLedStatusCode\RtLedStatusCode.inf
-  EdkCompatibilityPkg\Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\RtMemoryStatusCode\RtMemoryStatusCode.inf
-  EdkCompatibilityPkg\Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\RtPlatformStatusCode\Nt32\RtPlatformStatusCode.inf
-  EdkCompatibilityPkg\Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\RtPort80StatusCode\RtPort80StatusCode.inf
-  EdkCompatibilityPkg\Sample\Platform\Nt32\Ppi\EdkNt32PpiLib.inf
-  EdkCompatibilityPkg\Sample\Platform\Nt32\Protocol\EdkNt32ProtocolLib.inf
+# EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiPerformanceLib/PeiPerformanceLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesLib/PeiServicesLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiSmbusLib/PeiSmbusLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiDriverModelLib/UefiDriverModelLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiLib/UefiLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Pei/Hob/PeiHobLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib.inf
+  EdkCompatibilityPkg/Foundation/Library/RuntimeDxe/EfiRuntimeLib/EfiRuntimeLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Thunk16/Thunk16Lib.inf
+  EdkCompatibilityPkg/Foundation/Ppi/EdkPpiLib.inf
+  EdkCompatibilityPkg/Foundation/Protocol/EdkProtocolLib.inf
+  EdkCompatibilityPkg/Sample/Platform/Generic/MonoStatusCode/Library/Pei/MemoryStatusCode/MemoryStatusCode.inf
+  EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/BsDataHubStatusCode/BsDataHubStatusCode.inf
+  EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/BsSerialStatusCode/BsSerialStatusCode.inf
+  EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/RtLedStatusCode/RtLedStatusCode.inf
+  EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/RtMemoryStatusCode/RtMemoryStatusCode.inf
+  EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/RtPlatformStatusCode/Nt32/RtPlatformStatusCode.inf
+  EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/RtPort80StatusCode/RtPort80StatusCode.inf
+  EdkCompatibilityPkg/Sample/Platform/Nt32/Ppi/EdkNt32PpiLib.inf
+  EdkCompatibilityPkg/Sample/Platform/Nt32/Protocol/EdkNt32ProtocolLib.inf
 
 [Components.IA32,Components.X64]
-  EdkCompatibilityPkg\Foundation\Cpu\Pentium\CpuIA32Lib\CpuIA32Lib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiServicesTablePointerLibMm7\PeiServicesTablePointerLibMm7.inf
-  EdkCompatibilityPkg\Sample\Library\Dxe\WinNt\WinNtLib.inf
+  EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
+  EdkCompatibilityPkg/Sample/Library/Dxe/WinNt/WinNtLib.inf
 
 
 [Components.IPF]
-  EdkCompatibilityPkg\Foundation\Cpu\Itanium\CpuIa64Lib\CpuIA64Lib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\EdkDxeSalLib\EdkDxeSalLib.inf
-  EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiServicesTablePointerLibKr1\PeiServicesTablePointerLibKr1.inf
+  EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/EdkDxeSalLib/EdkDxeSalLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLibKr1/PeiServicesTablePointerLibKr1.inf
 

@@ -25,29 +25,29 @@ BASE_NAME=   EdkNt32PpiLib
 COMPONENT_TYPE=   LIBRARY
 
 [includes.common]
-  $(EDK_SOURCE)\Sample\Platform\Nt32
-  $(EDK_SOURCE)\Foundation\Efi
-  $(EDK_SOURCE)\Foundation\Include
-  $(EDK_SOURCE)\Foundation\Efi\Include
-  $(EDK_SOURCE)\Foundation\Framework\Include
-  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
-  $(EDK_SOURCE)\Foundation\Include\Pei
-  $(EDK_SOURCE)\Foundation\Library\Pei\Include
-  $(EDK_SOURCE)\Foundation\Core\Dxe
-  $(EDK_SOURCE)\Foundation\Library\Dxe\Include
-  $(EDK_SOURCE)\Foundation\Framework 
+  $(EDK_SOURCE)/Sample/Platform/Nt32
+  $(EDK_SOURCE)/Foundation/Efi
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
+  $(EDK_SOURCE)/Foundation/Include/Pei
+  $(EDK_SOURCE)/Foundation/Library/Pei/Include
+  $(EDK_SOURCE)/Foundation/Core/Dxe
+  $(EDK_SOURCE)/Foundation/Library/Dxe/Include
+  $(EDK_SOURCE)/Foundation/Framework 
                                    
 [nmake.common]
 C_STD_INCLUDE=
 
 [sources.common]
-    NtAutoscan\NtAutoscan.h
-    NtAutoscan\NtAutoscan.c
-    NtFwh\NtFwh.h
-    NtFwh\NtFwh.c
-    NtLoadAsDll\NtLoadAsDll.h
-    NtLoadAsDll\NtLoadAsDll.c
-    NtPeiLoadFile\NtPeiLoadFile.h
-    NtPeiLoadFile\NtPeiLoadFile.c
-    NtThunk\NtThunk.h
-    NtThunk\NtThunk.c
+    NtAutoscan/NtAutoscan.h
+    NtAutoscan/NtAutoscan.c
+    NtFwh/NtFwh.h
+    NtFwh/NtFwh.c
+    NtLoadAsDll/NtLoadAsDll.h
+    NtLoadAsDll/NtLoadAsDll.c
+    NtPeiLoadFile/NtPeiLoadFile.h
+    NtPeiLoadFile/NtPeiLoadFile.c
+    NtThunk/NtThunk.h
+    NtThunk/NtThunk.c

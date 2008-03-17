@@ -25,23 +25,23 @@ COMPONENT_TYPE       = LIBRARY
   x86Thunk.c
 
 [sources.ia32]
-  Ia32\Thunk16.asm
-  Ia32\Fx.asm
+  Ia32/Thunk16.asm
+  Ia32/Fx.asm
 
 [sources.x64]
-  X64\Thunk16.asm
-  X64\Fx.asm
+  X64/Thunk16.asm
+  X64/Fx.asm
 
 [includes.common]
   .
-  $(EDK_SOURCE)\Foundation\Framework
-  $(EDK_SOURCE)\Foundation\Efi
-  $(EDK_SOURCE)\Foundation
-  $(EDK_SOURCE)\Foundation\Include
-  $(EDK_SOURCE)\Foundation\Efi\Include
-  $(EDK_SOURCE)\Foundation\Framework\Include
-  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
-  $(EDK_SOURCE)\Foundation\Library\Dxe\Include
+  $(EDK_SOURCE)/Foundation/Framework
+  $(EDK_SOURCE)/Foundation/Efi
+  $(EDK_SOURCE)/Foundation
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
+  $(EDK_SOURCE)/Foundation/Library/Dxe/Include
 
 [libraries.common]
 

@@ -24,40 +24,40 @@ BASE_NAME=   EdkFrameworkGuidLib
 COMPONENT_TYPE=   LIBRARY
 
 [includes.common]
-  $(EDK_SOURCE)\Foundation\Framework
-  $(EDK_SOURCE)\Foundation\Efi
-  $(EDK_SOURCE)\Foundation\Include
-  $(EDK_SOURCE)\Foundation\Efi\Include
-  $(EDK_SOURCE)\Foundation\Framework\Include
-  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
-  $(EDK_SOURCE)\Foundation\Core\Dxe
-  $(EDK_SOURCE)\Foundation\Include\Pei
-  $(EDK_SOURCE)\Foundation\Library\Pei\Include
+  $(EDK_SOURCE)/Foundation/Framework
+  $(EDK_SOURCE)/Foundation/Efi
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
+  $(EDK_SOURCE)/Foundation/Core/Dxe
+  $(EDK_SOURCE)/Foundation/Include/Pei
+  $(EDK_SOURCE)/Foundation/Library/Pei/Include
   
 [nmake.common]
 
 [sources.common]
-  AcpiTableStorage\AcpiTableStorage.h
-  AcpiTableStorage\AcpiTableStorage.c
-  Apriori\Apriori.h
-  Apriori\Apriori.c
-  DataHubRecords\DataHubRecords.h
-  DataHubRecords\DataHubRecords.c  
-  DxeServices\DxeServices.h
-  DxeServices\DxeServices.c
-  FirmwareFileSystem\FirmwareFileSystem.h
-  FirmwareFileSystem\FirmwareFileSystem.c
-  Hob\Hob.h
-  Hob\Hob.c
-  MemoryAllocationHob\MemoryAllocationHob.c
-  MemoryAllocationHob\MemoryAllocationHob.h
-  SmramMemoryReserve\SmramMemoryReserve.h
-  SmramMemoryReserve\SmramMemoryReserve.c
-  StatusCodeDataTypeId\StatusCodeDataTypeId.h
-  StatusCodeDataTypeId\StatusCodeDataTypeId.c
-  FrameworkDevicePath\FrameworkDevicePath.h
-  FrameworkDevicePath\FrameworkDevicePath.c
-  FirmwareFileSystem2\FirmwareFileSystem2.h
-  FirmwareFileSystem2\FirmwareFileSystem2.c
-  PeiApriori\PeiApriori.h
-  PeiApriori\PeiApriori.c
+  AcpiTableStorage/AcpiTableStorage.h
+  AcpiTableStorage/AcpiTableStorage.c
+  Apriori/Apriori.h
+  Apriori/Apriori.c
+  DataHubRecords/DataHubRecords.h
+  DataHubRecords/DataHubRecords.c  
+  DxeServices/DxeServices.h
+  DxeServices/DxeServices.c
+  FirmwareFileSystem/FirmwareFileSystem.h
+  FirmwareFileSystem/FirmwareFileSystem.c
+  Hob/Hob.h
+  Hob/Hob.c
+  MemoryAllocationHob/MemoryAllocationHob.c
+  MemoryAllocationHob/MemoryAllocationHob.h
+  SmramMemoryReserve/SmramMemoryReserve.h
+  SmramMemoryReserve/SmramMemoryReserve.c
+  StatusCodeDataTypeId/StatusCodeDataTypeId.h
+  StatusCodeDataTypeId/StatusCodeDataTypeId.c
+  FrameworkDevicePath/FrameworkDevicePath.h
+  FrameworkDevicePath/FrameworkDevicePath.c
+  FirmwareFileSystem2/FirmwareFileSystem2.h
+  FirmwareFileSystem2/FirmwareFileSystem2.c
+  PeiApriori/PeiApriori.h
+  PeiApriori/PeiApriori.c

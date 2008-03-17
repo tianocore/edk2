@@ -26,36 +26,36 @@ COMPONENT_TYPE  = LIBRARY
 [sources.common] 
 
 [sources.ia32]
-  Ia32\memcpyRep1.asm
-  Ia32\memsetRep4.asm
-#  Ia32\memcpy.asm
-#  Ia32\memset.asm
+  Ia32/memcpyRep1.asm
+  Ia32/memsetRep4.asm
+#  Ia32/memcpy.asm
+#  Ia32/memset.asm
   
 [sources.x64]  
-  x64\memcpyRep1.asm
-  x64\memsetRep4.asm
-#  x64\memcpy.asm
-#  x64\memset.asm
+  x64/memcpyRep1.asm
+  x64/memsetRep4.asm
+#  x64/memcpy.asm
+#  x64/memset.asm
   
 [sources.Ipf]  
   memcpy.c
   memset.c
   
 [includes.common]
-  $(EDK_SOURCE)\Foundation
-  $(EDK_SOURCE)\Foundation\Framework
-  $(EDK_SOURCE)\Foundation\Efi
-  $(EDK_SOURCE)\Foundation\Include
-  $(EDK_SOURCE)\Foundation\Efi\Include
-  $(EDK_SOURCE)\Foundation\Framework\Include
-  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
+  $(EDK_SOURCE)/Foundation
+  $(EDK_SOURCE)/Foundation/Framework
+  $(EDK_SOURCE)/Foundation/Efi
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
   $(EDK_SOURCE)
-  $(EDK_SOURCE)\Foundation\Core\Dxe
-  $(EDK_SOURCE)\Foundation\Library\Dxe\Include
-  $(EDK_SOURCE)\Foundation\Include\Pei
-  $(EDK_SOURCE)\Foundation\Library\Pei\Include
-  $(EDK_SOURCE)\Foundation\Framework\Ppi\CpuIo
-  $(EDK_SOURCE)\Foundation\Framework
+  $(EDK_SOURCE)/Foundation/Core/Dxe
+  $(EDK_SOURCE)/Foundation/Library/Dxe/Include
+  $(EDK_SOURCE)/Foundation/Include/Pei
+  $(EDK_SOURCE)/Foundation/Library/Pei/Include
+  $(EDK_SOURCE)/Foundation/Framework/Ppi/CpuIo
+  $(EDK_SOURCE)/Foundation/Framework
 
 [libraries.common]
 
