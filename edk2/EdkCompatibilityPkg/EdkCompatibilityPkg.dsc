@@ -138,7 +138,7 @@
   EdkCompatibilityPkg\Sample\Platform\Nt32\Ppi\EdkNt32PpiLib.inf
   EdkCompatibilityPkg\Sample\Platform\Nt32\Protocol\EdkNt32ProtocolLib.inf
 
-[Components.IA32,X64]
+[Components.IA32,Components.X64]
   EdkCompatibilityPkg\Foundation\Cpu\Pentium\CpuIA32Lib\CpuIA32Lib.inf
   EdkCompatibilityPkg\Foundation\Library\EdkIIGlueLib\Library\PeiServicesTablePointerLibMm7\PeiServicesTablePointerLibMm7.inf
   EdkCompatibilityPkg\Sample\Library\Dxe\WinNt\WinNtLib.inf
