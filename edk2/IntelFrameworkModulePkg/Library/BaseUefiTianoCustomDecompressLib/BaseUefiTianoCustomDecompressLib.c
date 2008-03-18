@@ -821,7 +821,7 @@ Returns:
   //
   return UefiDecompressGetInfo (
           (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-          *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+          (*(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
           OutputBufferSize,
           ScratchBufferSize
          );
