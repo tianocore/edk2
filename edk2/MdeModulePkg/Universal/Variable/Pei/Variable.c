@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007 Intel Corporation. <BR>
+Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -588,7 +588,7 @@ Returns:
   EFI_PEI_SERVICES        **PeiServices;
 
   PeiServices = GetPeiServicesTablePointer ();
-  if (VariableName == NULL || VariableGuid == NULL) {
+  if (VariableName == NULL || VariableGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -665,7 +665,7 @@ Returns:
   EFI_PEI_SERVICES        **PeiServices;
 
   PeiServices = GetPeiServicesTablePointer ();
-  if (VariableName == NULL) {
+  if (VariableName == NULL || VariableGuid == NULL || VariableNameSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
