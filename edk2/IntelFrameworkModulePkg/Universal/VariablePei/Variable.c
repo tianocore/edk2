@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -16,7 +16,7 @@ Abstract:
 
   Framework PEIM to provide the Variable functionality
 
---*/
+**/
 
 
 #include "Variable.h"

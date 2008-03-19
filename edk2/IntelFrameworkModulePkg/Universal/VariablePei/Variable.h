@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -17,7 +17,7 @@ Abstract:
 
   Tiano PEIM to provide the variable functionality
 
---*/
+**/
 
 #ifndef _PEI_VARIABLE_H
 #define _PEI_VARIABLE_H

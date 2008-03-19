@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -21,7 +21,7 @@ Abstract:
 
 Revision History
 
---*/
+**/
 
 #ifndef _EFI_PCI_LIB_H
 #define _EFI_PCI_LIB_H
