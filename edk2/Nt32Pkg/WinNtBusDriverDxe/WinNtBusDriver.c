@@ -1,4 +1,4 @@
-/*+++
+/**@file
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -220,7 +220,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    ControllerHandle - add argument and description to function comment
 // TODO:    RemainingDevicePath - add argument and description to function comment

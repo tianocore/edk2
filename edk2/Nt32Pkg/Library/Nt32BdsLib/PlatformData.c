@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2004 - 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -18,7 +18,7 @@ Abstract:
   Defined the platform specific device path which will be used by
   platform Bbd to perform the platform policy connect.
 
---*/
+**/
 
 #include "BdsPlatform.h"
 

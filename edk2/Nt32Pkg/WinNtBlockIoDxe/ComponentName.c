@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
---*/
+**/
 #include <Uefi.h>
 #include <WinNtDxe.h>
 #include <Protocol/ComponentName.h>

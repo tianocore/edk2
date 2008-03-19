@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -19,7 +19,7 @@ Abstract:
   to produce PeCoff library class.
 
 
---*/
+**/
 
 #include <PiPei.h>
 #include <Guid/PeiPeCoffLoader.h>

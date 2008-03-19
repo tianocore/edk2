@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -26,7 +26,7 @@ Abstract:
   This code produces 128 K of temporary memory for the PEI stack by directly
   allocate memory space with ReadWrite and Execute attribute.
 
---*/
+**/
 
 #include "SecMain.h"
 

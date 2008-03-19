@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -58,7 +58,7 @@ Abstract:
 
   * Other names and brands may be claimed as the property of others.
 
---*/
+**/
 #include <Uefi.h>
 #include <WinNtDxe.h>
 #include <Protocol/WinNtThunk.h>

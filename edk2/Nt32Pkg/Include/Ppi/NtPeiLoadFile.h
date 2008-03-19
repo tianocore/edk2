@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -19,7 +19,7 @@ Abstract:
 
   When the PEI core is done it calls the DXE IPL via PPI
 
---*/
+**/
 
 #ifndef __NT_PEI_LOAD_FILE_H__
 #define __NT_PEI_LOAD_FILE_H__

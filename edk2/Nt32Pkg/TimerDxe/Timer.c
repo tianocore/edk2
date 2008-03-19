@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -21,7 +21,7 @@ Abstract:
   timer service.  In the future, the Thread creation should possibly be 
   abstracted by the CPU architectural protocol
 
---*/
+**/
 
 #include "Timer.h"
 

@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -25,7 +25,7 @@ Abstract:
 
   YOU MUST include EfiWinNT.h in place of Efi.h to make this file compile.
 
---*/
+**/
 
 #ifndef __WIN_NT_THUNK_H__
 #define __WIN_NT_THUNK_H__

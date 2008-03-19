@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@ Abstract:
 
   Firmware volume block driver for Intel Firmware Hub (FWH) device
 
---*/
+**/
 
 #ifndef _FW_BLOCK_SERVICE_H
 #define _FW_BLOCK_SERVICE_H

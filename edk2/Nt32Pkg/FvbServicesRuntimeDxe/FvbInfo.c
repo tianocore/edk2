@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -18,7 +18,7 @@ Abstract:
   Defines data structure that is the volume header found.These data is intent
   to decouple FVB driver with FV header.
 
---*/
+**/
 
 //
 // The package level header files this module uses
