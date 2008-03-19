@@ -574,7 +574,8 @@ EFI_STATUS
 Reclaim (
   IN  EFI_PHYSICAL_ADDRESS  VariableBase,
   OUT UINTN                 *LastVariableOffset,
-  IN  BOOLEAN               IsVolatile
+  IN  BOOLEAN               IsVolatile,
+  IN  VARIABLE_HEADER       *UpdatingVariable
   )
 /*++
 
@@ -596,12 +597,18 @@ Returns:
 --*/
 {
   VARIABLE_HEADER       *Variable;
+  VARIABLE_HEADER       *AddedVariable;
   VARIABLE_HEADER       *NextVariable;
+  VARIABLE_HEADER       *NextAddedVariable;
   VARIABLE_STORE_HEADER *VariableStoreHeader;
   UINT8                 *ValidBuffer;
-  UINTN                 ValidBufferSize;
+  UINTN                 MaximumBufferSize;
   UINTN                 VariableSize;
+  UINTN                 NameSize;
   UINT8                 *CurrPtr;
+  VOID                  *Point0;
+  VOID                  *Point1;
+  BOOLEAN               FoundAdded;
   EFI_STATUS            Status;
 
   VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) VariableBase);
@@ -609,39 +616,47 @@ Returns:
   //
   // Start Pointers for the variable.
   //
-  Variable        = GetStartPointer (VariableStoreHeader);
-  ValidBufferSize = sizeof (VARIABLE_STORE_HEADER);
+  Variable          = GetStartPointer (VariableStoreHeader);
+  MaximumBufferSize = sizeof (VARIABLE_STORE_HEADER);
 
   while (IsValidVariableHeader (Variable)) {
     NextVariable = GetNextVariablePtr (Variable);
-    if (Variable->State == VAR_ADDED) {
+    if (Variable->State == VAR_ADDED || 
+        Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
+       ) {
       VariableSize = (UINTN) NextVariable - (UINTN) Variable;
-      ValidBufferSize += VariableSize;
+      MaximumBufferSize += VariableSize;
     }
 
     Variable = NextVariable;
   }
 
-  ValidBuffer = AllocatePool (ValidBufferSize);
+  //
+  // Reserve the 1 Bytes with Oxff to identify the 
+  // end of the variable buffer. 
+  // 
+  MaximumBufferSize += 1;
+  ValidBuffer = AllocatePool (MaximumBufferSize);
   if (ValidBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  SetMem (ValidBuffer, ValidBufferSize, 0xff);
-
-  CurrPtr = ValidBuffer;
+  SetMem (ValidBuffer, MaximumBufferSize, 0xff);
 
   //
   // Copy variable store header
   //
-  CopyMem (CurrPtr, VariableStoreHeader, sizeof (VARIABLE_STORE_HEADER));
-  CurrPtr = (UINT8 *) GetStartPointer ((VARIABLE_STORE_HEADER *) CurrPtr);
+  CopyMem (ValidBuffer, VariableStoreHeader, sizeof (VARIABLE_STORE_HEADER));
+  CurrPtr = (UINT8 *) GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer);
 
   //
   // Start Pointers for the variable.
   //
-  Variable = GetStartPointer (VariableStoreHeader);
 
+  //
+  // Reinstall all ADDED variables
+  // 
+  Variable = GetStartPointer (VariableStoreHeader);
   while (IsValidVariableHeader (Variable)) {
     NextVariable = GetNextVariablePtr (Variable);
     if (Variable->State == VAR_ADDED) {
@@ -652,14 +667,61 @@ Returns:
 
     Variable = NextVariable;
   }
+  //
+  // Reinstall all in delete transition variables
+  // 
+  Variable      = GetStartPointer (VariableStoreHeader);
+  while (IsValidVariableHeader (Variable)) {
+    NextVariable = GetNextVariablePtr (Variable);
+    if (Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+
+      //
+      // Buffer has cached all ADDED variable. 
+      // Per IN_DELETED variable, we have to guarantee that
+      // no ADDED one in previous buffer. 
+      // 
+     
+      FoundAdded = FALSE;
+      AddedVariable = GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer);
+      while (IsValidVariableHeader (AddedVariable)) {
+        NextAddedVariable = GetNextVariablePtr (AddedVariable);
+        NameSize = NameSizeOfVariable (AddedVariable);
+        if (CompareGuid (&AddedVariable->VendorGuid, &Variable->VendorGuid) &&
+            NameSize == NameSizeOfVariable (Variable)
+           ) {
+          Point0 = (VOID *) GetVariableNamePtr (AddedVariable);
+          Point1 = (VOID *) GetVariableNamePtr (Variable);
+          if (!CompareMem (
+                Point0,
+                Point1,
+                NameSizeOfVariable (AddedVariable)
+                )
+             ) {
+            FoundAdded = TRUE;
+            break;
+          }
+        }
+        AddedVariable = NextAddedVariable;
+      }
+      if (!FoundAdded) {
+        VariableSize = (UINTN) NextVariable - (UINTN) Variable;
+        CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
+        if (Variable != UpdatingVariable) {
+          ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
+        }
+        CurrPtr += VariableSize;
+      }
+    }
+
+    Variable = NextVariable;
+  }
 
   if (IsVolatile) {
     //
     // If volatile variable store, just copy valid buffer
     //
     SetMem ((UINT8 *) (UINTN) VariableBase, VariableStoreHeader->Size, 0xff);
-    CopyMem ((UINT8 *) (UINTN) VariableBase, ValidBuffer, ValidBufferSize);
-    *LastVariableOffset = ValidBufferSize;
+    CopyMem ((UINT8 *) (UINTN) VariableBase, ValidBuffer, (UINTN) (CurrPtr - (UINT8 *) ValidBuffer));
     Status              = EFI_SUCCESS;
   } else {
     //
@@ -668,18 +730,16 @@ Returns:
     Status = FtwVariableSpace (
               VariableBase,
               ValidBuffer,
-              ValidBufferSize
+              (UINTN) (CurrPtr - (UINT8 *) ValidBuffer)
               );
-    if (!EFI_ERROR (Status)) {
-      *LastVariableOffset = ValidBufferSize;
-    }
+  }
+  if (!EFI_ERROR (Status)) {
+    *LastVariableOffset = (UINTN) (CurrPtr - (UINT8 *) ValidBuffer);
+  } else {
+    *LastVariableOffset = 0;
   }
 
   FreePool (ValidBuffer);
-
-  if (EFI_ERROR (Status)) {
-    *LastVariableOffset = 0;
-  }
 
   return Status;
 }
@@ -838,10 +898,12 @@ Returns:
 
 --*/
 {
-  VARIABLE_HEADER       *Variable[2];
-  VARIABLE_STORE_HEADER *VariableStoreHeader[2];
-  UINTN                 Index;
-  VOID                  *Point;
+  VARIABLE_HEADER         *Variable[2];
+  VARIABLE_HEADER         *InDeletedVariable;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader[2];
+  UINTN                   InDeletedStorageIndex;
+  UINTN                   Index;
+  VOID                    *Point;
 
   //
   // 0: Volatile, 1: Non-Volatile
@@ -861,29 +923,47 @@ Returns:
   if (VariableName[0] != 0 && VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Find the variable by walk through volatile and then non-volatile variable store
   //
+  InDeletedVariable     = NULL;
+  InDeletedStorageIndex = 0;
   for (Index = 0; Index < 2; Index++) {
-    PtrTrack->StartPtr  = GetStartPointer (VariableStoreHeader[Index]);
-    PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[Index]);
-
     while (IsValidVariableHeader (Variable[Index]) && (Variable[Index] <= GetEndPointer (VariableStoreHeader[Index]))) {
-      if (Variable[Index]->State == VAR_ADDED) {
+      if (Variable[Index]->State == VAR_ADDED || 
+          Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
+         ) {
         if (!EfiAtRuntime () || (Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
           if (VariableName[0] == 0) {
-            PtrTrack->CurrPtr   = Variable[Index];
-            PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
-            return EFI_SUCCESS;
+            if (Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+              InDeletedVariable     = Variable[Index];
+              InDeletedStorageIndex = Index;
+            } else {
+              PtrTrack->StartPtr  = GetStartPointer (VariableStoreHeader[Index]);
+              PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[Index]);
+              PtrTrack->CurrPtr   = Variable[Index];
+              PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
+
+              return EFI_SUCCESS;
+            }
           } else {
             if (CompareGuid (VendorGuid, &Variable[Index]->VendorGuid)) {
               Point = (VOID *) GetVariableNamePtr (Variable[Index]);
 
               ASSERT (NameSizeOfVariable (Variable[Index]) != 0);
               if (!CompareMem (VariableName, Point, NameSizeOfVariable (Variable[Index]))) {
-                PtrTrack->CurrPtr   = Variable[Index];
-                PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
-                return EFI_SUCCESS;
+                if (Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+                  InDeletedVariable     = Variable[Index];
+                  InDeletedStorageIndex = Index;
+                } else {
+                  PtrTrack->StartPtr  = GetStartPointer (VariableStoreHeader[Index]);
+                  PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[Index]);
+                  PtrTrack->CurrPtr   = Variable[Index];
+                  PtrTrack->Volatile  = (BOOLEAN)(Index == 0);
+
+                  return EFI_SUCCESS;
+                }
               }
             }
           }
@@ -891,6 +971,13 @@ Returns:
       }
 
       Variable[Index] = GetNextVariablePtr (Variable[Index]);
+    }
+    if (InDeletedVariable != NULL) {
+      PtrTrack->StartPtr  = GetStartPointer (VariableStoreHeader[InDeletedStorageIndex]);
+      PtrTrack->EndPtr    = GetEndPointer (VariableStoreHeader[InDeletedStorageIndex]);
+      PtrTrack->CurrPtr   = InDeletedVariable;
+      PtrTrack->Volatile  = (BOOLEAN)(InDeletedStorageIndex == 0);
+      return EFI_SUCCESS;
     }
   }
   PtrTrack->CurrPtr = NULL;
@@ -1279,6 +1366,7 @@ RuntimeServiceSetVariable (
       goto Done;
     } else if ((Variable.CurrPtr->State == VAR_ADDED) ||
                (Variable.CurrPtr->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION))) {
+
       //
       // Mark the old variable as in delete transition
       //
@@ -1388,7 +1476,7 @@ RuntimeServiceSetVariable (
       //
       // Perform garbage collection & reclaim operation
       //
-      Status = Reclaim (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase, NonVolatileOffset, FALSE);
+      Status = Reclaim (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase, NonVolatileOffset, FALSE, Variable.CurrPtr);
       if (EFI_ERROR (Status)) {
         goto Done;
       }
@@ -1492,7 +1580,7 @@ RuntimeServiceSetVariable (
       //
       // Perform garbage collection & reclaim operation
       //
-      Status = Reclaim (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase, VolatileOffset, TRUE);
+      Status = Reclaim (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase, VolatileOffset, TRUE, Variable.CurrPtr);
       if (EFI_ERROR (Status)) {
         goto Done;
       }
@@ -1723,7 +1811,8 @@ ReclaimForOS(
     Status = Reclaim (
               mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
               &mVariableModuleGlobal->NonVolatileLastVariableOffset,
-              FALSE
+              FALSE,
+              NULL
               );
     ASSERT_EFI_ERROR (Status);
   }
@@ -1912,7 +2001,8 @@ Returns:
         Status = Reclaim (
                   mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
                   &mVariableModuleGlobal->NonVolatileLastVariableOffset,
-                  FALSE
+                  FALSE,
+                  NULL
                   );
 
         if (EFI_ERROR (Status)) {
