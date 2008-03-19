@@ -47,7 +47,6 @@
   PcdLib
   BaseMemoryLib
   BaseLib
-  UefiBootServicesTableLib
   DebugLib
   UefiRuntimeServicesTableLib
   OemHookStatusCodeLib

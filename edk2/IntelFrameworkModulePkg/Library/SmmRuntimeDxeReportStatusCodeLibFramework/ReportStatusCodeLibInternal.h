@@ -19,7 +19,6 @@
 
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
@@ -30,7 +29,6 @@
 
 #include <FrameworkModuleBase.h>
 #include <DebugInfo.h>
-
 
 /**
   Locatet he report status code service.
