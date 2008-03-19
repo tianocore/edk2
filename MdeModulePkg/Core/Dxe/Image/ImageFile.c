@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -83,7 +83,9 @@ Returns:
   EFI_FILE_INFO                     *FileInfo;
   UINTN                             FileInfoSize;
   EFI_GUID                          *NameGuid;
+  FILEPATH_DEVICE_PATH              *OriginalFilePathNode;
 
+  OriginalFilePathNode = NULL;
   *AuthenticationStatus = 0;
   ZeroMem (ImageFileHandle, sizeof (IMAGE_FILE_HANDLE));
   ImageFileHandle->Signature = IMAGE_FILE_HANDLE_SIGNATURE;
@@ -187,41 +189,57 @@ Returns:
     //
     Status = Volume->OpenVolume (Volume, &FileHandle);
     if (!EFI_ERROR (Status)) {
-
       //
-      // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
-      //  directory information and filename can be seperate. The goal is to inch
-      //  our way down each device path node and close the previous node
+      // Duplicate the device path to avoid the access to unaligned device path node.
+      // Because the device path consists of one or more FILE PATH MEDIA DEVICE PATH
+      // nodes, It assures the fields in device path nodes are 2 byte aligned. 
       //
-      while (!IsDevicePathEnd (&FilePathNode->Header)) {
-        if (DevicePathType (&FilePathNode->Header) != MEDIA_DEVICE_PATH ||
-            DevicePathSubType (&FilePathNode->Header) != MEDIA_FILEPATH_DP) {
-          Status = EFI_UNSUPPORTED;
-        }
-
-        if (EFI_ERROR (Status)) {
-          //
-          // Exit loop on Error
-          //
-          break;
-        }
-
-        LastHandle = FileHandle;
-        FileHandle = NULL;
-        Status = LastHandle->Open (
-                              LastHandle,
-                              &FileHandle,
-                              FilePathNode->PathName,
-                              EFI_FILE_MODE_READ,
-                              0
-                              );
-
+      FilePathNode = (FILEPATH_DEVICE_PATH *)CoreDuplicateDevicePath((EFI_DEVICE_PATH_PROTOCOL *)(UINTN)FilePathNode);
+      if (FilePathNode == NULL) {
+        FileHandle->Close (FileHandle);
+        Status = EFI_OUT_OF_RESOURCES;
+      } else {
+        OriginalFilePathNode = FilePathNode;
         //
-        // Close the previous node
+        // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
+        // directory information and filename can be seperate. The goal is to inch
+        // our way down each device path node and close the previous node
         //
-        LastHandle->Close (LastHandle);
+        while (!IsDevicePathEnd (&FilePathNode->Header)) {
+          if (DevicePathType (&FilePathNode->Header) != MEDIA_DEVICE_PATH ||
+              DevicePathSubType (&FilePathNode->Header) != MEDIA_FILEPATH_DP) {
+            Status = EFI_UNSUPPORTED;
+          }
 
-        FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header);
+          if (EFI_ERROR (Status)) {
+            //
+            // Exit loop on Error
+            //
+            break;
+          }
+
+          LastHandle = FileHandle;
+          FileHandle = NULL;
+
+          Status = LastHandle->Open (
+                                LastHandle,
+                                &FileHandle,
+                                FilePathNode->PathName,
+                                EFI_FILE_MODE_READ,
+                                0
+                                );
+
+          //
+          // Close the previous node
+          //
+          LastHandle->Close (LastHandle);
+
+          FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header);
+        }
+        //
+        // Free the allocated memory pool 
+        //
+        CoreFreePool(OriginalFilePathNode);
       }
 
       if (!EFI_ERROR (Status)) {
