@@ -152,6 +152,8 @@ Returns:
                           SizeOfY - (PosY - GLYPH_HEIGHT - 1),
                           SizeOfX * sizeof (EFI_UGA_PIXEL)
                           );
+    } else {
+      return EFI_UNSUPPORTED;
     }
   }
   //
@@ -185,6 +187,8 @@ Returns:
                           BlockHeight,
                           (BlockWidth) * sizeof (EFI_UGA_PIXEL)
                           );
+    } else {
+      return EFI_UNSUPPORTED;
     }
   }
 
