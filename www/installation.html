@@ -102,7 +102,13 @@
 
 	<P><BR></P>
   <H2 CLASS="heading-2"><A NAME="3rdPartyTools"></A>Third Party Tools</H2>
-	<P>The following tools are optional (at least one 3<sup>rd</sup> party compiler tool chain is required):</P>
+        <P> 3<sup>rd</sup>Party Tools must include: a C pre-processor, C compiler, static linker, dynamic linker,
+        and an assembler and assembly linker.  For creating ACPI tables required by platforms, an ACPI assembler
+        is also required.</P>
+        <P>The compiler tool chains are not provided as part of EDK II.  Before purchasing a compiler tool chain,
+        make sure to review the End User License Agreement (EULA) that comes with the software to ensure that 
+        creating EFI firmware and applications (for commercial purposes) for the target architecture is permitted.</P>
+	<P>At least one of the following 3<sup>rd</sup> party compiler tool chain is required:</P>
 	<DIV ID="Section1" DIR="LTR">
 		<TABLE BORDER=1 CELLPADDING=1 CELLSPACING=0>
 			<TR>
@@ -121,7 +127,7 @@
 					<P ALIGN=CENTER><B>Cygwin</B><sup>1</sup></P>
 				</TD>
 				<TD>
-					<P ALIGN=CENTER><B>Current</B></P>
+					<P ALIGN=CENTER><B>4.1.2</B></P>
 				</TD>
 				<TD>
 					<P ALIGN=CENTER><A HREF="http://www.cygwin.com/">http://www.cygwin.com</A>
