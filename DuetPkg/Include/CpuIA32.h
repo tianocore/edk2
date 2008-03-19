@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.
 This software and associated documentation (if any) is furnished
@@ -17,7 +17,7 @@ Abstract:
 
   Basic Definition for IA32 Architecture.
 
---*/
+**/
 
 #ifndef _CPU_IA32_H_
 #define _CPU_IA32_H_

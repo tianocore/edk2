@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -16,7 +16,7 @@ Abstract:
   
 Revision History:
 
---*/
+**/
 
 #ifndef _DXELDR_PPIS_NEEDED_BY_DXE_CORE_H_
 #define _DXELDR_PPIS_NEEDED_BY_DXE_CORE_H_

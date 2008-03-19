@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -18,7 +18,7 @@ Abstract:
 
    GUIDs used for ACPI Description
 
---*/
+**/
 
 #ifndef _EFI_ACPI_DESCRIPTION_H_
 #define _EFI_ACPI_DESCRIPTION_H_
