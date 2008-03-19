@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -16,7 +16,7 @@ Abstract:
 
 Revision History:
 
---*/
+**/
 
 #include "HobGeneration.h"
 #include "VirtualMemory.h"

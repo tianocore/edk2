@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2004 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@ Abstract:
 
   Defines for the EFI Flash Map functionality
   
---*/
+**/
 
 #ifndef _EFI_FLASHMAP_H_
 #define _EFI_FLASHMAP_H_

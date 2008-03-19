@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -16,7 +16,7 @@ Abstract:
 
 Revision History:
 
---*/
+**/
 
 #ifndef _DXELDR_SERIAL_STATUS_CODE_H_
 #define _DXELDR_SERIAL_STATUS_CODE_H_

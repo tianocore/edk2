@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2004, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@ Abstract:
 
   GUID used for Flash Map HOB entries in the HOB list.
 
---*/
+**/
 
 #ifndef _FLASH_MAP_HOB_GUID_H_
 #define _FLASH_MAP_HOB_GUID_H_

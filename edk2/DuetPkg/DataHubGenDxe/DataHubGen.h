@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -15,7 +15,7 @@ Module Name:
 
 Abstract:
 
---*/
+**/
 
 #ifndef _DATA_HUB_GEN_H_
 #define _DATA_HUB_GEN_H_
