@@ -311,7 +311,7 @@ Routine Description:
       }
     }
 
-    if (EFI_ERROR (ReturnStatus)) {
+    if (EFI_ERROR (ReturnStatus) && FeaturePcdGet (PcdUgaConsumeSupport)) {
       UgaDraw = Private->TextOutList[Index].UgaDraw;
       if (UgaDraw != NULL) {
         Status = UgaDraw->SetMode (
@@ -581,7 +581,7 @@ ConSpliterGraphicsOutputBlt (
     }
 
     UgaDraw = Private->TextOutList[Index].UgaDraw;
-    if (UgaDraw != NULL) {
+    if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
       Status = UgaDraw->Blt (
                               UgaDraw,
                               (EFI_UGA_PIXEL *) BltBuffer,
@@ -628,7 +628,7 @@ DevNullGopSync (
                       Private->GraphicsOutput.Mode->Info->VerticalResolution,
                       0
                       );
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     return UgaDraw->Blt (
                       UgaDraw,
                       (EFI_UGA_PIXEL *) Private->GraphicsOutputBlt,
@@ -641,6 +641,8 @@ DevNullGopSync (
                       Private->GraphicsOutput.Mode->Info->VerticalResolution,
                       0
                       );
+  } else {
+    return EFI_UNSUPPORTED;
   }
 }
 
@@ -767,17 +769,22 @@ ConSpliterUgaDrawSetMode (
   // return the worst status met
   //
   for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
-    UgaDraw = Private->TextOutList[Index].UgaDraw;
-    if (UgaDraw != NULL) {
-      Status = UgaDraw->SetMode (
-                          UgaDraw,
-                          HorizontalResolution,
-                          VerticalResolution,
-                          ColorDepth,
-                          RefreshRate
-                          );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
+
+    ReturnStatus = EFI_UNSUPPORTED;
+
+    if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+      UgaDraw = Private->TextOutList[Index].UgaDraw;
+      if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
+        Status = UgaDraw->SetMode (
+                            UgaDraw,
+                            HorizontalResolution,
+                            VerticalResolution,
+                            ColorDepth,
+                            RefreshRate
+                            );
+        if (EFI_ERROR (Status)) {
+          ReturnStatus = Status;
+        }
       }
     }
 
@@ -1043,7 +1050,7 @@ ConSpliterUgaDrawBlt (
       }
     }
 
-    if (Private->TextOutList[Index].UgaDraw != NULL) {
+    if (Private->TextOutList[Index].UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
       Status = Private->TextOutList[Index].UgaDraw->Blt (
                                                       Private->TextOutList[Index].UgaDraw,
                                                       BltBuffer,
@@ -1077,7 +1084,7 @@ DevNullUgaSync (
   IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
   )
 {
-  if (UgaDraw != NULL) {
+  if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
     return UgaDraw->Blt (
                       UgaDraw,
                       Private->UgaBlt,
@@ -1090,7 +1097,7 @@ DevNullUgaSync (
                       Private->UgaVerticalResolution,
                       Private->UgaHorizontalResolution * sizeof (EFI_UGA_PIXEL)
                       );
-  } else {
+  } else if (GraphicsOutput != NULL) {
     return GraphicsOutput->Blt (
                       GraphicsOutput,
                       (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) Private->UgaBlt,
@@ -1103,6 +1110,8 @@ DevNullUgaSync (
                       Private->UgaVerticalResolution,
                       0
                       );
+  } else {
+    return EFI_UNSUPPORTED;
   }
 }
 
