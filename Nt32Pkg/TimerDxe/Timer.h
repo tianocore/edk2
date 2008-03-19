@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -19,7 +19,7 @@ Abstract:
   This Timer module uses an NT Thread to simulate the timer-tick driven
   timer service.
 
---*/
+**/
 
 #ifndef _TIMER_H_
 #define _TIMER_H_

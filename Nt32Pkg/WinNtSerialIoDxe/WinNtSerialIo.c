@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -43,7 +43,7 @@ Abstract:
   If Handle(1) contains a gEfiWinNtSerialPortGuid protocol then the driver is
   loaded on the device.
 
---*/
+**/
 
 #include "WinNtSerialIo.h"
 

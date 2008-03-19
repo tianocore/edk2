@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -24,7 +24,7 @@ Abstract:
   protocol on this handle. This driver can only support one one WinNtThunk protocol
   in the system, since the device path is hard coded.
 
---*/
+**/
 
 //
 // The package level header files this module uses

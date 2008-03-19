@@ -1,4 +1,4 @@
-/*++
+/**@file
  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -18,7 +18,7 @@ Abstract:
   Misc class required EFI Device Path definitions (Ports, slots & 
   onboard devices)
 
---*/
+**/
 
 #ifndef _MISC_DEVICE_PATH_H
 #define _MISC_DEVICE_PATH_H

@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -20,7 +20,7 @@ Abstract:
   the CPU-specific setjump/long pair.  Other services are not implemented
   in this driver.
 
---*/
+**/
 
 
 #include "CpuDriver.h"

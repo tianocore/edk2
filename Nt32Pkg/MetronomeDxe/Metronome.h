@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@ Abstract:
 
   NT Emulation Metronome Architectural Protocol Driver as defined in DXE CIS
 
---*/
+**/
 
 #ifndef _NT_THUNK_METRONOME_H_
 #define _NT_THUNK_METRONOME_H_

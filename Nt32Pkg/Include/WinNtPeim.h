@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -15,7 +15,7 @@ Module Name:
 Abstract:
   Public include file for the WinNt Library
 
---*/
+**/
 
 #ifndef __WIN_NT_PEIM_H__
 #define __WIN_NT_PEIM_H__

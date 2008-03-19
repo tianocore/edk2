@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@ Abstract:
 
   NT Emulation Architectural Protocol Driver as defined in Tiano.
 
---*/
+**/
 
 #ifndef _CPU_ARCHITECTURAL_PROTOCOL_DRIVER_H_
 #define _CPU_ARCHITECTURAL_PROTOCOL_DRIVER_H_

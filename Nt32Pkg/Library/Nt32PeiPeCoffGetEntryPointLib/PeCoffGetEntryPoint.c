@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -19,7 +19,7 @@ Abstract:
 
 Revision History
 
---*/
+**/
 
 #include <PiPei.h>
 #include <IndustryStandard/PeImage.h>

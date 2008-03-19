@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -22,7 +22,7 @@ Abstract:
 
   * Other names and brands may be claimed as the property of others.
 
---*/
+**/
 
 #ifndef _WIN_NT_SIMPLE_FILE_SYSTEM_H_
 #define _WIN_NT_SIMPLE_FILE_SYSTEM_H_

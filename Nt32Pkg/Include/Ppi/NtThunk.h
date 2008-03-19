@@ -1,4 +1,4 @@
-/*++
+/**@file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@ Abstract:
 
   WinNt Thunk interface PPI
 
---*/
+**/
 
 #ifndef __NT_PEI_WIN_NT_THUNK_H__
 #define __NT_PEI_WIN_NT_THUNK_H__
