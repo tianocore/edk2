@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -18,7 +18,7 @@ Abstract:
   This module contains data specific to dependency expressions
   and local function prototypes.
         
---*/
+**/
 
 #ifndef _PEI_DEPENDENCY_H_
 #define _PEI_DEPENDENCY_H_

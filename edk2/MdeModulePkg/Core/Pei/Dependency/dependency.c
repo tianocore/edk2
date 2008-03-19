@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -21,7 +21,7 @@ Abstract:
   if a driver can be scheduled for execution.  The criteria for
   schedulability is that the dependency expression is satisfied.
   
---*/
+**/
 
 #include <PeiMain.h>
 #include "dependency.h"

@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@ Abstract:
 
   EFI PEI Core HOB services
 
---*/
+**/
 
 #include <PeiMain.h>
 
