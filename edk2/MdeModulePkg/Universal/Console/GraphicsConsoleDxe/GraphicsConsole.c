@@ -424,6 +424,9 @@ GraphicsConsoleControllerDriverStart (
           goto Error;
         }
       }
+    } else {
+      Status = EFI_UNSUPPORTED;
+      goto Error;
     }
   }
 

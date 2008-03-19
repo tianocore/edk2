@@ -470,6 +470,8 @@ Returns:
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
+  } else {
+    return EFI_UNSUPPORTED;
   }
 
   Instance = 0;
@@ -607,6 +609,8 @@ Returns:
                             Height,
                             Width * sizeof (EFI_UGA_PIXEL)
                             );
+      } else {
+      Status = EFI_UNSUPPORTED;
       }
     }
 

@@ -415,6 +415,8 @@ Returns:
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
+  } else {
+    return EFI_UNSUPPORTED;
   }
 
   Instance = 0;
