@@ -1,5 +1,4 @@
-/*++
-
+/** @file
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -19,8 +18,7 @@ Abstract:
   CirrusLogic5430.c file which deals with the EFI 1.1 driver model.
   This file just does graphics.
 
---*/
-
+**/
 #include "CirrusLogic5430.h"
 
 //
