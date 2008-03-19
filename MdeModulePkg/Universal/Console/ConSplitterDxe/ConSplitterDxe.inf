@@ -84,3 +84,4 @@
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUgaConsumeSupport

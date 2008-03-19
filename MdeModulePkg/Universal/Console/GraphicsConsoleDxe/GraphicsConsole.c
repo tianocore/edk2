@@ -5,15 +5,15 @@ Remaining Tasks
   Implement optimal automatic Mode creation algorithm
   Solve palette issues for mixed graphics and text
   When does this protocol reset the palette?
-    
+
 Copyright (c) 2006 - 2007 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -139,12 +139,13 @@ GraphicsConsoleControllerDriverSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS                   Status;
   EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL     *UgaDraw;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_UGA_DRAW_PROTOCOL        *UgaDraw;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
 
-  UgaDraw = NULL;
+  GraphicsOutput = NULL;
+  UgaDraw        = NULL;
   //
   // Open the IO Abstraction(s) needed to perform the supported test
   //
@@ -156,9 +157,8 @@ GraphicsConsoleControllerDriverSupported (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  
-  if (EFI_ERROR (Status)) {
-    GraphicsOutput = NULL;
+
+  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
     // Open Graphics Output Protocol failed, try to open UGA Draw Protocol
     //
@@ -170,9 +170,9 @@ GraphicsConsoleControllerDriverSupported (
                     Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
                     );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  }
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //
@@ -215,7 +215,7 @@ Error:
           This->DriverBindingHandle,
           Controller
           );
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     gBS->CloseProtocol (
           Controller,
           &gEfiUgaDrawProtocolGuid,
@@ -292,9 +292,8 @@ GraphicsConsoleControllerDriverStart (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (EFI_ERROR(Status)) {
-    Private->GraphicsOutput = NULL;
 
+  if (EFI_ERROR(Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiUgaDrawProtocolGuid,
@@ -303,9 +302,10 @@ GraphicsConsoleControllerDriverStart (
                     Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
                     );
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    goto Error;
   }
 
   NarrowFontSize  = ReturnNarrowFontSize ();
@@ -325,10 +325,10 @@ GraphicsConsoleControllerDriverStart (
     SimplifiedFont->Header.Length        = (UINT32) (PackageLength - 4);
     SimplifiedFont->Header.Type          = EFI_HII_PACKAGE_SIMPLE_FONTS;
     SimplifiedFont->NumberOfNarrowGlyphs = (UINT16) (NarrowFontSize / sizeof (EFI_NARROW_GLYPH));
-    
+
     Location = (UINT8 *) (&SimplifiedFont->NumberOfWideGlyphs + 1);
     CopyMem (Location, UsStdNarrowGlyphData, NarrowFontSize);
-    
+
     //
     // Add this simplified font package to a package list then install it.
     //
@@ -336,7 +336,7 @@ GraphicsConsoleControllerDriverStart (
     Status = mHiiDatabase->NewPackageList (mHiiDatabase, PackageList, NULL, &(Private->HiiHandle));
     ASSERT_EFI_ERROR (Status);
     SafeFreePool (PackageList);
-    SafeFreePool (Package);    
+    SafeFreePool (Package);
 
     mFirstAccessFlag = FALSE;
   }
@@ -349,13 +349,13 @@ GraphicsConsoleControllerDriverStart (
 
   if (Private->GraphicsOutput != NULL) {
     //
-    // The console is build on top of Graphics Output Protocol, find the mode number 
+    // The console is build on top of Graphics Output Protocol, find the mode number
     // for the user-defined mode; if there are multiple video devices,
     // graphic console driver will set all the video devices to the same mode.
     //
     Status = CheckModeSupported (
-                 Private->GraphicsOutput, 
-                 CURRENT_HORIZONTAL_RESOLUTION, 
+                 Private->GraphicsOutput,
+                 CURRENT_HORIZONTAL_RESOLUTION,
                  CURRENT_VERTICAL_RESOLUTION,
                  &ModeNumber
                  );
@@ -370,9 +370,9 @@ GraphicsConsoleControllerDriverStart (
       // if not supporting current mode, try 800x600 which is required by UEFI/EFI spec
       //
       Status = CheckModeSupported (
-                   Private->GraphicsOutput, 
-                   800, 
-                   600, 
+                   Private->GraphicsOutput,
+                   800,
+                   600,
                    &ModeNumber
                    );
     }
@@ -385,7 +385,7 @@ GraphicsConsoleControllerDriverStart (
       VerticalResolution = Private->GraphicsOutput->Mode->Info->VerticalResolution;
       ModeNumber = Private->GraphicsOutput->Mode->Mode;
     }
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
     // At first try to set user-defined resolution
     //
@@ -401,7 +401,7 @@ GraphicsConsoleControllerDriverStart (
     if (!EFI_ERROR (Status)) {
       HorizontalResolution = CURRENT_HORIZONTAL_RESOLUTION;
       VerticalResolution   = CURRENT_VERTICAL_RESOLUTION;
-    } else {
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
       //
       // Try to set 800*600 which is required by UEFI/EFI spec
       //
@@ -475,11 +475,11 @@ GraphicsConsoleControllerDriverStart (
     Private->ModeData[MaxMode].DeltaY     = 0;
     MaxMode++;
   }
-  
+
   //
   // Add Mode #2 that must be 100x31 (graphic mode >= 800x600)
   //
-  if (Columns >= 100 && Rows >= 31) {  
+  if (Columns >= 100 && Rows >= 31) {
     Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
     Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
@@ -493,7 +493,7 @@ GraphicsConsoleControllerDriverStart (
   //
   if (HorizontalResolution > 800 && VerticalResolution > 600) {
     Private->ModeData[MaxMode].Columns    = HorizontalResolution/GLYPH_WIDTH;
-    Private->ModeData[MaxMode].Rows       = VerticalResolution/GLYPH_HEIGHT;    
+    Private->ModeData[MaxMode].Rows       = VerticalResolution/GLYPH_HEIGHT;
     Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
     Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
@@ -501,7 +501,7 @@ GraphicsConsoleControllerDriverStart (
     Private->ModeData[MaxMode].DeltaY     = (VerticalResolution % GLYPH_HEIGHT) >> 1;
     MaxMode++;
   }
-    
+
   //
   // Update the maximum number of modes
   //
@@ -541,7 +541,7 @@ Error:
             This->DriverBindingHandle,
             Controller
             );
-    } else {
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
       gBS->CloseProtocol (
             Controller,
             &gEfiUgaDrawProtocolGuid,
@@ -608,7 +608,7 @@ GraphicsConsoleControllerDriverStop (
             This->DriverBindingHandle,
             Controller
             );
-    } else {
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
       gBS->CloseProtocol (
             Controller,
             &gEfiUgaDrawProtocolGuid,
@@ -647,11 +647,11 @@ CheckModeSupported (
 {
   UINT32     ModeNumber;
   EFI_STATUS Status;
-  UINTN      SizeOfInfo;  
+  UINTN      SizeOfInfo;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
-    
+
   Status = EFI_SUCCESS;
-  
+
   for (ModeNumber = 0; ModeNumber < GraphicsOutput->Mode->MaxMode; ModeNumber++) {
     Status = GraphicsOutput->QueryMode (
                        GraphicsOutput,
@@ -671,13 +671,13 @@ CheckModeSupported (
       gBS->FreePool (Info);
     }
   }
-  
+
   if (ModeNumber == GraphicsOutput->Mode->MaxMode) {
     Status = EFI_UNSUPPORTED;
   }
-  
+
   *CurrentModeNumber = ModeNumber;
-  return Status; 
+  return Status;
 }
 
 EFI_STATUS
@@ -745,27 +745,27 @@ GraphicsConsoleConOutReset (
   )
 /*++
   Routine Description:
-  
+
     Implements SIMPLE_TEXT_OUTPUT.Reset().
-    If ExtendeVerification is TRUE, then perform dependent Graphics Console 
+    If ExtendeVerification is TRUE, then perform dependent Graphics Console
     device reset, and set display mode to mode 0.
     If ExtendedVerification is FALSE, only set display mode to mode 0.
-  
+
   Arguments:
-  
+
     This - Indicates the calling context.
-    
+
     ExtendedVerification - Indicates that the driver may perform a more exhaustive
                            verification operation of the device during reset.
-        
+
   Returns:
-  
+
     EFI_SUCCESS
-       The reset operation succeeds.   
-    
+       The reset operation succeeds.
+
     EFI_DEVICE_ERROR
-      The Graphics Console is not functioning correctly 
-                
+      The Graphics Console is not functioning correctly
+
 --*/
 {
   This->SetAttribute (This, EFI_TEXT_ATTR (This->Mode->Attribute & 0x0F, EFI_BACKGROUND_BLACK));
@@ -780,31 +780,31 @@ GraphicsConsoleConOutOutputString (
   )
 /*++
   Routine Description:
-  
+
     Implements SIMPLE_TEXT_OUTPUT.OutputString().
-    The Unicode string will be converted to Glyphs and will be 
+    The Unicode string will be converted to Glyphs and will be
     sent to the Graphics Console.
-    
-  
+
+
   Arguments:
-  
+
     This - Indicates the calling context.
-    
-    WString - The Null-terminated Unicode string to be displayed on 
+
+    WString - The Null-terminated Unicode string to be displayed on
               the Graphics Console.
-        
+
   Returns:
-  
+
     EFI_SUCCESS
-       The string is output successfully.   
-    
+       The string is output successfully.
+
     EFI_DEVICE_ERROR
       The Graphics Console failed to send the string out.
-      
+
     EFI_WARN_UNKNOWN_GLYPH
-      Indicates that some of the characters in the Unicode string could not 
-      be rendered and are skipped.          
-                
+      Indicates that some of the characters in the Unicode string could not
+      be rendered and are skipped.
+
 --*/
 {
   GRAPHICS_CONSOLE_DEV  *Private;
@@ -927,7 +927,7 @@ GraphicsConsoleConOutOutputString (
                     GLYPH_HEIGHT,
                     Delta
                     );
-        } else {
+        } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
           //
           // Scroll Screen Up One Row
           //
@@ -1084,28 +1084,28 @@ GraphicsConsoleConOutTestString (
   )
 /*++
   Routine Description:
-  
+
     Implements SIMPLE_TEXT_OUTPUT.TestString().
     If one of the characters in the *Wstring is
     neither valid valid Unicode drawing characters,
     not ASCII code, then this function will return
     EFI_UNSUPPORTED.
-        
-  
+
+
   Arguments:
-  
+
     This - Indicates the calling context.
-    
+
     WString - The Null-terminated Unicode string to be tested.
-        
+
   Returns:
-  
+
     EFI_SUCCESS
-       The Graphics Console is capable of rendering the output string. 
-    
+       The Graphics Console is capable of rendering the output string.
+
     EFI_UNSUPPORTED
-      Some of the characters in the Unicode string cannot be rendered.      
-                
+      Some of the characters in the Unicode string cannot be rendered.
+
 --*/
 {
   EFI_STATUS            Status;
@@ -1145,45 +1145,45 @@ GraphicsConsoleConOutQueryMode (
   )
 /*++
   Routine Description:
-  
+
     Implements SIMPLE_TEXT_OUTPUT.QueryMode().
     It returnes information for an available text mode
     that the Graphics Console supports.
     In this driver,we only support text mode 80x25, which is
     defined as mode 0.
-        
-  
+
+
   Arguments:
-  
+
     This - Indicates the calling context.
-    
+
     ModeNumber - The mode number to return information on.
-        
+
     Columns - The returned columns of the requested mode.
-        
-    Rows - The returned rows of the requested mode.                
-        
+
+    Rows - The returned rows of the requested mode.
+
   Returns:
-  
+
     EFI_SUCCESS
-      The requested mode information is returned. 
-    
+      The requested mode information is returned.
+
     EFI_UNSUPPORTED
-      The mode number is not valid.   
-                
+      The mode number is not valid.
+
 --*/
 {
   GRAPHICS_CONSOLE_DEV  *Private;
   EFI_STATUS            Status;
   EFI_TPL               OldTpl;
- 	
+
   if (ModeNumber >= (UINTN) This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   Status = EFI_SUCCESS;
-  
+
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
 
   *Columns  = Private->ModeData[ModeNumber].Columns;
@@ -1208,28 +1208,28 @@ GraphicsConsoleConOutSetMode (
   )
 /*++
   Routine Description:
-  
+
     Implements SIMPLE_TEXT_OUTPUT.SetMode().
     Set the Graphics Console to a specified mode.
-    In this driver, we only support mode 0.        
-  
+    In this driver, we only support mode 0.
+
   Arguments:
-  
+
     This - Indicates the calling context.
-    
+
     ModeNumber - The text mode to set.
-        
+
   Returns:
-  
+
     EFI_SUCCESS
        The requested text mode is set.
-       
+
     EFI_DEVICE_ERROR
       The requested text mode cannot be set because of Graphics Console device error.
-    
+
     EFI_UNSUPPORTED
-      The text mode number is not valid.       
-                
+      The text mode number is not valid.
+
 --*/
 {
   EFI_STATUS                      Status;
@@ -1340,7 +1340,7 @@ GraphicsConsoleConOutSetMode (
                           0
                           );
     }
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
     // Get the current UGA Draw mode information
     //
@@ -1412,31 +1412,31 @@ GraphicsConsoleConOutSetAttribute (
   )
 /*++
   Routine Description:
-  
-    Implements SIMPLE_TEXT_OUTPUT.SetAttribute().       
-  
+
+    Implements SIMPLE_TEXT_OUTPUT.SetAttribute().
+
   Arguments:
-  
+
     This - Indicates the calling context.
-    
+
     Attrubute - The attribute to set. Only bit0..6 are valid, all other bits
                 are undefined and must be zero.
-        
+
   Returns:
-  
+
     EFI_SUCCESS
-      The requested attribute is set. 
-       
+      The requested attribute is set.
+
     EFI_DEVICE_ERROR
       The requested attribute cannot be set due to Graphics Console port error.
-          
+
     EFI_UNSUPPORTED
-      The attribute requested is not defined by EFI spec.   
-                
+      The attribute requested is not defined by EFI spec.
+
 --*/
 {
   EFI_TPL               OldTpl;
-  
+
   if ((Attribute | 0xFF) != 0xFF) {
     return EFI_UNSUPPORTED;
   }
@@ -1465,27 +1465,27 @@ GraphicsConsoleConOutClearScreen (
   )
 /*++
   Routine Description:
-  
+
     Implements SIMPLE_TEXT_OUTPUT.ClearScreen().
-    It clears the Graphics Console's display to the 
+    It clears the Graphics Console's display to the
     currently selected background color.
-        
-  
+
+
   Arguments:
-  
+
     This - Indicates the calling context.
 
   Returns:
-  
+
     EFI_SUCCESS
       The operation completed successfully.
-       
+
     EFI_DEVICE_ERROR
-      The Graphics Console cannot be cleared due to Graphics Console device error.        
-    
+      The Graphics Console cannot be cleared due to Graphics Console device error.
+
     EFI_UNSUPPORTED
-      The Graphics Console is not in a valid text mode.       
-                
+      The Graphics Console is not in a valid text mode.
+
 --*/
 {
   EFI_STATUS                    Status;
@@ -1518,7 +1518,7 @@ GraphicsConsoleConOutClearScreen (
                         ModeData->GopHeight,
                         0
                         );
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     Status = UgaDraw->Blt (
                         UgaDraw,
                         (EFI_UGA_PIXEL *) (UINTN) &Background,
@@ -1531,6 +1531,8 @@ GraphicsConsoleConOutClearScreen (
                         ModeData->GopHeight,
                         0
                         );
+  } else {
+    Status = EFI_UNSUPPORTED;
   }
 
   This->Mode->CursorColumn  = 0;
@@ -1552,29 +1554,29 @@ GraphicsConsoleConOutSetCursorPosition (
   )
 /*++
   Routine Description:
-  
-    Implements SIMPLE_TEXT_OUTPUT.SetCursorPosition().          
-  
+
+    Implements SIMPLE_TEXT_OUTPUT.SetCursorPosition().
+
   Arguments:
-  
+
     This - Indicates the calling context.
-        
+
     Column - The row to set cursor to.
-        
-    Row - The column to set cursor to.                
+
+    Row - The column to set cursor to.
 
   Returns:
-  
+
     EFI_SUCCESS
       The operation completed successfully.
-       
+
     EFI_DEVICE_ERROR
-      The request fails due to Graphics Console device error.        
-    
+      The request fails due to Graphics Console device error.
+
     EFI_UNSUPPORTED
       The Graphics Console is not in a valid text mode, or the cursor position
-      is invalid for current mode.     
-                
+      is invalid for current mode.
+
 --*/
 {
   GRAPHICS_CONSOLE_DEV        *Private;
@@ -1620,31 +1622,31 @@ GraphicsConsoleConOutEnableCursor (
   )
 /*++
   Routine Description:
-  
+
     Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
-    In this driver, the cursor cannot be hidden.        
-  
+    In this driver, the cursor cannot be hidden.
+
   Arguments:
-  
+
     This - Indicates the calling context.
-        
+
     Visible - If TRUE, the cursor is set to be visible,
-              If FALSE, the cursor is set to be invisible.        
+              If FALSE, the cursor is set to be invisible.
 
   Returns:
-  
+
     EFI_SUCCESS
       The request is valid.
-       
+
     EFI_UNSUPPORTED
-      The Graphics Console does not support a hidden cursor.   
-                
+      The Graphics Console does not support a hidden cursor.
+
 --*/
 {
   EFI_TPL               OldTpl;
-  
+
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-    
+
   EraseCursor (This);
 
   This->Mode->CursorVisible = Visible;
@@ -1729,7 +1731,7 @@ DrawUnicodeWeightAtCursorN (
                          NULL
                          );
 
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     ASSERT (Private->UgaDraw!= NULL);
 
     UgaDraw = Private->UgaDraw;
@@ -1765,7 +1767,7 @@ DrawUnicodeWeightAtCursorN (
       // always be 1. ASSERT here to make sure.
       //
       ASSERT (RowInfoArraySize == 1);
-      
+
       Status = UgaDraw->Blt (
                           UgaDraw,
                           (EFI_UGA_PIXEL *) Blt->Image.Bitmap,
@@ -1782,6 +1784,8 @@ DrawUnicodeWeightAtCursorN (
 
     SafeFreePool (RowInfoArray);
     SafeFreePool (Blt->Image.Bitmap);
+  } else {
+    Status = EFI_UNSUPPORTED;
   }
 
   SafeFreePool (Blt);
@@ -1840,7 +1844,7 @@ EraseCursor (
               GLYPH_HEIGHT,
               GLYPH_WIDTH * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
               );
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     UgaDraw->Blt (
               UgaDraw,
               (EFI_UGA_PIXEL *) (UINTN) BltChar,
@@ -1881,7 +1885,7 @@ EraseCursor (
               GLYPH_HEIGHT,
               GLYPH_WIDTH * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
               );
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     UgaDraw->Blt (
               UgaDraw,
               (EFI_UGA_PIXEL *) (UINTN) BltChar,
@@ -1902,9 +1906,9 @@ EraseCursor (
 /**
   The user Entry Point for module GraphicsConsole. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

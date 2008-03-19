@@ -79,7 +79,7 @@ Returns:
                   &gEfiGraphicsOutputProtocolGuid,
                   (VOID **) &GraphicsOutput
                   );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     GraphicsOutput = NULL;
 
     Status = gBS->HandleProtocol (
@@ -87,15 +87,17 @@ Returns:
                     &gEfiUgaDrawProtocolGuid,
                     (VOID **) &UgaDraw
                     );
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
+  }
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
   }
 
+  SizeOfX = 0;
+  SizeOfY = 0;
   if (GraphicsOutput != NULL) {
     SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
     SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     Status = UgaDraw->GetMode (
                         UgaDraw,
                         &SizeOfX,
@@ -106,6 +108,8 @@ Returns:
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
+  } else {
+    return EFI_UNSUPPORTED;
   }
 
   BlockWidth  = SizeOfX / 100;
@@ -135,7 +139,7 @@ Returns:
                           SizeOfY - (PosY - GLYPH_HEIGHT - 1),
                           SizeOfX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                           );
-    } else {
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
       Status = UgaDraw->Blt (
                           UgaDraw,
                           (EFI_UGA_PIXEL *) &Color,
@@ -168,7 +172,7 @@ Returns:
                           BlockHeight,
                           (BlockWidth) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                           );
-    } else {
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
       Status = UgaDraw->Blt (
                           UgaDraw,
                           (EFI_UGA_PIXEL *) &ProgressColor,

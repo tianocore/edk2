@@ -61,4 +61,6 @@
   gEfiUgaDrawProtocolGuid                       # PROTOCOL TO_START
   gEfiHiiFontProtocolGuid
   gEfiHiiDatabaseProtocolGuid
-  
+
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUgaConsumeSupport

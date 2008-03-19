@@ -38,6 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DxePiLib.h>
+#include <Library/PcdLib.h>
 
 STATIC EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
   { 0x00, 0x00, 0x00, 0x00 },
@@ -113,19 +114,19 @@ Arguments:
 
   ImageHandle   - The driver image handle of the caller. The parameter is used to
                   optimize the loading of the image file so that the FV from which
-                  the driver image is loaded will be tried first. 
+                  the driver image is loaded will be tried first.
 
   FileNameGuid  - File Name of graphics file in the FV(s).
 
-  Image         - Pointer to pointer to return graphics image.  If NULL, a 
+  Image         - Pointer to pointer to return graphics image.  If NULL, a
                   buffer will be allocated.
 
   ImageSize     - Size of the graphics Image in bytes. Zero if no image found.
 
 
-Returns: 
+Returns:
 
-  EFI_SUCCESS          - Image and ImageSize are valid. 
+  EFI_SUCCESS          - Image and ImageSize are valid.
   EFI_BUFFER_TOO_SMALL - Image not big enough. ImageSize has required size
   EFI_NOT_FOUND        - FileNameGuid not found
 
@@ -370,7 +371,7 @@ Arguments:
   LogoFile - File name of logo to display on the center of the screen.
 
 
-Returns: 
+Returns:
 
   EFI_SUCCESS           - ConsoleControl has been flipped to graphics and logo
                           displayed.
@@ -401,7 +402,7 @@ Arguments:
                 the driver image is loaded will be tried first.
 
 
-Returns: 
+Returns:
 
   EFI_SUCCESS           - ConsoleControl has been flipped to graphics and logo
                           displayed.
@@ -442,15 +443,15 @@ Returns:
   // Try to open GOP first
   //
   Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID**)&GraphicsOutput);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     GraphicsOutput = NULL;
     //
-    // Open GOP failed, try to open UGA
+    // Open GOP failed, try to open UGwhA
     //
     Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID**)&UgaDraw);
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
+  }
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
   }
 
   Badging = NULL;
@@ -464,7 +465,7 @@ Returns:
   if (GraphicsOutput != NULL) {
     SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
     SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     Status = UgaDraw->GetMode (UgaDraw, &SizeOfX, &SizeOfY, &ColorDepth, &RefreshRate);
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
@@ -593,7 +594,7 @@ Returns:
                             Height,
                             Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                             );
-      } else {
+      } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
         Status = UgaDraw->Blt (
                             UgaDraw,
                             (EFI_UGA_PIXEL *) Blt,
@@ -658,7 +659,7 @@ UINTN
 _IPrint (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput,
   IN EFI_UGA_DRAW_PROTOCOL            *UgaDraw,
-  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     *Sto,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Sto,
   IN UINTN                            X,
   IN UINTN                            Y,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Foreground,
@@ -677,22 +678,22 @@ Arguments:
   GraphicsOutput  - Graphics output protocol interface
 
   UgaDraw         - UGA draw protocol interface
-  
+
   Sto             - Simple text out protocol interface
-  
+
   X               - X coordinate to start printing
-  
+
   Y               - Y coordinate to start printing
-  
+
   Foreground      - Foreground color
-  
+
   Background      - Background color
-  
+
   fmt             - Format string
-  
+
   args            - Print arguments
 
-Returns: 
+Returns:
 
   EFI_SUCCESS             -  success
   EFI_OUT_OF_RESOURCES    -  out of resources
@@ -711,7 +712,7 @@ Returns:
   UINTN                          LineBufferLen;
   EFI_HII_FONT_PROTOCOL          *HiiFont;
   EFI_IMAGE_OUTPUT               *Blt;
-  EFI_FONT_DISPLAY_INFO          *FontInfo;  
+  EFI_FONT_DISPLAY_INFO          *FontInfo;
 
   //
   // For now, allocate an arbitrarily long buffer
@@ -721,24 +722,31 @@ Returns:
     return EFI_OUT_OF_RESOURCES;
   }
 
+  HorizontalResolution  = 0;
+  VerticalResolution    = 0;
+  Blt                   = NULL;
+  FontInfo              = NULL;
+
   if (GraphicsOutput != NULL) {
     HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
     VerticalResolution = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     UgaDraw->GetMode (UgaDraw, &HorizontalResolution, &VerticalResolution, &ColorDepth, &RefreshRate);
+  } else {
+    Status = EFI_UNSUPPORTED;
+    goto Error;
   }
-  ASSERT ((HorizontalResolution != 0) && (VerticalResolution !=0)); 
 
-  Blt      = NULL;
-  FontInfo = NULL;
+  ASSERT ((HorizontalResolution != 0) && (VerticalResolution !=0));
+
   ASSERT (GraphicsOutput != NULL);
   Status = gBS->LocateProtocol (&gEfiHiiFontProtocolGuid, NULL, (VOID **) &HiiFont);
   if (EFI_ERROR (Status)) {
     goto Error;
-  }  
+  }
 
   UnicodeVSPrint (Buffer, 0x10000, fmt, args);
-  
+
   UnicodeWeight = (CHAR16 *) Buffer;
 
   for (Index = 0; UnicodeWeight[Index] != 0; Index++) {
@@ -750,7 +758,7 @@ Returns:
   }
 
   BufferLen = StrLen (Buffer);
- 
+
 
   LineBufferLen = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * EFI_GLYPH_HEIGHT;
   if (EFI_GLYPH_WIDTH * EFI_GLYPH_HEIGHT * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * BufferLen > LineBufferLen) {
@@ -767,7 +775,7 @@ Returns:
   Blt->Width        = (UINT16) (HorizontalResolution);
   Blt->Height       = (UINT16) (VerticalResolution);
   Blt->Image.Screen = GraphicsOutput;
-   
+
   FontInfo = (EFI_FONT_DISPLAY_INFO *) AllocateZeroPool (sizeof (EFI_FONT_DISPLAY_INFO));
   if (FontInfo == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -777,8 +785,8 @@ Returns:
     CopyMem (&FontInfo->ForegroundColor, Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
   } else {
     CopyMem (
-      &FontInfo->ForegroundColor, 
-      &mEfiColors[Sto->Mode->Attribute & 0x0f], 
+      &FontInfo->ForegroundColor,
+      &mEfiColors[Sto->Mode->Attribute & 0x0f],
       sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
       );
   }
@@ -786,8 +794,8 @@ Returns:
     CopyMem (&FontInfo->BackgroundColor, Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
   } else {
     CopyMem (
-      &FontInfo->BackgroundColor, 
-      &mEfiColors[Sto->Mode->Attribute >> 4], 
+      &FontInfo->BackgroundColor,
+      &mEfiColors[Sto->Mode->Attribute >> 4],
       sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
       );
   }
@@ -804,7 +812,7 @@ Returns:
                        NULL,
                        NULL
                        );
-  
+
 
 Error:
   SafeFreePool (Blt);
@@ -831,11 +839,11 @@ Routine Description:
 Arguments:
 
     X           - X coordinate to start printing
-    
+
     Y           - Y coordinate to start printing
-    
+
     ForeGround  - Foreground color
-    
+
     BackGround  - Background color
 
     Fmt         - Format string
@@ -866,7 +874,7 @@ Returns:
                   );
 
   UgaDraw = NULL;
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     GraphicsOutput = NULL;
 
     Status = gBS->HandleProtocol (
@@ -874,10 +882,9 @@ Returns:
                     &gEfiUgaDrawProtocolGuid,
                     (VOID**)&UgaDraw
                     );
-
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  }
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Status = gBS->HandleProtocol (

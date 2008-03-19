@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 EFI_STATUS
 GetGraphicsBitMapFromFV (
@@ -390,15 +391,15 @@ Returns:
   // Try to open GOP first
   //
   Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **) &GraphicsOutput);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR(Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     GraphicsOutput = NULL;
     //
     // Open GOP failed, try to open UGA
     //
     Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **) &UgaDraw);
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
+  }
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
   }
 
   Badging = NULL;
@@ -409,7 +410,7 @@ Returns:
   if (GraphicsOutput != NULL) {
     SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
     SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     Status = UgaDraw->GetMode (UgaDraw, &SizeOfX, &SizeOfY, &ColorDepth, &RefreshRate);
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
@@ -539,7 +540,7 @@ Returns:
                             Height,
                             Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                             );
-      } else {
+      } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
         Status = UgaDraw->Blt (
                             UgaDraw,
                             (EFI_UGA_PIXEL *) Blt,
@@ -552,6 +553,8 @@ Returns:
                             Height,
                             Width * sizeof (EFI_UGA_PIXEL)
                             );
+      } else {
+        Status = EFI_UNSUPPORTED;
       }
     }
 
@@ -696,7 +699,7 @@ Returns:
   if (GraphicsOutput != NULL) {
     HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
     VerticalResolution   = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport))  {
     //
     // Get the current mode information from the UGA Draw Protocol
     //
@@ -784,7 +787,7 @@ Returns:
                         GLYPH_HEIGHT,
                         BufferGlyphWidth * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                         );
-  } else {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     Status = UgaDraw->Blt (
                         UgaDraw,
                         (EFI_UGA_PIXEL *) (UINTN) LineBuffer,
@@ -797,6 +800,8 @@ Returns:
                         GLYPH_HEIGHT,
                         BufferGlyphWidth * sizeof (EFI_UGA_PIXEL)
                         );
+  } else {
+    Status = EFI_UNSUPPORTED;
   }
 
 Error:
@@ -861,7 +866,7 @@ Returns:
                   (VOID **) &GraphicsOutput
                   );
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     GraphicsOutput = NULL;
 
     Status = gBS->HandleProtocol (
@@ -869,10 +874,10 @@ Returns:
                     &gEfiUgaDrawProtocolGuid,
                     (VOID **) &UgaDraw
                     );
+  }
 
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Status = gBS->HandleProtocol (

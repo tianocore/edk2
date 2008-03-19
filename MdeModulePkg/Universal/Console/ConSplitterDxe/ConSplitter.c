@@ -686,7 +686,7 @@ ConSplitterTextOutConstructor (
   //
   // When new console device is added, the new mode will be set later,
   // so put current mode back to init state.
-  //  
+  //
   ConOutPrivate->TextOutMode.Mode = 0xFF;
 
   Status = ConSplitterGrowBuffer (
@@ -1236,6 +1236,9 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  GraphicsOutput = NULL;
+  UgaDraw        = NULL;
   //
   // Try to Open Graphics Output protocol
   //
@@ -1247,22 +1250,19 @@ Returns:
                   mConOut.VirtualHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
-  if (EFI_ERROR (Status)) {
-    GraphicsOutput = NULL;
-  }
-  //
-  // Open UGA_DRAW protocol
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiUgaDrawProtocolGuid,
-                  (VOID **) &UgaDraw,
-                  This->DriverBindingHandle,
-                  mConOut.VirtualHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-  if (EFI_ERROR (Status)) {
-    UgaDraw = NULL;
+
+  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
+    //
+    // Open UGA_DRAW protocol
+    //
+    Status = gBS->OpenProtocol (
+                    ControllerHandle,
+                    &gEfiUgaDrawProtocolGuid,
+                    (VOID **) &UgaDraw,
+                    This->DriverBindingHandle,
+                    mConOut.VirtualHandle,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
   }
 
   //
@@ -1270,7 +1270,7 @@ Returns:
   // so put current mode back to init state.
   //
   mConOut.TextOutMode.Mode = 0xFF;
-  
+
   //
   // If both ConOut and StdErr incorporate the same Text Out device,
   // their MaxMode and QueryData should be the intersection of both.
@@ -1278,7 +1278,7 @@ Returns:
   Status = ConSplitterTextOutAddDevice (&mConOut, TextOut, GraphicsOutput, UgaDraw);
   ConSplitterTextOutSetAttribute (&mConOut.TextOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
 
-  if (FeaturePcdGet (PcdConOutUgaSupport)) {
+  if (FeaturePcdGet (PcdConOutUgaSupport) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
     // Match the UGA mode data of ConOut with the current mode
     //
@@ -1332,13 +1332,13 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // When new console device is added, the new mode will be set later,
   // so put current mode back to init state.
   //
   mStdErr.TextOutMode.Mode = 0xFF;
-  
+
   //
   // If both ConOut and StdErr incorporate the same Text Out device,
   // their MaxMode and QueryData should be the intersection of both.
@@ -2711,7 +2711,7 @@ Returns:
       }
     }
   }
-  if (UgaDraw != NULL) {
+  if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
     // Graphics console driver can ensure the same mode for all GOP devices
     // so we can get the current mode from this video device
@@ -2751,7 +2751,7 @@ Done:
   if (GraphicsOutput != NULL) {
     Private->CurrentNumberOfGraphicsOutput++;
   }
-  if (UgaDraw != NULL) {
+  if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
     Private->CurrentNumberOfUgaDraw++;
   }
 
@@ -2801,7 +2801,7 @@ Returns:
 
   None
 
---*/  
+--*/
 {
   UINTN                         Col;
   UINTN                         Row;
@@ -2813,7 +2813,7 @@ Returns:
   EFI_STATUS                    Status;
   CONSOLE_OUT_MODE              *ModeInfo;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
-  
+
   PreferMode   = 0xFF;
   BaseMode     = 0xFF;
   TextOut      = &Private->TextOut;
@@ -2832,9 +2832,9 @@ Returns:
                    );
 
   //
-  // Set to the default mode 80 x 25 required by EFI/UEFI spec; 
+  // Set to the default mode 80 x 25 required by EFI/UEFI spec;
   // user can also define other valid default console mode here.
-  //            
+  //
   if (EFI_ERROR(Status)) {
     ModeInfo->Column = 80;
     ModeInfo->Row    = 25;
@@ -2844,9 +2844,9 @@ Returns:
                     EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     sizeof (CONSOLE_OUT_MODE),
                     ModeInfo
-                    );    
+                    );
   }
-  
+
   for (Mode = 0; Mode < MaxMode; Mode++) {
     Status = TextOut->QueryMode (TextOut, Mode, &Col, &Row);
     if (!EFI_ERROR(Status)) {
@@ -2858,19 +2858,19 @@ Returns:
       }
     }
   }
-  
+
   Status = TextOut->SetMode (TextOut, PreferMode);
-  
+
   //
   // if current mode setting is failed, default 80x25 mode will be set.
   //
   if (EFI_ERROR(Status)) {
     Status = TextOut->SetMode (TextOut, BaseMode);
     ASSERT(!EFI_ERROR(Status));
-    
+
     ModeInfo->Column = 80;
     ModeInfo->Row    = 25;
-    
+
     //
     // Update ConOutMode variable
     //
@@ -2880,7 +2880,7 @@ Returns:
                     EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     sizeof (CONSOLE_OUT_MODE),
                     ModeInfo
-                    );     
+                    );
   }
 
   gBS->FreePool (ModeInfo);
@@ -2989,7 +2989,7 @@ Returns:
     }
   }
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
-    if (UgaDraw != NULL) {
+    if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
       Status = UgaDraw->GetMode (
                     UgaDraw,
                     &UgaHorizontalResolution,
@@ -3043,7 +3043,7 @@ Returns:
   }
 
   //
-  // After adding new console device, all existing console devices should be 
+  // After adding new console device, all existing console devices should be
   // synced to the current shared mode.
   //
   ConsplitterSetConsoleOutMode (Private);
@@ -3084,7 +3084,7 @@ Returns:
     if (TextOutList->TextOut == TextOut) {
       CopyMem (TextOutList, TextOutList + 1, sizeof (TEXT_OUT_AND_GOP_DATA) * Index);
       CurrentNumOfConsoles--;
-      if (TextOutList->UgaDraw != NULL) {
+      if (TextOutList->UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
         Private->CurrentNumberOfUgaDraw--;
       }
       if (TextOutList->GraphicsOutput != NULL) {
