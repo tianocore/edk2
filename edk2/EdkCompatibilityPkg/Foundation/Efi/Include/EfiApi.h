@@ -1088,7 +1088,7 @@ typedef struct {
 #define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | 00)
 #define EFI_2_10_SYSTEM_TABLE_REVISION  ((2 << 16) | 10)
 
-typedef struct _EFI_SYSTEM_TABLE {
+struct _EFI_SYSTEM_TABLE {
   EFI_TABLE_HEADER              Hdr;
 
   CHAR16                        *FirmwareVendor;
@@ -1109,6 +1109,6 @@ typedef struct _EFI_SYSTEM_TABLE {
   UINTN                         NumberOfTableEntries;
   EFI_CONFIGURATION_TABLE       *ConfigurationTable;
 
-} EFI_SYSTEM_TABLE;
+};
 
 #endif
