@@ -241,13 +241,13 @@ EFI_STATUS
 //
 // Interface structure for the EFI_HII_IMAGE_PROTOCOL
 //
-typedef struct _EFI_HII_IMAGE_PROTOCOL {
+struct _EFI_HII_IMAGE_PROTOCOL {
   EFI_HII_NEW_IMAGE                  NewImage;
   EFI_HII_GET_IMAGE                  GetImage;
   EFI_HII_SET_IMAGE                  SetImage;
   EFI_HII_DRAW_IMAGE                 DrawImage;
   EFI_HII_DRAW_IMAGE_ID              DrawImageId;
-} EFI_HII_IMAGE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiHiiImageProtocolGuid;
 

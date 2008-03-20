@@ -130,10 +130,10 @@ Returns:
                     corrupted (not in a valid compressed format).
 
 --*/
-typedef struct _EFI_DECOMPRESS_PROTOCOL {
+struct _EFI_DECOMPRESS_PROTOCOL {
   EFI_DECOMPRESS_GET_INFO   GetInfo;
   EFI_DECOMPRESS_DECOMPRESS Decompress;
-} EFI_DECOMPRESS_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDecompressProtocolGuid;
 

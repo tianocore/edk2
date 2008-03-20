@@ -227,7 +227,7 @@ EFI_STATUS
   IN EFI_TCP4_PROTOCOL        *This
   );
 
-typedef struct _EFI_TCP4_PROTOCOL {
+struct _EFI_TCP4_PROTOCOL {
   EFI_TCP4_GET_MODE_DATA  GetModeData;
   EFI_TCP4_CONFIGURE      Configure;
   EFI_TCP4_ROUTES         Routes;
@@ -238,7 +238,7 @@ typedef struct _EFI_TCP4_PROTOCOL {
   EFI_TCP4_CLOSE          Close;
   EFI_TCP4_CANCEL         Cancel;
   EFI_TCP4_POLL           Poll;
-} EFI_TCP4_PROTOCOL;
+};
 
 #define EFI_CONNECTION_FIN      EFIERR (104)
 #define EFI_CONNECTION_RESET    EFIERR (105)

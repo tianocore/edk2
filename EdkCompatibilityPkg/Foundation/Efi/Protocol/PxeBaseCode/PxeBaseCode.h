@@ -362,7 +362,7 @@ EFI_STATUS
 //
 #define EFI_PXE_BASE_CODE_INTERFACE_REVISION  0x00010000
 
-typedef struct _EFI_PXE_BASE_CODE_PROTOCOL {
+struct _EFI_PXE_BASE_CODE_PROTOCOL {
   UINT64                            Revision;
   EFI_PXE_BASE_CODE_START           Start;
   EFI_PXE_BASE_CODE_STOP            Stop;
@@ -377,7 +377,7 @@ typedef struct _EFI_PXE_BASE_CODE_PROTOCOL {
   EFI_PXE_BASE_CODE_SET_STATION_IP  SetStationIp;
   EFI_PXE_BASE_CODE_SET_PACKETS     SetPackets;
   EFI_PXE_BASE_CODE_MODE            *Mode;
-} EFI_PXE_BASE_CODE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPxeBaseCodeProtocolGuid;
 

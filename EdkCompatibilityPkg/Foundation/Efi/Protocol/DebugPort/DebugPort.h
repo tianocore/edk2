@@ -70,12 +70,12 @@ EFI_STATUS
 //
 // DebugPort protocol definition
 //
-typedef struct _EFI_DEBUGPORT_PROTOCOL {
+struct _EFI_DEBUGPORT_PROTOCOL {
   EFI_DEBUGPORT_RESET Reset;
   EFI_DEBUGPORT_WRITE Write;
   EFI_DEBUGPORT_READ  Read;
   EFI_DEBUGPORT_POLL  Poll;
-} EFI_DEBUGPORT_PROTOCOL;
+};
 
 //
 // DEBUGPORT variable definitions...

@@ -45,9 +45,9 @@ EFI_STATUS
 //
 // Interface structure for the Bus Specific Driver Override Protocol
 //
-typedef struct _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL {
+struct _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL {
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_GET_DRIVER GetDriver;
-} EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiBusSpecificDriverOverrideProtocolGuid;
 

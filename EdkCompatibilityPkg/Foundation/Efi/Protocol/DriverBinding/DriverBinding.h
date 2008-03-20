@@ -116,14 +116,14 @@ EFI_STATUS
 //
 // Interface structure for the ControllerHandle Driver Protocol
 //
-typedef struct _EFI_DRIVER_BINDING_PROTOCOL {
+struct _EFI_DRIVER_BINDING_PROTOCOL {
   EFI_DRIVER_BINDING_SUPPORTED  Supported;
   EFI_DRIVER_BINDING_START      Start;
   EFI_DRIVER_BINDING_STOP       Stop;
   UINT32                        Version;
   EFI_HANDLE                    ImageHandle;
   EFI_HANDLE                    DriverBindingHandle;
-} EFI_DRIVER_BINDING_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDriverBindingProtocolGuid;
 

@@ -105,12 +105,12 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_ABSOLUTE_POINTER_PROTOCOL {
+struct _EFI_ABSOLUTE_POINTER_PROTOCOL {
   EFI_ABSOLUTE_POINTER_RESET         Reset;
   EFI_ABSOLUTE_POINTER_GET_STATE     GetState;
   EFI_EVENT                          WaitForInput;
   EFI_ABSOLUTE_POINTER_MODE          *Mode;
-} EFI_ABSOLUTE_POINTER_PROTOCOL;
+};
 
 extern EFI_GUID gEfiAbsolutePointerProtocolGuid;
 

@@ -173,7 +173,7 @@ EFI_STATUS
 //
 //  Protocol Interface Structure
 //
-typedef struct _EFI_USB_IO_PROTOCOL {
+struct _EFI_USB_IO_PROTOCOL {
   //
   // IO transfer
   //
@@ -198,7 +198,7 @@ typedef struct _EFI_USB_IO_PROTOCOL {
   // Reset controller's parent port
   //
   EFI_USB_IO_PORT_RESET                 UsbPortReset;
-} EFI_USB_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiUsbIoProtocolGuid;
 

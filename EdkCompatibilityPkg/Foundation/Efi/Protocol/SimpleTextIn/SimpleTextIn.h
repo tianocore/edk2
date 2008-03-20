@@ -125,11 +125,11 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_SIMPLE_TEXT_IN_PROTOCOL {
+struct _EFI_SIMPLE_TEXT_IN_PROTOCOL {
   EFI_INPUT_RESET     Reset;
   EFI_INPUT_READ_KEY  ReadKeyStroke;
   EFI_EVENT           WaitForKey;
-} EFI_SIMPLE_TEXT_IN_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSimpleTextInProtocolGuid;
 

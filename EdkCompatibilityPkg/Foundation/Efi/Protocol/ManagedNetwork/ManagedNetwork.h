@@ -147,7 +147,7 @@ EFI_STATUS
   IN EFI_MANAGED_NETWORK_PROTOCOL    *This
   );
 
-typedef struct _EFI_MANAGED_NETWORK_PROTOCOL {
+struct _EFI_MANAGED_NETWORK_PROTOCOL {
   EFI_MANAGED_NETWORK_GET_MODE_DATA       GetModeData;
   EFI_MANAGED_NETWORK_CONFIGURE           Configure;
   EFI_MANAGED_NETWORK_MCAST_IP_TO_MAC     McastIpToMac;
@@ -156,7 +156,7 @@ typedef struct _EFI_MANAGED_NETWORK_PROTOCOL {
   EFI_MANAGED_NETWORK_RECEIVE             Receive;
   EFI_MANAGED_NETWORK_CANCEL              Cancel;
   EFI_MANAGED_NETWORK_POLL                Poll;
-} EFI_MANAGED_NETWORK_PROTOCOL;
+};
 
 extern EFI_GUID gEfiManagedNetworkServiceBindingProtocolGuid;
 extern EFI_GUID gEfiManagedNetworkProtocolGuid;

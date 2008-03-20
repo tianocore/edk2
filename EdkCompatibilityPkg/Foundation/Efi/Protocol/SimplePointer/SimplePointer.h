@@ -64,12 +64,12 @@ EFI_STATUS
   IN OUT EFI_SIMPLE_POINTER_STATE         * State
   );
 
-typedef struct _EFI_SIMPLE_POINTER_PROTOCOL {
+struct _EFI_SIMPLE_POINTER_PROTOCOL {
   EFI_SIMPLE_POINTER_RESET      Reset;
   EFI_SIMPLE_POINTER_GET_STATE  GetState;
   EFI_EVENT                     WaitForInput;
   EFI_SIMPLE_POINTER_MODE       *Mode;
-} EFI_SIMPLE_POINTER_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSimplePointerProtocolGuid;
 

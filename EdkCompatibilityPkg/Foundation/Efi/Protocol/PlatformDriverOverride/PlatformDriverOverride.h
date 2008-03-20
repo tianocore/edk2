@@ -63,11 +63,11 @@ EFI_STATUS
 //
 // Interface structure for the Platform Driver Override Protocol
 //
-typedef struct _EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL {
+struct _EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL {
   EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER       GetDriver;
   EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER_PATH  GetDriverPath;
   EFI_PLATFORM_DRIVER_OVERRIDE_DRIVER_LOADED    DriverLoaded;
-} EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPlatformDriverOverrideProtocolGuid;
 

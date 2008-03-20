@@ -196,7 +196,7 @@ EFI_STATUS
   IN EFI_UDP4_PROTOCOL  *This
 );
 
-typedef struct _EFI_UDP4_PROTOCOL {
+struct _EFI_UDP4_PROTOCOL {
   EFI_UDP4_GET_MODE_DATA  GetModeData;
   EFI_UDP4_CONFIGURE      Configure;
   EFI_UDP4_GROUPS         Groups;
@@ -205,7 +205,7 @@ typedef struct _EFI_UDP4_PROTOCOL {
   EFI_UDP4_RECEIVE        Receive;
   EFI_UDP4_CANCEL         Cancel;
   EFI_UDP4_POLL           Poll;
-} EFI_UDP4_PROTOCOL;
+};
 
 extern EFI_GUID gEfiUdp4ServiceBindingProtocolGuid;
 extern EFI_GUID gEfiUdp4ProtocolGuid;

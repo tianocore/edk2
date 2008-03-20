@@ -69,9 +69,9 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_EDID_OVERRIDE_PROTOCOL {
+struct _EFI_EDID_OVERRIDE_PROTOCOL {
   EFI_EDID_OVERRIDE_PROTOCOL_GET_EDID   GetEdid;
-} EFI_EDID_OVERRIDE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiEdidOverrideProtocolGuid;
 

@@ -46,7 +46,7 @@ typedef enum {
   EfiNetworkInterfaceUndi = 1
 } EFI_NETWORK_PROTOCOL_TYPE;
 
-typedef struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
+struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
 
   UINT64  Revision;
   //
@@ -94,7 +94,7 @@ typedef struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
   //
   BOOLEAN Ipv6Supported;
   UINT8   IfNum;  // interface number to be used with pxeid structure
-} EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL;
+};
 
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid;
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid_31;

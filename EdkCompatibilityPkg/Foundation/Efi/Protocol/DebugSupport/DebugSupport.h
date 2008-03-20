@@ -581,13 +581,13 @@ EFI_STATUS
 //
 // DebugSupport protocol definition
 //
-typedef struct _EFI_DEBUG_SUPPORT_PROTOCOL {
+struct _EFI_DEBUG_SUPPORT_PROTOCOL {
   EFI_INSTRUCTION_SET_ARCHITECTURE  Isa;
   EFI_GET_MAXIMUM_PROCESSOR_INDEX   GetMaximumProcessorIndex;
   EFI_REGISTER_PERIODIC_CALLBACK    RegisterPeriodicCallback;
   EFI_REGISTER_EXCEPTION_CALLBACK   RegisterExceptionCallback;
   EFI_INVALIDATE_INSTRUCTION_CACHE  InvalidateInstructionCache;
-} EFI_DEBUG_SUPPORT_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDebugSupportProtocolGuid;
 
