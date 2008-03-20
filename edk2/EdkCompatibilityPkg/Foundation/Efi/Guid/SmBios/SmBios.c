@@ -24,7 +24,7 @@ Abstract:
 --*/
 
 #include "EfiSpec.h"
-#include EFI_GUID_DEFINITION (Smbios)
+#include EFI_GUID_DEFINITION (SmBios)
 
 EFI_GUID  gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
 
