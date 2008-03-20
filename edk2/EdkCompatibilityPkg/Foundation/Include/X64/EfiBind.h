@@ -138,19 +138,19 @@ typedef int64_t   intn_t;
 //
 // Processor specific defines
 //
-#define EFI_MAX_BIT       0x8000000000000000
-#define MAX_2_BITS        0xC000000000000000
+#define EFI_MAX_BIT       0x8000000000000000ULL
+#define MAX_2_BITS        0xC000000000000000ULL
 
 //
 // Maximum legal IA-32 address
 //
-#define EFI_MAX_ADDRESS   0xFFFFFFFFFFFFFFFF
+#define EFI_MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
 
 //
 //  Bad pointer value to use in check builds.
 //  if you see this value you are using uninitialized or free'ed data
 //
-#define EFI_BAD_POINTER          0xAFAFAFAFAFAFAFAF
+#define EFI_BAD_POINTER          0xAFAFAFAFAFAFAFAFULL
 #define EFI_BAD_POINTER_AS_BYTE  0xAF
 
 //
