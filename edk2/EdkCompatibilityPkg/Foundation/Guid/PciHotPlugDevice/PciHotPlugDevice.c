@@ -21,7 +21,7 @@ Abstract:
 --*/
 
 #include "Tiano.h"
-#include EFI_GUID_DEFINITION(PciHotplugDevice)
+#include EFI_GUID_DEFINITION(PciHotPlugDevice)
 
 
 EFI_GUID  gEfiPciHotplugDeviceGuid = EFI_PCI_HOTPLUG_DEVICE_GUID;
