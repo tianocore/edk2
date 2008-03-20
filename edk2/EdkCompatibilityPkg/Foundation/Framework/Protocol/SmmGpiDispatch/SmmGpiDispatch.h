@@ -141,11 +141,11 @@ EFI_STATUS
 //
 // Interface structure for the SMM GPI SMI Dispatch Protocol
 //
-typedef struct _EFI_SMM_GPI_DISPATCH_PROTOCOL {
+struct _EFI_SMM_GPI_DISPATCH_PROTOCOL {
   EFI_SMM_GPI_REGISTER    Register;
   EFI_SMM_GPI_UNREGISTER  UnRegister;
   UINTN                   NumSupportedGpis;
-} EFI_SMM_GPI_DISPATCH_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmGpiDispatchProtocolGuid;
 

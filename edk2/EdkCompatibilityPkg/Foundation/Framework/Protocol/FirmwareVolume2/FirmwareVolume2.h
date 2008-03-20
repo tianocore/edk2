@@ -177,7 +177,7 @@ EFI_STATUS
   );
 
 
-typedef struct _EFI_FIRMWARE_VOLUME2_PROTOCOL {
+struct _EFI_FIRMWARE_VOLUME2_PROTOCOL {
   EFI_FV_GET_ATTRIBUTES    GetVolumeAttributes;
   EFI_FV_SET_ATTRIBUTES    SetVolumeAttributes;
   EFI_FV_READ_FILE         ReadFile;
@@ -188,7 +188,7 @@ typedef struct _EFI_FIRMWARE_VOLUME2_PROTOCOL {
   EFI_HANDLE               ParentHandle;
   EFI_FV_GET_INFO          GetInfo;
   EFI_FV_SET_INFO          SetInfo;
-} EFI_FIRMWARE_VOLUME2_PROTOCOL;
+};
 
 extern EFI_GUID gEfiFirmwareVolume2ProtocolGuid;
 

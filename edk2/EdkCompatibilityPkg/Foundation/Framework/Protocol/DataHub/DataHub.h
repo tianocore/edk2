@@ -113,12 +113,12 @@ EFI_STATUS
   IN EFI_EVENT                FilterEvent
   );
 
-typedef struct _EFI_DATA_HUB_PROTOCOL {
+struct _EFI_DATA_HUB_PROTOCOL {
   EFI_DATA_HUB_LOG_DATA                 LogData;
   EFI_DATA_HUB_GET_NEXT_RECORD          GetNextRecord;
   EFI_DATA_HUB_REGISTER_FILTER_DRIVER   RegisterFilterDriver;
   EFI_DATA_HUB_UNREGISTER_FILTER_DRIVER UnregisterFilterDriver;
-} EFI_DATA_HUB_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDataHubProtocolGuid;
 

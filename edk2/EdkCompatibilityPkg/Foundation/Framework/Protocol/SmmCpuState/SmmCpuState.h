@@ -34,9 +34,9 @@ Revision History
 #define EFI_SMM_CPU_SAVE_STATE_PROTOCOL_GUID  \
   { 0x21f302ad, 0x6e94, 0x471b, 0x84, 0xbc, 0xb1, 0x48, 0x0, 0x40, 0x3a, 0x1d }
 
-typedef struct _EFI_SMM_CPU_SAVE_STATE_PROTOCOL {
+struct _EFI_SMM_CPU_SAVE_STATE_PROTOCOL {
   EFI_SMM_CPU_STATE                 **CpuSaveState;
-} EFI_SMM_CPU_SAVE_STATE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmCpuSaveStateProtocolGuid;
 

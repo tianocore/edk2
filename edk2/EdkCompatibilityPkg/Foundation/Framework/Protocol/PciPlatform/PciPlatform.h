@@ -197,12 +197,12 @@ EFI_STATUS
 ;
 
 
-typedef struct _EFI_PCI_PLATFORM_PROTOCOL {
+struct _EFI_PCI_PLATFORM_PROTOCOL {
   EFI_PCI_PLATFORM_PHASE_NOTIFY          PhaseNotify;
   EFI_PCI_PLATFORM_PREPROCESS_CONTROLLER PlatformPrepController;
   EFI_PCI_PLATFORM_GET_PLATFORM_POLICY   GetPlatformPolicy;
   EFI_PCI_PLATFORM_GET_PCI_ROM           GetPciRom;
-} EFI_PCI_PLATFORM_PROTOCOL;
+};
 
 extern EFI_GUID   gEfiPciPlatformProtocolGuid;
 

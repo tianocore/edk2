@@ -38,8 +38,6 @@ Abstract:
   }
 
 
-EFI_FORWARD_DECLARATION (EFI_FIRMWARE_VOLUME_PROTOCOL);
-
 //
 // ************************************************************
 // EFI_FV_ATTRIBUTES bit definitions
@@ -285,7 +283,7 @@ Returns:
   EFI_ACCESS_DENIED
 
 --*/
-typedef struct _EFI_FIRMWARE_VOLUME_PROTOCOL {
+struct _EFI_FIRMWARE_VOLUME_PROTOCOL {
   FV_GET_ATTRIBUTES GetVolumeAttributes;
   FV_SET_ATTRIBUTES SetVolumeAttributes;
   FV_READ_FILE      ReadFile;
@@ -294,7 +292,7 @@ typedef struct _EFI_FIRMWARE_VOLUME_PROTOCOL {
   FV_GET_NEXT_FILE  GetNextFile;
   UINT32            KeySize;
   EFI_HANDLE        ParentHandle;
-} EFI_FIRMWARE_VOLUME_PROTOCOL;
+};
 
 extern EFI_GUID gEfiFirmwareVolumeProtocolGuid;
 

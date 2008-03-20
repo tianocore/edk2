@@ -300,7 +300,7 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_LEGACY_8259_PROTOCOL {
+struct _EFI_LEGACY_8259_PROTOCOL {
   EFI_LEGACY_8259_SET_VECTOR_BASE     SetVectorBase;
   EFI_LEGACY_8259_GET_MASK            GetMask;
   EFI_LEGACY_8259_SET_MASK            SetMask;
@@ -310,7 +310,7 @@ typedef struct _EFI_LEGACY_8259_PROTOCOL {
   EFI_LEGACY_8259_DISABLE_IRQ         DisableIrq;
   EFI_LEGACY_8259_GET_INTERRUPT_LINE  GetInterruptLine;
   EFI_LEGACY_8259_END_OF_INTERRUPT    EndOfInterrupt;
-} EFI_LEGACY_8259_PROTOCOL;
+};
 
 extern EFI_GUID gEfiLegacy8259ProtocolGuid;
 

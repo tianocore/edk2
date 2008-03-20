@@ -331,7 +331,7 @@ EFI_STATUS
 // An IDE Bus driver wants to manage an IDE bus and possible IDE devices will have to retrieve the 
 // EFI_IDE_CONTROLLER_INIT_PROTOCOL instances.
 //
-typedef struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL {
+struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL {
   EFI_IDE_CONTROLLER_GET_CHANNEL_INFO    GetChannelInfo;
   EFI_IDE_CONTROLLER_NOTIFY_PHASE        NotifyPhase;
   EFI_IDE_CONTROLLER_SUBMIT_DATA         SubmitData;
@@ -340,7 +340,7 @@ typedef struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL {
   EFI_IDE_CONTROLLER_SET_TIMING          SetTiming;
   BOOLEAN                                                        EnumAll;
   UINT8                                                               ChannelCount; 
-} EFI_IDE_CONTROLLER_INIT_PROTOCOL;
+};
 
 
 extern EFI_GUID gEfiIdeControllerInitProtocolGuid;

@@ -36,8 +36,6 @@ Abstract:
 //
 // Forward reference for pure ANSI compatability
 //
-EFI_FORWARD_DECLARATION (EFI_FORM_BROWSER_PROTOCOL);
-
 typedef struct _EFI_FORM_BROWSER_PROTOCOL EFI_FORM_BROWSER_PROTOCOL;
 
 typedef struct {
@@ -87,10 +85,10 @@ EFI_STATUS
   ...
   );
 
-typedef struct _EFI_FORM_BROWSER_PROTOCOL {
+struct _EFI_FORM_BROWSER_PROTOCOL {
   EFI_SEND_FORM     SendForm;
   EFI_CREATE_POP_UP CreatePopUp;
-} EFI_FORM_BROWSER_PROTOCOL;
+};
 
 extern EFI_GUID gEfiFormBrowserProtocolGuid;
 

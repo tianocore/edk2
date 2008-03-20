@@ -143,10 +143,10 @@ EFI_STATUS
 //
 // Interface structure for the SMM Standby Button SMI Dispatch Protocol
 //
-typedef struct _EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL {
+struct _EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL {
   EFI_SMM_STANDBY_BUTTON_REGISTER   Register;
   EFI_SMM_STANDBY_BUTTON_UNREGISTER UnRegister;
-} EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmStandbyButtonDispatchProtocolGuid;
 
