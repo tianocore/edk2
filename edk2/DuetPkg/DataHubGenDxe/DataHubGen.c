@@ -55,20 +55,6 @@ GetSmbiosTablesFromHob (
   return NULL;
 }
 
-EFI_STATUS
-PrepareHiiPackage (
-  VOID
-  )
-{
-  EFI_HII_PACKAGES                  *PackageList;
-  EFI_STATUS                        Status;
-
-  PackageList   = PreparePackages (1, &gEfiMiscProducerGuid, DataHubGenDxeStrings);
-  Status        = gHii->NewPack (gHii, PackageList, &gStringHandle);
-
-  return Status;
-}
-
 EFI_SUBCLASS_TYPE1_HEADER mCpuDataRecordHeader = {
   EFI_PROCESSOR_SUBCLASS_VERSION,       // Version
   sizeof (EFI_SUBCLASS_TYPE1_HEADER),   // Header Size
@@ -126,8 +112,7 @@ InstallProcessorDataHub (
   ASSERT (UString != NULL);
   AsciiStrToUnicodeStr (AString, UString);
 
-  Token  = 0;
-  Status = gHii->NewString (gHii, NULL, gStringHandle, &Token, UString);
+  Status = HiiLibNewString (gStringHandle, &Token, UString);
 
   if (EFI_ERROR (Status)) {
     gBS->FreePool (UString);
@@ -256,8 +241,7 @@ InstallMiscDataHub (
   CopyMem (UString, FIRMWARE_BIOS_VERSIONE, sizeof(FIRMWARE_BIOS_VERSIONE));
   AsciiStrToUnicodeStr (AString, UString + sizeof(FIRMWARE_BIOS_VERSIONE) / sizeof(CHAR16) - 1);
 
-  Token  = 0;
-  Status = gHii->NewString (gHii, NULL, gStringHandle, &Token, UString);
+  Status = HiiLibNewString (gStringHandle, &Token, UString);
 
   if (EFI_ERROR (Status)) {
     gBS->FreePool (UString);
@@ -306,12 +290,8 @@ InstallMiscDataHub (
   CopyMem (UString, FIRMWARE_PRODUCT_NAME, sizeof(FIRMWARE_PRODUCT_NAME));
   AsciiStrToUnicodeStr (AString, UString + sizeof(FIRMWARE_PRODUCT_NAME) / sizeof(CHAR16) - 1);
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
-  Status = IfrLibNewString (gStringHandle, &Token, UString);
-#else
-  Token  = 0;
-  Status = gHii->NewString (gHii, NULL, gStringHandle, &Token, UString);
-#endif
+  Status = HiiLibNewString (gStringHandle, &Token, UString);
+
   if (EFI_ERROR (Status)) {
     gBS->FreePool (UString);
     return ;
@@ -350,7 +330,6 @@ DataHubGenEntrypoint (
   EFI_STATUS              Status;
   VOID                    *Smbios;
 
-
   Smbios = GetSmbiosTablesFromHob ();
   if (Smbios == NULL) {
     return EFI_NOT_FOUND;
@@ -381,8 +360,8 @@ DataHubGenEntrypoint (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  PrepareHiiPackage ();
+  
+  HiiLibAddPackages (1, &gEfiMiscProducerGuid, NULL, &gStringHandle, DataHubGenDxeStrings);
 
   InstallProcessorDataHub (Smbios);
   InstallCacheDataHub     (Smbios);

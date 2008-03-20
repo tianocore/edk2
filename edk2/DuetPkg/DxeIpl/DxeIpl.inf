@@ -20,7 +20,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeIpl
   FILE_GUID                      = 2119BBD7-9432-4f47-B5E2-5C4EA31B6BDC
-  MODULE_TYPE                    = PEIM
+  MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -37,7 +37,6 @@
   BaseLib
   BaseMemoryLib
   PrintLib
-  PeimEntryPoint
   ReportStatusCodeLib
 
 [Sources.common]
@@ -66,4 +65,9 @@
   Ia32\Paging.c
   Ia32\VirtualMemory.h
 
-  
+[BuildOptions.common]
+  #MSFT:*_*_IA32_DLINK_FLAGS = /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
+  MSFT:*_*_IA32_CC_FLAGS = /nologo /W4 /WX /Gy /c /D UNICODE /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
+  MSFT:*_*_IA32_PP_FLAGS = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
+  MSFT:*_*_IA32_ASM_FLAGS = /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
+  MSFT:*_*_IA32_ASMLINK_FLAGS       = /link /nologo /tiny  
