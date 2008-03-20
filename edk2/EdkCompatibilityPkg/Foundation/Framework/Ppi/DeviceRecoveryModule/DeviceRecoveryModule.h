@@ -57,11 +57,11 @@ EFI_STATUS
   OUT VOID                                        *Buffer
   );
 
-typedef struct _PEI_DEVICE_RECOVERY_MODULE_INTERFACE {
+struct _PEI_DEVICE_RECOVERY_MODULE_INTERFACE {
   PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE  GetNumberRecoveryCapsules;
   PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO    GetRecoveryCapsuleInfo;
   PEI_DEVICE_LOAD_RECOVERY_CAPSULE        LoadRecoveryCapsule;
-} PEI_DEVICE_RECOVERY_MODULE_INTERFACE;
+};
 
 extern EFI_GUID gPeiDeviceRecoveryModulePpiGuid;
 

@@ -39,9 +39,9 @@ EFI_STATUS
   OUT EFI_PHYSICAL_ADDRESS                      * EntryPoint
   );
 
-typedef struct _EFI_PEI_FV_FILE_LOADER_PPI {
+struct _EFI_PEI_FV_FILE_LOADER_PPI {
   EFI_PEI_FV_LOAD_FILE  FvLoadFile;
-} EFI_PEI_FV_FILE_LOADER_PPI;
+};
 
 extern EFI_GUID gPeiFvFileLoaderPpiGuid;
 

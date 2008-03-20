@@ -42,9 +42,9 @@ EFI_STATUS
   IN EFI_PEI_HOB_POINTERS         HobList
   );
 
-typedef struct _EFI_DXE_IPL_PPI {
+struct _EFI_DXE_IPL_PPI {
   EFI_DXE_IPL_ENTRY Entry;
-} EFI_DXE_IPL_PPI;
+};
 
 extern EFI_GUID gEfiDxeIplPpiGuid;
 

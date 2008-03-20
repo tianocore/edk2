@@ -41,12 +41,12 @@ typedef enum {
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_RESET_SYSTEM) (
+(EFIAPI *PEI_RESET_PPI_RESET_SYSTEM) (
   IN EFI_PEI_SERVICES   **PeiServices
   );
 
 typedef struct {
-  EFI_PEI_RESET_SYSTEM  ResetSystem;
+  PEI_RESET_PPI_RESET_SYSTEM  ResetSystem;
 } PEI_RESET_PPI;
 
 extern EFI_GUID gPeiResetPpiGuid;

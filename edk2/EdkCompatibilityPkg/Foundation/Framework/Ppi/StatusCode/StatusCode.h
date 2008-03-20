@@ -40,9 +40,9 @@ EFI_STATUS
   IN EFI_STATUS_CODE_DATA            * Data OPTIONAL
   );
 
-typedef struct _PEI_STATUS_CODE_PPI {
+struct _PEI_STATUS_CODE_PPI {
   PEI_REPORT_STATUS_CODE  ReportStatusCode;
-} PEI_STATUS_CODE_PPI;
+};
 
 extern EFI_GUID gPeiStatusCodePpiGuid;
 

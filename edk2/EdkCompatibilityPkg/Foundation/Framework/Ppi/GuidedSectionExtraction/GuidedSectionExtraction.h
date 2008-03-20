@@ -35,8 +35,8 @@ EFI_STATUS
   OUT UINT32                                      *AuthenticationStatus
   );
 
-typedef struct _EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI {
+struct _EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI {
   EFI_PEI_EXTRACT_GUIDED_SECTION  ExtractSection;
-} EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI;
+};
 
 #endif

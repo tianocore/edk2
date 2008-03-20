@@ -40,10 +40,10 @@ EFI_STATUS
   IN     EFI_GUID                                * FvFile OPTIONAL
   );
 
-typedef struct _PEI_BOOT_SCRIPT_EXECUTER_PPI {
+struct _PEI_BOOT_SCRIPT_EXECUTER_PPI {
   UINT64                  Revision;
   PEI_BOOT_SCRIPT_EXECUTE Execute;
-} PEI_BOOT_SCRIPT_EXECUTER_PPI;
+};
 
 extern EFI_GUID gPeiBootScriptExecuterPpiGuid;
 

@@ -100,13 +100,13 @@ EFI_STATUS
   OUT VOID                               **SectionData
   );
 
-typedef struct _EFI_PEI_FIRMWARE_VOLUME_PPI {
+struct _EFI_PEI_FIRMWARE_VOLUME_PPI {
   EFI_PEI_FV_PROCESS_FV             ProcessVolume;
   EFI_PEI_FV_FIND_FILE_TYPE         FindFileByType;   
   EFI_PEI_FV_FIND_FILE_NAME         FindFileByName;     
   EFI_PEI_FV_GET_FILE_INFO          GetFileInfo;      
   EFI_PEI_FV_GET_INFO               GetVolumeInfo;
   EFI_PEI_FV_FIND_SECTION           FindSectionByType;
-} EFI_PEI_FIRMWARE_VOLUME_PPI;
+};
 
 #endif

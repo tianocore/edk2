@@ -40,9 +40,9 @@ EFI_STATUS
   IN OUT BOOLEAN                  *DeferExection
   );
 
-typedef struct _EFI_PEI_SECURITY2_PPI {
+struct _EFI_PEI_SECURITY2_PPI {
   EFI_PEI_SECURITY_AUTHENTICATION_STATE  AuthenticationState;
-} EFI_PEI_SECURITY2_PPI;
+};
 
 
 extern EFI_GUID gEfiPeiSecurity2PpiGuid;

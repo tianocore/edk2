@@ -38,9 +38,9 @@ EFI_STATUS
   OUT UINTN                                  *OutputSize
   );
 
-typedef struct _EFI_PEI_DECOMPRESS_PPI {
+struct _EFI_PEI_DECOMPRESS_PPI {
   EFI_PEI_DECOMPRESS_DECOMPRESS   Decompress;
-} EFI_PEI_DECOMPRESS_PPI;
+};
 
 
 

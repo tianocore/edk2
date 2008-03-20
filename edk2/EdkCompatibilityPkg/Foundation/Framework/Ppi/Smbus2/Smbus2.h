@@ -83,13 +83,13 @@ EFI_STATUS
   IN      EFI_PEI_SMBUS_NOTIFY2_FUNCTION NotifyFunction
   );
 
-typedef struct _EFI_PEI_SMBUS2_PPI {
+struct _EFI_PEI_SMBUS2_PPI {
   EFI_PEI_SMBUS2_PPI_EXECUTE_OPERATION Execute;
   EFI_PEI_SMBUS2_PPI_ARP_DEVICE        ArpDevice;
   EFI_PEI_SMBUS2_PPI_GET_ARP_MAP       GetArpMap;
   EFI_PEI_SMBUS2_PPI_NOTIFY            Notify;
   EFI_GUID                             Identifier;
-} EFI_PEI_SMBUS2_PPI;
+};
 
 extern EFI_GUID gPeiSmbus2PpiGuid;
 

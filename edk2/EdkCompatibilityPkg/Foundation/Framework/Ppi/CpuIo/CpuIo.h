@@ -224,7 +224,7 @@ VOID
 // PEI_CPU_IO_PPI
 // *******************************************************
 //
-typedef struct _PEI_CPU_IO_PPI {
+struct _PEI_CPU_IO_PPI {
   PEI_CPU_IO_PPI_ACCESS       Mem;
   PEI_CPU_IO_PPI_ACCESS       Io;
   PEI_CPU_IO_PPI_IO_READ8     IoRead8;
@@ -243,7 +243,7 @@ typedef struct _PEI_CPU_IO_PPI {
   PEI_CPU_IO_PPI_MEM_WRITE16  MemWrite16;
   PEI_CPU_IO_PPI_MEM_WRITE32  MemWrite32;
   PEI_CPU_IO_PPI_MEM_WRITE64  MemWrite64;
-} PEI_CPU_IO_PPI;
+};
 
 extern EFI_GUID gPeiCpuIoPpiInServiceTableGuid;
 
