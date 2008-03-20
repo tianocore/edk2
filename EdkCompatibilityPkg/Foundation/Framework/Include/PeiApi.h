@@ -93,11 +93,11 @@ typedef struct {
   VOID      *Ppi;
 } EFI_PEI_PPI_DESCRIPTOR;
 
-typedef struct _EFI_PEI_NOTIFY_DESCRIPTOR {
+struct _EFI_PEI_NOTIFY_DESCRIPTOR {
   UINTN                       Flags;
   EFI_GUID                    *Guid;
   EFI_PEIM_NOTIFY_ENTRY_POINT Notify;
-} EFI_PEI_NOTIFY_DESCRIPTOR;
+};
 
 
 
@@ -499,7 +499,7 @@ EFI_STATUS
 typedef PEI_CPU_IO_PPI          EFI_PEI_CPU_IO_PPI;
 
 
-typedef struct _EFI_PEI_SERVICES {
+struct _EFI_PEI_SERVICES {
   EFI_TABLE_HEADER              Hdr;
 
   //
@@ -573,7 +573,7 @@ typedef struct _EFI_PEI_SERVICES {
   EFI_PEI_REGISTER_FOR_SHADOW     RegisterForShadow;
 #endif
 
-} EFI_PEI_SERVICES;
+};
 
 #if (PI_SPECIFICATION_VERSION < 0x00010000)
 
@@ -591,7 +591,7 @@ EFI_STATUS
 
 #else
 
-typedef struct _EFI_SEC_PEI_HAND_OFF{
+typedef struct _EFI_SEC_PEI_HAND_OFF {
   UINT16  DataSize;
   VOID    *BootFirmwareVolumeBase;
   UINTN   BootFirmwareVolumeSize;
@@ -601,7 +601,7 @@ typedef struct _EFI_SEC_PEI_HAND_OFF{
   UINTN   PeiTemporaryRamSize;
   VOID    *StackBase;
   UINTN   StackSize;
-}EFI_SEC_PEI_HAND_OFF;
+} EFI_SEC_PEI_HAND_OFF;
 
 typedef
 EFI_STATUS
