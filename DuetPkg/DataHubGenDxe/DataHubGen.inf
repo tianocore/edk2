@@ -42,7 +42,7 @@
   MemoryAllocationLib
   UefiDriverEntryPoint
   BaseLib
-  FrameworkHiiLib
+  HiiLib
   
 [Sources.common]
   DataHubGen.c
@@ -51,13 +51,13 @@
 
 [Guids.common]
   gEfiProcessorSubClassGuid
-  gEfiHiiProtocolGuid
   gEfiMiscSubClassGuid
   gEfiDataHubProtocolGuid
   gEfiSmbiosTableGuid
   gEfiMiscProducerGuid
   gEfiMemorySubClassGuid
   gEfiMemoryProducerGuid
+  gEfiHiiProtocolGuid
 
 [Depex]
   gEfiDataHubProtocolGuid AND gEfiHiiProtocolGuid
