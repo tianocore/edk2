@@ -111,9 +111,9 @@ Returns:
 //
 // Interface stucture for the Timer Architectural Protocol
 //
-typedef struct _EFI_SECURITY_ARCH_PROTOCOL {
+struct _EFI_SECURITY_ARCH_PROTOCOL {
   EFI_SECURITY_FILE_AUTHENTICATION_STATE  FileAuthenticationState;
-} EFI_SECURITY_ARCH_PROTOCOL;
+};
 /*++
 
   Protocol Description:

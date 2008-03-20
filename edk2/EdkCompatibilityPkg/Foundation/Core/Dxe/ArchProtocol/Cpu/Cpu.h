@@ -304,7 +304,7 @@ Returns:
                                           
 --*/
 
-typedef struct _EFI_CPU_ARCH_PROTOCOL {
+struct _EFI_CPU_ARCH_PROTOCOL {
   EFI_CPU_FLUSH_DATA_CACHE            FlushDataCache;
   EFI_CPU_ENABLE_INTERRUPT            EnableInterrupt;
   EFI_CPU_DISABLE_INTERRUPT           DisableInterrupt;
@@ -315,7 +315,7 @@ typedef struct _EFI_CPU_ARCH_PROTOCOL {
   EFI_CPU_SET_MEMORY_ATTRIBUTES       SetMemoryAttributes;
   UINT32                              NumberOfTimers;
   UINT32                              DmaBufferAlignment;
-} EFI_CPU_ARCH_PROTOCOL;
+};
 
 /*++
 

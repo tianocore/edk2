@@ -76,10 +76,10 @@ Returns:
 //
 // Interface stucture for the Metronome Architectural Protocol
 //
-typedef struct _EFI_METRONOME_ARCH_PROTOCOL {
+struct _EFI_METRONOME_ARCH_PROTOCOL {
   EFI_METRONOME_WAIT_FOR_TICK  WaitForTick;
   UINT32                       TickPeriod;
-} EFI_METRONOME_ARCH_PROTOCOL;
+};
 
 /*++
 
