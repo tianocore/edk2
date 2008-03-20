@@ -215,12 +215,12 @@ Returns:
 //
 // Interface stucture for the Timer Architectural Protocol
 //
-typedef struct _EFI_TIMER_ARCH_PROTOCOL {
+struct _EFI_TIMER_ARCH_PROTOCOL {
   EFI_TIMER_REGISTER_HANDLER          RegisterHandler;
   EFI_TIMER_SET_TIMER_PERIOD          SetTimerPeriod;
   EFI_TIMER_GET_TIMER_PERIOD          GetTimerPeriod;
   EFI_TIMER_GENERATE_SOFT_INTERRUPT   GenerateSoftInterrupt;
-} EFI_TIMER_ARCH_PROTOCOL;
+};
 
 /*++
 

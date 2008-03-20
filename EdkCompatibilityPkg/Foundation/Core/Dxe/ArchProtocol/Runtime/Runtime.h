@@ -46,27 +46,27 @@ Abstract:
 
 EFI_FORWARD_DECLARATION (EFI_RUNTIME_ARCH_PROTOCOL);
 
-typedef struct _EFI_RUNTIME_IMAGE_ENTRY {
+struct _EFI_RUNTIME_IMAGE_ENTRY {
   VOID                    *ImageBase;
   UINT64                  ImageSize;
   VOID                    *RelocationData;
   EFI_HANDLE              Handle;
   EFI_LIST_ENTRY          Link;
-} EFI_RUNTIME_IMAGE_ENTRY;
+};
 
-typedef struct _EFI_RUNTIME_EVENT_ENTRY {
+struct _EFI_RUNTIME_EVENT_ENTRY {
   UINT32                  Type;
   EFI_TPL                 NotifyTpl;
   EFI_EVENT_NOTIFY        NotifyFunction;
   VOID                    *NotifyContext;
   EFI_EVENT               *Event;
   EFI_LIST_ENTRY          Link;
-} EFI_RUNTIME_EVENT_ENTRY;
+};
 
 //
 // Interface stucture for the Runtime Architectural Protocol
 //
-typedef struct _EFI_RUNTIME_ARCH_PROTOCOL {
+struct _EFI_RUNTIME_ARCH_PROTOCOL {
   EFI_LIST_ENTRY          ImageHead;
   EFI_LIST_ENTRY          EventHead;
   UINTN                   MemoryDescriptorSize;
@@ -76,7 +76,7 @@ typedef struct _EFI_RUNTIME_ARCH_PROTOCOL {
   EFI_MEMORY_DESCRIPTOR   *MemoryMapVirtual;
   BOOLEAN                 VirtualMode;
   BOOLEAN                 AtRuntime;
-} EFI_RUNTIME_ARCH_PROTOCOL;
+};
 /*++
 
 Protocol Description:

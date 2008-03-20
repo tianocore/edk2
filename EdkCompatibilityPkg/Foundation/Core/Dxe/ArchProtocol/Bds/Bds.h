@@ -72,9 +72,9 @@ Returns:
 //
 // Interface stucture for the BDS Architectural Protocol
 //
-typedef struct _EFI_BDS_ARCH_PROTOCOL {
+struct _EFI_BDS_ARCH_PROTOCOL {
   EFI_BDS_ENTRY Entry;
-} EFI_BDS_ARCH_PROTOCOL;
+};
 
 /*++
 

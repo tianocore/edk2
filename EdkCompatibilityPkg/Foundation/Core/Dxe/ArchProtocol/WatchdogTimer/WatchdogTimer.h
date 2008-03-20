@@ -166,11 +166,11 @@ Returns:
 //
 // Interface stucture for the Watchdog Timer Architectural Protocol
 //
-typedef struct _EFI_WATCHDOG_TIMER_ARCH_PROTOCOL {
+struct _EFI_WATCHDOG_TIMER_ARCH_PROTOCOL {
   EFI_WATCHDOG_TIMER_REGISTER_HANDLER  RegisterHandler;
   EFI_WATCHDOG_TIMER_SET_TIMER_PERIOD  SetTimerPeriod;
   EFI_WATCHDOG_TIMER_GET_TIMER_PERIOD  GetTimerPeriod;
-} EFI_WATCHDOG_TIMER_ARCH_PROTOCOL;
+};
 
 /*++
 
