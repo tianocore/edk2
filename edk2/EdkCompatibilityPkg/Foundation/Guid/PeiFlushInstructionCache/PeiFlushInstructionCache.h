@@ -35,9 +35,9 @@ EFI_STATUS
   IN UINT64                                            Length
   );
 
-typedef struct _EFI_PEI_FLUSH_INSTRUCTION_CACHE_PROTOCOL {
+struct _EFI_PEI_FLUSH_INSTRUCTION_CACHE_PROTOCOL {
   EFI_PEI_FLUSH_INSTRUCTION_CACHE_FLUSH  Flush;
-} EFI_PEI_FLUSH_INSTRUCTION_CACHE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPeiFlushInstructionCacheGuid;
 
