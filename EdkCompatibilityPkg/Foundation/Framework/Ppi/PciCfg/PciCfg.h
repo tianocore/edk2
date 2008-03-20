@@ -54,11 +54,11 @@ EFI_STATUS
   IN UINTN                    ClearBits
   );
 
-typedef struct _PEI_PCI_CFG_PPI {
+struct _PEI_PCI_CFG_PPI {
   PEI_PCI_CFG_PPI_IO  Read;
   PEI_PCI_CFG_PPI_IO  Write;
   PEI_PCI_CFG_PPI_RW  Modify;
-} PEI_PCI_CFG_PPI;
+};
 
 extern EFI_GUID gPeiPciCfgPpiInServiceTableGuid;
 

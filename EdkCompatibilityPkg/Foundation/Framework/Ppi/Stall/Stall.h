@@ -37,10 +37,10 @@ EFI_STATUS
   IN UINTN                      Microseconds
   );
 
-typedef struct _PEI_STALL_PPI {
+struct _PEI_STALL_PPI {
   UINTN     Resolution;
   PEI_STALL Stall;
-} PEI_STALL_PPI;
+};
 
 extern EFI_GUID gPeiStallPpiGuid;
 

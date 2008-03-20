@@ -42,9 +42,9 @@ EFI_STATUS
   EFI_FIRMWARE_VOLUME_HEADER  **FVAddress
   );
 
-typedef struct _EFI_FIND_FV_PPI {
+struct _EFI_FIND_FV_PPI {
   EFI_FIND_FV_FINDFV  FindFv;
-} EFI_FIND_FV_PPI;
+};
 
 extern EFI_GUID gEfiFindFvPpiGuid;
 

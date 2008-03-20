@@ -77,11 +77,11 @@ EFI_STATUS
   OUT VOID                                     *Buffer
   );
 
-typedef struct _PEI_RECOVERY_BLOCK_IO_INTERFACE {
+struct _PEI_RECOVERY_BLOCK_IO_INTERFACE {
   PEI_GET_NUMBER_BLOCK_DEVICES      GetNumberOfBlockDevices;
   PEI_GET_DEVICE_MEDIA_INFORMATION  GetBlockDeviceMediaInfo;
   PEI_READ_BLOCKS                   ReadBlocks;
-} PEI_RECOVERY_BLOCK_IO_INTERFACE;
+};
 
 extern EFI_GUID gPeiBlockIoPpiGuid;
 

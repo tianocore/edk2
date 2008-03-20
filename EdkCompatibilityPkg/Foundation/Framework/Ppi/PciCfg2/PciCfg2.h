@@ -54,12 +54,12 @@ EFI_STATUS
   IN VOID                           *ClearBits
   );
 
-typedef struct _EFI_PEI_PCI_CFG2_PPI {
+struct _EFI_PEI_PCI_CFG2_PPI {
   EFI_PEI_PCI_CFG_PPI_IO  Read;
   EFI_PEI_PCI_CFG_PPI_IO  Write;
   EFI_PEI_PCI_CFG_PPI_RW  Modify;
   UINT16                  Segment;
-} EFI_PEI_PCI_CFG2_PPI;
+};
 
 extern EFI_GUID gPeiPciCfg2PpiGuid;
 

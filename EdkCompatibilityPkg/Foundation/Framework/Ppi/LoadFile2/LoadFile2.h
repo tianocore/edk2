@@ -40,9 +40,9 @@ EFI_STATUS
   );
 
 
-typedef struct _EFI_PEI_LOAD_FILE_PPI {
+struct _EFI_PEI_LOAD_FILE_PPI {
   EFI_PEI_LOAD_FILE LoadFile;
-} EFI_PEI_LOAD_FILE_PPI;
+};
 
 
 extern EFI_GUID gEfiLoadFile2PpiGuid;

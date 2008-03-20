@@ -32,13 +32,13 @@ EFI_FORWARD_DECLARATION (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI);
   { 0x49edb1c1, 0xbf21, 0x4761, { 0xbb, 0x12, 0xeb, 0x0, 0x31, 0xaa, 0xbb, 0x39 } }
 
 
-typedef struct _EFI_PEI_FIRMWARE_VOLUME_INFO_PPI {
+struct _EFI_PEI_FIRMWARE_VOLUME_INFO_PPI {
   EFI_GUID            FvFormat;
   VOID                *FvInfo;
   UINT32              FvInfoSize;
   EFI_GUID            *ParentFvName;
   EFI_GUID            *ParentFileName;
-} EFI_PEI_FIRMWARE_VOLUME_INFO_PPI;
+};
 
 
 extern EFI_GUID gEfiFirmwareVolumeInfoPpiGuid;

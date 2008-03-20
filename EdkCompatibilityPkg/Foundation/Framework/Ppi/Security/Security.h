@@ -39,9 +39,9 @@ EFI_STATUS
   IN OUT BOOLEAN                  *StartCrisisRecovery
   );
 
-typedef struct _PEI_SECURITY_PPI {
+struct _PEI_SECURITY_PPI {
   PEI_SECURITY_AUTHENTICATION_STATE AuthenticationState;
-} PEI_SECURITY_PPI;
+};
 
 extern EFI_GUID gPeiSecurityPpiGuid;
 
