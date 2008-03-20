@@ -446,7 +446,7 @@ Returns:
   if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     GraphicsOutput = NULL;
     //
-    // Open GOP failed, try to open UGwhA
+    // Open GOP failed, try to open UGA
     //
     Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID**)&UgaDraw);
   }
