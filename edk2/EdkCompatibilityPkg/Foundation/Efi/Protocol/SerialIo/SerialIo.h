@@ -279,7 +279,7 @@ typedef struct {
 
 #define SERIAL_IO_INTERFACE_REVISION  0x00010000
 
-typedef struct _EFI_SERIAL_IO_PROTOCOL {
+struct _EFI_SERIAL_IO_PROTOCOL {
   UINT32                      Revision;
   EFI_SERIAL_RESET            Reset;
   EFI_SERIAL_SET_ATTRIBUTES   SetAttributes;
@@ -289,7 +289,7 @@ typedef struct _EFI_SERIAL_IO_PROTOCOL {
   EFI_SERIAL_READ             Read;
 
   EFI_SERIAL_IO_MODE          *Mode;
-} EFI_SERIAL_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSerialIoProtocolGuid;
 

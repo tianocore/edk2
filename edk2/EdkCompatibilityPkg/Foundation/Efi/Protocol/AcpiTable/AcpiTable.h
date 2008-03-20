@@ -102,10 +102,10 @@ EFI_STATUS
 //
 // Interface structure for the ACPI Table Protocol
 //
-typedef struct _EFI_ACPI_TABLE_PROTOCOL {
+struct _EFI_ACPI_TABLE_PROTOCOL {
   EFI_ACPI_TABLE_INSTALL_ACPI_TABLE    InstallAcpiTable;
   EFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE  UninstallAcpiTable;
-} EFI_ACPI_TABLE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiAcpiTableProtocolGuid;
 

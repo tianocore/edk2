@@ -398,7 +398,7 @@ typedef struct {
   BOOLEAN CursorVisible;
 } EFI_SIMPLE_TEXT_OUTPUT_MODE;
 
-typedef struct _EFI_SIMPLE_TEXT_OUT_PROTOCOL {
+struct _EFI_SIMPLE_TEXT_OUT_PROTOCOL {
   EFI_TEXT_RESET                Reset;
 
   EFI_TEXT_OUTPUT_STRING        OutputString;
@@ -416,7 +416,7 @@ typedef struct _EFI_SIMPLE_TEXT_OUT_PROTOCOL {
   // Current mode
   //
   EFI_SIMPLE_TEXT_OUTPUT_MODE   *Mode;
-} EFI_SIMPLE_TEXT_OUT_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSimpleTextOutProtocolGuid;
 

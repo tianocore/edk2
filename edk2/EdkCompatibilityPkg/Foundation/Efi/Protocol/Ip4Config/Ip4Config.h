@@ -60,11 +60,11 @@ EFI_STATUS
   );
 
 
-typedef struct _EFI_IP4_CONFIG_PROTOCOL {
+struct _EFI_IP4_CONFIG_PROTOCOL {
   EFI_IP4_CONFIG_START     Start;
   EFI_IP4_CONFIG_STOP      Stop;
   EFI_IP4_CONFIG_GET_DATA  GetData;
-} EFI_IP4_CONFIG_PROTOCOL;
+};
 
 
 extern EFI_GUID gEfiIp4ConfigProtocolGuid;

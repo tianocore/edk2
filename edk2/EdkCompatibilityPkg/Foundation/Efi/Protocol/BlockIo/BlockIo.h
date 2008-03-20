@@ -189,7 +189,7 @@ typedef struct {
 
 #define EFI_BLOCK_IO_PROTOCOL_REVISION  0x00010000
 
-typedef struct _EFI_BLOCK_IO_PROTOCOL {
+struct _EFI_BLOCK_IO_PROTOCOL {
   UINT64              Revision;
 
   EFI_BLOCK_IO_MEDIA  *Media;
@@ -199,7 +199,7 @@ typedef struct _EFI_BLOCK_IO_PROTOCOL {
   EFI_BLOCK_WRITE     WriteBlocks;
   EFI_BLOCK_FLUSH     FlushBlocks;
 
-} EFI_BLOCK_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiBlockIoProtocolGuid;
 

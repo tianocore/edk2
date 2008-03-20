@@ -65,10 +65,10 @@ EFI_STATUS
 
 #define EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION  0x00010000
 
-typedef struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
+struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
   UINT64          Revision;
   EFI_VOLUME_OPEN OpenVolume;
-} EFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
+};
 
 typedef
 EFI_STATUS
@@ -356,7 +356,7 @@ EFI_STATUS
 ;
 
 #define EFI_FILE_HANDLE_REVISION  0x00010000
-typedef struct _EFI_FILE {
+struct _EFI_FILE {
   UINT64                Revision;
   EFI_FILE_OPEN         Open;
   EFI_FILE_CLOSE        Close;
@@ -368,8 +368,7 @@ typedef struct _EFI_FILE {
   EFI_FILE_GET_INFO     GetInfo;
   EFI_FILE_SET_INFO     SetInfo;
   EFI_FILE_FLUSH        Flush;
-}
-EFI_FILE, *EFI_FILE_HANDLE;
+} *EFI_FILE_HANDLE;
 
 extern EFI_GUID gEfiSimpleFileSystemProtocolGuid;
 

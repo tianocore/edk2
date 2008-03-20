@@ -34,8 +34,6 @@ Abstract:
 //
 EFI_FORWARD_DECLARATION (EFI_FORM_BROWSER2_PROTOCOL);
 
-typedef struct _EFI_FORM_BROWSER2_PROTOCOL EFI_FORM_BROWSER2_PROTOCOL;
-
 typedef struct {
   UINTN LeftColumn;
   UINTN RightColumn;
@@ -126,10 +124,10 @@ Returns:
 --*/
 ;
 
-typedef struct _EFI_FORM_BROWSER2_PROTOCOL {
+struct _EFI_FORM_BROWSER2_PROTOCOL {
   EFI_SEND_FORM2                       SendForm;
   EFI_BROWSER_CALLBACK2                BrowserCallback;
-} EFI_FORM_BROWSER2_PROTOCOL;
+};
 
 extern EFI_GUID gEfiFormBrowser2ProtocolGuid;
 

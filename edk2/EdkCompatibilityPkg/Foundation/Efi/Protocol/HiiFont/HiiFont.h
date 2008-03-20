@@ -271,12 +271,12 @@ EFI_STATUS
 //
 // Interface structure for the EFI_HII_FONT_PROTOCOL
 //
-typedef struct _EFI_HII_FONT_PROTOCOL {
+struct _EFI_HII_FONT_PROTOCOL {
   EFI_HII_STRING_TO_IMAGE       StringToImage;
   EFI_HII_STRING_ID_TO_IMAGE    StringIdToImage;
   EFI_HII_GET_GLYPH             GetGlyph;
   EFI_HII_GET_FONT_INFO         GetFontInfo;
-} EFI_HII_FONT_PROTOCOL;
+};
 
 extern EFI_GUID gEfiHiiFontProtocolGuid;
 

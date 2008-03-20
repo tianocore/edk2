@@ -220,7 +220,7 @@ EFI_STATUS
   OUT EFI_DHCP4_PACKET_OPTION  *PacketOptionList[]  OPTIONAL
 );
 
-typedef struct _EFI_DHCP4_PROTOCOL {
+struct _EFI_DHCP4_PROTOCOL {
   EFI_DHCP4_GET_MODE_DATA      GetModeData;
   EFI_DHCP4_CONFIGURE          Configure;
   EFI_DHCP4_START              Start;
@@ -230,6 +230,6 @@ typedef struct _EFI_DHCP4_PROTOCOL {
   EFI_DHCP4_BUILD              Build;
   EFI_DHCP4_TRANSMIT_RECEIVE   TransmitReceive;
   EFI_DHCP4_PARSE              Parse;
-} EFI_DHCP4_PROTOCOL;
+};
 
 #endif

@@ -223,7 +223,7 @@ EFI_STATUS
   IN EFI_IP4_PROTOCOL           *This
   );
 
-typedef struct _EFI_IP4_PROTOCOL {
+struct _EFI_IP4_PROTOCOL {
   EFI_IP4_GET_MODE_DATA         GetModeData;
   EFI_IP4_CONFIGURE             Configure;
   EFI_IP4_GROUPS                Groups;
@@ -232,7 +232,7 @@ typedef struct _EFI_IP4_PROTOCOL {
   EFI_IP4_RECEIVE               Receive;
   EFI_IP4_CANCEL                Cancel;
   EFI_IP4_POLL                  Poll;
-} EFI_IP4_PROTOCOL;
+};
 
 
 extern EFI_GUID gEfiIp4ServiceBindingProtocolGuid;

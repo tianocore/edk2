@@ -100,11 +100,11 @@ EFI_STATUS
 
 #define EFI_DISK_IO_PROTOCOL_REVISION 0x00010000
 
-typedef struct _EFI_DISK_IO_PROTOCOL {
+struct _EFI_DISK_IO_PROTOCOL {
   UINT64          Revision;
   EFI_DISK_READ   ReadDisk;
   EFI_DISK_WRITE  WriteDisk;
-} EFI_DISK_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDiskIoProtocolGuid;
 

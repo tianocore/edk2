@@ -125,11 +125,11 @@ EFI_STATUS
 //
 // Interface structure for the Component Name Protocol
 //
-typedef struct _EFI_COMPONENT_NAME2_PROTOCOL {
+struct _EFI_COMPONENT_NAME2_PROTOCOL {
   EFI_COMPONENT_NAME2_GET_DRIVER_NAME      GetDriverName;
   EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME  GetControllerName;
   CHAR8                                    *SupportedLanguages;
-} EFI_COMPONENT_NAME2_PROTOCOL;
+};
 
 extern EFI_GUID gEfiComponentName2ProtocolGuid;
 

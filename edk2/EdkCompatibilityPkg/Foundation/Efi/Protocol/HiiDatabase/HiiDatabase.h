@@ -431,7 +431,7 @@ EFI_STATUS
 --*/    
 ;
 
-typedef struct _EFI_HII_DATABASE_PROTOCOL {
+struct _EFI_HII_DATABASE_PROTOCOL {
   EFI_HII_DATABASE_NEW_PACK             NewPackageList;
   EFI_HII_DATABASE_REMOVE_PACK          RemovePackageList;
   EFI_HII_DATABASE_UPDATE_PACK          UpdatePackageList;
@@ -443,7 +443,7 @@ typedef struct _EFI_HII_DATABASE_PROTOCOL {
   EFI_HII_GET_KEYBOARD_LAYOUT           GetKeyboardLayout;
   EFI_HII_SET_KEYBOARD_LAYOUT           SetKeyboardLayout;
   EFI_HII_DATABASE_GET_PACK_HANDLE      GetPackageListHandle;
-} EFI_HII_DATABASE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiHiiDatabaseProtocolGuid;
 

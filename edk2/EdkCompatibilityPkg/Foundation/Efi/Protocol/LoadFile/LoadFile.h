@@ -78,9 +78,9 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_LOAD_FILE_PROTOCOL {
+struct _EFI_LOAD_FILE_PROTOCOL {
   EFI_LOAD_FILE LoadFile;
-} EFI_LOAD_FILE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiLoadFileProtocolGuid;
 

@@ -274,7 +274,7 @@ EFI_STATUS
 );
 
 
-typedef struct _EFI_MTFTP4_PROTOCOL {
+struct _EFI_MTFTP4_PROTOCOL {
   EFI_MTFTP4_GET_MODE_DATA        GetModeData;
   EFI_MTFTP4_CONFIGURE            Configure;
   EFI_MTFTP4_GET_INFO             GetInfo;
@@ -283,12 +283,12 @@ typedef struct _EFI_MTFTP4_PROTOCOL {
   EFI_MTFTP4_WRITE_FILE           WriteFile;
   EFI_MTFTP4_READ_DIRECTORY       ReadDirectory;
   EFI_MTFTP4_POLL                 Poll;
-} EFI_MTFTP4_PROTOCOL;
+};
 
 //
 //MTFTP4 token data
 //
-typedef struct _EFI_MTFTP4_TOKEN{
+struct _EFI_MTFTP4_TOKEN{
   IN OUT EFI_STATUS               Status;
   IN EFI_EVENT                    Event;
   IN EFI_MTFTP4_OVERRIDE_DATA     *OverrideData;
@@ -302,7 +302,7 @@ typedef struct _EFI_MTFTP4_TOKEN{
   IN EFI_MTFTP4_CHECK_PACKET      CheckPacket;
   IN EFI_MTFTP4_TIMEOUT_CALLBACK  TimeoutCallback;
   IN EFI_MTFTP4_PACKET_NEEDED     PacketNeeded;
-} EFI_MTFTP4_TOKEN;
+};
 
 #endif
 

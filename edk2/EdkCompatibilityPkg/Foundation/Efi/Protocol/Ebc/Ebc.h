@@ -168,12 +168,12 @@ EFI_STATUS
 //
 // Prototype for the actual EBC protocol interface
 //
-typedef struct _EFI_EBC_PROTOCOL {
+struct _EFI_EBC_PROTOCOL {
   EFI_EBC_CREATE_THUNK          CreateThunk;
   EFI_EBC_UNLOAD_IMAGE          UnloadImage;
   EFI_EBC_REGISTER_ICACHE_FLUSH RegisterICacheFlush;
   EFI_EBC_GET_VERSION           GetVersion;
-} EFI_EBC_PROTOCOL;
+};
 
 //
 // Extern the global EBC protocol GUID

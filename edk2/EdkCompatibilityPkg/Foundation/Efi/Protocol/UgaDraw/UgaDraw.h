@@ -170,11 +170,11 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_UGA_DRAW_PROTOCOL {
+struct _EFI_UGA_DRAW_PROTOCOL {
   EFI_UGA_DRAW_PROTOCOL_GET_MODE  GetMode;
   EFI_UGA_DRAW_PROTOCOL_SET_MODE  SetMode;
   EFI_UGA_DRAW_PROTOCOL_BLT       Blt;
-} EFI_UGA_DRAW_PROTOCOL;
+};
 
 extern EFI_GUID gEfiUgaDrawProtocolGuid;
 

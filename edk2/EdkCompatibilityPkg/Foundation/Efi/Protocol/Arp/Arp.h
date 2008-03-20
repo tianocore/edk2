@@ -32,7 +32,7 @@ Abstract:
 
 EFI_FORWARD_DECLARATION (EFI_ARP_PROTOCOL);
 
-typedef struct _EFI_ARP_FIND_DATA {
+struct _EFI_ARP_FIND_DATA {
 UINT32               Size;
 BOOLEAN              DenyFlag;
 BOOLEAN              StaticFlag;
@@ -40,7 +40,7 @@ UINT16               HwAddressType;
 UINT16               SwAddressType;
 UINT8                HwAddressLength;
 UINT8                SwAddressLength;
-} EFI_ARP_FIND_DATA;
+};
 
 
 //****************************************************
@@ -119,7 +119,7 @@ IN VOID              *TargetSwAddress  OPTIONAL,
 IN EFI_EVENT         ResolvedEvent     OPTIONAL
 );
 
-typedef struct _EFI_ARP_PROTOCOL {
+struct _EFI_ARP_PROTOCOL {
   EFI_ARP_CONFIGURE         Configure;
   EFI_ARP_ADD               Add;
   EFI_ARP_FIND              Find;
@@ -127,7 +127,7 @@ typedef struct _EFI_ARP_PROTOCOL {
   EFI_ARP_FLUSH             Flush;
   EFI_ARP_REQUEST           Request;
   EFI_ARP_CANCEL            Cancel;
-} EFI_ARP_PROTOCOL;
+};
 
 
 extern EFI_GUID gEfiArpServiceBindingProtocolGuid;

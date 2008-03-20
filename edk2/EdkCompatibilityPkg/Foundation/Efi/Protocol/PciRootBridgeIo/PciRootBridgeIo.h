@@ -196,7 +196,7 @@ EFI_STATUS
   OUT VOID                                     **Resources
   );
 
-typedef struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL {
+struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL {
   EFI_HANDLE                                      ParentHandle;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_POLL_IO_MEM     PollMem;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_POLL_IO_MEM     PollIo;
@@ -213,7 +213,7 @@ typedef struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL {
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_SET_ATTRIBUTES  SetAttributes;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_CONFIGURATION   Configuration;
   UINT32                                          SegmentNumber;
-} EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPciRootBridgeIoProtocolGuid;
 

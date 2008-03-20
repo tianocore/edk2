@@ -250,7 +250,7 @@ EFI_STATUS
 //
 // Interface structure for the PCI I/O Protocol
 //
-typedef struct _EFI_PCI_IO_PROTOCOL {
+struct _EFI_PCI_IO_PROTOCOL {
   EFI_PCI_IO_PROTOCOL_POLL_IO_MEM         PollMem;
   EFI_PCI_IO_PROTOCOL_POLL_IO_MEM         PollIo;
   EFI_PCI_IO_PROTOCOL_ACCESS              Mem;
@@ -268,7 +268,7 @@ typedef struct _EFI_PCI_IO_PROTOCOL {
   EFI_PCI_IO_PROTOCOL_SET_BAR_ATTRIBUTES  SetBarAttributes;
   UINT64                                  RomSize;
   VOID                                    *RomImage;
-} EFI_PCI_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPciIoProtocolGuid;
 

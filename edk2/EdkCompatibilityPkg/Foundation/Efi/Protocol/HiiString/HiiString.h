@@ -227,13 +227,13 @@ EFI_STATUS
 //
 // Interface structure for the EFI_HII_STRING_PROTOCOL
 //
-typedef struct _EFI_HII_STRING_PROTOCOL {
+struct _EFI_HII_STRING_PROTOCOL {
   EFI_HII_NEW_STRING        NewString;
   EFI_HII_GET_STRING        GetString;
   EFI_HII_SET_STRING        SetString;
   EFI_HII_GET_LANGUAGES     GetLanguages;
   EFI_HII_GET_2ND_LANGUAGES GetSecondaryLanguages;
-} EFI_HII_STRING_PROTOCOL;
+};
 
 extern EFI_GUID gEfiHiiStringProtocolGuid;
 

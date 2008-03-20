@@ -115,7 +115,7 @@ EFI_STATUS
   IN EFI_PHYSICAL_ADDRESS             HostAddress
   );
 
-typedef struct _EFI_DEVICE_IO_PROTOCOL {
+struct _EFI_DEVICE_IO_PROTOCOL {
   EFI_IO_ACCESS           Mem;
   EFI_IO_ACCESS           Io;
   EFI_IO_ACCESS           Pci;
@@ -125,7 +125,7 @@ typedef struct _EFI_DEVICE_IO_PROTOCOL {
   EFI_IO_ALLOCATE_BUFFER  AllocateBuffer;
   EFI_IO_FLUSH            Flush;
   EFI_IO_FREE_BUFFER      FreeBuffer;
-} EFI_DEVICE_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDeviceIoProtocolGuid;
 

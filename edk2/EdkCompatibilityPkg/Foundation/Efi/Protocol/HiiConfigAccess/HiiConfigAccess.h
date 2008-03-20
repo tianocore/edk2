@@ -136,11 +136,11 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_HII_CONFIG_ACCESS_PROTOCOL {
+struct _EFI_HII_CONFIG_ACCESS_PROTOCOL {
   EFI_HII_ACCESS_EXTRACT_CONFIG     ExtractConfig;
   EFI_HII_ACCESS_ROUTE_CONFIG       RouteConfig;
   EFI_HII_ACCESS_FORM_CALLBACK      Callback;
-} EFI_HII_CONFIG_ACCESS_PROTOCOL;
+};
 
 extern EFI_GUID gEfiHiiConfigAccessProtocolGuid;
 

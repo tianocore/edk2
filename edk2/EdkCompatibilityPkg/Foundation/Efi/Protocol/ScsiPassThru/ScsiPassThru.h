@@ -317,7 +317,7 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_SCSI_PASS_THRU_PROTOCOL {
+struct _EFI_SCSI_PASS_THRU_PROTOCOL {
   EFI_SCSI_PASS_THRU_MODE               *Mode;
   EFI_SCSI_PASS_THRU_PASSTHRU           PassThru;
   EFI_SCSI_PASS_THRU_GET_NEXT_DEVICE    GetNextDevice;
@@ -325,7 +325,7 @@ typedef struct _EFI_SCSI_PASS_THRU_PROTOCOL {
   EFI_SCSI_PASS_THRU_GET_TARGET_LUN     GetTargetLun;
   EFI_SCSI_PASS_THRU_RESET_CHANNEL      ResetChannel;
   EFI_SCSI_PASS_THRU_RESET_TARGET       ResetTarget;
-} EFI_SCSI_PASS_THRU_PROTOCOL;
+};
 
 extern EFI_GUID gEfiScsiPassThruProtocolGuid;
 
