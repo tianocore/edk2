@@ -32,7 +32,7 @@ Abstract:
 
 EFI_FORWARD_DECLARATION (EFI_ARP_PROTOCOL);
 
-struct _EFI_ARP_FIND_DATA {
+typedef struct _EFI_ARP_FIND_DATA {
 UINT32               Size;
 BOOLEAN              DenyFlag;
 BOOLEAN              StaticFlag;
@@ -40,7 +40,7 @@ UINT16               HwAddressType;
 UINT16               SwAddressType;
 UINT8                HwAddressLength;
 UINT8                SwAddressLength;
-};
+} EFI_ARP_FIND_DATA;
 
 
 //****************************************************
