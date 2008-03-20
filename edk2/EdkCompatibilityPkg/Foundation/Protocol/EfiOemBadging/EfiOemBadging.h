@@ -69,9 +69,9 @@ EFI_STATUS
 );
 
 
-typedef struct _EFI_OEM_BADGING_PROTOCOL {
+struct _EFI_OEM_BADGING_PROTOCOL {
   EFI_BADGING_GET_IMAGE       GetImage;
-} EFI_OEM_BADGING_PROTOCOL;
+};
 
 
 extern EFI_GUID gEfiOEMBadgingProtocolGuid;

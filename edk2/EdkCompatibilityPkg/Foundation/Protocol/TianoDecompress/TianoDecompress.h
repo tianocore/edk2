@@ -129,10 +129,10 @@ Returns:
 
 --*/
 
-typedef struct _EFI_TIANO_DECOMPRESS_PROTOCOL {
+struct _EFI_TIANO_DECOMPRESS_PROTOCOL {
   EFI_TIANO_DECOMPRESS_GET_INFO    GetInfo;
   EFI_TIANO_DECOMPRESS_DECOMPRESS  Decompress;
-} EFI_TIANO_DECOMPRESS_PROTOCOL;
+};
 
 extern EFI_GUID gEfiTianoDecompressProtocolGuid;
 

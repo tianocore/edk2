@@ -79,9 +79,9 @@ Returns:
 //
 // Protocol declaration
 //
-typedef struct _EFI_FTW_LITE_PROTOCOL {
+struct _EFI_FTW_LITE_PROTOCOL {
   EFI_FTW_LITE_WRITE               Write;
-} EFI_FTW_LITE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiFaultTolerantWriteLiteProtocolGuid;
 

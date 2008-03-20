@@ -51,7 +51,7 @@ EFI_STATUS
     EFI_DEVICE_ERROR      - The device is not functioning properly.
 
 --*/
-typedef struct _EFI_VGA_MINI_PORT_PROTOCOL {
+struct _EFI_VGA_MINI_PORT_PROTOCOL {
   EFI_VGA_MINI_PORT_SET_MODE  SetMode;
 
   UINT64                      VgaMemoryOffset;
@@ -63,7 +63,7 @@ typedef struct _EFI_VGA_MINI_PORT_PROTOCOL {
   UINT8                       CrtcDataRegisterBar;
 
   UINT8                       MaxMode;
-} EFI_VGA_MINI_PORT_PROTOCOL;
+};
 
 extern EFI_GUID gEfiVgaMiniPortProtocolGuid;
 

@@ -40,10 +40,10 @@ EFI_STATUS
   IN  EFI_HANDLE              Handle
   );
 
-typedef struct _EFI_PS2_POLICY_PROTOCOL {
+struct _EFI_PS2_POLICY_PROTOCOL {
   UINT8                 KeyboardLight;
   EFI_PS2_INIT_HARDWARE Ps2InitHardware;
-} EFI_PS2_POLICY_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPs2PolicyProtocolGuid;
 

@@ -91,11 +91,11 @@ EFI_GAUGE_DATA *
   );
 
 
-typedef struct _EFI_PERFORMANCE_PROTOCOL{
+struct _EFI_PERFORMANCE_PROTOCOL {
   EFI_PERF_START_GAUGE  StartGauge;
   EFI_PERF_END_GAUGE    EndGauge;
   EFI_PERF_GET_GAUGE    GetGauge;
-} EFI_PERFORMANCE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPerformanceProtocolGuid;
 

@@ -105,13 +105,13 @@ EFI_STATUS
 //
 // Extended Sal Boot Service Protocol Interface
 //
-typedef struct _EXTENDED_SAL_BOOT_SERVICE_PROTOCOL{
+struct _EXTENDED_SAL_BOOT_SERVICE_PROTOCOL {
   EXTENDED_SAL_ADD_SST_INFO                       AddSalSystemTableInfo;
   EXTENDED_SAL_ADD_SST_ENTRY                      AddSalSystemTableEntry;
   EXTENDED_SAL_REGISTER_INTERNAL_PROC             AddExtendedSalProc;   
   SAL_EXTENDED_SAL_PROC                           ExtendedSalProc;
   SAL_PROC                                        SalProc;
-} EXTENDED_SAL_BOOT_SERVICE_PROTOCOL;
+};
 
 extern EFI_GUID   gEfiExtendedSalBootServiceProtocolGuid;
 

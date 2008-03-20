@@ -72,11 +72,11 @@ EFI_STATUS
 //
 //  Protocol Interface Structure
 //
-typedef struct _EFI_USB_ATAPI_PROTOCOL {
+struct _EFI_USB_ATAPI_PROTOCOL {
   EFI_USB_ATAPI_PACKET_CMD        UsbAtapiPacketCmd;
   EFI_USB_MASS_STORAGE_RESET      UsbAtapiReset;
   UINT32                          CommandProtocol;
-} EFI_USB_ATAPI_PROTOCOL;
+};
 
 extern EFI_GUID gEfiUsbAtapiProtocolGuid;
 

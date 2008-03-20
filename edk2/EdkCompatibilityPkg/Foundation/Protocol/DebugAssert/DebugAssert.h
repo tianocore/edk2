@@ -73,7 +73,7 @@ EFI_STATUS
   IN  UINTN                             ErrorLevel
   );
 
-typedef struct _EFI_DEBUG_ASSERT_PROTOCOL {
+struct _EFI_DEBUG_ASSERT_PROTOCOL {
   
   EFI_DEBUG_ASSERT    Assert;
   EFI_DEBUG_PRINT     Print;
@@ -82,7 +82,7 @@ typedef struct _EFI_DEBUG_ASSERT_PROTOCOL {
   EFI_GET_ERROR_LEVEL GetErrorLevel;
   EFI_SET_ERROR_LEVEL SetErrorLevel;
 
-} EFI_DEBUG_ASSERT_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDebugAssertProtocolGuid;
 

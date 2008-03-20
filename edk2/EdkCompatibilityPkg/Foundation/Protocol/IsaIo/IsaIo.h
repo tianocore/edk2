@@ -169,7 +169,7 @@ EFI_STATUS
 //
 // Interface structure for the ISA I/O Protocol
 //
-typedef struct _EFI_ISA_IO_PROTOCOL {
+struct _EFI_ISA_IO_PROTOCOL {
   EFI_ISA_IO_PROTOCOL_ACCESS           Mem;
   EFI_ISA_IO_PROTOCOL_ACCESS           Io;
   EFI_ISA_IO_PROTOCOL_COPY_MEM         CopyMem;
@@ -181,7 +181,7 @@ typedef struct _EFI_ISA_IO_PROTOCOL {
   EFI_ISA_ACPI_RESOURCE_LIST           *ResourceList;
   UINT32                               RomSize;
   VOID                                 *RomImage;
-} EFI_ISA_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiIsaIoProtocolGuid;
 
@@ -345,7 +345,7 @@ Returns:
 //
 // Interface structure for the Light ISA I/O Protocol
 //
-typedef struct _EFI_LIGHT_ISA_IO_PROTOCOL {
+struct _EFI_LIGHT_ISA_IO_PROTOCOL {
   EFI_LIGHT_ISA_IO_PROTOCOL_ACCESS     Io;
   EFI_LIGHT_ISA_IO_PROTOCOL_MAP        Map;
   EFI_LIGHT_ISA_IO_PROTOCOL_UNMAP      Unmap;
@@ -353,7 +353,7 @@ typedef struct _EFI_LIGHT_ISA_IO_PROTOCOL {
   EFI_ISA_ACPI_RESOURCE_LIST           *ResourceList;
   UINT32                               RomSize;
   VOID                                 *RomImage;
-} EFI_LIGHT_ISA_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiLightIsaIoProtocolGuid;
 

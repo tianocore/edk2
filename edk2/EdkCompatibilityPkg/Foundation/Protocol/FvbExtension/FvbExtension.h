@@ -43,9 +43,9 @@ EFI_STATUS
 //
 // IPMI TRANSPORT PROTOCOL
 //
-typedef struct _EFI_FVB_EXTENSION_PROTOCOL {
+struct _EFI_FVB_EXTENSION_PROTOCOL {
   EFI_FV_ERASE_CUSTOM_BLOCK               EraseFvbCustomBlock;
- } EFI_FVB_EXTENSION_PROTOCOL;
+ };
 
 extern EFI_GUID                           gEfiFvbExtensionProtocolGuid;
 

@@ -167,13 +167,13 @@ extern EFI_GUID gEfiDiskInfoUsbInterfaceGuid;
   }
 extern EFI_GUID gEfiDiskInfoAhciInterfaceGuid;
 
-typedef struct _EFI_DISK_INFO_PROTOCOL {
+struct _EFI_DISK_INFO_PROTOCOL {
   EFI_GUID                  Interface;
   EFI_DISK_INFO_INQUIRY     Inquiry;
   EFI_DISK_INFO_IDENTIFY    Identify;
   EFI_DISK_INFO_SENSE_DATA  SenseData;
   EFI_DISK_INFO_WHICH_IDE   WhichIde;
-} EFI_DISK_INFO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDiskInfoProtocolGuid;
 
