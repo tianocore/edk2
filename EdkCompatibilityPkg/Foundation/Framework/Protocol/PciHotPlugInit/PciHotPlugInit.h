@@ -85,11 +85,11 @@ EFI_STATUS
 //
 
 
-typedef struct _EFI_PCI_HOT_PLUG_INIT_PROTOCOL {
+struct _EFI_PCI_HOT_PLUG_INIT_PROTOCOL {
   EFI_GET_ROOT_HPC_LIST                                  GetRootHpcList;
   EFI_INITIALIZE_ROOT_HPC                                InitializeRootHpc;
   EFI_GET_PCI_HOT_PLUG_PADDING                           GetResourcePadding;
-} EFI_PCI_HOT_PLUG_INIT_PROTOCOL;
+};
 
 
 extern EFI_GUID gEfiPciHotPlugInitProtocolGuid;

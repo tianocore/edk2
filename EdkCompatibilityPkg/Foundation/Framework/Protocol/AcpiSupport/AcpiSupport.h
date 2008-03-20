@@ -116,10 +116,10 @@ EFI_STATUS
 //
 // ACPI Support Protocol
 //
-typedef struct _EFI_ACPI_SUPPORT_PROTOCOL {
+struct _EFI_ACPI_SUPPORT_PROTOCOL {
   EFI_ACPI_GET_ACPI_TABLE GetAcpiTable;
   EFI_ACPI_SET_ACPI_TABLE SetAcpiTable;
   EFI_ACPI_PUBLISH_TABLES PublishTables;
-} EFI_ACPI_SUPPORT_PROTOCOL;
+};
 
 #endif

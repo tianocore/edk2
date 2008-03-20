@@ -72,11 +72,11 @@ EFI_STATUS
 //
 // Protocol definition
 //
-typedef struct _EFI_SECTION_EXTRACTION_PROTOCOL {
+struct _EFI_SECTION_EXTRACTION_PROTOCOL {
   EFI_OPEN_SECTION_STREAM   OpenSectionStream;
   EFI_GET_SECTION           GetSection;
   EFI_CLOSE_SECTION_STREAM  CloseSectionStream;
-} EFI_SECTION_EXTRACTION_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSectionExtractionProtocolGuid;
 

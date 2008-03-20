@@ -83,10 +83,10 @@ typedef struct {
 // EFI_CPU_IO_PROTOCOL
 // *******************************************************
 //
-typedef struct _EFI_CPU_IO_PROTOCOL {
+struct _EFI_CPU_IO_PROTOCOL {
   EFI_CPU_IO_PROTOCOL_ACCESS  Mem;
   EFI_CPU_IO_PROTOCOL_ACCESS  Io;
-} EFI_CPU_IO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiCpuIoProtocolGuid;
 

@@ -36,8 +36,6 @@ Abstract:
 //
 // Forward reference for pure ANSI compatability
 //
-EFI_FORWARD_DECLARATION (EFI_FORM_CALLBACK_PROTOCOL);
-
 typedef struct _EFI_FORM_CALLBACK_PROTOCOL  EFI_FORM_CALLBACK_PROTOCOL;
 
 #define RESET_REQUIRED  1 // Flags setting to signify that the callback operation resulted in an eventual
@@ -109,11 +107,11 @@ EFI_STATUS
   OUT    EFI_HII_CALLBACK_PACKET       **Packet
   );
 
-typedef struct _EFI_FORM_CALLBACK_PROTOCOL {
+struct _EFI_FORM_CALLBACK_PROTOCOL {
   EFI_NV_READ       NvRead;
   EFI_NV_WRITE      NvWrite;
   EFI_FORM_CALLBACK Callback;
-} EFI_FORM_CALLBACK_PROTOCOL;
+};
 
 extern EFI_GUID gEfiFormCallbackProtocolGuid;
 

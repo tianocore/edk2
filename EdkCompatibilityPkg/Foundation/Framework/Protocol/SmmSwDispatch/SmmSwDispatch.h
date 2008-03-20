@@ -140,11 +140,11 @@ EFI_STATUS
 //
 // Interface structure for the SMM Software SMI Dispatch Protocol
 //
-typedef struct _EFI_SMM_SW_DISPATCH_PROTOCOL {
+struct _EFI_SMM_SW_DISPATCH_PROTOCOL {
   EFI_SMM_SW_REGISTER   Register;
   EFI_SMM_SW_UNREGISTER UnRegister;
   UINTN                 MaximumSwiValue;
-} EFI_SMM_SW_DISPATCH_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmSwDispatchProtocolGuid;
 

@@ -67,12 +67,12 @@ EFI_STATUS
   IN OUT EFI_SMM_CONTROL_REGISTER       * SmiRegister
   );
 
-typedef struct _EFI_SMM_CONTROL_PROTOCOL {
+struct _EFI_SMM_CONTROL_PROTOCOL {
   EFI_SMM_ACTIVATE          Trigger;
   EFI_SMM_DEACTIVATE        Clear;
   EFI_SMM_GET_REGISTER_INFO GetRegisterInfo;
   UINTN                     MinimumTriggerPeriod;
-} EFI_SMM_CONTROL_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmControlProtocolGuid;
 

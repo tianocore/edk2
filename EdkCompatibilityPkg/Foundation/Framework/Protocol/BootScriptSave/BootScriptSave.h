@@ -63,10 +63,10 @@ EFI_STATUS
 //
 // S3 Save Protocol data structure
 //
-typedef struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL {
+struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL {
   EFI_BOOT_SCRIPT_WRITE       Write;
   EFI_BOOT_SCRIPT_CLOSE_TABLE CloseTable;
-} EFI_BOOT_SCRIPT_SAVE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiBootScriptSaveGuid;
 

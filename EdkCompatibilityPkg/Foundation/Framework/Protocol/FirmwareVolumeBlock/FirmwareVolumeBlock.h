@@ -235,7 +235,7 @@ Returns:
 --*/
 ;
 
-typedef struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
+struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
   EFI_FVB_GET_ATTRIBUTES        GetVolumeAttributes;
   EFI_FVB_SET_ATTRIBUTES        SetVolumeAttributes;
   EFI_FVB_GET_PHYSICAL_ADDRESS  GetPhysicalAddress;
@@ -244,7 +244,7 @@ typedef struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
   EFI_FVB_WRITE                 Write;
   EFI_FVB_ERASE_BLOCKS          EraseBlocks;
   EFI_HANDLE                    ParentHandle;
-} EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL;
+};
 
 extern EFI_GUID gEfiFirmwareVolumeBlockProtocolGuid;
 

@@ -694,7 +694,7 @@ Returns:
 --*/
 ;
 
-typedef struct _EFI_LEGACY_BIOS_PROTOCOL {
+struct _EFI_LEGACY_BIOS_PROTOCOL {
   EFI_LEGACY_BIOS_INT86                       Int86;
   EFI_LEGACY_BIOS_FARCALL86                   FarCall86;
   EFI_LEGACY_BIOS_CHECK_ROM                   CheckPciRom;
@@ -707,7 +707,7 @@ typedef struct _EFI_LEGACY_BIOS_PROTOCOL {
   EFI_LEGACY_BIOS_GET_LEGACY_REGION           GetLegacyRegion;
   EFI_LEGACY_BIOS_COPY_LEGACY_REGION          CopyLegacyRegion;
   EFI_LEGACY_BIOS_BOOT_UNCONVENTIONAL_DEVICE  BootUnconventionalDevice;
-} EFI_LEGACY_BIOS_PROTOCOL;
+};
 
 extern EFI_GUID gEfiLegacyBiosProtocolGuid;
 

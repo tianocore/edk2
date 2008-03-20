@@ -70,12 +70,12 @@ EFI_STATUS
   OUT UINT32                              *Granularity OPTIONAL
   );
 
-typedef struct _EFI_LEGACY_REGION_PROTOCOL {
+struct _EFI_LEGACY_REGION_PROTOCOL {
   EFI_LEGACY_REGION_DECODE    Decode;
   EFI_LEGACY_REGION_LOCK      Lock;
   EFI_LEGACY_REGION_BOOT_LOCK BootLock;
   EFI_LEGACY_REGION_UNLOCK    UnLock;
-} EFI_LEGACY_REGION_PROTOCOL;
+};
 
 extern EFI_GUID gEfiLegacyRegionProtocolGuid;
 

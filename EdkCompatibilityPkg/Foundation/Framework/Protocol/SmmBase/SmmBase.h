@@ -85,10 +85,10 @@ typedef struct {
   EFI_SMM_CPU_IO  Write;
 } EFI_SMM_IO_ACCESS;
 
-typedef struct _EFI_SMM_CPU_IO_INTERFACE {
+struct _EFI_SMM_CPU_IO_INTERFACE {
   EFI_SMM_IO_ACCESS Mem;
   EFI_SMM_IO_ACCESS Io;
-} EFI_SMM_CPU_IO_INTERFACE;
+};
 
 typedef
 EFI_STATUS
@@ -134,7 +134,7 @@ EFI_STATUS
   IN  OUT VOID                            *ProcArguments OPTIONAL
   );
 
-typedef struct _EFI_SMM_CPU_SAVE_STATE {
+struct _EFI_SMM_CPU_SAVE_STATE {
   UINT8   Reserved1[248];
   UINT32  SMBASE;
   UINT32  SMMRevId;
@@ -163,7 +163,7 @@ typedef struct _EFI_SMM_CPU_SAVE_STATE {
   UINT32  EFLAGS;
   UINT32  CR3;
   UINT32  CR0;
-} EFI_SMM_CPU_SAVE_STATE;
+};
 
 typedef struct {
   UINT8   Reserved19[760];    // FC00
@@ -341,7 +341,7 @@ typedef struct {
   UINT32  CR0;
 } EFI_SMM_CPU_CT_NOT_ENABLED_SAVE_STATE;
 
-typedef struct _EFI_SMM_OPTIONAL_FP_SAVE_STATE {
+struct _EFI_SMM_OPTIONAL_FP_SAVE_STATE {
   UINT16  Fcw;
   UINT16  Fsw;
   UINT16  Ftw;
@@ -361,7 +361,7 @@ typedef struct _EFI_SMM_OPTIONAL_FP_SAVE_STATE {
   UINT8   St0Mm6[10], Rsvd9[6];
   UINT8   St0Mm7[10], Rsvd10[6];
   UINT8   Rsvd11[22 * 16];
-} EFI_SMM_OPTIONAL_FP_SAVE_STATE;
+};
 
 typedef struct _EFI_SMM_OPTIONAL_FP_SAVE_STATE32 {
   UINT16  Fcw;
@@ -464,7 +464,7 @@ EFI_STATUS
 //
 // System Management System Table (SMST)
 //
-typedef struct _EFI_SMM_SYSTEM_TABLE {
+struct _EFI_SMM_SYSTEM_TABLE {
   EFI_TABLE_HEADER                    Hdr;
 
   CHAR16                              *SmmFirmwareVendor;
@@ -505,7 +505,7 @@ typedef struct _EFI_SMM_SYSTEM_TABLE {
   UINTN                               NumberOfTableEntries;
   EFI_CONFIGURATION_TABLE             *SmmConfigurationTable;
 
-} EFI_SMM_SYSTEM_TABLE;
+};
 
 //
 // SMM Handler Definition
@@ -779,7 +779,7 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_SMM_BASE_PROTOCOL {
+struct _EFI_SMM_BASE_PROTOCOL {
   EFI_SMM_REGISTER_HANDLER    Register;
   EFI_SMM_UNREGISTER_HANDLER  UnRegister;
   EFI_SMM_COMMUNICATE         Communicate;
@@ -788,7 +788,7 @@ typedef struct _EFI_SMM_BASE_PROTOCOL {
   EFI_SMM_ALLOCATE_POOL       SmmAllocatePool;
   EFI_SMM_FREE_POOL           SmmFreePool;
   EFI_SMM_GET_SMST_LOCATION   GetSmstLocation;
-} EFI_SMM_BASE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmBaseProtocolGuid;
 extern EFI_GUID gEfiSmmCpuIoGuid;

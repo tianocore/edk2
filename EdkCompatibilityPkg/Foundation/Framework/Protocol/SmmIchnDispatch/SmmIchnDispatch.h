@@ -194,10 +194,10 @@ EFI_STATUS
 //
 // Interface structure for the SMM Ich n specific SMI Dispatch Protocol
 //
-typedef struct _EFI_SMM_ICHN_DISPATCH_PROTOCOL {
+struct _EFI_SMM_ICHN_DISPATCH_PROTOCOL {
   EFI_SMM_ICHN_REGISTER   Register;
   EFI_SMM_ICHN_UNREGISTER UnRegister;
-} EFI_SMM_ICHN_DISPATCH_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmIchnDispatchProtocolGuid;
 

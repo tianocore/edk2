@@ -139,10 +139,10 @@ EFI_STATUS
 //
 // Interface structure for the SMM USB SMI Dispatch Protocol
 //
-typedef struct _EFI_SMM_USB_DISPATCH_PROTOCOL {
+struct _EFI_SMM_USB_DISPATCH_PROTOCOL {
   EFI_SMM_USB_REGISTER    Register;
   EFI_SMM_USB_UNREGISTER  UnRegister;
-} EFI_SMM_USB_DISPATCH_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmUsbDispatchProtocolGuid;
 

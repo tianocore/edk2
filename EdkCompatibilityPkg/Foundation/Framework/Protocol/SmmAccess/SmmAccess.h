@@ -65,14 +65,14 @@ EFI_STATUS
   IN OUT EFI_SMRAM_DESCRIPTOR            * SmramMap
   );
 
-typedef struct _EFI_SMM_ACCESS_PROTOCOL {
+struct _EFI_SMM_ACCESS_PROTOCOL {
   EFI_SMM_OPEN          Open;
   EFI_SMM_CLOSE         Close;
   EFI_SMM_LOCK          Lock;
   EFI_SMM_CAPABILITIES  GetCapabilities;
   BOOLEAN               LockState;
   BOOLEAN               OpenState;
-} EFI_SMM_ACCESS_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmAccessProtocolGuid;
 

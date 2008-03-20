@@ -56,10 +56,10 @@ EFI_STATUS
   OUT UINTN                         * Size
 );
 
-typedef struct _EFI_ACPI_S3_SAVE_PROTOCOL {
+struct _EFI_ACPI_S3_SAVE_PROTOCOL {
   EFI_ACPI_GET_LEGACY_MEMORY_SIZE   GetLegacyMemorySize;
   EFI_ACPI_S3_SAVE                  S3Save;
-} EFI_ACPI_S3_SAVE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiAcpiS3SaveGuid;
 

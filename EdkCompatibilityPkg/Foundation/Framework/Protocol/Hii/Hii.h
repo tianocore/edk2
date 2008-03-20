@@ -36,8 +36,6 @@ Abstract:
 //
 // Forward reference for pure ANSI compatability
 //
-EFI_FORWARD_DECLARATION (EFI_HII_PROTOCOL);
-
 typedef struct _EFI_HII_PROTOCOL  EFI_HII_PROTOCOL;
 
 //
@@ -585,7 +583,7 @@ EFI_STATUS
   OUT    EFI_KEY_DESCRIPTOR  * Descriptor
   );
 
-typedef struct _EFI_HII_PROTOCOL {
+struct _EFI_HII_PROTOCOL {
   EFI_HII_NEW_PACK            NewPack;
   EFI_HII_REMOVE_PACK         RemovePack;
   EFI_HII_FIND_HANDLES        FindHandles;
@@ -606,7 +604,7 @@ typedef struct _EFI_HII_PROTOCOL {
   EFI_HII_UPDATE_FORM         UpdateForm;
 
   EFI_HII_GET_KEYBOARD_LAYOUT GetKeyboardLayout;
-} EFI_HII_PROTOCOL;
+};
 
 extern EFI_GUID gEfiHiiProtocolGuid;
 

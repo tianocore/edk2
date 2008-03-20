@@ -194,11 +194,11 @@ EFI_STATUS
 //
 // Interface structure for the SMM Periodic Timer Dispatch Protocol
 //
-typedef struct _EFI_SMM_PERIODIC_TIMER_DISPATCH_PROTOCOL {
+struct _EFI_SMM_PERIODIC_TIMER_DISPATCH_PROTOCOL {
   EFI_SMM_PERIODIC_TIMER_REGISTER   Register;
   EFI_SMM_PERIODIC_TIMER_UNREGISTER UnRegister;
   EFI_SMM_PERIODIC_TIMER_INTERVAL   GetNextShorterInterval;
-} EFI_SMM_PERIODIC_TIMER_DISPATCH_PROTOCOL;
+};
 
 extern EFI_GUID gEfiSmmPeriodicTimerDispatchProtocolGuid;
 
