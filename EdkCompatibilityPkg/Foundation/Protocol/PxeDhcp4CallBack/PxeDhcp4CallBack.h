@@ -71,10 +71,10 @@ EFI_PXE_DHCP4_CALLBACK_STATUS
   IN DHCP4_PACKET           *Packet OPTIONAL
   );
 
-typedef struct _EFI_PXE_DHCP4_CALLBACK_PROTOCOL {
+struct _EFI_PXE_DHCP4_CALLBACK_PROTOCOL {
   UINT64                      Revision;
   EFI_PXE_DHCP4_CALLBACK      Callback;
-} EFI_PXE_DHCP4_CALLBACK_PROTOCOL;
+};
 
 //
 // GUID declaration

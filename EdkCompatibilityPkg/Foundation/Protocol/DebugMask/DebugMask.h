@@ -57,11 +57,11 @@ EFI_STATUS
 //
 // DebugMask protocol definition
 //
-typedef struct _EFI_DEBUG_MASK_PROTOCOL {
+struct _EFI_DEBUG_MASK_PROTOCOL {
   INT64                               Revision;
   EFI_GET_DEBUG_MASK                  GetDebugMask;
   EFI_SET_DEBUG_MASK                  SetDebugMask;
-} EFI_DEBUG_MASK_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDebugMaskProtocolGuid;
 

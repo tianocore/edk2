@@ -53,10 +53,10 @@ EFI_STATUS
   IN EFI_HANDLE                       ImageHandle
   );
 
-typedef struct _EFI_PE32_IMAGE_PROTOCOL {
+struct _EFI_PE32_IMAGE_PROTOCOL {
   LOAD_PE_IMAGE     LoadPeImage;
   UNLOAD_PE_IMAGE  UnLoadPeImage;
-} EFI_PE32_IMAGE_PROTOCOL;
+};
 
 extern EFI_GUID gEfiLoadPeImageGuid;
 

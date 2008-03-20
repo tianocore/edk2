@@ -110,10 +110,10 @@ BOOLEAN
 --*/
 ;
 
-typedef struct _EFI_LEGACY_BIOS_THUNK_PROTOCOL {
+struct _EFI_LEGACY_BIOS_THUNK_PROTOCOL {
   EFI_LEGACY_BIOS_THUNK_INT86                 Int86;
   EFI_LEGACY_BIOS_THUNK_FARCALL86             FarCall86;
-} EFI_LEGACY_BIOS_THUNK_PROTOCOL;
+};
 
 extern EFI_GUID gEfiLegacyBiosThunkProtocolGuid;
 

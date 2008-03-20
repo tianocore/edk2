@@ -143,12 +143,12 @@ EFI_STATUS
 --*/
 ;
 
-typedef struct _EFI_GENERIC_MEMORY_TEST_PROTOCOL {
+struct _EFI_GENERIC_MEMORY_TEST_PROTOCOL {
   EFI_MEMORY_TEST_INIT              MemoryTestInit;
   EFI_PERFORM_MEMORY_TEST           PerformMemoryTest;
   EFI_MEMORY_TEST_FINISHED          Finished;
   EFI_MEMORY_TEST_COMPATIBLE_RANGE  CompatibleRangeTest;
-} EFI_GENERIC_MEMORY_TEST_PROTOCOL;
+};
 
 extern EFI_GUID gEfiGenericMemTestProtocolGuid;
 #endif

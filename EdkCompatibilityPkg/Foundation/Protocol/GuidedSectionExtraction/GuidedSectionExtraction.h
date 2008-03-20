@@ -61,9 +61,9 @@ EFI_STATUS
 //
 // Protocol definition
 //
-typedef struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL {
+struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL {
   EFI_EXTRACT_GUIDED_SECTION  ExtractSection;
-} EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL;
+};
 
 //
 // may add other GUID here

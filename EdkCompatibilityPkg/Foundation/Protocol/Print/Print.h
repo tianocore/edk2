@@ -41,9 +41,9 @@ UINTN
   IN  VA_LIST       Marker
   );
 
-typedef struct _EFI_PRINT_PROTOCOL {
+struct _EFI_PRINT_PROTOCOL {
   EFI_VSPRINT                                   VSPrint;
-} EFI_PRINT_PROTOCOL;
+};
 
 
 extern EFI_GUID gEfiPrintProtocolGuid;

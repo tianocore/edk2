@@ -68,7 +68,7 @@ EFI_STATUS
   IN EFI_VARIABLE_STORE_PROTOCOL   *This
   );
 
-typedef struct _EFI_VARIABLE_STORE_PROTOCOL {
+struct _EFI_VARIABLE_STORE_PROTOCOL {
   
   //
   // Number of banks and bank size
@@ -84,7 +84,7 @@ typedef struct _EFI_VARIABLE_STORE_PROTOCOL {
   EFI_UPDATE_STORE            UpdateStore;
   EFI_CLEANUP_STORE           CleanupStore;
 
-} EFI_VARIABLE_STORE_PROTOCOL;
+};
 
 //
 //
