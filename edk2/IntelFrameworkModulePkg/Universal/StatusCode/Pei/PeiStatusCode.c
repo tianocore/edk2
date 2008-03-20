@@ -138,8 +138,10 @@ PeiStatusCodeDriverEntry (
   // Install PeiStatusCodePpi.
   // PeiServices use this Ppi to output status code.
   // use library
-  Status = PeiServicesInstallPpi (&mStatusCodePpiDescriptor);
-  ASSERT_EFI_ERROR (Status);
+  if (!FeaturePcdGet(PcdNtEmulatorEnable)) {
+    Status = PeiServicesInstallPpi (&mStatusCodePpiDescriptor);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return EFI_SUCCESS;
 }
