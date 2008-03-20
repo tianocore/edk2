@@ -42,11 +42,11 @@ EFI_STATUS
   IN VOID                                       *Context
   );
 
-typedef struct _EFI_PEI_TRANSFER_CONTROL_PROTOCOL {
+struct _EFI_PEI_TRANSFER_CONTROL_PROTOCOL {
   EFI_PEI_TRANSFER_CONTROL_LONG_JUMP   SetJump;
   EFI_PEI_TRANSFER_CONTROL_LONG_JUMP   LongJump;
   UINT32                               JumpContextSize;
-} EFI_PEI_TRANSFER_CONTROL_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPeiTransferControlGuid;
 
