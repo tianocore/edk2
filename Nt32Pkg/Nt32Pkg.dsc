@@ -336,7 +336,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
