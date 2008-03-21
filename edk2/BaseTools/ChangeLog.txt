@@ -42,20 +42,24 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 ##########                 Revision number of tools source code                 ##########
     BaseTools/Bin/Win32/build.exe
-        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
-        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
-        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
 
     BaseTools/Bin/Win32/GenFds.exe
-        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r937 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+
+    BaseTools/Bin/Win32/GenDepex.exe
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/AutoGen
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
     BaseTools/Bin/Win32/Trim.exe
-        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
-        r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
+        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
     BaseTools/Bin/Win32/MigrationMsa2Inf.exe
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/MigrationMsa2Inf
@@ -70,6 +74,31 @@ EDK_0000: Compatible: owner
 
     BaseTools/Bin/Win32/Fpd2Dsc.exe
         r767 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/fpd2dsc
+
+==========================================================================================
+EDK_4859: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Changed VfrCompile.exe to be UEFI HII compatible
+        2) Improved R8 module build
+        3) Added binary file build 
+        4) Removed "extern int __make_me_compile_correctly" in AutoGen code for 
+           R9 modules, but kept for R8 modules
+        5) Enfored more error check and introduced a optimization for GenDepex
+        6) Added BUILD_RULE_CONF in target.txt to specify build rules file
+        7) Rebuilt all Python tools with Python2.5.2
+ 
+        Code Change :
+        1) build.exe
+        2) VfrCompile.exe
+        3) GenFds.exe
+        4) GenDepex.exe
+        5) target.template
+
+
+        Possible Impacts:
+        1) All EFI code needs to be UEFI HII compatible.
+        2) Conf/target.txt needs to be replaced by new target.template
 
 ==========================================================================================
 EDK_4251: Non-Compatible: jwang36
