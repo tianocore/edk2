@@ -422,7 +422,7 @@ Returns:
   Status = gBS->LocateProtocol (
                    &gEfiIScsiInitiatorNameProtocolGuid,
                    NULL,
-                   &IScsiInitiatorName
+                   (VOID**) &IScsiInitiatorName
                    );
 
   if (!EFI_ERROR (Status)) {
