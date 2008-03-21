@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -413,8 +413,21 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
-  //EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
+  EFI_STATUS                         Status;
+  EFI_ISCSI_INITIATOR_NAME_PROTOCOL  *IScsiInitiatorName;
+
+  //
+  // There should be only one EFI_ISCSI_INITIATOR_NAME_PROTOCOL.
+  //
+  Status = gBS->LocateProtocol (
+                   &gEfiIScsiInitiatorNameProtocolGuid,
+                   NULL,
+                   &IScsiInitiatorName
+                   );
+
+  if (!EFI_ERROR (Status)) {
+    return EFI_ACCESS_DENIED;
+  }
 
   //
   // Initialize the EFI Driver Library
@@ -427,12 +440,11 @@ Returns:
              &gIScsiComponentName,
              &gIScsiComponentName2
            );
-  
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   if (!EFI_ERROR (Status)) {
+    //
+    // Install the iSCSI Initiator Name Protocol.
+    //
     Status = gBS->InstallProtocolInterface (
                     &ImageHandle,
                     &gEfiIScsiInitiatorNameProtocolGuid,
@@ -450,13 +462,28 @@ Returns:
             &gIScsiComponentName,
             NULL
             );
+      return Status;
+    }
+  
+    //
+    // Initialize the configuration form of iSCSI.
+    //
+    Status = IScsiConfigFormInit (gIScsiDriverBinding.DriverBindingHandle);
+    if (EFI_ERROR (Status)) {
+      gBS->UninstallMultipleProtocolInterfaces (
+            ImageHandle,
+            &gEfiDriverBindingProtocolGuid,
+            &gIScsiDriverBinding,
+            &gEfiComponentName2ProtocolGuid,
+            &gIScsiComponentName2,
+            &gEfiComponentNameProtocolGuid,
+            &gIScsiComponentName,
+            &gEfiIScsiInitiatorNameProtocolGuid,
+            &gIScsiInitiatorName,
+            NULL
+            );
     }
   }
-  //
-  // Initialize the configuration form of iSCSI.
-  //
-  IScsiConfigFormInit (gIScsiDriverBinding.DriverBindingHandle);
-
   return Status;
 }
 

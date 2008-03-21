@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,10 +19,10 @@ Abstract:
 
 #include "IScsiImpl.h"
 
-EFI_GUID        mVendorGuid             = ISCSI_CONFIG_GUID;
-BOOLEAN         mIScsiDeviceListUpdated = FALSE;
-UINTN           mNumberOfIScsiDevices   = 0;
-ISCSI_FORM_CALLBACK_INFO  *mCallbackInfo;
+EFI_GUID        mVendorGuid              = ISCSI_CONFIG_GUID;
+BOOLEAN         mIScsiDeviceListUpdated  = FALSE;
+UINTN           mNumberOfIScsiDevices    = 0;
+ISCSI_FORM_CALLBACK_INFO  *mCallbackInfo = NULL;
 
 LIST_ENTRY      mIScsiConfigFormList = {
   &mIScsiConfigFormList,
@@ -923,9 +923,9 @@ Returns:
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CallbackInfo->Signature             = ISCSI_FORM_CALLBACK_INFO_SIGNATURE;
+  CallbackInfo->Signature   = ISCSI_FORM_CALLBACK_INFO_SIGNATURE;
   CallbackInfo->HiiDatabase = HiiDatabase;
-  CallbackInfo->Current               = NULL;
+  CallbackInfo->Current     = NULL;
 
   CallbackInfo->ConfigAccess.ExtractConfig = IScsiFormExtractConfig;
   CallbackInfo->ConfigAccess.RouteConfig = IScsiFormRouteConfig;
@@ -933,6 +933,7 @@ Returns:
 
   Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **)&CallbackInfo->ConfigRouting);
   if (EFI_ERROR (Status)) {
+    FreePool(CallbackInfo);
     return Status;
   }
 
@@ -941,6 +942,7 @@ Returns:
   //
   Status = HiiLibCreateHiiDriverHandle (&CallbackInfo->DriverHandle);
   if (EFI_ERROR (Status)) {
+    FreePool(CallbackInfo);
     return Status;
   }
   
@@ -967,8 +969,9 @@ Returns:
                            CallbackInfo->DriverHandle,
                            &CallbackInfo->RegisteredHandle
                            );
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
   if (EFI_ERROR (Status)) {
+    FreePool(CallbackInfo);
     return Status;
   }
 
