@@ -37,7 +37,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 
-#include <IndustryStandard/pci22.h>
+#include <IndustryStandard/Pci22.h>
 #include "idedata.h"
 
 //
