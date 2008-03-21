@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 
-#include <IndustryStandard/pci22.h>
+#include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Acpi.h>
 
 
