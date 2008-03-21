@@ -78,9 +78,9 @@ Returns:
 //
 // Interface stucture for the STATUS CODE Architectural Protocol
 //
-struct _EFI_STATUS_CODE_PROTOCOL {
+typedef struct _EFI_STATUS_CODE_PROTOCOL {
   EFI_REPORT_STATUS_CODE         ReportStatusCode;
-};
+} EFI_STATUS_CODE_PROTOCOL;
 
 /*++
 //  Protocol Description:
