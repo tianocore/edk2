@@ -22,8 +22,6 @@ Abstract:
 #ifndef _GENERIC_BDS_LIB_H_
 #define _GENERIC_BDS_LIB_H_
 
-#define PI_SPECIFICATION_VERSION 0x00010000
-
 #include <PiDxe.h>
 #include <Protocol/HiiDatabase.h>
 #include <IndustryStandard/PeImage.h>
