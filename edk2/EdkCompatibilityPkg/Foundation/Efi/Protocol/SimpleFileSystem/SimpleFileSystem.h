@@ -356,7 +356,7 @@ EFI_STATUS
 ;
 
 #define EFI_FILE_HANDLE_REVISION  0x00010000
-struct _EFI_FILE {
+typedef struct _EFI_FILE {
   UINT64                Revision;
   EFI_FILE_OPEN         Open;
   EFI_FILE_CLOSE        Close;
