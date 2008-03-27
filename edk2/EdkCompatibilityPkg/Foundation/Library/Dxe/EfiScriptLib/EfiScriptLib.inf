@@ -42,5 +42,6 @@ COMPONENT_TYPE      = LIBRARY
 
 [libraries.common]
   EdkFrameworkProtocolLib
+  EfiDriverLib
 
 [nmake.common]
