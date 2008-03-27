@@ -23,6 +23,11 @@ Abstract:
 #ifndef __EDKII_GLUE_PEI_SERVICES_LIB_H__
 #define __EDKII_GLUE_PEI_SERVICES_LIB_H__
 
+//
+// To avoid macro expansion issue when the parameter list has #if #endif. 
+// 
+#define PeiServicesLocatePpi   GluePeiServicesLocatePpi
+
 /**
   This service enables a given PEIM to register an interface into the PEI Foundation. 
 
