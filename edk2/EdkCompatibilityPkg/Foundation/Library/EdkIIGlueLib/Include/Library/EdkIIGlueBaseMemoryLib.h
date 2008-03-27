@@ -29,7 +29,7 @@ Abstract:
 #define SetMem(_BUFFER, _LENGTH, _VALUE)                        GlueSetMem(_BUFFER, _LENGTH, _VALUE)
 #define CompareMem(_DESTINATIONBUFFER, _SOURCEBUFFER, _LENGTH)  GlueCompareMem(_DESTINATIONBUFFER, _SOURCEBUFFER, _LENGTH)
 #define CompareGuid(_GUID1, _GUID2)                             GlueCompareGuid(_GUID1, _GUID2)
-
+#define ScanGuid(_BUFFER, _LENGTH, _GUID)                       GlueScanGuid(_BUFFER, _LENGTH, _GUID)
 
 /**
   Copies a source buffer to a destination buffer, and returns the destination buffer.

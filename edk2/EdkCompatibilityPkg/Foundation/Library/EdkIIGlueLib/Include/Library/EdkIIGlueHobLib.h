@@ -24,10 +24,11 @@ Abstract:
 #define __EDKII_GLUE_HOB_LIB_H__
 
 
-#define GetFirstGuidHob(_GUID)																				GlueGetFirstGuidHob(_GUID)
-#define GetNextGuidHob(_GUID, _HobStart)    													GlueGetNextGuidHob(_GUID, _HobStart)
-#define BuildModuleHob(_MODULENAME, _MEMORYALLOCATIONMODULE, _MODULELENGTH, _ENTRYPOINT)		GlueBuildModuleHob(_MODULENAME, _MEMORYALLOCATIONMODULE, _MODULELENGTH, _ENTRYPOINT)
-#define BuildMemoryAllocationHob(_BASEADDRESS, _LENGTH, _MEMORYTYPE)	GlueBuildMemoryAllocationHob(_BASEADDRESS, _LENGTH, _MEMORYTYPE)
+#define GetFirstGuidHob(_GUID)                                                            GlueGetFirstGuidHob(_GUID)
+#define GetNextGuidHob(_GUID, _HobStart)                                                  GlueGetNextGuidHob(_GUID, _HobStart)
+#define BuildFvHob(_BASEADDRESS, _LENGTH)                                                 GlueBuildFvHob(_BASEADDRESS, _LENGTH)
+#define BuildModuleHob(_MODULENAME, _MEMORYALLOCATIONMODULE, _MODULELENGTH, _ENTRYPOINT)  GlueBuildModuleHob(_MODULENAME, _MEMORYALLOCATIONMODULE, _MODULELENGTH, _ENTRYPOINT)
+#define BuildMemoryAllocationHob(_BASEADDRESS, _LENGTH, _MEMORYTYPE)                      GlueBuildMemoryAllocationHob(_BASEADDRESS, _LENGTH, _MEMORYTYPE)
 
 
 /**
