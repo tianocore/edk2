@@ -106,9 +106,13 @@ Abstract:
 #define EDKII_GLUE_DebugClearMemoryValue        0xAF
 
 //
-// pci express base address
+// pci express base address.
+// "PCD_EDKII_GLUE_PciExpressBaseAddress" is required to be defined explicitly: 
+// e.g. in EDK II DSC file to build EDK modules: 
+// [BuildOptions]
+//   *_*_*_CC_FLAGS = /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xC0000000
 //
-#define EDKII_GLUE_PciExpressBaseAddress        0xE0000000
+#define EDKII_GLUE_PciExpressBaseAddress        PCD_EDKII_GLUE_PciExpressBaseAddress
 
 //
 //
