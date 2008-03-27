@@ -415,13 +415,13 @@ typedef struct {
 
 #if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
 
-#define MEDIA_FV_DP  0x06
+#define MEDIA_FV_DP  0x07
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
   EFI_GUID                  NameGuid;
 } MEDIA_FW_VOL_DEVICE_PATH;
 
-#define MEDIA_FV_FILEPATH_DP  0x07
+#define MEDIA_FV_FILEPATH_DP  0x06
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
   EFI_GUID                  NameGuid;
