@@ -130,6 +130,7 @@ typedef union {
 //
 // Definition for DMA-Remapping Reporting ACPI Table
 //
+#define EFI_ACPI_DMAR_TABLE_FLAGS_INTR_REMAP_CLEAR          0x00
 #define EFI_ACPI_DMAR_TABLE_FLAGS_INTR_REMAP_SET            0x01
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER                               Header;
