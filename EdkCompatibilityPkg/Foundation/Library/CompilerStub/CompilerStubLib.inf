@@ -24,6 +24,7 @@ BASE_NAME       = CompilerStub
 COMPONENT_TYPE  = LIBRARY
 
 [sources.common] 
+  Dummy.c
 
 [sources.ia32]
   Ia32/memcpyRep1.asm
