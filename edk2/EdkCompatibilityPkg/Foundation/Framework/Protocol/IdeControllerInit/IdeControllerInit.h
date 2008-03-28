@@ -31,7 +31,7 @@ Revision History
 // Global ID for the EFI Platform IDE Protocol GUID
 //
 #define EFI_IDE_CONTROLLER_INIT_PROTOCOL_GUID \
-  { 0xa1e37052, 0x80d9, 0x4e65, 0xa3, 0x17, 0x3e, 0x9a, 0x55, 0xc4, 0x3e, 0xc9 }
+  { 0xa1e37052, 0x80d9, 0x4e65, {0xa3, 0x17, 0x3e, 0x9a, 0x55, 0xc4, 0x3e, 0xc9} }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // Forward reference, ANSI compatability
