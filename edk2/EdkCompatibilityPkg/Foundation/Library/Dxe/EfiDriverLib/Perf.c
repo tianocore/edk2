@@ -98,7 +98,7 @@ Returns:
   UINTN EndIndex;
 
   if (PdbFileName == NULL) {
-    EfiAsciiStrCpy (GaugeString, " ");
+    EfiAsciiStrCpy (GaugeString, (CHAR8 *)" ");
   } else {
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++)
@@ -229,7 +229,7 @@ GetNameFromHandle (
   CHAR8                       *PdbFileName;
   EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
 
-  EfiAsciiStrCpy (GaugeString, " ");
+  EfiAsciiStrCpy (GaugeString, (CHAR8 *)" ");
 
   //
   // Get handle name from image protocol

@@ -280,7 +280,7 @@ Returns:
                   );
 
   if (EFI_ERROR (Status)) {
-    EfiAsciiStrCpy (Lang, "en-US");
+    EfiAsciiStrCpy (Lang, (CHAR8 *) "en-US");
   }
 
   return Status;

@@ -384,6 +384,8 @@ Returns:
   UINT8             Idx;
   UINT8             i;
 
+  Idx = 0;
+  TempVal = 0;
   //
   // Iterate the decimal values separated by dots
   //

@@ -77,7 +77,14 @@ Returns:
   //
   // Put break point in module that contained the error.
   //
+#ifndef __GNUC__
   EFI_BREAKPOINT ();
+#else
+  //
+  // Bugbug: Need to fix a GNC style cpu break point
+  // 
+  EFI_DEADLOOP ();
+#endif
 }
 
 VOID
