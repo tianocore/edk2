@@ -30,8 +30,10 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePathTemplate = {
       {
         HARDWARE_DEVICE_PATH,
         HW_VENDOR_DP,
-        (UINT8) (sizeof (HII_VENDOR_DEVICE_PATH_NODE)),
-        (UINT8) ((sizeof (HII_VENDOR_DEVICE_PATH_NODE)) >> 8)
+        {
+          (UINT8) (sizeof (HII_VENDOR_DEVICE_PATH_NODE)),
+          (UINT8) ((sizeof (HII_VENDOR_DEVICE_PATH_NODE)) >> 8)
+        }
       },
       EFI_IFR_TIANO_GUID,
     },
@@ -40,8 +42,9 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePathTemplate = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    END_DEVICE_PATH_LENGTH,
-    0
+    {
+      END_DEVICE_PATH_LENGTH
+    }
   }
 };
 
@@ -76,10 +79,10 @@ Returns:
     return;
   }
 
-  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, &gIfrLibHiiDatabase);
+  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &gIfrLibHiiDatabase);
   ASSERT_EFI_ERROR (Status);
 
-  Status = gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, &gIfrLibHiiString);
+  Status = gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, (VOID **) &gIfrLibHiiString);
   ASSERT_EFI_ERROR (Status);
 
   mHiiProtocolsInitialized = TRUE;
@@ -226,7 +229,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   DriverHandle,
                   &gEfiDevicePathProtocolGuid,
-                  &DevicePath
+                  (VOID **) &DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -294,7 +297,7 @@ Returns:
   BufferSize = EfiDevicePathSize (DevicePath);
   for(Index = 0; Index < HandleCount; Index++) {
     Handle = Handles[Index];
-    gBS->HandleProtocol (Handle, &gEfiDevicePathProtocolGuid, &TmpDevicePath);
+    gBS->HandleProtocol (Handle, &gEfiDevicePathProtocolGuid, (VOID **) &TmpDevicePath);
 
     //
     // Check whether DevicePath match
@@ -456,7 +459,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiHiiDatabaseProtocolGuid,
                   NULL,
-                  &HiiDatabase
+                  (VOID **) &HiiDatabase
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -533,7 +536,7 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiHiiDatabaseProtocolGuid,
                   NULL,
-                  &HiiDatabase
+                  (VOID **) &HiiDatabase
                   );
   if (EFI_ERROR (Status)) {
     return Status;

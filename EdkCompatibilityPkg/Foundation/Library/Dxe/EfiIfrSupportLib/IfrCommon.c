@@ -58,7 +58,7 @@ Returns:
                   );
 
   if (EFI_ERROR (Status)) {
-    EfiAsciiStrCpy (Language, "eng");
+    EfiAsciiStrCpy (Language, (CHAR8 *) "eng");
   }
 
   for (Index = 0; Index < 3; Index++) {

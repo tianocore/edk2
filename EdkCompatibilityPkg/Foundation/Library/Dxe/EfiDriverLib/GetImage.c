@@ -140,7 +140,7 @@ GetImageEx (
     Status = gBS->HandleProtocol (
                ImageHandle,
                &gEfiLoadedImageProtocolGuid,
-               &LoadedImage
+               (VOID **) &LoadedImage
                );
     if (EFI_ERROR (Status)) {
       return Status;
@@ -152,7 +152,7 @@ GetImageEx (
                   #else
                     &gEfiFirmwareVolume2ProtocolGuid,
                   #endif
-                    &ImageFv
+                    (VOID **) &ImageFv
                     );
     if (!EFI_ERROR (Status)) {
       Status = GetImageFromFv (ImageFv, NameGuid, SectionType, Buffer, Size);

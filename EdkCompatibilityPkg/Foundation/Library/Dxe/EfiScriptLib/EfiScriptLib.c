@@ -52,7 +52,7 @@ Returns:
 
   BS      = SystemTable->BootServices;
 
-  Status  = BS->LocateProtocol (&gEfiBootScriptSaveGuid, NULL, &mBootScriptSave);
+  Status  = BS->LocateProtocol (&gEfiBootScriptSaveGuid, NULL, (VOID **)&mBootScriptSave);
   if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
     mBootScriptSave = NULL;
   }
@@ -623,7 +623,7 @@ Returns:
   return BootScriptSaveInformation (      
            TableName,
            (UINT32) EfiStrLen (String) * 2 + 2, 
-           (EFI_PHYSICAL_ADDRESS)String
+           (EFI_PHYSICAL_ADDRESS) (UINTN) String
            );
 }
 
@@ -656,7 +656,7 @@ Returns:
   return BootScriptSaveInformation (      
            TableName,
            (UINT32) EfiAsciiStrLen (String) + 1, 
-           (EFI_PHYSICAL_ADDRESS)String
+           (EFI_PHYSICAL_ADDRESS) (UINTN) String
            );
 }
 

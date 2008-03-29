@@ -313,7 +313,7 @@ Returns:
   EFI_STATUS                    Status;
   EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
 
-  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, &ConsoleControl);
+  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
@@ -398,7 +398,7 @@ Returns:
   UINT32                        RefreshRate;
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
 
-  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, &ConsoleControl);
+  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
@@ -407,20 +407,20 @@ Returns:
   //
   // Try to open GOP first
   //
-  Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, &GraphicsOutput);
+  Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **) &GraphicsOutput);
   if (EFI_ERROR (Status)) {
     GraphicsOutput = NULL;
     //
     // Open GOP failed, try to open UGA
     //
-    Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, &UgaDraw);
+    Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **) &UgaDraw);
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
   }
 
   Badging = NULL;
-  Status  = gBS->LocateProtocol (&gEfiOEMBadgingProtocolGuid, NULL, &Badging);
+  Status  = gBS->LocateProtocol (&gEfiOEMBadgingProtocolGuid, NULL, (VOID **) &Badging);
 
   ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
 
@@ -462,7 +462,7 @@ Returns:
         continue;
       }
     } else {
-      Status = GetGraphicsBitMapFromFVEx (ImageHandle, LogoFile, &ImageData, &ImageSize);
+      Status = GetGraphicsBitMapFromFVEx (ImageHandle, LogoFile, (VOID **) &ImageData, &ImageSize);
       if (EFI_ERROR (Status)) {
         return EFI_UNSUPPORTED;
       }
@@ -476,7 +476,7 @@ Returns:
     Status = ConvertBmpToGopBlt (
               ImageData,
               ImageSize,
-              &Blt,
+              (VOID **) &Blt,
               &BltSize,
               &Height,
               &Width
@@ -609,7 +609,7 @@ Returns:
   EFI_STATUS                    Status;
   EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
 
-  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, &ConsoleControl);
+  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }

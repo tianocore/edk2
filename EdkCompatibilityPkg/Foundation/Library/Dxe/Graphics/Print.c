@@ -99,22 +99,22 @@ EfiStatusToString (
   );
 
 static EFI_GRAPHICS_OUTPUT_BLT_PIXEL  mEfiColors[16] = {
-  0x00, 0x00, 0x00, 0x00,
-  0x98, 0x00, 0x00, 0x00,
-  0x00, 0x98, 0x00, 0x00,
-  0x98, 0x98, 0x00, 0x00,
-  0x00, 0x00, 0x98, 0x00,
-  0x98, 0x00, 0x98, 0x00,
-  0x00, 0x98, 0x98, 0x00,
-  0x98, 0x98, 0x98, 0x00,
-  0x10, 0x10, 0x10, 0x00,
-  0xff, 0x10, 0x10, 0x00,
-  0x10, 0xff, 0x10, 0x00,
-  0xff, 0xff, 0x10, 0x00,
-  0x10, 0x10, 0xff, 0x00,
-  0xf0, 0x10, 0xff, 0x00,
-  0x10, 0xff, 0xff, 0x00,
-  0xff, 0xff, 0xff, 0x00,
+  {0x00, 0x00, 0x00, 0x00},
+  {0x98, 0x00, 0x00, 0x00},
+  {0x00, 0x98, 0x00, 0x00},
+  {0x98, 0x98, 0x00, 0x00},
+  {0x00, 0x00, 0x98, 0x00},
+  {0x98, 0x00, 0x98, 0x00},
+  {0x00, 0x98, 0x98, 0x00},
+  {0x98, 0x98, 0x98, 0x00},
+  {0x10, 0x10, 0x10, 0x00},
+  {0xff, 0x10, 0x10, 0x00},
+  {0x10, 0xff, 0x10, 0x00},
+  {0xff, 0xff, 0x10, 0x00},
+  {0x10, 0x10, 0xff, 0x00},
+  {0xf0, 0x10, 0xff, 0x00},
+  {0x10, 0xff, 0xff, 0x00},
+  {0xff, 0xff, 0xff, 0x00},
 };
 
 
@@ -632,7 +632,7 @@ Returns:
       case 'a':
         AsciiStr = (CHAR8 *) VA_ARG (Marker, CHAR8 *);
         if (AsciiStr == NULL) {
-          AsciiStr = "<null string>";
+          AsciiStr = (CHAR8 *) "<null string>";
         }
 
         for (Count = 0; (*AsciiStr != '\0') && (Index < NumberOfCharacters - 1); AsciiStr++, Count++) {
@@ -929,35 +929,35 @@ Returns:
   //
   // Can't use global Status String Array as UINTN is not constant for EBC
   //
-  if (Status == EFI_SUCCESS) { Desc = "Success"; } else 
-  if (Status == EFI_LOAD_ERROR) { Desc = "Load Error"; } else
-  if (Status == EFI_INVALID_PARAMETER) { Desc = "Invalid Parameter"; } else
-  if (Status == EFI_UNSUPPORTED) { Desc = "Unsupported"; } else
-  if (Status == EFI_BAD_BUFFER_SIZE) { Desc = "Bad Buffer Size"; } else
-  if (Status == EFI_BUFFER_TOO_SMALL) { Desc = "Buffer Too Small"; } else
-  if (Status == EFI_NOT_READY) { Desc = "Not Ready"; } else
-  if (Status == EFI_DEVICE_ERROR) { Desc = "Device Error"; } else
-  if (Status == EFI_WRITE_PROTECTED) { Desc = "Write Protected"; } else
-  if (Status == EFI_OUT_OF_RESOURCES) { Desc = "Out of Resources"; } else
-  if (Status == EFI_VOLUME_CORRUPTED) { Desc = "Volume Corrupt"; } else
-  if (Status == EFI_VOLUME_FULL) { Desc = "Volume Full"; } else
-  if (Status == EFI_NO_MEDIA) { Desc = "No Media"; } else
-  if (Status == EFI_MEDIA_CHANGED) { Desc = "Media changed"; } else
-  if (Status == EFI_NOT_FOUND) { Desc = "Not Found"; } else
-  if (Status == EFI_ACCESS_DENIED) { Desc = "Access Denied"; } else
-  if (Status == EFI_NO_RESPONSE) { Desc = "No Response"; } else
-  if (Status == EFI_NO_MAPPING) { Desc = "No mapping"; } else
-  if (Status == EFI_TIMEOUT) { Desc = "Time out"; } else
-  if (Status == EFI_NOT_STARTED) { Desc = "Not started"; } else
-  if (Status == EFI_ALREADY_STARTED) { Desc = "Already started"; } else
-  if (Status == EFI_ABORTED) { Desc = "Aborted"; } else
-  if (Status == EFI_ICMP_ERROR) { Desc = "ICMP Error"; } else
-  if (Status == EFI_TFTP_ERROR) { Desc = "TFTP Error"; } else
-  if (Status == EFI_PROTOCOL_ERROR) { Desc = "Protocol Error"; } else
-  if (Status == EFI_WARN_UNKNOWN_GLYPH) { Desc = "Warning Unknown Glyph"; } else
-  if (Status == EFI_WARN_DELETE_FAILURE) { Desc = "Warning Delete Failure"; } else
-  if (Status == EFI_WARN_WRITE_FAILURE) { Desc = "Warning Write Failure"; } else
-  if (Status == EFI_WARN_BUFFER_TOO_SMALL) { Desc = "Warning Buffer Too Small"; } 
+  if (Status == EFI_SUCCESS) { Desc = (CHAR8 *) "Success"; } else 
+  if (Status == EFI_LOAD_ERROR) { Desc = (CHAR8 *) "Load Error"; } else
+  if (Status == EFI_INVALID_PARAMETER) { Desc = (CHAR8 *) "Invalid Parameter"; } else
+  if (Status == EFI_UNSUPPORTED) { Desc = (CHAR8 *) "Unsupported"; } else
+  if (Status == EFI_BAD_BUFFER_SIZE) { Desc = (CHAR8 *) "Bad Buffer Size"; } else
+  if (Status == EFI_BUFFER_TOO_SMALL) { Desc = (CHAR8 *) "Buffer Too Small"; } else
+  if (Status == EFI_NOT_READY) { Desc = (CHAR8 *) "Not Ready"; } else
+  if (Status == EFI_DEVICE_ERROR) { Desc = (CHAR8 *) "Device Error"; } else
+  if (Status == EFI_WRITE_PROTECTED) { Desc = (CHAR8 *) "Write Protected"; } else
+  if (Status == EFI_OUT_OF_RESOURCES) { Desc = (CHAR8 *) "Out of Resources"; } else
+  if (Status == EFI_VOLUME_CORRUPTED) { Desc = (CHAR8 *) "Volume Corrupt"; } else
+  if (Status == EFI_VOLUME_FULL) { Desc = (CHAR8 *) "Volume Full"; } else
+  if (Status == EFI_NO_MEDIA) { Desc = (CHAR8 *) "No Media"; } else
+  if (Status == EFI_MEDIA_CHANGED) { Desc = (CHAR8 *) "Media changed"; } else
+  if (Status == EFI_NOT_FOUND) { Desc = (CHAR8 *) "Not Found"; } else
+  if (Status == EFI_ACCESS_DENIED) { Desc = (CHAR8 *) "Access Denied"; } else
+  if (Status == EFI_NO_RESPONSE) { Desc = (CHAR8 *) "No Response"; } else
+  if (Status == EFI_NO_MAPPING) { Desc = (CHAR8 *) "No mapping"; } else
+  if (Status == EFI_TIMEOUT) { Desc = (CHAR8 *) "Time out"; } else
+  if (Status == EFI_NOT_STARTED) { Desc = (CHAR8 *) "Not started"; } else
+  if (Status == EFI_ALREADY_STARTED) { Desc = (CHAR8 *) "Already started"; } else
+  if (Status == EFI_ABORTED) { Desc = (CHAR8 *) "Aborted"; } else
+  if (Status == EFI_ICMP_ERROR) { Desc = (CHAR8 *) "ICMP Error"; } else
+  if (Status == EFI_TFTP_ERROR) { Desc = (CHAR8 *) "TFTP Error"; } else
+  if (Status == EFI_PROTOCOL_ERROR) { Desc = (CHAR8 *) "Protocol Error"; } else
+  if (Status == EFI_WARN_UNKNOWN_GLYPH) { Desc = (CHAR8 *) "Warning Unknown Glyph"; } else
+  if (Status == EFI_WARN_DELETE_FAILURE) { Desc = (CHAR8 *) "Warning Delete Failure"; } else
+  if (Status == EFI_WARN_WRITE_FAILURE) { Desc = (CHAR8 *) "Warning Write Failure"; } else
+  if (Status == EFI_WARN_BUFFER_TOO_SMALL) { Desc = (CHAR8 *) "Warning Buffer Too Small"; } 
 
   //
   // If we found a match, copy the message to the user's buffer. Otherwise

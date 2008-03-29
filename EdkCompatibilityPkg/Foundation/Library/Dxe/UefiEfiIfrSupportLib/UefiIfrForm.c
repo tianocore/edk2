@@ -802,7 +802,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   DriverHandle,
                   &gEfiDevicePathProtocolGuid,
-                  &DevicePath
+                  (VOID **) &DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -948,12 +948,12 @@ Returns:
   //
   // Locate protocols for use
   //
-  Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, &FormBrowser2);
+  Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &FormBrowser2);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, &HiiConfigRouting);
+  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &HiiConfigRouting);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1062,12 +1062,12 @@ Returns:
   //
   // Locate protocols for use
   //
-  Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, &FormBrowser2);
+  Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &FormBrowser2);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, &HiiConfigRouting);
+  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &HiiConfigRouting);
   if (EFI_ERROR (Status)) {
     return Status;
   }
