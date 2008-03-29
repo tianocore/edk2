@@ -33,11 +33,13 @@ typedef unsigned long               ASM_UINT32;
 #ifdef _H2INC
 typedef double                      ASM_UINT64;
 #else
-typedef unsigned __int64            ASM_UINT64;
+typedef UINT64                      ASM_UINT64;
 #endif
 
+#ifndef __GNUC__
 #pragma pack (push)
 #pragma pack (1)
+#endif
 
 typedef struct _EFI_SMM_CPU_STATE32 {
   ASM_UINT8                         Reserved1[0xf8];        // fe00h
@@ -132,8 +134,12 @@ typedef struct _EFI_SMM_CPU_STATE64 {
   ASM_UINT64                        _CR0;                   // fff8h
 } EFI_SMM_CPU_STATE64;
 
+#ifndef __GNUC__
 #pragma warning (push)
 #pragma warning (disable: 4201)
+#endif
+
+
 typedef union _EFI_SMM_CPU_STATE {
   struct {
     ASM_UINT8                       Reserved[0x200];
@@ -141,9 +147,11 @@ typedef union _EFI_SMM_CPU_STATE {
   };
   EFI_SMM_CPU_STATE64               x64;
 } EFI_SMM_CPU_STATE;
-#pragma warning (pop)
 
+#ifndef __GNUC__
+#pragma warning (pop)
 #pragma pack (pop)
+#endif
 
 #define EFI_SMM_MIN_REV_ID_x64      0x30006
 
