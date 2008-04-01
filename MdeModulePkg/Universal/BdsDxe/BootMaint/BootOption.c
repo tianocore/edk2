@@ -1165,7 +1165,7 @@ Returns:
   Ptr       = Str;
   LastSlash = Str;
   while (*Ptr != 0) {
-    if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '.' && *(Ptr + 3) != 0) {
+    if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '.' && *(Ptr + 3) == L'\\') {
       //
       // Convert "\Name\..\" to "\"
       // DO NOT convert the .. if it is at the end of the string. This will
