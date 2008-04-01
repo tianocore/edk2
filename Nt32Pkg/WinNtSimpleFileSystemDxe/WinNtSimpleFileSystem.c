@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -617,6 +617,156 @@ Done:
   return Status;
 }
 
+/**
+  Count the number of Leading Dot in FileNameToken.
+
+  @param FileNameToken  A string representing a token in the path name.
+
+  @return  UINTN             The number of leading dot in the name.
+
+**/
+UINTN
+CountLeadingDots (
+  IN CONST CHAR16 * FileNameToken
+  )
+{
+  UINTN          Num;
+
+  Num = 0;
+  while (*FileNameToken == L'.') {
+    Num++;
+    FileNameToken++;
+  }
+  
+  return Num;
+}
+
+BOOLEAN 
+IsFileNameTokenValid (
+  IN CONST CHAR16 * FileNameToken
+  )
+{
+  UINTN Num;
+  if (StrStr (FileNameToken, L"/") != NULL) {
+    //
+    // No L'/' in file name.
+    //
+    return FALSE;
+  } else {
+    //
+    // If Token has all dot, the number should not exceed 2
+    //
+    Num = CountLeadingDots (FileNameToken);
+
+    if (Num == StrLen (FileNameToken)) {
+      //
+      // If the FileNameToken only contains a number of L'.'.
+      //
+      if (Num > 2) {
+        return FALSE;
+      }
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Return the first string token found in the indirect pointer a String named by FileName.
+
+  On input, FileName is a indirect pointer pointing to a String.
+  On output, FileName is a updated to point to the next character after the first
+  found L"\" or NULL if there is no L"\" found.
+
+  @param FileName  A indirect pointer pointing to a FileName.
+
+  @return  Token      The first string token found before a L"\".
+
+**/
+CHAR16 *
+GetNextFileNameToken (
+  IN OUT CONST CHAR16 ** FileName 
+  )
+{
+  CHAR16 *SlashPos;
+  CHAR16 *Token;
+  UINTN  Offset;
+  ASSERT (**FileName != L'\\');
+  ASSERT (**FileName != L'\0');
+
+  SlashPos = StrStr (*FileName, L"\\");
+  if (SlashPos == NULL) {
+    Token = AllocateCopyPool (StrSize(*FileName), *FileName);
+    *FileName = NULL;
+  } else {
+    Offset = SlashPos - *FileName;
+    Token = AllocateZeroPool ((Offset + 1) * sizeof (CHAR16));
+    StrnCpy (Token, *FileName, Offset);
+    //
+    // Point *FileName to the next character after L'\'.
+    //
+    *FileName = *FileName + Offset + 1;
+  }
+
+  return Token;
+}
+
+/**
+  Check if a FileName contains only Valid Characters.
+
+  If FileName contains only a single L'\', return TRUE.
+  If FileName contains two adjacent L'\', return FALSE.
+  If FileName conatins L'/' , return FALSE.
+  If FielName contains more than two dots seperated with other FileName characters
+  by L'\', return FALSE. For example, L'.\...\filename.txt' is invalid path name. But L'..TwoDots\filename.txt' is valid path name.
+
+  @param FileName  The File Name String to check.
+
+  @return  TRUE        FileName only contains valid characters.
+  @return  FALSE       FileName contains at least one invalid character.
+
+**/
+
+BOOLEAN
+IsFileNameValid (
+  IN CONST CHAR16 *FileName 
+  )
+{
+  CHAR16       *Token;
+  BOOLEAN      Valid;
+
+  //
+  // If FileName is just L'\', then it is a valid pathname. 
+  //
+  if (StrCmp (FileName, L"\\") == 0) {
+    return TRUE;
+  }
+  //
+  // We don't support two or more adjacent L'\'.
+  //
+  if (StrStr (FileName, L"\\\\") != NULL) {
+    return FALSE;
+  }
+
+  //
+  // Is FileName has a leading L"\", skip to next character.
+  //
+  if (FileName [0] == L'\\') {
+    FileName++;
+  }
+
+  do {
+    Token = GetNextFileNameToken (&FileName);
+    Valid = IsFileNameTokenValid (Token);
+    FreePool (Token);
+    
+    if (!Valid)
+      return FALSE;
+  } while (FileName != NULL);
+
+  return TRUE;
+}
+
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemOpen (
@@ -634,7 +784,7 @@ Routine Description:
 
 Arguments:
 
-  This        - A pointer to the source file location.
+  This        - A pointer to the seource file location.
 
   NewHandle   - Pointer to storage for the new file handle.
 
@@ -767,10 +917,10 @@ OpenRoot:
     }
     CutPrefix (FileName, Count);
     //
-    // Trim trailing dots and blanks
+    // Trim trailing blanks
     //
     for (TempFileName = FileName + StrLen (FileName) - 1;
-      TempFileName >= FileName && (*TempFileName == L' ' || *TempFileName == L'.');
+      TempFileName >= FileName && (*TempFileName == L' ');
       TempFileName--) {
       ;
     }
@@ -819,6 +969,11 @@ OpenRoot:
       StrCat (NewPrivateFile->FileName, L"\\");
       StrCat (NewPrivateFile->FileName, FileName);
     }
+  }
+
+  if (!IsFileNameValid (NewPrivateFile->FileName)) {
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
 
   //
