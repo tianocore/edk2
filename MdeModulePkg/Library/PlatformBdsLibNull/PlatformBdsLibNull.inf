@@ -40,6 +40,13 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  #
+  # This dependency is because of gEfiLegacyBiosProtocolGuid from GenericBdsLib.
+  # It may be removed if a Library class is created to abstract away definition
+  # in Framework specification or PI spec incorporates the Legacy Booting
+  # Protocols.
+  #
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
   BaseLib
