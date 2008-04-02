@@ -57,7 +57,7 @@ EfiDhcp4GetModeData (
   }
 
   Instance = DHCP_INSTANCE_FROM_THIS (This);
-  
+
   OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
   DhcpSb  = Instance->Service;
 
@@ -840,7 +840,7 @@ Returns:
   None
 
 --*/
-{  
+{
 }
 
 VOID
@@ -873,14 +873,14 @@ PxeDhcpInput (
   }
 
   ASSERT (UdpPacket != NULL);
-  
+
   //
   // Validate the packet received
   //
   if (UdpPacket->TotalSize < sizeof (EFI_DHCP4_HEADER)) {
     goto RESTART;
   }
-  
+
   //
   // Copy the DHCP message to a continuous memory block, make the buffer size
   // of the EFI_DHCP4_PACKET a multiple of 4-byte.
@@ -900,16 +900,16 @@ PxeDhcpInput (
   if (Packet->Length != UdpPacket->TotalSize) {
     goto RESTART;
   }
-  
+
   //
   // Is this packet the answer to our packet?
   //
   if ((Head->OpCode != BOOTP_REPLY) ||
       (Head->Xid != Token->Packet->Dhcp4.Header.Xid) ||
-      !NET_MAC_EQUAL (&DhcpSb->Mac, Head->ClientHwAddr, DhcpSb->HwLen)) {
+      (CompareMem (DhcpSb->ClientAddressSendOut, Head->ClientHwAddr, Head->HwAddrLen) != 0)) {
     goto RESTART;
   }
-  
+
   //
   // Validate the options and retrieve the interested options
   //
@@ -979,7 +979,7 @@ SIGNAL_USER:
 
   if (Token->CompletionEvent != NULL) {
     gBS->SignalEvent (Token->CompletionEvent);
-  }  
+  }
 }
 
 
@@ -1065,6 +1065,11 @@ EfiDhcp4TransmitReceive (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
+
+  //
+  // Save the Client Address is sent out
+  //
+  CopyMem (&DhcpSb->ClientAddressSendOut[0], &Token->Packet->Dhcp4.Header.ClientHwAddr[0], Token->Packet->Dhcp4.Header.HwAddrLen);
 
   //
   // Wrap the DHCP packet into a net buffer.

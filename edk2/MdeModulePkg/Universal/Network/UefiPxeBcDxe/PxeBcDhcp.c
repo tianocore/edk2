@@ -754,11 +754,14 @@ PxeBcDhcpCallBack (
   UINT16                              Value;
   EFI_STATUS                          Status;
   BOOLEAN                             Received;
+  CHAR8                               *SystemSerialNumber;
+  EFI_DHCP4_HEADER                    *DhcpHeader;
 
   if ((Dhcp4Event != Dhcp4RcvdOffer) &&
       (Dhcp4Event != Dhcp4SelectOffer) &&
       (Dhcp4Event != Dhcp4SendDiscover) &&
-      (Dhcp4Event != Dhcp4RcvdAck)) {
+      (Dhcp4Event != Dhcp4RcvdAck) &&
+      (Dhcp4Event != Dhcp4SendRequest)) {
     return EFI_SUCCESS;
   }
 
@@ -798,10 +801,32 @@ PxeBcDhcpCallBack (
   switch (Dhcp4Event) {
 
   case Dhcp4SendDiscover:
-    //
-    // Cache the dhcp discover packet, of which some information will be used later.
-    //
-    CopyMem (Mode->DhcpDiscover.Raw, &Packet->Dhcp4, Packet->Length);
+  case Dhcp4SendRequest:
+    if (Mode->SendGUID) {
+      //
+      // send the system GUID instead of the MAC address as the hardware address
+      // in the DHCP packet header.
+      //
+      DhcpHeader = &Packet->Dhcp4.Header;
+
+      if (EFI_ERROR (GetSmbiosSystemGuidAndSerialNumber ((EFI_GUID *) DhcpHeader->ClientHwAddr, &SystemSerialNumber))) {
+        //
+        // GUID not yet set - send all 0xff's to show programable (via SetVariable)
+        // SetMem(DHCPV4_OPTIONS_BUFFER.DhcpPlatformId.Guid, sizeof(EFI_GUID), 0xff);
+        // GUID not yet set - send all 0's to show not programable
+        //
+        ZeroMem (DhcpHeader->ClientHwAddr, sizeof (EFI_GUID));
+      }
+
+      DhcpHeader->HwAddrLen = sizeof (EFI_GUID);
+    }
+
+    if (Dhcp4Event == Dhcp4SendDiscover) {
+      //
+      // Cache the dhcp discover packet, of which some information will be used later.
+      //
+      CopyMem (Mode->DhcpDiscover.Raw, &Packet->Dhcp4, Packet->Length);
+    }
 
     break;
 
@@ -1044,6 +1069,9 @@ PxeBcDiscvBootService (
   EFI_DHCP4_PACKET_OPTION             *PxeOpt;
   PXEBC_OPTION_BOOT_ITEM              *PxeBootItem;
   UINT8                               VendorOptLen;
+  CHAR8                               *SystemSerialNumber;
+  EFI_DHCP4_HEADER                    *DhcpHeader;
+
 
   Mode      = Private->PxeBc.Mode;
   Dhcp4     = Private->Dhcp4;
@@ -1096,6 +1124,18 @@ PxeBcDiscvBootService (
 
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  DhcpHeader = &Token.Packet->Dhcp4.Header;
+  if (Mode->SendGUID) {
+    if (EFI_ERROR (GetSmbiosSystemGuidAndSerialNumber ((EFI_GUID *) DhcpHeader->ClientHwAddr, &SystemSerialNumber))) {
+      //
+      // GUID not yet set - send all 0's to show not programable
+      //
+      ZeroMem (DhcpHeader->ClientHwAddr, sizeof (EFI_GUID));
+    }
+
+    DhcpHeader->HwAddrLen = sizeof (EFI_GUID);
   }
 
   Token.Packet->Dhcp4.Header.Xid      = NET_RANDOM (NetRandomInitSeed ());

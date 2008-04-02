@@ -36,6 +36,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #include <Protocol/NetworkInterfaceIdentifier.h>
 #include <Protocol/PxeBaseCodeCallBack.h>
 #include <Protocol/Arp.h>
+#include <Protocol/Ip4.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -61,8 +62,10 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_HANDLE                                Image;
   EFI_HANDLE                                ArpChild;
   EFI_HANDLE                                Dhcp4Child;
+  EFI_HANDLE                                Ip4Child;
   EFI_HANDLE                                Mtftp4Child;
   EFI_HANDLE                                Udp4Child;
+
 
   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
 
@@ -72,9 +75,12 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL       *PxeBcCallback;
   EFI_ARP_PROTOCOL                          *Arp;
   EFI_DHCP4_PROTOCOL                        *Dhcp4;
+  EFI_IP4_PROTOCOL                          *Ip4;
+  EFI_IP4_CONFIG_DATA                       Ip4ConfigData;
   EFI_MTFTP4_PROTOCOL                       *Mtftp4;
   EFI_UDP4_PROTOCOL                         *Udp4;
   EFI_UDP4_CONFIG_DATA                      Udp4CfgData;
+
 
   EFI_PXE_BASE_CODE_MODE                    Mode;
   EFI_PXE_BASE_CODE_FUNCTION                Function;
@@ -91,6 +97,8 @@ struct _PXEBC_PRIVATE_DATA {
 
   UINT8                                     OptionBuffer[PXEBC_DHCP4_MAX_OPTION_SIZE];
   EFI_DHCP4_PACKET                          SeedPacket;
+  EFI_MAC_ADDRESS                           Mac;
+  UINT8                                     MacLen;
 
   BOOLEAN                                   SortOffers;
   UINT32                                    NumOffers;
@@ -115,6 +123,12 @@ struct _PXEBC_PRIVATE_DATA {
   UINT32                                    BootpIndex;
   UINT32                                    ProxyIndex[DHCP4_PACKET_TYPE_MAX];
   UINT32                                    BinlIndex[PXEBC_MAX_OFFER_NUM];
+
+  EFI_EVENT                                 GetArpCacheEvent;
+  //
+  // token and event used to get ICMP error data from IP
+  //
+  EFI_IP4_COMPLETION_TOKEN                  IcmpErrorRcvToken;
 };
 
 #define PXEBC_PRIVATE_DATA_FROM_PXEBC(a)          CR (a, PXEBC_PRIVATE_DATA, PxeBc, PXEBC_PRIVATE_DATA_SIGNATURE)
