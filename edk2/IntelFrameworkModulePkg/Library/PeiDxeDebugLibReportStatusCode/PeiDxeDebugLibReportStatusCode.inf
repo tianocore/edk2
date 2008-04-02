@@ -51,6 +51,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
 
-[Guid.common]
+[Guids.common]
   gEfiStatusCodeDataTypeDebugGuid
   
