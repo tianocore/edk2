@@ -70,7 +70,7 @@
   ExtendedHiiLib
 
 [Protocols]
-  gEfiPrintProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiPrintProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
   gEfiHiiConfigAccessProtocolGuid
   gEfiHiiStringProtocolGuid
   gEfiFormBrowser2ProtocolGuid
