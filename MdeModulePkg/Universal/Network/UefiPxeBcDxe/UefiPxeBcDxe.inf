@@ -91,4 +91,6 @@
   gEfiDhcp4ProtocolGuid                            # PROTOCOL ALWAYS_CONSUMED
   gEfiUdp4ProtocolGuid                             # PROTOCOL ALWAYS_CONSUMED
   gEfiNetworkInterfaceIdentifierProtocolGuid_31    # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ServiceBindingProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ProtocolGuid                              # PROTOCOL ALWAYS_CONSUMED
 

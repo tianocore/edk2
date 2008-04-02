@@ -60,6 +60,12 @@ PxeBcCheckPacket (
   Callback  = Private->PxeBcCallback;
   Status    = EFI_SUCCESS;
 
+  if (Packet->OpCode == EFI_MTFTP4_OPCODE_ERROR) {
+    Private->Mode.TftpErrorReceived = TRUE;
+    Private->Mode.TftpError.ErrorCode = (UINT8) Packet->Error.ErrorCode;
+    AsciiStrnCpy (Private->Mode.TftpError.ErrorString, (CHAR8 *) Packet->Error.ErrorMessage, 127);
+  }
+
   if (Callback != NULL) {
 
     Status = Callback->Callback (
@@ -152,7 +158,11 @@ PxeBcTftpGetFileSize (
                     );
 
   if (EFI_ERROR (Status)) {
-
+    if (Packet->OpCode == EFI_MTFTP4_OPCODE_ERROR) {
+      Private->Mode.TftpErrorReceived = TRUE;
+      Private->Mode.TftpError.ErrorCode = (UINT8) Packet->Error.ErrorCode;
+      AsciiStrnCpy (Private->Mode.TftpError.ErrorString, (CHAR8 *) Packet->Error.ErrorMessage, 127);
+    }
     goto ON_ERROR;
   }
 

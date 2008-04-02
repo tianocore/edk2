@@ -122,6 +122,7 @@ struct _DHCP_SERVICE {
   EFI_MAC_ADDRESS               Mac;
   UINT8                         HwType;
   UINT8                         HwLen;
+  UINT8                         ClientAddressSendOut[16];
 
   DHCP_PROTOCOL                 *ActiveChild;
   EFI_DHCP4_CONFIG_DATA         ActiveConfig;

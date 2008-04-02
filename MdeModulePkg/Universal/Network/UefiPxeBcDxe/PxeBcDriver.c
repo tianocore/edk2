@@ -223,6 +223,28 @@ PxeBcDriverBindingStart (
   Status = NetLibCreateServiceChild (
              ControllerHandle,
              This->DriverBindingHandle,
+             &gEfiIp4ServiceBindingProtocolGuid,
+             &Private->Ip4Child
+             );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  Status = gBS->OpenProtocol (
+                  Private->Ip4Child,
+                  &gEfiIp4ProtocolGuid,
+                  (VOID **) &Private->Ip4,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  Status = NetLibCreateServiceChild (
+             ControllerHandle,
+             This->DriverBindingHandle,
              &gEfiMtftp4ServiceBindingProtocolGuid,
              &Private->Mtftp4Child
              );
@@ -280,6 +302,17 @@ PxeBcDriverBindingStart (
   Private->Udp4CfgData.UseDefaultAddress  = FALSE;
 
   PxeBcInitSeedPacket (&Private->SeedPacket, Private->Udp4);
+  Private->MacLen = Private->SeedPacket.Dhcp4.Header.HwAddrLen;
+  CopyMem (&Private->Mac, &Private->SeedPacket.Dhcp4.Header.ClientHwAddr[0], Private->MacLen);
+
+
+  ZeroMem (&Private->Ip4ConfigData, sizeof (EFI_IP4_CONFIG_DATA));
+  Private->Ip4ConfigData.DefaultProtocol   = EFI_IP_PROTO_ICMP;
+  Private->Ip4ConfigData.AcceptIcmpErrors  = TRUE;
+  Private->Ip4ConfigData.TypeOfService     = DEFAULT_ToS;
+  Private->Ip4ConfigData.TimeToLive        = DEFAULT_TTL;
+  Private->Ip4ConfigData.DoNotFragment     = FALSE;
+  Private->Ip4ConfigData.RawData           = FALSE;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,
@@ -325,6 +358,22 @@ ON_ERROR:
       This->DriverBindingHandle,
       &gEfiMtftp4ServiceBindingProtocolGuid,
       Private->Mtftp4Child
+      );
+  }
+
+  if (Private->Ip4Child != NULL) {
+    gBS->CloseProtocol (
+          Private->Ip4Child,
+          &gEfiIp4ProtocolGuid,
+          This->DriverBindingHandle,
+          ControllerHandle
+          );
+
+    NetLibDestroyServiceChild (
+      ControllerHandle,
+      This->DriverBindingHandle,
+      &gEfiIp4ServiceBindingProtocolGuid,
+      Private->Ip4Child
       );
   }
 

@@ -1037,7 +1037,7 @@ DhcpInput (
   //
   if ((Head->OpCode != BOOTP_REPLY) ||
       (NTOHL (Head->Xid) != DhcpSb->Xid) ||
-      !NET_MAC_EQUAL (&DhcpSb->Mac, Head->ClientHwAddr, DhcpSb->HwLen)) {
+      (CompareMem (DhcpSb->ClientAddressSendOut, Head->ClientHwAddr, Head->HwAddrLen) != 0)) {
     goto RESTART;
   }
 
@@ -1362,6 +1362,12 @@ DhcpSendMessage (
   }
 
   //
+  // Save the Client Address will be sent out
+  //
+  CopyMem (&DhcpSb->ClientAddressSendOut[0], &Packet->Dhcp4.Header.ClientHwAddr[0], Packet->Dhcp4.Header.HwAddrLen);
+
+
+  //
   // Wrap it into a netbuf then send it.
   //
   Frag.Bulk = (UINT8 *) &Packet->Dhcp4.Header;
@@ -1492,7 +1498,7 @@ DhcpOnTimerTick (
   DHCP_SERVICE              *DhcpSb;
   DHCP_PROTOCOL             *Instance;
   EFI_STATUS                Status;
-  
+
   DhcpSb   = (DHCP_SERVICE *) Context;
   Instance = DhcpSb->ActiveChild;
 
@@ -1513,7 +1519,7 @@ DhcpOnTimerTick (
       goto END_SESSION;
     }
   }
-  
+
   //
   // Check the retransmit timer
   //
@@ -1558,7 +1564,7 @@ DhcpOnTimerTick (
       }
     }
   }
-  
+
   //
   // If an address has been acquired, check whether need to
   // refresh or whether it has expired.

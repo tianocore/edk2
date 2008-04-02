@@ -23,6 +23,204 @@ Abstract:
 
 #include "PxeBcImpl.h"
 
+/**
+  Get and record the arp cache
+
+  @param  This                    Pointer to EFI_PXE_BC_PROTOCOL
+
+  @retval EFI_SUCCESS             Arp cache updated successfully
+  @retval others                  If error occurs when updating arp cache
+
+**/
+STATIC
+EFI_STATUS
+UpdateArpCache (
+  IN EFI_PXE_BASE_CODE_PROTOCOL     * This
+  )
+{
+  PXEBC_PRIVATE_DATA      *Private;
+  EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_STATUS              Status;
+  UINT32                  EntryLength;
+  UINT32                  EntryCount;
+  EFI_ARP_FIND_DATA       *Entries;
+  UINT32                  Index;
+
+  Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
+  Mode    = Private->PxeBc.Mode;
+
+  Status = Private->Arp->Find (Private->Arp, TRUE, NULL, &EntryLength, &EntryCount, &Entries, TRUE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Mode->ArpCacheEntries = MIN (EntryCount, EFI_PXE_BASE_CODE_MAX_ARP_ENTRIES);
+  for (Index = 0; Index < Mode->ArpCacheEntries; Index ++) {
+    CopyMem (&Mode->ArpCache[Index].IpAddr, Entries + 1, Entries->SwAddressLength);
+    CopyMem (&Mode->ArpCache[Index].MacAddr, (UINT8 *)(Entries + 1) + Entries->SwAddressLength, Entries->HwAddressLength);
+    //
+    // Slip to the next FindData.
+    //
+    Entries = (EFI_ARP_FIND_DATA *)((UINT8 *)Entries + EntryLength);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Timeout routine to catch arp cache.
+
+  @param  Event              Pointer to EFI_PXE_BC_PROTOCOL
+  @param  Context            Context of the timer event
+
+**/
+STATIC
+VOID
+EFIAPI
+ArpCacheUpdateTimeout (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
+  )
+{
+  UpdateArpCache ((EFI_PXE_BASE_CODE_PROTOCOL *) Context);
+}
+
+/**
+  Timeout routine to catch arp cache.
+
+  @param  Event                    Pointer to EFI_PXE_BC_PROTOCOL
+  @param  Context
+
+**/
+STATIC
+BOOLEAN
+FindInArpCache (
+  EFI_PXE_BASE_CODE_MODE    *PxeBcMode,
+  EFI_IPv4_ADDRESS          *Ip4Addr,
+  EFI_MAC_ADDRESS           *MacAddress
+  )
+{
+  UINT32                  Index;
+
+  for (Index = 0; Index < PxeBcMode->ArpCacheEntries; Index ++) {
+    if (EFI_IP4_EQUAL (&PxeBcMode->ArpCache[Index].IpAddr.v4, Ip4Addr)) {
+      CopyMem (MacAddress, &PxeBcMode->ArpCache[Index].MacAddr, sizeof (EFI_MAC_ADDRESS));
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+  Notify function for the ICMP receive token, used to process
+  the received ICMP packets.
+
+  @param  Context               The context passed in by the event notifier.
+
+  @return None.
+
+**/
+STATIC
+VOID
+EFIAPI
+IcmpErrorListenHandlerDpc (
+  IN VOID      *Context
+  )
+{
+  EFI_STATUS              Status;
+  EFI_IP4_RECEIVE_DATA    *RxData;
+  EFI_IP4_PROTOCOL        *Ip4;
+  PXEBC_PRIVATE_DATA      *Private;
+  EFI_PXE_BASE_CODE_MODE  *Mode;
+  UINTN                   Index;
+  UINT32                  CopiedLen;
+  UINT8                   *CopiedPointer;
+
+  Private = (PXEBC_PRIVATE_DATA *) Context;
+  Mode    = &Private->Mode;
+  Status  = Private->IcmpErrorRcvToken.Status;
+  RxData  = Private->IcmpErrorRcvToken.Packet.RxData;
+  Ip4     = Private->Ip4;
+
+  if (EFI_ABORTED == Status) {
+    //
+    // The reception is actively aborted by the consumer, directly return.
+    //
+    return;
+  }
+
+  if ((EFI_SUCCESS != Status) || (NULL == RxData)) {
+    //
+    // Only process the normal packets and the icmp error packets, if RxData is NULL
+    // with Status == EFI_SUCCESS or EFI_ICMP_ERROR, just resume the receive although
+    // this should be a bug of the low layer (IP).
+    //
+    goto Resume;
+  }
+
+  if ((EFI_IP4 (RxData->Header->SourceAddress) != 0) &&
+    !Ip4IsUnicast (EFI_NTOHL (RxData->Header->SourceAddress), 0)) {
+    //
+    // The source address is not zero and it's not a unicast IP address, discard it.
+    //
+    goto CleanUp;
+  }
+
+  if (!EFI_IP4_EQUAL (&RxData->Header->DestinationAddress, &Mode->StationIp.v4)) {
+    //
+    // The dest address is not equal to Station Ip address, discard it.
+    //
+    goto CleanUp;
+  }
+
+  //
+  // Constructor ICMP error packet
+  //
+  CopiedLen = 0;
+  CopiedPointer = (UINT8 *) &Mode->IcmpError;
+
+  for (Index = 0; Index < RxData->FragmentCount; Index ++) {
+    CopiedLen += RxData->FragmentTable[Index].FragmentLength;
+    if (CopiedLen <= sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR)) {
+      CopyMem (CopiedPointer, RxData->FragmentTable[Index].FragmentBuffer, RxData->FragmentTable[Index].FragmentLength);
+    } else {
+      CopyMem (CopiedPointer, RxData->FragmentTable[Index].FragmentBuffer, CopiedLen - sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
+    }
+    CopiedPointer += CopiedLen;
+  }
+
+  goto Resume;
+
+CleanUp:
+  gBS->SignalEvent (RxData->RecycleSignal);
+
+Resume:
+  Ip4->Receive (Ip4, &(Private->IcmpErrorRcvToken));
+}
+
+/**
+  Request IcmpErrorListenHandlerDpc as a DPC at TPL_CALLBACK
+
+  @param  Event                 The event signaled.
+  @param  Context               The context passed in by the event notifier.
+
+  @return None.
+
+**/
+STATIC
+VOID
+EFIAPI
+IcmpErrorListenHandler (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  //
+  // Request IpIoListenHandlerDpc as a DPC at TPL_CALLBACK
+  //
+  NetLibQueueDpc (TPL_CALLBACK, IcmpErrorListenHandlerDpc, Context);
+}
 
 /**
   GC_NOTO: Add function description
@@ -53,6 +251,7 @@ EfiPxeBcStart (
   EFI_PXE_BASE_CODE_MODE  *Mode;
   EFI_STATUS              Status;
 
+  CpuDeadLoop ();
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -88,7 +287,78 @@ EfiPxeBcStart (
   Mode->ToS     = DEFAULT_ToS;
   Mode->AutoArp = TRUE;
 
-  return EFI_SUCCESS;
+  //
+  // Create the event for Arp Cache checking.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ArpCacheUpdateTimeout,
+                  This,
+                  &Private->GetArpCacheEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  //
+  // Start the timeout timer event.
+  //
+  Status = gBS->SetTimer (
+                  Private->GetArpCacheEvent,
+                  TimerPeriodic,
+                  TICKS_PER_SECOND
+                  );
+
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  //
+  // Create ICMP error receiving event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  IcmpErrorListenHandler,
+                  Private,
+                  &(Private->IcmpErrorRcvToken.Event)
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  Status = Private->Ip4->Configure (Private->Ip4, &Private->Ip4ConfigData);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  //
+  // start to listen incoming packet
+  //
+  Status = Private->Ip4->Receive (Private->Ip4, &Private->IcmpErrorRcvToken);
+  if (!EFI_ERROR (Status)) {
+    return Status;
+  }
+
+ON_EXIT:
+  Private->Ip4->Configure (Private->Ip4, NULL);
+
+  if (Private->IcmpErrorRcvToken.Event != NULL) {
+    gBS->CloseEvent (Private->IcmpErrorRcvToken.Event);
+  }
+
+  if (Private->GetArpCacheEvent != NULL) {
+    gBS->SetTimer (Private->GetArpCacheEvent, TimerCancel, 0);
+    gBS->CloseEvent (Private->GetArpCacheEvent);
+  }
+
+  Mode->Started = FALSE;
+  Mode->TTL     = 0;
+  Mode->ToS     = 0;
+  Mode->AutoArp = FALSE;
+
+  return Status;
 }
 
 
@@ -126,7 +396,32 @@ EfiPxeBcStop (
     return EFI_NOT_STARTED;
   }
 
+  Private->Ip4->Cancel (Private->Ip4, NULL);
+  //
+  // Dispatch the DPCs queued by the NotifyFunction of the canceled rx token's
+  // events.
+  //
+  NetLibDispatchDpc ();
+
+  Private->Ip4->Configure (Private->Ip4, NULL);
+
+  //
+  // Close the ICMP error receiving event.
+  //
+  gBS->CloseEvent (Private->IcmpErrorRcvToken.Event);
+
+  //
+  // Cancel the TimeoutEvent timer.
+  //
+  gBS->SetTimer (Private->GetArpCacheEvent, TimerCancel, 0);
+
+  //
+  // Close the TimeoutEvent event.
+  //
+  gBS->CloseEvent (Private->GetArpCacheEvent);
+
   Mode->Started = FALSE;
+
 
   //
   // Reset and leave joined groups
@@ -191,6 +486,9 @@ EfiPxeBcDhcp (
   if (!Mode->Started) {
     return EFI_NOT_STARTED;
   }
+
+  Mode->IcmpErrorReceived = FALSE;
+
   //
   // Initialize the DHCP options and build the option list
   //
@@ -233,6 +531,9 @@ EfiPxeBcDhcp (
         // the PXE boot requirements, EFI_TIMEOUT will be returned.
         //
         continue;
+      }
+      if (Status == EFI_ICMP_ERROR) {
+        Mode->IcmpErrorReceived = TRUE;
       }
       //
       // Other error status means the DHCP really fails.
@@ -286,6 +587,24 @@ EfiPxeBcDhcp (
 
       Private->Arp->Configure (Private->Arp, NULL);
       Private->Arp->Configure (Private->Arp, &ArpConfigData);
+
+      //
+      // Updated the route table. Fill the first entry.
+      //
+      Mode->RouteTableEntries                = 1;
+      Mode->RouteTable[0].IpAddr.Addr[0]     = Private->StationIp.Addr[0] & Private->SubnetMask.Addr[0];
+      Mode->RouteTable[0].SubnetMask.Addr[0] = Private->SubnetMask.Addr[0];
+      Mode->RouteTable[0].GwAddr.Addr[0]     = 0;
+
+      //
+      // Create the default route entry if there is a default router.
+      //
+      if (Private->GatewayIp.Addr[0] != 0) {
+        Mode->RouteTableEntries                = 2;
+        Mode->RouteTable[1].IpAddr.Addr[0]     = 0;
+        Mode->RouteTable[1].SubnetMask.Addr[0] = 0;
+        Mode->RouteTable[1].GwAddr.Addr[0]     = Private->GatewayIp.Addr[0];
+      }
     }
   }
 
@@ -360,6 +679,8 @@ EfiPxeBcDiscover (
   if (!Mode->Started) {
     return EFI_NOT_STARTED;
   }
+
+  Mode->IcmpErrorReceived = FALSE;
 
   //
   // If layer isn't EFI_PXE_BASE_CODE_BOOT_LAYER_INITIAL,
@@ -511,8 +832,11 @@ EfiPxeBcDiscover (
   }
 
   if (EFI_ERROR (Status) || !Mode->PxeReplyReceived || (!Mode->PxeBisReplyReceived && UseBis)) {
-
-    Status = EFI_DEVICE_ERROR;
+    if (Status == EFI_ICMP_ERROR) {
+      Mode->IcmpErrorReceived = TRUE;
+    } else {
+      Status = EFI_DEVICE_ERROR;
+    }
   } else {
     PxeBcParseCachedDhcpPacket (&Private->PxeReply);
   }
@@ -571,6 +895,8 @@ EfiPxeBcMtftp (
   PXEBC_PRIVATE_DATA      *Private;
   EFI_MTFTP4_CONFIG_DATA  Mtftp4Config;
   EFI_STATUS              Status;
+  EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_MAC_ADDRESS         TempMacAddr;
 
   if ((This == NULL) ||
       (Filename == NULL) ||
@@ -584,6 +910,20 @@ EfiPxeBcMtftp (
 
   Status  = EFI_DEVICE_ERROR;
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
+  Mode    = &Private->Mode;
+
+  if (!Mode->AutoArp) {
+    //
+    // If AutoArp is set false, check arp cache
+    //
+    UpdateArpCache (This);
+    if (!FindInArpCache (Mode, &ServerIp->v4, &TempMacAddr)) {
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  Mode->TftpErrorReceived = FALSE;
+  Mode->IcmpErrorReceived = FALSE;
 
   Mtftp4Config.UseDefaultSetting = FALSE;
   Mtftp4Config.TimeoutValue      = PXEBC_MTFTP_TIMEOUT;
@@ -666,6 +1006,10 @@ EfiPxeBcMtftp (
     break;
   }
 
+  if (Status == EFI_ICMP_ERROR) {
+    Mode->IcmpErrorReceived = TRUE;
+  }
+
   return Status;
 }
 
@@ -734,6 +1078,8 @@ EfiPxeBcUdpWrite (
   EFI_STATUS                Status;
   BOOLEAN                   IsDone;
   UINT16                    RandomSrcPort;
+  EFI_PXE_BASE_CODE_MODE    *Mode;
+  EFI_MAC_ADDRESS           TempMacAddr;
 
   IsDone = FALSE;
 
@@ -762,10 +1108,23 @@ EfiPxeBcUdpWrite (
 
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Udp4    = Private->Udp4;
+  Mode    = &Private->Mode;
 
   if (!Private->AddressIsOk && (SrcIp == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
+  if (!Mode->AutoArp) {
+    //
+    // If AutoArp is set false, check arp cache
+    //
+    UpdateArpCache (This);
+    if (!FindInArpCache (Mode, &DestIp->v4, &TempMacAddr)) {
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  Mode->IcmpErrorReceived = FALSE;
 
   if (SrcIp == NULL) {
     SrcIp = &Private->StationIp;
@@ -831,6 +1190,9 @@ EfiPxeBcUdpWrite (
 
   Status = Udp4->Transmit (Udp4, &Token);
   if (EFI_ERROR (Status)) {
+    if (Status == EFI_ICMP_ERROR) {
+      Mode->IcmpErrorReceived = TRUE;
+    }
     goto ON_EXIT;
   }
 
@@ -881,7 +1243,7 @@ CheckIpByFilter (
 
   CopyMem (&DestIp4Address, &Session->DestinationAddress, sizeof (DestIp4Address));
   if ((PxeBcMode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST) &&
-      IP4_IS_MULTICAST (NTOHL (EFI_IP4 (DestIp4Address)))
+      IP4_IS_MULTICAST (EFI_NTOHL (DestIp4Address))
       ) {
     return TRUE;
   }
@@ -894,7 +1256,7 @@ CheckIpByFilter (
 
   CopyMem (&Ip4Address, &PxeBcMode->StationIp.v4, sizeof (Ip4Address));
   if ((PxeBcMode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) &&
-      EFI_IP4_EQUAL (&PxeBcMode->StationIp.v4, &DestIp4Address)
+      EFI_IP4_EQUAL (&Ip4Address, &DestIp4Address)
       ) {
     return TRUE;
   }
@@ -999,6 +1361,8 @@ EfiPxeBcUdpRead (
     return EFI_NOT_STARTED;
   }
 
+  Mode->IcmpErrorReceived = FALSE;
+
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -1013,6 +1377,9 @@ EfiPxeBcUdpRead (
   IsDone = FALSE;
   Status = Udp4->Receive (Udp4, &Token);
   if (EFI_ERROR (Status)) {
+    if (Status == EFI_ICMP_ERROR) {
+      Mode->IcmpErrorReceived = TRUE;
+    }
     goto ON_EXIT;
   }
 
@@ -1338,9 +1705,24 @@ EfiPxeBcArp (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = Private->Arp->Request (Private->Arp, &IpAddr->v4, NULL, &TempMacAddr);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  Mode->IcmpErrorReceived = FALSE;
+
+  if (!Mode->AutoArp) {
+    //
+    // If AutoArp is set false, check arp cache
+    //
+    UpdateArpCache (This);
+    if (!FindInArpCache (Mode, &IpAddr->v4, &TempMacAddr)) {
+      return EFI_DEVICE_ERROR;
+    }
+  } else {
+    Status = Private->Arp->Request (Private->Arp, &IpAddr->v4, NULL, &TempMacAddr);
+    if (EFI_ERROR (Status)) {
+      if (Status == EFI_ICMP_ERROR) {
+        Mode->IcmpErrorReceived = TRUE;
+      }
+      return Status;
+    }
   }
 
   if (MacAddr != NULL) {
@@ -1519,11 +1901,13 @@ EfiPxeBcSetStationIP (
   }
 
   if (NewStationIp != NULL) {
-    Mode->StationIp = *NewStationIp;
+    Mode->StationIp    = *NewStationIp;
+    Private->StationIp = *NewStationIp;
   }
 
   if (NewSubnetMask != NULL) {
-    Mode->SubnetMask = *NewSubnetMask;
+    Mode->SubnetMask    = *NewSubnetMask;
+    Private->SubnetMask = *NewSubnetMask;
   }
 
   Private->AddressIsOk = TRUE;
@@ -1541,6 +1925,14 @@ EfiPxeBcSetStationIP (
 
     Private->Arp->Configure (Private->Arp, NULL);
     Private->Arp->Configure (Private->Arp, &ArpConfigData);
+
+    //
+    // Update the route table.
+    //
+    Mode->RouteTableEntries                = 1;
+    Mode->RouteTable[0].IpAddr.Addr[0]     = Private->StationIp.Addr[0] & Private->SubnetMask.Addr[0];
+    Mode->RouteTable[0].SubnetMask.Addr[0] = Private->SubnetMask.Addr[0];
+    Mode->RouteTable[0].GwAddr.Addr[0]     = 0;
   }
 
   return EFI_SUCCESS;
@@ -1964,6 +2356,7 @@ EfiPxeLoadFile (
   BlockSize       = 0x8000;
   Status          = EFI_DEVICE_ERROR;
 
+  CpuDeadLoop ();
   if (This == NULL || BufferSize == NULL) {
 
     return EFI_INVALID_PARAMETER;
