@@ -225,11 +225,13 @@ Returns:
   }
 
   if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->ImageContext.Machine)) {
-    //
-    // The PE/COFF loader can support loading image types that can be executed.
-    // If we loaded an image type that we can not execute return EFI_UNSUPORTED.
-    //
-    return EFI_UNSUPPORTED;
+    if (!EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED (Image->ImageContext.Machine)) {
+      //
+      // The PE/COFF loader can support loading image types that can be executed.
+      // If we loaded an image type that we can not execute return EFI_UNSUPORTED.
+      //
+      return EFI_UNSUPPORTED;
+    }
   }
   
   //
