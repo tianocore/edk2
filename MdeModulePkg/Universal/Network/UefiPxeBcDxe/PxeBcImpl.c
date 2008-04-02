@@ -251,7 +251,6 @@ EfiPxeBcStart (
   EFI_PXE_BASE_CODE_MODE  *Mode;
   EFI_STATUS              Status;
 
-  CpuDeadLoop ();
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2356,7 +2355,6 @@ EfiPxeLoadFile (
   BlockSize       = 0x8000;
   Status          = EFI_DEVICE_ERROR;
 
-  CpuDeadLoop ();
   if (This == NULL || BufferSize == NULL) {
 
     return EFI_INVALID_PARAMETER;
