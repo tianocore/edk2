@@ -444,19 +444,22 @@ PxeBcDriverBindingStop (
   EFI_STATUS                  Status;
 
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiArpProtocolGuid);
-
   if (NicHandle == NULL) {
-
     NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiDhcp4ProtocolGuid);
 
     if (NicHandle == NULL) {
-
-      NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiMtftp4ProtocolGuid);
+      NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiIp4ProtocolGuid);
 
       if (NicHandle == NULL) {
+        NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiUdp4ProtocolGuid);
 
-        return EFI_DEVICE_ERROR;
+        if (NicHandle == NULL) {
+          NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiMtftp4ProtocolGuid);
 
+          if (NicHandle == NULL) {
+            return EFI_DEVICE_ERROR;
+          }
+        }
       }
     }
   }
@@ -524,6 +527,19 @@ PxeBcDriverBindingStop (
       This->DriverBindingHandle,
       &gEfiMtftp4ServiceBindingProtocolGuid,
       Private->Mtftp4Child
+      );
+
+    gBS->CloseProtocol (
+          Private->Ip4Child,
+          &gEfiIp4ProtocolGuid,
+          This->DriverBindingHandle,
+          NicHandle
+          );
+    NetLibDestroyServiceChild (
+      NicHandle,
+      This->DriverBindingHandle,
+      &gEfiIp4ServiceBindingProtocolGuid,
+      Private->Ip4Child
       );
 
     gBS->CloseProtocol (
