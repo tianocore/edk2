@@ -59,7 +59,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg\IntelFrameworkPkg.dec
 
 [LibraryClasses]
   PeCoffLib
@@ -81,12 +80,9 @@
   PerformanceLib
 
 [Ppis]
-  gEfiPeiSecurityPpiGuid                        # PPI SOMETIMES_CONSUMED
-  gEfiPeiSectionExtractionPpiGuid               # PPI SOMETIMES_CONSUMED
   gEfiEndOfPeiSignalPpiGuid                     # PPI SOMETIMES_PRODUCED
   gEfiDxeIplPpiGuid                             # PPI SOMETIMES_PRODUCED
   gEfiPeiDecompressPpiGuid
-  gEfiPeiFirmwareVolumeInfoPpiGuid
   gEfiPeiReadOnlyVariable2PpiGuid
 
 [Guids]

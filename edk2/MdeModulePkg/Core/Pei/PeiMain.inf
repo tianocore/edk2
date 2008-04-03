@@ -50,7 +50,6 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg\IntelFrameworkPkg.dec
 
 [LibraryClasses]
   TimerLib
@@ -73,7 +72,6 @@
   gEfiFirmwareFileSystem2Guid
 
 [Ppis]
-  gEfiPeiSecurityPpiGuid                        # PPI_NOTIFY SOMETIMES_CONSUMED
   gEfiPeiStatusCodePpiGuid                      # PPI SOMETIMES_CONSUMED
   gEfiPeiResetPpiGuid                           # PPI SOMETIMES_CONSUMED
   gEfiDxeIplPpiGuid                             # PPI ALWAYS_CONSUMED
