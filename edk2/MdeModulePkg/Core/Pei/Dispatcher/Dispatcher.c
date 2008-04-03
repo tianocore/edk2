@@ -578,11 +578,6 @@ Returns:
               PrivateInMem->PeiMemoryInstalled     = TRUE;
 
               //
-              // Make sure we don't retry the same PEIM that added memory
-              //
-              PrivateInMem->CurrentPeimCount++;
-
-              //
               // Shadow PEI Core. When permanent memory is avaiable, shadow
               // PEI Core and PEIMs to get high performance.
               //
