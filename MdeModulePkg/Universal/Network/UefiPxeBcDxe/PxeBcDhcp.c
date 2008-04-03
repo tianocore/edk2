@@ -1669,7 +1669,8 @@ PxeBcSelectBootMenu (
   }
 
   if (UseDefaultItem) {
-    *Type = NTOHS (MenuArray[0]->Type);
+    CopyMem (Type, &MenuArray[0]->Type, sizeof (UINT16));
+    *Type = NTOHS (*Type);
     return EFI_SUCCESS;
   }
 
@@ -1769,7 +1770,8 @@ PxeBcSelectBootMenu (
   //
   // Swap the byte order
   //
-  *Type = NTOHS (MenuArray[Select]->Type);
+  CopyMem (Type, &MenuArray[Select]->Type, sizeof (UINT16));
+  *Type = NTOHS (*Type);
 
   return EFI_SUCCESS;
 }
