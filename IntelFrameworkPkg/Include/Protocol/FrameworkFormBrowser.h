@@ -50,7 +50,7 @@ typedef struct {
   UINTN RightColumn;
   UINTN TopRow;
   UINTN BottomRow;
-} EFI_SCREEN_DESCRIPTOR;
+} FRAMEWORK_EFI_SCREEN_DESCRIPTOR;
 
 /**
   Provides direction to the configuration driver whether to use the HII
@@ -99,7 +99,7 @@ EFI_STATUS
   IN  FRAMEWORK_EFI_IFR_PACKET                  *Packet, OPTIONAL
   IN  EFI_HANDLE                      CallbackHandle, OPTIONAL
   IN  UINT8                           *NvMapOverride, OPTIONAL
-  IN EFI_SCREEN_DESCRIPTOR            *ScreenDimensions, OPTIONAL
+  IN  FRAMEWORK_EFI_SCREEN_DESCRIPTOR            *ScreenDimensions, OPTIONAL
   OUT BOOLEAN                         *ResetRequired OPTIONAL
   );
 
