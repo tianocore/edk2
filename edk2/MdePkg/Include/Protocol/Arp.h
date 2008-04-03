@@ -1,4 +1,15 @@
 /** @file
+  
+  EFI ARP Protocol Definition
+  
+  The EFI ARP Service Binding Protocol is used to locate EFI
+  ARP Protocol drivers to create and destroy child of the
+  driver to communicate with other host using ARP protocol.
+  
+  The EFI ARP Protocol provides services to map IP network
+  address to hardware address used by a data link protocol.
+  
+  
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         

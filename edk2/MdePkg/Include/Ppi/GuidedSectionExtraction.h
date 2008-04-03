@@ -1,4 +1,4 @@
-/* @file
+/** @file
   If a GUID-defined section is encountered when doing section extraction, 
   the PEI Foundation or the EFI_PEI_FILE_LOADER_PPI instance 
   calls the appropriate instance of the GUIDed Section Extraction PPI 

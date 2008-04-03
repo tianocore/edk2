@@ -1,4 +1,4 @@
-/* @file
+/** @file
   This file declares Temporary RAM Support PPI.
 
   Copyright (c) 2006 - 2007, Intel Corporation                                                         

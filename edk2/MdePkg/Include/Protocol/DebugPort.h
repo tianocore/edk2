@@ -1,4 +1,9 @@
 /** @file
+  
+  The file defines the EFI Debugport protocol.
+  This protocol is used by debug agent to communicate with the
+  remote debug host.
+  
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         

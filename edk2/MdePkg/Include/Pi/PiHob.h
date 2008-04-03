@@ -1,4 +1,4 @@
-/* @file
+/** @file
   HOB related definitions in PI.
 
   Copyright (c) 2006 - 2007, Intel Corporation                                                         

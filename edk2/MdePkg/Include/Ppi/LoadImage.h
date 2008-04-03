@@ -1,4 +1,4 @@
-/* @file
+/** @file
   The file descript the PPI which notifies other drivers 
   of the PEIM being initialized by the PEI Dispatcher.
 

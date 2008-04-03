@@ -1,4 +1,4 @@
-/* @file
+/** @file
   EFI Guid Partition Table Format Definition.
 
   Copyright (c) 2006 - 2007, Intel Corporation
