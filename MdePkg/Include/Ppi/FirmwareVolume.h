@@ -1,4 +1,4 @@
-/* @file
+/** @file
   This file provides functions for accessing a memory-mapped firmware volume of a specific format.
 
   Copyright (c) 2006 - 2007, Intel Corporation                                                         

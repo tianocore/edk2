@@ -50,6 +50,7 @@ SetPeiServicesTablePointer (
   @param    PeiServices   The address of PeiServices pointer.
 **/
 VOID
+EFIAPI
 MigrateIdtTable (
   IN EFI_PEI_SERVICES  **PeiServices
   );

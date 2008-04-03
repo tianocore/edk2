@@ -1,4 +1,4 @@
-/* @file
+/** @file
   This file provides location and format of a firmware volume.
 
   Copyright (c) 2006 - 2007, Intel Corporation                                                         

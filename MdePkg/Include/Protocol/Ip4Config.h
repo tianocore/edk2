@@ -1,4 +1,8 @@
 /** @file
+
+  This file provides a definition of the EFI IPv4 Configuration
+  Protocol.
+
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -9,7 +13,6 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
 #ifndef __EFI_IP4CONFIG_PROTOCOL_H__
 #define __EFI_IP4CONFIG_PROTOCOL_H__
 

@@ -1,4 +1,16 @@
 /** @file
+  
+  This file defines the EFI IPv4 (Internet Protocol version 4)
+  Protocol interface. It is split into the following three main
+  sections:
+  - EFI IPv4 Service Binding Protocol
+  - EFI IPv4 Variable
+  - EFI IPv4 Protocol The EFI IPv4 Protocol provides basic
+    network IPv4 packet I/O services, which includes support for
+    a subset of the Internet Control Message Protocol (ICMP) and
+    may include support for the Internet Group Management
+    Protocol (IGMP).
+  
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         

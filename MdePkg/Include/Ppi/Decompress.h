@@ -1,4 +1,4 @@
-/* @file
+/** @file
   Provides decompression services to the PEI Foundatoin.
 
   Copyright (c) 2006, Intel Corporation                                                         

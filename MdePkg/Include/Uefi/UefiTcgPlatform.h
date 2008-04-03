@@ -1,4 +1,5 @@
-/* @file
+/** @file
+  
   TCG EFI Platform Definition in TCG_EFI_Platform_1_20_Final
 
   Copyright (c) 2006 - 2007, Intel Corporation

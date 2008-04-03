@@ -1,4 +1,4 @@
-/* @file
+/** @file
   Platform Configuration Database (PCD) PPI
 
   Copyright (c) 2006 - 2007, Intel Corporation                                                         
