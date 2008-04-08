@@ -467,7 +467,7 @@ ConSplitterTextOutConstructor (
   ConOutPrivate->GraphicsOutput.Mode->Info->Version = 0;
   ConOutPrivate->GraphicsOutput.Mode->Info->PixelFormat = PixelBltOnly;
   ConOutPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-  ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
+  ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
   ConOutPrivate->GraphicsOutput.Mode->FrameBufferSize = 0;
 
   ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
@@ -1985,7 +1985,7 @@ Returns:
       CurrentGraphicsOutputMode->Info->PixelFormat = PixelBltOnly;
       ZeroMem (&CurrentGraphicsOutputMode->Info->PixelInformation, sizeof (EFI_PIXEL_BITMASK));
       CurrentGraphicsOutputMode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-      CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
+      CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
       CurrentGraphicsOutputMode->FrameBufferSize = 0;
     }
 
@@ -2021,7 +2021,7 @@ Returns:
     CurrentGraphicsOutputMode->Info->PixelFormat = PixelBltOnly;
     CurrentGraphicsOutputMode->Info->PixelsPerScanLine = 800;
     CurrentGraphicsOutputMode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-    CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
+    CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
     CurrentGraphicsOutputMode->FrameBufferSize = 0;
 
     //

@@ -790,7 +790,7 @@ Returns:
              FilePath,
              SourceBuffer,
              SourceSize,
-             (EFI_PHYSICAL_ADDRESS)NULL,
+             (EFI_PHYSICAL_ADDRESS) (UINTN) NULL,
              NULL,
              ImageHandle,
              NULL,

@@ -1582,7 +1582,7 @@ Returns:
     PXE_ROMID_IMP_SOFTWARE_INT_SUPPORTED |
     PXE_ROMID_IMP_PACKET_RX_INT_SUPPORTED;
 
-  PxePtr->EntryPoint  = (UINT64) UNDI_APIEntry_new;
+  PxePtr->EntryPoint  = (UINT64) (UINTN) UNDI_APIEntry_new;
   PxePtr->MinorVer    = PXE_ROMID_MINORVER_31;
 
   PxePtr->reserved2[0]  = 0;
