@@ -666,7 +666,6 @@ GetDriverFromMapping (
   EFI_HANDLE                  *ImageHandleBuffer;
   UINTN                       ImageHandleCount;
   UINTN                       Index;
-  EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage;
   EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
   EFI_HANDLE                  DriverBindingHandle;
   BOOLEAN                     FoundLastReturned;
@@ -677,8 +676,7 @@ GetDriverFromMapping (
   EFI_DEVICE_PATH_PROTOCOL    *TempDriverImagePath;
   EFI_HANDLE                  ImageHandle;
   EFI_HANDLE                  Handle;
-  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageHandleDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL    *TatalFilePath;
+  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL  *BusSpecificDriverOverride;
   UINTN                       DevicePathSize;
 
@@ -786,39 +784,28 @@ GetDriverFromMapping (
         }
 
         for(Index = 0; Index < ImageHandleCount; Index ++) {
-          Status = gBS->HandleProtocol (
-                          ImageHandleBuffer[Index],
-                          &gEfiLoadedImageProtocolGuid,
-                          (VOID **) &LoadedImage
-                          );
-          if (EFI_ERROR (Status)) {
-            continue;
-          }
-
           //
-          // Get the driver image total file path
+          // Get the EFI Loaded Image Device Path Protocol
           //
-          LoadedImageHandleDevicePath = NULL;
+          LoadedImageDevicePath = NULL;
           Status = gBS->HandleProtocol (
-                              LoadedImage->DeviceHandle,
-                              &gEfiDevicePathProtocolGuid,
-                              (VOID **) &LoadedImageHandleDevicePath
+                              ImageHandleBuffer[Index],
+                              &gEfiLoadedImageDevicePathProtocolGuid,
+                              (VOID **) &LoadedImageDevicePath
                               );
           if (EFI_ERROR (Status)) {
             //
-            // Maybe Not all  LoadedImage->DeviceHandle has valid value.  Skip the invalid image.
+            // Maybe Not all EFI Loaded Image Device Path Protocol existed.
             //
             continue;
           }
 
-          TatalFilePath = AppendDevicePath (LoadedImageHandleDevicePath, LoadedImage->FilePath);
-
           DevicePathSize = GetDevicePathSize (DriverImageInfo->DriverImagePath);
-          if (DevicePathSize == GetDevicePathSize (TatalFilePath)) {
+          if (DevicePathSize == GetDevicePathSize (LoadedImageDevicePath)) {
             if (CompareMem (
                   DriverImageInfo->DriverImagePath,
-                  TatalFilePath,
-                  GetDevicePathSize (TatalFilePath)
+                  LoadedImageDevicePath,
+                  GetDevicePathSize (LoadedImageDevicePath)
                   ) == 0
                 ) {
               ImageFound = TRUE;
@@ -1881,7 +1868,7 @@ ConnectDevicePath (
           //    change, so next time will do the dispatch, then dispatch's status
           //    will take effect
           // 2. If the connect success, the RemainingDevicepath and handle will
-         //    change, then avoid the dispatch, we have chance to continue the
+          //    change, then avoid the dispatch, we have chance to continue the
           //    next connection
           //
           gBS->ConnectController (Handle, NULL, RemainingDevicePath, FALSE);
