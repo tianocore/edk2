@@ -1,5 +1,6 @@
 /** @file
-  Header file for DxeIpl PEIM.
+  Master header file for DxeIpl PEIM. All source files in this module should
+  include this file for common defininitions. 
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
