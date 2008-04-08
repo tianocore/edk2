@@ -1,6 +1,9 @@
 /** @file
   Internal include file of DXE CPU IO Library.
-
+  It includes all necessary protocol/library class's header file
+  for implementation of IoLib library instance. It is included 
+  all source code of this library instance.
+  
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License

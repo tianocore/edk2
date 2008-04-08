@@ -1,6 +1,8 @@
 /** @file
   I/O Library.
-
+  The implementation of I/O operation for this library instance 
+  are based on EFI_CPU_IO_PROTOCOL.
+  
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
