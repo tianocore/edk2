@@ -1,5 +1,8 @@
 /** @file
-
+  This protocol is used to prepare all information that is needed for the S3 resume boot path. This
+  protocol is not required for all platforms.
+  This protocol is defined in framework S3Resume v0.9, page 21.
+  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,13 +11,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  AcpiS3Save.h
-
-Abstract:
-
 
 **/
 

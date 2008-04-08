@@ -1,6 +1,13 @@
 /** @file
   This file declares Boot Script Executer PPI.
 
+  This PPI is published by a PEIM upon dispatch and provides an execution engine for the
+  Framework boot script. This PEIM should be platform neutral and have no specific knowledge of
+  platform instructions and other information. The ability to interpret the boot script depends on the
+  abundance of other PPIs that are available. For example, if the script requests an SMBus command
+  execution, the PEIM looks for a relevant PPI that is available to execute it, rather than executing it
+  by issuing the native IA-32 instruction.
+
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License

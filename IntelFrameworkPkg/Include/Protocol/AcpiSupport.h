@@ -1,6 +1,15 @@
 /** @file
-  Definition of the ACPI Support protocol.
+  This protocol provides some basic services to support publishing ACPI system tables. The
+  services handle many of the more mundane tasks that are required to publish a set of tables. The
+  services will do the following:
+  	- Generate common tables.
+	- Update the table links.
+	- Ensure that tables are properly aligned and use correct types of memory.
+	- Update checksum values and IDs.
+	- Complete the final installation of the tables.
 
+  This is defined in the ACPI Specification 0.9.
+  
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -9,11 +18,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  AcpiSupport.h
-
-  @par Revision Reference:
-  This is defined in the ACPI Specification 0.9.
 
 **/
 

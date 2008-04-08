@@ -1,5 +1,12 @@
 /** @file
   This file declares Device Recovery Module PPI.
+  The interface of this PPI does the following:
+    - Reports the number of recovery DXE capsules that exist on the associated device(s)
+    - Finds the requested firmware binary capsule
+    - Loads that capsule into memory
+  A device can be either a group of devices, such as a block device, or an individual device.T he
+  module determines the internal search order, with capsule number 1 as the highest load priority and
+  number N as the lowest priority.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

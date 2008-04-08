@@ -1,6 +1,22 @@
 /** @file
-  This file declares S3 Resume PPI.
-
+  This file declares S3 Resume PPI which accomplishes the firmware S3 resume boot path
+  and transfers control to OS.
+  
+  This PPI is published by the S3 resume PEIM and can be used on the S3 resume boot path to
+  restore the platform to its preboot configuration and transfer control to OS. The information that is
+  required for an S3 resume can be saved during the normal boot path using
+  EFI_ACPI_S3_SAVE_PROTOCOL. This presaved information can then be restored in the S3
+  resume boot path using EFI_PEI_S3_RESUME_PPI. Architecturally, the S3 resume PEIM is the
+  last PEIM to be dispatched in the S3 resume boot path.
+  Before using this PPI, the caller has to ensure the necessary information for the S3 resume, such as
+  the following, is available for the S3 resume boot path:
+  - EFI_ACPI_S3_RESUME_SCRIPT_TABLE script table. Type
+    EFI_ACPI_S3_RESUME_SCRIPT_TABLE is defined in the Intel® Platform Innovation
+    Framework for EFI Boot Script Specification.
+  - OS waking vector.
+  - The reserved memory range to be used for the S3 resume.
+  Otherwise, the S3 resume boot path may fail.
+  
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License

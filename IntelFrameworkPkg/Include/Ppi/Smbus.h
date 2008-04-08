@@ -1,5 +1,6 @@
 /** @file
-  This file declares Smbus PPI.
+  This file declares Smbus PPI which provides the basic I/O interfaces that a PEIM 
+  uses to access its SMBus controller and the slave devices attached to it.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
