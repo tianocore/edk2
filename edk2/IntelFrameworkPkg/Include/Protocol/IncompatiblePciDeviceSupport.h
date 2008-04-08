@@ -1,5 +1,19 @@
 /** @file
   This file declares EFI Incompatible PCI Device Support Protocol
+  This protocol allows the PCI bus driver to support resource allocation for some PCI devices that do not comply
+  with the PCI Specification.
+  The EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL is used by the PCI bus driver
+  to support resource allocation for some PCI devices that do not comply with the PCI Specification.
+  This protocol can find some incompatible PCI devices and report their special resource
+  requirements to the PCI bus driver. The generic PCI bus driver does not have prior knowledge of
+  any incompatible PCI devices. It interfaces with the
+  EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL to find out if a device is
+  incompatible and to obtain the special configuration requirements for a specific incompatible PCI
+  device.
+  This protocol is optional, and only one instance of this protocol can be present in the system. If a
+  platform supports this protocol, this protocol is produced by a Driver Execution Environment
+  (DXE) driver and must be made available before the Boot Device Selection (BDS) phase. The PCI
+  bus driver will look for the presence of this protocol before it begins PCI enumeration.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

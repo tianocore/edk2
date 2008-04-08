@@ -1,5 +1,7 @@
 /** @file
   This file declares EFI PCI Hot Plug Init Protocol
+  This protocol provides the necessary functionality to initialize the Hot Plug Controllers (HPCs) and
+  the buses that they control. This protocol also provides information regarding resource padding.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

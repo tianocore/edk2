@@ -1,5 +1,5 @@
 /** @file
-  This file declares EFI Smm Power Button Smi Child Protocol
+  Provides the parent dispatch service for the power button SMI source generator.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

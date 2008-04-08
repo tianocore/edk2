@@ -1,6 +1,9 @@
 /** @file
   This file declares Smm Gpi Smi Child Protocol
-
+  The EFI_SMM_GPI_DISPATCH_PROTOCOL provides the ability to install child handlers for the
+  given event types. Several inputs can be enabled. This purpose of this interface is to generate an
+  SMI in response to any of these inputs having a true value provided.
+  
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License

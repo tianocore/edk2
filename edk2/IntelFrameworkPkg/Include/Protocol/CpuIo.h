@@ -1,5 +1,6 @@
 /** @file
-  This code abstracts the CPU IO Protocol
+  This code abstracts the CPU IO Protocol which installed by some platform or chipset-specific 
+  PEIM that abstracts the processor-visible I/O operations.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

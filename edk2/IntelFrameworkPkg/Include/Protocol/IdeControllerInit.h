@@ -1,5 +1,13 @@
 /** @file
   This file declares EFI IDE Controller Init Protocol
+  The EFI_IDE_CONTROLLER_INIT_PROTOCOL provides the chipset-specific information to
+  the IDE bus driver. This protocol is mandatory for IDE controllers if the IDE devices behind the
+  controller are to be enumerated by an IDE bus driver.
+  There can only be one instance of EFI_IDE_CONTROLLER_INIT_PROTOCOL for each IDE
+  controller in a system. It is installed on the handle that corresponds to the IDE controller. An IDE
+  bus driver that wishes to manage an IDE bus and possibly IDE devices in a system will have to
+  retrieve the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance that is associated with the
+  controller to be managed.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

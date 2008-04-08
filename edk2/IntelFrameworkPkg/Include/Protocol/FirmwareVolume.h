@@ -1,6 +1,10 @@
 /** @file
   This file declares Firmware Volume protocol.
-
+  The Firmware Volume Protocol provides file-level access to the firmware volume.E ach firmware
+  volume driver must produce an instance of the Firmware Volume Protocol if the firmware volume
+  is to be visible to the system.T he Firmware Volume Protocol also provides mechanisms for
+  determining and modifying some attributes of the firmware volume.
+  
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -9,8 +13,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  FirmwareVolume.h
 
   @par Revision Reference:
   This protocol is defined in Firmware Volume specification.

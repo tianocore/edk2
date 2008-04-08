@@ -1,5 +1,5 @@
 /** @file
-  This file declares EFI Smm Periodic Timer Smi Child Protocol
+  Provides the parent dispatch service for the periodical timer SMI source generator.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

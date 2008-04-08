@@ -1,5 +1,10 @@
 /** @file
-  This file declares SMM SMRAM Access abstraction protocol
+  This file declares SMM SMRAM Access abstraction protocol which is used to control 
+  the visibility of the SMRAM on the platform. The expectation is
+  that the north bridge or memory controller would publish this protocol. 
+  For example, the Memory Controller Hub (MCH) has the hardware provision for this 
+  type of control. Because of the protected, distinguished class of memory for IA-32 
+  systems, the expectation is that this protocol would be supported only on IA-32 systems.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -9,8 +14,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  SmmAccess.h
 
   @par Revision Reference:
   This Protocol is defined in Framework of EFI SMM Core Interface Spec

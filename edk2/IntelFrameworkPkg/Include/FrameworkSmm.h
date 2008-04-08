@@ -1,5 +1,5 @@
 /** @file
-  Header file that supports Framework extension to UEFI/PI for DXE modules.
+  Header file that supports Framework extension to UEFI/PI for SMM modules.
 
   This header file must include Framework extension definitions common to DXE
   modules.

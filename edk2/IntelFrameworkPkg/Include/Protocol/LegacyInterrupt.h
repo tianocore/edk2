@@ -1,5 +1,5 @@
 /** @file
-  This protocol manages the legacy memory regions between 0xc0000 - 0xfffff
+  This protocol abstracts the PIRQ programming from the generic EFI Compatibility Support Modules (CSMs).
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -9,8 +9,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  LegacyInterrupt.h
 
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
