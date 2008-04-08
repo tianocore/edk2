@@ -1,5 +1,7 @@
 /** @file
   This file declares Section Extraction PPI.
+  This PPI supports encapsulating sections, such as GUIDed sections used to authenticate the file
+  encapsulation of other domain-specific wrapping.
 
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials

@@ -1,4 +1,6 @@
 /** @file
+  Library class name: SmmLib
+  
   SMM Library Services that abstracts both S/W SMI generation and detection. 
 
   Copyright (c) 2007, Intel Corporation                                                         

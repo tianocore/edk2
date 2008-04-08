@@ -1,5 +1,6 @@
 /** @file
-  This file declares Recovery Module PPI.
+  This file declares Recovery Module PPI. 
+  This PPI is used to find and load the recovery files.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

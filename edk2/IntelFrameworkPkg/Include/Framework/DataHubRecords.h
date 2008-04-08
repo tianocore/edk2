@@ -1,4 +1,4 @@
-  /** @file
+/** @file
   This file defines GUIDs and associated data structures for records posted to the Data Hub.
   The producers of these records use these definitions to construct records.
   The consumers of these records use these definitions to retrieve, filter and parse records.

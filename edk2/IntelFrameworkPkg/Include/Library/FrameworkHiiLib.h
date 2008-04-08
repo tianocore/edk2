@@ -1,6 +1,11 @@
 /** @file
-  Public include file for the HII Library
-
+  Library class name: FrameworkHiiLib.
+  
+  FrameworkHiiLib is designed for produce interfaces to access
+  framework HII things. It firstly also produce all interfaces define
+  in HiiLib library class in MdePkg/Include/HiiLib.h. It also produce
+  framework's old interface PreparePackages to keep compatiblity.
+     
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -9,8 +14,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-  Module Name:  HiiLib.h
 
 **/
 
@@ -34,8 +37,7 @@
   @param  NumberOfPackages The number of HII packages to prepare.
   @param  Guid Package GUID.
 
-  @return
-  The allocated and initialized packages.
+  @return The allocated and initialized packages.
 
 **/
 EFI_HII_PACKAGES *

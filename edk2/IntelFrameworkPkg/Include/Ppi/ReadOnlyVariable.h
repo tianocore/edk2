@@ -1,5 +1,10 @@
 /** @file
   This file declares Read-only Variable Service PPI
+  These services provide a lightweight, read-only variant of the full EFI variable services. The
+  reason that these services are read-only is to reduce the complexity of flash management. Also,
+  some implementation of the PEI may use the same physical flash part for variable and PEIM
+  storage; as such, a write command to certain technologies would alter the contents of the entire part,
+  thus making the in situ PEIM execution not follow the required flow.
 
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials
