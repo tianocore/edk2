@@ -1,7 +1,24 @@
 /** @file
   This file declares SMM Base abstraction protocol.
-  This is the base level of compatiblity for SMM drivers.
-
+  This protocol is used to install SMM handlers for support of subsequent SMI/PMI activations. This
+  protocol is available on both IA-32 and Itanium®-based systems.
+ 
+  The EFI_SMM_BASE_PROTOCOL is a set of services that is exported by a processor device. It is
+  a required protocol for the platform processor. This protocol can be used in both boot services and
+  runtime mode. However, only the following member functions need to exist into runtime:
+  - InSmm()
+  - Communicate()
+  This protocol is responsible for registering the handler services. The order in which the handlers are
+  executed is prescribed only with respect to the MakeLast flag in the RegisterCallback()
+  service. The driver exports these registration and unregistration services in boot services mode, but
+  the registered handlers will execute through the preboot and runtime. The only way to change the
+  behavior of a registered driver after ExitBootServices() has been invoked is to use some
+  private communication mechanism with the driver to order it to quiesce. This model permits typical
+  use cases, such as invoking the handler to enter ACPI mode, where the OS loader would make this
+  call before boot services are terminated. On the other hand, handlers for services such as chipset
+  workarounds for the century rollover in CMOS should provide commensurate services throughout
+  preboot and OS runtime.
+ 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License

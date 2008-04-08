@@ -1,6 +1,9 @@
 /** @file
-  This file declares PlatfromOpRom protocols.
-
+  This file declares PlatfromOpRom protocols which provides the interface between 
+  the PCI bus driver/PCI Host Bridge Resource Allocation driver and a platform-specific 
+  driver to describe the unique features of a platform. This
+  protocol is optional.
+  
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -9,8 +12,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  PciPlatform.h
 
   @par Revision Reference:
   This protocol is defined in PCI Platform Support Specification

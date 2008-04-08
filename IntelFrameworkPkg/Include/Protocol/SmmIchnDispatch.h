@@ -1,5 +1,7 @@
 /** @file
-  This file declares EFI Smm ICH [N] Specific Smi Child Protocol
+  Provides the parent dispatch service for a given SMI source generator.
+  The EFI_SMM_ICHN_DISPATCH_PROTOCOL provides the ability to install child handlers for
+  the given event types.
 
   Copyright (c) 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials

@@ -1,5 +1,5 @@
 /** @file
-  This file declares EFI Smm Sx Smi Child Protocol
+  Provides the parent dispatch service for a given Sx-state source generator.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

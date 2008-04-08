@@ -1,6 +1,8 @@
 /** @file
-  This file declares Pci Host Bridge Resource Allocation Protocol
-
+  This file declares Pci Host Bridge Resource Allocation Protocol which 
+  Provides the basic interfaces to abstract a PCI host bridge resource allocation. This protocol is
+  mandatory if the system includes PCI devices.
+  
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -9,8 +11,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  PciHostBridgeResourceAllocation.h
 
   @par Revision Reference:
   This protocol is defined in Framework of EFI Pci Host Bridge Resource Allocation Protocol Spec
