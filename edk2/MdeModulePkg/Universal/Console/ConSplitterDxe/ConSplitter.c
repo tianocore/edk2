@@ -749,7 +749,7 @@ ConSplitterTextOutConstructor (
     // Initialize the following items, theset items remain unchanged in GraphicsOutput->SetMode()
     // GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
     //
-    ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
+    ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
     ConOutPrivate->GraphicsOutput.Mode->FrameBufferSize = 0;
 
     ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
@@ -2683,7 +2683,7 @@ Returns:
       CurrentGraphicsOutputMode->Info->PixelFormat = PixelBltOnly;
       ZeroMem (&CurrentGraphicsOutputMode->Info->PixelInformation, sizeof (EFI_PIXEL_BITMASK));
       CurrentGraphicsOutputMode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-      CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
+      CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
       CurrentGraphicsOutputMode->FrameBufferSize = 0;
     }
 
@@ -2732,7 +2732,7 @@ Returns:
     Info->PixelFormat = PixelBltOnly;
     Info->PixelsPerScanLine = UgaHorizontalResolution;
     CurrentGraphicsOutputMode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-    CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
+    CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
     CurrentGraphicsOutputMode->FrameBufferSize = 0;
 
     //

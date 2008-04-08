@@ -95,7 +95,7 @@ Returns:
     // ScatterGatherList is only referenced if the capsules are defined to persist across
     // system reset. 
     //
-    if (ScatterGatherList == (EFI_PHYSICAL_ADDRESS) NULL) {
+    if (ScatterGatherList == (EFI_PHYSICAL_ADDRESS) (UINTN) NULL) {
       return EFI_INVALID_PARAMETER;
     } else {
       //

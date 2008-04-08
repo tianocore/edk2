@@ -1031,7 +1031,7 @@ WinNtGopConstructor (
   Private->GraphicsOutput.Mode->Info->VerticalResolution = 0;
   Private->GraphicsOutput.Mode->Info->PixelFormat = PixelBltOnly;
   Private->GraphicsOutput.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-  Private->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) NULL;
+  Private->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
   Private->GraphicsOutput.Mode->FrameBufferSize = 0;
 
   Private->HardwareNeedsStarting  = TRUE;
