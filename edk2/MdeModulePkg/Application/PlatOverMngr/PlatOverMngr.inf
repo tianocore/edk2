@@ -64,7 +64,6 @@
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL ALWAYS_CONSUMED
-#  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentName2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
