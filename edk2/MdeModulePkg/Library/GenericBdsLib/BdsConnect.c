@@ -1,6 +1,7 @@
 /** @file
+  BDS Lib functions which relate with connect the device
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  BdsConnect.c
-
-Abstract:
-
-  BDS Lib functions which relate with connect the device
-
 
 **/
 
@@ -29,12 +21,9 @@ Abstract:
   sure all the system controller avialbe and the platform default
   console connected.
 
-  None
-
-  @return None
-
 **/
 VOID
+EFIAPI
 BdsLibConnectAll (
   VOID
   )
@@ -98,6 +87,7 @@ BdsLibGenericConnectAll (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibConnectDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePathToConnect
   )
@@ -203,14 +193,13 @@ BdsLibConnectDevicePath (
   This function will connect all current system handles recursively. The
   connection will finish until every handle's child handle created if it have.
 
-  None
-
   @retval EFI_SUCCESS           All handles and it's child handle have been
                                 connected
   @retval EFI_STATUS            Return the status of gBS->LocateHandleBuffer().
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibConnectAllEfi (
   VOID
   )
@@ -245,13 +234,12 @@ BdsLibConnectAllEfi (
   This function will disconnect all current system handles. The disconnection
   will finish until every handle have been disconnected.
 
-  None
-
   @retval EFI_SUCCESS           All handles have been disconnected
   @retval EFI_STATUS            Return the status of gBS->LocateHandleBuffer().
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibDisconnectAllEfi (
   VOID
   )
@@ -291,12 +279,9 @@ BdsLibDisconnectAllEfi (
   the correspoinding controllers if have. And at the same time, make
   sure all the system controllers have driver to manage it if have.
 
-  None
-
-  @return None
-
 **/
 VOID
+EFIAPI
 BdsLibConnectAllDriversToAllControllers (
   VOID
   )
@@ -338,6 +323,7 @@ BdsLibConnectAllDriversToAllControllers (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibConnectUsbDevByShortFormDP(
   IN UINT8                      HostControllerPI,
   IN EFI_DEVICE_PATH_PROTOCOL   *RemainingDevicePath

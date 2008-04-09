@@ -1,6 +1,8 @@
 /** @file
+  BDS Lib functions which relate with create or process the boot
+  option.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,16 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  BdsBoot.c
-
-Abstract:
-
-  BDS Lib functions which relate with create or process the boot
-  option.
-
 
 **/
 
@@ -96,6 +88,7 @@ BdsLibDoLegacyBoot (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibBootViaBootOption (
   IN  BDS_COMMON_OPTION             * Option,
   IN  EFI_DEVICE_PATH_PROTOCOL      * DevicePath,
@@ -305,11 +298,12 @@ Done:
 
   @param  HardDriveDevicePath    EFI Device Path to boot, if it starts with a hard
                                  drive media device path.
- A Pointer to the full device path.
-  @retval NULL                   Cannot find a valid Hard Drive devic path
+  @return A Pointer to the full device path or NULL if a valid Hard Drive devic path
+          cannot be found.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 BdsExpandPartitionPartialDevicePathToFull (
   IN  HARDDRIVE_DEVICE_PATH      *HardDriveDevicePath
   )
@@ -521,6 +515,7 @@ BdsExpandPartitionPartialDevicePathToFull (
 
 **/
 BOOLEAN
+EFIAPI
 MatchPartitionDevicePathNode (
   IN  EFI_DEVICE_PATH_PROTOCOL   *BlockIoDevicePath,
   IN  HARDDRIVE_DEVICE_PATH      *HardDriveDevicePath
@@ -808,6 +803,7 @@ BdsDeleteAllInvalidEfiBootOption (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibEnumerateAllBootOption (
   IN OUT LIST_ENTRY          *BdsBootOptionList
   )
@@ -1113,6 +1109,7 @@ BdsLibEnumerateAllBootOption (
 
 **/
 VOID
+EFIAPI
 BdsLibBuildOptionFromHandle (
   IN  EFI_HANDLE                 Handle,
   IN  LIST_ENTRY                 *BdsBootOptionList,
@@ -1142,6 +1139,7 @@ BdsLibBuildOptionFromHandle (
 
 **/
 VOID
+EFIAPI
 BdsLibBuildOptionFromShell (
   IN EFI_HANDLE                  Handle,
   IN OUT LIST_ENTRY              *BdsBootOptionList
@@ -1175,12 +1173,9 @@ BdsLibBuildOptionFromShell (
 /**
   Boot from the EFI1.1 spec defined "BootNext" variable
 
-  None
-
-  @return None
-
 **/
 VOID
+EFIAPI
 BdsLibBootNext (
   VOID
   )
@@ -1243,6 +1238,7 @@ BdsLibBootNext (
 
 **/
 EFI_HANDLE
+EFIAPI
 BdsLibGetBootableHandle (
   IN  EFI_DEVICE_PATH_PROTOCOL      *DevicePath
   )
@@ -1465,37 +1461,29 @@ BdsLibNetworkBootWithMediaPresent (
 /**
   For a bootable Device path, return its boot type
 
-  @param  DevicePath             The bootable device Path to check
+  @param  DevicePath                      The bootable device Path to check
 
-  @return UINT32 Boot type :
-  @return //
-  @return // If the device path contains any media deviec path node, it is media boot type
-  @return // For the floppy node, handle it as media node
-  @return //
-  @return BDS_EFI_MEDIA_HD_BOOT
-  @return BDS_EFI_MEDIA_CDROM_BOOT
-  @return BDS_EFI_ACPI_FLOPPY_BOOT
-  @return //
-  @return // If the device path not contains any media deviec path node,  and
-  @return // its last device path node point to a message device path node, it is
-  @return // a message boot type
-  @return //
-  @return BDS_EFI_MESSAGE_ATAPI_BOOT
-  @return BDS_EFI_MESSAGE_SCSI_BOOT
-  @return BDS_EFI_MESSAGE_USB_DEVICE_BOOT
-  @return BDS_EFI_MESSAGE_MISC_BOOT
-  @return //
-  @return // Legacy boot type
-  @return //
-  @return BDS_LEGACY_BBS_BOOT
-  @return //
-  @return // If a EFI Removable BlockIO device path not point to a media and message devie,
-  @return // it is unsupported
-  @return //
-  @return BDS_EFI_UNSUPPORT
+  @retval BDS_EFI_MEDIA_HD_BOOT           If the device path contains any media deviec path node, it is media boot type
+                                          For the floppy node, handle it as media node
+  @retval BDS_EFI_MEDIA_CDROM_BOOT        If the device path contains any media deviec path node, it is media boot type
+                                          For the floppy node, handle it as media node
+  @retval BDS_EFI_ACPI_FLOPPY_BOOT        If the device path contains any media deviec path node, it is media boot type
+                                          For the floppy node, handle it as media node
+  @retval BDS_EFI_MESSAGE_ATAPI_BOOT      If the device path not contains any media deviec path node,  and
+                                          its last device path node point to a message device path node, it is
+  
+  @retval BDS_EFI_MESSAGE_SCSI_BOOT       If the device path not contains any media deviec path node,  and
+                                          its last device path node point to a message device path node, it is
+  @retval BDS_EFI_MESSAGE_USB_DEVICE_BOOT If the device path not contains any media deviec path node,  and
+                                          its last device path node point to a message device path node, it is
+  @retval BDS_EFI_MESSAGE_MISC_BOOT       If the device path not contains any media deviec path node,  and
+                                          its last device path node point to a message device path node, it is
+  @retval BDS_LEGACY_BBS_BOOT             Legacy boot type
+  @retval BDS_EFI_UNSUPPORT               An EFI Removable BlockIO device path not point to a media and message devie,   
 
 **/
 UINT32
+EFIAPI
 BdsGetBootTypeFromDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
@@ -1567,6 +1555,7 @@ BdsGetBootTypeFromDevicePath (
 
 **/
 BOOLEAN
+EFIAPI
 BdsLibIsValidEFIBootOptDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevPath,
   IN BOOLEAN                      CheckMedia
