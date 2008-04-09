@@ -1,6 +1,7 @@
-/*++
+/** @file
+  Header file for boot maintenance module.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  BootMaint.h
-
-Abstract:
-
-Revision History
-
---*/
+**/
 
 #ifndef _BOOT_MAINT_H
 #define _BOOT_MAINT_H
@@ -1050,6 +1043,12 @@ FileExplorerCallback (
 EFI_STATUS
 FormSetDispatcher (
   IN  BMM_CALLBACK_DATA    *CallbackData
+  );
+
+VOID *
+EfiLibGetVariable (
+  IN CHAR16               *Name,
+  IN EFI_GUID             *VendorGuid
   );
 
 //
