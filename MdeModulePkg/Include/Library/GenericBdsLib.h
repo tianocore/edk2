@@ -1,23 +1,16 @@
-/*++
-
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  GenericBdsLib.h
-
-Abstract:
-
+/** @file
   Generic BDS library definition, include the file and data structure
 
---*/
+Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
 
 #ifndef _GENERIC_BDS_LIB_H_
 #define _GENERIC_BDS_LIB_H_
@@ -114,18 +107,33 @@ typedef struct {
 //
 // Bds boot relate lib functions
 //
-EFI_STATUS
-BdsLibUpdateBootOrderList (
-  IN  LIST_ENTRY                 *BdsOptionList,
-  IN  CHAR16                         *VariableName
-  );
+/**
+  Boot from the EFI1.1 spec defined "BootNext" variable
 
+**/
 VOID
+EFIAPI
 BdsLibBootNext (
   VOID
   );
 
+/**
+  Process the boot option follow the EFI 1.1 specification and
+  special treat the legacy boot option with BBS_DEVICE_PATH.
+
+  @param  Option                 The boot option need to be processed
+  @param  DevicePath             The device path which describe where to load the
+                                 boot image or the legcy BBS device path to boot
+                                 the legacy OS
+  @param  ExitDataSize           Returned directly from gBS->StartImage ()
+  @param  ExitData               Returned directly from gBS->StartImage ()
+
+  @retval EFI_SUCCESS            Status from gBS->StartImage ()
+  @retval EFI_NOT_FOUND          If the Device Path is not found in the system
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibBootViaBootOption (
   IN  BDS_COMMON_OPTION             * Option,
   IN  EFI_DEVICE_PATH_PROTOCOL      * DevicePath,
@@ -133,70 +141,208 @@ BdsLibBootViaBootOption (
   OUT CHAR16                        **ExitData OPTIONAL
   );
 
+
+/**
+  This function will enumerate all possible boot device in the system,
+  it will only excute once of every boot.
+
+  @param  BdsBootOptionList      The header of the link list which indexed all
+                                 current boot options
+
+  @retval EFI_SUCCESS            Finished all the boot device enumerate and create
+                                 the boot option base on that boot device
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibEnumerateAllBootOption (
-  IN OUT LIST_ENTRY    *BdsBootOptionList
+  IN OUT LIST_ENTRY          *BdsBootOptionList
   );
 
+/**
+  Build the boot option with the handle parsed in
+
+  @param  Handle                 The handle which present the device path to create
+                                 boot option
+  @param  BdsBootOptionList      The header of the link list which indexed all
+                                 current boot options
+
+  @return VOID
+
+**/
 VOID
+EFIAPI
 BdsLibBuildOptionFromHandle (
-  IN  EFI_HANDLE          Handle,
-  IN  LIST_ENTRY      *BdsBootOptionList,
-  IN  CHAR16              *String
+  IN  EFI_HANDLE                 Handle,
+  IN  LIST_ENTRY                 *BdsBootOptionList,
+  IN  CHAR16                     *String
   );
 
+
+/**
+  Build the on flash shell boot option with the handle parsed in
+
+  @param  Handle                 The handle which present the device path to create
+                                 on flash shell boot option
+  @param  BdsBootOptionList      The header of the link list which indexed all
+                                 current boot options
+
+  @return None
+
+**/
 VOID
+EFIAPI
 BdsLibBuildOptionFromShell (
-  IN  EFI_HANDLE                     Handle,
-  IN  LIST_ENTRY                 *BdsBootOptionList
+  IN EFI_HANDLE                  Handle,
+  IN OUT LIST_ENTRY              *BdsBootOptionList
   );
 
 //
 // Bds misc lib functions
 //
+/**
+  Return the default value for system Timeout variable.
+
+  @return Timeout value.
+
+**/
 UINT16
+EFIAPI
 BdsLibGetTimeout (
   VOID
   );
 
+/**
+  Get boot mode by looking up configuration table and parsing HOB list
+
+  @param  BootMode              Boot mode from PEI handoff HOB.
+
+  @retval EFI_SUCCESS           Successfully get boot mode
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibGetBootMode (
   OUT EFI_BOOT_MODE       *BootMode
   );
 
+
+/**
+  The function will go through the driver optoin link list, load and start
+  every driver the driver optoin device path point to.
+
+  @param  BdsDriverLists        The header of the current driver option link list
+
+**/
 VOID
+EFIAPI
 BdsLibLoadDrivers (
-  IN  LIST_ENTRY              *BdsDriverLists
+  IN LIST_ENTRY                   *BdsDriverLists
   );
 
+
+/**
+  Process BootOrder, or DriverOrder variables, by calling
+  BdsLibVariableToOption () for each UINT16 in the variables.
+
+  @param  BdsCommonOptionList   The header of the option list base on variable
+                                VariableName
+  @param  VariableName          EFI Variable name indicate the BootOrder or
+                                DriverOrder
+
+  @retval EFI_SUCCESS           Success create the boot option or driver option
+                                list
+  @retval EFI_OUT_OF_RESOURCES  Failed to get the boot option or driver option list
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibBuildOptionFromVar (
-  IN  LIST_ENTRY              *BdsCommonOptionList,
-  IN  CHAR16                      *VariableName
+  IN  LIST_ENTRY                      *BdsCommonOptionList,
+  IN  CHAR16                          *VariableName
   );
 
-VOID                      *
+/**
+  Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
+  buffer, and the size of the buffer. If failure return NULL.
+
+  @param  Name                  String part of EFI variable name
+  @param  VendorGuid            GUID part of EFI variable name
+  @param  VariableSize          Returns the size of the EFI variable that was read
+
+  @return Dynamically allocated memory that contains a copy of the EFI variable.
+  @return Caller is responsible freeing the buffer.
+  @retval NULL                  Variable was not read
+
+**/
+VOID *
+EFIAPI
 BdsLibGetVariableAndSize (
   IN  CHAR16              *Name,
   IN  EFI_GUID            *VendorGuid,
   OUT UINTN               *VariableSize
   );
 
+
+/**
+  This function prints a series of strings.
+
+  @param  ConOut                Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
+  @param  ...                   A variable argument list containing series of
+                                strings, the last string must be NULL.
+
+  @retval EFI_SUCCESS           Success print out the string using ConOut.
+  @retval EFI_STATUS            Return the status of the ConOut->OutputString ().
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibOutputStrings (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *ConOut,
   ...
   );
 
-BDS_COMMON_OPTION         *
+/**
+  Build the boot#### or driver#### option from the VariableName, the
+  build boot#### or driver#### will also be linked to BdsCommonOptionList
+
+  @param  BdsCommonOptionList   The header of the boot#### or driver#### option
+                                link list
+  @param  VariableName          EFI Variable name indicate if it is boot#### or
+                                driver####
+
+  @retval BDS_COMMON_OPTION     Get the option just been created
+  @retval NULL                  Failed to get the new option
+
+**/
+BDS_COMMON_OPTION *
+EFIAPI
 BdsLibVariableToOption (
-  IN OUT LIST_ENTRY               *BdsCommonOptionList,
-  IN CHAR16                           *VariableName
+  IN OUT LIST_ENTRY                   *BdsCommonOptionList,
+  IN  CHAR16                          *VariableName
   );
 
+/**
+  This function will register the new boot#### or driver#### option base on
+  the VariableName. The new registered boot#### or driver#### will be linked
+  to BdsOptionList and also update to the VariableName. After the boot#### or
+  driver#### updated, the BootOrder or DriverOrder will also be updated.
+
+  @param  BdsOptionList         The header of the boot#### or driver#### link list
+  @param  DevicePath            The device path which the boot#### or driver####
+                                option present
+  @param  String                The description of the boot#### or driver####
+  @param  VariableName          Indicate if the boot#### or driver#### option
+
+  @retval EFI_SUCCESS           The boot#### or driver#### have been success
+                                registered
+  @retval EFI_STATUS            Return the status of gRT->SetVariable ().
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibRegisterNewOption (
-  IN  LIST_ENTRY                 *BdsOptionList,
+  IN  LIST_ENTRY                     *BdsOptionList,
   IN  EFI_DEVICE_PATH_PROTOCOL       *DevicePath,
   IN  CHAR16                         *String,
   IN  CHAR16                         *VariableName
@@ -205,27 +351,80 @@ BdsLibRegisterNewOption (
 //
 // Bds connect or disconnect driver lib funcion
 //
+/**
+  Connects all drivers to all controllers.
+  This function make sure all the current system driver will manage
+  the correspoinding controllers if have. And at the same time, make
+  sure all the system controllers have driver to manage it if have.
+
+**/
 VOID
+EFIAPI
 BdsLibConnectAllDriversToAllControllers (
   VOID
   );
 
+/**
+  This function will connect all the system driver to controller
+  first, and then special connect the default console, this make
+  sure all the system controller avialbe and the platform default
+  console connected.
+
+**/
 VOID
+EFIAPI
 BdsLibConnectAll (
   VOID
   );
 
+/**
+  This function will create all handles associate with every device
+  path node. If the handle associate with one device path node can not
+  be created success, then still give one chance to do the dispatch,
+  which load the missing drivers if possible.
+
+  @param  DevicePathToConnect   The device path which will be connected, it can be
+                                a multi-instance device path
+
+  @retval EFI_SUCCESS           All handles associate with every device path  node
+                                have been created
+  @retval EFI_OUT_OF_RESOURCES  There is no resource to create new handles
+  @retval EFI_NOT_FOUND         Create the handle associate with one device  path
+                                node failed
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibConnectDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePathToConnect
   );
 
+/**
+  This function will connect all current system handles recursively. The
+  connection will finish until every handle's child handle created if it have.
+
+  @retval EFI_SUCCESS           All handles and it's child handle have been
+                                connected
+  @retval EFI_STATUS            Return the status of gBS->LocateHandleBuffer().
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibConnectAllEfi (
   VOID
   );
 
+
+/**
+  This function will disconnect all current system handles. The disconnection
+  will finish until every handle have been disconnected.
+
+  @retval EFI_SUCCESS           All handles have been disconnected
+  @retval EFI_STATUS            Return the status of gBS->LocateHandleBuffer().
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibDisconnectAllEfi (
   VOID
   );
@@ -233,24 +432,77 @@ BdsLibDisconnectAllEfi (
 //
 // Bds console relate lib functions
 //
+/**
+  This function will search every simpletxt devive in current system,
+  and make every simpletxt device as pertantial console device.
+
+**/
 VOID
+EFIAPI
 BdsLibConnectAllConsoles (
   VOID
   );
 
+
+/**
+  This function will connect console device base on the console
+  device variable ConIn, ConOut and ErrOut.
+
+  @retval EFI_SUCCESS              At least one of the ConIn and ConOut device have
+                                   been connected success.
+  @retval EFI_STATUS               Return the status of
+                                   BdsLibConnectConsoleVariable ().
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibConnectAllDefaultConsoles (
   VOID
   );
 
+/**
+  This function update console variable based on ConVarName, it can
+  add or remove one specific console device path from the variable
+
+  @param  ConVarName               Console related variable name, ConIn, ConOut,
+                                   ErrOut.
+  @param  CustomizedConDevicePath  The console device path which will be added to
+                                   the console variable ConVarName, this parameter
+                                   can not be multi-instance.
+  @param  ExclusiveDevicePath      The console device path which will be removed
+                                   from the console variable ConVarName, this
+                                   parameter can not be multi-instance.
+
+  @retval EFI_UNSUPPORTED          Add or remove the same device path.
+  @retval EFI_SUCCESS              Success add or remove the device path from  the
+                                   console variable.
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibUpdateConsoleVariable (
   IN  CHAR16                    *ConVarName,
   IN  EFI_DEVICE_PATH_PROTOCOL  *CustomizedConDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL  *ExclusiveDevicePath
   );
 
+/**
+  Connect the console device base on the variable ConVarName, if
+  device path of the ConVarName is multi-instance device path, if
+  anyone of the instances is connected success, then this function
+  will return success.
+
+  @param  ConVarName               Console related variable name, ConIn, ConOut,
+                                   ErrOut.
+
+  @retval EFI_NOT_FOUND            There is not any console devices connected
+                                   success
+  @retval EFI_SUCCESS              Success connect any one instance of the console
+                                   device path base on the variable ConVarName.
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibConnectConsoleVariable (
   IN  CHAR16                 *ConVarName
   );
@@ -258,33 +510,76 @@ BdsLibConnectConsoleVariable (
 //
 // Bds device path relate lib functions
 //
-EFI_DEVICE_PATH_PROTOCOL  *
+/**
+  Function unpacks a device path data structure so that all the nodes
+  of a device path are naturally aligned.
+
+  @param  DevPath  A pointer to a device path data structure
+
+  @return If the memory for the device path is successfully allocated, then a
+          pointer to the new device path is returned.  Otherwise, NULL is returned.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 BdsLibUnpackDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   );
 
+/**
+  Delete the instance in Multi which matches partly with Single instance
+
+  @param  Multi                 A pointer to a multi-instance device path data
+                                structure.
+  @param  Single                A pointer to a single-instance device path data
+                                structure.
+
+  @return This function will remove the device path instances in Multi which partly
+          match with the Single, and return the result device path. If there is no
+          remaining device path as a result, this function will return NULL.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 BdsLibDelPartMatchInstance (
   IN     EFI_DEVICE_PATH_PROTOCOL  *Multi,
   IN     EFI_DEVICE_PATH_PROTOCOL  *Single
   );
 
+/**
+  Function compares a device path data structure to that of all the nodes of a
+  second device path instance.
+
+  @param  Multi                 A pointer to a multi-instance device path data
+                                structure.
+  @param  Single                A pointer to a single-instance device path data
+                                structure.
+
+  @retval TRUE                  If the Single is contained within Multi
+  @retval FALSE                 The Single is not match within Multi
+
+**/
 BOOLEAN
+EFIAPI
 BdsLibMatchDevicePaths (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Multi,
   IN  EFI_DEVICE_PATH_PROTOCOL  *Single
   );
 
-CHAR16                    *
+/**
+  This function converts an input device structure to a Unicode string.
+
+  @param DevPath                  A pointer to the device path structure.
+
+  @return A new allocated Unicode string that represents the device path.
+
+**/
+CHAR16 *
+EFIAPI
 DevicePathToStr (
-  EFI_DEVICE_PATH_PROTOCOL     *DevPath
+  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
   );
 
-VOID                      *
-EfiLibGetVariable (
-  IN CHAR16               *Name,
-  IN EFI_GUID             *VendorGuid
-  );
 
 //
 // Internal definitions
@@ -321,19 +616,6 @@ typedef struct {
   CHAR16                    iSCSITargetName[1];
 } ISCSI_DEVICE_PATH_WITH_NAME;
 
-
-//
-// Internal functions
-//
-EFI_STATUS
-BdsBootByDiskSignatureAndPartition (
-  IN  BDS_COMMON_OPTION          * Option,
-  IN  HARDDRIVE_DEVICE_PATH      * HardDriveDevicePath,
-  IN  UINT32                     LoadOptionsSize,
-  IN  VOID                       *LoadOptions,
-  OUT UINTN                      *ExitDataSize,
-  OUT CHAR16                     **ExitData OPTIONAL
-  );
 
 //
 // Notes: EFI 64 shadow all option rom
@@ -389,57 +671,107 @@ BdsDeleteBootOption (
 //
 //The interface functions relate with Setup Browser Reset Reminder feature
 //
+/**
+  Enable the setup browser reset reminder feature.
+  This routine is used in platform tip. If the platform policy need the feature, use the routine to enable it.
+
+**/
 VOID
+EFIAPI
 EnableResetReminderFeature (
   VOID
   );
 
+/**
+  Disable the setup browser reset reminder feature.
+  This routine is used in platform tip. If the platform policy do not want the feature, use the routine to disable it.
+
+**/
 VOID
+EFIAPI
 DisableResetReminderFeature (
   VOID
   );
 
+/**
+  Record the info that  a reset is required.
+  A  module boolean variable is used to record whether a reset is required.
+
+**/
 VOID
+EFIAPI
 EnableResetRequired (
   VOID
   );
 
+
+/**
+  Record the info that  no reset is required.
+  A  module boolean variable is used to record whether a reset is required.
+
+**/
 VOID
+EFIAPI
 DisableResetRequired (
   VOID
   );
 
+/**
+  Check whether platform policy enable the reset reminder feature. The default is enabled.
+
+**/
 BOOLEAN
+EFIAPI
 IsResetReminderFeatureEnable (
   VOID
   );
 
+/**
+  Check if  user changed any option setting which needs a system reset to be effective.
+
+**/
 BOOLEAN
+EFIAPI
 IsResetRequired (
   VOID
   );
 
+/**
+  Check whether a reset is needed, and finish the reset reminder feature.
+  If a reset is needed, Popup a menu to notice user, and finish the feature
+  according to the user selection.
+
+**/
 VOID
+EFIAPI
 SetupResetReminder (
   VOID
   );
 
+
+/**
+  Get the headers (dos, image, optional header) from an image
+
+  @param  Device                SimpleFileSystem device handle
+  @param  FileName              File name for the image
+  @param  DosHeader             Pointer to dos header
+  @param  ImageHeader           Pointer to image header
+  @param  OptionalHeader        Pointer to optional header
+
+  @retval EFI_SUCCESS           Successfully get the machine type.
+  @retval EFI_NOT_FOUND         The file is not found.
+  @retval EFI_LOAD_ERROR        File is not a valid image file.
+
+**/
 EFI_STATUS
+EFIAPI
 BdsLibGetImageHeader (
   IN  EFI_HANDLE                  Device,
   IN  CHAR16                      *FileName,
   OUT EFI_IMAGE_DOS_HEADER        *DosHeader,
   OUT EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr
-  )
-;
-
-EFI_STATUS
-BdsLibGetHiiHandles (
-  IN     EFI_HII_DATABASE_PROTOCOL *HiiDatabase,
-  IN OUT UINT16                    *HandleBufferLength,
-  OUT    EFI_HII_HANDLE            **HiiHandleBuffer
   );
-  
+
 //
 // Define the boot type which to classify the boot option type
 // Different boot option type could have different boot behavior
@@ -478,39 +810,146 @@ BdsLibGetHiiHandles (
 #define  PCI_CLASSC_PI_UHCI               0x00
 #define  PCI_CLASSC_PI_EHCI               0x20
 
+/**
+  Check whether there is a instance in BlockIoDevicePath, which contain multi device path
+  instances, has the same partition node with HardDriveDevicePath device path
+
+  @param  BlockIoDevicePath      Multi device path instances which need to check
+  @param  HardDriveDevicePath    A device path which starts with a hard drive media
+                                 device path.
+
+  @retval TRUE                   There is a matched device path instance FALSE
+                                 -There is no matched device path instance
+
+**/
 BOOLEAN
+EFIAPI
 MatchPartitionDevicePathNode (
   IN  EFI_DEVICE_PATH_PROTOCOL   *BlockIoDevicePath,
   IN  HARDDRIVE_DEVICE_PATH      *HardDriveDevicePath
   );
-  
+
+
+/**
+  Expand a device path that starts with a hard drive media device path node to be a
+  full device path that includes the full hardware path to the device. We need
+  to do this so it can be booted. As an optimizaiton the front match (the part point
+  to the partition node. E.g. ACPI() /PCI()/ATA()/Partition() ) is saved in a variable
+  so a connect all is not required on every boot. All successful history device path
+  which point to partition node (the front part) will be saved.
+
+  @param  HardDriveDevicePath    EFI Device Path to boot, if it starts with a hard
+                                 drive media device path.
+  @return A Pointer to the full device path or NULL if a valid Hard Drive devic path
+          cannot be found.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 BdsExpandPartitionPartialDevicePathToFull (
   IN  HARDDRIVE_DEVICE_PATH      *HardDriveDevicePath
   );
   
+/**
+  Return the bootable media handle.
+  First, check the device is connected
+  Second, check whether the device path point to a device which support SimpleFileSystemProtocol,
+  Third, detect the the default boot file in the Media, and return the removable Media handle.
+
+  @param  DevicePath             Device Path to a  bootable device
+
+  @retval NULL                   The device path points to an EFI bootable Media
+  @retval NULL                   The media on the DevicePath is not bootable
+
+**/
 EFI_HANDLE
+EFIAPI
 BdsLibGetBootableHandle (
   IN  EFI_DEVICE_PATH_PROTOCOL      *DevicePath
   );
   
+
+/**
+  Check whether the Device path in a boot option point to a valide bootable device,
+  And if CheckMedia is true, check the device is ready to boot now.
+
+  DevPath -- the Device path in a boot option
+  CheckMedia -- if true, check the device is ready to boot now.
+
+  @return TRUE      -- the Device path  is valide
+  @return FALSE   -- the Device path  is invalide .
+
+**/
 BOOLEAN
+EFIAPI
 BdsLibIsValidEFIBootOptDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevPath,
   IN BOOLEAN                      CheckMedia
   );
   
+/**
+  For a bootable Device path, return its boot type
+
+  @param  DevicePath                      The bootable device Path to check
+
+  @retval BDS_EFI_MEDIA_HD_BOOT           If the device path contains any media deviec path node, it is media boot type
+                                          For the floppy node, handle it as media node
+  @retval BDS_EFI_MEDIA_CDROM_BOOT        If the device path contains any media deviec path node, it is media boot type
+                                          For the floppy node, handle it as media node
+  @retval BDS_EFI_ACPI_FLOPPY_BOOT        If the device path contains any media deviec path node, it is media boot type
+                                          For the floppy node, handle it as media node
+  @retval BDS_EFI_MESSAGE_ATAPI_BOOT      If the device path not contains any media deviec path node,  and
+                                          its last device path node point to a message device path node, it is
+  
+  @retval BDS_EFI_MESSAGE_SCSI_BOOT       If the device path not contains any media deviec path node,  and
+                                          its last device path node point to a message device path node, it is
+  @retval BDS_EFI_MESSAGE_USB_DEVICE_BOOT If the device path not contains any media deviec path node,  and
+                                          its last device path node point to a message device path node, it is
+  @retval BDS_EFI_MESSAGE_MISC_BOOT       If the device path not contains any media deviec path node,  and
+                                          its last device path node point to a message device path node, it is
+  @retval BDS_LEGACY_BBS_BOOT             Legacy boot type
+  @retval BDS_EFI_UNSUPPORT               An EFI Removable BlockIO device path not point to a media and message devie,   
+
+**/
 UINT32
+EFIAPI
 BdsGetBootTypeFromDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   );
-  
+
+
+/**
+  This routine register a function to adjust the different type memory page number just before booting
+  and save the updated info into the variable for next boot to use
+
+**/
 VOID
 EFIAPI
 BdsLibSaveMemoryTypeInformation (
-  VOID 
+  VOID
   );
   
+
+/**
+  According to a file guild, check a Fv file device path is valid. If it is invalid,
+  try to return the valid device path.
+  FV address maybe changes for memory layout adjust from time to time, use this funciton
+  could promise the Fv file device path is right.
+
+  @param  DevicePath             on input, the Fv file device path need to check on
+                                 output, the updated valid Fv file device path
+  @param  FileGuid               the Fv file guild
+
+  @retval EFI_INVALID_PARAMETER  the input DevicePath or FileGuid is invalid
+                                 parameter
+  @retval EFI_UNSUPPORTED        the input DevicePath does not contain Fv file
+                                 guild at all
+  @retval EFI_ALREADY_STARTED    the input DevicePath has pointed to Fv file, it is
+                                 valid
+  @retval EFI_SUCCESS            has successfully updated the invalid DevicePath,
+                                 and return the updated device path in DevicePath
+
+**/
 EFI_STATUS
 EFIAPI
 BdsLibUpdateFvFileDevicePath (
@@ -518,28 +957,65 @@ BdsLibUpdateFvFileDevicePath (
   IN  EFI_GUID                          *FileGuid
   );
 
+
+/**
+  Connect the specific Usb device which match the short form device path,
+  and whose bus is determined by Host Controller (Uhci or Ehci)
+
+  @param  HostControllerPI      Uhci (0x00) or Ehci (0x20) or Both uhci and ehci
+                                (0xFF)
+  @param  RemainingDevicePath   a short-form device path that starts with the first
+                                element  being a USB WWID or a USB Class device
+                                path
+
+  @return EFI_INVALID_PARAMETER
+  @return EFI_SUCCESS
+  @return EFI_NOT_FOUND
+
+**/
 EFI_STATUS
-BdsLibConnectUsbDevByShortFormDP (
+EFIAPI
+BdsLibConnectUsbDevByShortFormDP(
   IN UINT8                      HostControllerPI,
   IN EFI_DEVICE_PATH_PROTOCOL   *RemainingDevicePath
   );
   
-EFI_TPL
-BdsLibGetCurrentTpl (
-  VOID
-  );
 
 //
 // The implementation of this function is provided by Platform code.
 //
+/**
+  Convert Vendor device path to device name
+
+  @param  Str      The buffer store device name
+  @param  DevPath  Pointer to vendor device path
+
+  @return When it return, the device name have been stored in *Str.
+
+**/
 VOID
+EFIAPI
 DevPathVendor (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
   )
 ;
 
+/**
+  Concatenates a formatted unicode string to allocated pool.
+  The caller must free the resulting buffer.
+
+  @param  Str      Tracks the allocated pool, size in use, and  amount of pool
+                   allocated.
+  @param  fmt      The format string
+
+  @return Allocated buffer with the formatted string printed in it.
+  @return The caller must free the allocated buffer.   The buffer
+  @return allocation is not packed.
+
+**/
 CHAR16 *
+EFIAPI
 CatPrint (
   IN OUT POOL_PRINT   *Str,
   IN CHAR16           *fmt,
