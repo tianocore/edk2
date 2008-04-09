@@ -1,6 +1,9 @@
-/*++
+/** @file
+  Disk Info protocol is used to export Inquiry Data for a drive.
+  Its needed to support low level formating of drives in a mannor
+  thats DOS compatible.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,17 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    DiskInfo.h
-
-Abstract:
-
-  Disk Info protocol is used to export Inquiry Data for a drive.
-  Its needed to support low level formating of drives in a mannor
-  thats DOS compatible.
-
---*/
+**/
 
 #ifndef __DISK_INFO_H__
 #define __DISK_INFO_H__
@@ -34,6 +27,20 @@ Abstract:
 //
 typedef struct _EFI_DISK_INFO_PROTOCOL  EFI_DISK_INFO_PROTOCOL;
 
+/**
+  Return the results of the Inquiry command to a drive in InquiryData.
+  Data format of Inquiry data is defined by the Interface GUID.
+
+  @param  This                  Protocol instance pointer. 
+  @param  InquiryData           Results of Inquiry command to device 
+  @param  InquiryDataSize       Size of InquiryData in bytes. 
+
+  @retval EFI_SUCCESS           InquiryData valid 
+  @retval EFI_NOT_FOUND         Device does not support this data class 
+  @retval EFI_DEVICE_ERROR      Error reading InquiryData from device 
+  @retval EFI_BUFFER_TOO_SMALL  IntquiryDataSize not big enough 
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_INQUIRY) (
@@ -41,26 +48,23 @@ EFI_STATUS
   IN OUT VOID                         *InquiryData,
   IN OUT UINT32                       *IntquiryDataSize
   )
-/*++
-
-  Routine Description:
-    Return the results of the Inquiry command to a drive in InquiryData.
-    Data format of Inquiry data is defined by the Interface GUID.
-
-  Arguments:
-    This        - Protocol instance pointer.
-    InquiryData - Results of Inquiry command to device
-    InquiryDataSize - Size of InquiryData in bytes.
-
-  Returns:
-    EFI_SUCCESS       - InquiryData valid
-    EFI_NOT_FOUND     - Device does not support this data class
-    EFI_DEVICE_ERROR  - Error reading InquiryData from device
-    EFI_BUFFER_TOO_SMALL - IntquiryDataSize not big enough
-
---*/
 ;
 
+
+/**
+  Return the results of the Identify command to a drive in IdentifyData.
+  Data format of Identify data is defined by the Interface GUID.
+
+  @param  This                  Protocol instance pointer. 
+  @param  IdentifyData          Results of Identify command to device 
+  @param  IdentifyDataSize      Size of IdentifyData in bytes. 
+
+  @retval EFI_SUCCESS           IdentifyData valid 
+  @retval EFI_NOT_FOUND         Device does not support this data class 
+  @retval EFI_DEVICE_ERROR      Error reading IdentifyData from device 
+  @retval EFI_BUFFER_TOO_SMALL  IdentifyDataSize not big enough 
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_IDENTIFY) (
@@ -68,26 +72,24 @@ EFI_STATUS
   IN OUT VOID                         *IdentifyData,
   IN OUT UINT32                       *IdentifyDataSize
   )
-/*++
-
-  Routine Description:
-    Return the results of the Identify command to a drive in IdentifyData.
-    Data format of Identify data is defined by the Interface GUID.
-
-  Arguments:
-    This        - Protocol instance pointer.
-    IdentifyData - Results of Identify command to device
-    IdentifyDataSize - Size of IdentifyData in bytes.
-
-  Returns:
-    EFI_SUCCESS       - IdentifyData valid
-    EFI_NOT_FOUND     - Device does not support this data class
-    EFI_DEVICE_ERROR  - Error reading IdentifyData from device
-    EFI_BUFFER_TOO_SMALL - IdentifyDataSize not big enough
-
---*/
 ;
 
+
+/**
+  Return the results of the Request Sense command to a drive in SenseData.
+  Data format of Sense data is defined by the Interface GUID.
+
+  @param  This                  Protocol instance pointer. 
+  @param  SenseData             Results of Request Sense command to device 
+  @param  SenseDataSize         Size of SenseData in bytes. 
+  @param  SenseDataNumber       Type of SenseData 
+
+  @retval EFI_SUCCESS           InquiryData valid 
+  @retval EFI_NOT_FOUND         Device does not support this data class 
+  @retval EFI_DEVICE_ERROR      Error reading InquiryData from device 
+  @retval EFI_BUFFER_TOO_SMALL  SenseDataSize not big enough 
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_SENSE_DATA) (
@@ -96,27 +98,20 @@ EFI_STATUS
   IN OUT UINT32                       *SenseDataSize,
   OUT UINT8                           *SenseDataNumber
   )
-/*++
-
-  Routine Description:
-    Return the results of the Request Sense command to a drive in SenseData.
-    Data format of Sense data is defined by the Interface GUID.
-
-  Arguments:
-    This            - Protocol instance pointer.
-    SenseData       - Results of Request Sense command to device
-    SenseDataSize   - Size of SenseData in bytes.
-    SenseDataNumber - Type of SenseData
-
-  Returns:
-    EFI_SUCCESS       - InquiryData valid
-    EFI_NOT_FOUND     - Device does not support this data class
-    EFI_DEVICE_ERROR  - Error reading InquiryData from device
-    EFI_BUFFER_TOO_SMALL - SenseDataSize not big enough
-
---*/
 ;
 
+/**
+  Return the results of the Request Sense command to a drive in SenseData.
+  Data format of Sense data is defined by the Interface GUID.
+
+  @param  This                  Protocol instance pointer. 
+  @param  IdeChannel            Primary or Secondary 
+  @param  IdeDevice             Master or Slave 
+
+  @retval EFI_SUCCESS           IdeChannel and IdeDevice are valid 
+  @retval EFI_UNSUPPORTED       This is not an IDE device 
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_WHICH_IDE) (
@@ -124,22 +119,6 @@ EFI_STATUS
   OUT UINT32                          *IdeChannel,
   OUT UINT32                          *IdeDevice
   )
-/*++
-
-  Routine Description:
-    Return the results of the Request Sense command to a drive in SenseData.
-    Data format of Sense data is defined by the Interface GUID.
-
-  Arguments:
-    This        - Protocol instance pointer.
-    IdeChannel  - Primary or Secondary
-    IdeDevice   - Master or Slave
-
-  Returns:
-    EFI_SUCCESS       - IdeChannel and IdeDevice are valid
-    EFI_UNSUPPORTED   - This is not an IDE device
-
---*/
 ;
 
 //

@@ -1,6 +1,8 @@
-/*++
+/** @file
+  This is a simple fault tolerant write driver, based on PlatformFd library.
+  And it only supports write BufferSize <= SpareAreaLength.
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,16 +11,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  FaultTolerantWriteLite.h
-
-Abstract:
-
-  This is a simple fault tolerant write driver, based on PlatformFd library.
-  And it only supports write BufferSize <= SpareAreaLength.
-
---*/
+**/
 
 #ifndef __FW_FAULT_TOLERANT_WRITE_LITE_PROTOCOL_H__
 #define __FW_FAULT_TOLERANT_WRITE_LITE_PROTOCOL_H__
@@ -34,7 +27,31 @@ typedef struct _EFI_FTW_LITE_PROTOCOL EFI_FTW_LITE_PROTOCOL;
 //
 // Protocol API definitions
 //
+/**
+  Starts a target block update. This records information about the write
+  in fault tolerant storage and will complete the write in a recoverable
+  manner, ensuring at all times that either the original contents or
+  the modified contents are available.
 
+  @param  This                 Calling context 
+  @param  FvBlockHandle        The handle of FVB protocol that provides services 
+                               for reading, writing, and erasing the target 
+                               block. 
+  @param  Lba                  The logical block address of the target block. 
+  @param  Offset               The offset within the target block to place the 
+                               data. 
+  @param  Length               The number of bytes to write to the target block. 
+  @param  Buffer               The data to write. 
+
+  @retval EFI_SUCCESS          The function completed successfully 
+  @retval EFI_ABORTED          The function could not complete successfully. 
+  @retval EFI_BAD_BUFFER_SIZE  The write would span a block boundary, which is 
+                               not a valid action. 
+  @retval EFI_ACCESS_DENIED    No writes have been allocated. 
+  @retval EFI_NOT_READY        The last write has not been completed. Restart () 
+                               must be called to complete it. 
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FTW_LITE_WRITE) (
@@ -44,37 +61,8 @@ EFI_STATUS
   IN UINTN                             Offset,
   IN UINTN                             *NumBytes,
   IN VOID                              *Buffer
-  );
-/*++
-
-Routine Description:
-
-  Starts a target block update. This records information about the write
-  in fault tolerant storage and will complete the write in a recoverable
-  manner, ensuring at all times that either the original contents or
-  the modified contents are available.
-
-Arguments:
-
-  This             - Calling context
-  FvBlockHandle    - The handle of FVB protocol that provides services for
-                     reading, writing, and erasing the target block.
-  Lba              - The logical block address of the target block.
-  Offset           - The offset within the target block to place the data.
-  Length           - The number of bytes to write to the target block.
-  Buffer           - The data to write.
-
-Returns:
-
-  EFI_SUCCESS          - The function completed successfully
-  EFI_ABORTED          - The function could not complete successfully.
-  EFI_BAD_BUFFER_SIZE  - The write would span a block boundary,
-                         which is not a valid action.
-  EFI_ACCESS_DENIED    - No writes have been allocated.
-  EFI_NOT_READY        - The last write has not been completed.
-                         Restart () must be called to complete it.
-
---*/
+  )
+;
 
 //
 // Protocol declaration
