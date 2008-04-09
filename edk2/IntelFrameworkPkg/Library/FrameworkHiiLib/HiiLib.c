@@ -10,8 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  HiiLib.c
-
 **/
 
 
@@ -19,15 +17,28 @@
 
 #include <Protocol/FrameworkHii.h>
 
-
 #include <Library/FrameworkHiiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 
+
 EFI_HII_PROTOCOL *mHii = NULL;
 
+/**
+  Library constustor function for HiiLib library instance locate the
+  gEfiHiiProtocolGuid firstly, the other interface in this library
+  instance will dependent on the protocol of gEfiHiiProtocolGuid.
+  So the depex of gEfiHiiProtocolGuid is required for this library 
+  instance.
+  If protocol of gEfiHiiProtocolGuid is not installed, then ASSERT().
+  
+  @param ImageHandle  The image handle of driver module who use this library 
+                      instance.
+  @param SystemTable  Pointer to the EFI System Table.
+  @retval EFI_SUCCESS library constuctor always success.
+**/
 EFI_STATUS
 EFIAPI
 FrameworkHiiLibConstructor (
@@ -48,7 +59,18 @@ FrameworkHiiLibConstructor (
   return EFI_SUCCESS;
 }
 
-
+/**
+  This function is internal function that prepare and create
+  HII packages with given number and package's guid.
+  It is invoked by HiiAddPackages() and PreparePackages() interface.
+  If the parameter of package's number is 0, then ASSERT().
+  
+  @param NumberOfPackages  Given number of package item in a HII package list.
+  @param Guid              Given GUID of a HII package list.
+  @param Marker            Package's content list.
+  
+  @return pointer to new created HII package list.
+**/
 EFI_HII_PACKAGES *
 InternalPreparePackages (
   IN UINTN           NumberOfPackages,
@@ -77,7 +99,6 @@ InternalPreparePackages (
   return HiiPackages;
 
 }
-
 
 /**
   This function allocates pool for an EFI_HII_PACKAGES structure
@@ -159,6 +180,18 @@ HiiLibAddPackages (
   return Status;
 }
 
+/**
+  Removes a package list from the default HII database.
+
+  If HiiHandle is NULL, then ASSERT.
+  If HiiHandle is not a valid EFI_HII_HANDLE in the default HII database, then ASSERT.
+
+  @param  HiiHandle                The handle that was previously registered to the data base that is requested for removal.
+                                             List later.
+
+  @return  VOID
+
+**/
 VOID
 EFIAPI
 HiiLibRemovePackages (
@@ -211,33 +244,22 @@ HiiLibNewString (
   return Status;
 }
 
+/**
+  Get the string given the StringId and String package Producer's Guid. The caller
+  is responsible to free the *String.
 
-EFI_STATUS
-EFIAPI
-HiiLibUpdateString (
-  IN  EFI_HII_HANDLE                  PackageList,
-  IN  EFI_STRING_ID                   StringId,
-  IN  CONST EFI_STRING                String
-  )
-{
-  FRAMEWORK_EFI_HII_HANDLE  FrameworkHiiHandle;
-  EFI_STATUS                Status;
+  If PackageList with the matching ProducerGuid is not found, then ASSERT.
+  If PackageList with the matching ProducerGuid is found but no String is
+  specified by StringId is found, then ASSERT.
 
-  FrameworkHiiHandle = (FRAMEWORK_EFI_HII_HANDLE) (UINTN) PackageList;
-  Status = mHii->NewString (
-            mHii,
-            NULL,
-            FrameworkHiiHandle,
-            &StringId,
-            String
-          );
+  @param  ProducerGuid           The Guid of String package list.
+  @param  StringId               The String ID.
+  @param  String                 The output string.
 
-  return Status;
-}
+  @retval EFI_SUCCESS            Operation is successful.
+  @retval EFI_OUT_OF_RESOURCES   There is not enought memory in the system.
 
-//
-// Just use the UEFI prototype
-//
+**/
 EFI_STATUS
 EFIAPI
 HiiLibGetStringFromToken (
@@ -249,9 +271,24 @@ HiiLibGetStringFromToken (
   return EFI_SUCCESS;  
 }
 
-//
-// Just use the UEFI prototype
-//
+/**
+  Get string specified by StringId form the HiiHandle. The caller
+  is responsible to free the *String.
+
+  If String is NULL, then ASSERT.
+  If HiiHandle could not be found in the default HII database, then ASSERT.
+  If StringId is not found in PackageList, then ASSERT.
+
+  @param  HiiHandle              The HII handle of package list.
+  @param  StringId               The String ID.
+  @param  String                 The output string.
+
+  @retval EFI_NOT_FOUND          String is not found.
+  @retval EFI_SUCCESS            Operation is successful.
+  @retval EFI_OUT_OF_RESOURCES   There is not enought memory in the system.
+  @retval EFI_INVALID_PARAMETER  The String is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiLibGetStringFromHandle (
@@ -263,9 +300,16 @@ HiiLibGetStringFromHandle (
   return EFI_SUCCESS;
 }
 
-//
-// Just use the UEFI prototype
-//
+/**
+  Create the driver handle for HII driver. The protocol and 
+  Package list of this driver wili be installed into this 
+  driver handle. 
+  The implement set DriverHandle to NULL simpliy to let 
+  handle manager create a default new handle.
+  
+  @param[out] DriverHandle the pointer of driver handle
+  @return always successful.
+**/
 EFI_STATUS
 EFIAPI
 HiiLibCreateHiiDriverHandle (
