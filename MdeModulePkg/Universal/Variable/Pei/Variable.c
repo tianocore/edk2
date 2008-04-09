@@ -1,4 +1,7 @@
-/*++
+/** @file
+
+  Implement ReadOnly Variable Services required by PEIM and install
+  PI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -10,13 +13,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name:
 
-  Variable.c
-
-Abstract:
-
-  PEIM to provide the Variable functionality
-
---*/
+**/
 
 
 #include "Variable.h"

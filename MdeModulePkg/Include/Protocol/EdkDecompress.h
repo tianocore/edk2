@@ -1,6 +1,8 @@
-/*++
+/** @file
 
-Copyright (c) 2006, Intel Corporation                                                         
+  The Tiano Decompress Protocol Interface
+
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,13 +11,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-  EdkDecompress.h
-    
-Abstract:
-  The Tiano Decompress Protocol Interface
-
---*/
+**/
 
 #ifndef __EDK_DECOMPRESS_H__
 #define __EDK_DECOMPRESS_H__
@@ -25,18 +21,7 @@ Abstract:
 
 typedef struct _EFI_TIANO_DECOMPRESS_PROTOCOL   EFI_TIANO_DECOMPRESS_PROTOCOL;
 
-typedef
-EFI_STATUS
-(EFIAPI *EFI_TIANO_DECOMPRESS_GET_INFO) (
-  IN EFI_TIANO_DECOMPRESS_PROTOCOL            *This,
-  IN   VOID                                   *Source,
-  IN   UINT32                                 SourceSize,
-  OUT  UINT32                                 *DestinationSize,
-  OUT  UINT32                                 *ScratchSize
-  );
-/*++
-
-Routine Description:
+/**
 
   The GetInfo() function retrieves the size of the uncompressed buffer 
   and the temporary scratch buffer required to decompress the buffer 
@@ -53,42 +38,35 @@ Routine Description:
   output it as DestinationSize.  And ScratchSize is specific to the decompression
   implementation.
 
-Arguments:
+  @param  This              The protocol instance pointer
+  @param  Source            The source buffer containing the compressed data.
+  @param  SourceSize        The size, in bytes, of source buffer.
+  @param  DestinationSize   A pointer to the size, in bytes, of the uncompressed buffer
+                            that will be generated when the compressed buffer specified 
+                            by Source and SourceSize is decompressed.
+  @param  ScratchSize       A pointer to the size, in bytes, of the scratch buffer that 
+                            is required to decompress the compressed buffer specified by
+                            Source and SourceSize.
 
-  This            - The protocol instance pointer
-  Source          - The source buffer containing the compressed data.
-  SourceSize      - The size, in bytes, of source buffer.
-  DestinationSize - A pointer to the size, in bytes, of the uncompressed buffer
-                    that will be generated when the compressed buffer specified 
-                    by Source and SourceSize is decompressed.
-  ScratchSize     - A pointer to the size, in bytes, of the scratch buffer that 
-                    is required to decompress the compressed buffer specified by
-                    Source and SourceSize.
-
-Returns:
-  EFI_SUCCESS     - The size of the uncompressed data was returned in DestinationSize
-                    and the size of the scratch buffer was returned in ScratchSize.
-  EFI_INVALID_PARAMETER - The size of the uncompressed data or the size of the scratch
-                  buffer cannot be determined from the compressed data specified by 
-                  Source and SourceData.
+  @retval EFI_SUCCESS       The size of the uncompressed data was returned in DestinationSize
+                            and the size of the scratch buffer was returned in ScratchSize.
+  @retval EFI_INVALID_PARAMETER   
+                            The size of the uncompressed data or the size of the scratch
+                            buffer cannot be determined from the compressed data specified by 
+                            Source and SourceData.
 
 --*/
-
-
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TIANO_DECOMPRESS_DECOMPRESS) (
-  IN EFI_TIANO_DECOMPRESS_PROTOCOL              *This,
-  IN     VOID*                                  Source,
-  IN     UINT32                                 SourceSize,
-  IN OUT VOID*                                  Destination,
-  IN     UINT32                                 DestinationSize,
-  IN OUT VOID*                                  Scratch,
-  IN     UINT32                                 ScratchSize
+(EFIAPI *EFI_TIANO_DECOMPRESS_GET_INFO) (
+  IN EFI_TIANO_DECOMPRESS_PROTOCOL            *This,
+  IN   VOID                                   *Source,
+  IN   UINT32                                 SourceSize,
+  OUT  UINT32                                 *DestinationSize,
+  OUT  UINT32                                 *ScratchSize
   );
-/*++
 
-Routine Description:
+/**
 
   The Decompress() function extracts decompressed data to its original form.
   
@@ -103,29 +81,35 @@ Routine Description:
   If the compressed source data specified by Source and SourceSize is not in 
   a valid compressed data format, then EFI_INVALID_PARAMETER is returned.
 
-Arguments:
+  @param  This              The protocol instance pointer
+  @param  Source            The source buffer containing the compressed data.
+  @param  SourceSize        The size of source data.
+  @param  Destination       On output, the destination buffer that contains 
+                            the uncompressed data.
+  @param  DestinationSize   The size of destination buffer. The size of destination
+                            buffer needed is obtained from GetInfo().
+  @param  Scratch           A temporary scratch buffer that is used to perform the 
+                            decompression.
+  @param  ScratchSize       The size of scratch buffer. The size of scratch buffer needed
+                            is obtained from GetInfo().
 
-  This            - The protocol instance pointer
-  Source          - The source buffer containing the compressed data.
-  SourceSize      - The size of source data.
-  Destination     - On output, the destination buffer that contains 
-                    the uncompressed data.
-  DestinationSize - The size of destination buffer. The size of destination
-                    buffer needed is obtained from GetInfo().
-  Scratch         - A temporary scratch buffer that is used to perform the 
-                    decompression.
-  ScratchSize     - The size of scratch buffer. The size of scratch buffer needed
-                    is obtained from GetInfo().
-
-Returns:
-
-  EFI_SUCCESS     - Decompression completed successfully, and the uncompressed 
-                    buffer is returned in Destination.
-  EFI_INVALID_PARAMETER 
-                  - The source buffer specified by Source and SourceSize is 
-                    corrupted (not in a valid compressed format).
-
---*/
+  @retval  EFI_SUCCESS     Decompression completed successfully, and the uncompressed 
+                           buffer is returned in Destination.
+  @retval  EFI_INVALID_PARAMETER 
+                           The source buffer specified by Source and SourceSize is 
+                           corrupted (not in a valid compressed format).
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_TIANO_DECOMPRESS_DECOMPRESS) (
+  IN EFI_TIANO_DECOMPRESS_PROTOCOL              *This,
+  IN     VOID*                                  Source,
+  IN     UINT32                                 SourceSize,
+  IN OUT VOID*                                  Destination,
+  IN     UINT32                                 DestinationSize,
+  IN OUT VOID*                                  Scratch,
+  IN     UINT32                                 ScratchSize
+  );
 
 struct _EFI_TIANO_DECOMPRESS_PROTOCOL {
   EFI_TIANO_DECOMPRESS_GET_INFO    GetInfo;

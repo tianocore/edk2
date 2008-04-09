@@ -1,6 +1,9 @@
-/*++
+/** @file 
 
-Copyright (c) 2006, Intel Corporation                                                         
+  Firmware Volume Block protocol functions.  
+  Consumes FV hobs and creates appropriate block protocols. 
+  
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,19 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  FwVolBlock.h
-
-Abstract:
-
-  Firmware Volume Block protocol..  Consumes FV hobs and creates
-  appropriate block protocols.
-
-  Also consumes NT_NON_MM_FV envinronment variable and produces appropriate
-  block protocols fro them also... (this is TBD)
-
---*/
+**/
 
 #ifndef _FWVOL_BLOCK_H_
 #define _FWVOL_BLOCK_H_

@@ -1,7 +1,8 @@
-/**
-  The internal header file for EdkFvbServiceLib.
+/** @file 
+  The internal header file includes the common header files, defines
+  internal structure FVB_ENTRY.
 
-Copyright (c) 2006, Intel Corporation. <BR>
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions

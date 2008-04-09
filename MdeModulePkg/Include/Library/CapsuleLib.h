@@ -1,4 +1,5 @@
 /** @file
+
   Capsule Library. This library class defines a set of interfaces on 
   how to process capusle image update.
 

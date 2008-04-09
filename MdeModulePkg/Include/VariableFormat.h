@@ -67,6 +67,9 @@ typedef enum {
 
 #pragma pack(1)
 
+//
+// Variable Store region header
+//
 typedef struct {
   UINT32  Signature;
   UINT32  Size;
@@ -76,6 +79,9 @@ typedef struct {
   UINT32  Reserved1;
 } VARIABLE_STORE_HEADER;
 
+//
+// Variable header structure
+//
 typedef struct {
   UINT16      StartId;
   UINT8       State;

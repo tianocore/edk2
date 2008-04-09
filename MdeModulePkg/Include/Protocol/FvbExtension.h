@@ -1,6 +1,8 @@
-/*++
+/** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+  FVB Extension protocol that extends the FVB Class in a component fashion.
+
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,15 +11,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    FvbExtension.h
-
-Abstract:
-
-  FVB Extension protocol that extends the FVB Class in a component fashion.
-
---*/
+**/
 
 #ifndef __FVB_EXTENSION_H__
 #define __FVB_EXTENSION_H__
@@ -30,6 +24,21 @@ typedef struct _EFI_FVB_EXTENSION_PROTOCOL EFI_FVB_EXTENSION_PROTOCOL;
 //
 //  FVB Extension Function Prototypes
 //
+/**
+  Erases and initializes a specified range of a firmware volume
+
+  @param[in]     This           Pointer to the FVB Extension protocol instance
+  @param[in]     StartLba       The starting logical block index to be erased
+  @param[in]     OffsetStartLba Offset into the starting block at which to 
+                                begin erasing    
+  @param[in]     LastLba        The last logical block index to be erased
+  @param[in]     OffsetLastLba  Offset into the last block at which to end erasing     
+
+  @retval   EFI_EFI_SUCCESS        Range was erased 
+  @retval   EFI_INVALID_PARAMETER  invalid parameter
+  @retval   EFI_UNSUPPORTED        Range can not be erased
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FV_ERASE_CUSTOM_BLOCK) (
@@ -41,7 +50,7 @@ EFI_STATUS
 );
 
 //
-// IPMI TRANSPORT PROTOCOL
+// FVB Extension PROTOCOL
 //
 struct _EFI_FVB_EXTENSION_PROTOCOL {
   EFI_FV_ERASE_CUSTOM_BLOCK               EraseFvbCustomBlock;

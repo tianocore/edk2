@@ -1,6 +1,7 @@
 /**@file
 
-  Firmware Volume Block Protocol Runtime Abstraction
+  Firmware Volume Block Protocol Runtime Interface Abstraction
+  And FVB Extension protocol Runtime Interface Abstraction
 
   mFvbEntry is an array of Handle Fvb pairs. The Fvb Lib Instance matches the
   index in the mFvbEntry array. This should be the same sequence as the FVB's
@@ -9,7 +10,7 @@
 
   If you are using any of these lib functions.you must first call FvbInitialize ().
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
