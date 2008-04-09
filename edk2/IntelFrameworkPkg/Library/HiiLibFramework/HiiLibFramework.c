@@ -10,8 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  HiiLib.c
-
 **/
 
 
@@ -27,7 +25,18 @@
 
 EFI_HII_PROTOCOL      *gHiiProtocol = NULL;
 
+/**
+  The constructor function for HiiLibFramework library instance
 
+  The constructor function locates Hii protocol from protocol database.
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiLibFrameworkConstructor (

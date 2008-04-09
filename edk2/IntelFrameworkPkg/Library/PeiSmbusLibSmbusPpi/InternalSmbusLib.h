@@ -1,5 +1,5 @@
 /** @file
-Internal header file for Smbus library.
+  Internal header file for Smbus library.
 
 Copyright (c) 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials                          
@@ -9,7 +9,6 @@ http://opensource.org/licenses/bsd-license.php
                                                                                           
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
 
 **/
 
