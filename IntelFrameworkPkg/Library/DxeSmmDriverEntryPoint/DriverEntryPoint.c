@@ -1,5 +1,7 @@
 /** @file
-  Entry point to a EFI/DXE driver.
+  This file implement EfiMain() for library class DxeSmmDriverEntryPoint.
+  EfiMain() is common driver entry point for all SMM driver who uses DxeSmmDriverEntryPoint
+  library class.
 
 Copyright (c) 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
