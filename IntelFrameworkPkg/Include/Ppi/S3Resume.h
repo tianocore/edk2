@@ -11,7 +11,7 @@
   Before using this PPI, the caller has to ensure the necessary information for the S3 resume, such as
   the following, is available for the S3 resume boot path:
   - EFI_ACPI_S3_RESUME_SCRIPT_TABLE script table. Type
-    EFI_ACPI_S3_RESUME_SCRIPT_TABLE is defined in the Intel® Platform Innovation
+    EFI_ACPI_S3_RESUME_SCRIPT_TABLE is defined in the Intel Platform Innovation
     Framework for EFI Boot Script Specification.
   - OS waking vector.
   - The reserved memory range to be used for the S3 resume.
