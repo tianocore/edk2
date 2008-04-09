@@ -1,4 +1,6 @@
 /** @file
+  Common Library Routines to assist in IFR creation on-the-fly
+  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,31 +10,12 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-  IfrCommon.c
-
-Abstract:
-
-  Common Library Routines to assist in IFR creation on-the-fly
-
-Revision History:
-
 **/
 
 //
 // Include common header file for this module.
 //
 #include "IfrSupportLibInternal.h"
-
-EFI_STATUS
-EFIAPI
-IfrLibConstruct (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  return EFI_SUCCESS;
-}
 
 EFI_STATUS
 GetCurrentLanguage (
