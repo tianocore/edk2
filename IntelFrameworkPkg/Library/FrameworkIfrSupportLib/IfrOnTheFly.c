@@ -1,4 +1,6 @@
 /** @file
+  Library Routines to create IFR on-the-fly
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -8,15 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-  IfrOnTheFly.c
-
-Abstract:
-
-  Library Routines to create IFR on-the-fly
-
-Revision History:
-
 **/
 
 //
@@ -24,6 +17,22 @@ Revision History:
 //
 #include "IfrSupportLibInternal.h"
 
+/**
+  Create a formset
+  
+  The form package is a collection of forms that are intended to describe the pages that will be
+  displayed to the user.
+  
+  @param FormSetTitle         Title of formset
+  @param Guid                 Guid of formset
+  @param Class                Class of formset
+  @param SubClass             Sub class of formset
+  @param FormBuffer           Pointer of the formset created
+  @param StringBuffer         Pointer of FormSetTitile string created
+  
+  @retval EFI_OUT_OF_RESOURCES     No enough buffer to allocate
+  @retval EFI_SUCCESS              Formset successfully created  
+**/
 EFI_STATUS
 CreateFormSet (
   IN      CHAR16              *FormSetTitle,
@@ -33,33 +42,6 @@ CreateFormSet (
   IN OUT  VOID                **FormBuffer,
   IN OUT  VOID                **StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a formset
-  
-Arguments:
-  
-  FormSetTitle        - Title of formset
-  
-  Guid                - Guid of formset
-  
-  Class               - Class of formset
-  
-  SubClass            - Sub class of formset
-  
-  FormBuffer          - Pointer of the formset created
-  
-  StringBuffer        - Pointer of FormSetTitile string created
-  
-Returns: 
-
-  EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-  
-  EFI_SUCCESS             - Formset successfully created
-
---*/
 {
   EFI_STATUS            Status;
   EFI_HII_IFR_PACK      IfrPack;
@@ -139,7 +121,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
-
+/**
+  Create a form
+  A form is the encapsulation of what amounts to a browser page. The header defines a FormId,
+  which is referenced by the form package, among others. It also defines a FormTitle, which is a
+  string to be used as the title for the form
+  
+  @param FormTitle        Title of the form
+  @param FormId           Id of the form
+  @param FormBuffer       Pointer of the form created
+  @param StringBuffer     Pointer of FormTitil string created
+  
+  @retval EFI_SUCCESS     Form successfully created
+**/
 EFI_STATUS
 CreateForm (
   IN      CHAR16              *FormTitle,
@@ -147,27 +141,6 @@ CreateForm (
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a form
-  
-Arguments:
-  
-  FormTitle       - Title of the form
-  
-  FormId          - Id of the form
-  
-  FormBuffer          - Pointer of the form created
-  
-  StringBuffer        - Pointer of FormTitil string created
-  
-Returns: 
-
-  EFI_SUCCESS     - Form successfully created
-
---*/
 {
   EFI_STATUS        Status;
   FRAMEWORK_EFI_IFR_FORM      Form;
@@ -202,39 +175,27 @@ Returns:
 
   Status                = AddOpCode (FormBuffer, &EndForm);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
-
+/**
+  Create a SubTitle
+  
+  Subtitle strings are intended to be used by authors to separate sections of questions into semantic
+  groups.
+  
+  @param SubTitle         Sub title to be created
+  @param FormBuffer       Where this subtitle to add to
+  @param StringBuffer     String buffer created for subtitle
+  
+  @retval EFI_SUCCESS      Subtitle successfully created
+**/
 EFI_STATUS
 CreateSubTitle (
   IN      CHAR16              *SubTitle,
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a SubTitle
-  
-Arguments:
-  
-  SubTitle        - Sub title to be created
-  
-  FormBuffer      - Where this subtitle to add to
-  
-  StringBuffer    - String buffer created for subtitle
-  
-Returns: 
-
-  EFI_SUCCESS     - Subtitle successfully created
-
---*/
 {
   EFI_STATUS        Status;
   FRAMEWORK_EFI_IFR_SUBTITLE  Subtitle;
@@ -258,14 +219,24 @@ Returns:
 
   Status                  = AddOpCode (FormBuffer, &Subtitle);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
-
+/**
+  Create a line of text
+  Unlike HTML, text is simply another tag. 
+  This tag type enables IFR to be more easily localized.
+  
+  @param String          - First string of the text
+  @param String2         - Second string of the text
+  @param String3         - Help string of the text
+  @param Flags           - Flag of the text
+  @param Key             - Key of the text
+  @param FormBuffer      - The form where this text adds to
+  @param StringBuffer    - String buffer created for String, String2 and String3
+  
+  @retval EFI_SUCCESS     - Text successfully created
+**/
 EFI_STATUS
 CreateText (
   IN      CHAR16              *String,
@@ -276,33 +247,6 @@ CreateText (
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a line of text
-  
-Arguments:
-  
-  String          - First string of the text
-  
-  String2         - Second string of the text
-  
-  String3         - Help string of the text
-  
-  Flags           - Flag of the text
-  
-  Key             - Key of the text
-  
-  FormBuffer      - The form where this text adds to
-  
-  StringBuffer    - String buffer created for String, String2 and String3
-  
-Returns: 
-
-  EFI_SUCCESS     - Text successfully created
-
---*/
 {
   EFI_STATUS    Status;
   FRAMEWORK_EFI_IFR_TEXT  Text;
@@ -354,14 +298,19 @@ Returns:
 
   Status    = AddOpCode (FormBuffer, &Text);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
-
+/**
+  Create a hyperlink
+  
+  @param FormId         Form ID of the hyperlink
+  @param Prompt         Prompt of the hyperlink
+  @param FormBuffer     The form where this hyperlink adds to
+  @param StringBuffer   String buffer created for Prompt
+  
+  @retval EFI_SUCCESS   Hyperlink successfully created  
+**/
 EFI_STATUS
 CreateGoto (
   IN      UINT16              FormId,
@@ -369,27 +318,6 @@ CreateGoto (
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a hyperlink
-  
-Arguments:
-  
-  FormId        - Form ID of the hyperlink
-  
-  Prompt        - Prompt of the hyperlink
-  
-  FormBuffer    - The form where this hyperlink adds to
-  
-  StringBuffer  - String buffer created for Prompt
-  
-Returns: 
-
-  EFI_SUCCESS     - Hyperlink successfully created
-
---*/
 {
   EFI_STATUS  Status;
   FRAMEWORK_EFI_IFR_REF Hyperlink;
@@ -414,14 +342,25 @@ Returns:
 
   Status                  = AddOpCode (FormBuffer, &Hyperlink);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
+/**
+  Create a one-of question with a set of options to choose from.  The
+  OptionsList is a pointer to a null-terminated list of option descriptions.
 
+  @param QuestionId      - Question ID of the one-of box
+  @param DataWidth       - DataWidth of the one-of box
+  @param Prompt          - Prompt of the one-of box
+  @param Help            - Help of the one-of box
+  @param OptionsList     - Each string in it is an option of the one-of box
+  @param OptionCount     - Option string count
+  @param FormBuffer      - The form where this one-of box adds to
+  @param StringBuffer    - String buffer created for Prompt, Help and Option strings
+  
+  @retval EFI_DEVICE_ERROR    - DataWidth > 2
+  @retval EFI_SUCCESS         - One-Of box successfully created.
+**/
 EFI_STATUS
 CreateOneOf (
   IN      UINT16              QuestionId,
@@ -433,38 +372,6 @@ CreateOneOf (
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a one-of question with a set of options to choose from.  The
-  OptionsList is a pointer to a null-terminated list of option descriptions.
-  
-Arguments:
-  
-  QuestionId      - Question ID of the one-of box
-  
-  DataWidth       - DataWidth of the one-of box
-  
-  Prompt          - Prompt of the one-of box
-  
-  Help            - Help of the one-of box
-  
-  OptionsList     - Each string in it is an option of the one-of box
-  
-  OptionCount     - Option string count
-  
-  FormBuffer      - The form where this one-of box adds to
-  
-  StringBuffer    - String buffer created for Prompt, Help and Option strings
-  
-Returns: 
-
-  EFI_DEVICE_ERROR    - DataWidth > 2
-
-  EFI_SUCCESS         - One-Of box successfully created.
-
---*/
 {
   EFI_STATUS            Status;
   UINTN                 Index;
@@ -551,6 +458,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create a one-of question with a set of options to choose from.  The
+  OptionsList is a pointer to a null-terminated list of option descriptions.
+  
+  @param QuestionId      - Question ID of the ordered list
+  @param MaxEntries      - MaxEntries of the ordered list
+  @param Prompt          - Prompt of the ordered list
+  @param Help            - Help of the ordered list
+  @param OptionsList     - Each string in it is an option of the ordered list
+  @param OptionCount     - Option string count
+  @param FormBuffer      - The form where this ordered list adds to
+  @param StringBuffer    - String buffer created for Prompt, Help and Option strings
+  
+  @retval EFI_SUCCESS     - Ordered list successfully created.
+**/
 EFI_STATUS
 CreateOrderedList (
   IN      UINT16              QuestionId,
@@ -562,36 +484,6 @@ CreateOrderedList (
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a one-of question with a set of options to choose from.  The
-  OptionsList is a pointer to a null-terminated list of option descriptions.
-  
-Arguments:
-  
-  QuestionId      - Question ID of the ordered list
-  
-  MaxEntries      - MaxEntries of the ordered list
-  
-  Prompt          - Prompt of the ordered list
-  
-  Help            - Help of the ordered list
-  
-  OptionsList     - Each string in it is an option of the ordered list
-  
-  OptionCount     - Option string count
-  
-  FormBuffer      - The form where this ordered list adds to
-  
-  StringBuffer    - String buffer created for Prompt, Help and Option strings
-  
-Returns: 
-
-  EFI_SUCCESS     - Ordered list successfully created.
-
---*/
 {
   EFI_STATUS            Status;
   UINTN                 Index;
@@ -664,14 +556,23 @@ Returns:
 
   Status                        = AddOpCode (FormBuffer, &EndOrderedList);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
-
+/**
+  Create a checkbox
+  
+  @param QuestionId       Question ID of the check box
+  @param DataWidth        DataWidth of the check box
+  @param Prompt           Prompt of the check box
+  @param Help             Help of the check box  
+  @param Flags            Flags of the check box
+  @param FormBuffer       The form where this check box adds to
+  @param StringBuffer     String buffer created for Prompt and Help.
+  
+  @retval  EFI_DEVICE_ERROR    DataWidth > 1
+  @retval EFI_SUCCESS          Check box successfully created
+**/
 EFI_STATUS
 CreateCheckBox (
   IN      UINT16              QuestionId,
@@ -682,35 +583,6 @@ CreateCheckBox (
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a checkbox
-  
-Arguments:
-  
-  QuestionId      - Question ID of the check box
-  
-  DataWidth       - DataWidth of the check box
-  
-  Prompt          - Prompt of the check box
-  
-  Help            - Help of the check box
-  
-  Flags           - Flags of the check box
-  
-  FormBuffer      - The form where this check box adds to
-  
-  StringBuffer    - String buffer created for Prompt and Help.
-  
-Returns: 
-
-  EFI_DEVICE_ERROR    - DataWidth > 1
-
-  EFI_SUCCESS         - Check box successfully created
-
---*/
 {
   EFI_STATUS        Status;
   FRAMEWORK_EFI_IFR_CHECKBOX  CheckBox;
@@ -757,15 +629,29 @@ Returns:
   CheckBox.Flags  = (UINT8) (Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
 
   Status          = AddOpCode (FormBuffer, &CheckBox);
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  
+  return Status;
 }
 
+/**
+  Create a numeric
+  
+  @param QuestionId       Question ID of the numeric
+  @param DataWidth        DataWidth of the numeric
+  @param Prompt           Prompt of the numeric
+  @param Help             Help of the numeric
+  @param Minimum          Minumun boundary of the numeric
+  @param Maximum          Maximum boundary of the numeric
+  @param Step             Step of the numeric
+  @param Default          Default value
+  @param Flags            Flags of the numeric
+  @param Key              Key of the numeric
+  @param FormBuffer       The form where this numeric adds to
+  @param StringBuffer     String buffer created for Prompt and Help.
 
+  @retval EFI_DEVICE_ERROR       DataWidth > 2
+  @retval EFI_SUCCESS            Numeric is successfully created  
+**/
 EFI_STATUS
 CreateNumeric (
   IN      UINT16              QuestionId,
@@ -781,45 +667,6 @@ CreateNumeric (
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a numeric
-  
-Arguments:
-  
-  QuestionId      - Question ID of the numeric
-  
-  DataWidth       - DataWidth of the numeric
-  
-  Prompt          - Prompt of the numeric
-  
-  Help            - Help of the numeric
-  
-  Minimum         - Minumun boundary of the numeric
-  
-  Maximum         - Maximum boundary of the numeric
-  
-  Step            - Step of the numeric
-  
-  Default         - Default value
-  
-  Flags           - Flags of the numeric
-  
-  Key             - Key of the numeric
-  
-  FormBuffer      - The form where this numeric adds to
-  
-  StringBuffer    - String buffer created for Prompt and Help.
-  
-Returns: 
-
-  EFI_DEVICE_ERROR      - DataWidth > 2
-  
-  EFI_SUCCESS           - Numeric is successfully created
-
---*/
 {
   EFI_STATUS      Status;
   FRAMEWORK_EFI_IFR_NUMERIC Numeric;
@@ -872,14 +719,24 @@ Returns:
 
   Status          = AddOpCode (FormBuffer, &Numeric);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
-
+/**
+  Create a string
+  
+  @param QuestionId      - Question ID of the string
+  @param DataWidth       - DataWidth of the string
+  @param Prompt          - Prompt of the string
+  @param Help            - Help of the string
+  @param MinSize         - Min size boundary of the string
+  @param MaxSize         - Max size boundary of the string
+  @param Flags           - Flags of the string
+  @param Key             - Key of the string
+  @param FormBuffer      - The form where this string adds to
+  @param StringBuffer    - String buffer created for Prompt and Help.
+  @retval EFI_SUCCESS     - String successfully created.  
+**/
 EFI_STATUS
 CreateString (
   IN      UINT16              QuestionId,
@@ -893,39 +750,6 @@ CreateString (
   IN OUT  VOID                *FormBuffer,
   IN OUT  VOID                *StringBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a string
-  
-Arguments:
-  
-  QuestionId      - Question ID of the string
-  
-  DataWidth       - DataWidth of the string
-  
-  Prompt          - Prompt of the string
-  
-  Help            - Help of the string
-  
-  MinSize         - Min size boundary of the string
-  
-  MaxSize         - Max size boundary of the string
-    
-  Flags           - Flags of the string
-  
-  Key             - Key of the string
-  
-  FormBuffer      - The form where this string adds to
-  
-  StringBuffer    - String buffer created for Prompt and Help.
-  
-Returns: 
-
-  EFI_SUCCESS     - String successfully created.
-
---*/
 {
   EFI_STATUS      Status;
   FRAMEWORK_EFI_IFR_STRING  String;
@@ -969,9 +793,6 @@ Returns:
 
   Status          = AddOpCode (FormBuffer, &String);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
+

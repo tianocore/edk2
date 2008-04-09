@@ -17,25 +17,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #include "IfrSupportLibInternal.h"
 
+/**
+  Determine what is the current language setting
+  The setting is stored in language variable in flash. This routine
+  will get setting by accesssing that variable. If failed to access
+  language variable, then use default setting that 'eng' as current
+  language setting.
+  
+  @param Lang Pointer of system language
+  
+  @return whether sucess to get setting from variable
+**/
 EFI_STATUS
 GetCurrentLanguage (
   OUT     CHAR16              *Lang
   )
-/*++
-
-Routine Description:
-
-  Determine what is the current language setting
-
-Arguments:
-
-  Lang      - Pointer of system language
-
-Returns:
-
-  Status code
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       Size;
@@ -75,7 +71,17 @@ Returns:
   return Status;
 }
 
-
+/**
+  Add a string to the incoming buffer and return the token and offset data
+  
+  @param StringBuffer      The incoming buffer
+  @param Language          Currrent language
+  @param String            The string to be added
+  @param StringToken       The index where the string placed  
+  
+  @retval EFI_OUT_OF_RESOURCES No enough buffer to allocate
+  @retval EFI_SUCCESS          String successfully added to the incoming buffer
+**/
 EFI_STATUS
 AddString (
   IN      VOID                *StringBuffer,
@@ -83,29 +89,6 @@ AddString (
   IN      CHAR16              *String,
   IN OUT  STRING_REF          *StringToken
   )
-/*++
-
-Routine Description:
-
-  Add a string to the incoming buffer and return the token and offset data
-
-Arguments:
-
-  StringBuffer      - The incoming buffer
-
-  Language          - Currrent language
-
-  String            - The string to be added
-
-  StringToken       - The index where the string placed
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-
-  EFI_SUCCESS             - String successfully added to the incoming buffer
-
---*/
 {
   EFI_HII_STRING_PACK *StringPack;
   EFI_HII_STRING_PACK *StringPackBuffer;
@@ -298,31 +281,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
-
+/**
+  Add op-code data to the FormBuffer
+  
+  @param FormBuffer      Form buffer to be inserted to
+  @param OpCodeData      Op-code data to be inserted  
+  
+  @retval EFI_OUT_OF_RESOURCES    No enough buffer to allocate
+  @retval EFI_SUCCESS             Op-code data successfully inserted  
+**/
 EFI_STATUS
 AddOpCode (
   IN      VOID                *FormBuffer,
   IN OUT  VOID                *OpCodeData
   )
-/*++
-
-Routine Description:
-
-  Add op-code data to the FormBuffer
-
-Arguments:
-
-  FormBuffer      - Form buffer to be inserted to
-
-  OpCodeData      - Op-code data to be inserted
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-
-  EFI_SUCCESS             - Op-code data successfully inserted
-
---*/
 {
   EFI_HII_PACK_HEADER *NewBuffer;
   UINT8               *Source;
@@ -415,26 +387,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Get the HII protocol interface
+  
+  @param Hii     HII protocol interface
+  
+  @return the statue of locating HII protocol
+**/
 STATIC
 EFI_STATUS
 GetHiiInterface (
   OUT     EFI_HII_PROTOCOL    **Hii
   )
-/*++
-
-Routine Description:
-
-  Get the HII protocol interface
-
-Arguments:
-
-  Hii     - HII protocol interface
-
-Returns:
-
-  Status code
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -450,7 +414,19 @@ Returns:
   return Status;;
 }
 
-
+/**
+  Extract information pertaining to the HiiHandle
+  
+  @param HiiHandle       Hii handle
+  @param ImageLength     For input, length of DefaultImage;
+                         For output, length of actually required
+  @param DefaultImage    Image buffer prepared by caller
+  @param Guid            Guid information about the form 
+  
+  @retval EFI_OUT_OF_RESOURCES    No enough buffer to allocate
+  @retval EFI_BUFFER_TOO_SMALL    DefualtImage has no enough ImageLength
+  @retval EFI_SUCCESS             Successfully extract data from Hii database.
+**/
 EFI_STATUS
 ExtractDataFromHiiHandle (
   IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
@@ -458,33 +434,6 @@ ExtractDataFromHiiHandle (
   OUT     UINT8               *DefaultImage,
   OUT     EFI_GUID            *Guid
   )
-/*++
-
-Routine Description:
-
-  Extract information pertaining to the HiiHandle
-
-Arguments:
-
-  HiiHandle       - Hii handle
-
-  ImageLength     - For input, length of DefaultImage;
-                    For output, length of actually required
-
-  DefaultImage    - Image buffer prepared by caller
-
-  Guid            - Guid information about the form
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-
-  EFI_BUFFER_TOO_SMALL    - DefualtImage has no enough ImageLength
-
-  EFI_SUCCESS             - Successfully extract data from Hii database.
-
-
---*/
 {
   EFI_STATUS        Status;
   EFI_HII_PROTOCOL  *Hii;
@@ -630,28 +579,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Finds HII handle for given pack GUID previously registered with the HII.
+  
+  @param HiiProtocol pointer to pointer to HII protocol interface.
+                     If NULL, the interface will be found but not returned.
+                     If it points to NULL, the interface will be found and
+                     written back to the pointer that is pointed to.
+  @param Guid        The GUID of the pack that registered with the HII.
 
+  @return  Handle to the HII pack previously registered by the memory driver.
+**/
 FRAMEWORK_EFI_HII_HANDLE 
 FindHiiHandle (
   IN OUT EFI_HII_PROTOCOL    **HiiProtocol, OPTIONAL
   IN     EFI_GUID            *Guid
   )
-/*++
-
-Routine Description:
-  Finds HII handle for given pack GUID previously registered with the HII.
-
-Arguments:
-  HiiProtocol - pointer to pointer to HII protocol interface.
-                If NULL, the interface will be found but not returned.
-                If it points to NULL, the interface will be found and
-                written back to the pointer that is pointed to.
-  Guid        - The GUID of the pack that registered with the HII.
-
-Returns:
-  Handle to the HII pack previously registered by the memory driver.
-
---*/
 {
   EFI_STATUS        Status;
 
@@ -746,34 +689,24 @@ lbl_exit:
   return HiiHandle;
 }
 
+/**
+  Validate that the data associated with the HiiHandle in NVRAM is within
+  the reasonable parameters for that FormSet.  Values for strings and passwords
+  are not verified due to their not having the equivalent of valid range settings.
 
+  @param HiiHandle    Handle of the HII database entry to query
+
+  @param Results      If return Status is EFI_SUCCESS, Results provides valid data
+                      TRUE  = NVRAM Data is within parameters
+                      FALSE = NVRAM Data is NOT within parameters
+  @retval EFI_OUT_OF_RESOURCES      No enough buffer to allocate
+  @retval EFI_SUCCESS               Data successfully validated
+**/
 EFI_STATUS
 ValidateDataFromHiiHandle (
   IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
   OUT     BOOLEAN             *Results
   )
-/*++
-
-Routine Description:
-
-  Validate that the data associated with the HiiHandle in NVRAM is within
-  the reasonable parameters for that FormSet.  Values for strings and passwords
-  are not verified due to their not having the equivalent of valid range settings.
-
-Arguments:
-
-  HiiHandle -   Handle of the HII database entry to query
-
-  Results -     If return Status is EFI_SUCCESS, Results provides valid data
-                TRUE  = NVRAM Data is within parameters
-                FALSE = NVRAM Data is NOT within parameters
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES      - No enough buffer to allocate
-
-  EFI_SUCCESS               - Data successfully validated
---*/
 {
   EFI_STATUS        Status;
   EFI_HII_PROTOCOL  *Hii;

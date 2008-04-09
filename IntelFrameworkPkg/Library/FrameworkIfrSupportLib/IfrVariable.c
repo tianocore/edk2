@@ -1,5 +1,6 @@
 /** @file
-
+  Variable/Map manipulations routines
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,12 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-  IfrVariable.c
-
-Abstract:
-  Variable/Map manipulations routines
-
 **/
 
 //
@@ -22,6 +17,15 @@ Abstract:
 //
 #include "IfrSupportLibInternal.h"
 
+/**
+  Extracts a variable form a Pack.
+
+  @param Pack - List of variables
+  @param Name - Name of the variable/map
+  @param Guid - GUID of the variable/map
+  @param Var  - Pointer to the variable/map
+  @param Size - Size of the variable/map in bytes
+**/
 VOID
 EfiLibHiiVariablePackGetMap (
   IN    EFI_HII_VARIABLE_PACK       *Pack,  
@@ -31,25 +35,7 @@ EfiLibHiiVariablePackGetMap (
   OUT   VOID                        **Var,   OPTIONAL
   OUT   UINTN                       *Size    OPTIONAL
   )
-/*++
 
-Routine Description:
-
-  Extracts a variable form a Pack.
-
-Arguments:
-
-  Pack - List of variables
-  Name - Name of the variable/map
-  Guid - GUID of the variable/map
-  Var  - Pointer to the variable/map
-  Size - Size of the variable/map in bytes
-
-Returns: 
-
-  VOID
-  
---*/
 {
   if (NULL != Name) {
     *Name = (VOID *) (Pack + 1);
@@ -73,28 +59,17 @@ Returns:
   }
 }
 
+/**
+  Finds a count of the variables/maps in the List.
 
+  @param List - List of variables
+
+  @return The number of map count.
+**/
 UINTN
 EfiLibHiiVariablePackListGetMapCnt (
   IN    EFI_HII_VARIABLE_PACK_LIST   *List
   )
-  
-/*++
-
-Routine Description:
-
-  Finds a count of the variables/maps in the List.
-
-Arguments:
-
-  List - List of variables
-
-Returns: 
-
-  UINTN - The number of map count.
-
---*/
-
 {
   UINTN   Cnt = 0;
   while (NULL != List) {
@@ -104,29 +79,20 @@ Returns:
   return Cnt;
 }
 
+/**
+  Will iterate all variable/maps as appearing 
+  in List and for each, it will call the Callback.
 
+  @param List     - List of variables
+  @param Callback - Routine to be called for each iterated variable.
+
+**/
 VOID
 EfiLibHiiVariablePackListForEachVar (
   IN    EFI_HII_VARIABLE_PACK_LIST               *List,
   IN    EFI_LIB_HII_VARIABLE_PACK_LIST_CALLBACK  *Callback
   )
-/*++
 
-Routine Description:
-
-  Will iterate all variable/maps as appearing 
-  in List and for each, it will call the Callback.
-
-Arguments:
-
-  List     - List of variables
-  Callback - Routine to be called for each iterated variable.
-
-Returns: 
-
-  VOID
-  
---*/
 
 {
   CHAR16    *MapName;
@@ -145,7 +111,20 @@ Returns:
   }
 }
 
+/**
+  Finds a variable form List given 
+  the order number as appears in the List.
 
+  @param Idx  - The index of the variable/map to retrieve
+  @param List - List of variables
+  @param Name - Name of the variable/map
+  @param Guid - GUID of the variable/map
+  @param Var  - Pointer to the variable/map
+  @param Size - Size of the variable/map in bytes
+
+  @param EFI_SUCCESS   - Variable is found, OUT parameters are valid
+  @param EFI_NOT_FOUND - Variable is not found, OUT parameters are not valid
+**/
 EFI_STATUS
 EfiLibHiiVariablePackListGetMapByIdx (
   IN    UINTN                       Idx,  
@@ -157,28 +136,7 @@ EfiLibHiiVariablePackListGetMapByIdx (
   OUT   UINTN                       *Size
   )
 
-/*++
 
-Routine Description:
-
-  Finds a variable form List given 
-  the order number as appears in the List.
-
-Arguments:
-
-  Idx  - The index of the variable/map to retrieve
-  List - List of variables
-  Name - Name of the variable/map
-  Guid - GUID of the variable/map
-  Var  - Pointer to the variable/map
-  Size - Size of the variable/map in bytes
-
-Returns:
-
-  EFI_SUCCESS   - Variable is found, OUT parameters are valid
-  EFI_NOT_FOUND - Variable is not found, OUT parameters are not valid
-
---*/
 {
   CHAR16     *MapName;
   EFI_GUID   *MapGuid;
@@ -214,7 +172,21 @@ Returns:
   return EFI_NOT_FOUND; 
 }
 
+/**
+  Finds a variable form List given the 
+  order number as appears in the List.
 
+  @param Id   - The ID of the variable/map to retrieve
+  @param List - List of variables
+  @param Name - Name of the variable/map
+  @param Guid - GUID of the variable/map
+  @param Var  - Pointer to the variable/map
+  @param Size - Size of the variable/map in bytes
+
+  @retval EFI_SUCCESS   - Variable is found, OUT parameters are valid
+  @retval EFI_NOT_FOUND - Variable is not found, OUT parameters are not valid
+
+**/
 EFI_STATUS
 EfiLibHiiVariablePackListGetMapById (
   IN    UINT16                        Id,  
@@ -224,30 +196,6 @@ EfiLibHiiVariablePackListGetMapById (
   OUT   VOID                          **Var,
   OUT   UINTN                         *Size
   )
-  
-/*++
-
-Routine Description:
-
-  Finds a variable form List given the 
-  order number as appears in the List.
-
-Arguments:
-
-  Id   - The ID of the variable/map to retrieve
-  List - List of variables
-  Name - Name of the variable/map
-  Guid - GUID of the variable/map
-  Var  - Pointer to the variable/map
-  Size - Size of the variable/map in bytes
-
-Returns:
-
-  EFI_SUCCESS   - Variable is found, OUT parameters are valid
-  EFI_NOT_FOUND - Variable is not found, OUT parameters are not valid
-
---*/
-
 { 
   CHAR16    *MapName;
   EFI_GUID  *MapGuid;
@@ -279,7 +227,18 @@ Returns:
   return EFI_NOT_FOUND; 
 }
 
+/**
+  Finds a variable form EFI_HII_VARIABLE_PACK_LIST given name and GUID.
 
+  @param List - List of variables
+  @param Name - Name of the variable/map to be found
+  @param Guid - GUID of the variable/map to be found
+  @param Var  - Pointer to the variable/map found
+  @param Size - Size of the variable/map in bytes found
+
+  @retval EFI_SUCCESS   - variable is found, OUT parameters are valid
+  @retval EFI_NOT_FOUND - variable is not found, OUT parameters are not valid
+**/
 EFI_STATUS
 EfiLibHiiVariablePackListGetMap (
   IN    EFI_HII_VARIABLE_PACK_LIST   *List,
@@ -289,28 +248,6 @@ EfiLibHiiVariablePackListGetMap (
   OUT   VOID                         **Var, 
   OUT   UINTN                        *Size
   )
-
-/*++
-
-Routine Description:
-
-  Finds a variable form EFI_HII_VARIABLE_PACK_LIST given name and GUID.
-
-Arguments:
-
-  List - List of variables
-  Name - Name of the variable/map to be found
-  Guid - GUID of the variable/map to be found
-  Var  - Pointer to the variable/map found
-  Size - Size of the variable/map in bytes found
-
-Returns:
-
-  EFI_SUCCESS   - variable is found, OUT parameters are valid
-  EFI_NOT_FOUND - variable is not found, OUT parameters are not valid
-
---*/
-
 { 
   VOID      *Map;
   UINTN     MapSize;
@@ -334,6 +271,21 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Finds out if a variable of specific Name/Guid/Size exists in NV. 
+  If it does, it will retrieve it into the Var. 
+
+  @param Name  Parameters of the variable to retrieve. Must match exactly.
+  @param Guid  Parameters of the variable to retrieve. Must match exactly.
+  @param Size  Parameters of the variable to retrieve. Must match exactly.
+  @param Var   Variable will be retrieved into buffer pointed by this pointer.
+               If pointing to NULL, the buffer will be allocated. Caller is responsible for releasing the buffer.
+
+  @retval EFI_SUCCESS    - The variable of exact Name/Guid/Size parameters was retrieved and written to Var.
+  @retval EFI_NOT_FOUND  - The variable of this Name/Guid was not found in the NV.
+  @retval EFI_LOAD_ERROR - The variable in the NV was of different size, or NV API returned error.
+
+**/
 EFI_STATUS
 EfiLibHiiVariableRetrieveFromNv (
   IN  CHAR16                 *Name,
@@ -341,22 +293,7 @@ EfiLibHiiVariableRetrieveFromNv (
   IN  UINTN                   Size,
   OUT VOID                  **Var
   )
-/*++
 
-Routine Description:
-  Finds out if a variable of specific Name/Guid/Size exists in NV. 
-  If it does, it will retrieve it into the Var. 
-
-Arguments:
-  Name, Guid, Size - Parameters of the variable to retrieve. Must match exactly.
-  Var              - Variable will be retrieved into buffer pointed by this pointer.
-                     If pointing to NULL, the buffer will be allocated. Caller is responsible for releasing the buffer.
-Returns:
-  EFI_SUCCESS    - The variable of exact Name/Guid/Size parameters was retrieved and written to Var.
-  EFI_NOT_FOUND  - The variable of this Name/Guid was not found in the NV.
-  EFI_LOAD_ERROR - The variable in the NV was of different size, or NV API returned error.
-
---*/
 {
   EFI_STATUS                  Status;
   UINTN                       SizeNv;
@@ -394,8 +331,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Overrrides the variable with NV data if found.
+  But it only does it if the Name ends with specified Suffix.
+  For example, if Suffix="MyOverride" and the Name="XyzSetupMyOverride",
+  the Suffix matches the end of Name, so the variable will be loaded from NV
+  provided the variable exists and the GUID and Size matches.
 
+  @param Suffix             Suffix the Name should end with.
+  @param Name, Guid, Size   Parameters of the variable to retrieve. Must match exactly.
+  @param Var                Variable will be retrieved into this buffer.
+                            Caller is responsible for providing storage of exactly Size size in bytes.
 
+  @retval EFI_SUCCESS           - The variable was overriden with NV variable of same Name/Guid/Size.
+  @retval EFI_INVALID_PARAMETER - The name of the variable does not end with <Suffix>.
+  @retval EFI_NOT_FOUND         - The variable of this Name/Guid was not found in the NV.
+  @retval EFI_LOAD_ERROR        - The variable in the NV was of different size, or NV API returned error.
+**/
 EFI_STATUS
 EfiLibHiiVariableOverrideIfSuffix (
   IN  CHAR16                 *Suffix,
@@ -404,27 +356,6 @@ EfiLibHiiVariableOverrideIfSuffix (
   IN  UINTN                   Size,
   OUT VOID                   *Var
   )  
-/*++
-
-Routine Description:
-  Overrrides the variable with NV data if found.
-  But it only does it if the Name ends with specified Suffix.
-  For example, if Suffix="MyOverride" and the Name="XyzSetupMyOverride",
-  the Suffix matches the end of Name, so the variable will be loaded from NV
-  provided the variable exists and the GUID and Size matches.
-
-Arguments:
-  Suffix           - Suffix the Name should end with.
-  Name, Guid, Size - Parameters of the variable to retrieve. Must match exactly.
-  Var              - Variable will be retrieved into this buffer.
-                     Caller is responsible for providing storage of exactly Size size in bytes.
-Returns:
-  EFI_SUCCESS           - The variable was overriden with NV variable of same Name/Guid/Size.
-  EFI_INVALID_PARAMETER - The name of the variable does not end with <Suffix>.
-  EFI_NOT_FOUND         - The variable of this Name/Guid was not found in the NV.
-  EFI_LOAD_ERROR        - The variable in the NV was of different size, or NV API returned error.
-
---*/
 {
   UINTN         StrLength;
   UINTN         StrLenSuffix;
@@ -440,6 +371,23 @@ Returns:
   return EfiLibHiiVariableRetrieveFromNv (Name, Guid, Size, &Var);
 }
 
+/**
+  Overrrides the variable with NV data if found.
+  But it only does it if the NV contains the same variable with Name is appended with Suffix.  
+  For example, if Suffix="MyOverride" and the Name="XyzSetup",
+  the Suffix will be appended to the end of Name, and the variable with Name="XyzSetupMyOverride"
+  will be loaded from NV provided the variable exists and the GUID and Size matches.
+
+  @param Suffix            Suffix the variable will be appended with.
+  @param Name, Guid, Size  Parameters of the variable to retrieve. Must match exactly.
+  @param Var               Variable will be retrieved into this buffer.
+                           Caller is responsible for providing storage of exactly Size size in bytes.
+
+  @retval EFI_SUCCESS    - The variable was overriden with NV variable of same Name/Guid/Size.
+  @retval EFI_NOT_FOUND  - The variable of this Name/Guid was not found in the NV.
+  @retval EFI_LOAD_ERROR - The variable in the NV was of different size, or NV API returned error.
+
+--*/
 EFI_STATUS
 EfiLibHiiVariableOverrideBySuffix (
   IN  CHAR16                 *Suffix,
@@ -448,27 +396,7 @@ EfiLibHiiVariableOverrideBySuffix (
   IN  UINTN                   Size,
   OUT VOID                   *Var
   ) 
-/*++
 
-Routine Description:
-  Overrrides the variable with NV data if found.
-  But it only does it if the NV contains the same variable with Name is appended with Suffix.  
-  For example, if Suffix="MyOverride" and the Name="XyzSetup",
-  the Suffix will be appended to the end of Name, and the variable with Name="XyzSetupMyOverride"
-  will be loaded from NV provided the variable exists and the GUID and Size matches.
-
-Arguments:
-  Suffix           - Suffix the variable will be appended with.
-  Name, Guid, Size - Parameters of the variable to retrieve. Must match exactly.
-  Var              - Variable will be retrieved into this buffer.
-                     Caller is responsible for providing storage of exactly Size size in bytes.
-
-Returns:
-  EFI_SUCCESS    - The variable was overriden with NV variable of same Name/Guid/Size.
-  EFI_NOT_FOUND  - The variable of this Name/Guid was not found in the NV.
-  EFI_LOAD_ERROR - The variable in the NV was of different size, or NV API returned error.
-
---*/
 {
   EFI_STATUS    Status;
   CHAR16       *NameSuffixed;

@@ -1,4 +1,7 @@
 /** @file
+  Library Routines to create IFR independent of string data - assume tokens already exist
+  Primarily to be used for exporting op-codes at a label in pre-defined forms.
+
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -8,15 +11,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-  IfrOpCodeCreation.c
-
-Abstract:
-
-  Library Routines to create IFR independent of string data - assume tokens already exist
-  Primarily to be used for exporting op-codes at a label in pre-defined forms.
-
-Revision History:
 
 **/
 
@@ -25,31 +19,22 @@ Revision History:
 //
 #include "IfrSupportLibInternal.h"
 
-EFI_STATUS
-CreateSubTitleOpCode (
-  IN      STRING_REF          StringToken,
-  IN OUT  VOID                *FormBuffer
-  )
-/*++
-
-Routine Description:
-
+/**
   Create a SubTitle opcode independent of string creation
   This is used primarily by users who need to create just one particular valid op-code and the string
   data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
   location to pre-defined forms in HII)
   
-Arguments:
+  @param StringToken      StringToken of the subtitle
+  @param FormBuffer       Output of subtitle as a form
   
-  StringToken     - StringToken of the subtitle
-  
-  FormBuffer      - Output of subtitle as a form
-  
-Returns: 
-
-  EFI_SUCCESS     - Subtitle created to be a form
-
---*/
+  @retval EFI_SUCCESS     Subtitle created to be a form
+**/
+EFI_STATUS
+CreateSubTitleOpCode (
+  IN      STRING_REF          StringToken,
+  IN OUT  VOID                *FormBuffer
+  )
 {
   FRAMEWORK_EFI_IFR_SUBTITLE  Subtitle;
 
@@ -61,7 +46,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create a Text opcode independent of string creation
+  This is used primarily by users who need to create just one particular valid op-code and the string
+  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
+  location to pre-defined forms in HII)
 
+  @param StringToken               - First string token of the text
+  @param StringTokenTwo            - Second string token of the text
+  @param StringTokenThree          - Help string token of the text
+  @param Flags                     - Flag of the text
+  @param Key                       - Key of the text
+  @param FormBuffer                - Output of text as a form
+
+  @retval EFI_SUCCESS       - Text created to be a form
+**/
 EFI_STATUS
 CreateTextOpCode (
   IN      STRING_REF          StringToken,
@@ -71,34 +70,6 @@ CreateTextOpCode (
   IN      UINT16              Key,
   IN OUT  VOID                *FormBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a Text opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
-Arguments:
-  
-  StringToken               - First string token of the text
-  
-  StringTokenTwo            - Second string token of the text
-  
-  StringTokenThree          - Help string token of the text
-  
-  Flags                     - Flag of the text
-  
-  Key                       - Key of the text
-  
-  FormBuffer                - Output of text as a form
-  
-Returns: 
-
-  EFI_SUCCESS       - Text created to be a form
-
---*/
 {
   FRAMEWORK_EFI_IFR_TEXT  Text;
 
@@ -116,7 +87,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create a hyperlink opcode independent of string creation
+  This is used primarily by users who need to create just one particular valid op-code and the string
+  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
+  location to pre-defined forms in HII)
+  
 
+  @param FormId          - Form ID of the hyperlink
+  @param StringToken     - Prompt string token of the hyperlink
+  @param StringTokenTwo  - Help string token of the hyperlink
+  @param Flags           - Flags of the hyperlink
+  @param Key             - Key of the hyperlink
+  @param FormBuffer      - Output of hyperlink as a form
+  @retval EFI_SUCCESS   - Hyperlink created to be a form
+--*/
 EFI_STATUS
 CreateGotoOpCode (
   IN      UINT16              FormId,
@@ -126,34 +111,7 @@ CreateGotoOpCode (
   IN      UINT16              Key,
   IN OUT  VOID                *FormBuffer
   )
-/*++
 
-Routine Description:
-
-  Create a hyperlink opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
-Arguments:
-  
-  FormId          - Form ID of the hyperlink
-  
-  StringToken     - Prompt string token of the hyperlink
-  
-  StringTokenTwo  - Help string token of the hyperlink
-  
-  Flags           - Flags of the hyperlink
-  
-  Key             - Key of the hyperlink
-  
-  FormBuffer      - Output of hyperlink as a form
-  
-Returns: 
-
-  EFI_SUCCESS   - Hyperlink created to be a form
-
---*/
 {
   FRAMEWORK_EFI_IFR_REF Hyperlink;
 
@@ -170,7 +128,27 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create a one-of opcode with a set of option op-codes to choose from independent of string creation.
+  This is used primarily by users who need to create just one particular valid op-code and the string
+  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
+  location to pre-defined forms in HII)
 
+  OptionsList is a pointer to a null-terminated list of option descriptions.  Ensure that OptionsList[x].StringToken
+  has been filled in since this routine will not generate StringToken values.
+  
+  @param QuestionId      - Question ID of the one-of box
+  @param DataWidth       - DataWidth of the one-of box
+  @param PromptToken     - Prompt string token of the one-of box
+  @param HelpToken       - Help string token of the one-of box
+  @param OptionsList     - Each string in it is an option of the one-of box
+  @param OptionCount     - Option string count
+  @param FormBuffer      - Output of One-Of box as a form
+  
+
+  @retval EFI_SUCCESS         - One-Of box created to be a form
+  @retval EFI_DEVICE_ERROR    - DataWidth > 2
+**/
 EFI_STATUS
 CreateOneOfOpCode (
   IN      UINT16              QuestionId,
@@ -181,41 +159,6 @@ CreateOneOfOpCode (
   IN      UINTN               OptionCount,
   IN OUT  VOID                *FormBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a one-of opcode with a set of option op-codes to choose from independent of string creation.
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-
-  OptionsList is a pointer to a null-terminated list of option descriptions.  Ensure that OptionsList[x].StringToken
-  has been filled in since this routine will not generate StringToken values.
-  
-Arguments:
-  
-  QuestionId      - Question ID of the one-of box
-  
-  DataWidth       - DataWidth of the one-of box
-  
-  PromptToken     - Prompt string token of the one-of box
-  
-  HelpToken       - Help string token of the one-of box
-  
-  OptionsList     - Each string in it is an option of the one-of box
-  
-  OptionCount     - Option string count
-  
-  FormBuffer      - Output of One-Of box as a form
-  
-Returns: 
-
-  EFI_SUCCESS         - One-Of box created to be a form
-  
-  EFI_DEVICE_ERROR    - DataWidth > 2
-
---*/
 {
   UINTN                 Index;
   FRAMEWORK_EFI_IFR_ONE_OF        OneOf;
@@ -268,6 +211,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create a ordered list opcode with a set of option op-codes to choose from independent of string creation.
+  This is used primarily by users who need to create just one particular valid op-code and the string
+  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
+  location to pre-defined forms in HII)
+
+  OptionsList is a pointer to a null-terminated list of option descriptions.  Ensure that OptionsList[x].StringToken
+  has been filled in since this routine will not generate StringToken values.
+  
+  @param QuestionId      - Question ID of the ordered list
+  @param MaxEntries      - MaxEntries of the ordered list
+  @param PromptToken     - Prompt string token of the ordered list
+  @param HelpToken       - Help string token of the ordered list
+  @param OptionsList     - Each string in it is an option of the ordered list
+  @param OptionCount     - Option string count
+  @param FormBuffer      - Output of ordered list as a form
+  
+  @retval EFI_SUCCESS     - Ordered list created to be a form
+**/
 EFI_STATUS
 CreateOrderedListOpCode (
   IN      UINT16              QuestionId,
@@ -278,39 +240,6 @@ CreateOrderedListOpCode (
   IN      UINTN               OptionCount,
   IN OUT  VOID                *FormBuffer
   )
-/*++
-
-Routine Description:
-
-  Create a ordered list opcode with a set of option op-codes to choose from independent of string creation.
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-
-  OptionsList is a pointer to a null-terminated list of option descriptions.  Ensure that OptionsList[x].StringToken
-  has been filled in since this routine will not generate StringToken values.
-  
-Arguments:
-  
-  QuestionId      - Question ID of the ordered list
-  
-  MaxEntries      - MaxEntries of the ordered list
-  
-  PromptToken     - Prompt string token of the ordered list
-  
-  HelpToken       - Help string token of the ordered list
-  
-  OptionsList     - Each string in it is an option of the ordered list
-  
-  OptionCount     - Option string count
-  
-  FormBuffer      - Output of ordered list as a form
-  
-Returns: 
-
-  EFI_SUCCESS     - Ordered list created to be a form
-
---*/
 {
   UINTN                 Index;
   FRAMEWORK_EFI_IFR_ORDERED_LIST  OrderedList;
@@ -356,6 +285,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create a checkbox opcode independent of string creation
+  This is used primarily by users who need to create just one particular valid op-code and the string
+  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
+  location to pre-defined forms in HII)
+
+  @param QuestionId      - Question ID of the check box
+  @param DataWidth       - DataWidth of the check box
+  @param PromptToken     - Prompt string token of the check box
+  @param HelpToken       - Help string token of the check box
+  @param Flags           - Flags of the check box
+  @param Key             - Key of the check box
+  @param FormBuffer      - Output of the check box as a form
+
+  @retval EFI_SUCCESS       - Checkbox created to be a form
+  @retval EFI_DEVICE_ERROR  - DataWidth > 1
+**/
 EFI_STATUS
 CreateCheckBoxOpCode (
   IN      UINT16              QuestionId,
@@ -366,38 +312,7 @@ CreateCheckBoxOpCode (
   IN      UINT16              Key,
   IN OUT  VOID                *FormBuffer
   )
-/*++
 
-Routine Description:
-
-  Create a checkbox opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
-Arguments:
-  
-  QuestionId      - Question ID of the check box
-  
-  DataWidth       - DataWidth of the check box
-  
-  PromptToken     - Prompt string token of the check box
-  
-  HelpToken       - Help string token of the check box
-  
-  Flags           - Flags of the check box
-  
-  Key             - Key of the check box
-  
-  FormBuffer      - Output of the check box as a form
-  
-Returns: 
-
-  EFI_SUCCESS       - Checkbox created to be a form
-  
-  EFI_DEVICE_ERROR  - DataWidth > 1
-
---*/
 {
   FRAMEWORK_EFI_IFR_CHECKBOX  CheckBox;
 
@@ -423,7 +338,28 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create a numeric opcode independent of string creation
+  This is used primarily by users who need to create just one particular valid op-code and the string
+  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
+  location to pre-defined forms in HII)
+  
+  @param QuestionId      - Question ID of the numeric
+  @param DataWidth       - DataWidth of the numeric
+  @param PromptToken     - Prompt string token of the numeric
+  @param HelpToken       - Help string token of the numeric
+  @param Minimum         - Minumun boundary of the numeric
+  @param Maximum         - Maximum boundary of the numeric
+  @param Step            - Step of the numeric
+  @param Default         - Default value of the numeric
+  @param Flags           - Flags of the numeric
+  @param Key             - Key of the numeric
+  @param FormBuffer      - Output of the numeric as a form
+ 
 
+  @retval EFI_SUCCESS       - The numeric created to be a form.
+  @retval EFI_DEVICE_ERROR  - DataWidth > 2
+**/
 EFI_STATUS
 CreateNumericOpCode (
   IN      UINT16              QuestionId,
@@ -438,46 +374,7 @@ CreateNumericOpCode (
   IN      UINT16              Key,
   IN OUT  VOID                *FormBuffer
   )
-/*++
 
-Routine Description:
-
-  Create a numeric opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
-Arguments:
-  
-  QuestionId      - Question ID of the numeric
-  
-  DataWidth       - DataWidth of the numeric
-  
-  PromptToken     - Prompt string token of the numeric
-  
-  HelpToken       - Help string token of the numeric
-  
-  Minimum         - Minumun boundary of the numeric
-  
-  Maximum         - Maximum boundary of the numeric
-  
-  Step            - Step of the numeric
-  
-  Default         - Default value of the numeric
-  
-  Flags           - Flags of the numeric
-  
-  Key             - Key of the numeric
-  
-  FormBuffer      - Output of the numeric as a form
-  
-Returns: 
-
-  EFI_SUCCESS       - The numeric created to be a form.
-  
-  EFI_DEVICE_ERROR  - DataWidth > 2
-
---*/
 {
   FRAMEWORK_EFI_IFR_NUMERIC Numeric;
 
@@ -507,7 +404,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
-
+/**
+  Create a numeric opcode independent of string creation
+  This is used primarily by users who need to create just one particular valid op-code and the string
+  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
+  location to pre-defined forms in HII)
+  
+  @param QuestionId       Question ID of the string
+  @param DataWidth        DataWidth of the string
+  @param PromptToken      Prompt token of the string
+  @param HelpToken        Help token of the string
+  @param MinSize          Min size boundary of the string
+  @param MaxSize          Max size boundary of the string
+  @param Flags            Flags of the string
+  @param Key              Key of the string
+  @param FormBuffer       Output of the string as a form
+  
+  @retval EFI_SUCCESS     String created to be a form.
+**/
 EFI_STATUS
 CreateStringOpCode (
   IN      UINT16              QuestionId,
@@ -520,40 +434,7 @@ CreateStringOpCode (
   IN      UINT16              Key,
   IN OUT  VOID                *FormBuffer
   )
-/*++
 
-Routine Description:
-
-  Create a numeric opcode independent of string creation
-  This is used primarily by users who need to create just one particular valid op-code and the string
-  data will be assumed to exist in the HiiDatabase already.  (Useful when exporting op-codes at a label
-  location to pre-defined forms in HII)
-  
-Arguments:
-  
-  QuestionId      - Question ID of the string
-  
-  DataWidth       - DataWidth of the string
-  
-  PromptToken     - Prompt token of the string
-  
-  HelpToken       - Help token of the string
-  
-  MinSize         - Min size boundary of the string
-  
-  MaxSize         - Max size boundary of the string
-    
-  Flags           - Flags of the string
-  
-  Key             - Key of the string
-  
-  FormBuffer      - Output of the string as a form
-  
-Returns: 
-
-  EFI_SUCCESS       - String created to be a form.
-
---*/
 {
   FRAMEWORK_EFI_IFR_STRING  String;
 
@@ -574,7 +455,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create a banner opcode.  This is primarily used by the FrontPage implementation from BDS.
+  
+  @param Title       - Title of the banner
+  @param LineNumber  - LineNumber of the banner
+  @param Alignment   - Alignment of the banner
+  @param FormBuffer  - Output of banner as a form
 
+  @retval EFI_SUCCESS     - Banner created to be a form.
+**/
 EFI_STATUS
 CreateBannerOpCode (
   IN      UINT16              Title,
@@ -582,27 +472,7 @@ CreateBannerOpCode (
   IN      UINT8               Alignment,
   IN OUT  VOID                *FormBuffer
   )
-/*++
 
-Routine Description:
-
-  Create a banner opcode.  This is primarily used by the FrontPage implementation from BDS.
-  
-Arguments:
-  
-  Title       - Title of the banner
-  
-  LineNumber  - LineNumber of the banner
-  
-  Alignment   - Alignment of the banner
-  
-  FormBuffer  - Output of banner as a form
-  
-Returns: 
-
-  EFI_SUCCESS     - Banner created to be a form.
-
---*/
 {
   FRAMEWORK_EFI_IFR_BANNER  Banner;
 
@@ -616,3 +486,5 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
+
