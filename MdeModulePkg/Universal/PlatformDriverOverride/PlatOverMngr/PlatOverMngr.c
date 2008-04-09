@@ -37,9 +37,6 @@ STATIC  LIST_ENTRY    mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMapping
 
 STATIC  EFI_HANDLE    *mDevicePathHandleBuffer;
 STATIC  EFI_HANDLE    *mDriverImageHandleBuffer;
-STATIC  EFI_HANDLE    mSelectedCtrDPHandle;
-
-STATIC CFG_PROTOCOL_INVOKER_CHOICE mChoice[MAX_CHOICE_NUM];
 
 STATIC UINTN         mSelectedCtrIndex;
 STATIC EFI_STRING_ID mControllerToken[MAX_CHOICE_NUM];
