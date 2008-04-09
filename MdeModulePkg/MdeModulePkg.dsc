@@ -297,8 +297,8 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
 
-  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
-  MdeModulePkg/Application/PlatOverMngr/PlatOverMngr.inf
+  MdeModulePkg/Universal/PlatformDriverOverride/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+  MdeModulePkg/Universal/PlatformDriverOverride/PlatOverMngr/PlatOverMngr.inf
 
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
