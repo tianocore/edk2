@@ -1,6 +1,8 @@
 /** @file
+  BDS internal function define the default device path string, it can be
+  replaced by platform device path.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,30 +11,10 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  DevicePath.c
-
-Abstract:
-
-  BDS internal function define the default device path string, it can be
-  replaced by platform device path.
-
-
 **/
 
 #include "InternalBdsLib.h"
 
-//
-// Platform Code should implement the Vendor specific Device Path display routine.
-//
-extern
-VOID
-DevPathVendor (
-  IN OUT POOL_PRINT       *Str,
-  IN VOID                 *DevPath
-  )
-;
 
 EFI_GUID  mEfiDevicePathMessagingUartFlowControlGuid = DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL;
 
@@ -102,6 +84,7 @@ Returns:
 
 **/
 CHAR16 *
+EFIAPI
 CatPrint (
   IN OUT POOL_PRINT   *Str,
   IN CHAR16           *fmt,
@@ -153,11 +136,12 @@ CatPrint (
 
   @param  DevPath  A pointer to a device path data structure
 
-  @return If the memory for the device path is successfully allocated, then a
-  @return pointer to the new device path is returned.  Otherwise, NULL is returned.
+  @return A ponter to new device If the memory for the device path is successfully allocated, then a
+          pointer to the new device path is returned.  Otherwise, NULL is returned.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 BdsLibUnpackDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   )
@@ -279,6 +263,7 @@ DevPathController (
 
 **/
 VOID
+EFIAPI
 DevPathVendor (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
@@ -1169,9 +1154,15 @@ DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
 
 
 /**
+  This function converts an input device structure to a Unicode string.
+
+  @param DevPath                  A pointer to the device path structure.
+
+  @return A new allocated Unicode string that represents the device path.
 
 **/
 CHAR16 *
+EFIAPI
 DevicePathToStr (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
   )

@@ -1,6 +1,7 @@
 /** @file
+  Misc BDS library function
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  BdsMisc.c
-
-Abstract:
-
-  Misc BDS library function
-
 
 **/
 
@@ -34,12 +26,11 @@ extern UINT16 gPlatformBootTimeOutDefault;
 /**
   Return the default value for system Timeout variable.
 
-  None
-
   @return Timeout value.
 
 **/
 UINT16
+EFIAPI
 BdsLibGetTimeout (
   VOID
   )
@@ -85,10 +76,9 @@ BdsLibGetTimeout (
 
   @param  BdsDriverLists        The header of the current driver option link list
 
-  @return None
-
 **/
 VOID
+EFIAPI
 BdsLibLoadDrivers (
   IN LIST_ENTRY                   *BdsDriverLists
   )
@@ -250,6 +240,7 @@ BdsLibGetFreeOptionNumber (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibRegisterNewOption (
   IN  LIST_ENTRY                     *BdsOptionList,
   IN  EFI_DEVICE_PATH_PROTOCOL       *DevicePath,
@@ -453,6 +444,7 @@ BdsLibRegisterNewOption (
 
 **/
 BDS_COMMON_OPTION *
+EFIAPI
 BdsLibVariableToOption (
   IN OUT LIST_ENTRY                   *BdsCommonOptionList,
   IN  CHAR16                          *VariableName
@@ -578,6 +570,7 @@ BdsLibVariableToOption (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibBuildOptionFromVar (
   IN  LIST_ENTRY                      *BdsCommonOptionList,
   IN  CHAR16                          *VariableName
@@ -630,31 +623,15 @@ BdsLibBuildOptionFromVar (
   @param  BootMode              Boot mode from PEI handoff HOB.
 
   @retval EFI_SUCCESS           Successfully get boot mode
-  @retval EFI_NOT_FOUND         Can not find the current system boot mode
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibGetBootMode (
   OUT EFI_BOOT_MODE       *BootMode
   )
 {
-  VOID        *HobList;
-  EFI_STATUS  Status;
-
-  //
-  // Get Hob list
-  //
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &HobList);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Hob list not found\n"));
-    *BootMode = 0;
-    return EFI_NOT_FOUND;
-  }
-
-  Status = R8_GetHobBootMode (HobList, BootMode);
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
-  }
+  *BootMode = GetBootModeHob ();
 
   return EFI_SUCCESS;
 }
@@ -674,6 +651,7 @@ BdsLibGetBootMode (
 
 **/
 VOID *
+EFIAPI
 BdsLibGetVariableAndSize (
   IN  CHAR16              *Name,
   IN  EFI_GUID            *VendorGuid,
@@ -722,11 +700,12 @@ BdsLibGetVariableAndSize (
                                 structure.
 
   @return This function will remove the device path instances in Multi which partly
-  @return match with the Single, and return the result device path. If there is no
-  @return remaining device path as a result, this function will return NULL.
+          match with the Single, and return the result device path. If there is no
+          remaining device path as a result, this function will return NULL.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 BdsLibDelPartMatchInstance (
   IN     EFI_DEVICE_PATH_PROTOCOL  *Multi,
   IN     EFI_DEVICE_PATH_PROTOCOL  *Single
@@ -785,6 +764,7 @@ BdsLibDelPartMatchInstance (
 
 **/
 BOOLEAN
+EFIAPI
 BdsLibMatchDevicePaths (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Multi,
   IN  EFI_DEVICE_PATH_PROTOCOL  *Single
@@ -834,6 +814,7 @@ BdsLibMatchDevicePaths (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibOutputStrings (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *ConOut,
   ...
@@ -876,12 +857,9 @@ BdsLibOutputStrings (
   Enable the setup browser reset reminder feature.
   This routine is used in platform tip. If the platform policy need the feature, use the routine to enable it.
 
-  VOID
-
-  @return VOID
-
 **/
 VOID
+EFIAPI
 EnableResetReminderFeature (
   VOID
   )
@@ -894,12 +872,9 @@ EnableResetReminderFeature (
   Disable the setup browser reset reminder feature.
   This routine is used in platform tip. If the platform policy do not want the feature, use the routine to disable it.
 
-  VOID
-
-  @return VOID
-
 **/
 VOID
+EFIAPI
 DisableResetReminderFeature (
   VOID
   )
@@ -912,12 +887,9 @@ DisableResetReminderFeature (
   Record the info that  a reset is required.
   A  module boolean variable is used to record whether a reset is required.
 
-  VOID
-
-  @return VOID
-
 **/
 VOID
+EFIAPI
 EnableResetRequired (
   VOID
   )
@@ -930,12 +902,9 @@ EnableResetRequired (
   Record the info that  no reset is required.
   A  module boolean variable is used to record whether a reset is required.
 
-  VOID
-
-  @return VOID
-
 **/
 VOID
+EFIAPI
 DisableResetRequired (
   VOID
   )
@@ -947,12 +916,9 @@ DisableResetRequired (
 /**
   Check whether platform policy enable the reset reminder feature. The default is enabled.
 
-  VOID
-
-  @return VOID
-
 **/
 BOOLEAN
+EFIAPI
 IsResetReminderFeatureEnable (
   VOID
   )
@@ -964,12 +930,9 @@ IsResetReminderFeatureEnable (
 /**
   Check if  user changed any option setting which needs a system reset to be effective.
 
-  VOID
-
-  @return VOID
-
 **/
 BOOLEAN
+EFIAPI
 IsResetRequired (
   VOID
   )
@@ -983,12 +946,9 @@ IsResetRequired (
   If a reset is needed, Popup a menu to notice user, and finish the feature
   according to the user selection.
 
-  VOID
-
-  @return VOID
-
 **/
 VOID
+EFIAPI
 SetupResetReminder (
   VOID
   )
@@ -1046,6 +1006,7 @@ SetupResetReminder (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibGetImageHeader (
   IN  EFI_HANDLE                  Device,
   IN  CHAR16                      *FileName,
@@ -1204,7 +1165,7 @@ Returns:
   UINT32                       Previous;
   UINT32                       Current;
   UINT32                       Next;
-  VOID                         *HobList;
+  EFI_HOB_GUID_TYPE            *GuidHob;
 
   UpdateRequired = FALSE;
 
@@ -1225,14 +1186,15 @@ Returns:
   // PEI is responsible for getting them from variable and build a Hob to save them.
   // If the previous Memory Type Information is not available, then set defaults
   //
-  EfiGetSystemConfigurationTable (&gEfiHobListGuid, &HobList);
-  Status = R8_GetNextGuidHob (&HobList, &gEfiMemoryTypeInformationGuid, (VOID **) &PreviousMemoryTypeInformation, &VariableSize);
-  if (EFI_ERROR (Status) || PreviousMemoryTypeInformation == NULL) {
+  GuidHob = GetFirstGuidHob (&gEfiMemoryTypeInformationGuid);
+  if (GuidHob == NULL) {
     //
     // If Platform has not built Memory Type Info into the Hob, just return.
     //
     return;
   }
+  PreviousMemoryTypeInformation = GET_GUID_HOB_DATA (GuidHob);
+  VariableSize = GET_GUID_HOB_DATA_SIZE (GuidHob);
 
   //
   // Use a heuristic to adjust the Memory Type Information for the next boot
@@ -1293,10 +1255,6 @@ Returns:
   This routine register a function to adjust the different type memory page number just before booting
   and save the updated info into the variable for next boot to use
 
-  None
-
-  @return None.
-
 **/
 VOID
 EFIAPI
@@ -1320,23 +1278,3 @@ BdsLibSaveMemoryTypeInformation (
 }
 
 
-/**
-  return the current TPL, copied from the EDKII glue lib.
-
-  VOID
-
-  @return Current TPL
-
-**/
-EFI_TPL
-BdsLibGetCurrentTpl (
-  VOID
-  )
-{
-  EFI_TPL                 Tpl;
-
-  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  gBS->RestoreTPL (Tpl);
-
-  return Tpl;
-}

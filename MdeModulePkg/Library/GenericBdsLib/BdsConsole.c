@@ -1,6 +1,7 @@
 /** @file
+  BDS Lib functions which contain all the code to connect console device
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  BdsConsole.c
-
-Abstract:
-
-  BDS Lib functions which contain all the code to connect console device
-
 
 **/
 
@@ -66,6 +58,7 @@ IsNvNeed (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibUpdateConsoleVariable (
   IN  CHAR16                    *ConVarName,
   IN  EFI_DEVICE_PATH_PROTOCOL  *CustomizedConDevicePath,
@@ -182,6 +175,7 @@ BdsLibUpdateConsoleVariable (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibConnectConsoleVariable (
   IN  CHAR16                 *ConVarName
   )
@@ -272,12 +266,9 @@ BdsLibConnectConsoleVariable (
   This function will search every simpletxt devive in current system,
   and make every simpletxt device as pertantial console device.
 
-  None
-
-  @return None
-
 **/
 VOID
+EFIAPI
 BdsLibConnectAllConsoles (
   VOID
   )
@@ -345,8 +336,6 @@ BdsLibConnectAllConsoles (
   This function will connect console device base on the console
   device variable ConIn, ConOut and ErrOut.
 
-  None
-
   @retval EFI_SUCCESS              At least one of the ConIn and ConOut device have
                                    been connected success.
   @retval EFI_STATUS               Return the status of
@@ -354,6 +343,7 @@ BdsLibConnectAllConsoles (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsLibConnectAllDefaultConsoles (
   VOID
   )
