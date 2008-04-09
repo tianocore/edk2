@@ -1,7 +1,7 @@
 /** @file
   This file declares SMM Base abstraction protocol.
   This protocol is used to install SMM handlers for support of subsequent SMI/PMI activations. This
-  protocol is available on both IA-32 and Itanium®-based systems.
+  protocol is available on both IA-32 and Itanium based systems.
  
   The EFI_SMM_BASE_PROTOCOL is a set of services that is exported by a processor device. It is
   a required protocol for the platform processor. This protocol can be used in both boot services and
@@ -27,8 +27,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  SmmBase.h
 
   @par Revision Reference:
   This Protocol is defined in Framework of EFI SMM Core Interface Spec
