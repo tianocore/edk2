@@ -4,9 +4,9 @@
   the following:
   - A processor driver to abstract the SMI/PMI IPI
   - The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an
-  Intel® chipset
+  Intel chipset
   Because of the possibility of performing SMI or PMI IPI transactions, the ability to generate this
-  event from a platform chipset agent is an optional capability for both IA-32 and Itanium®-based
+  event from a platform chipset agent is an optional capability for both IA-32 and Itanium based
   systems.
 
   Copyright (c) 2007, Intel Corporation
