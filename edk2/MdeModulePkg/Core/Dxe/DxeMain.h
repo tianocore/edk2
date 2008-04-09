@@ -1,5 +1,7 @@
 /**@file
-  Header file of DxeCore
+
+  The internal header file includes the common header files, defines
+  internal structure and functions used by DxeCore module.
   
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          

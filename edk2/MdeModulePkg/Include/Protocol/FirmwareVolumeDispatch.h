@@ -13,12 +13,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  FirmwareVolumeDispatch.h
-
-  @par Revision Reference:
-  This protol will be defined in DXE CIS Spec.
-  Version 0.91C.
-
 **/
 
 #ifndef __FIRMWARE_VOLUME_DISPATCH_H__
