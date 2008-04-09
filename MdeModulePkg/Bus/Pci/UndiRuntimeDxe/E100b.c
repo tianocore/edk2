@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Provides basic function upon network adapter card.
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,17 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-
- E100B.C
-
-Abstract:
-
-
-Revision History
-
---*/
+**/
 
 #include "Undi32.h"
 
@@ -50,28 +41,25 @@ static UINT8 basic_config_cmd[22] = {
     DelayIt (AdapterInfo, 50);    \
 }
 
-UINT8
-InByte (
-  IN NIC_DATA_INSTANCE *AdapterInfo,
-  IN UINT32            Port
-  )
-/*++
 
-Routine Description:
+/**
   This function calls the MemIo callback to read a byte from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
   which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
-Arguments:
-  Port              - Which port to read from.
+  @param  Port                            Which port to read from.
 
-Returns:
-  Results           - The data read from the port.
+  @retval Results                         The data read from the port.
 
---*/
+**/
 // TODO:    AdapterInfo - add argument and description to function comment
+UINT8
+InByte (
+  IN NIC_DATA_INSTANCE *AdapterInfo,
+  IN UINT32            Port
+  )
 {
   UINT8 Results;
 
@@ -85,28 +73,25 @@ Returns:
   return Results;
 }
 
-UINT16
-InWord (
-  IN NIC_DATA_INSTANCE *AdapterInfo,
-  IN UINT32            Port
-  )
-/*++
 
-Routine Description:
+/**
   This function calls the MemIo callback to read a word from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
   which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
-Arguments:
-  Port              - Which port to read from.
+  @param  Port                            Which port to read from.
 
-Returns:
-  Results           - The data read from the port.
+  @retval Results                         The data read from the port.
 
---*/
+**/
 // TODO:    AdapterInfo - add argument and description to function comment
+UINT16
+InWord (
+  IN NIC_DATA_INSTANCE *AdapterInfo,
+  IN UINT32            Port
+  )
 {
   UINT16  Results;
 
@@ -120,28 +105,25 @@ Returns:
   return Results;
 }
 
-UINT32
-InLong (
-  IN NIC_DATA_INSTANCE *AdapterInfo,
-  IN UINT32            Port
-  )
-/*++
 
-Routine Description:
+/**
   This function calls the MemIo callback to read a dword from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
   which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
-Arguments:
-  Port              - Which port to read from.
+  @param  Port                            Which port to read from.
 
-Returns:
-  Results           - The data read from the port.
+  @retval Results                         The data read from the port.
 
---*/
+**/
 // TODO:    AdapterInfo - add argument and description to function comment
+UINT32
+InLong (
+  IN NIC_DATA_INSTANCE *AdapterInfo,
+  IN UINT32            Port
+  )
 {
   UINT32  Results;
 
@@ -155,30 +137,27 @@ Returns:
   return Results;
 }
 
-VOID
-OutByte (
-  IN NIC_DATA_INSTANCE *AdapterInfo,
-  IN UINT8             Data,
-  IN UINT32            Port
-  )
-/*++
 
-Routine Description:
+/**
   This function calls the MemIo callback to write a byte from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
   which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
-Arguments:
-  Data              - Data to write to Port.
-  Port              - Which port to write to.
+  @param  Data                            Data to write to Port.
+  @param  Port                            Which port to write to.
 
-Returns:
-  none
+  @return none
 
---*/
+**/
 // TODO:    AdapterInfo - add argument and description to function comment
+VOID
+OutByte (
+  IN NIC_DATA_INSTANCE *AdapterInfo,
+  IN UINT8             Data,
+  IN UINT32            Port
+  )
 {
   UINT8 Val;
 
@@ -193,30 +172,27 @@ Returns:
   return ;
 }
 
-VOID
-OutWord (
-  IN NIC_DATA_INSTANCE *AdapterInfo,
-  IN UINT16            Data,
-  IN UINT32            Port
-  )
-/*++
 
-Routine Description:
+/**
   This function calls the MemIo callback to write a word from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
   which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
-Arguments:
-  Data              - Data to write to Port.
-  Port              - Which port to write to.
+  @param  Data                            Data to write to Port.
+  @param  Port                            Which port to write to.
 
-Returns:
-  none
+  @return none
 
---*/
+**/
 // TODO:    AdapterInfo - add argument and description to function comment
+VOID
+OutWord (
+  IN NIC_DATA_INSTANCE *AdapterInfo,
+  IN UINT16            Data,
+  IN UINT32            Port
+  )
 {
   UINT16  Val;
 
@@ -231,30 +207,27 @@ Returns:
   return ;
 }
 
-VOID
-OutLong (
-  IN NIC_DATA_INSTANCE *AdapterInfo,
-  IN UINT32            Data,
-  IN UINT32            Port
-  )
-/*++
 
-Routine Description:
+/**
   This function calls the MemIo callback to write a dword from the device's
   address space
   Since UNDI3.0 uses the TmpMemIo function (instead of the callback routine)
   which also takes the UniqueId parameter (as in UNDI3.1 spec) we don't have
   to make undi3.0 a special case
 
-Arguments:
-  Data              - Data to write to Port.
-  Port              - Which port to write to.
+  @param  Data                            Data to write to Port.
+  @param  Port                            Which port to write to.
 
-Returns:
-  none
+  @return none
 
---*/
+**/
 // TODO:    AdapterInfo - add argument and description to function comment
+VOID
+OutLong (
+  IN NIC_DATA_INSTANCE *AdapterInfo,
+  IN UINT32            Data,
+  IN UINT32            Port
+  )
 {
   UINT32  Val;
 
@@ -269,6 +242,19 @@ Returns:
   return ;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  MemAddr                         TODO: add argument description
+  @param  Size                            TODO: add argument description
+  @param  Direction                       TODO: add argument description
+  @param  MappedAddr                      TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 STATIC
 UINTN
 MapIt (
@@ -278,25 +264,6 @@ MapIt (
   IN UINT32            Direction,
   OUT UINT64           MappedAddr
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  MemAddr     - TODO: add argument description
-  Size        - TODO: add argument description
-  Direction   - TODO: add argument description
-  MappedAddr  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT64  *PhyAddr;
 
@@ -338,6 +305,19 @@ Returns:
   return PXE_STATCODE_SUCCESS;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  MemAddr                         TODO: add argument description
+  @param  Size                            TODO: add argument description
+  @param  Direction                       TODO: add argument description
+  @param  MappedAddr                      TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 STATIC
 VOID
 UnMapIt (
@@ -347,25 +327,6 @@ UnMapIt (
   IN UINT32            Direction,
   IN UINT64            MappedAddr
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  MemAddr     - TODO: add argument description
-  Size        - TODO: add argument description
-  Direction   - TODO: add argument description
-  MappedAddr  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   if (AdapterInfo->VersionFlag > 0x30) {
     //
@@ -386,24 +347,22 @@ Returns:
   return ;
 }
 
+
+/**
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+
+**/
+// TODO:    MicroSeconds - add argument and description to function comment
 STATIC
 VOID
 DelayIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
   UINT16               MicroSeconds
   )
-/*++
-
-Routine Description:
-
-Arguments:
-  AdapterInfo                     - Pointer to the NIC data structure information
-                                    which the UNDI driver is layering on..
-
-Returns:
-
---*/
-// TODO:    MicroSeconds - add argument and description to function comment
 {
   if (AdapterInfo->VersionFlag == 0x30) {
     (*AdapterInfo->Delay_30) (MicroSeconds);
@@ -412,24 +371,22 @@ Returns:
   }
 }
 
+
+/**
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+
+**/
+// TODO:    flag - add argument and description to function comment
 STATIC
 VOID
 BlockIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
   UINT32               flag
   )
-/*++
-
-Routine Description:
-
-Arguments:
-  AdapterInfo                     - Pointer to the NIC data structure information
-                                    which the UNDI driver is layering on..
-
-Returns:
-
---*/
-// TODO:    flag - add argument and description to function comment
 {
   if (AdapterInfo->VersionFlag == 0x30) {
     (*AdapterInfo->Block_30) (flag);
@@ -438,26 +395,20 @@ Returns:
   }
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 STATIC
 UINT8
 Load_Base_Regs (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   //
   // we will use the linear (flat) memory model and fill our base registers
@@ -488,28 +439,22 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  cmd_ptr                         TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 STATIC
 UINT8
 IssueCB (
   NIC_DATA_INSTANCE *AdapterInfo,
   TxCB              *cmd_ptr
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  cmd_ptr     - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT16  status;
 
@@ -555,26 +500,20 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 STATIC
 UINT8
 Configure (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   //
   // all command blocks are of TxCB format
@@ -632,25 +571,19 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINT8
 E100bSetupIAAddr (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   //
   // all command blocks are of TxCB format
@@ -693,22 +626,21 @@ Returns:
   return 0;
 }
 
+
+/**
+  Instructs the NIC to stop receiving packets.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+
+**/
 STATIC
 VOID
 StopRU (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  Instructs the NIC to stop receiving packets.
-
-Arguments:
-  AdapterInfo                     - Pointer to the NIC data structure information
-                                    which the UNDI driver is layering on..
-Returns:
-
---*/
 {
   if (AdapterInfo->Receive_Started) {
 
@@ -729,23 +661,23 @@ Returns:
   return ;
 }
 
+
+/**
+  Instructs the NIC to start receiving packets.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+  @retval 0                               Successful
+  @retval -1                              Already Started
+
+**/
 STATIC
 INT8
 StartRU (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  Instructs the NIC to start receiving packets.
-
-Arguments:
-  AdapterInfo                     - Pointer to the NIC data structure information
-                                    which the UNDI driver is layering on..
-Returns:
-  0                               - Successful
-  -1                              - Already Started
---*/
 {
 
   if (AdapterInfo->Receive_Started) {
@@ -769,24 +701,23 @@ Returns:
   return 0;
 }
 
+
+/**
+  Configures the chip.  This routine expects the NIC_DATA_INSTANCE structure to be filled in.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+  @retval 0                               Successful
+  @retval PXE_STATCODE_NOT_ENOUGH_MEMORY  Insufficient length of locked memory
+  @retval other                           Failure initializing chip
+
+**/
 UINTN
 E100bInit (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  Configures the chip.  This routine expects the NIC_DATA_INSTANCE structure to be filled in.
-
-Arguments:
-  AdapterInfo                     - Pointer to the NIC data structure information
-                                    which the UNDI driver is layering on..
-
-Returns:
-  0                               - Successful
-  PXE_STATCODE_NOT_ENOUGH_MEMORY  - Insufficient length of locked memory
-  other                           - Failure initializing chip
---*/
 {
   PCI_CONFIG_HEADER *CfgHdr;
   UINTN             stat;
@@ -865,21 +796,21 @@ Returns:
   return InitializeChip (AdapterInfo);
 }
 
+
+/**
+  Sets the interrupt state for the NIC.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+  @retval 0                               Successful
+
+**/
 UINT8
 E100bSetInterruptState (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  Sets the interrupt state for the NIC.
-
-Arguments:
-  AdapterInfo                     - Pointer to the NIC data structure information
-                                    which the UNDI driver is layering on..
-Returns:
-  0                               - Successful
---*/
 {
   //
   // don't set receive interrupt if receiver is disabled...
@@ -912,6 +843,20 @@ Returns:
 //
 // we are not going to disable broadcast for the WOL's sake!
 //
+
+/**
+  Instructs the NIC to start receiving packets.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on.. new_filter
+                                              - cpb                             -
+                                          cpbsize                         -
+
+  @retval 0                               Successful
+  @retval -1                              Already Started
+
+**/
 UINTN
 E100bSetfilter (
   NIC_DATA_INSTANCE *AdapterInfo,
@@ -919,22 +864,6 @@ E100bSetfilter (
   UINT64            cpb,
   UINT32            cpbsize
   )
-/*++
-
-Routine Description:
-  Instructs the NIC to start receiving packets.
-
-Arguments:
-  AdapterInfo                     - Pointer to the NIC data structure information
-                                    which the UNDI driver is layering on..
-  new_filter                      -
-  cpb                             -
-  cpbsize                         -
-
-Returns:
-  0                               - Successful
-  -1                              - Already Started
---*/
 {
   PXE_CPB_RECEIVE_FILTERS *mc_list = (PXE_CPB_RECEIVE_FILTERS *) (UINTN)cpb;
   UINT16                  cfg_flt;
@@ -1074,29 +1003,23 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  cpb                             TODO: add argument description
+  @param  opflags                         TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINTN
 E100bTransmit (
   NIC_DATA_INSTANCE *AdapterInfo,
   UINT64            cpb,
   UINT16            opflags
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  cpb         - TODO: add argument description
-  opflags     - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   PXE_CPB_TRANSMIT_FRAGMENTS  *tx_ptr_f;
   PXE_CPB_TRANSMIT            *tx_ptr_1;
@@ -1262,29 +1185,23 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  cpb                             TODO: add argument description
+  @param  db                              TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINTN
 E100bReceive (
   NIC_DATA_INSTANCE *AdapterInfo,
   UINT64            cpb,
   UINT64            db
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  cpb         - TODO: add argument description
-  db          - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   PXE_CPB_RECEIVE *rx_cpbptr;
   PXE_DB_RECEIVE  *rx_dbptr;
@@ -1392,7 +1309,7 @@ Returns:
             // mcast
             //
 
-            pkt_type = PXE_FRAME_TYPE_MULTICAST;
+            pkt_type = PXE_FRAME_TYPE_FILTERED_MULTICAST;
           } else {
             pkt_type = PXE_FRAME_TYPE_PROMISCUOUS;
           }
@@ -1449,25 +1366,19 @@ FreeRFD:
   return ret_code;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 INT16
 E100bReadEepromAndStationAddress (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   INT32   Index;
   INT32   Index2;
@@ -1524,25 +1435,19 @@ Returns:
 //  3) when one is free, Tail == Head and Freecount == 1
 //  4) First non-Free frame is always at Tail->next
 //
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINT8
 SetupCBlink (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   TxCB  *head_ptr;
   TxCB  *tail_ptr;
@@ -1590,25 +1495,19 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 TxCB *
 GetFreeCB (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   TxCB  *free_cb_ptr;
 
@@ -1637,27 +1536,21 @@ Returns:
   return free_cb_ptr;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  cb_ptr                          TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 VOID
 SetFreeCB (
   IN NIC_DATA_INSTANCE *AdapterInfo,
   IN TxCB              *cb_ptr
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  cb_ptr      - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   //
   // here we assume cb are returned in the order they are taken out
@@ -1671,25 +1564,19 @@ Returns:
   return ;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  ind                             TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINT16
 next (
   IN UINT16 ind
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  ind - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT16  Tmp;
 
@@ -1701,25 +1588,19 @@ Returns:
   return Tmp;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINT16
 CheckCBList (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   TxCB    *Tmp_ptr;
   UINT16  cnt;
@@ -1762,25 +1643,19 @@ Returns:
 //               bit in the previous RXFD is cleared.
 //               Allocation done during INIT, this is making linked list.
 //
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINT8
 SetupReceiveQueues (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   RxFD    *rx_ptr;
   RxFD    *tail_ptr;
@@ -1823,27 +1698,21 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  rx_index                        TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 VOID
 Recycle_RFD (
   IN NIC_DATA_INSTANCE *AdapterInfo,
   IN UINT16            rx_index
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  rx_index    - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   RxFD  *rx_ptr;
   RxFD  *tail_ptr;
@@ -1956,26 +1825,20 @@ Returns:
   }
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 STATIC
 UINT16
 shift_bits_in (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT8   Tmp;
   INT32   Index;
@@ -2008,26 +1871,25 @@ Returns:
   return retval;
 }
 
+
+/**
+  This routine sets the EEPROM lockout bit to gain exclusive access to the
+  eeprom. the access bit is the most significant bit in the General Control
+  Register 2 in the SCB space.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+  @retval TRUE                            if it got the access
+  @retval FALSE                           if it fails to get the exclusive access
+
+**/
 STATIC
 BOOLEAN
 E100bSetEepromLockOut (
   IN NIC_DATA_INSTANCE  *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine sets the EEPROM lockout bit to gain exclusive access to the
-  eeprom. the access bit is the most significant bit in the General Control
-  Register 2 in the SCB space.
-
-Arguments:
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  TRUE - if it got the access
-  FALSE - if it fails to get the exclusive access
-
---*/
 {
   UINTN wait;
   UINT8 tmp;
@@ -2057,25 +1919,24 @@ Returns:
   return TRUE;
 }
 
+
+/**
+  This routine Resets the EEPROM lockout bit to giveup access to the
+  eeprom. the access bit is the most significant bit in the General Control
+  Register 2 in the SCB space.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+  @return None
+
+**/
 STATIC
 VOID
 E100bReSetEepromLockOut (
   IN NIC_DATA_INSTANCE  *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine Resets the EEPROM lockout bit to giveup access to the
-  eeprom. the access bit is the most significant bit in the General Control
-  Register 2 in the SCB space.
-
-Arguments:
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
- None
-
---*/
 {
   UINT8 tmp;
 
@@ -2090,26 +1951,25 @@ Returns:
   }
 }
 
+
+/**
+  Using the NIC data structure information, read the EEPROM to get a Word of data for the MAC address.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+  @param  Location                        Word offset into the MAC address to read.
+  @param  AddrLen                         Number of bits of address length.
+
+  @retval RetVal                          The word read from the EEPROM.
+
+**/
 UINT16
 E100bReadEeprom (
   IN NIC_DATA_INSTANCE  *AdapterInfo,
   IN INT32              Location,
   IN UINT8              AddrLen
   )
-/*++
-
-Routine Description:
-  Using the NIC data structure information, read the EEPROM to get a Word of data for the MAC address.
-
-Arguments:
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-  Location          - Word offset into the MAC address to read.
-  AddrLen           - Number of bits of address length.
-
-Returns:
-  RetVal            - The word read from the EEPROM.
-
---*/
 {
   UINT16  RetVal;
   UINT8   Tmp;
@@ -2174,23 +2034,22 @@ Returns:
   return RetVal;
 }
 
+
+/**
+  Using the NIC data structure information, read the EEPROM to determine how many bits of address length
+  this EEPROM is in Words.
+
+  @param  AdapterInfo                     Pointer to the NIC data structure
+                                          information which the UNDI driver is
+                                          layering on..
+
+  @retval RetVal                          The word read from the EEPROM.
+
+**/
 UINT8
 E100bGetEepromAddrLen (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  Using the NIC data structure information, read the EEPROM to determine how many bits of address length
-  this EEPROM is in Words.
-
-Arguments:
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  RetVal            - The word read from the EEPROM.
-
---*/
 {
   UINT8   Tmp;
   UINT8   AddrLen;
@@ -2286,29 +2145,23 @@ Returns:
   return AddrLen;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  DBaddr                          TODO: add argument description
+  @param  DBsize                          TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINTN
 E100bStatistics (
   NIC_DATA_INSTANCE *AdapterInfo,
   UINT64            DBaddr,
   UINT16            DBsize
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  DBaddr      - TODO: add argument description
-  DBsize      - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   PXE_DB_STATISTICS db;
   //
@@ -2426,27 +2279,21 @@ Returns:
   return PXE_STATCODE_SUCCESS;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+  @param  OpFlags                         TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINTN
 E100bReset (
   IN NIC_DATA_INSTANCE *AdapterInfo,
   IN INT32             OpFlags
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-  OpFlags     - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
 
   UINT16  save_filter;
@@ -2497,25 +2344,19 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINTN
 E100bShutdown (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   //
   // disable the interrupts
@@ -2546,6 +2387,22 @@ Returns:
   return 0;
 }
 
+
+/**
+  This routine will write a value to the specified MII register
+  of an external MDI compliant device (e.g. PHY 100).  The command will
+  execute in polled mode.
+
+  @param  AdapterInfo                     pointer to the structure that contains
+                                          the NIC's context.
+  @param  RegAddress                      The MII register that we are writing to
+  @param  PhyAddress                      The MDI address of the Phy component.
+  @param  DataValue                       The value that we are writing to the MII
+                                          register.
+
+  @return nothing
+
+**/
 VOID
 MdiWrite (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -2553,22 +2410,6 @@ MdiWrite (
   IN UINT8             PhyAddress,
   IN UINT16            DataValue
   )
-/*++
-
-Routine Description:
- This routine will write a value to the specified MII register
- of an external MDI compliant device (e.g. PHY 100).  The command will
- execute in polled mode.
-
-Arguments:
-  AdapterInfo - pointer to the structure that contains the NIC's context.
-  RegAddress - The MII register that we are writing to
-  PhyAddress - The MDI address of the Phy component.
-  DataValue - The value that we are writing to the MII register.
-
-Returns:
- nothing
---*/
 {
   UINT32  WriteCommand;
 
@@ -2595,6 +2436,21 @@ Returns:
   }
 }
 
+
+/**
+  This routine will read a value from the specified MII register
+  of an external MDI compliant device (e.g. PHY 100), and return
+  it to the calling routine.  The command will execute in polled mode.
+
+  @param  AdapterInfo                     pointer to the structure that contains
+                                          the NIC's context.
+  @param  RegAddress                      The MII register that we are reading from
+  @param  PhyAddress                      The MDI address of the Phy component.
+  @param  DataValue                       pointer to the value that we read from
+                                          the MII register.
+
+
+**/
 VOID
 MdiRead (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -2602,22 +2458,6 @@ MdiRead (
   IN UINT8             PhyAddress,
   IN OUT UINT16        *DataValue
   )
-/*++
-
-Routine Description:
- This routine will read a value from the specified MII register
- of an external MDI compliant device (e.g. PHY 100), and return
- it to the calling routine.  The command will execute in polled mode.
-
-Arguments:
- AdapterInfo - pointer to the structure that contains the NIC's context.
- RegAddress - The MII register that we are reading from
- PhyAddress - The MDI address of the Phy component.
- DataValue - pointer to the value that we read from the MII register.
-
-Returns:
-
---*/
 {
   UINT32  ReadCommand;
 
@@ -2647,22 +2487,20 @@ Returns:
   *DataValue = InWord (AdapterInfo, AdapterInfo->ioaddr + SCBCtrlMDI);
 }
 
+
+/**
+  This routine will reset the PHY that the adapter is currently
+  configured to use.
+
+  @param  AdapterInfo                     pointer to the structure that contains
+                                          the NIC's context.
+
+
+**/
 VOID
 PhyReset (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
- This routine will reset the PHY that the adapter is currently
- configured to use.
-
-Arguments:
-  AdapterInfo - pointer to the structure that contains the NIC's context.
-
-Returns:
-
---*/
 {
   UINT16  MdiControlReg;
 
@@ -2683,53 +2521,49 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine will detect what phy we are using, set the line
+  speed, FDX or HDX, and configure the phy if necessary.
+  The following combinations are supported:
+  - TX or T4 PHY alone at PHY address 1
+  - T4 or TX PHY at address 1 and MII PHY at address 0
+  - 82503 alone (10Base-T mode, no full duplex support)
+  - 82503 and MII PHY (TX or T4) at address 0
+  The sequence / priority of detection is as follows:
+  - PHY 1 with cable termination
+  - PHY 0 with cable termination
+  - PHY 1 (if found) without cable termination
+  - 503 interface
+  Additionally auto-negotiation capable (NWAY) and parallel
+  detection PHYs are supported. The flow-chart is described in
+  the 82557 software writer's manual.
+  NOTE:  1.  All PHY MDI registers are read in polled mode.
+  2.  The routines assume that the 82557 has been RESET and we have
+  obtained the virtual memory address of the CSR.
+  3.  PhyDetect will not RESET the PHY.
+  4.  If FORCEFDX is set, SPEED should also be set. The driver will
+  check the values for inconsistency with the detected PHY
+  technology.
+  5.  PHY 1 (the PHY on the adapter) may have an address in the range
+  1 through 31 inclusive. The driver will accept addresses in
+  this range.
+  6.  Driver ignores FORCEFDX and SPEED overrides if a 503 interface
+  is detected.
+
+  @param  AdapterInfo                     pointer to the structure that contains
+                                          the NIC's context.
+
+  @retval TRUE                            If a Phy was detected, and configured
+                                          correctly.
+  @retval FALSE                           If a valid phy could not be detected and
+                                          configured.
+
+**/
 BOOLEAN
 PhyDetect (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
- This routine will detect what phy we are using, set the line
-              speed, FDX or HDX, and configure the phy if necessary.
-
-              The following combinations are supported:
-              - TX or T4 PHY alone at PHY address 1
-              - T4 or TX PHY at address 1 and MII PHY at address 0
-              - 82503 alone (10Base-T mode, no full duplex support)
-              - 82503 and MII PHY (TX or T4) at address 0
-
-              The sequence / priority of detection is as follows:
-              - PHY 1 with cable termination
-              - PHY 0 with cable termination
-              - PHY 1 (if found) without cable termination
-              - 503 interface
-
-              Additionally auto-negotiation capable (NWAY) and parallel
-              detection PHYs are supported. The flow-chart is described in
-              the 82557 software writer's manual.
-
-   NOTE:  1.  All PHY MDI registers are read in polled mode.
-          2.  The routines assume that the 82557 has been RESET and we have
-              obtained the virtual memory address of the CSR.
-          3.  PhyDetect will not RESET the PHY.
-          4.  If FORCEFDX is set, SPEED should also be set. The driver will
-              check the values for inconsistency with the detected PHY
-              technology.
-          5.  PHY 1 (the PHY on the adapter) may have an address in the range
-              1 through 31 inclusive. The driver will accept addresses in
-              this range.
-          6.  Driver ignores FORCEFDX and SPEED overrides if a 503 interface
-              is detected.
-
-Arguments:
-  AdapterInfo - pointer to the structure that contains the NIC's context.
-
-Returns:
-  TRUE - If a Phy was detected, and configured correctly.
-  FALSE - If a valid phy could not be detected and configured.
-
---*/
 {
   UINT16  *eedata;
   UINT16  MdiControlReg;
@@ -3005,35 +2839,33 @@ Returns:
   }
 }
 
+
+/**
+  This routine will setup phy 1 or phy 0 so that it is configured
+  to match a speed and duplex over-ride option.  If speed or
+  duplex mode is not explicitly specified in the registry, the
+  driver will skip the speed and duplex over-ride code, and
+  assume the adapter is automatically setting the line speed, and
+  the duplex mode.  At the end of this routine, any truly Phy
+  specific code will be executed (each Phy has its own quirks,
+  and some require that certain special bits are set).
+  NOTE:  The driver assumes that SPEED and FORCEFDX are specified at the
+  same time. If FORCEDPX is set without speed being set, the driver
+  will encouter a fatal error and log a message into the event viewer.
+
+  @param  AdapterInfo                     pointer to the structure that contains
+                                          the NIC's context.
+
+  @retval TRUE                            If the phy could be configured correctly
+  @retval FALSE                           If the phy couldn't be configured
+                                          correctly, because an unsupported
+                                          over-ride option was used
+
+**/
 BOOLEAN
 SetupPhy (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
- This routine will setup phy 1 or phy 0 so that it is configured
- to match a speed and duplex over-ride option.  If speed or
- duplex mode is not explicitly specified in the registry, the
- driver will skip the speed and duplex over-ride code, and
- assume the adapter is automatically setting the line speed, and
- the duplex mode.  At the end of this routine, any truly Phy
- specific code will be executed (each Phy has its own quirks,
- and some require that certain special bits are set).
-
- NOTE:  The driver assumes that SPEED and FORCEFDX are specified at the
-        same time. If FORCEDPX is set without speed being set, the driver
-        will encouter a fatal error and log a message into the event viewer.
-
-Arguments:
- AdapterInfo - pointer to the structure that contains the NIC's context.
-
-Returns:
- TRUE - If the phy could be configured correctly
- FALSE - If the phy couldn't be configured correctly, because an
-         unsupported over-ride option was used
-
---*/
 {
   UINT16  MdiControlReg;
   UINT16  MdiStatusReg;
@@ -3229,24 +3061,23 @@ Returns:
   return (TRUE);
 }
 
+
+/**
+  This routine will figure out what line speed and duplex mode
+  the PHY is currently using.
+
+  @param  AdapterInfo                     pointer to the structure that contains
+                                          the NIC's context.
+  @param  PhyId                           The ID of the PHY in question.
+
+  @return NOTHING
+
+**/
 VOID
 FindPhySpeedAndDpx (
   IN NIC_DATA_INSTANCE *AdapterInfo,
   IN UINT32            PhyId
   )
-/*++
-
-Routine Description:
- This routine will figure out what line speed and duplex mode
- the PHY is currently using.
-
-Arguments:
- AdapterInfo - pointer to the structure that contains the NIC's context.
- PhyId - The ID of the PHY in question.
-
-Returns:
-  NOTHING
---*/
 {
   UINT16  MdiStatusReg;
   UINT16  MdiMiscReg;
@@ -3452,25 +3283,19 @@ Returns:
   }
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 VOID
 XmitWaitForCompletion (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   TxCB  *TxPtr;
 
@@ -3490,27 +3315,21 @@ Returns:
   }
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  cmd_ptr                         TODO: add argument description
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 INT8
 CommandWaitForCompletion (
   TxCB              *cmd_ptr,
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  cmd_ptr     - TODO: add argument description
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   INT16 wait;
   wait = 5000;
@@ -3525,26 +3344,20 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 STATIC
 INT8
 SoftwareReset (
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT8   tco_stat;
   UINT16  wait;
@@ -3632,25 +3445,19 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINT8
 SelectiveReset (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT16  wait;
   UINT32  stat;
@@ -3686,25 +3493,19 @@ Returns:
   return 0;
 }
 
+
+/**
+  TODO: Add function description
+
+  @param  AdapterInfo                     TODO: add argument description
+
+  @return TODO: add return values
+
+**/
 UINT16
 InitializeChip (
   IN NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AdapterInfo - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT16  ret_val;
   if (SoftwareReset (AdapterInfo) != 0) {

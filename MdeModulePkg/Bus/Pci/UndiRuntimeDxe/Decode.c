@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Provides the basic UNID functions.
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,16 +10,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module name:
-    decode.c
+**/
 
-Abstract:
-
-Revision history:
-
---*/
-
-// TODO: fix comment to add: Module Name: DECODE.C
 #include "Undi32.h"
 
 //
@@ -49,53 +42,41 @@ UNDI_CALL_TABLE api_table[PXE_OPCODE_LAST_VALID+1] = { \
 // end of global variables
 //
 
+
+/**
+  This routine determines the operational state of the UNDI.  It updates the state flags in the
+  Command Descriptor Block based on information derived from the AdapterInfo instance data.
+  To ensure the command has completed successfully, CdbPtr->StatCode will contain the result of
+  the command execution.
+  The CdbPtr->StatFlags will contain a STOPPED, STARTED, or INITIALIZED state once the command
+  has successfully completed.
+  Keep in mind the AdapterInfo->State is the active state of the adapter (based on software
+  interrogation), and the CdbPtr->StateFlags is the passed back information that is reflected
+  to the caller of the UNDI API.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_GetState (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine determines the operational state of the UNDI.  It updates the state flags in the
-  Command Descriptor Block based on information derived from the AdapterInfo instance data.
-
-  To ensure the command has completed successfully, CdbPtr->StatCode will contain the result of
-  the command execution.
-
-  The CdbPtr->StatFlags will contain a STOPPED, STARTED, or INITIALIZED state once the command
-  has successfully completed.
-
-  Keep in mind the AdapterInfo->State is the active state of the adapter (based on software
-  interrogation), and the CdbPtr->StateFlags is the passed back information that is reflected
-  to the caller of the UNDI API.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   CdbPtr->StatFlags = (PXE_STATFLAGS) (CdbPtr->StatFlags | AdapterInfo->State);
   return ;
 }
 
-VOID
-UNDI_Start (
-  IN  PXE_CDB           *CdbPtr,
-  IN  NIC_DATA_INSTANCE *AdapterInfo
-  )
-/*++
 
-Routine Description:
+/**
   This routine is used to change the operational state of the UNDI from stopped to started.
   It will do this as long as the adapter's state is PXE_STATFLAGS_GET_STATE_STOPPED, otherwise
   the CdbPtr->StatFlags will reflect a command failure, and the CdbPtr->StatCode will reflect the
   UNDI as having already been started.
-
   This routine is modified to reflect the undi 1.1 specification changes. The
   changes in the spec are mainly in the callback routines, the new spec adds
   3 more callbacks and a unique id.
@@ -106,17 +87,20 @@ Routine Description:
   and Sync_Mem routines and a unique id variable for the new version.
   This is the function which an external entity (SNP, O/S, etc) would call
   to provide it's I/O abstraction to the UNDI.
-
   It's final action is to change the AdapterInfo->State to PXE_STATFLAGS_GET_STATE_STARTED.
 
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
 
-Returns:
-  None
+  @return None
 
---*/
+**/
+VOID
+UNDI_Start (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  )
 {
   PXE_CPB_START_30  *CpbPtr;
   PXE_CPB_START_31  *CpbPtr_31;
@@ -187,31 +171,27 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine is used to change the operational state of the UNDI from started to stopped.
+  It will not do this if the adapter's state is PXE_STATFLAGS_GET_STATE_INITIALIZED, otherwise
+  the CdbPtr->StatFlags will reflect a command failure, and the CdbPtr->StatCode will reflect the
+  UNDI as having already not been shut down.
+  The NIC's data structure will have the Delay, Virt2Phys, and Block, pointers zero'd out..
+  It's final action is to change the AdapterInfo->State to PXE_STATFLAGS_GET_STATE_STOPPED.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_Stop (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine is used to change the operational state of the UNDI from started to stopped.
-  It will not do this if the adapter's state is PXE_STATFLAGS_GET_STATE_INITIALIZED, otherwise
-  the CdbPtr->StatFlags will reflect a command failure, and the CdbPtr->StatCode will reflect the
-  UNDI as having already not been shut down.
-
-  The NIC's data structure will have the Delay, Virt2Phys, and Block, pointers zero'd out..
-
-  It's final action is to change the AdapterInfo->State to PXE_STATFLAGS_GET_STATE_STOPPED.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   if (AdapterInfo->State == PXE_STATFLAGS_GET_STATE_INITIALIZED) {
     CdbPtr->StatFlags = PXE_STATFLAGS_COMMAND_FAILED;
@@ -236,31 +216,27 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine is used to retrieve the initialization information that is needed by drivers and
+  applications to initialize the UNDI.  This will fill in data in the Data Block structure that is
+  pointed to by the caller's CdbPtr->DBaddr.  The fields filled in are as follows:
+  MemoryRequired, FrameDataLen, LinkSpeeds[0-3], NvCount, NvWidth, MediaHeaderLen, HWaddrLen,
+  MCastFilterCnt, TxBufCnt, TxBufSize, RxBufCnt, RxBufSize, IFtype, Duplex, and LoopBack.
+  In addition, the CdbPtr->StatFlags ORs in that this NIC supports cable detection.  (APRIORI knowledge)
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_GetInitInfo (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine is used to retrieve the initialization information that is needed by drivers and
-  applications to initialize the UNDI.  This will fill in data in the Data Block structure that is
-  pointed to by the caller's CdbPtr->DBaddr.  The fields filled in are as follows:
-
-  MemoryRequired, FrameDataLen, LinkSpeeds[0-3], NvCount, NvWidth, MediaHeaderLen, HWaddrLen,
-  MCastFilterCnt, TxBufCnt, TxBufSize, RxBufCnt, RxBufSize, IFtype, Duplex, and LoopBack.
-
-  In addition, the CdbPtr->StatFlags ORs in that this NIC supports cable detection.  (APRIORI knowledge)
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   PXE_DB_GET_INIT_INFO  *DbPtr;
 
@@ -292,30 +268,26 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine is used to retrieve the configuration information about the NIC being controlled by
+  this driver.  This will fill in data in the Data Block structure that is pointed to by the caller's CdbPtr->DBaddr.
+  The fields filled in are as follows:
+  DbPtr->pci.BusType, DbPtr->pci.Bus, DbPtr->pci.Device, and DbPtr->pci.
+  In addition, the DbPtr->pci.Config.Dword[0-63] grabs a copy of this NIC's PCI configuration space.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_GetConfigInfo (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine is used to retrieve the configuration information about the NIC being controlled by
-  this driver.  This will fill in data in the Data Block structure that is pointed to by the caller's CdbPtr->DBaddr.
-  The fields filled in are as follows:
-
-  DbPtr->pci.BusType, DbPtr->pci.Bus, DbPtr->pci.Device, and DbPtr->pci.
-
-  In addition, the DbPtr->pci.Config.Dword[0-63] grabs a copy of this NIC's PCI configuration space.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   UINT16                  Index;
   PXE_DB_GET_CONFIG_INFO  *DbPtr;
@@ -334,37 +306,32 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine resets the network adapter and initializes the UNDI using the parameters supplied in
+  the CPB.  This command must be issued before the network adapter can be setup to transmit and
+  receive packets.
+  Once the memory requirements of the UNDI are obtained by using the GetInitInfo command, a block
+  of non-swappable memory may need to be allocated.  The address of this memory must be passed to
+  UNDI during the Initialize in the CPB.  This memory is used primarily for transmit and receive buffers.
+  The fields CableDetect, LinkSpeed, Duplex, LoopBack, MemoryPtr, and MemoryLength are set with information
+  that was passed in the CPB and the NIC is initialized.
+  If the NIC initialization fails, the CdbPtr->StatFlags are updated with PXE_STATFLAGS_COMMAND_FAILED
+  Otherwise, AdapterInfo->State is updated with PXE_STATFLAGS_GET_STATE_INITIALIZED showing the state of
+  the UNDI is now initialized.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_Initialize (
   IN  PXE_CDB       *CdbPtr,
   NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine resets the network adapter and initializes the UNDI using the parameters supplied in
-  the CPB.  This command must be issued before the network adapter can be setup to transmit and
-  receive packets.
-
-  Once the memory requirements of the UNDI are obtained by using the GetInitInfo command, a block
-  of non-swappable memory may need to be allocated.  The address of this memory must be passed to
-  UNDI during the Initialize in the CPB.  This memory is used primarily for transmit and receive buffers.
-
-  The fields CableDetect, LinkSpeed, Duplex, LoopBack, MemoryPtr, and MemoryLength are set with information
-  that was passed in the CPB and the NIC is initialized.
-
-  If the NIC initialization fails, the CdbPtr->StatFlags are updated with PXE_STATFLAGS_COMMAND_FAILED
-  Otherwise, AdapterInfo->State is updated with PXE_STATFLAGS_GET_STATE_INITIALIZED showing the state of
-  the UNDI is now initialized.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   PXE_CPB_INITIALIZE  *CpbPtr;
 
@@ -414,27 +381,24 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine resets the network adapter and initializes the UNDI using the parameters supplied in
+  the CPB.  The transmit and receive queues are emptied and any pending interrupts are cleared.
+  If the NIC reset fails, the CdbPtr->StatFlags are updated with PXE_STATFLAGS_COMMAND_FAILED
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_Reset (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine resets the network adapter and initializes the UNDI using the parameters supplied in
-  the CPB.  The transmit and receive queues are emptied and any pending interrupts are cleared.
-
-  If the NIC reset fails, the CdbPtr->StatFlags are updated with PXE_STATFLAGS_COMMAND_FAILED
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   if (CdbPtr->OpFlags != PXE_OPFLAGS_NOT_USED &&
       CdbPtr->OpFlags != PXE_OPFLAGS_RESET_DISABLE_INTERRUPTS &&
@@ -452,32 +416,28 @@ Returns:
   }
 }
 
+
+/**
+  This routine resets the network adapter and leaves it in a safe state for another driver to
+  initialize.  Any pending transmits or receives are lost.  Receive filters and external
+  interrupt enables are disabled.  Once the UNDI has been shutdown, it can then be stopped
+  or initialized again.
+  If the NIC reset fails, the CdbPtr->StatFlags are updated with PXE_STATFLAGS_COMMAND_FAILED
+  Otherwise, AdapterInfo->State is updated with PXE_STATFLAGS_GET_STATE_STARTED showing the state of
+  the NIC as being started.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_Shutdown (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine resets the network adapter and leaves it in a safe state for another driver to
-  initialize.  Any pending transmits or receives are lost.  Receive filters and external
-  interrupt enables are disabled.  Once the UNDI has been shutdown, it can then be stopped
-  or initialized again.
-
-  If the NIC reset fails, the CdbPtr->StatFlags are updated with PXE_STATFLAGS_COMMAND_FAILED
-
-  Otherwise, AdapterInfo->State is updated with PXE_STATFLAGS_GET_STATE_STARTED showing the state of
-  the NIC as being started.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   //
   // do the shutdown stuff here
@@ -493,29 +453,26 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine can be used to read and/or change the current external interrupt enable
+  settings.  Disabling an external interrupt enable prevents and external (hardware)
+  interrupt from being signaled by the network device.  Internally the interrupt events
+  can still be polled by using the UNDI_GetState command.
+  The resulting information on the interrupt state will be passed back in the CdbPtr->StatFlags.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_Interrupt (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine can be used to read and/or change the current external interrupt enable
-  settings.  Disabling an external interrupt enable prevents and external (hardware)
-  interrupt from being signaled by the network device.  Internally the interrupt events
-  can still be polled by using the UNDI_GetState command.
-
-  The resulting information on the interrupt state will be passed back in the CdbPtr->StatFlags.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   UINT8 IntMask;
 
@@ -573,25 +530,23 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine is used to read and change receive filters and, if supported, read
+  and change multicast MAC address filter list.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_RecFilter (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine is used to read and change receive filters and, if supported, read
-  and change multicast MAC address filter list.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   UINT16                  NewFilter;
   UINT16                  OpFlags;
@@ -753,25 +708,23 @@ BadCdb:
   CdbPtr->StatCode  = PXE_STATCODE_INVALID_CDB;
 }
 
+
+/**
+  This routine is used to get the current station and broadcast MAC addresses, and to change the
+  current station MAC address.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_StnAddr (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine is used to get the current station and broadcast MAC addresses, and to change the
-  current station MAC address.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   PXE_CPB_STATION_ADDRESS *CpbPtr;
   PXE_DB_STATION_ADDRESS  *DbPtr;
@@ -822,17 +775,10 @@ Returns:
   return ;
 }
 
-VOID
-UNDI_Statistics (
-  IN  PXE_CDB           *CdbPtr,
-  IN  NIC_DATA_INSTANCE *AdapterInfo
-  )
-/*++
 
-Routine Description:
+/**
   This routine is used to read and clear the NIC traffic statistics.  This command is supported only
   if the !PXE structure's Implementation flags say so.
-
   Results will be parsed out in the following manner:
   CdbPtr->DBaddr.Data[0]   R  Total Frames (Including frames with errors and dropped frames)
   CdbPtr->DBaddr.Data[1]   R  Good Frames (All frames copied into receive buffer)
@@ -845,14 +791,18 @@ Routine Description:
   CdbPtr->DBaddr.Data[E]   T  Dropped Frames (Frames that were dropped because of collisions)
   CdbPtr->DBaddr.Data[14]  T  Total Collision Frames (Total collisions on this subnet)
 
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
 
-Returns:
-  None
+  @return None
 
---*/
+**/
+VOID
+UNDI_Statistics (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  )
 {
   if ((CdbPtr->OpFlags &~(PXE_OPFLAGS_STATISTICS_RESET)) != 0) {
     CdbPtr->StatFlags = PXE_STATFLAGS_COMMAND_FAILED;
@@ -872,27 +822,24 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine is used to translate a multicast IP address to a multicast MAC address.
+  This results in a MAC address composed of 25 bits of fixed data with the upper 23 bits of the IP
+  address being appended to it.  Results passed back in the equivalent of CdbPtr->DBaddr->MAC[0-5].
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_ip2mac (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine is used to translate a multicast IP address to a multicast MAC address.
-
-  This results in a MAC address composed of 25 bits of fixed data with the upper 23 bits of the IP
-  address being appended to it.  Results passed back in the equivalent of CdbPtr->DBaddr->MAC[0-5].
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   PXE_CPB_MCAST_IP_TO_MAC *CpbPtr;
   PXE_DB_MCAST_IP_TO_MAC  *DbPtr;
@@ -934,27 +881,24 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine is used to read and write non-volatile storage on the NIC (if supported).  The NVRAM
+  could be EEPROM, FLASH, or battery backed RAM.
+  This is an optional function according to the UNDI specification  (or will be......)
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_NVData (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine is used to read and write non-volatile storage on the NIC (if supported).  The NVRAM
-  could be EEPROM, FLASH, or battery backed RAM.
-
-  This is an optional function according to the UNDI specification  (or will be......)
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   PXE_DB_NVDATA *DbPtr;
   UINT16        Index;
@@ -985,32 +929,28 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine returns the current interrupt status and/or the transmitted buffer addresses.
+  If the current interrupt status is returned, pending interrupts will be acknowledged by this
+  command.  Transmitted buffer addresses that are written to the DB are removed from the transmit
+  buffer queue.
+  Normally, this command would be polled with interrupts disabled.
+  The transmit buffers are returned in CdbPtr->DBaddr->TxBufer[0 - NumEntries].
+  The interrupt status is returned in CdbPtr->StatFlags.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_Status (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine returns the current interrupt status and/or the transmitted buffer addresses.
-  If the current interrupt status is returned, pending interrupts will be acknowledged by this
-  command.  Transmitted buffer addresses that are written to the DB are removed from the transmit
-  buffer queue.
-
-  Normally, this command would be polled with interrupts disabled.
-
-  The transmit buffers are returned in CdbPtr->DBaddr->TxBufer[0 - NumEntries].
-  The interrupt status is returned in CdbPtr->StatFlags.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   PXE_DB_GET_STATUS *DbPtr;
   PXE_DB_GET_STATUS TmpGetStatus;
@@ -1123,26 +1063,24 @@ Returns:
   return ;
 }
 
+
+/**
+  This routine is used to fill media header(s) in transmit packet(s).
+  Copies the MAC address into the media header whether it is dealing
+  with fragmented or non-fragmented packets.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_FillHeader (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  This routine is used to fill media header(s) in transmit packet(s).
-  Copies the MAC address into the media header whether it is dealing
-  with fragmented or non-fragmented packets.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
   PXE_CPB_FILL_HEADER             *Cpb;
   PXE_CPB_FILL_HEADER_FRAGMENTED  *Cpbf;
@@ -1198,40 +1136,34 @@ Returns:
   return ;
 }
 
-VOID
-UNDI_Transmit (
-  IN  PXE_CDB           *CdbPtr,
-  IN  NIC_DATA_INSTANCE *AdapterInfo
-  )
-/*++
 
-Routine Description:
+/**
   This routine is used to place a packet into the transmit queue.  The data buffers given to
   this command are to be considered locked and the application or network driver loses
   ownership of these buffers and must not free or relocate them until the ownership returns.
-
   When the packets are transmitted, a transmit complete interrupt is generated (if interrupts
   are disabled, the transmit interrupt status is still set and can be checked using the UNDI_Status
   command.
-
   Some implementations and adapters support transmitting multiple packets with one transmit
   command.  If this feature is supported, the transmit CPBs can be linked in one transmit
   command.
-
   All UNDIs support fragmented frames, now all network devices or protocols do.  If a fragmented
   frame CPB is given to UNDI and the network device does not support fragmented frames
   (see !PXE.Implementation flag), the UNDI will have to copy the fragments into a local buffer
   before transmitting.
 
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
 
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
+  @return None
 
-Returns:
-  None
-
---*/
+**/
+VOID
+UNDI_Transmit (
+  IN  PXE_CDB           *CdbPtr,
+  IN  NIC_DATA_INSTANCE *AdapterInfo
+  )
 {
 
   if (CdbPtr->CPBsize == PXE_CPBSIZE_NOT_USED) {
@@ -1249,26 +1181,24 @@ Returns:
   return ;
 }
 
+
+/**
+  When the network adapter has received a frame, this command is used to copy the frame
+  into the driver/application storage location.  Once a frame has been copied, it is
+  removed from the receive queue.
+
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @return None
+
+**/
 VOID
 UNDI_Receive (
   IN  PXE_CDB           *CdbPtr,
   IN  NIC_DATA_INSTANCE *AdapterInfo
   )
-/*++
-
-Routine Description:
-  When the network adapter has received a frame, this command is used to copy the frame
-  into the driver/application storage location.  Once a frame has been copied, it is
-  removed from the receive queue.
-
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-  None
-
---*/
 {
 
   //
@@ -1291,27 +1221,25 @@ Returns:
 }
 
 
-VOID
-UNDI_APIEntry_new (
-  IN  UINT64 cdb
-  )
-/*++
 
-Routine Description:
+/**
   This is the main SW UNDI API entry using the newer nii protocol.
   The parameter passed in is a 64 bit flat model virtual
   address of the cdb.  We then jump into the common routine for both old and
   new nii protocol entries.
 
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
 
-Returns:
-  None
+  @return None
 
---*/
+**/
 // TODO:    cdb - add argument and description to function comment
+VOID
+UNDI_APIEntry_new (
+  IN  UINT64 cdb
+  )
 {
   PXE_CDB           *CdbPtr;
   NIC_DATA_INSTANCE *AdapterInfo;
@@ -1337,27 +1265,25 @@ Returns:
   UNDI_APIEntry_Common (cdb);
 }
 
-VOID
-UNDI_APIEntry_Common (
-  IN  UINT64 cdb
-  )
-/*++
 
-Routine Description:
+/**
   This is the common routine for both old and new entry point procedures.
   The parameter passed in is a 64 bit flat model virtual
   address of the cdb.  We then jump into the service routine pointed to by the
   Api_Table[OpCode].
 
-Arguments:
-  CdbPtr            - Pointer to the command descriptor block.
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
+  @param  CdbPtr               Pointer to the command descriptor block.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
 
-Returns:
-  None
+  @return None
 
---*/
+**/
 // TODO:    cdb - add argument and description to function comment
+VOID
+UNDI_APIEntry_Common (
+  IN  UINT64 cdb
+  )
 {
   PXE_CDB           *CdbPtr;
   NIC_DATA_INSTANCE *AdapterInfo;
@@ -1453,26 +1379,23 @@ badcdb:
   return ;
 }
 
+
+/**
+  This does an 8 bit check sum of the passed in buffer for Len bytes.
+  This is primarily used to update the check sum in the SW UNDI header.
+
+  @param  Buffer               Pointer to the passed in buffer to check sum
+  @param  Len                  Length of buffer to be check summed in bytes.
+
+  @return None
+
+**/
 STATIC
 UINT8
 ChkSum (
   IN  VOID   *Buffer,
   IN  UINT16 Len
   )
-/*++
-
-Routine Description:
-  This does an 8 bit check sum of the passed in buffer for Len bytes.
-  This is primarily used to update the check sum in the SW UNDI header.
-
-Arguments:
-  Buffer            - Pointer to the passed in buffer to check sum
-  Len               - Length of buffer to be check summed in bytes.
-
-Returns:
-  None
-
---*/
 {
   UINT8 Chksum;
   INT8  *Bp;
@@ -1489,27 +1412,24 @@ Returns:
   return Chksum;
 }
 
-VOID
-PxeUpdate (
-  IN  NIC_DATA_INSTANCE *NicPtr,
-  IN PXE_SW_UNDI        *PxePtr
-  )
-/*++
 
-Routine Description:
+/**
   When called with a null NicPtr, this routine decrements the number of NICs
   this UNDI is supporting and removes the NIC_DATA_POINTER from the array.
   Otherwise, it increments the number of NICs this UNDI is supported and
   updates the pxe.Fudge to ensure a proper check sum results.
 
-Arguments:
-  NicPtr            - Pointer to the NIC data structure.
+  @param  NicPtr               Pointer to the NIC data structure.
 
-Returns:
-  None
+  @return None
 
---*/
+**/
 // TODO:    PxePtr - add argument and description to function comment
+VOID
+PxeUpdate (
+  IN  NIC_DATA_INSTANCE *NicPtr,
+  IN PXE_SW_UNDI        *PxePtr
+  )
 {
   if (NicPtr == NULL) {
     if (PxePtr->IFcnt > 0) {
@@ -1532,25 +1452,22 @@ Returns:
   return ;
 }
 
+
+/**
+  Initialize the !PXE structure
+
+  @param  RemainingDevicePath  Not used, always produce all possible children.
+
+  @retval EFI_SUCCESS          This driver is added to Controller.
+  @retval other                This driver does not support this device.
+
+**/
+// TODO:    PxePtr - add argument and description to function comment
+// TODO:    VersionFlag - add argument and description to function comment
 VOID
 PxeStructInit (
   IN PXE_SW_UNDI *PxePtr
   )
-/*++
-
-Routine Description:
-  Initialize the !PXE structure
-
-Arguments:
-  RemainingDevicePath - Not used, always produce all possible children.
-
-Returns:
-  EFI_SUCCESS         - This driver is added to Controller.
-  other               - This driver does not support this device.
-
---*/
-// TODO:    PxePtr - add argument and description to function comment
-// TODO:    VersionFlag - add argument and description to function comment
 {
   //
   // Initialize the !PXE structure
