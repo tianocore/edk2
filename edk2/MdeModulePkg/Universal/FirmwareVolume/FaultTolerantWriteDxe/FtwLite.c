@@ -1,6 +1,18 @@
-/*++
+/** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  This is a simple fault tolerant write driver.
+  And it only supports write BufferSize <= SpareAreaLength.
+
+  This boot service only protocol provides fault tolerant write capability for 
+  block devices.  The protocol has internal non-volatile intermediate storage 
+  of the data and private information. It should be able to recover 
+  automatically from a critical fault, such as power failure. 
+
+  The implementation uses an FTW Lite (Fault Tolerant Write) Work Space. 
+  This work space is a memory copy of the work space on the Woring Block,
+  the size of the work space is the FTW_WORK_SPACE_SIZE bytes.
+
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,28 +21,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
 
-
-Module Name:
-
-  FtwLite.c
-
-Abstract:
-
-  This is a simple fault tolerant write driver, based on PlatformFd library.
-  And it only supports write BufferSize <= SpareAreaLength.
-
-  This boot service only protocol provides fault tolerant write capability for 
-  block devices.  The protocol has internal non-volatile intermediate storage 
-  of the data and private information. It should be able to recover 
-  automatically from a critical fault, such as power failure. 
-
-Notes:
-
-  The implementation uses an FTW Lite (Fault Tolerant Write) Work Space. 
-  This work space is a memory copy of the work space on the Woring Block,
-  the size of the work space is the FTW_WORK_SPACE_SIZE bytes.
-
---*/
+**/
 
 #include <FtwLite.h>
 

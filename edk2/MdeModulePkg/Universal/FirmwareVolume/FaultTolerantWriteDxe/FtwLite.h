@@ -1,6 +1,9 @@
-/*++
+/** @file
 
-Copyright (c) 2006, Intel Corporation                                                         
+  The internal header file includes the common header files, defines
+  internal structure and functions used by FtwLite module.
+
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -9,22 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
 
-
-Module Name:
-
-  FtwLite.h
-
-Abstract:
-
-  This is a simple fault tolerant write driver, based on PlatformFd library.
-  And it only supports write BufferSize <= SpareAreaLength.
-
-  This boot service only protocol provides fault tolerant write capability for 
-  block devices.  The protocol has internal non-volatile intermediate storage 
-  of the data and private information. It should be able to recover 
-  automatically from a critical fault, such as power failure. 
-
---*/
+**/
 
 #ifndef _EFI_FAULT_TOLERANT_WRITE_LITE_H_
 #define _EFI_FAULT_TOLERANT_WRITE_LITE_H_
