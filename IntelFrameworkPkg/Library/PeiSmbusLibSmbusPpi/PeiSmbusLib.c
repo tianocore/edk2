@@ -1,5 +1,5 @@
 /** @file
-Implementation of SmBusLib class library for PEI phase.
+  Implementation of SmBusLib class library for PEI phase.
 
 Copyright (c) 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials                          
@@ -10,9 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-
-Module Name: PeiSmbusLib.c
-
 **/
 
 #include "InternalSmbusLib.h"
@@ -21,7 +18,8 @@ Module Name: PeiSmbusLib.c
   Gets Smbus PPIs.
 
   This internal function retrieves Smbus PPI from PPI database.
-
+  If gEfiPeiSmbusPpiGuid can not be located, then ASSERT()
+  
   @param  PeiServices   An indirect pointer to the EFI_PEI_SERVICES published by the PEI Foundation.
 
   @return The pointer to Smbus PPI.

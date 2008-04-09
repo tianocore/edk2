@@ -1,5 +1,5 @@
 /** @file
-  Mde UEFI library functions.
+  The module provide methods to compute the displayed unicode width.
 
   Copyright (c) 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -10,12 +10,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  Console.c
-
 **/
 
 #include "FrameworkUefiLib.h"
-
+  
 typedef struct {
   CHAR16  WChar;
   UINT32  Width;
