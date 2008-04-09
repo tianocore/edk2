@@ -1,5 +1,5 @@
-
-/*++
+/** @file
+  EFI internal structures for the EFI UNDI driver.
 
 Copyright (c) 2006 - 2007, Intel Corporation.
 All rights reserved. This program and the accompanying materials
@@ -10,19 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    undi32.h
-
-Abstract:
-
-    EFI internal structures for the EFI UNDI driver
-
-
-
-Revision History
-
---*/
+**/
 
 #ifndef _UNDI_32_H_
 #define _UNDI_32_H_

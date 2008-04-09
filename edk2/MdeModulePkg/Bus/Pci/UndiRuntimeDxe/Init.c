@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Initialization functions for EFI UNDI32 driver.
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,20 +10,9 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    init.c
-
-Abstract:
-
-    Initialization functions for EFI UNDI32 driver
-
-Revision History
-
---*/
+**/
 
 #include "Undi32.h"
-#include <Library/BaseLib.h>
 //
 // Global Variables
 //
@@ -31,29 +21,23 @@ PXE_SW_UNDI             *pxe_31 = NULL;  // 3.1 entry
 UNDI32_DEV              *UNDI32DeviceList[MAX_NIC_INTERFACES];
 NII_TABLE               *UndiDataPointer = NULL;
 
+
+/**
+  When address mapping changes to virtual this should make the appropriate
+  address conversions.
+
+  (Standard Event handler)
+
+  @return None
+
+**/
+// TODO:    Context - add argument and description to function comment
 VOID
 EFIAPI
 UndiNotifyVirtual (
   EFI_EVENT Event,
   VOID      *Context
   )
-/*++
-
-Routine Description:
-
-  When address mapping changes to virtual this should make the appropriate
-  address conversions.
-
-Arguments:
-
-  (Standard Event handler)
-
-Returns:
-
-  None
-
---*/
-// TODO:    Context - add argument and description to function comment
 {
   UINT16  Index;
   VOID    *Pxe31Pointer;
@@ -62,7 +46,7 @@ Returns:
     Pxe31Pointer = (VOID *) pxe_31;
 
     EfiConvertPointer (
-      EFI_OPTIONAL_POINTER,
+      EFI_OPTIONAL_PTR,
       (VOID **) &Pxe31Pointer
       );
 
@@ -72,13 +56,13 @@ Returns:
     for (Index = 0; Index < pxe_31->IFcnt; Index++) {
       UNDI32DeviceList[Index]->NIIProtocol_31.ID = (UINT64) (UINTN) Pxe31Pointer;
       EfiConvertPointer (
-        EFI_OPTIONAL_POINTER,
+        EFI_OPTIONAL_PTR,
         (VOID **) &(UNDI32DeviceList[Index])
         );
     }
 
     EfiConvertPointer (
-      EFI_OPTIONAL_POINTER,
+      EFI_OPTIONAL_PTR,
       (VOID **) &(pxe_31->EntryPoint)
       );
     pxe_31 = Pxe31Pointer;
@@ -86,35 +70,29 @@ Returns:
 
   for (Index = 0; Index <= PXE_OPCODE_LAST_VALID; Index++) {
     EfiConvertPointer (
-      EFI_OPTIONAL_POINTER,
+      EFI_OPTIONAL_PTR,
       (VOID **) &api_table[Index].api_ptr
       );
   }
 }
 
+
+/**
+  When EFI is shuting down the boot services, we need to install a
+  configuration table for UNDI to work at runtime!
+
+  (Standard Event handler)
+
+  @return None
+
+**/
+// TODO:    Context - add argument and description to function comment
 VOID
 EFIAPI
 UndiNotifyExitBs (
   EFI_EVENT Event,
   VOID      *Context
   )
-/*++
-
-Routine Description:
-
-  When EFI is shuting down the boot services, we need to install a
-  configuration table for UNDI to work at runtime!
-
-Arguments:
-
-  (Standard Event handler)
-
-Returns:
-
-  None
-
---*/
-// TODO:    Context - add argument and description to function comment
 {
   InstallConfigTable ();
 }
@@ -131,6 +109,22 @@ EFI_DRIVER_BINDING_PROTOCOL  gUndiDriverBinding = {
 };
 
 
+
+/**
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  than contains a  DevicePath, PciIo protocol, Class code of 2, Vendor ID of 0x8086,
+  and DeviceId of (D100_DEVICE_ID || D102_DEVICE_ID || ICH3_DEVICE_ID_1 ||
+  ICH3_DEVICE_ID_2 || ICH3_DEVICE_ID_3 || ICH3_DEVICE_ID_4 || ICH3_DEVICE_ID_5 ||
+  ICH3_DEVICE_ID_6 || ICH3_DEVICE_ID_7 || ICH3_DEVICE_ID_8) can be supported.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to test.
+  @param  RemainingDevicePath  Not used.
+
+  @retval EFI_SUCCESS          This driver supports this device.
+  @retval other                This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 UndiDriverSupported (
@@ -138,31 +132,6 @@ UndiDriverSupported (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  Test to see if this driver supports ControllerHandle. Any ControllerHandle
-  than contains a  DevicePath, PciIo protocol, Class code of 2, Vendor ID of 0x8086,
-  and DeviceId of (D100_DEVICE_ID || D102_DEVICE_ID || ICH3_DEVICE_ID_1 ||
-  ICH3_DEVICE_ID_2 || ICH3_DEVICE_ID_3 || ICH3_DEVICE_ID_4 || ICH3_DEVICE_ID_5 ||
-  ICH3_DEVICE_ID_6 || ICH3_DEVICE_ID_7 || ICH3_DEVICE_ID_8) can be supported.
-
-Arguments:
-
-  This                - Protocol instance pointer.
-
-  Controller          - Handle of device to test.
-
-  RemainingDevicePath - Not used.
-
-Returns:
-
-  EFI_SUCCESS         - This driver supports this device.
-
-  other               - This driver does not support this device.
-
---*/
 {
   EFI_STATUS          Status;
   EFI_PCI_IO_PROTOCOL *PciIo;
@@ -246,6 +215,21 @@ Returns:
   return Status;
 }
 
+
+/**
+  Start this driver on Controller by opening PciIo and DevicePath protocol.
+  Initialize PXE structures, create a copy of the Controller Device Path with the
+  NIC's MAC address appended to it, install the NetworkInterfaceIdentifier protocol
+  on the newly created Device Path.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to work with.
+  @param  RemainingDevicePath  Not used, always produce all possible children.
+
+  @retval EFI_SUCCESS          This driver is added to Controller.
+  @retval other                This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 UndiDriverStart (
@@ -253,30 +237,6 @@ UndiDriverStart (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  Start this driver on Controller by opening PciIo and DevicePath protocol.
-  Initialize PXE structures, create a copy of the Controller Device Path with the
-  NIC's MAC address appended to it, install the NetworkInterfaceIdentifier protocol
-  on the newly created Device Path.
-
-Arguments:
-
-  This                - Protocol instance pointer.
-
-  Controller          - Handle of device to work with.
-
-  RemainingDevicePath - Not used, always produce all possible children.
-
-Returns:
-
-  EFI_SUCCESS         - This driver is added to Controller.
-
-  other               - This driver does not support this device.
-
---*/
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *UndiDevicePath;
@@ -506,7 +466,7 @@ Returns:
   // if the table exists, free it and alloc again, or alloc it directly
   //
   if (UndiDataPointer != NULL) {
-  	Status = gBS->FreePool(UndiDataPointer);
+    Status = gBS->FreePool(UndiDataPointer);
   }
   if (EFI_ERROR (Status)) {
     goto UndiErrorDeleteDevicePath;
@@ -586,6 +546,21 @@ UndiError:
   return Status;
 }
 
+
+/**
+  Stop this driver on Controller by removing NetworkInterfaceIdentifier protocol and
+  closing the DevicePath and PciIo protocols on Controller.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to stop driver on.
+  @param  NumberOfChildren     How many children need to be stopped.
+  @param  ChildHandleBuffer    Not used.
+
+  @retval EFI_SUCCESS          This driver is removed Controller.
+  @retval other                This driver was not removed from this device.
+
+**/
+// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 EFI_STATUS
 EFIAPI
 UndiDriverStop (
@@ -594,24 +569,6 @@ UndiDriverStop (
   IN  UINTN                          NumberOfChildren,
   IN  EFI_HANDLE                     *ChildHandleBuffer
   )
-/*++
-
-Routine Description:
-  Stop this driver on Controller by removing NetworkInterfaceIdentifier protocol and
-  closing the DevicePath and PciIo protocols on Controller.
-
-Arguments:
-  This              - Protocol instance pointer.
-  Controller        - Handle of device to stop driver on.
-  NumberOfChildren  - How many children need to be stopped.
-  ChildHandleBuffer - Not used.
-
-Returns:
-  EFI_SUCCESS       - This driver is removed Controller.
-  other             - This driver was not removed from this device.
-
---*/
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   EFI_STATUS                                Status;
   BOOLEAN                                   AllChildrenStopped;
@@ -717,34 +674,44 @@ Returns:
 
 }
 
+
+/**
+  Use the EFI boot services to produce a pause. This is also the routine which
+  gets replaced during RunTime by the O/S in the NIC_DATA_INSTANCE so it can
+  do it's own pause.
+
+  @param  UnqId                Runtime O/S routine might use this, this temp
+                               routine does not use it
+  @param  MicroSeconds         Determines the length of pause.
+
+  @return none
+
+**/
 VOID
 TmpDelay (
   IN UINT64 UnqId,
   IN UINTN  MicroSeconds
   )
-/*++
-
-Routine Description:
-
-  Use the EFI boot services to produce a pause. This is also the routine which
-  gets replaced during RunTime by the O/S in the NIC_DATA_INSTANCE so it can
-  do it's own pause.
-
-Arguments:
-
-  UnqId             - Runtime O/S routine might use this, this temp routine does not use it
-
-  MicroSeconds      - Determines the length of pause.
-
-Returns:
-
-  none
-
---*/
 {
   gBS->Stall ((UINT32) MicroSeconds);
 }
 
+
+/**
+  Use the PCI IO abstraction to issue memory or I/O reads and writes.  This is also the routine which
+  gets replaced during RunTime by the O/S in the NIC_DATA_INSTANCE so it can do it's own I/O abstractions.
+
+  @param  UnqId                Runtime O/S routine may use this field, this temp
+                               routine does not.
+  @param  ReadWrite            Determine if it is an I/O or Memory Read/Write
+                               Operation.
+  @param  Len                  Determines the width of the data operation.
+  @param  Port                 What port to Read/Write from.
+  @param  BuffAddr             Address to read to or write from.
+
+  @return none
+
+**/
 VOID
 TmpMemIo (
   IN UINT64 UnqId,
@@ -753,30 +720,6 @@ TmpMemIo (
   IN UINT64 Port,
   IN UINT64 BuffAddr
   )
-/*++
-
-Routine Description:
-
-  Use the PCI IO abstraction to issue memory or I/O reads and writes.  This is also the routine which
-  gets replaced during RunTime by the O/S in the NIC_DATA_INSTANCE so it can do it's own I/O abstractions.
-
-Arguments:
-
-  UnqId             - Runtime O/S routine may use this field, this temp routine does not.
-
-  ReadWrite         - Determine if it is an I/O or Memory Read/Write Operation.
-
-  Len               - Determines the width of the data operation.
-
-  Port              - What port to Read/Write from.
-
-  BuffAddr          - Address to read to or write from.
-
-Returns:
-
-  none
-
---*/
 {
   EFI_PCI_IO_PROTOCOL_WIDTH Width;
   NIC_DATA_INSTANCE         *AdapterInfo;
@@ -846,35 +789,31 @@ Returns:
   return ;
 }
 
+
+/**
+  Using the NIC data structure information, read the EEPROM to get the MAC address and then allocate space
+  for a new devicepath (**DevPtr) which will contain the original device path the NIC was found on (*BaseDevPtr)
+  and an added MAC node.
+
+  @param  DevPtr               Pointer which will point to the newly created device
+                               path with the MAC node attached.
+  @param  BaseDevPtr           Pointer to the device path which the UNDI device
+                               driver is latching on to.
+  @param  AdapterInfo          Pointer to the NIC data structure information which
+                               the UNDI driver is layering on..
+
+  @retval EFI_SUCCESS          A MAC address was successfully appended to the Base
+                               Device Path.
+  @retval other                Not enough resources available to create new Device
+                               Path node.
+
+**/
 EFI_STATUS
 AppendMac2DevPath (
   IN OUT  EFI_DEVICE_PATH_PROTOCOL **DevPtr,
   IN      EFI_DEVICE_PATH_PROTOCOL *BaseDevPtr,
   IN      NIC_DATA_INSTANCE        *AdapterInfo
   )
-/*++
-
-Routine Description:
-
-  Using the NIC data structure information, read the EEPROM to get the MAC address and then allocate space
-  for a new devicepath (**DevPtr) which will contain the original device path the NIC was found on (*BaseDevPtr)
-  and an added MAC node.
-
-Arguments:
-
-  DevPtr            - Pointer which will point to the newly created device path with the MAC node attached.
-
-  BaseDevPtr        - Pointer to the device path which the UNDI device driver is latching on to.
-
-  AdapterInfo       - Pointer to the NIC data structure information which the UNDI driver is layering on..
-
-Returns:
-
-  EFI_SUCCESS       - A MAC address was successfully appended to the Base Device Path.
-
-  other             - Not enough resources available to create new Device Path node.
-
---*/
 {
   EFI_MAC_ADDRESS           MACAddress;
   PCI_CONFIG_HEADER         *CfgHdr;
@@ -986,28 +925,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Install a GUID/Pointer pair into the system's configuration table.
+
+  none
+
+  @retval EFI_SUCCESS          Install a GUID/Pointer pair into the system's
+                               configuration table.
+  @retval other                Did not successfully install the GUID/Pointer pair
+                               into the configuration table.
+
+**/
+// TODO:    VOID - add argument and description to function comment
 EFI_STATUS
 InstallConfigTable (
   IN VOID
   )
-/*++
-
-Routine Description:
-
-  Install a GUID/Pointer pair into the system's configuration table.
-
-Arguments:
-
-  none
-
-Returns:
-
-  EFI_SUCCESS       - Install a GUID/Pointer pair into the system's configuration table.
-
-  other             - Did not successfully install the GUID/Pointer pair into the configuration table.
-
---*/
-// TODO:    VOID - add argument and description to function comment
 {
   EFI_STATUS              Status;
   EFI_CONFIGURATION_TABLE *CfgPtr;
@@ -1020,7 +954,7 @@ Returns:
   }
 
   if(UndiDataPointer == NULL) {
-  	return EFI_SUCCESS;
+    return EFI_SUCCESS;
   }
 
   UndiData = (NII_TABLE *)UndiDataPointer;
@@ -1079,14 +1013,6 @@ Returns:
 }
 
 /**
-
-  Install driver binding protocol of UNDI.
-
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
-  @param[in] SystemTable    A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS       The entry point is executed successfully.
-  @retval other             Some error occurs when executing this entry point.
 
 **/
 EFI_STATUS
