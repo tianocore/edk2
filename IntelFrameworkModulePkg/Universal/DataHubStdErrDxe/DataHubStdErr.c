@@ -31,6 +31,13 @@ EFI_DATA_HUB_PROTOCOL *mDataHub = NULL;
 
 EFI_EVENT             mDataHubStdErrEvent;
 
+/**
+  Event handler registered with the Data Hub to parse EFI_DEBUG_CODE. This
+  handler reads the Data Hub and sends any DEBUG info to StdErr.
+
+  @param Event    - The event that occured, not used
+  @param Context  - DataHub Protocol Pointer
+**/
 STATIC
 VOID
 EFIAPI
@@ -38,20 +45,6 @@ DataHubStdErrEventHandler (
   IN EFI_EVENT Event,
   IN VOID      *Context
   )
-/*++
-
-Routine Description:
-  Event handler registered with the Data Hub to parse EFI_DEBUG_CODE. This
-  handler reads the Data Hub and sends any DEBUG info to StdErr.
-
-Arguments:
-  Event    - The event that occured, not used
-  Context  - DataHub Protocol Pointer
-
-Returns:
-  None.
-
---*/
 {
   EFI_STATUS                           Status;
   EFI_DATA_HUB_PROTOCOL                *DataHub;
@@ -103,31 +96,23 @@ Returns:
   } while ((Mtc != 0) && !EFI_ERROR (Status));
 }
 
+/**
+  Register an event handler with the Data Hub to parse EFI_DEBUG_CODE. This
+  handler reads the Data Hub and sends any DEBUG info to StdErr.
+
+  @param ImageHandle - Image handle of this driver.
+  @param SystemTable - Pointer to EFI system table.
+
+  @retval EFI_SUCCESS             - The event handler was registered.
+  @retval EFI_OUT_OF_RESOURCES    - The event hadler was not registered due to lack of
+                            system resources.
+**/
 EFI_STATUS
 EFIAPI
 DataHubStdErrInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
-
-Routine Description:
-
-  Register an event handler with the Data Hub to parse EFI_DEBUG_CODE. This
-  handler reads the Data Hub and sends any DEBUG info to StdErr.
-
-Arguments:
-
-  ImageHandle - Image handle of this driver.
-  SystemTable - Pointer to EFI system table.
-
-Returns:
-
-  EFI_SUCCESS             - The event handler was registered.
-  EFI_OUT_OF_RESOURCES    - The event hadler was not registered due to lack of
-                            system resources.
-
---*/
 {
   EFI_STATUS  Status;
   UINT64      DataClass;
@@ -166,3 +151,4 @@ Returns:
 
   return Status;
 }
+
