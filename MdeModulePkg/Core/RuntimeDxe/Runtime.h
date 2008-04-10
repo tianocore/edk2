@@ -1,13 +1,15 @@
-/*++
+/** @file
+  Runtime Architectural Protocol as defined in the DXE CIS.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
-                                                                                          
+
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
 
 Module Name:
 
@@ -15,11 +17,9 @@ Module Name:
 
 Abstract:
 
-  Runtime Architectural Protocol as defined in the DXE CIS
-
   This code is used to produce the EFI runtime architectural protocol.
 
---*/
+**/
 
 #ifndef _RUNTIME_H_
 #define _RUNTIME_H_

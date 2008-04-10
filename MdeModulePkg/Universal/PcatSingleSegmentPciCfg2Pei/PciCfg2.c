@@ -1,4 +1,5 @@
-/**
+/** @file
+  Installs Single Segment Pci Configuration PPI.
 
   Copyright (c) 2006 - 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -27,9 +28,9 @@
 
    @param Address   PCI address with
                     EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS format.
-   
+
    @return The PCI address with PCI_LIB_ADDRESS format.
-   
+
 **/
 STATIC
 UINTN
@@ -69,7 +70,7 @@ PciCfgAddressConvert (
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 PciCfg2Read (
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
@@ -103,7 +104,7 @@ PciCfg2Read (
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 PciCfg2Write (
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
@@ -143,7 +144,7 @@ PciCfg2Write (
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 PciCfg2Modify (
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
@@ -209,7 +210,7 @@ EFI_PEI_PPI_DESCRIPTOR gPciCfg2PpiList = {
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 PciCfg2Read (
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
@@ -260,7 +261,7 @@ PciCfg2Read (
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 PciCfg2Write (
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
@@ -317,7 +318,7 @@ PciCfg2Write (
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 PciCfg2Modify (
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,

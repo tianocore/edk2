@@ -1,24 +1,17 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  EbcSupport.c
-
-Abstract:
-
+/** @file
   This module contains EBC support routines that are customized based on
   the target processor.
 
---*/
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
 
 #include "EbcInt.h"
 #include "EbcExecute.h"
@@ -141,7 +134,7 @@ EbcInterpret (
   // Now adjust the EBC stack pointer down to leave a gap for interpreter
   // execution. Then stuff a magic value there.
   //
-  
+
   Status = GetEBCStack((EFI_HANDLE)(UINTN)-1, &VmContext.StackPool, &StackIndex);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -151,7 +144,7 @@ EbcInterpret (
   VmContext.HighStackBottom = (UINTN) VmContext.R[0];
   VmContext.R[0] -= sizeof (UINTN);
 
-  
+
   PushU64 (&VmContext, (UINT64) VM_STACK_KEY_VALUE);
   VmContext.StackMagicPtr = (UINTN *) VmContext.R[0];
   VmContext.LowStackTop   = (UINTN) VmContext.R[0];
@@ -194,32 +187,27 @@ EbcInterpret (
   return (UINT64) VmContext.R[7];
 }
 
+
+/**
+  IPF implementation.
+  Begin executing an EBC image. The address of the entry point is passed
+  in via a processor register, so we'll need to make a call to get the
+  value.
+
+  @param  ImageHandle            image handle for the EBC application we're
+                                 executing
+  @param  SystemTable            standard system table passed into an driver's
+                                 entry point
+
+  @return The value returned by the EBC application we're going to run.
+
+**/
 STATIC
 UINT64
 ExecuteEbcImageEntryPoint (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-Routine Description:
-
-  IPF implementation.
-
-  Begin executing an EBC image. The address of the entry point is passed
-  in via a processor register, so we'll need to make a call to get the
-  value.
-  
-Arguments:
-
-  ImageHandle   - image handle for the EBC application we're executing
-  SystemTable   - standard system table passed into an driver's entry point
-
-Returns:
-
-  The value returned by the EBC application we're going to run.
-
---*/
 {
   //
   // Create a new VM context on the stack
@@ -256,7 +244,7 @@ Returns:
   // Get the stack pointer. This is the bottom of the upper stack.
   //
   Addr                      = EbcLLGetStackPointer ();
-  
+
   Status = GetEBCStack(ImageHandle, &VmContext.StackPool, &StackIndex);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -266,7 +254,7 @@ Returns:
   VmContext.HighStackBottom = (UINTN) VmContext.R[0];
   VmContext.R[0] -= sizeof (UINTN);
 
-  
+
   //
   // Allocate stack space for the interpreter. Then put a magic value
   // at the bottom so we can detect stack corruption.
@@ -320,6 +308,19 @@ Returns:
   return (UINT64) VmContext.R[7];
 }
 
+
+/**
+  Create thunks for an EBC image entry point, or an EBC protocol service.
+
+  @param  ImageHandle            Image handle for the EBC image. If not null, then
+                                 we're creating a thunk for an image entry point.
+  @param  EbcEntryPoint          Address of the EBC code that the thunk is to call
+  @param  Thunk                  Returned thunk we create here
+  @param  Flags                  Flags indicating options for creating the thunk
+
+  @return Standard EFI status.
+
+**/
 EFI_STATUS
 EbcCreateThunks (
   IN EFI_HANDLE   ImageHandle,
@@ -327,25 +328,6 @@ EbcCreateThunks (
   OUT VOID        **Thunk,
   IN  UINT32      Flags
   )
-/*++
-
-Routine Description:
-
-  Create thunks for an EBC image entry point, or an EBC protocol service.
-  
-Arguments:
-
-  ImageHandle     - Image handle for the EBC image. If not null, then we're
-                    creating a thunk for an image entry point.
-  EbcEntryPoint   - Address of the EBC code that the thunk is to call
-  Thunk           - Returned thunk we create here
-  Flags           - Flags indicating options for creating the thunk
-  
-Returns:
-
-  Standard EFI status.
-  
---*/
 {
   UINT8       *Ptr;
   UINT8       *ThunkBase;
@@ -680,6 +662,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Given raw bytes of Itanium based code, format them into a bundle and
+  write them out.
+
+  @param  MemPtr                 pointer to memory location to write the bundles to
+  @param  Template               5-bit template
+  @param  Slot0-2                instruction slot data for the bundle
+
+  @retval EFI_INVALID_PARAMETER  Pointer is not aligned
+  @retval      No                more than 5 bits in template
+  @retval      More              than 41 bits used in code
+  @retval EFI_SUCCESS            All data is written.
+
+**/
 STATIC
 EFI_STATUS
 WriteBundle (
@@ -689,27 +686,6 @@ WriteBundle (
   IN    UINT64  Slot1,
   IN    UINT64  Slot2
   )
-/*++
-
-Routine Description:
-
-  Given raw bytes of Itanium based code, format them into a bundle and
-  write them out.
-  
-Arguments:
-
-  MemPtr    - pointer to memory location to write the bundles to
-  Template  - 5-bit template
-  Slot0-2   - instruction slot data for the bundle
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Pointer is not aligned
-                        - No more than 5 bits in template
-                        - More than 41 bits used in code
-  EFI_SUCCESS           - All data is written.
-
---*/
 {
   UINT8   *BPtr;
   UINT32  Index;
@@ -760,6 +736,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  This function is called to execute an EBC CALLEX instruction.
+  The function check the callee's content to see whether it is common native
+  code or a thunk to another piece of EBC code.
+  If the callee is common native code, use EbcLLCAllEXASM to manipulate,
+  otherwise, set the VM->IP to target EBC code directly to avoid another VM
+  be startup which cost time and stack space.
+
+  @param  VmPtr                  Pointer to a VM context.
+  @param  FuncAddr               Callee's address
+  @param  NewStackPointer        New stack pointer after the call
+  @param  FramePtr               New frame pointer after the call
+  @param  Size                   The size of call instruction
+
+  @return None.
+
+**/
 VOID
 EbcLLCALLEX (
   IN VM_CONTEXT   *VmPtr,
@@ -768,30 +762,6 @@ EbcLLCALLEX (
   IN VOID         *FramePtr,
   IN UINT8        Size
   )
-/*++
-
-Routine Description:
-
-  This function is called to execute an EBC CALLEX instruction. 
-  The function check the callee's content to see whether it is common native
-  code or a thunk to another piece of EBC code.
-  If the callee is common native code, use EbcLLCAllEXASM to manipulate,
-  otherwise, set the VM->IP to target EBC code directly to avoid another VM
-  be startup which cost time and stack space.
-  
-Arguments:
-
-  VmPtr             - Pointer to a VM context.
-  FuncAddr          - Callee's address
-  NewStackPointer   - New stack pointer after the call
-  FramePtr          - New frame pointer after the call
-  Size              - The size of call instruction
-
-Returns:
-
-  None.
-  
---*/
 {
   UINTN    IsThunk;
   UINTN    TargetEbcAddr;

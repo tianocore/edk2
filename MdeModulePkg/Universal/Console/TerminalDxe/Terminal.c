@@ -1,6 +1,8 @@
-/*++
+/** @file
+  Produces Simple Text Input Protocl, Simple Text Input Extended Protocol and
+  Simple Text Output Protocol upon Serial IO Protocol.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,15 +11,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    Terminal.c
-
-Abstract:
-
-Revision History:
-
---*/
+**/
 
 
 #include "Terminal.h"
@@ -26,7 +20,7 @@ STATIC
 EFI_STATUS
 TerminalFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
-  );  
+  );
 
 //
 // Globals
@@ -97,7 +91,7 @@ TERMINAL_DEV  gTerminalDevTemplate = {
     { {0} }
   },
   NULL, // ControllerNameTable
-  NULL, 
+  NULL,
   INPUT_STATE_DEFAULT,
   RESET_STATE_DEFAULT,
   FALSE,
@@ -960,15 +954,15 @@ Returns:
   }
   while (!IsListEmpty (ListHead)) {
     NotifyNode = CR (
-                   ListHead->ForwardLink, 
-                   TERMINAL_CONSOLE_IN_EX_NOTIFY, 
-                   NotifyEntry, 
+                   ListHead->ForwardLink,
+                   TERMINAL_CONSOLE_IN_EX_NOTIFY,
+                   NotifyEntry,
                    TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                    );
     RemoveEntryList (ListHead->ForwardLink);
     gBS->FreePool (NotifyNode);
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -1344,9 +1338,9 @@ InitializeEfiKeyFiFo (
 /**
   The user Entry Point for module Terminal. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

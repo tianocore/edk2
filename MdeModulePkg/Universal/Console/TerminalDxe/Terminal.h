@@ -1,24 +1,16 @@
-/*++
+/** @file
+  Header file for Terminal driver.
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Module Name:
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  terminal.h
-
-Abstract:
-
-  
-Revision History
-
---*/
+**/
 
 #ifndef _TERMINAL_H
 #define _TERMINAL_H
@@ -212,15 +204,15 @@ Routine Description:
 
 Arguments:
 
-  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke 
+  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke
                       state data for the key that was registered.
-  InputData         - A pointer to a buffer that is filled in with the keystroke 
+  InputData         - A pointer to a buffer that is filled in with the keystroke
                       state data for the key that was pressed.
 
 Returns:
   TRUE              - Key be pressed matches a registered key.
-  FLASE             - Match failed. 
-  
+  FLASE             - Match failed.
+
 --*/
 ;
 
@@ -230,7 +222,7 @@ TerminalConInWaitForKeyEx (
   IN  EFI_EVENT       Event,
   IN  VOID            *Context
   )
-;  
+;
 //
 // Simple Text Input Ex protocol prototypes
 //
@@ -252,7 +244,7 @@ TerminalConInResetEx (
 
   Returns:
     EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+    EFI_DEVICE_ERROR      - The device is not functioning properly and could
                             not be reset.
 
 --*/
@@ -267,20 +259,20 @@ TerminalConInReadKeyStrokeEx (
 /*++
 
   Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
+    Reads the next keystroke from the input device. The WaitForKey Event can
     be used to test for existance of a keystroke via WaitForEvent () call.
 
   Arguments:
     This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke 
+    KeyData    - A pointer to a buffer that is filled in with the keystroke
                  state data for the key that was pressed.
 
   Returns:
     EFI_SUCCESS           - The keystroke information was returned.
     EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+    EFI_DEVICE_ERROR      - The keystroke information was not returned due to
                             hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
+    EFI_INVALID_PARAMETER - KeyData is NULL.
 
 --*/
 ;
@@ -298,17 +290,17 @@ TerminalConInSetState (
 
   Arguments:
     This                  - Protocol instance pointer.
-    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the
                             state for the input device.
-                          
-  Returns:                
+
+  Returns:
     EFI_SUCCESS           - The device state was set successfully.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+    EFI_DEVICE_ERROR      - The device is not functioning correctly and could
                             not have the setting adjusted.
     EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+    EFI_INVALID_PARAMETER - KeyToggleState is NULL.
 
---*/   
+--*/
 ;
 
 EFI_STATUS
@@ -326,18 +318,18 @@ TerminalConInRegisterKeyNotify (
 
   Arguments:
     This                    - Protocol instance pointer.
-    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+    KeyData                 - A pointer to a buffer that is filled in with the keystroke
                               information data for the key that was pressed.
-    KeyNotificationFunction - Points to the function to be called when the key 
-                              sequence is typed specified by KeyData.                        
-    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+    KeyNotificationFunction - Points to the function to be called when the key
+                              sequence is typed specified by KeyData.
+    NotifyHandle            - Points to the unique handle assigned to the registered notification.
 
   Returns:
     EFI_SUCCESS             - The notification function was registered successfully.
     EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
-                              
---*/   
+    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.
+
+--*/
 ;
 
 EFI_STATUS
@@ -352,15 +344,15 @@ TerminalConInUnregisterKeyNotify (
     Remove a registered notification function from a particular keystroke.
 
   Arguments:
-    This                    - Protocol instance pointer.    
+    This                    - Protocol instance pointer.
     NotificationHandle      - The handle of the notification function being unregistered.
 
   Returns:
     EFI_SUCCESS             - The notification function was unregistered successfully.
     EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    EFI_NOT_FOUND           - Can not find the matching entry in database.  
-                              
---*/   
+    EFI_NOT_FOUND           - Can not find the matching entry in database.
+
+--*/
 ;
 
 VOID

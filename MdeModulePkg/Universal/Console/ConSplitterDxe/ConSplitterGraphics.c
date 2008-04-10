@@ -1,6 +1,10 @@
-/*++
+/** @file
+  Support for ConsoleControl protocol. Support for Graphics output spliter.
+  Support for DevNull Console Out. This console uses memory buffers
+  to represnt the console. It allows a console to start very early and
+  when a new console is added it is synced up with the current console.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,18 +13,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
+**/
 
-  ConSplitterGraphics.c
-
-Abstract:
-
-  Support for ConsoleControl protocol. Support for Graphics output spliter.
-  Support for DevNull Console Out. This console uses memory buffers
-  to represnt the console. It allows a console to start very early and
-  when a new console is added it is synced up with the current console
-
---*/
 
 #include "ConSplitter.h"
 
