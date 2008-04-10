@@ -1,13 +1,14 @@
-/*++
+/** @file
+  CalculateCrc32 Boot Services as defined in DXE CIS.
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,22 +16,30 @@ Module Name:
 
 Abstract:
 
-  CalculateCrc32 Boot Services as defined in DXE CIS.
-
   This Boot Services is in the Runtime Driver because this service is
   also required by SetVirtualAddressMap() when the EFI System Table and
-  EFI Runtime Services Table are converted from physical address to 
+  EFI Runtime Services Table are converted from physical address to
   virtual addresses.  This requires that the 32-bit CRC be recomputed.
 
-Revision History:
-
---*/
+**/
 
 
 #include <PiDxe.h>
 
 UINT32  mCrcTable[256];
 
+/**
+  Calculate CRC32 for target data.
+
+  @param  Len                   The target data.
+  @param  DataSize              The target data size.
+  @param  CrcOut                The CRC32 for target data.
+
+  @retval EFI_SUCCESS           The CRC32 for target data is calculated successfully.
+  @retval EFI_INVALID_PARAMETER Some parameter is not valid, so the CRC32 is not
+                                calculated.
+
+**/
 EFI_STATUS
 EFIAPI
 RuntimeDriverCalculateCrc32 (
@@ -38,25 +47,6 @@ RuntimeDriverCalculateCrc32 (
   IN  UINTN   DataSize,
   OUT UINT32  *CrcOut
   )
-/*++
-
-Routine Description:
-
-  Calculate CRC32 for target data
-
-Arguments:
-
-  Data     - The target data.
-  DataSize - The target data size.
-  CrcOut   - The CRC32 for target data.
-
-Returns:
-
-  EFI_SUCCESS           - The CRC32 for target data is calculated successfully.
-  EFI_INVALID_PARAMETER - Some parameter is not valid, so the CRC32 is not 
-                          calculated.
-
---*/
 {
   UINT32  Crc;
   UINTN   Index;
@@ -75,26 +65,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Reverse bits for 32bit data.
+
+  @param  Value                 The data to be reversed.
+
+  @retrun                       Data reversed.
+
+**/
 STATIC
 UINT32
 ReverseBits (
   UINT32  Value
   )
-/*++
-
-Routine Description:
-
-  Reverse bits for 32bit data.
-
-Arguments:
-
-  Value - the data to be reversed.
-
-Returns:
-
-  UINT32 data reversed.
-
---*/
 {
   UINTN   Index;
   UINT32  NewValue;
@@ -109,25 +93,18 @@ Returns:
   return NewValue;
 }
 
+/**
+  Initialize CRC32 table.
+
+  @param  None
+
+  @retrun None
+
+**/
 VOID
 RuntimeDriverInitializeCrc32Table (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Initialize CRC32 table.
-
-Arguments:
-
-  None.
-
-Returns:
-
-  None.
-
---*/
 {
   UINTN   TableEntry;
   UINTN   Index;

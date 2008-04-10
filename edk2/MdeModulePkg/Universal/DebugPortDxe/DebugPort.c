@@ -1,29 +1,19 @@
-/*++
+/** @file
+  Top level C file for debugport driver.  Contains initialization function.
+  This driver layers on top of SerialIo.
+  ALL CODE IN THE SERIALIO STACK MUST BE RE-ENTRANT AND CALLABLE FROM
+  INTERRUPT CONTEXT
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Module Name:
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-    DebugPort.c
-
-Abstract:
-
-    Top level C file for debugport driver.  Contains initialization function.
-    This driver layers on top of SerialIo.
-    
-    ALL CODE IN THE SERIALIO STACK MUST BE RE-ENTRANT AND CALLABLE FROM
-    INTERRUPT CONTEXT.
-
-Revision History
-
---*/
+**/
 
 
 #include "DebugPort.h"
@@ -41,7 +31,7 @@ GetDebugPortVariable (
 Routine Description:
   Local worker function to obtain device path information from DebugPort variable.
   Records requested settings in DebugPort device structure.
-  
+
 Arguments:
   DEBUGPORT_DEVICE  *DebugPortDevice,
 
@@ -145,8 +135,8 @@ InitializeDebugPortDriver (
 Routine Description:
   Driver entry point.  Reads DebugPort variable to determine what device and settings
   to use as the debug port.  Binds exclusively to SerialIo. Reverts to defaults \
-  if no variable is found.  
-  
+  if no variable is found.
+
   Creates debugport and devicepath protocols on new handle.
 
 Arguments:
@@ -215,13 +205,13 @@ DebugPortSupported (
 Routine Description:
   Checks to see that there's not already a DebugPort interface somewhere.  If so,
   fail.
-  
+
   If there's a DEBUGPORT variable, the device path must match exactly.  If there's
   no DEBUGPORT variable, then device path is not checked and does not matter.
-  
+
   Checks to see that there's a serial io interface on the controller handle
   that can be bound BY_DRIVER | EXCLUSIVE.
-  
+
   If all these tests succeed, then we return EFI_SUCCESS, else, EFI_UNSUPPORTED
   or other error returned by OpenProtocol.
 
@@ -229,12 +219,12 @@ Arguments:
   This
   ControllerHandle
   RemainingDevicePath
-  
+
 Returns:
   EFI_UNSUPPORTED
   EFI_OUT_OF_RESOURCES
   EFI_SUCCESS
-  
+
 --*/
 {
   EFI_STATUS                Status;
@@ -332,7 +322,7 @@ Arguments:
   This
   ControllerHandle
   RemainingDevicePath
-  
+
 Returns:
   EFI_OUT_OF_RESOURCES
   EFI_SUCCESS
@@ -501,11 +491,11 @@ Routine Description:
 
 Arguments:
   Per UEFI 2.0 driver model
-  
+
 Returns:
   EFI_UNSUPPORTED
   EFI_SUCCESS
-  
+
 --*/
 {
   EFI_STATUS  Status;
@@ -590,9 +580,9 @@ Routine Description:
   We cannot call SerialIo:SetAttributes because it uses pool services, which use
   locks, which affect TPL, so it's not interrupt context safe or re-entrant.
   SerialIo:Reset() calls SetAttributes, so it can't be used either.
-  
-  The port itself should be fine since it was set up during initialization.  
-  
+
+  The port itself should be fine since it was set up during initialization.
+
 Arguments:
   This
 
@@ -626,7 +616,7 @@ DebugPortRead (
 Routine Description:
   DebugPort protocol member function.  Calls SerialIo:Read() after setting
   if it's different than the last SerialIo access.
-  
+
 Arguments:
   IN EFI_DEBUGPORT_PROTOCOL   *This
   IN UINT32                   Timeout,
@@ -686,11 +676,11 @@ Routine Description:
   DebugPort protocol member function.  Calls SerialIo:Write() Writes 8 bytes at
   a time and does a GetControl between 8 byte writes to help insure reads are
   interspersed This is poor-man's flow control..
-  
+
 Arguments:
   This               - Pointer to DebugPort protocol
   Timeout            - Timeout value
-  BufferSize         - On input, the size of Buffer. 
+  BufferSize         - On input, the size of Buffer.
                        On output, the amount of data actually written.
   Buffer             - Pointer to buffer to write
 
@@ -741,7 +731,7 @@ DebugPortPoll (
 Routine Description:
   DebugPort protocol member function.  Calls SerialIo:Write() after setting
   if it's different than the last SerialIo access.
-  
+
 Arguments:
   IN EFI_DEBUGPORT_PROTOCOL   *This
 
@@ -785,7 +775,7 @@ Routine Description:
   Unload function that is registered in the LoadImage protocol.  It un-installs
   protocols produced and deallocates pool used by the driver.  Called by the core
   when unloading the driver.
-  
+
 Arguments:
   EFI_HANDLE ImageHandle
 

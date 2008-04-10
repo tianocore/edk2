@@ -1,6 +1,7 @@
-/*++
+/** @file
+  Runtime Architectural Protocol as defined in the DXE CIS.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,8 +15,6 @@ Module Name:
   Runtime.c
 
 Abstract:
-
-  Runtime Architectural Protocol as defined in the DXE CIS
 
   This code is used to produce the EFI runtime virtual switch over
 
@@ -49,7 +48,7 @@ Revision History:
   Runtime Arch Protocol definition no longer contains CalculateCrc32. Boot Service
   Table now contains an item named CalculateCrc32.
 
---*/
+**/
 
 #include "Runtime.h"
 
@@ -367,7 +366,7 @@ Returns:
 
   //
   // UEFI don't require System Configuration Tables Conversion.
-  // 
+  //
 
   //
   // Convert the runtime fields of the EFI System Table and recompute the CRC-32

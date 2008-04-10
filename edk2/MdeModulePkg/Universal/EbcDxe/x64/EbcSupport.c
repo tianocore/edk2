@@ -1,24 +1,17 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  EbcSupport.c
-
-Abstract:
-
+/** @file
   This module contains EBC support routines that are customized based on
   the target x64 processor.
 
---*/
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
 
 #include "EbcInt.h"
 #include "EbcExecute.h"
@@ -45,7 +38,7 @@ PushU64 (
 Routine Description:
 
   Push a 64 bit unsigned value to the VM stack.
-  
+
 Arguments:
 
   VmPtr   -  The pointer to current VM context.
@@ -54,7 +47,7 @@ Arguments:
 Returns:
 
   VOID
-  
+
 --*/
 {
   //
@@ -66,6 +59,19 @@ Returns:
   return;
 }
 
+
+/**
+  Begin executing an EBC image. The address of the entry point is passed
+  in via a processor register, so we'll need to make a call to get the
+  value.
+
+  This is a thunk function. Microsoft x64 compiler only provide fast_call
+  calling convention, so the first four arguments are passed by rcx, rdx,
+  r8, and r9, while other arguments are passed in stack.
+
+  @return The value returned by the EBC application we're going to run.
+
+**/
 STATIC
 UINT64
 EbcInterpret (
@@ -86,25 +92,6 @@ EbcInterpret (
   UINTN      Arg15,
   UINTN      Arg16
   )
-/*++
-
-Routine Description:
-
-  Begin executing an EBC image. The address of the entry point is passed
-  in via a processor register, so we'll need to make a call to get the
-  value.
-  
-Arguments:
-
-  This is a thunk function. Microsoft x64 compiler only provide fast_call
-  calling convention, so the first four arguments are passed by rcx, rdx, 
-  r8, and r9, while other arguments are passed in stack.
-
-Returns:
-
-  The value returned by the EBC application we're going to run.
-  
---*/
 {
   //
   // Create a new VM context on the stack
@@ -140,7 +127,7 @@ Returns:
   //
   // Adjust the VM's stack pointer down.
   //
-  
+
   Status = GetEBCStack((EFI_HANDLE)(UINTN)-1, &VmContext.StackPool, &StackIndex);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -225,30 +212,25 @@ Returns:
   return (UINT64) VmContext.R[7];
 }
 
+
+/**
+  Begin executing an EBC image. The address of the entry point is passed
+  in via a processor register, so we'll need to make a call to get the
+  value.
+
+  @param  ImageHandle      image handle for the EBC application we're executing
+  @param  SystemTable      standard system table passed into an driver's entry
+                           point
+
+  @return The value returned by the EBC application we're going to run.
+
+**/
 STATIC
 UINT64
 ExecuteEbcImageEntryPoint (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-Routine Description:
-
-  Begin executing an EBC image. The address of the entry point is passed
-  in via a processor register, so we'll need to make a call to get the
-  value.
-  
-Arguments:
-
-  ImageHandle   - image handle for the EBC application we're executing
-  SystemTable   - standard system table passed into an driver's entry point
-
-Returns:
-
-  The value returned by the EBC application we're going to run.
-
---*/
 {
   //
   // Create a new VM context on the stack
@@ -344,6 +326,17 @@ Returns:
   return (UINT64) VmContext.R[7];
 }
 
+
+/**
+  Create an IA32 thunk for the given EBC entry point.
+
+  @param  ImageHandle      Handle of image for which this thunk is being created
+  @param  EbcEntryPoint    Address of the EBC code that the thunk is to call
+  @param  Thunk            Returned thunk we create here
+
+  @return Standard EFI status.
+
+**/
 EFI_STATUS
 EbcCreateThunks (
   IN EFI_HANDLE           ImageHandle,
@@ -351,23 +344,6 @@ EbcCreateThunks (
   OUT VOID                **Thunk,
   IN  UINT32              Flags
   )
-/*++
-
-Routine Description:
-
-  Create an IA32 thunk for the given EBC entry point.
-  
-Arguments:
-
-  ImageHandle     - Handle of image for which this thunk is being created
-  EbcEntryPoint   - Address of the EBC code that the thunk is to call
-  Thunk           - Returned thunk we create here
-
-Returns:
-
-  Standard EFI status.
-  
---*/
 {
   UINT8       *Ptr;
   UINT8       *ThunkBase;
@@ -496,6 +472,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  This function is called to execute an EBC CALLEX instruction.
+  The function check the callee's content to see whether it is common native
+  code or a thunk to another piece of EBC code.
+  If the callee is common native code, use EbcLLCAllEXASM to manipulate,
+  otherwise, set the VM->IP to target EBC code directly to avoid another VM
+  be startup which cost time and stack space.
+
+  @param  VmPtr            Pointer to a VM context.
+  @param  FuncAddr         Callee's address
+  @param  NewStackPointer  New stack pointer after the call
+  @param  FramePtr         New frame pointer after the call
+  @param  Size             The size of call instruction
+
+  @return None.
+
+**/
 VOID
 EbcLLCALLEX (
   IN VM_CONTEXT   *VmPtr,
@@ -504,30 +498,6 @@ EbcLLCALLEX (
   IN VOID         *FramePtr,
   IN UINT8        Size
   )
-/*++
-
-Routine Description:
-
-  This function is called to execute an EBC CALLEX instruction. 
-  The function check the callee's content to see whether it is common native
-  code or a thunk to another piece of EBC code.
-  If the callee is common native code, use EbcLLCAllEXASM to manipulate,
-  otherwise, set the VM->IP to target EBC code directly to avoid another VM
-  be startup which cost time and stack space.
-  
-Arguments:
-
-  VmPtr             - Pointer to a VM context.
-  FuncAddr          - Callee's address
-  NewStackPointer   - New stack pointer after the call
-  FramePtr          - New frame pointer after the call
-  Size              - The size of call instruction
-
-Returns:
-
-  None.
-  
---*/
 {
   UINTN    IsThunk;
   UINTN    TargetEbcAddr;

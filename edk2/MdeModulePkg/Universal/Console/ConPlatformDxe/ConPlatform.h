@@ -1,21 +1,16 @@
-/*++
+/** @file
+  Header file for Console Platfrom DXE Driver.
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2007, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-Module Name:
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-    ConPlatform.h
-    
-Abstract:
-
---*/
+**/
 
 #ifndef CON_MANAGE_H_
 #define CON_MANAGE_H_
@@ -24,11 +19,12 @@ Abstract:
 #include <Protocol/SimpleTextOut.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/ConsoleInDevice.h>
+#include <Guid/StandardErrorDevice.h>
+#include <Guid/ConsoleOutDevice.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Guid/HotPlugDevice.h>
-#include <Guid/StandardErrorDevice.h>
-#include <Guid/ConsoleOutDevice.h>
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>

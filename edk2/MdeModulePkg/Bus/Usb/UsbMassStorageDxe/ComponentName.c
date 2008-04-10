@@ -1,4 +1,5 @@
- /*++
+/** @file
+  UEFI Component Name(2) protocol implementation.
 
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -15,7 +16,8 @@ Module Name:
 
 Abstract:
 
---*/
+
+**/
 
 
 #include <PiDxe.h>

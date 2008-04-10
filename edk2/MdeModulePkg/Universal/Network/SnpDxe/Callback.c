@@ -1,4 +1,8 @@
-/*++
+/** @file
+  This file contains two sets of callback routines for undi3.0 and undi3.1.
+  the callback routines for Undi3.1 have an extra parameter UniqueId which
+  stores the interface context for the NIC that snp is trying to talk.
+
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,16 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module name:
- callback.c
-
-Abstract:
- This file contains two sets of callback routines for undi3.0 and undi3.1.
- the callback routines for Undi3.1 have an extra parameter UniqueId which
- stores the interface context for the NIC that snp is trying to talk..
-
---*/
-
+**/
 
 #include "Snp.h"
 
