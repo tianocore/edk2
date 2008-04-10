@@ -1,5 +1,5 @@
 /** @file
-  Report Status Code Library for DXE Phase.
+  Report Status Code Library for SMM Runtime driver.
 
   Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials

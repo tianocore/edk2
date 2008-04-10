@@ -1,4 +1,3 @@
-
 /** @file
   OEM hook status code library functions with no library constructor/destructor
 
@@ -10,8 +9,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  OemHookStatusCodeLib.h
 
 **/
 
@@ -70,4 +67,5 @@ OemHookStatusCodeReport (
   IN EFI_STATUS_CODE_DATA     *Data      OPTIONAL
   );
 
-#endif
+#endif // __OEM_HOOK_STATUSCODE_LIB__
+

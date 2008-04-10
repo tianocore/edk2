@@ -42,7 +42,7 @@ STATIC
 BOOLEAN               mHaveExitedBootServices = FALSE;
 
 /**
-  Locatet he report status code service.
+  Locate he report status code service.
 
   @return     EFI_REPORT_STATUS_CODE    function point to
               ReportStatusCode.
@@ -92,7 +92,7 @@ ReportStatusCodeLibVirtualAddressChange (
 }
 
 /**
-  Updatet the In Runtime Indicator.
+  Update the In Runtime Indicator.
 
   @param[in]    Event   The Event that is being processed
   @param[in]    Context Event Context
@@ -191,7 +191,13 @@ ReportStatusCodeLibConstruct (
   return Status;
 }
 
-
+/**
+  Desctructor of library will close events.
+  
+  @param ImageHandle callder module's image handle
+  @param SystemTable pointer to EFI system table.
+  @return the status of close event.
+**/
 EFI_STATUS
 EFIAPI
 ReportStatusCodeLibDestruct (
@@ -214,7 +220,6 @@ ReportStatusCodeLibDestruct (
 
   return Status;
 }
-
 
 /**
   Reports a status code with full parameters.
@@ -299,3 +304,4 @@ InternalReportStatusCodeEx (
   }
   return  InternalReportStatusCode (Type, Value, Instance, CallerId, mStatusCodeData);
 }
+

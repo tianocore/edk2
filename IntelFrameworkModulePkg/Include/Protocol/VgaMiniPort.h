@@ -22,6 +22,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _EFI_VGA_MINI_PORT_PROTOCOL  EFI_VGA_MINI_PORT_PROTOCOL;
 
+/**
+  Sets the text display mode of a VGA controller
+  
+  @param This             Protocol instance pointer.
+  @param Mode             Mode number.  0 - 80x25   1-80x50
+
+  @retval EFI_SUCCESS            The mode was set
+  @retval EFI_DEVICE_ERROR       The device is not functioning properly.
+  
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_VGA_MINI_PORT_SET_MODE) (
@@ -29,20 +39,6 @@ EFI_STATUS
   IN UINTN                               ModeNumber
   );
 
-/*++
-
-  Routine Description:
-    Sets the text display mode of a VGA controller
-
-  Arguments:
-    This                 - Protocol instance pointer.
-    Mode                 - Mode number.  0 - 80x25   1-80x50
-
-  Returns:
-    EFI_SUCCESS           - The mode was set
-    EFI_DEVICE_ERROR      - The device is not functioning properly.
-
---*/
 struct _EFI_VGA_MINI_PORT_PROTOCOL {
   EFI_VGA_MINI_PORT_SET_MODE  SetMode;
 

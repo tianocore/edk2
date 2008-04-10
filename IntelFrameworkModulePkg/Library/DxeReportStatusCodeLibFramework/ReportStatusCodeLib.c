@@ -13,8 +13,6 @@
 **/
 
 #include "ReportStatusCodeLibInternal.h"
-
-
  
 EFI_REPORT_STATUS_CODE  mReportStatusCode = NULL;
 
