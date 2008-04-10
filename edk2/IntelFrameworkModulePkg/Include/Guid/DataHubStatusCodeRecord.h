@@ -32,4 +32,5 @@ typedef struct {
 
 extern EFI_GUID gEfiDataHubStatusCodeRecordGuid;
 
-#endif
+#endif // __STATUS_CODE_H__
+

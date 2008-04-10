@@ -1,5 +1,6 @@
 /** @file
-  Report Status Code Library for DXE Phase.
+  Implementation for ReportStatusCodeLib library class. This 
+  library instance can be used to any phase: SEC/PEI/DXE.
 
   Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -11,7 +12,6 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
 
 #include <Base.h>
 #include <Framework/StatusCode.h>
@@ -528,3 +528,4 @@ ReportDebugCodeEnabled (
 {
   return (BOOLEAN) ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
+

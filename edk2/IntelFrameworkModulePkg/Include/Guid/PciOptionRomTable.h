@@ -37,4 +37,5 @@ typedef struct {
   EFI_PCI_OPTION_ROM_DESCRIPTOR   *PciOptionRomDescriptors;
 } EFI_PCI_OPTION_ROM_TABLE;
 
-#endif
+#endif // __PCI_OPTION_ROM_TABLE_GUID_H_
+

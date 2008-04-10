@@ -36,5 +36,4 @@ extern  EFI_GUID gEfiMemoryProducerGuid;
 
 extern  EFI_GUID gEfiMiscProducerGuid;
 
-
-#endif
+#endif // _DATAHUB_PRODUCER_H_

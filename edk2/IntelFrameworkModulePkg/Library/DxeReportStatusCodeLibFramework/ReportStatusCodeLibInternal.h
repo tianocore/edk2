@@ -33,7 +33,7 @@
 
 
 /**
-  Locatet he report status code service.
+  Locate he report status code service.
 
   @return     EFI_REPORT_STATUS_CODE    function point to
               ReportStatusCode.

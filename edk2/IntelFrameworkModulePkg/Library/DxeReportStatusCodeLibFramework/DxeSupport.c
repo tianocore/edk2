@@ -15,7 +15,7 @@
 #include "ReportStatusCodeLibInternal.h"
 
 /**
-  Locatet he report status code service.
+  Locate he report status code service.
 
   @return     EFI_REPORT_STATUS_CODE    function point to
               ReportStatusCode.
@@ -40,7 +40,47 @@ InternalGetReportStatusCode (
   return NULL;
 }
 
+/**
+  Reports a status code with full parameters.
 
+  The function reports a status code.  If ExtendedData is NULL and ExtendedDataSize
+  is 0, then an extended data buffer is not reported.  If ExtendedData is not
+  NULL and ExtendedDataSize is not 0, then an extended data buffer is allocated.
+  ExtendedData is assumed not have the standard status code header, so this function
+  is responsible for allocating a buffer large enough for the standard header and
+  the extended data passed into this function.  The standard header is filled in
+  with a GUID specified by ExtendedDataGuid.  If ExtendedDataGuid is NULL, then a
+  GUID of gEfiStatusCodeSpecificDatauid is used.  The status code is reported with
+  an instance specified by Instance and a caller ID specified by CallerId.  If
+  CallerId is NULL, then a caller ID of gEfiCallerIdGuid is used.
+
+  ReportStatusCodeEx()must actively prevent recursion.  If ReportStatusCodeEx()
+  is called while processing another any other Report Status Code Library function,
+  then ReportStatusCodeEx() must return EFI_DEVICE_ERROR immediately.
+
+  If ExtendedData is NULL and ExtendedDataSize is not zero, then ASSERT().
+  If ExtendedData is not NULL and ExtendedDataSize is zero, then ASSERT().
+
+  @param  Type              Status code type.
+  @param  Value             Status code value.
+  @param  Instance          Status code instance number.
+  @param  CallerId          Pointer to a GUID that identifies the caller of this
+                            function.  If this parameter is NULL, then a caller
+                            ID of gEfiCallerIdGuid is used.
+  @param  ExtendedDataGuid  Pointer to the GUID for the extended data buffer.
+                            If this parameter is NULL, then a the status code
+                            standard header is filled in with
+                            gEfiStatusCodeSpecificDataGuid.
+  @param  ExtendedData      Pointer to the extended data buffer.  This is an
+                            optional parameter that may be NULL.
+  @param  ExtendedDataSize  The size, in bytes, of the extended data buffer.
+
+  @retval  EFI_SUCCESS           The status code was reported.
+  @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate
+                                 the extended data section if it was specified.
+  @retval  EFI_UNSUPPORTED       Report status code is not supported
+
+**/
 EFI_STATUS
 EFIAPI
 InternalReportStatusCodeEx (

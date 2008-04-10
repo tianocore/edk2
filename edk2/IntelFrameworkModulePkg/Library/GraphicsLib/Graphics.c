@@ -37,37 +37,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
+/**
+  Return the graphics image file named FileNameGuid into Image and return it's
+  size in ImageSize. All Firmware Volumes (FV) in the system are searched for the
+  file name.
+
+  @param FileNameGuid  - File Name of graphics file in the FV(s).
+
+  @param Image         - Pointer to pointer to return graphics image.  If NULL, a
+                         buffer will be allocated.
+
+  @param ImageSize     - Size of the graphics Image in bytes. Zero if no image found.
+
+  @retval EFI_SUCCESS          - Image and ImageSize are valid.
+  @retval EFI_BUFFER_TOO_SMALL - Image not big enough. ImageSize has required size
+  @retval EFI_NOT_FOUND        - FileNameGuid not found
+
+**/
+
 EFI_STATUS
 GetGraphicsBitMapFromFV (
   IN  EFI_GUID      *FileNameGuid,
   OUT VOID          **Image,
   OUT UINTN         *ImageSize
   )
-/*++
-
-Routine Description:
-
-  Return the graphics image file named FileNameGuid into Image and return it's
-  size in ImageSize. All Firmware Volumes (FV) in the system are searched for the
-  file name.
-
-Arguments:
-
-  FileNameGuid  - File Name of graphics file in the FV(s).
-
-  Image         - Pointer to pointer to return graphics image.  If NULL, a
-                  buffer will be allocated.
-
-  ImageSize     - Size of the graphics Image in bytes. Zero if no image found.
-
-
-Returns:
-
-  EFI_SUCCESS          - Image and ImageSize are valid.
-  EFI_BUFFER_TOO_SMALL - Image not big enough. ImageSize has required size
-  EFI_NOT_FOUND        - FileNameGuid not found
-
---*/
 {
   EFI_STATUS                    Status;
   UINTN                         FvProtocolCount;
@@ -120,6 +113,31 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Convert a *.BMP graphics image to a GOP/UGA blt buffer. If a NULL Blt buffer
+  is passed in a GopBlt buffer will be allocated by this routine. If a GopBlt
+  buffer is passed in it will be used if it is big enough.
+
+  @param BmpImage      - Pointer to BMP file
+
+  @param BmpImageSize  - Number of bytes in BmpImage
+
+  @param GopBlt        - Buffer containing GOP version of BmpImage.
+
+  @param GopBltSize    - Size of GopBlt in bytes.
+
+  @param PixelHeight   - Height of GopBlt/BmpImage in pixels
+
+  @param PixelWidth    - Width of GopBlt/BmpImage in pixels
+
+
+  @retval EFI_SUCCESS           - GopBlt and GopBltSize are returned.
+  @retval EFI_UNSUPPORTED       - BmpImage is not a valid *.BMP image
+  @retval EFI_BUFFER_TOO_SMALL  - The passed in GopBlt buffer is not big enough.
+                                  GopBltSize will contain the required size.
+  @retval EFI_OUT_OF_RESOURCES  - No enough buffer to allocate
+
+**/
 STATIC
 EFI_STATUS
 ConvertBmpToGopBlt (
@@ -130,38 +148,7 @@ ConvertBmpToGopBlt (
   OUT UINTN     *PixelHeight,
   OUT UINTN     *PixelWidth
   )
-/*++
 
-Routine Description:
-
-  Convert a *.BMP graphics image to a GOP/UGA blt buffer. If a NULL Blt buffer
-  is passed in a GopBlt buffer will be allocated by this routine. If a GopBlt
-  buffer is passed in it will be used if it is big enough.
-
-Arguments:
-
-  BmpImage      - Pointer to BMP file
-
-  BmpImageSize  - Number of bytes in BmpImage
-
-  GopBlt        - Buffer containing GOP version of BmpImage.
-
-  GopBltSize    - Size of GopBlt in bytes.
-
-  PixelHeight   - Height of GopBlt/BmpImage in pixels
-
-  PixelWidth    - Width of GopBlt/BmpImage in pixels
-
-
-Returns:
-
-  EFI_SUCCESS           - GopBlt and GopBltSize are returned.
-  EFI_UNSUPPORTED       - BmpImage is not a valid *.BMP image
-  EFI_BUFFER_TOO_SMALL  - The passed in GopBlt buffer is not big enough.
-                          GopBltSize will contain the required size.
-  EFI_OUT_OF_RESOURCES  - No enough buffer to allocate
-
---*/
 {
   UINT8             *Image;
   UINT8             *ImageHeader;
@@ -296,30 +283,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
-
-EFI_STATUS
-LockKeyboards (
-  IN  CHAR16    *Password
-  )
-/*++
-
-Routine Description:
+/**
   Use Console Control Protocol to lock the Console In Spliter virtual handle.
   This is the ConInHandle and ConIn handle in the EFI system table. All key
   presses will be ignored until the Password is typed in. The only way to
   disable the password is to type it in to a ConIn device.
 
-Arguments:
-  Password - Password used to lock ConIn device
+  @param  Password - Password used to lock ConIn device
 
-
-Returns:
-
-  EFI_SUCCESS     - ConsoleControl has been flipped to graphics and logo
+  @retval EFI_SUCCESS     - ConsoleControl has been flipped to graphics and logo
                           displayed.
-  EFI_UNSUPPORTED - Logo not found
+  @retval EFI_UNSUPPORTED - Logo not found
 
---*/
+**/
+EFI_STATUS
+LockKeyboards (
+  IN  CHAR16    *Password
+  )
 {
   EFI_STATUS                    Status;
   EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
@@ -333,30 +313,22 @@ Returns:
   return Status;
 }
 
+/**
+  Use Console Control to turn off UGA based Simple Text Out consoles from going
+  to the UGA device. Put up LogoFile on every UGA device that is a console
 
+  @param LogoFile - File name of logo to display on the center of the screen.
+
+  @retval EFI_SUCCESS           - ConsoleControl has been flipped to graphics and logo
+                                  displayed.
+  @retval EFI_UNSUPPORTED       - Logo not found
+
+**/
 EFI_STATUS
 EnableQuietBoot (
   IN  EFI_GUID  *LogoFile
   )
-/*++
 
-Routine Description:
-
-  Use Console Control to turn off UGA based Simple Text Out consoles from going
-  to the UGA device. Put up LogoFile on every UGA device that is a console
-
-Arguments:
-
-  LogoFile - File name of logo to display on the center of the screen.
-
-
-Returns:
-
-  EFI_SUCCESS           - ConsoleControl has been flipped to graphics and logo
-                          displayed.
-  EFI_UNSUPPORTED       - Logo not found
-
---*/
 {
   EFI_STATUS                    Status;
   EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
@@ -571,28 +543,18 @@ Returns:
   return Status;
 }
 
+/**
+  Use Console Control to turn on GOP/UGA based Simple Text Out consoles. The GOP/UGA
+  Simple Text Out screens will now be synced up with all non GOP/UGA output devices
 
+  @retval EFI_SUCCESS           - GOP/UGA devices are back in text mode and synced up.
+  @retval EFI_UNSUPPORTED       - Logo not found
+**/
 EFI_STATUS
 DisableQuietBoot (
   VOID
   )
-/*++
 
-Routine Description:
-
-  Use Console Control to turn on GOP/UGA based Simple Text Out consoles. The GOP/UGA
-  Simple Text Out screens will now be synced up with all non GOP/UGA output devices
-
-Arguments:
-
-  NONE
-
-Returns:
-
-  EFI_SUCCESS           - GOP/UGA devices are back in text mode and synced up.
-  EFI_UNSUPPORTED       - Logo not found
-
---*/
 {
   EFI_STATUS                    Status;
   EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
@@ -624,6 +586,32 @@ static EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
   { 0xff, 0xff, 0xff, 0x00 }
 };
 
+/**
+  Display string worker for: Print, PrintAt, IPrint, IPrintAt
+
+  @param GraphicsOutput  - Graphics output protocol interface
+
+  @param UgaDraw         - UGA draw protocol interface
+
+  @param Sto             - Simple text out protocol interface
+
+  @param X               - X coordinate to start printing
+
+  @param Y               - Y coordinate to start printing
+
+  @param Foreground      - Foreground color
+
+  @param Background      - Background color
+
+  @param fmt             - Format string
+
+  @param args            - Print arguments
+
+
+  @retval EFI_SUCCESS             -  success
+  @retval EFI_OUT_OF_RESOURCES    -  out of resources
+
+**/
 STATIC
 UINTN
 _IPrint (
@@ -637,38 +625,7 @@ _IPrint (
   IN CHAR16                           *fmt,
   IN VA_LIST                          args
   )
-/*++
 
-Routine Description:
-
-  Display string worker for: Print, PrintAt, IPrint, IPrintAt
-
-Arguments:
-
-  GraphicsOutput  - Graphics output protocol interface
-
-  UgaDraw         - UGA draw protocol interface
-
-  Sto             - Simple text out protocol interface
-
-  X               - X coordinate to start printing
-
-  Y               - Y coordinate to start printing
-
-  Foreground      - Foreground color
-
-  Background      - Background color
-
-  fmt             - Format string
-
-  args            - Print arguments
-
-Returns:
-
-  EFI_SUCCESS             -  success
-  EFI_OUT_OF_RESOURCES    -  out of resources
-
---*/
 {
   VOID                           *Buffer;
   EFI_STATUS                     Status;
@@ -812,7 +769,25 @@ Error:
   return Status;
 }
 
+/**
+  Prints a formatted unicode string to the default console
 
+  @param X           - X coordinate to start printing
+
+  @param Y           - Y coordinate to start printing
+
+  @param ForeGround  - Foreground color
+
+  @param BackGround  - Background color
+
+  @param Fmt         - Format string
+
+  @param ...         - Print arguments
+
+
+  @retval Length of string printed to the console
+
+**/
 UINTN
 PrintXY (
   IN UINTN                            X,
@@ -822,31 +797,6 @@ PrintXY (
   IN CHAR16                           *Fmt,
   ...
   )
-/*++
-
-Routine Description:
-
-    Prints a formatted unicode string to the default console
-
-Arguments:
-
-    X           - X coordinate to start printing
-
-    Y           - Y coordinate to start printing
-
-    ForeGround  - Foreground color
-
-    BackGround  - Background color
-
-    Fmt         - Format string
-
-    ...         - Print arguments
-
-Returns:
-
-    Length of string printed to the console
-
---*/
 {
   EFI_HANDLE                    Handle;
 
@@ -894,3 +844,4 @@ Returns:
 
   return _IPrint (GraphicsOutput, UgaDraw, Sto, X, Y, ForeGround, BackGround, Fmt, Args);
 }
+
