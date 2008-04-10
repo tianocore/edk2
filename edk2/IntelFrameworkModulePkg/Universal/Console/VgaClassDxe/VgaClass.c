@@ -384,6 +384,20 @@ IsValidEfiCntlChar (
   IN  CHAR16  c
   );
 
+/**
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  than contains a VgaMiniPort and PciIo protocol can be supported.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 VgaClassDriverBindingSupported (
@@ -391,24 +405,6 @@ VgaClassDriverBindingSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-  
-  Routine Description:
-  
-    Supported.
-    
-  Arguments:
-  
-    (Standard DriverBinding Protocol Supported() function)
-    
-  Returns:
-  
-    EFI_STATUS
-  
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    RemainingDevicePath - add argument and description to function comment
 {
   EFI_STATUS                  Status;
   EFI_VGA_MINI_PORT_PROTOCOL  *VgaMiniPort;
@@ -445,6 +441,21 @@ VgaClassDriverBindingSupported (
   return Status;
 }
 
+/**
+  Start this driver on ControllerHandle by opening a PciIo and VgaMiniPort
+  protocol, creating VGA_CLASS_DEV device and install gEfiSimpleTextOutProtocolGuid
+  finnally.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 VgaClassDriverBindingStart (
@@ -452,26 +463,6 @@ VgaClassDriverBindingStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-  
-  Routine Description:
-  
-    Layers the Simple Text Output Protocol on top of the 
-    VGA Mini Port Protocol
-  
-  Arguments:
-  
-    (Standard DriverBinding Protocol Start() function)
-    
-  Returns:
-  
-    EFI_STATUS
-    
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    RemainingDevicePath - add argument and description to function comment
-// GC_TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 {
   EFI_STATUS                  Status;
   EFI_VGA_MINI_PORT_PROTOCOL  *VgaMiniPort;
@@ -609,6 +600,20 @@ ErrorExit:
 
 }
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 VgaClassDriverBindingStop (
@@ -617,26 +622,6 @@ VgaClassDriverBindingStop (
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
   )
-/*++
-  
-  Routine Description:
-  
-    Stop.
-  
-  Arguments:
-  
-    (Standard DriverBinding Protocol Stop() function)
-  
-  Returns:
-  
-    EFI_STATUS
-  
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    NumberOfChildren - add argument and description to function comment
-// GC_TODO:    ChildHandleBuffer - add argument and description to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                    Status;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *SimpleTextOut;
@@ -694,31 +679,19 @@ VgaClassDriverBindingStop (
 
   return EFI_SUCCESS;
 }
-//
-// Simple Text Output Protocol Functions
-//
+
+/**
+  Reset VgaClass device and clear output.
+  
+  @param This                 Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.
+  @param ExtendedVerification Whether need additional judgement
+**/
 EFI_STATUS
 EFIAPI
 VgaClassReset (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN  BOOLEAN                             ExtendedVerification
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This                  - GC_TODO: add argument description
-  ExtendedVerification  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   EFI_STATUS    Status;
   VGA_CLASS_DEV *VgaClassPrivate;
@@ -741,28 +714,18 @@ Returns:
   return This->ClearScreen (This);
 }
 
+/**
+  Output a string to VgaClass device.
+  
+  @param This                 Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.
+  @param WString              wide chars.
+**/
 EFI_STATUS
 EFIAPI
 VgaClassOutputString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  CHAR16                          *WString
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This    - GC_TODO: add argument description
-  WString - GC_TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   EFI_STATUS                  Status;
   VGA_CLASS_DEV               *VgaClassDev;
@@ -878,29 +841,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Detects if a Unicode char is for Box Drawing text graphics.
+  
+  @param This     Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
+  @param WString  Unicode chars
+  
+  @return if a Unicode char is for Box Drawing text graphics.
+**/
 EFI_STATUS
 EFIAPI
 VgaClassTestString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  CHAR16                          *WString
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This    - GC_TODO: add argument description
-  WString - GC_TODO: add argument description
-
-Returns:
-
-  EFI_UNSUPPORTED - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   while (*WString != 0x0000) {
     if (!(IsValidAscii (*WString) || IsValidEfiCntlChar (*WString) || LibIsValidTextGraphics (*WString, NULL, NULL))) {
@@ -913,26 +867,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Clear Screen via VgaClass device
+  
+  @param This     Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 
+  
+  @retval EFI_SUCESS Success to clear screen
+  @retval Others     Wrong displaying mode.
+**/
 EFI_STATUS
 EFIAPI
 VgaClassClearScreen (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This  - GC_TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   EFI_STATUS    Status;
   VGA_CLASS_DEV *VgaClassDev;
@@ -968,29 +915,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Set displaying mode's attribute
+  
+  @param This      Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 
+  @param Attribute Mode's attribute
+  
+  @param EFI_SUCCESS      Success to set attribute
+  @param EFI_UNSUPPORTED  Wrong mode's attribute wanted to be set
+**/
 EFI_STATUS
 EFIAPI
 VgaClassSetAttribute (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  UINTN                           Attribute
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This      - GC_TODO: add argument description
-  Attribute - GC_TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - GC_TODO: Add description for return value
-  EFI_UNSUPPORTED - GC_TODO: Add description for return value
-
---*/
 {
   if (Attribute <= EFI_MAX_ATTRIBUTE) {
     This->Mode->Attribute = (INT32) Attribute;
@@ -1000,6 +939,16 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Set cursor position.
+  
+  @param This      Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 
+  @param Column    Column of new cursor position.
+  @param Row       Row of new cursor position.
+  
+  @retval EFI_SUCCESS Sucess to set cursor's position.
+  @retval Others      Wrong current displaying mode.
+**/
 EFI_STATUS
 EFIAPI
 VgaClassSetCursorPosition (
@@ -1007,24 +956,6 @@ VgaClassSetCursorPosition (
   IN  UINTN                           Column,
   IN  UINTN                           Row
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This    - GC_TODO: add argument description
-  Column  - GC_TODO: add argument description
-  Row     - GC_TODO: add argument description
-
-Returns:
-
-  EFI_UNSUPPORTED - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   EFI_STATUS    Status;
   VGA_CLASS_DEV *VgaClassDev;
@@ -1055,28 +986,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Enable cursor to display or not.
+  
+  @param This      Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 
+  @param Visible   Display cursor or not.
+  
+  @retval EFI_SUCESS Success to display the cursor or not.
+**/
 EFI_STATUS
 EFIAPI
 VgaClassEnableCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  BOOLEAN                         Visible
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This    - GC_TODO: add argument description
-  Visible - GC_TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   VGA_CLASS_DEV *VgaClassDev;
 
@@ -1101,6 +1024,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Query colum and row according displaying mode number
+  The mode:
+  0: 80 * 25
+  1: 80 * 50
+  
+  @param This       Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
+  @param ModeNumber Mode number
+  @param Columns    return the columen in current mode number
+  @param Rows       return the row in current mode number.
+  
+  @return EFI_SUCCESS     Sucess to get columns and rows according to mode number
+  @return EFI_UNSUPPORTED Unsupported mode number
+**/
 EFI_STATUS
 EFIAPI
 VgaClassQueryMode (
@@ -1109,26 +1046,6 @@ VgaClassQueryMode (
   OUT UINTN                           *Columns,
   OUT UINTN                           *Rows
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This        - GC_TODO: add argument description
-  ModeNumber  - GC_TODO: add argument description
-  Columns     - GC_TODO: add argument description
-  Rows        - GC_TODO: add argument description
-
-Returns:
-
-  EFI_UNSUPPORTED - GC_TODO: Add description for return value
-  EFI_UNSUPPORTED - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   if ((INT32) ModeNumber >= This->Mode->MaxMode) {
     *Columns  = 0;
@@ -1156,28 +1073,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Set displaying mode number
+  
+  @param This       Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
+  @param ModeNumber mode number
+  
+  @retval EFI_UNSUPPORTED Unsupported mode number in parameter
+  @retval EFI_SUCCESS     Success to set the mode number.
+**/
 EFI_STATUS
 EFIAPI
 VgaClassSetMode (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  UINTN                           ModeNumber
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This        - GC_TODO: add argument description
-  ModeNumber  - GC_TODO: add argument description
-
-Returns:
-
-  EFI_UNSUPPORTED - GC_TODO: Add description for return value
-
---*/
 {
   EFI_STATUS    Status;
   VGA_CLASS_DEV *VgaClassDev;
@@ -1196,9 +1106,16 @@ Returns:
 
   return Status;
 }
-//
-// Private Worker Functions
-//
+
+/**
+  Set logic cursor's position to VgaClass device
+  
+  @param VgaClassDev device instance object
+  @param Column      cursor logic position.
+  @param Row         cursor logic position.
+  @param MaxColumn   max logic column
+  
+**/
 STATIC
 VOID
 SetVideoCursorPosition (
@@ -1207,24 +1124,6 @@ SetVideoCursorPosition (
   IN  UINTN          Row,
   IN  UINTN          MaxColumn
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  VgaClassDev - GC_TODO: add argument description
-  Column      - GC_TODO: add argument description
-  Row         - GC_TODO: add argument description
-  MaxColumn   - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   Column    = Column & 0xff;
   Row       = Row & 0xff;
@@ -1241,6 +1140,13 @@ Returns:
     );
 }
 
+/**
+  Program CRTC register via PCI IO.
+  
+  @param VgaClassDev  device instance object
+  @param Address      address
+  @param Data         data
+**/
 STATIC
 VOID
 WriteCrtc (
@@ -1248,23 +1154,6 @@ WriteCrtc (
   IN  UINT16         Address,
   IN  UINT8          Data
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  VgaClassDev - GC_TODO: add argument description
-  Address     - GC_TODO: add argument description
-  Data        - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   VgaClassDev->PciIo->Io.Write (
                           VgaClassDev->PciIo,
@@ -1285,6 +1174,16 @@ Returns:
                           );
 }
 
+/**
+  Detects if a Unicode char is for Box Drawing text graphics.
+
+  @param Grphic   Unicode char to test.
+  @param PcAnsi   Optional pointer to return PCANSI equivalent of Graphic.
+  @param Asci     Optional pointer to return Ascii equivalent of Graphic.
+
+  @return TRUE if Gpaphic is a supported Unicode Box Drawing character.
+
+**/
 STATIC
 BOOLEAN
 LibIsValidTextGraphics (
@@ -1292,26 +1191,6 @@ LibIsValidTextGraphics (
   OUT CHAR8   *PcAnsi, OPTIONAL
   OUT CHAR8   *Ascii OPTIONAL
   )
-/*++
-
-Routine Description:
-
-    Detects if a Unicode char is for Box Drawing text graphics.
-
-Arguments:
-
-    Grphic  - Unicode char to test.
-
-    PcAnsi  - Optional pointer to return PCANSI equivalent of Graphic.
-
-    Asci    - Optional pointer to return Ascii equivalent of Graphic.
-
-Returns:
-
-    TRUE if Gpaphic is a supported Unicode Box Drawing character.
-
---*/
-// GC_TODO:    Graphic - add argument and description to function comment
 {
   UNICODE_TO_CHAR *Table;
 
@@ -1340,26 +1219,17 @@ Returns:
   return FALSE;
 }
 
+/**
+  Judge whether is an ASCII char.
+  
+  @param Ascii character
+  @return whether is an ASCII char.
+**/
 STATIC
 BOOLEAN
 IsValidAscii (
   IN  CHAR16  Ascii
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Ascii - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   if ((Ascii >= 0x20) && (Ascii <= 0x7f)) {
     return TRUE;
@@ -1368,26 +1238,17 @@ Returns:
   return FALSE;
 }
 
+/**
+  Judge whether is diplaying control character.
+  
+  @param c character
+  @return whether is diplaying control character.
+**/
 STATIC
 BOOLEAN
 IsValidEfiCntlChar (
   IN  CHAR16  c
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  c - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   if (c == CHAR_NULL || c == CHAR_BACKSPACE || c == CHAR_LINEFEED || c == CHAR_CARRIAGE_RETURN) {
     return TRUE;
@@ -1395,3 +1256,4 @@ Returns:
 
   return FALSE;
 }
+
