@@ -1,24 +1,19 @@
-//++
-// Copyright (c) 2006, Intel Corporation                                                         
-// All rights reserved. This program and the accompanying materials                          
-// are licensed and made available under the terms and conditions of the BSD License         
-// which accompanies this distribution.  The full text of the license may be found at        
-// http://opensource.org/licenses/bsd-license.php                                            
-//                                                                                           
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-// 
-// Module Name:
-//
-//   EbcLowLevel.s
-//
-// Abstract:
-//
-//   Contains low level routines for the Virtual Machine implementation
-//   on an Itanium-based platform.
-//
-//
-//--
+/// @file
+///  Contains low level routines for the Virtual Machine implementation
+///  on an Itanium-based platform.
+///
+/// Copyright (c) 2006, Intel Corporation
+/// All rights reserved. This program and the accompanying materials
+/// are licensed and made available under the terms and conditions of the BSD License
+/// which accompanies this distribution.  The full text of the license may be found at
+/// http://opensource.org/licenses/bsd-license.php
+///
+/// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+///
+/// Module Name: EbcLowLevel.s
+///
+///
 
 .file  "EbcLowLevel.s"
 
@@ -40,7 +35,7 @@ name::
          mov ar##.##pfs=loc1 ;;\
          br##.##ret##.##dpnt  b0;;
 
-.type CopyMem, @function;  
+.type CopyMem, @function;
 
 //-----------------------------------------------------------------------------
 //++
@@ -51,16 +46,16 @@ name::
 //  calls the native function. On return it restores the original
 //  stack pointer and returns to the caller.
 //
-// Arguments : 
+// Arguments :
 //
 // On Entry :
 //    in0 = Address of native code to call
 //    in1 = New stack pointer
 //
-// Return Value: 
-// 
-// As per static calling conventions. 
-// 
+// Return Value:
+//
+// As per static calling conventions.
+//
 //--
 //---------------------------------------------------------------------------
 ;// void EbcAsmLLCALLEX (UINTN FunctionAddr, UINTN EbcStackPointer)
@@ -75,7 +70,7 @@ PROCEDURE_ENTRY(EbcAsmLLCALLEX)
   mov r8 = in1;;
 
   //
-  // Copy stack arguments from EBC stack into registers. 
+  // Copy stack arguments from EBC stack into registers.
   // Assume worst case and copy 8.
   //
   ld8   out0 = [r8], 8;;
@@ -98,7 +93,7 @@ PROCEDURE_ENTRY(EbcAsmLLCALLEX)
   or    loc3 = r1, r0
 
   //
-  // Set the new aligned stack pointer. Reserve space for the required 
+  // Set the new aligned stack pointer. Reserve space for the required
   // 16-bytes of scratch area as well.
   //
   add  r12 = 48, in1
@@ -129,13 +124,13 @@ PROCEDURE_EXIT(EbcAsmLLCALLEX)
 
 PROCEDURE_ENTRY(EbcLLCALLEXNative)
   NESTED_SETUP (3,6,3,0)
-  
+
   mov   loc2 = in2;;
   mov   loc3 = in1;;
   sub   loc2 = loc2, loc3
   mov   loc4 = r12;;
   or    loc5 = r1, r0
-  
+
   sub   r12 = r12, loc2
   mov   out2 = loc2;;
 
@@ -145,13 +140,13 @@ PROCEDURE_ENTRY(EbcLLCALLEXNative)
   adds  r12 = -0x8, r12
   (p0) br.call.dptk.many b0 = CopyMem;;
   adds  r12 = 0x8, r12
- 
+
   mov   out0 = in0;;
   mov   out1 = r12;;
   (p0) br.call.dptk.many b0 = EbcAsmLLCALLEX;;
   mov   r12 = loc4;;
   or    r1 = loc5, r0
-  
+
   NESTED_RETURN
 PROCEDURE_EXIT(EbcLLCALLEXNative)
 
@@ -186,7 +181,7 @@ PROCEDURE_EXIT(EbcLLGetReturnValue)
 PROCEDURE_ENTRY(EbcLLGetStackPointer)
     mov    r8 = r12 ;;
     br.ret.sptk  b0 ;;
-    br.sptk.few b6 
+    br.sptk.few b6
 PROCEDURE_EXIT(EbcLLGetStackPointer)
 
 

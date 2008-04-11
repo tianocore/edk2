@@ -256,6 +256,7 @@ UdpIoFreeRxToken (
 
 **/
 UDP_IO_PORT *
+EFIAPI
 UdpIoCreatePort (
   IN  EFI_HANDLE            Controller,
   IN  EFI_HANDLE            Image,
@@ -387,6 +388,7 @@ UdpIoCancelDgrams (
 
 **/
 EFI_STATUS
+EFIAPI
 UdpIoFreePort (
   IN  UDP_IO_PORT           *UdpIo
   )
@@ -444,6 +446,7 @@ UdpIoFreePort (
 
 **/
 VOID
+EFIAPI
 UdpIoCleanPort (
   IN  UDP_IO_PORT           *UdpIo
   )
@@ -532,6 +535,7 @@ UdpIoOnDgramSent (
 
 **/
 EFI_STATUS
+EFIAPI
 UdpIoSendDatagram (
   IN  UDP_IO_PORT           *UdpIo,
   IN  NET_BUF               *Packet,
@@ -604,6 +608,7 @@ UdpIoCancelSingleDgram (
 
 **/
 VOID
+EFIAPI
 UdpIoCancelSentDatagram (
   IN  UDP_IO_PORT           *UdpIo,
   IN  NET_BUF               *Packet
@@ -772,6 +777,7 @@ Returns:
 
 **/
 EFI_STATUS
+EFIAPI
 UdpIoRecvDatagram (
   IN  UDP_IO_PORT           *UdpIo,
   IN  UDP_IO_CALLBACK       CallBack,

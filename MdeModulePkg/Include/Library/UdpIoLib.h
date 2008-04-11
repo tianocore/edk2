@@ -1,6 +1,8 @@
 /** @file
+  The helper routines to access UDP service. It is used by both
+  DHCP and MTFTP.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,17 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Udp4Io.h
-
-Abstract:
-
-  The helper routines to access UDP service. It is used by both
-  DHCP and MTFTP.
-
 
 **/
 
@@ -133,7 +124,21 @@ BOOLEAN
   IN VOID                   *Context
   );
 
+/**
+  Create a UDP IO port to access the UDP service. It will
+  create and configure a UDP child.
+
+  @param  Controller            The controller that has the UDP service binding
+                                protocol installed.
+  @param  Image                 The image handle for the driver.
+  @param  Configure             The function to configure the created UDP child
+  @param  Context               The opaque parameter for the Configure funtion.
+
+  @return A point to just created UDP IO port or NULL if failed.
+
+**/
 UDP_IO_PORT *
+EFIAPI
 UdpIoCreatePort (
   IN  EFI_HANDLE            Controller,
   IN  EFI_HANDLE            ImageHandle,
@@ -141,17 +146,55 @@ UdpIoCreatePort (
   IN  VOID                  *Context
   );
 
+/**
+  Free the UDP IO port and all its related resources including
+  all the transmitted packet.
+
+  @param  UdpIo                 The UDP IO port to free.
+
+  @retval EFI_SUCCESS           The UDP IO port is freed.
+
+**/
 EFI_STATUS
+EFIAPI
 UdpIoFreePort (
   IN  UDP_IO_PORT           *UdpIo
   );
 
+/**
+  Clean up the UDP IO port. It will release all the transmitted
+  datagrams and receive request. It will also configure NULL the
+  UDP child.
+
+  @param  UdpIo                 UDP IO port to clean up.
+
+  @return None
+
+**/
 VOID
+EFIAPI
 UdpIoCleanPort (
   IN  UDP_IO_PORT           *UdpIo
   );
 
+/**
+  Send a packet through the UDP IO port.
+
+  @param  UdpIo                 The UDP IO Port to send the packet through
+  @param  Packet                The packet to send
+  @param  EndPoint              The local and remote access point
+  @param  Gateway               The gateway to use
+  @param  CallBack              The call back function to call when packet is
+                                transmitted or failed.
+  @param  Context               The opque parameter to the CallBack
+
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the packet
+  @retval EFI_SUCCESS           The packet is successfully delivered to UDP  for
+                                transmission.
+
+**/
 EFI_STATUS
+EFIAPI
 UdpIoSendDatagram (
   IN  UDP_IO_PORT           *UdpIo,
   IN  NET_BUF               *Packet,
@@ -161,13 +204,39 @@ UdpIoSendDatagram (
   IN  VOID                  *Context
   );
 
+/**
+  The selection function to cancel a single sent datagram.
+
+  @param  Token                 The UDP TX token to test againist.
+  @param  Context               The context
+
+  @return TRUE if the packet is to be cancelled, otherwise FALSE.
+
+**/
 VOID
+EFIAPI
 UdpIoCancelSentDatagram (
   IN  UDP_IO_PORT           *UdpIo,
   IN  NET_BUF               *Packet
   );
 
+/**
+  Issue a receive request to the UDP IO port.
+
+  @param  UdpIo                 The UDP IO port to recieve the packet from.
+  @param  CallBack              The call back function to execute when receive
+                                finished.
+  @param  Context               The opque context to the call back
+  @param  HeadLen               The lenght of the application's header
+
+  @retval EFI_ALREADY_STARTED   There is already a pending receive request. Only
+                                one receive request is supported.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate some resource.
+  @retval EFI_SUCCESS           The receive request is issued successfully.
+
+**/
 EFI_STATUS
+EFIAPI
 UdpIoRecvDatagram (
   IN  UDP_IO_PORT           *UdpIo,
   IN  UDP_IO_CALLBACK       CallBack,

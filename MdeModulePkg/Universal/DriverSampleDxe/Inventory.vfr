@@ -1,25 +1,17 @@
-// *++
+///** @file
 //
-// Copyright (c) 2007, Intel Corporation
-// All rights reserved. This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution.  The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
+//    Sample Inventory Data
 //
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//  Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+//  All rights reserved. This program and the accompanying materials
+//  are licensed and made available under the terms and conditions of the BSD License
+//  which accompanies this distribution.  The full text of the license may be found at
+//  http://opensource.org/licenses/bsd-license.php
 //
-// Module Name:
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
-//   Inventory.vfr
-//
-// Abstract:
-//
-//   Sample Inventory Data.
-//
-// Revision History:
-//
-// --*/
+//**/
 
 #define INVENTORY_GUID    { 0xb3f56470, 0x6141, 0x4621, 0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8 }
 

@@ -1,31 +1,21 @@
+;/** @file
+;  This code provides low level routines that support the Virtual Machine.
+;  for option ROMs.
+;
+;  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+;  All rights reserved. This program and the accompanying materials
+;  are licensed and made available under the terms and conditions of the BSD License
+;  which accompanies this distribution.  The full text of the license may be found at
+;  http://opensource.org/licenses/bsd-license.php
+;
+;  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+;  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+;
+;**/
+
+
   page    ,132
   title   VM ASSEMBLY LANGUAGE ROUTINES
-;****************************************************************************
-;*                                                                         
-;*  Copyright (c) 2006, Intel Corporation                                                         
-;*  All rights reserved. This program and the accompanying materials                          
-;*  are licensed and made available under the terms and conditions of the BSD License         
-;*  which accompanies this distribution.  The full text of the license may be found at        
-;*  http://opensource.org/licenses/bsd-license.php                                            
-;*                                                                                            
-;*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-;*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-;*                                                                          
-;****************************************************************************
-;****************************************************************************
-;                                   REV 1.0
-;****************************************************************************
-;
-; Rev  Date      Description
-; ---  --------  ------------------------------------------------------------
-; 1.0  05/09/12  Initial creation of file.
-;
-;****************************************************************************
-                             
-;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-; This code provides low level routines that support the Virtual Machine
-; for option ROMs. 
-;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 ;---------------------------------------------------------------------------
 ; Equate files needed.
@@ -40,10 +30,10 @@ text SEGMENT
 ;****************************************************************************
 ; EbcLLCALLEX
 ;
-; This function is called to execute an EBC CALLEX instruction. 
+; This function is called to execute an EBC CALLEX instruction.
 ; This instruction requires that we thunk out to external native
 ; code. For x64, we switch stacks, copy the arguments to the stack
-; and jump to the specified function. 
+; and jump to the specified function.
 ; On return, we restore the stack pointer to its original location.
 ;
 ; Destroys no working registers.
@@ -58,7 +48,7 @@ EbcLLCALLEXNative        PROC    PUBLIC
       push   rbx
       mov    rbp, rsp
       ; Function prolog
-      
+
       ; Copy FuncAddr to a preserved register.
       mov    rbx, rcx
 
@@ -67,9 +57,9 @@ EbcLLCALLEXNative        PROC    PUBLIC
       sub    rsp, r8
       mov    rcx, rsp
       sub    rsp, 20h
-      call   CopyMem      
+      call   CopyMem
       add    rsp, 20h
-      
+
       ; Considering the worst case, load 4 potiential arguments
       ; into registers.
       mov    rcx, qword ptr [rsp]
@@ -79,7 +69,7 @@ EbcLLCALLEXNative        PROC    PUBLIC
 
       ; Now call the external routine
       call  rbx
-      
+
       ; Function epilog
       mov      rsp, rbp
       pop      rbx
@@ -92,7 +82,7 @@ EbcLLCALLEXNative    ENDP
 ; Routine Description:
 ;   The VM thunk code stuffs an EBC entry point into a processor
 ;   register. Since we can't use inline assembly to get it from
-;   the interpreter C code, stuff it into the return value 
+;   the interpreter C code, stuff it into the return value
 ;   register and return.
 ;
 ; Arguments:
@@ -108,7 +98,7 @@ EbcLLGetEbcEntryPoint    ENDP
 ;/*++
 ;
 ;Routine Description:
-;  
+;
 ;  Return the caller's value of the stack pointer.
 ;
 ;Arguments:
@@ -123,7 +113,7 @@ EbcLLGetEbcEntryPoint    ENDP
 ;
 ;--*/
 
-; UINTN EbcLLGetStackPointer()            
+; UINTN EbcLLGetStackPointer()
 EbcLLGetStackPointer        PROC    PUBLIC
     mov    rax, rsp      ; get current stack pointer
     ; Stack adjusted by this much when we were called,

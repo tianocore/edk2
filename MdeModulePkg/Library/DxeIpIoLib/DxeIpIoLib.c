@@ -783,6 +783,7 @@ IpIoListenHandler (
 
 **/
 IP_IO *
+EFIAPI
 IpIoCreate (
   IN EFI_HANDLE Image,
   IN EFI_HANDLE Controller
@@ -851,6 +852,7 @@ ReleaseIpIo:
 
 **/
 EFI_STATUS
+EFIAPI
 IpIoOpen (
   IN IP_IO           *IpIo,
   IN IP_IO_OPEN_DATA *OpenData
@@ -984,6 +986,7 @@ IpIoStop (
 
 **/
 EFI_STATUS
+EFIAPI
 IpIoDestroy (
   IN IP_IO *IpIo
   )
@@ -1022,6 +1025,7 @@ IpIoDestroy (
 
 **/
 EFI_STATUS
+EFIAPI
 IpIoSend (
   IN IP_IO           *IpIo,
   IN NET_BUF         *Pkt,
@@ -1072,6 +1076,7 @@ IpIoSend (
 
 **/
 VOID
+EFIAPI
 IpIoCancelTxToken (
   IN IP_IO  *IpIo,
   IN VOID   *Packet
@@ -1109,6 +1114,7 @@ IpIoCancelTxToken (
 
 **/
 IP_IO_IP_INFO *
+EFIAPI
 IpIoAddIp (
   IN IP_IO  *IpIo
   )
@@ -1199,6 +1205,7 @@ ReleaseIpInfo:
 
 **/
 EFI_STATUS
+EFIAPI
 IpIoConfigIp (
   IN     IP_IO_IP_INFO        *IpInfo,
   IN OUT EFI_IP4_CONFIG_DATA  *Ip4ConfigData OPTIONAL
@@ -1269,6 +1276,7 @@ OnExit:
 
 **/
 VOID
+EFIAPI
 IpIoRemoveIp (
   IN IP_IO          *IpIo,
   IN IP_IO_IP_INFO  *IpInfo
@@ -1307,6 +1315,7 @@ IpIoRemoveIp (
 
 **/
 IP_IO_IP_INFO *
+EFIAPI
 IpIoFindSender (
   IN OUT IP_IO     **IpIo,
   IN     IP4_ADDR  Src
@@ -1355,6 +1364,7 @@ IpIoFindSender (
 
 **/
 EFI_STATUS
+EFIAPI
 IpIoGetIcmpErrStatus (
   IN  ICMP_ERROR  IcmpError,
   OUT BOOLEAN     *IsHard, OPTIONAL
