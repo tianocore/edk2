@@ -23,7 +23,7 @@ Abstract:
 #ifndef __EDKII_GLUE_BASE_TYPES_H__
 #define __EDKII_GLUE_BASE_TYPES_H__
 
-#include "..\EdkIIGlueConfig.h"
+#include "../EdkIIGlueConfig.h"
 
 #define BREAKPOINT      EFI_BREAKPOINT
 #define DEADLOOP        EFI_DEADLOOP

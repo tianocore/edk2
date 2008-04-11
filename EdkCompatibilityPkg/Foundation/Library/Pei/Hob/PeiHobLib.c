@@ -22,8 +22,8 @@ Abstract:
 
 #include "Tiano.h"
 #include "PeiHob.h"
-#include "peihoblib.h"
-#include "peilib.h"
+#include "PeiHobLib.h"
+#include "PeiLib.h"
 #include EFI_GUID_DEFINITION(MemoryAllocationHob)
 
 

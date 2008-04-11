@@ -25,7 +25,7 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (LoadedImage)
 #include EFI_GUID_DEFINITION (Hob)
 #include EFI_GUID_DEFINITION (PeiPerformanceHob)
-#include "linkedlist.h"
+#include "LinkedList.h"
 #include "EfiHobLib.h"
 #include "EfiImage.h"
 
