@@ -53,7 +53,10 @@ typedef UINT64 EFI_LBA;
 #define OUT
 #define OPTIONAL
 #endif
+
+#ifndef UNALIGNED
 #define UNALIGNED
+#endif
 
 //
 // Modifiers for EFI Runtime and Boot Services
