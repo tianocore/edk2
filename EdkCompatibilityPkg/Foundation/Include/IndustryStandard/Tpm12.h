@@ -1007,9 +1007,6 @@ typedef struct tdTPM_EK_BLOB_AUTH
 } TPM_EK_BLOB_AUTH;
 
 
-// TPM_CHOSENID_HASH = SHA(identityLabel || privacyCA)
-typedef TPM_DIGEST                  TPM_CHOSENID_HASH;
-
 typedef struct tdTPM_IDENTITY_CONTENTS
 {
     TPM_STRUCT_VER                  ver;
