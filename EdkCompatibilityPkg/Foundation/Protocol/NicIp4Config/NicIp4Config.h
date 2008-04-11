@@ -33,7 +33,7 @@ Abstract:
 
 typedef struct _EFI_NIC_IP4_CONFIG_PROTOCOL EFI_NIC_IP4_CONFIG_PROTOCOL;
 
-typedef enum {
+enum {
   //
   // Config source: dhcp or static
   //
@@ -106,7 +106,6 @@ EFI_STATUS
   IN  NIC_ADDR                    *NicAddr       OPTIONAL 
   );
 
-typedef 
 struct _EFI_NIC_IP4_CONFIG_PROTOCOL {
   EFI_NIC_IP4_CONFIG_GET_NAME     GetName;
   EFI_NIC_IP4_CONFIG_GET_INFO     GetInfo;
