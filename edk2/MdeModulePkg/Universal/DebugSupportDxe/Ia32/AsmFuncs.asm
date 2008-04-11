@@ -1,15 +1,16 @@
-;******************************************************************************
-;*
-;* Copyright (c) 2006, Intel Corporation                                                         
-;* All rights reserved. This program and the accompanying materials                          
-;* are licensed and made available under the terms and conditions of the BSD License         
-;* which accompanies this distribution.  The full text of the license may be found at        
-;* http://opensource.org/licenses/bsd-license.php                                            
-;*                                                                                           
-;* THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-;* WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-;*
-;******************************************************************************
+;/** @file
+;  Low leve IA32 specific debug support functions.
+;
+;  Copyright (c) 2006, Intel Corporation. <BR>
+;  All rights reserved. This program and the accompanying materials
+;  are licensed and made available under the terms and conditions of the BSD License
+;  which accompanies this distribution.  The full text of the license may be found at
+;  http://opensource.org/licenses/bsd-license.php
+;
+;  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+;  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+;
+;**/
 
 .586p
 .MODEL          FLAT, C
@@ -95,7 +96,7 @@ OrigVector      dd      66666666h ; ?
 align           16
 DebugStackEnd   db      "DbgStkEnd >>>>>>"      ;; 16 byte long string - must be 16 bytes to preserve alignment
                 dd      1ffdh dup (000000000h)  ;; 32K should be enough stack
-                                                ;;   This allocation is coocked to insure 
+                                                ;;   This allocation is coocked to insure
                                                 ;;   that the the buffer for the FXSTORE instruction
                                                 ;;   will be 16 byte aligned also.
                                                 ;;

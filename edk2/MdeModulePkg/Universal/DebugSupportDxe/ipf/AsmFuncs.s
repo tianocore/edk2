@@ -1,24 +1,18 @@
-//++
-// Copyright (c) 2006, Intel Corporation                                                         
-// All rights reserved. This program and the accompanying materials                          
-// are licensed and made available under the terms and conditions of the BSD License         
-// which accompanies this distribution.  The full text of the license may be found at        
-// http://opensource.org/licenses/bsd-license.php                                            
-//                                                                                           
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-// 
-// Module Name:
-//
-//  AsmFuncs.s
-//
-// Abstract:
-//
-//  Low level IPF routines used by the debug support driver
-//
-// Revision History:
-//
-//--
+/// @file
+///  Low level IPF routines used by the debug support driver
+///
+/// Copyright (c) 2006, Intel Corporation
+/// All rights reserved. This program and the accompanying materials
+/// are licensed and made available under the terms and conditions of the BSD License
+/// which accompanies this distribution.  The full text of the license may be found at
+/// http://opensource.org/licenses/bsd-license.php
+///
+/// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+///
+/// Module Name: AsmFuncs.s
+///
+///
 
 
 #include "common.i"
@@ -127,32 +121,32 @@ LoopBack:   // $L143:
 //      our chained handler installed:
 //
 //
-//                                                 
-//                                                 
-//                           
-//      This IVT entry is      Failsafe bundle     
-//      reserved by the         
-//      Itanium architecture   Original bundle 0   
-//      and is used for         
-//      for locating our                           
-//      handler and the                            
-//      original bundle        Patch code...       
-//      zero of the ext                            
-//      interrupt handler                          
-//                              
-//      RSVD    (3400)         Unused              
-//                           
-//                                                 
-//                                                 
-//                                                 
-//                                                 
-//                                                 
-//                                                 
-//                                                 
-//                                                 
-//                                                 
-//                                                 
-//                              
+//
+//
+//
+//      This IVT entry is      Failsafe bundle
+//      reserved by the
+//      Itanium architecture   Original bundle 0
+//      and is used for
+//      for locating our
+//      handler and the
+//      original bundle        Patch code...
+//      zero of the ext
+//      interrupt handler
+//
+//      RSVD    (3400)         Unused
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //      EXT_INT (3000)         Bundle 0               Bundle zero - This one is
 //                                modified, all other bundles
 //                                                       in the EXT_INT entry are
@@ -430,7 +424,7 @@ RelocateSlot:
         add         loc3=loc2, in1;;            // loc3 = physical address of branch target
 (p14)   sub         loc2=r0,loc2;;              // flip sign in loc2 if offset is negative
         sub         loc4=loc3,in2;;             // loc4 = relative offset from new ip to branch target
-        cmp.lt      p15, p14 = 0, loc4;;        // get new sign bit 
+        cmp.lt      p15, p14 = 0, loc4;;        // get new sign bit
 (p14)   sub         loc5=r0,loc4                // get absolute value of offset
 (p15)   mov         loc5=loc4;;
         movl        loc6=0x0FFFFFF;;            // maximum offset in bytes for ip-rel branch
@@ -1230,7 +1224,7 @@ HookHandler:
   // the backing store.  The processor, however may not be aware that the
   // stacked registers need to be reloaded from the backing store.  Therefore,
   // we explicitly cause the RSE to refresh the stacked register's contents
-  // from the backing store.  
+  // from the backing store.
         mov         loc0=ar.rsc                 // get RSC value
         mov         loc1=ar.rsc                 // save it so we can restore it
         movl        loc3=0xffffffffc000ffff;;   // create mask for clearing RSC.loadrs
@@ -1307,7 +1301,7 @@ PatchCode:
         movl      SCRATCH_REG1 = ~( MASK(PSR_DT,1) | MASK(PSR_RT,1));;
         and       SCRATCH_REG1 = SCRATCH_REG0, SCRATCH_REG1;;
         mov       psr.l = SCRATCH_REG1;;
-        srlz.d  
+        srlz.d
         tbit.z    p14, p15 = SCRATCH_REG6, PSR_IS;;   // Check to see if we were
                                                       // interrupted from IA32
                                                       // context.  If so, bail out

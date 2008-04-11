@@ -41,6 +41,7 @@ Abstract:
 
 **/
 EFI_STATUS
+EFIAPI
 QueueDpc (
   IN EFI_TPL            DpcTpl,
   IN EFI_DPC_PROCEDURE  DpcProcedure,
@@ -58,6 +59,7 @@ QueueDpc (
 
 **/
 EFI_STATUS
+EFIAPI
 DispatchDpc (
   VOID
   );

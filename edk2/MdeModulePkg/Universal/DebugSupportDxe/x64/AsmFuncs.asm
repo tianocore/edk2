@@ -1,15 +1,16 @@
-;******************************************************************************
-;*
-;* Copyright (c) 2006, Intel Corporation                                                         
-;* All rights reserved. This program and the accompanying materials                          
-;* are licensed and made available under the terms and conditions of the BSD License         
-;* which accompanies this distribution.  The full text of the license may be found at        
-;* http://opensource.org/licenses/bsd-license.php                                            
-;*                                                                                           
-;* THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-;* WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-;*
-;******************************************************************************
+;/** @file
+;  Low level x64 routines used by the debug support driver.
+;
+;  Copyright (c) 2007 - 2008, Intel Corporation. <BR>
+;  All rights reserved. This program and the accompanying materials
+;  are licensed and made available under the terms and conditions of the BSD License
+;  which accompanies this distribution.  The full text of the license may be found at
+;  http://opensource.org/licenses/bsd-license.php
+;
+;  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+;  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+;
+;**/
 
 EXCPT64_DIVIDE_ERROR     EQU    0
 EXCPT64_DEBUG            EQU    1
@@ -93,7 +94,7 @@ OrigVector      dq      6666666666666666h ; ?
 align           16
 DebugStackEnd   db      "DbgStkEnd >>>>>>"      ;; 16 byte long string - must be 16 bytes to preserve alignment
                 dd      1ffch dup (000000000h)  ;; 32K should be enough stack
-                                                ;;   This allocation is coocked to insure 
+                                                ;;   This allocation is coocked to insure
                                                 ;;   that the the buffer for the FXSTORE instruction
                                                 ;;   will be 16 byte aligned also.
                                                 ;;

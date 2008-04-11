@@ -100,6 +100,7 @@ FreeNbuf:
 
 **/
 NET_BUF  *
+EFIAPI
 NetbufAlloc (
   IN UINT32                 Len
   )
@@ -202,6 +203,7 @@ NetbufFreeVector (
 
 **/
 VOID
+EFIAPI
 NetbufFree (
   IN NET_BUF                *Nbuf
   )
@@ -231,6 +233,7 @@ NetbufFree (
 
 **/
 NET_BUF  *
+EFIAPI
 NetbufClone (
   IN NET_BUF                *Nbuf
   )
@@ -278,6 +281,7 @@ NetbufClone (
 
 **/
 NET_BUF  *
+EFIAPI
 NetbufDuplicate (
   IN NET_BUF                *Nbuf,
   IN NET_BUF                *Duplicate        OPTIONAL,
@@ -319,6 +323,7 @@ NetbufDuplicate (
 
 **/
 VOID
+EFIAPI
 NetbufFreeList (
   IN LIST_ENTRY             *Head
   )
@@ -356,6 +361,7 @@ NetbufFreeList (
 
 **/
 UINT8  *
+EFIAPI
 NetbufGetByte (
   IN  NET_BUF               *Nbuf,
   IN  UINT32                Offset,
@@ -517,6 +523,7 @@ NetbufGetFragmentFree (
 
 **/
 NET_BUF  *
+EFIAPI
 NetbufGetFragment (
   IN NET_BUF                *Nbuf,
   IN UINT32                 Offset,
@@ -699,6 +706,7 @@ FreeChild:
 
 **/
 NET_BUF  *
+EFIAPI
 NetbufFromExt (
   IN NET_FRAGMENT           *ExtFragment,
   IN UINT32                 ExtNum,
@@ -869,6 +877,7 @@ FreeFirstBlock:
 
 **/
 EFI_STATUS
+EFIAPI
 NetbufBuildExt (
   IN NET_BUF                *Nbuf,
   IN NET_FRAGMENT           *ExtFragment,
@@ -915,6 +924,7 @@ NetbufBuildExt (
 
 **/
 NET_BUF  *
+EFIAPI
 NetbufFromBufList (
   IN LIST_ENTRY             *BufList,
   IN UINT32                 HeadSpace,
@@ -988,6 +998,7 @@ NetbufFromBufList (
 
 **/
 VOID
+EFIAPI
 NetbufReserve (
   IN NET_BUF                *Nbuf,
   IN UINT32                 Len
@@ -1019,6 +1030,7 @@ NetbufReserve (
 
 **/
 UINT8  *
+EFIAPI
 NetbufAllocSpace (
   IN NET_BUF                *Nbuf,
   IN UINT32                 Len,
@@ -1140,6 +1152,7 @@ NetblockTrim (
 
 **/
 UINT32
+EFIAPI
 NetbufTrim (
   IN NET_BUF                *Nbuf,
   IN UINT32                 Len,
@@ -1204,6 +1217,7 @@ NetbufTrim (
 
 **/
 UINT32
+EFIAPI
 NetbufCopy (
   IN NET_BUF                *Nbuf,
   IN UINT32                 Offset,
@@ -1300,6 +1314,7 @@ NetbufCopy (
 
 **/
 VOID
+EFIAPI
 NetbufQueInit (
   IN NET_BUF_QUEUE          *NbufQue
   )
@@ -1323,6 +1338,7 @@ NetbufQueInit (
 
 **/
 NET_BUF_QUEUE  *
+EFIAPI
 NetbufQueAlloc (
   VOID
   )
@@ -1349,6 +1365,7 @@ NetbufQueAlloc (
 
 **/
 VOID
+EFIAPI
 NetbufQueFree (
   IN NET_BUF_QUEUE          *NbufQue
   )
@@ -1374,6 +1391,7 @@ NetbufQueFree (
 
 **/
 VOID
+EFIAPI
 NetbufQueAppend (
   IN NET_BUF_QUEUE          *NbufQue,
   IN NET_BUF                *Nbuf
@@ -1399,6 +1417,7 @@ NetbufQueAppend (
 
 **/
 NET_BUF  *
+EFIAPI
 NetbufQueRemove (
   IN NET_BUF_QUEUE          *NbufQue
   )
@@ -1528,6 +1547,7 @@ NetbufQueCopy (
 
 **/
 UINT32
+EFIAPI
 NetbufQueTrim (
   IN NET_BUF_QUEUE          *NbufQue,
   IN UINT32                 Len
@@ -1586,6 +1606,7 @@ NetbufQueTrim (
 
 **/
 VOID
+EFIAPI
 NetbufQueFlush (
   IN NET_BUF_QUEUE          *NbufQue
   )
@@ -1609,6 +1630,7 @@ NetbufQueFlush (
 
 **/
 UINT16
+EFIAPI
 NetblockChecksum (
   IN UINT8                  *Bulk,
   IN UINT32                 Len
@@ -1653,6 +1675,7 @@ NetblockChecksum (
 
 **/
 UINT16
+EFIAPI
 NetAddChecksum (
   IN UINT16                 Checksum1,
   IN UINT16                 Checksum2
@@ -1683,6 +1706,7 @@ NetAddChecksum (
 
 **/
 UINT16
+EFIAPI
 NetbufChecksum (
   IN NET_BUF                *Nbuf
   )
@@ -1736,6 +1760,7 @@ NetbufChecksum (
 
 **/
 UINT16
+EFIAPI
 NetPseudoHeadChecksum (
   IN IP4_ADDR               Src,
   IN IP4_ADDR               Dst,

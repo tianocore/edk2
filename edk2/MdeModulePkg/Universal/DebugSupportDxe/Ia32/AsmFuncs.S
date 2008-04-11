@@ -1,15 +1,16 @@
-#******************************************************************************
-#*
-#* Copyright (c) 2006, Intel Corporation                                                         
-#* All rights reserved. This program and the accompanying materials                          
-#* are licensed and made available under the terms and conditions of the BSD License         
-#* which accompanies this distribution.  The full text of the license may be found at        
-#* http://opensource.org/licenses/bsd-license.php                                            
-#*                                                                                           
-#* THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#* WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-#*
-#******************************************************************************
+#/**@file
+# Low leve IA32 specific debug support functions.
+#
+# Copyright (c) 2006, Intel Corporation
+# All rights reserved. This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
 
 .globl ASM_PFX(OrigVector)
 .globl ASM_PFX(InterruptEntryStub)
@@ -29,12 +30,12 @@ ASM_PFX(StubSize):       .long   ASM_PFX(InterruptEntryStubEnd) - ASM_PFX(Interr
 ASM_PFX(FxStorSupport):
         push   %ebx
         mov    $0x1,%eax
-        cpuid  
+        cpuid
         mov    %edx,%eax
         and    $0x1000000,%eax
         shr    $0x18,%eax
         pop    %ebx
-        ret    
+        ret
 
 .globl ASM_PFX(GetIdtr)
 ASM_PFX(GetIdtr):
@@ -43,25 +44,25 @@ ASM_PFX(GetIdtr):
         add    $0xfffffff8,%esp
         sidtl  0xfffffffa(%ebp)
         mov    0xfffffffc(%ebp),%eax
-        leave  
-        ret    
+        leave
+        ret
 
 .globl ASM_PFX(WriteInterruptFlag)
 ASM_PFX(WriteInterruptFlag):
         push   %ebp
         mov    %esp,%ebp
-        pushf  
+        pushf
         pop    %eax
         and    $0x200,%eax
         shr    $0x9,%eax
         mov    0x8(%ebp),%ecx
         or     %cl,%cl
         jne    ASM_PFX(WriteInterruptFlag+0x17)
-        cli    
+        cli
         jmp    ASM_PFX(WriteInterruptFlag+0x18)
-        sti    
-        leave  
-        ret    
+        sti
+        leave
+        ret
 
 .globl ASM_PFX(Vect2Desc)
 ASM_PFX(Vect2Desc):
@@ -74,8 +75,8 @@ ASM_PFX(Vect2Desc):
         movw   $0x8e00,0x4(%ecx)
         shr    $0x10,%eax
         mov    %ax,0x6(%ecx)
-        leave  
-        ret    
+        leave
+        ret
 
 .globl ASM_PFX(InterruptEntryStub)
 ASM_PFX(InterruptEntryStub):
@@ -88,8 +89,8 @@ ASM_PFX(InterruptEntryStubEnd):
 
 .globl ASM_PFX(CommonIdtEntry)
 ASM_PFX(CommonIdtEntry):
-        pusha  
-        pushf  
+        pusha
+        pushf
         pop    %eax
         mov    %eax,0x0
         cmpl   $0x8,0x0
@@ -259,12 +260,12 @@ ASM_PFX(CommonIdtEntry):
         push   %ebx
         push   %cs
         push   $0x0
-        iret   
+        iret
 
 PhonyIretd:
-        popa   
+        popa
         mov    0x0,%esp
         jmp    *0x0
-        popa   
+        popa
         mov    0x0,%esp
-        iret   
+        iret

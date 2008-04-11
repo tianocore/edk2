@@ -123,6 +123,7 @@ NibbleToHexChar (
 
 **/
 INTN
+EFIAPI
 NetGetMaskLength (
   IN IP4_ADDR               NetMask
   )
@@ -150,6 +151,7 @@ NetGetMaskLength (
 
 **/
 INTN
+EFIAPI
 NetGetIpClass (
   IN IP4_ADDR               Addr
   )
@@ -189,6 +191,7 @@ NetGetIpClass (
 
 **/
 BOOLEAN
+EFIAPI
 Ip4IsUnicast (
   IN IP4_ADDR               Ip,
   IN IP4_ADDR               NetMask
@@ -223,6 +226,7 @@ Ip4IsUnicast (
 
 **/
 UINT32
+EFIAPI
 NetRandomInitSeed (
   VOID
   )
@@ -249,6 +253,7 @@ NetRandomInitSeed (
 
 **/
 UINT32
+EFIAPI
 NetGetUint32 (
   IN UINT8                  *Buf
   )
@@ -271,6 +276,7 @@ NetGetUint32 (
 
 **/
 VOID
+EFIAPI
 NetPutUint32 (
   IN UINT8                  *Buf,
   IN UINT32                 Data
@@ -290,6 +296,7 @@ NetPutUint32 (
 
 **/
 LIST_ENTRY *
+EFIAPI
 NetListRemoveHead (
   LIST_ENTRY            *Head
   )
@@ -324,6 +331,7 @@ NetListRemoveHead (
 
 **/
 LIST_ENTRY *
+EFIAPI
 NetListRemoveTail (
   LIST_ENTRY            *Head
   )
@@ -359,6 +367,7 @@ NetListRemoveTail (
 
 **/
 VOID
+EFIAPI
 NetListInsertAfter (
   IN LIST_ENTRY         *PrevEntry,
   IN LIST_ENTRY         *NewEntry
@@ -381,6 +390,7 @@ NetListInsertAfter (
 
 **/
 VOID
+EFIAPI
 NetListInsertBefore (
   IN LIST_ENTRY     *PostEntry,
   IN LIST_ENTRY     *NewEntry
@@ -402,6 +412,7 @@ NetListInsertBefore (
 
 **/
 VOID
+EFIAPI
 NetMapInit (
   IN NET_MAP                *Map
   )
@@ -423,6 +434,7 @@ NetMapInit (
 
 **/
 VOID
+EFIAPI
 NetMapClean (
   IN NET_MAP                *Map
   )
@@ -464,6 +476,7 @@ NetMapClean (
 
 **/
 BOOLEAN
+EFIAPI
 NetMapIsEmpty (
   IN NET_MAP                *Map
   )
@@ -482,6 +495,7 @@ NetMapIsEmpty (
 
 **/
 UINTN
+EFIAPI
 NetMapGetCount (
   IN NET_MAP                *Map
   )
@@ -548,6 +562,7 @@ NetMapAllocItem (
 
 **/
 EFI_STATUS
+EFIAPI
 NetMapInsertHead (
   IN NET_MAP                *Map,
   IN VOID                   *Key,
@@ -585,6 +600,7 @@ NetMapInsertHead (
 
 **/
 EFI_STATUS
+EFIAPI
 NetMapInsertTail (
   IN NET_MAP                *Map,
   IN VOID                   *Key,
@@ -649,6 +665,7 @@ NetItemInMap (
 
 **/
 NET_MAP_ITEM *
+EFIAPI
 NetMapFindKey (
   IN  NET_MAP               *Map,
   IN  VOID                  *Key
@@ -682,6 +699,7 @@ NetMapFindKey (
 
 **/
 VOID *
+EFIAPI
 NetMapRemoveItem (
   IN  NET_MAP             *Map,
   IN  NET_MAP_ITEM        *Item,
@@ -713,6 +731,7 @@ NetMapRemoveItem (
 
 **/
 VOID *
+EFIAPI
 NetMapRemoveHead (
   IN  NET_MAP               *Map,
   OUT VOID                  **Value         OPTIONAL
@@ -749,6 +768,7 @@ NetMapRemoveHead (
 
 **/
 VOID *
+EFIAPI
 NetMapRemoveTail (
   IN  NET_MAP               *Map,
   OUT VOID                  **Value       OPTIONAL
@@ -789,6 +809,7 @@ NetMapRemoveTail (
 
 **/
 EFI_STATUS
+EFIAPI
 NetMapIterate (
   IN NET_MAP                *Map,
   IN NET_MAP_CALLBACK       CallBack,
@@ -950,6 +971,7 @@ NetLibDefaultUnload (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibCreateServiceChild (
   IN  EFI_HANDLE            Controller,
   IN  EFI_HANDLE            Image,
@@ -1000,6 +1022,7 @@ NetLibCreateServiceChild (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibDestroyServiceChild (
   IN  EFI_HANDLE            Controller,
   IN  EFI_HANDLE            Image,
@@ -1053,6 +1076,7 @@ NetLibDestroyServiceChild (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibGetMacString (
   IN           EFI_HANDLE  SnpHandle,
   IN           EFI_HANDLE  ImageHandle,
@@ -1181,6 +1205,7 @@ ON_EXIT:
   @retval None
 **/
 VOID
+EFIAPI
 NetLibCreateIPv4DPathNode (
   IN OUT IPv4_DEVICE_PATH  *Node,
   IN EFI_HANDLE            Controller,
@@ -1229,6 +1254,7 @@ NetLibCreateIPv4DPathNode (
 
 **/
 EFI_HANDLE
+EFIAPI
 NetLibGetNicHandle (
   IN EFI_HANDLE             Controller,
   IN EFI_GUID               *ProtocolGuid
@@ -1280,6 +1306,7 @@ NetLibGetNicHandle (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibQueueDpc (
   IN EFI_TPL            DpcTpl,
   IN EFI_DPC_PROCEDURE  DpcProcedure,
@@ -1297,6 +1324,7 @@ NetLibQueueDpc (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibDispatchDpc (
   VOID
   )
