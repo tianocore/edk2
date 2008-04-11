@@ -100,19 +100,6 @@ struct _EFI_PEI_NOTIFY_DESCRIPTOR {
 };
 
 
-
-typedef
-EFI_STATUS
-(EFIAPI *EFI_REPORT_STATUS_CODE) (
-  IN EFI_STATUS_CODE_TYPE     Type,
-  IN EFI_STATUS_CODE_VALUE    Value,
-  IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId OPTIONAL,
-  IN EFI_STATUS_CODE_DATA     *Data OPTIONAL
-  );
-
-
-
 #if (PI_SPECIFICATION_VERSION < 0x00010000)
 
 //

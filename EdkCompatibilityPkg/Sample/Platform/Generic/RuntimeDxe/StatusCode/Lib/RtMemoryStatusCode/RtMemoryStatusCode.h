@@ -33,6 +33,12 @@ Abstract:
 #include "RtPlatformStatusCodeLib.h"
 
 //
+// Referenced protocols
+//
+#include EFI_ARCH_PROTOCOL_DEFINITION (StatusCode)
+
+
+//
 // Consumed protocols
 //
 #include EFI_PPI_CONSUMER (StatusCodeMemory)
