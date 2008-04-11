@@ -26,7 +26,7 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (FirmwareVolume2)
 #include EFI_PROTOCOL_DEFINITION (GraphicsOutput)
 #include EFI_PROTOCOL_DEFINITION (UgaDraw)
-#include EFI_PROTOCOL_DEFINITION (EfiOEMBadging)
+#include EFI_PROTOCOL_DEFINITION (EfiOemBadging)
 
 #include EFI_GUID_DEFINITION (Bmp)
 

@@ -41,7 +41,7 @@ Abstract:
 #include "EfiBind.h"
 #include "EfiTypes.h"
 #include "EfiError.h"
-#include "Common\EdkIIGlueBaseTypes.h"
+#include "Common/EdkIIGlueBaseTypes.h"
 #include "EfiImage.h"
 #include "EfiPeOptionalHeader.h"
 #include "EfiStdArg.h"
@@ -62,36 +62,36 @@ Abstract:
 #include "LinkedList.h"
 #include "EfiCommonLib.h"
 
-#include "Common\EdkIIGlueDefinitionChangesBase.h"
+#include "Common/EdkIIGlueDefinitionChangesBase.h"
 
 //
 // EdkII Glue Library Class headers
 //
 
-#include "Library\EdkIIGlueBaseLib.h"
-#include "Library\EdkIIGlueBaseMemoryLib.h"
-#include "Library\EdkIIGlueCacheMaintenanceLib.h"
-#include "Library\EdkIIGlueIoLib.h"
-#include "Library\EdkIIGluePciCf8Lib.h"
-#include "Library\EdkIIGluePciExpressLib.h"
-#include "Library\EdkIIGluePciLib.h"
-#include "Library\EdkIIGluePeCoffGetEntryPointLib.h"
-#include "Library\EdkIIGluePeCoffLib.h"
-#include "Library\EdkIIGluePostCodeLib.h"
-#include "Library\EdkIIGluePrintLib.h"
-#include "Library\EdkIIGlueTimerLib.h"
-#include "Library\EdkIIGlueUefiDecompressLib.h"
-#include "Library\EdkIIGlueDebugLib.h"
+#include "Library/EdkIIGlueBaseLib.h"
+#include "Library/EdkIIGlueBaseMemoryLib.h"
+#include "Library/EdkIIGlueCacheMaintenanceLib.h"
+#include "Library/EdkIIGlueIoLib.h"
+#include "Library/EdkIIGluePciCf8Lib.h"
+#include "Library/EdkIIGluePciExpressLib.h"
+#include "Library/EdkIIGluePciLib.h"
+#include "Library/EdkIIGluePeCoffGetEntryPointLib.h"
+#include "Library/EdkIIGluePeCoffLib.h"
+#include "Library/EdkIIGluePostCodeLib.h"
+#include "Library/EdkIIGluePrintLib.h"
+#include "Library/EdkIIGlueTimerLib.h"
+#include "Library/EdkIIGlueUefiDecompressLib.h"
+#include "Library/EdkIIGlueDebugLib.h"
 
 //
 // Publish MDE Library PCDs
 //
-#include "Pcd\EdkIIGluePcdBaseLib.h"
-#include "Pcd\EdkIIGluePcdDebugLib.h"
-#include "Pcd\EdkIIGluePcdIoLib.h"
-#include "Pcd\EdkIIGluePcdPciExpressLib.h"
-#include "Pcd\EdkIIGluePcdPostCodeLib.h"
-#include "Pcd\EdkIIGluePcdReportStatusCodeLib.h"
-#include "Pcd\EdkIIGluePcdTimerLib.h"
+#include "Pcd/EdkIIGluePcdBaseLib.h"
+#include "Pcd/EdkIIGluePcdDebugLib.h"
+#include "Pcd/EdkIIGluePcdIoLib.h"
+#include "Pcd/EdkIIGluePcdPciExpressLib.h"
+#include "Pcd/EdkIIGluePcdPostCodeLib.h"
+#include "Pcd/EdkIIGluePcdReportStatusCodeLib.h"
+#include "Pcd/EdkIIGluePcdTimerLib.h"
 
 #endif

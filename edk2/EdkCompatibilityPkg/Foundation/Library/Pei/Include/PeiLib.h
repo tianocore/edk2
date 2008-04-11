@@ -24,7 +24,7 @@ Abstract:
 
 #include "Tiano.h"
 #include "Pei.h"
-#include "peiHobLib.h"
+#include "PeiHobLib.h"
 #include "PeiPerf.h"
 #include EFI_PROTOCOL_DEFINITION (Decompress)
 #include EFI_PROTOCOL_DEFINITION (TianoDecompress)
