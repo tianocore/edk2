@@ -41,8 +41,8 @@ COMPONENT_TYPE=   LIBRARY
 C_STD_INCLUDE=
 
 [sources.common]
-    NtAutoscan/NtAutoScan.h
-    NtAutoscan/NtAutoScan.c
+    NtAutoScan/NtAutoScan.h
+    NtAutoScan/NtAutoScan.c
     NtFwh/NtFwh.h
     NtFwh/NtFwh.c
     NtLoadAsDll/NtLoadAsDll.h
