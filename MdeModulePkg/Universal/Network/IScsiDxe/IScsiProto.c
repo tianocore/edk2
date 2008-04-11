@@ -2776,6 +2776,7 @@ Returns:
   Status        = EFI_SUCCESS;
   Tcb           = NULL;
   TimeoutEvent  = NULL;
+  Timeout       = 0;
 
   if (Session->State != SESSION_STATE_LOGGED_IN) {
     return EFI_DEVICE_ERROR;
@@ -2790,15 +2791,6 @@ Returns:
 
   if (Packet->Timeout != 0) {
     Timeout = MultU64x32 (Packet->Timeout, 2);
-    //
-    // Start the timeout timer.
-    //
-    Status = gBS->SetTimer (Conn->TimeoutEvent, TimerRelative, Timeout);
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
-
-    TimeoutEvent = Conn->TimeoutEvent;
   }
 
   Status = IScsiNewTcb (Conn, &Tcb);
@@ -2854,6 +2846,16 @@ Returns:
   InBufferContext.InDataLen = Packet->InTransferLength;
 
   while (!Tcb->StatusXferd) {
+    //
+    // Start the timeout timer.
+    //
+    if (Timeout) {
+      Status = gBS->SetTimer (Conn->TimeoutEvent, TimerRelative, Timeout);
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+      TimeoutEvent = Conn->TimeoutEvent; 
+    }
     //
     // try to receive PDU from target.
     //
