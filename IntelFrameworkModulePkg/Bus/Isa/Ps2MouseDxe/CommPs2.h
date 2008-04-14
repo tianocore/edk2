@@ -102,266 +102,184 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //    0 - output buffer empty
 //    1 - keyboard controller data in output buffer
 //
+
+/**
+  Issue self test command via IsaIo interface.
+  
+  @param IsaIo Pointer to instance of EFI_ISA_IO_PROTOCOL
+  
+  @return EFI_SUCCESS  Success to do keyboard self testing.
+  @return others       Fail to do keyboard self testing.
+**/
 EFI_STATUS
 KbcSelfTest (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to enable keyboard AUX functionality.
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 KbcEnableAux (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to disable keyboard AUX functionality.
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 KbcDisableAux (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to enable keyboard.
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 KbcEnableKb (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to disable keyboard.
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 KbcDisableKb (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to check keyboard status.
+  
+  @param IsaIo          Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param KeyboardEnable return whether keyboard is enable.
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 CheckKbStatus (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   OUT BOOLEAN                             *KeyboardEnable
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo           - GC_TODO: add argument description
-  KeyboardEnable  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to reset keyboard.
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 PS2MouseReset (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to set mouse's sample rate
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param SampleRate value of sample rate 
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 PS2MouseSetSampleRate (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_SR                             SampleRate
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo       - GC_TODO: add argument description
-  SampleRate  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to set mouse's resolution.
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Resolution value of resolution
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 PS2MouseSetResolution (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_RE                             Resolution
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo       - GC_TODO: add argument description
-  Resolution  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to set mouse's scaling.
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Scaling value of scaling
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 PS2MouseSetScaling (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_SF                             Scaling
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo   - GC_TODO: add argument description
-  Scaling - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Issue command to enable Ps2 mouse.
+  
+  @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
+  
+  @return Status of command issuing.
+**/
 EFI_STATUS
 PS2MouseEnable (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Get mouse packet . Only care first 3 bytes
+
+  @param MouseDev  Pointer of PS2 Mouse Private Data Structure 
+
+  @retval EFI_NOT_READY  Mouse Device not ready to input data packet, or some error happened during getting the packet
+  @retval EFI_SUCCESS    The data packet is gotten successfully.
+
+**/
 EFI_STATUS
 PS2MouseGetPacket (
   PS2_MOUSE_DEV     *MouseDev
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  MouseDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
-**/
 ;
 
+/**
+  Read data via IsaIo protocol with given number.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Buffer  Buffer receive data of mouse
+  @param BufSize The size of buffer
+  @param State   Check input or read data
+  
+  @return status of reading mouse data.
+**/
 EFI_STATUS
 PS2MouseRead (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
@@ -373,24 +291,61 @@ PS2MouseRead (
 //
 // 8042 I/O function
 //
+/**
+  I/O work flow of outing 8042 command.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Command I/O command.
+  
+  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_TIMEOUT Keyboard controller time out.
+**/
 EFI_STATUS
 Out8042Command (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINT8                                Command
   );
 
+/**
+  I/O work flow of in 8042 data.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Data    Data value
+  
+  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_TIMEOUT Keyboard controller time out.
+**/
 EFI_STATUS
 In8042Data (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN OUT UINT8                            *Data
   );
 
+/**
+  I/O work flow of outing 8042 data.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Data    Data value
+  
+  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_TIMEOUT Keyboard controller time out.
+**/
 EFI_STATUS
 Out8042Data (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINT8                                Data
   );
 
+/**
+  I/O work flow of outing 8042 Aux command.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Command Aux I/O command
+  @param Resend  Whether need resend the Aux command.
+  
+  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_TIMEOUT Keyboard controller time out.
+**/
 EFI_STATUS
 Out8042AuxCommand (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
@@ -398,29 +353,73 @@ Out8042AuxCommand (
   IN BOOLEAN                              Resend
   );
 
+/**
+  I/O work flow of in 8042 Aux data.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Data    Buffer holding return value.
+  
+  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_TIMEOUT Keyboard controller time out.
+**/
 EFI_STATUS
 In8042AuxData (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN OUT UINT8                            *Data
   );
 
+/**
+  I/O work flow of outing 8042 Aux data.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Command Aux I/O command
+  
+  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_TIMEOUT Keyboard controller time out.
+**/
 EFI_STATUS
 Out8042AuxData (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINT8                                Data
   );
 
+/**
+  Check keyboard controller status, if it is output buffer full and for auxiliary device
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  
+  @retval EFI_SUCCESS   Keyboard controller is ready
+  @retval EFI_NOT_READY Keyboard controller is not ready
+**/
 EFI_STATUS
 CheckForInput (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   );
 
+/**
+  I/O work flow to wait input buffer empty in given time.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Timeout Wating time.
+  
+  @retval EFI_TIMEOUT if input is still not empty in given time.
+  @retval EFI_SUCCESS input is empty.
+**/
 EFI_STATUS
 WaitInputEmpty (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINTN                                Timeout
   );
 
+/**
+  I/O work flow to wait output buffer full in given time.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Timeout given time
+  
+  @retval EFI_TIMEOUT  output is not full in given time
+  @retval EFI_SUCCESS  output is full in given time.
+**/
 EFI_STATUS
 WaitOutputFull (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
