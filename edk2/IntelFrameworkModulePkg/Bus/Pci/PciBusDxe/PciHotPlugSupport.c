@@ -26,7 +26,7 @@ PciHPCInitialized (
   IN EFI_EVENT    Event,
   IN VOID         *Context
   )
-/*++
+/**
 
 Routine Description:
 
@@ -36,7 +36,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Event - add argument and description to function comment
 // TODO:    Context - add argument and description to function comment
 {
@@ -52,7 +52,7 @@ EfiCompareDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath1,
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath2
   )
-/*++
+/**
 
 Routine Description:
 
@@ -62,7 +62,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    DevicePath1 - add argument and description to function comment
 // TODO:    DevicePath2 - add argument and description to function comment
 {
@@ -87,7 +87,7 @@ EFI_STATUS
 InitializeHotPlugSupport (
   VOID
   )
-/*++
+/**
 
 Routine Description:
 
@@ -97,7 +97,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -153,7 +153,7 @@ IsRootPciHotPlugBus (
   IN EFI_DEVICE_PATH_PROTOCOL         *HpbDevicePath,
   OUT UINTN                           *HpIndex
   )
-/*++
+/**
 
 Routine Description:
 
@@ -166,7 +166,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    HpbDevicePath - add argument and description to function comment
 {
   UINTN Index;
@@ -191,7 +191,7 @@ IsRootPciHotPlugController (
   IN EFI_DEVICE_PATH_PROTOCOL         *HpcDevicePath,
   OUT UINTN                           *HpIndex
   )
-/*++
+/**
 
 Routine Description:
 
@@ -204,7 +204,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   UINTN Index;
 
@@ -228,7 +228,7 @@ CreateEventForHpc (
   IN UINTN       HpIndex,
   OUT EFI_EVENT  *Event
   )
-/*++
+/**
 
 Routine Description:
 
@@ -238,7 +238,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    HpIndex - add argument and description to function comment
 // TODO:    Event - add argument and description to function comment
 {
@@ -263,7 +263,7 @@ EFI_STATUS
 AllRootHPCInitialized (
   IN  UINTN           TimeoutInMicroSeconds
   )
-/*++
+/**
 
 Routine Description:
 
@@ -274,7 +274,7 @@ Returns:
   EFI_SUCCESS - All root hpc's initialization is finished before the timeout
   EFI_TIMEOUT - Time out
 
---*/
+**/
 {
   UINT32  Delay;
   UINTN   Index;
@@ -309,7 +309,7 @@ EFI_STATUS
 IsSHPC (
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -319,7 +319,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -356,7 +356,7 @@ EFI_STATUS
 GetResourcePaddingForHpb (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -366,7 +366,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
@@ -409,7 +409,7 @@ EFI_STATUS
 IsPciHotPlugBus (
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -419,7 +419,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment

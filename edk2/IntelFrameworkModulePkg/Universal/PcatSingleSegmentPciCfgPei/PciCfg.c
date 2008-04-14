@@ -54,7 +54,7 @@ PciCfgRead (
   UINTN  PciLibAddress;
 
   PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
-	switch (Width) {
+  switch (Width) {
     case EfiPeiPciCfgWidthUint8:
       * (UINT8 *) Buffer = PciRead8 (PciLibAddress);
       break;
@@ -70,7 +70,7 @@ PciCfgRead (
     default:
       return EFI_INVALID_PARAMETER;
   }
-	return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 
@@ -119,8 +119,8 @@ PciCfgWrite (
 
     default:
       return EFI_INVALID_PARAMETER;
-	}
-	return EFI_SUCCESS;
+  }
+  return EFI_SUCCESS;
 }
 
 
@@ -154,7 +154,7 @@ PciCfgModify (
   UINTN  PciLibAddress;
 
   PciLibAddress = PciCfgAddressConvert ((EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *) &Address);
-	switch (Width) {
+  switch (Width) {
     case EfiPeiPciCfgWidthUint8:
       PciAndThenOr8 (PciLibAddress, (UINT8)~ClearBits, (UINT8)SetBits);
       break;
@@ -170,5 +170,6 @@ PciCfgModify (
     default:
       return EFI_INVALID_PARAMETER;
   }
-	return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
+

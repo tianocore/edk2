@@ -45,7 +45,7 @@ PciBusEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
+/**
 
 Routine Description:
 
@@ -62,7 +62,7 @@ Returns:
   EFI_SUCCESS
   EFI_DEVICE_ERROR
 
---*/
+**/
 // TODO:    ImageHandle - add argument and description to function comment
 // TODO:    SystemTable - add argument and description to function comment
 {
@@ -99,7 +99,7 @@ PciBusDriverBindingSupported (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
+/**
 
 Routine Description:
 
@@ -115,7 +115,7 @@ Returns:
 
   EFI_SUCCESS
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Controller - add argument and description to function comment
 // TODO:    RemainingDevicePath - add argument and description to function comment
@@ -193,7 +193,7 @@ PciBusDriverBindingStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
+/**
 
 Routine Description:
 
@@ -208,7 +208,7 @@ Arguments:
 Returns:
 
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Controller - add argument and description to function comment
 // TODO:    RemainingDevicePath - add argument and description to function comment
@@ -262,7 +262,7 @@ PciBusDriverBindingStop (
   IN  UINTN                         NumberOfChildren,
   IN  EFI_HANDLE                    *ChildHandleBuffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -279,7 +279,7 @@ Arguments:
 Returns:
 
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Controller - add argument and description to function comment
 // TODO:    NumberOfChildren - add argument and description to function comment

@@ -23,7 +23,7 @@ EFI_STATUS
 KbcSelfTest (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -38,7 +38,7 @@ Returns:
   EFI_DEVICE_ERROR - GC_TODO: Add description for return value
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS  Status;
   UINT8       Data;
@@ -92,7 +92,7 @@ EFI_STATUS
 KbcEnableAux (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -106,7 +106,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   //
   // Send 8042 enable mouse command
@@ -118,7 +118,7 @@ EFI_STATUS
 KbcDisableAux (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -132,7 +132,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   //
   // Send 8042 disable mouse command
@@ -144,7 +144,7 @@ EFI_STATUS
 KbcEnableKb (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -158,7 +158,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   //
   // Send 8042 enable keyboard command
@@ -170,7 +170,7 @@ EFI_STATUS
 KbcDisableKb (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -184,7 +184,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   //
   // Send 8042 disable keyboard command
@@ -197,7 +197,7 @@ CheckKbStatus (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   OUT BOOLEAN                             *KeyboardEnable
   )
-/*++
+/**
 
 Routine Description:
 
@@ -212,7 +212,7 @@ Returns:
 
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS  Status;
   UINT8       Data;
@@ -245,7 +245,7 @@ EFI_STATUS
 PS2MouseReset (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -261,7 +261,7 @@ Returns:
   EFI_DEVICE_ERROR - GC_TODO: Add description for return value
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS  Status;
   UINT8       Data;
@@ -301,7 +301,7 @@ PS2MouseSetSampleRate (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_SR                             SampleRate
   )
-/*++
+/**
 
 Routine Description:
 
@@ -316,7 +316,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   EFI_STATUS  Status;
 
@@ -338,7 +338,7 @@ PS2MouseSetResolution (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_RE                             Resolution
   )
-/*++
+/**
 
 Routine Description:
 
@@ -353,7 +353,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   EFI_STATUS  Status;
 
@@ -375,7 +375,7 @@ PS2MouseSetScaling (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_SF                             Scaling
   )
-/*++
+/**
 
 Routine Description:
 
@@ -390,7 +390,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   UINT8 Command;
 
@@ -406,7 +406,7 @@ EFI_STATUS
 PS2MouseEnable (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -420,7 +420,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   //
   // Send auxiliary command to enable mouse
@@ -432,7 +432,7 @@ EFI_STATUS
 PS2MouseGetPacket (
   PS2_MOUSE_DEV     *MouseDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -447,7 +447,7 @@ Returns:
   EFI_NOT_READY -  Mouse Device not ready to input data packet, or some error happened during getting the packet
   EFI_SUCCESS - The data packet is gotten successfully.
 
---*/
+**/
 {
   EFI_STATUS  Status;
   BOOLEAN     KeyboardEnable;
@@ -576,7 +576,7 @@ PS2MouseRead (
   IN OUT UINTN                            *BufSize,
   IN  UINTN                               State
   )
-/*++
+/**
 
 Routine Description:
 
@@ -593,7 +593,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 {
   EFI_STATUS  Status;
   UINTN       BytesRead;
@@ -642,7 +642,7 @@ Out8042Command (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINT8                                Command
   )
-/*++
+/**
 
 Routine Description:
 
@@ -657,7 +657,7 @@ Returns:
 
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS  Status;
   UINT8       Data;
@@ -688,7 +688,7 @@ Out8042Data (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINT8                                Data
   )
-/*++
+/**
 
 Routine Description:
 
@@ -703,7 +703,7 @@ Returns:
 
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS  Status;
   UINT8       temp;
@@ -731,7 +731,7 @@ In8042Data (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN OUT UINT8                            *Data
   )
-/*++
+/**
 
 Routine Description:
 
@@ -747,7 +747,7 @@ Returns:
   EFI_TIMEOUT - GC_TODO: Add description for return value
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   UINTN Delay;
   UINT8 temp;
@@ -783,7 +783,7 @@ Out8042AuxCommand (
   IN UINT8                                Command,
   IN BOOLEAN                              Resend
   )
-/*++
+/**
 
 Routine Description:
 
@@ -802,7 +802,7 @@ Returns:
   EFI_DEVICE_ERROR - GC_TODO: Add description for return value
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS  Status;
   UINT8       Data;
@@ -874,7 +874,7 @@ Out8042AuxData (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINT8                                Data
   )
-/*++
+/**
 
 Routine Description:
 
@@ -889,7 +889,7 @@ Returns:
 
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS  Status;
   UINT8       Temp;
@@ -927,7 +927,7 @@ In8042AuxData (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN OUT UINT8                            *Data
   )
-/*++
+/**
 
 Routine Description:
 
@@ -942,7 +942,7 @@ Returns:
 
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS  Status;
 
@@ -963,7 +963,7 @@ EFI_STATUS
 CheckForInput (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -978,7 +978,7 @@ Returns:
   EFI_NOT_READY - GC_TODO: Add description for return value
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   UINT8 Data;
 
@@ -999,7 +999,7 @@ WaitInputEmpty (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINTN                                Timeout
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1015,7 +1015,7 @@ Returns:
   EFI_TIMEOUT - GC_TODO: Add description for return value
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   UINTN Delay;
   UINT8 Data;
@@ -1048,7 +1048,7 @@ WaitOutputFull (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINTN                                Timeout
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1064,7 +1064,7 @@ Returns:
   EFI_TIMEOUT - GC_TODO: Add description for return value
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   UINTN Delay;
   UINT8 Data;

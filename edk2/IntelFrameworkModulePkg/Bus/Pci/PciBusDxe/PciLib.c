@@ -26,7 +26,7 @@ VOID
 InstallHotPlugRequestProtocol (
   IN EFI_STATUS *Status
   )
-/*++
+/**
 
 Routine Description:
 
@@ -37,7 +37,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   EFI_HANDLE  Handle;
 
@@ -58,7 +58,7 @@ VOID
 InstallPciHotplugGuid (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -70,7 +70,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   EFI_STATUS  Status;
 
@@ -94,7 +94,7 @@ VOID
 UninstallPciHotplugGuid (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -106,7 +106,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   EFI_STATUS  Status;
 
@@ -140,7 +140,7 @@ VOID
 GetBackPcCardBar (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -153,7 +153,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   UINT32  Address;
 
@@ -227,7 +227,7 @@ RemoveRejectedPciDevices (
   EFI_HANDLE        RootBridgeHandle,
   IN PCI_IO_DEVICE  *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -241,7 +241,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_IO_DEVICE   *Temp;
@@ -316,7 +316,7 @@ EFI_STATUS
 PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -326,7 +326,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciResAlloc - add argument and description to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
@@ -689,7 +689,7 @@ EFI_STATUS
 PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -703,7 +703,7 @@ Returns:
 
   EFI Status.
 
---*/
+**/
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
@@ -1224,7 +1224,7 @@ PciScanBus_WithoutHotPlugDeviceSupport (
   OUT UINT8                             *SubBusNumber,
   OUT UINT8                             *PaddedBusRange
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1236,7 +1236,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    StartBusNumber - add argument and description to function comment
 // TODO:    SubBusNumber - add argument and description to function comment
@@ -1409,7 +1409,7 @@ PciScanBus_WithHotPlugDeviceSupport (
   OUT UINT8                             *SubBusNumber,
   OUT UINT8                             *PaddedBusRange
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1426,7 +1426,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_DEVICE_ERROR - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1704,7 +1704,7 @@ EFI_STATUS
 PciRootBridgeP2CProcess (
   IN PCI_IO_DEVICE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1716,7 +1716,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1782,7 +1782,7 @@ EFI_STATUS
 PciHostBridgeP2CProcess (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1792,7 +1792,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciResAlloc - add argument and description to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -1833,7 +1833,7 @@ EFI_STATUS
 PciHostBridgeEnumerator (
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1848,7 +1848,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment

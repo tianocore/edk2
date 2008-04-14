@@ -1,6 +1,5 @@
 /**@file
 
-  
 Copyright (c) 2006 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -242,25 +241,17 @@ IsaFloppyComponentNameGetControllerName (
            );
 }
 
+/**
+  Add the component name for the floppy device
+
+  @param  FdcDev                 - A pointer to the FDC_BLK_IO_DEV instance.
+
+**/
 VOID
 AddName (
   IN  FDC_BLK_IO_DEV         *FdcDev
   )
-/*++
 
-  Routine Description:
-  
-    Add the component name for the floppy device
-
-  Arguments:
-  
-    FdcDev                 - A pointer to the FDC_BLK_IO_DEV instance.
-
-  Returns:
-
-    None
-    
---*/
 {
   CHAR16  FloppyDriveName[FLOPPY_DRIVE_NAME_ASCII_LEN + 1];
 
@@ -282,3 +273,4 @@ AddName (
     );
 
 }
+

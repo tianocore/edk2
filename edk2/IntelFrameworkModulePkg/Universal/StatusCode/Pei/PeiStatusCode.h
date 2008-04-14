@@ -1,4 +1,3 @@
-
 /** @file
   Heade file of status code PEIM
 
@@ -10,8 +9,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  PeiStatusCode.h
 
 **/
 
@@ -155,4 +152,6 @@ ReportDispatcher (
   IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
   );
 
-#endif
+#endif //__PEI_STATUS_CODE_H__
+
+

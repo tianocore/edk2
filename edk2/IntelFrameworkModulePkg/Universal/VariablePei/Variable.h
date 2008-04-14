@@ -9,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Variable.h
-
-Abstract:
-
-  Tiano PEIM to provide the variable functionality
-
 **/
 
 #ifndef _PEI_VARIABLE_H
@@ -73,22 +65,6 @@ PeimInitializeVariableServices (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  FfsHeader   - TODO: add argument description
-  PeiServices - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 EFI_STATUS
@@ -101,26 +77,6 @@ PeiGetVariable (
   IN OUT UINTN                    *DataSize,
   OUT VOID                        *Data
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PeiServices   - TODO: add argument description
-  VariableName  - TODO: add argument description
-  VendorGuid    - TODO: add argument description
-  Attributes    - TODO: add argument description
-  DataSize      - TODO: add argument description
-  Data          - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 EFI_STATUS
@@ -133,35 +89,6 @@ PeiGetVariable2 (
   IN OUT    UINTN                           *DataSize,
   OUT       VOID                            *Data
   )
-/*++
-
-Routine Description:
-
-  Provide the read variable functionality of the variable services.
-
-Arguments:
-
-  PeiServices - General purpose services available to every PEIM.
-
-  VariableName     - The variable name
-
-  VendorGuid       - The vendor's GUID
-
-  Attributes       - Pointer to the attribute
-
-  DataSize         - Size of data
-
-  Data             - Pointer to data
-
-Returns:
-
-  EFI_SUCCESS           - The interface could be successfully installed
-
-  EFI_NOT_FOUND         - The variable could not be discovered
-
-  EFI_BUFFER_TOO_SMALL  - The caller buffer is not large enough
-
---*/
 ;  
   
 EFI_STATUS
@@ -172,32 +99,6 @@ PeiGetNextVariableName2 (
   IN OUT CHAR16                             *VariableName,
   IN OUT EFI_GUID                           *VariableGuid
   )
-/*++
-
-Routine Description:
-
-  Provide the get next variable functionality of the variable services.
-
-Arguments:
-
-  PeiServices        - General purpose services available to every PEIM.
-  VariabvleNameSize  - The variable name's size.
-  VariableName       - A pointer to the variable's name.
-  VariableGuid       - A pointer to the EFI_GUID structure.
-
-  VariableNameSize - Size of the variable name
-
-  VariableName     - The variable name
-
-  VendorGuid       - The vendor's GUID
-
-Returns:
-
-  EFI_SUCCESS - The interface could be successfully installed
-
-  EFI_NOT_FOUND - The variable could not be discovered
-
---*/
 ;
   
 EFI_STATUS
@@ -208,24 +109,6 @@ PeiGetNextVariableName (
   IN OUT CHAR16                   *VariableName,
   IN OUT EFI_GUID                 *VendorGuid
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PeiServices       - TODO: add argument description
-  VariableNameSize  - TODO: add argument description
-  VariableName      - TODO: add argument description
-  VendorGuid        - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 /**

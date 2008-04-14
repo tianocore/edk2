@@ -69,7 +69,7 @@ PciOperateRegister (
   IN  UINT8         Operation,
   OUT UINT16        *PtrCommand
   )
-/*++
+/**
 
 Routine Description:
 
@@ -87,14 +87,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
 PciCapabilitySupport (
   IN PCI_IO_DEVICE  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -108,7 +108,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -118,7 +118,7 @@ LocateCapabilityRegBlock (
   IN OUT UINT8      *Offset,
   OUT UINT8         *NextRegBlock OPTIONAL
   )
-/*++
+/**
 
 Routine Description:
 
@@ -135,7 +135,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 

@@ -22,7 +22,7 @@ PciOperateRegister (
   IN  UINT8         Operation,
   OUT UINT16        *PtrCommand
   )
-/*++
+/**
 
 Routine Description:
 
@@ -32,7 +32,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    Command - add argument and description to function comment
 // TODO:    Offset - add argument and description to function comment
@@ -82,7 +82,7 @@ BOOLEAN
 PciCapabilitySupport (
   IN PCI_IO_DEVICE  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -92,7 +92,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 {
 
@@ -110,7 +110,7 @@ LocateCapabilityRegBlock (
   IN OUT UINT8      *Offset,
   OUT UINT8         *NextRegBlock OPTIONAL
   )
-/*++
+/**
 
 Routine Description:
   Locate cap reg.
@@ -125,7 +125,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment

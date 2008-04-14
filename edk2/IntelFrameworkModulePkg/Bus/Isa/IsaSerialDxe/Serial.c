@@ -1,5 +1,5 @@
 /**@file
-	Serial driver for standard UARTS on an ISA bus.
+  Serial driver for standard UARTS on an ISA bus.
 
   Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -122,7 +122,16 @@ InitializeIsaSerial (
   return Status;
 }
 
+/**
+  Check to see if this driver supports the given controller
 
+  @param  This - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller - The handle of the controller to test.
+  @param  RemainingDevicePath - A pointer to the remaining portion of a device path.
+
+  @return EFI_SUCCESS - This driver can support the given controller
+
+**/
 EFI_STATUS
 EFIAPI
 SerialControllerDriverSupported (
@@ -130,23 +139,7 @@ SerialControllerDriverSupported (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
 
-  Routine Description:
-
-    Check to see if this driver supports the given controller
-
-  Arguments:
-
-    This - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller - The handle of the controller to test.
-    RemainingDevicePath - A pointer to the remaining portion of a device path.
-
-  Returns:
-
-    EFI_SUCCESS - This driver can support the given controller
-
---*/
 {
   EFI_STATUS                                Status;
   EFI_DEVICE_PATH_PROTOCOL                  *ParentDevicePath;
@@ -265,6 +258,16 @@ Error:
   return Status;
 }
 
+/**
+  Start to management the controller passed in
+
+  @param  This - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller - The handle of the controller to test.
+  @param  RemainingDevicePath - A pointer to the remaining portion of a device path.
+
+  @return EFI_SUCCESS - Driver is started successfully
+
+**/
 EFI_STATUS
 EFIAPI
 SerialControllerDriverStart (
@@ -272,23 +275,7 @@ SerialControllerDriverStart (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
 
-  Routine Description:
-
-    Start to management the controller passed in
-
-  Arguments:
-
-    This - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller - The handle of the controller to test.
-    RemainingDevicePath - A pointer to the remaining portion of a device path.
-
-  Returns:
-
-    EFI_SUCCESS - Driver is started successfully
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
@@ -527,6 +514,18 @@ Error:
   return Status;
 }
 
+/**
+  Disconnect this driver with the controller, uninstall related protocol instance
+
+  @param  This                - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller          - The handle of the controller to test.
+  @param  NumberOfChildren    - Number of child device.
+  @param  RemainingDevicePath - A pointer to the remaining portion of a device path.
+
+  @retval EFI_SUCCESS         - Operation successfully
+  @retval EFI_DEVICE_ERROR    - Cannot stop the driver successfully
+
+**/
 EFI_STATUS
 EFIAPI
 SerialControllerDriverStop (
@@ -535,25 +534,7 @@ SerialControllerDriverStop (
   IN  UINTN                          NumberOfChildren,
   IN  EFI_HANDLE                     *ChildHandleBuffer
   )
-/*++
 
-  Routine Description:
-
-    Disconnect this driver with the controller, uninstall related protocol instance
-
-  Arguments:
-
-    This                - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller          - The handle of the controller to test.
-    NumberOfChildren    - Number of child device.
-    RemainingDevicePath - A pointer to the remaining portion of a device path.
-
-  Returns:
-
-    EFI_SUCCESS         - Operation successfully
-    EFI_DEVICE_ERROR    - Cannot stop the driver successfully
-
---*/
 {
   EFI_STATUS                          Status;
   UINTN                               Index;
@@ -664,26 +645,19 @@ SerialControllerDriverStop (
   return EFI_SUCCESS;
 }
 
+/**
+  Detect whether specific FIFO is full or not
+
+  @param Fifo  - A pointer to the Data Structure SERIAL_DEV_FIFO
+
+  @return whether specific FIFO is full or not
+
+**/
 BOOLEAN
 IsaSerialFifoFull (
   IN SERIAL_DEV_FIFO *Fifo
   )
-/*++
 
-  Routine Description:
-
-    Detect whether specific FIFO is full or not
-
-  Arguments:
-
-    Fifo  - A pointer to the Data Structure SERIAL_DEV_FIFO
-
-  Returns:
-
-    TRUE  - the FIFO is full
-    FALSE - the FIFO is not full
-
---*/
 {
   if (Fifo->Surplus == 0) {
     return TRUE;
@@ -692,26 +666,20 @@ IsaSerialFifoFull (
   return FALSE;
 }
 
+/**
+  Detect whether specific FIFO is empty or not
+
+ 
+  @param  Fifo  - A pointer to the Data Structure SERIAL_DEV_FIFO
+
+  @return whether specific FIFO is empty or not
+
+**/
 BOOLEAN
 IsaSerialFifoEmpty (
   IN SERIAL_DEV_FIFO *Fifo
   )
-/*++
 
-  Routine Description:
-
-    Detect whether specific FIFO is empty or not
-
-  Arguments:
-
-    Fifo  - A pointer to the Data Structure SERIAL_DEV_FIFO
-
-  Returns:
-
-    TRUE  - the FIFO is empty
-    FALSE - the FIFO is not empty
-
---*/
 {
   if (Fifo->Surplus == SERIAL_MAX_BUFFER_SIZE) {
     return TRUE;
@@ -720,28 +688,22 @@ IsaSerialFifoEmpty (
   return FALSE;
 }
 
+/**
+  Add data to specific FIFO
+
+  @param Fifo                - A pointer to the Data Structure SERIAL_DEV_FIFO
+  @param Data                - the data added to FIFO
+
+  @retval EFI_SUCCESS         - Add data to specific FIFO successfully
+  @retval EFI_OUT_OF_RESOURCE - Failed to add data because FIFO is already full
+
+**/
 EFI_STATUS
 IsaSerialFifoAdd (
   IN SERIAL_DEV_FIFO *Fifo,
   IN UINT8           Data
   )
-/*++
 
-  Routine Description:
-
-    Add data to specific FIFO
-
-  Arguments:
-
-    Fifo                - A pointer to the Data Structure SERIAL_DEV_FIFO
-    Data                - the data added to FIFO
-
-  Returns:
-
-    EFI_SUCCESS         - Add data to specific FIFO successfully
-    EFI_OUT_OF_RESOURCE - Failed to add data because FIFO is already full
-
---*/
 {
   //
   // if FIFO full can not add data
@@ -762,27 +724,22 @@ IsaSerialFifoAdd (
   return EFI_SUCCESS;
 }
 
+/**
+  Remove data from specific FIFO
+
+  @param Fifo                - A pointer to the Data Structure SERIAL_DEV_FIFO
+  @param Data                - the data removed from FIFO
+
+  @retval EFI_SUCCESS         - Remove data from specific FIFO successfully
+  @retval EFI_OUT_OF_RESOURCE - Failed to remove data because FIFO is empty
+
+**/
 EFI_STATUS
 IsaSerialFifoRemove (
   IN  SERIAL_DEV_FIFO *Fifo,
   OUT UINT8           *Data
   )
-/*++
 
-  Routine Description:
-
-    Remove data from specific FIFO
-
-  Arguments:
-
-    Fifo                - A pointer to the Data Structure SERIAL_DEV_FIFO
-    Data                - the data removed from FIFO
-
-  Returns:
-    EFI_SUCCESS         - Remove data from specific FIFO successfully
-    EFI_OUT_OF_RESOURCE - Failed to remove data because FIFO is empty
-
---*/
 {
   //
   // if FIFO is empty, no data can remove
@@ -803,27 +760,21 @@ IsaSerialFifoRemove (
   return EFI_SUCCESS;
 }
 
+/**
+  Reads and writes all avaliable data.
+
+  @param SerialDevice         - The device to flush
+
+  @retval EFI_SUCCESS         - Data was read/written successfully.
+  @retval EFI_OUT_OF_RESOURCE - Failed because software receive FIFO is full.  Note, when
+                                this happens, pending writes are not done.
+
+**/
 EFI_STATUS
 IsaSerialReceiveTransmit (
   IN SERIAL_DEV *SerialDevice
   )
-/*++
 
-  Routine Description:
-
-    Reads and writes all avaliable data.
-
-  Arguments:
-
-    SerialDevice        - The device to flush
-
-  Returns:
-
-    EFI_SUCCESS         - Data was read/written successfully.
-    EFI_OUT_OF_RESOURCE - Failed because software receive FIFO is full.  Note, when
-                          this happens, pending writes are not done.
-
---*/
 {
   SERIAL_PORT_LSR Lsr;
   UINT8           Data;
@@ -968,30 +919,24 @@ IsaSerialReceiveTransmit (
 
   return EFI_SUCCESS;
 }
+
 //
 // Interface Functions
 //
+/**
+  Reset serial device
+
+  @param This             - Pointer to EFI_SERIAL_IO_PROTOCOL
+
+  @retval EFI_SUCCESS      - Reset successfully
+  @retval EFI_DEVICE_ERROR - Failed to reset
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialReset (
   IN EFI_SERIAL_IO_PROTOCOL  *This
   )
-/*++
-
-  Routine Description:
-
-    Reset serial device
-
-  Arguments:
-
-    This             - Pointer to EFI_SERIAL_IO_PROTOCOL
-
-  Returns:
-
-    EFI_SUCCESS      - Reset successfully
-    EFI_DEVICE_ERROR - Failed to reset
-
---*/
 {
   EFI_STATUS      Status;
   SERIAL_DEV      *SerialDevice;
@@ -1106,6 +1051,23 @@ IsaSerialReset (
   return EFI_SUCCESS;
 }
 
+/**
+  Set new attributes to a serial device
+
+  @param This                   - Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param  BaudRate               - The baudrate of the serial device
+  @param  ReceiveFifoDepth       - The depth of receive FIFO buffer
+  @param  Timeout                - The request timeout for a single char
+  @param  Parity                 - The type of parity used in serial device
+  @param  DataBits               - Number of databits used in serial device
+  @param  StopBits               - Number of stopbits used in serial device
+
+  @retval  EFI_SUCCESS            - The new attributes were set
+  @retval  EFI_INVALID_PARAMETERS - One or more attributes have an unsupported value
+  @retval  EFI_UNSUPPORTED        - Data Bits can not set to 5 or 6
+  @retval  EFI_DEVICE_ERROR       - The serial device is not functioning correctly (no return)
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialSetAttributes (
@@ -1117,30 +1079,6 @@ IsaSerialSetAttributes (
   IN UINT8                   DataBits,
   IN EFI_STOP_BITS_TYPE      StopBits
   )
-/*++
-
-  Routine Description:
-
-    Set new attributes to a serial device
-
-  Arguments:
-
-    This                   - Pointer to EFI_SERIAL_IO_PROTOCOL
-    BaudRate               - The baudrate of the serial device
-    ReceiveFifoDepth       - The depth of receive FIFO buffer
-    Timeout                - The request timeout for a single char
-    Parity                 - The type of parity used in serial device
-    DataBits               - Number of databits used in serial device
-    StopBits               - Number of stopbits used in serial device
-
-  Returns:
-
-    EFI_SUCCESS            - The new attributes were set
-    EFI_INVALID_PARAMETERS - One or more attributes have an unsupported value
-    EFI_UNSUPPORTED        - Data Bits can not set to 5 or 6
-    EFI_DEVICE_ERROR       - The serial device is not functioning correctly (no return)
-
---*/
 {
   EFI_STATUS                Status;
   SERIAL_DEV                *SerialDevice;
@@ -1424,29 +1362,22 @@ IsaSerialSetAttributes (
   return EFI_SUCCESS;
 }
 
+/**
+  Set Control Bits
+
+  @param This            - Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param Control         - Control bits that can be settable
+
+  @retval EFI_SUCCESS     - New Control bits were set successfully
+  @retval EFI_UNSUPPORTED - The Control bits wanted to set are not supported
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialSetControl (
   IN EFI_SERIAL_IO_PROTOCOL  *This,
   IN UINT32                  Control
   )
-/*++
-
-  Routine Description:
-
-    Set Control Bits
-
-  Arguments:
-
-    This            - Pointer to EFI_SERIAL_IO_PROTOCOL
-    Control         - Control bits that can be settable
-
-  Returns:
-
-    EFI_SUCCESS     - New Control bits were set successfully
-    EFI_UNSUPPORTED - The Control bits wanted to set are not supported
-
---*/
 {
   SERIAL_DEV      *SerialDevice;
   SERIAL_PORT_MCR Mcr;
@@ -1504,28 +1435,21 @@ IsaSerialSetControl (
   return EFI_SUCCESS;
 }
 
+/**
+  Get ControlBits
+
+  @param This        - Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param Control     - Control signals of the serial device
+
+  @retval EFI_SUCCESS - Get Control signals successfully
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialGetControl (
   IN EFI_SERIAL_IO_PROTOCOL  *This,
   OUT UINT32                 *Control
   )
-/*++
-
-  Routine Description:
-
-    Get ControlBits
-
-  Arguments:
-
-    This        - Pointer to EFI_SERIAL_IO_PROTOCOL
-    Control     - Control signals of the serial device
-
-  Returns:
-
-    EFI_SUCCESS - Get Control signals successfully
-
---*/
 {
   SERIAL_DEV      *SerialDevice;
   SERIAL_PORT_MSR Msr;
@@ -1604,6 +1528,19 @@ IsaSerialGetControl (
   return EFI_SUCCESS;
 }
 
+/**
+  Write the specified number of bytes to serial device
+
+  @param This             - Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param  BufferSize       - On input the size of Buffer, on output the amount of
+                       data actually written
+  @param  Buffer           - The buffer of data to write
+
+  @retval EFI_SUCCESS      - The data were written successfully
+  @retval EFI_DEVICE_ERROR - The device reported an error
+  @retval EFI_TIMEOUT      - The write operation was stopped due to timeout
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialWrite (
@@ -1611,26 +1548,6 @@ IsaSerialWrite (
   IN OUT UINTN               *BufferSize,
   IN VOID                    *Buffer
   )
-/*++
-
-  Routine Description:
-
-    Write the specified number of bytes to serial device
-
-  Arguments:
-
-    This             - Pointer to EFI_SERIAL_IO_PROTOCOL
-    BufferSize       - On input the size of Buffer, on output the amount of
-                       data actually written
-    Buffer           - The buffer of data to write
-
-  Returns:
-
-    EFI_SUCCESS      - The data were written successfully
-    EFI_DEVICE_ERROR - The device reported an error
-    EFI_TIMEOUT      - The write operation was stopped due to timeout
-
---*/
 {
   SERIAL_DEV  *SerialDevice;
   UINT8       *CharBuffer;
@@ -1692,6 +1609,19 @@ IsaSerialWrite (
   return EFI_SUCCESS;
 }
 
+/**
+  Read the specified number of bytes from serial device
+
+  @param This             - Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param BufferSize       - On input the size of Buffer, on output the amount of
+                       data returned in buffer
+  @param Buffer           -  The buffer to return the data into
+
+  @retval EFI_SUCCESS      - The data were read successfully
+  @retval EFI_DEVICE_ERROR - The device reported an error
+  @retval EFI_TIMEOUT      - The read operation was stopped due to timeout
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialRead (
@@ -1699,26 +1629,6 @@ IsaSerialRead (
   IN OUT UINTN               *BufferSize,
   OUT VOID                   *Buffer
   )
-/*++
-
-  Routine Description:
-
-    Read the specified number of bytes from serial device
-
-  Arguments:
-
-    This             - Pointer to EFI_SERIAL_IO_PROTOCOL
-    BufferSize       - On input the size of Buffer, on output the amount of
-                       data returned in buffer
-    Buffer           -  The buffer to return the data into
-
-  Returns:
-
-    EFI_SUCCESS      - The data were read successfully
-    EFI_DEVICE_ERROR - The device reported an error
-    EFI_TIMEOUT      - The read operation was stopped due to timeout
-
---*/
 {
   SERIAL_DEV  *SerialDevice;
   UINT32      Index;
@@ -1793,26 +1703,18 @@ IsaSerialRead (
   return EFI_SUCCESS;
 }
 
+/**
+  Use scratchpad register to test if this serial port is present
+
+  @param SerialDevice - Pointer to serial device structure
+
+  @return if this serial port is present
+**/
 BOOLEAN
 IsaSerialPortPresent (
   IN SERIAL_DEV *SerialDevice
   )
-/*++
 
-  Routine Description:
-
-    Use scratchpad register to test if this serial port is present
-
-  Arguments:
-
-    SerialDevice - Pointer to serial device structure
-
-  Returns:
-
-    TRUE         - The serial port is present
-    FALSE        - The serial port is NOT present
-
---*/
 {
   UINT8   Temp;
   BOOLEAN Status;
@@ -1845,29 +1747,22 @@ IsaSerialPortPresent (
   return Status;
 }
 
+/**
+  Use IsaIo protocol to read serial port
+
+  @param IsaIo       - Pointer to EFI_ISA_IO_PROTOCOL instance
+  @param BaseAddress - Serial port register group base address
+  @param Offset      - Offset in register group
+
+  @return Data read from serial port
+
+**/
 UINT8
 IsaSerialReadPort (
   IN EFI_ISA_IO_PROTOCOL                   *IsaIo,
   IN UINT16                                BaseAddress,
   IN UINT32                                Offset
   )
-/*++
-
-  Routine Description:
-
-    Use IsaIo protocol to read serial port
-
-  Arguments:
-
-    IsaIo       - Pointer to EFI_ISA_IO_PROTOCOL instance
-    BaseAddress - Serial port register group base address
-    Offset      - Offset in register group
-
-  Returns:
-
-    Data read from serial port
-
---*/
 {
   UINT8 Data;
 
@@ -1884,6 +1779,15 @@ IsaSerialReadPort (
   return Data;
 }
 
+/**
+  Use IsaIo protocol to write serial port
+
+  @param  IsaIo       - Pointer to EFI_ISA_IO_PROTOCOL instance
+  @param  BaseAddress - Serial port register group base address
+  @param  Offset      - Offset in register group
+  @param  Data        - data which is to be written to some serial port register
+
+**/
 VOID
 IsaSerialWritePort (
   IN EFI_ISA_IO_PROTOCOL                 *IsaIo,
@@ -1891,24 +1795,6 @@ IsaSerialWritePort (
   IN UINT32                              Offset,
   IN UINT8                               Data
   )
-/*++
-
-  Routine Description:
-
-    Use IsaIo protocol to write serial port
-
-  Arguments:
-
-    IsaIo       - Pointer to EFI_ISA_IO_PROTOCOL instance
-    BaseAddress - Serial port register group base address
-    Offset      - Offset in register group
-    Data        - data which is to be written to some serial port register
-
-  Returns:
-
-    None
-
---*/
 {
   //
   // Use IsaIo to access IO

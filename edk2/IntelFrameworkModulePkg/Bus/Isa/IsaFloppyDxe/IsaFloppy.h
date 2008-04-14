@@ -492,6 +492,16 @@ extern EFI_DRIVER_BINDING_PROTOCOL   gFdcControllerDriver;
 //
 // EFI Driver Binding Protocol Functions
 //
+/**
+  Test controller is a Floppy Disk Controller
+  
+  @param This                 Pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param Controller           driver's controller
+  @param RemainingDevicePath  children device path
+  
+  @retval EFI_UNSUPPORTED controller is not floppy disk
+  @retval EFI_SUCCESS     controller is floppy disk
+**/
 EFI_STATUS
 EFIAPI
 FdcControllerDriverSupported (
@@ -499,25 +509,17 @@ FdcControllerDriverSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This                - GC_TODO: add argument description
-  Controller          - GC_TODO: add argument description
-  RemainingDevicePath - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Create floppy control instance on controller.
+  
+  @param This         Pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param Controller   driver controller handle
+  @param RemainingDevicePath Children's device path
+  
+  @retval whether success to create floppy control instance.
+**/
 EFI_STATUS
 EFIAPI
 FdcControllerDriverStart (
@@ -525,25 +527,22 @@ FdcControllerDriverStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This                - GC_TODO: add argument description
-  Controller          - GC_TODO: add argument description
-  RemainingDevicePath - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 FdcControllerDriverStop (
@@ -552,75 +551,65 @@ FdcControllerDriverStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This              - GC_TODO: add argument description
-  Controller        - GC_TODO: add argument description
-  NumberOfChildren  - GC_TODO: add argument description
-  ChildHandleBuffer - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
 //
 // EFI Block I/O Protocol Functions
 //
+/**
+  Reset the Floppy Logic Drive, call the FddReset function   
+  
+  @param This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
+  @param ExtendedVerification BOOLEAN: Indicate that the driver may perform a more 
+                    exhaustive verification operation of the device during 
+                    reset, now this par is ignored in this driver          
+  @retval  EFI_SUCCESS:      The Floppy Logic Drive is reset
+  @retval  EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly 
+                      and can not be reset
+
+**/
 EFI_STATUS
 EFIAPI
 FdcReset (
   IN EFI_BLOCK_IO_PROTOCOL  *This,
   IN BOOLEAN                ExtendedVerification
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This                  - GC_TODO: add argument description
-  ExtendedVerification  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Flush block via fdd controller
+  
+  @param  This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
+  @return EFI_SUCCESS
+
+**/
 EFI_STATUS
 EFIAPI
 FddFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Read the requested number of blocks from the device   
+  
+  @param This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
+  @param MediaId UINT32:    The media id that the read request is for    
+  @param  LBA EFI_LBA:     The starting logic block address to read from on the device
+  @param  BufferSize UINTN:  The size of the Buffer in bytes
+  @param  Buffer VOID *:     A pointer to the destination buffer for the data
+  
+  @retval  EFI_SUCCESS:     The data was read correctly from the device
+  @retval  EFI_DEVICE_ERROR:The device reported an error while attempting to perform
+                     the read operation
+  @retval  EFI_NO_MEDIA:    There is no media in the device
+  @retval  EFI_MEDIA_CHANGED:   The MediaId is not for the current media
+  @retval  EFI_BAD_BUFFER_SIZE: The BufferSize parameter is not a multiple of the 
+                         intrinsic block size of the device
+  @retval  EFI_INVALID_PARAMETER:The read request contains LBAs that are not valid, 
+                          or the buffer is not on proper alignment 
+
+**/
 EFI_STATUS
 EFIAPI
 FddReadBlocks (
@@ -630,27 +619,28 @@ FddReadBlocks (
   IN  UINTN                  BufferSize,
   OUT VOID                   *Buffer
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This        - GC_TODO: add argument description
-  MediaId     - GC_TODO: add argument description
-  LBA         - GC_TODO: add argument description
-  BufferSize  - GC_TODO: add argument description
-  Buffer      - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Write a specified number of blocks to the device   
+  
+  @param  This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
+  @param  MediaId UINT32:    The media id that the write request is for   
+  @param  LBA EFI_LBA:     The starting logic block address to be written
+  @param  BufferSize UINTN:  The size in bytes in Buffer
+  @param  Buffer VOID *:     A pointer to the source buffer for the data
+  
+  @retval  EFI_SUCCESS:     The data were written correctly to the device
+  @retval  EFI_WRITE_PROTECTED: The device can not be written to 
+  @retval  EFI_NO_MEDIA:    There is no media in the device
+  @retval  EFI_MEDIA_CHANGED:   The MediaId is not for the current media
+  @retval  EFI_DEVICE_ERROR:  The device reported an error while attempting to perform 
+                       the write operation 
+  @retval  EFI_BAD_BUFFER_SIZE: The BufferSize parameter is not a multiple of the 
+                         intrinsic block size of the device
+  @retval  EFI_INVALID_PARAMETER:The write request contains LBAs that are not valid, 
+                          or the buffer is not on proper alignment 
+**/
 EFI_STATUS
 EFIAPI
 FddWriteBlocks (
@@ -660,311 +650,238 @@ FddWriteBlocks (
   IN UINTN                  BufferSize,
   IN VOID                   *Buffer
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This        - GC_TODO: add argument description
-  MediaId     - GC_TODO: add argument description
-  LBA         - GC_TODO: add argument description
-  BufferSize  - GC_TODO: add argument description
-  Buffer      - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
 //
 // Prototypes of internal functions
 //
+/**
+
+  Detect the floppy drive is presented or not
+ 
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  @retval EFI_SUCCESS    Drive is presented
+  @retval EFI_NOT_FOUND  Drive is not presented
+
+**/
 EFI_STATUS
 DiscoverFddDevice (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+
+  Do recalibrate  and see the drive is presented or not
+  Set the media parameters
+  
+  @param FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  @return the drive is presented or not
+
+**/
 EFI_STATUS
 FddIdentify (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+
+  Reset the Floppy Logic Drive
+  
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  
+  @retval EFI_SUCCESS:    The Floppy Logic Drive is reset
+  @retval EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly and
+                      can not be reset
+
+**/
 EFI_STATUS
 FddReset (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+
+  Turn the drive's motor on
+  The drive's motor must be on before any command can be executed
+  
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:       Turn the drive's motor on successfully
+  @retval  EFI_DEVICE_ERROR:    The drive is busy, so can not turn motor on
+  @retval  EFI_INVALID_PARAMETER: Fail to Set timer(Cancel timer)
+
+**/
 EFI_STATUS
 MotorOn (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+
+  Set a Timer and when Timer goes off, turn the motor off
+  
+  
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:       Set the Timer successfully
+  @retval  EFI_INVALID_PARAMETER: Fail to Set the timer
+
+**/
 EFI_STATUS
 MotorOff (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Detect the disk in the drive is changed or not
+  
+  
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:    No disk media change
+  @retval  EFI_DEVICE_ERROR: Fail to do the recalibrate or seek operation
+  @retval  EFI_NO_MEDIA:   No disk in the drive
+  @retval  EFI_MEDIA_CHANGED:  There is a new disk in the drive
+**/
 EFI_STATUS
 DisketChanged (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Do the Specify command, this command sets DMA operation
+  and the initial values for each of the three internal
+  times: HUT, SRT and HLT
+  
+  @param This    Pointer to instance of FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:    Execute the Specify command successfully
+  @retval  EFI_DEVICE_ERROR: Fail to execute the command
+
+**/
 EFI_STATUS
 Specify (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Set the head of floppy drive to track 0
+ 
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @retval EFI_SUCCESS:    Execute the Recalibrate operation successfully
+  @retval EFI_DEVICE_ERROR: Fail to execute the Recalibrate operation
+
+**/
 EFI_STATUS
 Recalibrate (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Set the head of floppy drive to the new cylinder
+  
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  Lba EFI_LBA     : The logic block address want to seek
+  
+  @retval  EFI_SUCCESS:    Execute the Seek operation successfully
+  @retval  EFI_DEVICE_ERROR: Fail to execute the Seek operation
+
+**/
 EFI_STATUS
 Seek (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN EFI_LBA         Lba
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-  Lba     - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Do the Sense Interrupt Status command, this command
+  resets the interrupt signal
+  
+  
+  @param  StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC
+  @param  PresentCylinderNumber  UINT8 *: Be used to save present cylinder number
+                                    read from FDC
+  
+  @retval  EFI_SUCCESS:    Execute the Sense Interrupt Status command successfully
+  @retval  EFI_DEVICE_ERROR: Fail to execute the command
+
+**/
 EFI_STATUS
 SenseIntStatus (
   IN     FDC_BLK_IO_DEV  *FdcDev,
   IN OUT UINT8           *StatusRegister0,
   IN OUT UINT8           *PresentCylinderNumber
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev                - GC_TODO: add argument description
-  StatusRegister0       - GC_TODO: add argument description
-  PresentCylinderNumber - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Do the Sense Drive Status command
+  
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  Lba EFI_LBA     : Logic block address
+  
+  @retval  EFI_SUCCESS:    Execute the Sense Drive Status command successfully
+  @retval  EFI_DEVICE_ERROR: Fail to execute the command
+  @retval  EFI_WRITE_PROTECTED:The disk is write protected
+
+**/
 EFI_STATUS
 SenseDrvStatus (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN EFI_LBA         Lba
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-  Lba     - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Update the disk media properties and if necessary
+                        reinstall Block I/O interface
+ 
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:    Do the operation successfully
+  @retval  EFI_DEVICE_ERROR: Fail to the operation
+
+**/
 EFI_STATUS
 DetectMedia (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Set the data rate and so on
+ 
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+
+  @retval EFI_SUCCESS success to set the data rate
+**/
 EFI_STATUS
 Setup (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Read or Write a number of blocks in the same cylinder
+ 
+  @param  FdcDev      A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  HostAddress device address 
+  @param  Lba         The starting logic block address to read from on the device
+  @param  NumberOfBlocks The number of block wanted to be read or write
+  @param  Read        Operation type: read or write
+  
+  @retval EFI_SUCCESS Success operate
+
+**/
 EFI_STATUS
 ReadWriteDataSector (
   IN FDC_BLK_IO_DEV  *FdcDev,
@@ -973,287 +890,224 @@ ReadWriteDataSector (
   IN UINTN           NumberOfBlocks,
   IN BOOLEAN         Read
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev          - GC_TODO: add argument description
-  HostAddress     - GC_TODO: add argument description
-  Lba             - GC_TODO: add argument description
-  NumberOfBlocks  - GC_TODO: add argument description
-  Read            - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Fill in FDD command's parameter
+  
+  @param FdcDev   Pointer to instance of FDC_BLK_IO_DEV
+  @param Lba      The starting logic block address to read from on the device
+  @param Command  FDD command
+
+**/
 VOID
 FillPara (
   IN FDC_BLK_IO_DEV       *FdcDev,
   IN EFI_LBA              Lba,
   IN FDD_COMMAND_PACKET1  *Command
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-  Lba     - GC_TODO: add argument description
-  Command - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Read result byte from Data Register of FDC
+  
+  @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
+  @param Pointer UINT8 *: Be used to save result byte read from FDC
+  
+  
+  @retval  EFI_SUCCESS:    Read result byte from FDC successfully
+  @retval  EFI_DEVICE_ERROR: The FDC is not ready to be read
+
+**/
 EFI_STATUS
 DataInByte (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT8           *Pointer
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-  Pointer - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Write command byte to Data Register of FDC
+  
+  @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
+  @param Pointer Be used to save command byte written to FDC
+  
+  @retval  EFI_SUCCESS:    Write command byte to FDC successfully
+  @retval  EFI_DEVICE_ERROR: The FDC is not ready to be written
+
+**/
 EFI_STATUS
 DataOutByte (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT8           *Pointer
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-  Pointer - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Detect the specified floppy logic drive is busy or
+  not within a period of time
+  
+  @param Disk             Indicate it is drive A or drive B
+  @param TimeoutInSeconds the time period for waiting
+  
+  @retval EFI_SUCCESS:  The drive and command are not busy
+  @retval EFI_TIMEOUT:  The drive or command is still busy after a period time that
+                        set by TimeoutInSeconds
+
+**/
 EFI_STATUS
 FddWaitForBSYClear (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINTN           TimeoutInSeconds
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev            - GC_TODO: add argument description
-  TimeoutInSeconds  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+
+  Routine Description:  Determine whether FDC is ready to write or read
+  
+  @param  FdcDev Pointer to instance of FDC_BLK_IO_DEV
+  @param  Dio BOOLEAN:      Indicate the FDC is waiting to write or read
+  @param  TimeoutInSeconds UINTN: The time period for waiting
+  
+  @retval EFI_SUCCESS:  FDC is ready to write or read
+  @retval EFI_NOT_READY:  FDC is not ready within the specified time period
+
+**/
 EFI_STATUS
 FddDRQReady (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN BOOLEAN         Dio,
   IN UINTN           TimeoutInSeconds
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev            - GC_TODO: add argument description
-  Dio               - GC_TODO: add argument description
-  TimeoutInSeconds  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Set FDC control structure's attribute according to
+  result 
+
+  @param Result  Point to result structure
+  @param FdcDev  FDC control structure
+
+  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @param EFI_SUCCESS - GC_TODO: Add description for return value
+
+**/
 EFI_STATUS
 CheckResult (
   IN     FDD_RESULT_PACKET  *Result,
   IN OUT FDC_BLK_IO_DEV     *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Result  - GC_TODO: add argument description
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Check the drive status information
+  
+  @param StatusRegister3  the value of Status Register 3
+  
+  @retval EFI_SUCCESS           The disk is not write protected
+  @retval EFI_WRITE_PROTECTED:  The disk is write protected
+
+**/
 EFI_STATUS
 CheckStatus3 (
   IN UINT8 StatusRegister3
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  StatusRegister3 - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Calculate the number of block in the same cylinder
+  according to LBA
+  
+  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param LBA EFI_LBA:      The starting logic block address
+  @param NumberOfBlocks UINTN: The number of blocks
+  
+  @return The number of blocks in the same cylinder which the starting
+        logic block address is LBA
+
+**/
 UINTN
 GetTransferBlockCount (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN EFI_LBA         LBA,
   IN UINTN           NumberOfBlocks
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev          - GC_TODO: add argument description
-  LBA             - GC_TODO: add argument description
-  NumberOfBlocks  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  When the Timer(2s) off, turn the drive's motor off
+  
+  @param Event EFI_EVENT: Event(the timer) whose notification function is being
+                     invoked
+  @param Context VOID *:  Pointer to the notification function's context
+
+**/
 VOID
 EFIAPI
 FddTimerProc (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Event   - GC_TODO: add argument description
-  Context - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Read I/O port for FDC
+ 
+  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param Offset The offset address of port
+
+**/
 UINT8
 FdcReadPort (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT32          Offset
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-  Offset  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Write I/O port for FDC
+ 
+  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param Offset The offset address of port
+
+**/
 VOID
 FdcWritePort (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT32          Offset,
   IN UINT8           Data
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-  Offset  - GC_TODO: add argument description
-  Data    - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Read or Write a number of blocks to floppy device
+
+  @param This     Pointer to instance of EFI_BLOCK_IO_PROTOCOL
+  @param MediaId  The media id of read/write request
+  @param LBA      The starting logic block address to read from on the device
+  @param BufferSize The size of the Buffer in bytes
+  @param Operation   - GC_TODO: add argument description
+  Buffer      - GC_TODO: add argument description
+
+  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_NO_MEDIA - GC_TODO: Add description for return value
+  @retval EFI_MEDIA_CHANGED - GC_TODO: Add description for return value
+  @retval EFI_WRITE_PROTECTED - GC_TODO: Add description for return value
+  @retval EFI_BAD_BUFFER_SIZE - GC_TODO: Add description for return value
+  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
+  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+
+**/
 EFI_STATUS
 FddReadWriteBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,
@@ -1263,47 +1117,19 @@ FddReadWriteBlocks (
   IN  BOOLEAN                Operation,
   OUT VOID                   *Buffer
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This        - GC_TODO: add argument description
-  MediaId     - GC_TODO: add argument description
-  LBA         - GC_TODO: add argument description
-  BufferSize  - GC_TODO: add argument description
-  Operation   - GC_TODO: add argument description
-  Buffer      - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Common interface for free cache 
+  
+  @param FdcDec  Pointer of FDC_BLK_IO_DEV instance
+  
+**/
 VOID
 FdcFreeCache (
   IN    FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
 #endif
+

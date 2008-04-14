@@ -1,4 +1,3 @@
-
 /** @file
   Serial I/O status code reporting worker.
 
@@ -10,9 +9,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  SerialStatusCodeWorker.c
-
 **/
 
 #include "PeiStatusCode.h"
@@ -168,3 +164,4 @@ SerialStatusCodeReportWorker (
 
   return EFI_SUCCESS;
 }
+

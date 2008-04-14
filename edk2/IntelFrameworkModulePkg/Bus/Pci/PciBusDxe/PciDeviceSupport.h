@@ -18,7 +18,7 @@ EFI_STATUS
 InitializePciDevicePool (
   VOID
   )
-/*++
+/**
 
 Routine Description:
 
@@ -32,14 +32,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 InsertRootBridge (
   PCI_IO_DEVICE *RootBridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -53,7 +53,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -61,7 +61,7 @@ InsertPciDevice (
   PCI_IO_DEVICE *Bridge,
   PCI_IO_DEVICE *PciDeviceNode
   )
-/*++
+/**
 
 Routine Description:
 
@@ -76,14 +76,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 DestroyRootBridge (
   IN PCI_IO_DEVICE *RootBridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -97,14 +97,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 DestroyPciDeviceTree (
   IN PCI_IO_DEVICE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -118,14 +118,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 DestroyRootBridgeByHandle (
   EFI_HANDLE Controller
   )
-/*++
+/**
 
 Routine Description:
 
@@ -139,7 +139,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -148,7 +148,7 @@ RegisterPciDevice (
   IN  PCI_IO_DEVICE                  *PciIoDevice,
   OUT EFI_HANDLE                     *Handle OPTIONAL
   )
-/*++
+/**
 
 Routine Description:
 
@@ -164,7 +164,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -172,7 +172,7 @@ RemoveAllPciDeviceOnBridge (
   EFI_HANDLE               RootBridgeHandle,
   PCI_IO_DEVICE            *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -187,7 +187,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -195,7 +195,7 @@ DeRegisterPciDevice (
   IN  EFI_HANDLE                     Controller,
   IN  EFI_HANDLE                     Handle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -210,7 +210,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -221,7 +221,7 @@ StartPciDevicesOnBridge (
   IN OUT UINT8                           *NumberOfChildren,
   IN OUT EFI_HANDLE                      *ChildHandleBuffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -239,14 +239,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 StartPciDevices (
   IN EFI_HANDLE                         Controller
   )
-/*++
+/**
 
 Routine Description:
 
@@ -260,14 +260,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_IO_DEVICE *
 CreateRootBridge (
   IN EFI_HANDLE RootBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -281,14 +281,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_IO_DEVICE *
 GetRootBridgeByHandle (
   EFI_HANDLE RootBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -302,14 +302,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
 RootBridgeExisted (
   IN EFI_HANDLE RootBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -323,7 +323,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
@@ -331,7 +331,7 @@ PciDeviceExisted (
   IN PCI_IO_DEVICE    *Bridge,
   IN PCI_IO_DEVICE    *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -346,14 +346,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheSameSegment (
   IN PCI_IO_DEVICE        *VgaDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -367,14 +367,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheRootBridge (
   IN PCI_IO_DEVICE        *RootBridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -388,7 +388,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -397,7 +397,7 @@ GetHpcPciAddress (
   IN  EFI_DEVICE_PATH_PROTOCOL         *HpcDevicePath,
   OUT UINT64                           *PciAddress
   )
-/*++
+/**
 
 Routine Description:
 
@@ -413,7 +413,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -422,7 +422,7 @@ GetHpcPciAddressFromRootBridge (
   IN  EFI_DEVICE_PATH_PROTOCOL         *RemainingDevicePath,
   OUT UINT64                           *PciAddress
   )
-/*++
+/**
 
 Routine Description:
 
@@ -438,14 +438,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 FreePciDevice (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -459,7 +459,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 #endif

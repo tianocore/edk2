@@ -17,7 +17,7 @@ EFI_STATUS
 ResetPowerManagementFeature (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -31,7 +31,7 @@ Returns:
   
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment

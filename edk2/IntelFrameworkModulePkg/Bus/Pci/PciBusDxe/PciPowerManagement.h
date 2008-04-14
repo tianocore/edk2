@@ -18,7 +18,7 @@ EFI_STATUS
 ResetPowerManagementFeature (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -32,7 +32,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 #endif

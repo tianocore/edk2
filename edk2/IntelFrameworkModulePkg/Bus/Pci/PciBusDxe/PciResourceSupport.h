@@ -64,7 +64,7 @@ SkipVGAAperture (
   OUT UINT64   *Start,
   IN  UINT64   Length
   )
-/*++
+/**
 
 Routine Description:
 
@@ -79,7 +79,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -87,7 +87,7 @@ SkipIsaAliasAperture (
   OUT UINT64   *Start,
   IN  UINT64   Length
   )
-/*++
+/**
 
 Routine Description:
 
@@ -102,7 +102,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -110,7 +110,7 @@ InsertResourceNode (
   PCI_RESOURCE_NODE *Bridge,
   PCI_RESOURCE_NODE *ResNode
   )
-/*++
+/**
 
 Routine Description:
 
@@ -125,7 +125,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -134,7 +134,7 @@ MergeResourceTree (
   PCI_RESOURCE_NODE *Res,
   BOOLEAN           TypeMerge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -150,14 +150,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 CalculateApertureIo16 (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -171,14 +171,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 CalculateResourceAperture (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -192,7 +192,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -204,7 +204,7 @@ GetResourceFromDevice (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -223,7 +223,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_RESOURCE_NODE *
@@ -235,7 +235,7 @@ CreateResourceNode (
   IN PCI_BAR_TYPE          ResType,
   IN PCI_RESOURCE_USAGE    ResUsage
   )
-/*++
+/**
 
 Routine Description:
 
@@ -254,7 +254,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -266,7 +266,7 @@ CreateResourceMap (
   IN PCI_RESOURCE_NODE *Mem64Node,
   IN PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -285,7 +285,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -297,7 +297,7 @@ ResourcePaddingPolicy (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -316,7 +316,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -327,7 +327,7 @@ DegradeResource (
   IN PCI_RESOURCE_NODE *Mem64Node,
   IN PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -345,7 +345,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
@@ -353,7 +353,7 @@ BridgeSupportResourceDecode (
   IN PCI_IO_DEVICE *Bridge,
   IN UINT32        Decode
   )
-/*++
+/**
 
 Routine Description:
 
@@ -368,7 +368,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -376,7 +376,7 @@ ProgramResource (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -391,7 +391,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -399,7 +399,7 @@ ProgramBar (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -414,7 +414,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -422,7 +422,7 @@ ProgramPpbApperture (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -437,7 +437,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -446,7 +446,7 @@ ProgrameUpstreamBridgeForRom (
   IN UINT32          OptionRomBase,
   IN BOOLEAN         Enable
   )
-/*++
+/**
 
 Routine Description:
 
@@ -462,14 +462,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
 ResourceRequestExisted (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -483,7 +483,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -491,7 +491,7 @@ InitializeResourcePool (
   PCI_RESOURCE_NODE   *ResourcePool,
   PCI_BAR_TYPE        ResourceType
   )
-/*++
+/**
 
 Routine Description:
 
@@ -506,7 +506,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -523,7 +523,7 @@ GetResourceMap (
   PCI_RESOURCE_NODE  *Mem64Pool,
   PCI_RESOURCE_NODE  *PMem64Pool
   )
-/*++
+/**
 
 Routine Description:
 
@@ -547,14 +547,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 DestroyResourceTree (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -568,7 +568,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -578,7 +578,7 @@ RecordReservedResource (
   IN PCI_BAR_TYPE   ResType,
   IN PCI_IO_DEVICE  *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -595,7 +595,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -607,7 +607,7 @@ ResourcePaddingForCardBusBridge (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -626,7 +626,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -634,7 +634,7 @@ ProgramP2C (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -649,7 +649,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -661,7 +661,7 @@ ApplyResourcePadding (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -680,14 +680,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 VOID
 GetResourcePaddingPpb (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -701,7 +701,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -709,7 +709,7 @@ ResetAllPpbBusNumber (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber
   )
-/*++
+/**
 
 Routine Description:
 
@@ -724,7 +724,7 @@ Returns:
 
   None
 
---*/
+**/
 ;
 
 #endif

@@ -19,7 +19,7 @@ EFI_STATUS
 InitializePciIoInstance (
   PCI_IO_DEVICE  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -33,7 +33,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -45,7 +45,7 @@ PciIoVerifyBarAccess (
   IN UINTN                        Count,
   UINT64                          *Offset
   )
-/*++
+/**
 
 Routine Description:
 
@@ -64,7 +64,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -74,7 +74,7 @@ PciIoVerifyConfigAccess (
   IN UINTN                      Count,
   IN UINT64                     *Offset
   )
-/*++
+/**
 
 Routine Description:
 
@@ -91,7 +91,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -106,7 +106,7 @@ PciIoPollMem (
   IN  UINT64                     Delay,
   OUT UINT64                     *Result
   )
-/*++
+/**
 
 Routine Description:
 
@@ -127,7 +127,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -142,7 +142,7 @@ PciIoPollIo (
   IN  UINT64                     Delay,
   OUT UINT64                     *Result
   )
-/*++
+/**
 
 Routine Description:
 
@@ -163,7 +163,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -176,7 +176,7 @@ PciIoMemRead (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -195,7 +195,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -208,7 +208,7 @@ PciIoMemWrite (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -227,7 +227,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -240,7 +240,7 @@ PciIoIoRead (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -259,7 +259,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -272,7 +272,7 @@ PciIoIoWrite (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -291,7 +291,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -303,7 +303,7 @@ PciIoConfigRead (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -321,7 +321,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -333,7 +333,7 @@ PciIoConfigWrite (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -351,7 +351,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -365,7 +365,7 @@ PciIoCopyMem (
   IN     UINT64                       SrcOffset,
   IN     UINTN                        Count
   )
-/*++
+/**
 
 Routine Description:
 
@@ -385,7 +385,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -398,7 +398,7 @@ PciIoMap (
   OUT    EFI_PHYSICAL_ADDRESS           *DeviceAddress,
   OUT    VOID                           **Mapping
   )
-/*++
+/**
 
 Routine Description:
 
@@ -417,7 +417,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -426,7 +426,7 @@ PciIoUnmap (
   IN  EFI_PCI_IO_PROTOCOL  *This,
   IN  VOID                 *Mapping
   )
-/*++
+/**
 
 Routine Description:
 
@@ -441,7 +441,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -454,7 +454,7 @@ PciIoAllocateBuffer (
   OUT VOID                  **HostAddress,
   IN  UINT64                Attributes
   )
-/*++
+/**
 
 Routine Description:
 
@@ -473,7 +473,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -483,7 +483,7 @@ PciIoFreeBuffer (
   IN  UINTN                 Pages,
   IN  VOID                  *HostAddress
   )
-/*++
+/**
 
 Routine Description:
 
@@ -499,7 +499,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -507,7 +507,7 @@ EFIAPI
 PciIoFlush (
   IN  EFI_PCI_IO_PROTOCOL  *This
   )
-/*++
+/**
 
 Routine Description:
 
@@ -521,7 +521,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -533,7 +533,7 @@ PciIoGetLocation (
   OUT UINTN                *Device,
   OUT UINTN                *Function
   )
-/*++
+/**
 
 Routine Description:
 
@@ -551,7 +551,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
@@ -560,7 +560,7 @@ CheckBarType (
   UINT8                  BarIndex,
   PCI_BAR_TYPE           BarType
   )
-/*++
+/**
 
 Routine Description:
 
@@ -576,7 +576,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -585,7 +585,7 @@ ModifyRootBridgeAttributes (
   IN  UINT64                                   Attributes,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation
   )
-/*++
+/**
 
 Routine Description:
 
@@ -601,7 +601,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -609,7 +609,7 @@ SupportPaletteSnoopAttributes (
   IN  PCI_IO_DEVICE                            *PciIoDevice,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation
   )
-/*++
+/**
 
 Routine Description:
 
@@ -624,7 +624,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -635,7 +635,7 @@ PciIoAttributes (
   IN  UINT64                                   Attributes,
   OUT UINT64                                   *Result OPTIONAL
   )
-/*++
+/**
 
 Routine Description:
 
@@ -652,7 +652,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -663,7 +663,7 @@ PciIoGetBarAttributes (
   OUT UINT64                         *Supports, OPTIONAL
   OUT VOID                           **Resources OPTIONAL
   )
-/*++
+/**
 
 Routine Description:
 
@@ -680,7 +680,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -692,7 +692,7 @@ PciIoSetBarAttributes (
   IN OUT UINT64                       *Offset,
   IN OUT UINT64                       *Length
   )
-/*++
+/**
 
 Routine Description:
 
@@ -710,7 +710,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -719,7 +719,7 @@ UpStreamBridgesAttributes (
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation,
   IN  UINT64                                   Attributes
   )
-/*++
+/**
 
 Routine Description:
 
@@ -735,7 +735,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
@@ -743,7 +743,7 @@ PciDevicesOnTheSamePath (
   IN PCI_IO_DEVICE        *PciDevice1,
   IN PCI_IO_DEVICE        *PciDevice2
   )
-/*++
+/**
 
 Routine Description:
 
@@ -758,7 +758,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 #endif

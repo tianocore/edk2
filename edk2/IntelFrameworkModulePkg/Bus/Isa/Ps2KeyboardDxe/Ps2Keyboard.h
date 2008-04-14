@@ -131,28 +131,22 @@ extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 //
 // Driver entry point
 //
+/**
+  The user Entry Point for module Ps2Keyboard. The user code starts with this function.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
+
+**/
 EFI_STATUS
 EFIAPI
 InstallPs2KeyboardDriver (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ImageHandle - GC_TODO: add argument description
-  SystemTable - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
 #define KEYBOARD_8042_DATA_REGISTER     0x60
@@ -191,233 +185,170 @@ Returns:
 //
 // Other functions that are used among .c files
 //
+/**
+  Show keyboard status lights according to
+  indicators in ConsoleIn.
 
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  
+  @return status
+
+**/
 EFI_STATUS
 UpdateStatusLights (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
-/*++
-
-Routine Description:
-
-  Show keyboard status light for ScrollLock, NumLock and CapsLock
-  according to indicators in ConsoleIn.
-
-Arguments:
-
-  ConsoleIn   - driver private structure
-
-Returns:
-
-  EFI_SUCCESS - Show the status light successfully.
-  EFI_TIMEOUT - Timeout when operating read/write on registers.
-
---*/  
 ;
 
+/**
+  write key to keyboard
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Data      value wanted to be written
+
+  @retval EFI_TIMEOUT - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+
+**/
 EFI_STATUS
 KeyboardRead (
   IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
   OUT UINT8                   *Data
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-  Data      - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Get scancode from scancode buffer
+  and translate into EFI-scancode and unicode defined by EFI spec
+  The function is always called in TPL_NOTIFY
+
+  @param ConsoleIn KEYBOARD_CONSOLE_IN_DEV instance pointer
+
+  @retval EFI_NOT_READY - Input from console not ready yet.
+  @retval EFI_SUCCESS   - Function executed successfully.
+
+**/
 EFI_STATUS
 KeyGetchar (
   IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Perform 8042 controller and keyboard Initialization
+  If ExtendedVerification is TRUE, do additional test for
+  the keyboard interface
+
+  @param ConsoleIn - KEYBOARD_CONSOLE_IN_DEV instance pointer
+  @param ExtendedVerification - indicates a thorough initialization
+
+  @retval EFI_DEVICE_ERROR Fail to init keyboard
+  @retval EFI_SUCCESS      Success to init keyboard
+**/
 EFI_STATUS
 InitKeyboard (
   IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN BOOLEAN                     ExtendedVerification
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn             - GC_TODO: add argument description
-  ExtendedVerification  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Disable the keyboard interface of the 8042 controller
+
+  @param ConsoleIn   - the device instance
+
+  @return status of issuing disable command
+
+**/
 EFI_STATUS
 DisableKeyboard (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Timer event handler: read a series of scancodes from 8042
+  and put them into memory scancode buffer.
+  it read as much scancodes to either fill
+  the memory buffer or empty the keyboard buffer.
+  It is registered as running under TPL_NOTIFY
+
+  @param Event - The timer event
+  @param Context - A KEYBOARD_CONSOLE_IN_DEV pointer
+
+**/
 VOID
 EFIAPI
 KeyboardTimerHandler (
   IN EFI_EVENT    Event,
   IN VOID         *Context
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Event   - GC_TODO: add argument description
-  Context - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  logic reset keyboard
+  Implement SIMPLE_TEXT_IN.Reset()
+  Perform 8042 controller and keyboard initialization
+
+  @param This    Pointer to instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL
+  @param ExtendedVerification Indicate that the driver may perform a more 
+                              exhaustive verification operation of the device during 
+                              reset, now this par is ignored in this driver    
+
+**/
 EFI_STATUS
 EFIAPI
 KeyboardEfiReset (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   IN  BOOLEAN                         ExtendedVerification
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This                  - GC_TODO: add argument description
-  ExtendedVerification  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Implement SIMPLE_TEXT_IN.ReadKeyStroke().
+  Retrieve key values for driver user.
+
+  @param This    Pointer to instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL
+  @param Key     The output buffer for key value 
+
+  @retval EFI_SUCCESS success to read key stroke
+**/
 EFI_STATUS
 EFIAPI
 KeyboardReadKeyStroke (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   OUT EFI_INPUT_KEY                   *Key
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This  - GC_TODO: add argument description
-  Key   - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Event notification function for SIMPLE_TEXT_IN.WaitForKey event
+  Signal the event if there is key available
+
+  @param Event    the event object
+  @param Context  waitting context
+
+**/
 VOID
 EFIAPI
 KeyboardWaitForKey (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Event   - GC_TODO: add argument description
-  Context - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Read status register
+
+  @param ConsoleIn  Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+
+  @return value in status register
+
+**/
 UINT8
 KeyReadStatusRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
 /**
@@ -437,106 +368,106 @@ CheckKeyboardConnect (
   )
 ;
 
+/**
+  Event notification function for SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx event
+  Signal the event if there is key available
+
+  @param Event    event object
+  @param Context  waiting context
+
+**/
 VOID
 EFIAPI
 KeyboardWaitForKeyEx (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
   )
-/*++
-
-Routine Description:
-
-  Event notification function for SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx event
-  Signal the event if there is key available
-
-Arguments:
-
-Returns:
-
---*/    
 ;  
 
 //
 // Simple Text Input Ex protocol function prototypes
 //
 
+/**
+  Reset the input device and optionaly run diagnostics
+
+  @param This                 - Protocol instance pointer.
+  @param ExtendedVerification - Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS           - The device was reset.
+  @retval EFI_DEVICE_ERROR      - The device is not functioning properly and could 
+                                  not be reset.
+
+**/
 EFI_STATUS
 EFIAPI
 KeyboardEfiResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
   )
-/*++
-
-  Routine Description:
-    Reset the input device and optionaly run diagnostics
-
-  Arguments:
-    This                 - Protocol instance pointer.
-    ExtendedVerification - Driver may perform diagnostics on reset.
-
-  Returns:
-    EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
-                            not be reset.
-
---*/
 ;
 
+/**
+    Reads the next keystroke from the input device. The WaitForKey Event can 
+    be used to test for existance of a keystroke via WaitForEvent () call.
+
+
+    @param This       - Protocol instance pointer.
+    @param KeyData    - A pointer to a buffer that is filled in with the keystroke 
+                 state data for the key that was pressed.
+
+    @retval EFI_SUCCESS           - The keystroke information was returned.
+    @retval EFI_NOT_READY         - There was no keystroke data availiable.
+    @retval EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
+                            hardware errors.
+    @retval EFI_INVALID_PARAMETER - KeyData is NULL.                        
+
+**/
 EFI_STATUS
 EFIAPI
 KeyboardReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
   )
-/*++
-
-  Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
-    be used to test for existance of a keystroke via WaitForEvent () call.
-
-  Arguments:
-    This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke 
-                 state data for the key that was pressed.
-
-  Returns:
-    EFI_SUCCESS           - The keystroke information was returned.
-    EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
-                            hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
-
---*/
 ;
 
+/**
+  Set certain state for the input device.
+
+  @param This              - Protocol instance pointer.
+  @param KeyToggleState    - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
+                        state for the input device.
+
+  @retval EFI_SUCCESS           - The device state was set successfully.
+  @retval EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
+                            not have the setting adjusted.
+  @retval EFI_UNSUPPORTED       - The device does not have the ability to set its state.
+  @retval EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
+
+**/
 EFI_STATUS
 EFIAPI
 KeyboardSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
   )
-/*++
-
-  Routine Description:
-    Set certain state for the input device.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
-                            state for the input device.
-                          
-  Returns:                
-    EFI_SUCCESS           - The device state was set successfully.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
-                            not have the setting adjusted.
-    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
-
---*/   
 ;
 
+/**
+    Register a notification function for a particular keystroke for the input device.
+
+    @param This                    - Protocol instance pointer.
+    @param KeyData                 - A pointer to a buffer that is filled in with the keystroke 
+                              information data for the key that was pressed.
+    @param KeyNotificationFunction - Points to the function to be called when the key 
+                              sequence is typed specified by KeyData.                        
+    @param NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
+
+    @retval EFI_SUCCESS             - The notification function was registered successfully.
+    @retval EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
+    @retval EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
+                              
+**/   
 EFI_STATUS
 EFIAPI
 KeyboardRegisterKeyNotify (
@@ -545,48 +476,26 @@ KeyboardRegisterKeyNotify (
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT EFI_HANDLE                        *NotifyHandle
   )
-/*++
-
-  Routine Description:
-    Register a notification function for a particular keystroke for the input device.
-
-  Arguments:
-    This                    - Protocol instance pointer.
-    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
-                              information data for the key that was pressed.
-    KeyNotificationFunction - Points to the function to be called when the key 
-                              sequence is typed specified by KeyData.                        
-    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
-
-  Returns:
-    EFI_SUCCESS             - The notification function was registered successfully.
-    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
-                              
---*/   
 ;
 
+/**
+    Remove a registered notification function from a particular keystroke.
+
+    @param This                    - Protocol instance pointer.    
+    @param NotificationHandle      - The handle of the notification function being unregistered.
+
+  
+    @retval EFI_SUCCESS             - The notification function was unregistered successfully.
+    @retval EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
+    @retval EFI_NOT_FOUND           - Can not find the matching entry in database.  
+                              
+**/ 
 EFI_STATUS
 EFIAPI
 KeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
   )
-/*++
-
-  Routine Description:
-    Remove a registered notification function from a particular keystroke.
-
-  Arguments:
-    This                    - Protocol instance pointer.    
-    NotificationHandle      - The handle of the notification function being unregistered.
-
-  Returns:
-    EFI_SUCCESS             - The notification function was unregistered successfully.
-    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    EFI_NOT_FOUND           - Can not find the matching entry in database.  
-                              
---*/   
 ;
 
 #endif

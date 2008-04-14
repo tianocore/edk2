@@ -25,7 +25,7 @@ PciDevicePresent (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -37,7 +37,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciRootBridgeIo - add argument and description to function comment
 // TODO:    Pci - add argument and description to function comment
 // TODO:    Bus - add argument and description to function comment
@@ -92,7 +92,7 @@ PciPciDeviceInfoCollector (
   IN PCI_IO_DEVICE                      *Bridge,
   UINT8                                 StartBusNumber
   )
-/*++
+/**
 
 Routine Description:
 
@@ -102,7 +102,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    StartBusNumber - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -210,7 +210,7 @@ PciSearchDevice (
   IN  UINT8                                 Func,
   OUT PCI_IO_DEVICE                         **PciDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -229,7 +229,7 @@ Returns:
 
   Status code.
 
---*/
+**/
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -339,7 +339,7 @@ GatherDeviceInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -349,7 +349,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    Pci - add argument and description to function comment
 // TODO:    Bus - add argument and description to function comment
@@ -409,7 +409,7 @@ GatherPpbInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -419,7 +419,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    Pci - add argument and description to function comment
 // TODO:    Bus - add argument and description to function comment
@@ -543,7 +543,7 @@ GatherP2CInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -553,7 +553,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    Pci - add argument and description to function comment
 // TODO:    Bus - add argument and description to function comment
@@ -614,7 +614,7 @@ CreatePciDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL *ParentDevicePath,
   IN  PCI_IO_DEVICE            *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -624,7 +624,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    ParentDevicePath - add argument and description to function comment
 // TODO:    PciIoDevice - add argument and description to function comment
 {
@@ -652,7 +652,7 @@ BarExisted (
   OUT UINT32       *BarLengthValue,
   OUT UINT32       *OriginalBarValue
   )
-/*++
+/**
 
 Routine Description:
 
@@ -670,7 +670,7 @@ Returns:
   EFI_NOT_FOUND     - The bar don't exist.
   EFI_SUCCESS       - The bar exist.
 
---*/
+**/
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT32              OriginalValue;
@@ -726,7 +726,7 @@ PciTestSupportedAttribute (
   IN UINT16                             *OldCommand,
   IN UINT16                             *OldBridgeControl
   )
-/*++
+/**
 
 Routine Description:
 
@@ -736,7 +736,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    Command - add argument and description to function comment
 // TODO:    BridgeControl - add argument and description to function comment
@@ -809,7 +809,7 @@ PciSetDeviceAttribute (
   IN UINT16                             BridgeControl,
   IN UINTN                              Option
   )
-/*++
+/**
 
   Routine Description:
     Set the supported or current attributes of a PCI device
@@ -822,9 +822,9 @@ PciSetDeviceAttribute (
 
   Returns:
 
---*/
+**/
 
-/*++
+/**
 
 Routine Description:
 
@@ -838,7 +838,7 @@ Returns:
   EFI_SUCCESS   Always success
 
 
---*/
+**/
 {
   UINT64  Attributes;
 
@@ -925,7 +925,7 @@ GetFastBackToBackSupport (
   IN PCI_IO_DEVICE                      *PciIoDevice,
   IN UINT8                              StatusIndex
   )
-/*++
+/**
 
 Routine Description:
 
@@ -937,7 +937,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    StatusIndex - add argument and description to function comment
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
@@ -973,7 +973,7 @@ EFI_STATUS
 ProcessOptionRomLight (
   IN PCI_IO_DEVICE                      *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -986,7 +986,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1022,7 +1022,7 @@ EFI_STATUS
 DetermineDeviceAttribute (
   IN PCI_IO_DEVICE                      *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1034,7 +1034,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1201,7 +1201,7 @@ EFI_STATUS
 UpdatePciInfo (
   IN PCI_IO_DEVICE  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1213,7 +1213,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
 {
@@ -1359,7 +1359,7 @@ SetNewAlign (
   IN UINT64 *Alignment,
   IN UINT64 NewAlignment
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1371,7 +1371,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Alignment - add argument and description to function comment
 // TODO:    NewAlignment - add argument and description to function comment
 {
@@ -1438,7 +1438,7 @@ PciParseBar (
   IN UINTN          Offset,
   IN UINTN          BarIndex
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1448,7 +1448,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    Offset - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
@@ -1628,7 +1628,7 @@ EFI_STATUS
 InitializePciDevice (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1641,7 +1641,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1666,7 +1666,7 @@ EFI_STATUS
 InitializePpb (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1676,7 +1676,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1719,7 +1719,7 @@ EFI_STATUS
 InitializeP2C (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1729,7 +1729,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1769,7 +1769,7 @@ CreatePciIoDevice (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1779,7 +1779,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciRootBridgeIo - add argument and description to function comment
 // TODO:    Pci - add argument and description to function comment
 // TODO:    Bus - add argument and description to function comment
@@ -1862,7 +1862,7 @@ EFI_STATUS
 PciEnumeratorLight (
   IN EFI_HANDLE                    Controller
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1876,7 +1876,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Controller - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -1985,7 +1985,7 @@ PciGetBusRange (
   OUT    UINT16                             *MaxBus,
   OUT    UINT16                             *BusRange
   )
-/*++
+/**
 
 Routine Description:
 
@@ -2002,7 +2002,7 @@ Returns:
 
   Status Code.
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 {
@@ -2034,7 +2034,7 @@ EFI_STATUS
 StartManagingRootBridge (
   IN PCI_IO_DEVICE *RootBridgeDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -2045,7 +2045,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    RootBridgeDev - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -2088,7 +2088,7 @@ BOOLEAN
 IsPciDeviceRejected (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -2101,7 +2101,7 @@ Returns:
   TRUE      This device should be rejected
   FALSE     This device shouldn't be rejected
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 {
   EFI_STATUS  Status;
@@ -2209,7 +2209,7 @@ ResetAllPpbBusNumber (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber
   )
-/*++
+/**
 
 Routine Description:
 
@@ -2224,7 +2224,7 @@ Returns:
 
   EFI_SUCCESS - TODO: Add description for return value
 
---*/
+**/
 {
   EFI_STATUS                      Status;
   PCI_TYPE00                      Pci;
