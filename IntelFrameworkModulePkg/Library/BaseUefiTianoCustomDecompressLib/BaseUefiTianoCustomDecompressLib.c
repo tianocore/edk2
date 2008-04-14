@@ -771,7 +771,7 @@ TianoDecompressGetInfo (
   @retval RETURN_INVALID_PARAMETER  The source data is corrupted, or
                                     The GUID in InputSection does not match this instance guid.
 
---*/
+**/
 RETURN_STATUS
 EFIAPI
 TianoDecompress (

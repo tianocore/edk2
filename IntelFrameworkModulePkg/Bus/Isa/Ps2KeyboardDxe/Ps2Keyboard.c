@@ -62,6 +62,16 @@ EFI_DRIVER_BINDING_PROTOCOL gKeyboardControllerDriver = {
   NULL
 };
 
+/**
+  Test controller is a keyboard Controller
+  
+  @param This                 Pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param Controller           driver's controller
+  @param RemainingDevicePath  children device path
+  
+  @retval EFI_UNSUPPORTED controller is not floppy disk
+  @retval EFI_SUCCESS     controller is floppy disk
+**/
 EFI_STATUS
 EFIAPI
 KbdControllerDriverSupported (
@@ -69,20 +79,6 @@ KbdControllerDriverSupported (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  ControllerDriver Protocol Method
-
-Arguments:
-
-Returns:
-
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    RemainingDevicePath - add argument and description to function comment
 {
   EFI_STATUS                          Status;
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
@@ -120,6 +116,15 @@ Returns:
   return Status;
 }
 
+/**
+  Create KEYBOARD_CONSOLE_IN_DEV instance on controller.
+  
+  @param This         Pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param Controller   driver controller handle
+  @param RemainingDevicePath Children's device path
+  
+  @retval whether success to create floppy control instance.
+**/
 EFI_STATUS
 EFIAPI
 KbdControllerDriverStart (
@@ -127,19 +132,6 @@ KbdControllerDriverStart (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    RemainingDevicePath - add argument and description to function comment
-// GC_TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
   EFI_STATUS                                Status;
   EFI_STATUS                                Status1;
@@ -388,6 +380,20 @@ ErrorExit:
   return Status;
 }
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 KbdControllerDriverStop (
@@ -396,20 +402,6 @@ KbdControllerDriverStop (
   IN  UINTN                          NumberOfChildren,
   IN  EFI_HANDLE                     *ChildHandleBuffer
   )
-/*++
-
-  Routine Description:
-
-  Arguments:
-
-  Returns:
-
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    NumberOfChildren - add argument and description to function comment
-// GC_TODO:    ChildHandleBuffer - add argument and description to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                     Status;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL *ConIn;
@@ -517,25 +509,16 @@ KbdControllerDriverStop (
   return EFI_SUCCESS;
 }
 
+/**
+  Free the waiting key notify list.
+  
+  @param ListHead  Pointer to list head
+**/
 STATIC
 EFI_STATUS
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-  ListHead   - The list head
-
-Returns:
-
-  EFI_SUCCESS           - Free the notify list successfully
-  EFI_INVALID_PARAMETER - ListHead is invalid.
-
---*/
 {
   KEYBOARD_CONSOLE_IN_EX_NOTIFY *NotifyNode;
 
@@ -591,3 +574,4 @@ InitializePs2Keyboard(
 
   return Status;
 }
+

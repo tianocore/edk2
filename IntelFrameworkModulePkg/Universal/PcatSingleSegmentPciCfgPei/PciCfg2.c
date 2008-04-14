@@ -260,7 +260,15 @@ PciCfg2Modify (
   return EFI_SUCCESS;
 }
 
-
+/**
+  Module's entry function. 
+  This routine will install EFI_PEI_PCI_CFG2_PPI or EFI_PEI_PCI_CFG_PPI
+  according to PeiServices's version.
+  
+  @param FfsHeader    Image's header
+  @param PeiServices  Pointer of EFI_PEI_SERVICES
+  @return Whether success to install service
+**/
 EFI_STATUS
 EFIAPI
 PeimInitializePciCfg (
@@ -298,3 +306,4 @@ PeimInitializePciCfg (
 
   return Status;
 }
+

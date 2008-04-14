@@ -42,7 +42,7 @@ PciVgaMiniPortDriverEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
+/**
 
   Routine Description:
     Driver Entry Point.
@@ -52,7 +52,7 @@ PciVgaMiniPortDriverEntryPoint (
 
   Returns:
     EFI_STATUS
---*/
+**/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,

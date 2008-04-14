@@ -82,7 +82,7 @@ VgaClassDriverBindingSupported (
   IN EFI_HANDLE                    Controller,
   IN EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   )
-/*++
+/**
 
 Routine Description:
 
@@ -98,7 +98,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -108,7 +108,7 @@ VgaClassDriverBindingStart (
   IN EFI_HANDLE                    Controller,
   IN EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   )
-/*++
+/**
 
 Routine Description:
 
@@ -124,7 +124,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -135,7 +135,7 @@ VgaClassDriverBindingStop (
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -152,7 +152,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 //
@@ -164,7 +164,7 @@ VgaClassReset (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  BOOLEAN                      ExtendedVerification
   )
-/*++
+/**
 
 Routine Description:
 
@@ -179,7 +179,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -188,7 +188,7 @@ VgaClassOutputString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  CHAR16                       *WString
   )
-/*++
+/**
 
 Routine Description:
 
@@ -203,7 +203,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -212,7 +212,7 @@ VgaClassTestString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  CHAR16                       *WString
   )
-/*++
+/**
 
 Routine Description:
 
@@ -227,7 +227,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -235,7 +235,7 @@ EFIAPI
 VgaClassClearScreen (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This
   )
-/*++
+/**
 
 Routine Description:
 
@@ -249,7 +249,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -258,7 +258,7 @@ VgaClassSetAttribute (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  UINTN                        Attribute
   )
-/*++
+/**
 
 Routine Description:
 
@@ -273,7 +273,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -283,7 +283,7 @@ VgaClassSetCursorPosition (
   IN  UINTN                        Column,
   IN  UINTN                        Row
   )
-/*++
+/**
 
 Routine Description:
 
@@ -299,7 +299,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -308,7 +308,7 @@ VgaClassEnableCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  BOOLEAN                      Visible
   )
-/*++
+/**
 
 Routine Description:
 
@@ -323,7 +323,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -334,7 +334,7 @@ VgaClassQueryMode (
   OUT UINTN                        *Columns,
   OUT UINTN                        *Rows
   )
-/*++
+/**
 
 Routine Description:
 
@@ -351,7 +351,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -360,7 +360,7 @@ VgaClassSetMode (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  UINTN                        ModeNumber
   )
-/*++
+/**
 
 Routine Description:
 
@@ -375,7 +375,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 #endif

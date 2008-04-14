@@ -156,7 +156,7 @@ AddName (
   IN  SERIAL_DEV                                   *SerialDevice,
   IN  EFI_ISA_IO_PROTOCOL                          *IsaIo
   )
-/*++
+/**
 
   Routine Description:
 
@@ -171,7 +171,7 @@ AddName (
 
     None
 
---*/
+**/
 ;
 
 #endif

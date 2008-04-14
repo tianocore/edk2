@@ -1,4 +1,3 @@
-
 /** @file
   Generic PeiStatusCode Module.
 

@@ -39,7 +39,7 @@ PciRomAddImageMapping (
   IN UINT64      RomAddress,
   IN UINT64      RomLength
   )
-/*++
+/**
 
 Routine Description:
 
@@ -59,7 +59,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 {
   EFI_PCI_ROM_IMAGE_MAPPING *TempMapping;
 
@@ -98,7 +98,7 @@ PciRomGetRomResourceFromPciOptionRomTable (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -106,7 +106,7 @@ Arguments:
 
 Returns:
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    PciRootBridgeIo - add argument and description to function comment
 // TODO:    PciIoDevice - add argument and description to function comment
@@ -152,7 +152,7 @@ EFI_STATUS
 PciRomGetImageMapping (
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -160,7 +160,7 @@ Arguments:
 
 Returns:
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {

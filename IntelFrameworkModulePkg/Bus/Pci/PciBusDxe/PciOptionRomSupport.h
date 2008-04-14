@@ -18,7 +18,7 @@ EFI_STATUS
 GetOpRomInfo (
   IN PCI_IO_DEVICE    *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -32,7 +32,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -40,7 +40,7 @@ LoadOpRomImage (
   IN PCI_IO_DEVICE   *PciDevice,
   IN UINT64          RomBase
   )
-/*++
+/**
 
 Routine Description:
 
@@ -55,7 +55,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -65,7 +65,7 @@ RomDecode (
   IN UINT32          RomBar,
   IN BOOLEAN         Enable
   )
-/*++
+/**
 
 Routine Description:
 
@@ -82,14 +82,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 ProcessOpRomImage (
   PCI_IO_DEVICE   *PciDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -103,7 +103,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 #endif

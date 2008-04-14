@@ -66,7 +66,7 @@ ReportErrorStatusCode (
   IN PCI_IO_DEVICE               *PciIoDevice,
   IN EFI_STATUS_CODE_VALUE       Code
   )
-/*++
+/**
 
 Routine Description:
 
@@ -78,7 +78,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    Code - add argument and description to function comment
 {
@@ -93,7 +93,7 @@ EFI_STATUS
 InitializePciIoInstance (
   PCI_IO_DEVICE  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -105,7 +105,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -122,7 +122,7 @@ PciIoVerifyBarAccess (
   IN UINTN                        Count,
   UINT64                          *Offset
   )
-/*++
+/**
 
 Routine Description:
 
@@ -134,7 +134,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
 // TODO:    Type - add argument and description to function comment
@@ -193,7 +193,7 @@ PciIoVerifyConfigAccess (
   IN UINTN                      Count,
   IN UINT64                     *Offset
   )
-/*++
+/**
 
 Routine Description:
 
@@ -205,7 +205,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    Count - add argument and description to function comment
@@ -258,7 +258,7 @@ PciIoPollMem (
   IN  UINT64                     Delay,
   OUT UINT64                     *Result
   )
-/*++
+/**
 
 Routine Description:
 
@@ -270,7 +270,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
@@ -330,7 +330,7 @@ PciIoPollIo (
   IN  UINT64                     Delay,
   OUT UINT64                     *Result
   )
-/*++
+/**
 
 Routine Description:
 
@@ -342,7 +342,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
@@ -396,7 +396,7 @@ PciIoMemRead (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -408,7 +408,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
@@ -457,7 +457,7 @@ PciIoMemWrite (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -469,7 +469,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
@@ -518,7 +518,7 @@ PciIoIoRead (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -530,7 +530,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
@@ -579,7 +579,7 @@ PciIoIoWrite (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -591,7 +591,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
@@ -639,7 +639,7 @@ PciIoConfigRead (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -651,7 +651,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    Offset - add argument and description to function comment
@@ -694,7 +694,7 @@ PciIoConfigWrite (
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -706,7 +706,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    Offset - add argument and description to function comment
@@ -751,7 +751,7 @@ PciIoCopyMem (
   IN     UINT64                       SrcOffset,
   IN     UINTN                        Count
   )
-/*++
+/**
 
 Routine Description:
 
@@ -763,7 +763,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Width - add argument and description to function comment
 // TODO:    DestBarIndex - add argument and description to function comment
@@ -831,7 +831,7 @@ PciIoMap (
   OUT    EFI_PHYSICAL_ADDRESS           *DeviceAddress,
   OUT    VOID                           **Mapping
   )
-/*++
+/**
 
 Routine Description:
 
@@ -843,7 +843,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Operation - add argument and description to function comment
 // TODO:    HostAddress - add argument and description to function comment
@@ -892,7 +892,7 @@ PciIoUnmap (
   IN  EFI_PCI_IO_PROTOCOL  *This,
   IN  VOID                 *Mapping
   )
-/*++
+/**
 
 Routine Description:
 
@@ -904,7 +904,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Mapping - add argument and description to function comment
 {
@@ -935,7 +935,7 @@ PciIoAllocateBuffer (
   OUT VOID                  **HostAddress,
   IN  UINT64                Attributes
   )
-/*++
+/**
 
 Routine Description:
 
@@ -947,7 +947,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Type - add argument and description to function comment
 // TODO:    MemoryType - add argument and description to function comment
@@ -993,7 +993,7 @@ PciIoFreeBuffer (
   IN  UINTN                 Pages,
   IN  VOID                  *HostAddress
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1005,7 +1005,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Pages - add argument and description to function comment
 // TODO:    HostAddress - add argument and description to function comment
@@ -1033,7 +1033,7 @@ EFIAPI
 PciIoFlush (
   IN  EFI_PCI_IO_PROTOCOL  *This
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1045,7 +1045,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 {
   EFI_STATUS    Status;
@@ -1072,7 +1072,7 @@ PciIoGetLocation (
   OUT UINTN                *Device,
   OUT UINTN                *Function
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1084,7 +1084,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Segment - add argument and description to function comment
 // TODO:    Bus - add argument and description to function comment
@@ -1115,7 +1115,7 @@ CheckBarType (
   UINT8                  BarIndex,
   PCI_BAR_TYPE           BarType
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1127,7 +1127,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
 // TODO:    BarType - add argument and description to function comment
@@ -1166,7 +1166,7 @@ ModifyRootBridgeAttributes (
   IN  UINT64                                   Attributes,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1178,7 +1178,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    Attributes - add argument and description to function comment
 // TODO:    Operation - add argument and description to function comment
@@ -1244,7 +1244,7 @@ SupportPaletteSnoopAttributes (
   IN  PCI_IO_DEVICE                            *PciIoDevice,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1256,7 +1256,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    Operation - add argument and description to function comment
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
@@ -1372,7 +1372,7 @@ PciIoAttributes (
   IN  UINT64                                   Attributes,
   OUT UINT64                                   *Result OPTIONAL
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1383,7 +1383,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Operation - add argument and description to function comment
 // TODO:    Attributes - add argument and description to function comment
@@ -1666,7 +1666,7 @@ PciIoGetBarAttributes (
   OUT UINT64                         *Supports, OPTIONAL
   OUT VOID                           **Resources OPTIONAL
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1677,7 +1677,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
 // TODO:    Supports - add argument and description to function comment
@@ -1830,7 +1830,7 @@ PciIoSetBarAttributes (
   IN OUT UINT64                       *Offset,
   IN OUT UINT64                       *Length
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1841,7 +1841,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    Attributes - add argument and description to function comment
 // TODO:    BarIndex - add argument and description to function comment
@@ -1905,7 +1905,7 @@ UpStreamBridgesAttributes (
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation,
   IN  UINT64                                   Attributes
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1915,7 +1915,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    Operation - add argument and description to function comment
 // TODO:    Attributes - add argument and description to function comment
@@ -1946,7 +1946,7 @@ PciDevicesOnTheSamePath (
   IN PCI_IO_DEVICE        *PciDevice1,
   IN PCI_IO_DEVICE        *PciDevice2
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1956,7 +1956,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciDevice1 - add argument and description to function comment
 // TODO:    PciDevice2 - add argument and description to function comment
 {

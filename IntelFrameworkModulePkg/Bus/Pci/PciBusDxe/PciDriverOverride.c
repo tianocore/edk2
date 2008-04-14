@@ -18,7 +18,7 @@ EFI_STATUS
 InitializePciDriverOverrideInstance (
   PCI_IO_DEVICE  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -30,7 +30,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -44,7 +44,7 @@ GetDriver (
   IN EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN OUT EFI_HANDLE                                         *DriverImageHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -56,7 +56,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    This - add argument and description to function comment
 // TODO:    DriverImageHandle - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -108,7 +108,7 @@ AddDriver (
   IN PCI_IO_DEVICE     *PciIoDevice,
   IN EFI_HANDLE        DriverImageHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -120,7 +120,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    DriverImageHandle - add argument and description to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment

@@ -23,29 +23,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "IsaFloppy.h"
 
+/**
+  Reset the Floppy Logic Drive, call the FddReset function   
+  
+  @param This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
+  @param ExtendedVerification BOOLEAN: Indicate that the driver may perform a more 
+                    exhaustive verification operation of the device during 
+                    reset, now this par is ignored in this driver          
+  @retval  EFI_SUCCESS:      The Floppy Logic Drive is reset
+  @retval  EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly 
+                      and can not be reset
+
+**/
 EFI_STATUS
 EFIAPI
 FdcReset (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,
   IN  BOOLEAN                ExtendedVerification
   )
-/*++
-  
-  Routine Description:  Reset the Floppy Logic Drive, call the FddReset function   
-  Parameters:
-    This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
-    ExtendedVerification BOOLEAN: Indicate that the driver may perform a more 
-                    exhaustive verification operation of the device during 
-                    reset, now this par is ignored in this driver          
-  Returns:
-    EFI_SUCCESS:      The Floppy Logic Drive is reset
-    EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly 
-                      and can not be reset
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    ExtendedVerification - add argument and description to function comment
 {
   FDC_BLK_IO_DEV  *FdcDev;
 
@@ -63,22 +58,18 @@ FdcReset (
   return FddReset (FdcDev);
 }
 
+/**
+  Flush block via fdd controller
+  
+  @param  This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
+  @return EFI_SUCCESS
+
+**/
 EFI_STATUS
 EFIAPI
 FddFlushBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL  *This
   )
-/*++
-  
-  Routine Description:  
-  Parameters:
-    This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
-  Returns:
-    EFI_SUCCESS:    
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    This - add argument and description to function comment
 {
   //
   // Not supported yet
@@ -86,28 +77,18 @@ FddFlushBlocks (
   return EFI_SUCCESS;
 }
 
+/**
+  Common report status code interface
+  
+  @param This  Pointer of FDC_BLK_IO_DEV instance
+  @param Read  Error type: read or write?
+**/
 STATIC
 VOID
 FddReportStatus (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,
   IN  BOOLEAN                Read
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This  - GC_TODO: add argument description
-  Read  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   FDC_BLK_IO_DEV  *FdcDev;
 
@@ -120,6 +101,26 @@ Returns:
     );
 }
 
+/**
+  Read the requested number of blocks from the device   
+  
+  @param This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
+  @param MediaId UINT32:    The media id that the read request is for    
+  @param  LBA EFI_LBA:     The starting logic block address to read from on the device
+  @param  BufferSize UINTN:  The size of the Buffer in bytes
+  @param  Buffer VOID *:     A pointer to the destination buffer for the data
+  
+  @retval  EFI_SUCCESS:     The data was read correctly from the device
+  @retval  EFI_DEVICE_ERROR:The device reported an error while attempting to perform
+                     the read operation
+  @retval  EFI_NO_MEDIA:    There is no media in the device
+  @retval  EFI_MEDIA_CHANGED:   The MediaId is not for the current media
+  @retval  EFI_BAD_BUFFER_SIZE: The BufferSize parameter is not a multiple of the 
+                         intrinsic block size of the device
+  @retval  EFI_INVALID_PARAMETER:The read request contains LBAs that are not valid, 
+                          or the buffer is not on proper alignment 
+
+**/
 EFI_STATUS
 EFIAPI
 FddReadBlocks (
@@ -129,33 +130,6 @@ FddReadBlocks (
   IN  UINTN                  BufferSize,
   OUT VOID                   *Buffer
   )
-/*++
-
-  Routine Description:  Read the requested number of blocks from the device   
-  Parameters:
-    This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
-    MediaId UINT32:    The media id that the read request is for    
-    LBA EFI_LBA:     The starting logic block address to read from on the device
-    BufferSize UINTN:  The size of the Buffer in bytes
-    Buffer VOID *:     A pointer to the destination buffer for the data
-  Returns:
-    EFI_SUCCESS:     The data was read correctly from the device
-    EFI_DEVICE_ERROR:The device reported an error while attempting to perform
-                     the read operation
-    EFI_NO_MEDIA:    There is no media in the device
-    EFI_MEDIA_CHANGED:   The MediaId is not for the current media
-    EFI_BAD_BUFFER_SIZE: The BufferSize parameter is not a multiple of the 
-                         intrinsic block size of the device
-    EFI_INVALID_PARAMETER:The read request contains LBAs that are not valid, 
-                          or the buffer is not on proper alignment 
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    MediaId - add argument and description to function comment
-// GC_TODO:    LBA - add argument and description to function comment
-// GC_TODO:    BufferSize - add argument and description to function comment
-// GC_TODO:    Buffer - add argument and description to function comment
 {
   EFI_STATUS  Status;
 
@@ -168,6 +142,26 @@ FddReadBlocks (
   return Status;
 }
 
+/**
+  Write a specified number of blocks to the device   
+  
+  @param  This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
+  @param  MediaId UINT32:    The media id that the write request is for   
+  @param  LBA EFI_LBA:     The starting logic block address to be written
+  @param  BufferSize UINTN:  The size in bytes in Buffer
+  @param  Buffer VOID *:     A pointer to the source buffer for the data
+  
+  @retval  EFI_SUCCESS:     The data were written correctly to the device
+  @retval  EFI_WRITE_PROTECTED: The device can not be written to 
+  @retval  EFI_NO_MEDIA:    There is no media in the device
+  @retval  EFI_MEDIA_CHANGED:   The MediaId is not for the current media
+  @retval  EFI_DEVICE_ERROR:  The device reported an error while attempting to perform 
+                       the write operation 
+  @retval  EFI_BAD_BUFFER_SIZE: The BufferSize parameter is not a multiple of the 
+                         intrinsic block size of the device
+  @retval  EFI_INVALID_PARAMETER:The write request contains LBAs that are not valid, 
+                          or the buffer is not on proper alignment 
+**/
 EFI_STATUS
 EFIAPI
 FddWriteBlocks (
@@ -177,35 +171,6 @@ FddWriteBlocks (
   IN UINTN                  BufferSize,
   IN VOID                   *Buffer
   )
-/*++
-
-  Routine Description:  Write a specified number of blocks to the device   
-  Parameters:
-    This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
-    MediaId UINT32:    The media id that the write request is for   
-    LBA EFI_LBA:     The starting logic block address to be written
-    BufferSize UINTN:  The size in bytes in Buffer
-    Buffer VOID *:     A pointer to the source buffer for the data
-  Returns :
-    EFI_SUCCESS:     The data were written correctly to the device
-    EFI_WRITE_PROTECTED: The device can not be written to 
-    EFI_NO_MEDIA:    There is no media in the device
-    EFI_MEDIA_CHANGED:   The MediaId is not for the current media
-    EFI_DEVICE_ERROR:  The device reported an error while attempting to perform 
-                       the write operation 
-    EFI_BAD_BUFFER_SIZE: The BufferSize parameter is not a multiple of the 
-                         intrinsic block size of the device
-    EFI_INVALID_PARAMETER:The write request contains LBAs that are not valid, 
-                          or the buffer is not on proper alignment 
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO: function comment is missing 'Returns:'
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    MediaId - add argument and description to function comment
-// GC_TODO:    LBA - add argument and description to function comment
-// GC_TODO:    BufferSize - add argument and description to function comment
-// GC_TODO:    Buffer - add argument and description to function comment
 {
   EFI_STATUS  Status;
 
@@ -218,6 +183,32 @@ FddWriteBlocks (
   return Status;
 }
 
+/**
+  Read or Write a number of blocks to floppy device
+
+  @param This     Pointer to instance of EFI_BLOCK_IO_PROTOCOL
+  @param MediaId  The media id of read/write request
+  @param LBA      The starting logic block address to read from on the device
+  @param BufferSize The size of the Buffer in bytes
+  @param Operation   - GC_TODO: add argument description
+  Buffer      - GC_TODO: add argument description
+
+  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_NO_MEDIA - GC_TODO: Add description for return value
+  @retval EFI_MEDIA_CHANGED - GC_TODO: Add description for return value
+  @retval EFI_WRITE_PROTECTED - GC_TODO: Add description for return value
+  @retval EFI_BAD_BUFFER_SIZE - GC_TODO: Add description for return value
+  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
+  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+
+**/
 EFI_STATUS
 FddReadWriteBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,
@@ -227,39 +218,6 @@ FddReadWriteBlocks (
   IN  BOOLEAN                Operation,
   OUT VOID                   *Buffer
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This        - GC_TODO: add argument description
-  MediaId     - GC_TODO: add argument description
-  LBA         - GC_TODO: add argument description
-  BufferSize  - GC_TODO: add argument description
-  Operation   - GC_TODO: add argument description
-  Buffer      - GC_TODO: add argument description
-
-Returns:
-
-  EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-  EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  EFI_NO_MEDIA - GC_TODO: Add description for return value
-  EFI_MEDIA_CHANGED - GC_TODO: Add description for return value
-  EFI_WRITE_PROTECTED - GC_TODO: Add description for return value
-  EFI_BAD_BUFFER_SIZE - GC_TODO: Add description for return value
-  EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
-  EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-  EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   EFI_BLOCK_IO_MEDIA  *Media;
   FDC_BLK_IO_DEV      *FdcDev;
@@ -423,25 +381,16 @@ Returns:
 
 }
 
+/**
+  Common interface for free cache 
+  
+  @param FdcDec  Pointer of FDC_BLK_IO_DEV instance
+  
+**/
 VOID
 FdcFreeCache (
   IN    FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   if (FdcDev->Cache) {
     gBS->FreePool (FdcDev->Cache);

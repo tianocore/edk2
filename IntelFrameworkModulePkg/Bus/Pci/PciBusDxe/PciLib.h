@@ -53,7 +53,7 @@ void
 InstallHotPlugRequestProtocol (
   IN  EFI_STATUS                    *Status
   )
-/*++
+/**
 
 Routine Description:
 
@@ -67,14 +67,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 VOID
 InstallPciHotplugGuid (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -88,14 +88,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 VOID
 UninstallPciHotplugGuid (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -109,14 +109,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 VOID
 GetBackPcCardBar (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -130,7 +130,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -138,7 +138,7 @@ RemoveRejectedPciDevices (
   EFI_HANDLE        RootBridgeHandle,
   IN PCI_IO_DEVICE  *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -153,14 +153,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PciHostBridgeResourceAllocator (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -174,7 +174,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -196,7 +196,7 @@ PciScanBus (
   OUT UINT8                             *SubBusNumber,
   OUT UINT8                             *PaddedBusRange
   )
-/*++
+/**
 
 Routine Description:
 
@@ -213,7 +213,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -238,7 +238,7 @@ EFI_STATUS
 PciRootBridgeP2CProcess (
   IN PCI_IO_DEVICE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -252,14 +252,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PciHostBridgeP2CProcess (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -273,14 +273,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PciHostBridgeEnumerator (
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -294,7 +294,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 /**

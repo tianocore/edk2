@@ -73,7 +73,16 @@ InitializeIsaFloppy(
   return Status;
 }
 
-
+/**
+  Test controller is a Floppy Disk Controller
+  
+  @param This                 Pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param Controller           driver's controller
+  @param RemainingDevicePath  children device path
+  
+  @retval EFI_UNSUPPORTED controller is not floppy disk
+  @retval EFI_SUCCESS     controller is floppy disk
+**/
 EFI_STATUS
 EFIAPI
 FdcControllerDriverSupported (
@@ -81,20 +90,6 @@ FdcControllerDriverSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  ControllerDriver Protocol Method
-
-Arguments:
-
-Returns:
-
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    RemainingDevicePath - add argument and description to function comment
 {
   EFI_STATUS                          Status;
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
@@ -133,6 +128,15 @@ Returns:
   return Status;
 }
 
+/**
+  Create floppy control instance on controller.
+  
+  @param This         Pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param Controller   driver controller handle
+  @param RemainingDevicePath Children's device path
+  
+  @retval whether success to create floppy control instance.
+**/
 EFI_STATUS
 EFIAPI
 FdcControllerDriverStart (
@@ -140,18 +144,6 @@ FdcControllerDriverStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    RemainingDevicePath - add argument and description to function comment
 {
   EFI_STATUS                                Status;
   FDC_BLK_IO_DEV                            *FdcDev;
@@ -364,6 +356,20 @@ Done:
   return Status;
 }
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 FdcControllerDriverStop (
@@ -372,20 +378,6 @@ FdcControllerDriverStop (
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
-/*++
-
-  Routine Description:
-
-  Arguments:
-
-  Returns:
-
---*/
-// GC_TODO:    This - add argument and description to function comment
-// GC_TODO:    Controller - add argument and description to function comment
-// GC_TODO:    NumberOfChildren - add argument and description to function comment
-// GC_TODO:    ChildHandleBuffer - add argument and description to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS            Status;
   EFI_BLOCK_IO_PROTOCOL *BlkIo;
@@ -478,3 +470,4 @@ FdcControllerDriverStop (
 
   return EFI_SUCCESS;
 }
+

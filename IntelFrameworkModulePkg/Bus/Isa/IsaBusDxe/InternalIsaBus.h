@@ -173,7 +173,7 @@ IsaBusControllerDriverSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
   )
-/*++
+/**
 
   Routine Description:
   
@@ -194,7 +194,7 @@ IsaBusControllerDriverSupported (
     EFI_SUCCESS          - The device is supported by this driver.
     EFI_UNSUPPORTED      - The device is not supported by this driver.
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -204,7 +204,7 @@ IsaBusControllerDriverStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
   )
-/*++
+/**
 
   Routine Description:
   
@@ -227,7 +227,7 @@ IsaBusControllerDriverStart (
     EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of 
                             resources.
   
---*/
+**/
 ;
 
 EFI_STATUS
@@ -238,7 +238,7 @@ IsaBusControllerDriverStop (
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   * ChildHandleBuffer OPTIONAL
   )
-/*++
+/**
 
   Routine Description:
   
@@ -262,7 +262,7 @@ IsaBusControllerDriverStop (
     EFI_OUT_OF_RESOURCES   - The request could not be completed due to a lack of 
                              resources.
 
---*/
+**/
 ;
 
 //
@@ -278,7 +278,7 @@ IsaCreateDevice (
   IN EFI_ISA_ACPI_RESOURCE_LIST   *IsaDeviceResourceList,
   OUT EFI_DEVICE_PATH_PROTOCOL    **ChildDevicePath
   )
-/*++
+/**
 
   Routine Description:
   
@@ -300,7 +300,7 @@ IsaCreateDevice (
                              resources.
     EFI_DEVICE_ERROR       - Can not create child device.
     
---*/
+**/
 ;
 
 EFI_STATUS
@@ -308,7 +308,7 @@ InitializeIsaIoInstance (
   IN ISA_IO_DEVICE               *IsaIoDevice,
   IN EFI_ISA_ACPI_RESOURCE_LIST  *IsaDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -323,7 +323,7 @@ Returns:
 
   EFI_SUCCESS            - Initial success.
   
---*/
+**/
 ;
 
 #endif

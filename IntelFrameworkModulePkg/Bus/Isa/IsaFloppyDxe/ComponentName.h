@@ -1,6 +1,5 @@
 /**@file
 
-  
 Copyright (c) 2006 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -156,7 +155,7 @@ VOID
 AddName (
   IN  FDC_BLK_IO_DEV               *FdcDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -170,7 +169,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 #endif

@@ -106,7 +106,7 @@ EFI_STATUS
 KbcSelfTest (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -120,14 +120,14 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 KbcEnableAux (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -141,14 +141,14 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 KbcDisableAux (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -162,14 +162,14 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 KbcEnableKb (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -183,14 +183,14 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 KbcDisableKb (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -204,7 +204,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -212,7 +212,7 @@ CheckKbStatus (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   OUT BOOLEAN                             *KeyboardEnable
   )
-/*++
+/**
 
 Routine Description:
 
@@ -227,14 +227,14 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PS2MouseReset (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -248,7 +248,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -256,7 +256,7 @@ PS2MouseSetSampleRate (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_SR                             SampleRate
   )
-/*++
+/**
 
 Routine Description:
 
@@ -271,7 +271,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -279,7 +279,7 @@ PS2MouseSetResolution (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_RE                             Resolution
   )
-/*++
+/**
 
 Routine Description:
 
@@ -294,7 +294,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -302,7 +302,7 @@ PS2MouseSetScaling (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_SF                             Scaling
   )
-/*++
+/**
 
 Routine Description:
 
@@ -317,14 +317,14 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PS2MouseEnable (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
   )
-/*++
+/**
 
 Routine Description:
 
@@ -338,14 +338,14 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PS2MouseGetPacket (
   PS2_MOUSE_DEV     *MouseDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -359,7 +359,7 @@ Returns:
 
   GC_TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS

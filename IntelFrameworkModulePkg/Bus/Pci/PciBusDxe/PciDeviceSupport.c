@@ -25,7 +25,7 @@ EFI_STATUS
 InitializePciDevicePool (
   VOID
   )
-/*++
+/**
 
 Routine Description:
 
@@ -37,7 +37,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   InitializeListHead (&gPciDevicePool);
@@ -49,7 +49,7 @@ EFI_STATUS
 InsertRootBridge (
   PCI_IO_DEVICE *RootBridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -63,7 +63,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
 
@@ -77,7 +77,7 @@ InsertPciDevice (
   PCI_IO_DEVICE *Bridge,
   PCI_IO_DEVICE *PciDeviceNode
   )
-/*++
+/**
 
 Routine Description:
 
@@ -92,7 +92,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
 
@@ -106,7 +106,7 @@ EFI_STATUS
 DestroyRootBridge (
   IN PCI_IO_DEVICE *RootBridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -119,7 +119,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   DestroyPciDeviceTree (RootBridge);
@@ -133,7 +133,7 @@ EFI_STATUS
 FreePciDevice (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -148,7 +148,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
 
@@ -172,7 +172,7 @@ EFI_STATUS
 DestroyPciDeviceTree (
   IN PCI_IO_DEVICE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -187,7 +187,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   LIST_ENTRY      *CurrentLink;
@@ -218,7 +218,7 @@ EFI_STATUS
 DestroyRootBridgeByHandle (
   EFI_HANDLE Controller
   )
-/*++
+/**
 
 Routine Description:
 
@@ -234,7 +234,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 {
@@ -270,7 +270,7 @@ RegisterPciDevice (
   IN  PCI_IO_DEVICE                  *PciIoDevice,
   OUT EFI_HANDLE                     *Handle OPTIONAL
   )
-/*++
+/**
 
 Routine Description:
 
@@ -289,7 +289,7 @@ Returns:
   EFI_SUCCESS   - The PCI device is successfully registered.
   Others        - An error occurred when registering the PCI device.
 
---*/
+**/
 {
   EFI_STATUS          Status;
   VOID                *PlatformOpRomBuffer;
@@ -440,7 +440,7 @@ RemoveAllPciDeviceOnBridge (
   EFI_HANDLE               RootBridgeHandle,
   PCI_IO_DEVICE            *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -455,7 +455,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
 
@@ -495,7 +495,7 @@ DeRegisterPciDevice (
   IN  EFI_HANDLE                     Controller,
   IN  EFI_HANDLE                     Handle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -512,7 +512,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -639,7 +639,7 @@ StartPciDevicesOnBridge (
   IN OUT UINT8                           *NumberOfChildren,
   IN OUT EFI_HANDLE                      *ChildHandleBuffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -657,7 +657,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_NOT_READY - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
@@ -810,7 +810,7 @@ EFI_STATUS
 StartPciDevices (
   IN EFI_HANDLE                         Controller
   )
-/*++
+/**
 
 Routine Description:
 
@@ -824,7 +824,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   PCI_IO_DEVICE     *RootBridge;
   EFI_HANDLE        ThisHostBridge;
@@ -862,7 +862,7 @@ PCI_IO_DEVICE *
 CreateRootBridge (
   IN EFI_HANDLE RootBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -874,7 +874,7 @@ Returns:
 
   None
 
---*/
+**/
 {
 
   EFI_STATUS                      Status;
@@ -956,7 +956,7 @@ PCI_IO_DEVICE *
 GetRootBridgeByHandle (
   EFI_HANDLE RootBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -969,7 +969,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   PCI_IO_DEVICE   *RootBridgeDev;
   LIST_ENTRY      *CurrentLink;
@@ -994,7 +994,7 @@ PciDeviceExisted (
   IN PCI_IO_DEVICE    *Bridge,
   IN PCI_IO_DEVICE    *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1007,7 +1007,7 @@ Returns:
 
   None
 
---*/
+**/
 {
 
   PCI_IO_DEVICE   *Temp;
@@ -1039,7 +1039,7 @@ PCI_IO_DEVICE *
 ActiveVGADeviceOnTheSameSegment (
   IN PCI_IO_DEVICE        *VgaDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1051,7 +1051,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   LIST_ENTRY      *CurrentLink;
   PCI_IO_DEVICE   *Temp;
@@ -1081,7 +1081,7 @@ PCI_IO_DEVICE *
 ActiveVGADeviceOnTheRootBridge (
   IN PCI_IO_DEVICE        *RootBridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1093,7 +1093,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   LIST_ENTRY      *CurrentLink;
   PCI_IO_DEVICE   *Temp;
@@ -1133,7 +1133,7 @@ GetHpcPciAddress (
   IN  EFI_DEVICE_PATH_PROTOCOL         *HpcDevicePath,
   OUT UINT64                           *PciAddress
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1147,7 +1147,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -1222,7 +1222,7 @@ GetHpcPciAddressFromRootBridge (
   IN  EFI_DEVICE_PATH_PROTOCOL         *RemainingDevicePath,
   OUT UINT64                           *PciAddress
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1236,7 +1236,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    RootBridge - add argument and description to function comment
 // TODO:    RemainingDevicePath - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment

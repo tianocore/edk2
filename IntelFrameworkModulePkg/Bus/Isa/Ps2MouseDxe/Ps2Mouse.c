@@ -35,7 +35,7 @@ PS2MouseDriverSupported (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
+/**
 
 Routine Description:
 
@@ -45,7 +45,7 @@ Arguments:
 
 Returns:
 
---*/
+**/
 // GC_TODO:    This - add argument and description to function comment
 // GC_TODO:    Controller - add argument and description to function comment
 // GC_TODO:    RemainingDevicePath - add argument and description to function comment
@@ -115,7 +115,7 @@ PS2MouseDriverStart (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
+/**
 
 Routine Description:
     Start protocol interfaces for the mouse device handles.
@@ -129,7 +129,7 @@ Returns:
     EFI_SUCCESS             - This driver is added to DeviceHandle.
     other                               - Errors occurred.
 
---*/
+**/
 {
   EFI_STATUS                          Status;
   EFI_STATUS                          EmptyStatus;
@@ -390,7 +390,7 @@ PS2MouseDriverStop (
   IN UINTN                          NumberOfChildren,
   IN EFI_HANDLE                     *ChildHandleBuffer
   )
-/*++
+/**
 
   Routine Description:
 
@@ -398,7 +398,7 @@ PS2MouseDriverStop (
 
   Returns:
 
---*/
+**/
 // GC_TODO:    This - add argument and description to function comment
 // GC_TODO:    Controller - add argument and description to function comment
 // GC_TODO:    NumberOfChildren - add argument and description to function comment
@@ -489,7 +489,7 @@ MouseReset (
   IN EFI_SIMPLE_POINTER_PROTOCOL    *This,
   IN BOOLEAN                        ExtendedVerification
   )
-/*++
+/**
 
 Routine Description:
 
@@ -505,7 +505,7 @@ Returns:
  EFI_SUCCESS         - The command byte is written successfully.
  EFI_DEVICE_ERROR    - Errors occurred during reseting keyboard.
 
---*/
+**/
 {
   EFI_STATUS    Status;
   PS2_MOUSE_DEV *MouseDev;
@@ -609,7 +609,7 @@ BOOLEAN
 CheckMouseConnect (
   IN  PS2_MOUSE_DEV     *MouseDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -624,7 +624,7 @@ Returns:
   TRUE                - Keyboard in System.
   FALSE               - Keyboard not in System.
 
---*/
+**/
 {
   EFI_STATUS     Status;
 
@@ -642,7 +642,7 @@ MouseGetState (
   IN EFI_SIMPLE_POINTER_PROTOCOL    *This,
   IN OUT EFI_SIMPLE_POINTER_STATE   *State
   )
-/*++
+/**
 
 Routine Description:
 
@@ -659,7 +659,7 @@ Returns:
   EFI_NOT_READY - GC_TODO: Add description for return value
   EFI_SUCCESS - GC_TODO: Add description for return value
 
---*/
+**/
 {
   PS2_MOUSE_DEV *MouseDev;
   EFI_TPL       OldTpl;
@@ -695,7 +695,7 @@ MouseWaitForInput (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
   )
-/*++
+/**
 
 Routine Description:
 
@@ -706,7 +706,7 @@ Arguments:
 
 Returns:
 
---*/
+**/
 // GC_TODO:    Event - add argument and description to function comment
 // GC_TODO:    Context - add argument and description to function comment
 {
@@ -730,7 +730,7 @@ PollMouse (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
-/*++
+/**
 
 Routine Description:
 
@@ -746,7 +746,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   PS2_MOUSE_DEV *MouseDev;
 

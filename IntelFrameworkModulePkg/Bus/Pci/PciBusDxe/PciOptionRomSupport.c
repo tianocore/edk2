@@ -34,7 +34,7 @@ EFI_STATUS
 GetOpRomInfo (
   IN PCI_IO_DEVICE    *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -42,7 +42,7 @@ Arguments:
 
 Returns:
 
---*/
+**/
 // TODO:    PciIoDevice - add argument and description to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -130,7 +130,7 @@ LoadOpRomImage (
   IN PCI_IO_DEVICE   *PciDevice,
   IN UINT64          RomBase
   )
-/*++
+/**
 
 Routine Description:
 
@@ -140,7 +140,7 @@ Arguments:
 
 Returns:
 
---*/
+**/
 // TODO:    PciDevice - add argument and description to function comment
 // TODO:    RomBase - add argument and description to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
@@ -314,7 +314,7 @@ RomDecode (
   IN UINT32          RomBar,
   IN BOOLEAN         Enable
   )
-/*++
+/**
 
 Routine Description:
 
@@ -322,7 +322,7 @@ Arguments:
 
 Returns:
 
---*/
+**/
 // TODO:    PciDevice - add argument and description to function comment
 // TODO:    RomBarIndex - add argument and description to function comment
 // TODO:    RomBar - add argument and description to function comment
@@ -399,7 +399,7 @@ EFI_STATUS
 ProcessOpRomImage (
   PCI_IO_DEVICE   *PciDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -412,7 +412,7 @@ Returns:
 
   EFI Status.
 
---*/
+**/
 {
   UINT8                         Indicator;
   UINT32                        ImageSize;

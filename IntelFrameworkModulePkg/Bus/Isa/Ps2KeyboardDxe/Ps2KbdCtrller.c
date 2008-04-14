@@ -635,26 +635,20 @@ ConvertKeyboardScanCodeToEfiKey[] = {
 //
 STATIC UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
 
+/**
+  Read data register 
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+
+  @return return the value 
+
+**/
 STATIC
 UINT8
 KeyReadDataRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
-/*++
 
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
   UINT8                               Data;
@@ -675,28 +669,20 @@ Returns:
   return Data;
 }
 
+/**
+  Write data register
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Data      value wanted to be written
+
+**/
 STATIC
 VOID
 KeyWriteDataRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   )
-/*++
 
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-  Data      - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
 
@@ -718,25 +704,18 @@ Returns:
   //
 }
 
+/**
+  Read status register
+
+  @param ConsoleIn  Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+
+  @return value in status register
+
+**/
 UINT8
 KeyReadStatusRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
   UINT8                               Data;
@@ -758,28 +737,20 @@ Returns:
 
 }
 
+/**
+  Write command register 
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Data      The value wanted to be written
+
+**/
+
 STATIC
 VOID
 KeyWriteCommandRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-  Data      - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
 
@@ -798,25 +769,19 @@ Returns:
 
 }
 
+/**
+  Display error message
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param ErrMsg    Unicode string of error message
+  
+**/
 STATIC
 VOID
 KeyboardError (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN CHAR16                  *ErrMsg
   )
-/*++
-
-Routine Description:
-
-  Display error message
-
-Arguments:
-
-Returns:
-
---*/
-// GC_TODO:    ConsoleIn - add argument and description to function comment
-// GC_TODO:    ErrMsg - add argument and description to function comment
 {
   ConsoleIn->KeyboardErr = TRUE;
 
@@ -826,30 +791,24 @@ Returns:
   //
 }
 
-VOID
-EFIAPI
-KeyboardTimerHandler (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
-  )
-/*++
-
-Routine Description:
-
+/**
   Timer event handler: read a series of scancodes from 8042
   and put them into memory scancode buffer.
   it read as much scancodes to either fill
   the memory buffer or empty the keyboard buffer.
   It is registered as running under TPL_NOTIFY
 
-Arguments:
+  @param Event - The timer event
+  @param Context - A KEYBOARD_CONSOLE_IN_DEV pointer
 
-  Event - The timer event
-  Context - A KEYBOARD_CONSOLE_IN_DEV pointer
+**/
+VOID
+EFIAPI
+KeyboardTimerHandler (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
+  )
 
-Returns:
-
---*/
 {
   UINT8                   Data;
   EFI_TPL                 OldTpl;
@@ -942,6 +901,17 @@ Returns:
   return ;
 }
 
+/**
+  Read several bytes from the scancode buffer without removing them.
+  This function is called to see if there are enough bytes of scancode
+  representing a single key.
+
+  @param Count - Number of bytes to be read
+  @param Buf - Store the results
+
+  @retval EFI_SUCCESS success to scan the keyboard code
+  @retval EFI_NOT_READY invalid parameter
+**/
 STATIC
 EFI_STATUS
 GetScancodeBufHead (
@@ -949,27 +919,6 @@ GetScancodeBufHead (
   IN UINT32                  Count,
   OUT UINT8                  *Buf
   )
-/*++
-
-Routine Description:
-
-  Read several bytes from the scancode buffer without removing them.
-  This function is called to see if there are enough bytes of scancode
-  representing a single key.
-
-Arguments:
-
-  Count - Number of bytes to be read
-  Buf - Store the results
-
-Returns:
-
-  EFI_STATUS
-
---*/
-// GC_TODO:    ConsoleIn - add argument and description to function comment
-// GC_TODO:    EFI_NOT_READY - add return value to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   UINT32  Index;
   UINT32  Pos;
@@ -1005,6 +954,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Read & remove several bytes from the scancode buffer.
+  This function is usually called after GetScancodeBufHead()
+
+  @param Count - Number of bytes to be read
+  @param Buf - Store the results
+
+  @retval EFI_SUCCESS success to scan the keyboard code
+  @retval EFI_NOT_READY invalid parameter
+**/
 STATIC
 EFI_STATUS
 PopScancodeBufHead (
@@ -1012,26 +972,6 @@ PopScancodeBufHead (
   IN UINT32                 Count,
   OUT UINT8                 *Buf
   )
-/*++
-
-Routine Description:
-
-  Read & remove several bytes from the scancode buffer.
-  This function is usually called after GetScancodeBufHead()
-
-Arguments:
-
-  Count - Number of bytes to be read
-  Buf - Store the results
-
-Returns:
-
-  EFI_STATUS
-
---*/
-// GC_TODO:    ConsoleIn - add argument and description to function comment
-// GC_TODO:    EFI_NOT_READY - add return value to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   UINT32  Index;
 
@@ -1068,28 +1008,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Read key value 
+
+  @param ConsoleIn - Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Data      - Pointer to outof buffer for keeping key value
+
+  @retval EFI_TIMEOUT Status resigter time out
+  @retval EFI_SUCCESS Success to read keyboard
+
+**/
 EFI_STATUS
 KeyboardRead (
   IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
   OUT UINT8                   *Data
   )
-/*++
 
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-  Data      - GC_TODO: add argument description
-
-Returns:
-
-  EFI_TIMEOUT - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   UINT32  TimeOut;
   UINT32  RegFilled;
@@ -1117,29 +1051,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  write key to keyboard
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Data      value wanted to be written
+
+  @retval EFI_TIMEOUT - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+
+**/
 STATIC
 EFI_STATUS
 KeyboardWrite (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-  Data      - GC_TODO: add argument description
-
-Returns:
-
-  EFI_TIMEOUT - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   UINT32  TimeOut;
   UINT32  RegEmptied;
@@ -1170,30 +1097,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Issue keyboard command
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Data      The buff holding the command 
+
+  @retval EFI_TIMEOUT Keyboard is not ready to issuing 
+  @retval EFI_SUCCESS Success to issue keyboard command
+
+**/
 STATIC
 EFI_STATUS
 KeyboardCommand (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  ConsoleIn - GC_TODO: add argument description
-  Data      - GC_TODO: add argument description
-
-Returns:
-
-  EFI_TIMEOUT - GC_TODO: Add description for return value
-  EFI_TIMEOUT - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   UINT32  TimeOut;
   UINT32  RegEmptied;
@@ -1241,32 +1160,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  wait for a specific value to be presented on
+  8042 Data register by keyboard and then read it,
+  used in keyboard commands ack
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Value     the value wanted to be waited.
+
+  @retval EFI_TIMEOUT Fail to get specific value in given time
+  @retval EFI_SUCCESS Success to get specific value in given time.
+  
+**/
 STATIC
 EFI_STATUS
 KeyboardWaitForValue (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Value
   )
-/*++
-
-Routine Description:
-
-  wait for a specific value to be presented on
-  8042 Data register by keyboard and then read it,
-  used in keyboard commands ack
-
-Arguments:
-
-  ConsoleIn - The KEYBOARD_CONSOLE_IN_DEV instance pointer
-  Value - The value to be waited for
-
-Returns:
-
-  EFI_STATUS
-
---*/
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
-// GC_TODO:    EFI_TIMEOUT - add return value to function comment
 {
   UINT8   Data;
   UINT32  TimeOut;
@@ -1324,23 +1235,19 @@ Returns:
 
 }
 
+/**
+  Show keyboard status lights according to
+  indicators in ConsoleIn.
+
+  @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  
+  @return status
+
+**/
 EFI_STATUS
 UpdateStatusLights (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
-/*++
-
-Routine Description:
-
-  Show keyboard status lights according to
-  indicators in ConsoleIn.
-
-Arguments:
-
-Returns:
-
---*/
-// GC_TODO:    ConsoleIn - add argument and description to function comment
 {
   EFI_STATUS  Status;
   UINT8       Command;
@@ -1381,28 +1288,21 @@ Returns:
   return Status;
 }
 
-EFI_STATUS
-KeyGetchar (
-  IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  )
-/*++
-
-Routine Description:
-
+/**
   Get scancode from scancode buffer
   and translate into EFI-scancode and unicode defined by EFI spec
   The function is always called in TPL_NOTIFY
 
-Arguments:
+  @param ConsoleIn KEYBOARD_CONSOLE_IN_DEV instance pointer
 
-  ConsoleIn - KEYBOARD_CONSOLE_IN_DEV instance pointer
+  @retval EFI_NOT_READY - Input from console not ready yet.
+  @retval EFI_SUCCESS   - Function executed successfully.
 
-Returns:
-
-  EFI_NOT_READY - Input from console not ready yet.
-  EFI_SUCCESS   - Function executed successfully.
-
---*/
+**/
+EFI_STATUS
+KeyGetchar (
+  IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  )
 {
   EFI_STATUS  Status;
   UINT8       ScanCode;
@@ -1740,32 +1640,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Perform 8042 controller and keyboard Initialization
+  If ExtendedVerification is TRUE, do additional test for
+  the keyboard interface
+
+  @param ConsoleIn - KEYBOARD_CONSOLE_IN_DEV instance pointer
+  @param ExtendedVerification - indicates a thorough initialization
+
+  @retval EFI_DEVICE_ERROR Fail to init keyboard
+  @retval EFI_SUCCESS      Success to init keyboard
+**/
 EFI_STATUS
 InitKeyboard (
   IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN BOOLEAN                     ExtendedVerification
   )
-/*++
-
-Routine Description:
-
-  Perform 8042 controller and keyboard Initialization
-  If ExtendedVerification is TRUE, do additional test for
-  the keyboard interface
-
-Arguments:
-
-  ConsoleIn - KEYBOARD_CONSOLE_IN_DEV instance pointer
-  ExtendedVerification - indicates a thorough initialization
-
-Returns:
-
-  EFI_STATUS
-
---*/
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   EFI_STATUS              Status;
   EFI_STATUS              Status1;
@@ -2086,26 +1976,18 @@ Done:
 
 }
 
+/**
+  Disable the keyboard interface of the 8042 controller
+
+  @param ConsoleIn   - the device instance
+
+  @return status of issuing disable command
+
+**/
 EFI_STATUS
 DisableKeyboard (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   )
-/*++
-
-Routine Description:
-
-  Disable the keyboard interface of the 8042 controller
-
-Arguments:
-
-  ConsoleIn   - the device instance
-
-Returns:
-
-  EFI_STATUS
-
---*/
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   EFI_STATUS  Status;
 
@@ -2170,3 +2052,4 @@ CheckKeyboardConnect (
 
   return TRUE;
 }
+

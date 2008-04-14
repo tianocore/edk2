@@ -21,7 +21,7 @@ EFI_STATUS
 PciEnumerator (
   IN EFI_HANDLE                    Controller
   )
-/*++
+/**
 
 Routine Description:
 
@@ -35,7 +35,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -43,7 +43,7 @@ PciRootBridgeEnumerator (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc,
   IN PCI_IO_DEVICE                                     *RootBridgeDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -58,7 +58,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -67,7 +67,7 @@ ProcessOptionRom (
   IN UINT64        RomBase,
   IN UINT64        MaxLength
   )
-/*++
+/**
 
 Routine Description:
 
@@ -83,7 +83,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -92,7 +92,7 @@ PciAssignBusNumber (
   IN UINT8                              StartBusNumber,
   OUT UINT8                             *SubBusNumber
   )
-/*++
+/**
 
 Routine Description:
 
@@ -108,7 +108,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -116,7 +116,7 @@ DetermineRootBridgeAttributes (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc,
   IN PCI_IO_DEVICE                                    *RootBridgeDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -131,14 +131,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 UINT64
 GetMaxOptionRomSize (
   IN PCI_IO_DEVICE   *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -152,14 +152,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PciHostBridgeDeviceAttribute (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -173,7 +173,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -185,7 +185,7 @@ GetResourceAllocationStatus (
   OUT UINT64  *Mem64ResStatus,
   OUT UINT64  *PMem64ResStatus
   )
-/*++
+/**
 
 Routine Description:
 
@@ -204,14 +204,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 RejectPciDevice (
   IN PCI_IO_DEVICE       *PciDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -225,14 +225,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
 IsRejectiveDevice (
   IN  PCI_RESOURCE_NODE   *PciResNode
   )
-/*++
+/**
 
 Routine Description:
 
@@ -246,7 +246,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_RESOURCE_NODE *
@@ -254,7 +254,7 @@ GetLargerConsumerDevice (
   IN  PCI_RESOURCE_NODE   *PciResNode1,
   IN  PCI_RESOURCE_NODE   *PciResNode2
   )
-/*++
+/**
 
 Routine Description:
 
@@ -269,14 +269,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_RESOURCE_NODE *
 GetMaxResourceConsumerDevice (
   IN  PCI_RESOURCE_NODE   *ResPool
   )
-/*++
+/**
 
 Routine Description:
 
@@ -290,7 +290,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -306,7 +306,7 @@ PciHostBridgeAdjustAllocation (
   IN  UINT64              Mem64ResStatus,
   IN  UINT64              PMem64ResStatus
   )
-/*++
+/**
 
 Routine Description:
 
@@ -329,7 +329,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -342,7 +342,7 @@ ConstructAcpiResourceRequestor (
   IN PCI_RESOURCE_NODE  *PMem64Node,
   OUT VOID              **pConfig
   )
-/*++
+/**
 
 Routine Description:
 
@@ -362,7 +362,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -374,7 +374,7 @@ GetResourceBase (
   OUT UINT64  *Mem64Base,
   OUT UINT64  *PMem64Base
   )
-/*++
+/**
 
 Routine Description:
 
@@ -393,14 +393,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PciBridgeEnumerator (
   IN PCI_IO_DEVICE                                     *BridgeDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -414,14 +414,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PciBridgeResourceAllocator (
   IN PCI_IO_DEVICE  *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -435,7 +435,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -447,7 +447,7 @@ GetResourceBaseFromBridge (
   OUT UINT64        *Mem64Base,
   OUT UINT64        *PMem64Base
   )
-/*++
+/**
 
 Routine Description:
 
@@ -466,14 +466,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PciHostBridgeP2CProcess (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -487,7 +487,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -495,7 +495,7 @@ NotifyPhase (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc,
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE       Phase
   )
-/*++
+/**
 
 Routine Description:
 
@@ -510,7 +510,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -521,7 +521,7 @@ PreprocessController (
   IN UINT8                                          Func,
   IN EFI_PCI_CONTROLLER_RESOURCE_ALLOCATION_PHASE   Phase
   )
-/*++
+/**
 
 Routine Description:
 
@@ -539,7 +539,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -552,7 +552,7 @@ PciHotPlugRequestNotify (
   IN OUT UINT8                        *NumberOfChildren,
   IN OUT EFI_HANDLE                   * ChildHandleBuffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -571,14 +571,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
 SearchHostBridgeHandle (
   IN EFI_HANDLE RootBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -592,14 +592,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 AddHostBridgeEnumerator (
   IN EFI_HANDLE HostBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -613,7 +613,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 #endif

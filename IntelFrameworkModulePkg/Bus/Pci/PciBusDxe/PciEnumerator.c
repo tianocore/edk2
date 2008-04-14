@@ -21,7 +21,7 @@ EFI_STATUS
 PciEnumerator (
   IN EFI_HANDLE                    Controller
   )
-/*++
+/**
 
 Routine Description:
 
@@ -34,7 +34,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Controller - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -139,7 +139,7 @@ PciRootBridgeEnumerator (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc,
   IN PCI_IO_DEVICE                                     *RootBridgeDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -149,7 +149,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciResAlloc - add argument and description to function comment
 // TODO:    RootBridgeDev - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -252,7 +252,7 @@ ProcessOptionRom (
   IN UINT64        RomBase,
   IN UINT64        MaxLength
   )
-/*++
+/**
 
 Routine Description:
 
@@ -264,7 +264,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    RomBase - add argument and description to function comment
 // TODO:    MaxLength - add argument and description to function comment
@@ -307,7 +307,7 @@ PciAssignBusNumber (
   IN UINT8                              StartBusNumber,
   OUT UINT8                             *SubBusNumber
   )
-/*++
+/**
 
 Routine Description:
 
@@ -319,7 +319,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    StartBusNumber - add argument and description to function comment
 // TODO:    SubBusNumber - add argument and description to function comment
@@ -456,7 +456,7 @@ DetermineRootBridgeAttributes (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc,
   IN PCI_IO_DEVICE                                    *RootBridgeDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -469,7 +469,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciResAlloc - add argument and description to function comment
 // TODO:    RootBridgeDev - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -518,7 +518,7 @@ UINT64
 GetMaxOptionRomSize (
   IN PCI_IO_DEVICE   *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -530,7 +530,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 {
   LIST_ENTRY      *CurrentLink;
@@ -586,7 +586,7 @@ EFI_STATUS
 PciHostBridgeDeviceAttribute (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/*++
+/**
 
 Routine Description:
 
@@ -598,7 +598,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciResAlloc - add argument and description to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -642,7 +642,7 @@ GetResourceAllocationStatus (
   OUT UINT64  *Mem64ResStatus,
   OUT UINT64  *PMem64ResStatus
   )
-/*++
+/**
 
 Routine Description:
 
@@ -654,7 +654,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    AcpiConfig - add argument and description to function comment
 // TODO:    IoResStatus - add argument and description to function comment
 // TODO:    Mem32ResStatus - add argument and description to function comment
@@ -728,7 +728,7 @@ EFI_STATUS
 RejectPciDevice (
   IN PCI_IO_DEVICE       *PciDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -740,7 +740,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciDevice - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_ABORTED - add return value to function comment
@@ -809,7 +809,7 @@ BOOLEAN
 IsRejectiveDevice (
   IN  PCI_RESOURCE_NODE   *PciResNode
   )
-/*++
+/**
 
 Routine Description:
 
@@ -821,7 +821,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciResNode - add argument and description to function comment
 {
   PCI_IO_DEVICE *Temp;
@@ -864,7 +864,7 @@ GetLargerConsumerDevice (
   IN  PCI_RESOURCE_NODE   *PciResNode1,
   IN  PCI_RESOURCE_NODE   *PciResNode2
   )
-/*++
+/**
 
 Routine Description:
 
@@ -876,7 +876,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciResNode1 - add argument and description to function comment
 // TODO:    PciResNode2 - add argument and description to function comment
 {
@@ -906,7 +906,7 @@ PCI_RESOURCE_NODE *
 GetMaxResourceConsumerDevice (
   IN  PCI_RESOURCE_NODE   *ResPool
   )
-/*++
+/**
 
 Routine Description:
 
@@ -918,7 +918,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    ResPool - add argument and description to function comment
 {
   PCI_RESOURCE_NODE *Temp;
@@ -966,7 +966,7 @@ PciHostBridgeAdjustAllocation (
   IN  UINT64              Mem64ResStatus,
   IN  UINT64              PMem64ResStatus
   )
-/*++
+/**
 
 Routine Description:
 
@@ -978,7 +978,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    IoPool - add argument and description to function comment
 // TODO:    Mem32Pool - add argument and description to function comment
 // TODO:    PMem32Pool - add argument and description to function comment
@@ -1108,7 +1108,7 @@ ConstructAcpiResourceRequestor (
   IN PCI_RESOURCE_NODE  *PMem64Node,
   OUT VOID              **pConfig
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1118,7 +1118,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    IoNode - add argument and description to function comment
 // TODO:    Mem32Node - add argument and description to function comment
@@ -1354,7 +1354,7 @@ GetResourceBase (
   OUT UINT64  *Mem64Base,
   OUT UINT64  *PMem64Base
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1364,7 +1364,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    pConfig - add argument and description to function comment
 // TODO:    IoBase - add argument and description to function comment
 // TODO:    Mem32Base - add argument and description to function comment
@@ -1448,7 +1448,7 @@ EFI_STATUS
 PciBridgeEnumerator (
   IN PCI_IO_DEVICE                                     *BridgeDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1458,7 +1458,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    BridgeDev - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1512,7 +1512,7 @@ EFI_STATUS
 PciBridgeResourceAllocator (
   IN PCI_IO_DEVICE  *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1522,7 +1522,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1676,7 +1676,7 @@ GetResourceBaseFromBridge (
   OUT UINT64        *Mem64Base,
   OUT UINT64        *PMem64Base
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1686,7 +1686,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    IoBase - add argument and description to function comment
 // TODO:    Mem32Base - add argument and description to function comment
@@ -1766,7 +1766,7 @@ NotifyPhase (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc,
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE       Phase
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1776,7 +1776,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciResAlloc - add argument and description to function comment
 // TODO:    Phase - add argument and description to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
@@ -1850,7 +1850,7 @@ PreprocessController (
   IN UINT8                                            Func,
   IN EFI_PCI_CONTROLLER_RESOURCE_ALLOCATION_PHASE     Phase
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1860,7 +1860,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    Bus - add argument and description to function comment
 // TODO:    Device - add argument and description to function comment
@@ -1959,7 +1959,7 @@ PciHotPlugRequestNotify (
   IN OUT UINT8                        *NumberOfChildren,
   IN OUT EFI_HANDLE                   * ChildHandleBuffer
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1978,7 +1978,7 @@ Returns:
 
   Status code.
 
---*/
+**/
 // TODO:    RemainingDevicePath - add argument and description to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -2078,7 +2078,7 @@ BOOLEAN
 SearchHostBridgeHandle (
   IN EFI_HANDLE RootBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -2088,7 +2088,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    RootBridgeHandle - add argument and description to function comment
 {
   EFI_HANDLE                      HostBridgeHandle;
@@ -2126,7 +2126,7 @@ EFI_STATUS
 AddHostBridgeEnumerator (
   IN EFI_HANDLE HostBridgeHandle
   )
-/*++
+/**
 
 Routine Description:
 
@@ -2136,7 +2136,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    HostBridgeHandle - add argument and description to function comment
 // TODO:    EFI_ABORTED - add return value to function comment
 // TODO:    EFI_ABORTED - add return value to function comment

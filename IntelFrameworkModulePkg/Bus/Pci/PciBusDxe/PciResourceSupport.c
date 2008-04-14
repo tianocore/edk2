@@ -20,7 +20,7 @@ SkipVGAAperture (
   OUT UINT64   *Start,
   IN  UINT64   Length
   )
-/*++
+/**
 
 Routine Description:
 
@@ -32,7 +32,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Start - add argument and description to function comment
 // TODO:    Length - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -62,7 +62,7 @@ SkipIsaAliasAperture (
   OUT UINT64   *Start,
   IN  UINT64   Length
   )
-/*++
+/**
 
 Routine Description:
 
@@ -74,7 +74,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Start - add argument and description to function comment
 // TODO:    Length - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -106,7 +106,7 @@ InsertResourceNode (
   PCI_RESOURCE_NODE *Bridge,
   PCI_RESOURCE_NODE *ResNode
   )
-/*++
+/**
 
 Routine Description:
 
@@ -119,7 +119,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    ResNode - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -159,7 +159,7 @@ MergeResourceTree (
   PCI_RESOURCE_NODE *Res,
   BOOLEAN           TypeMerge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -177,7 +177,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Dst - add argument and description to function comment
 // TODO:    Res - add argument and description to function comment
 // TODO:    TypeMerge - add argument and description to function comment
@@ -208,7 +208,7 @@ EFI_STATUS
 CalculateApertureIo16 (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -221,7 +221,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -349,7 +349,7 @@ EFI_STATUS
 CalculateResourceAperture (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -362,7 +362,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -464,7 +464,7 @@ GetResourceFromDevice (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -474,7 +474,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciDev - add argument and description to function comment
 // TODO:    IoNode - add argument and description to function comment
 // TODO:    Mem32Node - add argument and description to function comment
@@ -617,7 +617,7 @@ CreateResourceNode (
   IN PCI_BAR_TYPE          ResType,
   IN PCI_RESOURCE_USAGE    ResUsage
   )
-/*++
+/**
 
 Routine Description:
 
@@ -629,7 +629,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciDev - add argument and description to function comment
 // TODO:    Length - add argument and description to function comment
 // TODO:    Alignment - add argument and description to function comment
@@ -677,7 +677,7 @@ CreateResourceMap (
   IN PCI_RESOURCE_NODE *Mem64Node,
   IN PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -690,7 +690,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    IoNode - add argument and description to function comment
 // TODO:    Mem32Node - add argument and description to function comment
@@ -932,7 +932,7 @@ ResourcePaddingPolicy (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -952,7 +952,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   //
@@ -981,7 +981,7 @@ DegradeResource (
   IN PCI_RESOURCE_NODE *Mem64Node,
   IN PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -997,7 +997,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    Mem32Node - add argument and description to function comment
 // TODO:    PMem32Node - add argument and description to function comment
@@ -1083,7 +1083,7 @@ BridgeSupportResourceDecode (
   IN PCI_IO_DEVICE *Bridge,
   IN UINT32        Decode
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1098,9 +1098,9 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 {
-  /*++
+  /**
 
 Routine Description:
 
@@ -1110,7 +1110,7 @@ Returns:
   
   None
 
---*/
+**/
   if ((Bridge->Decodes) & Decode) {
     return TRUE;
   }
@@ -1123,7 +1123,7 @@ ProgramResource (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1136,7 +1136,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Base - add argument and description to function comment
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
@@ -1184,7 +1184,7 @@ ProgramBar (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1194,7 +1194,7 @@ Returns:
   
   None
 
---*/
+**/
 // TODO:    Base - add argument and description to function comment
 // TODO:    Node - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -1274,7 +1274,7 @@ ProgramPpbApperture (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1284,7 +1284,7 @@ Returns:
   
   None
 
---*/
+**/
 // TODO:    Base - add argument and description to function comment
 // TODO:    Node - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -1456,7 +1456,7 @@ ProgrameUpstreamBridgeForRom (
   IN UINT32          OptionRomBase,
   IN BOOLEAN         Enable
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1464,7 +1464,7 @@ Arguments:
 
 Returns:
 
---*/
+**/
 // TODO:    PciDevice - add argument and description to function comment
 // TODO:    OptionRomBase - add argument and description to function comment
 // TODO:    Enable - add argument and description to function comment
@@ -1510,7 +1510,7 @@ BOOLEAN
 ResourceRequestExisted (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1522,7 +1522,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   if (Bridge != NULL) {
     if (!IsListEmpty (&Bridge->ChildList) || Bridge->Length != 0) {
@@ -1538,7 +1538,7 @@ InitializeResourcePool (
   PCI_RESOURCE_NODE   *ResourcePool,
   PCI_BAR_TYPE        ResourceType
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1548,7 +1548,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    ResourcePool - add argument and description to function comment
 // TODO:    ResourceType - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -1576,7 +1576,7 @@ GetResourceMap (
   PCI_RESOURCE_NODE  *Mem64Pool,
   PCI_RESOURCE_NODE  *PMem64Pool
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1586,7 +1586,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciDev - add argument and description to function comment
 // TODO:    IoBridge - add argument and description to function comment
 // TODO:    Mem32Bridge - add argument and description to function comment
@@ -1691,7 +1691,7 @@ EFI_STATUS
 DestroyResourceTree (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1701,7 +1701,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Bridge - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
@@ -1733,7 +1733,7 @@ RecordReservedResource (
   IN PCI_BAR_TYPE   ResType,
   IN PCI_IO_DEVICE  *Bridge
   )
-/*++
+/**
 
 Routine Description:
   
@@ -1743,7 +1743,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    Base - add argument and description to function comment
 // TODO:    Length - add argument and description to function comment
 // TODO:    ResType - add argument and description to function comment
@@ -1777,7 +1777,7 @@ ResourcePaddingForCardBusBridge (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1787,7 +1787,7 @@ Returns:
 
   None
 
---*/
+**/
 // TODO:    PciDev - add argument and description to function comment
 // TODO:    IoNode - add argument and description to function comment
 // TODO:    Mem32Node - add argument and description to function comment
@@ -1880,7 +1880,7 @@ ProgramP2C (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -1890,7 +1890,7 @@ Returns:
   
   None
 
---*/
+**/
 // TODO:    Base - add argument and description to function comment
 // TODO:    Node - add argument and description to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -2127,7 +2127,7 @@ ApplyResourcePadding (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/*++
+/**
 
 Routine Description:
 
@@ -2137,7 +2137,7 @@ Returns:
   
   None
 
---*/
+**/
 // TODO:    PciDev - add argument and description to function comment
 // TODO:    IoNode - add argument and description to function comment
 // TODO:    Mem32Node - add argument and description to function comment
@@ -2291,7 +2291,7 @@ VOID
 GetResourcePaddingPpb (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -2305,7 +2305,7 @@ Returns:
 
   None
 
---*/
+**/
 {
   if (gPciHotPlugInit) {
     if (PciIoDevice->ResourcePaddingDescriptors == NULL) {

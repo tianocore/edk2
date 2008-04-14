@@ -23,7 +23,7 @@ PciDevicePresent (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -41,7 +41,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -49,7 +49,7 @@ PciPciDeviceInfoCollector (
   IN PCI_IO_DEVICE                      *Bridge,
   UINT8                                 StartBusNumber
   )
-/*++
+/**
 
 Routine Description:
 
@@ -64,7 +64,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -76,7 +76,7 @@ PciSearchDevice (
   UINT8                                 Func,
   PCI_IO_DEVICE                         **PciDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -95,7 +95,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_IO_DEVICE             *
@@ -106,7 +106,7 @@ GatherDeviceInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -124,7 +124,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_IO_DEVICE             *
@@ -135,7 +135,7 @@ GatherPpbInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -153,7 +153,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_IO_DEVICE             *
@@ -164,7 +164,7 @@ GatherP2CInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -182,7 +182,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_DEVICE_PATH_PROTOCOL  *
@@ -190,7 +190,7 @@ CreatePciDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL *ParentDevicePath,
   IN  PCI_IO_DEVICE            *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -205,7 +205,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -215,7 +215,7 @@ BarExisted (
   OUT UINT32       *BarLengthValue,
   OUT UINT32       *OriginalBarValue
   )
-/*++
+/**
 
 Routine Description:
 
@@ -232,7 +232,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -243,7 +243,7 @@ PciTestSupportedAttribute (
   IN UINT16                             *OldCommand,
   IN UINT16                             *OldBridgeControl
   )
-/*++
+/**
 
 Routine Description:
 
@@ -261,7 +261,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -271,7 +271,7 @@ PciSetDeviceAttribute (
   IN UINT16                             BridgeControl,
   IN UINTN                              Option
   )
-/*++
+/**
 
 Routine Description:
 
@@ -288,7 +288,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -296,7 +296,7 @@ GetFastBackToBackSupport (
   IN PCI_IO_DEVICE                      *PciIoDevice,
   IN UINT8                              StatusIndex
   )
-/*++
+/**
 
 Routine Description:
 
@@ -311,14 +311,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 DetermineDeviceAttribute (
   IN PCI_IO_DEVICE                      *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -332,14 +332,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 UpdatePciInfo (
   IN PCI_IO_DEVICE  *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -353,7 +353,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 VOID
@@ -361,7 +361,7 @@ SetNewAlign (
   IN UINT64 *Alignment,
   IN UINT64 NewAlignment
   )
-/*++
+/**
 
 Routine Description:
 
@@ -376,7 +376,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 UINTN
@@ -385,7 +385,7 @@ PciParseBar (
   IN UINTN          Offset,
   IN UINTN          BarIndex
   )
-/*++
+/**
 
 Routine Description:
 
@@ -401,14 +401,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 InitializePciDevice (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -422,14 +422,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 InitializePpb (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -443,14 +443,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 InitializeP2C (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -464,7 +464,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 PCI_IO_DEVICE             *
@@ -475,7 +475,7 @@ CreatePciIoDevice (
   UINT8                               Device,
   UINT8                               Func
   )
-/*++
+/**
 
 Routine Description:
 
@@ -493,14 +493,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 PciEnumeratorLight (
   IN EFI_HANDLE                    Controller
   )
-/*++
+/**
 
 Routine Description:
 
@@ -514,7 +514,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
@@ -524,7 +524,7 @@ PciGetBusRange (
   OUT    UINT16                             *MaxBus,
   OUT    UINT16                             *BusRange
   )
-/*++
+/**
 
 Routine Description:
 
@@ -541,14 +541,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 EFI_STATUS
 StartManagingRootBridge (
   IN PCI_IO_DEVICE *RootBridgeDev
   )
-/*++
+/**
 
 Routine Description:
 
@@ -562,14 +562,14 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 BOOLEAN
 IsPciDeviceRejected (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/*++
+/**
 
 Routine Description:
 
@@ -583,7 +583,7 @@ Returns:
 
   TODO: add return values
 
---*/
+**/
 ;
 
 #endif

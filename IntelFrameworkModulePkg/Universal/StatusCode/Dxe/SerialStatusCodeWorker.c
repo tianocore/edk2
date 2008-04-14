@@ -1,4 +1,3 @@
-
 /** @file
   Serial I/O status code reporting worker.
 
@@ -220,3 +219,4 @@ SerialStatusCodeReportWorker (
 
   return EFI_SUCCESS;
 }
+

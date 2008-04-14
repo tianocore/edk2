@@ -22,22 +22,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "IsaFloppy.h"
 
+/**
+
+  Detect the floppy drive is presented or not
+ 
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  @retval EFI_SUCCESS    Drive is presented
+  @retval EFI_NOT_FOUND  Drive is not presented
+
+**/
 EFI_STATUS
 DiscoverFddDevice (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:  Detect the floppy drive is presented or not
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
-  Returns:
-    EFI_SUCCESS    Drive is presented
-    EFI_NOT_FOUND  Drive is not presented
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   EFI_STATUS  Status;
 
@@ -61,23 +58,19 @@ DiscoverFddDevice (
   return EFI_SUCCESS;
 }
 
+/**
+
+  Do recalibrate  and see the drive is presented or not
+  Set the media parameters
+  
+  @param FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  @return the drive is presented or not
+
+**/
 EFI_STATUS
 FddIdentify (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:   Do recalibrate  and see the drive is presented or not
-         Set the media parameters
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
-  Returns:
-    EFI_SUCCESS:
-    EFI_DEVICE_ERROR:
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   EFI_STATUS  Status;
 
@@ -143,23 +136,21 @@ FddIdentify (
   return EFI_SUCCESS;
 }
 
+/**
+
+  Reset the Floppy Logic Drive
+  
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  
+  @retval EFI_SUCCESS:    The Floppy Logic Drive is reset
+  @retval EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly and
+                      can not be reset
+
+**/
 EFI_STATUS
 FddReset (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:  Reset the Floppy Logic Drive
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
-  Returns:
-    EFI_SUCCESS:    The Floppy Logic Drive is reset
-    EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly and
-                      can not be reset
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   UINT8 data;
   UINT8 StatusRegister0;
@@ -244,24 +235,22 @@ FddReset (
   return EFI_SUCCESS;
 }
 
+/**
+
+  Turn the drive's motor on
+  The drive's motor must be on before any command can be executed
+  
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:       Turn the drive's motor on successfully
+  @retval  EFI_DEVICE_ERROR:    The drive is busy, so can not turn motor on
+  @retval  EFI_INVALID_PARAMETER: Fail to Set timer(Cancel timer)
+
+**/
 EFI_STATUS
 MotorOn (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:  Turn the drive's motor on
-        The drive's motor must be on before any command can be executed
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
-  Returns:
-    EFI_SUCCESS:       Turn the drive's motor on successfully
-    EFI_DEVICE_ERROR:    The drive is busy, so can not turn motor on
-    EFI_INVALID_PARAMETER: Fail to Set timer(Cancel timer)
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   EFI_STATUS  Status;
   UINT8       data;
@@ -328,22 +317,21 @@ MotorOn (
   return EFI_SUCCESS;
 }
 
+/**
+
+  Set a Timer and when Timer goes off, turn the motor off
+  
+  
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:       Set the Timer successfully
+  @retval  EFI_INVALID_PARAMETER: Fail to Set the timer
+
+**/
 EFI_STATUS
 MotorOff (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:  Set a Timer and when Timer goes off, turn the motor off
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
-  Returns:
-    EFI_SUCCESS:       Set the Timer successfully
-    EFI_INVALID_PARAMETER: Fail to Set the timer
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   //
   // Set the timer : 2s
@@ -351,24 +339,21 @@ MotorOff (
   return gBS->SetTimer (FdcDev->Event, TimerRelative, 20000000);
 }
 
+/**
+  Detect the disk in the drive is changed or not
+  
+  
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:    No disk media change
+  @retval  EFI_DEVICE_ERROR: Fail to do the recalibrate or seek operation
+  @retval  EFI_NO_MEDIA:   No disk in the drive
+  @retval  EFI_MEDIA_CHANGED:  There is a new disk in the drive
+**/
 EFI_STATUS
 DisketChanged (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:  Detect the disk in the drive is changed or not
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-  Returns:
-    EFI_SUCCESS:    No disk media change
-    EFI_DEVICE_ERROR: Fail to do the recalibrate or seek operation
-    EFI_NO_MEDIA:   No disk in the drive
-    EFI_MEDIA_CHANGED:  There is a new disk in the drive
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   EFI_STATUS  Status;
   UINT8       data;
@@ -418,24 +403,21 @@ DisketChanged (
   return EFI_SUCCESS;
 }
 
+/**
+  Do the Specify command, this command sets DMA operation
+  and the initial values for each of the three internal
+  times: HUT, SRT and HLT
+  
+  @param This    Pointer to instance of FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:    Execute the Specify command successfully
+  @retval  EFI_DEVICE_ERROR: Fail to execute the command
+
+**/
 EFI_STATUS
 Specify (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:  Do the Specify command, this command sets DMA operation
-                        and the initial values for each of the three internal
-                        times: HUT, SRT and HLT
-  Parameters:
-    None
-  Returns:
-    EFI_SUCCESS:    Execute the Specify command successfully
-    EFI_DEVICE_ERROR: Fail to execute the command
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   FDD_SPECIFY_CMD Command;
   UINTN           Index;
@@ -464,22 +446,18 @@ Specify (
   return EFI_SUCCESS;
 }
 
+/**
+  Set the head of floppy drive to track 0
+ 
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @retval EFI_SUCCESS:    Execute the Recalibrate operation successfully
+  @retval EFI_DEVICE_ERROR: Fail to execute the Recalibrate operation
+
+**/
 EFI_STATUS
 Recalibrate (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:  Set the head of floppy drive to track 0
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-  Returns:
-    EFI_SUCCESS:    Execute the Recalibrate operation successfully
-    EFI_DEVICE_ERROR: Fail to execute the Recalibrate operation
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   FDD_COMMAND_PACKET2 Command;
   UINTN               Index;
@@ -542,25 +520,21 @@ Recalibrate (
   return EFI_SUCCESS;
 }
 
+/**
+  Set the head of floppy drive to the new cylinder
+  
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  Lba EFI_LBA     : The logic block address want to seek
+  
+  @retval  EFI_SUCCESS:    Execute the Seek operation successfully
+  @retval  EFI_DEVICE_ERROR: Fail to execute the Seek operation
+
+**/
 EFI_STATUS
 Seek (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN EFI_LBA         Lba
   )
-/*++
-
-  Routine Description:  Set the head of floppy drive to the new cylinder
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-    Lba EFI_LBA     : The logic block address want to seek
-  Returns:
-    EFI_SUCCESS:    Execute the Seek operation successfully
-    EFI_DEVICE_ERROR: Fail to execute the Seek operation
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    Lba - add argument and description to function comment
 {
   FDD_SEEK_CMD  Command;
   UINT8         EndOfTrack;
@@ -649,29 +623,25 @@ Seek (
   }
 }
 
+/**
+  Do the Sense Interrupt Status command, this command
+  resets the interrupt signal
+  
+  
+  @param  StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC
+  @param  PresentCylinderNumber  UINT8 *: Be used to save present cylinder number
+                                    read from FDC
+  
+  @retval  EFI_SUCCESS:    Execute the Sense Interrupt Status command successfully
+  @retval  EFI_DEVICE_ERROR: Fail to execute the command
+
+**/
 EFI_STATUS
 SenseIntStatus (
   IN     FDC_BLK_IO_DEV  *FdcDev,
   IN OUT UINT8           *StatusRegister0,
   IN OUT UINT8           *PresentCylinderNumber
   )
-/*++
-
-  Routine Description:  Do the Sense Interrupt Status command, this command
-                        resets the interrupt signal
-  Parameters:
-    StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC
-    PresentCylinderNumber  UINT8 *: Be used to save present cylinder number
-                                    read from FDC
-  Returns:
-    EFI_SUCCESS:    Execute the Sense Interrupt Status command successfully
-    EFI_DEVICE_ERROR: Fail to execute the command
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    StatusRegister0 - add argument and description to function comment
-// GC_TODO:    PresentCylinderNumber - add argument and description to function comment
 {
   UINT8 command;
 
@@ -691,26 +661,22 @@ SenseIntStatus (
   return EFI_SUCCESS;
 }
 
+/**
+  Do the Sense Drive Status command
+  
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  Lba EFI_LBA     : Logic block address
+  
+  @retval  EFI_SUCCESS:    Execute the Sense Drive Status command successfully
+  @retval  EFI_DEVICE_ERROR: Fail to execute the command
+  @retval  EFI_WRITE_PROTECTED:The disk is write protected
+
+**/
 EFI_STATUS
 SenseDrvStatus (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN EFI_LBA         Lba
   )
-/*++
-
-  Routine Description:  Do the Sense Drive Status command
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-    Lba EFI_LBA     : Logic block address
-  Returns:
-    EFI_SUCCESS:    Execute the Sense Drive Status command successfully
-    EFI_DEVICE_ERROR: Fail to execute the command
-    EFI_WRITE_PROTECTED:The disk is write protected
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    Lba - add argument and description to function comment
 {
   FDD_COMMAND_PACKET2 Command;
   UINT8               Head;
@@ -758,23 +724,20 @@ SenseDrvStatus (
   return CheckStatus3 (StatusRegister3);
 }
 
+/**
+  Update the disk media properties and if necessary
+                        reinstall Block I/O interface
+ 
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  
+  @retval  EFI_SUCCESS:    Do the operation successfully
+  @retval  EFI_DEVICE_ERROR: Fail to the operation
+
+**/
 EFI_STATUS
 DetectMedia (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description:  Update the disk media properties and if necessary
-                        reinstall Block I/O interface
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-  Returns:
-    EFI_SUCCESS:    Do the operation successfully
-    EFI_DEVICE_ERROR: Fail to the operation
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
 {
   EFI_STATUS  Status;
   BOOLEAN     bReset;
@@ -840,22 +803,17 @@ DetectMedia (
   return EFI_SUCCESS;
 }
 
+/**
+  Set the data rate and so on
+ 
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+
+  @retval EFI_SUCCESS success to set the data rate
+**/
 EFI_STATUS
 Setup (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
-/*++
-
-  Routine Description: Set the data rate and so on
-  Parameters:
-    None
-  Returns:
-    EFI_SUCCESS:
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   EFI_STATUS  Status;
 
@@ -878,6 +836,18 @@ Setup (
   return EFI_SUCCESS;
 }
 
+/**
+  Read or Write a number of blocks in the same cylinder
+ 
+  @param  FdcDev      A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  HostAddress device address 
+  @param  Lba         The starting logic block address to read from on the device
+  @param  NumberOfBlocks The number of block wanted to be read or write
+  @param  Read        Operation type: read or write
+  
+  @retval EFI_SUCCESS Success operate
+
+**/
 EFI_STATUS
 ReadWriteDataSector (
   IN  FDC_BLK_IO_DEV  *FdcDev,
@@ -886,30 +856,6 @@ ReadWriteDataSector (
   IN  UINTN           NumberOfBlocks,
   IN  BOOLEAN         Read
   )
-/*++
-
-  Routine Description: Read or Write a number of blocks in the same cylinder
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV * : A pointer to Data Structure FDC_BLK_IO_DEV
-    Buffer VOID *:
-    Lba EFI_LBA:
-    NumberOfBlocks UINTN:
-    Read BOOLEAN:
-  Returns:
-    EFI_SUCCESS:
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    HostAddress - add argument and description to function comment
-// GC_TODO:    Lba - add argument and description to function comment
-// GC_TODO:    NumberOfBlocks - add argument and description to function comment
-// GC_TODO:    Read - add argument and description to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_TIMEOUT - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   EFI_STATUS                                    Status;
   FDD_COMMAND_PACKET1                           Command;
@@ -1040,23 +986,20 @@ ReadWriteDataSector (
   return CheckResult (&Result, FdcDev);
 }
 
+/**
+  Fill in FDD command's parameter
+  
+  @param FdcDev   Pointer to instance of FDC_BLK_IO_DEV
+  @param Lba      The starting logic block address to read from on the device
+  @param Command  FDD command
+
+**/
 VOID
 FillPara (
   IN  FDC_BLK_IO_DEV       *FdcDev,
   IN  EFI_LBA              Lba,
   IN  FDD_COMMAND_PACKET1  *Command
   )
-/*++
-
-  Routine Description: Fill in Parameter
-  Parameters:
-  Returns:
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    Lba - add argument and description to function comment
-// GC_TODO:    Command - add argument and description to function comment
 {
   UINT8 EndOfTrack;
 
@@ -1084,24 +1027,22 @@ FillPara (
   Command->DataLength = DISK_1440K_DTL;
 }
 
+/**
+  Read result byte from Data Register of FDC
+  
+  @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
+  @param Pointer UINT8 *: Be used to save result byte read from FDC
+  
+  
+  @retval  EFI_SUCCESS:    Read result byte from FDC successfully
+  @retval  EFI_DEVICE_ERROR: The FDC is not ready to be read
+
+**/
 EFI_STATUS
 DataInByte (
   IN     FDC_BLK_IO_DEV  *FdcDev,
   IN OUT UINT8           *Pointer
   )
-/*++
-
-  Routine Description:  Read result byte from Data Register of FDC
-  Parameters:
-    Pointer UINT8 *: Be used to save result byte read from FDC
-  Returns:
-    EFI_SUCCESS:    Read result byte from FDC successfully
-    EFI_DEVICE_ERROR: The FDC is not ready to be read
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    Pointer - add argument and description to function comment
 {
   UINT8 data;
 
@@ -1126,24 +1067,21 @@ DataInByte (
   return EFI_SUCCESS;
 }
 
+/**
+  Write command byte to Data Register of FDC
+  
+  @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
+  @param Pointer Be used to save command byte written to FDC
+  
+  @retval  EFI_SUCCESS:    Write command byte to FDC successfully
+  @retval  EFI_DEVICE_ERROR: The FDC is not ready to be written
+
+**/
 EFI_STATUS
 DataOutByte (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT8           *Pointer
   )
-/*++
-
-  Routine Description:  Write command byte to Data Register of FDC
-  Parameters:
-    Pointer UINT8 *: Be used to save command byte written to FDC
-  Returns:
-    EFI_SUCCESS:    Write command byte to FDC successfully
-    EFI_DEVICE_ERROR: The FDC is not ready to be written
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    Pointer - add argument and description to function comment
 {
   UINT8 data;
 
@@ -1169,27 +1107,23 @@ DataOutByte (
   return EFI_SUCCESS;
 }
 
+/**
+  Detect the specified floppy logic drive is busy or
+  not within a period of time
+  
+  @param Disk             Indicate it is drive A or drive B
+  @param TimeoutInSeconds the time period for waiting
+  
+  @retval EFI_SUCCESS:  The drive and command are not busy
+  @retval EFI_TIMEOUT:  The drive or command is still busy after a period time that
+                        set by TimeoutInSeconds
+
+**/
 EFI_STATUS
 FddWaitForBSYClear (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINTN           TimeoutInSeconds
   )
-/*++
-
-  Routine Description:  Detect the specified floppy logic drive is busy or
-                        not within a period of time
-  Parameters:
-    Disk EFI_FDC_DISK:    Indicate it is drive A or drive B
-    TimeoutInSeconds UINTN: the time period for waiting
-  Returns:
-    EFI_SUCCESS:  The drive and command are not busy
-    EFI_TIMEOUT:  The drive or command is still busy after a period time that
-                  set by TimeoutInSeconds
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    TimeoutInSeconds - add argument and description to function comment
 {
   UINTN Delay;
   UINT8 StatusRegister;
@@ -1228,27 +1162,24 @@ FddWaitForBSYClear (
   return EFI_SUCCESS;
 }
 
+/**
+
+  Routine Description:  Determine whether FDC is ready to write or read
+  
+  @param  FdcDev Pointer to instance of FDC_BLK_IO_DEV
+  @param  Dio BOOLEAN:      Indicate the FDC is waiting to write or read
+  @param  TimeoutInSeconds UINTN: The time period for waiting
+  
+  @retval EFI_SUCCESS:  FDC is ready to write or read
+  @retval EFI_NOT_READY:  FDC is not ready within the specified time period
+
+**/
 EFI_STATUS
 FddDRQReady (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN BOOLEAN         Dio,
   IN  UINTN          TimeoutInSeconds
   )
-/*++
-
-  Routine Description:  Determine whether FDC is ready to write or read
-  Parameters:
-    Dio BOOLEAN:      Indicate the FDC is waiting to write or read
-    TimeoutInSeconds UINTN: The time period for waiting
-  Returns:
-    EFI_SUCCESS:  FDC is ready to write or read
-    EFI_NOT_READY:  FDC is not ready within the specified time period
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    Dio - add argument and description to function comment
-// GC_TODO:    TimeoutInSeconds - add argument and description to function comment
 {
   UINTN Delay;
   UINT8 StatusRegister;
@@ -1294,30 +1225,24 @@ FddDRQReady (
   return EFI_SUCCESS;
 }
 
+/**
+  Set FDC control structure's attribute according to
+  result 
+
+  @param Result  Point to result structure
+  @param FdcDev  FDC control structure
+
+  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @param EFI_SUCCESS - GC_TODO: Add description for return value
+
+**/
 EFI_STATUS
 CheckResult (
   IN     FDD_RESULT_PACKET  *Result,
   IN OUT FDC_BLK_IO_DEV     *FdcDev
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Result  - GC_TODO: add argument description
-  FdcDev  - GC_TODO: add argument description
-
-Returns:
-
-  EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   //
   // Check Status Register0
@@ -1351,22 +1276,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Check the drive status information
+  
+  @param StatusRegister3  the value of Status Register 3
+  
+  @retval EFI_SUCCESS           The disk is not write protected
+  @retval EFI_WRITE_PROTECTED:  The disk is write protected
+
+**/
 EFI_STATUS
 CheckStatus3 (
   IN UINT8 StatusRegister3
   )
-/*++
-
-  Routine Description:  Check the drive status information
-  Parameters:
-    StatusRegister3 UINT8: the value of Status Register 3
-  Returns:
-    EFI_SUCCESS:
-    EFI_WRITE_PROTECTED:  The disk is write protected
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    StatusRegister3 - add argument and description to function comment
 {
   if (StatusRegister3 & STS3_WP) {
     return EFI_WRITE_PROTECTED;
@@ -1375,29 +1297,24 @@ CheckStatus3 (
   return EFI_SUCCESS;
 }
 
+/**
+  Calculate the number of block in the same cylinder
+  according to LBA
+  
+  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param LBA EFI_LBA:      The starting logic block address
+  @param NumberOfBlocks UINTN: The number of blocks
+  
+  @return The number of blocks in the same cylinder which the starting
+        logic block address is LBA
+
+**/
 UINTN
 GetTransferBlockCount (
   IN  FDC_BLK_IO_DEV  *FdcDev,
   IN  EFI_LBA         LBA,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-
-  Routine Description:  Calculate the number of block in the same cylinder
-                        according to LBA
-  Parameters:
-    FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-    LBA EFI_LBA:      The starting logic block address
-    NumberOfBlocks UINTN: The number of blocks
-  Returns:
-    UINTN : The number of blocks in the same cylinder which the starting
-        logic block address is LBA
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    LBA - add argument and description to function comment
-// GC_TODO:    NumberOfBlocks - add argument and description to function comment
 {
   UINT8 EndOfTrack;
   UINT8 Head;
@@ -1417,26 +1334,20 @@ GetTransferBlockCount (
   }
 }
 
+/**
+  When the Timer(2s) off, turn the drive's motor off
+  
+  @param Event EFI_EVENT: Event(the timer) whose notification function is being
+                     invoked
+  @param Context VOID *:  Pointer to the notification function's context
+
+**/
 VOID
 EFIAPI
 FddTimerProc (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
-/*++
-
-  Routine Description:  When the Timer(2s) off, turn the drive's motor off
-  Parameters:
-    Event EFI_EVENT: Event(the timer) whose notification function is being
-                     invoked
-    Context VOID *:  Pointer to the notification function's context
-  Returns:
-    VOID
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    Event - add argument and description to function comment
-// GC_TODO:    Context - add argument and description to function comment
 {
   FDC_BLK_IO_DEV  *FdcDev;
   UINT8           data;
@@ -1462,21 +1373,18 @@ FddTimerProc (
   MicroSecondDelay (500);
 }
 
+/**
+  Read I/O port for FDC
+ 
+  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param Offset The offset address of port
+
+**/
 UINT8
 FdcReadPort (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT32          Offset
   )
-/*++
-
-  Routine Description: Read I/O port for FDC
-  Parameters:
-  Returns:
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    Offset - add argument and description to function comment
 {
   UINT8       Data;
 
@@ -1494,23 +1402,19 @@ FdcReadPort (
   return Data;
 }
 
+/**
+  Write I/O port for FDC
+ 
+  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param Offset The offset address of port
+
+**/
 VOID
 FdcWritePort (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT32          Offset,
   IN UINT8           Data
   )
-/*++
-
-  Routine Description: Write I/O port for FDC
-  Parameters:
-  Returns:
-
---*/
-// GC_TODO: function comment is missing 'Arguments:'
-// GC_TODO:    FdcDev - add argument and description to function comment
-// GC_TODO:    Offset - add argument and description to function comment
-// GC_TODO:    Data - add argument and description to function comment
 {
 
   //
@@ -1524,3 +1428,4 @@ FdcWritePort (
                       &Data
                       );
 }
+

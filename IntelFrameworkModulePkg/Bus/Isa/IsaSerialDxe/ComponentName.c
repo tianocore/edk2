@@ -232,7 +232,7 @@ AddName (
   IN  SERIAL_DEV                               *SerialDevice,
   IN  EFI_ISA_IO_PROTOCOL                      *IsaIo
   )
-/*++
+/**
 
   Routine Description:
   
@@ -247,7 +247,7 @@ AddName (
 
     None
     
---*/
+**/
 {
   CHAR16  SerialPortName[sizeof (SERIAL_PORT_NAME)];
 
