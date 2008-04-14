@@ -85,6 +85,7 @@
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize

@@ -67,15 +67,13 @@ typedef union {
   VOID                        *Raw;
 } PEI_PPI_LIST_POINTERS;
 
-#define MAX_PPI_DESCRIPTORS 64
-
 typedef struct {
   INTN                    PpiListEnd;
   INTN                    NotifyListEnd;
   INTN                    DispatchListEnd;
   INTN                    LastDispatchedInstall;
   INTN                    LastDispatchedNotify;
-  PEI_PPI_LIST_POINTERS   PpiListPtrs[MAX_PPI_DESCRIPTORS];
+  PEI_PPI_LIST_POINTERS   PpiListPtrs[FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)];
 } PEI_PPI_DATABASE;
 
 

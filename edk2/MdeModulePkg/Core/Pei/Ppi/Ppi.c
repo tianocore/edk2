@@ -46,9 +46,9 @@ Returns:
 --*/
 {
   if (OldCoreData == NULL) {
-    PrivateData->PpiData.NotifyListEnd = MAX_PPI_DESCRIPTORS-1;
-    PrivateData->PpiData.DispatchListEnd = MAX_PPI_DESCRIPTORS-1;
-    PrivateData->PpiData.LastDispatchedNotify = MAX_PPI_DESCRIPTORS-1;
+    PrivateData->PpiData.NotifyListEnd = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
+    PrivateData->PpiData.DispatchListEnd = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
+    PrivateData->PpiData.LastDispatchedNotify = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
   }
 
   return;
@@ -87,7 +87,7 @@ Returns:
 
   Fixup = (UINTN)NewHandOffHob - OldCheckingBottom;
 
-  for (Index = 0; Index < MAX_PPI_DESCRIPTORS; Index++) {
+  for (Index = 0; Index < FixedPcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
     if (Index < PrivateData->PpiData.PpiListEnd ||
         Index > PrivateData->PpiData.NotifyListEnd) {
       PpiPointer = &PrivateData->PpiData.PpiListPtrs[Index];
@@ -564,7 +564,7 @@ Returns:
         EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH,
         PrivateData->PpiData.LastDispatchedInstall,
         PrivateData->PpiData.PpiListEnd,
-        MAX_PPI_DESCRIPTORS-1,
+        FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1,
         PrivateData->PpiData.DispatchListEnd
         );
       PrivateData->PpiData.LastDispatchedInstall = TempValue;
