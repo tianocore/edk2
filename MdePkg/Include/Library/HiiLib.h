@@ -354,6 +354,25 @@ HiiLibGetNextLanguage (
   in UEFI specification Appendix M.
 
   If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
+
+  @param  HiiHandle              The HII package list handle.
+
+  @retval   !NULL  The supported languages.
+  @retval   NULL    If Supported Languages can not be retrived.
+
+**/
+CHAR8 *
+EFIAPI
+HiiLibGetSupportedLanguages (
+  IN EFI_HII_HANDLE           HiiHandle
+  )
+;
+
+/**
+  This function returns the list of supported 2nd languages, in the format specified
+  in UEFI specification Appendix M.
+
+  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
   If not enough resource to complete the operation, then ASSERT.
 
   @param  HiiHandle              The HII package list handle.
@@ -363,10 +382,12 @@ HiiLibGetNextLanguage (
 **/
 CHAR8 *
 EFIAPI
-HiiLibGetSupportedLanguages (
-  IN EFI_HII_HANDLE           HiiHandle
+HiiLibGetSupportedSecondaryLanguages (
+  IN EFI_HII_HANDLE           HiiHandle,
+  IN CONST CHAR8              *FirstLanguage
   )
 ;
+
 
 /**
   This function returns the number of supported languages on HiiHandle.
