@@ -91,12 +91,20 @@ HiiLibGetSupportedLanguages (
   // Collect current supported Languages for given HII handle
   //
   BufferSize = 0x1000;
-  LanguageString = AllocatePool (BufferSize);
+  LanguageString = AllocateZeroPool (BufferSize);
+  if (LanguageString == NULL) {
+    return NULL;
+  }
+  
   Status = mHiiStringProt->GetLanguages (mHiiStringProt, HiiHandle, LanguageString, &BufferSize);
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
     gBS->FreePool (LanguageString);
-    LanguageString = AllocatePool (BufferSize);
+    LanguageString = AllocateZeroPool (BufferSize);
+    if (LanguageString == NULL) {
+      return NULL;
+    }
+
     Status = mHiiStringProt->GetLanguages (mHiiStringProt, HiiHandle, LanguageString, &BufferSize);
   }
 
@@ -134,3 +142,45 @@ HiiLibGetSupportedLanguageNumber (
 
   return LangNumber;
 }
+
+CHAR8 *
+EFIAPI
+HiiLibGetSupportedSecondaryLanguages (
+  IN EFI_HII_HANDLE           HiiHandle,
+  IN CONST CHAR8              *FirstLanguage
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
+  CHAR8       *LanguageString;
+
+  ASSERT (HiiHandle != NULL);
+  ASSERT (IsHiiHandleRegistered (HiiHandle));
+  //
+  // Collect current supported 2nd Languages for given HII handle
+  //
+  BufferSize = 0x1000;
+  LanguageString = AllocateZeroPool (BufferSize);
+  if (LanguageString == NULL) {
+    return NULL;
+  }
+  Status = mHiiStringProt->GetSecondaryLanguages (mHiiStringProt, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
+  
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    gBS->FreePool (LanguageString);
+    LanguageString = AllocateZeroPool (BufferSize);
+    if (LanguageString == NULL) {
+      return NULL;
+    }
+
+    Status = mHiiStringProt->GetSecondaryLanguages (mHiiStringProt, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
+  }
+
+  if (EFI_ERROR (Status)) {
+    LanguageString = NULL;
+  }
+
+  return LanguageString;
+}
+
+
