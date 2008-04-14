@@ -33,5 +33,10 @@ Returns:
 
 --*/
 {
-  return EFI_SUCCESS;
+  ASSERT (FALSE);
+  //
+  // In previous Framewok HII implementation, GetKeyBoardLayout is defined in HII 0.92 specification,
+  // but it is not implemented. We ASSERT and return UNSUPPORTED here. 
+  //
+  return EFI_UNSUPPORTED;
 }

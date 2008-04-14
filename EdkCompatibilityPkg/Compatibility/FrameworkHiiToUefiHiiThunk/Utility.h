@@ -21,4 +21,21 @@ GetGuidOfFirstFormset (
   CONST EFI_HII_FORM_PACKAGE * FormPackage
 );
 
+/**
+  Find the UefiHiiHandle based on a Framework HII Handle returned by
+  the HII Thunk to Framework HII code.
+
+  @param Private                        The pointer to the private data of Hii Thunk.
+  @param FrameworkHiiHandle     Framework HII Handle returned by  the HII Thunk to Framework HII code.
+
+  @retval  NULL                           If Framework HII Handle passed in does not have matching UEFI HII handle.
+  @retval  !NULL                         If the match is found.
+  
+**/
+EFI_HII_HANDLE
+FrameworkHiiHandleToUefiHiiHandle (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+  IN FRAMEWORK_EFI_HII_HANDLE          FrameworkHiiHandle
+  )
+;
 #endif
