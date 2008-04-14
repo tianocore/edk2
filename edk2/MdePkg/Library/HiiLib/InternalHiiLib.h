@@ -36,8 +36,8 @@
 #define HII_LIB_DEFAULT_STRING_SIZE     0x200
 
 
-extern EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt;
-extern EFI_HII_STRING_PROTOCOL     *mHiiStringProt;
+extern CONST EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt;
+extern CONST EFI_HII_STRING_PROTOCOL     *mHiiStringProt;
 
 BOOLEAN
 IsHiiHandleRegistered (

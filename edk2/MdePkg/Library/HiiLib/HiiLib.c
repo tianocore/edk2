@@ -14,8 +14,8 @@
 
 #include "InternalHiiLib.h"
 
-EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt;
-EFI_HII_STRING_PROTOCOL     *mHiiStringProt;
+CONST EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt;
+CONST EFI_HII_STRING_PROTOCOL     *mHiiStringProt;
 
 /**
   The constructor function of Hii Library.
