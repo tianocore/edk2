@@ -39,3 +39,30 @@ GetGuidOfFirstFormset (
   return NULL;
 }
 
+EFI_HII_HANDLE
+FrameworkHiiHandleToUefiHiiHandle (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+  IN FRAMEWORK_EFI_HII_HANDLE          FrameworkHiiHandle
+  )
+{
+  LIST_ENTRY                                *ListEntry;
+  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
+
+  ASSERT (FrameworkHiiHandle != (FRAMEWORK_EFI_HII_HANDLE) 0);
+  ASSERT (Private != NULL);
+
+  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
+       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
+       ListEntry = ListEntry->ForwardLink
+       ) {
+
+    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
+
+    if (FrameworkHiiHandle == HandleMapEntry->FrameworkHiiHandle) {
+      return HandleMapEntry->UefiHiiHandle;
+    }
+  }
+  
+  return (EFI_HII_HANDLE) NULL;
+}
+

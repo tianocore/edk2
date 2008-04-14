@@ -44,7 +44,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/FrameworkIfrSupportLib.h>
 #include <Library/HiiLib.h>
-#include "Utility.h"
 
 //
 // Macros
@@ -318,5 +317,7 @@ HiiCompareLanguage (
   IN  CHAR16                *Language
   )
 ;
+
+#include "Utility.h"
 
 #endif

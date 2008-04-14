@@ -1,8 +1,8 @@
 /**@file
+Framework to UEFI 2.1 HII Thunk. The driver consume UEFI HII protocols
+to produce a Framework HII protocol.
 
-Framework to UEFI 2.1 HII Thunk
-
-Copyright (c) 2003, Intel Corporation
+Copyright (c) 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -175,7 +175,36 @@ Returns:
 
 --*/
 {
-  ASSERT (FALSE);
+  EFI_HII_THUNK_PRIVATE_DATA *Private;
+  EFI_HII_HANDLE             UefiHiiHandle;
+  CHAR8                      *AsciiLanguageCodes;
+  CHAR16                     *UnicodeLanguageCodes;
+
+  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+
+  
+  
+  UefiHiiHandle = FrameworkHiiHandleToUefiHiiHandle (Private, Handle);
+  if (UefiHiiHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AsciiLanguageCodes = HiiLibGetSupportedLanguages (UefiHiiHandle);
+
+  if (AsciiLanguageCodes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  UnicodeLanguageCodes = AllocateZeroPool (AsciiStrSize (AsciiLanguageCodes) * sizeof (CHAR16));
+  if (UnicodeLanguageCodes == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // The language returned is in RFC 3066 format.
+  //
+  *LanguageString = AsciiStrToUnicodeStr (AsciiLanguageCodes, UnicodeLanguageCodes);
+
   return EFI_SUCCESS;
 }
 
@@ -200,7 +229,41 @@ Returns:
 
 --*/
 {
-  ASSERT (FALSE);
+  EFI_HII_THUNK_PRIVATE_DATA *Private;
+  EFI_HII_HANDLE             UefiHiiHandle;
+  CHAR8                      *AsciiPrimaryLanguage;
+  CHAR8                      *AsciiLanguageCodes;
+  CHAR16                     *UnicodeLanguageCodes;
+
+  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+
+  
+  
+  UefiHiiHandle = FrameworkHiiHandleToUefiHiiHandle (Private, Handle);
+  if (UefiHiiHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AsciiPrimaryLanguage = AllocateZeroPool (StrLen (PrimaryLanguage) + 1);
+
+  UnicodeStrToAsciiStr (PrimaryLanguage, AsciiPrimaryLanguage);
+
+  AsciiLanguageCodes = HiiLibGetSupportedSecondaryLanguages (UefiHiiHandle, AsciiPrimaryLanguage);
+
+  if (AsciiLanguageCodes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  UnicodeLanguageCodes = AllocateZeroPool (AsciiStrSize (AsciiLanguageCodes) * sizeof (CHAR16));
+  if (UnicodeLanguageCodes == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // The language returned is in RFC 3066 format.
+  //
+  *LanguageString = AsciiStrToUnicodeStr (AsciiLanguageCodes, UnicodeLanguageCodes);
+
   return EFI_SUCCESS;
 }
 
