@@ -1297,7 +1297,7 @@ Returns:
         //
         // Add feature to support customized secondary bus number
         //
-       	if (*SubBusNumber == 0) {
+        if (*SubBusNumber == 0) {
           *SubBusNumber   = *PaddedBusRange;
           *PaddedBusRange = 0;
         }
@@ -1594,7 +1594,7 @@ Returns:
         //
         // Add feature to support customized secondary bus number
         //
-       	if (*SubBusNumber == 0) {
+        if (*SubBusNumber == 0) {
           *SubBusNumber   = *PaddedBusRange;
           *PaddedBusRange = 0;
         }
@@ -1778,24 +1778,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Process Option Rom on this host bridge
+  
+  @param PciResAlloc Pointer to instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  
+  @retval EFI_NOT_FOUND Can not find the root bridge instance
+  @retval EFI_SUCCESS   Success process
+**/
 EFI_STATUS
 PciHostBridgeP2CProcess (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciResAlloc - add argument and description to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_HANDLE    RootBridgeHandle;
   PCI_IO_DEVICE *RootBridgeDev;

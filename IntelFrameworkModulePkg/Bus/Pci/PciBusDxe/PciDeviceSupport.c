@@ -21,50 +21,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 LIST_ENTRY  gPciDevicePool;
 
+/**
+  Initialize the gPciDevicePool
+**/
 EFI_STATUS
 InitializePciDevicePool (
   VOID
   )
-/**
-
-Routine Description:
-
-  Initialize the gPciDevicePool
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   InitializeListHead (&gPciDevicePool);
 
   return EFI_SUCCESS;
 }
 
+/**
+  Insert a root bridge into PCI device pool
+
+  @param RootBridge    - A pointer to the PCI_IO_DEVICE.
+
+**/
 EFI_STATUS
 InsertRootBridge (
   PCI_IO_DEVICE *RootBridge
   )
-/**
-
-Routine Description:
-
-  Insert a root bridge into PCI device pool
-
-Arguments:
-
-  RootBridge    - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   InsertTailList (&gPciDevicePool, &(RootBridge->Link));
@@ -72,28 +51,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to insert a PCI device node under
+  a bridge
+
+  @param Bridge         A pointer to the PCI_IO_DEVICE.
+  @param PciDeviceNode  A pointer to the PCI_IO_DEVICE.
+
+**/
 EFI_STATUS
 InsertPciDevice (
   PCI_IO_DEVICE *Bridge,
   PCI_IO_DEVICE *PciDeviceNode
   )
-/**
-
-Routine Description:
-
-  This function is used to insert a PCI device node under
-  a bridge
-
-Arguments:
-  Bridge        - A pointer to the PCI_IO_DEVICE.
-  PciDeviceNode - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   InsertTailList (&Bridge->ChildList, &(PciDeviceNode->Link));
@@ -102,25 +72,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Destroy root bridge and remove it from deivce tree.
+  
+  @param RootBridge   The bridge want to be removed
+  
+**/
 EFI_STATUS
 DestroyRootBridge (
   IN PCI_IO_DEVICE *RootBridge
   )
-/**
-
-Routine Description:
-
-
-Arguments:
-
-  RootBridge   - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   DestroyPciDeviceTree (RootBridge);
 
@@ -129,27 +90,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Destroy a pci device node.
+  Also all direct or indirect allocated resource for this node will be freed.
+
+  @param PciIoDevice  A pointer to the PCI_IO_DEVICE.
+
+**/
 EFI_STATUS
 FreePciDevice (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  Destroy a pci device node.
-  Also all direct or indirect allocated resource for this node will be freed.
-
-Arguments:
-
-  PciIoDevice   - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   //
@@ -168,27 +119,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Destroy all the pci device node under the bridge.
+  Bridge itself is not included.
+
+  @param Bridge   A pointer to the PCI_IO_DEVICE.
+
+**/
 EFI_STATUS
 DestroyPciDeviceTree (
   IN PCI_IO_DEVICE *Bridge
   )
-/**
-
-Routine Description:
-
-  Destroy all the pci device node under the bridge.
-  Bridge itself is not included.
-
-Arguments:
-
-  Bridge   - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   LIST_ENTRY      *CurrentLink;
   PCI_IO_DEVICE   *Temp;
@@ -214,29 +155,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-DestroyRootBridgeByHandle (
-  EFI_HANDLE Controller
-  )
 /**
-
-Routine Description:
-
   Destroy all device nodes under the root bridge
   specified by Controller.
   The root bridge itself is also included.
 
-Arguments:
-
-  Controller   - An efi handle.
-
-Returns:
-
-  None
+  @param Controller   An efi handle.
 
 **/
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
+EFI_STATUS
+DestroyRootBridgeByHandle (
+  EFI_HANDLE Controller
+  )
 {
 
   LIST_ENTRY      *CurrentLink;
@@ -264,32 +194,25 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  This function registers the PCI IO device. It creates a handle for this PCI IO device
+  (if the handle does not exist), attaches appropriate protocols onto the handle, does
+  necessary initialization, and sets up parent/child relationship with its bus controller.
+
+  @param Controller    - An EFI handle for the PCI bus controller.
+  @param PciIoDevice   - A PCI_IO_DEVICE pointer to the PCI IO device to be registered.
+  @param Handle        - A pointer to hold the EFI handle for the PCI IO device.
+
+  @retval EFI_SUCCESS   - The PCI device is successfully registered.
+  @retval Others        - An error occurred when registering the PCI device.
+
+**/
 EFI_STATUS
 RegisterPciDevice (
   IN  EFI_HANDLE                     Controller,
   IN  PCI_IO_DEVICE                  *PciIoDevice,
   OUT EFI_HANDLE                     *Handle OPTIONAL
   )
-/**
-
-Routine Description:
-
-  This function registers the PCI IO device. It creates a handle for this PCI IO device
-  (if the handle does not exist), attaches appropriate protocols onto the handle, does
-  necessary initialization, and sets up parent/child relationship with its bus controller.
-
-Arguments:
-
-  Controller    - An EFI handle for the PCI bus controller.
-  PciIoDevice   - A PCI_IO_DEVICE pointer to the PCI IO device to be registered.
-  Handle        - A pointer to hold the EFI handle for the PCI IO device.
-
-Returns:
-
-  EFI_SUCCESS   - The PCI device is successfully registered.
-  Others        - An error occurred when registering the PCI device.
-
-**/
 {
   EFI_STATUS          Status;
   VOID                *PlatformOpRomBuffer;
@@ -435,28 +358,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to remove the whole PCI devices from the bridge.
+
+  @param RootBridgeHandle   An efi handle.
+  @param Bridge             A pointer to the PCI_IO_DEVICE.
+
+  @retval EFI_SUCCESS
+**/
 EFI_STATUS
 RemoveAllPciDeviceOnBridge (
   EFI_HANDLE               RootBridgeHandle,
   PCI_IO_DEVICE            *Bridge
   )
-/**
 
-Routine Description:
-
-  This function is used to remove the whole PCI devices from the bridge.
-
-Arguments:
-
-  RootBridgeHandle   - An efi handle.
-  Bridge             - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   LIST_ENTRY      *CurrentLink;
@@ -490,32 +405,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-DeRegisterPciDevice (
-  IN  EFI_HANDLE                     Controller,
-  IN  EFI_HANDLE                     Handle
-  )
 /**
-
-Routine Description:
 
   This function is used to de-register the PCI device from the EFI,
   That includes un-installing PciIo protocol from the specified PCI
   device handle.
 
-Arguments:
+  @param Controller   - controller handle
+  @param Handle       - device handle
 
-  Controller   - An efi handle.
-  Handle       - An efi handle.
-
-Returns:
-
-  None
-
+  @return Status of de-register pci device
 **/
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
+EFI_STATUS
+DeRegisterPciDevice (
+  IN  EFI_HANDLE                     Controller,
+  IN  EFI_HANDLE                     Handle
+  )
+
 {
   EFI_PCI_IO_PROTOCOL             *PciIo;
   EFI_STATUS                      Status;
@@ -631,6 +537,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Start to manage the PCI device on specified the root bridge or PCI-PCI Bridge
+
+  @param Controller          An efi handle.
+  @param RootBridge          A pointer to the PCI_IO_DEVICE.
+  @param RemainingDevicePath A pointer to the EFI_DEVICE_PATH_PROTOCOL.
+  @param NumberOfChildren    Children number.
+  @param ChildHandleBuffer   A pointer to the child handle buffer.
+
+  @retval EFI_NOT_READY   Device is not allocated
+  @retval EFI_UNSUPPORTED Device only support PCI-PCI bridge.
+  @retval EFI_NOT_FOUND   Can not find the specific device
+  @retval EFI_SUCCESS     Success to start Pci device on bridge
+
+**/
 EFI_STATUS
 StartPciDevicesOnBridge (
   IN EFI_HANDLE                          Controller,
@@ -639,29 +560,7 @@ StartPciDevicesOnBridge (
   IN OUT UINT8                           *NumberOfChildren,
   IN OUT EFI_HANDLE                      *ChildHandleBuffer
   )
-/**
 
-Routine Description:
-
-  Start to manage the PCI device on specified the root bridge or PCI-PCI Bridge
-
-Arguments:
-
-  Controller          - An efi handle.
-  RootBridge          - A pointer to the PCI_IO_DEVICE.
-  RemainingDevicePath - A pointer to the EFI_DEVICE_PATH_PROTOCOL.
-  NumberOfChildren    - Children number.
-  ChildHandleBuffer   - A pointer to the child handle buffer.
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_NOT_READY - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
 {
   PCI_IO_DEVICE             *PciIoDevice;
   EFI_DEV_PATH_PTR          Node;
@@ -806,25 +705,18 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Start to manage all the PCI devices it found previously under 
+  the entire host bridge.
+
+  @param Controller          - root bridge handle.
+
+**/
 EFI_STATUS
 StartPciDevices (
   IN EFI_HANDLE                         Controller
   )
-/**
 
-Routine Description:
-
-  Start to manage all the PCI devices it found previously under 
-  the entire host bridge.
-
-Arguments:
-  Controller          - root bridge handle.
-
-Returns:
-
-  None
-
-**/
 {
   PCI_IO_DEVICE     *RootBridge;
   EFI_HANDLE        ThisHostBridge;
@@ -858,23 +750,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create root bridge device
+
+  @param RootBridgeHandle   - Parent bridge handle.
+
+  @return pointer to new root bridge 
+**/
 PCI_IO_DEVICE *
 CreateRootBridge (
   IN EFI_HANDLE RootBridgeHandle
   )
-/**
-
-Routine Description:
-
-
-Arguments:
-  RootBridgeHandle   - An efi handle.
-
-Returns:
-
-  None
-
-**/
 {
 
   EFI_STATUS                      Status;
@@ -952,24 +838,17 @@ Returns:
   return Dev;
 }
 
+/**
+  Get root bridge device instance by specific handle
+
+  @param RootBridgeHandle    Given root bridge handle
+
+  @return root bridge device instance
+**/
 PCI_IO_DEVICE *
 GetRootBridgeByHandle (
   EFI_HANDLE RootBridgeHandle
   )
-/**
-
-Routine Description:
-
-
-Arguments:
-
-  RootBridgeHandle    - An efi handle.
-
-Returns:
-
-  None
-
-**/
 {
   PCI_IO_DEVICE   *RootBridgeDev;
   LIST_ENTRY      *CurrentLink;
@@ -989,25 +868,19 @@ Returns:
   return NULL;
 }
 
+/**
+  Judege whether Pci device existed
+  
+  @param Bridge       Parent bridege instance 
+  @param PciIoDevice  Device instance
+  
+  @return whether Pci device existed
+**/
 BOOLEAN
 PciDeviceExisted (
   IN PCI_IO_DEVICE    *Bridge,
   IN PCI_IO_DEVICE    *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-  Bridge       - A pointer to the PCI_IO_DEVICE.
-  PciIoDevice  - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
 {
 
   PCI_IO_DEVICE   *Temp;
@@ -1035,23 +908,17 @@ Returns:
   return FALSE;
 }
 
+/**
+  Active VGA device
+  
+  @param VgaDevice device instance for VGA
+  
+  @return device instance
+**/
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheSameSegment (
   IN PCI_IO_DEVICE        *VgaDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-  VgaDevice    - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
 {
   LIST_ENTRY      *CurrentLink;
   PCI_IO_DEVICE   *Temp;
@@ -1077,23 +944,17 @@ Returns:
   return NULL;
 }
 
+/**
+  Active VGA device on root bridge
+  
+  @param RootBridge  Root bridge device instance
+  
+  @return VGA device instance
+**/
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheRootBridge (
   IN PCI_IO_DEVICE        *RootBridge
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-  RootBridge    - A pointer to the PCI_IO_DEVICE.
-
-Returns:
-
-  None
-
-**/
 {
   LIST_ENTRY      *CurrentLink;
   PCI_IO_DEVICE   *Temp;
@@ -1127,31 +988,21 @@ Returns:
   return NULL;
 }
 
+/**
+  Get HPC PCI address according to its device path
+  @param PciRootBridgeIo   Root bridege Io instance
+  @param HpcDevicePath     Given searching device path
+  @param PciAddress        Buffer holding searched result
+  
+  @retval EFI_NOT_FOUND Can not find the specific device path.
+  @retval EFI_SUCCESS   Success to get the device path
+**/
 EFI_STATUS
 GetHpcPciAddress (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   IN  EFI_DEVICE_PATH_PROTOCOL         *HpcDevicePath,
   OUT UINT64                           *PciAddress
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-  PciRootBridgeIo       - A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  HpcDevicePath         - A pointer to the EFI_DEVICE_PATH_PROTOCL.
-  PciAddress            - A pointer to the pci address.
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_NOT_FOUND - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
 {
   EFI_DEVICE_PATH_PROTOCOL  *CurrentDevicePath;
   EFI_DEV_PATH_PTR          Node;
@@ -1216,32 +1067,20 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Get HPC PCI address according to its device path
+  @param RootBridge           Root bridege Io instance
+  @param RemainingDevicePath  Given searching device path
+  @param PciAddress           Buffer holding searched result
+  
+  @retval EFI_NOT_FOUND Can not find the specific device path.
+**/
 EFI_STATUS
 GetHpcPciAddressFromRootBridge (
   IN  PCI_IO_DEVICE                    *RootBridge,
   IN  EFI_DEVICE_PATH_PROTOCOL         *RemainingDevicePath,
   OUT UINT64                           *PciAddress
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-  PciRootBridgeIo       - A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  HpcDevicePath         - A pointer to the EFI_DEVICE_PATH_PROTOCL.
-  PciAddress            - A pointer to the pci address.
-
-Returns:
-
-  None
-
-**/
-// TODO:    RootBridge - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_DEV_PATH_PTR          Node;
   PCI_IO_DEVICE             *Temp;
@@ -1302,3 +1141,4 @@ Returns:
   return EFI_SUCCESS;
 
 }
+
