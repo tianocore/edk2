@@ -17,6 +17,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciCommand.h"
 #include "PciIo.h"
 
+/**
+  This routine is used to check whether the pci device is present.
+  
+  @param PciRootBridgeIo   Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL
+  @param Pci               Output buffer for PCI device structure
+  @param Bus               PCI bus NO
+  @param Device            PCI device NO
+  @param Func              PCI Func NO
+  
+  @retval EFI_NOT_FOUND device not present
+  @retval EFI_SUCCESS   device is found.
+**/
 EFI_STATUS
 PciDevicePresent (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
@@ -25,26 +37,6 @@ PciDevicePresent (
   UINT8                               Device,
   UINT8                               Func
   )
-/**
-
-Routine Description:
-
-  This routine is used to check whether the pci device is present
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciRootBridgeIo - add argument and description to function comment
-// TODO:    Pci - add argument and description to function comment
-// TODO:    Bus - add argument and description to function comment
-// TODO:    Device - add argument and description to function comment
-// TODO:    Func - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
 {
   UINT64      Address;
   EFI_STATUS  Status;
@@ -87,25 +79,19 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Collect all the resource information under this root bridge
+  A database that records all the information about pci device subject to this
+  root bridge will then be created.
+    
+  @param Bridge         Parent bridge instance
+  @param StartBusNumer  Bus number of begining 
+**/
 EFI_STATUS
 PciPciDeviceInfoCollector (
   IN PCI_IO_DEVICE                      *Bridge,
   UINT8                                 StartBusNumber
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    StartBusNumber - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS          Status;
   PCI_TYPE00          Pci;
@@ -201,6 +187,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Seach required device and get PCI device info block
+  
+  @param Bridge     Parent bridge instance
+  @param Pci        Output of PCI device info block
+  @param Bus        PCI bus NO.
+  @param Device     PCI device NO.
+  @param Func       PCI func  NO.
+  @param PciDevice  output of searched PCI device instance
+**/
 EFI_STATUS
 PciSearchDevice (
   IN  PCI_IO_DEVICE                         *Bridge,
@@ -210,29 +206,6 @@ PciSearchDevice (
   IN  UINT8                                 Func,
   OUT PCI_IO_DEVICE                         **PciDevice
   )
-/**
-
-Routine Description:
-
-  Search required device.
-
-Arguments:
-
-  Bridge     - A pointer to the PCI_IO_DEVICE.
-  Pci        - A pointer to the PCI_TYPE00.
-  Bus        - Bus number.
-  Device     - Device number.
-  Func       - Function number.
-  PciDevice  - The Required pci device.
-
-Returns:
-
-  Status code.
-
-**/
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_IO_DEVICE *PciIoDevice;
 
@@ -331,6 +304,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create PCI private data for PCI device
+  
+  @param Bridge Parent bridge instance
+  @param Pci    PCI bar block
+  @param Bus    PCI device Bus NO.
+  @param Device PCI device DeviceNO.
+  @param Func   PCI device's func NO.
+  
+  @return new PCI device's private date structure.
+**/
 PCI_IO_DEVICE *
 GatherDeviceInfo (
   IN PCI_IO_DEVICE                    *Bridge,
@@ -339,22 +323,6 @@ GatherDeviceInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    Pci - add argument and description to function comment
-// TODO:    Bus - add argument and description to function comment
-// TODO:    Device - add argument and description to function comment
-// TODO:    Func - add argument and description to function comment
 {
   UINTN                           Offset;
   UINTN                           BarIndex;
@@ -401,6 +369,17 @@ Returns:
   return PciIoDevice;
 }
 
+/**
+  Create private data for bridge device's PPB.
+  
+  @param Bridge     Parent bridge 
+  @param Pci        Pci device block
+  @param Bus        Bridge device's bus NO.
+  @param Device     Bridge device's device NO.
+  @param Func       Bridge device's func NO.
+  
+  @return bridge device instance
+**/
 PCI_IO_DEVICE *
 GatherPpbInfo (
   IN PCI_IO_DEVICE                    *Bridge,
@@ -409,22 +388,6 @@ GatherPpbInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    Pci - add argument and description to function comment
-// TODO:    Bus - add argument and description to function comment
-// TODO:    Device - add argument and description to function comment
-// TODO:    Func - add argument and description to function comment
 {
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
   PCI_IO_DEVICE                   *PciIoDevice;
@@ -535,6 +498,17 @@ Returns:
   return PciIoDevice;
 }
 
+/**
+  Create private data for hotplug bridge device
+  
+  @param Bridge Parent bridge instance
+  @param Pci    PCI bar block
+  @param Bus    hotplug bridge device's bus NO.
+  @param Device hotplug bridge device's device NO.
+  @param Func   hotplug bridge device's Func NO.
+  
+  @return hotplug bridge device instance
+**/
 PCI_IO_DEVICE *
 GatherP2CInfo (
   IN PCI_IO_DEVICE                    *Bridge,
@@ -543,22 +517,6 @@ GatherP2CInfo (
   UINT8                               Device,
   UINT8                               Func
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    Pci - add argument and description to function comment
-// TODO:    Bus - add argument and description to function comment
-// TODO:    Device - add argument and description to function comment
-// TODO:    Func - add argument and description to function comment
 {
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
   PCI_IO_DEVICE                   *PciIoDevice;
@@ -609,24 +567,19 @@ Returns:
   return PciIoDevice;
 }
 
+/**
+  Create device path for pci deivce
+  
+  @param ParentDevicePath  Parent bridge's path
+  @param PciIoDevice       Pci device instance
+  
+  @return device path protocol instance for specific pci device.
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 CreatePciDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL *ParentDevicePath,
   IN  PCI_IO_DEVICE            *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    ParentDevicePath - add argument and description to function comment
-// TODO:    PciIoDevice - add argument and description to function comment
 {
 
   PCI_DEVICE_PATH PciNode;
@@ -645,6 +598,18 @@ Returns:
   return PciIoDevice->DevicePath;
 }
 
+/**
+  Check the bar is existed or not.
+
+  @param PciIoDevice       - A pointer to the PCI_IO_DEVICE.
+  @param Offset            - The offset.
+  @param BarLengthValue    - The bar length value.
+  @param OriginalBarValue  - The original bar value.
+
+  @retval EFI_NOT_FOUND     - The bar don't exist.
+  @retval EFI_SUCCESS       - The bar exist.
+
+**/
 EFI_STATUS
 BarExisted (
   IN PCI_IO_DEVICE *PciIoDevice,
@@ -652,25 +617,7 @@ BarExisted (
   OUT UINT32       *BarLengthValue,
   OUT UINT32       *OriginalBarValue
   )
-/**
 
-Routine Description:
-
-  Check the bar is existed or not.
-
-Arguments:
-
-  PciIoDevice       - A pointer to the PCI_IO_DEVICE.
-  Offset            - The offset.
-  BarLengthValue    - The bar length value.
-  OriginalBarValue  - The original bar value.
-
-Returns:
-
-  EFI_NOT_FOUND     - The bar don't exist.
-  EFI_SUCCESS       - The bar exist.
-
-**/
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT32              OriginalValue;
@@ -718,6 +665,17 @@ Returns:
   }
 }
 
+/**
+  Test whether the device can support attributes 
+  
+  @param PciIoDevice   Pci device instance
+  @param Command       Command register value.
+  @param BridgeControl Bridge control value for PPB or P2C.
+  @param OldCommand    Old command register offset
+  @param OldBridgeControl Old Bridge control value for PPB or P2C.
+  
+  @return EFI_SUCCESS
+**/
 EFI_STATUS
 PciTestSupportedAttribute (
   IN PCI_IO_DEVICE                      *PciIoDevice,
@@ -726,23 +684,6 @@ PciTestSupportedAttribute (
   IN UINT16                             *OldCommand,
   IN UINT16                             *OldBridgeControl
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    Command - add argument and description to function comment
-// TODO:    BridgeControl - add argument and description to function comment
-// TODO:    OldCommand - add argument and description to function comment
-// TODO:    OldBridgeControl - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_TPL OldTpl;
 
@@ -802,6 +743,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Set the supported or current attributes of a PCI device
+  
+  @param PciIoDevice   - Structure pointer for PCI device.
+  @param Command       - Command register value.
+  @param BridgeControl - Bridge control value for PPB or P2C.
+  @param Option        - Make a choice of EFI_SET_SUPPORTS or EFI_SET_ATTRIBUTES.
+  
+**/
 EFI_STATUS
 PciSetDeviceAttribute (
   IN PCI_IO_DEVICE                      *PciIoDevice,
@@ -809,36 +759,6 @@ PciSetDeviceAttribute (
   IN UINT16                             BridgeControl,
   IN UINTN                              Option
   )
-/**
-
-  Routine Description:
-    Set the supported or current attributes of a PCI device
-
-  Arguments:
-    PciIoDevice   - Structure pointer for PCI device.
-    Command       - Command register value.
-    BridgeControl - Bridge control value for PPB or P2C.
-    Option        - Make a choice of EFI_SET_SUPPORTS or EFI_SET_ATTRIBUTES.
-
-  Returns:
-
-**/
-
-/**
-
-Routine Description:
-
-
-
-Arguments:
-
-
-Returns:
-
-  EFI_SUCCESS   Always success
-
-
-**/
 {
   UINT64  Attributes;
 
@@ -920,29 +840,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Determine if the device can support Fast Back to Back attribute
+  
+  @param PciIoDevice  Pci device instance
+  @param StatusIndex  Status register value
+**/
 EFI_STATUS
 GetFastBackToBackSupport (
   IN PCI_IO_DEVICE                      *PciIoDevice,
   IN UINT8                              StatusIndex
   )
-/**
-
-Routine Description:
-
-  Determine if the device can support Fast Back to Back attribute
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    StatusIndex - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
   EFI_STATUS          Status;
@@ -968,27 +876,19 @@ Returns:
 
 }
 
+/**
+  Process the option ROM for all the children of the specified parent PCI device.
+  It can only be used after the first full Option ROM process.
+
+  @param PciIoDevice Pci device instance
+  
+  @retval EFI_SUCCESS Success Operation.
+**/
 STATIC
 EFI_STATUS
 ProcessOptionRomLight (
   IN PCI_IO_DEVICE                      *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  Process the option ROM for all the children of the specified parent PCI device.
-  It can only be used after the first full Option ROM process.
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_IO_DEVICE   *Temp;
   LIST_ENTRY      *CurrentLink;
@@ -1018,25 +918,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+ Determine the related attributes of all devices under a Root Bridge
+ 
+ @param PciIoDevice   PCI device instance
+ 
+**/
 EFI_STATUS
 DetermineDeviceAttribute (
   IN PCI_IO_DEVICE                      *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  Determine the related attributes of all devices under a Root Bridge
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   UINT16          Command;
   UINT16          BridgeControl;
@@ -1197,25 +1088,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This routine is used to update the bar information for those incompatible PCI device
+  
+  @param PciIoDevice      Pci device instance
+  @return EFI_UNSUPPORTED failed to update Pci Info
+**/
 EFI_STATUS
 UpdatePciInfo (
   IN PCI_IO_DEVICE  *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  This routine is used to update the bar information for those incompatible PCI device
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
 {
   EFI_STATUS                        Status;
   UINTN                             BarIndex;
@@ -1354,26 +1236,18 @@ Returns:
 
 }
 
+/**
+  This routine will update the alignment with the new alignment
+  
+  @param Alignment old alignment
+  @param NewAlignment new alignment
+  
+**/
 VOID
 SetNewAlign (
   IN UINT64 *Alignment,
   IN UINT64 NewAlignment
   )
-/**
-
-Routine Description:
-
-  This routine will update the alignment with the new alignment
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Alignment - add argument and description to function comment
-// TODO:    NewAlignment - add argument and description to function comment
 {
   UINT64  OldAlignment;
   UINTN   ShiftBit;
@@ -1432,26 +1306,21 @@ Returns:
   return ;
 }
 
+/**
+  Parse PCI bar bit.
+  
+  @param PciIoDevice  Pci device instance
+  @param Offset       bar offset
+  @param BarIndex     bar index
+  
+  @return next bar offset.
+**/
 UINTN
 PciParseBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
   IN UINTN          Offset,
   IN UINTN          BarIndex
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    Offset - add argument and description to function comment
-// TODO:    BarIndex - add argument and description to function comment
 {
   UINT32      Value;
   UINT32      OriginalValue;
@@ -1582,7 +1451,7 @@ Returns:
       Data  = Value;
       Index = 0;
       for (Data = Value; Data != 0; Data >>= 1) {
-      	Index ++;
+        Index ++;
       }
       Value |= ((UINT32)(-1) << Index);
 
@@ -1624,26 +1493,16 @@ Returns:
   return Offset + 4;
 }
 
+/**
+  This routine is used to initialize the bar of a PCI device
+  It can be called typically when a device is going to be rejected
+
+  @param PciIoDevice Pci device instance
+**/
 EFI_STATUS
 InitializePciDevice (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  This routine is used to initialize the bar of a PCI device
-  It can be called typically when a device is going to be rejected
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT8               Offset;
@@ -1662,23 +1521,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Init PPB for bridge device
+  
+  @param  PciIoDevice Pci device instance
+**/
 EFI_STATUS
 InitializePpb (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
 
@@ -1715,23 +1566,15 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Init private data for Hotplug bridge device
+  
+  @param PciIoDevice hotplug bridge device
+**/
 EFI_STATUS
 InitializeP2C (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
 
@@ -1761,6 +1604,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create and initiliaze general PCI I/O device instance for
+  PCI device/bridge device/hotplug bridge device.
+  
+  @param PciRootBridgeIo   Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL
+  @param Pci               Pci bar block
+  @param Bus               device Bus NO.
+  @param Device            device device NO.
+  @param Func              device func NO.
+  
+  @return instance of PCI device
+**/
 PCI_IO_DEVICE *
 CreatePciIoDevice (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
@@ -1769,22 +1624,6 @@ CreatePciIoDevice (
   UINT8                               Device,
   UINT8                               Func
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciRootBridgeIo - add argument and description to function comment
-// TODO:    Pci - add argument and description to function comment
-// TODO:    Bus - add argument and description to function comment
-// TODO:    Device - add argument and description to function comment
-// TODO:    Func - add argument and description to function comment
 {
 
   EFI_STATUS    Status;
@@ -1858,28 +1697,19 @@ Returns:
   return PciIoDevice;
 }
 
-EFI_STATUS
-PciEnumeratorLight (
-  IN EFI_HANDLE                    Controller
-  )
 /**
-
-Routine Description:
-
   This routine is used to enumerate entire pci bus system
   in a given platform
   It is only called on the second start on the same Root Bridge.
 
-Arguments:
-
-Returns:
-
-  None
-
+  @param Controller  Parent bridge handler
+  
+  @return status of operation.
 **/
-// TODO:    Controller - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
+EFI_STATUS
+PciEnumeratorLight (
+  IN EFI_HANDLE                    Controller
+  )
 {
 
   EFI_STATUS                        Status;
@@ -1978,6 +1808,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Get bus range.
+  
+  @param Descriptors  A pointer to the address space descriptor.
+  @param MinBus       The min bus.
+  @param MaxBus       The max bus.
+  @param BusRange     The bus range.
+  
+  @retval EFI_SUCCESS Success operation.
+  @retval EFI_NOT_FOUND  can not find the specific bus.
+**/
 EFI_STATUS
 PciGetBusRange (
   IN     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  **Descriptors,
@@ -1985,26 +1826,6 @@ PciGetBusRange (
   OUT    UINT16                             *MaxBus,
   OUT    UINT16                             *BusRange
   )
-/**
-
-Routine Description:
-
-  Get the bus range.
-
-Arguments:
-
-  Descriptors     - A pointer to the address space descriptor.
-  MinBus          - The min bus.
-  MaxBus          - The max bus.
-  BusRange        - The bus range.
-
-Returns:
-
-  Status Code.
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
 {
 
   while ((*Descriptors)->Desc != ACPI_END_TAG_DESCRIPTOR) {
@@ -2034,20 +1855,6 @@ EFI_STATUS
 StartManagingRootBridge (
   IN PCI_IO_DEVICE *RootBridgeDev
   )
-/**
-
-Routine Description:
-
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    RootBridgeDev - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_HANDLE                      RootBridgeHandle;
   EFI_STATUS                      Status;
@@ -2084,25 +1891,19 @@ Returns:
 
 }
 
+/**
+  This routine can be used to check whether a PCI device should be rejected when light enumeration
+
+  @param PciIoDevice  Pci device instance
+
+  @retval TRUE      This device should be rejected
+  @retval FALSE     This device shouldn't be rejected
+  
+**/
 BOOLEAN
 IsPciDeviceRejected (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  This routine can be used to check whether a PCI device should be rejected when light enumeration
-
-Arguments:
-
-Returns:
-
-  TRUE      This device should be rejected
-  FALSE     This device shouldn't be rejected
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
 {
   EFI_STATUS  Status;
   UINT32      TestValue;
@@ -2204,27 +2005,17 @@ Returns:
   return FALSE;
 }
 
+/**
+  Reset and all bus number from specific bridge.
+  
+  @param Bridge           Parent specific bridge
+  @param StartBusNumber   start bus number
+**/
 EFI_STATUS
 ResetAllPpbBusNumber (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Bridge          - TODO: add argument description
-  StartBusNumber  - TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - TODO: Add description for return value
-
-**/
 {
   EFI_STATUS                      Status;
   PCI_TYPE00                      Pci;

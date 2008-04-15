@@ -1,5 +1,6 @@
 /**@file
-
+   Driver Binding functions for PCI bus module.
+   
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -39,32 +40,22 @@ EFI_PCI_PLATFORM_PROTOCOL                     *gPciPlatformProtocol;
 //
 // PCI Bus Driver Support Functions
 //
+/**
+  Initialize the global variables
+  publish the driver binding protocol
+
+  @param[IN] ImageHandle,
+  @param[IN] *SystemTable
+
+  @retval status of installing driver binding component name protocol.
+
+**/
 EFI_STATUS
 EFIAPI
 PciBusEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/**
-
-Routine Description:
-
-  Initialize the global variables
-  publish the driver binding protocol
-
-Arguments:
-
-  IN EFI_HANDLE     ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_DEVICE_ERROR
-
-**/
-// TODO:    ImageHandle - add argument and description to function comment
-// TODO:    SystemTable - add argument and description to function comment
 {
   EFI_STATUS  Status;
 
@@ -92,6 +83,20 @@ Returns:
   return Status;
 }
 
+/**
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  than contains a gEfiPciRootBridgeIoProtocolGuid protocol can be supported.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 PciBusDriverBindingSupported (
@@ -99,27 +104,6 @@ PciBusDriverBindingSupported (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/**
-
-Routine Description:
-
-  Check to see if pci bus driver supports the given controller
-
-Arguments:
-
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-
-Returns:
-
-  EFI_SUCCESS
-
-**/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
 {
   EFI_STATUS                      Status;
   EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
@@ -186,6 +170,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Start this driver on ControllerHandle and enumerate Pci bus and start
+  all device under PCI bus.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 PciBusDriverBindingStart (
@@ -193,26 +191,6 @@ PciBusDriverBindingStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/**
-
-Routine Description:
-
-  Start to management the controller passed in
-
-Arguments:
-
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-
-Returns:
-
-
-**/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS  Status;
 
@@ -254,6 +232,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 PciBusDriverBindingStop (
@@ -262,31 +254,6 @@ PciBusDriverBindingStop (
   IN  UINTN                         NumberOfChildren,
   IN  EFI_HANDLE                    *ChildHandleBuffer
   )
-/**
-
-Routine Description:
-
-  Stop one or more children created at start of pci bus driver
-  if all the the children get closed, close the protocol
-
-Arguments:
-
-  IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN  EFI_HANDLE                    Controller,
-  IN  UINTN                         NumberOfChildren,
-  IN  EFI_HANDLE                    *ChildHandleBuffer
-
-Returns:
-
-
-**/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    NumberOfChildren - add argument and description to function comment
-// TODO:    ChildHandleBuffer - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS  Status;
   UINTN       Index;
@@ -340,3 +307,4 @@ Returns:
 
   return EFI_SUCCESS;
 }
+

@@ -61,6 +61,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_ENABLE_REGISTER   3
 #define EFI_DISABLE_REGISTER  4
 
+/**
+  Operate the PCI register via PciIo function interface.
+  
+  @param PciIoDevice    Pointer to instance of PCI_IO_DEVICE
+  @param Command        Operator command
+  @param Offset         The address within the PCI configuration space for the PCI controller.
+  @param Operation      Type of Operation
+  @param PtrCommand     Return buffer holding old PCI command, if operation is not EFI_SET_REGISTER
+  
+  @return status of PciIo operation
+**/
 EFI_STATUS
 PciOperateRegister (
   IN  PCI_IO_DEVICE *PciIoDevice,
@@ -69,48 +80,34 @@ PciOperateRegister (
   IN  UINT8         Operation,
   OUT UINT16        *PtrCommand
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-  Command     - TODO: add argument description
-  Offset      - TODO: add argument description
-  Operation   - TODO: add argument description
-  PtrCommand  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  check the cpability of this device supports
+  
+  @param PciIoDevice  Pointer to instance of PCI_IO_DEVICE
+  
+  @retval TRUE  Support
+  @retval FALSE Not support
+**/
 BOOLEAN
 PciCapabilitySupport (
   IN PCI_IO_DEVICE  *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Locate cap reg.
+  
+  @param PciIoDevice         - A pointer to the PCI_IO_DEVICE.
+  @param CapId               - The cap ID.
+  @param Offset              - A pointer to the offset.
+  @param NextRegBlock        - A pointer to the next block.
+  
+  @retval EFI_UNSUPPORTED  Pci device does not support
+  @retval EFI_NOT_FOUND    Pci device support but can not find register block.
+  @retval EFI_SUCCESS      Success to locate capability register block
+**/
 EFI_STATUS
 LocateCapabilityRegBlock (
   IN PCI_IO_DEVICE  *PciIoDevice,
@@ -118,24 +115,6 @@ LocateCapabilityRegBlock (
   IN OUT UINT8      *Offset,
   OUT UINT8         *NextRegBlock OPTIONAL
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice   - TODO: add argument description
-  CapId         - TODO: add argument description
-  Offset        - TODO: add argument description
-  NextRegBlock  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
 

@@ -14,55 +14,37 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "pcibus.h"
 
+/**
+  Initializes a PCI Driver Override Instance
+
+  @param  PciIoDevice   Device instance
+
+  @retval EFI_SUCCESS Operation success
+**/
 EFI_STATUS
 InitializePciDriverOverrideInstance (
   PCI_IO_DEVICE  *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  Initializes a PCI Driver Override Instance
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   PciIoDevice->PciDriverOverride.GetDriver = GetDriver;
   return EFI_SUCCESS;
 }
 
+/**
+  Get a overriding driver image
+  @param  This                Pointer to instance of EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL
+  @param  DriverImageHandle   Override driver image,
+  
+  @retval EFI_SUCCESS                 Success to get driver image handle
+  @retval EFI_NOT_FOUND               can not find override driver image
+  @retval EFI_INVALID_PARAMETER       Invalid parameter
+**/
 EFI_STATUS
 EFIAPI
 GetDriver (
   IN EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN OUT EFI_HANDLE                                         *DriverImageHandle
   )
-/**
-
-Routine Description:
-
-  Get a overriding driver image
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    This - add argument and description to function comment
-// TODO:    DriverImageHandle - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
   PCI_IO_DEVICE             *PciIoDevice;
   LIST_ENTRY                *CurrentLink;
@@ -103,31 +85,20 @@ Returns:
   return EFI_INVALID_PARAMETER;
 }
 
+/**
+  Add an overriding driver image
+  
+  @param PciIoDevice        Instance of PciIo device
+  @param DriverImageHandle  new added driver image
+  
+  @retval EFI_OUT_OF_RESOURCES no memory resource for new driver instance
+  @retval EFI_SUCCESS       Success add driver
+**/
 EFI_STATUS
 AddDriver (
   IN PCI_IO_DEVICE     *PciIoDevice,
   IN EFI_HANDLE        DriverImageHandle
   )
-/**
-
-Routine Description:
-
-  Add a overriding driver image
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    DriverImageHandle - add argument and description to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                    Status;
   EFI_IMAGE_DOS_HEADER          *DosHdr;
@@ -164,3 +135,4 @@ Returns:
   }
   return EFI_SUCCESS;
 }
+
