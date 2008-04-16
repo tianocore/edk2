@@ -29,7 +29,7 @@ GetGuidOfFirstFormset (
 
   while ((UINT8 *) OpCodeData < StartOfNextPackage) {
     if (OpCodeData->OpCode == EFI_IFR_FORM_SET_OP) {
-      return &(((EFI_IFR_FORM_SET *) OpCodeData)->Guid);
+      return AllocateCopyPool (sizeof(EFI_GUID), &(((EFI_IFR_FORM_SET *) OpCodeData)->Guid));
     }
     OpCodeData = (EFI_IFR_OP_HEADER *) ((UINT8 *) OpCodeData + OpCodeData->Length);
   }
