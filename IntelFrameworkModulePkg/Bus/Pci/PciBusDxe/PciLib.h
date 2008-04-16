@@ -49,132 +49,79 @@ typedef struct {
   UINT8                              *AllocRes;
 } EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD;
 
+/**
+  Install protocol gEfiPciHotPlugRequestProtocolGuid
+  @param Status    return status of protocol installation.
+**/
 void
 InstallHotPlugRequestProtocol (
   IN  EFI_STATUS                    *Status
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Status  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Install protocol gEfiPciHotplugDeviceGuid into hotplug device
+  instance
+  
+  @param PciIoDevice  hotplug device instance
+  
+**/
 VOID
 InstallPciHotplugGuid (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  UnInstall protocol gEfiPciHotplugDeviceGuid into hotplug device
+  instance
+  
+  @param PciIoDevice  hotplug device instance
+  
+**/
 VOID
 UninstallPciHotplugGuid (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Retrieve the BAR information via PciIo interface
+  
+  @param PciIoDevice Pci device instance
+**/
 VOID
 GetBackPcCardBar (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Remove rejected pci device from specific root bridge
+  handle.
+  
+  @param RootBridgeHandle  specific parent root bridge handle
+  @param Bridge            Bridge device instance
+  
+  @retval EFI_SUCCESS  Success operation.
+**/
 EFI_STATUS
 RemoveRejectedPciDevices (
   EFI_HANDLE        RootBridgeHandle,
   IN PCI_IO_DEVICE  *Bridge
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  RootBridgeHandle  - TODO: add argument description
-  Bridge            - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Wrapper function for allocating resource for pci host bridge.
+  
+  @param PciResAlloc Point to protocol instance EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  
+**/
 EFI_STATUS
 PciHostBridgeResourceAllocator (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciResAlloc - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
 EFI_STATUS
@@ -189,6 +136,18 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
   )
 ;
 
+/**
+  Wapper function of scanning pci bus and assign bus number to the given PCI bus system
+  Feature flag PcdPciBusHotplugDeviceSupport determine whether need support hotplug  
+  
+  @param  Bridge          Bridge device instance
+  @param  StartBusNumber  start point
+  @param  SubBusNumber    Point to sub bus number
+  @param  PaddedBusRange  Customized bus number
+  
+  @retval EFI_SUCCESS     Success
+  @retval EFI_DEVICE_ERROR Fail to scan bus
+**/
 EFI_STATUS
 PciScanBus (
   IN PCI_IO_DEVICE                      *Bridge,
@@ -196,24 +155,6 @@ PciScanBus (
   OUT UINT8                             *SubBusNumber,
   OUT UINT8                             *PaddedBusRange
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Bridge          - TODO: add argument description
-  StartBusNumber  - TODO: add argument description
-  SubBusNumber    - TODO: add argument description
-  PaddedBusRange  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
 EFI_STATUS
@@ -234,67 +175,49 @@ PciScanBus_WithoutHotPlugDeviceSupport (
   )
 ;
 
+/**
+  Process Option Rom on this host bridge
+  
+  @param Bridge  Pci bridge device instance
+  
+  @retval EFI_SUCCESS Success
+**/
+
 EFI_STATUS
 PciRootBridgeP2CProcess (
   IN PCI_IO_DEVICE *Bridge
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Bridge  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Process Option Rom on this host bridge
+  
+  @param PciResAlloc Pointer to instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  
+  @retval EFI_NOT_FOUND Can not find the root bridge instance
+  @retval EFI_SUCCESS   Success process
+**/
 EFI_STATUS
 PciHostBridgeP2CProcess (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   )
+;
+
 /**
+  This function is used to enumerate the entire host bridge
+  in a given platform
 
-Routine Description:
+  @param PciResAlloc   A pointer to the resource allocate protocol.
 
-  TODO: Add function description
-
-Arguments:
-
-  PciResAlloc - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
+  @retval EFI_OUT_OF_RESOURCES no enough resource
+  @retval EFI_SUCCESS Success
 
 **/
-;
 
 EFI_STATUS
 PciHostBridgeEnumerator (
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciResAlloc - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
 /**

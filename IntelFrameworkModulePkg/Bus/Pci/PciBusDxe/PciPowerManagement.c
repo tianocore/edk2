@@ -13,28 +13,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "pcibus.h"
 
-EFI_STATUS
-ResetPowerManagementFeature (
-  IN PCI_IO_DEVICE *PciIoDevice
-  )
 /**
-
-Routine Description:
-
   This function is intended to turn off PWE assertion and
   put the device to D0 state if the device supports
   PCI Power Management.
 
-Arguments:
+  @param PciIoDevice  Pci device instance
 
-Returns:
-  
-  None
-
+  @retval EFI_UNSUPPORTED Device do not support power management
+  @retval EFI_SUCCESS     Success
 **/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
+EFI_STATUS
+ResetPowerManagementFeature (
+  IN PCI_IO_DEVICE *PciIoDevice
+  )
 {
   EFI_STATUS  Status;
   UINT8       PowerManagementRegBlock;
@@ -71,3 +63,4 @@ Returns:
 
   return EFI_SUCCESS;
 }
+

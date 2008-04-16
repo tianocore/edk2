@@ -15,27 +15,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciResourceSupport.h"
 #include "PciCommand.h"
 
+/**
+  The function is used to skip VGA range
+  
+  @param Start    address including VGA range
+  @param Length   length of VGA range.
+  
+  @retval EFI_SUCCESS success
+**/
 EFI_STATUS
 SkipVGAAperture (
   OUT UINT64   *Start,
   IN  UINT64   Length
   )
-/**
-
-Routine Description:
-
-  The function is used to skip VGA range
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Start - add argument and description to function comment
-// TODO:    Length - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   UINT64  Original;
   UINT64  Mask;
@@ -57,27 +49,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to skip ISA aliasing aperture
+  
+  @param Start    address including ISA aliasing aperture
+  @param Length   length of ISA aliasing aperture
+  
+  @retval EFI_SUCCESS success
+**/
 EFI_STATUS
 SkipIsaAliasAperture (
   OUT UINT64   *Start,
   IN  UINT64   Length
   )
-/**
-
-Routine Description:
-
-  This function is used to skip ISA aliasing aperture
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Start - add argument and description to function comment
-// TODO:    Length - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   UINT64  Original;
@@ -101,28 +85,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function inserts a resource node into the resource list.
+  The resource list is sorted in descend order.
+
+  @param Bridge  PCI resource node for bridge
+  @param ResNode Resource node want to be inserted
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 InsertResourceNode (
   PCI_RESOURCE_NODE *Bridge,
   PCI_RESOURCE_NODE *ResNode
   )
-/**
-
-Routine Description:
-
-  This function inserts a resource node into the resource list.
-  The resource list is sorted in descend order.
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    ResNode - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   LIST_ENTRY        *CurrentLink;
   PCI_RESOURCE_NODE *Temp;
@@ -153,12 +129,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-MergeResourceTree (
-  PCI_RESOURCE_NODE *Dst,
-  PCI_RESOURCE_NODE *Res,
-  BOOLEAN           TypeMerge
-  )
 /**
 
 Routine Description:
@@ -171,17 +141,20 @@ Routine Description:
   If the TypeMerge is TRUE, Res resource type is changed to the type of destination resource
   type.
 
-Arguments:
-
-Returns:
-
-  None
-
+  @param Dst        Point to destination resource tree
+  @param Res        Point to source resource tree
+  @param TypeMerge  If the TypeMerge is TRUE, Res resource type is changed to the type of 
+                    destination resource type.
+                    
+                    
+  @retval EFI_SUCCESS Success
 **/
-// TODO:    Dst - add argument and description to function comment
-// TODO:    Res - add argument and description to function comment
-// TODO:    TypeMerge - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
+EFI_STATUS
+MergeResourceTree (
+  PCI_RESOURCE_NODE *Dst,
+  PCI_RESOURCE_NODE *Res,
+  BOOLEAN           TypeMerge
+  )
 {
 
   LIST_ENTRY        *CurrentLink;
@@ -204,27 +177,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to calculate the IO16 aperture
+  for a bridge.
+
+  @param Bridge PCI resource node for bridge.
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 CalculateApertureIo16 (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/**
-
-Routine Description:
-
-  This function is used to calculate the IO16 aperture
-  for a bridge.
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   UINT64            Aperture;
@@ -345,27 +309,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to calculate the resource aperture
+  for a given bridge device
+
+  @param Bridge Give bridge device
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 CalculateResourceAperture (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/**
-
-Routine Description:
-
-  This function is used to calculate the resource aperture
-  for a given bridge device
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   UINT64            Aperture;
   LIST_ENTRY        *CurrentLink;
@@ -455,6 +410,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Get IO/Memory resource infor for given PCI device
+  
+  @param PciDev     Pci device instance
+  @param IoNode     Resource info node for IO 
+  @param Mem32Node  Resource info node for 32-bit memory
+  @param PMem32Node Resource info node for 32-bit PMemory
+  @param Mem64Node  Resource info node for 64-bit memory
+  @param PMem64Node Resource info node for 64-bit PMemory
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 GetResourceFromDevice (
   PCI_IO_DEVICE     *PciDev,
@@ -464,24 +431,6 @@ GetResourceFromDevice (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciDev - add argument and description to function comment
-// TODO:    IoNode - add argument and description to function comment
-// TODO:    Mem32Node - add argument and description to function comment
-// TODO:    PMem32Node - add argument and description to function comment
-// TODO:    Mem64Node - add argument and description to function comment
-// TODO:    PMem64Node - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   UINT8             Index;
@@ -608,6 +557,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to create a resource node
+
+  @param PciDev       Pci device instance
+  @param Length       Length of Io/Memory resource
+  @param Alignment    Alignment of resource
+  @param Bar          Bar index 
+  @param ResType      Type of resource: IO/Memory
+  @param ResUage      Resource usage
+**/
 PCI_RESOURCE_NODE *
 CreateResourceNode (
   IN PCI_IO_DEVICE         *PciDev,
@@ -617,25 +576,6 @@ CreateResourceNode (
   IN PCI_BAR_TYPE          ResType,
   IN PCI_RESOURCE_USAGE    ResUsage
   )
-/**
-
-Routine Description:
-
-  This function is used to create a resource node
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciDev - add argument and description to function comment
-// TODO:    Length - add argument and description to function comment
-// TODO:    Alignment - add argument and description to function comment
-// TODO:    Bar - add argument and description to function comment
-// TODO:    ResType - add argument and description to function comment
-// TODO:    ResUsage - add argument and description to function comment
 {
   PCI_RESOURCE_NODE *Node;
 
@@ -668,6 +608,19 @@ Returns:
   return Node;
 }
 
+/**
+  This routine is used to extract resource request from
+  device node list.
+
+  @param Bridge     Pci device instance
+  @param IoNode     Resource info node for IO 
+  @param Mem32Node  Resource info node for 32-bit memory
+  @param PMem32Node Resource info node for 32-bit PMemory
+  @param Mem64Node  Resource info node for 64-bit memory
+  @param PMem64Node Resource info node for 64-bit PMemory
+
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 CreateResourceMap (
   IN PCI_IO_DEVICE     *Bridge,
@@ -677,27 +630,6 @@ CreateResourceMap (
   IN PCI_RESOURCE_NODE *Mem64Node,
   IN PCI_RESOURCE_NODE *PMem64Node
   )
-/**
-
-Routine Description:
-
-  This routine is used to extract resource request from
-  device node list.
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    IoNode - add argument and description to function comment
-// TODO:    Mem32Node - add argument and description to function comment
-// TODO:    PMem32Node - add argument and description to function comment
-// TODO:    Mem64Node - add argument and description to function comment
-// TODO:    PMem64Node - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_IO_DEVICE     *Temp;
   PCI_RESOURCE_NODE *IoBridge;
@@ -923,6 +855,18 @@ Returns:
 
 }
 
+/**
+  This function is used to do the resource padding for a specific platform
+
+  @param Bridge     Pci device instance
+  @param IoNode     Resource info node for IO 
+  @param Mem32Node  Resource info node for 32-bit memory
+  @param PMem32Node Resource info node for 32-bit PMemory
+  @param Mem64Node  Resource info node for 64-bit memory
+  @param PMem64Node Resource info node for 64-bit PMemory
+
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 ResourcePaddingPolicy (
   PCI_IO_DEVICE     *PciDev,
@@ -932,28 +876,6 @@ ResourcePaddingPolicy (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/**
-
-Routine Description:
-
-  This function is used to do the resource padding for a specific platform
-
-Arguments:
-
-  PciDev        - A pointer to the PCI_IO_DEVICE structrue.    
-  IoNode        - A pointer to the PCI_RESOURCE_NODE structrue.
-  Mem32Node     - A pointer to the PCI_RESOURCE_NODE structrue.
-  PMem32Node    - A pointer to the PCI_RESOURCE_NODE structrue.
-  Mem64Node     - A pointer to the PCI_RESOURCE_NODE structrue.
-  PMem64Node    - A pointer to the PCI_RESOURCE_NODE structrue.
-
-Returns:
-  Status code
-
-  None
-
-**/
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   //
   // Create padding resource node
@@ -973,6 +895,22 @@ Returns:
 
 }
 
+/**
+  This function is used to degrade resource if the upstream bridge 
+  doesn't support certain resource. Degradation path is 
+  PMEM64 -> MEM64  -> MEM32
+  PMEM64 -> PMEM32 -> MEM32
+  IO32   -> IO16
+
+  @param Bridge     Pci device instance
+  @param IoNode     Resource info node for IO 
+  @param Mem32Node  Resource info node for 32-bit memory
+  @param PMem32Node Resource info node for 32-bit PMemory
+  @param Mem64Node  Resource info node for 64-bit memory
+  @param PMem64Node Resource info node for 64-bit PMemory
+
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 DegradeResource (
   IN PCI_IO_DEVICE     *Bridge,
@@ -981,29 +919,6 @@ DegradeResource (
   IN PCI_RESOURCE_NODE *Mem64Node,
   IN PCI_RESOURCE_NODE *PMem64Node
   )
-/**
-
-Routine Description:
-
-  This function is used to degrade resource if the upstream bridge 
-  doesn't support certain resource. Degradation path is 
-  PMEM64 -> MEM64  -> MEM32
-  PMEM64 -> PMEM32 -> MEM32
-  IO32   -> IO16
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    Mem32Node - add argument and description to function comment
-// TODO:    PMem32Node - add argument and description to function comment
-// TODO:    Mem64Node - add argument and description to function comment
-// TODO:    PMem64Node - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   //
@@ -1078,39 +993,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Test whether bridge device support decode resource
+  
+  @param Bridge    Bridge device instance
+  @param Decode    Decode type according to resource type
+  
+  @return whether bridge device support decode resource
+  
+**/
 BOOLEAN
 BridgeSupportResourceDecode (
   IN PCI_IO_DEVICE *Bridge,
   IN UINT32        Decode
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Bridge  - TODO: add argument description
-  Decode  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 {
-  /**
 
-Routine Description:
-
-Arguments:
-
-Returns:
-  
-  None
-
-**/
   if ((Bridge->Decodes) & Decode) {
     return TRUE;
   }
@@ -1118,29 +1016,21 @@ Returns:
   return FALSE;
 }
 
+/**
+  This function is used to program the resource allocated 
+  for each resource node
+
+  
+  @param Base     Base address of resource
+  @param Bridge   Bridge device instance
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 ProgramResource (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Bridge
   )
-/**
-
-Routine Description:
-
-  This function is used to program the resource allocated 
-  for each resource node
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Base - add argument and description to function comment
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   LIST_ENTRY        *CurrentLink;
   PCI_RESOURCE_NODE *Node;
@@ -1179,25 +1069,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Program Bar register.
+  
+  @param Base  Base address for resource
+  @param Node  Point to resoure node structure
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 ProgramBar (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-  
-  None
-
-**/
-// TODO:    Base - add argument and description to function comment
-// TODO:    Node - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT64              Address;
@@ -1269,26 +1153,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Program PPB apperture
+  
+  @param Base  Base address for resource
+  @param Node  Point to resoure node structure
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 ProgramPpbApperture (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-  
-  None
-
-**/
-// TODO:    Base - add argument and description to function comment
-// TODO:    Node - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT64              Address;
@@ -1450,25 +1327,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Program parent bridge for oprom
+  
+  @param PciDevice      Pci deivce instance
+  @param OptionRomBase  Base address for oprom
+  @param Enable         Enable/Disable
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 ProgrameUpstreamBridgeForRom (
   IN PCI_IO_DEVICE   *PciDevice,
   IN UINT32          OptionRomBase,
   IN BOOLEAN         Enable
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-**/
-// TODO:    PciDevice - add argument and description to function comment
-// TODO:    OptionRomBase - add argument and description to function comment
-// TODO:    Enable - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_IO_DEVICE     *Parent;
   PCI_RESOURCE_NODE Node;
@@ -1506,23 +1379,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Test whether resource exists for a bridge
+  
+  @param Bridge  Point to resource node for a bridge 
+  
+  @return whether resource exists
+**/
 BOOLEAN
 ResourceRequestExisted (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-  Bridge      - A pointer to the PCI_RESOURCE_NODE.
-
-Returns:
-
-  None
-
-**/
 {
   if (Bridge != NULL) {
     if (!IsListEmpty (&Bridge->ChildList) || Bridge->Length != 0) {
@@ -1533,25 +1400,17 @@ Returns:
   return FALSE;
 }
 
+/**
+  Initialize resource pool structure.
+  
+  @param ResourcePool Point to resource pool structure
+  @param ResourceType Type of resource
+**/
 EFI_STATUS
 InitializeResourcePool (
   PCI_RESOURCE_NODE   *ResourcePool,
   PCI_BAR_TYPE        ResourceType
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    ResourcePool - add argument and description to function comment
-// TODO:    ResourceType - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   ZeroMem (ResourcePool, sizeof (PCI_RESOURCE_NODE));
@@ -1562,6 +1421,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Get all resource information for given Pci device
+  
+  @param PciDev         Pci device instance
+  @param IoBridge       Io resource node
+  @param Mem32Bridge    32-bit memory node
+  @param PMem32Bridge   32-bit Pmemory node
+  @param Mem64Bridge    64-bit memory node
+  @param PMem64Bridge   64-bit PMemory node
+  @param IoPool         Link list header for Io resource
+  @param Mem32Pool      Link list header for 32-bit memory
+  @param PMem32Pool     Link list header for 32-bit Pmemory
+  @param Mem64Pool      Link list header for 64-bit memory
+  @param PMem64Pool     Link list header for 64-bit Pmemory
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 GetResourceMap (
   PCI_IO_DEVICE      *PciDev,
@@ -1576,29 +1452,6 @@ GetResourceMap (
   PCI_RESOURCE_NODE  *Mem64Pool,
   PCI_RESOURCE_NODE  *PMem64Pool
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciDev - add argument and description to function comment
-// TODO:    IoBridge - add argument and description to function comment
-// TODO:    Mem32Bridge - add argument and description to function comment
-// TODO:    PMem32Bridge - add argument and description to function comment
-// TODO:    Mem64Bridge - add argument and description to function comment
-// TODO:    PMem64Bridge - add argument and description to function comment
-// TODO:    IoPool - add argument and description to function comment
-// TODO:    Mem32Pool - add argument and description to function comment
-// TODO:    PMem32Pool - add argument and description to function comment
-// TODO:    Mem64Pool - add argument and description to function comment
-// TODO:    PMem64Pool - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
 
   PCI_RESOURCE_NODE *Temp;
@@ -1687,23 +1540,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Destory given resource tree
+  
+  @param Bridge  root node of resource tree
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 DestroyResourceTree (
   IN PCI_RESOURCE_NODE *Bridge
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_RESOURCE_NODE *Temp;
   LIST_ENTRY        *CurrentLink;
@@ -1726,6 +1573,14 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Record the reserved resource and insert to reserved list.
+  
+  @param Base     Base address of reserved resourse
+  @param Length   Length of reserved resource 
+  @param ResType  Resource type
+  @param Bridge   Pci device instance
+**/
 EFI_STATUS
 RecordReservedResource (
   IN UINT64         Base,
@@ -1733,23 +1588,6 @@ RecordReservedResource (
   IN PCI_BAR_TYPE   ResType,
   IN PCI_IO_DEVICE  *Bridge
   )
-/**
-
-Routine Description:
-  
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Base - add argument and description to function comment
-// TODO:    Length - add argument and description to function comment
-// TODO:    ResType - add argument and description to function comment
-// TODO:    Bridge - add argument and description to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_RESERVED_RESOURCE_LIST  *ReservedNode;
 
@@ -1768,6 +1606,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Insert resource padding for P2C
+  
+  @param PciDev     Pci device instance
+  @param IoNode     Resource info node for IO 
+  @param Mem32Node  Resource info node for 32-bit memory
+  @param PMem32Node Resource info node for 32-bit PMemory
+  @param Mem64Node  Resource info node for 64-bit memory
+  @param PMem64Node Resource info node for 64-bit PMemory
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 ResourcePaddingForCardBusBridge (
   PCI_IO_DEVICE     *PciDev,
@@ -1777,24 +1627,6 @@ ResourcePaddingForCardBusBridge (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciDev - add argument and description to function comment
-// TODO:    IoNode - add argument and description to function comment
-// TODO:    Mem32Node - add argument and description to function comment
-// TODO:    PMem32Node - add argument and description to function comment
-// TODO:    Mem64Node - add argument and description to function comment
-// TODO:    PMem64Node - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   PCI_RESOURCE_NODE *Node;
 
@@ -1875,25 +1707,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Program P2C register for given resource node
+  
+  @param Base    Base address of P2C device
+  @param Node    Given resource node.
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 ProgramP2C (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-  
-  None
-
-**/
-// TODO:    Base - add argument and description to function comment
-// TODO:    Node - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT64              Address;
@@ -2118,6 +1944,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create padding resource node.
+  
+  @param PciDev     Pci device instance
+  @param IoNode     Resource info node for IO 
+  @param Mem32Node  Resource info node for 32-bit memory
+  @param PMem32Node Resource info node for 32-bit PMemory
+  @param Mem64Node  Resource info node for 64-bit memory
+  @param PMem64Node Resource info node for 64-bit PMemory
+  
+  @retval EFI_SUCCESS Success
+
+**/
 EFI_STATUS
 ApplyResourcePadding (
   PCI_IO_DEVICE     *PciDev,
@@ -2127,24 +1966,6 @@ ApplyResourcePadding (
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-  
-  None
-
-**/
-// TODO:    PciDev - add argument and description to function comment
-// TODO:    IoNode - add argument and description to function comment
-// TODO:    Mem32Node - add argument and description to function comment
-// TODO:    PMem32Node - add argument and description to function comment
-// TODO:    Mem64Node - add argument and description to function comment
-// TODO:    PMem64Node - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Ptr;
   PCI_RESOURCE_NODE                 *Node;
@@ -2283,29 +2104,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
-//
-// Light PCI bus driver woundn't support hotplug root device
-// So no need to pad resource for them
-//
+/**
+  Get padding resource for PPB
+  Light PCI bus driver woundn't support hotplug root device
+  So no need to pad resource for them
+
+  @param   PciIoDevice Pci device instance
+**/
 VOID
 GetResourcePaddingPpb (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  Get resource.
-
-Arguments:
-
-  PciIoDevice        A pointer to a pci device.
-
-Returns:
-
-  None
-
-**/
 {
   if (gPciHotPlugInit) {
     if (PciIoDevice->ResourcePaddingDescriptors == NULL) {
@@ -2313,3 +2122,4 @@ Returns:
     }
   }
 }
+

@@ -30,22 +30,16 @@ MEMMAP_DEVICE_PATH  mPciOptionRomImageDevicePathNodeTemplate = {
   0
 };
 
+/**
+  Get Pci device's oprom infor bits.
+  
+  @retval EFI_NOT_FOUND Pci device has not oprom
+  @retval EFI_SUCCESS   Pci device has oprom
+**/
 EFI_STATUS
 GetOpRomInfo (
   IN PCI_IO_DEVICE    *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   UINT8                           RomBarIndex;
   UINT32                          AllOnes;
@@ -125,27 +119,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Load option rom image for specified PCI device
+  
+  @param PciDevice Pci device instance
+  @param RomBase   Base address of oprom.
+  
+  @retval EFI_OUT_OF_RESOURCES not enough memory to hold image
+  @retval EFI_SUCESS           Success
+**/
 EFI_STATUS
 LoadOpRomImage (
   IN PCI_IO_DEVICE   *PciDevice,
   IN UINT64          RomBase
   )
-/**
-
-Routine Description:
-
-    Load option rom image for specified PCI device
-
-Arguments:
-
-Returns:
-
-**/
-// TODO:    PciDevice - add argument and description to function comment
-// TODO:    RomBase - add argument and description to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 {
   UINT8                     RomBarIndex;
   UINT8                     Indicator;
@@ -307,6 +294,17 @@ Returns:
   return retStatus;
 }
 
+/**
+  enable/disable oprom decode
+  
+  @param PciDevice    pci device instance
+  @param RomBarIndex  The BAR index of the standard PCI Configuration header to use as the
+                      base address for resource range. The legal range for this field is 0..5.
+  @param RomBar       Base address of rom
+  @param Enable       Flag for enable/disable decode.
+  
+  @retval EFI_SUCCESS Success
+**/
 EFI_STATUS
 RomDecode (
   IN PCI_IO_DEVICE   *PciDevice,
@@ -314,20 +312,6 @@ RomDecode (
   IN UINT32          RomBar,
   IN BOOLEAN         Enable
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-**/
-// TODO:    PciDevice - add argument and description to function comment
-// TODO:    RomBarIndex - add argument and description to function comment
-// TODO:    RomBar - add argument and description to function comment
-// TODO:    Enable - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   UINT32              Value32;
   UINT32              Offset;
@@ -395,24 +379,15 @@ Returns:
 
 }
 
+/**
+  Process the oprom image.
+  
+  @param PciDevice Pci device instance
+**/
 EFI_STATUS
 ProcessOpRomImage (
   PCI_IO_DEVICE   *PciDevice
   )
-/**
-
-Routine Description:
-
-  Process the oprom image.
-
-Arguments:
-  PciDevice       A pointer to a pci device.
-
-Returns:
-
-  EFI Status.
-
-**/
 {
   UINT8                         Indicator;
   UINT32                        ImageSize;
@@ -580,3 +555,4 @@ Returns:
   return retStatus;
 
 }
+

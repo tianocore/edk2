@@ -32,224 +32,144 @@ extern EFI_HPC_LOCATION               *gPciRootHpcPool;
 extern UINTN                          gPciRootHpcCount;
 extern ROOT_HPC_DATA                  *gPciRootHpcData;
 
+/**
+  Init HPC private data.
+  
+  @param  Event     event object
+  @param  Context   HPC private data.
+**/
 VOID
 EFIAPI
 PciHPCInitialized (
   IN EFI_EVENT    Event,
   IN VOID         *Context
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Event   - TODO: add argument description
-  Context - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Compare two device path
+  
+  @param DevicePath1    the first device path want to be compared
+  @param DevicePath2    the first device path want to be compared
+  
+  @retval TRUE    equal
+  @retval FALSE   different
+**/
 BOOLEAN
 EfiCompareDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath1,
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath2
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  DevicePath1 - TODO: add argument description
-  DevicePath2 - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Init hot plug support and root hot plug private data.
+  
+**/
 EFI_STATUS
 InitializeHotPlugSupport (
   VOID
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  None
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Test whether PCI device is hot plug bus.
+  
+  @param PciIoDevice  PCI device instance
+  
+  @retval EFI_SUCCESS   PCI device is hot plug bus
+  @retval EFI_NOT_FOUND PCI device is not hot plug bus
+**/
 EFI_STATUS
 IsPciHotPlugBus (
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Test whether device path is for root pci hot plug bus
+  
+  @param HpbdevicePath  tested device path
+  @param HpIndex        Return the index of root hot plug in global array.
+  
+  @retval TRUE  device path is for root pci hot plug
+  @retval FALSE device path is not for root pci hot plug
+**/
 BOOLEAN
 IsRootPciHotPlugBus (
   IN EFI_DEVICE_PATH_PROTOCOL         *HpbDevicePath,
   OUT UINTN                           *HpIndex
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  HpbDevicePath - TODO: add argument description
-  HpIndex       - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Test whether device path is for root pci hot plug controller
+  
+  @param HpbdevicePath  tested device path
+  @param HpIndex        Return the index of root hot plug in global array.
+  
+  @retval TRUE  device path is for root pci hot plug controller
+  @retval FALSE device path is not for root pci hot plug controller
+**/
 BOOLEAN
 IsRootPciHotPlugController (
   IN EFI_DEVICE_PATH_PROTOCOL         *HpcDevicePath,
   OUT UINTN                           *HpIndex
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  HpcDevicePath - TODO: add argument description
-  HpIndex       - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Wrapper for creating event object for HPC 
+  
+  @param  HpIndex   index of hot plug device in global array
+  @param  Event     event object
+  
+  @return status of create event invoken
+**/
 EFI_STATUS
 CreateEventForHpc (
   IN UINTN       HpIndex,
   OUT EFI_EVENT  *Event
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  HpIndex - TODO: add argument description
-  Event   - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Wait for all root HPC initialized.
+  
+  @param TimeoutInMicroSeconds  microseconds to wait for all root hpc's initialization
+**/
 EFI_STATUS
 AllRootHPCInitialized (
   IN  UINTN           TimeoutInMicroSeconds
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-  TimeoutInMicroSeconds - microseconds to wait for all root hpc's initialization
-
-Returns:
-  EFI_SUCCESS - All root hpc's initialization is finished before the timeout
-  EFI_TIMEOUT - Time out
-
-**/
 ;
 
+/**
+  Check HPC capability register block
+  
+  @param PciIoDevice PCI device instance
+  
+  @retval EFI_SUCCESS   PCI device is HPC
+  @retval EFI_NOT_FOUND PCI device is not HPC
+**/
 EFI_STATUS
 IsSHPC (
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
+/**
+  Get resource padding for hot plug bus
+  
+  @param PciIoDevice PCI device instance
+  
+  @retval EFI_SUCCESS   success get padding and set it into PCI device instance
+  @retval EFI_NOT_FOUND PCI device is not a hot plug bus.
+**/
 EFI_STATUS
 GetResourcePaddingForHpb (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
 #endif
