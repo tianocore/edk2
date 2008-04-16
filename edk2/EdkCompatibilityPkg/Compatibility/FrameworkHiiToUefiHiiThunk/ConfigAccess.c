@@ -100,8 +100,8 @@ GetBufferStorage  (
       if (BufferStorageKey == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      CopyGuid (&BufferStorageKey->Guid, &VarStoreOpCode->Guid);
-
+      CopyMem (&BufferStorageKey->Guid, &VarStoreOpCode->Guid, sizeof (EFI_GUID));
+      
       BufferStorageKey->Name = AllocateZeroPool (AsciiStrSize (VarStoreOpCode->Name) * 2);
       AsciiStrToUnicodeStr (VarStoreOpCode->Name, BufferStorageKey->Name);
 
