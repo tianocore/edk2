@@ -29,6 +29,17 @@ static UINTN                      mNumberOfPciRomImages     = 0;
 static UINTN                      mMaxNumberOfPciRomImages  = 0;
 static EFI_PCI_ROM_IMAGE_MAPPING  *mRomImageTable           = NULL;
 
+/**
+  Add the Rom Image to internal database for later PCI light enumeration
+  
+  @param ImageHandle    Option Rom image handle
+  @param Seg            Segment of PCI space
+  @param Bus            Bus NO of PCI space
+  @param Dev            Dev NO of PCI space
+  @param Func           Func NO of PCI space
+  @param RomAddress     Base address of OptionRom
+  @param RomLength      Length of rom image.
+**/
 VOID
 PciRomAddImageMapping (
   IN EFI_HANDLE  ImageHandle,
@@ -39,27 +50,6 @@ PciRomAddImageMapping (
   IN UINT64      RomAddress,
   IN UINT64      RomLength
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  ImageHandle - TODO: add argument description
-  Seg         - TODO: add argument description
-  Bus         - TODO: add argument description
-  Dev         - TODO: add argument description
-  Func        - TODO: add argument description
-  RomAddress  - TODO: add argument description
-  RomLength   - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 {
   EFI_PCI_ROM_IMAGE_MAPPING *TempMapping;
 
@@ -92,26 +82,19 @@ Returns:
   mNumberOfPciRomImages++;
 }
 
+/**
+  Load all option rom image to PCI driver list.
+  
+  @param This             Pointer to protocol instance EFI_DRIVER_BINDING_PROTOCOL
+  @param PciRootBridgeIo  Root bridge Io instance
+  @param PciIoDevice      device instance
+**/
 EFI_STATUS
 PciRomGetRomResourceFromPciOptionRomTable (
   IN EFI_DRIVER_BINDING_PROTOCOL      *This,
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-**/
-// TODO:    This - add argument and description to function comment
-// TODO:    PciRootBridgeIo - add argument and description to function comment
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                    Status;
   EFI_PCI_OPTION_ROM_TABLE      *PciOptionRomTable;
@@ -148,21 +131,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Get Option rom driver's mapping for PCI device.
+  
+  @param PciIoDevice Device instance.
+
+**/
 EFI_STATUS
 PciRomGetImageMapping (
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
   UINTN                           Index;

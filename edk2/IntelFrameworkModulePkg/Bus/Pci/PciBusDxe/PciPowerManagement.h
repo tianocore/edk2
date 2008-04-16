@@ -14,25 +14,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_PCI_POWER_MANAGEMENT_H
 #define _EFI_PCI_POWER_MANAGEMENT_H
 
+/**
+  This function is intended to turn off PWE assertion and
+  put the device to D0 state if the device supports
+  PCI Power Management.
+
+  @param PciIoDevice  Pci device instance
+
+  @retval EFI_UNSUPPORTED Device do not support power management
+  @retval EFI_SUCCESS     Success
+**/
 EFI_STATUS
 ResetPowerManagementFeature (
   IN PCI_IO_DEVICE *PciIoDevice
   )
-/**
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIoDevice - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
-**/
 ;
 
 #endif

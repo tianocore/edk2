@@ -1,5 +1,6 @@
 /**@file
-
+  This module provide support function for hot plug device.
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -20,25 +21,18 @@ EFI_HPC_LOCATION                *gPciRootHpcPool;
 UINTN                           gPciRootHpcCount;
 ROOT_HPC_DATA                   *gPciRootHpcData;
 
+/**
+  Init HPC private data.
+  
+  @param  Event     event object
+  @param  Context   HPC private data.
+**/
 VOID
 EFIAPI
 PciHPCInitialized (
   IN EFI_EVENT    Event,
   IN VOID         *Context
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    Event - add argument and description to function comment
-// TODO:    Context - add argument and description to function comment
 {
   ROOT_HPC_DATA *HpcData;
 
@@ -47,24 +41,20 @@ Returns:
 
 }
 
+/**
+  Compare two device path
+  
+  @param DevicePath1    the first device path want to be compared
+  @param DevicePath2    the first device path want to be compared
+  
+  @retval TRUE    equal
+  @retval FALSE   different
+**/
 BOOLEAN
 EfiCompareDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath1,
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath2
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    DevicePath1 - add argument and description to function comment
-// TODO:    DevicePath2 - add argument and description to function comment
 {
   UINTN Size1;
   UINTN Size2;
@@ -83,24 +73,14 @@ Returns:
   return TRUE;
 }
 
+/**
+  Init hot plug support and root hot plug private data.
+  
+**/
 EFI_STATUS
 InitializeHotPlugSupport (
   VOID
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS        Status;
   EFI_HPC_LOCATION  *HpcList;
@@ -148,26 +128,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Test whether device path is for root pci hot plug bus
+  
+  @param HpbdevicePath  tested device path
+  @param HpIndex        Return the index of root hot plug in global array.
+  
+  @retval TRUE  device path is for root pci hot plug
+  @retval FALSE device path is not for root pci hot plug
+**/
 BOOLEAN
 IsRootPciHotPlugBus (
   IN EFI_DEVICE_PATH_PROTOCOL         *HpbDevicePath,
   OUT UINTN                           *HpIndex
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-  HpcDevicePath       - A pointer to the EFI_DEVICE_PATH_PROTOCOL.
-  HpIndex             - A pointer to the Index.
-
-Returns:
-
-  None
-
-**/
-// TODO:    HpbDevicePath - add argument and description to function comment
 {
   UINTN Index;
 
@@ -186,25 +160,20 @@ Returns:
   return FALSE;
 }
 
+/**
+  Test whether device path is for root pci hot plug controller
+  
+  @param HpbdevicePath  tested device path
+  @param HpIndex        Return the index of root hot plug in global array.
+  
+  @retval TRUE  device path is for root pci hot plug controller
+  @retval FALSE device path is not for root pci hot plug controller
+**/
 BOOLEAN
 IsRootPciHotPlugController (
   IN EFI_DEVICE_PATH_PROTOCOL         *HpcDevicePath,
   OUT UINTN                           *HpIndex
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-  HpcDevicePath       - A pointer to the EFI_DEVICE_PATH_PROTOCOL.
-  HpIndex             - A pointer to the Index.
-
-Returns:
-
-  None
-
-**/
 {
   UINTN Index;
 
@@ -223,24 +192,19 @@ Returns:
   return FALSE;
 }
 
+/**
+  Wrapper for creating event object for HPC 
+  
+  @param  HpIndex   index of hot plug device in global array
+  @param  Event     event object
+  
+  @return status of create event invoken
+**/
 EFI_STATUS
 CreateEventForHpc (
   IN UINTN       HpIndex,
   OUT EFI_EVENT  *Event
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    HpIndex - add argument and description to function comment
-// TODO:    Event - add argument and description to function comment
 {
   EFI_STATUS  Status;
 
@@ -259,22 +223,15 @@ Returns:
   return Status;
 }
 
+/**
+  Wait for all root HPC initialized.
+  
+  @param TimeoutInMicroSeconds  microseconds to wait for all root hpc's initialization
+**/
 EFI_STATUS
 AllRootHPCInitialized (
   IN  UINTN           TimeoutInMicroSeconds
   )
-/**
-
-Routine Description:
-
-Arguments:
-  TimeoutInMicroSeconds - microseconds to wait for all root hpc's initialization
-
-Returns:
-  EFI_SUCCESS - All root hpc's initialization is finished before the timeout
-  EFI_TIMEOUT - Time out
-
-**/
 {
   UINT32  Delay;
   UINTN   Index;
@@ -305,25 +262,18 @@ Returns:
   return EFI_TIMEOUT;
 }
 
+/**
+  Check HPC capability register block
+  
+  @param PciIoDevice PCI device instance
+  
+  @retval EFI_SUCCESS   PCI device is HPC
+  @retval EFI_NOT_FOUND PCI device is not HPC
+**/
 EFI_STATUS
 IsSHPC (
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
 {
 
   EFI_STATUS  Status;
@@ -352,6 +302,14 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Get resource padding for hot plug bus
+  
+  @param PciIoDevice PCI device instance
+  
+  @retval EFI_SUCCESS   success get padding and set it into PCI device instance
+  @retval EFI_NOT_FOUND PCI device is not a hot plug bus.
+**/
 EFI_STATUS
 GetResourcePaddingForHpb (
   IN PCI_IO_DEVICE *PciIoDevice
@@ -405,25 +363,18 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Test whether PCI device is hot plug bus.
+  
+  @param PciIoDevice  PCI device instance
+  
+  @retval EFI_SUCCESS   PCI device is hot plug bus
+  @retval EFI_NOT_FOUND PCI device is not hot plug bus
+**/
 EFI_STATUS
 IsPciHotPlugBus (
   PCI_IO_DEVICE                       *PciIoDevice
   )
-/**
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
-**/
-// TODO:    PciIoDevice - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
 {
   BOOLEAN     Result;
   EFI_STATUS  Status;
@@ -449,3 +400,4 @@ Returns:
 
   return EFI_NOT_FOUND;
 }
+
