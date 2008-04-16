@@ -66,3 +66,27 @@ FrameworkHiiHandleToUefiHiiHandle (
   return (EFI_HII_HANDLE) NULL;
 }
 
+
+HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *
+FrameworkHiiHandleToMapDatabaseEntry (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+  IN FRAMEWORK_EFI_HII_HANDLE          FrameworkHiiHandle
+  )
+{
+  LIST_ENTRY                 *ListEntry;
+  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *HandleMapEntry;
+
+  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
+       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
+       ListEntry = ListEntry->ForwardLink
+       ) {
+    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
+
+    if (FrameworkHiiHandle == HandleMapEntry->FrameworkHiiHandle) {
+      return HandleMapEntry;
+    }
+  }
+
+  return (HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *) NULL;
+}
+

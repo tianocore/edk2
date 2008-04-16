@@ -44,6 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/FrameworkIfrSupportLib.h>
 #include <Library/HiiLib.h>
+#include <Library/ExtendedHiiLib.h>
 
 //
 // Macros
@@ -106,17 +107,37 @@ typedef struct {
   // other package list with IsPackageListWithOnlyStringPackages is TRUE.
   //
   BOOLEAN                    DoesPackageListImportStringPackages;
-  EFI_HII_PACKAGE_LIST_HEADER *ImportedUefiStringPackageListHeader; //Only valid if DoesPackageListImportStringPackages is true.
-
+  
 } HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY;
+
+#define HII_TRHUNK_BUFFER_STORAGE_KEY_SIGNATURE              EFI_SIGNATURE_32 ('H', 'T', 's', 'k')
+#define HII_TRHUNK_BUFFER_STORAGE_KEY_FROM_LIST_ENTRY(Record) CR(Record, HII_TRHUNK_BUFFER_STORAGE_KEY, List, HII_TRHUNK_BUFFER_STORAGE_KEY_SIGNATURE)
+typedef struct {
+  LIST_ENTRY List;
+  UINT32     Signature;
+  EFI_GUID   Guid;
+  CHAR16     *Name;
+  UINTN      Size;
+  UINT16     VarStoreId;
+} HII_TRHUNK_BUFFER_STORAGE_KEY;
+
+#define HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE_SIGNATURE            EFI_SIGNATURE_32 ('H', 'T', 'c', 'a')
+#define HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE_FROM_PROTOCOL(Record) CR(Record, HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE, ConfigAccessProtocol, HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE_SIGNATURE)
+typedef struct {
+  UINT32                         Signature;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL ConfigAccessProtocol;
+  EFI_FORM_CALLBACK_PROTOCOL     *FrameworkFormCallbackProtocol;
+  LIST_ENTRY                     ConfigAccessBufferStorageListHead;
+} HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE;
 
 //
 // Extern Variables
 //
-extern EFI_HII_DATABASE_PROTOCOL *mUefiHiiDatabaseProtocol;
-extern EFI_HII_FONT_PROTOCOL     *mUefiHiiFontProtocol;
-extern EFI_HII_IMAGE_PROTOCOL    *mUefiHiiImageProtocol;
-extern EFI_HII_STRING_PROTOCOL   *mUefiStringProtocol;
+extern CONST EFI_HII_DATABASE_PROTOCOL            *mUefiHiiDatabaseProtocol;
+extern CONST EFI_HII_FONT_PROTOCOL                *mUefiHiiFontProtocol;
+extern CONST EFI_HII_IMAGE_PROTOCOL               *mUefiHiiImageProtocol;
+extern CONST EFI_HII_STRING_PROTOCOL              *mUefiStringProtocol;
+extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mUefiConfigRoutingProtocol;
 
 //
 // Prototypes
@@ -319,5 +340,6 @@ HiiCompareLanguage (
 ;
 
 #include "Utility.h"
+#include "ConfigAccess.h"
 
 #endif

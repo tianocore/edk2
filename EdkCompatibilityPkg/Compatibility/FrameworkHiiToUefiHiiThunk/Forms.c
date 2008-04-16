@@ -122,6 +122,46 @@ HiiGetDefaultImage (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+ThunkUpdateFormCallBack (
+  IN       EFI_HANDLE                                CallbackHandle,
+  IN CONST HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry
+  )
+{
+  EFI_STATUS                                Status;
+  EFI_FORM_CALLBACK_PROTOCOL                *FrameworkFormCallbackProtocol;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL            *ConfigAccessProtocol;
+  EFI_HANDLE                                UefiDriverHandle;
+  HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE *ConfigAccessProtocolInstance;
+  
+  Status = gBS->HandleProtocol (
+                   CallbackHandle,
+                   &gEfiFormCallbackProtocolGuid,
+                   (VOID **) &FrameworkFormCallbackProtocol
+                   );
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  Status = mUefiHiiDatabaseProtocol->GetPackageListHandle (
+                                        mUefiHiiDatabaseProtocol,
+                                        HandleMapEntry->UefiHiiHandle,
+                                        &UefiDriverHandle
+                                        );
+  ASSERT_EFI_ERROR (Status);
+  Status = gBS->HandleProtocol (
+                   UefiDriverHandle,
+                   &gEfiHiiConfigAccessProtocolGuid,
+                   (VOID **) &ConfigAccessProtocol
+                   );
+  ASSERT_EFI_ERROR (Status);
+  
+  ConfigAccessProtocolInstance = HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE_FROM_PROTOCOL (ConfigAccessProtocol);
+  
+  ConfigAccessProtocolInstance->FrameworkFormCallbackProtocol = FrameworkFormCallbackProtocol;
+
+  return EFI_SUCCESS;
+}
 
 EFI_STATUS
 EFIAPI
@@ -150,5 +190,23 @@ Returns:
 
 --*/
 {
+  EFI_STATUS                                Status;
+  EFI_HII_THUNK_PRIVATE_DATA                *Private;
+  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
+
+  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+
+  HandleMapEntry = FrameworkHiiHandleToMapDatabaseEntry (Private, Handle);
+
+  if (HandleMapEntry == NULL) {
+    return EFI_NOT_FOUND;
+  }
+  
+  if (Data->FormSetUpdate) {
+    Status = ThunkUpdateFormCallBack ((EFI_HANDLE) (UINTN) Data->FormCallbackHandle, HandleMapEntry);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
   return EFI_SUCCESS;
 }
