@@ -40,12 +40,15 @@
   Forms.c
   HiiDatabase.h
   HiiDatabase.c
+  ConfigAccess.c
+  ConfigAccess.h
   Utility.c
   Utility.h
-
+  
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
@@ -57,6 +60,7 @@
   DebugLib
   BaseLib
   HiiLib
+  ExtendedHiiLib
 
 
 
@@ -66,10 +70,14 @@
   gEfiHiiDatabaseProtocolGuid
   gEfiHiiStringProtocolGuid
   gEfiHiiFontProtocolGuid
+  gEfiHiiConfigRoutingProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid
+  gEfiFormCallbackProtocolGuid
 
 [Depex]
   gEfiHiiImageProtocolGuid AND
   gEfiHiiDatabaseProtocolGuid AND
   gEfiHiiStringProtocolGuid AND
-  gEfiHiiFontProtocolGuid
+  gEfiHiiFontProtocolGuid AND
+  gEfiHiiConfigRoutingProtocolGuid
 

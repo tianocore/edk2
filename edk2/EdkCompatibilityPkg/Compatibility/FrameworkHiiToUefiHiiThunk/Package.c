@@ -308,15 +308,6 @@ FindAndAddStringPackageToIfrPackageList(
 }
 
 EFI_STATUS
-InstallDefaultUefiConfigAccessProtocol (
-  IN  EFI_HII_PACKAGES            *Packages,
-  OUT EFI_HANDLE                  *Handle
-  )
-{
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
 UefiRegisterPackageList(
   EFI_HII_THUNK_PRIVATE_DATA  *Private,
   EFI_HII_PACKAGES            *Packages,
@@ -358,7 +349,7 @@ UefiRegisterPackageList(
   // that Setup Utility will load the Buffer Storage
   //
   if (IfrPackNum != 0) {
-    InstallDefaultUefiConfigAccessProtocol (Packages, &UefiHiiDriverHandle);
+    InstallDefaultUefiConfigAccessProtocol (Packages, &UefiHiiDriverHandle, HandleMappingEntry);
   }
   UefiPackageListHeader = PrepareUefiPackageListFromFrameworkHiiPackages (Packages, GuidId);
   Status = mUefiHiiDatabaseProtocol->NewPackageList (

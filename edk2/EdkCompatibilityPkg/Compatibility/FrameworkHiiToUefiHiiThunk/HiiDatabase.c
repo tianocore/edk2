@@ -56,10 +56,12 @@ EFI_HII_THUNK_PRIVATE_DATA HiiThunkPrivateDataTempate = {
   },
 };
 
-EFI_HII_DATABASE_PROTOCOL *mUefiHiiDatabaseProtocol;
-EFI_HII_FONT_PROTOCOL     *mUefiHiiFontProtocol;
-EFI_HII_IMAGE_PROTOCOL    *mUefiHiiImageProtocol;
-EFI_HII_STRING_PROTOCOL   *mUefiStringProtocol;
+CONST EFI_HII_DATABASE_PROTOCOL            *mUefiHiiDatabaseProtocol;
+CONST EFI_HII_FONT_PROTOCOL                *mUefiHiiFontProtocol;
+CONST EFI_HII_IMAGE_PROTOCOL               *mUefiHiiImageProtocol;
+CONST EFI_HII_STRING_PROTOCOL              *mUefiStringProtocol;
+CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mUefiConfigRoutingProtocol;
+
 
 EFI_STATUS
 EFIAPI
@@ -116,6 +118,13 @@ Returns:
                   &gEfiHiiStringProtocolGuid,
                   NULL,
                   (VOID **) &mUefiStringProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->LocateProtocol (
+                  &gEfiHiiConfigRoutingProtocolGuid,
+                  NULL,
+                  (VOID **) &mUefiConfigRoutingProtocol
                   );
   ASSERT_EFI_ERROR (Status);
 

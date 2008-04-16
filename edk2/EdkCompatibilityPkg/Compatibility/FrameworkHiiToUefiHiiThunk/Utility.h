@@ -38,4 +38,12 @@ FrameworkHiiHandleToUefiHiiHandle (
   IN FRAMEWORK_EFI_HII_HANDLE          FrameworkHiiHandle
   )
 ;
+
+HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *
+FrameworkHiiHandleToMapDatabaseEntry (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+  IN FRAMEWORK_EFI_HII_HANDLE          FrameworkHiiHandle
+  )
+;
+
 #endif
