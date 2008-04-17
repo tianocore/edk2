@@ -61,6 +61,7 @@ Returns:
 --*/
 ;
 
+#ifdef SUPPORT_DEPRECATED_IFRSUPPORTLIB_API
 EFI_STATUS
 AddString (
   IN      VOID                *StringBuffer,
@@ -515,6 +516,7 @@ Returns:
 
 --*/
 ;
+#endif
 
 EFI_STATUS
 ExtractDataFromHiiHandle (
@@ -920,6 +922,7 @@ Returns:
 --*/
 ;
 
+#ifdef SUPPORT_DEPRECATED_IFRSUPPORTLIB_API
 EFI_STATUS
 ValidateDataFromHiiHandle (
   IN      EFI_HII_HANDLE      HiiHandle,
@@ -948,6 +951,7 @@ Returns:
   EFI_SUCCESS               - Data successfully validated
 --*/
 ;
+#endif
 
 EFI_STATUS
 CreateBannerOpCode (

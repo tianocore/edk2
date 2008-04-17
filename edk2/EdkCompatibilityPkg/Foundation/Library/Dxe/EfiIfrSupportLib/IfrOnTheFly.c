@@ -21,6 +21,8 @@ Revision History:
 
 #include "IfrLibrary.h"
 
+#ifdef SUPPORT_DEPRECATED_IFRSUPPORTLIB_API
+
 EFI_STATUS
 CreateFormSet (
   IN      CHAR16              *FormSetTitle,
@@ -972,3 +974,6 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
+#endif
+
