@@ -165,6 +165,6 @@ Abstract:
 
 #define EFI_D_RESERVED  (EFI_D_GENERIC | EFI_D_INTRINSIC)       
 
-#define EFI_DBUG_MASK   (EFI_D_ERROR)
+#define EFI_DBUG_MASK   (EFI_D_ERROR | EFI_D_INFO | EFI_D_WARN)
 
 #endif
