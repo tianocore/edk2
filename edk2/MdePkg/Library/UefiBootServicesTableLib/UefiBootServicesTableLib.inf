@@ -32,8 +32,7 @@
 
 [Sources.common]
   UefiBootServicesTableLib.c
-
-
+  UefiBootServicesTableLibInternal.h
 
 [Packages]
   MdePkg/MdePkg.dec
