@@ -61,8 +61,8 @@
   BaseLib
   HiiLib
   ExtendedHiiLib
-
-
+  IfrSupportLib
+  ExtendedIfrSupportLib
 
 [Protocols]
   gEfiHiiProtocolGuid

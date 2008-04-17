@@ -42,9 +42,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/FrameworkIfrSupportLib.h>
+//#include <Library/FrameworkIfrSupportLib.h>
 #include <Library/HiiLib.h>
 #include <Library/ExtendedHiiLib.h>
+
+//
+// There are some type redefinitions between Framework Ifr Support Library and 
+// UEFI HII Ifr Support Library. We undefine the duplicated Framework  definition here 
+// so that the duplicated definitions in UEFI HII Ifr can be defined.
+// In this Thunk Module, we will access all Framework definition with "FRAMEWORK_" prefix.
+//
+#undef IFR_OPTION
+#undef EFI_HII_UPDATE_DATA
+
+#include <Library/IfrSupportLib.h>
+#include <Library/ExtendedIfrSupportLib.h>
 
 //
 // Macros
@@ -55,10 +67,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Typedef
 //
 
+#pragma pack (push, 1)
 typedef struct {
   UINT32                  BinaryLength;
   EFI_HII_PACKAGE_HEADER  PackageHeader;
 } TIANO_AUTOGEN_PACKAGES_HEADER;
+#pragma pack (pop)
 
 #define EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(Record)   CR(Record, EFI_HII_THUNK_PRIVATE_DATA, Hii, EFI_HII_THUNK_DRIVER_DATA_SIGNATURE)
 #define EFI_HII_THUNK_DRIVER_DATA_SIGNATURE            EFI_SIGNATURE_32 ('H', 'i', 'I', 'T')
@@ -319,7 +333,7 @@ HiiUpdateForm (
   IN FRAMEWORK_EFI_HII_HANDLE          Handle,
   IN EFI_FORM_LABEL         Label,
   IN BOOLEAN                AddData,
-  IN EFI_HII_UPDATE_DATA    *Data
+  IN FRAMEWORK_EFI_HII_UPDATE_DATA    *Data
   )
 ;
 

@@ -45,22 +45,15 @@ FrameworkHiiHandleToUefiHiiHandle (
   IN FRAMEWORK_EFI_HII_HANDLE          FrameworkHiiHandle
   )
 {
-  LIST_ENTRY                                *ListEntry;
   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
 
   ASSERT (FrameworkHiiHandle != (FRAMEWORK_EFI_HII_HANDLE) 0);
   ASSERT (Private != NULL);
 
-  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
-       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
-       ListEntry = ListEntry->ForwardLink
-       ) {
+  HandleMapEntry = FrameworkHiiHandleToMapDatabaseEntry (Private, FrameworkHiiHandle);
 
-    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
-
-    if (FrameworkHiiHandle == HandleMapEntry->FrameworkHiiHandle) {
-      return HandleMapEntry->UefiHiiHandle;
-    }
+  if (HandleMapEntry != NULL) {
+    return HandleMapEntry->UefiHiiHandle;
   }
   
   return (EFI_HII_HANDLE) NULL;
@@ -89,4 +82,33 @@ FrameworkHiiHandleToMapDatabaseEntry (
 
   return (HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *) NULL;
 }
+
+
+EFI_HII_HANDLE *
+TagGuidToUefiIfrHiiHandle (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+  IN CONST EFI_GUID                   *Guid
+  )
+{
+  LIST_ENTRY                 *ListEntry;
+  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *HandleMapEntry;
+
+  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
+       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
+       ListEntry = ListEntry->ForwardLink
+       ) {
+    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
+
+    if (CompareGuid (Guid, &HandleMapEntry->TagGuid) && HandleMapEntry->DoesPackageListImportStringPackages) {
+      return HandleMapEntry->UefiHiiHandle;
+    }
+  }
+
+  return (EFI_HII_HANDLE *) NULL;
+  
+}
+
+
+
+
 

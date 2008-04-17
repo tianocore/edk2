@@ -215,7 +215,10 @@ PrepareUefiPackageListFromFrameworkHiiPackages (
 
   for (Index = 0; Index < NumberOfPackages; Index++) {
     CopyMem (&PackageLength, &TianoAutogenPackageHdrArray[Index]->BinaryLength, sizeof (UINT32));
-    PackageListLength += PackageLength;
+    //
+    //TIANO_AUTOGEN_PACKAGES_HEADER.BinaryLength include the BinaryLength itself.
+    //
+    PackageListLength += (PackageLength - sizeof(UINT32)); 
   }
 
   //
@@ -482,27 +485,41 @@ Returns:
 {
   EFI_STATUS                 Status;
   EFI_HII_THUNK_PRIVATE_DATA *Private;
-  LIST_ENTRY                 *ListEntry;
   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *HandleMapEntry;
+  EFI_DEVICE_PATH_PROTOCOL   *Path;
 
   Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
-       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
-       ListEntry = ListEntry->ForwardLink
-       ) {
-    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
+  HandleMapEntry = FrameworkHiiHandleToMapDatabaseEntry (Private, Handle);
 
-    if (Handle == HandleMapEntry->FrameworkHiiHandle) {
-      Status = mUefiHiiDatabaseProtocol->RemovePackageList (
-                                            mUefiHiiDatabaseProtocol,
-                                            HandleMapEntry->UefiHiiHandle
-                                            );
-      ASSERT_EFI_ERROR (Status);
+  if (HandleMapEntry->UefiHiiHandle != NULL) {
+    Status = mUefiHiiDatabaseProtocol->RemovePackageList (
+                                          mUefiHiiDatabaseProtocol,
+                                          HandleMapEntry->UefiHiiHandle
+                                          );
+    ASSERT_EFI_ERROR (Status);
 
-      RemoveEntryList (ListEntry);
-      return Status;
+    Status = gBS->HandleProtocol (
+                    HandleMapEntry->UefiHiiHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    &Path
+                    );
+
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->UninstallProtocolInterface (
+                      HandleMapEntry->UefiHiiHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      Path
+                      );
+      if (!EFI_ERROR (Status)) {
+        FreePool (Path);
+      }
     }
+
+    RemoveEntryList (&HandleMapEntry->List);
+
+    FreePool (HandleMapEntry);
+    return Status;
   }
 
   return EFI_NOT_FOUND;

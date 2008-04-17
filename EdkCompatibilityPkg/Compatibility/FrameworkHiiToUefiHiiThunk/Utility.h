@@ -46,4 +46,12 @@ FrameworkHiiHandleToMapDatabaseEntry (
   )
 ;
 
+
+EFI_HII_HANDLE *
+TagGuidToUefiIfrHiiHandle (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+  IN CONST EFI_GUID                   *Guid
+  )
+;
+
 #endif
