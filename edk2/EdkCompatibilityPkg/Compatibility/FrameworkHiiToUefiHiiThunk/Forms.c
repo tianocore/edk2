@@ -185,7 +185,7 @@ AppendToUpdateBuffer (
   }
   
   CopyMem (UefiData->Data + UefiData->Offset, OpCodeBuf, BufSize);
-  UefiData->Offset += BufSize;
+  UefiData->Offset += (UINT32) BufSize;
 
   return EFI_SUCCESS;
 }
