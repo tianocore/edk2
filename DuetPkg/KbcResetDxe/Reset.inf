@@ -1,0 +1,59 @@
+#/*++
+# 
+# Copyright (c) 2006, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+#  Module Name:
+#    Reset.inf
+#
+#  Abstract:
+#
+#--*/
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = KbcReset
+  FILE_GUID                      = 6F0198AA-1F1D-426D-AE3E-39AB633FCC28
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeReset
+
+[Packages]
+  DuetPkg/DuetPkg.dec
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  IoLib
+
+[Sources.common]
+  Reset.c
+  Reset.h
+
+[Sources.ipf]
+  Ipf\IpfReset.c
+
+[Sources.ia32]
+  Ia32\Ia32Reset.c
+
+[Sources.x64]
+  x64\x64Reset.c
+
+[Protocols]
+  gEfiResetArchProtocolGuid
+
+[Depex]
+  gEfiCpuIoProtocolGuid
+
+
