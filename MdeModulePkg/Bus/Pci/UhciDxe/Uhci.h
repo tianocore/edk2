@@ -39,6 +39,7 @@ Revision History
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 
 #include <IndustryStandard/Pci22.h>
 
