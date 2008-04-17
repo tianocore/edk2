@@ -169,6 +169,7 @@ typedef struct {
   BOOLEAN               FormSetUpdate;      // If TRUE, next variable is significant
   EFI_PHYSICAL_ADDRESS  FormCallbackHandle; // If not 0, will update Formset with this info
   BOOLEAN               FormUpdate;         // If TRUE, next variable is significant
+  UINT16                FormValue;          // specify which form is to be updated if FormUpdate value is TRUE.
   STRING_REF            FormTitle;          // If not 0, will update Form with this info
   UINT16                DataCount;          // The number of Data entries in this structure
   UINT8                 *Data;              // An array of 1+ op-codes, specified by DataCount
