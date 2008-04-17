@@ -1,6 +1,7 @@
-/*++
+/** @file
+  Miscellaneous routines for IScsi driver.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,35 +16,33 @@ Module Name:
 
 Abstract:
 
-  Miscellaneous routines for iSCSI driver.
+  Miscellaneous routines for IScsi driver.
 
---*/
+**/
 
 #include "IScsiImpl.h"
 
 STATIC CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFabcdef";
 
+/**
+  Determines if a Unicode character is a hexadecimal digit.
+  The test is case insensitive.
+  
+  @param  Digit[out] Pointer to byte that receives the value of the hex character.
+
+  @param  Char[in]   Unicode character to test.
+
+  @retval TRUE       If the character is a hexadecimal digit.
+
+  @retval FALSE      Otherwise.
+
+**/
 static
 BOOLEAN
 IsHexDigit (
   OUT UINT8      *Digit,
   IN  CHAR16      Char
   )
-/*++
-
-  Routine Description:
-    Determines if a Unicode character is a hexadecimal digit.
-    The test is case insensitive.
-
-  Arguments:
-    Digit - Pointer to byte that receives the value of the hex character.
-    Char  - Unicode character to test.
-
-  Returns:
-    TRUE  - If the character is a hexadecimal digit.
-    FALSE - Otherwise.
-
---*/
 {
   if ((Char >= L'0') && (Char <= L'9')) {
     *Digit = (UINT8) (Char - L'0');
@@ -63,27 +62,23 @@ IsHexDigit (
   return FALSE;
 }
 
+/**
+  Removes (trims) specified leading and trailing characters from a string.
+
+  @param  str[in][out] Pointer to the null-terminated string to be trimmed. On return, 
+                       str will hold the trimmed string. 
+
+  @param  CharC[in]    Character will be trimmed from str.
+
+  @retval NONE.
+
+**/
 static
 VOID
 StrTrim (
   IN OUT CHAR16   *str,
   IN     CHAR16   CharC
   )
-/*++
-
-Routine Description:
-  
-  Removes (trims) specified leading and trailing characters from a string.
-  
-Arguments: 
-  
-  str     - Pointer to the null-terminated string to be trimmed. On return, 
-            str will hold the trimmed string. 
-  CharC       - Character will be trimmed from str.
-  
-Returns:
-
---*/
 {
   CHAR16  *p1;
   CHAR16  *p2;
@@ -123,25 +118,18 @@ Returns:
   }
 }
 
+/**
+  Calculate the prefix length of the IPv4 subnet mask.
+
+  @param  SubnetMask[in] The IPv4 subnet mask.
+
+  @retval The prefix length of the subnet mask.
+
+**/
 UINT8
 IScsiGetSubnetMaskPrefixLength (
   IN EFI_IPv4_ADDRESS  *SubnetMask
   )
-/*++
-
-Routine Description:
-
-  Calculate the prefix length of the IPv4 subnet mask.
-
-Arguments:
-
-  SubnetMask - The IPv4 subnet mask.
-
-Returns:
-
-  The prefix length of the subnet mask.
-
---*/
 {
   UINT8   Len;
   UINT32  ReverseMask;
@@ -170,28 +158,23 @@ Returns:
   return (UINT8) (32 - Len);
 }
 
+/**
+  Convert the hexadecimal encoded LUN string into the 64-bit LUN. 
+
+  @param  Str[in]               The hexadecimal encoded LUN string.
+
+  @param  Lun[out]              Storage to return the 64-bit LUN.
+
+  @retval EFI_SUCCESS           The 64-bit LUN is stored in Lun.
+
+  @retval EFI_INVALID_PARAMETER The string is malformatted.
+
+**/
 EFI_STATUS
 IScsiAsciiStrToLun (
   IN  CHAR8  *Str,
   OUT UINT8  *Lun
   )
-/*++
-
-Routine Description:
-
-  Convert the hexadecimal encoded LUN string into the 64-bit LUN. 
-
-Arguments:
-
-  Str - The hexadecimal encoded LUN string.
-  Lun - Storage to return the 64-bit LUN.
-
-Returns:
-
-  EFI_SUCCESS           - The 64-bit LUN is stored in Lun.
-  EFI_INVALID_PARAMETER - The string is malformatted.
-
---*/
 {
   UINT32  Index;
   CHAR8   *LunUnitStr[4];
@@ -245,27 +228,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Convert the 64-bit LUN into the hexadecimal encoded LUN string.
+
+  @param  Lun[in]  The 64-bit LUN.
+
+  @param  Str[out] The storage to return the hexadecimal encoded LUN string.
+
+  @retval None.
+
+**/
 VOID
 IScsiLunToUnicodeStr (
   IN UINT8    *Lun,
   OUT CHAR16  *Str
   )
-/*++
-
-Routine Description:
-
-  Convert the 64-bit LUN into the hexadecimal encoded LUN string.
-
-Arguments:
-
-  Lun - The 64-bit LUN.
-  Str - The storage to return the hexadecimal encoded LUN string.
-
-Returns:
-
-  None.
-
---*/
 {
   UINTN   Index;
   CHAR16  *TempStr;
@@ -301,27 +278,21 @@ Returns:
   }
 }
 
+/**
+  Convert the ASCII string into a UNICODE string.
+
+  @param  Source[out]      The ASCII string.
+
+  @param  Destination[out] The storage to return the UNICODE string.
+
+  @retval CHAR16 *         Pointer to the UNICODE string.
+
+**/
 CHAR16 *
 IScsiAsciiStrToUnicodeStr (
   IN  CHAR8   *Source,
   OUT CHAR16  *Destination
   )
-/*++
-
-Routine Description:
-
-  Convert the ASCII string into a UNICODE string.
-
-Arguments:
-
-  Source      - The ASCII string.
-  Destination - The storage to return the UNICODE string.
-
-Returns:
-
-  Pointer to the UNICODE string.
-
---*/
 {
   ASSERT (Destination != NULL);
   ASSERT (Source != NULL);
@@ -335,27 +306,21 @@ Returns:
   return Destination;
 }
 
+/**
+  Convert the UNICODE string into an ASCII string.
+
+  @param  Source[in]       The UNICODE string.
+
+  @param  Destination[out] The storage to return the ASCII string.
+
+  @retval CHAR8 *          Pointer to the ASCII string.
+
+**/
 CHAR8 *
 IScsiUnicodeStrToAsciiStr (
   IN  CHAR16  *Source,
   OUT CHAR8   *Destination
   )
-/*++
-
-Routine Description:
-
-  Convert the UNICODE string into an ASCII string.
-
-Arguments:
-
-  Source      - The UNICODE string.
-  Destination - The storage to return the ASCII string.
-
-Returns:
-
-  Pointer to the ASCII string.
-
---*/
 {
   ASSERT (Destination != NULL);
   ASSERT (Source != NULL);
@@ -374,28 +339,23 @@ Returns:
   return Destination;
 }
 
+/**
+  Convert the decimal dotted IPv4 address into the binary IPv4 address.
+
+  @param  Str[in]               The UNICODE string.
+
+  @param  Ip[out]               The storage to return the ASCII string.
+
+  @retval EFI_SUCCESS           The binary IP address is returned in Ip.
+
+  @retval EFI_INVALID_PARAMETER The IP string is malformatted.
+
+**/
 EFI_STATUS
 IScsiAsciiStrToIp (
   IN  CHAR8             *Str,
   OUT EFI_IPv4_ADDRESS  *Ip
   )
-/*++
-
-Routine Description:
-
-  Convert the decimal dotted IPv4 address into the binary IPv4 address.
-
-Arguments:
-
-  Str - The UNICODE string.
-  Ip  - The storage to return the ASCII string.
-
-Returns:
-
-  EFI_SUCCESS           - The binary IP address is returned in Ip.
-  EFI_INVALID_PARAMETER - The IP string is malformatted.
-
---*/
 {
   UINTN Index;
   UINTN Number;
@@ -445,29 +405,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Convert the mac address into a hexadecimal encoded "-" seperated string.
+
+  @param  Mac[in]  The mac address.
+
+  @param  Len[in]  Length in bytes of the mac address.
+
+  @param  Str[out] The storage to return the mac string.
+
+  @retval None.
+
+**/
 VOID
 IScsiMacAddrToStr (
   IN  EFI_MAC_ADDRESS  *Mac,
   IN  UINT32           Len,
   OUT CHAR16           *Str
   )
-/*++
-
-Routine Description:
-
-  Convert the mac address into a hexadecimal encoded "-" seperated string.
-
-Arguments:
-
-  Mac - The mac address.
-  Len - Length in bytes of the mac address.
-  Str - The storage to return the mac string.
-
-Returns:
-
-  None.
-
---*/
 {
   UINT32  Index;
 
@@ -480,6 +435,23 @@ Returns:
   Str[3 * Index - 1] = L'\0';
 }
 
+/**
+  Convert the binary encoded buffer into a hexadecimal encoded string.
+
+  @param  BinBuffer[in]        The buffer containing the binary data.
+
+  @param  BinLength[in]        Length of the binary buffer.
+
+  @param  HexStr[in][out]      Pointer to the string.
+
+  @param  HexLength[in][out]   The length of the string.
+
+  @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string 
+                               and the length of the string is updated.
+
+  @retval EFI_BUFFER_TOO_SMALL The string is too small.
+
+**/
 EFI_STATUS
 IScsiBinToHex (
   IN     UINT8  *BinBuffer,
@@ -487,26 +459,6 @@ IScsiBinToHex (
   IN OUT CHAR8  *HexStr,
   IN OUT UINT32 *HexLength
   )
-/*++
-
-Routine Description:
-
-  Convert the binary encoded buffer into a hexadecimal encoded string.
-
-Arguments:
-
-  BinBuffer - The buffer containing the binary data.
-  BinLength - Length of the binary buffer.
-  HexStr    - Pointer to the string.
-  HexLength - The length of the string.
-
-Returns:
-
-  EFI_SUCCESS          - The binary data is converted to the hexadecimal string 
-                         and the length of the string is updated.
-  EFI_BUFFER_TOO_SMALL - The string is too small.
-
---*/
 {
   UINTN Index;
 
@@ -536,31 +488,27 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Convert the hexadecimal string into a binary encoded buffer.
+
+  @param  BinBuffer[in][out]   The binary buffer.
+
+  @param  BinLength[in][out]   Length of the binary buffer.
+
+  @param  HexStr[in]           The hexadecimal string.
+
+  @retval EFI_SUCCESS          The hexadecimal string is converted into a binary
+                               encoded buffer.
+
+  @retval EFI_BUFFER_TOO_SMALL The binary buffer is too small to hold the converted data.s
+
+**/
 EFI_STATUS
 IScsiHexToBin (
   IN OUT UINT8  *BinBuffer,
   IN OUT UINT32 *BinLength,
   IN     CHAR8  *HexStr
   )
-/*++
-
-Routine Description:
-
-  Convert the hexadecimal string into a binary encoded buffer.
-
-Arguments:
-
-  BinBuffer - The binary buffer.
-  BinLength - Length of the binary buffer.
-  HexStr    - The hexadecimal string.
-
-Returns:
-
-  EFI_SUCCESS          - The hexadecimal string is converted into a binary 
-                         encoded buffer.
-  EFI_BUFFER_TOO_SMALL - The binary buffer is too small to hold the converted data.s
-
---*/
 {
   UINTN   Index;
   UINT32  HexCount;
@@ -613,27 +561,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Generate random numbers.
+
+  @param  Rand[in][out]  The buffer to contain random numbers.
+
+  @param  RandLength[in] The length of the Rand buffer.
+
+  @retval None.
+
+**/
 VOID
 IScsiGenRandom (
   IN OUT UINT8  *Rand,
   IN     UINTN  RandLength
   )
-/*++
-
-Routine Description:
-
-  Generate random numbers.
-
-Arguments:
-
-  Rand       - The buffer to contain random numbers.
-  RandLength - The length of the Rand buffer.
-
-Returns:
-
-  None.
-
---*/
 {
   UINT32  Random;
 
@@ -644,27 +586,21 @@ Returns:
   }
 }
 
+/**
+  Create the iSCSI driver data..
+
+  @param  Image[in]      The handle of the driver image.
+
+  @param  Controller[in] The handle of the controller.
+
+  @retval The iSCSI driver data created.
+
+**/
 ISCSI_DRIVER_DATA *
 IScsiCreateDriverData (
   IN EFI_HANDLE  Image,
   IN EFI_HANDLE  Controller
   )
-/*++
-
-Routine Description:
-
-  Create the iSCSI driver data..
-
-Arguments:
-
-  Image      - The handle of the driver image.
-  Controller - The handle of the controller.
-
-Returns:
-
-  The iSCSI driver data created.
-
---*/
 {
   ISCSI_DRIVER_DATA *Private;
   EFI_STATUS        Status;
@@ -725,25 +661,18 @@ Returns:
   return Private;
 }
 
+/**
+  Clean the iSCSI driver data.
+
+  @param  Private[in] The iSCSI driver data.
+
+  @retval None.
+
+**/
 VOID
 IScsiCleanDriverData (
   IN ISCSI_DRIVER_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  Clean the iSCSI driver data.
-
-Arguments:
-
-  Private - The iSCSI driver data.
-
-Returns:
-
- None.
-
---*/
 {
   if (Private->DevicePath != NULL) {
     gBS->UninstallProtocolInterface (
@@ -768,26 +697,21 @@ Returns:
   gBS->FreePool (Private);
 }
 
+/**
+
+  Get the various configuration data of this iSCSI instance.
+
+  @param  Private[in]   The iSCSI driver data.
+
+  @retval EFI_SUCCESS   The configuration of this instance is got.
+
+  @retval EFI_NOT_FOUND This iSCSI instance is not configured yet.
+
+**/
 EFI_STATUS
 IScsiGetConfigData (
   IN ISCSI_DRIVER_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  Get the various configuration data of this iSCSI instance.
-
-Arguments:
-
-  Private - The iSCSI driver data.
-
-Returns:
-
-  EFI_SUCCESS   - The configuration of this instance is got.
-  EFI_NOT_FOUND - This iSCSI instance is not configured yet.
-
---*/
 {
   EFI_STATUS                  Status;
   ISCSI_SESSION               *Session;
@@ -866,25 +790,18 @@ Returns:
   return Status;
 }
 
+/**
+  Get the device path of the iSCSI tcp connection and update it.
+
+  @param  Private[in] The iSCSI driver data.
+
+  @retval The updated device path.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 IScsiGetTcpConnDevicePath (
   IN ISCSI_DRIVER_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  Get the device path of the iSCSI tcp connection and update it.
-
-Arguments:
-
-  Private - The iSCSI driver data.
-
-Returns:
-
-  The updated device path.
-
---*/
 {
   ISCSI_SESSION             *Session;
   ISCSI_CONNECTION          *Conn;
@@ -937,28 +854,22 @@ Returns:
   return DevicePath;
 }
 
+/**
+  Abort the session when the transition from BS to RT is initiated.
+
+  @param  Event[in]   The event signaled.
+
+  @param  Context[in] The iSCSI driver data.
+
+  @retval None.
+
+**/
 VOID
 EFIAPI
 IScsiOnExitBootService (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
-/*++
-
-Routine Description:
-
-  Abort the session when the transition from BS to RT is initiated.
-
-Arguments:
-
-  Event   - The event signaled.
-  Context - The iSCSI driver data.
-
-Returns:
-
-  None.
-
---*/
 {
   ISCSI_DRIVER_DATA *Private;
 

@@ -1,4 +1,5 @@
-/*++
+/** @file
+  The entry point of IScsi driver
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -14,8 +15,9 @@ Module Name:
   IScsiDriver.c
 
 Abstract:
+  The entry point of IScsi driver
 
---*/
+**/
 
 #include "IScsiImpl.h"
 
@@ -30,6 +32,22 @@ EFI_DRIVER_BINDING_PROTOCOL gIScsiDriverBinding = {
 
 EFI_GUID                    mIScsiPrivateGuid   = ISCSI_PRIVATE_GUID;
 
+/**
+  Test to see if IScsi driver supports the given controller. 
+
+  @param  This[in]                Protocol instance pointer.
+
+  @param  ControllerHandle[in]    Handle of controller to test.
+
+  @param  RemainingDevicePath[in] Optional parameter use to pick a specific child device to start.
+
+  @retval EFI_SUCCES              This driver supports the controller.
+
+  @retval EFI_ALREADY_STARTED     This driver is already running on this device.
+
+  @retval EFI_UNSUPPORTED         This driver doesn't support the controller.
+
+**/
 EFI_STATUS
 EFIAPI
 IScsiDriverBindingSupported (
@@ -37,25 +55,6 @@ IScsiDriverBindingSupported (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  Test to see if iSCSI driver supports the given controller. 
-
-Arguments:
-
-  This                - Protocol instance pointer.
-  ControllerHandle    - Handle of controller to test.
-  RemainingDevicePath - Optional parameter use to pick a specific child device to start.
-
-Returns:
-
-  EFI_SUCCES          - This driver supports the controller.
-  EFI_ALREADY_STARTED - This driver is already running on this device.
-  EFI_UNSUPPORTED     - This driver doesn't support the controller.
-
---*/
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *CurrentDevicePath;
@@ -100,6 +99,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Start to manage the controller. 
+
+  @param  This[in]                Protocol instance pointer.
+
+  @param  ControllerHandle[in]    Handle of the controller.
+
+  @param  RemainingDevicePath[in] Optional parameter use to pick a specific child device to start.
+
+  @retval EFI_SUCCES              This driver supports this device.
+
+  @retval EFI_ALREADY_STARTED     This driver is already running on this device.
+
+**/
 EFI_STATUS
 EFIAPI
 IScsiDriverBindingStart (
@@ -107,24 +120,6 @@ IScsiDriverBindingStart (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  Start to manage the controller. 
-
-Arguments:
-
-  This                - Protocol instance pointer.
-  ControllerHandle    - Handle of the controller.
-  RemainingDevicePath - Optional parameter use to pick a specific child device to start.
-
-Returns:
-
-  EFI_SUCCES          - This driver supports this device.
-  EFI_ALREADY_STARTED - This driver is already running on this device.
-
---*/
 {
   EFI_STATUS        Status;
   ISCSI_DRIVER_DATA *Private;
@@ -209,6 +204,20 @@ ON_ERROR:
   return Status;
 }
 
+/**
+  Release the control of this controller and remove the IScsi functions.
+
+  @param  This[in]              Protocol instance pointer.
+
+  @param  ControllerHandle[in]  Handle of controller to stop.
+
+  @param  NumberOfChildren[in]  Not used.
+
+  @param  ChildHandleBuffer[in] Not used.
+
+  @retval EFI_SUCCES            This driver supports this device.
+
+**/
 EFI_STATUS
 EFIAPI
 IScsiDriverBindingStop (
@@ -217,24 +226,6 @@ IScsiDriverBindingStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
   )
-/*++
-
-Routine Description:
-
-  Release the control of this controller and remove the iSCSI functions.
-
-Arguments:
-
-  This                - Protocol instance pointer.
-  ControllerHandle    - Handle of controller to stop.
-  NumberOfChildren    - Not used.
-  ChildHandleBuffer   - Not used.
-
-Returns:
-
-  EFI_SUCCES          - This driver supports this device.
-
---*/
 {
   EFI_HANDLE                      IScsiController;
   EFI_STATUS                      Status;
@@ -315,27 +306,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Unload the iSCSI driver.
+
+  @param  ImageHandle[in]  The handle of the driver image.
+
+  @retval EFI_SUCCESS      The driver is unloaded.
+
+  @retval EFI_DEVICE_ERROR Some unexpected error happened.
+
+**/
 EFI_STATUS
 EFIAPI
 EfiIScsiUnload (
   IN EFI_HANDLE  ImageHandle
   )
-/*++
-
-Routine Description:
-
-  Unload the iSCSI driver.
-
-Arguments:
-
-  ImageHandle - The handle of the driver image.
-
-Returns:
-
-  EFI_SUCCESS      - The driver is unloaded.
-  EFI_DEVICE_ERROR - Some unexpected error happened.
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       DeviceHandleCount;
@@ -389,29 +374,24 @@ Returns:
   return Status;
 }
 
+/**
+  Initialize the global variables publish the driver binding protocol.
+
+  @param  ImageHandle[in]  The handle of the driver image.
+
+  @param  SystemTable[in]  The EFI system table.
+
+  @retval EFI_SUCCESS      The protocols are installed.
+
+  @retval EFI_DEVICE_ERROR Some unexpected error happened.
+
+**/
 EFI_STATUS
 EFIAPI
 IScsiDriverEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
-
-Routine Description:
-
-  Initialize the global variables publish the driver binding protocol.
-
-Arguments:
-
-  ImageHandle - The handle of the driver image.
-  SystemTable - The EFI system table.
-
-Returns:
-
-  EFI_SUCCESS      - The protocols are installed.
-  EFI_DEVICE_ERROR - Some unexpected error happened.
-
---*/
 {
   EFI_STATUS                         Status;
   EFI_ISCSI_INITIATOR_NAME_PROTOCOL  *IScsiInitiatorName;

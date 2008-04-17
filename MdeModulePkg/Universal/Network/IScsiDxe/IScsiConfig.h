@@ -1,6 +1,7 @@
-/*++
+/** @file
+  The header file of IScsiConfig.c
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,8 +16,9 @@ Module Name:
 
 Abstract:
 
+  The header file of IScsiConfig.c
 
---*/
+**/
 
 #ifndef _ISCSI_CONFIG_H_
 #define _ISCSI_CONFIG_H_
@@ -84,6 +86,21 @@ typedef struct _ISCSI_FORM_CALLBACK_INFO {
   ISCSI_CONFIG_FORM_ENTRY          *Current;
 } ISCSI_FORM_CALLBACK_INFO;
 
+/**
+  Updates the iSCSI configuration form to add/delete an entry for the iSCSI
+  device specified by the Controller.
+
+  @param  DriverBindingHandle[in] The driverbinding handle.
+
+  @param  Controller[in]          The controller handle of the iSCSI device.
+
+  @param  AddForm[in]             Whether to add or delete a form entry.
+
+  @retval EFI_SUCCESS             The iSCSI configuration form is updated.
+
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+
+**/
 EFI_STATUS
 IScsiConfigUpdateForm (
   IN EFI_HANDLE  DriverBindingHandle,
@@ -91,11 +108,33 @@ IScsiConfigUpdateForm (
   IN BOOLEAN     AddForm
   );
 
+/**
+  Initialize the iSCSI configuration form.
+
+  @param  DriverBindingHandle[in] The iSCSI driverbinding handle.
+
+  @retval EFI_SUCCESS             The iSCSI configuration form is initialized.
+
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+
+**/
 EFI_STATUS
 IScsiConfigFormInit (
   IN EFI_HANDLE  DriverBindingHandle
   );
 
+/**
+  Unload the iSCSI configuration form, this includes: delete all the iSCSI
+  device configuration entries, uninstall the form callback protocol and
+  free the resources used.
+
+  @param  DriverBindingHandle[in] The iSCSI driverbinding handle.
+
+  @retval EFI_SUCCESS             The iSCSI configuration form is unloaded.
+
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+
+**/
 EFI_STATUS
 IScsiConfigFormUnload (
   IN EFI_HANDLE  DriverBindingHandle

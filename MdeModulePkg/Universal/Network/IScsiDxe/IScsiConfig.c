@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Helper functions for configuring or getting the parameters relating to ISCSI
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -15,7 +16,9 @@ Module Name:
 
 Abstract:
 
---*/
+  Helper functions for configuring or getting the parameters relating to ISCSI
+
+**/
 
 #include "IScsiImpl.h"
 
@@ -29,76 +32,56 @@ LIST_ENTRY      mIScsiConfigFormList = {
   &mIScsiConfigFormList
 };
 
+/**
+  Convert the IPv4 address into a dotted string.
+
+  @param  Ip[in]   The IPv4 address.
+
+  @param  Str[out] The dotted IP string.
+
+  @retval None.
+
+**/
 STATIC
 VOID
 IScsiIpToStr (
   IN  EFI_IPv4_ADDRESS  *Ip,
   OUT CHAR16            *Str
   )
-/*++
-
-Routine Description:
-
-  Convert the IPv4 address into a dotted string.
-
-Arguments:
-
-  Ip  - The IPv4 address.
-  Str - The dotted IP string.
-
-Returns:
-
-  None.
-
---*/
 {
   UnicodeSPrint ( Str, 2 * IP4_STR_MAX_SIZE, L"%d.%d.%d.%d", Ip->Addr[0], Ip->Addr[1], Ip->Addr[2], Ip->Addr[3]);
 }
 
+/**
+  Pop up an invalid notify which displays the message in Warning.
+
+  @param  Warning[in] The warning message.
+
+  @retval None.
+
+**/
 VOID
 PopUpInvalidNotify (
   IN CHAR16 *Warning
   )
-/*++
-
-Routine Description:
-
-  Pop up an invalid notify which displays the message in Warning.
-
-Arguments:
-
-  Warning - The warning message.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_INPUT_KEY             Key;
 
   IfrLibCreatePopUp (1, &Key, Warning);
 }
 
+/**
+  Update the list of iSCSI devices the iSCSI driver is controlling.
+
+  @param  None.
+
+  @retval None.
+
+**/
 EFI_STATUS
 IScsiUpdateDeviceList (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Update the list of iSCSI devices the iSCSI driver is controlling.
-
-Arguments:
-
-  None.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_STATUS                  Status;
   ISCSI_DEVICE_LIST           *DeviceList;
@@ -226,26 +209,19 @@ Returns:
   return Status;
 }
 
+/**
+  Get the iSCSI configuration form entry by the index of the goto opcode actived.
+
+  @param  Index[in] The 0-based index of the goto opcode actived.
+
+  @retval The iSCSI configuration form entry found.
+
+**/
 STATIC
 ISCSI_CONFIG_FORM_ENTRY *
 IScsiGetConfigFormEntryByIndex (
   IN UINT32 Index
   )
-/*++
-
-Routine Description:
-
-  Get the iSCSI configuration form entry by the index of the goto opcode actived.
-
-Arguments:
-
-  Index - The 0-based index of the goto opcode actived.
-
-Returns:
-
-  The iSCSI configuration form entry found.
-
---*/
 {
   UINT32                  CurrentIndex;
   LIST_ENTRY              *Entry;
@@ -266,28 +242,22 @@ Returns:
   return ConfigFormEntry;
 }
 
+/**
+  Convert the iSCSI configuration data into the IFR data.
+
+  @param  ConfigFormEntry[in] The iSCSI configuration form entry.
+
+  @param  IfrNvData[in]       The IFR nv data.
+
+  @retval None.
+
+**/
 STATIC
 VOID
 IScsiConvertDeviceConfigDataToIfrNvData (
   IN ISCSI_CONFIG_FORM_ENTRY  *ConfigFormEntry,
   IN ISCSI_CONFIG_IFR_NVDATA  *IfrNvData
   )
-/*++
-
-Routine Description:
-
-  Convert the iSCSI configuration data into the IFR data.
-
-Arguments:
-
-  ConfigFormEntry - The iSCSI configuration form entry.
-  IfrNvData       - The IFR nv data.
-
-Returns:
-
-  None.
-
---*/
 {
   ISCSI_SESSION_CONFIG_NVDATA   *SessionConfigData;
   ISCSI_CHAP_AUTH_CONFIG_NVDATA *AuthConfigData;
@@ -324,7 +294,33 @@ Returns:
   IScsiAsciiStrToUnicodeStr (AuthConfigData->ReverseCHAPSecret, IfrNvData->ReverseCHAPSecret);
 }
 
+/**
+  This function allows a caller to extract the current configuration for one
+  or more named elements from the target driver.
 
+  @param  This[in]              Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+
+  @param  Request[in]           A null-terminated Unicode string in <ConfigRequest> format.
+
+  @param  Progress[out]         On return, points to a character in the Request string.
+                                Points to the string's null terminator if request was successful.
+                                Points to the most recent '&' before the first failing name/value
+                                pair (or the beginning of the string if the failure is in the
+                                first name/value pair) if the request was not successful.
+
+  @param  Results[out]          A null-terminated Unicode string in <ConfigAltResp> format which
+                                has all values filled in for the names in the Request string.
+                                String to be allocated by the called function.
+
+  @retval EFI_SUCCESS           The Results is filled with the requested values.
+
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory to store the results.
+
+  @retval EFI_INVALID_PARAMETER Request is NULL, illegal syntax, or unknown name.
+
+  @retval EFI_NOT_FOUND         Routing data doesn't match any storage in this driver.
+
+**/
 EFI_STATUS
 EFIAPI
 IScsiFormExtractConfig (
@@ -333,31 +329,6 @@ IScsiFormExtractConfig (
   OUT EFI_STRING                             *Progress,
   OUT EFI_STRING                             *Results
   )
-/*++
-
-  Routine Description:
-    This function allows a caller to extract the current configuration for one
-    or more named elements from the target driver.
-
-  Arguments:
-    This       - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Request    - A null-terminated Unicode string in <ConfigRequest> format.
-    Progress   - On return, points to a character in the Request string.
-                 Points to the string's null terminator if request was successful.
-                 Points to the most recent '&' before the first failing name/value
-                 pair (or the beginning of the string if the failure is in the
-                 first name/value pair) if the request was not successful.
-    Results    - A null-terminated Unicode string in <ConfigAltResp> format which
-                 has all values filled in for the names in the Request string.
-                 String to be allocated by the called function.
-
-  Returns:
-    EFI_SUCCESS           - The Results is filled with the requested values.
-    EFI_OUT_OF_RESOURCES  - Not enough memory to store the results.
-    EFI_INVALID_PARAMETER - Request is NULL, illegal syntax, or unknown name.
-    EFI_NOT_FOUND         - Routing data doesn't match any storage in this driver.
-
---*/
 {
   EFI_STATUS                       Status;
   CHAR8                            InitiatorName[ISCSI_NAME_IFR_MAX_SIZE];
@@ -406,6 +377,25 @@ IScsiFormExtractConfig (
   return Status;
 }
 
+/**
+  This function processes the results of changes in configuration.
+
+  @param  This[in]              Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+
+  @param  Configuration[in]     A null-terminated Unicode string in <ConfigResp> format.
+
+  @param  Progress[out]         A pointer to a string filled in with the offset of the most
+                                recent '&' before the first failing name/value pair (or the
+                                beginning of the string if the failure is in the first
+                                name/value pair) or the terminating NULL if all was successful.
+
+  @retval EFI_SUCCESS           The Results is processed successfully.
+
+  @retval EFI_INVALID_PARAMETER Configuration is NULL.
+
+  @retval EFI_NOT_FOUND         Routing data doesn't match any storage in this driver.
+
+**/
 EFI_STATUS
 EFIAPI
 IScsiFormRouteConfig (
@@ -413,29 +403,35 @@ IScsiFormRouteConfig (
   IN  CONST EFI_STRING                       Configuration,
   OUT EFI_STRING                             *Progress
   )
-/*++
-
-  Routine Description:
-    This function processes the results of changes in configuration.
-
-  Arguments:
-    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Configuration - A null-terminated Unicode string in <ConfigResp> format.
-    Progress      - A pointer to a string filled in with the offset of the most
-                    recent '&' before the first failing name/value pair (or the
-                    beginning of the string if the failure is in the first
-                    name/value pair) or the terminating NULL if all was successful.
-
-  Returns:
-    EFI_SUCCESS           - The Results is processed successfully.
-    EFI_INVALID_PARAMETER - Configuration is NULL.
-    EFI_NOT_FOUND         - Routing data doesn't match any storage in this driver.
-
---*/
 {
   return EFI_SUCCESS;
 }
 
+/**
+  This function processes the results of changes in configuration.
+
+  @param  This[in]             Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+
+  @param  Action[in]           Specifies the type of action taken by the browser.
+
+  @param  QuestionId[in]       A unique value which is sent to the original exporting driver
+                               so that it can identify the type of data to expect.
+
+  @param  Type[in]             The type of value for the question.
+
+  @param  Value[in]            A pointer to the data being sent to the original exporting driver.
+
+  @param  ActionRequest[out]   On return, points to the action requested by the callback function.
+
+  @retval EFI_SUCCESS          The callback successfully handled the action.
+
+  @retval EFI_OUT_OF_RESOURCES Not enough storage is available to hold the variable and its data.
+
+  @retval EFI_DEVICE_ERROR     The variable could not be saved.
+
+  @retval EFI_UNSUPPORTED      The specified Action is not supported by the callback.
+
+**/
 EFI_STATUS
 EFIAPI
 IScsiFormCallback (
@@ -446,27 +442,6 @@ IScsiFormCallback (
   IN  EFI_IFR_TYPE_VALUE                     *Value,
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
-/*++
-
-  Routine Description:
-    This function processes the results of changes in configuration.
-
-  Arguments:
-    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Action        - Specifies the type of action taken by the browser.
-    QuestionId    - A unique value which is sent to the original exporting driver
-                    so that it can identify the type of data to expect.
-    Type          - The type of value for the question.
-    Value         - A pointer to the data being sent to the original exporting driver.
-    ActionRequest - On return, points to the action requested by the callback function.
-
-  Returns:
-    EFI_SUCCESS          - The callback successfully handled the action.
-    EFI_OUT_OF_RESOURCES - Not enough storage is available to hold the variable and its data.
-    EFI_DEVICE_ERROR     - The variable could not be saved.
-    EFI_UNSUPPORTED      - The specified Action is not supported by the callback.
-
---*/
 {
   ISCSI_FORM_CALLBACK_INFO  *Private;
   UINTN                     BufferSize;
@@ -722,32 +697,27 @@ IScsiFormCallback (
   return Status;
 }
 
+/**
+  Updates the iSCSI configuration form to add/delete an entry for the iSCSI
+  device specified by the Controller.
 
+  @param  DriverBindingHandle[in] The driverbinding handle.
+
+  @param  Controller[in]          The controller handle of the iSCSI device.
+
+  @param  AddForm[in]             Whether to add or delete a form entry.
+
+  @retval EFI_SUCCESS             The iSCSI configuration form is updated.
+
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+
+**/
 EFI_STATUS
 IScsiConfigUpdateForm (
   IN EFI_HANDLE  DriverBindingHandle,
   IN EFI_HANDLE  Controller,
   IN BOOLEAN     AddForm
   )
-/*++
-
-Routine Description:
-
-  Updates the iSCSI configuration form to add/delete an entry for the iSCSI
-  device specified by the Controller.
-
-Arguments:
-
-  DriverBindingHandle - The driverbinding handle.
-  Controller          - The controller handle of the iSCSI device.
-  AddForm             - Whether to add or delete a form entry.
-
-Returns:
-
-  EFI_SUCCESS          - The iSCSI configuration form is updated.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-
---*/
 {
   LIST_ENTRY                  *Entry;
   ISCSI_CONFIG_FORM_ENTRY     *ConfigFormEntry;
@@ -887,26 +857,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Initialize the iSCSI configuration form.
+
+  @param  DriverBindingHandle[in] The iSCSI driverbinding handle.
+
+  @retval EFI_SUCCESS             The iSCSI configuration form is initialized.
+
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+
+**/
 EFI_STATUS
 IScsiConfigFormInit (
   IN EFI_HANDLE  DriverBindingHandle
   )
-/*++
-
-Routine Description:
-
-  Initialize the iSCSI configuration form.
-
-Arguments:
-
-  DriverBindingHandle - The iSCSI driverbinding handle.
-
-Returns:
-
-  EFI_SUCCESS          - The iSCSI configuration form is initialized.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-
---*/
 {
   EFI_STATUS                  Status;
   EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
@@ -980,28 +944,22 @@ Returns:
   return Status;
 }
 
-EFI_STATUS
-IScsiConfigFormUnload (
-  IN EFI_HANDLE  DriverBindingHandle
-  )
-/*++
-
-Routine Description:
-
+/**
   Unload the iSCSI configuration form, this includes: delete all the iSCSI
   device configuration entries, uninstall the form callback protocol and
   free the resources used.
 
-Arguments:
+  @param  DriverBindingHandle[in] The iSCSI driverbinding handle.
 
-  DriverBindingHandle - The iSCSI driverbinding handle.
+  @retval EFI_SUCCESS             The iSCSI configuration form is unloaded.
 
-Returns:
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
 
-  EFI_SUCCESS          - The iSCSI configuration form is unloaded.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-
---*/
+**/
+EFI_STATUS
+IScsiConfigFormUnload (
+  IN EFI_HANDLE  DriverBindingHandle
+  )
 {
   ISCSI_CONFIG_FORM_ENTRY     *ConfigFormEntry;
 

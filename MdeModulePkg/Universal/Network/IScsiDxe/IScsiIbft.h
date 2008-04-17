@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Some extra definitions for iBFT
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -17,7 +18,7 @@ Abstract:
 
   Some extra definitions for iBFT.
 
---*/
+**/
 
 #ifndef _ISCSI_IBFT_H_
 #define _ISCSI_IBFT_H_
@@ -32,6 +33,15 @@ Abstract:
 
 #define IBFT_ROUNDUP(size)  NET_ROUNDUP ((size), EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_ALIGNMENT)
 
+/**
+  Publish and remove the iSCSI Boot Firmware Table according to the iSCSI
+  session status.
+
+  @param  None.
+
+  @retval None.
+
+**/
 VOID
 IScsiPublishIbft (
   IN VOID

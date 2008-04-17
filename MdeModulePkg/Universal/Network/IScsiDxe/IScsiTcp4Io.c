@@ -1,4 +1,5 @@
-/*++
+/** @file
+  The wrap of TCP/IP Socket interface
 
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -14,37 +15,48 @@ Module Name:
   IScsiTcp4Io.c
 
 Abstract:
+  The wrap of TCP/IP Socket interface
 
---*/
+**/
 
 #include "IScsiImpl.h"
 
+/**
+  The common notify function associated with various Tcp4Io events. 
+
+  @param  Event[in]   The event signaled.
+
+  @param  Contect[in] The context.
+
+  @retval None.
+
+**/
 VOID
 EFIAPI
 Tcp4IoCommonNotify (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
-/*++
-
-Routine Description:
-
-  The common notify function associated with various Tcp4Io events. 
-
-Arguments:
-
-  Event   - The event signaled.
-  Contect - The context.
-
-Returns:
-
-  None.
-
---*/
 {
   *((BOOLEAN *) Context) = TRUE;
 }
 
+/**
+  Create a TCP socket with the specified configuration data. 
+
+  @param  Image[in]      The handle of the driver image.
+
+  @param  Controller[in] The handle of the controller.
+
+  @param  ConfigData[in] The Tcp4 configuration data.
+
+  @param  Tcp4Io[in]     The Tcp4Io.
+  
+  @retval EFI_SUCCESS    The TCP socket is created and configured.
+
+  @retval Other          Failed to create the TCP socket or configure it.
+
+**/
 EFI_STATUS
 Tcp4IoCreateSocket (
   IN EFI_HANDLE           Image,
@@ -52,25 +64,6 @@ Tcp4IoCreateSocket (
   IN TCP4_IO_CONFIG_DATA  *ConfigData,
   IN TCP4_IO              *Tcp4Io
   )
-/*++
-
-Routine Description:
-
-  Create a TCP socket with the specified configuration data. 
-
-Arguments:
-
-  Image      - The handle of the driver image.
-  Controller - The handle of the controller.
-  ConfigData - The Tcp4 configuration data.
-  Tcp4Io     - The Tcp4Io.
-
-Returns:
-
-  EFI_SUCCESS - The TCP socket is created and configured.
-  other       - Failed to create the TCP socket or configure it.
-
---*/
 {
   EFI_STATUS            Status;
   EFI_TCP4_PROTOCOL     *Tcp4;
@@ -252,25 +245,18 @@ ON_ERROR:
   return Status;
 }
 
+/**
+  Destroy the socket. 
+
+  @param[in]  Tcp4Io The Tcp4Io which wraps the socket to be destroyeds.
+
+  @retval     None.
+
+**/
 VOID
 Tcp4IoDestroySocket (
   IN TCP4_IO  *Tcp4Io
   )
-/*++
-
-Routine Description:
-
-  Destroy the socket. 
-
-Arguments:
-
-  Tcp4Io - The Tcp4Io which wraps the socket to be destroyeds.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_TCP4_PROTOCOL *Tcp4;
 
@@ -297,27 +283,21 @@ Returns:
     );
 }
 
+/**
+  Connect to the other endpoint of the TCP socket.
+
+  @param  Tcp4Io[in]  The Tcp4Io wrapping the TCP socket.
+
+  @param  Timeout[in] The time to wait for connection done.
+
+  @retval None.
+
+**/
 EFI_STATUS
 Tcp4IoConnect (
   IN TCP4_IO    *Tcp4Io,
   IN EFI_EVENT  Timeout
   )
-/*++
-
-Routine Description:
-
-  Connect to the other endpoint of the TCP socket.
-
-Arguments:
-
-  Tcp4Io  - The Tcp4Io wrapping the TCP socket.
-  Timeout - The time to wait for connection done.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_TCP4_PROTOCOL *Tcp4;
   EFI_STATUS        Status;
@@ -342,25 +322,18 @@ Returns:
   return Status;
 }
 
+/**
+  Reset the socket.
+
+  @param  Tcp4Io[in] The Tcp4Io wrapping the TCP socket.
+
+  @retval None.
+
+**/
 VOID
 Tcp4IoReset (
   IN TCP4_IO  *Tcp4Io
   )
-/*++
-
-Routine Description:
-
-  Reset the socket.
-
-Arguments:
-
-  Tcp4Io - The Tcp4Io wrapping the TCP socket.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_STATUS        Status;
   EFI_TCP4_PROTOCOL *Tcp4;
@@ -379,28 +352,23 @@ Returns:
   }
 }
 
+/**
+  Transmit the Packet to the other endpoint of the socket.
+
+  @param  Tcp4Io[in]           The Tcp4Io wrapping the TCP socket.
+
+  @param  Packet[in]           The packet to transmit
+
+  @retval EFI_SUCCESS          The packet is trasmitted.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+**/
 EFI_STATUS
 Tcp4IoTransmit (
   IN TCP4_IO  *Tcp4Io,
   IN NET_BUF  *Packet
   )
-/*++
-
-Routine Description:
-
-  Transmit the Packet to the other endpoint of the socket.
-
-Arguments:
-
-  Tcp4Io - The Tcp4Io wrapping the TCP socket.
-  Packet - The packet to transmit
-
-Returns:
-
-  EFI_SUCCESS          - The packet is trasmitted.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-
---*/
 {
   EFI_TCP4_TRANSMIT_DATA  *TxData;
   EFI_TCP4_PROTOCOL       *Tcp4;
@@ -447,6 +415,26 @@ ON_EXIT:
   return Status;
 }
 
+/**
+  Receive data from the socket.
+
+  @param  Tcp4Io[in]           The Tcp4Io which wraps the socket to be destroyeds.
+
+  @param  Packet[in]           The buffer to hold the data copy from the soket rx buffer.
+
+  @param  AsyncMode[in]        Is this receive asyncronous or not.
+
+  @param  Timeout[in]          The time to wait for receiving the amount of data the Packet
+                               can hold.
+
+  @retval EFI_SUCCESS          The required amount of data is received from the socket.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate momery.
+
+  @retval EFI_TIMEOUT          Failed to receive the required amount of data in the
+                               specified time period.
+
+**/
 EFI_STATUS
 Tcp4IoReceive (
   IN TCP4_IO    *Tcp4Io,
@@ -454,28 +442,6 @@ Tcp4IoReceive (
   IN BOOLEAN    AsyncMode,
   IN EFI_EVENT  Timeout
   )
-/*++
-
-Routine Description:
-
-  Receive data from the socket.
-
-Arguments:
-
-  Tcp4Io    - The Tcp4Io which wraps the socket to be destroyeds.
-  Packet    - The buffer to hold the data copy from the soket rx buffer.
-  AsyncMode - Is this receive asyncronous or not.
-  Timeout   - The time to wait for receiving the amount of data the Packet
-              can hold.
-
-Returns:
-
-  EFI_SUCCESS          - The required amount of data is received from the socket.
-  EFI_OUT_OF_RESOURCES - Failed to allocate momery.
-  EFI_TIMEOUT          - Failed to receive the required amount of data in the
-                         specified time period.
-
---*/
 {
   EFI_TCP4_PROTOCOL     *Tcp4;
   EFI_TCP4_RECEIVE_DATA RxData;

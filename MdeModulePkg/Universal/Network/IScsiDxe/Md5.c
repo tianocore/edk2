@@ -1,6 +1,7 @@
-/*++
+/** @file
+  Implementation of MD5 algorithm
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +18,7 @@ Abstract:
 
   Implementation of MD5 algorithm
 
---*/
+**/
 
 #include "Md5.h"
 
@@ -122,26 +123,19 @@ STATIC CONST MD5_TRANSFORM_FUNC MD5_F[] = {
   TF4
 };
 
+/**
+  Perform the MD5 transform on 64 bytes data segment
+
+  @param  Md5Ctx[in]  it includes the data segment for Md5 transform
+
+  @retval NONE.
+
+**/
 STATIC
 VOID
 MD5Transform (
   IN MD5_CTX  *Md5Ctx
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Md5Ctx  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   UINT32  i;
   UINT32  j;
@@ -177,6 +171,23 @@ Returns:
   }
 }
 
+/**
+  Copy data segment into the M field of MD5_CTX structure for later transform.
+  If the length of data segment is larger than 64 bytes, then does the transform
+  immediately and the generated Md5 code is stored in the States field of MD5_CTX
+  data struct for later accumulation. 
+  All of Md5 code generated for the sequential 64-bytes data segaments are be
+  accumulated in MD5Final() function.
+
+  @param  Md5Ctx[in]  the data structure of storing the original data
+                      segment and the final result.
+
+  @param  Data[in]    the data wanted to be transformed
+
+  @param  DataLen[in] the length of data
+
+  @retval NONE.
+**/
 STATIC
 VOID
 MD5UpdateBlock (
@@ -184,23 +195,6 @@ MD5UpdateBlock (
   IN CONST UINT8  *Data,
   IN       UINTN  DataLen
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Md5Ctx  - GC_TODO: add argument description
-  Data    - GC_TODO: add argument description
-  DataLen - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   UINTN Limit;
 
@@ -217,25 +211,18 @@ Returns:
   Md5Ctx->Count += DataLen;
 }
 
+/**
+  Initialize four 32-bits chaining variables and use them to do the Md5 transform.
+
+  @param  Md5Ctx[in]  the data structure of Md5
+
+  @retval EFI_SUCCESS initialization is ok
+
+**/
 EFI_STATUS
 MD5Init (
   IN MD5_CTX  *Md5Ctx
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Md5Ctx  - GC_TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   ZeroMem (Md5Ctx, sizeof (*Md5Ctx));
 
@@ -250,29 +237,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  the external interface of Md5 algorithm
+
+  @param  Md5Ctx[in]  the data structure of storing the original data
+                      segment and the final result.
+
+  @param  Data[in]    the data wanted to be transformed.
+
+  @param  DataLen[in] the length of data.
+
+  @retval EFI_SUCCESS the transform is ok.
+
+**/
 EFI_STATUS
 MD5Update (
   IN  MD5_CTX  *Md5Ctx,
   IN  VOID     *Data,
   IN  UINTN    DataLen
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Md5Ctx  - GC_TODO: add argument description
-  Data    - GC_TODO: add argument description
-  DataLen - GC_TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   if (EFI_ERROR (Md5Ctx->Status)) {
     return Md5Ctx->Status;
@@ -283,27 +266,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  accumulate the MD5 value of every data segment and generate the finial
+  result according to MD5 algorithm
+
+  @param  Md5Ctx[in]   the data structure of storing the original data
+                       segment and the final result.
+
+  @param  HashVal[out] the final 128-bits output.
+
+  @retval EFI_SUCCESS  the transform is ok.
+
+**/
 EFI_STATUS
 MD5Final (
   IN  MD5_CTX  *Md5Ctx,
   OUT UINT8    *HashVal
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Md5Ctx  - GC_TODO: add argument description
-  HashVal - GC_TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   UINTN PadLength;
 
