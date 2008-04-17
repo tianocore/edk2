@@ -1,4 +1,5 @@
-/*++
+/**
+  ISci DHCP related configuration routines.
 
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -15,12 +16,30 @@ Module Name:
 
 Abstract:
 
-  iSCSI DHCP related configuration routines.
+  IScsi DHCP related configuration routines.
 
---*/
+**/
 
 #include "IScsiImpl.h"
 
+/**
+  Extract the Root Path option and get the required target information.
+
+  @param  RootPath[in]          The RootPath.
+
+  @param  Length[in]            Length of the RootPath option payload.
+
+  @param  ConfigNvData[in]      The iSCSI session configuration data read from nonvolatile device.
+
+  @retval EFI_SUCCESS           All required information is extracted from the RootPath option.
+
+  @retval EFI_NOT_FOUND         The RootPath is not an iSCSI RootPath.
+
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
+
+  @retval EFI_INVALID_PARAMETER The RootPath is mal-formatted.
+
+**/
 STATIC
 EFI_STATUS
 IScsiDhcpExtractRootPath (
@@ -28,26 +47,6 @@ IScsiDhcpExtractRootPath (
   IN UINT8                        Length,
   IN ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData
   )
-/*++
-
-Routine Description:
-
-  Extract the Root Path option and get the required target information.
-  
-Arguments:
-
-  RootPath     - The RootPath.
-  Length       - Length of the RootPath option payload.
-  ConfigNvData - The iSCSI session configuration data read from nonvolatile device.
-
-Returns:
-
-  EFI_SUCCESS           - All required information is extracted from the RootPath option.
-  EFI_NOT_FOUND         - The RootPath is not an iSCSI RootPath.
-  EFI_OUT_OF_RESOURCES  - Failed to allocate memory.
-  EFI_INVALID_PARAMETER - The RootPath is mal-formatted.
-
---*/
 {
   EFI_STATUS            Status;
   UINT8                 IScsiRootPathIdLen;
@@ -183,6 +182,28 @@ ON_EXIT:
   return Status;
 }
 
+/**
+  The callback function registerd to the DHCP4 instance which is used to select
+  the qualified DHCP OFFER.
+  
+  @param  This[in]         The DHCP4 protocol.
+
+  @param  Context[in]      The context set when configuring the DHCP4 protocol.
+
+  @param  CurrentState[in] The current state of the DHCP4 protocol.
+
+  @param  Dhcp4Event[in]   The event occurs in the current state.
+
+  @param  Packet[in]       The DHCP packet that is to be sent or already received. 
+
+  @param  NewPackt[out]    The packet used to replace the above Packet.
+
+  @retval EFI_NOT_READY    The DHCP OFFER packet doesn't match our requirements.
+
+  @retval EFI_SUCCESS      Either the DHCP OFFER is qualified or we're not intereseted
+                           in the Dhcp4Event.
+
+**/
 STATIC
 EFI_STATUS
 IScsiDhcpSelectOffer (
@@ -193,29 +214,6 @@ IScsiDhcpSelectOffer (
   IN  EFI_DHCP4_PACKET    * Packet, OPTIONAL
   OUT EFI_DHCP4_PACKET    **NewPacket OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  The callback function registerd to the DHCP4 instance which is used to select
-  the qualified DHCP OFFER.
-  
-Arguments:
-
-  This         - The DHCP4 protocol.
-  Context      - The context set when configuring the DHCP4 protocol.
-  CurrentState - The current state of the DHCP4 protocol.
-  Dhcp4Event   - The event occurs in the current state.
-  Packet       - The DHCP packet that is to be sent or already received.
-  NewPackt     - The packet used to replace the above Packet.
-
-Returns:
-
-  EFI_NOT_READY - The DHCP OFFER packet doesn't match our requirements.
-  EFI_SUCCESS   - Either the DHCP OFFER is qualified or we're not intereseted
-                  in the Dhcp4Event.
-
---*/
 {
   EFI_STATUS              Status;
   UINT32                  OptionCount;
@@ -267,30 +265,27 @@ Returns:
   return Status;
 }
 
+/**
+  Parse the DHCP ACK to get the address configuration and DNS information.
+
+  @param  Dhcp4[in]             The DHCP4 protocol.
+
+  @param  ConfigData[in]        The session configuration data.
+
+  @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
+
+  @retval EFI_NO_MAPPING        DHCP failed to acquire address and other information.
+
+  @retval EFI_INVALID_PARAMETER The DHCP ACK's DNS option is mal-formatted.
+
+  @retval EFI_DEVICE_ERROR      Some unexpected error happened.
+
+**/
 EFI_STATUS
 IScsiParseDhcpAck (
   IN EFI_DHCP4_PROTOCOL         *Dhcp4,
   IN ISCSI_SESSION_CONFIG_DATA  *ConfigData
   )
-/*++
-
-Routine Description:
-
-  Parse the DHCP ACK to get the address configuration and DNS information.
-  
-Arguments:
-
-  Dhcp4      - The DHCP4 protocol.
-  ConfigData - The session configuration data.
-
-Returns:
-
-  EFI_SUCCESS           - The DNS information is got from the DHCP ACK.
-  EFI_NO_MAPPING        - DHCP failed to acquire address and other information.
-  EFI_INVALID_PARAMETER - The DHCP ACK's DNS option is mal-formatted.
-  EFI_DEVICE_ERROR      - Some unexpected error happened.
-
---*/
 {
   EFI_STATUS              Status;
   EFI_DHCP4_MODE_DATA     Dhcp4ModeData;
@@ -366,32 +361,30 @@ Returns:
   return Status;
 }
 
+/**
+  Parse the DHCP ACK to get the address configuration and DNS information.
+  
+  @param  Image[in]             The handle of the driver image.
+
+  @param  Controller[in]        The handle of the controller;
+
+  @param  ConfigData[in]        The session configuration data.
+
+  @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
+
+  @retval EFI_NO_MAPPING        DHCP failed to acquire address and other information.
+
+  @retval EFI_INVALID_PARAMETER The DHCP ACK's DNS option is mal-formatted.
+
+  @retval EFI_DEVICE_ERROR      Some unexpected error happened.
+
+**/
 EFI_STATUS
 IScsiDoDhcp (
   IN EFI_HANDLE                 Image,
   IN EFI_HANDLE                 Controller,
   IN ISCSI_SESSION_CONFIG_DATA  *ConfigData
   )
-/*++
-
-Routine Description:
-
-  Parse the DHCP ACK to get the address configuration and DNS information.
-  
-Arguments:
-
-  Image      - The handle of the driver image.
-  Controller - The handle of the controller;
-  ConfigData - The session configuration data.
-
-Returns:
-
-  EFI_SUCCESS           - The DNS information is got from the DHCP ACK.
-  EFI_NO_MAPPING        - DHCP failed to acquire address and other information.
-  EFI_INVALID_PARAMETER - The DHCP ACK's DNS option is mal-formatted.
-  EFI_DEVICE_ERROR      - Some unexpected error happened.
-
---*/
 {
   EFI_HANDLE              Dhcp4Handle;
   EFI_DHCP4_PROTOCOL      *Dhcp4;

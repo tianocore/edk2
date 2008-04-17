@@ -1,4 +1,5 @@
-/*++
+/** @file
+  The header file of CHAP configuration
 
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -14,8 +15,8 @@ Module Name:
   IScsiCHAP.h
 
 Abstract:
-
---*/
+  the header file for CHAP
+**/
 
 #ifndef _ISCSI_CHAP_H_
 #define _ISCSI_CHAP_H_
@@ -80,12 +81,43 @@ typedef struct _ISCSI_CHAP_AUTH_DATA {
   UINT32                        OutChallengeLength;
 } ISCSI_CHAP_AUTH_DATA;
 
+/**
+  This function checks the received iSCSI Login Response during the security
+  negotiation stage.
+  
+  @param  Conn[in]             The iSCSI connection.
+
+  @param  Transit[in]          The transit flag of the latest iSCSI Login Response.
+
+  @retval EFI_SUCCESS          The Login Response passed the CHAP validation.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+  @retval EFI_PROTOCOL_ERROR   Some kind of protocol error happend.
+
+**/
 EFI_STATUS
 IScsiCHAPOnRspReceived (
   IN ISCSI_CONNECTION  *Conn,
   IN BOOLEAN           Transit
   );
 
+/**
+  This function fills the CHAP authentication information into the login PDU
+  during the security negotiation stage in the iSCSI connection login.
+
+  @param  Conn[in]             The iSCSI connection.
+
+  @param  Pdu[in]              The PDU to send out.
+
+  @retval EFI_SUCCESS          All check passed and the phase-related CHAP
+                               authentication info is filled into the iSCSI PDU.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+  @retval EFI_PROTOCOL_ERROR   Some kind of protocol error happend.
+
+**/
 EFI_STATUS
 IScsiCHAPToSendReq (
   IN ISCSI_CONNECTION  *Conn,

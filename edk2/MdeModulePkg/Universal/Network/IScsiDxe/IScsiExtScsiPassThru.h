@@ -1,4 +1,5 @@
-/*++
+/** @file
+  The header file of IScsiExtScsiPassThru.c
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -14,8 +15,9 @@ Module Name:
   IScsiExtScsiPassThru.h
 
 Abstract:
+  The header file of IScsiExtScsiPassThru.c
 
---*/
+**/
 
 #ifndef _ISCSI_EXT_SCSI_PASS_THRU_H_
 #define _ISCSI_EXT_SCSI_PASS_THRU_H_

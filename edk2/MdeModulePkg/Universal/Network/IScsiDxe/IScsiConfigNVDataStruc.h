@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Define NVData structures used by the iSCSI configuration component
 
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -17,7 +18,7 @@ Abstract:
  
   NVData structure used by the iSCSI configuration component.
 
---*/
+**/
 
 #ifndef _ISCSI_NVDATASTRUC_H_
 #define _ISCSI_NVDATASTRUC_H_

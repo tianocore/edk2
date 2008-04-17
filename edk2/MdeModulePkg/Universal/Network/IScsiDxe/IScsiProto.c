@@ -1,6 +1,7 @@
-/*++
+/** @file
+  The implementation of IScsi protocol based on RFC3720
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,86 +15,68 @@ Module Name:
   IScsiProto.c
 
 Abstract:
+  The implementation of IScsi protocol based on RFC3720
 
---*/
+**/
 
 #include "IScsiImpl.h"
 
 static UINT32 mDataSegPad = 0;
 
+/**
+  Attach the iSCSI connection to the iSCSI session. 
+
+  @param  Session[in] The iSCSI session.
+
+  @param  Conn[in]    The iSCSI connection.
+
+  @retval None.
+
+**/
 VOID
 IScsiAttatchConnection (
   IN ISCSI_SESSION     *Session,
   IN ISCSI_CONNECTION  *Conn
   )
-/*++
-
-Routine Description:
-
-  Attach the iSCSI connection to the iSCSI session. 
-
-Arguments:
-
-  Session - The iSCSI session.
-  Conn    - The iSCSI connection.
-
-Returns:
-
-  None.
-
---*/
 {
   InsertTailList (&Session->Conns, &Conn->Link);
   Conn->Session = Session;
   Session->NumConns++;
 }
 
+/**
+  Detach the iSCSI connection from the session it belongs to. 
+
+  @param  Conn[in] The iSCSI connection.
+
+  @retval None.
+
+**/
 VOID
 IScsiDetatchConnection (
   IN ISCSI_CONNECTION  *Conn
   )
-/*++
-
-Routine Description:
-
-  Detach the iSCSI connection from the session it belongs to. 
-
-Arguments:
-
-  Conn - The iSCSI connection.
-
-Returns:
-
-  None.
-
---*/
 {
   RemoveEntryList (&Conn->Link);
   Conn->Session->NumConns--;
   Conn->Session = NULL;
 }
 
+/**
+  Check the sequence number according to RFC3720. 
+
+  @param  ExpSN[in]   The currently expected sequence number.
+
+  @param  NewSN[in]   The sequence number to check.
+
+  @retval EFI_SUCCESS The check passed and the ExpSN is increased.
+
+**/
 EFI_STATUS
 IScsiCheckSN (
   IN UINT32  *ExpSN,
   IN UINT32  NewSN
   )
-/*++
-
-Routine Description:
-
-  Check the sequence number according to RFC3720. 
-
-Arguments:
-
-  ExpSN - The currently expected sequence number.
-  NewSN - The sequence number to check.
-
-Returns:
-
-  EFI_SUCCESS - The check passed and the ExpSN is increased.
-
---*/
 {
   if (!ISCSI_SEQ_EQ (NewSN, *ExpSN)) {
     if (ISCSI_SEQ_LT (NewSN, *ExpSN)) {
@@ -113,29 +96,24 @@ Returns:
   }
 }
 
+/**
+  Update the sequence numbers for the iSCSI command.
+
+  @param  Session[in]  The iSCSI session.
+
+  @param  MaxCmdSN[in] Maximum CmdSN from the target.
+
+  @param  ExpCmdSN[in] Next expected CmdSN from the target.
+
+  @retval None.
+
+**/
 VOID
 IScsiUpdateCmdSN (
   IN ISCSI_SESSION  *Session,
   IN UINT32         MaxCmdSN,
   IN UINT32         ExpCmdSN
   )
-/*++
-
-Routine Description:
-
-  Update the sequence numbers for the iSCSI command.
-
-Arguments:
-
-  Session  - The iSCSI session.
-  MaxCmdSN - Maximum CmdSN from the target.
-  ExpCmdSN - Next expected CmdSN from the target.
-
-Returns:
-
-  None.
-
---*/
 {
   if (ISCSI_SEQ_LT (MaxCmdSN, ExpCmdSN - 1)) {
     return ;
@@ -150,27 +128,22 @@ Returns:
   }
 }
 
+/**
+  This function does the iSCSI connection login.
+
+  @param  Conn[in]           The iSCSI connection to login.
+
+  @retval EFI_SUCCESS        The iSCSI connection is logged into the iSCSI target.
+
+  @retval EFI_TIMEOUT        Timeout happened during the login procedure.
+
+  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
+
+**/
 EFI_STATUS
 IScsiConnLogin (
   IN ISCSI_CONNECTION  *Conn
   )
-/*++
-
-Routine Description:
-
-  This function does the iSCSI connection login.
-
-Arguments:
-
-  Conn - The iSCSI connection to login.
-
-Returns:
-
-  EFI_SUCCESS        - The iSCSI connection is logged into the iSCSI target.
-  EFI_TIMEOUT        - Timeout happened during the login procedure.
-  EFI_PROTOCOL_ERROR - Some kind of iSCSI protocol error happened.
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -210,50 +183,37 @@ Returns:
   return Status;
 }
 
+/**
+  Reset the iSCSI connection.
+
+  @param  Conn[in] The iSCSI connection to reset.
+
+  @retval None.
+
+**/
 VOID
 IScsiConnReset (
   IN ISCSI_CONNECTION  *Conn
   )
-/*++
-
-Routine Description:
-
-  Reset the iSCSI connection.
-
-Arguments:
-
-  Conn - The iSCSI connection to reset.
-
-Returns:
-
-  None.
-
---*/
 {
   Tcp4IoReset (&Conn->Tcp4Io);
 }
 
+/**
+  Create a TCP connection for the iSCSI session.
+
+  @param  Private[in] The iSCSI driver data.
+
+  @param  Session[in] Maximum CmdSN from the target.
+
+  @retval The newly created iSCSI connection.
+
+**/
 ISCSI_CONNECTION *
 IScsiCreateConnection (
   IN ISCSI_DRIVER_DATA  *Private,
   IN ISCSI_SESSION      *Session
   )
-/*++
-
-Routine Description:
-
-  Create a TCP connection for the iSCSI session.
-
-Arguments:
-
-  Private - The iSCSI driver data.
-  Session - Maximum CmdSN from the target.
-
-Returns:
-
-  The newly created iSCSI connection.
-
---*/
 {
   ISCSI_CONNECTION    *Conn;
   TCP4_IO_CONFIG_DATA Tcp4IoConfig;
@@ -320,25 +280,18 @@ Returns:
   return Conn;
 }
 
+/**
+  Destroy an iSCSI connection.
+
+  @param  Conn[in] The connection to destroy.
+
+  @retval None.
+
+**/
 VOID
 IScsiDestroyConnection (
   IN ISCSI_CONNECTION  *Conn
   )
-/*++
-
-Routine Description:
-
-  Destroy an iSCSI connection.
-
-Arguments:
-
-  Conn - The connection to destroy.
-
-Returns:
-
-  None.
-
---*/
 {
   Tcp4IoDestroySocket (&Conn->Tcp4Io);
   NetbufQueFlush (&Conn->RspQue);
@@ -346,27 +299,22 @@ Returns:
   gBS->FreePool (Conn);
 }
 
+/**
+  Login the iSCSI session.
+
+  @param  Private[in]          The iSCSI driver data.
+
+  @retval EFI_SUCCESS          The iSCSI session login procedure finished.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+  @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
+
+**/
 EFI_STATUS
 IScsiSessionLogin (
   IN ISCSI_DRIVER_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  Login the iSCSI session.
-
-Arguments:
-
-  Private - The iSCSI driver data.
-
-Returns:
-
-  EFI_SUCCESS          - The iSCSI session login procedure finished.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-  EFI_PROTOCOL_ERROR   - Some kind of iSCSI protocol error happened.
-
---*/
 {
   EFI_STATUS        Status;
   ISCSI_SESSION     *Session;
@@ -409,29 +357,24 @@ Returns:
   return Status;
 }
 
+/**
+  Build and send the iSCSI login request to the iSCSI target according to
+  the current login stage.
+
+  @param  Conn[in]             The connection in the iSCSI login phase.
+
+  @retval EFI_SUCCESS          The iSCSI login request PDU is built and sent on this
+                               connection.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+  @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
+
+**/
 EFI_STATUS
 IScsiSendLoginReq (
   IN ISCSI_CONNECTION  *Conn
   )
-/*++
-
-Routine Description:
-
-  Build and send the iSCSI login request to the iSCSI target according to
-  the current login stage.
-
-Arguments:
-
-  Conn - The connection in the iSCSI login phase.
-
-Returns:
-
-  EFI_SUCCESS          - The iSCSI login request PDU is built and sent on this
-                         connection.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-  EFI_PROTOCOL_ERROR   - Some kind of iSCSI protocol error happened.
-
---*/
 {
   NET_BUF     *Pdu;
   EFI_STATUS  Status;
@@ -453,27 +396,22 @@ Returns:
   return Status;
 }
 
+/**
+  Receive and process the iSCSI login response.
+
+  @param  Conn[in]             The connection in the iSCSI login phase.
+
+  @retval EFI_SUCCESS          The iSCSI login response PDU is received and processed.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+  @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
+
+**/
 EFI_STATUS
 IScsiReceiveLoginRsp (
   IN ISCSI_CONNECTION  *Conn
   )
-/*++
-
-Routine Description:
-
-  Receive and process the iSCSI login response.
-
-Arguments:
-
-  Conn - The connection in the iSCSI login phase.
-
-Returns:
-
-  EFI_SUCCESS          - The iSCSI login response PDU is received and processed.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-  EFI_PROTOCOL_ERROR   - Some kind of iSCSI protocol error happened.
-
---*/
 {
   EFI_STATUS  Status;
   NET_BUF     *Pdu;
@@ -495,34 +433,31 @@ Returns:
   return Status;
 }
 
+/**
+  Add an iSCSI key-value pair as a string into the data segment of the Login Request PDU.
+  The DataSegmentLength and the actual size of the net buffer containing this PDU will be
+  updated.
+
+  @param  Pdu[in]              The iSCSI PDU whose data segment the key-value pair will
+                               be added to.
+
+  @param  Key[in]              The key name string.
+
+  @param  Value[in]            The value string.
+
+  @retval EFI_SUCCESS          The key-valu pair is added to the PDU's datasegment and
+                               the correspondence length fields are updated.
+
+  @retval EFI_OUT_OF_RESOURCES There is not enough space in the PDU to add the key-value
+                               pair.
+
+**/
 EFI_STATUS
 IScsiAddKeyValuePair (
   IN NET_BUF          *Pdu,
   IN CHAR8            *Key,
   IN CHAR8            *Value
   )
-/*++
-
-Routine Description:
-
-  Add an iSCSI key-value pair as a string into the data segment of the Login Request PDU.
-  The DataSegmentLength and the actual size of the net buffer containing this PDU will be
-  updated.
-
-Arguments:
-
-  Pdu   - The iSCSI PDU whose data segment the key-value pair will be added to.
-  Key   - The key name string.
-  Value - The value string.
-
-Returns:
-
-  EFI_SUCCESS          - The key-valu pair is added to the PDU's datasegment and
-                         the correspondence length fields are updated.
-  EFI_OUT_OF_RESOURCES - There is not enough space in the PDU to add the key-value
-                         pair.
-
---*/
 {
   UINT32              DataSegLen;
   UINT32              KeyLen;
@@ -575,25 +510,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Prepare the iSCSI login request to be sent according to the current login status.
+
+  @param  Conn[in] The connection in the iSCSI login phase.
+
+  @retval The pointer to the net buffer containing the iSCSI login request built.
+
+**/
 NET_BUF *
 IScsiPrepareLoginReq (
   IN ISCSI_CONNECTION  *Conn
   )
-/*++
-
-Routine Description:
-
-  Prepare the iSCSI login request to be sent according to the current login status.
-
-Arguments:
-
-  Conn - The connection in the iSCSI login phase.
-
-Returns:
-
-  The pointer to the net buffer containing the iSCSI login request built.
-
---*/
 {
   ISCSI_SESSION       *Session;
   NET_BUF             *Nbuf;
@@ -674,28 +602,23 @@ Returns:
   return Nbuf;
 }
 
+/**
+  Process the iSCSI Login Response.
+
+  @param  Conn[in] The connection on which the iSCSI login response is received.
+
+  @param  Pdu[in]  The iSCSI login response PDU.
+
+  @retval EFI_SUCCESS        The iSCSI login response PDU is processed and all check are passed.
+
+  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
+
+**/
 EFI_STATUS
 IScsiProcessLoginRsp (
   IN ISCSI_CONNECTION  *Conn,
   IN NET_BUF           *Pdu
   )
-/*++
-
-Routine Description:
-
-  Process the iSCSI Login Response.
-
-Arguments:
-
-  Conn - The connection on which the iSCSI login response is received.
-  Pdu  - The iSCSI login response PDU.
-
-Returns:
-
-  EFI_SUCCESS        - The iSCSI login response PDU is processed and all check are passed.
-  EFI_PROTOCOL_ERROR - Some kind of iSCSI protocol error happened.
-
---*/
 {
   EFI_STATUS            Status;
   ISCSI_SESSION         *Session;
@@ -886,32 +809,30 @@ Returns:
   return Status;
 }
 
+/**
+  Updated the target information according the data received in the iSCSI
+  login response with an target redirection status.
+
+  @param  Session[in]          The iSCSI session.
+
+  @param  Data[in]             The data segment which should contain the
+                               TargetAddress key-value list.
+
+  @param  Len[in]              Length of the data.
+
+  @retval EFI_SUCCESS          The target address is updated.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+  @retval EFI_NOT_FOUND        The TargetAddress key is not found.
+
+**/
 EFI_STATUS
 IScsiUpdateTargetAddress (
   IN ISCSI_SESSION  *Session,
   IN CHAR8          *Data,
   IN UINT32         Len
   )
-/*++
-
-Routine Description:
-
-  Updated the target information according the data received in the iSCSI
-  login response with an target redirection status.
-
-Arguments:
-
-  Session - The iSCSI session.
-  Data    - The data segment which should contain the TargetAddress key-value list.
-  Len     - Length of the data.
-
-Returns:
-
-  EFI_SUCCESS          - The target address is updated.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-  EFI_NOT_FOUND        - The TargetAddress key is not found.
-
---*/
 {
   LIST_ENTRY      *KeyValueList;
   CHAR8           *TargetAddress;
@@ -989,25 +910,18 @@ Returns:
   return Status;
 }
 
+/**
+  The callback function to free the net buffer list.
+
+  @param  Arg[in] The opaque parameter.
+
+  @retval None.
+
+**/
 VOID
 IScsiFreeNbufList (
   VOID *Arg
   )
-/*++
-
-Routine Description:
-
-  The callback function to free the net buffer list.
-
-Arguments:
-
-  Arg - The opaque parameter.
-
-Returns:
-
-  None.
-
---*/
 {
   ASSERT (Arg != NULL);
 
@@ -1015,28 +929,45 @@ Returns:
   gBS->FreePool (Arg);
 }
 
+/**
+  The callback function called in NetBufFree, it does nothing.
+
+  @param  Arg[in] The opaque parameter.
+
+  @retval None.
+
+**/
 VOID
 IScsiNbufExtFree (
   VOID *Arg
   )
-/*++
-
-Routine Description:
-
-  The callback function called in NetBufFree, it does nothing.
-
-Arguments:
-
-  Arg - The opaque parameter.
-
-Returns:
-
-  None.
-
---*/
 {
 }
 
+/**
+  Receive an iSCSI response PDU. An iSCSI response PDU contains an iSCSI PDU header and
+  an optional data segment. The two parts will be put into two blocks of buffers in the
+  net buffer. The digest check will be conducted in this function if needed and the digests
+  will be trimmed from the PDU buffer.
+
+  @param  Conn[in]         The iSCSI connection to receive data from.
+
+  @param  Pdu[out]         The received iSCSI pdu.
+
+  @param  Context[in]      The context used to describe information on the caller provided
+                           buffer to receive data segment of the iSCSI pdu, it's optional.
+
+  @param  HeaderDigest[in] Whether there will be header digest received.
+
+  @param  DataDigest[in]   Whether there will be data digest.
+
+  @param  TimeoutEvent[in] The timeout event, it's optional.
+
+  @retval EFI_SUCCESS      An iSCSI pdu is received.
+
+  @retval EFI_TIMEOUT      Timeout happenend.
+
+**/
 EFI_STATUS
 IScsiReceivePdu (
   IN ISCSI_CONNECTION                      *Conn,
@@ -1046,31 +977,6 @@ IScsiReceivePdu (
   IN BOOLEAN                               DataDigest,
   IN EFI_EVENT                             TimeoutEvent OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  Receive an iSCSI response PDU. An iSCSI response PDU contains an iSCSI PDU header and
-  an optional data segment. The two parts will be put into two blocks of buffers in the
-  net buffer. The digest check will be conducted in this function if needed and the digests
-  will be trimmed from the PDU buffer.
-
-Arguments:
-
-  Conn         - The iSCSI connection to receive data from.
-  Pdu          - The received iSCSI pdu.
-  Context      - The context used to describe information on the caller provided
-                 buffer to receive data segment of the iSCSI pdu, it's optional.
-  HeaderDigest - Whether there will be header digest received.
-  DataDigest   - Whether there will be data digest.
-  TimeoutEvent - The timeout event, it's optional.
-
-Returns:
-
-  EFI_SUCCESS - An iSCSI pdu is received.
-  EFI_TIMEOUT - Timeout happenend.
-
---*/
 {
   LIST_ENTRY      *NbufList;
   UINT32          Len;
@@ -1242,28 +1148,23 @@ ON_EXIT:
   return Status;
 }
 
+/**
+  Check and get the result of the prameter negotiation.
+
+  @param  Conn[in]           The connection in iSCSI login.
+
+  @param  Pdu[in]            The iSCSI response PDU containing the parameter list.
+
+  @retval EFI_SUCCESS        The parmeter check is passed and negotiation is finished.
+
+  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
+
+**/
 EFI_STATUS
 IScsiCheckOpParams (
   IN ISCSI_CONNECTION  *Conn,
   IN BOOLEAN           Transit
   )
-/*++
-
-Routine Description:
-
-  Check and get the result of the prameter negotiation.
-
-Arguments:
-
-  Conn - The connection in iSCSI login.
-  Pdu  - The iSCSI response PDU containing the parameter list.
-
-Returns:
-
-  EFI_SUCCESS        - The parmeter check is passed and negotiation is finished.
-  EFI_PROTOCOL_ERROR - Some kind of iSCSI protocol error happened.
-
---*/
 {
   EFI_STATUS      Status;
   LIST_ENTRY      *KeyValueList;
@@ -1504,28 +1405,23 @@ ON_ERROR:
   return Status;
 }
 
+/**
+  Fill the oprational prameters.
+
+  @param  Conn[in]             The connection in iSCSI login.
+
+  @param  Pdu[in]              The iSCSI login request PDU to fill the parameters.
+
+  @retval EFI_SUCCESS          The parmeters are filled into the iSCSI login request PDU.
+
+  @retval EFI_OUT_OF_RESOURCES There is not enough space in the PDU to hold the parameters.
+
+**/
 EFI_STATUS
 IScsiFillOpParams (
   IN ISCSI_CONNECTION  *Conn,
   IN NET_BUF           *Pdu
   )
-/*++
-
-Routine Description:
-
-  Fill the oprational prameters.
-
-Arguments:
-
-  Conn - The connection in iSCSI login.
-  Pdu  - The iSCSI login request PDU to fill the parameters.
-
-Returns:
-
-  EFI_SUCCESS          - The parmeters are filled into the iSCSI login request PDU.
-  EFI_OUT_OF_RESOURCES - There is not enough space in the PDU to hold the parameters.
-
---*/
 {
   ISCSI_SESSION *Session;
   CHAR8         Value[256];
@@ -1577,29 +1473,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Pad the iSCSI AHS or data segment to an integer number of 4 byte words.
+
+  @param  Pdu[in]              The iSCSI pdu which contains segments to pad.
+
+  @param  Len[in]              The length of the last semgnet in the PDU.
+
+  @retval EFI_SUCCESS          The segment is padded or no need to pad it.
+
+  @retval EFI_OUT_OF_RESOURCES There is not enough remaining free space to add the
+                               padding bytes.
+
+**/
 EFI_STATUS
 IScsiPadSegment (
   IN NET_BUF  *Pdu,
   IN UINT32   Len
   )
-/*++
-
-Routine Description:
-
-  Pad the iSCSI AHS or data segment to an integer number of 4 byte words.
-
-Arguments:
-
-  Pdu - The iSCSI pdu which contains segments to pad.
-  Len - The length of the last semgnet in the PDU.
-
-Returns:
-
-  EFI_SUCCESS          - The segment is padded or no need to pad it.
-  EFI_OUT_OF_RESOURCES - There is not enough remaining free space to add the
-                         padding bytes.
-
---*/
 {
   UINT32  PadLen;
   UINT8   *Data;
@@ -1618,27 +1509,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
-LIST_ENTRY     *
+/**
+  Build a key-value list from the data segment.
+
+  @param  Data[in] The data segment containing the key-value pairs.
+
+  @param  Len[in]  Length of the data segment.
+
+  @retval The key-value list.
+
+**/
+LIST_ENTRY *
 IScsiBuildKeyValueList (
   IN CHAR8  *Data,
   IN UINT32 Len
   )
-/*++
-
-Routine Description:
-
-  Build a key-value list from the data segment.
-
-Arguments:
-
-  Data - The data segment containing the key-value pairs.
-  Len  - Length of the data segment.
-
-Returns:
-
-  The key-value list.
-
---*/
 {
   LIST_ENTRY            *ListHead;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
@@ -1692,28 +1577,22 @@ ON_ERROR:
   return NULL;
 }
 
+/**
+  Get the value string by the key name from the key-value list. If found,
+  the key-value entry will be removed from the list.
+
+  @param  KeyValueList[in] The key-value list.
+
+  @param  Key[in]          The key name to find.
+
+  @retval The value string.
+
+**/
 CHAR8 *
 IScsiGetValueByKeyFromList (
   IN LIST_ENTRY      *KeyValueList,
   IN CHAR8           *Key
   )
-/*++
-
-Routine Description:
-
-  Get the value string by the key name from the key-value list. If found,
-  the key-value entry will be removed from the list.
-
-Arguments:
-
-  KeyValueList - The key-value list.
-  Key          - The key name to find.
-
-Returns:
-
-  The value string.
-
---*/
 {
   LIST_ENTRY            *Entry;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
@@ -1736,25 +1615,18 @@ Returns:
   return Value;
 }
 
+/**
+  Free the key-value list.
+
+  @param  KeyValueList[in] The key-value list.
+  
+  @retval None.
+
+**/
 VOID
 IScsiFreeKeyValueList (
   IN LIST_ENTRY      *KeyValueList
   )
-/*++
-
-Routine Description:
-
-  Free the key-value list.
-
-Arguments:
-
-  KeyValueList - The key-value list.
-
-Returns:
-
-  None.
-
---*/
 {
   LIST_ENTRY            *Entry;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
@@ -1769,28 +1641,23 @@ Returns:
   gBS->FreePool (KeyValueList);
 }
 
+/**
+  Normalize the iSCSI name according to RFC.
+
+  @param  Name[in]           The iSCSI name.
+
+  @param  Len[in]            length of the iSCSI name.
+
+  @retval EFI_SUCCESS        The iSCSI name is valid and normalized.
+
+  @retval EFI_PROTOCOL_ERROR The iSCSI name is mal-formatted or not in the IQN format.
+
+**/
 EFI_STATUS
 IScsiNormalizeName (
   IN CHAR8  *Name,
   IN UINTN  Len
   )
-/*++
-
-Routine Description:
-
-  Normalize the iSCSI name according to RFC.
-
-Arguments:
-
-  Name - The iSCSI name.
-  Len  - length of the iSCSI name.
-
-Returns:
-
-  EFI_SUCCESS        - The iSCSI name is valid and normalized.
-  EFI_PROTOCOL_ERROR - The iSCSI name is mal-formatted or not in the IQN format.
-
---*/
 {
   UINTN Index;
 
@@ -1826,28 +1693,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Create an iSCSI task control block.
+
+  @param  Conn[in]             The connection on which the task control block will be created.
+
+  @param  Tcb[out]             The newly created task control block.
+
+  @retval EFI_SUCCESS          The task control block is created.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+**/
 EFI_STATUS
 IScsiNewTcb (
   IN  ISCSI_CONNECTION  *Conn,
   OUT ISCSI_TCB         **Tcb
   )
-/*++
-
-Routine Description:
-
-  Create an iSCSI task control block.
-
-Arguments:
-
-  Conn - The connection on which the task control block will be created.
-  Tcb  - The newly created task control block.
-
-Returns:
-
-  EFI_SUCCESS          - The task control block is created.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-
---*/
 {
   ISCSI_SESSION *Session;
   ISCSI_TCB     *NewTcb;
@@ -1885,52 +1747,39 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Delete the tcb from the connection and destroy it.
+
+  @param  Tcb The tcb to delete.
+
+  @retval None.
+
+**/
 VOID
 IScsiDelTcb (
   IN ISCSI_TCB  *Tcb
   )
-/*++
-
-Routine Description:
-
-  Delete the tcb from the connection and destroy it.
-
-Arguments:
-
-  Tcb - The tcb to delete.
-
-Returns:
-
-  None.
-
---*/
 {
   RemoveEntryList (&Tcb->Link);
 
   gBS->FreePool (Tcb);
 }
 
+/**
+  Find the task control block by the initator task tag.
+
+  @param  TcbList[in]          The tcb list.
+
+  @param  InitiatorTaskTag[in] The initiator task tag.
+
+  @retval The task control block found.
+
+**/
 ISCSI_TCB *
 IScsiFindTcbByITT (
   IN LIST_ENTRY      *TcbList,
   IN UINT32          InitiatorTaskTag
   )
-/*++
-
-Routine Description:
-
-  Find the task control block by the initator task tag.
-
-Arguments:
-
-  TcbList          - The tcb list.
-  InitiatorTaskTag - The initiator task tag.
-
-Returns:
-
-  The task control block found.
-
---*/
 {
   ISCSI_TCB       *Tcb;
   LIST_ENTRY      *Entry;
@@ -1950,29 +1799,24 @@ Returns:
   return Tcb;
 }
 
+/**
+  Create a data segment, pad it and calculate the CRC if needed.
+
+  @param  Data[in]       The data to fill into the data segment.
+
+  @param  Len[in]        Length of the data.
+
+  @param  DataDigest[in] Whether to calculate CRC for this data segment.
+
+  @retval The net buffer wrapping the data segment.
+
+**/
 NET_BUF *
 IScsiNewDataSegment (
   IN UINT8    *Data,
   IN UINT32   Len,
   IN BOOLEAN  DataDigest
   )
-/*++
-
-Routine Description:
-
-  Create a data segment, pad it and calculate the CRC if needed.
-
-Arguments:
-
-  Data       - The data to fill into the data segment.
-  Len        - Length of the data.
-  DataDigest - Whether to calculate CRC for this data segment.
-
-Returns:
-
-  The net buffer wrapping the data segment.
-
---*/
 {
   NET_FRAGMENT  Fragment[2];
   UINT32        FragmentCount;
@@ -1997,30 +1841,25 @@ Returns:
   return DataSeg;
 }
 
+/**
+  Create a iSCSI SCSI command PDU to encapsulate the command issued
+  by SCSI through the EXT SCSI PASS THRU Protocol.
+
+  @param  Packet[in] The EXT SCSI PASS THRU request packet containing the SCSI command.
+
+  @param  Lun[in]    The LUN.
+
+  @param  Tcb[in]    The tcb assocated with this SCSI command.
+
+  @retval The created iSCSI SCSI command PDU.
+
+**/
 NET_BUF *
 IScsiNewScsiCmdPdu (
   IN EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
   IN UINT64                                     Lun,
   IN ISCSI_TCB                                  *Tcb
   )
-/*++
-
-Routine Description:
-
-  Create a iSCSI SCSI command PDU to encapsulate the command issued
-  by SCSI through the EXT SCSI PASS THRU Protocol.
-
-Arguments:
-
-  Packet - The EXT SCSI PASS THRU request packet containing the SCSI command.
-  Lun    - The LUN.
-  Tcb    - The tcb assocated with this SCSI command.
-
-Returns:
-
-  The created iSCSI SCSI command PDU.
-
---*/
 {
   LIST_ENTRY                      *NbufList;
   NET_BUF                         *Pdu;
@@ -2177,6 +2016,22 @@ ON_EXIT:
   return Pdu;
 }
 
+/**
+  Create a new iSCSI SCSI Data Out PDU.
+
+  @param  Data[in]   The data to put into the Data Out PDU.
+
+  @param  Len[in]    Length of the data.
+
+  @param  DataSN[in] The DataSN of the Data Out PDU.
+
+  @param  Tcb[in]    The task control block of this Data Out PDU.
+
+  @param  Lun[in]    The LUN.
+
+  @retval The net buffer wrapping the Data Out PDU.
+
+**/
 NET_BUF *
 IScsiNewDataOutPdu (
   IN UINT8      *Data,
@@ -2185,25 +2040,6 @@ IScsiNewDataOutPdu (
   IN ISCSI_TCB  *Tcb,
   IN UINT64     Lun
   )
-/*++
-
-Routine Description:
-
-  Create a new iSCSI SCSI Data Out PDU.
-
-Arguments:
-
-  Data   - The data to put into the Data Out PDU.
-  Len    - Length of the data.
-  DataSN - The DataSN of the Data Out PDU.
-  Tcb    - The task control block of this Data Out PDU.
-  Lun    - The LUN.
-
-Returns:
-
-  The net buffer wrapping the Data Out PDU.
-
---*/
 {
   LIST_ENTRY          *NbufList;
   NET_BUF             *PduHdr;
@@ -2273,29 +2109,24 @@ Returns:
   return Pdu;
 }
 
-LIST_ENTRY     *
+/**
+  Generate a consecutive sequence of iSCSI SCSI Data Out PDUs.
+
+  @param  Data[in] The data  which will be carried by the sequence of iSCSI SCSI Data Out PDUs.
+
+  @param  Tcb[in]  The task control block of the data to send out.
+
+  @param  Lun[in]  The LUN the data will be sent to.
+
+  @retval A list of net buffers with each of them wraps an iSCSI SCSI Data Out PDU.
+
+**/
+LIST_ENTRY *
 IScsiGenerateDataOutPduSequence (
   IN UINT8      *Data,
   IN ISCSI_TCB  *Tcb,
   IN UINT64     Lun
   )
-/*++
-
-Routine Description:
-
-  Generate a consecutive sequence of iSCSI SCSI Data Out PDUs.
-
-Arguments:
-
-  Data - The data  which will be carried by the sequence of iSCSI SCSI Data Out PDUs.
-  Tcb  - The task control block of the data to send out.
-  Lun  - The LUN the data will be sent to.
-
-Returns:
-
-  A list of net buffers with each of them wraps an iSCSI SCSI Data Out PDU.
-
---*/
 {
   LIST_ENTRY          *PduList;
   UINT32              DataSN;
@@ -2353,30 +2184,26 @@ ON_EXIT:
   return PduList;
 }
 
+/**
+  Send the Data in a sequence of Data Out PDUs one by one.
+
+  @param  Data[in]             The data to carry by Data Out PDUs.
+
+  @param  Lun[in]              The LUN the data will be sent to.
+
+  @param  Tcb[in]              The task control block.
+
+  @retval EFI_SUCCES           The data is sent out to the LUN.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+**/
 EFI_STATUS
 IScsiSendDataOutPduSequence (
   IN UINT8      *Data,
   IN UINT64     Lun,
   IN ISCSI_TCB  *Tcb
   )
-/*++
-
-Routine Description:
-
-  Send the Data in a sequence of Data Out PDUs one by one.
-
-Arguments:
-
-  Data - The data to carry by Data Out PDUs.
-  Lun  - The LUN the data will be sent to.
-  Tcb  - The task control block.
-
-Returns:
-
-  EFI_SUCCES           - The data is sent out to the LUN.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-
---*/
 {
   LIST_ENTRY      *DataOutPduList;
   LIST_ENTRY      *Entry;
@@ -2410,31 +2237,27 @@ Returns:
   return Status;
 }
 
+/**
+  Process the received iSCSI SCSI Data In PDU.
+
+  @param  Pdu[in]            The Data In PDU received.
+
+  @param  Tcb[in]            The task control block.
+
+  @param  Packet[in][out]    The EXT SCSI PASS THRU request packet.
+
+  @retval EFI_SUCCES         The check on the Data IN PDU is passed and some update
+                             actions are taken.
+
+  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol errror happened.
+
+**/
 EFI_STATUS
 IScsiOnDataInRcvd (
   IN NET_BUF                                         *Pdu,
   IN ISCSI_TCB                                       *Tcb,
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
-/*++
-
-Routine Description:
-
-  Process the received iSCSI SCSI Data In PDU.
-
-Arguments:
-
-  Pdu    - The Data In PDU received.
-  Tcb    - The task control block.
-  Packet - The EXT SCSI PASS THRU request packet.
-
-Returns:
-
-  EFI_SUCCES          - The check on the Data IN PDU is passed and some update
-                        actions are taken.
-  EFI_PROTOCOL_ERROR  - Some kind of iSCSI protocol errror happened.
-
---*/
 {
   ISCSI_SCSI_DATA_IN  *DataInHdr;
   EFI_STATUS          Status;
@@ -2502,6 +2325,22 @@ Returns:
   return Status;
 }
 
+/**
+  Process the received iSCSI R2T PDU.
+
+  @param  Pdu[in]            The R2T PDU received.
+
+  @param  Tcb[in]            The task control block.
+
+  @param  Lun[in]            The Lun.
+
+  @param  Packet[in][out]    The EXT SCSI PASS THRU request packet.
+
+  @retval EFI_SUCCES         The R2T PDU is valid and the solicited data is sent out.
+
+  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol errror happened.
+
+**/
 EFI_STATUS
 IScsiOnR2TRcvd (
   IN NET_BUF                                         *Pdu,
@@ -2509,25 +2348,6 @@ IScsiOnR2TRcvd (
   IN UINT64                                          Lun,
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
-/*++
-
-Routine Description:
-
-  Process the received iSCSI R2T PDU.
-
-Arguments:
-
-  Pdu    - The R2T PDU received.
-  Tcb    - The task control block.
-  Lun    - The Lun.
-  Packet - The EXT SCSI PASS THRU request packet.
-
-Returns:
-
-  EFI_SUCCES          - The R2T PDU is valid and the solicited data is sent out.
-  EFI_PROTOCOL_ERROR  - Some kind of iSCSI protocol errror happened.
-
---*/
 {
   ISCSI_READY_TO_TRANSFER *R2THdr;
   EFI_STATUS              Status;
@@ -2573,30 +2393,26 @@ Returns:
   return Status;
 }
 
+/**
+  Process the received iSCSI SCSI Response PDU.
+
+  @param  Pdu[in]            The Response PDU received.
+
+  @param  Tcb[in]            The task control block.
+
+  @param  Packet[in][out]    The EXT SCSI PASS THRU request packet.
+
+  @retval EFI_SUCCES         The Response PDU is processed.
+
+  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol errror happened.
+
+**/
 EFI_STATUS
 IScsiOnScsiRspRcvd (
   IN NET_BUF                                         *Pdu,
   IN ISCSI_TCB                                       *Tcb,
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
-/*++
-
-Routine Description:
-
-  Process the received iSCSI SCSI Response PDU.
-
-Arguments:
-
-  Pdu    - The Response PDU received.
-  Tcb    - The task control block.
-  Packet - The EXT SCSI PASS THRU request packet.
-
-Returns:
-
-  EFI_SUCCES         - The Response PDU is processed.
-  EFI_PROTOCOL_ERROR - Some kind of iSCSI protocol errror happened.
-
---*/
 {
   SCSI_RESPONSE     *ScsiRspHdr;
   ISCSI_SENSE_DATA  *SenseData;
@@ -2680,29 +2496,24 @@ Returns:
   return Status;
 }
 
+/**
+  Process the received NOP In PDU.
+
+  @param  Pdu[in]            The NOP In PDU received.
+
+  @param  Tcb[in]            The task control block.
+
+  @retval EFI_SUCCES         The NOP In PDU is processed and the related sequence
+                             numbers are updated.
+
+  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol errror happened.
+
+**/
 EFI_STATUS
 IScsiOnNopInRcvd (
   IN NET_BUF    *Pdu,
   IN ISCSI_TCB  *Tcb
   )
-/*++
-
-Routine Description:
-
-  Process the received NOP In PDU.
-
-Arguments:
-
-  Pdu    - The NOP In PDU received.
-  Tcb    - The task control block.
-
-Returns:
-
-  EFI_SUCCES          - The NOP In PDU is processed and the related sequence
-                        numbers are updated.
-  EFI_PROTOCOL_ERROR  - Some kind of iSCSI protocol errror happened.
-
---*/
 {
   ISCSI_NOP_IN  *NopInHdr;
   EFI_STATUS    Status;
@@ -2729,6 +2540,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Execute the SCSI command issued through the EXT SCSI PASS THRU protocol.
+
+  @param  PassThru[in]     The EXT SCSI PASS THRU protocol.
+
+  @param  Target[in]       The target ID.
+
+  @param  Lun[in]          The LUN.
+
+  @param  Packet[in][out]  The request packet containing IO request, SCSI command
+                           buffer and buffers to read/write.
+
+  @retval EFI_SUCCES       The SCSI command is executed and the result is updated to 
+                           the Packet.
+
+  @retval EFI_DEVICE_ERROR Some unexpected error happened.
+
+**/
 EFI_STATUS
 IScsiExecuteScsiCommand (
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                 *PassThru,
@@ -2736,27 +2565,6 @@ IScsiExecuteScsiCommand (
   IN UINT64                                          Lun,
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
-/*++
-
-Routine Description:
-
-  Execute the SCSI command issued through the EXT SCSI PASS THRU protocol.
-
-Arguments:
-
-  PassThru - The EXT SCSI PASS THRU protocol.
-  Target   - The target ID.
-  Lun      - The LUN.
-  Packet   - The request packet containing IO request, SCSI command buffer and
-             buffers to read/write.
-
-Returns:
-
-  EFI_SUCCES       - The SCSI command is executed and the result is updated to 
-                     the Packet.
-  EFI_DEVICE_ERROR - Some unexpected error happened.
-
---*/
 {
   EFI_STATUS              Status;
   ISCSI_DRIVER_DATA       *Private;
@@ -2923,26 +2731,20 @@ ON_EXIT:
   return Status;
 }
 
+/**
+  Reinstate the session on some error.
+
+  @param  Private[in] The iSCSI driver data.
+
+  @retval EFI_SUCCES  The session is reinstated from some error.
+
+  @retval other       Reinstatement failed.
+
+**/
 EFI_STATUS
 IScsiSessionReinstatement (
   IN ISCSI_DRIVER_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  Reinstate the session on some error.
-
-Arguments:
-
-  Private - The iSCSI driver data.
-
-Returns:
-
-  EFI_SUCCES - The session is reinstated from some error.
-  other      - Reinstatement failed.
-
---*/
 {
   ISCSI_SESSION *Session;
   EFI_STATUS    Status;
@@ -2964,27 +2766,21 @@ Returns:
   return Status;
 }
 
+/**
+  Initialize some session parameters before login.
+
+  @param  Session[in]  The iSCSI session.
+
+  @param  Recovery[in] Whether the request is from a fresh new start or recovery.
+
+  @retval None.
+
+**/
 VOID
 IScsiSessionInit (
   IN ISCSI_SESSION  *Session,
   IN BOOLEAN        Recovery
   )
-/*++
-
-Routine Description:
-
-  Initialize some session parameters before login.
-
-Arguments:
-
-  Session  - The iSCSI session.
-  Recovery - Whether the request is from a fresh new start or recovery.
-
-Returns:
-
-  None.
-
---*/
 {
   UINT32  Random;
 
@@ -3025,26 +2821,19 @@ Returns:
   Session->ErrorRecoveryLevel   = 0;
 }
 
+/**
+  Abort the iSCSI session, that is, reset all the connection and free the
+  resources.
+
+  @param  Session[in] The iSCSI session.
+
+  @retval EFI_SUCCES  The session is aborted.
+
+**/
 EFI_STATUS
 IScsiSessionAbort (
   IN ISCSI_SESSION  *Session
   )
-/*++
-
-Routine Description:
-
-  Abort the iSCSI session, that is, reset all the connection and free the
-  resources.
-
-Arguments:
-
-  Session - The iSCSI session.
-
-Returns:
-
-  EFI_SUCCES - The session is aborted.
-
---*/
 {
   ISCSI_DRIVER_DATA *Private;
   ISCSI_CONNECTION  *Conn;

@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Data structure for DHCP support
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -14,8 +15,9 @@ Module Name:
   IScsiDhcp.h
 
 Abstract:
+  The header file of IScsiDhcp.c
 
---*/
+**/
 
 #ifndef _ISCSI_DHCP_H_
 #define _ISCSI_DHCP_H_
@@ -45,6 +47,24 @@ typedef struct _ISCSI_ROOT_PATH_FIELD {
   UINT8 Len;
 } ISCSI_ROOT_PATH_FIELD;
 
+/**
+  Parse the DHCP ACK to get the address configuration and DNS information.
+  
+  @param  Image[in]             The handle of the driver image.
+
+  @param  Controller[in]        The handle of the controller;
+
+  @param  ConfigData[in]        The session configuration data.
+
+  @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
+
+  @retval EFI_NO_MAPPING        DHCP failed to acquire address and other information.
+
+  @retval EFI_INVALID_PARAMETER The DHCP ACK's DNS option is mal-formatted.
+
+  @retval EFI_DEVICE_ERROR      Some unexpected error happened.
+
+**/
 EFI_STATUS
 IScsiDoDhcp (
   IN EFI_HANDLE                 Image,

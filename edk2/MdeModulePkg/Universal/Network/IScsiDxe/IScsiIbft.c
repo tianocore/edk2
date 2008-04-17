@@ -1,6 +1,7 @@
-/*++
+/** @file
+  Implementation for iSCSI Boot Firmware Table publication.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,30 +18,23 @@ Abstract:
 
   Implementation for iSCSI Boot Firmware Table publication.
 
---*/
+**/
 
 #include "IScsiImpl.h"
 
+/**
+  Initialize the header of the iSCSI Boot Firmware Table.
+  
+  @param  Header[in] The header of the iSCSI Boot Firmware Table.
+
+  @retval None.
+
+**/
 STATIC
 VOID
 IScsiInitIbfTableHeader (
   IN EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Header
   )
-/*++
-
-Routine Description:
-
-  Initialize the header of the iSCSI Boot Firmware Table.
-  
-Arguments:
-
-  Header - The header of the iSCSI Boot Firmware Table.
-
-Returns:
-
-  None.
-
---*/
 {
   ZeroMem (Header, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER));
 
@@ -56,29 +50,23 @@ Returns:
   Header->OemId[4]  = 'L';
 }
 
+/**
+  Initialize the control section of the iSCSI Boot Firmware Table.
+  
+  @param  Table[in]       The ACPI table.
+
+  @param  HandleCount[in] The number of the handles associated with iSCSI sessions, it's
+                          equal to the number of iSCSI sessions.
+
+  @retval None.
+
+**/
 STATIC
 VOID
 IScsiInitControlSection (
   IN EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Table,
   IN UINTN                                      HandleCount
   )
-/*++
-
-Routine Description:
-
-  Initialize the control section of the iSCSI Boot Firmware Table.
-  
-Arguments:
-
-  Table       - The ACPI table.
-  HandleCount - The number of the handles associated with iSCSI sessions, it's
-                equal to the number of iSCSI sessions.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE  *Control;
   UINTN                                                 NumOffset;
@@ -105,6 +93,19 @@ Returns:
   }
 }
 
+/**
+  Add one item into the heap.
+
+  @param  Heap[in][out] On input, the current address of the heap; On output, the address of
+                        the heap after the item is added.
+
+  @param  Data[in]      The data to add into the heap.
+
+  @param  Len[in]       Length of the Data in byte.
+
+  @retval None.
+
+**/
 STATIC
 VOID
 IScsiAddHeapItem (
@@ -112,24 +113,6 @@ IScsiAddHeapItem (
   IN     VOID   *Data,
   IN     UINTN  Len
   )
-/*++
-
-Routine Description:
-
-  Add one item into the heap.
-  
-Arguments:
-
-  Heap - On input, the current address of the heap; On output, the address of
-         the heap after the item is added.
-  Data - The data to add into the heap.
-  Len  - Length of the Data in byte.
-
-Returns:
-
-  None.
-
---*/
 {
   //
   // Add one byte for the NULL delimiter.
@@ -140,6 +123,18 @@ Returns:
   *(*Heap + Len) = 0;
 }
 
+/**
+  Fill the Initiator section of the iSCSI Boot Firmware Table.
+
+  @param  Table[in]     The ACPI table.
+
+  @param  Heap[in][out] The heap.
+
+  @param  Handle[in]    The handle associated with the iSCSI session.
+
+  @retval None.
+
+**/
 STATIC
 VOID
 IScsiFillInitiatorSection (
@@ -147,23 +142,6 @@ IScsiFillInitiatorSection (
   IN OUT UINT8                                      **Heap,
   IN     EFI_HANDLE                                 Handle
   )
-/*++
-
-Routine Description:
-
-  Fill the Initiator section of the iSCSI Boot Firmware Table.
-  
-Arguments:
-
-  Table  - The ACPI table.
-  Heap   - The heap.
-  Handle - The handle associated with the iSCSI session.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE    *Control;
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE  *Initiator;
@@ -209,28 +187,22 @@ Returns:
   Initiator->IScsiNameOffset  = (UINT16) ((UINTN) *Heap - (UINTN) Table);
 }
 
+/**
+  Map the v4 IP address into v6 IP address.
+
+  @param  V4 The v4 IP address.
+
+  @param  V6 The v6 IP address.
+
+  @retval None.
+
+**/
 STATIC
 VOID
 IScsiMapV4ToV6Addr (
   IN  EFI_IPv4_ADDRESS *V4,
   OUT EFI_IPv6_ADDRESS *V6
   )
-/*++
-
-Routine Description:
-
-  Map the v4 IP address into v6 IP address.
-  
-Arguments:
-
-  V4 - The v4 IP address.
-  V6 - The v6 IP address.
-
-Returns:
-
-  None.
-
---*/
 {
   UINTN Index;
 
@@ -244,27 +216,20 @@ Returns:
   }
 }
 
+/**
+  Get the NIC's PCI location and return it accroding to the composited
+  format defined in iSCSI Boot Firmware Table.
+
+  @param  Controller[in]  The handle of the controller.
+
+  @retval UINT16          The composited representation of the NIC PCI location.
+
+**/
 STATIC
 UINT16
 IScsiGetNICPciLocation (
   IN EFI_HANDLE  Controller
   )
-/*++
-
-Routine Description:
-
-  Get the NIC's PCI location and return it accroding to the composited
-  format defined in iSCSI Boot Firmware Table.
-  
-Arguments:
-
-  Controller - The handle of the controller.
-
-Returns:
-
-  UINT16 - The composited representation of the NIC PCI location.
-
---*/
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
@@ -306,26 +271,19 @@ Returns:
   return (UINT16) ((Bus << 8) | (Device << 3) | Function);
 }
 
+/**
+  Get the MAC address of the controller.
+  
+  @param  Controller[in]    The handle of the controller.
+
+  @retval EFI_MAC_ADDRESS * The mac address.
+
+**/
 STATIC
 EFI_MAC_ADDRESS *
 IScsiGetMacAddress (
   IN EFI_HANDLE  Controller
   )
-/*++
-
-Routine Description:
-
-  Get the MAC address of the controller.
-  
-Arguments:
-
-  Controller - The handle of the controller.
-
-Returns:
-
-  EFI_MAC_ADDRESS * - The mac address.
-
---*/
 {
   EFI_STATUS                  Status;
   EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
@@ -340,6 +298,20 @@ Returns:
   return &Snp->Mode->PermanentAddress;
 }
 
+/**
+  Fill the NIC and target sections in iSCSI Boot Firmware Table.
+
+  @param  Table[in]       The buffer of the ACPI table.
+
+  @param  Heap[in][out]   The heap buffer used to store the variable length parameters such as iSCSI name.
+
+  @param  HandleCount[in] The number of handles having iSCSI private protocol installed.
+
+  @param  Handles[in]     The handle buffer.
+
+  @retval None.
+
+**/
 STATIC
 VOID
 IScsiFillNICAndTargetSections (
@@ -348,24 +320,6 @@ IScsiFillNICAndTargetSections (
   IN     UINTN                                      HandleCount,
   IN     EFI_HANDLE                                 *Handles
   )
-/*++
-
-Routine Description:
-
-  Fill the NIC and target sections in iSCSI Boot Firmware Table.
-
-Arguments:
-
-  Table       - The buffer of the ACPI table.
-  Heap        - The heap buffer used to store the variable length parameters such as iSCSI name.
-  HandleCount - The number of handles having iSCSI private protocol installed.
-  Handles     - The handle buffer.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE  *Control;
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE      *Nic;
@@ -520,26 +474,19 @@ Returns:
   }
 }
 
+/**
+  Publish and remove the iSCSI Boot Firmware Table according to the iSCSI
+  session status.
+
+  @param  None.
+
+  @retval None.
+
+**/
 VOID
 IScsiPublishIbft (
   IN VOID
   )
-/*++
-
-Routine Description:
-
-  Publish and remove the iSCSI Boot Firmware Table according to the iSCSI
-  session status.
-
-Arguments:
-
-  None.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_STATUS                                Status;
   UINTN                                     TableHandle;

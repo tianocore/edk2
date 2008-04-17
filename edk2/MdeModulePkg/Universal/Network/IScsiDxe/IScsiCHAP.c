@@ -1,6 +1,7 @@
-/*++
+/** @file
+  Challenge-Handshake Authentication Protocol (CHAP) Configuration
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +16,9 @@ Module Name:
 
 Abstract:
 
---*/
+  This file is for CHAP configuration
+
+**/
 
 #include "IScsiImpl.h"
 #include "Md5.h"
@@ -92,30 +95,26 @@ IScsiCHAPAuthTarget (
   return Status;
 }
 
+/**
+  This function checks the received iSCSI Login Response during the security
+  negotiation stage.
+  
+  @param  Conn[in]             The iSCSI connection.
+
+  @param  Transit[in]          The transit flag of the latest iSCSI Login Response.
+
+  @retval EFI_SUCCESS          The Login Response passed the CHAP validation.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+  @retval EFI_PROTOCOL_ERROR   Some kind of protocol error happend.
+
+**/
 EFI_STATUS
 IScsiCHAPOnRspReceived (
   IN ISCSI_CONNECTION  *Conn,
   IN BOOLEAN           Transit
   )
-/*++
-
-Routine Description:
-
-  This function checks the received iSCSI Login Response during the security
-  negotiation stage.
-  
-Arguments:
-
-  Conn    - The iSCSI connection.
-  Transit - The transit flag of the latest iSCSI Login Response.
-
-Returns:
-
-  EFI_SUCCESS          - The Login Response passed the CHAP validation.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-  EFI_PROTOCOL_ERROR   - Some kind of protocol error happend.
-
---*/
 {
   EFI_STATUS                Status;
   ISCSI_SESSION             *Session;
@@ -288,31 +287,27 @@ ON_EXIT:
   return Status;
 }
 
+/**
+  This function fills the CHAP authentication information into the login PDU
+  during the security negotiation stage in the iSCSI connection login.
+
+  @param  Conn[in]             The iSCSI connection.
+
+  @param  Pdu[in]              The PDU to send out.
+
+  @retval EFI_SUCCESS          All check passed and the phase-related CHAP
+                               authentication info is filled into the iSCSI PDU.
+
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+
+  @retval EFI_PROTOCOL_ERROR   Some kind of protocol error happend.
+
+**/
 EFI_STATUS
 IScsiCHAPToSendReq (
   IN ISCSI_CONNECTION  *Conn,
   IN NET_BUF           *Pdu
   )
-/*++
-
-Routine Description:
-
-  This function fills the CHAP authentication information into the login PDU
-  during the security negotiation stage in the iSCSI connection login.
-  
-Arguments:
-
-  Conn - The iSCSI connection.
-  Pdu  - The PDU to send out.
-
-Returns:
-
-  EFI_SUCCESS          - All check passed and the phase-related CHAP authentication
-                         info is filled into the iSCSI PDU.
-  EFI_OUT_OF_RESOURCES - Failed to allocate memory.
-  EFI_PROTOCOL_ERROR   - Some kind of protocol error happend.
-
---*/
 {
   EFI_STATUS                Status;
   ISCSI_SESSION             *Session;
