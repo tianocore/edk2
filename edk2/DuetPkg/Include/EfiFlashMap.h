@@ -22,7 +22,6 @@ Abstract:
 #ifndef _EFI_FLASHMAP_H_
 #define _EFI_FLASHMAP_H_
 
-
 //
 // Definition for flash map GUIDed HOBs
 //
@@ -59,6 +58,7 @@ typedef UINT8   EFI_FLASH_AREA_TYPE;
 // An individual sub-area Entry.
 // A single flash area may consist of  more than one sub-area.
 //
+/**
 typedef struct {
   EFI_FLASH_AREA_ATTRIBUTES Attributes;
   UINT32                    Reserved;
@@ -121,6 +121,32 @@ typedef struct {
   UINT8                     Reserved[3];
   EFI_GUID                  AreaTypeGuid;
 } EFI_FLASH_AREA_DATA;
+**/
+
+typedef struct {
+  EFI_FLASH_AREA_ATTRIBUTES Attributes;
+  UINT32                    Reserved;
+  EFI_PHYSICAL_ADDRESS      Base;
+  EFI_PHYSICAL_ADDRESS      Length;
+  EFI_GUID                  FileSystem;
+} EFI_FLASH_SUBAREA_ENTRY;
+
+typedef struct {
+  UINT8                   Reserved[3];
+  EFI_FLASH_AREA_TYPE     AreaType;
+  EFI_GUID                AreaTypeGuid;
+  UINT32                  NumberOfEntries;
+  EFI_FLASH_SUBAREA_ENTRY Entries[1];
+  //
+  // Extended Hob data.
+  //
+  // VolumeId and FilePath indicating a unique file.
+  //
+  UINT32                  VolumeId;
+  CHAR16                  FilePath[256];
+  UINT32                  ActuralSize;
+  UINT32                  Offset;
+} EFI_FLASH_MAP_FS_ENTRY_DATA;
 
 #pragma pack()
 

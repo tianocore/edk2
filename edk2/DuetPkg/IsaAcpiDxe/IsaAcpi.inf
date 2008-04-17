@@ -1,0 +1,50 @@
+#/*++
+# 
+# Copyright (c) 2005, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+#  Module Name:
+#   IsaAcpi.inf
+#
+#  Abstract:
+#    Component description file for PCAT ISA ACPI driver
+#
+#--*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IsaAcpi
+  FILE_GUID                      = 38A0EC22-FBE7-4911-8BC1-176E0D6C1DBD
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x0002000A
+
+  ENTRY_POINT                    = PcatIsaAcpiDriverEntryPoint
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  DuetPkg/DuetPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  
+[Sources]
+  PcatIsaAcpi.h
+  PcatIsaAcpi.c
+  IsaAcpi.c
+  ComponentName.c
+
+[Protocols]
+  gEfiPciIoProtocolGuid
+  gEfiIsaAcpiProtocolGuid

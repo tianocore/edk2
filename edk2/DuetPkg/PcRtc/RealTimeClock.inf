@@ -1,0 +1,63 @@
+#/*++
+# 
+# Copyright (c) 2005, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+#  Module Name:
+#
+#  Abstract:
+#
+#--*/
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RealTimeClock
+  FILE_GUID                      = 378D7B65-8DA9-4773-B6E4-A47826A833E1
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeRealTimeClock
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  DuetPkg/DuetPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  IoLib
+  TimerLib
+  BaseMemoryLib
+
+[Sources.common]
+  RealTimeClock.c
+  RealTimeClock.h
+
+[Sources.ia32]
+  Ia32/RealTimeClock.c
+
+[Sources.x64]
+  x64/RealTimeClock.c
+
+[Sources.ipf]
+  Ipf/RealTimeClock.c
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiMetronomeArchProtocolGuid 
+  gEfiCpuIoProtocolGuid
+  gEfiRealTimeClockArchProtocolGuid
+
+[Depex]
+  gEfiCpuArchProtocolGuid AND gEfiMetronomeArchProtocolGuid AND gEfiCpuIoProtocolGuid
