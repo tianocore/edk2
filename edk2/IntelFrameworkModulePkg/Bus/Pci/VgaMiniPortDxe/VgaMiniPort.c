@@ -33,26 +33,20 @@ EFI_DRIVER_BINDING_PROTOCOL gPciVgaMiniPortDriverBinding = {
   NULL
 };
 
-//
-// Driver Entry Point
-//
+/**
+  Driver entry point for VgaMiniPort driver.
+  
+  @param ImageHandle  Driver image handle
+  @param SystemTable  Point to EFI_SYSTEM_TABLE
+  
+  @retval Status of install driver binding protocol.
+**/
 EFI_STATUS
 EFIAPI
 PciVgaMiniPortDriverEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/**
-
-  Routine Description:
-    Driver Entry Point.
-
-  Arguments:
-    (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
-
-  Returns:
-    EFI_STATUS
-**/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
@@ -287,13 +281,13 @@ PciVgaMiniPortDriverBindingStop (
 //
 
 /**
-  GC_TODO: Add function description
+  Thunk function of EFI_VGA_MINI_PORT_SET_MODE
 
-  @param  This             GC_TODO: add argument description
-  @param  ModeNumber       GC_TODO: add argument description
+  @param  This             Point to instance of EFI_VGA_MINI_PORT_PROTOCOL
+  @param  ModeNumber       Mode number
 
-  @retval EFI_UNSUPPORTED  GC_TODO: Add description for return value
-  @retval EFI_SUCCESS      GC_TODO: Add description for return value
+  @retval EFI_UNSUPPORTED  Invalid mode number
+  @retval EFI_SUCCESS      Success
 
 **/
 EFI_STATUS
@@ -309,3 +303,4 @@ PciVgaMiniPortSetMode (
 
   return EFI_SUCCESS;
 }
+  

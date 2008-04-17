@@ -1,5 +1,6 @@
 /** @file
-
+  Implementation of EFI_COMPONENT_NAME_PROTOCOL for VgaminiPort driver.
+  
 Copyright (c) 2006 - 2007 Intel Corporation. All rights reserved
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
