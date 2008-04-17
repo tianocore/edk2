@@ -171,6 +171,7 @@ typedef struct {
   //
 } EFI_HII_EXPORT_TABLE;
 
+#define EFI_HII_UPDATE_DATA FRAMEWORK_EFI_HII_UPDATE_DATA 
 typedef struct {
   BOOLEAN               FormSetUpdate;      // If TRUE, next variable is significant
   EFI_PHYSICAL_ADDRESS  FormCallbackHandle; // If not 0, will update Formset with this info
