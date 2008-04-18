@@ -60,7 +60,7 @@ Abstract:
 
 SMBIOS_STRUCTURE_POINTER
 GetSmbiosTableFromType (
-  IN VOID                  *Smbios,
+  IN SMBIOS_TABLE_ENTRY_POINT  *Smbios,
   IN UINT8                 Type,
   IN UINTN                 Index
   );

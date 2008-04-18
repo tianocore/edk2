@@ -656,7 +656,7 @@ Returns:
 
 VOID
 DebugSerialPrint (
-  IN UINT8    *OutputString
+  IN CHAR8    *OutputString
   )
 /*++
 
