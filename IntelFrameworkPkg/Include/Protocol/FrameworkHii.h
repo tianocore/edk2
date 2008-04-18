@@ -171,7 +171,6 @@ typedef struct {
   //
 } EFI_HII_EXPORT_TABLE;
 
-#define EFI_HII_UPDATE_DATA FRAMEWORK_EFI_HII_UPDATE_DATA 
 typedef struct {
   BOOLEAN               FormSetUpdate;      // If TRUE, next variable is significant
   EFI_PHYSICAL_ADDRESS  FormCallbackHandle; // If not 0, will update Formset with this info
@@ -180,7 +179,7 @@ typedef struct {
   STRING_REF            FormTitle;          // If not 0, will update Form with this info
   UINT16                DataCount;          // The number of Data entries in this structure
   UINT8                 *Data;              // An array of 1+ op-codes, specified by DataCount
-} EFI_HII_UPDATE_DATA;
+} FRAMEWORK_EFI_HII_UPDATE_DATA;
 
 //
 // String attributes
@@ -711,7 +710,7 @@ EFI_STATUS
   IN FRAMEWORK_EFI_HII_HANDLE        Handle,
   IN EFI_FORM_LABEL       Label,
   IN BOOLEAN              AddData,
-  IN EFI_HII_UPDATE_DATA  *Data
+  IN FRAMEWORK_EFI_HII_UPDATE_DATA  *Data
   );
 
 /**
