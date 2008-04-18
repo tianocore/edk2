@@ -98,30 +98,4 @@ InternalPreparePackages (
 
 }
 
-EFI_STATUS
-EFIAPI
-PrepareAndCreateNewPackages (
-  IN            UINTN      NumberOfPackages,
-  IN CONST      EFI_GUID   *GuidId,
-  OUT           VOID      **HiiHandle,         //Framework is FRAMEWORK_HII_HANDLE; UEFI is EFI_HII_HANDLE; 
-                                     // C:\D\Work\Tiano\Tiano_Main_Trunk\TIANO\Platform\IntelEpg\SR870BN4\MemorySubClassDriver\DualChannelDdr\MemorySubClass.c make use of this output value
-  ...
-  )
-{
-  EFI_STATUS                Status;
-  EFI_HII_PACKAGES          *PackageList;
-  VA_LIST                   Args;
-  FRAMEWORK_EFI_HII_HANDLE  FrameworkHiiHandle;
-
-  
-  VA_START (Args, HiiHandle);
-  PackageList = InternalPreparePackages (NumberOfPackages, GuidId, Args);
-  VA_END (Args);
-  
-  Status      = gHiiProtocol->NewPack (gHiiProtocol, PackageList, &FrameworkHiiHandle);
-  *HiiHandle  = (VOID *) (UINTN) FrameworkHiiHandle;
-
-  return Status;
-}
-
 
