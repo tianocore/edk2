@@ -1246,7 +1246,7 @@ Returns:
   //
   // Check whether the user input after the duration time has expired 
   //
-  OldTpl = BdsLibGetCurrentTpl();
+  OldTpl = EfiGetCurrentTpl();
   gBS->RestoreTPL (TPL_APPLICATION); 
   gBS->WaitForEvent (1, &UserInputDurationTime, &Index);
   gBS->CloseEvent (UserInputDurationTime);
