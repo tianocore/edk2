@@ -1,0 +1,58 @@
+#/*++
+# 
+# Copyright (c) 2006, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+#  Module Name:
+#    EfiLdr.inf
+#
+#  Abstract:
+#
+#--*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EfiLoader
+  FILE_GUID                      = 7E374E25-8E01-4FEE-87F2-390C23C606CD
+  #MODULE_TYPE                    = USER_DEFINED
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+  ENTRY_POINT                    = EfiLoader
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  UefiApplicationEntryPoint
+  BaseUefiTianoDecompressLib
+  
+[Sources.common]
+  Debug.h
+  PeLoader.h
+  Support.h
+  EfiLdrHandoff.h
+  EfiLdr.h
+  EfiLoader.c
+  Debug.c
+  PeLoader.c
+  Support.c
+  
+[BuildOptions.common]
+  #MSFT:*_*_IA32_DLINK_FLAGS = /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
+  MSFT:*_*_IA32_CC_FLAGS = /nologo /W4 /WX /Gy /c /D UNICODE /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
+  MSFT:*_*_IA32_PP_FLAGS = /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h
+  MSFT:*_*_IA32_ASM_FLAGS = /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
+  MSFT:*_*_IA32_ASMLINK_FLAGS       = /link /nologo /tiny  

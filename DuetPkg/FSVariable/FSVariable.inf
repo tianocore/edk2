@@ -1,0 +1,69 @@
+#/*++
+#
+# Copyright (c) 2006 - 2007, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+# 
+#  Module Name:
+#
+#   FSVariable.inf
+#
+#  Abstract:
+#
+#    Component description file for variable module
+#
+#--*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FSVariable
+  FILE_GUID                      = A36495C1-C205-414e-B71F-4BE3476D699C
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+  ENTRY_POINT                    = VariableServiceInitialize
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  DuetPkg/DuetPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources.common]
+  FSVariable.h
+  VariableStorage.h
+  FSVariable.c
+  FileStorage.c
+  MemStorage.c
+
+[LibraryClasses.common]
+  PcdLib
+  BaseMemoryLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiRuntimeLib
+  DebugLib
+  UefiLib
+  HobLib
+  DxeServicesTableLib
+  DevicePathLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEfiHobListGuid
+  gEfiFlashMapHobGuid
+
+[Protocols]
+  gEfiVariableArchProtocolGuid
+  gEfiVariableWriteArchProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiBlockIoProtocolGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
+
