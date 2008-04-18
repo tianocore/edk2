@@ -38,7 +38,7 @@ typedef UINT8 PARALLEL_MODE;
 // signature "$EFI"
 ///////////////////////////////////////////////////////////////////////////////
 
-#define EFI_COMPATIBILITY16_TABLE_SIGNATURE EFI_SIGNATURE_32('$', 'E', 'F', 'I')
+#define EFI_COMPATIBILITY16_TABLE_SIGNATURE EFI_SIGNATURE_32 ('I', 'F', 'E', '$')
 
 typedef struct {
   UINT32  Signature;      // "$EFI"
