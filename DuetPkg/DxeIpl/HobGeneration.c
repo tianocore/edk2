@@ -547,7 +547,7 @@ Return:
     //
     // Process region above 4GB
     //
-    if (EfiMemoryDescriptor[Index].PhysicalStart >= 0x100000000) {
+    if (EfiMemoryDescriptor[Index].PhysicalStart >= 0x100000000LL) {
       if (EfiMemoryDescriptor[Index].Type == EfiConventionalMemory) {
         if (gHob->MemoryAbove4GB.PhysicalStart == 0) {
           gHob->MemoryAbove4GB.PhysicalStart  = EfiMemoryDescriptor[Index].PhysicalStart;

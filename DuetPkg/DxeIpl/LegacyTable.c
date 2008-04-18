@@ -21,7 +21,7 @@ Revision History:
 #include "DxeIpl.h"
 #include "HobGeneration.h"
 
-#define ACPI_RSD_PTR      0x2052545020445352
+#define ACPI_RSD_PTR      0x2052545020445352LL
 #define MPS_PTR           EFI_SIGNATURE_32('_','M','P','_')
 #define SMBIOS_PTR        EFI_SIGNATURE_32('_','S','M','_')
 

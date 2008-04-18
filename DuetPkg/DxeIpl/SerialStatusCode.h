@@ -67,7 +67,7 @@ extern UINT8   gBreakSet;
 
 VOID
 DebugSerialPrint (
-  IN UINT8    *OutputString
+  IN CHAR8    *OutputString
   );
 
 VOID

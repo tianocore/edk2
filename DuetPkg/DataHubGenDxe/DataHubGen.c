@@ -338,7 +338,7 @@ DataHubGenEntrypoint (
   Status = gBS->LocateProtocol (
                   &gEfiDataHubProtocolGuid,
                   NULL,
-                  &gDataHub
+                  (VOID**)&gDataHub
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -354,7 +354,7 @@ DataHubGenEntrypoint (
   Status = gBS->LocateProtocol (
                   &gEfiHiiProtocolGuid,
                   NULL,
-                  &gHii
+                  (VOID**)&gHii
                   );
 #endif
   if (EFI_ERROR (Status)) {

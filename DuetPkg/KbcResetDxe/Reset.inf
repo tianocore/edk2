@@ -42,13 +42,13 @@
   Reset.h
 
 [Sources.ipf]
-  Ipf\IpfReset.c
+  Ipf/IpfReset.c
 
 [Sources.ia32]
-  Ia32\Ia32Reset.c
+  Ia32/Ia32Reset.c
 
 [Sources.x64]
-  x64\x64Reset.c
+  x64/x64Reset.c
 
 [Protocols]
   gEfiResetArchProtocolGuid
