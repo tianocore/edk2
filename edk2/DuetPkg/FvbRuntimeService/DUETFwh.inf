@@ -1,0 +1,62 @@
+#/*++
+#
+# Copyright (c) 2007, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+# 
+#  Module Name:
+#
+#   DUETFwh.inf
+#
+#  Abstract:
+#
+#    Component description file for DUET Module
+#
+#--*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DuetFwh
+  FILE_GUID                      = BDFE5FAA-2A35-44bb-B17A-8084D4E2B9E9
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+  ENTRY_POINT                    = FvbInitialize
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DuetPkg/DuetPkg.dec
+  #TianoModulePkg/TianoModulePkg.dec
+
+[Sources.common]
+  FwBlockService.c
+  FwBlockService.h
+  FvbInfo.c
+  FileIo.c
+  FileIo.h
+
+[LibraryClasses]
+  DevicePathLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiRuntimeLib
+  HobLib
+
+[Guids]
+  gEfiFlashMapHobGuid
+  gEfiHobListGuid
+  gEfiAlternateFvBlockGuid
+
+[Protocols]
+  gEfiFvbExtensionProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiFirmwareVolumeBlockProtocolGuid
+  gEfiBlockIoProtocolGuid
+
