@@ -295,6 +295,7 @@
 
     <Command>
         GenFw -o ${dst} -j ${src}
+        -$(CP) ${dst} $(BIN_DIR)
 
 [Build.Unicode-Text-File]
     <InputFile>
