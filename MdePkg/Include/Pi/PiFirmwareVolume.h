@@ -18,6 +18,8 @@
 #ifndef __PI_FIRMWAREVOLUME_H__
 #define __PI_FIRMWAREVOLUME_H__
 
+#include <ProcessorBind.h>
+
 //
 // EFI_FV_FILE_ATTRIBUTES
 //
@@ -90,9 +92,9 @@ typedef struct {
   UINT32 Length;
 } EFI_FV_BLOCK_MAP_ENTRY;
 
-//
-// Describes the features and layout of the firmware volume.
-//
+///
+/// Describes the features and layout of the firmware volume.
+///
 typedef struct {
   UINT8                     ZeroVector[16];
   EFI_GUID                  FileSystemGuid;

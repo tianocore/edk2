@@ -18,6 +18,8 @@
 #ifndef __PI_BOOT_MODE_H__
 #define __PI_BOOT_MODE_H__
 
+#include <ProcessorBind.h>
+
 typedef UINT32  EFI_BOOT_MODE;
 
 //

@@ -15,6 +15,8 @@
 #ifndef __UEFI_MULTIPHASE_H__
 #define __UEFI_MULTIPHASE_H__
 
+#include <ProcessorBind.h>
+
 //
 // Enumeration of memory types introduced in UEFI.
 // 
