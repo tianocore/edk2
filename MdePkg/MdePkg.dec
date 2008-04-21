@@ -84,6 +84,9 @@
   GraphicsLib|Include/Library/GraphicsLib.h
   ExtractGuidedSectionLib|Include/Library/ExtractGuidedSectionLib.h
   IfrSupportLib|Include/Library/IfrSupportLib.h
+  PeiPiLib|Include/Library/PeiPiLib.h
+  SerialPortLib|Include/Library/SerialPortLib.h
+  DxePiLib|Include/Library/DxePiLib.h
   
 [LibraryClasses.IPF]
   SalLib|Include/Library/SalLib.h
