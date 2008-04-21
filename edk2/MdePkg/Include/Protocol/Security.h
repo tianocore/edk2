@@ -31,6 +31,8 @@
 #ifndef __ARCH_PROTOCOL_SECURITY_H__
 #define __ARCH_PROTOCOL_SECURITY_H__
 
+#include <PiDxe.h>
+
 //
 // Global ID for the Security Code Architectural Protocol
 //

@@ -15,6 +15,8 @@
 
 **/
 
+#include <PiDxe.h>
+
 #ifndef __EDID_OVERRIDE_H__
 #define __EDID_OVERRIDE_H__
 

@@ -15,6 +15,8 @@
 #ifndef __PCD_H__
 #define __PCD_H__
 
+#include <PiDxe.h>
+
 extern EFI_GUID gPcdProtocolGuid;
 
 #define PCD_PROTOCOL_GUID \
