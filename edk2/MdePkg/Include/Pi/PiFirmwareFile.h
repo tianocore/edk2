@@ -15,8 +15,11 @@
 
 **/
 
+
 #ifndef __PI_FIRMWARE_FILE_H__
 #define __PI_FIRMWARE_FILE_H__
+
+#include <ProcessorBind.h>
 
 #pragma pack(1)
 //
