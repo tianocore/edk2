@@ -22,6 +22,9 @@
 // Basical data type definitions introduced in UEFI.
 // 
 typedef GUID                      EFI_GUID;
+///
+/// Function return status for EFI API
+///
 typedef RETURN_STATUS             EFI_STATUS;
 typedef VOID                      *EFI_HANDLE;
 
