@@ -144,9 +144,7 @@ EfiNamedEventSignal (
   can then immediately be restored back to the current TPL level with a call 
   to RestoreTPL().
 
-  @param  VOID
-
-  @retvale EFI_TPL              The current TPL.
+  @return The current TPL.
 
 **/
 EFI_TPL
@@ -180,7 +178,6 @@ EfiInitializeLock (
   priority level.  Since there is no preemption or multiprocessor support in EFI,
   acquiring the lock only consists of raising to the locks TPL.
 
-  @param  Lock      A pointer to the lock data structure to initialize.
   @param  Priority  The task priority level of the lock.
 
   @return The lock.
@@ -220,7 +217,7 @@ EfiInitializeLock (
   priority level of the mutual exclusion lock.  Then, it places the lock in the 
   acquired state.
 
-  @param  Priority  The task priority level of the lock.
+  @param  Lock              A pointer to the lock to acquire.
 
 **/
 VOID
@@ -302,7 +299,7 @@ EfiTestManagedDevice (
 
   @param  ControllerHandle     A handle for a (parent) controller to test. 
   @param  ChildHandle          A child handle to test.
-  @param  ConsumsedGuid        Supplies the protocol that the child controller
+  @param  ProtocolGuid         Supplies the protocol that the child controller
                                opens on its parent controller. 
 
   @retval EFI_SUCCESS          ChildHandle is a child of the ControllerHandle.
@@ -676,7 +673,7 @@ EfiCreateEventLegacyBootEx (
   the EDK/EFI 1.10 form and EDKII/UEFI 2.0 form and allows common code to 
   work both ways.
 
-  @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+  @param  ReadyToBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
 
   @retval EFI_SUCCESS       Event was created.
   @retval Other             Event was not created.
@@ -701,7 +698,7 @@ EfiCreateEventReadyToBoot (
   @param  NotifyTpl         The task priority level of the event.
   @param  NotifyFunction    The notification function to call when the event is signaled.
   @param  NotifyContext     The content to pass to NotifyFunction when the event is signaled.
-  @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+  @param  ReadyToBootEvent  Returns the EFI event returned from gBS->CreateEvent(Ex).
 
   @retval EFI_SUCCESS       Event was created.
   @retval Other             Event was not created.

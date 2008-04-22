@@ -57,14 +57,14 @@ HiiLibPreparePackageList (
 
   If HiiHandle is NULL, then ASSERT.
 
-  @param  NumberOfPackages  The number of HII packages to register.
-  @param  GuidId                    Package List GUID ID.
-  @param  EFI_HANDLE            Optional. If not NULL, the DriverHandle on which an instance of DEVICE_PATH_PROTOCOL is installed.
-                                             This DriverHandle uniquely defines the device that the added packages are associated with.
-  @param  HiiHandle                On output, the HiiHandle is update with the handle which can be used to retrieve the Package 
-                                             List later. If the functions failed to add the package to the default HII database, this value will
-                                             be set to NULL.
-  @param  ...                          The variable argument list describing all HII Package.
+  @param  NumberOfPackages    The number of HII packages to register.
+  @param  GuidId              Package List GUID ID.
+  @param  DriverHandle        Optional. If not NULL, the DriverHandle on which an instance of DEVICE_PATH_PROTOCOL is installed.
+                              This DriverHandle uniquely defines the device that the added packages are associated with.
+  @param  HiiHandle           On output, the HiiHandle is update with the handle which can be used to retrieve the Package 
+                              List later. If the functions failed to add the package to the default HII database, this value will
+                              be set to NULL.
+  @param  ...                 The variable argument list describing all HII Package.
 
   @return  EFI_SUCCESS         If the packages are successfully added to the default HII database.
   @return  EFI_OUT_OF_RESOURCE Not enough resource to complete the operation.
@@ -248,8 +248,6 @@ HiiLibGetStringFromToken (
   If HandleBufferLength is NULL, then ASSERT.
   If HiiHandleBuffer is NULL, then ASSERT.
 
-  @param  HiiDatabase            A pointer to the EFI_HII_DATABASE_PROTOCOL
-                                 instance.
   @param  HandleBufferLength     On input, a pointer to the length of the handle
                                  buffer. On output, the length of the handle buffer
                                  that is required for the handles found.
@@ -272,8 +270,8 @@ HiiLibGetHiiHandles (
   If HiiHandle could not be found in the default HII database, then ASSERT.
   If Guid is NULL, then ASSERT.
 
-  @param  HiiHandle              Hii handle
-  @param  Guid                   Package list GUID
+  @param  Handle              Hii handle
+  @param  Guid                Package list GUID
 
   @retval EFI_SUCCESS            Successfully extract GUID from Hii database.
 
@@ -376,7 +374,8 @@ HiiLibGetSupportedLanguages (
   If not enough resource to complete the operation, then ASSERT.
 
   @param  HiiHandle              The HII package list handle.
-
+  @param  FirstLanguage          Pointer to language name buffer.
+  
   @return The supported languages.
 
 **/
