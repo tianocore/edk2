@@ -31,9 +31,9 @@
   specified by Context1 and Context2. Context1 and Context2 are optional and
   may be 0. The function EntryPoint must never return.
 
-  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
-                      is called. The descriptor in the GDT that this selector
-                      references must be setup for 32-bit protected mode.
+  @param  CodeSelector  The 16-bit selector to load in the CS before EntryPoint
+                        is called. The descriptor in the GDT that this selector
+                        references must be setup for 32-bit protected mode.
   @param  EntryPoint  The 64-bit virtual address of the function to call with
                       the new stack after paging is disabled.
   @param  Context1    The 64-bit virtual address of the context to pass into

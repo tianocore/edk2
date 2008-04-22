@@ -89,7 +89,7 @@ IsNodeInList (
 
   If ListHead is NULL, then ASSERT().
 
-  @param  ListHead  A pointer to the head node of a new doubly linked list.
+  @param  List  A pointer to the head node of a new doubly linked list.
 
   @return ListHead
 
@@ -122,7 +122,7 @@ InitializeListHead (
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
-  @param  ListHead  A pointer to the head node of a doubly linked list.
+  @param  List      A pointer to the head node of a doubly linked list.
   @param  Entry     A pointer to a node that is to be inserted at the beginning
                     of a doubly linked list.
 
@@ -162,7 +162,7 @@ InsertHeadList (
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
-  @param  ListHead  A pointer to the head node of a doubly linked list.
+  @param  List      A pointer to the head node of a doubly linked list.
   @param  Entry     A pointer to a node that is to be added at the end of the
                     doubly linked list.
 
@@ -269,7 +269,7 @@ GetNextNode (
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
 
-  @param  ListHead  A pointer to the head node of a doubly linked list.
+  @param  List  A pointer to the head node of a doubly linked list.
 
   @retval TRUE  The linked list is empty.
   @retval FALSE The linked list is not empty.
