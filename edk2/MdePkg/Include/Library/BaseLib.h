@@ -848,7 +848,8 @@ AsciiStriCmp (
 
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
-
+  @param  Length        Maximum number of ASCII characters for compare.
+  
   @retval 0   FirstString is identical to SecondString.
   @retval !=0 FirstString is not identical to SecondString.
 
@@ -1151,7 +1152,7 @@ AsciiStrHexToUint64 (
   @param  Source        Pointer to a Null-terminated ASCII string.
   @param  Destination   Pointer to a Null-terminated Unicode string.
 
-  @reture Destination
+  @return Destination
 
 **/
 CHAR16 *
