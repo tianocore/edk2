@@ -15,6 +15,7 @@
 #ifndef __EFI_DRIVER_CONFIGURATION_H__
 #define __EFI_DRIVER_CONFIGURATION_H__
 
+#include <PiDxe.h>
 #include <Protocol/DriverConfiguration2.h>
 
 //

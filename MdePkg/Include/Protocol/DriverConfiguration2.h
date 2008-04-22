@@ -15,6 +15,8 @@
 #ifndef __EFI_DRIVER_CONFIGURATION2_H__
 #define __EFI_DRIVER_CONFIGURATION2_H__
 
+#include <PiDxe.h>
+
 //
 // Global ID for the Driver Configuration Protocol defined in UEFI 2.0
 //

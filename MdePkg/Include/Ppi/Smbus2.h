@@ -18,7 +18,7 @@
 
 #ifndef _PEI_SMBUS2_PPI_H
 #define _PEI_SMBUS2_PPI_H
-
+#include <PiPei.h>
 #include <IndustryStandard/SmBus.h>
 
 #define EFI_PEI_SMBUS2_PPI_GUID \
@@ -172,7 +172,6 @@ EFI_STATUS
   The Notify() function registers all the callback functions to allow the 
   bus driver to call these functions when the SlaveAddress/Data pair happens.
 
-  @param  PeiServices    A pointer to the system PEI Services Table.
   @param  This           A pointer to the EFI_PEI_SMBUS_PPI instance.
   @param  SlaveAddress   Address that the host controller detects as
                          sending a message and calls all the registered functions.

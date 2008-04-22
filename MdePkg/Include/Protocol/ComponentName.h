@@ -15,6 +15,8 @@
 #ifndef __EFI_COMPONENT_NAME_H__
 #define __EFI_COMPONENT_NAME_H__
 
+#include <PiDxe.h>
+
 //
 // Global ID for the Component Name Protocol
 //
