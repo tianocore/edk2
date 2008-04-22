@@ -632,7 +632,7 @@ StrHexToUint64 (
   @param  Source        Pointer to a Null-terminated Unicode string.
   @param  Destination   Pointer to a Null-terminated ASCII string.
 
-  @reture Destination
+  @return Destination
 
 **/
 CHAR8 *
@@ -1802,7 +1802,7 @@ GetPowerOfTwo64 (
   from little endian to big endian or vice versa. The byte swapped value is
   returned.
 
-  @param  Operand A 16-bit unsigned value.
+  @param  Value Operand A 16-bit unsigned value.
 
   @return The byte swaped Operand.
 
@@ -1821,7 +1821,7 @@ SwapBytes16 (
   from little endian to big endian or vice versa. The byte swapped value is
   returned.
 
-  @param  Operand A 32-bit unsigned value.
+  @param  Value Operand A 32-bit unsigned value.
 
   @return The byte swaped Operand.
 
@@ -1840,7 +1840,7 @@ SwapBytes32 (
   from little endian to big endian or vice versa. The byte swapped value is
   returned.
 
-  @param  Operand A 64-bit unsigned value.
+  @param  Value Operand A 64-bit unsigned value.
 
   @return The byte swaped Operand.
 
