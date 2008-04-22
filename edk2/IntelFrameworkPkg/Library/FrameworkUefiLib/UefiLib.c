@@ -252,9 +252,7 @@ EfiNamedEventSignal (
   can then immediately be restored back to the current TPL level with a call
   to RestoreTPL().
 
-  @param  VOID
-
-  @retvale EFI_TPL              The current TPL.
+  @return The current TPL.
 
 **/
 EFI_TPL
@@ -305,7 +303,7 @@ EfiInitializeLock (
   priority level of the mutual exclusion lock.  Then, it places the lock in the
   acquired state.
 
-  @param  Priority  The task priority level of the lock.
+  @param  Lock  Point to EFI_LOCK instance
 
 **/
 VOID
@@ -454,7 +452,7 @@ EfiTestManagedDevice (
 
   @param  ControllerHandle     A handle for a (parent) controller to test.
   @param  ChildHandle          A child handle to test.
-  @param  ConsumsedGuid        Supplies the protocol that the child controller
+  @param  ProtocolGuid         Supplies the protocol that the child controller
                                opens on its parent controller.
 
   @retval EFI_SUCCESS          ChildHandle is a child of the ControllerHandle.
