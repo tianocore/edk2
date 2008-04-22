@@ -4384,7 +4384,7 @@ ConSplitterTextOutReset (
     }
   }
 
-  This->SetAttribute (This, EFI_TEXT_ATTR (This->Mode->Attribute & 0x0F, EFI_BACKGROUND_BLACK));
+  This->SetAttribute (This, EFI_TEXT_ATTR (This->Mode->Attribute & 0x0F, EFI_BLACK));
 
   Status = DevNullTextOutSetMode (Private, 0);
   if (EFI_ERROR (Status)) {
