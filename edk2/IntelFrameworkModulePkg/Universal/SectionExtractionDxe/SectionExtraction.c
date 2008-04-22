@@ -1299,7 +1299,7 @@ IsValidSectionStream (
 
   @param SignalFlag      -  Boolean value to decide whether kick the event after register or not.
 
-  @Return  The EFI_EVENT that has been registered to be signaled when a ProtocolGuid
+  @return  The EFI_EVENT that has been registered to be signaled when a ProtocolGuid
            is added to the system.
 
 **/

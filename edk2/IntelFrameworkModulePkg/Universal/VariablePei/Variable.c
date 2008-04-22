@@ -73,7 +73,7 @@ PeimInitializeVariableServices (
 
   @param VarStoreHeader        Pointer to the Variable Store Header.
 
-  @Return VARIABLE_HEADER*      Pointer to last unavailable Variable Header
+  @return VARIABLE_HEADER*      Pointer to last unavailable Variable Header
 
 **/
 VARIABLE_HEADER *
@@ -92,7 +92,7 @@ GetStartPointer (
 
   @param VarStoreHeader        Pointer to the Variable Store Header.
 
-  @Return  VARIABLE_HEADER*      Pointer to last unavailable Variable Header
+  @return  VARIABLE_HEADER*      Pointer to last unavailable Variable Header
 
 **/
 VARIABLE_HEADER *
@@ -136,7 +136,7 @@ IsValidVariableHeader (
 
   @param Variable            Pointer to the Variable Header.
 
-  @Return UINTN               Size of variable in bytes
+  @return UINTN               Size of variable in bytes
 
 **/
 UINTN
@@ -158,7 +158,7 @@ NameSizeOfVariable (
 
   @param Variable            Pointer to the Variable Header.
 
-  @Return  UINTN               Size of variable in bytes
+  @return  UINTN               Size of variable in bytes
 
 **/
 UINTN
@@ -180,7 +180,7 @@ DataSizeOfVariable (
 
   @param Variable            Pointer to the Variable Header.
 
-  @Return CHAR16*              Pointer to Variable Name
+  @return CHAR16*              Pointer to Variable Name
 
 **/
 CHAR16 *
@@ -198,7 +198,7 @@ GetVariableNamePtr (
 
   @param Variable            Pointer to the Variable Header.
 
-  @Return  UINT8*              Pointer to Variable Data
+  @return  UINT8*              Pointer to Variable Data
 
 **/
 UINT8 *
@@ -223,7 +223,7 @@ GetVariableDataPtr (
 
   @param Variable              Pointer to the Variable Header.
 
-  @Return VARIABLE_HEADER*      Pointer to next variable header.
+  @return VARIABLE_HEADER*      Pointer to next variable header.
 
 **/
 VARIABLE_HEADER *
@@ -295,7 +295,7 @@ GetVariableStoreStatus (
   @param PtrTrack       - Variable Track Pointer structure that contains
                    Variable Information.
 
-  @Retval  EFI_SUCCESS    - Found match variable
+  @retval  EFI_SUCCESS    - Found match variable
   @retval EFI_NOT_FOUND  - Variable not found
 
 **/

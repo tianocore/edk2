@@ -191,7 +191,7 @@ FddWriteBlocks (
   @param LBA      The starting logic block address to read from on the device
   @param BufferSize The size of the Buffer in bytes
   @param Operation   - GC_TODO: add argument description
-  Buffer      - GC_TODO: add argument description
+  @param Buffer      - GC_TODO: add argument description
 
   @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
   @retval EFI_SUCCESS - GC_TODO: Add description for return value
@@ -384,7 +384,7 @@ FddReadWriteBlocks (
 /**
   Common interface for free cache 
   
-  @param FdcDec  Pointer of FDC_BLK_IO_DEV instance
+  @param FdcDev  Pointer of FDC_BLK_IO_DEV instance
   
 **/
 VOID

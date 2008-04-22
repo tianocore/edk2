@@ -85,7 +85,7 @@ static EFI_ISA_DMA_REGISTERS  DmaRegisters[8] = {
 
   @param Code         - The error status code.
   
-  @Return EFI_SUCCESS  - Success to report status code.
+  @return EFI_SUCCESS  - Success to report status code.
 **/
 EFI_STATUS
 ReportErrorStatusCode (
@@ -204,10 +204,10 @@ IsaIoIoRead (
   @param Count                 - The number of I/O operations to perform. 
   @param Buffer                - The source buffer to write data from
 
-  @Retval EFI_SUCCESS           - The data was writen to the device sucessfully.
-  @Retval EFI_UNSUPPORTED       - The Offset is not valid for this device.
-  @Retval EFI_INVALID_PARAMETER - Width or Count, or both, were invalid.
-  @Retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
+  @retval EFI_SUCCESS           - The data was writen to the device sucessfully.
+  @retval EFI_UNSUPPORTED       - The Offset is not valid for this device.
+  @retval EFI_INVALID_PARAMETER - Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
 
 **/
 EFI_STATUS
