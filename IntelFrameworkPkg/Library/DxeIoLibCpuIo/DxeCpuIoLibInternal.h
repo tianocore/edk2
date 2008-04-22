@@ -109,7 +109,8 @@ MmioReadWorker (
   @param  Address       The MMIO register to read.
                         The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
-
+  @param  Data          The value to write to the I/O port.
+  
   @return Data read from registers in the EFI system memory space.
 
 **/

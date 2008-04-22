@@ -137,10 +137,11 @@ PreparePackages (
   Then, EFI_HII_PACKAGE_LIST will be register to the default System HII Database. The
   Handle to the newly registered Package List is returned throught HiiHandle.
 
-  @param  NumberOfPackages  The number of HII packages to register.
-  @param  GuidId                    Package List GUID ID.
+  @param  NumberOfPackages         The number of HII packages to register.
+  @param  GuidId                   Package List GUID ID.
+  @param  DriverHandle             The pointer of driver handle
   @param  HiiHandle                The ID used to retrieve the Package List later.
-  @param  ...                          The variable argument list describing all HII Package.
+  @param  ...                      The variable argument list describing all HII Package.
 
   @return
   The allocated and initialized packages.
@@ -279,7 +280,7 @@ HiiLibGetStringFromToken (
   If HiiHandle could not be found in the default HII database, then ASSERT.
   If StringId is not found in PackageList, then ASSERT.
 
-  @param  HiiHandle              The HII handle of package list.
+  @param  PackageList            The HII handle of package list.
   @param  StringId               The String ID.
   @param  String                 The output string.
 

@@ -64,7 +64,8 @@ HiiLibFrameworkConstructor (
   and the variable length argument list of package pointers.
 
   @param  NumberOfPackages The number of HII packages to prepare.
-  @param  Guid Package GUID.
+  @param  Guid             Package GUID.
+  @param  Args             Package contents
 
   @return The allocated and initialized packages.
 

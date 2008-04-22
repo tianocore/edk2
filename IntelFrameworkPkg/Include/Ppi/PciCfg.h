@@ -21,6 +21,8 @@
 #ifndef __PEI_PCI_CFG_H__
 #define __PEI_PCI_CFG_H__
 
+#include <Pi/PiPeiCis.h>
+
 #define EFI_PEI_PCI_CFG_PPI_INSTALLED_GUID \
   { \
     0xe1f2eba0, 0xf7b9, 0x4a26, {0x86, 0x20, 0x13, 0x12, 0x21, 0x64, 0x2a, 0x90 } \
@@ -82,7 +84,6 @@ EFI_STATUS
   );
 
 /**
-  @par Ppi Description:
   The EFI_PEI_PCI_CFG_PPI interfaces are used to abstract accesses to PCI 
   controllers behind a PCI root bridge controller.
 

@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param Pack - List of variables
   @param Name - Name of the variable/map
   @param Guid - GUID of the variable/map
+  @param Id   - The index of the variable/map to retrieve
   @param Var  - Pointer to the variable/map
   @param Size - Size of the variable/map in bytes
 **/
@@ -119,11 +120,12 @@ EfiLibHiiVariablePackListForEachVar (
   @param List - List of variables
   @param Name - Name of the variable/map
   @param Guid - GUID of the variable/map
+  @param Id   - Id of the variable/map
   @param Var  - Pointer to the variable/map
   @param Size - Size of the variable/map in bytes
 
-  @param EFI_SUCCESS   - Variable is found, OUT parameters are valid
-  @param EFI_NOT_FOUND - Variable is not found, OUT parameters are not valid
+  @return EFI_SUCCESS   - Variable is found, OUT parameters are valid
+  @return EFI_NOT_FOUND - Variable is not found, OUT parameters are not valid
 **/
 EFI_STATUS
 EfiLibHiiVariablePackListGetMapByIdx (
@@ -233,6 +235,7 @@ EfiLibHiiVariablePackListGetMapById (
   @param List - List of variables
   @param Name - Name of the variable/map to be found
   @param Guid - GUID of the variable/map to be found
+  @param Id   - Id of the variable/map to be found
   @param Var  - Pointer to the variable/map found
   @param Size - Size of the variable/map in bytes found
 
