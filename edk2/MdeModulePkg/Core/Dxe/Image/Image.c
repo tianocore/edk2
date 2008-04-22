@@ -612,9 +612,9 @@ Arguments:
                         the image to be loaded.
   SourceSize          - The size in bytes of SourceBuffer.
   DstBuffer           - The buffer to store the image
-  NumberOfPages       - If not NULL, a pointer to the image's page number, if this number
-                        is not enough, return EFI_BUFFER_TOO_SMALL and this parameter contain
-                        the required number.
+  NumberOfPages       - If not NULL, it inputs a pointer to the page number of DstBuffer and outputs
+                        a pointer to the page number of the image. If this number is not enough, 
+                        return EFI_BUFFER_TOO_SMALL and this parameter contains the required number.
   ImageHandle         - Pointer to the returned image handle that is created when the image
                         is successfully loaded.
   EntryPoint          - A pointer to the entry point
@@ -759,6 +759,10 @@ Returns:
     }
     goto Done;
   }
+
+  if (NumberOfPages != NULL) {
+    *NumberOfPages = Image->NumberOfPages;
+  }  
 
   //
   // Register the image in the Debug Image Info Table if the attribute is set
