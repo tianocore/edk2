@@ -1,5 +1,5 @@
 /** @file
-  Processor or Compiler specific defines and types for x64.
+  Processor or Compiler specific defines and types for Ia32 architecture.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
