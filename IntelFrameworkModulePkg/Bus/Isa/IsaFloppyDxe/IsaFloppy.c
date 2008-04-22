@@ -361,7 +361,7 @@ Done:
   created by this driver.
 
   @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on
+  @param  Controller        Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
   @param  ChildHandleBuffer List of Child Handles to Stop.

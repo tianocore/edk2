@@ -2008,7 +2008,7 @@ DisableKeyboard (
   If Keyboard receives 0xF4, it will respond with 'ACK'. If it doesn't respond, the device
   should not be in system.
 
-  @param[in]  BiosKeyboardPrivate   Keyboard Private Data Structure
+  @param[in]  ConsoleIn             Keyboard Private Data Structure
 
   @retval     TRUE                  Keyboard in System.
   @retval     FALSE                 Keyboard not in System.

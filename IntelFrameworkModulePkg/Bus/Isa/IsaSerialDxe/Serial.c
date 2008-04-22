@@ -520,7 +520,7 @@ Error:
   @param  This                - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param  Controller          - The handle of the controller to test.
   @param  NumberOfChildren    - Number of child device.
-  @param  RemainingDevicePath - A pointer to the remaining portion of a device path.
+  @param  ChildHandleBuffer   - A pointer to the remaining portion of a device path.
 
   @retval EFI_SUCCESS         - Operation successfully
   @retval EFI_DEVICE_ERROR    - Cannot stop the driver successfully

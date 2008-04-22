@@ -408,7 +408,7 @@ DisketChanged (
   and the initial values for each of the three internal
   times: HUT, SRT and HLT
   
-  @param This    Pointer to instance of FDC_BLK_IO_DEV
+  @param FdcDev    Pointer to instance of FDC_BLK_IO_DEV
   
   @retval  EFI_SUCCESS:    Execute the Specify command successfully
   @retval  EFI_DEVICE_ERROR: Fail to execute the command
@@ -627,7 +627,7 @@ Seek (
   Do the Sense Interrupt Status command, this command
   resets the interrupt signal
   
-  
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   @param  StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC
   @param  PresentCylinderNumber  UINT8 *: Be used to save present cylinder number
                                     read from FDC
@@ -1111,7 +1111,7 @@ DataOutByte (
   Detect the specified floppy logic drive is busy or
   not within a period of time
   
-  @param Disk             Indicate it is drive A or drive B
+  @param FdcDev           Indicate it is drive A or drive B
   @param TimeoutInSeconds the time period for waiting
   
   @retval EFI_SUCCESS:  The drive and command are not busy
@@ -1232,10 +1232,10 @@ FddDRQReady (
   @param Result  Point to result structure
   @param FdcDev  FDC control structure
 
-  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  @param EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  @param EFI_SUCCESS - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS - GC_TODO: Add description for return value
 
 **/
 EFI_STATUS
@@ -1407,7 +1407,8 @@ FdcReadPort (
  
   @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   @param Offset The offset address of port
-
+  @param Data   Value written to port
+  
 **/
 VOID
 FdcWritePort (
