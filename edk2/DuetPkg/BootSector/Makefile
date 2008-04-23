@@ -167,12 +167,8 @@ LIBS =
 
 COMMON_DEPS = 
 
-all: init $(TARGET_FILES) loader
+all: $(TARGET_FILES) loader
           
-init:
-  if not exist $(OUTPUT_DIR) mkdir $(OUTPUT_DIR)
-  if not exist $(DEBUG_DIR) mkdir $(DEBUG_DIR)
-
 #=============                
 $(OUTPUT_DIR)\bootsect.obj:$(MODULE_DIR)\bootsect.asm
   $(ASM) /c /omf /Fo"$(OUTPUT_DIR)\bootsect.obj" /FR"$(OUTPUT_DIR)\bootsect.txt" "$(MODULE_DIR)\bootsect.asm"
