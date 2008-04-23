@@ -646,6 +646,8 @@ _IPrint (
   UINTN                          BufferGlyphWidth;
 
   GlyphStatus = 0;
+  HorizontalResolution = 0;
+  VerticalResolution = 0;
 
   //
   // For now, allocate an arbitrarily long buffer
