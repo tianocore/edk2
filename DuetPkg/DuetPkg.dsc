@@ -9,7 +9,7 @@
   SUPPORTED_ARCHITECTURES        = IA32|X64
   BUILD_TARGETS                  = DEBUG
   SKUID_IDENTIFIER               = DEFAULT
-  #FLASH_DEFINITION               = DuetPkg/DuetPkg.fdf
+  FLASH_DEFINITION               = DuetPkg/DuetPkg.fdf
 
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
