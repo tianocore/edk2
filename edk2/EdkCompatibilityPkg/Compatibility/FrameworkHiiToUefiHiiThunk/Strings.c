@@ -267,8 +267,8 @@ Returns:
       if (AsciiLanguage == NULL) {
         return HiiLibGetString (HandleMapEntry->UefiHiiHandle, Token, StringBuffer, BufferLengthTemp);
       } else {
-        return mUefiStringProtocol->GetString (
-                                     mUefiStringProtocol,
+        return mHiiStringProtocol->GetString (
+                                     mHiiStringProtocol,
                                      AsciiLanguage,
                                      HandleMapEntry->UefiHiiHandle,
                                      Token,

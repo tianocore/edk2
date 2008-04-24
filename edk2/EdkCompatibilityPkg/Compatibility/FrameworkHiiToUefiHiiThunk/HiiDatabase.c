@@ -56,11 +56,11 @@ EFI_HII_THUNK_PRIVATE_DATA HiiThunkPrivateDataTempate = {
   },
 };
 
-CONST EFI_HII_DATABASE_PROTOCOL            *mUefiHiiDatabaseProtocol;
-CONST EFI_HII_FONT_PROTOCOL                *mUefiHiiFontProtocol;
-CONST EFI_HII_IMAGE_PROTOCOL               *mUefiHiiImageProtocol;
-CONST EFI_HII_STRING_PROTOCOL              *mUefiStringProtocol;
-CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mUefiConfigRoutingProtocol;
+CONST EFI_HII_DATABASE_PROTOCOL            *mHiiDatabase;
+CONST EFI_HII_FONT_PROTOCOL                *mHiiFontProtocol;
+CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
+CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
+CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
 
 
 EFI_STATUS
@@ -96,35 +96,35 @@ Returns:
   Status = gBS->LocateProtocol (
                   &gEfiHiiDatabaseProtocolGuid,
                   NULL,
-                  (VOID **) &mUefiHiiDatabaseProtocol
+                  (VOID **) &mHiiDatabase
                   );
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->LocateProtocol (
                   &gEfiHiiFontProtocolGuid,
                   NULL,
-                  (VOID **) &mUefiHiiFontProtocol
+                  (VOID **) &mHiiFontProtocol
                   );
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->LocateProtocol (
                   &gEfiHiiImageProtocolGuid,
                   NULL,
-                  (VOID **) &mUefiHiiImageProtocol
+                  (VOID **) &mHiiImageProtocol
                   );
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->LocateProtocol (
                   &gEfiHiiStringProtocolGuid,
                   NULL,
-                  (VOID **) &mUefiStringProtocol
+                  (VOID **) &mHiiStringProtocol
                   );
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->LocateProtocol (
                   &gEfiHiiConfigRoutingProtocolGuid,
                   NULL,
-                  (VOID **) &mUefiConfigRoutingProtocol
+                  (VOID **) &mHiiConfigRoutingProtocol
                   );
   ASSERT_EFI_ERROR (Status);
 

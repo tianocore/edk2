@@ -332,8 +332,8 @@ ThunkExtractConfig (
   }
   
   if (!EFI_ERROR (Status)) {
-    Status = mUefiConfigRoutingProtocol->BlockToConfig (
-                                            mUefiConfigRoutingProtocol,
+    Status = mHiiConfigRoutingProtocol->BlockToConfig (
+                                            mHiiConfigRoutingProtocol,
                                             Request,
                                             Data,
                                             DataSize,
@@ -378,8 +378,8 @@ ThunkRouteConfig (
   if (Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  Status = mUefiConfigRoutingProtocol->ConfigToBlock (
-                                          mUefiConfigRoutingProtocol,
+  Status = mHiiConfigRoutingProtocol->ConfigToBlock (
+                                          mHiiConfigRoutingProtocol,
                                           Configuration,
                                           Data,
                                           &LastModifiedByteIndex,

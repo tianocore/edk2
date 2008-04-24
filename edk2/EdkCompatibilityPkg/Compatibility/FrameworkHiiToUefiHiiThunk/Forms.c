@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "HiiDatabase.h"
+#include "UefiIfrDefault.h"
 
 EFI_STATUS
 EFIAPI
@@ -89,6 +90,7 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
+
 EFI_STATUS
 EFIAPI
 HiiGetDefaultImage (
@@ -119,7 +121,31 @@ HiiGetDefaultImage (
 
 --*/
 {
-  return EFI_SUCCESS;
+  LIST_ENTRY        *UefiDefaults;
+  EFI_HII_HANDLE    UefiHiiHandle;
+  EFI_STATUS        Status;
+  EFI_HII_THUNK_PRIVATE_DATA *Private;
+
+  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+
+  UefiHiiHandle = FrameworkHiiHandleToUefiHiiHandle (Private, Handle);
+  if (UefiHiiHandle == NULL) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  UefiDefaults = NULL;
+  Status = UefiIfrGetBufferTypeDefaults (UefiHiiHandle, &UefiDefaults);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = UefiDefaultsToFrameworkDefaults (UefiDefaults, DefaultMask, VariablePackList);
+
+Done:
+  FreeDefaultList (UefiDefaults);
+  
+  return Status;
 }
 
 EFI_STATUS
@@ -143,8 +169,8 @@ ThunkUpdateFormCallBack (
     return EFI_INVALID_PARAMETER;
   }
   
-  Status = mUefiHiiDatabaseProtocol->GetPackageListHandle (
-                                        mUefiHiiDatabaseProtocol,
+  Status = mHiiDatabase->GetPackageListHandle (
+                                        mHiiDatabase,
                                         HandleMapEntry->UefiHiiHandle,
                                         &UefiDriverHandle
                                         );
@@ -191,7 +217,7 @@ AppendToUpdateBuffer (
 }
 
 EFI_STATUS
-Framework2UefiCreateSubtitleOpCode (
+F2UCreateSubtitleOpCode (
   IN CONST FRAMEWORK_EFI_IFR_SUBTITLE  *FwSubTitle,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
   )
@@ -209,7 +235,7 @@ Framework2UefiCreateSubtitleOpCode (
 }
 
 EFI_STATUS
-Framework2UefiCreateTextOpCode (
+F2UCreateTextOpCode (
   IN CONST FRAMEWORK_EFI_IFR_TEXT      *FwText,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
   )
@@ -260,11 +286,11 @@ ThunkFrameworkUpdateDataToUefiUpdateData (
   for (Index = 0; Index < Data->DataCount; Index++) {
     switch (FrameworkOpcodeBuffer->OpCode) {
       case FRAMEWORK_EFI_IFR_SUBTITLE_OP:
-        Status = Framework2UefiCreateSubtitleOpCode ((FRAMEWORK_EFI_IFR_SUBTITLE  *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer);
+        Status = F2UCreateSubtitleOpCode ((FRAMEWORK_EFI_IFR_SUBTITLE  *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer);
         break;
         
       case FRAMEWORK_EFI_IFR_TEXT_OP:
-        Status = Framework2UefiCreateTextOpCode ((FRAMEWORK_EFI_IFR_TEXT  *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer);  
+        Status = F2UCreateTextOpCode ((FRAMEWORK_EFI_IFR_TEXT  *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer);  
         break;
         
       default:
@@ -284,6 +310,199 @@ ThunkFrameworkUpdateDataToUefiUpdateData (
   *UefiData = UefiUpdateDataBuffer;
   
   return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+GetPackageDataFromPackageList (
+  IN  EFI_HII_PACKAGE_LIST_HEADER *HiiPackageList,
+  IN  UINT32                      PackageIndex,
+  OUT UINT32                      *BufferLen,
+  OUT EFI_HII_PACKAGE_HEADER      **Buffer
+  )
+{
+  UINT32                        Index;
+  EFI_HII_PACKAGE_HEADER        *Package;
+  UINT32                        Offset;
+  UINT32                        PackageListLength;
+  EFI_HII_PACKAGE_HEADER        PackageHeader = {0, 0};
+
+  ASSERT(HiiPackageList != NULL);
+
+  if ((BufferLen == NULL) || (Buffer == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Package = NULL;
+  Index   = 0;
+  Offset  = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
+  CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
+  while (Offset < PackageListLength) {
+    Package = (EFI_HII_PACKAGE_HEADER *) (((UINT8 *) HiiPackageList) + Offset);
+    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
+    if (Index == PackageIndex) {
+      break;
+    }
+    Offset += PackageHeader.Length;
+    Index++;
+  }
+  if (Offset >= PackageListLength) {
+    //
+    // no package found in this Package List
+    //
+    return EFI_NOT_FOUND;
+  }
+
+  *BufferLen = PackageHeader.Length;
+  *Buffer    = Package;
+  return EFI_SUCCESS;
+}
+
+/**
+  Check if Label exist in the IFR form package.
+
+  @param 
+
+**/
+EFI_STATUS
+LocateLabel (
+  IN CONST EFI_HII_PACKAGE_HEADER *Package,
+  IN       EFI_FORM_LABEL          Label,
+  OUT      EFI_GUID                *FormsetGuid,
+  OUT      EFI_FORM_ID             *FormId
+  )
+{
+  UINTN                     Offset;
+  EFI_IFR_OP_HEADER         *IfrOpHdr;
+  UINT8                     ExtendOpCode;
+  UINT16                    LabelNumber;
+  EFI_GUID                  InternalFormSetGuid;
+  EFI_FORM_ID               InternalFormId;
+  BOOLEAN                   GetFormSet;
+  BOOLEAN                   GetForm;
+
+  IfrOpHdr   = (EFI_IFR_OP_HEADER *)((UINT8 *) Package + sizeof (EFI_HII_PACKAGE_HEADER));
+  Offset     = sizeof (EFI_HII_PACKAGE_HEADER);
+
+  InternalFormId= 0;
+  ZeroMem (&InternalFormSetGuid, sizeof (EFI_GUID));
+  GetFormSet = FALSE;
+  GetForm    = FALSE;
+
+  while (Offset < Package->Length) {
+    switch (IfrOpHdr->OpCode) {
+    case EFI_IFR_FORM_SET_OP :
+      CopyMem (&InternalFormSetGuid, &((EFI_IFR_FORM_SET *) IfrOpHdr)->Guid, sizeof (EFI_GUID));
+      GetFormSet = TRUE;
+      break;
+
+    case EFI_IFR_FORM_OP:
+      CopyMem (&InternalFormId, &((EFI_IFR_FORM *) IfrOpHdr)->FormId, sizeof (EFI_FORM_ID));
+      GetForm = TRUE;
+      break;
+
+    case EFI_IFR_GUID_OP :
+      ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
+      
+      if (ExtendOpCode != EFI_IFR_EXTEND_OP_LABEL) {
+        //
+        // Go to the next Op-Code
+        //
+        Offset   += IfrOpHdr->Length;
+        IfrOpHdr = (EFI_IFR_OP_HEADER *) ((CHAR8 *) (IfrOpHdr) + IfrOpHdr->Length);
+        continue;
+      }
+      
+      CopyMem (&LabelNumber, &((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number, sizeof (UINT16));
+      if (LabelNumber == Label) {
+        ASSERT (GetForm && GetFormSet);
+        CopyGuid (FormsetGuid, &InternalFormSetGuid);
+        *FormId = InternalFormId;
+        return EFI_SUCCESS;
+      }
+      
+
+      break;
+    default :
+      break;
+    }
+
+    //
+    // Go to the next Op-Code
+    //
+    Offset   += IfrOpHdr->Length;
+    IfrOpHdr = (EFI_IFR_OP_HEADER *) ((CHAR8 *) (IfrOpHdr) + IfrOpHdr->Length);
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Find the first EFI_FORM_LABEL in FormSets for a given EFI_HII_HANLDE defined.
+  
+  EFI_FORM_LABEL is a specific to Tiano implementation. The current implementation
+  does not restrict labels with same label value to be duplicated in either FormSet 
+  scope or Form scope. This function will only locate the FIRST EFI_FORM_LABEL
+  with value as the same as the input Label in the Formset registered with UefiHiiHandle. The FormSet GUID 
+  and Form ID is returned if such Label is found.
+
+  
+  @retval EFI_INVALID_PARAMETER If UefiHiiHandle is not a valid handle.
+  @retval EFI_NOT_FOUND   The package list identified by UefiHiiHandle deos not contain FormSet or
+                                         There is no Form ID with value Label found in all Form Sets in the pacakge
+                                         list.
+                                         
+  @retval EFI_SUCCESS       The first found Form ID is returned in FormId.
+**/
+EFI_STATUS
+ThunkLocateFormId (
+  IN  EFI_HII_HANDLE Handle,
+  IN  EFI_FORM_LABEL Label,
+  OUT EFI_GUID       *FormsetGuid,
+  OUT EFI_FORM_ID    *FormId
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+  UINT32                       Index;
+  UINTN                        BufferSize;
+  EFI_HII_PACKAGE_HEADER       PackageHeader;
+  EFI_HII_PACKAGE_HEADER       *Package;
+  UINT32                       PackageLength;
+
+  BufferSize = 0;
+  HiiPackageList   = NULL;
+  Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, Handle, &BufferSize, HiiPackageList);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    HiiPackageList = AllocatePool (BufferSize);
+    ASSERT (HiiPackageList != NULL);
+
+    Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, Handle, &BufferSize, HiiPackageList);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+  }
+
+  for (Index = 0; ; Index++) {
+    Status = GetPackageDataFromPackageList (HiiPackageList, Index, &PackageLength, &Package);
+    if (!EFI_ERROR (Status)) {
+      CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
+      if (PackageHeader.Type == EFI_HII_PACKAGE_FORM) {
+        Status = LocateLabel (Package, Label, FormsetGuid, FormId);
+        if (!EFI_ERROR(Status)) {
+          break;
+        }
+      }
+    } else {
+      break;
+    }
+  }
+
+  
+Done:
+  FreePool (HiiPackageList);
+  
+  return Status;
 }
 EFI_STATUS
 EFIAPI
@@ -317,6 +536,8 @@ Returns:
   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
   EFI_HII_UPDATE_DATA                       *UefiHiiUpdateData;
   EFI_HII_HANDLE                            UefiHiiHandle;
+  EFI_GUID                                  FormsetGuid;
+  EFI_FORM_ID                               FormId;
 
   Status = EFI_SUCCESS;
 
@@ -350,7 +571,10 @@ Returns:
     
     ThunkFrameworkUpdateDataToUefiUpdateData (Data, AddData, &UefiHiiUpdateData);
 
-    Status = IfrLibUpdateForm (UefiHiiHandle, NULL, 0, Label, AddData, UefiHiiUpdateData);
+    Status = ThunkLocateFormId (UefiHiiHandle, Label, &FormsetGuid, &FormId);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, AddData, UefiHiiUpdateData);
     ASSERT_EFI_ERROR (Status);
     
     if (UefiHiiUpdateData != NULL) {
