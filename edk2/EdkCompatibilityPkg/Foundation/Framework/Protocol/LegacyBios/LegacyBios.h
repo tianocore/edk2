@@ -218,7 +218,7 @@ typedef enum {
   Compatibility16DispatchOprom          = 0x0005,
   Compatibility16GetTableAddress        = 0x0006,
   Compatibility16SetKeyboardLeds        = 0x0007,
-  Compatibility16InstallPciHandler      = 0x0008,
+  Compatibility16InstallPciHandler      = 0x0008
 } EFI_COMPATIBILITY_FUNCTIONS;
 
 //

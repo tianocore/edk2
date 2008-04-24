@@ -137,7 +137,7 @@ typedef enum {
   EfiSystemWakeupTypeLanRemote = 5,
   EfiSystemWakeupTypePowerSwitch = 6,
   EfiSystemWakeupTypePciPme = 7,
-  EfiSystemWakeupTypeAcPowerRestored = 8,
+  EfiSystemWakeupTypeAcPowerRestored = 8
 } EFI_MISC_SYSTEM_WAKEUP_TYPE;
 
 typedef struct {
@@ -180,7 +180,7 @@ typedef enum {
   EfiBaseBoardTypeMotherBoard = 0xA,
   EfiBaseBoardTypeProcessorMemoryModule = 0xB,
   EfiBaseBoardTypeProcessorIOModule = 0xC,
-  EfiBaseBoardTypeInterconnectBoard = 0xD,
+  EfiBaseBoardTypeInterconnectBoard = 0xD
 } EFI_BASE_BOARD_TYPE;
 
 typedef struct {
@@ -248,7 +248,7 @@ typedef enum {
   EfiChassisStateSafe = 3,
   EfiChassisStateWarning = 4,
   EfiChassisStateCritical = 5,
-  EfiChassisStateNonRecoverable = 6,
+  EfiChassisStateNonRecoverable = 6
 } EFI_MISC_CHASSIS_STATE;
 
 typedef enum {  
@@ -256,7 +256,7 @@ typedef enum {
   EfiChassisSecurityStatusUnknown = 2,
   EfiChassisSecurityStatusNone = 3,
   EfiChassisSecurityStatusExternalInterfaceLockedOut = 4,
-  EfiChassisSecurityStatusExternalInterfaceLockedEnabled = 5,
+  EfiChassisSecurityStatusExternalInterfaceLockedEnabled = 5
 } EFI_MISC_CHASSIS_SECURITY_STATE;
 
 typedef struct {
@@ -338,7 +338,7 @@ typedef enum {
   EfiPortConnectorTypePCH98 = 0xA2,
   EfiPortConnectorTypePC98Note = 0xA3,
   EfiPortConnectorTypePC98Full = 0xA4,
-  EfiPortConnectorTypeOther = 0xFF,
+  EfiPortConnectorTypeOther = 0xFF
 } EFI_MISC_PORT_CONNECTOR_TYPE;
 
 typedef enum {  
@@ -378,7 +378,7 @@ typedef enum {
   EfiPortTypeSas = 0x21,
   EfiPortType8251Compatible = 0xA0,
   EfiPortType8251FifoCompatible = 0xA1,
-  EfiPortTypeOther = 0xFF,
+  EfiPortTypeOther = 0xFF
 } EFI_MISC_PORT_TYPE;
 
 
@@ -445,14 +445,14 @@ typedef enum {
   EfiSlotDataBusWidth8xOrx8 = 0xB,
   EfiSlotDataBusWidth12xOrx12 = 0xC,
   EfiSlotDataBusWidth16xOrx16 = 0xD,
-  EfiSlotDataBusWidth32xOrx32 = 0xE,
+  EfiSlotDataBusWidth32xOrx32 = 0xE
 } EFI_MISC_SLOT_DATA_BUS_WIDTH;
 
 typedef enum {  
   EfiSlotUsageOther = 1,
   EfiSlotUsageUnknown = 2,
   EfiSlotUsageAvailable = 3,
-  EfiSlotUsageInUse = 4,
+  EfiSlotUsageInUse = 4
 } EFI_MISC_SLOT_USAGE;
   
 typedef enum {  
@@ -613,7 +613,7 @@ typedef enum {
   EfiPointingDeviceTypeGlidePoint = 6,
   EfiPointingDeviceTouchPad = 7,
   EfiPointingDeviceTouchScreen = 8,
-  EfiPointingDeviceOpticalSensor = 9,
+  EfiPointingDeviceOpticalSensor = 9
 } EFI_MISC_POINTING_DEVICE_TYPE;
 
 typedef enum {  
@@ -627,7 +627,7 @@ typedef enum {
   EfiPointingDeviceInterfaceADB = 8,
   EfiPointingDeviceInterfaceBusMouseDB9 = 0xA0,
   EfiPointingDeviceInterfaceBusMouseMicroDin = 0xA1,
-  EfiPointingDeviceInterfaceUsb = 0xA2,
+  EfiPointingDeviceInterfaceUsb = 0xA2
 } EFI_MISC_POINTING_DEVICE_INTERFACE;
 
 typedef struct {
@@ -652,7 +652,7 @@ typedef enum {
   EfiPortableBatteryDeviceChemistryNickelMetalHydride = 5,
   EfiPortableBatteryDeviceChemistryLithiumIon = 6,
   EfiPortableBatteryDeviceChemistryZincAir = 7,
-  EfiPortableBatteryDeviceChemistryLithiumPolymer = 8,
+  EfiPortableBatteryDeviceChemistryLithiumPolymer = 8
 } EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY;
 
 typedef struct {
@@ -908,7 +908,7 @@ typedef enum {
   EfiBootInformationStatusWatchdogTimerExpired = 8,
   EfiBootInformationStatusStartReserved = 9,
   EfiBootInformationStatusStartOemSpecific = 128,
-  EfiBootInformationStatusStartProductSpecific = 192,
+  EfiBootInformationStatusStartProductSpecific = 192
 } EFI_MISC_BOOT_INFORMATION_STATUS_TYPE;
 
 typedef struct {
@@ -977,7 +977,7 @@ typedef enum {
   EfiIpmiOther = 0,
   EfiIpmiKcs = 1,
   EfiIpmiSmic = 2,
-  EfiIpmiBt = 3,
+  EfiIpmiBt = 3
 } EFI_MISC_IPMI_INTERFACE_TYPE;
 
 typedef struct {

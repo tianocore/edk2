@@ -414,10 +414,10 @@ EFI_STATUS
 typedef enum {
   EfiResetCold,
   EfiResetWarm,
-  EfiResetShutdown,
+  EfiResetShutdown
 
 #if ((TIANO_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
-  EfiResetUpdate
+  , EfiResetUpdate
 #endif
 
 } EFI_RESET_TYPE;

@@ -22,7 +22,7 @@ Abstract:
 #ifndef _TIANO_SPEC_ERROR_H_
 #define _TIANO_SPEC_ERROR_H_
 
-#include "EfiBind.h"
+#include <EfiBind.h>
 #define TIANO_ERROR(a)          (MAX_2_BITS | (a))
 
 //

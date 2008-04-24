@@ -118,7 +118,7 @@ UpdateFormPackageData (
   EfiCopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
   IfrOpHdr   = (EFI_IFR_OP_HEADER *)((UINT8 *) Package + sizeof (EFI_HII_PACKAGE_HEADER));
   Offset     = sizeof (EFI_HII_PACKAGE_HEADER);
-  GetFormSet = (FormSetGuid == NULL) ? TRUE : FALSE;
+  GetFormSet = (BOOLEAN)((FormSetGuid == NULL) ? TRUE : FALSE);
   GetForm    = FALSE;
   Updated    = FALSE;
 

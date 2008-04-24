@@ -167,7 +167,7 @@ Returns:
     Operand >>= 1;
     Bitpos++;
   }
-  return (Bitpos - 1);
+  return (UINT8)(Bitpos - 1);
 
 }
 

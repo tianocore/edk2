@@ -762,8 +762,6 @@ Returns: (VOID)
       }
     }
   }
-
-  return ;
 }
 
 EFI_STATUS
