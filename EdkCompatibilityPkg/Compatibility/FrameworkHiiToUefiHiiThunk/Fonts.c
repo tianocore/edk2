@@ -16,6 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "HiiDatabase.h"
 
+
+UINT8 mGlyphBuffer[EFI_GLYPH_WIDTH * 2 * EFI_GLYPH_HEIGHT];
+
 EFI_STATUS
 EFIAPI
 HiiGetGlyph (
@@ -47,7 +50,7 @@ Returns:
 --*/
 {
   ASSERT (FALSE);
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 EFI_STATUS
@@ -64,5 +67,5 @@ HiiGlyphToBlt (
   )
 {
   ASSERT (FALSE);
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }

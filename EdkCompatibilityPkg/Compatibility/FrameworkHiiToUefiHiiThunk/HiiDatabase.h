@@ -46,17 +46,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HiiLib.h>
 #include <Library/ExtendedHiiLib.h>
 
-//
-// There are some type redefinitions between Framework Ifr Support Library and 
-// UEFI HII Ifr Support Library. We undefine the duplicated Framework  definition here 
-// so that the duplicated definitions in UEFI HII Ifr can be defined.
-// In this Thunk Module, we will access all Framework definition with "FRAMEWORK_" prefix.
-//
-#undef IFR_OPTION
-#undef EFI_HII_UPDATE_DATA
-
 #include <Library/IfrSupportLib.h>
 #include <Library/ExtendedIfrSupportLib.h>
+
+#include <MdeModuleHii.h>
 
 //
 // Macros
@@ -147,11 +140,11 @@ typedef struct {
 //
 // Extern Variables
 //
-extern CONST EFI_HII_DATABASE_PROTOCOL            *mUefiHiiDatabaseProtocol;
-extern CONST EFI_HII_FONT_PROTOCOL                *mUefiHiiFontProtocol;
-extern CONST EFI_HII_IMAGE_PROTOCOL               *mUefiHiiImageProtocol;
-extern CONST EFI_HII_STRING_PROTOCOL              *mUefiStringProtocol;
-extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mUefiConfigRoutingProtocol;
+extern CONST EFI_HII_DATABASE_PROTOCOL            *mHiiDatabase;
+extern CONST EFI_HII_FONT_PROTOCOL                *mHiiFontProtocol;
+extern CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
+extern CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
+extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
 
 //
 // Prototypes

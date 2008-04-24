@@ -33,6 +33,15 @@
 #
 
 [Sources.common]
+  UefiIfrParserInternal.h
+  UefiIfrParserCommon.c
+  UefiIfrParserCommon.h
+  UefiIfrParser.c
+  UefiIfrParser.h
+  UefiIfrParserExpression.c
+  UefiIfrParserExpressionInternal.h
+  UefiIfrDefault.c
+  UefiIfrDefault.h
   Keyboard.c
   Fonts.c
   Package.c
@@ -44,6 +53,8 @@
   ConfigAccess.h
   Utility.c
   Utility.h
+  R8Lib.c
+  R8Lib.h
   
 
 [Packages]
@@ -63,6 +74,7 @@
   ExtendedHiiLib
   IfrSupportLib
   ExtendedIfrSupportLib
+  PrintLib
 
 [Protocols]
   gEfiHiiProtocolGuid
@@ -73,6 +85,7 @@
   gEfiHiiConfigRoutingProtocolGuid
   gEfiHiiConfigAccessProtocolGuid
   gEfiFormCallbackProtocolGuid
+  gEfiUnicodeCollation2ProtocolGuid
 
 [Depex]
   gEfiHiiImageProtocolGuid AND

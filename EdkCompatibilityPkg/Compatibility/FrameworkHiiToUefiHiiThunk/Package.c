@@ -86,8 +86,8 @@ LibExportPackageLists (
 
   Size = 0;
   PackageListHdr = NULL;
-  Status = mUefiHiiDatabaseProtocol->ExportPackageLists (
-                                      mUefiHiiDatabaseProtocol,
+  Status = mHiiDatabase->ExportPackageLists (
+                                      mHiiDatabase,
                                       UefiHiiHandle,
                                       &Size,
                                       PackageListHdr
@@ -100,8 +100,8 @@ LibExportPackageLists (
     if (PackageListHeader == NULL) {
       return EFI_OUT_OF_RESOURCES;
     } else {
-      Status = mUefiHiiDatabaseProtocol->ExportPackageLists (
-                                          mUefiHiiDatabaseProtocol,
+      Status = mHiiDatabase->ExportPackageLists (
+                                          mHiiDatabase,
                                           UefiHiiHandle,
                                           &Size,
                                           PackageListHdr
@@ -140,8 +140,8 @@ InsertStringPackagesToIfrPackageList (
  )
 {
   EFI_STATUS                  Status;
-  Status = mUefiHiiDatabaseProtocol->UpdatePackageList (
-                                        mUefiHiiDatabaseProtocol,
+  Status = mHiiDatabase->UpdatePackageList (
+                                        mHiiDatabase,
                                         UefiHiiHandle,
                                         StringPackageListHeader
                                         );
@@ -253,23 +253,21 @@ PrepareUefiPackageListFromFrameworkHiiPackages (
   return PackageListHeader;  
 }
 
-EFI_GUID *
-UefiGeneratePackageListGuidId (
-  IN CONST EFI_HII_PACKAGES * Packages
+VOID
+GenerateGuidId (
+  IN      CONST EFI_GUID * InGuid,
+  OUT           EFI_GUID * OutGuid
   )
 {
-  EFI_GUID                 *Guid;
   UINT64                   MonotonicCount;
 
-  Guid = AllocateCopyPool (sizeof (EFI_GUID), Packages->GuidId);
+  CopyMem (OutGuid, InGuid, sizeof (EFI_GUID));
   
   gBS->GetNextMonotonicCount (&MonotonicCount);
   //
   // Use Monotonic Count as a psedo random number generator.
   //
-  *((UINT64 *) Guid) = *((UINT64 *) Guid) + MonotonicCount;
-  
-  return Guid;
+  *((UINT64 *) OutGuid) = *((UINT64 *) OutGuid) + MonotonicCount;
 }
 
 EFI_STATUS
@@ -310,6 +308,9 @@ FindAndAddStringPackageToIfrPackageList(
 
 }
 
+CONST EFI_GUID mAGuid = 
+  { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e } };
+
 EFI_STATUS
 UefiRegisterPackageList(
   EFI_HII_THUNK_PRIVATE_DATA  *Private,
@@ -322,20 +323,35 @@ UefiRegisterPackageList(
   UINTN                       IfrPackNum;
   EFI_HII_PACKAGE_LIST_HEADER *UefiPackageListHeader;
   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *HandleMappingEntry;
-  EFI_GUID                    *GuidId;
+  EFI_GUID                    GuidId;
   EFI_HANDLE                  UefiHiiDriverHandle;
 
-  GuidId = NULL;
   UefiHiiDriverHandle = NULL;
 
   Status = GetIfrAndStringPackNum (Packages, &IfrPackNum, &StringPackNum);
   ASSERT_EFI_ERROR (Status);
+  //
+  // Thunk Layer only handle the following combinations of IfrPack, StringPkg and FontPack
+  //
+  if (IfrPackNum > 1) {
+    return EFI_UNSUPPORTED;
+  }
 
   HandleMappingEntry = AllocateZeroPool (sizeof (*HandleMappingEntry));
   ASSERT (HandleMappingEntry != NULL);
   
   HandleMappingEntry->Signature = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_SIGNATURE;
   HandleMappingEntry->FrameworkHiiHandle = Private->StaticHiiHandle++;
+
+  //
+  // Packages->GuidId may be NULL. In such case, caller of FramworkHii->NewPack is registering
+  // package with StringPack and IfrPack.
+  //
+  if (Packages->GuidId == NULL) {
+    Packages->GuidId = &GuidId;
+    GenerateGuidId (&mAGuid, Packages->GuidId);
+  }
+  
   CopyGuid (&HandleMappingEntry->TagGuid, Packages->GuidId);
 
   if ((StringPackNum == 0) && (IfrPackNum != 0)) {
@@ -344,7 +360,7 @@ UefiRegisterPackageList(
     // In Framework HII implementation, Packages->GuidId is used as an identifier to associate 
     // a PackageList with only IFR to a Package list the with String package.
     //
-    GuidId = UefiGeneratePackageListGuidId (Packages);
+    GenerateGuidId (Packages->GuidId, &GuidId);
   }
 
   //
@@ -354,9 +370,9 @@ UefiRegisterPackageList(
   if (IfrPackNum != 0) {
     InstallDefaultUefiConfigAccessProtocol (Packages, &UefiHiiDriverHandle, HandleMappingEntry);
   }
-  UefiPackageListHeader = PrepareUefiPackageListFromFrameworkHiiPackages (Packages, GuidId);
-  Status = mUefiHiiDatabaseProtocol->NewPackageList (
-              mUefiHiiDatabaseProtocol,
+  UefiPackageListHeader = PrepareUefiPackageListFromFrameworkHiiPackages (Packages, &GuidId);
+  Status = mHiiDatabase->NewPackageList (
+              mHiiDatabase,
               UefiPackageListHeader,  
               UefiHiiDriverHandle,
               &HandleMappingEntry->UefiHiiHandle
@@ -413,7 +429,6 @@ Done:
   }
 
   FreePool (UefiPackageListHeader);
-  SafeFreePool (GuidId);
   
   return Status;
 }
@@ -493,8 +508,8 @@ Returns:
   HandleMapEntry = FrameworkHiiHandleToMapDatabaseEntry (Private, Handle);
 
   if (HandleMapEntry->UefiHiiHandle != NULL) {
-    Status = mUefiHiiDatabaseProtocol->RemovePackageList (
-                                          mUefiHiiDatabaseProtocol,
+    Status = mHiiDatabase->RemovePackageList (
+                                          mHiiDatabase,
                                           HandleMapEntry->UefiHiiHandle
                                           );
     ASSERT_EFI_ERROR (Status);
