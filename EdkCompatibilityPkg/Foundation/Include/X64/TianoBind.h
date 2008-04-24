@@ -23,7 +23,7 @@ Abstract:
 #ifndef _TIANO_BIND_H_
 #define _TIANO_BIND_H_
 
-#include "EfiBind.h"
+#include <EfiBind.h>
 
 #define EFI_DXE_ENTRY_POINT(InitFunction)
 

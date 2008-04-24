@@ -196,7 +196,8 @@ Returns:
   // Make sure it will all fit in the passed in buffer
   //
   TotalSize = sizeof (EFI_STATUS_CODE_DATA) + sizeof (EFI_DEBUG_ASSERT_DATA);
-  TotalSize += EfiAsciiStrLen (Filename) + EfiAsciiStrLen (Description);
+  TotalSize += EfiAsciiStrLen (Filename);
+  TotalSize += EfiAsciiStrLen (Description);
   if (TotalSize > BufferSize) {
     return EFI_BUFFER_TOO_SMALL;
   }

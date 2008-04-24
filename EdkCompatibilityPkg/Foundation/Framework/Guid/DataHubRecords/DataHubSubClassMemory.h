@@ -78,7 +78,7 @@ typedef enum _EFI_MEMORY_ARRAY_USE {
   EfiMemoryArrayUseVideoMemory                = 0x04,
   EfiMemoryArrayUseFlashMemory                = 0x05,
   EfiMemoryArrayUseNonVolatileRam             = 0x06,
-  EfiMemoryArrayUseCacheMemory                = 0x07,
+  EfiMemoryArrayUseCacheMemory                = 0x07
 } EFI_MEMORY_ARRAY_USE;
 
 typedef enum _EFI_MEMORY_ERROR_CORRECTION {
@@ -88,7 +88,7 @@ typedef enum _EFI_MEMORY_ERROR_CORRECTION {
   EfiMemoryErrorCorrectionParity              = 0x04,
   EfiMemoryErrorCorrectionSingleBitEcc        = 0x05,
   EfiMemoryErrorCorrectionMultiBitEcc         = 0x06,
-  EfiMemoryErrorCorrectionCrc                 = 0x07,
+  EfiMemoryErrorCorrectionCrc                 = 0x07
 } EFI_MEMORY_ERROR_CORRECTION;
 
 typedef struct {

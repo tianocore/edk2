@@ -32,7 +32,7 @@ IsValidQuestionFlags (
   IN UINT8                   Flags
   )
 {
-  return (Flags & (~QUESTION_FLAGS)) ? FALSE : TRUE;
+  return (BOOLEAN)((Flags & (~QUESTION_FLAGS)) ? FALSE : TRUE);
 }
 
 STATIC
@@ -41,7 +41,7 @@ IsValidValueType (
   IN UINT8                   Type
   )
 {
-  return (Type <= EFI_IFR_TYPE_OTHER) ? TRUE : FALSE;
+  return (BOOLEAN)((Type <= EFI_IFR_TYPE_OTHER) ? TRUE : FALSE);
 }
 
 STATIC
@@ -67,7 +67,7 @@ IsValidCheckboxFlags (
   IN UINT8                   Flags
   )
 {
-  return (Flags <= EFI_IFR_CHECKBOX_DEFAULT_MFG) ? TRUE : FALSE;
+  return (BOOLEAN)((Flags <= EFI_IFR_CHECKBOX_DEFAULT_MFG) ? TRUE : FALSE);
 }
 
 EFI_STATUS
@@ -302,7 +302,7 @@ CreateOneOfOptionOpCode (
 
     OneOfOption.Option        = OptionsList[Index].StringToken;
     OneOfOption.Value         = OptionsList[Index].Value;
-    OneOfOption.Flags         = OptionsList[Index].Flags & (EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG);
+    OneOfOption.Flags         = (UINT8)(OptionsList[Index].Flags & (EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG));
     OneOfOption.Type          = Type;
 
     LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
@@ -360,7 +360,7 @@ CreateOneOfOpCode (
   EfiCopyMem (LocalBuffer, &OneOf, sizeof (EFI_IFR_ONE_OF));
   Data->Offset += sizeof (EFI_IFR_ONE_OF);
 
-  CreateOneOfOptionOpCode (OptionCount, OptionsList, (OneOfFlags & EFI_IFR_NUMERIC_SIZE), Data);
+  CreateOneOfOptionOpCode (OptionCount, OptionsList, (UINT8)(OneOfFlags & EFI_IFR_NUMERIC_SIZE), Data);
 
   CreateEndOpCode (Data);
 
@@ -549,7 +549,7 @@ CreateNumericOpCode (
   Data->Offset += sizeof (EFI_IFR_NUMERIC);
 
   DefaultValue.u64 = Default;
-  Status = CreateDefaultOpCode (&DefaultValue, (NumericFlags & EFI_IFR_NUMERIC_SIZE), Data);
+  Status = CreateDefaultOpCode (&DefaultValue, (UINT8)(NumericFlags & EFI_IFR_NUMERIC_SIZE), Data);
   if (EFI_ERROR(Status)) {
     return Status;
   }

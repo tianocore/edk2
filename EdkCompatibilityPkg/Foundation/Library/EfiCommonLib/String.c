@@ -593,7 +593,7 @@ HexStringToBuf (
     } else {
       Byte = Buf[Idx / 2];
       Byte &= 0x0F;
-      Byte |= Digit << 4;
+      Byte = (UINT8)(Byte | (Digit << 4));
     }
 
     Buf[Idx / 2] = Byte;
@@ -749,9 +749,11 @@ Returns:
   Sub = StrCharSet;
   
   while ((*String != L'\0') && (*StrCharSet != L'\0')) {
-    if (*String++ != *StrCharSet++) {
+    if (*String++ != *StrCharSet) {
       String = ++Src;
       StrCharSet = Sub;
+    } else {
+      StrCharSet++;
     }
   }
   if (*StrCharSet == L'\0') {
@@ -788,9 +790,11 @@ Returns:
   Sub = StrCharSet;
   
   while ((*String != '\0') && (*StrCharSet != '\0')) {
-    if (*String++ != *StrCharSet++) {
+    if (*String++ != *StrCharSet) {
       String = ++Src;
       StrCharSet = Sub;
+    } else {
+      StrCharSet++;
     }
   }
   if (*StrCharSet == '\0') {

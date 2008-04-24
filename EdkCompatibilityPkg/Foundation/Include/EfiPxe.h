@@ -33,7 +33,11 @@ Abstract:
 // #define PXE_NETWORK_ORDER         1   // network order
 //
 #define PXE_UINT64_SUPPORT  1 // UINT64 supported
-// #define PXE_NO_UINT64_SUPPORT     1   // UINT64 not supported
+#if PXE_UINT64_SUPPORT == 0
+#define PXE_NO_UINT64_SUPPORT     1
+#else
+#define PXE_NO_UINT64_SUPPORT     0
+#endif
 //
 #define PXE_BUSTYPE(a, b, c, d) \
     ( \

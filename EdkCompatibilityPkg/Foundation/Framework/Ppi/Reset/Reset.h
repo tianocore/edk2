@@ -36,7 +36,7 @@ Abstract:
 //
 typedef enum {
   PeiResetCold,
-  PeiResetWarm,
+  PeiResetWarm
 } PEI_RESET_TYPE;
 
 typedef
