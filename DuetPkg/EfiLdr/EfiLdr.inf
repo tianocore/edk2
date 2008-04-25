@@ -37,8 +37,7 @@
   BaseLib
   BaseMemoryLib
   UefiApplicationEntryPoint
-  BaseUefiTianoDecompressLib
-  
+
 [Sources.common]
   Debug.h
   PeLoader.h
@@ -49,7 +48,12 @@
   Debug.c
   PeLoader.c
   Support.c
-  
+  TianoDecompress.c
+  TianoDecompress.h
+
+[Guids.common]
+  gTianoCustomDecompressGuid
+
 [BuildOptions.common]
   #MSFT:*_*_IA32_DLINK_FLAGS = /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
   MSFT:*_*_IA32_CC_FLAGS = /nologo /W4 /WX /Gy /c /D UNICODE /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
