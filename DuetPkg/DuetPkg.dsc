@@ -129,3 +129,6 @@
   # ISA Support
   DuetPkg/IsaAcpiDxe/IsaAcpi.inf
   DuetPkg/BootSector/BootSector.inf
+
+[BuildOptions.common]
+  MSFT:*_*_*_CC_FLAGS = /Fa$* /FAsc /FR$(@R).SBR
