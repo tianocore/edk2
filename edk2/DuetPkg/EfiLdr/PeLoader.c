@@ -138,6 +138,7 @@ EfiLdrPeCoffLoadPeImage (
   UINT32                          NumberOfRvaAndSizes;
   EFI_IMAGE_DATA_DIRECTORY        *DataDirectory;
   UINT64                          ImageBase;
+  CHAR8                           PrintBuffer[256];
 
   ZeroMem (&DosHdr, sizeof(DosHdr));
   ZeroMem (&PeHdr, sizeof(PeHdr));
@@ -148,16 +149,18 @@ EfiLdrPeCoffLoadPeImage (
 
   EfiLdrPeCoffImageRead (FHand, 0, sizeof(DosHdr), &DosHdr);
   if (DosHdr.e_magic != EFI_IMAGE_DOS_SIGNATURE) {
-//    DEBUG ((D_LOAD, "PeCoffLoadPeImage: Dos header signature not found\n"));
-PrintHeader ('F');
+    AsciiSPrint (PrintBuffer, 256, "PeCoffLoadPeImage: Dos header signature not found\n");
+    PrintString (PrintBuffer);
+    PrintHeader ('F');
     return EFI_UNSUPPORTED;
   }
 
   EfiLdrPeCoffImageRead (FHand, DosHdr.e_lfanew, sizeof(PeHdr), &PeHdr);
 
   if (PeHdr.Pe32.Signature != EFI_IMAGE_NT_SIGNATURE) {
-//    DEBUG ((D_LOAD, "PeCoffLoadPeImage: PE image header signature not found\n"));
-PrintHeader ('G');
+    AsciiSPrint (PrintBuffer, 256, "PeCoffLoadPeImage: PE image header signature not found\n");
+    PrintString (PrintBuffer);
+    PrintHeader ('G');
     return EFI_UNSUPPORTED;
   }
     
@@ -167,8 +170,9 @@ PrintHeader ('G');
 
   Status = EfiLdrPeCoffSetImageType (Image, PeHdr.Pe32.OptionalHeader.Subsystem);
   if (EFI_ERROR(Status)) {
-//    DEBUG ((D_LOAD, "PeCoffLoadPeImage: Subsystem type not known\n"));
-PrintHeader ('H');
+    AsciiSPrint (PrintBuffer, 256, "PeCoffLoadPeImage: Subsystem type not known\n");
+    PrintString (PrintBuffer);
+    PrintHeader ('H');
     return Status;
   }
 
@@ -178,8 +182,9 @@ PrintHeader ('H');
 
   Status = EfiLdrPeCoffCheckImageMachineType (PeHdr.Pe32.FileHeader.Machine);
   if (EFI_ERROR(Status)) {
-//    DEBUG ((D_LOAD, "PeCoffLoadPeImage: Incorrect machine type\n"));
-PrintHeader ('I');
+    AsciiSPrint (PrintBuffer, 256, "PeCoffLoadPeImage: Incorrect machine type\n");
+    PrintString (PrintBuffer);
+    PrintHeader ('I');
     return Status;
   }
 
@@ -232,11 +237,12 @@ PrintHeader ('I');
   }
 
   if (EFI_ERROR(Status)) {
-PrintHeader ('J');
+    PrintHeader ('J');
     return Status;
   }
 
-//  DEBUG((D_LOAD, "LoadPe: new image base %lx\n", Image->ImageBasePage));
+  AsciiSPrint (PrintBuffer, 256, "LoadPe: new image base %lx\n", Image->ImageBasePage);
+  PrintString (PrintBuffer);
   Image->Info.ImageBase = (VOID *)(UINTN)Image->ImageBasePage;
   Image->Info.ImageSize = (Image->NoPages << EFI_PAGE_SHIFT) - 1;
   Image->ImageBase      = (UINT8 *)(UINTN)Image->ImageBasePage;
@@ -254,7 +260,7 @@ PrintHeader ('J');
              );
 
   if (EFI_ERROR(Status)) {
-PrintHeader ('K');
+    PrintHeader ('K');
     return Status;
   }
 
@@ -319,7 +325,7 @@ PrintHeader ('K');
         
     if (EFI_ERROR(Status) || !Base || !End) {
 //      DEBUG((D_LOAD|D_ERROR, "LoadPe: Section %d was not loaded\n", Index));
-PrintHeader ('L');
+    PrintHeader ('L');
       return EFI_LOAD_ERROR;
     }
 
@@ -381,7 +387,7 @@ PrintHeader ('M');
                );
 
     if (EFI_ERROR(Status)) {
-PrintHeader ('N');
+      PrintHeader ('N');
       return Status;
     }
   }

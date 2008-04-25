@@ -37,6 +37,7 @@
   BaseLib
   BaseMemoryLib
   UefiApplicationEntryPoint
+  PrintLib
 
 [Sources.common]
   Debug.h

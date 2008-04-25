@@ -30,6 +30,7 @@ Revision History:
 #include <IndustryStandard/PeImage.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/PrintLib.h>
 
 #define INT15_E820_AddressRangeMemory   1
 #define INT15_E820_AddressRangeReserved 2
@@ -79,28 +80,6 @@ typedef struct {
   UINT32                MemoryMapSize;
   BIOS_MEMORY_MAP_ENTRY MemoryMapEntry[1];
 } BIOS_MEMORY_MAP;
-
-EFI_STATUS
-EFIAPI
-UefiDecompressGetInfo (
-  IN      EFI_TIANO_DECOMPRESS_PROTOCOL *This,
-  IN      VOID                          *Source,
-  IN      UINT32                        SrcSize,
-  OUT     UINT32                        *DstSize,
-  OUT     UINT32                        *ScratchSize
-  );
-
-EFI_STATUS
-EFIAPI
-TianoDecompress (
-  IN      EFI_TIANO_DECOMPRESS_PROTOCOL *This,
-  IN      VOID                          *Source,
-  IN      UINT32                        SrcSize,
-  IN OUT  VOID                          *Destination,
-  IN      UINT32                        DstSize,
-  IN OUT  VOID                          *Scratch,
-  IN      UINT32                        ScratchSize
-  );
 
 EFILDR_LOADED_IMAGE    DxeCoreImage;
 EFILDR_LOADED_IMAGE    DxeIplImage;

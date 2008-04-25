@@ -22,6 +22,18 @@ Revision History:
 #include "Support.h"
 #include "Debug.h"
 #include "PeLoader.h"
+#include "TianoDecompress.h"
+
+STATIC
+VOID
+SystemHang(
+  VOID
+  )
+{
+  CHAR8 PrintBuffer[256];
+  AsciiSPrint (PrintBuffer, 256, "## FATEL ERROR ##: Fail to load DUET images! System hang!\n");
+  CpuDeadLoop();
+}
 
 VOID
 EfiLoader (
@@ -39,18 +51,18 @@ EfiLoader (
   UINTN                 BfvPageNumber;
   UINTN                 BfvBase;
   EFI_MAIN_ENTRYPOINT   EfiMainEntrypoint;
+  CHAR8                 PrintBuffer[256];
   static EFILDRHANDOFF  Handoff;
 
-PrintHeader ('A');
-
   ClearScreen();
-  PrintString("EFI Loader\n");
+  
+  PrintHeader ('A');
 
-//  PrintString("&BiosMemoryMapBaseAddress = ");   
-//  PrintValue64 ((UINT64)(&BiosMemoryMapBaseAddress));
-//  PrintString("  BiosMemoryMapBaseAddress = ");   
-//  PrintValue(BiosMemoryMapBaseAddress);
-//  PrintString("\n");
+  AsciiSPrint (PrintBuffer, 256, "Enter DUET Loader ...\n", BiosMemoryMapBaseAddress);
+  PrintString (PrintBuffer);
+
+  AsciiSPrint (PrintBuffer, 256, "BiosMemoryMapBaseAddress = 0x%x\n", BiosMemoryMapBaseAddress);
+  PrintString (PrintBuffer);
 
   //
   // Add all EfiConventionalMemory descriptors to the table.  If there are partial pages, then
@@ -60,6 +72,9 @@ PrintHeader ('A');
   NumberOfMemoryMapEntries = 0;
   GenMemoryMap (&NumberOfMemoryMapEntries, EfiMemoryDescriptor, BiosMemoryMap);
 
+  AsciiSPrint (PrintBuffer, 256, "Get %d entries of memory map!\n", NumberOfMemoryMapEntries);
+  PrintString (PrintBuffer);
+
   //
   // Get information on where the image is in memory
   //
@@ -67,7 +82,6 @@ PrintHeader ('A');
   EFILDRHeader = (EFILDR_HEADER *)(UINTN)(EFILDR_HEADER_ADDRESS);
   EFILDRImage  = (EFILDR_IMAGE *)(UINTN)(EFILDR_HEADER_ADDRESS + sizeof(EFILDR_HEADER));
 
-PrintHeader ('D');
 
   //
   // Point to the 4th image (Bfv)
@@ -79,19 +93,25 @@ PrintHeader ('D');
   // Decompress the image
   //
 
-  Status = UefiDecompressGetInfo (
-             NULL, 
+  AsciiSPrint (PrintBuffer, 256, "Decompress BFV image, Image Address=0x%x! Offset=0x%x\n", 
+               (UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
+               EFILDRImage->Offset);
+  PrintString (PrintBuffer);
+
+  Status = TianoGetInfo (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              &DestinationSize, 
              &ScratchSize
              );
+
   if (EFI_ERROR (Status)) {
-    CpuDeadLoop();
+    AsciiSPrint (PrintBuffer, 256, "Fail to get decompress information for BFV!\n");
+    PrintString (PrintBuffer);
+    SystemHang();
   }
 
   Status = TianoDecompress (
-             NULL, 
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              (VOID *)(UINTN)EFI_DECOMPRESSED_BUFFER_ADDRESS,
@@ -99,19 +119,22 @@ PrintHeader ('D');
              (VOID *)(UINTN)((EFI_DECOMPRESSED_BUFFER_ADDRESS + DestinationSize + 0x1000) & 0xfffff000),
              ScratchSize
              );
+
   if (EFI_ERROR (Status)) {
-    CpuDeadLoop();
+    AsciiSPrint (PrintBuffer, 256, "Fail to decompress BFV!\n");
+    PrintString (PrintBuffer);
+    SystemHang();
   }
 
   BfvPageNumber = EFI_SIZE_TO_PAGES (DestinationSize);
   BfvBase = (UINTN) FindSpace (BfvPageNumber, &NumberOfMemoryMapEntries, EfiMemoryDescriptor, EfiRuntimeServicesData, EFI_MEMORY_WB);
   if (BfvBase == 0) {
-    CpuDeadLoop();
+    SystemHang();
   }
   ZeroMem ((VOID *)(UINTN)BfvBase, BfvPageNumber * EFI_PAGE_SIZE);
   CopyMem ((VOID *)(UINTN)BfvBase, (VOID *)(UINTN)EFI_DECOMPRESSED_BUFFER_ADDRESS, DestinationSize);
 
-PrintHeader ('B');
+  PrintHeader ('B');
 
   //
   // Point to the 2nd image (DxeIpl)
@@ -122,20 +145,23 @@ PrintHeader ('B');
   //
   // Decompress the image
   //
+  AsciiSPrint (PrintBuffer, 256, "Decompress DxeIpl image, Image Address=0x%x! Offset=0x%x\n", 
+               (UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
+               EFILDRImage->Offset);
 
-  Status = UefiDecompressGetInfo (
-             NULL, 
+  Status = TianoGetInfo (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              &DestinationSize, 
              &ScratchSize
              );
   if (EFI_ERROR (Status)) {
-    CpuDeadLoop();
+    AsciiSPrint (PrintBuffer, 256, "Fail to get decompress information for DxeIpl!\n");
+    PrintString (PrintBuffer);
+    SystemHang();
   }
 
   Status = TianoDecompress (
-             NULL, 
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              (VOID *)(UINTN)EFI_DECOMPRESSED_BUFFER_ADDRESS,
@@ -144,8 +170,13 @@ PrintHeader ('B');
              ScratchSize
              );
   if (EFI_ERROR (Status)) {
-    CpuDeadLoop();
+    AsciiSPrint (PrintBuffer, 256, "Fail to decompress DxeIpl image\n");
+    PrintString (PrintBuffer);
+    SystemHang();
   }
+
+  AsciiSPrint (PrintBuffer, 256, "Start load DxeIpl PE image\n");
+  PrintString (PrintBuffer);  
 
   //
   // Load and relocate the EFI PE/COFF Firmware Image 
@@ -157,7 +188,9 @@ PrintHeader ('B');
              EfiMemoryDescriptor
              );
   if (EFI_ERROR (Status)) {
-    CpuDeadLoop();
+    AsciiSPrint (PrintBuffer, 256, "Fail to load and relocate DxeIpl PE image!\n");
+    PrintString (PrintBuffer);
+    SystemHang();
   }
 
 //  PrintString("Image.NoPages = ");   
@@ -176,19 +209,17 @@ PrintHeader ('C');
   // Decompress the image
   //
 
-  Status = UefiDecompressGetInfo (
-             NULL, 
+  Status = TianoGetInfo (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              &DestinationSize, 
              &ScratchSize
              );
   if (EFI_ERROR (Status)) {
-    CpuDeadLoop();
+    SystemHang();
   }
 
   Status = TianoDecompress (
-             NULL, 
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              (VOID *)(UINTN)EFI_DECOMPRESSED_BUFFER_ADDRESS,
@@ -197,7 +228,7 @@ PrintHeader ('C');
              ScratchSize
              );
   if (EFI_ERROR (Status)) {
-    CpuDeadLoop();
+    SystemHang();
   }
 
   //
@@ -210,7 +241,7 @@ PrintHeader ('C');
              EfiMemoryDescriptor
              );
   if (EFI_ERROR (Status)) {
-    CpuDeadLoop();
+    SystemHang();
   }
 
 PrintHeader ('E');
@@ -261,6 +292,6 @@ PrintHeader ('F');
   // There was a problem loading the image, so HALT the system.
   //
 
-  CpuDeadLoop();
+  SystemHang();
 }
 
