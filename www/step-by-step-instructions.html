@@ -1,0 +1,197 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<head>
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+</head>
+
+<Body>
+
+<h2 class="main-title">
+  Step-by-step (walk-throughs) for building with edk2
+</h2>
+
+<p class="main-details">
+  <font size="2">
+    This page contains some step-by-step guides in an attempt to give
+    a highly detailed description of how to set up building on an edk2
+    system.&nbsp;
+    A few different operating systems are targeted.&nbsp;
+    It is hoped that these examples can either provide exact steps for
+    setting up an edk2 build environment.&nbsp;
+    If instructions are not available for your exact system configuration,
+    you may still be able to 'tweak' the instructions to work on your
+    system.
+  </font>
+</p>
+
+<font size="2">
+  <ul>
+    <li><a href="#MacOSX10.5">Mac OS X 10.5</a> (Leopard)</li>
+    <li><a href="#Ubuntu8.04">Ubuntu 8.04</a></li>
+  </ul>
+</font>
+
+<h2 class="main-title">
+  <a name="MacOSX10.5"></a>
+  Mac OS X 10.5
+</h2>
+
+<h3 class="build-step-title">
+  Work in progress...
+</h3>
+
+<!--
+<p class="build-step-details">
+  These instructions for OS X 10.5 are currently under construction.&nbsp;
+  Please do not try to use them until this notice is removed!
+</p>
+-->
+
+<h2 class="main-title">
+  <a name="Ubuntu8.04"></a>
+  Ubuntu 8.04
+</h2>
+
+<h3 class="build-step-title">
+  Work in progress...
+</h3>
+
+<p class="build-step-details">
+  These instructions for Ubuntu 8.04 are currently under construction.&nbsp;
+  Please do not try to use them until this notice is removed!
+</p>
+
+<h3 class="build-step-title">
+  Getting started &amp; Instructions for the instructions
+</h3>
+
+<p class="build-step-details">
+  These instructions will be written as a series of commands executed from
+  a command terminal.&nbsp;
+  To open the command terminal application, open the "Applications" menu,
+  then open the "Accessories" sub-menu, and then select the "Terminal"
+  application.
+</p>
+
+<p class="build-step-details">
+  Often these instructions will contain a command which needs to be
+  executed in the terminal window.&nbsp; For example:
+</p>
+
+<pre class="build-step-code">
+bash:~$ <b>echo this bold text is a sample command</b>
+</pre>
+
+<p class="build-step-details">
+  To execute this command, highlight the <b>bold</b> text of the 
+  command in your web browser.&nbsp;
+  After the text is highlighted, you can paste the text into the terminal
+  window with the middle mouse button.&nbsp;
+</p>
+<p class="build-step-details">
+  There may be other ways to copy and paste the text into the terminal.&nbsp;
+  For example, you can usually press 'Ctrl-C' within your web browser to copy
+  the text, and within the gnome-terminal program you can then press
+  'Ctrl-<b>Shift</b>-V' to paste the text.&nbsp;
+  After pasting the command into the shell, you may need to press the
+  enter or return key to execute the command.&nbsp;
+  If all else fails, you can type the command by hand.
+</p>
+
+<p class="build-step-details">
+  Some commands are very long, and we use the backslash character (\) to
+  tell the shell program that the line is not finished.&nbsp; For example:
+</p>
+
+<pre class="build-step-code">
+bash:~$ <b>echo this bold text is a sample command \
+          which is broken into two lines</b>
+</pre>
+
+<p class="build-step-details">
+  When you copy and paste, make sure you include all lines of the command.&nbsp;
+  If you are typing the command, you can remove the backslash character (\)
+  and combine the lines into a single line if you prefer.
+</p>
+
+<p class="build-step-details">
+  If a command starts with the 'sudo' command, then you may be prompted for
+  your user password.&nbsp;
+  This will be the same password as you used to login to the system.
+</p>
+
+<p class="build-step-details">
+  For the purposes of this set of instructions, we will be using the following
+  paths.&nbsp;
+</p>
+
+<table class="build-step-details">
+  <tr>
+    <td>
+      <a href="https://edk2.tianocore.org">Edk2</a> source tree:
+    </td>
+    <td>
+      <b>~/src/edk2</b>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://buildtools.tianocore.org">Buildtools</a> source tree:
+    </td>
+    <td>
+      <b>~/src/buildtools</b>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      gcc x64 cross-compiler installation:
+    </td>
+    <td>
+      <b>~/programs/gcc/x64</b>
+    </td>
+  </tr>
+</table>
+
+<p class="build-step-details">
+  You will need to change the commands if you want to use different
+  locations, but this is not recommended unless you are sure that you
+  know what you are doing.
+</p>
+
+<h3 class="build-step-title">
+    Install tools from apt
+</h3>
+
+<p class="build-step-details">
+  Several ubuntu packages will be needed to fully set up an edk2 build
+  environment.&nbsp;
+  In order to easily install all the requirements, you need to run
+  this command.
+</p>
+
+<pre class="build-step-code">
+bash:~$ <b>sudo apt-get install build-essentials uuid-dev \
+          python-setuptools texinfo bison flex libgmp3-dev \
+          libmpfr-dev</b>
+</pre>
+
+<h3 class="build-step-title">
+    Install python antlr module
+</h3>
+
+<p class="build-step-details">
+  In order to install the python antlr module, we use the 'easy_install'
+  command.&nbsp;
+  The following command is the latest version right now, but if
+  you encounter difficulties, you may want to confirm the version at
+  <a href="http://www.antlr.org/download/Python">http://www.antlr.org/download/Python</a>.
+</p>
+
+<pre class="build-step-code">
+bash:~$ <b>sudo easy_install \
+  http://www.antlr.org/download/Python/antlr_python_runtime-3.0.1-py2.5.egg</b>
+</pre>
+
+
+</Body>
+

@@ -1,0 +1,43 @@
+
+.main-title, .main-details {
+  font-size: 11pt;
+}
+
+.main-details {
+  margin-top: 0.19in;
+  margin-bottom: 0.19in
+}
+
+.main-title {
+  font-weight: bold;
+  margin-top: 0in;
+  margin-bottom: 0.08in;
+  border-bottom: thin solid black;
+}
+
+.build-step-title {
+  font-size: 11pt;
+  font-weight: bold;
+  margin-top: 0.19in;
+  margin-bottom: 0.19in
+}
+
+.build-step-details {
+}
+
+.build-step-code {
+  font-family: "courier new", "courier", "monospace";
+  border: 1px dashed;
+  margin-right: 0.25in;
+  padding: 2pt 4pt 2pt 4pt;
+  background-color: #F0F0F0;
+}
+
+.build-step-details, .build-step-code, .build-step-title {
+  margin-left: 0.25in;
+}
+
+table.build-step-details td {
+  border-style: hidden;
+}
+
