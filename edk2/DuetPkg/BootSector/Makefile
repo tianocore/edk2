@@ -33,7 +33,7 @@ LIBS =
 
 COMMON_DEPS = 
 
-all: $(TARGET_FILES) loader
+all: $(TARGET_FILES)
           
 #=============                
 $(OUTPUT_DIR)\bootsect.obj:$(MODULE_DIR)\bootsect.asm
