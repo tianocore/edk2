@@ -199,7 +199,7 @@ bash:~$ <b>echo this bold text is a sample command \
 </p>
 
 <h3 class="build-step-title">
-    Install tools from apt
+  Install tools from apt
 </h3>
 
 <p class="build-step-details">
@@ -216,7 +216,7 @@ bash:~$ <b>sudo apt-get install build-essentials uuid-dev \
 </pre>
 
 <h3 class="build-step-title">
-    Install python antlr module
+  Install python antlr module
 </h3>
 
 <p class="build-step-details">
@@ -230,5 +230,149 @@ bash:~$ <b>sudo apt-get install build-essentials uuid-dev \
 <pre class="build-step-code">
 bash:~$ <b>sudo easy_install \
   http://www.antlr.org/download/Python/antlr_python_runtime-3.0.1-py2.5.egg</b>
+</pre>
+
+<h3 class="build-step-title">
+  Get and build the edk2 BaseTools
+</h3>
+
+<p class="build-step-details">
+  We will now check out the BaseTools source code using subversion.&nbsp;
+  (If you are behind a web proxy, then you may need to configure your proxy
+  in the ~/.subversion/servers file.)&nbsp;
+</p>
+
+<pre class="build-step-code">
+bash:~$ <b>mkdir ~/src</b>
+bash:~$ <b>cd ~/src</b>
+bash:~$ <b>svn co \
+  https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools</b>
+bash:~$ <b>make -C BaseTools</b>
+</pre>
+
+<h3 class="build-step-title">
+  Build <a href="http://gcc.gnu.org">gcc</a> x64 UEFI cross compiler
+</h3>
+
+<p class="build-step-details">
+  In order to build UEFI images for x64, you will need to build a
+  cross-compiler build of gcc.&nbsp;
+  This can take quite a while to complete, possibly several hours on
+  older systems.&nbsp;
+  But, a Python script has been provided to automate this build process.&nbsp;
+  Please note that if your network is behind a firewall, you may need to
+  set the http_proxy environment variable:
+</p>
+
+<pre class="build-step-code">
+Note: This is only needed if behind a internet firewall!
+bash:~$ <b>export http_proxy=proxy.domain.com:proxy_port</b>
+</pre>
+
+<p class="build-step-details">
+  To build gcc for x64, use these commands (this will take quite a while
+  to complete):
+</p>
+
+<pre class="build-step-code">
+bash:~$ <b>cd ~/src/BaseTools/gcc</b>
+bash:~$ <b>./mingw-gcc-build.py --arch=x64 --prefix=~/programs/gcc/x64</b>
+</pre>
+
+<h3 class="build-step-title">
+  Get the edk2 source tree
+</h3>
+
+<pre class="build-step-code">
+bash:~$ <b>cd ~/src</b>
+bash:~$ <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2</b>
+</pre>
+
+<h3 class="build-step-title">
+  Setup build shell environment
+</h3>
+
+<pre class="build-step-code">
+bash:~$ <b>cd ~/src/edk2</b>
+bash:~$ <b>export EDK_TOOLS_PATH=~/src/BaseTools</b>
+bash:~$ <b>. edksetup.sh BaseTools</b>
+</pre>
+
+<h3 class="build-step-title">
+  Modify Conf files
+</h3>
+
+<p class="build-step-details">
+  You will need to edit the Conf/tools_def.txt and Conf/target.txt files.&nbsp;
+</p>
+
+<p class="build-step-details">
+  For the <i>Conf/tools_def.txt</i> file, find the following lines:
+</p>
+
+<pre class="build-step-code">
+*_UNIXGCC_X64_CC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
+*_UNIXGCC_X64_SLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ar
+*_UNIXGCC_X64_DLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ld
+*_UNIXGCC_X64_ASM_PATH              = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
+*_UNIXGCC_X64_PP_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
+*_UNIXGCC_X64_VFRPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
+</pre>
+
+<p class="build-step-details">
+  And change the cooresponding lines to match these:
+</p>
+
+<pre class="build-step-code">
+*_UNIXGCC_X64_CC_PATH               = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-gcc
+*_UNIXGCC_X64_SLINK_PATH            = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-ar
+*_UNIXGCC_X64_DLINK_PATH            = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-ld
+*_UNIXGCC_X64_ASM_PATH              = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-gcc
+*_UNIXGCC_X64_PP_PATH               = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-gcc
+*_UNIXGCC_X64_VFRPP_PATH            = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-gcc
+</pre>
+
+<p class="build-step-details">
+  For the <i>Conf/target.txt</i> file, find the following lines:
+</p>
+
+<pre class="build-step-code">
+ACTIVE_PLATFORM       = Nt32Pkg/Nt32Pkg.dsc
+TARGET_ARCH           = IA32
+TOOL_CHAIN_TAG        = MYTOOLS
+</pre>
+
+<p class="build-step-details">
+  And change the cooresponding lines to match these:
+</p>
+
+<pre class="build-step-code">
+ACTIVE_PLATFORM       = MdeModulePkg/MdeModulePkg.dsc
+TARGET_ARCH           = X64
+TOOL_CHAIN_TAG        = UNIXGCC
+</pre>
+
+<h3 class="build-step-title">
+  Build Hello World!&nbsp; (and the rest of MdeModulePkg)
+</h3>
+
+<p class="build-step-details">
+  Now you should be able to simply run the 'build' command to compile
+  the MdeModulePkg.
+</p>
+
+<pre class="build-step-code">
+bash:~$ <b>build</b>
+</pre>
+
+<p class="build-step-details">
+  As a tangible result of the build, you should have the HelloWorld UEFI
+  X64 application.&nbsp;
+  If you have a X64 UEFI system available to you, you ought to be able to
+  run this application under the shell.
+</p>
+
+<pre class="build-step-code">
+bash:~$ <b>ls Build/MdeModule/DEBUG_UNIXGCC/X64/HelloWorld.efi</b>
 </pre>
 
