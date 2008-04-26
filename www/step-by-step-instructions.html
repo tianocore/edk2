@@ -77,7 +77,7 @@
 </h2>
 
 <h3 class="build-step-title">
-  Work in progress...
+  Coming soon...
 </h3>
 
 <!--
@@ -91,15 +91,6 @@
   <a name="Ubuntu8.04"></a>
   Ubuntu 8.04
 </h2>
-
-<h3 class="build-step-title">
-  Work in progress...
-</h3>
-
-<p class="build-step-details">
-  These instructions for Ubuntu 8.04 are currently under construction.&nbsp;
-  Please do not try to use them until this notice is removed!
-</p>
 
 <h3 class="build-step-title">
   Getting started &amp; Instructions for the instructions
@@ -140,7 +131,7 @@ bash:~$ <b>echo this bold text is a sample command</b>
 
 <p class="build-step-details">
   Some commands are very long, and we use the backslash character (\) to
-  tell the shell program that the line is not finished.&nbsp; For example:
+  tell the shell program that the command is not finished.&nbsp; For example:
 </p>
 
 <pre class="build-step-code">
@@ -149,7 +140,8 @@ bash:~$ <b>echo this bold text is a sample command \
 </pre>
 
 <p class="build-step-details">
-  When you copy and paste, make sure you include all lines of the command.&nbsp;
+  When you copy and paste, make sure you include all lines of the command
+  (including the backslash (\) characters).&nbsp;
   If you are typing the command, you can remove the backslash character (\)
   and combine the lines into a single line if you prefer.
 </p>
@@ -210,9 +202,9 @@ bash:~$ <b>echo this bold text is a sample command \
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>sudo apt-get install build-essentials uuid-dev \
+bash:~$ <b>sudo apt-get install build-essential uuid-dev \
           python-setuptools texinfo bison flex libgmp3-dev \
-          libmpfr-dev</b>
+          libmpfr-dev subversion</b>
 </pre>
 
 <h3 class="build-step-title">
@@ -240,14 +232,17 @@ bash:~$ <b>sudo easy_install \
   We will now check out the BaseTools source code using subversion.&nbsp;
   (If you are behind a web proxy, then you may need to configure your proxy
   in the ~/.subversion/servers file.)&nbsp;
+  We will tell subversion to use the 'guest' username on tianocore.org.&nbsp;
+  The password for the 'guest' account is blank/empty.
 </p>
 
 <pre class="build-step-code">
 bash:~$ <b>mkdir ~/src</b>
-bash:~$ <b>cd ~/src</b>
-bash:~$ <b>svn co \
-  https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools</b>
-bash:~$ <b>make -C BaseTools</b>
+bash:~/src$ <b>cd ~/src</b>
+bash:~/src$ <b>svn co \
+  https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools \
+  --username guest</b>
+bash:~/src$ <b>make -C BaseTools</b>
 </pre>
 
 <h3 class="build-step-title">
@@ -266,7 +261,7 @@ bash:~$ <b>make -C BaseTools</b>
 
 <pre class="build-step-code">
 Note: This is only needed if behind a internet firewall!
-bash:~$ <b>export http_proxy=proxy.domain.com:proxy_port</b>
+bash:~/src$ <b>export http_proxy=proxy.domain.com:proxy_port</b>
 </pre>
 
 <p class="build-step-details">
@@ -275,8 +270,9 @@ bash:~$ <b>export http_proxy=proxy.domain.com:proxy_port</b>
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>cd ~/src/BaseTools/gcc</b>
-bash:~$ <b>./mingw-gcc-build.py --arch=x64 --prefix=~/programs/gcc/x64</b>
+bash:~/src$ <b>cd ~/src/BaseTools/gcc</b>
+bash:~/src/BaseTools/gcc$ <b>./mingw-gcc-build.py --arch=x64 \
+  --prefix=~/programs/gcc/x64</b>
 </pre>
 
 <h3 class="build-step-title">
@@ -284,8 +280,10 @@ bash:~$ <b>./mingw-gcc-build.py --arch=x64 --prefix=~/programs/gcc/x64</b>
 </h3>
 
 <pre class="build-step-code">
-bash:~$ <b>cd ~/src</b>
-bash:~$ <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2</b>
+bash:~/src/BaseTools/gcc$ <b>cd ~/src</b>
+bash:~/src$ <b>svn co \
+  https://edk2.tianocore.org/svn/edk2/trunk/edk2 \
+  --username guest</b>
 </pre>
 
 <h3 class="build-step-title">
@@ -293,9 +291,9 @@ bash:~$ <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2</b>
 </h3>
 
 <pre class="build-step-code">
-bash:~$ <b>cd ~/src/edk2</b>
-bash:~$ <b>export EDK_TOOLS_PATH=~/src/BaseTools</b>
-bash:~$ <b>. edksetup.sh BaseTools</b>
+bash:~/src$ <b>cd ~/src/edk2</b>
+bash:~/src/edk2$ <b>export EDK_TOOLS_PATH=~/src/BaseTools</b>
+bash:~/src/edk2$ <b>. edksetup.sh BaseTools</b>
 </pre>
 
 <h3 class="build-step-title">
@@ -362,7 +360,7 @@ TOOL_CHAIN_TAG        = UNIXGCC
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>build</b>
+bash:~/src/edk2$ <b>build</b>
 </pre>
 
 <p class="build-step-details">
@@ -373,6 +371,6 @@ bash:~$ <b>build</b>
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>ls Build/MdeModule/DEBUG_UNIXGCC/X64/HelloWorld.efi</b>
+bash:~/src/edk2$ <b>ls Build/MdeModule/DEBUG_UNIXGCC/X64/HelloWorld.efi</b>
 </pre>
 
