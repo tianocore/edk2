@@ -720,7 +720,8 @@ Returns:
 
   Buffer[0] = '\0';
 
-  if (ReportStatusCodeExtractAssertInfo (CodeType, Value, Data, &Filename, &Description, &LineNumber)) {
+  if (Data != NULL && 
+      ReportStatusCodeExtractAssertInfo (CodeType, Value, Data, &Filename, &Description, &LineNumber)) {
     //
     // Processes PEI_ASSERT ()
     //
@@ -733,7 +734,8 @@ Returns:
       Description
       );
 
-  } else if (ReportStatusCodeExtractDebugInfo (Data, &ErrorLevel, &Marker, &Format)) {
+  } else if (Data != NULL &&
+             ReportStatusCodeExtractDebugInfo (Data, &ErrorLevel, &Marker, &Format)) {
     //
     // Process PEI_DEBUG () macro to Serial
     //
