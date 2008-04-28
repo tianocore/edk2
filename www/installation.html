@@ -277,6 +277,10 @@
 		has been pre-populated with the standard location for the Microsoft
 		tool chains and includes the standard location of the Intel C
 		Compiler for EFI Byte Code (EBC).</P>
+    <P>The default tool chain (named MYTOOLS) is pre-configured to use VS2005 for
+    IA32 and X64 target architectures and the DDK for IPF target architectures.
+    To use a different tool chain, either modify the tools_def.txt file's MYTOOLS
+    entries, or modify the %WORKSPACE%\Conf\target.txt file's TOOL_CHAIN_TAG.</P>
 		<P>Once the external tools are installed and the environment variables
 		are set, you can try a build.
     </P>
@@ -287,7 +291,7 @@
       Win32 binaries of the EDK II tools used in edk2 development. It will
 			fail if the external tools above are not properly installed.<BR>
 			Using the --nt32 switch will run &quot;%VS80COMNTOOLS%\vsvars32&quot; (VS2005) or 
-      &quot;%VS71COMNTOOLS%\vsvars32&quot; (VS2003.NET) to setup standard C FLAGS, 
+      &quot;%VS71COMNTOOLS%\vsvars32&quot; (VS2003 .NET) to setup standard C FLAGS, 
       Library and Include locations to build the Nt32 emulation environment.<BR>
       <B>Note:</B> If you do not want to build the Nt32 emulation environment, you do not
       need to use the --nt32 switch or run vsvars32.bat.</UL>
