@@ -19,9 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define WIDE_CHAR           0xFFF1
 #define NON_BREAKING_CHAR   0xFFF2
 
-#define GLYPH_WIDTH         EFI_GLYPH_WIDTH
-#define GLYPH_HEIGHT        EFI_GLYPH_HEIGHT
-
 //
 // State defined for password statemachine 
 //
