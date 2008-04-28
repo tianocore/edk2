@@ -127,9 +127,9 @@ Returns:
                           0,
                           0,
                           0,
-                          PosY - GLYPH_HEIGHT - 1,
+                          PosY - EFI_GLYPH_HEIGHT - 1,
                           SizeOfX,
-                          SizeOfY - (PosY - GLYPH_HEIGHT - 1),
+                          SizeOfY - (PosY - EFI_GLYPH_HEIGHT - 1),
                           SizeOfX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                           );
     } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
@@ -140,9 +140,9 @@ Returns:
                           0,
                           0,
                           0,
-                          PosY - GLYPH_HEIGHT - 1,
+                          PosY - EFI_GLYPH_HEIGHT - 1,
                           SizeOfX,
-                          SizeOfY - (PosY - GLYPH_HEIGHT - 1),
+                          SizeOfY - (PosY - EFI_GLYPH_HEIGHT - 1),
                           SizeOfX * sizeof (EFI_UGA_PIXEL)
                           );
     } else {
@@ -186,8 +186,8 @@ Returns:
   }
 
   PrintXY (
-    (SizeOfX - StrLen (Title) * GLYPH_WIDTH) / 2,
-    PosY - GLYPH_HEIGHT - 1,
+    (SizeOfX - StrLen (Title) * EFI_GLYPH_WIDTH) / 2,
+    PosY - EFI_GLYPH_HEIGHT - 1,
     &TitleForeground,
     &TitleBackground,
     Title
