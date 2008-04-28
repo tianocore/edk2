@@ -45,7 +45,6 @@ InitializationDispatcherWorker (
   UINTN                             Index;
   VOID                              *HobStart;
 
-  CpuDeadLoop();
   //
   // If enable UseSerial, then initialize serial port.
   // if enable UseRuntimeMemory, then initialize runtime memory status code worker.
