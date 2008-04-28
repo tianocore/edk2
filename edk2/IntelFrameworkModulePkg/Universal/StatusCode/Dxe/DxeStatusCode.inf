@@ -103,4 +103,4 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize
 
 [Depex]
-  gEfiDataHubProtocolGuid
+  TRUE
