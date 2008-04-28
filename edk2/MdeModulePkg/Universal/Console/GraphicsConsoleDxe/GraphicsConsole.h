@@ -170,12 +170,6 @@ GraphicsConsoleComponentNameGetControllerName (
 
 
 //
-// Glyph database
-//
-//#define GLYPH_WIDTH   8
-//#define GLYPH_HEIGHT  19
-
-//
 // User can define valid graphic resolution here
 // e.g. 640x480, 800x600, 1024x768...
 //

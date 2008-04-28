@@ -433,8 +433,8 @@ GraphicsConsoleControllerDriverStart (
   //
   // Compute the maximum number of text Rows and Columns that this current graphics mode can support
   //
-  Columns = HorizontalResolution / GLYPH_WIDTH;
-  Rows    = VerticalResolution / GLYPH_HEIGHT;
+  Columns = HorizontalResolution / EFI_GLYPH_WIDTH;
+  Rows    = VerticalResolution / EFI_GLYPH_HEIGHT;
 
   //
   // See if the mode is too small to support the required 80x25 text mode
@@ -449,8 +449,8 @@ GraphicsConsoleControllerDriverStart (
   Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
   Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
   Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-  Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (80 * GLYPH_WIDTH)) >> 1;
-  Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (25 * GLYPH_HEIGHT)) >> 1;
+  Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (80 * EFI_GLYPH_WIDTH)) >> 1;
+  Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (25 * EFI_GLYPH_HEIGHT)) >> 1;
   MaxMode++;
 
   //
@@ -460,8 +460,8 @@ GraphicsConsoleControllerDriverStart (
     Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
     Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (80 * GLYPH_WIDTH)) >> 1;
-    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (50 * GLYPH_HEIGHT)) >> 1;
+    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (80 * EFI_GLYPH_WIDTH)) >> 1;
+    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (50 * EFI_GLYPH_HEIGHT)) >> 1;
     MaxMode++;
   }
 
@@ -486,8 +486,8 @@ GraphicsConsoleControllerDriverStart (
     Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
     Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (100 * GLYPH_WIDTH)) >> 1;
-    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (31 * GLYPH_HEIGHT)) >> 1;
+    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (100 * EFI_GLYPH_WIDTH)) >> 1;
+    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (31 * EFI_GLYPH_HEIGHT)) >> 1;
     MaxMode++;
   }
 
@@ -495,13 +495,13 @@ GraphicsConsoleControllerDriverStart (
   // Add Mode #3 that uses the entire display for user-defined mode
   //
   if (HorizontalResolution > 800 && VerticalResolution > 600) {
-    Private->ModeData[MaxMode].Columns    = HorizontalResolution/GLYPH_WIDTH;
-    Private->ModeData[MaxMode].Rows       = VerticalResolution/GLYPH_HEIGHT;
+    Private->ModeData[MaxMode].Columns    = HorizontalResolution/EFI_GLYPH_WIDTH;
+    Private->ModeData[MaxMode].Rows       = VerticalResolution/EFI_GLYPH_HEIGHT;
     Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
     Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution % GLYPH_WIDTH) >> 1;
-    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution % GLYPH_HEIGHT) >> 1;
+    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution % EFI_GLYPH_WIDTH) >> 1;
+    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution % EFI_GLYPH_HEIGHT) >> 1;
     MaxMode++;
   }
 
@@ -846,8 +846,8 @@ GraphicsConsoleConOutOutputString (
   MaxRow    = Private->ModeData[Mode].Rows;
   DeltaX    = Private->ModeData[Mode].DeltaX;
   DeltaY    = Private->ModeData[Mode].DeltaY;
-  Width     = MaxColumn * GLYPH_WIDTH;
-  Height    = (MaxRow - 1) * GLYPH_HEIGHT;
+  Width     = MaxColumn * EFI_GLYPH_WIDTH;
+  Height    = (MaxRow - 1) * EFI_GLYPH_HEIGHT;
   Delta     = Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
 
   //
@@ -907,7 +907,7 @@ GraphicsConsoleConOutOutputString (
                     NULL,
                     EfiBltVideoToVideo,
                     DeltaX,
-                    DeltaY + GLYPH_HEIGHT,
+                    DeltaY + EFI_GLYPH_HEIGHT,
                     DeltaX,
                     DeltaY,
                     Width,
@@ -927,7 +927,7 @@ GraphicsConsoleConOutOutputString (
                     DeltaX,
                     DeltaY + Height,
                     Width,
-                    GLYPH_HEIGHT,
+                    EFI_GLYPH_HEIGHT,
                     Delta
                     );
         } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
@@ -939,7 +939,7 @@ GraphicsConsoleConOutOutputString (
                     NULL,
                     EfiUgaVideoToVideo,
                     DeltaX,
-                    DeltaY + GLYPH_HEIGHT,
+                    DeltaY + EFI_GLYPH_HEIGHT,
                     DeltaX,
                     DeltaY,
                     Width,
@@ -959,7 +959,7 @@ GraphicsConsoleConOutOutputString (
                     DeltaX,
                     DeltaY + Height,
                     Width,
-                    GLYPH_HEIGHT,
+                    EFI_GLYPH_HEIGHT,
                     Delta
                     );
         }
@@ -1274,7 +1274,7 @@ GraphicsConsoleConOutSetMode (
   //
   // Attempt to allocate a line buffer for the requested mode number
   //
-  NewLineBuffer = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * ModeData->Columns * GLYPH_WIDTH * GLYPH_HEIGHT);
+  NewLineBuffer = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * ModeData->Columns * EFI_GLYPH_WIDTH * EFI_GLYPH_HEIGHT);
 
   if (NewLineBuffer == NULL) {
     //
@@ -1727,8 +1727,8 @@ DrawUnicodeWeightAtCursorN (
                          String,
                          FontInfo,
                          &Blt,
-                         This->Mode->CursorColumn * GLYPH_WIDTH + Private->ModeData[This->Mode->Mode].DeltaX,
-                         This->Mode->CursorRow * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
+                         This->Mode->CursorColumn * EFI_GLYPH_WIDTH + Private->ModeData[This->Mode->Mode].DeltaX,
+                         This->Mode->CursorRow * EFI_GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
                          NULL,
                          NULL,
                          NULL
@@ -1757,8 +1757,8 @@ DrawUnicodeWeightAtCursorN (
                           String,
                           FontInfo,
                           &Blt,
-                          This->Mode->CursorColumn * GLYPH_WIDTH + Private->ModeData[This->Mode->Mode].DeltaX,
-                          This->Mode->CursorRow * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
+                          This->Mode->CursorColumn * EFI_GLYPH_WIDTH + Private->ModeData[This->Mode->Mode].DeltaX,
+                          This->Mode->CursorRow * EFI_GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
                           &RowInfoArray,
                           &RowInfoArraySize,
                           NULL
@@ -1775,10 +1775,10 @@ DrawUnicodeWeightAtCursorN (
                           UgaDraw,
                           (EFI_UGA_PIXEL *) Blt->Image.Bitmap,
                           EfiUgaBltBufferToVideo,
-                          This->Mode->CursorColumn * GLYPH_WIDTH  + Private->ModeData[This->Mode->Mode].DeltaX,
-                          (This->Mode->CursorRow) * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
-                          This->Mode->CursorColumn * GLYPH_WIDTH  + Private->ModeData[This->Mode->Mode].DeltaX,
-                          (This->Mode->CursorRow) * GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
+                          This->Mode->CursorColumn * EFI_GLYPH_WIDTH  + Private->ModeData[This->Mode->Mode].DeltaX,
+                          (This->Mode->CursorRow) * EFI_GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
+                          This->Mode->CursorColumn * EFI_GLYPH_WIDTH  + Private->ModeData[This->Mode->Mode].DeltaX,
+                          (This->Mode->CursorRow) * EFI_GLYPH_HEIGHT + Private->ModeData[This->Mode->Mode].DeltaY,
                           RowInfoArray[0].LineWidth,
                           RowInfoArray[0].LineHeight,
                           Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
@@ -1812,7 +1812,7 @@ EraseCursor (
   EFI_UGA_DRAW_PROTOCOL       *UgaDraw;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION Background;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION BltChar[GLYPH_HEIGHT][GLYPH_WIDTH];
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION BltChar[EFI_GLYPH_HEIGHT][EFI_GLYPH_WIDTH];
   UINTN                       X;
   UINTN                       Y;
 
@@ -1832,8 +1832,8 @@ EraseCursor (
   //
   // Blt a character to the screen
   //
-  GlyphX  = (CurrentMode->CursorColumn * GLYPH_WIDTH) + Private->ModeData[CurrentMode->Mode].DeltaX;
-  GlyphY  = (CurrentMode->CursorRow * GLYPH_HEIGHT) + Private->ModeData[CurrentMode->Mode].DeltaY;
+  GlyphX  = (CurrentMode->CursorColumn * EFI_GLYPH_WIDTH) + Private->ModeData[CurrentMode->Mode].DeltaX;
+  GlyphY  = (CurrentMode->CursorRow * EFI_GLYPH_HEIGHT) + Private->ModeData[CurrentMode->Mode].DeltaY;
   if (GraphicsOutput != NULL) {
     GraphicsOutput->Blt (
               GraphicsOutput,
@@ -1843,9 +1843,9 @@ EraseCursor (
               GlyphY,
               0,
               0,
-              GLYPH_WIDTH,
-              GLYPH_HEIGHT,
-              GLYPH_WIDTH * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+              EFI_GLYPH_WIDTH,
+              EFI_GLYPH_HEIGHT,
+              EFI_GLYPH_WIDTH * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
               );
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     UgaDraw->Blt (
@@ -1856,9 +1856,9 @@ EraseCursor (
               GlyphY,
               0,
               0,
-              GLYPH_WIDTH,
-              GLYPH_HEIGHT,
-              GLYPH_WIDTH * sizeof (EFI_UGA_PIXEL)
+              EFI_GLYPH_WIDTH,
+              EFI_GLYPH_HEIGHT,
+              EFI_GLYPH_WIDTH * sizeof (EFI_UGA_PIXEL)
               );
   }
 
@@ -1867,10 +1867,10 @@ EraseCursor (
   //
   // Convert Monochrome bitmap of the Glyph to BltBuffer structure
   //
-  for (Y = 0; Y < GLYPH_HEIGHT; Y++) {
-    for (X = 0; X < GLYPH_WIDTH; X++) {
+  for (Y = 0; Y < EFI_GLYPH_HEIGHT; Y++) {
+    for (X = 0; X < EFI_GLYPH_WIDTH; X++) {
       if ((mCursorGlyph.GlyphCol1[Y] & (1 << X)) != 0) {
-        BltChar[Y][GLYPH_WIDTH - X - 1].Raw ^= Foreground.Raw;
+        BltChar[Y][EFI_GLYPH_WIDTH - X - 1].Raw ^= Foreground.Raw;
       }
     }
   }
@@ -1884,9 +1884,9 @@ EraseCursor (
               0,
               GlyphX,
               GlyphY,
-              GLYPH_WIDTH,
-              GLYPH_HEIGHT,
-              GLYPH_WIDTH * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+              EFI_GLYPH_WIDTH,
+              EFI_GLYPH_HEIGHT,
+              EFI_GLYPH_WIDTH * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
               );
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     UgaDraw->Blt (
@@ -1897,9 +1897,9 @@ EraseCursor (
               0,
               GlyphX,
               GlyphY,
-              GLYPH_WIDTH,
-              GLYPH_HEIGHT,
-              GLYPH_WIDTH * sizeof (EFI_UGA_PIXEL)
+              EFI_GLYPH_WIDTH,
+              EFI_GLYPH_HEIGHT,
+              EFI_GLYPH_WIDTH * sizeof (EFI_UGA_PIXEL)
               );
   }
 
