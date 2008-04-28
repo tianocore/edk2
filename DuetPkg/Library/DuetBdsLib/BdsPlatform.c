@@ -1080,7 +1080,12 @@ Returns:
   // from the graphic lib
   //
   if (QuietBoot) {
-    EnableQuietBootEx (&gEfiDefaultBmpLogoGuid, mBdsImageHandle);
+    Status = EnableQuietBootEx (&gEfiDefaultBmpLogoGuid, mBdsImageHandle);
+    if (EFI_ERROR (Status)) {
+      DisableQuietBoot ();
+      return;
+    }
+
     //
     // Perform system diagnostic
     //

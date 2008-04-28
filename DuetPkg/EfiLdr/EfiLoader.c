@@ -148,6 +148,7 @@ EfiLoader (
   AsciiSPrint (PrintBuffer, 256, "Decompress DxeIpl image, Image Address=0x%x! Offset=0x%x\n", 
                (UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
                EFILDRImage->Offset);
+  PrintString (PrintBuffer);
 
   Status = TianoGetInfo (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
@@ -192,6 +193,9 @@ EfiLoader (
     PrintString (PrintBuffer);
     SystemHang();
   }
+  AsciiSPrint (PrintBuffer, 256, "DxeIpl PE image is successed loaded at 0x%x, entry=0x%x\n",
+               (UINTN)DxeIplImage.ImageBasePage, (UINTN)DxeIplImage.EntryPoint);
+  PrintString (PrintBuffer);  
 
 //  PrintString("Image.NoPages = ");   
 //  PrintValue(Image.NoPages);
@@ -208,6 +212,10 @@ PrintHeader ('C');
   //
   // Decompress the image
   //
+  AsciiSPrint (PrintBuffer, 256, "Decompress DXEMain FV image, Image Address=0x%x! Offset=0x%x\n", 
+               (UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
+               EFILDRImage->Offset);
+  PrintString (PrintBuffer);
 
   Status = TianoGetInfo (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
@@ -216,6 +224,8 @@ PrintHeader ('C');
              &ScratchSize
              );
   if (EFI_ERROR (Status)) {
+    AsciiSPrint (PrintBuffer, 256, "Fail to get decompress information for DXEMain FV image!\n");
+    PrintString (PrintBuffer);
     SystemHang();
   }
 
@@ -243,6 +253,9 @@ PrintHeader ('C');
   if (EFI_ERROR (Status)) {
     SystemHang();
   }
+  AsciiSPrint (PrintBuffer, 256, "DxeCore PE image is successed loaded at 0x%x, entry=0x%x\n",
+               (UINTN)DxeCoreImage.ImageBasePage, (UINTN)DxeCoreImage.EntryPoint);
+  PrintString (PrintBuffer);  
 
 PrintHeader ('E');
 
@@ -282,6 +295,9 @@ PrintHeader ('E');
     Handoff.DxeCoreImageSize  = DxeCoreImage.NoPages * EFI_PAGE_SIZE;
     Handoff.DxeCoreEntryPoint = (VOID *)(UINTN)DxeCoreImage.EntryPoint;
 
+    AsciiSPrint (PrintBuffer, 256, "Transfer to DxeIpl ...Address=0x%x\n", (UINTN)DxeIplImage.EntryPoint);
+    PrintString (PrintBuffer);
+    
     EfiMainEntrypoint = (EFI_MAIN_ENTRYPOINT)(UINTN)DxeIplImage.EntryPoint;
     EfiMainEntrypoint (&Handoff);
   }

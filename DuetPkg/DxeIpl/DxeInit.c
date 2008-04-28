@@ -135,7 +135,8 @@ Returns:
   VOID                  *MemoryTopOnDescriptor;
   VOID                  *MemoryDescriptor;
   VOID                  *NvStorageBase;
-
+  
+  PrintString("Enter DxeIpl ...\n");
 /*
   ClearScreen();
   PrintString("handoff:\n");
