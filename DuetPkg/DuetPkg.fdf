@@ -70,7 +70,7 @@ INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   
 INF  DuetPkg/FSVariable/FSVariable.inf
-
+INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
@@ -94,7 +94,7 @@ INF  DuetPkg/CpuDxe/Cpu.inf
 INF  IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
 INF  DuetPkg/KbcResetDxe/Reset.inf
 INF  DuetPkg/LegacyMetronome/Metronome.inf
-
+INF  DuetPkg/8254TimerDxe/8254Timer.inf
 INF  DuetPkg/PcRtc/RealTimeClock.inf
 INF  DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
 INF  IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf

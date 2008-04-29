@@ -135,7 +135,8 @@ Returns:
   VOID                  *MemoryTopOnDescriptor;
   VOID                  *MemoryDescriptor;
   VOID                  *NvStorageBase;
-  
+  CHAR8                 PrintBuffer[256];
+
   PrintString("Enter DxeIpl ...\n");
 /*
   ClearScreen();
@@ -182,9 +183,15 @@ Returns:
   
   //   3.1 NV data
   NvStorageBase = PrepareHobNvStorage (MemoryTopOnDescriptor);
+  AsciiSPrint (PrintBuffer, 256, "NV Storage Base=0x%x\n", (UINTN)NvStorageBase);
+  PrintString (PrintBuffer);
+
   //   3.2 Stack
   StackTop = NvStorageBase;
   StackBottom = PrepareHobStack (StackTop);
+  AsciiSPrint (PrintBuffer, 256, "Stack Top=0x%x, Stack Bottom=0x%x\n", 
+              (UINTN)StackTop, (UINTN)StackBottom);
+  PrintString (PrintBuffer);
   //   3.3 Page Table
   PageTableBase = PreparePageTable (StackBottom, gHob->Cpu.SizeOfMemorySpace);
   //   3.4 MemDesc (will be used in PlatformBds)
@@ -206,6 +213,21 @@ Returns:
 
   CompleteHobGeneration ();
 
+  AsciiSPrint (PrintBuffer, 256, "HobStart=0x%x\n", (UINTN)gHob);
+  PrintString (PrintBuffer);
+
+  AsciiSPrint (PrintBuffer, 256, "Memory Top=0x%x, Bottom=0x%x\n", 
+              (UINTN)gHob->Phit.EfiMemoryTop, (UINTN)gHob->Phit.EfiMemoryBottom);
+  PrintString (PrintBuffer);
+
+  AsciiSPrint (PrintBuffer, 256, "Free Memory Top=0x%x, Bottom=0x%x\n", 
+              (UINTN)gHob->Phit.EfiFreeMemoryTop, (UINTN)gHob->Phit.EfiFreeMemoryBottom);
+  PrintString (PrintBuffer);
+
+  AsciiSPrint (PrintBuffer, 256, "Nv Base=0x%x, Length=0x%x\n", 
+              (UINTN)gHob->NvStorageFvb.FvbInfo.Entries[0].Base, 
+              (UINTN)gHob->NvFtwFvb.FvbInfo.Entries[0].Length);
+  PrintString (PrintBuffer);
 /*
   //
   // Print Hob Info
@@ -269,11 +291,11 @@ Returns:
   PrintString("\n");   
   EFI_DEADLOOP();
 */
-
   ClearScreen();
   PrintString("\n\n\n\n\n\n\n\n\n\n");
   PrintString("                         WELCOME TO EFI WORLD!\n");
 
+  
   EnterDxeMain (StackTop, Handoff->DxeCoreEntryPoint, gHob, PageTableBase);
 
   //
