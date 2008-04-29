@@ -1329,7 +1329,7 @@ Returns:
 
 EFI_STATUS
 GetFvbHeader (
-  IN OUT VOID                           **HobList,
+  IN OUT EFI_PEI_HOB_POINTERS           *HobList,
   OUT    EFI_FIRMWARE_VOLUME_HEADER     **FwVolHeader,
   OUT    EFI_PHYSICAL_ADDRESS           *BaseAddress     OPTIONAL,
   OUT    UINT32                         *VolumeId        OPTIONAL,
@@ -1340,7 +1340,6 @@ GetFvbHeader (
   )
 {
   EFI_STATUS                  Status;
-  VOID                        *Buffer;
   EFI_FLASH_MAP_FS_ENTRY_DATA *FlashMapEntry;
   EFI_FLASH_SUBAREA_ENTRY     *FlashMapSubEntry;
 
@@ -1348,13 +1347,15 @@ GetFvbHeader (
   *FwVolHeader  = NULL;
   TRY_ASSIGN (WriteBack, FALSE);
 
-  Buffer        = GetNextGuidHob (&gEfiFlashMapHobGuid, HobList);
-  if (EFI_ERROR (Status)) {
+  DEBUG ((EFI_D_INFO, "Hob start is 0x%x\n", (UINTN)(*HobList).Raw));
+  (*HobList).Raw = GetNextGuidHob (&gEfiFlashMapHobGuid, (*HobList).Raw);
+  if ((*HobList).Raw == NULL) {
     return EFI_NOT_FOUND;
   }
 
-  FlashMapEntry     = (EFI_FLASH_MAP_FS_ENTRY_DATA *) Buffer;
+  FlashMapEntry     = (EFI_FLASH_MAP_FS_ENTRY_DATA *) GET_GUID_HOB_DATA ((*HobList).Guid);
   FlashMapSubEntry  = &FlashMapEntry->Entries[0];
+  
   //
   // Check if it is a "FVB" area
   //
@@ -1548,7 +1549,7 @@ Returns:
   EFI_FW_VOL_INSTANCE                 *FwhInstance;
   EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
   VOID                                *HobList;
-  VOID                                *FirmwareVolumeHobList;
+  EFI_PEI_HOB_POINTERS                FirmwareVolumeHobList;
   UINT32                              BufferSize;
   EFI_FV_BLOCK_MAP_ENTRY              *PtrBlockMapEntry;
   UINTN                               LbaAddress;
@@ -1591,12 +1592,13 @@ Returns:
   // Calculate the total size for all firmware volume block instances
   //
   BufferSize            = 0;
-  FirmwareVolumeHobList = HobList;
+  FirmwareVolumeHobList.Raw = GetHobList();
   do {
     Status = GetFvbHeader (&FirmwareVolumeHobList, &FwVolHeader, NULL, NULL, NULL, NULL, NULL, NULL);
     if (EFI_ERROR (Status)) {
       break;
     }
+    FirmwareVolumeHobList.Raw = GET_NEXT_HOB (FirmwareVolumeHobList);
 
     if (FwVolHeader) {
       BufferSize += (FwVolHeader->HeaderLength + sizeof (EFI_FW_VOL_INSTANCE) - sizeof (EFI_FIRMWARE_VOLUME_HEADER));
@@ -1621,9 +1623,9 @@ Returns:
   FwhInstance = mFvbModuleGlobal->FvInstance[FVB_PHYSICAL];
   mFvbModuleGlobal->FvInstance[FVB_VIRTUAL] = FwhInstance;
 
-  mFvbModuleGlobal->NumFv = 0;
-  FirmwareVolumeHobList   = HobList;
-  MaxLbaSize              = 0;
+  mFvbModuleGlobal->NumFv     = 0;
+  FirmwareVolumeHobList.Raw   = GetHobList();
+  MaxLbaSize                  = 0;
 
   //
   // Fill in the private data of each firmware volume block instance
@@ -1637,6 +1639,7 @@ Returns:
     if (EFI_ERROR (Status)) {
       break;
     }
+    FirmwareVolumeHobList.Raw = GET_NEXT_HOB (FirmwareVolumeHobList);
 
     if (!FwVolHeader) {
       continue;

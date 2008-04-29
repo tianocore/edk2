@@ -67,3 +67,5 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
 
+[Depex]
+  TRUE

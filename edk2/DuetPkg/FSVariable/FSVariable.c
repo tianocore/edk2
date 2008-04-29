@@ -1154,12 +1154,11 @@ Returns:
   EFI_STATUS                      Status;
   EFI_HANDLE                      NewHandle;
   VS_DEV                          *Dev;
-  VOID                            *HobList;
+  EFI_PEI_HOB_POINTERS            GuidHob;
   VARIABLE_HEADER                 *NextVariable;
   VARIABLE_STORE_HEADER           *VariableStoreHeader;
   EFI_FLASH_MAP_FS_ENTRY_DATA     *FlashMapEntryData;
   EFI_FLASH_SUBAREA_ENTRY         VariableStoreEntry;
-  VOID                            *Buffer;
   UINT64                          BaseAddress;
   UINT64                          Length;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR GcdDescriptor;
@@ -1173,27 +1172,18 @@ Returns:
     return Status;
   }
 
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &HobList);
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  
-  for (FlashMapEntryData = NULL; ;) {
-    Buffer = GetNextGuidHob (&gEfiFlashMapHobGuid, &HobList);
-
-    FlashMapEntryData = (EFI_FLASH_MAP_FS_ENTRY_DATA *) Buffer;
-
-    //
-    // Get the variable store area
-    //
+  GuidHob.Raw = GetHobList ();
+  FlashMapEntryData = NULL;
+  while ((GuidHob.Raw = GetNextGuidHob (&gEfiFlashMapHobGuid, GuidHob.Raw)) != NULL) {
+    FlashMapEntryData = (EFI_FLASH_MAP_FS_ENTRY_DATA *) GET_GUID_HOB_DATA (GuidHob.Guid);
     if (FlashMapEntryData->AreaType == EFI_FLASH_AREA_EFI_VARIABLES) {
       break;
     }
+    GuidHob.Raw = GET_NEXT_HOB (GuidHob); 
   }
 
-  if (EFI_ERROR (Status) || FlashMapEntryData == NULL) {
+  if (FlashMapEntryData == NULL) {
+    DEBUG ((EFI_D_ERROR, "FSVariable: Could not find flash area for variable!\n"));
     Status = EFI_NOT_FOUND;
     return Status;
   }

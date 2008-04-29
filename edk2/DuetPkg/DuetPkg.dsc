@@ -109,7 +109,7 @@
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   
   DuetPkg/FSVariable/FSVariable.inf
-
+  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf {
@@ -139,6 +139,7 @@
   DuetPkg/LegacyMetronome/Metronome.inf
 
   DuetPkg/PcRtc/RealTimeClock.inf
+  DuetPkg/8254TimerDxe/8254Timer.inf
   DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 
