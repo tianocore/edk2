@@ -51,3 +51,6 @@
   gEfiCpuArchProtocolGuid
   gEfiLegacyBiosThunkProtocolGuid
   gEfiLegacy8259ProtocolGuid
+
+[Depex]
+  gEfiLegacy8259ProtocolGuid
