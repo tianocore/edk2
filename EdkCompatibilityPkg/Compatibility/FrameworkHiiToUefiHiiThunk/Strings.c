@@ -133,6 +133,7 @@ HiiThunkNewStringForAllStringPackages (
     *Reference = StringId1;
     Status = EFI_SUCCESS;
   } else {
+    ASSERT (FALSE);
     Status = EFI_NOT_FOUND;
   }
   
@@ -173,9 +174,14 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   Status = HiiThunkNewStringForAllStringPackages (Private, &TagGuid, Language, Reference, NewString);
-  ASSERT_EFI_ERROR (Status);  
+  //
+  // For UNI file, some String may not be defined for a language. This has been true for a lot of platform code.
+  // For this case, EFI_NOT_FOUND will be returned. To allow the old code to be run without porting, we don't assert 
+  // on EFI_NOT_FOUND. The missing String will be declared if user select differnt languages for the platform.
+  //
+  ASSERT_EFI_ERROR (EFI_ERROR (Status) && Status != EFI_NOT_FOUND);  
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS
