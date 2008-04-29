@@ -393,7 +393,7 @@ BuildMemoryAllocationHob (
 #define GET_HOB_TYPE(Hob)     ((Hob).Header->HobType)
 #define GET_HOB_LENGTH(Hob)   ((Hob).Header->HobLength)
 #define GET_NEXT_HOB(Hob)     ((Hob).Raw + GET_HOB_LENGTH (Hob))
-#define END_OF_HOB_LIST(Hob)  (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_END_OF_HOB_LIST)
+#define END_OF_HOB_LIST(Hob)  (GET_HOB_TYPE (Hob) == (UINT16)EFI_HOB_TYPE_END_OF_HOB_LIST)
 
 //
 // Get the data and data size field of GUID 
