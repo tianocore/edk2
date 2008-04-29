@@ -116,7 +116,10 @@
     <LibraryClasses>
       DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   }
-  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf {
+    <LibraryClasses>
+      IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  }
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
