@@ -435,32 +435,50 @@ Returns:
     }
   }
 
-  if (Data->DataCount != 0) {
-    if (HandleMapEntry->IsPackageListWithOnlyStringPackages) {
-      UefiHiiHandle = TagGuidToUefiIfrHiiHandle (Private, &HandleMapEntry->TagGuid);
-
-      if (UefiHiiHandle == NULL) {
-        return EFI_INVALID_PARAMETER;
-      }
-    } else {
-      UefiHiiHandle = HandleMapEntry->UefiHiiHandle;
+  if (HandleMapEntry->IsPackageListWithOnlyStringPackages) {
+    UefiHiiHandle = TagGuidToUefiIfrHiiHandle (Private, &HandleMapEntry->TagGuid);
+  
+    if (UefiHiiHandle == NULL) {
+      return EFI_INVALID_PARAMETER;
     }
+  } else {
+    UefiHiiHandle = HandleMapEntry->UefiHiiHandle;
+  }
 
-    UefiHiiUpdateData = NULL;
+  UefiHiiUpdateData = NULL;
+
+  if (AddData) {
+    if (Data->DataCount != 0) {
+      
+      Status = ThunkFrameworkUpdateDataToUefiUpdateData (Data, AddData, &UefiHiiUpdateData);
+      ASSERT_EFI_ERROR (Status);
+
+      Status = ThunkLocateFormId (UefiHiiHandle, Label, &FormsetGuid, &FormId);
+      ASSERT_EFI_ERROR (Status);
+
+      Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, AddData, UefiHiiUpdateData);
+      ASSERT_EFI_ERROR (Status);
+      
+    } else {
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
+    }
     
-    Status = ThunkFrameworkUpdateDataToUefiUpdateData (Data, AddData, &UefiHiiUpdateData);
-    ASSERT_EFI_ERROR (Status);
-
+  } else {
     Status = ThunkLocateFormId (UefiHiiHandle, Label, &FormsetGuid, &FormId);
     ASSERT_EFI_ERROR (Status);
 
-    Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, AddData, UefiHiiUpdateData);
-    ASSERT_EFI_ERROR (Status);
+    //
+    // Delete Opcode starting from Labe in FormId found
+    //
     
-    if (UefiHiiUpdateData != NULL) {
-      SafeFreePool (UefiHiiUpdateData->Data);
-      SafeFreePool (UefiHiiUpdateData);
-    }
+    Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, FALSE, NULL);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  if (UefiHiiUpdateData != NULL) {
+    SafeFreePool (UefiHiiUpdateData->Data);
+    SafeFreePool (UefiHiiUpdateData);
   }
 
   return Status;
