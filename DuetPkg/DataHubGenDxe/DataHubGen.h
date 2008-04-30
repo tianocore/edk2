@@ -30,6 +30,7 @@ Abstract:
 
 #include <Protocol/Datahub.h>
 #include <Protocol/FrameworkHii.h>
+#include <Protocol/HiiDatabase.h>
 
 #include <Library/BaseLib.h>
 #include <Library/UefiLib.h>

@@ -18,8 +18,8 @@ Abstract:
 **/
 
 #include "DataHubGen.h"
+EFI_HII_DATABASE_PROTOCOL        *gHiiDatabase;
 
-EFI_HII_PROTOCOL            *gHii;
 extern UINT8                DataHubGenDxeStrings[];
 
 EFI_DATA_HUB_PROTOCOL       *gDataHub;
@@ -30,26 +30,18 @@ GetSmbiosTablesFromHob (
   VOID
   )
 {
-  EFI_STATUS                  Status;
-  EFI_HOB_HANDOFF_INFO_TABLE  *HobList;
   EFI_PHYSICAL_ADDRESS       *Table;
-
+  EFI_PEI_HOB_POINTERS        GuidHob;
   //
   // Get Hob List
   //
-  
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, (VOID *) &HobList);
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  //
-  // If there is a SMBIOS table in the HOB add it to the EFI System table
-  //
-  Table = GetNextGuidHob (&gEfiSmbiosTableGuid, &HobList);
-
-  if (!EFI_ERROR (Status)) {
-    return (VOID *)(UINTN)*Table;
+  GuidHob.Raw = GetHobList ();
+  GuidHob.Raw = GetNextGuidHob (&gEfiSmbiosTableGuid, GuidHob.Raw);
+  if (GuidHob.Raw != NULL) {
+    Table = GET_GUID_HOB_DATA (GuidHob.Guid);
+    if (Table != NULL) {
+      return (VOID *)(UINTN)*Table;
+    }
   }
 
   return NULL;
@@ -344,19 +336,12 @@ DataHubGenEntrypoint (
     return Status;
   }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
   Status = gBS->LocateProtocol (
                   &gEfiHiiDatabaseProtocolGuid,
                   NULL,
                   &gHiiDatabase
                   );
-#else
-  Status = gBS->LocateProtocol (
-                  &gEfiHiiProtocolGuid,
-                  NULL,
-                  (VOID**)&gHii
-                  );
-#endif
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
