@@ -743,7 +743,6 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
   
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
   //
   //  The size of the VariableName, including the Unicode Null in bytes plus
   //  the DataSize is limited to maximum size of MAX_HARDWARE_ERROR_VARIABLE_SIZE (32K)
@@ -760,16 +759,7 @@ Returns:
       return EFI_INVALID_PARAMETER;
     }  
   }  
-#else  
-  //
-  //  The size of the VariableName, including the Unicode Null in bytes plus
-  //  the DataSize is limited to maximum size of MAX_VARIABLE_SIZE (1024) bytes.
-  //
-  if ((DataSize > MAX_VARIABLE_SIZE) ||
-      (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > MAX_VARIABLE_SIZE)) {
-    return EFI_INVALID_PARAMETER;
-  }  
-#endif
+
   //
   // Check whether the input variable is already existed
   //
@@ -984,7 +974,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 EFI_STATUS
 EFIAPI
 QueryVariableInfo (
@@ -1028,21 +1017,12 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
   
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)  
   if((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == 0) {
     //
     // Make sure the Attributes combination is supported by the platform.
     //
     return EFI_UNSUPPORTED;  
   }  
-#else
-  if((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)) == 0) {
-    //
-    // Make sure the Attributes combination is supported by the platform.
-    //
-    return EFI_UNSUPPORTED;  
-  } 
-#endif  
   else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
     //
     // Make sure if runtime bit is set, boot service bit is set also.
@@ -1070,14 +1050,12 @@ Returns:
   //
   *MaximumVariableSize = MAX_VARIABLE_SIZE - sizeof (VARIABLE_HEADER);
 
-#if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
   //
   // Harware error record variable needs larger size.
   //
   if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
     *MaximumVariableSize = MAX_HARDWARE_ERROR_VARIABLE_SIZE - sizeof (VARIABLE_HEADER);
   }
-#endif
   
   //
   // Point to the starting address of the variables.
@@ -1124,7 +1102,6 @@ Returns:
 
   return EFI_SUCCESS;
 }
-#endif
 
 EFI_STATUS
 EFIAPI
@@ -1299,9 +1276,7 @@ Returns:
   SystemTable->RuntimeServices->GetNextVariableName = GetNextVariableName;
   SystemTable->RuntimeServices->SetVariable         = SetVariable;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   SystemTable->RuntimeServices->QueryVariableInfo   = QueryVariableInfo;
-#endif
 
   //
   // Now install the Variable Runtime Architectural Protocol on a new handle

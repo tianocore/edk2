@@ -48,9 +48,8 @@ Returns:
 
 --*/
 {
-  EFI_STATUS                  Status;
-  EFI_HOB_HANDOFF_INFO_TABLE  *HobList;
-  EFI_HOB_HANDOFF_INFO_TABLE  *HobStart;
+  EFI_PEI_HOB_POINTERS        GuidHob;
+  EFI_PEI_HOB_POINTERS        HobStart;
   EFI_PHYSICAL_ADDRESS        *Table;
   UINTN                       Index;
   EFI_GUID                    *TableGuidArray[] = {
@@ -60,19 +59,14 @@ Returns:
   //
   // Get Hob List
   //
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, (VOID *) &HobList);
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
+  HobStart.Raw = GetHobList ();
   //
   // Iteratively add ACPI Table, SMBIOS Table, MPS Table to EFI System Table
   //
   for (Index = 0; Index < sizeof (TableGuidArray) / sizeof (*TableGuidArray); ++Index) {
-    HobStart = HobList;
-    Table = NULL;
-    Table = GetNextGuidHob (TableGuidArray[Index], &HobStart);
-    if (!EFI_ERROR (Status)) {
+    GuidHob.Raw = GetNextGuidHob (TableGuidArray[Index], HobStart.Raw);
+    if (GuidHob.Raw != NULL) {
+      Table = GET_GUID_HOB_DATA (GuidHob.Guid);
       if (Table != NULL) {
         //
         // Check if Mps Table/Smbios Table/Acpi Table exists in E/F seg,
@@ -152,7 +146,7 @@ UpdateMemoryMap (
   )
 {
   EFI_STATUS                  Status;
-  EFI_HOB_HANDOFF_INFO_TABLE  *HobList;
+  EFI_PEI_HOB_POINTERS        GuidHob;
   VOID                        *Table;
   MEMORY_DESC_HOB             MemoryDescHob;
   UINTN                       Index;
@@ -161,12 +155,18 @@ UpdateMemoryMap (
   //
   // Get Hob List
   //
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, (VOID *) &HobList);
-  if (EFI_ERROR (Status)) {
+  GuidHob.Raw = GetHobList();
+  
+  GuidHob.Raw = GetNextGuidHob (&gEfiLdrMemoryDescriptorGuid, GuidHob.Raw);
+  if (GuidHob.Raw == NULL) {
+    DEBUG ((EFI_D_ERROR, "Fail to get gEfiLdrMemoryDescriptorGuid from GUID HOB LIST!\n"));
     return;
   }
-
-  Table = GetNextGuidHob (&gEfiLdrMemoryDescriptorGuid, &HobList);
+  Table = GET_GUID_HOB_DATA (GuidHob.Guid);
+  if (Table == NULL) {
+    DEBUG ((EFI_D_ERROR, "Fail to get gEfiLdrMemoryDescriptorGuid from GUID HOB LIST!\n"));
+    return;
+  }
   MemoryDescHob.MemDescCount = *(UINTN *)Table;
   MemoryDescHob.MemDesc      = *(EFI_MEMORY_DESCRIPTOR **)((UINTN)Table + sizeof(UINTN));
 
@@ -382,6 +382,19 @@ Returns:
   // Fixup Tasble CRC after we updated Firmware Vendor and Revision
   //
   gBS->CalculateCrc32 ((VOID *) gST, sizeof (EFI_SYSTEM_TABLE), &gST->Hdr.CRC32);
+
+  GetSystemTablesFromHob ();
+
+  UpdateMemoryMap ();
+  
+  //
+  // Append Usb Keyboard short form DevicePath into "ConInDev" 
+  //
+  BdsLibUpdateConsoleVariable (
+    VarConsoleInpDev,
+    (EFI_DEVICE_PATH_PROTOCOL *) &gUsbClassKeyboardDevicePath,
+    NULL
+    );
 }
 
 UINT64
@@ -407,23 +420,27 @@ Returns:
   UINTN                                    BufferSize;
   UINT32                                   Index;
   UINT32                                   Number;
-  VOID                                     *HobList;
-  EFI_STATUS                               Status;
+  EFI_PEI_HOB_POINTERS                     GuidHob;
 
   BufferSize = 0;
   //
   // Get Hob List from configuration table
   //
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &HobList);
-  if (EFI_ERROR (Status)) {
-    return 0;
-  }
+  GuidHob.Raw = GetHobList ();
 
   //
   // Get PciExpressAddressInfo Hob
   //
-  PciExpressBaseAddressInfo = NULL;
-  PciExpressBaseAddressInfo = GetNextGuidHob (&gEfiPciExpressBaseAddressGuid, &HobList);
+  GuidHob.Raw = GetNextGuidHob (&gEfiPciExpressBaseAddressGuid, GuidHob.Raw);
+  if (GuidHob.Raw == NULL) {
+    DEBUG ((EFI_D_ERROR, "Fail to get gEfiPciExpressBaseAddressGuid from GUID HOB\n"));
+    return 0;
+  }
+  PciExpressBaseAddressInfo = (EFI_PCI_EXPRESS_BASE_ADDRESS_INFORMATION *) GET_GUID_HOB_DATA (GuidHob.Guid);
+  if (PciExpressBaseAddressInfo == NULL) {
+    DEBUG ((EFI_D_ERROR, "Fail to get gEfiPciExpressBaseAddressGuid from GUID HOB\n"));
+    return 0;
+  }
 
   //
   // Search the PciExpress Base Address in the Hob for current RootBridge
@@ -585,7 +602,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 EFI_STATUS
 GetGopDevicePath (
    IN  EFI_DEVICE_PATH_PROTOCOL *PciDevicePath,
@@ -670,7 +686,6 @@ GetGopDevicePath (
 
   return EFI_SUCCESS;
 }
-#endif
 
 EFI_STATUS
 PreparePciVgaDevicePath (
@@ -696,9 +711,7 @@ Returns:
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   EFI_DEVICE_PATH_PROTOCOL  *GopDevicePath;
-#endif  
 
   DevicePath = NULL;
   Status = gBS->HandleProtocol (
@@ -710,10 +723,8 @@ Returns:
     return Status;
   }
   
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   GetGopDevicePath (DevicePath, &GopDevicePath);
   DevicePath = GopDevicePath;
-#endif
 
   BdsLibUpdateConsoleVariable (VarConsoleOut, DevicePath, NULL);
   
@@ -839,6 +850,7 @@ Returns:
         // Add IsaKeyboard to ConIn,
         // add IsaSerial to ConOut, ConIn, ErrOut
         //
+        DEBUG ((EFI_D_INFO, "Find the LPC Bridge device\n"));
         PrepareLpcBridgeDevicePath (HandleBuffer[Index]);
         continue;
       }
@@ -849,6 +861,7 @@ Returns:
         //
         // Add them to ConOut, ConIn, ErrOut.
         //
+        DEBUG ((EFI_D_INFO, "Find the 16550 SERIAL device\n"));
         PreparePciSerialDevicePath (HandleBuffer[Index]);
         continue;
       }
@@ -861,6 +874,7 @@ Returns:
       //
       // Add them to ConOut.
       //
+      DEBUG ((EFI_D_INFO, "Find the VGA device\n"));
       PreparePciVgaDevicePath (HandleBuffer[Index]);
       continue;
     }

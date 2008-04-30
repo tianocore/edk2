@@ -112,10 +112,6 @@
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf {
-    <LibraryClasses>
-      DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-  }
   IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf 
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
@@ -126,14 +122,14 @@
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-
+  
+  
   DuetPkg/DataHubGenDxe/DataHubGen.inf
   DuetPkg/FvbRuntimeService/DUETFwh.inf
   DuetPkg/EfiLdr/EfiLdr.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   DuetPkg/CpuIoDxe/CpuIo.inf
   DuetPkg/CpuDxe/Cpu.inf
-  
   IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
   DuetPkg/KbcResetDxe/Reset.inf
   DuetPkg/LegacyMetronome/Metronome.inf
@@ -141,8 +137,10 @@
   DuetPkg/PcRtc/RealTimeClock.inf
   DuetPkg/8254TimerDxe/8254Timer.inf
   DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
+  DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
+  IntelFrameworkModulePkg/Bus/Pci/VgaMiniPortDxe/VgaMiniPortDxe.inf
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
-
+  
   # IDE Support
   #IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   
@@ -155,6 +153,14 @@
   
   # ISA Support
   DuetPkg/IsaAcpiDxe/IsaAcpi.inf
+  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
+  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
+  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
+
+  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+
   DuetPkg/BootSector/BootSector.inf
 
 [BuildOptions.common]
