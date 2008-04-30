@@ -708,7 +708,7 @@ UefiDefaultsToFrameworkDefaults (
       // So the default storage of Var Store in VFR from a Framework module 
       // should be translated to 0xFFEE.
       //
-      if (Node->StoreId == 0xFFEE) {
+      if (Node->StoreId == RESERVED_VARSTORE_ID) {
         Pack->VariableId = 0;
       }
       //

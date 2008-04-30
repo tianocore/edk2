@@ -33,6 +33,8 @@
 #
 
 [Sources.common]
+  OpcodeCreation.c
+  OpcodeCreation.h
   UefiIfrParserInternal.h
   UefiIfrParserCommon.c
   UefiIfrParserCommon.h
