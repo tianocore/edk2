@@ -269,7 +269,8 @@ EFI_STATUS
 F2UCreateOneOfOpCode (
   IN CONST FRAMEWORK_EFI_IFR_ONE_OF    *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData,
-  OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode
+  OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
+  OUT      UINTN                       *DataCount
   )
 {
   EFI_STATUS     Status;
@@ -278,7 +279,11 @@ F2UCreateOneOfOpCode (
   FRAMEWORK_EFI_IFR_ONE_OF_OPTION *FwOneOfOp;
   BOOLEAN        HasQuestionId;
 
+  ASSERT (NextFwOpcode != NULL);
+  ASSERT (DataCount != NULL);
+
   ZeroMem (&UOpcode, sizeof(UOpcode));
+  *DataCount = 0;
 
   UOpcode.Header.Length = sizeof(UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_ONE_OF_OP;
@@ -291,6 +296,7 @@ F2UCreateOneOfOpCode (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  *DataCount += 1;
 
   //
   // Go over the Framework IFR binary to get the QuestionId for generated UEFI One Of Option opcode
@@ -318,11 +324,14 @@ F2UCreateOneOfOpCode (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+    FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpHeader + FwOpHeader->Length);
+    *DataCount += 1;
   }
 
   Status = UCreateEndOfOpcode (UefiData);
   if (!EFI_ERROR (Status)) {
     *NextFwOpcode = (FRAMEWORK_EFI_IFR_OP_HEADER *)((UINT8 *) FwOpHeader + FwOpHeader->Length);
+    *DataCount += 1;
   }
 
   return Status;
@@ -360,7 +369,8 @@ EFI_STATUS
 F2UCreateOrderedListOpCode (
   IN CONST FRAMEWORK_EFI_IFR_ORDERED_LIST *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData,
-  OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode
+  OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
+  OUT      UINTN                       *DataCount
   )
 {
   EFI_IFR_ORDERED_LIST              UOpcode;
@@ -368,6 +378,7 @@ F2UCreateOrderedListOpCode (
   FRAMEWORK_EFI_IFR_OP_HEADER       *FwOpHeader;
 
   ZeroMem (&UOpcode, sizeof(UOpcode));
+  *DataCount = 0;
 
   UOpcode.Header.Length = sizeof(UOpcode);
   UOpcode.Header.OpCode = EFI_IFR_ORDERED_LIST_OP;
@@ -382,6 +393,7 @@ F2UCreateOrderedListOpCode (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  *DataCount += 1;
 
   FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpcode + FwOpcode->Header.Length);
   while (FwOpHeader->OpCode != FRAMEWORK_EFI_IFR_END_ONE_OF_OP) {
@@ -389,14 +401,17 @@ F2UCreateOrderedListOpCode (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+    FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpHeader + FwOpHeader->Length);
+    *DataCount += 1;
   }
 
   Status = UCreateEndOfOpcode (UefiData);
   if (!EFI_ERROR (Status)) {
     *NextFwOpcode = (FRAMEWORK_EFI_IFR_OP_HEADER *)((UINT8 *) FwOpHeader + FwOpHeader->Length);
+    *DataCount += 1;
   }
 
-  return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiData);
+  return Status;
 }
 
 /*
@@ -751,6 +766,7 @@ ThunkFrameworkUpdateDataToUefiUpdateData (
   EFI_HII_UPDATE_DATA                  *UefiUpdateDataBuffer;
   UINTN                                Index;
   EFI_STATUS                           Status;
+  UINTN                                DataCount;
   static UINTN                         mOneOfOptionWidth;
 
   mOneOfOptionWidth = 0;
@@ -771,7 +787,12 @@ ThunkFrameworkUpdateDataToUefiUpdateData (
 
   FrameworkOpcodeBuffer = (FRAMEWORK_EFI_IFR_OP_HEADER *) &Data->Data;
 
-  for (Index = 0; Index < Data->DataCount; Index++) {
+  for (Index = 0; Index < Data->DataCount; Index += DataCount) {
+    //
+    // By default Datacount is 1. For FRAMEWORK_EFI_IFR_ONE_OF_OP and FRAMEWORK_EFI_IFR_ORDERED_LIST_OP,
+    // DataCount maybe more than 1.
+    //
+    DataCount = 1;
     switch (FrameworkOpcodeBuffer->OpCode) {
       case FRAMEWORK_EFI_IFR_SUBTITLE_OP:
         Status = F2UCreateSubtitleOpCode ((FRAMEWORK_EFI_IFR_SUBTITLE  *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer);
@@ -786,7 +807,7 @@ ThunkFrameworkUpdateDataToUefiUpdateData (
         break;
         
       case FRAMEWORK_EFI_IFR_ONE_OF_OP:
-        Status = F2UCreateOneOfOpCode ((FRAMEWORK_EFI_IFR_ONE_OF *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer, &NextFrameworkOpcodeBuffer);
+        Status = F2UCreateOneOfOpCode ((FRAMEWORK_EFI_IFR_ONE_OF *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer, &NextFrameworkOpcodeBuffer, &DataCount);
         if (!EFI_ERROR (Status)) {
           FrameworkOpcodeBuffer = NextFrameworkOpcodeBuffer;
           //
@@ -797,7 +818,7 @@ ThunkFrameworkUpdateDataToUefiUpdateData (
         break;
 
       case FRAMEWORK_EFI_IFR_ORDERED_LIST_OP:
-        Status = F2UCreateOrderedListOpCode ((FRAMEWORK_EFI_IFR_ORDERED_LIST *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer, &NextFrameworkOpcodeBuffer);
+        Status = F2UCreateOrderedListOpCode ((FRAMEWORK_EFI_IFR_ORDERED_LIST *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer, &NextFrameworkOpcodeBuffer, &DataCount);
         if (!EFI_ERROR (Status)) {
           FrameworkOpcodeBuffer = NextFrameworkOpcodeBuffer;
           //

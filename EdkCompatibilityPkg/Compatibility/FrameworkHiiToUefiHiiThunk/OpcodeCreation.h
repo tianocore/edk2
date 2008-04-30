@@ -56,7 +56,8 @@ EFI_STATUS
 F2UCreateOneOfOpCode (
   IN CONST FRAMEWORK_EFI_IFR_ONE_OF    *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData,
-  OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode
+  OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
+  OUT      UINTN                       *DataCount
   )
 ;
 
@@ -64,7 +65,8 @@ EFI_STATUS
 F2UCreateOrderedListOpCode (
   IN CONST FRAMEWORK_EFI_IFR_ORDERED_LIST *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData,
-  OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode
+  OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
+  OUT      UINTN                       *DataCount
   )
 ;
 
