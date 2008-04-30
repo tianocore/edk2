@@ -459,11 +459,7 @@ Returns:
       Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, AddData, UefiHiiUpdateData);
       ASSERT_EFI_ERROR (Status);
       
-    } else {
-      ASSERT (FALSE);
-      return EFI_INVALID_PARAMETER;
-    }
-    
+    } 
   } else {
     Status = ThunkLocateFormId (UefiHiiHandle, Label, &FormsetGuid, &FormId);
     ASSERT_EFI_ERROR (Status);
@@ -471,8 +467,9 @@ Returns:
     //
     // Delete Opcode starting from Labe in FormId found
     //
-    
-    Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, FALSE, NULL);
+    UefiHiiUpdateData = AllocateZeroPool (sizeof (*UefiHiiUpdateData));
+	
+    Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, FALSE, UefiHiiUpdateData);
     ASSERT_EFI_ERROR (Status);
   }
 
