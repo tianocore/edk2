@@ -595,7 +595,7 @@ F2UCreateNumericOpCode (
   }
 
   //
-  // We need to create a default 
+  // We need to create a default value.
   //
   if (FwOpcode->Default != 0) {
     ZeroMem (&UOpcodeDefault, sizeof (UOpcodeDefault));
