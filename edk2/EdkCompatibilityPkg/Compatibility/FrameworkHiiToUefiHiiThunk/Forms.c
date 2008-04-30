@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "HiiDatabase.h"
 #include "UefiIfrDefault.h"
+#include "OpcodeCreation.h"
 
 EFI_STATUS
 EFIAPI
@@ -189,128 +190,6 @@ ThunkUpdateFormCallBack (
   return EFI_SUCCESS;
 }
 
-#define LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL   0x1000
-
-EFI_STATUS
-AppendToUpdateBuffer (
-  IN CONST  UINT8                *OpCodeBuf,
-  IN        UINTN                BufSize,
-  OUT       EFI_HII_UPDATE_DATA  *UefiData
-  )
-{
-  UINT8 * NewBuff;
-  
-  if (UefiData->Offset + BufSize > UefiData->BufferSize) {
-    NewBuff = AllocateCopyPool (UefiData->BufferSize + LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL, UefiData->Data);
-    if (NewBuff == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    UefiData->BufferSize += LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL;
-    FreePool (UefiData->Data);
-    UefiData->Data = NewBuff;
-  }
-  
-  CopyMem (UefiData->Data + UefiData->Offset, OpCodeBuf, BufSize);
-  UefiData->Offset += (UINT32) BufSize;
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-F2UCreateSubtitleOpCode (
-  IN CONST FRAMEWORK_EFI_IFR_SUBTITLE  *FwSubTitle,
-  OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-{
-  EFI_IFR_SUBTITLE USubTitle;
-
-  ZeroMem (&USubTitle, sizeof(USubTitle));
-
-  USubTitle.Header.OpCode = EFI_IFR_SUBTITLE_OP;
-  USubTitle.Header.Length = sizeof (EFI_IFR_SUBTITLE);
-
-  USubTitle.Statement.Prompt = FwSubTitle->SubTitle;
-
-  return AppendToUpdateBuffer ((UINT8 *)&USubTitle, sizeof(EFI_IFR_SUBTITLE), UefiData);
-}
-
-EFI_STATUS
-F2UCreateTextOpCode (
-  IN CONST FRAMEWORK_EFI_IFR_TEXT      *FwText,
-  OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-{
-  EFI_IFR_TEXT UText;
-
-  ZeroMem (&UText, sizeof(UText));
-  
-  UText.Header.OpCode = EFI_IFR_TEXT_OP;
-  UText.Header.Length = sizeof (EFI_IFR_TEXT);
-
-  UText.Statement.Help   = FwText->Help;
-
-  UText.Statement.Prompt = FwText->Text;
-  UText.TextTwo          = FwText->TextTwo;
-  
-  return AppendToUpdateBuffer ((UINT8 *) &UText, sizeof(EFI_IFR_TEXT), UefiData);
-}
-
-
-EFI_STATUS
-ThunkFrameworkUpdateDataToUefiUpdateData (
-  IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *Data,
-  IN       BOOLEAN                          AddData,
-  OUT      EFI_HII_UPDATE_DATA              **UefiData
-  )
-{
-  FRAMEWORK_EFI_IFR_OP_HEADER          *FrameworkOpcodeBuffer;
-  EFI_HII_UPDATE_DATA                  *UefiUpdateDataBuffer;
-  UINTN                                Index;
-  EFI_STATUS                           Status;
-
-  UefiUpdateDataBuffer = AllocateZeroPool (sizeof (EFI_HII_UPDATE_DATA));
-  if (UefiUpdateDataBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  
-  UefiUpdateDataBuffer->Data = AllocateZeroPool (LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL);
-  if (UefiUpdateDataBuffer->Data == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  UefiUpdateDataBuffer->BufferSize = LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL;
-  UefiUpdateDataBuffer->Offset = 0;
-
-  FrameworkOpcodeBuffer = (FRAMEWORK_EFI_IFR_OP_HEADER *) &Data->Data;
-
-  for (Index = 0; Index < Data->DataCount; Index++) {
-    switch (FrameworkOpcodeBuffer->OpCode) {
-      case FRAMEWORK_EFI_IFR_SUBTITLE_OP:
-        Status = F2UCreateSubtitleOpCode ((FRAMEWORK_EFI_IFR_SUBTITLE  *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer);
-        break;
-        
-      case FRAMEWORK_EFI_IFR_TEXT_OP:
-        Status = F2UCreateTextOpCode ((FRAMEWORK_EFI_IFR_TEXT  *) FrameworkOpcodeBuffer, UefiUpdateDataBuffer);  
-        break;
-        
-      default:
-        ASSERT (FALSE);
-        return EFI_UNSUPPORTED;
-    }
-
-    if (EFI_ERROR (Status)) {
-      FreePool (UefiUpdateDataBuffer->Data);
-      FreePool (UefiUpdateDataBuffer);
-      return Status;
-    }
-
-    FrameworkOpcodeBuffer = (FRAMEWORK_EFI_IFR_OP_HEADER *)((UINT8 *) FrameworkOpcodeBuffer + FrameworkOpcodeBuffer->Length);
-  }
-
-  *UefiData = UefiUpdateDataBuffer;
-  
-  return EFI_SUCCESS;
-}
 
 STATIC
 EFI_STATUS
@@ -569,7 +448,8 @@ Returns:
 
     UefiHiiUpdateData = NULL;
     
-    ThunkFrameworkUpdateDataToUefiUpdateData (Data, AddData, &UefiHiiUpdateData);
+    Status = ThunkFrameworkUpdateDataToUefiUpdateData (Data, AddData, &UefiHiiUpdateData);
+    ASSERT_EFI_ERROR (Status);
 
     Status = ThunkLocateFormId (UefiHiiHandle, Label, &FormsetGuid, &FormId);
     ASSERT_EFI_ERROR (Status);

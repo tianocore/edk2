@@ -331,7 +331,8 @@ UefiRegisterPackageList(
   Status = GetIfrAndStringPackNum (Packages, &IfrPackNum, &StringPackNum);
   ASSERT_EFI_ERROR (Status);
   //
-  // Thunk Layer only handle the following combinations of IfrPack, StringPkg and FontPack
+  // Thunk Layer only handle the following combinations of IfrPack, StringPkg and FontPack.
+  // Thunk Layer only allow zero or one IfrPack in the Package List.
   //
   if (IfrPackNum > 1) {
     return EFI_UNSUPPORTED;
@@ -365,7 +366,7 @@ UefiRegisterPackageList(
 
   //
   // UEFI HII require EFI_HII_CONFIG_ACCESS_PROTOCOL to be installed on a EFI_HANDLE, so
-  // that Setup Utility will load the Buffer Storage
+  // that Setup Utility can load the Buffer Storage using this protocol.
   //
   if (IfrPackNum != 0) {
     InstallDefaultUefiConfigAccessProtocol (Packages, &UefiHiiDriverHandle, HandleMappingEntry);
