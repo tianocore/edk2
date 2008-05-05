@@ -1380,13 +1380,13 @@ GetFvbHeader (
   TRY_ASSIGN (Offset,      FlashMapEntry->Offset);
 
   DEBUG ((
-    EFI_D_ERROR, 
+    EFI_D_INFO, 
     "FlashMap HOB: BaseAddress = 0x%x, Length = 0x%x, ActuralLength = 0x%x, Offset = 0x%x\n", 
     (UINTN) FlashMapSubEntry->Base, (UINTN) FlashMapSubEntry->Length, 
     (UINTN) FlashMapEntry->ActuralSize, (UINTN) FlashMapEntry->Offset
   ));
   DEBUG ((
-    EFI_D_ERROR,
+    EFI_D_INFO,
     "FlashMap HOB: VolumeId = 0x%lx, MappedFile = %s\n",
     (UINTN) FlashMapEntry->VolumeId, (UINTN) FlashMapEntry->FilePath
   ));
@@ -1548,7 +1548,6 @@ Returns:
   EFI_STATUS                          Status;
   EFI_FW_VOL_INSTANCE                 *FwhInstance;
   EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
-  VOID                                *HobList;
   EFI_PEI_HOB_POINTERS                FirmwareVolumeHobList;
   UINT32                              BufferSize;
   EFI_FV_BLOCK_MAP_ENTRY              *PtrBlockMapEntry;
@@ -1568,12 +1567,6 @@ Returns:
   UINTN                               NumOfBlocks;
   UINTN                               HeaderLength;
   BOOLEAN                             InstallSfsNotify;
-
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &HobList);
-  //
-  // No FV HOBs found
-  //
-  ASSERT_EFI_ERROR (Status);
 
   HeaderLength     = 0;
   InstallSfsNotify = FALSE;
@@ -1644,7 +1637,7 @@ Returns:
     if (!FwVolHeader) {
       continue;
     }
-
+    
     CopyMem ((UINTN *) &(FwhInstance->VolumeHeader), (UINTN *) FwVolHeader, FwVolHeader->HeaderLength);
     FwVolHeader                       = &(FwhInstance->VolumeHeader);
 
@@ -1665,11 +1658,12 @@ Returns:
       FwhInstance->MappedFile[0]        = L'\0';
     }
     
-
+    DEBUG ((EFI_D_INFO, "FirmVolume Found! BaseAddress=0x%lx, VolumeId=0x%x, MappedFile=%s, Size=0x%x\n",
+           (UINTN) BaseAddress, VolumeId, MappedFile, ActuralSize));
     //
     // We may expose readonly FVB in future.
     //
-    FwhInstance->WriteEnabled         = TRUE;
+    FwhInstance->WriteEnabled         = TRUE; // Ken: Why enable write?
     EfiInitializeLock (&(FwhInstance->FvbDevLock), TPL_HIGH_LEVEL);
 
     LbaAddress  = (UINTN) FwhInstance->FvBase[0];

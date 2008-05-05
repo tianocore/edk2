@@ -1164,7 +1164,7 @@ Returns:
     Status = EFI_NOT_FOUND;
     return Status;
   }
-
+  
   VariableStoreEntry = FlashMapEntryData->Entries[0];
 
   //

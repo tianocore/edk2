@@ -32,7 +32,7 @@ Abstract:
 #include <Library/UefiBootServicesTableLib.h>
 
 #define CPU_EXCEPTION_DEBUG_OUTPUT   1
-#define CPU_EXCEPTION_VGA_SWITCH     1
+#define CPU_EXCEPTION_VGA_SWITCH     0
 
 #define INTERRUPT_VECTOR_NUMBER 0x100
 
