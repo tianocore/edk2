@@ -167,7 +167,6 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 
   DuetPkg/BootSector/BootSector.inf
-  FatPkg/EnhancedFatDxe/Fat.inf
 
 [BuildOptions.common]
   MSFT:*_*_*_CC_FLAGS = /Fa$* /FAsc /FR$(@R).SBR
