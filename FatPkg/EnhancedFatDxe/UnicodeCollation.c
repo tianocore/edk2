@@ -275,7 +275,7 @@ FatFatToStr (
 {
   ASSERT (Fat != NULL);
   ASSERT (String != NULL);
-  ASSERT (((UINTN) String & 0x01) != 0);
+  ASSERT (((UINTN) String & 0x01) == 0);
   ASSERT (mUnicodeCollationInterface != NULL);
 
   mUnicodeCollationInterface->FatToStr (mUnicodeCollationInterface, FatSize, Fat, String);
