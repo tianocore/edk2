@@ -115,7 +115,7 @@ Returns:
   //
   // Volume installed
   //
-  DEBUG ((EFI_D_INIT, "%HInstalled Fat filesystem on %x%N\n", Handle));
+  DEBUG ((EFI_D_INIT, "Installed Fat filesystem on %p\n", Handle));
   Volume->Valid = TRUE;
 
 Done:
