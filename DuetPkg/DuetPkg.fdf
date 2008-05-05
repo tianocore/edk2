@@ -120,11 +120,10 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-INF  FatPkg/EnhancedFatDxe/Fat.inf
 
-#FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
-#  SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
-#  }
+FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
+  SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
+  }
 
 #FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
 #  SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
