@@ -40,5 +40,5 @@ Abstract:
 #define NV_FTW_FVB_SIZE             ((NV_FTW_WORKING_SIZE + NV_FTW_SPARE_SIZE + EFI_RUNTIME_UPDATABLE_FV_HEADER_LENGTH + FV_BLOCK_MASK) & ~FV_BLOCK_MASK)
 #define NV_FTW_FVB_BLOCK_NUM        (NV_FTW_FVB_SIZE / FV_BLOCK_SIZE)
 
-#define NV_STORAGE_FILE_PATH        L"\\Efivar.bin"
+#define NV_STORAGE_FILE_PATH        L".\\Efivar.bin"
 #endif // _EFI_FLASH_LAYOUT

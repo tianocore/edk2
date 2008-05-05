@@ -755,7 +755,7 @@ Returns:
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-
+  
   DevicePath = NULL;
   Status = gBS->HandleProtocol (
                   DeviceHandle,
@@ -932,6 +932,7 @@ Returns:
                &gEfiGlobalVariableGuid,
                &DevicePathSize
                );
+  
   if (VarConout == NULL || VarConin == NULL) {
     //
     // Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut

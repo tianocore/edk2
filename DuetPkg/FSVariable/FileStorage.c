@@ -229,7 +229,9 @@ OnSimpleFileSystemInstall (
   NumBytes = Dev->Size;
   Status = File->Write (File, &NumBytes, VAR_DATA_PTR (Dev));
   ASSERT_EFI_ERROR (Status);
-  FileClose (File);
+  // KEN: bugbug here if closing file, volume handle will be free,
+  // and system will be hang when accessing volume handle in future.
+  //FileClose (File);
   DEBUG ((EFI_D_ERROR, "FileStorage: Mapped to file!\n"));
 }
 
@@ -407,7 +409,7 @@ OpenStore (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Open the root directory of the volume
   //
