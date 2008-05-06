@@ -107,6 +107,8 @@ Returns:
   RTC_REGISTER_D  RegisterD;
   UINT8           Century;
   EFI_TIME        Time;
+  UINTN           DataSize;
+  UINT32          TimerVar;
 
   //
   // Acquire RTC Lock to make access to RTC atomic
@@ -175,8 +177,9 @@ Returns:
 
   //
   // Set RTC configuration after get original time
+  // The value of bit AIE should be reserved.
   //
-  RtcWrite (RTC_ADDRESS_REGISTER_B, RTC_INIT_REGISTER_B);
+  RtcWrite (RTC_ADDRESS_REGISTER_B, RTC_INIT_REGISTER_B | (RegisterB.Data & BIT5));
 
   //
   // Release RTC Lock.
@@ -197,6 +200,25 @@ Returns:
     Time.Day    = RTC_INIT_DAY;
     Time.Month  = RTC_INIT_MONTH;
     Time.Year   = RTC_INIT_YEAR;
+  }
+  //
+  // Get the data of Daylight saving and time zone, if they have been
+  // stored in NV variable during previous boot.
+  //
+  DataSize = sizeof (UINT32);
+  Status = EfiGetVariable (
+             L"TimerVar",
+             &gEfiGenericPlatformVariableGuid,
+             NULL,
+             &DataSize,
+             (VOID *) &TimerVar
+             );
+  if (!EFI_ERROR (Status)) {
+    Global->SavedTimeZone = (INT16) TimerVar;
+    Global->Daylight      = (UINT8) (TimerVar >> 16);
+
+    Time.TimeZone = Global->SavedTimeZone;
+    Time.Daylight = Global->Daylight;
   }
   //
   // Reset time value according to new RTC configuration
@@ -343,6 +365,7 @@ Routine Description:
   EFI_TIME        RtcTime;
   RTC_REGISTER_B  RegisterB;
   UINT8           Century;
+  UINT32          TimerVar;
 
   if (Time == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -417,7 +440,19 @@ Routine Description:
   //
   Global->SavedTimeZone = Time->TimeZone;
   Global->Daylight      = Time->Daylight;
-  return Status;
+
+  TimerVar = Time->Daylight;
+  TimerVar = (UINT32) ((TimerVar << 16) | Time->TimeZone);
+  Status =  EfiSetVariable (
+              L"TimerVar",
+              &gEfiGenericPlatformVariableGuid,
+              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+              sizeof (TimerVar),
+              &TimerVar
+              );
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS

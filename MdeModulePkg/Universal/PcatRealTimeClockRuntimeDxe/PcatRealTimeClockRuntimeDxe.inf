@@ -40,6 +40,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   UefiRuntimeServicesTableLib
@@ -53,8 +54,12 @@
   DebugLib
   BaseLib
 
+[Guids]
+  gEfiGenericPlatformVariableGuid               # ALWAYS_CONSUMED
+
 [Protocols]
   gEfiRealTimeClockArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
 
 [Depex]
-  TRUE
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
+  
