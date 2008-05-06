@@ -1580,7 +1580,7 @@ EhcDriverBindingStart (
   // Robustnesss improvement such as for UoL
   // Default is not required.
   //
-  if (FeaturePcdGet (PcdUsbLegacySupport)) {
+  if (FeaturePcdGet (PcdTurnOffUsbLegacySupport)) {
     EhcClearLegacySupport (Ehc);
   }
   EhcResetHC (Ehc, EHC_RESET_TIMEOUT);

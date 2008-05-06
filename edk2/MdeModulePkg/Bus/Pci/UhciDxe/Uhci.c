@@ -1658,7 +1658,7 @@ UhciDriverBindingStart (
   // Robustnesss improvement such as for UoL
   // Default is not required.
   //
-  if (FeaturePcdGet (PcdUsbLegacySupport)) {
+  if (FeaturePcdGet (PcdTurnOffUsbLegacySupport)) {
     UhciTurnOffUsbEmulation (PciIo);
   }
 
