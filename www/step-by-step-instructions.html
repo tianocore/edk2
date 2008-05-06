@@ -17,9 +17,8 @@
     margin-bottom: 0.08in;
     border-bottom: thin solid black;
   }
-  
+
   .build-step-title {
-    font-size: 11pt;
     font-weight: bold;
     margin-top: 0.19in;
     margin-bottom: 0.19in
@@ -27,9 +26,12 @@
   
   .build-step-details {
   }
-  
-  .build-step-code {
+
+  .monospace, .build-step-code {
     font-family: "courier new", "courier", "monospace";
+  }
+
+  .build-step-code {
     border: 1px dashed;
     margin-right: 0.25in;
     padding: 2pt 4pt 2pt 4pt;
@@ -37,11 +39,16 @@
   }
   
   .build-step-details, .build-step-code, .build-step-title {
+    font-size: 12pt;
     margin-left: 0.25in;
   }
   
   table.build-step-details td {
     border-style: hidden;
+  }
+  
+  img.in-text {
+    vertical-align: top;
   }
   -->
 </style>
@@ -51,57 +58,29 @@
 </h2>
 
 <p class="main-details">
-  <font size="2">
-    This page contains some step-by-step guides in an attempt to give
-    a highly detailed description of how to set up building on an edk2
-    system.&nbsp;
-    A few different operating systems are targeted.&nbsp;
-    It is hoped that these examples can either provide exact steps for
-    setting up an edk2 build environment.&nbsp;
-    If instructions are not available for your exact system configuration,
-    you may still be able to 'tweak' the instructions to work on your
-    system.
-  </font>
+  This page contains some step-by-step guides in an attempt to give
+  a highly detailed description of how to set up building on an edk2
+  system.&nbsp;
+  A few different operating systems are targeted.&nbsp;
+  It is hoped that these examples can either provide exact steps for
+  setting up an edk2 build environment.&nbsp;
+  If instructions are not available for your exact system configuration,
+  you may still be able to <i>tweak</i> the instructions to work on your
+  system.
 </p>
-
-<font size="2">
-  <ul>
-    <li><a href="#MacOSX10.5">Mac OS X 10.5</a> (Leopard)</li>
-    <li><a href="#Ubuntu8.04">Ubuntu 8.04</a></li>
-  </ul>
-</font>
-
-<h2 class="main-title">
-  <a name="MacOSX10.5"></a>
-  Mac OS X 10.5
-</h2>
-
-<h3 class="build-step-title">
-  Coming soon...
-</h3>
 
 <!--
-<p class="build-step-details">
-  These instructions for OS X 10.5 are currently under construction.&nbsp;
-  Please do not try to use them until this notice is removed!
-</p>
+ #
+ # Getting started for unix-like systems
+ #
 -->
-
 <h2 class="main-title">
-  <a name="Ubuntu8.04"></a>
-  Ubuntu 8.04
+  Getting started for UNIX-like operating systems
 </h2>
-
-<h3 class="build-step-title">
-  Getting started &amp; Instructions for the instructions
-</h3>
 
 <p class="build-step-details">
   These instructions will be written as a series of commands executed from
-  a command terminal.&nbsp;
-  To open the command terminal application, open the "Applications" menu,
-  then open the "Accessories" sub-menu, and then select the "Terminal"
-  application.
+  a command terminal.
 </p>
 
 <p class="build-step-details">
@@ -110,23 +89,26 @@
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>echo this bold text is a sample command</b>
+bash$ <b>echo this bold text is a sample command</b>
 </pre>
 
 <p class="build-step-details">
-  To execute this command, highlight the <b>bold</b> text of the 
+  To execute this command, highlight the
+  <font class="monospace"><b>bold</b></font>
+  text of the 
   command in your web browser.&nbsp;
-  After the text is highlighted, you can paste the text into the terminal
-  window with the middle mouse button.&nbsp;
+  Most web browsers should be able to copy the text by selecting <i>Copy</i>
+  under the <i>Edit</i> menu.&nbsp;
+  Now, change back to the terminal application, and there should be a
+  <i>Paste</i> operation under the <i>Edit</i> menu.&nbsp;
+  After pasting the command into the shell, you may need to press the
+  <i>enter</i> or <i>return</i> key to execute the command.&nbsp;
 </p>
 <p class="build-step-details">
-  There may be other ways to copy and paste the text into the terminal.&nbsp;
-  For example, you can usually press 'Ctrl-C' within your web browser to copy
-  the text, and within the gnome-terminal program you can then press
-  'Ctrl-<b>Shift</b>-V' to paste the text.&nbsp;
-  After pasting the command into the shell, you may need to press the
-  enter or return key to execute the command.&nbsp;
-  If all else fails, you can type the command by hand.
+  Of course, there may be other ways to copy and paste the command into
+  the terminal which are specific to the windowing environment and
+  applications that you are using.&nbsp;
+  If all else fails, however, you can type the command by hand.
 </p>
 
 <p class="build-step-details">
@@ -135,8 +117,8 @@ bash:~$ <b>echo this bold text is a sample command</b>
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>echo this bold text is a sample command \
-          which is broken into two lines</b>
+bash$ <b>echo this bold text is a sample command \
+        which is broken into two lines</b>
 </pre>
 
 <p class="build-step-details">
@@ -147,8 +129,8 @@ bash:~$ <b>echo this bold text is a sample command \
 </p>
 
 <p class="build-step-details">
-  If a command starts with the 'sudo' command, then you may be prompted for
-  your user password.&nbsp;
+  If a command starts with the <font class="monospace"><b>sudo</b></font>
+  command, then you may be prompted for your user password.&nbsp;
   This will be the same password as you used to login to the system.
 </p>
 
@@ -163,7 +145,7 @@ bash:~$ <b>echo this bold text is a sample command \
       <a href="https://edk2.tianocore.org">Edk2</a> source tree:
     </td>
     <td>
-      <b>~/src/edk2</b>
+      <font class="monospace"><b>~/src/edk2</b></font>
     </td>
   </tr>
   <tr>
@@ -171,7 +153,7 @@ bash:~$ <b>echo this bold text is a sample command \
       <a href="https://buildtools.tianocore.org">Buildtools</a> source tree:
     </td>
     <td>
-      <b>~/src/buildtools</b>
+      <font class="monospace"><b>~/src/buildtools</b></font>
     </td>
   </tr>
   <tr>
@@ -179,7 +161,7 @@ bash:~$ <b>echo this bold text is a sample command \
       gcc x64 cross-compiler installation:
     </td>
     <td>
-      <b>~/programs/gcc/x64</b>
+      <font class="monospace"><b>~/programs/gcc/x64</b></font>
     </td>
   </tr>
 </table>
@@ -190,8 +172,229 @@ bash:~$ <b>echo this bold text is a sample command \
   know what you are doing.
 </p>
 
+<h2 class="main-title">
+  Internet proxies
+</h2>
+
+<p class="build-step-details">
+  If your network utilizes a firewall with a web proxy, then you may
+  need to configure your proxy information for various command line
+  applications to work.&nbsp;
+  You may need to consult with your network administrator to find
+  out the computer name and port to use for proxy setup.&nbsp;
+  The following commands are common examples of how you would configure
+  your proxy by setting an environment variable:
+</p>
+
+<pre class="build-step-code">
+bash$ <b>export http_proxy=http://proxy.domain.com:proxy_port</b>
+bash$ <b>export ftp_proxy=$http_proxy</b>
+</pre>
+
+<p class="build-step-details">
+  To utilize the subversion source control command behind an internet
+  firewall with a web proxy, you should configure the
+  <font class="monospace">~/.subversion/servers</font> file.
+</p>
+
+<h2 class="main-title">
+  Instructions for various UNIX-like systems
+</h2>
+
+<font size="2">
+  <ul>
+    <li><a href="#RHEL4">Red Hat Enterprise Linux 4 Desktop</a></li>
+    <li><a href="#MacOSX10.5">Mac OS X 10.5</a> (Leopard)</li>
+    <li><a href="#SLED10">SuSE Linux Enterprise 10 Desktop</a></li>
+    <li><a href="#Ubuntu8.04">Ubuntu 8.04</a></li>
+  </ul>
+</font>
+
+<!--
+ #
+ # Red Hat Enterprise Linux 4 Desktop
+ #
+-->
+<h2 class="main-title">
+  <a name="RHEL4"></a>
+  Red Hat Enterprise Linux 4 Desktop
+</h2>
+
 <h3 class="build-step-title">
-  Install tools from apt
+  Coming soon...
+</h3>
+
+<!--
+ #
+ # MAC OS X 10.5
+ #
+-->
+<h2 class="main-title">
+  <a name="MacOSX10.5"></a>
+  Mac OS X 10.5
+</h2>
+
+<h3 class="build-step-title">
+  Work in progress...
+</h3>
+
+<p class="build-step-details">
+  These instructions for OS X 10.5 are currently under construction.&nbsp;
+  Please do not try to use them until this notice is removed!
+</p>
+
+<h3 class="build-step-title">
+  Xcode Tools
+</h3>
+
+<p class="build-step-details">
+  The first step is to install the Apple Xcode
+  development environment:<br>
+  &nbsp;&nbsp;<a href="http://developer.apple.com/tools/xcode">http://developer.apple.com/tools/xcode</a>
+</p>
+
+<p class="build-step-details">
+  To install Xcode, you must register as an Apple developer, and
+  download the Xcode installation disk image (which is fairly large).&nbsp;
+  These instructions were verified with Xcode 3.0.&nbsp;
+  Within the Xcode Tools disk image, only the
+  <font class="monospace">Xcode&nbsp;Tools.mpkg</font> package
+  needs to be installed.
+</p>
+
+<h3 class="build-step-title">
+  Open OS X Terminal program
+</h3>
+
+<p class="build-step-details">
+  Past this point, the remaining instructions will utilize OS X's built in
+  command shell (bash) via the <i>Terminal</i> application.&nbsp;
+  To open the command terminal application, open <i>Finder</i>, then press the
+  <img src="apple-command-key.gif" class="in-text" alt="Cmd" title="Command/Apple key" />-Shift-U
+  key combination.&nbsp;
+  (This opens the <i>Applications</i> => <i>Utilities</i> folder.)&nbsp;
+  In the <i>Utilities</i> folder, you should see the <i>Terminal</i>
+  application.
+</p>
+
+
+<h3 class="build-step-title">
+  GMP &amp; MPFR (if behind a web proxy)
+</h3>
+
+<p class="build-step-details">
+  The <a href="http://gmplib.org/">gmp</a> and
+  <a href="http://www.mpfr.org/">mpfr</a> libraries are needed to build
+  the gcc cross compiler at a later point in these instructions.&nbsp;
+  Building these libraries on OS X can present some difficulties, so
+  if you are not behind a network firewall, then consider using the
+  macports project to install these libraries. (see below)&nbsp;
+  Be sure to set the http_proxy and ftp_proxy environment variables
+  before using the 'curl' commands below.
+</p>
+
+<pre class="build-step-code">
+bash$ <b>mkdir ~/src</b>
+bash$ <b>cd ~/src</b>
+bash$ <b>curl --remote-name \
+  ftp://ftp.gnu.org/gnu/gmp/gmp-4.2.2.tar.bz2</b>
+bash$ <b>tar jxvf gmp-4.2.2.tar.bz2</b>
+bash$ <b>cd gmp-4.2.2</b>
+bash$ <b>./configure --prefix=/usr</b>
+bash$ <b>make</b>
+bash$ <b>make check</b>
+bash$ <b>sudo make install</b>
+
+Note: This might be needed for 64-bit machines if
+      the MPFR configure fails below.
+bash$ <b>export CFLAGS="-m64"</b>
+
+bash$ <b>cd ~/src</b>
+bash$ <b>curl --remote-name \
+  http://www.mpfr.org/mpfr-current/mpfr-2.3.1.tar.bz2</b>
+bash$ <b>tar jxvf mpfr-2.3.1.tar.bz2</b>
+bash$ <b>cd mpfr-2.3.1</b>
+bash$ <b>./configure --prefix=/usr</b>
+bash$ <b>make</b>
+bash$ <b>make check</b>
+bash$ <b>sudo make install</b>
+</pre>
+
+
+<h3 class="build-step-title">
+  GMP &amp; MPFR via Macports (if not behind web proxy)
+</h3>
+
+<p class="build-step-details">
+  If you are not behind a network firewall, then the
+  <a href="http://www.macports.org/">http://www.macports.org</a>
+  project can greatly simlify the installation of gmp &amp; mpfr.&nbsp;
+  (Macports does not work easily with web proxies at this time.)
+  After installing macports you should be able to simply run this
+  command at the shell prompt.
+</p>
+
+<pre class="build-step-code">
+bash$ <b>sudo port install gmp mpfr</b>
+</pre>
+
+<h3 class="build-step-title">
+  Continue with common instructions
+</h3>
+
+<p class="build-step-details">
+  The remaining instructions are
+  <a href="#UnixCommon">common for most UNIX-like systems</a>.
+</p>
+
+<!--
+ #
+ # SuSE Linux Enterprise 10 Desktop
+ #
+-->
+<h2 class="main-title">
+  <a name="SLED10"></a>
+  SuSE Linux Enterprise 10 Desktop
+</h2>
+
+<h3 class="build-step-title">
+  Coming soon...
+</h3>
+
+
+<!--
+ #
+ # Ubuntu 8.04
+ #
+-->
+<h2 class="main-title">
+  <a name="Ubuntu8.04"></a>
+  Ubuntu 8.04
+</h2>
+
+<h3 class="build-step-title">
+  Please note
+</h3>
+
+<p class="build-step-details">
+  The Ubuntu platform is not officially supported or tested by the
+  <a href="index.html">edk2</a>
+  project at this time.
+</p>
+
+<h3 class="build-step-title">
+  Open the <a href="http://www.gnome.org">GNOME<a> Terminal program
+</h3>
+
+<p class="build-step-details">
+  These instructions will utilize Ubuntu's built in
+  command shell (bash) via the <i>GNOME Terminal</i> application.&nbsp;
+  To open the <i>Terminal</i> application, locate it under the
+  <i>Applications</i> menu and the <i>Accessories</i> sub-menu.
+</p>
+
+<h3 class="build-step-title">
+  Install required software from apt
 </h3>
 
 <p class="build-step-details">
@@ -202,10 +405,37 @@ bash:~$ <b>echo this bold text is a sample command \
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>sudo apt-get install build-essential uuid-dev \
-          python-setuptools texinfo bison flex libgmp3-dev \
-          libmpfr-dev subversion</b>
+bash$ <b>sudo apt-get install build-essential uuid-dev \
+        python-setuptools texinfo bison flex libgmp3-dev \
+        libmpfr-dev subversion</b>
 </pre>
+
+<h3 class="build-step-title">
+  Continue with common instructions
+</h3>
+
+<p class="build-step-details">
+  The remaining instructions are
+  <a href="#UnixCommon">common for most UNIX-like systems</a>.
+</p>
+
+<!--
+ #
+ # Common instruction unix-like systems
+ #
+-->
+<h2 class="main-title">
+  <a name="UnixCommon"></a>
+  Common instructions for UNIX-like systems
+</h2>
+
+<p class="build-step-details">
+  A significant portion of the steps are common on the various UNIX-like
+  platforms.&nbsp;
+  You should start with the instructions for the operating system that
+  most closely matches your platform, and it will direct you here at the
+  appropriate time.
+</p>
 
 <h3 class="build-step-title">
   Install python antlr module
@@ -216,11 +446,13 @@ bash:~$ <b>sudo apt-get install build-essential uuid-dev \
   command.&nbsp;
   The following command is the latest version right now, but if
   you encounter difficulties, you may want to confirm the version at
-  <a href="http://www.antlr.org/download/Python">http://www.antlr.org/download/Python</a>.
+  <a href="http://www.antlr.org/download/Python">http://www.antlr.org/download/Python</a>.&nbsp;
+  Be sure to set the http_proxy and ftp_proxy environment variables
+  if you are behind a network firewall.
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>sudo easy_install \
+bash$ <b>sudo easy_install \
   http://www.antlr.org/download/Python/antlr_python_runtime-3.0.1-py2.5.egg</b>
 </pre>
 
@@ -237,12 +469,12 @@ bash:~$ <b>sudo easy_install \
 </p>
 
 <pre class="build-step-code">
-bash:~$ <b>mkdir ~/src</b>
-bash:~/src$ <b>cd ~/src</b>
-bash:~/src$ <b>svn co \
+bash$ <b>mkdir ~/src</b>
+bash$ <b>cd ~/src</b>
+bash$ <b>svn co \
   https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools \
   --username guest</b>
-bash:~/src$ <b>make -C BaseTools</b>
+bash$ <b>make -C BaseTools</b>
 </pre>
 
 <h3 class="build-step-title">
@@ -254,14 +486,12 @@ bash:~/src$ <b>make -C BaseTools</b>
   cross-compiler build of gcc.&nbsp;
   This can take quite a while to complete, possibly several hours on
   older systems.&nbsp;
-  But, a Python script has been provided to automate this build process.&nbsp;
-  Please note that if your network is behind a firewall, you may need to
-  set the http_proxy environment variable:
+  But, a Python script has been provided to automate this build process.
 </p>
 
 <pre class="build-step-code">
 Note: This is only needed if behind a internet firewall!
-bash:~/src$ <b>export http_proxy=proxy.domain.com:proxy_port</b>
+bash$ <b>export http_proxy=http://proxy.domain.com:proxy_port</b>
 </pre>
 
 <p class="build-step-details">
@@ -270,8 +500,8 @@ bash:~/src$ <b>export http_proxy=proxy.domain.com:proxy_port</b>
 </p>
 
 <pre class="build-step-code">
-bash:~/src$ <b>cd ~/src/BaseTools/gcc</b>
-bash:~/src/BaseTools/gcc$ <b>./mingw-gcc-build.py --arch=x64 \
+bash$ <b>cd ~/src/BaseTools/gcc</b>
+bash$ <b>./mingw-gcc-build.py --arch=x64 \
   --prefix=~/programs/gcc/x64</b>
 </pre>
 
@@ -280,8 +510,8 @@ bash:~/src/BaseTools/gcc$ <b>./mingw-gcc-build.py --arch=x64 \
 </h3>
 
 <pre class="build-step-code">
-bash:~/src/BaseTools/gcc$ <b>cd ~/src</b>
-bash:~/src$ <b>svn co \
+bash$ <b>cd ~/src</b>
+bash$ <b>svn co \
   https://edk2.tianocore.org/svn/edk2/trunk/edk2 \
   --username guest</b>
 </pre>
@@ -291,9 +521,9 @@ bash:~/src$ <b>svn co \
 </h3>
 
 <pre class="build-step-code">
-bash:~/src$ <b>cd ~/src/edk2</b>
-bash:~/src/edk2$ <b>export EDK_TOOLS_PATH=~/src/BaseTools</b>
-bash:~/src/edk2$ <b>. edksetup.sh BaseTools</b>
+bash$ <b>cd ~/src/edk2</b>
+bash$ <b>export EDK_TOOLS_PATH=~/src/BaseTools</b>
+bash$ <b>. edksetup.sh BaseTools</b>
 </pre>
 
 <h3 class="build-step-title">
@@ -360,7 +590,7 @@ TOOL_CHAIN_TAG        = UNIXGCC
 </p>
 
 <pre class="build-step-code">
-bash:~/src/edk2$ <b>build</b>
+bash$ <b>build</b>
 </pre>
 
 <p class="build-step-details">
@@ -371,6 +601,6 @@ bash:~/src/edk2$ <b>build</b>
 </p>
 
 <pre class="build-step-code">
-bash:~/src/edk2$ <b>ls Build/MdeModule/DEBUG_UNIXGCC/X64/HelloWorld.efi</b>
+bash$ <b>ls Build/MdeModule/DEBUG_UNIXGCC/X64/HelloWorld.efi</b>
 </pre>
 
