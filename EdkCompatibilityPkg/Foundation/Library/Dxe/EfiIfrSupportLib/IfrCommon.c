@@ -490,8 +490,6 @@ Returns:
   
 --*/
 {
-#ifdef SUPPORT_DEPRECATED_IFRSUPPORTLIB_API
-
   EFI_STATUS        Status;
   EFI_HII_PROTOCOL  *Hii;
   UINTN             DataLength;
@@ -632,13 +630,6 @@ Returns:
   gBS->FreePool (OldData);
 
   return EFI_SUCCESS;
-#else
-  //
-  // The implementation will be added later.
-  //
-  ASSERT (FALSE);
-  return EFI_UNSUPPORTED;
-#endif
 }
 
 
@@ -664,7 +655,6 @@ Returns:
 
 --*/
 {
-#ifdef SUPPORT_DEPRECATED_IFRSUPPORTLIB_API
   EFI_STATUS        Status;
 
   EFI_HII_HANDLE    *HiiHandleBuffer;
@@ -756,13 +746,6 @@ Returns:
 lbl_exit:
   gBS->FreePool (HiiHandleBuffer);
   return HiiHandle;
-#else
-  //
-  // The implementation will be added later.
-  //
-  ASSERT (FALSE);
-  return (EFI_HII_HANDLE) 0;
-#endif
 }
 
 #ifdef SUPPORT_DEPRECATED_IFRSUPPORTLIB_API
