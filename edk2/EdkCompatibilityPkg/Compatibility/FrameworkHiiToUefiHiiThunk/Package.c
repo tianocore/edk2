@@ -327,6 +327,7 @@ UefiRegisterPackageList(
   EFI_HANDLE                  UefiHiiDriverHandle;
 
   UefiHiiDriverHandle = NULL;
+  UefiPackageListHeader = NULL;
 
   Status = GetIfrAndStringPackNum (Packages, &IfrPackNum, &StringPackNum);
   ASSERT_EFI_ERROR (Status);
@@ -342,7 +343,10 @@ UefiRegisterPackageList(
   ASSERT (HandleMappingEntry != NULL);
   
   HandleMappingEntry->Signature = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_SIGNATURE;
-  HandleMappingEntry->FrameworkHiiHandle = Private->StaticHiiHandle++;
+  Status = AssignHiiHandle (Private, &HandleMappingEntry->FrameworkHiiHandle);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
 
   //
   // Packages->GuidId may be NULL. In such case, caller of FramworkHii->NewPack is registering
@@ -429,10 +433,12 @@ Done:
     *Handle = HandleMappingEntry->FrameworkHiiHandle;
   }
 
-  FreePool (UefiPackageListHeader);
+  SafeFreePool (UefiPackageListHeader);
   
   return Status;
 }
+
+BOOLEAN mInFrameworkHiiNewPack = FALSE;
 
 EFI_STATUS
 EFIAPI
@@ -471,6 +477,14 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // We use a simple Global variable to inform NewPackNotify
+  // that the package list registered here is already registered
+  // in the HII Thunk Layer. So NewPackNotify does not need to
+  // call RegisterUefiHiiHandle () to registered it.
+  //
+  mInFrameworkHiiNewPack = TRUE;
+
   Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
   Status = UefiRegisterPackageList (
@@ -478,6 +492,8 @@ Returns:
               Packages,
               Handle
             );
+
+  mInFrameworkHiiNewPack = FALSE;
 
   return Status;
 }

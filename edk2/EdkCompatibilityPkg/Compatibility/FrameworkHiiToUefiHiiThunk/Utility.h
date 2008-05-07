@@ -46,6 +46,12 @@ FrameworkHiiHandleToMapDatabaseEntry (
   )
 ;
 
+HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *
+UefiHiiHandleToMapDatabaseEntry (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+  IN EFI_HII_HANDLE                   UefiHiiHandle
+  )
+;
 
 EFI_HII_HANDLE *
 TagGuidToUefiIfrHiiHandle (
@@ -54,4 +60,17 @@ TagGuidToUefiIfrHiiHandle (
   )
 ;
 
+EFI_STATUS
+AssignHiiHandle (
+  IN OUT EFI_HII_THUNK_PRIVATE_DATA *Private,
+  OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
+  )
+;
+
+EFI_STATUS
+AssignPureUefiHiiHandle (
+  IN OUT EFI_HII_THUNK_PRIVATE_DATA *Private,
+  OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
+  )
+;
 #endif

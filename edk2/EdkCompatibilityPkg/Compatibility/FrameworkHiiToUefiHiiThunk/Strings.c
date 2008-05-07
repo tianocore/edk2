@@ -81,7 +81,7 @@ HiiThunkNewStringForAllStringPackages (
   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
   EFI_STRING_ID                             StringId1;
   EFI_STRING_ID                             StringId2;
-  CHAR8                                     *UefiStringProtocolLanguage;
+  CHAR8                                     *AsciiLanguage;
   BOOLEAN                                   Found;
 
   ASSERT (TagGuid != NULL);
@@ -90,14 +90,12 @@ HiiThunkNewStringForAllStringPackages (
   StringId2 = (EFI_STRING_ID) 0;
   Found = FALSE;
 
-  //
-  // BugBug: We will handle the case that Language is not NULL later.
-  //
-  ASSERT (Language == NULL);
-  
-  //if (Language == NULL) {
-    UefiStringProtocolLanguage = NULL;
-  //}
+  if (Language == NULL) {
+    AsciiLanguage = NULL;
+  } else {
+    AsciiLanguage = AllocateZeroPool (StrLen (Language) + 1);
+    UnicodeStrToAsciiStr (Language, AsciiLanguage);
+  }
 
   for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
        ListEntry != &Private->HiiThunkHandleMappingDBListHead;
@@ -109,9 +107,32 @@ HiiThunkNewStringForAllStringPackages (
     if (CompareGuid (TagGuid, &HandleMapEntry->TagGuid)) {
       Found = TRUE;
       if (*Reference == 0) {
-        Status = HiiLibNewString (HandleMapEntry->UefiHiiHandle, &StringId2, NewString);
+        if (AsciiLanguage == NULL) {
+          Status = HiiLibNewString (HandleMapEntry->UefiHiiHandle, &StringId2, NewString);
+        } else {
+          Status = mHiiStringProtocol->NewString (
+                                         mHiiStringProtocol,
+                                         HandleMapEntry->UefiHiiHandle,
+                                         &StringId2,
+                                         AsciiLanguage,
+                                         NULL,
+                                         NewString,
+                                         NULL
+                                         );
+        }
       } else {
-        Status = HiiLibSetString (HandleMapEntry->UefiHiiHandle, *Reference, NewString);
+        if (AsciiLanguage == NULL) {
+          Status = HiiLibSetString (HandleMapEntry->UefiHiiHandle, *Reference, NewString);
+        } else {
+          Status = mHiiStringProtocol->SetString (
+                                       mHiiStringProtocol,
+                                       HandleMapEntry->UefiHiiHandle,
+                                       *Reference,
+                                       AsciiLanguage,
+                                       NewString,
+                                       NULL
+                                       );
+        }
       }
       if (EFI_ERROR (Status)) {
         return Status;
@@ -177,7 +198,8 @@ Returns:
   //
   // For UNI file, some String may not be defined for a language. This has been true for a lot of platform code.
   // For this case, EFI_NOT_FOUND will be returned. To allow the old code to be run without porting, we don't assert 
-  // on EFI_NOT_FOUND. The missing String will be declared if user select differnt languages for the platform.
+  // on EFI_NOT_FOUND. The missing Strings will be shown if user select a differnt languages other than the default
+  // English language for the platform.
   //
   ASSERT_EFI_ERROR (EFI_ERROR (Status) && Status != EFI_NOT_FOUND);  
 
@@ -204,6 +226,32 @@ Returns:
 {
   ASSERT (FALSE);
   return EFI_UNSUPPORTED;
+}
+
+typedef struct {
+  CHAR8 *Iso639;
+  CHAR8 *Rfc3066;
+} ISO639TORFC3066MAP;
+
+ISO639TORFC3066MAP Iso639ToRfc3066Map [] = {
+    {"eng", "en-US"},
+    {"fra", "fr-FR"},
+};
+
+CHAR8 *
+Iso639ToRfc3066 (
+  CHAR8 *Iso638Lang
+  )
+{
+  UINTN Index;
+
+  for (Index = 0; Index < sizeof (Iso639ToRfc3066Map) / sizeof (Iso639ToRfc3066Map[0]); Index++) {
+    if (AsciiStrnCmp (Iso638Lang, Iso639ToRfc3066Map[Index].Iso639, AsciiStrSize (Iso638Lang)) == 0) {
+      return Iso639ToRfc3066Map[Index].Rfc3066;
+    }
+  }
+
+  return (CHAR8 *) NULL;
 }
 
 EFI_STATUS
@@ -249,6 +297,7 @@ Returns:
   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
   CHAR8                                     *AsciiLanguage;
   EFI_HII_THUNK_PRIVATE_DATA                *Private;
+  CHAR8                                     *Rfc3066AsciiLanguage;
 
   Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
@@ -260,6 +309,17 @@ Returns:
       return EFI_OUT_OF_RESOURCES;
     }
     UnicodeStrToAsciiStr  (LanguageString, AsciiLanguage);
+
+    Rfc3066AsciiLanguage = Iso639ToRfc3066 (AsciiLanguage);
+    //
+    // Caller of Framework HII Interface uses the Language Identification String defined 
+    // in Iso639. So map it to the Language Identifier defined in RFC3066.
+    //
+    if (Rfc3066AsciiLanguage != NULL) {
+      FreePool (AsciiLanguage);
+      AsciiLanguage = AllocateCopyPool (AsciiStrSize (Rfc3066AsciiLanguage), Rfc3066AsciiLanguage);
+    }
+    
   }
 
   for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;

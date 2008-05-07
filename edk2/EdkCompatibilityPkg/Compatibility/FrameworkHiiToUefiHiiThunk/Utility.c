@@ -83,6 +83,28 @@ FrameworkHiiHandleToMapDatabaseEntry (
   return (HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *) NULL;
 }
 
+HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *
+UefiHiiHandleToMapDatabaseEntry (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+  IN EFI_HII_HANDLE                   UefiHiiHandle
+  )
+{
+  LIST_ENTRY                 *ListEntry;
+  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *HandleMapEntry;
+
+  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
+       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
+       ListEntry = ListEntry->ForwardLink
+       ) {
+    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
+
+    if (UefiHiiHandle == HandleMapEntry->UefiHiiHandle) {
+      return HandleMapEntry;
+    }
+  }
+
+  return (HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *) NULL;
+}
 
 EFI_HII_HANDLE *
 TagGuidToUefiIfrHiiHandle (
@@ -108,7 +130,48 @@ TagGuidToUefiIfrHiiHandle (
   
 }
 
+BOOLEAN
+IsFrameworkHiiDatabaseHandleDepleted (
+  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private
+  )
+{
+  return (BOOLEAN) (Private->StaticHiiHandle == (UINTN) Private->StaticPureUefiHiiHandle);
+}
 
+EFI_STATUS
 
+AssignHiiHandle (
+  IN OUT EFI_HII_THUNK_PRIVATE_DATA *Private,
+  OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
+  )
+{
+  ASSERT (Handle != NULL);
 
+  *Handle = Private->StaticHiiHandle;
+  Private->StaticHiiHandle += 1;
+
+  if (IsFrameworkHiiDatabaseHandleDepleted (Private)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+AssignPureUefiHiiHandle (
+  IN OUT EFI_HII_THUNK_PRIVATE_DATA *Private,
+    OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
+  )
+{
+  ASSERT (Handle != NULL);
+
+  *Handle = Private->StaticPureUefiHiiHandle;
+  Private->StaticPureUefiHiiHandle -= 1;
+
+  if (IsFrameworkHiiDatabaseHandleDepleted (Private)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  return EFI_SUCCESS;
+}
 
