@@ -130,7 +130,10 @@
   
   DuetPkg/DataHubGenDxe/DataHubGen.inf
   #DuetPkg/FvbRuntimeService/DUETFwh.inf
-  DuetPkg/EfiLdr/EfiLdr.inf
+  DuetPkg/EfiLdr/EfiLdr.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  }
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   DuetPkg/CpuIoDxe/CpuIo.inf
   DuetPkg/CpuDxe/Cpu.inf
