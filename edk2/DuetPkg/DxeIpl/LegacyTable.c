@@ -20,6 +20,7 @@ Revision History:
 
 #include "DxeIpl.h"
 #include "HobGeneration.h"
+#include "Debug.h"
 
 #define ACPI_RSD_PTR      0x2052545020445352LL
 #define MPS_PTR           EFI_SIGNATURE_32('_','M','P','_')
@@ -225,7 +226,7 @@ FindAcpiPtr (
   //
   // Check ACPI2.0 table
   //
-  if (Hob->Acpi20.Table > 0) {
+  if ((int)Hob->Acpi20.Table != -1) {
     Rsdp = (RSDP_TABLE *)(UINTN)Hob->Acpi20.Table;
     Rsdt = (RSDT_TABLE *)(UINTN)Rsdp->RsdtAddress;
     Xsdt = NULL;
@@ -249,7 +250,7 @@ FindAcpiPtr (
   //
   // Check ACPI1.0 table
   //
-  if ((AcpiTable == NULL) && (Hob->Acpi.Table > 0)) {
+  if ((AcpiTable == NULL) && ((int)Hob->Acpi.Table != -1)) {
     Rsdp = (RSDP_TABLE *)(UINTN)Hob->Acpi.Table;
     Rsdt = (RSDT_TABLE *)(UINTN)Rsdp->RsdtAddress;
     //
@@ -411,10 +412,18 @@ PrepareHobLegacyTable (
   IN HOB_TEMPLATE  *Hob
   )
 {
+  CHAR8    PrintBuffer[256];
+
   Hob->Acpi.Table   = (EFI_PHYSICAL_ADDRESS)(UINTN)FindAcpiRsdPtr ();
+  AsciiSPrint (PrintBuffer, 256, "\nAcpiTable=0x%x ", (UINT32)(UINTN)Hob->Acpi.Table);
+  PrintString (PrintBuffer);
   Hob->Acpi20.Table = (EFI_PHYSICAL_ADDRESS)(UINTN)FindAcpiRsdPtr ();
   Hob->Smbios.Table = (EFI_PHYSICAL_ADDRESS)(UINTN)FindSMBIOSPtr ();
+  AsciiSPrint (PrintBuffer, 256, "SMBIOS Table=0x%x ", (UINT32)(UINTN)Hob->Smbios.Table);
+  PrintString (PrintBuffer);
   Hob->Mps.Table    = (EFI_PHYSICAL_ADDRESS)(UINTN)FindMPSPtr ();
+  AsciiSPrint (PrintBuffer, 256, "MPS Table=0x%x\n", (UINT32)(UINTN)Hob->Mps.Table);
+  PrintString (PrintBuffer);
 
   PrepareMcfgTable (Hob);
 

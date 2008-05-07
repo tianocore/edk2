@@ -105,7 +105,10 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial|TRUE
 
 [Components.common]
-  DuetPkg/DxeIpl/DxeIpl.inf
+  DuetPkg/DxeIpl/DxeIpl.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  }
 
   MdeModulePkg/Core/Dxe/DxeMain.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
