@@ -74,13 +74,17 @@ typedef struct {
   EFI_HANDLE               Handle;
   EFI_HII_PROTOCOL         Hii;
   FRAMEWORK_EFI_HII_HANDLE StaticHiiHandle;
+  FRAMEWORK_EFI_HII_HANDLE StaticPureUefiHiiHandle;
 
   //
   // This LIST_ENTRY is the list head which has HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY type 
   // as list entry.
   //
   LIST_ENTRY               HiiThunkHandleMappingDBListHead;
-  
+
+  EFI_HANDLE               NewPackNotifyHandle;
+  EFI_HANDLE               RemovePackNotifyHandle;
+  EFI_HANDLE               AddPackNotifyHandle;
 } EFI_HII_THUNK_PRIVATE_DATA;
 
 
@@ -145,6 +149,9 @@ extern CONST EFI_HII_FONT_PROTOCOL                *mHiiFontProtocol;
 extern CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
 extern CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
 extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
+
+extern BOOLEAN                                    mInFrameworkHiiNewPack;
+
 
 //
 // Prototypes

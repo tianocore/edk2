@@ -42,6 +42,39 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
+#pragma pack(push, 1)
+typedef struct {
+  EFI_HII_PACK_HEADER            PackageHeader;
+  FRAMEWORK_EFI_IFR_FORM_SET     FormSet;
+  FRAMEWORK_EFI_IFR_END_FORM_SET EndFormSet;
+} FRAMEWORK_HII_FORMSET_TEMPLATE;
+#pragma pack(pop)
+
+FRAMEWORK_HII_FORMSET_TEMPLATE FormSetTemplate = {
+  {
+    sizeof (FRAMEWORK_HII_FORMSET_TEMPLATE),
+    EFI_HII_IFR
+  },
+  {
+    {
+      FRAMEWORK_EFI_IFR_FORM_SET_OP,
+      sizeof (FRAMEWORK_EFI_IFR_FORM_SET)
+    },
+    //Guid
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  },
+  {
+    FRAMEWORK_EFI_IFR_END_FORM_SET_OP,
+    sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET)
+  }
+};
+
 EFI_STATUS
 EFIAPI
 HiiGetForms (
@@ -87,8 +120,29 @@ Returns:
 
 --*/
 {
-  ASSERT (FALSE);
-  return EFI_UNSUPPORTED;
+  EFI_HII_THUNK_PRIVATE_DATA                *Private;
+  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *MapEntry;
+  FRAMEWORK_HII_FORMSET_TEMPLATE            *OutputFormSet;
+
+  if (*BufferLengthTemp < sizeof(FRAMEWORK_HII_FORMSET_TEMPLATE)) {
+    *BufferLengthTemp = sizeof(FRAMEWORK_HII_FORMSET_TEMPLATE);
+    return EFI_BUFFER_TOO_SMALL;
+  }
+  
+  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+
+  MapEntry = FrameworkHiiHandleToMapDatabaseEntry (Private, Handle);
+
+  if (MapEntry == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  OutputFormSet = (FRAMEWORK_HII_FORMSET_TEMPLATE *) Buffer;
+  
+  CopyMem (OutputFormSet, &FormSetTemplate, sizeof (FRAMEWORK_HII_FORMSET_TEMPLATE));
+  CopyMem (&OutputFormSet->FormSet.Guid, &MapEntry->TagGuid, sizeof (EFI_GUID)); 
+  
+  return EFI_SUCCESS;
 }
 
 
