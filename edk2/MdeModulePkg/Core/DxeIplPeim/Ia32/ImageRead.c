@@ -14,6 +14,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeIpl.h"
 
+
+
+
+
+/**
+  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
+
+  @param  FileHandle   The handle to the PE/COFF file 
+  @param  FileOffset   The offset, in bytes, into the file to read 
+  @param  ReadSize     The number of bytes to read from the file starting at 
+                       FileOffset 
+  @param  Buffer       A pointer to the buffer to read the data into. 
+
+  @retval EFI_SUCCESS  ReadSize bytes of data were read into Buffer from the 
+                       PE/COFF file starting at FileOffset
+
+**/
 EFI_STATUS
 EFIAPI
 PeiImageRead (
@@ -22,27 +39,6 @@ PeiImageRead (
   IN OUT UINTN   *ReadSize,
   OUT    VOID    *Buffer
   )
-/*++
-
-Routine Description:
-
-  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
-
-Arguments:
-
-  FileHandle - The handle to the PE/COFF file
-
-  FileOffset - The offset, in bytes, into the file to read
-
-  ReadSize   - The number of bytes to read from the file starting at FileOffset
-
-  Buffer     - A pointer to the buffer to read the data into.
-
-Returns:
-
-  EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
-
---*/
 {
   UINT8 *Destination32;
   UINT8 *Source32;
@@ -66,24 +62,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+
+
+
+/**
+   This function simply retrieves the function pointer of ImageRead in
+   ImageContext structure.
+    
+   @param ImageContext       A pointer to the structure of 
+                             PE_COFF_LOADER_IMAGE_CONTEXT
+   
+   @retval EFI_SUCCESS       This function always return EFI_SUCCESS.
+
+**/
 EFI_STATUS
 GetImageReadFunction (
   IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
-/*++
-
-Routine Description:
-  Support routine to return the PE32 Image Reader.
-  If the PeiImageRead() function is less than a page
-  in legnth. If the function is more than a page the DXE IPL will crash!!!!
-
-Arguments:
-  ImageContext  - The context of the image being loaded
-
-Returns:
-  EFI_SUCCESS - If Image function location is found
-
---*/
 {
   VOID        *MemoryBuffer;
 
