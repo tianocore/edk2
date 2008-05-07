@@ -136,7 +136,8 @@ Returns:
   VOID                  *MemoryDescriptor;
   VOID                  *NvStorageBase;
   CHAR8                 PrintBuffer[256];
-
+  
+  ClearScreen();
   PrintString("Enter DxeIpl ...\n");
 /*
   ClearScreen();
@@ -295,7 +296,6 @@ Returns:
   PrintString("\n\n\n\n\n\n\n\n\n\n");
   PrintString("                         WELCOME TO EFI WORLD!\n");
 
-  
   EnterDxeMain (StackTop, Handoff->DxeCoreEntryPoint, gHob, PageTableBase);
 
   //
@@ -304,3 +304,12 @@ Returns:
   CpuDeadLoop ();
 }
 
+EFI_STATUS
+EFIAPI
+_ModuleEntryPoint (
+  IN EFILDRHANDOFF  *Handoff
+  )
+{
+  DxeInit(Handoff);
+  return EFI_SUCCESS;
+}
