@@ -101,6 +101,7 @@
 
 [FixedPcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe
+
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid
 

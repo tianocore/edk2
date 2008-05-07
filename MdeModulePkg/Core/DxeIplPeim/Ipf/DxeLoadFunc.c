@@ -14,6 +14,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeIpl.h"
 
+
+
+/**
+   Transfers control to DxeCore.
+
+   This function performs a CPU architecture specific operations to execute
+   the entry point of DxeCore with the parameters of HobList.
+   It also intalls EFI_END_OF_PEI_PPI to signal the end of PEI phase.
+
+   @param DxeCoreEntryPoint         The entrypoint of DxeCore.
+   @param HobList                   The start of HobList passed to DxeCore.
+   @param EndOfPeiSignal            The PPI descriptor for EFI_END_OF_PEI_PPI.
+
+**/
 VOID
 HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,

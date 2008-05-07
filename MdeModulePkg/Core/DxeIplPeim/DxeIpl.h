@@ -55,6 +55,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern BOOLEAN gInMemory;
 
+
+
+
+/**
+   Loads and relocates a PE/COFF image into memory.
+
+   @param FileHandle        The image file handle
+   @param ImageAddress      The base address of the relocated PE/COFF image
+   @param ImageSize         The size of the relocated PE/COFF image
+   @param EntryPoint        The entry point of the relocated PE/COFF image
+   
+   @return EFI_SUCCESS           The file was loaded and relocated
+   @return EFI_OUT_OF_RESOURCES  There was not enough memory to load and relocate the PE/COFF file
+
+**/
 EFI_STATUS
 PeiLoadFile (
   IN  EFI_PEI_FILE_HANDLE                       FileHandle,
@@ -64,18 +79,54 @@ PeiLoadFile (
   )
 ;
 
+
+
+/**
+   Find DxeCore driver from all First Volumes.
+
+   @param FileHandle    Pointer to FFS file to search.
+   
+   @return EFI_SUCESS   Success to find the FFS in specificed FV
+   @return others       Fail to find the FFS in specificed FV
+
+**/
 EFI_STATUS
 DxeIplFindDxeCore (
   OUT EFI_PEI_FILE_HANDLE   *FileHandle
   )
 ;
 
+
+
+/**
+   This function simply retrieves the function pointer of ImageRead in
+   ImageContext structure.
+    
+   @param ImageContext       A pointer to the structure of 
+                             PE_COFF_LOADER_IMAGE_CONTEXT
+   
+   @retval EFI_SUCCESS       This function always return EFI_SUCCESS.
+
+**/
 EFI_STATUS
 GetImageReadFunction (
   IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 ;
 
+
+
+/**
+   Main entry point to last PEIM 
+    
+   @param This          Entry point for DXE IPL PPI
+   @param PeiServices   General purpose services available to every PEIM.
+   @param HobList       Address to the Pei HOB list
+   
+   @return EFI_SUCCESS              DXE core was successfully loaded. 
+   @return EFI_OUT_OF_RESOURCES     There are not enough resources to load DXE core.
+
+**/
 EFI_STATUS
 EFIAPI
 DxeLoadCore (
@@ -84,6 +135,20 @@ DxeLoadCore (
   IN EFI_PEI_HOB_POINTERS  HobList
   );
 
+
+
+/**
+   Transfers control to DxeCore.
+
+   This function performs a CPU architecture specific operations to execute
+   the entry point of DxeCore with the parameters of HobList.
+   It also intalls EFI_END_OF_PEI_PPI to signal the end of PEI phase.
+
+   @param DxeCoreEntryPoint         The entrypoint of DxeCore.
+   @param HobList                   The start of HobList passed to DxeCore.
+   @param EndOfPeiSignal            The PPI descriptor for EFI_END_OF_PEI_PPI.
+
+**/
 VOID
 HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
@@ -91,12 +156,35 @@ HandOffToDxeCore (
   IN EFI_PEI_PPI_DESCRIPTOR *EndOfPeiSignal
   );
 
+
+
+/**
+   Updates the Stack HOB passed to DXE phase.
+
+   This function traverses the whole HOB list and update the stack HOB to
+   reflect the real stack that is used by DXE core.
+
+   @param BaseAddress           The lower address of stack used by DxeCore.
+   @param Length                The length of stack used by DxeCore.
+
+**/
 VOID
 UpdateStackHob (
   IN EFI_PHYSICAL_ADDRESS        BaseAddress,
   IN UINT64                      Length
   );
 
+
+
+/**
+  Initializes the Dxe Ipl PPI
+
+  @param  FfsHandle   The handle of FFS file.
+  @param  PeiServices General purpose services available to
+                      every PEIM.
+  @return EFI_SUCESS
+
+**/
 EFI_STATUS
 EFIAPI
 PeimInitializeDxeIpl (
