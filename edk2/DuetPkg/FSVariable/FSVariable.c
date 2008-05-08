@@ -1165,7 +1165,11 @@ Returns:
     return Status;
   }
   
-  VariableStoreEntry = FlashMapEntryData->Entries[0];
+  CopyMem(
+    (VOID*)&VariableStoreEntry,
+    (VOID*)&FlashMapEntryData->Entries[0],
+    sizeof(EFI_FLASH_SUBAREA_ENTRY)
+    );
 
   //
   // Mark the variable storage region of the FLASH as RUNTIME

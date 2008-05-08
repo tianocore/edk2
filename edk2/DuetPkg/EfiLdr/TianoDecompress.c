@@ -201,9 +201,7 @@ Returns:
   UINT16  NextCode;
   UINT16  Mask;
 
-  for (Index = 1; Index <= 16; Index++) {
-    Count[Index] = 0;
-  }
+  SetMem (&Count[1], sizeof(UINT16) * 16, 0);
 
   for (Index = 0; Index < NumOfChar; Index++) {
     Count[BitLen[Index]]++;
@@ -235,9 +233,7 @@ Returns:
 
   if (Index != 0) {
     Index3 = (UINT16) (1U << TableBits);
-    while (Index != Index3) {
-      Table[Index++] = 0;
-    }
+    SetMem(&Table[Index], sizeof(UINT16) * (Index3 - Index + 1), 0);
   }
 
   Avail = NumOfChar;
@@ -388,9 +384,7 @@ Returns:
       Sd->mPTTable[Index] = CharC;
     }
 
-    for (Index = 0; Index < nn; Index++) {
-      Sd->mPTLen[Index] = 0;
-    }
+    SetMem ((VOID*) &Sd->mPTLen, nn * sizeof(UINT8), 0);
 
     return 0;
   }
@@ -421,10 +415,7 @@ Returns:
     }
   }
 
-  while (Index < nn) {
-    Sd->mPTLen[Index++] = 0;
-  }
-
+  SetMem ((VOID*) &Sd->mPTLen[Index], (nn - Index) * sizeof(UINT8), 0);
   return MakeTable (Sd, nn, Sd->mPTLen, 8, Sd->mPTTable);
 }
 
@@ -457,9 +448,7 @@ Returns: (VOID)
   if (Number == 0) {
     CharC = (UINT16) GetBits (Sd, CBIT);
 
-    for (Index = 0; Index < NC; Index++) {
-      Sd->mCLen[Index] = 0;
-    }
+    SetMem ((VOID*)&Sd->mCLen, sizeof(UINT8) * NC, 0);
 
     for (Index = 0; Index < 4096; Index++) {
       Sd->mCTable[Index] = CharC;
@@ -513,9 +502,7 @@ Returns: (VOID)
     }
   }
 
-  while (Index < NC) {
-    Sd->mCLen[Index++] = 0;
-  }
+  SetMem ((VOID*) &Sd->mCLen[Index], sizeof(UINT8) * (NC - Index), 0);
 
   MakeTable (Sd, NC, Sd->mCLen, 12, Sd->mCTable);
 
@@ -731,7 +718,6 @@ Returns:
 
 --*/
 {
-  UINT32        Index;
   UINT32        CompSize;
   UINT32        OrigSize;
   EFI_STATUS    Status;
@@ -773,9 +759,8 @@ Returns:
 
   Src = Src + 8;
 
-  for (Index = 0; Index < sizeof (SCRATCH_DATA); Index++) {
-    ((UINT8 *) Sd)[Index] = 0;
-  }
+  SetMem ((VOID*) Sd, sizeof(SCRATCH_DATA), 0);
+
   //
   // The length of the field 'Position Set Code Length Array Size' in Block Header.
   // For EFI 1.1 de/compression algorithm(Version 1), mPBit = 4
