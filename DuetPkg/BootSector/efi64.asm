@@ -597,7 +597,7 @@ InnerLoop1:
 
 
 
-    wbinvd
+    ;wbinvd
 @@:    
     jmp     @b
 
@@ -690,7 +690,7 @@ looptop:
     mov     byte ptr [edi], bl
     add     edi, 2
     loop    looptop
-    wbinvd
+    ;wbinvd
     
     pop     eax
     pop     ebx
