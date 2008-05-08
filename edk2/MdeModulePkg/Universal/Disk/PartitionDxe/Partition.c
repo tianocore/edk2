@@ -555,8 +555,7 @@ PartitionFlushBlocks (
   Create a child handle for a logical block device that represents the
   bytes Start to End of the Parent Block IO device.
 
-  @param[in]  This              Protocol instance pointer.
-  @param[in]  This              Calling context.
+  @param[in]  This              Protocol instance pointer
   @param[in]  ParentHandle      Parent Handle for new child
   @param[in]  ParentDiskIo      Parent DiskIo interface
   @param[in]  ParentBlockIo     Parent BlockIo interface

@@ -24,26 +24,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Partition.h"
 
+/**
+  Test to see if the Mbr buffer is a valid MBR.
+
+  @param  Mbr         Parent Handle.
+  @param  LastLba     Last Lba address on the device.
+   
+  @retval TRUE        Mbr is a Valid MBR.
+  @retval FALSE       Mbr is not a Valid MBR.
+
+**/
 STATIC
 BOOLEAN
 PartitionValidMbr (
   IN  MASTER_BOOT_RECORD      *Mbr,
   IN  EFI_LBA                 LastLba
   )
-/*++
-
-Routine Description:
-  Test to see if the Mbr buffer is a valid MBR
-
-Arguments:       
-  Mbr     - Parent Handle 
-  LastLba - Last Lba address on the device.
-
-Returns:
-  TRUE  - Mbr is a Valid MBR
-  FALSE - Mbr is not a Valid MBR
-
---*/
 {
   UINT32  StartingLBA;
   UINT32  EndingLBA;
@@ -102,6 +98,21 @@ Returns:
   return MbrValid;
 }
 
+
+/**
+  Install child handles if the Handle supports MBR format.
+
+  @param  This              Calling context.
+  @param  Handle            Parent Handle.
+  @param  DiskIo            Parent DiskIo interface.
+  @param  BlockIo           Parent BlockIo interface.
+  @param  DevicePath        Parent Device Path.
+   
+  @retval EFI_SUCCESS       A child handle was added.
+  @retval EFI_MEDIA_CHANGED Media change was detected.
+  @retval Others            MBR partition was not found.
+
+**/
 EFI_STATUS
 PartitionInstallMbrChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -110,24 +121,6 @@ PartitionInstallMbrChildHandles (
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
-/*++
-
-Routine Description:
-  Install child handles if the Handle supports MBR format.
-
-Arguments:       
-  This       - Calling context.
-  Handle     - Parent Handle 
-  DiskIo     - Parent DiskIo interface
-  BlockIo    - Parent BlockIo interface
-  DevicePath - Parent Device Path
-
-Returns:
-  EFI_SUCCESS       - If a child handle was added
-  EFI_MEDIA_CHANGED - Media changed Detected
-	!EFI_SUCCESS      - Not found MBR partition.
-
---*/
 {
   EFI_STATUS                Status;
   MASTER_BOOT_RECORD        *Mbr;

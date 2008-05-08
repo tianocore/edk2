@@ -53,6 +53,19 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gDiskIoComponentName2;
 // Prototypes
 // Driver model protocol interface
 //
+/**
+  Test to see if this driver supports ControllerHandle. 
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingSupported (
@@ -61,6 +74,20 @@ DiskIoDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Start this driver on ControllerHandle by opening a Block IO protocol and
+  installing a Disk IO protocol on ControllerHandle.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingStart (
@@ -69,6 +96,20 @@ DiskIoDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Stop this driver on ControllerHandle by removing Disk IO protocol and closing
+  the Block IO protocol on ControllerHandle.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingStop (
@@ -81,6 +122,29 @@ DiskIoDriverBindingStop (
 //
 // Disk I/O Protocol Interface
 //
+/**
+  Read BufferSize bytes from Offset into Buffer.
+  Reads may support reads that are not aligned on
+  sector boundaries. There are three cases:
+    UnderRun - The first byte is not on a sector boundary or the read request is
+               less than a sector in length.
+    Aligned  - A read of N contiguous sectors.
+    OverRun  - The last byte is not on a sector boundary.
+
+  @param  This                  Protocol instance pointer.
+  @param  MediaId               Id of the media, changes every time the media is replaced.
+  @param  Offset                The starting byte offset to read from
+  @param  BufferSize            Size of Buffer
+  @param  Buffer                Buffer containing read data
+
+  @retval EFI_SUCCESS           The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_INVALID_PARAMETER The read request contains device addresses that are not
+                                valid for the device.
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoReadDisk (
@@ -91,6 +155,31 @@ DiskIoReadDisk (
   OUT VOID                 *Buffer
   );
 
+/**
+  Read BufferSize bytes from Offset into Buffer.
+  Writes may require a read modify write to support writes that are not
+  aligned on sector boundaries. There are three cases:
+    UnderRun - The first byte is not on a sector boundary or the write request
+               is less than a sector in length. Read modify write is required.
+    Aligned  - A write of N contiguous sectors.
+    OverRun  - The last byte is not on a sector boundary. Read modified write
+               required.
+
+  @param  This       Protocol instance pointer.
+  @param  MediaId    Id of the media, changes every time the media is replaced.
+  @param  Offset     The starting byte offset to read from
+  @param  BufferSize Size of Buffer
+  @param  Buffer     Buffer containing read data
+
+  @retval EFI_SUCCESS           The data was written correctly to the device.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_INVALID_PARAMETER The write request contains device addresses that are not
+                                 valid for the device.
+
+**/
 EFI_STATUS
 EFIAPI
 DiskIoWriteDisk (
