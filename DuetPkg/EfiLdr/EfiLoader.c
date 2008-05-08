@@ -311,3 +311,14 @@ PrintHeader ('F');
   SystemHang();
 }
 
+EFI_STATUS
+EFIAPI
+_ModuleEntryPoint (
+  UINT32    BiosMemoryMapBaseAddress
+  )
+{
+  EfiLoader(BiosMemoryMapBaseAddress);
+  return EFI_SUCCESS;
+}
+
+
