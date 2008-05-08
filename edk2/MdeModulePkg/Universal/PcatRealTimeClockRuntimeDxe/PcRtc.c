@@ -179,7 +179,7 @@ Returns:
   // Set RTC configuration after get original time
   // The value of bit AIE should be reserved.
   //
-  RtcWrite (RTC_ADDRESS_REGISTER_B, RTC_INIT_REGISTER_B | (RegisterB.Data & BIT5));
+  RtcWrite (RTC_ADDRESS_REGISTER_B, (UINT8)(RTC_INIT_REGISTER_B | (RegisterB.Data & BIT5)));
 
   //
   // Release RTC Lock.
