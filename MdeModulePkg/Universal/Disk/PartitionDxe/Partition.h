@@ -88,6 +88,20 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gPartitionComponentName2;
 //
 // Function Prototypes
 //
+/**
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  than contains a BlockIo and DiskIo protocol can be supported.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 PartitionDriverBindingSupported (
@@ -96,6 +110,21 @@ PartitionDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
+/**
+  Start this driver on ControllerHandle by opening a Block IO and Disk IO
+  protocol, reading Device Path, and creating a child handle with a
+  Disk IO and device path protocol.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 PartitionDriverBindingStart (
@@ -104,6 +133,20 @@ PartitionDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 PartitionDriverBindingStop (
@@ -243,6 +286,25 @@ PartitionComponentNameGetControllerName (
   );
 
 
+/**
+  Create a child handle for a logical block device that represents the
+  bytes Start to End of the Parent Block IO device.
+
+  @param[in]  This              Protocol instance pointer
+  @param[in]  ParentHandle      Parent Handle for new child
+  @param[in]  ParentDiskIo      Parent DiskIo interface
+  @param[in]  ParentBlockIo     Parent BlockIo interface
+  @param[in]  ParentDevicePath  Parent Device Path
+  @param[in]  DevicePathNode    Child Device Path node
+  @param[in]  Start             Start Block
+  @param[in]  End               End Block
+  @param[in]  BlockSize         Child block size
+  @param[in]  InstallEspGuid    Flag to install EFI System Partition GUID on handle
+
+  @retval EFI_SUCCESS       A child handle was added
+  @retval other             A child handle was not added
+
+**/
 EFI_STATUS
 PartitionInstallChildHandle (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -258,6 +320,20 @@ PartitionInstallChildHandle (
   )
 ;
 
+/**
+  Install child handles if the Handle supports GPT partition structure.
+
+  @param[in]  This       - Calling context.
+  @param[in]  Handle     - Parent Handle
+  @param[in]  DiskIo     - Parent DiskIo interface
+  @param[in]  BlockIo    - Parent BlockIo interface
+  @param[in]  DevicePath - Parent Device Path
+
+  @retval EFI_SUCCESS         Valid GPT disk
+  @retval EFI_MEDIA_CHANGED   Media changed Detected
+  @retval other               Not a valid GPT disk
+
+**/
 EFI_STATUS
 PartitionInstallGptChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -268,6 +344,21 @@ PartitionInstallGptChildHandles (
   )
 ;
 
+/**
+  Install child handles if the Handle supports El Torito format.
+
+  @param[in]  This        Calling context.
+  @param[in]  Handle      Parent Handle
+  @param[in]  DiskIo      Parent DiskIo interface
+  @param[in]  BlockIo     Parent BlockIo interface
+  @param[in]  DevicePath  Parent Device Path
+
+
+  @retval EFI_SUCCESS         Child handle(s) was added
+  @retval EFI_MEDIA_CHANGED   Media changed Detected
+  @retval other               no child handle was added
+
+**/
 EFI_STATUS
 PartitionInstallElToritoChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -278,6 +369,20 @@ PartitionInstallElToritoChildHandles (
   )
 ;
 
+/**
+  Install child handles if the Handle supports MBR format.
+
+  @param  This              Calling context.
+  @param  Handle            Parent Handle.
+  @param  DiskIo            Parent DiskIo interface.
+  @param  BlockIo           Parent BlockIo interface.
+  @param  DevicePath        Parent Device Path.
+   
+  @retval EFI_SUCCESS       A child handle was added.
+  @retval EFI_MEDIA_CHANGED Media change was detected.
+  @retval Others            MBR partition was not found.
+
+**/
 EFI_STATUS
 PartitionInstallMbrChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
