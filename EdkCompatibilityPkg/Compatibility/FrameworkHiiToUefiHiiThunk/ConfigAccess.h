@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 InstallDefaultUefiConfigAccessProtocol (
   IN  CONST EFI_HII_PACKAGES                         *Packages,
-  OUT       EFI_HANDLE                               *Handle,
   IN  OUT   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *MapEntry
   )
 ;

@@ -120,7 +120,6 @@ GetBufferStorage  (
 EFI_STATUS
 InstallDefaultUefiConfigAccessProtocol (
   IN  CONST EFI_HII_PACKAGES                         *Packages,
-  OUT       EFI_HANDLE                               *Handle,
   IN  OUT   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *MapEntry
   )
 {
@@ -128,7 +127,7 @@ InstallDefaultUefiConfigAccessProtocol (
   EFI_STATUS                                  Status;
   HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE  *ConfigAccessInstance;
 
-  Status = HiiLibCreateHiiDriverHandle (Handle);
+  Status = HiiLibCreateHiiDriverHandle (&MapEntry->UefiHiiDriverHandle);
   ConfigAccessInstance = AllocateCopyPool (
                            sizeof (HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE), 
                            &ConfigAccessProtocolInstanceTempate
@@ -147,7 +146,7 @@ InstallDefaultUefiConfigAccessProtocol (
   }
 
   Status = gBS->InstallMultipleProtocolInterfaces (
-          Handle,
+          &MapEntry->UefiHiiDriverHandle,
           &gEfiHiiConfigAccessProtocolGuid,
           &ConfigAccessInstance->ConfigAccessProtocol,
           NULL
