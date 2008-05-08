@@ -136,6 +136,10 @@ AddPackNotify (
   Status  = EFI_SUCCESS;
   Private = mHiiThunkPrivateData;
 
+  if (mInFrameworkHiiNewPack) {
+    return EFI_SUCCESS;
+  }
+
   //
   // We only create a MapEntry if the Uefi Hii Handle is only already registered
   // by the HII Thunk Layer.
@@ -251,6 +255,10 @@ RemovePackNotify (
 
   ASSERT (PackageType == EFI_HII_PACKAGE_STRINGS);
   ASSERT (NotifyType == EFI_HII_DATABASE_NOTIFY_REMOVE_PACK);
+
+  if (mInFrameworkHiiRemovePack) {
+    return EFI_SUCCESS;
+  }
 
   Private = mHiiThunkPrivateData;
 

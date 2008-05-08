@@ -95,6 +95,7 @@ typedef struct {
   UINT32                    Signature;
   FRAMEWORK_EFI_HII_HANDLE  FrameworkHiiHandle;
   EFI_HII_HANDLE            UefiHiiHandle;
+  EFI_HANDLE                UefiHiiDriverHandle;
 
   BOOLEAN                   IsPackageListWithOnlyStringPackages;
   //
@@ -151,6 +152,7 @@ extern CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
 extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
 
 extern BOOLEAN                                    mInFrameworkHiiNewPack;
+extern BOOLEAN                                    mInFrameworkHiiRemovePack;
 
 
 //
