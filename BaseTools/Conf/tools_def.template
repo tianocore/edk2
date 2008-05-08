@@ -669,8 +669,8 @@ RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_MYTOOLS_*_ASM16_PATH            = DEF(VS2005TEAMSUITE_BIN)\ml.exe
 *_MYTOOLS_*_ASMLINK16_PATH        = DEF(WINDDK_BIN16)\link.exe
 *_MYTOOLS_*_ASMLINK16_FLAGS       = /nologo /tiny
-  DEBUG_MYTOOLS_*_ASM_FLAGS       = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-RELEASE_MYTOOLS_*_ASM_FLAGS       = /nologo /c /WX /W3 /coff /Cx /Zd
+  DEBUG_MYTOOLS_*_ASM16_FLAGS     = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
+RELEASE_MYTOOLS_*_ASM16_FLAGS     = /nologo /c /WX /W3 /coff /Cx /Zd
 
 ##################
 # IA32 definitions
