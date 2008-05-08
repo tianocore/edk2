@@ -159,7 +159,6 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-  MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
   
   # ISA Support
   DuetPkg/IsaAcpiDxe/IsaAcpi.inf
@@ -177,4 +176,5 @@
 [BuildOptions.common]
   MSFT:*_*_*_CC_FLAGS = /Fa$* /FAsc /FR$(@R).SBR
   MSFT:*_*_IA32_CC_FLAGS = /D EFI32
-  MSFT:*_*_X64_CC_FLAGS = /D EFI64
+  MSFT:*_*_X64_CC_FLAGS = /D EFIX64
+  MSFT:*_*_IPF_CC_FLAGS = /D EFI64

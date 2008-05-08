@@ -108,25 +108,20 @@ INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
   
   # ISA Support
 INF  DuetPkg/IsaAcpiDxe/IsaAcpi.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
-INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
+#INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 
-INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+#INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+#INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+#INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 
-FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
-  SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
-  }
-
-#FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
-#  SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
+#FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
+#  SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
 #  }
 
 [Rule.Common.PEI_CORE]
