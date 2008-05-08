@@ -25,7 +25,6 @@
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
-  ENTRY_POINT                    = EfiLoader
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -36,7 +35,6 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
-  UefiApplicationEntryPoint
   PrintLib
 
 [Sources.common]
