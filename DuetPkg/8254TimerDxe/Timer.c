@@ -265,7 +265,7 @@ Returns:
     //
     // Convert TimerPeriod into 8254 counts
     //
-    TimerCount = DivU64x32 (MultU64x32 (119318, (UINTN) TimerPeriod) + 500000, 1000000);
+    TimerCount = DivU64x32 (MultU64x32 (119318, (UINT32) TimerPeriod) + 500000, 1000000);
 
     //
     // Check for overflow

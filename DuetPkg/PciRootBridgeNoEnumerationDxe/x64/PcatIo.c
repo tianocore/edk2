@@ -122,7 +122,7 @@ PcatRootBridgeIoPciRW (
 
   UsePciExpressAccess = FALSE;
 
-  EfiCopyMem (&PciAddress, &UserAddress, sizeof(UINT64));
+  CopyMem (&PciAddress, &UserAddress, sizeof(UINT64));
 
   if (PciAddress.ExtendedRegister > 0xFF) {
     //
@@ -136,9 +136,9 @@ PcatRootBridgeIoPciRW (
     }
   } else {
     if (PciAddress.ExtendedRegister != 0) {
-      Pci.Reg = PciAddress.ExtendedRegister & 0xFF;
+      Pci.Bits.Reg = PciAddress.ExtendedRegister & 0xFF;
     } else {
-      Pci.Reg = PciAddress.Register;
+      Pci.Bits.Reg = PciAddress.Register;
     }
     //
     // Note: We can also use PciExpress access here, if wanted.
@@ -146,11 +146,11 @@ PcatRootBridgeIoPciRW (
   }
 
   if (!UsePciExpressAccess) {
-    Pci.Func     = PciAddress.Function;
-    Pci.Dev      = PciAddress.Device;
-    Pci.Bus      = PciAddress.Bus;
-    Pci.Reserved = 0;
-    Pci.Enable   = 1;
+    Pci.Bits.Func     = PciAddress.Function;
+    Pci.Bits.Dev      = PciAddress.Device;
+    Pci.Bits.Bus      = PciAddress.Bus;
+    Pci.Bits.Reserved = 0;
+    Pci.Bits.Enable   = 1;
 
     //
     // PCI Config access are all 32-bit alligned, but by accessing the
@@ -160,11 +160,11 @@ PcatRootBridgeIoPciRW (
     // To read a byte of PCI config space you load 0xcf8 and 
     //  read 0xcfc, 0xcfd, 0xcfe, 0xcff
     //
-    PciDataStride = Pci.Reg & 0x03;
+    PciDataStride = Pci.Bits.Reg & 0x03;
 
     while (Count) {
       PciAligned = Pci;
-      PciAligned.Reg &= 0xfc;
+      PciAligned.Bits.Reg &= 0xfc;
       PciData = (UINTN)PrivateData->PciData + PciDataStride;
       EfiAcquireLock(&PrivateData->PciLock);
       This->Io.Write (This, EfiPciWidthUint32, PrivateData->PciAddress, 1, &PciAligned);
@@ -176,7 +176,7 @@ PcatRootBridgeIoPciRW (
       EfiReleaseLock(&PrivateData->PciLock);
       UserBuffer = ((UINT8 *)UserBuffer) + OutStride;
       PciDataStride = (PciDataStride + InStride) % 4;
-      Pci.Reg += InStride;
+      Pci.Bits.Reg += InStride;
       Count -= 1;
     }
   } else {
@@ -425,7 +425,7 @@ CheckForRom (
 
           LastImage = TRUE;
 
-          EfiZeroMem (&EfiRomHeader, sizeof(EfiRomHeader));
+          ZeroMem (&EfiRomHeader, sizeof(EfiRomHeader));
           IoDev->Mem.Read (
             IoDev, 
             EfiPciWidthUint8, 
@@ -438,7 +438,7 @@ CheckForRom (
 
           if (EfiRomHeader.Signature == 0xaa55) {
 
-            EfiZeroMem (&Pcir, sizeof(Pcir));
+            ZeroMem (&Pcir, sizeof(Pcir));
             IoDev->Mem.Read (
               IoDev, 
               EfiPciWidthUint8, 
@@ -480,7 +480,7 @@ CheckForRom (
                             &TempPciOptionRomDescriptors
                             );
             if (mPciOptionRomTable.PciOptionRomCount > 0) {
-              EfiCopyMem(
+              CopyMem(
                 TempPciOptionRomDescriptors, 
                 mPciOptionRomTable.PciOptionRomDescriptors, 
                 (UINT32)mPciOptionRomTable.PciOptionRomCount * sizeof(EFI_PCI_OPTION_ROM_DESCRIPTOR)

@@ -270,7 +270,7 @@ PcatRootBridgeIoPollMem (
 {
   EFI_STATUS  Status;
   UINT64      NumberOfTicks;
-  UINTN       Remainder;
+  UINT32      Remainder;
 
   if (Result == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -332,7 +332,7 @@ PcatRootBridgeIoPollIo (
 {
   EFI_STATUS  Status;
   UINT64      NumberOfTicks;
-  UINTN       Remainder;
+  UINT32       Remainder;
 
   if (Result == NULL) {
     return EFI_INVALID_PARAMETER;
