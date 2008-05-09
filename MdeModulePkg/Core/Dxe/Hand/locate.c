@@ -38,6 +38,18 @@ IHANDLE *
   OUT VOID                  **Interface
   );
 
+/**
+  Routine to get the next Handle, when you are searching for all handles.
+
+  @param  Position               Information about which Handle to seach for. 
+  @param  Interface              Return the interface structure for the matching 
+                                 protocol. 
+
+  @retval IHANDLE                An IHANDLE is returned if the next Position is 
+                                 not the end of the list. A NULL_HANDLE is 
+                                 returned if it's the end of the list.
+
+**/
 STATIC
 IHANDLE *
 CoreGetNextLocateAllHandles (
@@ -45,6 +57,19 @@ CoreGetNextLocateAllHandles (
   OUT VOID                  **Interface
   );
 
+/**
+  Routine to get the next Handle, when you are searching for register protocol
+  notifies.
+
+  @param  Position               Information about which Handle to seach for. 
+  @param  Interface              Return the interface structure for the matching 
+                                 protocol. 
+
+  @retval IHANDLE                An IHANDLE is returned if the next Position is 
+                                 not the end of the list. A NULL_HANDLE is 
+                                 returned if it's the end of the list.
+
+**/
 STATIC
 IHANDLE *
 CoreGetNextLocateByRegisterNotify (
@@ -52,6 +77,18 @@ CoreGetNextLocateByRegisterNotify (
   OUT VOID                  **Interface
   );
 
+/**
+  Routine to get the next Handle, when you are searching for a given protocol.
+
+  @param  Position               Information about which Handle to seach for. 
+  @param  Interface              Return the interface structure for the matching 
+                                 protocol. 
+
+  @retval IHANDLE                An IHANDLE is returned if the next Position is 
+                                 not the end of the list. A NULL_HANDLE is 
+                                 returned if it's the end of the list.
+
+**/
 STATIC
 IHANDLE *
 CoreGetNextLocateByProtocol (
@@ -59,13 +96,25 @@ CoreGetNextLocateByProtocol (
   OUT VOID                  **Interface
   );
 
-//
-//
-//
 
+/**
+  Locates the requested handle(s) and returns them in Buffer.
 
+  @param  SearchType             The type of search to perform to locate the 
+                                 handles 
+  @param  Protocol               The protocol to search for 
+  @param  SearchKey              Dependant on SearchType 
+  @param  BufferSize             On input the size of Buffer.  On output the  
+                                 size of data returned. 
+  @param  Buffer                 The buffer to return the results in 
 
- 
+  @retval EFI_BUFFER_TOO_SMALL   Buffer too small, required buffer size is 
+                                 returned in BufferSize. 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter 
+  @retval EFI_SUCCESS            Successfully found the requested handle(s) and 
+                                 returns them in Buffer.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreLocateHandle (
@@ -75,35 +124,6 @@ CoreLocateHandle (
   IN OUT UINTN                *BufferSize,
   OUT EFI_HANDLE              *Buffer
   )
-/*++
-
-Routine Description:
-
-  Locates the requested handle(s) and returns them in Buffer.
-
-Arguments:
-
-  SearchType  - The type of search to perform to locate the handles
-
-  Protocol    - The protocol to search for
-  
-  SearchKey   - Dependant on SearchType
-
-  BufferSize  - On input the size of Buffer.  On output the 
-                size of data returned.  
-
-  Buffer      - The buffer to return the results in
-
-
-Returns:
-
-  EFI_BUFFER_TOO_SMALL      - Buffer too small, required buffer size is returned in BufferSize.
-
-  EFI_INVALID_PARAMETER     - Invalid parameter
-  
-  EFI_SUCCESS               - Successfully found the requested handle(s) and returns them in Buffer.
-  
---*/
 {
   EFI_STATUS          Status;
   LOCATE_POSITION     Position;
@@ -243,29 +263,25 @@ Returns:
 }
 
 
+
+/**
+  Routine to get the next Handle, when you are searching for all handles.
+
+  @param  Position               Information about which Handle to seach for. 
+  @param  Interface              Return the interface structure for the matching 
+                                 protocol. 
+
+  @retval IHANDLE                An IHANDLE is returned if the next Position is 
+                                 not the end of the list. A NULL_HANDLE is 
+                                 returned if it's the end of the list.
+
+**/
 STATIC
 IHANDLE *
 CoreGetNextLocateAllHandles (
   IN OUT LOCATE_POSITION    *Position,
   OUT VOID                  **Interface
   )
-/*++
-
-Routine Description:
-
-  Routine to get the next Handle, when you are searching for all handles.
-
-Arguments:
-
-  Position  - Information about which Handle to seach for.
-
-  Interface - Return the interface structure for the matching protocol.
-  
-Returns:
-  IHANDLE - An IHANDLE is returned if the next Position is not the end of the
-            list. A NULL_HANDLE is returned if it's the end of the list.
-  
---*/
 {
   IHANDLE     *Handle;
 
@@ -287,30 +303,26 @@ Returns:
 }
 
 
+
+/**
+  Routine to get the next Handle, when you are searching for register protocol
+  notifies.
+
+  @param  Position               Information about which Handle to seach for. 
+  @param  Interface              Return the interface structure for the matching 
+                                 protocol. 
+
+  @retval IHANDLE                An IHANDLE is returned if the next Position is 
+                                 not the end of the list. A NULL_HANDLE is 
+                                 returned if it's the end of the list.
+
+**/
 STATIC
 IHANDLE *
 CoreGetNextLocateByRegisterNotify (
   IN OUT LOCATE_POSITION    *Position,
   OUT VOID                  **Interface
   )
-/*++
-
-Routine Description:
-
-  Routine to get the next Handle, when you are searching for register protocol 
-  notifies.
-
-Arguments:
-
-  Position  - Information about which Handle to seach for.
-
-  Interface - Return the interface structure for the matching protocol.
-  
-Returns:
-  IHANDLE - An IHANDLE is returned if the next Position is not the end of the
-            list. A NULL_HANDLE is returned if it's the end of the list.
-  
---*/
 {
   IHANDLE             *Handle;
   PROTOCOL_NOTIFY     *ProtNotify;
@@ -343,29 +355,25 @@ Returns:
 }
 
 
+
+/**
+  Routine to get the next Handle, when you are searching for a given protocol.
+
+  @param  Position               Information about which Handle to seach for. 
+  @param  Interface              Return the interface structure for the matching 
+                                 protocol. 
+
+  @retval IHANDLE                An IHANDLE is returned if the next Position is 
+                                 not the end of the list. A NULL_HANDLE is 
+                                 returned if it's the end of the list.
+
+**/
 STATIC
 IHANDLE *
 CoreGetNextLocateByProtocol (
   IN OUT LOCATE_POSITION    *Position,
   OUT VOID                  **Interface
   )
-/*++
-
-Routine Description:
-
-  Routine to get the next Handle, when you are searching for a given protocol.
-
-Arguments:
-
-  Position  - Information about which Handle to seach for.
-
-  Interface - Return the interface structure for the matching protocol.
-  
-Returns:
-  IHANDLE - An IHANDLE is returned if the next Position is not the end of the
-            list. A NULL_HANDLE is returned if it's the end of the list.
-  
---*/
 {
   IHANDLE             *Handle;
   LIST_ENTRY          *Link;
@@ -410,6 +418,22 @@ Returns:
 
 
 
+
+/**
+  Locates the handle to a device on the device path that best matches the specified protocol.
+
+  @param  Protocol               The protocol to search for. 
+  @param  DevicePath             On input, a pointer to a pointer to the device 
+                                 path. On output, the device path pointer is 
+                                 modified to point to the remaining part of the 
+                                 devicepath. 
+  @param  Device                 A pointer to the returned device handle. 
+
+  @retval EFI_SUCCESS            The resulting handle was returned. 
+  @retval EFI_NOT_FOUND          No handles matched the search. 
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreLocateDevicePath (
@@ -417,26 +441,6 @@ CoreLocateDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePath,
   OUT EFI_HANDLE                    *Device
   )
-/*++
-
-Routine Description:
-
-  Locates the handle to a device on the device path that best matches the specified protocol.
-
-Arguments:
-
-  Protocol    - The protocol to search for.
-  DevicePath  - On input, a pointer to a pointer to the device path. On output, the device
-                  path pointer is modified to point to the remaining part of the devicepath.
-  Device      - A pointer to the returned device handle.              
-
-Returns:
-
-  EFI_SUCCESS           - The resulting handle was returned.
-  EFI_NOT_FOUND         - No handles matched the search.
-  EFI_INVALID_PARAMETER - One of the parameters has an invalid value.
-
---*/
 {
   INTN                        SourceSize;
   INTN                        Size;
@@ -469,7 +473,7 @@ Returns:
   // The source path can only have 1 instance
   //
   if (CoreIsDevicePathMultiInstance (SourcePath)) {
-    DEBUG((EFI_D_ERROR, "LocateDevicePath: Device path has too many instances\n"));
+    DEBUG((DEBUG_ERROR, "LocateDevicePath: Device path has too many instances\n"));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -533,6 +537,23 @@ Returns:
 
 
  
+
+/**
+  Return the first Protocol Interface that matches the Protocol GUID. If
+  Registration is pasased in return a Protocol Instance that was just add
+  to the system. If Retistration is NULL return the first Protocol Interface
+  you find.
+
+  @param  Protocol               The protocol to search for 
+  @param  Registration           Optional Registration Key returned from 
+                                 RegisterProtocolNotify() 
+  @param  Interface              Return the Protocol interface (instance). 
+
+  @retval EFI_SUCCESS            If a valid Interface is returned 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter 
+  @retval EFI_NOT_FOUND          Protocol interface not found
+
+**/
 EFI_STATUS
 EFIAPI
 CoreLocateProtocol (
@@ -540,32 +561,6 @@ CoreLocateProtocol (
   IN  VOID      *Registration OPTIONAL,
   OUT VOID      **Interface
   )
-/*++
-
-Routine Description:
-
-  Return the first Protocol Interface that matches the Protocol GUID. If
-  Registration is pasased in return a Protocol Instance that was just add
-  to the system. If Retistration is NULL return the first Protocol Interface
-  you find.
-
-Arguments:
-
-  Protocol     - The protocol to search for
-  
-  Registration - Optional Registration Key returned from RegisterProtocolNotify() 
-
-  Interface    - Return the Protocol interface (instance).
-
-Returns:
-
-  EFI_SUCCESS - If a valid Interface is returned
-  
-  EFI_INVALID_PARAMETER       - Invalid parameter
-  
-  EFI_NOT_FOUND               - Protocol interface not found
-
---*/
 {
   EFI_STATUS              Status;
   LOCATE_POSITION         Position;
@@ -631,6 +626,29 @@ Done:
 
 
  
+
+/**
+  Function returns an array of handles that support the requested protocol
+  in a buffer allocated from pool. This is a version of CoreLocateHandle()
+  that allocates a buffer for the caller.
+
+  @param  SearchType             Specifies which handle(s) are to be returned. 
+  @param  Protocol               Provides the protocol to search by.    This 
+                                 parameter is only valid for SearchType 
+                                 ByProtocol. 
+  @param  SearchKey              Supplies the search key depending on the 
+                                 SearchType. 
+  @param  NumberHandles          The number of handles returned in Buffer. 
+  @param  Buffer                 A pointer to the buffer to return the requested 
+                                 array of  handles that support Protocol. 
+
+  @retval EFI_SUCCESS            The result array of handles was returned. 
+  @retval EFI_NOT_FOUND          No handles match the search. 
+  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the 
+                                 matching results. 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+
+**/
 EFI_STATUS
 EFIAPI
 CoreLocateHandleBuffer (
@@ -640,32 +658,6 @@ CoreLocateHandleBuffer (
   IN OUT UINTN                    *NumberHandles,
   OUT EFI_HANDLE                  **Buffer
   )
-/*++
-
-Routine Description:
-
-  Function returns an array of handles that support the requested protocol 
-  in a buffer allocated from pool. This is a version of CoreLocateHandle()
-  that allocates a buffer for the caller.
-
-Arguments:
-
-  SearchType           - Specifies which handle(s) are to be returned.
-  Protocol             - Provides the protocol to search by.   
-                         This parameter is only valid for SearchType ByProtocol.
-  SearchKey            - Supplies the search key depending on the SearchType.
-  NumberHandles      - The number of handles returned in Buffer.
-  Buffer               - A pointer to the buffer to return the requested array of 
-                         handles that support Protocol.
-
-Returns:
-  
-  EFI_SUCCESS          - The result array of handles was returned.
-  EFI_NOT_FOUND        - No handles match the search. 
-  EFI_OUT_OF_RESOURCES - There is not enough pool memory to store the matching results.
-  EFI_INVALID_PARAMETER   - Invalid parameter
-
---*/
 {
   EFI_STATUS          Status;
   UINTN               BufferSize;
@@ -721,5 +713,6 @@ Returns:
 
   return Status;
 }
+
 
 

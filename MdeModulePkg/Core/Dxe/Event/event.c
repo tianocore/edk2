@@ -62,74 +62,47 @@ UINT32 mEventTable[] = {
   EVT_TIMER | EVT_NOTIFY_WAIT,
 };
 
+
+/**
+  Enter critical section by acquiring the lock on gEventQueueLock.
+
+**/
 STATIC
 VOID
 CoreAcquireEventLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Enter critical section by acquiring the lock on gEventQueueLock.
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   CoreAcquireLock (&gEventQueueLock);
 }
 
+
+/**
+  Exit critical section by releasing the lock on gEventQueueLock.
+
+**/
 STATIC
 VOID
 CoreReleaseEventLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Exit critical section by releasing the lock on gEventQueueLock.
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   CoreReleaseLock (&gEventQueueLock);
 }
 
 
+
+/**
+  Initializes "event" support and populates parts of the System and Runtime Table.
+
+
+  @retval EFI_SUCCESS            Always return success
+
+**/
 EFI_STATUS
 CoreInitializeEventServices (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Initializes "event" support and populates parts of the System and Runtime Table.
-
-Arguments:
-
-  None
-
-Returns:
-
-  EFI_SUCCESS - Always return success
-
---*/
 {
   UINTN        Index;
 
@@ -143,25 +116,18 @@ Returns:
 }
 
 
+
+/**
+  Dispatches all pending events.
+
+  @param  Priority               The task priority level of event notifications 
+                                 to dispatch
+
+**/
 VOID
 CoreDispatchEventNotifies (
   IN EFI_TPL      Priority
   )
-/*++
-
-Routine Description:
-
-  Dispatches all pending events.
-
-Arguments:
-
-  Priority - The task priority level of event notifications to dispatch
-
-Returns:
-
-  None
-
---*/
 {
   IEVENT          *Event;
   LIST_ENTRY      *Head;
@@ -207,26 +173,18 @@ Returns:
 }
 
 
+
+/**
+  Queues the event's notification function to fire.
+
+  @param  Event                  The Event to notify
+
+**/
 STATIC
 VOID
 CoreNotifyEvent (
   IN  IEVENT      *Event
   )
-/*++
-
-Routine Description:
-
-  Queues the event's notification function to fire
-
-Arguments:
-
-  Event       - The Event to notify
-
-Returns:
-
-  None
-
---*/
 {
 
   //
@@ -253,23 +211,17 @@ Returns:
 
 
 
+
+/**
+  Signals all events in the EventGroup.
+
+  @param  EventGroup             The list to signal
+
+**/
 VOID
 CoreNotifySignalList (
   IN EFI_GUID     *EventGroup
   )
-/*++
-
-Routine Description:
-  Signals all events in the EventGroup
-
-Arguments:
-  EventGroup - The list to signal
-
-Returns:
-
-  None
-
---*/
 {
   LIST_ENTRY              *Link;
   LIST_ENTRY              *Head;
@@ -288,6 +240,25 @@ Returns:
   CoreReleaseEventLock ();
 }
 
+
+/**
+  Creates a general-purpose event structure.
+
+  @param  Type                   The type of event to create and its mode and 
+                                 attributes 
+  @param  NotifyTpl              The task priority level of event notifications 
+  @param  NotifyFunction         Pointer to the events notification function 
+  @param  NotifyContext          Pointer to the notification functions context; 
+                                 corresponds to parameter "Context" in the 
+                                 notification function 
+  @param  Event                  Pointer to the newly created event if the call 
+                                 succeeds; undefined otherwise 
+
+  @retval EFI_SUCCESS            The event structure was created 
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value 
+  @retval EFI_OUT_OF_RESOURCES   The event could not be allocated
+
+**/
 EFI_STATUS
 EFIAPI
 CoreCreateEvent (
@@ -297,30 +268,32 @@ CoreCreateEvent (
   IN VOID                     *NotifyContext, OPTIONAL
   OUT EFI_EVENT               *Event
   )
-/*++
-
-Routine Description:
-  Creates a general-purpose event structure
-
-Arguments:
-  Type                - The type of event to create and its mode and attributes
-  NotifyTpl           - The task priority level of event notifications
-  NotifyFunction      - Pointer to the events notification function
-  NotifyContext       - Pointer to the notification functions context; corresponds to
-                        parameter "Context" in the notification function
-  Event               - Pointer to the newly created event if the call succeeds; undefined otherwise
-
-Returns:
-  EFI_SUCCESS           - The event structure was created
-  EFI_INVALID_PARAMETER - One of the parameters has an invalid value
-  EFI_OUT_OF_RESOURCES  - The event could not be allocated
-
---*/
 {
   return CoreCreateEventEx (Type, NotifyTpl, NotifyFunction, NotifyContext, NULL, Event);
 }
 
 
+
+/**
+  Creates a general-purpose event structure
+
+  @param  Type                   The type of event to create and its mode and 
+                                 attributes 
+  @param  NotifyTpl              The task priority level of event notifications 
+  @param  NotifyFunction         Pointer to the events notification function 
+  @param  NotifyContext          Pointer to the notification functions context; 
+                                 corresponds to parameter "Context" in the 
+                                 notification function 
+  @param  EventGroup             GUID for EventGroup if NULL act the same as 
+                                 gBS->CreateEvent(). 
+  @param  Event                  Pointer to the newly created event if the call 
+                                 succeeds; undefined otherwise 
+
+  @retval EFI_SUCCESS            The event structure was created 
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value 
+  @retval EFI_OUT_OF_RESOURCES   The event could not be allocated
+
+**/
 EFI_STATUS
 EFIAPI
 CoreCreateEventEx (
@@ -331,26 +304,6 @@ CoreCreateEventEx (
   IN CONST EFI_GUID           *EventGroup,    OPTIONAL
   OUT EFI_EVENT               *Event
   )
-/*++
-
-Routine Description:
-  Creates a general-purpose event structure
-
-Arguments:
-  Type                - The type of event to create and its mode and attributes
-  NotifyTpl           - The task priority level of event notifications
-  NotifyFunction      - Pointer to the events notification function
-  NotifyContext       - Pointer to the notification functions context; corresponds to
-                        parameter "Context" in the notification function
-  EventGroup          - GUID for EventGroup if NULL act the same as gBS->CreateEvent().
-  Event               - Pointer to the newly created event if the call succeeds; undefined otherwise
-
-Returns:
-  EFI_SUCCESS           - The event structure was created
-  EFI_INVALID_PARAMETER - One of the parameters has an invalid value
-  EFI_OUT_OF_RESOURCES  - The event could not be allocated
-
---*/
 {
   EFI_STATUS      Status;
   IEVENT          *IEvent;
@@ -482,28 +435,21 @@ Returns:
 
 
 
+
+/**
+  Signals the event.  Queues the event to be notified if needed
+
+  @param  UserEvent              The event to signal 
+
+  @retval EFI_INVALID_PARAMETER  Parameters are not valid. 
+  @retval EFI_SUCCESS            The event was signaled.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreSignalEvent (
   IN EFI_EVENT    UserEvent
   )
-/*++
-
-Routine Description:
-
-  Signals the event.  Queues the event to be notified if needed
-
-Arguments:
-
-  UserEvent - The event to signal
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Parameters are not valid.
-
-  EFI_SUCCESS - The event was signaled.
-
---*/
 {
   IEVENT          *Event;
 
@@ -549,29 +495,22 @@ Returns:
 }
 
 
+
+/**
+  Check the status of an event.
+
+  @param  UserEvent              The event to check 
+
+  @retval EFI_SUCCESS            The event is in the signaled state 
+  @retval EFI_NOT_READY          The event is not in the signaled state 
+  @retval EFI_INVALID_PARAMETER  Event is of type EVT_NOTIFY_SIGNAL
+
+**/
 EFI_STATUS
 EFIAPI
 CoreCheckEvent (
   IN EFI_EVENT        UserEvent
   )
-/*++
-
-Routine Description:
-
-  Check the status of an event
-
-Arguments:
-
-  UserEvent - The event to check
-
-Returns:
-
-  EFI_SUCCESS           - The event is in the signaled state
-  EFI_NOT_READY         - The event is not in the signaled state
-  EFI_INVALID_PARAMETER - Event is of type EVT_NOTIFY_SIGNAL
-
---*/
-
 {
   IEVENT      *Event;
   EFI_STATUS  Status;
@@ -625,6 +564,21 @@ Returns:
 
 
 
+
+/**
+  Stops execution until an event is signaled.
+
+  @param  NumberOfEvents         The number of events in the UserEvents array 
+  @param  UserEvents             An array of EFI_EVENT 
+  @param  UserIndex              Pointer to the index of the event which 
+                                 satisfied the wait condition 
+
+  @retval EFI_SUCCESS            The event indicated by Index was signaled. 
+  @retval EFI_INVALID_PARAMETER  The event indicated by Index has a notification 
+                                 function or Event was not a valid type 
+  @retval EFI_UNSUPPORTED        The current TPL is not TPL_APPLICATION
+
+**/
 EFI_STATUS
 EFIAPI
 CoreWaitForEvent (
@@ -632,27 +586,6 @@ CoreWaitForEvent (
   IN EFI_EVENT    *UserEvents,
   OUT UINTN       *UserIndex
   )
-/*++
-
-Routine Description:
-
-  Stops execution until an event is signaled.
-
-Arguments:
-
-  NumberOfEvents  - The number of events in the UserEvents array
-  UserEvents      - An array of EFI_EVENT
-  UserIndex       - Pointer to the index of the event which satisfied the wait condition
-
-Returns:
-
-  EFI_SUCCESS           - The event indicated by Index was signaled.
-  EFI_INVALID_PARAMETER - The event indicated by Index has a notification function or
-                          Event was not a valid type
-  EFI_UNSUPPORTED       - The current TPL is not TPL_APPLICATION
-
---*/
-
 {
   EFI_STATUS      Status;
   UINTN           Index;
@@ -687,29 +620,21 @@ Returns:
 }
 
 
+
+/**
+  Closes an event and frees the event structure.
+
+  @param  UserEvent              Event to close 
+
+  @retval EFI_INVALID_PARAMETER  Parameters are not valid. 
+  @retval EFI_SUCCESS            The event has been closed
+
+**/
 EFI_STATUS
 EFIAPI
 CoreCloseEvent (
   IN EFI_EVENT    UserEvent
   )
-/*++
-
-Routine Description:
-
-  Closes an event and frees the event structure.
-
-Arguments:
-
-  UserEvent - Event to close
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Parameters are not valid.
-
-  EFI_SUCCESS - The event has been closed
-
---*/
-
 {
   EFI_STATUS  Status;
   IEVENT      *Event;

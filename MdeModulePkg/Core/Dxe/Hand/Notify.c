@@ -15,23 +15,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <DxeMain.h>
 
+
+/**
+  Signal event for every protocol in protocol entry.
+
+  @param  ProtEntry              Protocol entry
+
+**/
 VOID
 CoreNotifyProtocolEntry (
   IN PROTOCOL_ENTRY   *ProtEntry
   )
-/*++
-
-Routine Description:
-
-  Signal event for every protocol in protocol entry.
-
-Arguments:
-
-  ProtEntry     - Protocol entry
-
-Returns:
-
---*/
 {
   PROTOCOL_NOTIFY     *ProtNotify;
   LIST_ENTRY          *Link;
@@ -45,31 +39,23 @@ Returns:
 }
 
 
+
+/**
+  Removes Protocol from the protocol list (but not the handle list).
+
+  @param  Handle                 The handle to remove protocol on. 
+  @param  Protocol               GUID of the protocol to be moved 
+  @param  Interface              The interface of the protocol 
+
+  @return Protocol Entry
+
+**/
 PROTOCOL_INTERFACE *
 CoreRemoveInterfaceFromProtocol (
   IN IHANDLE        *Handle,
   IN EFI_GUID       *Protocol,
   IN VOID           *Interface
   )
-/*++
-
-Routine Description:
-
-  Removes Protocol from the protocol list (but not the handle list).
-
-Arguments:
-
-  Handle -  The handle to remove protocol on.
-
-  Protocol  -  GUID of the protocol to be moved
-
-  Interface - The interface of the protocol
-
-Returns:
-
-  Protocol Entry
-
---*/
 {
   PROTOCOL_INTERFACE  *Prot;
   PROTOCOL_NOTIFY     *ProtNotify;
@@ -107,6 +93,20 @@ Returns:
 
 
 
+
+/**
+  Add a new protocol notification record for the request protocol.
+
+  @param  Protocol               The requested protocol to add the notify 
+                                 registration 
+  @param  Event                  The event to signal 
+  @param  Registration           Returns the registration record 
+
+  @retval EFI_INVALID_PARAMETER  Invalid parameter 
+  @retval EFI_SUCCESS            Successfully returned the registration record 
+                                 that has been added
+
+**/
 EFI_STATUS
 EFIAPI
 CoreRegisterProtocolNotify (
@@ -114,28 +114,6 @@ CoreRegisterProtocolNotify (
   IN EFI_EVENT      Event,
   OUT  VOID           **Registration
   )
-/*++
-
-Routine Description:
-
-  Add a new protocol notification record for the request protocol.
-
-Arguments:
-
-  Protocol      - The requested protocol to add the notify registration
-
-  Event         - The event to signal 
-
-  Registration  - Returns the registration record
-
-
-Returns:
-
-  EFI_INVALID_PARAMETER       - Invalid parameter
-
-  EFI_SUCCESS                 - Successfully returned the registration record that has been added
-  
---*/
 {
   PROTOCOL_ENTRY      *ProtEntry;
   PROTOCOL_NOTIFY     *ProtNotify;
@@ -194,6 +172,21 @@ Returns:
 
 
 
+
+/**
+  Reinstall a protocol interface on a device handle.  The OldInterface for Protocol is replaced by the NewInterface.
+
+  @param  UserHandle             Handle on which the interface is to be 
+                                 reinstalled 
+  @param  Protocol               The numeric ID of the interface 
+  @param  OldInterface           A pointer to the old interface 
+  @param  NewInterface           A pointer to the new interface 
+
+  @retval EFI_SUCCESS            The protocol interface was installed
+  @retval EFI_NOT_FOUND          The OldInterface on the handle was not found
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value
+
+**/
 EFI_STATUS
 EFIAPI
 CoreReinstallProtocolInterface (
@@ -202,29 +195,6 @@ CoreReinstallProtocolInterface (
   IN VOID           *OldInterface,
   IN VOID           *NewInterface
   )
-/*++
-
-Routine Description:
-
-  Reinstall a protocol interface on a device handle.  The OldInterface for Protocol is replaced by the NewInterface.
-
-Arguments:
-
-  UserHandle    - Handle on which the interface is to be reinstalled
-  Protocol      - The numeric ID of the interface
-  OldInterface  - A pointer to the old interface
-  NewInterface  - A pointer to the new interface 
-
-
-Returns:
-
-  Status code.
-
-  On EFI_SUCCESS            The protocol interface was installed
-  On EFI_NOT_FOUND          The OldInterface on the handle was not found
-  On EFI_INVALID_PARAMETER  One of the parameters has an invalid value
-  
---*/
 {
   EFI_STATUS                Status;
   IHANDLE                   *Handle;

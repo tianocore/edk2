@@ -91,12 +91,30 @@ EFI_MEMORY_TYPE_INFORMATION gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
 //
 // Internal prototypes
 //
+/**
+  Find untested but initialized memory regions in GCD map and convert them to be DXE allocatable.
+
+**/
 STATIC
 VOID 
 PromoteMemoryResource (
   VOID
-);
+  );
 
+/**
+  Internal function.  Adds a ranges to the memory map.
+  The range must not already exist in the map.
+
+  @param  Type                   The type of memory range to add 
+  @param  Start                  The starting address in the memory range Must be 
+                                 paged aligned 
+  @param  End                    The last address in the range Must be the last 
+                                 byte of a page 
+  @param  Attribute              The attributes of the memory range to add 
+
+  @return None.  The range is added to the memory map
+
+**/
 STATIC
 VOID
 CoreAddRange (
@@ -106,12 +124,33 @@ CoreAddRange (
   IN UINT64                   Attribute
   );
 
+/**
+  Internal function.  Moves any memory descriptors that are on the
+  temporary descriptor stack to heap.
+
+**/
 STATIC
 VOID
 CoreFreeMemoryMapStack (
   VOID
   );
 
+/**
+  Internal function.  Converts a memory range to the specified type.
+  The range must exist in the memory map.
+
+  @param  Start                  The first address of the range Must be page 
+                                 aligned 
+  @param  NumberOfPages          The number of pages to convert 
+  @param  NewType                The new type for the memory range 
+
+  @retval EFI_INVALID_PARAMETER  Invalid parameter 
+  @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified 
+                                 range  or convertion not allowed. 
+  @retval EFI_SUCCESS            Successfully converts the memory range to the 
+                                 specified type.
+
+**/
 STATIC
 EFI_STATUS
 CoreConvertPages (
@@ -120,90 +159,79 @@ CoreConvertPages (
   IN EFI_MEMORY_TYPE  NewType
   );
 
+/**
+  Internal function.  Removes a descriptor entry.
+
+  @param  Entry                  The entry to remove
+
+**/
 STATIC
 VOID
 RemoveMemoryMapEntry (
   MEMORY_MAP      *Entry
   );
   
+/**
+  Internal function.  Deque a descriptor entry from the mFreeMemoryMapEntryList.
+  If the list is emtry, then allocate a new page to refuel the list.
+  Please Note this algorithm to allocate the memory map descriptor has a property
+  that the memory allocated for memory entries always grows, and will never really be freed
+  For example, if the current boot uses 2000 memory map entries at the maximum point, but
+  ends up with only 50 at the time the OS is booted, then the memory associated with the 1950
+  memory map entries is still allocated from EfiBootServicesMemory.
+
+
+  @return The Memory map descriptor dequed from the mFreeMemoryMapEntryList
+
+**/
 STATIC
 MEMORY_MAP *
 AllocateMemoryMapEntry (
   VOID
   );
  
+
+/**
+  Enter critical section by gaining lock on gMemoryLock.
+
+**/
 VOID
 CoreAcquireMemoryLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Enter critical section by gaining lock on gMemoryLock
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   CoreAcquireLock (&gMemoryLock);
 }
 
 
+
+/**
+  Exit critical section by releasing lock on gMemoryLock.
+
+**/
 VOID
 CoreReleaseMemoryLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Exit critical section by releasing lock on gMemoryLock
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   CoreReleaseLock (&gMemoryLock);
 }
 
+
+/**
+  Find untested but initialized memory regions in GCD map and convert them to be DXE allocatable.
+
+**/
 STATIC
 VOID
 PromoteMemoryResource (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Find untested but initialized memory regions in GCD map and convert them to be DXE allocatable.
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   LIST_ENTRY                       *Link;
   EFI_GCD_MAP_ENTRY                *Entry;
 
-  DEBUG ((EFI_D_ERROR | EFI_D_PAGE, "Promote the memory resource\n"));
+  DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "Promote the memory resource\n"));
   
   CoreAcquireGcdMemoryLock ();
   
@@ -246,6 +274,22 @@ Returns:
   return;
 }
 
+
+/**
+  Called to initialize the memory map and add descriptors to
+  the current descriptor list.
+  The first descriptor that is added must be general usable
+  memory as the addition allocates heap.
+
+  @param  Type                   The type of memory to add 
+  @param  Start                  The starting address in the memory range Must be 
+                                 page aligned 
+  @param  NumberOfPages          The number of pages in the range 
+  @param  Attribute              Attributes of the memory to add 
+
+  @return None.  The range is added to the memory map
+
+**/
 VOID
 CoreAddMemoryDescriptor (
   IN EFI_MEMORY_TYPE       Type,
@@ -253,32 +297,6 @@ CoreAddMemoryDescriptor (
   IN UINT64                NumberOfPages,
   IN UINT64                Attribute
   )
-/*++
-
-Routine Description:
-
-  Called to initialize the memory map and add descriptors to
-  the current descriptor list.
-
-  The first descriptor that is added must be general usable
-  memory as the addition allocates heap.
-
-Arguments:
-
-  Type          - The type of memory to add
-
-  Start         - The starting address in the memory range
-                  Must be page aligned
-
-  NumberOfPages - The number of pages in the range
-
-  Attribute     - Attributes of the memory to add
-
-Returns:
-
-  None.  The range is added to the memory map
-
---*/
 {
   EFI_PHYSICAL_ADDRESS        End;
   EFI_STATUS                  Status;
@@ -416,6 +434,21 @@ Returns:
 }
 
 
+
+/**
+  Internal function.  Adds a ranges to the memory map.
+  The range must not already exist in the map.
+
+  @param  Type                   The type of memory range to add 
+  @param  Start                  The starting address in the memory range Must be 
+                                 paged aligned 
+  @param  End                    The last address in the range Must be the last 
+                                 byte of a page 
+  @param  Attribute              The attributes of the memory range to add 
+
+  @return None.  The range is added to the memory map
+
+**/
 STATIC
 VOID
 CoreAddRange (
@@ -424,30 +457,6 @@ CoreAddRange (
   IN EFI_PHYSICAL_ADDRESS     End,
   IN UINT64                   Attribute
   )
-/*++
-
-Routine Description:
-
-  Internal function.  Adds a ranges to the memory map.
-  The range must not already exist in the map.
-
-Arguments:
-
-  Type    - The type of memory range to add
-
-  Start   - The starting address in the memory range
-            Must be paged aligned
-
-  End     - The last address in the range
-          Must be the last byte of a page
-
-  Attribute - The attributes of the memory range to add
-
-Returns:
-
-  None.  The range is added to the memory map
-
---*/
 {
   LIST_ENTRY        *Link;
   MEMORY_MAP        *Entry;
@@ -457,7 +466,7 @@ Returns:
 
   ASSERT_LOCKED (&gMemoryLock);
   
-  DEBUG ((EFI_D_PAGE, "AddRange: %lx-%lx to %d\n", Start, End, Type));
+  DEBUG ((DEBUG_PAGE, "AddRange: %lx-%lx to %d\n", Start, End, Type));
 
   //
   // Memory map being altered so updated key
@@ -527,27 +536,17 @@ Returns:
   return ;
 }
 
+
+/**
+  Internal function.  Moves any memory descriptors that are on the
+  temporary descriptor stack to heap.
+
+**/
 STATIC
 VOID
 CoreFreeMemoryMapStack (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Internal function.  Moves any memory descriptors that are on the
-  temporary descriptor stack to heap.
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   MEMORY_MAP      *Entry;
   MEMORY_MAP      *Entry2;
@@ -615,64 +614,49 @@ Returns:
   mFreeMapStack -= 1;
 }
 
+
+/**
+  Internal function.  Removes a descriptor entry.
+
+  @param  Entry                  The entry to remove
+
+**/
 STATIC
 VOID
 RemoveMemoryMapEntry (
   MEMORY_MAP      *Entry
   )
-/*++
-
-Routine Description:
-
-  Internal function.  Removes a descriptor entry.
-
-Arguments:
-
-  Entry   - The entry to remove
-
-Returns:
-
-  None
-
---*/
 {
   RemoveEntryList (&Entry->Link);
   Entry->Link.ForwardLink = NULL;
 
   if (Entry->FromPages) {
-  	//
-  	// Insert the free memory map descriptor to the end of mFreeMemoryMapEntryList
-  	//
+    //
+    // Insert the free memory map descriptor to the end of mFreeMemoryMapEntryList
+    //
     InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
   }
 }
 
+
+/**
+  Internal function.  Deque a descriptor entry from the mFreeMemoryMapEntryList.
+  If the list is emtry, then allocate a new page to refuel the list.
+  Please Note this algorithm to allocate the memory map descriptor has a property
+  that the memory allocated for memory entries always grows, and will never really be freed
+  For example, if the current boot uses 2000 memory map entries at the maximum point, but
+  ends up with only 50 at the time the OS is booted, then the memory associated with the 1950
+  memory map entries is still allocated from EfiBootServicesMemory.
+
+
+  @return The Memory map descriptor dequed from the mFreeMemoryMapEntryList
+
+**/
 STATIC
 MEMORY_MAP *
 AllocateMemoryMapEntry (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Internal function.  Deque a descriptor entry from the mFreeMemoryMapEntryList.
-  If the list is emtry, then allocate a new page to refuel the list. 
-  Please Note this algorithm to allocate the memory map descriptor has a property
-  that the memory allocated for memory entries always grows, and will never really be freed 
-  For example, if the current boot uses 2000 memory map entries at the maximum point, but
-  ends up with only 50 at the time the OS is booted, then the memory associated with the 1950 
-  memory map entries is still allocated from EfiBootServicesMemory.  
-
-Arguments:
-
-  NONE
-
-Returns:
-
-  The Memory map descriptor dequed from the mFreeMemoryMapEntryList
-
---*/ 
 {
   MEMORY_MAP*            FreeDescriptorEntries;
   MEMORY_MAP*            Entry;
@@ -704,6 +688,23 @@ Returns:
   return Entry;
 }    
 
+
+/**
+  Internal function.  Converts a memory range to the specified type.
+  The range must exist in the memory map.
+
+  @param  Start                  The first address of the range Must be page 
+                                 aligned 
+  @param  NumberOfPages          The number of pages to convert 
+  @param  NewType                The new type for the memory range 
+
+  @retval EFI_INVALID_PARAMETER  Invalid parameter 
+  @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified 
+                                 range  or convertion not allowed. 
+  @retval EFI_SUCCESS            Successfully converts the memory range to the 
+                                 specified type.
+
+**/
 STATIC
 EFI_STATUS
 CoreConvertPages (
@@ -711,32 +712,6 @@ CoreConvertPages (
   IN UINT64           NumberOfPages,
   IN EFI_MEMORY_TYPE  NewType
   )
-/*++
-
-Routine Description:
-
-  Internal function.  Converts a memory range to the specified type.
-  The range must exist in the memory map.
-
-Arguments:
-
-  Start         - The first address of the range
-                  Must be page aligned
-
-  NumberOfPages - The number of pages to convert
-
-  NewType       - The new type for the memory range
-
-Returns:
-
-  EFI_INVALID_PARAMETER   - Invalid parameter
-  
-  EFI_NOT_FOUND           - Could not find a descriptor cover the specified range 
-                            or convertion not allowed.
-  
-  EFI_SUCCESS             - Successfully converts the memory range to the specified type.
-
---*/
 {
 
   UINT64          NumberOfBytes;
@@ -777,7 +752,7 @@ Returns:
     }
 
     if (Link == &gMemoryMap) {
-      DEBUG ((EFI_D_ERROR | EFI_D_PAGE, "ConvertPages: failed to find range %lx - %lx\n", Start, End));
+      DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "ConvertPages: failed to find range %lx - %lx\n", Start, End));
       return EFI_NOT_FOUND;
     }
 
@@ -790,13 +765,13 @@ Returns:
       RangeEnd = Entry->End;
     }
 
-    DEBUG ((EFI_D_PAGE, "ConvertRange: %lx-%lx to %d\n", Start, RangeEnd, NewType));
+    DEBUG ((DEBUG_PAGE, "ConvertRange: %lx-%lx to %d\n", Start, RangeEnd, NewType));
 
     //
     // Debug code - verify conversion is allowed
     //
     if (!(NewType == EfiConventionalMemory ? 1 : 0) ^ (Entry->Type == EfiConventionalMemory ? 1 : 0)) {
-      DEBUG ((EFI_D_ERROR , "ConvertPages: Incompatible memory types\n"));
+      DEBUG ((DEBUG_ERROR , "ConvertPages: Incompatible memory types\n"));
       return EFI_NOT_FOUND;
     }  
 
@@ -909,6 +884,20 @@ Returns:
 }
 
 
+
+/**
+  Internal function. Finds a consecutive free page range below
+  the requested address.
+
+  @param  MaxAddress             The address that the range must be below 
+  @param  NumberOfPages          Number of pages needed 
+  @param  NewType                The type of memory the range is going to be 
+                                 turned into 
+  @param  Alignment              Bits to align with 
+
+  @return The base address of the range, or 0 if the range was not found
+
+**/
 STATIC
 UINT64
 CoreFindFreePagesI (
@@ -917,28 +906,6 @@ CoreFindFreePagesI (
   IN EFI_MEMORY_TYPE  NewType,
   IN UINTN            Alignment
   )
-/*++
-
-Routine Description:
-
-  Internal function. Finds a consecutive free page range below
-  the requested address.
-
-Arguments:
-
-  MaxAddress    - The address that the range must be below
-
-  NumberOfPages - Number of pages needed
-
-  NewType       - The type of memory the range is going to be turned into
-
-  Alignment     - Bits to align with
-
-Returns:
-
-  The base address of the range, or 0 if the range was not found
-
---*/
 {
   UINT64          NumberOfBytes;
   UINT64          Target;
@@ -1038,6 +1005,20 @@ Returns:
   return Target;
 }
 
+
+/**
+  Internal function.  Finds a consecutive free page range below
+  the requested address
+
+  @param  MaxAddress             The address that the range must be below 
+  @param  NoPages                Number of pages needed 
+  @param  NewType                The type of memory the range is going to be 
+                                 turned into 
+  @param  Alignment              Bits to align with 
+
+  @return The base address of the range, or 0 if the range was not found.
+
+**/
 STATIC
 UINT64
 FindFreePages (
@@ -1046,28 +1027,6 @@ FindFreePages (
     IN EFI_MEMORY_TYPE  NewType,
     IN UINTN            Alignment
     )
-/*++
-
-Routine Description:
-
-    Internal function.  Finds a consecutive free page range below
-    the requested address
-
-Arguments:
-
-    MaxAddress          - The address that the range must be below
-
-    NoPages             - Number of pages needed
-
-    NewType             - The type of memory the range is going to be turned into
-
-    Alignment           - Bits to align with
-
-Returns:
-
-    The base address of the range, or 0 if the range was not found.
-
---*/
 {
   UINT64  NewMaxAddress;
   UINT64  Start;
@@ -1103,6 +1062,25 @@ Returns:
 }
 
 
+
+/**
+  Allocates pages from the memory map.
+
+  @param  Type                   The type of allocation to perform 
+  @param  MemoryType             The type of memory to turn the allocated pages 
+                                 into 
+  @param  NumberOfPages          The number of pages to allocate 
+  @param  Memory                 A pointer to receive the base allocated memory 
+                                 address 
+
+  @return Status. On success, Memory is filled in with the base address allocated
+  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in 
+                                 spec. 
+  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement. 
+  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate. 
+  @retval EFI_SUCCESS            Pages successfully allocated.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreAllocatePages (
@@ -1111,35 +1089,6 @@ CoreAllocatePages (
   IN UINTN                  NumberOfPages,
   IN OUT EFI_PHYSICAL_ADDRESS  *Memory
   )
-/*++
-
-Routine Description:
-
-  Allocates pages from the memory map.
-
-Arguments:
-
-  Type          - The type of allocation to perform
-
-  MemoryType    - The type of memory to turn the allocated pages into
-
-  NumberOfPages - The number of pages to allocate
-
-  Memory        - A pointer to receive the base allocated memory address
-
-Returns:
-
-  Status. On success, Memory is filled in with the base address allocated
-
-  EFI_INVALID_PARAMETER     - Parameters violate checking rules defined in spec.
-  
-  EFI_NOT_FOUND             - Could not allocate pages match the requirement.
-  
-  EFI_OUT_OF_RESOURCES      - No enough pages to allocate.
-  
-  EFI_SUCCESS               - Pages successfully allocated.
-
---*/
 {
   EFI_STATUS      Status;
   UINT64          Start;
@@ -1219,33 +1168,24 @@ Done:
 
 
 
+
+/**
+  Frees previous allocated pages.
+
+  @param  Memory                 Base address of memory being freed 
+  @param  NumberOfPages          The number of pages to free 
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range 
+  @retval EFI_INVALID_PARAMETER  Address not aligned 
+  @return EFI_SUCCESS         -Pages successfully freed.
+
+**/
 EFI_STATUS 
 EFIAPI
 CoreFreePages (
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
   )
-/*++
-
-Routine Description:
-
-  Frees previous allocated pages.
-
-Arguments:
-
-  Memory        - Base address of memory being freed
-
-  NumberOfPages - The number of pages to free
-
-Returns:
-
-  EFI_NOT_FOUND       - Could not find the entry that covers the range
-  
-  EFI_INVALID_PARAMETER   - Address not aligned
-  
-  EFI_SUCCESS         -Pages successfully freed.
-
---*/
 {
   EFI_STATUS      Status;
   LIST_ENTRY      *Link;
@@ -1311,6 +1251,37 @@ Returns:
 
 
 
+
+/**
+  This function returns a copy of the current memory map. The map is an array of
+  memory descriptors, each of which describes a contiguous block of memory.
+
+  @param  MemoryMapSize          A pointer to the size, in bytes, of the 
+                                 MemoryMap buffer. On input, this is the size of 
+                                 the buffer allocated by the caller.  On output, 
+                                 it is the size of the buffer returned by the 
+                                 firmware  if the buffer was large enough, or the 
+                                 size of the buffer needed  to contain the map if 
+                                 the buffer was too small. 
+  @param  MemoryMap              A pointer to the buffer in which firmware places 
+                                 the current memory map. 
+  @param  MapKey                 A pointer to the location in which firmware 
+                                 returns the key for the current memory map. 
+  @param  DescriptorSize         A pointer to the location in which firmware 
+                                 returns the size, in bytes, of an individual 
+                                 EFI_MEMORY_DESCRIPTOR. 
+  @param  DescriptorVersion      A pointer to the location in which firmware 
+                                 returns the version number associated with the 
+                                 EFI_MEMORY_DESCRIPTOR. 
+
+  @retval EFI_SUCCESS            The memory map was returned in the MemoryMap 
+                                 buffer. 
+  @retval EFI_BUFFER_TOO_SMALL   The MemoryMap buffer was too small. The current 
+                                 buffer size needed to hold the memory map is 
+                                 returned in MemoryMapSize. 
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreGetMemoryMap (
@@ -1320,36 +1291,6 @@ CoreGetMemoryMap (
   OUT UINTN                     *DescriptorSize,
   OUT UINT32                    *DescriptorVersion
   )
-/*++
-
-Routine Description:
-
-  This function returns a copy of the current memory map. The map is an array of 
-  memory descriptors, each of which describes a contiguous block of memory.
-
-Arguments:
-
-  MemoryMapSize     - A pointer to the size, in bytes, of the MemoryMap buffer. On
-                      input, this is the size of the buffer allocated by the caller. 
-                      On output, it is the size of the buffer returned by the firmware 
-                      if the buffer was large enough, or the size of the buffer needed 
-                      to contain the map if the buffer was too small.
-  MemoryMap         - A pointer to the buffer in which firmware places the current memory map.
-  MapKey            - A pointer to the location in which firmware returns the key for the
-                      current memory map.
-  DescriptorSize    - A pointer to the location in which firmware returns the size, in
-                      bytes, of an individual EFI_MEMORY_DESCRIPTOR.
-  DescriptorVersion - A pointer to the location in which firmware returns the version
-                      number associated with the EFI_MEMORY_DESCRIPTOR.
-
-Returns:
-
-  EFI_SUCCESS           - The memory map was returned in the MemoryMap buffer.       
-  EFI_BUFFER_TOO_SMALL  - The MemoryMap buffer was too small. The current buffer size
-                          needed to hold the memory map is returned in MemoryMapSize.
-  EFI_INVALID_PARAMETER - One of the parameters has an invalid value.                
-
---*/
 {
   EFI_STATUS                        Status;
   UINTN                             Size;  
@@ -1506,32 +1447,24 @@ Done:
   return Status;
 }
 
+
+/**
+  Internal function.  Used by the pool functions to allocate pages
+  to back pool allocation requests.
+
+  @param  PoolType               The type of memory for the new pool pages 
+  @param  NumberOfPages          No of pages to allocate 
+  @param  Alignment              Bits to align. 
+
+  @return The allocated memory, or NULL
+
+**/
 VOID *
 CoreAllocatePoolPages (
   IN EFI_MEMORY_TYPE    PoolType,
   IN UINTN              NumberOfPages,
   IN UINTN              Alignment
   )
-/*++
-
-Routine Description:
-
-  Internal function.  Used by the pool functions to allocate pages
-  to back pool allocation requests.
-
-Arguments:
-
-  PoolType      - The type of memory for the new pool pages
-
-  NumberOfPages - No of pages to allocate
-
-  Alignment     - Bits to align.
-
-Returns:
-
-  The allocated memory, or NULL
-
---*/
 {
   UINT64            Start;
 
@@ -1544,7 +1477,7 @@ Returns:
   // Convert it to boot services data
   //
   if (Start == 0) {
-    DEBUG ((EFI_D_ERROR | EFI_D_PAGE, "AllocatePoolPages: failed to allocate %d pages\n", NumberOfPages));
+    DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "AllocatePoolPages: failed to allocate %d pages\n", NumberOfPages));
   } else {
     CoreConvertPages (Start, NumberOfPages, PoolType);
   }
@@ -1552,55 +1485,40 @@ Returns:
   return (VOID *)(UINTN)Start;
 }
 
+
+/**
+  Internal function.  Frees pool pages allocated via AllocatePoolPages ()
+
+  @param  Memory                 The base address to free 
+  @param  NumberOfPages          The number of pages to free
+
+**/
 VOID
 CoreFreePoolPages (
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
   )
-/*++
-
-Routine Description:
-
-  Internal function.  Frees pool pages allocated via AllocatePoolPages ()
-
-Arguments:
-
-  Memory        - The base address to free
-
-  NumberOfPages - The number of pages to free
-
-Returns:
-
-  None
-
---*/
 {
   CoreConvertPages (Memory, NumberOfPages, EfiConventionalMemory);
 }
 
 
+
+/**
+  Make sure the memory map is following all the construction rules,
+  it is the last time to check memory map error before exit boot services.
+
+  @param  MapKey                 Memory map key 
+
+  @retval EFI_INVALID_PARAMETER  Memory map not consistent with construction 
+                                 rules. 
+  @retval EFI_SUCCESS            Valid memory map.
+
+**/
 EFI_STATUS
 CoreTerminateMemoryMap (
   IN UINTN          MapKey
   )
-/*++
-
-Routine Description:
-
-  Make sure the memory map is following all the construction rules, 
-  it is the last time to check memory map error before exit boot services.
-
-Arguments:
-
-  MapKey        - Memory map key
-
-Returns:
-
-  EFI_INVALID_PARAMETER       - Memory map not consistent with construction rules.
-  
-  EFI_SUCCESS                 - Valid memory map.
-
---*/
 {
   EFI_STATUS        Status;
   LIST_ENTRY        *Link;
@@ -1622,17 +1540,17 @@ Returns:
       Entry = CR(Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
       if (Entry->Attribute & EFI_MEMORY_RUNTIME) { 
         if (Entry->Type == EfiACPIReclaimMemory || Entry->Type == EfiACPIMemoryNVS) {
-          DEBUG((EFI_D_ERROR, "ExitBootServices: ACPI memory entry has RUNTIME attribute set.\n"));
+          DEBUG((DEBUG_ERROR, "ExitBootServices: ACPI memory entry has RUNTIME attribute set.\n"));
           CoreReleaseMemoryLock ();
           return EFI_INVALID_PARAMETER;
         }
         if (Entry->Start & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) {
-          DEBUG((EFI_D_ERROR, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
+          DEBUG((DEBUG_ERROR, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
           CoreReleaseMemoryLock ();
           return EFI_INVALID_PARAMETER;
         }
         if ((Entry->End + 1) & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) {
-          DEBUG((EFI_D_ERROR, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
+          DEBUG((DEBUG_ERROR, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
           CoreReleaseMemoryLock ();
           return EFI_INVALID_PARAMETER;
         }
@@ -1654,6 +1572,7 @@ Returns:
 
   return Status;
 }
+
 
 
 

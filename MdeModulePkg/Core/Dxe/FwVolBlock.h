@@ -47,106 +47,123 @@ typedef struct {
 
 
 
+/**
+  This routine is the driver initialization entry point.  It initializes the
+  libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
+  produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
+
+  @param  ImageHandle            The image handle. 
+  @param  SystemTable            The system table. 
+
+  @retval EFI_SUCCESS            Successfully initialized firmware volume block 
+                                 driver.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolBlockDriverInit (
   IN EFI_HANDLE               ImageHandle,
   IN EFI_SYSTEM_TABLE         *SystemTable
   )
-/*++
-
-Routine Description:
-    This routine is the driver initialization entry point.  It initializes the
-    libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
-    produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
-Arguments:
-    ImageHandle   - The image handle.
-    SystemTable   - The system table.
-Returns:
-    EFI_SUCCESS   - Successfully initialized firmware volume block driver.
---*/
 ;
 
 
+
+/**
+  Retrieves Volume attributes.  No polarity translations are done.
+
+  @param  This                   Calling context 
+  @param  Attributes             output buffer which contains attributes 
+
+  @retval EFI_SUCCESS            The firmware volume attributes were returned.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolBlockGetAttributes (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   OUT       EFI_FVB_ATTRIBUTES                  *Attributes
   )
-/*++
-
-Routine Description:
-    Retrieves Volume attributes.  No polarity translations are done.
-
-Arguments:
-    This - Calling context
-    Attributes - output buffer which contains attributes
-
-Returns:
-    EFI_SUCCESS - The firmware volume attributes were returned.
-
---*/
 ;
 
 
+
+/**
+  Modifies the current settings of the firmware volume according to the input parameter.
+
+  @param  This                   Calling context 
+  @param  Attributes             input buffer which contains attributes 
+
+  @retval EFI_SUCCESS            The firmware volume attributes were returned. 
+  @retval EFI_INVALID_PARAMETER  The attributes requested are in conflict with 
+                                 the capabilities as declared in the firmware 
+                                 volume header. 
+  @retval EFI_UNSUPPORTED        Not supported.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolBlockSetAttributes (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   IN CONST  EFI_FVB_ATTRIBUTES                  *Attributes
   )
-/*++
-
-Routine Description:
-  Modifies the current settings of the firmware volume according to the input parameter.
-
-Arguments:
-  This - Calling context
-  Attributes - input buffer which contains attributes
-
-Returns:
-  EFI_SUCCESS -  The firmware volume attributes were returned.
-  EFI_INVALID_PARAMETER  -  The attributes requested are in conflict with the capabilities as
-                             declared in the firmware volume header.
-  EFI_UNSUPPORTED        -  Not supported.
---*/
 ;
 
 
+
+/**
+  The EraseBlock() function erases one or more blocks as denoted by the
+  variable argument list. The entire parameter list of blocks must be verified
+  prior to erasing any blocks.  If a block is requested that does not exist
+  within the associated firmware volume (it has a larger index than the last
+  block of the firmware volume), the EraseBlock() function must return
+  EFI_INVALID_PARAMETER without modifying the contents of the firmware volume.
+
+  @param  This                   Calling context 
+  @param  ...                    Starting LBA followed by Number of Lba to erase. 
+                                 a -1 to terminate the list. 
+
+  @retval EFI_SUCCESS            The erase request was successfully completed. 
+  @retval EFI_ACCESS_DENIED      The firmware volume is in the WriteDisabled 
+                                 state. 
+  @retval EFI_DEVICE_ERROR       The block device is not functioning correctly 
+                                 and could not be written. The firmware device 
+                                 may have been partially erased. 
+  @retval EFI_INVALID_PARAMETER  One or more of the LBAs listed in the variable 
+                                 argument list do 
+  @retval EFI_UNSUPPORTED        Not supported.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolBlockEraseBlock (
   IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
   ...
   )
-/*++
-
-Routine Description:
-  The EraseBlock() function erases one or more blocks as denoted by the 
-variable argument list. The entire parameter list of blocks must be verified
-prior to erasing any blocks.  If a block is requested that does not exist 
-within the associated firmware volume (it has a larger index than the last 
-block of the firmware volume), the EraseBlock() function must return
-EFI_INVALID_PARAMETER without modifying the contents of the firmware volume.
-
-Arguments:
-  This - Calling context
-  ...  - Starting LBA followed by Number of Lba to erase. a -1 to terminate
-           the list.
-    
-Returns:
-  EFI_SUCCESS   -  The erase request was successfully completed.
-  EFI_ACCESS_DENIED   -  The firmware volume is in the WriteDisabled state.
-  EFI_DEVICE_ERROR    -  The block device is not functioning correctly and could not be
-                         written. The firmware device may have been partially erased.
-  EFI_INVALID_PARAMETER  -  One or more of the LBAs listed in the variable argument list do
-  EFI_UNSUPPORTED        -  Not supported.
-    
---*/
 ;
 
 
+
+/**
+  Read the specified number of bytes from the block to the input buffer.
+
+  @param  This                   Indicates the calling context. 
+  @param  Lba                    The starting logical block index to read. 
+  @param  Offset                 Offset into the block at which to begin reading. 
+  @param  NumBytes               Pointer to a UINT32. At entry, *NumBytes 
+                                 contains the total size of the buffer. At exit, 
+                                 *NumBytes contains the total number of bytes 
+                                 actually read. 
+  @param  Buffer                 Pinter to a caller-allocated buffer that 
+                                 contains the destine for the read. 
+
+  @retval EFI_SUCCESS            The firmware volume was read successfully. 
+  @retval EFI_BAD_BUFFER_SIZE    The read was attempted across an LBA boundary. 
+  @retval EFI_ACCESS_DENIED      Access denied. 
+  @retval EFI_DEVICE_ERROR       The block device is malfunctioning and could not 
+                                 be read.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolBlockReadBlock (
@@ -156,30 +173,34 @@ FwVolBlockReadBlock (
   IN OUT    UINTN                                *NumBytes,
   IN OUT    UINT8                                *Buffer
   )
-/*++
-
-Routine Description:
-  Read the specified number of bytes from the block to the input buffer.
-
-Arguments:
-  This          -  Indicates the calling context.
-  Lba           -  The starting logical block index to read.
-  Offset        -  Offset into the block at which to begin reading.
-  NumBytes      -  Pointer to a UINT32. At entry, *NumBytes contains the
-                   total size of the buffer. At exit, *NumBytes contains the
-                   total number of bytes actually read.
-  Buffer        -  Pinter to a caller-allocated buffer that contains the destine
-                   for the read.    
-
-Returns:      
-  EFI_SUCCESS  -  The firmware volume was read successfully.
-  EFI_BAD_BUFFER_SIZE -  The read was attempted across an LBA boundary.
-  EFI_ACCESS_DENIED  -  Access denied.
-  EFI_DEVICE_ERROR   -  The block device is malfunctioning and could not be read.
---*/
 ;
 
   
+
+/**
+  Writes the specified number of bytes from the input buffer to the block.
+
+  @param  This                   Indicates the calling context. 
+  @param  Lba                    The starting logical block index to write to. 
+  @param  Offset                 Offset into the block at which to begin writing. 
+  @param  NumBytes               Pointer to a UINT32. At entry, *NumBytes 
+                                 contains the total size of the buffer. At exit, 
+                                 *NumBytes contains the total number of bytes 
+                                 actually written. 
+  @param  Buffer                 Pinter to a caller-allocated buffer that 
+                                 contains the source for the write. 
+
+  @retval EFI_SUCCESS            The firmware volume was written successfully. 
+  @retval EFI_BAD_BUFFER_SIZE    The write was attempted across an LBA boundary. 
+                                 On output, NumBytes contains the total number of 
+                                 bytes actually written. 
+  @retval EFI_ACCESS_DENIED      The firmware volume is in the WriteDisabled 
+                                 state. 
+  @retval EFI_DEVICE_ERROR       The block device is malfunctioning and could not 
+                                 be written. 
+  @retval EFI_UNSUPPORTED        Not supported.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolBlockWriteBlock (
@@ -189,54 +210,47 @@ FwVolBlockWriteBlock (
   IN OUT UINTN                            *NumBytes,
   IN UINT8                                *Buffer
   )
-/*++
-
-Routine Description:
-  Writes the specified number of bytes from the input buffer to the block.
-
-Arguments:
-  This          -  Indicates the calling context.
-  Lba           -  The starting logical block index to write to.
-  Offset        -  Offset into the block at which to begin writing.
-  NumBytes      -  Pointer to a UINT32. At entry, *NumBytes contains the
-                   total size of the buffer. At exit, *NumBytes contains the
-                   total number of bytes actually written.
-  Buffer        -  Pinter to a caller-allocated buffer that contains the source
-                   for the write.    
-
-Returns:     
-  EFI_SUCCESS  -  The firmware volume was written successfully.
-  EFI_BAD_BUFFER_SIZE -  The write was attempted across an LBA boundary. On output,
-                         NumBytes contains the total number of bytes actually written.
-  EFI_ACCESS_DENIED  -  The firmware volume is in the WriteDisabled state.
-  EFI_DEVICE_ERROR   -  The block device is malfunctioning and could not be written.
-  EFI_UNSUPPORTED    -  Not supported.
---*/
 ;
 
     
+
+/**
+  Get Fvb's base address.
+
+  @param  This                   Indicates the calling context. 
+  @param  Address                Fvb device base address. 
+
+  @retval EFI_SUCCESS            Successfully got Fvb's base address. 
+  @retval EFI_UNSUPPORTED        Not supported.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolBlockGetPhysicalAddress (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
   OUT       EFI_PHYSICAL_ADDRESS                  *Address
   )
-/*++
-
-Routine Description:
-  Get Fvb's base address.
-
-Arguments:
-  This          -  Indicates the calling context.
-  Address       -  Fvb device base address.
-
-Returns:     
-  EFI_SUCCESS  -  Successfully got Fvb's base address.
-  EFI_UNSUPPORTED -  Not supported.
---*/
 ;
 
 
+
+/**
+  Retrieves the size in bytes of a specific block within a firmware volume.
+
+  @param  This                   Indicates the calling context. 
+  @param  Lba                    Indicates the block for which to return the 
+                                 size. 
+  @param  BlockSize              Pointer to a caller-allocated UINTN in which the 
+                                 size of the block is returned. 
+  @param  NumberOfBlocks         Pointer to a caller-allocated UINTN in which the 
+                                 number of consecutive blocks starting with Lba 
+                                 is returned. All blocks in this range have a 
+                                 size of BlockSize. 
+
+  @retval EFI_SUCCESS            The firmware volume base address is returned. 
+  @retval EFI_INVALID_PARAMETER  The requested LBA is out of range.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolBlockGetBlockSize (
@@ -245,71 +259,52 @@ FwVolBlockGetBlockSize (
   OUT       UINTN                               *BlockSize,
   OUT       UINTN                               *NumberOfBlocks
   )
-/*++
-
-Routine Description:
-  Retrieves the size in bytes of a specific block within a firmware volume.
-
-Arguments:
-  This            -  Indicates the calling context.
-  Lba             -  Indicates the block for which to return the size.
-  BlockSize       -  Pointer to a caller-allocated UINTN in which the size of the
-                     block is returned.
-  NumberOfBlocks  -  Pointer to a caller-allocated UINTN in which the number of
-                     consecutive blocks starting with Lba is returned. All blocks
-                     in this range have a size of BlockSize.   
-Returns:
-  EFI_SUCCESS  -  The firmware volume base address is returned.
-  EFI_INVALID_PARAMETER  -  The requested LBA is out of range.
---*/
 ;
+
+/**
+  This routine is the driver initialization entry point.  It initializes the
+  libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
+  produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
+
+  @param  ImageHandle            The image handle. 
+  @param  SystemTable            The system table. 
+
+  @retval EFI_SUCCESS            Successfully initialized firmware volume block 
+                                 driver.
+
+**/
 EFI_STATUS
 FwVolBlockDriverInit (
   IN EFI_HANDLE               ImageHandle,
   IN EFI_SYSTEM_TABLE         *SystemTable
   )
-/*++
-
-Routine Description:
-    This routine is the driver initialization entry point.  It initializes the
-    libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
-    produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
-Arguments:
-    ImageHandle   - The image handle.
-    SystemTable   - The system table.
-Returns:
-    Status code
-
---*/
 ;
 
+
+/**
+  This routine produces a firmware volume block protocol on a given
+  buffer.
+
+  @param  BaseAddress            base address of the firmware volume image 
+  @param  Length                 length of the firmware volume image 
+  @param  ParentHandle           handle of parent firmware volume, if this image 
+                                 came from an FV image file in another firmware 
+                                 volume (ala capsules) 
+  @param  FvProtocol             Firmware volume block protocol produced. 
+
+  @retval EFI_VOLUME_CORRUPTED   Volume corrupted. 
+  @retval EFI_OUT_OF_RESOURCES   No enough buffer to be allocated. 
+  @retval EFI_SUCCESS            Successfully produced a FVB protocol on given 
+                                 buffer.
+
+**/
 EFI_STATUS
 ProduceFVBProtocolOnBuffer (
   IN EFI_PHYSICAL_ADDRESS   BaseAddress,
   IN UINT64                 Length,
   IN EFI_HANDLE             ParentHandle,
-  OUT EFI_HANDLE            *FvProtocolHandle  OPTIONAL
+  OUT EFI_HANDLE            *FvProtocol  OPTIONAL
   )
-/*++
-
-Routine Description:
-    This routine produces a firmware volume block protocol on a given
-    buffer. 
-
-Arguments:
-    BaseAddress     - base address of the firmware volume image
-    Length          - length of the firmware volume image
-    ParentHandle    - handle of parent firmware volume, if this
-                      image came from an FV image file in another
-                      firmware volume (ala capsules)
-    FvProtocolHandle  - Firmware volume block protocol produced.
-    
-Returns:
-    EFI_VOLUME_CORRUPTED    - Volume corrupted.
-    EFI_OUT_OF_RESOURCES    - No enough buffer to be allocated.
-    EFI_SUCCESS             - Successfully produced a FVB protocol on given buffer.
-                     
---*/
 ;
 
 #endif

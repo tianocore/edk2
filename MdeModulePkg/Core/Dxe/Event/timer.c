@@ -19,12 +19,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Internal prototypes
 //
+/**
+  Returns the current system time.
+
+  @return The current system time
+
+**/
 STATIC
 UINT64
 CoreCurrentSystemTime (
   VOID
   );
 
+/**
+  Checks the sorted timer list against the current system time.
+  Signals any expired event timer.
+
+  @param  CheckEvent             Not used 
+  @param  Context                Not used
+
+**/
 STATIC
 VOID
 EFIAPI
@@ -33,6 +47,13 @@ CoreCheckTimers (
   IN VOID         *Context
   );
 
+/**
+  Inserts the timer event.
+
+  @param  Event                  Points to the internal structure of timer event 
+                                 to be installed
+
+**/
 STATIC
 VOID
 CoreInsertEventTimer (
@@ -54,25 +75,15 @@ static UINT64           mEfiSystemTime = 0;
 // Timer functions
 //
 
+
+/**
+  Initializes timer support.
+
+**/
 VOID
 CoreInitializeTimer (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Initializes timer support
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -86,26 +97,18 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 }
 
+
+/**
+  Returns the current system time.
+
+  @return The current system time
+
+**/
 STATIC
 UINT64
 CoreCurrentSystemTime (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Returns the current system time
-
-Arguments:
-
-  None
-
-Returns:
-
-  Returns the current system time
-
---*/
 {
   UINT64          SystemTime;
 
@@ -115,26 +118,19 @@ Returns:
   return SystemTime;
 }
 
+
+/**
+  Called by the platform code to process a tick.
+
+  @param  Duration               The number of 100ns elasped since the last call 
+                                 to TimerTick
+
+**/
 VOID
 EFIAPI
 CoreTimerTick (
   IN UINT64   Duration
   )
-/*++
-
-Routine Description:
-
-  Called by the platform code to process a tick.
-
-Arguments:
-
-  Duration    - The number of 100ns elasped since the last call to TimerTick
-
-Returns:
-
-  None
-
---*/
 {
   IEVENT          *Event;
 
@@ -166,6 +162,15 @@ Returns:
   CoreReleaseLock (&mEfiSystemTimeLock);
 }
 
+
+/**
+  Checks the sorted timer list against the current system time.
+  Signals any expired event timer.
+
+  @param  CheckEvent             Not used 
+  @param  Context                Not used
+
+**/
 STATIC
 VOID
 EFIAPI
@@ -173,24 +178,6 @@ CoreCheckTimers (
   IN EFI_EVENT            CheckEvent,
   IN VOID                 *Context
   )
-/*++
-
-Routine Description:
-
-  Checks the sorted timer list against the current system time.
-  Signals any expired event timer.
-
-Arguments:
-
-  CheckEvent  - Not used
-
-  Context     - Not used
-
-Returns:
-
-  None
-
---*/
 {
   UINT64                  SystemTime;
   IEVENT                  *Event;
@@ -255,26 +242,19 @@ Returns:
   CoreReleaseLock (&mEfiTimerLock);
 }
 
+
+/**
+  Inserts the timer event.
+
+  @param  Event                  Points to the internal structure of timer event 
+                                 to be installed
+
+**/
 STATIC
 VOID
 CoreInsertEventTimer (
   IN IEVENT   *Event
   )
-/*++
-
-Routine Description:
-
-  Inserts the timer event
-
-Arguments:
-
-  Event - Points to the internal structure of timer event to be installed
-
-Returns:
-
-  None
-
---*/
 {
   UINT64          TriggerTime;
   LIST_ENTRY      *Link;
@@ -305,6 +285,22 @@ Returns:
 
 
 
+
+/**
+  Sets the type of timer and the trigger time for a timer event.
+
+  @param  UserEvent              The timer event that is to be signaled at the 
+                                 specified time 
+  @param  Type                   The type of time that is specified in 
+                                 TriggerTime 
+  @param  TriggerTime            The number of 100ns units until the timer 
+                                 expires 
+
+  @retval EFI_SUCCESS            The event has been set to be signaled at the 
+                                 requested time 
+  @retval EFI_INVALID_PARAMETER  Event or Type is not valid
+
+**/
 EFI_STATUS
 EFIAPI
 CoreSetTimer (
@@ -312,24 +308,6 @@ CoreSetTimer (
   IN EFI_TIMER_DELAY      Type,
   IN UINT64               TriggerTime
   )
-/*++
-
-Routine Description:
-
-  Sets the type of timer and the trigger time for a timer event.
-
-Arguments:
-
-  UserEvent   - The timer event that is to be signaled at the specified time
-  Type        - The type of time that is specified in TriggerTime
-  TriggerTime - The number of 100ns units until the timer expires
-
-Returns:
-
-  EFI_SUCCESS           - The event has been set to be signaled at the requested time
-  EFI_INVALID_PARAMETER - Event or Type is not valid
-
---*/
 {
   IEVENT      *Event;
 

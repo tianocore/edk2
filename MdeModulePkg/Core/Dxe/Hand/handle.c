@@ -1,6 +1,6 @@
 /** @file 
 
-  UEFI handle & protocol handling
+  UEFI handle & protocol handling.
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -28,75 +28,48 @@ EFI_LOCK               gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL
 UINT64                 gHandleDatabaseKey    = 0;
 
 
+
+/**
+  Acquire lock on gProtocolDatabaseLock.
+
+**/
 VOID
 CoreAcquireProtocolLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Acquire lock on gProtocolDatabaseLock.
-  
-Arguments:
-
-  None
-  
-Returns:
-
-  None
-
---*/
 {
   CoreAcquireLock (&gProtocolDatabaseLock);
 }
 
 
+
+/**
+  Release lock on gProtocolDatabaseLock.
+
+**/
 VOID
 CoreReleaseProtocolLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Release lock on gProtocolDatabaseLock.
-  
-Arguments:
-
-  None
-  
-Returns:
-
-  None
-
---*/
 {
   CoreReleaseLock (&gProtocolDatabaseLock);
 }
 
 
+
+/**
+  Check whether a handle is a valid EFI_HANDLE
+
+  @param  UserHandle             The handle to check 
+
+  @retval EFI_INVALID_PARAMETER  The handle is NULL or not a valid EFI_HANDLE. 
+  @retval EFI_SUCCESS            The handle is valid EFI_HANDLE.
+
+**/
 EFI_STATUS
 CoreValidateHandle (
   IN  EFI_HANDLE                UserHandle
   )
-/*++
-
-Routine Description:
-
-  Check whether a handle is a valid EFI_HANDLE
-  
-Arguments:
-
-  UserHandle    - The handle to check
-  
-Returns:
-
-  EFI_INVALID_PARAMETER   - The handle is NULL or not a valid EFI_HANDLE.
-
-  EFI_SUCCESS             - The handle is valid EFI_HANDLE.
-
---*/
 {
   IHANDLE             *Handle;
 
@@ -111,30 +84,22 @@ Returns:
 }
 
 
+
+/**
+  Finds the protocol entry for the requested protocol.
+  The gProtocolDatabaseLock must be owned
+
+  @param  Protocol               The ID of the protocol 
+  @param  Create                 Create a new entry if not found 
+
+  @return Protocol entry
+
+**/
 PROTOCOL_ENTRY  *
 CoreFindProtocolEntry (
   IN EFI_GUID   *Protocol,
   IN BOOLEAN    Create
   )
-/*++
-
-Routine Description:
-
-  Finds the protocol entry for the requested protocol.
-  
-  The gProtocolDatabaseLock must be owned
-
-Arguments:
-  
-  Protocol  - The ID of the protocol 
-
-  Create    - Create a new entry if not found
-
-Returns:
-
-  Protocol entry
-
---*/
 {
   LIST_ENTRY          *Link;
   PROTOCOL_ENTRY      *Item;
@@ -190,34 +155,25 @@ Returns:
 }
 
 
+
+/**
+  Finds the protocol instance for the requested handle and protocol.
+  Note: This function doesn't do parameters checking, it's caller's responsibility
+  to pass in valid parameters.
+
+  @param  Handle                 The handle to search the protocol on 
+  @param  Protocol               GUID of the protocol 
+  @param  Interface              The interface for the protocol being searched 
+
+  @return Protocol instance (NULL: Not found)
+
+**/
 PROTOCOL_INTERFACE *
 CoreFindProtocolInterface (
   IN IHANDLE        *Handle,
   IN EFI_GUID       *Protocol,
   IN VOID           *Interface
   )
-/*++
-
-Routine Description:
-
-  Finds the protocol instance for the requested handle and protocol.
-  
-  Note: This function doesn't do parameters checking, it's caller's responsibility 
-        to pass in valid parameters.
-  
-Arguments:
-  
-  Handle    - The handle to search the protocol on
-  
-  Protocol  - GUID of the protocol
-
-  Interface - The interface for the protocol being searched
-
-Returns:
-
-  Protocol instance (NULL: Not found)
-
---*/  
 {
   PROTOCOL_INTERFACE  *Prot;
   PROTOCOL_ENTRY      *ProtEntry;
@@ -253,27 +209,22 @@ Returns:
   return Prot;
 }
 
+
+/**
+  Removes an event from a register protocol notify list on a protocol.
+
+  @param  Event                  The event to search for in the protocol 
+                                 database. 
+
+  @return EFI_SUCCESS   if the event was found and removed.
+  @return EFI_NOT_FOUND if the event was not found in the protocl database.
+
+**/
 STATIC
 EFI_STATUS
 CoreUnregisterProtocolNotifyEvent (
   IN EFI_EVENT      Event
   )
-/*++
-
-Routine Description:
-
-  Removes an event from a register protocol notify list on a protocol.
-
-Arguments:
-  
-  Event   - The event to search for in the protocol database.
-
-Returns:
-
-  EFI_SUCCESS   if the event was found and removed.
-  EFI_NOT_FOUND if the event was not found in the protocl database.
-
---*/
 {
   LIST_ENTRY         *Link;
   PROTOCOL_ENTRY     *ProtEntry;
@@ -308,25 +259,20 @@ Returns:
 }
 
 
+
+/**
+  Removes all the events in the protocol database that match Event.
+
+  @param  Event                  The event to search for in the protocol 
+                                 database. 
+
+  @return EFI_SUCCESS when done searching the entire database.
+
+**/
 EFI_STATUS
 CoreUnregisterProtocolNotify (
   IN EFI_EVENT      Event
   )
-/*++
-
-Routine Description:
-
-  Removes all the events in the protocol database that match Event.
-
-Arguments:
-  
-  Event   - The event to search for in the protocol database.
-
-Returns:
-
-  EFI_SUCCESS when done searching the entire database.
-
---*/
 {
   EFI_STATUS       Status;
 
@@ -339,6 +285,21 @@ Returns:
 
 
 
+
+/**
+  Wrapper function to CoreInstallProtocolInterfaceNotify.  This is the public API which
+  Calls the private one which contains a BOOLEAN parameter for notifications
+
+  @param  UserHandle             The handle to install the protocol handler on, 
+                                 or NULL if a new handle is to be allocated 
+  @param  Protocol               The protocol to add to the handle 
+  @param  InterfaceType          Indicates whether Interface is supplied in 
+                                 native form. 
+  @param  Interface              The interface for the protocol being added 
+
+  @return Status code
+
+**/
 EFI_STATUS
 EFIAPI
 CoreInstallProtocolInterface (
@@ -347,29 +308,6 @@ CoreInstallProtocolInterface (
   IN EFI_INTERFACE_TYPE InterfaceType,
   IN VOID               *Interface
   )
-/*++
-
-Routine Description:
-
-  Wrapper function to CoreInstallProtocolInterfaceNotify.  This is the public API which
-  Calls the private one which contains a BOOLEAN parameter for notifications
-
-Arguments:
-
-  UserHandle     - The handle to install the protocol handler on,
-                    or NULL if a new handle is to be allocated
-
-  Protocol       - The protocol to add to the handle
-
-  InterfaceType  - Indicates whether Interface is supplied in native form.
-
-  Interface      - The interface for the protocol being added
-
-Returns:
-
-  Status code    
-
---*/
 {
   return CoreInstallProtocolInterfaceNotify (
             UserHandle, 
@@ -380,6 +318,24 @@ Returns:
             );
 }
 
+
+/**
+  Installs a protocol interface into the boot services environment.
+
+  @param  UserHandle             The handle to install the protocol handler on, 
+                                 or NULL if a new handle is to be allocated 
+  @param  Protocol               The protocol to add to the handle 
+  @param  InterfaceType          Indicates whether Interface is supplied in 
+                                 native form. 
+  @param  Interface              The interface for the protocol being added 
+  @param  Notify                 indicates whether notify the notification list  
+                                 for this protocol 
+
+  @retval EFI_INVALID_PARAMETER  Invalid parameter 
+  @retval EFI_OUT_OF_RESOURCES   No enough buffer to allocate 
+  @retval EFI_SUCCESS            Protocol interface successfully installed
+
+**/
 EFI_STATUS
 CoreInstallProtocolInterfaceNotify (
   IN OUT EFI_HANDLE     *UserHandle,
@@ -388,35 +344,6 @@ CoreInstallProtocolInterfaceNotify (
   IN VOID               *Interface,
   IN BOOLEAN            Notify
   )
-/*++
-
-Routine Description:
-
-  Installs a protocol interface into the boot services environment.
-
-Arguments:
-
-  UserHandle     - The handle to install the protocol handler on,
-                   or NULL if a new handle is to be allocated
-
-  Protocol       - The protocol to add to the handle
-
-  InterfaceType  - Indicates whether Interface is supplied in native form.
-
-  Interface      - The interface for the protocol being added
-
-  Notify         - indicates whether notify the notification list 
-                   for this protocol
-
-Returns:
-
-  EFI_INVALID_PARAMETER     - Invalid parameter
-  
-  EFI_OUT_OF_RESOURCES       - No enough buffer to allocate
-  
-  EFI_SUCCESS               - Protocol interface successfully installed
-
---*/
 {
   PROTOCOL_INTERFACE  *Prot;
   PROTOCOL_ENTRY      *ProtEntry;
@@ -439,7 +366,7 @@ Returns:
   //
   // Print debug message
   //
-  DEBUG((EFI_D_ERROR | EFI_D_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
+  DEBUG((DEBUG_ERROR | DEBUG_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
 
   Status = EFI_OUT_OF_RESOURCES;
   Prot = NULL;
@@ -574,38 +501,32 @@ Done:
 
 
 
+
+/**
+  Installs a list of protocol interface into the boot services environment.
+  This function calls InstallProtocolInterface() in a loop. If any error
+  occures all the protocols added by this function are removed. This is
+  basically a lib function to save space.
+
+  @param  Handle                 The handle to install the protocol handlers on, 
+                                 or NULL if a new handle is to be allocated 
+  @param  ...                    EFI_GUID followed by protocol instance. A NULL 
+                                 terminates the  list. The pairs are the 
+                                 arguments to InstallProtocolInterface(). All the 
+                                 protocols are added to Handle. 
+
+  @retval EFI_INVALID_PARAMETER  Handle is NULL. 
+  @retval EFI_SUCCESS            Protocol interfaces successfully installed.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreInstallMultipleProtocolInterfaces (
   IN OUT EFI_HANDLE           *Handle,
   ...
   )
-/*++
-
-Routine Description:
-
-  Installs a list of protocol interface into the boot services environment.
-  This function calls InstallProtocolInterface() in a loop. If any error
-  occures all the protocols added by this function are removed. This is 
-  basically a lib function to save space.
-
-Arguments:
-
-  Handle      - The handle to install the protocol handlers on,
-                or NULL if a new handle is to be allocated
-  ...         - EFI_GUID followed by protocol instance. A NULL terminates the 
-                list. The pairs are the arguments to InstallProtocolInterface().
-                All the protocols are added to Handle.
-
-Returns:
-
-  EFI_INVALID_PARAMETER       - Handle is NULL.
-  
-  EFI_SUCCESS                 - Protocol interfaces successfully installed.
-
---*/
 {
-  VA_LIST                   args;
+  VA_LIST                   Args;
   EFI_STATUS                Status;
   EFI_GUID                  *Protocol;
   VOID                      *Interface;
@@ -628,17 +549,17 @@ Returns:
   //
   // Check for duplicate device path and install the protocol interfaces
   //
-  VA_START (args, Handle);
+  VA_START (Args, Handle);
   for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
     //
     // If protocol is NULL, then it's the end of the list
     //
-    Protocol = VA_ARG (args, EFI_GUID *);
+    Protocol = VA_ARG (Args, EFI_GUID *);
     if (Protocol == NULL) {
       break;
     }
 
-    Interface = VA_ARG (args, VOID *);
+    Interface = VA_ARG (Args, VOID *);
 
     //
     // Make sure you are installing on top a device path that has already been added.
@@ -666,10 +587,10 @@ Returns:
     //
     // Reset the va_arg back to the first argument.
     //
-    VA_START (args, Handle);
+    VA_START (Args, Handle);
     for (; Index > 1; Index--) {
-      Protocol = VA_ARG (args, EFI_GUID *);
-      Interface = VA_ARG (args, VOID *);
+      Protocol = VA_ARG (Args, EFI_GUID *);
+      Interface = VA_ARG (Args, VOID *);
       CoreUninstallProtocolInterface (*Handle, Protocol, Interface);
     }        
     *Handle = OldHandle;
@@ -682,32 +603,26 @@ Returns:
   return Status;
 }
 
+
+/**
+  Attempts to disconnect all drivers that are using the protocol interface being queried.
+  If failed, reconnect all drivers disconnected.
+  Note: This function doesn't do parameters checking, it's caller's responsibility
+  to pass in valid parameters.
+
+  @param  UserHandle             The handle on which the protocol is installed 
+  @param  Prot                   The protocol to disconnect drivers from 
+
+  @retval EFI_SUCCESS            Drivers using the protocol interface are all 
+                                 disconnected 
+  @retval EFI_ACCESS_DENIED      Failed to disconnect one or all of the drivers
+
+**/
 EFI_STATUS
 CoreDisconnectControllersUsingProtocolInterface (
   IN EFI_HANDLE           UserHandle,
   IN PROTOCOL_INTERFACE   *Prot
   )
-/*++
-
-Routine Description:
-
-  Attempts to disconnect all drivers that are using the protocol interface being queried.
-  If failed, reconnect all drivers disconnected.
-  
-  Note: This function doesn't do parameters checking, it's caller's responsibility 
-        to pass in valid parameters.
-
-Arguments:
-
-  UserHandle  - The handle on which the protocol is installed 
-  Prot        - The protocol to disconnect drivers from
-
-Returns:
-
-  EFI_SUCCESS       - Drivers using the protocol interface are all disconnected
-  EFI_ACCESS_DENIED - Failed to disconnect one or all of the drivers
-
---*/
 {
   EFI_STATUS            Status;
   BOOLEAN               ItemFound;
@@ -773,6 +688,20 @@ Returns:
 }
 
 
+
+/**
+  Uninstalls all instances of a protocol:interfacer from a handle.
+  If the last protocol interface is remove from the handle, the
+  handle is freed.
+
+  @param  UserHandle             The handle to remove the protocol handler from 
+  @param  Protocol               The protocol, of protocol:interface, to remove 
+  @param  Interface              The interface, of protocol:interface, to remove 
+
+  @retval EFI_INVALID_PARAMETER  Protocol is NULL. 
+  @retval EFI_SUCCESS            Protocol interface successfully uninstalled.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreUninstallProtocolInterface (
@@ -780,29 +709,6 @@ CoreUninstallProtocolInterface (
   IN EFI_GUID         *Protocol,
   IN VOID             *Interface
   )
-/*++
-
-Routine Description:
-
-  Uninstalls all instances of a protocol:interfacer from a handle. 
-  If the last protocol interface is remove from the handle, the 
-  handle is freed.
-
-Arguments:
-
-  UserHandle      - The handle to remove the protocol handler from
-
-  Protocol        - The protocol, of protocol:interface, to remove
-
-  Interface       - The interface, of protocol:interface, to remove
-
-Returns:
-
-  EFI_INVALID_PARAMETER       - Protocol is NULL.
-  
-  EFI_SUCCESS                 - Protocol interface successfully uninstalled.
-
---*/
 {
   EFI_STATUS            Status;
   IHANDLE               *Handle;
@@ -897,51 +803,45 @@ Done:
 
 
 
+
+/**
+  Uninstalls a list of protocol interface in the boot services environment.
+  This function calls UnisatllProtocolInterface() in a loop. This is
+  basically a lib function to save space.
+
+  @param  Handle                 The handle to uninstall the protocol 
+  @param  ...                    EFI_GUID followed by protocol instance. A NULL 
+                                 terminates the  list. The pairs are the 
+                                 arguments to UninstallProtocolInterface(). All 
+                                 the protocols are added to Handle. 
+
+  @return Status code
+
+**/
 EFI_STATUS
 EFIAPI
 CoreUninstallMultipleProtocolInterfaces (
   IN EFI_HANDLE           Handle,
   ...
   )
-/*++
-
-Routine Description:
-
-  Uninstalls a list of protocol interface in the boot services environment. 
-  This function calls UnisatllProtocolInterface() in a loop. This is 
-  basically a lib function to save space.
-
-Arguments:
-
-  Handle      - The handle to uninstall the protocol
-
-  ...         - EFI_GUID followed by protocol instance. A NULL terminates the 
-                list. The pairs are the arguments to UninstallProtocolInterface().
-                All the protocols are added to Handle.
-
-Returns:
-
-  Status code    
-
---*/
 {
   EFI_STATUS      Status;
-  VA_LIST         args;
+  VA_LIST         Args;
   EFI_GUID        *Protocol;
   VOID            *Interface;
   UINTN           Index;
 
-  VA_START (args, Handle);
+  VA_START (Args, Handle);
   for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
     //
     // If protocol is NULL, then it's the end of the list
     //
-    Protocol = VA_ARG (args, EFI_GUID *);
+    Protocol = VA_ARG (Args, EFI_GUID *);
     if (Protocol == NULL) {
       break;
     }
 
-    Interface = VA_ARG (args, VOID *);
+    Interface = VA_ARG (Args, VOID *);
 
     //
     // Uninstall it
@@ -957,10 +857,10 @@ Returns:
     //
     // Reset the va_arg back to the first argument.
     //
-    VA_START (args, Handle);
+    VA_START (Args, Handle);
     for (; Index > 1; Index--) {
-      Protocol = VA_ARG(args, EFI_GUID *);
-      Interface = VA_ARG(args, VOID *);
+      Protocol = VA_ARG(Args, EFI_GUID *);
+      Interface = VA_ARG(Args, VOID *);
       CoreInstallProtocolInterface (&Handle, Protocol, EFI_NATIVE_INTERFACE, Interface);
     }        
   }
@@ -968,29 +868,22 @@ Returns:
   return Status;
 }    
 
+
+/**
+  Locate a certain GUID protocol interface in a Handle's protocols.
+
+  @param  UserHandle             The handle to obtain the protocol interface on 
+  @param  Protocol               The GUID of the protocol 
+
+  @return The requested protocol interface for the handle
+
+**/
 STATIC
 PROTOCOL_INTERFACE  *
 CoreGetProtocolInterface (
   IN  EFI_HANDLE                UserHandle,
   IN  EFI_GUID                  *Protocol
   )
-/*++
-
-Routine Description:
-
-  Locate a certain GUID protocol interface in a Handle's protocols.
-
-Arguments:
-
-  UserHandle  - The handle to obtain the protocol interface on
-
-  Protocol    - The GUID of the protocol 
-
-Returns:
-
-  The requested protocol interface for the handle
-  
---*/  
 {
   EFI_STATUS          Status;
   PROTOCOL_ENTRY      *ProtEntry;
@@ -1019,6 +912,18 @@ Returns:
 }
 
 
+
+/**
+  Queries a handle to determine if it supports a specified protocol.
+
+  @param  UserHandle             The handle being queried. 
+  @param  Protocol               The published unique identifier of the protocol. 
+  @param  Interface              Supplies the address where a pointer to the 
+                                 corresponding Protocol Interface is returned. 
+
+  @return The requested protocol interface for the handle
+
+**/
 EFI_STATUS
 EFIAPI
 CoreHandleProtocol (
@@ -1026,26 +931,6 @@ CoreHandleProtocol (
   IN EFI_GUID         *Protocol,
   OUT VOID            **Interface
   )
-/*++
-
-Routine Description:
-
-  Queries a handle to determine if it supports a specified protocol.
-
-Arguments:
-
-  UserHandle  - The handle being queried.
-
-  Protocol    - The published unique identifier of the protocol.
-
-  Interface   - Supplies the address where a pointer to the corresponding Protocol
-               Interface is returned.
-
-Returns:
-
-  The requested protocol interface for the handle
-  
---*/  
 {
   return CoreOpenProtocol (
           UserHandle,     
@@ -1058,6 +943,27 @@ Returns:
 }
 
 
+
+/**
+  Locates the installed protocol handler for the handle, and
+  invokes it to obtain the protocol interface. Usage information
+  is registered in the protocol data base.
+
+  @param  UserHandle             The handle to obtain the protocol interface on 
+  @param  Protocol               The ID of the protocol 
+  @param  Interface              The location to return the protocol interface 
+  @param  ImageHandle            The handle of the Image that is opening the 
+                                 protocol interface specified by Protocol and 
+                                 Interface. 
+  @param  ControllerHandle       The controller handle that is requiring this 
+                                 interface. 
+  @param  Attributes             The open mode of the protocol interface 
+                                 specified by Handle and Protocol. 
+
+  @retval EFI_INVALID_PARAMETER  Protocol is NULL. 
+  @retval EFI_SUCCESS            Get the protocol interface.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreOpenProtocol (
@@ -1068,37 +974,6 @@ CoreOpenProtocol (
   IN  EFI_HANDLE                ControllerHandle,
   IN  UINT32                    Attributes
   )
-/*++
-
-Routine Description:
-
-  Locates the installed protocol handler for the handle, and
-  invokes it to obtain the protocol interface. Usage information
-  is registered in the protocol data base.
-
-Arguments:
-
-  UserHandle     - The handle to obtain the protocol interface on
-
-  Protocol       - The ID of the protocol 
-
-  Interface      - The location to return the protocol interface
-
-  ImageHandle       - The handle of the Image that is opening the protocol interface
-                    specified by Protocol and Interface.
-  
-  ControllerHandle  - The controller handle that is requiring this interface.
-
-  Attributes     - The open mode of the protocol interface specified by Handle
-                    and Protocol.
-
-Returns:
-
-  EFI_INVALID_PARAMETER       - Protocol is NULL.
-  
-  EFI_SUCCESS                 - Get the protocol interface.
-  
---*/
 {
   EFI_STATUS          Status;
   PROTOCOL_INTERFACE  *Prot;
@@ -1298,6 +1173,32 @@ Done:
 }
 
 
+
+/**
+  Closes a protocol on a handle that was opened using OpenProtocol().
+
+  @param  UserHandle             The handle for the protocol interface that was 
+                                 previously opened with OpenProtocol(), and is 
+                                 now being closed. 
+  @param  Protocol               The published unique identifier of the protocol. 
+                                 It is the caller's responsibility to pass in a 
+                                 valid GUID. 
+  @param  AgentHandle            The handle of the agent that is closing the 
+                                 protocol interface. 
+  @param  ControllerHandle       If the agent that opened a protocol is a driver 
+                                 that follows the EFI Driver Model, then this 
+                                 parameter is the controller handle that required 
+                                 the protocol interface. If the agent does not 
+                                 follow the EFI Driver Model, then this parameter 
+                                 is optional and may be NULL. 
+
+  @retval EFI_SUCCESS            The protocol instance was closed. 
+  @retval EFI_INVALID_PARAMETER  Handle, AgentHandle or ControllerHandle is not a 
+                                 valid EFI_HANDLE. 
+  @retval EFI_NOT_FOUND          Can not find the specified protocol or 
+                                 AgentHandle.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreCloseProtocol (
@@ -1306,31 +1207,6 @@ CoreCloseProtocol (
   IN  EFI_HANDLE                AgentHandle,
   IN  EFI_HANDLE                ControllerHandle  
   )
-/*++
-
-Routine Description:
-
-  Closes a protocol on a handle that was opened using OpenProtocol().
-
-Arguments:
-
-  UserHandle       -  The handle for the protocol interface that was previously opened
-                      with OpenProtocol(), and is now being closed.
-  Protocol         -  The published unique identifier of the protocol. It is the caller's
-                      responsibility to pass in a valid GUID.
-  AgentHandle      -  The handle of the agent that is closing the protocol interface.
-  ControllerHandle -  If the agent that opened a protocol is a driver that follows the
-                      EFI Driver Model, then this parameter is the controller handle
-                      that required the protocol interface. If the agent does not follow
-                      the EFI Driver Model, then this parameter is optional and may be NULL.
-
-Returns:
-
-  EFI_SUCCESS             - The protocol instance was closed.
-  EFI_INVALID_PARAMETER   - Handle, AgentHandle or ControllerHandle is not a valid EFI_HANDLE. 
-  EFI_NOT_FOUND           - Can not find the specified protocol or AgentHandle.
-  
---*/
 {
   EFI_STATUS          Status;
   PROTOCOL_INTERFACE  *ProtocolInterface;
@@ -1397,6 +1273,18 @@ Done:
 
 
 
+
+/**
+  Return information about Opened protocols in the system
+
+  @param  UserHandle             The handle to close the protocol interface on 
+  @param  Protocol               The ID of the protocol 
+  @param  EntryBuffer            A pointer to a buffer of open protocol 
+                                 information in the form of 
+                                 EFI_OPEN_PROTOCOL_INFORMATION_ENTRY structures. 
+  @param  EntryCount             Number of EntryBuffer entries
+
+**/
 EFI_STATUS
 EFIAPI
 CoreOpenProtocolInformation (
@@ -1405,27 +1293,6 @@ CoreOpenProtocolInformation (
   OUT EFI_OPEN_PROTOCOL_INFORMATION_ENTRY **EntryBuffer,
   OUT UINTN                               *EntryCount
   )
-/*++
-
-Routine Description:
-
-  Return information about Opened protocols in the system
-
-Arguments:
-
-  UserHandle  - The handle to close the protocol interface on
-
-  Protocol    - The ID of the protocol 
-
-  EntryBuffer - A pointer to a buffer of open protocol information in the form of
-                EFI_OPEN_PROTOCOL_INFORMATION_ENTRY structures.
-
-  EntryCount  - Number of EntryBuffer entries
-
-Returns:
-
-  
---*/
 {
   EFI_STATUS                          Status;
   PROTOCOL_INTERFACE                  *ProtocolInterface;
@@ -1500,6 +1367,30 @@ Done:
 
 
 
+
+/**
+  Retrieves the list of protocol interface GUIDs that are installed on a handle in a buffer allocated
+  from pool.
+
+  @param  UserHandle             The handle from which to retrieve the list of 
+                                 protocol interface GUIDs. 
+  @param  ProtocolBuffer         A pointer to the list of protocol interface GUID 
+                                 pointers that are installed on Handle. 
+  @param  ProtocolBufferCount    A pointer to the number of GUID pointers present 
+                                 in ProtocolBuffer. 
+
+  @retval EFI_SUCCESS            The list of protocol interface GUIDs installed 
+                                 on Handle was returned in ProtocolBuffer. The 
+                                 number of protocol interface GUIDs was returned 
+                                 in ProtocolBufferCount. 
+  @retval EFI_INVALID_PARAMETER  Handle is NULL. 
+  @retval EFI_INVALID_PARAMETER  Handle is not a valid EFI_HANDLE. 
+  @retval EFI_INVALID_PARAMETER  ProtocolBuffer is NULL. 
+  @retval EFI_INVALID_PARAMETER  ProtocolBufferCount is NULL. 
+  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the 
+                                 results.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreProtocolsPerHandle (
@@ -1507,35 +1398,6 @@ CoreProtocolsPerHandle (
   OUT EFI_GUID        ***ProtocolBuffer,
   OUT UINTN           *ProtocolBufferCount
   )
-/*++
-
-Routine Description:
-
-  Retrieves the list of protocol interface GUIDs that are installed on a handle in a buffer allocated
- from pool.
-
-Arguments:
-
-  UserHandle           - The handle from which to retrieve the list of protocol interface
-                          GUIDs.
-
-  ProtocolBuffer       - A pointer to the list of protocol interface GUID pointers that are
-                          installed on Handle.
-
-  ProtocolBufferCount  - A pointer to the number of GUID pointers present in
-                          ProtocolBuffer.
-
-Returns:
-  EFI_SUCCESS   -  The list of protocol interface GUIDs installed on Handle was returned in
-                   ProtocolBuffer. The number of protocol interface GUIDs was
-                   returned in ProtocolBufferCount.
-  EFI_INVALID_PARAMETER   -  Handle is NULL.
-  EFI_INVALID_PARAMETER   -  Handle is not a valid EFI_HANDLE.
-  EFI_INVALID_PARAMETER   -  ProtocolBuffer is NULL.
-  EFI_INVALID_PARAMETER   -  ProtocolBufferCount is NULL.
-  EFI_OUT_OF_RESOURCES    -  There is not enough pool memory to store the results.
-  
---*/
 {
   EFI_STATUS                          Status;
   IHANDLE                             *Handle;
@@ -1600,48 +1462,35 @@ Done:
 }
 
 
+
+/**
+  return handle database key.
+
+
+  @return Handle database key.
+
+**/
 UINT64
 CoreGetHandleDatabaseKey (
   VOID
   )
-/*++
-
-Routine Description:
-
-  return handle database key.
-
-Arguments:
-
-  None
-  
-Returns:
-  
-  Handle database key.
-  
---*/
 {
   return gHandleDatabaseKey;
 }
 
 
+
+/**
+  Go connect any handles that were created or modified while a image executed.
+
+  @param  Key                    The Key to show that the handle has been 
+                                 created/modified
+
+**/
 VOID
 CoreConnectHandlesByKey (
   UINT64  Key
   )
-/*++
-
-Routine Description:
-
-  Go connect any handles that were created or modified while a image executed.
-
-Arguments:
-
-  Key  -  The Key to show that the handle has been created/modified
-
-Returns:
-  
-  None
---*/
 {
   UINTN           Count;
   LIST_ENTRY      *Link;

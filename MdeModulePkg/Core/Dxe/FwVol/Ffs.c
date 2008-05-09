@@ -19,24 +19,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PHYSICAL_ADDRESS_TO_POINTER(Address) ((VOID *)((UINTN)(Address)))
 
 
+/**
+  Get the FFS file state by checking the highest bit set in the header's state field.
+
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
+  @param  FfsHeader      Points to the FFS file header 
+
+  @return FFS File state
+
+**/
 EFI_FFS_FILE_STATE
 GetFileState (
   IN UINT8                ErasePolarity,
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   )
-/*++
-
-Routine Description:
-  Get the FFS file state by checking the highest bit set in the header's state field
-
-Arguments:
-  ErasePolarity -  Erase polarity attribute of the firmware volume
-  FfsHeader     -  Points to the FFS file header
-    
-Returns:
-  FFS File state 
-    
---*/
 {
   EFI_FFS_FILE_STATE      FileState;
   UINT8                   HighestBit;
@@ -56,27 +52,24 @@ Returns:
 }
 
 
+
+/**
+  Check if a block of buffer is erased.
+
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
+  @param  InBuffer       The buffer to be checked 
+  @param  BufferSize     Size of the buffer in bytes 
+
+  @retval TRUE           The block of buffer is erased 
+  @retval FALSE          The block of buffer is not erased
+
+**/
 BOOLEAN
 IsBufferErased (
   IN UINT8    ErasePolarity,
   IN VOID     *InBuffer,
   IN UINTN    BufferSize
   )
-/*++
-
-Routine Description:
-  Check if a block of buffer is erased
-
-Arguments:
-  ErasePolarity -  Erase polarity attribute of the firmware volume
-  InBuffer      -  The buffer to be checked
-  BufferSize    -  Size of the buffer in bytes
-    
-Returns:
-  TRUE  -  The block of buffer is erased
-  FALSE -  The block of buffer is not erased
-    
---*/
 {
   UINTN   Count;
   UINT8   EraseByte;
@@ -99,35 +92,32 @@ Returns:
 }
 
 
+
+/**
+  Verify checksum of the firmware volume header.
+
+  @param  FvHeader       Points to the firmware volume header to be checked 
+
+  @retval TRUE           Checksum verification passed 
+  @retval FALSE          Checksum verification failed
+
+**/
 BOOLEAN
 VerifyFvHeaderChecksum (
   IN EFI_FIRMWARE_VOLUME_HEADER *FvHeader
   )
-/*++
-
-Routine Description:
-  Verify checksum of the firmware volume header 
-
-Arguments:
-  FvHeader  -  Points to the firmware volume header to be checked
-    
-Returns:
-  TRUE  -  Checksum verification passed
-  FALSE -  Checksum verification failed
-    
---*/
 {
   UINT32  Index;
   UINT32  HeaderLength;
   UINT16  Checksum;
-  UINT16  *ptr;
+  UINT16  *Ptr;
 
   HeaderLength = FvHeader->HeaderLength;
-  ptr = (UINT16 *)FvHeader;
+  Ptr = (UINT16 *)FvHeader;
   Checksum = 0;
 
   for (Index = 0; Index < HeaderLength / sizeof (UINT16); Index++) {
-    Checksum = (UINT16)(Checksum + ptr[Index]);
+    Checksum = (UINT16)(Checksum + Ptr[Index]);
   }
 
   if (Checksum == 0) {
@@ -137,33 +127,30 @@ Returns:
   }
 }
 
+
+/**
+  Verify checksum of the FFS file header.
+
+  @param  FfsHeader      Points to the FFS file header to be checked 
+
+  @retval TRUE           Checksum verification passed 
+  @retval FALSE          Checksum verification failed
+
+**/
 STATIC
 BOOLEAN
 VerifyHeaderChecksum (
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   )
-/*++
-
-Routine Description:
-  Verify checksum of the FFS file header 
-
-Arguments:
-  FfsHeader  -  Points to the FFS file header to be checked
-    
-Returns:
-  TRUE  -  Checksum verification passed
-  FALSE -  Checksum verification failed
-    
---*/
 {
   UINT32            Index;
-  UINT8             *ptr;
+  UINT8             *Ptr;
   UINT8             HeaderChecksum;
 
-  ptr = (UINT8 *)FfsHeader;
+  Ptr = (UINT8 *)FfsHeader;
   HeaderChecksum = 0;
   for (Index = 0; Index < sizeof(EFI_FFS_FILE_HEADER); Index++) {
-    HeaderChecksum = (UINT8)(HeaderChecksum + ptr[Index]);
+    HeaderChecksum = (UINT8)(HeaderChecksum + Ptr[Index]);
   }
 
   HeaderChecksum = (UINT8) (HeaderChecksum - FfsHeader->State - FfsHeader->IntegrityCheck.Checksum.File);
@@ -176,27 +163,24 @@ Returns:
 }
 
 
+
+/**
+  Check if it's a valid FFS file header.
+
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
+  @param  FfsHeader      Points to the FFS file header to be checked 
+  @param  FileState      FFS file state to be returned 
+
+  @retval TRUE           Valid FFS file header 
+  @retval FALSE          Invalid FFS file header
+
+**/
 BOOLEAN
 IsValidFfsHeader (
   IN UINT8                ErasePolarity,
   IN EFI_FFS_FILE_HEADER  *FfsHeader,
   OUT EFI_FFS_FILE_STATE  *FileState
   )
-/*++
-
-Routine Description:
-  Check if it's a valid FFS file header
-
-Arguments:
-  ErasePolarity -  Erase polarity attribute of the firmware volume
-  FfsHeader     -  Points to the FFS file header to be checked
-  FileState     -  FFS file state to be returned
-    
-Returns:
-  TRUE  -  Valid FFS file header
-  FALSE -  Invalid FFS file header
-    
---*/
 {
   *FileState = GetFileState (ErasePolarity, FfsHeader);
 
@@ -218,26 +202,23 @@ Returns:
 }
 
 
+
+/**
+  Check if it's a valid FFS file.
+  Here we are sure that it has a valid FFS file header since we must call IsValidFfsHeader() first.
+
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
+  @param  FfsHeader      Points to the FFS file to be checked 
+
+  @retval TRUE           Valid FFS file 
+  @retval FALSE          Invalid FFS file
+
+**/
 BOOLEAN
 IsValidFfsFile (
   IN UINT8                ErasePolarity,
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   )
-/*++
-
-Routine Description:
-  Check if it's a valid FFS file. 
-  Here we are sure that it has a valid FFS file header since we must call IsValidFfsHeader() first.
-
-Arguments:
-  ErasePolarity -  Erase polarity attribute of the firmware volume
-  FfsHeader     -  Points to the FFS file to be checked
-    
-Returns:
-  TRUE  -  Valid FFS file
-  FALSE -  Invalid FFS file
-    
---*/
 {
   EFI_FFS_FILE_STATE  FileState;
 
@@ -257,4 +238,5 @@ Returns:
       return FALSE;
   }
 }
+
 

@@ -17,7 +17,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 //
 // Driver Support Function Prototypes
-//
+// 
+/**
+  Connects a controller to a driver.
+
+  @param  ControllerHandle                      Handle of the controller to be 
+                                                connected. 
+  @param  ContextDriverImageHandles             DriverImageHandle A pointer to an 
+                                                ordered list of driver image 
+                                                handles. 
+  @param  RemainingDevicePath                   RemainingDevicePath A pointer to 
+                                                the device path that specifies a 
+                                                child  of the controller 
+                                                specified by ControllerHandle. 
+
+  @retval EFI_SUCCESS                           One or more drivers were 
+                                                connected to ControllerHandle. 
+  @retval EFI_OUT_OF_RESOURCES                  No enough system resources to 
+                                                complete the request. 
+  @retval EFI_NOT_FOUND                         No drivers were connected to 
+                                                ControllerHandle.
+
+**/
 EFI_STATUS 
 CoreConnectSingleController (
   IN  EFI_HANDLE                ControllerHandle,
@@ -28,6 +49,25 @@ CoreConnectSingleController (
 //
 // Driver Support Functions
 //
+
+/**
+  Connects one or more drivers to a controller.
+
+  @param  ControllerHandle                      Handle of the controller to be 
+                                                connected. 
+  @param  DriverImageHandle                     DriverImageHandle A pointer to an 
+                                                ordered list of driver image 
+                                                handles. 
+  @param  RemainingDevicePath                   RemainingDevicePath A pointer to 
+                                                the device path that specifies a 
+                                                child of the controller specified 
+                                                by ControllerHandle. 
+  @param  Recursive                             Whether the function would be 
+                                                called recursively or not. 
+
+  @return Status code.
+
+**/
 EFI_STATUS 
 EFIAPI
 CoreConnectController (
@@ -36,28 +76,6 @@ CoreConnectController (
   IN  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath  OPTIONAL,
   IN  BOOLEAN                   Recursive
   )
-/*++
-
-Routine Description:
-
-  Connects one or more drivers to a controller.
-
-Arguments:
-
-  ControllerHandle            - Handle of the controller to be connected.
-
-  DriverImageHandle           - DriverImageHandle A pointer to an ordered list of driver image handles.
-
-  RemainingDevicePath         - RemainingDevicePath A pointer to the device path that specifies a child of the
-                                controller specified by ControllerHandle.
-    
-  Recursive                   - Whether the function would be called recursively or not.
-
-Returns:
-
-  Status code.
-
---*/
 {
   EFI_STATUS                           Status;
   EFI_STATUS                           ReturnStatus;
@@ -195,6 +213,26 @@ Returns:
   return ReturnStatus;
 }
 
+
+/**
+  Add Driver Binding Protocols from Context Driver Image Handles to sorted
+  Driver Binding Protocol list.
+
+  @param  DriverBindingHandle                   Handle of the driver binding 
+                                                protocol. 
+  @param  NumberOfSortedDriverBindingProtocols  Number Of sorted driver binding 
+                                                protocols 
+  @param  SortedDriverBindingProtocols          The sorted protocol list. 
+  @param  DriverBindingHandleCount              Driver Binding Handle Count. 
+  @param  DriverBindingHandleBuffer             The buffer of driver binding 
+                                                protocol to be modified. 
+  @param  IsImageHandle                         Indicate whether 
+                                                DriverBindingHandle is an image 
+                                                handle 
+
+  @return None.
+
+**/
 VOID
 AddSortedDriverBindingProtocol (
   IN      EFI_HANDLE                   DriverBindingHandle,
@@ -204,32 +242,6 @@ AddSortedDriverBindingProtocol (
   IN OUT  EFI_HANDLE                   *DriverBindingHandleBuffer,
   IN      BOOLEAN                      IsImageHandle
   )
-/*++
-
-Routine Description:
-
-  Add Driver Binding Protocols from Context Driver Image Handles to sorted 
-   Driver Binding Protocol list.
-
-Arguments:
-
-  DriverBindingHandle - Handle of the driver binding protocol.
-
-  NumberOfSortedDriverBindingProtocols - Number Of sorted driver binding protocols
-
-  SortedDriverBindingProtocols - The sorted protocol list.                        
-    
-  DriverBindingHandleCount - Driver Binding Handle Count.
-
-  DriverBindingHandleBuffer - The buffer of driver binding protocol to be modified.
-
-  IsImageHandle - Indicate whether DriverBindingHandle is an image handle
-  
-Returns:
-
-  None.
-
---*/
 {
   EFI_STATUS                   Status;
   EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding;
@@ -324,32 +336,34 @@ Returns:
   }
 }
  
+
+/**
+  Connects a controller to a driver.
+
+  @param  ControllerHandle                      Handle of the controller to be 
+                                                connected. 
+  @param  ContextDriverImageHandles             DriverImageHandle A pointer to an 
+                                                ordered list of driver image 
+                                                handles. 
+  @param  RemainingDevicePath                   RemainingDevicePath A pointer to 
+                                                the device path that specifies a 
+                                                child  of the controller 
+                                                specified by ControllerHandle. 
+
+  @retval EFI_SUCCESS                           One or more drivers were 
+                                                connected to ControllerHandle. 
+  @retval EFI_OUT_OF_RESOURCES                  No enough system resources to 
+                                                complete the request. 
+  @retval EFI_NOT_FOUND                         No drivers were connected to 
+                                                ControllerHandle.
+
+**/
 EFI_STATUS 
 CoreConnectSingleController (
   IN  EFI_HANDLE                ControllerHandle,
   IN  EFI_HANDLE                *ContextDriverImageHandles OPTIONAL,
   IN  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath       OPTIONAL     
   )
-/*++
-
-Routine Description:
-
-  Connects a controller to a driver.
-
-Arguments:
-
-  ControllerHandle            - Handle of the controller to be connected.
-  ContextDriverImageHandles   - DriverImageHandle A pointer to an ordered list of driver image handles.
-  RemainingDevicePath         - RemainingDevicePath A pointer to the device path that specifies a child 
-                                of the controller specified by ControllerHandle.
-    
-Returns:
-
-  EFI_SUCCESS           - One or more drivers were connected to ControllerHandle.
-  EFI_OUT_OF_RESOURCES  - No enough system resources to complete the request.
-  EFI_NOT_FOUND         - No drivers were connected to ControllerHandle.
-
---*/
 {
   EFI_STATUS                                 Status;
   UINTN                                      Index;
@@ -610,6 +624,40 @@ Returns:
 }
 
 
+
+/**
+  Disonnects a controller from a driver
+
+  @param  ControllerHandle                      ControllerHandle The handle of 
+                                                the controller from which 
+                                                driver(s)  are to be 
+                                                disconnected. 
+  @param  DriverImageHandle                     DriverImageHandle The driver to 
+                                                disconnect from ControllerHandle. 
+  @param  ChildHandle                           ChildHandle The handle of the 
+                                                child to destroy. 
+
+  @retval EFI_SUCCESS                           One or more drivers were 
+                                                disconnected from the controller. 
+  @retval EFI_SUCCESS                           On entry, no drivers are managing 
+                                                ControllerHandle. 
+  @retval EFI_SUCCESS                           DriverImageHandle is not NULL, 
+                                                and on entry DriverImageHandle is 
+                                                not managing ControllerHandle. 
+  @retval EFI_INVALID_PARAMETER                 ControllerHandle is not a valid 
+                                                EFI_HANDLE. 
+  @retval EFI_INVALID_PARAMETER                 DriverImageHandle is not NULL, 
+                                                and it is not a valid EFI_HANDLE. 
+  @retval EFI_INVALID_PARAMETER                 ChildHandle is not NULL, and it 
+                                                is not a valid EFI_HANDLE. 
+  @retval EFI_OUT_OF_RESOURCES                  There are not enough resources 
+                                                available to disconnect any 
+                                                drivers from ControllerHandle. 
+  @retval EFI_DEVICE_ERROR                      The controller could not be 
+                                                disconnected because of a device 
+                                                error.
+
+**/
 EFI_STATUS 
 EFIAPI
 CoreDisconnectController (
@@ -617,31 +665,6 @@ CoreDisconnectController (
   IN  EFI_HANDLE  DriverImageHandle  OPTIONAL,
   IN  EFI_HANDLE  ChildHandle        OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  Disonnects a controller from a driver
-
-Arguments:
-
-  ControllerHandle  - ControllerHandle The handle of the controller from which driver(s) 
-                        are to be disconnected.
-  DriverImageHandle - DriverImageHandle The driver to disconnect from ControllerHandle.
-  ChildHandle       - ChildHandle The handle of the child to destroy.
-
-Returns:
-
-  EFI_SUCCESS           -  One or more drivers were disconnected from the controller.
-  EFI_SUCCESS           -  On entry, no drivers are managing ControllerHandle.
-  EFI_SUCCESS           -  DriverImageHandle is not NULL, and on entry DriverImageHandle is not managing ControllerHandle.
-  EFI_INVALID_PARAMETER -  ControllerHandle is not a valid EFI_HANDLE.
-  EFI_INVALID_PARAMETER -  DriverImageHandle is not NULL, and it is not a valid EFI_HANDLE.
-  EFI_INVALID_PARAMETER -  ChildHandle is not NULL, and it is not a valid EFI_HANDLE.
-  EFI_OUT_OF_RESOURCES  -  There are not enough resources available to disconnect any drivers from ControllerHandle.
-  EFI_DEVICE_ERROR      -  The controller could not be disconnected because of a device error.
-
---*/
 {
   EFI_STATUS                          Status;
   IHANDLE                             *Handle;

@@ -77,25 +77,15 @@ LIST_ENTRY      PoolHeadList;
 //
 //
 
+
+/**
+  Called to initialize the pool.
+
+**/
 VOID
 CoreInitializePool (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Called to initialize the pool.
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   UINTN  Type;
   UINTN  Index;
@@ -111,26 +101,20 @@ Returns:
   InitializeListHead (&PoolHeadList);
 }
 
+
+/**
+  Look up pool head for specified memory type.
+
+  @param  MemoryType             Memory type of which pool head is looked for 
+
+  @return Pointer of Corresponding pool head.
+
+**/
 STATIC
 POOL *
 LookupPoolHead (
   IN EFI_MEMORY_TYPE  MemoryType
   )
-/*++
-
-Routine Description:
-
-  Look up pool head for specified memory type.
-
-Arguments:
-
-  MemoryType      - Memory type of which pool head is looked for
-
-Returns:
-
-  Pointer of Corresponding pool head.
-
---*/
 {
   LIST_ENTRY      *Link;
   POOL            *Pool;
@@ -171,6 +155,20 @@ Returns:
 
  
 
+
+/**
+  Allocate pool of a particular type.
+
+  @param  PoolType               Type of pool to allocate 
+  @param  Size                   The amount of pool to allocate 
+  @param  Buffer                 The address to return a pointer to the allocated 
+                                 pool 
+
+  @retval EFI_INVALID_PARAMETER  PoolType not valid 
+  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed. 
+  @retval EFI_SUCCESS            Pool successfully allocated.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreAllocatePool (
@@ -178,29 +176,6 @@ CoreAllocatePool (
   IN UINTN            Size,
   OUT VOID            **Buffer
   )
-/*++
-
-Routine Description:
-
-  Allocate pool of a particular type.
-
-Arguments:
-
-  PoolType    - Type of pool to allocate
-
-  Size        - The amount of pool to allocate
-
-  Buffer      - The address to return a pointer to the allocated pool
-
-Returns:
-
-  EFI_INVALID_PARAMETER     - PoolType not valid
-  
-  EFI_OUT_OF_RESOURCES      - Size exceeds max pool size or allocation failed.  
-  
-  EFI_SUCCESS               - Pool successfully allocated.
-
---*/
 {
   EFI_STATUS    Status;
 
@@ -236,31 +211,22 @@ Returns:
 }
 
 
+
+/**
+  Internal function to allocate pool of a particular type.
+  Caller must have the memory lock held
+
+  @param  PoolType               Type of pool to allocate 
+  @param  Size                   The amount of pool to allocate 
+
+  @return The allocate pool, or NULL
+
+**/
 VOID *
 CoreAllocatePoolI (
   IN EFI_MEMORY_TYPE  PoolType,
   IN UINTN            Size
   )
-/*++
-
-Routine Description:
-
-  Internal function to allocate pool of a particular type.
-
-  Caller must have the memory lock held
-
-
-Arguments:
-
-  PoolType    - Type of pool to allocate
-
-  Size        - The amount of pool to allocate
-
-Returns:
-
-  The allocate pool, or NULL
-
---*/
 {
   POOL        *Pool;
   POOL_FREE   *Free;
@@ -270,7 +236,7 @@ Returns:
   VOID        *Buffer;
   UINTN       Index;
   UINTN       FSize;
-  UINTN       offset;
+  UINTN       Offset;
   UINTN       Adjustment;
   UINTN       NoPages;
 
@@ -322,23 +288,23 @@ Returns:
     //
     // Carve up new page into free pool blocks
     //
-    offset = 0;
-    while (offset < DEFAULT_PAGE_ALLOCATION) {
+    Offset = 0;
+    while (Offset < DEFAULT_PAGE_ALLOCATION) {
       ASSERT (Index < MAX_POOL_LIST);
       FSize = LIST_TO_SIZE(Index);
 
-      while (offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
-        Free = (POOL_FREE *) &NewPage[offset];          
+      while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
+        Free = (POOL_FREE *) &NewPage[Offset];          
         Free->Signature = POOL_FREE_SIGNATURE;
         Free->Index     = (UINT32)Index;
         InsertHeadList (&Pool->FreeList[Index], &Free->Link);
-        offset += FSize;
+        Offset += FSize;
       }
 
       Index -= 1;
     }
 
-    ASSERT (offset == DEFAULT_PAGE_ALLOCATION);
+    ASSERT (Offset == DEFAULT_PAGE_ALLOCATION);
     Index = SIZE_TO_LIST(Size);
   }
 
@@ -368,7 +334,7 @@ Done:
     DEBUG_CLEAR_MEMORY (Buffer, Size - POOL_OVERHEAD);
 
     DEBUG (
-      (EFI_D_POOL,
+      (DEBUG_POOL,
       "AllocatePoolI: Type %x, Addr %x (len %x) %,d\n",
        PoolType, 
        Buffer, 
@@ -382,7 +348,7 @@ Done:
     Pool->Used += Size;
 
   } else {
-    DEBUG ((EFI_D_ERROR | EFI_D_POOL, "AllocatePool: failed to allocate %d bytes\n", Size));
+    DEBUG ((DEBUG_ERROR | DEBUG_POOL, "AllocatePool: failed to allocate %d bytes\n", Size));
   }
 
   return Buffer;
@@ -390,28 +356,21 @@ Done:
   
 
 
+
+/**
+  Frees pool.
+
+  @param  Buffer                 The allocated pool entry to free 
+
+  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value. 
+  @retval EFI_SUCCESS            Pool successfully freed.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreFreePool (
   IN VOID        *Buffer
   )
-/*++
-
-Routine Description:
-
-  Frees pool.
-
-Arguments:
-
-  Buffer      - The allocated pool entry to free
-
-Returns:
-
-  EFI_INVALID_PARAMETER   - Buffer is not a valid value.
-  
-  EFI_SUCCESS             - Pool successfully freed.
-
---*/
 {
   EFI_STATUS Status;
 
@@ -426,30 +385,21 @@ Returns:
 }
 
 
+
+/**
+  Internal function to free a pool entry.
+  Caller must have the memory lock held
+
+  @param  Buffer                 The allocated pool entry to free 
+
+  @retval EFI_INVALID_PARAMETER  Buffer not valid 
+  @retval EFI_SUCCESS            Buffer successfully freed.
+
+**/
 EFI_STATUS
 CoreFreePoolI (
   IN VOID       *Buffer
   )
-/*++
-
-Routine Description:
-
-  Internal function to free a pool entry.
-
-  Caller must have the memory lock held
-
-
-Arguments:
-
-  Buffer      - The allocated pool entry to free
-
-Returns:
-
-  EFI_INVALID_PARAMETER     - Buffer not valid
-  
-  EFI_SUCCESS               - Buffer successfully freed.
-
---*/
 {
   POOL        *Pool;
   POOL_HEAD   *Head;
@@ -460,7 +410,7 @@ Returns:
   UINTN       Size;
   CHAR8       *NewPage;
   UINTN       FSize;
-  UINTN       offset;
+  UINTN       Offset;
   BOOLEAN     AllFree;
 
   ASSERT(NULL != Buffer);
@@ -501,7 +451,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
   Pool->Used -= Size;
-  DEBUG ((EFI_D_POOL, "FreePool: %x (len %x) %,d\n", Head->Data, Head->Size - POOL_OVERHEAD, Pool->Used));
+  DEBUG ((DEBUG_POOL, "FreePool: %x (len %x) %,d\n", Head->Data, Head->Size - POOL_OVERHEAD, Pool->Used));
 
   //
   // Determine the pool list 
@@ -545,17 +495,17 @@ Returns:
       Index = Free->Index;
 
       AllFree = TRUE;
-      offset = 0;
+      Offset = 0;
       
-      while ((offset < DEFAULT_PAGE_ALLOCATION) && (AllFree)) {
+      while ((Offset < DEFAULT_PAGE_ALLOCATION) && (AllFree)) {
         FSize = LIST_TO_SIZE(Index);
-        while (offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
-          Free = (POOL_FREE *) &NewPage[offset];
+        while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
+          Free = (POOL_FREE *) &NewPage[Offset];
           ASSERT(NULL != Free);
           if (Free->Signature != POOL_FREE_SIGNATURE) {
             AllFree = FALSE;
           }
-          offset += FSize;
+          Offset += FSize;
         }
         Index -= 1;
       }
@@ -570,15 +520,15 @@ Returns:
         Free = (POOL_FREE *) &NewPage[0];
         ASSERT(NULL != Free);
         Index = Free->Index;
-        offset = 0;
+        Offset = 0;
         
-        while (offset < DEFAULT_PAGE_ALLOCATION) {
+        while (Offset < DEFAULT_PAGE_ALLOCATION) {
           FSize = LIST_TO_SIZE(Index);
-          while (offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
-            Free = (POOL_FREE *) &NewPage[offset];
+          while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
+            Free = (POOL_FREE *) &NewPage[Offset];
             ASSERT(NULL != Free);
             RemoveEntryList (&Free->Link);
-            offset += FSize;
+            Offset += FSize;
           }
           Index -= 1;
         }
