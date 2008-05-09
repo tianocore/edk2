@@ -358,7 +358,7 @@ CoreCreateEventEx (
   //
   // If it's a notify type of event, check its parameters
   //
-  if ((Type & (EVT_NOTIFY_WAIT | EVT_NOTIFY_SIGNAL))) {
+  if ((Type & (EVT_NOTIFY_WAIT | EVT_NOTIFY_SIGNAL)) != 0) {
     //
     // Check for an invalid NotifyFunction or NotifyTpl
     //
@@ -381,7 +381,7 @@ CoreCreateEventEx (
   // Allcoate and initialize a new event structure.
   //
   Status = CoreAllocatePool (
-             (Type & EVT_RUNTIME) ? EfiRuntimeServicesData: EfiBootServicesData,
+             ((Type & EVT_RUNTIME) != 0) ? EfiRuntimeServicesData: EfiBootServicesData,
              sizeof (IEVENT),
              (VOID **)&IEvent
              );
@@ -404,7 +404,7 @@ CoreCreateEventEx (
 
   *Event = IEvent;
 
-  if (Type & EVT_RUNTIME) {
+  if ((Type & EVT_RUNTIME) != 0) {
     //
     // Keep a list of all RT events so we can tell the RT AP.
     //

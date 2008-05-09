@@ -586,11 +586,11 @@ CoreConvertSpace (
   }
 
   Map = NULL;
-  if (Operation & GCD_MEMORY_SPACE_OPERATION) {
+  if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreAcquireGcdMemoryLock ();
     Map = &mGcdMemorySpaceMap;
   }
-  if (Operation & GCD_IO_SPACE_OPERATION) {
+  if ((Operation & GCD_IO_SPACE_OPERATION) != 0) {
     CoreAcquireGcdIoLock ();
     Map = &mGcdIoSpaceMap;
   }
@@ -666,7 +666,7 @@ CoreConvertSpace (
     // Set attribute operations
     //
     case GCD_SET_ATTRIBUTES_MEMORY_OPERATION:
-      if (Attributes & EFI_MEMORY_RUNTIME) {
+      if ((Attributes & EFI_MEMORY_RUNTIME) != 0) {
         if ((BaseAddress & EFI_PAGE_MASK) != 0 || (Length & EFI_PAGE_MASK) != 0) {
           Status = EFI_INVALID_PARAMETER;
 
@@ -775,10 +775,10 @@ CoreConvertSpace (
   Status = CoreCleanupGcdMapEntry (TopEntry, BottomEntry, StartLink, EndLink, Map);
 
 Done:
-  if (Operation & GCD_MEMORY_SPACE_OPERATION) {
+  if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreReleaseGcdMemoryLock ();
   }
-  if (Operation & GCD_IO_SPACE_OPERATION) {
+  if ((Operation & GCD_IO_SPACE_OPERATION) != 0) {
     CoreReleaseGcdIoLock ();
   }
 
@@ -902,11 +902,11 @@ CoreAllocateSpace (
   }
 
   Map = NULL;
-  if (Operation & GCD_MEMORY_SPACE_OPERATION) {
+  if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreAcquireGcdMemoryLock ();
     Map = &mGcdMemorySpaceMap;
   }
-  if (Operation & GCD_IO_SPACE_OPERATION) {
+  if ((Operation & GCD_IO_SPACE_OPERATION) != 0) {
     CoreAcquireGcdIoLock ();
     Map = &mGcdIoSpaceMap;
   }
@@ -1073,10 +1073,10 @@ CoreAllocateSpace (
   Status = CoreCleanupGcdMapEntry (TopEntry, BottomEntry, StartLink, EndLink, Map);
 
 Done:
-  if (Operation & GCD_MEMORY_SPACE_OPERATION) {
+  if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreReleaseGcdMemoryLock ();
   }
-  if (Operation & GCD_IO_SPACE_OPERATION) {
+  if ((Operation & GCD_IO_SPACE_OPERATION) !=0) {
     CoreReleaseGcdIoLock ();
   }
 

@@ -332,7 +332,7 @@ CoreLoadPeImage (
   // is used to relocate the image when SetVirtualAddressMap() is called. The
   // relocation is done by the Runtime AP.
   //
-  if (Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION) {
+  if ((Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION) != 0) {
     if (Image->ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) {
       Image->ImageContext.FixupData = CoreAllocateRuntimePool ((UINTN)(Image->ImageContext.FixupDataSize));
       if (Image->ImageContext.FixupData == NULL) {
@@ -432,7 +432,7 @@ CoreLoadPeImage (
   Image->Info.ImageSize     = Image->ImageContext.ImageSize;
   Image->Info.ImageCodeType = (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType);
   Image->Info.ImageDataType = (EFI_MEMORY_TYPE) (Image->ImageContext.ImageDataMemoryType);
-  if (Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION) {
+  if ((Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION) != 0) {
     if (Image->ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) {
       //
       // Make a list off all the RT images so we can let the RT AP know about them.
@@ -754,7 +754,7 @@ CoreLoadImageCommon (
   //
   // Register the image in the Debug Image Info Table if the attribute is set
   //
-  if (Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_DEBUG_IMAGE_INFO_TABLE_REGISTRATION) {
+  if ((Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_DEBUG_IMAGE_INFO_TABLE_REGISTRATION) != 0) {
     CoreNewDebugImageInfoEntry (EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL, &Image->Info, Image->Handle);
   }
 
@@ -1014,7 +1014,7 @@ CoreStartImage (
   // The initial call to SetJump() must always return 0.
   // Subsequent calls to LongJump() cause a non-zero value to be returned by SetJump().
   //
-  if (!SetJumpFlag) {
+  if (SetJumpFlag == 0) {
     //
     // Call the image's entry point
     //
