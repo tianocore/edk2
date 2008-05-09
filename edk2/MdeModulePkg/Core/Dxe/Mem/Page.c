@@ -557,7 +557,7 @@ CoreFreeMemoryMapStack (
   //
   // If already freeing the map stack, then return
   //
-  if (mFreeMapStack) {
+  if (mFreeMapStack != 0) {
     return ;
   }
 
@@ -566,7 +566,7 @@ CoreFreeMemoryMapStack (
   //
   mFreeMapStack += 1;
 
-  while (mMapDepth) {
+  while (mMapDepth != 0) {
     //
     // Deque an memory map entry from mFreeMemoryMapEntryList 
     //
@@ -730,7 +730,7 @@ CoreConvertPages (
   ASSERT (End > Start) ;
   ASSERT_LOCKED (&gMemoryLock);
 
-  if (NumberOfPages == 0 || (Start & EFI_PAGE_MASK ) || (Start > (Start + NumberOfBytes))) {
+  if (NumberOfPages == 0 || ((Start & EFI_PAGE_MASK) != 0) || (Start > (Start + NumberOfBytes))) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1042,9 +1042,9 @@ FindFreePages (
   }
 
   Start = CoreFindFreePagesI (NewMaxAddress, NoPages, NewType, Alignment);
-  if (!Start) {
+  if (Start == 0) {
     Start = CoreFindFreePagesI (MaxAddress, NoPages, NewType, Alignment);
-    if (!Start) {
+    if (Start == 0) {
       //
       // Here means there may be no enough memory to use, so try to go through
       // all the memory descript to promote the untested memory directly

@@ -467,7 +467,7 @@ CoreGrowBuffer (
   //
   // If there's an error, free the buffer
   //
-  if ((!TryAgain) && (EFI_ERROR (*Status)) && (*Buffer)) {
+  if ((!TryAgain) && (EFI_ERROR (*Status)) && (*Buffer != NULL)) {
     CoreFreePool (*Buffer);
     *Buffer = NULL;
   }

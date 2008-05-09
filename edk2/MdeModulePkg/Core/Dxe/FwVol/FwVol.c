@@ -272,7 +272,7 @@ FvCheck (
   //
   // Scan to check the free space & File list
   //
-  if (FvbAttributes & EFI_FVB2_ERASE_POLARITY) {
+  if ((FvbAttributes & EFI_FVB2_ERASE_POLARITY) != 0) {
     FvDevice->ErasePolarity = 1;
   } else {
     FvDevice->ErasePolarity = 0;
