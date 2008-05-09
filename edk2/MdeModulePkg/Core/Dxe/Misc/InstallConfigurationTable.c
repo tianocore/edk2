@@ -20,30 +20,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 UINTN mSystemTableAllocateSize = 0;
 
 
+
+/**
+  Find a config table by name in system table's ConfigurationTable.
+
+  @param  Guid           The table name to look for 
+  @param  Table          Pointer of the config table 
+
+  @retval EFI_NOT_FOUND  Could not find the table in system table's 
+                         ConfigurationTable. 
+  @retval EFI_SUCCESS    Table successfully found.
+
+**/
 EFI_STATUS
 CoreGetConfigTable (
   IN EFI_GUID *Guid,
   OUT VOID    **Table
   )
-/*++
-
-Routine Description:
-
-  Find a config table by name in system table's ConfigurationTable.
-
-Arguments:
-
-  Guid        - The table name to look for
-  
-  Table       - Pointer of the config table
-
-Returns: 
-
-  EFI_NOT_FOUND       - Could not find the table in system table's ConfigurationTable.
-  
-  EFI_SUCCESS         - Table successfully found.
-
---*/
 {
   UINTN Index;
 
@@ -59,33 +52,28 @@ Returns:
 
 
 
+
+/**
+  Boot Service called to add, modify, or remove a system configuration table from
+  the EFI System Table.
+
+  @param  Guid           Pointer to the GUID for the entry to add, update, or 
+                         remove 
+  @param  Table          Pointer to the configuration table for the entry to add, 
+                         update, or remove, may be NULL. 
+
+  @return EFI_SUCCESS               Guid, Table pair added, updated, or removed.
+  @return EFI_INVALID_PARAMETER     Input GUID not valid.
+  @return EFI_NOT_FOUND             Attempted to delete non-existant entry
+  @return EFI_OUT_OF_RESOURCES      Not enough memory available
+
+**/
 EFI_STATUS
 EFIAPI
 CoreInstallConfigurationTable (
   IN EFI_GUID *Guid,
   IN VOID     *Table
   )
-/*++
-
-Routine Description:
-
-  Boot Service called to add, modify, or remove a system configuration table from 
-  the EFI System Table.
-
-Arguments:
-
-  Guid     -  Pointer to the GUID for the entry to add, update, or remove
-  Table    -  Pointer to the configuration table for the entry to add, update, or
-              remove, may be NULL.
-
-Returns:
-  
-  EFI_SUCCESS               Guid, Table pair added, updated, or removed.
-  EFI_INVALID_PARAMETER     Input GUID not valid.
-  EFI_NOT_FOUND             Attempted to delete non-existant entry
-  EFI_OUT_OF_RESOURCES      Not enough memory available
-
---*/
 {
   UINTN                   Index;
   EFI_CONFIGURATION_TABLE *EfiConfigurationTable;

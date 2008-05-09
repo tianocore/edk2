@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Section Extraction Protocol implementation.
   
   Stream database is implemented as a linked list of section streams,
@@ -27,7 +27,7 @@
   3) A support protocol is not found, and the data is not available to be read
      without it.  This results in EFI_PROTOCOL_ERROR.
      
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -100,6 +100,21 @@ typedef struct {
 // Local prototypes
 //
 
+/**
+  Worker function.  Determine if the input stream:child matches the input type.
+
+  @param  Stream                 Indicates the section stream associated with the 
+                                 child 
+  @param  Child                  Indicates the child to check 
+  @param  SearchType             Indicates the type of section to check against 
+                                 for 
+  @param  SectionDefinitionGuid  Indicates the GUID to check against if the type 
+                                 is EFI_SECTION_GUID_DEFINED 
+
+  @retval TRUE                   The child matches 
+  @retval FALSE                  The child doesn't match
+
+**/
 STATIC
 BOOLEAN
 ChildIsType (
@@ -110,6 +125,15 @@ ChildIsType (
   );
 
 #if 0
+/**
+  RPN callback function.  Removes a stale section stream and re-initializes it
+  with an updated AuthenticationStatus.
+
+  @param  Event                  The event that fired 
+  @param  RpnContext             A pointer to the context that allows us to 
+                                 identify the relevent encapsulation...
+
+**/
 STATIC
 VOID
 EFIAPI
@@ -120,6 +144,16 @@ NotifyGuidedExtraction (
 #endif
 
 #if 0
+/**
+  Worker function.  Constructor for RPN event if needed to keep AuthenticationStatus
+  cache correct when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears.
+
+  @param  ParentStream           Indicates the parent of the ecnapsulation 
+                                 section (child) 
+  @param  ChildNode              Indicates the child node that is the 
+                                 encapsulation section.
+
+**/
 STATIC
 VOID
 CreateGuidedExtractionRpnEvent (
@@ -128,6 +162,18 @@ CreateGuidedExtractionRpnEvent (
   );
 #endif
 
+/**
+  Worker function.  Search stream database for requested stream handle.
+
+  @param  SearchHandle           Indicates which stream to look for. 
+  @param  FoundStream            Output pointer to the found stream. 
+
+  @retval EFI_SUCCESS            StreamHandle was found and *FoundStream contains 
+                                 the stream node. 
+  @retval EFI_NOT_FOUND          SearchHandle was not found in the stream 
+                                 database.
+
+**/
 STATIC
 EFI_STATUS
 FindStreamNode (
@@ -135,6 +181,32 @@ FindStreamNode (
   OUT CORE_SECTION_STREAM_NODE                **FoundStream
   );
   
+/**
+  Worker function  Recursively searches / builds section stream database
+  looking for requested section.
+
+  @param  SourceStream           Indicates the section stream in which to do the 
+                                 search. 
+  @param  SearchType             Indicates the type of section to search for. 
+  @param  SectionInstance        Indicates which instance of section to find.  
+                                 This is an in/out parameter to deal with 
+                                 recursions. 
+  @param  SectionDefinitionGuid  Guid of section definition 
+  @param  FoundChild             Output indicating the child node that is found. 
+  @param  FoundStream            Output indicating which section stream the child 
+                                 was found in.  If this stream was generated as a 
+                                 result of an encapsulation section, the 
+                                 streamhandle is visible within the SEP driver 
+                                 only.
+  @param  AuthenticationStatus   Indicates the authentication status of the found section. 
+
+  @retval EFI_SUCCESS            Child node was found and returned. 
+                                 EFI_OUT_OF_RESOURCES- Memory allocation failed. 
+  @retval EFI_NOT_FOUND          Requested child node does not exist. 
+  @retval EFI_PROTOCOL_ERROR     a required GUIDED section extraction protocol 
+                                 does not exist
+
+**/
 STATIC
 EFI_STATUS
 FindChildNode (
@@ -147,6 +219,27 @@ FindChildNode (
   OUT    UINT32                               *AuthenticationStatus
   );
   
+/**
+  Worker function.  Constructor for new child nodes.
+
+  @param  Stream                 Indicates the section stream in which to add the 
+                                 child. 
+  @param  ChildOffset            Indicates the offset in Stream that is the 
+                                 beginning of the child section. 
+  @param  ChildNode              Indicates the Callee allocated and initialized 
+                                 child. 
+
+  @retval EFI_SUCCESS            Child node was found and returned. 
+                                 EFI_OUT_OF_RESOURCES- Memory allocation failed. 
+  @retval EFI_PROTOCOL_ERROR     Encapsulation sections produce new stream 
+                                 handles when the child node is created.  If the 
+                                 section type is GUID defined, and the extraction 
+                                 GUID does not exist, and producing the stream 
+                                 requires the GUID, then a protocol error is 
+                                 generated and no child is produced. Values 
+                                 returned by OpenSectionStreamEx.
+
+**/
 STATIC
 EFI_STATUS
 CreateChildNode (
@@ -155,12 +248,51 @@ CreateChildNode (
   OUT    CORE_SECTION_CHILD_NODE              **ChildNode
   );
   
+/**
+  Worker function.  Destructor for child nodes.
+
+  @param  ChildNode              Indicates the node to destroy
+
+**/
 STATIC
 VOID
 FreeChildNode (
   IN  CORE_SECTION_CHILD_NODE                 *ChildNode
   );
   
+/**
+  Worker function.  Constructor for section streams.
+
+  @param  SectionStreamLength    Size in bytes of the section stream. 
+  @param  SectionStream          Buffer containing the new section stream. 
+  @param  AllocateBuffer         Indicates whether the stream buffer is to be 
+                                 copied or the input buffer is to be used in 
+                                 place. AuthenticationStatus- Indicates the 
+                                 default authentication status for the new 
+                                 stream. 
+  @param  AuthenticationStatus   A pointer to a caller-allocated UINT32 that
+                                 indicates the authentication status of the
+                                 output buffer. If the input section¡¯s
+                                 GuidedSectionHeader.Attributes field
+                                 has the EFI_GUIDED_SECTION_AUTH_STATUS_VALID
+                                 bit as clear, AuthenticationStatus must return
+                                 zero. Both local bits (19:16) and aggregate
+                                 bits (3:0) in AuthenticationStatus are returned
+                                 by ExtractSection(). These bits reflect the
+                                 status of the extraction operation. The bit
+                                 pattern in both regions must be the same, as
+                                 the local and aggregate authentication statuses
+                                 have equivalent meaning at this level. If the
+                                 function returns anything other than
+                                 EFI_SUCCESS, the value of *AuthenticationStatus
+                                 is undefined.
+  @param  SectionStreamHandle    A pointer to a caller allocated section stream 
+                                 handle. 
+
+  @retval EFI_SUCCESS            Stream was added to stream database. 
+  @retval EFI_OUT_OF_RESOURCES   memory allocation failed.
+
+**/
 STATIC
 EFI_STATUS
 OpenSectionStreamEx (
@@ -171,6 +303,15 @@ OpenSectionStreamEx (
      OUT UINTN                                *SectionStreamHandle
   );
   
+/**
+  Check if a stream is valid.
+
+  @param  SectionStream          The section stream to be checked 
+  @param  SectionStreamLength    The length of section stream 
+
+  @return A boolean value indicating the validness of the section stream.
+
+**/
 STATIC
 BOOLEAN
 IsValidSectionStream (
@@ -178,6 +319,90 @@ IsValidSectionStream (
   IN  UINTN                                   SectionStreamLength
   );
 
+/**
+  The ExtractSection() function processes the input section and
+  allocates a buffer from the pool in which it returns the section
+  contents. If the section being extracted contains
+  authentication information (the section's
+  GuidedSectionHeader.Attributes field has the
+  EFI_GUIDED_SECTION_AUTH_STATUS_VALID bit set), the values
+  returned in AuthenticationStatus must reflect the results of
+  the authentication operation. Depending on the algorithm and
+  size of the encapsulated data, the time that is required to do
+  a full authentication may be prohibitively long for some
+  classes of systems. To indicate this, use
+  EFI_SECURITY_POLICY_PROTOCOL_GUID, which may be published by
+  the security policy driver (see the Platform Initialization
+  Driver Execution Environment Core Interface Specification for
+  more details and the GUID definition). If the
+  EFI_SECURITY_POLICY_PROTOCOL_GUID exists in the handle
+  database, then, if possible, full authentication should be
+  skipped and the section contents simply returned in the
+  OutputBuffer. In this case, the
+  EFI_AUTH_STATUS_PLATFORM_OVERRIDE bit AuthenticationStatus
+  must be set on return. ExtractSection() is callable only from
+  TPL_NOTIFY and below. Behavior of ExtractSection() at any
+  EFI_TPL above TPL_NOTIFY is undefined. Type EFI_TPL is
+  defined in RaiseTPL() in the UEFI 2.0 specification.
+
+  
+  @param This         Indicates the
+                      EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
+
+  @param InputSection Buffer containing the input GUIDed section
+                      to be processed. OutputBuffer OutputBuffer
+                      is allocated from boot services pool
+                      memory and contains the new section
+                      stream. The caller is responsible for
+                      freeing this buffer.
+  @param OutputBuffer *OutputBuffer is allocated from boot services
+                      pool memory and contains the new section stream.
+                      The caller is responsible for freeing this buffer.
+  @param OutputSize   A pointer to a caller-allocated UINTN in
+                      which the size of OutputBuffer allocation
+                      is stored. If the function returns
+                      anything other than EFI_SUCCESS, the value
+                      of OutputSize is undefined.
+
+  @param AuthenticationStatus A pointer to a caller-allocated
+                              UINT32 that indicates the
+                              authentication status of the
+                              output buffer. If the input
+                              section's
+                              GuidedSectionHeader.Attributes
+                              field has the
+                              EFI_GUIDED_SECTION_AUTH_STATUS_VAL
+                              bit as clear, AuthenticationStatus
+                              must return zero. Both local bits
+                              (19:16) and aggregate bits (3:0)
+                              in AuthenticationStatus are
+                              returned by ExtractSection().
+                              These bits reflect the status of
+                              the extraction operation. The bit
+                              pattern in both regions must be
+                              the same, as the local and
+                              aggregate authentication statuses
+                              have equivalent meaning at this
+                              level. If the function returns
+                              anything other than EFI_SUCCESS,
+                              the value of AuthenticationStatus
+                              is undefined.
+
+
+  @retval EFI_SUCCESS          The InputSection was successfully
+                               processed and the section contents were
+                               returned.
+
+  @retval EFI_OUT_OF_RESOURCES The system has insufficient
+                               resources to process the
+                               request.
+
+  @retval EFI_INVALID_PARAMETER The GUID in InputSection does
+                                not match this instance of the
+                                GUIDed Section Extraction
+                                Protocol.
+
+**/
 EFI_STATUS
 EFIAPI
 CustomGuidedSectionExtract (
@@ -198,27 +423,24 @@ EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL mCustomGuidedSectionExtractionProtocol = 
   CustomGuidedSectionExtract
 };
                                              
+
+/**
+  Entry point of the section extraction code. Initializes an instance of the
+  section extraction interface and installs it on a new handle.
+
+  @param  ImageHandle   A handle for the image that is initializing this driver
+  @param  SystemTable   A pointer to the EFI system table
+
+  @retval EFI_SUCCESS           Driver initialized successfully
+  @retval EFI_OUT_OF_RESOURCES  Could not allocate needed resources
+
+**/
 EFI_STATUS
 EFIAPI
 InitializeSectionExtraction (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
   )
-/*++
-
-Routine Description: 
-  Entry point of the section extraction code. Initializes an instance of the 
-  section extraction interface and installs it on a new handle.
-
-Arguments:  
-  ImageHandle   EFI_HANDLE: A handle for the image that is initializing this driver
-  SystemTable   EFI_SYSTEM_TABLE: A pointer to the EFI system table        
-
-Returns:  
-  EFI_SUCCESS:  Driver initialized successfully
-  EFI_OUT_OF_RESOURCES:   Could not allocate needed resources
-
---*/
 {
   EFI_STATUS                         Status;
   EFI_GUID                           *ExtractHandlerGuidTable;
@@ -246,6 +468,22 @@ Returns:
   return Status;
 }
 
+
+/**
+  SEP member function.  This function creates and returns a new section stream
+  handle to represent the new section stream.
+
+  @param  SectionStreamLength    Size in bytes of the section stream. 
+  @param  SectionStream          Buffer containing the new section stream. 
+  @param  SectionStreamHandle    A pointer to a caller allocated UINTN that on 
+                                 output contains the new section stream handle. 
+
+  @retval EFI_SUCCESS            The section stream is created successfully.
+  @retval EFI_OUT_OF_RESOURCES   memory allocation failed. 
+  @retval EFI_INVALID_PARAMETER  Section stream does not end concident with end 
+                                 of last section.
+
+**/
 EFI_STATUS
 EFIAPI
 OpenSectionStream (
@@ -253,26 +491,6 @@ OpenSectionStream (
   IN     VOID                                      *SectionStream,
      OUT UINTN                                     *SectionStreamHandle
   )
-/*++
-
-Routine Description:
-  SEP member function.  This function creates and returns a new section stream
-  handle to represent the new section stream.
-
-Arguments:
-  This                - Indicates the calling context.
-  SectionStreamLength - Size in bytes of the section stream.
-  SectionStream       - Buffer containing the new section stream.
-  SectionStreamHandle - A pointer to a caller allocated UINTN that on output
-                        contains the new section stream handle.
-
-Returns:
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES - memory allocation failed.
-  EFI_INVALID_PARAMETER - section stream does not end concident with end of
-                          last section.
-
---*/
 {
   //
   // Check to see section stream looks good...
@@ -290,6 +508,64 @@ Returns:
           );
 }
   
+
+/**
+  SEP member function.  Retrieves requested section from section stream.
+
+  @param  SectionStreamHandle   The section stream from which to extract the
+                                requested section.
+  @param  SectionType           A pointer to the type of section to search for.
+  @param  SectionDefinitionGuid If the section type is EFI_SECTION_GUID_DEFINED,
+                                then SectionDefinitionGuid indicates which of
+                                these types of sections to search for.
+  @param  SectionInstance       Indicates which instance of the requested
+                                section to return.
+  @param  Buffer                Double indirection to buffer.  If *Buffer is
+                                non-null on input, then the buffer is caller
+                                allocated.  If Buffer is NULL, then the buffer
+                                is callee allocated.  In either case, the
+                                requried buffer size is returned in *BufferSize.
+  @param  BufferSize            On input, indicates the size of *Buffer if
+                                *Buffer is non-null on input.  On output,
+                                indicates the required size (allocated size if
+                                callee allocated) of *Buffer.
+  @param  AuthenticationStatus  A pointer to a caller-allocated UINT32 that
+                                indicates the authentication status of the
+                                output buffer. If the input section¡¯s
+                                GuidedSectionHeader.Attributes field
+                                has the EFI_GUIDED_SECTION_AUTH_STATUS_VALID
+                                bit as clear, AuthenticationStatus must return
+                                zero. Both local bits (19:16) and aggregate
+                                bits (3:0) in AuthenticationStatus are returned
+                                by ExtractSection(). These bits reflect the
+                                status of the extraction operation. The bit
+                                pattern in both regions must be the same, as
+                                the local and aggregate authentication statuses
+                                have equivalent meaning at this level. If the
+                                function returns anything other than
+                                EFI_SUCCESS, the value of *AuthenticationStatus
+                                is undefined.
+
+  @retval EFI_SUCCESS           Section was retrieved successfully
+  @retval EFI_PROTOCOL_ERROR    A GUID defined section was encountered in the
+                                section stream with its
+                                EFI_GUIDED_SECTION_PROCESSING_REQUIRED bit set,
+                                but there was no corresponding GUIDed Section
+                                Extraction Protocol in the handle database.
+                                *Buffer is unmodified.
+  @retval EFI_NOT_FOUND         An error was encountered when parsing the
+                                SectionStream.  This indicates the SectionStream
+                                is not correctly formatted.
+  @retval EFI_NOT_FOUND         The requested section does not exist.
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process
+                                the request.
+  @retval EFI_INVALID_PARAMETER The SectionStreamHandle does not exist.
+  @retval EFI_WARN_TOO_SMALL    The size of the caller allocated input buffer is
+                                insufficient to contain the requested section.
+                                The input buffer is filled and section contents
+                                are truncated.
+
+**/
 EFI_STATUS
 EFIAPI
 GetSection (
@@ -301,51 +577,6 @@ GetSection (
   IN OUT UINTN                                          *BufferSize,
   OUT UINT32                                            *AuthenticationStatus
   )
-/*++
-
-Routine Description:
-  SEP member function.  Retrieves requested section from section stream.
-
-Arguments:  
-  SectionStreamHandle:  The section stream from which to extract the requested
-                          section.
-  SectionType:         A pointer to the type of section to search for.
-  SectionDefinitionGuid: If the section type is EFI_SECTION_GUID_DEFINED, then
-                        SectionDefinitionGuid indicates which of these types
-                          of sections to search for.
-  SectionInstance:      Indicates which instance of the requested section to
-                          return.
-  Buffer:               Double indirection to buffer.  If *Buffer is non-null on
-                          input, then the buffer is caller allocated.  If
-                          *Buffer is NULL, then the buffer is callee allocated.
-                          In either case, the requried buffer size is returned
-                          in *BufferSize.
-  BufferSize:           On input, indicates the size of *Buffer if *Buffer is
-                          non-null on input.  On output, indicates the required
-                          size (allocated size if callee allocated) of *Buffer.
-  AuthenticationStatus: Indicates the authentication status of the retrieved
-                          section.
-
-Returns:  
-  EFI_SUCCESS:        Section was retrieved successfully
-  EFI_PROTOCOL_ERROR: A GUID defined section was encountered in the section 
-                        stream with its EFI_GUIDED_SECTION_PROCESSING_REQUIRED
-                        bit set, but there was no corresponding GUIDed Section 
-                        Extraction Protocol in the handle database.  *Buffer is 
-                        unmodified.
-  EFI_NOT_FOUND:      An error was encountered when parsing the SectionStream.
-                        This indicates the SectionStream  is not correctly 
-                        formatted.
-  EFI_NOT_FOUND:      The requested section does not exist.
-  EFI_OUT_OF_RESOURCES: The system has insufficient resources to process the 
-                        request.
-  EFI_INVALID_PARAMETER: The SectionStreamHandle does not exist.
-  EFI_WARN_TOO_SMALL: The size of the caller allocated input buffer is 
-                        insufficient to contain the requested section.  The 
-                        input buffer is filled and contents are section contents
-                        are truncated.
-
---*/
 {
   CORE_SECTION_STREAM_NODE                              *StreamNode;
   EFI_TPL                                               OldTpl;
@@ -430,27 +661,23 @@ GetSection_Done:
 }
 
 
+
+/**
+  SEP member function.  Deletes an existing section stream
+
+  @param  StreamHandleToClose    Indicates the stream to close 
+
+  @retval EFI_SUCCESS            The section stream is closed sucessfully.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed. 
+  @retval EFI_INVALID_PARAMETER  Section stream does not end concident with end 
+                                 of last section.
+
+**/
 EFI_STATUS
 EFIAPI
 CloseSectionStream (
   IN  UINTN                                     StreamHandleToClose
   )
-/*++
-
-Routine Description:
-  SEP member function.  Deletes an existing section stream
-
-Arguments:
-  This                - Indicates the calling context.
-  StreamHandleToClose - Indicates the stream to close
-
-Returns:
-  EFI_SUCCESS
-  EFI_OUT_OF_RESOURCES - memory allocation failed.
-  EFI_INVALID_PARAMETER - section stream does not end concident with end of
-                          last section.
-
---*/
 {
   CORE_SECTION_STREAM_NODE                      *StreamNode;
   EFI_TPL                                       OldTpl;
@@ -486,6 +713,22 @@ Returns:
 }
 
 
+
+/**
+  Worker function.  Determine if the input stream:child matches the input type.
+
+  @param  Stream                 Indicates the section stream associated with the 
+                                 child 
+  @param  Child                  Indicates the child to check 
+  @param  SearchType             Indicates the type of section to check against 
+                                 for 
+  @param  SectionDefinitionGuid  Indicates the GUID to check against if the type 
+                                 is EFI_SECTION_GUID_DEFINED 
+
+  @retval TRUE                   The child matches 
+  @retval FALSE                  The child doesn't match
+
+**/
 STATIC
 BOOLEAN
 ChildIsType (
@@ -494,22 +737,6 @@ ChildIsType (
   IN EFI_SECTION_TYPE         SearchType,
   IN EFI_GUID                 *SectionDefinitionGuid
   )
-/*++
-
-Routine Description:
-  Worker function.  Determine if the input stream:child matches the input type.
-
-Arguments:
-  Stream              - Indicates the section stream associated with the child
-  Child               - Indicates the child to check
-  SearchType          - Indicates the type of section to check against for
-  SectionDefinitionGuid - Indicates the GUID to check against if the type is
-                        EFI_SECTION_GUID_DEFINED
-Returns:
-  TRUE                - The child matches
-  FALSE               - The child doesn't match
-
---*/
 {
   EFI_GUID_DEFINED_SECTION    *GuidedSection;
   
@@ -527,6 +754,33 @@ Returns:
 }
 
 
+
+/**
+  Worker function  Recursively searches / builds section stream database
+  looking for requested section.
+
+  @param  SourceStream           Indicates the section stream in which to do the 
+                                 search. 
+  @param  SearchType             Indicates the type of section to search for. 
+  @param  SectionInstance        Indicates which instance of section to find.  
+                                 This is an in/out parameter to deal with 
+                                 recursions. 
+  @param  SectionDefinitionGuid  Guid of section definition 
+  @param  FoundChild             Output indicating the child node that is found. 
+  @param  FoundStream            Output indicating which section stream the child 
+                                 was found in.  If this stream was generated as a 
+                                 result of an encapsulation section, the 
+                                 streamhandle is visible within the SEP driver 
+                                 only.
+  @param  AuthenticationStatus   Indicates the authentication status of the found section. 
+
+  @retval EFI_SUCCESS            Child node was found and returned. 
+                                 EFI_OUT_OF_RESOURCES- Memory allocation failed. 
+  @retval EFI_NOT_FOUND          Requested child node does not exist. 
+  @retval EFI_PROTOCOL_ERROR     a required GUIDED section extraction protocol 
+                                 does not exist
+
+**/
 STATIC
 EFI_STATUS
 FindChildNode (
@@ -538,33 +792,6 @@ FindChildNode (
   OUT    CORE_SECTION_STREAM_NODE                   **FoundStream,
   OUT    UINT32                                     *AuthenticationStatus
   )
-/*++
-
-Routine Description:
-  Worker function  Recursively searches / builds section stream database
-  looking for requested section.
-
-Arguments:
-  SourceStream        - Indicates the section stream in which to do the search.
-  SearchType          - Indicates the type of section to search for.
-  SectionInstance     - Indicates which instance of section to find.  This is
-                        an in/out parameter to deal with recursions.
-  SectionDefinitionGuid  - Guid of section definition
-  FoundChild          - Output indicating the child node that is found.
-  FoundStream         - Output indicating which section stream the child was
-                        found in.  If this stream was generated as a result of
-                        an encapsulation section, the streamhandle is visible
-                        within the SEP driver only.
-  AuthenticationStatus- Indicates the authentication status of the found section.
-
-Returns:
-  EFI_SUCCESS         - Child node was found and returned.
-  EFI_OUT_OF_RESOURCES- Memory allocation failed.
-  EFI_NOT_FOUND       - Requested child node does not exist.
-  EFI_PROTOCOL_ERROR  - a required GUIDED section extraction protocol does not
-                        exist
-
---*/
 {
   CORE_SECTION_CHILD_NODE                       *CurrentChildNode;
   CORE_SECTION_CHILD_NODE                       *RecursedChildNode;
@@ -684,6 +911,28 @@ Returns:
 }
 
 
+
+/**
+  Worker function.  Constructor for new child nodes.
+
+  @param  Stream                 Indicates the section stream in which to add the 
+                                 child. 
+  @param  ChildOffset            Indicates the offset in Stream that is the 
+                                 beginning of the child section. 
+  @param  ChildNode              Indicates the Callee allocated and initialized 
+                                 child. 
+
+  @retval EFI_SUCCESS            Child node was found and returned. 
+                                 EFI_OUT_OF_RESOURCES- Memory allocation failed. 
+  @retval EFI_PROTOCOL_ERROR     Encapsulation sections produce new stream 
+                                 handles when the child node is created.  If the 
+                                 section type is GUID defined, and the extraction 
+                                 GUID does not exist, and producing the stream 
+                                 requires the GUID, then a protocol error is 
+                                 generated and no child is produced. Values 
+                                 returned by OpenSectionStreamEx.
+
+**/
 STATIC
 EFI_STATUS
 CreateChildNode (
@@ -691,28 +940,6 @@ CreateChildNode (
   IN     UINT32                                ChildOffset,
      OUT CORE_SECTION_CHILD_NODE               **ChildNode
   )
-/*++
-
-Routine Description:
-  Worker function.  Constructor for new child nodes.
-
-Arguments:
-  Stream              - Indicates the section stream in which to add the child.
-  ChildOffset         - Indicates the offset in Stream that is the beginning
-                        of the child section.
-  ChildNode           - Indicates the Callee allocated and initialized child.
-
-Returns:
-  EFI_SUCCESS         - Child node was found and returned.
-  EFI_OUT_OF_RESOURCES- Memory allocation failed.
-  EFI_PROTOCOL_ERROR  - Encapsulation sections produce new stream handles when
-                        the child node is created.  If the section type is GUID
-                        defined, and the extraction GUID does not exist, and
-                        producing the stream requires the GUID, then a protocol
-                        error is generated and no child is produced.
-  Values returned by OpenSectionStreamEx.
-
---*/
 {
   EFI_STATUS                                   Status;
   EFI_COMMON_SECTION_HEADER                    *SectionHeader;
@@ -939,26 +1166,22 @@ Returns:
 
 
 #if 0
+/**
+  Worker function.  Constructor for RPN event if needed to keep AuthenticationStatus
+  cache correct when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears...
+
+  @param  ParentStream           Indicates the parent of the ecnapsulation 
+                                 section (child) 
+  @param  ChildNode              Indicates the child node that is the 
+                                 encapsulation section.
+
+**/
 STATIC
 VOID
 CreateGuidedExtractionRpnEvent (
   IN CORE_SECTION_STREAM_NODE       *ParentStream,
   IN CORE_SECTION_CHILD_NODE        *ChildNode
   )
-/*++
-
-Routine Description:
-  Worker function.  Constructor for RPN event if needed to keep AuthenticationStatus
-  cache correct when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears...
-
-Arguments:
-  ParentStream        - Indicates the parent of the ecnapsulation section (child)
-  ChildNode           - Indicates the child node that is the encapsulation section.
-
-Returns:
-  None
-
---*/
 {
   RPN_EVENT_CONTEXT *Context;
   
@@ -984,6 +1207,15 @@ Returns:
 
 
 #if 0
+/**
+  RPN callback function.  Removes a stale section stream and re-initializes it
+  with an updated AuthenticationStatus.
+
+  @param  Event                  The event that fired 
+  @param  RpnContext             A pointer to the context that allows us to 
+                                 identify the relevent encapsulation...
+
+**/
 STATIC
 VOID
 EFIAPI
@@ -991,21 +1223,6 @@ NotifyGuidedExtraction (
   IN   EFI_EVENT   Event,
   IN   VOID        *RpnContext
   )
-/*++
-
-Routine Description:
-  RPN callback function.  Removes a stale section stream and re-initializes it
-  with an updated AuthenticationStatus.
-
-Arguments:
-  Event               - The event that fired
-  RpnContext          - A pointer to the context that allows us to identify
-                        the relevent encapsulation...
-
-Returns:
-  None
-
---*/
 {
   EFI_STATUS                              Status;
   EFI_GUID_DEFINED_SECTION                *GuidedHeader;
@@ -1064,24 +1281,17 @@ Returns:
 }  
 #endif
 
+/**
+  Worker function.  Destructor for child nodes.
 
+  @param  ChildNode              Indicates the node to destroy
+
+**/
 STATIC
 VOID
 FreeChildNode (
   IN  CORE_SECTION_CHILD_NODE                   *ChildNode
   )
-/*++
-
-Routine Description:
-  Worker function.  Destructor for child nodes.
-
-Arguments:
-  ChildNode           - Indicates the node to destroy
-
-Returns:
-  none
-
---*/
 {
   ASSERT (ChildNode->Signature == CORE_SECTION_CHILD_SIGNATURE);
   //
@@ -1103,6 +1313,40 @@ Returns:
 }  
 
 
+
+/**
+  Worker function.  Constructor for section streams.
+
+  @param  SectionStreamLength    Size in bytes of the section stream. 
+  @param  SectionStream          Buffer containing the new section stream. 
+  @param  AllocateBuffer         Indicates whether the stream buffer is to be 
+                                 copied or the input buffer is to be used in 
+                                 place. AuthenticationStatus- Indicates the 
+                                 default authentication status for the new 
+                                 stream. 
+  @param  AuthenticationStatus   A pointer to a caller-allocated UINT32 that
+                                 indicates the authentication status of the
+                                 output buffer. If the input section¡¯s
+                                 GuidedSectionHeader.Attributes field
+                                 has the EFI_GUIDED_SECTION_AUTH_STATUS_VALID
+                                 bit as clear, AuthenticationStatus must return
+                                 zero. Both local bits (19:16) and aggregate
+                                 bits (3:0) in AuthenticationStatus are returned
+                                 by ExtractSection(). These bits reflect the
+                                 status of the extraction operation. The bit
+                                 pattern in both regions must be the same, as
+                                 the local and aggregate authentication statuses
+                                 have equivalent meaning at this level. If the
+                                 function returns anything other than
+                                 EFI_SUCCESS, the value of *AuthenticationStatus
+                                 is undefined.
+  @param  SectionStreamHandle    A pointer to a caller allocated section stream 
+                                 handle. 
+
+  @retval EFI_SUCCESS            Stream was added to stream database. 
+  @retval EFI_OUT_OF_RESOURCES   memory allocation failed.
+
+**/
 STATIC
 EFI_STATUS
 OpenSectionStreamEx (
@@ -1112,25 +1356,6 @@ OpenSectionStreamEx (
   IN     UINT32                                    AuthenticationStatus,   
      OUT UINTN                                     *SectionStreamHandle
   )
-/*++
-
-  Routine Description:
-    Worker function.  Constructor for section streams.
-
-  Arguments:
-    SectionStreamLength - Size in bytes of the section stream.
-    SectionStream       - Buffer containing the new section stream.
-    AllocateBuffer      - Indicates whether the stream buffer is to be copied
-                          or the input buffer is to be used in place.
-    AuthenticationStatus- Indicates the default authentication status for the
-                          new stream.
-    SectionStreamHandle - A pointer to a caller allocated section stream handle.
-
-  Returns:
-    EFI_SUCCESS         - Stream was added to stream database.
-    EFI_OUT_OF_RESOURCES - memory allocation failed.
-
---*/
 {
   CORE_SECTION_STREAM_NODE    *NewStream;
   EFI_TPL                     OldTpl;
@@ -1195,27 +1420,25 @@ OpenSectionStreamEx (
 }
 
 
+
+/**
+  Worker function.  Search stream database for requested stream handle.
+
+  @param  SearchHandle           Indicates which stream to look for. 
+  @param  FoundStream            Output pointer to the found stream. 
+
+  @retval EFI_SUCCESS            StreamHandle was found and *FoundStream contains 
+                                 the stream node. 
+  @retval EFI_NOT_FOUND          SearchHandle was not found in the stream 
+                                 database.
+
+**/
 STATIC
 EFI_STATUS
 FindStreamNode (
   IN  UINTN                                     SearchHandle,
   OUT CORE_SECTION_STREAM_NODE                  **FoundStream
   )
-/*++
-
-  Routine Description:
-    Worker function.  Search stream database for requested stream handle.
-
-  Arguments:
-    SearchHandle        - Indicates which stream to look for.
-    FoundStream         - Output pointer to the found stream.
-
-  Returns:
-    EFI_SUCCESS         - StreamHandle was found and *FoundStream contains
-                          the stream node.
-    EFI_NOT_FOUND       - SearchHandle was not found in the stream database.
-
---*/
 {  
   CORE_SECTION_STREAM_NODE                      *StreamNode;
   
@@ -1237,26 +1460,22 @@ FindStreamNode (
 }
 
 
+
+/**
+  Check if a stream is valid.
+
+  @param  SectionStream          The section stream to be checked 
+  @param  SectionStreamLength    The length of section stream 
+
+  @return A boolean value indicating the validness of the section stream.
+
+**/
 STATIC
 BOOLEAN
 IsValidSectionStream (
   IN  VOID              *SectionStream,
   IN  UINTN             SectionStreamLength
   )
-/*++
-
-Routine Description:
-  Check if a stream is valid.
-
-Arguments:
-  SectionStream         - The section stream to be checked
-  SectionStreamLength   - The length of section stream
-
-Returns:
-  TRUE
-  FALSE
-
---*/
 {
   UINTN                       TotalLength;
   UINTN                       SectionLength;
@@ -1319,16 +1538,18 @@ Returns:
   defined in RaiseTPL() in the UEFI 2.0 specification.
 
   
-  @param This   Indicates the
-                EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
-  
+  @param This         Indicates the
+                      EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
+
   @param InputSection Buffer containing the input GUIDed section
                       to be processed. OutputBuffer OutputBuffer
                       is allocated from boot services pool
                       memory and contains the new section
                       stream. The caller is responsible for
                       freeing this buffer.
-
+  @param OutputBuffer *OutputBuffer is allocated from boot services
+                      pool memory and contains the new section stream.
+                      The caller is responsible for freeing this buffer.
   @param OutputSize   A pointer to a caller-allocated UINTN in
                       which the size of OutputBuffer allocation
                       is stored. If the function returns
@@ -1360,13 +1581,13 @@ Returns:
                               is undefined.
 
 
-  @retval EFI_SUCCESS The InputSection was successfully
-                      processed and the section contents were
-                      returned.
+  @retval EFI_SUCCESS          The InputSection was successfully
+                               processed and the section contents were
+                               returned.
 
-  @retval EFI_OUT_OF_RESOURCES  The system has insufficient
-                                resources to process the
-                                request.
+  @retval EFI_OUT_OF_RESOURCES The system has insufficient
+                               resources to process the
+                               request.
 
   @retval EFI_INVALID_PARAMETER The GUID in InputSection does
                                 not match this instance of the
@@ -1401,14 +1622,14 @@ CustomGuidedSectionExtract (
   // Call GetInfo to get the size and attribute of input guided section data.
   //
   Status = ExtractGuidedSectionGetInfo (
-            InputSection,
-            &OutputBufferSize,
-            &ScratchBufferSize,
-            &SectionAttribute
-           );
+             InputSection,
+             &OutputBufferSize,
+             &ScratchBufferSize,
+             &SectionAttribute
+             );
   
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "GetInfo from guided section Failed - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "GetInfo from guided section Failed - %r\n", Status));
     return Status;
   }
   
@@ -1452,7 +1673,7 @@ CustomGuidedSectionExtract (
     if (ScratchBuffer != NULL) {
       CoreFreePool (ScratchBuffer);
     }
-    DEBUG ((EFI_D_ERROR, "Extract guided section Failed - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Extract guided section Failed - %r\n", Status));
     return Status;
   }
 

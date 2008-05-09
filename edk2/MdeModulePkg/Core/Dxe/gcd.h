@@ -14,8 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _GCD_H
-#define _GCD_H
+#ifndef _GCD_H_
+#define _GCD_H_
 
 //
 // GCD Operations

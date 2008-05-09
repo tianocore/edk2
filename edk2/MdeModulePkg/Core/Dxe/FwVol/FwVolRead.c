@@ -36,23 +36,20 @@ Required Alignment    Alignment Value in FFS       Alignment Value in
 UINT8 mFvAttributes[] = {0, 4, 7, 9, 10, 12, 15, 16}; 
 
 
+
+/**
+  Convert the FFS File Attributes to FV File Attributes
+
+  @param  FfsAttributes              The attributes of UINT8 type. 
+
+  @return The attributes of EFI_FV_FILE_ATTRIBUTES
+
+**/
 STATIC
 EFI_FV_FILE_ATTRIBUTES
 FfsAttributes2FvFileAttributes (
   IN EFI_FFS_FILE_ATTRIBUTES FfsAttributes
   )
-/*++
-
-  Routine Description:
-    Convert the FFS File Attributes to FV File Attributes
-    
-  Arguments:
-    FfsAttributes   -   The attributes of UINT8 type.
-    
-  Returns:
-    The attributes of EFI_FV_FILE_ATTRIBUTES
-    
---*/
 {
   FfsAttributes = (EFI_FFS_FILE_ATTRIBUTES)((FfsAttributes & FFS_ATTRIB_DATA_ALIGNMENT) >> 3);
   ASSERT (FfsAttributes < 8);
@@ -61,6 +58,53 @@ FfsAttributes2FvFileAttributes (
 }
 
 
+
+/**
+  Given the input key, search for the next matching file in the volume.
+
+  @param  This                       Indicates the calling context. 
+  @param  Key                        Key is a pointer to a caller allocated 
+                                     buffer that contains implementation specific 
+                                     data that is used to track where to begin 
+                                     the search for the next file. The size of 
+                                     the buffer must be at least This->KeySize 
+                                     bytes long. To reinitialize the search and 
+                                     begin from the beginning of the firmware 
+                                     volume, the entire buffer must be cleared to 
+                                     zero. Other than clearing the buffer to 
+                                     initiate a new search, the caller must not 
+                                     modify the data in the buffer between calls 
+                                     to GetNextFile(). 
+  @param  FileType                   FileType is a pointer to a caller allocated 
+                                     EFI_FV_FILETYPE. The GetNextFile() API can 
+                                     filter it's search for files based on the 
+                                     value of *FileType input. A *FileType input 
+                                     of 0 causes GetNextFile() to search for 
+                                     files of all types.  If a file is found, the 
+                                     file's type is returned in *FileType.  
+                                     *FileType is not modified if no file is 
+                                     found. 
+  @param  NameGuid                   NameGuid is a pointer to a caller allocated 
+                                     EFI_GUID. If a file is found, the file's 
+                                     name is returned in *NameGuid.  *NameGuid is 
+                                     not modified if no file is found. 
+  @param  Attributes                 Attributes is a pointer to a caller 
+                                     allocated EFI_FV_FILE_ATTRIBUTES.  If a file 
+                                     is found, the file's attributes are returned 
+                                     in *Attributes. *Attributes is not modified 
+                                     if no file is found. 
+  @param  Size                       Size is a pointer to a caller allocated 
+                                     UINTN. If a file is found, the file's size 
+                                     is returned in *Size. *Size is not modified 
+                                     if no file is found. 
+
+  @retval EFI_SUCCESS                Successfully find the file. 
+  @retval EFI_DEVICE_ERROR           Device error. 
+  @retval EFI_ACCESS_DENIED          Fv could not read. 
+  @retval EFI_NOT_FOUND              No matching file found. 
+  @retval EFI_INVALID_PARAMETER      Invalid parameter
+
+**/
 EFI_STATUS
 EFIAPI
 FvGetNextFile (
@@ -69,51 +113,8 @@ FvGetNextFile (
   IN OUT     EFI_FV_FILETYPE               *FileType,
   OUT        EFI_GUID                      *NameGuid,
   OUT        EFI_FV_FILE_ATTRIBUTES        *Attributes,
-  OUT        UINTN                          *Size
+  OUT        UINTN                         *Size
   )
-/*++
-
-Routine Description:
-    Given the input key, search for the next matching file in the volume.
-
-Arguments:
-    This          -   Indicates the calling context.
-    FileType      -   FileType is a pointer to a caller allocated
-                      EFI_FV_FILETYPE. The GetNextFile() API can filter it's
-                      search for files based on the value of *FileType input.
-                      A *FileType input of 0 causes GetNextFile() to search for
-                      files of all types.  If a file is found, the file's type
-                      is returned in *FileType.  *FileType is not modified if
-                      no file is found.
-    Key           -   Key is a pointer to a caller allocated buffer that
-                      contains implementation specific data that is used to
-                      track where to begin the search for the next file.
-                      The size of the buffer must be at least This->KeySize
-                      bytes long. To reinitialize the search and begin from
-                      the beginning of the firmware volume, the entire buffer
-                      must be cleared to zero. Other than clearing the buffer
-                      to initiate a new search, the caller must not modify the
-                      data in the buffer between calls to GetNextFile().
-    NameGuid      -   NameGuid is a pointer to a caller allocated EFI_GUID.
-                      If a file is found, the file's name is returned in
-                      *NameGuid.  *NameGuid is not modified if no file is
-                      found.
-    Attributes    -   Attributes is a pointer to a caller allocated
-                      EFI_FV_FILE_ATTRIBUTES.  If a file is found, the file's
-                      attributes are returned in *Attributes. *Attributes is
-                      not modified if no file is found.
-    Size          -   Size is a pointer to a caller allocated UINTN.
-                      If a file is found, the file's size is returned in *Size.
-                      *Size is not modified if no file is found.
-
-Returns:
-    EFI_SUCCESS                 - Successfully find the file.
-    EFI_DEVICE_ERROR            - Device error.
-    EFI_ACCESS_DENIED           - Fv could not read.
-    EFI_NOT_FOUND               - No matching file found.
-    EFI_INVALID_PARAMETER       - Invalid parameter
-
---*/
 {
   EFI_STATUS                                  Status;
   FV_DEVICE                                   *FvDevice;
@@ -218,6 +219,47 @@ Returns:
 }
 
 
+
+/**
+  Locates a file in the firmware volume and
+  copies it to the supplied buffer.
+
+  @param  This                       Indicates the calling context. 
+  @param  NameGuid                   Pointer to an EFI_GUID, which is the 
+                                     filename. 
+  @param  Buffer                     Buffer is a pointer to pointer to a buffer 
+                                     in which the file or section contents or are 
+                                     returned. 
+  @param  BufferSize                 BufferSize is a pointer to caller allocated 
+                                     UINTN. On input *BufferSize indicates the 
+                                     size in bytes of the memory region pointed 
+                                     to by Buffer. On output, *BufferSize 
+                                     contains the number of bytes required to 
+                                     read the file. 
+  @param  FoundType                  FoundType is a pointer to a caller allocated 
+                                     EFI_FV_FILETYPE that on successful return 
+                                     from Read() contains the type of file read.  
+                                     This output reflects the file type 
+                                     irrespective of the value of the SectionType 
+                                     input. 
+  @param  FileAttributes             FileAttributes is a pointer to a caller 
+                                     allocated EFI_FV_FILE_ATTRIBUTES.  On 
+                                     successful return from Read(), 
+                                     *FileAttributes contains the attributes of 
+                                     the file read. 
+  @param  AuthenticationStatus       AuthenticationStatus is a pointer to a 
+                                     caller allocated UINTN in which the 
+                                     authentication status is returned. 
+
+  @retval EFI_SUCCESS                Successfully read to memory buffer. 
+  @retval EFI_WARN_BUFFER_TOO_SMALL  Buffer too small. 
+  @retval EFI_NOT_FOUND              Not found. 
+  @retval EFI_DEVICE_ERROR           Device error. 
+  @retval EFI_ACCESS_DENIED          Could not read. 
+  @retval EFI_INVALID_PARAMETER      Invalid parameter. 
+  @retval EFI_OUT_OF_RESOURCES       Not enough buffer to be allocated.
+
+**/
 EFI_STATUS
 EFIAPI
 FvReadFile (
@@ -229,44 +271,6 @@ FvReadFile (
   OUT      EFI_FV_FILE_ATTRIBUTES        *FileAttributes,
   OUT      UINT32                        *AuthenticationStatus
   )
-/*++
-
-Routine Description:
-    Locates a file in the firmware volume and
-    copies it to the supplied buffer.
-
-Arguments:
-    This              -   Indicates the calling context.
-    NameGuid          -   Pointer to an EFI_GUID, which is the filename.
-    Buffer            -   Buffer is a pointer to pointer to a buffer in
-                          which the file or section contents or are returned.
-    BufferSize        -   BufferSize is a pointer to caller allocated
-                          UINTN. On input *BufferSize indicates the size
-                          in bytes of the memory region pointed to by
-                          Buffer. On output, *BufferSize contains the number
-                          of bytes required to read the file.
-    FoundType         -   FoundType is a pointer to a caller allocated
-                          EFI_FV_FILETYPE that on successful return from Read()
-                          contains the type of file read.  This output reflects
-                          the file type irrespective of the value of the
-                          SectionType input.
-    FileAttributes    -   FileAttributes is a pointer to a caller allocated
-                          EFI_FV_FILE_ATTRIBUTES.  On successful return from
-                          Read(), *FileAttributes contains the attributes of
-                          the file read.
-    AuthenticationStatus -  AuthenticationStatus is a pointer to a caller
-                          allocated UINTN in which the authentication status
-                          is returned.
-Returns:
-    EFI_SUCCESS                   - Successfully read to memory buffer.
-    EFI_WARN_BUFFER_TOO_SMALL     - Buffer too small.
-    EFI_NOT_FOUND                 - Not found.
-    EFI_DEVICE_ERROR              - Device error.
-    EFI_ACCESS_DENIED             - Could not read.
-    EFI_INVALID_PARAMETER         - Invalid parameter.
-    EFI_OUT_OF_RESOURCES          - Not enough buffer to be allocated.
-
---*/
 {
   EFI_STATUS                        Status;
   FV_DEVICE                         *FvDevice;
@@ -361,6 +365,35 @@ Returns:
 }
 
 
+
+/**
+  Locates a section in a given FFS File and
+  copies it to the supplied buffer (not including section header).
+
+  @param  This                       Indicates the calling context. 
+  @param  NameGuid                   Pointer to an EFI_GUID, which is the 
+                                     filename. 
+  @param  SectionType                Indicates the section type to return. 
+  @param  SectionInstance            Indicates which instance of sections with a 
+                                     type of SectionType to return. 
+  @param  Buffer                     Buffer is a pointer to pointer to a buffer 
+                                     in which the file or section contents or are 
+                                     returned. 
+  @param  BufferSize                 BufferSize is a pointer to caller allocated 
+                                     UINTN.
+  @param  AuthenticationStatus       AuthenticationStatus is a pointer to a 
+                                     caller allocated UINT32 in which the 
+                                     authentication status is returned. 
+
+  @retval EFI_SUCCESS                Successfully read the file section into 
+                                     buffer. 
+  @retval EFI_WARN_BUFFER_TOO_SMALL  Buffer too small. 
+  @retval EFI_NOT_FOUND              Section not found. 
+  @retval EFI_DEVICE_ERROR           Device error. 
+  @retval EFI_ACCESS_DENIED          Could not read. 
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
+
+**/
 EFI_STATUS
 EFIAPI
 FvReadFileSection (
@@ -372,34 +405,6 @@ FvReadFileSection (
   IN OUT    UINTN                          *BufferSize,
   OUT       UINT32                         *AuthenticationStatus
   )
-/*++
-
-  Routine Description:
-    Locates a section in a given FFS File and
-    copies it to the supplied buffer (not including section header).
-
-  Arguments:
-    This              -   Indicates the calling context.
-    NameGuid          -   Pointer to an EFI_GUID, which is the filename.
-    SectionType       -   Indicates the section type to return.
-    SectionInstance   -   Indicates which instance of sections with a type of
-                          SectionType to return.
-    Buffer            -   Buffer is a pointer to pointer to a buffer in which
-                          the file or section contents or are returned.
-    BufferSize        -   BufferSize is a pointer to caller allocated UINTN.
-    AuthenticationStatus -AuthenticationStatus is a pointer to a caller
-                          allocated UINT32 in which the authentication status
-                          is returned.
-
-  Returns:
-    EFI_SUCCESS                     - Successfully read the file section into buffer.
-    EFI_WARN_BUFFER_TOO_SMALL       - Buffer too small.
-    EFI_NOT_FOUND                   - Section not found.
-    EFI_DEVICE_ERROR                - Device error.
-    EFI_ACCESS_DENIED               - Could not read.
-    EFI_INVALID_PARAMETER           - Invalid parameter.
-
---*/
 {
   EFI_STATUS                        Status;
   FV_DEVICE                         *FvDevice;
@@ -481,4 +486,5 @@ Done:
 
   return Status;
 }
+
 

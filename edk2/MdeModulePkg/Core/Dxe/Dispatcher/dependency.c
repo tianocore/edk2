@@ -30,32 +30,20 @@ BOOLEAN *mDepexEvaluationStackPointer = NULL;
 // Worker functions
 //
 
+
+/**
+  Grow size of the Depex stack
+
+  @retval EFI_SUCCESS           Stack successfully growed. 
+  @retval EFI_OUT_OF_RESOURCES  There is not enough system memory to grow the 
+                                stack.
+
+**/
 STATIC
 EFI_STATUS
 GrowDepexStack (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Grow size of the Depex stack
-
-Arguments:
-
-  Stack     - Old stack on the way in and new stack on the way out
-
-  StackSize - New size of the stack
-
-Returns:
-
-  EFI_SUCCESS          - Stack successfully growed.
-  
-  EFI_OUT_OF_RESOURCES - There is not enough system memory to grow the stack.
-  
-  
-
---*/
 {
   BOOLEAN     *NewStack;
   UINTN       Size;
@@ -97,28 +85,22 @@ Returns:
 }
 
 
+
+/**
+  Push an element onto the Boolean Stack
+
+  @param  Value                 BOOLEAN to push. 
+
+  @retval EFI_SUCCESS           The value was pushed onto the stack. 
+  @retval EFI_OUT_OF_RESOURCES  There is not enough system memory to grow the 
+                                stack.
+
+**/
 STATIC
 EFI_STATUS
 PushBool (
   IN BOOLEAN  Value
   )
-/*++
-
-Routine Description:
-
-  Push an element onto the Boolean Stack
-
-Arguments:
-
-  Value - BOOLEAN to push.
-
-Returns:
-
-  EFI_SUCCESS          - The value was pushed onto the stack.
-
-  EFI_OUT_OF_RESOURCES - There is not enough system memory to grow the stack.
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -145,28 +127,21 @@ Returns:
 }
 
 
+
+/**
+  Pop an element from the Boolean stack.
+
+  @param  Value                 BOOLEAN to pop. 
+
+  @retval EFI_SUCCESS           The value was popped onto the stack. 
+  @retval EFI_ACCESS_DENIED     The pop operation underflowed the stack
+
+**/
 STATIC
 EFI_STATUS 
 PopBool (
   OUT BOOLEAN  *Value
   )
-/*++
-
-Routine Description:
-
-  Pop an element from the Boolean stack.
-
-Arguments:
-
-  Value - BOOLEAN to pop.
-
-Returns:
-
-  EFI_SUCCESS       - The value was popped onto the stack.
-
-  EFI_ACCESS_DENIED - The pop operation underflowed the stack
-
---*/
 {
   //
   // Check for a stack underflow condition
@@ -184,29 +159,23 @@ Returns:
 }
 
 
+
+/**
+  Preprocess dependency expression and update DriverEntry to reflect the
+  state of  Before, After, and SOR dependencies. If DriverEntry->Before
+  or DriverEntry->After is set it will never be cleared. If SOR is set
+  it will be cleared by CoreSchedule(), and then the driver can be
+  dispatched.
+
+  @param  DriverEntry           DriverEntry element to update 
+
+  @retval EFI_SUCCESS           It always works.
+
+**/
 EFI_STATUS
 CorePreProcessDepex (
   IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry  
   )
-/*++
-
-Routine Description:
-
-  Preprocess dependency expression and update DriverEntry to reflect the
-  state of  Before, After, and SOR dependencies. If DriverEntry->Before
-  or DriverEntry->After is set it will never be cleared. If SOR is set
-  it will be cleared by CoreSchedule(), and then the driver can be 
-  dispatched.
-
-Arguments:
-
-  DriverEntry - DriverEntry element to update
-
-Returns:
-
-  EFI_SUCCESS - It always works.
-
---*/
 {
   UINT8  *Iterator;
     
@@ -231,31 +200,24 @@ Returns:
 }
 
 
+
+/**
+  This is the POSTFIX version of the dependency evaluator.  This code does
+  not need to handle Before or After, as it is not valid to call this
+  routine in this case. The SOR is just ignored and is a nop in the grammer.
+  POSTFIX means all the math is done on top of the stack.
+
+  @param  DriverEntry           DriverEntry element to update 
+
+  @retval TRUE                  If driver is ready to run. 
+  @retval FALSE                 If driver is not ready to run or some fatal error 
+                                was found.
+
+**/
 BOOLEAN
 CoreIsSchedulable (
   IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry  
   )
-/*++
-
-Routine Description:
-
-  This is the POSTFIX version of the dependency evaluator.  This code does 
-  not need to handle Before or After, as it is not valid to call this 
-  routine in this case. The SOR is just ignored and is a nop in the grammer.
-
-  POSTFIX means all the math is done on top of the stack.
-
-Arguments:
-
-  DriverEntry - DriverEntry element to update
-  
-Returns:
-
-  TRUE - If driver is ready to run.
-
-  FALSE - If driver is not ready to run or some fatal error was found.
-
---*/
 {
   EFI_STATUS  Status;
   UINT8       *Iterator;
@@ -443,4 +405,5 @@ Returns:
 Done:
   return FALSE;
 }
+
 

@@ -1,4 +1,4 @@
-/**@file
+/** @file
   DXE Dispatcher.
 
   Step #1 - When a FV protocol is added to the system every driver in the FV
@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -94,12 +94,40 @@ FV_FILEPATH_DEVICE_PATH mFvDevicePath;
 //
 // Function Prototypes
 //
+/**
+  Insert InsertedDriverEntry onto the mScheduledQueue. To do this you
+  must add any driver with a before dependency on InsertedDriverEntry first.
+  You do this by recursively calling this routine. After all the Befores are
+  processed you can add InsertedDriverEntry to the mScheduledQueue.
+  Then you can add any driver with an After dependency on InsertedDriverEntry
+  by recursively calling this routine.
+
+  @param  InsertedDriverEntry   The driver to insert on the ScheduledLink Queue
+
+**/
 STATIC
 VOID
 CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   IN  EFI_CORE_DRIVER_ENTRY   *InsertedDriverEntry
   );
  
+/**
+  Event notification that is fired every time a FV dispatch protocol is added.
+  More than one protocol may have been added when this event is fired, so you
+  must loop on CoreLocateHandle () to see how many protocols were added and
+  do the following to each FV:
+  If the Fv has already been processed, skip it. If the Fv has not been
+  processed then mark it as being processed, as we are about to process it.
+  Read the Fv and add any driver in the Fv to the mDiscoveredList.The
+  mDiscoveredList is never free'ed and contains variables that define
+  the other states the DXE driver transitions to..
+  While you are at it read the A Priori file into memory.
+  Place drivers in the A Priori list onto the mScheduledQueue.
+
+  @param  Event                 The Event that is being processed, not used. 
+  @param  Context               Event Context, not used.
+
+**/
 STATIC
 VOID
 EFIAPI
@@ -108,6 +136,19 @@ CoreFwVolEventProtocolNotify (
   IN  VOID            *Context
   );
 
+/**
+  Convert FvHandle and DriverName into an EFI device path
+
+  @param  Fv                    Fv protocol, needed to read Depex info out of 
+                                FLASH. 
+  @param  FvHandle              Handle for Fv, needed in the 
+                                EFI_CORE_DRIVER_ENTRY so that the PE image can be 
+                                read out of the FV at a later time. 
+  @param  DriverName            Name of driver to add to mDiscoveredList. 
+
+  @return Pointer to device path constructed from FvHandle and DriverName
+
+**/
 STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 CoreFvToDevicePath (
@@ -116,6 +157,26 @@ CoreFvToDevicePath (
   IN  EFI_GUID                        *DriverName
   );
 
+/**
+  Add an entry to the mDiscoveredList. Allocate memory to store the DriverEntry,
+  and initilize any state variables. Read the Depex from the FV and store it
+  in DriverEntry. Pre-process the Depex to set the SOR, Before and After state.
+  The Discovered list is never free'ed and contains booleans that represent the
+  other possible DXE driver states.
+
+  @param  Fv                    Fv protocol, needed to read Depex info out of 
+                                FLASH. 
+  @param  FvHandle              Handle for Fv, needed in the 
+                                EFI_CORE_DRIVER_ENTRY so that the PE image can be 
+                                read out of the FV at a later time. 
+  @param  DriverName            Name of driver to add to mDiscoveredList. 
+
+  @retval EFI_SUCCESS           If driver was added to the mDiscoveredList. 
+  @retval EFI_ALREADY_STARTED   The driver has already been started. Only one 
+                                DriverName may be active in the system at any one 
+                                time.
+
+**/
 STATIC 
 EFI_STATUS
 CoreAddToDriverList (
@@ -124,6 +185,18 @@ CoreAddToDriverList (
   IN  EFI_GUID                      *DriverName
   );
 
+/**
+  Get the driver from the FV through driver name, and produce a FVB protocol on FvHandle.
+
+  @param  Fv                    The FIRMWARE_VOLUME protocol installed on the FV. 
+  @param  FvHandle              The handle which FVB protocol installed on. 
+  @param  DriverName            The driver guid specified. 
+
+  @retval EFI_OUT_OF_RESOURCES  No enough memory or other resource. 
+  @retval EFI_VOLUME_CORRUPTED  Corrupted volume. 
+  @retval EFI_SUCCESS           Function successfully returned.
+
+**/
 STATIC
 EFI_STATUS 
 CoreProcessFvImageFile (
@@ -132,81 +205,52 @@ CoreProcessFvImageFile (
   IN  EFI_GUID                        *DriverName
   );
 
+
+/**
+  Enter critical section by gaining lock on mDispatcherLock.
+
+**/
 STATIC
 VOID
 CoreAcquireDispatcherLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Enter critical section by gaining lock on mDispatcherLock
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
-
 {
   CoreAcquireLock (&mDispatcherLock);
 }
 
+
+/**
+  Exit critical section by releasing lock on mDispatcherLock.
+
+**/
 STATIC
 VOID
 CoreReleaseDispatcherLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Exit critical section by releasing lock on mDispatcherLock
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   CoreReleaseLock (&mDispatcherLock);
 }
 
+
+/**
+  Read Depex and pre-process the Depex for Before and After. If Section Extraction
+  protocol returns an error via ReadSection defer the reading of the Depex.
+
+  @param  DriverEntry           Driver to work on. 
+
+  @retval EFI_SUCCESS           Depex read and preprossesed 
+  @retval EFI_PROTOCOL_ERROR    The section extraction protocol returned an error 
+                                and  Depex reading needs to be retried. 
+  @retval Error                 DEPEX not found.
+
+**/
 STATIC
 EFI_STATUS
 CoreGetDepexSectionAndPreProccess (
   IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry
   )
-/*++
-
-Routine Description:
-
-  Read Depex and pre-process the Depex for Before and After. If Section Extraction
-  protocol returns an error via ReadSection defer the reading of the Depex.
-
-Arguments:
-
-  DriverEntry - Driver to work on.
-  
-Returns:
-
-  EFI_SUCCESS - Depex read and preprossesed 
-
-  EFI_PROTOCOL_ERROR - The section extraction protocol returned an error and 
-                        Depex reading needs to be retried.
-
-  Other Error - DEPEX not found.
-
---*/
 {
   EFI_STATUS                    Status;
   EFI_SECTION_TYPE              SectionType;
@@ -255,6 +299,21 @@ Returns:
   return Status;
 }
 
+
+/**
+  Check every driver and locate a matching one. If the driver is found, the Unrequested
+  state flag is cleared.
+
+  @param  FirmwareVolumeHandle  The handle of the Firmware Volume that contains 
+                                the firmware  file specified by DriverName. 
+  @param  DriverName            The Driver name to put in the Dependent state. 
+
+  @retval EFI_SUCCESS           The DriverName was found and it's SOR bit was 
+                                cleared 
+  @retval EFI_NOT_FOUND         The DriverName does not exist or it's SOR bit was 
+                                not set. 
+
+**/
 EFI_DXESERVICE
 EFI_STATUS
 EFIAPI
@@ -262,27 +321,6 @@ CoreSchedule (
   IN  EFI_HANDLE  FirmwareVolumeHandle,
   IN  EFI_GUID    *DriverName
   )
-/*++
-
-Routine Description:
-
-  Check every driver and locate a matching one. If the driver is found, the Unrequested
-  state flag is cleared.
-
-Arguments:
-
-  FirmwareVolumeHandle - The handle of the Firmware Volume that contains the firmware 
-                         file specified by DriverName.
-
-  DriverName           - The Driver name to put in the Dependent state.
-
-Returns:
-
-  EFI_SUCCESS   - The DriverName was found and it's SOR bit was cleared
-
-  EFI_NOT_FOUND - The DriverName does not exist or it's SOR bit was not set.
-
---*/
 {
   LIST_ENTRY            *Link;
   EFI_CORE_DRIVER_ENTRY *DriverEntry;
@@ -310,6 +348,19 @@ Returns:
 }
 
 
+
+/**
+  Convert a driver from the Untrused back to the Scheduled state
+
+  @param  FirmwareVolumeHandle  The handle of the Firmware Volume that contains 
+                                the firmware  file specified by DriverName. 
+  @param  DriverName            The Driver name to put in the Scheduled state 
+
+  @retval EFI_SUCCESS           The file was found in the untrusted state, and it 
+                                was promoted  to the trusted state. 
+  @retval EFI_NOT_FOUND         The file was not found in the untrusted state. 
+
+**/
 EFI_DXESERVICE
 EFI_STATUS
 EFIAPI
@@ -317,27 +368,6 @@ CoreTrust (
   IN  EFI_HANDLE  FirmwareVolumeHandle,
   IN  EFI_GUID    *DriverName
   )
-/*++
-
-Routine Description:
-
-  Convert a driver from the Untrused back to the Scheduled state
-
-Arguments:
-
-  FirmwareVolumeHandle - The handle of the Firmware Volume that contains the firmware 
-                         file specified by DriverName.
-
-  DriverName           - The Driver name to put in the Scheduled state
-
-Returns:
-
-  EFI_SUCCESS   - The file was found in the untrusted state, and it was promoted 
-                  to the trusted state.
-
-  EFI_NOT_FOUND - The file was not found in the untrusted state.
-
---*/
 {
   LIST_ENTRY            *Link;
   EFI_CORE_DRIVER_ENTRY *DriverEntry;
@@ -366,37 +396,29 @@ Returns:
 }
 
 
+
+/**
+  This is the main Dispatcher for DXE and it exits when there are no more
+  drivers to run. Drain the mScheduledQueue and load and start a PE
+  image for each driver. Search the mDiscoveredList to see if any driver can
+  be placed on the mScheduledQueue. If no drivers are placed on the
+  mScheduledQueue exit the function. On exit it is assumed the Bds()
+  will be called, and when the Bds() exits the Dispatcher will be called
+  again.
+
+  NONE
+
+  @retval EFI_ALREADY_STARTED   The DXE Dispatcher is already running 
+  @retval EFI_NOT_FOUND         No DXE Drivers were dispatched 
+  @retval EFI_SUCCESS           One or more DXE Drivers were dispatched 
+
+**/
 EFI_DXESERVICE
 EFI_STATUS
 EFIAPI
 CoreDispatcher (
   VOID
   )
-/*++
-
-Routine Description:
-
-  This is the main Dispatcher for DXE and it exits when there are no more 
-  drivers to run. Drain the mScheduledQueue and load and start a PE
-  image for each driver. Search the mDiscoveredList to see if any driver can 
-  be placed on the mScheduledQueue. If no drivers are placed on the
-  mScheduledQueue exit the function. On exit it is assumed the Bds()
-  will be called, and when the Bds() exits the Dispatcher will be called 
-  again.
-
-Arguments:
-
-  NONE
-
-Returns:
-
-  EFI_ALREADY_STARTED - The DXE Dispatcher is already running
-
-  EFI_NOT_FOUND       - No DXE Drivers were dispatched
-
-  EFI_SUCCESS         - One or more DXE Drivers were dispatched
-
---*/
 {
   EFI_STATUS                      Status;
   EFI_STATUS                      ReturnStatus;
@@ -524,31 +546,23 @@ Returns:
   return ReturnStatus;
 }
 
+
+/**
+  Insert InsertedDriverEntry onto the mScheduledQueue. To do this you
+  must add any driver with a before dependency on InsertedDriverEntry first.
+  You do this by recursively calling this routine. After all the Befores are
+  processed you can add InsertedDriverEntry to the mScheduledQueue.
+  Then you can add any driver with an After dependency on InsertedDriverEntry
+  by recursively calling this routine.
+
+  @param  InsertedDriverEntry   The driver to insert on the ScheduledLink Queue
+
+**/
 STATIC
 VOID
 CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   IN  EFI_CORE_DRIVER_ENTRY   *InsertedDriverEntry
   )
-/*++
-
-Routine Description:
-
-  Insert InsertedDriverEntry onto the mScheduledQueue. To do this you 
-  must add any driver with a before dependency on InsertedDriverEntry first.
-  You do this by recursively calling this routine. After all the Befores are
-  processed you can add InsertedDriverEntry to the mScheduledQueue. 
-  Then you can add any driver with an After dependency on InsertedDriverEntry 
-  by recursively calling this routine.
-
-Arguments:
-
-  InsertedDriverEntry - The driver to insert on the ScheduledLink Queue
-
-Returns:
-
-  NONE 
-
---*/
 {
   LIST_ENTRY            *Link;
   EFI_CORE_DRIVER_ENTRY *DriverEntry;
@@ -595,28 +609,22 @@ Returns:
   }
 }
 
+
+/**
+  Return TRUE if the Fv has been processed, FALSE if not.
+
+  @param  FvHandle              The handle of a FV that's being tested 
+
+  @retval TRUE                  Fv protocol on FvHandle has been processed 
+  @retval FALSE                 Fv protocol on FvHandle has not yet been 
+                                processed
+
+**/
 STATIC
 BOOLEAN
 FvHasBeenProcessed (
   IN  EFI_HANDLE      FvHandle
   )
-/*++
-
-Routine Description:
-
-  Return TRUE if the Fv has been processed, FALSE if not.
-
-Arguments:
-
-  FvHandle - The handle of a FV that's being tested
-
-Returns:
-
-  TRUE  - Fv protocol on FvHandle has been processed
-
-  FALSE - Fv protocol on FvHandle has not yet been processed
-
---*/
 {
   LIST_ENTRY      *Link;
   KNOWN_HANDLE    *KnownHandle;
@@ -630,28 +638,20 @@ Returns:
   return FALSE;
 }
 
+
+/**
+  Remember that Fv protocol on FvHandle has had it's drivers placed on the
+  mDiscoveredList. This fucntion adds entries on the mFvHandleList. Items are
+  never removed/freed from the mFvHandleList.
+
+  @param  FvHandle              The handle of a FV that has been processed
+
+**/
 STATIC
 VOID
 FvIsBeingProcesssed (
   IN  EFI_HANDLE    FvHandle
   )
-/*++
-
-Routine Description:
-
-  Remember that Fv protocol on FvHandle has had it's drivers placed on the
-  mDiscoveredList. This fucntion adds entries on the mFvHandleList. Items are
-  never removed/freed from the mFvHandleList.
-
-Arguments:
-
-  FvHandle - The handle of a FV that has been processed
-
-Returns:
-
-  None
-
---*/
 {
   KNOWN_HANDLE  *KnownHandle;
 
@@ -665,6 +665,20 @@ Returns:
 
 
 
+
+/**
+  Convert FvHandle and DriverName into an EFI device path
+
+  @param  Fv                    Fv protocol, needed to read Depex info out of 
+                                FLASH. 
+  @param  FvHandle              Handle for Fv, needed in the 
+                                EFI_CORE_DRIVER_ENTRY so that the PE image can be 
+                                read out of the FV at a later time. 
+  @param  DriverName            Name of driver to add to mDiscoveredList. 
+
+  @return Pointer to device path constructed from FvHandle and DriverName
+
+**/
 STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 CoreFvToDevicePath (
@@ -672,26 +686,6 @@ CoreFvToDevicePath (
   IN  EFI_HANDLE                      FvHandle,
   IN  EFI_GUID                        *DriverName
   )
-/*++
-
-Routine Description:
-
-  Convert FvHandle and DriverName into an EFI device path
-
-Arguments:
-
-  Fv         - Fv protocol, needed to read Depex info out of FLASH.
-  
-  FvHandle   - Handle for Fv, needed in the EFI_CORE_DRIVER_ENTRY so that the
-               PE image can be read out of the FV at a later time.
-
-  DriverName - Name of driver to add to mDiscoveredList.
-
-Returns:
-
-  Pointer to device path constructed from FvHandle and DriverName
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_DEVICE_PATH_PROTOCOL            *FvDevicePath;
@@ -723,39 +717,33 @@ Returns:
 
 
 
+
+/**
+  Add an entry to the mDiscoveredList. Allocate memory to store the DriverEntry,
+  and initilize any state variables. Read the Depex from the FV and store it
+  in DriverEntry. Pre-process the Depex to set the SOR, Before and After state.
+  The Discovered list is never free'ed and contains booleans that represent the
+  other possible DXE driver states.
+
+  @param  Fv                    Fv protocol, needed to read Depex info out of 
+                                FLASH. 
+  @param  FvHandle              Handle for Fv, needed in the 
+                                EFI_CORE_DRIVER_ENTRY so that the PE image can be 
+                                read out of the FV at a later time. 
+  @param  DriverName            Name of driver to add to mDiscoveredList. 
+
+  @retval EFI_SUCCESS           If driver was added to the mDiscoveredList. 
+  @retval EFI_ALREADY_STARTED   The driver has already been started. Only one 
+                                DriverName may be active in the system at any one 
+                                time.
+
+**/
 EFI_STATUS
 CoreAddToDriverList (
   IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
   IN  EFI_GUID                        *DriverName
   )
-/*++
-
-Routine Description:
-
-  Add an entry to the mDiscoveredList. Allocate memory to store the DriverEntry, 
-  and initilize any state variables. Read the Depex from the FV and store it
-  in DriverEntry. Pre-process the Depex to set the SOR, Before and After state.
-  The Discovered list is never free'ed and contains booleans that represent the
-  other possible DXE driver states.
-
-Arguments:
-
-  Fv         - Fv protocol, needed to read Depex info out of FLASH.
-  
-  FvHandle   - Handle for Fv, needed in the EFI_CORE_DRIVER_ENTRY so that the
-               PE image can be read out of the FV at a later time.
-
-  DriverName - Name of driver to add to mDiscoveredList.
-
-Returns:
-
-  EFI_SUCCESS - If driver was added to the mDiscoveredList.
-
-  EFI_ALREADY_STARTED - The driver has already been started. Only one DriverName
-                        may be active in the system at any one time.
-
---*/
 {
   EFI_CORE_DRIVER_ENTRY               *DriverEntry;
 
@@ -784,32 +772,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Check if a FV Image type file (EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) is
+  described by a EFI_HOB_FIRMWARE_VOLUME2 Hob.
+
+  @param  FvHandle              The handle which FVB protocol installed on. 
+  @param  DriverName            The driver guid specified. 
+
+  @retval TRUE                  This file is found in a EFI_HOB_FIRMWARE_VOLUME2 
+                                Hob. 
+  @retval FALSE                 Not found.
+
+**/
 STATIC
 BOOLEAN
 FvFoundInHobFv2 (
   IN  EFI_HANDLE                      FvHandle,
   IN  CONST EFI_GUID                  *DriverName
   )
-/*++
-
-Routine Description:
-
-  Check if a FV Image type file (EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) is
-  described by a EFI_HOB_FIRMWARE_VOLUME2 Hob.
-
-Arguments:
-
-  FvHandle    - The handle which FVB protocol installed on.
-  DriverName  - The driver guid specified.
-
-Returns:
-
-  TRUE    - This file is found in a EFI_HOB_FIRMWARE_VOLUME2 Hob.
-
-  FALSE   - Not found.
-  
-
---*/
 {
   EFI_PEI_HOB_POINTERS                HobFv2;
   
@@ -826,34 +807,25 @@ Returns:
 }
 
 
+
+/**
+  Get the driver from the FV through driver name, and produce a FVB protocol on FvHandle.
+
+  @param  Fv                    The FIRMWARE_VOLUME protocol installed on the FV. 
+  @param  FvHandle              The handle which FVB protocol installed on. 
+  @param  DriverName            The driver guid specified. 
+
+  @retval EFI_OUT_OF_RESOURCES  No enough memory or other resource. 
+  @retval EFI_VOLUME_CORRUPTED  Corrupted volume. 
+  @retval EFI_SUCCESS           Function successfully returned.
+
+**/
 EFI_STATUS 
 CoreProcessFvImageFile (
   IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
   IN  EFI_HANDLE                      FvHandle,
   IN  EFI_GUID                        *DriverName
   )
-/*++
-
-Routine Description:
-
-  Get the driver from the FV through driver name, and produce a FVB protocol on FvHandle.
-
-Arguments:
-
-  Fv          - The FIRMWARE_VOLUME protocol installed on the FV.
-  FvHandle    - The handle which FVB protocol installed on.
-  DriverName  - The driver guid specified.
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES    - No enough memory or other resource.
-  
-  EFI_VOLUME_CORRUPTED    - Corrupted volume.
-  
-  EFI_SUCCESS             - Function successfully returned.
-  
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_SECTION_TYPE                    SectionType;
@@ -932,6 +904,24 @@ Returns:
   return Status;
 }
 
+
+/**
+  Event notification that is fired every time a FV dispatch protocol is added.
+  More than one protocol may have been added when this event is fired, so you
+  must loop on CoreLocateHandle () to see how many protocols were added and
+  do the following to each FV:
+  If the Fv has already been processed, skip it. If the Fv has not been
+  processed then mark it as being processed, as we are about to process it.
+  Read the Fv and add any driver in the Fv to the mDiscoveredList.The
+  mDiscoveredList is never free'ed and contains variables that define
+  the other states the DXE driver transitions to..
+  While you are at it read the A Priori file into memory.
+  Place drivers in the A Priori list onto the mScheduledQueue.
+
+  @param  Event                 The Event that is being processed, not used. 
+  @param  Context               Event Context, not used.
+
+**/
 STATIC
 VOID
 EFIAPI
@@ -939,36 +929,6 @@ CoreFwVolEventProtocolNotify (
   IN  EFI_EVENT       Event,
   IN  VOID            *Context
   )
-/*++
-
-Routine Description:
-
-  Event notification that is fired every time a FV dispatch protocol is added. 
-  More than one protocol may have been added when this event is fired, so you
-  must loop on CoreLocateHandle () to see how many protocols were added and
-  do the following to each FV:
-
-  If the Fv has already been processed, skip it. If the Fv has not been 
-  processed then mark it as being processed, as we are about to process it.
-
-  Read the Fv and add any driver in the Fv to the mDiscoveredList.The 
-  mDiscoveredList is never free'ed and contains variables that define
-  the other states the DXE driver transitions to.. 
-  
-  While you are at it read the A Priori file into memory.
-  Place drivers in the A Priori list onto the mScheduledQueue.
-
-Arguments:
-
-  Event   - The Event that is being processed, not used.
-  
-  Context - Event Context, not used.
-
-Returns:
-
-  None
-
---*/
 {
   EFI_STATUS                    Status;
   EFI_STATUS                    GetNextFileStatus;
@@ -1181,26 +1141,16 @@ Returns:
 }
 
 
+
+/**
+  Initialize the dispatcher. Initialize the notification function that runs when
+  a FV protocol is added to the system.
+
+**/
 VOID
 CoreInitializeDispatcher (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Initialize the dispatcher. Initialize the notification function that runs when
-  a FV protocol is added to the system.
-
-Arguments:
-
-  NONE
-
-Returns:
-
-  NONE 
-
---*/
 {
   mFwVolEvent = CoreCreateProtocolNotifyEvent (
                   &gEfiFirmwareVolume2ProtocolGuid, 
@@ -1215,26 +1165,16 @@ Returns:
 //
 // Function only used in debug builds
 //
+
+/**
+  Traverse the discovered list for any drivers that were discovered but not loaded
+  because the dependency experessions evaluated to false.
+
+**/
 VOID
 CoreDisplayDiscoveredNotDispatched (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Traverse the discovered list for any drivers that were discovered but not loaded 
-  because the dependency experessions evaluated to false
-
-Arguments:
-
-  NONE
-
-Returns:
-
-  NONE 
-
---*/
 {
   LIST_ENTRY                    *Link;
   EFI_CORE_DRIVER_ENTRY         *DriverEntry;
@@ -1242,7 +1182,7 @@ Returns:
   for (Link = mDiscoveredList.ForwardLink;Link !=&mDiscoveredList; Link = Link->ForwardLink) {
     DriverEntry = CR(Link, EFI_CORE_DRIVER_ENTRY, Link, EFI_CORE_DRIVER_ENTRY_SIGNATURE);
     if (DriverEntry->Dependent) {
-      DEBUG ((EFI_D_LOAD, "Driver %g was discovered but not loaded!!\n", &DriverEntry->FileName));
+      DEBUG ((DEBUG_LOAD, "Driver %g was discovered but not loaded!!\n", &DriverEntry->FileName));
     }
   }
 }

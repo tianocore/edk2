@@ -15,6 +15,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <DxeMain.h>
 
+
+/**
+  Opens a file for (simple) reading.  The simple read abstraction
+  will access the file either from a memory copy, from a file
+  system interface, or from the load file interface.
+
+  @param  BootPolicy             Policy for Open Image File. 
+  @param  SourceBuffer           Pointer to the memory location containing copy 
+                                 of the image to be loaded. 
+  @param  SourceSize             The size in bytes of SourceBuffer. 
+  @param  FilePath               The specific file path from which the image is 
+                                 loaded 
+  @param  DeviceHandle           Pointer to the return device handle. 
+  @param  ImageFileHandle        Pointer to the image file handle. 
+  @param  AuthenticationStatus   Pointer to a caller-allocated UINT32 in which 
+                                 the authentication status is returned. 
+
+  @retval EFI_SUCCESS            Image file successfully opened. 
+  @retval EFI_LOAD_ERROR         If the caller passed a copy of the file, and 
+                                 SourceSize is 0. 
+  @retval EFI_INVALID_PARAMETER  File path is not valid. 
+  @retval EFI_NOT_FOUND          File not found.
+
+**/
 EFI_STATUS
 CoreOpenImageFile (
   IN BOOLEAN                        BootPolicy,
@@ -25,36 +49,6 @@ CoreOpenImageFile (
   IN IMAGE_FILE_HANDLE              *ImageFileHandle,
   OUT UINT32                        *AuthenticationStatus
   )
-/*++
-
-Routine Description:
-
-    Opens a file for (simple) reading.  The simple read abstraction
-    will access the file either from a memory copy, from a file
-    system interface, or from the load file interface.
-
-Arguments:
-
-  BootPolicy    - Policy for Open Image File.
-  SourceBuffer  - Pointer to the memory location containing copy
-                  of the image to be loaded.
-  SourceSize    - The size in bytes of SourceBuffer.
-  FilePath      - The specific file path from which the image is loaded
-  DeviceHandle  - Pointer to the return device handle.
-  ImageFileHandle      - Pointer to the image file handle.
-  AuthenticationStatus - Pointer to a caller-allocated UINT32 in which the authentication status is returned.
-
-Returns:
-
-    EFI_SUCCESS     - Image file successfully opened.
-
-    EFI_LOAD_ERROR  - If the caller passed a copy of the file, and SourceSize is 0.
-
-    EFI_INVALID_PARAMETER   - File path is not valid.
-
-    EFI_NOT_FOUND   - File not found.
-
---*/
 {
   EFI_STATUS                        Status;
   EFI_DEVICE_PATH_PROTOCOL          *TempFilePath;
@@ -318,7 +312,7 @@ Returns:
   //
   // Nothing else to try
   //
-  DEBUG ((EFI_D_LOAD|EFI_D_WARN, "CoreOpenImageFile: Device did not support a known load protocol\n"));
+  DEBUG ((DEBUG_LOAD|DEBUG_WARN, "CoreOpenImageFile: Device did not support a known load protocol\n"));
   Status = EFI_NOT_FOUND;
 
 Done:
@@ -340,6 +334,21 @@ Done:
 
 
 
+
+/**
+  Read image file (specified by UserHandle) into user specified buffer with specified offset
+  and length.
+
+  @param  UserHandle             Image file handle 
+  @param  Offset                 Offset to the source file 
+  @param  ReadSize               For input, pointer of size to read; For output, 
+                                 pointer of size actually read. 
+  @param  Buffer                 Buffer to write into 
+
+  @retval EFI_SUCCESS            Successfully read the specified part of file 
+                                 into buffer.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreReadImageFile (
@@ -348,29 +357,6 @@ CoreReadImageFile (
   IN OUT UINTN   *ReadSize,
   OUT    VOID    *Buffer
   )
-/*++
-
-Routine Description:
-
-  Read image file (specified by UserHandle) into user specified buffer with specified offset
-  and length.
-
-Arguments:
-
-  UserHandle      - Image file handle
-
-  Offset          - Offset to the source file
-
-  ReadSize        - For input, pointer of size to read;
-                    For output, pointer of size actually read.
-
-  Buffer          - Buffer to write into
-
-Returns:
-
-  EFI_SUCCESS     - Successfully read the specified part of file into buffer.
-
---*/
 {
   UINTN               EndPosition;
   IMAGE_FILE_HANDLE  *FHand;
@@ -393,6 +379,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Search a handle to a device on a specified device path that supports a specified protocol,
+  interface of that protocol on that handle is another output.
+
+  @param  Protocol               The protocol to search for 
+  @param  FilePath               The specified device path 
+  @param  Interface              Interface of the protocol on the handle 
+  @param  Handle                 The handle to the device on the specified device 
+                                 path that supports the protocol. 
+
+  @return Status code.
+
+**/
 EFI_STATUS
 CoreDevicePathToInterface (
   IN EFI_GUID                     *Protocol,
@@ -400,28 +400,6 @@ CoreDevicePathToInterface (
   OUT VOID                        **Interface,
   OUT EFI_HANDLE                  *Handle
   )
-/*++
-
-Routine Description:
-
-  Search a handle to a device on a specified device path that supports a specified protocol,
-  interface of that protocol on that handle is another output.
-
-Arguments:
-
-  Protocol      - The protocol to search for
-
-  FilePath      - The specified device path
-
-  Interface     - Interface of the protocol on the handle
-
-  Handle        - The handle to the device on the specified device path that supports the protocol.
-
-Returns:
-
-  Status code.
-
---*/
 {
   EFI_STATUS                      Status;
 
@@ -432,37 +410,28 @@ Returns:
   return Status;
 }
 
+
+/**
+  Helper function called as part of the code needed
+  to allocate the proper sized buffer for various
+  EFI interfaces.
+
+  @param  Status                 Current status 
+  @param  Buffer                 Current allocated buffer, or NULL 
+  @param  BufferSize             Current buffer size needed 
+
+  @retval TRUE                   if the buffer was reallocated and the caller 
+                                 should try the API again. 
+  @retval FALSE                  buffer could not be allocated and the caller 
+                                 should not try the API again.
+
+**/
 BOOLEAN
 CoreGrowBuffer (
   IN OUT EFI_STATUS   *Status,
   IN OUT VOID         **Buffer,
   IN UINTN            BufferSize
   )
-/*++
-
-Routine Description:
-
-    Helper function called as part of the code needed
-    to allocate the proper sized buffer for various
-    EFI interfaces.
-
-Arguments:
-
-    Status      - Current status
-
-    Buffer      - Current allocated buffer, or NULL
-
-    BufferSize  - Current buffer size needed
-
-Returns:
-
-    TRUE - if the buffer was reallocated and the caller
-    should try the API again.
-
-    FALSE - buffer could not be allocated and the caller
-    should not try the API again.
-
---*/
 {
   BOOLEAN         TryAgain;
 
@@ -505,4 +474,5 @@ Returns:
 
   return TryAgain;
 }
+
 

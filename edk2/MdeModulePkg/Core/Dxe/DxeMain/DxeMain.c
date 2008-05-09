@@ -1,7 +1,7 @@
-/**@file
+/** @file
 
   DXE Core Main Entry Point
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -228,26 +228,21 @@ EFI_DECOMPRESS_PROTOCOL  gEfiDecompress = {
 //
 // Main entry point to the DXE Core
 //
+
+/**
+  Main entry point to DXE Core.
+
+  @param  HobStart               Pointer to the beginning of the HOB List from 
+                                 PEI 
+
+  @return This function should never return
+
+**/
 VOID
 EFIAPI
 DxeMain (
   IN  VOID *HobStart
   )
-/*++
-
-Routine Description:
-
-  Main entry point to DXE Core.
-
-Arguments:
-
-  HobStart - Pointer to the beginning of the HOB List from PEI
-
-Returns:
-
-  This function should never return
-
---*/
 {
   EFI_STATUS                         Status;
   EFI_PHYSICAL_ADDRESS               MemoryBaseAddress;
@@ -335,7 +330,7 @@ Returns:
     gDxeCoreImageHandle
     );
 
-  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "HOBLIST address in DXE = 0x%016lx\n", (UINT64) (UINTN) HobStart));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "HOBLIST address in DXE = 0x%016lx\n", (UINT64) (UINTN) HobStart));
 
   //
   // Initialize the Event Services
@@ -438,26 +433,19 @@ Returns:
 }
 
 
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are
+  available.
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
 EFI_STATUS
 EFIAPI
 CoreEfiNotAvailableYetArg0 (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Place holder function until all the Boot Services and Runtime Services are available
-
-Arguments:
-
-  None
-
-Returns:
-
-  EFI_NOT_AVAILABLE_YET
-
---*/
 {
   //
   // This function should never be executed.  If it does, then the architectural protocols
@@ -468,26 +456,21 @@ Returns:
   return EFI_NOT_AVAILABLE_YET;
 }
 
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are
+  available.
+
+  @param  Arg1                   Undefined 
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
 EFI_STATUS
 EFIAPI
 CoreEfiNotAvailableYetArg1 (
   UINTN Arg1
   )
-/*++
-
-Routine Description:
-
-  Place holder function until all the Boot Services and Runtime Services are available
-
-Arguments:
-
-  Arg1        - Undefined
-
-Returns:
-
-  EFI_NOT_AVAILABLE_YET
-
---*/
 {
   //
   // This function should never be executed.  If it does, then the architectural protocols
@@ -498,29 +481,22 @@ Returns:
   return EFI_NOT_AVAILABLE_YET;
 }
 
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  Arg1                   Undefined 
+  @param  Arg2                   Undefined 
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
 EFI_STATUS
 EFIAPI
 CoreEfiNotAvailableYetArg2 (
   UINTN Arg1,
   UINTN Arg2
   )
-/*++
-
-Routine Description:
-
-  Place holder function until all the Boot Services and Runtime Services are available
-
-Arguments:
-
-  Arg1        - Undefined
-
-  Arg2        - Undefined
-
-Returns:
-
-  EFI_NOT_AVAILABLE_YET
-
---*/
 {
   //
   // This function should never be executed.  If it does, then the architectural protocols
@@ -531,6 +507,17 @@ Returns:
   return EFI_NOT_AVAILABLE_YET;
 }
 
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  Arg1                   Undefined 
+  @param  Arg2                   Undefined 
+  @param  Arg3                   Undefined 
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
 EFI_STATUS
 EFIAPI
 CoreEfiNotAvailableYetArg3 (
@@ -538,25 +525,6 @@ CoreEfiNotAvailableYetArg3 (
   UINTN Arg2,
   UINTN Arg3
   )
-/*++
-
-Routine Description:
-
-  Place holder function until all the Boot Services and Runtime Services are available
-
-Arguments:
-
-  Arg1        - Undefined
-
-  Arg2        - Undefined
-
-  Arg3        - Undefined
-
-Returns:
-
-  EFI_NOT_AVAILABLE_YET
-
---*/
 {
   //
   // This function should never be executed.  If it does, then the architectural protocols
@@ -567,6 +535,18 @@ Returns:
   return EFI_NOT_AVAILABLE_YET;
 }
 
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  Arg1                   Undefined 
+  @param  Arg2                   Undefined 
+  @param  Arg3                   Undefined 
+  @param  Arg4                   Undefined 
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
 EFI_STATUS
 EFIAPI
 CoreEfiNotAvailableYetArg4 (
@@ -575,27 +555,6 @@ CoreEfiNotAvailableYetArg4 (
   UINTN Arg3,
   UINTN Arg4
   )
-/*++
-
-Routine Description:
-
-  Place holder function until all the Boot Services and Runtime Services are available
-
-Arguments:
-
-  Arg1        - Undefined
-
-  Arg2        - Undefined
-
-  Arg3        - Undefined
-
-  Arg4        - Undefined
-
-Returns:
-
-  EFI_NOT_AVAILABLE_YET
-
---*/
 {
   //
   // This function should never be executed.  If it does, then the architectural protocols
@@ -606,6 +565,19 @@ Returns:
   return EFI_NOT_AVAILABLE_YET;
 }
 
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  Arg1                   Undefined 
+  @param  Arg2                   Undefined 
+  @param  Arg3                   Undefined 
+  @param  Arg4                   Undefined 
+  @param  Arg5                   Undefined 
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
 EFI_STATUS
 EFIAPI
 CoreEfiNotAvailableYetArg5 (
@@ -615,29 +587,6 @@ CoreEfiNotAvailableYetArg5 (
   UINTN Arg4,
   UINTN Arg5
   )
-/*++
-
-Routine Description:
-
-  Place holder function until all the Boot Services and Runtime Services are available
-
-Arguments:
-
-  Arg1        - Undefined
-
-  Arg2        - Undefined
-
-  Arg3        - Undefined
-
-  Arg4        - Undefined
-
-  Arg5        - Undefined
-
-Returns:
-
-  EFI_NOT_AVAILABLE_YET
-
---*/
 {
   //
   // This function should never be executed.  If it does, then the architectural protocols
@@ -649,30 +598,23 @@ Returns:
 }
 
 
+
+/**
+  Searches for a Protocol Interface passed from PEI through a HOB.
+
+  @param  ProtocolGuid           The Protocol GUID to search for in the HOB List 
+  @param  Interface              A pointer to the interface for the Protocol GUID 
+
+  @retval EFI_SUCCESS            The Protocol GUID was found and its interface is 
+                                 returned in Interface 
+  @retval EFI_NOT_FOUND          The Protocol GUID was not found in the HOB List
+
+**/
 EFI_STATUS
 CoreGetPeiProtocol (
   IN EFI_GUID  *ProtocolGuid,
   IN VOID      **Interface
   )
-/*++
-
-Routine Description:
-
-  Searches for a Protocol Interface passed from PEI through a HOB
-
-Arguments:
-
-  ProtocolGuid - The Protocol GUID to search for in the HOB List
-
-  Interface    - A pointer to the interface for the Protocol GUID
-
-Returns:
-
-  EFI_SUCCESS   - The Protocol GUID was found and its interface is returned in Interface
-
-  EFI_NOT_FOUND - The Protocol GUID was not found in the HOB List
-
---*/
 {
   EFI_HOB_GUID_TYPE   *GuidHob;
   VOID                *Buffer;
@@ -691,26 +633,18 @@ Returns:
 }
 
 
+
+/**
+  Calcualte the 32-bit CRC in a EFI table using the service provided by the
+  gRuntime service.
+
+  @param  Hdr                    Pointer to an EFI standard header
+
+**/
 VOID
 CalculateEfiHdrCrc (
   IN  OUT EFI_TABLE_HEADER    *Hdr
   )
-/*++
-
-Routine Description:
-
-  Calcualte the 32-bit CRC in a EFI table using the service provided by the
-  gRuntime service.
-
-Arguments:
-
-  Hdr  - Pointer to an EFI standard header
-
-Returns:
-
-  None
-
---*/
 {
   UINT32 Crc;
 
@@ -727,30 +661,23 @@ Returns:
 
 
 
+
+/**
+  Terminates all boot services.
+
+  @param  ImageHandle            Handle that identifies the exiting image. 
+  @param  MapKey                 Key to the latest memory map.
+
+  @retval EFI_SUCCESS            Boot Services terminated 
+  @retval EFI_INVALID_PARAMETER  MapKey is incorrect.
+
+**/
 EFI_STATUS
 EFIAPI
 CoreExitBootServices (
   IN EFI_HANDLE   ImageHandle,
   IN UINTN        MapKey
   )
-/*++
-
-Routine Description:
-
-  Terminates all boot services.
-
-Arguments:
-
-  ImageHandle   - Handle that identifies the exiting image.
-
-  MapKey -Key to the latest memory map.
-
-Returns:
-
-  EFI_SUCCESS - Boot Services terminated
-  EFI_INVALID_PARAMETER - MapKey is incorrect.
-
---*/
 {
   EFI_STATUS    Status;
   EFI_STATUS    StatusTemp;
@@ -847,7 +774,48 @@ Returns:
   return Status;
 }
 
+
+/**
+  Given a compressed source buffer, this function retrieves the size of the
+  uncompressed buffer and the size of the scratch buffer required to decompress
+  the compressed source buffer.
+
+  The GetInfo() function retrieves the size of the uncompressed buffer and the
+  temporary scratch buffer required to decompress the buffer specified by Source
+  and SourceSize. If the size of the uncompressed buffer or the size of the
+  scratch buffer cannot be determined from the compressed data specified by
+  Source and SourceData, then EFI_INVALID_PARAMETER is returned. Otherwise, the
+  size of the uncompressed buffer is returned in DestinationSize, the size of
+  the scratch buffer is returned in ScratchSize, and EFI_SUCCESS is returned.
+  The GetInfo() function does not have scratch buffer available to perform a
+  thorough checking of the validity of the source data. It just retrieves the
+  "Original Size" field from the beginning bytes of the source data and output
+  it as DestinationSize. And ScratchSize is specific to the decompression
+  implementation.
+
+  @param  This               A pointer to the EFI_DECOMPRESS_PROTOCOL instance.
+  @param  Source             The source buffer containing the compressed data.
+  @param  SourceSize         The size, in bytes, of the source buffer.
+  @param  DestinationSize    A pointer to the size, in bytes, of the
+                             uncompressed buffer that will be generated when the
+                             compressed buffer specified by Source and
+                             SourceSize is decompressed.
+  @param  ScratchSize        A pointer to the size, in bytes, of the scratch
+                             buffer that is required to decompress the
+                             compressed buffer specified by Source and
+                             SourceSize.
+   
+  @retval EFI_SUCCESS        The size of the uncompressed data was returned in
+                             DestinationSize and the size of the scratch buffer
+                             was returned in ScratchSize.
+  @retval EFI_INVALID_PARAMETER The size of the uncompressed data or the size of
+                                the scratch buffer cannot be determined from the
+                                compressed data specified by Source and
+                                SourceSize.
+
+**/
 EFI_STATUS
+EFIAPI
 DxeMainUefiDecompressGetInfo (
   IN EFI_DECOMPRESS_PROTOCOL            *This,
   IN   VOID                             *Source,
@@ -864,6 +832,41 @@ DxeMainUefiDecompressGetInfo (
   return UefiDecompressGetInfo (Source, SourceSize, DestinationSize, ScratchSize);
 }
 
+
+/**
+  Decompresses a compressed source buffer.
+
+  The Decompress() function extracts decompressed data to its original form.
+  This protocol is designed so that the decompression algorithm can be
+  implemented without using any memory services. As a result, the Decompress()
+  Function is not allowed to call AllocatePool() or AllocatePages() in its
+  implementation. It is the caller¡¯s responsibility to allocate and free the
+  Destination and Scratch buffers.
+  If the compressed source data specified by Source and SourceSize is
+  sucessfully decompressed into Destination, then EFI_SUCCESS is returned. If
+  the compressed source data specified by Source and SourceSize is not in a
+  valid compressed data format, then EFI_INVALID_PARAMETER is returned.
+
+  @param  This                A pointer to the EFI_DECOMPRESS_PROTOCOL instance.
+  @param  Source              The source buffer containing the compressed data.
+  @param  SourceSize          SourceSizeThe size of source data.
+  @param  Destination         On output, the destination buffer that contains
+                              the uncompressed data.
+  @param  DestinationSize     The size of the destination buffer.  The size of
+                              the destination buffer needed is obtained from
+                              EFI_DECOMPRESS_PROTOCOL.GetInfo().
+  @param  Scratch             A temporary scratch buffer that is used to perform
+                              the decompression.
+  @param  ScratchSize         The size of scratch buffer. The size of the
+                              scratch buffer needed is obtained from GetInfo().
+  
+  @retval EFI_SUCCESS         Decompression completed successfully, and the
+                              uncompressed buffer is returned in Destination.
+  @retval EFI_INVALID_PARAMETER  The source buffer specified by Source and
+                                 SourceSize is corrupted (not in a valid
+                                 compressed format).
+
+**/
 EFI_STATUS
 EFIAPI
 DxeMainUefiDecompress (

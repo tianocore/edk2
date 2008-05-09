@@ -15,27 +15,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <DxeMain.h>
 
+
+/**
+  Set Interrupt State.
+
+  @param  Enable  The state of enable or disable interrupt
+
+**/
 STATIC
 VOID
 CoreSetInterruptState (
   IN BOOLEAN      Enable
   )
-/*++
-
-Routine Description:
-  
-  Set Interrupt State
-  
-Arguments:
-  
-  Enable - The state of enable or disable interrupt
-  
-Returns:
-  
-  None
-
---*/
-
 {
   if (gCpu != NULL) {
     if (Enable) {
@@ -49,25 +40,19 @@ Returns:
 //
 // Return the highest set bit
 //
+
+/**
+  Return the highest set bit.
+
+  @param  Number  The value to check 
+
+  @return Bit position of the highest set bit
+
+**/
 UINTN
 CoreHighestSetBit (
   IN UINTN     Number
   )
-/*++
-
-Routine Description:
-  
-  Return the highest set bit
-  
-Arguments:
-  
-  Number - The value to check
-  
-Returns:
-  
-  Bit position of the highest set bit
-
---*/
 {
   UINTN   msb;
   
@@ -81,27 +66,21 @@ Returns:
 
 
 
+
+/**
+  Raise the task priority level to the new level.
+  High level is implemented by disabling processor interrupts.
+
+  @param  NewTpl  New task priority level 
+
+  @return The previous task priority level
+
+**/
 EFI_TPL
 EFIAPI
 CoreRaiseTpl (
   IN EFI_TPL      NewTpl
   )
-/*++
-
-Routine Description:
-
-  Raise the task priority level to the new level.
-  High level is implemented by disabling processor interrupts.
-
-Arguments:
-
-  NewTpl  - New task priority level
-    
-Returns:
-
-  The previous task priority level
-
---*/
 {
   EFI_TPL     OldTpl;
 
@@ -126,27 +105,19 @@ Returns:
 
 
 
+
+/**
+  Lowers the task priority to the previous value.   If the new
+  priority unmasks events at a higher priority, they are dispatched.
+
+  @param  NewTpl  New, lower, task priority
+
+**/
 VOID
 EFIAPI
 CoreRestoreTpl (
   IN EFI_TPL NewTpl
   )
-/*++
-
-Routine Description:
-
-  Lowers the task priority to the previous value.   If the new 
-  priority unmasks events at a higher priority, they are dispatched.
-
-Arguments:
-
-  NewTpl  - New, lower, task priority
-    
-Returns:
-
-  None
-
---*/
 {
   EFI_TPL     OldTpl;
 

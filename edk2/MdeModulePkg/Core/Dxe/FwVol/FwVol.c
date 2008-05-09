@@ -1,9 +1,9 @@
-/**@file
+/** @file
   Firmware File System driver that produce Firmware Volume protocol.
   Layers on top of Firmware Block protocol to produce a file abstraction 
   of FV based files.
   
-Copyright (c) 2006 - 2007 Intel Corporation. <BR>
+Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -53,29 +53,26 @@ FV_DEVICE mFvDevice = {
 // FFS helper functions
 //
 
+
+/**
+  given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
+  copy the volume header into it.
+
+  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to 
+                                read the volume header 
+  @param  FwVolHeader           Pointer to pointer to allocated buffer in which 
+                                the volume header is returned. 
+
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated. 
+  @retval EFI_SUCCESS           Successfully read volume header to the allocated 
+                                buffer.
+
+**/
 EFI_STATUS
 GetFwVolHeader (
   IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
   OUT    EFI_FIRMWARE_VOLUME_HEADER             **FwVolHeader
   )
-/*++
-
-Routine Description:
-  given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
-  copy the volume header into it.
-
-Arguments:
-  Fvb - The FW_VOL_BLOCK_PROTOCOL instance from which to read the volume
-          header
-  FwVolHeader - Pointer to pointer to allocated buffer in which the volume
-                  header is returned.
-
-Returns:
-  EFI_OUT_OF_RESOURCES    - No enough buffer could be allocated.
-  EFI_SUCCESS             - Successfully read volume header to the allocated buffer.
-
---*/
-
 {
   EFI_STATUS                  Status;
   EFI_FIRMWARE_VOLUME_HEADER  TempFvh;
@@ -119,23 +116,20 @@ Returns:
 }
 
 
+
+/**
+  Free FvDevice resource when error happens
+
+  @param  FvDevice              pointer to the FvDevice to be freed. 
+
+  @return None.
+
+**/
 STATIC
 VOID
 FreeFvDeviceResource (
   IN FV_DEVICE  *FvDevice
   )
-/*++
-
-Routine Description:
-  Free FvDevice resource when error happens
-
-Arguments:
-  FvDevice - pointer to the FvDevice to be freed.
-
-Returns:
-  None.
-
---*/
 {
   FFS_FILE_LIST_ENTRY         *FfsFileEntry;
   LIST_ENTRY                  *NextEntry;
@@ -174,24 +168,21 @@ Returns:
 }
 
 
+
+/**
+  Check if a FV is consistent and allocate cache
+
+  @param  FvDevice              pointer to the FvDevice to be checked. 
+
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated. 
+  @retval EFI_SUCCESS           FV is consistent and cache is allocated. 
+  @retval EFI_VOLUME_CORRUPTED  File system is corrupted.
+
+**/
 EFI_STATUS
 FvCheck (
   IN OUT FV_DEVICE  *FvDevice
   )
-/*++
-
-Routine Description:
-  Check if a FV is consistent and allocate cache
-
-Arguments:
-  FvDevice - pointer to the FvDevice to be checked.
-
-Returns:
-  EFI_OUT_OF_RESOURCES    - No enough buffer could be allocated.
-  EFI_SUCCESS             - FV is consistent and cache is allocated.
-  EFI_VOLUME_CORRUPTED    - File system is corrupted.
-
---*/
 {
   EFI_STATUS                            Status;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb;
@@ -380,6 +371,17 @@ Done:
 }
 
 
+
+/**
+  This notification function is invoked when an instance of the
+  EFI_FW_VOLUME_BLOCK_PROTOCOL is produced.  It layers an instance of the
+  EFI_FIRMWARE_VOLUME2_PROTOCOL on the same handle.  This is the function where
+  the actual initialization of the EFI_FIRMWARE_VOLUME2_PROTOCOL is done.
+
+  @param  Event                 The event that occured 
+  @param  Context               For EFI compatiblity.  Not used.
+
+**/
 STATIC
 VOID
 EFIAPI
@@ -387,23 +389,6 @@ NotifyFwVolBlock (
   IN  EFI_EVENT Event,
   IN  VOID      *Context
   )
-/*++
-
-Routine Description:
-    This notification function is invoked when an instance of the
-    EFI_FW_VOLUME_BLOCK_PROTOCOL is produced.  It layers an instance of the
-    EFI_FIRMWARE_VOLUME2_PROTOCOL on the same handle.  This is the function where
-    the actual initialization of the EFI_FIRMWARE_VOLUME2_PROTOCOL is done.
-
-Arguments:
-    Event - The event that occured
-    Context - For EFI compatiblity.  Not used.
-
-Returns:
-
-    None.
-
---*/
 {
   EFI_HANDLE                            Handle;
   EFI_STATUS                            Status;
@@ -515,27 +500,24 @@ Returns:
 }
 
 
+
+/**
+  This routine is the driver initialization entry point.  It initializes the
+  libraries, and registers two notification functions.  These notification
+  functions are responsible for building the FV stack dynamically.
+
+  @param  ImageHandle           The image handle. 
+  @param  SystemTable           The system table. 
+
+  @retval EFI_SUCCESS           Function successfully returned.
+
+**/
 EFI_STATUS
 EFIAPI
 FwVolDriverInit (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
   )
-/*++
-
-Routine Description:
-    This routine is the driver initialization entry point.  It initializes the
-    libraries, and registers two notification functions.  These notification
-    functions are responsible for building the FV stack dynamically.
-    
-Arguments:
-    ImageHandle   - The image handle.
-    SystemTable   - The system table.
-    
-Returns:
-    EFI_SUCCESS   - Function successfully returned.
-
---*/
 {
   gEfiFwVolBlockEvent = CoreCreateProtocolNotifyEvent (
                           &gEfiFirmwareVolumeBlockProtocolGuid,
@@ -547,4 +529,5 @@ Returns:
                           );
   return EFI_SUCCESS;
 }
+
 
