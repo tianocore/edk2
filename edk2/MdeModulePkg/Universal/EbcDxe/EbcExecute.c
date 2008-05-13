@@ -1,7 +1,7 @@
 /** @file
   Contains code that implements the virtual machine.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,6 +42,28 @@ UINT64
   IN UINT64     Op2
   );
 
+/**
+  Decode a 16-bit index to determine the offset. Given an index value:
+
+    b15     - sign bit
+    b14:12  - number of bits in this index assigned to natural units (=a)
+    ba:11   - constant units = ConstUnits
+    b0:a    - natural units = NaturalUnits
+  
+  Given this info, the offset can be computed by:
+    offset = sign_bit * (ConstUnits + NaturalUnits * sizeof(UINTN))
+
+  Max offset is achieved with index = 0x7FFF giving an offset of
+  0x27B (32-bit machine) or 0x477 (64-bit machine).
+  Min offset is achieved with index = 
+
+  @param  VmPtr             A pointer to VM context.
+  @param  CodeOffset        Offset from IP of the location of the 16-bit index
+                            to decode.
+
+  @return The decoded offset.
+
+**/
 STATIC
 INT16
 VmReadIndex16 (
@@ -49,6 +71,16 @@ VmReadIndex16 (
   IN UINT32     CodeOffset
   );
 
+/**
+  Decode a 32-bit index to determine the offset.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  CodeOffset        Offset from IP of the location of the 32-bit index
+                            to decode.
+
+  @return Converted index per EBC VM specification.
+
+**/
 STATIC
 INT32
 VmReadIndex32 (
@@ -56,6 +88,16 @@ VmReadIndex32 (
   IN UINT32     CodeOffset
   );
 
+/**
+  Decode a 64-bit index to determine the offset.
+
+  @param  VmPtr             A pointer to VM context.s
+  @param  CodeOffset        Offset from IP of the location of the 64-bit index
+                            to decode.
+
+  @return Converted index per EBC VM specification
+
+**/
 STATIC
 INT64
 VmReadIndex64 (
@@ -63,6 +105,15 @@ VmReadIndex64 (
   IN UINT32     CodeOffset
   );
 
+/**
+  Reads 8-bit data form the memory address.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  Addr              The memory address.
+
+  @return The 8-bit value from the memory adress.
+
+**/
 STATIC
 UINT8
 VmReadMem8 (
@@ -70,6 +121,15 @@ VmReadMem8 (
   IN UINTN      Addr
   );
 
+/**
+  Reads 16-bit data form the memory address.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  Addr              The memory address.
+
+  @return The 16-bit value from the memory adress.
+
+**/
 STATIC
 UINT16
 VmReadMem16 (
@@ -77,6 +137,15 @@ VmReadMem16 (
   IN UINTN      Addr
   );
 
+/**
+  Reads 32-bit data form the memory address.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  Addr              The memory address.
+
+  @return The 32-bit value from the memory adress.
+
+**/
 STATIC
 UINT32
 VmReadMem32 (
@@ -84,6 +153,15 @@ VmReadMem32 (
   IN UINTN      Addr
   );
 
+/**
+  Reads 64-bit data form the memory address.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  Addr              The memory address.
+
+  @return The 64-bit value from the memory adress.
+
+**/
 STATIC
 UINT64
 VmReadMem64 (
@@ -91,6 +169,15 @@ VmReadMem64 (
   IN UINTN      Addr
   );
 
+/**
+  Read a natural value from memory. May or may not be aligned.
+
+  @param  VmPtr             current VM context
+  @param  Addr              the address to read from
+
+  @return The natural value at address Addr.
+
+**/
 STATIC
 UINTN
 VmReadMemN (
@@ -98,30 +185,111 @@ VmReadMemN (
   IN UINTN      Addr
   );
 
+/**
+  Writes 8-bit data to memory address.
+   
+  This routine is called by the EBC data
+  movement instructions that write to memory. Since these writes
+  may be to the stack, which looks like (high address on top) this,
+
+  [EBC entry point arguments]
+  [VM stack]
+  [EBC stack]
+
+  we need to detect all attempts to write to the EBC entry point argument
+  stack area and adjust the address (which will initially point into the 
+  VM stack) to point into the EBC entry point arguments.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Addr              Adddress to write to.
+  @param  Data              Value to write to Addr.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval Other             Some error occurs when writing data to the address.
+
+**/
 STATIC
 EFI_STATUS
 VmWriteMem8 (
   IN VM_CONTEXT *VmPtr,
-  UINTN         Addr,
+  IN UINTN      Addr,
   IN UINT8      Data
   );
 
+/**
+  Writes 16-bit data to memory address.
+   
+  This routine is called by the EBC data
+  movement instructions that write to memory. Since these writes
+  may be to the stack, which looks like (high address on top) this,
+
+  [EBC entry point arguments]
+  [VM stack]
+  [EBC stack]
+
+  we need to detect all attempts to write to the EBC entry point argument
+  stack area and adjust the address (which will initially point into the 
+  VM stack) to point into the EBC entry point arguments.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Addr              Adddress to write to.
+  @param  Data              Value to write to Addr.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval Other             Some error occurs when writing data to the address.
+
+**/
 STATIC
 EFI_STATUS
 VmWriteMem16 (
   IN VM_CONTEXT *VmPtr,
-  UINTN         Addr,
+  IN UINTN      Addr,
   IN UINT16     Data
   );
 
+/**
+  Writes 32-bit data to memory address.
+   
+  This routine is called by the EBC data
+  movement instructions that write to memory. Since these writes
+  may be to the stack, which looks like (high address on top) this,
+
+  [EBC entry point arguments]
+  [VM stack]
+  [EBC stack]
+
+  we need to detect all attempts to write to the EBC entry point argument
+  stack area and adjust the address (which will initially point into the 
+  VM stack) to point into the EBC entry point arguments.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Addr              Adddress to write to.
+  @param  Data              Value to write to Addr.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval Other             Some error occurs when writing data to the address.
+
+**/
 STATIC
 EFI_STATUS
 VmWriteMem32 (
   IN VM_CONTEXT *VmPtr,
-  UINTN         Addr,
+  IN UINTN      Addr,
   IN UINT32     Data
   );
 
+/**
+  Reads 16-bit unsinged data from the code stream.
+
+  This routine provides the ability to read raw unsigned data from the code
+  stream.
+
+  @param  VmPtr             A pointer to VM context
+  @param  Offset            Offset from current IP to the raw data to read.
+
+  @return The raw unsigned 16-bit value from the code stream.
+
+**/
 STATIC
 UINT16
 VmReadCode16 (
@@ -129,6 +297,18 @@ VmReadCode16 (
   IN UINT32     Offset
   );
 
+/**
+  Reads 32-bit unsinged data from the code stream.
+
+  This routine provides the ability to read raw unsigned data from the code
+  stream.
+
+  @param  VmPtr             A pointer to VM context
+  @param  Offset            Offset from current IP to the raw data to read.
+
+  @return The raw unsigned 32-bit value from the code stream.
+
+**/
 STATIC
 UINT32
 VmReadCode32 (
@@ -136,6 +316,18 @@ VmReadCode32 (
   IN UINT32     Offset
   );
 
+/**
+  Reads 64-bit unsinged data from the code stream.
+
+  This routine provides the ability to read raw unsigned data from the code
+  stream.
+
+  @param  VmPtr             A pointer to VM context
+  @param  Offset            Offset from current IP to the raw data to read.
+
+  @return The raw unsigned 64-bit value from the code stream.
+
+**/
 STATIC
 UINT64
 VmReadCode64 (
@@ -143,6 +335,20 @@ VmReadCode64 (
   IN UINT32     Offset
   );
 
+/**
+  Reads 8-bit immediate value at the offset.
+
+  This routine is called by the EBC execute
+  functions to read EBC immediate values from the code stream.
+  Since we can't assume alignment, each tries to read in the biggest
+  chunks size available, but will revert to smaller reads if necessary.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Offset            offset from IP of the code bytes to read.
+
+  @return Signed data of the requested size from the specified address.
+
+**/
 STATIC
 INT8
 VmReadImmed8 (
@@ -150,6 +356,20 @@ VmReadImmed8 (
   IN UINT32     Offset
   );
 
+/**
+  Reads 16-bit immediate value at the offset.
+
+  This routine is called by the EBC execute
+  functions to read EBC immediate values from the code stream.
+  Since we can't assume alignment, each tries to read in the biggest
+  chunks size available, but will revert to smaller reads if necessary.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Offset            offset from IP of the code bytes to read.
+
+  @return Signed data of the requested size from the specified address.
+
+**/
 STATIC
 INT16
 VmReadImmed16 (
@@ -157,6 +377,20 @@ VmReadImmed16 (
   IN UINT32     Offset
   );
 
+/**
+  Reads 32-bit immediate value at the offset.
+
+  This routine is called by the EBC execute
+  functions to read EBC immediate values from the code stream.
+  Since we can't assume alignment, each tries to read in the biggest
+  chunks size available, but will revert to smaller reads if necessary.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Offset            offset from IP of the code bytes to read.
+
+  @return Signed data of the requested size from the specified address.
+
+**/
 STATIC
 INT32
 VmReadImmed32 (
@@ -164,6 +398,20 @@ VmReadImmed32 (
   IN UINT32     Offset
   );
 
+/**
+  Reads 64-bit immediate value at the offset.
+
+  This routine is called by the EBC execute
+  functions to read EBC immediate values from the code stream.
+  Since we can't assume alignment, each tries to read in the biggest
+  chunks size available, but will revert to smaller reads if necessary.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Offset            offset from IP of the code bytes to read.
+
+  @return Signed data of the requested size from the specified address.
+
+**/
 STATIC
 INT64
 VmReadImmed64 (
@@ -171,6 +419,25 @@ VmReadImmed64 (
   IN UINT32     Offset
   );
 
+/**
+  Given an address that EBC is going to read from or write to, return
+  an appropriate address that accounts for a gap in the stack.
+  The stack for this application looks like this (high addr on top)
+  [EBC entry point arguments]
+  [VM stack]
+  [EBC stack]
+  The EBC assumes that its arguments are at the top of its stack, which
+  is where the VM stack is really. Therefore if the EBC does memory
+  accesses into the VM stack area, then we need to convert the address
+  to point to the EBC entry point arguments area. Do this here.
+
+  @param  VmPtr             A Pointer to VM context.
+  @param  Addr              Address of interest
+
+  @return The unchanged address if it's not in the VM stack region. Otherwise,
+          adjust for the stack gap and return the modified address.
+
+**/
 STATIC
 UINTN
 ConvertStackAddr (
@@ -178,136 +445,459 @@ ConvertStackAddr (
   IN UINTN        Addr
   );
 
+/**
+  Execute all the EBC data manipulation instructions.
+  Since the EBC data manipulation instructions all have the same basic form,
+  they can share the code that does the fetch of operands and the write-back
+  of the result. This function performs the fetch of the operands (even if
+  both are not needed to be fetched, like NOT instruction), dispatches to the
+  appropriate subfunction, then writes back the returned result.
+
+  Format:
+    INSTRUCITON[32|64] {@}R1, {@}R2 {Immed16|Index16}
+
+  @param  VmPtr             A pointer to VM context.
+  @param  IsSignedOp        Indicates whether the operand is signed or not.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteDataManip (
   IN VM_CONTEXT   *VmPtr,
-  IN BOOLEAN      IsSignedOperation
+  IN BOOLEAN      IsSignedOp
   );
 
 //
 // Functions that execute VM opcodes
 //
+/**
+  Execute the EBC BREAK instruction.
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteBREAK (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the JMP instruction.
+
+  Instruction syntax:
+    JMP64{cs|cc} Immed64
+    JMP32{cs|cc} {@}R1 {Immed32|Index32}
+  
+  Encoding:
+    b0.7 -  immediate data present
+    b0.6 -  1 = 64 bit immediate data
+            0 = 32 bit immediate data
+    b1.7 -  1 = conditional
+    b1.6    1 = CS (condition set)
+            0 = CC (condition clear)
+    b1.4    1 = relative address
+            0 = absolute address
+    b1.3    1 = operand1 indirect
+    b1.2-0  operand 1
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteJMP (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC JMP8 instruction.
+
+  Instruction syntax:
+    JMP8{cs|cc}  Offset/2
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteJMP8 (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Implements the EBC CALL instruction.
+
+  Instruction format:
+    CALL64 Immed64
+    CALL32 {@}R1 {Immed32|Index32}
+    CALLEX64 Immed64
+    CALLEX16 {@}R1 {Immed32}
+
+    If Rx == R0, then it's a PC relative call to PC = PC + imm32.
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteCALL (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC RET instruction.
+
+  Instruction syntax:
+    RET
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteRET (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC CMP instruction.
+
+  Instruction syntax:
+    CMP[32|64][eq|lte|gte|ulte|ugte] R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteCMP (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC CMPI instruction
+
+  Instruction syntax:
+    CMPI[32|64]{w|d}[eq|lte|gte|ulte|ugte] {@}Rx {Index16}, Immed16|Immed32
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteCMPI (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the MOVxx instructions.
+
+  Instruction format:
+    
+    MOV[b|w|d|q|n]{w|d} {@}R1 {Index16|32}, {@}R2 {Index16|32}
+    MOVqq {@}R1 {Index64}, {@}R2 {Index64}
+  
+    Copies contents of [R2] -> [R1], zero extending where required.
+  
+    First character indicates the size of the move.
+    Second character indicates the size of the index(s).
+  
+    Invalid to have R1 direct with index.
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteMOVxx (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC MOVI.
+
+  Instruction syntax:
+  
+    MOVI[b|w|d|q][w|d|q] {@}R1 {Index16}, ImmData16|32|64
+  
+    First variable character specifies the move size
+    Second variable character specifies size of the immediate data
+  
+    Sign-extend the immediate data to the size of the operation, and zero-extend
+    if storing to a register.
+  
+    Operand1 direct with index/immed is invalid.
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteMOVI (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC MOV immediate natural. This instruction moves an immediate
+  index value into a register or memory location.
+
+  Instruction syntax:
+  
+    MOVIn[w|d|q] {@}R1 {Index16}, Index16|32|64
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteMOVIn (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC MOVREL instruction.
+  Dest <- Ip + ImmData
+
+  Instruction syntax:
+  
+    MOVREL[w|d|q] {@}R1 {Index16}, ImmData16|32|64
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteMOVREL (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC PUSHn instruction
+
+  Instruction syntax:
+    PUSHn {@}R1 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecutePUSHn (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC PUSH instruction.
+
+  Instruction syntax:
+    PUSH[32|64] {@}R1 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecutePUSH (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC POPn instruction.
+
+  Instruction syntax:
+    POPn {@}R1 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecutePOPn (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC POP instruction.
+
+  Instruction syntax:
+    POPn {@}R1 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecutePOP (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute all the EBC signed data manipulation instructions.
+  Since the EBC data manipulation instructions all have the same basic form,
+  they can share the code that does the fetch of operands and the write-back
+  of the result. This function performs the fetch of the operands (even if
+  both are not needed to be fetched, like NOT instruction), dispatches to the
+  appropriate subfunction, then writes back the returned result.
+
+  Format:
+    INSTRUCITON[32|64] {@}R1, {@}R2 {Immed16|Index16}
+
+  @param  VmPtr             A pointer to VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteSignedDataManip (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute all the EBC unsigned data manipulation instructions.
+  Since the EBC data manipulation instructions all have the same basic form,
+  they can share the code that does the fetch of operands and the write-back
+  of the result. This function performs the fetch of the operands (even if
+  both are not needed to be fetched, like NOT instruction), dispatches to the
+  appropriate subfunction, then writes back the returned result.
+
+  Format:
+    INSTRUCITON[32|64] {@}R1, {@}R2 {Immed16|Index16}
+
+  @param  VmPtr             A pointer to VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteUnsignedDataManip (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC LOADSP instruction.
+
+  Instruction syntax:
+    LOADSP  SP1, R2
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteLOADSP (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC STORESP instruction.
+
+  Instruction syntax:
+    STORESP  Rx, FLAGS|IP
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteSTORESP (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC MOVsnw instruction. This instruction loads a signed
+  natural value from memory or register to another memory or register. On
+  32-bit machines, the value gets sign-extended to 64 bits if the destination
+  is a register.
+
+  Instruction syntax:
+  
+    MOVsnd {@}R1 {Indx32}, {@}R2 {Index32|Immed32}
+  
+    0:7 1=>operand1 index present
+    0:6 1=>operand2 index present
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteMOVsnd (
   IN VM_CONTEXT *VmPtr
   );
 
+/**
+  Execute the EBC MOVsnw instruction. This instruction loads a signed
+  natural value from memory or register to another memory or register. On
+  32-bit machines, the value gets sign-extended to 64 bits if the destination
+  is a register.
+
+  Instruction syntax:
+  
+    MOVsnw {@}R1 {Index16}, {@}R2 {Index16|Immed16}
+  
+    0:7 1=>operand1 index present
+    0:6 1=>operand2 index present
+
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteMOVsnw (
@@ -317,6 +907,19 @@ ExecuteMOVsnw (
 //
 // Data manipulation subfunctions
 //
+/**
+  Execute the EBC NOT instruction.s
+
+  Instruction syntax:
+    NOT[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return ~Op2
+
+**/
 STATIC
 UINT64
 ExecuteNOT (
@@ -325,6 +928,19 @@ ExecuteNOT (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC NEG instruction.
+
+  Instruction syntax:
+    NEG[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op2 * -1
+
+**/
 STATIC
 UINT64
 ExecuteNEG (
@@ -333,6 +949,19 @@ ExecuteNEG (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC ADD instruction.
+
+  Instruction syntax:
+    ADD[32|64] {@}R1, {@}R2 {Index16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 + Op2
+
+**/
 STATIC
 UINT64
 ExecuteADD (
@@ -341,6 +970,19 @@ ExecuteADD (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC SUB instruction.
+
+  Instruction syntax:
+    SUB[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 - Op2
+
+**/
 STATIC
 UINT64
 ExecuteSUB (
@@ -349,6 +991,19 @@ ExecuteSUB (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC MUL instruction.
+
+  Instruction syntax:
+    SUB[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 * Op2
+
+**/
 STATIC
 UINT64
 ExecuteMUL (
@@ -357,6 +1012,19 @@ ExecuteMUL (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC MULU instruction
+
+  Instruction syntax:
+    MULU[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return (unsigned)Op1 * (unsigned)Op2
+
+**/
 STATIC
 UINT64
 ExecuteMULU (
@@ -365,6 +1033,19 @@ ExecuteMULU (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC DIV instruction.
+
+  Instruction syntax:
+    DIV[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 / Op2
+
+**/
 STATIC
 UINT64
 ExecuteDIV (
@@ -373,6 +1054,19 @@ ExecuteDIV (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC DIVU instruction
+
+  Instruction syntax:
+    DIVU[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return (unsigned)Op1 / (unsigned)Op2
+
+**/
 STATIC
 UINT64
 ExecuteDIVU (
@@ -381,6 +1075,19 @@ ExecuteDIVU (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC MOD instruction.
+
+  Instruction syntax:
+    MOD[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 MODULUS Op2
+
+**/
 STATIC
 UINT64
 ExecuteMOD (
@@ -389,6 +1096,19 @@ ExecuteMOD (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC MODU instruction.
+
+  Instruction syntax:
+    MODU[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 UNSIGNED_MODULUS Op2
+
+**/
 STATIC
 UINT64
 ExecuteMODU (
@@ -397,6 +1117,19 @@ ExecuteMODU (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC AND instruction.
+
+  Instruction syntax:
+    AND[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 AND Op2
+
+**/
 STATIC
 UINT64
 ExecuteAND (
@@ -405,6 +1138,19 @@ ExecuteAND (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC OR instruction.
+
+  Instruction syntax:
+    OR[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 OR Op2
+
+**/
 STATIC
 UINT64
 ExecuteOR (
@@ -413,6 +1159,19 @@ ExecuteOR (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC XOR instruction.
+
+  Instruction syntax:
+    XOR[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 XOR Op2
+
+**/
 STATIC
 UINT64
 ExecuteXOR (
@@ -421,6 +1180,19 @@ ExecuteXOR (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC SHL shift left instruction.
+
+  Instruction syntax:
+    SHL[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 << Op2
+
+**/
 STATIC
 UINT64
 ExecuteSHL (
@@ -429,6 +1201,19 @@ ExecuteSHL (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC SHR instruction.
+
+  Instruction syntax:
+    SHR[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 >> Op2  (unsigned operands)
+
+**/
 STATIC
 UINT64
 ExecuteSHR (
@@ -437,6 +1222,19 @@ ExecuteSHR (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC ASHR instruction.
+
+  Instruction syntax:
+    ASHR[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return Op1 >> Op2 (signed)
+
+**/
 STATIC
 UINT64
 ExecuteASHR (
@@ -445,6 +1243,19 @@ ExecuteASHR (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC EXTNDB instruction to sign-extend a byte value.
+
+  Instruction syntax:
+    EXTNDB[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return (INT64)(INT8)Op2
+
+**/
 STATIC
 UINT64
 ExecuteEXTNDB (
@@ -453,6 +1264,19 @@ ExecuteEXTNDB (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC EXTNDW instruction to sign-extend a 16-bit value.
+
+  Instruction syntax:
+    EXTNDW[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return (INT64)(INT16)Op2
+
+**/
 STATIC
 UINT64
 ExecuteEXTNDW (
@@ -461,6 +1285,19 @@ ExecuteEXTNDW (
   IN UINT64     Op2
   );
 
+/**
+  Execute the EBC EXTNDD instruction to sign-extend a 32-bit value.
+
+  Instruction syntax:
+    EXTNDD[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Op1               Operand 1 from the instruction
+  @param  Op2               Operand 2 from the instruction
+
+  @return (INT64)(INT32)Op2
+
+**/
 STATIC
 UINT64
 ExecuteEXTNDD (
@@ -473,7 +1310,7 @@ ExecuteEXTNDD (
 // Once we retrieve the operands for the data manipulation instructions,
 // call these functions to perform the operation.
 //
-static CONST DATA_MANIP_EXEC_FUNCTION mDataManipDispatchTable[] = {
+STATIC CONST DATA_MANIP_EXEC_FUNCTION mDataManipDispatchTable[] = {
   ExecuteNOT,
   ExecuteNEG,
   ExecuteADD,
@@ -495,7 +1332,7 @@ static CONST DATA_MANIP_EXEC_FUNCTION mDataManipDispatchTable[] = {
   ExecuteEXTNDD,
 };
 
-static CONST VM_TABLE_ENTRY           mVmOpcodeTable[] = {
+STATIC CONST VM_TABLE_ENTRY           mVmOpcodeTable[] = {
   { ExecuteBREAK },             // opcode 0x00
   { ExecuteJMP },               // opcode 0x01
   { ExecuteJMP8 },              // opcode 0x02
@@ -559,7 +1396,7 @@ static CONST VM_TABLE_ENTRY           mVmOpcodeTable[] = {
 //
 // Length of JMP instructions, depending on upper two bits of opcode.
 //
-static CONST UINT8                    mJMPLen[] = { 2, 2, 6, 10 };
+STATIC CONST UINT8                    mJMPLen[] = { 2, 2, 6, 10 };
 
 //
 // Simple Debugger Protocol GUID
@@ -571,12 +1408,14 @@ EFI_GUID mEbcSimpleDebuggerProtocolGuid = EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL_GUID;
   Given a pointer to a new VM context, execute one or more instructions. This
   function is only used for test purposes via the EBC VM test protocol.
 
-  @param  This              pointer to protocol interface
-  @param  VmPtr             pointer to a VM context
-  @param  InstructionCount  how many instructions to execute. 0 if don't count.
+  @param  This              A pointer to the EFI_EBC_VM_TEST_PROTOCOL structure.
+  @param  VmPtr             A pointer to a VM context.
+  @param  InstructionCount  A pointer to a UINTN value holding the number of
+                            instructions to execute. If it holds value of 0,
+                            then the instruction to be executed is 1.
 
-  @return EFI_UNSUPPORTED
-  @return EFI_SUCCESS
+  @retval EFI_UNSUPPORTED   At least one of the opcodes is not supported.
+  @retval EFI_SUCCESS       All of the instructions are executed successfully.
 
 **/
 EFI_STATUS
@@ -632,9 +1471,10 @@ EbcExecuteInstructions (
 /**
   Execute an EBC image from an entry point or from a published protocol.
 
-  @param  VmPtr             pointer to prepared VM context.
+  @param  VmPtr             A pointer to a VM context.
 
-  @return Standard EBC status.
+  @retval EFI_UNSUPPORTED   At least one of the opcodes is not supported.
+  @retval EFI_SUCCESS       All of the instructions are executed successfully.
 
 **/
 EFI_STATUS
@@ -755,17 +1595,22 @@ Done:
 /**
   Execute the MOVxx instructions.
 
-  @param  VmPtr             pointer to a VM context.
+  Instruction format:
+    
+    MOV[b|w|d|q|n]{w|d} {@}R1 {Index16|32}, {@}R2 {Index16|32}
+    MOVqq {@}R1 {Index64}, {@}R2 {Index64}
+  
+    Copies contents of [R2] -> [R1], zero extending where required.
+  
+    First character indicates the size of the move.
+    Second character indicates the size of the index(s).
+  
+    Invalid to have R1 direct with index.
 
-  @return EFI_UNSUPPORTED
-  @return EFI_SUCCESS
-  @return Instruction format:
-  @return MOV[b|w|d|q|n]{w|d} {@}R1 {Index16|32}, {@}R2 {Index16|32}
-  @return MOVqq {@}R1 {Index64}, {@}R2 {Index64}
-  @return Copies contents of [R2] -> [R1], zero extending where required.
-  @return First character indicates the size of the move.
-  @return Second character indicates the size of the index(s).
-  @return Invalid to have R1 direct with index.
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1031,12 +1876,11 @@ ExecuteMOVxx (
 
 
 /**
-  Execute the EBC BREAK instruction
+  Execute the EBC BREAK instruction.
 
-  @param  VmPtr             pointer to current VM context
+  @param  VmPtr             A pointer to a VM context.
 
-  @return EFI_UNSUPPORTED
-  @return EFI_SUCCESS
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1141,21 +1985,28 @@ ExecuteBREAK (
 
 
 /**
-  Execute the JMP instruction
+  Execute the JMP instruction.
 
-  @param  VmPtr             pointer to VM context
+  Instruction syntax:
+    JMP64{cs|cc} Immed64
+    JMP32{cs|cc} {@}R1 {Immed32|Index32}
+  
+  Encoding:
+    b0.7 -  immediate data present
+    b0.6 -  1 = 64 bit immediate data
+            0 = 32 bit immediate data
+    b1.7 -  1 = conditional
+    b1.6    1 = CS (condition set)
+            0 = CC (condition clear)
+    b1.4    1 = relative address
+            0 = absolute address
+    b1.3    1 = operand1 indirect
+    b1.2-0  operand 1
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return JMP64{cs|cc} Immed64
-  @return JMP32{cs|cc} {@}R1 {Immed32|Index32}
-  @return Encoding:
-  @retval b0.7              immediate data present
-  @retval b0.6              1 = 64 bit immediate data 0 = 32 bit immediate data
-  @retval b1.7              1 = conditional b1.6    1 = CS (condition set) 0 = CC
-                            (condition clear) b1.4    1 = relative address 0 =
-                            absolute address b1.3    1 = operand1 indirect b1.2-0
-                            operand 1
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1311,13 +2162,14 @@ ExecuteJMP (
 
 
 /**
-  Execute the EBC JMP8 instruction
+  Execute the EBC JMP8 instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    JMP8{cs|cc}  Offset/2
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return JMP8{cs|cc}  Offset/2
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1361,18 +2213,24 @@ ExecuteJMP8 (
 
 
 /**
-  Execute the EBC MOVI
+  Execute the EBC MOVI.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+  
+    MOVI[b|w|d|q][w|d|q] {@}R1 {Index16}, ImmData16|32|64
+  
+    First variable character specifies the move size
+    Second variable character specifies size of the immediate data
+  
+    Sign-extend the immediate data to the size of the operation, and zero-extend
+    if storing to a register.
+  
+    Operand1 direct with index/immed is invalid.
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return MOVI[b|w|d|q][w|d|q] {@}R1 {Index16}, ImmData16|32|64
-  @return First variable character specifies the move size
-  @return Second variable character specifies size of the immediate data
-  @return Sign-extend the immediate data to the size of the operation, and zero-extend
-  @return if storing to a register.
-  @return Operand1 direct with index/immed is invalid.
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1484,11 +2342,14 @@ ExecuteMOVI (
   Execute the EBC MOV immediate natural. This instruction moves an immediate
   index value into a register or memory location.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+  
+    MOVIn[w|d|q] {@}R1 {Index16}, Index16|32|64
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return MOVIn[w|d|q] {@}R1 {Index16}, Index16|32|64
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1584,11 +2445,14 @@ ExecuteMOVIn (
   Execute the EBC MOVREL instruction.
   Dest <- Ip + ImmData
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+  
+    MOVREL[w|d|q] {@}R1 {Index16}, ImmData16|32|64
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return MOVREL[w|d|q] {@}R1 {Index16}, ImmData16|32|64
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1685,13 +2549,17 @@ ExecuteMOVREL (
   32-bit machines, the value gets sign-extended to 64 bits if the destination
   is a register.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+  
+    MOVsnw {@}R1 {Index16}, {@}R2 {Index16|Immed16}
+  
+    0:7 1=>operand1 index present
+    0:6 1=>operand2 index present
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return MOVsnw {@}R1 {Index16}, {@}R2 {Index16|Immed16}
-  @return 0:7 1=>operand1 index present
-  @return 0:6 1=>operand2 index present
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1775,13 +2643,17 @@ ExecuteMOVsnw (
   32-bit machines, the value gets sign-extended to 64 bits if the destination
   is a register.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+  
+    MOVsnd {@}R1 {Indx32}, {@}R2 {Index32|Immed32}
+  
+    0:7 1=>operand1 index present
+    0:6 1=>operand2 index present
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return MOVsnd {@}R1 {Indx32}, {@}R2 {Index32|Immed32}
-  @return 0:7 1=>operand1 index present
-  @return 0:6 1=>operand2 index present
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1862,11 +2734,12 @@ ExecuteMOVsnd (
 /**
   Execute the EBC PUSHn instruction
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    PUSHn {@}R1 {Index16|Immed16}
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return PUSHn {@}R1 {Index16|Immed16}
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1919,13 +2792,14 @@ ExecutePUSHn (
 
 
 /**
-  Execute the EBC PUSH instruction
+  Execute the EBC PUSH instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    PUSH[32|64] {@}R1 {Index16|Immed16}
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return PUSH[32|64] {@}R1 {Index16|Immed16}
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -1995,13 +2869,14 @@ ExecutePUSH (
 
 
 /**
-  Execute the EBC POPn instruction
+  Execute the EBC POPn instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    POPn {@}R1 {Index16|Immed16}
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return POPn {@}R1 {Index16|Immed16}
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -2054,13 +2929,14 @@ ExecutePOPn (
 
 
 /**
-  Execute the EBC POP instruction
+  Execute the EBC POP instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    POPn {@}R1 {Index16|Immed16}
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return POP {@}R1 {Index16|Immed16}
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -2134,16 +3010,18 @@ ExecutePOP (
 
 /**
   Implements the EBC CALL instruction.
+
   Instruction format:
-  CALL64 Immed64
-  CALL32 {@}R1 {Immed32|Index32}
-  CALLEX64 Immed64
-  CALLEX16 {@}R1 {Immed32}
-  If Rx == R0, then it's a PC relative call to PC = PC + imm32.
+    CALL64 Immed64
+    CALL32 {@}R1 {Immed32|Index32}
+    CALLEX64 Immed64
+    CALLEX16 {@}R1 {Immed32}
 
-  @param  VmPtr             pointer to a VM context.
+    If Rx == R0, then it's a PC relative call to PC = PC + imm32.
 
-  @return Standard EFI_STATUS
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -2270,13 +3148,14 @@ ExecuteCALL (
 
 
 /**
-  Execute the EBC RET instruction
+  Execute the EBC RET instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    RET
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return RET
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -2317,13 +3196,15 @@ ExecuteRET (
 
 
 /**
-  Execute the EBC CMP instruction
+  Execute the EBC CMP instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    CMP[32|64][eq|lte|gte|ulte|ugte] R1, {@}R2 {Index16|Immed16}
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return CMP[32|64][eq|lte|gte|ulte|ugte] R1, {@}R2 {Index16|Immed16}
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -2479,11 +3360,13 @@ ExecuteCMP (
 /**
   Execute the EBC CMPI instruction
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    CMPI[32|64]{w|d}[eq|lte|gte|ulte|ugte] {@}Rx {Index16}, Immed16|Immed32
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return CMPI[32|64]{w|d}[eq|lte|gte|ulte|ugte] {@}Rx {Index16}, Immed16|Immed32
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -2655,15 +3538,16 @@ ExecuteCMPI (
 
 
 /**
-  Execute the EBC NOT instruction
+  Execute the EBC NOT instruction.s
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    NOT[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return ~Op2
-  @return Instruction syntax:
-  @return NOT[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -2679,15 +3563,16 @@ ExecuteNOT (
 
 
 /**
-  Execute the EBC NEG instruction
+  Execute the EBC NEG instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    NEG[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op2 * -1
-  @return Instruction syntax:
-  @return NEG[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -2703,15 +3588,16 @@ ExecuteNEG (
 
 
 /**
-  Execute the EBC ADD instruction
+  Execute the EBC ADD instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    ADD[32|64] {@}R1, {@}R2 {Index16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 + Op2
-  @return Instruction syntax:
-  @return ADD[32|64] {@}R1, {@}R2 {Index16}
 
 **/
 STATIC
@@ -2727,15 +3613,16 @@ ExecuteADD (
 
 
 /**
-  Execute the EBC SUB instruction
+  Execute the EBC SUB instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    SUB[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
-  @retval Op1               Op2 Standard EFI_STATUS
-  @return Instruction syntax:
-  @return SUB[32|64] {@}R1, {@}R2 {Index16|Immed16}
+  @return Op1 - Op2
 
 **/
 STATIC
@@ -2755,15 +3642,16 @@ ExecuteSUB (
 
 
 /**
-  Execute the EBC MUL instruction
+  Execute the EBC MUL instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    SUB[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 * Op2
-  @return Instruction syntax:
-  @return MUL[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -2785,13 +3673,14 @@ ExecuteMUL (
 /**
   Execute the EBC MULU instruction
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    MULU[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return (unsigned)Op1 * (unsigned)Op2
-  @return Instruction syntax:
-  @return MULU[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -2811,15 +3700,16 @@ ExecuteMULU (
 
 
 /**
-  Execute the EBC DIV instruction
+  Execute the EBC DIV instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    DIV[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
-  @return Op1/Op2
-  @return Instruction syntax:
-  @return DIV[32|64] {@}R1, {@}R2 {Index16|Immed16}
+  @return Op1 / Op2
 
 **/
 STATIC
@@ -2856,13 +3746,14 @@ ExecuteDIV (
 /**
   Execute the EBC DIVU instruction
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    DIVU[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return (unsigned)Op1 / (unsigned)Op2
-  @return Instruction syntax:
-  @return DIVU[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -2899,15 +3790,16 @@ ExecuteDIVU (
 
 
 /**
-  Execute the EBC MOD instruction
+  Execute the EBC MOD instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    MOD[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 MODULUS Op2
-  @return Instruction syntax:
-  @return MOD[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -2938,15 +3830,16 @@ ExecuteMOD (
 
 
 /**
-  Execute the EBC MODU instruction
+  Execute the EBC MODU instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    MODU[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 UNSIGNED_MODULUS Op2
-  @return Instruction syntax:
-  @return MODU[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -2977,15 +3870,16 @@ ExecuteMODU (
 
 
 /**
-  Execute the EBC AND instruction
+  Execute the EBC AND instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    AND[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 AND Op2
-  @return Instruction syntax:
-  @return AND[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3001,15 +3895,16 @@ ExecuteAND (
 
 
 /**
-  Execute the EBC OR instruction
+  Execute the EBC OR instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    OR[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 OR Op2
-  @return Instruction syntax:
-  @return OR[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3025,15 +3920,16 @@ ExecuteOR (
 
 
 /**
-  Execute the EBC XOR instruction
+  Execute the EBC XOR instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    XOR[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 XOR Op2
-  @return Instruction syntax:
-  @return XOR[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3049,15 +3945,16 @@ ExecuteXOR (
 
 
 /**
-  Execute the EBC SHL shift left instruction
+  Execute the EBC SHL shift left instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    SHL[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 << Op2
-  @return Instruction syntax:
-  @return SHL[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3077,15 +3974,16 @@ ExecuteSHL (
 
 
 /**
-  Execute the EBC SHR instruction
+  Execute the EBC SHR instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    SHR[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 >> Op2  (unsigned operands)
-  @return Instruction syntax:
-  @return SHR[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3105,15 +4003,16 @@ ExecuteSHR (
 
 
 /**
-  Execute the EBC ASHR instruction
+  Execute the EBC ASHR instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    ASHR[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return Op1 >> Op2 (signed)
-  @return Instruction syntax:
-  @return ASHR[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3135,13 +4034,14 @@ ExecuteASHR (
 /**
   Execute the EBC EXTNDB instruction to sign-extend a byte value.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    EXTNDB[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return (INT64)(INT8)Op2
-  @return Instruction syntax:
-  @return EXTNDB[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3168,13 +4068,14 @@ ExecuteEXTNDB (
 /**
   Execute the EBC EXTNDW instruction to sign-extend a 16-bit value.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    EXTNDW[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return (INT64)(INT16)Op2
-  @return Instruction syntax:
-  @return EXTNDW[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3208,13 +4109,14 @@ ExecuteEXTNDW (
 /**
   Execute the EBC EXTNDD instruction to sign-extend a 32-bit value.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    EXTNDD[32|64] {@}R1, {@}R2 {Index16|Immed16}
+
+  @param  VmPtr             A pointer to a VM context.
   @param  Op1               Operand 1 from the instruction
   @param  Op2               Operand 2 from the instruction
 
   @return (INT64)(INT32)Op2
-  @return Instruction syntax:
-  @return EXTNDD[32|64] {@}R1, {@}R2 {Index16|Immed16}
 
 **/
 STATIC
@@ -3237,6 +4139,24 @@ ExecuteEXTNDD (
   return (UINT64) Data64;
 }
 
+
+/**
+  Execute all the EBC signed data manipulation instructions.
+  Since the EBC data manipulation instructions all have the same basic form,
+  they can share the code that does the fetch of operands and the write-back
+  of the result. This function performs the fetch of the operands (even if
+  both are not needed to be fetched, like NOT instruction), dispatches to the
+  appropriate subfunction, then writes back the returned result.
+
+  Format:
+    INSTRUCITON[32|64] {@}R1, {@}R2 {Immed16|Index16}
+
+  @param  VmPtr             A pointer to VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteSignedDataManip (
@@ -3250,6 +4170,24 @@ ExecuteSignedDataManip (
   return ExecuteDataManip (VmPtr, TRUE);
 }
 
+
+/**
+  Execute all the EBC unsigned data manipulation instructions.
+  Since the EBC data manipulation instructions all have the same basic form,
+  they can share the code that does the fetch of operands and the write-back
+  of the result. This function performs the fetch of the operands (even if
+  both are not needed to be fetched, like NOT instruction), dispatches to the
+  appropriate subfunction, then writes back the returned result.
+
+  Format:
+    INSTRUCITON[32|64] {@}R1, {@}R2 {Immed16|Index16}
+
+  @param  VmPtr             A pointer to VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
+
+**/
 STATIC
 EFI_STATUS
 ExecuteUnsignedDataManip (
@@ -3272,11 +4210,14 @@ ExecuteUnsignedDataManip (
   both are not needed to be fetched, like NOT instruction), dispatches to the
   appropriate subfunction, then writes back the returned result.
 
-  @param  VmPtr             pointer to VM context
+  Format:
+    INSTRUCITON[32|64] {@}R1, {@}R2 {Immed16|Index16}
 
-  @return Standard EBC status
-  @return Format:
-  @return INSTRUCITON[32|64] {@}R1, {@}R2 {Immed16|Index16}
+  @param  VmPtr             A pointer to VM context.
+  @param  IsSignedOp        Indicates whether the operand is signed or not.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -3418,13 +4359,15 @@ ExecuteDataManip (
 
 
 /**
-  Execute the EBC LOADSP instruction
+  Execute the EBC LOADSP instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    LOADSP  SP1, R2
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return LOADSP  SP1, R2
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -3471,13 +4414,15 @@ ExecuteLOADSP (
 
 
 /**
-  Execute the EBC STORESP instruction
+  Execute the EBC STORESP instruction.
 
-  @param  VmPtr             pointer to a VM context
+  Instruction syntax:
+    STORESP  Rx, FLAGS|IP
 
-  @return Standard EFI_STATUS
-  @return Instruction syntax:
-  @return STORESP  Rx, FLAGS|IP
+  @param  VmPtr             A pointer to a VM context.
+
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
 STATIC
@@ -3532,19 +4477,22 @@ ExecuteSTORESP (
 
 /**
   Decode a 16-bit index to determine the offset. Given an index value:
-  b15     - sign bit
-  b14:12  - number of bits in this index assigned to natural units (=a)
-  ba:11   - constant units = C
-  b0:a    - natural units = N
+
+    b15     - sign bit
+    b14:12  - number of bits in this index assigned to natural units (=a)
+    ba:11   - constant units = ConstUnits
+    b0:a    - natural units = NaturalUnits
+  
   Given this info, the offset can be computed by:
-  offset = sign_bit * (C + N * sizeof(UINTN))
+    offset = sign_bit * (ConstUnits + NaturalUnits * sizeof(UINTN))
+
   Max offset is achieved with index = 0x7FFF giving an offset of
   0x27B (32-bit machine) or 0x477 (64-bit machine).
-  Min offset is achieved with index =
+  Min offset is achieved with index = 
 
-  @param  VmPtr             pointer to VM context
-  @param  CodeOffset        offset from IP of the location of the 16-bit index to
-                            decode
+  @param  VmPtr             A pointer to VM context.
+  @param  CodeOffset        Offset from IP of the location of the 16-bit index
+                            to decode.
 
   @return The decoded offset.
 
@@ -3558,8 +4506,8 @@ VmReadIndex16 (
 {
   UINT16  Index;
   INT16   Offset;
-  INT16   C;
-  INT16   N;
+  INT16   ConstUnits;
+  INT16   NaturalUnits;
   INT16   NBits;
   INT16   Mask;
 
@@ -3569,7 +4517,7 @@ VmReadIndex16 (
   Index = VmReadCode16 (VmPtr, CodeOffset);
 
   //
-  // Get the mask for N. First get the number of bits from the index.
+  // Get the mask for NaturalUnits. First get the number of bits from the index.
   //
   NBits = (INT16) ((Index & 0x7000) >> 12);
 
@@ -3584,16 +4532,16 @@ VmReadIndex16 (
   Mask = (INT16) ((INT16)~0 << NBits);
 
   //
-  // Now using the mask, extract N from the lower bits of the index.
+  // Now using the mask, extract NaturalUnits from the lower bits of the index.
   //
-  N = (INT16) (Index &~Mask);
+  NaturalUnits = (INT16) (Index &~Mask);
 
   //
-  // Now compute C
+  // Now compute ConstUnits
   //
-  C       = (INT16) (((Index &~0xF000) & Mask) >> NBits);
+  ConstUnits       = (INT16) (((Index &~0xF000) & Mask) >> NBits);
 
-  Offset  = (INT16) (N * sizeof (UINTN) + C);
+  Offset  = (INT16) (NaturalUnits * sizeof (UINTN) + ConstUnits);
 
   //
   // Now set the sign
@@ -3614,11 +4562,11 @@ VmReadIndex16 (
 /**
   Decode a 32-bit index to determine the offset.
 
-  @param  VmPtr             pointer to VM context
-  @param  CodeOffset        offset from IP of the location of the 32-bit index to
-                            decode
+  @param  VmPtr             A pointer to VM context.
+  @param  CodeOffset        Offset from IP of the location of the 32-bit index
+                            to decode.
 
-  @return Converted index per EBC VM specification
+  @return Converted index per EBC VM specification.
 
 **/
 STATIC
@@ -3630,15 +4578,15 @@ VmReadIndex32 (
 {
   UINT32  Index;
   INT32   Offset;
-  INT32   C;
-  INT32   N;
+  INT32   ConstUnits;
+  INT32   NaturalUnits;
   INT32   NBits;
   INT32   Mask;
 
   Index = VmReadImmed32 (VmPtr, CodeOffset);
 
   //
-  // Get the mask for N. First get the number of bits from the index.
+  // Get the mask for NaturalUnits. First get the number of bits from the index.
   //
   NBits = (Index & 0x70000000) >> 28;
 
@@ -3653,16 +4601,16 @@ VmReadIndex32 (
   Mask = (INT32)~0 << NBits;
 
   //
-  // Now using the mask, extract N from the lower bits of the index.
+  // Now using the mask, extract NaturalUnits from the lower bits of the index.
   //
-  N = Index &~Mask;
+  NaturalUnits = Index &~Mask;
 
   //
-  // Now compute C
+  // Now compute ConstUnits
   //
-  C       = ((Index &~0xF0000000) & Mask) >> NBits;
+  ConstUnits       = ((Index &~0xF0000000) & Mask) >> NBits;
 
-  Offset  = N * sizeof (UINTN) + C;
+  Offset  = NaturalUnits * sizeof (UINTN) + ConstUnits;
 
   //
   // Now set the sign
@@ -3678,9 +4626,9 @@ VmReadIndex32 (
 /**
   Decode a 64-bit index to determine the offset.
 
-  @param  VmPtr             pointer to VM context
-  @param  CodeOffset        offset from IP of the location of the 64-bit index to
-                            decode
+  @param  VmPtr             A pointer to VM context.s
+  @param  CodeOffset        Offset from IP of the location of the 64-bit index
+                            to decode.
 
   @return Converted index per EBC VM specification
 
@@ -3694,15 +4642,15 @@ VmReadIndex64 (
 {
   UINT64  Index;
   INT64   Offset;
-  INT64   C;
-  INT64   N;
+  INT64   ConstUnits;
+  INT64   NaturalUnits;
   INT64   NBits;
   INT64   Mask;
 
   Index = VmReadCode64 (VmPtr, CodeOffset);
 
   //
-  // Get the mask for N. First get the number of bits from the index.
+  // Get the mask for NaturalUnits. First get the number of bits from the index.
   //
   NBits = RShiftU64 ((Index & 0x7000000000000000ULL), 60);
 
@@ -3717,16 +4665,16 @@ VmReadIndex64 (
   Mask = (LShiftU64 ((UINT64)~0, (UINTN)NBits));
 
   //
-  // Now using the mask, extract N from the lower bits of the index.
+  // Now using the mask, extract NaturalUnits from the lower bits of the index.
   //
-  N = Index &~Mask;
+  NaturalUnits = Index &~Mask;
 
   //
-  // Now compute C
+  // Now compute ConstUnits
   //
-  C       = ARShiftU64 (((Index &~0xF000000000000000ULL) & Mask), (UINTN)NBits);
+  ConstUnits = ARShiftU64 (((Index &~0xF000000000000000ULL) & Mask), (UINTN)NBits);
 
-  Offset  = MultU64x64 (N, sizeof (UINTN)) + C;
+  Offset  = MultU64x64 (NaturalUnits, sizeof (UINTN)) + ConstUnits;
 
   //
   // Now set the sign
@@ -3740,21 +4688,26 @@ VmReadIndex64 (
 
 
 /**
-  The following VmWriteMem? routines are called by the EBC data
+  Writes 8-bit data to memory address.
+   
+  This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
+
   [EBC entry point arguments]
   [VM stack]
   [EBC stack]
+
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the
+  stack area and adjust the address (which will initially point into the 
   VM stack) to point into the EBC entry point arguments.
 
-  @param  VmPtr             pointer to a VM context
-  @param  Addr              adddress to write to
-  @param  Data              value to write to Addr
+  @param  VmPtr             A pointer to a VM context.
+  @param  Addr              Adddress to write to.
+  @param  Data              Value to write to Addr.
 
-  @return Standard EFI_STATUS
+  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval Other             Some error occurs when writing data to the address.
 
 **/
 STATIC
@@ -3773,6 +4726,29 @@ VmWriteMem8 (
   return EFI_SUCCESS;
 }
 
+/**
+  Writes 16-bit data to memory address.
+   
+  This routine is called by the EBC data
+  movement instructions that write to memory. Since these writes
+  may be to the stack, which looks like (high address on top) this,
+
+  [EBC entry point arguments]
+  [VM stack]
+  [EBC stack]
+
+  we need to detect all attempts to write to the EBC entry point argument
+  stack area and adjust the address (which will initially point into the 
+  VM stack) to point into the EBC entry point arguments.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Addr              Adddress to write to.
+  @param  Data              Value to write to Addr.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval Other             Some error occurs when writing data to the address.
+
+**/
 STATIC
 EFI_STATUS
 VmWriteMem16 (
@@ -3813,6 +4789,30 @@ VmWriteMem16 (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Writes 32-bit data to memory address.
+   
+  This routine is called by the EBC data
+  movement instructions that write to memory. Since these writes
+  may be to the stack, which looks like (high address on top) this,
+
+  [EBC entry point arguments]
+  [VM stack]
+  [EBC stack]
+
+  we need to detect all attempts to write to the EBC entry point argument
+  stack area and adjust the address (which will initially point into the 
+  VM stack) to point into the EBC entry point arguments.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Addr              Adddress to write to.
+  @param  Data              Value to write to Addr.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval Other             Some error occurs when writing data to the address.
+
+**/
 STATIC
 EFI_STATUS
 VmWriteMem32 (
@@ -3853,6 +4853,30 @@ VmWriteMem32 (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Writes 64-bit data to memory address.
+   
+  This routine is called by the EBC data
+  movement instructions that write to memory. Since these writes
+  may be to the stack, which looks like (high address on top) this,
+
+  [EBC entry point arguments]
+  [VM stack]
+  [EBC stack]
+
+  we need to detect all attempts to write to the EBC entry point argument
+  stack area and adjust the address (which will initially point into the 
+  VM stack) to point into the EBC entry point arguments.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Addr              Adddress to write to.
+  @param  Data              Value to write to Addr.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval Other             Some error occurs when writing data to the address.
+
+**/
 EFI_STATUS
 VmWriteMem64 (
   IN VM_CONTEXT   *VmPtr,
@@ -3894,6 +4918,30 @@ VmWriteMem64 (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Writes UINTN data to memory address.
+   
+  This routine is called by the EBC data
+  movement instructions that write to memory. Since these writes
+  may be to the stack, which looks like (high address on top) this,
+
+  [EBC entry point arguments]
+  [VM stack]
+  [EBC stack]
+
+  we need to detect all attempts to write to the EBC entry point argument
+  stack area and adjust the address (which will initially point into the 
+  VM stack) to point into the EBC entry point arguments.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Addr              Adddress to write to.
+  @param  Data              Value to write to Addr.
+
+  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval Other             Some error occurs when writing data to the address.
+
+**/
 EFI_STATUS
 VmWriteMemN (
   IN VM_CONTEXT   *VmPtr,
@@ -3930,12 +4978,14 @@ VmWriteMemN (
 
 
 /**
-  The following VmReadImmed routines are called by the EBC execute
+  Reads 8-bit immediate value at the offset.
+
+  This routine is called by the EBC execute
   functions to read EBC immediate values from the code stream.
   Since we can't assume alignment, each tries to read in the biggest
   chunks size available, but will revert to smaller reads if necessary.
 
-  @param  VmPtr             pointer to a VM context
+  @param  VmPtr             A pointer to a VM context.
   @param  Offset            offset from IP of the code bytes to read.
 
   @return Signed data of the requested size from the specified address.
@@ -3954,6 +5004,20 @@ VmReadImmed8 (
   return * (INT8 *) (VmPtr->Ip + Offset);
 }
 
+/**
+  Reads 16-bit immediate value at the offset.
+
+  This routine is called by the EBC execute
+  functions to read EBC immediate values from the code stream.
+  Since we can't assume alignment, each tries to read in the biggest
+  chunks size available, but will revert to smaller reads if necessary.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Offset            offset from IP of the code bytes to read.
+
+  @return Signed data of the requested size from the specified address.
+
+**/
 STATIC
 INT16
 VmReadImmed16 (
@@ -3982,6 +5046,21 @@ VmReadImmed16 (
   return (INT16) (*(UINT8 *) (VmPtr->Ip + Offset) + (*(UINT8 *) (VmPtr->Ip + Offset + 1) << 8));
 }
 
+
+/**
+  Reads 32-bit immediate value at the offset.
+
+  This routine is called by the EBC execute
+  functions to read EBC immediate values from the code stream.
+  Since we can't assume alignment, each tries to read in the biggest
+  chunks size available, but will revert to smaller reads if necessary.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Offset            offset from IP of the code bytes to read.
+
+  @return Signed data of the requested size from the specified address.
+
+**/
 STATIC
 INT32
 VmReadImmed32 (
@@ -4005,6 +5084,21 @@ VmReadImmed32 (
   return Data;
 }
 
+
+/**
+  Reads 64-bit immediate value at the offset.
+
+  This routine is called by the EBC execute
+  functions to read EBC immediate values from the code stream.
+  Since we can't assume alignment, each tries to read in the biggest
+  chunks size available, but will revert to smaller reads if necessary.
+
+  @param  VmPtr             A pointer to a VM context.
+  @param  Offset            offset from IP of the code bytes to read.
+
+  @return Signed data of the requested size from the specified address.
+
+**/
 STATIC
 INT64
 VmReadImmed64 (
@@ -4036,11 +5130,13 @@ VmReadImmed64 (
 
 
 /**
-  The following VmReadCode() routines provide the ability to read raw
-  unsigned data from the code stream.
+  Reads 16-bit unsinged data from the code stream.
 
-  @param  VmPtr             pointer to VM context
-  @param  Offset            offset from current IP to the raw data to read.
+  This routine provides the ability to read raw unsigned data from the code
+  stream.
+
+  @param  VmPtr             A pointer to VM context
+  @param  Offset            Offset from current IP to the raw data to read.
 
   @return The raw unsigned 16-bit value from the code stream.
 
@@ -4073,6 +5169,19 @@ VmReadCode16 (
   return (UINT16) (*(UINT8 *) (VmPtr->Ip + Offset) + (*(UINT8 *) (VmPtr->Ip + Offset + 1) << 8));
 }
 
+
+/**
+  Reads 32-bit unsinged data from the code stream.
+
+  This routine provides the ability to read raw unsigned data from the code
+  stream.
+
+  @param  VmPtr             A pointer to VM context
+  @param  Offset            Offset from current IP to the raw data to read.
+
+  @return The raw unsigned 32-bit value from the code stream.
+
+**/
 STATIC
 UINT32
 VmReadCode32 (
@@ -4095,6 +5204,19 @@ VmReadCode32 (
   return Data;
 }
 
+
+/**
+  Reads 64-bit unsinged data from the code stream.
+
+  This routine provides the ability to read raw unsigned data from the code
+  stream.
+
+  @param  VmPtr             A pointer to VM context
+  @param  Offset            Offset from current IP to the raw data to read.
+
+  @return The raw unsigned 64-bit value from the code stream.
+
+**/
 STATIC
 UINT64
 VmReadCode64 (
@@ -4124,6 +5246,16 @@ VmReadCode64 (
   return Data64;
 }
 
+
+/**
+  Reads 8-bit data form the memory address.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  Addr              The memory address.
+
+  @return The 8-bit value from the memory adress.
+
+**/
 STATIC
 UINT8
 VmReadMem8 (
@@ -4141,6 +5273,15 @@ VmReadMem8 (
   return * (UINT8 *) Addr;
 }
 
+/**
+  Reads 16-bit data form the memory address.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  Addr              The memory address.
+
+  @return The 16-bit value from the memory adress.
+
+**/
 STATIC
 UINT16
 VmReadMem16 (
@@ -4164,6 +5305,15 @@ VmReadMem16 (
   return (UINT16) (*(UINT8 *) Addr + (*(UINT8 *) (Addr + 1) << 8));
 }
 
+/**
+  Reads 32-bit data form the memory address.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  Addr              The memory address.
+
+  @return The 32-bit value from the memory adress.
+
+**/
 STATIC
 UINT32
 VmReadMem32 (
@@ -4191,6 +5341,15 @@ VmReadMem32 (
   return Data;
 }
 
+/**
+  Reads 64-bit data form the memory address.
+
+  @param  VmPtr             A pointer to VM context.
+  @param  Addr              The memory address.
+
+  @return The 64-bit value from the memory adress.
+
+**/
 STATIC
 UINT64
 VmReadMem64 (
@@ -4234,11 +5393,11 @@ VmReadMem64 (
   accesses into the VM stack area, then we need to convert the address
   to point to the EBC entry point arguments area. Do this here.
 
-  @param  VmPtr             pointer to VM context
-  @param  Addr              address of interest
+  @param  VmPtr             A Pointer to VM context.
+  @param  Addr              Address of interest
 
   @return The unchanged address if it's not in the VM stack region. Otherwise,
-  @return adjust for the stack gap and return the modified address.
+          adjust for the stack gap and return the modified address.
 
 **/
 STATIC
@@ -4299,6 +5458,12 @@ VmReadMemN (
   return Data;
 }
 
+/**
+  Returns the version of the EBC virtual machine.
+    
+  @return The 64-bit version of EBC virtual machine.
+
+**/
 UINT64
 GetVmVersion (
   VOID
