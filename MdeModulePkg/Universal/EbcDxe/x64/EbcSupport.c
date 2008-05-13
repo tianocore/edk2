@@ -27,28 +27,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define STACK_REMAIN_SIZE (1024 * 4)
 
+
+/**
+  Pushes a 64 bit unsigned value to the VM stack.
+
+  @param VmPtr  The pointer to current VM context.
+  @param Arg    The value to be pushed.
+
+**/
 STATIC
 VOID
 PushU64 (
-  VM_CONTEXT *VmPtr,
-  UINT64     Arg
+  IN VM_CONTEXT *VmPtr,
+  IN UINT64     Arg
   )
-/*++
-
-Routine Description:
-
-  Push a 64 bit unsigned value to the VM stack.
-
-Arguments:
-
-  VmPtr   -  The pointer to current VM context.
-  Arg     -  The value to be pushed
-
-Returns:
-
-  VOID
-
---*/
 {
   //
   // Advance the VM stack down, and then copy the argument to the stack.
@@ -69,28 +61,45 @@ Returns:
   calling convention, so the first four arguments are passed by rcx, rdx,
   r8, and r9, while other arguments are passed in stack.
 
+  @param  Arg1                  The 1st argument.
+  @param  Arg2                  The 2nd argument.
+  @param  Arg3                  The 3rd argument.
+  @param  Arg4                  The 4th argument.
+  @param  Arg5                  The 5th argument.
+  @param  Arg6                  The 6th argument.
+  @param  Arg7                  The 7th argument.
+  @param  Arg8                  The 8th argument.
+  @param  Arg9                  The 9th argument.
+  @param  Arg10                 The 10th argument.
+  @param  Arg11                 The 11th argument.
+  @param  Arg12                 The 12th argument.
+  @param  Arg13                 The 13th argument.
+  @param  Arg14                 The 14th argument.
+  @param  Arg15                 The 15th argument.
+  @param  Arg16                 The 16th argument.
+
   @return The value returned by the EBC application we're going to run.
 
 **/
 STATIC
 UINT64
 EbcInterpret (
-  UINTN      Arg1,
-  UINTN      Arg2,
-  UINTN      Arg3,
-  UINTN      Arg4,
-  UINTN      Arg5,
-  UINTN      Arg6,
-  UINTN      Arg7,
-  UINTN      Arg8,
-  UINTN      Arg9,
-  UINTN      Arg10,
-  UINTN      Arg11,
-  UINTN      Arg12,
-  UINTN      Arg13,
-  UINTN      Arg14,
-  UINTN      Arg15,
-  UINTN      Arg16
+  IN OUT UINTN      Arg1,
+  IN OUT UINTN      Arg2,
+  IN OUT UINTN      Arg3,
+  IN OUT UINTN      Arg4,
+  IN OUT UINTN      Arg5,
+  IN OUT UINTN      Arg6,
+  IN OUT UINTN      Arg7,
+  IN OUT UINTN      Arg8,
+  IN OUT UINTN      Arg9,
+  IN OUT UINTN      Arg10,
+  IN OUT UINTN      Arg11,
+  IN OUT UINTN      Arg12,
+  IN OUT UINTN      Arg13,
+  IN OUT UINTN      Arg14,
+  IN OUT UINTN      Arg15,
+  IN OUT UINTN      Arg16
   )
 {
   //
@@ -328,13 +337,20 @@ ExecuteEbcImageEntryPoint (
 
 
 /**
-  Create an IA32 thunk for the given EBC entry point.
+  Create thunks for an EBC image entry point, or an EBC protocol service.
 
-  @param  ImageHandle      Handle of image for which this thunk is being created
-  @param  EbcEntryPoint    Address of the EBC code that the thunk is to call
-  @param  Thunk            Returned thunk we create here
+  @param  ImageHandle           Image handle for the EBC image. If not null, then
+                                we're creating a thunk for an image entry point.
+  @param  EbcEntryPoint         Address of the EBC code that the thunk is to call
+  @param  Thunk                 Returned thunk we create here
+  @param  Flags                 Flags indicating options for creating the thunk
 
-  @return Standard EFI status.
+  @retval EFI_SUCCESS           The thunk was created successfully.
+  @retval EFI_INVALID_PARAMETER The parameter of EbcEntryPoint is not 16-bit
+                                aligned.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough memory to created the EBC
+                                Thunk.
+  @retval EFI_BUFFER_TOO_SMALL  EBC_THUNK_SIZE is not larger enough.
 
 **/
 EFI_STATUS
@@ -347,7 +363,7 @@ EbcCreateThunks (
 {
   UINT8       *Ptr;
   UINT8       *ThunkBase;
-  UINT32      I;
+  UINT32      Index;
   UINT64      Addr;
   INT32       Size;
   INT32       ThunkSize;
@@ -390,7 +406,7 @@ EbcCreateThunks (
   Ptr++;
   Size--;
   Addr = (UINT64) 0xCA112EBCCA112EBCULL;
-  for (I = 0; I < sizeof (Addr); I++) {
+  for (Index = 0; Index < sizeof (Addr); Index++) {
     *Ptr = (UINT8) (UINTN) Addr;
     Addr >>= 8;
     Ptr++;
@@ -410,7 +426,7 @@ EbcCreateThunks (
   Ptr++;
   Size--;
   Addr = (UINT64) EbcEntryPoint;
-  for (I = 0; I < sizeof (Addr); I++) {
+  for (Index = 0; Index < sizeof (Addr); Index++) {
     *Ptr = (UINT8) (UINTN) Addr;
     Addr >>= 8;
     Ptr++;
@@ -438,7 +454,7 @@ EbcCreateThunks (
   *Ptr = 0xBB;
   Ptr++;
   Size--;
-  for (I = 0; I < sizeof (Addr); I++) {
+  for (Index = 0; Index < sizeof (Addr); Index++) {
     *Ptr = (UINT8) Addr;
     Addr >>= 8;
     Ptr++;
@@ -486,8 +502,6 @@ EbcCreateThunks (
   @param  NewStackPointer  New stack pointer after the call
   @param  FramePtr         New frame pointer after the call
   @param  Size             The size of call instruction
-
-  @return None.
 
 **/
 VOID

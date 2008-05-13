@@ -36,13 +36,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   otherwise, set the VM->IP to target EBC code directly to avoid another VM
   be startup which cost time and stack space.
 
-  @parm VmPtr              Pointer to a VM context.
-  @parm FuncAddr           Callee's address
-  @parm NewStackPointer    New stack pointer after the call
-  @parm FramePtr           New frame pointer after the call
-  @parm Size               The size of call instruction
-
-  @return None.
+  @param  VmPtr            Pointer to a VM context.
+  @param  FuncAddr         Callee's address
+  @param  NewStackPointer  New stack pointer after the call
+  @param  FramePtr         New frame pointer after the call
+  @param  Size             The size of call instruction
 
 **/
 VOID
@@ -137,9 +135,26 @@ Action:
   in via a processor register, so we'll need to make a call to get the
   value.
 
-  None. Since we're called from a fixed up thunk (which we want to keep
-  small), our only so-called argument is the EBC entry point passed in
-  to us in a processor register.
+  This is a thunk function. Microsoft x64 compiler only provide fast_call
+  calling convention, so the first four arguments are passed by rcx, rdx,
+  r8, and r9, while other arguments are passed in stack.
+
+  @param  Arg1                  The 1st argument.
+  @param  Arg2                  The 2nd argument.
+  @param  Arg3                  The 3rd argument.
+  @param  Arg4                  The 4th argument.
+  @param  Arg5                  The 5th argument.
+  @param  Arg6                  The 6th argument.
+  @param  Arg7                  The 7th argument.
+  @param  Arg8                  The 8th argument.
+  @param  Arg9                  The 9th argument.
+  @param  Arg10                 The 10th argument.
+  @param  Arg11                 The 11th argument.
+  @param  Arg12                 The 12th argument.
+  @param  Arg13                 The 13th argument.
+  @param  Arg14                 The 14th argument.
+  @param  Arg15                 The 15th argument.
+  @param  Arg16                 The 16th argument.
 
   @return The value returned by the EBC application we're going to run.
 
@@ -286,8 +301,9 @@ EbcInterpret (
   in via a processor register, so we'll need to make a call to get the
   value.
 
-  @param  ImageHandle    image handle for the EBC application we're executing
-  @param  SystemTable    standard system table passed into an driver's entry point
+  @param  ImageHandle      image handle for the EBC application we're executing
+  @param  SystemTable      standard system table passed into an driver's entry
+                           point
 
   @return The value returned by the EBC application we're going to run.
 
@@ -385,13 +401,20 @@ ExecuteEbcImageEntryPoint (
 
 
 /**
-  Create an IA32 thunk for the given EBC entry point.
+  Create thunks for an EBC image entry point, or an EBC protocol service.
 
-  @param  ImageHandle    Handle of image for which this thunk is being created
-  @param  EbcEntryPoint  Address of the EBC code that the thunk is to call
-  @param  Thunk          Returned thunk we create here
+  @param  ImageHandle           Image handle for the EBC image. If not null, then
+                                we're creating a thunk for an image entry point.
+  @param  EbcEntryPoint         Address of the EBC code that the thunk is to call
+  @param  Thunk                 Returned thunk we create here
+  @param  Flags                 Flags indicating options for creating the thunk
 
-  @return Standard EFI status.
+  @retval EFI_SUCCESS           The thunk was created successfully.
+  @retval EFI_INVALID_PARAMETER The parameter of EbcEntryPoint is not 16-bit
+                                aligned.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough memory to created the EBC
+                                Thunk.
+  @retval EFI_BUFFER_TOO_SMALL  EBC_THUNK_SIZE is not larger enough.
 
 **/
 EFI_STATUS
@@ -404,7 +427,7 @@ EbcCreateThunks (
 {
   UINT8       *Ptr;
   UINT8       *ThunkBase;
-  UINT32      I;
+  UINT32      Index;
   UINT32      Addr;
   INT32       Size;
   INT32       ThunkSize;
@@ -444,7 +467,7 @@ EbcCreateThunks (
   Ptr++;
   Size--;
   Addr = (UINT32) 0xCA112EBC;
-  for (I = 0; I < sizeof (Addr); I++) {
+  for (Index = 0; Index < sizeof (Addr); Index++) {
     *Ptr = (UINT8) (UINTN) Addr;
     Addr >>= 8;
     Ptr++;
@@ -461,7 +484,7 @@ EbcCreateThunks (
   Ptr++;
   Size--;
   Addr = (UINT32) EbcEntryPoint;
-  for (I = 0; I < sizeof (Addr); I++) {
+  for (Index = 0; Index < sizeof (Addr); Index++) {
     *Ptr = (UINT8) (UINTN) Addr;
     Addr >>= 8;
     Ptr++;
@@ -483,7 +506,7 @@ EbcCreateThunks (
   *Ptr = 0xB9;
   Ptr++;
   Size--;
-  for (I = 0; I < sizeof (Addr); I++) {
+  for (Index = 0; Index < sizeof (Addr); Index++) {
     *Ptr = (UINT8) Addr;
     Addr >>= 8;
     Ptr++;
