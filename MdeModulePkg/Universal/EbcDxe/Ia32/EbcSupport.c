@@ -494,7 +494,7 @@ EbcCreateThunks (
   // Stick in a load of ecx with the address of appropriate VM function.
   //  mov ecx 12345678h  => 0xB9 0x78 0x56 0x34 0x12
   //
-  if (Flags & FLAG_THUNK_ENTRY_POINT) {
+  if ((Flags & FLAG_THUNK_ENTRY_POINT) != 0) {
     Addr = (UINT32) (UINTN) ExecuteEbcImageEntryPoint;
   } else {
     Addr = (UINT32) (UINTN) EbcInterpret;

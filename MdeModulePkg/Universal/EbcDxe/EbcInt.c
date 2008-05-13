@@ -769,7 +769,7 @@ EbcDebugSignalException (
   // If it's a fatal exception, then flag it in the VM context in case an
   // attached debugger tries to return from it.
   //
-  if (ExceptionFlags & EXCEPTION_FLAG_FATAL) {
+  if ((ExceptionFlags & EXCEPTION_FLAG_FATAL) != 0) {
     VmPtr->StopFlags |= STOPFLAG_APP_DONE;
   }
 
