@@ -1527,7 +1527,7 @@ EbcExecute (
   // instruction sets it if it runs out of stack.
   //
   VmPtr->StopFlags = 0;
-  while (!(VmPtr->StopFlags & STOPFLAG_APP_DONE)) {
+  while ((VmPtr->StopFlags & STOPFLAG_APP_DONE) == 0) {
     //
     // If we've found a simple debugger protocol, call it
     //
@@ -1575,11 +1575,11 @@ EbcExecute (
     //
     // Make sure stack has not been corrupted. Only report it once though.
     //
-    if (!StackCorrupted && (*VmPtr->StackMagicPtr != (UINTN) VM_STACK_KEY_VALUE)) {
+    if ((StackCorrupted == 0) && (*VmPtr->StackMagicPtr != (UINTN) VM_STACK_KEY_VALUE)) {
       EbcDebugSignalException (EXCEPT_EBC_STACK_FAULT, EXCEPTION_FLAG_FATAL, VmPtr);
       StackCorrupted = 1;
     }
-    if (!StackCorrupted && ((UINT64)VmPtr->R[0] <= (UINT64)(UINTN) VmPtr->StackTop)) {
+    if ((StackCorrupted == 0) && ((UINT64)VmPtr->R[0] <= (UINT64)(UINTN) VmPtr->StackTop)) {
       EbcDebugSignalException (EXCEPT_EBC_STACK_FAULT, EXCEPTION_FLAG_FATAL, VmPtr);
       StackCorrupted = 1;
     }
@@ -1652,7 +1652,7 @@ ExecuteMOVxx (
   // is 2 (opcode + operands). Add to this size each index specified.
   //
   Size = 2;
-  if (Opcode & (OPCODE_M_IMMED_OP1 | OPCODE_M_IMMED_OP2)) {
+  if ((Opcode & (OPCODE_M_IMMED_OP1 | OPCODE_M_IMMED_OP2)) != 0) {
     //
     // Determine size of the index from the opcode. Then get it.
     //
@@ -1661,13 +1661,13 @@ ExecuteMOVxx (
       // MOVBW, MOVWW, MOVDW, MOVQW, and MOVNW have 16-bit immediate index.
       // Get one or both index values.
       //
-      if (Opcode & OPCODE_M_IMMED_OP1) {
+      if ((Opcode & OPCODE_M_IMMED_OP1) != 0) {
         Index16     = VmReadIndex16 (VmPtr, 2);
         Index64Op1  = (INT64) Index16;
         Size += sizeof (UINT16);
       }
 
-      if (Opcode & OPCODE_M_IMMED_OP2) {
+      if ((Opcode & OPCODE_M_IMMED_OP2) != 0) {
         Index16     = VmReadIndex16 (VmPtr, Size);
         Index64Op2  = (INT64) Index16;
         Size += sizeof (UINT16);
@@ -1676,13 +1676,13 @@ ExecuteMOVxx (
       //
       // MOVBD, MOVWD, MOVDD, MOVQD, and MOVND have 32-bit immediate index
       //
-      if (Opcode & OPCODE_M_IMMED_OP1) {
+      if ((Opcode & OPCODE_M_IMMED_OP1) != 0) {
         Index32     = VmReadIndex32 (VmPtr, 2);
         Index64Op1  = (INT64) Index32;
         Size += sizeof (UINT32);
       }
 
-      if (Opcode & OPCODE_M_IMMED_OP2) {
+      if ((Opcode & OPCODE_M_IMMED_OP2) != 0) {
         Index32     = VmReadIndex32 (VmPtr, Size);
         Index64Op2  = (INT64) Index32;
         Size += sizeof (UINT32);
@@ -1691,12 +1691,12 @@ ExecuteMOVxx (
       //
       // MOVqq -- only form with a 64-bit index
       //
-      if (Opcode & OPCODE_M_IMMED_OP1) {
+      if ((Opcode & OPCODE_M_IMMED_OP1) != 0) {
         Index64Op1 = VmReadIndex64 (VmPtr, 2);
         Size += sizeof (UINT64);
       }
 
-      if (Opcode & OPCODE_M_IMMED_OP2) {
+      if ((Opcode & OPCODE_M_IMMED_OP2) != 0) {
         Index64Op2 = VmReadIndex64 (VmPtr, Size);
         Size += sizeof (UINT64);
       }
@@ -1786,7 +1786,7 @@ ExecuteMOVxx (
     // Did Operand2 have an index? If so, treat as two signed values since
     // indexes are signed values.
     //
-    if (Opcode & OPCODE_M_IMMED_OP2) {
+    if ((Opcode & OPCODE_M_IMMED_OP2) != 0) {
       //
       // NOTE: need to find a way to fix this, most likely by changing the VM
       // implementation to remove the stack gap. To do that, we'd need to
@@ -1853,7 +1853,7 @@ ExecuteMOVxx (
     // Operand1 direct.
     // Make sure we didn't have an index on operand1.
     //
-    if (Opcode & OPCODE_M_IMMED_OP1) {
+    if ((Opcode & OPCODE_M_IMMED_OP1) != 0) {
       EbcDebugSignalException (
         EXCEPT_EBC_INSTRUCTION_ENCODING,
         EXCEPTION_FLAG_FATAL,
@@ -2037,9 +2037,9 @@ ExecuteJMP (
   // Decode instruction conditions
   // If we haven't met the condition, then simply advance the IP and return.
   //
-  CompareSet    = (UINT8) ((Operand & JMP_M_CS) ? 1 : 0);
+  CompareSet    = (UINT8) (((Operand & JMP_M_CS) != 0) ? 1 : 0);
   ConditionFlag = (UINT8) VMFLAG_ISSET (VmPtr, VMFLAGS_CC);
-  if (Operand & CONDITION_M_CONDITIONAL) {
+  if ((Operand & CONDITION_M_CONDITIONAL) != 0) {
     if (CompareSet != ConditionFlag) {
       VmPtr->Ip += Size;
       return EFI_SUCCESS;
@@ -2049,12 +2049,12 @@ ExecuteJMP (
   // Check for 64-bit form and do it right away since it's the most
   // straight-forward form.
   //
-  if (Opcode & OPCODE_M_IMMDATA64) {
+  if ((Opcode & OPCODE_M_IMMDATA64) != 0) {
     //
     // Double check for immediate-data, which is required. If not there,
     // then signal an exception
     //
-    if (!(Opcode & OPCODE_M_IMMDATA)) {
+    if ((Opcode & OPCODE_M_IMMDATA) == 0) {
       EbcDebugSignalException (
         EXCEPT_EBC_INSTRUCTION_ENCODING,
         EXCEPTION_FLAG_ERROR,
@@ -2080,7 +2080,7 @@ ExecuteJMP (
     //
     // Take jump -- relative or absolute
     //
-    if (Operand & JMP_M_RELATIVE) {
+    if ((Operand & JMP_M_RELATIVE) != 0) {
       VmPtr->Ip += (UINTN) Data64 + Size;
     } else {
       VmPtr->Ip = (VMIP) (UINTN) Data64;
@@ -2095,7 +2095,7 @@ ExecuteJMP (
   //   JMP32 @R1 Index32 -- immediate data is an index
   //   JMP32 R1 Immed32  -- immedate data is an offset
   //
-  if (Opcode & OPCODE_M_IMMDATA) {
+  if ((Opcode & OPCODE_M_IMMDATA) != 0) {
     if (OPERAND1_INDIRECT (Operand)) {
       Index32 = VmReadIndex32 (VmPtr, 2);
     } else {
@@ -2130,7 +2130,7 @@ ExecuteJMP (
       return EFI_UNSUPPORTED;
     }
 
-    if (Operand & JMP_M_RELATIVE) {
+    if ((Operand & JMP_M_RELATIVE) != 0) {
       VmPtr->Ip += (UINTN) Addr + Size;
     } else {
       VmPtr->Ip = (VMIP) Addr;
@@ -2150,7 +2150,7 @@ ExecuteJMP (
       return EFI_UNSUPPORTED;
     }
 
-    if (Operand & JMP_M_RELATIVE) {
+    if ((Operand & JMP_M_RELATIVE) != 0) {
       VmPtr->Ip += (UINTN) Addr + Size;
     } else {
       VmPtr->Ip = (VMIP) Addr;
@@ -2187,13 +2187,13 @@ ExecuteJMP8 (
   // Decode instruction.
   //
   Opcode        = GETOPCODE (VmPtr);
-  CompareSet    = (UINT8) ((Opcode & JMP_M_CS) ? 1 : 0);
+  CompareSet    = (UINT8) (((Opcode & JMP_M_CS) != 0) ? 1 : 0);
   ConditionFlag = (UINT8) VMFLAG_ISSET (VmPtr, VMFLAGS_CC);
 
   //
   // If we haven't met the condition, then simply advance the IP and return
   //
-  if (Opcode & CONDITION_M_CONDITIONAL) {
+  if ((Opcode & CONDITION_M_CONDITIONAL) != 0) {
     if (CompareSet != ConditionFlag) {
       VmPtr->Ip += 2;
       return EFI_SUCCESS;
@@ -2256,7 +2256,7 @@ ExecuteMOVI (
   //
   // Get the index (16-bit) if present
   //
-  if (Operands & MOVI_M_IMMDATA) {
+  if ((Operands & MOVI_M_IMMDATA) != 0) {
     Index16 = VmReadIndex16 (VmPtr, 2);
     Size    = 4;
   } else {
@@ -2293,7 +2293,7 @@ ExecuteMOVI (
     //
     // Operand1 direct. Make sure it didn't have an index.
     //
-    if (Operands & MOVI_M_IMMDATA) {
+    if ((Operands & MOVI_M_IMMDATA) != 0) {
       EbcDebugSignalException (
         EXCEPT_EBC_INSTRUCTION_ENCODING,
         EXCEPTION_FLAG_FATAL,
@@ -2376,7 +2376,7 @@ ExecuteMOVIn (
   //
   // Get the operand1 index (16-bit) if present
   //
-  if (Operands & MOVI_M_IMMDATA) {
+  if ((Operands & MOVI_M_IMMDATA) != 0) {
     Index16 = VmReadIndex16 (VmPtr, 2);
     Size    = 4;
   } else {
@@ -2416,7 +2416,7 @@ ExecuteMOVIn (
     // Check for MOVIn R1 Index16, Immed (not indirect, with index), which
     // is illegal
     //
-    if (Operands & MOVI_M_IMMDATA) {
+    if ((Operands & MOVI_M_IMMDATA) != 0) {
       EbcDebugSignalException (
         EXCEPT_EBC_INSTRUCTION_ENCODING,
         EXCEPTION_FLAG_FATAL,
@@ -2478,7 +2478,7 @@ ExecuteMOVREL (
   //
   // Get the Operand 1 index (16-bit) if present
   //
-  if (Operands & MOVI_M_IMMDATA) {
+  if ((Operands & MOVI_M_IMMDATA) != 0) {
     Index16 = VmReadIndex16 (VmPtr, 2);
     Size    = 4;
   } else {
@@ -2516,7 +2516,7 @@ ExecuteMOVREL (
     //
     // Check for illegal combination of operand1 direct with immediate data
     //
-    if (Operands & MOVI_M_IMMDATA) {
+    if ((Operands & MOVI_M_IMMDATA) != 0) {
       EbcDebugSignalException (
         EXCEPT_EBC_INSTRUCTION_ENCODING,
         EXCEPTION_FLAG_FATAL,
@@ -2587,7 +2587,7 @@ ExecuteMOVsnw (
   // Get the indexes if present.
   //
   Size = 2;
-  if (Opcode & OPCODE_M_IMMED_OP1) {
+  if ((Opcode & OPCODE_M_IMMED_OP1) !=0) {
     if (OPERAND1_INDIRECT (Operands)) {
       Op1Index = VmReadIndex16 (VmPtr, 2);
     } else {
@@ -2605,7 +2605,7 @@ ExecuteMOVsnw (
     Size += sizeof (UINT16);
   }
 
-  if (Opcode & OPCODE_M_IMMED_OP2) {
+  if ((Opcode & OPCODE_M_IMMED_OP2) != 0) {
     if (OPERAND2_INDIRECT (Operands)) {
       Op2Index = VmReadIndex16 (VmPtr, Size);
     } else {
@@ -2681,7 +2681,7 @@ ExecuteMOVsnd (
   // Get the indexes if present.
   //
   Size = 2;
-  if (Opcode & OPCODE_M_IMMED_OP1) {
+  if ((Opcode & OPCODE_M_IMMED_OP1) != 0) {
     if (OPERAND1_INDIRECT (Operands)) {
       Op1Index = VmReadIndex32 (VmPtr, 2);
     } else {
@@ -2699,7 +2699,7 @@ ExecuteMOVsnd (
     Size += sizeof (UINT32);
   }
 
-  if (Opcode & OPCODE_M_IMMED_OP2) {
+  if ((Opcode & OPCODE_M_IMMED_OP2) != 0) {
     if (OPERAND2_INDIRECT (Operands)) {
       Op2Index = VmReadIndex32 (VmPtr, Size);
     } else {
@@ -2762,7 +2762,7 @@ ExecutePUSHn (
   //
   // Get index if present
   //
-  if (Opcode & PUSHPOP_M_IMMDATA) {
+  if ((Opcode & PUSHPOP_M_IMMDATA) != 0) {
     if (OPERAND1_INDIRECT (Operands)) {
       Index16 = VmReadIndex16 (VmPtr, 2);
     } else {
@@ -2822,7 +2822,7 @@ ExecutePUSH (
   //
   // Get immediate index if present, then advance the IP.
   //
-  if (Opcode & PUSHPOP_M_IMMDATA) {
+  if ((Opcode & PUSHPOP_M_IMMDATA) != 0) {
     if (OPERAND1_INDIRECT (Operands)) {
       Index16 = VmReadIndex16 (VmPtr, 2);
     } else {
@@ -2837,7 +2837,7 @@ ExecutePUSH (
   //
   // Get the data to push
   //
-  if (Opcode & PUSHPOP_M_64) {
+  if ((Opcode & PUSHPOP_M_64) != 0) {
     if (OPERAND1_INDIRECT (Operands)) {
       Data64 = VmReadMem64 (VmPtr, (UINTN) (VmPtr->R[OPERAND1_REGNUM (Operands)] + Index16));
     } else {
@@ -2898,7 +2898,7 @@ ExecutePOPn (
   //
   // Get immediate data if present, and advance the IP
   //
-  if (Opcode & PUSHPOP_M_IMMDATA) {
+  if ((Opcode & PUSHPOP_M_IMMDATA) != 0) {
     if (OPERAND1_INDIRECT (Operands)) {
       Index16 = VmReadIndex16 (VmPtr, 2);
     } else {
@@ -2959,7 +2959,7 @@ ExecutePOP (
   //
   // Get immediate data if present, and advance the IP.
   //
-  if (Opcode & PUSHPOP_M_IMMDATA) {
+  if ((Opcode & PUSHPOP_M_IMMDATA) != 0) {
     if (OPERAND1_INDIRECT (Operands)) {
       Index16 = VmReadIndex16 (VmPtr, 2);
     } else {
@@ -2974,7 +2974,7 @@ ExecutePOP (
   //
   // Get the data off the stack, then write it to the appropriate location
   //
-  if (Opcode & PUSHPOP_M_64) {
+  if ((Opcode & PUSHPOP_M_64) != 0) {
     //
     // Read the data off the stack, then adjust the stack pointer
     //
@@ -3052,8 +3052,8 @@ ExecuteCALL (
   //
   // Determine the instruction size, and get immediate data if present
   //
-  if (Opcode & OPCODE_M_IMMDATA) {
-    if (Opcode & OPCODE_M_IMMDATA64) {
+  if ((Opcode & OPCODE_M_IMMDATA) != 0) {
+    if ((Opcode & OPCODE_M_IMMDATA64) != 0) {
       Immed64 = VmReadImmed64 (VmPtr, 2);
       Size    = 10;
     } else {
@@ -3085,7 +3085,7 @@ ExecuteCALL (
   //
   // If 64-bit data, then absolute jump only
   //
-  if (Opcode & OPCODE_M_IMMDATA64) {
+  if ((Opcode & OPCODE_M_IMMDATA64) != 0) {
     //
     // Native or EBC call?
     //
@@ -3122,7 +3122,7 @@ ExecuteCALL (
       // EBC call. Relative or absolute? If relative, then it's relative to the
       // start of the next instruction.
       //
-      if (Operands & OPERAND_M_RELATIVE_ADDR) {
+      if ((Operands & OPERAND_M_RELATIVE_ADDR) != 0) {
         VmPtr->Ip += Immed64 + Size;
       } else {
         VmPtr->Ip = (VMIP) (UINTN) Immed64;
@@ -3131,10 +3131,10 @@ ExecuteCALL (
       //
       // Native call. Relative or absolute?
       //
-      if (Operands & OPERAND_M_RELATIVE_ADDR) {
+      if ((Operands & OPERAND_M_RELATIVE_ADDR) != 0) {
         EbcLLCALLEX (VmPtr, (UINTN) (Immed64 + VmPtr->Ip + Size), (UINTN) VmPtr->R[0], FramePtr, Size);
       } else {
-        if (VmPtr->StopFlags & STOPFLAG_BREAK_ON_CALLEX) {
+        if ((VmPtr->StopFlags & STOPFLAG_BREAK_ON_CALLEX) != 0) {
           CpuBreakpoint ();
         }
 
@@ -3233,7 +3233,7 @@ ExecuteCMP (
   //
   // Get immediate data
   //
-  if (Opcode & OPCODE_M_IMMDATA) {
+  if ((Opcode & OPCODE_M_IMMDATA) != 0) {
     if (OPERAND2_INDIRECT (Operands)) {
       Index16 = VmReadIndex16 (VmPtr, 2);
     } else {
@@ -3249,7 +3249,7 @@ ExecuteCMP (
   // Now get Op2
   //
   if (OPERAND2_INDIRECT (Operands)) {
-    if (Opcode & OPCODE_M_64BIT) {
+    if ((Opcode & OPCODE_M_64BIT) != 0) {
       Op2 = (INT64) VmReadMem64 (VmPtr, (UINTN) (VmPtr->R[OPERAND2_REGNUM (Operands)] + Index16));
     } else {
       //
@@ -3264,7 +3264,7 @@ ExecuteCMP (
   // Now do the compare
   //
   Flag = 0;
-  if (Opcode & OPCODE_M_64BIT) {
+  if ((Opcode & OPCODE_M_64BIT) != 0) {
     //
     // 64-bit compares
     //
@@ -3344,7 +3344,7 @@ ExecuteCMP (
   //
   // Now set the flag accordingly for the comparison
   //
-  if (Flag) {
+  if (Flag != 0) {
     VMFLAG_SET (VmPtr, VMFLAGS_CC);
   } else {
     VMFLAG_CLEAR (VmPtr, VMFLAGS_CC);
@@ -3393,7 +3393,7 @@ ExecuteCMPI (
   // Get operand1 index if present
   //
   Size = 2;
-  if (Operands & OPERAND_M_CMPI_INDEX) {
+  if ((Operands & OPERAND_M_CMPI_INDEX) != 0) {
     Index16 = VmReadIndex16 (VmPtr, 2);
     Size += 2;
   } else {
@@ -3407,7 +3407,7 @@ ExecuteCMPI (
     //
     // Indirect operand1. Fetch 32 or 64-bit value based on compare size.
     //
-    if (Opcode & OPCODE_M_CMPI64) {
+    if ((Opcode & OPCODE_M_CMPI64) != 0) {
       Op1 = (INT64) VmReadMem64 (VmPtr, (UINTN) Op1 + Index16);
     } else {
       Op1 = (INT64) VmReadMem32 (VmPtr, (UINTN) Op1 + Index16);
@@ -3417,7 +3417,7 @@ ExecuteCMPI (
     // Better not have been an index with direct. That is, CMPI R1 Index,...
     // is illegal.
     //
-    if (Operands & OPERAND_M_CMPI_INDEX) {
+    if ((Operands & OPERAND_M_CMPI_INDEX) != 0) {
       EbcDebugSignalException (
         EXCEPT_EBC_INSTRUCTION_ENCODING,
         EXCEPTION_FLAG_ERROR,
@@ -3430,7 +3430,7 @@ ExecuteCMPI (
   //
   // Get immediate data -- 16- or 32-bit sign extended
   //
-  if (Opcode & OPCODE_M_CMPI32_DATA) {
+  if ((Opcode & OPCODE_M_CMPI32_DATA) != 0) {
     Op2 = (INT64) VmReadImmed32 (VmPtr, Size);
     Size += 4;
   } else {
@@ -3444,7 +3444,7 @@ ExecuteCMPI (
   // Now do the compare
   //
   Flag = 0;
-  if (Opcode & OPCODE_M_CMPI64) {
+  if ((Opcode & OPCODE_M_CMPI64) != 0) {
     //
     // 64 bit comparison
     //
@@ -3524,7 +3524,7 @@ ExecuteCMPI (
   //
   // Now set the flag accordingly for the comparison
   //
-  if (Flag) {
+  if (Flag != 0) {
     VMFLAG_SET (VmPtr, VMFLAGS_CC);
   } else {
     VMFLAG_CLEAR (VmPtr, VMFLAGS_CC);
@@ -3633,7 +3633,7 @@ ExecuteSUB (
   IN UINT64       Op2
   )
 {
-  if (*VmPtr->Ip & DATAMANIP_M_64) {
+  if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return (UINT64) ((INT64) ((INT64) Op1 - (INT64) Op2));
   } else {
     return (UINT64) ((INT64) ((INT32) Op1 - (INT32) Op2));
@@ -3662,7 +3662,7 @@ ExecuteMUL (
   IN UINT64       Op2
   )
 {
-  if (*VmPtr->Ip & DATAMANIP_M_64) {
+  if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return MultS64x64 ((INT64)Op1, (INT64)Op2);
   } else {
     return (UINT64) ((INT64) ((INT32) Op1 * (INT32) Op2));
@@ -3691,7 +3691,7 @@ ExecuteMULU (
   IN UINT64       Op2
   )
 {
-  if (*VmPtr->Ip & DATAMANIP_M_64) {
+  if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return MultU64x64 (Op1, Op2);
   } else {
     return (UINT64) ((UINT32) Op1 * (UINT32) Op2);
@@ -3734,7 +3734,7 @@ ExecuteDIV (
 
     return 0;
   } else {
-    if (*VmPtr->Ip & DATAMANIP_M_64) {
+    if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
       return (UINT64) (DivS64x64Remainder (Op1, Op2, &Remainder));
     } else {
       return (UINT64) ((INT64) ((INT32) Op1 / (INT32) Op2));
@@ -3780,7 +3780,7 @@ ExecuteDIVU (
     //
     // Get the destination register
     //
-    if (*VmPtr->Ip & DATAMANIP_M_64) {
+    if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
       return (UINT64) (DivU64x64Remainder ((INT64)Op1, (INT64)Op2, &Remainder));
     } else {
       return (UINT64) ((UINT32) Op1 / (UINT32) Op2);
@@ -3965,7 +3965,7 @@ ExecuteSHL (
   IN UINT64       Op2
   )
 {
-  if (*VmPtr->Ip & DATAMANIP_M_64) {
+  if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return LShiftU64 (Op1, (UINTN)Op2);
   } else {
     return (UINT64) ((UINT32) ((UINT32) Op1 << (UINT32) Op2));
@@ -3994,7 +3994,7 @@ ExecuteSHR (
   IN UINT64       Op2
   )
 {
-  if (*VmPtr->Ip & DATAMANIP_M_64) {
+  if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return RShiftU64 (Op1, (UINTN)Op2);
   } else {
     return (UINT64) ((UINT32) Op1 >> (UINT32) Op2);
@@ -4023,7 +4023,7 @@ ExecuteASHR (
   IN UINT64       Op2
   )
 {
-  if (*VmPtr->Ip & DATAMANIP_M_64) {
+  if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return ARShiftU64 (Op1, (UINTN)Op2);
   } else {
     return (UINT64) ((INT64) ((INT32) Op1 >> (UINT32) Op2));
@@ -4243,7 +4243,7 @@ ExecuteDataManip (
   //
   // Determine if we have immediate data by the opcode
   //
-  if (Opcode & DATAMANIP_M_IMMDATA) {
+  if ((Opcode & DATAMANIP_M_IMMDATA) != 0) {
     //
     // Index16 if Ry is indirect, or Immed16 if Ry direct.
     //
@@ -4266,7 +4266,7 @@ ExecuteDataManip (
     //
     // Indirect form: @R2 Index16. Fetch as 32- or 64-bit data
     //
-    if (Opcode & DATAMANIP_M_64) {
+    if ((Opcode & DATAMANIP_M_64) != 0) {
       Op2 = VmReadMem64 (VmPtr, (UINTN) Op2);
     } else {
       //
@@ -4293,7 +4293,7 @@ ExecuteDataManip (
   //
   Op1 = VmPtr->R[OPERAND1_REGNUM (Operands)];
   if (OPERAND1_INDIRECT (Operands)) {
-    if (Opcode & DATAMANIP_M_64) {
+    if ((Opcode & DATAMANIP_M_64) != 0) {
       Op1 = VmReadMem64 (VmPtr, (UINTN) Op1);
     } else {
       if (IsSignedOp) {
@@ -4335,7 +4335,7 @@ ExecuteDataManip (
   //
   if (OPERAND1_INDIRECT (Operands)) {
     Op1 = VmPtr->R[OPERAND1_REGNUM (Operands)];
-    if (Opcode & DATAMANIP_M_64) {
+    if ((Opcode & DATAMANIP_M_64) != 0) {
       VmWriteMem64 (VmPtr, (UINTN) Op1, Op2);
     } else {
       VmWriteMem32 (VmPtr, (UINTN) Op1, (UINT32) Op2);
@@ -4546,7 +4546,7 @@ VmReadIndex16 (
   //
   // Now set the sign
   //
-  if (Index & 0x8000) {
+  if ((Index & 0x8000) != 0) {
     //
     // Do it the hard way to work around a bogus compiler warning
     //
@@ -4615,7 +4615,7 @@ VmReadIndex32 (
   //
   // Now set the sign
   //
-  if (Index & 0x80000000) {
+  if ((Index & 0x80000000) != 0) {
     Offset = Offset * -1;
   }
 
@@ -4679,7 +4679,7 @@ VmReadIndex64 (
   //
   // Now set the sign
   //
-  if (Index & 0x8000000000000000ULL) {
+  if ((Index & 0x8000000000000000ULL) != 0) {
     Offset = MultS64x64 (Offset, -1);
   }
 

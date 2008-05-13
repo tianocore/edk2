@@ -439,7 +439,7 @@ EbcCreateThunks (
   // point.
   // mov r11 123456789abcdef0h  => 49 BB F0 DE BC 9A 78 56 34 12
   //
-  if (Flags & FLAG_THUNK_ENTRY_POINT) {
+  if ((Flags & FLAG_THUNK_ENTRY_POINT) != 0) {
     Addr = (UINTN) ExecuteEbcImageEntryPoint;
   } else {
     Addr = (UINTN) EbcInterpret;

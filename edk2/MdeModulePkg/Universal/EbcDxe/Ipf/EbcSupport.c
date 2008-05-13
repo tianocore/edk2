@@ -591,7 +591,7 @@ EbcCreateThunks (
   // to the address of the entry point of the interpreter.
   //
   Ptr += 16;
-  if (Flags & FLAG_THUNK_ENTRY_POINT) {
+  if ((Flags & FLAG_THUNK_ENTRY_POINT) != 0) {
     Addr = (UINT64) ExecuteEbcImageEntryPoint;
   } else {
     Addr = (UINT64) EbcInterpret;
@@ -746,13 +746,13 @@ WriteBundle (
   //
   // Verify no more than 5 bits in template
   //
-  if (Template &~0x1F) {
+  if ((Template &~0x1F) != 0) {
     return EFI_INVALID_PARAMETER;
   }
   //
   // Verify max of 41 bits used in code
   //
-  if ((Slot0 | Slot1 | Slot2) &~0x1ffffffffff) {
+  if (((Slot0 | Slot1 | Slot2) &~0x1ffffffffff) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
