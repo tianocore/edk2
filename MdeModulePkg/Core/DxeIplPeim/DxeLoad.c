@@ -67,7 +67,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient
                                 resources to process the request.
   
-  @reteval EFI_INVALID_PARAMETER The GUID in InputSection does
+  @retval EFI_INVALID_PARAMETER The GUID in InputSection does
                                 not match this instance of the
                                 GUIDed Section Extraction PPI.
 
@@ -118,7 +118,7 @@ BOOLEAN gInMemory = FALSE;
 // Module Globals used in the DXE to PEI handoff
 // These must be module globals, so the stack can be switched
 //
-static EFI_DXE_IPL_PPI mDxeIplPpi = {
+STATIC EFI_DXE_IPL_PPI mDxeIplPpi = {
   DxeLoadCore
 };
 
@@ -130,7 +130,7 @@ STATIC EFI_PEI_DECOMPRESS_PPI mDecompressPpi = {
   Decompress
 };
 
-static EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
+STATIC EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiDxeIplPpiGuid,
@@ -143,7 +143,7 @@ static EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
   }
 };
 
-static EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
+STATIC EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
   NULL
@@ -247,7 +247,7 @@ DxeLoadCore (
   EFI_PEI_FILE_HANDLE                       FileHandle;
   EFI_PEI_READ_ONLY_VARIABLE2_PPI           *Variable;
   UINTN                                     DataSize;
-  EFI_MEMORY_TYPE_INFORMATION               MemoryData [EfiMaxMemoryType + 1];
+  EFI_MEMORY_TYPE_INFORMATION               MemoryData[EfiMaxMemoryType + 1];
 
   //
   // if in S3 Resume, restore configure
@@ -544,7 +544,7 @@ PeiLoadFile (
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient
                                 resources to process the request.
   
-  @reteval EFI_INVALID_PARAMETER The GUID in InputSection does
+  @retval EFI_INVALID_PARAMETER The GUID in InputSection does
                                 not match this instance of the
                                 GUIDed Section Extraction PPI.
 
@@ -594,7 +594,7 @@ CustomGuidedSectionExtract (
     }
   }
 
-  if ((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) && OutputBufferSize > 0) {  
+  if (((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) && OutputBufferSize > 0) {  
     //
     // Allocate output buffer
     //
