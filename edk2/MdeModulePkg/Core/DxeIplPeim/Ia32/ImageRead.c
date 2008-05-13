@@ -55,7 +55,7 @@ PeiImageRead (
 //  ASSERT (ALIGN_POINTER (Source32, sizeof (UINT32)) == Source32);
 
   Length = *ReadSize;
-  while (Length--) {
+  while (Length-- != 0) {
     *(Destination32++) = *(Source32++);
   }
 
