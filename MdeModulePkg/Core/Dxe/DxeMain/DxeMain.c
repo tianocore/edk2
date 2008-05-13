@@ -840,7 +840,7 @@ DxeMainUefiDecompressGetInfo (
   This protocol is designed so that the decompression algorithm can be
   implemented without using any memory services. As a result, the Decompress()
   Function is not allowed to call AllocatePool() or AllocatePages() in its
-  implementation. It is the caller¡¯s responsibility to allocate and free the
+  implementation. It is the caller's responsibility to allocate and free the
   Destination and Scratch buffers.
   If the compressed source data specified by Source and SourceSize is
   sucessfully decompressed into Destination, then EFI_SUCCESS is returned. If

@@ -272,7 +272,7 @@ FreeChildNode (
                                  stream. 
   @param  AuthenticationStatus   A pointer to a caller-allocated UINT32 that
                                  indicates the authentication status of the
-                                 output buffer. If the input section¡¯s
+                                 output buffer. If the input section's
                                  GuidedSectionHeader.Attributes field
                                  has the EFI_GUIDED_SECTION_AUTH_STATUS_VALID
                                  bit as clear, AuthenticationStatus must return
@@ -531,7 +531,7 @@ OpenSectionStream (
                                 callee allocated) of *Buffer.
   @param  AuthenticationStatus  A pointer to a caller-allocated UINT32 that
                                 indicates the authentication status of the
-                                output buffer. If the input section¡¯s
+                                output buffer. If the input section's
                                 GuidedSectionHeader.Attributes field
                                 has the EFI_GUIDED_SECTION_AUTH_STATUS_VALID
                                 bit as clear, AuthenticationStatus must return
@@ -1326,7 +1326,7 @@ FreeChildNode (
                                  stream. 
   @param  AuthenticationStatus   A pointer to a caller-allocated UINT32 that
                                  indicates the authentication status of the
-                                 output buffer. If the input section¡¯s
+                                 output buffer. If the input section's
                                  GuidedSectionHeader.Attributes field
                                  has the EFI_GUIDED_SECTION_AUTH_STATUS_VALID
                                  bit as clear, AuthenticationStatus must return

@@ -220,7 +220,7 @@ typedef struct {
   CHAR16                       *GuidString;
 } GUID_TO_STRING_PROTOCOL_ENTRY;
 
-static const GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
+STATIC CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
   { &gEfiSecurityArchProtocolGuid,         (CHAR16 *)L"Security"           },
   { &gEfiCpuArchProtocolGuid,              (CHAR16 *)L"CPU"                },
   { &gEfiMetronomeArchProtocolGuid,        (CHAR16 *)L"Metronome"          },

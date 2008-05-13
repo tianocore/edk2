@@ -64,12 +64,12 @@ CoreInsertEventTimer (
 // Internal data
 //
 
-static LIST_ENTRY       mEfiTimerList = INITIALIZE_LIST_HEAD_VARIABLE (mEfiTimerList);
-static EFI_LOCK         mEfiTimerLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL - 1);
-static EFI_EVENT        mEfiCheckTimerEvent;
+STATIC LIST_ENTRY       mEfiTimerList = INITIALIZE_LIST_HEAD_VARIABLE (mEfiTimerList);
+STATIC EFI_LOCK         mEfiTimerLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL - 1);
+STATIC EFI_EVENT        mEfiCheckTimerEvent;
 
-static EFI_LOCK         mEfiSystemTimeLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL);
-static UINT64           mEfiSystemTime = 0;
+STATIC EFI_LOCK         mEfiSystemTimeLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL);
+STATIC UINT64           mEfiSystemTime = 0;
 
 //
 // Timer functions
