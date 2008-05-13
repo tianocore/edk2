@@ -76,7 +76,7 @@ VOID            *mFwVolEventRegistration;
 //
 // List of file types supported by dispatcher
 //
-static EFI_FV_FILETYPE mDxeFileTypes[] = { 
+STATIC EFI_FV_FILETYPE mDxeFileTypes[] = { 
   EFI_FV_FILETYPE_DRIVER, 
   EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER, 
   EFI_FV_FILETYPE_DXE_CORE,

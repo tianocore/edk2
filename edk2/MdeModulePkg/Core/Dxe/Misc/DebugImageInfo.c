@@ -17,13 +17,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <DxeMain.h>
 
 
-static EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
+STATIC EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
   0,          // volatile UINT32                 UpdateStatus;
   0,          // UINT32                          TableSize;
   NULL        // EFI_DEBUG_IMAGE_INFO            *EfiDebugImageInfoTable;
 };
 
-static EFI_SYSTEM_TABLE_POINTER *mDebugTable = NULL;
+STATIC EFI_SYSTEM_TABLE_POINTER *mDebugTable = NULL;
 
     
 

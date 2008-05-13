@@ -2269,7 +2269,7 @@ DxeMainUefiDecompressGetInfo (
   This protocol is designed so that the decompression algorithm can be
   implemented without using any memory services. As a result, the Decompress()
   Function is not allowed to call AllocatePool() or AllocatePages() in its
-  implementation. It is the caller¡¯s responsibility to allocate and free the
+  implementation. It is the caller's responsibility to allocate and free the
   Destination and Scratch buffers.
   If the compressed source data specified by Source and SourceSize is
   sucessfully decompressed into Destination, then EFI_SUCCESS is returned. If
@@ -2355,7 +2355,7 @@ OpenSectionStream (
                                 callee allocated) of *Buffer.
   @param  AuthenticationStatus  A pointer to a caller-allocated UINT32 that
                                 indicates the authentication status of the
-                                output buffer. If the input section¡¯s
+                                output buffer. If the input section's
                                 GuidedSectionHeader.Attributes field
                                 has the EFI_GUIDED_SECTION_AUTH_STATUS_VALID
                                 bit as clear, AuthenticationStatus must return
