@@ -502,6 +502,7 @@ GetBufferTypeDefaultIdAndStorageId (
   Node->Signature = UEFI_IFR_BUFFER_STORAGE_NODE_SIGNATURE;
   Node->Name      = AllocateCopyPool (StrSize (Storage->Name), Storage->Name);
   Node->DefaultId = DefaultStore->DefaultId;
+  Node->StoreId   = Storage->VarStoreId;
   CopyGuid (&Node->Guid, &Storage->Guid);
   Node->Size      = Storage->Size;
   Node->Buffer    = AllocateZeroPool (Node->Size);
@@ -710,13 +711,14 @@ UefiDefaultsToFrameworkDefaults (
       //
       if (Node->StoreId == RESERVED_VARSTORE_ID) {
         Pack->VariableId = 0;
+      } else {
+        Pack->VariableId = Node->StoreId;
       }
       //
       // Initialize EFI_HII_VARIABLE_PACK
       //
       Pack->Header.Type   = 0;
       Pack->Header.Length = Size;
-      Pack->VariableId = Node->StoreId;
       Pack->VariableNameLength = StrSize (Node->Name);
       CopyMem (&Pack->VariableGuid, &Node->Guid, sizeof (EFI_GUID));
       
@@ -749,9 +751,7 @@ UefiDefaultsToFrameworkDefaults (
                                               a UEFI form set.
                                              
 
-  @retval   EFI_SUCCESS                       Successful.
-  @retval   EFI_INVALID_PARAMETER      The default mask is not FRAMEWORK_EFI_IFR_FLAG_DEFAULT or 
-                                                           FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING.
+  @retval   VOID
 **/
 VOID
 FreeDefaultList (
