@@ -101,9 +101,8 @@ EbcCreateThunks (
   IN EFI_HANDLE           ImageHandle,
   IN VOID                 *EbcEntryPoint,
   OUT VOID                **Thunk,
-  IN UINT32               Flags
-  )
-;
+  IN  UINT32              Flags
+  );
 
 /**
   Add a thunk to our list of thunks for a given image handle.
@@ -120,11 +119,10 @@ EbcCreateThunks (
 **/
 EFI_STATUS
 EbcAddImageThunk (
-  IN EFI_HANDLE     ImageHandle,
-  IN VOID           *ThunkBuffer,
-  IN UINT32         ThunkSize
-  )
-;
+  IN EFI_HANDLE      ImageHandle,
+  IN VOID            *ThunkBuffer,
+  IN UINT32          ThunkSize
+  );
 
 //
 // The interpreter calls these when an exception is detected,
@@ -143,11 +141,10 @@ EbcAddImageThunk (
 **/
 EFI_STATUS
 EbcDebugSignalException (
-  IN EFI_EXCEPTION_TYPE ExceptionType,
-  IN EXCEPTION_FLAGS    ExceptionFlags,
-  IN VM_CONTEXT         *VmPtr
-  )
-;
+  IN EFI_EXCEPTION_TYPE                   ExceptionType,
+  IN EXCEPTION_FLAGS                      ExceptionFlags,
+  IN VM_CONTEXT                           *VmPtr
+  );
 
 //
 // Define a constant of how often to call the debugger periodic callback
@@ -161,21 +158,20 @@ EbcDebugSignalException (
 //
 // External low level functions that are native-processor dependent
 // 
-/** 
+/**
   The VM thunk code stuffs an EBC entry point into a processor 
   register. Since we can't use inline assembly to get it from
   the interpreter C code, stuff it into the return value
   register and return.
  
   @return  The contents of the register in which the entry point is passed.
- 
-**/ 
+
+**/
 UINTN
 EFIAPI
 EbcLLGetEbcEntryPoint (
   VOID
-  )
-;
+  );
 
 /**
   Returns the caller's value of the stack pointer.
@@ -183,15 +179,14 @@ EbcLLGetEbcEntryPoint (
   We adjust it by 4 here because when they called us, the return address
   is put on the stack, thereby lowering it by 4 bytes.
 
-  @return The current value of the stack pointer for the caller. 
+  @return The current value of the stack pointer for the caller.
 
 **/
 UINTN
 EFIAPI
 EbcLLGetStackPointer (
   VOID
-  )
-;
+  );
 
 /**
   This function is called to execute an EBC CALLEX instruction.
@@ -204,7 +199,7 @@ EbcLLGetStackPointer (
   @param  CallAddr     The function address.
   @param  EbcSp        The new EBC stack pointer.
   @param  FramePtr     The frame pointer.
-   
+
 **/
 VOID
 EFIAPI
@@ -212,8 +207,7 @@ EbcLLCALLEXNative (
   IN UINTN        CallAddr,
   IN UINTN        EbcSp,
   IN VOID         *FramePtr
-  )
-;
+  );
 
 /**
   This function is called to execute an EBC CALLEX instruction.
@@ -237,8 +231,7 @@ EbcLLCALLEX (
   IN UINTN        NewStackPointer,
   IN VOID         *FramePtr,
   IN UINT8        Size
-  )
-;
+  );
 
 /**
   When EBC calls native, on return the VM has to stuff the return
@@ -246,15 +239,14 @@ EbcLLCALLEX (
   in the register, so simply return and the caller should get the
   return result properly.
 
-  @return The unmodified value returned by the native code. 
+  @return The unmodified value returned by the native code.
 
 **/
 INT64
 EFIAPI
 EbcLLGetReturnValue (
   VOID
-  )
-;
+  );
 
 /**
   Returns the stack index and buffer assosicated with the Handle parameter.

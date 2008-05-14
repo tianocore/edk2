@@ -52,8 +52,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 EbcUnloadImage (
-  IN EFI_EBC_PROTOCOL     *This,
-  IN EFI_HANDLE           ImageHandle
+  IN EFI_EBC_PROTOCOL   *This,
+  IN EFI_HANDLE         ImageHandle
   );
 
 /**
@@ -79,10 +79,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 EbcCreateThunk (
-  IN EFI_EBC_PROTOCOL     *This,
-  IN EFI_HANDLE           ImageHandle,
-  IN VOID                 *EbcEntryPoint,
-  OUT VOID                **Thunk
+  IN EFI_EBC_PROTOCOL   *This,
+  IN EFI_HANDLE         ImageHandle,
+  IN VOID               *EbcEntryPoint,
+  OUT VOID              **Thunk
   );
 
 /**
@@ -100,8 +100,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 EbcGetVersion (
-  IN EFI_EBC_PROTOCOL     *This,
-  IN OUT UINT64           *Version
+  IN EFI_EBC_PROTOCOL   *This,
+  IN OUT UINT64         *Version
   );
 
 /**
@@ -187,7 +187,7 @@ EbcDebugPeriodic (
 STATIC
 EFI_STATUS
 InitEbcVmTestProtocol (
-  IN EFI_HANDLE     *Handle
+  IN EFI_HANDLE     *IHandle
   );
 
 /**
@@ -216,8 +216,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 EbcRegisterICacheFlush (
-  IN EFI_EBC_PROTOCOL               *This,
-  IN EBC_ICACHE_FLUSH               Flush
+  IN EFI_EBC_PROTOCOL   *This,
+  IN EBC_ICACHE_FLUSH   Flush
   );
 
 /**
@@ -235,8 +235,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugGetMaximumProcessorIndex (
-  IN EFI_DEBUG_SUPPORT_PROTOCOL     *This,
-  OUT UINTN                         *MaxProcessorIndex
+  IN EFI_DEBUG_SUPPORT_PROTOCOL          *This,
+  OUT UINTN                              *MaxProcessorIndex
   );
 
 /**
@@ -264,9 +264,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugRegisterPeriodicCallback (
-  IN EFI_DEBUG_SUPPORT_PROTOCOL     *This,
-  IN UINTN                          ProcessorIndex,
-  IN EFI_PERIODIC_CALLBACK          PeriodicCallback
+  IN EFI_DEBUG_SUPPORT_PROTOCOL  *This,
+  IN UINTN                       ProcessorIndex,
+  IN EFI_PERIODIC_CALLBACK       PeriodicCallback
   );
 
 /**
@@ -298,10 +298,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugRegisterExceptionCallback (
-  IN EFI_DEBUG_SUPPORT_PROTOCOL     *This,
-  IN UINTN                          ProcessorIndex,
-  IN EFI_EXCEPTION_CALLBACK         ExceptionCallback,
-  IN EFI_EXCEPTION_TYPE             ExceptionType
+  IN EFI_DEBUG_SUPPORT_PROTOCOL  *This,
+  IN UINTN                       ProcessorIndex,
+  IN EFI_EXCEPTION_CALLBACK      ExceptionCallback,
+  IN EFI_EXCEPTION_TYPE          ExceptionType
   );
 
 /**
@@ -324,10 +324,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugInvalidateInstructionCache (
-  IN EFI_DEBUG_SUPPORT_PROTOCOL     *This,
-  IN UINTN                          ProcessorIndex,
-  IN VOID                           *Start,
-  IN UINT64                         Length
+  IN EFI_DEBUG_SUPPORT_PROTOCOL          *This,
+  IN UINTN                               ProcessorIndex,
+  IN VOID                                *Start,
+  IN UINT64                              Length
   );
 
 //

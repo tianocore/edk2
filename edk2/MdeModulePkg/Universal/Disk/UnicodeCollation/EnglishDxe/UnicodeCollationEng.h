@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _UNICODE_COLLATION_ENG_H
-#define _UNICODE_COLLATION_ENG_H
+#ifndef _UNICODE_COLLATION_ENG_H_
+#define _UNICODE_COLLATION_ENG_H_
 
 
 
@@ -32,8 +32,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define CHAR_FAT_VALID  0x01
 
-#define ToUpper(a)      (CHAR16) (a <= 0xFF ? mEngUpperMap[a] : a)
-#define ToLower(a)      (CHAR16) (a <= 0xFF ? mEngLowerMap[a] : a)
+#define TO_UPPER(a)      (CHAR16) (a <= 0xFF ? mEngUpperMap[a] : a)
+#define TO_LOWER(a)      (CHAR16) (a <= 0xFF ? mEngLowerMap[a] : a)
 
 //
 // Prototypes
@@ -54,11 +54,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 INTN
 EFIAPI
 EngStriColl (
-  IN EFI_UNICODE_COLLATION_PROTOCOL           *This,
-  IN CHAR16                                   *Str1,
-  IN CHAR16                                   *Str2
-  )
-;
+  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
+  IN CHAR16                           *Str1,
+  IN CHAR16                           *Str2
+  );
 
 /**
   Performs a case-insensitive comparison of a Null-terminated Unicode 
@@ -75,11 +74,10 @@ EngStriColl (
 BOOLEAN
 EFIAPI
 EngMetaiMatch (
-  IN EFI_UNICODE_COLLATION_PROTOCOL          *This,
-  IN CHAR16                                  *String,
-  IN CHAR16                                  *Pattern
-  )
-;
+  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
+  IN CHAR16                           *String,
+  IN CHAR16                           *Pattern
+  );
 
 /**
   Converts all the Unicode characters in a Null-terminated Unicode string to 
@@ -92,10 +90,9 @@ EngMetaiMatch (
 VOID
 EFIAPI
 EngStrLwr (
-  IN EFI_UNICODE_COLLATION_PROTOCOL          *This,
-  IN OUT CHAR16                              *Str
-  )
-;
+  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
+  IN OUT CHAR16                       *Str
+  );
 
 /**
   Converts all the Unicode characters in a Null-terminated Unicode string to upper
@@ -108,10 +105,9 @@ EngStrLwr (
 VOID
 EFIAPI
 EngStrUpr (
-  IN EFI_UNICODE_COLLATION_PROTOCOL          *This,
-  IN OUT CHAR16                              *Str
-  )
-;
+  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
+  IN OUT CHAR16                       *Str
+  );
 
 /**
   Converts an 8.3 FAT file name in an OEM character set to a Null-terminated 
@@ -128,12 +124,11 @@ EngStrUpr (
 VOID
 EFIAPI
 EngFatToStr (
-  IN EFI_UNICODE_COLLATION_PROTOCOL          *This,
-  IN UINTN                                   FatSize,
-  IN CHAR8                                   *Fat,
-  OUT CHAR16                                 *String
-  )
-;
+  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
+  IN UINTN                            FatSize,
+  IN CHAR8                            *Fat,
+  OUT CHAR16                          *String
+  );
 
 /**
   Converts a Null-terminated Unicode string to legal characters in a FAT 
@@ -153,12 +148,11 @@ EngFatToStr (
 BOOLEAN
 EFIAPI
 EngStrToFat (
-  IN EFI_UNICODE_COLLATION_PROTOCOL          *This,
-  IN CHAR16                                  *String,
-  IN UINTN                                   FatSize,
-  OUT CHAR8                                  *Fat
-  )
-;
+  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
+  IN CHAR16                           *String,
+  IN UINTN                            FatSize,
+  OUT CHAR8                           *Fat
+  );
 
 /**
   The user Entry Point for English module.
@@ -178,7 +172,7 @@ EFIAPI
 InitializeUnicodeCollationEng (
   IN EFI_HANDLE       ImageHandle,
   IN EFI_SYSTEM_TABLE *SystemTable
-  )
-;
+  );
 
 #endif
+

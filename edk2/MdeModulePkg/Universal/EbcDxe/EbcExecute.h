@@ -239,8 +239,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 EbcExecute (
   IN VM_CONTEXT *VmPtr
-  )
-;
+  );
 
 
 
@@ -253,8 +252,7 @@ EbcExecute (
 UINT64
 GetVmVersion (
   VOID
-  )
-;
+  );
 
 /**
   Writes UINTN data to memory address.
@@ -284,8 +282,7 @@ VmWriteMemN (
   IN VM_CONTEXT   *VmPtr,
   IN UINTN        Addr,
   IN UINTN        Data
-  )
-;
+  );
 
 /**
   Writes 64-bit data to memory address.
@@ -312,11 +309,10 @@ VmWriteMemN (
 **/
 EFI_STATUS
 VmWriteMem64 (
-  IN VM_CONTEXT *VmPtr,
-  UINTN         Addr,
-  IN UINT64     Data
-  )
-;
+  IN VM_CONTEXT   *VmPtr,
+  IN UINTN        Addr,
+  IN UINT64       Data
+  );
 
 //
 // Define a protocol for an EBC VM test interface.
@@ -385,7 +381,6 @@ EbcExecuteInstructions (
   IN EFI_EBC_VM_TEST_PROTOCOL *This,
   IN VM_CONTEXT               *VmPtr,
   IN OUT UINTN                *InstructionCount
-  )
-;
+  );
 
 #endif // ifndef _EBC_EXECUTE_H_

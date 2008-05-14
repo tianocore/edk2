@@ -122,7 +122,7 @@ InitializeUnicodeCollationEng (
     }
   }
 
-  for (Index = 0; mOtherChars[Index]; Index++) {
+  for (Index = 0; mOtherChars[Index] != 0; Index++) {
     Index2 = mOtherChars[Index];
     mEngInfoMap[Index2] |= CHAR_FAT_VALID;
   }
@@ -191,8 +191,8 @@ EngStriColl (
   IN CHAR16                           *Str2
   )
 {
-  while (*Str1) {
-    if (ToUpper (*Str1) != ToUpper (*Str2)) {
+  while (*Str1 != 0) {
+    if (TO_UPPER (*Str1) != TO_UPPER (*Str2)) {
       break;
     }
 
@@ -200,7 +200,7 @@ EngStriColl (
     Str2 += 1;
   }
 
-  return ToUpper (*Str1) - ToUpper (*Str2);
+  return TO_UPPER (*Str1) - TO_UPPER (*Str2);
 }
 
 
@@ -219,8 +219,8 @@ EngStrLwr (
   IN OUT CHAR16                       *Str
   )
 {
-  while (*Str) {
-    *Str = ToLower (*Str);
+  while (*Str != 0) {
+    *Str = TO_LOWER (*Str);
     Str += 1;
   }
 }
@@ -241,8 +241,8 @@ EngStrUpr (
   IN OUT CHAR16                       *Str
   )
 {
-  while (*Str) {
-    *Str = ToUpper (*Str);
+  while (*Str != 0) {
+    *Str = TO_UPPER (*Str);
     Str += 1;
   }
 }
@@ -280,7 +280,7 @@ EngMetaiMatch (
       //
       // End of pattern.  If end of string, TRUE match
       //
-      if (*String) {
+      if (*String != 0) {
         return FALSE;
       } else {
         return TRUE;
@@ -290,7 +290,7 @@ EngMetaiMatch (
       //
       // Match zero or more chars
       //
-      while (*String) {
+      while (*String != 0) {
         if (EngMetaiMatch (This, String, Pattern)) {
           return TRUE;
         }
@@ -304,7 +304,7 @@ EngMetaiMatch (
       //
       // Match any one char
       //
-      if (!*String) {
+      if (*String == 0) {
         return FALSE;
       }
 
@@ -316,7 +316,7 @@ EngMetaiMatch (
       // Match char set
       //
       CharC = *String;
-      if (!CharC) {
+      if (CharC == 0) {
         //
         // syntax problem
         //
@@ -325,7 +325,7 @@ EngMetaiMatch (
 
       Index3  = 0;
       CharP   = *Pattern++;
-      while (CharP) {
+      while (CharP != 0) {
         if (CharP == ']') {
           return FALSE;
         }
@@ -342,7 +342,7 @@ EngMetaiMatch (
             return FALSE;
           }
 
-          if (ToUpper (CharC) >= ToUpper (Index3) && ToUpper (CharC) <= ToUpper (CharP)) {
+          if (TO_UPPER (CharC) >= TO_UPPER (Index3) && TO_UPPER (CharC) <= TO_UPPER (CharP)) {
             //
             // if in range, it's a match
             //
@@ -351,7 +351,7 @@ EngMetaiMatch (
         }
 
         Index3 = CharP;
-        if (ToUpper (CharC) == ToUpper (CharP)) {
+        if (TO_UPPER (CharC) == TO_UPPER (CharP)) {
           //
           // if char matches
           //
@@ -363,7 +363,7 @@ EngMetaiMatch (
       //
       // skip to end of match char set
       //
-      while (CharP && CharP != ']') {
+      while ((CharP != 0) && (CharP != ']')) {
         CharP = *Pattern;
         Pattern += 1;
       }
@@ -373,7 +373,7 @@ EngMetaiMatch (
 
     default:
       CharC = *String;
-      if (ToUpper (CharC) != ToUpper (CharP)) {
+      if (TO_UPPER (CharC) != TO_UPPER (CharP)) {
         return FALSE;
       }
 
@@ -408,7 +408,7 @@ EngFatToStr (
   //
   // No DBCS issues, just expand and add null terminate to end of string
   //
-  while (*Fat && FatSize) {
+  while ((*Fat != 0) && (FatSize != 0)) {
     *String = *Fat;
     String += 1;
     Fat += 1;
@@ -446,7 +446,7 @@ EngStrToFat (
   BOOLEAN SpecialCharExist;
 
   SpecialCharExist = FALSE;
-  while (*String && FatSize) {
+  while ((*String != 0) && (FatSize != 0)) {
     //
     // Skip '.' or ' ' when making a fat name
     //
@@ -455,7 +455,7 @@ EngStrToFat (
       // If this is a valid fat char, move it.
       // Otherwise, move a '_' and flag the fact that the name needs an Lfn
       //
-      if (*String < 0x100 && (mEngInfoMap[*String] & CHAR_FAT_VALID)) {
+      if (*String < 0x100 && ((mEngInfoMap[*String] & CHAR_FAT_VALID) != 0)) {
         *Fat = mEngUpperMap[*String];
       } else {
         *Fat              = '_';

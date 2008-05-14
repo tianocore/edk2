@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _DISK_IO_H
-#define _DISK_IO_H
+#ifndef _DISK_IO_H_
+#define _DISK_IO_H_
 
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
@@ -69,9 +69,9 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gDiskIoComponentName2;
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 /**
@@ -91,9 +91,9 @@ DiskIoDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 /**
