@@ -301,7 +301,15 @@ MapUefiHiiHandles (
                             HandleBuffer
                             );
   if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
-    return Status;
+    //
+    // As no package is registered to UEFI HII Database, EFI_SUCCESS is returned.
+    // 
+    //
+    if (Status == EFI_NOT_FOUND) {
+      return EFI_SUCCESS;
+    } else {
+      return Status;
+    }
   }
 
   HandleBuffer = AllocateZeroPool (HandleBufferLength);
