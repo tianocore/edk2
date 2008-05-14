@@ -166,7 +166,7 @@ PartitionInstallElToritoChildHandles (
       Check += CheckBuffer[Index];
     }
 
-    if (Check & 0xFFFF) {
+    if ((Check & 0xFFFF) != 0) {
       DEBUG ((EFI_D_ERROR, "EltCheckBootCatalog: El Torito boot catalog header checksum failed\n"));
       continue;
     }

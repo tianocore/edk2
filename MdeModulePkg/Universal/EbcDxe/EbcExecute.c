@@ -67,8 +67,8 @@ UINT64
 STATIC
 INT16
 VmReadIndex16 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT32     CodeOffset
+  IN VM_CONTEXT     *VmPtr,
+  IN UINT32         CodeOffset
   );
 
 /**
@@ -84,8 +84,8 @@ VmReadIndex16 (
 STATIC
 INT32
 VmReadIndex32 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT32     CodeOffset
+  IN VM_CONTEXT     *VmPtr,
+  IN UINT32         CodeOffset
   );
 
 /**
@@ -101,8 +101,8 @@ VmReadIndex32 (
 STATIC
 INT64
 VmReadIndex64 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT32     CodeOffset
+  IN VM_CONTEXT     *VmPtr,
+  IN UINT32         CodeOffset
   );
 
 /**
@@ -117,8 +117,8 @@ VmReadIndex64 (
 STATIC
 UINT8
 VmReadMem8 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINTN      Addr
+  IN VM_CONTEXT   *VmPtr,
+  IN UINTN        Addr
   );
 
 /**
@@ -165,8 +165,8 @@ VmReadMem32 (
 STATIC
 UINT64
 VmReadMem64 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINTN      Addr
+  IN VM_CONTEXT   *VmPtr,
+  IN UINTN        Addr
   );
 
 /**
@@ -181,8 +181,8 @@ VmReadMem64 (
 STATIC
 UINTN
 VmReadMemN (
-  IN VM_CONTEXT *VmPtr,
-  IN UINTN      Addr
+  IN VM_CONTEXT    *VmPtr,
+  IN UINTN         Addr
   );
 
 /**
@@ -211,9 +211,9 @@ VmReadMemN (
 STATIC
 EFI_STATUS
 VmWriteMem8 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINTN      Addr,
-  IN UINT8      Data
+  IN VM_CONTEXT    *VmPtr,
+  IN UINTN         Addr,
+  IN UINT8         Data
   );
 
 /**
@@ -242,9 +242,9 @@ VmWriteMem8 (
 STATIC
 EFI_STATUS
 VmWriteMem16 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINTN      Addr,
-  IN UINT16     Data
+  IN VM_CONTEXT   *VmPtr,
+  IN UINTN        Addr,
+  IN UINT16       Data
   );
 
 /**
@@ -273,9 +273,9 @@ VmWriteMem16 (
 STATIC
 EFI_STATUS
 VmWriteMem32 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINTN      Addr,
-  IN UINT32     Data
+  IN VM_CONTEXT   *VmPtr,
+  IN UINTN        Addr,
+  IN UINT32       Data
   );
 
 /**
@@ -441,8 +441,8 @@ VmReadImmed64 (
 STATIC
 UINTN
 ConvertStackAddr (
-  IN VM_CONTEXT   *VmPtr,
-  IN UINTN        Addr
+  IN VM_CONTEXT    *VmPtr,
+  IN UINTN         Addr
   );
 
 /**
@@ -792,7 +792,7 @@ ExecutePOP (
 STATIC
 EFI_STATUS
 ExecuteSignedDataManip (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT   *VmPtr
   );
 
 /**
@@ -815,7 +815,7 @@ ExecuteSignedDataManip (
 STATIC
 EFI_STATUS
 ExecuteUnsignedDataManip (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT   *VmPtr
   );
 
 /**
@@ -923,9 +923,9 @@ ExecuteMOVsnw (
 STATIC
 UINT64
 ExecuteNOT (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT     *VmPtr,
+  IN UINT64         Op1,
+  IN UINT64         Op2
   );
 
 /**
@@ -944,9 +944,9 @@ ExecuteNOT (
 STATIC
 UINT64
 ExecuteNEG (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -965,9 +965,9 @@ ExecuteNEG (
 STATIC
 UINT64
 ExecuteADD (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -986,9 +986,9 @@ ExecuteADD (
 STATIC
 UINT64
 ExecuteSUB (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1007,9 +1007,9 @@ ExecuteSUB (
 STATIC
 UINT64
 ExecuteMUL (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1028,9 +1028,9 @@ ExecuteMUL (
 STATIC
 UINT64
 ExecuteMULU (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1049,9 +1049,9 @@ ExecuteMULU (
 STATIC
 UINT64
 ExecuteDIV (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1070,9 +1070,9 @@ ExecuteDIV (
 STATIC
 UINT64
 ExecuteDIVU (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1091,9 +1091,9 @@ ExecuteDIVU (
 STATIC
 UINT64
 ExecuteMOD (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1112,9 +1112,9 @@ ExecuteMOD (
 STATIC
 UINT64
 ExecuteMODU (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1133,9 +1133,9 @@ ExecuteMODU (
 STATIC
 UINT64
 ExecuteAND (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1154,9 +1154,9 @@ ExecuteAND (
 STATIC
 UINT64
 ExecuteOR (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1175,9 +1175,9 @@ ExecuteOR (
 STATIC
 UINT64
 ExecuteXOR (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1196,9 +1196,9 @@ ExecuteXOR (
 STATIC
 UINT64
 ExecuteSHL (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1217,9 +1217,9 @@ ExecuteSHL (
 STATIC
 UINT64
 ExecuteSHR (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1238,9 +1238,9 @@ ExecuteSHR (
 STATIC
 UINT64
 ExecuteASHR (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1259,9 +1259,9 @@ ExecuteASHR (
 STATIC
 UINT64
 ExecuteEXTNDB (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1280,9 +1280,9 @@ ExecuteEXTNDB (
 STATIC
 UINT64
 ExecuteEXTNDW (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 /**
@@ -1301,9 +1301,9 @@ ExecuteEXTNDW (
 STATIC
 UINT64
 ExecuteEXTNDD (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Op1,
-  IN UINT64     Op2
+  IN VM_CONTEXT   *VmPtr,
+  IN UINT64       Op1,
+  IN UINT64       Op2
   );
 
 //

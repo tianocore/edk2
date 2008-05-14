@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PARTITION_H 
-#define _PARTITION_H 
+#ifndef _PARTITION_H_ 
+#define _PARTITION_H_ 
 
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
@@ -150,10 +150,10 @@ PartitionDriverBindingStart (
 EFI_STATUS
 EFIAPI
 PartitionDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN  EFI_HANDLE                   ControllerHandle,
-  IN  UINTN                        NumberOfChildren,
-  IN  EFI_HANDLE                   *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
+  IN  EFI_HANDLE                    ControllerHandle,
+  IN  UINTN                         NumberOfChildren,
+  IN  EFI_HANDLE                    *ChildHandleBuffer
   );
 
 //
@@ -313,12 +313,11 @@ PartitionInstallChildHandle (
   IN  EFI_BLOCK_IO_PROTOCOL        *ParentBlockIo,
   IN  EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePathNode,
-  IN  UINT64                       Start,
-  IN  UINT64                       End,
+  IN  EFI_LBA                      Start,
+  IN  EFI_LBA                      End,
   IN  UINT32                       BlockSize,
   IN  BOOLEAN                      InstallEspGuid
-  )
-;
+  );
 
 /**
   Install child handles if the Handle supports GPT partition structure.
@@ -341,8 +340,7 @@ PartitionInstallGptChildHandles (
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
-  )
-;
+  );
 
 /**
   Install child handles if the Handle supports El Torito format.
@@ -366,8 +364,7 @@ PartitionInstallElToritoChildHandles (
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
-  )
-;
+  );
 
 /**
   Install child handles if the Handle supports MBR format.
@@ -390,8 +387,7 @@ PartitionInstallMbrChildHandles (
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
-  )
-;
+  );
 
 typedef
 EFI_STATUS

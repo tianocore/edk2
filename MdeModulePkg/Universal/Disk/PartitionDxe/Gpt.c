@@ -79,7 +79,7 @@ PartitionRestoreGptTable (
 
 
 /**
-  Restore Partition Table to its alternate place
+  Restore Partition Table to its alternate place.
   (Primary -> Backup or Backup -> Primary)
 
   @param[in]    PartHeader    Partition table header structure
@@ -97,7 +97,7 @@ PartitionCheckGptEntry (
 
 
 /**
-  Checks the CRC32 value in the table header
+  Checks the CRC32 value in the table header.
 
   @param  MaxSize   Max Size limit
   @param  Size      The size of the table
@@ -116,7 +116,7 @@ PartitionCheckCrcAltSize (
 
 
 /**
-  Checks the CRC32 value in the table header
+  Checks the CRC32 value in the table header.
 
   @param  MaxSize   Max Size limit
   @param  Hdr       Table to check
@@ -133,7 +133,7 @@ PartitionCheckCrc (
 
 
 /**
-  Updates the CRC32 value in the table header
+  Updates the CRC32 value in the table header.
 
   @param  Size   The size of the table
   @param  Hdr    Table to update
@@ -147,7 +147,7 @@ PartitionSetCrcAltSize (
 
 
 /**
-  Updates the CRC32 value in the table header
+  Updates the CRC32 value in the table header.
 
   @param  Hdr    Table to update
 
@@ -619,7 +619,7 @@ Done:
 
 
 /**
-  Restore Partition Table to its alternate place
+  Restore Partition Table to its alternate place.
   (Primary -> Backup or Backup -> Primary)
 
   @param[in]    PartHeader    Partition table header structure
@@ -681,7 +681,7 @@ PartitionCheckGptEntry (
 
 
 /**
-  Updates the CRC32 value in the table header
+  Updates the CRC32 value in the table header.
 
   @param  Hdr    Table to update
 
@@ -696,7 +696,7 @@ PartitionSetCrc (
 
 
 /**
-  Updates the CRC32 value in the table header
+  Updates the CRC32 value in the table header.
 
   @param  Size   The size of the table
   @param  Hdr    Table to update
@@ -707,7 +707,6 @@ PartitionSetCrcAltSize (
   IN UINTN                 Size,
   IN OUT EFI_TABLE_HEADER  *Hdr
   )
-
 {
   UINT32  Crc;
 
@@ -718,7 +717,7 @@ PartitionSetCrcAltSize (
 
 
 /**
-  Checks the CRC32 value in the table header
+  Checks the CRC32 value in the table header.
 
   @param  MaxSize   Max Size limit
   @param  Hdr       Table to check
@@ -738,7 +737,7 @@ PartitionCheckCrc (
 
 
 /**
-  Checks the CRC32 value in the table header
+  Checks the CRC32 value in the table header.
 
   @param  MaxSize   Max Size limit
   @param  Size      The size of the table
@@ -768,7 +767,7 @@ PartitionCheckCrcAltSize (
     return FALSE;
   }
 
-  if (MaxSize && Size > MaxSize) {
+  if ((MaxSize != 0) && (Size > MaxSize)) {
     DEBUG ((EFI_D_ERROR, "CheckCrc32: Size > MaxSize\n"));
     return FALSE;
   }

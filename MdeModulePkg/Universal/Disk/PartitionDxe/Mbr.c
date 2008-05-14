@@ -93,7 +93,7 @@ PartitionValidMbr (
     }
   }
   //
-  // Non of the regions overlapped so MBR is O.K.
+  // None of the regions overlapped so MBR is O.K.
   //
   return MbrValid;
 }
