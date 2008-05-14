@@ -66,6 +66,27 @@ formset
   help     = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
   class    = EFI_ON_BOARD_DEVICE_CLASS,
   subclass = EFI_SETUP_APPLICATION_SUBCLASS,
+  
+  //
+  // Notes: VfrCompiler will insert a Standard Default Storage declaration 
+  // after the formset declaration.    >00000040: 5C 06 00 00 00 00.
+  // So we don't need to declare the Standard Default.
+  // Please check the vfr.lst file for details.
+  // To enable list file for VFR, add "-l" to VfrCompile <Command> in [Build.Visual-Form-Representation-File] as follows:
+  //          VfrCompile -l --no-pre-processing --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+  //
+  
+  //
+  // Define a Default Storage for Manufacturing Defauls. Attribut = 1 (EFI_HII_DEFAULT_CLASS_MANUFACTURING).
+  // Only if this Default Storage is defined, CHECKBOX_DEFAULT_MFG can be used for CheckBox.
+  //
+  defaultstore MfgDefault, prompt = STRING_TOKEN (STR_DEFAULTSTORE_MFG), attribute = 1;
+
+  //
+  // Define a Safe Deafult Storage. Attribute = 2 (EFI_HII_DEFAULT_CLASS_SAFE) as an example.
+  // It is not referenced.
+  //
+  defaultstore SafeDefault, prompt = STRING_TOKEN (STR_DEFAULTSTORE_SAFE), attribute = 2;
 
   //
   // Define a Buffer Storage (EFI_IFR_VARSTORE)
@@ -155,10 +176,11 @@ formset
                  help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
                  //
                  // CHECKBOX_DEFAULT indicate this checkbox is marked with EFI_IFR_CHECKBOX_DEFAULT
+                 // CHECKBOX_DEFAULT_MFG indicate EFI_IFR_CHECKBOX_DEFAULT_MFG.
                  //
-                 flags    = CHECKBOX_DEFAULT,
+                 flags    = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG,
                  key      = 0,
-
+                 default  = 1,
         endcheckbox;
       endif;
 	endif;
