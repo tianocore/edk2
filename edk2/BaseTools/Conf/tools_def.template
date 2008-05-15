@@ -660,6 +660,7 @@ RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 
 *_MYTOOLS_*_ASL_PATH                = DEF(ASL_BIN)\iasl.exe
 
+*_MYTOOLS_*_ASL_FLAGS                    = 
 *_MYTOOLS_*_MAKE_FLAGS                   = /nologo
 *_MYTOOLS_*_VFRPP_FLAGS                  = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
 *_MYTOOLS_*_APP_FLAGS                    = /nologo /E /TC
