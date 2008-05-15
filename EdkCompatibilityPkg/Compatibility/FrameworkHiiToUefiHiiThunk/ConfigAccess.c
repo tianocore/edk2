@@ -479,11 +479,11 @@ ThunkExtractConfig (
   so that data can be written to the data storage such as UEFI Variable or module's
   customized storage exposed by EFI_FRAMEWORK_CALLBACK.
    
-   @param This          Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL
+   @param This              Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL
    @param Configuration A null-terminated Unicode string in <ConfigResp> format.
-   @param a pointer to a string filled in with the offset of the most recent ¡®&¡¯ before the first
-                failing name / value pair (or the beginning of the string if the failure is in the first
-                name / value pair) or the terminating NULL if all was successful.
+   @param Progress         A pointer to a string filled in with the offset of the most recent ¡®&¡¯ before the first
+                                     failing name / value pair (or the beginning of the string if the failure is in the first
+                                     name / value pair) or the terminating NULL if all was successful.
    
    @retval EFI_INVALID_PARAMETER   If there is no Buffer Storage for this Config Access instance.
    @retval EFI_SUCCESS                    The setting is saved successfully.
