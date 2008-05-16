@@ -46,3 +46,25 @@ EDK_4853: Non-Compatible: qwang12
 
 		Possible Impacts:
 		1) Modules that may reference this structure.
+
+==========================================================================================
+EDK_5216: Non-Compatible: qwang12
+
+	  PI spec defines some definitions that same name with those in Framework Specification.
+	  Change those in Framework Specifications by adding "FRAMEWORK_" prefix so that these two
+	  header file can be included in the same module (for example a thunk driver).
+	  
+	  EFI_FV_ATTRIBUTES
+	  EFI_FV_GET_ATTRIBUTES
+	  EFI_FV_SET_ATTRIBUTES
+	  EFI_FV_READ_FILE
+	  EFI_FV_READ_SECTION
+	  EFI_FV_WRITE_POLICY
+	  EFI_FV_UNRELIABLE_WRITE
+	  EFI_FV_RELIABLE_WRITE
+	  EFI_FV_WRITE_FILE_DATA
+	  EFI_FV_WRITE_FILE
+	  EFI_FV_GET_NEXT_FILE
+
+		Possible Impacts:
+		1) Modules that may reference this definitions need to be updated.
