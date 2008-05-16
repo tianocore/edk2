@@ -205,6 +205,7 @@ IScsiUpdateDeviceList (
         );
 
   gBS->FreePool (DeviceList);
+  gBS->FreePool (Handles);
 
   return Status;
 }
