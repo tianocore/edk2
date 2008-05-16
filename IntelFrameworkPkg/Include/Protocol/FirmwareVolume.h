@@ -38,13 +38,13 @@
 typedef struct _EFI_FIRMWARE_VOLUME_PROTOCOL  EFI_FIRMWARE_VOLUME_PROTOCOL;
 
 //
-// EFI_FV_ATTRIBUTES bit definitions
+// FRAMEWORK_EFI_FV_ATTRIBUTES bit definitions
 //
-typedef UINT64  EFI_FV_ATTRIBUTES;
+typedef UINT64  FRAMEWORK_EFI_FV_ATTRIBUTES;
 
 //
 // ************************************************************
-// EFI_FV_ATTRIBUTES bit definitions
+// FRAMEWORK_EFI_FV_ATTRIBUTES bit definitions
 // ************************************************************
 //
 #define EFI_FV_READ_DISABLE_CAP       0x0000000000000001ULL
@@ -94,9 +94,9 @@ typedef UINT64  EFI_FV_ATTRIBUTES;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FV_GET_ATTRIBUTES) (
-  IN  EFI_FIRMWARE_VOLUME_PROTOCOL  *This,
-  OUT EFI_FV_ATTRIBUTES             *Attributes
+(EFIAPI *FRAMEWORK_EFI_FV_GET_ATTRIBUTES) (
+  IN  EFI_FIRMWARE_VOLUME_PROTOCOL            *This,
+  OUT FRAMEWORK_EFI_FV_ATTRIBUTES             *Attributes
   );
 
 /**
@@ -112,9 +112,9 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FV_SET_ATTRIBUTES) (
+(EFIAPI *FRAMEWORK_EFI_FV_SET_ATTRIBUTES) (
   IN EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN OUT EFI_FV_ATTRIBUTES          *Attributes
+  IN OUT FRAMEWORK_EFI_FV_ATTRIBUTES          *Attributes
   );
 
 /**
@@ -147,7 +147,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FV_READ_FILE) (
+(EFIAPI *FRAMEWORK_EFI_FV_READ_FILE) (
   IN EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
   IN EFI_GUID                       *NameGuid,
   IN OUT VOID                       **Buffer,
@@ -188,7 +188,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FV_READ_SECTION) (
+(EFIAPI *FRAMEWORK_EFI_FV_READ_SECTION) (
   IN EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
   IN EFI_GUID                       *NameGuid,
   IN EFI_SECTION_TYPE               SectionType,
@@ -198,10 +198,10 @@ EFI_STATUS
   OUT UINT32                        *AuthenticationStatus
   );
 
-typedef UINT32  EFI_FV_WRITE_POLICY;
+typedef UINT32  FRAMEWORK_EFI_FV_WRITE_POLICY;
 
-#define EFI_FV_UNRELIABLE_WRITE 0x00000000
-#define EFI_FV_RELIABLE_WRITE   0x00000001
+#define FRAMEWORK_EFI_FV_UNRELIABLE_WRITE 0x00000000
+#define FRAMEWORK_EFI_FV_RELIABLE_WRITE   0x00000001
 
 typedef struct {
   EFI_GUID                *NameGuid;
@@ -209,7 +209,7 @@ typedef struct {
   EFI_FV_FILE_ATTRIBUTES  FileAttributes;
   VOID                    *Buffer;
   UINT32                  BufferSize;
-} EFI_FV_WRITE_FILE_DATA;
+} FRAMEWORK_EFI_FV_WRITE_FILE_DATA;
 
 /**
   Write the supplied file (NameGuid) to the FV.
@@ -232,11 +232,11 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FV_WRITE_FILE) (
-  IN EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN UINT32                         NumberOfFiles,
-  IN EFI_FV_WRITE_POLICY            WritePolicy,
-  IN EFI_FV_WRITE_FILE_DATA         *FileData
+(EFIAPI *FRAMEWORK_EFI_FV_WRITE_FILE) (
+  IN EFI_FIRMWARE_VOLUME_PROTOCOL             *This,
+  IN UINT32                                   NumberOfFiles,
+  IN FRAMEWORK_EFI_FV_WRITE_POLICY            WritePolicy,
+  IN FRAMEWORK_EFI_FV_WRITE_FILE_DATA         *FileData
   );
 
 /**
@@ -259,7 +259,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FV_GET_NEXT_FILE) (
+(EFIAPI *FRAMEWORK_EFI_FV_GET_NEXT_FILE) (
   IN EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
   IN OUT VOID                       *Key,
   IN OUT EFI_FV_FILETYPE            *FileType,
@@ -303,12 +303,12 @@ EFI_STATUS
 
 **/
 struct _EFI_FIRMWARE_VOLUME_PROTOCOL {
-  EFI_FV_GET_ATTRIBUTES GetVolumeAttributes;
-  EFI_FV_SET_ATTRIBUTES SetVolumeAttributes;
-  EFI_FV_READ_FILE      ReadFile;
-  EFI_FV_READ_SECTION   ReadSection;
-  EFI_FV_WRITE_FILE     WriteFile;
-  EFI_FV_GET_NEXT_FILE  GetNextFile;
+  FRAMEWORK_EFI_FV_GET_ATTRIBUTES GetVolumeAttributes;
+  FRAMEWORK_EFI_FV_SET_ATTRIBUTES SetVolumeAttributes;
+  FRAMEWORK_EFI_FV_READ_FILE      ReadFile;
+  FRAMEWORK_EFI_FV_READ_SECTION   ReadSection;
+  FRAMEWORK_EFI_FV_WRITE_FILE     WriteFile;
+  FRAMEWORK_EFI_FV_GET_NEXT_FILE  GetNextFile;
   UINT32                KeySize;
   EFI_HANDLE            ParentHandle;
 };
