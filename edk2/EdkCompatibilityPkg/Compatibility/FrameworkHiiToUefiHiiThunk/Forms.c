@@ -61,7 +61,7 @@ FRAMEWORK_HII_FORMSET_TEMPLATE FormSetTemplate = {
       sizeof (FRAMEWORK_EFI_IFR_FORM_SET)
     },
     //Guid
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}},
     0,
     0,
     0,
@@ -70,8 +70,10 @@ FRAMEWORK_HII_FORMSET_TEMPLATE FormSetTemplate = {
     0
   },
   {
-    FRAMEWORK_EFI_IFR_END_FORM_SET_OP,
-    sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET)
+    {
+      FRAMEWORK_EFI_IFR_END_FORM_SET_OP,
+      sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET)
+    }
   }
 };
 

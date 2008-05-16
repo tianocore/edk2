@@ -122,21 +122,6 @@ LibExportPackageLists (
   return Status;
 }
 
-BOOLEAN
-IsOnlyStringPackagesInPackageList (
-  IN CONST EFI_HII_PACKAGE_LIST_HEADER *StringPackageListHeader
-  )
-{
-  EFI_HII_PACKAGE_HEADER *PackageHeader;
-
-  PackageHeader = (EFI_HII_PACKAGE_HEADER *) (StringPackageListHeader + 1);
-
-  while (PackageHeader->Type != EFI_HII_PACKAGE_END) {
-    PackageHeader = (EFI_HII_PACKAGE_HEADER *) (PackageHeader );
-  }
-}
-  
-
 EFI_STATUS
 InsertStringPackagesToIfrPackageList (
   IN CONST EFI_HII_PACKAGE_LIST_HEADER *StringPackageListHeader,
