@@ -18,12 +18,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_HII_THUNK_PRIVATE_DATA *mHiiThunkPrivateData;
 
 EFI_HII_THUNK_PRIVATE_DATA mHiiThunkPrivateDataTempate = {
-  {//Signature
-    EFI_HII_THUNK_DRIVER_DATA_SIGNATURE 
-  },
-  {//Handle
-    (EFI_HANDLE) NULL
-  },
+  //Signature
+  EFI_HII_THUNK_DRIVER_DATA_SIGNATURE 
+  ,
+  //Handle
+  (EFI_HANDLE) NULL
+  ,
   { //Hii
     HiiNewPack,
     HiiRemovePack,
@@ -46,18 +46,18 @@ EFI_HII_THUNK_PRIVATE_DATA mHiiThunkPrivateDataTempate = {
     
     HiiGetKeyboardLayout
   },
-  { //StaticHiiHandle
-    //The FRAMEWORK_EFI_HII_HANDLE starts from 1 
-    // and increase upwords untill reach the value of StaticPureUefiHiiHandle. 
-    // The code will assert to prevent overflow.
-    (FRAMEWORK_EFI_HII_HANDLE) 1 
-  },
-  { //StaticPureUefiHiiHandle
-    //The Static FRAMEWORK_EFI_HII_HANDLE starts from 0xFFFF 
-    // and decrease downwords untill reach the value of StaticHiiHandle. 
-    // The code will assert to prevent overflow.
-    (FRAMEWORK_EFI_HII_HANDLE) 0xFFFF 
-  },
+  //StaticHiiHandle
+  //The FRAMEWORK_EFI_HII_HANDLE starts from 1 
+  // and increase upwords untill reach the value of StaticPureUefiHiiHandle. 
+  // The code will assert to prevent overflow.
+  (FRAMEWORK_EFI_HII_HANDLE) 1 
+  ,
+  //StaticPureUefiHiiHandle
+  //The Static FRAMEWORK_EFI_HII_HANDLE starts from 0xFFFF 
+  // and decrease downwords untill reach the value of StaticHiiHandle. 
+  // The code will assert to prevent overflow.
+  (FRAMEWORK_EFI_HII_HANDLE) 0xFFFF 
+  ,
   {
     NULL, NULL                  //HiiHandleLinkList
   },
