@@ -1,7 +1,14 @@
 #/** @file
-# Component description file for PeiVariable module.
+# Module produce FV2 on top of FV.
 #
-# PEIM to provide the Variable functionality.
+# UEFI PI specification supersedes Inte's Framework Specification.
+# EFI_FIRMWARE_VOLUME_PROTOCOL defined in Intel Framework Pkg is replaced by
+# EFI_FIRMWARE_VOLUME2_PROTOCOL in MdePkg.
+# This module produces FV2 on top of FV. This module is used on platform when both of
+# these two conditions are true:
+# 1) Framework module producing FV is present
+# 2) And the rest of modules on the platform consume FV2
+#
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
