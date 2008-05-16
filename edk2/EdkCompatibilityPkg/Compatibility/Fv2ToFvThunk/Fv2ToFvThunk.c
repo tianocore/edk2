@@ -1,4 +1,13 @@
-/*++
+/**
+Module produce FV2 on top of FV.
+
+UEFI PI specification supersedes Inte's Framework Specification.
+EFI_FIRMWARE_VOLUME_PROTOCOL defined in Intel Framework Pkg is replaced by
+EFI_FIRMWARE_VOLUME2_PROTOCOL in MdePkg.
+This module produces FV2 on top of FV. This module is used on platform when both of
+these two conditions are true:
+1) Framework module producing FV is present
+2) And the rest of modules on the platform consume FV2
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -10,13 +19,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name:
 
-  FvToFv2Thunk.c
-
-Abstract:
-
-  DXE driver 
-
---*/
+**/
 
 #include <PiDxe.h>
 #include <Protocol/FirmwareVolume2.h>
@@ -933,11 +936,14 @@ Fv2SetVolumeAttributes (
   FIRMWARE_VOLUME2_PRIVATE_DATA  *Private;
   EFI_FIRMWARE_VOLUME_PROTOCOL   *FirmwareVolume;
   FRAMEWORK_EFI_FV_ATTRIBUTES    FrameworkFvAttributes; 
+  UINTN                          Shift;
 
   Private = FIRMWARE_VOLUME2_PRIVATE_DATA_FROM_THIS (This);
   FirmwareVolume = Private->FirmwareVolume;
 
-  FrameworkFvAttributes = (*FvAttributes & 0x1ff) | ((UINTN)EFI_FV_ALIGNMENT_2 << ((*FvAttributes & EFI_FV2_ALIGNMENT) >> 16));
+  FrameworkFvAttributes = (*FvAttributes & 0x1ff);
+  Shift = (UINTN) RShiftU64(*FvAttributes & EFI_FV2_ALIGNMENT, 16);
+  FrameworkFvAttributes = FrameworkFvAttributes | LShiftU64 (EFI_FV_ALIGNMENT_2, Shift);
 
   return FirmwareVolume->SetVolumeAttributes (
                            FirmwareVolume,
