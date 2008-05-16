@@ -1,4 +1,11 @@
-/*++
+/** @file
+UEFI PI specification supersedes Inte's Framework Specification.
+EFI_FIRMWARE_VOLUME_PROTOCOL defined in Intel Framework Pkg is replaced by
+EFI_FIRMWARE_VOLUME2_PROTOCOL in MdePkg.
+This module produces FV on top of FV2. This module is used on platform when both of
+these two conditions are true:
+1) Framework module consuming FV is present
+2) And the platform only produces FV2
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -10,13 +17,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name:
 
-  FvToFv2Thunk.c
-
-Abstract:
-
-  DXE driver 
-
---*/
+**/
 
 #include <PiDxe.h>
 #include <Protocol/FirmwareVolume2.h>
