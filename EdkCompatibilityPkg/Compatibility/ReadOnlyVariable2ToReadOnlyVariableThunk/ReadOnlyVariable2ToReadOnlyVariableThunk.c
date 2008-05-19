@@ -1,4 +1,15 @@
-/*++
+/** @file
+Module produce EFI_PEI_READ_ONLY_VARIABLE2_PPI on top of EFI_PEI_READ_ONLY_VARIABLE_PPI.
+UEFI PI Spec supersedes Intel's Framework Specs. 
+EFI_PEI_READ_ONLY_VARIABLE_PPI defined in Intel Framework Pkg is replaced by EFI_PEI_READ_ONLY_VARIABLE2_PPI
+in MdePkg.
+This module produces EFI_PEI_READ_ONLY_VARIABLE2_PPI on top of EFI_PEI_READ_ONLY_VARIABLE_PPI. 
+This module is used on platform when both of these two conditions are true:
+1) Framework module produces EFI_PEI_READ_ONLY_VARIABLE_PPI is present.
+2) The platform has PI modules that only consumes EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+
+This module can't be used together with ReadOnlyVariableToReadOnlyVariable2Thunk module.
+
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -10,17 +21,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name:
 
-  Variable.c
-
-Abstract:
-
-  PEIM to provide the Variable functionality
-
---*/
+**/
 
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/ReadOnlyVariable.h>
+#include <Ppi/ReadOnlyVariableThunkPresent.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
@@ -62,6 +68,13 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   &mVariablePpi
 };
 
+
+EFI_PEI_PPI_DESCRIPTOR     mReadOnlyVariableThunkPresent = {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gPeiReadonlyVariableThunkPresentPpiGuid,
+    NULL
+  };
+
 EFI_STATUS
 EFIAPI
 PeimInitializeReadOnlyVariable2 (
@@ -86,6 +99,17 @@ Returns:
 
 --*/
 {
+  VOID        *Interface;
+  EFI_STATUS  Status;
+
+  //
+  // Make sure ReadOnlyVariable2ToReadOnlyVariable module is not present. If so, the call chain will form a
+  // infinite loop: ReadOnlyVariable2 -> ReadOnlyVariable -> ReadOnlyVariable2 -> ....
+  //
+  Status = PeiServicesLocatePpi (&gPeiReadonlyVariableThunkPresentPpiGuid, 0, NULL, &Interface);
+  ASSERT (Status == EFI_NOT_FOUND);
+  
+  PeiServicesInstallPpi (&mReadOnlyVariableThunkPresent);
   //
   // Publish the variable capability to other modules
   //
