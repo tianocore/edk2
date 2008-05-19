@@ -1,4 +1,4 @@
-/**
+/** @file
 Module produce EFI_PEI_READ_ONLY_VARIABLE_PPI on top of EFI_PEI_READ_ONLY_VARIABLE2_PPI.
 UEFI PI Spec supersedes Intel's Framework Specs. 
 # EFI_PEI_READ_ONLY_VARIABLE_PPI defined in Intel Framework Pkg is replaced by EFI_PEI_READ_ONLY_VARIABLE2_PPI
@@ -7,6 +7,8 @@ UEFI PI Spec supersedes Intel's Framework Specs.
 # This module is used on platform when both of these two conditions are true:
 # 1) Framework module consumes EFI_PEI_READ_ONLY_VARIABLE_PPI is present.
 # 2) The platform has a PI module that only produces EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+
+This module can't be used together with ReadOnlyVariable2ToReadOnlyVariableThunk module.
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -23,7 +25,9 @@ Module Name:
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable.h>
 #include <Ppi/ReadOnlyVariable2.h>
+#include <Ppi/ReadOnlyVariableThunkPresent.h>
 #include <Library/DebugLib.h>
+#include <Library/PeiServicesLib.h>
 
 //
 // Function Prototypes
@@ -86,6 +90,16 @@ Returns:
 
 --*/
 {
+  VOID        *Interface;
+  EFI_STATUS  Status;
+
+  //
+  // Make sure ReadOnlyVariableToReadOnlyVariable2 module is not present. If so, the call chain will form a
+  // infinite loop: ReadOnlyVariable -> ReadOnlyVariable2 -> ReadOnlyVariable -> ....
+  //
+  Status = PeiServicesLocatePpi (&gPeiReadonlyVariableThunkPresentPpiGuid, 0, NULL, &Interface);
+  ASSERT (Status == EFI_NOT_FOUND);
+
   //
   // Publish the variable capability to other modules
   //
