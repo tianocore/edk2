@@ -1,5 +1,16 @@
 #/** @file
-# Component description file for PeiVariable module.
+# Module produce EFI_PEI_READ_ONLY_VARIABLE_PPI top of EFI_PEI_READ_ONLY_VARIABLE2_PPI .
+#
+# UEFI PI Spec supersedes Intel's Framework Specs. 
+# EFI_PEI_READ_ONLY_VARIABLE_PPI defined in Intel Framework Pkg is replaced by EFI_PEI_READ_ONLY_VARIABLE2_PPI
+# in MdePkg.
+# This module produces EFI_PEI_READ_ONLY_VARIABLE2_PPI on top of EFI_PEI_READ_ONLY_VARIABLE_PPI . 
+# This module is used on platform when both of these two conditions are true:
+# 1) Framework module produces EFI_PEI_READ_ONLY_VARIABLE_PPI is present.
+# 2) The platform has PI modules that consumes EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+#
+# This module can't be used together with ReadOnlyVariableToReadOnlyVariable2Thunk module.
+#
 #
 # PEIM to provide the Variable functionality.
 # Copyright (c) 2006 - 2007, Intel Corporation
@@ -36,6 +47,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
@@ -47,6 +59,7 @@
 [Ppis]
   gEfiPeiReadOnlyVariablePpiGuid                 # PPI ALWAYS_CONSUMED
   gEfiPeiReadOnlyVariable2PpiGuid                # PPI ALWAYS_PRODUCED
+  gPeiReadonlyVariableThunkPresentPpiGuid
 
 [Depex]
   gEfiPeiReadOnlyVariablePpiGuid
