@@ -8,6 +8,8 @@
 # This module is used on platform when both of these two conditions are true:
 # 1) Framework module consumes EFI_PEI_READ_ONLY_VARIABLE_PPI is present.
 # 2) The platform has a PI module that only produces EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+# This module can't be used together with ReadOnlyVariable2ToReadOnlyVariableThunk module.
+
 #
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
@@ -43,15 +45,18 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
   DebugLib
+  PeiServicesLib
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
   gEfiPeiReadOnlyVariablePpiGuid                # PPI ALWAYS_PRODUCED
+  gPeiReadonlyVariableThunkPresentPpiGuid
 
 [Depex]
   gEfiPeiReadOnlyVariable2PpiGuid
