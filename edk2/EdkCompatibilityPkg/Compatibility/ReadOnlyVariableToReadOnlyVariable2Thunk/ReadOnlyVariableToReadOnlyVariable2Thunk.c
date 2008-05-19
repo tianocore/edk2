@@ -1,4 +1,12 @@
-/*++
+/**
+Module produce EFI_PEI_READ_ONLY_VARIABLE_PPI on top of EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+UEFI PI Spec supersedes Intel's Framework Specs. 
+# EFI_PEI_READ_ONLY_VARIABLE_PPI defined in Intel Framework Pkg is replaced by EFI_PEI_READ_ONLY_VARIABLE2_PPI
+# in MdePkg.
+# This module produces EFI_PEI_READ_ONLY_VARIABLE_PPI on top of EFI_PEI_READ_ONLY_VARIABLE2_PPI. 
+# This module is used on platform when both of these two conditions are true:
+# 1) Framework module consumes EFI_PEI_READ_ONLY_VARIABLE_PPI is present.
+# 2) The platform has a PI module that only produces EFI_PEI_READ_ONLY_VARIABLE2_PPI.
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -10,13 +18,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name:
 
-  Variable.c
-
-Abstract:
-
-  PEIM to provide the Variable functionality
-
---*/
+**/
 
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable.h>
