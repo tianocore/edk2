@@ -1,0 +1,61 @@
+#/** @file
+# Module produce UC on top of UC2.
+#
+# UEFI 2.1 specification supersedes Inte's EFI Specification 1.10.
+# UNICODE_COLLATION_PROTOCOL defined in Inte's EFI Specification 1.10 is replaced by
+# EFI_UNICODE_COLLATION_PROTOCOL in UEFI 2.1.
+# This module produces UC on top of UC2. This module is used on platform when both of
+# these two conditions are true:
+# 1) EFI 1.10 module consuming UC present
+# 2) And the rest of modules on the platform produce UC2
+#
+# Copyright (c) 2006 - 2008, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UcToUc2Thunk
+  FILE_GUID                      = FD76FF8E-665F-4afc-AF75-724EF5A569E5
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+  ENTRY_POINT                    = InitializeUC
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  UcToUc2Thunk.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  BaseLib
+  DebugLib
+  UefiLib
+  MemoryAllocationLib
+  HiiLib
+
+[Protocols]
+  gEfiUnicodeCollation2ProtocolGuid
+  gEfiUnicodeCollationProtocolGuid
+
+[Depex]
+  TRUE
