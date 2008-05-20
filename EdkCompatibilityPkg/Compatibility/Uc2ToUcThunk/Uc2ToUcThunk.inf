@@ -2,7 +2,7 @@
 # Module produce UC2 on top of UC.
 #
 # UEFI 2.1 specification supersedes Inte's EFI Specification 1.10.
-# EFI_UNICODE_COLLATION_PROTOCOL defined in Inte's EFI Specification 1.10 is replaced by
+# UNICODE_COLLATION_PROTOCOL defined in Inte's EFI Specification 1.10 is replaced by
 # EFI_UNICODE_COLLATION_PROTOCOL in UEFI 2.1.
 # This module produces UC2 on top of UC. This module is used on platform when both of
 # these two conditions are true:

@@ -163,7 +163,7 @@ typedef struct {
   EFI_UNICODE_COLLATION_PROTOCOL *UC;
 } UC2_PRIVATE_DATA;
 
-#define UC2_PRIVATE_DATA_FROM_THIS(a) CR (a, UC2_PRIVATE_DATA, UC, UC2_PRIVATE_DATA_SIGNATURE)
+#define UC2_PRIVATE_DATA_FROM_THIS(a) CR (a, UC2_PRIVATE_DATA, UC2, UC2_PRIVATE_DATA_SIGNATURE)
 
 //
 // Firmware Volume Protocol template
@@ -251,7 +251,7 @@ Uc2NotificationEvent (
     // Fill in rest of private data structure
     //
     Private->UC2.SupportedLanguages = AllocateZeroPool (RFC_3066_ENTRY_SIZE);
-    Status = ConvertIso639LanguageToRfc3066Language (Private->UC->SupportedLanguages ,Private->UC2.SupportedLanguages);
+    Status = ConvertIso639LanguageToRfc3066Language (Private->UC->SupportedLanguages, Private->UC2.SupportedLanguages);
 
     if (!EFI_ERROR (Status)) {
 
