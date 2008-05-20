@@ -1,4 +1,4 @@
-/**
+/** @file
 Module produce PciCfgPpi on top of PciCfgPpi2.
 
 PIWG's PI specification replaces Inte's EFI Specification 1.10.
@@ -7,7 +7,7 @@ EFI_PEI_PCI_CFG2_PPI in PI 1.0.
 This module produces PciCfgPpi on top of PciCfgPpi2. This module is used on platform when both of
 these two conditions are true:
 1) Framework module is present that consumes PCI CFG  AND
-2) R9 module is present that produces PCI CFG2 but not PCI CFG
+2) PI module is present that produces PCI CFG2 but not PCI CFG
 
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
