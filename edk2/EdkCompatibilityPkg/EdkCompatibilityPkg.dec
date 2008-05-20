@@ -38,7 +38,7 @@
 #
 ################################################################################
 [Includes.common]
-
+  Compatibility/Include
 
 ################################################################################
 #
@@ -47,3 +47,8 @@
 #
 ################################################################################
 [LibraryClasses.common]
+
+[Ppis.common]
+  gPeiReadonlyVariableThunkPresentPpiGuid = { 0xe84e9e0b, 0xb5dd, 0x4d08, { 0x9e, 0x46, 0x82, 0x1f, 0xf, 0x14, 0xe9, 0x1b }} 
+  gEcpPeiPciCfgPpiGuid                    = {0xb0ee53d4, 0xa049, 0x4a79, { 0xb2, 0xff, 0x19, 0xd9, 0xfa, 0xef, 0xaa, 0x94 }} 
+
