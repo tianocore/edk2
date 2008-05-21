@@ -1,4 +1,5 @@
 ;/** @file
+;  
 ;    IDT vector entry.
 ;  
 ;  Copyright (c) 2007 - 2008, Intel Corporation. <BR>

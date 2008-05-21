@@ -3,7 +3,7 @@
   Provides auxiliary support routines for the VM. That is, routines
   that are not particularly related to VM execution of EBC instructions.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -48,7 +48,6 @@ typedef struct _EBC_IMAGE_LIST {
   @retval EFI_SUCCESS           The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcUnloadImage (
@@ -75,7 +74,6 @@ EbcUnloadImage (
   @retval EFI_OUT_OF_RESOURCES  Memory could not be allocated for the thunk.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcCreateThunk (
@@ -96,7 +94,6 @@ EbcCreateThunk (
   @retval EFI_INVALID_PARAMETER Version pointer is NULL.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcGetVersion (
@@ -114,7 +111,6 @@ EbcGetVersion (
   @retval Others                Some error occurs when creating periodic event.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 InitializeEbcCallback (
@@ -130,7 +126,6 @@ InitializeEbcCallback (
   @param  SystemContext          EBC system context.
 
 **/
-STATIC
 VOID
 EFIAPI
 CommonEbcExceptionHandler (
@@ -146,7 +141,6 @@ CommonEbcExceptionHandler (
   @param  Context                It should be the address of VM_CONTEXT pointer.
 
 **/
-STATIC
 VOID
 EFIAPI
 EbcPeriodicNotifyFunction (
@@ -164,7 +158,6 @@ EbcPeriodicNotifyFunction (
   @retval EFI_SUCCESS            The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugPeriodic (
@@ -184,7 +177,6 @@ EbcDebugPeriodic (
   @retval EFI_SUCCESS            The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 InitEbcVmTestProtocol (
   IN EFI_HANDLE     *IHandle
@@ -196,7 +188,6 @@ InitEbcVmTestProtocol (
   @return EFI_UNSUPPORTED  This function always return EFI_UNSUPPORTED status.
 
 **/
-STATIC
 EFI_STATUS
 EbcVmTestUnsupported (
   VOID
@@ -212,7 +203,6 @@ EbcVmTestUnsupported (
   @retval EFI_SUCCESS The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcRegisterICacheFlush (
@@ -231,7 +221,6 @@ EbcRegisterICacheFlush (
   @retval EFI_SUCCESS           The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugGetMaximumProcessorIndex (
@@ -260,7 +249,6 @@ EbcDebugGetMaximumProcessorIndex (
                                 callback function was previously registered.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugRegisterPeriodicCallback (
@@ -294,7 +282,6 @@ EbcDebugRegisterPeriodicCallback (
                                 callback function was previously registered.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugRegisterExceptionCallback (
@@ -320,7 +307,6 @@ EbcDebugRegisterExceptionCallback (
   @retval EFI_SUCCESS           The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugInvalidateInstructionCache (
@@ -571,7 +557,6 @@ ErrorExit:
   @retval EFI_OUT_OF_RESOURCES  Memory could not be allocated for the thunk.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcCreateThunk (
@@ -604,7 +589,6 @@ EbcCreateThunk (
   @retval EFI_SUCCESS           The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugGetMaximumProcessorIndex (
@@ -638,7 +622,6 @@ EbcDebugGetMaximumProcessorIndex (
                                 callback function was previously registered.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugRegisterPeriodicCallback (
@@ -684,7 +667,6 @@ EbcDebugRegisterPeriodicCallback (
                                 callback function was previously registered.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugRegisterExceptionCallback (
@@ -724,7 +706,6 @@ EbcDebugRegisterExceptionCallback (
   @retval EFI_SUCCESS           The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugInvalidateInstructionCache (
@@ -827,7 +808,6 @@ EbcDebugSignalException (
   @retval Others                Some error occurs when creating periodic event.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 InitializeEbcCallback (
@@ -885,7 +865,6 @@ InitializeEbcCallback (
   @param  SystemContext          EBC system context.
 
 **/
-STATIC
 VOID
 EFIAPI
 CommonEbcExceptionHandler (
@@ -910,7 +889,6 @@ CommonEbcExceptionHandler (
   @param  Context                It should be the address of VM_CONTEXT pointer.
 
 **/
-STATIC
 VOID
 EFIAPI
 EbcPeriodicNotifyFunction (
@@ -940,7 +918,6 @@ EbcPeriodicNotifyFunction (
   @retval EFI_SUCCESS            The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcDebugPeriodic (
@@ -1006,7 +983,6 @@ EbcDebugPeriodic (
   @retval EFI_SUCCESS           The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcUnloadImage (
@@ -1152,7 +1128,6 @@ EbcAddImageThunk (
   @retval EFI_SUCCESS The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcRegisterICacheFlush (
@@ -1175,7 +1150,6 @@ EbcRegisterICacheFlush (
   @retval EFI_INVALID_PARAMETER Version pointer is NULL.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EbcGetVersion (
@@ -1325,7 +1299,6 @@ FreeEBCStack(
   @retval EFI_SUCCESS            The function completed successfully.
 
 **/
-STATIC
 EFI_STATUS
 InitEbcVmTestProtocol (
   IN EFI_HANDLE     *IHandle
@@ -1367,7 +1340,6 @@ InitEbcVmTestProtocol (
   @return EFI_UNSUPPORTED  This function always return EFI_UNSUPPORTED status.
 
 **/
-STATIC
 EFI_STATUS
 EbcVmTestUnsupported (
   VOID

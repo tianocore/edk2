@@ -1,7 +1,7 @@
 /** @file
   Contains code that implements the virtual machine.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -64,7 +64,6 @@ UINT64
   @return The decoded offset.
 
 **/
-STATIC
 INT16
 VmReadIndex16 (
   IN VM_CONTEXT     *VmPtr,
@@ -81,7 +80,6 @@ VmReadIndex16 (
   @return Converted index per EBC VM specification.
 
 **/
-STATIC
 INT32
 VmReadIndex32 (
   IN VM_CONTEXT     *VmPtr,
@@ -98,7 +96,6 @@ VmReadIndex32 (
   @return Converted index per EBC VM specification
 
 **/
-STATIC
 INT64
 VmReadIndex64 (
   IN VM_CONTEXT     *VmPtr,
@@ -114,7 +111,6 @@ VmReadIndex64 (
   @return The 8-bit value from the memory adress.
 
 **/
-STATIC
 UINT8
 VmReadMem8 (
   IN VM_CONTEXT   *VmPtr,
@@ -130,7 +126,6 @@ VmReadMem8 (
   @return The 16-bit value from the memory adress.
 
 **/
-STATIC
 UINT16
 VmReadMem16 (
   IN VM_CONTEXT *VmPtr,
@@ -146,7 +141,6 @@ VmReadMem16 (
   @return The 32-bit value from the memory adress.
 
 **/
-STATIC
 UINT32
 VmReadMem32 (
   IN VM_CONTEXT *VmPtr,
@@ -162,7 +156,6 @@ VmReadMem32 (
   @return The 64-bit value from the memory adress.
 
 **/
-STATIC
 UINT64
 VmReadMem64 (
   IN VM_CONTEXT   *VmPtr,
@@ -178,7 +171,6 @@ VmReadMem64 (
   @return The natural value at address Addr.
 
 **/
-STATIC
 UINTN
 VmReadMemN (
   IN VM_CONTEXT    *VmPtr,
@@ -208,7 +200,6 @@ VmReadMemN (
   @retval Other             Some error occurs when writing data to the address.
 
 **/
-STATIC
 EFI_STATUS
 VmWriteMem8 (
   IN VM_CONTEXT    *VmPtr,
@@ -239,7 +230,6 @@ VmWriteMem8 (
   @retval Other             Some error occurs when writing data to the address.
 
 **/
-STATIC
 EFI_STATUS
 VmWriteMem16 (
   IN VM_CONTEXT   *VmPtr,
@@ -270,7 +260,6 @@ VmWriteMem16 (
   @retval Other             Some error occurs when writing data to the address.
 
 **/
-STATIC
 EFI_STATUS
 VmWriteMem32 (
   IN VM_CONTEXT   *VmPtr,
@@ -290,7 +279,6 @@ VmWriteMem32 (
   @return The raw unsigned 16-bit value from the code stream.
 
 **/
-STATIC
 UINT16
 VmReadCode16 (
   IN VM_CONTEXT *VmPtr,
@@ -309,7 +297,6 @@ VmReadCode16 (
   @return The raw unsigned 32-bit value from the code stream.
 
 **/
-STATIC
 UINT32
 VmReadCode32 (
   IN VM_CONTEXT *VmPtr,
@@ -328,7 +315,6 @@ VmReadCode32 (
   @return The raw unsigned 64-bit value from the code stream.
 
 **/
-STATIC
 UINT64
 VmReadCode64 (
   IN VM_CONTEXT *VmPtr,
@@ -349,7 +335,6 @@ VmReadCode64 (
   @return Signed data of the requested size from the specified address.
 
 **/
-STATIC
 INT8
 VmReadImmed8 (
   IN VM_CONTEXT *VmPtr,
@@ -370,7 +355,6 @@ VmReadImmed8 (
   @return Signed data of the requested size from the specified address.
 
 **/
-STATIC
 INT16
 VmReadImmed16 (
   IN VM_CONTEXT *VmPtr,
@@ -391,7 +375,6 @@ VmReadImmed16 (
   @return Signed data of the requested size from the specified address.
 
 **/
-STATIC
 INT32
 VmReadImmed32 (
   IN VM_CONTEXT *VmPtr,
@@ -412,7 +395,6 @@ VmReadImmed32 (
   @return Signed data of the requested size from the specified address.
 
 **/
-STATIC
 INT64
 VmReadImmed64 (
   IN VM_CONTEXT *VmPtr,
@@ -438,7 +420,6 @@ VmReadImmed64 (
           adjust for the stack gap and return the modified address.
 
 **/
-STATIC
 UINTN
 ConvertStackAddr (
   IN VM_CONTEXT    *VmPtr,
@@ -463,7 +444,6 @@ ConvertStackAddr (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteDataManip (
   IN VM_CONTEXT   *VmPtr,
@@ -481,7 +461,6 @@ ExecuteDataManip (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteBREAK (
   IN VM_CONTEXT *VmPtr
@@ -512,7 +491,6 @@ ExecuteBREAK (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteJMP (
   IN VM_CONTEXT *VmPtr
@@ -529,7 +507,6 @@ ExecuteJMP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteJMP8 (
   IN VM_CONTEXT *VmPtr
@@ -551,7 +528,6 @@ ExecuteJMP8 (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteCALL (
   IN VM_CONTEXT *VmPtr
@@ -568,7 +544,6 @@ ExecuteCALL (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteRET (
   IN VM_CONTEXT *VmPtr
@@ -586,7 +561,6 @@ ExecuteRET (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteCMP (
   IN VM_CONTEXT *VmPtr
@@ -604,7 +578,6 @@ ExecuteCMP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteCMPI (
   IN VM_CONTEXT *VmPtr
@@ -631,7 +604,6 @@ ExecuteCMPI (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVxx (
   IN VM_CONTEXT *VmPtr
@@ -658,7 +630,6 @@ ExecuteMOVxx (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVI (
   IN VM_CONTEXT *VmPtr
@@ -678,7 +649,6 @@ ExecuteMOVI (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVIn (
   IN VM_CONTEXT *VmPtr
@@ -698,7 +668,6 @@ ExecuteMOVIn (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVREL (
   IN VM_CONTEXT *VmPtr
@@ -715,7 +684,6 @@ ExecuteMOVREL (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecutePUSHn (
   IN VM_CONTEXT *VmPtr
@@ -732,7 +700,6 @@ ExecutePUSHn (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecutePUSH (
   IN VM_CONTEXT *VmPtr
@@ -749,7 +716,6 @@ ExecutePUSH (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecutePOPn (
   IN VM_CONTEXT *VmPtr
@@ -766,7 +732,6 @@ ExecutePOPn (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecutePOP (
   IN VM_CONTEXT *VmPtr
@@ -789,7 +754,6 @@ ExecutePOP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteSignedDataManip (
   IN VM_CONTEXT   *VmPtr
@@ -812,7 +776,6 @@ ExecuteSignedDataManip (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteUnsignedDataManip (
   IN VM_CONTEXT   *VmPtr
@@ -830,7 +793,6 @@ ExecuteUnsignedDataManip (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteLOADSP (
   IN VM_CONTEXT *VmPtr
@@ -848,7 +810,6 @@ ExecuteLOADSP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteSTORESP (
   IN VM_CONTEXT *VmPtr
@@ -873,7 +834,6 @@ ExecuteSTORESP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVsnd (
   IN VM_CONTEXT *VmPtr
@@ -898,7 +858,6 @@ ExecuteMOVsnd (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVsnw (
   IN VM_CONTEXT *VmPtr
@@ -920,7 +879,6 @@ ExecuteMOVsnw (
   @return ~Op2
 
 **/
-STATIC
 UINT64
 ExecuteNOT (
   IN VM_CONTEXT     *VmPtr,
@@ -941,7 +899,6 @@ ExecuteNOT (
   @return Op2 * -1
 
 **/
-STATIC
 UINT64
 ExecuteNEG (
   IN VM_CONTEXT   *VmPtr,
@@ -962,7 +919,6 @@ ExecuteNEG (
   @return Op1 + Op2
 
 **/
-STATIC
 UINT64
 ExecuteADD (
   IN VM_CONTEXT   *VmPtr,
@@ -983,7 +939,6 @@ ExecuteADD (
   @return Op1 - Op2
 
 **/
-STATIC
 UINT64
 ExecuteSUB (
   IN VM_CONTEXT   *VmPtr,
@@ -1004,7 +959,6 @@ ExecuteSUB (
   @return Op1 * Op2
 
 **/
-STATIC
 UINT64
 ExecuteMUL (
   IN VM_CONTEXT   *VmPtr,
@@ -1025,7 +979,6 @@ ExecuteMUL (
   @return (unsigned)Op1 * (unsigned)Op2
 
 **/
-STATIC
 UINT64
 ExecuteMULU (
   IN VM_CONTEXT   *VmPtr,
@@ -1046,7 +999,6 @@ ExecuteMULU (
   @return Op1 / Op2
 
 **/
-STATIC
 UINT64
 ExecuteDIV (
   IN VM_CONTEXT   *VmPtr,
@@ -1067,7 +1019,6 @@ ExecuteDIV (
   @return (unsigned)Op1 / (unsigned)Op2
 
 **/
-STATIC
 UINT64
 ExecuteDIVU (
   IN VM_CONTEXT   *VmPtr,
@@ -1088,7 +1039,6 @@ ExecuteDIVU (
   @return Op1 MODULUS Op2
 
 **/
-STATIC
 UINT64
 ExecuteMOD (
   IN VM_CONTEXT   *VmPtr,
@@ -1109,7 +1059,6 @@ ExecuteMOD (
   @return Op1 UNSIGNED_MODULUS Op2
 
 **/
-STATIC
 UINT64
 ExecuteMODU (
   IN VM_CONTEXT   *VmPtr,
@@ -1130,7 +1079,6 @@ ExecuteMODU (
   @return Op1 AND Op2
 
 **/
-STATIC
 UINT64
 ExecuteAND (
   IN VM_CONTEXT   *VmPtr,
@@ -1151,7 +1099,6 @@ ExecuteAND (
   @return Op1 OR Op2
 
 **/
-STATIC
 UINT64
 ExecuteOR (
   IN VM_CONTEXT   *VmPtr,
@@ -1172,7 +1119,6 @@ ExecuteOR (
   @return Op1 XOR Op2
 
 **/
-STATIC
 UINT64
 ExecuteXOR (
   IN VM_CONTEXT   *VmPtr,
@@ -1193,7 +1139,6 @@ ExecuteXOR (
   @return Op1 << Op2
 
 **/
-STATIC
 UINT64
 ExecuteSHL (
   IN VM_CONTEXT   *VmPtr,
@@ -1214,7 +1159,6 @@ ExecuteSHL (
   @return Op1 >> Op2  (unsigned operands)
 
 **/
-STATIC
 UINT64
 ExecuteSHR (
   IN VM_CONTEXT   *VmPtr,
@@ -1235,7 +1179,6 @@ ExecuteSHR (
   @return Op1 >> Op2 (signed)
 
 **/
-STATIC
 UINT64
 ExecuteASHR (
   IN VM_CONTEXT   *VmPtr,
@@ -1256,7 +1199,6 @@ ExecuteASHR (
   @return (INT64)(INT8)Op2
 
 **/
-STATIC
 UINT64
 ExecuteEXTNDB (
   IN VM_CONTEXT   *VmPtr,
@@ -1277,7 +1219,6 @@ ExecuteEXTNDB (
   @return (INT64)(INT16)Op2
 
 **/
-STATIC
 UINT64
 ExecuteEXTNDW (
   IN VM_CONTEXT   *VmPtr,
@@ -1298,7 +1239,6 @@ ExecuteEXTNDW (
   @return (INT64)(INT32)Op2
 
 **/
-STATIC
 UINT64
 ExecuteEXTNDD (
   IN VM_CONTEXT   *VmPtr,
@@ -1613,7 +1553,6 @@ Done:
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVxx (
   IN VM_CONTEXT *VmPtr
@@ -1883,7 +1822,6 @@ ExecuteMOVxx (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteBREAK (
   IN VM_CONTEXT *VmPtr
@@ -2009,7 +1947,6 @@ ExecuteBREAK (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteJMP (
   IN VM_CONTEXT *VmPtr
@@ -2172,7 +2109,6 @@ ExecuteJMP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteJMP8 (
   IN VM_CONTEXT *VmPtr
@@ -2233,7 +2169,6 @@ ExecuteJMP8 (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVI (
   IN VM_CONTEXT *VmPtr
@@ -2352,7 +2287,6 @@ ExecuteMOVI (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVIn (
   IN VM_CONTEXT *VmPtr
@@ -2455,7 +2389,6 @@ ExecuteMOVIn (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVREL (
   IN VM_CONTEXT *VmPtr
@@ -2562,7 +2495,6 @@ ExecuteMOVREL (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVsnw (
   IN VM_CONTEXT *VmPtr
@@ -2656,7 +2588,6 @@ ExecuteMOVsnw (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteMOVsnd (
   IN VM_CONTEXT *VmPtr
@@ -2742,7 +2673,6 @@ ExecuteMOVsnd (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecutePUSHn (
   IN VM_CONTEXT *VmPtr
@@ -2802,7 +2732,6 @@ ExecutePUSHn (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecutePUSH (
   IN VM_CONTEXT *VmPtr
@@ -2879,7 +2808,6 @@ ExecutePUSH (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecutePOPn (
   IN VM_CONTEXT *VmPtr
@@ -2939,7 +2867,6 @@ ExecutePOPn (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecutePOP (
   IN VM_CONTEXT *VmPtr
@@ -3024,7 +2951,6 @@ ExecutePOP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteCALL (
   IN VM_CONTEXT *VmPtr
@@ -3158,7 +3084,6 @@ ExecuteCALL (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteRET (
   IN VM_CONTEXT *VmPtr
@@ -3207,7 +3132,6 @@ ExecuteRET (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteCMP (
   IN VM_CONTEXT *VmPtr
@@ -3369,7 +3293,6 @@ ExecuteCMP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteCMPI (
   IN VM_CONTEXT *VmPtr
@@ -3550,7 +3473,6 @@ ExecuteCMPI (
   @return ~Op2
 
 **/
-STATIC
 UINT64
 ExecuteNOT (
   IN VM_CONTEXT     *VmPtr,
@@ -3575,7 +3497,6 @@ ExecuteNOT (
   @return Op2 * -1
 
 **/
-STATIC
 UINT64
 ExecuteNEG (
   IN VM_CONTEXT   *VmPtr,
@@ -3600,7 +3521,6 @@ ExecuteNEG (
   @return Op1 + Op2
 
 **/
-STATIC
 UINT64
 ExecuteADD (
   IN VM_CONTEXT   *VmPtr,
@@ -3625,7 +3545,6 @@ ExecuteADD (
   @return Op1 - Op2
 
 **/
-STATIC
 UINT64
 ExecuteSUB (
   IN VM_CONTEXT   *VmPtr,
@@ -3654,7 +3573,6 @@ ExecuteSUB (
   @return Op1 * Op2
 
 **/
-STATIC
 UINT64
 ExecuteMUL (
   IN VM_CONTEXT   *VmPtr,
@@ -3683,7 +3601,6 @@ ExecuteMUL (
   @return (unsigned)Op1 * (unsigned)Op2
 
 **/
-STATIC
 UINT64
 ExecuteMULU (
   IN VM_CONTEXT   *VmPtr,
@@ -3712,7 +3629,6 @@ ExecuteMULU (
   @return Op1 / Op2
 
 **/
-STATIC
 UINT64
 ExecuteDIV (
   IN VM_CONTEXT   *VmPtr,
@@ -3756,7 +3672,6 @@ ExecuteDIV (
   @return (unsigned)Op1 / (unsigned)Op2
 
 **/
-STATIC
 UINT64
 ExecuteDIVU (
   IN VM_CONTEXT   *VmPtr,
@@ -3802,7 +3717,6 @@ ExecuteDIVU (
   @return Op1 MODULUS Op2
 
 **/
-STATIC
 UINT64
 ExecuteMOD (
   IN VM_CONTEXT   *VmPtr,
@@ -3842,7 +3756,6 @@ ExecuteMOD (
   @return Op1 UNSIGNED_MODULUS Op2
 
 **/
-STATIC
 UINT64
 ExecuteMODU (
   IN VM_CONTEXT   *VmPtr,
@@ -3882,7 +3795,6 @@ ExecuteMODU (
   @return Op1 AND Op2
 
 **/
-STATIC
 UINT64
 ExecuteAND (
   IN VM_CONTEXT   *VmPtr,
@@ -3907,7 +3819,6 @@ ExecuteAND (
   @return Op1 OR Op2
 
 **/
-STATIC
 UINT64
 ExecuteOR (
   IN VM_CONTEXT   *VmPtr,
@@ -3932,7 +3843,6 @@ ExecuteOR (
   @return Op1 XOR Op2
 
 **/
-STATIC
 UINT64
 ExecuteXOR (
   IN VM_CONTEXT   *VmPtr,
@@ -3957,7 +3867,6 @@ ExecuteXOR (
   @return Op1 << Op2
 
 **/
-STATIC
 UINT64
 ExecuteSHL (
   IN VM_CONTEXT   *VmPtr,
@@ -3986,7 +3895,6 @@ ExecuteSHL (
   @return Op1 >> Op2  (unsigned operands)
 
 **/
-STATIC
 UINT64
 ExecuteSHR (
   IN VM_CONTEXT   *VmPtr,
@@ -4015,7 +3923,6 @@ ExecuteSHR (
   @return Op1 >> Op2 (signed)
 
 **/
-STATIC
 UINT64
 ExecuteASHR (
   IN VM_CONTEXT   *VmPtr,
@@ -4044,7 +3951,6 @@ ExecuteASHR (
   @return (INT64)(INT8)Op2
 
 **/
-STATIC
 UINT64
 ExecuteEXTNDB (
   IN VM_CONTEXT   *VmPtr,
@@ -4078,7 +3984,6 @@ ExecuteEXTNDB (
   @return (INT64)(INT16)Op2
 
 **/
-STATIC
 UINT64
 ExecuteEXTNDW (
   IN VM_CONTEXT   *VmPtr,
@@ -4119,7 +4024,6 @@ ExecuteEXTNDW (
   @return (INT64)(INT32)Op2
 
 **/
-STATIC
 UINT64
 ExecuteEXTNDD (
   IN VM_CONTEXT   *VmPtr,
@@ -4157,7 +4061,6 @@ ExecuteEXTNDD (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteSignedDataManip (
   IN VM_CONTEXT   *VmPtr
@@ -4188,7 +4091,6 @@ ExecuteSignedDataManip (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteUnsignedDataManip (
   IN VM_CONTEXT   *VmPtr
@@ -4220,7 +4122,6 @@ ExecuteUnsignedDataManip (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteDataManip (
   IN VM_CONTEXT   *VmPtr,
@@ -4370,7 +4271,6 @@ ExecuteDataManip (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteLOADSP (
   IN VM_CONTEXT *VmPtr
@@ -4425,7 +4325,6 @@ ExecuteLOADSP (
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
-STATIC
 EFI_STATUS
 ExecuteSTORESP (
   IN VM_CONTEXT *VmPtr
@@ -4497,7 +4396,6 @@ ExecuteSTORESP (
   @return The decoded offset.
 
 **/
-STATIC
 INT16
 VmReadIndex16 (
   IN VM_CONTEXT     *VmPtr,
@@ -4569,7 +4467,6 @@ VmReadIndex16 (
   @return Converted index per EBC VM specification.
 
 **/
-STATIC
 INT32
 VmReadIndex32 (
   IN VM_CONTEXT     *VmPtr,
@@ -4633,7 +4530,6 @@ VmReadIndex32 (
   @return Converted index per EBC VM specification
 
 **/
-STATIC
 INT64
 VmReadIndex64 (
   IN VM_CONTEXT     *VmPtr,
@@ -4710,7 +4606,6 @@ VmReadIndex64 (
   @retval Other             Some error occurs when writing data to the address.
 
 **/
-STATIC
 EFI_STATUS
 VmWriteMem8 (
   IN VM_CONTEXT    *VmPtr,
@@ -4749,7 +4644,6 @@ VmWriteMem8 (
   @retval Other             Some error occurs when writing data to the address.
 
 **/
-STATIC
 EFI_STATUS
 VmWriteMem16 (
   IN VM_CONTEXT   *VmPtr,
@@ -4813,7 +4707,6 @@ VmWriteMem16 (
   @retval Other             Some error occurs when writing data to the address.
 
 **/
-STATIC
 EFI_STATUS
 VmWriteMem32 (
   IN VM_CONTEXT   *VmPtr,
@@ -4991,7 +4884,6 @@ VmWriteMemN (
   @return Signed data of the requested size from the specified address.
 
 **/
-STATIC
 INT8
 VmReadImmed8 (
   IN VM_CONTEXT *VmPtr,
@@ -5018,7 +4910,6 @@ VmReadImmed8 (
   @return Signed data of the requested size from the specified address.
 
 **/
-STATIC
 INT16
 VmReadImmed16 (
   IN VM_CONTEXT *VmPtr,
@@ -5061,7 +4952,6 @@ VmReadImmed16 (
   @return Signed data of the requested size from the specified address.
 
 **/
-STATIC
 INT32
 VmReadImmed32 (
   IN VM_CONTEXT *VmPtr,
@@ -5099,7 +4989,6 @@ VmReadImmed32 (
   @return Signed data of the requested size from the specified address.
 
 **/
-STATIC
 INT64
 VmReadImmed64 (
   IN VM_CONTEXT *VmPtr,
@@ -5141,7 +5030,6 @@ VmReadImmed64 (
   @return The raw unsigned 16-bit value from the code stream.
 
 **/
-STATIC
 UINT16
 VmReadCode16 (
   IN VM_CONTEXT *VmPtr,
@@ -5182,7 +5070,6 @@ VmReadCode16 (
   @return The raw unsigned 32-bit value from the code stream.
 
 **/
-STATIC
 UINT32
 VmReadCode32 (
   IN VM_CONTEXT *VmPtr,
@@ -5217,7 +5104,6 @@ VmReadCode32 (
   @return The raw unsigned 64-bit value from the code stream.
 
 **/
-STATIC
 UINT64
 VmReadCode64 (
   IN VM_CONTEXT *VmPtr,
@@ -5256,7 +5142,6 @@ VmReadCode64 (
   @return The 8-bit value from the memory adress.
 
 **/
-STATIC
 UINT8
 VmReadMem8 (
   IN VM_CONTEXT   *VmPtr,
@@ -5282,7 +5167,6 @@ VmReadMem8 (
   @return The 16-bit value from the memory adress.
 
 **/
-STATIC
 UINT16
 VmReadMem16 (
   IN VM_CONTEXT *VmPtr,
@@ -5314,7 +5198,6 @@ VmReadMem16 (
   @return The 32-bit value from the memory adress.
 
 **/
-STATIC
 UINT32
 VmReadMem32 (
   IN VM_CONTEXT *VmPtr,
@@ -5350,7 +5233,6 @@ VmReadMem32 (
   @return The 64-bit value from the memory adress.
 
 **/
-STATIC
 UINT64
 VmReadMem64 (
   IN VM_CONTEXT   *VmPtr,
@@ -5400,7 +5282,6 @@ VmReadMem64 (
           adjust for the stack gap and return the modified address.
 
 **/
-STATIC
 UINTN
 ConvertStackAddr (
   IN VM_CONTEXT    *VmPtr,
@@ -5421,7 +5302,6 @@ ConvertStackAddr (
   @return The natural value at address Addr.
 
 **/
-STATIC
 UINTN
 VmReadMemN (
   IN VM_CONTEXT    *VmPtr,
