@@ -1301,4 +1301,75 @@ Returns:
 --*/
 ;
 
+
+
+EFI_STATUS
+EFIAPI 
+PeiLibPciCfgModify (
+  IN EFI_PEI_SERVICES         **PeiServices,
+  IN PEI_PCI_CFG_PPI_WIDTH    Width,
+  IN UINT64                   Address,
+  IN UINTN                    SetBits,
+  IN UINTN                    ClearBits
+  )
+/*++
+
+Routine Description:
+
+  PCI read-modify-write operations.
+
+  PIWG's PI specification replaces Inte's EFI Specification 1.10.
+  EFI_PEI_PCI_CFG_PPI defined in Inte's EFI Specification 1.10 is replaced by
+  EFI_PEI_PCI_CFG2_PPI in PI 1.0. "Modify" function  in these two PPI are not 
+  compatibile with each other.
+  
+
+  For Framework code that make the following call:
+
+      PciCfg->Modify (
+                       PeiServices,
+                       PciCfg,
+                       Width,
+                       Address,
+                       SetBits,
+                       ClearBits
+                       );
+   it will be updated to the following code which call this library API:
+      PeiLibPciCfgModify (
+          PeiServices,
+          Width,
+          Address,
+          SetBits,
+          ClearBits
+          );
+
+   The 
+
+Arguments:
+  
+  PeiServices     An indirect pointer to the PEI Services Table
+                          published by the PEI Foundation.
+
+  Width           The width of the access. Enumerated in bytes. Type
+                          EFI_PEI_PCI_CFG_PPI_WIDTH is defined in Read().
+
+  Address         The physical address of the access.
+
+  SetBits         Points to value to bitwise-OR with the read configuration value.
+
+                          The size of the value is determined by Width.
+
+  ClearBits       Points to the value to negate and bitwise-AND with the read configuration value.
+                          The size of the value is determined by Width.
+
+
+Returns:
+
+  EFI_SUCCESS           The function completed successfully.
+
+  EFI_DEVICE_ERROR      There was a problem with the transaction.
+
+--*/
+;
+
 #endif
