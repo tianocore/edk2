@@ -2,15 +2,15 @@
   Firmware File System driver that produce Firmware Volume protocol.
   Layers on top of Firmware Block protocol to produce a file abstraction 
   of FV based files.
-  
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -125,7 +125,6 @@ GetFwVolHeader (
   @return None.
 
 **/
-STATIC
 VOID
 FreeFvDeviceResource (
   IN FV_DEVICE  *FvDevice
@@ -382,7 +381,6 @@ Done:
   @param  Context               For EFI compatiblity.  Not used.
 
 **/
-STATIC
 VOID
 EFIAPI
 NotifyFwVolBlock (

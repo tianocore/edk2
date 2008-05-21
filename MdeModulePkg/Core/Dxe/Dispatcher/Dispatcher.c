@@ -26,14 +26,14 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -105,7 +105,6 @@ FV_FILEPATH_DEVICE_PATH mFvDevicePath;
   @param  InsertedDriverEntry   The driver to insert on the ScheduledLink Queue
 
 **/
-STATIC
 VOID
 CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   IN  EFI_CORE_DRIVER_ENTRY   *InsertedDriverEntry
@@ -128,7 +127,6 @@ CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   @param  Context               Event Context, not used.
 
 **/
-STATIC
 VOID
 EFIAPI
 CoreFwVolEventProtocolNotify (
@@ -149,7 +147,6 @@ CoreFwVolEventProtocolNotify (
   @return Pointer to device path constructed from FvHandle and DriverName
 
 **/
-STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 CoreFvToDevicePath (
   IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
@@ -177,12 +174,11 @@ CoreFvToDevicePath (
                                 time.
 
 **/
-STATIC 
 EFI_STATUS
 CoreAddToDriverList (
-  IN  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv,
-  IN  EFI_HANDLE                    FvHandle,
-  IN  EFI_GUID                      *DriverName
+  IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
+  IN  EFI_HANDLE                      FvHandle,
+  IN  EFI_GUID                        *DriverName
   );
 
 /**
@@ -197,7 +193,6 @@ CoreAddToDriverList (
   @retval EFI_SUCCESS           Function successfully returned.
 
 **/
-STATIC
 EFI_STATUS 
 CoreProcessFvImageFile (
   IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
@@ -210,7 +205,6 @@ CoreProcessFvImageFile (
   Enter critical section by gaining lock on mDispatcherLock.
 
 **/
-STATIC
 VOID
 CoreAcquireDispatcherLock (
   VOID
@@ -224,7 +218,6 @@ CoreAcquireDispatcherLock (
   Exit critical section by releasing lock on mDispatcherLock.
 
 **/
-STATIC
 VOID
 CoreReleaseDispatcherLock (
   VOID
@@ -246,7 +239,6 @@ CoreReleaseDispatcherLock (
   @retval Error                 DEPEX not found.
 
 **/
-STATIC
 EFI_STATUS
 CoreGetDepexSectionAndPreProccess (
   IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry
@@ -314,7 +306,6 @@ CoreGetDepexSectionAndPreProccess (
                                 not set. 
 
 **/
-EFI_DXESERVICE
 EFI_STATUS
 EFIAPI
 CoreSchedule (
@@ -361,7 +352,6 @@ CoreSchedule (
   @retval EFI_NOT_FOUND         The file was not found in the untrusted state. 
 
 **/
-EFI_DXESERVICE
 EFI_STATUS
 EFIAPI
 CoreTrust (
@@ -413,7 +403,6 @@ CoreTrust (
   @retval EFI_SUCCESS           One or more DXE Drivers were dispatched 
 
 **/
-EFI_DXESERVICE
 EFI_STATUS
 EFIAPI
 CoreDispatcher (
@@ -558,7 +547,6 @@ CoreDispatcher (
   @param  InsertedDriverEntry   The driver to insert on the ScheduledLink Queue
 
 **/
-STATIC
 VOID
 CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   IN  EFI_CORE_DRIVER_ENTRY   *InsertedDriverEntry
@@ -620,7 +608,6 @@ CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
                                 processed
 
 **/
-STATIC
 BOOLEAN
 FvHasBeenProcessed (
   IN  EFI_HANDLE      FvHandle
@@ -647,7 +634,6 @@ FvHasBeenProcessed (
   @param  FvHandle              The handle of a FV that has been processed
 
 **/
-STATIC
 VOID
 FvIsBeingProcesssed (
   IN  EFI_HANDLE    FvHandle
@@ -679,7 +665,6 @@ FvIsBeingProcesssed (
   @return Pointer to device path constructed from FvHandle and DriverName
 
 **/
-STATIC
 EFI_DEVICE_PATH_PROTOCOL *
 CoreFvToDevicePath (
   IN  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv,
@@ -785,7 +770,6 @@ CoreAddToDriverList (
   @retval FALSE                 Not found.
 
 **/
-STATIC
 BOOLEAN
 FvFoundInHobFv2 (
   IN  EFI_HANDLE                      FvHandle,
@@ -922,7 +906,6 @@ CoreProcessFvImageFile (
   @param  Context               Event Context, not used.
 
 **/
-STATIC
 VOID
 EFIAPI
 CoreFwVolEventProtocolNotify (

@@ -1,16 +1,14 @@
-/** @file 
-
+/** @file
   Internal functions shared in DxeCore module.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -30,8 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID
 CoreReportProgressCode (
   IN  EFI_STATUS_CODE_VALUE   Value
-  )
-;
+  );
 
 
 /**
@@ -48,8 +45,7 @@ VOID
 CoreReportProgressCodeSpecific (
   IN  EFI_STATUS_CODE_VALUE   Value,
   IN  EFI_HANDLE              Handle
-  )
-;
+  );
 
 
 /**
@@ -63,9 +59,8 @@ CoreReportProgressCodeSpecific (
 **/
 VOID
 CoreAcquireLock (
-  IN EFI_LOCK *Lock
-  )
-;
+  IN EFI_LOCK  *Lock
+  );
 
 
 /**
@@ -84,8 +79,7 @@ CoreAcquireLock (
 EFI_STATUS
 CoreAcquireLockOrFail (
   IN EFI_LOCK  *Lock
-  )
-;
+  );
 
 
 /**
@@ -99,9 +93,8 @@ CoreAcquireLockOrFail (
 **/
 VOID
 CoreReleaseLock (
-  IN EFI_LOCK *Lock
-  )
-;
+  IN EFI_LOCK  *Lock
+  );
 
 //
 // Device Path functions
@@ -119,8 +112,7 @@ CoreReleaseLock (
 UINTN
 CoreDevicePathSize (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-;
+  );
 
 
 /**
@@ -135,8 +127,7 @@ CoreDevicePathSize (
 BOOLEAN
 CoreIsDevicePathMultiInstance (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-;
+  );
 
 
 
@@ -152,8 +143,7 @@ CoreIsDevicePathMultiInstance (
 EFI_DEVICE_PATH_PROTOCOL *
 CoreDuplicateDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
-  )
-;
+  );
 
 
 /**
@@ -171,8 +161,7 @@ EFI_DEVICE_PATH_PROTOCOL *
 CoreAppendDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *Src1,
   IN EFI_DEVICE_PATH_PROTOCOL  *Src2
-  )
-;
+  );
 
 
 /**
@@ -186,8 +175,7 @@ CoreAppendDevicePath (
 VOID *
 CoreAllocateBootServicesPool (
   IN  UINTN   AllocationSize
-  )
-;
+  );
 
 
 /**
@@ -201,8 +189,7 @@ CoreAllocateBootServicesPool (
 VOID *
 CoreAllocateZeroBootServicesPool (
   IN  UINTN   AllocationSize
-  )
-;
+  );
 
 
 /**
@@ -219,9 +206,8 @@ CoreAllocateZeroBootServicesPool (
 EFI_STATUS
 CoreGetConfigTable (
   IN EFI_GUID *Guid,
-  IN OUT VOID **Table
-  )
-;
+  OUT VOID    **Table
+  );
 
 
 /**
@@ -238,8 +224,7 @@ VOID *
 CoreAllocateRuntimeCopyPool (
   IN  UINTN   AllocationSize,
   IN  VOID    *Buffer
-  )
-;
+  );
 
 
 /**
@@ -253,8 +238,7 @@ CoreAllocateRuntimeCopyPool (
 VOID *
 CoreAllocateRuntimePool (
   IN  UINTN   AllocationSize
-  )
-;
+  );
 
 
 /**
@@ -271,8 +255,7 @@ VOID *
 CoreAllocateCopyPool (
   IN  UINTN   AllocationSize,
   IN  VOID    *Buffer
-  )
-;
+  );
 
 
 /**
@@ -299,7 +282,6 @@ CoreCreateProtocolNotifyEvent (
   IN VOID                 *NotifyContext,
   OUT VOID                **Registration,
   IN  BOOLEAN             SignalFlag
-  )
-;
+  );
 
 #endif

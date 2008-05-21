@@ -1,15 +1,14 @@
-/** @file 
-
+/** @file
   Support functions for managing protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -113,10 +112,9 @@ typedef struct {
 **/
 PROTOCOL_ENTRY  *
 CoreFindProtocolEntry (
-  IN EFI_GUID     *Protocol,
-  IN BOOLEAN      Create
-  )
-;
+  IN EFI_GUID   *Protocol,
+  IN BOOLEAN    Create
+  );
 
 
 /**
@@ -127,9 +125,8 @@ CoreFindProtocolEntry (
 **/
 VOID
 CoreNotifyProtocolEntry (
-  IN PROTOCOL_ENTRY       *ProtEntry
-  )
-;
+  IN PROTOCOL_ENTRY   *ProtEntry
+  );
 
 
 /**
@@ -146,11 +143,10 @@ CoreNotifyProtocolEntry (
 **/
 PROTOCOL_INTERFACE *
 CoreFindProtocolInterface (
-  IN IHANDLE              *Handle,
-  IN EFI_GUID             *Protocol,
-  IN VOID                 *Interface
-  )
-;
+  IN IHANDLE        *Handle,
+  IN EFI_GUID       *Protocol,
+  IN VOID           *Interface
+  );
 
 
 /**
@@ -165,11 +161,10 @@ CoreFindProtocolInterface (
 **/
 PROTOCOL_INTERFACE *
 CoreRemoveInterfaceFromProtocol (
-  IN IHANDLE              *Handle,
-  IN EFI_GUID             *Protocol,
-  IN VOID                 *Interface
-  )
-;
+  IN IHANDLE        *Handle,
+  IN EFI_GUID       *Protocol,
+  IN VOID           *Interface
+  );
 
 
 /**
@@ -183,9 +178,8 @@ CoreRemoveInterfaceFromProtocol (
 **/
 EFI_STATUS
 CoreUnregisterProtocolNotify (
-  IN EFI_EVENT            Event
-  )
-;
+  IN EFI_EVENT      Event
+  );
 
 
 /**
@@ -206,8 +200,7 @@ EFI_STATUS
 CoreDisconnectControllersUsingProtocolInterface (
   IN EFI_HANDLE           UserHandle,
   IN PROTOCOL_INTERFACE   *Prot
-  )
-;
+  );
 
 
 /**
@@ -217,8 +210,7 @@ CoreDisconnectControllersUsingProtocolInterface (
 VOID
 CoreAcquireProtocolLock (
   VOID
-  )
-;
+  );
 
 
 /**
@@ -228,8 +220,7 @@ CoreAcquireProtocolLock (
 VOID
 CoreReleaseProtocolLock (
   VOID
-  )
-;
+  );
 
 
 /**
@@ -244,8 +235,7 @@ CoreReleaseProtocolLock (
 EFI_STATUS
 CoreValidateHandle (
   IN  EFI_HANDLE                UserHandle
-  )
-;
+  );
 
 //
 // Externs

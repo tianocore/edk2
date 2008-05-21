@@ -1,16 +1,15 @@
 /** @file
-
   Firmware File System protocol. Layers on top of Firmware
   Block protocol to produce a file abstraction of FV based files.
-  
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -61,10 +60,9 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 FvGetVolumeAttributes (
-  IN    CONST EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
-  OUT         EFI_FV_ATTRIBUTES              *Attributes
-  )
-;
+  IN  CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
+  OUT       EFI_FV_ATTRIBUTES             *Attributes
+  );
 
 
 /**
@@ -80,10 +78,9 @@ FvGetVolumeAttributes (
 EFI_STATUS
 EFIAPI
 FvSetVolumeAttributes (
-  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
-  IN OUT    EFI_FV_ATTRIBUTES              *Attributes
-  )
-;
+  IN     CONST EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
+  IN OUT       EFI_FV_ATTRIBUTES              *Attributes
+  );
 
 
 /**
@@ -135,14 +132,13 @@ FvSetVolumeAttributes (
 EFI_STATUS
 EFIAPI
 FvGetNextFile (
-  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
-  IN OUT    VOID                           *Key,
-  IN OUT    EFI_FV_FILETYPE                *FileType,
-  OUT       EFI_GUID                       *NameGuid,
-  OUT       EFI_FV_FILE_ATTRIBUTES         *Attributes,
-  OUT       UINTN                          *Size
-  )
-;
+  IN CONST   EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
+  IN OUT     VOID                          *Key,
+  IN OUT     EFI_FV_FILETYPE               *FileType,
+  OUT        EFI_GUID                      *NameGuid,
+  OUT        EFI_FV_FILE_ATTRIBUTES        *Attributes,
+  OUT        UINTN                         *Size
+  );
 
 
 
@@ -189,15 +185,14 @@ FvGetNextFile (
 EFI_STATUS
 EFIAPI
 FvReadFile (
-  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL   *This,
-  IN CONST  EFI_GUID                       *NameGuid,
-  IN OUT    VOID                           **Buffer,
-  IN OUT    UINTN                          *BufferSize,
-  OUT       EFI_FV_FILETYPE                *FoundType,
-  OUT       EFI_FV_FILE_ATTRIBUTES         *FileAttributes,
-  OUT       UINT32                         *AuthenticationStatus
-  )
-;
+  IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
+  IN CONST EFI_GUID                      *NameGuid,
+  IN OUT   VOID                          **Buffer,
+  IN OUT   UINTN                         *BufferSize,
+  OUT      EFI_FV_FILETYPE               *FoundType,
+  OUT      EFI_FV_FILE_ATTRIBUTES        *FileAttributes,
+  OUT      UINT32                        *AuthenticationStatus
+  );
 
 
 /**
@@ -231,15 +226,14 @@ FvReadFile (
 EFI_STATUS
 EFIAPI
 FvReadFileSection (
-  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL   *This,
+  IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
   IN CONST  EFI_GUID                       *NameGuid,
   IN        EFI_SECTION_TYPE               SectionType,
   IN        UINTN                          SectionInstance,
   IN OUT    VOID                           **Buffer,
   IN OUT    UINTN                          *BufferSize,
   OUT       UINT32                         *AuthenticationStatus
-  )
-;
+  );
 
 
 /**
@@ -266,12 +260,11 @@ FvReadFileSection (
 EFI_STATUS
 EFIAPI
 FvWriteFile (
-  IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL       *This,
-  IN       UINT32                             NumberOfFiles,
-  IN       EFI_FV_WRITE_POLICY                WritePolicy,
-  IN       EFI_FV_WRITE_FILE_DATA             *FileData
-  )
-;
+  IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL  *This,
+  IN       UINT32                         NumberOfFiles,
+  IN       EFI_FV_WRITE_POLICY            WritePolicy,
+  IN       EFI_FV_WRITE_FILE_DATA         *FileData
+  );
 
 
 /**
@@ -292,10 +285,9 @@ EFIAPI
 FvGetVolumeInfo (
   IN  CONST EFI_FIRMWARE_VOLUME2_PROTOCOL       *This,
   IN  CONST EFI_GUID                            *InformationType,
-  IN  OUT   UINTN                               *BufferSize,
-  OUT       VOID                                *Buffer
-  )
-;
+  IN OUT UINTN                                  *BufferSize,
+  OUT VOID                                      *Buffer
+  );
 
 
 
@@ -317,10 +309,9 @@ EFIAPI
 FvSetVolumeInfo (
   IN  CONST EFI_FIRMWARE_VOLUME2_PROTOCOL       *This,
   IN  CONST EFI_GUID                            *InformationType,
-  IN        UINTN                               BufferSize,
-  IN  CONST  VOID                               *Buffer
-  )
-;
+  IN  UINTN                                     BufferSize,
+  IN CONST  VOID                                *Buffer
+  );
   
 //
 //Internal functions
@@ -349,10 +340,9 @@ typedef enum {
 BOOLEAN
 IsBufferErased (
   IN UINT8    ErasePolarity,
-  IN VOID     *Buffer,
+  IN VOID     *InBuffer,
   IN UINTN    BufferSize
-  )
-;
+  );
 
 
 /**
@@ -364,12 +354,11 @@ IsBufferErased (
   @return FFS File state
 
 **/
-EFI_FFS_FILE_STATE 
+EFI_FFS_FILE_STATE
 GetFileState (
   IN UINT8                ErasePolarity,
   IN EFI_FFS_FILE_HEADER  *FfsHeader
-  )
-;
+  );
 
 
 /**
@@ -385,8 +374,7 @@ VOID
 SetFileState (
   IN UINT8                State,
   IN EFI_FFS_FILE_HEADER  *FfsHeader
-  )
-;
+  );
 
 
 /**
@@ -401,8 +389,7 @@ SetFileState (
 BOOLEAN
 VerifyFvHeaderChecksum (
   IN EFI_FIRMWARE_VOLUME_HEADER *FvHeader
-  )
-;
+  );
     
 
 /**
@@ -418,11 +405,10 @@ VerifyFvHeaderChecksum (
 **/
 BOOLEAN
 IsValidFfsHeader (
-  IN  UINT8                ErasePolarity,
-  IN  EFI_FFS_FILE_HEADER  *FfsHeader,
-  OUT EFI_FFS_FILE_STATE   *FileState
-  )
-;
+  IN UINT8                ErasePolarity,
+  IN EFI_FFS_FILE_HEADER  *FfsHeader,
+  OUT EFI_FFS_FILE_STATE  *FileState
+  );
 
 
 /**
@@ -440,8 +426,7 @@ BOOLEAN
 IsValidFfsFile (
   IN UINT8                ErasePolarity,
   IN EFI_FFS_FILE_HEADER  *FfsHeader
-  )
-;
+  );
 
 
 /**
@@ -460,10 +445,9 @@ IsValidFfsFile (
 **/
 EFI_STATUS
 GetFwVolHeader (
-  IN  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *Fvb,
-  OUT EFI_FIRMWARE_VOLUME_HEADER              **FwVolHeader
-  )
-;
+  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
+  OUT    EFI_FIRMWARE_VOLUME_HEADER             **FwVolHeader
+  );
 
 
 
@@ -480,7 +464,6 @@ GetFwVolHeader (
 EFI_STATUS
 FvCheck (
   IN OUT FV_DEVICE  *FvDevice
-  )
-;
+  );
 
 #endif

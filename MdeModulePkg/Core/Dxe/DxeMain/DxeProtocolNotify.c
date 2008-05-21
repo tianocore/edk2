@@ -1,10 +1,9 @@
-/** @file 
-
+/** @file
   This file deals with Architecture Protocol (AP) registration in
   the Dxe Core. The mArchProtocols[] array represents a list of
   events that represent the Architectural Protocols.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -82,7 +81,6 @@ CoreAllEfiServicesAvailable (
   @param  Context        Event Context, not used.
 
 **/
-STATIC
 VOID
 EFIAPI
 GenericArchProtocolNotify (

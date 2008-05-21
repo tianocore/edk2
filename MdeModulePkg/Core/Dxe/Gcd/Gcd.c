@@ -1,17 +1,16 @@
-/** @file 
-
-    The file contains the GCD related services in the EFI Boot Services Table.
+/** @file
+  The file contains the GCD related services in the EFI Boot Services Table.
     The GCD services are used to manage the memory and I/O regions that 
     are accessible to the CPU that is executing the DXE core.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -122,7 +121,6 @@ CoreReleaseGcdMemoryLock (
   Acquire memory lock on mGcdIoSpaceLock.
 
 **/
-STATIC
 VOID
 CoreAcquireGcdIoLock (
   VOID
@@ -136,7 +134,6 @@ CoreAcquireGcdIoLock (
   Release memory lock on mGcdIoSpaceLock.
 
 **/
-STATIC
 VOID
 CoreReleaseGcdIoLock (
   VOID
@@ -163,7 +160,6 @@ CoreReleaseGcdIoLock (
   @return A 64 bit value is the aligned to the value nearest Value with an alignment by Alignment.
 
 **/
-STATIC
 UINT64
 AlignValue (
   IN UINT64   Value,
@@ -189,7 +185,6 @@ AlignValue (
   @return A 64 bit value is the aligned to the value nearest Value with an alignment by Alignment.
 
 **/
-STATIC
 UINT64
 PageAlignAddress (
   IN UINT64 Value
@@ -207,7 +202,6 @@ PageAlignAddress (
   @return A 64 bit value is the aligned to the value nearest Value with an alignment by Alignment.
 
 **/
-STATIC
 UINT64
 PageAlignLength (
   IN UINT64 Value
@@ -230,7 +224,6 @@ PageAlignLength (
   @retval EFI_SUCCESS            Both entries successfully allocated.
 
 **/
-STATIC
 EFI_STATUS
 CoreAllocateGcdMapEntry (
   IN OUT EFI_GCD_MAP_ENTRY  **TopEntry,
@@ -266,7 +259,6 @@ CoreAllocateGcdMapEntry (
   @retval EFI_SUCCESS            The new range was inserted into the linked list
 
 **/
-STATIC
 EFI_STATUS
 CoreInsertGcdMapEntry (
   IN LIST_ENTRY           *Link,
@@ -311,7 +303,6 @@ CoreInsertGcdMapEntry (
   @retval EFI_UNSUPPORTED        These adjacent regions could not merge.
 
 **/
-STATIC
 EFI_STATUS
 CoreMergeGcdMapEntry (
   IN LIST_ENTRY      *Link,
@@ -385,7 +376,6 @@ CoreMergeGcdMapEntry (
   @retval EFI_SUCCESS            GCD map successfully cleaned up.
 
 **/
-STATIC
 EFI_STATUS
 CoreCleanupGcdMapEntry (
   IN EFI_GCD_MAP_ENTRY  *TopEntry,
@@ -430,7 +420,6 @@ CoreCleanupGcdMapEntry (
   @retval EFI_NOT_FOUND          Not found.
 
 **/
-STATIC
 EFI_STATUS
 CoreSearchGcdMapEntry (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -475,7 +464,6 @@ CoreSearchGcdMapEntry (
   @return The count.
 
 **/
-STATIC
 UINTN
 CoreCountGcdMapEntry (
   IN LIST_ENTRY  *Map
@@ -503,11 +491,10 @@ CoreCountGcdMapEntry (
   @return The enum value of memory attribute.
 
 **/
-STATIC
 UINT64
 ConverToCpuArchAttributes (
   UINT64 Attributes
-  ) 
+  )
 {
   if ( (Attributes & EFI_MEMORY_UC) == EFI_MEMORY_UC) {
     return EFI_MEMORY_UC;
@@ -557,7 +544,6 @@ ConverToCpuArchAttributes (
   @retval EFI_OUT_OF_RESOURCES   No buffer could be allocated.
 
 **/
-STATIC
 EFI_STATUS
 CoreConvertSpace (
   IN UINTN                 Operation,
@@ -801,7 +787,6 @@ Done:
                                  space.
 
 **/
-STATIC
 EFI_STATUS
 CoreAllocateSpaceCheckEntry (
   IN UINTN                Operation,
@@ -849,7 +834,6 @@ CoreAllocateSpaceCheckEntry (
   @retval EFI_SUCCESS            Space successfully allocated.
 
 **/
-STATIC
 EFI_STATUS
 CoreAllocateSpace (
   IN     UINTN                  Operation,
@@ -1096,7 +1080,6 @@ Done:
   @retval EFI_SUCCESS            Successfully add a segment of memory space.
 
 **/
-STATIC
 EFI_STATUS
 CoreInternalAddMemorySpace (
   IN EFI_GCD_MEMORY_TYPE   GcdMemoryType,
@@ -1283,7 +1266,6 @@ CoreRemoveMemorySpace (
   @param  Entry                  According to this entry
 
 **/
-STATIC
 VOID
 BuildMemoryDescriptor (
   IN OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Descriptor,
@@ -1558,7 +1540,6 @@ CoreRemoveIoSpace (
   @param  Entry                  According to this entry
 
 **/
-STATIC
 VOID
 BuildIoDescriptor (
   IN EFI_GCD_IO_SPACE_DESCRIPTOR  *Descriptor,
@@ -1701,7 +1682,6 @@ Done:
   @return The capabilities mask for an EFI Memory Descriptor.
 
 **/
-STATIC
 UINT64
 CoreConvertResourceDescriptorHobAttributesToCapabilities (
   EFI_GCD_MEMORY_TYPE  GcdMemoryType,
