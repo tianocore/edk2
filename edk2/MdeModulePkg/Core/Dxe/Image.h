@@ -1,8 +1,7 @@
-/** @file 
-  
+/** @file
   Data structure and functions to load and unload PeImage.
-  
-Copyright (c) 2006 - 2008, Intel Corporation
+
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -122,8 +121,7 @@ CoreOpenImageFile (
   OUT EFI_HANDLE                    *DeviceHandle,
   IN IMAGE_FILE_HANDLE              *ImageFileHandle,
   OUT UINT32                        *AuthenticationStatus
-  )
-;
+  );
 
 
 
@@ -144,12 +142,11 @@ CoreOpenImageFile (
 EFI_STATUS
 EFIAPI
 CoreReadImageFile (
-  IN     VOID     *UserHandle,
-  IN     UINTN    Offset,
-  IN OUT UINTN    *ReadSize,
-  OUT     VOID    *Buffer
-  )
-;
+  IN     VOID    *UserHandle,
+  IN     UINTN   Offset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  );
 
 
 /**
@@ -162,8 +159,7 @@ VOID
 EFIAPI
 CoreCloseImageFile (
   IN IMAGE_FILE_HANDLE *ImageFileHandle
-  )
-;
+  );
 
 //
 // Image processing worker functions
@@ -185,11 +181,10 @@ CoreCloseImageFile (
 EFI_STATUS
 CoreDevicePathToInterface (
   IN EFI_GUID                     *Protocol,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL **FilePath,
+  IN EFI_DEVICE_PATH_PROTOCOL     **FilePath,
   OUT VOID                        **Interface,
   OUT EFI_HANDLE                  *Handle
-  )
-;
+  );
 
 
 /**
@@ -215,14 +210,13 @@ CoreDevicePathToInterface (
 **/
 EFI_STATUS
 CoreLoadPeImage (
-  IN  BOOLEAN                    BootPolicy,
-  IN  VOID                       *Pe32Handle,
-  IN  LOADED_IMAGE_PRIVATE_DATA  *Image,
-  IN  EFI_PHYSICAL_ADDRESS       DstBuffer   OPTIONAL,
+  IN BOOLEAN                     BootPolicy,  
+  IN VOID                        *Pe32Handle,
+  IN LOADED_IMAGE_PRIVATE_DATA   *Image,
+  IN EFI_PHYSICAL_ADDRESS        DstBuffer    OPTIONAL,
   OUT EFI_PHYSICAL_ADDRESS       *EntryPoint  OPTIONAL,
   IN  UINT32                     Attribute
-  )
-;
+  );
 
 
 /**
@@ -236,8 +230,7 @@ CoreLoadPeImage (
 LOADED_IMAGE_PRIVATE_DATA *
 CoreLoadedImageInfo (
   IN EFI_HANDLE  ImageHandle
-  )
-;
+  );
 
 
 /**
@@ -251,8 +244,7 @@ VOID
 CoreUnloadAndCloseImage (
   IN LOADED_IMAGE_PRIVATE_DATA  *Image,
   IN BOOLEAN                    FreePage
-  )
-;
+  );
 
 
 //
@@ -292,7 +284,7 @@ CoreUnloadAndCloseImage (
 EFI_STATUS
 EFIAPI
 CoreLoadImageEx (
-  IN EFI_PE32_IMAGE_PROTOCOL           *This,
+  IN  EFI_PE32_IMAGE_PROTOCOL          *This,
   IN  EFI_HANDLE                       ParentImageHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL         *FilePath,
   IN  VOID                             *SourceBuffer       OPTIONAL,
@@ -302,8 +294,7 @@ CoreLoadImageEx (
   OUT EFI_HANDLE                       *ImageHandle,
   OUT EFI_PHYSICAL_ADDRESS             *EntryPoint         OPTIONAL,
   IN  UINT32                           Attribute
-  )
-;
+  );
 
 
 /**
@@ -320,8 +311,7 @@ CoreLoadImageEx (
 EFI_STATUS
 EFIAPI
 CoreUnloadImageEx (
-  IN EFI_PE32_IMAGE_PROTOCOL            *This,
+  IN EFI_PE32_IMAGE_PROTOCOL  *This,
   IN EFI_HANDLE                         ImageHandle
-  )
-;
+  );
 #endif

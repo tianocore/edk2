@@ -1,8 +1,7 @@
-/** @file 
-
+/** @file
   Core Timer Services
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,7 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return The current system time
 
 **/
-STATIC
 UINT64
 CoreCurrentSystemTime (
   VOID
@@ -39,12 +37,11 @@ CoreCurrentSystemTime (
   @param  Context                Not used
 
 **/
-STATIC
 VOID
 EFIAPI
 CoreCheckTimers (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
+  IN EFI_EVENT            CheckEvent,
+  IN VOID                 *Context
   );
 
 /**
@@ -54,10 +51,9 @@ CoreCheckTimers (
                                  to be installed
 
 **/
-STATIC
 VOID
 CoreInsertEventTimer (
-  IN IEVENT       *Event
+  IN IEVENT   *Event
   );
 
 //
@@ -104,7 +100,6 @@ CoreInitializeTimer (
   @return The current system time
 
 **/
-STATIC
 UINT64
 CoreCurrentSystemTime (
   VOID
@@ -171,7 +166,6 @@ CoreTimerTick (
   @param  Context                Not used
 
 **/
-STATIC
 VOID
 EFIAPI
 CoreCheckTimers (
@@ -250,7 +244,6 @@ CoreCheckTimers (
                                  to be installed
 
 **/
-STATIC
 VOID
 CoreInsertEventTimer (
   IN IEVENT   *Event

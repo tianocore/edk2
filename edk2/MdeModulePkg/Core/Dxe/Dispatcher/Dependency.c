@@ -1,19 +1,18 @@
 /** @file
-
   DXE Dispatcher Dependency Evaluator
 
   This routine evaluates a dependency expression (DEPENDENCY_EXPRESSION) to determine
   if a driver can be scheduled for execution.  The criteria for
   schedulability is that the dependency expression is satisfied.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -39,7 +38,6 @@ BOOLEAN *mDepexEvaluationStackPointer = NULL;
                                 stack.
 
 **/
-STATIC
 EFI_STATUS
 GrowDepexStack (
   VOID
@@ -96,7 +94,6 @@ GrowDepexStack (
                                 stack.
 
 **/
-STATIC
 EFI_STATUS
 PushBool (
   IN BOOLEAN  Value
@@ -137,7 +134,6 @@ PushBool (
   @retval EFI_ACCESS_DENIED     The pop operation underflowed the stack
 
 **/
-STATIC
 EFI_STATUS 
 PopBool (
   OUT BOOLEAN  *Value

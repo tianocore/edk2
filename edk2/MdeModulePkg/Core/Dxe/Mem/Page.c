@@ -1,15 +1,14 @@
 /** @file
-
   UEFI Memory page management functions.
 
-Copyright (c) 2007 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2007 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -95,8 +94,7 @@ EFI_MEMORY_TYPE_INFORMATION gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
   Find untested but initialized memory regions in GCD map and convert them to be DXE allocatable.
 
 **/
-STATIC
-VOID 
+VOID
 PromoteMemoryResource (
   VOID
   );
@@ -115,7 +113,6 @@ PromoteMemoryResource (
   @return None.  The range is added to the memory map
 
 **/
-STATIC
 VOID
 CoreAddRange (
   IN EFI_MEMORY_TYPE          Type,
@@ -129,7 +126,6 @@ CoreAddRange (
   temporary descriptor stack to heap.
 
 **/
-STATIC
 VOID
 CoreFreeMemoryMapStack (
   VOID
@@ -151,7 +147,6 @@ CoreFreeMemoryMapStack (
                                  specified type.
 
 **/
-STATIC
 EFI_STATUS
 CoreConvertPages (
   IN UINT64           Start,
@@ -165,7 +160,6 @@ CoreConvertPages (
   @param  Entry                  The entry to remove
 
 **/
-STATIC
 VOID
 RemoveMemoryMapEntry (
   MEMORY_MAP      *Entry
@@ -184,7 +178,6 @@ RemoveMemoryMapEntry (
   @return The Memory map descriptor dequed from the mFreeMemoryMapEntryList
 
 **/
-STATIC
 MEMORY_MAP *
 AllocateMemoryMapEntry (
   VOID
@@ -222,7 +215,6 @@ CoreReleaseMemoryLock (
   Find untested but initialized memory regions in GCD map and convert them to be DXE allocatable.
 
 **/
-STATIC
 VOID
 PromoteMemoryResource (
   VOID
@@ -449,7 +441,6 @@ CoreAddMemoryDescriptor (
   @return None.  The range is added to the memory map
 
 **/
-STATIC
 VOID
 CoreAddRange (
   IN EFI_MEMORY_TYPE          Type,
@@ -542,7 +533,6 @@ CoreAddRange (
   temporary descriptor stack to heap.
 
 **/
-STATIC
 VOID
 CoreFreeMemoryMapStack (
   VOID
@@ -621,7 +611,6 @@ CoreFreeMemoryMapStack (
   @param  Entry                  The entry to remove
 
 **/
-STATIC
 VOID
 RemoveMemoryMapEntry (
   MEMORY_MAP      *Entry
@@ -652,7 +641,6 @@ RemoveMemoryMapEntry (
   @return The Memory map descriptor dequed from the mFreeMemoryMapEntryList
 
 **/
-STATIC
 MEMORY_MAP *
 AllocateMemoryMapEntry (
   VOID
@@ -705,7 +693,6 @@ AllocateMemoryMapEntry (
                                  specified type.
 
 **/
-STATIC
 EFI_STATUS
 CoreConvertPages (
   IN UINT64           Start,
@@ -898,7 +885,6 @@ CoreConvertPages (
   @return The base address of the range, or 0 if the range was not found
 
 **/
-STATIC
 UINT64
 CoreFindFreePagesI (
   IN UINT64           MaxAddress,
@@ -1019,7 +1005,6 @@ CoreFindFreePagesI (
   @return The base address of the range, or 0 if the range was not found.
 
 **/
-STATIC
 UINT64
 FindFreePages (
     IN UINT64           MaxAddress,

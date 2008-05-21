@@ -1,8 +1,7 @@
-/** @file 
-
+/** @file
   UEFI Event support functions implemented in this file.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -67,7 +66,6 @@ UINT32 mEventTable[] = {
   Enter critical section by acquiring the lock on gEventQueueLock.
 
 **/
-STATIC
 VOID
 CoreAcquireEventLock (
   VOID
@@ -81,7 +79,6 @@ CoreAcquireEventLock (
   Exit critical section by releasing the lock on gEventQueueLock.
 
 **/
-STATIC
 VOID
 CoreReleaseEventLock (
   VOID
@@ -180,7 +177,6 @@ CoreDispatchEventNotifies (
   @param  Event                  The Event to notify
 
 **/
-STATIC
 VOID
 CoreNotifyEvent (
   IN  IEVENT      *Event

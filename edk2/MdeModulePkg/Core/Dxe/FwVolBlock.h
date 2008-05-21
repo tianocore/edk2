@@ -1,16 +1,15 @@
-/** @file 
-
+/** @file
   Firmware Volume Block protocol functions.  
-  Consumes FV hobs and creates appropriate block protocols. 
-  
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Consumes FV hobs and creates appropriate block protocols.
+
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -62,10 +61,9 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 FwVolBlockDriverInit (
-  IN EFI_HANDLE               ImageHandle,
-  IN EFI_SYSTEM_TABLE         *SystemTable
-  )
-;
+  IN EFI_HANDLE                 ImageHandle,
+  IN EFI_SYSTEM_TABLE           *SystemTable
+  );
 
 
 
@@ -83,8 +81,7 @@ EFIAPI
 FwVolBlockGetAttributes (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   OUT       EFI_FVB_ATTRIBUTES                  *Attributes
-  )
-;
+  );
 
 
 
@@ -106,8 +103,7 @@ EFIAPI
 FwVolBlockSetAttributes (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   IN CONST  EFI_FVB_ATTRIBUTES                  *Attributes
-  )
-;
+  );
 
 
 
@@ -139,8 +135,7 @@ EFIAPI
 FwVolBlockEraseBlock (
   IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
   ...
-  )
-;
+  );
 
 
 
@@ -172,8 +167,7 @@ FwVolBlockReadBlock (
   IN CONST  UINTN                                Offset,
   IN OUT    UINTN                                *NumBytes,
   IN OUT    UINT8                                *Buffer
-  )
-;
+  );
 
   
 
@@ -204,13 +198,12 @@ FwVolBlockReadBlock (
 EFI_STATUS
 EFIAPI
 FwVolBlockWriteBlock (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
-  IN EFI_LBA                              Lba,
-  IN UINTN                                Offset,
-  IN OUT UINTN                            *NumBytes,
-  IN UINT8                                *Buffer
-  )
-;
+  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL   *This,
+  IN     EFI_LBA                              Lba,
+  IN     UINTN                                Offset,
+  IN OUT UINTN                                *NumBytes,
+  IN     UINT8                                *Buffer
+  );
 
     
 
@@ -227,10 +220,9 @@ FwVolBlockWriteBlock (
 EFI_STATUS
 EFIAPI
 FwVolBlockGetPhysicalAddress (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
-  OUT       EFI_PHYSICAL_ADDRESS                  *Address
-  )
-;
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  OUT       EFI_PHYSICAL_ADDRESS                *Address
+  );
 
 
 
@@ -256,10 +248,9 @@ EFIAPI
 FwVolBlockGetBlockSize (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   IN CONST  EFI_LBA                             Lba,
-  OUT       UINTN                               *BlockSize,
-  OUT       UINTN                               *NumberOfBlocks
-  )
-;
+  IN OUT    UINTN                               *BlockSize,
+  IN OUT    UINTN                               *NumberOfBlocks
+  );
 
 /**
   This routine is the driver initialization entry point.  It initializes the
@@ -274,11 +265,11 @@ FwVolBlockGetBlockSize (
 
 **/
 EFI_STATUS
+EFIAPI
 FwVolBlockDriverInit (
-  IN EFI_HANDLE               ImageHandle,
-  IN EFI_SYSTEM_TABLE         *SystemTable
-  )
-;
+  IN EFI_HANDLE                 ImageHandle,
+  IN EFI_SYSTEM_TABLE           *SystemTable
+  );
 
 
 /**
@@ -304,7 +295,6 @@ ProduceFVBProtocolOnBuffer (
   IN UINT64                 Length,
   IN EFI_HANDLE             ParentHandle,
   OUT EFI_HANDLE            *FvProtocol  OPTIONAL
-  )
-;
+  );
 
 #endif

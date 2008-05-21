@@ -1,15 +1,14 @@
-/** @file 
-
+/** @file
   UEFI handle & protocol handling.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -22,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // gProtocolDatabaseLock - Lock to protect the mProtocolDatabase
 // gHandleDatabaseKey    -  The Key to show that the handle has been created/modified
 //
-static LIST_ENTRY      mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
+STATIC LIST_ENTRY      mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
 LIST_ENTRY             gHandleList           = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
 EFI_LOCK               gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 UINT64                 gHandleDatabaseKey    = 0;
@@ -220,7 +219,6 @@ CoreFindProtocolInterface (
   @return EFI_NOT_FOUND if the event was not found in the protocl database.
 
 **/
-STATIC
 EFI_STATUS
 CoreUnregisterProtocolNotifyEvent (
   IN EFI_EVENT      Event
@@ -878,7 +876,6 @@ CoreUninstallMultipleProtocolInterfaces (
   @return The requested protocol interface for the handle
 
 **/
-STATIC
 PROTOCOL_INTERFACE  *
 CoreGetProtocolInterface (
   IN  EFI_HANDLE                UserHandle,

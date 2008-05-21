@@ -26,15 +26,15 @@
      
   3) A support protocol is not found, and the data is not available to be read
      without it.  This results in EFI_PROTOCOL_ERROR.
-     
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -115,13 +115,12 @@ typedef struct {
   @retval FALSE                  The child doesn't match
 
 **/
-STATIC
 BOOLEAN
 ChildIsType (
-  IN CORE_SECTION_STREAM_NODE                 *Stream,
-  IN CORE_SECTION_CHILD_NODE                  *Child,
-  IN EFI_SECTION_TYPE                         SearchType,
-  IN EFI_GUID                                 *SectionDefinitionGuid
+  IN CORE_SECTION_STREAM_NODE *Stream,
+  IN CORE_SECTION_CHILD_NODE  *Child,
+  IN EFI_SECTION_TYPE         SearchType,
+  IN EFI_GUID                 *SectionDefinitionGuid
   );
 
 #if 0
@@ -134,19 +133,18 @@ ChildIsType (
                                  identify the relevent encapsulation...
 
 **/
-STATIC
 VOID
 EFIAPI
 NotifyGuidedExtraction (
-  IN  EFI_EVENT                             Event,
-  IN  VOID                                  *RpnContext
+  IN   EFI_EVENT   Event,
+  IN   VOID        *RpnContext
   );
 #endif
 
 #if 0
 /**
   Worker function.  Constructor for RPN event if needed to keep AuthenticationStatus
-  cache correct when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears.
+  cache correct when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears...
 
   @param  ParentStream           Indicates the parent of the ecnapsulation 
                                  section (child) 
@@ -154,11 +152,10 @@ NotifyGuidedExtraction (
                                  encapsulation section.
 
 **/
-STATIC
 VOID
 CreateGuidedExtractionRpnEvent (
-  IN CORE_SECTION_STREAM_NODE                 *ParentStream,
-  IN CORE_SECTION_CHILD_NODE                  *ChildNode
+  IN CORE_SECTION_STREAM_NODE       *ParentStream,
+  IN CORE_SECTION_CHILD_NODE        *ChildNode
   );
 #endif
 
@@ -174,11 +171,10 @@ CreateGuidedExtractionRpnEvent (
                                  database.
 
 **/
-STATIC
 EFI_STATUS
 FindStreamNode (
-  IN  UINTN                                   SearchHandle,
-  OUT CORE_SECTION_STREAM_NODE                **FoundStream
+  IN  UINTN                                     SearchHandle,
+  OUT CORE_SECTION_STREAM_NODE                  **FoundStream
   );
   
 /**
@@ -207,16 +203,15 @@ FindStreamNode (
                                  does not exist
 
 **/
-STATIC
 EFI_STATUS
 FindChildNode (
-  IN     CORE_SECTION_STREAM_NODE             *SourceStream,
-  IN     EFI_SECTION_TYPE                     SearchType,
-  IN     UINTN                                *SectionInstance,
-  IN     EFI_GUID                             *SectionDefinitionGuid,
-  OUT    CORE_SECTION_CHILD_NODE              **FoundChild,
-  OUT    CORE_SECTION_STREAM_NODE             **FoundStream,
-  OUT    UINT32                               *AuthenticationStatus
+  IN     CORE_SECTION_STREAM_NODE                   *SourceStream,
+  IN     EFI_SECTION_TYPE                           SearchType,
+  IN OUT UINTN                                      *SectionInstance,
+  IN     EFI_GUID                                   *SectionDefinitionGuid,
+  OUT    CORE_SECTION_CHILD_NODE                    **FoundChild,
+  OUT    CORE_SECTION_STREAM_NODE                   **FoundStream,
+  OUT    UINT32                                     *AuthenticationStatus
   );
   
 /**
@@ -240,12 +235,11 @@ FindChildNode (
                                  returned by OpenSectionStreamEx.
 
 **/
-STATIC
 EFI_STATUS
 CreateChildNode (
-  IN     CORE_SECTION_STREAM_NODE             *Stream,
-  IN     UINT32                               ChildOffset,
-  OUT    CORE_SECTION_CHILD_NODE              **ChildNode
+  IN     CORE_SECTION_STREAM_NODE              *Stream,
+  IN     UINT32                                ChildOffset,
+     OUT CORE_SECTION_CHILD_NODE               **ChildNode
   );
   
 /**
@@ -254,10 +248,9 @@ CreateChildNode (
   @param  ChildNode              Indicates the node to destroy
 
 **/
-STATIC
 VOID
 FreeChildNode (
-  IN  CORE_SECTION_CHILD_NODE                 *ChildNode
+  IN  CORE_SECTION_CHILD_NODE                   *ChildNode
   );
   
 /**
@@ -293,14 +286,13 @@ FreeChildNode (
   @retval EFI_OUT_OF_RESOURCES   memory allocation failed.
 
 **/
-STATIC
 EFI_STATUS
 OpenSectionStreamEx (
-  IN     UINTN                                SectionStreamLength,
-  IN     VOID                                 *SectionStream,
-  IN     BOOLEAN                              AllocateBuffer,
-  IN     UINT32                               AuthenticationStatus,   
-     OUT UINTN                                *SectionStreamHandle
+  IN     UINTN                                     SectionStreamLength,
+  IN     VOID                                      *SectionStream,
+  IN     BOOLEAN                                   AllocateBuffer,
+  IN     UINT32                                    AuthenticationStatus,   
+     OUT UINTN                                     *SectionStreamHandle
   );
   
 /**
@@ -312,11 +304,10 @@ OpenSectionStreamEx (
   @return A boolean value indicating the validness of the section stream.
 
 **/
-STATIC
 BOOLEAN
 IsValidSectionStream (
-  IN  VOID                                    *SectionStream,
-  IN  UINTN                                   SectionStreamLength
+  IN  VOID              *SectionStream,
+  IN  UINTN             SectionStreamLength
   );
 
 /**
@@ -406,7 +397,7 @@ IsValidSectionStream (
 EFI_STATUS
 EFIAPI
 CustomGuidedSectionExtract (
-  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *This,
+  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *This,
   IN CONST  VOID                                   *InputSection,
   OUT       VOID                                   **OutputBuffer,
   OUT       UINTN                                  *OutputSize,
@@ -729,7 +720,6 @@ CloseSectionStream (
   @retval FALSE                  The child doesn't match
 
 **/
-STATIC
 BOOLEAN
 ChildIsType (
   IN CORE_SECTION_STREAM_NODE *Stream,
@@ -781,7 +771,6 @@ ChildIsType (
                                  does not exist
 
 **/
-STATIC
 EFI_STATUS
 FindChildNode (
   IN     CORE_SECTION_STREAM_NODE                   *SourceStream,
@@ -933,7 +922,6 @@ FindChildNode (
                                  returned by OpenSectionStreamEx.
 
 **/
-STATIC
 EFI_STATUS
 CreateChildNode (
   IN     CORE_SECTION_STREAM_NODE              *Stream,
@@ -1176,7 +1164,6 @@ CreateChildNode (
                                  encapsulation section.
 
 **/
-STATIC
 VOID
 CreateGuidedExtractionRpnEvent (
   IN CORE_SECTION_STREAM_NODE       *ParentStream,
@@ -1216,7 +1203,6 @@ CreateGuidedExtractionRpnEvent (
                                  identify the relevent encapsulation...
 
 **/
-STATIC
 VOID
 EFIAPI
 NotifyGuidedExtraction (
@@ -1287,7 +1273,6 @@ NotifyGuidedExtraction (
   @param  ChildNode              Indicates the node to destroy
 
 **/
-STATIC
 VOID
 FreeChildNode (
   IN  CORE_SECTION_CHILD_NODE                   *ChildNode
@@ -1347,7 +1332,6 @@ FreeChildNode (
   @retval EFI_OUT_OF_RESOURCES   memory allocation failed.
 
 **/
-STATIC
 EFI_STATUS
 OpenSectionStreamEx (
   IN     UINTN                                     SectionStreamLength,
@@ -1433,7 +1417,6 @@ OpenSectionStreamEx (
                                  database.
 
 **/
-STATIC
 EFI_STATUS
 FindStreamNode (
   IN  UINTN                                     SearchHandle,
@@ -1470,7 +1453,6 @@ FindStreamNode (
   @return A boolean value indicating the validness of the section stream.
 
 **/
-STATIC
 BOOLEAN
 IsValidSectionStream (
   IN  VOID              *SectionStream,
