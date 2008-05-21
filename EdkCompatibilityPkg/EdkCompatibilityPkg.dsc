@@ -40,6 +40,29 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
 [SkuIds]
   0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
 
+[LibraryClasses.common]
+  BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
+  UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  HiiLib|MdePkg/Library/HiiLib/HiiLib.inf
+  ExtendedHiiLib|MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
+  IfrSupportLib|MdePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  ExtendedIfrSupportLib|MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
+  UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
+  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  PalCallLib|MdePkg/Library/BasePalCallLibNull/BasePalCallLibNull.inf
+  UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
+  PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
+  PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+
 [BuildOptions]
   GCC:*_*_IA32_CC_FLAGS     = -DEFI32 $(GCC_MACRO)
   GCC:*_*_IA32_ASM_FLAGS    = -DEFI32
@@ -188,6 +211,19 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/RtPort80StatusCode/RtPort80StatusCode.inf
   EdkCompatibilityPkg/Sample/Platform/Nt32/Ppi/EdkNt32PpiLib.inf
   EdkCompatibilityPkg/Sample/Platform/Nt32/Protocol/EdkNt32ProtocolLib.inf
+
+  #
+  # Modules in Compatibility Directory
+  #
+  EdkCompatibilityPkg/Compatibility/FrameworkHiiToUefiHiiThunk/FrameworkHiiToUefiHiiThunk.inf
+  EdkCompatibilityPkg/Compatibility/FvToFv2Thunk/FvToFv2Thunk.inf
+  EdkCompatibilityPkg/Compatibility/Fv2ToFvThunk/Fv2ToFvThunk.inf
+  EdkCompatibilityPkg/Compatibility/PciCfg2ToPciCfgThunk/PciCfg2ToPciCfgThunk.inf
+  EdkCompatibilityPkg/Compatibility/PciCfgToPciCfg2Thunk/PciCfgToPciCfg2Thunk.inf
+  EdkCompatibilityPkg/Compatibility/ReadOnlyVariable2ToReadOnlyVariableThunk/ReadOnlyVariable2ToReadOnlyVariableThunk.inf
+  EdkCompatibilityPkg/Compatibility/ReadOnlyVariableToReadOnlyVariable2Thunk/ReadOnlyVariableToReadOnlyVariable2Thunk.inf
+  EdkCompatibilityPkg/Compatibility/Uc2ToUcThunk/Uc2ToUcThunk.inf
+  EdkCompatibilityPkg/Compatibility/UcToUc2Thunk/UcToUc2Thunk.inf
 
 [Components.IA32,Components.X64]
   EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib.inf
