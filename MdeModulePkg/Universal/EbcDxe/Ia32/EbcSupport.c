@@ -2,7 +2,7 @@
   This module contains EBC support routines that are customized based on
   the target processor.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -159,7 +159,6 @@ Action:
   @return The value returned by the EBC application we're going to run.
 
 **/
-STATIC
 UINT64
 EbcInterpret (
   IN OUT UINTN      Arg1,
@@ -308,7 +307,6 @@ EbcInterpret (
   @return The value returned by the EBC application we're going to run.
 
 **/
-STATIC
 UINT64
 ExecuteEbcImageEntryPoint (
   IN EFI_HANDLE           ImageHandle,

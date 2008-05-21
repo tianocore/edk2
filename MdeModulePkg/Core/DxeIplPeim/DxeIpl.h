@@ -1,6 +1,6 @@
 /** @file
   Master header file for DxeIpl PEIM. All source files in this module should
-  include this file for common defininitions. 
+  include this file for common defininitions.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -76,8 +76,7 @@ PeiLoadFile (
   OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
   OUT UINT64                                    *ImageSize,
   OUT EFI_PHYSICAL_ADDRESS                      *EntryPoint
-  )
-;
+  );
 
 
 
@@ -93,8 +92,7 @@ PeiLoadFile (
 EFI_STATUS
 DxeIplFindDxeCore (
   OUT EFI_PEI_FILE_HANDLE   *FileHandle
-  )
-;
+  );
 
 
 
@@ -111,8 +109,7 @@ DxeIplFindDxeCore (
 EFI_STATUS
 GetImageReadFunction (
   IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  )
-;
+  );
 
 
 
@@ -190,8 +187,7 @@ EFIAPI
 PeimInitializeDxeIpl (
   IN EFI_PEI_FILE_HANDLE       FfsHandle,
   IN EFI_PEI_SERVICES          **PeiServices
-  )
-;
+  );
 
 
 #endif

@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 processed. OutputBuffer OutputBuffer is
                                 allocated from PEI permanent memory and contains
                                 the new section stream.
-  @param CompressionSection     A pointer to the input buffer, which contains
+  @param InputSection           A pointer to the input buffer, which contains
                                 the input section to be processed.
   @param OutputBuffer           A pointer to a caller-allocated buffer, whose
                                 size is specified by the contents of OutputSize.
@@ -75,7 +75,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 CustomGuidedSectionExtract (
   IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This,
-  IN CONST  VOID                                  *CompressionSection,
+  IN CONST  VOID                                  *InputSection,
   OUT       VOID                                  **OutputBuffer,
   OUT       UINTN                                 *OutputSize,
   OUT       UINT32                                *AuthenticationStatus
@@ -109,7 +109,7 @@ Decompress (
   IN CONST  EFI_COMPRESSION_SECTION *CompressionSection,
   OUT       VOID                    **OutputBuffer,
   OUT       UINTN                   *OutputSize
-);
+ );
 
 
 BOOLEAN gInMemory = FALSE;

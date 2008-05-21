@@ -116,8 +116,7 @@ typedef union {
 UINTN
 CreateIdentityMappingPageTables (
   VOID
-  )
-;
+  );
 
 
 
