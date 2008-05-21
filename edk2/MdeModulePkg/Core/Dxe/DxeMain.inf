@@ -30,10 +30,10 @@
 
 [Sources.common]
   Library.h
-  imem.h
+  Imem.h
   Image.h
-  hand.h
-  gcd.h
+  Hand.h
+  Gcd.h
   FwVolDriver.h
   FwVolBlock.h
   Exec.h
@@ -49,23 +49,23 @@
   Library/Library.c
   Hand/DriverSupport.c
   Hand/Notify.c
-  Hand/locate.c
-  Hand/handle.c
-  Gcd/gcd.c
-  Mem/pool.c
+  Hand/Locate.c
+  Hand/Handle.c
+  Gcd/Gcd.c
+  Mem/Pool.c
   Mem/Page.c
-  Mem/memdata.c
+  Mem/MemData.c
   FwVolBlock/FwVolBlock.c
   FwVol/FwVolWrite.c
   FwVol/FwVolRead.c
   FwVol/FwVolAttrib.c
   FwVol/Ffs.c
   FwVol/FwVol.c
-  Event/tpl.c
-  Event/timer.c
-  Event/event.c
-  Event/execdata.c
-  Dispatcher/dependency.c
+  Event/Tpl.c
+  Event/Timer.c
+  Event/Event.c
+  Event/ExecData.c
+  Dispatcher/Dependency.c
   Dispatcher/Dispatcher.c
   DxeMain/DxeProtocolNotify.c
   DxeMain/DxeMain.c
