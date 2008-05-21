@@ -43,6 +43,7 @@ EFI_FORWARD_DECLARATION (EFI_PEI_SERVICES);
 #include EFI_PPI_DEFINITION (CpuIo)
 #include EFI_PPI_DEFINITION (PciCfg)
 #include EFI_PPI_DEFINITION (PciCfg2)
+#include EFI_PPI_DEFINITION (EcpPciCfg)
 
 //
 // PEI Specification Revision information
@@ -546,7 +547,11 @@ struct _EFI_PEI_SERVICES {
 #if (PI_SPECIFICATION_VERSION < 0x00010000)
 
   PEI_CPU_IO_PPI                 *CpuIo;
+#if defined (SUPPORT_DEPRECATED_PCI_CFG_PPI)
   PEI_PCI_CFG_PPI                *PciCfg;
+#else
+  ECP_PEI_PCI_CFG_PPI            *PciCfg;
+#endif
 #else
   EFI_PEI_CPU_IO_PPI             *CpuIo;
   EFI_PEI_PCI_CFG2_PPI           *PciCfg;

@@ -100,3 +100,6 @@ COMPONENT_TYPE=   LIBRARY
     FirmwareVolume/FirmwareVolume.c
     GuidedSectionExtraction/GuidedSectionExtraction.h
     GuidedSectionExtraction/GuidedSectionExtraction.c
+    EcpPciCfg/EcpPciCfg.h
+    EcpPciCfg/EcpPciCfg.c
+    
