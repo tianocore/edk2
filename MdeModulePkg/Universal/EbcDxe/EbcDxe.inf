@@ -45,9 +45,9 @@
   Ia32/EbcLowLevel.asm
 
 [Sources.X64]
-  x64/EbcSupport.c
-  x64/EbcLowLevel.S
-  x64/EbcLowLevel.asm
+  X64/EbcSupport.c
+  X64/EbcLowLevel.S
+  X64/EbcLowLevel.asm
 
 [Sources.IPF]
   Ipf/EbcSupport.h
