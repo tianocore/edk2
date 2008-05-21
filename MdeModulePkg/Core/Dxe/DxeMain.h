@@ -83,11 +83,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Library.h"
 #include "FwVolBlock.h"
 #include "FwVolDriver.h"
-#include "gcd.h"
-#include "imem.h"
+#include "Gcd.h"
+#include "Imem.h"
 #include "Image.h"
 #include "Exec.h"
-#include "hand.h"
+#include "Hand.h"
 
 
 //
