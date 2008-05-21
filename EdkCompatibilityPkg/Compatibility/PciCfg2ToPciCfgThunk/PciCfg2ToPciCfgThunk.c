@@ -1,20 +1,54 @@
 /** @file
-Module produces PciCfgPpi2 on top of PciCfgPpi. It also updates the 
-PciCfg2Ppi pointer in the EFI_PEI_SERVICES upon a installation of
-EcpPeiPciCfgPpi. EcpPeiPciCfgPpi is installed in a framework module which
-produce PciCfgPpi originally. This framework module is updated based on the 
-following rule:
-Search pattern:
-	   PeiServices->PciCfg = <*>;
-Replace pattern:
-        {
-          static EFI_PEI_PPI_DESCRIPTOR gEcpPeiPciCfgPpiList = {
-            (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-            &gEcpPeiPciCfgPpiGuid,
-            <*>
-          };
-          (**PeiServices).InstallPpi (PeiServices, gEcpPeiPciCfgPpiList);
-        }
+ Module produces PciCfgPpi2 on top of PciCfgPpi. It also updates the 
+ PciCfg2Ppi pointer in the EFI_PEI_SERVICES upon a installation of
+ EcpPeiPciCfgPpi. 
+
+ EcpPeiPciCfgPpi is installed by a framework module which
+ produce PciCfgPpi originally. Such framework module is updated based on the 
+ following rule to install EcpPeiPciCfgPpi instead of updating the PciCfg pointer
+ in the Framework PeiServicesTable: 
+ 
+ Search pattern:
+ 	   PeiServices->PciCfg = <*>;
+ Replace pattern:
+         {
+           static EFI_PEI_PPI_DESCRIPTOR gEcpPeiPciCfgPpiList = {
+             (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+             &gEcpPeiPciCfgPpiGuid,
+             <*>
+           };
+           (**PeiServices).InstallPpi (PeiServices, gEcpPeiPciCfgPpiList);
+         }
+ 
+ In addition, the PeiServicesTable definition in PeiApi.h is updated to
+ 
+ struct _EFI_PEI_SERVICES {
+   EFI_TABLE_HEADER              Hdr;
+   ...
+ 
+   //
+   // Pointer to PPI interface
+   //
+ if (PI_SPECIFICATION_VERSION < 0x00010000)
+ 
+   PEI_CPU_IO_PPI                 *CpuIo;
+   ECP_PEI_PCI_CFG_PPI        *PciCfg;  //Changed.
+ else
+ ...
+ endif
+ 
+ };
+ 
+ This change enable the detection of code segment which invokes PeiServices->PciCfg->Modify.
+ Such code causes a build break as ECP_PEI_PCI_CFG_PPI does not has "Modify" field. 
+ This should be updated to a call to PeiLibPciCfgModify as shown below:
+ 
+ Search pattern:
+ 		*->Modify(<*>); 
+ Replace pattern:
+ 		PeiLibPciCfgModify(<*>);
+
+
 
 PIWG's PI specification replaces Inte's EFI Specification 1.10.
 EFI_PEI_PCI_CFG_PPI defined in Inte's EFI Specification 1.10 is replaced by
