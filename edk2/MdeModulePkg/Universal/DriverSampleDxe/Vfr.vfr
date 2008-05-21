@@ -309,7 +309,7 @@ formset
             minimum = 0,
             maximum = 0xf0,
             step    = 0,
-            default = 21,
+            default = 20,
 
             inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
               ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99
