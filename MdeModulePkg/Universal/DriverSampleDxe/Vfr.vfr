@@ -44,15 +44,6 @@
 #define EFI_VARIABLE_READ_ONLY          0x00000008
 
 //
-// NV data structure definition
-//
-typedef struct {
-  UINT8         Field8;
-  UINT16        Field16;
-  UINT8         OrderedList[3];
-} MY_DATA2;
-
-//
 // Labels definition
 //
 #define LABEL_1_VALUE               0x01
@@ -324,6 +315,16 @@ formset
     numeric varid   = MyEfiVar,                           // Reference of EFI variable storage
             prompt  = STRING_TOKEN(STR_TALL_HEX_PROMPT),
             help    = STRING_TOKEN(STR_NUMERIC_HELP1),
+            flags   = DISPLAY_UINT_HEX,                   // Display in HEX format (if not specified, default is in decimal format)
+            minimum = 0,
+            maximum = 250,
+            default = 175,
+
+    endnumeric;
+
+    numeric varid   = MyIfrNVData2.Field8,                           // Reference of MyIfrNVData2 storage
+            prompt  = STRING_TOKEN(STR_MYIFRNVDATA2_HEX_PROMPT),
+            help    = STRING_TOKEN(STR_MYIFRNVDATA2_HEX_HELP),
             flags   = DISPLAY_UINT_HEX,                   // Display in HEX format (if not specified, default is in decimal format)
             minimum = 0,
             maximum = 250,
