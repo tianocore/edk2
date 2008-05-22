@@ -139,9 +139,7 @@ FrontPageCallback (
   CHAR8                         *LanguageString;
   CHAR8                         *LangCode;
   CHAR8                         Lang[RFC_3066_ENTRY_SIZE];
-#ifdef LANG_SUPPORT
   CHAR8                         OldLang[ISO_639_2_ENTRY_SIZE];
-#endif
   UINTN                         Index;
   EFI_STATUS                    Status;
 
@@ -190,21 +188,21 @@ FrontPageCallback (
                     Lang
                     );
 
-#ifdef LANG_SUPPORT
-    //
-    // Set UEFI deprecated variable "Lang" for backwards compatibility
-    //
-    Status = ConvertRfc3066LanguageToIso639Language (Lang, OldLang);
-    if (!EFI_ERROR (Status)) {
-      Status = gRT->SetVariable (
-                      L"Lang",
-                      &gEfiGlobalVariableGuid,
-                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      ISO_639_2_ENTRY_SIZE,
-                      OldLang
-                      );
+    if (!FeaturePcdGet (PcdUefiVariableDefaultLangDepricate)) {
+      //
+      // Set UEFI deprecated variable "Lang" for backwards compatibility
+      //
+      Status = ConvertRfc3066LanguageToIso639Language (Lang, OldLang);
+      if (!EFI_ERROR (Status)) {
+        Status = gRT->SetVariable (
+                        L"Lang",
+                        &gEfiGlobalVariableGuid,
+                        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                        ISO_639_2_ENTRY_SIZE,
+                        OldLang
+                        );
+      }
     }
-#endif
 
     FreePool (LanguageString);
     break;
