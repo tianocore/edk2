@@ -43,14 +43,12 @@ InternalAllocatePages (
 {
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  Memory; 
-  EFI_PEI_SERVICES      **PeiServices;
 
   if (Pages == 0) {
     return NULL;
   }
 
-  PeiServices = GetPeiServicesTablePointer ();
-  Status = ((*PeiServices)->AllocatePages) (PeiServices, MemoryType, Pages, &Memory);
+  Status = PeiServicesAllocatePages (MemoryType, Pages, &Memory);
   if (EFI_ERROR (Status)) {
     Memory = 0;
   }
@@ -352,12 +350,9 @@ GlueAllocatePool (
   )
 {
   EFI_STATUS        Status;
-  EFI_PEI_SERVICES  **PeiServices;
   VOID              *Buffer;
   
-  PeiServices = GetPeiServicesTablePointer ();
-
-  Status = ((*PeiServices)->AllocatePool) (PeiServices, AllocationSize, &Buffer);
+  Status = PeiServicesAllocatePool (AllocationSize, &Buffer);
   if (EFI_ERROR (Status)) {
     Buffer = NULL;
   }
