@@ -1828,15 +1828,9 @@ CoreGetIoSpaceMap (
   will be called, and when the Bds() exits the Dispatcher will be called
   again.
 
-  NONE
-
   @retval EFI_ALREADY_STARTED    The DXE Dispatcher is already running 
   @retval EFI_NOT_FOUND          No DXE Drivers were dispatched 
   @retval EFI_SUCCESS            One or more DXE Drivers were dispatched 
-
-**/
-EFI_DXESERVICE
-/**
 
 **/
 EFI_STATUS
@@ -1859,10 +1853,6 @@ CoreDispatcher (
                                  was not set. 
 
 **/
-EFI_DXESERVICE
-/**
-
-**/
 EFI_STATUS
 EFIAPI
 CoreSchedule (
@@ -1881,10 +1871,6 @@ CoreSchedule (
   @retval EFI_SUCCESS            The file was found in the untrusted state, and 
                                  it was promoted  to the trusted state. 
   @retval EFI_NOT_FOUND          The file was not found in the untrusted state. 
-
-**/
-EFI_DXESERVICE
-/**
 
 **/
 EFI_STATUS
