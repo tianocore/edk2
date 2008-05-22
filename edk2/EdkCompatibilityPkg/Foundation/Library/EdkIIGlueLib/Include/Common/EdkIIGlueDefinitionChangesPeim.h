@@ -103,7 +103,6 @@ typedef EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION         EFI_MISC_SMBIOS_STRUCT_ENCA
 // typedef Edk types - EdkII types
 //
 typedef PEI_RECOVERY_MODULE_INTERFACE                EFI_PEI_RECOVERY_MODULE_PPI;
-typedef PEI_CPU_IO_PPI                               EFI_PEI_CPU_IO_PPI;
 typedef PEI_STALL_PPI                                EFI_PEI_STALL_PPI;
 typedef PEI_SMBUS_PPI                                EFI_PEI_SMBUS_PPI;
 typedef PEI_READ_ONLY_VARIABLE_PPI                   EFI_PEI_READ_ONLY_VARIABLE_PPI;
