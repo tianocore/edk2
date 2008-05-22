@@ -59,6 +59,17 @@ typedef struct {
   UINT8   BootOrderLarge;
   UINT8   DynamicCheck;
 } DRIVER_SAMPLE_CONFIGURATION;
+
+//
+// 2nd NV data structure definition
+//
+typedef struct {
+  UINT8         Field8;
+  UINT16        Field16;
+  UINT8         OrderedList[3];
+} MY_DATA2;
+
+
 #pragma pack()
 
 #endif
