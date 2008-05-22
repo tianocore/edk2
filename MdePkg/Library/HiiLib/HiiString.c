@@ -416,6 +416,44 @@ ConvertRfc3066LanguageToIso639Language (
 
 
 /**
+  Convert language code from ISO639-2 to RFC3066.
+
+  LanguageIso639 contain a single ISO639-2 code such as
+  "eng" or "fra".
+
+  The LanguageRfc3066 must be a buffer large enough
+  for RFC_3066_ENTRY_SIZE characters.
+
+  If LanguageIso639 is NULL, then ASSERT.
+  If LanguageRfc3066 is NULL, then ASSERT.
+
+  @param  LanguageIso639         ISO639-2 language code.
+  @param  LanguageRfc3066        RFC3066 language code.
+
+  @retval EFI_SUCCESS            Language code converted.
+  @retval EFI_NOT_FOUND          Language code not found.
+
+**/
+EFI_STATUS
+EFIAPI
+ConvertIso639LanguageToRfc3066Language (
+  IN  CONST CHAR8   *LanguageIso639,
+  OUT CHAR8         *LanguageRfc3066
+  )
+{
+  UINTN Index;
+  
+  for (Index = 0; Iso639ToRfc3066ConversionTable[Index] != 0; Index += 5) {
+    if (CompareMem (LanguageIso639, &Iso639ToRfc3066ConversionTable[Index], 3) == 0) {
+      CopyMem (LanguageRfc3066, &Iso639ToRfc3066ConversionTable[Index + 3], 2);
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
   Convert language code list from RFC3066 to ISO639-2, e.g. "en-US;fr-FR" will
   be converted to "engfra".
 
