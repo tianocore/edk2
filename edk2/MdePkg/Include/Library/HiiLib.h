@@ -409,6 +409,12 @@ HiiLibGetSupportedLanguageNumber (
 /**
   Convert language code from RFC3066 to ISO639-2.
 
+  LanguageRfc3066 contain a single RFC 3066 code such as
+  "en-US" or "fr-FR".
+
+  The LanguageRfc3066 must be a buffer large enough
+  for ISO_639_2_ENTRY_SIZE characters.
+
   If LanguageRfc3066 is NULL, then ASSERT.
   If LanguageIso639 is NULL, then ASSERT.
 
@@ -422,8 +428,35 @@ HiiLibGetSupportedLanguageNumber (
 EFI_STATUS
 EFIAPI
 ConvertRfc3066LanguageToIso639Language (
-  CHAR8   *LanguageRfc3066,
-  CHAR8   *LanguageIso639
+  IN  CHAR8   *LanguageRfc3066,
+  OUT CHAR8   *LanguageIso639
+  )
+;
+
+/**
+  Convert language code from ISO639-2 to RFC3066.
+
+  LanguageIso639 contain a single ISO639-2 code such as
+  "eng" or "fra".
+
+  The LanguageRfc3066 must be a buffer large enough
+  for RFC_3066_ENTRY_SIZE characters.
+
+  If LanguageIso639 is NULL, then ASSERT.
+  If LanguageRfc3066 is NULL, then ASSERT.
+
+  @param  LanguageIso639         ISO639-2 language code.
+  @param  LanguageRfc3066        RFC3066 language code.
+
+  @retval EFI_SUCCESS            Language code converted.
+  @retval EFI_NOT_FOUND          Language code not found.
+
+**/
+EFI_STATUS
+EFIAPI
+ConvertIso639LanguageToRfc3066Language (
+  IN  CONST CHAR8   *LanguageIso639,
+  OUT CHAR8         *LanguageRfc3066
   )
 ;
 
