@@ -38,7 +38,7 @@ Abstract:
 // General Type & API definitions
 //
 
-#include "EfiBind.h"
+#include <EfiBind.h>
 #include "EfiTypes.h"
 #include "EfiError.h"
 #include "Common/EdkIIGlueBaseTypes.h"
