@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -85,6 +85,38 @@ Abstract:
 //
 #pragma pack()
 
+#if __INTEL_COMPILER
+//
+// Disable ICC's warning: trailing comma is nonstandard
+//
+//#pragma warning ( disable : 271 )
+
+//
+// Disable ICC's warning: extra ";" ignored
+//
+#pragma warning ( disable : 424 )
+
+//
+// Disable ICC's warning: : variable "foo" was set but never used
+//
+#pragma warning ( disable : 593 )
+
+//
+// Disable ICC's remark #1418: external function definition with no prior declaration.
+// This is legal ANSI C code so we disable the remark that is turned on with /W4
+//
+#pragma warning ( disable : 1418 )
+
+
+//
+// Disable ICC's remark #1419: external declaration in primary source file
+// This is legal ANSI C code so we disable the remark that is turned on with /W4
+//
+#pragma warning ( disable : 1419 )
+
+#endif
+
+
 #if _MSC_EXTENSIONS
 
 //
@@ -133,7 +165,7 @@ Abstract:
 #endif
 
 
-#if (__STDC_VERSION__ < 199901L)
+#if !defined(__GNUC__) && (__STDC_VERSION__ < 199901L)
   //
   // No ANSI C 2000 stdint.h integer width declarations, so define equivalents
   //
