@@ -125,7 +125,7 @@ Returns:
   EFI_STATUS                Status;
 
   DevicePathSize  = (UINT16) EfiDevicePathSize (DevicePath);
-  Size            = DevicePathSize + sizeof (EFI_STATUS_CODE_DATA);
+  Size            = (UINT16) (DevicePathSize + sizeof (EFI_STATUS_CODE_DATA));
   ExtendedData    = (EFI_STATUS_CODE_DATA *) EfiLibAllocatePool (Size);
   if (ExtendedData == NULL) {
     return EFI_OUT_OF_RESOURCES;
