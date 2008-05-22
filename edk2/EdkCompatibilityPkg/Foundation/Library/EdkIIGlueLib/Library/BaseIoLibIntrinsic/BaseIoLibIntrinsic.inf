@@ -23,17 +23,21 @@
 BASE_NAME       = EdkIIGlueBaseIoLibIntrinsic
 COMPONENT_TYPE  = LIBRARY
 
-[sources.common]
-  
-[sources.ia32]
-  IoLib.c
-  IoLibMsc.c
-  IoHighLevel.c
+[Sources.common]
 
-[sources.x64]
-  IoLib.c
-  IoLibMsc.c
+[Sources.Ia32]
   IoHighLevel.c
+  IoLibGcc.c    | GCC
+  IoLibMsc.c    | MSFT
+  IoLibIcc.c    | INTEL
+  IoLib.c
+
+[Sources.X64]
+  IoHighLevel.c
+  IoLibGcc.c    | GCC
+  IoLibMsc.c    | MSFT
+  IoLibIcc.c    | INTEL
+  IoLib.c
 
 [sources.ipf]
   IoLibIpf.c
