@@ -38,8 +38,6 @@
   UefiIfrForm.c
   UefiIfrLibraryInternal.h
   UefiIfrOpCodeCreation.c
-  R8Lib.h
-  R8Lib.c
 
 
 [Packages]
@@ -71,4 +69,3 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
-  

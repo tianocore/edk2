@@ -604,6 +604,134 @@ StrHexToUint64 (
   IN      CONST CHAR16      	      *String
   );
 
+/**
+  Convert a nibble in the low 4 bits of a byte to a Unicode hexadecimal character.
+
+  This function converts a nibble in the low 4 bits of a byte to a Unicode hexadecimal 
+  character  For example, the nibble  0x01 and 0x0A will converted to L'1' and L'A' 
+  respectively.
+
+  The upper nibble in the input byte will be masked off.
+
+  @param Nibble     The nibble which is in the low 4 bits of the input byte.
+
+  @retval  CHAR16   The Unicode hexadecimal character.
+  
+**/
+CHAR16
+EFIAPI
+NibbleToHexChar (
+  IN UINT8      Nibble
+  )
+;
+
+/** 
+  Convert binary buffer to a Unicode String in a specified sequence. 
+
+  This function converts bytes in the binary Buffer Buf to a Unicode String Str. 
+  Each byte will be represented by two Unicode characters. For example, byte 0xA1 will 
+  be converted into two Unicode character L'A' and L'1'. In the output String, the Unicode Character 
+  for the Most Significant Nibble will be put before the Unicode Character for the Least Significant
+  Nibble. The output string for the buffer containing a single byte 0xA1 will be L"A1". 
+  For a buffer with multiple bytes, the Unicode character produced by the first byte will be put into the 
+  the last character in the output string. The one next to first byte will be put into the
+  character before the last character. This rules applies to the rest of the bytes. The Unicode
+  character by the last byte will be put into the first character in the output string. For example,
+  the input buffer for a 64-bits unsigned integrer 0x12345678abcdef1234 will be converted to
+  a Unicode string equal to L"12345678abcdef1234".
+
+  @param String                        On input, String is pointed to the buffer allocated for the convertion.
+  @param StringLen                     The Length of String buffer to hold the output String. The length must include the tailing '\0' character.
+                                       The StringLen required to convert a N bytes Buffer will be a least equal to or greater 
+                                       than 2*N + 1.
+  @param Buffer                        The pointer to a input buffer.
+  @param BufferSizeInBytes             Lenth in bytes of the input buffer.
+  
+
+  @retval  EFI_SUCCESS                 The convertion is successfull. All bytes in Buffer has been convert to the corresponding
+                                       Unicode character and placed into the right place in String.
+  @retval  EFI_BUFFER_TOO_SMALL        StringSizeInBytes is smaller than 2 * N + 1the number of bytes required to
+                                       complete the convertion. 
+**/
+RETURN_STATUS
+EFIAPI
+BufToHexString (
+  IN OUT       CHAR16               *String,
+  IN OUT       UINTN                *StringLen,
+  IN     CONST UINT8                *Buffer,
+  IN           UINTN                BufferSizeInBytes
+  )
+;
+
+
+/**
+  Convert a Unicode string consisting of hexadecimal characters to a output byte buffer.
+
+  This function converts a Unicode string consisting of characters in the range of Hexadecimal
+  character (L'0' to L'9', L'A' to L'F' and L'a' to L'f') to a output byte buffer. The function will stop
+  at the first non-hexadecimal character or the NULL character. The convertion process can be
+  simply viewed as the reverse operations defined by BufToHexString. Two Unicode characters will be 
+  converted into one byte. The first Unicode character represents the Most Significant Nibble and the
+  second Unicode character represents the Least Significant Nibble in the output byte. 
+  The first pair of Unicode characters represents the last byte in the output buffer. The second pair of Unicode 
+  characters represent the  the byte preceding the last byte. This rule applies to the rest pairs of bytes. 
+  The last pair represent the first byte in the output buffer. 
+
+  For example, a Unciode String L"12345678" will be converted into a buffer wil the following bytes 
+  (first byte is the byte in the lowest memory address): "0x78, 0x56, 0x34, 0x12".
+
+  If String has N valid hexadecimal characters for conversion,  the caller must make sure Buffer is at least 
+  N/2 (if N is even) or (N+1)/2 (if N if odd) bytes. 
+
+  @param Buffer                      The output buffer allocated by the caller.
+  @param BufferSizeInBytes           On input, the size in bytes of Buffer. On output, it is updated to 
+                                     contain the size of the Buffer which is actually used for the converstion.
+                                     For Unicode string with 2*N hexadecimal characters (not including the 
+                                     tailing NULL character), N bytes of Buffer will be used for the output.
+  @param String                      The input hexadecimal string.
+  @param ConvertedStrLen             The number of hexadecimal characters used to produce content in output
+                                     buffer Buffer.
+
+  @retval  RETURN_BUFFER_TOO_SMALL   The input BufferSizeInBytes is too small to hold the output. BufferSizeInBytes
+                                     will be updated to the size required for the converstion.
+  @retval  RETURN_SUCCESS            The convertion is successful or the first Unicode character from String
+                                     is hexadecimal. If ConvertedStrLen is not NULL, it is updated
+                                     to the number of hexadecimal character used for the converstion.
+**/
+RETURN_STATUS
+EFIAPI
+HexStringToBuf (
+  OUT          UINT8                    *Buffer,   
+  IN OUT       UINTN                    *BufferSizeInBytes,
+  IN     CONST CHAR16                   *String,
+  OUT          UINTN                    *ConvertedStrLen  OPTIONAL
+  )
+;
+
+
+/**
+  Test if  a Unicode character is a hexadecimal digit. If true, the input
+  Unicode character is converted to a byte. 
+
+  This function tests if a Unicode character is a hexadecimal digit. If true, the input
+  Unicode character is converted to a byte. For example, Unicode character
+  L'A' will be converted to 0x0A. 
+
+  If Digit is NULL, then ASSERT.
+
+  @retval TRUE        Char is in the range of Hexadecimal number. Digit is updated
+                      to the byte value of the number.
+  @retval FALSE       Char is not in the range of Hexadecimal number. Digit is keep
+                      intact.
+  
+**/
+BOOLEAN
+EFIAPI
+IsHexDigit (
+  OUT UINT8      *Digit,
+  IN  CHAR16      Char
+  )
+;
 
 /**
   Convert one Null-terminated Unicode string to a Null-terminated
@@ -7107,4 +7235,5 @@ AsmPrepareAndThunk16 (
 #endif
 
 #endif
+
 

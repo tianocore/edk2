@@ -40,8 +40,4 @@ Abstract:
 #include <Library/HiiLib.h>
 #include <Library/PcdLib.h>
 
-//#include <MdeModuleHii.h>
-
-#include "R8Lib.h"
-
 #endif
