@@ -231,7 +231,7 @@ Returns:
                              NULL,
                              (VOID **) &PciCfg2
                              );
-  ASSERT_EFI_ERROR (Status);
+  ASSERT_PEI_ERROR (PeiServices, Status);
 
   Status = PciCfg2->Modify (
                       PeiServices,
