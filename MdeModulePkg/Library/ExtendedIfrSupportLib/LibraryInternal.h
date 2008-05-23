@@ -33,6 +33,4 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <MdeModuleHii.h>
 
-#include "R8Lib.h"
-
 #endif

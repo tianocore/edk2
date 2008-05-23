@@ -45,8 +45,6 @@
   ProcessOptions.c
   Ui.c
   Ui.h
-  R8Lib.c
-  R8Lib.h
   Colors.h
 
 
@@ -80,4 +78,5 @@
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid
+
 

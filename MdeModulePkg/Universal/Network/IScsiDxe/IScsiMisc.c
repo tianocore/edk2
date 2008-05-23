@@ -25,44 +25,6 @@ Abstract:
 STATIC CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFabcdef";
 
 /**
-  Determines if a Unicode character is a hexadecimal digit.
-  The test is case insensitive.
-  
-  @param  Digit[out] Pointer to byte that receives the value of the hex character.
-
-  @param  Char[in]   Unicode character to test.
-
-  @retval TRUE       If the character is a hexadecimal digit.
-
-  @retval FALSE      Otherwise.
-
-**/
-static
-BOOLEAN
-IsHexDigit (
-  OUT UINT8      *Digit,
-  IN  CHAR16      Char
-  )
-{
-  if ((Char >= L'0') && (Char <= L'9')) {
-    *Digit = (UINT8) (Char - L'0');
-    return TRUE;
-  }
-
-  if ((Char >= L'A') && (Char <= L'F')) {
-    *Digit = (UINT8) (Char - L'A' + 0x0A);
-    return TRUE;
-  }
-
-  if ((Char >= L'a') && (Char <= L'f')) {
-    *Digit = (UINT8) (Char - L'a' + 0x0A);
-    return TRUE;
-  }
-
-  return FALSE;
-}
-
-/**
   Removes (trims) specified leading and trailing characters from a string.
 
   @param  str[in][out] Pointer to the null-terminated string to be trimmed. On return, 

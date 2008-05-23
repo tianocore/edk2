@@ -88,9 +88,9 @@ CHAR16            gPromptBlockWidth;
 CHAR16            gOptionBlockWidth;
 CHAR16            gHelpBlockWidth;
 
-EFI_GUID  gZeroGuid = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+EFI_GUID  gZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 EFI_GUID  gSetupBrowserGuid = {
-  0xab368524, 0xb60c, 0x495b, 0xa0, 0x9, 0x12, 0xe8, 0x5b, 0x1a, 0xea, 0x32
+  0xab368524, 0xb60c, 0x495b, {0xa0, 0x9, 0x12, 0xe8, 0x5b, 0x1a, 0xea, 0x32}
 };
 
 FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
@@ -102,14 +102,16 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
       0x847bc3fe,
       0xb974,
       0x446d,
-      0x94,
-      0x49,
-      0x5a,
-      0xd5,
-      0x41,
-      0x2e,
-      0x99,
-      0x3b
+      {
+        0x94,
+        0x49,
+        0x5a,
+        0xd5,
+        0x41,
+        0x2e,
+        0x99,
+        0x3b
+      }
     },
     NONE_FUNCTION_KEY_SETTING
   },
@@ -121,14 +123,16 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
       0x3ebfa8e6,
       0x511d,
       0x4b5b,
-      0xa9,
-      0x5f,
-      0xfb,
-      0x38,
-      0x26,
-      0xf,
-      0x1c,
-      0x27
+      {
+        0xa9,
+        0x5f,
+        0xfb,
+        0x38,
+        0x26,
+        0xf,
+        0x1c,
+        0x27
+      }
     },
     NONE_FUNCTION_KEY_SETTING
   },
@@ -140,14 +144,16 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
       0x642237c7,
       0x35d4,
       0x472d,
-      0x83,
-      0x65,
-      0x12,
-      0xe0,
-      0xcc,
-      0xf2,
-      0x7a,
-      0x22
+      {
+        0x83,
+        0x65,
+        0x12,
+        0xe0,
+        0xcc,
+        0xf2,
+        0x7a,
+        0x22
+      }
     },
     NONE_FUNCTION_KEY_SETTING
   },
@@ -159,20 +165,20 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
       0x1f2d63e1,
       0xfebd,
       0x4dc7,
-      0x9c,
-      0xc5,
-      0xba,
-      0x2b,
-      0x1c,
-      0xef,
-      0x9c,
-      0x5b
+      {
+        0x9c,
+        0xc5,
+        0xba,
+        0x2b,
+        0x1c,
+        0xef,
+        0x9c,
+        0x5b
+      }
     },
     NONE_FUNCTION_KEY_SETTING
   },
 };
-
-//@MT: EFI_DRIVER_ENTRY_POINT (InitializeSetup)
 
 EFI_STATUS
 EFIAPI
@@ -535,8 +541,6 @@ InitializeSetup (
   EFI_STATUS                  Status;
   EFI_HANDLE                  HiiDriverHandle;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
-
-  //@MT: EfiInitializeDriverLib (ImageHandle, SystemTable);
 
   //
   // Locate required Hii relative protocols
@@ -1171,7 +1175,7 @@ GetQuestionValue (
       if (IsString) {
         StrCpy ((CHAR16 *) Dst, Value);
       } else {
-        Status = R8_HexStringToBuf (Dst, &StorageWidth, Value, NULL);
+        Status = HexStringToBuf (Dst, &StorageWidth, Value, NULL);
       }
 
       gBS->FreePool (Value);
@@ -1237,7 +1241,7 @@ GetQuestionValue (
     if (!IsBufferStorage && IsString) {
       StrCpy ((CHAR16 *) Dst, Value);
     } else {
-      Status = R8_HexStringToBuf (Dst, &StorageWidth, Value, NULL);
+      Status = HexStringToBuf (Dst, &StorageWidth, Value, NULL);
       if (EFI_ERROR (Status)) {
         gBS->FreePool (Result);
         return Status;
@@ -1410,7 +1414,7 @@ SetQuestionValue (
       BufferLen = (StorageWidth * 2 + 1) * sizeof (CHAR16);
       Value = AllocateZeroPool (BufferLen);
       ASSERT (Value != NULL);
-      R8_BufToHexString (Value, &BufferLen, Src, StorageWidth);
+      BufToHexString (Value, &BufferLen, Src, StorageWidth);
     }
 
     Status = SetValueByName (Storage, Question->VariableName, Value);
@@ -1450,7 +1454,7 @@ SetQuestionValue (
       StrCpy (Value, (CHAR16 *) Src);
     } else {
       BufferLen = (StorageWidth * 2 + 1) * sizeof (CHAR16);
-      R8_BufToHexString (Value, &BufferLen, Src, StorageWidth);
+      BufToHexString (Value, &BufferLen, Src, StorageWidth);
     }
 
     //

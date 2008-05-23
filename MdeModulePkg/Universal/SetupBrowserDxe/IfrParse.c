@@ -21,7 +21,6 @@ Abstract:
 
 #include "Setup.h"
 #include "Ui.h"
-//@MT:#include "EfiPrintLib.h"
 
 UINT16           mStatementIndex;
 UINT16           mExpressionOpCodeIndex;

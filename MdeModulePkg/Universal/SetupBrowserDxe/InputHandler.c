@@ -612,7 +612,7 @@ EnterCarriageReturn:
     default:
       if (ManualInput) {
         if (HexInput) {
-          if (!R8_IsHexDigit (&Digital, Key.UnicodeChar)) {
+          if (!IsHexDigit (&Digital, Key.UnicodeChar)) {
             UpdateStatusBar (INPUT_ERROR, Question->QuestionFlags, TRUE);
             break;
           }
