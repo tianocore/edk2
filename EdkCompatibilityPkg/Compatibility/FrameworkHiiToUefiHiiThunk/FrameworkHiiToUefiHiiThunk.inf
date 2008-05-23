@@ -59,9 +59,7 @@
   ConfigAccess.h
   Utility.c
   Utility.h
-  R8Lib.c
-  R8Lib.h
-  
+ 
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -99,4 +97,5 @@
   gEfiHiiStringProtocolGuid AND
   gEfiHiiFontProtocolGuid AND
   gEfiHiiConfigRoutingProtocolGuid
+
 
