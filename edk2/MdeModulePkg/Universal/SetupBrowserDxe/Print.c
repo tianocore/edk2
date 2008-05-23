@@ -33,11 +33,6 @@ Abstract:
 
 **/
 
-//@MT:#include "Tiano.h"
-//@MT:#include "EfiDriverLib.h"
-//@MT:#include "EfiPrintLib.h"
-//@MT:#include "EfiStdArg.h"
-//@MT:#include "TianoHii.h"
 #include "Setup.h"
 
 UINTN

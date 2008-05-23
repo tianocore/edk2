@@ -54,22 +54,7 @@ Revision History
 #include <Library/HiiLib.h>
 #include <Library/ExtendedHiiLib.h>
 
-#include "R8Lib.h"
-
 #include "Colors.h"
-
-//@MT:#include EFI_PROTOCOL_DEFINITION (HiiDatabase)
-//@MT:#include EFI_PROTOCOL_DEFINITION (HiiString)
-//@MT:#include EFI_PROTOCOL_DEFINITION (HiiConfigRouting)
-//@MT:#include EFI_PROTOCOL_DEFINITION (HiiConfigAccess)
-//@MT:#include EFI_PROTOCOL_DEFINITION (FormBrowser2)
-
-//@MT:#include EFI_GUID_DEFINITION (GlobalVariable)
-//@MT:#include EFI_PROTOCOL_DEFINITION (DevicePath)
-//@MT:#include EFI_PROTOCOL_DEFINITION (SimpleTextOut)
-//@MT:#include EFI_PROTOCOL_DEFINITION (SimpleTextIn)
-//@MT:#include EFI_PROTOCOL_DEFINITION (Print)
-//@MT:#include EFI_PROTOCOL_DEFINITION (UnicodeCollation)
 
 //
 // This is the generated header file which includes whatever needs to be exported (strings + IFR)

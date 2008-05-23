@@ -85,33 +85,6 @@ IP4_ADDR  mIp4AllMasks[IP4_MASK_NUM] = {
 EFI_IPv4_ADDRESS  mZeroIp4Addr = {{0, 0, 0, 0}};
 
 /**
-  Converts the low nibble of a byte  to hex unicode character.
-
-  @param  Nibble  lower nibble of a byte.
-
-  @return Hex unicode character.
-
-**/
-CHAR16
-NibbleToHexChar (
-  IN UINT8      Nibble
-  )
-{
-  //
-  // Porting Guide:
-  // This library interface is simply obsolete.
-  // Include the source code to user code.
-  //
-
-  Nibble &= 0x0F;
-  if (Nibble <= 0x9) {
-    return (CHAR16)(Nibble + L'0');
-  }
-
-  return (CHAR16)(Nibble - 0xA + L'A');
-}
-
-/**
   Return the length of the mask. If the mask is invalid,
   return the invalid length 33, which is IP4_MASK_NUM.
   NetMask is in the host byte order.

@@ -563,7 +563,6 @@ DriverSampleInit (
   //
   // Initialize the library and our protocol.
   //
-  //@MT: EfiInitializeDriverLib (ImageHandle, SystemTable);
 
   //
   // Initialize screen dimensions for SendForm().

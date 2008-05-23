@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -92,7 +92,7 @@ HexStringToBufPrivate (
   //
   // Find out how many hex characters the string has.
   //
-  for (Idx = 0, HexCnt = 0; R8_IsHexDigit (&Digit, Str[Idx]); Idx++, HexCnt++);
+  for (Idx = 0, HexCnt = 0; IsHexDigit (&Digit, Str[Idx]); Idx++, HexCnt++);
 
   if (HexCnt == 0) {
     *Len = 0;
@@ -115,7 +115,7 @@ HexStringToBufPrivate (
 
   for (Idx = 0; Idx < HexCnt; Idx++) {
 
-    R8_IsHexDigit (&Digit, Str[Idx]);
+    IsHexDigit (&Digit, Str[Idx]);
 
     //
     // For odd charaters, write the lower nibble for each buffer byte,
@@ -765,7 +765,7 @@ GetValueOfNumber (
     goto Exit;
   }
 
-  Status = R8_HexStringToBuf (Buf, &Length, Str, NULL);
+  Status = HexStringToBuf (Buf, &Length, Str, NULL);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -1607,7 +1607,7 @@ HiiBlockToConfig (
       goto Exit;
     }
 
-    Status = R8_BufToHexString (ValueStr, &Length, Value, Width);
+    Status = BufToHexString (ValueStr, &Length, Value, Width);
     ASSERT_EFI_ERROR (Status);
     SafeFreePool (Value);
     Value = NULL;
@@ -2113,4 +2113,5 @@ Exit:
 #endif
 
 }
+
 

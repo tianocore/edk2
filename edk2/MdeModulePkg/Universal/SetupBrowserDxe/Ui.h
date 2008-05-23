@@ -25,11 +25,7 @@ Revision History
 #ifndef _UI_H
 #define _UI_H
 
-//@MT:#include "Tiano.h"
-//@MT:#include "EfiDriverLib.h"
 #include "Setup.h"
-//@MT:#include "GraphicsLib.h"
-//@MT:#include "EfiPrintLib.h"
 
 //
 // Globals

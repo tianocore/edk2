@@ -647,7 +647,7 @@ IfrToUint (
       // Hex string
       //
       BufferSize = sizeof (UINT64);
-      Status = R8_HexStringToBuf ((UINT8 *) &Result->Value.u64, &BufferSize, StringPtr + 2, NULL);
+      Status = HexStringToBuf ((UINT8 *) &Result->Value.u64, &BufferSize, StringPtr + 2, NULL);
     } else {
       //
       // BUGBUG: Need handle decimal string
