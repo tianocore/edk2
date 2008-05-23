@@ -239,7 +239,7 @@ ISO639TORFC3066MAP Iso639ToRfc3066Map [] = {
 };
 
 CHAR8 *
-Iso639ToRfc3066 (
+ConvertIso639ToRfc3066 (
   CHAR8 *Iso638Lang
   )
 {
@@ -310,7 +310,13 @@ Returns:
     }
     UnicodeStrToAsciiStr  (LanguageString, AsciiLanguage);
 
-    Rfc3066AsciiLanguage = Iso639ToRfc3066 (AsciiLanguage);
+    Rfc3066AsciiLanguage = ConvertIso639ToRfc3066 (AsciiLanguage);
+
+    //
+    // If Rfc3066AsciiLanguage is NULL, more language mapping must be added to 
+    // Iso639ToRfc3066Map.
+    //
+    ASSERT (Rfc3066AsciiLanguage != NULL);
     //
     // Caller of Framework HII Interface uses the Language Identification String defined 
     // in Iso639. So map it to the Language Identifier defined in RFC3066.
@@ -378,4 +384,5 @@ Returns:
   ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
+
 
