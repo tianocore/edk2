@@ -165,15 +165,11 @@ Returns:
   Time.Month  = RtcRead (RTC_ADDRESS_MONTH);
   Time.Year   = RtcRead (RTC_ADDRESS_YEAR);
 
-  ConvertRtcTimeToEfiTime (&Time, RegisterB);
-
   if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = BcdToDecimal8 ((UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f));
+    Century = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
   } else {
-    Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
+    Century = RtcRead (RTC_ADDRESS_CENTURY);
   }
-
-  Time.Year = (UINT16) (Century * 100 + Time.Year);
 
   //
   // Set RTC configuration after get original time
@@ -186,13 +182,18 @@ Returns:
   //
   //BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
   //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
+  //
   if (!EfiAtRuntime ()) {
   EfiReleaseLock (&Global->RtcLock);
   }
+ 
   //
   // Validate time fields
   //
-  Status = RtcTimeFieldsValid (&Time);
+  Status = ConvertRtcTimeToEfiTime (&Time, Century, RegisterB);
+  if (!EFI_ERROR (Status)) {
+    Status = RtcTimeFieldsValid (&Time);
+  }
   if (EFI_ERROR (Status)) {
     Time.Second = RTC_INIT_SECOND;
     Time.Minute = RTC_INIT_MINUTE;
@@ -295,15 +296,11 @@ Routine Description:
   Time->Month   = RtcRead (RTC_ADDRESS_MONTH);
   Time->Year    = RtcRead (RTC_ADDRESS_YEAR);
 
-  ConvertRtcTimeToEfiTime (Time, RegisterB);
-
   if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = BcdToDecimal8 ((UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f));
+    Century = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
   } else {
-    Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
+    Century = RtcRead (RTC_ADDRESS_CENTURY);
   }
-
-  Time->Year = (UINT16) (Century * 100 + Time->Year);
 
   //
   // Release RTC Lock.
@@ -322,7 +319,10 @@ Routine Description:
   //
   // Make sure all field values are in correct range
   //
-  Status = RtcTimeFieldsValid (Time);
+  Status = ConvertRtcTimeToEfiTime (Time, Century, RegisterB);
+  if (!EFI_ERROR (Status)) {
+    Status = RtcTimeFieldsValid (Time);
+  }
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
@@ -539,15 +539,11 @@ Returns:
     Time->Year    = RtcRead (RTC_ADDRESS_YEAR);
   }
 
-  ConvertRtcTimeToEfiTime (Time, RegisterB);
-
   if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = BcdToDecimal8 ((UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f));
+    Century = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
   } else {
-    Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
+    Century = RtcRead (RTC_ADDRESS_CENTURY);
   }
-
-  Time->Year = (UINT16) (Century * 100 + Time->Year);
 
   //
   // Release RTC Lock.
@@ -560,7 +556,10 @@ Returns:
   //
   // Make sure all field values are in correct range
   //
-  Status = RtcTimeFieldsValid (Time);
+  Status = ConvertRtcTimeToEfiTime (Time, Century, RegisterB);
+  if (!EFI_ERROR (Status)) {
+    Status = RtcTimeFieldsValid (Time);
+  }
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
@@ -719,23 +718,52 @@ Returns:
   return EFI_DEVICE_ERROR;
 }
 
-VOID
-ConvertRtcTimeToEfiTime (
-  IN EFI_TIME       *Time,
-  IN RTC_REGISTER_B RegisterB
+/**
+  Checks an 8-bit BCD value, and converts to an 8-bit value if valid.
+
+  This function checks the 8-bit BCD value specified by Value.
+  If valid, the function converts it to an 8-bit value and returns it.
+  Otherwise, return 0xff.
+
+  @param  Value The 8-bit BCD value to check and convert
+
+  @return The 8-bit value converted.
+          0xff if Value is invalid.
+
+**/
+UINT8
+CheckAndConvertBcd8ToDecimal8 (
+  IN  UINT8  Value
   )
-/*++
+{
+  if ((Value < 0xa0) && ((Value & 0xf) < 0xa)) {
+    return BcdToDecimal8 (Value);
+  }
 
-Routine Description:
+  return 0xff;
+}
 
-  Arguments:
+/**
+  Converts time read from RTC to EFI_TIME format defined by UEFI spec.
 
+  This function converts raw time data read from RTC to the EFI_TIME format
+  defined by UEFI spec.
+  If data mode of RTC is BCD, then converts it to decimal,
+  If RTC is in 12-hour format, then converts it to 24-hour format.
 
+  @param   Time       On input, the time data read from RTC to convert
+                      On output, the time converted to UEFI format
+  @param   Century    Value of century read from RTC.
+  @param   RegisterB  Value of Register B of RTC, indicating data mode
+                      and hour format.
 
-Returns:
---*/
-// GC_TODO:    Time - add argument and description to function comment
-// GC_TODO:    RegisterB - add argument and description to function comment
+**/
+EFI_STATUS
+ConvertRtcTimeToEfiTime (
+  IN OUT EFI_TIME        *Time,
+  IN     UINT8           Century,
+  IN     RTC_REGISTER_B  RegisterB
+  )
 {
   BOOLEAN PM;
 
@@ -748,13 +776,23 @@ Returns:
   Time->Hour = (UINT8) (Time->Hour & 0x7f);
 
   if (RegisterB.Bits.DM == 0) {
-    Time->Year    = BcdToDecimal8 ((UINT8) Time->Year);
-    Time->Month   = BcdToDecimal8 (Time->Month);
-    Time->Day     = BcdToDecimal8 (Time->Day);
-    Time->Hour    = BcdToDecimal8 (Time->Hour);
-    Time->Minute  = BcdToDecimal8 (Time->Minute);
-    Time->Second  = BcdToDecimal8 (Time->Second);
+    Time->Year    = CheckAndConvertBcd8ToDecimal8 ((UINT8) Time->Year);
+    Time->Month   = CheckAndConvertBcd8ToDecimal8 (Time->Month);
+    Time->Day     = CheckAndConvertBcd8ToDecimal8 (Time->Day);
+    Time->Hour    = CheckAndConvertBcd8ToDecimal8 (Time->Hour);
+    Time->Minute  = CheckAndConvertBcd8ToDecimal8 (Time->Minute);
+    Time->Second  = CheckAndConvertBcd8ToDecimal8 (Time->Second);
+    Century       = CheckAndConvertBcd8ToDecimal8 (Century);
   }
+
+  if (Time->Year == 0xff || Time->Month == 0xff || Time->Day == 0xff ||
+      Time->Hour == 0xff || Time->Minute == 0xff || Time->Second == 0xff ||
+      Century == 0xff) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Time->Year = (UINT16) (Century * 100 + Time->Year);
+
   //
   // If time is in 12 hour format, convert it to 24 hour format
   //
@@ -771,6 +809,8 @@ Returns:
   Time->Nanosecond  = 0;
   Time->TimeZone    = EFI_UNSPECIFIED_TIMEZONE;
   Time->Daylight    = 0;
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS

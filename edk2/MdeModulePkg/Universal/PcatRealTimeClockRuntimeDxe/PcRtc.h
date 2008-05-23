@@ -398,27 +398,27 @@ Returns:
 --*/
 ;
 
-VOID
+/**
+  Converts time read from RTC to EFI_TIME format defined by UEFI spec.
+
+  This function converts raw time data read from RTC to the EFI_TIME format
+  defined by UEFI spec.
+  If data mode of RTC is BCD, then converts it to decimal,
+  If RTC is in 12-hour format, then converts it to 24-hour format.
+
+  @param   Time       On input, the time data read from RTC to convert
+                      On output, the time converted to UEFI format
+  @param   Century    Value of century read from RTC.
+  @param   RegisterB  Value of Register B of RTC, indicating data mode
+                      and hour format.
+
+**/
+EFI_STATUS
 ConvertRtcTimeToEfiTime (
-  IN EFI_TIME       *Time,
-  IN RTC_REGISTER_B RegisterB
+  IN OUT EFI_TIME        *Time,
+  IN     UINT8           Century,
+  IN     RTC_REGISTER_B  RegisterB
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Time      - GC_TODO: add argument description
-  RegisterB - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
 EFI_STATUS
