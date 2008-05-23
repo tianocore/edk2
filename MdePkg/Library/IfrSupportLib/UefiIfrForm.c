@@ -27,55 +27,6 @@ Abstract:
 //
 UINT16 mFakeConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH=0";
 
-#if 0
-STATIC
-EFI_STATUS
-GetPackageDataFromPackageList (
-  IN  EFI_HII_PACKAGE_LIST_HEADER *HiiPackageList,
-  IN  UINT32                      PackageIndex,
-  OUT UINT32                      *BufferLen,
-  OUT EFI_HII_PACKAGE_HEADER      **Buffer
-  )
-{
-  UINT32                        Index;
-  EFI_HII_PACKAGE_HEADER        *Package;
-  UINT32                        Offset;
-  UINT32                        PackageListLength;
-  EFI_HII_PACKAGE_HEADER        PackageHeader = {0, 0};
-
-  ASSERT(HiiPackageList != NULL);
-
-  if ((BufferLen == NULL) || (Buffer == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Package = NULL;
-  Index   = 0;
-  Offset  = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
-  while (Offset < PackageListLength) {
-    Package = (EFI_HII_PACKAGE_HEADER *) (((UINT8 *) HiiPackageList) + Offset);
-    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-    if (Index == PackageIndex) {
-      break;
-    }
-    Offset += PackageHeader.Length;
-    Index++;
-  }
-  if (Offset >= PackageListLength) {
-    //
-    // no package found in this Package List
-    //
-    return EFI_NOT_FOUND;
-  }
-
-  *BufferLen = PackageHeader.Length;
-  *Buffer    = Package;
-  return EFI_SUCCESS;
-}
-#endif
-
-
 /**
   Draw a dialog and return the selected key.
 
@@ -301,7 +252,7 @@ SwapBuffer (
 
 
 /**
-  Converts binary buffer to Unicode string in reversed byte order from R8_BufToHexString().
+  Converts binary buffer to Unicode string in reversed byte order from BufToHexString().
 
   @param  Str                    String for output
   @param  Buffer                 Binary buffer.
@@ -326,7 +277,7 @@ BufferToHexString (
   SwapBuffer (NewBuffer, BufferSize);
 
   StrBufferLen = (BufferSize + 1) * sizeof (CHAR16);
-  Status = R8_BufToHexString (Str, &StrBufferLen, NewBuffer, BufferSize);
+  Status = BufToHexString (Str, &StrBufferLen, NewBuffer, BufferSize);
 
   gBS->FreePool (NewBuffer);
 
@@ -335,7 +286,7 @@ BufferToHexString (
 
 
 /**
-  Converts Hex String to binary buffer in reversed byte order from R8_HexStringToBuf().
+  Converts Hex String to binary buffer in reversed byte order from HexStringToBuf().
 
   @param  Buffer                 Pointer to buffer that receives the data.
   @param  BufferSize             Length in bytes of the buffer to hold converted
@@ -360,7 +311,7 @@ HexStringToBuffer (
   UINTN       ConvertedStrLen;
 
   ConvertedStrLen = 0;
-  Status = R8_HexStringToBuf (Buffer, BufferSize, Str, &ConvertedStrLen);
+  Status = HexStringToBuf (Buffer, BufferSize, Str, &ConvertedStrLen);
   if (!EFI_ERROR (Status)) {
     SwapBuffer (Buffer, ConvertedStrLen);
   }
@@ -496,7 +447,7 @@ FindBlockName (
 
     Data = 0;
     BufferSize = sizeof (UINTN);
-    Status = R8_HexStringToBuf ((UINT8 *) &Data, &BufferSize, String, &ConvertedStrLen);
+    Status = HexStringToBuf ((UINT8 *) &Data, &BufferSize, String, &ConvertedStrLen);
     if (EFI_ERROR (Status)) {
       return FALSE;
     }
@@ -513,7 +464,7 @@ FindBlockName (
 
     Data = 0;
     BufferSize = sizeof (UINTN);
-    Status = R8_HexStringToBuf ((UINT8 *) &Data, &BufferSize, String, &ConvertedStrLen);
+    Status = HexStringToBuf ((UINT8 *) &Data, &BufferSize, String, &ConvertedStrLen);
     if (EFI_ERROR (Status)) {
       return FALSE;
     }
@@ -710,7 +661,7 @@ SetBrowserData (
     //
     StringPtr = BlockName + 16;
     BufferLen = sizeof (BlockName) - (16 * sizeof (CHAR16));
-    R8_BufToHexString (StringPtr, &BufferLen, (UINT8 *) &BufferSize, sizeof (UINTN));
+    BufToHexString (StringPtr, &BufferLen, (UINT8 *) &BufferSize, sizeof (UINTN));
 
     Request = BlockName;
   } else {

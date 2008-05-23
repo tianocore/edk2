@@ -32,10 +32,6 @@
 // The architectural variable "Lang" and "LangCodes" are deprecated in UEFI
 // specification. While, UEFI specification also states that these deprecated
 // variables may be provided for backwards compatibility.
-// If "LANG_SUPPORT" is defined, "Lang" and "LangCodes" will be produced;
-// If "LANG_SUPPORT" is undefined, "Lang" and "LangCodes" will not be produced.
-//
-#define LANG_SUPPORT
 
 #define EFI_LANGUAGE_VARIABLE           L"Lang"
 #define EFI_LANGUAGE_CODES_VARIABLE     L"LangCodes"
