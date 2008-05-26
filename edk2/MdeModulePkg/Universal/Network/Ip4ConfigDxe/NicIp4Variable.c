@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -249,6 +249,7 @@ Ip4ConfigFindNicVariable (
       }
 
       CopyMem (Config, Cur, Len);
+      Ip4ConfigFixRouteTablePointer (&Config->Ip4Info);
       return Config;
     }
 
@@ -381,3 +382,20 @@ Ip4ConfigModifyVariable (
   NewVar->CheckSum = (UINT16) (~NetblockChecksum ((UINT8 *) NewVar, TotalLen));
   return NewVar;
 }
+
+VOID
+Ip4ConfigFixRouteTablePointer (
+  IN EFI_IP4_IPCONFIG_DATA  *ConfigData
+  )
+{
+  //
+  // The memory used for route table entries must immediately follow 
+  // the ConfigData and be not packed.
+  //
+  if (ConfigData->RouteTableSize > 0) {
+    ConfigData->RouteTable = (EFI_IP4_ROUTE_TABLE *) (ConfigData + 1);
+  } else {
+    ConfigData->RouteTable = NULL;
+  }
+}
+
