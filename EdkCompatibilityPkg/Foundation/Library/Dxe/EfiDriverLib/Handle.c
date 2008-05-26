@@ -110,7 +110,7 @@ Returns:
     // Start with the second protocol, the first one is sure on this handle.
     //
     VA_START (args, Interface);
-    VA_ARG (args, EFI_GUID *);
+    Protocol = VA_ARG (args, EFI_GUID *);
 
     //
     // Iterate protocols from the variable list.
