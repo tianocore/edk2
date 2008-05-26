@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,11 +32,11 @@ Abstract:
 //
 #define SIZEOF_IP4_CONFIG_INFO(Ip4Config) \
   (sizeof (EFI_IP4_IPCONFIG_DATA) + \
-   sizeof (EFI_IP4_ROUTE_TABLE) * (MAX (1, (Ip4Config)->RouteTableSize) - 1))
+   sizeof (EFI_IP4_ROUTE_TABLE) * (Ip4Config)->RouteTableSize)
 
 #define SIZEOF_NIC_IP4_CONFIG_INFO(NicConfig) \
   (sizeof (NIC_IP4_CONFIG_INFO) + \
-   sizeof (EFI_IP4_ROUTE_TABLE) * (MAX (1, (NicConfig)->Ip4Info.RouteTableSize) - 1))
+   sizeof (EFI_IP4_ROUTE_TABLE) * (NicConfig)->Ip4Info.RouteTableSize)
 
 //
 // Compare whether two NIC address are equal includes their type and length.
@@ -72,4 +72,10 @@ Ip4ConfigModifyVariable (
   IN NIC_ADDR               *NicAddr,
   IN NIC_IP4_CONFIG_INFO    *Config       OPTIONAL
   );
+
+VOID
+Ip4ConfigFixRouteTablePointer (
+  IN EFI_IP4_IPCONFIG_DATA  *ConfigData
+  );
+
 #endif
