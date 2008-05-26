@@ -453,12 +453,6 @@ GatherPpbInfo (
     } else {
       PciIoDevice->Decodes |= EFI_BRIDGE_IO16_DECODE_SUPPORTED;
     }
-    //
-    // changed to support En1K for IO Bridge Device
-    //
-    if( (Value & 0x0c) == 0x0c ){
-      PciIoDevice->Decodes |= EFI_BRIDGE_IOEN1K_DECODE_SUPPORTED;
-    }
   }
 
   Status = BarExisted (
