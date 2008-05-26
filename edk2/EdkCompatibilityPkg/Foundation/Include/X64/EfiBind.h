@@ -248,7 +248,12 @@ typedef int64_t   intn_t;
 
 #endif
 
-
+//
+// For symbol name in GNU assembly code, an extra "_" is necessary
+//
+#if __GNUC__
+  #define ASM_PFX(name) _##name    
+#endif
 
 #endif
 
