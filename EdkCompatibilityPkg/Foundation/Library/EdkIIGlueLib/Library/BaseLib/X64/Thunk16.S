@@ -18,8 +18,7 @@
 #   Real mode thunk
 #
 #------------------------------------------------------------------------------
-
-#include <Library/BaseLib.h>
+#include <EdkIIGlueBase.h>
 
 .globl ASM_PFX(m16Start)
 .globl ASM_PFX(m16Size)

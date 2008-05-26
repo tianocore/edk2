@@ -19,7 +19,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <Library/BaseLib.h>
+#include <EdkIIGlueBase.h>
 
 .globl ASM_PFX(m16Start), ASM_PFX(m16Size), ASM_PFX(mThunk16Attr), ASM_PFX(m16Gdt), ASM_PFX(m16GdtrBase), ASM_PFX(mTransition)
 .globl ASM_PFX(InternalAsmThunk16)
