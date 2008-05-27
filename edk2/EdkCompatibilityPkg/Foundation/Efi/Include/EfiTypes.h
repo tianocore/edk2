@@ -36,7 +36,7 @@ typedef int32_t INT32;
 typedef uint32_t UINT32;
 typedef int64_t INT64;
 typedef uint64_t UINT64;
-typedef uint8_t CHAR8;
+typedef char CHAR8;
 typedef uint16_t CHAR16;
 typedef UINT64 EFI_LBA;
 
