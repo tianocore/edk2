@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -46,6 +46,14 @@ PxeBcCommonNotify (
   )
 ;
 
+EFI_STATUS
+PxeBcConfigureUdpWriteInstance (
+  IN EFI_UDP4_PROTOCOL  *Udp4,
+  IN EFI_IPv4_ADDRESS   *StationIp,
+  IN EFI_IPv4_ADDRESS   *SubnetMask,
+  IN EFI_IPv4_ADDRESS   *Gateway,
+  IN OUT UINT16         *SrcPort
+  );
 VOID
 CvtNum (
   IN UINTN  Number,

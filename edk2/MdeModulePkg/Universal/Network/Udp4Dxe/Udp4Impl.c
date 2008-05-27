@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -306,7 +306,7 @@ Udp4CheckTimeout (
       //
       // Iterate all the rxdatas belonging to this udp instance.
       //
-      Wrap = NET_LIST_USER_STRUCT (Entry, UDP4_RXDATA_WRAP, Link);
+      Wrap = NET_LIST_USER_STRUCT (WrapEntry, UDP4_RXDATA_WRAP, Link);
 
       if (Wrap->TimeoutTick <= UDP4_TIMEOUT_INTERVAL / 1000) {
         //

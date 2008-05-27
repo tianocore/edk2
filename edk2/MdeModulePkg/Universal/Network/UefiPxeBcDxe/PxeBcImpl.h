@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -64,8 +64,8 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_HANDLE                                Dhcp4Child;
   EFI_HANDLE                                Ip4Child;
   EFI_HANDLE                                Mtftp4Child;
-  EFI_HANDLE                                Udp4Child;
-
+  EFI_HANDLE                                Udp4ReadChild;
+  EFI_HANDLE                                Udp4WriteChild;
 
   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
 
@@ -78,7 +78,9 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_IP4_PROTOCOL                          *Ip4;
   EFI_IP4_CONFIG_DATA                       Ip4ConfigData;
   EFI_MTFTP4_PROTOCOL                       *Mtftp4;
-  EFI_UDP4_PROTOCOL                         *Udp4;
+  EFI_UDP4_PROTOCOL                         *Udp4Read;
+  EFI_UDP4_PROTOCOL                         *Udp4Write;
+  UINT16                                    CurrentUdpSrcPort;
   EFI_UDP4_CONFIG_DATA                      Udp4CfgData;
 
 

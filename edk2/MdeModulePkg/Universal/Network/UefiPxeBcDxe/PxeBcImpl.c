@@ -272,7 +272,7 @@ EfiPxeBcStart (
   //
   // Configure the udp4 instance to let it receive data
   //
-  Status = Private->Udp4->Configure (Private->Udp4, &Private->Udp4CfgData);
+  Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -421,13 +421,9 @@ EfiPxeBcStop (
 
   Mode->Started = FALSE;
 
-
-  //
-  // Reset and leave joined groups
-  //
-  Private->Udp4->Groups (Private->Udp4, FALSE, NULL);
-
-  Private->Udp4->Configure (Private->Udp4, NULL);
+  Private->CurrentUdpSrcPort = 0;
+  Private->Udp4Write->Configure (Private->Udp4Write, NULL);
+  Private->Udp4Read->Configure (Private->Udp4Read, NULL);
 
   Private->Dhcp4->Stop (Private->Dhcp4);
   Private->Dhcp4->Configure (Private->Dhcp4, NULL);
@@ -1076,7 +1072,6 @@ EfiPxeBcUdpWrite (
   EFI_UDP4_SESSION_DATA     Udp4Session;
   EFI_STATUS                Status;
   BOOLEAN                   IsDone;
-  UINT16                    RandomSrcPort;
   EFI_PXE_BASE_CODE_MODE    *Mode;
   EFI_MAC_ADDRESS           TempMacAddr;
 
@@ -1106,8 +1101,11 @@ EfiPxeBcUdpWrite (
   }
 
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
-  Udp4    = Private->Udp4;
+  Udp4    = Private->Udp4Write;
   Mode    = &Private->Mode;
+  if (!Mode->Started) {
+    return EFI_NOT_STARTED;
+  }
 
   if (!Private->AddressIsOk && (SrcIp == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1125,23 +1123,25 @@ EfiPxeBcUdpWrite (
 
   Mode->IcmpErrorReceived = FALSE;
 
-  if (SrcIp == NULL) {
-    SrcIp = &Private->StationIp;
-
-    if (GatewayIp == NULL) {
-      GatewayIp = &Private->GatewayIp;
+  if ((Private->CurrentUdpSrcPort == 0) ||
+    ((SrcPort != NULL) && (*SrcPort != Private->CurrentUdpSrcPort))) {
+    //
+    // Port is changed, (re)configure the Udp4Write instance
+    //
+    if (SrcPort != NULL) {
+      Private->CurrentUdpSrcPort = *SrcPort;
     }
-  }
 
-  if ((SrcPort == NULL) || (OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_PORT)) {
-    RandomSrcPort = (UINT16) (NET_RANDOM (NetRandomInitSeed ()) % 10000 + 1024);
-
-    if (SrcPort == NULL) {
-
-      SrcPort  = &RandomSrcPort;
-    } else {
-
-      *SrcPort = RandomSrcPort;
+    Status = PxeBcConfigureUdpWriteInstance (
+               Udp4,
+               &Private->StationIp.v4,
+               &Private->SubnetMask.v4,
+               &Private->GatewayIp.v4,
+               &Private->CurrentUdpSrcPort
+               );
+    if (EFI_ERROR (Status)) {
+      Private->CurrentUdpSrcPort = 0;
+      return EFI_INVALID_PARAMETER;
     }
   }
 
@@ -1150,8 +1150,12 @@ EfiPxeBcUdpWrite (
 
   CopyMem (&Udp4Session.DestinationAddress, DestIp, sizeof (EFI_IPv4_ADDRESS));
   Udp4Session.DestinationPort = *DestPort;
-  CopyMem (&Udp4Session.SourceAddress, SrcIp, sizeof (EFI_IPv4_ADDRESS));
-  Udp4Session.SourcePort = *SrcPort;
+  if (SrcIp != NULL) {
+    CopyMem (&Udp4Session.SourceAddress, SrcIp, sizeof (EFI_IPv4_ADDRESS));
+  }
+  if (SrcPort != NULL) {
+    Udp4Session.SourcePort = *SrcPort;
+  }
 
   FragCount = (HeaderSize != NULL) ? 2 : 1;
   Udp4TxData = (EFI_UDP4_TRANSMIT_DATA *) AllocatePool (sizeof (EFI_UDP4_TRANSMIT_DATA) + (FragCount - 1) * sizeof (EFI_UDP4_FRAGMENT_DATA));
@@ -1171,7 +1175,9 @@ EfiPxeBcUdpWrite (
     DataLength += (UINT32) *HeaderSize;
   }
 
-  Udp4TxData->GatewayAddress  = (EFI_IPv4_ADDRESS *) GatewayIp;
+  if (GatewayIp != NULL) {
+    Udp4TxData->GatewayAddress  = (EFI_IPv4_ADDRESS *) GatewayIp;
+  }
   Udp4TxData->UdpSessionData  = &Udp4Session;
   Udp4TxData->DataLength      = DataLength;
   Token.Packet.TxData         = Udp4TxData;
@@ -1344,7 +1350,7 @@ EfiPxeBcUdpRead (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((HeaderSize != NULL) && (*HeaderSize == 0)) || ((HeaderPtr == NULL) && (*HeaderSize != 0))) {
+  if (((HeaderSize != NULL) && (*HeaderSize == 0)) || ((HeaderSize != NULL) && (HeaderPtr == NULL))) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1354,7 +1360,7 @@ EfiPxeBcUdpRead (
 
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Mode    = Private->PxeBc.Mode;
-  Udp4    = Private->Udp4;
+  Udp4    = Private->Udp4Read;
 
   if (!Mode->Started) {
     return EFI_NOT_STARTED;
@@ -1372,6 +1378,8 @@ EfiPxeBcUdpRead (
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+TRY_AGAIN:
 
   IsDone = FALSE;
   Status = Udp4->Receive (Udp4, &Token);
@@ -1410,6 +1418,8 @@ EfiPxeBcUdpRead (
     }
 
     if (Matched) {
+      Matched = FALSE;
+
       //
       // Match the destination ip of the received udp dgram
       //
@@ -1510,6 +1520,10 @@ EfiPxeBcUdpRead (
     // Recycle the RxData
     //
     gBS->SignalEvent (RxData->RecycleSignal);
+
+    if (!Matched) {
+      goto TRY_AGAIN;
+    }
   }
 
 ON_EXIT:
@@ -1594,7 +1608,7 @@ EfiPxeBcSetIpFilter (
   // Clear the UDP instance configuration, all joined groups will be left
   // during the operation.
   //
-  Private->Udp4->Configure (Private->Udp4, NULL);
+  Private->Udp4Read->Configure (Private->Udp4Read, NULL);
   Private->Udp4CfgData.AcceptPromiscuous  = FALSE;
   Private->Udp4CfgData.AcceptBroadcast    = FALSE;
 
@@ -1610,7 +1624,7 @@ EfiPxeBcSetIpFilter (
     //
     // Configure the UDP instance with the new configuration.
     //
-    Status = Private->Udp4->Configure (Private->Udp4, &Private->Udp4CfgData);
+    Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1627,7 +1641,7 @@ EfiPxeBcSetIpFilter (
     //
     // Configure the UDP instance with the new configuration.
     //
-    Status = Private->Udp4->Configure (Private->Udp4, &Private->Udp4CfgData);
+    Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1639,7 +1653,7 @@ EfiPxeBcSetIpFilter (
           //
           // Join the mutilcast group
           //
-          Status = Private->Udp4->Groups (Private->Udp4, TRUE, &NewFilter->IpList[Index].v4);
+          Status = Private->Udp4Read->Groups (Private->Udp4Read, TRUE, &NewFilter->IpList[Index].v4);
           if (EFI_ERROR (Status)) {
             return Status;
           }
@@ -2448,7 +2462,7 @@ EfiPxeLoadFile (
   switch (Status) {
 
   case EFI_SUCCESS:
-    break;
+    return EFI_SUCCESS;
 
   case EFI_BUFFER_TOO_SMALL:
     if (Buffer != NULL) {
