@@ -12,6 +12,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#ifndef __PCI_INCOMPATIBLE_DEVICE_SUPPORT_LIB_H__
+#define __PCI_INCOMPATIBLE_DEVICE_SUPPORT_LIB_H__
+
 #define PCI_REGISTER_READ    0xfffffffffffffff1ULL
 #define PCI_REGISTER_WRITE   0xfffffffffffffff2ULL
 #define VALUE_NOCARE         0xffffffffffffffffULL
@@ -132,3 +135,6 @@ PciRegisterAccessCheck (
   IN  UINT64                        AccessWidth,
   OUT VOID                          *Configuration
   );
+
+#endif
+
