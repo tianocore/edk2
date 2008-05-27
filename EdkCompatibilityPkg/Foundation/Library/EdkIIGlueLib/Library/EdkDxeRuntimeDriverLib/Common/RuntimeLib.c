@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "..\RuntimeLibInternal.h"
+#include "../RuntimeLibInternal.h"
 
 //
 // Driver Lib Module Globals
