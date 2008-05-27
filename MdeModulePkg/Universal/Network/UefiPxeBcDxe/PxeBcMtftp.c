@@ -254,7 +254,7 @@ PxeBcTftpReadFile (
 
   if (BlockSize != NULL) {
 
-    ReqOpt[0].OptionStr = (UINT8*)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[0].OptionStr = (UINT8*) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[0].ValueStr  = OptBuf;
     UtoA10 (*BlockSize, (CHAR8 *) ReqOpt[0].ValueStr);
     OptCnt++;
@@ -336,7 +336,7 @@ PxeBcTftpWriteFile (
 
   if (BlockSize != NULL) {
 
-    ReqOpt[0].OptionStr = (UINT8*)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[0].OptionStr = (UINT8*) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[0].ValueStr  = OptBuf;
     UtoA10 (*BlockSize, (CHAR8 *) ReqOpt[0].ValueStr);
     OptCnt++;
@@ -410,7 +410,7 @@ PxeBcTftpReadDirectory (
 
   if (BlockSize != NULL) {
 
-    ReqOpt[0].OptionStr = (UINT8*)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[0].OptionStr = (UINT8*) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[0].ValueStr  = OptBuf;
     UtoA10 (*BlockSize, (CHAR8 *) ReqOpt[0].ValueStr);
     OptCnt++;

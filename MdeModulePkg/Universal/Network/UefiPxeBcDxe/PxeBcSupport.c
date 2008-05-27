@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -160,6 +160,56 @@ PxeBcCommonNotify (
   )
 {
   *((BOOLEAN *) Context) = TRUE;
+}
+
+EFI_STATUS
+PxeBcConfigureUdpWriteInstance (
+  IN EFI_UDP4_PROTOCOL  *Udp4,
+  IN EFI_IPv4_ADDRESS   *StationIp,
+  IN EFI_IPv4_ADDRESS   *SubnetMask,
+  IN EFI_IPv4_ADDRESS   *Gateway,
+  IN OUT UINT16         *SrcPort
+  )
+{
+  EFI_UDP4_CONFIG_DATA  Udp4CfgData;
+  EFI_STATUS            Status;
+
+  ZeroMem (&Udp4CfgData, sizeof (Udp4CfgData));
+
+  Udp4CfgData.ReceiveTimeout = 1000;
+  Udp4CfgData.TypeOfService  = DEFAULT_ToS;
+  Udp4CfgData.TimeToLive     = DEFAULT_TTL;
+
+  CopyMem (&Udp4CfgData.StationAddress, StationIp, sizeof (*StationIp));
+  CopyMem (&Udp4CfgData.SubnetMask, SubnetMask, sizeof (*SubnetMask));
+
+  Udp4CfgData.StationPort    = *SrcPort;
+
+  //
+  // Reset the instance.
+  //
+  Udp4->Configure (Udp4, NULL);
+
+  Status = Udp4->Configure (Udp4, &Udp4CfgData);
+  if (!EFI_ERROR (Status) && (Gateway->Addr[0] != 0)) {
+    //
+    // basic configuration OK, need to add the default route entry
+    //
+    Status = Udp4->Routes (Udp4, FALSE, &mZeroIp4Addr, &mZeroIp4Addr, Gateway);
+    if (EFI_ERROR (Status)) {
+      //
+      // roll back
+      //
+      Udp4->Configure (Udp4, NULL);
+    }
+  }
+
+  if (!EFI_ERROR (Status) && (*SrcPort == 0)) {
+    Udp4->GetModeData (Udp4, &Udp4CfgData, NULL, NULL, NULL);
+    *SrcPort = Udp4CfgData.StationPort;
+  }
+
+  return Status;
 }
 
 
