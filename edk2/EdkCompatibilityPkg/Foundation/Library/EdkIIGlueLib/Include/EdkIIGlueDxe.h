@@ -60,7 +60,7 @@ Abstract:
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 #include EFI_GUID_DEFINITION (EventGroup)
-#include EFI_GUID_DEFINITION (EventLegacybios)
+#include EFI_GUID_DEFINITION (EventLegacyBios)
 #include EFI_GUID_DEFINITION (FrameworkDevicePath)
 
 #include EFI_PROTOCOL_DEFINITION (EdidActive)
@@ -87,7 +87,7 @@ Abstract:
 #include EFI_GUID_DEFINITION (Mps)
 #include EFI_GUID_DEFINITION (PcAnsi)
 #include EFI_GUID_DEFINITION (SalSystemTable)
-#include EFI_GUID_DEFINITION (Smbios)
+#include EFI_GUID_DEFINITION (SmBios)
 //#include EFI_GUID_DEFINITION (SmmCommunicate)
 #include EFI_GUID_DEFINITION (SmramMemoryReserve)
 //
@@ -175,7 +175,7 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (LoadedImage)
 #include EFI_PROTOCOL_DEFINITION (LoadFile)
 #include EFI_PROTOCOL_DEFINITION (PciHostBridgeResourceAllocation)
-#include EFI_PROTOCOL_DEFINITION (PciHotplugInit)
+#include EFI_PROTOCOL_DEFINITION (PciHotPlugInit)
 #include EFI_PROTOCOL_DEFINITION (PciIo)
 #include EFI_PROTOCOL_DEFINITION (PciPlatform)
 #include EFI_PROTOCOL_DEFINITION (PciRootBridgeIo)
@@ -186,7 +186,7 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (ScsiPassThru)
 #include EFI_PROTOCOL_DEFINITION (SectionExtraction)
 #include EFI_PROTOCOL_DEFINITION (SerialIo)
-#include EFI_PROTOCOL_DEFINITION (SimpleFilesystem)
+#include EFI_PROTOCOL_DEFINITION (SimpleFileSystem)
 #include EFI_PROTOCOL_DEFINITION (SimpleNetwork)
 #include EFI_PROTOCOL_DEFINITION (SimplePointer)
 #include EFI_PROTOCOL_DEFINITION (SimpleTextIn)
@@ -218,7 +218,7 @@ Abstract:
 #include EFI_ARCH_PROTOCOL_DEFINITION (Bds)
 #include EFI_ARCH_PROTOCOL_DEFINITION (Cpu)
 #include EFI_ARCH_PROTOCOL_DEFINITION (Metronome)
-#include EFI_ARCH_PROTOCOL_DEFINITION (Monotoniccounter)
+#include EFI_ARCH_PROTOCOL_DEFINITION (MonotonicCounter)
 #include EFI_ARCH_PROTOCOL_DEFINITION (RealTimeClock)
 #include EFI_ARCH_PROTOCOL_DEFINITION (Reset)
 #include EFI_ARCH_PROTOCOL_DEFINITION (Runtime)
@@ -226,7 +226,7 @@ Abstract:
 #include EFI_ARCH_PROTOCOL_DEFINITION (StatusCode)
 #include EFI_ARCH_PROTOCOL_DEFINITION (Timer)
 #include EFI_ARCH_PROTOCOL_DEFINITION (Variable)
-#include EFI_ARCH_PROTOCOL_DEFINITION (Variablewrite)
+#include EFI_ARCH_PROTOCOL_DEFINITION (VariableWrite)
 #include EFI_ARCH_PROTOCOL_DEFINITION (WatchdogTimer)
 
 //
@@ -243,7 +243,7 @@ Abstract:
 #include "EfiDriverLib.h"
 #include "EfiCapsule.h"
 
-#include "Common\EdkIIGlueDefinitionChangesDxe.h"
+#include "Common/EdkIIGlueDefinitionChangesDxe.h"
 
 
 //
@@ -251,22 +251,22 @@ Abstract:
 //
 
 #include "EdkIIGlueBase.h"
-#include "Library\EdkIIGlueDebugLib.h"
-#include "Library\EdkIIGluePostCodeLib.h"
-#include "Library\EdkIIGlueReportStatusCodeLib.h"
-#include "Library\EdkIIGlueHiiLib.h"
-#include "Library\EdkIIGlueHobLib.h"
-#include "Library\EdkIIGlueMemoryAllocationLib.h"
-#include "Library\EdkIIGlueSmbusLib.h"
-#include "Library\EdkIIGlueDxeRuntimeDriverLib.h"
-#include "Library\EdkIIGlueDxeServicesTableLib.h"
-#include "Library\EdkIIGlueDxeSmmDriverEntryPoint.h"
-#include "Library\EdkIIGlueDevicePathLib.h"
-#include "Library\EdkIIGlueUefiLib.h"
-#include "Library\EdkIIGlueUefiDecompressLib.h"
-#include "Library\EdkIIGlueUefiDriverModelLib.h"
-#include "Library\EdkIIGlueUefiBootServicesTableLib.h"
-#include "Library\EdkIIGlueUefiDriverEntryPoint.h"
-#include "Library\EdkIIGlueUefiRuntimeServicesTableLib.h"
+#include "Library/EdkIIGlueDebugLib.h"
+#include "Library/EdkIIGluePostCodeLib.h"
+#include "Library/EdkIIGlueReportStatusCodeLib.h"
+#include "Library/EdkIIGlueHiiLib.h"
+#include "Library/EdkIIGlueHobLib.h"
+#include "Library/EdkIIGlueMemoryAllocationLib.h"
+#include "Library/EdkIIGlueSmbusLib.h"
+#include "Library/EdkIIGlueDxeRuntimeDriverLib.h"
+#include "Library/EdkIIGlueDxeServicesTableLib.h"
+#include "Library/EdkIIGlueDxeSmmDriverEntryPoint.h"
+#include "Library/EdkIIGlueDevicePathLib.h"
+#include "Library/EdkIIGlueUefiLib.h"
+#include "Library/EdkIIGlueUefiDecompressLib.h"
+#include "Library/EdkIIGlueUefiDriverModelLib.h"
+#include "Library/EdkIIGlueUefiBootServicesTableLib.h"
+#include "Library/EdkIIGlueUefiDriverEntryPoint.h"
+#include "Library/EdkIIGlueUefiRuntimeServicesTableLib.h"
 
 #endif
