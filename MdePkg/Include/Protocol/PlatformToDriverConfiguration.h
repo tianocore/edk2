@@ -268,7 +268,7 @@ EFI_STATUS
   configuration information from the platform. For every call to
   Query() there must be a matching call to Response() so the
   UEFI driver can inform the platform how it used the
-  information passed in from Query(). It¡¯s legal for a UEFI
+  information passed in from Query(). It's legal for a UEFI
   driver to use Response() to inform the platform it does not
   understand the data returned via Query() and thus no action was
   taken.

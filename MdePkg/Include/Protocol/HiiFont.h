@@ -308,7 +308,7 @@ EFI_STATUS
   EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set. This flag cannot be used
   with EFI_HII_OUT_FLAG_CLIP_CLEAN_X. If
   EFI_HII_OUT_FLAG_TRANSPARENT is set, then BackgroundColor is
-  ignored and all off¡± pixels in the character¡¯s glyph will
+  ignored and all off" pixels in the character's glyph will
   use the pixel value from Blt. This flag cannot be used if Blt
   is NULL upon entry. If EFI_HII_IGNORE_IF_NO_GLYPH is set, then
   characters which have no glyphs are not drawn. Otherwise, they

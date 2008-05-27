@@ -28,7 +28,7 @@
 //  as optional, a unique return code of 0xFFFFFFFFFFFFFFFF is returned in the
 //  Status field of the PAL_CALL_RETURN structure.
 //  This indicates that the procedure is not present in this PAL implementation.
-//  It is the caller¡¯s responsibility to check for this return code after calling
+//  It is the caller's responsibility to check for this return code after calling
 //  any optional PAL procedure.
 //  No parameter checking is performed on the 5 input parameters, but there are
 //  some common rules that the caller should follow when making a PAL call.  Any

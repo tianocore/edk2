@@ -213,7 +213,7 @@ EFI_STATUS
   @param  LogEvent           This service abstracts the capability to add 
                              an entry to the Event Log.
   @param  PassThroughToTPM   This service provides a pass-through capability 
-                             from the caller to the system¡¯s TPM.
+                             from the caller to the system's TPM.
   @param  HashLogExtendEvent This service abstracts the capability to do a hash 
                              operation on a data buffer, extend a specific TPM PCR 
                              with the hash result, and add an entry to the Event Log. 

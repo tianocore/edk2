@@ -1397,8 +1397,8 @@ typedef struct {
 #define EFI_AFFECTED_BY_STANDARD_SHIFT       0x0001
 //
 // This key is affected by the caps lock so that if a keyboard driver
-// would need to disambiguate between a key which had a ¡°1¡± defined
-// versus a ¡°a¡± character.  Having this bit turned on would tell
+// would need to disambiguate between a key which had a "1" defined
+// versus a "a" character.  Having this bit turned on would tell
 // the keyboard driver to use the appropriate shifted state or not.
 //
 #define EFI_AFFECTED_BY_CAPS_LOCK            0x0002

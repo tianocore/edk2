@@ -1069,7 +1069,7 @@ typedef struct {
 
   PAL Procedure - PAL_FIXED_ADDR.
 
-  Return the fixed component of a processor¡¯s directed address.
+  Return the fixed component of a processor's directed address.
   It is required by IPF. It is required by IPF. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and virtual mode.
@@ -3239,7 +3239,7 @@ typedef struct {
 /**
 
   @param Mode  Bit2:0, Indicates the mode of operation for this
-               procedure: 0 - Query mode 1 ¨C Error inject mode
+               procedure: 0 - Query mode 1 - Error inject mode
                (err_inj should also be specified) 2 - Cancel
                outstanding trigger. All other fields in
                PAL_MC_ERROR_TYPE_INFO,
@@ -3409,7 +3409,7 @@ typedef struct {
 
 /**
 
-   Buffer Pointed to by err_data_buffer ¨C TLB
+   Buffer Pointed to by err_data_buffer - TLB
 
 **/
 typedef struct {
@@ -3865,7 +3865,7 @@ typedef struct {
                       when transitioning to virtual mode
                       operations.
 
-  @return R9    Virtualization Service Address ¨C VSA specifies
+  @return R9    Virtualization Service Address - VSA specifies
                 the virtual base address of the PAL
                 virtualization services in this virtual
                 environment.
@@ -4037,7 +4037,7 @@ typedef struct {
   as required or optional.  If a PAL procedure is specified as optional, a unique return
   code of 0xFFFFFFFFFFFFFFFF is returned in the Status field of the PAL_CALL_RETURN structure.
   This indicates that the procedure is not present in this PAL implementation.  It is the
-  caller¡¯s responsibility to check for this return code after calling any optional PAL
+  caller's responsibility to check for this return code after calling any optional PAL
   procedure. No parameter checking is performed on the 4 input parameters, but there are
   some common rules that the caller should follow when making a PAL call.  Any address
   passed to PAL as buffers for return parameters must be 8-byte aligned.  Unaligned addresses

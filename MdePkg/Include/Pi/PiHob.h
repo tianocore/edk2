@@ -91,7 +91,7 @@ typedef struct {
   EFI_HOB_GENERIC_HEADER            Header;
   EFI_HOB_MEMORY_ALLOCATION_HEADER  AllocDescriptor;
   //
-  // Additional data pertaining to the ¡°Name¡± Guid memory
+  // Additional data pertaining to the "Name" Guid memory
   // may go here.
   //
 } EFI_HOB_MEMORY_ALLOCATION;
@@ -109,7 +109,7 @@ typedef struct {
 
 //
 // Defines the location of the boot-strap 
-// processor (BSP) BSPStore (¡°Backing Store Pointer Store¡±).
+// processor (BSP) BSPStore ("Backing Store Pointer Store").
 // This HOB is valid for the Itanium processor family only 
 // register overflow store.
 // 
