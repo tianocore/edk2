@@ -1504,7 +1504,7 @@ PrintBbsTable (
 
     DEBUG (
       (DEBUG_ERROR,
-      " %02x: %04x %02x/%02x/%02x %02x/02%x %04x %04x %04x:%04x\n",
+      " %02x: %04x %02x/%02x/%02x %02x/%02x %04x %04x %04x:%04x\n",
       (UINTN) Idx,
       (UINTN) LocalBbsTable[Idx].BootPriority,
       (UINTN) LocalBbsTable[Idx].Bus,
