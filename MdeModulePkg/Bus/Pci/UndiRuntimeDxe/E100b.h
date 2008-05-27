@@ -12,6 +12,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#ifndef _E100B_H_
+#define _E100B_H_
+
 // pci config offsets:
 
 #define RX_BUFFER_COUNT 32
@@ -663,3 +666,6 @@ struct MC_CB_STRUCT{
 #pragma pack()
 
 #define FOUR_GIGABYTE (UINT64)0x100000000ULL
+
+#endif
+
