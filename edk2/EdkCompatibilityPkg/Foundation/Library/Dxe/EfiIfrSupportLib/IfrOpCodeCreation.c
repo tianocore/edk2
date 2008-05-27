@@ -235,11 +235,11 @@ Returns:
 
   OneOf.Help          = HelpToken;
 
-  LocalBuffer         = (CHAR8 *) FormBuffer;
+  LocalBuffer         = (UINT8 *) FormBuffer;
 
   EfiCopyMem (LocalBuffer, &OneOf, sizeof (EFI_IFR_ONE_OF));
 
-  LocalBuffer = (CHAR8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF));
+  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF));
 
   for (Index = 0; Index < OptionCount; Index++) {
     OneOfOption.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
@@ -252,7 +252,7 @@ Returns:
 
     EfiCopyMem (LocalBuffer, &OneOfOption, sizeof (EFI_IFR_ONE_OF_OPTION));
 
-    LocalBuffer = (CHAR8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF_OPTION));
+    LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF_OPTION));
   }
 
   EndOneOf.Header.Length  = sizeof (EFI_IFR_END_ONE_OF);
@@ -260,7 +260,7 @@ Returns:
 
   EfiCopyMem (LocalBuffer, &EndOneOf, sizeof (EFI_IFR_END_ONE_OF));
 
-  LocalBuffer = (CHAR8 *) (LocalBuffer + sizeof (EFI_IFR_END_ONE_OF));
+  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_END_ONE_OF));
 
   return EFI_SUCCESS;
 }
@@ -323,11 +323,11 @@ Returns:
 
   OrderedList.Help          = HelpToken;
 
-  LocalBuffer               = (CHAR8 *) FormBuffer;
+  LocalBuffer               = (UINT8 *) FormBuffer;
 
   EfiCopyMem (LocalBuffer, &OrderedList, sizeof (EFI_IFR_ORDERED_LIST));
 
-  LocalBuffer = (CHAR8 *) (LocalBuffer + sizeof (EFI_IFR_ORDERED_LIST));
+  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ORDERED_LIST));
 
   for (Index = 0; Index < OptionCount; Index++) {
     OrderedListOption.Header.OpCode = EFI_IFR_ONE_OF_OPTION_OP;
@@ -340,7 +340,7 @@ Returns:
 
     EfiCopyMem (LocalBuffer, &OrderedListOption, sizeof (EFI_IFR_ONE_OF_OPTION));
 
-    LocalBuffer = (CHAR8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF_OPTION));
+    LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_ONE_OF_OPTION));
   }
 
   EndOrderedList.Header.Length  = sizeof (EFI_IFR_END_ONE_OF);
@@ -348,7 +348,7 @@ Returns:
 
   EfiCopyMem (LocalBuffer, &EndOrderedList, sizeof (EFI_IFR_END_ONE_OF));
 
-  LocalBuffer = (CHAR8 *) (LocalBuffer + sizeof (EFI_IFR_END_ONE_OF));
+  LocalBuffer = (UINT8 *) (LocalBuffer + sizeof (EFI_IFR_END_ONE_OF));
 
   return EFI_SUCCESS;
 }
