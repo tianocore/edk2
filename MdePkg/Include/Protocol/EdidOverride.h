@@ -15,10 +15,10 @@
 
 **/
 
-#include <PiDxe.h>
-
 #ifndef __EDID_OVERRIDE_H__
 #define __EDID_OVERRIDE_H__
+
+#include <PiDxe.h>
 
 #define EFI_EDID_OVERRIDE_PROTOCOL_GUID \
   { \
