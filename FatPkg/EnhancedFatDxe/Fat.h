@@ -244,7 +244,7 @@ typedef struct _FAT_OFILE {
   //
   // Dirty is set if there have been any updates to the
   // file
-  // Archive is set if the archive attribute in the file’s
+  // Archive is set if the archive attribute in the file's
   // directory entry needs to be set when performing flush
   // PreserveLastMod is set if the last modification of the
   // file is specified by SetInfo API
