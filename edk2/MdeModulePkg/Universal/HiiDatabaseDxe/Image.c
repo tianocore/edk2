@@ -790,7 +790,7 @@ HiiNewImage (
   @param  This                   A pointer to the EFI_HII_IMAGE_PROTOCOL instance.
   @param  PackageList            Handle of the package list where this image will
                                  be searched.
-  @param  ImageId                The image¡¯s id,, which is unique within
+  @param  ImageId                The image's id,, which is unique within
                                  PackageList.
   @param  Image                  Points to the image.
   @param  ImageSize              On entry, points to the size of the buffer pointed
@@ -993,7 +993,7 @@ HiiGetImage (
 
   @param  This                   A pointer to the EFI_HII_IMAGE_PROTOCOL instance.
   @param  PackageList            The package list containing the images.
-  @param  ImageId                The image¡¯s id,, which is unique within
+  @param  ImageId                The image's id,, which is unique within
                                  PackageList.
   @param  Image                  Points to the image.
 
@@ -1196,7 +1196,7 @@ HiiSetImage (
                                  this image and  EFI_HII_DRAW_FLAG_CLIP is implied.
                                  If this points to a  NULL on entry, then a buffer
                                  will be allocated to hold  the generated image and
-                                 the pointer updated on exit. It is the caller¡¯s
+                                 the pointer updated on exit. It is the caller's
                                  responsibility to free this buffer.
   @param  BltY                   Specifies the offset from the left and top edge of
                                  the  output image of the first pixel in the image.
@@ -1441,7 +1441,7 @@ HiiDrawImage (
                                  EFI_HII_DRAW_FLAG_CLIP is implied. If this points
                                  to a  NULL on entry, then a buffer will be
                                  allocated to hold  the generated image and the
-                                 pointer updated on exit. It is the caller¡¯s
+                                 pointer updated on exit. It is the caller's
                                  responsibility to free this buffer.
   @param  BltY                   Specifies the offset from the left and top edge of
                                  the  output image of the first pixel in the image.

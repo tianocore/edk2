@@ -2,7 +2,7 @@
   This file declares Security Architectural PPI.
   
   This PPI is installed by some platform PEIM that abstracts the security policy to the PEI
-  Foundation, namely the case of a PEIM¡¯s authentication state being returned during the PEI section
+  Foundation, namely the case of a PEIM's authentication state being returned during the PEI section
   extraction process.
   
   Copyright (c) 2006, Intel Corporation

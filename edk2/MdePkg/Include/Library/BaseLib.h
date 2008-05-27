@@ -4621,9 +4621,9 @@ AsmReadDbr (
 
   All processor implementations provide at least 4 performance counters
   (PMC/PMD [4]...PMC/PMD [7] pairs), and 4 performance monitor counter overflow
-  status registers (PMC [0]¡­ PMC [3]).  Processor implementations may provide
+  status registers (PMC [0]... PMC [3]).  Processor implementations may provide
   additional implementation-dependent PMC and PMD to increase the number of
-  ¡®generic¡¯ performance counters (PMC/PMD pairs).  The remainder of PMC and PMD
+  'generic' performance counters (PMC/PMD pairs).  The remainder of PMC and PMD
   register set is implementation dependent.  No parameter checking is performed
   on Index.  If the Index value is beyond the implemented PMC register range,
   zero value will be returned.
@@ -4647,9 +4647,9 @@ AsmReadPmc (
 
   All processor implementations provide at least 4 performance counters
   (PMC/PMD [4]...PMC/PMD [7] pairs), and 4 performance monitor counter
-  overflow status registers (PMC [0]¡­ PMC [3]).  Processor implementations may
+  overflow status registers (PMC [0]... PMC [3]).  Processor implementations may
   provide additional implementation-dependent PMC and PMD to increase the number
-  of ¡®generic¡¯ performance counters (PMC/PMD pairs).  The remainder of PMC and PMD
+  of 'generic' performance counters (PMC/PMD pairs).  The remainder of PMC and PMD
   register set is implementation dependent.  No parameter checking is performed
   on Index.  If the Index value is beyond the implemented PMD register range,
   zero value will be returned.
@@ -4729,8 +4729,8 @@ AsmWriteDbr (
   Writes current value of Performance Monitor Configuration Register specified by Index.
   All processor implementations provide at least 4 performance counters
   (PMC/PMD [4]...PMC/PMD [7] pairs), and 4 performance monitor counter overflow status
-  registers (PMC [0]¡­ PMC [3]).  Processor implementations may provide additional
-  implementation-dependent PMC and PMD to increase the number of ¡®generic¡¯ performance
+  registers (PMC [0]... PMC [3]).  Processor implementations may provide additional
+  implementation-dependent PMC and PMD to increase the number of 'generic' performance
   counters (PMC/PMD pairs).  The remainder of PMC and PMD register set is implementation
   dependent.  No parameter checking is performed on Index.  If the Index value is
   beyond the implemented PMC register range, the write is ignored.
@@ -4756,8 +4756,8 @@ AsmWritePmc (
   Writes current value of Performance Monitor Data Register specified by Index.
   All processor implementations provide at least 4 performance counters
   (PMC/PMD [4]...PMC/PMD [7] pairs), and 4 performance monitor counter overflow
-  status registers (PMC [0]¡­ PMC [3]).  Processor implementations may provide
-  additional implementation-dependent PMC and PMD to increase the number of ¡®generic¡¯
+  status registers (PMC [0]... PMC [3]).  Processor implementations may provide
+  additional implementation-dependent PMC and PMD to increase the number of 'generic'
   performance counters (PMC/PMD pairs).  The remainder of PMC and PMD register set
   is implementation dependent.  No parameter checking is performed on Index.  If the
   Index value is beyond the implemented PMD register range, the write is ignored.
@@ -4860,7 +4860,7 @@ AsmCpuVirtual (
   as optional, a unique return code of 0xFFFFFFFFFFFFFFFF is returned in the
   Status field of the PAL_CALL_RETURN structure.
   This indicates that the procedure is not present in this PAL implementation.
-  It is the caller¡¯s responsibility to check for this return code after calling
+  It is the caller's responsibility to check for this return code after calling
   any optional PAL procedure.
   No parameter checking is performed on the 5 input parameters, but there are
   some common rules that the caller should follow when making a PAL call.  Any

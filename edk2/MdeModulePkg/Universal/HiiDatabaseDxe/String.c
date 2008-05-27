@@ -249,7 +249,7 @@ GetStringFontInfo (
 
   @param  Private                Hii database private structure.
   @param  StringPackage          Hii string package instance.
-  @param  StringId               The string¡¯s id, which is unique within
+  @param  StringId               The string's id, which is unique within
                                  PackageList.
   @param  BlockType              Output the block type of found string block.
   @param  StringBlockAddr        Output the block address of found string block.
@@ -567,7 +567,7 @@ FindStringBlock (
 
   @param  Private                Hii database private structure.
   @param  StringPackage          Hii string package instance.
-  @param  StringId               The string¡¯s id, which is unique within
+  @param  StringId               The string's id, which is unique within
                                  PackageList.
   @param  String                 Points to retrieved null-terminated string.
   @param  StringSize             On entry, points to the size of the buffer pointed
@@ -672,7 +672,7 @@ GetStringWorker (
 
   @param  Private                HII database driver private structure.
   @param  StringPackage          HII string package instance.
-  @param  StringId               The string¡¯s id, which is unique within
+  @param  StringId               The string's id, which is unique within
                                  PackageList.
   @param  String                 Points to the new null-terminated string.
   @param  StringFontInfo         Points to the input font info.
@@ -909,7 +909,7 @@ SetStringWorker (
                                  not zero, the LanguageName being passed  in will
                                  be ignored.
   @param  String                 Points to the new null-terminated string.
-  @param  StringFontInfo         Points to the new string¡¯s font information or
+  @param  StringFontInfo         Points to the new string's font information or
                                  NULL if the string should have the default system
                                  font, size and style.
 
@@ -1251,7 +1251,7 @@ HiiNewString (
   @param  StringSize             On entry, points to the size of the buffer pointed
                                  to by  String, in bytes. On return, points to the
                                  length of the string, in bytes.
-  @param  StringFontInfo         If not NULL, points to the string¡¯s font
+  @param  StringFontInfo         If not NULL, points to the string's font
                                  information.  It's caller's responsibility to free
                                  this buffer.
 
@@ -1334,11 +1334,11 @@ HiiGetString (
 
   @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
   @param  PackageList            The package list containing the strings.
-  @param  StringId               The string¡¯s id, which is unique within
+  @param  StringId               The string's id, which is unique within
                                  PackageList.
   @param  Language               Points to the language for the updated string.
   @param  String                 Points to the new null-terminated string.
-  @param  StringFontInfo         Points to the string¡¯s font information or NULL if
+  @param  StringFontInfo         Points to the string's font information or NULL if
                                  the  string font information is not changed.
 
   @retval EFI_SUCCESS            The string was updated successfully.

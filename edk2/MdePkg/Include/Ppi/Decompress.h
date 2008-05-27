@@ -60,7 +60,7 @@ EFI_STATUS
 
 
 /**                                                              
-  This PPI¡¯s single member function decompresses a compression
+  This PPI's single member function decompresses a compression
   encapsulated section. It is used by the PEI Foundation to
   process sectioned files. Prior to the installation of this PPI,
   compression sections will be ignored.

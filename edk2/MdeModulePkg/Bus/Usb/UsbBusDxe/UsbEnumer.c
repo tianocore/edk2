@@ -732,14 +732,14 @@ UsbEnumerateNewDev (
 
   //
   // After port is reset, hub establishes a signal path between
-  // the device and host (DEFALUT state). Device¡¯s registers are
+  // the device and host (DEFALUT state). Device's registers are
   // reset, use default address 0 (host enumerates one device at
   // a time) , and ready to respond to control transfer at EP 0.
   //
 
   //
   // Host sends a Get_Descriptor request to learn the max packet
-  // size of default pipe (only part of the device¡¯s descriptor).
+  // size of default pipe (only part of the device's descriptor).
   //
   Status = UsbGetMaxPacketSize0 (Child);
 
@@ -782,7 +782,7 @@ UsbEnumerateNewDev (
   DEBUG ((EFI_D_INFO, "UsbEnumerateNewDev: device is now ADDRESSED at %d\n", Address));
 
   //
-  // Host learns about the device¡¯s abilities by requesting device's
+  // Host learns about the device's abilities by requesting device's
   // entire descriptions.
   //
   Status = UsbBuildDescTable (Child);

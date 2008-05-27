@@ -1370,7 +1370,7 @@ IsLineBreak (
                                   EFI_HII_OUT_FLAG_CLIP is implied. If this points
                                   to a NULL on entry, then a              buffer
                                   will be allocated to hold the generated image and
-                                  the pointer updated on exit. It is the caller¡¯s
+                                  the pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
   @param  BltX,BLTY               Specifies the offset from the left and top edge
                                   of the image of the first character cell in the
@@ -1381,7 +1381,7 @@ IsLineBreak (
                                   updated to contain the        number of elements.
                                   This array describes the characters which were at
                                   least partially drawn and the heights of the
-                                  rows. It is the caller¡¯s responsibility to free
+                                  rows. It is the caller's responsibility to free
                                   this buffer.
   @param  RowInfoArraySize        If this is non-NULL on entry, then on exit it
                                   contains the number of elements in RowInfoArray.
@@ -1923,7 +1923,7 @@ Exit:
   @param  Flags                   Describes how the string is to be drawn.
   @param  PackageList             The package list in the HII database to search
                                   for the specified string.
-  @param  StringId                The string¡¯s id, which is unique within
+  @param  StringId                The string's id, which is unique within
                                   PackageList.
   @param  Language                Points to the language for the retrieved string.
                                   If NULL, then the current system language is
@@ -1939,7 +1939,7 @@ Exit:
                                   EFI_HII_OUT_FLAG_CLIP is implied. If this points
                                   to a NULL on entry, then a              buffer
                                   will be allocated to hold the generated image and
-                                  the pointer updated on exit. It is the caller¡¯s
+                                  the pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
   @param  BltX,BLTY               Specifies the offset from the left and top edge
                                   of the image of the first character cell in the
@@ -1950,7 +1950,7 @@ Exit:
                                   updated to contain the        number of elements.
                                   This array describes the characters which were at
                                   least partially drawn and the heights of the
-                                  rows. It is the caller¡¯s responsibility to free
+                                  rows. It is the caller's responsibility to free
                                   this buffer.
   @param  RowInfoArraySize        If this is non-NULL on entry, then on exit it
                                   contains the number of elements in RowInfoArray.
@@ -2071,7 +2071,7 @@ HiiStringIdToImage (
                                   system font and color.
   @param  Blt                     Thus must point to a NULL on entry. A buffer will
                                   be allocated to hold the output and the pointer
-                                  updated on exit. It is the caller¡¯s
+                                  updated on exit. It is the caller's
                                   responsibility to free this buffer.
   @param  Baseline                Number of pixels from the bottom of the bitmap to
                                   the baseline.
@@ -2232,7 +2232,7 @@ Exit:
                                   are no more matching fonts.
   @param  StringInfoIn            Upon entry, points to the font to return
                                   information about.
-  @param  StringInfoOut           Upon return, contains the matching font¡¯s
+  @param  StringInfoOut           Upon return, contains the matching font's
                                   information.  If NULL, then no information is
                                   returned. It's caller's responsibility to free
                                   this buffer.

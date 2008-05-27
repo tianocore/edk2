@@ -318,7 +318,7 @@ EFI_STATUS
 
 
 //
-// These types can be ORed together as needed ¨C for example,
+// These types can be ORed together as needed - for example,
 // EVT_TIMER might be Ored with EVT_NOTIFY_WAIT or
 // EVT_NOTIFY_SIGNAL.
 //
@@ -341,7 +341,7 @@ EFI_STATUS
 #define EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE     EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE
 
 //
-// The event¡¯s NotifyContext pointer points to a runtime memory
+// The event's NotifyContext pointer points to a runtime memory
 // address.
 // The event is deprecated in UEFI2.0 and later specifications.
 //

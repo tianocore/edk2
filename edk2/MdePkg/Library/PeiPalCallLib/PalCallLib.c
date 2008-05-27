@@ -33,7 +33,7 @@
   as required or optional.  If a PAL procedure is specified as optional, a unique return
   code of 0xFFFFFFFFFFFFFFFF is returned in the Status field of the PAL_CALL_RETURN structure.
   This indicates that the procedure is not present in this PAL implementation.  It is the
-  caller¡¯s responsibility to check for this return code after calling any optional PAL
+  caller's responsibility to check for this return code after calling any optional PAL
   procedure. No parameter checking is performed on the 4 input parameters, but there are
   some common rules that the caller should follow when making a PAL call.  Any address
   passed to PAL as buffers for return parameters must be 8-byte aligned.  Unaligned addresses

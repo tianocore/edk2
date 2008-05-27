@@ -383,7 +383,7 @@ GetSystemFont (
 
   @param  Private                 Hii database private structure.
   @param  StringPackage           Hii string package instance.
-  @param  StringId                The string¡¯s id, which is unique within
+  @param  StringId                The string's id, which is unique within
                                   PackageList.
   @param  BlockType               Output the block type of found string block.
   @param  StringBlockAddr         Output the block address of found string block.
@@ -466,7 +466,7 @@ FindGlyphBlock (
                                   EFI_HII_OUT_FLAG_CLIP is implied. If this points
                                   to a NULL on entry, then a              buffer
                                   will be allocated to hold the generated image and
-                                  the pointer updated on exit. It is the caller¡¯s
+                                  the pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
   @param  BltX,BLTY               Specifies the offset from the left and top edge
                                   of the image of the first character cell in the
@@ -477,7 +477,7 @@ FindGlyphBlock (
                                   updated to contain the        number of elements.
                                   This array describes the characters which were at
                                   least partially drawn and the heights of the
-                                  rows. It is the caller¡¯s responsibility to free
+                                  rows. It is the caller's responsibility to free
                                   this buffer.
   @param  RowInfoArraySize        If this is non-NULL on entry, then on exit it
                                   contains the number of elements in RowInfoArray.
@@ -522,7 +522,7 @@ HiiStringToImage (
   @param  Flags                   Describes how the string is to be drawn.
   @param  PackageList             The package list in the HII database to search
                                   for the specified string.
-  @param  StringId                The string¡¯s id, which is unique within
+  @param  StringId                The string's id, which is unique within
                                   PackageList.
   @param  Language                Points to the language for the retrieved string.
                                   If NULL, then the current system language is
@@ -538,7 +538,7 @@ HiiStringToImage (
                                   EFI_HII_OUT_FLAG_CLIP is implied. If this points
                                   to a NULL on entry, then a              buffer
                                   will be allocated to hold the generated image and
-                                  the pointer updated on exit. It is the caller¡¯s
+                                  the pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
   @param  BltX,BLTY               Specifies the offset from the left and top edge
                                   of the image of the first character cell in the
@@ -549,7 +549,7 @@ HiiStringToImage (
                                   updated to contain the        number of elements.
                                   This array describes the characters which were at
                                   least partially drawn and the heights of the
-                                  rows. It is the caller¡¯s responsibility to free
+                                  rows. It is the caller's responsibility to free
                                   this buffer.
   @param  RowInfoArraySize        If this is non-NULL on entry, then on exit it
                                   contains the number of elements in RowInfoArray.
@@ -599,7 +599,7 @@ HiiStringIdToImage (
                                   system font and color.
   @param  Blt                     Thus must point to a NULL on entry. A buffer will
                                   be allocated to hold the output and the pointer
-                                  updated on exit. It is the caller¡¯s
+                                  updated on exit. It is the caller's
                                   responsibility to free this buffer.
   @param  Baseline                Number of pixels from the bottom of the bitmap to
                                   the baseline.
@@ -636,7 +636,7 @@ HiiGetGlyph (
                                   are no more matching fonts.
   @param  StringInfoIn            Upon entry, points to the font to return
                                   information about.
-  @param  StringInfoOut           Upon return, contains the matching font¡¯s
+  @param  StringInfoOut           Upon return, contains the matching font's
                                   information.  If NULL, then no information is
                                   returned. It's caller's responsibility to free
                                   this buffer.
@@ -703,7 +703,7 @@ HiiNewImage (
   @param  This                    A pointer to the EFI_HII_IMAGE_PROTOCOL instance.
   @param  PackageList             Handle of the package list where this image will
                                   be searched.
-  @param  ImageId                 The image¡¯s id,, which is unique within
+  @param  ImageId                 The image's id,, which is unique within
                                   PackageList.
   @param  Image                   Points to the image.
   @param  ImageSize               On entry, points to the size of the buffer
@@ -735,7 +735,7 @@ HiiGetImage (
 
   @param  This                    A pointer to the EFI_HII_IMAGE_PROTOCOL instance.
   @param  PackageList             The package list containing the images.
-  @param  ImageId                 The image¡¯s id,, which is unique within
+  @param  ImageId                 The image's id,, which is unique within
                                   PackageList.
   @param  Image                   Points to the image.
 
@@ -771,7 +771,7 @@ HiiSetImage (
                                   implied. If this points to a  NULL on entry, then
                                   a buffer will be allocated to hold  the generated
                                   image and the pointer updated on exit. It is the
-                                  caller¡¯s responsibility to free this buffer.
+                                  caller's responsibility to free this buffer.
   @param  BltY                    Specifies the offset from the left and top edge
                                   of the  output image of the first pixel in the
                                   image.
@@ -813,7 +813,7 @@ HiiDrawImage (
                                   EFI_HII_DRAW_FLAG_CLIP is implied. If this points
                                   to a  NULL on entry, then a buffer will be
                                   allocated to hold  the generated image and the
-                                  pointer updated on exit. It is the caller¡¯s
+                                  pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
   @param  BltY                    Specifies the offset from the left and top edge
                                   of the  output image of the first pixel in the
@@ -863,7 +863,7 @@ HiiDrawImageId (
                                   Language is not zero, the LanguageName being
                                   passed  in will be ignored.
   @param  String                  Points to the new null-terminated string.
-  @param  StringFontInfo          Points to the new string¡¯s font information or
+  @param  StringFontInfo          Points to the new string's font information or
                                   NULL if the string should have the default system
                                   font, size and style.
 
@@ -906,7 +906,7 @@ HiiNewString (
   @param  StringSize              On entry, points to the size of the buffer
                                   pointed to by  String, in bytes. On return,
                                   points to the length of the string, in bytes.
-  @param  StringFontInfo          If not NULL, points to the string¡¯s font
+  @param  StringFontInfo          If not NULL, points to the string's font
                                   information.  It's caller's responsibility to
                                   free this buffer.
 
@@ -943,11 +943,11 @@ HiiGetString (
   @param  This                    A pointer to the EFI_HII_STRING_PROTOCOL
                                   instance.
   @param  PackageList             The package list containing the strings.
-  @param  StringId                The string¡¯s id, which is unique within
+  @param  StringId                The string's id, which is unique within
                                   PackageList.
   @param  Language                Points to the language for the updated string.
   @param  String                  Points to the new null-terminated string.
-  @param  StringFontInfo          Points to the string¡¯s font information or NULL
+  @param  StringFontInfo          Points to the string's font information or NULL
                                   if the string font information is not changed.
 
   @retval EFI_SUCCESS             The string was updated successfully.
@@ -1429,9 +1429,9 @@ HiiGetPackageListHandle (
   @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the parts of the
                                   results that must be stored awaiting possible
                                   future        protocols.
-  @retval EFI_NOT_FOUND           Routing data doesn¡¯t match any known driver.
-                                     Progress set to the ¡°G¡± in ¡°GUID¡± of the
-                                  routing  header that doesn¡¯t match. Note: There
+  @retval EFI_NOT_FOUND           Routing data doesn't match any known driver.
+                                     Progress set to the "G" in "GUID" of the
+                                  routing  header that doesn't match. Note: There
                                   is no         requirement that all routing data
                                   be validated before any configuration extraction.
   @retval EFI_INVALID_PARAMETER   For example, passing in a NULL for the Request
@@ -1522,7 +1522,7 @@ HiiConfigRoutingRoutConfig (
 
 /**
   This helper function is to be called by drivers to map configuration data stored
-  in byte array (¡°block¡±) formats such as UEFI Variables into current configuration strings.
+  in byte array ("block") formats such as UEFI Variables into current configuration strings.
 
   @param  This                    A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL
                                   instance.
@@ -1551,12 +1551,12 @@ HiiConfigRoutingRoutConfig (
                                   error. Progress points to the first character of
                                   ConfigRequest.
   @retval EFI_NOT_FOUND           Target for the specified routing data was not
-                                  found. Progress points to the ¡°G¡± in ¡°GUID¡± of
+                                  found. Progress points to the "G" in "GUID" of
                                   the      errant routing data.
   @retval EFI_DEVICE_ERROR        Block not large enough. Progress undefined.
   @retval EFI_INVALID_PARAMETER   Encountered non <BlockName> formatted string.
                                        Block is left updated and Progress points at
-                                  the ¡®&¡¯ preceding the first non-<BlockName>.
+                                  the '&' preceding the first non-<BlockName>.
 
 **/
 EFI_STATUS
@@ -1574,7 +1574,7 @@ HiiBlockToConfig (
 
 /**
   This helper function is to be called by drivers to map configuration strings
-  to configurations stored in byte array (¡°block¡±) formats such as UEFI Variables.
+  to configurations stored in byte array ("block") formats such as UEFI Variables.
 
   @param  This                    A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL
                                   instance.
@@ -1610,11 +1610,11 @@ HiiBlockToConfig (
                                   error. Progress points to the first character of
                                            ConfigResp.
   @retval EFI_NOT_FOUND           Target for the specified routing data was not
-                                  found. Progress points to the ¡°G¡± in ¡°GUID¡± of
+                                  found. Progress points to the "G" in "GUID" of
                                   the      errant routing data.
   @retval EFI_INVALID_PARAMETER   Encountered non <BlockName> formatted name /
                                   value pair. Block is left updated and
-                                  Progress points at the ¡®&¡¯ preceding the first
+                                  Progress points at the '&' preceding the first
                                   non-<BlockName>.
 
 **/
