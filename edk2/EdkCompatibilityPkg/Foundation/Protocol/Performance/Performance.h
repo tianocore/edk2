@@ -54,7 +54,7 @@ typedef struct {
   UINT64            StartTick;
   UINT64            EndTick;
   EFI_GUID          GuidName;
-  UINT8             PdbFileName[EFI_PERF_PDBFILENAME_LENGTH];
+  CHAR8             PdbFileName[EFI_PERF_PDBFILENAME_LENGTH];
   UINT8             Phase;
 } EFI_GAUGE_DATA ;
 
