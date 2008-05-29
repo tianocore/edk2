@@ -135,6 +135,21 @@ typedef struct {
   UINT32                          ADR;
 } ACPI_ADR_DEVICE_PATH;
 
+#define ACPI_ADR_DISPLAY_TYPE_OTHER             0
+#define ACPI_ADR_DISPLAY_TYPE_VGA               1
+#define ACPI_ADR_DISPLAY_TYPE_TV                2
+#define ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL  3
+#define ACPI_ADR_DISPLAY_TYPE_INTERNAL_DIGITAL  4
+
+#define ACPI_DISPLAY_ADR(_DeviceIdScheme, _HeadId, _NonVgaOutput, _BiosCanDetect, _VendorInfo, _Type, _Port, _Index) \
+          ((UINT32) ( (((_DeviceIdScheme) & 0x1) << 31) |  \
+                      (((_HeadId)         & 0x7) << 18) |  \
+                      (((_NonVgaOutput)   & 0x1) << 17) |  \
+                      (((_BiosCanDetect)  & 0x1) << 16) |  \
+                      (((_VendorInfo)     & 0xf) << 12) |  \
+                      (((_Type)           & 0xf) << 8)  |  \
+                      (((_Port)           & 0xf) << 4)  |  \
+                       ((_Index)          & 0xf) ))
 
 //
 // Messaging Device Paths
