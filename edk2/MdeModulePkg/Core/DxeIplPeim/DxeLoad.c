@@ -276,27 +276,26 @@ DxeLoadCore (
              NULL,
              (VOID **)&Variable
              );
-  ASSERT_EFI_ERROR (Status);
-
-  DataSize = sizeof (MemoryData);
-  Status = Variable->GetVariable ( 
-                       Variable, 
-                       EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
-                       &gEfiMemoryTypeInformationGuid,
-                       NULL,
-                       &DataSize,
-                       &MemoryData
-                       );
-
   if (!EFI_ERROR (Status)) {
-    //
-    // Build the GUID'd HOB for DXE
-    //
-    BuildGuidDataHob (
-      &gEfiMemoryTypeInformationGuid,
-      MemoryData,
-      DataSize
-      );
+    DataSize = sizeof (MemoryData);
+    Status = Variable->GetVariable ( 
+                         Variable, 
+                         EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                         &gEfiMemoryTypeInformationGuid,
+                         NULL,
+                         &DataSize,
+                         &MemoryData
+                         );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Build the GUID'd HOB for DXE
+      //
+      BuildGuidDataHob (
+        &gEfiMemoryTypeInformationGuid,
+        MemoryData,
+        DataSize
+        );
+    }
   }
 
   //
