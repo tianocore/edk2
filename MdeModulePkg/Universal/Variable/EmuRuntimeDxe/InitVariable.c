@@ -21,6 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 extern ESAL_VARIABLE_GLOBAL *mVariableModuleGlobal;
 
+EFI_EVENT   mVirtualAddressChangeEvent = NULL;
+
 EFI_STATUS
 EFIAPI
 RuntimeServiceGetVariable (
@@ -202,6 +204,15 @@ Returns:
                   &gEfiVariableWriteArchProtocolGuid,
                   NULL,
                   NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
+                  TPL_NOTIFY,
+                  VariableClassAddressChangeEvent,
+                  NULL,
+                  &mVirtualAddressChangeEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
