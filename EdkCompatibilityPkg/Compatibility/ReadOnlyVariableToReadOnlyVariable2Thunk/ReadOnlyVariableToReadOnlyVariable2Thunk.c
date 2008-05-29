@@ -66,29 +66,21 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   &mVariablePpi
 };
 
+/**
+  Standard entry point of a PEIM.
+
+  @param FfsHeadher  The FFS file header
+  @param PeiServices  General purpose services available to every PEIM.
+
+  @retval EFI_SUCCESS If the gEfiPeiReadOnlyVariablePpiGuid interface could be successfully installed.
+
+--*/
 EFI_STATUS
 EFIAPI
 PeimInitializeReadOnlyVariable (
-  IN EFI_FFS_FILE_HEADER     *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE     FfsHeader,
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
-/*++
-
-Routine Description:
-
-  Provide the functionality of the variable services.
-
-Arguments:
-
-  FfsHeadher  - The FFS file header
-  PeiServices - General purpose services available to every PEIM.
-
-Returns:
-
-  Status -  EFI_SUCCESS if the interface could be successfully
-            installed
-
---*/
 {
   VOID        *Interface;
   EFI_STATUS  Status;
