@@ -1,5 +1,8 @@
 /** @file
-Module Layer Device I/O on top of PCI Root Bridge I/O (Segment 0)
+Module produces Device I/O on top of PCI Root Bridge I/O for Segment 0 only.
+This is a valid assumption because many of the EFI 1.02/EFI 1.10 systems that may have provided 
+Device I/O were single segment platforms.  The goal of the ECP is to provide compatibility with the 
+drivers/apps that may have used Device I/O.
 
 Device I/O is on list of deprecated protocols for UEFI 2.0 and later.
 This module module layers Device I/O on top of PCI Root Bridge I/O (Segment 0)
@@ -451,7 +454,8 @@ PciRootBridgeIoNotificationEvent (
     ASSERT_EFI_ERROR (Status);
 
     //
-    // We only install Device IO for PCI bus in Segment 0
+    // We only install Device IO for PCI bus in Segment 0.
+    // See the file description at @file for details.
     //
     if (PciRootBridgeIo->SegmentNumber != 0) {
       continue;
@@ -1107,8 +1111,12 @@ DeviceIoAllocateBuffer (
   IN OUT EFI_PHYSICAL_ADDRESS      *PhysicalAddress
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  HostAddress;
+  EFI_STATUS              Status;
+  EFI_PHYSICAL_ADDRESS    HostAddress;
+  DEVICE_IO_PRIVATE_DATA  *Private;
+  VOID                    *HostAddress2;
+
+  Private = DEVICE_IO_PRIVATE_DATA_FROM_THIS (This);
 
   HostAddress = *PhysicalAddress;
 
@@ -1129,18 +1137,23 @@ DeviceIoAllocateBuffer (
     HostAddress = MAX_COMMON_BUFFER;
   }
 
-  Status = gBS->AllocatePages (
-                  Type,
-                  MemoryType,
-                  Pages,
-                  &HostAddress
-                  );
+  HostAddress2 = (VOID *) (UINTN) (HostAddress);
+  Status = Private->PciRootBridgeIo->AllocateBuffer (
+                                       Private->PciRootBridgeIo,
+                                       Type,
+                                       MemoryType,
+                                       Pages,
+                                       &HostAddress2,
+                                       EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE |
+                                       EFI_PCI_ATTRIBUTE_MEMORY_CACHED
+                                       );
+                                                    
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
 
-  *PhysicalAddress = HostAddress;
+  *PhysicalAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress2;
 
   return EFI_SUCCESS;
 }
@@ -1195,10 +1208,19 @@ DeviceIoFreeBuffer (
   IN EFI_PHYSICAL_ADDRESS     HostAddress
   )
 {
+  DEVICE_IO_PRIVATE_DATA  *Private;
+
+  Private = DEVICE_IO_PRIVATE_DATA_FROM_THIS (This);
+
   if (((HostAddress & EFI_PAGE_MASK) != 0) || (Pages <= 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  return gBS->FreePages (HostAddress, Pages);
+  return  Private->PciRootBridgeIo->FreeBuffer (
+            Private->PciRootBridgeIo,
+            Pages,
+            (VOID *) (UINTN) HostAddress
+            );
+
 }
 
