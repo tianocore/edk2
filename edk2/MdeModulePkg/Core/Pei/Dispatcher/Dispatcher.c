@@ -578,6 +578,11 @@ Returns:
               PrivateInMem->PeiMemoryInstalled     = TRUE;
 
               //
+              // Restart scan of all PEIMs on next pass
+              //
+              PrivateInMem->CurrentPeimCount = 0;
+
+              //
               // Shadow PEI Core. When permanent memory is avaiable, shadow
               // PEI Core and PEIMs to get high performance.
               //
