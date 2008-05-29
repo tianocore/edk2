@@ -116,6 +116,21 @@ Returns:
   return PeiServicesInstallPpi (&mPpiListVariable);
 }
 
+/**
+  Provide the read variable functionality of the variable services.
+
+  @param  PeiServices           General purpose services available to every PEIM.
+  @param  VariableName          The variable name
+  @param  VendorGuid            The vendor's GUID
+  @param  Attributes            Pointer to the attribute
+  @param  DataSize              Size of data
+  @param  Data                  Pointer to data
+
+  @retval EFI_SUCCESS           The interface could be successfully installed
+  @retval EFI_NOT_FOUND         The variable could not be discovered
+  @retval EFI_BUFFER_TOO_SMALL  The caller buffer is not large enough
+
+**/
 EFI_STATUS
 EFIAPI
 PeiGetVariable (
@@ -126,35 +141,6 @@ PeiGetVariable (
   IN OUT    UINTN                           *DataSize,
   OUT       VOID                            *Data
   )
-/*++
-
-Routine Description:
-
-  Provide the read variable functionality of the variable services.
-
-Arguments:
-
-  PeiServices - General purpose services available to every PEIM.
-
-  VariableName     - The variable name
-
-  VendorGuid       - The vendor's GUID
-
-  Attributes       - Pointer to the attribute
-
-  DataSize         - Size of data
-
-  Data             - Pointer to data
-
-Returns:
-
-  EFI_SUCCESS           - The interface could be successfully installed
-
-  EFI_NOT_FOUND         - The variable could not be discovered
-
-  EFI_BUFFER_TOO_SMALL  - The caller buffer is not large enough
-
---*/
 {
   EFI_STATUS                     Status;
   EFI_PEI_READ_ONLY_VARIABLE_PPI *ReadOnlyVariable;
@@ -177,6 +163,21 @@ Returns:
                              );
 }
 
+/**
+  Provide the get next variable functionality of the variable services.
+
+  @param  PeiServices           General purpose services available to every PEIM.
+  @param  VariabvleNameSize     The variable name's size.
+  @param  VariableName          A pointer to the variable's name.
+  @param  VariableGuid          A pointer to the EFI_GUID structure.
+  @param  VariableNameSize      Size of the variable name
+  @param  VariableName          The variable name
+  @param  VendorGuid            The vendor's GUID
+
+  @retval EFI_SUCCESS           The interface could be successfully installed
+  @retval EFI_NOT_FOUND         The variable could not be discovered
+
+**/
 EFI_STATUS
 EFIAPI
 PeiGetNextVariableName (
@@ -185,32 +186,6 @@ PeiGetNextVariableName (
   IN OUT CHAR16                             *VariableName,
   IN OUT EFI_GUID                           *VariableGuid
   )
-/*++
-
-Routine Description:
-
-  Provide the get next variable functionality of the variable services.
-
-Arguments:
-
-  PeiServices        - General purpose services available to every PEIM.
-  VariabvleNameSize  - The variable name's size.
-  VariableName       - A pointer to the variable's name.
-  VariableGuid       - A pointer to the EFI_GUID structure.
-
-  VariableNameSize - Size of the variable name
-
-  VariableName     - The variable name
-
-  VendorGuid       - The vendor's GUID
-
-Returns:
-
-  EFI_SUCCESS - The interface could be successfully installed
-
-  EFI_NOT_FOUND - The variable could not be discovered
-
---*/
 {
   EFI_STATUS                     Status;
   EFI_PEI_READ_ONLY_VARIABLE_PPI *ReadOnlyVariable;
