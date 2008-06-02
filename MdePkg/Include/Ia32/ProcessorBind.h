@@ -176,10 +176,10 @@ typedef INT32   INTN;
   // Microsoft* compiler requires _EFIAPI useage, __cdecl is Microsoft* specific C.
   // 
   #define EFIAPI __cdecl  
-#endif
-
-#if __GNUC__
-  #define EFIAPI __attribute__((cdecl))    
+#else
+  #if __GNUC__
+    #define EFIAPI __attribute__((cdecl))  
+  #endif  
 #endif
 
 //
