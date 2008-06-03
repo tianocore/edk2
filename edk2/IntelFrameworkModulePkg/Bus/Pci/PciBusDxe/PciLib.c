@@ -1222,122 +1222,122 @@ PciScanBus_WithoutHotPlugDeviceSupport (
                 Func
                 );
 
-      if (!EFI_ERROR (Status)   &&
-          (IS_PCI_BRIDGE (&Pci) ||
-          IS_CARDBUS_BRIDGE (&Pci))) {
+      if (!EFI_ERROR (Status)) {
+        DEBUG((EFI_D_ERROR, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func));
+        
+        if (IS_PCI_BRIDGE (&Pci) ||
+          IS_CARDBUS_BRIDGE (&Pci)) {
 
-        DEBUG((EFI_D_ERROR, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func ));
-
-        //
-        // Get the bridge information
-        //
-        Status = PciSearchDevice (
-                  Bridge,
-                  &Pci,
-                  StartBusNumber,
-                  Device,
-                  Func,
-                  &PciDevice
-                  );
-
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        //
-        // Add feature to support customized secondary bus number
-        //
-        if (*SubBusNumber == 0) {
-          *SubBusNumber   = *PaddedBusRange;
-          *PaddedBusRange = 0;
-        }
-
-        (*SubBusNumber)++;
-
-        SecondBus = (*SubBusNumber);
-
-        Register  = (UINT16) ((SecondBus << 8) | (UINT16) StartBusNumber);
-
-        Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
-
-        Status = PciRootBridgeIoWrite (
-                                        PciRootBridgeIo,
-                                        &Pci,
-                                        EfiPciWidthUint16,
-                                        Address,
-                                        1,
-                                        &Register
-                                        );
-
-        //
-        // Initialize SubBusNumber to SecondBus
-        //
-        Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
-        Status = PciRootBridgeIoWrite (
-                                        PciRootBridgeIo,
-                                        &Pci,
-                                        EfiPciWidthUint8,
-                                        Address,
-                                        1,
-                                        SubBusNumber
-                                        );
-        //
-        // If it is PPB, resursively search down this bridge
-        //
-        if (IS_PCI_BRIDGE (&Pci)) {
           //
-          // Temporarily initialize SubBusNumber to maximum bus number to ensure the
-          // PCI configuration transaction to go through any PPB
+          // Get the bridge information
           //
-          Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
-          Register  = 0xFF;
+          Status = PciSearchDevice (
+                    Bridge,
+                    &Pci,
+                    StartBusNumber,
+                    Device,
+                    Func,
+                    &PciDevice
+                    );
+        
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
+        
+          //
+          // Add feature to support customized secondary bus number
+          //
+          if (*SubBusNumber == 0) {
+            *SubBusNumber   = *PaddedBusRange;
+            *PaddedBusRange = 0;
+          }
+        
+          (*SubBusNumber)++;
+        
+          SecondBus = (*SubBusNumber);
+        
+          Register  = (UINT16) ((SecondBus << 8) | (UINT16) StartBusNumber);
+        
+          Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
+        
+          Status = PciRootBridgeIoWrite (
+                                          PciRootBridgeIo,
+                                          &Pci,
+                                          EfiPciWidthUint16,
+                                          Address,
+                                          1,
+                                          &Register
+                                          );
+        
+          //
+          // Initialize SubBusNumber to SecondBus
+          //
+          Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
           Status = PciRootBridgeIoWrite (
                                           PciRootBridgeIo,
                                           &Pci,
                                           EfiPciWidthUint8,
                                           Address,
                                           1,
-                                          &Register
+                                          SubBusNumber
                                           );
-
-          PreprocessController (
-            PciDevice,
-            PciDevice->BusNumber,
-            PciDevice->DeviceNumber,
-            PciDevice->FunctionNumber,
-            EfiPciBeforeChildBusEnumeration
-            );
-
-          DEBUG((EFI_D_ERROR, "Scan  PPB(%02d,%02d,%02d)\n", PciDevice->BusNumber, PciDevice->DeviceNumber,PciDevice->FunctionNumber ));
-          Status = PciScanBus (
-                    PciDevice,
-                    (UINT8) (SecondBus),
-                    SubBusNumber,
-                    PaddedBusRange
-                    );
-
-          if (EFI_ERROR (Status)) {
-            return EFI_DEVICE_ERROR;
+          //
+          // If it is PPB, resursively search down this bridge
+          //
+          if (IS_PCI_BRIDGE (&Pci)) {
+            //
+            // Temporarily initialize SubBusNumber to maximum bus number to ensure the
+            // PCI configuration transaction to go through any PPB
+            //
+            Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
+            Register  = 0xFF;
+            Status = PciRootBridgeIoWrite (
+                                            PciRootBridgeIo,
+                                            &Pci,
+                                            EfiPciWidthUint8,
+                                            Address,
+                                            1,
+                                            &Register
+                                            );
+        
+            PreprocessController (
+              PciDevice,
+              PciDevice->BusNumber,
+              PciDevice->DeviceNumber,
+              PciDevice->FunctionNumber,
+              EfiPciBeforeChildBusEnumeration
+              );
+        
+            DEBUG((EFI_D_ERROR, "Scan  PPB(%02d,%02d,%02d)\n", PciDevice->BusNumber, PciDevice->DeviceNumber,PciDevice->FunctionNumber ));
+            Status = PciScanBus (
+                      PciDevice,
+                      (UINT8) (SecondBus),
+                      SubBusNumber,
+                      PaddedBusRange
+                      );
+        
+            if (EFI_ERROR (Status)) {
+              return EFI_DEVICE_ERROR;
+            }
           }
+        
+          //
+          // Set the current maximum bus number under the PPB
+          //
+        
+          Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
+        
+          Status = PciRootBridgeIoWrite (
+                                          PciRootBridgeIo,
+                                          &Pci,
+                                          EfiPciWidthUint8,
+                                          Address,
+                                          1,
+                                          SubBusNumber
+                                          );
+        
         }
-
-        //
-        // Set the current maximum bus number under the PPB
-        //
-
-        Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
-
-        Status = PciRootBridgeIoWrite (
-                                        PciRootBridgeIo,
-                                        &Pci,
-                                        EfiPciWidthUint8,
-                                        Address,
-                                        1,
-                                        SubBusNumber
-                                        );
-
       }
-
       if (Func == 0 && !IS_PCI_MULTI_FUNC (&Pci)) {
 
         //
