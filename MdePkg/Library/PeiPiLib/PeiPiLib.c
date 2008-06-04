@@ -61,7 +61,8 @@ PiLibInstallFvInfoPpi (
   IN UINT32                  FvInfoSize,
   IN EFI_GUID                *ParentFvName, OPTIONAL
   IN EFI_GUID                *ParentFileName OPTIONAL
-  ) {
+  )
+{
   
   EFI_STATUS                       Status;   
   EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *FvInfoPpi;
