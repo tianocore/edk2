@@ -28,7 +28,7 @@ typedef struct _UDP_IO_PORT UDP_IO_PORT;
 enum {
   UDP_IO_RX_SIGNATURE = EFI_SIGNATURE_32 ('U', 'D', 'P', 'R'),
   UDP_IO_TX_SIGNATURE = EFI_SIGNATURE_32 ('U', 'D', 'P', 'T'),
-  UDP_IO_SIGNATURE    = EFI_SIGNATURE_32 ('U', 'D', 'P', 'I'),
+  UDP_IO_SIGNATURE    = EFI_SIGNATURE_32 ('U', 'D', 'P', 'I')
 };
 
 typedef struct {
