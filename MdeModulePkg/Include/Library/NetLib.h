@@ -45,7 +45,7 @@ enum {
   IP4_ADDR_CLASSD,
   IP4_ADDR_CLASSE,
 
-  IP4_MASK_NUM          = 33,
+  IP4_MASK_NUM          = 33
 };
 
 #pragma pack(1)
@@ -765,7 +765,7 @@ enum {
   NET_PROTO_DATA       = 64,   // Opaque buffer for protocols
   NET_BUF_HEAD         = 1,    // Trim or allocate space from head
   NET_BUF_TAIL         = 0,    // Trim or allocate space from tail
-  NET_VECTOR_OWN_FIRST = 0x01, // We allocated the 1st block in the vector
+  NET_VECTOR_OWN_FIRST = 0x01  // We allocated the 1st block in the vector
 };
 
 #define NET_CHECK_SIGNATURE(PData, SIGNATURE) \
