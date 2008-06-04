@@ -31,13 +31,13 @@ Abstract:
 #define ISCSI_SEQ_EQ(s1, s2)  ((s1) == (s2))
 #define ISCSI_SEQ_LT(s1, s2) \
     ( \
-      (((INT32) (s1) < (INT32) (s2)) && (s2 - s1) < (1 << 31)) || \
-      (((INT32) (s1) > (INT32) (s2)) && (s1 - s2) > (1 << 31)) \
+      (((INT32) (s1) < (INT32) (s2)) && (s2 - s1) < ((UINT32) 1 << 31)) || \
+      (((INT32) (s1) > (INT32) (s2)) && (s1 - s2) > ((UINT32) 1 << 31)) \
     )
 #define ISCSI_SEQ_GT(s1, s2) \
     ( \
-      (((INT32) (s1) < (INT32) (s2)) && (s2 - s1) > (1 << 31)) || \
-      (((INT32) (s1) > (INT32) (s2)) && (s1 - s2) < (1 << 31)) \
+      (((INT32) (s1) < (INT32) (s2)) && (s2 - s1) > ((UINT32) 1 << 31)) || \
+      (((INT32) (s1) > (INT32) (s2)) && (s1 - s2) < ((UINT32) 1 << 31)) \
     )
 
 #define ISCSI_WELL_KNOWN_PORT                   3260
