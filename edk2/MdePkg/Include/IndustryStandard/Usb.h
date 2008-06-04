@@ -190,7 +190,7 @@ enum {
   //
   //Use 200 ms to increase the error handling response time
   //
-  EFI_USB_INTERRUPT_DELAY = 2000000,
+  EFI_USB_INTERRUPT_DELAY = 2000000
 };
 
 
