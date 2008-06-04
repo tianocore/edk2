@@ -21,7 +21,7 @@
 #define EFI_PEI_DECOMPRESS_PPI_GUID \
   { 0x1a36e4e7, 0xfab6, 0x476a, { 0x8e, 0x75, 0x69, 0x5a, 0x5, 0x76, 0xfd, 0xd7 } }
 
-typedef struct _EFI_PEI_DECOMPRESS_PPI  EFI_PEI_DECOMPRESS_PPI;;
+typedef struct _EFI_PEI_DECOMPRESS_PPI  EFI_PEI_DECOMPRESS_PPI;
 
 /**                                                              
   Decompresses the data in a compressed section and returns it
