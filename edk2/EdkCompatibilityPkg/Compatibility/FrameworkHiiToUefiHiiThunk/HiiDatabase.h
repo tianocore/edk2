@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/GlobalVariable.h>
 #include <Protocol/FrameworkFormCallback.h>
 #include <Protocol/FrameworkHii.h>
+#include <Protocol/FrameworkFormBrowser.h>
 
 //
 // UEFI HII Protocols
@@ -141,6 +142,14 @@ typedef struct {
   EFI_FORM_CALLBACK_PROTOCOL     *FrameworkFormCallbackProtocol;
   LIST_ENTRY                     ConfigAccessBufferStorageListHead;
 } HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE;
+
+#define EFI_FORMBROWSER_THUNK_PRIVATE_DATA_SIGNATURE            EFI_SIGNATURE_32 ('F', 'B', 'T', 'd')
+typedef struct {
+  UINTN                     Signature;
+  EFI_HANDLE                Handle;
+  EFI_FORM_BROWSER_PROTOCOL FormBrowser;
+} EFI_FORMBROWSER_THUNK_PRIVATE_DATA;
+
 
 //
 // Extern Variables
@@ -354,6 +363,34 @@ HiiCompareLanguage (
   IN  CHAR16                *Language
   )
 ;
+
+
+
+EFI_STATUS
+EFIAPI 
+ThunkSendForm (
+  IN  EFI_FORM_BROWSER_PROTOCOL       *This,
+  IN  BOOLEAN                         UseDatabase,
+  IN  FRAMEWORK_EFI_HII_HANDLE        *Handle,
+  IN  UINTN                           HandleCount,
+  IN  FRAMEWORK_EFI_IFR_PACKET                  *Packet, OPTIONAL
+  IN  EFI_HANDLE                      CallbackHandle, OPTIONAL
+  IN  UINT8                           *NvMapOverride, OPTIONAL
+  IN  FRAMEWORK_EFI_SCREEN_DESCRIPTOR            *ScreenDimensions, OPTIONAL
+  OUT BOOLEAN                         *ResetRequired OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI 
+ThunkCreatePopUp (
+  IN  UINTN                           NumberOfLines,
+  IN  BOOLEAN                         HotKey,
+  IN  UINTN                           MaximumStringSize,
+  OUT CHAR16                          *StringBuffer,
+  OUT EFI_INPUT_KEY                   *KeyValue,
+  IN  CHAR16                          *String,
+  ...
+  );
 
 #include "Utility.h"
 #include "ConfigAccess.h"
