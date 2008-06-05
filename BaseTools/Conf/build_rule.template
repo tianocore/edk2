@@ -98,6 +98,7 @@
         ?.cpp
         ?.Cpp
         ?.CPP
+        $(MAKE_FILE)
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
@@ -122,9 +123,11 @@
 [Build.Assembly-Code-File]
     <InputFile.MSFT, InputFile.INTEL>
         Assembly-Code-File = ?.asm, ?.Asm, ?.ASM
+        $(MAKE_FILE)
 
     <InputFile.GCC>
         ?.S
+        $(MAKE_FILE)
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
@@ -142,6 +145,7 @@
 [Build.Iasm-Code-File]
     <InputFile>
         ?.s
+        $(MAKE_FILE)
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
@@ -156,6 +160,7 @@
         ?.vfr
         ?.Vfr
         ?.VFR
+        $(MAKE_FILE)
 
     <OutputFile>
         $(DEBUG_DIR)(+)${s_dir}(+)${s_base}.c
