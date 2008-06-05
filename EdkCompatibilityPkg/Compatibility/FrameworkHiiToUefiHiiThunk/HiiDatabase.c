@@ -63,6 +63,16 @@ EFI_HII_THUNK_PRIVATE_DATA mHiiThunkPrivateDataTempate = {
   },
 };
 
+EFI_FORMBROWSER_THUNK_PRIVATE_DATA mBrowserThunkPrivateDataTemplate = {
+  EFI_FORMBROWSER_THUNK_PRIVATE_DATA_SIGNATURE,
+  (EFI_HANDLE) NULL,
+  {
+    ThunkSendForm,
+    ThunkCreatePopUp
+  }
+};
+
+
 CONST EFI_HII_DATABASE_PROTOCOL            *mHiiDatabase;
 CONST EFI_HII_FONT_PROTOCOL                *mHiiFontProtocol;
 CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
@@ -447,6 +457,14 @@ Returns:
                            );
   ASSERT_EFI_ERROR (Status);
 
+  Status = gBS->InstallProtocolInterface (
+                  &mBrowserThunkPrivateDataTemplate.Handle,
+                  &gEfiFormBrowserProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  (VOID *) &mBrowserThunkPrivateDataTemplate.FormBrowser
+                  );
+  ASSERT_EFI_ERROR (Status);
+  
   return Status;
 }
 
@@ -619,4 +637,37 @@ Returns:
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+EFIAPI 
+ThunkSendForm (
+  IN  EFI_FORM_BROWSER_PROTOCOL       *This,
+  IN  BOOLEAN                         UseDatabase,
+  IN  FRAMEWORK_EFI_HII_HANDLE        *Handle,
+  IN  UINTN                           HandleCount,
+  IN  FRAMEWORK_EFI_IFR_PACKET                  *Packet, OPTIONAL
+  IN  EFI_HANDLE                      CallbackHandle, OPTIONAL
+  IN  UINT8                           *NvMapOverride, OPTIONAL
+  IN  FRAMEWORK_EFI_SCREEN_DESCRIPTOR            *ScreenDimensions, OPTIONAL
+  OUT BOOLEAN                         *ResetRequired OPTIONAL
+  )
+{
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+EFIAPI 
+ThunkCreatePopUp (
+  IN  UINTN                           NumberOfLines,
+  IN  BOOLEAN                         HotKey,
+  IN  UINTN                           MaximumStringSize,
+  OUT CHAR16                          *StringBuffer,
+  OUT EFI_INPUT_KEY                   *KeyValue,
+  IN  CHAR16                          *String,
+  ...
+  )
+{
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
 

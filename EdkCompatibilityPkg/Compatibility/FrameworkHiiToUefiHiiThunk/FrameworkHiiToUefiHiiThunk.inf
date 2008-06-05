@@ -90,6 +90,7 @@
   gEfiHiiConfigAccessProtocolGuid
   gEfiFormCallbackProtocolGuid
   gEfiUnicodeCollation2ProtocolGuid
+  gEfiFormBrowserProtocolGuid
 
 [Depex]
   gEfiHiiImageProtocolGuid AND
