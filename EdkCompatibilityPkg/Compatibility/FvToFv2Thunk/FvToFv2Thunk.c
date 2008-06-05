@@ -375,7 +375,7 @@ FvGetVolumeAttributes (
                               Attributes
                               );
   if (!EFI_ERROR (Status)) {
-    *Attributes = (*Attributes & 0x1ff) | ((UINTN)EFI_FV_ALIGNMENT_2 << ((*Attributes & EFI_FV2_ALIGNMENT) >> 16));
+    *Attributes = (*Attributes & 0x1ff) | ((UINTN)EFI_FV_ALIGNMENT_2 << RShiftU64((*Attributes & EFI_FV2_ALIGNMENT), 16));
   }
   return Status;
 }
