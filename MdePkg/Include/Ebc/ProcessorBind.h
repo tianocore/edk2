@@ -29,7 +29,7 @@
 typedef char                  INT8;
 typedef unsigned char         BOOLEAN;
 typedef unsigned char         UINT8;
-typedef unsigned char         CHAR8;
+typedef char                  CHAR8;
 
 typedef short                 INT16;
 typedef unsigned short        UINT16;
