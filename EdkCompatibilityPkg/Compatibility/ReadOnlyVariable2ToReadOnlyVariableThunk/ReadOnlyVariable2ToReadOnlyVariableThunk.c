@@ -73,7 +73,7 @@ EFI_PEI_PPI_DESCRIPTOR     mReadOnlyVariableThunkPresent = {
     (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gPeiReadonlyVariableThunkPresentPpiGuid,
     NULL
-  };
+};
 
 EFI_STATUS
 EFIAPI
@@ -109,7 +109,9 @@ Returns:
   Status = PeiServicesLocatePpi (&gPeiReadonlyVariableThunkPresentPpiGuid, 0, NULL, &Interface);
   ASSERT (Status == EFI_NOT_FOUND);
   
-  PeiServicesInstallPpi (&mReadOnlyVariableThunkPresent);
+  Status = PeiServicesInstallPpi (&mReadOnlyVariableThunkPresent);
+  ASSERT_EFI_ERROR (Status);
+  
   //
   // Publish the variable capability to other modules
   //
