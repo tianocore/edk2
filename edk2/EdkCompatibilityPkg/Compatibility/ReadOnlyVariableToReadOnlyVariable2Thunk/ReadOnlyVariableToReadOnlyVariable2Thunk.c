@@ -66,6 +66,13 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   &mVariablePpi
 };
 
+EFI_PEI_PPI_DESCRIPTOR     mReadOnlyVariableThunkPresent = {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gPeiReadonlyVariableThunkPresentPpiGuid,
+    NULL
+};
+
+
 /**
   Standard entry point of a PEIM.
 
@@ -91,6 +98,9 @@ PeimInitializeReadOnlyVariable (
   //
   Status = PeiServicesLocatePpi (&gPeiReadonlyVariableThunkPresentPpiGuid, 0, NULL, &Interface);
   ASSERT (Status == EFI_NOT_FOUND);
+
+  Status = PeiServicesInstallPpi (&mReadOnlyVariableThunkPresent);
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Publish the variable capability to other modules
