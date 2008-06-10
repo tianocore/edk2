@@ -190,7 +190,7 @@ UC2_PRIVATE_DATA gUC2PrivateDataTemplate = {
 
 VOID
 EFIAPI
-Uc2NotificationEvent (
+UcNotificationEvent (
   IN  EFI_EVENT       Event,
   IN  VOID            *Context
   )
@@ -292,7 +292,7 @@ InitializeUC2 (
   EfiCreateProtocolNotifyEvent (
     &gEfiUnicodeCollationProtocolGuid,
     TPL_CALLBACK,
-    Uc2NotificationEvent,
+    UcNotificationEvent,
     NULL,
     &mUc2Registration
     );
