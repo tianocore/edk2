@@ -290,7 +290,7 @@ InitializeUC (
   )
 {
   EfiCreateProtocolNotifyEvent (
-    &gEfiUnicodeCollationProtocolGuid,
+    &gEfiUnicodeCollation2ProtocolGuid,
     TPL_CALLBACK,
     Uc2NotificationEvent,
     NULL,
