@@ -241,7 +241,7 @@ AddName (
   Arguments:
   
     SerialDevice              - A pointer to the SERIAL_DEV instance.
-    IsaIo                     - A pointer to the EFI_ISA_IO_PROTOCOL or EFI_LIGHT_ISA_IO_PROTOCOL instance.
+    IsaIo                     - A pointer to the EFI_ISA_IO_PROTOCOL instance.
     
   Returns:
 
