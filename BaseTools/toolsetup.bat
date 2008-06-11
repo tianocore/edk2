@@ -131,7 +131,7 @@ pushd .
   )
   echo EDK_TOOLS_PATH      = %EDK_TOOLS_PATH%
   if defined BASE_TOOLS_PATH (
-    echo BASE_TOOLS_PATH     = %EDK_TOOLS_PATH%
+    echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
   )
   echo.
 
