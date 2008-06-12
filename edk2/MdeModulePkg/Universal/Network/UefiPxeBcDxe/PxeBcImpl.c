@@ -2456,57 +2456,46 @@ EfiPxeLoadFile (
           &Private->LoadFileCallback
           );
   }
+
   //
   // Check download status
   //
-  switch (Status) {
-
-  case EFI_SUCCESS:
+  if (Status == EFI_SUCCESS) {
     return EFI_SUCCESS;
 
-  case EFI_BUFFER_TOO_SMALL:
+  } else if (Status == EFI_BUFFER_TOO_SMALL) {
     if (Buffer != NULL) {
       AsciiPrint ("PXE-E05: Download buffer is smaller than requested file.\n");
     } else {
       return Status;
     }
-    break;
 
-  case EFI_DEVICE_ERROR:
+  } else if (Status == EFI_DEVICE_ERROR) {
     AsciiPrint ("PXE-E07: Network device error.\n");
-    break;
 
-  case EFI_OUT_OF_RESOURCES:
+  } else if (Status == EFI_OUT_OF_RESOURCES) {
     AsciiPrint ("PXE-E09: Could not allocate I/O buffers.\n");
-    break;
 
-  case EFI_NO_MEDIA:
+  } else if (Status == EFI_NO_MEDIA) {
     AsciiPrint ("PXE-E12: Could not detect network connection.\n");
-    break;
 
-  case EFI_NO_RESPONSE:
+  } else if (Status == EFI_NO_RESPONSE) {
     AsciiPrint ("PXE-E16: No offer received.\n");
-    break;
 
-  case EFI_TIMEOUT:
+  } else if (Status == EFI_TIMEOUT) {
     AsciiPrint ("PXE-E18: Server response timeout.\n");
-    break;
 
-  case EFI_ABORTED:
+  } else if (Status == EFI_ABORTED) {
     AsciiPrint ("PXE-E21: Remote boot cancelled.\n");
-    break;
 
-  case EFI_ICMP_ERROR:
+  } else if (Status == EFI_ICMP_ERROR) {
     AsciiPrint ("PXE-E22: Client received ICMP error from server.\n");
-    break;
 
-  case EFI_TFTP_ERROR:
+  } else if (Status == EFI_TFTP_ERROR) {
     AsciiPrint ("PXE-E23: Client received TFTP error from server.\n");
-    break;
 
-  default:
+  } else {
     AsciiPrint ("PXE-E99: Unexpected network error.\n");
-    break;
   }
 
   PxeBc->Stop (PxeBc);
