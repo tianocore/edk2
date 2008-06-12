@@ -9,6 +9,10 @@ these two conditions are true:
 1) Framework module is present that consumes PCI CFG  AND
 2) PI module is present that produces PCI CFG2 but not PCI CFG
 
+The Usage of this module is rare since EDK II module IntelFrameworkModulePkg\Universal\PcatSingleSegmentPciCfgPei\PcatSingleSegmentPciCfgPei.inf
+that produce PCI CFG2 can also produce PCI CFG by setting Pcd Feature Flag gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable
+to FALSE.
+
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
