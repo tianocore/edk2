@@ -41,7 +41,7 @@
 #
 
 [Sources.common]
-  FvHobtoFvInfoThunk.c
+  FvInfoToFvHobThunk.c
 
 [Packages]
   MdePkg/MdePkg.dec
