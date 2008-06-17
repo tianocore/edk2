@@ -59,4 +59,6 @@
   gEfiPeiFirmwareVolumeInfoPpiGuid
 
 [Depex]
+  # This DPX ensure that this module is dispatched as late as possible in PEI phase
+  # so that all FV HOB has been built.
   gEfiPeiMemoryDiscoveredPpiGuid
