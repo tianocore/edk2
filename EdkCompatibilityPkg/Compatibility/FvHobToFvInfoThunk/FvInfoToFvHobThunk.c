@@ -84,7 +84,7 @@ FvInfoPpiInstalled (
 **/
 EFI_STATUS
 EFIAPI
-FvHobtoFvInfoThunkEntry (
+PeimEntry (
   IN EFI_PEI_FILE_HANDLE       FfsHeader,
   IN CONST EFI_PEI_SERVICES    **PeiServices
   )
