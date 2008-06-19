@@ -337,7 +337,7 @@ GetSupportedLanguages (
 
 Routine Description:
   This function returns the list of supported languages, in the format specified
-  in UEFI specification Appendix M.
+  in UEFI specification Appendix M.
 
 Arguments:
   HiiHandle  - The HII package list handle.
