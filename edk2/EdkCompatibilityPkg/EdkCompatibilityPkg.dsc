@@ -25,10 +25,11 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/EdkCompatibilityPkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF
+  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 define MSFT_MACRO                = /D EFI_SPECIFICATION_VERSION=0x0002000A /D PI_SPECIFICATION_VERSION=0x00010000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000
+define INTEL_MACRO                = /D EFI_SPECIFICATION_VERSION=0x0002000A /D PI_SPECIFICATION_VERSION=0x00010000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000
 define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_SPECIFICATION_VERSION=0x00010000 -DTIANO_RELEASE_VERSION=0x00080006 -DPCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000
 
 ################################################################################
@@ -49,12 +50,11 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   ExtendedIfrSupportLib|MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   PalCallLib|MdePkg/Library/BasePalCallLibNull/BasePalCallLibNull.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
@@ -62,6 +62,14 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  PeiPiLib|MdePkg/Library/PeiPiLib/PeiPiLib.inf
+  
+[LibraryClasses.common.PEIM]
+  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+
+[LibraryClasses.common.DXE_DRIVER]
+  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
 
 [BuildOptions]
   GCC:*_*_IA32_CC_FLAGS     = -DEFI32 $(GCC_MACRO)
@@ -88,6 +96,9 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   INTEL:*_*_IA32_VFRPP_FLAGS = /D EFI32 $(MSFT_MACRO)
   INTEL:*_*_IA32_APP_FLAGS   = /D EFI32 $(MSFT_MACRO)
   INTEL:*_*_IA32_PP_FLAGS    = /D EFI32 $(MSFT_MACRO)
+
+  INTEL:*_*_EBC_CC_FLAGS    = /D EFI32 $(MSFT_MACRO)
+  INTEL:*_*_EBC_PP_FLAGS    = /D EFI32 $(MSFT_MACRO)
 
   INTEL:*_*_X64_CC_FLAGS     = /D EFIX64 $(MSFT_MACRO)
   INTEL:*_*_X64_ASM_FLAGS    = /DEFIX64
@@ -149,6 +160,9 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   EdkCompatibilityPkg/Foundation/Library/Dxe/UefiEfiIfrSupportLib/UefiEfiIfrSupportLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  #
+  # Need to sync with MdePkg\Library\BaseIoLibIntrinsic\BaseIoLibIntrinsic.inf so that EBC can pass build
+  #
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseLib/BaseLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -197,7 +211,6 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib.inf
   EdkCompatibilityPkg/Foundation/Library/Pei/Hob/PeiHobLib.inf
-  EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib.inf
   EdkCompatibilityPkg/Foundation/Library/RuntimeDxe/EfiRuntimeLib/EfiRuntimeLib.inf
   EdkCompatibilityPkg/Foundation/Library/Thunk16/Thunk16Lib.inf
   EdkCompatibilityPkg/Foundation/Ppi/EdkPpiLib.inf
@@ -218,6 +231,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   EdkCompatibilityPkg/Compatibility/DeviceIoToPciRootBridgeIoThunk/DeviceIoToPciRootBridgeIoThunk.inf
   EdkCompatibilityPkg/Compatibility/FrameworkHiiToUefiHiiThunk/FrameworkHiiToUefiHiiThunk.inf
   EdkCompatibilityPkg/Compatibility/FvFileLoaderToLoadFileThunk/FvFileLoaderToLoadFileThunk.inf
+  EdkCompatibilityPkg/Compatibility/FvInfoToFvHobThunk/FvInfoToFvHobThunk.inf
   EdkCompatibilityPkg/Compatibility/FvToFv2Thunk/FvToFv2Thunk.inf
   EdkCompatibilityPkg/Compatibility/Fv2ToFvThunk/Fv2ToFvThunk.inf
   EdkCompatibilityPkg/Compatibility/PciCfg2ToPciCfgThunk/PciCfg2ToPciCfgThunk.inf
@@ -227,6 +241,9 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   EdkCompatibilityPkg/Compatibility/Uc2ToUcThunk/Uc2ToUcThunk.inf
   EdkCompatibilityPkg/Compatibility/UcToUc2Thunk/UcToUc2Thunk.inf
 
+[Components.IA32,Components.X64,Components.IPF]
+  EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib.inf
+  
 [Components.IA32,Components.X64]
   EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
