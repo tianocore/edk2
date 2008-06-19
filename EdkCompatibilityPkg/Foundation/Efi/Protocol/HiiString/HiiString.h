@@ -65,7 +65,7 @@ EFI_STATUS
                         associated with a given Language is not zero, the LanguageName being passed 
                         in will be ignored.    
     String            - Points to the new null-terminated string.                                                                                     
-    StringFontInfo    - Points to the new string¡¯s font information or NULL if the string should have the
+    StringFontInfo    - Points to the new string's font information or NULL if the string should have the
                         default system font, size and style.                                                  
 
   Returns:
@@ -105,7 +105,7 @@ EFI_STATUS
     StringSize        - On entry, points to the size of the buffer pointed to by 
                         String, in bytes. On return,
                         points to the length of the string, in bytes.                                                                                             
-    StringFontInfo    - If not NULL, points to the string¡¯s font information. 
+    StringFontInfo    - If not NULL, points to the string's font information. 
                         It's caller's responsibility to free this buffer.
 
   Returns:
@@ -139,10 +139,10 @@ EFI_STATUS
   Arguments:          
     This              - A pointer to the EFI_HII_STRING_PROTOCOL instance.
     PackageList       - The package list containing the strings.
-    StringId          - The string¡¯s id, which is unique within PackageList.    
+    StringId          - The string's id, which is unique within PackageList.    
     Language          - Points to the language for the updated string.
     String            - Points to the new null-terminated string.                   
-    StringFontInfo    - Points to the string¡¯s font information or NULL if the string font information is not
+    StringFontInfo    - Points to the string's font information or NULL if the string font information is not
                         changed.  
 
   Returns:

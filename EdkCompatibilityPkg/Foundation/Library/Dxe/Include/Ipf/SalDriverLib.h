@@ -669,7 +669,7 @@ Routine Description:
 Arguments:
 
   Time          - A pointer to storage to receive a snapshot of the current time.
-  Capabilities  - An optional pointer to a buffer to receive the real time clock device¡¯s
+  Capabilities  - An optional pointer to a buffer to receive the real time clock device's
                   capabilities.
 
 Returns:

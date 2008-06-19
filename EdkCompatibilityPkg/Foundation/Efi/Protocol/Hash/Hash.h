@@ -100,7 +100,7 @@ EFI_STATUS
   Arguments:
     This             -  Points to this instance of EFI_HASH_PROTOCOL.
     HashAlgorithm    -  Points to the EFI_GUID which identifies the algorithm to use.
-    HashSize         -  Holds the returned size of the algorithm¡¯s hash.
+    HashSize         -  Holds the returned size of the algorithm's hash.
   
   Returns:
     EFI_SUCCESS            - Hash size returned successfully.
@@ -139,7 +139,7 @@ EFI_STATUS
     EFI_SUCCESS            - Hash returned successfully.
     EFI_INVALID_PARAMETER  - Message or Hash is NULL
     EFI_UNSUPPORTED        - The algorithm specified by HashAlgorithm is not supported by this
-                             driver. Or extend is TRUE and the algorithm doesn¡¯t support extending the hash.
+                             driver. Or extend is TRUE and the algorithm doesn't support extending the hash.
 
 --*/
 ;    

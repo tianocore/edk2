@@ -504,7 +504,7 @@ Arguments:
 
   Length                    - The length in bytes of memory allocated by this HOB.
   
-  Name                      - A GUID that defines the memory allocation region¡¯s type and purpose, 
+  Name                      - A GUID that defines the memory allocation region's type and purpose, 
                               as well as other fields within the memory allocation HOB.
                               
   MemoryType                - Defines the type of memory allocated by this HOB.

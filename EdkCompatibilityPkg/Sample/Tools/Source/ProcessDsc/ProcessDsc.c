@@ -4562,7 +4562,7 @@ SmartOpen (
     if (SmartFile->FileContent != NULL) {
       memset (SmartFile->FileContent, 0, FileSize + 1);
       //
-      // Usually FileLength < FileSize, because in text mode, carriage return¨Clinefeed
+      // Usually FileLength < FileSize, because in text mode, carriage return-linefeed
       // combinations are translated into single linefeeds on input
       //       
       SmartFile->FileLength = fread (SmartFile->FileContent, sizeof(char), FileSize, Fptr);

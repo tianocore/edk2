@@ -113,7 +113,7 @@ EFI_STATUS
   Arguments:          
     This              - A pointer to the EFI_HII_IMAGE_PROTOCOL instance.
     PackageList       - Handle of the package list where this image will be searched.    
-    ImageId           - The image¡¯s id,, which is unique within PackageList.
+    ImageId           - The image's id,, which is unique within PackageList.
     Image             - Points to the image.
     ImageSize         - On entry, points to the size of the buffer pointed to by Image, in bytes. On return,
                         points to the length of the image, in bytes.                                        
@@ -144,7 +144,7 @@ EFI_STATUS
   Arguments:          
     This              - A pointer to the EFI_HII_IMAGE_PROTOCOL instance.
     PackageList       - The package list containing the images.
-    ImageId           - The image¡¯s id,, which is unique within PackageList.
+    ImageId           - The image's id,, which is unique within PackageList.
     Image             - Points to the image.
                         
   Returns:
@@ -182,7 +182,7 @@ EFI_STATUS
                         EFI_HII_DRAW_FLAG_CLIP is implied. If this points to a 
                         NULL on entry, then a buffer will be allocated to hold 
                         the generated image and the pointer updated on exit. It
-                        is the caller¡¯s responsibility to free this buffer.
+                        is the caller's responsibility to free this buffer.
     BltX, BltY        - Specifies the offset from the left and top edge of the 
                         output image of the first pixel in the image.
                         
@@ -226,7 +226,7 @@ EFI_STATUS
                         EFI_HII_DRAW_FLAG_CLIP is implied. If this points to a 
                         NULL on entry, then a buffer will be allocated to hold 
                         the generated image and the pointer updated on exit. It
-                        is the caller¡¯s responsibility to free this buffer.
+                        is the caller's responsibility to free this buffer.
     BltX, BltY        - Specifies the offset from the left and top edge of the 
                         output image of the first pixel in the image.
                         

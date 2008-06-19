@@ -49,8 +49,8 @@ InstallDefaultUefiConfigAccessProtocol (
                                 includes the routing information as well as the configurable name / value pairs. It is
                                 invalid for this string to be in <MultiConfigRequest> format.
 
-   @param Progress   On return, points to a character in the Request string. Points to the string¡¯s null
-                               terminator if request was successful. Points to the most recent ¡®&¡¯ before the first
+   @param Progress   On return, points to a character in the Request string. Points to the string's null
+                               terminator if request was successful. Points to the most recent '&' before the first
                                 failing name / value pair (or the beginning of the string if the failure is in the first
                                 name / value pair) if the request was not successful
    @param Results     A null-terminated Unicode string in <ConfigAltResp> format which has all
@@ -80,7 +80,7 @@ ThunkExtractConfig (
    
    @param This              Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL
    @param Configuration A null-terminated Unicode string in <ConfigResp> format.
-   @param Progress         A pointer to a string filled in with the offset of the most recent ¡®&¡¯ before the first
+   @param Progress         A pointer to a string filled in with the offset of the most recent '&' before the first
                                      failing name / value pair (or the beginning of the string if the failure is in the first
                                      name / value pair) or the terminating NULL if all was successful.
    

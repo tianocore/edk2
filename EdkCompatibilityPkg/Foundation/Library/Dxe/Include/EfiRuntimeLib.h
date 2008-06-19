@@ -69,7 +69,7 @@ Routine Description:
 Arguments:
 
   Event   - Event whose notification function is being invoked.
-  Context - Pointer to the notification function¡¯s context, which is
+  Context - Pointer to the notification function's context, which is
             implementation-dependent.
 
 Returns:
@@ -513,7 +513,7 @@ EfiGetNextHighMonotonicCount (
 
 Routine Description:
 
-  Returns the next high 32 bits of the platform¡¯s monotonic counter.
+  Returns the next high 32 bits of the platform's monotonic counter.
 
 Arguments:
 
@@ -541,7 +541,7 @@ Routine Description:
 Arguments:
 
   Time          - A pointer to storage to receive a snapshot of the current time.
-  Capabilities  - An optional pointer to a buffer to receive the real time clock device¡¯s
+  Capabilities  - An optional pointer to a buffer to receive the real time clock device's
                   capabilities.
 
 Returns:
@@ -638,7 +638,7 @@ Routine Description:
 Arguments:
 
   VariableName  - A Null-terminated Unicode string that is the name of the
-                  vendor¡¯s variable.
+                  vendor's variable.
   VendorGuid    - A unique identifier for the vendor.
   Attributes    - If not NULL, a pointer to the memory location to return the
                   attributes bitmask for the variable.
@@ -700,7 +700,7 @@ Routine Description:
 Arguments:
 
   VariableName  - A Null-terminated Unicode string that is the name of the
-                  vendor¡¯s variable.
+                  vendor's variable.
   VendorGuid    - A unique identifier for the vendor.
   Attributes    - Attributes bitmask to set for the variable.
   DataSize      - The size in bytes of the Data buffer.
