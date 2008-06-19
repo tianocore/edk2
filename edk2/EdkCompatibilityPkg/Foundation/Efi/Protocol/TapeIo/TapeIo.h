@@ -83,7 +83,7 @@ EFI_STATUS
     EFI_INVALID_PARAMETER - A NULL Buffer was specified with a non-zero
                             BufferSize or the device is operating in fixed block
                             size mode and the BufferSize was not a multiple of
-                            device¡¯s fixed block size
+                            device's fixed block size
     EFI_DEVICE_ERROR      - A device error occurred while attempting to transfer data
                             from the media.
     
@@ -124,7 +124,7 @@ EFI_STATUS
     EFI_INVALID_PARAMETER - A NULL Buffer was specified with a non-zero
                           BufferSize or the device is operating in fixed block
                           size mode and the BufferSize was not a multiple of
-                          device¡¯s fixed block size
+                          device's fixed block size
     EFI_DEVICE_ERROR      A device error occurred while attempting to transfer data
                           from the media.
     

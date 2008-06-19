@@ -114,13 +114,13 @@ EFI_STATUS
                         wide and Height pixels high. The string will be drawn onto this image and               
                         EFI_HII_OUT_FLAG_CLIP is implied. If this points to a NULL on entry, then a             
                         buffer will be allocated to hold the generated image and the pointer updated on exit. It
-                        is the caller¡¯s responsibility to free this buffer.                                    
+                        is the caller's responsibility to free this buffer.                                    
     BltX,BLTY         - Specifies the offset from the left and top edge of the image of the first character cell in
                         the image.                                                                                     
     RowInfoArray      - If this is non-NULL on entry, then on exit, this will point to an allocated buffer   
                         containing row information and RowInfoArraySize will be updated to contain the       
                         number of elements. This array describes the characters which were at least partially
-                        drawn and the heights of the rows. It is the caller¡¯s responsibility to free this buffer.                            
+                        drawn and the heights of the rows. It is the caller's responsibility to free this buffer.                            
     RowInfoArraySize  - If this is non-NULL on entry, then on exit it contains the number of elements in
                         RowInfoArray.                                                                   
     ColumnInfoArray   - If this is non-NULL, then on return it will be filled with the horizontal offset for each 
@@ -162,7 +162,7 @@ EFI_STATUS
     This              - A pointer to the EFI_HII_FONT_PROTOCOL instance.
     Flags             - Describes how the string is to be drawn.                 
     PackageList       - The package list in the HII database to search for the specified string.         
-    StringId          - The string¡¯s id, which is unique within PackageList.                            
+    StringId          - The string's id, which is unique within PackageList.                            
     Language          - Points to the language for the retrieved string. If NULL, then the current system
                         language is used.                                                                
     StringInfo        - Points to the string output information, including the color and font. 
@@ -171,13 +171,13 @@ EFI_STATUS
                         wide and Height pixels high. The string will be drawn onto this image and               
                         EFI_HII_OUT_FLAG_CLIP is implied. If this points to a NULL on entry, then a             
                         buffer will be allocated to hold the generated image and the pointer updated on exit. It
-                        is the caller¡¯s responsibility to free this buffer.                                    
+                        is the caller's responsibility to free this buffer.                                    
     BltX,BLTY         - Specifies the offset from the left and top edge of the image of the first character cell in
                         the image.                                                                                     
     RowInfoArray      - If this is non-NULL on entry, then on exit, this will point to an allocated buffer   
                         containing row information and RowInfoArraySize will be updated to contain the       
                         number of elements. This array describes the characters which were at least partially
-                        drawn and the heights of the rows. It is the caller¡¯s responsibility to free this buffer.                            
+                        drawn and the heights of the rows. It is the caller's responsibility to free this buffer.                            
     RowInfoArraySize  - If this is non-NULL on entry, then on exit it contains the number of elements in
                         RowInfoArray.                                                                   
     ColumnInfoArray   - If this is non-NULL, then on return it will be filled with the horizontal offset for each 
@@ -214,7 +214,7 @@ EFI_STATUS
     StringInfo        - Points to the string font and color information or NULL if the string should use the
                         default system font and color.                                                      
     Blt               - Thus must point to a NULL on entry. A buffer will be allocated to hold the output and
-                        the pointer updated on exit. It is the caller¡¯s responsibility to free this buffer. 
+                        the pointer updated on exit. It is the caller's responsibility to free this buffer. 
     Baseline          - Number of pixels from the bottom of the bitmap to the baseline.
 
   Returns:
@@ -251,7 +251,7 @@ EFI_STATUS
                         first font. On return, points to the returned font handle or
                         points to NULL if there are no more matching fonts.                                               
     StringInfoIn      - Upon entry, points to the font to return information about.                        
-    StringInfoOut     - Upon return, contains the matching font¡¯s information. 
+    StringInfoOut     - Upon return, contains the matching font's information. 
                         If NULL, then no information is returned.
                         It's caller's responsibility to free this buffer.
     String            - Points to the string which will be tested to determine 
