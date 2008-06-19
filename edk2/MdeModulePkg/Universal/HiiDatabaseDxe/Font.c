@@ -337,7 +337,7 @@ GlyphToBlt (
   IN     UINTN                         ImageWidth,
   IN     UINTN                         ImageHeight,
   IN     BOOLEAN                       Transparent,
-  IN     EFI_HII_GLYPH_INFO            Cell,
+  IN     CONST EFI_HII_GLYPH_INFO      *Cell,
   IN     UINT8                         Attributes,
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL **Origin
   )
@@ -350,7 +350,7 @@ GlyphToBlt (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL        *BltBuffer;
 
   ASSERT (GlyphBuffer != NULL && Origin != NULL && *Origin != NULL);
-  ASSERT (Cell.Width <= ImageWidth && Cell.Height <= ImageHeight);
+  ASSERT (Cell->Width <= ImageWidth && Cell->Height <= ImageHeight);
 
   BltBuffer = *Origin;
 
@@ -366,13 +366,13 @@ GlyphToBlt (
   // The glyph's upper left hand corner pixel is the most significant bit of the
   // first bitmap byte.
   //
-  for (Y = 0; Y < Cell.Height; Y++) {
-    OffsetY = BITMAP_LEN_1_BIT (Cell.Width, Y);
+  for (Y = 0; Y < Cell->Height; Y++) {
+    OffsetY = BITMAP_LEN_1_BIT (Cell->Width, Y);
 
     //
     // All bits in these bytes are meaningful.
     //
-    for (X = 0; X < Cell.Width / 8; X++) {
+    for (X = 0; X < Cell->Width / 8; X++) {
       Data  = *(GlyphBuffer + OffsetY + X);
       for (Index = 0; Index < 8; Index++) {
         if ((Data & (1 << Index)) != 0) {
@@ -385,12 +385,12 @@ GlyphToBlt (
       }
     }
 
-    if (Cell.Width % 8 != 0) {
+    if (Cell->Width % 8 != 0) {
       //
       // There are some padding bits in this byte. Ignore them.
       //
       Data  = *(GlyphBuffer + OffsetY + X);
-      for (Index = 0; Index < Cell.Width % 8; Index++) {
+      for (Index = 0; Index < Cell->Width % 8; Index++) {
         if ((Data & (1 << (8 - Index - 1))) != 0) {
           BltBuffer[Y * ImageWidth + X * 8 + Index] = Foreground;
         } else {
@@ -403,7 +403,7 @@ GlyphToBlt (
 
   } // end of for (Y=0...)
 
-  *Origin = BltBuffer + Cell.Width;
+  *Origin = BltBuffer + Cell->Width;
 }
 
 
@@ -440,7 +440,7 @@ GlyphToImage (
   IN     UINTN                         ImageWidth,
   IN     UINTN                         ImageHeight,
   IN     BOOLEAN                       Transparent,
-  IN     EFI_HII_GLYPH_INFO            Cell,
+  IN     CONST EFI_HII_GLYPH_INFO      *Cell,
   IN     UINT8                         Attributes,
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL **Origin
   )
@@ -448,7 +448,7 @@ GlyphToImage (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL        *Buffer;
 
   ASSERT (GlyphBuffer != NULL && Origin != NULL && *Origin != NULL);
-  ASSERT (Cell.Width <= ImageWidth && Cell.Height <= ImageHeight);
+  ASSERT (Cell->Width <= ImageWidth && Cell->Height <= ImageHeight);
 
   Buffer = *Origin;
 
@@ -457,7 +457,7 @@ GlyphToImage (
     // This character is a non-spacing key, print it OR'd with the previous glyph.
     // without advancing cursor.
     //
-    Buffer -= Cell.Width;
+    Buffer -= Cell->Width;
     GlyphToBlt (
       GlyphBuffer,
       Foreground,
@@ -511,7 +511,7 @@ GlyphToImage (
 
   } else if ((Attributes & PROPORTIONAL_GLYPH) == PROPORTIONAL_GLYPH) {
     //
-    // This character is proportional glyph, i.e. Cell.Width * Cell.Height pixels.
+    // This character is proportional glyph, i.e. Cell->Width * Cell->Height pixels.
     //
     GlyphToBlt (
       GlyphBuffer,
@@ -1776,7 +1776,7 @@ HiiStringToImage (
             RowInfo[RowIndex].LineWidth,
             RowInfo[RowIndex].LineHeight,
             Transparent,
-            Cell[Index1],
+            &Cell[Index1],
             Attributes[Index1],
             &BufferPtr
             );
@@ -1817,7 +1817,7 @@ HiiStringToImage (
             Image->Width,
             Image->Height,
             Transparent,
-            Cell[Index1],
+            &Cell[Index1],
             Attributes[Index1],
             &BufferPtr
             );
@@ -2182,7 +2182,7 @@ HiiGetGlyph (
     Image->Width,
     Image->Height,
     FALSE,
-    Cell,
+    &Cell,
     Attributes,
     &BltBuffer
     );
