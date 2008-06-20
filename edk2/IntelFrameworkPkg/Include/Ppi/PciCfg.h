@@ -22,6 +22,10 @@
 #define __PEI_PCI_CFG_H__
 
 #include <Pi/PiPeiCis.h>
+//
+// Get the common definitions for EFI_PEI_PCI_CFG_PPI_WIDTH.
+//
+#include <Ppi/PciCfg2.h>
 
 #define EFI_PEI_PCI_CFG_PPI_INSTALLED_GUID \
   { \
