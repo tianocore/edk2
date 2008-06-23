@@ -1,7 +1,7 @@
 /** @file
   The file provides services to retrieve font information.
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -31,8 +31,8 @@ typedef VOID    *EFI_FONT_HANDLE;
 typedef UINT32  EFI_HII_OUT_FLAGS;
 #define EFI_HII_OUT_FLAG_CLIP         0x00000001
 #define EFI_HII_OUT_FLAG_WRAP         0x00000002
-#define EFI_HII_OUT_FLAG_CLEAN_Y      0x00000004
-#define EFI_HII_OUT_FLAG_CLEAN_X      0x00000008
+#define EFI_HII_OUT_FLAG_CLIP_CLEAN_Y 0x00000004
+#define EFI_HII_OUT_FLAG_CLIP_CLEAN_X 0x00000008
 #define EFI_HII_OUT_FLAG_TRANSPARENT  0x00000010
 #define EFI_HII_IGNORE_IF_NO_GLYPH    0x00000020
 #define EFI_HII_IGNORE_LINE_BREAK     0x00000040
@@ -87,9 +87,9 @@ typedef UINT32  EFI_FONT_INFO_MASK;
 // EFI_FONT_INFO
 // 
 typedef struct {
-  UINT32  FontStyle;
-  UINT16  FontSize;
-  CHAR16  FontName[1];
+  EFI_HII_FONT_STYLE FontStyle;
+  UINT16             FontSize; // character cell height in pixels
+  CHAR16             FontName[1];
 } EFI_FONT_INFO;
 
 /**
@@ -253,10 +253,9 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
   @retval EFI_OUT_OF_RESOURCES  Unable to allocate an output
                                 buffer for RowInfoArray or Blt.
   
-  @retval EFI_INVALID_PARAMETER The String or Blt or Height or
-                                Width was NULL.
+  @retval EFI_INVALID_PARAMETER The String or Blt.
+  @retval EFI_INVALID_PARAMETER Flags were invalid combination..
 
-  
 **/
 typedef
 EFI_STATUS
@@ -388,6 +387,10 @@ EFI_STATUS
 
   @retval EFI_INVALID_PARAMETER The String or Blt or Height or
                                 Width was NULL.
+  @retval EFI_INVALID_PARAMETER The Blt or PackageList was NULL.
+  @retval EFI_INVALID_PARAMETER  Flags were invalid combination.
+  @retval EFI_NOT_FOUND   The specified PackageList is not in the Database or the stringid is not 
+                        in the specified PackageList. 
 
 **/
 typedef
@@ -469,7 +472,8 @@ EFI_STATUS
                     to NULL if there are no more matching fonts.
 
   @param StringInfoIn Upon entry, points to the font to return
-                      information about.
+                      information about. If NULL, then the information about the system default 
+                      font will be returned.
 
   @param StringInfoOut  Upon return, contains the matching
                         font's information. If NULL, then no
@@ -483,8 +487,9 @@ EFI_STATUS
   
   @retval EFI_NOT_FOUND No matching font was found.
   
-  @retval EFI_INVALID_PARAMETER FontHandle is NULL or
-                                StringInfoIn is NULL
+  @retval EFI_INVALID_PARAMETER  StringInfoIn->FontInfoMask is an invalid combination.
+
+  @retval EFI_OUT_OF_RESOURCES   There were insufficient resources to complete the request.
   
 **/
 typedef
@@ -492,7 +497,7 @@ EFI_STATUS
 (EFIAPI *EFI_HII_GET_FONT_INFO) (
   IN CONST  EFI_HII_FONT_PROTOCOL *This,
   IN OUT    EFI_FONT_HANDLE       *FontHandle,
-  IN CONST  EFI_FONT_DISPLAY_INFO *StringInfoIn,
+  IN CONST  EFI_FONT_DISPLAY_INFO *StringInfoIn, OPTIONAL
   OUT       EFI_FONT_DISPLAY_INFO **StringInfoOut,
   IN CONST  EFI_STRING            String OPTIONAL
 );

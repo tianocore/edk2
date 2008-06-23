@@ -95,6 +95,8 @@ HiiLibGetSupportedLanguages (
   if (LanguageString == NULL) {
     return NULL;
   }
+
+  LocateHiiProtocols ();
   
   Status = mHiiStringProt->GetLanguages (mHiiStringProt, HiiHandle, LanguageString, &BufferSize);
   
@@ -164,6 +166,9 @@ HiiLibGetSupportedSecondaryLanguages (
   if (LanguageString == NULL) {
     return NULL;
   }
+
+  LocateHiiProtocols ();
+  
   Status = mHiiStringProt->GetSecondaryLanguages (mHiiStringProt, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
   
   if (Status == EFI_BUFFER_TOO_SMALL) {

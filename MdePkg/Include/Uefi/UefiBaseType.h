@@ -2,7 +2,7 @@
 
   Defines data types and constants introduced in UEFI.
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -122,6 +122,7 @@ typedef union {
 #define EFI_CRC_ERROR             RETURN_CRC_ERROR   
 #define EFI_END_OF_MEDIA          RETURN_END_OF_MEDIA
 #define EFI_END_OF_FILE           RETURN_END_OF_FILE
+#define EFI_INVALID_LANGUAGE      RETURN_INVALID_LANGUAGE
 
 #define EFI_WARN_UNKNOWN_GLYPH    RETURN_WARN_UNKNOWN_GLYPH   
 #define EFI_WARN_DELETE_FAILURE   RETURN_WARN_DELETE_FAILURE  

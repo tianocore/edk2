@@ -7,7 +7,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -293,6 +293,8 @@ typedef INTN RETURN_STATUS;
 #define RETURN_CRC_ERROR             ENCODE_ERROR (27)
 #define RETURN_END_OF_MEDIA          ENCODE_ERROR (28)
 #define RETURN_END_OF_FILE           ENCODE_ERROR (31)
+#define RETURN_INVALID_LANGUAGE      ENCODE_ERROR (32)
+
 
 #define RETURN_WARN_UNKNOWN_GLYPH    ENCODE_WARNING (1)
 #define RETURN_WARN_DELETE_FAILURE   ENCODE_WARNING (2)

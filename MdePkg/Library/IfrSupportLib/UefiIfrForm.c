@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007- 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -242,11 +242,33 @@ SwapBuffer (
   UINT8  Temp;
   UINTN  SwapCount;
 
-  SwapCount = (BufferSize - 1) / 2;
+  SwapCount = BufferSize / 2;
   for (Index = 0; Index < SwapCount; Index++) {
     Temp = Buffer[Index];
     Buffer[Index] = Buffer[BufferSize - 1 - Index];
     Buffer[BufferSize - 1 - Index] = Temp;
+  }
+}
+
+/**
+  Converts the unicode character of the string from uppercase to lowercase.
+
+  @param Str     String to be converted
+
+  @retval VOID
+  
+**/
+VOID
+ToLower (
+  IN OUT CHAR16    *Str
+  )
+{
+  CHAR16      *Ptr;
+  
+  for (Ptr = Str; *Ptr != L'\0'; Ptr++) {
+    if (*Ptr >= L'A' && *Ptr <= L'Z') {
+      *Ptr = (CHAR16) (*Ptr - L'A' + L'a');
+    }
   }
 }
 
@@ -276,10 +298,14 @@ BufferToHexString (
   NewBuffer = AllocateCopyPool (BufferSize, Buffer);
   SwapBuffer (NewBuffer, BufferSize);
 
-  StrBufferLen = (BufferSize + 1) * sizeof (CHAR16);
+  StrBufferLen = BufferSize * sizeof (CHAR16) + 1;
   Status = BufToHexString (Str, &StrBufferLen, NewBuffer, BufferSize);
 
   gBS->FreePool (NewBuffer);
+  //
+  // Convert the uppercase to lowercase since <HexAf> is defined in lowercase format.
+  //
+  ToLower (Str);
 
   return Status;
 }
@@ -319,6 +345,123 @@ HexStringToBuffer (
   return Status;
 }
 
+/**
+  Convert binary representation Config string (e.g. "0041004200430044") to the
+  original string (e.g. "ABCD"). Config string appears in <ConfigHdr> (i.e.
+  "&NAME=<string>"), or Name/Value pair in <ConfigBody> (i.e. "label=<string>").
+
+  @param UnicodeString  Original Unicode string.
+  @param StrBufferLen   On input: Length in bytes of buffer to hold the Unicode string.
+                                    Includes tailing '\0' character.
+                                    On output:
+                                      If return EFI_SUCCESS, containing length of Unicode string buffer.
+                                      If return EFI_BUFFER_TOO_SMALL, containg length of string buffer desired.
+  @param ConfigString   Binary representation of Unicode String, <string> := (<HexCh>4)+
+
+  @retval EFI_SUCCESS          Routine success.
+  @retval EFI_BUFFER_TOO_SMALL The string buffer is too small.
+
+**/
+EFI_STATUS
+ConfigStringToUnicode (
+  IN OUT CHAR16                *UnicodeString,
+  IN OUT UINTN                 *StrBufferLen,
+  IN CHAR16                    *ConfigString
+  )
+{
+  UINTN       Index;
+  UINTN       Len;
+  UINTN       BufferSize;
+  CHAR16      BackupChar;
+
+  Len = StrLen (ConfigString) / 4;
+  BufferSize = (Len + 1) * sizeof (CHAR16);
+
+  if (*StrBufferLen < BufferSize) {
+    *StrBufferLen = BufferSize;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  *StrBufferLen = BufferSize;
+
+  for (Index = 0; Index < Len; Index++) {
+    BackupChar = ConfigString[4];
+    ConfigString[4] = L'\0';
+
+    HexStringToBuf ((UINT8 *) UnicodeString, &BufferSize, ConfigString, NULL);
+
+    ConfigString[4] = BackupChar;
+
+    ConfigString += 4;
+    UnicodeString += 1;
+  }
+
+  //
+  // Add tailing '\0' character
+  //
+  *UnicodeString = L'\0';
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Convert Unicode string to binary representation Config string, e.g.
+  "ABCD" => "0041004200430044". Config string appears in <ConfigHdr> (i.e.
+  "&NAME=<string>"), or Name/Value pair in <ConfigBody> (i.e. "label=<string>").
+
+  @param ConfigString   Binary representation of Unicode String, <string> := (<HexCh>4)+
+  @param  StrBufferLen  On input: Length in bytes of buffer to hold the Unicode string.
+                                    Includes tailing '\0' character.
+                                    On output:
+                                      If return EFI_SUCCESS, containing length of Unicode string buffer.
+                                      If return EFI_BUFFER_TOO_SMALL, containg length of string buffer desired.
+  @param  UnicodeString  Original Unicode string.
+
+  @retval EFI_SUCCESS           Routine success.
+  @retval EFI_BUFFER_TOO_SMALL  The string buffer is too small.
+
+**/
+EFI_STATUS
+UnicodeToConfigString (
+  IN OUT CHAR16                *ConfigString,
+  IN OUT UINTN                 *StrBufferLen,
+  IN CHAR16                    *UnicodeString
+  )
+{
+  UINTN       Index;
+  UINTN       Len;
+  UINTN       BufferSize;
+  CHAR16      *String;
+
+  Len = StrLen (UnicodeString);
+  BufferSize = (Len * 4 + 1) * sizeof (CHAR16);
+
+  if (*StrBufferLen < BufferSize) {
+    *StrBufferLen = BufferSize;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  *StrBufferLen = BufferSize;
+  String        = ConfigString;
+
+  for (Index = 0; Index < Len; Index++) {
+    BufToHexString (ConfigString, &BufferSize, (UINT8 *) UnicodeString, 2);
+
+    ConfigString += 4;
+    UnicodeString += 1;
+  }
+
+  //
+  // Add tailing '\0' character
+  //
+  *ConfigString = L'\0';
+
+  //
+  // Convert the uppercase to lowercase since <HexAf> is defined in lowercase format.
+  //
+  ToLower (String);  
+  return EFI_SUCCESS;
+}
 
 /**
   Construct <ConfigHdr> using routing information GUID/NAME/PATH.
@@ -383,10 +526,10 @@ ConstructConfigHdr (
   DevicePathSize = GetDevicePathSize (DevicePath);
 
   //
-  // GUID=<HexCh>32&NAME=<Alpha>NameStrLen&PATH=<HexChar>DevicePathStrLen <NULL>
-  // | 5  |   32   |  6  |   NameStrLen   |  6  |    DevicePathStrLen   |
+  // GUID=<HexCh>32&NAME=<Char>NameStrLen&PATH=<HexChar>DevicePathStrLen <NULL>
+  // | 5  |   32   |  6  |  NameStrLen*4 |  6  |    DevicePathStrLen    | 1 |
   //
-  BufferSize = (5 + 32 + 6 + NameStrLen + 6 + DevicePathSize * 2 + 1) * sizeof (CHAR16);
+  BufferSize = (5 + 32 + 6 + NameStrLen * 4 + 6 + DevicePathSize * 2 + 1) * sizeof (CHAR16);
   if (*StrBufferLen < BufferSize) {
     *StrBufferLen = BufferSize;
     return EFI_BUFFER_TOO_SMALL;
@@ -401,11 +544,15 @@ ConstructConfigHdr (
   BufferToHexString (StrPtr, (UINT8 *) Guid, sizeof (EFI_GUID));
   StrPtr += 32;
 
+  //
+  // Convert name string, e.g. name "ABCD" => "&NAME=0041004200430044"
+  //
   StrCpy (StrPtr, L"&NAME=");
   StrPtr += 6;
   if (Name != NULL) {
-    StrCpy (StrPtr, Name);
-    StrPtr += NameStrLen;
+    BufferSize = (NameStrLen * 4 + 1) * sizeof (CHAR16);
+    UnicodeToConfigString (StrPtr, &BufferSize, Name);
+    StrPtr += (NameStrLen * 4);
   }
 
   StrCpy (StrPtr, L"&PATH=");

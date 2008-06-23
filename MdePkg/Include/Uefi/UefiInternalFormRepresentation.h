@@ -4,7 +4,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -133,6 +133,7 @@ typedef struct _EFI_HII_SIMPLE_FONT_PACKAGE_HDR {
 // Font Package
 //
 
+#define EFI_HII_FONT_STYLE_NORMAL            0x00000000
 #define EFI_HII_FONT_STYLE_BOLD              0x00000001
 #define EFI_HII_FONT_STYLE_ITALIC            0x00000002
 #define EFI_HII_FONT_STYLE_EMBOSS            0x00010000
@@ -723,14 +724,14 @@ typedef struct _EFI_IFR_VARSTORE {
 
 typedef struct _EFI_IFR_VARSTORE_EFI {
   EFI_IFR_OP_HEADER        Header;
-  UINT16                   VarStoreId;
+  EFI_VARSTORE_ID          VarStoreId;
   EFI_GUID                 Guid;
   UINT32                   Attributes;
 } EFI_IFR_VARSTORE_EFI;
 
 typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
   EFI_IFR_OP_HEADER        Header;
-  UINT16                   VarStoreId;
+  EFI_VARSTORE_ID          VarStoreId;
   EFI_GUID                 Guid;
 } EFI_IFR_VARSTORE_NAME_VALUE;
 
@@ -1299,7 +1300,7 @@ typedef enum {
   EfiKeyB8,
   EfiKeyB9,
   EfiKeyB10,
-  EfiKeyRshift,
+  EfiKeyRShift,
   EfiKeyUpArrow,
   EfiKeyOne,
   EfiKeyTwo,
@@ -1422,16 +1423,16 @@ typedef struct {
   // EFI_HII_KEYBOARD_LAYOUT Layout[];
 } EFI_HII_KEYBOARD_PACKAGE_HDR;
 
-typedef struct {
-  CHAR16                  Language[3];
-  CHAR16                  Space;
-  CHAR16                  DescriptionString[1];
-} EFI_DESCRIPTION_STRING;
+//typedef struct {
+//  CHAR16                  Language[];           // RFC4646 Language Code
+//  CHAR16                  Space;
+//  CHAR16                  DescriptionString[];
+//} EFI_DESCRIPTION_STRING;
 
-typedef struct {
-  UINT16                  DescriptionCount;
-  EFI_DESCRIPTION_STRING  DescriptionString[1];
-} EFI_DESCRIPTION_STRING_BUNDLE;
+//typedef struct {
+//  UINT16                  DescriptionCount;
+//  EFI_DESCRIPTION_STRING  DescriptionString[];
+//} EFI_DESCRIPTION_STRING_BUNDLE;
 
 //
 // Modifier values
@@ -1451,7 +1452,7 @@ typedef struct {
 #define EFI_LEFT_SHIFT_MODIFIER          0x000C
 #define EFI_RIGHT_SHIFT_MODIFIER         0x000D
 #define EFI_CAPS_LOCK_MODIFIER           0x000E
-#define EFI_NUM_LOCK _MODIFIER           0x000F
+#define EFI_NUM_LOCK_MODIFIER            0x000F
 #define EFI_LEFT_ARROW_MODIFIER          0x0010
 #define EFI_RIGHT_ARROW_MODIFIER         0x0011
 #define EFI_DOWN_ARROW_MODIFIER          0x0012
@@ -1483,6 +1484,10 @@ typedef struct {
 #define EFI_SCROLL_LOCK_MODIFIER         0x0024
 #define EFI_PAUSE_MODIFIER               0x0025
 #define EFI_BREAK_MODIFIER               0x0026
+
+#define EFI_LEFT_LOGO_MODIFIER           0x0027
+#define EFI_RIGHT_LOGO_MODIFIER          0x0028
+#define EFI_MENU_MODIFIER                0x0029
 
 #pragma pack()
 

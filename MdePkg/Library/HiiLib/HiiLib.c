@@ -16,44 +16,36 @@
 
 CONST EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt;
 CONST EFI_HII_STRING_PROTOCOL     *mHiiStringProt;
+BOOLEAN mHiiProtocolsInitialized = FALSE;
+
 
 /**
-  The constructor function of Hii Library.
-  
-  The constructor function caches the value of default HII protocol instances.
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-  
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+  This function locate Hii relative protocols for later usage.
+
+  @param VOID
+
+  @retval  VOID
 
 **/
-EFI_STATUS
-EFIAPI
-UefiHiiLibConstructor (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+VOID
+LocateHiiProtocols (
+  VOID
   )
 {
-  EFI_STATUS Status;
-  
-  Status = gBS->LocateProtocol (
-      &gEfiHiiDatabaseProtocolGuid,
-      NULL,
-      (VOID **) &mHiiDatabaseProt
-    );
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (mHiiDatabaseProt != NULL);
+  EFI_STATUS  Status;
 
-  Status = gBS->LocateProtocol (
-      &gEfiHiiStringProtocolGuid,
-      NULL,
-      (VOID **) &mHiiStringProt
-    );
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (mHiiStringProt != NULL);
+  if (mHiiProtocolsInitialized) {
+    return;
+  }
 
-  return EFI_SUCCESS;
+  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &mHiiDatabaseProt);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, (VOID **) &mHiiStringProt);
+  ASSERT_EFI_ERROR (Status);
+
+  mHiiProtocolsInitialized = TRUE;
 }
 
 
@@ -151,6 +143,8 @@ HiiLibAddPackages (
 
   ASSERT (HiiHandle != NULL);
 
+  LocateHiiProtocols ();
+
   VA_START (Args, HiiHandle);
   PackageListHeader = InternalHiiLibPreparePackages (NumberOfPackages, GuidId, Args);
 
@@ -174,8 +168,10 @@ HiiLibRemovePackages (
   )
 {
   EFI_STATUS Status;
-
   ASSERT (HiiHandle != NULL);
+
+  LocateHiiProtocols ();
+
   Status = mHiiDatabaseProt->RemovePackageList (mHiiDatabaseProt, HiiHandle);
   ASSERT_EFI_ERROR (Status);
 }
@@ -195,6 +191,8 @@ HiiLibGetHiiHandles (
   ASSERT (HiiHandleBuffer != NULL);
 
   BufferLength = 0;
+
+  LocateHiiProtocols ();
 
   //
   // Try to find the actual buffer size for HiiHandle Buffer.
@@ -245,6 +243,9 @@ HiiLibExtractGuidFromHiiHandle (
   //
   BufferSize = 0;
   HiiPackageList = NULL;
+
+  LocateHiiProtocols ();
+
   Status = mHiiDatabaseProt->ExportPackageLists (mHiiDatabaseProt, Handle, &BufferSize, HiiPackageList);
   ASSERT (Status != EFI_NOT_FOUND);
   
@@ -326,6 +327,8 @@ HiiLibDevicePathToHiiHandle (
     return NULL;
   }
 
+  LocateHiiProtocols ();
+
   //
   // Retrieve all Hii Handles from HII database
   //
@@ -392,6 +395,9 @@ IsHiiHandleRegistered (
 
   HiiPackageList = NULL;
   BufferSize = 0;
+
+  LocateHiiProtocols ();
+
   Status = mHiiDatabaseProt->ExportPackageLists (
              mHiiDatabaseProt,
              HiiHandle,

@@ -1,7 +1,7 @@
 /** @file
   The file provides services to manipulate string data.
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -101,14 +101,16 @@ EFI_STATUS
                     points to the length of the string, in
                     bytes.
   
-  @param StringFontInfo   Points to the string's font
-                          information or NULL if the string font
-                          information is not desired.
+  @param StringFontInfo  Points to a buffer that will be callee allocated and will 
+                      have the string's font information into this buffer.  
+                      The caller is responsible for freeing this buffer.  
+                      If the parameter is NULL a buffer will not be allocated 
+                      and the string font information will not be returned.
   
   @retval EFI_SUCCESS The string was returned successfully.
   
   @retval EFI_NOT_FOUND The string specified by StringId is not
-                        available.
+                        available. The specified PackageList is not in the database.
   
   @retval EFI_INVALID_LANGUAGE  The string specified by StringId
                                 is available but not in the
@@ -158,7 +160,7 @@ EFI_STATUS
   @retval EFI_SUCCESS   The string was successfully updated.
   
   @retval EFI_NOT_FOUND The string specified by StringId is not
-                        in the database.
+                        in the database. The specified PackageList is not in the database.
   
   @retval EFI_INVALID_PARAMETER The String or Language was NULL.
   
@@ -203,7 +205,8 @@ EFI_STATUS
                                 updated to contain the required
                                 size.
   
-  @retval EFI_INVALID_PARAMETER Languages is NULL.
+  @retval EFI_INVALID_PARAMETER Languages or LanguagesSize is NULL.
+  @retval EFI_NOT_FOUND The specified PackageList is not in the database.
 
 
 **/
@@ -261,6 +264,7 @@ EFI_STATUS
 
   @retval EFI_INVALID_PARAMETER FirstLanguage is NULL or
                                 SecondLanguage is NULL.
+  @retval EFI_NOT_FOUND The specified PackageList is not in the database.
 
 **/
 typedef
