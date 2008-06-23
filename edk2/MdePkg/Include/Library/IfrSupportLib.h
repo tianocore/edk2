@@ -2,7 +2,7 @@
   The file contain all library functions and definitions for IFR opcode creation and 
   related Form Browser utility Operations.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -423,6 +423,20 @@ CreateStringOpCode (
 ;
 
 /**
+  Converts the unicode character of the string from uppercase to lowercase.
+
+  @param Str     String to be converted
+
+  @retval VOID
+  
+**/
+VOID
+ToLower (
+  IN OUT CHAR16    *Str
+  )
+;
+
+/**
   Converts binary buffer to Unicode string in reversed byte order to BufToHexString().
 
   @param  Str                    String for output
@@ -461,6 +475,54 @@ HexStringToBuffer (
   IN OUT UINT8         *Buffer,
   IN OUT UINTN         *BufferSize,
   IN CHAR16            *Str
+  )
+;
+
+/**
+  Convert binary representation Config string (e.g. "0041004200430044") to the
+  original string (e.g. "ABCD"). Config string appears in <ConfigHdr> (i.e.
+  "&NAME=<string>"), or Name/Value pair in <ConfigBody> (i.e. "label=<string>").
+
+  @param UnicodeString  Original Unicode string.
+  @param StrBufferLen   On input: Length in bytes of buffer to hold the Unicode string.
+                                    Includes tailing '\0' character.
+                                    On output:
+                                      If return EFI_SUCCESS, containing length of Unicode string buffer.
+                                      If return EFI_BUFFER_TOO_SMALL, containg length of string buffer desired.
+  @param ConfigString   Binary representation of Unicode String, <string> := (<HexCh>4)+
+
+  @retval EFI_SUCCESS          Routine success.
+  @retval EFI_BUFFER_TOO_SMALL The string buffer is too small.
+
+**/EFI_STATUS
+ConfigStringToUnicode (
+  IN OUT CHAR16                *UnicodeString,
+  IN OUT UINTN                 *StrBufferLen,
+  IN CHAR16                    *ConfigString
+  )
+;
+
+/**
+  Convert Unicode string to binary representation Config string, e.g.
+  "ABCD" => "0041004200430044". Config string appears in <ConfigHdr> (i.e.
+  "&NAME=<string>"), or Name/Value pair in <ConfigBody> (i.e. "label=<string>").
+
+  @param ConfigString   Binary representation of Unicode String, <string> := (<HexCh>4)+
+  @param  StrBufferLen  On input: Length in bytes of buffer to hold the Unicode string.
+                                    Includes tailing '\0' character.
+                                    On output:
+                                      If return EFI_SUCCESS, containing length of Unicode string buffer.
+                                      If return EFI_BUFFER_TOO_SMALL, containg length of string buffer desired.
+  @param  UnicodeString  Original Unicode string.
+
+  @retval EFI_SUCCESS           Routine success.
+  @retval EFI_BUFFER_TOO_SMALL  The string buffer is too small.
+
+**/EFI_STATUS
+UnicodeToConfigString (
+  IN OUT CHAR16                *ConfigString,
+  IN OUT UINTN                 *StrBufferLen,
+  IN CHAR16                    *UnicodeString
   )
 ;
 

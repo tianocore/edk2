@@ -25,8 +25,6 @@
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  CONSTRUCTOR                    = IfrSupportLibConstructor
-
 #
 # The following information is for reference only and not required by the build tools.
 #
@@ -34,7 +32,6 @@
 #
 
 [Sources.common]
-  UefiIfrCommon.c
   UefiIfrForm.c
   UefiIfrLibraryInternal.h
   UefiIfrOpCodeCreation.c
@@ -63,9 +60,6 @@
   gEfiHiiStringProtocolGuid
   gEfiHiiConfigRoutingProtocolGuid
   gEfiFormBrowser2ProtocolGuid   
-
-[Depex]
-  gEfiHiiDatabaseProtocolGuid AND gEfiHiiStringProtocolGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang

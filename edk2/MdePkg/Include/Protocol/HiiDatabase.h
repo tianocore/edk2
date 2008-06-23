@@ -2,7 +2,7 @@
   The file provides Database manager for HII-related data
   structures.
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -127,8 +127,7 @@ EFI_STATUS
   
   @retval EFI_SUCCESS   The data associated with the Handle was
                         removed from the HII database.
-  
-  @retval EFI_INVALID_PARAMETER   The Handle was not valid.
+  @retval EFI_NOT_FOUND   The specified Handle is not in database.
 
 **/
 typedef
@@ -177,7 +176,8 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES  Unable to allocate enough memory
                                 for the updated database.
   
-  @retval EFI_INVALID_PARAMETER   The Handle was not valid.
+  @retval EFI_INVALID_PARAMETER  PackageList was NULL.
+  @retval EFI_NOT_FOUND          The specified Handle is not in database.
 
 **/
 typedef
@@ -219,14 +219,20 @@ EFI_STATUS
   @param Handle   An array of EFI_HII_HANDLE  instances returned.
 
 
-  @retval EFI_SUCCESS   Handle was updated successfully.
+  @retval EFI_SUCCESS The matching handles are outputed successfully.
+                           HandleBufferLength is updated with the actual length.
 
-  @retval EFI_BUFFER_TOO_SMALL  The HandleBufferLength parameter
+  @retval EFI_BUFFER_TOO_SMALL The HandleBufferLength parameter
                                 indicates that Handle is too
                                 small to support the number of
                                 handles. HandleBufferLength is
                                 updated with a value that will
                                 enable the data to fit.
+  @retval EFI_NOT_FOUND No matching handle could not be found in database.
+  @retval EFI_INVALID_PARAMETER  Handle or HandleBufferLength was NULL.
+  @retval EFI_INVALID_PARAMETER  PackageType is not a EFI_HII_PACKAGE_TYPE_GUID but
+                          PackageGuid is not NULL, PackageType is a EFI_HII_
+                           PACKAGE_TYPE_GUID but PackageGuid is NULL.
 
 
 **/
@@ -368,8 +374,9 @@ EFI_STATUS
   @retval EFI_SUCCESS   Unregister the notification
                         Successsfully
   
-  @retval EFI_INVALID_PARAMETER   The Handle is invalid.
-
+  @retval EFI_NOT_FOUND The incoming notification handle does not exist 
+                         in current hii database.
+  
 **/
 typedef
 EFI_STATUS

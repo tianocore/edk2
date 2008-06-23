@@ -1,7 +1,7 @@
 /** @file
   The file provides services to access to images in the images database.
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -48,7 +48,7 @@ typedef struct _EFI_IMAGE_INPUT {
   UINT32                          Flags;
   UINT16                          Width;
   UINT16                          Height;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL   Bitmap[1];
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *Bitmap;
 } EFI_IMAGE_INPUT;
 
 
@@ -109,21 +109,14 @@ EFI_STATUS
   
   @param Image  Points to the new image.
   
-  @param ImageSize  On entry, points to the size of the buffer
-                    pointed to by Image, in bytes. On return,
-                    points to the length of the image, in bytes.
-  
-  
   @retval EFI_SUCCESS   The image was returned successfully.
-  
+                                     The specified PackageList is not in the database.
   @retval EFI_NOT_FOUND The image specified by ImageId is not
                         available.
   
-  @retval EFI_BUFFER_TOO_SMALL  The buffer specified by
-                                ImageLength is too small to hold
-                                the image.
-  
   @retval EFI_INVALID_PARAMETER The Image or Langugae was NULL.
+  @retval EFI_OUT_OF_RESOURCES   The bitmap could not be retrieved because there was not
+                         enough memory.
 
 
 **/
@@ -133,8 +126,7 @@ EFI_STATUS
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
   IN        EFI_HII_HANDLE          PackageList,
   IN        EFI_IMAGE_ID            ImageId,
-  OUT       EFI_IMAGE_INPUT         *Image,
-  OUT       UINTN                   *ImageSize
+  OUT       EFI_IMAGE_INPUT         *Image
 );
 
 /**
@@ -156,7 +148,8 @@ EFI_STATUS
   @retval EFI_SUCCESS The image was successfully updated.
   
   @retval EFI_NOT_FOUND   The image specified by ImageId is not
-                          in the database.
+                                        in the database.
+                                        The specified PackageList is not in the database. 
   
   @retval EFI_INVALID_PARAMETER   The Image or Language was
                                   NULL.
@@ -180,8 +173,8 @@ typedef UINT32  EFI_HII_DRAW_FLAGS;
 #define EFI_HII_DRAW_FLAG_CLIP          0x00000001
 #define EFI_HII_DRAW_FLAG_TRANSPARENT   0x00000030
 #define EFI_HII_DRAW_FLAG_DEFAULT       0x00000000
-#define EFI_HII_DRAW_FLAG_FORCE_TRANS   0x00000001
-#define EFI_HII_DRAW_FLAG_FORCE_OPAQUE  0x00000002
+#define EFI_HII_DRAW_FLAG_FORCE_TRANS   0x00000010
+#define EFI_HII_DRAW_FLAG_FORCE_OPAQUE  0x00000020
 #define EFI_HII_DIRECT_TO_SCREEN        0x00000080
 
 
@@ -332,8 +325,9 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES  Unable to allocate an output
                                 buffer for RowInfoArray or Blt.
   
-  @retval EFI_INVALID_PARAMETER The Image or Blt or Height or
-                                Width was NULL.
+  @retval EFI_NOT_FOUND  The image specified by ImageId is not in the database. 
+                                        The specified PackageList is not in the database.                            
+  @retval EFI_INVALID_PARAMETER  The Blt was NULL.    
 
 **/
 typedef
