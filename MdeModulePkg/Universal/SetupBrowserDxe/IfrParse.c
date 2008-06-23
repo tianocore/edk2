@@ -1,5 +1,5 @@
 /** @file
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1233,11 +1233,11 @@ ParseOpCodes (
       //
       CurrentStatement->Minimum = ((EFI_IFR_STRING *) OpCodeData)->MinSize;
       CurrentStatement->Maximum = ((EFI_IFR_STRING *) OpCodeData)->MaxSize;
-      CurrentStatement->StorageWidth = (UINT16)((UINTN) CurrentStatement->Maximum * sizeof (UINT16));
+      CurrentStatement->StorageWidth = (UINT16)((UINTN) CurrentStatement->Maximum * sizeof (CHAR16));
       CurrentStatement->Flags = ((EFI_IFR_STRING *) OpCodeData)->Flags;
 
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_STRING;
-      CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
+      CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth + sizeof (CHAR16));
 
       InitializeRequestElement (FormSet, CurrentStatement);
       break;
@@ -1252,10 +1252,10 @@ ParseOpCodes (
       //
       CopyMem (&CurrentStatement->Minimum, &((EFI_IFR_PASSWORD *) OpCodeData)->MinSize, sizeof (UINT16));
       CopyMem (&CurrentStatement->Maximum, &((EFI_IFR_PASSWORD *) OpCodeData)->MaxSize, sizeof (UINT16));
-      CurrentStatement->StorageWidth = (UINT16)((UINTN) CurrentStatement->Maximum * sizeof (UINT16));
+      CurrentStatement->StorageWidth = (UINT16)((UINTN) CurrentStatement->Maximum * sizeof (CHAR16));
 
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_STRING;
-      CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
+      CurrentStatement->BufferValue = AllocateZeroPool ((CurrentStatement->StorageWidth + sizeof (CHAR16)));
 
       InitializeRequestElement (FormSet, CurrentStatement);
       break;

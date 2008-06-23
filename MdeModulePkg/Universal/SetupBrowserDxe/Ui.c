@@ -2299,7 +2299,7 @@ UiDisplayMenu (
             Selection->Statement = NULL;
             break;
           }
-          BufferSize = StrLen (StringPtr) / 4;
+          BufferSize = StrLen (StringPtr) / 2;
           DevicePath = AllocatePool (BufferSize);
 
           HexStringToBuffer ((UINT8 *) DevicePath, &BufferSize, StringPtr);

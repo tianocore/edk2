@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -382,6 +382,11 @@ USBKeyboardDriverBindingStart (
     goto ErrorExit;
   }
 
+  Status = InitKeyboardLayout (UsbKeyboardDevice);
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
+
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
@@ -649,6 +654,9 @@ USBKeyboardDriverBindingStop (
   gBS->CloseEvent ((UsbKeyboardDevice->SimpleInput).WaitForKey);
   gBS->CloseEvent (UsbKeyboardDevice->SimpleInputEx.WaitForKeyEx);  
   KbdFreeNotifyList (&UsbKeyboardDevice->NotifyList);    
+
+  ReleaseKeyboardLayoutResources (UsbKeyboardDevice);
+  gBS->CloseEvent (UsbKeyboardDevice->KeyboardLayoutEvent);
 
   if (UsbKeyboardDevice->ControllerNameTable != NULL) {
     FreeUnicodeStringTable (UsbKeyboardDevice->ControllerNameTable);

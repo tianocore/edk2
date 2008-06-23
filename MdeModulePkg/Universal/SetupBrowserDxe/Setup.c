@@ -1,5 +1,5 @@
 /** @file
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1173,7 +1173,11 @@ GetQuestionValue (
       }
 
       if (IsString) {
-        StrCpy ((CHAR16 *) Dst, Value);
+        //
+        // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
+        //
+        Length = StorageWidth + sizeof (CHAR16);
+        Status = ConfigStringToUnicode ((CHAR16 *) Dst, &Length, Value);
       } else {
         Status = HexStringToBuf (Dst, &StorageWidth, Value, NULL);
       }
@@ -1239,7 +1243,11 @@ GetQuestionValue (
     //
     Value = Value + 1;
     if (!IsBufferStorage && IsString) {
-      StrCpy ((CHAR16 *) Dst, Value);
+      //
+      // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
+      //
+      Length = StorageWidth + sizeof (CHAR16);
+      Status = ConfigStringToUnicode ((CHAR16 *) Dst, &Length, Value);
     } else {
       Status = HexStringToBuf (Dst, &StorageWidth, Value, NULL);
       if (EFI_ERROR (Status)) {
@@ -1408,13 +1416,21 @@ SetQuestionValue (
     CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
   } else {
     if (IsString) {
+      //
+      // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+      //
       Value = NULL;
-      NewStringCpy (&Value, (CHAR16 *) Src);
-    } else {
-      BufferLen = (StorageWidth * 2 + 1) * sizeof (CHAR16);
+      BufferLen = ((StrLen ((CHAR16 *) Src) * 4) + 1) * sizeof (CHAR16);
       Value = AllocateZeroPool (BufferLen);
       ASSERT (Value != NULL);
+      Status = UnicodeToConfigString (Value, &BufferLen, (CHAR16 *) Src);
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      BufferLen = StorageWidth * 2 + 1;
+      Value = AllocateZeroPool (BufferLen * sizeof (CHAR16));
+      ASSERT (Value != NULL);
       BufToHexString (Value, &BufferLen, Src, StorageWidth);
+      ToLower (Value);
     }
 
     Status = SetValueByName (Storage, Question->VariableName, Value);
@@ -1424,7 +1440,7 @@ SetQuestionValue (
   if (!Cached) {
     //
     // <ConfigResp> ::= <ConfigHdr> + <BlockName> + "&VALUE=" + "<HexCh>StorageWidth * 2" ||
-    //                <ConfigHdr> + "&" + <VariableName> + "=" + "<HexCh>StorageWidth * 2"
+    //                <ConfigHdr> + "&" + <VariableName> + "=" + "<string>"
     //
     if (IsBufferStorage) {
       Length = StrLen (Question->BlockName) + 7;
@@ -1432,7 +1448,7 @@ SetQuestionValue (
       Length = StrLen (Question->VariableName) + 2;
     }
     if (!IsBufferStorage && IsString) {
-      Length += StrLen ((CHAR16 *) Src);
+      Length += (StrLen ((CHAR16 *) Src) * 4);
     } else {
       Length += (StorageWidth * 2);
     }
@@ -1451,10 +1467,16 @@ SetQuestionValue (
 
     Value = ConfigResp + StrLen (ConfigResp);
     if (!IsBufferStorage && IsString) {
-      StrCpy (Value, (CHAR16 *) Src);
+      //
+      // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+      //
+      BufferLen = ((StrLen ((CHAR16 *) Src) * 4) + 1) * sizeof (CHAR16);
+      Status = UnicodeToConfigString (Value, &BufferLen, (CHAR16 *) Src);
+      ASSERT_EFI_ERROR (Status);
     } else {
-      BufferLen = (StorageWidth * 2 + 1) * sizeof (CHAR16);
+      BufferLen = StorageWidth * 2 + 1;
       BufToHexString (Value, &BufferLen, Src, StorageWidth);
+      ToLower (Value);
     }
 
     //

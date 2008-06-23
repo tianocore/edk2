@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -610,7 +610,7 @@ HiiNewImage (
   UINTN                               NewBlockSize;
   EFI_IMAGE_INPUT                     *ImageIn;
 
-  if (This == NULL || ImageId == NULL || Image == NULL || PackageList == NULL) {
+  if (This == NULL || ImageId == NULL || Image == NULL || Image->Bitmap == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -798,10 +798,13 @@ HiiNewImage (
                                  length of the image, in bytes.
 
   @retval EFI_SUCCESS            The new image was returned successfully.
-  @retval EFI_NOT_FOUND          The image specified by ImageId is not available.
+  @retval EFI_NOT_FOUND           The image specified by ImageId is not in the
+                                                database. The specified PackageList is not in the database.
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by ImageSize is too small to
                                  hold the image.
   @retval EFI_INVALID_PARAMETER  The Image or ImageSize was NULL.
+  @retval EFI_OUT_OF_RESOURCES   The bitmap could not be retrieved because there was not
+                                                     enough memory.
 
 **/
 EFI_STATUS
@@ -810,8 +813,7 @@ HiiGetImage (
   IN  CONST EFI_HII_IMAGE_PROTOCOL   *This,
   IN  EFI_HII_HANDLE                 PackageList,
   IN  EFI_IMAGE_ID                   ImageId,
-  OUT EFI_IMAGE_INPUT                *Image,
-  OUT UINTN                          *ImageSize
+  OUT EFI_IMAGE_INPUT                *Image
   )
 {
   HII_DATABASE_PRIVATE_DATA           *Private;
@@ -831,7 +833,7 @@ HiiGetImage (
   UINT8                               PaletteIndex;
   UINT16                              PaletteSize;
 
-  if (This == NULL || ImageSize == NULL || Image == NULL || ImageId < 1 || PackageList == NULL) {
+  if (This == NULL || Image == NULL || ImageId < 1) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -897,13 +899,12 @@ HiiGetImage (
     // Use the common block code since the definition of these structures is the same.
     //
     CopyMem (&Iibt1bit, ImageBlock, sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK));
-    ImageLength = sizeof (EFI_IMAGE_INPUT) + sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) *
-                  (Iibt1bit.Bitmap.Width * Iibt1bit.Bitmap.Height - 1);
-    if (*ImageSize < ImageLength) {
-      *ImageSize = ImageLength;
-      return EFI_BUFFER_TOO_SMALL;
+    ImageLength = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) *
+                  (Iibt1bit.Bitmap.Width * Iibt1bit.Bitmap.Height);
+    Image->Bitmap = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocateZeroPool (ImageLength);
+    if (Image->Bitmap == NULL) {
+      return EFI_OUT_OF_RESOURCES;
     }
-    ZeroMem (Image, ImageLength);
 
     if (Flag) {
       Image->Flags = EFI_IMAGE_TRANSPARENT;
@@ -956,13 +957,11 @@ HiiGetImage (
       ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK) + sizeof (UINT16),
       sizeof (UINT16)
       );
-    ImageLength = sizeof (EFI_IMAGE_INPUT) +
-                  sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * (Width * Height - 1);
-    if (*ImageSize < ImageLength) {
-      *ImageSize = ImageLength;
-      return EFI_BUFFER_TOO_SMALL;
+    ImageLength = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * (Width * Height);
+    Image->Bitmap = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocateZeroPool (ImageLength);
+    if (Image->Bitmap == NULL) {
+      return EFI_OUT_OF_RESOURCES;
     }
-    ZeroMem (Image, ImageLength);
 
     if (Flag) {
       Image->Flags = EFI_IMAGE_TRANSPARENT;
@@ -999,7 +998,7 @@ HiiGetImage (
 
   @retval EFI_SUCCESS            The new image was updated successfully.
   @retval EFI_NOT_FOUND          The image specified by ImageId is not in the
-                                 database.
+                                                database. The specified PackageList is not in the database.    
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
 
 **/
@@ -1036,7 +1035,7 @@ HiiSetImage (
   UINT32                               Part1Size;
   UINT32                               Part2Size;
 
-  if (This == NULL || Image == NULL || ImageId < 1 || PackageList == NULL) {
+  if (This == NULL || Image == NULL || ImageId < 1 || Image->Bitmap == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1448,9 +1447,9 @@ HiiDrawImage (
 
   @retval EFI_SUCCESS            The image was successfully drawn.
   @retval EFI_OUT_OF_RESOURCES   Unable to allocate an output buffer for Blt.
-  @retval EFI_INVALID_PARAMETER  The Image was NULL.
-  @retval EFI_NOT_FOUND          The specified packagelist could not be found in
-                                 current database.
+  @retval EFI_INVALID_PARAMETER  The Blt was NULL.
+  @retval EFI_NOT_FOUND          The image specified by ImageId is not in the database. 
+                           The specified PackageList is not in the database.                             
 
 **/
 EFI_STATUS
@@ -1466,14 +1465,12 @@ HiiDrawImageId (
   )
 {
   EFI_STATUS                          Status;
-  EFI_IMAGE_INPUT                     ImageTemp;
-  EFI_IMAGE_INPUT                     *Image;
-  UINTN                               ImageSize;
+  EFI_IMAGE_INPUT                     Image;
 
   //
   // Check input parameter.
   //
-  if (This == NULL || PackageList == NULL || Blt == NULL || PackageList == NULL) {
+  if (This == NULL || Blt == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1484,24 +1481,16 @@ HiiDrawImageId (
   //
   // Get the specified Image.
   //
-  ImageSize = 0;
-  Status = HiiGetImage (This, PackageList, ImageId, &ImageTemp, &ImageSize);
-  if (Status != EFI_BUFFER_TOO_SMALL) {
+  Status = HiiGetImage (This, PackageList, ImageId, &Image);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  Image = (EFI_IMAGE_INPUT *) AllocateZeroPool (ImageSize);
-  if (Image == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  Status = HiiGetImage (This, PackageList, ImageId, Image, &ImageSize);
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Draw this image.
   //
-  Status = HiiDrawImage (This, Flags, Image, Blt, BltX, BltY);
-  SafeFreePool (Image);
+  Status = HiiDrawImage (This, Flags, &Image, Blt, BltX, BltY);
+  SafeFreePool (Image.Bitmap);
   return Status;
 }
 

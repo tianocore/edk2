@@ -57,7 +57,8 @@
   UefiDriverEntryPoint
   BaseMemoryLib
   DebugLib
-
+  IfrSupportLib
+  HiiLib
 
 [Protocols]
   gEfiConsoleControlProtocolGuid                
