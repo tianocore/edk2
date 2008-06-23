@@ -62,11 +62,15 @@
   gSimpleTextInExNotifyGuid                     # ALWAYS_CONSUMED
 
 [Protocols]
-  gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiUsbIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
+  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL TO_START
 
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver
+  
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardPresenceDetect

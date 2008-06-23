@@ -40,6 +40,7 @@ CHAR16 mLanguageWindow[16] = {
 
   @param  Private                Hii database private structure.
   @param  StringPackage          HII string package instance.
+  @param  FontId                Font identifer, which must be unique within the string package.
   @param  DuplicateEnable        If true, duplicate HII_FONT_INFO which refers to
                                  the same EFI_FONT_INFO is permitted. Otherwise it
                                  is not allowed.
@@ -57,6 +58,7 @@ BOOLEAN
 ReferFontInfoLocally (
   IN  HII_DATABASE_PRIVATE_DATA   *Private,
   IN  HII_STRING_PACKAGE_INSTANCE *StringPackage,
+  IN  UINT8                       FontId,
   IN  BOOLEAN                     DuplicateEnable,
   IN  HII_GLOBAL_FONT_INFO        *GlobalFontInfo,
   OUT HII_FONT_INFO               **LocalFontInfo
@@ -82,11 +84,6 @@ ReferFontInfoLocally (
       }
     }
   }
-  //
-  // Since string package tool set FontId initially to 0 and increases it
-  // progressively by one, StringPackage->FondId always represents an unique
-  // and available FontId.
-  //
   // FontId identifies EFI_FONT_INFO in local string package uniquely.
   // GlobalEntry points to a HII_GLOBAL_FONT_INFO which identifies
   // EFI_FONT_INFO uniquely in whole hii database.
@@ -95,11 +92,9 @@ ReferFontInfoLocally (
   ASSERT (LocalFont != NULL);
 
   LocalFont->Signature   = HII_FONT_INFO_SIGNATURE;
-  LocalFont->FontId      = StringPackage->FontId;
+  LocalFont->FontId      = FontId;
   LocalFont->GlobalEntry = &GlobalFontInfo->Entry;
   InsertTailList (&StringPackage->FontInfoList, &LocalFont->Entry);
-
-  StringPackage->FontId++;
 
   *LocalFontInfo = LocalFont;
   return FALSE;
@@ -183,13 +178,12 @@ GetUnicodeStringTextOrSize (
     StringPtr += sizeof (CHAR16);
   }
 
+  if (*BufferSize < StringSize) {
+    *BufferSize = StringSize;
+    return EFI_BUFFER_TOO_SMALL;
+  }
   if (StringDest != NULL) {
-    if (*BufferSize < StringSize) {
-      *BufferSize = StringSize;
-      return EFI_BUFFER_TOO_SMALL;
-    }
     CopyMem (StringDest, StringSrc, StringSize);
-    return EFI_SUCCESS;
   }
 
   *BufferSize = StringSize;
@@ -292,6 +286,7 @@ FindStringBlock (
   UINT16                               FontSize;
   UINT8                                Length8;
   EFI_HII_SIBT_EXT2_BLOCK              Ext2;
+  UINT8                                FontId;
   UINT32                               Length32;
   UINTN                                StringSize;
   CHAR16                               Zero;
@@ -486,7 +481,9 @@ FindStringBlock (
         // Find the relationship between global font info and the font info of
         // this EFI_HII_SIBT_FONT block then backup its information in local package.
         //
-        BlockHdr += sizeof (EFI_HII_SIBT_EXT2_BLOCK) + sizeof (UINT8);
+        BlockHdr += sizeof (EFI_HII_SIBT_EXT2_BLOCK);
+        CopyMem (&FontId, BlockHdr, sizeof (UINT8));
+        BlockHdr += sizeof (UINT8);
         CopyMem (&FontSize, BlockHdr, sizeof (UINT16));
         BlockHdr += sizeof (UINT16);
         CopyMem (&FontStyle, BlockHdr, sizeof (EFI_HII_FONT_STYLE));
@@ -502,16 +499,21 @@ FindStringBlock (
         FontInfo->FontSize  = FontSize;
         CopyMem (FontInfo->FontName, BlockHdr, StringSize);
 
+        //
+        // If find the corresponding global font info, save the relationship.
+        // Otherwise ignore this EFI_HII_SIBT_FONT block.
+        //
         if (IsFontInfoExisted (Private, FontInfo, NULL, NULL, &GlobalFont)) {
-          //
-          // If find the corresponding global font info, save the relationship.
-          //
-          ReferFontInfoLocally (Private, StringPackage, TRUE, GlobalFont, &LocalFont);
+          ReferFontInfoLocally (Private, StringPackage, FontId, TRUE, GlobalFont, &LocalFont);
         }
 
         //
-        // If can not find, ignore this EFI_HII_SIBT_FONT block.
-        //
+        // Since string package tool set FontId initially to 0 and increases it
+        // progressively by one, StringPackage->FondId always represents an unique
+        // and available FontId.
+        //        
+        StringPackage->FontId++;
+
         SafeFreePool (FontInfo);
       }
 
@@ -647,7 +649,8 @@ GetStringWorker (
   }
 
   //
-  // Get the string font.
+  // Get the string font. The FontId 0 is the default font for those string blocks which 
+  // do not specify a font identifier. If default font is not specified, return NULL.
   //
   if (StringFontInfo != NULL) {
     switch (BlockType) {
@@ -656,10 +659,13 @@ GetStringWorker (
     case EFI_HII_SIBT_STRING_UCS2_FONT:
     case EFI_HII_SIBT_STRINGS_UCS2_FONT:
       FontId = *(StringBlockAddr + sizeof (EFI_HII_STRING_BLOCK));
-      return GetStringFontInfo (StringPackage, FontId, StringFontInfo);
       break;
     default:
-      break;
+      FontId = 0;
+    }
+    Status = GetStringFontInfo (StringPackage, FontId, StringFontInfo);
+    if (Status == EFI_NOT_FOUND) {
+        *StringFontInfo = NULL;
     }
   }
 
@@ -737,38 +743,48 @@ SetStringWorker (
   Referred   = FALSE;
 
   //
-  // Set the string font according to input font information.
+  // The input StringFontInfo should exist in current database if specified.
   //
   if (StringFontInfo != NULL) {
-    //
-    // The input StringFontInfo should exist in current database
-    //
     if (!IsFontInfoExisted (Private, StringFontInfo, NULL, NULL, &GlobalFont)) {
       return EFI_INVALID_PARAMETER;
     } else {
-      Referred = ReferFontInfoLocally (Private, StringPackage, FALSE, GlobalFont, &LocalFont);
+      Referred = ReferFontInfoLocally (
+                   Private, 
+                   StringPackage, 
+                   StringPackage->FontId, 
+                   FALSE, 
+                   GlobalFont, 
+                   &LocalFont
+                   );
+      if (!Referred) {
+        StringPackage->FontId++;
+      }
     }
-
     //
-    // Update the FontId of the specified string block
+    // Update the FontId of the specified string block to input font info.
     //
     switch (BlockType) {
-    case EFI_HII_SIBT_STRING_SCSU_FONT:
+    case EFI_HII_SIBT_STRING_SCSU_FONT:  
     case EFI_HII_SIBT_STRINGS_SCSU_FONT:
     case EFI_HII_SIBT_STRING_UCS2_FONT:
     case EFI_HII_SIBT_STRINGS_UCS2_FONT:
       *(StringBlockAddr + sizeof (EFI_HII_STRING_BLOCK)) = LocalFont->FontId;
       break;
     default:
-      return EFI_NOT_FOUND;
+      //
+      // When modify the font info of these blocks, the block type should be updated
+      // to contain font info thus the whole structure should be revised.
+      // It is recommended to use tool to modify the block type not in the code.
+      //      
+      return EFI_UNSUPPORTED;
     }
-
   }
 
   OldBlockSize = StringPackage->StringPkgHdr->Header.Length - StringPackage->StringPkgHdr->HdrSize;
 
   //
-  // Set the string text.
+  // Set the string text and font.
   //
   StringTextPtr = StringBlockAddr + StringTextOffset;
   switch (BlockType) {
@@ -1138,7 +1154,7 @@ HiiNewString (
     //
     Ucs2FontBlockSize = (UINT32) (StrSize (String) + sizeof (EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK) -
                                   sizeof (CHAR16));
-    if (ReferFontInfoLocally (Private, StringPackage, FALSE, GlobalFont, &LocalFont)) {
+    if (ReferFontInfoLocally (Private, StringPackage, StringPackage->FontId, FALSE, GlobalFont, &LocalFont)) {
       //
       // Create a EFI_HII_SIBT_STRING_UCS2_FONT block only.
       //
@@ -1229,6 +1245,12 @@ HiiNewString (
       StringPackage->StringBlock = StringBlock;
       StringPackage->StringPkgHdr->Header.Length += FontBlockSize + Ucs2FontBlockSize;
       PackageListNode->PackageListHdr.PackageLength += FontBlockSize + Ucs2FontBlockSize;
+
+      //
+      // Increase the FontId to make it unique since we already add 
+      // a EFI_HII_SIBT_FONT block to this string package.
+      //
+      StringPackage->FontId++;
     }
   }
 
@@ -1258,7 +1280,9 @@ HiiNewString (
   @retval EFI_SUCCESS            The string was returned successfully.
   @retval EFI_NOT_FOUND          The string specified by StringId is not available.
   @retval EFI_NOT_FOUND          The string specified by StringId is available but
-                                 not in the specified language.
+                                                not in the specified language.
+                                                The specified PackageList is not in the database.
+  @retval EFI_INVALID_LANGUAGE   - The string specified by StringId is available but
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by StringSize is too small to
                                   hold the string.
   @retval EFI_INVALID_PARAMETER  The String or Language or StringSize was NULL.
@@ -1309,18 +1333,34 @@ HiiGetString (
   }
 
   if (PackageListNode != NULL) {
+    //
+    // First search: to match the StringId in the specified language.
+    //
     for (Link =  PackageListNode->StringPkgHdr.ForwardLink;
          Link != &PackageListNode->StringPkgHdr;
          Link =  Link->ForwardLink
         ) {
-      StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-      if (R8_EfiLibCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
-        Status = GetStringWorker (Private, StringPackage, StringId, String, StringSize, StringFontInfo);
-        if (Status != EFI_NOT_FOUND) {
-          return Status;
+        StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
+        if (R8_EfiLibCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
+          Status = GetStringWorker (Private, StringPackage, StringId, String, StringSize, StringFontInfo);
+          if (Status != EFI_NOT_FOUND) {
+            return Status;
+          }
         }
       }
-    }
+      //
+      // Second search: to match the StringId in other available languages if exist.
+      //
+      for (Link =  PackageListNode->StringPkgHdr.ForwardLink; 
+           Link != &PackageListNode->StringPkgHdr;
+           Link =  Link->ForwardLink
+          ) {
+      StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);      
+      Status = GetStringWorker (Private, StringPackage, StringId, String, StringSize, StringFontInfo);
+      if (!EFI_ERROR (Status)) {
+        return EFI_INVALID_LANGUAGE;
+      }
+    }    
   }
 
   return EFI_NOT_FOUND;
@@ -1528,8 +1568,9 @@ HiiGetLanguages (
                                  too small to hold the returned information.
                                  SecondLanguageSize is updated to hold the size of
                                  the buffer required.
-  @retval EFI_NOT_FOUND          The language specified by FirstLanguage is not
-                                 present in the specified package list.
+  @retval EFI_INVALID_LANGUAGE           The language specified by FirstLanguage is not
+                                  present in the specified package list.
+  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.                                
 
 **/
 EFI_STATUS
@@ -1562,45 +1603,51 @@ HiiGetSecondaryLanguages (
   }
 
   Private    = HII_STRING_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-  Languages  = NULL;
-  ResultSize = 0;
 
+  PackageListNode = NULL;     
   for (Link = Private->DatabaseList.ForwardLink; Link != &Private->DatabaseList; Link = Link->ForwardLink) {
     DatabaseRecord  = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
     if (DatabaseRecord->Handle == PackageList) {
       PackageListNode = (HII_DATABASE_PACKAGE_LIST_INSTANCE *) (DatabaseRecord->PackageList);
-      for (Link1 = PackageListNode->StringPkgHdr.ForwardLink;
-           Link1 != &PackageListNode->StringPkgHdr;
-           Link1 = Link1->ForwardLink
-          ) {
-        StringPackage = CR (Link1, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-        if (R8_EfiLibCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) FirstLanguage)) {
-          Languages = StringPackage->StringPkgHdr->Language;
-          //
-          // Language is a series of ';' terminated strings, first one is primary
-          // language and following with other secondary languages or NULL if no
-          // secondary languages any more.
-          //
-          Languages = AsciiStrStr (Languages, ";");
-          if (Languages == NULL) {
-            break;
-          }
-          Languages++;
-
-          ResultSize = AsciiStrSize (Languages);
-          if (ResultSize <= *SecondLanguagesSize) {
-            AsciiStrCpy (SecondLanguages, Languages);
-          } else {
-            *SecondLanguagesSize = ResultSize;
-            return EFI_BUFFER_TOO_SMALL;
-          }
-
-          return EFI_SUCCESS;
-        }
+        break;
       }
+    }
+    if (PackageListNode == NULL) {
+      return EFI_NOT_FOUND;
+    }
+      
+    Languages  = NULL;
+    ResultSize = 0;
+    for (Link1 = PackageListNode->StringPkgHdr.ForwardLink;
+         Link1 != &PackageListNode->StringPkgHdr;
+         Link1 = Link1->ForwardLink
+        ) {
+    StringPackage = CR (Link1, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
+    if (R8_EfiLibCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) FirstLanguage)) {
+      Languages = StringPackage->StringPkgHdr->Language;
+      //
+      // Language is a series of ';' terminated strings, first one is primary
+      // language and following with other secondary languages or NULL if no
+      // secondary languages any more.
+      //
+      Languages = AsciiStrStr (Languages, ";");
+      if (Languages == NULL) {
+        break;
+      }
+      Languages++;
+
+      ResultSize = AsciiStrSize (Languages);
+      if (ResultSize <= *SecondLanguagesSize) {
+        AsciiStrCpy (SecondLanguages, Languages);
+      } else {
+        *SecondLanguagesSize = ResultSize;
+        return EFI_BUFFER_TOO_SMALL;
+      }
+
+      return EFI_SUCCESS;
     }
   }
 
-  return EFI_NOT_FOUND;
+  return EFI_INVALID_LANGUAGE;
 }
 

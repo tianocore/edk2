@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,6 +47,8 @@ Revision History
 #include <Library/BaseLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/IfrSupportLib.h>
+#include <Library/HiiLib.h>
 
 #define HII_DATABASE_NOTIFY_GUID \
   { \
@@ -495,7 +497,8 @@ FindGlyphBlock (
   @retval EFI_SUCCESS             The string was successfully rendered.
   @retval EFI_OUT_OF_RESOURCES    Unable to allocate an output buffer for
                                   RowInfoArray or Blt.
-  @retval EFI_INVALID_PARAMETER   The String was NULL.
+  @retval EFI_INVALID_PARAMETER The String or Blt.
+  @retval EFI_INVALID_PARAMETER Flags were invalid combination..
 
 **/
 EFI_STATUS
@@ -567,7 +570,10 @@ HiiStringToImage (
   @retval EFI_SUCCESS             The string was successfully rendered.
   @retval EFI_OUT_OF_RESOURCES    Unable to allocate an output buffer for
                                   RowInfoArray or Blt.
-  @retval EFI_INVALID_PARAMETER   The String was NULL.
+  @retval EFI_INVALID_PARAMETER The Blt or PackageList was NULL.
+  @retval EFI_INVALID_PARAMETER Flags were invalid combination.
+  @retval EFI_NOT_FOUND         The specified PackageList is not in the Database or the stringid is not 
+                          in the specified PackageList. 
 
 **/
 EFI_STATUS
@@ -616,7 +622,7 @@ EFIAPI
 HiiGetGlyph (
   IN  CONST EFI_HII_FONT_PROTOCOL    *This,
   IN  CHAR16                         Char,
-  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfo,
+  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfo, OPTIONAL
   OUT EFI_IMAGE_OUTPUT               **Blt,
   OUT UINTN                          *Baseline OPTIONAL
   )
@@ -635,7 +641,8 @@ HiiGetGlyph (
                                   returned font handle or points to NULL if there
                                   are no more matching fonts.
   @param  StringInfoIn            Upon entry, points to the font to return
-                                  information about.
+                                  information about. If NULL, then the information about the system default 
+                                  font will be returned.
   @param  StringInfoOut           Upon return, contains the matching font's
                                   information.  If NULL, then no information is
                                   returned. It's caller's responsibility to free
@@ -647,9 +654,9 @@ HiiGetGlyph (
   @retval EFI_SUCCESS             Matching font returned successfully.
   @retval EFI_NOT_FOUND           No matching font was found.
   @retval EFI_INVALID_PARAMETER   StringInfoIn is NULL.
+  @retval EFI_INVALID_PARAMETER  StringInfoIn->FontInfoMask is an invalid combination.
   @retval EFI_OUT_OF_RESOURCES    There were insufficient resources to complete the
                                   request.
-
 **/
 EFI_STATUS
 EFIAPI
@@ -706,15 +713,15 @@ HiiNewImage (
   @param  ImageId                 The image's id,, which is unique within
                                   PackageList.
   @param  Image                   Points to the image.
-  @param  ImageSize               On entry, points to the size of the buffer
-                                  pointed to by Image, in bytes. On return, points
-                                  to the length of the image, in bytes.
 
   @retval EFI_SUCCESS             The new image was returned successfully.
   @retval EFI_NOT_FOUND           The image specified by ImageId is not available.
+                                                 The specified PackageList is not in the database.
   @retval EFI_BUFFER_TOO_SMALL    The buffer specified by ImageSize is too small to
                                   hold the image.
   @retval EFI_INVALID_PARAMETER   The Image or ImageSize was NULL.
+  @retval EFI_OUT_OF_RESOURCES   The bitmap could not be retrieved because there was not
+                                                       enough memory.
 
 **/
 EFI_STATUS
@@ -723,8 +730,7 @@ HiiGetImage (
   IN  CONST EFI_HII_IMAGE_PROTOCOL   *This,
   IN  EFI_HII_HANDLE                 PackageList,
   IN  EFI_IMAGE_ID                   ImageId,
-  OUT EFI_IMAGE_INPUT                *Image,
-  OUT UINTN                          *ImageSize
+  OUT EFI_IMAGE_INPUT                *Image
   )
 ;
 
@@ -741,7 +747,7 @@ HiiGetImage (
 
   @retval EFI_SUCCESS             The new image was updated successfully.
   @retval EFI_NOT_FOUND           The image specified by ImageId is not in the
-                                  database.
+                                                database. The specified PackageList is not in the database.
   @retval EFI_INVALID_PARAMETER   The Image was NULL.
 
 **/
@@ -821,9 +827,9 @@ HiiDrawImage (
 
   @retval EFI_SUCCESS             The image was successfully drawn.
   @retval EFI_OUT_OF_RESOURCES    Unable to allocate an output buffer for Blt.
-  @retval EFI_INVALID_PARAMETER   The Image was NULL.
-  @retval EFI_NOT_FOUND           The specified packagelist could not be found in
-                                  current database.
+  @retval EFI_INVALID_PARAMETER  The Blt was NULL.
+  @retval EFI_NOT_FOUND          The image specified by ImageId is not in the database. 
+                           The specified PackageList is not in the database.
 
 **/
 EFI_STATUS
@@ -914,7 +920,9 @@ HiiNewString (
   @retval EFI_NOT_FOUND           The string specified by StringId is not
                                   available.
   @retval EFI_NOT_FOUND           The string specified by StringId is available but
-                                  not in the specified language.
+                                                not in the specified language.
+                                                The specified PackageList is not in the database.
+  @retval EFI_INVALID_LANGUAGE   - The string specified by StringId is available but
   @retval EFI_BUFFER_TOO_SMALL    The buffer specified by StringSize is too small
                                   to  hold the string.
   @retval EFI_INVALID_PARAMETER   The String or Language or StringSize was NULL.
@@ -1029,8 +1037,9 @@ HiiGetLanguages (
                                   too small to hold the returned information.
                                   SecondLanguageSize is updated to hold the size of
                                   the buffer required.
-  @retval EFI_NOT_FOUND           The language specified by FirstLanguage is not
+  @retval EFI_INVALID_LANGUAGE           The language specified by FirstLanguage is not
                                   present in the specified package list.
+  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.                                
 
 **/
 EFI_STATUS
@@ -1091,9 +1100,7 @@ HiiNewPackageList (
 
   @retval EFI_SUCCESS             The data associated with the Handle was removed
                                   from  the HII database.
-  @retval EFI_NOT_FOUND           The specified PackageList could not be found in
-                                  database.
-  @retval EFI_INVALID_PARAMETER   The Handle was not valid.
+  @retval EFI_NOT_FOUND           The specified Handle is not in database.
 
 **/
 EFI_STATUS
@@ -1119,9 +1126,8 @@ HiiRemovePackageList (
   @retval EFI_SUCCESS             The HII database was successfully updated.
   @retval EFI_OUT_OF_RESOURCES    Unable to allocate enough memory for the updated
                                   database.
-  @retval EFI_INVALID_PARAMETER   Handle or PackageList was NULL.
-  @retval EFI_NOT_FOUND           The Handle was not valid or could not be found in
-                                  database.
+  @retval EFI_INVALID_PARAMETER  PackageList was NULL.
+  @retval EFI_NOT_FOUND          The specified Handle is not in database.
 
 **/
 EFI_STATUS
@@ -1154,6 +1160,7 @@ HiiUpdatePackageList (
   @param  Handle                  An array of EFI_HII_HANDLE instances returned.
 
   @retval EFI_SUCCESS             The matching handles are outputed successfully.
+                                                HandleBufferLength is updated with the actual length.
   @retval EFI_BUFFER_TO_SMALL     The HandleBufferLength parameter indicates that
                                   Handle is too small to support the number of
                                   handles. HandleBufferLength is updated with a
@@ -1161,6 +1168,10 @@ HiiUpdatePackageList (
   @retval EFI_NOT_FOUND           No matching handle could not be found in
                                   database.
   @retval EFI_INVALID_PARAMETER   Handle or HandleBufferLength was NULL.
+  @retval EFI_INVALID_PARAMETER  PackageType is not a EFI_HII_PACKAGE_TYPE_GUID but
+                         PackageGuid is not NULL, PackageType is a EFI_HII_
+                         PACKAGE_TYPE_GUID but PackageGuid is NULL.
+  
 
 **/
 EFI_STATUS
@@ -1271,7 +1282,8 @@ HiiRegisterPackageNotify (
                                   unregistered.
 
   @retval EFI_SUCCESS             Notification is unregistered successfully.
-  @retval EFI_INVALID_PARAMETER   The Handle is invalid.
+  @retval EFI_NOT_FOUND          The incoming notification handle does not exist 
+                           in current hii database.
 
 **/
 EFI_STATUS
@@ -1511,7 +1523,7 @@ HiiConfigRoutingExportConfig (
 **/
 EFI_STATUS
 EFIAPI
-HiiConfigRoutingRoutConfig (
+HiiConfigRoutingRouteConfig (
   IN  CONST EFI_HII_CONFIG_ROUTING_PROTOCOL  *This,
   IN  CONST EFI_STRING                       Configuration,
   OUT EFI_STRING                             *Progress

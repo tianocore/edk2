@@ -931,6 +931,8 @@ Returns:
       //
       // Timeout or user press enter to continue
       //
+      gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+      gST->ConOut->ClearScreen (gST->ConOut);
       goto Exit;
     }
   }

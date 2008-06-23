@@ -37,6 +37,16 @@ InitUSBKeyboard (
   );
 
 EFI_STATUS
+InitKeyboardLayout (
+  IN USB_KB_DEV   *UsbKeyboardDevice
+  );
+
+VOID
+ReleaseKeyboardLayoutResources (
+  USB_KB_DEV  *UsbKeyboardDevice
+  );
+
+EFI_STATUS
 EFIAPI
 KeyboardHandler (
   IN  VOID          *Data,
