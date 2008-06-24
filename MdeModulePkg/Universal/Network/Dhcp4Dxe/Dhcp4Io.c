@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -272,9 +272,7 @@ DhcpSetTransmitTimer (
 
   DhcpSb->PacketToLive = Times[DhcpSb->CurRetry];
 
-  if (DhcpSb->DhcpState == Dhcp4Selecting) {
-    DhcpSb->WaitOffer = DhcpSb->PacketToLive;
-  }
+  return;
 }
 
 /**
@@ -497,7 +495,6 @@ DhcpCleanLease (
   DhcpSb->PacketToLive  = 0;
   DhcpSb->CurRetry      = 0;
   DhcpSb->MaxRetries    = 0;
-  DhcpSb->WaitOffer     = 0;
   DhcpSb->LeaseLife     = 0;
 }
 
@@ -524,11 +521,6 @@ DhcpChooseOffer (
   EFI_STATUS                Status;
 
   ASSERT (DhcpSb->LastOffer != NULL);
-
-  //
-  // Stop waiting more offers
-  //
-  DhcpSb->WaitOffer = 0;
 
   //
   // User will cache previous offers if he wants to select
@@ -1501,30 +1493,27 @@ DhcpOnTimerTick (
 
   DhcpSb   = (DHCP_SERVICE *) Context;
   Instance = DhcpSb->ActiveChild;
-
-  //
-  // Check the time to wait offer
-  //
-  if ((DhcpSb->WaitOffer > 0) && (--DhcpSb->WaitOffer == 0)) {
-    //
-    // OK, offer collection finished, select a offer
-    //
-    ASSERT (DhcpSb->DhcpState == Dhcp4Selecting);
-
-    if (DhcpSb->LastOffer == NULL) {
-      goto END_SESSION;
-    }
-
-    if (EFI_ERROR (DhcpChooseOffer (DhcpSb))) {
-      goto END_SESSION;
-    }
-  }
-
+  
   //
   // Check the retransmit timer
   //
   if ((DhcpSb->PacketToLive > 0) && (--DhcpSb->PacketToLive == 0)) {
 
+    //
+    // Select offer at each timeout if any offer received.
+    //
+    if (DhcpSb->DhcpState == Dhcp4Selecting && DhcpSb->LastOffer != NULL) {
+
+      Status = DhcpChooseOffer (DhcpSb);
+
+      if (EFI_ERROR(Status)) {
+        FreePool (DhcpSb->LastOffer);
+        DhcpSb->LastOffer = NULL;
+      } else {
+        goto ON_EXIT;
+      }
+    }
+    
     if (++DhcpSb->CurRetry < DhcpSb->MaxRetries) {
       //
       // Still has another try
@@ -1532,10 +1521,7 @@ DhcpOnTimerTick (
       DhcpRetransmit (DhcpSb);
       DhcpSetTransmitTimer (DhcpSb);
 
-    } else {
-      if (!DHCP_CONNECTED (DhcpSb->DhcpState)) {
-        goto END_SESSION;
-      }
+    } else if (DHCP_CONNECTED (DhcpSb->DhcpState)) {
 
       //
       // Retransmission failed, if the DHCP request is initiated by
@@ -1562,9 +1548,11 @@ DhcpOnTimerTick (
         DhcpSb->IoStatus = EFI_TIMEOUT;
         DhcpNotifyUser (DhcpSb, DHCP_NOTIFY_RENEWREBIND);
       }
+    } else {
+      goto END_SESSION;
     }
   }
-
+  
   //
   // If an address has been acquired, check whether need to
   // refresh or whether it has expired.
@@ -1628,9 +1616,7 @@ DhcpOnTimerTick (
     }
   }
 
-  //
-  //
-  //
+ON_EXIT:
   if ((Instance != NULL) && (Instance->Token != NULL)) {
     Instance->Timeout--;
     if (Instance->Timeout == 0) {
