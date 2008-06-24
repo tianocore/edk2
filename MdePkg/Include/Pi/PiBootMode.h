@@ -20,6 +20,9 @@
 
 #include <ProcessorBind.h>
 
+///
+/// EFI boot mode
+/// 
 typedef UINT32  EFI_BOOT_MODE;
 
 //

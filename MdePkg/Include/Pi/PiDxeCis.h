@@ -20,9 +20,9 @@
 
 #include <Pi/PiMultiPhase.h>
 
-//
-// Global Coherencey Domain types
-//
+///
+/// Global Coherencey Domain types - Memory type
+///
 typedef enum {
   EfiGcdMemoryTypeNonExistent,
   EfiGcdMemoryTypeReserved,
@@ -31,7 +31,9 @@ typedef enum {
   EfiGcdMemoryTypeMaximum
 } EFI_GCD_MEMORY_TYPE;
 
-
+///
+/// Global Coherencey Domain types - IO type
+///
 typedef enum {
   EfiGcdIoTypeNonExistent,
   EfiGcdIoTypeReserved,
@@ -39,7 +41,9 @@ typedef enum {
   EfiGcdIoTypeMaximum
 } EFI_GCD_IO_TYPE;
 
-
+///
+/// The type of allocation to perform.
+/// 
 typedef enum {
   EfiGcdAllocateAnySearchBottomUp,
   EfiGcdAllocateMaxAddressSearchBottomUp,
@@ -49,23 +53,92 @@ typedef enum {
   EfiGcdMaxAllocateType
 } EFI_GCD_ALLOCATE_TYPE;
 
-
+///
+/// EFI_GCD_MEMORY_SPACE_DESCRIPTOR
+/// 
 typedef struct {
+  ///
+  /// The physical address of the first byte in the memory region. Type
+  /// EFI_PHYSICAL_ADDRESS is defined in the AllocatePages() function
+  /// description in the UEFI 2.0 specification
+  /// 
   EFI_PHYSICAL_ADDRESS  BaseAddress;
+
+  ///
+  /// The number of bytes in the memory region.
+  /// 
   UINT64                Length;
+
+  ///
+  /// The bit mask of attributes that the memory region is capable of supporting. The bit
+  /// mask of available attributes is defined in the GetMemoryMap() function description
+  /// in the UEFI 2.0 specification.
+  /// 
   UINT64                Capabilities;
+  ///
+  /// The bit mask of attributes that the memory region is currently using. The bit mask of
+  /// available attributes is defined in GetMemoryMap().
+  /// 
   UINT64                Attributes;
+  ///
+  /// Type of the memory region. Type EFI_GCD_MEMORY_TYPE is defined in the
+  /// AddMemorySpace() function description
+  /// 
   EFI_GCD_MEMORY_TYPE   GcdMemoryType;
+
+  ///
+  /// The image handle of the agent that allocated the memory resource described by
+  /// PhysicalStart and NumberOfBytes. If this field is NULL, then the memory
+  /// resource is not currently allocated. Type EFI_HANDLE is defined in
+  /// InstallProtocolInterface() in the UEFI 2.0 specification.
+  /// 
   EFI_HANDLE            ImageHandle;
+
+  ///
+  /// The device handle for which the memory resource has been allocated. If
+  /// ImageHandle is NULL, then the memory resource is not currently allocated. If this
+  /// field is NULL, then the memory resource is not associated with a device that is
+  /// described by a device handle. Type EFI_HANDLE is defined in
+  /// InstallProtocolInterface() in the UEFI 2.0 specification.
+  /// 
   EFI_HANDLE            DeviceHandle;
 } EFI_GCD_MEMORY_SPACE_DESCRIPTOR;
 
-
+///
+/// EFI_GCD_IO_SPACE_DESCRIPTOR
+/// 
 typedef struct {
+  ///
+  /// Physical address of the first byte in the I/O region. Type
+  /// EFI_PHYSICAL_ADDRESS is defined in the AllocatePages() function
+  /// description in the UEFI 2.0 specification.
+  /// 
   EFI_PHYSICAL_ADDRESS  BaseAddress;
+
+  /// Number of bytes in the I/O region.
   UINT64                Length;
+
+  /// 
+  /// Type of the I/O region. Type EFI_GCD_IO_TYPE is defined in the
+  /// AddIoSpace() function description.
+  /// 
   EFI_GCD_IO_TYPE       GcdIoType;
+
+  /// 
+  /// The image handle of the agent that allocated the I/O resource described by
+  /// PhysicalStart and NumberOfBytes. If this field is NULL, then the I/O
+  /// resource is not currently allocated. Type EFI_HANDLE is defined in
+  /// InstallProtocolInterface() in the UEFI 2.0 specification.
+  /// 
   EFI_HANDLE            ImageHandle;
+
+  ///
+  /// The device handle for which the I/O resource has been allocated. If ImageHandle
+  /// is NULL, then the I/O resource is not currently allocated. If this field is NULL, then
+  /// the I/O resource is not associated with a device that is described by a device handle.
+  /// Type EFI_HANDLE is defined in InstallProtocolInterface() in the UEFI
+  /// 2.0 specification.
+  /// 
   EFI_HANDLE            DeviceHandle;
 } EFI_GCD_IO_SPACE_DESCRIPTOR;
 
@@ -84,7 +157,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ADD_MEMORY_SPACE) (
+(EFIAPI *EFI_ADD_MEMORY_SPACE)(
   IN EFI_GCD_MEMORY_TYPE   GcdMemoryType,
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
@@ -111,7 +184,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ALLOCATE_MEMORY_SPACE) (
+(EFIAPI *EFI_ALLOCATE_MEMORY_SPACE)(
   IN     EFI_GCD_ALLOCATE_TYPE               GcdAllocateType,
   IN     EFI_GCD_MEMORY_TYPE                 GcdMemoryType,
   IN     UINTN                               Alignment,
@@ -134,7 +207,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FREE_MEMORY_SPACE) (
+(EFIAPI *EFI_FREE_MEMORY_SPACE)(
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
   )
@@ -152,7 +225,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_REMOVE_MEMORY_SPACE) (
+(EFIAPI *EFI_REMOVE_MEMORY_SPACE)(
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
   )
@@ -170,7 +243,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_MEMORY_SPACE_DESCRIPTOR) (
+(EFIAPI *EFI_GET_MEMORY_SPACE_DESCRIPTOR)(
   IN  EFI_PHYSICAL_ADDRESS             BaseAddress,
   OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Descriptor
   )
@@ -189,7 +262,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SET_MEMORY_SPACE_ATTRIBUTES) (
+(EFIAPI *EFI_SET_MEMORY_SPACE_ATTRIBUTES)(
   IN EFI_PHYSICAL_ADDRESS         BaseAddress,
   IN UINT64                       Length,
   IN UINT64                       Attributes
@@ -210,7 +283,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_MEMORY_SPACE_MAP) (
+(EFIAPI *EFI_GET_MEMORY_SPACE_MAP)(
   OUT UINTN                            *NumberOfDescriptors,
   OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR  **MemorySpaceMap
   )
@@ -228,7 +301,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ADD_IO_SPACE) (
+(EFIAPI *EFI_ADD_IO_SPACE)(
   IN EFI_GCD_IO_TYPE       GcdIoType,
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
@@ -254,7 +327,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ALLOCATE_IO_SPACE) (
+(EFIAPI *EFI_ALLOCATE_IO_SPACE)(
   IN     EFI_GCD_ALLOCATE_TYPE               GcdAllocateType,
   IN     EFI_GCD_IO_TYPE                     GcdIoType,
   IN     UINTN                               Alignment,
@@ -277,7 +350,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FREE_IO_SPACE) (
+(EFIAPI *EFI_FREE_IO_SPACE)(
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
   )
@@ -295,7 +368,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_REMOVE_IO_SPACE) (
+(EFIAPI *EFI_REMOVE_IO_SPACE)(
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
   )
@@ -313,7 +386,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_IO_SPACE_DESCRIPTOR) (
+(EFIAPI *EFI_GET_IO_SPACE_DESCRIPTOR)(
   IN  EFI_PHYSICAL_ADDRESS         BaseAddress,
   OUT EFI_GCD_IO_SPACE_DESCRIPTOR  *Descriptor
   )
@@ -332,7 +405,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_IO_SPACE_MAP) (
+(EFIAPI *EFI_GET_IO_SPACE_MAP)(
   OUT UINTN                        *NumberOfDescriptors,
   OUT EFI_GCD_IO_SPACE_DESCRIPTOR  **IoSpaceMap
   )
@@ -348,7 +421,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DISPATCH) (
+(EFIAPI *EFI_DISPATCH)(
   VOID
   )
 ;
@@ -364,7 +437,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SCHEDULE) (
+(EFIAPI *EFI_SCHEDULE)(
   IN EFI_HANDLE  FirmwareVolumeHandle,
   IN EFI_GUID    *DriverName
   )
@@ -381,7 +454,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TRUST) (
+(EFIAPI *EFI_TRUST)(
   IN EFI_HANDLE  FirmwareVolumeHandle,
   IN EFI_GUID    *DriverName
   )
@@ -399,7 +472,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PROCESS_FIRMWARE_VOLUME) (
+(EFIAPI *EFI_PROCESS_FIRMWARE_VOLUME)(
   IN VOID                             *FvHeader,
   IN UINTN                            Size,
   OUT EFI_HANDLE                      *FirmwareVolumeHandle
