@@ -111,7 +111,7 @@ typedef UINT64  EFI_FV_ATTRIBUTES;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FV_GET_ATTRIBUTES) (
+(EFIAPI * EFI_FV_GET_ATTRIBUTES)(
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   OUT       EFI_FV_ATTRIBUTES             *FvAttributes
 );
@@ -207,7 +207,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FV_SET_ATTRIBUTES) (
+(EFIAPI * EFI_FV_SET_ATTRIBUTES)(
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   IN OUT    EFI_FV_ATTRIBUTES             *FvAttributes
 );
@@ -304,7 +304,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FV_READ_FILE) (
+(EFIAPI * EFI_FV_READ_FILE)(
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   IN CONST  EFI_GUID                      *NameGuid,
   IN OUT    VOID                          **Buffer,
@@ -415,7 +415,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FV_READ_SECTION) (
+(EFIAPI * EFI_FV_READ_SECTION)(
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   IN CONST  EFI_GUID                      *NameGuid,
   IN        EFI_SECTION_TYPE              SectionType,
@@ -511,7 +511,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS 
-(EFIAPI * EFI_FV_WRITE_FILE) (
+(EFIAPI * EFI_FV_WRITE_FILE)(
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   IN        UINT32                        NumberOfFiles,
   IN        EFI_FV_WRITE_POLICY           WritePolicy,
@@ -599,7 +599,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FV_GET_NEXT_FILE) (
+(EFIAPI * EFI_FV_GET_NEXT_FILE)(
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   IN OUT    VOID                          *Key,
   IN OUT    EFI_FV_FILETYPE               *FileType,
@@ -655,7 +655,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FV_GET_INFO) (
+(EFIAPI *EFI_FV_GET_INFO)(
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   IN CONST  EFI_GUID                      *InformationType,
   IN OUT    UINTN                         *BufferSize,
@@ -704,7 +704,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FV_SET_INFO) (
+(EFIAPI *EFI_FV_SET_INFO)(
   IN CONST  EFI_FIRMWARE_VOLUME2_PROTOCOL *This,
   IN CONST  EFI_GUID                      *InformationType,
   IN        UINTN                         BufferSize,

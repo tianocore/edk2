@@ -108,7 +108,7 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_EXTRACT_CONFIG ) (
+(EFIAPI * EFI_HII_ROUTING_EXTRACT_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   IN CONST  EFI_STRING                      Request,
   OUT       EFI_STRING                      *Progress,
@@ -153,7 +153,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_EXPORT_CONFIG ) (
+(EFIAPI * EFI_HII_ROUTING_EXPORT_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   OUT       EFI_STRING                      *Results
 );
@@ -201,7 +201,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_ROUTE_CONFIG ) (
+(EFIAPI * EFI_HII_ROUTING_ROUTE_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   IN CONST  EFI_STRING                      Configuration,
   OUT       EFI_STRING                      *Progress
@@ -271,7 +271,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_BLOCK_TO_CONFIG ) (
+(EFIAPI * EFI_HII_ROUTING_BLOCK_TO_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   IN CONST  EFI_STRING                      ConfigRequest,
   IN CONST  UINT8                           *Block,
@@ -330,7 +330,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_CONFIG_TO_BLOCK ) (
+(EFIAPI * EFI_HII_ROUTING_CONFIG_TO_BLOCK)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   IN CONST  EFI_STRING                      ConfigResp,
   IN OUT    UINT8                           *Block,
@@ -340,7 +340,7 @@ EFI_STATUS
 
 typedef
 EFI_STATUS 
-(EFIAPI * EFI_HII_GET_ALT_CFG) (
+(EFIAPI * EFI_HII_GET_ALT_CFG)(
   IN  CONST EFI_HII_CONFIG_ROUTING_PROTOCOL    *This, 
   IN  CONST EFI_STRING                         Configuration, 
   IN  CONST EFI_GUID                           *Guid, 

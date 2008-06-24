@@ -105,7 +105,7 @@ typedef UINTN EFI_BROWSER_ACTION;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ACCESS_EXTRACT_CONFIG ) (
+(EFIAPI * EFI_HII_ACCESS_EXTRACT_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
   IN CONST  EFI_STRING                      Request,
   OUT       EFI_STRING                      *Progress,
@@ -154,7 +154,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ACCESS_ROUTE_CONFIG ) (
+(EFIAPI * EFI_HII_ACCESS_ROUTE_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
   IN CONST  EFI_STRING                      Configuration,
   OUT       EFI_STRING                      *Progress
@@ -199,7 +199,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_ACCESS_FORM_CALLBACK) (
+(EFIAPI *EFI_HII_ACCESS_FORM_CALLBACK)(
   IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
   IN  EFI_BROWSER_ACTION                     Action,
   IN  EFI_QUESTION_ID                        QuestionId,

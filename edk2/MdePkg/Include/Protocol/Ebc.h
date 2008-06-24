@@ -50,7 +50,7 @@ typedef struct _EFI_EBC_PROTOCOL EFI_EBC_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EBC_CREATE_THUNK) (
+(EFIAPI *EFI_EBC_CREATE_THUNK)(
   IN EFI_EBC_PROTOCOL           *This,
   IN EFI_HANDLE                 ImageHandle,
   IN VOID                       *EbcEntryPoint,
@@ -70,7 +70,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EBC_UNLOAD_IMAGE) (
+(EFIAPI *EFI_EBC_UNLOAD_IMAGE)(
   IN EFI_EBC_PROTOCOL           *This,
   IN EFI_HANDLE                 ImageHandle
   );
@@ -87,7 +87,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EBC_ICACHE_FLUSH) (
+(EFIAPI *EBC_ICACHE_FLUSH)(
   IN EFI_PHYSICAL_ADDRESS     Start,
   IN UINT64                   Length
   );
@@ -106,7 +106,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EBC_REGISTER_ICACHE_FLUSH) (
+(EFIAPI *EFI_EBC_REGISTER_ICACHE_FLUSH)(
   IN EFI_EBC_PROTOCOL           *This,
   IN EBC_ICACHE_FLUSH           Flush
   );
@@ -123,7 +123,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EBC_GET_VERSION) (
+(EFIAPI *EFI_EBC_GET_VERSION)(
   IN EFI_EBC_PROTOCOL           *This,
   IN OUT UINT64                 *Version
   );

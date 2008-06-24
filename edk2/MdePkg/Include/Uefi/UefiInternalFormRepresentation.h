@@ -41,9 +41,9 @@ typedef UINT32  EFI_HII_FONT_STYLE;
 #pragma pack(1)
 
 
-//
-// HII package list
-//
+///
+/// HII package list
+///
 typedef struct {
   EFI_GUID               PackageListGuid;
   UINT32                 PackageLength;
@@ -1391,22 +1391,24 @@ typedef struct {
   UINT16                  AffectedAttribute;
 } EFI_KEY_DESCRIPTOR;
 
-//
-// A key which is affected by all the standard shift modifiers.  
-// Most keys would be expected to have this bit active.
-//
+///
+/// A key which is affected by all the standard shift modifiers.  
+/// Most keys would be expected to have this bit active.
+///
 #define EFI_AFFECTED_BY_STANDARD_SHIFT       0x0001
-//
-// This key is affected by the caps lock so that if a keyboard driver
-// would need to disambiguate between a key which had a "1" defined
-// versus a "a" character.  Having this bit turned on would tell
-// the keyboard driver to use the appropriate shifted state or not.
-//
+
+///
+/// This key is affected by the caps lock so that if a keyboard driver
+/// would need to disambiguate between a key which had a "1" defined
+/// versus a "a" character.  Having this bit turned on would tell
+/// the keyboard driver to use the appropriate shifted state or not.
+///
 #define EFI_AFFECTED_BY_CAPS_LOCK            0x0002
-//
-// Similar to the case of CAPS lock, if this bit is active, the key
-// is affected by the num lock being turned on.
-//
+
+///
+/// Similar to the case of CAPS lock, if this bit is active, the key
+/// is affected by the num lock being turned on.
+///
 #define EFI_AFFECTED_BY_NUM_LOCK             0x0004
 
 typedef struct {
@@ -1493,14 +1495,14 @@ typedef struct {
 
 
 
-//
-// References to string tokens must use this macro to enable scanning for
-// token usages.
-//
-//
-// STRING_TOKEN is not defined in UEFI specification. But it is placed 
-// here for the easy access by C files and VFR source files.
-//
+///
+/// References to string tokens must use this macro to enable scanning for
+/// token usages.
+///
+///
+/// STRING_TOKEN is not defined in UEFI specification. But it is placed 
+/// here for the easy access by C files and VFR source files.
+///
 #define STRING_TOKEN(t) t
 
 #endif

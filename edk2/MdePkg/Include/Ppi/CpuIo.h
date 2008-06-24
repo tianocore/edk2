@@ -64,7 +64,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_MEM) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_MEM)(
   IN  EFI_PEI_SERVICES                  **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI                *This,
   IN  EFI_PEI_CPU_IO_PPI_WIDTH          Width,
@@ -95,7 +95,7 @@ typedef struct {
 **/
 typedef
 UINT8
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ8) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ8)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address
@@ -113,7 +113,7 @@ UINT8
 **/
 typedef
 UINT16
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ16) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ16)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address
@@ -131,7 +131,7 @@ UINT16
 **/
 typedef
 UINT32
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ32) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ32)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address
@@ -149,7 +149,7 @@ UINT32
 **/
 typedef
 UINT64
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ64) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ64)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address
@@ -168,7 +168,7 @@ UINT64
 **/
 typedef
 VOID
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE8) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE8)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address,
@@ -188,7 +188,7 @@ VOID
 **/
 typedef
 VOID
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE16) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE16)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address,
@@ -208,7 +208,7 @@ VOID
 **/
 typedef
 VOID
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE32) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE32)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address,
@@ -228,7 +228,7 @@ VOID
 **/
 typedef
 VOID
-(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE64) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE64)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address,
@@ -247,7 +247,7 @@ VOID
 **/
 typedef
 UINT8
-(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ8) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ8)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address
@@ -265,7 +265,7 @@ UINT8
 **/
 typedef
 UINT16
-(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ16) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ16)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address
@@ -283,7 +283,7 @@ UINT16
 **/
 typedef
 UINT32
-(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ32) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ32)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address
@@ -301,7 +301,7 @@ UINT32
 **/
 typedef
 UINT64
-(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ64) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ64)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address
@@ -320,7 +320,7 @@ UINT64
 **/
 typedef
 VOID
-(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE8) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE8)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address,
@@ -340,7 +340,7 @@ VOID
 **/
 typedef
 VOID
-(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE16) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE16)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address,
@@ -360,7 +360,7 @@ VOID
 **/
 typedef
 VOID
-(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE32) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE32)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address,
@@ -380,7 +380,7 @@ VOID
 **/
 typedef
 VOID
-(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE64) (
+(EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE64)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  EFI_PEI_CPU_IO_PPI      *This,
   IN  UINT64                  Address,

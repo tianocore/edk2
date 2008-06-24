@@ -52,7 +52,7 @@
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_REPORT_STATUS_CODE) (
+(EFIAPI *EFI_REPORT_STATUS_CODE)(
   IN EFI_STATUS_CODE_TYPE     Type,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,

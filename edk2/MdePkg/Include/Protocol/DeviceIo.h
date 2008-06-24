@@ -63,7 +63,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DEVICE_IO) (
+(EFIAPI *EFI_DEVICE_IO)(
   IN EFI_DEVICE_IO_PROTOCOL         *This,
   IN EFI_IO_WIDTH                   Width,
   IN UINT64                         Address,
@@ -92,7 +92,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_DEVICE_PATH) (
+(EFIAPI *EFI_PCI_DEVICE_PATH)(
   IN EFI_DEVICE_IO_PROTOCOL           *This,
   IN UINT64                           PciAddress,
   IN OUT EFI_DEVICE_PATH_PROTOCOL     **PciDevicePath
@@ -124,7 +124,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IO_MAP) (
+(EFIAPI *EFI_IO_MAP)(
   IN EFI_DEVICE_IO_PROTOCOL           *This,
   IN EFI_IO_OPERATION_TYPE            Operation,
   IN EFI_PHYSICAL_ADDRESS             *HostAddress,
@@ -145,7 +145,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IO_UNMAP) (
+(EFIAPI *EFI_IO_UNMAP)(
   IN EFI_DEVICE_IO_PROTOCOL           *This,
   IN VOID                             *Mapping
   );
@@ -169,7 +169,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IO_ALLOCATE_BUFFER) (
+(EFIAPI *EFI_IO_ALLOCATE_BUFFER)(
   IN EFI_DEVICE_IO_PROTOCOL           *This,
   IN EFI_ALLOCATE_TYPE                Type,
   IN EFI_MEMORY_TYPE                  MemoryType,
@@ -188,7 +188,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IO_FLUSH) (
+(EFIAPI *EFI_IO_FLUSH)(
   IN EFI_DEVICE_IO_PROTOCOL  *This
   );
 
@@ -207,7 +207,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IO_FREE_BUFFER) (
+(EFIAPI *EFI_IO_FREE_BUFFER)(
   IN EFI_DEVICE_IO_PROTOCOL           *This,
   IN UINTN                            Pages,
   IN EFI_PHYSICAL_ADDRESS             HostAddress

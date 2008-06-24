@@ -55,7 +55,7 @@ typedef EFI_DISK_IO_PROTOCOL  EFI_DISK_IO;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DISK_READ) (
+(EFIAPI *EFI_DISK_READ)(
   IN EFI_DISK_IO_PROTOCOL         *This,
   IN UINT32                       MediaId,
   IN UINT64                       Offset,
@@ -84,7 +84,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DISK_WRITE) (
+(EFIAPI *EFI_DISK_WRITE)(
   IN EFI_DISK_IO_PROTOCOL         *This,
   IN UINT32                       MediaId,
   IN UINT64                       Offset,

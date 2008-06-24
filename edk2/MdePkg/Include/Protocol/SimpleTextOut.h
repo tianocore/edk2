@@ -161,7 +161,7 @@ typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_RESET) (
+(EFIAPI *EFI_TEXT_RESET)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL           *This,
   IN BOOLEAN                                ExtendedVerification
   )
@@ -187,7 +187,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_STRING) (
+(EFIAPI *EFI_TEXT_STRING)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN CHAR16                                 *String
   )
@@ -209,7 +209,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_TEST_STRING) (
+(EFIAPI *EFI_TEXT_TEST_STRING)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN CHAR16                                 *String
   )
@@ -233,7 +233,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_QUERY_MODE) (
+(EFIAPI *EFI_TEXT_QUERY_MODE)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  ModeNumber,
   OUT UINTN                                 *Columns,
@@ -254,7 +254,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_SET_MODE) (
+(EFIAPI *EFI_TEXT_SET_MODE)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  ModeNumber
   )
@@ -276,7 +276,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_SET_ATTRIBUTE) (
+(EFIAPI *EFI_TEXT_SET_ATTRIBUTE)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  Attribute
   )
@@ -295,7 +295,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_CLEAR_SCREEN) (
+(EFIAPI *EFI_TEXT_CLEAR_SCREEN)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *This
   )
 ;
@@ -319,7 +319,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_SET_CURSOR_POSITION) (
+(EFIAPI *EFI_TEXT_SET_CURSOR_POSITION)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  Column,
   IN UINTN                                  Row
@@ -342,7 +342,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TEXT_ENABLE_CURSOR) (
+(EFIAPI *EFI_TEXT_ENABLE_CURSOR)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN BOOLEAN                                Visible
   )

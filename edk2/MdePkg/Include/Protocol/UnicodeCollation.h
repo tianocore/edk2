@@ -61,7 +61,7 @@ typedef EFI_UNICODE_COLLATION_PROTOCOL          UNICODE_COLLATION_INTERFACE;
 **/
 typedef
 INTN
-(EFIAPI *EFI_UNICODE_COLLATION_STRICOLL) (
+(EFIAPI *EFI_UNICODE_COLLATION_STRICOLL)(
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN CHAR16                                 *Str1,
   IN CHAR16                                 *Str2
@@ -82,7 +82,7 @@ INTN
 **/
 typedef
 BOOLEAN
-(EFIAPI *EFI_UNICODE_COLLATION_METAIMATCH) (
+(EFIAPI *EFI_UNICODE_COLLATION_METAIMATCH)(
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN CHAR16                                 *String,
   IN CHAR16                                 *Pattern
@@ -101,7 +101,7 @@ BOOLEAN
 **/
 typedef
 VOID
-(EFIAPI *EFI_UNICODE_COLLATION_STRLWR) (
+(EFIAPI *EFI_UNICODE_COLLATION_STRLWR)(
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN OUT CHAR16                             *Str
   )
@@ -119,7 +119,7 @@ VOID
 **/
 typedef
 VOID
-(EFIAPI *EFI_UNICODE_COLLATION_STRUPR) (
+(EFIAPI *EFI_UNICODE_COLLATION_STRUPR)(
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN OUT CHAR16                             *Str
   )
@@ -141,7 +141,7 @@ VOID
 **/
 typedef
 VOID
-(EFIAPI *EFI_UNICODE_COLLATION_FATTOSTR) (
+(EFIAPI *EFI_UNICODE_COLLATION_FATTOSTR)(
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN UINTN                                  FatSize,
   IN CHAR8                                  *Fat,
@@ -166,7 +166,7 @@ VOID
 **/
 typedef
 BOOLEAN
-(EFIAPI *EFI_UNICODE_COLLATION_STRTOFAT) (
+(EFIAPI *EFI_UNICODE_COLLATION_STRTOFAT)(
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN CHAR16                                 *String,
   IN UINTN                                  FatSize,

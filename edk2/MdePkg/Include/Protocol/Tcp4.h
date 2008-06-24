@@ -178,7 +178,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_GET_MODE_DATA) (
+(EFIAPI *EFI_TCP4_GET_MODE_DATA)(
   IN CONST  EFI_TCP4_PROTOCOL                  *This,
   OUT       EFI_TCP4_CONNECTION_STATE          *Tcp4State      OPTIONAL,
   OUT       EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData OPTIONAL,
@@ -210,7 +210,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_CONFIGURE) (
+(EFIAPI *EFI_TCP4_CONFIGURE)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_CONFIG_DATA                *TcpConfigData OPTIONAL
   )
@@ -252,7 +252,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_ROUTES) (
+(EFIAPI *EFI_TCP4_ROUTES)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN BOOLEAN                             DeleteRoute,
   IN EFI_IPv4_ADDRESS                    *SubnetAddress,
@@ -285,7 +285,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_CONNECT) (
+(EFIAPI *EFI_TCP4_CONNECT)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_CONNECTION_TOKEN           *ConnectionToken
   )
@@ -315,7 +315,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_ACCEPT) (
+(EFIAPI *EFI_TCP4_ACCEPT)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_LISTEN_TOKEN               *ListenToken
   )
@@ -354,7 +354,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_TRANSMIT) (
+(EFIAPI *EFI_TCP4_TRANSMIT)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_IO_TOKEN                   *Token
   )
@@ -398,7 +398,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_RECEIVE) (
+(EFIAPI *EFI_TCP4_RECEIVE)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_IO_TOKEN                   *Token
   )
@@ -429,7 +429,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_CLOSE) (
+(EFIAPI *EFI_TCP4_CLOSE)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_CLOSE_TOKEN                *CloseToken
   )
@@ -458,7 +458,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_CANCEL) (
+(EFIAPI *EFI_TCP4_CANCEL)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_COMPLETION_TOKEN           *Token OPTIONAL
   )
@@ -480,7 +480,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP4_POLL) (
+(EFIAPI *EFI_TCP4_POLL)(
   IN EFI_TCP4_PROTOCOL                   *This
   )
 ;

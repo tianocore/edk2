@@ -93,7 +93,7 @@ typedef union {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HASH_GET_HASH_SIZE) (
+(EFIAPI *EFI_HASH_GET_HASH_SIZE)(
   IN  CONST EFI_HASH_PROTOCOL     *This,
   IN  CONST EFI_GUID              *HashAlgorithm,
   OUT UINTN                       *HashSize
@@ -120,7 +120,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HASH_HASH) (
+(EFIAPI *EFI_HASH_HASH)(
   IN CONST EFI_HASH_PROTOCOL      *This,
   IN CONST EFI_GUID               *HashAlgorithm,
   IN BOOLEAN                      Extend,

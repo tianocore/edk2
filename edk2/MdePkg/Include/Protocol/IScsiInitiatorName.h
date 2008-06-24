@@ -40,7 +40,7 @@ typedef struct _EFI_ISCSI_INITIATOR_NAME_PROTOCOL EFI_ISCSI_INITIATOR_NAME_PROTO
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_ISCSI_INITIATOR_NAME_GET) (
+(EFIAPI *EFI_ISCSI_INITIATOR_NAME_GET)(
   IN EFI_ISCSI_INITIATOR_NAME_PROTOCOL *This,
   IN OUT UINTN                         *BufferSize,
   OUT VOID                             *Buffer
@@ -66,7 +66,7 @@ EFI_STATUS
 
 **/
 typedef EFI_STATUS
-(EFIAPI *EFI_ISCSI_INITIATOR_NAME_SET) (
+(EFIAPI *EFI_ISCSI_INITIATOR_NAME_SET)(
   IN EFI_ISCSI_INITIATOR_NAME_PROTOCOL *This,
   IN OUT UINTN                         *BufferSize,
   IN VOID                              *Buffer

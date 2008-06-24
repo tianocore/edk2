@@ -41,7 +41,7 @@ typedef struct _EFI_DXE_IPL_PPI EFI_DXE_IPL_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DXE_IPL_ENTRY) (
+(EFIAPI *EFI_DXE_IPL_ENTRY)(
   IN EFI_DXE_IPL_PPI              *This,
   IN EFI_PEI_SERVICES             **PeiServices,
   IN EFI_PEI_HOB_POINTERS         HobList

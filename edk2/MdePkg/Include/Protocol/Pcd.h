@@ -50,7 +50,7 @@ extern EFI_GUID gPcdProtocolGuid;
 **/
 typedef 
 VOID
-(EFIAPI *PCD_PROTOCOL_SET_SKU) (
+(EFIAPI *PCD_PROTOCOL_SET_SKU)(
   IN  UINTN                  SkuId
   );
 
@@ -69,7 +69,7 @@ VOID
 **/
 typedef
 UINT8
-(EFIAPI *PCD_PROTOCOL_GET8) (
+(EFIAPI *PCD_PROTOCOL_GET8)(
   IN UINTN             TokenNumber
   );
 
@@ -88,7 +88,7 @@ UINT8
 **/
 typedef
 UINT16
-(EFIAPI *PCD_PROTOCOL_GET16) (
+(EFIAPI *PCD_PROTOCOL_GET16)(
   IN UINTN             TokenNumber
   );
 
@@ -107,7 +107,7 @@ UINT16
 **/
 typedef
 UINT32
-(EFIAPI *PCD_PROTOCOL_GET32) (
+(EFIAPI *PCD_PROTOCOL_GET32)(
   IN UINTN             TokenNumber
   );
 
@@ -126,7 +126,7 @@ UINT32
 **/
 typedef
 UINT64
-(EFIAPI *PCD_PROTOCOL_GET64) (
+(EFIAPI *PCD_PROTOCOL_GET64)(
   IN UINTN             TokenNumber
   );
 
@@ -147,7 +147,7 @@ UINT64
 **/
 typedef
 VOID *
-(EFIAPI *PCD_PROTOCOL_GET_POINTER) (
+(EFIAPI *PCD_PROTOCOL_GET_POINTER)(
   IN UINTN             TokenNumber
   );
 
@@ -168,7 +168,7 @@ VOID *
 **/
 typedef
 BOOLEAN
-(EFIAPI *PCD_PROTOCOL_GET_BOOLEAN) (
+(EFIAPI *PCD_PROTOCOL_GET_BOOLEAN)(
   IN UINTN             TokenNumber
   );
 
@@ -187,7 +187,7 @@ BOOLEAN
 **/
 typedef
 UINTN
-(EFIAPI *PCD_PROTOCOL_GET_SIZE) (
+(EFIAPI *PCD_PROTOCOL_GET_SIZE)(
   IN UINTN             TokenNumber
   );
 
@@ -209,7 +209,7 @@ UINTN
 **/
 typedef
 UINT8
-(EFIAPI *PCD_PROTOCOL_GET_EX_8) (
+(EFIAPI *PCD_PROTOCOL_GET_EX_8)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
   );
@@ -232,7 +232,7 @@ UINT8
 **/
 typedef
 UINT16
-(EFIAPI *PCD_PROTOCOL_GET_EX_16) (
+(EFIAPI *PCD_PROTOCOL_GET_EX_16)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
   );
@@ -254,7 +254,7 @@ UINT16
   
 **/typedef
 UINT32
-(EFIAPI *PCD_PROTOCOL_GET_EX_32) (
+(EFIAPI *PCD_PROTOCOL_GET_EX_32)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
   );
@@ -277,7 +277,7 @@ UINT32
 **/
 typedef
 UINT64
-(EFIAPI *PCD_PROTOCOL_GET_EX_64) (
+(EFIAPI *PCD_PROTOCOL_GET_EX_64)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
   );
@@ -300,7 +300,7 @@ UINT64
 **/
 typedef
 VOID *
-(EFIAPI *PCD_PROTOCOL_GET_EX_POINTER) (
+(EFIAPI *PCD_PROTOCOL_GET_EX_POINTER)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
   );
@@ -323,7 +323,7 @@ VOID *
 **/
 typedef
 BOOLEAN
-(EFIAPI *PCD_PROTOCOL_GET_EX_BOOLEAN) (
+(EFIAPI *PCD_PROTOCOL_GET_EX_BOOLEAN)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
   );
@@ -344,7 +344,7 @@ BOOLEAN
 **/
 typedef
 UINTN
-(EFIAPI *PCD_PROTOCOL_GET_EX_SIZE) (
+(EFIAPI *PCD_PROTOCOL_GET_EX_SIZE)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
   );
@@ -370,7 +370,7 @@ UINTN
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET8) (
+(EFIAPI *PCD_PROTOCOL_SET8)(
   IN UINTN             TokenNumber,
   IN UINT8             Value
   );
@@ -396,7 +396,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET16) (
+(EFIAPI *PCD_PROTOCOL_SET16)(
   IN UINTN              TokenNumber,
   IN UINT16             Value
   );
@@ -422,7 +422,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET32) (
+(EFIAPI *PCD_PROTOCOL_SET32)(
   IN UINTN              TokenNumber,
   IN UINT32             Value
   );
@@ -448,7 +448,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET64) (
+(EFIAPI *PCD_PROTOCOL_SET64)(
   IN UINTN             TokenNumber,
   IN UINT64            Value
   );
@@ -478,7 +478,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET_POINTER) (
+(EFIAPI *PCD_PROTOCOL_SET_POINTER)(
   IN      UINTN             TokenNumber,
   IN OUT  UINTN             *SizeOfBuffer,
   IN      VOID              *Buffer
@@ -505,7 +505,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET_BOOLEAN) (
+(EFIAPI *PCD_PROTOCOL_SET_BOOLEAN)(
   IN UINTN             TokenNumber,
   IN BOOLEAN           Value
   );
@@ -532,7 +532,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET_EX_8) (
+(EFIAPI *PCD_PROTOCOL_SET_EX_8)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN UINT8             Value
@@ -560,7 +560,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET_EX_16) (
+(EFIAPI *PCD_PROTOCOL_SET_EX_16)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN UINT16            Value
@@ -588,7 +588,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET_EX_32) (
+(EFIAPI *PCD_PROTOCOL_SET_EX_32)(
   IN CONST EFI_GUID     *Guid,
   IN UINTN              TokenNumber,
   IN UINT32             Value
@@ -616,7 +616,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET_EX_64) (
+(EFIAPI *PCD_PROTOCOL_SET_EX_64)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN UINT64            Value
@@ -648,7 +648,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET_EX_POINTER) (
+(EFIAPI *PCD_PROTOCOL_SET_EX_POINTER)(
   IN      CONST EFI_GUID    *Guid,
   IN      UINTN             TokenNumber,
   IN OUT  UINTN             *SizeOfBuffer,
@@ -677,7 +677,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_SET_EX_BOOLEAN) (
+(EFIAPI *PCD_PROTOCOL_SET_EX_BOOLEAN)(
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN BOOLEAN           Value
@@ -706,7 +706,7 @@ EFI_STATUS
 **/
 typedef
 VOID
-(EFIAPI *PCD_PROTOCOL_CALLBACK) (
+(EFIAPI *PCD_PROTOCOL_CALLBACK)(
   IN      CONST EFI_GUID   *CallBackGuid, OPTIONAL
   IN      UINTN            CallBackToken,
   IN  OUT VOID             *TokenData,
@@ -729,7 +729,7 @@ VOID
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_CALLBACK_ONSET) (
+(EFIAPI *PCD_PROTOCOL_CALLBACK_ONSET)(
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
@@ -751,7 +751,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_CANCEL_CALLBACK) (
+(EFIAPI *PCD_PROTOCOL_CANCEL_CALLBACK)(
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
@@ -779,7 +779,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_GET_NEXT_TOKEN) (
+(EFIAPI *PCD_PROTOCOL_GET_NEXT_TOKEN)(
   IN      CONST EFI_GUID      *Guid, OPTIONAL
   IN OUT  UINTN               *TokenNumber
   );
@@ -809,7 +809,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *PCD_PROTOCOL_GET_NEXT_TOKENSPACE) (
+(EFIAPI *PCD_PROTOCOL_GET_NEXT_TOKENSPACE)(
   IN  OUT    CONST EFI_GUID      **Guid
   );
 

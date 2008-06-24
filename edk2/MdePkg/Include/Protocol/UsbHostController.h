@@ -46,7 +46,7 @@ typedef struct _EFI_USB_HC_PROTOCOL EFI_USB_HC_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_RESET) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_RESET)(
   IN EFI_USB_HC_PROTOCOL     *This,
   IN UINT16                  Attributes
   );
@@ -66,7 +66,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_GET_STATE) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_GET_STATE)(
   IN  EFI_USB_HC_PROTOCOL    *This,
   OUT EFI_USB_HC_STATE       *State
   );
@@ -85,7 +85,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_SET_STATE) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_SET_STATE)(
   IN EFI_USB_HC_PROTOCOL     *This,
   IN EFI_USB_HC_STATE        State
   );
@@ -122,7 +122,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_CONTROL_TRANSFER) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_CONTROL_TRANSFER)(
   IN     EFI_USB_HC_PROTOCOL       *This,
   IN     UINT8                     DeviceAddress,
   IN     BOOLEAN                   IsSlowDevice,
@@ -164,7 +164,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_BULK_TRANSFER) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_BULK_TRANSFER)(
   IN     EFI_USB_HC_PROTOCOL    *This,
   IN     UINT8                  DeviceAddress,
   IN     UINT8                  EndPointAddress,
@@ -209,7 +209,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_ASYNC_INTERRUPT_TRANSFER) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_ASYNC_INTERRUPT_TRANSFER)(
   IN     EFI_USB_HC_PROTOCOL                                 *This,
   IN     UINT8                                               DeviceAddress,
   IN     UINT8                                               EndPointAddress,
@@ -254,7 +254,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_SYNC_INTERRUPT_TRANSFER) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_SYNC_INTERRUPT_TRANSFER)(
   IN     EFI_USB_HC_PROTOCOL    *This,
   IN     UINT8                  DeviceAddress,
   IN     UINT8                  EndPointAddress,
@@ -293,7 +293,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_ISOCHRONOUS_TRANSFER) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_ISOCHRONOUS_TRANSFER)(
   IN     EFI_USB_HC_PROTOCOL    *This,
   IN     UINT8                  DeviceAddress,
   IN     UINT8                  EndPointAddress,
@@ -328,7 +328,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_ASYNC_ISOCHRONOUS_TRANSFER) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_ASYNC_ISOCHRONOUS_TRANSFER)(
   IN     EFI_USB_HC_PROTOCOL                *This,
   IN     UINT8                              DeviceAddress,
   IN     UINT8                              EndPointAddress,
@@ -352,7 +352,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_GET_ROOTHUB_PORT_NUMBER) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_GET_ROOTHUB_PORT_NUMBER)(
   IN EFI_USB_HC_PROTOCOL    *This,
   OUT UINT8                 *PortNumber
   );
@@ -372,7 +372,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_GET_ROOTHUB_PORT_STATUS) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_GET_ROOTHUB_PORT_STATUS)(
   IN EFI_USB_HC_PROTOCOL     *This,
   IN  UINT8                  PortNumber,
   OUT EFI_USB_PORT_STATUS    *PortStatus
@@ -394,7 +394,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_SET_ROOTHUB_PORT_FEATURE) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_SET_ROOTHUB_PORT_FEATURE)(
   IN EFI_USB_HC_PROTOCOL     *This,
   IN UINT8                   PortNumber,
   IN EFI_USB_PORT_FEATURE    PortFeature
@@ -416,7 +416,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_HC_PROTOCOL_CLEAR_ROOTHUB_PORT_FEATURE) (
+(EFIAPI *EFI_USB_HC_PROTOCOL_CLEAR_ROOTHUB_PORT_FEATURE)(
   IN EFI_USB_HC_PROTOCOL     *This,
   IN UINT8                   PortNumber,
   IN EFI_USB_PORT_FEATURE    PortFeature

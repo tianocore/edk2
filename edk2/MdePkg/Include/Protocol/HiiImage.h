@@ -79,7 +79,7 @@ typedef struct _EFI_IMAGE_INPUT {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_NEW_IMAGE) (
+(EFIAPI *EFI_HII_NEW_IMAGE)(
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
   IN        EFI_HII_HANDLE          PackageList,
   OUT       EFI_IMAGE_ID            *ImageId,
@@ -122,7 +122,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_GET_IMAGE) (
+(EFIAPI *EFI_HII_GET_IMAGE)(
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
   IN        EFI_HII_HANDLE          PackageList,
   IN        EFI_IMAGE_ID            ImageId,
@@ -157,7 +157,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_SET_IMAGE) (
+(EFIAPI *EFI_HII_SET_IMAGE)(
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
   IN        EFI_HII_HANDLE          PackageList,
   IN        EFI_IMAGE_ID            ImageId,
@@ -253,7 +253,7 @@ typedef struct _EFI_IMAGE_OUTPUT {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_DRAW_IMAGE) (
+(EFIAPI *EFI_HII_DRAW_IMAGE)(
   IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
   IN        EFI_HII_DRAW_FLAGS      Flags,
   IN CONST  EFI_IMAGE_INPUT         *Image,
@@ -332,7 +332,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_DRAW_IMAGE_ID) (
+(EFIAPI *EFI_HII_DRAW_IMAGE_ID)(
 IN CONST  EFI_HII_IMAGE_PROTOCOL  *This,
 IN        EFI_HII_DRAW_FLAGS      Flags,
 IN        EFI_HII_HANDLE          PackageList,

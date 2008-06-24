@@ -523,7 +523,7 @@ typedef union {
 **/
 typedef
 VOID
-(*EFI_EXCEPTION_CALLBACK) (
+(*EFI_EXCEPTION_CALLBACK)(
   IN     EFI_EXCEPTION_TYPE               ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT               SystemContext
   );
@@ -536,7 +536,7 @@ VOID
 **/
 typedef
 VOID
-(*EFI_PERIODIC_CALLBACK) (
+(*EFI_PERIODIC_CALLBACK)(
   IN OUT EFI_SYSTEM_CONTEXT               SystemContext
   );
 
@@ -568,7 +568,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_MAXIMUM_PROCESSOR_INDEX) (
+(EFIAPI *EFI_GET_MAXIMUM_PROCESSOR_INDEX)(
   IN EFI_DEBUG_SUPPORT_PROTOCOL          *This,
   OUT UINTN                              *MaxProcessorIndex
   );
@@ -590,7 +590,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_REGISTER_PERIODIC_CALLBACK) (
+(EFIAPI *EFI_REGISTER_PERIODIC_CALLBACK)(
   IN EFI_DEBUG_SUPPORT_PROTOCOL          *This,
   IN UINTN                               ProcessorIndex,
   IN EFI_PERIODIC_CALLBACK               PeriodicCallback
@@ -614,7 +614,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_REGISTER_EXCEPTION_CALLBACK) (
+(EFIAPI *EFI_REGISTER_EXCEPTION_CALLBACK)(
   IN EFI_DEBUG_SUPPORT_PROTOCOL          *This,
   IN UINTN                               ProcessorIndex,
   IN EFI_EXCEPTION_CALLBACK              ExceptionCallback,
@@ -636,7 +636,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_INVALIDATE_INSTRUCTION_CACHE) (
+(EFIAPI *EFI_INVALIDATE_INSTRUCTION_CACHE)(
   IN EFI_DEBUG_SUPPORT_PROTOCOL          *This,
   IN UINTN                               ProcessorIndex,
   IN VOID                                *Start,

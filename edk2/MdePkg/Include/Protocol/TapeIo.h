@@ -72,7 +72,7 @@ typedef struct {
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_TAPE_READ) (
+(EFIAPI *EFI_TAPE_READ)(
   IN EFI_TAPE_IO_PROTOCOL *This,
   IN OUT UINTN            *BufferSize,
   OUT VOID                *Buffer
@@ -109,7 +109,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_TAPE_WRITE) (
+(EFIAPI *EFI_TAPE_WRITE)(
   IN EFI_TAPE_IO_PROTOCOL *This,
   IN UINTN                *BufferSize,
   IN VOID                 *Buffer
@@ -133,7 +133,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_TAPE_REWIND) (
+(EFIAPI *EFI_TAPE_REWIND)(
   IN EFI_TAPE_IO_PROTOCOL *This
   )
 ;   
@@ -162,7 +162,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TAPE_SPACE) (
+(EFIAPI *EFI_TAPE_SPACE)(
   IN EFI_TAPE_IO_PROTOCOL *This,
   INTN                    Direction,
   UINTN                   Type
@@ -190,7 +190,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_TAPE_WRITEFM) (
+(EFIAPI *EFI_TAPE_WRITEFM)(
   IN EFI_TAPE_IO_PROTOCOL *This,
   IN UINTN                Count
   )
@@ -214,7 +214,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_TAPE_RESET) (
+(EFIAPI *EFI_TAPE_RESET)(
   IN EFI_TAPE_IO_PROTOCOL *This,
   IN BOOLEAN              ExtendedVerification
   )

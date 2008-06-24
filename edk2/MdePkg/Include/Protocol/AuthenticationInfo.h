@@ -80,7 +80,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_AUTHENTICATION_PROTOCOL_INFO_GET) (
+(EFIAPI *EFI_AUTHENTICATION_PROTOCOL_INFO_GET)(
   IN  EFI_AUTHENTICATION_INFO_PROTOCOL *This,
   IN  EFI_HANDLE                       *ControllerHandle,
   OUT VOID                             *Buffer
@@ -104,7 +104,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_AUTHENTICATION_PROTOCOL_INFO_SET) (
+(EFIAPI *EFI_AUTHENTICATION_PROTOCOL_INFO_SET)(
   IN EFI_AUTHENTICATION_INFO_PROTOCOL  *This,
   IN EFI_HANDLE                        *ControllerHandle,
   IN VOID                              *Buffer

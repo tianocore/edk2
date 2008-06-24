@@ -48,7 +48,7 @@ typedef EFI_BLOCK_IO_PROTOCOL   EFI_BLOCK_IO;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BLOCK_RESET) (
+(EFIAPI *EFI_BLOCK_RESET)(
   IN EFI_BLOCK_IO_PROTOCOL          *This,
   IN BOOLEAN                        ExtendedVerification
   )
@@ -74,7 +74,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BLOCK_READ) (
+(EFIAPI *EFI_BLOCK_READ)(
   IN EFI_BLOCK_IO_PROTOCOL          *This,
   IN UINT32                         MediaId,
   IN EFI_LBA                        Lba,
@@ -104,7 +104,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BLOCK_WRITE) (
+(EFIAPI *EFI_BLOCK_WRITE)(
   IN EFI_BLOCK_IO_PROTOCOL          *This,
   IN UINT32                         MediaId,
   IN EFI_LBA                        Lba,
@@ -125,7 +125,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BLOCK_FLUSH) (
+(EFIAPI *EFI_BLOCK_FLUSH)(
   IN EFI_BLOCK_IO_PROTOCOL  *This
   )
 ;

@@ -17,15 +17,16 @@
 
 #define PRIMARY_PART_HEADER_LBA 1
 
-//
-// EFI Partition Table Signature: "EFI PART"
-// 
+///
+/// EFI Partition Table Signature: "EFI PART"
+/// 
 #define EFI_PTAB_HEADER_ID      0x5452415020494645ULL
 
 #pragma pack(1)
-//
-// GPT Partition Table Header
-//
+
+///
+/// GPT Partition Table Header
+///
 typedef struct {
   EFI_TABLE_HEADER  Header;
   EFI_LBA           MyLBA;
@@ -39,9 +40,9 @@ typedef struct {
   UINT32            PartitionEntryArrayCRC32;
 } EFI_PARTITION_TABLE_HEADER;
 
-//
-// GPT Partition Entry
-//
+///
+/// GPT Partition Entry
+///
 typedef struct {
   EFI_GUID  PartitionTypeGUID;
   EFI_GUID  UniquePartitionGUID;
@@ -51,9 +52,9 @@ typedef struct {
   CHAR16    PartitionName[36];
 } EFI_PARTITION_ENTRY;
 
-//
-// GPT Partition Entry Status
-//
+///
+/// GPT Partition Entry Status
+///
 typedef struct {
   BOOLEAN OutOfRange;
   BOOLEAN Overlap;

@@ -52,7 +52,7 @@ typedef enum {
 **/
 typedef
 VOID
-(EFIAPI *EFI_CPU_INTERRUPT_HANDLER) (
+(EFIAPI *EFI_CPU_INTERRUPT_HANDLER)(
   IN CONST  EFI_EXCEPTION_TYPE  InterruptType,
   IN CONST  EFI_SYSTEM_CONTEXT  SystemContext
   );
@@ -86,7 +86,7 @@ VOID
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CPU_FLUSH_DATA_CACHE) (
+(EFIAPI *EFI_CPU_FLUSH_DATA_CACHE)(
   IN EFI_CPU_ARCH_PROTOCOL              *This,
   IN EFI_PHYSICAL_ADDRESS               Start,
   IN UINT64                             Length,
@@ -105,7 +105,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CPU_ENABLE_INTERRUPT) (
+(EFIAPI *EFI_CPU_ENABLE_INTERRUPT)(
   IN EFI_CPU_ARCH_PROTOCOL              *This
   );
 
@@ -121,7 +121,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CPU_DISABLE_INTERRUPT) (
+(EFIAPI *EFI_CPU_DISABLE_INTERRUPT)(
   IN EFI_CPU_ARCH_PROTOCOL              *This
   );
 
@@ -141,7 +141,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CPU_GET_INTERRUPT_STATE) (
+(EFIAPI *EFI_CPU_GET_INTERRUPT_STATE)(
   IN EFI_CPU_ARCH_PROTOCOL              *This,
   OUT BOOLEAN                           *State
   );
@@ -165,7 +165,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CPU_INIT) (
+(EFIAPI *EFI_CPU_INIT)(
   IN EFI_CPU_ARCH_PROTOCOL              *This,
   IN EFI_CPU_INIT_TYPE                  InitType
   );
@@ -194,7 +194,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CPU_REGISTER_INTERRUPT_HANDLER) (
+(EFIAPI *EFI_CPU_REGISTER_INTERRUPT_HANDLER)(
   IN EFI_CPU_ARCH_PROTOCOL              *This,
   IN EFI_EXCEPTION_TYPE                 InterruptType,
   IN EFI_CPU_INTERRUPT_HANDLER          InterruptHandler
@@ -219,7 +219,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CPU_GET_TIMER_VALUE) (
+(EFIAPI *EFI_CPU_GET_TIMER_VALUE)(
   IN EFI_CPU_ARCH_PROTOCOL              *This,
   IN UINT32                             TimerIndex,
   OUT UINT64                            *TimerValue,
@@ -250,7 +250,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CPU_SET_MEMORY_ATTRIBUTES) (
+(EFIAPI *EFI_CPU_SET_MEMORY_ATTRIBUTES)(
   IN EFI_CPU_ARCH_PROTOCOL              *This,
   IN  EFI_PHYSICAL_ADDRESS              BaseAddress,
   IN  UINT64                            Length,
