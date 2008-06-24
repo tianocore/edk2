@@ -20,9 +20,9 @@
 
 #include <ProcessorBind.h>
 
-//
-// EFI_FV_FILE_ATTRIBUTES
-//
+///
+/// EFI_FV_FILE_ATTRIBUTES
+///
 typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
 
 //
@@ -32,6 +32,9 @@ typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
 #define EFI_FV_FILE_ATTRIB_FIXED          0x00000100
 #define EFI_FV_FILE_ATTRIB_MEMORY_MAPPED  0x00000200
 
+///
+/// type of EFI FVB attribute
+/// 
 typedef UINT32  EFI_FVB_ATTRIBUTES;
 
 // 
@@ -116,20 +119,26 @@ typedef struct {
 ///
 #define EFI_FVH_REVISION  0x02
 
-//
-// Extension header pointed by ExtHeaderOffset of volume header.
-// 
+///
+/// Extension header pointed by ExtHeaderOffset of volume header.
+/// 
 typedef struct {
   EFI_GUID  FvName;
   UINT32    ExtHeaderSize;
 } EFI_FIRMWARE_VOLUME_EXT_HEADER;
 
+///
+/// Entry struture for describing FV extension header
+/// 
 typedef struct {
   UINT16    ExtEntrySize;
   UINT16    ExtEntryType;
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY;
 
 #define EFI_FV_EXT_TYPE_OEM_TYPE  0x01
+///
+/// This extension header provides a mapping between a GUID and an OEM file type.
+/// 
 typedef struct {
   EFI_FIRMWARE_VOLUME_EXT_ENTRY Hdr;
   UINT32    TypeMask;
