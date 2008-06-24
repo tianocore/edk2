@@ -127,7 +127,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EXT_SCSI_PASS_THRU_PASSTHRU) (
+(EFIAPI *EFI_EXT_SCSI_PASS_THRU_PASSTHRU)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
   IN UINT8                                          *Target,
   IN UINT64                                         Lun,
@@ -164,7 +164,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EXT_SCSI_PASS_THRU_GET_NEXT_TARGET_LUN) (
+(EFIAPI *EFI_EXT_SCSI_PASS_THRU_GET_NEXT_TARGET_LUN)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
   IN OUT UINT8                                      **Target,
   IN OUT UINT64                                     *Lun
@@ -200,7 +200,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EXT_SCSI_PASS_THRU_BUILD_DEVICE_PATH) (
+(EFIAPI *EFI_EXT_SCSI_PASS_THRU_BUILD_DEVICE_PATH)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
   IN UINT8                                         *Target,
   IN UINT64                                        Lun,
@@ -229,7 +229,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EXT_SCSI_PASS_THRU_GET_TARGET_LUN) (
+(EFIAPI *EFI_EXT_SCSI_PASS_THRU_GET_TARGET_LUN)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
   IN EFI_DEVICE_PATH_PROTOCOL                      *DevicePath,
   OUT UINT8                                        **Target,
@@ -250,7 +250,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EXT_SCSI_PASS_THRU_RESET_CHANNEL) (
+(EFIAPI *EFI_EXT_SCSI_PASS_THRU_RESET_CHANNEL)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This
   )
 ;    
@@ -276,7 +276,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EXT_SCSI_PASS_THRU_RESET_TARGET_LUN) (
+(EFIAPI *EFI_EXT_SCSI_PASS_THRU_RESET_TARGET_LUN)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
   IN UINT8                                         *Target,
   IN UINT64                                        Lun
@@ -307,7 +307,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EXT_SCSI_PASS_THRU_GET_NEXT_TARGET) (
+(EFIAPI *EFI_EXT_SCSI_PASS_THRU_GET_NEXT_TARGET)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
   IN OUT UINT8                                     **Target
   )

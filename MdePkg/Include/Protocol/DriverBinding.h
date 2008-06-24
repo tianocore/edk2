@@ -42,7 +42,7 @@ typedef struct _EFI_DRIVER_BINDING_PROTOCOL  EFI_DRIVER_BINDING_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_BINDING_SUPPORTED) (
+(EFIAPI *EFI_DRIVER_BINDING_SUPPORTED)(
   IN EFI_DRIVER_BINDING_PROTOCOL            *This,
   IN EFI_HANDLE                             ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL               *RemainingDevicePath OPTIONAL
@@ -64,7 +64,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_BINDING_START) (
+(EFIAPI *EFI_DRIVER_BINDING_START)(
   IN EFI_DRIVER_BINDING_PROTOCOL            *This,
   IN EFI_HANDLE                             ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL               *RemainingDevicePath OPTIONAL
@@ -86,7 +86,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_BINDING_STOP) (
+(EFIAPI *EFI_DRIVER_BINDING_STOP)(
   IN EFI_DRIVER_BINDING_PROTOCOL            *This,
   IN  EFI_HANDLE                            ControllerHandle,
   IN  UINTN                                 NumberOfChildren,

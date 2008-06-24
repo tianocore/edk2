@@ -57,7 +57,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SIMPLE_POINTER_RESET) (
+(EFIAPI *EFI_SIMPLE_POINTER_RESET)(
   IN EFI_SIMPLE_POINTER_PROTOCOL            *This,
   IN BOOLEAN                                ExtendedVerification
   );
@@ -78,7 +78,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SIMPLE_POINTER_GET_STATE) (
+(EFIAPI *EFI_SIMPLE_POINTER_GET_STATE)(
   IN EFI_SIMPLE_POINTER_PROTOCOL          *This,
   IN OUT EFI_SIMPLE_POINTER_STATE         *State
   );

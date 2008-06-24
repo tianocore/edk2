@@ -107,7 +107,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_NEXT_VARIABLE_NAME2) (
+(EFIAPI *EFI_PEI_NEXT_VARIABLE_NAME2)(
   IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI *This,
   IN OUT    UINTN                           *VariableNameSize,
   IN OUT    CHAR16                          *VariableName,

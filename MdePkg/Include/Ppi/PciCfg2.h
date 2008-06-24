@@ -32,7 +32,7 @@ typedef struct _EFI_PEI_PCI_CFG2_PPI   EFI_PEI_PCI_CFG2_PPI;
   (((bus) << 24) | \
   ((dev) << 16) | \
   ((func) << 8) | \
-  ((reg) < 256 ? (reg) : ((UINT64) (reg) << 32)));
+  ((reg) < 256 ? (reg) : ((UINT64)(reg) << 32)));
 
 //
 // EFI_PEI_PCI_CFG_PPI_WIDTH
@@ -82,7 +82,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCI_CFG2_PPI_IO) (
+(EFIAPI *EFI_PEI_PCI_CFG2_PPI_IO)(
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
   IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
@@ -122,7 +122,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCI_CFG2_PPI_RW) (
+(EFIAPI *EFI_PEI_PCI_CFG2_PPI_RW)(
   IN CONST  EFI_PEI_SERVICES          **PeiServices,
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
   IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,

@@ -68,7 +68,7 @@ typedef EFI_LOAD_FILE_PROTOCOL  EFI_LOAD_FILE_INTERFACE;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LOAD_FILE) (
+(EFIAPI *EFI_LOAD_FILE)(
   IN EFI_LOAD_FILE_PROTOCOL           *This,
   IN EFI_DEVICE_PATH_PROTOCOL         *FilePath,
   IN BOOLEAN                          BootPolicy,

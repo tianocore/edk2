@@ -58,7 +58,7 @@ typedef struct _EFI_HII_STRING_PROTOCOL EFI_HII_STRING_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_NEW_STRING) (
+(EFIAPI *EFI_HII_NEW_STRING)(
   IN CONST  EFI_HII_STRING_PROTOCOL   *This,
   IN        EFI_HII_HANDLE            PackageList,
   OUT       EFI_STRING_ID             *StringId,
@@ -125,7 +125,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_GET_STRING) (
+(EFIAPI *EFI_HII_GET_STRING)(
   IN CONST  EFI_HII_STRING_PROTOCOL *This,
   IN CONST  CHAR8                   *Language,
   IN        EFI_HII_HANDLE          PackageList,
@@ -170,7 +170,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_SET_STRING) (
+(EFIAPI *EFI_HII_SET_STRING)(
   IN CONST  EFI_HII_STRING_PROTOCOL *This,
   IN        EFI_HII_HANDLE          PackageList,
   IN        EFI_STRING_ID           StringId,
@@ -212,7 +212,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_GET_LANGUAGES) (
+(EFIAPI *EFI_HII_GET_LANGUAGES)(
   IN CONST  EFI_HII_STRING_PROTOCOL   *This,
   IN        EFI_HII_HANDLE            PackageList,
   IN OUT    CHAR8                     *Languages,
@@ -269,7 +269,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_GET_2ND_LANGUAGES) (
+(EFIAPI *EFI_HII_GET_2ND_LANGUAGES)(
   IN CONST  EFI_HII_STRING_PROTOCOL   *This,
   IN        EFI_HII_HANDLE            PackageList,
   IN CONST  CHAR8                     *FirstLanguage,

@@ -50,7 +50,7 @@ typedef struct _EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL  EFI_PLATFORM_DRIVER_OVERR
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER) (
+(EFIAPI *EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER)(
   IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN     EFI_HANDLE                                     ControllerHandle,
   IN OUT EFI_HANDLE                                     *DriverImageHandle
@@ -78,7 +78,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER_PATH) (
+(EFIAPI *EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER_PATH)(
   IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN     EFI_HANDLE                                     ControllerHandle,
   IN OUT EFI_DEVICE_PATH_PROTOCOL                       **DriverImagePath
@@ -112,7 +112,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PLATFORM_DRIVER_OVERRIDE_DRIVER_LOADED) (
+(EFIAPI *EFI_PLATFORM_DRIVER_OVERRIDE_DRIVER_LOADED)(
   IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL          *This,
   IN EFI_HANDLE                                     ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL                       *DriverImagePath,

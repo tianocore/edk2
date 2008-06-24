@@ -79,7 +79,7 @@ typedef UINT32   TCG_ALGORITHM_ID;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCG_STATUS_CHECK) (
+(EFIAPI *EFI_TCG_STATUS_CHECK)(
   IN      EFI_TCG_PROTOCOL          *This,
   OUT     TCG_EFI_BOOT_SERVICE_CAPABILITY
                                     *ProtocolCapability,
@@ -107,7 +107,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCG_HASH_ALL) (
+(EFIAPI *EFI_TCG_HASH_ALL)(
   IN      EFI_TCG_PROTOCOL          *This,
   IN      UINT8                     *HashData,
   IN      UINT64                    HashDataLen,
@@ -137,7 +137,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCG_LOG_EVENT) (
+(EFIAPI *EFI_TCG_LOG_EVENT)(
   IN      EFI_TCG_PROTOCOL          *This,
   IN      TCG_PCR_EVENT             *TCGLogData,
   IN OUT  UINT32                    *EventNumber,
@@ -161,7 +161,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCG_PASS_THROUGH_TO_TPM) (
+(EFIAPI *EFI_TCG_PASS_THROUGH_TO_TPM)(
   IN      EFI_TCG_PROTOCOL          *This,
   IN      UINT32                    TpmInputParamterBlockSize,
   IN      UINT8                     *TpmInputParamterBlock,
@@ -194,7 +194,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCG_HASH_LOG_EXTEND_EVENT) (
+(EFIAPI *EFI_TCG_HASH_LOG_EXTEND_EVENT)(
   IN      EFI_TCG_PROTOCOL          *This,
   IN      EFI_PHYSICAL_ADDRESS      HashData,
   IN      UINT64                    HashDataLen,

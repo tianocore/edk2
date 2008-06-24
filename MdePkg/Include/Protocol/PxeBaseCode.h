@@ -249,7 +249,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_START) (
+(EFIAPI *EFI_PXE_BASE_CODE_START)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
   IN BOOLEAN                               UseIpv6
   );
@@ -268,7 +268,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_STOP) (
+(EFIAPI *EFI_PXE_BASE_CODE_STOP)(
   IN EFI_PXE_BASE_CODE_PROTOCOL    *This
   );
 
@@ -294,7 +294,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_DHCP) (
+(EFIAPI *EFI_PXE_BASE_CODE_DHCP)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
   IN BOOLEAN                               SortOffers
   );
@@ -324,7 +324,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_DISCOVER) (
+(EFIAPI *EFI_PXE_BASE_CODE_DISCOVER)(
   IN EFI_PXE_BASE_CODE_PROTOCOL           *This,
   IN UINT16                               Type,
   IN UINT16                               *Layer,
@@ -362,7 +362,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_MTFTP) (
+(EFIAPI *EFI_PXE_BASE_CODE_MTFTP)(
   IN EFI_PXE_BASE_CODE_PROTOCOL                *This,
   IN EFI_PXE_BASE_CODE_TFTP_OPCODE             Operation,
   IN OUT VOID                                  *BufferPtr OPTIONAL,
@@ -403,7 +403,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_UDP_WRITE) (
+(EFIAPI *EFI_PXE_BASE_CODE_UDP_WRITE)(
   IN EFI_PXE_BASE_CODE_PROTOCOL                *This,
   IN UINT16                                    OpFlags,
   IN EFI_IP_ADDRESS                            *DestIp,
@@ -445,7 +445,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_UDP_READ) (
+(EFIAPI *EFI_PXE_BASE_CODE_UDP_READ)(
   IN EFI_PXE_BASE_CODE_PROTOCOL                *This,
   IN UINT16                                    OpFlags,
   IN OUT EFI_IP_ADDRESS                        *DestIp,     OPTIONAL
@@ -471,7 +471,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_SET_IP_FILTER) (
+(EFIAPI *EFI_PXE_BASE_CODE_SET_IP_FILTER)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
   IN EFI_PXE_BASE_CODE_IP_FILTER           *NewFilter
   );
@@ -494,7 +494,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_ARP) (
+(EFIAPI *EFI_PXE_BASE_CODE_ARP)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
   IN EFI_IP_ADDRESS                        *IpAddr,
   IN EFI_MAC_ADDRESS                       *MacAddr OPTIONAL
@@ -522,7 +522,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_SET_PARAMETERS) (
+(EFIAPI *EFI_PXE_BASE_CODE_SET_PARAMETERS)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
   IN BOOLEAN                               *NewAutoArp,     OPTIONAL
   IN BOOLEAN                               *NewSendGUID,    OPTIONAL
@@ -545,7 +545,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_SET_STATION_IP) (
+(EFIAPI *EFI_PXE_BASE_CODE_SET_STATION_IP)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
   IN EFI_IP_ADDRESS                        *NewStationIp,   OPTIONAL
   IN EFI_IP_ADDRESS                        *NewSubnetMask   OPTIONAL
@@ -581,7 +581,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_BASE_CODE_SET_PACKETS) (
+(EFIAPI *EFI_PXE_BASE_CODE_SET_PACKETS)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
   BOOLEAN                                  *NewDhcpDiscoverValid,   OPTIONAL
   BOOLEAN                                  *NewDhcpAckReceived,     OPTIONAL

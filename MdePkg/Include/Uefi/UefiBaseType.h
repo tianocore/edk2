@@ -18,10 +18,11 @@
 
 #include "Base.h"
 
-//
-// Basical data type definitions introduced in UEFI.
-// 
+///
+/// Basical data type definitions introduced in UEFI.
+/// 
 typedef GUID                      EFI_GUID;
+
 ///
 /// Function return status for EFI API
 ///
@@ -148,9 +149,9 @@ typedef union {
     (EFI_SIGNATURE_32 (A, B, C, D) | ((UINT64) (EFI_SIGNATURE_32 (E, F, G, H)) << 32))
 
 
-//
-//  Returns the byte offset to a field within a structure
-//
+///
+///  Returns the byte offset to a field within a structure
+///
 #define EFI_FIELD_OFFSET(TYPE,Field) ((UINTN)(&(((TYPE *) 0)->Field)))
 
 //

@@ -43,7 +43,7 @@
 **/
 typedef
 CHAR16*
-(EFIAPI *EFI_DEVICE_PATH_TO_TEXT_NODE) (
+(EFIAPI *EFI_DEVICE_PATH_TO_TEXT_NODE)(
   IN CONST EFI_DEVICE_PATH_PROTOCOL   *DeviceNode,
   IN BOOLEAN                          DisplayOnly,
   IN BOOLEAN                          AllowShortcuts
@@ -67,7 +67,7 @@ CHAR16*
 **/
 typedef
 CHAR16*
-(EFIAPI *EFI_DEVICE_PATH_TO_TEXT_PATH) (
+(EFIAPI *EFI_DEVICE_PATH_TO_TEXT_PATH)(
   IN CONST EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
   IN BOOLEAN                          DisplayOnly,
   IN BOOLEAN                          AllowShortcuts

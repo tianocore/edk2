@@ -43,7 +43,7 @@ typedef struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL EFI_FIRMWARE_VOLUME_BLOCK_PRO
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FVB_GET_ATTRIBUTES) (
+(EFIAPI * EFI_FVB_GET_ATTRIBUTES)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   OUT       EFI_FVB_ATTRIBUTES                  *Attributes
 );
@@ -76,7 +76,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FVB_SET_ATTRIBUTES) (
+(EFIAPI * EFI_FVB_SET_ATTRIBUTES)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   IN OUT    EFI_FVB_ATTRIBUTES                  *Attributes
 );
@@ -107,7 +107,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FVB_GET_PHYSICAL_ADDRESS) (
+(EFIAPI * EFI_FVB_GET_PHYSICAL_ADDRESS)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   OUT       EFI_PHYSICAL_ADDRESS                *Address
 );
@@ -145,7 +145,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FVB_GET_BLOCK_SIZE) (
+(EFIAPI * EFI_FVB_GET_BLOCK_SIZE)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   IN        EFI_LBA                             Lba,
   OUT       UINTN                               *BlockSize,
@@ -201,7 +201,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FVB_READ) (
+(EFIAPI *EFI_FVB_READ)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   IN        EFI_LBA                             Lba,
   IN        UINTN                               Offset,
@@ -274,7 +274,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FVB_WRITE) (
+(EFIAPI * EFI_FVB_WRITE)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   IN        EFI_LBA                             Lba,
   IN        UINTN                               Offset,
@@ -339,7 +339,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FVB_ERASE_BLOCKS) (
+(EFIAPI * EFI_FVB_ERASE_BLOCKS)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   ...
 );

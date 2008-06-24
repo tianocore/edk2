@@ -31,14 +31,14 @@
         ((PXE_UINT32) (a) & 0xFF) \
     )
 
-//
-// UNDI ROM ID and devive ID signature
-//
+///
+/// UNDI ROM ID and devive ID signature
+///
 #define PXE_BUSTYPE_PXE PXE_BUSTYPE ('!', 'P', 'X', 'E')
 
-//
-// BUS ROM ID signatures
-//
+///
+/// BUS ROM ID signatures
+///
 #define PXE_BUSTYPE_PCI     PXE_BUSTYPE ('P', 'C', 'I', 'R')
 #define PXE_BUSTYPE_PC_CARD PXE_BUSTYPE ('P', 'C', 'C', 'R')
 #define PXE_BUSTYPE_USB     PXE_BUSTYPE ('U', 'S', 'B', 'R')
@@ -77,9 +77,9 @@ typedef UINT16         PXE_UINT16;
 typedef UINT32         PXE_UINT32;
 typedef UINTN          PXE_UINTN;
  
-//
-// typedef unsigned long PXE_UINT64;
-//
+///
+/// typedef unsigned long PXE_UINT64;
+///
 typedef UINT64      PXE_UINT64;
 
 typedef PXE_UINT8 PXE_BOOL;
@@ -88,99 +88,99 @@ typedef PXE_UINT8 PXE_BOOL;
 
 typedef PXE_UINT16      PXE_OPCODE;
 
-//
-// Return UNDI operational state.
-//
+///
+/// Return UNDI operational state.
+///
 #define PXE_OPCODE_GET_STATE  0x0000
 
-//
-// Change UNDI operational state from Stopped to Started.
-//
+///
+/// Change UNDI operational state from Stopped to Started.
+///
 #define PXE_OPCODE_START  0x0001
 
-//
-// Change UNDI operational state from Started to Stopped.
-//
+///
+/// Change UNDI operational state from Started to Stopped.
+///
 #define PXE_OPCODE_STOP 0x0002
 
-//
-// Get UNDI initialization information.
-//
+///
+/// Get UNDI initialization information.
+///
 #define PXE_OPCODE_GET_INIT_INFO  0x0003
 
-//
-// Get NIC configuration information.
-//
+///
+/// Get NIC configuration information.
+///
 #define PXE_OPCODE_GET_CONFIG_INFO  0x0004
 
-//
-// Changed UNDI operational state from Started to Initialized.
-//
+///
+/// Changed UNDI operational state from Started to Initialized.
+///
 #define PXE_OPCODE_INITIALIZE 0x0005
 
-//
-// Re-initialize the NIC H/W.
-//
+///
+/// Re-initialize the NIC H/W.
+///
 #define PXE_OPCODE_RESET  0x0006
 
-//
-// Change the UNDI operational state from Initialized to Started.
-//
+///
+/// Change the UNDI operational state from Initialized to Started.
+///
 #define PXE_OPCODE_SHUTDOWN 0x0007
 
-//
-// Read & change state of external interrupt enables.
-//
+///
+/// Read & change state of external interrupt enables.
+///
 #define PXE_OPCODE_INTERRUPT_ENABLES  0x0008
 
-//
-// Read & change state of packet receive filters.
-//
+///
+/// Read & change state of packet receive filters.
+///
 #define PXE_OPCODE_RECEIVE_FILTERS  0x0009
 
-//
-// Read & change station MAC address.
-//
+///
+/// Read & change station MAC address.
+///
 #define PXE_OPCODE_STATION_ADDRESS  0x000A
 
-//
-// Read traffic statistics.
-//
+///
+/// Read traffic statistics.
+///
 #define PXE_OPCODE_STATISTICS 0x000B
 
-//
-// Convert multicast IP address to multicast MAC address.
-//
+///
+/// Convert multicast IP address to multicast MAC address.
+///
 #define PXE_OPCODE_MCAST_IP_TO_MAC  0x000C
 
-//
-// Read or change non-volatile storage on the NIC.
-//
+///
+/// Read or change non-volatile storage on the NIC.
+///
 #define PXE_OPCODE_NVDATA 0x000D
 
-//
-// Get & clear interrupt status.
-//
+///
+/// Get & clear interrupt status.
+///
 #define PXE_OPCODE_GET_STATUS 0x000E
 
-//
-// Fill media header in packet for transmit.
-//
+///
+/// Fill media header in packet for transmit.
+///
 #define PXE_OPCODE_FILL_HEADER  0x000F
 
-//
-// Transmit packet(s).
-//
+///
+/// Transmit packet(s).
+///
 #define PXE_OPCODE_TRANSMIT 0x0010
 
-//
-// Receive packet.
-//
+///
+/// Receive packet.
+///
 #define PXE_OPCODE_RECEIVE  0x0011
 
-//
-// Last valid PXE UNDI OpCode number.
-//
+///
+/// Last valid PXE UNDI OpCode number.
+///
 #define PXE_OPCODE_LAST_VALID 0x0011
 
 typedef PXE_UINT16  PXE_OPFLAGS;
@@ -245,28 +245,28 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_INTERRUPT_DISABLE 0x4000
 #define PXE_OPFLAGS_INTERRUPT_READ    0x0000
 
-//
-// Enable receive interrupts.  An external interrupt will be generated
-// after a complete non-error packet has been received.
-//
+///
+/// Enable receive interrupts.  An external interrupt will be generated
+/// after a complete non-error packet has been received.
+///
 #define PXE_OPFLAGS_INTERRUPT_RECEIVE 0x0001
 
-//
-// Enable transmit interrupts.  An external interrupt will be generated
-// after a complete non-error packet has been transmitted.
-//
+///
+/// Enable transmit interrupts.  An external interrupt will be generated
+/// after a complete non-error packet has been transmitted.
+///
 #define PXE_OPFLAGS_INTERRUPT_TRANSMIT  0x0002
 
-//
-// Enable command interrupts.  An external interrupt will be generated
-// when command execution stops.
-//
+///
+/// Enable command interrupts.  An external interrupt will be generated
+/// when command execution stops.
+///
 #define PXE_OPFLAGS_INTERRUPT_COMMAND 0x0004
 
-//
-// Generate software interrupt.  Setting this bit generates an external
-// interrupt, if it is supported by the hardware.
-//
+///
+/// Generate software interrupt.  Setting this bit generates an external
+/// interrupt, if it is supported by the hardware.
+///
 #define PXE_OPFLAGS_INTERRUPT_SOFTWARE  0x0008
 
 //
@@ -282,40 +282,40 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_RECEIVE_FILTER_DISABLE  0x4000
 #define PXE_OPFLAGS_RECEIVE_FILTER_READ     0x0000
 
-//
-// To reset the contents of the multicast MAC address filter list,
-// set this OpFlag:
-//
+///
+/// To reset the contents of the multicast MAC address filter list,
+/// set this OpFlag:
+///
 #define PXE_OPFLAGS_RECEIVE_FILTER_RESET_MCAST_LIST 0x2000
 
-//
-// Enable unicast packet receiving.  Packets sent to the current station
-// MAC address will be received.
-//
+///
+/// Enable unicast packet receiving.  Packets sent to the current station
+/// MAC address will be received.
+///
 #define PXE_OPFLAGS_RECEIVE_FILTER_UNICAST  0x0001
 
-//
-// Enable broadcast packet receiving.  Packets sent to the broadcast
-// MAC address will be received.
-//
+///
+/// Enable broadcast packet receiving.  Packets sent to the broadcast
+/// MAC address will be received.
+///
 #define PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST  0x0002
 
-//
-// Enable filtered multicast packet receiving.  Packets sent to any
-// of the multicast MAC addresses in the multicast MAC address filter
-// list will be received.  If the filter list is empty, no multicast
-//
+///
+/// Enable filtered multicast packet receiving.  Packets sent to any
+/// of the multicast MAC addresses in the multicast MAC address filter
+/// list will be received.  If the filter list is empty, no multicast
+///
 #define PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST 0x0004
 
-//
-// Enable promiscuous packet receiving.  All packets will be received.
-//
+///
+/// Enable promiscuous packet receiving.  All packets will be received.
+///
 #define PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS  0x0008
 
-//
-// Enable promiscuous multicast packet receiving.  All multicast
-// packets will be received.
-//
+///
+/// Enable promiscuous multicast packet receiving.  All multicast
+/// packets will be received.
+///
 #define PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST  0x0010
 
 //

@@ -43,7 +43,7 @@ typedef struct _EFI_UGA_DRAW_PROTOCOL EFI_UGA_DRAW_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_UGA_DRAW_PROTOCOL_GET_MODE) (
+(EFIAPI *EFI_UGA_DRAW_PROTOCOL_GET_MODE)(
   IN  EFI_UGA_DRAW_PROTOCOL *This,
   OUT UINT32                *HorizontalResolution,
   OUT UINT32                *VerticalResolution,
@@ -67,7 +67,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_UGA_DRAW_PROTOCOL_SET_MODE) (
+(EFIAPI *EFI_UGA_DRAW_PROTOCOL_SET_MODE)(
   IN  EFI_UGA_DRAW_PROTOCOL *This,
   IN  UINT32                HorizontalResolution,
   IN  UINT32                VerticalResolution,
@@ -145,7 +145,7 @@ typedef enum {
 --*/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_UGA_DRAW_PROTOCOL_BLT) (
+(EFIAPI *EFI_UGA_DRAW_PROTOCOL_BLT)(
   IN  EFI_UGA_DRAW_PROTOCOL                   * This,
   IN  EFI_UGA_PIXEL                           * BltBuffer, OPTIONAL
   IN  EFI_UGA_BLT_OPERATION                   BltOperation,

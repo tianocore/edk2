@@ -61,7 +61,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IP4_CONFIG_START) (
+(EFIAPI *EFI_IP4_CONFIG_START)(
   IN EFI_IP4_CONFIG_PROTOCOL   *This,
   IN EFI_EVENT                 DoneEvent,
   IN EFI_EVENT                 ReconfigEvent
@@ -80,7 +80,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IP4_CONFIG_STOP) (
+(EFIAPI *EFI_IP4_CONFIG_STOP)(
   IN EFI_IP4_CONFIG_PROTOCOL   *This
   )
 ;
@@ -106,7 +106,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IP4_CONFIG_GET_DATA) (
+(EFIAPI *EFI_IP4_CONFIG_GET_DATA)(
   IN EFI_IP4_CONFIG_PROTOCOL   *This,
   IN OUT UINTN                 *IpConfigDataSize,
   OUT EFI_IP4_IPCONFIG_DATA    *IpConfigData    OPTIONAL

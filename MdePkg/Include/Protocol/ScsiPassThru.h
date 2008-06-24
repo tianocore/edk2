@@ -133,7 +133,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SCSI_PASS_THRU_PASSTHRU) (
+(EFIAPI *EFI_SCSI_PASS_THRU_PASSTHRU)(
   IN EFI_SCSI_PASS_THRU_PROTOCOL                          *This,
   IN UINT32                                               Target,
   IN UINT64                                               Lun,
@@ -168,7 +168,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SCSI_PASS_THRU_GET_NEXT_DEVICE) (
+(EFIAPI *EFI_SCSI_PASS_THRU_GET_NEXT_DEVICE)(
   IN EFI_SCSI_PASS_THRU_PROTOCOL            *This,
   IN OUT UINT32                             *Target,
   IN OUT UINT64                             *Lun
@@ -204,7 +204,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SCSI_PASS_THRU_BUILD_DEVICE_PATH) (
+(EFIAPI *EFI_SCSI_PASS_THRU_BUILD_DEVICE_PATH)(
   IN EFI_SCSI_PASS_THRU_PROTOCOL            *This,
   IN     UINT32                             Target,
   IN     UINT64                             Lun,
@@ -237,7 +237,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SCSI_PASS_THRU_GET_TARGET_LUN) (
+(EFIAPI *EFI_SCSI_PASS_THRU_GET_TARGET_LUN)(
   IN EFI_SCSI_PASS_THRU_PROTOCOL            *This,
   IN  EFI_DEVICE_PATH_PROTOCOL              *DevicePath,
   OUT UINT32                                *Target,
@@ -262,7 +262,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SCSI_PASS_THRU_RESET_CHANNEL) (
+(EFIAPI *EFI_SCSI_PASS_THRU_RESET_CHANNEL)(
   IN EFI_SCSI_PASS_THRU_PROTOCOL             *This
   )
 ;
@@ -288,7 +288,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SCSI_PASS_THRU_RESET_TARGET) (
+(EFIAPI *EFI_SCSI_PASS_THRU_RESET_TARGET)(
   IN EFI_SCSI_PASS_THRU_PROTOCOL             *This,
   IN UINT32                                  Target,
   IN UINT64                                  Lun

@@ -55,7 +55,7 @@ typedef struct {
 **/
 typedef
 VOID
-(EFIAPI *EFI_DRIVER_HEALTH_REPAIR_PROGRESS_NOTIFY) (
+(EFIAPI *EFI_DRIVER_HEALTH_REPAIR_PROGRESS_NOTIFY)(
   IN UINTN  Value,
   IN UINTN  Limit
   );
@@ -161,7 +161,7 @@ VOID
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_HEALTH_GET_HEALTH_STATUS) (
+(EFIAPI *EFI_DRIVER_HEALTH_GET_HEALTH_STATUS)(
   IN  EFI_DRIVER_HEALTH_PROTOCOL       *This,
   IN  EFI_HANDLE                       ControllerHandle  OPTIONAL,
   IN  EFI_HANDLE                       ChildHandle       OPTIONAL,
@@ -201,7 +201,7 @@ EFI_STATUS
 */
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_HEALTH_REPAIR) (
+(EFIAPI *EFI_DRIVER_HEALTH_REPAIR)(
   IN  EFI_DRIVER_HEALTH_PROTOCOL                *This,
   IN  EFI_HANDLE                                ControllerHandle,
   IN  EFI_HANDLE                                ChildHandle           OPTIONAL,

@@ -57,7 +57,7 @@ typedef struct _EFI_DECOMPRESS_PROTOCOL  EFI_DECOMPRESS_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DECOMPRESS_GET_INFO) (
+(EFIAPI *EFI_DECOMPRESS_GET_INFO)(
   IN EFI_DECOMPRESS_PROTOCOL            *This,
   IN   VOID                             *Source,
   IN   UINT32                           SourceSize,
@@ -99,7 +99,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DECOMPRESS_DECOMPRESS) (
+(EFIAPI *EFI_DECOMPRESS_DECOMPRESS)(
   IN EFI_DECOMPRESS_PROTOCOL              *This,
   IN     VOID                             *Source,
   IN     UINT32                           SourceSize,

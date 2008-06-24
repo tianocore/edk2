@@ -46,7 +46,7 @@ typedef struct _EFI_DEBUGPORT_PROTOCOL EFI_DEBUGPORT_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DEBUGPORT_RESET) (
+(EFIAPI *EFI_DEBUGPORT_RESET)(
   IN EFI_DEBUGPORT_PROTOCOL               *This
   );
 
@@ -66,7 +66,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DEBUGPORT_WRITE) (
+(EFIAPI *EFI_DEBUGPORT_WRITE)(
   IN EFI_DEBUGPORT_PROTOCOL               *This,
   IN UINT32                               Timeout,
   IN OUT UINTN                            *BufferSize,
@@ -90,7 +90,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DEBUGPORT_READ) (
+(EFIAPI *EFI_DEBUGPORT_READ)(
   IN EFI_DEBUGPORT_PROTOCOL               *This,
   IN UINT32                               Timeout,
   IN OUT UINTN                            *BufferSize,
@@ -109,7 +109,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DEBUGPORT_POLL) (
+(EFIAPI *EFI_DEBUGPORT_POLL)(
   IN EFI_DEBUGPORT_PROTOCOL               *This
   );
 

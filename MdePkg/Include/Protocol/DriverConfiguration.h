@@ -73,7 +73,7 @@ typedef struct _EFI_DRIVER_CONFIGURATION_PROTOCOL  EFI_DRIVER_CONFIGURATION_PROT
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_CONFIGURATION_SET_OPTIONS) (
+(EFIAPI *EFI_DRIVER_CONFIGURATION_SET_OPTIONS)(
   IN EFI_DRIVER_CONFIGURATION_PROTOCOL                        *This,
   IN  EFI_HANDLE                                              ControllerHandle,
   IN  EFI_HANDLE                                              ChildHandle  OPTIONAL,
@@ -112,7 +112,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_CONFIGURATION_OPTIONS_VALID) (
+(EFIAPI *EFI_DRIVER_CONFIGURATION_OPTIONS_VALID)(
   IN EFI_DRIVER_CONFIGURATION_PROTOCOL                        *This,
   IN  EFI_HANDLE                                              ControllerHandle,
   IN  EFI_HANDLE                                              ChildHandle  OPTIONAL
@@ -139,7 +139,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS) (
+(EFIAPI *EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS)(
   IN EFI_DRIVER_CONFIGURATION_PROTOCOL                        *This,
   IN  EFI_HANDLE                                              ControllerHandle,
   IN  EFI_HANDLE                                              ChildHandle  OPTIONAL,

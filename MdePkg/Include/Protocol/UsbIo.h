@@ -79,7 +79,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ASYNC_USB_TRANSFER_CALLBACK) (
+(EFIAPI *EFI_ASYNC_USB_TRANSFER_CALLBACK)(
   IN VOID         *Data,
   IN UINTN        DataLength,
   IN VOID         *Context,
@@ -115,7 +115,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_CONTROL_TRANSFER) (
+(EFIAPI *EFI_USB_IO_CONTROL_TRANSFER)(
   IN EFI_USB_IO_PROTOCOL                        *This,
   IN EFI_USB_DEVICE_REQUEST                     *Request,
   IN EFI_USB_DATA_DIRECTION                     Direction,
@@ -148,7 +148,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_BULK_TRANSFER) (
+(EFIAPI *EFI_USB_IO_BULK_TRANSFER)(
   IN EFI_USB_IO_PROTOCOL            *This,
   IN UINT8                          DeviceEndpoint,
   IN OUT VOID                       *Data,
@@ -183,7 +183,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_ASYNC_INTERRUPT_TRANSFER) (
+(EFIAPI *EFI_USB_IO_ASYNC_INTERRUPT_TRANSFER)(
   IN EFI_USB_IO_PROTOCOL                                 *This,
   IN UINT8                                               DeviceEndpoint,
   IN BOOLEAN                                             IsNewTransfer,
@@ -214,7 +214,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_SYNC_INTERRUPT_TRANSFER) (
+(EFIAPI *EFI_USB_IO_SYNC_INTERRUPT_TRANSFER)(
   IN EFI_USB_IO_PROTOCOL            *This,
   IN     UINT8                      DeviceEndpoint,
   IN OUT VOID                       *Data,
@@ -244,7 +244,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_ISOCHRONOUS_TRANSFER) (
+(EFIAPI *EFI_USB_IO_ISOCHRONOUS_TRANSFER)(
   IN EFI_USB_IO_PROTOCOL            *This,
   IN     UINT8                      DeviceEndpoint,
   IN OUT VOID                       *Data,
@@ -273,7 +273,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_ASYNC_ISOCHRONOUS_TRANSFER) (
+(EFIAPI *EFI_USB_IO_ASYNC_ISOCHRONOUS_TRANSFER)(
   IN EFI_USB_IO_PROTOCOL              *This,
   IN UINT8                            DeviceEndpoint,
   IN OUT VOID                         *Data,
@@ -295,7 +295,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_PORT_RESET) (
+(EFIAPI *EFI_USB_IO_PORT_RESET)(
   IN EFI_USB_IO_PROTOCOL    *This
   );
 
@@ -312,7 +312,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_GET_DEVICE_DESCRIPTOR) (
+(EFIAPI *EFI_USB_IO_GET_DEVICE_DESCRIPTOR)(
   IN EFI_USB_IO_PROTOCOL            *This,
   OUT EFI_USB_DEVICE_DESCRIPTOR     *DeviceDescriptor
   );
@@ -331,7 +331,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_GET_CONFIG_DESCRIPTOR) (
+(EFIAPI *EFI_USB_IO_GET_CONFIG_DESCRIPTOR)(
   IN EFI_USB_IO_PROTOCOL            *This,
   OUT EFI_USB_CONFIG_DESCRIPTOR     *ConfigurationDescriptor
   );
@@ -351,7 +351,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_GET_INTERFACE_DESCRIPTOR) (
+(EFIAPI *EFI_USB_IO_GET_INTERFACE_DESCRIPTOR)(
   IN EFI_USB_IO_PROTOCOL            *This,
   OUT EFI_USB_INTERFACE_DESCRIPTOR  *InterfaceDescriptor
   );
@@ -372,7 +372,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_GET_ENDPOINT_DESCRIPTOR) (
+(EFIAPI *EFI_USB_IO_GET_ENDPOINT_DESCRIPTOR)(
   IN EFI_USB_IO_PROTOCOL            *This,
   IN  UINT8                         EndpointIndex,
   OUT EFI_USB_ENDPOINT_DESCRIPTOR   *EndpointDescriptor
@@ -394,7 +394,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_GET_STRING_DESCRIPTOR) (
+(EFIAPI *EFI_USB_IO_GET_STRING_DESCRIPTOR)(
   IN EFI_USB_IO_PROTOCOL            *This,
   IN  UINT16                        LangID,
   IN  UINT8                         StringID,
@@ -413,7 +413,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_USB_IO_GET_SUPPORTED_LANGUAGE) (
+(EFIAPI *EFI_USB_IO_GET_SUPPORTED_LANGUAGE)(
   IN EFI_USB_IO_PROTOCOL            *This,
   OUT UINT16                        **LangIDTable,
   OUT UINT16                        *TableSize

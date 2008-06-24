@@ -466,7 +466,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_MTFTP4_POLL) (
+(EFIAPI *EFI_MTFTP4_POLL)(
   IN EFI_MTFTP4_PROTOCOL       *This
   )
 ;                                                                                                                 

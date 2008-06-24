@@ -95,7 +95,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SERIAL_RESET) (
+(EFIAPI *EFI_SERIAL_RESET)(
   IN EFI_SERIAL_IO_PROTOCOL *This
   )
 ;
@@ -128,7 +128,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SERIAL_SET_ATTRIBUTES) (
+(EFIAPI *EFI_SERIAL_SET_ATTRIBUTES)(
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   IN UINT64                         BaudRate,
   IN UINT32                         ReceiveFifoDepth,
@@ -152,7 +152,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SERIAL_SET_CONTROL_BITS) (
+(EFIAPI *EFI_SERIAL_SET_CONTROL_BITS)(
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   IN UINT32                         Control
   )
@@ -170,7 +170,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SERIAL_GET_CONTROL_BITS) (
+(EFIAPI *EFI_SERIAL_GET_CONTROL_BITS)(
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   OUT UINT32                        *Control
   )
@@ -191,7 +191,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SERIAL_WRITE) (
+(EFIAPI *EFI_SERIAL_WRITE)(
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   IN OUT UINTN                      *BufferSize,
   IN VOID                           *Buffer
@@ -213,7 +213,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SERIAL_READ) (
+(EFIAPI *EFI_SERIAL_READ)(
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   IN OUT UINTN                      *BufferSize,
   OUT VOID                          *Buffer

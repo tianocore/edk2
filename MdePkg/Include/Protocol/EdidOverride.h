@@ -48,7 +48,7 @@ typedef struct _EFI_EDID_OVERRIDE_PROTOCOL EFI_EDID_OVERRIDE_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_EDID_OVERRIDE_PROTOCOL_GET_EDID) (
+(EFIAPI *EFI_EDID_OVERRIDE_PROTOCOL_GET_EDID)(
   IN  EFI_EDID_OVERRIDE_PROTOCOL          *This,
   IN  EFI_HANDLE                          *ChildHandle,
   OUT UINT32                              *Attributes,

@@ -149,7 +149,7 @@ typedef struct {
 **/                                       
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_INITIALIZE) (
+(EFIAPI *EFI_BIS_INITIALIZE)(
   IN     EFI_BIS_PROTOCOL        *This,              
   OUT    BIS_APPLICATION_HANDLE  *AppHandle,         
   IN OUT EFI_BIS_VERSION         *InterfaceVersion,  
@@ -173,7 +173,7 @@ EFI_STATUS
 **/     
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_FREE) (
+(EFIAPI *EFI_BIS_FREE)(
   IN BIS_APPLICATION_HANDLE  AppHandle,               
   IN EFI_BIS_DATA            *ToFree                  
   );
@@ -194,7 +194,7 @@ EFI_STATUS
 **/   
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_SHUTDOWN) (
+(EFIAPI *EFI_BIS_SHUTDOWN)(
   IN BIS_APPLICATION_HANDLE  AppHandle               
   );
 
@@ -218,7 +218,7 @@ EFI_STATUS
 **/ 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_GET_BOOT_OBJECT_AUTHORIZATION_CERTIFICATE) (
+(EFIAPI *EFI_BIS_GET_BOOT_OBJECT_AUTHORIZATION_CERTIFICATE)(
   IN  BIS_APPLICATION_HANDLE  AppHandle,              
   OUT EFI_BIS_DATA            **Certificate           
   );
@@ -247,7 +247,7 @@ EFI_STATUS
 **/ 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_VERIFY_BOOT_OBJECT) (
+(EFIAPI *EFI_BIS_VERIFY_BOOT_OBJECT)(
   IN  BIS_APPLICATION_HANDLE AppHandle,               
   IN  EFI_BIS_DATA           *Credentials,            
   IN  EFI_BIS_DATA           *DataObject,             
@@ -273,7 +273,7 @@ EFI_STATUS
 **/ 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_GET_BOOT_OBJECT_AUTHORIZATION_CHECKFLAG) (
+(EFIAPI *EFI_BIS_GET_BOOT_OBJECT_AUTHORIZATION_CHECKFLAG)(
   IN  BIS_APPLICATION_HANDLE  AppHandle,             
   OUT BOOLEAN                 *CheckIsRequired       
   );
@@ -298,7 +298,7 @@ EFI_STATUS
 **/ 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_GET_BOOT_OBJECT_AUTHORIZATION_UPDATE_TOKEN) (
+(EFIAPI *EFI_BIS_GET_BOOT_OBJECT_AUTHORIZATION_UPDATE_TOKEN)(
   IN  BIS_APPLICATION_HANDLE  AppHandle,              
   OUT EFI_BIS_DATA            **UpdateToken           
   );
@@ -325,7 +325,7 @@ EFI_STATUS
 **/ 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_UPDATE_BOOT_OBJECT_AUTHORIZATION) (
+(EFIAPI *EFI_BIS_UPDATE_BOOT_OBJECT_AUTHORIZATION)(
   IN  BIS_APPLICATION_HANDLE AppHandle,               
   IN  EFI_BIS_DATA           *RequestCredential,      
   OUT EFI_BIS_DATA           **NewUpdateToken         
@@ -362,7 +362,7 @@ EFI_STATUS
 **/ 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_VERIFY_OBJECT_WITH_CREDENTIAL) (
+(EFIAPI *EFI_BIS_VERIFY_OBJECT_WITH_CREDENTIAL)(
   IN  BIS_APPLICATION_HANDLE AppHandle,              
   IN  EFI_BIS_DATA           *Credentials,           
   IN  EFI_BIS_DATA           *DataObject,            
@@ -392,7 +392,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BIS_GET_SIGNATURE_INFO) (
+(EFIAPI *EFI_BIS_GET_SIGNATURE_INFO)(
   IN  BIS_APPLICATION_HANDLE  AppHandle,           
   OUT EFI_BIS_DATA            **SignatureInfo      
   );

@@ -117,7 +117,7 @@ typedef UINTN EFI_BROWSER_ACTION_REQUEST;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SEND_FORM2) (
+(EFIAPI *EFI_SEND_FORM2)(
   IN CONST  EFI_FORM_BROWSER2_PROTOCOL  *This,
   IN        EFI_HII_HANDLE              *Handle,
   IN        UINTN                      HandleCount,
@@ -168,7 +168,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BROWSER_CALLBACK2 ) (
+(EFIAPI *EFI_BROWSER_CALLBACK2)(
   IN CONST  EFI_FORM_BROWSER2_PROTOCOL *This,
   IN OUT    UINTN                     *ResultsDataSize,
   IN OUT    EFI_STRING                ResultsData,

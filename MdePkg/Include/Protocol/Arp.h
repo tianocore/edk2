@@ -72,7 +72,7 @@ typedef struct {
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_ARP_CONFIGURE) (
+(EFIAPI *EFI_ARP_CONFIGURE)(
   IN EFI_ARP_PROTOCOL       *This,
   IN EFI_ARP_CONFIG_DATA    *ConfigData   OPTIONAL
   )
@@ -104,7 +104,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ARP_ADD) (
+(EFIAPI *EFI_ARP_ADD)(
   IN EFI_ARP_PROTOCOL       *This,
   IN BOOLEAN                DenyFlag,
   IN VOID                   *TargetSwAddress  OPTIONAL,
@@ -138,7 +138,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_ARP_FIND) (
+(EFIAPI *EFI_ARP_FIND)(
   IN EFI_ARP_PROTOCOL       *This,
   IN BOOLEAN                BySwAddress,
   IN VOID                   *AddressBuffer    OPTIONAL,
@@ -167,7 +167,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ARP_DELETE) (
+(EFIAPI *EFI_ARP_DELETE)(
   IN EFI_ARP_PROTOCOL       *This,
   IN BOOLEAN                BySwAddress,
   IN VOID                   *AddressBuffer   OPTIONAL
@@ -187,7 +187,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ARP_FLUSH) (
+(EFIAPI *EFI_ARP_FLUSH)(
   IN EFI_ARP_PROTOCOL       *This
   )
 ;  
@@ -218,7 +218,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ARP_REQUEST) (
+(EFIAPI *EFI_ARP_REQUEST)(
   IN EFI_ARP_PROTOCOL       *This, 
   IN VOID                   *TargetSwAddress  OPTIONAL,
   IN EFI_EVENT              ResolvedEvent     OPTIONAL,
@@ -244,7 +244,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ARP_CANCEL) (
+(EFIAPI *EFI_ARP_CANCEL)(
   IN EFI_ARP_PROTOCOL       *This, 
   IN VOID                   *TargetSwAddress  OPTIONAL,
   IN EFI_EVENT              ResolvedEvent     OPTIONAL

@@ -52,7 +52,7 @@ typedef struct _EFI_COMPONENT_NAME_PROTOCOL  EFI_COMPONENT_NAME_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_COMPONENT_NAME_GET_DRIVER_NAME) (
+(EFIAPI *EFI_COMPONENT_NAME_GET_DRIVER_NAME)(
   IN EFI_COMPONENT_NAME_PROTOCOL           *This,
   IN  CHAR8                                *Language,
   OUT CHAR16                               **DriverName
@@ -101,7 +101,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_COMPONENT_NAME_GET_CONTROLLER_NAME) (
+(EFIAPI *EFI_COMPONENT_NAME_GET_CONTROLLER_NAME)(
   IN EFI_COMPONENT_NAME_PROTOCOL                              *This,
   IN  EFI_HANDLE                                              ControllerHandle,
   IN  EFI_HANDLE                                              ChildHandle        OPTIONAL,

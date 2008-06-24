@@ -88,7 +88,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS) (
+(EFIAPI *EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS)(
   IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL                        *This,
   IN  EFI_HANDLE                                            ControllerHandle,
   IN  EFI_HANDLE                                            ChildHandle  OPTIONAL,

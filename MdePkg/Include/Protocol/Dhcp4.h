@@ -126,7 +126,7 @@ typedef enum{
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_CALLBACK) (
+(EFIAPI *EFI_DHCP4_CALLBACK)(
   IN  EFI_DHCP4_PROTOCOL         *This,
   IN  VOID                       *Context,
   IN  EFI_DHCP4_STATE            CurrentState,
@@ -196,7 +196,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_GET_MODE_DATA) (
+(EFIAPI *EFI_DHCP4_GET_MODE_DATA)(
   IN  EFI_DHCP4_PROTOCOL      *This,
   OUT EFI_DHCP4_MODE_DATA     *Dhcp4ModeData
   )
@@ -223,7 +223,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_CONFIGURE) (
+(EFIAPI *EFI_DHCP4_CONFIGURE)(
   IN EFI_DHCP4_PROTOCOL       *This,
   IN EFI_DHCP4_CONFIG_DATA    *Dhcp4CfgData  OPTIONAL
   )
@@ -258,7 +258,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_START) (
+(EFIAPI *EFI_DHCP4_START)(
   IN EFI_DHCP4_PROTOCOL       *This,
   IN EFI_EVENT                CompletionEvent   OPTIONAL
   )
@@ -292,7 +292,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_RENEW_REBIND) (
+(EFIAPI *EFI_DHCP4_RENEW_REBIND)(
   IN EFI_DHCP4_PROTOCOL       *This,
   IN BOOLEAN                  RebindRequest,
   IN EFI_EVENT                CompletionEvent  OPTIONAL
@@ -312,7 +312,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_RELEASE) (
+(EFIAPI *EFI_DHCP4_RELEASE)(
   IN EFI_DHCP4_PROTOCOL       *This
   )
 ;
@@ -328,7 +328,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_STOP) (
+(EFIAPI *EFI_DHCP4_STOP)(
   IN EFI_DHCP4_PROTOCOL       *This
   )
 ;
@@ -357,7 +357,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_BUILD) (
+(EFIAPI *EFI_DHCP4_BUILD)(
   IN  EFI_DHCP4_PROTOCOL      *This,
   IN  EFI_DHCP4_PACKET        *SeedPacket,
   IN  UINT32                  DeleteCount,
@@ -384,7 +384,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_TRANSMIT_RECEIVE) (
+(EFIAPI *EFI_DHCP4_TRANSMIT_RECEIVE)(
   IN EFI_DHCP4_PROTOCOL                *This,
   IN EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token
   )
@@ -412,7 +412,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DHCP4_PARSE) (
+(EFIAPI *EFI_DHCP4_PARSE)(
   IN EFI_DHCP4_PROTOCOL        *This,
   IN EFI_DHCP4_PACKET          *Packet,
   IN OUT UINT32                *OptionCount,

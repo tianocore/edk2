@@ -122,7 +122,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_POLL_IO_MEM) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_POLL_IO_MEM)(
   IN EFI_PCI_IO_PROTOCOL           *This,
   IN  EFI_PCI_IO_PROTOCOL_WIDTH    Width,
   IN  UINT8                        BarIndex,
@@ -155,7 +155,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_IO_MEM) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_IO_MEM)(
   IN EFI_PCI_IO_PROTOCOL              *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
   IN     UINT8                        BarIndex,
@@ -189,7 +189,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_CONFIG) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_CONFIG)(
   IN EFI_PCI_IO_PROTOCOL              *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
   IN     UINT32                       Offset,
@@ -232,7 +232,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_COPY_MEM) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_COPY_MEM)(
   IN EFI_PCI_IO_PROTOCOL              *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
   IN     UINT8                        DestBarIndex,
@@ -263,7 +263,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_MAP) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_MAP)(
   IN EFI_PCI_IO_PROTOCOL                *This,
   IN     EFI_PCI_IO_PROTOCOL_OPERATION  Operation,
   IN     VOID                           *HostAddress,
@@ -284,7 +284,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_UNMAP) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_UNMAP)(
   IN EFI_PCI_IO_PROTOCOL           *This,
   IN  VOID                         *Mapping
   );
@@ -311,7 +311,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_ALLOCATE_BUFFER) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_ALLOCATE_BUFFER)(
   IN EFI_PCI_IO_PROTOCOL           *This,
   IN  EFI_ALLOCATE_TYPE            Type,
   IN  EFI_MEMORY_TYPE              MemoryType,
@@ -334,7 +334,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_FREE_BUFFER) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_FREE_BUFFER)(
   IN EFI_PCI_IO_PROTOCOL           *This,
   IN  UINTN                        Pages,
   IN  VOID                         *HostAddress
@@ -353,7 +353,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_FLUSH) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_FLUSH)(
   IN EFI_PCI_IO_PROTOCOL  *This
   );
 
@@ -372,7 +372,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_GET_LOCATION) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_GET_LOCATION)(
   IN EFI_PCI_IO_PROTOCOL          *This,
   OUT UINTN                       *SegmentNumber,
   OUT UINTN                       *BusNumber,
@@ -401,7 +401,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_ATTRIBUTES) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_ATTRIBUTES)(
   IN EFI_PCI_IO_PROTOCOL                       *This,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation,
   IN  UINT64                                   Attributes,
@@ -432,7 +432,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_GET_BAR_ATTRIBUTES) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_GET_BAR_ATTRIBUTES)(
   IN EFI_PCI_IO_PROTOCOL             *This,
   IN  UINT8                          BarIndex,
   OUT UINT64                         *Supports, OPTIONAL
@@ -465,7 +465,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_IO_PROTOCOL_SET_BAR_ATTRIBUTES) (
+(EFIAPI *EFI_PCI_IO_PROTOCOL_SET_BAR_ATTRIBUTES)(
   IN EFI_PCI_IO_PROTOCOL              *This,
   IN     UINT64                       Attributes,
   IN     UINT8                        BarIndex,
