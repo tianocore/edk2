@@ -840,7 +840,8 @@ UsbIoPortReset (
   Address       = Dev->Address;
   Dev->Address  = 0;
   Status        = UsbSetAddress (Dev, Address);
-
+  Dev->Address  = Address;
+  
   if (EFI_ERROR (Status)) {
     DEBUG (( EFI_D_ERROR, "UsbIoPortReset: failed to set address for device %d - %r\n",
                 Address, Status));
@@ -848,8 +849,10 @@ UsbIoPortReset (
     goto ON_EXIT;
   }
 
-  Dev->Address  = Address;
+  gBS->Stall (USB_SET_DEVICE_ADDRESS_STALL);
 
+  DEBUG (( EFI_D_INFO, "UsbIoPortReset: device is now ADDRESSED at %d\n", Address));
+  
   //
   // Reset the current active configure, after this device
   // is in CONFIGURED state.
