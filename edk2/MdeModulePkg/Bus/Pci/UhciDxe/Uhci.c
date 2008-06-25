@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -313,9 +313,10 @@ Uhci2GetCapability (
     // returns 0 in this bit if port number is invalid. Also, if
     // PciIo IoRead returns error, 0xFFFF is returned to caller.
     //
-    if (((PortSC & 0x80) != 0) && (PortSC != 0xFFFF)) {
-      (*PortNumber)++;
+    if (((PortSC & 0x80) == 0) || (PortSC == 0xFFFF)) {
+      break;
     }
+    (*PortNumber)++;
   }
 
   Uhc->RootPorts = *PortNumber;

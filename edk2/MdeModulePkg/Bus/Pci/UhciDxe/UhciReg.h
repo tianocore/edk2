@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -68,8 +68,13 @@ enum {
   USBPORTSC_PR          = BIT(9),  // Port Reset
   USBPORTSC_SUSP        = BIT(12), // Suspend
 
-  USB_MAX_ROOTHUB_PORT  = 0x0F,    // Max number of root hub port
-
+  //
+  // UHCI Spec said it must implement 2 ports each host at least,
+  // and if more, check whether the bit7 of PORTSC is always 1.
+  // So here assume the max of port number each host is 16.
+  //
+  USB_MAX_ROOTHUB_PORT  = 0x0F,
+  
   //
   // Command register bit definitions
   //
