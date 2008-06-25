@@ -128,16 +128,16 @@ UINT8 KeyboardLayoutTable[USB_KEYCODE_MAX_MAKE + 8][5] = {
   {EfiKeyZero,       '0',      '0',   EFI_INSERT_MODIFIER,      EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x62
   {EfiKeyPeriod,     '.',      '.',   EFI_DELETE_MODIFIER,      EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x63
   {EfiKeyB0,         '\\',     '|',   EFI_NULL_MODIFIER,        EFI_AFFECTED_BY_STANDARD_SHIFT}, // 0x64 Keyboard Non-US \ and |
-  {EfiKeyA4,         0x00,     0x00,  EFI_NULL_MODIFIER,        0},                              // 0x65 Keyboard Application
+  {EfiKeyA4,         0x00,     0x00,  EFI_MENU_MODIFIER,        0},                              // 0x65 Keyboard Application
 
   {EfiKeyLCtrl,      0,        0,     EFI_LEFT_CONTROL_MODIFIER,    0},  // 0xe0
   {EfiKeyLShift,     0,        0,     EFI_LEFT_SHIFT_MODIFIER,      0},  // 0xe1
   {EfiKeyLAlt,       0,        0,     EFI_LEFT_ALT_MODIFIER,        0},  // 0xe2
-  {EfiKeyA0,         0,        0,     EFI_NULL_MODIFIER,            0},  // 0xe3
+  {EfiKeyA0,         0,        0,     EFI_LEFT_LOGO_MODIFIER,       0},  // 0xe3
   {EfiKeyRCtrl,      0,        0,     EFI_RIGHT_CONTROL_MODIFIER,   0},  // 0xe4
   {EfiKeyRShift,     0,        0,     EFI_RIGHT_SHIFT_MODIFIER,     0},  // 0xe5
   {EfiKeyA2,         0,        0,     EFI_RIGHT_ALT_MODIFIER,       0},  // 0xe6
-  {EfiKeyA3,         0,        0,     EFI_NULL_MODIFIER,            0},  // 0xe7
+  {EfiKeyA3,         0,        0,     EFI_RIGHT_LOGO_MODIFIER,      0},  // 0xe7
 };
 
 VOID
@@ -1346,6 +1346,7 @@ USBParseKey (
       //
       // SysReq release
       //
+      case EFI_PRINT_MODIFIER:
       case EFI_SYS_REQUEST_MODIFIER:
         UsbKeyboardDevice->SysReqOn = 0;
         break;
@@ -1435,6 +1436,7 @@ USBParseKey (
     //
     // SysReq press
     //
+    case EFI_PRINT_MODIFIER:
     case EFI_SYS_REQUEST_MODIFIER:
       UsbKeyboardDevice->SysReqOn = 1;
       continue;
@@ -1480,7 +1482,6 @@ USBParseKey (
     //
     case EFI_FUNCTION_KEY_ELEVEN_MODIFIER:
     case EFI_FUNCTION_KEY_TWELVE_MODIFIER:
-    case EFI_PRINT_MODIFIER:
     case EFI_PAUSE_MODIFIER:
     case EFI_BREAK_MODIFIER:
       //
