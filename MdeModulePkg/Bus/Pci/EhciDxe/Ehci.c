@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1436,8 +1436,8 @@ EhcCreateUsb2Hc (
   Ehc->Usb2Hc.GetRootHubPortStatus      = EhcGetRootHubPortStatus;
   Ehc->Usb2Hc.SetRootHubPortFeature     = EhcSetRootHubPortFeature;
   Ehc->Usb2Hc.ClearRootHubPortFeature   = EhcClearRootHubPortFeature;
-  Ehc->Usb2Hc.MajorRevision             = 0x1;
-  Ehc->Usb2Hc.MinorRevision             = 0x1;
+  Ehc->Usb2Hc.MajorRevision             = 0x2;
+  Ehc->Usb2Hc.MinorRevision             = 0x0;
 
   Ehc->PciIo                 = PciIo;
   Ehc->OriginalPciAttributes = OriginalPciAttributes;

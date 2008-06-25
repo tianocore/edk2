@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -713,13 +713,14 @@ UsbEnumerateNewDev (
   if (Child->Speed != EFI_USB_SPEED_HIGH) {
     //
     // If the child isn't a high speed device, it is necessary to
-    // set the transaction translator. This is quite simple:
+    // set the transaction translator. Port TT is 1-based.
+    // This is quite simple:
     //  1. if parent is of high speed, then parent is our translator
     //  2. otherwise use parent's translator.
     //
     if (Parent->Speed == EFI_USB_SPEED_HIGH) {
       Child->Translator.TranslatorHubAddress  = Parent->Address;
-      Child->Translator.TranslatorPortNumber  = Port;
+      Child->Translator.TranslatorPortNumber  = Port + 1;
 
     } else {
       Child->Translator = Parent->Translator;
