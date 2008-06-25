@@ -133,7 +133,7 @@ HiiLibAddPackages (
   IN       UINTN               NumberOfPackages,
   IN CONST EFI_GUID            *GuidId,
   IN       EFI_HANDLE          DriverHandle, OPTIONAL
-  OUT      EFI_HII_HANDLE      *HiiHandle, OPTIONAL
+  OUT      EFI_HII_HANDLE      *HiiHandle,
   ...
   )
 {
