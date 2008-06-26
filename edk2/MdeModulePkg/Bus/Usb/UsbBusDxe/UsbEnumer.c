@@ -720,7 +720,7 @@ UsbEnumerateNewDev (
     //
     if (Parent->Speed == EFI_USB_SPEED_HIGH) {
       Child->Translator.TranslatorHubAddress  = Parent->Address;
-      Child->Translator.TranslatorPortNumber  = Port + 1;
+      Child->Translator.TranslatorPortNumber  = (UINT8) (Port + 1);
 
     } else {
       Child->Translator = Parent->Translator;
