@@ -15,9 +15,8 @@
 #ifndef __PCI30_H__
 #define __PCI30_H__
 
-//#include "pci23.h"
-
 #define PCI_CLASS_MASS_STORAGE_SATADPA   0x06
+#define PCI_CLASS_MASS_STORAGE_AHCI      PCI_CLASS_MASS_STORAGE_SATADPA
 
 #pragma pack(push, 1)
 
