@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,16 +43,17 @@ enum {
 };
 
 struct _USB_MASS_DEVICE {
-  UINT32                Signature;
-  EFI_HANDLE            Controller;
-  EFI_USB_IO_PROTOCOL   *UsbIo;
-  EFI_BLOCK_IO_PROTOCOL BlockIo;
-  EFI_BLOCK_IO_MEDIA    BlockIoMedia;
-  BOOLEAN               OpticalStorage;
-  UINT8                 Lun;          // Logical Unit Number
-  UINT8                 Pdt;          // Peripheral Device Type
-  USB_MASS_TRANSPORT    *Transport;   // USB mass storage transport protocol
-  VOID                  *Context;     // Opaque storage for mass transport
+  UINT32                    Signature;
+  EFI_HANDLE                Controller;
+  EFI_USB_IO_PROTOCOL       *UsbIo;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_BLOCK_IO_PROTOCOL     BlockIo;
+  EFI_BLOCK_IO_MEDIA        BlockIoMedia;
+  BOOLEAN                   OpticalStorage;
+  UINT8                     Lun;          // Logical Unit Number
+  UINT8                     Pdt;          // Peripheral Device Type
+  USB_MASS_TRANSPORT        *Transport;   // USB mass storage transport protocol
+  VOID                      *Context;     // Opaque storage for mass transport
 };
 
 #define USB_MASS_DEVICE_FROM_BLOCKIO(a) \

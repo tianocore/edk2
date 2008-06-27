@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,6 @@ UsbBotResetDevice (
   in the Context if Context isn't NULL.
 
   @param  UsbIo                 The USB IO protocol to use
-  @param  Controller            The controller to init
   @param  Context               The variable to save the context to
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory
@@ -51,7 +50,6 @@ STATIC
 EFI_STATUS
 UsbBotInit (
   IN  EFI_USB_IO_PROTOCOL       * UsbIo,
-  IN  EFI_HANDLE                Controller,
   OUT VOID                      **Context OPTIONAL
   )
 {
@@ -149,6 +147,7 @@ ON_ERROR:
   @param  CmdLen                the length of the command
   @param  DataDir               The direction of the data
   @param  TransLen              The expected length of the data
+  @param  Lun                   The number of logic unit
 
   @retval EFI_NOT_READY         The device return NAK to the transfer
   @retval EFI_SUCCESS           The command is sent to the device.
@@ -162,7 +161,8 @@ UsbBotSendCommand (
   IN UINT8                    *Cmd,
   IN UINT8                    CmdLen,
   IN EFI_USB_DATA_DIRECTION   DataDir,
-  IN UINT32                   TransLen
+  IN UINT32                   TransLen,
+  IN UINT8                    Lun
   )
 {
   USB_BOT_CBW               Cbw;
@@ -180,7 +180,7 @@ UsbBotSendCommand (
   Cbw.Tag       = UsbBot->CbwTag;
   Cbw.DataLen   = TransLen;
   Cbw.Flag      = (UINT8) ((DataDir == EfiUsbDataIn) ? 0x80 : 0);
-  Cbw.Lun       = 0;
+  Cbw.Lun       = Lun;
   Cbw.CmdLen    = CmdLen;
 
   ZeroMem (Cbw.CmdBlock, USB_BOT_MAX_CMDLEN);
@@ -389,6 +389,7 @@ UsbBotGetStatus (
   @param  DataDir               The direction of the data transfer
   @param  Data                  The buffer to hold data
   @param  DataLen               The length of the data
+  @param  Lun                   The number of logic unit
   @param  Timeout               The time to wait command
   @param  CmdStatus             The result of high level command execution
 
@@ -405,6 +406,7 @@ UsbBotExecCommand (
   IN  EFI_USB_DATA_DIRECTION  DataDir,
   IN  VOID                    *Data,
   IN  UINT32                  DataLen,
+  IN  UINT8                   Lun,
   IN  UINT32                  Timeout,
   OUT UINT32                  *CmdStatus
   )
@@ -421,7 +423,7 @@ UsbBotExecCommand (
   // Send the command to the device. Return immediately if device
   // rejects the command.
   //
-  Status = UsbBotSendCommand (UsbBot, Cmd, CmdLen, DataDir, DataLen);
+  Status = UsbBotSendCommand (UsbBot, Cmd, CmdLen, DataDir, DataLen, Lun);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "UsbBotExecCommand: UsbBotSendCommand (%r)\n", Status));
     return Status;
@@ -488,10 +490,10 @@ UsbBotResetDevice (
   }
 
   //
-  // Issue a class specific "Bulk-Only Mass Storage Reset reqest.
+  // Issue a class specific Bulk-Only Mass Storage Reset reqest.
   // See the spec section 3.1
   //
-  Request.RequestType = 0x21;
+  Request.RequestType = 0x21; // Class, Interface, Host to Device
   Request.Request     = USB_BOT_RESET_REQUEST;
   Request.Value       = 0;
   Request.Index       = UsbBot->Interface.InterfaceNumber;
@@ -528,6 +530,86 @@ UsbBotResetDevice (
   return Status;
 }
 
+/*++
+
+Routine Description:
+
+  Reset the mass storage device by BOT protocol
+
+Arguments:
+
+  Context - The context of the BOT protocol, that is, USB_BOT_PROTOCOL
+  MaxLun  - Return pointer to the max number of lun. Maxlun=1 means lun0 and 
+            lun1 in all.
+
+Returns:
+
+  EFI_SUCCESS - The device is reset
+  Others      - Failed to reset the device.
+
+--*/
+STATIC
+EFI_STATUS
+UsbBotGetMaxLun (
+  IN  VOID                    *Context,
+  IN  UINT8                   *MaxLun
+  )
+/*++
+
+Routine Description:
+
+  Reset the mass storage device by BOT protocol
+
+Arguments:
+
+  Context - The context of the BOT protocol, that is, USB_BOT_PROTOCOL
+  MaxLun  - Return pointer to the max number of lun. Maxlun=1 means lun0 and 
+            lun1 in all.
+
+Returns:
+
+  EFI_SUCCESS - The device is reset
+  Others      - Failed to reset the device.
+
+--*/
+{
+  USB_BOT_PROTOCOL        *UsbBot;
+  EFI_USB_DEVICE_REQUEST  Request;
+  EFI_STATUS              Status;
+  UINT32                  Result;
+  UINT32                  Timeout;
+
+  ASSERT (Context);
+  
+  UsbBot = (USB_BOT_PROTOCOL *) Context;
+
+  //
+  // Issue a class specific Bulk-Only Mass Storage get max lun reqest.
+  // See the spec section 3.2
+  //
+  Request.RequestType = 0xA1; // Class, Interface, Device to Host
+  Request.Request     = USB_BOT_GETLUN_REQUEST;
+  Request.Value       = 0;
+  Request.Index       = UsbBot->Interface.InterfaceNumber;
+  Request.Length      = 1;
+  Timeout             = USB_BOT_RESET_DEVICE_TIMEOUT / USB_MASS_1_MILLISECOND;
+
+  Status = UsbBot->UsbIo->UsbControlTransfer (
+                            UsbBot->UsbIo,
+                            &Request,
+                            EfiUsbDataIn,
+                            Timeout,
+                            (VOID *)MaxLun,
+                            1,
+                            &Result
+                            );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "UsbBotGetMaxLun: (%r)\n", Status));
+  }
+
+  return Status;
+}
 
 /**
   Clean up the resource used by this BOT protocol
@@ -554,5 +636,7 @@ mUsbBotTransport = {
   UsbBotInit,
   UsbBotExecCommand,
   UsbBotResetDevice,
+  UsbBotGetMaxLun,
   UsbBotFini
 };
+

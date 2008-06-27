@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -40,7 +40,6 @@ UsbCbiResetDevice (
   If Context isn't NULL, it will save its context in it.
 
   @param  UsbIo                 The USB IO to use
-  @param  Controller            The device controller
   @param  Context               The variable to save context in
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory
@@ -52,7 +51,6 @@ STATIC
 EFI_STATUS
 UsbCbiInit (
   IN  EFI_USB_IO_PROTOCOL   *UsbIo,
-  IN  EFI_HANDLE            Controller,
   OUT VOID                  **Context       OPTIONAL
   )
 {
@@ -413,6 +411,7 @@ UsbCbiGetStatus (
   @param  DataDir               The direction of data transfer
   @param  Data                  The buffer to hold the data
   @param  DataLen               The length of the buffer
+  @param  Lun                   Should be 0, this field for bot only
   @param  Timeout               The time to wait
   @param  CmdStatus             The result of the command execution
 
@@ -429,6 +428,7 @@ UsbCbiExecCommand (
   IN  EFI_USB_DATA_DIRECTION  DataDir,
   IN  VOID                    *Data,
   IN  UINT32                  DataLen,
+  IN  UINT8                   Lun,
   IN  UINT32                  Timeout,
   OUT UINT32                  *CmdStatus
   )
@@ -603,6 +603,7 @@ mUsbCbi0Transport = {
   UsbCbiInit,
   UsbCbiExecCommand,
   UsbCbiResetDevice,
+  NULL,
   UsbCbiFini
 };
 
@@ -612,5 +613,6 @@ mUsbCbi1Transport = {
   UsbCbiInit,
   UsbCbiExecCommand,
   UsbCbiResetDevice,
+  NULL,
   UsbCbiFini
 };
