@@ -1767,9 +1767,9 @@ DrawUnicodeWeightAtCursorN (
     if (!EFI_ERROR (Status)) {
       //
       // Line breaks are handled by caller of DrawUnicodeWeightAtCursorN, so the updated parameter RowInfoArraySize by StringToImage will
-      // always be 1. ASSERT here to make sure.
+      // always be 1 or 0 (if there is no valid Unicode Char can be printed). ASSERT here to make sure.
       //
-      ASSERT (RowInfoArraySize == 1);
+      ASSERT (RowInfoArraySize <= 1);
 
       Status = UgaDraw->Blt (
                           UgaDraw,
