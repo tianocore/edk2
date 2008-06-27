@@ -373,7 +373,7 @@ UsbMassInitTransport (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
-                  &UsbIo,
+                  (VOID **) &UsbIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -526,7 +526,7 @@ UsbMassInitMultiLun (
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiUsbIoProtocolGuid,
-                    &UsbIo,
+                    (VOID **) &UsbIo,
                     This->DriverBindingHandle,
                     UsbMass->Controller,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -597,7 +597,7 @@ UsbMassInitNonLun (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
-                  &UsbIo,
+                  (VOID **) &UsbIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -868,7 +868,7 @@ USBMassDriverBindingStop (
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiBlockIoProtocolGuid,
-                    &BlockIo,
+                    (VOID **) &BlockIo,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -973,7 +973,7 @@ USBMassDriverBindingStop (
       gBS->OpenProtocol (
              Controller,
              &gEfiUsbIoProtocolGuid,
-             &UsbIo,
+             (VOID **) &UsbIo,
              This->DriverBindingHandle,
              ChildHandleBuffer[Index],
              EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
