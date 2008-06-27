@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -163,6 +163,7 @@ UsbBootRequestSense (
                         EfiUsbDataIn,
                         &SenseData,
                         sizeof (USB_BOOT_REQUEST_SENSE_DATA),
+                        UsbMass->Lun,
                         USB_BOOT_GENERAL_CMD_TIMEOUT,
                         &CmdResult
                         );
@@ -280,6 +281,7 @@ UsbBootExecCmd (
                            DataDir,
                            Data,
                            DataLen,
+                           UsbMass->Lun,
                            Timeout,
                            &CmdResult
                            );

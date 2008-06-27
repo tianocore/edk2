@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,6 +36,7 @@ Revision History
 
 #include <Protocol/BlockIo.h>
 #include <Protocol/UsbIo.h>
+#include <Protocol/DevicePath.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -43,6 +44,7 @@ Revision History
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/DevicePathLib.h>
 
 #define USB_IS_IN_ENDPOINT(EndPointAddr)      (((EndPointAddr) & 0x80) == 0x80)
 #define USB_IS_OUT_ENDPOINT(EndPointAddr)     (((EndPointAddr) & 0x80) == 0)
@@ -85,7 +87,6 @@ typedef
 EFI_STATUS
 (*USB_MASS_INIT_TRANSPORT) (
   IN  EFI_USB_IO_PROTOCOL     *Usb,
-  IN  EFI_HANDLE              Controller,
   OUT VOID                    **Context    OPTIONAL
   );
 
@@ -98,6 +99,7 @@ EFI_STATUS
   IN  EFI_USB_DATA_DIRECTION  DataDir,
   IN  VOID                    *Data,
   IN  UINT32                  DataLen,
+  IN  UINT8                   Lun,
   IN  UINT32                  Timeout,
   OUT UINT32                  *CmdStatus
   );
@@ -107,6 +109,13 @@ EFI_STATUS
 (*USB_MASS_RESET) (
   IN  VOID                    *Context,
   IN  BOOLEAN                 ExtendedVerification
+  );
+
+typedef
+EFI_STATUS
+(*USB_MASS_GET_MAX_LUN) (
+  IN  VOID                    *Context,
+  IN  UINT8                   *MaxLun
   );
 
 typedef
@@ -128,6 +137,7 @@ typedef struct {
   USB_MASS_INIT_TRANSPORT Init;        // Initialize the mass storage transport protocol
   USB_MASS_EXEC_COMMAND   ExecCommand; // Transport command to the device then get result
   USB_MASS_RESET          Reset;       // Reset the device
+  USB_MASS_GET_MAX_LUN    GetMaxLun;   // Get max lun, only for bot
   USB_MASS_FINI           Fini;        // Clean up the resources.
 } USB_MASS_TRANSPORT;
 
