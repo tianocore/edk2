@@ -27,26 +27,26 @@
 ;
 ;-----------------------------------------------------------------------
 */
-@VectorTemplateBase:
+VectorTemplateBase:
         pushl %eax
         .byte 0x6a    #  push #VectorNum
-@VectorNum:
+VectorNum:
         .byte 0
         movl  CommonInterruptEntry, %eax
         jmp   *%eax
-@VectorTemplateEnd:
+VectorTemplateEnd:
 
 
 ASM_PFX(AsmGetVectorTemplatInfo):
         movl  4(%esp), %ecx
-        movl  $@VectorTemplateBase, (%ecx)
-        movl  $(@VectorTemplateEnd - @VectorTemplateBase), %eax
+        movl  $VectorTemplateBase, (%ecx)
+        movl  $(VectorTemplateEnd - VectorTemplateBase), %eax
         ret
 
 ASM_PFX(AsmVectorFixup):
         movl  8(%esp), %eax
         movl  4(%esp), %ecx
-        movb  %al, (@VectorNum - @VectorTemplateBase)(%ecx)
+        movb  %al, (VectorNum - VectorTemplateBase)(%ecx)
         ret
 
 /*
@@ -72,8 +72,8 @@ ASM_PFX(AsmVectorFixup):
 
 CommonInterruptEntry: 
         cli
-@@:
-        jmp   @@
+1:
+        jmp   1b
 
 
 
