@@ -983,6 +983,21 @@ SecNt32PeCoffRelocateImage (
      (unsigned long)ImageContext->ImageAddress,
      (unsigned long)ImageContext->EntryPoint);
 
+  Handle = dlopen(ImageContext->PdbPointer, RTLD_NOW);
+  
+  if (Handle) {
+    Entry = dlsym(Handle, "_ModuleEntryPoint");
+  } else {
+    printf("%s\n", dlerror());  
+  }
+  
+  if (Entry != NULL) {
+    ImageContext->EntryPoint = Entry;
+    printf("Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, Entry);
+  } else {
+    printf("Could not find _ModuleEntryPoint Entry, Module may be built error\n");
+  }
+
   SecUnixLoaderBreak ();
 
   return Status;

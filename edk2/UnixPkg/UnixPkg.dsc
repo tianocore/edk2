@@ -492,5 +492,5 @@
   }
 
 [BuildOptions]
-  #DEBUG_*_IA32_DLINK_FLAGS = --shared
+  DEBUG_*_IA32_DLINK_FLAGS = --shared
   *_*_IA32_CC_FLAGS = -idirafter/usr/include
