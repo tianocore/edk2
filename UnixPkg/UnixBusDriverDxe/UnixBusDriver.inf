@@ -1,0 +1,92 @@
+#/** @file
+# Unix Bus driver
+#
+# This following section documents the envirnoment variables for the Win NT
+#  build. These variables are used to define the (virtual) hardware
+#  configuration of the NT environment
+# Copyright (c) 2006, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UnixBusDriver
+  FILE_GUID                      = f320d656-8985-11db-90e0-0040d02b1835
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeUnixBusDriver
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gUnixBusDriverBinding                        
+#  COMPONENT_NAME                =  gUnixBusDriverComponentName                  
+#
+
+[Sources.common]
+  ComponentName.c
+  UnixBusDriver.c
+  UnixBusDriver.h
+  EntryPoint.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnixPkg/UnixPkg.dec
+
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  PcdLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+
+
+[Guids]
+  gEfiUnixConsoleGuid                          # ALWAYS_CONSUMED
+  gEfiUnixUgaGuid                              # ALWAYS_CONSUMED
+  gEfiUnixSerialPortGuid                       # ALWAYS_CONSUMED
+  gEfiUnixFileSystemGuid                       # ALWAYS_CONSUMED
+  gEfiUnixPhysicalDisksGuid                    # ALWAYS_CONSUMED
+  gEfiUnixVirtualDisksGuid                     # ALWAYS_CONSUMED
+  gEfiUnixCPUModelGuid
+  gEfiUnixCPUSpeedGuid
+  gEfiUnixMemoryGuid
+
+
+[Protocols]
+  gPcdProtocolGuid                              # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiUnixThunkProtocolGuid                     # PROTOCOL TO_START
+  gEfiUnixIoProtocolGuid                        # PROTOCOL BY_START
+
+
+[Pcd.common]
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixSerialPort
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuSpeed
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuModel
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixPhysicalDisk
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixVirtualDisk
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFileSystem
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixUga
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixConsole
+

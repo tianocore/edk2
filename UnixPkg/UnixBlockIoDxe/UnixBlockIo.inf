@@ -1,0 +1,71 @@
+#/** @file
+# Block Io driver
+#
+# Produce block IO abstractions for real devices on your PC using Unix APIs.
+#  The configuration of what devices to mount or emulate comes from
+#  environment variables.
+# Copyright (c) 2006, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UnixBlockIo
+  FILE_GUID                      = f3085888-8985-11db-9c93-0040d02b1835
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeUnixBlockIo
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gUnixBlockIoDriverBinding                    
+#  COMPONENT_NAME                =  gUnixBlockIoComponentName                    
+#  DRIVER_DIAG                   =  gUnixBlockIoDriverDiagnostics                
+#
+
+[Sources.common]
+  DriverDiagnostics.c
+  DriverConfiguration.c
+  ComponentName.c
+  UnixBlockIo.c
+  UnixBlockIo.h
+  EntryPoint.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnixPkg/UnixPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+
+
+[Guids]
+  gEfiUnixPhysicalDisksGuid                    # SOMETIMES_CONSUMED
+  gEfiUnixVirtualDisksGuid                     # ALWAYS_CONSUMED
+
+
+[Protocols]
+  gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
+  gEfiUnixIoProtocolGuid                        # PROTOCOL TO_START
+
