@@ -82,7 +82,6 @@ DhcpInitRequest (
   @retval EFI_ABORTED           The user function ask it to abort.
 
 **/
-STATIC
 EFI_STATUS
 DhcpCallUser (
   IN  DHCP_SERVICE          *DhcpSb,
@@ -250,7 +249,6 @@ DhcpSetState (
   @return None
 
 **/
-STATIC
 VOID
 DhcpSetTransmitTimer (
   IN DHCP_SERVICE           *DhcpSb
@@ -287,7 +285,6 @@ DhcpSetTransmitTimer (
   @return None
 
 **/
-STATIC
 VOID
 DhcpComputeLease (
   IN DHCP_SERVICE           *DhcpSb,
@@ -396,7 +393,6 @@ DhcpConfigLeaseIoPort (
   @retval EFI_SUCCESS           The lease is recorded.
 
 **/
-STATIC
 EFI_STATUS
 DhcpLeaseAcquired (
   IN DHCP_SERVICE           *DhcpSb
@@ -509,7 +505,6 @@ DhcpCleanLease (
   @retval EFI_SUCCESS           One of the offer is selected.
 
 **/
-STATIC
 EFI_STATUS
 DhcpChooseOffer (
   IN DHCP_SERVICE           *DhcpSb
@@ -591,7 +586,6 @@ DhcpChooseOffer (
   @return None
 
 **/
-STATIC
 VOID
 DhcpEndSession (
   IN DHCP_SERVICE           *DhcpSb,
@@ -623,7 +617,6 @@ DhcpEndSession (
   @retval Others                Some error occured.
 
 **/
-STATIC
 EFI_STATUS
 DhcpHandleSelect (
   IN DHCP_SERVICE           *DhcpSb,
@@ -698,7 +691,6 @@ ON_EXIT:
   @retval Others                Some error occured.
 
 **/
-STATIC
 EFI_STATUS
 DhcpHandleRequest (
   IN DHCP_SERVICE           *DhcpSb,
@@ -791,7 +783,6 @@ ON_EXIT:
   @retval Others                Some error occured.
 
 **/
-STATIC
 EFI_STATUS
 DhcpHandleRenewRebind (
   IN DHCP_SERVICE           *DhcpSb,
@@ -850,7 +841,7 @@ DhcpHandleRenewRebind (
   DhcpSb->LeaseLife = 0;
   DhcpSetState (DhcpSb, Dhcp4Bound, TRUE);
 
-  if (DhcpSb->ExtraRefresh) {
+  if (DhcpSb->ExtraRefresh != 0) {
     DhcpSb->ExtraRefresh  = FALSE;
 
     DhcpSb->IoStatus      = EFI_SUCCESS;
@@ -875,7 +866,6 @@ ON_EXIT:
   @retval Others                Some error occured.
 
 **/
-STATIC
 EFI_STATUS
 DhcpHandleReboot (
   IN DHCP_SERVICE           *DhcpSb,
@@ -1528,7 +1518,7 @@ DhcpOnTimerTick (
       // user, adjust the current state according to the lease life.
       // Otherwise do nothing to wait the lease to timeout
       //
-      if (DhcpSb->ExtraRefresh) {
+      if (DhcpSb->ExtraRefresh != 0) {
         Status = EFI_SUCCESS;
 
         if (DhcpSb->LeaseLife < DhcpSb->T1) {
@@ -1564,7 +1554,7 @@ DhcpOnTimerTick (
     // Don't timeout the lease, only count the life if user is
     // requesting extra renew/rebind. Adjust the state after that.
     //
-    if (DhcpSb->ExtraRefresh) {
+    if (DhcpSb->ExtraRefresh != 0) {
       return ;
     }
 

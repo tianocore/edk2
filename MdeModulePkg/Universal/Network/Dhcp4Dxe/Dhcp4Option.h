@@ -27,7 +27,7 @@ Abstract:
 //
 // DHCP option tags (types)
 //
-enum {
+typedef enum {
   //
   // RFC1497 vendor extensions
   //
@@ -132,12 +132,12 @@ enum {
   DHCP_TAG_T2              = 59,         // Rebinding (T2) Time Value
   DHCP_TAG_VENDOR_CLASS    = 60,         // Vendor class identifier
   DHCP_TAG_CLIENT_ID       = 61          // Client-identifier
-};
+} DHCP_TAGS;
 
-enum {
-  DHCP_OPTION_MAGIC        = 0x63538263, // Network byte order
-  DHCP_MAX_OPTIONS         = 256,
+#define DHCP_OPTION_MAGIC      0x63538263 // Network byte order
+#define DHCP_MAX_OPTIONS              256
 
+typedef enum {
   //
   // DHCP option types, this is used to validate the DHCP options.
   //
@@ -146,15 +146,17 @@ enum {
   DHCP_OPTION_INT16,
   DHCP_OPTION_INT32,
   DHCP_OPTION_IP,
-  DHCP_OPTION_IPPAIR,
+  DHCP_OPTION_IPPAIR
+} DHCP_OPTION_TYPE; 
 
+typedef enum {
   //
   // Value of DHCP overload option
   //
   DHCP_OVERLOAD_FILENAME   = 1,
   DHCP_OVERLOAD_SVRNAME    = 2,
   DHCP_OVERLOAD_BOTH       = 3
-};
+} DHCP_OVERLOAD_TYPE;
 
 //
 // The DHCP option structure. This structure extends the EFI_DHCP_OPTION
@@ -225,6 +227,21 @@ EFI_STATUS
   IN VOID                   *Context
   );
 
+/**
+  Iterate through a DHCP message to visit each option. First inspect
+  all the options in the OPTION field. Then if overloaded, inspect
+  the options in FILENAME and SERVERNAME fields. One option may be
+  encoded in several places. See RFC 3396 Encoding Long Options in DHCP
+
+  @param  Packet                 The DHCP packet to check the options for
+  @param  Check                  The callback function to be called for each option
+                                 found
+  @param  Context                The opaque parameter for Check
+
+  @retval EFI_SUCCESS            The DHCP packet's options are well formated
+  @retval Others                 The DHCP packet's options are not well formated
+
+**/
 EFI_STATUS
 DhcpIterateOptions (
   IN  EFI_DHCP4_PACKET      *Packet,
@@ -232,12 +249,51 @@ DhcpIterateOptions (
   IN  VOID                  *Context
   );
 
+/**
+  Validate the packet's options. If necessary, allocate
+  and fill in the interested parameters.
+
+  @param  Packet                 The packet to validate the options
+  @param  Para                   The variable to save the DHCP parameters.
+
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to validate the packet.
+  @retval EFI_INVALID_PARAMETER  The options are mal-formated
+  @retval EFI_SUCCESS            The options are parsed into OptionPoint
+
+**/
 EFI_STATUS
 DhcpValidateOptions (
   IN  EFI_DHCP4_PACKET      *Packet,
   OUT DHCP_PARAMETER        **Para          OPTIONAL
   );
 
+/**
+  Parse the options of a DHCP packet. It supports RFC 3396: Encoding
+  Long Options in DHCP. That is, it will combine all the option value
+  of all the occurances of each option.
+  A little bit of implemenation:
+  It adopts the "Key indexed counting" algorithm. First, it allocates
+  an array of 256 DHCP_OPTION_COUNTs because DHCP option tag is encoded
+  as a UINT8. It then iterates the DHCP packet to get data length of
+  each option by calling DhcpIterOptions with DhcpGetOptionLen. Now, it
+  knows the number of present options and their length. It allocates a
+  array of DHCP_OPTION and a continous buffer after the array to put
+  all the options' data. Each option's data is pointed to by the Data
+  field in DHCP_OPTION structure. At last, it call DhcpIterateOptions
+  with DhcpFillOption to fill each option's data to its position in the
+  buffer.
+
+  @param  Packet                 The DHCP packet to parse the options
+  @param  Count                  The number of valid dhcp options present in the
+                                 packet
+  @param  OptionPoint            The array that contains the DHCP options. Caller
+                                 should free it.
+
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to parse the packet.
+  @retval EFI_INVALID_PARAMETER  The options are mal-formated
+  @retval EFI_SUCCESS            The options are parsed into OptionPoint
+
+**/
 EFI_STATUS
 DhcpParseOption (
   IN  EFI_DHCP4_PACKET      *Packet,
@@ -245,6 +301,18 @@ DhcpParseOption (
   OUT DHCP_OPTION           **OptionPoint
   );
 
+/**
+  Append an option to the memory, if the option is longer than
+  255 bytes, splits it into several options.
+
+  @param  Buf                    The buffer to append the option to
+  @param  Tag                    The option's tag
+  @param  DataLen                The length of the option's data
+  @param  Data                   The option's data
+
+  @return The position to append the next option
+
+**/
 UINT8 *
 DhcpAppendOption (
   IN UINT8                  *Buf,
@@ -253,6 +321,22 @@ DhcpAppendOption (
   IN UINT8                  *Data
   );
 
+/**
+  Build a new DHCP packet from a seed packet. Options may be deleted or
+  appended. The caller should free the NewPacket when finished using it.
+
+  @param  SeedPacket             The seed packet to start with
+  @param  DeleteCount            The number of options to delete
+  @param  DeleteList             The options to delete from the packet
+  @param  AppendCount            The number of options to append
+  @param  AppendList             The options to append to the packet
+  @param  NewPacket              The new packet, allocated and built by this
+                                 function.
+
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
+  @retval EFI_SUCCESS            The packet is build.
+
+**/
 EFI_STATUS
 DhcpBuild (
   IN  EFI_DHCP4_PACKET         *SeedPacket,

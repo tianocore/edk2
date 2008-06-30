@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,7 +45,6 @@ EFI_DRIVER_BINDING_PROTOCOL gArpDriverBinding = {
   @retval other                  Failed to initialize the arp service context.
 
 **/
-STATIC
 EFI_STATUS
 ArpCreateService (
   IN EFI_HANDLE        ImageHandle,
@@ -200,7 +199,6 @@ ERROR_EXIT:
   @return None.
 
 **/
-STATIC
 VOID
 ArpCleanService (
   IN ARP_SERVICE_DATA  *ArpService
@@ -706,31 +704,23 @@ ArpServiceBindingDestroyChild (
   return Status;
 }
 
+/**
+  The entry point for Arp driver which installs the driver binding and component name
+  protocol on its ImageHandle.
 
+  @param  ImageHandle            The image handle of the driver.
+  @param  SystemTable            The system table.
+
+  @retval EFI_SUCCES             if the driver binding and component name protocols are successfully
+  @retval Others                 Failed to install the protocols.
+
+**/
 EFI_STATUS
 EFIAPI
 ArpDriverEntryPoint (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-  The entry point for Arp driver which installs the driver binding and component name
-  protocol on its ImageHandle.
-
-Arguments:
-
-  ImageHandle - The image handle of the driver.
-  SystemTable - The system table.
-
-Returns:
-
-  EFI_SUCCESS - if the driver binding and component name protocols are successfully
-                installed, otherwise if failed.
-
---*/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,

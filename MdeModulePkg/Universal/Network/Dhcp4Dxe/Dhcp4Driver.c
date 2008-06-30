@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,30 +36,22 @@ EFI_SERVICE_BINDING_PROTOCOL mDhcp4ServiceBindingTemplete = {
   Dhcp4ServiceBindingDestroyChild
 };
 
+/**
+  Entry point of the DHCP driver to install various protocols.
 
+  @param  ImageHandle            The image handle of the driver.
+  @param  SystemTable            The system table.
+
+  @retval EFI_SUCCES             if the driver binding and component name protocols are successfully
+  @retval Others                 Failed to install the protocols.
+
+**/
 EFI_STATUS
 EFIAPI
 Dhcp4DriverEntryPoint (
   IN EFI_HANDLE             ImageHandle,
   IN EFI_SYSTEM_TABLE       *SystemTable
   )
-/*++
-
-Routine Description:
-
-  Entry point of the DHCP driver to install various protocols.
-
-Arguments:
-
-  ImageHandle - The driver's image handle
-  SystemTable - The system table
-
-Returns:
-
-  EFI_SUCCESS - All the related protocols are installed.
-  Others      - Failed to install the protocols.
-
---*/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
@@ -432,7 +424,7 @@ Dhcp4DriverBindingStop (
 
 
 /**
-  Initialize a new DHCP child
+  Initialize a new DHCP child.
 
   @param  DhcpSb                 The dhcp service instance
   @param  Instance               The dhcp instance to initialize

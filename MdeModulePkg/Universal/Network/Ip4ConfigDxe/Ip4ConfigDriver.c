@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -60,30 +60,22 @@ EfiIp4ConfigUnload (
   return NetLibDefaultUnload (ImageHandle);
 }
 
+/**
+  The entry point for IP4 config driver which install the driver
+  binding and component name protocol on its image.
 
+  @param  ImageHandle            The image handle of the driver.
+  @param  SystemTable            The system table.
+
+  @retval EFI_SUCCES             All the related protocols are installed on the driver.
+  @retval Others                 Failed to install protocols.
+
+**/
 EFI_STATUS
 Ip4ConfigDriverEntryPoint (
   IN EFI_HANDLE             ImageHandle,
   IN EFI_SYSTEM_TABLE       *SystemTable
   )
-/*++
-
-Routine Description:
-
-  The entry point for IP4 config driver which install the driver
-  binding and component name protocol on its image.
-
-Arguments:
-
-  ImageHandle - The Image handle of the driver
-  SystemTable - The system table
-
-Returns:
-
-  EFI_SUCCESS - All the related protocols are installed on the driver
-  Others      - Failed to install the protocol
-
---*/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,

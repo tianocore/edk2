@@ -91,7 +91,7 @@ Ip4ConfigIsValid (
 
 
 /**
-  Read the ip4 configure variable from the EFI variable
+  Read the ip4 configure variable from the EFI variable.
 
   None
 
@@ -186,7 +186,7 @@ ON_ERROR:
 **/
 EFI_STATUS
 Ip4ConfigWriteVariable (
-  IN IP4_CONFIG_VARIABLE    * Config        OPTIONAL
+  IN IP4_CONFIG_VARIABLE    *Config        OPTIONAL
   )
 {
   EFI_STATUS                Status;

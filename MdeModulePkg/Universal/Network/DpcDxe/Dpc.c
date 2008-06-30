@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -299,29 +299,23 @@ DpcDispatchDpc (
   return ReturnStatus;
 }
 
+/**
+  The entry point for DPC driver which installs the EFI_DPC_PROTOCOL onto a new handle.
+
+  @param  ImageHandle            The image handle of the driver.
+  @param  SystemTable            The system table.
+
+  @retval EFI_SUCCES             The DPC queues were initialized and the EFI_DPC_PROTOCOL was
+                                 installed onto a new handle.
+  @retval Others                 Failed to install EFI_DPC_PROTOCOL.
+
+**/
 EFI_STATUS
 EFIAPI
 DpcDriverEntryPoint (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-  The entry point for DPC driver which installs the EFI_DPC_PROTOCOL onto a new handle.
-
-Arguments:
-
-  ImageHandle - The image handle of the driver.
-  SystemTable - The system table.
-
-Returns:
-
-  EFI_SUCCESS - The DPC queues were initialized and the EFI_DPC_PROTOCOL was
-                installed onto a new handle.
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       Index;

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,18 +42,20 @@ Abstract:
 
 typedef struct _IP4_CONFIG_INSTANCE IP4_CONFIG_INSTANCE;
 
-enum {
+typedef enum {
   IP4_CONFIG_STATE_IDLE         = 0,
   IP4_CONFIG_STATE_STARTED,
-  IP4_CONFIG_STATE_CONFIGURED,
+  IP4_CONFIG_STATE_CONFIGURED
+} IP4_CONFIG_STATE;
 
-  IP4_PROTO_ICMP                = 0x01,
-  IP4_CONFIG_INSTANCE_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', '4', 'C'),
+#define IP4_PROTO_ICMP                 0x01
+#define IP4_CONFIG_INSTANCE_SIGNATURE  EFI_SIGNATURE_32 ('I', 'P', '4', 'C')
 
+typedef enum {
   DHCP_TAG_PARA_LIST            = 55,
   DHCP_TAG_NETMASK              = 1,
   DHCP_TAG_ROUTER               = 3
-};
+} DHCP_TAGS;
 
 //
 // Configure the DHCP to request the routers and netmask
@@ -121,11 +123,27 @@ extern IP4_CONFIG_INSTANCE           *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIAB
 extern EFI_IP4_CONFIG_PROTOCOL       mIp4ConfigProtocolTemplate;
 extern EFI_NIC_IP4_CONFIG_PROTOCOL   mNicIp4ConfigProtocolTemplate;
 
+/**
+  Release all the DHCP related resources.
+
+  @param  This                   The IP4 configure instance
+
+  @return None
+
+**/
 VOID
 Ip4ConfigCleanDhcp4 (
   IN IP4_CONFIG_INSTANCE        *This
   );
 
+/**
+  Clean up all the configuration parameters.
+
+  @param  Instance               The IP4 configure instance
+
+  @return None
+
+**/
 VOID
 Ip4ConfigCleanConfig (
   IN IP4_CONFIG_INSTANCE        *Instance

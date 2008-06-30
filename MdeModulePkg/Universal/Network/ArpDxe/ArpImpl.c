@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -531,7 +531,6 @@ ArpTimerHandler (
   @return The two addresses match or not.
 
 **/
-STATIC
 BOOLEAN
 ArpMatchAddress (
   IN NET_ARP_ADDRESS  *AddressOne,
@@ -597,7 +596,7 @@ ArpFindNextCacheEntryInTable (
   for (Entry = StartEntry->ForwardLink; Entry != CacheTable; Entry = Entry->ForwardLink) {
     CacheEntry = NET_LIST_USER_STRUCT (Entry, ARP_CACHE_ENTRY, List);
 
-    if (FindOpType & MATCH_SW_ADDRESS) {
+    if ((FindOpType & MATCH_SW_ADDRESS) != 0) {
       //
       // Find by the software address.
       //
@@ -609,7 +608,7 @@ ArpFindNextCacheEntryInTable (
       }
     }
 
-    if (FindOpType & MATCH_HW_ADDRESS) {
+    if ((FindOpType & MATCH_HW_ADDRESS) != 0) {
       //
       // Find by the hardware address.
       //
@@ -930,7 +929,7 @@ ArpConfigureInstance (
       // The instance is not configured.
       //
 
-      if (ConfigData->SwAddressType == IPv4_ETHER_PROTO_TYPE) {
+      if (ConfigData->SwAddressType == IPV4_ETHER_PROTO_TYPE) {
         CopyMem (&Ip, ConfigData->StationAddress, sizeof (IP4_ADDR));
 
         if (!Ip4IsUnicast (NTOHL (Ip), 0)) {
@@ -1224,7 +1223,6 @@ CLEAN_EXIT:
   @return The count of the deleted cache entries.
 
 **/
-STATIC
 UINTN
 ArpDeleteCacheEntryInTable (
   IN LIST_ENTRY      *CacheTable,
