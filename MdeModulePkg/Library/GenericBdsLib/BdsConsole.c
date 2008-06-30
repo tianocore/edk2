@@ -254,7 +254,7 @@ BdsLibConnectConsoleVariable (
 
   gBS->FreePool (StartDevicePath);
 
-  if (DeviceExist == FALSE) {
+  if (!DeviceExist) {
     return EFI_NOT_FOUND;
   }
 
