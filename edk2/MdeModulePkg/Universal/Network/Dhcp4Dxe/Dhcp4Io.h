@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,18 +34,21 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 
 
-enum {
-  DHCP_WAIT_OFFER         = 3,              // Time to wait the offers
-  DHCP_DEFAULT_LEASE      = 7 *24 *60 *60,  // Seven days as default.
-  DHCP_SERVER_PORT        = 67,
-  DHCP_CLIENT_PORT        = 68,
 
+#define DHCP_WAIT_OFFER                 3  // Time to wait the offers
+#define DHCP_DEFAULT_LEASE  7 *24 *60 *60  // Seven days as default.
+#define DHCP_SERVER_PORT               67
+#define DHCP_CLIENT_PORT               68
+
+typedef enum {
   //
   // BOOTP header "op" field
   //
   BOOTP_REQUEST           = 1,
-  BOOTP_REPLY             = 2,
+  BOOTP_REPLY             = 2
+} DHCP_OP_TYPE;
 
+typedef enum {
   //
   // DHCP message types
   //
@@ -56,21 +59,38 @@ enum {
   DHCP_MSG_ACK            = 5,
   DHCP_MSG_NAK            = 6,
   DHCP_MSG_RELEASE        = 7,
-  DHCP_MSG_INFORM         = 8,
+  DHCP_MSG_INFORM         = 8
+} DHCP_MSG_TYPE;
 
+typedef enum {
   //
   // DHCP notify user type
   //
   DHCP_NOTIFY_COMPLETION  = 1,
   DHCP_NOTIFY_RENEWREBIND,
   DHCP_NOTIFY_ALL
-};
+} DHCP_NOTIFY_TYPE;
 
 #define DHCP_IS_BOOTP(Parameter)  (((Parameter) == NULL) || ((Parameter)->DhcpType == 0))
 
 #define DHCP_CONNECTED(State)     \
   (((State) == Dhcp4Bound) || ((State) == (Dhcp4Renewing)) || ((State) == Dhcp4Rebinding))
 
+/**
+  Set the DHCP state. If CallUser is true, it will try to notify
+  the user before change the state by DhcpNotifyUser. It returns
+  EFI_ABORTED if the user return EFI_ABORTED, otherwise, it returns
+  EFI_SUCCESS. If CallUser is FALSE, it isn't necessary to test
+  the return value of this function.
+
+  @param  DhcpSb                The DHCP service instance
+  @param  State                 The new DHCP state to change to
+  @param  CallUser              Whether we need to call user
+
+  @retval EFI_SUCCESS           The state is changed
+  @retval EFI_ABORTED           The user asks to abort the DHCP process.
+
+**/
 EFI_STATUS
 DhcpSetState (
   IN DHCP_SERVICE           *DhcpSb,
@@ -78,6 +98,24 @@ DhcpSetState (
   IN BOOLEAN                CallUser
   );
 
+/**
+  Build and transmit a DHCP message according to the current states.
+  This function implement the Table 5. of RFC 2131. Always transits
+  the state (as defined in Figure 5. of the same RFC) before sending
+  a DHCP message. The table is adjusted accordingly.
+
+  @param  DhcpSb                The DHCP service instance
+  @param  Seed                  The seed packet which the new packet is based on
+  @param  Para                  The DHCP parameter of the Seed packet
+  @param  Type                  The message type to send
+  @param  Msg                   The human readable message to include in the packet
+                                sent.
+
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resources for the packet
+  @retval EFI_ACCESS_DENIED     Failed to transmit the packet through UDP
+  @retval EFI_SUCCESS           The message is sent
+
+**/
 EFI_STATUS
 DhcpSendMessage (
   IN DHCP_SERVICE           *DhcpSb,
@@ -87,6 +125,19 @@ DhcpSendMessage (
   IN UINT8                  *Msg
   );
 
+/**
+  Each DHCP service has three timer. Two of them are count down timer.
+  One for the packet retransmission. The other is to collect the offers.
+  The third timer increaments the lease life which is compared to T1, T2,
+  and lease to determine the time to renew and rebind the lease.
+  DhcpOnTimerTick will be called once every second.
+
+  @param  Event                 The timer event
+  @param  Context               The context, which is the DHCP service instance.
+
+  @return None
+
+**/
 VOID
 EFIAPI
 DhcpOnTimerTick (
@@ -94,6 +145,18 @@ DhcpOnTimerTick (
   IN VOID                   *Context
   );
 
+/**
+  Handle the received DHCP packets. This function drivers the DHCP
+  state machine.
+
+  @param  UdpPacket             The UDP packets received.
+  @param  Points                The local/remote UDP access points
+  @param  IoStatus              The status of the UDP receive
+  @param  Context               The opaque parameter to the function.
+
+  @return None
+
+**/
 VOID
 DhcpInput (
   NET_BUF                   *UdpPacket,
@@ -102,16 +165,44 @@ DhcpInput (
   VOID                      *Context
   );
 
+/**
+  Send an initial DISCOVER or REQUEST message according to the
+  DHCP service's current state.
+
+  @param  DhcpSb                The DHCP service instance
+
+  @retval EFI_SUCCESS           The request has been sent
+
+**/
 EFI_STATUS
 DhcpInitRequest (
   IN DHCP_SERVICE           *DhcpSb
   );
 
+/**
+  Clean up the DHCP related states, IoStatus isn't reset.
+
+  @param  DhcpSb                The DHCP instance service.
+
+  @return None
+
+**/
 VOID
 DhcpCleanLease (
   IN DHCP_SERVICE           *DhcpSb
   );
 
+/**
+  Release the net buffer when packet is sent.
+
+  @param  UdpPacket             The UDP packets received.
+  @param  Points                The local/remote UDP access points
+  @param  IoStatus              The status of the UDP receive
+  @param  Context               The opaque parameter to the function.
+
+  @return None
+
+**/
 VOID
 DhcpOnPacketSent (
   NET_BUF                   *Packet,

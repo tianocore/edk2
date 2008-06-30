@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,9 +27,7 @@ Abstract:
 // to validate a dhcp message. Refere the comments of the
 // DHCP_OPTION_FORMAT structure.
 //
-STATIC
-DHCP_OPTION_FORMAT
-DhcpOptionFormats [] = {
+STATIC DHCP_OPTION_FORMAT DhcpOptionFormats[] = {
   {DHCP_TAG_NETMASK,        DHCP_OPTION_IP,     1, 1  , TRUE},
   {DHCP_TAG_TIME_OFFSET,    DHCP_OPTION_INT32,  1, 1  , FALSE},
   {DHCP_TAG_ROUTER,         DHCP_OPTION_IP,     1, -1 , TRUE},
@@ -127,7 +125,6 @@ DhcpOptionFormats [] = {
   @return The point to the option's format, NULL if not found.
 
 **/
-STATIC
 DHCP_OPTION_FORMAT *
 DhcpFindOptionFormat (
   IN UINT8                  Tag
@@ -168,7 +165,6 @@ DhcpFindOptionFormat (
   @return TRUE is the option is valid, otherwise FALSE.
 
 **/
-STATIC
 BOOLEAN
 DhcpOptionIsValid (
   IN DHCP_OPTION_FORMAT     *Format,
@@ -249,7 +245,6 @@ DhcpOptionIsValid (
   @retval EFI_INVALID_PARAMETER  The DHCP option is mal-formated
 
 **/
-STATIC
 EFI_STATUS
 DhcpGetParameter (
   IN UINT8                  Tag,
@@ -323,7 +318,6 @@ DhcpGetParameter (
   @retval EFI_INVALID_PARAMETER  The options are mal-formated.
 
 **/
-STATIC
 EFI_STATUS
 DhcpIterateBufferOptions (
   IN  UINT8                 *Buffer,
@@ -468,7 +462,6 @@ DhcpIterateOptions (
   @retval EFI_SUCCESS            It always returns EFI_SUCCESS.
 
 **/
-STATIC
 EFI_STATUS
 DhcpGetOptionLen (
   IN UINT8                  Tag,
@@ -499,7 +492,6 @@ DhcpGetOptionLen (
   @retval EFI_SUCCESS            It always returns EFI_SUCCESS
 
 **/
-STATIC
 EFI_STATUS
 DhcpFillOption (
   IN UINT8                  Tag,

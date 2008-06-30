@@ -24,6 +24,16 @@ Abstract:
 
 IP4_CONFIG_INSTANCE *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
 
+/**
+  Callback function when DHCP process finished. It will save the
+  retrieved IP configure parameter from DHCP to the NVRam.
+
+  @param  Event                  The callback event
+  @param  Context                Opaque context to the callback
+
+  @return None
+
+**/
 VOID
 EFIAPI
 Ip4ConfigOnDhcp4Complete (
@@ -44,7 +54,6 @@ Ip4ConfigOnDhcp4Complete (
   @retval EFI_SUCCESS            The name or address of the NIC are returned.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiNicIp4ConfigGetName (
@@ -733,7 +742,7 @@ Ip4ConfigCleanDhcp4 (
 
 
 /**
-  Clean up all the configuration parameters
+  Clean up all the configuration parameters.
 
   @param  Instance               The IP4 configure instance
 

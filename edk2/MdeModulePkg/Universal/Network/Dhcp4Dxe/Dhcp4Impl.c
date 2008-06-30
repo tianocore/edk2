@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,7 +35,6 @@ Abstract:
                                  operation parameter.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4GetModeData (
@@ -286,7 +285,6 @@ DhcpYieldControl (
   @retval EFI_SUCCESS            The child is configured.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4Configure (
@@ -407,7 +405,6 @@ ON_EXIT:
   @retval EFI_SUCCESS            The DHCP process is started.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4Start (
@@ -497,7 +494,6 @@ ON_ERROR:
   @retval EFI_SUCCESS            The DHCP is renewed/rebound.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4RenewRebind (
@@ -597,7 +593,6 @@ ON_ERROR:
   @retval EFI_SUCCESS            The lease is released.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4Release (
@@ -664,7 +659,6 @@ ON_EXIT:
   @retval EFI_SUCCESS            The DHCP process is stopped.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4Stop (
@@ -719,7 +713,6 @@ EfiDhcp4Stop (
   @retval EFI_SUCCESS            The packet is build.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4Build (
@@ -762,7 +755,6 @@ EfiDhcp4Build (
            );
 }
 
-STATIC
 EFI_STATUS
 Dhcp4InstanceConfigUdpIo (
   IN UDP_IO_PORT  *UdpIo,
@@ -801,7 +793,6 @@ Dhcp4InstanceConfigUdpIo (
   return UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfigData);
 }
 
-STATIC
 EFI_STATUS
 Dhcp4InstanceCreateUdpIo (
   IN DHCP_PROTOCOL  *Instance
@@ -820,7 +811,6 @@ Dhcp4InstanceCreateUdpIo (
   }
 }
 
-STATIC
 VOID
 DhcpDummyExtFree (
   IN VOID                   *Arg
@@ -998,7 +988,6 @@ SIGNAL_USER:
   @retval Others                Some other unexpected error occurred.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4TransmitReceive (
@@ -1165,7 +1154,6 @@ ON_ERROR:
   @retval EFI_SUCCESS            It always returns EFI_SUCCESS
 
 **/
-STATIC
 EFI_STATUS
 Dhcp4ParseCheckOption (
   IN UINT8                  Tag,
@@ -1207,7 +1195,6 @@ Dhcp4ParseCheckOption (
   @retval EFI_SUCCESS            The options are parsed.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiDhcp4Parse (

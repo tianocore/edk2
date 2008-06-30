@@ -48,10 +48,10 @@ typedef struct _DHCP_PROTOCOL DHCP_PROTOCOL;
 #include "Dhcp4Option.h"
 #include "Dhcp4Io.h"
 
-enum {
-  DHCP_SERVICE_SIGNATURE  = EFI_SIGNATURE_32 ('D', 'H', 'C', 'P'),
-  DHCP_PROTOCOL_SIGNATURE = EFI_SIGNATURE_32 ('d', 'h', 'c', 'p'),
+#define DHCP_SERVICE_SIGNATURE   EFI_SIGNATURE_32 ('D', 'H', 'C', 'P')
+#define DHCP_PROTOCOL_SIGNATURE  EFI_SIGNATURE_32 ('d', 'h', 'c', 'p')
 
+typedef enum {
   //
   // The state of the DHCP service. It starts as UNCONFIGED. If
   // and active child configures the service successfully, it
@@ -62,7 +62,7 @@ enum {
   DHCP_UNCONFIGED         = 0,
   DHCP_CONFIGED,
   DHCP_DESTORY
-};
+} DHCP_STATE;
 
 struct _DHCP_PROTOCOL {
   UINT32                            Signature;
@@ -153,6 +153,16 @@ typedef struct {
 
 extern EFI_DHCP4_PROTOCOL mDhcp4ProtocolTemplate;
 
+/**
+  Give up the control of the DHCP service to let other child
+  resume. Don't change the service's DHCP state and the Client
+  address and option list configure as required by RFC2131.
+
+  @param  DhcpSb                 The DHCP service instance.
+
+  @return None
+
+**/
 VOID
 DhcpYieldControl (
   IN DHCP_SERVICE         *DhcpSb

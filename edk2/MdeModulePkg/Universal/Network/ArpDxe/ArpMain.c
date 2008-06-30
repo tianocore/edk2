@@ -495,7 +495,7 @@ ArpRequest (
   SnpMode    = &ArpService->SnpMode;
 
   if ((TargetSwAddress == NULL) ||
-    ((Instance->ConfigData.SwAddressType == IPv4_ETHER_PROTO_TYPE) &&
+    ((Instance->ConfigData.SwAddressType == IPV4_ETHER_PROTO_TYPE) &&
     IP4_IS_LOCAL_BROADCAST (*((UINT32 *)TargetSwAddress)))) {
     //
     // Return the hardware broadcast address.
@@ -505,7 +505,7 @@ ArpRequest (
     goto SIGNAL_USER;
   }
 
-  if ((Instance->ConfigData.SwAddressType == IPv4_ETHER_PROTO_TYPE) &&
+  if ((Instance->ConfigData.SwAddressType == IPV4_ETHER_PROTO_TYPE) &&
     IP4_IS_MULTICAST (NTOHL (*((UINT32 *)TargetSwAddress)))) {
     //
     // If the software address is an IPv4 multicast address, invoke Mnp to
