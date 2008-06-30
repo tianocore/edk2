@@ -1,0 +1,97 @@
+#/** @file
+#
+# This is the Unix Emulation Environment Platform
+#
+# Reference platform implementation using an emulator.
+# Copyright (c) 2008, Intel Corporation.
+#
+#  All rights reserved.
+#    This program and the accompanying materials are licensed and made available 
+#    under the terms and conditions of the BSD License which accompanies this distribution.
+#    The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
+#    OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_VERSION                    = 0x00010005
+  PACKAGE_NAME                   = EdkUnixPkg
+  PACKAGE_GUID                   = f2805c44-8985-11db-9e98-0040d02b1835
+  PACKAGE_VERSION                = 0.1
+
+
+[Includes.common]
+  Include
+
+
+[LibraryClasses.common]
+  UnixLib|Include/Library/UnixLib.h
+
+
+[Protocols.common]
+  gEfiUnixIoProtocolGuid         = {0xf2e23f54, 0x8985, 0x11db, {0xac, 0x79, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixUgaIoProtocolGuid      = {0xf2e5e2c6, 0x8985, 0x11db, {0xa1, 0x91, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixThunkProtocolGuid      = {0xf2e98868, 0x8985, 0x11db, {0x9a, 0x59, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+
+
+[Ppis.common]
+  gPeiUnixAutoScanPpiGuid        = {0xf2ed3d14, 0x8985, 0x11db, {0xb0, 0x57, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gUnixFwhPpiGuid                = {0xf2f0dc30, 0x8985, 0x11db, {0xa1, 0x5b, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gUnixPeiLoadFilePpiGuid        = {0xf2f48768, 0x8985, 0x11db, {0xb8, 0xda, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gPeiUnixThunkPpiGuid           = {0xf2f830f2, 0x8985, 0x11db, {0x80, 0x6b, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+
+
+[Guids.common]
+  gEfiUnixPkgTokenSpaceGuid      = {0xf2b6838c, 0x8985, 0x11db, {0x9d, 0x1c, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixVirtualDisksGuid       = {0xf2ba331a, 0x8985, 0x11db, {0xa4, 0x06, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixPhysicalDisksGuid      = {0xf2bdcc96, 0x8985, 0x11db, {0x87, 0x19, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixFileSystemGuid         = {0xf2c16b9e, 0x8985, 0x11db, {0x92, 0xc8, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixUgaGuid                = {0xf2c8b80e, 0x8985, 0x11db, {0x93, 0xf1, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixConsoleGuid            = {0xf2cc5d06, 0x8985, 0x11db, {0xbb, 0x19, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixMemoryGuid             = {0xf2d006cc, 0x8985, 0x11db, {0xa4, 0x72, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixCPUModelGuid           = {0xf2d3b330, 0x8985, 0x11db, {0x8a, 0xa3, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixCPUSpeedGuid           = {0xf2d74e5a, 0x8985, 0x11db, {0x97, 0x05, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35}}
+  gEfiUnixSerialPortGuid         = {0x6d3a727d, 0x66c8, 0x4d19, {0x87, 0xe6, 0x02, 0x15, 0x86, 0x14, 0x90, 0xf3}}
+  gEfiFlashMapHobGuid            = {0xb091e7d2, 0x05a0, 0x4198, {0x94, 0xf0, 0x74, 0xb7, 0xb8, 0xc5, 0x54, 0x59}}
+
+
+[PcdsFixedAtBuild.common]
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixBootMode|1|UINT32|0x00001006
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c
+  
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageVariableBase|0x0|UINT32|0x00001014
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageFtwSpareBase|0x0|UINT32|0x00001015
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageFtwWorkingBase|0x0|UINT32|0x00001016
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress|0x0|UINT32|0x00001017
+
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogBase|0x0|UINT32|0x0000100e
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoveryBase|0x0|UINT32|0x00001010
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoverySize|0x0|UINT32|0x00001011
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize|0x0|UINT32|0x00001012
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareBlockSize|0|UINT32|0x00001013
+
+
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
+
+
+[PcdsDynamic.common]
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixPhysicalDisk|L"E:RW;245760;512"|VOID*|0x00001000
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixUga|L"UGA Window"|VOID*|0x00001003
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFileSystem|L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"|VOID*|0x00001004
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize|L"64!64"|VOID*|0x00001005
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuModel|L"Intel(R) Processor Model"|VOID*|0x00001007
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixCpuSpeed|L"3000"|VOID*|0x00001008
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixConsole|L"Bus Driver Console Window"|VOID*|0x0000100a
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixSerialPort|L"/dev/ttyS0"|VOID*|0x00001002
+
+
+[PcdsPatchableInModule.common]
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixBootMode|1|UINT32|0x00001006
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c
+
+

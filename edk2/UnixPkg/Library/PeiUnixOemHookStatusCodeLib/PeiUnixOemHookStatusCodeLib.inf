@@ -1,0 +1,61 @@
+#/** @file
+# Memory Status Code Library for UEFI drivers
+#
+# Lib to provide memory journal status code reporting Routines
+# Copyright (c) 2007, Intel Corporation.
+#
+#  All rights reserved.
+#  This software and associated documentation (if any) is furnished
+#  under a license and may only be used or copied in accordance
+#  with the terms of the license. Except as permitted by such
+#  license, no part of this software or documentation may be
+#  reproduced, stored in a retrieval system, or transmitted in any
+#  form or by any means without the express written consent of
+#  Intel Corporation.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiUnixOemHookStatusCodeLib
+  FILE_GUID                      = 23E378C1-B199-49ad-9F14-DAF5D3C7EC28
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = OemHookStatusCodeLib|PEIM 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources.common]
+  UnixOemHookStatusCodeLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnixPkg/UnixPkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+
+[LibraryClasses]
+  PeiServicesLib
+  ReportStatusCodeLib
+  BaseMemoryLib
+  PrintLib
+  DebugLib
+
+
+[Guids]
+  gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED
+
+
+[Ppis]
+  gPeiUnixThunkPpiGuid                          # PPI ALWAYS_CONSUMED
+
