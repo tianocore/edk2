@@ -13,14 +13,30 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
+
 **/
 
 
 #include "ConSplitter.h"
 
 
-static CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
+STATIC CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
+
+/**
+  Return the current video mode information. Also returns info about existence
+  of Graphics Output devices or UGA Draw devices in system, and if the Std In device is locked. All the
+  arguments are optional and only returned if a non NULL pointer is passed in.
+
+  @param  This                    Protocol instance pointer.
+  @param  Mode                    Are we in text of grahics mode.
+  @param  GopExists               TRUE if GOP Spliter has found a GOP/UGA device
+  @param  StdInLocked             TRUE if StdIn device is keyboard locked
+
+  @retval EFI_SUCCESS             Mode information returned.
+  @retval EFI_INVALID_PARAMETER   Invalid parameters.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSpliterConsoleControlGetMode (
@@ -29,24 +45,6 @@ ConSpliterConsoleControlGetMode (
   OUT BOOLEAN                         *GopExists,
   OUT BOOLEAN                         *StdInLocked
   )
-/*++
-
-  Routine Description:
-    Return the current video mode information. Also returns info about existence
-    of Graphics Output devices or UGA Draw devices in system, and if the Std In device is locked. All the
-    arguments are optional and only returned if a non NULL pointer is passed in.
-
-  Arguments:
-    This - Protocol instance pointer.
-    Mode        - Are we in text of grahics mode.
-    GopExists   - TRUE if GOP Spliter has found a GOP/UGA device
-    StdInLocked - TRUE if StdIn device is keyboard locked
-
-  Returns:
-    EFI_SUCCESS - Mode information returned.
-    EFI_INVALID_PARAMETER - Invalid parameters.
-
---*/
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
   UINTN                           Index;
@@ -76,28 +74,25 @@ ConSpliterConsoleControlGetMode (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Set the current mode to either text or graphics. Graphics is
+  for Quiet Boot.
+
+  @param  This                    Protocol instance pointer.
+  @param  Mode                    Mode to set the
+
+  @retval EFI_SUCCESS             Mode information returned.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_UNSUPPORTED         Operation unsupported.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSpliterConsoleControlSetMode (
   IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
   IN  EFI_CONSOLE_CONTROL_SCREEN_MODE Mode
   )
-/*++
-
-  Routine Description:
-    Set the current mode to either text or graphics. Graphics is
-    for Quiet Boot.
-
-  Arguments:
-    This  - Protocol instance pointer.
-    Mode  - Mode to set the
-
-  Returns:
-    EFI_SUCCESS     - Mode information returned.
-    EFI_INVALID_PARAMETER - Invalid parameter.
-    EFI_UNSUPPORTED - Operation unsupported.
-
---*/
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
   UINTN                           Index;
@@ -154,6 +149,25 @@ ConSpliterConsoleControlSetMode (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Return the current video mode information.
+
+  @param  This                    Protocol instance pointer.
+  @param  ModeNumber              The mode number to return information on.
+  @param  SizeOfInfo              A pointer to the size, in bytes, of the Info
+                                  buffer.
+  @param  Info                    Caller allocated buffer that returns information
+                                  about ModeNumber.
+
+  @retval EFI_SUCCESS             Mode information returned.
+  @retval EFI_BUFFER_TOO_SMALL    The Info buffer was too small.
+  @retval EFI_DEVICE_ERROR        A hardware error occurred trying to retrieve the
+                                  video mode.
+  @retval EFI_NOT_STARTED         Video display is not initialized. Call SetMode ()
+  @retval EFI_INVALID_PARAMETER   One of the input args was NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSpliterGraphicsOutputQueryMode (
@@ -162,25 +176,6 @@ ConSpliterGraphicsOutputQueryMode (
   OUT UINTN                                 *SizeOfInfo,
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
   )
-/*++
-
-  Routine Description:
-    Return the current video mode information.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    ModeNumber            - The mode number to return information on.
-    Info                  - Caller allocated buffer that returns information about ModeNumber.
-    SizeOfInfo            - A pointer to the size, in bytes, of the Info buffer.
-
-  Returns:
-    EFI_SUCCESS           - Mode information returned.
-    EFI_BUFFER_TOO_SMALL  - The Info buffer was too small.
-    EFI_DEVICE_ERROR      - A hardware error occurred trying to retrieve the video mode.
-    EFI_NOT_STARTED       - Video display is not initialized. Call SetMode ()
-    EFI_INVALID_PARAMETER - One of the input args was NULL.
-
---*/
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
 
@@ -210,28 +205,25 @@ ConSpliterGraphicsOutputQueryMode (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Graphics output protocol interface to set video mode
+
+  @param  This                    Protocol instance pointer.
+  @param  ModeNumber              The mode number to be set.
+
+  @retval EFI_SUCCESS             Graphics mode was changed.
+  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
+                                  the request.
+  @retval EFI_UNSUPPORTED         ModeNumber is not supported by this device.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSpliterGraphicsOutputSetMode (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
   IN  UINT32                       ModeNumber
   )
-/*++
-
-Routine Description:
-
-  Graphics output protocol interface to set video mode
-
-  Arguments:
-    This             - Protocol instance pointer.
-    ModeNumber       - The mode number to be set.
-
-  Returns:
-    EFI_SUCCESS      - Graphics mode was changed.
-    EFI_DEVICE_ERROR - The device had an error and could not complete the request.
-    EFI_UNSUPPORTED  - ModeNumber is not supported by this device.
-
---*/
 {
   EFI_STATUS                             Status;
   TEXT_OUT_SPLITTER_PRIVATE_DATA         *Private;
@@ -338,7 +330,6 @@ Routine Description:
   return ReturnStatus;
 }
 
-STATIC
 EFI_STATUS
 DevNullGraphicsOutputBlt (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA                *Private,
@@ -393,7 +384,7 @@ DevNullGraphicsOutputBlt (
 
     BltPtr    = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltBuffer + DestinationY * Delta + DestinationX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     ScreenPtr = &Private->GraphicsOutputBlt[SourceY * HorizontalResolution + SourceX];
-    while (Height) {
+    while (Height > 0) {
       CopyMem (BltPtr, ScreenPtr, Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
       BltPtr = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltPtr + Delta);
       ScreenPtr += HorizontalResolution;
@@ -456,6 +447,53 @@ DevNullGraphicsOutputBlt (
   return EFI_SUCCESS;
 }
 
+
+/**
+  The following table defines actions for BltOperations.
+
+  EfiBltVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY)
+  directly to every pixel of the video display rectangle
+  (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height).
+  Only one pixel will be used from the BltBuffer. Delta is NOT used.
+  EfiBltVideoToBltBuffer - Read data from the video display rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
+  the BltBuffer rectangle (DestinationX, DestinationY )
+  (DestinationX + Width, DestinationY + Height). If DestinationX or
+  DestinationY is not zero then Delta must be set to the length in bytes
+  of a row in the BltBuffer.
+  EfiBltBufferToVideo - Write data from the  BltBuffer rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
+  video display rectangle (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
+  not zero then Delta must be set to the length in bytes of a row in the
+  BltBuffer.
+  EfiBltVideoToVideo - Copy from the video display rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
+  to the video display rectangle (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height).
+  The BltBuffer and Delta  are not used in this mode.
+
+  @param  This                    Protocol instance pointer.
+  @param  BltBuffer               Buffer containing data to blit into video buffer.
+                                  This buffer has a size of
+                                  Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+  @param  BltOperation            Operation to perform on BlitBuffer and video
+                                  memory
+  @param  SourceX                 X coordinate of source for the BltBuffer.
+  @param  SourceY                 Y coordinate of source for the BltBuffer.
+  @param  DestinationX            X coordinate of destination for the BltBuffer.
+  @param  DestinationY            Y coordinate of destination for the BltBuffer.
+  @param  Width                   Width of rectangle in BltBuffer in pixels.
+  @param  Height                  Hight of rectangle in BltBuffer in pixels. Delta
+                                         -
+
+  @retval EFI_SUCCESS             The Blt operation completed.
+  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
+  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video
+                                  buffer.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSpliterGraphicsOutputBlt (
@@ -470,53 +508,6 @@ ConSpliterGraphicsOutputBlt (
   IN  UINTN                                         Height,
   IN  UINTN                                         Delta         OPTIONAL
   )
-/*++
-
-  Routine Description:
-    The following table defines actions for BltOperations:
-    EfiBltVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY)
-      directly to every pixel of the video display rectangle
-      (DestinationX, DestinationY)
-      (DestinationX + Width, DestinationY + Height).
-      Only one pixel will be used from the BltBuffer. Delta is NOT used.
-    EfiBltVideoToBltBuffer - Read data from the video display rectangle
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
-      the BltBuffer rectangle (DestinationX, DestinationY )
-      (DestinationX + Width, DestinationY + Height). If DestinationX or
-      DestinationY is not zero then Delta must be set to the length in bytes
-      of a row in the BltBuffer.
-    EfiBltBufferToVideo - Write data from the  BltBuffer rectangle
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
-      video display rectangle (DestinationX, DestinationY)
-      (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
-      not zero then Delta must be set to the length in bytes of a row in the
-      BltBuffer.
-    EfiBltVideoToVideo - Copy from the video display rectangle
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
-      to the video display rectangle (DestinationX, DestinationY)
-      (DestinationX + Width, DestinationY + Height).
-     The BltBuffer and Delta  are not used in this mode.
-
-  Arguments:
-    This          - Protocol instance pointer.
-    BltBuffer     - Buffer containing data to blit into video buffer. This
-                    buffer has a size of Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
-    BltOperation  - Operation to perform on BlitBuffer and video memory
-    SourceX       - X coordinate of source for the BltBuffer.
-    SourceY       - Y coordinate of source for the BltBuffer.
-    DestinationX  - X coordinate of destination for the BltBuffer.
-    DestinationY  - Y coordinate of destination for the BltBuffer.
-    Width         - Width of rectangle in BltBuffer in pixels.
-    Height        - Hight of rectangle in BltBuffer in pixels.
-    Delta         -
-
-  Returns:
-    EFI_SUCCESS           - The Blt operation completed.
-    EFI_INVALID_PARAMETER - BltOperation is not valid.
-    EFI_DEVICE_ERROR      - A hardware error occured writting to the video
-                             buffer.
-
---*/
 {
   EFI_STATUS                      Status;
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
@@ -640,6 +631,21 @@ DevNullGopSync (
   }
 }
 
+
+/**
+  Return the current video mode information.
+
+  @param  This                    Protocol instance pointer.
+  @param  HorizontalResolution    Current video horizontal resolution in pixels
+  @param  VerticalResolution      Current video vertical resolution in pixels
+  @param  ColorDepth              Current video color depth in bits per pixel
+  @param  RefreshRate             Current video refresh rate in Hz.
+
+  @retval EFI_SUCCESS             Mode information returned.
+  @retval EFI_NOT_STARTED         Video display is not initialized. Call SetMode ()
+  @retval EFI_INVALID_PARAMETER   One of the input args was NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSpliterUgaDrawGetMode (
@@ -649,28 +655,13 @@ ConSpliterUgaDrawGetMode (
   OUT UINT32                          *ColorDepth,
   OUT UINT32                          *RefreshRate
   )
-/*++
-
-  Routine Description:
-    Return the current video mode information.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    HorizontalResolution  - Current video horizontal resolution in pixels
-    VerticalResolution    - Current video vertical resolution in pixels
-    ColorDepth            - Current video color depth in bits per pixel
-    RefreshRate           - Current video refresh rate in Hz.
-
-  Returns:
-    EFI_SUCCESS           - Mode information returned.
-    EFI_NOT_STARTED       - Video display is not initialized. Call SetMode ()
-    EFI_INVALID_PARAMETER - One of the input args was NULL.
-
---*/
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
 
-  if (!(HorizontalResolution && VerticalResolution && RefreshRate && ColorDepth)) {
+  if ((HorizontalResolution == NULL) ||
+	  (VerticalResolution   == NULL) ||
+	  (RefreshRate          == NULL) ||
+	  (ColorDepth           == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -686,6 +677,21 @@ ConSpliterUgaDrawGetMode (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Return the current video mode information.
+
+  @param  This                    Protocol instance pointer.
+  @param  HorizontalResolution    Current video horizontal resolution in pixels
+  @param  VerticalResolution      Current video vertical resolution in pixels
+  @param  ColorDepth              Current video color depth in bits per pixel
+  @param  RefreshRate             Current video refresh rate in Hz.
+
+  @retval EFI_SUCCESS             Mode information returned.
+  @retval EFI_NOT_STARTED         Video display is not initialized. Call SetMode ()
+  @retval EFI_OUT_OF_RESOURCES    Out of resources.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSpliterUgaDrawSetMode (
@@ -695,24 +701,6 @@ ConSpliterUgaDrawSetMode (
   IN UINT32                           ColorDepth,
   IN UINT32                           RefreshRate
   )
-/*++
-
-  Routine Description:
-    Return the current video mode information.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    HorizontalResolution  - Current video horizontal resolution in pixels
-    VerticalResolution    - Current video vertical resolution in pixels
-    ColorDepth            - Current video color depth in bits per pixel
-    RefreshRate           - Current video refresh rate in Hz.
-
-  Returns:
-    EFI_SUCCESS     - Mode information returned.
-    EFI_NOT_STARTED - Video display is not initialized. Call SetMode ()
-    EFI_OUT_OF_RESOURCES - Out of resources.
-
---*/
 {
   EFI_STATUS                             Status;
   TEXT_OUT_SPLITTER_PRIVATE_DATA         *Private;
@@ -865,7 +853,7 @@ DevNullUgaBlt (
 
     BltPtr    = (EFI_UGA_PIXEL *) ((UINT8 *) BltBuffer + DestinationY * Delta + DestinationX * sizeof (EFI_UGA_PIXEL));
     ScreenPtr = &Private->UgaBlt[SourceY * HorizontalResolution + SourceX];
-    while (Height) {
+    while (Height > 0) {
       CopyMem (BltPtr, ScreenPtr, Width * sizeof (EFI_UGA_PIXEL));
       BltPtr = (EFI_UGA_PIXEL *) ((UINT8 *) BltPtr + Delta);
       ScreenPtr += HorizontalResolution;
@@ -928,6 +916,53 @@ DevNullUgaBlt (
   return EFI_SUCCESS;
 }
 
+
+/**
+  The following table defines actions for BltOperations.
+
+  EfiUgaVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY)
+  directly to every pixel of the video display rectangle
+  (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height).
+  Only one pixel will be used from the BltBuffer. Delta is NOT used.
+  EfiUgaVideoToBltBuffer - Read data from the video display rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
+  the BltBuffer rectangle (DestinationX, DestinationY )
+  (DestinationX + Width, DestinationY + Height). If DestinationX or
+  DestinationY is not zero then Delta must be set to the length in bytes
+  of a row in the BltBuffer.
+  EfiUgaBltBufferToVideo - Write data from the  BltBuffer rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
+  video display rectangle (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
+  not zero then Delta must be set to the length in bytes of a row in the
+  BltBuffer.
+  EfiUgaVideoToVideo - Copy from the video display rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
+  to the video display rectangle (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height).
+  The BltBuffer and Delta  are not used in this mode.
+
+  @param  This                    Protocol instance pointer.
+  @param  BltBuffer               Buffer containing data to blit into video buffer.
+                                  This buffer has a size of
+                                  Width*Height*sizeof(EFI_UGA_PIXEL)
+  @param  BltOperation            Operation to perform on BlitBuffer and video
+                                  memory
+  @param  SourceX                 X coordinate of source for the BltBuffer.
+  @param  SourceY                 Y coordinate of source for the BltBuffer.
+  @param  DestinationX            X coordinate of destination for the BltBuffer.
+  @param  DestinationY            Y coordinate of destination for the BltBuffer.
+  @param  Width                   Width of rectangle in BltBuffer in pixels.
+  @param  Height                  Hight of rectangle in BltBuffer in pixels. Delta
+                                         -
+
+  @retval EFI_SUCCESS             The Blt operation completed.
+  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
+  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video
+                                  buffer.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSpliterUgaDrawBlt (
@@ -942,53 +977,6 @@ ConSpliterUgaDrawBlt (
   IN  UINTN                                         Height,
   IN  UINTN                                         Delta         OPTIONAL
   )
-/*++
-
-  Routine Description:
-    The following table defines actions for BltOperations:
-    EfiUgaVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY)
-      directly to every pixel of the video display rectangle
-      (DestinationX, DestinationY)
-      (DestinationX + Width, DestinationY + Height).
-      Only one pixel will be used from the BltBuffer. Delta is NOT used.
-    EfiUgaVideoToBltBuffer - Read data from the video display rectangle
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
-      the BltBuffer rectangle (DestinationX, DestinationY )
-      (DestinationX + Width, DestinationY + Height). If DestinationX or
-      DestinationY is not zero then Delta must be set to the length in bytes
-      of a row in the BltBuffer.
-    EfiUgaBltBufferToVideo - Write data from the  BltBuffer rectangle
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
-      video display rectangle (DestinationX, DestinationY)
-      (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
-      not zero then Delta must be set to the length in bytes of a row in the
-      BltBuffer.
-    EfiUgaVideoToVideo - Copy from the video display rectangle
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
-      to the video display rectangle (DestinationX, DestinationY)
-      (DestinationX + Width, DestinationY + Height).
-     The BltBuffer and Delta  are not used in this mode.
-
-  Arguments:
-    This          - Protocol instance pointer.
-    BltBuffer     - Buffer containing data to blit into video buffer. This
-                    buffer has a size of Width*Height*sizeof(EFI_UGA_PIXEL)
-    BltOperation  - Operation to perform on BlitBuffer and video memory
-    SourceX       - X coordinate of source for the BltBuffer.
-    SourceY       - Y coordinate of source for the BltBuffer.
-    DestinationX  - X coordinate of destination for the BltBuffer.
-    DestinationY  - Y coordinate of destination for the BltBuffer.
-    Width         - Width of rectangle in BltBuffer in pixels.
-    Height        - Hight of rectangle in BltBuffer in pixels.
-    Delta         -
-
-  Returns:
-    EFI_SUCCESS           - The Blt operation completed.
-    EFI_INVALID_PARAMETER - BltOperation is not valid.
-    EFI_DEVICE_ERROR      - A hardware error occured writting to the video
-                             buffer.
-
---*/
 {
   EFI_STATUS                      Status;
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
@@ -1109,34 +1097,32 @@ DevNullUgaSync (
   }
 }
 
+
+/**
+  Write a Unicode string to the output device.
+
+  @param  Private                 Pointer to the console output splitter's private
+                                  data. It indicates the calling context.
+  @param  WString                 The NULL-terminated Unicode string to be
+                                  displayed on the output device(s). All output
+                                  devices must also support the Unicode drawing
+                                  defined in this file.
+
+  @retval EFI_SUCCESS             The string was output to the device.
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting to
+                                  output the text.
+  @retval EFI_UNSUPPORTED         The output device's mode is not currently in a
+                                  defined text mode.
+  @retval EFI_WARN_UNKNOWN_GLYPH  This warning code indicates that some of the
+                                  characters in the Unicode string could not be
+                                  rendered and were skipped.
+
+**/
 EFI_STATUS
 DevNullTextOutOutputString (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  CHAR16                          *WString
   )
-/*++
-
-  Routine Description:
-    Write a Unicode string to the output device.
-
-  Arguments:
-    Private - Pointer to the console output splitter's private data. It
-              indicates the calling context.
-    WString - The NULL-terminated Unicode string to be displayed on the output
-              device(s). All output devices must also support the Unicode
-              drawing defined in this file.
-
-  Returns:
-    EFI_SUCCESS            - The string was output to the device.
-    EFI_DEVICE_ERROR       - The device reported an error while attempting to
-                              output the text.
-    EFI_UNSUPPORTED        - The output device's mode is not currently in a
-                              defined text mode.
-    EFI_WARN_UNKNOWN_GLYPH - This warning code indicates that some of the
-                              characters in the Unicode string could not be
-                              rendered and were skipped.
-
---*/
 {
   UINTN                       SizeScreen;
   UINTN                       SizeAttribute;
@@ -1165,7 +1151,7 @@ DevNullTextOutOutputString (
     CurrentWidth = 1;
   }
 
-  while (*WString) {
+  while (*WString != L'\0') {
 
     if (*WString == CHAR_BACKSPACE) {
       //
@@ -1193,7 +1179,7 @@ DevNullTextOutOutputString (
           //
           InsertChar  = CHAR_BACKSPACE;
           PStr        = WString + 1;
-          while (*PStr) {
+          while (*PStr != L'\0') {
             TempChar    = *PStr;
             *PStr       = InsertChar;
             InsertChar  = TempChar;
@@ -1329,28 +1315,25 @@ DevNullTextOutOutputString (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Sets the output device(s) to a specified mode.
+
+  @param  Private                 Private data structure pointer.
+  @param  ModeNumber              The mode number to set.
+
+  @retval EFI_SUCCESS             The requested text mode was set.
+  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
+                                  the request.
+  @retval EFI_UNSUPPORTED         The mode number was not valid.
+  @retval EFI_OUT_OF_RESOURCES    Out of resources.
+
+**/
 EFI_STATUS
 DevNullTextOutSetMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  UINTN                           ModeNumber
   )
-/*++
-
-  Routine Description:
-    Sets the output device(s) to a specified mode.
-
-  Arguments:
-    Private    - Private data structure pointer.
-    ModeNumber - The mode number to set.
-
-  Returns:
-    EFI_SUCCESS      - The requested text mode was set.
-    EFI_DEVICE_ERROR - The device had an error and
-                       could not complete the request.
-    EFI_UNSUPPORTED - The mode number was not valid.
-    EFI_OUT_OF_RESOURCES - Out of resources.
-
---*/
 {
   UINTN                         Size;
   INT32                         CurrentMode;
@@ -1408,26 +1391,23 @@ DevNullTextOutSetMode (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Clears the output device(s) display to the currently selected background
+  color.
+
+  @param  Private                 Protocol instance pointer.
+
+  @retval EFI_SUCCESS             The operation completed successfully.
+  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
+                                  the request.
+  @retval EFI_UNSUPPORTED         The output device is not in a valid text mode.
+
+**/
 EFI_STATUS
 DevNullTextOutClearScreen (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
   )
-/*++
-
-  Routine Description:
-    Clears the output device(s) display to the currently selected background
-    color.
-
-  Arguments:
-    Private     - Protocol instance pointer.
-
-  Returns:
-    EFI_SUCCESS      - The operation completed successfully.
-    EFI_DEVICE_ERROR - The device had an error and
-                       could not complete the request.
-    EFI_UNSUPPORTED - The output device is not in a valid text mode.
-
---*/
 {
   UINTN   Row;
   UINTN   Column;
@@ -1460,31 +1440,30 @@ DevNullTextOutClearScreen (
   return DevNullTextOutEnableCursor (Private, TRUE);
 }
 
+
+/**
+  Sets the current coordinates of the cursor position.
+
+  @param  Private                 Protocol instance pointer.
+  @param  Column                  
+  @param  Row                     the position to set the cursor to. Must be
+                                  greater than or equal to zero and less than the
+                                  number of columns and rows by QueryMode ().
+
+  @retval EFI_SUCCESS             The operation completed successfully.
+  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
+                                  the request.
+  @retval EFI_UNSUPPORTED         The output device is not in a valid text mode, or
+                                  the cursor position is invalid for the current
+                                  mode.
+
+**/
 EFI_STATUS
 DevNullTextOutSetCursorPosition (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  UINTN                           Column,
   IN  UINTN                           Row
   )
-/*++
-
-  Routine Description:
-    Sets the current coordinates of the cursor position
-
-  Arguments:
-    Private       - Protocol instance pointer.
-    Column, Row - the position to set the cursor to. Must be greater than or
-                  equal to zero and less than the number of columns and rows
-                  by QueryMode ().
-
-  Returns:
-    EFI_SUCCESS      - The operation completed successfully.
-    EFI_DEVICE_ERROR - The device had an error and
-                       could not complete the request.
-    EFI_UNSUPPORTED - The output device is not in a valid text mode, or the
-                       cursor position is invalid for the current mode.
-
---*/
 {
   //
   // No need to do extra check here as whether (Column, Row) is valid has
@@ -1497,53 +1476,44 @@ DevNullTextOutSetCursorPosition (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
+  In this driver, the cursor cannot be hidden.
+
+  @param  Private                 Indicates the calling context.
+  @param  Visible                 If TRUE, the cursor is set to be visible, If
+                                  FALSE, the cursor is set to be invisible.
+
+  @retval EFI_SUCCESS             The request is valid.
+
+**/
 EFI_STATUS
 DevNullTextOutEnableCursor (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  BOOLEAN                         Visible
   )
-/*++
-  Routine Description:
-
-    Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
-    In this driver, the cursor cannot be hidden.
-
-  Arguments:
-
-    Private - Indicates the calling context.
-
-    Visible - If TRUE, the cursor is set to be visible, If FALSE, the cursor
-              is set to be invisible.
-
-  Returns:
-
-    EFI_SUCCESS - The request is valid.
-
-
---*/
 {
   Private->TextOutMode.CursorVisible = Visible;
 
   return EFI_SUCCESS;
 }
 
+
+/**
+  Take the DevNull TextOut device and update the Simple Text Out on every
+  UGA device.
+
+  @param  Private                 Indicates the calling context.
+
+  @retval EFI_SUCCESS             The request is valid.
+  @retval other                   Return status of TextOut->OutputString ()
+
+**/
 EFI_STATUS
 DevNullSyncStdOut (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
   )
-/*++
-  Routine Description:
-    Take the DevNull TextOut device and update the Simple Text Out on every
-    UGA device.
-
-  Arguments:
-    Private - Indicates the calling context.
-
-  Returns:
-    EFI_SUCCESS - The request is valid.
-    other       - Return status of TextOut->OutputString ()
-
---*/
 {
   EFI_STATUS                       Status;
   EFI_STATUS                       ReturnStatus;
@@ -1607,7 +1577,7 @@ DevNullSyncStdOut (
 
     Column = 0;
     while (Column < MaxColumn) {
-      if (Screen[Column]) {
+      if (Screen[Column] > 0) {
         CurrentAttribute  = Attributes[Column];
         CurrentColumn     = Column;
         ScreenStart       = &Screen[Column];
@@ -1625,7 +1595,7 @@ DevNullSyncStdOut (
 
           *BufferTail = *Str;
           BufferTail++;
-          if (Attributes[Column] & EFI_WIDE_ATTRIBUTE) {
+          if ((Attributes[Column] & EFI_WIDE_ATTRIBUTE) != 0) {
             Str++;
             Column++;
           }
