@@ -86,36 +86,30 @@ CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0
 //
 // Body of the ConOut functions
 //
+
+/**
+  Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.Reset().
+  If ExtendeVerification is TRUE, then perform dependent serial device reset,
+  and set display mode to mode 0.
+  If ExtendedVerification is FALSE, only set display mode to mode 0.
+
+  @param  This                  Indicates the calling context.
+  @param  ExtendedVerification  Indicates that the driver may perform a more
+                                exhaustive verification operation of the device
+                                during reset.
+
+  @return EFI_SUCCESS
+  @return The reset operation succeeds.
+  @return EFI_DEVICE_ERROR
+  @return The terminal is not functioning correctly or the serial port reset fails.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutReset (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  BOOLEAN                          ExtendedVerification
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.Reset().
-    If ExtendeVerification is TRUE, then perform dependent serial device reset,
-    and set display mode to mode 0.
-    If ExtendedVerification is FALSE, only set display mode to mode 0.
-
-  Arguments:
-
-    This - Indicates the calling context.
-
-    ExtendedVerification - Indicates that the driver may perform a more exhaustive
-                           verification operation of the device during reset.
-
-  Returns:
-
-    EFI_SUCCESS
-       The reset operation succeeds.
-
-    EFI_DEVICE_ERROR
-      The terminal is not functioning correctly or the serial port reset fails.
-
---*/
 {
   EFI_STATUS    Status;
   TERMINAL_DEV  *TerminalDevice;
@@ -157,42 +151,29 @@ TerminalConOutReset (
   return Status;
 }
 
+
+/**
+  Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.OutputString().
+  The Unicode string will be converted to terminal expressible data stream
+  and send to terminal via serial port.
+
+  @param  This                    Indicates the calling context.
+  @param  WString                 The Null-terminated Unicode string to be displayed
+                                  on the terminal screen.
+
+  @return EFI_SUCCESS             The string is output successfully.
+  @return EFI_DEVICE_ERROR        The serial port fails to send the string out.
+  @return EFI_WARN_UNKNOWN_GLYPH  Indicates that some of the characters in the Unicode string could not
+                                  be rendered and are skipped.
+  @return EFI_UNSUPPORTED
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutOutputString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  CHAR16                           *WString
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.OutputString().
-    The Unicode string will be converted to terminal expressible data stream
-    and send to terminal via serial port.
-
-
-  Arguments:
-
-    This - Indicates the calling context.
-
-    WString - The Null-terminated Unicode string to be displayed on
-              the terminal screen.
-
-  Returns:
-
-    EFI_SUCCESS
-       The string is output successfully.
-
-    EFI_DEVICE_ERROR
-      The serial port fails to send the string out.
-
-    EFI_WARN_UNKNOWN_GLYPH
-      Indicates that some of the characters in the Unicode string could not
-      be rendered and are skipped.
-
-    EFI_UNSUPPORTED
-
---*/
 {
   TERMINAL_DEV                *TerminalDevice;
   EFI_SIMPLE_TEXT_OUTPUT_MODE *Mode;
@@ -238,9 +219,9 @@ TerminalConOutOutputString (
 
     switch (TerminalDevice->TerminalType) {
 
-    case PcAnsiType:
-    case VT100Type:
-    case VT100PlusType:
+    case PCANSITYPE:
+    case VT100TYPE:
+    case VT100PLUSTYPE:
 
       if (!TerminalIsValidTextGraphics (*WString, &GraphicChar, &AsciiChar)) {
         //
@@ -266,7 +247,7 @@ TerminalConOutOutputString (
 
       }
 
-      if (TerminalDevice->TerminalType != PcAnsiType) {
+      if (TerminalDevice->TerminalType != PCANSITYPE) {
         GraphicChar = AsciiChar;
       }
 
@@ -284,7 +265,7 @@ TerminalConOutOutputString (
 
       break;
 
-    case VTUTF8Type:
+    case VTUTF8TYPE:
       UnicodeToUtf8 (*WString, &Utf8Char, &ValidBytes);
       Length = ValidBytes;
       Status = TerminalDevice->SerialIo->Write (
@@ -353,37 +334,27 @@ OutputError:
   return EFI_DEVICE_ERROR;
 }
 
+
+/**
+  Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.TestString().
+  If one of the characters in the *Wstring is
+  neither valid Unicode drawing characters,
+  not ASCII code, then this function will return
+  EFI_UNSUPPORTED.
+
+  @param  This              Indicates the calling context.
+  @param  WString           The Null-terminated Unicode string to be tested.
+
+  @return EFI_SUCCESS       The terminal is capable of rendering the output string.
+  @return EFI_UNSUPPORTED   Some of the characters in the Unicode string cannot be rendered.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutTestString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  CHAR16                           *WString
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.TestString().
-    If one of the characters in the *Wstring is
-    neither valid Unicode drawing characters,
-    not ASCII code, then this function will return
-    EFI_UNSUPPORTED.
-
-
-  Arguments:
-
-    This - Indicates the calling context.
-
-    WString - The Null-terminated Unicode string to be tested.
-
-  Returns:
-
-    EFI_SUCCESS
-       The terminal is capable of rendering the output string.
-
-    EFI_UNSUPPORTED
-      Some of the characters in the Unicode string cannot be rendered.
-
---*/
 {
   TERMINAL_DEV  *TerminalDevice;
   EFI_STATUS    Status;
@@ -395,13 +366,13 @@ TerminalConOutTestString (
 
   switch (TerminalDevice->TerminalType) {
 
-  case PcAnsiType:
-  case VT100Type:
-  case VT100PlusType:
+  case PCANSITYPE:
+  case VT100TYPE:
+  case VT100PLUSTYPE:
     Status = AnsiTestString (TerminalDevice, WString);
     break;
 
-  case VTUTF8Type:
+  case VTUTF8TYPE:
     Status = VTUTF8TestString (TerminalDevice, WString);
     break;
 
@@ -413,6 +384,24 @@ TerminalConOutTestString (
   return Status;
 }
 
+
+/**
+  Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.QueryMode().
+  It returns information for an available text mode
+  that the terminal supports.
+  In this driver, we support text mode 80x25 (mode 0),
+  80x50 (mode 1), 100x31 (mode 2).
+
+  @param This        Indicates the calling context.
+  @param ModeNumber  The mode number to return information on.
+  @param Columns     The returned columns of the requested mode.
+  @param Rows        The returned rows of the requested mode.
+
+  @return EFI_SUCCESS       The requested mode information is returned.
+  @return EFI_UNSUPPORTED   The mode number is not valid.
+  @return EFI_DEVICE_ERROR
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutQueryMode (
@@ -421,41 +410,6 @@ TerminalConOutQueryMode (
   OUT UINTN                            *Columns,
   OUT UINTN                            *Rows
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_OUT_PROTOCOL.QueryMode().
-    It returns information for an available text mode
-    that the terminal supports.
-    In this driver, we support text mode 80x25 (mode 0),
-    80x50 (mode 1), 100x31 (mode 2).
-
-
-  Arguments:
-
-    *This
-        Indicates the calling context.
-
-    ModeNumber
-        The mode number to return information on.
-
-    Columns
-        The returned columns of the requested mode.
-
-    Rows
-        The returned rows of the requested mode.
-
-  Returns:
-
-    EFI_SUCCESS
-      The requested mode information is returned.
-
-    EFI_UNSUPPORTED
-      The mode number is not valid.
-
-    EFI_DEVICE_ERROR
-
---*/
 {
   if (This->Mode->MaxMode > 3) {
     return EFI_DEVICE_ERROR;
@@ -478,39 +432,27 @@ TerminalConOutQueryMode (
   return EFI_UNSUPPORTED;
 }
 
+
+/**
+  Implements EFI_SIMPLE_TEXT_OUT.SetMode().
+  Set the terminal to a specified display mode.
+  In this driver, we only support mode 0.
+
+  @param This          Indicates the calling context.
+  @param ModeNumber    The text mode to set.
+
+  @return EFI_SUCCESS       The requested text mode is set.
+  @return EFI_DEVICE_ERROR  The requested text mode cannot be set 
+                            because of serial device error.
+  @return EFI_UNSUPPORTED   The text mode number is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutSetMode (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  UINTN                            ModeNumber
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_OUT.SetMode().
-    Set the terminal to a specified display mode.
-    In this driver, we only support mode 0.
-
-  Arguments:
-
-    This
-        Indicates the calling context.
-
-    ModeNumber
-        The text mode to set.
-
-  Returns:
-
-    EFI_SUCCESS
-       The requested text mode is set.
-
-    EFI_DEVICE_ERROR
-      The requested text mode cannot be set because of serial device error.
-
-    EFI_UNSUPPORTED
-      The text mode number is not valid.
-
---*/
 {
   EFI_STATUS    Status;
   TERMINAL_DEV  *TerminalDevice;
@@ -550,38 +492,25 @@ TerminalConOutSetMode (
 
 }
 
+
+/**
+  Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetAttribute().
+
+  @param This        Indicates the calling context.
+  @param Attribute   The attribute to set. Only bit0..6 are valid, all other bits
+                     are undefined and must be zero.
+
+  @return EFI_SUCCESS        The requested attribute is set.
+  @return EFI_DEVICE_ERROR   The requested attribute cannot be set due to serial port error.
+  @return EFI_UNSUPPORTED    The attribute requested is not defined by EFI spec.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutSetAttribute (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  UINTN                            Attribute
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetAttribute().
-
-  Arguments:
-
-    This
-        Indicates the calling context.
-
-    Attribute
-        The attribute to set. Only bit0..6 are valid, all other bits
-        are undefined and must be zero.
-
-  Returns:
-
-    EFI_SUCCESS
-      The requested attribute is set.
-
-    EFI_DEVICE_ERROR
-      The requested attribute cannot be set due to serial port error.
-
-    EFI_UNSUPPORTED
-      The attribute requested is not defined by EFI spec.
-
---*/
 {
   UINT8         ForegroundControl;
   UINT8         BackgroundControl;
@@ -736,36 +665,24 @@ TerminalConOutSetAttribute (
 
 }
 
+
+/**
+  Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.ClearScreen().
+  It clears the ANSI terminal's display to the
+  currently selected background color.
+
+  @param This     Indicates the calling context.
+
+  @return EFI_SUCCESS       The operation completed successfully.
+  @return EFI_DEVICE_ERROR  The terminal screen cannot be cleared due to serial port error.
+  @return EFI_UNSUPPORTED   The terminal is not in a valid display mode.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutClearScreen (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.ClearScreen().
-    It clears the ANSI terminal's display to the
-    currently selected background color.
-
-
-  Arguments:
-
-    This
-        Indicates the calling context.
-
-  Returns:
-
-    EFI_SUCCESS
-      The operation completed successfully.
-
-    EFI_DEVICE_ERROR
-      The terminal screen cannot be cleared due to serial port error.
-
-    EFI_UNSUPPORTED
-      The terminal is not in a valid display mode.
-
---*/
 {
   EFI_STATUS    Status;
   TERMINAL_DEV  *TerminalDevice;
@@ -788,6 +705,20 @@ TerminalConOutClearScreen (
   return Status;
 }
 
+
+/**
+  Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetCursorPosition().
+
+  @param This      Indicates the calling context.
+  @param Column    The row to set cursor to.
+  @param Row       The column to set cursor to.
+
+  @return EFI_SUCCESS       The operation completed successfully.
+  @return EFI_DEVICE_ERROR  The request fails due to serial port error.
+  @return EFI_UNSUPPORTED   The terminal is not in a valid text mode, or the cursor position
+                            is invalid for current mode.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutSetCursorPosition (
@@ -795,35 +726,6 @@ TerminalConOutSetCursorPosition (
   IN  UINTN                            Column,
   IN  UINTN                            Row
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetCursorPosition().
-
-  Arguments:
-
-    This
-        Indicates the calling context.
-
-    Column
-        The row to set cursor to.
-
-    Row
-        The column to set cursor to.
-
-  Returns:
-
-    EFI_SUCCESS
-      The operation completed successfully.
-
-    EFI_DEVICE_ERROR
-      The request fails due to serial port error.
-
-    EFI_UNSUPPORTED
-      The terminal is not in a valid text mode, or the cursor position
-      is invalid for current mode.
-
---*/
 {
   EFI_SIMPLE_TEXT_OUTPUT_MODE *Mode;
   UINTN                       MaxColumn;
@@ -879,36 +781,25 @@ TerminalConOutSetCursorPosition (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
+  In this driver, the cursor cannot be hidden.
+
+  @param This      Indicates the calling context.
+  @param Visible   If TRUE, the cursor is set to be visible,
+                   If FALSE, the cursor is set to be invisible.
+
+  @return EFI_SUCCESS      The request is valid.
+  @return EFI_UNSUPPORTED  The terminal does not support cursor hidden.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConOutEnableCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  BOOLEAN                          Visible
   )
-/*++
-  Routine Description:
-
-    Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
-    In this driver, the cursor cannot be hidden.
-
-  Arguments:
-
-    This
-        Indicates the calling context.
-
-    Visible
-        If TRUE, the cursor is set to be visible,
-        If FALSE, the cursor is set to be invisible.
-
-  Returns:
-
-    EFI_SUCCESS
-      The request is valid.
-
-    EFI_UNSUPPORTED
-      The terminal does not support cursor hidden.
-
---*/
 {
   if (!Visible) {
     return EFI_UNSUPPORTED;
@@ -917,31 +808,25 @@ TerminalConOutEnableCursor (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Detects if a Unicode char is for Box Drawing text graphics.
+
+  @param  Graphic      Unicode char to test.
+  @param  PcAnsi       Optional pointer to return PCANSI equivalent of
+                       Graphic.
+  @param  Ascii        Optional pointer to return ASCII equivalent of
+                       Graphic.
+
+  @return TRUE         If Graphic is a supported Unicode Box Drawing character.
+
+**/
 BOOLEAN
 TerminalIsValidTextGraphics (
   IN  CHAR16  Graphic,
   OUT CHAR8   *PcAnsi, OPTIONAL
   OUT CHAR8   *Ascii OPTIONAL
   )
-/*++
-
-Routine Description:
-
-    Detects if a Unicode char is for Box Drawing text graphics.
-
-Arguments:
-
-    Graphic  - Unicode char to test.
-
-    PcAnsi  - Optional pointer to return PCANSI equivalent of Graphic.
-
-    Ascii   - Optional pointer to return ASCII equivalent of Graphic.
-
-Returns:
-
-    TRUE if Graphic is a supported Unicode Box Drawing character.
-
---*/
 {
   UNICODE_TO_CHAR *Table;
 

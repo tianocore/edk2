@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Implementation translation among different code tyies.
 
 Copyright (c) 2006, Intel Corporation. <BR>
