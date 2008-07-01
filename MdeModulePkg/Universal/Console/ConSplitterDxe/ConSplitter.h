@@ -1,7 +1,7 @@
-/**@file
+/** @file
   Private data structures for the Console Splitter driver
 
-Copyright (c) 2006 - 2007 Intel Corporation. <BR>
+Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -76,7 +76,7 @@ extern EFI_GUID                     gSimpleTextInExNotifyGuid;
 #define CONSOLE_SPLITTER_MODES_ALLOC_UNIT     32
 #define MAX_STD_IN_PASSWORD                   80
 
-#define VarConOutMode L"ConOutMode"
+#define VARCONOUTMODE L"ConOutMode"
 
 typedef struct {
   UINTN   Column;
@@ -259,6 +259,15 @@ ConSplitterDriverEntry (
   )
 ;
 
+/**
+  Construct the ConSplitter.
+
+  @param  ConInPrivate             A pointer to the TEXT_IN_SPLITTER_PRIVATE_DATA
+                                   structure.
+
+  @retval EFI_OUT_OF_RESOURCES     Out of resources.
+
+**/
 EFI_STATUS
 ConSplitterTextInConstructor (
   TEXT_IN_SPLITTER_PRIVATE_DATA       *Private
@@ -274,6 +283,17 @@ ConSplitterTextOutConstructor (
 //
 // Driver Binding Functions
 //
+
+/**
+  Console In Supported Check
+
+  @param  This                     Pointer to protocol.
+  @param  ControllerHandle         Controller handle.
+  @param  RemainingDevicePath      Remaining device path.
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterConInDriverBindingSupported (
@@ -283,6 +303,16 @@ ConSplitterConInDriverBindingSupported (
   )
 ;
 
+/**
+  Standard Error Supported Check
+
+  @param  This                     Pointer to protocol.
+  @param  ControllerHandle         Controller handle.
+  @param  RemainingDevicePath      Remaining device path.
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerDriverBindingSupported (
@@ -292,6 +322,16 @@ ConSplitterSimplePointerDriverBindingSupported (
   )
 ;
 
+/**
+  Console Out Supported Check
+
+  @param  This                     Pointer to protocol.
+  @param  ControllerHandle         Controller handle.
+  @param  RemainingDevicePath      Remaining device path.
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterConOutDriverBindingSupported (
@@ -301,6 +341,16 @@ ConSplitterConOutDriverBindingSupported (
   )
 ;
 
+/**
+  Standard Error Supported Check
+
+  @param  This                     Pointer to protocol.
+  @param  ControllerHandle         Controller handle.
+  @param  RemainingDevicePath      Remaining device path.
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterStdErrDriverBindingSupported (
@@ -436,51 +486,48 @@ ConSplitterAbsolutePointerDeleteDevice (
 // Absolute Pointer protocol interfaces
 //
 
+
+/**
+  Resets the pointer device hardware.
+
+  @param  This                     Protocol instance pointer.
+  @param  ExtendedVerification     Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS              The device was reset.
+  @retval EFI_DEVICE_ERROR         The device is not functioning correctly and
+                                   could not be reset.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterAbsolutePointerReset (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
   IN BOOLEAN                         ExtendedVerification
   )
-/*++
-
-  Routine Description:
-    Resets the pointer device hardware.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    ExtendedVerification  - Driver may perform diagnostics on reset.
-
-  Returns:
-    EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could
-                            not be reset.
-
---*/
 ;
 
+
+/**
+  Retrieves the current state of a pointer device.
+
+  @param  This                     Protocol instance pointer.
+  @param  State                    A pointer to the state information on the
+                                   pointer device.
+
+  @retval EFI_SUCCESS              The state of the pointer device was returned in
+                                   State..
+  @retval EFI_NOT_READY            The state of the pointer device has not changed
+                                   since the last call to GetState().
+  @retval EFI_DEVICE_ERROR         A device error occurred while attempting to
+                                   retrieve the pointer device's current state.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterAbsolutePointerGetState (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
   IN OUT EFI_ABSOLUTE_POINTER_STATE  *State
   )
-/*++
-
-  Routine Description:
-    Retrieves the current state of a pointer device.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    State                 - A pointer to the state information on the pointer device.
-
-  Returns:
-    EFI_SUCCESS           - The state of the pointer device was returned in State..
-    EFI_NOT_READY         - The state of the pointer device has not changed since the last call to
-                            GetState().
-    EFI_DEVICE_ERROR      - A device error occurred while attempting to retrieve the pointer
-                            device's current state.
---*/
 ;
 
 VOID
@@ -954,82 +1001,95 @@ ConSplitterTextInExDeleteDevice (
 // Simple Text Input Ex protocol function prototypes
 //
 
+
+/**
+  Reset the input device and optionaly run diagnostics
+
+  @param  This                     Protocol instance pointer.
+  @param  ExtendedVerification     Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS              The device was reset.
+  @retval EFI_DEVICE_ERROR         The device is not functioning properly and could
+                                   not be reset.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterTextInResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
   )
-/*++
-
-  Routine Description:
-    Reset the input device and optionaly run diagnostics
-
-  Arguments:
-    This                 - Protocol instance pointer.
-    ExtendedVerification - Driver may perform diagnostics on reset.
-
-  Returns:
-    EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could
-                            not be reset.
-
---*/
 ;
 
+
+/**
+  Reads the next keystroke from the input device. The WaitForKey Event can
+  be used to test for existance of a keystroke via WaitForEvent () call.
+
+  @param  This                     Protocol instance pointer.
+  @param  KeyData                  A pointer to a buffer that is filled in with the
+                                   keystroke state data for the key that was
+                                   pressed.
+
+  @retval EFI_SUCCESS              The keystroke information was returned.
+  @retval EFI_NOT_READY            There was no keystroke data availiable.
+  @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
+                                   to hardware errors.
+  @retval EFI_INVALID_PARAMETER    KeyData is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterTextInReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
   )
-/*++
-
-  Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
-
-  Arguments:
-    This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke
-                 state data for the key that was pressed.
-
-  Returns:
-    EFI_SUCCESS           - The keystroke information was returned.
-    EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to
-                            hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.
-
---*/
 ;
 
+
+/**
+  Set certain state for the input device.
+
+  @param  This                     Protocol instance pointer.
+  @param  KeyToggleState           A pointer to the EFI_KEY_TOGGLE_STATE to set the
+                                   state for the input device.
+
+  @retval EFI_SUCCESS              The device state was set successfully.
+  @retval EFI_DEVICE_ERROR         The device is not functioning correctly and
+                                   could not have the setting adjusted.
+  @retval EFI_UNSUPPORTED          The device does not have the ability to set its
+                                   state.
+  @retval EFI_INVALID_PARAMETER    KeyToggleState is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterTextInSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
   )
-/*++
-
-  Routine Description:
-    Set certain state for the input device.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the
-                            state for the input device.
-
-  Returns:
-    EFI_SUCCESS           - The device state was set successfully.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could
-                            not have the setting adjusted.
-    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-    EFI_INVALID_PARAMETER - KeyToggleState is NULL.
-
---*/
 ;
 
+
+/**
+  Register a notification function for a particular keystroke for the input device.
+
+  @param  This                     Protocol instance pointer.
+  @param  KeyData                  A pointer to a buffer that is filled in with the
+                                   keystroke information data for the key that was
+                                   pressed.
+  @param  KeyNotificationFunction  Points to the function to be called when the key
+                                   sequence is typed specified by KeyData.
+  @param  NotifyHandle             Points to the unique handle assigned to the
+                                   registered notification.
+
+  @retval EFI_SUCCESS              The notification function was registered
+                                   successfully.
+  @retval EFI_OUT_OF_RESOURCES     Unable to allocate resources for necesssary data
+                                   structures.
+  @retval EFI_INVALID_PARAMETER    KeyData or NotifyHandle is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterTextInRegisterKeyNotify (
@@ -1038,48 +1098,28 @@ ConSplitterTextInRegisterKeyNotify (
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT EFI_HANDLE                        *NotifyHandle
   )
-/*++
-
-  Routine Description:
-    Register a notification function for a particular keystroke for the input device.
-
-  Arguments:
-    This                    - Protocol instance pointer.
-    KeyData                 - A pointer to a buffer that is filled in with the keystroke
-                              information data for the key that was pressed.
-    KeyNotificationFunction - Points to the function to be called when the key
-                              sequence is typed specified by KeyData.
-    NotifyHandle            - Points to the unique handle assigned to the registered notification.
-
-  Returns:
-    EFI_SUCCESS             - The notification function was registered successfully.
-    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.
-
---*/
 ;
 
+
+/**
+  Remove a registered notification function from a particular keystroke.
+
+  @param  This                     Protocol instance pointer.
+  @param  NotificationHandle       The handle of the notification function being
+                                   unregistered.
+
+  @retval EFI_SUCCESS              The notification function was unregistered
+                                   successfully.
+  @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid.
+  @retval EFI_NOT_FOUND            Can not find the matching entry in database.
+
+**/
 EFI_STATUS
 EFIAPI
 ConSplitterTextInUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
   )
-/*++
-
-  Routine Description:
-    Remove a registered notification function from a particular keystroke.
-
-  Arguments:
-    This                    - Protocol instance pointer.
-    NotificationHandle      - The handle of the notification function being unregistered.
-
-  Returns:
-    EFI_SUCCESS             - The notification function was unregistered successfully.
-    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    EFI_NOT_FOUND           - Can not find the matching entry in database.
-
---*/
 ;
 VOID
 EFIAPI
@@ -1135,6 +1175,19 @@ ConSplitterSimplePointerGetState (
   )
 ;
 
+/**
+  This event agregates all the events of the ConIn devices in the spliter.
+  If the ConIn is password locked then return.
+  If any events of physical ConIn devices are signaled, signal the ConIn
+  spliter event. This will cause the calling code to call
+  ConSplitterTextInReadKeyStroke ().
+
+  @param  Event                    The Event assoicated with callback.
+  @param  Context                  Context registered when Event was created.
+
+  @return None
+
+**/
 VOID
 EFIAPI
 ConSplitterSimplePointerWaitForInput (
