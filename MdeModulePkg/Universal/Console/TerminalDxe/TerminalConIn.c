@@ -1,7 +1,7 @@
-/**@file
+/** @file
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2007, Intel Corporation. <BR>
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,31 +15,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Terminal.h"
 
 
-STATIC
+
+/**
+  Reads the next keystroke from the input device. The WaitForKey Event can
+  be used to test for existance of a keystroke via WaitForEvent () call.
+
+  @param  TerminalDevice           Terminal driver private structure
+  @param  KeyData                  A pointer to a buffer that is filled in with the
+                                   keystroke state data for the key that was
+                                   pressed.
+
+  @retval EFI_SUCCESS              The keystroke information was returned.
+  @retval EFI_NOT_READY            There was no keystroke data availiable.
+  @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
+                                   to hardware errors.
+  @retval EFI_INVALID_PARAMETER    KeyData is NULL.
+
+**/
 EFI_STATUS
 ReadKeyStrokeWorker (
   IN  TERMINAL_DEV *TerminalDevice,
   OUT EFI_KEY_DATA *KeyData
   )
-/*++
-
-  Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
-
-  Arguments:
-    TerminalDevice        - Terminal driver private structure
-    KeyData               - A pointer to a buffer that is filled in with the keystroke
-                            state data for the key that was pressed.
-
-  Returns:
-    EFI_SUCCESS           - The keystroke information was returned.
-    EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to
-                            hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.
-
---*/
 {
   EFI_STATUS                      Status;
   LIST_ENTRY                      *Link;
@@ -86,35 +83,26 @@ ReadKeyStrokeWorker (
 
 }
 
+/**
+  Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.Reset().
+  This driver only perform dependent serial device reset regardless of
+  the value of ExtendeVerification
 
+  @param  This                     Indicates the calling context.
+  @param  ExtendedVerification     Skip by this driver.
+
+  @return EFI_SUCCESS
+  @return The reset operation succeeds.
+  @return EFI_DEVICE_ERROR
+  @return The dependent serial port reset fails.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConInReset (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   IN  BOOLEAN                         ExtendedVerification
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.Reset().
-    This driver only perform dependent serial device reset regardless of
-    the value of ExtendeVerification
-
-  Arguments:
-
-    This - Indicates the calling context.
-
-    ExtendedVerification - Skip by this driver.
-
-  Returns:
-
-    EFI_SUCCESS
-       The reset operation succeeds.
-
-    EFI_DEVICE_ERROR
-      The dependent serial port reset fails.
-
---*/
 {
   EFI_STATUS    Status;
   TERMINAL_DEV  *TerminalDevice;
@@ -150,36 +138,29 @@ TerminalConInReset (
   return Status;
 }
 
+
+/**
+  Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.ReadKeyStroke().
+
+  @param  This                     Indicates the calling context.
+  @param  Key                      A pointer to a buffer that is filled in with the
+                                   keystroke information for the key that was sent
+                                   from terminal.
+
+  @return EFI_SUCCESS
+  @return The keystroke information is returned successfully.
+  @return EFI_NOT_READY
+  @return There is no keystroke data available.
+  @return EFI_DEVICE_ERROR
+  @return The dependent serial device encounters error.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConInReadKeyStroke (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   OUT EFI_INPUT_KEY                   *Key
   )
-/*++
-  Routine Description:
-
-    Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.ReadKeyStroke().
-
-  Arguments:
-
-    This - Indicates the calling context.
-
-    Key  - A pointer to a buffer that is filled in with the keystroke
-        information for the key that was sent from terminal.
-
-  Returns:
-
-    EFI_SUCCESS
-      The keystroke information is returned successfully.
-
-    EFI_NOT_READY
-      There is no keystroke data available.
-
-    EFI_DEVICE_ERROR
-      The dependent serial device encounters error.
-
---*/
 {
   TERMINAL_DEV  *TerminalDevice;
   EFI_STATUS    Status;
@@ -202,27 +183,25 @@ TerminalConInReadKeyStroke (
 }
 
 
+
+/**
+
+  @param  RegsiteredData           A pointer to a buffer that is filled in with the
+                                   keystroke state data for the key that was
+                                   registered.
+  @param  InputData                A pointer to a buffer that is filled in with the
+                                   keystroke state data for the key that was
+                                   pressed.
+
+  @retval TRUE                     Key be pressed matches a registered key.
+  @retval FLASE                    Match failed.
+
+**/
 BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke
-                      state data for the key that was registered.
-  InputData         - A pointer to a buffer that is filled in with the keystroke
-                      state data for the key that was pressed.
-
-Returns:
-  TRUE              - Key be pressed matches a registered key.
-  FLASE             - Match failed.
-
---*/
 {
   ASSERT (RegsiteredData != NULL && InputData != NULL);
 
@@ -235,29 +214,23 @@ Returns:
 }
 
 
+
+/**
+  Event notification function for EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx event
+  Signal the event if there is key available
+
+  @param  Event                    Indicates the event that invoke this function.
+  @param  Context                  Indicates the calling context.
+
+  @return none.
+
+**/
 VOID
 EFIAPI
 TerminalConInWaitForKeyEx (
   IN  EFI_EVENT       Event,
   IN  VOID            *Context
   )
-/*++
-  Routine Description:
-
-    Event notification function for EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx event
-    Signal the event if there is key available
-
-  Arguments:
-
-    Event - Indicates the event that invoke this function.
-
-    Context - Indicates the calling context.
-
-  Returns:
-
-    N/A
-
---*/
 {
   TERMINAL_DEV            *TerminalDevice;
 
@@ -271,27 +244,24 @@ TerminalConInWaitForKeyEx (
 // Simple Text Input Ex protocol functions
 //
 
+
+/**
+  Reset the input device and optionaly run diagnostics
+
+  @param  This                     Protocol instance pointer.
+  @param  ExtendedVerification     Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS              The device was reset.
+  @retval EFI_DEVICE_ERROR         The device is not functioning properly and could
+                                   not be reset.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConInResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
   )
-/*++
-
-  Routine Description:
-    Reset the input device and optionaly run diagnostics
-
-  Arguments:
-    This                 - Protocol instance pointer.
-    ExtendedVerification - Driver may perform diagnostics on reset.
-
-  Returns:
-    EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could
-                            not be reset.
-
---*/
 {
   EFI_STATUS              Status;
   TERMINAL_DEV            *TerminalDevice;
@@ -307,31 +277,29 @@ TerminalConInResetEx (
 
 }
 
+
+/**
+  Reads the next keystroke from the input device. The WaitForKey Event can
+  be used to test for existance of a keystroke via WaitForEvent () call.
+
+  @param  This                     Protocol instance pointer.
+  @param  KeyData                  A pointer to a buffer that is filled in with the
+                                   keystroke state data for the key that was
+                                   pressed.
+
+  @retval EFI_SUCCESS              The keystroke information was returned.
+  @retval EFI_NOT_READY            There was no keystroke data availiable.
+  @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
+                                   to hardware errors.
+  @retval EFI_INVALID_PARAMETER    KeyData is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConInReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
   )
-/*++
-
-  Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
-
-  Arguments:
-    This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke
-                 state data for the key that was pressed.
-
-  Returns:
-    EFI_SUCCESS           - The keystroke information was returned.
-    EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to
-                            hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.
-
---*/
 {
   TERMINAL_DEV                    *TerminalDevice;
 
@@ -345,30 +313,28 @@ TerminalConInReadKeyStrokeEx (
 
 }
 
+
+/**
+  Set certain state for the input device.
+
+  @param  This                     Protocol instance pointer.
+  @param  KeyToggleState           A pointer to the EFI_KEY_TOGGLE_STATE to set the
+                                   state for the input device.
+
+  @retval EFI_SUCCESS              The device state was set successfully.
+  @retval EFI_DEVICE_ERROR         The device is not functioning correctly and
+                                   could not have the setting adjusted.
+  @retval EFI_UNSUPPORTED          The device does not have the ability to set its
+                                   state.
+  @retval EFI_INVALID_PARAMETER    KeyToggleState is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConInSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
   )
-/*++
-
-  Routine Description:
-    Set certain state for the input device.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the
-                            state for the input device.
-
-  Returns:
-    EFI_SUCCESS           - The device state was set successfully.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could
-                            not have the setting adjusted.
-    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-    EFI_INVALID_PARAMETER - KeyToggleState is NULL.
-
---*/
 {
   if (KeyToggleState == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -377,6 +343,26 @@ TerminalConInSetState (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Register a notification function for a particular keystroke for the input device.
+
+  @param  This                     Protocol instance pointer.
+  @param  KeyData                  A pointer to a buffer that is filled in with the
+                                   keystroke information data for the key that was
+                                   pressed.
+  @param  KeyNotificationFunction  Points to the function to be called when the key
+                                   sequence is typed specified by KeyData.
+  @param  NotifyHandle             Points to the unique handle assigned to the
+                                   registered notification.
+
+  @retval EFI_SUCCESS              The notification function was registered
+                                   successfully.
+  @retval EFI_OUT_OF_RESOURCES     Unable to allocate resources for necesssary data
+                                   structures.
+  @retval EFI_INVALID_PARAMETER    KeyData or NotifyHandle is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConInRegisterKeyNotify (
@@ -385,25 +371,6 @@ TerminalConInRegisterKeyNotify (
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT EFI_HANDLE                        *NotifyHandle
   )
-/*++
-
-  Routine Description:
-    Register a notification function for a particular keystroke for the input device.
-
-  Arguments:
-    This                    - Protocol instance pointer.
-    KeyData                 - A pointer to a buffer that is filled in with the keystroke
-                              information data for the key that was pressed.
-    KeyNotificationFunction - Points to the function to be called when the key
-                              sequence is typed specified by KeyData.
-    NotifyHandle            - Points to the unique handle assigned to the registered notification.
-
-  Returns:
-    EFI_SUCCESS             - The notification function was registered successfully.
-    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.
-
---*/
 {
   EFI_STATUS                      Status;
   TERMINAL_DEV                    *TerminalDevice;
@@ -462,27 +429,26 @@ TerminalConInRegisterKeyNotify (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Remove a registered notification function from a particular keystroke.
+
+  @param  This                     Protocol instance pointer.
+  @param  NotificationHandle       The handle of the notification function being
+                                   unregistered.
+
+  @retval EFI_SUCCESS              The notification function was unregistered
+                                   successfully.
+  @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid.
+  @retval EFI_NOT_FOUND            Can not find the matching entry in database.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalConInUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
   )
-/*++
-
-  Routine Description:
-    Remove a registered notification function from a particular keystroke.
-
-  Arguments:
-    This                    - Protocol instance pointer.
-    NotificationHandle      - The handle of the notification function being unregistered.
-
-  Returns:
-    EFI_SUCCESS             - The notification function was unregistered successfully.
-    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    EFI_NOT_FOUND           - Can not find the matching entry in database.
-
---*/
 {
   EFI_STATUS                      Status;
   TERMINAL_DEV                    *TerminalDevice;
@@ -534,27 +500,30 @@ TerminalConInUnregisterKeyNotify (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Turn raw data into Unicode (according to different encode), and 
+  translate Unicode into key information. (according to different standard). 
 
+  @param  TerminalDevice       Terminal driver private structure.
+
+  @return none.
+
+**/
 VOID
 TranslateRawDataToEfiKey (
   IN  TERMINAL_DEV      *TerminalDevice
   )
-/*++
-    Step1: Turn raw data into Unicode (according to different encode).
-    Step2: Translate Unicode into key information.
-    (according to different terminal standard).
---*/
 {
   switch (TerminalDevice->TerminalType) {
 
-  case PcAnsiType:
-  case VT100Type:
-  case VT100PlusType:
+  case PCANSITYPE:
+  case VT100TYPE:
+  case VT100PLUSTYPE:
     AnsiRawDataToUnicode (TerminalDevice);
     UnicodeToEfiKey (TerminalDevice);
     break;
 
-  case VTUTF8Type:
+  case VTUTF8TYPE:
     //
     // Process all the raw data in the RawFIFO,
     // put the processed key into UnicodeFIFO.
@@ -571,29 +540,22 @@ TranslateRawDataToEfiKey (
   }
 }
 
+/**
+  Event notification function for EFI_SIMPLE_TEXT_INPUT_PROTOCOL.WaitForKey event
+  Signal the event if there is key available
+
+  @param  Event                    Indicates the event that invoke this function.
+  @param  Context                  Indicates the calling context.
+
+  @return None
+
+**/
 VOID
 EFIAPI
 TerminalConInWaitForKey (
   IN  EFI_EVENT       Event,
   IN  VOID            *Context
   )
-/*++
-  Routine Description:
-
-    Event notification function for EFI_SIMPLE_TEXT_INPUT_PROTOCOL.WaitForKey event
-    Signal the event if there is key available
-
-  Arguments:
-
-    Event - Indicates the event that invoke this function.
-
-    Context - Indicates the calling context.
-
-  Returns:
-
-    N/A
-
---*/
 {
   //
   // Someone is waiting on the keystroke event, if there's
@@ -607,30 +569,23 @@ TerminalConInWaitForKey (
   }
 }
 
+
+/**
+  Check for a pending key in the Efi Key FIFO or Serial device buffer.
+
+  @param  This                     Indicates the calling context.
+
+  @return EFI_SUCCESS
+  @return There is key pending.
+  @return EFI_NOT_READY
+  @return There is no key pending.
+  @return EFI_DEVICE_ERROR
+
+**/
 EFI_STATUS
 TerminalConInCheckForKey (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This
   )
-/*++
-  Routine Description:
-
-    Check for a pending key in the Efi Key FIFO or Serial device buffer.
-
-  Arguments:
-
-    This - Indicates the calling context.
-
-  Returns:
-
-    EFI_SUCCESS
-       There is key pending.
-
-    EFI_NOT_READY
-      There is no key pending.
-
-    EFI_DEVICE_ERROR
-
---*/
 {
   EFI_STATUS              Status;
   TERMINAL_DEV            *TerminalDevice;
@@ -680,7 +635,7 @@ TerminalConInCheckForKey (
   //
   Status = SerialIo->GetControl (SerialIo, &Control);
 
-  if (Control & EFI_SERIAL_INPUT_BUFFER_EMPTY) {
+  if (0 != (Control & EFI_SERIAL_INPUT_BUFFER_EMPTY)) {
     //
     // Translate all the raw data in RawFIFO into EFI Key,
     // according to different terminal type supported.
@@ -732,26 +687,31 @@ TerminalConInCheckForKey (
   return EFI_SUCCESS;
 }
 
+/**
+  Get one key out of serial buffer.
+
+  @param  SerialIo           Serial I/O protocl attached to the serial device.
+  @param  Output             The fetched key.
+
+  @return EFI_NOT_READY      If serial buffer is empty.
+  @return EFI_DEVICE_ERROR   If reading serial buffer encounter error.
+  @return EFI_SUCCESS        If reading serial buffer successfully, put
+                             the fetched key to the parameter output.
+
+**/
 EFI_STATUS
 GetOneKeyFromSerial (
   EFI_SERIAL_IO_PROTOCOL  *SerialIo,
-  UINT8                   *Input
+  UINT8                   *Output
   )
-/*++
-    Get one key out of serial buffer.
-    If serial buffer is empty, return EFI_NOT_READY;
-    if reading serial buffer encounter error, returns EFI_DEVICE_ERROR;
-    if reading serial buffer successfully, put the fetched key to
-    the parameter "Input", and return EFI_SUCCESS.
---*/
 {
   EFI_STATUS  Status;
   UINTN       Size;
 
   Size    = 1;
-  *Input  = 0;
+  *Output = 0;
 
-  Status  = SerialIo->Read (SerialIo, &Size, Input);
+  Status  = SerialIo->Read (SerialIo, &Size, Output);
 
   if (EFI_ERROR (Status)) {
 
@@ -763,23 +723,29 @@ GetOneKeyFromSerial (
 
   }
 
-  if (*Input == 0) {
+  if (*Output == 0) {
     return EFI_NOT_READY;
   }
 
   return EFI_SUCCESS;
 }
 
+/**
+  Insert one byte raw data into the Raw Data FIFO.
+
+  @param  TerminalDevice       Terminal driver private structure.
+  @param  Input                The key will be input.
+
+  @return TRUE                 If insert successfully.
+  @return FLASE                If Raw Data buffer is full before key insertion,
+                               and the key is lost.
+
+**/
 BOOLEAN
 RawFiFoInsertOneKey (
   TERMINAL_DEV      *TerminalDevice,
   UINT8             Input
   )
-/*++
-    Insert one byte raw data into the Raw Data FIFO.
-    If FIFO is FULL before data insertion,
-    return FALSE, and the key is lost.
---*/
 {
   UINT8 Tail;
 
@@ -799,16 +765,21 @@ RawFiFoInsertOneKey (
   return TRUE;
 }
 
+/**
+  Remove one pre-fetched key out of the Raw Data FIFO.
+
+  @param  TerminalDevice       Terminal driver private structure.
+  @param  Output               The key will be removed.
+
+  @return TRUE                 If insert successfully.
+  @return FLASE                If Raw Data FIFO buffer is empty before remove operation.
+
+**/
 BOOLEAN
 RawFiFoRemoveOneKey (
   TERMINAL_DEV  *TerminalDevice,
   UINT8         *Output
   )
-/*++
-    Remove one byte raw data out of the Raw Data FIFO.
-    If FIFO buffer is empty before remove operation,
-    return FALSE.
---*/
 {
   UINT8 Head;
 
@@ -829,13 +800,19 @@ RawFiFoRemoveOneKey (
   return TRUE;
 }
 
+/**
+  Clarify whether Raw Data FIFO buffer is empty.
+
+  @param  TerminalDevice       Terminal driver private structure
+
+  @return TRUE                 If Raw Data FIFO buffer is empty.
+  @return FLASE                If Raw Data FIFO buffer is not empty.
+
+**/
 BOOLEAN
 IsRawFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
   )
-/*++
-    Clarify whether FIFO buffer is empty.
---*/
 {
   if (TerminalDevice->RawFiFo.Head == TerminalDevice->RawFiFo.Tail) {
     return TRUE;
@@ -844,13 +821,19 @@ IsRawFiFoEmpty (
   }
 }
 
+/**
+  Clarify whether Raw Data FIFO buffer is full.
+
+  @param  TerminalDevice       Terminal driver private structure
+
+  @return TRUE                 If Raw Data FIFO buffer is full.
+  @return FLASE                If Raw Data FIFO buffer is not full.
+
+**/
 BOOLEAN
 IsRawFiFoFull (
   TERMINAL_DEV  *TerminalDevice
   )
-/*++
-    Clarify whether FIFO buffer is full.
---*/
 {
   UINT8 Tail;
   UINT8 Head;
@@ -866,16 +849,22 @@ IsRawFiFoFull (
   return FALSE;
 }
 
+/**
+  Insert one pre-fetched key into the FIFO buffer.
+
+  @param  TerminalDevice       Terminal driver private structure.
+  @param  Key                  The key will be input.
+
+  @return TRUE                 If insert successfully.
+  @return FLASE                If FIFO buffer is full before key insertion,
+                               and the key is lost.
+
+**/
 BOOLEAN
 EfiKeyFiFoInsertOneKey (
   TERMINAL_DEV      *TerminalDevice,
   EFI_INPUT_KEY     Key
   )
-/*++
-    Insert one pre-fetched key into the FIFO buffer.
-    If FIFO buffer is FULL before key insertion,
-    return FALSE, and the key is lost.
---*/
 {
   UINT8 Tail;
 
@@ -895,16 +884,21 @@ EfiKeyFiFoInsertOneKey (
   return TRUE;
 }
 
+/**
+  Remove one pre-fetched key out of the FIFO buffer.
+
+  @param  TerminalDevice       Terminal driver private structure.
+  @param  Output               The key will be removed.
+
+  @return TRUE                 If insert successfully.
+  @return FLASE                If FIFO buffer is empty before remove operation.
+
+**/
 BOOLEAN
 EfiKeyFiFoRemoveOneKey (
   TERMINAL_DEV  *TerminalDevice,
   EFI_INPUT_KEY *Output
   )
-/*++
-    Remove one pre-fetched key out of the FIFO buffer.
-    If FIFO buffer is empty before remove operation,
-    return FALSE.
---*/
 {
   UINT8 Head;
 
@@ -926,13 +920,19 @@ EfiKeyFiFoRemoveOneKey (
   return TRUE;
 }
 
+/**
+  Clarify whether FIFO buffer is empty.
+
+  @param  TerminalDevice       Terminal driver private structure
+
+  @return TRUE                 If FIFO buffer is empty.
+  @return FLASE                If FIFO buffer is not empty.
+
+**/
 BOOLEAN
 IsEfiKeyFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
   )
-/*++
-    Clarify whether FIFO buffer is empty.
---*/
 {
   if (TerminalDevice->EfiKeyFiFo.Head == TerminalDevice->EfiKeyFiFo.Tail) {
     return TRUE;
@@ -941,13 +941,19 @@ IsEfiKeyFiFoEmpty (
   }
 }
 
+/**
+  Clarify whether FIFO buffer is full.
+
+  @param  TerminalDevice       Terminal driver private structure
+
+  @return TRUE                 If FIFO buffer is full.
+  @return FLASE                If FIFO buffer is not full.
+
+**/
 BOOLEAN
 IsEfiKeyFiFoFull (
   TERMINAL_DEV  *TerminalDevice
   )
-/*++
-    Clarify whether FIFO buffer is full.
---*/
 {
   UINT8 Tail;
   UINT8 Head;
@@ -963,16 +969,22 @@ IsEfiKeyFiFoFull (
   return FALSE;
 }
 
+/**
+  Insert one pre-fetched key into the Unicode FIFO buffer.
+
+  @param  TerminalDevice       Terminal driver private structure.
+  @param  Input                The key will be input.
+
+  @return TRUE                 If insert successfully.
+  @return FLASE                If Unicode FIFO buffer is full before key insertion,
+                               and the key is lost.
+
+**/
 BOOLEAN
 UnicodeFiFoInsertOneKey (
   TERMINAL_DEV      *TerminalDevice,
   UINT16            Input
   )
-/*++
-    Insert one pre-fetched key into the FIFO buffer.
-    If FIFO buffer is FULL before key insertion,
-    return FALSE, and the key is lost.
---*/
 {
   UINT8 Tail;
 
@@ -992,16 +1004,21 @@ UnicodeFiFoInsertOneKey (
   return TRUE;
 }
 
+/**
+  Remove one pre-fetched key out of the Unicode FIFO buffer.
+
+  @param  TerminalDevice       Terminal driver private structure.
+  @param  Output               The key will be removed.
+
+  @return TRUE                 If insert successfully.
+  @return FLASE                If Unicode FIFO buffer is empty before remove operation.
+
+**/
 BOOLEAN
 UnicodeFiFoRemoveOneKey (
   TERMINAL_DEV  *TerminalDevice,
   UINT16        *Output
   )
-/*++
-    Remove one pre-fetched key out of the FIFO buffer.
-    If FIFO buffer is empty before remove operation,
-    return FALSE.
---*/
 {
   UINT8 Head;
 
@@ -1022,13 +1039,19 @@ UnicodeFiFoRemoveOneKey (
   return TRUE;
 }
 
+/**
+  Clarify whether Unicode FIFO buffer is empty.
+
+  @param  TerminalDevice       Terminal driver private structure
+
+  @return TRUE                 If Unicode FIFO buffer is empty.
+  @return FLASE                If Unicode FIFO buffer is not empty.
+
+**/
 BOOLEAN
 IsUnicodeFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
   )
-/*++
-    Clarify whether FIFO buffer is empty.
---*/
 {
   if (TerminalDevice->UnicodeFiFo.Head == TerminalDevice->UnicodeFiFo.Tail) {
     return TRUE;
@@ -1037,13 +1060,19 @@ IsUnicodeFiFoEmpty (
   }
 }
 
+/**
+  Clarify whether Unicode FIFO buffer is full.
+
+  @param  TerminalDevice       Terminal driver private structure
+
+  @return TRUE                 If Unicode FIFO buffer is full.
+  @return FLASE                If Unicode FIFO buffer is not full.
+
+**/
 BOOLEAN
 IsUnicodeFiFoFull (
   TERMINAL_DEV  *TerminalDevice
   )
-/*++
-    Clarify whether FIFO buffer is full.
---*/
 {
   UINT8 Tail;
   UINT8 Head;
@@ -1077,7 +1106,6 @@ UnicodeFiFoGetKeyCount (
   }
 }
 
-STATIC
 VOID
 UnicodeToEfiKeyFlushState (
   IN  TERMINAL_DEV    *TerminalDevice
@@ -1085,31 +1113,31 @@ UnicodeToEfiKeyFlushState (
 {
   EFI_INPUT_KEY Key;
 
-  if (TerminalDevice->InputState & INPUT_STATE_ESC) {
+  if (0 != (TerminalDevice->InputState & INPUT_STATE_ESC)) {
     Key.ScanCode    = SCAN_ESC;
     Key.UnicodeChar = 0;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if (TerminalDevice->InputState & INPUT_STATE_CSI) {
+  if (0 != (TerminalDevice->InputState & INPUT_STATE_CSI)) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = CSI;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if (TerminalDevice->InputState & INPUT_STATE_LEFTOPENBRACKET) {
+  if (0 != (TerminalDevice->InputState & INPUT_STATE_LEFTOPENBRACKET)) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = LEFTOPENBRACKET;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if (TerminalDevice->InputState & INPUT_STATE_O) {
+  if (0 != (TerminalDevice->InputState & INPUT_STATE_O)) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = 'O';
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if (TerminalDevice->InputState & INPUT_STATE_2) {
+  if (0 != (TerminalDevice->InputState & INPUT_STATE_2)) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = '2';
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
@@ -1124,80 +1152,74 @@ UnicodeToEfiKeyFlushState (
   TerminalDevice->InputState = INPUT_STATE_DEFAULT;
 }
 
+
+/**
+  Converts a stream of Unicode characters from a terminal input device into EFI Keys that
+  can be read through the Simple Input Protocol.  The table below shows the keyboard
+  input mappings that this function supports.  If the ESC sequence listed in one of the
+  columns is presented, then it is translated into the coorespoding EFI Scan Code.  If a
+  matching sequence is not found, then the raw key strokes are converted into EFI Keys.
+  2 seconds are allowed for an ESC sequence to be completed.  If the ESC sequence is not
+  completed in 2 seconds, then the raw key strokes of the partial ESC sequence are
+  converted into EFI Keys.
+  There is one special input sequence that will force the system to reset.
+  This is ESC R ESC r ESC R.
+
+  Symbols used in table below
+  ===========================
+    ESC = 0x1B
+    CSI = 0x9B
+    DEL = 0x7f
+    ^   = CTRL
+  
+  +=========+======+===========+==========+==========+
+  |         | EFI  | UEFI 2.0  |          |          |
+  |         | Scan |           |  VT100+  |          |
+  |   KEY   | Code |  PC ANSI  |  VTUTF8  |   VT100  |
+  +=========+======+===========+==========+==========+
+  | NULL    | 0x00 |           |          |          |
+  | UP      | 0x01 | ESC [ A   | ESC [ A  | ESC [ A  |
+  | DOWN    | 0x02 | ESC [ B   | ESC [ B  | ESC [ B  |
+  | RIGHT   | 0x03 | ESC [ C   | ESC [ C  | ESC [ C  |
+  | LEFT    | 0x04 | ESC [ D   | ESC [ D  | ESC [ D  |
+  | HOME    | 0x05 | ESC [ H   | ESC h    | ESC [ H  |
+  | END     | 0x06 | ESC [ F   | ESC k    | ESC [ K  |
+  | INSERT  | 0x07 | ESC [ @   | ESC +    | ESC [ @  |
+  |         |      | ESC [ L   |          | ESC [ L  |
+  | DELETE  | 0x08 | ESC [ X   | ESC -    | ESC [ P  |
+  | PG UP   | 0x09 | ESC [ I   | ESC ?    | ESC [ V  |
+  |         |      |           |          | ESC [ ?  |
+  | PG DOWN | 0x0A | ESC [ G   | ESC /    | ESC [ U  |
+  |         |      |           |          | ESC [ /  |
+  | F1      | 0x0B | ESC [ M   | ESC 1    | ESC O P  |
+  | F2      | 0x0C | ESC [ N   | ESC 2    | ESC O Q  |
+  | F3      | 0x0D | ESC [ O   | ESC 3    | ESC O w  |
+  | F4      | 0x0E | ESC [ P   | ESC 4    | ESC O x  |
+  | F5      | 0x0F | ESC [ Q   | ESC 5    | ESC O t  |
+  | F6      | 0x10 | ESC [ R   | ESC 6    | ESC O u  |
+  | F7      | 0x11 | ESC [ S   | ESC 7    | ESC O q  |
+  | F8      | 0x12 | ESC [ T   | ESC 8    | ESC O r  |
+  | F9      | 0x13 | ESC [ U   | ESC 9    | ESC O p  |
+  | F10     | 0x14 | ESC [ V   | ESC 0    | ESC O M  |
+  | Escape  | 0x17 | ESC       | ESC      | ESC      |
+  | F11     | 0x15 |           | ESC !    |          |
+  | F12     | 0x16 |           | ESC @    |          |
+  +=========+======+===========+==========+==========+
+  
+  Special Mappings
+  ================
+  ESC R ESC r ESC R = Reset System
+
+
+  @param TerminalDevice   The terminal device to use to translate raw input into EFI Keys
+
+  @return None
+
+**/
 VOID
 UnicodeToEfiKey (
   IN  TERMINAL_DEV    *TerminalDevice
   )
-/*++
-  Routine Description:
-
-    Converts a stream of Unicode characters from a terminal input device into EFI Keys that
-    can be read through the Simple Input Protocol.  The table below shows the keyboard
-    input mappings that this function supports.  If the ESC sequence listed in one of the
-    columns is presented, then it is translated into the coorespoding EFI Scan Code.  If a
-    matching sequence is not found, then the raw key strokes are converted into EFI Keys.
-
-    2 seconds are allowed for an ESC sequence to be completed.  If the ESC sequence is not
-    completed in 2 seconds, then the raw key strokes of the partial ESC sequence are
-    converted into EFI Keys.
-
-    There is one special input sequence that will force the system to reset.
-    This is ESC R ESC r ESC R.
-
-  Arguments:
-
-    TerminaDevice : The terminal device to use to translate raw input into EFI Keys
-
-  Returns:
-
-    None
-
-Symbols used in table below
-===========================
-  ESC = 0x1B
-  CSI = 0x9B
-  DEL = 0x7f
-  ^   = CTRL
-
-+=========+======+===========+==========+==========+
-|         | EFI  | UEFI 2.0  |          |          |
-|         | Scan |           |  VT100+  |          |
-|   KEY   | Code |  PC ANSI  |  VTUTF8  |   VT100  |
-+=========+======+===========+==========+==========+
-| NULL    | 0x00 |           |          |          |
-| UP      | 0x01 | ESC [ A   | ESC [ A  | ESC [ A  |
-| DOWN    | 0x02 | ESC [ B   | ESC [ B  | ESC [ B  |
-| RIGHT   | 0x03 | ESC [ C   | ESC [ C  | ESC [ C  |
-| LEFT    | 0x04 | ESC [ D   | ESC [ D  | ESC [ D  |
-| HOME    | 0x05 | ESC [ H   | ESC h    | ESC [ H  |
-| END     | 0x06 | ESC [ F   | ESC k    | ESC [ K  |
-| INSERT  | 0x07 | ESC [ @   | ESC +    | ESC [ @  |
-|         |      | ESC [ L   |          | ESC [ L  |
-| DELETE  | 0x08 | ESC [ X   | ESC -    | ESC [ P  |
-| PG UP   | 0x09 | ESC [ I   | ESC ?    | ESC [ V  |
-|         |      |           |          | ESC [ ?  |
-| PG DOWN | 0x0A | ESC [ G   | ESC /    | ESC [ U  |
-|         |      |           |          | ESC [ /  |
-| F1      | 0x0B | ESC [ M   | ESC 1    | ESC O P  |
-| F2      | 0x0C | ESC [ N   | ESC 2    | ESC O Q  |
-| F3      | 0x0D | ESC [ O   | ESC 3    | ESC O w  |
-| F4      | 0x0E | ESC [ P   | ESC 4    | ESC O x  |
-| F5      | 0x0F | ESC [ Q   | ESC 5    | ESC O t  |
-| F6      | 0x10 | ESC [ R   | ESC 6    | ESC O u  |
-| F7      | 0x11 | ESC [ S   | ESC 7    | ESC O q  |
-| F8      | 0x12 | ESC [ T   | ESC 8    | ESC O r  |
-| F9      | 0x13 | ESC [ U   | ESC 9    | ESC O p  |
-| F10     | 0x14 | ESC [ V   | ESC 0    | ESC O M  |
-| Escape  | 0x17 | ESC       | ESC      | ESC      |
-| F11     | 0x15 |           | ESC !    |          |
-| F12     | 0x16 |           | ESC @    |          |
-+=========+======+===========+==========+==========+
-
-Special Mappings
-================
-ESC R ESC r ESC R = Reset System
-
---*/
 {
   EFI_STATUS          Status;
   EFI_STATUS          TimerStatus;
@@ -1245,7 +1267,7 @@ ESC R ESC r ESC R = Reset System
         continue;
       }
 
-      if (UnicodeChar == 'O' && TerminalDevice->TerminalType == VT100Type) {
+      if (UnicodeChar == 'O' && TerminalDevice->TerminalType == VT100TYPE) {
         TerminalDevice->InputState |= INPUT_STATE_O;
         TerminalDevice->ResetState = RESET_STATE_DEFAULT;
         continue;
@@ -1253,8 +1275,8 @@ ESC R ESC r ESC R = Reset System
 
       Key.ScanCode = SCAN_NULL;
 
-      if (TerminalDevice->TerminalType == VT100PlusType ||
-          TerminalDevice->TerminalType == VTUTF8Type) {
+      if (TerminalDevice->TerminalType == VT100PLUSTYPE ||
+          TerminalDevice->TerminalType == VTUTF8TYPE) {
         switch (UnicodeChar) {
         case '1':
           Key.ScanCode = SCAN_F1;
@@ -1358,7 +1380,7 @@ ESC R ESC r ESC R = Reset System
 
       Key.ScanCode = SCAN_NULL;
 
-      if (TerminalDevice->TerminalType == VT100Type) {
+      if (TerminalDevice->TerminalType == VT100TYPE) {
         switch (UnicodeChar) {
         case 'P':
           Key.ScanCode = SCAN_F1;
@@ -1413,10 +1435,10 @@ ESC R ESC r ESC R = Reset System
 
       Key.ScanCode = SCAN_NULL;
 
-      if (TerminalDevice->TerminalType == PcAnsiType    ||
-          TerminalDevice->TerminalType == VT100Type     ||
-          TerminalDevice->TerminalType == VT100PlusType ||
-          TerminalDevice->TerminalType == VTUTF8Type) {
+      if (TerminalDevice->TerminalType == PCANSITYPE    ||
+          TerminalDevice->TerminalType == VT100TYPE     ||
+          TerminalDevice->TerminalType == VT100PLUSTYPE ||
+          TerminalDevice->TerminalType == VTUTF8TYPE) {
         switch (UnicodeChar) {
         case 'A':
           Key.ScanCode = SCAN_UP;
@@ -1431,100 +1453,100 @@ ESC R ESC r ESC R = Reset System
           Key.ScanCode = SCAN_LEFT;
           break;
         case 'H':
-          if (TerminalDevice->TerminalType == PcAnsiType ||
-              TerminalDevice->TerminalType == VT100Type) {
+          if (TerminalDevice->TerminalType == PCANSITYPE ||
+              TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_HOME;
           }
           break;
         case 'F':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_END;
           }
           break;
         case 'K':
-          if (TerminalDevice->TerminalType == VT100Type) {
+          if (TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_END;
           }
           break;
         case 'L':
         case '@':
-          if (TerminalDevice->TerminalType == PcAnsiType ||
-              TerminalDevice->TerminalType == VT100Type) {
+          if (TerminalDevice->TerminalType == PCANSITYPE ||
+              TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_INSERT;
           }
           break;
         case 'X':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_DELETE;
           }
           break;
         case 'P':
-          if (TerminalDevice->TerminalType == VT100Type) {
+          if (TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_DELETE;
-          } else if (TerminalDevice->TerminalType == PcAnsiType) {
+          } else if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F4;
           }
           break;
         case 'I':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_PAGE_UP;
           }
           break;
         case 'V':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F10;
           }
         case '?':
-          if (TerminalDevice->TerminalType == VT100Type) {
+          if (TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_PAGE_UP;
           }
           break;
         case 'G':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_PAGE_DOWN;
           }
           break;
         case 'U':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F9;
           }
         case '/':
-          if (TerminalDevice->TerminalType == VT100Type) {
+          if (TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_PAGE_DOWN;
           }
           break;
         case 'M':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F1;
           }
           break;
         case 'N':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F2;
           }
           break;
         case 'O':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F3;
           }
           break;
         case 'Q':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F5;
           }
           break;
         case 'R':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F6;
           }
           break;
         case 'S':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F7;
           }
           break;
         case 'T':
-          if (TerminalDevice->TerminalType == PcAnsiType) {
+          if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F8;
           }
           break;

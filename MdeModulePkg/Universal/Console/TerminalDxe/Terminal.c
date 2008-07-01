@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Terminal.h"
 
-STATIC
 EFI_STATUS
 TerminalFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
@@ -209,6 +208,19 @@ TerminalDriverBindingSupported (
   return Status;
 }
 
+
+/**
+  Start the controller.
+
+  @param  This                   A pointer to the EFI_DRIVER_BINDING_PROTOCOL
+                                 instance.
+  @param  Controller             The handle of the controller to start.
+  @param  RemainingDevicePath    A pointer to the remaining portion of a devcie
+                                 path.
+
+  @return EFI_SUCCESS.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalDriverBindingStart (
@@ -216,23 +228,6 @@ TerminalDriverBindingStart (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-  Routine Description:
-
-    Start the controller.
-
-  Arguments:
-
-    This                - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller          - The handle of the controller to start.
-    RemainingDevicePath - A pointer to the remaining portion of a devcie path.
-
-  Returns:
-
-    EFI_SUCCESS.
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
@@ -358,8 +353,8 @@ TerminalDriverBindingStart (
     }
 
     TerminalType = FixedPcdGet8 (PcdDefaultTerminalType);
-    // must be between PcAnsiType (0) and VTUTF8Type (3)
-    ASSERT (TerminalType <= VTUTF8Type);
+    // must be between PCANSITYPE (0) and VTUTF8TYPE (3)
+    ASSERT (TerminalType <= VTUTF8TYPE);
 
     CopyMem (&DefaultNode->Guid, gTerminalType[TerminalType], sizeof (EFI_GUID));
     RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL*)DefaultNode;
@@ -369,13 +364,13 @@ TerminalDriverBindingStart (
     //
     Node = (VENDOR_DEVICE_PATH *)RemainingDevicePath;
     if (CompareGuid (&Node->Guid, &gEfiPcAnsiGuid)) {
-      TerminalType = PcAnsiType;
+      TerminalType = PCANSITYPE;
     } else if (CompareGuid (&Node->Guid, &gEfiVT100Guid)) {
-      TerminalType = VT100Type;
+      TerminalType = VT100TYPE;
     } else if (CompareGuid (&Node->Guid, &gEfiVT100PlusGuid)) {
-      TerminalType = VT100PlusType;
+      TerminalType = VT100PLUSTYPE;
     } else if (CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
-      TerminalType = VTUTF8Type;
+      TerminalType = VTUTF8TYPE;
     } else {
       goto Error;
     }
@@ -544,7 +539,7 @@ TerminalDriverBindingStart (
   //
   TerminalDevice->ControllerNameTable = NULL;
   switch (TerminalDevice->TerminalType) {
-  case PcAnsiType:
+  case PCANSITYPE:
     AddUnicodeString2 (
       "eng",
       gTerminalComponentName.SupportedLanguages,
@@ -562,7 +557,7 @@ TerminalDriverBindingStart (
 
     break;
 
-  case VT100Type:
+  case VT100TYPE:
     AddUnicodeString2 (
       "eng",
       gTerminalComponentName.SupportedLanguages,
@@ -580,7 +575,7 @@ TerminalDriverBindingStart (
 
     break;
 
-  case VT100PlusType:
+  case VT100PLUSTYPE:
     AddUnicodeString2 (
       "eng",
       gTerminalComponentName.SupportedLanguages,
@@ -598,7 +593,7 @@ TerminalDriverBindingStart (
 
     break;
 
-  case VTUTF8Type:
+  case VTUTF8TYPE:
     AddUnicodeString2 (
       "eng",
       gTerminalComponentName.SupportedLanguages,
@@ -731,6 +726,21 @@ Error:
   return Status;
 }
 
+
+/**
+  Stop a device controller.
+
+  @param  This                   A pointer to the EFI_DRIVER_BINDING_PROTOCOL
+                                 instance.
+  @param  Controller             A handle to the device being stopped.
+  @param  NumberOfChildren       The number of child device handles in
+                                 ChildHandleBuffer.
+  @param  ChildHandleBuffer      An array of child handles to be freed.
+
+  @retval EFI_SUCCESS            Operation successful.
+  @retval EFI_DEVICE_ERROR       Devices error.
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalDriverBindingStop (
@@ -739,25 +749,6 @@ TerminalDriverBindingStop (
   IN  UINTN                         NumberOfChildren,
   IN  EFI_HANDLE                    *ChildHandleBuffer
   )
-/*++
-
-  Routine Description:
-
-    Stop a device controller.
-
-  Arguments:
-
-    This              - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller        - A handle to the device being stopped.
-    NumberOfChildren  - The number of child device handles in ChildHandleBuffer.
-    ChildHandleBuffer - An array of child handles to be freed.
-
-  Returns:
-
-    EFI_SUCCESS      - Operation successful.
-    EFI_DEVICE_ERROR - Devices error.
-
---*/
 {
   EFI_STATUS                       Status;
   UINTN                            Index;
@@ -927,25 +918,19 @@ TerminalDriverBindingStop (
   return EFI_SUCCESS;
 }
 
-STATIC
+
+/**
+
+  @param  ListHead               The list head
+
+  @retval EFI_SUCCESS            Free the notify list successfully
+  @retval EFI_INVALID_PARAMETER  ListHead is invalid.
+
+**/
 EFI_STATUS
 TerminalFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-  ListHead   - The list head
-
-Returns:
-
-  EFI_SUCCESS           - Free the notify list successfully
-  EFI_INVALID_PARAMETER - ListHead is invalid.
-
---*/
 {
   TERMINAL_CONSOLE_IN_EX_NOTIFY *NotifyNode;
 
@@ -994,7 +979,7 @@ TerminalUpdateConsoleDevVariable (
   //
   // Append terminal device path onto the variable.
   //
-  for (TerminalType = PcAnsiType; TerminalType <= VTUTF8Type; TerminalType++) {
+  for (TerminalType = PCANSITYPE; TerminalType <= VTUTF8TYPE; TerminalType++) {
     SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
     NewVariable = AppendDevicePathInstance (Variable, TempDevicePath);
     if (Variable != NULL) {
@@ -1023,25 +1008,21 @@ TerminalUpdateConsoleDevVariable (
   return ;
 }
 
+
+/**
+  Remove console device variable.
+
+  @param  VariableName           A pointer to the variable name.
+  @param  ParentDevicePath       A pointer to the parent device path.
+
+  @return None.
+
+**/
 VOID
 TerminalRemoveConsoleDevVariable (
   IN CHAR16                    *VariableName,
   IN EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath
   )
-/*++
-
-  Routine Description:
-
-    Remove console device variable.
-
-  Arguments:
-
-    VariableName     - A pointer to the variable name.
-    ParentDevicePath - A pointer to the parent device path.
-
-  Returns:
-
---*/
 {
   EFI_STATUS                Status;
   BOOLEAN                   FoundOne;
@@ -1091,7 +1072,7 @@ TerminalRemoveConsoleDevVariable (
     // Loop through all the terminal types that this driver supports
     //
     Match = FALSE;
-    for (TerminalType = PcAnsiType; TerminalType <= VTUTF8Type; TerminalType++) {
+    for (TerminalType = PCANSITYPE; TerminalType <= VTUTF8TYPE; TerminalType++) {
 
       SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
 
@@ -1146,32 +1127,26 @@ TerminalRemoveConsoleDevVariable (
   return ;
 }
 
+
+/**
+  Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
+  buffer, and the size of the buffer. On failure return NULL.
+
+  @param  Name                   String part of EFI variable name
+  @param  VendorGuid             GUID part of EFI variable name
+  @param  VariableSize           Returns the size of the EFI variable that was read
+
+  @return Dynamically allocated memory that contains a copy of the EFI variable.
+  @return Caller is repsoncible freeing the buffer.
+  @retval NULL                   Variable was not read
+
+**/
 VOID *
 TerminalGetVariableAndSize (
   IN  CHAR16              *Name,
   IN  EFI_GUID            *VendorGuid,
   OUT UINTN               *VariableSize
   )
-/*++
-
-Routine Description:
-  Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
-  buffer, and the size of the buffer. On failure return NULL.
-
-Arguments:
-  Name       - String part of EFI variable name
-
-  VendorGuid - GUID part of EFI variable name
-
-  VariableSize - Returns the size of the EFI variable that was read
-
-Returns:
-  Dynamically allocated memory that contains a copy of the EFI variable.
-  Caller is repsoncible freeing the buffer.
-
-  NULL - Variable was not read
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       BufferSize;
@@ -1245,7 +1220,7 @@ SetTerminalDevicePath (
   //
   switch (TerminalType) {
 
-  case PcAnsiType:
+  case PCANSITYPE:
     CopyMem (
       &Node.Guid,
       &gEfiPcAnsiGuid,
@@ -1253,7 +1228,7 @@ SetTerminalDevicePath (
       );
     break;
 
-  case VT100Type:
+  case VT100TYPE:
     CopyMem (
       &Node.Guid,
       &gEfiVT100Guid,
@@ -1261,7 +1236,7 @@ SetTerminalDevicePath (
       );
     break;
 
-  case VT100PlusType:
+  case VT100PLUSTYPE:
     CopyMem (
       &Node.Guid,
       &gEfiVT100PlusGuid,
@@ -1269,7 +1244,7 @@ SetTerminalDevicePath (
       );
     break;
 
-  case VTUTF8Type:
+  case VTUTF8TYPE:
     CopyMem (
       &Node.Guid,
       &gEfiVTUTF8Guid,
