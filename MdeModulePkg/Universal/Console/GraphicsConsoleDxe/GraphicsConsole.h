@@ -1,7 +1,7 @@
 /** @file
   Header file for GraphicsConsole driver.
 
-Copyright (c) 2006, Intel Corporation. <BR>
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _GRAPHICS_CONSOLE_H
-#define _GRAPHICS_CONSOLE_H
+#ifndef _GRAPHICS_CONSOLE_H_
+#define _GRAPHICS_CONSOLE_H_
 
 #include <PiDxe.h>
 #include <Protocol/SimpleTextOut.h>
@@ -228,11 +228,23 @@ ReturnNarrowFontSize (
   VOID
   );
 
-UINTN
-ReturnWideFontSize (
-  VOID
-  );
+/**
+  Implements SIMPLE_TEXT_OUTPUT.Reset().
+  If ExtendeVerification is TRUE, then perform dependent Graphics Console
+  device reset, and set display mode to mode 0.
+  If ExtendedVerification is FALSE, only set display mode to mode 0.
 
+  @param  This                  Indicates the calling context.
+  @param  ExtendedVerification  Indicates that the driver may perform a more
+                                exhaustive verification operation of the device
+                                during reset.
+
+  @return EFI_SUCCESS
+  @return The reset operation succeeds.
+  @return EFI_DEVICE_ERROR
+  @return The Graphics Console is not functioning correctly
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutReset (
@@ -240,6 +252,24 @@ GraphicsConsoleConOutReset (
   IN  BOOLEAN                            ExtendedVerification
   );
 
+/**
+  Implements SIMPLE_TEXT_OUTPUT.OutputString().
+  The Unicode string will be converted to Glyphs and will be
+  sent to the Graphics Console.
+
+  @param  This                  Indicates the calling context.
+  @param  WString               The Null-terminated Unicode string to be displayed
+                                on the Graphics Console.
+
+  @return EFI_SUCCESS
+  @return The string is output successfully.
+  @return EFI_DEVICE_ERROR
+  @return The Graphics Console failed to send the string out.
+  @return EFI_WARN_UNKNOWN_GLYPH
+  @return Indicates that some of the characters in the Unicode string could not
+  @return be rendered and are skipped.
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutOutputString (
@@ -247,6 +277,22 @@ GraphicsConsoleConOutOutputString (
   IN  CHAR16                           *WString
   );
 
+/**
+  Implements SIMPLE_TEXT_OUTPUT.TestString().
+  If one of the characters in the *Wstring is
+  neither valid valid Unicode drawing characters,
+  not ASCII code, then this function will return
+  EFI_UNSUPPORTED.
+
+  @param  This                  Indicates the calling context.
+  @param  WString               The Null-terminated Unicode string to be tested.
+
+  @return EFI_SUCCESS
+  @return The Graphics Console is capable of rendering the output string.
+  @return EFI_UNSUPPORTED
+  @return Some of the characters in the Unicode string cannot be rendered.
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutTestString (
@@ -254,6 +300,24 @@ GraphicsConsoleConOutTestString (
   IN  CHAR16                           *WString
   );
 
+/**
+  Implements SIMPLE_TEXT_OUTPUT.QueryMode().
+  It returnes information for an available text mode
+  that the Graphics Console supports.
+  In this driver,we only support text mode 80x25, which is
+  defined as mode 0.
+
+  @param  This                  Indicates the calling context.
+  @param  ModeNumber            The mode number to return information on.
+  @param  Columns               The returned columns of the requested mode.
+  @param  Rows                  The returned rows of the requested mode.
+
+  @return EFI_SUCCESS
+  @return The requested mode information is returned.
+  @return EFI_UNSUPPORTED
+  @return The mode number is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutQueryMode (
@@ -263,6 +327,22 @@ GraphicsConsoleConOutQueryMode (
   OUT UINTN                            *Rows
   );
 
+/**
+  Implements SIMPLE_TEXT_OUTPUT.SetMode().
+  Set the Graphics Console to a specified mode.
+  In this driver, we only support mode 0.
+
+  @param  This                  Indicates the calling context.
+  @param  ModeNumber            The text mode to set.
+
+  @return EFI_SUCCESS
+  @return The requested text mode is set.
+  @return EFI_DEVICE_ERROR
+  @return The requested text mode cannot be set because of Graphics Console device error.
+  @return EFI_UNSUPPORTED
+  @return The text mode number is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutSetMode (
@@ -270,6 +350,18 @@ GraphicsConsoleConOutSetMode (
   IN  UINTN                            ModeNumber
   );
 
+/**
+  Implements SIMPLE_TEXT_OUTPUT.SetAttribute().
+
+  @param  This                  Indicates the calling context.
+  @param  Attribute             The attribute to set. Only bit0..6 are valid, all
+                                other bits are undefined and must be zero.
+
+  @return EFI_SUCCESS           The requested attribute is set.
+  @return EFI_DEVICE_ERROR      The requested attribute cannot be set due to Graphics Console port error.
+  @return EFI_UNSUPPORTED       The attribute requested is not defined by EFI spec.
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutSetAttribute (
@@ -277,12 +369,43 @@ GraphicsConsoleConOutSetAttribute (
   IN  UINTN                            Attribute
   );
 
+/**
+  Implements SIMPLE_TEXT_OUTPUT.ClearScreen().
+  It clears the Graphics Console's display to the
+  currently selected background color.
+
+  @param  This                  Indicates the calling context.
+
+  @return EFI_SUCCESS
+  @return The operation completed successfully.
+  @return EFI_DEVICE_ERROR
+  @return The Graphics Console cannot be cleared due to Graphics Console device error.
+  @return EFI_UNSUPPORTED
+  @return The Graphics Console is not in a valid text mode.
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutClearScreen (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
   );
 
+/**
+  Implements SIMPLE_TEXT_OUTPUT.SetCursorPosition().
+
+  @param  This                  Indicates the calling context.
+  @param  Column                The row to set cursor to.
+  @param  Row                   The column to set cursor to.
+
+  @return EFI_SUCCESS
+  @return The operation completed successfully.
+  @return EFI_DEVICE_ERROR
+  @return The request fails due to Graphics Console device error.
+  @return EFI_UNSUPPORTED
+  @return The Graphics Console is not in a valid text mode, or the cursor position
+  @return is invalid for current mode.
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutSetCursorPosition (
@@ -291,6 +414,20 @@ GraphicsConsoleConOutSetCursorPosition (
   IN  UINTN                            Row
   );
 
+/**
+  Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
+  In this driver, the cursor cannot be hidden.
+
+  @param  This                  Indicates the calling context.
+  @param  Visible               If TRUE, the cursor is set to be visible, If FALSE,
+                                the cursor is set to be invisible.
+
+  @return EFI_SUCCESS
+  @return The request is valid.
+  @return EFI_UNSUPPORTED
+  @return The Graphics Console does not support a hidden cursor.
+
+**/
 EFI_STATUS
 EFIAPI
 GraphicsConsoleConOutEnableCursor (
@@ -322,6 +459,7 @@ GraphicsConsoleControllerDriverStop (
   IN  UINTN                          NumberOfChildren,
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
+
 
 EFI_STATUS
 EfiLocateHiiProtocol (
