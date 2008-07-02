@@ -3,7 +3,7 @@
 #
 # IDE bus driver. This driver will enumerate IDE device and export the blockIo
 #  protocol for every device.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -42,13 +42,13 @@
   DriverConfiguration.c
   ComponentName.h
   ComponentName.c
-  atapi.c
-  ata.c
-  ide.c
-  idebus.c
-  idedata.h
-  ide.h
-  idebus.h
+  Atapi.c
+  Ata.c
+  Ide.c
+  IdeBus.c
+  IdeData.h
+  Ide.h
+  IdeBus.h
 
 
 [Packages]
