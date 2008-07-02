@@ -817,7 +817,7 @@ UsbIoPortReset (
   UsbIf  = USB_INTERFACE_FROM_USBIO (This);
   Dev    = UsbIf->Device;
 
-  if (UsbIf->IsHub == TRUE) {
+  if (UsbIf->IsHub) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
