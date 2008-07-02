@@ -1640,7 +1640,7 @@ FREE_POOL:
   gBS->FreePool (Ehc);
 
 CLOSE_PCIIO:
-  if (PciAttributesSaved == TRUE) {
+  if (PciAttributesSaved) {
     //
     // Restore original PCI attributes
     //

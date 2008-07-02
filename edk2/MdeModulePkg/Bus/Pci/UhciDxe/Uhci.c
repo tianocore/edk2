@@ -1756,7 +1756,7 @@ FREE_UHC:
   UhciFreeDev (Uhc);
 
 CLOSE_PCIIO:
-  if (PciAttributesSaved == TRUE) {
+  if (PciAttributesSaved) {
     //
     // Restore original PCI attributes
     //
