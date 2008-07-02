@@ -4,7 +4,7 @@
 # PCI bus driver. This module will probe all PCI devices and allocate MMIO and IO
 #  space for these devices. Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable
 #  support hot plug.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -39,7 +39,7 @@
 [Sources.common]
   PciLib.c
   PciIo.c
-  pcibus.c
+  Pcibus.c
   PciDeviceSupport.c
   ComponentName.c
   ComponentName.h
@@ -64,7 +64,7 @@
   PciDeviceSupport.h
   PciCommand.h
   PciIo.h
-  pcibus.h
+  Pcibus.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -90,7 +90,7 @@
 
 [Guids]
   gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED  System Table
-  gEfiUgaIoProtocolGuid                         # ALWAYS_CONSUMED  System Table
+  gEfiUgaIoProtocolGuid                         # ALWAYS_CONSUMED     System Table
   gEfiPciHotplugDeviceGuid                      # PRIVATE
   gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED
 
