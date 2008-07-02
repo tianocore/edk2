@@ -2,7 +2,7 @@
 # PCI Incompatible device support Library
 #
 # Check PCI incompatible devices and set necessary configuration
-# Copyright (c) 2007, Intel Corporation.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,7 +20,7 @@
   FILE_GUID                      = 1ca1c1f9-5baf-4204-b6e5-5e24109a4e4e
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PciIncompatibleDeviceSupportLib 
+  LIBRARY_CLASS                  = PciIncompatibleDeviceSupportLib|DXE_DRIVER UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
