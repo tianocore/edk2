@@ -91,10 +91,8 @@ ReadKeyStrokeWorker (
   @param  This                     Indicates the calling context.
   @param  ExtendedVerification     Skip by this driver.
 
-  @return EFI_SUCCESS
-  @return The reset operation succeeds.
-  @return EFI_DEVICE_ERROR
-  @return The dependent serial port reset fails.
+  @return EFI_SUCCESS              The reset operation succeeds.
+  @return EFI_DEVICE_ERROR         The dependent serial port reset fails.
 
 **/
 EFI_STATUS
@@ -138,21 +136,17 @@ TerminalConInReset (
   return Status;
 }
 
-
 /**
   Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.ReadKeyStroke().
 
-  @param  This                     Indicates the calling context.
-  @param  Key                      A pointer to a buffer that is filled in with the
-                                   keystroke information for the key that was sent
-                                   from terminal.
+  @param  This                Indicates the calling context.
+  @param  Key                 A pointer to a buffer that is filled in with the
+                              keystroke information for the key that was sent
+                              from terminal.
 
-  @return EFI_SUCCESS
-  @return The keystroke information is returned successfully.
-  @return EFI_NOT_READY
-  @return There is no keystroke data available.
-  @return EFI_DEVICE_ERROR
-  @return The dependent serial device encounters error.
+  @return EFI_SUCCESS         The keystroke information is returned successfully.
+  @return EFI_NOT_READY       There is no keystroke data available.
+  @return EFI_DEVICE_ERROR    The dependent serial device encounters error.
 
 **/
 EFI_STATUS
@@ -182,9 +176,8 @@ TerminalConInReadKeyStroke (
 
 }
 
-
-
 /**
+  Check if the key already has been registered.
 
   @param  RegsiteredData           A pointer to a buffer that is filled in with the
                                    keystroke state data for the key that was
@@ -243,7 +236,6 @@ TerminalConInWaitForKeyEx (
 //
 // Simple Text Input Ex protocol functions
 //
-
 
 /**
   Reset the input device and optionaly run diagnostics
@@ -501,7 +493,7 @@ TerminalConInUnregisterKeyNotify (
 }
 
 /**
-  Turn raw data into Unicode (according to different encode), and 
+  Translate raw data into Unicode (according to different encode), and 
   translate Unicode into key information. (according to different standard). 
 
   @param  TerminalDevice       Terminal driver private structure.
@@ -575,11 +567,9 @@ TerminalConInWaitForKey (
 
   @param  This                     Indicates the calling context.
 
-  @return EFI_SUCCESS
-  @return There is key pending.
-  @return EFI_NOT_READY
-  @return There is no key pending.
-  @return EFI_DEVICE_ERROR
+  @retval EFI_SUCCESS              There is key pending.
+  @retval EFI_NOT_READY            There is no key pending.
+  @retval EFI_DEVICE_ERROR         If Serial IO is not attched to serial device.
 
 **/
 EFI_STATUS
@@ -1088,6 +1078,14 @@ IsUnicodeFiFoFull (
   return FALSE;
 }
 
+/**
+  Count Unicode FIFO buffer.
+
+  @param  TerminalDevice       Terminal driver private structure
+
+  @return The count in bytes of Unicode FIFO.
+
+**/
 UINT8
 UnicodeFiFoGetKeyCount (
   TERMINAL_DEV    *TerminalDevice
@@ -1106,6 +1104,14 @@ UnicodeFiFoGetKeyCount (
   }
 }
 
+/**
+  Update the Unicode characters from a terminal input device into EFI Keys FIFO.
+  
+  @param TerminalDevice   The terminal device to use to translate raw input into EFI Keys
+
+  @return None.
+
+**/
 VOID
 UnicodeToEfiKeyFlushState (
   IN  TERMINAL_DEV    *TerminalDevice
@@ -1155,10 +1161,13 @@ UnicodeToEfiKeyFlushState (
 
 /**
   Converts a stream of Unicode characters from a terminal input device into EFI Keys that
-  can be read through the Simple Input Protocol.  The table below shows the keyboard
-  input mappings that this function supports.  If the ESC sequence listed in one of the
-  columns is presented, then it is translated into the coorespoding EFI Scan Code.  If a
-  matching sequence is not found, then the raw key strokes are converted into EFI Keys.
+  can be read through the Simple Input Protocol. 
+  
+  The table below shows the keyboard input mappings that this function supports.
+  If the ESC sequence listed in one of the columns is presented, then it is translated
+  into the coorespoding EFI Scan Code.  If a matching sequence is not found, then the raw
+  key strokes are converted into EFI Keys.
+
   2 seconds are allowed for an ESC sequence to be completed.  If the ESC sequence is not
   completed in 2 seconds, then the raw key strokes of the partial ESC sequence are
   converted into EFI Keys.
@@ -1171,7 +1180,7 @@ UnicodeToEfiKeyFlushState (
     CSI = 0x9B
     DEL = 0x7f
     ^   = CTRL
-  
+
   +=========+======+===========+==========+==========+
   |         | EFI  | UEFI 2.0  |          |          |
   |         | Scan |           |  VT100+  |          |
@@ -1205,15 +1214,14 @@ UnicodeToEfiKeyFlushState (
   | F11     | 0x15 |           | ESC !    |          |
   | F12     | 0x16 |           | ESC @    |          |
   +=========+======+===========+==========+==========+
-  
+
   Special Mappings
   ================
   ESC R ESC r ESC R = Reset System
 
-
   @param TerminalDevice   The terminal device to use to translate raw input into EFI Keys
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -1250,7 +1258,7 @@ UnicodeToEfiKey (
     //
     // Fetch one Unicode character from the Unicode FIFO
     //
-    UnicodeFiFoRemoveOneKey (TerminalDevice,&UnicodeChar);
+    UnicodeFiFoRemoveOneKey (TerminalDevice, &UnicodeChar);
 
     SetDefaultResetState = TRUE;
 

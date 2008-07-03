@@ -16,6 +16,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Terminal.h"
 
+/**
+  Free notify functions list.
+
+  @param  ListHead               The list head
+
+  @retval EFI_SUCCESS            Free the notify list successfully.
+  @retval EFI_INVALID_PARAMETER  ListHead is NULL.
+
+**/
 EFI_STATUS
 TerminalFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
@@ -109,7 +118,19 @@ TERMINAL_DEV  gTerminalDevTemplate = {
 };
 
 
+/**
+  Test to see if this driver supports ControllerHandle. 
 
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 TerminalDriverBindingSupported (
@@ -208,17 +229,20 @@ TerminalDriverBindingSupported (
   return Status;
 }
 
-
 /**
-  Start the controller.
+  Start this driver on ControllerHandle by opening a Serial IO protocol,
+  reading Device Path, and creating a child handle with a Simple Text In,
+  Simple Text In Ex and Simple Text Out protocol, and device path protocol.
+  And store Console Device Environment Variables.
 
-  @param  This                   A pointer to the EFI_DRIVER_BINDING_PROTOCOL
-                                 instance.
-  @param  Controller             The handle of the controller to start.
-  @param  RemainingDevicePath    A pointer to the remaining portion of a devcie
-                                 path.
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
 
-  @return EFI_SUCCESS.
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
 
 **/
 EFI_STATUS
@@ -353,7 +377,9 @@ TerminalDriverBindingStart (
     }
 
     TerminalType = FixedPcdGet8 (PcdDefaultTerminalType);
-    // must be between PCANSITYPE (0) and VTUTF8TYPE (3)
+    //
+    // Must be between PCANSITYPE (0) and VTUTF8TYPE (3)
+    //
     ASSERT (TerminalType <= VTUTF8TYPE);
 
     CopyMem (&DefaultNode->Guid, gTerminalType[TerminalType], sizeof (EFI_GUID));
@@ -726,19 +752,19 @@ Error:
   return Status;
 }
 
-
 /**
-  Stop a device controller.
+  Stop this driver on ControllerHandle by closing Simple Text In, Simple Text
+  In Ex, Simple Text Out protocol, and removing parent device path from
+  Console Device Environment Variables.    
 
-  @param  This                   A pointer to the EFI_DRIVER_BINDING_PROTOCOL
-                                 instance.
-  @param  Controller             A handle to the device being stopped.
-  @param  NumberOfChildren       The number of child device handles in
-                                 ChildHandleBuffer.
-  @param  ChildHandleBuffer      An array of child handles to be freed.
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS            Operation successful.
-  @retval EFI_DEVICE_ERROR       Devices error.
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval other             This driver could not be removed from this device.
 
 **/
 EFI_STATUS
@@ -920,11 +946,12 @@ TerminalDriverBindingStop (
 
 
 /**
+  Free notify functions list.
 
   @param  ListHead               The list head
 
-  @retval EFI_SUCCESS            Free the notify list successfully
-  @retval EFI_INVALID_PARAMETER  ListHead is invalid.
+  @retval EFI_SUCCESS            Free the notify list successfully.
+  @retval EFI_INVALID_PARAMETER  ListHead is NULL.
 
 **/
 EFI_STATUS
@@ -952,7 +979,15 @@ TerminalFreeNotifyList (
 }
 
 
+/**
+  Update terminal device path in Console Device Environment Variables.
 
+  @param  VariableName           The Console Device Environment Variable.
+  @param  ParentDevicePath       The terminal devcie path to be updated.
+
+  @return None.
+
+**/
 VOID
 TerminalUpdateConsoleDevVariable (
   IN CHAR16                    *VariableName,
@@ -1010,10 +1045,10 @@ TerminalUpdateConsoleDevVariable (
 
 
 /**
-  Remove console device variable.
+  Remove terminal device path from Console Device Environment Variables.
 
-  @param  VariableName           A pointer to the variable name.
-  @param  ParentDevicePath       A pointer to the parent device path.
+  @param  VariableName           Console Device Environment Variables.
+  @param  ParentDevicePath       The terminal devcie path to be updated.
 
   @return None.
 
@@ -1202,6 +1237,18 @@ TerminalGetVariableAndSize (
   return Buffer;
 }
 
+/**
+  Build termial device path according to terminal type.
+
+  @param  TerminalType           The terminal type is PC ANSI, VT100, VT100+ or VT-UTF8.
+  @param  ParentDevicePath       Parent devcie path.
+  @param  TerminalDevicePath     Returned terminal device path, if building successfully.
+
+  @retval EFI_UNSUPPORTED        Terminal does not belong to the supported type.
+  @retval EFI_OUT_OF_RESOURCES   Generate terminal device path failed.
+  @retval EFI_SUCCESS            Build terminal device path successfully.
+
+**/
 EFI_STATUS
 SetTerminalDevicePath (
   IN  UINT8                       TerminalType,
@@ -1276,6 +1323,14 @@ SetTerminalDevicePath (
   return EFI_SUCCESS;
 }
 
+/**
+  Initialize the Raw Data FIFO.
+
+  @param TerminalDevice          The terminal device.
+
+  @return None.
+
+**/
 VOID
 InitializeRawFiFo (
   IN  TERMINAL_DEV  *TerminalDevice
@@ -1287,6 +1342,14 @@ InitializeRawFiFo (
   TerminalDevice->RawFiFo.Head = TerminalDevice->RawFiFo.Tail;
 }
 
+/**
+  Initialize the Unicode FIFO.
+
+  @param TerminalDevice          The terminal device.
+
+  @return None.
+
+**/
 VOID
 InitializeUnicodeFiFo (
   IN  TERMINAL_DEV  *TerminalDevice
@@ -1298,6 +1361,14 @@ InitializeUnicodeFiFo (
   TerminalDevice->UnicodeFiFo.Head = TerminalDevice->UnicodeFiFo.Tail;
 }
 
+/**
+  Initialize the EFI Key FIFO.
+
+  @param TerminalDevice          The terminal device.
+
+  @return None.
+
+**/
 VOID
 InitializeEfiKeyFiFo (
   IN  TERMINAL_DEV  *TerminalDevice

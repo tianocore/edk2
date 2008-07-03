@@ -98,10 +98,8 @@ CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0
                                 exhaustive verification operation of the device
                                 during reset.
 
-  @return EFI_SUCCESS
-  @return The reset operation succeeds.
-  @return EFI_DEVICE_ERROR
-  @return The terminal is not functioning correctly or the serial port reset fails.
+  @return EFI_SUCCESS           The reset operation succeeds.
+  @return EFI_DEVICE_ERROR      The terminal is not functioning correctly or the serial port reset fails.
 
 **/
 EFI_STATUS
@@ -161,11 +159,11 @@ TerminalConOutReset (
   @param  WString                 The Null-terminated Unicode string to be displayed
                                   on the terminal screen.
 
-  @return EFI_SUCCESS             The string is output successfully.
-  @return EFI_DEVICE_ERROR        The serial port fails to send the string out.
-  @return EFI_WARN_UNKNOWN_GLYPH  Indicates that some of the characters in the Unicode string could not
+  @retval EFI_SUCCESS             The string is output successfully.
+  @retval EFI_DEVICE_ERROR        The serial port fails to send the string out.
+  @retval EFI_WARN_UNKNOWN_GLYPH  Indicates that some of the characters in the Unicode string could not
                                   be rendered and are skipped.
-  @return EFI_UNSUPPORTED
+  @retval EFI_UNSUPPORTED         If current display mode is out of range.
 
 **/
 EFI_STATUS
@@ -855,6 +853,15 @@ TerminalIsValidTextGraphics (
   return FALSE;
 }
 
+/**
+  Detects if a valid ASCII char.
+
+  @param  Ascii        An ASCII character.
+                       
+  @retval TRUE         If it is a valid ASCII character.
+  @retval FALSE        If it is not a valid ASCII character.
+
+**/
 BOOLEAN
 TerminalIsValidAscii (
   IN  CHAR16  Ascii
@@ -870,6 +877,15 @@ TerminalIsValidAscii (
   return FALSE;
 }
 
+/**
+  Detects if a valid EFI control character.
+
+  @param  CharC        An input EFI Control character.
+                       
+  @retval TRUE         If it is a valid EFI control character.
+  @retval FALSE        If it is not a valid EFI control character.
+
+**/
 BOOLEAN
 TerminalIsValidEfiCntlChar (
   IN  CHAR16  CharC

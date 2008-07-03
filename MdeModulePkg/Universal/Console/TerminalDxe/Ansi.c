@@ -1,7 +1,7 @@
 /** @file
-  Provides misc functions upon ansi.
+  Implementation of translation upon PC ANSI.
 
-Copyright (c) 2006, Intel Corporation. <BR>
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Terminal.h"
 
+/**
+  Translate all raw data in the Raw FIFI into unicode, and insert
+  them into Unicode FIFO.
+
+  @param TerminalDevice          The terminal device.
+
+  @return None.
+
+**/
 VOID
 AnsiRawDataToUnicode (
   IN  TERMINAL_DEV    *TerminalDevice
@@ -35,6 +44,17 @@ AnsiRawDataToUnicode (
   }
 }
 
+/**
+  Check if input string is valid Ascii string, valid EFI control characters
+  or valid text graphics.
+
+  @param  TerminalDevice          The terminal device.
+  @param  WString                 The input string.          
+ 
+  @retval EFI_UNSUPPORTED         If not all input characters are valid.
+  @retval EFI_SUCCESS             If all input characters are valid.
+
+**/
 EFI_STATUS
 AnsiTestString (
   IN  TERMINAL_DEV    *TerminalDevice,
