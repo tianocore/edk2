@@ -1,5 +1,5 @@
 /** @file
-  Implementation translation among different code tyies.
+  Implementation of translation upon VT-UTF8.
 
 Copyright (c) 2006, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -14,6 +14,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Terminal.h"
 
+/**
+  Translate all VT-UTF8 characters in the Raw FIFI into unicode characters, 
+  and insert them into Unicode FIFO.
+
+  @param TerminalDevice          The terminal device.
+
+  @return None.
+
+**/
 VOID
 VTUTF8RawDataToUnicode (
   IN  TERMINAL_DEV    *TerminalDevice
@@ -43,6 +52,17 @@ VTUTF8RawDataToUnicode (
   }
 }
 
+/**
+  Get one valid VT-UTF8 characters set from Raw Data FIFO.
+
+  @param  Utf8Device          The terminal device.
+  @param  Utf8Char            Returned valid VT-UTF8 characters set.
+  @param  ValidBytes          The count of returned VT-VTF8 characters. 
+                              If ValidBytes is zero, no valid VT-UTF8 returned.
+
+  @retval None.
+
+**/
 VOID
 GetOneValidUtf8Char (
   IN  TERMINAL_DEV      *Utf8Device,
@@ -148,6 +168,23 @@ GetOneValidUtf8Char (
   return ;
 }
 
+/** 
+  Translate VT-UTF8 characters into one Unicode character.
+
+  UTF8 Encoding Table
+  Bits per Character | Unicode Character Range | Unicode Binary  Encoding |	UTF8 Binary Encoding
+        0-7	         |     0x0000 - 0x007F	   |     00000000 0xxxxxxx	  |   0xxxxxxx
+        8-11 	       |     0x0080 - 0x07FF	   |     00000xxx xxxxxxxx 	  |   110xxxxx 10xxxxxx
+       12-16	       |     0x0800 - 0xFFFF	   |     xxxxxxxx xxxxxxxx	  |   1110xxxx 10xxxxxx 10xxxxxx
+
+
+  @param  Utf8Char         VT-UTF8 character set needs translating.
+  @param  ValidBytes       The count of valid VT-UTF8 characters.
+  @param  UnicodeChar      Returned unicode character. 
+  
+  @return None.
+
+**/
 VOID
 Utf8ToUnicode (
   IN  UTF8_CHAR       Utf8Char,
@@ -206,6 +243,24 @@ Utf8ToUnicode (
   return ;
 }
 
+/** 
+  Translate one Unicode character into VT-UTF8 characters.
+
+  UTF8 Encoding Table
+  Bits per Character | Unicode Character Range | Unicode Binary  Encoding |	UTF8 Binary Encoding
+        0-7	         |     0x0000 - 0x007F	   |     00000000 0xxxxxxx	  |   0xxxxxxx
+        8-11 	       |     0x0080 - 0x07FF	   |     00000xxx xxxxxxxx 	  |   110xxxxx 10xxxxxx
+       12-16	       |     0x0800 - 0xFFFF	   |     xxxxxxxx xxxxxxxx	  |   1110xxxx 10xxxxxx 10xxxxxx
+
+
+  @param  Unicode          Unicode character need translating.
+  @param  Utf8Char         Return VT-UTF8 character set.
+  @param  ValidBytes       The count of valid VT-UTF8 characters. If
+                           ValidBytes is zero, no valid VT-UTF8 returned.
+  
+  @return None.
+
+**/
 VOID
 UnicodeToUtf8 (
   IN  CHAR16      Unicode,
@@ -249,6 +304,16 @@ UnicodeToUtf8 (
   }
 }
 
+
+/**
+  Check if input string is valid VT-UTF8 string.
+
+  @param  TerminalDevice          The terminal device.
+  @param  WString                 The input string.          
+ 
+  @retval EFI_SUCCESS             If all input characters are valid.
+
+**/
 EFI_STATUS
 VTUTF8TestString (
   IN  TERMINAL_DEV    *TerminalDevice,
