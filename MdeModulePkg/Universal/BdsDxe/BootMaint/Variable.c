@@ -14,25 +14,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
-EFI_STATUS
-Var_DelBootOption (
-  VOID
-  )
-/*++
-
-Routine Description:
+/**
   Delete Boot Option that represent a Deleted state in BootOptionMenu.
   After deleting this boot option, call Var_ChangeBootOrder to
   make sure BootOrder is in valid state.
 
-Arguments:
-  LoadOption -- Pointer to the boot option that to be deleted
 
-Returns:
-  EFI_SUCCESS
-  Others
+  @param VOID            EDES_TODO: Add parameter description
 
---*/
+           EDES_TODO: Incomplete Descriptions  EFI_SUCCESS
+           EDES_TODO: Incomplete Descriptions  Others
+
+**/
+EFI_STATUS
+Var_DelBootOption (
+  VOID
+  )
 {
   BM_MENU_ENTRY   *NewMenuEntry;
   BM_LOAD_CONTEXT *NewLoadContext;
@@ -83,25 +80,23 @@ Returns:
   return Status;
 }
 
-EFI_STATUS
-Var_ChangeBootOrder (
-  VOID
-  )
-/*++
-
-Routine Description:
+/**
   After any operation on Boot####, there will be a discrepancy in BootOrder.
   Since some are missing but in BootOrder, while some are present but are
   not reflected by BootOrder. Then a function rebuild BootOrder from
   scratch by content from BootOptionMenu is needed.
 
-Arguments:
 
-Returns:
-  EFI_SUCCESS
-  Others
+  @param VOID            EDES_TODO: Add parameter description
 
---*/
+           EDES_TODO: Incomplete Descriptions  EFI_SUCCESS
+           EDES_TODO: Incomplete Descriptions  Others
+
+**/
+EFI_STATUS
+Var_ChangeBootOrder (
+  VOID
+  )
 {
 
   EFI_STATUS    Status;
@@ -177,25 +172,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-Var_DelDriverOption (
-  VOID
-  )
-/*++
-
-Routine Description:
+/**
   Delete Load Option that represent a Deleted state in BootOptionMenu.
   After deleting this Driver option, call Var_ChangeDriverOrder to
   make sure DriverOrder is in valid state.
 
-Arguments:
-  LoadOption -- Pointer to the Driver option that to be deleted
 
-Returns:
-  EFI_SUCCESS
-  Others
+  @param VOID            EDES_TODO: Add parameter description
 
---*/
+           EDES_TODO: Incomplete Descriptions  EFI_SUCCESS
+           EDES_TODO: Incomplete Descriptions  Others
+
+**/
+EFI_STATUS
+Var_DelDriverOption (
+  VOID
+  )
 {
   BM_MENU_ENTRY   *NewMenuEntry;
   BM_LOAD_CONTEXT *NewLoadContext;
@@ -238,26 +230,24 @@ Returns:
   return Status;
 }
 
-EFI_STATUS
-Var_ChangeDriverOrder (
-  VOID
-  )
-/*++
-
-Routine Description:
+/**
   After any operation on Driver####, there will be a discrepancy in
   DriverOrder. Since some are missing but in DriverOrder, while some
   are present but are not reflected by DriverOrder. Then a function
   rebuild DriverOrder from scratch by content from DriverOptionMenu is
   needed.
 
-Arguments:
 
-Returns:
-  EFI_SUCCESS
-  Others
+  @param VOID            EDES_TODO: Add parameter description
 
---*/
+           EDES_TODO: Incomplete Descriptions  EFI_SUCCESS
+           EDES_TODO: Incomplete Descriptions  Others
+
+**/
+EFI_STATUS
+Var_ChangeDriverOrder (
+  VOID
+  )
 {
   EFI_STATUS    Status;
   BM_MENU_ENTRY *NewMenuEntry;
@@ -324,6 +314,14 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 Var_UpdateAllConsoleOption (
   VOID
@@ -374,6 +372,16 @@ Var_UpdateAllConsoleOption (
   }
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param ConsoleName     EDES_TODO: Add parameter description
+  @param ConsoleMenu     EDES_TODO: Add parameter description
+  @param UpdatePageId    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateConsoleOption (
   IN UINT16                     *ConsoleName,
@@ -464,6 +472,14 @@ Var_UpdateConsoleOption (
 
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateConsoleInpOption (
   VOID
@@ -472,6 +488,14 @@ Var_UpdateConsoleInpOption (
   return Var_UpdateConsoleOption (L"ConIn", &ConsoleInpMenu, FORM_CON_IN_ID);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateConsoleOutOption (
   VOID
@@ -480,6 +504,14 @@ Var_UpdateConsoleOutOption (
   return Var_UpdateConsoleOption (L"ConOut", &ConsoleOutMenu, FORM_CON_OUT_ID);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateErrorOutOption (
   VOID
@@ -488,6 +520,18 @@ Var_UpdateErrorOutOption (
   return Var_UpdateConsoleOption (L"ErrOut", &ConsoleErrMenu, FORM_CON_ERR_ID);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+  @param HiiHandle       EDES_TODO: Add parameter description
+  @param DescriptionData EDES_TODO: Add parameter description
+  @param OptionalData    EDES_TODO: Add parameter description
+  @param ForceReconnect  EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateDriverOption (
   IN  BMM_CALLBACK_DATA         *CallbackData,
@@ -653,6 +697,15 @@ Var_UpdateDriverOption (
   return EFI_SUCCESS;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+  @param NvRamMap        EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateBootOption (
   IN  BMM_CALLBACK_DATA                   *CallbackData,
@@ -811,6 +864,14 @@ Var_UpdateBootOption (
   return EFI_SUCCESS;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateBootNext (
   IN BMM_CALLBACK_DATA            *CallbackData
@@ -860,6 +921,14 @@ Var_UpdateBootNext (
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateBootOrder (
   IN BMM_CALLBACK_DATA            *CallbackData
@@ -925,6 +994,14 @@ Var_UpdateBootOrder (
 
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateDriverOrder (
   IN BMM_CALLBACK_DATA            *CallbackData
@@ -982,6 +1059,14 @@ Var_UpdateDriverOrder (
   return EFI_SUCCESS;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateBBSOption (
   IN BMM_CALLBACK_DATA            *CallbackData
@@ -1278,6 +1363,14 @@ Var_UpdateBBSOption (
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 Var_UpdateConMode (
   IN BMM_CALLBACK_DATA            *CallbackData

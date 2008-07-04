@@ -13,6 +13,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #include "Bds.h"
 
+/**
+  This function locks the block 
+
+  @param CpuIo           A instance of EFI_CPU_IO_PROTOCOL. 
+  @param Base            The base address flash region to be locked.
+
+  @return VOID           No return.
+
+**/
 VOID
 BdsLockFv (
   IN EFI_CPU_IO_PROTOCOL          *CpuIo,
@@ -55,13 +64,7 @@ BdsLockFv (
   }
 }
 
-EFI_STATUS
-ProcessCapsules (
-  EFI_BOOT_MODE BootMode
-  )
-/*++
-
-Routine Description:
+/**
 
   This routine is called to see if there are any capsules we need to process.
   If the boot mode is not UPDATE, then we do nothing. Otherwise find the
@@ -69,23 +72,22 @@ Routine Description:
   Then call the dispatcher to dispatch drivers from them. Finally, check
   the status of the updates.
 
-Arguments:
 
-  BootMode - the current boot mode
+  @param BootMode        - the current boot mode
 
-Returns:
+  @retval  EFI_INVALID_PARAMETER  boot mode is not correct for an update
+                                  Note:
+                                  This function should be called by BDS in case we need to do some
+                                  sort of processing even if there is no capsule to process. We
+                                  need to do this if an earlier update went awry and we need to
+                                  clear the capsule variable so on the next reset PEI does not see it and
+                                  think there is a capsule available.
 
-  EFI_INVALID_PARAMETER - boot mode is not correct for an update
-
-Note:
-
- This function should be called by BDS in case we need to do some
- sort of processing even if there is no capsule to process. We
- need to do this if an earlier update went awry and we need to
- clear the capsule variable so on the next reset PEI does not see it and
- think there is a capsule available.
-
---*/
+**/
+EFI_STATUS
+ProcessCapsules (
+  EFI_BOOT_MODE BootMode
+  )
 {
   EFI_STATUS                  Status;
   EFI_PEI_HOB_POINTERS        HobPointer;

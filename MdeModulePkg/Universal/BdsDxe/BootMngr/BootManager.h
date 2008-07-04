@@ -52,6 +52,19 @@ typedef struct {
   EFI_HII_CONFIG_ACCESS_PROTOCOL   ConfigAccess;
 } BOOT_MANAGER_CALLBACK_DATA;
 
+/**
+  EDES_TODO: Add function description
+
+  @param This            EDES_TODO: Add parameter description
+  @param Action          EDES_TODO: Add parameter description
+  @param QuestionId      EDES_TODO: Add parameter description
+  @param Type            EDES_TODO: Add parameter description
+  @param Value           EDES_TODO: Add parameter description
+  @param ActionRequest   EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 EFIAPI
 BootManagerCallback (
@@ -64,12 +77,28 @@ BootManagerCallback (
   )
 ;
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 InitializeBootManager (
   VOID
   )
 ;
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 CallBootManager (
   VOID

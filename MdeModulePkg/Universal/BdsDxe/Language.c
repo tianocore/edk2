@@ -250,21 +250,19 @@ FONT_PACK_BIN mFontBin = {
   }
 };
 
+/**
+  Routine to export glyphs to the HII database.  This is in addition to whatever is defined in the Graphics Console driver.
+
+
+  @param VOID
+
+  @return VOID
+
+**/
 VOID
 ExportFonts (
   VOID
   )
-/*++
-
-Routine Description:
-  Routine to export glyphs to the HII database.  This is in addition to whatever is defined in the Graphics Console driver.
-
-Arguments:
-  None
-
-Returns:
-
---*/
 {
   EFI_STATUS                   Status;
   EFI_HANDLE                   DriverHandle;
@@ -286,22 +284,20 @@ Returns:
   FreePool (PackageList);
 }
 
+/**
+  Determine the current language that will be used
+  based on language related EFI Variables
+
+
+  @param LangCodesSettingRequired - If required to set LangCode variable
+
+  @return VOID
+
+**/
 VOID
 InitializeLanguage (
   BOOLEAN LangCodesSettingRequired
   )
-/*++
-
-Routine Description:
-  Determine the current language that will be used
-  based on language related EFI Variables
-
-Arguments:
-  LangCodesSettingRequired - If required to set LangCode variable
-
-Returns:
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       Size;

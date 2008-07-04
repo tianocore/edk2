@@ -19,27 +19,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BootMaint.h"
 #include "BBSsupport.h"
 
+/**
+  EDES_TODO: Add function description
+
+  @param MenuType        Use this parameter to identify current
+                         Menu type
+
+           EDES_TODO: Incomplete Descriptions  NULL                Cannot allocate memory for current menu
+           EDES_TODO: Incomplete Descriptions  entry
+           EDES_TODO: Incomplete Descriptions  Others              A valid pointer pointing to the allocated
+           EDES_TODO: Incomplete Descriptions  memory pool for current menu entry
+
+**/
 BM_MENU_ENTRY *
 BOpt_CreateMenuEntry (
   UINTN           MenuType
   )
-/*++
-
-Routine Description
-  Create Menu Entry for future use, make all types together
-  in order to reduce code size
-
-Arguments:
-  MenuType            Use this parameter to identify current
-                      Menu type
-
-Returns:
-  NULL                Cannot allocate memory for current menu
-                      entry
-  Others              A valid pointer pointing to the allocated
-                      memory pool for current menu entry
-
---*/
 {
   BM_MENU_ENTRY *MenuEntry;
   UINTN         ContextSize;
@@ -96,21 +91,18 @@ Returns:
   return MenuEntry;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param MenuEntry       EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 BOpt_DestroyMenuEntry (
   BM_MENU_ENTRY         *MenuEntry
   )
-/*++
-  Routine Description :
-    Destroy the menu entry passed in
-
-  Arguments :
-    The menu entry need to be destroyed
-
-  Returns :
-    None
-
---*/
 {
   BM_LOAD_CONTEXT           *LoadContext;
   BM_FILE_CONTEXT           *FileContext;
@@ -180,25 +172,20 @@ BOpt_DestroyMenuEntry (
   SafeFreePool (MenuEntry);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param MenuOption      EDES_TODO: Add parameter description
+  @param MenuNumber      EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 BM_MENU_ENTRY *
 BOpt_GetMenuEntry (
   BM_MENU_OPTION      *MenuOption,
   UINTN               MenuNumber
   )
-/*++
-  Rountine Description :
-    Use this routine to get one particular menu entry in specified
-    menu
-
-  Arguments :
-    MenuOption        The menu that we will search
-
-    MenuNumber        The menunubmer that we want
-
-  Returns :
-    The desired menu entry
-
---*/
 {
   BM_MENU_ENTRY   *NewMenuEntry;
   UINTN           Index;
@@ -218,29 +205,19 @@ BOpt_GetMenuEntry (
   return NewMenuEntry;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    BMM context data
+
+  @retval  EFI_SUCCESS             Success find the file system
+  @retval  EFI_OUT_OF_RESOURCES    Can not create menu entry
+
+**/
 EFI_STATUS
 BOpt_FindFileSystem (
   IN BMM_CALLBACK_DATA          *CallbackData
   )
-/*++
-
-Routine Description
-  Find file systems for current Extensible Firmware
-  Including Handles that support Simple File System
-  protocol, Load File protocol.
-
-  Building up the FileSystem Menu for user selection
-  All file system will be stored in FsOptionMenu
-  for future use.
-
-Arguments:
-  CallbackData           -   BMM context data
-
-Returns:
-  EFI_SUCCESS            -   Success find the file system
-  EFI_OUT_OF_RESOURCES   -   Can not create menu entry
-
---*/
 {
   UINTN                     NoBlkIoHandles;
   UINTN                     NoSimpleFsHandles;

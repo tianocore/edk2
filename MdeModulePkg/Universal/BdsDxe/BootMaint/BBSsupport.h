@@ -19,6 +19,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Bugbug: Candidate for a PCD entries
 //
+/**
+  EDES_TODO: Add function description
+
+  @param CurBBSEntry     EDES_TODO: Add parameter description
+  @param Index           EDES_TODO: Add parameter description
+  @param BufSize         EDES_TODO: Add parameter description
+  @param BootString      EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 #define MAX_BBS_ENTRIES 0x100
 
 VOID
@@ -29,38 +40,57 @@ BdsBuildLegacyDevNameString (
   OUT CHAR16                       *BootString
   );
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsDeleteAllInvalidLegacyBootOptions (
   VOID
   );
 
+/**
+
+  Add the legacy boot options from BBS table if they do not exist.
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @retval  EFI_SUCCESS        The boot options are added successfully or they are already in boot options.
+  @retval  others             An error occurred when creating legacy boot options.
+
+**/
 EFI_STATUS
 BdsAddNonExistingLegacyBootOptions (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Add the legacy boot options from BBS table if they do not exist.
-
-Arguments:
-
-  None.
-
-Returns:
-
-  EFI_SUCCESS       - The boot options are added successfully or they are already in boot options.
-  others            - An error occurred when creating legacy boot options.
-
---*/
 ;
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsUpdateLegacyDevOrder (
   VOID
   );
 
+/**
+  EDES_TODO: Add function description
+
+  @param Entry           EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsRefreshBbsTableForBoot (
   IN BDS_COMMON_OPTION        *Entry

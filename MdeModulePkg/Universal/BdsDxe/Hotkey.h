@@ -37,72 +37,57 @@ typedef struct {
 
 #define VarKeyOrder       L"KeyOrder"
 
+/**
+
+  Create Key#### for the given hotkey.
+
+
+  @param KeyOption       - The Hot Key Option to be added.
+  @param KeyOptionNumber - The key option number for Key#### (optional).
+
+  @retval  EFI_SUCCESS            Register hotkey successfully.
+  @retval  EFI_INVALID_PARAMETER  The hotkey option is invalid.
+
+**/
 EFI_STATUS
 RegisterHotkey (
   IN EFI_KEY_OPTION     *KeyOption,
   OUT UINT16            *KeyOptionNumber
 )
-/*++
-
-Routine Description:
-
-  Create Key#### for the given hotkey.
-
-Arguments:
-
-  KeyOption             - The Hot Key Option to be added.
-  KeyOptionNumber       - The key option number for Key#### (optional).
-
-Returns:
-
-  EFI_SUCCESS           - Register hotkey successfully.
-  EFI_INVALID_PARAMETER - The hotkey option is invalid.
-
---*/
 ;
 
+/**
+
+  Delete Key#### for the given Key Option number.
+
+
+  @param KeyOptionNumber - Key option number for Key####
+
+  @retval  EFI_SUCCESS            Unregister hotkey successfully.
+  @retval  EFI_NOT_FOUND          No Key#### is found for the given Key Option number.
+
+**/
 EFI_STATUS
 UnregisterHotkey (
   IN UINT16             KeyOptionNumber
 )
-/*++
-
-Routine Description:
-
-  Delete Key#### for the given Key Option number.
-
-Arguments:
-
-  KeyOptionNumber       - Key option number for Key####
-
-Returns:
-
-  EFI_SUCCESS           - Unregister hotkey successfully.
-  EFI_NOT_FOUND         - No Key#### is found for the given Key Option number.
-
---*/
 ;
 
 
+/**
+
+  Process all the "Key####" variables, associate Hotkeys with corresponding Boot Options.
+
+
+  @param VOID
+
+  @retval  EFI_SUCCESS    Hotkey services successfully initialized.
+
+**/
 EFI_STATUS
 InitializeHotkeyService (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Process all the "Key####" variables, associate Hotkeys with corresponding Boot Options.
-
-Arguments:
-
-  None
-
-Returns:
-
-  EFI_SUCCESS   - Hotkey services successfully initialized.
-
---*/
 ;
 
 #endif

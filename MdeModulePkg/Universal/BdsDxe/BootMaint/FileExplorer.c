@@ -14,22 +14,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
+/**
+  Update the File Explore page.
+
+
+  @param CallbackData    EDES_TODO: Add parameter description
+  @param MenuOption      Pointer to menu options to display.
+
+           EDES_TODO: Incomplete Descriptions  None.
+
+**/
 VOID
 UpdateFileExplorePage (
   IN BMM_CALLBACK_DATA            *CallbackData,
   BM_MENU_OPTION                  *MenuOption
   )
-/*++
-Routine Description:
-  Update the File Explore page.
-
-Arguments:
-  MenuOption      - Pointer to menu options to display.
-
-Returns:
-  None.
-
---*/
 {
   UINTN           Index;
   BM_MENU_ENTRY   *NewMenuEntry;
@@ -93,25 +92,22 @@ Returns:
     );
 }
 
+/**
+  Update the file explower page with the refershed file system.
+
+
+  @param CallbackData    BMM context data
+  @param KeyValue        Key value to identify the type of data to expect.
+
+  @retval  TRUE           Inform the caller to create a callback packet to exit file explorer.
+  @retval  FALSE          Indicate that there is no need to exit file explorer.
+
+**/
 BOOLEAN
 UpdateFileExplorer (
   IN BMM_CALLBACK_DATA            *CallbackData,
   IN UINT16                       KeyValue
   )
-/*++
-
-Routine Description:
-  Update the file explower page with the refershed file system.
-
-Arguments:
-  CallbackData  -   BMM context data
-  KeyValue        - Key value to identify the type of data to expect.
-
-Returns:
-  TRUE          - Inform the caller to create a callback packet to exit file explorer.
-  FALSE         - Indicate that there is no need to exit file explorer.
-
---*/
 {
   UINT16          FileOptionMask;
   BM_MENU_ENTRY   *NewMenuEntry;
@@ -214,6 +210,24 @@ Returns:
   return ExitFileExplorer;
 }
 
+/**
+  This function processes the results of changes in configuration.
+
+
+  @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Action          Specifies the type of action taken by the browser.
+  @param QuestionId      A unique value which is sent to the original exporting driver
+                         so that it can identify the type of data to expect.
+  @param Type            The type of value for the question.
+  @param Value           A pointer to the data being sent to the original exporting driver.
+  @param ActionRequest   On return, points to the action requested by the callback function.
+
+  @retval  EFI_SUCCESS           The callback successfully handled the action.
+  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
+  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
+  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
+
+**/
 EFI_STATUS
 EFIAPI
 FileExplorerCallback (
@@ -224,27 +238,6 @@ FileExplorerCallback (
   IN  EFI_IFR_TYPE_VALUE                     *Value,
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
-/*++
-
-  Routine Description:
-    This function processes the results of changes in configuration.
-
-  Arguments:
-    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Action        - Specifies the type of action taken by the browser.
-    QuestionId    - A unique value which is sent to the original exporting driver
-                    so that it can identify the type of data to expect.
-    Type          - The type of value for the question.
-    Value         - A pointer to the data being sent to the original exporting driver.
-    ActionRequest - On return, points to the action requested by the callback function.
-
-  Returns:
-    EFI_SUCCESS          - The callback successfully handled the action.
-    EFI_OUT_OF_RESOURCES - Not enough storage is available to hold the variable and its data.
-    EFI_DEVICE_ERROR     - The variable could not be saved.
-    EFI_UNSUPPORTED      - The specified Action is not supported by the callback.
-
---*/
 {
   BMM_CALLBACK_DATA     *Private;
   FILE_EXPLORER_NV_DATA *NvRamMap;

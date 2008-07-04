@@ -32,32 +32,27 @@ UINT16                          *mBootNext = NULL;
 
 EFI_HANDLE                      mBdsImageHandle;
 
+/**
+
+  Install Boot Device Selection Protocol
+
+
+  @param ImageHandle     The image handle.
+  @param SystemTable     The system table.
+
+  @retval  EFI_SUCEESS  BDS has finished initializing.
+                        Rerun the
+                        dispatcher and recall BDS.Entry
+  @retval  Other        Return value from AllocatePool()
+                        or gBS->InstallProtocolInterface
+
+**/
 EFI_STATUS
 EFIAPI
 BdsInitialize (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
-/*++
-
-Routine Description:
-
-  Install Boot Device Selection Protocol
-
-Arguments:
-
-  (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
-
-Returns:
-
-  EFI_SUCEESS - BDS has finished initializing.
-                Rerun the
-                dispatcher and recall BDS.Entry
-
-  Other       - Return value from AllocatePool()
-                or gBS->InstallProtocolInterface
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -77,25 +72,20 @@ Returns:
   return Status;
 }
 
+/**
+
+  In the loop of attempt to boot for the boot order
+
+
+  @param VOID           No input parameter.
+
+  @retval VOID          No returns.
+
+**/
 VOID
 BdsBootDeviceSelect (
   VOID
   )
-/*++
-
-Routine Description:
-
-  In the loop of attempt to boot for the boot order
-
-Arguments:
-
-  None.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_STATUS        Status;
   LIST_ENTRY        *Link;
@@ -263,27 +253,22 @@ Returns:
 
 }
 
+/**
+
+  Service routine for BdsInstance->Entry(). Devices are connected, the
+  consoles are initialized, and the boot options are tried.
+
+
+  @param This            - Protocol Instance structure.
+
+  @retval  EFI_SUCEESS  BDS->Entry has finished executing.
+
+**/
 VOID
 EFIAPI
 BdsEntry (
   IN EFI_BDS_ARCH_PROTOCOL  *This
   )
-/*++
-
-Routine Description:
-
-  Service routine for BdsInstance->Entry(). Devices are connected, the
-  consoles are initialized, and the boot options are tried.
-
-Arguments:
-
-  This - Protocol Instance structure.
-
-Returns:
-
-  EFI_SUCEESS - BDS->Entry has finished executing.
-
---*/
 {
   EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData;
   LIST_ENTRY                      DriverOptionList;
@@ -327,7 +312,7 @@ Returns:
   //
   InitializeStringSupport ();
   InitializeLanguage (TRUE);
-  InitializeFrontPage (FALSE);
+  InitializeFrontPage (TRUE);
 
   //
   // Set up the device list based on EFI 1.1 variables

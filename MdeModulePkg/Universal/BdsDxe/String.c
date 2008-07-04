@@ -22,22 +22,19 @@ EFI_GUID mBdsStringPackGuid = {
   0x7bac95d3, 0xddf, 0x42f3, 0x9e, 0x24, 0x7c, 0x64, 0x49, 0x40, 0x37, 0x9a
 };
 
+/**
+  Initialize HII global accessor for string support
+
+
+  @param VOID
+
+  @retval  EFI_SUCCESS  String support initialize success.
+
+**/
 EFI_STATUS
 InitializeStringSupport (
   VOID
   )
-/*++
-
-Routine Description:
-  Initialize HII global accessor for string support
-
-Arguments:
-  None
-
-Returns:
-  EFI_SUCCESS - String support initialize success.
-
---*/
 {
   EFI_STATUS                   Status;
   EFI_HANDLE                   DriverHandle;
@@ -70,23 +67,20 @@ Returns:
   return Status;
 }
 
+/**
+  Get string by string id from HII Interface
+
+
+  @param Id              String ID.
+
+  @retval  CHAR16 *  String from ID.
+  @retval  NULL      If error occurs.
+
+**/
 CHAR16 *
 GetStringById (
   IN  EFI_STRING_ID   Id
   )
-/*++
-
-Routine Description:
-  Get string by string id from HII Interface
-
-Arguments:
-  Id       - String ID.
-
-Returns:
-  CHAR16 * - String from ID.
-  NULL     - If error occurs.
-
---*/
 {
   CHAR16 *String;
 

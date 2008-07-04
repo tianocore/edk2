@@ -24,36 +24,50 @@ EFI_GUID mFileExplorerGuid = FILE_EXPLORE_FORMSET_GUID;
 CHAR16  mBootMaintStorageName[] = L"BmData";
 CHAR16  mFileExplorerStorageName[] = L"FeData";
 
+/**
+  Init all memu.
+
+  @param CallbackData    The 
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 InitAllMenu (
   IN  BMM_CALLBACK_DATA    *CallbackData
   );
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 FreeAllMenu (
   VOID
   );
 
+/**
+  Create string tokens for a menu from its help strings and display strings
+
+
+  @param CallbackData    EDES_TODO: Add parameter description
+  @param HiiHandle       - Hii Handle of the package to be updated.
+  @param MenuOption      - The Menu whose string tokens need to be created
+
+  @retval  EFI_SUCCESS      string tokens created successfully
+  @retval  others           contain some errors
+
+**/
 EFI_STATUS
 CreateMenuStringToken (
   IN BMM_CALLBACK_DATA                *CallbackData,
   IN EFI_HII_HANDLE                   HiiHandle,
   IN BM_MENU_OPTION                   *MenuOption
   )
-/*++
-
-Routine Description:
-  Create string tokens for a menu from its help strings and display strings
-
-Arguments:
-  HiiHandle       - Hii Handle of the package to be updated.
-  MenuOption      - The Menu whose string tokens need to be created
-
-Returns:
-  EFI_SUCCESS     - string tokens created successfully
-  others          - contain some errors
-
---*/
 {
   BM_MENU_ENTRY *NewMenuEntry;
   UINTN         Index;
@@ -81,6 +95,28 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function allows a caller to extract the current configuration for one
+  or more named elements from the target driver.
+
+
+  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Request         - A null-terminated Unicode string in <ConfigRequest> format.
+  @param Progress        - On return, points to a character in the Request string.
+                         Points to the string's null terminator if request was successful.
+                         Points to the most recent '&' before the first failing name/value
+                         pair (or the beginning of the string if the failure is in the
+                         first name/value pair) if the request was not successful.
+  @param Results         - A null-terminated Unicode string in <ConfigAltResp> format which
+                         has all values filled in for the names in the Request string.
+                         String to be allocated by the called function.
+
+  @retval  EFI_SUCCESS            The Results is filled with the requested values.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough memory to store the results.
+  @retval  EFI_INVALID_PARAMETER  Request is NULL, illegal syntax, or unknown name.
+  @retval  EFI_NOT_FOUND          Routing data doesn't match any storage in this driver.
+
+**/
 EFI_STATUS
 EFIAPI
 BootMaintExtractConfig (
@@ -89,31 +125,6 @@ BootMaintExtractConfig (
   OUT EFI_STRING                             *Progress,
   OUT EFI_STRING                             *Results
   )
-/*++
-
-  Routine Description:
-    This function allows a caller to extract the current configuration for one
-    or more named elements from the target driver.
-
-  Arguments:
-    This       - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Request    - A null-terminated Unicode string in <ConfigRequest> format.
-    Progress   - On return, points to a character in the Request string.
-                 Points to the string's null terminator if request was successful.
-                 Points to the most recent '&' before the first failing name/value
-                 pair (or the beginning of the string if the failure is in the
-                 first name/value pair) if the request was not successful.
-    Results    - A null-terminated Unicode string in <ConfigAltResp> format which
-                 has all values filled in for the names in the Request string.
-                 String to be allocated by the called function.
-
-  Returns:
-    EFI_SUCCESS           - The Results is filled with the requested values.
-    EFI_OUT_OF_RESOURCES  - Not enough memory to store the results.
-    EFI_INVALID_PARAMETER - Request is NULL, illegal syntax, or unknown name.
-    EFI_NOT_FOUND         - Routing data doesn't match any storage in this driver.
-
---*/
 {
   EFI_STATUS         Status;
   UINTN              BufferSize;
@@ -136,6 +147,24 @@ BootMaintExtractConfig (
   return Status;
 }
 
+/**
+  This function processes the results of changes in configuration.
+
+
+  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Action          - Specifies the type of action taken by the browser.
+  @param QuestionId      - A unique value which is sent to the original exporting driver
+                         so that it can identify the type of data to expect.
+  @param Type            - The type of value for the question.
+  @param Value           - A pointer to the data being sent to the original exporting driver.
+  @param ActionRequest   - On return, points to the action requested by the callback function.
+
+  @retval  EFI_SUCCESS           The callback successfully handled the action.
+  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
+  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
+  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
+
+**/
 EFI_STATUS
 EFIAPI
 BootMaintCallback (
@@ -146,27 +175,6 @@ BootMaintCallback (
   IN  EFI_IFR_TYPE_VALUE                     *Value,
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
-/*++
-
-  Routine Description:
-    This function processes the results of changes in configuration.
-
-  Arguments:
-    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Action        - Specifies the type of action taken by the browser.
-    QuestionId    - A unique value which is sent to the original exporting driver
-                    so that it can identify the type of data to expect.
-    Type          - The type of value for the question.
-    Value         - A pointer to the data being sent to the original exporting driver.
-    ActionRequest - On return, points to the action requested by the callback function.
-
-  Returns:
-    EFI_SUCCESS          - The callback successfully handled the action.
-    EFI_OUT_OF_RESOURCES - Not enough storage is available to hold the variable and its data.
-    EFI_DEVICE_ERROR     - The variable could not be saved.
-    EFI_UNSUPPORTED      - The specified Action is not supported by the callback.
-
---*/
 {
   BMM_CALLBACK_DATA *Private;
   BM_MENU_ENTRY     *NewMenuEntry;
@@ -527,27 +535,24 @@ BootMaintCallback (
   return Status;
 }
 
+/**
+  Function handling request to apply changes for BMM pages.
+
+
+  @param Private         - Pointer to callback data buffer.
+  @param CurrentFakeNVMap - Pointer to buffer holding data of various values used by BMM
+  @param FormId          - ID of the form which has sent the request to apply change.
+
+  @retval  EFI_SUCCESS       Change successfully applied.
+  @retval  Other             Error occurs while trying to apply changes.
+
+**/
 EFI_STATUS
 ApplyChangeHandler (
   IN  BMM_CALLBACK_DATA               *Private,
   IN  BMM_FAKE_NV_DATA                *CurrentFakeNVMap,
   IN  EFI_FORM_ID                     FormId
   )
-/*++
-
-Routine Description:
-  Function handling request to apply changes for BMM pages.
-
-Arguments:
-  Private          - Pointer to callback data buffer.
-  CurrentFakeNVMap - Pointer to buffer holding data of various values used by BMM
-  FormId           - ID of the form which has sent the request to apply change.
-
-Returns:
-  EFI_SUCCESS      - Change successfully applied.
-  Other            - Error occurs while trying to apply changes.
-
---*/
 {
   BM_CONSOLE_CONTEXT  *NewConsoleContext;
   BM_TERMINAL_CONTEXT *NewTerminalContext;
@@ -717,6 +722,15 @@ Error:
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param Private         EDES_TODO: Add parameter description
+  @param CurrentFakeNVMap EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 DiscardChangeHandler (
   IN  BMM_CALLBACK_DATA               *Private,
@@ -763,24 +777,20 @@ DiscardChangeHandler (
   }
 }
 
+/**
+  Initialize the Boot Maintenance Utitliy
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @retval  EFI_SUCCESS      utility ended successfully
+  @retval  others           contain some errors
+
+**/
 EFI_STATUS
 InitializeBM (
   VOID
   )
-/*++
-
-Routine Description:
-  Initialize the Boot Maintenance Utitliy
-
-Arguments:
-  ImageHandle     - caller provided handle
-  SystemTable     - caller provided system tables
-
-Returns:
-  EFI_SUCCESS     - utility ended successfully
-  others          - contain some errors
-
---*/
 {
   EFI_LEGACY_BIOS_PROTOCOL    *LegacyBios;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
@@ -1020,6 +1030,14 @@ Returns:
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 InitAllMenu (
   IN  BMM_CALLBACK_DATA    *CallbackData
@@ -1041,6 +1059,14 @@ InitAllMenu (
   GetAllConsoles ();
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 FreeAllMenu (
   VOID
@@ -1055,22 +1081,19 @@ FreeAllMenu (
   FreeAllConsoles ();
 }
 
+/**
+  Intialize all the string depositories.
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+           EDES_TODO: Description incomplete  None.
+
+**/
 VOID
 InitializeStringDepository (
   VOID
   )
-/*++
-
-Routine Description:
-  Intialize all the string depositories.
-
-Arguments:
-  None.
-
-Returns:
-  None.
-
---*/
 {
   STRING_DEPOSITORY *StringDepository;
   StringDepository              = EfiAllocateZeroPool (sizeof (STRING_DEPOSITORY) * STRING_DEPOSITORY_NUMBER);
@@ -1083,23 +1106,21 @@ Returns:
   TerminalStrDepository         = StringDepository;
 }
 
+/**
+  Fetch a usable string node from the string depository and return the string token.
+
+
+  @param CallbackData    EDES_TODO: Add parameter description
+  @param StringDepository - Pointer of the string depository.
+
+  @retval  EFI_STRING_ID           String token.
+
+**/
 EFI_STRING_ID
 GetStringTokenFromDepository (
   IN   BMM_CALLBACK_DATA     *CallbackData,
   IN   STRING_DEPOSITORY     *StringDepository
   )
-/*++
-
-Routine Description:
-  Fetch a usable string node from the string depository and return the string token.
-
-Arguments:
-  StringDepository       - Pointer of the string depository.
-
-Returns:
-  EFI_STRING_ID          - String token.
-
---*/
 {
   STRING_LIST_NODE  *CurrentListNode;
   STRING_LIST_NODE  *NextListNode;
@@ -1134,22 +1155,19 @@ Returns:
   return StringDepository->CurrentNode->StringToken;
 }
 
+/**
+  Reclaim string depositories by moving the current node pointer to list head..
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+           EDES_TODO: Description incomplete  None.
+
+**/
 VOID
 ReclaimStringDepository (
   VOID
   )
-/*++
-
-Routine Description:
-  Reclaim string depositories by moving the current node pointer to list head..
-
-Arguments:
-  None.
-
-Returns:
-  None.
-
---*/
 {
   UINTN             DepositoryIndex;
   STRING_DEPOSITORY *StringDepository;
@@ -1161,22 +1179,19 @@ Returns:
   }
 }
 
+/**
+  Release resource for all the string depositories.
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+           EDES_TODO: Description incomplete  None.
+
+**/
 VOID
 CleanUpStringDepository (
   VOID
   )
-/*++
-
-Routine Description:
-  Release resource for all the string depositories.
-
-Arguments:
-  None.
-
-Returns:
-  None.
-
---*/
 {
   UINTN             NodeIndex;
   UINTN             DepositoryIndex;
@@ -1204,20 +1219,19 @@ Returns:
   SafeFreePool (FileOptionStrDepository);
 }
 
+/**
+  Start boot maintenance manager
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsStartBootMaint (
   VOID
   )
-/*++
-
-Routine Description:
-  Start boot maintenance manager
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_STATUS      Status;
   LIST_ENTRY      BdsBootOptionList;
@@ -1254,20 +1268,19 @@ Returns:
   return Status;
 }
 
+/**
+  Dispatch BMM formset and FileExplorer formset.
+
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 FormSetDispatcher (
   IN  BMM_CALLBACK_DATA    *CallbackData
   )
-/*++
-
-Routine Description:
-  Dispatch BMM formset and FileExplorer formset.
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_STATUS                 Status;
   EFI_BROWSER_ACTION_REQUEST ActionRequest;
