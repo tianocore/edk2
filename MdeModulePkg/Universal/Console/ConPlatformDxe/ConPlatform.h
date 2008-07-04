@@ -1,7 +1,7 @@
 /** @file
   Header file for Console Platfrom DXE Driver.
 
-Copyright (c) 2006 - 2007, Intel Corporation. <BR>
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef CON_MANAGE_H_
-#define CON_MANAGE_H_
+#ifndef _CON_MANAGE_H_
+#define _CON_MANAGE_H_
 
 #include <Uefi.h>
 #include <Protocol/SimpleTextOut.h>
@@ -51,6 +51,19 @@ typedef enum {
   DELETE
 } CONPLATFORM_VAR_OPERATION;
 
+/**
+  Test to see if specific Protocol could be supported on the ControllerHandle. 
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+  @param  ProtocolGuid        The specfic protocol.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 ConPlatformDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -59,6 +72,18 @@ ConPlatformDriverBindingSupported (
   IN  EFI_GUID                     *ProtocolGuid
   );
 
+/**
+  Test to see if EFI Text In Protocol could be supported on the ControllerHandle. 
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 ConPlatformTextInDriverBindingSupported (
@@ -67,6 +92,18 @@ ConPlatformTextInDriverBindingSupported (
   IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
+/**
+  Test to see if EFI Text Out Protocol could be supported on the ControllerHandle. 
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 ConPlatformTextOutDriverBindingSupported (
@@ -75,6 +112,23 @@ ConPlatformTextOutDriverBindingSupported (
   IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
+/**
+  Start this driver on ControllerHandle by opening Simple Text In protocol,
+  reading Device Path, and installing Console Devcice In GUID on ControllerHandle.
+
+  If this devcie is not one hot-plug devce, append its device path into the 
+  console environment variables ConInDev.
+  
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 ConPlatformTextInDriverBindingStart (
@@ -83,6 +137,24 @@ ConPlatformTextInDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   );
 
+/**
+  Start this driver on ControllerHandle by opening Simple Text Out protocol,
+  reading Device Path, and installing Console Devcice Out GUID, Standard Error
+  Device GUID on ControllerHandle.
+
+  If this devcie is not one hot-plug devce, append its device path into the 
+  console environment variables ConOutDev, StdErrDev.
+  
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 ConPlatformTextOutDriverBindingStart (
@@ -91,6 +163,20 @@ ConPlatformTextOutDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   );
 
+/**
+  Stop this driver on ControllerHandle by removing Console Devcice In GUID 
+  and closing the Simple Text In protocol on ControllerHandle.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 ConPlatformTextInDriverBindingStop (
@@ -100,6 +186,20 @@ ConPlatformTextInDriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
+/**
+  Stop this driver on ControllerHandle by removing Console Devcice Out GUID 
+  and closing the Simple Text Out protocol on ControllerHandle.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 ConPlatformTextOutDriverBindingStop (
@@ -109,6 +209,16 @@ ConPlatformTextOutDriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
+/**
+  Unstall the specific protocol.
+
+  @param This            Protocol instance pointer.
+  @param Handle          Handle of device to unstall protocol on.
+  @param ProtocolGuid    The specific protocol need to be uninstalled.
+
+  @return None.
+
+**/
 VOID
 ConPlatformUnInstallProtocol (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -116,19 +226,62 @@ ConPlatformUnInstallProtocol (
   IN  EFI_GUID                     *ProtocolGuid
   );
 
+/**
+  Read the EFI variable (Name) and return a dynamically allocated
+  buffer, and the size of the buffer. On failure return NULL.
+
+
+  @param  Name             String part of EFI variable name
+
+  @return Dynamically allocated memory that contains a copy of the EFI variable.
+          Caller is repsoncible freeing the buffer.
+          NULL - Variable was not read
+
+**/
 VOID *
 ConPlatformGetVariable (
   IN  CHAR16              *Name
   );
 
+/**
+  Function compares a device path data structure to that of all the nodes of a
+  second device path instance.
+
+
+  @param Multi           A pointer to a multi-instance device path data structure.
+  @param Single          A pointer to a single-instance device path data structure.
+  @param NewDevicePath   If Delete is TRUE, this parameter must not be null, and it
+                         points to the remaining device path data structure.
+                         (remaining device path = Multi - Single.)
+  @param Delete          If TRUE, means removing Single from Multi.
+                         If FALSE, the routine just check whether Single matches
+                         with any instance in Multi.
+
+  @return The function returns EFI_SUCCESS if the Single is contained within Multi.
+          Otherwise, EFI_NOT_FOUND is returned.
+
+**/
 EFI_STATUS
 ConPlatformMatchDevicePaths (
-  IN  EFI_DEVICE_PATH_PROTOCOL  * Multi,
-  IN  EFI_DEVICE_PATH_PROTOCOL  * Single,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *Multi,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *Single,
   IN  EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath OPTIONAL,
   IN  BOOLEAN                   Delete
   );
 
+/**
+  Update console devicein console environment variables. 
+
+  @param  VariableName    Console environment variables, ConOutDev, ConInDev
+                          StdErrDev, ConIn or ConOut.
+  @param  DevicePath      Console devcie's device path.
+  @param  Operation       Variable operations, such as APPEND or DELETE.
+
+  @retval EFI_SUCCESS           Variable operates successfully.
+  @retval EFI_OUT_OF_RESOURCES  If variable cannot be appended.
+  @retval other                 Variable updating failed.
+
+**/
 EFI_STATUS
 ConPlatformUpdateDeviceVariable (
   IN  CHAR16                    *VariableName,
@@ -136,6 +289,16 @@ ConPlatformUpdateDeviceVariable (
   IN  CONPLATFORM_VAR_OPERATION Operation
   );
 
+/**
+  Check if the device is one hot-plug supported.
+
+  @param  DriverBindingHandle   Protocol instance pointer.
+  @param  ControllerHandle      Handle of device to check.
+
+  @retval TRUE                  The devcie is a hot-plug device
+  @retval FALSE                 The devcie is not a hot-plug device.
+
+**/
 BOOLEAN
 IsHotPlugDevice (
   EFI_HANDLE    DriverBindingHandle,
