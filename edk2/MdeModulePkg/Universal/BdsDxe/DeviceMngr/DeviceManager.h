@@ -66,12 +66,24 @@ typedef struct {
       ConfigAccess, \
       DEVICE_MANAGER_CALLBACK_DATA_SIGNATURE \
       )
-
 typedef struct {
   EFI_STRING_ID  StringId;
   UINT16         Class;
 } DEVICE_MANAGER_MENU_ITEM;
 
+/**
+  EDES_TODO: Add function description
+
+  @param This            EDES_TODO: Add parameter description
+  @param Action          EDES_TODO: Add parameter description
+  @param QuestionId      EDES_TODO: Add parameter description
+  @param Type            EDES_TODO: Add parameter description
+  @param Value           EDES_TODO: Add parameter description
+  @param ActionRequest   EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 EFIAPI
 DeviceManagerCallback (
@@ -84,12 +96,28 @@ DeviceManagerCallback (
   )
 ;
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 InitializeDeviceManager (
   VOID
   )
 ;
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 CallDeviceManager (
   VOID

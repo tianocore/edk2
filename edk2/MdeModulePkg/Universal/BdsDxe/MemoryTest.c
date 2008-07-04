@@ -18,6 +18,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // BDS Platform Functions
 //
+/**
+
+  Show progress bar with title above it. It only works in Graphics mode.
+
+
+  @param TitleForeground Foreground color for Title.
+  @param TitleBackground Background color for Title.
+  @param Title           Title above progress bar.
+  @param ProgressColor   Progress bar color.
+  @param Progress        Progress (0-100)
+  @param PreviousValue   The previous value of the progress.
+
+  @retval  EFI_STATUS       Success update the progress bar
+
+**/
 EFI_STATUS
 PlatformBdsShowProgress (
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
@@ -27,25 +42,6 @@ PlatformBdsShowProgress (
   IN UINTN                         Progress,
   IN UINTN                         PreviousValue
   )
-/*++
-
-Routine Description:
-
-  Show progress bar with title above it. It only works in Graphics mode.
-
-Arguments:
-
-  TitleForeground - Foreground color for Title.
-  TitleBackground - Background color for Title.
-  Title           - Title above progress bar.
-  ProgressColor   - Progress bar color.
-  Progress        - Progress (0-100)
-
-Returns:
-
-  EFI_STATUS      - Success update the progress bar
-
---*/
 {
   EFI_STATUS                     Status;
   EFI_GRAPHICS_OUTPUT_PROTOCOL   *GraphicsOutput;
@@ -196,27 +192,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-BdsMemoryTest (
-  IN EXTENDMEM_COVERAGE_LEVEL Level
-  )
-/*++
-
-Routine Description:
+/**
 
   Perform the memory test base on the memory test intensive level,
   and update the memory resource.
 
-Arguments:
 
-  Level  - The memory test intensive level.
+  @param Level           The memory test intensive level.
 
-Returns:
+  @retval  EFI_STATUS       Success test all the system memory and update
+                            the memory resource
 
-  EFI_STATUS      - Success test all the system memory and update
-                    the memory resource
-
---*/
+**/
+EFI_STATUS
+BdsMemoryTest (
+  IN EXTENDMEM_COVERAGE_LEVEL Level
+  )
 {
   EFI_STATUS                        Status;
   EFI_STATUS                        KeyStatus;

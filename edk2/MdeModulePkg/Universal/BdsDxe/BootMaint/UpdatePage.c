@@ -14,26 +14,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
+/**
+  Refresh the global UpdateData structure.
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+           EDES_TODO: Incomplete Descriptions  None.
+
+**/
 VOID
 RefreshUpdateData (
   VOID
   )
-/*++
-
-Routine Description:
-  Refresh the global UpdateData structure.
-
-Arguments:
-  None.
-
-Returns:
-  None.
-
---*/
 {
   gUpdateData.Offset = 0;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdatePageStart (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -58,6 +63,14 @@ UpdatePageStart (
 
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdatePageEnd (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -107,6 +120,15 @@ UpdatePageEnd (
     );
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param LabelId         EDES_TODO: Add parameter description
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 CleanUpPage (
   IN UINT16                           LabelId,
@@ -128,6 +150,14 @@ CleanUpPage (
     );
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param FileContext     EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BootThisFile (
   IN BM_FILE_CONTEXT                   *FileContext
@@ -161,6 +191,14 @@ BootThisFile (
 
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateConCOMPage (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -190,6 +228,14 @@ UpdateConCOMPage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateBootDelPage (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -229,6 +275,14 @@ UpdateBootDelPage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateDrvAddHandlePage (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -257,6 +311,14 @@ UpdateDrvAddHandlePage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateDrvDelPage (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -294,6 +356,14 @@ UpdateDrvDelPage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateDriverAddHandleDescPage (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -356,6 +426,16 @@ UpdateDriverAddHandleDescPage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param UpdatePageId    EDES_TODO: Add parameter description
+  @param ConsoleMenu     EDES_TODO: Add parameter description
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateConsolePage (
   IN UINT16                           UpdatePageId,
@@ -429,6 +509,16 @@ UpdateConsolePage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param UpdatePageId    EDES_TODO: Add parameter description
+  @param OptionMenu      EDES_TODO: Add parameter description
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateOrderPage (
   IN UINT16                           UpdatePageId,
@@ -489,6 +579,14 @@ UpdateOrderPage (
     );
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateBootNextPage (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -554,6 +652,14 @@ UpdateBootNextPage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateTimeOutPage (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -587,22 +693,19 @@ UpdateTimeOutPage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  Refresh the text mode page
+
+
+  @param CallbackData    BMM_CALLBACK_DATA
+
+           EDES_TODO: Incomplete Descriptions  None.
+
+**/
 VOID
 UpdateConModePage (
   IN BMM_CALLBACK_DATA                *CallbackData
   )
-/*++
-
-Routine Description:
-  Refresh the text mode page
-
-Arguments:
-  CallbackData      - BMM_CALLBACK_DATA
-
-Returns:
-  None.
-
---*/
 {
   UINTN                         Mode;
   UINTN                         Index;
@@ -698,6 +801,14 @@ Returns:
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateTerminalPage (
   IN BMM_CALLBACK_DATA                *CallbackData
@@ -864,6 +975,15 @@ UpdateTerminalPage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param UpdatePageId    EDES_TODO: Add parameter description
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdatePageBody (
   IN UINT16                           UpdatePageId,
@@ -897,6 +1017,16 @@ UpdatePageBody (
   }
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param DeviceType      EDES_TODO: Add parameter description
+  @param OptionIndex     EDES_TODO: Add parameter description
+  @param OptionSize      EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID *
 GetLegacyBootOptionVar (
   IN  UINTN                            DeviceType,
@@ -969,6 +1099,15 @@ GetLegacyBootOptionVar (
   return NULL;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param UpdatePageId    EDES_TODO: Add parameter description
+  @param CallbackData    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdateSetLegacyDeviceOrderPage (
   IN UINT16                           UpdatePageId,
@@ -1164,6 +1303,15 @@ UpdateSetLegacyDeviceOrderPage (
   UpdatePageEnd (CallbackData);
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param Private         EDES_TODO: Add parameter description
+  @param NewPageId       EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 UpdatePageId (
   BMM_CALLBACK_DATA              *Private,

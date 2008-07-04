@@ -22,26 +22,21 @@ EFI_EVENT       mHotkeyEvent;
 VOID            *mHotkeyRegistration;
 
 
+/**
+
+  Check if the Key Option is valid or not.
+
+
+  @param KeyOption       The Hot Key Option to be checked.
+
+  @retval  TRUE          The Hot Key Option is valid.
+  @retval  FALSE         The Hot Key Option is invalid.
+
+**/
 BOOLEAN
 IsKeyOptionValid (
   IN EFI_KEY_OPTION     *KeyOption
 )
-/*++
-
-Routine Description:
-
-  Check if the Key Option is valid or not.
-
-Arguments:
-
-  KeyOption    - The Hot Key Option to be checked.
-
-Returns:
-
-  TRUE         - The Hot Key Option is valid.
-  FALSE        - The Hot Key Option is invalid.
-
---*/
 {
   UINT16   BootOptionName[10];
   UINT8    *BootOptionVar;
@@ -71,28 +66,23 @@ Returns:
   return (BOOLEAN) ((KeyOption->BootOptionCrc == Crc) ? TRUE : FALSE);
 }
 
+/**
+
+  Create Key#### for the given hotkey.
+
+
+  @param KeyOption       The Hot Key Option to be added.
+  @param KeyOptionNumber The key option number for Key#### (optional).
+
+  @retval  EFI_SUCCESS            Register hotkey successfully.
+  @retval  EFI_INVALID_PARAMETER  The hotkey option is invalid.
+
+**/
 EFI_STATUS
 RegisterHotkey (
   IN EFI_KEY_OPTION     *KeyOption,
   OUT UINT16            *KeyOptionNumber
 )
-/*++
-
-Routine Description:
-
-  Create Key#### for the given hotkey.
-
-Arguments:
-
-  KeyOption             - The Hot Key Option to be added.
-  KeyOptionNumber       - The key option number for Key#### (optional).
-
-Returns:
-
-  EFI_SUCCESS           - Register hotkey successfully.
-  EFI_INVALID_PARAMETER - The hotkey option is invalid.
-
---*/
 {
   UINT16          KeyOptionName[10];
   UINT16          *KeyOrder;
@@ -234,26 +224,21 @@ Returns:
   return Status;
 }
 
+/**
+
+  Delete Key#### for the given Key Option number.
+
+
+  @param KeyOptionNumber Key option number for Key####
+
+  @retval  EFI_SUCCESS            Unregister hotkey successfully.
+  @retval  EFI_NOT_FOUND          No Key#### is found for the given Key Option number.
+
+**/
 EFI_STATUS
 UnregisterHotkey (
   IN UINT16     KeyOptionNumber
 )
-/*++
-
-Routine Description:
-
-  Delete Key#### for the given Key Option number.
-
-Arguments:
-
-  KeyOptionNumber       - Key option number for Key####
-
-Returns:
-
-  EFI_SUCCESS           - Unregister hotkey successfully.
-  EFI_NOT_FOUND         - No Key#### is found for the given Key Option number.
-
---*/
 {
   UINT16      KeyOption[10];
   UINTN       Index;
@@ -318,27 +303,22 @@ Returns:
   return Status;
 }
 
-EFI_STATUS
-HotkeyCallback (
-  IN EFI_KEY_DATA     *KeyData
-)
-/*++
-
-Routine Description:
+/**
 
   This is the common notification function for HotKeys, it will be registered
   with SimpleTextInEx protocol interface - RegisterKeyNotify() of ConIn handle.
 
-Arguments:
 
-  KeyData               - A pointer to a buffer that is filled in with the keystroke
-                          information for the key that was pressed.
+  @param KeyData         A pointer to a buffer that is filled in with the keystroke
+                         information for the key that was pressed.
 
-Returns:
+  @retval  EFI_SUCCESS            KeyData is successfully processed.
 
-  EFI_SUCCESS           - KeyData is successfully processed.
-
---*/
+**/
+EFI_STATUS
+HotkeyCallback (
+  IN EFI_KEY_DATA     *KeyData
+)
 {
   BOOLEAN            HotkeyCatched;
   LIST_ENTRY         BootLists;
@@ -456,26 +436,21 @@ Returns:
   return Status;
 }
 
+/**
+
+  Register the common HotKey notify function to given SimpleTextInEx protocol instance.
+
+
+  @param SimpleTextInEx  Simple Text Input Ex protocol instance
+
+  @retval  EFI_SUCCESS            Register hotkey notification function successfully.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate necessary data structures.
+
+**/
 EFI_STATUS
 HotkeyRegisterNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *SimpleTextInEx
 )
-/*++
-
-Routine Description:
-
-  Register the common HotKey notify function to given SimpleTextInEx protocol instance.
-
-Arguments:
-
-  SimpleTextInEx        - Simple Text Input Ex protocol instance
-
-Returns:
-
-  EFI_SUCCESS           - Register hotkey notification function successfully.
-  EFI_OUT_OF_RESOURCES  - Unable to allocate necessary data structures.
-
---*/
 {
   UINTN              Index;
   EFI_STATUS         Status;
@@ -513,26 +488,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Callback function for SimpleTextInEx protocol install events
+
+
+  @param Event           the event that is signaled.
+  @param Context         not used here.
+
+  @return VOID
+
+**/
 VOID
 EFIAPI
 HotkeyEvent (
   IN EFI_EVENT    Event,
   IN VOID         *Context
   )
-/*++
-
-Routine Description:
-  Callback function for SimpleTextInEx protocol install events
-
-Arguments:
-
-  Standard event notification function arguments:
-  Event         - the event that is signaled.
-  Context       - not used here.
-
-Returns:
-
---*/
 {
   EFI_STATUS                         Status;
   UINTN                              BufferSize;
@@ -566,25 +537,20 @@ Returns:
   }
 }
 
+/**
+
+  Insert Key Option to hotkey list.
+
+
+  @param KeyOption       The Hot Key Option to be added to hotkey list.
+
+  @retval  EFI_SUCCESS  Add to hotkey list success.
+
+**/
 EFI_STATUS
 HotkeyInsertList (
   IN EFI_KEY_OPTION     *KeyOption
 )
-/*++
-
-Routine Description:
-
-  Insert Key Option to hotkey list.
-
-Arguments:
-
-  KeyOption   - The Hot Key Option to be added to hotkey list.
-
-Returns:
-
-  EFI_SUCCESS - Add to hotkey list success.
-
---*/
 {
   BDS_HOTKEY_OPTION  *HotkeyLeft;
   BDS_HOTKEY_OPTION  *HotkeyRight;
@@ -664,25 +630,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Process all the "Key####" variables, associate Hotkeys with corresponding Boot Options.
+
+
+  @param VOID
+
+  @retval  EFI_SUCCESS    Hotkey services successfully initialized.
+
+**/
 EFI_STATUS
 InitializeHotkeyService (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Process all the "Key####" variables, associate Hotkeys with corresponding Boot Options.
-
-Arguments:
-
-  None
-
-Returns:
-
-  EFI_SUCCESS   - Hotkey services successfully initialized.
-
---*/
 {
   EFI_STATUS      Status;
   UINT32          BootOptionSupport;

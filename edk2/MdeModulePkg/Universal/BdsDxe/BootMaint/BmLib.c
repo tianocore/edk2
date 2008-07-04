@@ -14,24 +14,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
-VOID *
-EfiAllocateZeroPool (
-  IN UINTN            Size
-  )
-/*++
-
-Routine Description:
+/**
   Wrap original AllocatePool gBS call
   and ZeroMem gBS call into a single
   function in order to decrease code length
 
-Arguments:
 
-Returns:
-  Valid pointer to the allocated buffer
-  Null for failure
+  @param Size            The size to allocate
 
---*/
+  @return  Valid pointer to the allocated buffer
+  @retval  Null for failure
+
+**/
+VOID *
+EfiAllocateZeroPool (
+  IN UINTN            Size
+  )
 {
   EFI_STATUS  Status;
   VOID        *Ptr;
@@ -45,31 +43,25 @@ Returns:
   return Ptr;
 }
 
+/**
+
+  Find the first instance of this Protocol
+  in the system and return it's interface
+
+
+  @param ProtocolGuid    - Provides the protocol to search for
+  @param Interface       - On return, a pointer to the first interface
+                         that matches ProtocolGuid
+
+  @retval  EFI_SUCCESS      A protocol instance matching ProtocolGuid was found
+  @retval  EFI_NOT_FOUND    No protocol instances were found that match ProtocolGuid
+
+**/
 EFI_STATUS
 EfiLibLocateProtocol (
   IN  EFI_GUID    *ProtocolGuid,
   OUT VOID        **Interface
   )
-/*++
-
-Routine Description:
-
-  Find the first instance of this Protocol
-  in the system and return it's interface
-
-Arguments:
-
-  ProtocolGuid    - Provides the protocol to search for
-  Interface       - On return, a pointer to the first interface
-                    that matches ProtocolGuid
-
-Returns:
-
-  EFI_SUCCESS     - A protocol instance matching ProtocolGuid was found
-
-  EFI_NOT_FOUND   - No protocol instances were found that match ProtocolGuid
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -81,25 +73,20 @@ Returns:
   return Status;
 }
 
+/**
+
+  Function opens and returns a file handle to the root directory of a volume.
+
+
+  @param DeviceHandle    - A handle for a device
+
+  @return A valid file handle or NULL is returned
+
+**/
 EFI_FILE_HANDLE
 EfiLibOpenRoot (
   IN EFI_HANDLE                   DeviceHandle
   )
-/*++
-
-Routine Description:
-
-  Function opens and returns a file handle to the root directory of a volume.
-
-Arguments:
-
-  DeviceHandle         - A handle for a device
-
-Returns:
-
-  A valid file handle or NULL is returned
-
---*/
 {
   EFI_STATUS                      Status;
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Volume;
@@ -131,34 +118,27 @@ Returns:
   return EFI_ERROR (Status) ? NULL : File;
 }
 
+/**
+
+  Helper function called as part of the code needed
+  to allocate the proper sized buffer for various
+  EFI interfaces.
+
+
+  @param Status          - Current status
+  @param Buffer          - Current allocated buffer, or NULL
+  @param BufferSize      - Current buffer size needed
+
+  @retval  TRUE  if the buffer was reallocated and the caller
+                 should try the API again.
+
+**/
 BOOLEAN
 EfiGrowBuffer (
   IN OUT EFI_STATUS   *Status,
   IN OUT VOID         **Buffer,
   IN UINTN            BufferSize
   )
-/*++
-
-Routine Description:
-
-    Helper function called as part of the code needed
-    to allocate the proper sized buffer for various
-    EFI interfaces.
-
-Arguments:
-
-    Status      - Current status
-
-    Buffer      - Current allocated buffer, or NULL
-
-    BufferSize  - Current buffer size needed
-
-Returns:
-
-    TRUE - if the buffer was reallocated and the caller
-    should try the API again.
-
---*/
 {
   BOOLEAN TryAgain;
 
@@ -195,60 +175,48 @@ Returns:
   return TryAgain;
 }
 
+/**
+  Function returns the value of the specified variable.
+
+
+  @param Name            - A Null-terminated Unicode string that is
+                         the name of the vendor's variable.
+  @param VendorGuid      - A unique identifier for the vendor.
+
+  @return               The payload of the variable.
+
+**/
 VOID *
 EfiLibGetVariable (
   IN CHAR16               *Name,
   IN EFI_GUID             *VendorGuid
   )
-/*++
-
-Routine Description:
-  Function returns the value of the specified variable.
-
-Arguments:
-  Name                - A Null-terminated Unicode string that is
-                        the name of the vendor's variable.
-
-  VendorGuid          - A unique identifier for the vendor.
-
-Returns:
-
-  None
-
---*/
 {
   UINTN VarSize;
 
   return BdsLibGetVariableAndSize (Name, VendorGuid, &VarSize);
 }
 
+/**
+  Function deletes the variable specified by VarName and VarGuid.
+
+
+  @param VarName         - A Null-terminated Unicode string that is
+                         the name of the vendor's variable.
+                         
+  @param VendorGuid           - A unique identifier for the vendor.
+
+  @retval  EFI_SUCCESS           The variable was found and removed
+  @retval  EFI_UNSUPPORTED       The variable store was inaccessible
+  @retval  EFI_OUT_OF_RESOURCES  The temporary buffer was not available
+  @retval  EFI_NOT_FOUND         The variable was not found
+
+**/
 EFI_STATUS
 EfiLibDeleteVariable (
   IN CHAR16   *VarName,
   IN EFI_GUID *VarGuid
   )
-/*++
-
-Routine Description:
-  Function deletes the variable specified by VarName and VarGuid.
-
-Arguments:
-  VarName              - A Null-terminated Unicode string that is
-                         the name of the vendor's variable.
-
-  VendorGuid           - A unique identifier for the vendor.
-
-Returns:
-
-  EFI_SUCCESS          - The variable was found and removed
-
-  EFI_UNSUPPORTED      - The variable store was inaccessible
-
-  EFI_OUT_OF_RESOURCES - The temporary buffer was not available
-
-  EFI_NOT_FOUND        - The variable was not found
-
---*/
 {
   VOID        *VarBuf;
   EFI_STATUS  Status;
@@ -268,26 +236,21 @@ Returns:
   return Status;
 }
 
-EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *
-EfiLibFileSystemVolumeLabelInfo (
-  IN EFI_FILE_HANDLE      FHand
-  )
-/*++
-
-Routine Description:
+/**
 
   Function gets the file system information from an open file descriptor,
   and stores it in a buffer allocated from pool.
 
-Arguments:
 
-  Fhand         - A file handle
+  @param FHand           The file handle.
 
-Returns:
+  @return                A pointer to a buffer with file information or NULL is returned
 
-  A pointer to a buffer with file information or NULL is returned
-
---*/
+**/
+EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *
+EfiLibFileSystemVolumeLabelInfo (
+  IN EFI_FILE_HANDLE      FHand
+  )
 {
   EFI_STATUS                        Status;
   EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *Buffer;
@@ -313,6 +276,15 @@ Returns:
   return Buffer;
 }
 
+/**
+  Duplicate a string.
+
+  @param Src             The source.
+
+  @return A new string which is duplicated copy of the source.
+  @retval NULL If there is not enought memory.
+
+**/
 CHAR16 *
 EfiStrDuplicate (
   IN CHAR16   *Src
@@ -331,26 +303,20 @@ EfiStrDuplicate (
   return Dest;
 }
 
-EFI_FILE_INFO *
-EfiLibFileInfo (
-  IN EFI_FILE_HANDLE      FHand
-  )
-/*++
-
-Routine Description:
+/**
 
   Function gets the file information from an open file descriptor, and stores it
   in a buffer allocated from pool.
 
-Arguments:
+  @param FHand           File Handle.
 
-  Fhand         - A file handle
+  @return                A pointer to a buffer with file information or NULL is returned
 
-Returns:
-
-  A pointer to a buffer with file information or NULL is returned
-
---*/
+**/
+EFI_FILE_INFO *
+EfiLibFileInfo (
+  IN EFI_FILE_HANDLE      FHand
+  )
 {
   EFI_STATUS    Status;
   EFI_FILE_INFO *Buffer;
@@ -377,25 +343,21 @@ Returns:
   return Buffer;
 }
 
+/**
+  Function is used to determine the number of device path instances
+  that exist in a device path.
+
+
+  @param DevicePath      - A pointer to a device path data structure.
+
+  @return This function counts and returns the number of device path instances
+          in DevicePath.
+
+**/
 UINTN
 EfiDevicePathInstanceCount (
   IN EFI_DEVICE_PATH_PROTOCOL      *DevicePath
   )
-/*++
-
-Routine Description:
-  Function is used to determine the number of device path instances
-  that exist in a device path.
-
-Arguments:
-  DevicePath           - A pointer to a device path data structure.
-
-Returns:
-
-  This function counts and returns the number of device path instances
-  in DevicePath.
-
---*/
 {
   UINTN Count;
   UINTN Size;
@@ -408,31 +370,25 @@ Returns:
   return Count;
 }
 
+/**
+  Adjusts the size of a previously allocated buffer.
+
+
+  @param OldPool         - A pointer to the buffer whose size is being adjusted.
+  @param OldSize         - The size of the current buffer.
+  @param NewSize         - The size of the new buffer.
+
+  @retval  EFI_SUCEESS            The requested number of bytes were allocated.
+  @retval  EFI_OUT_OF_RESOURCES   The pool requested could not be allocated.
+  @retval  EFI_INVALID_PARAMETER  The buffer was invalid.
+
+**/
 VOID *
 EfiReallocatePool (
   IN VOID                 *OldPool,
   IN UINTN                OldSize,
   IN UINTN                NewSize
   )
-/*++
-
-Routine Description:
-  Adjusts the size of a previously allocated buffer.
-
-Arguments:
-  OldPool               - A pointer to the buffer whose size is being adjusted.
-  OldSize               - The size of the current buffer.
-  NewSize               - The size of the new buffer.
-
-Returns:
-
-  EFI_SUCEESS           - The requested number of bytes were allocated.
-
-  EFI_OUT_OF_RESOURCES  - The pool requested could not be allocated.
-
-  EFI_INVALID_PARAMETER - The buffer was invalid.
-
---*/
 {
   VOID  *NewPool;
 
@@ -452,26 +408,22 @@ Returns:
   return NewPool;
 }
 
+/**
+  Compare two EFI_TIME data.
+
+
+  @param FirstTime       - A pointer to the first EFI_TIME data.
+  @param SecondTime      - A pointer to the second EFI_TIME data.
+
+  @retval  TRUE              The FirstTime is not later than the SecondTime.
+  @retval  FALSE             The FirstTime is later than the SecondTime.
+
+**/
 BOOLEAN
 TimeCompare (
   IN EFI_TIME               *FirstTime,
   IN EFI_TIME               *SecondTime
   )
-/*++
-
-Routine Description:
-  Compare two EFI_TIME data.
-
-Arguments:
-
-  FirstTime         - A pointer to the first EFI_TIME data.
-  SecondTime        - A pointer to the second EFI_TIME data.
-
-Returns:
-  TRUE              The FirstTime is not later than the SecondTime.
-  FALSE             The FirstTime is later than the SecondTime.
-
---*/
 {
   if (FirstTime->Year != SecondTime->Year) {
     return (BOOLEAN) (FirstTime->Year < SecondTime->Year);
@@ -490,6 +442,16 @@ Returns:
   return (BOOLEAN) (FirstTime->Nanosecond <= SecondTime->Nanosecond);
 }
 
+/**
+  Get a string from the Data Hub record based on 
+  a device path.
+
+  @param DevPath         The device Path.
+
+  @return A string located from the Data Hub records based on
+          the device path.
+
+**/
 UINT16 *
 EfiLibStrFromDatahub (
   IN EFI_DEVICE_PATH_PROTOCOL                 *DevPath

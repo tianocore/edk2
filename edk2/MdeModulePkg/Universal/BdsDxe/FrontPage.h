@@ -84,6 +84,28 @@ extern EFI_HII_CONFIG_ROUTING_PROTOCOL *gHiiConfigRouting;
 extern UINTN    gCallbackKey;
 extern BOOLEAN  gConnectAllHappened;
 
+/**
+  This function allows a caller to extract the current configuration for one
+  or more named elements from the target driver.
+
+
+  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Request         - A null-terminated Unicode string in <ConfigRequest> format.
+  @param Progress        - On return, points to a character in the Request string.
+                         Points to the string's null terminator if request was successful.
+                         Points to the most recent '&' before the first failing name/value
+                         pair (or the beginning of the string if the failure is in the
+                         first name/value pair) if the request was not successful.
+  @param Results         - A null-terminated Unicode string in <ConfigAltResp> format which
+                         has all values filled in for the names in the Request string.
+                         String to be allocated by the called function.
+
+  @retval  EFI_SUCCESS            The Results is filled with the requested values.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough memory to store the results.
+  @retval  EFI_INVALID_PARAMETER  Request is NULL, illegal syntax, or unknown name.
+  @retval  EFI_NOT_FOUND          Routing data doesn't match any storage in this driver.
+
+**/
 EFI_STATUS
 EFIAPI
 FakeExtractConfig (
@@ -93,6 +115,22 @@ FakeExtractConfig (
   OUT EFI_STRING                             *Results
   );
 
+/**
+  This function processes the results of changes in configuration.
+
+
+  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Configuration   - A null-terminated Unicode string in <ConfigResp> format.
+  @param Progress        - A pointer to a string filled in with the offset of the most
+                         recent '&' before the first failing name/value pair (or the
+                         beginning of the string if the failure is in the first
+                         name/value pair) or the terminating NULL if all was successful.
+
+  @retval  EFI_SUCCESS            The Results is processed successfully.
+  @retval  EFI_INVALID_PARAMETER  Configuration is NULL.
+  @retval  EFI_NOT_FOUND          Routing data doesn't match any storage in this driver.
+
+**/
 EFI_STATUS
 EFIAPI
 FakeRouteConfig (
@@ -101,6 +139,24 @@ FakeRouteConfig (
   OUT EFI_STRING                             *Progress
   );
 
+/**
+  This function processes the results of changes in configuration.
+
+
+  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Action          - Specifies the type of action taken by the browser.
+  @param QuestionId      - A unique value which is sent to the original exporting driver
+                         so that it can identify the type of data to expect.
+  @param Type            - The type of value for the question.
+  @param Value           - A pointer to the data being sent to the original exporting driver.
+  @param ActionRequest   - On return, points to the action requested by the callback function.
+
+  @retval  EFI_SUCCESS           The callback successfully handled the action.
+  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
+  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
+  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
+
+**/
 EFI_STATUS
 EFIAPI
 FrontPageCallback (
@@ -112,11 +168,32 @@ FrontPageCallback (
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   );
 
+/**
+  Initialize HII information for the FrontPage
+
+
+  @param InitializeHiiData    TRUE if HII elements need to be initialized.
+
+  @retval  EFI_SUCCESS        The operation is successful.
+  @retval  EFI_DEVICE_ERROR   If the dynamic opcode creation failed.
+
+**/
 EFI_STATUS
 InitializeFrontPage (
   IN BOOLEAN    ReInitializeStrings
   );
 
+/**
+  Acquire the string associated with the ProducerGuid and return it.
+
+
+  @param ProducerGuid    - The Guid to search the HII database for
+  @param Token           - The token value of the string to extract
+  @param String          - The string that is extracted
+
+  @retval  EFI_SUCCESS  The function returns EFI_SUCCESS always.
+
+**/
 EFI_STATUS
 GetProducerString (
   IN      EFI_GUID                  *ProducerGuid,
@@ -124,12 +201,37 @@ GetProducerString (
   OUT     CHAR16                    **String
   );
 
+/**
+  Compare two EFI_TIME data.
+
+
+  @param FirstTime       - A pointer to the first EFI_TIME data.
+  @param SecondTime      - A pointer to the second EFI_TIME data.
+
+  @retval  TRUE              The FirstTime is not later than the SecondTime.
+  @retval  FALSE             The FirstTime is later than the SecondTime.
+
+**/
 BOOLEAN
 TimeCompare (
   IN EFI_TIME               *FirstTime,
   IN EFI_TIME               *SecondTime
   );
 
+/**
+  This function is the main entry of the platform setup entry.
+  The function will present the main menu of the system setup,
+  this is the platform reference part and can be customize.
+
+
+  @param TimeoutDefault  - The fault time out value before the system
+                         continue to boot.
+  @param ConnectAllHappened - The indicater to check if the connect all have
+                         already happended.
+
+  @return VOID.
+
+**/
 VOID
 PlatformBdsEnterFrontPage (
   IN UINT16                 TimeoutDefault,

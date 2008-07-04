@@ -14,16 +14,41 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
+/**
+  EDES_TODO: Add function description
+
+  @param DevPath         EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_DEVICE_PATH_PROTOCOL  *
 DevicePathInstanceDup (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   );
 
+/**
+  EDES_TODO: Add function description
+
+  @param DevicePath      EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 UpdateComAttributeFromVariable (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   );
 
+/**
+  EDES_TODO: Add function description
+
+  @param DevicePath      EDES_TODO: Add parameter description
+  @param ChangeTerminal  EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 ChangeTerminalDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
@@ -136,6 +161,14 @@ ChangeTerminalDevicePath (
 
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param DevicePath      EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 ChangeVariableDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath
@@ -200,24 +233,22 @@ ChangeVariableDevicePath (
   return ;
 }
 
+/**
+  Retrieve ACPI UID of UART from device path
+
+
+  @param Handle          EDES_TODO: Add parameter description
+  @param AcpiUid         EDES_TODO: Add parameter description
+
+  @retval  TRUE   Find valid UID from device path
+  @retval  FALSE  Can't find
+
+**/
 BOOLEAN
 RetrieveUartUid (
   IN EFI_HANDLE   Handle,
   IN OUT UINT32   *AcpiUid
   )
-/*++
-
-Routine Description:
-  Retrieve ACPI UID of UART from device path
-
-Arguments:
-  Handles   -   EFI_SERIAL_IO_PROTOCOL handle
-
-Returns:
-  TRUE  - Find valid UID from device path
-  FALSE - Can't find
-
---*/
 {
   UINT32                    Match;
   UINT8                     *Ptr;
@@ -249,24 +280,21 @@ Returns:
   }
 }
 
+/**
+  Sort Uart handles array with Acpi->UID from low to high
+
+
+  @param Handles         EFI_SERIAL_IO_PROTOCOL handle buffer
+  @param NoHandles       EFI_SERIAL_IO_PROTOCOL handle count
+
+           EDES_TODO: Incomplete Descriptions  None
+
+**/
 VOID
 SortedUartHandle (
   IN  EFI_HANDLE *Handles,
   IN  UINTN      NoHandles
   )
-/*++
-
-Routine Description:
-  Sort Uart handles array with Acpi->UID from low to high
-
-Arguments:
-  Handles   -   EFI_SERIAL_IO_PROTOCOL handle buffer
-  NoHandles -   EFI_SERIAL_IO_PROTOCOL handle count
-
-Returns:
-  None
-
---*/
 {
   UINTN       Index1;
   UINTN       Index2;
@@ -299,6 +327,16 @@ Returns:
   }
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param DevicePath      EDES_TODO: Add parameter description
+  @param Termi           EDES_TODO: Add parameter description
+  @param Com             EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 BOOLEAN
 IsTerminalDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL *DevicePath,
@@ -306,20 +344,19 @@ IsTerminalDevicePath (
   OUT UINTN                    *Com
   );
 
+/**
+  Build a list containing all serial devices
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 LocateSerialIo (
   VOID
   )
-/*++
-
-Routine Description:
-  Build a list containing all serial devices
-
-Arguments:
-
-Returns:
-
---*/
 {
   UINT8                     *Ptr;
   UINTN                     Index;
@@ -507,21 +544,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Update Com Ports attributes from DevicePath
+
+
+  @param DevicePath      DevicePath that contains Com ports
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 UpdateComAttributeFromVariable (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
-/*++
-
-Routine Description:
-  Update Com Ports attributes from DevicePath
-
-Arguments:
-  DevicePath  -   DevicePath that contains Com ports
-
-Returns:
-
---*/
 {
   EFI_DEVICE_PATH_PROTOCOL  *Node;
   EFI_DEVICE_PATH_PROTOCOL  *SerialNode;
@@ -630,25 +665,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Function creates a device path data structure that identically matches the
+  device path passed in.
+
+
+  @param DevPath         A pointer to a device path data structure.
+
+           EDES_TODO: Incomplete Descriptions  The new copy of DevPath is created to identically match the input.
+           EDES_TODO: Incomplete Descriptions  Otherwise, NULL is returned.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevicePathInstanceDup (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   )
-/*++
-
-Routine Description:
-  Function creates a device path data structure that identically matches the
-  device path passed in.
-
-Arguments:
-  DevPath      - A pointer to a device path data structure.
-
-Returns:
-
-  The new copy of DevPath is created to identically match the input.
-  Otherwise, NULL is returned.
-
---*/
 {
   EFI_DEVICE_PATH_PROTOCOL  *NewDevPath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathInst;
@@ -682,6 +713,14 @@ Returns:
   return NewDevPath;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param ConsoleMenuType EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 GetConsoleMenu (
   IN UINTN              ConsoleMenuType
@@ -801,22 +840,20 @@ GetConsoleMenu (
   return EFI_SUCCESS;
 }
 
+/**
+  Build up ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+           EDES_TODO: Incomplete Descriptions  EFI_SUCCESS
+           EDES_TODO: Incomplete Descriptions  Others
+
+**/
 EFI_STATUS
 GetAllConsoles (
   VOID
   )
-/*++
-
-Routine Description:
-  Build up ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
-
-Arguments:
-
-Returns:
-  EFI_SUCCESS
-  Others
-
---*/
 {
   GetConsoleMenu (BM_CONSOLE_IN_CONTEXT_SELECT);
   GetConsoleMenu (BM_CONSOLE_OUT_CONTEXT_SELECT);
@@ -824,22 +861,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Free ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+           EDES_TODO: Incomplete Descriptions  EFI_SUCCESS
+           EDES_TODO: Incomplete Descriptions  Others
+
+**/
 EFI_STATUS
 FreeAllConsoles (
   VOID
   )
-/*++
-
-Routine Description:
-  Free ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
-
-Arguments:
-
-Returns:
-  EFI_SUCCESS
-  Others
-
---*/
 {
   BOpt_FreeMenu (&ConsoleOutMenu);
   BOpt_FreeMenu (&ConsoleInpMenu);
@@ -848,27 +883,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Test whether DevicePath is a valid Terminal
+
+
+  @param DevicePath      DevicePath to be checked
+  @param Termi           If is terminal, give its type
+  @param Com             If is Com Port, give its type
+
+  @retval  TRUE         If DevicePath point to a Terminal
+                        FALSE
+
+**/
 BOOLEAN
 IsTerminalDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   OUT TYPE_OF_TERMINAL         *Termi,
   OUT UINTN                    *Com
   )
-/*++
-
-Routine Description:
-  Test whether DevicePath is a valid Terminal
-
-Arguments:
-  DevicePath  -   DevicePath to be checked
-  Termi       -   If is terminal, give its type
-  Com         -   If is Com Port, give its type
-
-Returns:
-  TRUE        -   If DevicePath point to a Terminal
-  FALSE
-
---*/
 {
   UINT8                 *Ptr;
   BOOLEAN               IsTerminal;
@@ -935,22 +967,19 @@ Returns:
   return TRUE;
 }
 
+/**
+  Get mode number according to column and row
+
+
+  @param CallbackData    BMM_CALLBACK_DATA
+
+           EDES_TODO: Incomplete Descriptions  None.
+
+**/
 VOID
 GetConsoleOutMode (
   IN  BMM_CALLBACK_DATA    *CallbackData
   )
-/*++
-
-Routine Description:
-  Get mode number according to column and row
-
-Arguments:
-  CallbackData  -  BMM_CALLBACK_DATA
-
-Returns:
-  None.
-
---*/
 {
   UINTN                         Col;
   UINTN                         Row;

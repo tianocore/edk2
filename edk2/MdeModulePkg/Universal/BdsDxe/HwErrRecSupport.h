@@ -18,27 +18,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Bds.h"
 
+/**
+  Set the HwErrRecSupport variable contains a binary UINT16 that supplies the
+  level of support for Hardware Error Record Persistence that is implemented
+  by the platform.
+
+
+  @param HwErrRecSupportLevel
+                         zero value      - Indicates that the platform implements no support for
+                         Hardware Error Record Persistence.
+                         non-zero value  - Indicates that the platform implements Hardware Error
+                         Record Persistence.
+
+  @return  VOID
+
+**/
 VOID
 InitializeHwErrRecSupport (
   IN UINT16       HwErrRecSupportLevel
   )
-/*++
-
-  Routine Description:
-    Set the HwErrRecSupport variable contains a binary UINT16 that supplies the
-    level of support for Hardware Error Record Persistence that is implemented
-    by the platform.
-
-  Arguments:
-    HwErrRecSupportLevel
-      zero value      - Indicates that the platform implements no support for
-                        Hardware Error Record Persistence.
-      non-zero value  - Indicates that the platform implements Hardware Error
-                        Record Persistence.
-
-  Returns:
-
---*/
 ;
 
 #endif

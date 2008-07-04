@@ -39,6 +39,24 @@ DEVICE_MANAGER_MENU_ITEM  mDeviceManagerMenuItemTable[] = {
 #define MENU_ITEM_NUM  \
   (sizeof (mDeviceManagerMenuItemTable) / sizeof (DEVICE_MANAGER_MENU_ITEM))
 
+/**
+  This function processes the results of changes in configuration.
+
+
+  @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Action          Specifies the type of action taken by the browser.
+  @param QuestionId      A unique value which is sent to the original exporting driver
+                         so that it can identify the type of data to expect.
+  @param Type            The type of value for the question.
+  @param Value           A pointer to the data being sent to the original exporting driver.
+  @param ActionRequest   On return, points to the action requested by the callback function.
+
+  @retval  EFI_SUCCESS           The callback successfully handled the action.
+  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
+  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
+  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
+
+**/
 EFI_STATUS
 EFIAPI
 DeviceManagerCallback (
@@ -49,27 +67,6 @@ DeviceManagerCallback (
   IN  EFI_IFR_TYPE_VALUE                     *Value,
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
-/*++
-
-  Routine Description:
-    This function processes the results of changes in configuration.
-
-  Arguments:
-    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Action        - Specifies the type of action taken by the browser.
-    QuestionId    - A unique value which is sent to the original exporting driver
-                    so that it can identify the type of data to expect.
-    Type          - The type of value for the question.
-    Value         - A pointer to the data being sent to the original exporting driver.
-    ActionRequest - On return, points to the action requested by the callback function.
-
-  Returns:
-    EFI_SUCCESS          - The callback successfully handled the action.
-    EFI_OUT_OF_RESOURCES - Not enough storage is available to hold the variable and its data.
-    EFI_DEVICE_ERROR     - The variable could not be saved.
-    EFI_UNSUPPORTED      - The specified Action is not supported by the callback.
-
---*/
 {
   DEVICE_MANAGER_CALLBACK_DATA *PrivateData;
 
@@ -113,22 +110,20 @@ DeviceManagerCallback (
   return EFI_SUCCESS;
 }
 
+/**
+
+  Initialize HII information for the FrontPage
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 InitializeDeviceManager (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Initialize HII information for the FrontPage
-
-Arguments:
-  None
-
-Returns:
-
---*/
 {
   EFI_STATUS                  Status;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
@@ -169,25 +164,21 @@ Returns:
   return Status;
 }
 
+/**
+
+  Call the browser and display the device manager
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @retval  EFI_SUCCESS             Operation is successful.
+  @retval  EFI_INVALID_PARAMETER   If the inputs to SendForm function is not valid.
+
+**/
 EFI_STATUS
 CallDeviceManager (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Call the browser and display the device manager
-
-Arguments:
-
-  None
-
-Returns:
-  EFI_SUCCESS            - Operation is successful.
-  EFI_INVALID_PARAMETER  - If the inputs to SendForm function is not valid.
-
---*/
 {
   EFI_STATUS                  Status;
   UINTN                       Count;

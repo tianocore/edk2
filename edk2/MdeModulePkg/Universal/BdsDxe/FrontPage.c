@@ -37,6 +37,28 @@ FRONT_PAGE_CALLBACK_DATA  gFrontPagePrivate = {
   }
 };
 
+/**
+  This function allows a caller to extract the current configuration for one
+  or more named elements from the target driver.
+
+
+  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Request         - A null-terminated Unicode string in <ConfigRequest> format.
+  @param Progress        - On return, points to a character in the Request string.
+                         Points to the string's null terminator if request was successful.
+                         Points to the most recent '&' before the first failing name/value
+                         pair (or the beginning of the string if the failure is in the
+                         first name/value pair) if the request was not successful.
+  @param Results         - A null-terminated Unicode string in <ConfigAltResp> format which
+                         has all values filled in for the names in the Request string.
+                         String to be allocated by the called function.
+
+  @retval  EFI_SUCCESS            The Results is filled with the requested values.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough memory to store the results.
+  @retval  EFI_INVALID_PARAMETER  Request is NULL, illegal syntax, or unknown name.
+  @retval  EFI_NOT_FOUND          Routing data doesn't match any storage in this driver.
+
+**/
 EFI_STATUS
 EFIAPI
 FakeExtractConfig (
@@ -45,35 +67,26 @@ FakeExtractConfig (
   OUT EFI_STRING                             *Progress,
   OUT EFI_STRING                             *Results
   )
-/*++
-
-  Routine Description:
-    This function allows a caller to extract the current configuration for one
-    or more named elements from the target driver.
-
-  Arguments:
-    This       - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Request    - A null-terminated Unicode string in <ConfigRequest> format.
-    Progress   - On return, points to a character in the Request string.
-                 Points to the string's null terminator if request was successful.
-                 Points to the most recent '&' before the first failing name/value
-                 pair (or the beginning of the string if the failure is in the
-                 first name/value pair) if the request was not successful.
-    Results    - A null-terminated Unicode string in <ConfigAltResp> format which
-                 has all values filled in for the names in the Request string.
-                 String to be allocated by the called function.
-
-  Returns:
-    EFI_SUCCESS           - The Results is filled with the requested values.
-    EFI_OUT_OF_RESOURCES  - Not enough memory to store the results.
-    EFI_INVALID_PARAMETER - Request is NULL, illegal syntax, or unknown name.
-    EFI_NOT_FOUND         - Routing data doesn't match any storage in this driver.
-
---*/
 {
   return EFI_NOT_FOUND;
 }
 
+/**
+  This function processes the results of changes in configuration.
+
+
+  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Configuration   - A null-terminated Unicode string in <ConfigResp> format.
+  @param Progress        - A pointer to a string filled in with the offset of the most
+                         recent '&' before the first failing name/value pair (or the
+                         beginning of the string if the failure is in the first
+                         name/value pair) or the terminating NULL if all was successful.
+
+  @retval  EFI_SUCCESS            The Results is processed successfully.
+  @retval  EFI_INVALID_PARAMETER  Configuration is NULL.
+  @retval  EFI_NOT_FOUND          Routing data doesn't match any storage in this driver.
+
+**/
 EFI_STATUS
 EFIAPI
 FakeRouteConfig (
@@ -81,29 +94,28 @@ FakeRouteConfig (
   IN  CONST EFI_STRING                       Configuration,
   OUT EFI_STRING                             *Progress
   )
-/*++
-
-  Routine Description:
-    This function processes the results of changes in configuration.
-
-  Arguments:
-    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Configuration - A null-terminated Unicode string in <ConfigResp> format.
-    Progress      - A pointer to a string filled in with the offset of the most
-                    recent '&' before the first failing name/value pair (or the
-                    beginning of the string if the failure is in the first
-                    name/value pair) or the terminating NULL if all was successful.
-
-  Returns:
-    EFI_SUCCESS           - The Results is processed successfully.
-    EFI_INVALID_PARAMETER - Configuration is NULL.
-    EFI_NOT_FOUND         - Routing data doesn't match any storage in this driver.
-
---*/
 {
   return EFI_SUCCESS;
 }
 
+/**
+  This function processes the results of changes in configuration.
+
+
+  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Action          - Specifies the type of action taken by the browser.
+  @param QuestionId      - A unique value which is sent to the original exporting driver
+                         so that it can identify the type of data to expect.
+  @param Type            - The type of value for the question.
+  @param Value           - A pointer to the data being sent to the original exporting driver.
+  @param ActionRequest   - On return, points to the action requested by the callback function.
+
+  @retval  EFI_SUCCESS           The callback successfully handled the action.
+  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
+  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
+  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
+
+**/
 EFI_STATUS
 EFIAPI
 FrontPageCallback (
@@ -114,27 +126,6 @@ FrontPageCallback (
   IN  EFI_IFR_TYPE_VALUE                     *Value,
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
-/*++
-
-  Routine Description:
-    This function processes the results of changes in configuration.
-
-  Arguments:
-    This          - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-    Action        - Specifies the type of action taken by the browser.
-    QuestionId    - A unique value which is sent to the original exporting driver
-                    so that it can identify the type of data to expect.
-    Type          - The type of value for the question.
-    Value         - A pointer to the data being sent to the original exporting driver.
-    ActionRequest - On return, points to the action requested by the callback function.
-
-  Returns:
-    EFI_SUCCESS          - The callback successfully handled the action.
-    EFI_OUT_OF_RESOURCES - Not enough storage is available to hold the variable and its data.
-    EFI_DEVICE_ERROR     - The variable could not be saved.
-    EFI_UNSUPPORTED      - The specified Action is not supported by the callback.
-
---*/
 {
   CHAR8                         *LanguageString;
   CHAR8                         *LangCode;
@@ -235,23 +226,20 @@ FrontPageCallback (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-InitializeFrontPage (
-  BOOLEAN                         ReInitializeStrings
-  )
-/*++
-
-Routine Description:
+/**
   Initialize HII information for the FrontPage
 
-Arguments:
-  None
 
-Returns:
-  EFI_SUCCESS       - The operation is successful.
-  EFI_DEVICE_ERROR  - If the dynamic opcode creation failed.
+  @param InitializeHiiData    TRUE if HII elements need to be initialized.
 
---*/
+  @retval  EFI_SUCCESS        The operation is successful.
+  @retval  EFI_DEVICE_ERROR   If the dynamic opcode creation failed.
+
+**/
+EFI_STATUS
+InitializeFrontPage (
+  BOOLEAN                         InitializeHiiData
+  )
 {
   EFI_STATUS                  Status;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
@@ -268,7 +256,7 @@ Returns:
   UINTN                       Index;
   EFI_HII_HANDLE              HiiHandle;
 
-  if (!ReInitializeStrings) {
+  if (InitializeHiiData) {
     //
     // Initialize the Device Manager
     //
@@ -456,21 +444,20 @@ Returns:
   return Status;
 }
 
+/**
+  Call the browser and display the front page
+
+
+  @param VOID            No input.
+
+  @return   Status code that will be returned by
+            EFI_FORM_BROWSER2_PROTOCOL.SendForm ().
+
+**/
 EFI_STATUS
 CallFrontPage (
   VOID
   )
-/*++
-
-Routine Description:
-  Call the browser and display the front page
-
-Arguments:
-  None
-
-Returns:
-
---*/
 {
   EFI_STATUS                  Status;
   EFI_BROWSER_ACTION_REQUEST  ActionRequest;
@@ -510,26 +497,23 @@ Returns:
   return Status;
 }
 
+/**
+  Acquire the string associated with the ProducerGuid and return it.
+
+
+  @param ProducerGuid    - The Guid to search the HII database for
+  @param Token           - The token value of the string to extract
+  @param String          - The string that is extracted
+
+  @retval  EFI_SUCCESS  The function returns EFI_SUCCESS always.
+
+**/
 EFI_STATUS
 GetProducerString (
   IN      EFI_GUID                  *ProducerGuid,
   IN      EFI_STRING_ID             Token,
   OUT     CHAR16                    **String
   )
-/*++
-
-Routine Description:
-  Acquire the string associated with the ProducerGuid and return it.
-
-Arguments:
-  ProducerGuid - The Guid to search the HII database for
-  Token - The token value of the string to extract
-  String - The string that is extracted
-
-Returns:
-  EFI_SUCCESS - The function returns EFI_SUCCESS always.
-
---*/
 {
   EFI_STATUS      Status;
 
@@ -541,23 +525,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Convert Processor Frequency Data to a string
+
+
+  @param ProcessorFrequency - The frequency data to process
+  @param String          - The string that is created
+
+  @return VOID.
+
+**/
 VOID
 ConvertProcessorToString (
   IN  EFI_PROCESSOR_CORE_FREQUENCY_DATA *ProcessorFrequency,
   OUT CHAR16                            **String
   )
-/*++
-
-Routine Description:
-  Convert Processor Frequency Data to a string
-
-Arguments:
-  ProcessorFrequency - The frequency data to process
-  String - The string that is created
-
-Returns:
-
---*/
 {
   CHAR16  *StringBuffer;
   UINTN   Index;
@@ -584,23 +566,21 @@ Returns:
   return ;
 }
 
+/**
+  Convert Memory Size to a string
+
+
+  @param MemorySize      - The size of the memory to process
+  @param String          - The string that is created
+
+  @return VOID.
+
+**/
 VOID
 ConvertMemorySizeToString (
   IN  UINT32          MemorySize,
   OUT CHAR16          **String
   )
-/*++
-
-Routine Description:
-  Convert Memory Size to a string
-
-Arguments:
-  MemorySize - The size of the memory to process
-  String - The string that is created
-
-Returns:
-
---*/
 {
   CHAR16  *StringBuffer;
 
@@ -614,21 +594,19 @@ Returns:
   return ;
 }
 
+/**
+  Update the banner information for the Front Page based on DataHub information
+
+
+  @param VOID            No input.
+
+  @return No output.
+
+**/
 VOID
 UpdateFrontPageStrings (
   VOID
   )
-/*++
-
-Routine Description:
-  Update the banner information for the Front Page based on DataHub information
-
-Arguments:
-  None
-
-Returns:
-
---*/
 {
   EFI_STATUS                        Status;
   EFI_STRING_ID                     TokenToUpdate;
@@ -725,25 +703,23 @@ Returns:
   return ;
 }
 
+/**
+  Function waits for a given event to fire, or for an optional timeout to expire.
+
+
+  @param Event           The event to wait for
+                        
+  @param Timeout         An optional timeout value in 100 ns units.
+
+  @retval  EFI_SUCCESS       Event fired before Timeout expired.
+  @retval  EFI_TIME_OUT      Timout expired before Event fired..
+
+**/
 EFI_STATUS
 WaitForSingleEvent (
   IN EFI_EVENT                  Event,
   IN UINT64                     Timeout OPTIONAL
   )
-/*++
-
-Routine Description:
-  Function waits for a given event to fire, or for an optional timeout to expire.
-
-Arguments:
-  Event            - The event to wait for
-  Timeout          - An optional timeout value in 100 ns units.
-
-Returns:
-  EFI_SUCCESS      - Event fired before Timeout expired.
-  EFI_TIME_OUT     - Timout expired before Event fired..
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       Index;
@@ -792,24 +768,21 @@ Returns:
   return Status;
 }
 
+/**
+  Function show progress bar to wait for user input.
+
+
+  @param TimeoutDefault  - The fault time out value before the system
+                         continue to boot.
+
+  @retval  EFI_SUCCESS       User pressed some key except "Enter"
+  @retval  EFI_TIME_OUT      Timout expired or user press "Enter"
+
+**/
 EFI_STATUS
 ShowProgress (
   IN UINT16                       TimeoutDefault
   )
-/*++
-
-Routine Description:
-  Function show progress bar to wait for user input.
-
-Arguments:
-  TimeoutDefault   - The fault time out value before the system
-                     continue to boot.
-
-Returns:
-  EFI_SUCCESS      - User pressed some key except "Enter"
-  EFI_TIME_OUT     - Timout expired or user press "Enter"
-
---*/
 {
   EFI_STATUS                    Status;
   CHAR16                        *TmpStr;
@@ -888,28 +861,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is the main entry of the platform setup entry.
+  The function will present the main menu of the system setup,
+  this is the platform reference part and can be customize.
+
+
+  @param TimeoutDefault  - The fault time out value before the system
+                         continue to boot.
+  @param ConnectAllHappened - The indicater to check if the connect all have
+                         already happended.
+
+  @return VOID.
+
+**/
 VOID
 PlatformBdsEnterFrontPage (
   IN UINT16                       TimeoutDefault,
   IN BOOLEAN                      ConnectAllHappened
   )
-/*++
-
-Routine Description:
-  This function is the main entry of the platform setup entry.
-  The function will present the main menu of the system setup,
-  this is the platform reference part and can be customize.
-
-Arguments:
-  TimeoutDefault     - The fault time out value before the system
-                       continue to boot.
-  ConnectAllHappened - The indicater to check if the connect all have
-                       already happended.
-
-Returns:
-  None
-
---*/
 {
   EFI_STATUS                    Status;
   EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
@@ -939,7 +909,7 @@ Returns:
 
   do {
 
-    InitializeFrontPage (TRUE);
+    InitializeFrontPage (FALSE);
 
     //
     // Update Front Page strings

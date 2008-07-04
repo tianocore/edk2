@@ -23,32 +23,27 @@ EFI_DEVICE_PATH_PROTOCOL  EndDevicePath[] = {
   0
 };
 
+/**
+
+  Translate the first n characters of an Ascii string to
+  Unicode characters. The count n is indicated by parameter
+  Size. If Size is greater than the length of string, then
+  the entire string is translated.
+
+
+  @param a               Pointer to input Ascii string.
+  @param Size            The number of characters to translate.
+  @param u               Pointer to output Unicode string buffer.
+
+  @return None
+
+**/
 VOID
 AsciiToUnicodeSize (
   IN UINT8              *a,
   IN UINTN              Size,
   OUT UINT16            *u
   )
-/*++
-
-  Routine Description:
-
-    Translate the first n characters of an Ascii string to
-    Unicode characters. The count n is indicated by parameter
-    Size. If Size is greater than the length of string, then
-    the entire string is translated.
-
-  Arguments:
-
-    a         - Pointer to input Ascii string.
-    Size      - The number of characters to translate.
-    u         - Pointer to output Unicode string buffer.
-
-  Returns:
-
-    None
-
---*/
 {
   UINTN i;
 
@@ -64,28 +59,25 @@ AsciiToUnicodeSize (
   u[i] = 0;
 }
 
+/**
+
+  change a Unicode string t ASCII string
+
+
+  @param UStr            Unicode string
+                         Lenght - most possible length of AStr
+  @param Length          The length of UStr.
+  @param AStr            ASCII string to pass out
+
+  @return Actual length
+
+**/
 UINTN
 UnicodeToAscii (
   IN  CHAR16  *UStr,
   IN  UINTN   Length,
   OUT CHAR8   *AStr
   )
-/*++
-Routine Description:
-
-  change a Unicode string t ASCII string
-
-Arguments:
-
-  UStr   - Unicode string
-  Lenght - most possible length of AStr
-  AStr   - ASCII string to pass out
-
-Returns:
-
-  Actuall length
-
---*/
 {
   UINTN Index;
 
@@ -99,6 +91,17 @@ Returns:
   return Index;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param CurBBSEntry     EDES_TODO: Add parameter description
+  @param Index           EDES_TODO: Add parameter description
+  @param BufSize         EDES_TODO: Add parameter description
+  @param BootString      EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 BdsBuildLegacyDevNameString (
   IN BBS_TABLE                 *CurBBSEntry,
@@ -205,6 +208,27 @@ BdsBuildLegacyDevNameString (
   }
 }
 
+/**
+
+  Create a legacy boot option for the specified entry of
+  BBS table, save it as variable, and append it to the boot
+  order list.
+
+
+  @param CurrentBbsEntry Pointer to current BBS table.
+  @param CurrentBbsDevPath Pointer to the Device Path Protocol instance of BBS
+  @param Index           Index of the specified entry in BBS table.
+  @param BootOrderList   On input, the original boot order list.
+                         On output, the new boot order list attached with the
+                         created node.
+  @param BootOrderListSize On input, the original size of boot order list.
+                         - On output, the size of new boot order list.
+
+  @retval  EFI_SUCCESS             Boot Option successfully created.
+  @retval  EFI_OUT_OF_RESOURCES    Fail to allocate necessary memory.
+  @retval  Other                   Error occurs while setting variable.
+
+**/
 EFI_STATUS
 BdsCreateLegacyBootOption (
   IN BBS_TABLE                        *CurrentBbsEntry,
@@ -213,32 +237,6 @@ BdsCreateLegacyBootOption (
   IN OUT UINT16                       **BootOrderList,
   IN OUT UINTN                        *BootOrderListSize
   )
-/*++
-
-  Routine Description:
-
-    Create a legacy boot option for the specified entry of
-    BBS table, save it as variable, and append it to the boot
-    order list.
-
-  Arguments:
-
-    CurrentBbsEntry        - Pointer to current BBS table.
-    CurrentBbsDevPath      - Pointer to the Device Path Protocol instance of BBS
-    Index                  - Index of the specified entry in BBS table.
-    BootOrderList          - On input, the original boot order list.
-                             On output, the new boot order list attached with the
-                             created node.
-    BootOrderListSize      - On input, the original size of boot order list.
-                           - On output, the size of new boot order list.
-
-  Returns:
-
-    EFI_SUCCESS            - Boot Option successfully created.
-    EFI_OUT_OF_RESOURCES   - Fail to allocate necessary memory.
-    Other                  - Error occurs while setting variable.
-
---*/
 {
   EFI_STATUS           Status;
   UINT16               CurrentBootOptionNo;
@@ -394,6 +392,16 @@ BdsCreateLegacyBootOption (
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param BootOptionVar   EDES_TODO: Add parameter description
+  @param BbsEntry        EDES_TODO: Add parameter description
+  @param BbsIndex        EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 BOOLEAN
 BdsIsLegacyBootOption (
   IN UINT8                 *BootOptionVar,
@@ -426,6 +434,16 @@ BdsIsLegacyBootOption (
   return Ret;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param OptionNumber    EDES_TODO: Add parameter description
+  @param BootOrder       EDES_TODO: Add parameter description
+  @param BootOrderSize   EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsDeleteBootOption (
   IN UINTN                       OptionNumber,
@@ -467,29 +485,24 @@ BdsDeleteBootOption (
 
 }
 
+/**
+
+  Delete all the invalid legacy boot options.
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @retval  EFI_SUCCESS             All invalide legacy boot options are deleted.
+  @retval  EFI_OUT_OF_RESOURCES    Fail to allocate necessary memory.
+  @retval  EFI_NOT_FOUND           Fail to retrive variable of boot order.
+  @retval  Other                   Error occurs while setting variable or locating
+                                   protocol.
+
+**/
 EFI_STATUS
 BdsDeleteAllInvalidLegacyBootOptions (
   VOID
   )
-/*++
-
-  Routine Description:
-
-    Delete all the invalid legacy boot options.
-
-  Arguments:
-
-    None.
-
-  Returns:
-
-    EFI_SUCCESS            - All invalide legacy boot options are deleted.
-    EFI_OUT_OF_RESOURCES   - Fail to allocate necessary memory.
-    EFI_NOT_FOUND          - Fail to retrive variable of boot order.
-    Other                  - Error occurs while setting variable or locating
-                             protocol.
-
---*/
 {
   UINT16                    *BootOrder;
   UINT8                     *BootOptionVar;
@@ -610,6 +623,19 @@ BdsDeleteAllInvalidLegacyBootOptions (
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param BootOrder       EDES_TODO: Add parameter description
+  @param BootOptionNum   EDES_TODO: Add parameter description
+  @param DevType         EDES_TODO: Add parameter description
+  @param Attribute       EDES_TODO: Add parameter description
+  @param BbsIndex        EDES_TODO: Add parameter description
+  @param OptionNumber    EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 BOOLEAN
 BdsFindLegacyBootOptionByDevType (
   IN UINT16                 *BootOrder,
@@ -667,6 +693,17 @@ BdsFindLegacyBootOptionByDevType (
   return Found;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param BbsItem         EDES_TODO: Add parameter description
+  @param Index           EDES_TODO: Add parameter description
+  @param BootOrderList   EDES_TODO: Add parameter description
+  @param BootOrderListSize EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsCreateOneLegacyBootOption (
   IN BBS_TABLE              *BbsItem,
@@ -709,26 +746,21 @@ BdsCreateOneLegacyBootOption (
   return Status;
 }
 
+/**
+
+  Add the legacy boot options from BBS table if they do not exist.
+
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @retval  EFI_SUCCESS        The boot options are added successfully or they are already in boot options.
+  @retval  others             An error occurred when creating legacy boot options.
+
+**/
 EFI_STATUS
 BdsAddNonExistingLegacyBootOptions (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Add the legacy boot options from BBS table if they do not exist.
-
-Arguments:
-
-  None.
-
-Returns:
-
-  EFI_SUCCESS       - The boot options are added successfully or they are already in boot options.
-  others            - An error occurred when creating legacy boot options.
-
---*/
 {
   UINT16                    *BootOrder;
   UINTN                     BootOrderSize;
@@ -825,6 +857,17 @@ Returns:
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param BbsTable        EDES_TODO: Add parameter description
+  @param BbsType         EDES_TODO: Add parameter description
+  @param BbsCount        EDES_TODO: Add parameter description
+  @param Buf             EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 UINT16 *
 BdsFillDevOrderBuf (
   IN BBS_TABLE                    *BbsTable,
@@ -851,6 +894,15 @@ BdsFillDevOrderBuf (
   return Buf;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param BbsTable        EDES_TODO: Add parameter description
+  @param BbsCount        EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsCreateDevOrder (
   IN BBS_TABLE                  *BbsTable,
@@ -976,21 +1028,18 @@ BdsCreateDevOrder (
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param VOID            EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsUpdateLegacyDevOrder (
   VOID
   )
-/*++
-Format of LegacyDevOrder variable:
-|-----------------------------------------------------------------------------------------------------------------
-| BBS_FLOPPY | Length | Index0 | Index1 | ... | BBS_HARDDISK | Length | Index0 | Index1 | ... | BBS_CDROM | Length | Index0 | ...
-|-----------------------------------------------------------------------------------------------------------------
-
-Length is a 16 bit integer, it indicates how many Indexes follows, including the size of itself.
-Index# is a 16 bit integer, the low byte of it stands for the index in BBS table
-           the high byte of it only have two value 0 and 0xFF, 0xFF means this device has been
-           disabled by user.
---*/
 {
   UINT8                     *DevOrder;
   UINT8                     *NewDevOrder;
@@ -1418,18 +1467,22 @@ Index# is a 16 bit integer, the low byte of it stands for the index in BBS table
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param DeviceType      EDES_TODO: Add parameter description
+  @param LocalBbsTable   EDES_TODO: Add parameter description
+  @param Priority        EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsSetBootPriority4SameTypeDev (
   IN UINT16                                              DeviceType,
   IN OUT BBS_TABLE                                       *LocalBbsTable,
   IN OUT UINT16                                          *Priority
   )
-/*++
-DeviceType           - BBS_FLOPPY, BBS_HARDDISK, BBS_CDROM and so on
-LocalBbsTable       - BBS table instance
-Priority                 - As input arg, it is the start point of boot priority, as output arg, it is the start point of boot
-                              priority can be used next time.
---*/
 {
   UINT8   *DevOrder;
 
@@ -1484,6 +1537,14 @@ Priority                 - As input arg, it is the start point of boot priority,
   return EFI_SUCCESS;
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param LocalBbsTable   EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 VOID
 PrintBbsTable (
   IN BBS_TABLE                      *LocalBbsTable
@@ -1524,6 +1585,14 @@ PrintBbsTable (
   DEBUG ((DEBUG_ERROR, "\n"));
 }
 
+/**
+  EDES_TODO: Add function description
+
+  @param Entry           EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
 BdsRefreshBbsTableForBoot (
   IN BDS_COMMON_OPTION        *Entry
