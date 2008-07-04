@@ -91,8 +91,8 @@ static int
 TryCreateShmImage(UGA_IO_PRIVATE *drv)
 {
   drv->image = XShmCreateImage (drv->display, drv->visual,
-				drv->depth, ZPixmap, NULL, &drv->xshm_info,
-				drv->width, drv->height);
+                 drv->depth, ZPixmap, NULL, &drv->xshm_info,
+                 drv->width, drv->height);
   if (drv->image == NULL)
     return 0;
 
@@ -109,8 +109,8 @@ TryCreateShmImage(UGA_IO_PRIVATE *drv)
   }
 
   drv->xshm_info.shmid = shmget
-	(IPC_PRIVATE, drv->image->bytes_per_line * drv->image->height,
-	 IPC_CREAT | 0777);
+                          (IPC_PRIVATE, drv->image->bytes_per_line * drv->image->height,
+                          IPC_CREAT | 0777);
   if (drv->xshm_info.shmid < 0)
     {
       XDestroyImage(drv->image);
@@ -129,7 +129,7 @@ TryCreateShmImage(UGA_IO_PRIVATE *drv)
 
   drv->xshm_info.shmaddr = (char*)drv->image_data;
   drv->image->data = (char*)drv->image_data;
-	  
+
   if (!XShmAttach (drv->display, &drv->xshm_info))
     {
       shmdt (drv->image_data);
@@ -152,7 +152,7 @@ UgaClose (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
       XDestroyImage(drv->image);
 
       if (drv->use_shm)
-	shmdt (drv->image_data);
+        shmdt (drv->image_data);
 
       drv->image_data = NULL;
       drv->image = NULL;
@@ -176,7 +176,7 @@ UgaSize(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height)
       XDestroyImage(drv->image);
 
       if (drv->use_shm)
-	shmdt (drv->image_data);
+        shmdt (drv->image_data);
 
       drv->image_data = NULL;
       drv->image = NULL;
@@ -187,25 +187,22 @@ UgaSize(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height)
   XResizeWindow (drv->display, drv->win, Width, Height);
 
   /* Allocate image.  */
-  if (XShmQueryExtension(drv->display) && TryCreateShmImage(drv))
-    {
-      drv->use_shm = 1;
-    }	
-  else	
-    {
-      drv->use_shm = 0;
-      if (drv->depth > 16)
-	drv->pixel_shift = 2;
-      else if (drv->depth > 8)
-	drv->pixel_shift = 1;
-      else
-	drv->pixel_shift = 0;
+  if (XShmQueryExtension(drv->display) && TryCreateShmImage(drv)) {
+    drv->use_shm = 1;
+  } else {
+    drv->use_shm = 0;
+    if (drv->depth > 16)
+      drv->pixel_shift = 2;
+    else if (drv->depth > 8)
+      drv->pixel_shift = 1;
+    else
+      drv->pixel_shift = 0;
       
       drv->image_data = malloc((drv->width * drv->height) << drv->pixel_shift);
       drv->image = XCreateImage (drv->display, drv->visual, drv->depth,
-				 ZPixmap, 0, (char *)drv->image_data,
-				 drv->width, drv->height,
-				 8 << drv->pixel_shift, 0);
+                                  ZPixmap, 0, (char *)drv->image_data,
+                                  drv->width, drv->height,
+                                  8 << drv->pixel_shift, 0);
     }
   drv->line_bytes = drv->image->bytes_per_line;
   fill_shift_mask (&drv->r, drv->image->red_mask);
@@ -278,10 +275,11 @@ Redraw(UGA_IO_PRIVATE *drv, UINTN X, UINTN Y, UINTN Width, UINTN Height)
 {
   if (drv->use_shm)
     XShmPutImage (drv->display, drv->win, drv->gc, drv->image,
-		  X, Y, X, Y, Width, Height, False);
+                   X, Y, X, Y, Width, Height, False);
   else
     XPutImage (drv->display, drv->win, drv->gc, drv->image,
-		  X, Y, X, Y, Width, Height);
+                X, Y, X, Y, Width, Height);
+  XFlush(drv->display);
 }
 
 static void
@@ -291,11 +289,11 @@ HandleEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
     {
     case Expose:
       Redraw(drv, ev->xexpose.x, ev->xexpose.y,
-	     ev->xexpose.width, ev->xexpose.height);
+        ev->xexpose.width, ev->xexpose.height);
       break;
     case GraphicsExpose:
       Redraw(drv, ev->xgraphicsexpose.x, ev->xgraphicsexpose.y,
-	     ev->xgraphicsexpose.width, ev->xgraphicsexpose.height);
+        ev->xgraphicsexpose.width, ev->xgraphicsexpose.height);
       break;
     case KeyPress:
       handleKeyEvent(drv, ev);
@@ -321,7 +319,7 @@ HandleEvents(UGA_IO_PRIVATE *drv)
   while (XPending(drv->display) != 0)
     {
       XEvent ev;
-	  
+
       XNextEvent (drv->display, &ev);
       HandleEvent(drv, &ev);
     }
@@ -442,23 +440,23 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
 
   switch (BltOperation) {
   case EfiUgaVideoToBltBuffer:
-    Blt = BltBuffer;
+    Blt = (EFI_UGA_PIXEL *)((UINT8 *)BltBuffer + (DestinationY * Delta) + DestinationX * sizeof (EFI_UGA_PIXEL));
     Delta -= Width * sizeof (EFI_UGA_PIXEL);
     for (SrcY = SourceY; SrcY < (Height + SourceY); SrcY++) {
       for (SrcX = SourceX; SrcX < (Width + SourceX); SrcX++) {
-	*Blt++ = UgaColorToPixel(Private,
-				 XGetPixel(Private->image, SrcX, SrcY));
+        *Blt++ = UgaColorToPixel(Private,
+                                  XGetPixel(Private->image, SrcX, SrcY));
       }
       Blt = (EFI_UGA_PIXEL *) ((UINT8 *) Blt + Delta);
     }
     break;
   case EfiUgaBltBufferToVideo:
-    Blt = BltBuffer;
+    Blt = (EFI_UGA_PIXEL *)((UINT8 *)BltBuffer + (SourceY * Delta) + SourceX * sizeof (EFI_UGA_PIXEL));
     Delta -= Width * sizeof (EFI_UGA_PIXEL);
     for (DstY = DestinationY; DstY < (Height + DestinationY); DstY++) {
       for (DstX = DestinationX; DstX < (Width + DestinationX); DstX++) {
-	XPutPixel(Private->image, DstX, DstY, UgaPixelToColor(Private, *Blt));
-	Blt++;
+        XPutPixel(Private->image, DstX, DstY, UgaPixelToColor(Private, *Blt));
+        Blt++;
       }
       Blt = (EFI_UGA_PIXEL *) ((UINT8 *) Blt + Delta);
     }
@@ -471,22 +469,22 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
     Nbr = Width << Private->pixel_shift;
     if (DestinationY < SourceY) {
       for (Index = 0; Index < Height; Index++) {
-	memcpy (Dst, Src, Nbr);
-	Dst += Private->line_bytes;
-	Src += Private->line_bytes;
+        memcpy (Dst, Src, Nbr);
+        Dst += Private->line_bytes;
+        Src += Private->line_bytes;
       }
     }
     else {
       Dst += (Height - 1) * Private->line_bytes;
       Src += (Height - 1) * Private->line_bytes;
       for (Index = 0; Index < Height; Index++) {
-	//
-	// Source and Destination Y may be equal, therefore Dst and Src may
-	// overlap.
-	//
-	memmove (Dst, Src, Nbr);
-	Dst -= Private->line_bytes;
-	Src -= Private->line_bytes;
+      //
+      // Source and Destination Y may be equal, therefore Dst and Src may
+      // overlap.
+      //
+      memmove (Dst, Src, Nbr);
+      Dst -= Private->line_bytes;
+      Src -= Private->line_bytes;
       }
     }
     break;
@@ -494,7 +492,7 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
     Color = UgaPixelToColor(Private, *BltBuffer);
     for (DstY = DestinationY; DstY < (Height + DestinationY); DstY++) {
       for (DstX = DestinationX; DstX < (Width + DestinationX); DstX++) {
-	XPutPixel(Private->image, DstX, DstY, Color);
+        XPutPixel(Private->image, DstX, DstY, Color);
       }
     }
     break;
@@ -508,21 +506,22 @@ UgaBlt(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
   switch (BltOperation) {
   case EfiUgaVideoToVideo:
     XCopyArea(Private->display, Private->win, Private->win, Private->gc,
-	      SourceX, SourceY, Width, Height, DestinationX, DestinationY);
+               SourceX, SourceY, Width, Height, DestinationX, DestinationY);
     while (1) {
       XEvent ev;
-	  
+
       XNextEvent (Private->display, &ev);
       HandleEvent(Private, &ev);
       if (ev.type == NoExpose || ev.type == GraphicsExpose)
-	break;
+        break;
     }
     break;
   case EfiUgaVideoFill:
     Color = UgaPixelToColor(Private, *BltBuffer);
     XSetForeground(Private->display, Private->gc, Color);
     XFillRectangle(Private->display, Private->win, Private->gc,
-		   DestinationX, DestinationY, Width, Height);
+                    DestinationX, DestinationY, Width, Height);
+    XFlush(Private->display);
     break;
   case EfiUgaBltBufferToVideo:
     Redraw(Private, DestinationX, DestinationY, Width, Height);
@@ -559,17 +558,17 @@ UgaCreate (EFI_UNIX_UGA_IO_PROTOCOL **Uga, CONST CHAR16 *Title)
   if (drv->display == NULL)
     {
       fprintf (stderr, "uga: cannot connect to X server %s\n",
-	       XDisplayName (display_name));
+                XDisplayName (display_name));
       free (drv);
       return EFI_DEVICE_ERROR;
     }
   drv->screen = DefaultScreen (drv->display);
   drv->visual = DefaultVisual (drv->display, drv->screen);
   drv->win = XCreateSimpleWindow
-	(drv->display, RootWindow (drv->display, drv->screen),
-	 0, 0, 4, 4, border_width,
-	 BlackPixel (drv->display, drv->screen),
-	 WhitePixel (drv->display, drv->screen));
+               (drv->display, RootWindow (drv->display, drv->screen),
+                0, 0, 4, 4, border_width,
+                WhitePixel (drv->display, drv->screen),
+                BlackPixel (drv->display, drv->screen));
 
   drv->depth = DefaultDepth (drv->display, drv->screen);
 
@@ -587,7 +586,7 @@ UgaCreate (EFI_UNIX_UGA_IO_PROTOCOL **Uga, CONST CHAR16 *Title)
   }
 
   XSelectInput (drv->display, drv->win,
-		ExposureMask | KeyPressMask);
+                 ExposureMask | KeyPressMask);
   drv->gc = DefaultGC (drv->display, drv->screen);
 
   *Uga = (EFI_UNIX_UGA_IO_PROTOCOL *)drv;
