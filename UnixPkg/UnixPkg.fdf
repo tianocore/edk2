@@ -210,7 +210,7 @@ INF  UnixPkg/UnixBusDriverDxe/UnixBusDriver.inf
 INF  UnixPkg/UnixBlockIoDxe/UnixBlockIo.inf
 INF  UnixPkg/UnixSerialIoDxe/UnixSerialIo.inf
 INF  UnixPkg/UnixUgaDxe/UnixUga.inf
-INF  UnixPkg/UnixConsoleDxe/UnixConsole.inf
+#INF  UnixPkg/UnixConsoleDxe/UnixConsole.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf  
 INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf 
