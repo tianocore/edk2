@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BBSsupport.h"
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param MenuType        Use this parameter to identify current
                          Menu type
@@ -92,7 +92,7 @@ BOpt_CreateMenuEntry (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param MenuEntry       EDES_TODO: Add parameter description
 
@@ -173,7 +173,7 @@ BOpt_DestroyMenuEntry (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param MenuOption      EDES_TODO: Add parameter description
   @param MenuNumber      EDES_TODO: Add parameter description
@@ -206,7 +206,7 @@ BOpt_GetMenuEntry (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    BMM context data
 
@@ -338,7 +338,7 @@ BOpt_FindFileSystem (
       FileContext->Handle     = SimpleFsHandle[Index];
       MenuEntry->OptionNumber = Index;
       FileContext->FHandle    = EfiLibOpenRoot (FileContext->Handle);
-      if (!FileContext->FHandle) {
+      if (FileContext->FHandle == NULL) {
         BOpt_DestroyMenuEntry (MenuEntry);
         continue;
       }
@@ -583,7 +583,7 @@ Returns:
   }
 
   DirInfo = EfiLibFileInfo (NewDir);
-  if (!DirInfo) {
+  if (DirInfo == NULL) {
     return EFI_NOT_FOUND;
   }
 
@@ -598,7 +598,7 @@ Returns:
 
   DirBufferSize = sizeof (EFI_FILE_INFO) + 1024;
   DirInfo       = EfiAllocateZeroPool (DirBufferSize);
-  if (!DirInfo) {
+  if (DirInfo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   //
@@ -908,7 +908,7 @@ Returns:
               &BootNextSize
               );
 
-  if (BootNext) {
+  if (BootNext != NULL) {
     if (BootNextSize != sizeof (UINT16)) {
       SafeFreePool (BootNext);
       BootNext = NULL;
@@ -925,19 +925,19 @@ Returns:
                           &gEfiGlobalVariableGuid,
                           &BootOptionSize
                           );
-    if (!LoadOptionFromVar) {
+    if (LoadOptionFromVar == NULL) {
       continue;
     }
 
     LoadOption = EfiAllocateZeroPool (BootOptionSize);
-    if (!LoadOption) {
+    if (LoadOption == NULL) {
       continue;
     }
 
     CopyMem (LoadOption, LoadOptionFromVar, BootOptionSize);
     SafeFreePool (LoadOptionFromVar);
 
-    if (BootNext) {
+    if (BootNext != NULL) {
       BootNextFlag = (BOOLEAN) (*BootNext == BootOrderList[Index]);
     } else {
       BootNextFlag = FALSE;
@@ -1086,7 +1086,7 @@ BdsStrCpy (
   ASSERT (Destination != NULL);
 
   ReturnValue = Destination;
-  while (*Source) {
+  while (*Source != L'\0') {
     *(Destination++) = *(Source++);
   }
   *Destination = 0;
@@ -1180,7 +1180,7 @@ Returns:
   //
   // Search for ".efi" extension
   //
-  while (*FileName) {
+  while (*FileName != L'\0') {
     if (FileName[0] == '.') {
       if (FileName[1] == 'e' || FileName[1] == 'E') {
         if (FileName[2] == 'f' || FileName[2] == 'F') {
@@ -1406,7 +1406,7 @@ Returns:
                     &gEfiGlobalVariableGuid,
                     &BootOrderListSize
                     );
-  if (BootOrderList) {
+  if (BootOrderList != NULL) {
     //
     // already have Boot####
     //
@@ -1480,7 +1480,7 @@ Returns:
                       &gEfiGlobalVariableGuid,
                       &DriverOrderListSize
                       );
-  if (DriverOrderList) {
+  if (DriverOrderList != NULL) {
     //
     // already have Driver####
     //
@@ -1575,12 +1575,12 @@ Returns:
                           &gEfiGlobalVariableGuid,
                           &DriverOptionSize
                           );
-    if (!LoadOptionFromVar) {
+    if (LoadOptionFromVar == NULL) {
       continue;
     }
 
     LoadOption = EfiAllocateZeroPool (DriverOptionSize);
-    if (!LoadOption) {
+    if (LoadOption == NULL) {
       continue;
     }
 

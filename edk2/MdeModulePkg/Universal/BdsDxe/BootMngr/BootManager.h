@@ -53,7 +53,7 @@ typedef struct {
 } BOOT_MANAGER_CALLBACK_DATA;
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param This            EDES_TODO: Add parameter description
   @param Action          EDES_TODO: Add parameter description
@@ -78,7 +78,7 @@ BootManagerCallback (
 ;
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -92,7 +92,7 @@ InitializeBootManager (
 ;
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 

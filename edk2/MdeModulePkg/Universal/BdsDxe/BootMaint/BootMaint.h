@@ -470,7 +470,7 @@ typedef struct _STRING_DEPOSITORY {
 // For initializing File System menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -487,7 +487,7 @@ BOpt_FindFileSystem (
 // For cleaning up File System menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -504,7 +504,7 @@ BOpt_FreeFileSystem (
 // For initializing File Navigation menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param MenuEntry       EDES_TODO: Add parameter description
@@ -523,7 +523,7 @@ BOpt_FindFiles (
 // For cleaning up File Navigation menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -540,7 +540,7 @@ BOpt_FreeFiles (
 // For Initializing handle navigation menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -557,7 +557,7 @@ BOpt_FindDrivers (
 // For Cleaning up handle navigation menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -571,7 +571,7 @@ BOpt_FreeDrivers(VOID);
 // For initializing Boot Option menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -587,7 +587,7 @@ BOpt_GetBootOptions (
 // For Initializing Driver option menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -603,7 +603,7 @@ BOpt_GetDriverOptions (
 // For Cleaning up boot option menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -617,7 +617,7 @@ BOpt_FreeBootOptions (VOID);
 // For cleaning up driver option menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -631,7 +631,7 @@ BOpt_FreeDriverOptions(VOID);
 // For Initializing HD/FD/CD/NET/BEV option menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -645,7 +645,7 @@ BOpt_GetLegacyOptions(VOID);
 // For cleaning up driver option menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -659,7 +659,7 @@ BOpt_FreeLegacyOptions(VOID);
 // this function is used to take place of all other free menu actions
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param FreeMenu        EDES_TODO: Add parameter description
 
@@ -676,7 +676,7 @@ BOpt_FreeMenu (
 // Following are the helper functions used
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Str1            EDES_TODO: Add parameter description
   @param Str2            EDES_TODO: Add parameter description
@@ -691,7 +691,7 @@ BOpt_AppendFileName (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param FileName        EDES_TODO: Add parameter description
 
@@ -704,7 +704,7 @@ BOpt_IsEfiImageName (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Dir             EDES_TODO: Add parameter description
   @param FileName        EDES_TODO: Add parameter description
@@ -722,7 +722,7 @@ BOpt_IsEfiApp (
 // Get current unused boot option number
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -736,7 +736,7 @@ BOpt_GetBootOptionNumber (VOID);
 // Get current unused driver option number
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -747,7 +747,7 @@ UINT16
 BOpt_GetDriverOptionNumber (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param MenuType        EDES_TODO: Add parameter description
 
@@ -760,7 +760,7 @@ BOpt_CreateMenuEntry (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param MenuEntry       EDES_TODO: Add parameter description
 
@@ -773,7 +773,7 @@ BOpt_DestroyMenuEntry (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param MenuOption      EDES_TODO: Add parameter description
   @param MenuNumber      EDES_TODO: Add parameter description
@@ -791,7 +791,7 @@ BOpt_GetMenuEntry (
 // a helper function used to free pool type memory
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Buffer          EDES_TODO: Add parameter description
 
@@ -807,7 +807,7 @@ SafeFreePool (
 // Locate all serial io devices for console
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -821,7 +821,7 @@ LocateSerialIo (VOID);
 // Initializing Console menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -835,7 +835,7 @@ GetAllConsoles(VOID);
 // Get current mode information
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -851,7 +851,7 @@ GetConsoleOutMode (
 // Cleaning up console menu
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -862,7 +862,7 @@ EFI_STATUS
 FreeAllConsoles(VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevicePath      EDES_TODO: Add parameter description
 
@@ -875,7 +875,7 @@ ChangeVariableDevicePath (
 );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevicePath      EDES_TODO: Add parameter description
   @param ChangeTerminal  EDES_TODO: Add parameter description
@@ -892,7 +892,7 @@ ChangeTerminalDevicePath (
 // Variable operation by menu selection
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param NvRamMap        EDES_TODO: Add parameter description
@@ -907,7 +907,7 @@ Var_UpdateBootOption (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -918,7 +918,7 @@ EFI_STATUS
 Var_DelBootOption (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -929,7 +929,7 @@ EFI_STATUS
 Var_ChangeBootOrder (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param HiiHandle       EDES_TODO: Add parameter description
@@ -950,7 +950,7 @@ Var_UpdateDriverOption (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -961,7 +961,7 @@ EFI_STATUS
 Var_DelDriverOption (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -972,7 +972,7 @@ EFI_STATUS
 Var_ChangeDriverOrder (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -983,7 +983,7 @@ EFI_STATUS
 Var_UpdateConsoleInpOption (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -994,7 +994,7 @@ EFI_STATUS
 Var_UpdateConsoleOutOption (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1005,7 +1005,7 @@ EFI_STATUS
 Var_UpdateErrorOutOption (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1016,7 +1016,7 @@ VOID
 Var_UpdateAllConsoleOption (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1029,7 +1029,7 @@ Var_UpdateBootNext (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1042,7 +1042,7 @@ Var_UpdateBootOrder (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1055,7 +1055,7 @@ Var_UpdateDriverOrder (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1068,7 +1068,7 @@ Var_UpdateBBSOption (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1084,7 +1084,7 @@ Var_UpdateConMode (
 // Following are page create and refresh functions
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1097,7 +1097,7 @@ RefreshUpdateData (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param LabelId         EDES_TODO: Add parameter description
   @param CallbackData    EDES_TODO: Add parameter description
@@ -1112,7 +1112,7 @@ CleanUpPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param UpdatingMenu    EDES_TODO: Add parameter description
@@ -1143,7 +1143,7 @@ UpdatePage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1156,7 +1156,7 @@ UpdateBootAddPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1169,7 +1169,7 @@ UpdateBootDelPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1182,7 +1182,7 @@ UpdateDrvAddFilePage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1195,7 +1195,7 @@ UpdateDrvAddHandlePage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1208,7 +1208,7 @@ UpdateDrvDelPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1221,7 +1221,7 @@ UpdateDriverAddHandleDescPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1234,7 +1234,7 @@ UpdateBootTimeOut (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1247,7 +1247,7 @@ UpdateConInPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1260,7 +1260,7 @@ UpdateConOutPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1273,7 +1273,7 @@ UpdateStdErrPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param UpdatePageId    EDES_TODO: Add parameter description
   @param CallbackData    EDES_TODO: Add parameter description
@@ -1288,7 +1288,7 @@ UpdatePageBody (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1301,7 +1301,7 @@ UpdateCOM1Page (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1314,7 +1314,7 @@ UpdateCOM2Page (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1327,7 +1327,7 @@ UpdateBootOrderPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1340,7 +1340,7 @@ UpdateDriverOrderPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1353,7 +1353,7 @@ UpdateBootNextPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1366,7 +1366,7 @@ UpdateTimeOutPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1379,7 +1379,7 @@ UpdateTerminalPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1392,7 +1392,7 @@ UpdateConModePage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1405,7 +1405,7 @@ UpdateConCOMPage (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param UpdatePageId    EDES_TODO: Add parameter description
   @param CallbackData    EDES_TODO: Add parameter description
@@ -1420,7 +1420,7 @@ UpdateSetLegacyDeviceOrderPage (
 );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param BbsType         EDES_TODO: Add parameter description
   @param BbsFlag         EDES_TODO: Add parameter description
@@ -1435,7 +1435,7 @@ BootLegacy (
 );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param TerminalNumber  EDES_TODO: Add parameter description
 
@@ -1448,7 +1448,7 @@ GetCurrentTerminal (
 );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DeviceHandle    EDES_TODO: Add parameter description
 
@@ -1461,7 +1461,7 @@ EfiLibOpenRoot (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param FHand           EDES_TODO: Add parameter description
 
@@ -1474,7 +1474,7 @@ EfiLibFileSystemVolumeLabelInfo (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param FHand           EDES_TODO: Add parameter description
 
@@ -1487,7 +1487,7 @@ EfiLibFileInfo (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param UStr            EDES_TODO: Add parameter description
   @param Length          EDES_TODO: Add parameter description
@@ -1504,7 +1504,7 @@ UnicodeToAscii (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevPath         EDES_TODO: Add parameter description
 
@@ -1517,7 +1517,7 @@ DevicePathToStr (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Size            EDES_TODO: Add parameter description
 
@@ -1530,7 +1530,7 @@ EfiAllocateZeroPool (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param ProtocolGuid    EDES_TODO: Add parameter description
   @param Interface       EDES_TODO: Add parameter description
@@ -1545,7 +1545,7 @@ EfiLibLocateProtocol (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param OldPool         EDES_TODO: Add parameter description
   @param OldSize         EDES_TODO: Add parameter description
@@ -1562,7 +1562,7 @@ EfiReallocatePool (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevPath         EDES_TODO: Add parameter description
 
@@ -1575,7 +1575,7 @@ DevicePathToStr (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Name            EDES_TODO: Add parameter description
   @param VendorGuid      EDES_TODO: Add parameter description
@@ -1592,7 +1592,7 @@ BdsLibGetVariableAndSize (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VarName         EDES_TODO: Add parameter description
   @param VarGuid         EDES_TODO: Add parameter description
@@ -1607,7 +1607,7 @@ EfiLibDeleteVariable (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Src             EDES_TODO: Add parameter description
 
@@ -1620,7 +1620,7 @@ EfiStrDuplicate (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Multi           EDES_TODO: Add parameter description
   @param Single          EDES_TODO: Add parameter description
@@ -1635,7 +1635,7 @@ EfiLibMatchDevicePaths (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevicePath      EDES_TODO: Add parameter description
 
@@ -1648,7 +1648,7 @@ EfiDevicePathInstanceCount (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param HiiHandle       EDES_TODO: Add parameter description
@@ -1665,7 +1665,7 @@ CreateMenuStringToken (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevPath         EDES_TODO: Add parameter description
 
@@ -1678,7 +1678,7 @@ EfiLibStrFromDatahub (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DeviceType      EDES_TODO: Add parameter description
   @param OptionIndex     EDES_TODO: Add parameter description
@@ -1695,7 +1695,7 @@ GetLegacyBootOptionVar (
  );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1708,7 +1708,7 @@ InitializeBM (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1721,7 +1721,7 @@ BdsStartBootMaint (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1732,7 +1732,7 @@ VOID
 InitializeStringDepository (VOID);
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param StringDepository EDES_TODO: Add parameter description
@@ -1747,7 +1747,7 @@ GetStringTokenFromDepository (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1760,7 +1760,7 @@ ReclaimStringDepository (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1773,7 +1773,7 @@ CleanUpStringDepository (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Private         EDES_TODO: Add parameter description
   @param CurrentFakeNVMap EDES_TODO: Add parameter description
@@ -1790,7 +1790,7 @@ ApplyChangeHandler (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Private         EDES_TODO: Add parameter description
   @param CurrentFakeNVMap EDES_TODO: Add parameter description
@@ -1805,7 +1805,7 @@ DiscardChangeHandler (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Private         EDES_TODO: Add parameter description
   @param NewPageId       EDES_TODO: Add parameter description
@@ -1820,7 +1820,7 @@ UpdatePageId (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param FileContext     EDES_TODO: Add parameter description
 
@@ -1833,7 +1833,7 @@ BootThisFile (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param KeyValue        EDES_TODO: Add parameter description
@@ -1848,7 +1848,7 @@ UpdateFileExplorer (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param This            EDES_TODO: Add parameter description
   @param Action          EDES_TODO: Add parameter description
@@ -1872,7 +1872,7 @@ FileExplorerCallback (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1885,7 +1885,7 @@ FormSetDispatcher (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Name            EDES_TODO: Add parameter description
   @param VendorGuid      EDES_TODO: Add parameter description

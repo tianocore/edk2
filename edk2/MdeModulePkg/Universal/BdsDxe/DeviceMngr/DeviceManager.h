@@ -72,7 +72,7 @@ typedef struct {
 } DEVICE_MANAGER_MENU_ITEM;
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param This            EDES_TODO: Add parameter description
   @param Action          EDES_TODO: Add parameter description
@@ -97,7 +97,7 @@ DeviceManagerCallback (
 ;
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -111,7 +111,7 @@ InitializeDeviceManager (
 ;
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
