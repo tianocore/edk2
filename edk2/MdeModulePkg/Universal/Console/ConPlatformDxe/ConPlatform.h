@@ -114,7 +114,7 @@ ConPlatformTextOutDriverBindingSupported (
 
 /**
   Start this driver on ControllerHandle by opening Simple Text In protocol,
-  reading Device Path, and installing Console Devcice In GUID on ControllerHandle.
+  reading Device Path, and installing Console In Devcice GUID on ControllerHandle.
 
   If this devcie is not one hot-plug devce, append its device path into the 
   console environment variables ConInDev.
@@ -139,7 +139,7 @@ ConPlatformTextInDriverBindingStart (
 
 /**
   Start this driver on ControllerHandle by opening Simple Text Out protocol,
-  reading Device Path, and installing Console Devcice Out GUID, Standard Error
+  reading Device Path, and installing Console Out Devcice GUID, Standard Error
   Device GUID on ControllerHandle.
 
   If this devcie is not one hot-plug devce, append its device path into the 
@@ -164,7 +164,7 @@ ConPlatformTextOutDriverBindingStart (
   );
 
 /**
-  Stop this driver on ControllerHandle by removing Console Devcice In GUID 
+  Stop this driver on ControllerHandle by removing Console In Devcice GUID 
   and closing the Simple Text In protocol on ControllerHandle.
 
   @param  This              Protocol instance pointer.
@@ -187,7 +187,7 @@ ConPlatformTextInDriverBindingStop (
   );
 
 /**
-  Stop this driver on ControllerHandle by removing Console Devcice Out GUID 
+  Stop this driver on ControllerHandle by removing Console Out Devcice GUID 
   and closing the Simple Text Out protocol on ControllerHandle.
 
   @param  This              Protocol instance pointer.
