@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BootMaint.h"
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevPath         EDES_TODO: Add parameter description
 
@@ -28,7 +28,7 @@ DevicePathInstanceDup (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevicePath      EDES_TODO: Add parameter description
 
@@ -41,7 +41,7 @@ UpdateComAttributeFromVariable (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevicePath      EDES_TODO: Add parameter description
   @param ChangeTerminal  EDES_TODO: Add parameter description
@@ -162,7 +162,7 @@ ChangeTerminalDevicePath (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevicePath      EDES_TODO: Add parameter description
 
@@ -328,7 +328,7 @@ SortedUartHandle (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DevicePath      EDES_TODO: Add parameter description
   @param Termi           EDES_TODO: Add parameter description
@@ -420,7 +420,7 @@ LocateSerialIo (
 
     if (CompareMem (&Acpi->HID, &Match, sizeof (UINT32)) == 0) {
       NewMenuEntry = BOpt_CreateMenuEntry (BM_TERMINAL_CONTEXT_SELECT);
-      if (!NewMenuEntry) {
+      if (NewMenuEntry == NULL) {
         SafeFreePool (Handles);
         return EFI_OUT_OF_RESOURCES;
       }
@@ -482,15 +482,15 @@ LocateSerialIo (
   OutDevicePath = EfiLibGetVariable (L"ConOut", &gEfiGlobalVariableGuid);
   InpDevicePath = EfiLibGetVariable (L"ConIn", &gEfiGlobalVariableGuid);
   ErrDevicePath = EfiLibGetVariable (L"ErrOut", &gEfiGlobalVariableGuid);
-  if (OutDevicePath) {
+  if (OutDevicePath != NULL) {
     UpdateComAttributeFromVariable (OutDevicePath);
   }
 
-  if (InpDevicePath) {
+  if (InpDevicePath != NULL) {
     UpdateComAttributeFromVariable (InpDevicePath);
   }
 
-  if (ErrDevicePath) {
+  if (ErrDevicePath != NULL) {
     UpdateComAttributeFromVariable (ErrDevicePath);
   }
 
@@ -697,12 +697,12 @@ DevicePathInstanceDup (
   // Make a copy and set proper end type
   //
   NewDevPath = NULL;
-  if (Size) {
+  if (Size != 0) {
     NewDevPath = EfiAllocateZeroPool (Size);
     ASSERT (NewDevPath != NULL);
   }
 
-  if (NewDevPath) {
+  if (NewDevPath != NULL) {
     CopyMem (NewDevPath, DevicePathInst, Size);
     Ptr = (UINT8 *) NewDevPath;
     Ptr += Size - sizeof (EFI_DEVICE_PATH_PROTOCOL);
@@ -714,7 +714,7 @@ DevicePathInstanceDup (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param ConsoleMenuType EDES_TODO: Add parameter description
 

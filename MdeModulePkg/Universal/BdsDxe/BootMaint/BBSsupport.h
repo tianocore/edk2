@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Bugbug: Candidate for a PCD entries
 //
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CurBBSEntry     EDES_TODO: Add parameter description
   @param Index           EDES_TODO: Add parameter description
@@ -41,7 +41,7 @@ BdsBuildLegacyDevNameString (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -71,7 +71,7 @@ BdsAddNonExistingLegacyBootOptions (
 ;
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -84,7 +84,7 @@ BdsUpdateLegacyDevOrder (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Entry           EDES_TODO: Add parameter description
 

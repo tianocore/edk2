@@ -92,7 +92,7 @@ UnicodeToAscii (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CurBBSEntry     EDES_TODO: Add parameter description
   @param Index           EDES_TODO: Add parameter description
@@ -393,7 +393,7 @@ BdsCreateLegacyBootOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param BootOptionVar   EDES_TODO: Add parameter description
   @param BbsEntry        EDES_TODO: Add parameter description
@@ -435,7 +435,7 @@ BdsIsLegacyBootOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param OptionNumber    EDES_TODO: Add parameter description
   @param BootOrder       EDES_TODO: Add parameter description
@@ -606,7 +606,7 @@ BdsDeleteAllInvalidLegacyBootOptions (
       );
   }
 
-  if (BootOrderSize) {
+  if (BootOrderSize != 0) {
     Status = gRT->SetVariable (
                     L"BootOrder",
                     &gEfiGlobalVariableGuid,
@@ -624,7 +624,7 @@ BdsDeleteAllInvalidLegacyBootOptions (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param BootOrder       EDES_TODO: Add parameter description
   @param BootOptionNum   EDES_TODO: Add parameter description
@@ -694,7 +694,7 @@ BdsFindLegacyBootOptionByDevType (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param BbsItem         EDES_TODO: Add parameter description
   @param Index           EDES_TODO: Add parameter description
@@ -858,7 +858,7 @@ BdsAddNonExistingLegacyBootOptions (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param BbsTable        EDES_TODO: Add parameter description
   @param BbsType         EDES_TODO: Add parameter description
@@ -895,7 +895,7 @@ BdsFillDevOrderBuf (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param BbsTable        EDES_TODO: Add parameter description
   @param BbsCount        EDES_TODO: Add parameter description
@@ -980,7 +980,7 @@ BdsCreateDevOrder (
   Ptr += sizeof (BBS_TYPE);
   *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + FDCount * sizeof (UINT16));
   Ptr += sizeof (UINT16);
-  if (FDCount) {
+  if (FDCount != 0) {
     Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_FLOPPY, BbsCount, (UINT16 *) Ptr);
   }
 
@@ -988,7 +988,7 @@ BdsCreateDevOrder (
   Ptr += sizeof (BBS_TYPE);
   *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
   Ptr += sizeof (UINT16);
-  if (HDCount) {
+  if (HDCount != 0) {
     Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_HARDDISK, BbsCount, (UINT16 *) Ptr);
   }
 
@@ -996,7 +996,7 @@ BdsCreateDevOrder (
   Ptr += sizeof (BBS_TYPE);
   *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
   Ptr += sizeof (UINT16);
-  if (CDCount) {
+  if (CDCount != 0) {
     Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_CDROM, BbsCount, (UINT16 *) Ptr);
   }
 
@@ -1004,7 +1004,7 @@ BdsCreateDevOrder (
   Ptr += sizeof (BBS_TYPE);
   *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
   Ptr += sizeof (UINT16);
-  if (NETCount) {
+  if (NETCount != 0) {
     Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_EMBED_NETWORK, BbsCount, (UINT16 *) Ptr);
   }
 
@@ -1012,7 +1012,7 @@ BdsCreateDevOrder (
   Ptr += sizeof (BBS_TYPE);
   *((UINT16 *) Ptr) = (UINT16) (sizeof (UINT16) + BEVCount * sizeof (UINT16));
   Ptr += sizeof (UINT16);
-  if (BEVCount) {
+  if (BEVCount != 0) {
     Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_BEV_DEVICE, BbsCount, (UINT16 *) Ptr);
   }
 
@@ -1029,7 +1029,7 @@ BdsCreateDevOrder (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -1334,7 +1334,7 @@ BdsUpdateLegacyDevOrder (
     // at this point we have copied those valid indexes to new buffer
     // and we should check if there is any new appeared boot device
     //
-    if (Idx) {
+    if (Idx != 0) {
       for (Index2 = 0; Index2 < *Idx; Index2++) {
         if ((NewDevPtr[Index2] & 0xFF) == (UINT16) Index) {
           break;
@@ -1353,7 +1353,7 @@ BdsUpdateLegacyDevOrder (
     }
   }
 
-  if (FDCount) {
+  if (FDCount != 0) {
     //
     // Just to make sure that disabled indexes are all at the end of the array
     //
@@ -1373,7 +1373,7 @@ BdsUpdateLegacyDevOrder (
     }
   }
 
-  if (HDCount) {
+  if (HDCount != 0) {
     //
     // Just to make sure that disabled indexes are all at the end of the array
     //
@@ -1393,7 +1393,7 @@ BdsUpdateLegacyDevOrder (
     }
   }
 
-  if (CDCount) {
+  if (CDCount != 0) {
     //
     // Just to make sure that disabled indexes are all at the end of the array
     //
@@ -1413,7 +1413,7 @@ BdsUpdateLegacyDevOrder (
     }
   }
 
-  if (NETCount) {
+  if (NETCount != 0) {
     //
     // Just to make sure that disabled indexes are all at the end of the array
     //
@@ -1433,7 +1433,7 @@ BdsUpdateLegacyDevOrder (
     }
   }
 
-  if (BEVCount) {
+  if (BEVCount!= 0) {
     //
     // Just to make sure that disabled indexes are all at the end of the array
     //
@@ -1468,7 +1468,7 @@ BdsUpdateLegacyDevOrder (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DeviceType      EDES_TODO: Add parameter description
   @param LocalBbsTable   EDES_TODO: Add parameter description
@@ -1538,7 +1538,7 @@ BdsSetBootPriority4SameTypeDev (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param LocalBbsTable   EDES_TODO: Add parameter description
 
@@ -1586,7 +1586,7 @@ PrintBbsTable (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Entry           EDES_TODO: Add parameter description
 
@@ -1671,7 +1671,7 @@ BdsRefreshBbsTableForBoot (
                           &gEfiGlobalVariableGuid,
                           &BootOrderSize
                           );
-  for (Index = 0; BootOrder && Index < BootOrderSize / sizeof (UINT16); Index++) {
+  for (Index = 0; ((BootOrder != NULL) && (Index < BootOrderSize / sizeof (UINT16))); Index++) {
     UnicodeSPrint (BootOption, sizeof (BootOption), L"Boot%04x", BootOrder[Index]);
     BootOptionVar = BdsLibGetVariableAndSize (
                       BootOption,
@@ -1714,7 +1714,7 @@ BdsRefreshBbsTableForBoot (
     }
   }
 
-  if (BootOrder) {
+  if (BootOrder != NULL) {
     SafeFreePool (BootOrder);
   }
   //

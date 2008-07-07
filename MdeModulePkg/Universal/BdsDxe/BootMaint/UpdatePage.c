@@ -32,7 +32,7 @@ RefreshUpdateData (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -64,7 +64,7 @@ UpdatePageStart (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -121,7 +121,7 @@ UpdatePageEnd (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param LabelId         EDES_TODO: Add parameter description
   @param CallbackData    EDES_TODO: Add parameter description
@@ -151,7 +151,7 @@ CleanUpPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param FileContext     EDES_TODO: Add parameter description
 
@@ -192,7 +192,7 @@ BootThisFile (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -229,7 +229,7 @@ UpdateConCOMPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -276,7 +276,7 @@ UpdateBootDelPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -312,7 +312,7 @@ UpdateDrvAddHandlePage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -357,7 +357,7 @@ UpdateDrvDelPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -427,7 +427,7 @@ UpdateDriverAddHandleDescPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param UpdatePageId    EDES_TODO: Add parameter description
   @param ConsoleMenu     EDES_TODO: Add parameter description
@@ -482,9 +482,9 @@ UpdateConsolePage (
     NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, Index2);
     NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
 
-    if ((NewTerminalContext->IsConIn && (UpdatePageId == FORM_CON_IN_ID)) ||
-        (NewTerminalContext->IsConOut && (UpdatePageId == FORM_CON_OUT_ID)) ||
-        (NewTerminalContext->IsStdErr && (UpdatePageId == FORM_CON_ERR_ID))
+    if (((NewTerminalContext->IsConIn != 0) && (UpdatePageId == FORM_CON_IN_ID)) ||
+        ((NewTerminalContext->IsConOut != 0) && (UpdatePageId == FORM_CON_OUT_ID)) ||
+        ((NewTerminalContext->IsStdErr != 0) && (UpdatePageId == FORM_CON_ERR_ID))
         ) {
       CheckFlags |= EFI_IFR_CHECKBOX_DEFAULT;
       CallbackData->BmmFakeNvData.ConsoleCheck[Index] = TRUE;
@@ -510,7 +510,7 @@ UpdateConsolePage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param UpdatePageId    EDES_TODO: Add parameter description
   @param OptionMenu      EDES_TODO: Add parameter description
@@ -580,7 +580,7 @@ UpdateOrderPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -653,7 +653,7 @@ UpdateBootNextPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -802,7 +802,7 @@ UpdateConModePage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -976,7 +976,7 @@ UpdateTerminalPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param UpdatePageId    EDES_TODO: Add parameter description
   @param CallbackData    EDES_TODO: Add parameter description
@@ -1018,7 +1018,7 @@ UpdatePageBody (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param DeviceType      EDES_TODO: Add parameter description
   @param OptionIndex     EDES_TODO: Add parameter description
@@ -1100,7 +1100,7 @@ GetLegacyBootOptionVar (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param UpdatePageId    EDES_TODO: Add parameter description
   @param CallbackData    EDES_TODO: Add parameter description
@@ -1304,7 +1304,7 @@ UpdateSetLegacyDeviceOrderPage (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Private         EDES_TODO: Add parameter description
   @param NewPageId       EDES_TODO: Add parameter description

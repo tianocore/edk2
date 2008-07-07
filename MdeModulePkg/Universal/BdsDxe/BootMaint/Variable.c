@@ -121,7 +121,7 @@ Var_ChangeBootOrder (
   //
   // If exists, delete it to hold new BootOrder
   //
-  if (BootOrderList) {
+  if (BootOrderList != NULL) {
     EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
     SafeFreePool (BootOrderList);
     BootOrderList = NULL;
@@ -271,7 +271,7 @@ Var_ChangeDriverOrder (
   //
   // If exists, delete it to hold new DriverOrder
   //
-  if (DriverOrderList) {
+  if (DriverOrderList != NULL) {
     EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
     SafeFreePool (DriverOrderList);
     DriverOrderList = NULL;
@@ -315,7 +315,7 @@ Var_ChangeDriverOrder (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -335,7 +335,7 @@ Var_UpdateAllConsoleOption (
   OutDevicePath = EfiLibGetVariable (L"ConOut", &gEfiGlobalVariableGuid);
   InpDevicePath = EfiLibGetVariable (L"ConIn", &gEfiGlobalVariableGuid);
   ErrDevicePath = EfiLibGetVariable (L"ErrOut", &gEfiGlobalVariableGuid);
-  if (OutDevicePath) {
+  if (OutDevicePath != NULL) {
     ChangeVariableDevicePath (OutDevicePath);
     Status = gRT->SetVariable (
                     L"ConOut",
@@ -347,7 +347,7 @@ Var_UpdateAllConsoleOption (
     ASSERT (!EFI_ERROR (Status));
   }
 
-  if (InpDevicePath) {
+  if (InpDevicePath != NULL) {
     ChangeVariableDevicePath (InpDevicePath);
     Status = gRT->SetVariable (
                     L"ConIn",
@@ -359,7 +359,7 @@ Var_UpdateAllConsoleOption (
     ASSERT (!EFI_ERROR (Status));
   }
 
-  if (ErrDevicePath) {
+  if (ErrDevicePath != NULL) {
     ChangeVariableDevicePath (ErrDevicePath);
     Status = gRT->SetVariable (
                     L"ErrOut",
@@ -373,7 +373,7 @@ Var_UpdateAllConsoleOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param ConsoleName     EDES_TODO: Add parameter description
   @param ConsoleMenu     EDES_TODO: Add parameter description
@@ -430,9 +430,9 @@ Var_UpdateConsoleOption (
     }
 
     NewTerminalContext = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-    if ((NewTerminalContext->IsConIn && (UpdatePageId == FORM_CON_IN_ID)) ||
-        (NewTerminalContext->IsConOut && (UpdatePageId == FORM_CON_OUT_ID)) ||
-        (NewTerminalContext->IsStdErr && (UpdatePageId == FORM_CON_ERR_ID))
+    if (((NewTerminalContext->IsConIn != 0) && (UpdatePageId == FORM_CON_IN_ID)) ||
+        ((NewTerminalContext->IsConOut != 0)  && (UpdatePageId == FORM_CON_OUT_ID)) ||
+        ((NewTerminalContext->IsStdErr  != 0) && (UpdatePageId == FORM_CON_ERR_ID))
         ) {
       Vendor.Header.Type    = MESSAGING_DEVICE_PATH;
       Vendor.Header.SubType = MSG_VENDOR_DP;
@@ -455,7 +455,7 @@ Var_UpdateConsoleOption (
     }
   }
 
-  if (ConDevicePath) {
+  if (ConDevicePath != NULL) {
     Status = gRT->SetVariable (
                     ConsoleName,
                     &gEfiGlobalVariableGuid,
@@ -473,7 +473,7 @@ Var_UpdateConsoleOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -489,7 +489,7 @@ Var_UpdateConsoleInpOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -505,7 +505,7 @@ Var_UpdateConsoleOutOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -521,7 +521,7 @@ Var_UpdateErrorOutOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param HiiHandle       EDES_TODO: Add parameter description
@@ -698,7 +698,7 @@ Var_UpdateDriverOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
   @param NvRamMap        EDES_TODO: Add parameter description
@@ -865,7 +865,7 @@ Var_UpdateBootOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -922,7 +922,7 @@ Var_UpdateBootNext (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -954,18 +954,18 @@ Var_UpdateBootOrder (
                     );
 
   NewBootOrderList = EfiAllocateZeroPool (BootOrderListSize);
-  if (!NewBootOrderList) {
+  if (NewBootOrderList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   Map = EfiAllocateZeroPool (BootOrderListSize / sizeof (UINT16));
-  if (!Map) {
+  if (Map == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   //
   // If exists, delete it to hold new BootOrder
   //
-  if (BootOrderList) {
+  if (BootOrderList != NULL) {
     EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
   }
 
@@ -995,7 +995,7 @@ Var_UpdateBootOrder (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1027,13 +1027,13 @@ Var_UpdateDriverOrder (
 
   NewDriverOrderList = EfiAllocateZeroPool (DriverOrderListSize);
 
-  if (!NewDriverOrderList) {
+  if (NewDriverOrderList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   //
   // If exists, delete it to hold new DriverOrder
   //
-  if (DriverOrderList) {
+  if (DriverOrderList != NULL) {
     EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
   }
 
@@ -1060,7 +1060,7 @@ Var_UpdateDriverOrder (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1202,7 +1202,7 @@ Var_UpdateBBSOption (
     Tmp &= 0xFF;
     Pos = Tmp / 8;
     Bit = 7 - (Tmp % 8);
-    if (DisMap[Pos] & (1 << Bit)) {
+    if ((DisMap[Pos] & (1 << Bit)) != 0) {
       NewOrder[Index] = (UINT16) (0xFF00 | Tmp);
       Index++;
     }
@@ -1364,7 +1364,7 @@ Var_UpdateBBSOption (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 

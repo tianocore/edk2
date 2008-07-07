@@ -145,7 +145,7 @@ EfiGrowBuffer (
   //
   // If this is an initial request, buffer will be null with a new buffer size
   //
-  if (!*Buffer && BufferSize) {
+  if ((*Buffer == NULL) && (BufferSize != 0)) {
     *Status = EFI_BUFFER_TOO_SMALL;
   }
   //
@@ -158,7 +158,7 @@ EfiGrowBuffer (
 
     *Buffer = EfiAllocateZeroPool (BufferSize);
 
-    if (*Buffer) {
+    if (*Buffer != NULL) {
       TryAgain = TRUE;
     } else {
       *Status = EFI_OUT_OF_RESOURCES;
@@ -167,7 +167,7 @@ EfiGrowBuffer (
   //
   // If there's an error, free the buffer
   //
-  if (!TryAgain && EFI_ERROR (*Status) && *Buffer) {
+  if (!TryAgain && EFI_ERROR (*Status) && (*Buffer != NULL)) {
     SafeFreePool (*Buffer);
     *Buffer = NULL;
   }
@@ -224,7 +224,7 @@ EfiLibDeleteVariable (
   VarBuf  = EfiLibGetVariable (VarName, VarGuid);
   Status  = EFI_NOT_FOUND;
 
-  if (VarBuf) {
+  if (VarBuf != NULL) {
     //
     // Delete variable from Storage
     //
@@ -296,7 +296,7 @@ EfiStrDuplicate (
   Size  = StrSize (Src);
   Dest  = EfiAllocateZeroPool (Size);
   ASSERT (Dest != NULL);
-  if (Dest) {
+  if (Dest != NULL) {
     CopyMem (Dest, Src, Size);
   }
 
@@ -393,12 +393,12 @@ EfiReallocatePool (
   VOID  *NewPool;
 
   NewPool = NULL;
-  if (NewSize) {
+  if (NewSize != 0) {
     NewPool = EfiAllocateZeroPool (NewSize);
   }
 
-  if (OldPool) {
-    if (NewPool) {
+  if (OldPool != NULL) {
+    if (NewPool != NULL) {
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 

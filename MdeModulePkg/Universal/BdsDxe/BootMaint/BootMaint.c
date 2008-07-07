@@ -38,7 +38,7 @@ InitAllMenu (
   );
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -723,7 +723,7 @@ Error:
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param Private         EDES_TODO: Add parameter description
   @param CurrentFakeNVMap EDES_TODO: Add parameter description
@@ -812,7 +812,7 @@ InitializeBM (
   // Create LoadOption in BmmCallbackInfo for Driver Callback
   //
   Ptr = EfiAllocateZeroPool (sizeof (BM_LOAD_CONTEXT) + sizeof (BM_FILE_CONTEXT) + sizeof (BM_HANDLE_CONTEXT) + sizeof (BM_MENU_ENTRY));
-  if (!Ptr) {
+  if (Ptr == NULL) {
     SafeFreePool (BmmCallbackInfo);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1031,7 +1031,7 @@ InitializeBM (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param CallbackData    EDES_TODO: Add parameter description
 
@@ -1060,7 +1060,7 @@ InitAllMenu (
 }
 
 /**
-  EDES_TODO: Add function description
+  EDES_TODO: Add function description.
 
   @param VOID            EDES_TODO: Add parameter description
 
