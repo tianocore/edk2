@@ -18,10 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiPei.h>
 #include <Ppi/DxeIpl.h>
-#include <Protocol/EdkDecompress.h>
 #include <Ppi/EndOfPeiPhase.h>
-#include <Protocol/CustomizedDecompress.h>
-#include <Protocol/Decompress.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Guid/MemoryTypeInformation.h>

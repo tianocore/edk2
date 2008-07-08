@@ -1,6 +1,7 @@
 /** @file
 
-  Load File protocol.
+  Load File protocol provides capability to load and unload EFI image into 
+  memory and execute it.
 
   Load file protocol exists to supports the addition of new boot devices,
   and to support booting from devices that do not map well to file system.

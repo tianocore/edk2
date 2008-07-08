@@ -1,4 +1,5 @@
-/*++
+/** @file
+  This guid is used for Platform Override Variable named L"PlatDriOver".
 
 Copyright (c) 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,15 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  OverrideVariable.h
-
-Abstract:
-
-  Platform Override Variable Guid definitions
-
---*/
+**/
 
 #ifndef __EFI_OVERRIDE_VARIABLE_GUID_H__
 #define __EFI_OVERRIDE_VARIABLE_GUID_H__

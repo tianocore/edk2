@@ -1,5 +1,7 @@
 /** @file
-  The variable space Guid to pair with a Unicode string name to tag an EFI variable.
+  This file defines the genenic platform guid for EFI variable.
+  Common drivers can use this generic guid with its variable name to specify 
+  its EFI variable without defining another new guid.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -14,6 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef __GENERIC_PLATFORM_VARIABLE_H__
 #define __GENERIC_PLATFORM_VARIABLE_H__
+
+#define EFI_GENERIC_PLATFORM_VARIABLE_GUID  \
+  { 0x59d1c24f, 0x50f1, 0x401a, { 0xb1, 0x01, 0xf3, 0x3e, 0x0d, 0xae, 0xd4, 0x43 }}
 
 extern EFI_GUID gEfiGenericPlatformVariableGuid;
 

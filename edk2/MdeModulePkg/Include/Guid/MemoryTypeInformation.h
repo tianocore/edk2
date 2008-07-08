@@ -1,5 +1,6 @@
 /** @file
-  GUID used for Memory Type Information entries in the HOB list.
+  This file defines the memory type information guid, variable name and guid hob structure. 
+  This guid is used for Memory Type Information entries in the HOB list and EFI variable.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

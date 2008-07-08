@@ -1,7 +1,6 @@
 /** @file
-
-  GUIDs used for System Non Volatile HOB entries in the in the HOB list and FV Guids carrying
-  the System specific information.
+  This file defines GUIDs used for System Non Volatile HOB entries in the HOB list,
+  and FV Guids that carrying the System specific information.
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          

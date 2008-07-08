@@ -1,6 +1,5 @@
 /** @file
-
-  GUIDs used for variable list entries put in the EFI system table.
+  This file defines GUIDs used for variable list entries put in the EFI system table.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

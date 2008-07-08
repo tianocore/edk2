@@ -1,6 +1,6 @@
 /** @file
   This file defines header data structures for BMP file and default
-  BMP file GUID. 
+  GUID for BMP logo file. 
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

@@ -1,10 +1,9 @@
 /** @file
   This file declares Firmware Volume Dispatch protocol.
 
-  Presence of this protocol tells the dispatch to dispatch from this Firmware
-  Volume
+  Presence of this protocol tells the core dispatcher to dispatch this Firmware Volume.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at

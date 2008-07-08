@@ -1,6 +1,7 @@
-/*++
+/** @file
+  EFI PXE DHCP4 Callback protocol definition.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,16 +10,10 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-  PxeDhcp4Callback.h
+**/
 
-Abstract:
-  EFI PXE DHCP4 Callback protocol definition.
-
---*/
-
-#ifndef _PXE_DHCP4CALLBACK_H
-#define _PXE_DHCP4CALLBACK_H
+#ifndef __PXE_DHCP4CALLBACK_H__
+#define __PXE_DHCP4CALLBACK_H__
 
 #include <Protocol/PxeDhcp4.h>
 //

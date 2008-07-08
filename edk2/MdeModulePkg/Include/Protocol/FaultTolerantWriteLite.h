@@ -1,6 +1,6 @@
 /** @file
-  This is a simple fault tolerant write driver, based on PlatformFd library.
-  And it only supports write BufferSize <= SpareAreaLength.
+  Fault tolerant write lite protocol defines only one interface to write 
+  the buffer to the fault tolerant storage.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -33,7 +33,7 @@ typedef struct _EFI_FTW_LITE_PROTOCOL EFI_FTW_LITE_PROTOCOL;
   manner, ensuring at all times that either the original contents or
   the modified contents are available.
 
-  @param  This                 Calling context 
+  @param  This                 The pointer to this protocol instance. 
   @param  FvBlockHandle        The handle of FVB protocol that provides services 
                                for reading, writing, and erasing the target 
                                block. 
@@ -45,12 +45,11 @@ typedef struct _EFI_FTW_LITE_PROTOCOL EFI_FTW_LITE_PROTOCOL;
 
   @retval EFI_SUCCESS          The function completed successfully 
   @retval EFI_ABORTED          The function could not complete successfully. 
-  @retval EFI_BAD_BUFFER_SIZE  The write would span a block boundary, which is 
-                               not a valid action. 
+  @retval EFI_BAD_BUFFER_SIZE  The input data can't fit within the target block. 
   @retval EFI_ACCESS_DENIED    No writes have been allocated. 
-  @retval EFI_NOT_READY        The last write has not been completed. Restart () 
-                               must be called to complete it. 
-
+  @retval EFI_OUT_OF_RESOURCES Cannot allocate enough memory resource.
+  @retval EFI_NOT_FOUND        Cannot find FVB protocol by handle.
+  
 **/
 typedef
 EFI_STATUS

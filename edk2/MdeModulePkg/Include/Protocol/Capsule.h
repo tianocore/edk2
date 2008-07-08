@@ -1,6 +1,7 @@
 /** @file
 
-  Capsule Architectural Protocol is added to produce UEFI2.0 capsule runtime services.
+  Capsule Architectural Protocol is responsible to tag UEFI2.0 capsule runtime services
+  are ready in EFI_RUNTIME_SERVICES.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

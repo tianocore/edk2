@@ -1151,7 +1151,7 @@ Var_UpdateBBSOption (
   // Update the Variable "LegacyDevOrder"
   //
   VarData = (UINT8 *) BdsLibGetVariableAndSize (
-                        VarLegacyDevOrder,
+                        VAR_LEGACY_DEV_ORDER,
                         &EfiLegacyDevOrderGuid,
                         &VarSize
                         );
@@ -1216,7 +1216,7 @@ Var_UpdateBBSOption (
   SafeFreePool (NewOrder);
 
   Status = gRT->SetVariable (
-                  VarLegacyDevOrder,
+                  VAR_LEGACY_DEV_ORDER,
                   &EfiLegacyDevOrderGuid,
                   VAR_FLAG,
                   VarSize,

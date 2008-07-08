@@ -1,7 +1,5 @@
 /** @file
 
-  Defines data structure that is the headers found at the runtime
-  updatable firmware volumes.
   The header structure of FTW working block region.
 
 Copyright (c) 2006 - 2008, Intel Corporation

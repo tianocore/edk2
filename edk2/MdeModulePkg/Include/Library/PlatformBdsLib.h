@@ -54,8 +54,6 @@ struct _EFI_BDS_ARCH_PROTOCOL_INSTANCE {
 
   @param  PrivateData             The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
 
-  @return None.
-
 **/
 VOID
 EFIAPI
@@ -91,8 +89,6 @@ PlatformBdsPolicyBehavior (
   @param  ExitData                Exit data returned from failed boot.
   @param  ExitDataSize            Exit data size returned from failed boot.
 
-  @return None.
-
 **/
 VOID
 EFIAPI
@@ -126,7 +122,6 @@ PlatformBdsBootSuccess (
   The flash layout is platform specific.
 
   @retval EFI_SUCCESS             The non-updatable flash areas.
-  @retval Others                  Some error occurs when locking non-updatable flash areas.
 **/
 EFI_STATUS
 EFIAPI

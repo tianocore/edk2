@@ -1,6 +1,6 @@
 /** @file
-  This library includes the APIs that is specific to EDK II's implementation.
-  It extended the UEFI Specification to define GUIDed device path.
+  This library includes two extended HII functions to 
+  create and destory Hii Package by create the virtual Driver Handle.
 
 Copyright (c) 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

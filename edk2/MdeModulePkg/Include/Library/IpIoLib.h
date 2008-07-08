@@ -242,7 +242,8 @@ IpIoOpen (
                                 packet.
   @param  Pkt                   Pointer to the IP packet to be sent.
   @param  Sender                The IP protocol instance used for sending.
-  @param  NotifyData
+  @param  Context               
+  @param  NotifyData            
   @param  Dest                  The destination IP address to send this packet to.
   @param  OverrideData          The data to override some configuration of the IP
                                 instance used for sending.
@@ -265,12 +266,10 @@ IpIoSend (
   );
 
 /**
-  Add a new IP instance for sending data.
+  Cancel the IP transmit token which wraps this Packet.
 
-  @param  IpIo                  Pointer to a IP_IO instance to add a new IP
-                                instance for sending purpose.
-
-  @return Pointer to the created IP_IO_IP_INFO structure, NULL is failed.
+  @param  IpIo                  Pointer to the IP_IO instance.
+  @param  Packet                Pointer to the packet to cancel.
 
 **/
 VOID

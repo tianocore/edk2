@@ -1,6 +1,8 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+  This library provides basic platform driver override functions.
+
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,13 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-    PlatDriOverLib.h
-
-Abstract:
-
 
 **/
 
@@ -38,7 +33,7 @@ Abstract:
 
   @retval EFI_ALREADY_STARTED      There has been a Platform Driver Override
                                    Protocol in the system, cannot install it again.
-  @retval Other                    Returned by InstallProtocolInterface
+  @retval EFI_SUCCESS              The protocol is installed successfully.
 
 **/
 EFI_STATUS
@@ -48,7 +43,7 @@ InstallPlatformDriverOverrideProtocol (
   );
 
 /**
-  Free all the mapping database memory resource and initialize the mapping list entry
+  Free all the mapping database memory resource and initialize the mapping list entry.
 
   @param  MappingDataBase          Mapping database list entry pointer
 
@@ -65,56 +60,13 @@ FreeMappingDatabase (
 /**
   Read the environment variable(s) that contain the override mappings from Controller Device Path to
   a set of Driver Device Paths, and create the mapping database in memory with those variable info.
-  VariableLayout{
-  //
-  // NotEnd indicate whether the variable is the last one, and has no subsequent variable need to load.
-  // Each variable has MaximumVariableSize limitation, so  we maybe need multi variables to store
-  // large mapping infos.
-  // The variable(s) name rule is PlatDriOver, PlatDriOver1, PlatDriOver2, ....
-  //
-  UINT32                         NotEnd;
-  //
-  // The entry which contains the mapping that Controller Device Path to a set of Driver Device Paths
-  // There are often multi mapping entries in a variable.
-  //
-  UINT32                         SIGNATURE;            //EFI_SIGNATURE_32('p','d','o','i')
-  UINT32                         DriverNum;
-  EFI_DEVICE_PATH_PROTOCOL       ControllerDevicePath[];
-  EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
-  EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
-  EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
-  ......
-  UINT32                         SIGNATURE;
-  UINT32                         DriverNum;
-  EFI_DEVICE_PATH_PROTOCOL       ControllerDevicePath[];
-  EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
-  EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
-  EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
-  ......
-  }
-  typedef struct _PLATFORM_OVERRIDE_ITEM{
-  UINTN                          Signature;                  //EFI_SIGNATURE_32('p','d','o','i')
-  LIST_ENTRY                     Link;
-  UINT32                         DriverInfoNum;
-  EFI_DEVICE_PATH_PROTOCOL       *ControllerDevicePath;
-  LIST_ENTRY                     DriverInfoList;         //DRIVER_IMAGE_INFO List
-  } PLATFORM_OVERRIDE_ITEM;
-  typedef struct _DRIVER_IMAGE_INFO{
-  UINTN                          Signature;                  //EFI_SIGNATURE_32('p','d','i','i')
-  LIST_ENTRY                     Link;
-  EFI_HANDLE                     ImageHandle;
-  EFI_DEVICE_PATH_PROTOCOL       *DriverImagePath;
-  BOOLEAN                        UnLoadable;
-  BOOLEAN                        UnStartable;
-  } DRIVER_IMAGE_INFO;
 
   @param  MappingDataBase          Mapping database list entry pointer
 
   @retval EFI_INVALID_PARAMETER    MappingDataBase pointer is null
   @retval EFI_NOT_FOUND            Cannot find the 'PlatDriOver' NV variable
   @retval EFI_VOLUME_CORRUPTED     The found NV variable is corrupted
-  @retval EFI_SUCCESS              Create the mapping database in memory
-                                   successfully
+  @retval EFI_SUCCESS              Create the mapping database in memory successfully
 
 **/
 EFI_STATUS
@@ -124,7 +76,7 @@ InitOverridesMapping (
   );
 
 /**
-  Save the memory mapping database into NV environment variable(s)
+  Save the memory mapping database into NV environment variable(s).
 
   @param  MappingDataBase          Mapping database list entry pointer
 
@@ -141,8 +93,7 @@ SaveOverridesMapping (
 /**
   Retrieves the image handle of the platform override driver for a controller in the system from the memory mapping database.
 
-  @param  This                     A pointer to the
-                                   EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
+  @param  This                     A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
   @param  ControllerHandle         The device handle of the controller to check if
                                    a driver override exists.
   @param  DriverImageHandle        On output, a pointer to the next driver handle.
@@ -174,6 +125,12 @@ GetDriverFromMapping (
   IN     EFI_HANDLE                                     CallerImageHandle
   );
 
+/**
+  Deletes all environment variable(s) that contain the override mappings from Controller Device Path to
+  a set of Driver Device Paths.
+
+  @retval EFI_SUCCESS  Delete all variable(s) successfully.
+**/
 EFI_STATUS
 EFIAPI
 DeleteOverridesVariables (
@@ -183,19 +140,19 @@ DeleteOverridesVariables (
 /**
   Check mapping database whether already has the  mapping info which
   records the input Controller to input DriverImage.
-  If has, the controller's total override driver number and input DriverImage's order number is return.
 
-  @param  ControllerDevicePath     The controller device path need to add a
-                                   override driver image item
-  @param  DriverImageDevicePath    The driver image device path need to be insert
+  @param  ControllerDevicePath     The controller device path is to be check.
+  @param  DriverImageDevicePath    The driver image device path is to be check.
   @param  MappingDataBase          Mapping database list entry pointer
   @param  DriverInfoNum            the controller's total override driver number
-  @param  DriverImageNO            The inserted order number
+  @param  DriverImageNO            The driver order number for the input DriverImage.
+                                   If the DriverImageDevicePath is NULL, DriverImageNO is not set.
 
-  @return EFI_INVALID_PARAMETER
-  @return EFI_NOT_FOUND
-  @return EFI_SUCCESS
-
+  @retval EFI_INVALID_PARAMETER    ControllerDevicePath or MappingDataBase is NULL.
+  @retval EFI_NOT_FOUND            ControllerDevicePath is not found in MappingDataBase or
+                                   DriverImageDevicePath is not found in the found DriverImage Info list. 
+  @retval EFI_SUCCESS              The controller's total override driver number and 
+                                   input DriverImage's order number is correctly return.
 **/
 EFI_STATUS
 EFIAPI
@@ -215,11 +172,15 @@ CheckMapping (
                                    override driver image item
   @param  DriverImageDevicePath    The driver image device path need to be insert
   @param  MappingDataBase          Mapping database list entry pointer
-  @param  DriverImageNO            The inserted order number
+  @param  DriverImageNO            The inserted order number. If this number is taken, 
+                                   the larger available number will be used.
 
-  @return EFI_INVALID_PARAMETER
-  @return EFI_ALREADY_STARTED
-  @return EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER    ControllerDevicePath is NULL, or DriverImageDevicePath is NULL
+                                   or MappingDataBase is NULL
+  @retval EFI_ALREADY_STARTED      The input Controller to input DriverImage has been 
+                                   recorded into the mapping database.
+  @retval EFI_SUCCESS              The Controller and DriverImage are inserted into 
+                                   the mapping database successfully.
 
 **/
 EFI_STATUS
@@ -234,15 +195,16 @@ InsertDriverImage (
 /**
   Delete a controller's override driver from the mapping database.
 
-  @param  ControllerDevicePath     The controller device path need to add a
-                                   override driver image item
-  @param  DriverImageDevicePath    The driver image device path need to be insert
+  @param  ControllerDevicePath     The controller device path will be deleted 
+                                   when all drivers images on it are removed.
+  @param  DriverImageDevicePath    The driver image device path will be delete.
+                                   If NULL, all driver image will be delete.
   @param  MappingDataBase          Mapping database list entry pointer
-  @param  DriverImageNO            The inserted order number
 
-  @return EFI_INVALID_PARAMETER
-  @return EFI_NOT_FOUND
-  @return EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER    ControllerDevicePath is NULL, or MappingDataBase is NULL
+  @retval EFI_NOT_FOUND            ControllerDevicePath is not found in MappingDataBase or
+                                   DriverImageDevicePath is not found in the found DriverImage Info list. 
+  @retval EFI_SUCCESS              Delete the specified driver successfully.
 
 **/
 EFI_STATUS
@@ -256,9 +218,12 @@ DeleteDriverImage (
 /**
   Get the first Binding protocol which has the specific image handle
 
-  @param  Image          Image handle
+  @param  ImageHandle          The Image handle
+  @param  BindingHandle        The BindingHandle of the found Driver Binding protocol.
+                               If Binding protocol is not found, it is set to NULL. 
 
-  @return Pointer into the Binding Protocol interface
+  @return                      Pointer into the Binding Protocol interface
+  @retval NULL                 The paramter is not valid or the binding protocol is not found.
 
 **/
 EFI_DRIVER_BINDING_PROTOCOL *

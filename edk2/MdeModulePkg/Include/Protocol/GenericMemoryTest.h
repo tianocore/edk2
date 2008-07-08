@@ -1,6 +1,5 @@
 /** @file
-  The EFI generic memory test protocol interface.
-  For more information please look at EfiMemoryTest.doc
+  This protocol defines the EFI generic memory test interfaces in Dxe phase.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -47,7 +46,7 @@ typedef enum {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_MEMORY_TEST_INIT) (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This,
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
   IN  EXTENDMEM_COVERAGE_LEVEL                 Level,
   OUT BOOLEAN                                  *RequireSoftECCInit
   )
@@ -71,6 +70,7 @@ EFI_STATUS
                               internally. 
   @retval EFI_NOT_FOUND       Indicate all the non-tested memory blocks have  
                               already go through. 
+  @retval EFI_DEVICE_ERROR    Mis-compare error, and no agent can handle it
 
 **/
 typedef
@@ -110,15 +110,14 @@ EFI_STATUS
   @param  StartAddress        The start address of the memory range. 
   @param  Length              The memory range's length. 
   
-  @retval EFI_SUCCESS         The compatible memory range pass the memory test. 
-  @retval EFI_DEVICE_ERROR    The compatible memory range test find memory error 
-                              and also return return the error address. 
+  @retval EFI_SUCCESS           The compatible memory range pass the memory test. 
+  @retval EFI_INVALID_PARAMETER The compatible memory range must be below 16M.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_MEMORY_TEST_COMPATIBLE_RANGE) (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This,
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
   IN  EFI_PHYSICAL_ADDRESS                     StartAddress,
   IN  UINT64                                   Length
   )

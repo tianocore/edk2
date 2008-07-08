@@ -1,5 +1,5 @@
 /** @file
-  PPI published by the PEIM that is responsible for detecting operator presence.
+  This file defines OperatorPresent PPI responsible for detecting TPM operator presence.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
