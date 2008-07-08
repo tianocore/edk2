@@ -2,7 +2,7 @@
 # Graphics Library for UEFI drivers
 #
 # This library provides supports for basic graphic functions.
-# Copyright (c) 2006 - 2007, Intel Corporation.
+# Copyright (c) 2006 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,7 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = EdkGraphicsLib
-  FILE_GUID                      = 08c1a0e4-1208-47f8-a2c5-f42eabee653a
+  FILE_GUID                      = BF0788B9-12F2-42ca-A41B-B43C06BA8202
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = GraphicsLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
