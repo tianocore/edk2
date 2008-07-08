@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -73,16 +73,148 @@ Returns:
 }
 
 EFI_STATUS
+InstallAllDriverProtocolsWorker (
+  IN EFI_HANDLE                         ImageHandle,
+  IN EFI_SYSTEM_TABLE                   * SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL        * DriverBinding,
+  IN EFI_HANDLE                         DriverBindingHandle,
+  IN EFI_COMPONENT_NAME_PROTOCOL        * ComponentName, OPTIONAL
+  IN EFI_COMPONENT_NAME2_PROTOCOL       * ComponentName2, OPTIONAL
+  IN EFI_DRIVER_CONFIGURATION_PROTOCOL  * DriverConfiguration, OPTIONAL
+  IN EFI_DRIVER_CONFIGURATION2_PROTOCOL * DriverConfiguration2, OPTIONAL
+  IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL    * DriverDiagnostics, OPTIONAL
+  IN EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   * DriverDiagnostics2 OPTIONAL
+  )
+/*++
+
+Routine Description:
+
+  Intialize a driver by installing the Driver Binding Protocol onto the 
+  driver's DriverBindingHandle.  This is typically the same as the driver's
+  ImageHandle, but it can be different if the driver produces multiple
+  DriverBinding Protocols.  This function also initializes the EFI Driver
+  Library that initializes the global variables gST, gBS, gRT.
+
+Arguments:
+
+  ImageHandle         - The image handle of the driver
+
+  SystemTable         - The EFI System Table that was passed to the driver's entry point
+
+  DriverBinding       - A Driver Binding Protocol instance that this driver is producing
+
+  DriverBindingHandle - The handle that DriverBinding is to be installe onto.  If this
+                        parameter is NULL, then a new handle is created.
+
+  ComponentName       - A Component Name Protocol instance that this driver is producing
+
+  ComponentName2      - A Component Name2 Protocol instance that this driver is producing
+
+  DriverConfiguration - A Driver Configuration Protocol instance that this driver is producing
+
+  DriverConfiguration2- A Driver Configuration2 Protocol instance that this driver is producing
+  
+  DriverDiagnostics   - A Driver Diagnostics Protocol instance that this driver is producing
+
+  DriverDiagnostics2  - A Driver Diagnostics2 Protocol instance that this driver is producing
+
+Returns: 
+
+  EFI_SUCCESS if all the protocols were installed onto DriverBindingHandle
+
+  Otherwise, then return status from gBS->InstallProtocolInterface()
+
+--*/
+{
+  EFI_STATUS  Status;
+
+  Status = EfiLibInstallDriverBinding (ImageHandle, SystemTable, DriverBinding, DriverBindingHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (ComponentName != NULL) {
+    Status = gBS->InstallProtocolInterface (
+                    &DriverBinding->DriverBindingHandle,
+                    &gEfiComponentNameProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    ComponentName
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (ComponentName2 != NULL) {
+    Status = gBS->InstallProtocolInterface (
+                    &DriverBinding->DriverBindingHandle,
+                    &gEfiComponentName2ProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    ComponentName2
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (DriverConfiguration != NULL) {
+    Status = gBS->InstallProtocolInterface (
+                    &DriverBinding->DriverBindingHandle,
+                    &gEfiDriverConfigurationProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    DriverConfiguration
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (DriverConfiguration2 != NULL) {
+    Status = gBS->InstallProtocolInterface (
+                    &DriverBinding->DriverBindingHandle,
+                    &gEfiDriverConfiguration2ProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    DriverConfiguration2
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (DriverDiagnostics != NULL) {
+    Status = gBS->InstallProtocolInterface (
+                    &DriverBinding->DriverBindingHandle,
+                    &gEfiDriverDiagnosticsProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    DriverDiagnostics
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (DriverDiagnostics2 != NULL) {
+    Status = gBS->InstallProtocolInterface (
+                    &DriverBinding->DriverBindingHandle,
+                    &gEfiDriverDiagnostics2ProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    DriverDiagnostics2
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
 EfiLibInstallAllDriverProtocols (
   IN EFI_HANDLE                         ImageHandle,
   IN EFI_SYSTEM_TABLE                   * SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL        * DriverBinding,
   IN EFI_HANDLE                         DriverBindingHandle,
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  IN EFI_COMPONENT_NAME2_PROTOCOL       * ComponentName, OPTIONAL
-#else
   IN EFI_COMPONENT_NAME_PROTOCOL        * ComponentName, OPTIONAL
-#endif
   IN EFI_DRIVER_CONFIGURATION_PROTOCOL  * DriverConfiguration, OPTIONAL
   IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL    * DriverDiagnostics OPTIONAL
   )
@@ -121,54 +253,77 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
+  return InstallAllDriverProtocolsWorker (
+           ImageHandle,
+           SystemTable,
+           DriverBinding,
+           DriverBindingHandle,
+           ComponentName,
+           NULL,
+           DriverConfiguration,
+           NULL,
+           DriverDiagnostics,
+           NULL
+           );
+}
 
-  Status = EfiLibInstallDriverBinding (ImageHandle, SystemTable, DriverBinding, DriverBindingHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+EFI_STATUS
+EfiLibInstallAllDriverProtocols2 (
+  IN EFI_HANDLE                         ImageHandle,
+  IN EFI_SYSTEM_TABLE                   * SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL        * DriverBinding,
+  IN EFI_HANDLE                         DriverBindingHandle,
+  IN EFI_COMPONENT_NAME2_PROTOCOL       * ComponentName2, OPTIONAL
+  IN EFI_DRIVER_CONFIGURATION2_PROTOCOL * DriverConfiguration2, OPTIONAL
+  IN EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   * DriverDiagnostics2 OPTIONAL
+  )
+/*++
 
-  if (ComponentName != NULL) {
-    Status = gBS->InstallProtocolInterface (
-                    &DriverBinding->DriverBindingHandle,
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-                    &gEfiComponentName2ProtocolGuid,
-#else
-                    &gEfiComponentNameProtocolGuid,
-#endif
-                    EFI_NATIVE_INTERFACE,
-                    ComponentName
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
+Routine Description:
 
-  if (DriverConfiguration != NULL) {
-    Status = gBS->InstallProtocolInterface (
-                    &DriverBinding->DriverBindingHandle,
-                    &gEfiDriverConfigurationProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    DriverConfiguration
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
+  Intialize a driver by installing the Driver Binding Protocol onto the 
+  driver's DriverBindingHandle.  This is typically the same as the driver's
+  ImageHandle, but it can be different if the driver produces multiple
+  DriverBinding Protocols.  This function also initializes the EFI Driver
+  Library that initializes the global variables gST, gBS, gRT.
 
-  if (DriverDiagnostics != NULL) {
-    Status = gBS->InstallProtocolInterface (
-                    &DriverBinding->DriverBindingHandle,
-                    &gEfiDriverDiagnosticsProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    DriverDiagnostics
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
+Arguments:
 
-  return EFI_SUCCESS;
+  ImageHandle         - The image handle of the driver
+
+  SystemTable         - The EFI System Table that was passed to the driver's entry point
+
+  DriverBinding       - A Driver Binding Protocol instance that this driver is producing
+
+  DriverBindingHandle - The handle that DriverBinding is to be installe onto.  If this
+                        parameter is NULL, then a new handle is created.
+
+  ComponentName2      - A Component Name2 Protocol instance that this driver is producing
+
+  DriverConfiguration2- A Driver Configuration2 Protocol instance that this driver is producing
+  
+  DriverDiagnostics2  - A Driver Diagnostics2 Protocol instance that this driver is producing
+
+Returns: 
+
+  EFI_SUCCESS if all the protocols were installed onto DriverBindingHandle
+
+  Otherwise, then return status from gBS->InstallProtocolInterface()
+
+--*/
+{
+  return InstallAllDriverProtocolsWorker (
+           ImageHandle,
+           SystemTable,
+           DriverBinding,
+           DriverBindingHandle,
+           NULL,
+           ComponentName2,
+           NULL,
+           DriverConfiguration2,
+           NULL,
+           DriverDiagnostics2
+           );
 }
 
 EFI_STATUS

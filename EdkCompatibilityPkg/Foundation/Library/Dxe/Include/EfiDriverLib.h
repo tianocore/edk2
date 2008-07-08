@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -28,6 +28,7 @@ Abstract:
 #include "LinkedList.h"
 #include "GetImage.h"
 #include "EfiImageFormat.h"
+#include "EfiCompNameSupport.h"
 
 #include EFI_GUID_DEFINITION (DxeServices)
 #include EFI_GUID_DEFINITION (EventGroup)
@@ -40,7 +41,9 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (ComponentName)
 #include EFI_PROTOCOL_DEFINITION (ComponentName2)
 #include EFI_PROTOCOL_DEFINITION (DriverConfiguration)
+#include EFI_PROTOCOL_DEFINITION (DriverConfiguration2)
 #include EFI_PROTOCOL_DEFINITION (DriverDiagnostics)
+#include EFI_PROTOCOL_DEFINITION (DriverDiagnostics2)
 
 #include EFI_PROTOCOL_DEFINITION (DebugMask)
 
@@ -166,13 +169,9 @@ EfiLibInstallAllDriverProtocols (
   IN EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding,
   IN EFI_HANDLE                         DriverBindingHandle,
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-  IN EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName,
-#else
-  IN EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,
-#endif
-  IN EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration,
-  IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics
+  IN EFI_COMPONENT_NAME_PROTOCOL        *ComponentName, OPTIONAL
+  IN EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics OPTIONAL
   )
 /*++
 
@@ -200,6 +199,52 @@ Arguments:
   DriverConfiguration - A Driver Configuration Protocol instance that this driver is producing
   
   DriverDiagnostics   - A Driver Diagnostics Protocol instance that this driver is producing
+
+Returns: 
+
+  EFI_SUCCESS if all the protocols were installed onto DriverBindingHandle
+
+  Otherwise, then return status from gBS->InstallProtocolInterface()
+
+--*/
+;
+
+EFI_STATUS
+EfiLibInstallAllDriverProtocols2 (
+  IN EFI_HANDLE                         ImageHandle,
+  IN EFI_SYSTEM_TABLE                   *SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding,
+  IN EFI_HANDLE                         DriverBindingHandle,
+  IN EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2, OPTIONAL
+  IN EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2, OPTIONAL
+  IN EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2 OPTIONAL
+  )
+/*++
+
+Routine Description:
+
+  Intialize a driver by installing the Driver Binding Protocol onto the 
+  driver's DriverBindingHandle.  This is typically the same as the driver's
+  ImageHandle, but it can be different if the driver produces multiple
+  DriverBinding Protocols.  This function also initializes the EFI Driver
+  Library that initializes the global variables gST, gBS, gRT.
+
+Arguments:
+
+  ImageHandle         - The image handle of the driver
+
+  SystemTable         - The EFI System Table that was passed to the driver's entry point
+
+  DriverBinding       - A Driver Binding Protocol instance that this driver is producing
+
+  DriverBindingHandle - The handle that DriverBinding is to be installe onto.  If this
+                        parameter is NULL, then a new handle is created.
+
+  ComponentName2      - A Component Name2 Protocol instance that this driver is producing
+
+  DriverConfiguration2- A Driver Configuration2 Protocol instance that this driver is producing
+  
+  DriverDiagnostics2  - A Driver Diagnostics2 Protocol instance that this driver is producing
 
 Returns: 
 
