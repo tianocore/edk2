@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                  
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,7 +23,5 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION (UnicodeCollation)
 
 EFI_GUID  gEfiUnicodeCollationProtocolGuid = EFI_UNICODE_COLLATION_PROTOCOL_GUID;
-EFI_GUID  gEfiUnicodeCollation2ProtocolGuid = EFI_UNICODE_COLLATION2_PROTOCOL_GUID;
 
 EFI_GUID_STRING(&gEfiUnicodeCollationProtocolGuid, "Unicode Collation Protocol", "EFI 1.0 Unicode Collation Protocol");
-EFI_GUID_STRING(&gEfiUnicodeCollation2ProtocolGuid, "Unicode Collation Protocol", "UEFI 2.10 Unicode Collation Protocol");

@@ -11,11 +11,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-    ComponentName.c
+    ComponentName2.c
     
 Abstract:
 
-    EFI Component Name Protocol
+    EFI Component Name2 Protocol
 
 Revision History
 
@@ -26,4 +26,4 @@ Revision History
 
 EFI_GUID  gEfiComponentName2ProtocolGuid = EFI_COMPONENT_NAME2_PROTOCOL_GUID;
 
-EFI_GUID_STRING(&gEfiComponentName2ProtocolGuid, "Component Name2 Protocol", "EFI 2.0 Component Name2 Protocol");
+EFI_GUID_STRING(&gEfiComponentName2ProtocolGuid, "Component Name2 Protocol", "UEFI 2.0 Component Name2 Protocol");
