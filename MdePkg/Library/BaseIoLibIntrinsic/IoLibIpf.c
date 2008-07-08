@@ -61,7 +61,7 @@ InternalGetMemoryMapAddress (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT8
@@ -82,7 +82,7 @@ IoRead8 (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT16
@@ -103,7 +103,7 @@ IoRead16 (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT32
@@ -126,7 +126,7 @@ IoRead32 (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT64
@@ -149,7 +149,9 @@ IoRead64 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port. It equals to the
+          input Value instead of the actual value read back from
+          the I/O port.
 
 **/
 UINT8
@@ -172,7 +174,9 @@ IoWrite8 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port. It equals to the
+          input Value instead of the actual value read back from
+          the I/O port.
 
 **/
 UINT16
@@ -195,7 +199,9 @@ IoWrite16 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port. It equals to the
+          input Value instead of the actual value read back from
+          the I/O port.
 
 **/
 UINT32
@@ -220,7 +226,9 @@ IoWrite32 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port. It equals to the
+          input Value instead of the actual value read back from
+          the I/O port.
 
 **/
 UINT64
@@ -243,7 +251,7 @@ IoWrite64 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT8
@@ -272,7 +280,7 @@ MmioRead8 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT16
@@ -306,7 +314,7 @@ MmioRead16 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT32
@@ -340,7 +348,7 @@ MmioRead32 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT64
@@ -376,7 +384,9 @@ MmioRead64 (
   @param  Address The MMIO register to write.
   @param  Data    The value to write to the MMIO register.
 
-  @return The value written the memory address.
+  @return The value written to the Mmio. It equals to the
+          input Value instead of the actual value read back from
+          the Mmio.
 
 **/
 UINT8
@@ -405,7 +415,9 @@ MmioWrite8 (
   @param  Address The MMIO register to write.
   @param  Data    The value to write to the MMIO register.
 
-  @return The value written the memory address.
+  @return The value written to the Mmio. It equals to the
+          input Value instead of the actual value read back from
+          the Mmio.
 
 **/
 UINT16
@@ -439,7 +451,9 @@ MmioWrite16 (
   @param  Address The MMIO register to write.
   @param  Data    The value to write to the MMIO register.
 
-  @return The value written the memory address.
+  @return The value written to the Mmio. It equals to the
+          input Value instead of the actual value read back from
+          the Mmio.
 
 **/
 UINT32
@@ -473,7 +487,9 @@ MmioWrite32 (
   @param  Address The MMIO register to write.
   @param  Data    The value to write to the MMIO register.
 
-  @return The value written the memory address.
+  @return The value written to the Mmio. It equals to the
+          input Value instead of the actual value read back from
+          the Mmio.
 
 **/
 UINT64

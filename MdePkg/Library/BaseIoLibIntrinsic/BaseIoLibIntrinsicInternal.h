@@ -1,7 +1,7 @@
 /**@file
   Common header file shared by all source files.
 
-  This file includes package header files, library classes and protocol, PPI & GUID definitions.
+  This file includes package header files, dependent library classes.
 
   Copyright (c) 2007, Intel Corporation.
   All rights reserved. This program and the accompanying materials
@@ -12,8 +12,8 @@
    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
-#ifndef __COMMON_HEADER_H_
-#define __COMMON_HEADER_H_
+#ifndef __BASEIOLIB_INTRINSIC_INTERNAL_H_
+#define __BASEIOLIB_INTRINSIC_INTERNAL_H_
 
 
 

@@ -56,7 +56,7 @@ ScanMem32 (
   IN UINT32      Value
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return NULL;
   }
 

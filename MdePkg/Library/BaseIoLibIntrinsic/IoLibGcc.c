@@ -37,7 +37,7 @@
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT8
@@ -61,6 +61,9 @@ MmioRead8 (
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
 
+  @return The value written to the Mmio. It equals to the input
+          Value instead of the actual value read back from the
+          Mmio.
 **/
 UINT8
 EFIAPI
@@ -83,7 +86,7 @@ MmioWrite8 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT16
@@ -108,6 +111,9 @@ MmioRead16 (
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
 
+  @return The value written to the Mmio. It equals to the input
+          Value instead of the actual value read back from the
+          Mmio.
 **/
 UINT16
 EFIAPI
@@ -131,7 +137,7 @@ MmioWrite16 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT32
@@ -156,6 +162,9 @@ MmioRead32 (
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
 
+  @return The value written to the Mmio. It equals to the input
+          Value instead of the actual value read back from the
+          Mmio.
 **/
 UINT32
 EFIAPI
@@ -179,7 +188,7 @@ MmioWrite32 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT64
@@ -204,6 +213,9 @@ MmioRead64 (
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
 
+  @return The value written to the Mmio. It equals to the input
+          Value instead of the actual value read back from the
+          Mmio.
 **/
 UINT64
 EFIAPI
@@ -229,7 +241,7 @@ MmioWrite64 (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 __inline__
@@ -257,7 +269,9 @@ IoRead8 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port. It equals to the
+          input Value instead of the actual value read back from
+          the I/O port.
 
 **/
 __inline__
@@ -283,7 +297,7 @@ IoWrite8 (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 __inline__
@@ -312,7 +326,9 @@ IoRead16 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port. It equals to the
+          input Value instead of the actual value read back from
+          the I/O port.
 
 **/
 __inline__
@@ -339,7 +355,7 @@ IoWrite16 (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 __inline__
@@ -368,7 +384,9 @@ IoRead32 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return The value written to the I/O port. It equals to the
+          input Value instead of the actual value read back from
+          the I/O port.
 
 **/
 __inline__

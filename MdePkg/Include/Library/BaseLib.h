@@ -471,7 +471,7 @@ StrStr (
 
   @param  String			    Pointer to a Null-terminated Unicode string.
 
-  @retval UINTN
+  @retval Value translated from String.
 
 **/
 UINTN
@@ -511,7 +511,7 @@ StrDecimalToUintn (
 
   @param  String			    Pointer to a Null-terminated Unicode string.
 
-  @retval UINT64
+  @retval Value translated from String.
 
 **/
 UINT64
@@ -553,7 +553,7 @@ StrDecimalToUint64 (
 
   @param  String			    Pointer to a Null-terminated Unicode string.
 
-  @retval UINTN
+  @retval Value translated from String.
 
 **/
 UINTN
@@ -595,7 +595,7 @@ StrHexToUintn (
 
   @param  String			    Pointer to a Null-terminated Unicode string.
 
-  @retval UINT64
+  @retval Value translated from String.
 
 **/
 UINT64
@@ -1127,7 +1127,7 @@ AsciiStrStr (
 
   @param  String			    Pointer to a Null-terminated ASCII string.
 
-  @retval UINTN
+  @retval Value translated from String.
 
 **/
 UINTN
@@ -1164,7 +1164,7 @@ AsciiStrDecimalToUintn (
 
   @param  String			    Pointer to a Null-terminated ASCII string.
 
-  @retval UINT64
+  @retval Value translated from String.
 
 **/
 UINT64
@@ -1205,7 +1205,7 @@ AsciiStrDecimalToUint64 (
 
   @param  String			    Pointer to a Null-terminated ASCII string.
 
-  @retval UINTN
+  @retval Value translated from String.
 
 **/
 UINTN
@@ -1246,7 +1246,7 @@ AsciiStrHexToUintn (
 
   @param  String			    Pointer to a Null-terminated ASCII string.
 
-  @retval UINT64
+  @retval Value translated from String.
 
 **/
 UINT64
@@ -1595,6 +1595,8 @@ IsNodeAtEnd (
 
   @param  FirstEntry  A pointer to a node in a linked list.
   @param  SecondEntry A pointer to another node in the same linked list.
+  
+  @return SecondEntry
 
 **/
 LIST_ENTRY *
@@ -2237,7 +2239,7 @@ WriteUnaligned16 (
 
   @param  Buffer  Pointer to a 24-bit value that may be unaligned.
 
-  @return The value read.
+  @return The value read from Buffer.
 
 **/
 UINT32
@@ -2259,7 +2261,7 @@ ReadUnaligned24 (
   @param  Buffer  Pointer to a 24-bit value that may be unaligned.
   @param  Value   24-bit value to write to Buffer.
 
-  @return The value written.
+  @return The value written to Buffer.
 
 **/
 UINT32
@@ -2280,7 +2282,7 @@ WriteUnaligned24 (
 
   @param  Uint32  Pointer to a 32-bit value that may be unaligned.
 
-  @return *Uint32
+  @return Value read from Uint32
 
 **/
 UINT32
@@ -2302,7 +2304,7 @@ ReadUnaligned32 (
   @param  Uint32  Pointer to a 32-bit value that may be unaligned.
   @param  Value   32-bit value to write to Buffer.
 
-  @return Value
+  @return Value written to Uint32.
 
 **/
 UINT32
@@ -2323,7 +2325,7 @@ WriteUnaligned32 (
 
   @param  Uint64  Pointer to a 64-bit value that may be unaligned.
 
-  @return *Uint64
+  @return Value read from Uint64.
 
 **/
 UINT64
@@ -2345,7 +2347,7 @@ ReadUnaligned64 (
   @param  Uint64  Pointer to a 64-bit value that may be unaligned.
   @param  Value   64-bit value to write to Buffer.
 
-  @return Value
+  @return Value written to Uint64.
 
 **/
 UINT64
@@ -3048,7 +3050,7 @@ GetSpinLockProperties (
   @param  SpinLock  A pointer to the spin lock to initialize to the released
                     state.
 
-  @return SpinLock
+  @return SpinLock in release state.
 
 **/
 SPIN_LOCK *
@@ -3075,7 +3077,7 @@ InitializeSpinLock (
 
   @param  SpinLock  A pointer to the spin lock to place in the acquired state.
 
-  @return SpinLock
+  @return SpinLock accquired lock.
 
 **/
 SPIN_LOCK *
@@ -3120,7 +3122,7 @@ AcquireSpinLockOrFail (
 
   @param  SpinLock  A pointer to the spin lock to release.
 
-  @return SpinLock
+  @return SpinLock released lock.
 
 **/
 SPIN_LOCK *
@@ -3245,6 +3247,7 @@ InterlockedCompareExchange64 (
   @param  CompareValue  Pointer value used in compare operation.
   @param  ExchangeValue Pointer value used in exchange operation.
 
+  @return The original *Value before exchange.
 **/
 VOID *
 EFIAPI
@@ -3552,8 +3555,6 @@ LongJump (
 /**
   Enables CPU interrupts.
 
-  Enables CPU interrupts.
-
 **/
 VOID
 EFIAPI
@@ -3565,8 +3566,6 @@ EnableInterrupts (
 /**
   Disables CPU interrupts.
 
-  Disables CPU interrupts.
-
 **/
 VOID
 EFIAPI
@@ -3576,9 +3575,6 @@ DisableInterrupts (
 
 
 /**
-  Disables CPU interrupts and returns the interrupt state prior to the disable
-  operation.
-
   Disables CPU interrupts and returns the interrupt state prior to the disable
   operation.
 
@@ -3597,9 +3593,6 @@ SaveAndDisableInterrupts (
   Enables CPU interrupts for the smallest window required to capture any
   pending interrupts.
 
-  Enables CPU interrupts for the smallest window required to capture any
-  pending interrupts.
-
 **/
 VOID
 EFIAPI
@@ -3611,8 +3604,8 @@ EnableDisableInterrupts (
 /**
   Retrieves the current CPU interrupt state.
 
-  Retrieves the current CPU interrupt state. Returns TRUE is interrupts are
-  currently enabled. Otherwise returns FALSE.
+  Returns TRUE is interrupts are currently enabled. Otherwise
+  returns FALSE.
 
   @retval TRUE  CPU interrupts are enabled.
   @retval FALSE CPU interrupts are disabled.

@@ -52,7 +52,7 @@ CopyMem (
   IN UINTN       Length
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return DestinationBuffer;
   }
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)DestinationBuffer));

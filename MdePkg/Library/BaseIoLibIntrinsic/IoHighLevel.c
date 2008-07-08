@@ -130,7 +130,8 @@ IoAndThenOr8 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
 
-  @return The value read.
+  @return The value read from I/O port specified by StartBit and
+          EndBit.
 
 **/
 UINT8
@@ -410,7 +411,8 @@ IoAndThenOr16 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
 
-  @return The value read.
+  @return The value read from I/O port specified by StartBit and
+          EndBit.
 
 **/
 UINT16
@@ -690,7 +692,8 @@ IoAndThenOr32 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
 
-  @return The value read.
+  @return The value read from I/O port specified by StartBit and
+          EndBit.
 
 **/
 UINT32
@@ -970,7 +973,8 @@ IoAndThenOr64 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
 
-  @return The value read.
+  @return The value read from I/O port specified by StartBit and
+          EndBit.
 
 **/
 UINT64
@@ -1251,7 +1255,8 @@ MmioAndThenOr8 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
 
-  @return The value read.
+  @return The value read from I/O port specified by StartBit and
+          EndBit.
 
 **/
 UINT8
@@ -1533,7 +1538,8 @@ MmioAndThenOr16 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
 
-  @return The value read.
+  @return The value read from I/O port specified by StartBit and
+          EndBit.
 
 **/
 UINT16
@@ -1815,7 +1821,8 @@ MmioAndThenOr32 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
 
-  @return The value read.
+  @return The value read from I/O port specified by StartBit and
+          EndBit.
 
 **/
 UINT32
@@ -2097,7 +2104,8 @@ MmioAndThenOr64 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
 
-  @return The value read.
+  @return The value read from I/O port specified by StartBit and
+          EndBit.
 
 **/
 UINT64

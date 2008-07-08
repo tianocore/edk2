@@ -36,5 +36,5 @@ CpuDeadLoop (
 {
   volatile UINTN  Index;
 
-  for (Index = 0; Index == 0;);
+  for (Index = 0; 0 == Index;);
 }

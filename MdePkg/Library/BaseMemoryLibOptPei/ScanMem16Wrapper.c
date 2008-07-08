@@ -56,7 +56,7 @@ ScanMem16 (
   IN UINT16      Value
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return NULL;
   }
 

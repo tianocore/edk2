@@ -52,7 +52,7 @@ SetMem64 (
   IN UINT64  Value
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return Buffer;
   }
 

@@ -28,7 +28,7 @@
 
   @param  Buffer  Pointer to a 16-bit value that may be unaligned.
 
-  @return *Uint16
+  @return Data read from Buffer.
 
 **/
 UINT16
@@ -54,7 +54,7 @@ ReadUnaligned16 (
   @param  Buffer  Pointer to a 16-bit value that may be unaligned.
   @param  Value   16-bit value to write to Buffer.
 
-  @return Value
+  @return Value written to Buffer
 
 **/
 UINT16
@@ -79,7 +79,7 @@ WriteUnaligned16 (
 
   @param  Buffer  Pointer to a 24-bit value that may be unaligned.
 
-  @return The value read.
+  @return The value read from Buffer.
 
 **/
 UINT32
@@ -105,7 +105,7 @@ ReadUnaligned24 (
   @param  Buffer  Pointer to a 24-bit value that may be unaligned.
   @param  Value   24-bit value to write to Buffer.
 
-  @return The value written.
+  @return The value written to Buffer.
 
 **/
 UINT32
@@ -131,7 +131,7 @@ WriteUnaligned24 (
 
   @param  Buffer  Pointer to a 32-bit value that may be unaligned.
 
-  @return *Uint32
+  @return Data read from Buffer.
 
 **/
 UINT32
@@ -157,7 +157,7 @@ ReadUnaligned32 (
   @param  Buffer  Pointer to a 32-bit value that may be unaligned.
   @param  Value   32-bit value to write to Buffer.
 
-  @return Value
+  @return Value written to Buffer
 
 **/
 UINT32
@@ -182,7 +182,7 @@ WriteUnaligned32 (
 
   @param  Buffer  Pointer to a 64-bit value that may be unaligned.
 
-  @return *Uint64
+  @return Data read from Buffer.
 
 **/
 UINT64
@@ -208,7 +208,7 @@ ReadUnaligned64 (
   @param  Buffer  Pointer to a 64-bit value that may be unaligned.
   @param  Value   64-bit value to write to Buffer.
 
-  @return Value
+  @return Value written to Buffer.
 
 **/
 UINT64

@@ -51,7 +51,7 @@ InternalMemCopyMem (
   Set Buffer to Value for Size bytes.
 
   @param  Buffer Memory to set.
-  @param  Size Number of bytes to set
+  @param  Length Number of bytes to set
   @param  Value Value of the set operation.
 
   @return Buffer
@@ -123,7 +123,7 @@ InternalMemSetMem64 (
   Set Buffer to 0 for Size bytes.
 
   @param  Buffer Memory to set.
-  @param  Size Number of bytes to set
+  @param  Length Number of bytes to set
 
   @return Buffer
 

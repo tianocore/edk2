@@ -39,7 +39,7 @@ AsmFxSave (
   )
 {
   ASSERT (Buffer != NULL);
-  ASSERT (((UINTN)Buffer & 0xf) == 0);
+  ASSERT (0 == ((UINTN)Buffer & 0xf));
 
   InternalX86FxSave (Buffer);
 

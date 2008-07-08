@@ -41,6 +41,7 @@
 
 **/
 BOOLEAN
+EFIAPI
 IsNodeInList (
   IN      CONST LIST_ENTRY      *List,
   IN      CONST LIST_ENTRY      *Node
@@ -384,6 +385,8 @@ IsNodeAtEnd (
 
   @param  FirstEntry  A pointer to a node in a linked list.
   @param  SecondEntry A pointer to another node in the same linked list.
+  
+  @return SecondEntry
 
 **/
 LIST_ENTRY *

@@ -56,14 +56,14 @@ ScanMem16 (
   IN UINT16      Value
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return NULL;
   }
 
   ASSERT (Buffer != NULL);
-  ASSERT (((UINTN)Buffer & (sizeof (Value) - 1)) == 0);
+  ASSERT (0 == ((UINTN)Buffer & (sizeof (Value) - 1)));
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Buffer));
-  ASSERT ((Length & (sizeof (Value) - 1)) == 0);
+  ASSERT (0 == (Length & (sizeof (Value) - 1)));
 
   return (VOID*)InternalMemScanMem16 (Buffer, Length / sizeof (Value), Value);
 }

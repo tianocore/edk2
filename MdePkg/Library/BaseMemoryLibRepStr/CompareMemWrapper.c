@@ -58,7 +58,7 @@ CompareMem (
   IN UINTN       Length
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return 0;
   }
   ASSERT (DestinationBuffer != NULL);

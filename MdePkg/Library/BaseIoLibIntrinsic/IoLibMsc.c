@@ -63,7 +63,7 @@ void          _ReadWriteBarrier (void);
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT8
@@ -119,7 +119,7 @@ IoWrite8 (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT16
@@ -177,7 +177,7 @@ IoWrite16 (
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT32
@@ -236,7 +236,7 @@ IoWrite32 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT8
@@ -262,7 +262,11 @@ MmioRead8 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
-
+  
+  @return The value written to the Mmio. It equals to the input
+          Value instead of the actual value read back from the
+          Mmio.
+  
 **/
 UINT8
 EFIAPI
@@ -285,7 +289,7 @@ MmioWrite8 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT16
@@ -312,6 +316,9 @@ MmioRead16 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
+  
+  @return The value read from the Mmio after wrote specified
+          Value.
 
 **/
 UINT16
@@ -336,7 +343,7 @@ MmioWrite16 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT32
@@ -363,6 +370,10 @@ MmioRead32 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
+  
+  @return The value written to the Mmio. It equals to the input
+          Value instead of the actual value read back from the
+          Mmio.
 
 **/
 UINT32
@@ -387,7 +398,7 @@ MmioWrite32 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT64
@@ -415,6 +426,10 @@ MmioRead64 (
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
 
+  @return The value written to the Mmio. It equals to the input
+          Value instead of the actual value read back from the
+          Mmio.
+  
 **/
 UINT64
 EFIAPI

@@ -54,7 +54,7 @@ ScanMem8 (
   IN UINT8       Value
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return NULL;
   }
   ASSERT (Buffer != NULL);

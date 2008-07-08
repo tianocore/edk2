@@ -45,12 +45,10 @@
 [Packages]
   MdePkg/MdePkg.dec
 
-[LibraryClasses]
-  DebugLib
-
 [LibraryClasses.Ipf]
   PalCallLib
 
 [LibraryClasses.common]
   BaseLib
+  DebugLib
 
