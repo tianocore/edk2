@@ -82,6 +82,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE \
       )
 
+/**
+
+  Show progress bar with title above it. It only works in Graphics mode.
+
+
+  @param TitleForeground Foreground color for Title.
+  @param TitleBackground Background color for Title.
+  @param Title           Title above progress bar.
+  @param ProgressColor   Progress bar color.
+  @param Progress        Progress (0-100)
+  @param PreviousValue   The previous value of the progress.
+
+  @retval  EFI_STATUS       Success update the progress bar
+
+**/
 EFI_STATUS
 PlatformBdsShowProgress (
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
