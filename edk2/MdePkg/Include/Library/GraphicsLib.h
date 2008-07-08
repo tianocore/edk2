@@ -179,7 +179,7 @@ LockKeyboards (
   @param[in]  X            Row to start printing at
   @param[in]  Y            Column to start printing at
   @param[in]  ForeGround   Foreground color
-  @param[in]  ForeGround   background color
+  @param[in]  BackGround   background color
   @param[in]  Fmt          Print format sting. See definition of Print
   @param[in]  ...          Argumnet stream defined by Fmt string
 
@@ -192,7 +192,7 @@ PrintXY (
   IN UINTN                            X,
   IN UINTN                            Y,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
   IN CHAR16                           *Fmt,
   ...
   );
