@@ -1,5 +1,7 @@
 /** @file
 
+  This file contains the definination for host controller memory management routines.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,16 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  EhciMem.h
-
-Abstract:
-
-  This file contains the definination for host controller memory management routines
-
-Revision History
 
 **/
 
@@ -59,12 +51,12 @@ typedef struct _USBHC_MEM_POOL {
   USBHC_MEM_BLOCK         *Head;
 } USBHC_MEM_POOL;
 
-enum {
+typedef enum {
   USBHC_MEM_UNIT           = 64,     // Memory allocation unit, must be 2^n, n>4
 
   USBHC_MEM_UNIT_MASK      = USBHC_MEM_UNIT - 1,
   USBHC_MEM_DEFAULT_PAGES  = 16
-};
+} USBHC_MEM_UNIT_DATA;
 
 #define USBHC_MEM_ROUND(Len)  (((Len) + USBHC_MEM_UNIT_MASK) & (~USBHC_MEM_UNIT_MASK))
 
@@ -82,43 +74,34 @@ enum {
 
 
 
+/**
+  Initialize the memory management pool for the host controller.
+
+  @param  PciIo               The PciIo that can be used to access the host controller.
+  @param  Check4G             Whether the host controller requires allocated memory
+                              from one 4G address space.
+  @param  Which4G             The 4G memory area each memory allocated should be from.
+
+  @retval EFI_SUCCESS         The memory pool is initialized.
+  @retval EFI_OUT_OF_RESOURCE Fail to init the memory pool.
+
+**/
 USBHC_MEM_POOL *
 UsbHcInitMemPool (
   IN EFI_PCI_IO_PROTOCOL  *PciIo,
   IN BOOLEAN              Check4G,
   IN UINT32               Which4G
   )
-/*++
-
-Routine Description:
-
-  Initialize the memory management pool for the host controller
-
-Arguments:
-
-  Pool    - The USB memory pool to initialize
-  PciIo   - The PciIo that can be used to access the host controller
-  Check4G - Whether the host controller requires allocated memory
-            from one 4G address space.
-  Which4G - The 4G memory area each memory allocated should be from
-
-Returns:
-
-  EFI_SUCCESS         : The memory pool is initialized
-  EFI_OUT_OF_RESOURCE : Fail to init the memory pool
-
---*/
 ;
 
 
-
 /**
-  Release the memory management pool
+  Release the memory management pool.
 
-  @param  Pool  The USB memory pool to free
+  @param   Pool               The USB memory pool to free.
 
-  @return EFI_SUCCESS      : The memory pool is freed
-  @return EFI_DEVICE_ERROR : Failed to free the memory pool
+  @retval EFI_SUCCESS       The memory pool is freed.
+  @retval EFI_DEVICE_ERROR  Failed to free the memory pool.
 
 **/
 EFI_STATUS
@@ -128,15 +111,14 @@ UsbHcFreeMemPool (
 ;
 
 
-
 /**
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
 
-  @param  Pool  The host controller's memory pool
-  @param  Size  Size of the memory to allocate
+  @param  Pool  The host controller's memory pool.
+  @param  Size  Size of the memory to allocate.
 
-  @return The allocated memory or NULL
+  @return The allocated memory or NULL.
 
 **/
 VOID *
@@ -147,15 +129,14 @@ UsbHcAllocateMem (
 ;
 
 
-
 /**
-  Free the allocated memory back to the memory pool
+  Free the allocated memory back to the memory pool.
 
-  @param  Pool  The memory pool of the host controller
-  @param  Mem   The memory to free
-  @param  Size  The size of the memory to free
+  @param  Pool  The memory pool of the host controller.
+  @param  Mem   The memory to free.
+  @param  Size  The size of the memory to free.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
