@@ -37,6 +37,29 @@ EDK_0000: Compatible: owner
 
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
+==========================================================================================
+EDK_r5418-5419: Non-Compatible: qhuang8
+	Class_Library: Update EfiDriverLib in ECP to make it compatible with EDK1.01(EDK1117),
+				   but the change itself is incompatible.
+    With this change, EFI1.10 drivers can be directly dropped
+    in and built in UEFI build mode. EfiLibInstallAllDriverProtocols2() and
+    INSTALL_ALL_DRIVER_PROTOCOLS_OR_PROTOCOLS2() are added to support UEFI driver
+    model protocols. Please replace all the occurrences of EfiLibInstallAllDriverProtocols
+    and INSTALL_ALL_DRIVER_PROTOCOLS with INSTALL_ALL_DRIVER_PROTOCOLS_OR_PROTOCOLS2
+    in Edk 1.04 based source tree.
+    
+    Code Change:
+    1) Edk\Foundation\Include\EfiCompNameSupport.h:
+	   Add macro INSTALL_ALL_DRIVER_PROTOCOLS_OR_PROTOCOLS2().
+    2) Edk\Foundation\Library\Dxe\EfiDriverLib\EfiDriverModelLib.c
+       Edk\Foundation\Library\Dxe\Include\EfiDriverLib.h
+       Update EfiLibInstallAllDriverProtocols() and add EfiLibInstallAllDriverProtocols2()
+
+	Possible impact:
+	1) If your "EDK style" code base is based on ECP r5417 or below, please replace all the
+	   occurrences of EfiLibInstallAllDriverProtocols and INSTALL_ALL_DRIVER_PROTOCOLS with
+	   INSTALL_ALL_DRIVER_PROTOCOLS_OR_PROTOCOLS2
+
 
 ==========================================================================================
 EDK_r4955: Non-Compatible: qhuang8
