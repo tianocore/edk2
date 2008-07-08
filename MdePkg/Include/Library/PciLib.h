@@ -1,7 +1,7 @@
 /** @file
   PCI Library Services for PCI Segment #0
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -72,7 +72,7 @@ UINT8
 EFIAPI
 PciWrite8 (
   IN      UINTN                     Address,
-  IN      UINT8                     Data
+  IN      UINT8                     Value
   );
 
 /**
@@ -372,7 +372,7 @@ UINT16
 EFIAPI
 PciWrite16 (
   IN      UINTN                     Address,
-  IN      UINT16                    Data
+  IN      UINT16                    Value
   );
 
 /**
@@ -680,7 +680,7 @@ UINT32
 EFIAPI
 PciWrite32 (
   IN      UINTN                     Address,
-  IN      UINT32                    Data
+  IN      UINT32                    Value
   );
 
 /**

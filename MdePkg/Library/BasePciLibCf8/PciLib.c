@@ -1,7 +1,7 @@
 /** @file
   PCI Library using Port CF8/CFC access.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -63,10 +63,10 @@ UINT8
 EFIAPI
 PciWrite8 (
   IN      UINTN                     Address,
-  IN      UINT8                     Data
+  IN      UINT8                     Value
   )
 {
-  return PciCf8Write8 (Address, Data);
+  return PciCf8Write8 (Address, Value);
 }
 
 /**
@@ -391,10 +391,10 @@ UINT16
 EFIAPI
 PciWrite16 (
   IN      UINTN                     Address,
-  IN      UINT16                    Data
+  IN      UINT16                    Value
   )
 {
-  return PciCf8Write16 (Address, Data);
+  return PciCf8Write16 (Address, Value);
 }
 
 /**
@@ -719,10 +719,10 @@ UINT32
 EFIAPI
 PciWrite32 (
   IN      UINTN                     Address,
-  IN      UINT32                    Data
+  IN      UINT32                    Value
   )
 {
-  return PciCf8Write32 (Address, Data);
+  return PciCf8Write32 (Address, Value);
 }
 
 /**
