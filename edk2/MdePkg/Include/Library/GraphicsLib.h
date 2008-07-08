@@ -1,7 +1,7 @@
 /** @file
   Graphics Library
 
-  Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation.<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -36,6 +36,7 @@
 
 **/
 EFI_STATUS
+EFIAPI
 GetGraphicsBitMapFromFV (
   IN  EFI_GUID      *FileNameGuid,
   OUT VOID          **Image,
@@ -63,6 +64,7 @@ GetGraphicsBitMapFromFV (
 
 **/
 EFI_STATUS
+EFIAPI
 GetGraphicsBitMapFromFVEx (
   IN  EFI_HANDLE    ImageHandle,
   IN  EFI_GUID      *FileNameGuid,
@@ -88,6 +90,7 @@ GetGraphicsBitMapFromFVEx (
                                 UgaBltSize will contain the required size.
 **/
 EFI_STATUS
+EFIAPI
 ConvertBmpToUgaBlt (
   IN  VOID      *BmpImage,
   IN  UINTN     BmpImageSize,
@@ -109,6 +112,7 @@ ConvertBmpToUgaBlt (
 
 **/
 EFI_STATUS
+EFIAPI
 EnableQuietBoot (
   IN  EFI_GUID  *LogoFile
   );
@@ -127,6 +131,7 @@ EnableQuietBoot (
 
 **/
 EFI_STATUS
+EFIAPI
 EnableQuietBootEx (
   IN  EFI_GUID    *LogoFile,
   IN  EFI_HANDLE  ImageHandle
@@ -141,6 +146,7 @@ EnableQuietBootEx (
 
 **/
 EFI_STATUS
+EFIAPI
 DisableQuietBoot (
   VOID
   );
@@ -160,6 +166,7 @@ DisableQuietBoot (
 
 **/
 EFI_STATUS
+EFIAPI
 LockKeyboards (
   IN  CHAR16    *Password
   );
@@ -171,8 +178,8 @@ LockKeyboards (
 
   @param[in]  X            Row to start printing at
   @param[in]  Y            Column to start printing at
-  @param[in]  Foreground   Foreground color
-  @param[in]  Background   background color
+  @param[in]  ForeGround   Foreground color
+  @param[in]  ForeGround   background color
   @param[in]  Fmt          Print format sting. See definition of Print
   @param[in]  ...          Argumnet stream defined by Fmt string
 
@@ -184,8 +191,8 @@ EFIAPI
 PrintXY (
   IN UINTN                            X,
   IN UINTN                            Y,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Foreground, OPTIONAL
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Background, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
   IN CHAR16                           *Fmt,
   ...
   );
