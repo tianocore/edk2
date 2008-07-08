@@ -274,7 +274,8 @@ Returns:
   TEMPORARY_RAM_SUPPORT_PPI           *TemporaryRamSupportPpi;
   EFI_HOB_HANDOFF_INFO_TABLE          *OldHandOffTable;
   EFI_HOB_HANDOFF_INFO_TABLE          *NewHandOffTable;
-  INTN                                Offset;
+  INTN                                StackOffset;
+  INTN                                HeapOffset;
   PEI_CORE_INSTANCE                   *PrivateInMem;
   UINT64                              NewPeiStackSize;
   UINT64                              OldPeiStackSize;
@@ -484,7 +485,7 @@ Returns:
               if (Private->StackSize > OldPeiStackSize) {
                 StackGap = Private->StackSize - OldPeiStackSize;
               }
-
+
               //
               // Update HandOffHob for new installed permenent memory
               //
@@ -497,9 +498,13 @@ Returns:
               // CAUTION: The new base is computed accounding to gap of new stack.
               //
               NewPermenentMemoryBase = Private->PhysicalMemoryBegin + StackGap;
-              Offset                 = (UINTN) NewPermenentMemoryBase - (UINTN) SecCoreData->TemporaryRamBase;
-              NewHandOffTable        = (EFI_HOB_HANDOFF_INFO_TABLE *)((UINTN)OldHandOffTable + Offset);
-              PrivateInMem           = (PEI_CORE_INSTANCE *)((UINTN) (VOID*) Private + Offset);
+              StackOffset            = (UINTN) NewPermenentMemoryBase - (UINTN) SecCoreData->StackBase;
+              HeapOffset             = (INTN) ((UINTN) Private->PhysicalMemoryBegin + Private->StackSize - \
+                                               (UINTN) SecCoreData->PeiTemporaryRamBase);
+              DEBUG ((EFI_D_INFO, "Heap Offset = 0x%X Stack Offset = 0x%X\n", HeapOffset, StackOffset));
+              
+              NewHandOffTable        = (EFI_HOB_HANDOFF_INFO_TABLE *)((UINTN)OldHandOffTable + HeapOffset);
+              PrivateInMem           = (PEI_CORE_INSTANCE *)((UINTN) (VOID*) Private + StackOffset);
 
               //
               // TemporaryRamSupportPpi is produced by platform's SEC
@@ -536,7 +541,7 @@ Returns:
               //
               PrivateInMem->PS          = &PrivateInMem->ServiceTableShadow;
               PrivateInMem->CpuIo       = &PrivateInMem->ServiceTableShadow.CpuIo;
-              PrivateInMem->HobList.Raw = (VOID*) ((UINTN) PrivateInMem->HobList.Raw + Offset);
+              PrivateInMem->HobList.Raw = (VOID*) ((UINTN) PrivateInMem->HobList.Raw + HeapOffset);
               PrivateInMem->StackBase   = (EFI_PHYSICAL_ADDRESS)(((UINTN)PrivateInMem->PhysicalMemoryBegin + EFI_PAGE_MASK) & ~EFI_PAGE_MASK);
 
               PeiServices = &PrivateInMem->PS;
@@ -550,7 +555,7 @@ Returns:
               // Update HandOffHob for new installed permenent memory
               //
               NewHandOffTable->EfiEndOfHobList =
-                (EFI_PHYSICAL_ADDRESS)((UINTN) NewHandOffTable->EfiEndOfHobList + Offset);
+                (EFI_PHYSICAL_ADDRESS)((UINTN) NewHandOffTable->EfiEndOfHobList + HeapOffset);
               NewHandOffTable->EfiMemoryTop        = PrivateInMem->PhysicalMemoryBegin +
                                                      PrivateInMem->PhysicalMemoryLength;
               NewHandOffTable->EfiMemoryBottom     = PrivateInMem->PhysicalMemoryBegin;
