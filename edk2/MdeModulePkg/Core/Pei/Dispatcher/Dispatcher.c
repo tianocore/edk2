@@ -485,7 +485,7 @@ Returns:
               if (Private->StackSize > OldPeiStackSize) {
                 StackGap = Private->StackSize - OldPeiStackSize;
               }
-
+
               //
               // Update HandOffHob for new installed permenent memory
               //
@@ -498,7 +498,7 @@ Returns:
               // CAUTION: The new base is computed accounding to gap of new stack.
               //
               NewPermenentMemoryBase = Private->PhysicalMemoryBegin + StackGap;
-              StackOffset            = (UINTN) NewPermenentMemoryBase - (UINTN) SecCoreData->StackBase;
+              StackOffset            = (UINTN) NewPermenentMemoryBase - (UINTN) SecCoreData->StackBase;
               HeapOffset             = (INTN) ((UINTN) Private->PhysicalMemoryBegin + Private->StackSize - \
                                                (UINTN) SecCoreData->PeiTemporaryRamBase);
               DEBUG ((EFI_D_INFO, "Heap Offset = 0x%X Stack Offset = 0x%X\n", HeapOffset, StackOffset));
