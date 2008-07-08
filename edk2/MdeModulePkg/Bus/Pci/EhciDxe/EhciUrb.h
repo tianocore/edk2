@@ -1,5 +1,8 @@
 /** @file
 
+    This file contains URB request, each request is warpped in a
+    URB (Usb Request Block).
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,17 +11,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-    EhciUrb.h
-
-Abstract:
-
-    This file contains URB request, each request is warpped in a
-    URB (Usb Request Block)
-
-Revision History
 
 **/
 
@@ -30,7 +22,7 @@ typedef struct _EHC_QTD  EHC_QTD;
 typedef struct _EHC_QH   EHC_QH;
 typedef struct _URB      URB;
 
-enum {
+typedef enum {
   //
   // Transfer types, used in URB to identify the transfer type
   //
@@ -84,7 +76,7 @@ enum {
   QH_MICROFRAME_7         = 0x80,
 
   USB_ERR_SHORT_PACKET    = 0x200
-};
+}EHCI_URB_FLAG_VALUE;
 
 //
 // Fill in the hardware link point: pass in a EHC_QH/QH_HW
@@ -249,16 +241,16 @@ struct _URB {
 
 
 /**
-  Create a single QTD to hold the data
+  Create a single QTD to hold the data.
 
-  @param  Ehc        The EHCI device
-  @param  Data       Current data not associated with a QTD
-  @param  DataLen    The length of the data
-  @param  PktId      Packet ID to use in the QTD
-  @param  Toggle     Data toggle to use in the QTD
-  @param  MaxPacket  Maximu packet length of the endpoint
+  @param  Ehc        The EHCI device.
+  @param  Data       Current data not associated with a QTD.
+  @param  DataLen    The length of the data.
+  @param  PktId      Packet ID to use in the QTD.
+  @param  Toggle     Data toggle to use in the QTD.
+  @param  MaxPacket  Maximu packet length of the endpoint.
 
-  @return Created QTD or NULL if failed to create one
+  @return Created QTD or NULL if failed to create one.
 
 **/
 EHC_QTD *
@@ -275,12 +267,12 @@ EhcCreateQtd (
 
 
 /**
-  Allocate and initialize a EHCI queue head
+  Allocate and initialize a EHCI queue head.
 
-  @param  Ehci       The EHCI device
-  @param  Ep         The endpoint to create queue head for
+  @param  Ehci       The EHCI device.
+  @param  Ep         The endpoint to create queue head for.
 
-  @return Created queue head or NULL if failed to create one
+  @return Created queue head or NULL if failed to create one.
 
 **/
 EHC_QH *
@@ -294,10 +286,10 @@ EhcCreateQh (
 /**
   Free an allocated URB. It is possible for it to be partially inited.
 
-  @param  Ehc        The EHCI device
-  @param  Urb        The URB to free
+  @param  Ehc        The EHCI device.
+  @param  Urb        The URB to free.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -309,24 +301,24 @@ EhcFreeUrb (
 
 
 /**
-  Create a new URB and its associated QTD
+  Create a new URB and its associated QTD.
 
-  @param  Ehc        The EHCI device
-  @param  DevAddr    The device address
-  @param  EpAddr     Endpoint addrress & its direction
-  @param  DevSpeed   The device speed
-  @param  Toggle     Initial data toggle to use
-  @param  MaxPacket  The max packet length of the endpoint
-  @param  Hub        The transaction translator to use
-  @param  Type       The transaction type
-  @param  Request    The standard USB request for control transfer
-  @param  Data       The user data to transfer
-  @param  DataLen    The length of data buffer
-  @param  Callback   The function to call when data is transferred
-  @param  Context    The context to the callback
-  @param  Interval   The interval for interrupt transfer
+  @param  Ehc        The EHCI device.
+  @param  DevAddr    The device address.
+  @param  EpAddr     Endpoint addrress & its direction.
+  @param  DevSpeed   The device speed.
+  @param  Toggle     Initial data toggle to use.
+  @param  MaxPacket  The max packet length of the endpoint.
+  @param  Hub        The transaction translator to use.
+  @param  Type       The transaction type.
+  @param  Request    The standard USB request for control transfer.
+  @param  Data       The user data to transfer.
+  @param  DataLen    The length of data buffer.
+  @param  Callback   The function to call when data is transferred.
+  @param  Context    The context to the callback.
+  @param  Interval   The interval for interrupt transfer.
 
-  @return Created URB or NULL
+  @return Created URB or NULL.
 
 **/
 URB *

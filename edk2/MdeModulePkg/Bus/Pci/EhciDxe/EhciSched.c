@@ -1,5 +1,7 @@
 /** @file
 
+  EHCI transfer scheduling routines.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,31 +11,20 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    EhciSched.c
-
-Abstract:
-
-    EHCI transfer scheduling routines
-
-Revision History
-
 **/
 
 #include "Ehci.h"
 
 
 /**
-  Create helper QTD/QH for the EHCI device
+  Create helper QTD/QH for the EHCI device.
 
-  @param  Ehc                   The EHCI device
+  @param  Ehc                   The EHCI device.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for helper QTD/QH
-  @retval EFI_SUCCESS           Helper QH/QTD are created
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for helper QTD/QH.
+  @retval EFI_SUCCESS           Helper QH/QTD are created.
 
 **/
-STATIC
 EFI_STATUS
 EhcCreateHelpQ (
   IN USB2_HC_DEV          *Ehc
@@ -102,14 +93,13 @@ EhcCreateHelpQ (
 }
 
 
-
 /**
-  Initialize the schedule data structure such as frame list
+  Initialize the schedule data structure such as frame list.
 
-  @param  Ehc                   The EHCI device to init schedule data for
+  @param  Ehc                   The EHCI device to init schedule data.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to init schedule data
-  @retval EFI_SUCCESS           The schedule data is initialized
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to init schedule data.
+  @retval EFI_SUCCESS           The schedule data is initialized.
 
 **/
 EFI_STATUS
@@ -213,13 +203,12 @@ EhcInitSched (
 }
 
 
-
 /**
   Free the schedule data. It may be partially initialized.
 
-  @param  Ehc                   The EHCI device
+  @param  Ehc                   The EHCI device.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -269,7 +258,6 @@ EhcFreeSched (
 }
 
 
-
 /**
   Link the queue head to the asynchronous schedule list.
   UEFI only supports one CTRL/BULK transfer at a time
@@ -277,10 +265,10 @@ EhcFreeSched (
   management: A reclamation header is always linked to
   the AsyncListAddr, the only active QH is appended to it.
 
-  @param  Ehc                   The EHCI device
-  @param  Qh                    The queue head to link
+  @param  Ehc                   The EHCI device.
+  @param  Qh                    The queue head to link.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -308,12 +296,12 @@ EhcLinkQhToAsync (
 
 /**
   Unlink a queue head from the asynchronous schedule list.
-  Need to synchronize with hardware
+  Need to synchronize with hardware.
 
-  @param  Ehc                   The EHCI device
-  @param  Qh                    The queue head to unlink
+  @param  Ehc                   The EHCI device.
+  @param  Qh                    The queue head to unlink.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -355,10 +343,10 @@ EhcUnlinkQhFromAsync (
   schedule frame list. This code is very much the same as
   that in UHCI.
 
-  @param  Ehc                   The EHCI device
-  @param  Qh                    The queue head to link
+  @param  Ehc                   The EHCI device.
+  @param  Qh                    The queue head to link.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -454,12 +442,12 @@ EhcLinkQhToPeriod (
 
 /**
   Unlink an interrupt queue head from the periodic
-  schedule frame list
+  schedule frame list.
 
-  @param  Ehc                   The EHCI device
-  @param  Qh                    The queue head to unlink
+  @param  Ehc                   The EHCI device.
+  @param  Qh                    The queue head to unlink.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -514,18 +502,16 @@ EhcUnlinkQhFromPeriod (
 }
 
 
-
 /**
   Check the URB's execution result and update the URB's
   result accordingly.
 
-  @param  Ehc                   The EHCI device
-  @param  Urb                   The URB to check result
+  @param  Ehc                   The EHCI device.
+  @param  Urb                   The URB to check result.
 
   @return Whether the result of URB transfer is finialized.
 
 **/
-STATIC
 BOOLEAN
 EhcCheckUrbResult (
   IN  USB2_HC_DEV         *Ehc,
@@ -637,13 +623,13 @@ ON_EXIT:
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
 
-  @param  Ehc                   The EHCI device
-  @param  Urb                   The URB to execute
-  @param  TimeOut               The time to wait before abort, in millisecond.
+  @param  Ehc               The EHCI device.
+  @param  Urb               The URB to execute.
+  @param  TimeOut           The time to wait before abort, in millisecond.
 
-  @return EFI_DEVICE_ERROR : The transfer failed due to transfer error
-  @return EFI_TIMEOUT      : The transfer failed due to time out
-  @return EFI_SUCCESS      : The transfer finished OK
+  @return EFI_DEVICE_ERROR  The transfer failed due to transfer error.
+  @return EFI_TIMEOUT       The transfer failed due to time out.
+  @return EFI_SUCCESS       The transfer finished OK.
 
 **/
 EFI_STATUS
@@ -691,15 +677,15 @@ EhcExecTransfer (
 
 /**
   Delete a single asynchronous interrupt transfer for
-  the device and endpoint
+  the device and endpoint.
 
-  @param  Ehc                   The EHCI device
-  @param  DevAddr               The address of the target device
-  @param  EpNum                 The endpoint of the target
-  @param  DataToggle            Return the next data toggle to use
+  @param  Ehc                   The EHCI device.
+  @param  DevAddr               The address of the target device.
+  @param  EpNum                 The endpoint of the target.
+  @param  DataToggle            Return the next data toggle to use.
 
-  @retval EFI_SUCCESS           An asynchronous transfer is removed
-  @retval EFI_NOT_FOUND         No transfer for the device is found
+  @retval EFI_SUCCESS           An asynchronous transfer is removed.
+  @retval EFI_NOT_FOUND         No transfer for the device is found.
 
 **/
 EFI_STATUS
@@ -715,7 +701,7 @@ EhciDelAsyncIntTransfer (
   URB                     *Urb;
   EFI_USB_DATA_DIRECTION  Direction;
 
-  Direction = ((EpNum & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
+  Direction = (((EpNum & 0x80) != 0) ? EfiUsbDataIn : EfiUsbDataOut);
   EpNum    &= 0x0F;
 
   EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Ehc->AsyncIntTransfers) {
@@ -744,11 +730,11 @@ EhciDelAsyncIntTransfer (
 
 
 /**
-  Remove all the asynchronous interrutp transfers
+  Remove all the asynchronous interrutp transfers.
 
-  @param  Ehc                   The EHCI device
+  @param  Ehc                   The EHCI device.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -771,30 +757,23 @@ EhciDelAllAsyncIntTransfers (
   }
 }
 
-STATIC
+
+/**
+  Flush data from PCI controller specific address to mapped system
+  memory address.
+
+  @param  Ehc                The EHCI device.
+  @param  Urb                The URB to unmap.
+
+  @retval EFI_SUCCESS        Success to flush data to mapped system memory.
+  @retval EFI_DEVICE_ERROR   Fail to flush data to mapped system memory.
+
+**/
 EFI_STATUS
 EhcFlushAsyncIntMap (
   IN  USB2_HC_DEV         *Ehc,
   IN  URB                 *Urb
   )
-/*++
-
-Routine Description:
-
-  Flush data from PCI controller specific address to mapped system
-  memory address.
-
-Arguments:
-
-  Ehc         - The EHCI device
-  Urb         - The URB to unmap
-
-Returns:
-
-  EFI_SUCCESS      - Success to flush data to mapped system memory
-  EFI_DEVICE_ERROR - Fail to flush data to mapped system memory
-
---*/
 {
   EFI_STATUS                    Status;
   EFI_PHYSICAL_ADDRESS          PhyAddr;
@@ -833,16 +812,14 @@ ON_ERROR:
 }
 
 
-
 /**
-  Update the queue head for next round of asynchronous transfer
+  Update the queue head for next round of asynchronous transfer.
 
-  @param  Urb                   The URB to update
+  @param  Urb                   The URB to update.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 EhcUpdateAsyncRequest (
   IN URB                  *Urb
@@ -913,12 +890,12 @@ EhcUpdateAsyncRequest (
 
 
 /**
-  Interrupt transfer periodic check handler
+  Interrupt transfer periodic check handler.
 
-  @param  Event                 Interrupt event
-  @param  Context               Pointer to USB2_HC_DEV
+  @param  Event                 Interrupt event.
+  @param  Context               Pointer to USB2_HC_DEV.
 
-  @return None
+  @return None.
 
 **/
 VOID

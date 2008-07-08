@@ -1,5 +1,7 @@
 /** @file
 
+  This file contains the definination for host controller register operation routines.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,23 +11,13 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  EhciReg.h
-
-Abstract:
-
-  This file contains the definination for host controller register operation routines
-
-Revision History
-
 **/
 
 #ifndef _EFI_EHCI_REG_H_
 #define _EFI_EHCI_REG_H_
 
 
-enum {
+typedef enum {
   //
   // Capability register offset
   //
@@ -94,7 +86,7 @@ enum {
   EHC_PCI_CLASSC          = 0x09,
   EHC_PCI_CLASSC_PI       = 0x20,
   EHC_BAR_INDEX           = 0 /* how many bytes away from USB_BASE to 0x10 */
-};
+}EHCI_REGISTER_OFFSET;
 
 #define EHC_LINK_TERMINATED(Link) (((Link) & 0x01) != 0)
 
@@ -123,38 +115,30 @@ typedef struct {
 } USB_CLASSC;
 #pragma pack()
 
+/**
+  Read EHCI capability register.
 
+  @param  Ehc     The EHCI device.
+  @param  Offset  Capability register address.
+
+  @return The register content.
+
+**/
 UINT32
 EhcReadCapRegister (
   IN  USB2_HC_DEV         *Ehc,
   IN  UINT32              Offset
   )
-/*++
-
-Routine Description:
-
-  Read  EHCI capability register
-
-Arguments:
-
-  Ehc     - The Ehc device
-  Offset  - Capability register address
-
-Returns:
-
-  The register content read
-
---*/
 ;
 
 
 /**
-  Read  Ehc Operation register
+  Read EHCI Operation register.
 
-  @param  Ehc      The EHCI device
-  @param  Offset   The operation register offset
+  @param  Ehc      The EHCI device.
+  @param  Offset   The operation register offset.
 
-  @return The register content read
+  @return The register content.
 
 **/
 UINT32
@@ -166,13 +150,13 @@ EhcReadOpReg (
 
 
 /**
-  Write  the data to the EHCI operation register
+  Write  the data to the EHCI operation register.
 
-  @param  Ehc      The EHCI device
-  @param  Offset   EHCI operation register offset
-  @param  Data     The data to write
+  @param  Ehc      The EHCI device.
+  @param  Offset   EHCI operation register offset.
+  @param  Data     The data to write.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -186,11 +170,11 @@ EhcWriteOpReg (
 
 /**
   Add support for UEFI Over Legacy (UoL) feature, stop
-  the legacy USB SMI support
+  the legacy USB SMI support.
 
   @param  Ehc      The EHCI device.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -205,11 +189,11 @@ EhcClearLegacySupport (
   Set door bell and wait it to be ACKed by host controller.
   This function is used to synchronize with the hardware.
 
-  @param  Ehc      The EHCI device
-  @param  Timeout  The time to wait before abort (in millisecond, ms)
+  @param  Ehc          The EHCI device.
+  @param  Timeout      The time to wait before abort (in millisecond, ms).
 
-  @return EFI_SUCCESS : Synchronized with the hardware
-  @return EFI_TIMEOUT : Time out happened while waiting door bell to set
+  @retval EFI_SUCCESS  Synchronized with the hardware.
+  @retval EFI_TIMEOUT  Time out happened while waiting door bell to set.
 
 **/
 EFI_STATUS
@@ -221,12 +205,11 @@ EhcSetAndWaitDoorBell (
 
 
 /**
-  Clear all the interrutp status bits, these bits
-  are Write-Clean
+  Clear all the interrutp status bits, these bits are Write-Clean.
 
-  @param  Ehc      The EHCI device
+  @param  Ehc      The EHCI device.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -238,12 +221,12 @@ EhcAckAllInterrupt (
 
 
 /**
-  Whether Ehc is halted
+  Whether Ehc is halted.
 
-  @param  Ehc      The EHCI device
+  @param  Ehc     The EHCI device.
 
-  @return TRUE  : The controller is halted
-  @return FALSE : It isn't halted
+  @retval TRUE    The controller is halted.
+  @retval FALSE   It isn't halted.
 
 **/
 BOOLEAN
@@ -254,12 +237,12 @@ EhcIsHalt (
 
 
 /**
-  Whether system error occurred
+  Whether system error occurred.
 
-  @param  Ehc      The EHCI device
+  @param  Ehc      The EHCI device.
 
-  @return TRUE  : System error happened
-  @return FALSE : No system error
+  @retval TRUE     System error happened.
+  @retval FALSE    No system error.
 
 **/
 BOOLEAN
@@ -269,15 +252,14 @@ EhcIsSysError (
 ;
 
 
-
 /**
-  Reset the host controller
+  Reset the host controller.
 
-  @param  Ehc      The EHCI device
-  @param  Timeout  Time to wait before abort (in millisecond, ms)
+  @param  Ehc          The EHCI device.
+  @param  Timeout      Time to wait before abort (in millisecond, ms).
 
-  @return EFI_SUCCESS : The host controller is reset
-  @return Others      : Failed to reset the host
+  @retval EFI_SUCCESS  The host controller is reset.
+  @return Others       Failed to reset the host.
 
 **/
 EFI_STATUS
@@ -288,15 +270,14 @@ EhcResetHC (
 ;
 
 
-
 /**
-  Halt the host controller
+  Halt the host controller.
 
-  @param  Ehc      The EHCI device
-  @param  Timeout  Time to wait before abort
+  @param  Ehc          The EHCI device.
+  @param  Timeout      Time to wait before abort.
 
-  @return EFI_SUCCESS : The EHCI is halt
-  @return EFI_TIMEOUT : Failed to halt the controller before Timeout
+  @return EFI_SUCCESS  The EHCI is halt.
+  @return EFI_TIMEOUT  Failed to halt the controller before Timeout.
 
 **/
 EFI_STATUS
@@ -307,15 +288,14 @@ EhcHaltHC (
 ;
 
 
-
 /**
-  Set the EHCI to run
+  Set the EHCI to run.
 
-  @param  Ehc      The EHCI device
-  @param  Timeout  Time to wait before abort
+  @param  Ehc          The EHCI device.
+  @param  Timeout      Time to wait before abort.
 
-  @return EFI_SUCCESS : The EHCI is running
-  @return Others      : Failed to set the EHCI to run
+  @return EFI_SUCCESS  The EHCI is running.
+  @return Others       Failed to set the EHCI to run.
 
 **/
 EFI_STATUS
@@ -329,17 +309,17 @@ EhcRunHC (
 
 /**
   Initialize the HC hardware.
-  EHCI spec lists the five things to do to initialize the hardware
+  EHCI spec lists the five things to do to initialize the hardware:
   1. Program CTRLDSSEGMENT
   2. Set USBINTR to enable interrupts
   3. Set periodic list base
   4. Set USBCMD, interrupt threshold, frame list size etc
   5. Write 1 to CONFIGFLAG to route all ports to EHCI
 
-  @param  Ehc      The EHCI device
+  @param  Ehc          The EHCI device.
 
-  @return EFI_SUCCESS : The EHCI has come out of halt state
-  @return EFI_TIMEOUT : Time out happened
+  @return EFI_SUCCESS  The EHCI has come out of halt state.
+  @return EFI_TIMEOUT  Time out happened.
 
 **/
 EFI_STATUS

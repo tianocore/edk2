@@ -1,5 +1,7 @@
 /** @file
 
+  This file provides the information dump support for EHCI when in debug mode.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,30 +11,19 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    EhciDebug.c
-
-Abstract:
-  This file provides the information dump support for EHCI when in debug mode.
-
-Revision History
-
 **/
 
 
 #include "Ehci.h"
 
 /**
-  Dump the status byte in QTD/QH to a more friendly
-  format
+  Dump the status byte in QTD/QH to a more friendly format.
 
-  @param  State    The state in the QTD/QH
+  @param  State    The state in the QTD/QH.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 EhcDumpStatus (
   IN UINT32               State
@@ -75,10 +66,10 @@ EhcDumpStatus (
 
 
 /**
-  Dump the fields of a QTD
+  Dump the fields of a QTD.
 
-  @param  Qtd      The QTD to dump
-  @param  Msg      The message to print before the dump
+  @param  Qtd      The QTD to dump.
+  @param  Msg      The message to print before the dump.
 
   @return None
 
@@ -129,11 +120,11 @@ EhcDumpQtd (
 
 
 /**
-  Dump the queue head
+  Dump the queue head.
 
-  @param  Qh       The queue head to dump
-  @param  Msg      The message to print before the dump
-  @param  DumpBuf  Whether to dump the memory buffer of the associated QTD
+  @param  Qh       The queue head to dump.
+  @param  Msg      The message to print before the dump.
+  @param  DumpBuf  Whether to dump the memory buffer of the associated QTD.
 
   @return None
 
@@ -218,12 +209,12 @@ EhcDumpQh (
 
 
 /**
-  Dump the buffer in the form of hex
+  Dump the buffer in the form of hex.
 
-  @param  Buf      The buffer to dump
-  @param  Len      The length of buffer
+  @param  Buf      The buffer to dump.
+  @param  Len      The length of buffer.
 
-  @return None
+  @return None.
 
 **/
 VOID

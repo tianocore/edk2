@@ -1,5 +1,7 @@
 /** @file
 
+  Provides some data struct used by EHCI controller driver.
+
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,15 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-    Ehci.h
-
-Abstract:
-
-
-Revision History
 
 **/
 
@@ -48,7 +41,7 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 #include "EhciSched.h"
 #include "EhciDebug.h"
 
-enum {
+typedef enum {
   EHC_1_MICROSECOND            = 1,
   EHC_1_MILLISECOND            = 1000 * EHC_1_MICROSECOND,
   EHC_1_SECOND                 = 1000 * EHC_1_MILLISECOND,
@@ -69,16 +62,17 @@ enum {
   // and the unit of Async is 100us, means 50ms as interval.
   //
   EHC_SYNC_POLL_INTERVAL       = 20 * EHC_1_MICROSECOND,
-  EHC_ASYNC_POLL_INTERVAL      = 50 * 10000U,
+  EHC_ASYNC_POLL_INTERVAL      = 50 * 10000U
+} EHC_TIMEOUT_EXPERIENCE_VALUE;
+
 
   //
   // EHC raises TPL to TPL_NOTIFY to serialize all its operations
   // to protect shared data structures.
   //
-  EHC_TPL                      = TPL_NOTIFY,
+#define  EHC_TPL                TPL_NOTIFY
 
-  USB2_HC_DEV_SIGNATURE        = EFI_SIGNATURE_32 ('e', 'h', 'c', 'i')
-};
+#define  USB2_HC_DEV_SIGNATURE  EFI_SIGNATURE_32 ('e', 'h', 'c', 'i')
 
 //
 //Iterate through the doule linked list. NOT delete safe

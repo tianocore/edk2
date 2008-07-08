@@ -26,12 +26,12 @@ Revision History
 
 
 /**
-  Dump the fields of a QTD
+  Dump the fields of a QTD.
 
-  @param  Qtd      The QTD to dump
-  @param  Msg      The message to print before the dump
+  @param  Qtd      The QTD to dump.
+  @param  Msg      The message to print before the dump.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -44,13 +44,13 @@ EhcDumpQtd (
 
 
 /**
-  Dump the queue head
+  Dump the queue head.
 
-  @param  Qh       The queue head to dump
-  @param  Msg      The message to print before the dump
-  @param  DumpBuf  Whether to dump the memory buffer of the associated QTD
+  @param  Qh       The queue head to dump.
+  @param  Msg      The message to print before the dump.
+  @param  DumpBuf  Whether to dump the memory buffer of the associated QTD.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -64,12 +64,12 @@ EhcDumpQh (
 
 
 /**
-  Dump the buffer in the form of hex
+  Dump the buffer in the form of hex.
 
-  @param  Buf      The buffer to dump
-  @param  Len      The length of buffer
+  @param  Buf      The buffer to dump.
+  @param  Len      The length of buffer.
 
-  @return None
+  @return None.
 
 **/
 VOID

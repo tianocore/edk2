@@ -1,5 +1,8 @@
 /** @file
 
+    This file contains URB request, each request is warpped in a
+    URB (Usb Request Block).
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,33 +12,22 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    EhciUrb.c
-
-Abstract:
-
-    This file contains URB request, each request is warpped in a
-    URB (Usb Request Block)
-
-Revision History
-
 **/
 
 #include "Ehci.h"
 
 
 /**
-  Create a single QTD to hold the data
+  Create a single QTD to hold the data.
 
-  @param  Ehc                   The EHCI device
-  @param  Data                  Current data not associated with a QTD
-  @param  DataLen               The length of the data
-  @param  PktId                 Packet ID to use in the QTD
-  @param  Toggle                Data toggle to use in the QTD
-  @param  MaxPacket             Maximu packet length of the endpoint
+  @param  Ehc                   The EHCI device.
+  @param  Data                  Current data not associated with a QTD.
+  @param  DataLen               The length of the data.
+  @param  PktId                 Packet ID to use in the QTD.
+  @param  Toggle                Data toggle to use in the QTD.
+  @param  MaxPacket             Maximu packet length of the endpoint.
 
-  @return Created QTD or NULL if failed to create one
+  @return Created QTD or NULL if failed to create one.
 
 **/
 EHC_QTD *
@@ -130,13 +122,12 @@ EhcCreateQtd (
   2. Microframe S-mask
   3. Microframe C-mask
 
-  @param  Ep                    The queue head's related endpoint
-  @param  QhHw                  The queue head to initialize
+  @param  Ep                    The queue head's related endpoint.
+  @param  QhHw                  The queue head to initialize.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 EhcInitIntQh (
   IN USB_ENDPOINT         *Ep,
@@ -173,12 +164,12 @@ EhcInitIntQh (
 
 
 /**
-  Allocate and initialize a EHCI queue head
+  Allocate and initialize a EHCI queue head.
 
-  @param  Ehci                  The EHCI device
-  @param  Ep                    The endpoint to create queue head for
+  @param  Ehci                  The EHCI device.
+  @param  Ep                    The endpoint to create queue head for.
 
-  @return Created queue head or NULL if failed to create one
+  @return Created queue head or NULL if failed to create one.
 
 **/
 EHC_QH *
@@ -258,21 +249,19 @@ EhcCreateQh (
 }
 
 
-
 /**
   Convert the poll interval from application to that
   be used by EHCI interface data structure. Only need
   to get the max 2^n that is less than interval. UEFI
   can't support high speed endpoint with a interval less
   than 8 microframe because interval is specified in
-  the unit of ms (millisecond)
+  the unit of ms (millisecond).
 
-  @param  Interval              The interval to convert
+  @param  Interval              The interval to convert.
 
-  @return The converted interval
+  @return The converted interval.
 
 **/
-STATIC
 UINTN
 EhcConvertPollRate (
   IN  UINTN               Interval
@@ -298,17 +287,15 @@ EhcConvertPollRate (
 }
 
 
-
 /**
-  Free a list of QTDs
+  Free a list of QTDs.
 
-  @param  Ehc                   The EHCI device
-  @param  Qtds                  The list head of the QTD
+  @param  Ehc                   The EHCI device.
+  @param  Qtds                  The list head of the QTD.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 EhcFreeQtds (
   IN USB2_HC_DEV          *Ehc,
@@ -331,10 +318,10 @@ EhcFreeQtds (
 /**
   Free an allocated URB. It is possible for it to be partially inited.
 
-  @param  Ehc                   The EHCI device
-  @param  Urb                   The URB to free
+  @param  Ehc                   The EHCI device.
+  @param  Urb                   The URB to free.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -368,18 +355,16 @@ EhcFreeUrb (
 }
 
 
-
 /**
-  Create a list of QTDs for the URB
+  Create a list of QTDs for the URB.
 
-  @param  Ehc                   The EHCI device
-  @param  Urb                   The URB to create QTDs for
+  @param  Ehc                   The EHCI device.
+  @param  Urb                   The URB to create QTDs for.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for QTD
-  @retval EFI_SUCCESS           The QTDs are allocated for the URB
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for QTD.
+  @retval EFI_SUCCESS           The QTDs are allocated for the URB.
 
 **/
-STATIC
 EFI_STATUS
 EhcCreateQtds (
   IN USB2_HC_DEV          *Ehc,
@@ -530,24 +515,24 @@ ON_ERROR:
 
 
 /**
-  Create a new URB and its associated QTD
+  Create a new URB and its associated QTD.
 
-  @param  Ehc                   The EHCI device
-  @param  DevAddr               The device address
-  @param  EpAddr                Endpoint addrress & its direction
-  @param  DevSpeed              The device speed
-  @param  Toggle                Initial data toggle to use
-  @param  MaxPacket             The max packet length of the endpoint
-  @param  Hub                   The transaction translator to use
-  @param  Type                  The transaction type
-  @param  Request               The standard USB request for control transfer
-  @param  Data                  The user data to transfer
-  @param  DataLen               The length of data buffer
-  @param  Callback              The function to call when data is transferred
-  @param  Context               The context to the callback
-  @param  Interval              The interval for interrupt transfer
+  @param  Ehc                   The EHCI device.
+  @param  DevAddr               The device address.
+  @param  EpAddr                Endpoint addrress & its direction.
+  @param  DevSpeed              The device speed.
+  @param  Toggle                Initial data toggle to use.
+  @param  MaxPacket             The max packet length of the endpoint.
+  @param  Hub                   The transaction translator to use.
+  @param  Type                  The transaction type.
+  @param  Request               The standard USB request for control transfer.
+  @param  Data                  The user data to transfer.
+  @param  DataLen               The length of data buffer.
+  @param  Callback              The function to call when data is transferred.
+  @param  Context               The context to the callback.
+  @param  Interval              The interval for interrupt transfer.
 
-  @return Created URB or NULL
+  @return Created URB or NULL.
 
 **/
 URB *
@@ -589,7 +574,7 @@ EhcCreateUrb (
   Ep              = &Urb->Ep;
   Ep->DevAddr     = DevAddr;
   Ep->EpAddr      = (UINT8) (EpAddr & 0x0F);
-  Ep->Direction   = ((EpAddr & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
+  Ep->Direction   = (((EpAddr & 0x80) != 0) ? EfiUsbDataIn : EfiUsbDataOut);
   Ep->DevSpeed    = DevSpeed;
   Ep->MaxPacket   = MaxPacket;
 
