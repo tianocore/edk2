@@ -1,6 +1,6 @@
 /** @file
-  
-  GUID for the PE/COFF Loader APIs shared between SEC, PEI and DXE
+  This file defines PeCoffLoader guid for PeCoffLoader entry in the HOB list.
+  It also defines PE/COFF Loader APIs in PeCoffLoader Hob entry shared between SEC, PEI and DXE
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -128,7 +128,7 @@ RETURN_STATUS
 typedef 
 RETURN_STATUS
 (EFIAPI *EFI_PEI_PE_COFF_LOADER_UNLOAD_IMAGE) (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
+  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL      *This,
   IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   );
 

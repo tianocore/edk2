@@ -1,6 +1,7 @@
 /** @file
 
-  Capsule update Guid definitions for capsule varialbe and capsule hob.
+  This file defines capsule update guid, capsule variable name and 
+  capsule guid hob data strucutre, which are required by capsule update feature.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -17,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __EFI_CAPSULE_VENDOR_GUID_H__
 
 //
-// Note -- This guid is used as a vendor GUID (depending on implementation)
+// Note -- This guid is used as a variable GUID (depending on implementation)
 // for the capsule variable if the capsule pointer is passes through reset
 // via a variable.
 //

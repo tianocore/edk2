@@ -31,6 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 EFI_STATUS
+EFIAPI
 CreateBannerOpCode (
   IN      EFI_STRING_ID       Title,
   IN      UINT16              LineNumber,
@@ -62,6 +63,7 @@ CreateBannerOpCode (
 
 **/
 EFI_STATUS
+EFIAPI
 IfrLibUpdateForm (
   IN EFI_HII_HANDLE            Handle,
   IN EFI_GUID                  *FormSetGuid, OPTIONAL
@@ -92,6 +94,7 @@ IfrLibUpdateForm (
 
 **/
 EFI_STATUS
+EFIAPI
 IfrLibExtractClassFromHiiHandle (
   IN      EFI_HII_HANDLE      Handle,
   OUT     UINT16              *Class,
@@ -106,7 +109,8 @@ IfrLibExtractClassFromHiiHandle (
 
   @param  Buffer                 the start address of buffer.
   @param  BufferSize             the size of buffer.
-  @param  Number                 the number of the strings.
+  @param  Number                 the number of the ConfigBody strings.
+  @param  ...                    the ConfigBody strings
 
   @retval EFI_BUFFER_TOO_SMALL   the BufferSize is too small to operate.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL or BufferSize is 0.

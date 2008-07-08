@@ -106,8 +106,6 @@
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL SOMETIMES_CONSUMED
   gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiTianoDecompressProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiCustomizedDecompressProtocolGuid          # PROTOCOL ALWAYS_CONSUMED
   gEfiDecompressProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiLoadPeImageProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMED

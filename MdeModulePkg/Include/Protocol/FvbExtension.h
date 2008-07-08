@@ -25,7 +25,7 @@ typedef struct _EFI_FVB_EXTENSION_PROTOCOL EFI_FVB_EXTENSION_PROTOCOL;
 //  FVB Extension Function Prototypes
 //
 /**
-  Erases and initializes a specified range of a firmware volume
+  Erases and initializes a specified range of a firmware volume block
 
   @param[in]     This           Pointer to the FVB Extension protocol instance
   @param[in]     StartLba       The starting logical block index to be erased
@@ -34,19 +34,20 @@ typedef struct _EFI_FVB_EXTENSION_PROTOCOL EFI_FVB_EXTENSION_PROTOCOL;
   @param[in]     LastLba        The last logical block index to be erased
   @param[in]     OffsetLastLba  Offset into the last block at which to end erasing     
 
-  @retval   EFI_EFI_SUCCESS        Range was erased 
-  @retval   EFI_INVALID_PARAMETER  invalid parameter
-  @retval   EFI_UNSUPPORTED        Range can not be erased
-
+  @retval EFI_SUCCESS           The specified range was erased successfully
+  @retval EFI_ACCESS_DENIED     The firmware volume block is in the WriteDisabled state
+  @retval EFI_DEVICE_ERROR      The block device is not functioning correctly and 
+                                could not be written. Firmware device may have been
+                                partially erased
 **/
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FV_ERASE_CUSTOM_BLOCK) (
   IN EFI_FVB_EXTENSION_PROTOCOL   *This,
-  IN EFI_LBA                              StartLba,
-  IN UINTN                                OffsetStartLba,
-  IN EFI_LBA                              LastLba,
-  IN UINTN                                OffsetLastLba
+  IN EFI_LBA                      StartLba,
+  IN UINTN                        OffsetStartLba,
+  IN EFI_LBA                      LastLba,
+  IN UINTN                        OffsetLastLba
 );
 
 //

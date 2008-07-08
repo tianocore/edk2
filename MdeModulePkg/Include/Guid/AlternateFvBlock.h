@@ -1,6 +1,7 @@
 /** @file
 
-  Tiano Guid used to define the Alternate Firmware Volume Block Guid.
+  This file defines the Alternate Firmware Volume Block Guid, which is 
+  used to specify that the additional FVB protocol is installed into FVB handle.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

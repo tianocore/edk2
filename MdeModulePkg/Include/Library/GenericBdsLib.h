@@ -1,5 +1,5 @@
 /** @file
-  Generic BDS library definition, include the file and data structure
+  Generic BDS library definition, include the data structure and function.
 
 Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -25,7 +25,7 @@ extern EFI_HANDLE mBdsImageHandle;
 //
 // Constants which are variable names used to access variables
 //
-#define VarLegacyDevOrder L"LegacyDevOrder"
+#define VAR_LEGACY_DEV_ORDER L"LegacyDevOrder"
 
 //
 // Data structures and defines
@@ -105,10 +105,10 @@ typedef struct {
 //
 
 //
-// Bds boot relate lib functions
+// Bds boot related lib functions
 //
 /**
-  Boot from the EFI1.1 spec defined "BootNext" variable
+  Boot from the UEFI spec defined "BootNext" variable.
 
 **/
 VOID
@@ -118,17 +118,17 @@ BdsLibBootNext (
   );
 
 /**
-  Process the boot option follow the EFI 1.1 specification and
+  Process the boot option follow the UEFI specification and
   special treat the legacy boot option with BBS_DEVICE_PATH.
 
   @param  Option                 The boot option need to be processed
   @param  DevicePath             The device path which describe where to load the
                                  boot image or the legcy BBS device path to boot
                                  the legacy OS
-  @param  ExitDataSize           Returned directly from gBS->StartImage ()
-  @param  ExitData               Returned directly from gBS->StartImage ()
+  @param  ExitDataSize           The size of exit data.
+  @param  ExitData               Data returned when Boot image failed.
 
-  @retval EFI_SUCCESS            Status from gBS->StartImage ()
+  @retval EFI_SUCCESS            Boot from the input boot option successfully.
   @retval EFI_NOT_FOUND          If the Device Path is not found in the system
 
 **/
@@ -166,8 +166,7 @@ BdsLibEnumerateAllBootOption (
                                  boot option
   @param  BdsBootOptionList      The header of the link list which indexed all
                                  current boot options
-
-  @return VOID
+  @param  String                 The description of the boot option.
 
 **/
 VOID
@@ -180,14 +179,12 @@ BdsLibBuildOptionFromHandle (
 
 
 /**
-  Build the on flash shell boot option with the handle parsed in
+  Build the on flash shell boot option with the handle parsed in.
 
   @param  Handle                 The handle which present the device path to create
                                  on flash shell boot option
   @param  BdsBootOptionList      The header of the link list which indexed all
                                  current boot options
-
-  @return None
 
 **/
 VOID
@@ -270,8 +267,8 @@ BdsLibBuildOptionFromVar (
   @param  VendorGuid            GUID part of EFI variable name
   @param  VariableSize          Returns the size of the EFI variable that was read
 
-  @return Dynamically allocated memory that contains a copy of the EFI variable.
-  @return Caller is responsible freeing the buffer.
+  @return                       Dynamically allocated memory that contains a copy of the EFI variable
+                                Caller is responsible freeing the buffer.
   @retval NULL                  Variable was not read
 
 **/
@@ -304,7 +301,7 @@ BdsLibOutputStrings (
 
 /**
   Build the boot#### or driver#### option from the VariableName, the
-  build boot#### or driver#### will also be linked to BdsCommonOptionList
+  build boot#### or driver#### will also be linked to BdsCommonOptionList.
 
   @param  BdsCommonOptionList   The header of the boot#### or driver#### option
                                 link list
@@ -430,7 +427,7 @@ BdsLibDisconnectAllEfi (
   );
 
 //
-// Bds console relate lib functions
+// Bds console related lib functions
 //
 /**
   This function will search every simpletxt devive in current system,
@@ -450,8 +447,7 @@ BdsLibConnectAllConsoles (
 
   @retval EFI_SUCCESS              At least one of the ConIn and ConOut device have
                                    been connected success.
-  @retval EFI_STATUS               Return the status of
-                                   BdsLibConnectConsoleVariable ().
+  @retval EFI_STATUS               Return the status of BdsLibConnectConsoleVariable ().
 
 **/
 EFI_STATUS
@@ -473,7 +469,7 @@ BdsLibConnectAllDefaultConsoles (
                                    from the console variable ConVarName, this
                                    parameter can not be multi-instance.
 
-  @retval EFI_UNSUPPORTED          Add or remove the same device path.
+  @retval EFI_UNSUPPORTED          The added device path is same to the removed one.
   @retval EFI_SUCCESS              Success add or remove the device path from  the
                                    console variable.
 
@@ -508,7 +504,7 @@ BdsLibConnectConsoleVariable (
   );
 
 //
-// Bds device path relate lib functions
+// Bds device path related lib functions
 //
 /**
   Function unpacks a device path data structure so that all the nodes
@@ -555,8 +551,8 @@ BdsLibDelPartMatchInstance (
   @param  Single                A pointer to a single-instance device path data
                                 structure.
 
-  @retval TRUE                  If the Single is contained within Multi
-  @retval FALSE                 The Single is not match within Multi
+  @retval TRUE                  If the Single device path is contained within Multi device path.
+  @retval FALSE                 The Single device path is not match within Multi device path.
 
 **/
 BOOLEAN
@@ -622,11 +618,19 @@ typedef struct {
 //
 #if defined (MDE_CPU_IPF)
 #define EFI64_SHADOW_ALL_LEGACY_ROM() ShadowAllOptionRom ();
-VOID
-ShadowAllOptionRom();
 #else
 #define EFI64_SHADOW_ALL_LEGACY_ROM()
 #endif
+
+/**
+  Shadow all Legacy OptionRom. 
+
+**/
+VOID
+EFIAPI
+ShadowAllOptionRom (
+  VOID
+  );
 
 //
 // BBS support macros and functions
@@ -641,27 +645,76 @@ ShadowAllOptionRom();
 #define REFRESH_LEGACY_BOOT_OPTIONS
 #endif
 
+/**
+  Delete all the invalid legacy boot options.
+
+  @retval EFI_SUCCESS             All invalide legacy boot options are deleted.
+  @retval EFI_OUT_OF_RESOURCES    Fail to allocate necessary memory.
+  @retval EFI_NOT_FOUND           Fail to retrive variable of boot order.
+
+**/
 EFI_STATUS
+EFIAPI
 BdsDeleteAllInvalidLegacyBootOptions (
   VOID
   );
 
+/**
+
+  Add the legacy boot options from BBS table if they do not exist.
+
+  @retval EFI_SUCCESS       The boot options are added successfully 
+                            or they are already in boot options.
+
+**/
 EFI_STATUS
+EFIAPI
 BdsAddNonExistingLegacyBootOptions (
   VOID
   );
 
+/**
+
+  Add the legacy boot devices from BBS table into 
+  the legacy device boot order.
+
+  @retval EFI_SUCCESS       The boot devices are added successfully.
+
+**/
 EFI_STATUS
+EFIAPI
 BdsUpdateLegacyDevOrder (
   VOID
   );
 
+/**
+
+  Set the boot priority for BBS entries based on boot option entry and boot order.
+
+  @param  Entry             The boot option is to be checked for refresh BBS table.
+  
+  @retval EFI_SUCCESS       The boot priority for BBS entries is refreshed successfully.
+
+**/
 EFI_STATUS
+EFIAPI
 BdsRefreshBbsTableForBoot (
   IN BDS_COMMON_OPTION        *Entry
   );
 
+/**
+
+  Delete boot option specified by OptionNumber and adjust the boot order.
+
+  @param  OptionNumber      The boot option to be deleted.
+  @param  BootOrder         Boot order list to be adjusted by remove this boot option.
+  @param  BootOrderSize     The size of Boot order list will be modified.
+  
+  @retval EFI_SUCCESS       The boot option is deleted successfully.
+
+**/
 EFI_STATUS
+EFIAPI
 BdsDeleteBootOption (
   IN UINTN                       OptionNumber,
   IN OUT UINT16                  *BootOrder,
@@ -755,8 +808,7 @@ SetupResetReminder (
   @param  Device                SimpleFileSystem device handle
   @param  FileName              File name for the image
   @param  DosHeader             Pointer to dos header
-  @param  ImageHeader           Pointer to image header
-  @param  OptionalHeader        Pointer to optional header
+  @param  Hdr                   The buffer in which to return the PE32, PE32+, or TE header.
 
   @retval EFI_SUCCESS           Successfully get the machine type.
   @retval EFI_NOT_FOUND         The file is not found.
@@ -818,8 +870,8 @@ BdsLibGetImageHeader (
   @param  HardDriveDevicePath    A device path which starts with a hard drive media
                                  device path.
 
-  @retval TRUE                   There is a matched device path instance FALSE
-                                 -There is no matched device path instance
+  @retval TRUE                   There is a matched device path instance.
+  @retval FALSE                  There is no matched device path instance.
 
 **/
 BOOLEAN
@@ -858,7 +910,6 @@ BdsExpandPartitionPartialDevicePathToFull (
 
   @param  DevicePath             Device Path to a  bootable device
 
-  @retval NULL                   The device path points to an EFI bootable Media
   @retval NULL                   The media on the DevicePath is not bootable
 
 **/
@@ -873,11 +924,11 @@ BdsLibGetBootableHandle (
   Check whether the Device path in a boot option point to a valide bootable device,
   And if CheckMedia is true, check the device is ready to boot now.
 
-  DevPath -- the Device path in a boot option
-  CheckMedia -- if true, check the device is ready to boot now.
+  @param  DevPath     the Device path in a boot option
+  @param  CheckMedia  if true, check the device is ready to boot now.
 
-  @return TRUE      -- the Device path  is valide
-  @return FALSE   -- the Device path  is invalide .
+  @retval TRUE        the Device path  is valide
+  @retval FALSE       the Device path  is invalide .
 
 **/
 BOOLEAN
@@ -888,7 +939,7 @@ BdsLibIsValidEFIBootOptDevicePath (
   );
   
 /**
-  For a bootable Device path, return its boot type
+  For a bootable Device path, return its boot type.
 
   @param  DevicePath                      The bootable device Path to check
 
@@ -919,8 +970,8 @@ BdsGetBootTypeFromDevicePath (
 
 
 /**
-  This routine register a function to adjust the different type memory page number just before booting
-  and save the updated info into the variable for next boot to use
+  This routine register a function to adjust the different type memory page number
+  just before booting and save the updated info into the variable for next boot to use.
 
 **/
 VOID
@@ -965,12 +1016,13 @@ BdsLibUpdateFvFileDevicePath (
   @param  HostControllerPI      Uhci (0x00) or Ehci (0x20) or Both uhci and ehci
                                 (0xFF)
   @param  RemainingDevicePath   a short-form device path that starts with the first
-                                element  being a USB WWID or a USB Class device
+                                element being a USB WWID or a USB Class device
                                 path
 
-  @return EFI_INVALID_PARAMETER
-  @return EFI_SUCCESS
-  @return EFI_NOT_FOUND
+  @retval EFI_SUCCESS           The specific Usb device is connected successfully.
+  @retval EFI_INVALID_PARAMETER Invalid HostControllerPi (not 0x00, 0x20 or 0xFF) 
+                                or RemainingDevicePath is not the USB class device path.
+  @retval EFI_NOT_FOUND         The device specified by device path is not found.
 
 **/
 EFI_STATUS
@@ -985,12 +1037,10 @@ BdsLibConnectUsbDevByShortFormDP(
 // The implementation of this function is provided by Platform code.
 //
 /**
-  Convert Vendor device path to device name
+  Convert Vendor device path to device name.
 
   @param  Str      The buffer store device name
   @param  DevPath  Pointer to vendor device path
-
-  @return When it return, the device name have been stored in *Str.
 
 **/
 VOID
@@ -1005,13 +1055,13 @@ DevPathVendor (
   Concatenates a formatted unicode string to allocated pool.
   The caller must free the resulting buffer.
 
-  @param  Str      Tracks the allocated pool, size in use, and  amount of pool
-                   allocated.
+  @param  Str      Tracks the allocated pool, size in use, and amount of pool allocated.
   @param  fmt      The format string
+  @param  ...      The data will be printed.
 
   @return Allocated buffer with the formatted string printed in it.
-  @return The caller must free the allocated buffer.   The buffer
-  @return allocation is not packed.
+          The caller must free the allocated buffer.
+          The buffer allocation is not packed.
 
 **/
 CHAR16 *

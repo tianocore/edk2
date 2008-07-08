@@ -1,6 +1,7 @@
 /** @file
 
-  This file defines the Print protocol.
+  This print protocol defines six basic print functions to 
+  print the format unicode and ascii string.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

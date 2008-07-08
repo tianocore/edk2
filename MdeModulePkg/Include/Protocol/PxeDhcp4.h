@@ -1,6 +1,7 @@
-/*++
+/** @file
+  EFI PXE DHCPv4 protocol definition
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,13 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-  PxeDhcp4.h
-
-Abstract:
-  EFI PXE DHCPv4 protocol definition
-
---*/
+**/
 
 #ifndef _PXEDHCP4_H_
 #define _PXEDHCP4_H_
@@ -168,23 +163,23 @@ typedef union _DHCP4_PACKET {
 #define DHCP4_NIS_SERVERS                     41
 #define DHCP4_NTP_SERVERS                     42
 #define DHCP4_VENDOR_SPECIFIC                 43
-# define PXE_MTFTP_IP                         1
-# define PXE_MTFTP_CPORT                      2
-# define PXE_MTFTP_SPORT                      3
-# define PXE_MTFTP_TMOUT                      4
-# define PXE_MTFTP_DELAY                      5
-# define PXE_DISCOVERY_CONTROL                6
-#  define PXE_DISABLE_BROADCAST_DISCOVERY     0x01
-#  define PXE_DISABLE_MULTICAST_DISCOVERY     0x02
-#  define PXE_ACCEPT_ONLY_PXE_BOOT_SERVERS    0x04
-#  define PXE_DO_NOT_PROMPT                   0x08
-# define PXE_DISCOVERY_MCAST_ADDR             7
-# define PXE_BOOT_SERVERS                     8
-# define PXE_BOOT_MENU                        9
-# define PXE_BOOT_PROMPT                      10
-# define PXE_MCAST_ADDRS_ALLOC                11
-# define PXE_CREDENTIAL_TYPES                 12
-# define PXE_BOOT_ITEM                        71
+#define PXE_MTFTP_IP                          1
+#define PXE_MTFTP_CPORT                       2
+#define PXE_MTFTP_SPORT                       3
+#define PXE_MTFTP_TMOUT                       4
+#define PXE_MTFTP_DELAY                       5
+#define PXE_DISCOVERY_CONTROL                 6
+#define PXE_DISABLE_BROADCAST_DISCOVERY       0x01
+#define PXE_DISABLE_MULTICAST_DISCOVERY       0x02
+#define PXE_ACCEPT_ONLY_PXE_BOOT_SERVERS      0x04
+#define PXE_DO_NOT_PROMPT                     0x08
+#define PXE_DISCOVERY_MCAST_ADDR              7
+#define PXE_BOOT_SERVERS                      8
+#define PXE_BOOT_MENU                         9
+#define PXE_BOOT_PROMPT                       10
+#define PXE_MCAST_ADDRS_ALLOC                 11
+#define PXE_CREDENTIAL_TYPES                  12
+#define PXE_BOOT_ITEM                         71
 #define DHCP4_NBNS_SERVERS                    44
 #define DHCP4_NBDD_SERVERS                    45
 #define DHCP4_NETBIOS_NODE_TYPE               46
@@ -194,23 +189,23 @@ typedef union _DHCP4_PACKET {
 #define DHCP4_REQUESTED_IP_ADDRESS            50
 #define DHCP4_LEASE_TIME                      51
 #define DHCP4_OPTION_OVERLOAD                 52
-# define DHCP4_OVERLOAD_FNAME                 1
-# define DHCP4_OVERLOAD_SNAME                 2
-# define DHCP4_OVERLOAD_FNAME_AND_SNAME       3
+#define DHCP4_OVERLOAD_FNAME                  1
+#define DHCP4_OVERLOAD_SNAME                  2
+#define DHCP4_OVERLOAD_FNAME_AND_SNAME        3
 #define DHCP4_MESSAGE_TYPE                    53
-# define DHCP4_MESSAGE_TYPE_DISCOVER          1
-# define DHCP4_MESSAGE_TYPE_OFFER             2
-# define DHCP4_MESSAGE_TYPE_REQUEST           3
-# define DHCP4_MESSAGE_TYPE_DECLINE           4
-# define DHCP4_MESSAGE_TYPE_ACK               5
-# define DHCP4_MESSAGE_TYPE_NAK               6
-# define DHCP4_MESSAGE_TYPE_RELEASE           7
-# define DHCP4_MESSAGE_TYPE_INFORM            8
+#define DHCP4_MESSAGE_TYPE_DISCOVER           1
+#define DHCP4_MESSAGE_TYPE_OFFER              2
+#define DHCP4_MESSAGE_TYPE_REQUEST            3
+#define DHCP4_MESSAGE_TYPE_DECLINE            4
+#define DHCP4_MESSAGE_TYPE_ACK                5
+#define DHCP4_MESSAGE_TYPE_NAK                6
+#define DHCP4_MESSAGE_TYPE_RELEASE            7
+#define DHCP4_MESSAGE_TYPE_INFORM             8
 #define DHCP4_SERVER_IDENTIFIER               54
 #define DHCP4_PARAMETER_REQUEST_LIST          55
 #define DHCP4_ERROR_MESSAGE                   56
 #define DHCP4_MAX_MESSAGE_SIZE                57
-# define DHCP4_DEFAULT_MAX_MESSAGE_SIZE       576
+#define DHCP4_DEFAULT_MAX_MESSAGE_SIZE        576
 #define DHCP4_RENEWAL_TIME                    58
 #define DHCP4_REBINDING_TIME                  59
 #define DHCP4_CLASS_IDENTIFIER                60

@@ -45,7 +45,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/DxeServices.h>
 #include <Guid/MemoryAllocationHob.h>
 #include <Protocol/StatusCode.h>
-#include <Protocol/CustomizedDecompress.h>
 #include <Protocol/Decompress.h>
 #include <Protocol/LoadPe32Image.h>
 #include <Protocol/FirmwareVolumeDispatch.h>
@@ -53,7 +52,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Ebc.h>
 #include <Guid/EventLegacyBios.h>
 #include <Protocol/Reset.h>
-#include <Protocol/EdkDecompress.h>
 #include <Protocol/Cpu.h>
 #include <Guid/EventGroup.h>
 #include <Protocol/Metronome.h>

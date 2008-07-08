@@ -25,11 +25,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _UDP_IO_PORT UDP_IO_PORT;
 
-enum {
+typedef enum {
   UDP_IO_RX_SIGNATURE = EFI_SIGNATURE_32 ('U', 'D', 'P', 'R'),
   UDP_IO_TX_SIGNATURE = EFI_SIGNATURE_32 ('U', 'D', 'P', 'T'),
   UDP_IO_SIGNATURE    = EFI_SIGNATURE_32 ('U', 'D', 'P', 'I')
-};
+} UDP_IO_SIGNATURE_TYPE;
 
 typedef struct {
   IP4_ADDR                  LocalAddr;
@@ -130,7 +130,7 @@ BOOLEAN
 
   @param  Controller            The controller that has the UDP service binding
                                 protocol installed.
-  @param  Image                 The image handle for the driver.
+  @param  ImageHandle           The image handle for the driver.
   @param  Configure             The function to configure the created UDP child
   @param  Context               The opaque parameter for the Configure funtion.
 
@@ -205,12 +205,12 @@ UdpIoSendDatagram (
   );
 
 /**
-  The selection function to cancel a single sent datagram.
+  Cancel a single sent datagram.
 
-  @param  Token                 The UDP TX token to test againist.
-  @param  Context               The context
+  @param  UdpIo                 The UDP IO port to cancel the packet from
+  @param  Packet                The packet to cancel
 
-  @return TRUE if the packet is to be cancelled, otherwise FALSE.
+  @return None
 
 **/
 VOID

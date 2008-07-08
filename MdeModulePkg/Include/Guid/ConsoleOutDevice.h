@@ -1,6 +1,9 @@
-/*++
+/** @file
+  This guid is used to specifiy the device is the console out device.
+  If the device is the console out device, this guid as the protocol guid
+  will be installed into this device handle.
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,14 +12,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  ConsoleOutDevice.h
-
-Abstract:
-
-
---*/
+**/
 
 #ifndef __CONSOLE_OUT_DEVICE_H__
 #define __CONSOLE_OUT_DEVICE_H__

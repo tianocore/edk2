@@ -1236,7 +1236,7 @@ UpdateSetLegacyDeviceOrderPage (
   // Get Device Order from variable
   //
   VarData = BdsLibGetVariableAndSize (
-              VarLegacyDevOrder,
+              VAR_LEGACY_DEV_ORDER,
               &EfiLegacyDevOrderGuid,
               &VarSize
               );

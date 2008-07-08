@@ -1,5 +1,6 @@
 /** @file
-  EFI OEM Badging Protocol definition header file
+  EFI OEM Badging Protocol defines the interface to get the OEM badging 
+  image with the dispaly attribute. This protocol can be produced based on OEM images.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -45,7 +46,23 @@ typedef enum {
   EfiBadgingDisplayAttributeCustomized
 } EFI_BADGING_DISPLAY_ATTRIBUTE;
 
+/**
 
+  Load an OEM image and return its data as well as attributes.
+
+  @param This              Pointer to this protocol instance.
+  @param Instance          The visiable image instance is founded and returned from the input instance.
+  @param Format            Format of the image such as BMP,JPEG,etc.
+  @param ImageData         Image data returned.
+  @param ImageSize         Size of the image returned.
+  @param Attribute         Display attributes of the image returned.
+  @param CoordinateX       X coordinate of the image.
+  @param CoordinateY       Y coordinate of the image.
+
+  @retval EFI_SUCCESS      Image has been fetched successfully.
+  @retval EFI_NOT_FOUND    The specified image could not be found.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_BADGING_GET_IMAGE) (

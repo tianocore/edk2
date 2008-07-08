@@ -1017,7 +1017,7 @@ BdsCreateDevOrder (
   }
 
   Status = gRT->SetVariable (
-                  VarLegacyDevOrder,
+                  VAR_LEGACY_DEV_ORDER,
                   &EfiLegacyDevOrderGuid,
                   VAR_FLAG,
                   TotalSize,
@@ -1107,7 +1107,7 @@ BdsUpdateLegacyDevOrder (
                 );
 
   DevOrder = (UINT8 *) BdsLibGetVariableAndSize (
-                        VarLegacyDevOrder,
+                        VAR_LEGACY_DEV_ORDER,
                         &EfiLegacyDevOrderGuid,
                         &DevOrderSize
                         );
@@ -1456,7 +1456,7 @@ BdsUpdateLegacyDevOrder (
   SafeFreePool (DevOrder);
 
   Status = gRT->SetVariable (
-                  VarLegacyDevOrder,
+                  VAR_LEGACY_DEV_ORDER,
                   &EfiLegacyDevOrderGuid,
                   VAR_FLAG,
                   TotalSize,
@@ -1493,7 +1493,7 @@ BdsSetBootPriority4SameTypeDev (
   UINTN   Index;
 
   DevOrder = BdsLibGetVariableAndSize (
-              VarLegacyDevOrder,
+              VAR_LEGACY_DEV_ORDER,
               &EfiLegacyDevOrderGuid,
               &DevOrderSize
               );

@@ -1,6 +1,7 @@
-/*++
+/** @file
+  This file defines NicIp4Config Protocol.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,13 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  NicIp4Config.h
-
-Abstract:
-
---*/
+**/
 
 #ifndef __NIC_IP4_CONFIG_H__
 #define __NIC_IP4_CONFIG_H__
@@ -38,7 +33,7 @@ Abstract:
 
 typedef struct _EFI_NIC_IP4_CONFIG_PROTOCOL EFI_NIC_IP4_CONFIG_PROTOCOL;
 
-enum {
+typedef enum {
   //
   // Config source: dhcp or static
   //
@@ -48,7 +43,7 @@ enum {
 
   IP4_NIC_NAME_LENGTH        = 64,
   MAX_IP4_CONFIG_IN_VARIABLE = 16
-};
+} IP4_CONFIG_TYPE;
 
 //
 // The following structures are used by drivers/applications other

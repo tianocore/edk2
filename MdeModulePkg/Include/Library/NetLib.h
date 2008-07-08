@@ -28,7 +28,7 @@ typedef UINT32          IP4_ADDR;
 typedef UINT32          TCP_SEQNO;
 typedef UINT16          TCP_PORTNO;
 
-enum {
+typedef enum {
   NET_ETHER_ADDR_LEN    = 6,
   NET_IFTYPE_ETHERNET   = 0x01,
 
@@ -46,7 +46,7 @@ enum {
   IP4_ADDR_CLASSE,
 
   IP4_MASK_NUM          = 33
-};
+} IP4_CLASS_TYPE;
 
 #pragma pack(1)
 
@@ -340,7 +340,7 @@ NetListRemoveTail (
   );
 
 /**
-  Insert the NewEntry after the PrevEntry
+  Insert the NewEntry after the PrevEntry.
 
   @param  PrevEntry             The previous entry to insert after
   @param  NewEntry              The new entry to insert
@@ -356,7 +356,7 @@ NetListInsertAfter (
   );
 
 /**
-  Insert the NewEntry before the PostEntry
+  Insert the NewEntry before the PostEntry.
 
   @param  PostEntry             The entry to insert before
   @param  NewEntry              The new entry to insert
@@ -519,7 +519,7 @@ NetMapRemoveItem (
   );
 
 /**
-  Remove the first entry on the netmap
+  Remove the first entry on the netmap.
 
   @param  Map                   The netmap to remove the head from
   @param  Value                 The variable to receive the value if not NULL
@@ -535,7 +535,7 @@ NetMapRemoveHead (
   );
 
 /**
-  Remove the last entry on the netmap
+  Remove the last entry on the netmap.
 
   @param  Map                   The netmap to remove the tail from
   @param  Value                 The variable to receive the value if not NULL
@@ -586,8 +586,8 @@ NetMapIterate (
 /**
   Create a child of the service that is identified by ServiceBindingGuid.
 
-  @param  Controller            The controller which has the service installed.
-  @param  Image                 The image handle used to open service.
+  @param  ControllerHandle      The controller which has the service installed.
+  @param  ImageHandle           The image handle used to open service.
   @param  ServiceBindingGuid    The service's Guid.
   @param  ChildHandle           The handle to receive the create child
 
@@ -607,8 +607,8 @@ NetLibCreateServiceChild (
 /**
   Destory a child of the service that is identified by ServiceBindingGuid.
 
-  @param  Controller            The controller which has the service installed.
-  @param  Image                 The image handle used to open service.
+  @param  ControllerHandle      The controller which has the service installed.
+  @param  ImageHandle           The image handle used to open service.
   @param  ServiceBindingGuid    The service's Guid.
   @param  ChildHandle           The child to destory
 
@@ -702,10 +702,10 @@ NetLibGetNicHandle (
 /**
   Add a Deferred Procedure Call to the end of the DPC queue.
 
-  @DpcTpl           The EFI_TPL that the DPC should be invoked.
-  @DpcProcedure     Pointer to the DPC's function.
-  @DpcContext       Pointer to the DPC's context.  Passed to DpcProcedure
-                    when DpcProcedure is invoked.
+  @param DpcTpl           The EFI_TPL that the DPC should be invoked.
+  @param DpcProcedure     Pointer to the DPC's function.
+  @param DpcContext       Pointer to the DPC's context.  Passed to DpcProcedure
+                          when DpcProcedure is invoked.
 
   @retval  EFI_SUCCESS              The DPC was queued.
   @retval  EFI_INVALID_PARAMETER    DpcTpl is not a valid EFI_TPL.
@@ -736,15 +736,12 @@ NetLibDispatchDpc (
   );
 
 /**
-  The constructor function caches the pointer to DPC protocol.
+  This is the default unload handle for all the network drivers.
 
-  The constructor function locates DPC protocol from protocol database.
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
+  @param  ImageHandle           The drivers' driver image.
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+  @retval EFI_SUCCESS           The image is unloaded.
+  @retval Others                Failed to unload the image.
 
 **/
 EFI_STATUS
@@ -753,7 +750,7 @@ NetLibDefaultUnload (
   IN EFI_HANDLE             ImageHandle
   );
 
-enum {
+typedef enum {
   //
   //Various signatures
   //
@@ -766,7 +763,7 @@ enum {
   NET_BUF_HEAD         = 1,    // Trim or allocate space from head
   NET_BUF_TAIL         = 0,    // Trim or allocate space from tail
   NET_VECTOR_OWN_FIRST = 0x01  // We allocated the 1st block in the vector
-};
+} NET_SIGNATURE_TYPE;
 
 #define NET_CHECK_SIGNATURE(PData, SIGNATURE) \
   ASSERT (((PData) != NULL) && ((PData)->Signature == (SIGNATURE)))
@@ -1270,14 +1267,13 @@ NetbufQueCopy (
   );
 
 /**
-  Copy some data from the buffer queue to the destination.
+  Trim some data from the queue header, release the buffer if
+  whole buffer is trimmed.
 
   @param  NbufQue               Pointer to the net buffer queue.
-  @param  Offset                The sequence number of the first byte to copy.
-  @param  Len                   Length of the data to copy.
-  @param  Dest                  The destination of the data to copy to.
+  @param  Len                   Length of the data to trim.
 
-  @retval UINTN                 The length of the copied data.
+  @retval UINTN                 The length of the data trimmed.
 
 **/
 UINT32

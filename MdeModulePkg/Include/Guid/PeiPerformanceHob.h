@@ -1,5 +1,6 @@
 /** @file
-  GUIDs used for PEI Performance HOB data structures
+  This file defines performance guid for the performance entry in the HOB list, 
+  and define the PEI Performance HOB data structures.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
