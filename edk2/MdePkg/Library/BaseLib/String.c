@@ -193,7 +193,7 @@ StrLen (
 
   @param  String  Pointer to a Null-terminated Unicode string.
 
-  @return The size of String.
+  @return The size in bytes of String.
 
 **/
 UINTN
@@ -291,7 +291,7 @@ StrnCmp (
   IN      UINTN                     Length
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return 0;
   }
 
@@ -469,7 +469,7 @@ StrStr (
       SearchStringTmp++;
     } 
     
-    if (*SearchStringTmp == '\0') {
+    if ('\0' == *SearchStringTmp) {
       return (CHAR16 *) FirstMatch;
     }
 
@@ -641,14 +641,14 @@ StrDecimalToUintn (
   //
   // Ignore the pad spaces (space or tab)
   //
-  while ((*String == L' ') || (*String == L'\t')) {
+  while ((L' ' ==*String) || (L'\t' == *String)) {
     String++;
   }
 
   //
   // Ignore leading Zeros after the spaces
   //
-  while (*String == L'0') {
+  while (L'0' == *String) {
     String++;
   }
 
@@ -660,7 +660,7 @@ StrDecimalToUintn (
     // to the range defined by UINTN, then ASSERT().
     //
     ASSERT ((Result < QUIENT_MAX_UINTN_DIVIDED_BY_10) ||
-      ((Result == QUIENT_MAX_UINTN_DIVIDED_BY_10) &&
+      ((QUIENT_MAX_UINTN_DIVIDED_BY_10 == Result) &&
       (*String - L'0') <= REMINDER_MAX_UINTN_DIVIDED_BY_10)
       );
 
@@ -723,14 +723,14 @@ StrDecimalToUint64 (
   //
   // Ignore the pad spaces (space or tab)
   //
-  while ((*String == L' ') || (*String == L'\t')) {
+  while ((L' ' == *String) || (L'\t' == *String)) {
     String++;
   }
 
   //
   // Ignore leading Zeros after the spaces
   //
-  while (*String == L'0') {
+  while (L'0' == *String) {
     String++;
   }
 
@@ -742,7 +742,7 @@ StrDecimalToUint64 (
     // to the range defined by UINTN, then ASSERT().
     //
     ASSERT ((Result < QUIENT_MAX_UINT64_DIVIDED_BY_10) || 
-      ((Result == QUIENT_MAX_UINT64_DIVIDED_BY_10) && 
+      ((QUIENT_MAX_UINT64_DIVIDED_BY_10 == Result) && 
       (*String - L'0') <= REMINDER_MAX_UINT64_DIVIDED_BY_10)
       );
 
@@ -805,19 +805,19 @@ StrHexToUintn (
   //
   // Ignore the pad spaces (space or tab) 
   //
-  while ((*String == L' ') || (*String == L'\t')) {
+  while ((L' ' == *String) || (L'\t' == *String)) {
     String++;
   }
 
   //
   // Ignore leading Zeros after the spaces
   //
-  while (*String == L'0') {
+  while (L'0' == *String) {
     String++;
   }
 
   if (InternalCharToUpper (*String) == L'X') {
-    ASSERT (*(String - 1)  == L'0');
+    ASSERT (L'0' == *(String - 1));
     if (*(String - 1)  != L'0') {
       return 0;
     }
@@ -835,7 +835,7 @@ StrHexToUintn (
     // to the range defined by UINTN, then ASSERT().
     //
     ASSERT ((Result < QUIENT_MAX_UINTN_DIVIDED_BY_16) ||
-      ((Result == QUIENT_MAX_UINTN_DIVIDED_BY_16) && 
+      ((QUIENT_MAX_UINTN_DIVIDED_BY_16 == Result) && 
       (InternalHexCharToUintn (*String) <= REMINDER_MAX_UINTN_DIVIDED_BY_16))
       );
 
@@ -899,19 +899,19 @@ StrHexToUint64 (
   //
   // Ignore the pad spaces (space or tab) 
   //
-  while ((*String == L' ') || (*String == L'\t')) {
+  while ((L' ' == *String) || (L'\t' == *String)) {
     String++;
   }
 
   //
   // Ignore leading Zeros after the spaces
   //
-  while (*String == L'0') {
+  while (L'0' == *String) {
     String++;
   }
 
   if (InternalCharToUpper (*String) == L'X') {
-    ASSERT (*(String - 1)  == L'0');
+    ASSERT (L'0' == *(String - 1));
     if (*(String - 1)  != L'0') {
       return 0;
     }
@@ -929,7 +929,7 @@ StrHexToUint64 (
     // to the range defined by UINTN, then ASSERT().
     //
     ASSERT ((Result < QUIENT_MAX_UINT64_DIVIDED_BY_16)|| 
-      ((Result == QUIENT_MAX_UINT64_DIVIDED_BY_16) && 
+      ((QUIENT_MAX_UINT64_DIVIDED_BY_16 == Result) && 
       (InternalHexCharToUintn (*String) <= REMINDER_MAX_UINT64_DIVIDED_BY_16))
       );
 
@@ -1153,7 +1153,7 @@ AsciiStrnCpy (
 {
   CHAR8                             *ReturnValue;
 
-  if (Length == 0) {
+  if (0 == Length) {
     return Destination;
   }
 
@@ -1432,7 +1432,7 @@ AsciiStrnCmp (
   IN      UINTN                     Length
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return 0;
   }
 
@@ -1662,14 +1662,14 @@ AsciiStrDecimalToUintn (
   //
   // Ignore the pad spaces (space or tab)
   //
-  while ((*String == ' ') || (*String == '\t')) {
+  while ((' ' == *String) || ('\t' == *String)) {
     String++;
   }
 
   //
   // Ignore leading Zeros after the spaces
   //
-  while (*String == '0') {
+  while ('0' == *String) {
     String++;
   }
 
@@ -1681,7 +1681,7 @@ AsciiStrDecimalToUintn (
     // to the range defined by UINTN, then ASSERT().
     //
     ASSERT ((Result < QUIENT_MAX_UINTN_DIVIDED_BY_10) ||
-      ((Result == QUIENT_MAX_UINTN_DIVIDED_BY_10) && 
+      ((QUIENT_MAX_UINTN_DIVIDED_BY_10 == Result) && 
       (*String - '0') <= REMINDER_MAX_UINTN_DIVIDED_BY_10)
       );
 
@@ -1739,14 +1739,14 @@ AsciiStrDecimalToUint64 (
   //
   // Ignore the pad spaces (space or tab)
   //
-  while ((*String == ' ') || (*String == '\t')) {
+  while ((' ' == *String) || ('\t' == *String)) {
     String++;
   }
 
   //
   // Ignore leading Zeros after the spaces
   //
-  while (*String == '0') {
+  while ('0' == *String) {
     String++;
   }
 
@@ -1758,7 +1758,7 @@ AsciiStrDecimalToUint64 (
     // to the range defined by UINTN, then ASSERT().
     //
     ASSERT ((Result < QUIENT_MAX_UINT64_DIVIDED_BY_10) || 
-      ((Result == QUIENT_MAX_UINT64_DIVIDED_BY_10) && 
+      ((QUIENT_MAX_UINT64_DIVIDED_BY_10 == Result) && 
       (*String - '0') <= REMINDER_MAX_UINT64_DIVIDED_BY_10)
       );
 
@@ -1819,19 +1819,19 @@ AsciiStrHexToUintn (
   //
   // Ignore the pad spaces (space or tab) 
   //
-  while ((*String == ' ') || (*String == '\t')) {
+  while ((' ' == *String) || ('\t' == *String)) {
     String++;
   }
 
   //
   // Ignore leading Zeros after the spaces
   //
-  while (*String == '0') {
+  while ('0' == *String) {
     String++;
   }
 
   if (AsciiToUpper (*String) == 'X') {
-    ASSERT (*(String - 1)  == '0');
+    ASSERT ('0' == *(String - 1));
     if (*(String - 1)  != '0') {
       return 0;
     }
@@ -1849,7 +1849,7 @@ AsciiStrHexToUintn (
     // to the range defined by UINTN, then ASSERT().
     //
      ASSERT ((Result < QUIENT_MAX_UINTN_DIVIDED_BY_16) ||
-       ((Result == QUIENT_MAX_UINTN_DIVIDED_BY_16) && 
+       ((QUIENT_MAX_UINTN_DIVIDED_BY_16 == Result) && 
        (InternalAsciiHexCharToUintn (*String) <= REMINDER_MAX_UINTN_DIVIDED_BY_16))
        );
 
@@ -1914,19 +1914,19 @@ AsciiStrHexToUint64 (
   //
   // Ignore the pad spaces (space or tab) 
   //
-  while ((*String == ' ') || (*String == '\t')) {
+  while ((' ' == *String) || ('\t' == *String)) {
     String++;
   }
 
   //
   // Ignore leading Zeros after the spaces
   //
-  while (*String == '0') {
+  while ('0' == *String) {
     String++;
   }
 
   if (AsciiToUpper (*String) == 'X') {
-    ASSERT (*(String - 1)  == '0');
+    ASSERT ('0' == *(String - 1));
     if (*(String - 1)  != '0') {
       return 0;
     }
@@ -1944,7 +1944,7 @@ AsciiStrHexToUint64 (
     // to the range defined by UINTN, then ASSERT().
     //
     ASSERT ((Result < QUIENT_MAX_UINT64_DIVIDED_BY_16) ||
-      ((Result == QUIENT_MAX_UINT64_DIVIDED_BY_16) && 
+      ((QUIENT_MAX_UINT64_DIVIDED_BY_16 == Result) && 
       (InternalAsciiHexCharToUintn (*String) <= REMINDER_MAX_UINT64_DIVIDED_BY_16))
       );
 

@@ -26,6 +26,7 @@
 #ifndef __MEM_LIB_INTERNALS__
 #define __MEM_LIB_INTERNALS__
 
+#include <Base.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -52,7 +53,7 @@ InternalMemCopyMem (
   Set Buffer to Value for Size bytes.
 
   @param  Buffer Memory to set.
-  @param  Size Number of bytes to set
+  @param  Length Number of bytes to set
   @param  Value Value of the set operation.
 
   @return Buffer
@@ -124,7 +125,7 @@ InternalMemSetMem64 (
   Set Buffer to 0 for Size bytes.
 
   @param  Buffer Memory to set.
-  @param  Size Number of bytes to set
+  @param  Length Number of bytes to set
 
   @return Buffer
 

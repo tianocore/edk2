@@ -28,6 +28,7 @@
 
 **/
 VOID
+EFIAPI
 InternalAssertJumpBuffer (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
   );

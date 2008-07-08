@@ -311,6 +311,7 @@ InternalMathDivRemU64x64 (
 
 **/
 INT64
+EFIAPI
 InternalMathDivRemS64x64 (
   IN      INT64                     Dividend,
   IN      INT64                     Divisor,
@@ -374,6 +375,7 @@ InternalSwitchStack (
 
 **/
 BOOLEAN
+EFIAPI
 IsNodeInList (
   IN      CONST LIST_ENTRY      *List,
   IN      CONST LIST_ENTRY      *Node
@@ -484,6 +486,7 @@ InternalSyncCompareExchange64 (
 
 **/
 unsigned int
+EFIAPI
 BitFieldReadUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,
@@ -508,6 +511,7 @@ BitFieldReadUint (
 
 **/
 unsigned int
+EFIAPI
 BitFieldOrUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,
@@ -533,6 +537,7 @@ BitFieldOrUint (
 
 **/
 unsigned int
+EFIAPI
 BitFieldAndUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,
@@ -553,6 +558,7 @@ BitFieldAndUint (
 
 **/
 VOID
+EFIAPI
 InternalAssertJumpBuffer (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
   );

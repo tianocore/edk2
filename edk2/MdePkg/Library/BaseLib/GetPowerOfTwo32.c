@@ -38,7 +38,7 @@ GetPowerOfTwo32 (
   IN      UINT32                    Operand
   )
 {
-  if (Operand == 0) {
+  if (0 == Operand) {
     return 0;
   }
 

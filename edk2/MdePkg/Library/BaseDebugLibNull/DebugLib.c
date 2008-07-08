@@ -93,7 +93,7 @@ DebugAssert (
   @param   Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
   @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
-  @return  Buffer
+  @return  Buffer filled with PcdDebugClearMemoryValue.
 
 **/
 VOID *
@@ -116,6 +116,8 @@ DebugClearMemory (
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear.
+  
+  @return  Always return FALSE.
 
 **/
 BOOLEAN
@@ -137,6 +139,8 @@ DebugAssertEnabled (
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is clear.
+  
+  @return Always return FALSE.
 
 **/
 BOOLEAN
@@ -158,6 +162,8 @@ DebugPrintEnabled (
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is clear.
+  
+  @return  Always return FALSE.
 
 **/
 BOOLEAN
@@ -179,6 +185,8 @@ DebugCodeEnabled (
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
+  
+  @return  Always return FALSE.
 
 **/
 BOOLEAN

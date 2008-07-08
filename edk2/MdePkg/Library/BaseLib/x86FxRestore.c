@@ -40,12 +40,12 @@ AsmFxRestore (
   )
 {
   ASSERT (Buffer != NULL);
-  ASSERT (((UINTN)Buffer & 0xf) == 0);
+  ASSERT (0 == ((UINTN)Buffer & 0xf));
 
   //
   // Check the flag recorded by AsmFxSave()
   //
-  ASSERT (*(UINT32 *) (&Buffer[sizeof (IA32_FX_BUFFER) - 4]) == 0xAA5555AA);
+  ASSERT (0xAA5555AA == *(UINT32 *) (&Buffer[sizeof (IA32_FX_BUFFER) - 4]));
 
   InternalX86FxRestore (Buffer);
 }

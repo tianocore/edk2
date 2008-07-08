@@ -49,7 +49,6 @@ GetSpinLockProperties (
   VOID
   )
 {
-  // @bug May use a PCD entry to determine this alignment.
   return 32;
 }
 
@@ -66,7 +65,7 @@ GetSpinLockProperties (
   @param  SpinLock  A pointer to the spin lock to initialize to the released
                     state.
 
-  @return SpinLock
+  @return SpinLock in release state.
 
 **/
 SPIN_LOCK *
@@ -101,7 +100,7 @@ InitializeSpinLock (
 
   @param  SpinLock  A pointer to the spin lock to place in the acquired state.
 
-  @return SpinLock
+  @return SpinLock accquired lock.
 
 **/
 SPIN_LOCK *
@@ -224,7 +223,7 @@ AcquireSpinLockOrFail (
 
   @param  SpinLock  A pointer to the spin lock to release.
 
-  @return SpinLock
+  @return SpinLock released lock.
 
 **/
 SPIN_LOCK *
@@ -374,6 +373,7 @@ InterlockedCompareExchange64 (
   @param  CompareValue  Pointer value used in compare operation.
   @param  ExchangeValue Pointer value used in exchange operation.
 
+  @return The original *Value before exchange.
 **/
 VOID *
 EFIAPI

@@ -12,9 +12,6 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
 #include "BaseIoLibIntrinsicInternal.h"
 
 /**
@@ -32,7 +29,7 @@
   @param  Length          Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer receiving the data read.
 
-  @return Buffer
+  @return Buffer contains the data read from Mmio.
 
 **/
 UINT8 *
@@ -76,7 +73,7 @@ MmioReadBuffer8 (
   @param  Length          Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer receiving the data read.
 
-  @return Buffer
+  @return Buffer contains the data read from Mmio.
 
 **/
 UINT16 *
@@ -127,7 +124,7 @@ MmioReadBuffer16 (
   @param  Length          Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer receiving the data read.
 
-  @return Buffer
+  @return Buffer contains the data read from Mmio.
 
 **/
 UINT32 *
@@ -178,7 +175,7 @@ MmioReadBuffer32 (
   @param  Length          Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer receiving the data read.
 
-  @return Buffer
+  @return Buffer contains the data read from Mmio.
 
 **/
 UINT64 *

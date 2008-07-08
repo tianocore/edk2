@@ -55,14 +55,14 @@ SetMem64 (
   IN UINT64  Value
   )
 {
-  if (Length == 0) {
+  if (0 == Length) {
     return Buffer;
   }
 
   ASSERT (Buffer != NULL);
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Buffer));
-  ASSERT ((((UINTN)Buffer) & (sizeof (Value) - 1)) == 0);
-  ASSERT ((Length & (sizeof (Value) - 1)) == 0);
+  ASSERT (0 == (((UINTN)Buffer) & (sizeof (Value) - 1)));
+  ASSERT (0 == (Length & (sizeof (Value) - 1)));
 
   return InternalMemSetMem64 (Buffer, Length / sizeof (Value), Value);
 }

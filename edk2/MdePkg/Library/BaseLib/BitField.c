@@ -32,6 +32,7 @@
 
 **/
 unsigned int
+EFIAPI
 BitFieldReadUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,
@@ -62,6 +63,7 @@ BitFieldReadUint (
 
 **/
 unsigned int
+EFIAPI
 BitFieldOrUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,
@@ -93,6 +95,7 @@ BitFieldOrUint (
 
 **/
 unsigned int
+EFIAPI
 BitFieldAndUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,

@@ -37,7 +37,7 @@ GetInterruptState (
   IA32_EFLAGS32                     EFlags;
 
   EFlags.UintN = AsmReadEflags ();
-  return (BOOLEAN)(EFlags.Bits.IF == 1);
+  return (BOOLEAN)(1 == EFlags.Bits.IF);
 }
 
 

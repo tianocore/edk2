@@ -48,7 +48,7 @@ ZeroMem (
   IN UINTN  Length
   )
 {
-  ASSERT (!(Buffer == NULL && Length > 0));
+  ASSERT (!(NULL == Buffer && Length > 0));
   ASSERT (Length <= (MAX_ADDRESS - (UINTN)Buffer + 1));
   return InternalMemZeroMem (Buffer, Length);
 }

@@ -61,7 +61,7 @@ InvalidateInstructionCache (
 
   @param  Length  The number of bytes to invalidate from the instruction cache.
 
-  @return Address
+  @return Address of cahce invalidation.
 
 **/
 VOID *
@@ -116,7 +116,7 @@ WriteBackInvalidateDataCache (
   @param  Length  The number of bytes to write back and invalidate from the
                   data cache.
 
-  @return Address
+  @return Address of cache invalidation.
 
 **/
 VOID *
@@ -172,7 +172,7 @@ WriteBackDataCache (
                   mode, then Address is a virtual address.
   @param  Length  The number of bytes to write back from the data cache.
 
-  @return Address
+  @return Address of cache wrote in main memory.
 
 **/
 VOID *
@@ -231,7 +231,7 @@ InvalidateDataCache (
                   then Address is a virtual address.
   @param  Length  The number of bytes to invalidate from the data cache.
 
-  @return Address
+  @return Address of cache invalidation.
 
 **/
 VOID *

@@ -12,9 +12,6 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
 #include "BaseIoLibIntrinsicInternal.h"
 
 /**
@@ -28,7 +25,7 @@
 
   @param  Port  The I/O port to read.
 
-  @return The value read.
+  @return Always return zero.
 
 **/
 UINT64
@@ -53,7 +50,7 @@ IoRead64 (
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written the I/O port.
+  @return Always return zero.
 
 **/
 UINT64

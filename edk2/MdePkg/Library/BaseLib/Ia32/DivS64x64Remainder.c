@@ -37,6 +37,7 @@
 
 **/
 INT64
+EFIAPI
 InternalMathDivRemS64x64 (
   IN      INT64                     Dividend,
   IN      INT64                     Divisor,
