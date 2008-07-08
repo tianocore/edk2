@@ -77,8 +77,12 @@ COMPONENT_TYPE=   LIBRARY
   DriverBinding/DriverBinding.c
   DriverConfiguration/DriverConfiguration.h
   DriverConfiguration/DriverConfiguration.c
+  DriverConfiguration2/DriverConfiguration2.h
+  DriverConfiguration2/DriverConfiguration2.c
   DriverDiagnostics/DriverDiagnostics.h
   DriverDiagnostics/DriverDiagnostics.c
+  DriverDiagnostics2/DriverDiagnostics2.h
+  DriverDiagnostics2/DriverDiagnostics2.c
   Ebc/Ebc.h
   Ebc/Ebc.c
   EdidActive/EdidActive.h
@@ -157,6 +161,8 @@ COMPONENT_TYPE=   LIBRARY
   UgaIo/UgaIo.c
   UnicodeCollation/UnicodeCollation.h
   UnicodeCollation/UnicodeCollation.c
+  UnicodeCollation2/UnicodeCollation2.h
+  UnicodeCollation2/UnicodeCollation2.c
   UsbHostController/UsbHostController.h
   UsbHostController/UsbHostController.c
   UsbIo/UsbIo.h
