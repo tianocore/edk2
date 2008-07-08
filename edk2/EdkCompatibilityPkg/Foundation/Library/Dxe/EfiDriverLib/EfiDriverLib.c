@@ -138,6 +138,11 @@ NextSupportedLanguage (
 #ifdef LANGUAGE_RFC_3066   // LANGUAGE_RFC_3066
   for (; (*Languages != 0) && (*Languages != ';'); Languages++)
     ;
+
+  if (*Languages == ';') {
+    Languages++;
+  }
+
   return Languages;
 #else                      // LANGUAGE_ISO_639_2
   return (Languages + 3);
