@@ -1,5 +1,6 @@
 /** @file
-  PCI Library using PC Express access.
+  PCI Library functions that use the 256 MB PCI Express MMIO window to perform PCI
+  Configuration cycles. Layers on PCI Express Library.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -14,7 +15,6 @@
 
 
 #include <Base.h>
-
 
 #include <Library/PciLib.h>
 #include <Library/PciExpressLib.h>

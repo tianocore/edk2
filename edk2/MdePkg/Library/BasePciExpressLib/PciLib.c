@@ -1,6 +1,4 @@
 /** @file
-  PCI Library.
-
   Functions in this library instance make use of MMIO functions in IoLib to
   access memory mapped PCI configuration space.
 

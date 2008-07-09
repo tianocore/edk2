@@ -1,5 +1,6 @@
 /** @file
-  PCI Library using Port CF8/CFC access.
+  PCI Library functions that use I/O ports 0xCF8 and 0xCFC to perform
+  PCI Configuration cycles. Layers on top of one PCI CF8 Library instance.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -14,7 +15,6 @@
 
 
 #include <Base.h>
-
 
 #include <Library/PciLib.h>
 #include <Library/PciCf8Lib.h>
