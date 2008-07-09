@@ -1,5 +1,7 @@
 /** @file
 
+    Wrapper function for usb host controller interface.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,17 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:
-
-    UsbUtility.c
-
-  Abstract:
-
-    Wrapper function for usb host controller interface
-
-  Revision History
-
 
 **/
 
@@ -59,14 +50,14 @@ STATIC USB_CLASS_FORMAT_DEVICE_PATH mAllUsbClassDevicePath = {
 
 
 /**
-  Get the capability of the host controller
+  Get the capability of the host controller.
 
-  @param  UsbBus           The usb driver
-  @param  MaxSpeed         The maximum speed this host controller supports
-  @param  NumOfPort        The number of the root hub port
-  @param  Is64BitCapable   Whether this controller support 64 bit addressing
+  @param  UsbBus           The usb driver.
+  @param  MaxSpeed         The maximum speed this host controller supports.
+  @param  NumOfPort        The number of the root hub port.
+  @param  Is64BitCapable   Whether this controller support 64 bit addressing.
 
-  @retval EFI_SUCCESS      The host controller capability is returned
+  @retval EFI_SUCCESS      The host controller capability is returned.
   @retval Others           Failed to retrieve the host controller capability.
 
 **/
@@ -100,13 +91,16 @@ UsbHcGetCapability (
 
 
 /**
-  Reset the host controller
+  Reset the host controller.
 
-  @param  UsbBus           The usb bus driver
-  @param  Attributes       The reset type, only global reset is used by this driver
+  @param  UsbBus                The usb bus driver.
+  @param  Attributes            The reset type, only global reset is used by this driver.
 
-  @return GC_TODO: add return values
-
+  @retval EFI_SUCCESS           The reset operation succeeded.
+  @retval EFI_INVALID_PARAMETER Attributes is not valid.
+  @retval EFI_UNSUPPOURTED      The type of reset specified by Attributes is
+                                not currently supported by the host controller.
+  @retval EFI_DEVICE_ERROR      Host controller isn't halted to reset.
 **/
 EFI_STATUS
 UsbHcReset (
@@ -127,13 +121,13 @@ UsbHcReset (
 
 
 /**
-  Get the current operation state of the host controller
+  Get the current operation state of the host controller.
 
-  @param  UsbBus           The USB bus driver
-  @param  State            The host controller operation state
+  @param  UsbBus           The USB bus driver.
+  @param  State            The host controller operation state.
 
-  @retval EFI_SUCCESS      The operation state is returned in State
-  @retval Others           Failed to get the host controller state
+  @retval EFI_SUCCESS      The operation state is returned in State.
+  @retval Others           Failed to get the host controller state.
 
 **/
 EFI_STATUS
@@ -155,13 +149,13 @@ UsbHcGetState (
 
 
 /**
-  Set the host controller operation state
+  Set the host controller operation state.
 
-  @param  UsbBus           The USB bus driver
-  @param  State            The state to set
+  @param  UsbBus           The USB bus driver.
+  @param  State            The state to set.
 
-  @retval EFI_SUCCESS      The host controller is now working at State
-  @retval Others           Failed to set operation state
+  @retval EFI_SUCCESS      The host controller is now working at State.
+  @retval Others           Failed to set operation state.
 
 **/
 EFI_STATUS
@@ -183,14 +177,14 @@ UsbHcSetState (
 
 
 /**
-  Get the root hub port state
+  Get the root hub port state.
 
-  @param  UsbBus           The USB bus driver
-  @param  PortIndex        The index of port
-  @param  PortStatus       The variable to save port state
+  @param  UsbBus           The USB bus driver.
+  @param  PortIndex        The index of port.
+  @param  PortStatus       The variable to save port state.
 
-  @retval EFI_SUCCESS      The root port state is returned in
-  @retval Others           Failed to get the root hub port state
+  @retval EFI_SUCCESS      The root port state is returned in.
+  @retval Others           Failed to get the root hub port state.
 
 **/
 EFI_STATUS
@@ -213,14 +207,14 @@ UsbHcGetRootHubPortStatus (
 
 
 /**
-  Set the root hub port feature
+  Set the root hub port feature.
 
-  @param  UsbBus           The USB bus driver
-  @param  PortIndex        The port index
-  @param  Feature          The port feature to set
+  @param  UsbBus           The USB bus driver.
+  @param  PortIndex        The port index.
+  @param  Feature          The port feature to set.
 
-  @retval EFI_SUCCESS      The port feature is set
-  @retval Others           Failed to set port feature
+  @retval EFI_SUCCESS      The port feature is set.
+  @retval Others           Failed to set port feature.
 
 **/
 EFI_STATUS
@@ -244,14 +238,14 @@ UsbHcSetRootHubPortFeature (
 
 
 /**
-  Clear the root hub port feature
+  Clear the root hub port feature.
 
-  @param  UsbBus           The USB bus driver
-  @param  PortIndex        The port index
-  @param  Feature          The port feature to clear
+  @param  UsbBus           The USB bus driver.
+  @param  PortIndex        The port index.
+  @param  Feature          The port feature to clear.
 
-  @retval EFI_SUCCESS      The port feature is clear
-  @retval Others           Failed to clear port feature
+  @retval EFI_SUCCESS      The port feature is clear.
+  @retval Others           Failed to clear port feature.
 
 **/
 EFI_STATUS
@@ -274,22 +268,22 @@ UsbHcClearRootHubPortFeature (
 
 
 /**
-  Execute a control transfer to the device
+  Execute a control transfer to the device.
 
-  @param  UsbBus           The USB bus driver
-  @param  DevAddr          The device address
-  @param  DevSpeed         The device speed
-  @param  MaxPacket        Maximum packet size of endpoint 0
-  @param  Request          The control transfer request
-  @param  Direction        The direction of data stage
-  @param  Data             The buffer holding data
-  @param  DataLength       The length of the data
-  @param  TimeOut          Timeout (in ms) to wait until timeout
-  @param  Translator       The transaction translator for low/full speed device
-  @param  UsbResult        The result of transfer
+  @param  UsbBus           The USB bus driver.
+  @param  DevAddr          The device address.
+  @param  DevSpeed         The device speed.
+  @param  MaxPacket        Maximum packet size of endpoint 0.
+  @param  Request          The control transfer request.
+  @param  Direction        The direction of data stage.
+  @param  Data             The buffer holding data.
+  @param  DataLength       The length of the data.
+  @param  TimeOut          Timeout (in ms) to wait until timeout.
+  @param  Translator       The transaction translator for low/full speed device.
+  @param  UsbResult        The result of transfer.
 
-  @retval EFI_SUCCESS      The control transfer finished without error
-  @retval Others           The control transfer failed, reason returned in UsbReslt
+  @retval EFI_SUCCESS      The control transfer finished without error.
+  @retval Others           The control transfer failed, reason returned in UsbReslt.
 
 **/
 EFI_STATUS
@@ -346,25 +340,25 @@ UsbHcControlTransfer (
 
 
 /**
-  Execute a bulk transfer to the device's endpoint
+  Execute a bulk transfer to the device's endpoint.
 
-  @param  UsbBus           The USB bus driver
-  @param  DevAddr          The target device address
+  @param  UsbBus           The USB bus driver.
+  @param  DevAddr          The target device address.
   @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7
-  @param  DevSpeed         The device's speed
-  @param  MaxPacket        The endpoint's max packet size
-  @param  BufferNum        The number of data buffer
-  @param  Data             Array of pointers to data buffer
-  @param  DataLength       The length of data buffer
+                           bit 7.
+  @param  DevSpeed         The device's speed.
+  @param  MaxPacket        The endpoint's max packet size.
+  @param  BufferNum        The number of data buffer.
+  @param  Data             Array of pointers to data buffer.
+  @param  DataLength       The length of data buffer.
   @param  DataToggle       On input, the initial data toggle to use, also  return
                            the next toggle on output.
-  @param  TimeOut          The time to wait until timeout
-  @param  Translator       The transaction translator for low/full speed device
-  @param  UsbResult        The result of USB execution
+  @param  TimeOut          The time to wait until timeout.
+  @param  Translator       The transaction translator for low/full speed device.
+  @param  UsbResult        The result of USB execution.
 
-  @retval EFI_SUCCESS      The bulk transfer is finished without error
-  @retval Others           Failed to execute bulk transfer, result in UsbResult
+  @retval EFI_SUCCESS      The bulk transfer is finished without error.
+  @retval Others           Failed to execute bulk transfer, result in UsbResult.
 
 **/
 EFI_STATUS
@@ -419,25 +413,25 @@ UsbHcBulkTransfer (
 
 
 /**
-  Queue or cancel an asynchronous interrupt transfer
+  Queue or cancel an asynchronous interrupt transfer.
 
-  @param  UsbBus           The USB bus driver
-  @param  DevAddr          The target device address
+  @param  UsbBus           The USB bus driver.
+  @param  DevAddr          The target device address.
   @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7
-  @param  DevSpeed         The device's speed
-  @param  MaxPacket        The endpoint's max packet size
+                           bit 7.
+  @param  DevSpeed         The device's speed.
+  @param  MaxPacket        The endpoint's max packet size.
   @param  IsNewTransfer    Whether this is a new request. If not, cancel the old
-                           request
-  @param  DataToggle       Data toggle to use on input, next toggle on output
-  @param  PollingInterval  The interval to poll the interrupt transfer (in ms)
-  @param  DataLength       The length of periodical data receive
-  @param  Translator       The transaction translator for low/full speed device
-  @param  Callback         Function to call when data is received
-  @param  Context          The context to the callback
+                           request.
+  @param  DataToggle       Data toggle to use on input, next toggle on output.
+  @param  PollingInterval  The interval to poll the interrupt transfer (in ms).
+  @param  DataLength       The length of periodical data receive.
+  @param  Translator       The transaction translator for low/full speed device.
+  @param  Callback         Function to call when data is received.
+  @param  Context          The context to the callback.
 
-  @retval EFI_SUCCESS      The asynchronous transfer is queued
-  @retval Others           Failed to queue the transfer
+  @retval EFI_SUCCESS      The asynchronous transfer is queued.
+  @retval Others           Failed to queue the transfer.
 
 **/
 EFI_STATUS
@@ -497,24 +491,24 @@ UsbHcAsyncInterruptTransfer (
 
 
 /**
-  Execute a synchronous interrupt transfer to the target endpoint
+  Execute a synchronous interrupt transfer to the target endpoint.
 
-  @param  UsbBus           The USB bus driver
-  @param  DevAddr          The target device address
+  @param  UsbBus           The USB bus driver.
+  @param  DevAddr          The target device address.
   @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7
-  @param  DevSpeed         The device's speed
-  @param  MaxPacket        The endpoint's max packet size
-  @param  Data             Pointer to data buffer
-  @param  DataLength       The length of data buffer
+                           bit 7.
+  @param  DevSpeed         The device's speed.
+  @param  MaxPacket        The endpoint's max packet size.
+  @param  Data             Pointer to data buffer.
+  @param  DataLength       The length of data buffer.
   @param  DataToggle       On input, the initial data toggle to use, also  return
                            the next toggle on output.
-  @param  TimeOut          The time to wait until timeout
-  @param  Translator       The transaction translator for low/full speed device
-  @param  UsbResult        The result of USB execution
+  @param  TimeOut          The time to wait until timeout.
+  @param  Translator       The transaction translator for low/full speed device.
+  @param  UsbResult        The result of USB execution.
 
-  @retval EFI_SUCCESS      The synchronous interrupt transfer is OK
-  @retval Others           Failed to execute the synchronous interrupt transfer
+  @retval EFI_SUCCESS      The synchronous interrupt transfer is OK.
+  @retval Others           Failed to execute the synchronous interrupt transfer.
 
 **/
 EFI_STATUS
@@ -570,21 +564,21 @@ UsbHcSyncInterruptTransfer (
 
 
 /**
-  Execute a synchronous Isochronous USB transfer
+  Execute a synchronous Isochronous USB transfer.
 
-  @param  UsbBus           The USB bus driver
-  @param  DevAddr          The target device address
+  @param  UsbBus           The USB bus driver.
+  @param  DevAddr          The target device address.
   @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7
-  @param  DevSpeed         The device's speed
-  @param  MaxPacket        The endpoint's max packet size
-  @param  BufferNum        The number of data buffer
-  @param  Data             Array of pointers to data buffer
-  @param  DataLength       The length of data buffer
-  @param  Translator       The transaction translator for low/full speed device
-  @param  UsbResult        The result of USB execution
+                           bit 7.
+  @param  DevSpeed         The device's speed.
+  @param  MaxPacket        The endpoint's max packet size.
+  @param  BufferNum        The number of data buffer.
+  @param  Data             Array of pointers to data buffer.
+  @param  DataLength       The length of data buffer.
+  @param  Translator       The transaction translator for low/full speed device.
+  @param  UsbResult        The result of USB execution.
 
-  @retval EFI_UNSUPPORTED  The isochronous transfer isn't supported now
+  @retval EFI_UNSUPPORTED  The isochronous transfer isn't supported now.
 
 **/
 EFI_STATUS
@@ -606,22 +600,22 @@ UsbHcIsochronousTransfer (
 
 
 /**
-  Queue an asynchronous isochronous transfer
+  Queue an asynchronous isochronous transfer.
 
-  @param  UsbBus           The USB bus driver
-  @param  DevAddr          The target device address
+  @param  UsbBus           The USB bus driver.
+  @param  DevAddr          The target device address.
   @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7
-  @param  DevSpeed         The device's speed
-  @param  MaxPacket        The endpoint's max packet size
-  @param  BufferNum        The number of data buffer
-  @param  Data             Array of pointers to data buffer
-  @param  DataLength       The length of data buffer
-  @param  Translator       The transaction translator for low/full speed device
-  @param  Callback         The function to call when data is transferred
-  @param  Context          The context to the callback function
+                           bit 7.
+  @param  DevSpeed         The device's speed.
+  @param  MaxPacket        The endpoint's max packet size.
+  @param  BufferNum        The number of data buffer.
+  @param  Data             Array of pointers to data buffer.
+  @param  DataLength       The length of data buffer.
+  @param  Translator       The transaction translator for low/full speed device.
+  @param  Callback         The function to call when data is transferred.
+  @param  Context          The context to the callback function.
 
-  @retval EFI_UNSUPPORTED  The asynchronous isochronous transfer isn't supported
+  @retval EFI_UNSUPPORTED  The asynchronous isochronous transfer isn't supported.
 
 **/
 EFI_STATUS
@@ -644,12 +638,12 @@ UsbHcAsyncIsochronousTransfer (
 
 
 /**
-  Open the USB host controller protocol BY_CHILD
+  Open the USB host controller protocol BY_CHILD.
 
-  @param  Bus              The USB bus driver
-  @param  Child            The child handle
+  @param  Bus              The USB bus driver.
+  @param  Child            The child handle.
 
-  @return The open protocol return
+  @return The open protocol return.
 
 **/
 EFI_STATUS
@@ -688,12 +682,12 @@ UsbOpenHostProtoByChild (
 
 
 /**
-  Close the USB host controller protocol BY_CHILD
+  Close the USB host controller protocol BY_CHILD.
 
-  @param  Bus              The USB bus driver
-  @param  Child            The child handle
+  @param  Bus              The USB bus driver.
+  @param  Child            The child handle.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -721,13 +715,12 @@ UsbCloseHostProtoByChild (
 }
 
 
-
 /**
   return the current TPL, copied from the EDKII glue lib.
 
-  VOID
+  @param  VOID.
 
-  @return Current TPL
+  @return Current TPL.
 
 **/
 EFI_TPL
@@ -744,11 +737,11 @@ UsbGetCurrentTpl (
 }
 
 /**
-  Create a new device path which only contain the first Usb part of the DevicePath
+  Create a new device path which only contain the first Usb part of the DevicePath.
 
-  @param DevicePath  A full device path which contain the usb nodes
+  @param DevicePath  A full device path which contain the usb nodes.
 
-  @return            A new device path which only contain the Usb part of the DevicePath
+  @return            A new device path which only contain the Usb part of the DevicePath.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -816,11 +809,11 @@ GetUsbDPFromFullDP (
 /**
   Check whether a usb device path is in a DEVICE_PATH_LIST_ITEM list.
 
-  @param UsbDP       a usb device path of DEVICE_PATH_LIST_ITEM
-  @parem UsbIoDPList a DEVICE_PATH_LIST_ITEM list
+  @param UsbDP       a usb device path of DEVICE_PATH_LIST_ITEM.
+  @param UsbIoDPList a DEVICE_PATH_LIST_ITEM list.
 
-  @retval TRUE       there is a DEVICE_PATH_LIST_ITEM in UsbIoDPList which contains the passed in UsbDP
-  @retval FALSE      there is no DEVICE_PATH_LIST_ITEM in UsbIoDPList which contains the passed in UsbDP
+  @retval TRUE       there is a DEVICE_PATH_LIST_ITEM in UsbIoDPList which contains the passed in UsbDP.
+  @retval FALSE      there is no DEVICE_PATH_LIST_ITEM in UsbIoDPList which contains the passed in UsbDP.
 
 **/
 BOOLEAN
@@ -867,11 +860,11 @@ SearchUsbDPInList (
 /**
   Add a usb device path into the DEVICE_PATH_LIST_ITEM list.
 
-  @param UsbDP        a usb device path of DEVICE_PATH_LIST_ITEM
-  @param UsbIoDPList  a DEVICE_PATH_LIST_ITEM list
+  @param UsbDP                   a usb device path of DEVICE_PATH_LIST_ITEM.
+  @param UsbIoDPList             a DEVICE_PATH_LIST_ITEM list.
 
-  @retval EFI_INVALID_PARAMETER
-  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER  If parameters are invalid, return this value.
+  @retval EFI_SUCCESS            If Add operation is successful, return this value.
 
 **/
 EFI_STATUS
@@ -909,13 +902,13 @@ AddUsbDPToList (
 
 /**
   Check whether usb device, whose interface is UsbIf, matches the usb class which indicated by
-  UsbClassDevicePathPtr whose is a short form usb class device path
+  UsbClassDevicePathPtr whose is a short form usb class device path.
 
-  @param UsbClassDevicePathPtr    a short form usb class device path
-  @param UsbIf                    a usb device interface
+  @param UsbClassDevicePathPtr    a short form usb class device path.
+  @param UsbIf                    a usb device interface.
 
-  @retval TRUE                    the usb device match the usb class
-  @retval FALSE                   the usb device does not match the usb class
+  @retval TRUE                    the usb device match the usb class.
+  @retval FALSE                   the usb device does not match the usb class.
 
 **/
 BOOLEAN
@@ -989,16 +982,15 @@ MatchUsbClass (
 
 /**
   Check whether usb device, whose interface is UsbIf, matches the usb WWID requirement which indicated by
-  UsbWWIDDevicePathPtr whose is a short form usb WWID device path
+  UsbWWIDDevicePathPtr whose is a short form usb WWID device path.
 
-  @param UsbClassDevicePathPtr   a short form usb WWID device path
-  @param UsbIf                   a usb device interface
+  @param UsbWWIDDevicePathPtr    a short form usb WWID device path.
+  @param UsbIf                   a usb device interface.
 
-  @retval TRUE                   the usb device match the usb WWID requirement
-  @retval FALSE                  the usb device does not match the usb WWID requirement
+  @retval TRUE                   the usb device match the usb WWID requirement.
+  @retval FALSE                  the usb device does not match the usb WWID requirement.
 
 **/
-STATIC
 BOOLEAN
 MatchUsbWwid (
   IN USB_WWID_DEVICE_PATH       *UsbWWIDDevicePathPtr,
@@ -1047,12 +1039,12 @@ MatchUsbWwid (
 }
 
 /**
-  Free a DEVICE_PATH_LIST_ITEM list
+  Free a DEVICE_PATH_LIST_ITEM list.
 
-  @param UsbIoDPList  a DEVICE_PATH_LIST_ITEM list pointer
+  @param  UsbIoDPList            a DEVICE_PATH_LIST_ITEM list pointer.
 
-  @retval EFI_INVALID_PARAMETER
-  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER  If parameters are invalid, return this value.
+  @retval EFI_SUCCESS            If free operation is successful, return this value.
 
 **/
 EFI_STATUS
@@ -1094,14 +1086,13 @@ UsbBusFreeUsbDPList (
 
 /**
   Store a wanted usb child device info (its Usb part of device path) which is indicated by
-  RemainingDevicePath in a Usb bus which  is indicated by UsbBusId
+  RemainingDevicePath in a Usb bus which  is indicated by UsbBusId.
 
-  @param UsbBusId              Point to EFI_USB_BUS_PROTOCOL interface
-  @param RemainingDevicePath   The remaining device patch
+  @param  UsbBusId               Point to EFI_USB_BUS_PROTOCOL interface.
+  @param  RemainingDevicePath    The remaining device patch.
 
-  @retval EFI_SUCCESS
-  @retval EFI_INVALID_PARAMETER
-  @retval EFI_OUT_OF_RESOURCES
+  @retval EFI_SUCCESS            Add operation is successful.
+  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
 
 **/
 EFI_STATUS
@@ -1158,14 +1149,13 @@ UsbBusAddWantedUsbIoDP (
 }
 
 /**
-  Check whether a usb child  device is the wanted device in a bus
+  Check whether a usb child device is the wanted device in a bus.
 
-  @param Bus      The Usb bus's private data pointer
-  @param UsbIf    The usb child  device inferface
+  @param  Bus     The Usb bus's private data pointer.
+  @param  UsbIf   The usb child device inferface.
 
-  @retval EFI_SUCCESS
-  @retval EFI_INVALID_PARAMETER
-  @retval EFI_OUT_OF_RESOURCES
+  @retval True    If a usb child device is the wanted device in a bus.
+  @retval False   If a usb child device is *NOT* the wanted device in a bus.
 
 **/
 BOOLEAN
@@ -1265,13 +1255,12 @@ UsbBusIsWantedUsbIO (
 
 /**
   Recursively connnect every wanted usb child device to ensure they all fully connected.
-  Check all the child Usb IO handles in this bus, recursively connecte if it is wanted usb child device
+  Check all the child Usb IO handles in this bus, recursively connecte if it is wanted usb child device.
 
-  @param UsbBusId   point to EFI_USB_BUS_PROTOCOL interface
+  @param  UsbBusId                  Point to EFI_USB_BUS_PROTOCOL interface.
 
-  @retval EFI_SUCCESS
-  @retval EFI_INVALID_PARAMETER
-  @retval EFI_OUT_OF_RESOURCES
+  @retval EFI_SUCCESS               Connect is done successfully.
+  @retval EFI_INVALID_PARAMETER     The parameter is invalid.
 
 **/
 EFI_STATUS

@@ -1,5 +1,7 @@
 /** @file
 
+    The definition for USB hub.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,17 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:
-
-    UsbHub.h
-
-  Abstract:
-
-    The definition for USB hub
-
-  Revision History
-
 
 **/
 
@@ -30,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_ENDPOINT_ADDR(EpAddr) ((EpAddr) & 0x7F)
 #define USB_ENDPOINT_TYPE(Desc)   ((Desc)->Attributes & USB_ENDPOINT_TYPE_MASK)
 
-enum {
+typedef enum {
   USB_DESC_TYPE_HUB           = 0x29,
 
   //
@@ -95,7 +86,7 @@ enum {
   // after 500ms(LOOP * STALL = 100 * 5ms), set by experience
   //
   USB_WAIT_PORT_STS_CHANGE_LOOP   = 100
-};
+}USB_HUB_FLAGS_VALUE;
 
 #pragma pack(1)
 //
@@ -119,6 +110,23 @@ typedef struct {
 } USB_CHANGE_FEATURE_MAP;
 
 
+/**
+  Clear the transaction translate buffer if full/low
+  speed control/bulk transfer failed and the transfer
+  uses this hub as translator.Remember to clear the TT
+  buffer of transaction translator, not that of the
+  parent.
+
+  @param  UsbDev                The Usb device.
+  @param  Port                  The port of the hub.
+  @param  DevAddr               Address of the failed transaction.
+  @param  EpNum                 The endpoint number of the failed transaction.
+  @param  EpType                The type of failed transaction.
+
+  @retval EFI_SUCCESS           The TT buffer is cleared.
+  @retval Others                Failed to clear the TT buffer.
+
+**/
 EFI_STATUS
 UsbHubCtrlClearTTBuffer (
   IN USB_DEVICE           *UsbDev,
@@ -129,11 +137,31 @@ UsbHubCtrlClearTTBuffer (
   );
 
 
+/**
+  Test whether the interface is a hub interface.
+
+  @param  UsbIf                 The interface to test.
+
+  @retval TRUE                  The interface is a hub interface.
+  @retval FALSE                 The interface isn't a hub interface.
+
+**/
 BOOLEAN
 UsbIsHubInterface (
   IN USB_INTERFACE        *UsbIf
   );
 
+
+/**
+  Ack the hub change bits. If these bits are not ACKed, Hub will
+  always return changed bit map from its interrupt endpoint.
+
+  @param  UsbDev                The Usb device.
+
+  @retval EFI_SUCCESS           The hub change status is ACKed.
+  @retval Others                Failed to ACK the hub status.
+
+**/
 EFI_STATUS
 UsbHubAckHubStatus (
   IN  USB_DEVICE         *UsbDev

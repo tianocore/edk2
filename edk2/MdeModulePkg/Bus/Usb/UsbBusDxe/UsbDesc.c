@@ -1,5 +1,7 @@
 /** @file
 
+    Manage Usb Descriptor List
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,31 +11,19 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:
-
-    UsbDesc.c
-
-  Abstract:
-
-    Manage Usb Descriptor List
-
-  Revision History
-
-
 **/
 
 #include "UsbBus.h"
 
 
 /**
-  Free the interface setting descriptor
+  Free the interface setting descriptor.
 
-  @param  Setting               The descriptor to free
+  @param  Setting               The descriptor to free.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UsbFreeInterfaceDesc (
   IN USB_INTERFACE_SETTING  *Setting
@@ -61,17 +51,15 @@ UsbFreeInterfaceDesc (
 }
 
 
-
 /**
   Free a configuration descriptor with its interface
-  descriptors. It may be initialized partially
+  descriptors. It may be initialized partially.
 
-  @param  Config                The configuration descriptor to free
+  @param  Config                The configuration descriptor to free.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UsbFreeConfigDesc (
   IN USB_CONFIG_DESC      *Config
@@ -112,13 +100,12 @@ UsbFreeConfigDesc (
 }
 
 
-
 /**
-  Free a device descriptor with its configurations
+  Free a device descriptor with its configurations.
 
-  @param  DevDesc               The device descriptor
+  @param  DevDesc               The device descriptor.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -143,17 +130,16 @@ UsbFreeDevDesc (
 
 
 /**
-  Create a descriptor
+  Create a descriptor.
 
-  @param  DescBuf               The buffer of raw descriptor
-  @param  Len                   The lenght of the raw descriptor buffer
-  @param  Type                  The type of descriptor to create
-  @param  Consumed              Number of bytes consumed
+  @param  DescBuf               The buffer of raw descriptor.
+  @param  Len                   The lenght of the raw descriptor buffer.
+  @param  Type                  The type of descriptor to create.
+  @param  Consumed              Number of bytes consumed.
 
-  @return Created descriptor or NULL
+  @return Created descriptor or NULL.
 
 **/
-STATIC
 VOID *
 UsbCreateDesc (
   IN  UINT8               *DescBuf,
@@ -226,16 +212,15 @@ UsbCreateDesc (
 
 
 /**
-  Parse an interface desciptor and its endpoints
+  Parse an interface desciptor and its endpoints.
 
-  @param  DescBuf               The buffer of raw descriptor
-  @param  Len                   The lenght of the raw descriptor buffer
-  @param  Consumed              The number of raw descriptor consumed
+  @param  DescBuf               The buffer of raw descriptor.
+  @param  Len                   The lenght of the raw descriptor buffer.
+  @param  Consumed              The number of raw descriptor consumed.
 
-  @return The create interface setting or NULL if failed
+  @return The create interface setting or NULL if failed.
 
 **/
-STATIC
 USB_INTERFACE_SETTING *
 UsbParseInterfaceDesc (
   IN  UINT8               *DescBuf,
@@ -307,13 +292,12 @@ ON_ERROR:
 /**
   Parse the configuration descriptor and its interfaces.
 
-  @param  DescBuf               The buffer of raw descriptor
-  @param  Len                   The lenght of the raw descriptor buffer
+  @param  DescBuf               The buffer of raw descriptor.
+  @param  Len                   The lenght of the raw descriptor buffer.
 
-  @return The created configuration descriptor
+  @return The created configuration descriptor.
 
 **/
-STATIC
 USB_CONFIG_DESC *
 UsbParseConfigDesc (
   IN UINT8                *DescBuf,
@@ -407,25 +391,24 @@ ON_ERROR:
 }
 
 
-
 /**
   USB standard control transfer support routine. This
   function is used by USB device. It is possible that
   the device's interfaces are still waiting to be
   enumerated.
 
-  @param  UsbDev                The usb device
-  @param  Direction             The direction of data transfer
-  @param  Type                  Standard / class specific / vendor specific
-  @param  Target                The receiving target
-  @param  Request               Which request
-  @param  Value                 The wValue parameter of the request
-  @param  Index                 The wIndex parameter of the request
-  @param  Buf                   The buffer to receive data into / transmit from
-  @param  Length                The length of the buffer
+  @param  UsbDev                The usb device.
+  @param  Direction             The direction of data transfer.
+  @param  Type                  Standard / class specific / vendor specific.
+  @param  Target                The receiving target.
+  @param  Request               Which request.
+  @param  Value                 The wValue parameter of the request.
+  @param  Index                 The wIndex parameter of the request.
+  @param  Buf                   The buffer to receive data into / transmit from.
+  @param  Length                The length of the buffer.
 
-  @retval EFI_SUCCESS           The control request is executed
-  @retval EFI_DEVICE_ERROR      Failed to execute the control transfer
+  @retval EFI_SUCCESS           The control request is executed.
+  @retval EFI_DEVICE_ERROR      Failed to execute the control transfer.
 
 **/
 EFI_STATUS
@@ -473,23 +456,21 @@ UsbCtrlRequest (
 }
 
 
-
 /**
   Get the standard descriptors.
 
-  @param  UsbDev                The USB device to read descriptor from
-  @param  DescType              The type of descriptor to read
-  @param  DescIndex             The index of descriptor to read
+  @param  UsbDev                The USB device to read descriptor from.
+  @param  DescType              The type of descriptor to read.
+  @param  DescIndex             The index of descriptor to read.
   @param  LangId                Language ID, only used to get string, otherwise set
-                                it to 0
-  @param  Buf                   The buffer to hold the descriptor read
-  @param  Length                The length of the buffer
+                                it to 0.
+  @param  Buf                   The buffer to hold the descriptor read.
+  @param  Length                The length of the buffer.
 
-  @retval EFI_SUCCESS           The descriptor is read OK
-  @retval Others                Failed to retrieve the descriptor
+  @retval EFI_SUCCESS           The descriptor is read OK.
+  @retval Others                Failed to retrieve the descriptor.
 
 **/
-STATIC
 EFI_STATUS
 UsbCtrlGetDesc (
   IN  USB_DEVICE          *UsbDev,
@@ -518,16 +499,15 @@ UsbCtrlGetDesc (
 }
 
 
-
 /**
   Return the max packet size for endpoint zero. This function
   is the first function called to get descriptors during bus
   enumeration.
 
-  @param  UsbDev                The usb device
+  @param  UsbDev                The usb device.
 
-  @retval EFI_SUCCESS           The max packet size of endpoint zero is retrieved
-  @retval EFI_DEVICE_ERROR      Failed to retrieve it
+  @retval EFI_SUCCESS           The max packet size of endpoint zero is retrieved.
+  @retval EFI_DEVICE_ERROR      Failed to retrieve it.
 
 **/
 EFI_STATUS
@@ -561,17 +541,15 @@ UsbGetMaxPacketSize0 (
 }
 
 
-
 /**
   Get the device descriptor for the device.
 
-  @param  UsbDev                The Usb device to retrieve descriptor from
+  @param  UsbDev                The Usb device to retrieve descriptor from.
 
-  @retval EFI_SUCCESS           The device descriptor is returned
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory
+  @retval EFI_SUCCESS           The device descriptor is returned.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
 
 **/
-STATIC
 EFI_STATUS
 UsbGetDevDesc (
   IN USB_DEVICE           *UsbDev
@@ -605,17 +583,16 @@ UsbGetDevDesc (
 }
 
 
-
 /**
   Retrieve the indexed string for the language. It requires two
   steps to get a string, first to get the string's length. Then
   the string itself.
 
-  @param  UsbDev                The usb device
-  @param  Index                 The index the string to retrieve
-  @param  LangId                Language ID
+  @param  UsbDev                The usb device.
+  @param  Index                 The index the string to retrieve.
+  @param  LangId                Language ID.
 
-  @return The created string descriptor or NULL
+  @return The created string descriptor or NULL.
 
 **/
 EFI_USB_STRING_DESCRIPTOR *
@@ -662,16 +639,14 @@ UsbGetOneString (
 }
 
 
-
 /**
-  Build the language ID table for string descriptors
+  Build the language ID table for string descriptors.
 
-  @param  UsbDev                The Usb device
+  @param  UsbDev                The Usb device.
 
-  @retval EFI_UNSUPPORTED       This device doesn't support string table
+  @retval EFI_UNSUPPORTED       This device doesn't support string table.
 
 **/
-STATIC
 EFI_STATUS
 UsbBuildLangTable (
   IN USB_DEVICE           *UsbDev
@@ -716,20 +691,18 @@ ON_EXIT:
 }
 
 
-
 /**
   Retrieve the indexed configure for the device. USB device
   returns the configuration togetther with the interfaces for
   this configuration. Configuration descriptor is also of
-  variable length
+  variable length.
 
-  @param  UsbDev                The Usb interface
-  @param  Index                 The index of the configuration
+  @param  UsbDev                The Usb interface.
+  @param  Index                 The index of the configuration.
 
-  @return The created configuration descriptor
+  @return The created configuration descriptor.
 
 **/
-STATIC
 EFI_USB_CONFIG_DESCRIPTOR *
 UsbGetOneConfig (
   IN USB_DEVICE           *UsbDev,
@@ -774,16 +747,15 @@ UsbGetOneConfig (
 }
 
 
-
 /**
   Build the whole array of descriptors. This function must
   be called after UsbGetMaxPacketSize0 returns the max packet
   size correctly for endpoint 0.
 
-  @param  UsbDev                The Usb device
+  @param  UsbDev                The Usb device.
 
-  @retval EFI_SUCCESS           The descriptor table is build
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the descriptor
+  @retval EFI_SUCCESS           The descriptor table is build.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the descriptor.
 
 **/
 EFI_STATUS
@@ -877,11 +849,11 @@ UsbBuildDescTable (
 /**
   Set the device's address.
 
-  @param  UsbDev                The device to set address to
-  @param  Address               The address to set
+  @param  UsbDev                The device to set address to.
+  @param  Address               The address to set.
 
-  @retval EFI_SUCCESS           The device is set to the address
-  @retval Others                Failed to set the device address
+  @retval EFI_SUCCESS           The device is set to the address.
+  @retval Others                Failed to set the device address.
 
 **/
 EFI_STATUS
@@ -913,11 +885,11 @@ UsbSetAddress (
   the device's internal state. UsbSelectConfig changes
   the Usb bus's internal state.
 
-  @param  UsbDev                The USB device to set configure to
-  @param  ConfigIndex           The configure index to set
+  @param  UsbDev                The USB device to set configure to.
+  @param  ConfigIndex           The configure index to set.
 
-  @retval EFI_SUCCESS           The device is configured now
-  @retval Others                Failed to set the device configure
+  @retval EFI_SUCCESS           The device is configured now.
+  @retval Others                Failed to set the device configure.
 
 **/
 EFI_STATUS
@@ -944,19 +916,18 @@ UsbSetConfig (
 }
 
 
-
 /**
   Usb UsbIo interface to clear the feature. This is should
   only be used by HUB which is considered a device driver
   on top of the UsbIo interface.
 
-  @param  UsbIo                 The UsbIo interface
-  @param  Target                The target of the transfer: endpoint/device
-  @param  Feature               The feature to clear
-  @param  Index                 The wIndex parameter
+  @param  UsbIo                 The UsbIo interface.
+  @param  Target                The target of the transfer: endpoint/device.
+  @param  Feature               The feature to clear.
+  @param  Index                 The wIndex parameter.
 
-  @retval EFI_SUCCESS           The device feature is cleared
-  @retval Others                Failed to clear the feature
+  @retval EFI_SUCCESS           The device feature is cleared.
+  @retval Others                Failed to clear the feature.
 
 **/
 EFI_STATUS
