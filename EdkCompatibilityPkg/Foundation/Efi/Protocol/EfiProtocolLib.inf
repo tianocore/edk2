@@ -43,6 +43,8 @@ COMPONENT_TYPE=   LIBRARY
   AcpiTable/AcpiTable.c
   Arp/Arp.h
   Arp/Arp.c
+  AuthenticationInfo/AuthenticationInfo.h
+  AuthenticationInfo/AuthenticationInfo.c
   Bis/Bis.h
   Bis/Bis.c
   BlockIo/BlockIo.h
@@ -83,6 +85,8 @@ COMPONENT_TYPE=   LIBRARY
   DriverDiagnostics/DriverDiagnostics.c
   DriverDiagnostics2/DriverDiagnostics2.h
   DriverDiagnostics2/DriverDiagnostics2.c
+  DriverSupportedEfiVersion/DriverSupportedEfiVersion.h
+  DriverSupportedEfiVersion/DriverSupportedEfiVersion.c
   Ebc/Ebc.h
   Ebc/Ebc.c
   EdidActive/EdidActive.h
@@ -121,6 +125,8 @@ COMPONENT_TYPE=   LIBRARY
   Ip4Config/Ip4Config.c
   LoadedImage/LoadedImage.h
   LoadedImage/LoadedImage.c
+  LoadedImageDevicePath\LoadedImageDevicePath.h
+  LoadedImageDevicePath\LoadedImageDevicePath.c
   LoadFile/LoadFile.h
   LoadFile/LoadFile.c
   ManagedNetwork/ManagedNetwork.h
@@ -133,6 +139,8 @@ COMPONENT_TYPE=   LIBRARY
   PciRootBridgeIo/PciRootBridgeIo.c
   PlatformDriverOverride/PlatformDriverOverride.h
   PlatformDriverOverride/PlatformDriverOverride.c
+  PlatformToDriverConfiguration/PlatformToDriverConfiguration.h
+  PlatformToDriverConfiguration/PlatformToDriverConfiguration.c
   PxeBaseCode/PxeBaseCode.h
   PxeBaseCode/PxeBaseCode.c
   PxeBaseCodeCallBack/PxeBaseCodeCallBack.h
