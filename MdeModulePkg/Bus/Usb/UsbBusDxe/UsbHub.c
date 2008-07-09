@@ -1,5 +1,7 @@
 /** @file
 
+    Unified interface for RootHub and Hub.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,17 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:
-
-    UsbHub.c
-
-  Abstract:
-
-    Unified interface for RootHub and Hub
-
-  Revision History
-
 
 **/
 
@@ -32,16 +23,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  USB hub control transfer to clear the hub feature
+  USB hub control transfer to clear the hub feature.
 
-  @param  HubDev                The device of the hub
-  @param  Feature               The feature to clear
+  @param  HubDev                The device of the hub.
+  @param  Feature               The feature to clear.
 
-  @retval EFI_SUCCESS           Feature of the hub is cleared
-  @retval Others                Failed to clear the feature
+  @retval EFI_SUCCESS           Feature of the hub is cleared.
+  @retval Others                Failed to clear the feature.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubCtrlClearHubFeature (
   IN USB_DEVICE           *HubDev,
@@ -67,17 +57,16 @@ UsbHubCtrlClearHubFeature (
 
 
 /**
-  Clear the feature of the device's port
+  Clear the feature of the device's port.
 
-  @param  HubDev                The hub device
-  @param  Port                  The port to clear feature
-  @param  Feature               The feature to clear
+  @param  HubDev                The hub device.
+  @param  Port                  The port to clear feature.
+  @param  Feature               The feature to clear.
 
   @retval EFI_SUCCESS           The feature of the port is cleared.
   @retval Others                Failed to clear the feature.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubCtrlClearPortFeature (
   IN USB_DEVICE           *HubDev,
@@ -107,7 +96,6 @@ UsbHubCtrlClearPortFeature (
 }
 
 
-
 /**
   Clear the transaction translate buffer if full/low
   speed control/bulk transfer failed and the transfer
@@ -115,14 +103,14 @@ UsbHubCtrlClearPortFeature (
   buffer of transaction translator, not that of the
   parent.
 
-  @param  HubDev                The hub device
-  @param  Port                  The port of the hub
-  @param  DevAddr               Address of the failed transaction
-  @param  EpNum                 The endpoint number of the failed transaction
-  @param  EpType                The type of failed transaction
+  @param  HubDev                The hub device.
+  @param  Port                  The port of the hub.
+  @param  DevAddr               Address of the failed transaction.
+  @param  EpNum                 The endpoint number of the failed transaction.
+  @param  EpType                The type of failed transaction.
 
-  @retval EFI_SUCCESS           The TT buffer is cleared
-  @retval Others                Failed to clear the TT buffer
+  @retval EFI_SUCCESS           The TT buffer is cleared.
+  @retval Others                Failed to clear the TT buffer.
 
 **/
 EFI_STATUS
@@ -160,17 +148,16 @@ UsbHubCtrlClearTTBuffer (
 
 
 /**
-  Usb hub control transfer to get the hub descriptor
+  Usb hub control transfer to get the hub descriptor.
 
-  @param  HubDev                The hub device
-  @param  Buf                   The buffer to hold the descriptor
-  @param  Len                   The length to retrieve
+  @param  HubDev                The hub device.
+  @param  Buf                   The buffer to hold the descriptor.
+  @param  Len                   The length to retrieve.
 
-  @retval EFI_SUCCESS           The hub descriptor is retrieved
-  @retval Others                Failed to retrieve the hub descriptor
+  @retval EFI_SUCCESS           The hub descriptor is retrieved.
+  @retval Others                Failed to retrieve the hub descriptor.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubCtrlGetHubDesc (
   IN  USB_DEVICE          *HubDev,
@@ -197,16 +184,15 @@ UsbHubCtrlGetHubDesc (
 
 
 /**
-  Usb hub control transfer to get the hub status
+  Usb hub control transfer to get the hub status.
 
-  @param  HubDev                The hub device
-  @param  State                 The variable to return the status
+  @param  HubDev                The hub device.
+  @param  State                 The variable to return the status.
 
-  @retval EFI_SUCCESS           The hub status is returned in State
-  @retval Others                Failed to get the hub status
+  @retval EFI_SUCCESS           The hub status is returned in State.
+  @retval Others                Failed to get the hub status.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubCtrlGetHubStatus (
   IN  USB_DEVICE          *HubDev,
@@ -232,17 +218,16 @@ UsbHubCtrlGetHubStatus (
 
 
 /**
-  Usb hub control transfer to get the port status
+  Usb hub control transfer to get the port status.
 
-  @param  HubDev                The hub device
-  @param  Port                  The port of the hub
-  @param  State                 Variable to return the hub port state
+  @param  HubDev                The hub device.
+  @param  Port                  The port of the hub.
+  @param  State                 Variable to return the hub port state.
 
-  @retval EFI_SUCCESS           The port state is returned in State
-  @retval Others                Failed to retrive the port state
+  @retval EFI_SUCCESS           The port state is returned in State.
+  @retval Others                Failed to retrive the port state.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubCtrlGetPortStatus (
   IN  USB_DEVICE          *HubDev,
@@ -275,13 +260,13 @@ UsbHubCtrlGetPortStatus (
 
 
 /**
-  Usb hub control transfer to reset the TT (Transaction Transaltor)
+  Usb hub control transfer to reset the TT (Transaction Transaltor).
 
-  @param  HubDev                The hub device
-  @param  Port                  The port of the hub
+  @param  HubDev                The hub device.
+  @param  Port                  The port of the hub.
 
-  @retval EFI_SUCCESS           The TT of the hub is reset
-  @retval Others                Failed to reset the port
+  @retval EFI_SUCCESS           The TT of the hub is reset.
+  @retval Others                Failed to reset the port.
 
 **/
 EFI_STATUS
@@ -309,13 +294,13 @@ UsbHubCtrlResetTT (
 
 
 /**
-  Usb hub control transfer to set the hub feature
+  Usb hub control transfer to set the hub feature.
 
-  @param  HubDev                The hub device
-  @param  Feature               The feature to set
+  @param  HubDev                The hub device.
+  @param  Feature               The feature to set.
 
-  @retval EFI_SUCESS            The feature is set for the hub
-  @retval Others                Failed to set the feature
+  @retval EFI_SUCESS            The feature is set for the hub.
+  @retval Others                Failed to set the feature.
 
 **/
 EFI_STATUS
@@ -343,17 +328,16 @@ UsbHubCtrlSetHubFeature (
 
 
 /**
-  Usb hub control transfer to set the port feature
+  Usb hub control transfer to set the port feature.
 
-  @param  HubDev                The Usb hub device
-  @param  Port                  The Usb port to set feature for
-  @param  Feature               The feature to set
+  @param  HubDev                The Usb hub device.
+  @param  Port                  The Usb port to set feature for.
+  @param  Feature               The feature to set.
 
-  @retval EFI_SUCCESS           The feature is set for the port
-  @retval Others                Failed to set the feature
+  @retval EFI_SUCCESS           The feature is set for the port.
+  @retval Others                Failed to set the feature.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubCtrlSetPortFeature (
   IN USB_DEVICE           *HubDev,
@@ -386,16 +370,15 @@ UsbHubCtrlSetPortFeature (
 /**
   Read the whole usb hub descriptor. It is necessary
   to do it in two steps because hub descriptor is of
-  variable length
+  variable length.
 
-  @param  HubDev                The hub device
-  @param  HubDesc               The variable to return the descriptor
+  @param  HubDev                The hub device.
+  @param  HubDesc               The variable to return the descriptor.
 
-  @retval EFI_SUCCESS           The hub descriptor is read
-  @retval Others                Failed to read the hub descriptor
+  @retval EFI_SUCCESS           The hub descriptor is read.
+  @retval Others                Failed to read the hub descriptor.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubReadDesc (
   IN  USB_DEVICE              *HubDev,
@@ -427,10 +410,10 @@ UsbHubReadDesc (
   Ack the hub change bits. If these bits are not ACKed, Hub will
   always return changed bit map from its interrupt endpoint.
 
-  @param  HubDev                The hub device
+  @param  HubDev                The hub device.
 
-  @retval EFI_SUCCESS           The hub change status is ACKed
-  @retval Others                Failed to ACK the hub status
+  @retval EFI_SUCCESS           The hub change status is ACKed.
+  @retval Others                Failed to ACK the hub status.
 
 **/
 EFI_STATUS
@@ -462,10 +445,10 @@ UsbHubAckHubStatus (
 /**
   Test whether the interface is a hub interface.
 
-  @param  UsbIf                 The interface to test
+  @param  UsbIf                 The interface to test.
 
-  @retval TRUE                  The interface is a hub interface
-  @retval FALSE                 The interface isn't a hub interface
+  @retval TRUE                  The interface is a hub interface.
+  @retval FALSE                 The interface isn't a hub interface.
 
 **/
 BOOLEAN
@@ -496,16 +479,15 @@ UsbIsHubInterface (
   interrupt endpoint. It is called periodically by
   the underlying host controller.
 
-  @param  Data                  The data read
-  @param  DataLength            The length of the data read
-  @param  Context               The context
-  @param  Result                The result of the last interrupt transfer
+  @param  Data                  The data read.
+  @param  DataLength            The length of the data read.
+  @param  Context               The context.
+  @param  Result                The result of the last interrupt transfer.
 
-  @retval EFI_SUCCESS           The process is OK
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource
+  @retval EFI_SUCCESS           The process is OK.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource.
 
 **/
-STATIC
 EFI_STATUS
 UsbOnHubInterrupt (
   IN  VOID                *Data,
@@ -624,15 +606,14 @@ USB_CHANGE_FEATURE_MAP  mRootHubFeatureMap[USB_ROOT_HUB_MAP_SIZE] = {
 
 
 /**
-  Initialize the device for a non-root hub
+  Initialize the device for a non-root hub.
 
-  @param  HubIf                 The USB hub interface
+  @param  HubIf                 The USB hub interface.
 
-  @retval EFI_SUCCESS           The hub is initialized
-  @retval EFI_DEVICE_ERROR      Failed to initialize the hub
+  @retval EFI_SUCCESS           The hub is initialized.
+  @retval EFI_DEVICE_ERROR      Failed to initialize the hub.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubInit (
   IN USB_INTERFACE        *HubIf
@@ -760,15 +741,14 @@ UsbHubInit (
   the port changes in PortState. Bus enumeration code
   doesn't need to ACK the port change bits.
 
-  @param  HubIf                 The hub interface
-  @param  Port                  The port of the hub to get state
-  @param  PortState             Variable to return the port state
+  @param  HubIf                 The hub interface.
+  @param  Port                  The port of the hub to get state.
+  @param  PortState             Variable to return the port state.
 
-  @retval EFI_SUCCESS           The port status is successfully returned
-  @retval Others                Failed to return the status
+  @retval EFI_SUCCESS           The port status is successfully returned.
+  @retval Others                Failed to return the status.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubGetPortStatus (
   IN  USB_INTERFACE       *HubIf,
@@ -788,13 +768,12 @@ UsbHubGetPortStatus (
 /**
   Clear the port change status.
 
-  @param  HubIf                 The hub interface
-  @param  Port                  The hub port
+  @param  HubIf                 The hub interface.
+  @param  Port                  The hub port.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UsbHubClearPortChange (
   IN USB_INTERFACE        *HubIf,
@@ -830,17 +809,16 @@ UsbHubClearPortChange (
 
 
 /**
-  Function to set the port feature for non-root hub
+  Function to set the port feature for non-root hub.
 
-  @param  HubIf                 The hub interface
-  @param  Port                  The port of the hub
-  @param  Feature               The feature of the port to set
+  @param  HubIf                 The hub interface.
+  @param  Port                  The port of the hub.
+  @param  Feature               The feature of the port to set.
 
-  @retval EFI_SUCCESS           The hub port feature is set
-  @retval Others                Failed to set the port feature
+  @retval EFI_SUCCESS           The hub port feature is set.
+  @retval Others                Failed to set the port feature.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubSetPortFeature (
   IN USB_INTERFACE        *HubIf,
@@ -857,17 +835,16 @@ UsbHubSetPortFeature (
 
 
 /**
-  Interface function to clear the port feature for non-root hub
+  Interface function to clear the port feature for non-root hub.
 
-  @param  HubIf                 The hub interface
-  @param  Port                  The port of the hub to clear feature for
-  @param  Feature               The feature to clear
+  @param  HubIf                 The hub interface.
+  @param  Port                  The port of the hub to clear feature for.
+  @param  Feature               The feature to clear.
 
-  @retval EFI_SUCCESS           The port feature is cleared
-  @retval Others                Failed to clear the port feature
+  @retval EFI_SUCCESS           The port feature is cleared.
+  @retval Others                Failed to clear the port feature.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubClearPortFeature (
   IN USB_INTERFACE        *HubIf,
@@ -884,17 +861,16 @@ UsbHubClearPortFeature (
 
 
 /**
-  Interface funtion to reset the port
+  Interface funtion to reset the port.
 
-  @param  HubIf                 The hub interface
-  @param  Port                  The port to reset
+  @param  HubIf                 The hub interface.
+  @param  Port                  The port to reset.
 
-  @retval EFI_SUCCESS           The hub port is reset
-  @retval EFI_TIMEOUT           Failed to reset the port in time
-  @retval Others                Failed to reset the port
+  @retval EFI_SUCCESS           The hub port is reset.
+  @retval EFI_TIMEOUT           Failed to reset the port in time.
+  @retval Others                Failed to reset the port.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubResetPort (
   IN USB_INTERFACE        *HubIf,
@@ -939,14 +915,13 @@ UsbHubResetPort (
 
 
 /**
-  Release the hub's control of the interface
+  Release the hub's control of the interface.
 
-  @param  HubIf                 The hub interface
+  @param  HubIf                 The hub interface.
 
-  @retval EFI_SUCCESS           The interface is release of hub control
+  @retval EFI_SUCCESS           The interface is release of hub control.
 
 **/
-STATIC
 EFI_STATUS
 UsbHubRelease (
   IN USB_INTERFACE        *HubIf
@@ -984,15 +959,14 @@ UsbHubRelease (
 
 
 /**
-  Initialize the interface for root hub
+  Initialize the interface for root hub.
 
-  @param  HubIf                 The root hub interface
+  @param  HubIf                 The root hub interface.
 
-  @retval EFI_SUCCESS           The interface is initialied for root hub
-  @retval Others                Failed to initialize the hub
+  @retval EFI_SUCCESS           The interface is initialied for root hub.
+  @retval Others                Failed to initialize the hub.
 
 **/
-STATIC
 EFI_STATUS
 UsbRootHubInit (
   IN USB_INTERFACE        *HubIf
@@ -1054,22 +1028,20 @@ UsbRootHubInit (
 }
 
 
-
 /**
   Get the port status. This function is required to
   ACK the port change bits although it will return
   the port changes in PortState. Bus enumeration code
   doesn't need to ACK the port change bits.
 
-  @param  HubIf                 The root hub interface
-  @param  Port                  The root hub port to get the state
-  @param  PortState             Variable to return the port state
+  @param  HubIf                 The root hub interface.
+  @param  Port                  The root hub port to get the state.
+  @param  PortState             Variable to return the port state.
 
-  @retval EFI_SUCCESS           The port state is returned
-  @retval Others                Failed to retrieve the port state
+  @retval EFI_SUCCESS           The port state is returned.
+  @retval Others                Failed to retrieve the port state.
 
 **/
-STATIC
 EFI_STATUS
 UsbRootHubGetPortStatus (
   IN  USB_INTERFACE       *HubIf,
@@ -1090,14 +1062,13 @@ UsbRootHubGetPortStatus (
 /**
   Clear the port change status.
 
-  @param  HubIf                 The root hub interface
-  @param  Port                  The root hub port
+  @param  HubIf                 The root hub interface.
+  @param  Port                  The root hub port.
 
-  @retval EFI_SUCCESS           The port state is returned
-  @retval Others                Failed to retrieve the port state
+  @retval EFI_SUCCESS           The port state is returned.
+  @retval Others                Failed to retrieve the port state.
 
 **/
-STATIC
 VOID
 UsbRootHubClearPortChange (
   IN USB_INTERFACE        *HubIf,
@@ -1131,19 +1102,17 @@ UsbRootHubClearPortChange (
 }
 
 
-
 /**
-  Set the root hub port feature
+  Set the root hub port feature.
 
-  @param  HubIf                 The Usb hub interface
-  @param  Port                  The hub port
-  @param  Feature               The feature to set
+  @param  HubIf                 The Usb hub interface.
+  @param  Port                  The hub port.
+  @param  Feature               The feature to set.
 
-  @retval EFI_SUCCESS           The root hub port is set with the feature
-  @retval Others                Failed to set the feature
+  @retval EFI_SUCCESS           The root hub port is set with the feature.
+  @retval Others                Failed to set the feature.
 
 **/
-STATIC
 EFI_STATUS
 UsbRootHubSetPortFeature (
   IN USB_INTERFACE        *HubIf,
@@ -1160,17 +1129,16 @@ UsbRootHubSetPortFeature (
 
 
 /**
-  Clear the root hub port feature
+  Clear the root hub port feature.
 
-  @param  HubIf                 The root hub interface
-  @param  Port                  The root hub port
-  @param  Feature               The feature to clear
+  @param  HubIf                 The root hub interface.
+  @param  Port                  The root hub port.
+  @param  Feature               The feature to clear.
 
-  @retval EFI_SUCCESS           The root hub port is cleared of the feature
-  @retval Others                Failed to clear the feature
+  @retval EFI_SUCCESS           The root hub port is cleared of the feature.
+  @retval Others                Failed to clear the feature.
 
 **/
-STATIC
 EFI_STATUS
 UsbRootHubClearPortFeature (
   IN USB_INTERFACE        *HubIf,
@@ -1187,19 +1155,18 @@ UsbRootHubClearPortFeature (
 
 
 /**
-  Interface funtion to reset the root hub port
+  Interface funtion to reset the root hub port.
 
-  @param  RootIf                The root hub interface
-  @param  Port                  The port to reset
+  @param  RootIf                The root hub interface.
+  @param  Port                  The port to reset.
 
-  @retval EFI_SUCCESS           The hub port is reset
-  @retval EFI_TIMEOUT           Failed to reset the port in time
-  @retval EFI_NOT_FOUND         The low/full speed device connected to high  speed
-                                root hub is released to the companion UHCI
-  @retval Others                Failed to reset the port
+  @retval EFI_SUCCESS           The hub port is reset.
+  @retval EFI_TIMEOUT           Failed to reset the port in time.
+  @retval EFI_NOT_FOUND         The low/full speed device connected to high  speed.
+                                root hub is released to the companion UHCI.
+  @retval Others                Failed to reset the port.
 
 **/
-STATIC
 EFI_STATUS
 UsbRootHubResetPort (
   IN USB_INTERFACE        *RootIf,
@@ -1295,15 +1262,14 @@ UsbRootHubResetPort (
 
 
 /**
-  Release the root hub's control of the interface
+  Release the root hub's control of the interface.
 
-  @param  HubIf                 The root hub interface
+  @param  HubIf                 The root hub interface.
 
   @retval EFI_SUCCESS           The root hub's control of the interface is
                                 released.
 
 **/
-STATIC
 EFI_STATUS
 UsbRootHubRelease (
   IN USB_INTERFACE        *HubIf

@@ -1,4 +1,7 @@
 /** @file
+
+    Usb Bus Driver Binding and Bus IO Protocol.
+
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7,17 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:
-
-    UsbBus.h
-
-  Abstract:
-
-    Usb Bus Driver Binding and Bus IO Protocol
-
-  Revision History
-
 
 **/
 
@@ -55,7 +47,7 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 #include "UsbHub.h"
 #include "UsbEnumer.h"
 
-enum {
+typedef enum {
   USB_MAX_LANG_ID           = 16,
   USB_MAX_INTERFACE         = 16,
   USB_MAX_DEVICES           = 128,
@@ -125,17 +117,17 @@ enum {
   //
   // Send clear feature request timeout, set by experience
   //
-  USB_CLEAR_FEATURE_REQUEST_TIMEOUT  = 10 * USB_BUS_1_MILLISECOND,
+  USB_CLEAR_FEATURE_REQUEST_TIMEOUT  = 10 * USB_BUS_1_MILLISECOND
+}USB_BUS_TIMEOUT_EXPERIENCE_VALUE;
 
-  //
-  // Bus raises TPL to TPL_NOTIFY to serialize all its operations
-  // to protect shared data structures.
-  //
-  USB_BUS_TPL               = TPL_NOTIFY,
+//
+// Bus raises TPL to TPL_NOTIFY to serialize all its operations
+// to protect shared data structures.
+//
+#define  USB_BUS_TPL               TPL_NOTIFY
 
-  USB_INTERFACE_SIGNATURE   = EFI_SIGNATURE_32 ('U', 'S', 'B', 'I'),
-  USB_BUS_SIGNATURE         = EFI_SIGNATURE_32 ('U', 'S', 'B', 'B')
-};
+#define  USB_INTERFACE_SIGNATURE   EFI_SIGNATURE_32 ('U', 'S', 'B', 'I')
+#define  USB_BUS_SIGNATURE         EFI_SIGNATURE_32 ('U', 'S', 'B', 'B')
 
 #define USB_BIT(a)                  ((UINTN)(1 << (a)))
 #define USB_BIT_IS_SET(Data, Bit)   ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
@@ -279,12 +271,32 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        End;
 } USB_CLASS_FORMAT_DEVICE_PATH;
 
+/**
+  Free a DEVICE_PATH_LIST_ITEM list.
+
+  @param  UsbIoDPList            a DEVICE_PATH_LIST_ITEM list pointer.
+
+  @retval EFI_INVALID_PARAMETER  If parameters are invalid, return this value.
+  @retval EFI_SUCCESS            If free operation is successful, return this value.
+
+**/
 EFI_STATUS
 EFIAPI
 UsbBusFreeUsbDPList (
   IN     LIST_ENTRY                                 *UsbIoDPList
   );
 
+/**
+  Store a wanted usb child device info (its Usb part of device path) which is indicated by
+  RemainingDevicePath in a Usb bus which  is indicated by UsbBusId.
+
+  @param  UsbBusId               Point to EFI_USB_BUS_PROTOCOL interface.
+  @param  RemainingDevicePath    The remaining device patch.
+
+  @retval EFI_SUCCESS            Add operation is successful.
+  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
+
+**/
 EFI_STATUS
 EFIAPI
 UsbBusAddWantedUsbIoDP (
@@ -292,6 +304,16 @@ UsbBusAddWantedUsbIoDP (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
+/**
+  Check whether a usb child device is the wanted device in a bus.
+
+  @param  Bus     The Usb bus's private data pointer.
+  @param  UsbIf   The usb child device inferface.
+
+  @retval True    If a usb child device is the wanted device in a bus.
+  @retval False   If a usb child device is *NOT* the wanted device in a bus.
+
+**/
 BOOLEAN
 EFIAPI
 UsbBusIsWantedUsbIO (
@@ -299,6 +321,16 @@ UsbBusIsWantedUsbIO (
   IN USB_INTERFACE           *UsbIf
   );
 
+/**
+  Recursively connnect every wanted usb child device to ensure they all fully connected.
+  Check all the child Usb IO handles in this bus, recursively connecte if it is wanted usb child device.
+
+  @param  UsbBusId                  Point to EFI_USB_BUS_PROTOCOL interface.
+
+  @retval EFI_SUCCESS               Connect is done successfully.
+  @retval EFI_INVALID_PARAMETER     The parameter is invalid.
+
+**/
 EFI_STATUS
 EFIAPI
 UsbBusRecursivelyConnectWantedUsbIo (

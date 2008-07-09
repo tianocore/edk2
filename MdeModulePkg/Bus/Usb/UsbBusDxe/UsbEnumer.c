@@ -1,5 +1,7 @@
 /** @file
 
+    Usb bus enumeration support.
+
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,29 +11,18 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:
-
-    UsbEnumer.c
-
-  Abstract:
-
-    Usb bus enumeration support
-
-  Revision History
-
-
 **/
 
 #include "UsbBus.h"
 
 
 /**
-  Return the endpoint descriptor in this interface
+  Return the endpoint descriptor in this interface.
 
-  @param  UsbIf                 The interface to search in
-  @param  EpAddr                The address of the endpoint to return
+  @param  UsbIf                 The interface to search in.
+  @param  EpAddr                The address of the endpoint to return.
 
-  @return The endpoint descriptor or NULL
+  @return The endpoint descriptor or NULL.
 
 **/
 USB_ENDPOINT_DESC *
@@ -56,14 +47,13 @@ UsbGetEndpointDesc (
 
 
 /**
-  Free the resource used by USB interface
+  Free the resource used by USB interface.
 
-  @param  UsbIf                 The USB interface to free
+  @param  UsbIf                 The USB interface to free.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UsbFreeInterface (
   IN USB_INTERFACE        *UsbIf
@@ -92,13 +82,12 @@ UsbFreeInterface (
   Create an interface for the descriptor IfDesc. Each
   device's configuration can have several interfaces.
 
-  @param  Device                The device has the interface descriptor
-  @param  IfDesc                The interface descriptor
+  @param  Device                The device has the interface descriptor.
+  @param  IfDesc                The interface descriptor.
 
   @return The created USB interface for the descriptor, or NULL.
 
 **/
-STATIC
 USB_INTERFACE *
 UsbCreateInterface (
   IN USB_DEVICE           *Device,
@@ -185,7 +174,7 @@ UsbCreateInterface (
   return UsbIf;
 
 ON_ERROR:
-  if (UsbIf->DevicePath) {
+  if (UsbIf->DevicePath != NULL) {
     gBS->FreePool (UsbIf->DevicePath);
   }
 
@@ -195,14 +184,13 @@ ON_ERROR:
 
 
 /**
-  Free the resource used by this USB device
+  Free the resource used by this USB device.
 
-  @param  Device                The USB device to free
+  @param  Device                The USB device to free.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UsbFreeDevice (
   IN USB_DEVICE           *Device
@@ -219,13 +207,12 @@ UsbFreeDevice (
 /**
   Create a device which is on the parent's ParentPort port.
 
-  @param  ParentIf              The parent HUB interface
-  @param  ParentPort            The port on the HUB this device is connected to
+  @param  ParentIf              The parent HUB interface.
+  @param  ParentPort            The port on the HUB this device is connected to.
 
-  @return Created USB device
+  @return Created USB device, Or NULL.
 
 **/
-STATIC
 USB_DEVICE *
 UsbCreateDevice (
   IN USB_INTERFACE        *ParentIf,
@@ -255,13 +242,12 @@ UsbCreateDevice (
   Connect the USB interface with its driver. EFI USB bus will
   create a USB interface for each seperate interface descriptor.
 
-  @param  UsbIf                 The interface to connect driver to
+  @param  UsbIf             The interface to connect driver to.
 
-  @return EFI_SUCCESS : Interface is managed by some driver
-  @return Others      : Failed to locate a driver for this interface
+  @return EFI_SUCCESS       Interface is managed by some driver.
+  @return Others            Failed to locate a driver for this interface.
 
 **/
-STATIC
 EFI_STATUS
 UsbConnectDriver (
   IN USB_INTERFACE        *UsbIf
@@ -318,10 +304,10 @@ UsbConnectDriver (
   settings. Only one setting is active. It will
   also reset its endpoints' toggle to zero.
 
-  @param  IfDesc                The interface descriptor to set
-  @param  Alternate             The alternate setting number to locate
+  @param  IfDesc                The interface descriptor to set.
+  @param  Alternate             The alternate setting number to locate.
 
-  @retval EFI_NOT_FOUND         There is no setting with this alternate index
+  @retval EFI_NOT_FOUND         There is no setting with this alternate index.
   @retval EFI_SUCCESS           The interface is set to Alternate setting.
 
 **/
@@ -371,11 +357,11 @@ UsbSelectSetting (
   Select a new configuration for the device. Each
   device may support several configurations.
 
-  @param  Device                The device to select configuration
-  @param  ConfigValue           The index of the configuration ( != 0)
+  @param  Device                The device to select configuration.
+  @param  ConfigValue           The index of the configuration ( != 0).
 
-  @retval EFI_NOT_FOUND         There is no configuration with the index
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource
+  @retval EFI_NOT_FOUND         There is no configuration with the index.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource.
   @retval EFI_SUCCESS           The configuration is selected.
 
 **/
@@ -455,16 +441,14 @@ UsbSelectConfig (
 }
 
 
-
 /**
   Disconnect the USB interface with its driver.
 
-  @param  UsbIf                 The interface to disconnect driver from
+  @param  UsbIf                 The interface to disconnect driver from.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UsbDisconnectDriver (
   IN USB_INTERFACE        *UsbIf
@@ -503,13 +487,12 @@ UsbDisconnectDriver (
 }
 
 
-
 /**
-  Remove the current device configuration
+  Remove the current device configuration.
 
-  @param  Device                The USB device to remove configuration from
+  @param  Device                The USB device to remove configuration from.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -540,13 +523,12 @@ UsbRemoveConfig (
 }
 
 
-
 /**
   Remove the device and all its children from the bus.
 
-  @param  Device                The device to remove
+  @param  Device                The device to remove.
 
-  @retval EFI_SUCCESS           The device is removed
+  @retval EFI_SUCCESS           The device is removed.
 
 **/
 EFI_STATUS
@@ -592,15 +574,14 @@ UsbRemoveDevice (
 
 
 /**
-  Find the child device on the hub's port
+  Find the child device on the hub's port.
 
-  @param  HubIf                 The hub interface
-  @param  Port                  The port of the hub this child is connected to
+  @param  HubIf                 The hub interface.
+  @param  Port                  The port of the hub this child is connected to.
 
-  @return The device on the hub's port, or NULL if there is none
+  @return The device on the hub's port, or NULL if there is none.
 
 **/
-STATIC
 USB_DEVICE *
 UsbFindChild (
   IN USB_INTERFACE        *HubIf,
@@ -630,19 +611,17 @@ UsbFindChild (
 }
 
 
-
 /**
   Enumerate and configure the new device on the port of this HUB interface.
 
-  @param  HubIf                 The HUB that has the device connected
-  @param  Port                  The port index of the hub (started with zero)
+  @param  HubIf                 The HUB that has the device connected.
+  @param  Port                  The port index of the hub (started with zero).
 
-  @retval EFI_SUCCESS           The device is enumerated (added or removed)
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the device
-  @retval Others                Failed to enumerate the device
+  @retval EFI_SUCCESS           The device is enumerated (added or removed).
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the device.
+  @retval Others                Failed to enumerate the device.
 
 **/
-STATIC
 EFI_STATUS
 UsbEnumerateNewDev (
   IN USB_INTERFACE        *HubIf,
@@ -832,19 +811,17 @@ ON_ERROR:
 }
 
 
-
 /**
   Process the events on the port.
 
-  @param  HubIf                 The HUB that has the device connected
-  @param  Port                  The port index of the hub (started with zero)
+  @param  HubIf                 The HUB that has the device connected.
+  @param  Port                  The port index of the hub (started with zero).
 
-  @retval EFI_SUCCESS           The device is enumerated (added or removed)
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the device
-  @retval Others                Failed to enumerate the device
+  @retval EFI_SUCCESS           The device is enumerated (added or removed).
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the device.
+  @retval Others                Failed to enumerate the device.
 
 **/
-STATIC
 EFI_STATUS
 UsbEnumeratePort (
   IN USB_INTERFACE        *HubIf,
@@ -949,15 +926,16 @@ UsbEnumeratePort (
 
 
 /**
-  Enumerate all the changed hub ports
+  Enumerate all the changed hub ports.
 
-  @param  Event                 The event that is triggered
-  @param  Context               The context to the event
+  @param  Event                 The event that is triggered.
+  @param  Context               The context to the event.
 
-  @return None
+  @return None.
 
 **/
 VOID
+EFIAPI
 UsbHubEnumeration (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
@@ -999,12 +977,12 @@ UsbHubEnumeration (
 
 
 /**
-  Enumerate all the changed hub ports
+  Enumerate all the changed hub ports.
 
-  @param  Event                 The event that is triggered
-  @param  Context               The context to the event
+  @param  Event                 The event that is triggered.
+  @param  Context               The context to the event.
 
-  @return None
+  @return None.
 
 **/
 VOID
