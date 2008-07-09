@@ -30,7 +30,7 @@
 #
 
 [Sources.common]
-  PciLib.c
+  PciCf8Lib.c
 
 [Packages]
   MdePkg/MdePkg.dec
