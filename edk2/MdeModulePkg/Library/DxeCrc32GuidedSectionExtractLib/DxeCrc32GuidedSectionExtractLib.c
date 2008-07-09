@@ -27,6 +27,21 @@ typedef struct {
   UINT32                    CRC32Checksum;
 } CRC32_SECTION_HEADER;
 
+/**
+
+  The implementation of Crc32 guided section GetInfo() to get 
+  size and attribute of the guided section.
+
+  @param InputSection       Buffer containing the input GUIDed section to be processed.
+  @param OutputBufferSize   The size of OutputBuffer.
+  @param ScratchBufferSize  The size of ScratchBuffer.
+  @param SectionAttribute   The attribute of the input guided section.
+
+  @retval EFI_SUCCESS            The size of destination buffer, the size of scratch buffer and 
+                                 the attribute of the input section are successull retrieved.
+  @retval EFI_INVALID_PARAMETER  The GUID in InputSection does not match this instance guid.
+
+**/
 EFI_STATUS
 EFIAPI
 Crc32GuidedSectionGetInfo (
@@ -35,26 +50,10 @@ Crc32GuidedSectionGetInfo (
   OUT UINT32      *ScratchBufferSize,
   OUT UINT16      *SectionAttribute
   )
-/*++
-
-Routine Description:
-
-  The implementation of Crc32 guided section GetInfo().
-
-Arguments:
-  InputSection          Buffer containing the input GUIDed section to be processed. 
-  OutputBufferSize      The size of OutputBuffer.
-  ScratchBufferSize     The size of ScratchBuffer.
-  SectionAttribute      The attribute of the input guided section.
-
-Returns:
-
-  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
-  EFI_INVALID_PARAMETER - The source data is corrupted, or
-                          The GUID in InputSection does not match this instance guid.
-
---*/
 {
+  //
+  // Check whether the input guid section is recognized.
+  //
   if (!CompareGuid (
         &gEfiCrc32GuidedSectionExtractionProtocolGuid, 
         &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
@@ -71,6 +70,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  The implementation of Crc32 Guided section extraction to get the section data.
+
+  @param InputSection    Buffer containing the input GUIDed section to be processed.
+  @param OutputBuffer    to contain the output data, which is allocated by the caller.
+  @param ScratchBuffer   A pointer to a caller-allocated buffer for function internal use.
+  @param AuthenticationStatus A pointer to a caller-allocated UINT32 that indicates the
+                         authentication status of the output buffer.
+
+  @retval EFI_SUCCESS            Section Data and Auth Status is extracted successfully.
+  @retval EFI_INVALID_PARAMETER  The GUID in InputSection does not match this instance guid.
+
+**/
 EFI_STATUS
 EFIAPI
 Crc32GuidedSectionHandler (
@@ -79,28 +92,6 @@ Crc32GuidedSectionHandler (
   IN        VOID    *ScratchBuffer,        OPTIONAL
   OUT       UINT32  *AuthenticationStatus
   )
-/*++
-
-Routine Description:
-
-  The implementation of Crc32 Guided section extraction.
-
-Arguments:
-  InputSection           Buffer containing the input GUIDed section to be processed. 
-  OutputBuffer           OutputBuffer to point to the start of the section's contents.
-                         if guided data is not prcessed. Otherwise,
-                         OutputBuffer to contain the output data, which is allocated by the caller.
-  ScratchBuffer          A pointer to a caller-allocated buffer for function internal use. 
-  AuthenticationStatus   A pointer to a caller-allocated UINT32 that indicates the
-                         authentication status of the output buffer. 
-
-Returns:
-
-  RETURN_SUCCESS           - Decompression is successfull
-  RETURN_INVALID_PARAMETER - The source data is corrupted, or
-                             The GUID in InputSection does not match this instance guid.
-
---*/
 {
   EFI_STATUS                Status;
   CRC32_SECTION_HEADER      *Crc32SectionHeader;
@@ -108,12 +99,18 @@ Returns:
   UINT32                    OutputBufferSize;
   VOID                      *DummyInterface;
 
+  //
+  // Check whether the input guid section is recognized.
+  //
   if (!CompareGuid (
         &gEfiCrc32GuidedSectionExtractionProtocolGuid, 
         &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
     return EFI_INVALID_PARAMETER;
   }
-
+  
+  //
+  // Init Checksum value to Zero.
+  //
   Crc32Checksum = 0;
   //
   // Points to the Crc32 section header
@@ -134,6 +131,9 @@ Returns:
   //
   Status = gBS->LocateProtocol (&gEfiSecurityPolicyProtocolGuid, NULL, &DummyInterface);
   if (!EFI_ERROR (Status)) {
+    //
+    // If SecurityPolicy Protocol exist, AUTH platform override bit is set.
+    //
     *AuthenticationStatus |= EFI_AUTH_STATUS_PLATFORM_OVERRIDE;
   } else {
     //
@@ -142,9 +142,15 @@ Returns:
     Status = gBS->CalculateCrc32 (*OutputBuffer, OutputBufferSize, &Crc32Checksum);
     if (Status == EFI_SUCCESS) {
       if (Crc32Checksum != Crc32SectionHeader->CRC32Checksum) {
+        //
+        // If Crc32 checksum is not matched, AUTH tested failed bit is set.
+        //
         *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
       }
     } else {
+      //
+      // If Crc32 checksum is not calculated, AUTH not tested bit is set.
+      //
       *AuthenticationStatus |= EFI_AUTH_STATUS_NOT_TESTED;
     }
   }
@@ -156,7 +162,7 @@ Returns:
   Register Crc32 section handler.
 
   @retval  RETURN_SUCCESS            Register successfully.
-  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to store this handler.
+  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to register this handler.
 **/
 EFI_STATUS
 EFIAPI

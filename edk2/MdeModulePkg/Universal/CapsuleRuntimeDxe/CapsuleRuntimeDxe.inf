@@ -50,7 +50,7 @@
   gEfiCapsuleVendorGuid                         # SOMETIMES_CONSUMED
 
 [Protocols]
-  gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest

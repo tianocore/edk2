@@ -1,7 +1,7 @@
 #/** @file
-# Component description file for Crc32SectionExtract library.
+# Crc32SectionExtract library instance registers Crc32 handler into ExtractGuidedSectionLib.
 #
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
   FILE_GUID                      = 387A2490-81FC-4E7C-8E0A-3E58C30FCD0B
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
