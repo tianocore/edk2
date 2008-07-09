@@ -1,7 +1,7 @@
 /** @file
-  Some definitions for Security Architectural Protocol stub driver
+  Inlcude the required definitions for Security Architectural Protocol stub driver
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                              
+  Copyright (c) 2006 - 2008, Intel Corporation                                              
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _SECURITY_STUB_ARCH_PROTOCOL_H
-#define _SECURITY_STUB_ARCH_PROTOCOL_H
+#ifndef __SECURITY_STUB_ARCH_PROTOCOL_H__
+#define __SECURITY_STUB_ARCH_PROTOCOL_H__
 
 
 //
@@ -28,6 +28,41 @@
 //
 // Function prototypes
 //
+/**
+  The EFI_SECURITY_ARCH_PROTOCOL (SAP) is used to abstract platform-specific 
+  policy from the DXE core response to an attempt to use a file that returns a 
+  given status for the authentication check from the section extraction protocol.  
+
+  The possible responses in a given SAP implementation may include locking 
+  flash upon failure to authenticate, attestation logging for all signed drivers, 
+  and other exception operations.  The File parameter allows for possible logging 
+  within the SAP of the driver.
+
+  If File is NULL, then EFI_INVALID_PARAMETER is returned.
+
+  If the file specified by File with an authentication status specified by 
+  AuthenticationStatus is safe for the DXE Core to use, then EFI_SUCCESS is returned.
+
+  If the file specified by File with an authentication status specified by 
+  AuthenticationStatus is not safe for the DXE Core to use under any circumstances, 
+  then EFI_ACCESS_DENIED is returned.
+
+  If the file specified by File with an authentication status specified by 
+  AuthenticationStatus is not safe for the DXE Core to use right now, but it 
+  might be possible to use it at a future time, then EFI_SECURITY_VIOLATION is 
+  returned.
+
+  @param  This             The EFI_SECURITY_ARCH_PROTOCOL instance.
+  @param  AuthenticationStatus 
+                           This is the authentication type returned from the Section
+                           Extraction protocol. See the Section Extraction Protocol
+                           Specification for details on this type.
+  @param  File             This is a pointer to the device path of the file that is
+                           being dispatched. This will optionally be used for logging.
+
+  @retval EFI_SUCCESS            Do nothing and return.
+  @retval EFI_INVALID_PARAMETER  File is NULL.
+**/
 EFI_STATUS
 EFIAPI
 SecurityStubAuthenticateState (
@@ -36,6 +71,17 @@ SecurityStubAuthenticateState (
   IN  EFI_DEVICE_PATH_PROTOCOL           *File
   );
 
+/**
+  The user Entry Point for DXE driver. The user code starts with this function
+  as the real entry point for the image goes into a library that calls this 
+  function.
+
+  @param ImageHandle    The firmware allocated handle for the EFI image.  
+  @param SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   Install the sample Security Architectural Protocol successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 SecurityStubInitialize (

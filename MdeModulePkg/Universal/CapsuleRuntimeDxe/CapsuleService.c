@@ -1,5 +1,6 @@
 /** @file
-  Capsule Runtime Service.
+  Capsule Runtime Drivers produces two UEFI capsule runtime services.
+  (UpdateCapsule, QueryCapsuleCapabilities)
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -14,6 +15,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "CapsuleService.h"
 
+/**
+  Passes capsules to the firmware with both virtual and physical mapping. Depending on the intended
+  consumption, the firmware may process the capsule immediately. If the payload should persist
+  across a system reset, the reset value returned from EFI_QueryCapsuleCapabilities must
+  be passed into ResetSystem() and will cause the capsule to be processed by the firmware as
+  part of the reset process.
+
+  @param  CapsuleHeaderArray    Virtual pointer to an array of virtual pointers to the capsules
+                                being passed into update capsule.
+  @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
+                                CaspuleHeaderArray.
+  @param  ScatterGatherList     Physical pointer to a set of
+                                EFI_CAPSULE_BLOCK_DESCRIPTOR that describes the
+                                location in physical memory of a set of capsules.
+
+  @retval EFI_SUCCESS           Valid capsule was passed. If
+                                CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set, the
+                                capsule has been successfully processed by the firmware.
+  @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
+  @retval EFI_INVALID_PARAMETER CapsuleCount is Zero, or CapsuleImage is not valid.
+                                For across reset capsule image, ScatterGatherList is NULL.
+  @retval EFI_UNSUPPORTED       CapsuleImage is not recognized by the firmware.
+
+**/
 EFI_STATUS
 EFIAPI
 UpdateCapsule (
@@ -21,33 +46,14 @@ UpdateCapsule (
   IN UINTN                   CapsuleCount,
   IN EFI_PHYSICAL_ADDRESS    ScatterGatherList OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  This code finds whether the capsules need reset to update, if not, update immediately.
-
-Arguments:
-
-  CapsuleHeaderArray             A array of pointers to capsule headers passed in
-  CapsuleCount                   The number of capsule
-  ScatterGatherList              Physical address of datablock list points to capsule
-
-Returns:
-
-  EFI STATUS
-  EFI_SUCCESS                    Valid capsule was passed.If CAPSULE_FLAG_PERSIT_ACROSS_RESET is
-                                 not set, the capsule has been successfully processed by the firmware.
-                                 If it set, the ScattlerGatherList is successfully to be set.
-  EFI_INVALID_PARAMETER          CapsuleCount is less than 1,CapsuleGuid is not supported.
-  EFI_DEVICE_ERROR               Failed to SetVariable or ProcessFirmwareVolume.
-
---*/
 {
   UINTN                     ArrayNumber;
   EFI_STATUS                Status;
   EFI_CAPSULE_HEADER        *CapsuleHeader;
-
+  
+  //
+  // Capsule Count can't be less than one.
+  //
   if (CapsuleCount < 1) {
     return EFI_INVALID_PARAMETER;
   }
@@ -76,7 +82,10 @@ Returns:
   // Assume that capsules have the same flags on reseting or not.
   //
   CapsuleHeader = CapsuleHeaderArray[0];
-
+  
+  //
+  //  Process across reset capsule image.
+  //
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
     //
     // Check if the platform supports update capsule across a system reset
@@ -107,25 +116,27 @@ Returns:
         return Status;
       }
       //
-      // Successfully set the capsule image address into variable.
+      // Successfully set the capsule image address into EFI variable.
       //
       return EFI_SUCCESS;
     }
   }
 
   //
-  // The rest occurs in the condition of non-reset mode
-  // Now Runtime mode doesn't support the non-reset capsule image.
+  // Process the non-reset capsule image.
   //
   if (EfiAtRuntime ()) {
+    //
+    // Runtime mode doesn't support the non-reset capsule image.
+    //
     return EFI_UNSUPPORTED;
   }
 
   //
   // Here should be in the boot-time for non-reset capsule image
-  // Default process to Update Capsule image into Flash.
+  // Platform specific update for the non-reset capsule image.
   //
-  for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
+  for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     Status = ProcessCapsuleImage (CapsuleHeaderArray[ArrayNumber]);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -135,8 +146,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Returns if the capsule can be supported via UpdateCapsule().
 
+  @param  CapsuleHeaderArray    Virtual pointer to an array of virtual pointers to the capsules
+                                being passed into update capsule.
+  @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
+                                CaspuleHeaderArray.
+  @param  MaxiumCapsuleSize     On output the maximum size that UpdateCapsule() can
+                                support as an argument to UpdateCapsule() via
+                                CapsuleHeaderArray and ScatterGatherList.
+  @param  ResetType             Returns the type of reset required for the capsule update.
 
+  @retval EFI_SUCCESS           Valid answer returned.
+  @retval EFI_UNSUPPORTED       The capsule image is not supported on this platform, and
+                                MaximumCapsuleSize and ResetType are undefined.
+  @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL, or ResetTyep is NULL,
+                                Or CapsuleCount is Zero, or CapsuleImage is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 QueryCapsuleCapabilities (
@@ -145,36 +173,20 @@ QueryCapsuleCapabilities (
   OUT UINT64               *MaxiumCapsuleSize,
   OUT EFI_RESET_TYPE       *ResetType
   )
-/*++
-
-Routine Description:
-
-  This code is to query about capsule capability.
-
-Arguments:
-
-  CapsuleHeaderArray              A array of pointers to capsule headers passed in
-  CapsuleCount                    The number of capsule
-  MaxiumCapsuleSize               Max capsule size is supported
-  ResetType                       Reset type the capsule indicates, if reset is not needed,return EfiResetCold.
-                                  If reset is needed, return EfiResetWarm.
-
-Returns:
-
-  EFI STATUS
-  EFI_SUCCESS                     Valid answer returned
-  EFI_INVALID_PARAMETER           MaxiumCapsuleSize is NULL,ResetType is NULL.CapsuleCount is less than 1,CapsuleGuid is not supported.
-  EFI_UNSUPPORTED                 The capsule type is not supported.
-
---*/
 {
   UINTN                     ArrayNumber;
   EFI_CAPSULE_HEADER        *CapsuleHeader;
 
+  //
+  // Capsule Count can't be less than one.
+  //
   if (CapsuleCount < 1) {
     return EFI_INVALID_PARAMETER;
   }
-
+  
+  //
+  // Check whether input paramter is valid
+  //
   if ((MaxiumCapsuleSize == NULL) ||(ResetType == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -191,7 +203,7 @@ Returns:
       return EFI_INVALID_PARAMETER;
     }
     //
-    // Check Capsule image without populate flag by firmware support capsule function  
+    // Check Capsule image without populate flag is supported by firmware
     //
     if (((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) && 
         (SupportCapsuleImage (CapsuleHeader) != EFI_SUCCESS)) {
@@ -200,7 +212,7 @@ Returns:
   }
 
   //
-  //Assume that capsules have the same flags on reseting or not.
+  // Assume that capsules have the same flags on reseting or not.
   //
   CapsuleHeader = CapsuleHeaderArray[0];
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
@@ -213,6 +225,9 @@ Returns:
     *ResetType = EfiResetWarm;
     *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizePopulateCapsule);
   } else {
+    //
+    // For non-reset capsule image.
+    //
     *ResetType = EfiResetCold;
     *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizeNonPopulateCapsule);
   }
@@ -220,37 +235,35 @@ Returns:
 }
 
 
+/**
+
+  This code is to install UEFI capsule runtime service.
+
+  @param  ImageHandle    The firmware allocated handle for the EFI image.  
+  @param  SystemTable    A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS    UEFI Capsule Runtime Services are installed successfully. 
+
+**/
 EFI_STATUS
 EFIAPI
 CapsuleServiceInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
-
-Routine Description:
-
-  This code is capsule runtime service initialization.
-
-Arguments:
-
-  ImageHandle          The image handle
-  SystemTable          The system table.
-
-Returns:
-
-  EFI STATUS
-
---*/
 {
   EFI_STATUS  Status;
   EFI_HANDLE  NewHandle;
-
+  
+  //
+  // Install capsule runtime services into UEFI runtime service tables.
+  //
   SystemTable->RuntimeServices->UpdateCapsule                    = UpdateCapsule;
   SystemTable->RuntimeServices->QueryCapsuleCapabilities         = QueryCapsuleCapabilities;
 
   //
-  // Now install the Capsule Architectural Protocol on a new handle
+  // Install the Capsule Architectural Protocol on a new handle
+  // to signify the capsule runtime services are ready.
   //
   NewHandle = NULL;
 

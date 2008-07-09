@@ -1,5 +1,6 @@
 /** @file
-  Recovery Library. This library class defines a set of methods related do recovery.
+  Null Recovery Library instance. 
+  This library class defines a set of methods related do recovery.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -16,8 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Calling this function causes the system do recovery.
   
-  @retval EFI_SUCESS   Sucess to do recovery.
-  @retval Others       Fail to do recovery.
+  @retval EFI_UNSUPPORTED       Recovery is not supported.
 **/
 EFI_STATUS
 EFIAPI
