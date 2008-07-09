@@ -1,9 +1,9 @@
 #/** @file
-# Component description file for PCI Express Base PCI Library.
+# This driver impements one PCI Library based on PCI Express Library.
 #
 # PCI Library that uses the 256 MB PCI Express MMIO window to perform PCI
-#  Configuration cycles. Layers on top of an I/O Library instance.
-# Copyright (c) 2007, Intel Corporation.
+#  Configuration cycles. Layers on one PCI Express Library instance.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -32,7 +32,6 @@
 
 [Sources.common]
   PciLib.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
