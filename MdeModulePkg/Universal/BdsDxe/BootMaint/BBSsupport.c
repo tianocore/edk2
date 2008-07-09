@@ -435,16 +435,18 @@ BdsIsLegacyBootOption (
 }
 
 /**
-  EDES_TODO: Add function description.
 
-  @param OptionNumber    EDES_TODO: Add parameter description
-  @param BootOrder       EDES_TODO: Add parameter description
-  @param BootOrderSize   EDES_TODO: Add parameter description
+  Delete boot option specified by OptionNumber and adjust the boot order.
 
-  @return EDES_TODO: Add description for return value
+  @param  OptionNumber      The boot option to be deleted.
+  @param  BootOrder         Boot order list to be adjusted by remove this boot option.
+  @param  BootOrderSize     The size of Boot order list will be modified.
+  
+  @retval EFI_SUCCESS       The boot option is deleted successfully.
 
 **/
 EFI_STATUS
+EFIAPI
 BdsDeleteBootOption (
   IN UINTN                       OptionNumber,
   IN OUT UINT16                  *BootOrder,
@@ -486,20 +488,14 @@ BdsDeleteBootOption (
 }
 
 /**
-
   Delete all the invalid legacy boot options.
 
-
-  @param VOID            EDES_TODO: Add parameter description
-
-  @retval  EFI_SUCCESS             All invalide legacy boot options are deleted.
-  @retval  EFI_OUT_OF_RESOURCES    Fail to allocate necessary memory.
-  @retval  EFI_NOT_FOUND           Fail to retrive variable of boot order.
-  @retval  Other                   Error occurs while setting variable or locating
-                                   protocol.
-
+  @retval EFI_SUCCESS             All invalide legacy boot options are deleted.
+  @retval EFI_OUT_OF_RESOURCES    Fail to allocate necessary memory.
+  @retval EFI_NOT_FOUND           Fail to retrive variable of boot order.
 **/
 EFI_STATUS
+EFIAPI
 BdsDeleteAllInvalidLegacyBootOptions (
   VOID
   )
@@ -750,14 +746,12 @@ BdsCreateOneLegacyBootOption (
 
   Add the legacy boot options from BBS table if they do not exist.
 
-
-  @param VOID            EDES_TODO: Add parameter description
-
-  @retval  EFI_SUCCESS        The boot options are added successfully or they are already in boot options.
-  @retval  others             An error occurred when creating legacy boot options.
+  @retval EFI_SUCCESS       The boot options are added successfully 
+                            or they are already in boot options.
 
 **/
 EFI_STATUS
+EFIAPI
 BdsAddNonExistingLegacyBootOptions (
   VOID
   )
@@ -1029,14 +1023,15 @@ BdsCreateDevOrder (
 }
 
 /**
-  EDES_TODO: Add function description.
 
-  @param VOID            EDES_TODO: Add parameter description
+  Add the legacy boot devices from BBS table into 
+  the legacy device boot order.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS       The boot devices are added successfully.
 
 **/
 EFI_STATUS
+EFIAPI
 BdsUpdateLegacyDevOrder (
   VOID
   )
@@ -1586,14 +1581,16 @@ PrintBbsTable (
 }
 
 /**
-  EDES_TODO: Add function description.
 
-  @param Entry           EDES_TODO: Add parameter description
+  Set the boot priority for BBS entries based on boot option entry and boot order.
 
-  @return EDES_TODO: Add description for return value
+  @param  Entry             The boot option is to be checked for refresh BBS table.
+  
+  @retval EFI_SUCCESS       The boot priority for BBS entries is refreshed successfully.
 
 **/
 EFI_STATUS
+EFIAPI
 BdsRefreshBbsTableForBoot (
   IN BDS_COMMON_OPTION        *Entry
   )
