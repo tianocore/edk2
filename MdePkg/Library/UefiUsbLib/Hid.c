@@ -17,10 +17,10 @@
 
 
 /**
-  Get Hid Descriptor
+  Get Hid Descriptor.
 
-  @param  UsbIo             EFI_USB_IO_PROTOCOL
-  @param  InterfaceNum      Hid interface number
+  @param  UsbIo             EFI_USB_IO_PROTOCOL.
+  @param  InterfaceNum      Hid interface number.
   @param  HidDescriptor     Caller allocated buffer to store Usb hid descriptor if
                             successfully returned.
 
@@ -63,12 +63,9 @@ UsbGetHidDescriptor (
   return Result;
 
 }
-//
-// Function to get Report Class descriptor
-//
 
 /**
-  get Report Class descriptor
+  Get Report Class descriptor.
 
   @param  UsbIo             EFI_USB_IO_PROTOCOL.
   @param  InterfaceNum      Report interface number.
@@ -118,15 +115,12 @@ UsbGetReportDescriptor (
   return Result;
 
 }
-//
-// Following are HID class request
-//
 
 /**
-  Get Hid Protocol Request
+  Get Hid Protocol Request.
 
-  @param  UsbIo             EFI_USB_IO_PROTOCOL
-  @param  Interface         Which interface the caller wants to get protocol
+  @param  UsbIo             EFI_USB_IO_PROTOCOL.
+  @param  Interface         Which interface the caller wants to get protocol.
   @param  Protocol          Protocol value returned.
 
   @return EFI_SUCCESS
@@ -174,12 +168,11 @@ UsbGetProtocolRequest (
 }
 
 
-
 /**
-  Set Hid Protocol Request
+  Set Hid Protocol Request.
 
-  @param  UsbIo             EFI_USB_IO_PROTOCOL
-  @param  Interface         Which interface the caller wants to set protocol
+  @param  UsbIo             EFI_USB_IO_PROTOCOL.
+  @param  Interface         Which interface the caller wants to set protocol.
   @param  Protocol          Protocol value the caller wants to set.
 
   @return EFI_SUCCESS
@@ -226,11 +219,10 @@ UsbSetProtocolRequest (
 }
 
 
-
 /**
   Set Idel request.
 
-  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  UsbIo             EFI_USB_IO_PROTOCOL.
   @param  Interface         Which interface the caller wants to set.
   @param  ReportId          Which report the caller wants to set.
   @param  Duration          Idle rate the caller wants to set.
@@ -283,7 +275,7 @@ UsbSetIdleRequest (
 /**
   Get Idel request.
 
-  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  UsbIo             EFI_USB_IO_PROTOCOL.
   @param  Interface         Which interface the caller wants to get.
   @param  ReportId          Which report the caller wants to get.
   @param  Duration          Idle rate the caller wants to get.
@@ -334,11 +326,10 @@ UsbGetIdleRequest (
 }
 
 
-
 /**
   Hid Set Report request.
 
-  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  UsbIo             EFI_USB_IO_PROTOCOL.
   @param  Interface         Which interface the caller wants to set.
   @param  ReportId          Which report the caller wants to set.
   @param  ReportType        Type of report.
@@ -396,7 +387,7 @@ UsbSetReportRequest (
 /**
   Hid Set Report request.
 
-  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  UsbIo             EFI_USB_IO_PROTOCOL.
   @param  Interface         Which interface the caller wants to set.
   @param  ReportId          Which report the caller wants to set.
   @param  ReportType        Type of report.
