@@ -1,5 +1,7 @@
 /** @file
 
+  The definition for UHCI driver model and HC protocol routines.
+
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,21 +11,10 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Uhci.h
-
-Abstract:
-
-  The definition for UHCI driver model and HC protocol routines.
-
-Revision History
-
-
 **/
 
-#ifndef _UHCI_H
-#define _UHCI_H
+#ifndef _EFI_UHCI_H_
+#define _EFI_UHCI_H_
 
 
 #include <PiDxe.h>
@@ -51,7 +42,7 @@ typedef struct _USB_HC_DEV  USB_HC_DEV;
 #include "UhciSched.h"
 #include "UhciDebug.h"
 
-enum {
+typedef enum {
   UHC_1_MICROSECOND             = 1,
   UHC_1_MILLISECOND             = 1000 * UHC_1_MICROSECOND,
   UHC_1_SECOND                  = 1000 * UHC_1_MILLISECOND,
@@ -80,16 +71,17 @@ enum {
   // and the unit of Async is 100us.
   //
   UHC_SYNC_POLL_INTERVAL        = 50 * UHC_1_MICROSECOND,
-  UHC_ASYNC_POLL_INTERVAL       = 50 * 10000UL,
+  UHC_ASYNC_POLL_INTERVAL       = 50 * 10000UL
+}UHC_TIMEOUT_EXPERIENCE_VALUE;
 
-  //
-  // UHC raises TPL to TPL_NOTIFY to serialize all its operations
-  // to protect shared data structures.
-  //
-  UHCI_TPL                 = TPL_NOTIFY,
 
-  USB_HC_DEV_SIGNATURE          = EFI_SIGNATURE_32 ('u', 'h', 'c', 'i')
-};
+//
+// UHC raises TPL to TPL_NOTIFY to serialize all its operations
+// to protect shared data structures.
+//
+#define  UHCI_TPL                     TPL_NOTIFY
+
+#define  USB_HC_DEV_SIGNATURE         EFI_SIGNATURE_32 ('u', 'h', 'c', 'i')
 
 #pragma pack(1)
 typedef struct {

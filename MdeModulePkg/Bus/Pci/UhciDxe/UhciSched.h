@@ -1,5 +1,7 @@
 /** @file
 
+  The definition for EHCI register operation routines.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,24 +11,13 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  UhciSched.h
-
-Abstract:
-
-  The definition for EHCI register operation routines.
-
-Revision History
-
-
 **/
 
 #ifndef _EFI_UHCI_SCHED_H_
 #define _EFI_UHCI_SCHED_H_
 
 
-enum {
+typedef enum {
   UHCI_ASYNC_INT_SIGNATURE = EFI_SIGNATURE_32 ('u', 'h', 'c', 'a'),
 
   //
@@ -40,7 +31,7 @@ enum {
                       EFI_USB_ERR_TIMEOUT | EFI_USB_ERR_BITSTUFF |
                       EFI_USB_ERR_SYSTEM
 
-};
+}UHCI_ERR_FAIL_MASK;
 
 //
 // Structure to return the result of UHCI QH execution.
@@ -91,36 +82,29 @@ struct _UHCI_ASYNC_REQUEST{
 #define UHCI_ASYNC_INT_FROM_LINK(a) \
           CR (a, UHCI_ASYNC_REQUEST, Link, UHCI_ASYNC_INT_SIGNATURE)
 
+
+/**
+  Create Frame List Structure.
+
+  @param  Uhc                    The UHCI device.
+
+  @return EFI_OUT_OF_RESOURCES   Can't allocate memory resources.
+  @return EFI_UNSUPPORTED        Map memory fail.
+  @return EFI_SUCCESS            Success.
+
+**/
 EFI_STATUS
 UhciInitFrameList (
   IN USB_HC_DEV         *Uhc
   )
-/*++
-
-Routine Description:
-
-  Create Frame List Structure
-
-Arguments:
-
-  Uhc         - UHCI device
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES - Can't allocate memory resources
-  EFI_UNSUPPORTED      - Map memory fail
-  EFI_SUCCESS          - Success
-
---*/
 ;
 
-
 /**
-  Destory FrameList buffer
+  Destory FrameList buffer.
 
-  @param  Uhc                    The UHCI device
+  @param  Uhc                    The UHCI device.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
@@ -132,11 +116,11 @@ UhciDestoryFrameList (
 
 /**
   Convert the poll rate to the maxium 2^n that is smaller
-  than Interval
+  than Interval.
 
-  @param  Interval               The poll rate to convert
+  @param  Interval               The poll rate to convert.
 
-  @return The converted poll rate
+  @return The converted poll rate.
 
 **/
 UINTN
@@ -150,10 +134,10 @@ UhciConvertPollRate (
   Link a queue head (for asynchronous interrupt transfer) to
   the frame list.
 
-  @param  FrameBase              The base of the frame list
-  @param  Qh                     The queue head to link into
+  @param  FrameBase              The base of the frame list.
+  @param  Qh                     The queue head to link into.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -169,10 +153,10 @@ UhciLinkQhToFrameList (
   the precedence node, and pointer there next to QhSw's
   next.
 
-  @param  FrameBase              The base address of the frame list
-  @param  Qh                     The queue head to unlink
+  @param  FrameBase              The base address of the frame list.
+  @param  Qh                     The queue head to unlink.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -184,16 +168,17 @@ UhciUnlinkQhFromFrameList (
 
 
 /**
-  Check the result of the transfer
+  Check the result of the transfer.
 
-  @param  Uhc                    The UHCI device
-  @param  Td                     The first TDs of the transfer
-  @param  TimeOut                TimeOut value in milliseconds
-  @param  IsLow                  Is Low Speed Device
-  @param  QhResult               The variable to return result
+  @param  Uhc                    The UHCI device.
+  @param  Qh                     The queue head of the transfer.
+  @param  Td                     The first TDs of the transfer.
+  @param  TimeOut                TimeOut value in milliseconds.
+  @param  IsLow                  Is Low Speed Device.
+  @param  QhResult               The variable to return result.
 
-  @retval EFI_SUCCESS            The transfer finished with success
-  @retval EFI_DEVICE_ERROR       Transfer failed
+  @retval EFI_SUCCESS            The transfer finished with success.
+  @retval EFI_DEVICE_ERROR       Transfer failed.
 
 **/
 EFI_STATUS
@@ -209,24 +194,23 @@ UhciExecuteTransfer (
 
 
 /**
-  Create Async Request node, and Link to List
+  Create Async Request node, and Link to List.
 
-  @param  Uhc                    The UHCI device
-  @param  Qh                     The queue head of the transfer
-  @param  FirstTd                First TD of the transfer
-  @param  DevAddr                Device Address
-  @param  EndPoint               EndPoint Address
-  @param  Toggle                 Data Toggle
-  @param  DataLen                Data length
-  @param  Interval               Polling Interval when inserted to frame list
-  @param  Mapping                Mapping value
-  @param  Data                   Data buffer, unmapped
-  @param  Callback               Callback after interrupt transfeer
-  @param  Context                Callback Context passed as function parameter
-  @param  IsLow                  Is Low Speed
+  @param  Uhc                    The UHCI device.
+  @param  Qh                     The queue head of the transfer.
+  @param  FirstTd                First TD of the transfer.
+  @param  DevAddr                Device Address.
+  @param  EndPoint               EndPoint Address.
+  @param  DataLen                Data length.
+  @param  Interval               Polling Interval when inserted to frame list.
+  @param  Mapping                Mapping value.
+  @param  Data                   Data buffer, unmapped.
+  @param  Callback               Callback after interrupt transfeer.
+  @param  Context                Callback Context passed as function parameter.
+  @param  IsLow                  Is Low Speed.
 
-  @retval EFI_SUCCESS            An asynchronous transfer is created
-  @retval EFI_INVALID_PARAMETER  Paremeter is error
+  @retval EFI_SUCCESS            An asynchronous transfer is created.
+  @retval EFI_INVALID_PARAMETER  Paremeter is error.
   @retval EFI_OUT_OF_RESOURCES   Failed because of resource shortage.
 
 **/
@@ -249,16 +233,16 @@ UhciCreateAsyncReq (
 
 
 /**
-  Delete Async Interrupt QH and TDs
+  Delete Async Interrupt QH and TDs.
 
-  @param  Uhc                    The UHCI device
-  @param  DevAddr                Device Address
-  @param  EndPoint               EndPoint Address
-  @param  Toggle                 The next data toggle to use
+  @param  Uhc                    The UHCI device.
+  @param  DevAddr                Device Address.
+  @param  EndPoint               EndPoint Address.
+  @param  Toggle                 The next data toggle to use.
 
-  @retval EFI_SUCCESS            The request is deleted
-  @retval EFI_INVALID_PARAMETER  Paremeter is error
-  @retval EFI_NOT_FOUND          The asynchronous isn't found
+  @retval EFI_SUCCESS            The request is deleted.
+  @retval EFI_INVALID_PARAMETER  Paremeter is error.
+  @retval EFI_NOT_FOUND          The asynchronous isn't found.
 
 **/
 EFI_STATUS
@@ -274,9 +258,9 @@ UhciRemoveAsyncReq (
 /**
   Release all the asynchronous transfers on the lsit.
 
-  @param  Uhc                    The UHCI device
+  @param  Uhc                    The UHCI device.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
@@ -287,12 +271,12 @@ UhciFreeAllAsyncReq (
 
 
 /**
-  Interrupt transfer periodic check handler
+  Interrupt transfer periodic check handler.
 
-  @param  Event                  The event of the time
-  @param  Context                Context of the event, pointer to USB_HC_DEV
+  @param  Event                  The event of the time.
+  @param  Context                Context of the event, pointer to USB_HC_DEV.
 
-  @return VOID
+  @return None.
 
 **/
 VOID

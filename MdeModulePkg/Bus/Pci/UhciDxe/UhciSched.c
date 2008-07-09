@@ -1,5 +1,7 @@
 /** @file
 
+  The EHCI register operation routines.
+
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,30 +11,19 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  UhciSched.c
-
-Abstract:
-
-  The EHCI register operation routines.
-
-Revision History
-
-
 **/
 
 #include "Uhci.h"
 
 
 /**
-  Create Frame List Structure
+  Create Frame List Structure.
 
-  @param  Uhc                    UHCI device
+  @param  Uhc                    UHCI device.
 
-  @retval EFI_OUT_OF_RESOURCES   Can't allocate memory resources
-  @retval EFI_UNSUPPORTED        Map memory fail
-  @retval EFI_SUCCESS            Success
+  @retval EFI_OUT_OF_RESOURCES   Can't allocate memory resources.
+  @retval EFI_UNSUPPORTED        Map memory fail.
+  @retval EFI_SUCCESS            Success.
 
 **/
 EFI_STATUS
@@ -155,11 +146,11 @@ ON_ERROR:
 
 
 /**
-  Destory FrameList buffer
+  Destory FrameList buffer.
 
-  @param  Uhc                    The UHCI device
+  @param  Uhc                    The UHCI device.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
@@ -201,11 +192,11 @@ UhciDestoryFrameList (
 
 /**
   Convert the poll rate to the maxium 2^n that is smaller
-  than Interval
+  than Interval.
 
-  @param  Interval               The poll rate to convert
+  @param  Interval               The poll rate to convert.
 
-  @return The converted poll rate
+  @return The converted poll rate.
 
 **/
 UINTN
@@ -235,10 +226,10 @@ UhciConvertPollRate (
   Link a queue head (for asynchronous interrupt transfer) to
   the frame list.
 
-  @param  FrameBase              The base of the frame list
-  @param  Qh                     The queue head to link into
+  @param  FrameBase              The base of the frame list.
+  @param  Qh                     The queue head to link into.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -340,10 +331,10 @@ UhciLinkQhToFrameList (
   the precedence node, and pointer there next to QhSw's
   next.
 
-  @param  FrameBase              The base address of the frame list
-  @param  Qh                     The queue head to unlink
+  @param  FrameBase              The base address of the frame list.
+  @param  Qh                     The queue head to unlink.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -398,17 +389,16 @@ UhciUnlinkQhFromFrameList (
 
 
 /**
-  Check TDs Results
+  Check TDs Results.
 
-  @param  Uhc                    This UHCI device
-  @param  Td                     UHCI_TD_SW to check
-  @param  IsLow                  Is Low Speed Device
-  @param  QhResult               Return the result of this TD list
+  @param  Uhc                    This UHCI device.
+  @param  Td                     UHCI_TD_SW to check.
+  @param  IsLow                  Is Low Speed Device.
+  @param  QhResult               Return the result of this TD list.
 
   @return Whether the TD's result is finialized.
 
 **/
-STATIC
 BOOLEAN
 UhciCheckTdStatus (
   IN  USB_HC_DEV          *Uhc,
@@ -452,23 +442,23 @@ UhciCheckTdStatus (
     // upper layer won't distinguish these condtions. So, only
     // set these bits when TD is actually halted.
     //
-    if (State & USBTD_STALLED) {
-      if (State & USBTD_BABBLE) {
+    if ((State & USBTD_STALLED) != 0) {
+      if ((State & USBTD_BABBLE) != 0) {
         QhResult->Result |= EFI_USB_ERR_BABBLE;
 
       } else if (TdHw->ErrorCount != 0) {
         QhResult->Result |= EFI_USB_ERR_STALL;
       }
 
-      if (State & USBTD_CRC) {
+      if ((State & USBTD_CRC) != 0) {
         QhResult->Result |= EFI_USB_ERR_CRC;
       }
 
-      if (State & USBTD_BUFFERR) {
+      if ((State & USBTD_BUFFERR) != 0) {
         QhResult->Result |= EFI_USB_ERR_BUFFER;
       }
 
-      if (Td->TdHw.Status & USBTD_BITSTUFF) {
+      if ((Td->TdHw.Status & USBTD_BITSTUFF) != 0) {
         QhResult->Result |= EFI_USB_ERR_BITSTUFF;
       }
 
@@ -479,7 +469,7 @@ UhciCheckTdStatus (
       Finished = TRUE;
       goto ON_EXIT;
 
-    } else if (State & USBTD_ACTIVE) {
+    } else if ((State & USBTD_ACTIVE) != 0) {
       //
       // The TD is still active, no need to check further.
       //
@@ -540,18 +530,18 @@ ON_EXIT:
 }
 
 
-
 /**
-  Check the result of the transfer
+  Check the result of the transfer.
 
-  @param  Uhc                    The UHCI device
-  @param  Td                     The first TDs of the transfer
-  @param  TimeOut                TimeOut value in milliseconds
-  @param  IsLow                  Is Low Speed Device
-  @param  QhResult               The variable to return result
+  @param  Uhc                    The UHCI device.
+  @param  Qh                     The queue head of the transfer.
+  @param  Td                     The first TDs of the transfer.
+  @param  TimeOut                TimeOut value in milliseconds.
+  @param  IsLow                  Is Low Speed Device.
+  @param  QhResult               The variable to return result.
 
-  @retval EFI_SUCCESS            The transfer finished with success
-  @retval EFI_DEVICE_ERROR       Transfer failed
+  @retval EFI_SUCCESS            The transfer finished with success.
+  @retval EFI_DEVICE_ERROR       Transfer failed.
 
 **/
 EFI_STATUS
@@ -606,16 +596,15 @@ UhciExecuteTransfer (
 
 
 /**
-  Update Async Request, QH and TDs
+  Update Async Request, QH and TDs.
 
-  @param  AsyncReq               The UHCI asynchronous transfer to update
-  @param  Result                 Transfer reslut
-  @param  ErrTdPos               Error TD Position
+  @param  AsyncReq               The UHCI asynchronous transfer to update.
+  @param  Result                 Transfer reslut.
+  @param  NextToggle             The toggle of next data.
 
-  @return VOID
+  @return None.
 
 **/
-STATIC
 VOID
 UhciUpdateAsyncReq (
   IN UHCI_ASYNC_REQUEST  *AsyncReq,
@@ -653,23 +642,23 @@ UhciUpdateAsyncReq (
 
 
 /**
-  Create Async Request node, and Link to List
+  Create Async Request node, and Link to List.
 
-  @param  Uhc                    The UHCI device
-  @param  Qh                     The queue head of the transfer
-  @param  FirstTd                First TD of the transfer
-  @param  DevAddr                Device Address
-  @param  EndPoint               EndPoint Address
-  @param  DataLen                Data length
-  @param  Interval               Polling Interval when inserted to frame list
-  @param  Mapping                Mapping value
-  @param  Data                   Data buffer, unmapped
-  @param  Callback               Callback after interrupt transfeer
-  @param  Context                Callback Context passed as function parameter
-  @param  IsLow                  Is Low Speed
+  @param  Uhc                    The UHCI device.
+  @param  Qh                     The queue head of the transfer.
+  @param  FirstTd                First TD of the transfer.
+  @param  DevAddr                Device Address.
+  @param  EndPoint               EndPoint Address.
+  @param  DataLen                Data length.
+  @param  Interval               Polling Interval when inserted to frame list.
+  @param  Mapping                Mapping value.
+  @param  Data                   Data buffer, unmapped.
+  @param  Callback               Callback after interrupt transfeer.
+  @param  Context                Callback Context passed as function parameter.
+  @param  IsLow                  Is Low Speed.
 
-  @retval EFI_SUCCESS            An asynchronous transfer is created
-  @retval EFI_INVALID_PARAMETER  Paremeter is error
+  @retval EFI_SUCCESS            An asynchronous transfer is created.
+  @retval EFI_INVALID_PARAMETER  Paremeter is error.
   @retval EFI_OUT_OF_RESOURCES   Failed because of resource shortage.
 
 **/
@@ -725,17 +714,15 @@ UhciCreateAsyncReq (
 }
 
 
-
 /**
-  Free an asynchronous request's resource such as memory
+  Free an asynchronous request's resource such as memory.
 
-  @param  Uhc                    The UHCI device
-  @param  AsyncReq               The asynchronous request to free
+  @param  Uhc                    The UHCI device.
+  @param  AsyncReq               The asynchronous request to free.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UhciFreeAsyncReq (
   IN USB_HC_DEV           *Uhc,
@@ -766,15 +753,14 @@ UhciFreeAsyncReq (
   UHC's recycle list to wait for a while before release the memory.
   Until then, hardware won't hold point to the request.
 
-  @param  Uhc                    The UHCI device
-  @param  AsyncReq               The asynchronous request to free
+  @param  Uhc                    The UHCI device.
+  @param  AsyncReq               The asynchronous request to free.
   @param  FreeNow                If TRUE, free the resource immediately, otherwise
                                  add the request to recycle wait list.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UhciUnlinkAsyncReq (
   IN USB_HC_DEV           *Uhc,
@@ -802,16 +788,16 @@ UhciUnlinkAsyncReq (
 
 
 /**
-  Delete Async Interrupt QH and TDs
+  Delete Async Interrupt QH and TDs.
 
-  @param  Uhc                    The UHCI device
-  @param  DevAddr                Device Address
-  @param  EndPoint               EndPoint Address
-  @param  Toggle                 The next data toggle to use
+  @param  Uhc                    The UHCI device.
+  @param  DevAddr                Device Address.
+  @param  EndPoint               EndPoint Address.
+  @param  Toggle                 The next data toggle to use.
 
-  @retval EFI_SUCCESS            The request is deleted
-  @retval EFI_INVALID_PARAMETER  Paremeter is error
-  @retval EFI_NOT_FOUND          The asynchronous isn't found
+  @retval EFI_SUCCESS            The request is deleted.
+  @retval EFI_INVALID_PARAMETER  Paremeter is error.
+  @retval EFI_NOT_FOUND          The asynchronous isn't found.
 
 **/
 EFI_STATUS
@@ -886,12 +872,11 @@ UhciRemoveAsyncReq (
   existing for at least 50ms, far enough for the hardware
   to clear its cache.
 
-  @param  Uhc                    The UHCI device
+  @param  Uhc                    The UHCI device.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UhciRecycleAsyncReq (
   IN USB_HC_DEV           *Uhc
@@ -917,9 +902,9 @@ UhciRecycleAsyncReq (
 /**
   Release all the asynchronous transfers on the lsit.
 
-  @param  Uhc                    The UHCI device
+  @param  Uhc                    The UHCI device.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
@@ -952,12 +937,12 @@ UhciFreeAllAsyncReq (
 
 
 /**
-  Interrupt transfer periodic check handler
+  Interrupt transfer periodic check handler.
 
-  @param  Event                  The event of the time
-  @param  Context                Context of the event, pointer to USB_HC_DEV
+  @param  Event                  The event of the time.
+  @param  Context                Context of the event, pointer to USB_HC_DEV.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
