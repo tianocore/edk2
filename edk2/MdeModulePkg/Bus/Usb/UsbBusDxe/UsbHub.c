@@ -1065,8 +1065,7 @@ UsbRootHubGetPortStatus (
   @param  HubIf                 The root hub interface.
   @param  Port                  The root hub port.
 
-  @retval EFI_SUCCESS           The port state is returned.
-  @retval Others                Failed to retrieve the port state.
+  @return None.
 
 **/
 VOID
