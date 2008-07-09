@@ -20,18 +20,18 @@
 
 
 /**
-  Usb Get Descriptor
+  Usb Get Descriptor.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  Value                  Device Request Value
-  @param  Index                  Device Request Index
-  @param  DescriptorLength       Descriptor Length
-  @param  Descriptor             Descriptor buffer to contain result
-  @param  Status                 Transfer Status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  Value                  Device Request Value.
+  @param  Index                  Device Request Index.
+  @param  DescriptorLength       Descriptor Length.
+  @param  Descriptor             Descriptor buffer to contain result.
+  @param  Status                 Transfer Status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -72,18 +72,18 @@ UsbGetDescriptor (
 
 
 /**
-  Usb Set Descriptor
+  Usb Set Descriptor.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  Value                  Device Request Value
-  @param  Index                  Device Request Index
-  @param  DescriptorLength       Descriptor Length
-  @param  Descriptor             Descriptor buffer to set
-  @param  Status                 Transfer Status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  Value                  Device Request Value.
+  @param  Index                  Device Request Index.
+  @param  DescriptorLength       Descriptor Length.
+  @param  Descriptor             Descriptor buffer to set.
+  @param  Status                 Transfer Status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -124,16 +124,16 @@ UsbSetDescriptor (
 
 
 /**
-  Usb Get Device Interface
+  Usb Get Device Interface.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  Index                  Interface index value
-  @param  AltSetting             Alternate setting
-  @param  Status                 Trasnsfer status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  Index                  Interface index value.
+  @param  AltSetting             Alternate setting.
+  @param  Status                 Trasnsfer status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -171,16 +171,16 @@ UsbGetInterface (
 
 
 /**
-  Usb Set Device Interface
+  Usb Set Device Interface.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  InterfaceNo            Interface Number
-  @param  AltSetting             Alternate setting
-  @param  Status                 Trasnsfer status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  InterfaceNo            Interface Number.
+  @param  AltSetting             Alternate setting.
+  @param  Status                 Trasnsfer status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -219,15 +219,15 @@ UsbSetInterface (
 
 
 /**
-  Usb Get Device Configuration
+  Usb Get Device Configuration.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  ConfigValue            Config Value
-  @param  Status                 Transfer Status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  ConfigValue            Config Value.
+  @param  Status                 Transfer Status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -263,15 +263,15 @@ UsbGetConfiguration (
 
 
 /**
-  Usb Set Device Configuration
+  Usb Set Device Configuration.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  Value                  Configuration Value to set
-  @param  Status                 Transfer status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  Value                  Configuration Value to set.
+  @param  Status                 Transfer status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -307,17 +307,17 @@ UsbSetConfiguration (
 
 
 /**
-  Usb Set Device Feature
+  Usb Set Device Feature.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  Recipient              Interface/Device/Endpoint
-  @param  Value                  Request value
-  @param  Target                 Request Index
-  @param  Status                 Transfer status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  Recipient              Interface/Device/Endpoint.
+  @param  Value                  Request value.
+  @param  Target                 Request Index.
+  @param  Status                 Transfer status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -373,17 +373,17 @@ UsbSetFeature (
 
 
 /**
-  Usb Clear Device Feature
+  Usb Clear Device Feature.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  Recipient              Interface/Device/Endpoint
-  @param  Value                  Request value
-  @param  Target                 Request Index
-  @param  Status                 Transfer status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  Recipient              Interface/Device/Endpoint.
+  @param  Value                  Request value.
+  @param  Target                 Request Index.
+  @param  Status                 Transfer status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -439,17 +439,17 @@ UsbClearFeature (
 
 
 /**
-  Usb Get Device Status
+  Usb Get Device Status.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  Recipient              Interface/Device/Endpoint
-  @param  Target                 Request index
-  @param  DevStatus              Device status
-  @param  Status                 Transfer status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  Recipient              Interface/Device/Endpoint.
+  @param  Target                 Request index.
+  @param  DevStatus              Device status.
+  @param  Status                 Transfer status.
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error
-  @retval EFI_SUCCESS            Success
-  @retval EFI_TIMEOUT            Device has no response
+  @retval EFI_INVALID_PARAMETER  Parameter is error.
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_TIMEOUT            Device has no response.
 
 **/
 EFI_STATUS
@@ -504,17 +504,16 @@ UsbGetStatus (
 }
 
 
-
 /**
-  Clear endpoint stall
+  Clear endpoint stall.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL
-  @param  EndpointNo             Endpoint Number
-  @param  Status                 Transfer Status
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
+  @param  EndpointNo             Endpoint Number.
+  @param  Status                 Transfer Status.
 
-  @retval EFI_NOT_FOUND          Can't find the Endpoint
-  @retval EFI_DEVICE_ERROR       Hardware error
-  @retval EFI_SUCCESS            Success
+  @retval EFI_NOT_FOUND          Can't find the Endpoint.
+  @retval EFI_DEVICE_ERROR       Hardware error.
+  @retval EFI_SUCCESS            Success.
 
 **/
 EFI_STATUS
