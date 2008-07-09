@@ -1,5 +1,7 @@
 /** @file
 
+  The definition for UHCI register operation routines.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,17 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  UhciQueue.h
-
-Abstract:
-
-  The definition for UHCI register operation routines.
-
-Revision History
-
 
 **/
 
@@ -104,12 +95,12 @@ struct _UHCI_TD_SW {
 
 
 /**
-  Link the TD To QH
+  Link the TD To QH.
 
-  @param  Qh          The queue head for the TD to link to
-  @param  Td          The TD to link
+  @param  Qh          The queue head for the TD to link to.
+  @param  Td          The TD to link.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
@@ -121,12 +112,12 @@ UhciLinkTdToQh (
 
 
 /**
-  Unlink TD from the QH
+  Unlink TD from the QH.
 
-  @param  Qh          The queue head to unlink from
-  @param  Td          The TD to unlink
+  @param  Qh          The queue head to unlink from.
+  @param  Td          The TD to unlink.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
@@ -138,15 +129,15 @@ UhciUnlinkTdFromQh (
 
 
 /**
-  Map address of request structure buffer
+  Map address of request structure buffer.
 
-  @param  Uhc         The UHCI device
-  @param  Request     The user request buffer
-  @param  MappedAddr  Mapped address of request
-  @param  Map         Identificaion of this mapping to return
+  @param  Uhc                The UHCI device.
+  @param  Request            The user request buffer.
+  @param  MappedAddr         Mapped address of request.
+  @param  Map                Identificaion of this mapping to return.
 
-  @return EFI_SUCCESS      : Success
-  @return EFI_DEVICE_ERROR : Fail to map the user request
+  @return EFI_SUCCESS        Success.
+  @return EFI_DEVICE_ERROR   Fail to map the user request.
 
 **/
 EFI_STATUS
@@ -160,18 +151,18 @@ UhciMapUserRequest (
 
 
 /**
-  Map address of user data buffer
+  Map address of user data buffer.
 
-  @param  Uhc         The UHCI device
-  @param  Direction   direction of the data transfer
-  @param  Data        The user data buffer
-  @param  Len         Length of the user data
-  @param  PktId       Packet identificaion
-  @param  MappedAddr  mapped address to return
-  @param  Map         identificaion of this mapping to return
+  @param  Uhc                The UHCI device.
+  @param  Direction          Direction of the data transfer.
+  @param  Data               The user data buffer.
+  @param  Len                Length of the user data.
+  @param  PktId              Packet identificaion.
+  @param  MappedAddr         Mapped address to return.
+  @param  Map                Identificaion of this mapping to return.
 
-  @return EFI_SUCCESS      : Success
-  @return EFI_DEVICE_ERROR : Fail to map the user data
+  @return EFI_SUCCESS        Success.
+  @return EFI_DEVICE_ERROR   Fail to map the user data.
 
 **/
 EFI_STATUS
@@ -188,12 +179,12 @@ UhciMapUserData (
 
 
 /**
-  Delete a list of TDs
+  Delete a list of TDs.
 
-  @param  Uhc         The UHCI device
-  @param  FirstTd     TD link list head
+  @param  Uhc         The UHCI device.
+  @param  FirstTd     TD link list head.
 
-  @return VOID
+  @return None.
 
 **/
 VOID
@@ -205,12 +196,12 @@ UhciDestoryTds (
 
 
 /**
-  Create an initialize a new queue head
+  Create an initialize a new queue head.
 
-  @param  Uhc         The UHCI device
-  @param  Interval    The polling interval for the queue
+  @param  Uhc         The UHCI device.
+  @param  Interval    The polling interval for the queue.
 
-  @return The newly created queue header
+  @return The newly created queue header.
 
 **/
 UHCI_QH_SW *
@@ -222,18 +213,18 @@ UhciCreateQh (
 
 
 /**
-  Create Tds list for Control Transfer
+  Create Tds list for Control Transfer.
 
-  @param  Uhc         The UHCI device
-  @param  DeviceAddr  The device address
-  @param  DataPktId   Packet Identification of Data Tds
-  @param  Request     A pointer to request structure buffer to transfer
-  @param  Data        A pointer to user data buffer to transfer
-  @param  DataLen     Length of user data to transfer
-  @param  MaxPacket   Maximum packet size for control transfer
-  @param  IsLow       Full speed or low speed
+  @param  Uhc         The UHCI device.
+  @param  DeviceAddr  The device address.
+  @param  DataPktId   Packet Identification of Data Tds.
+  @param  Request     A pointer to request structure buffer to transfer.
+  @param  Data        A pointer to user data buffer to transfer.
+  @param  DataLen     Length of user data to transfer.
+  @param  MaxPacket   Maximum packet size for control transfer.
+  @param  IsLow       Full speed or low speed.
 
-  @return The Td list head for the control transfer
+  @return The Td list head for the control transfer.
 
 **/
 UHCI_TD_SW *
@@ -251,19 +242,19 @@ UhciCreateCtrlTds (
 
 
 /**
-  Create Tds list for Bulk/Interrupt Transfer
+  Create Tds list for Bulk/Interrupt Transfer.
 
-  @param  Uhc         USB_HC_DEV
-  @param  DevAddr     Address of Device
-  @param  EndPoint    Endpoint Number
-  @param  PktId       Packet Identification of Data Tds
-  @param  Data        A pointer to user data buffer to transfer
-  @param  DataLen     Length of user data to transfer
-  @param  DataToggle  Data Toggle Pointer
-  @param  MaxPacket   Maximum packet size for Bulk/Interrupt transfer
-  @param  IsLow       Is Low Speed Device
+  @param  Uhc         USB_HC_DEV.
+  @param  DevAddr     Address of Device.
+  @param  EndPoint    Endpoint Number.
+  @param  PktId       Packet Identification of Data Tds.
+  @param  Data        A pointer to user data buffer to transfer.
+  @param  DataLen     Length of user data to transfer.
+  @param  DataToggle  Data Toggle Pointer.
+  @param  MaxPacket   Maximum packet size for Bulk/Interrupt transfer.
+  @param  IsLow       Is Low Speed Device.
 
-  @return The Tds list head for the bulk transfer
+  @return The Tds list head for the bulk transfer.
 
 **/
 UHCI_TD_SW *

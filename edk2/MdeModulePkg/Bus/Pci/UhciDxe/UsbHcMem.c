@@ -1,5 +1,7 @@
 /** @file
 
+  The routine procedure for uhci memory allocate/free.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,30 +11,20 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    EhciMem.c
-
-Abstract:
-
-
-Revision History
-
 **/
 
 #include "Uhci.h"
 
 
 /**
-  Allocate a block of memory to be used by the buffer pool
+  Allocate a block of memory to be used by the buffer pool.
 
-  @param  Pool           The buffer pool to allocate memory for
-  @param  Pages          How many pages to allocate
+  @param  Pool           The buffer pool to allocate memory for.
+  @param  Pages          How many pages to allocate.
 
-  @return The allocated memory block or NULL if failed
+  @return The allocated memory block or NULL if failed.
 
 **/
-STATIC
 USBHC_MEM_BLOCK *
 UsbHcAllocMemBlock (
   IN  USBHC_MEM_POOL      *Pool,
@@ -126,15 +118,14 @@ FREE_BITARRAY:
 
 
 /**
-  Free the memory block from the memory pool
+  Free the memory block from the memory pool.
 
-  @param  Pool           The memory pool to free the block from
-  @param  Block          The memory block to free
+  @param  Pool           The memory pool to free the block from.
+  @param  Block          The memory block to free.
 
-  @return VOID
+  @return None.
 
 **/
-STATIC
 VOID
 UsbHcFreeMemBlock (
   IN USBHC_MEM_POOL       *Pool,
@@ -159,17 +150,15 @@ UsbHcFreeMemBlock (
 
 
 /**
-  Alloc some memory from the block
+  Alloc some memory from the block.
 
-  @param  Block          The memory block to allocate memory from
-  @param  Mem            The variable to store the memory allocated
-  @param  Units          Number of memory units to allocate
+  @param  Block           The memory block to allocate memory from.
+  @param  Units           Number of memory units to allocate.
 
-  @return EFI_SUCCESS   : The needed memory is allocated
-  @return EFI_NOT_FOUND : Can't find the free memory
+  @return EFI_SUCCESS     The needed memory is allocated.
+  @return EFI_NOT_FOUND   Can't find the free memory.
 
 **/
-STATIC
 VOID *
 UsbHcAllocMemFromBlock (
   IN  USBHC_MEM_BLOCK     *Block,
@@ -235,15 +224,14 @@ UsbHcAllocMemFromBlock (
 
 
 /**
-  Insert the memory block to the pool's list of the blocks
+  Insert the memory block to the pool's list of the blocks.
 
-  @param  Head           The head of the memory pool's block list
-  @param  Block          The memory block to insert
+  @param  Head           The head of the memory pool's block list.
+  @param  Block          The memory block to insert.
 
-  @return VOID
+  @return None.
 
 **/
-STATIC
 VOID
 UsbHcInsertMemBlockToPool (
   IN USBHC_MEM_BLOCK      *Head,
@@ -259,13 +247,12 @@ UsbHcInsertMemBlockToPool (
 /**
   Is the memory block empty?
 
-  @param  Block          The memory block to check
+  @param  Block     The memory block to check.
 
-  @return TRUE  : The memory block is empty
-  @return FALSE : The memory block isn't empty
+  @return TRUE      The memory block is empty.
+  @return FALSE     The memory block isn't empty.
 
 **/
-STATIC
 BOOLEAN
 UsbHcIsMemBlockEmpty (
   IN USBHC_MEM_BLOCK     *Block
@@ -284,15 +271,14 @@ UsbHcIsMemBlockEmpty (
 
 
 /**
-  Unlink the memory block from the pool's list
+  Unlink the memory block from the pool's list.
 
-  @param  Head           The block list head of the memory's pool
+  @param  Head           The block list head of the memory's pool.
   @param  BlockToUnlink  The memory block to unlink.
 
-  @return VOID
+  @return None.
 
 **/
-STATIC
 VOID
 UsbHcUnlinkMemBlock (
   IN USBHC_MEM_BLOCK      *Head,
@@ -314,16 +300,15 @@ UsbHcUnlinkMemBlock (
 
 
 /**
-  Initialize the memory management pool for the host controller
+  Initialize the memory management pool for the host controller.
 
-  @param  Pool           The USB memory pool to initialize
-  @param  PciIo          The PciIo that can be used to access the host controller
-  @param  Check4G        Whether the host controller requires allocated memory
-                         from one 4G address space.
-  @param  Which4G        The 4G memory area each memory allocated should be from
+  @param  PciIo                 The PciIo that can be used to access the host controller.
+  @param  Check4G               Whether the host controller requires allocated memory
+                                from one 4G address space.
+  @param  Which4G               The 4G memory area each memory allocated should be from.
 
-  @return EFI_SUCCESS         : The memory pool is initialized
-  @return EFI_OUT_OF_RESOURCE : Fail to init the memory pool
+  @return EFI_SUCCESS           The memory pool is initialized.
+  @return EFI_OUT_OF_RESOURCE   Fail to init the memory pool.
 
 **/
 USBHC_MEM_POOL *
@@ -356,12 +341,12 @@ UsbHcInitMemPool (
 
 
 /**
-  Release the memory management pool
+  Release the memory management pool.
 
-  @param  Pool           The USB memory pool to free
+  @param  Pool               The USB memory pool to free.
 
-  @return EFI_SUCCESS      : The memory pool is freed
-  @return EFI_DEVICE_ERROR : Failed to free the memory pool
+  @return EFI_SUCCESS        The memory pool is freed.
+  @return EFI_DEVICE_ERROR   Failed to free the memory pool.
 
 **/
 EFI_STATUS
@@ -393,10 +378,10 @@ UsbHcFreeMemPool (
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
 
-  @param  Pool           The host controller's memory pool
-  @param  Size           Size of the memory to allocate
+  @param  Pool           The host controller's memory pool.
+  @param  Size           Size of the memory to allocate.
 
-  @return The allocated memory or NULL
+  @return The allocated memory or NULL.
 
 **/
 VOID *
@@ -467,13 +452,13 @@ UsbHcAllocateMem (
 
 
 /**
-  Free the allocated memory back to the memory pool
+  Free the allocated memory back to the memory pool.
 
-  @param  Pool           The memory pool of the host controller
-  @param  Mem            The memory to free
-  @param  Size           The size of the memory to free
+  @param  Pool           The memory pool of the host controller.
+  @param  Mem            The memory to free.
+  @param  Size           The size of the memory to free.
 
-  @return VOID
+  @return None.
 
 **/
 VOID

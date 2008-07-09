@@ -1,5 +1,7 @@
 /** @file
 
+  The UHCI driver model and HC protocol routines.
+
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,17 +11,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Uhci.c
-
-Abstract:
-
-  The UHCI driver model and HC protocol routines.
-
-Revision History
-
-
 **/
 
 #include "Uhci.h"
@@ -27,17 +18,16 @@ Revision History
 /**
   Provides software reset for the USB host controller according to UEFI 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  @param  Attributes           A bit mask of the reset operation to perform.  See
-                               below for a list of the supported bit mask values.
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  Attributes             A bit mask of the reset operation to perform.  See
+                                 below for a list of the supported bit mask values.
 
-  @return EFI_SUCCESS           : The reset operation succeeded.
-  @return EFI_INVALID_PARAMETER : Attributes is not valid.
-  @return EFI_UNSUPPORTED       : This type of reset is not currently supported
-  @return EFI_DEVICE_ERROR      : Other errors
+  @return EFI_SUCCESS            The reset operation succeeded.
+  @return EFI_INVALID_PARAMETER  Attributes is not valid.
+  @return EFI_UNSUPPORTED        This type of reset is not currently supported.
+  @return EFI_DEVICE_ERROR       Other errors.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2Reset (
@@ -112,15 +102,14 @@ ON_INVAILD_PARAMETER:
 /**
   Retrieves current state of the USB host controller according to UEFI 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  @param  State                Variable to receive current device state
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  State                  Variable to receive current device state.
 
-  @return EFI_SUCCESS           : The state is returned
-  @return EFI_INVALID_PARAMETER : State is not valid.
-  @return EFI_DEVICE_ERROR      : Other errors2006
+  @return EFI_SUCCESS            The state is returned.
+  @return EFI_INVALID_PARAMETER  State is not valid.
+  @return EFI_DEVICE_ERROR       Other errors.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2GetState (
@@ -141,7 +130,7 @@ Uhci2GetState (
   UsbCmd  = UhciReadReg (Uhc->PciIo, USBCMD_OFFSET);
   UsbSts  = UhciReadReg (Uhc->PciIo, USBSTS_OFFSET);
 
-  if (UsbCmd & USBCMD_EGSM) {
+  if ((UsbCmd & USBCMD_EGSM) !=0 ) {
     *State = EfiUsbHcStateSuspend;
 
   } else if ((UsbSts & USBSTS_HCH) != 0) {
@@ -158,16 +147,15 @@ Uhci2GetState (
 /**
   Sets the USB host controller to a specific state according to UEFI 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  @param  State                Indicates the state of the host controller that will
-                               be set.
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  State                  Indicates the state of the host controller that will
+                                 be set.
 
-  @return EFI_SUCCESS           : Host controller was successfully placed in the state
-  @return EFI_INVALID_PARAMETER : State is invalid.
-  @return EFI_DEVICE_ERROR      : Failed to set the state
+  @return EFI_SUCCESS            Host controller was successfully placed in the state.
+  @return EFI_INVALID_PARAMETER  State is invalid.
+  @return EFI_DEVICE_ERROR       Failed to set the state.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2SetState (
@@ -265,19 +253,18 @@ ON_EXIT:
 /**
   Retrieves capabilities of USB host controller according to UEFI 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL instance
-  @param  MaxSpeed             A pointer to the max speed USB host controller
-                               supports.
-  @param  PortNumber           A pointer to the number of root hub ports.
-  @param  Is64BitCapable       A pointer to an integer to show whether USB host
-                               controller supports 64-bit memory addressing.
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  MaxSpeed               A pointer to the max speed USB host controller
+                                 supports.
+  @param  PortNumber             A pointer to the number of root hub ports.
+  @param  Is64BitCapable         A pointer to an integer to show whether USB host
+                                 controller supports 64-bit memory addressing.
 
-  @return EFI_SUCCESS           : capabilities were retrieved successfully.
-  @return EFI_INVALID_PARAMETER : MaxSpeed or PortNumber or Is64BitCapable is NULL.
-  @return EFI_DEVICE_ERROR      : An error was encountered
+  @return EFI_SUCCESS            capabilities were retrieved successfully.
+  @return EFI_INVALID_PARAMETER  MaxSpeed or PortNumber or Is64BitCapable is NULL.
+  @return EFI_DEVICE_ERROR       An error was encountered.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2GetCapability (
@@ -329,17 +316,16 @@ Uhci2GetCapability (
 /**
   Retrieves the current status of a USB root hub port according to UEFI 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL.
-  @param  PortNumber           The port to get status
-  @param  PortStatus           A pointer to the current port status bits and  port
-                               status change bits.
+  @param  This                    A pointer to the EFI_USB2_HC_PROTOCOL.
+  @param  PortNumber              The port to get status.
+  @param  PortStatus              A pointer to the current port status bits and  port
+                                  status change bits.
 
-  @return EFI_SUCCESS           : status of the USB root hub port was returned in PortStatus.
-  @return EFI_INVALID_PARAMETER : PortNumber is invalid.
-  @return EFI_DEVICE_ERROR      : Can't read register
+  @return EFI_SUCCESS             status of the USB root hub port was returned in PortStatus.
+  @return EFI_INVALID_PARAMETER   PortNumber is invalid.
+  @return EFI_DEVICE_ERROR        Can't read register.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2GetRootHubPortStatus (
@@ -368,24 +354,24 @@ Uhci2GetRootHubPortStatus (
 
   PortSC                        = UhciReadReg (Uhc->PciIo, Offset);
 
-  if (PortSC & USBPORTSC_CCS) {
+  if ((PortSC & USBPORTSC_CCS) != 0) {
     PortStatus->PortStatus |= USB_PORT_STAT_CONNECTION;
   }
 
-  if (PortSC & USBPORTSC_PED) {
+  if ((PortSC & USBPORTSC_PED) != 0) {
     PortStatus->PortStatus |= USB_PORT_STAT_ENABLE;
   }
 
-  if (PortSC & USBPORTSC_SUSP) {
+  if ((PortSC & USBPORTSC_SUSP) != 0) {
     DEBUG ((EFI_D_INFO, "Uhci2GetRootHubPortStatus: port %d is suspended\n", PortNumber));
     PortStatus->PortStatus |= USB_PORT_STAT_SUSPEND;
   }
 
-  if (PortSC & USBPORTSC_PR) {
+  if ((PortSC & USBPORTSC_PR) != 0) {
     PortStatus->PortStatus |= USB_PORT_STAT_RESET;
   }
 
-  if (PortSC & USBPORTSC_LSDA) {
+  if ((PortSC & USBPORTSC_LSDA) != 0) {
     PortStatus->PortStatus |= USB_PORT_STAT_LOW_SPEED;
   }
 
@@ -394,11 +380,11 @@ Uhci2GetRootHubPortStatus (
   //
   PortStatus->PortStatus |= USB_PORT_STAT_OWNER;
 
-  if (PortSC & USBPORTSC_CSC) {
+  if ((PortSC & USBPORTSC_CSC) != 0) {
     PortStatus->PortChangeStatus |= USB_PORT_STAT_C_CONNECTION;
   }
 
-  if (PortSC & USBPORTSC_PEDC) {
+  if ((PortSC & USBPORTSC_PEDC) != 0) {
     PortStatus->PortChangeStatus |= USB_PORT_STAT_C_ENABLE;
   }
 
@@ -409,18 +395,17 @@ Uhci2GetRootHubPortStatus (
 /**
   Sets a feature for the specified root hub port according to UEFI 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL.
-  @param  PortNumber           Specifies the root hub port whose feature  is
-                               requested to be set.
-  @param  PortFeature          Indicates the feature selector associated  with the
-                               feature set request.
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL.
+  @param  PortNumber             Specifies the root hub port whose feature  is
+                                 requested to be set.
+  @param  PortFeature            Indicates the feature selector associated  with the
+                                 feature set request.
 
-  @return EFI_SUCCESS           : PortFeature was set for the root port
-  @return EFI_INVALID_PARAMETER : PortNumber is invalid or PortFeature is invalid.
-  @return EFI_DEVICE_ERROR      : Can't read register
+  @return EFI_SUCCESS            PortFeature was set for the root port.
+  @return EFI_INVALID_PARAMETER  PortNumber is invalid or PortFeature is invalid.
+  @return EFI_DEVICE_ERROR       Can't read register.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2SetRootHubPortFeature (
@@ -449,7 +434,7 @@ Uhci2SetRootHubPortFeature (
   switch (PortFeature) {
   case EfiUsbPortSuspend:
     Command = UhciReadReg (Uhc->PciIo, USBCMD_OFFSET);
-    if (!(Command & USBCMD_EGSM)) {
+    if ((Command & USBCMD_EGSM) == 0) {
       //
       // if global suspend is not active, can set port suspend
       //
@@ -489,18 +474,17 @@ Uhci2SetRootHubPortFeature (
 /**
   Clears a feature for the specified root hub port according to Uefi 2.0 spec.
 
-  @param  This                 A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  @param  PortNumber           Specifies the root hub port whose feature  is
-                               requested to be cleared.
-  @param  PortFeature          Indicates the feature selector associated with the
-                               feature clear request.
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  PortNumber             Specifies the root hub port whose feature  is
+                                 requested to be cleared.
+  @param  PortFeature            Indicates the feature selector associated with the
+                                 feature clear request.
 
-  @return EFI_SUCCESS           : PortFeature was cleared for the USB root hub port
-  @return EFI_INVALID_PARAMETER : PortNumber is invalid or PortFeature is invalid.
-  @return EFI_DEVICE_ERROR      : Can't read register
+  @return EFI_SUCCESS            PortFeature was cleared for the USB root hub port.
+  @return EFI_INVALID_PARAMETER  PortNumber is invalid or PortFeature is invalid.
+  @return EFI_DEVICE_ERROR       Can't read register.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2ClearRootHubPortFeature (
@@ -591,27 +575,27 @@ Uhci2ClearRootHubPortFeature (
 
 
 /**
-  Submits control transfer to a target USB device accroding to UEFI 2.0 spec..
+  Submits control transfer to a target USB device accroding to UEFI 2.0 spec.
 
-  This                : A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  DeviceAddress       : Target device address
-  DeviceSpeed         : Device speed
-  MaximumPacketLength : Maximum packet size of the target endpoint
-  Request             : USB device request to send
-  TransferDirection   : Data direction of the Data stage in control transfer
-  Data                : Data to transmit/receive in data stage
-  DataLength          : Length of the data
-  TimeOut             : Maximum time, in microseconds, for transfer to complete.
-  TransferResult      : Variable to receive the transfer result
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  DeviceAddress          Target device address.
+  @param  DeviceSpeed            Device speed.
+  @param  MaximumPacketLength    Maximum packet size of the target endpoint.
+  @param  Request                USB device request to send.
+  @param  TransferDirection      Data direction of the Data stage in control transfer.
+  @param  Data                   Data to transmit/receive in data stage.
+  @param  DataLength             Length of the data.
+  @param  TimeOut                Maximum time, in microseconds, for transfer to complete.
+  @param  Translator             Transaction translator to be used by this device.
+  @param  TransferResult         Variable to receive the transfer result.
 
-  @return EFI_SUCCESS           : The control transfer was completed successfully.
-  @return EFI_OUT_OF_RESOURCES  : Failed due to lack of resource.
-  @return EFI_INVALID_PARAMETER : Some parameters are invalid.
-  @return EFI_TIMEOUT           : Failed due to timeout.
-  @return EFI_DEVICE_ERROR      : Failed due to host controller or device error.
+  @return EFI_SUCCESS            The control transfer was completed successfully.
+  @return EFI_OUT_OF_RESOURCES   Failed due to lack of resource.
+  @return EFI_INVALID_PARAMETER  Some parameters are invalid.
+  @return EFI_TIMEOUT            Failed due to timeout.
+  @return EFI_DEVICE_ERROR       Failed due to host controller or device error.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2ControlTransfer (
@@ -747,32 +731,30 @@ ON_EXIT:
 }
 
 
-
 /**
-  Submits bulk transfer to a bulk endpoint of a USB device
+  Submits bulk transfer to a bulk endpoint of a USB device.
 
-  This                : A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  DeviceAddress       : Target device address
-  EndPointAddress     : Endpoint number and direction
-  DeviceSpeed         : Device speed
-  MaximumPacketLength : Maximum packet size of the target endpoint
-  DataBuffersNumber   : Number of data buffers prepared for the transfer.
-  Data                : Array of pointers to the buffers of data
-  DataLength          : On input, size of the data buffer, On output,
-  actually transferred data size.
-  DataToggle          : On input, data toggle to use; On output, next data toggle
-  Translator          : A pointr to the transaction translator data.
-  TimeOut             : Maximum time out, in microseconds
-  TransferResult      : Variable to receive transfer result
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  DeviceAddress          Target device address.
+  @param  EndPointAddress        Endpoint number and direction.
+  @param  DeviceSpeed            Device speed.
+  @param  MaximumPacketLength    Maximum packet size of the target endpoint.
+  @param  DataBuffersNumber      Number of data buffers prepared for the transfer.
+  @param  Data                   Array of pointers to the buffers of data.
+  @param  DataLength             On input, size of the data buffer, On output,
+                                 actually transferred data size.
+  @param  DataToggle             On input, data toggle to use; On output, next data toggle.
+  @param  TimeOut                Maximum time out, in microseconds.
+  @param  Translator             A pointr to the transaction translator data.
+  @param  TransferResult         Variable to receive transfer result.
 
-  @return EFI_SUCCESS           : The bulk transfer was completed successfully.
-  @return EFI_OUT_OF_RESOURCES  : Failed due to lack of resource.
-  @return EFI_INVALID_PARAMETER : Some parameters are invalid.
-  @return EFI_TIMEOUT           : Failed due to timeout.
-  @return EFI_DEVICE_ERROR      : Failed due to host controller or device error.
+  @return EFI_SUCCESS            The bulk transfer was completed successfully.
+  @return EFI_OUT_OF_RESOURCES   Failed due to lack of resource.
+  @return EFI_INVALID_PARAMETER  Some parameters are invalid.
+  @return EFI_TIMEOUT            Failed due to timeout.
+  @return EFI_DEVICE_ERROR       Failed due to host controller or device error.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2BulkTransfer (
@@ -809,11 +791,7 @@ Uhci2BulkTransfer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((DataLength == NULL) || (Data == NULL) || (TransferResult == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (*DataLength == 0) {
+  if ((DataLength == NULL) || (*DataLength == 0) || (Data == NULL) || (TransferResult == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -845,7 +823,7 @@ Uhci2BulkTransfer (
   // Map the source data buffer for bus master access,
   // then create a list of TDs
   //
-  if (EndPointAddress & 0x80) {
+  if ((EndPointAddress & 0x80) != 0) {
     Direction = EfiUsbDataIn;
   } else {
     Direction = EfiUsbDataOut;
@@ -906,27 +884,26 @@ ON_EXIT:
   Submits an asynchronous interrupt transfer to an
   interrupt endpoint of a USB device according to UEFI 2.0 spec.
 
-  This                : A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  DeviceAddress       : Target device address
-  EndPointAddress     : Endpoint number and direction
-  DeviceSpeed         : Device speed
-  MaximumPacketLength : Maximum packet size of the target endpoint
-  IsNewTransfer       : If TRUE, submit a new transfer, if FALSE cancel old transfer
-  DataToggle          : On input, data toggle to use; On output, next data toggle
-  PollingInterval     : Interrupt poll rate in milliseconds
-  DataLength          : On input, size of the data buffer, On output,
-  actually transferred data size.
-  Translator          : A pointr to the transaction translator data.
-  CallBackFunction    : Function to call periodically
-  Context             : User context
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  DeviceAddress          Target device address.
+  @param  EndPointAddress        Endpoint number and direction.
+  @param  DeviceSpeed            Device speed.
+  @param  MaximumPacketLength    Maximum packet size of the target endpoint.
+  @param  IsNewTransfer          If TRUE, submit a new transfer, if FALSE cancel old transfer.
+  @param  DataToggle             On input, data toggle to use; On output, next data toggle.
+  @param  PollingInterval        Interrupt poll rate in milliseconds.
+  @param  DataLength             On input, size of the data buffer, On output,
+                                 actually transferred data size.
+  @param  Translator             A pointr to the transaction translator data.
+  @param  CallBackFunction       Function to call periodically.
+  @param  Context                User context.
 
-  @return EFI_SUCCESS           : Transfer was submitted
-  @return EFI_INVALID_PARAMETER : Some parameters are invalid.
-  @return EFI_OUT_OF_RESOURCES  : Failed due to a lack of resources.
-  @return EFI_DEVICE_ERROR      : Can't read register
+  @return EFI_SUCCESS            Transfer was submitted.
+  @return EFI_INVALID_PARAMETER  Some parameters are invalid.
+  @return EFI_OUT_OF_RESOURCES   Failed due to a lack of resources.
+  @return EFI_DEVICE_ERROR       Can't read register.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2AsyncInterruptTransfer (
@@ -1102,28 +1079,27 @@ FREE_DATA:
   Submits synchronous interrupt transfer to an interrupt endpoint
   of a USB device according to UEFI 2.0 spec.
 
-  This                : A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  DeviceAddress       : Target device address
-  EndPointAddress     : Endpoint number and direction
-  DeviceSpeed         : Device speed
-  MaximumPacketLength : Maximum packet size of the target endpoint
-  DataBuffersNumber   : Number of data buffers prepared for the transfer.
-  Data                : Array of pointers to the buffers of data
-  DataLength          : On input, size of the data buffer, On output,
-  actually transferred data size.
-  DataToggle          : On input, data toggle to use; On output, next data toggle
-  TimeOut             : Maximum time out, in microseconds
-  Translator          : A pointr to the transaction translator data.
-  TransferResult      : Variable to receive transfer result
 
-  @return EFI_SUCCESS           : The transfer was completed successfully.
-  @return EFI_OUT_OF_RESOURCES  : Failed due to lack of resource.
-  @return EFI_INVALID_PARAMETER : Some parameters are invalid.
-  @return EFI_TIMEOUT           : Failed due to timeout.
-  @return EFI_DEVICE_ERROR      : Failed due to host controller or device error.
+  @param  This                   A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  DeviceAddress          Target device address.
+  @param  EndPointAddress        Endpoint number and direction.
+  @param  DeviceSpeed            Device speed.
+  @param  MaximumPacketLength    Maximum packet size of the target endpoint.
+  @param  Data                   Array of pointers to the buffers of data.
+  @param  DataLength             On input, size of the data buffer, On output,
+                                 actually transferred data size.
+  @param  DataToggle             On input, data toggle to use; On output, next data toggle.
+  @param  TimeOut                Maximum time out, in microseconds.
+  @param  Translator             A pointr to the transaction translator data.
+  @param  TransferResult         Variable to receive transfer result.
+
+  @return EFI_SUCCESS            The transfer was completed successfully.
+  @return EFI_OUT_OF_RESOURCES   Failed due to lack of resource.
+  @return EFI_INVALID_PARAMETER  Some parameters are invalid.
+  @return EFI_TIMEOUT            Failed due to timeout.
+  @return EFI_DEVICE_ERROR       Failed due to host controller or device error.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2SyncInterruptTransfer (
@@ -1254,22 +1230,21 @@ ON_EXIT:
 /**
   Submits isochronous transfer to a target USB device according to UEFI 2.0 spec.
 
-  This                : A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  DeviceAddress       : Target device address
-  EndPointAddress     : Endpoint number and direction
-  DeviceSpeed         : Device speed
-  MaximumPacketLength : Maximum packet size of the target endpoint
-  DataBuffersNumber   : Number of data buffers prepared for the transfer.
-  Data                : Array of pointers to the buffers of data
-  DataLength          : On input, size of the data buffer, On output,
-  actually transferred data size.
-  Translator          : A pointr to the transaction translator data.
-  TransferResult      : Variable to receive transfer result
+  @param  This                  A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  DeviceAddress         Target device address.
+  @param  EndPointAddress       Endpoint number and direction.
+  @param  DeviceSpeed           Device speed.
+  @param  MaximumPacketLength   Maximum packet size of the target endpoint.
+  @param  DataBuffersNumber     Number of data buffers prepared for the transfer.
+  @param  Data                  Array of pointers to the buffers of data.
+  @param  DataLength            On input, size of the data buffer, On output,
+                                actually transferred data size.
+  @param  Translator            A pointr to the transaction translator data.
+  @param  TransferResult        Variable to receive transfer result.
 
   @return EFI_UNSUPPORTED
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2IsochronousTransfer (
@@ -1292,21 +1267,22 @@ Uhci2IsochronousTransfer (
 /**
   Submits Async isochronous transfer to a target USB device according to UEFI 2.0 spec.
 
-  This                : A pointer to the EFI_USB2_HC_PROTOCOL instance.
-  DeviceAddress       : Target device address
-  EndPointAddress     : Endpoint number and direction
-  DeviceSpeed         : Device speed
-  MaximumPacketLength : Maximum packet size of the target endpoint
-  DataBuffersNumber   : Number of data buffers prepared for the transfer.
-  Data                : Array of pointers to the buffers of data
-  Translator          : A pointr to the transaction translator data.
-  IsochronousCallBack : Function to call when the transfer complete
-  Context             : Pass to the call back function as parameter
+  @param  This                  A pointer to the EFI_USB2_HC_PROTOCOL instance.
+  @param  DeviceAddress         Target device address.
+  @param  EndPointAddress       Endpoint number and direction.
+  @param  DeviceSpeed           Device speed.
+  @param  MaximumPacketLength   Maximum packet size of the target endpoint.
+  @param  DataBuffersNumber     Number of data buffers prepared for the transfer.
+  @param  Data                  Array of pointers to the buffers of data.
+  @param  DataLength            On input, size of the data buffer, On output,
+                                actually transferred data size.
+  @param  Translator            A pointr to the transaction translator data.
+  @param  IsochronousCallBack   Function to call when the transfer complete.
+  @param  Context               Pass to the call back function as parameter.
 
   @return EFI_UNSUPPORTED
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 Uhci2AsyncIsochronousTransfer (
@@ -1326,29 +1302,22 @@ Uhci2AsyncIsochronousTransfer (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Entry point for EFI drivers.
+
+  @param  ImageHandle      EFI_HANDLE.
+  @param  SystemTable      EFI_SYSTEM_TABLE.
+
+  @retval EFI_SUCCESS      Driver is successfully loaded.
+  @return Others           Failed.
+
+**/
 EFI_STATUS
 EFIAPI
 UhciDriverEntryPoint (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-  Routine Description:
-
-    Entry point for EFI drivers.
-
-  Arguments:
-
-    ImageHandle - EFI_HANDLE
-    SystemTable - EFI_SYSTEM_TABLE
-
-  Returns:
-
-    EFI_SUCCESS : Driver is successfully loaded
-    Others      : Failed
-
---*/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
@@ -1366,11 +1335,11 @@ UhciDriverEntryPoint (
   ControllerHandle that has UsbHcProtocol installed will be supported.
 
   @param  This                 Protocol instance pointer.
-  @param  Controller           Handle of device to test
-  @param  RemainingDevicePath  Not used
+  @param  Controller           Handle of device to test.
+  @param  RemainingDevicePath  Not used.
 
-  @return EFI_SUCCESS         : This driver supports this device.
-  @return EFI_UNSUPPORTED     : This driver does not support this device.
+  @return EFI_SUCCESS          This driver supports this device.
+  @return EFI_UNSUPPORTED      This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -1440,14 +1409,14 @@ ON_EXIT:
 
 
 /**
-  Allocate and initialize the empty UHCI device
+  Allocate and initialize the empty UHCI device.
 
-  @param  PciIo                The PCIIO to use
+  @param  PciIo                  The PCIIO to use.
+  @param  OriginalPciAttributes  The original PCI attributes.
 
-  @return Allocated UHCI device
+  @return Allocated UHCI device. If err, return NULL.
 
 **/
-STATIC
 USB_HC_DEV *
 UhciAllocateDev (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
@@ -1517,14 +1486,13 @@ ON_ERROR:
 
 
 /**
-  Free the UHCI device and release its associated resources
+  Free the UHCI device and release its associated resources.
 
-  @param  Uhc                  The UHCI device to release
+  @param  Uhc     The UHCI device to release.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UhciFreeDev (
   IN USB_HC_DEV           *Uhc
@@ -1538,7 +1506,7 @@ UhciFreeDev (
     UsbHcFreeMemPool (Uhc->MemPool);
   }
 
-  if (Uhc->CtrlNameTable) {
+  if (Uhc->CtrlNameTable != NULL) {
     FreeUnicodeStringTable (Uhc->CtrlNameTable);
   }
 
@@ -1547,15 +1515,14 @@ UhciFreeDev (
 
 
 /**
-  Uninstall all Uhci Interface
+  Uninstall all Uhci Interface.
 
-  @param  Controller           Controller handle
+  @param  Controller           Controller handle.
   @param  This                 Protocol instance pointer.
 
-  @return VOID
+  @return None.
 
 **/
-STATIC
 VOID
 UhciCleanDevUp (
   IN  EFI_HANDLE           Controller,
@@ -1594,17 +1561,16 @@ UhciCleanDevUp (
 
 
 /**
-  Starting the Usb UHCI Driver
+  Starting the Usb UHCI Driver.
 
   @param  This                 Protocol instance pointer.
-  @param  Controller           Handle of device to test
-  @param  RemainingDevicePath  Not used
+  @param  Controller           Handle of device to test.
+  @param  RemainingDevicePath  Not used.
 
   @retval EFI_SUCCESS          This driver supports this device.
   @retval EFI_UNSUPPORTED      This driver does not support this device.
-  @retval EFI_DEVICE_ERROR     This driver cannot be started due to device Error
-                               EFI_OUT_OF_RESOURCES- Failed due to resource
-                               shortage
+  @retval EFI_DEVICE_ERROR     This driver cannot be started due to device Error.
+                               EFI_OUT_OF_RESOURCES- Failed due to resource shortage.
 
 **/
 EFI_STATUS
@@ -1784,8 +1750,8 @@ CLOSE_PCIIO:
   created by this driver.
 
   @param  This                 Protocol instance pointer.
-  @param  Controller           Handle of device to stop driver on
-  @param  NumberOfChildren     Number of Children in the ChildHandleBuffer
+  @param  Controller           Handle of device to stop driver on.
+  @param  NumberOfChildren     Number of Children in the ChildHandleBuffer.
   @param  ChildHandleBuffer    List of handles for the children we need to stop.
 
   @return EFI_SUCCESS

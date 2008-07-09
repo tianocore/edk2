@@ -1,5 +1,7 @@
 /** @file
 
+  This file provides the information dump support for Uhci when in debug mode.
+
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,17 +11,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  UhciDebug.c
-
-Abstract:
-
-  This file provides the information dump support for Uhci when in debug mode.
-
-Revision History
-
-
 **/
 
 #include "Uhci.h"
@@ -27,11 +18,11 @@ Revision History
 
 
 /**
-  Dump the content of QH structure
+  Dump the content of QH structure.
 
-  @param  QhSw    Pointer to software QH structure
+  @param  QhSw    Pointer to software QH structure.
 
-  @return None
+  @return None.
 
 **/
 VOID
@@ -51,10 +42,10 @@ UhciDumpQh (
 /**
   Dump the content of TD structure.
 
-  @param  TdSw    Pointer to software TD structure
-  @param  IsCur   Whether dump the whole list, or only dump the current TD
+  @param  TdSw    Pointer to software TD structure.
+  @param  IsCur   Whether dump the whole list, or only dump the current TD.
 
-  @return None
+  @return None.
 
 **/
 VOID
