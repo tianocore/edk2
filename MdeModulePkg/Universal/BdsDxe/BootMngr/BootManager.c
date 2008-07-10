@@ -31,7 +31,9 @@ BOOT_MANAGER_CALLBACK_DATA  gBootManagerPrivate = {
 };
 
 /**
-  This function processes the results of changes in configuration.
+  This call back funtion is registered with Boot Manager formset.
+  When user selects a boot option, this call back function will
+  be triggered. The boot option is saved for later processing.
 
 
   @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
@@ -43,9 +45,7 @@ BOOT_MANAGER_CALLBACK_DATA  gBootManagerPrivate = {
   @param ActionRequest   On return, points to the action requested by the callback function.
 
   @retval  EFI_SUCCESS           The callback successfully handled the action.
-  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
-  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
-  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
+  @retval  EFI_INVALID_PARAMETER The setup browser call this function with invalid parameters.
 
 **/
 EFI_STATUS
@@ -101,10 +101,9 @@ BootManagerCallback (
 
 /**
 
-  Initialize HII information for the FrontPage
+  Registers HII packages for the Boot Manger to HII Database.
+  It also registers the browser call back function.
 
-
-  @param VOID            EDES_TODO: Add parameter description
 
   @return EDES_TODO: Add description for return value
 
@@ -154,8 +153,11 @@ InitializeBootManager (
 }
 
 /**
-  Invoke Boot Manager. Hook to enable UI timeout override behavior.
-
+  This funtion invokees Boot Manager. If all devices have not a chance to be connected,
+  the connect all will be triggered. It then enumerate all boot options. If 
+  a boot option from the Boot Manager page is selected, Boot Manager will boot
+  from this boot option.
+  
 **/
 VOID
 CallBootManager (
