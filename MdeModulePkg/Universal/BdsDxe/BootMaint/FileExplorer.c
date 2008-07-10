@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param CallbackData    The BMM context data.
   @param MenuOption      Pointer to menu options to display.
 
-  @return VOID
+  
 
 **/
 VOID

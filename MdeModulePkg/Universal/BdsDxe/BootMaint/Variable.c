@@ -19,9 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   After deleting this boot option, call Var_ChangeBootOrder to
   make sure BootOrder is in valid state.
 
-
-  @param VOID            EDES_TODO: Add parameter description
-
   @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to  
                         BM_LOAD_CONTEXT marked for deletion is deleted
   @return Others        If failed to update the "BootOrder" variable after deletion. 
@@ -88,7 +85,7 @@ Var_DelBootOption (
   scratch by content from BootOptionMenu is needed.
 
 
-  @param VOID
+  
 
   @retval  EFI_SUCCESS  The boot order is updated successfully.
   @return               EFI_STATUS other than EFI_SUCCESS if failed to
@@ -180,7 +177,7 @@ Var_ChangeBootOrder (
   make sure DriverOrder is in valid state.
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS Load Option is successfully updated.
   @return Other value than EFI_SUCCESS if failed to update "Driver Order" EFI
@@ -241,7 +238,7 @@ Var_DelDriverOption (
   needed.
 
 
-  @param VOID
+  
 
   @retval  EFI_SUCCESS  The driver order is updated successfully.
   @return               EFI_STATUS other than EFI_SUCCESS if failed to
@@ -323,9 +320,9 @@ Var_ChangeDriverOrder (
   based on the new BaudRate, Data Bits, parity and Stop Bits
   set.
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -490,7 +487,7 @@ Var_UpdateConsoleOption (
   console device.
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
@@ -509,7 +506,7 @@ Var_UpdateConsoleInpOption (
   console device.
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
@@ -528,7 +525,7 @@ Var_UpdateConsoleOutOption (
   console device.
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
@@ -552,7 +549,7 @@ Var_UpdateErrorOutOption (
   @param HiiHandle       The HII handle associated with the BMM formset.
   @param DescriptionData The description of this driver option.
   @param OptionalData    The optional load option.
-  @param ForceReconnect  EDES_TODO: Add parameter description
+  @param ForceReconnect  If to force reconnect.
 
   @retval EFI_OUT_OF_RESOURCES If not enought memory to complete the operation.
   @retval EFI_SUCCESS          If function completes successfully.
@@ -736,7 +733,6 @@ Var_UpdateDriverOption (
   @retval EFI_SUCCESS          If function completes successfully.
 
 **/
-
 EFI_STATUS
 Var_UpdateBootOption (
   IN  BMM_CALLBACK_DATA                   *CallbackData,
@@ -1429,7 +1425,7 @@ Var_UpdateConMode (
   }
 
   Status = gRT->SetVariable (
-                  VarConOutMode,
+                  VAR_CON_OUT_MODE,
                   &gEfiGenericPlatformVariableGuid,
                   EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   sizeof (CONSOLE_OUT_MODE),

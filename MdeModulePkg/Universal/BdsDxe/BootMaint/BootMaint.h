@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _BOOT_MAINT_H
-#define _BOOT_MAINT_H
+#ifndef _BOOT_MAINT_H_
+#define _BOOT_MAINT_H_
 
 #include "Bds.h"
 #include "BBSsupport.h"
@@ -23,9 +23,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Constants which are variable names used to access variables
 //
-#define VarLegacyDevOrder L"LegacyDevOrder"
+#define VAR_LEGACY_DEV_ORDER L"LegacyDevOrder"
 
-#define VarConOutMode L"ConOutMode"
+#define VAR_CON_OUT_MODE L"ConOutMode"
 
 //
 // Guid of a NV Variable which store the information about the
@@ -39,16 +39,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // String Contant
 //
-#define StrFloppy       L"Floppy Drive #%02x"
-#define StrHardDisk     L"HardDisk Drive #%02x"
-#define StrCDROM        L"ATAPI CDROM Drive #%02x"
-#define StrNET          L"NET Drive #%02x"
-#define StrBEV          L"BEV Drive #%02x"
-#define StrFloppyHelp   L"Select Floppy Drive #%02x"
-#define StrHardDiskHelp L"Select HardDisk Drive #%02x"
-#define StrCDROMHelp    L"Select ATAPI CDROM Drive #%02x"
-#define StrNETHelp      L"NET Drive #%02x"
-#define StrBEVHelp      L"BEV Drive #%02x"
+#define STR_FLOPPY       L"Floppy Drive #%02x"
+#define STR_HARDDISK     L"HardDisk Drive #%02x"
+#define STR_CDROM        L"ATAPI CDROM Drive #%02x"
+#define STR_NET          L"NET Drive #%02x"
+#define STR_BEV          L"BEV Drive #%02x"
+#define STR_FLOPPY_HELP   L"Select Floppy Drive #%02x"
+#define STR_HARDDISK_HELP L"Select HardDisk Drive #%02x"
+#define STR_CDROM_HELP    L"Select ATAPI CDROM Drive #%02x"
+#define STR_NET_HELP      L"NET Drive #%02x"
+#define STR_BEV_HELP      L"BEV Drive #%02x"
 
 //
 // Variable created with this flag will be "Efi:...."
@@ -60,22 +60,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define MAX_CHAR      480
 #define MAX_CHAR_SIZE (MAX_CHAR * 2)
-
-//
-// Check to see if current build support option active feature of
-// some driver option
-//
-#ifndef LOAD_OPTION_ACTIVE
-#define LOAD_OPTION_ACTIVE  0x00000001
-#endif
-
-//
-// Check to see if current build support force reconnect feature of
-// some driver option
-//
-#ifndef LOAD_OPTION_FORCE_RECONNECT
-#define LOAD_OPTION_FORCE_RECONNECT 0x00000002
-#endif
 
 extern EFI_GUID mBootMaintGuid;
 extern EFI_GUID mFileExplorerGuid;
@@ -493,10 +477,11 @@ BOpt_FindFileSystem (
   All files and sub-directories in current directory
   will be stored in DirectoryMenu for future use.
 
-  @param FileOption  Pointer for Dir to explore.
+  @param CallbackData  The BMM context data.
+  @param MenuEntry     The Menu Entry.
 
-  @retval TRUE         Get files from current dir successfully.
-  @retval FALSE        Can't get files from current dir.
+  @retval EFI_SUCCESS         Get files from current dir successfully.
+  @return Other value if can't get files from current dir.
 
 **/
 EFI_STATUS
@@ -513,7 +498,7 @@ BOpt_FindFiles (
   All valid handles in the system except those consume SimpleFs, LoadFile
   are stored in DriverMenu for future use.
 
-  @param VOID 
+   
 
   @retval EFI_SUCCESS The function complets successfully.
   @return Other value if failed to build the DriverMenu.
@@ -530,7 +515,7 @@ BOpt_FindDrivers (
   Build the BootOptionMenu according to BootOrder Variable.
   This Routine will access the Boot#### to get EFI_LOAD_OPTION.
 
-  @param None
+  @param CallbackData The BMM context data.
 
   @return The number of the Var Boot####.
 
@@ -560,7 +545,7 @@ BOpt_GetDriverOptions (
 /**
   Build the LegacyFDMenu LegacyHDMenu LegacyCDMenu according to LegacyBios.GetBbsInfo().
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS The function complete successfully.
   @retval EFI_OUT_OF_RESOURCES No enough memory to complete this function.
@@ -574,9 +559,9 @@ BOpt_GetLegacyOptions (
 /**
   Free out resouce allocated from Legacy Boot Options.
 
-  @param VOID.
+  .
 
-  @return VOID.
+  .
 
 **/
 VOID
@@ -585,11 +570,11 @@ BOpt_FreeLegacyOptions (
   );
 
 /**
-  Free resources allocated in Allocate Rountine
+  Free resources allocated in Allocate Rountine.
 
   @param FreeMenu        Menu to be freed
 
-  @return VOID
+  
 
 **/
 VOID
@@ -652,7 +637,7 @@ BOpt_IsEfiApp (
 
   Get the Option Number that has not been allocated for use.
 
-  @param VOID
+  
 
   @return The available Option Number.
 
@@ -666,7 +651,7 @@ BOpt_GetBootOptionNumber (
 
   Get the Option Number that is not in use.
 
-  @param VOID
+  
 
   @return The unused Option Number.
 
@@ -726,12 +711,11 @@ BOpt_GetMenuEntry (
 // Locate all serial io devices for console
 //
 /**
-  Build a list containing all serial devices
+  Build a list containing all serial devices.
 
 
-  @param VOID            EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS The function complete successfully.
+  @retval EFI_UNSUPPORTED No serial ports present.
 
 **/
 EFI_STATUS
@@ -746,7 +730,7 @@ LocateSerialIo (
   Build up ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS    The function always complete successfully.
 
@@ -765,7 +749,7 @@ GetAllConsoles(
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -780,7 +764,7 @@ GetConsoleOutMode (
   Free ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
 
 
-  @param VOID            EDES_TODO: Add parameter description
+              EDES_TODO: Add parameter description
 
   @retval EFI_SUCCESS    The function always complete successfully.
 **/
@@ -796,13 +780,14 @@ FreeAllConsoles (
 
   @param DevicePath
 
-  @return VOID
+  
 
 **/
 VOID
 ChangeVariableDevicePath (
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-);
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+;
 
 /**
   Update the multi-instance device path of Terminal Device based on
@@ -818,9 +803,9 @@ ChangeVariableDevicePath (
 **/
 EFI_STATUS
 ChangeTerminalDevicePath (
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
-  BOOLEAN                   ChangeTerminal
-);
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN BOOLEAN                   ChangeTerminal
+  );
 //
 // Variable operation by menu selection
 //
@@ -849,7 +834,7 @@ Var_UpdateBootOption (
   make sure BootOrder is in valid state.
 
 
-  @param VOID            EDES_TODO: Add parameter description
+              EDES_TODO: Add parameter description
 
   @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to  
                         BM_LOAD_CONTEXT marked for deletion is deleted
@@ -868,7 +853,7 @@ Var_DelBootOption (
   scratch by content from BootOptionMenu is needed.
 
 
-  @param VOID
+  
 
   @retval  EFI_SUCCESS  The boot order is updated successfully.
   @return               EFI_STATUS other than EFI_SUCCESS if failed to
@@ -911,7 +896,7 @@ Var_UpdateDriverOption (
   make sure DriverOrder is in valid state.
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS Load Option is successfully updated.
   @return Other value than EFI_SUCCESS if failed to update "Driver Order" EFI
@@ -931,7 +916,7 @@ Var_DelDriverOption (
   needed.
 
 
-  @param VOID
+  
 
   @retval  EFI_SUCCESS  The driver order is updated successfully.
   @return               EFI_STATUS other than EFI_SUCCESS if failed to
@@ -948,7 +933,7 @@ Var_ChangeDriverOrder (
   console device.
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
@@ -964,7 +949,7 @@ Var_UpdateConsoleInpOption (
   console device.
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
@@ -980,7 +965,7 @@ Var_UpdateConsoleOutOption (
   console device.
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
@@ -996,9 +981,9 @@ Var_UpdateErrorOutOption (
   based on the new BaudRate, Data Bits, parity and Stop Bits
   set.
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1096,9 +1081,9 @@ Var_UpdateConMode (
 /**
   Refresh the global UpdateData structure.
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1114,7 +1099,7 @@ RefreshUpdateData (
                          opcode deletion.
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1129,7 +1114,7 @@ CleanUpPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1142,7 +1127,7 @@ UpdateBootDelPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1157,7 +1142,7 @@ UpdateDrvAddHandlePage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1171,7 +1156,7 @@ UpdateDrvDelPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1186,7 +1171,7 @@ UpdateDriverAddHandleDescPage (
   @param UpdatePageId    The form ID.
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1201,7 +1186,7 @@ UpdatePageBody (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1215,7 +1200,7 @@ UpdateBootNextPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1230,7 +1215,7 @@ UpdateTimeOutPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1244,7 +1229,7 @@ UpdateTerminalPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1258,7 +1243,7 @@ UpdateConModePage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1273,14 +1258,14 @@ UpdateConCOMPage (
   @param UpdatePageId    The form ID. It also spefies the legacy device type.
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
 UpdateSetLegacyDeviceOrderPage (
   IN UINT16                           UpdatePageId,
   IN BMM_CALLBACK_DATA                *CallbackData
-);
+  );
 
 
 /**
@@ -1366,7 +1351,7 @@ DevicePathToStr (
 /**
 
   Find the first instance of this Protocol
-  in the system and return it's interface
+  in the system and return it's interface.
 
 
   @param ProtocolGuid    Provides the protocol to search for
@@ -1408,7 +1393,7 @@ EfiReallocatePool (
 
   @param  Name                  String part of EFI variable name
   @param  VendorGuid            GUID part of EFI variable name
-  @param  VariableSize          Returns the size of the EFI variable that was read
+  @param  VarSize          Returns the size of the EFI variable that was read
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
   @return Caller is responsible freeing the buffer.
@@ -1429,7 +1414,7 @@ BdsLibGetVariableAndSize (
   @param VarName         - A Null-terminated Unicode string that is
                          the name of the vendor's variable.
                          
-  @param VendorGuid           - A unique identifier for the vendor.
+  @param VarGuid           - A unique identifier for the vendor.
 
   @retval  EFI_SUCCESS           The variable was found and removed
   @retval  EFI_UNSUPPORTED       The variable store was inaccessible
@@ -1517,7 +1502,7 @@ EfiLibStrFromDatahub (
   @param OptionIndex     Returns the index number (#### in Boot####).
   @param OptionSize      Return the size of the Boot### variable.
 
-  @return VOID
+  
 
 **/
 VOID                              *
@@ -1525,16 +1510,13 @@ GetLegacyBootOptionVar (
   IN  UINTN                            DeviceType,
   OUT UINTN                            *OptionIndex,
   OUT UINTN                            *OptionSize
- );
+  );
 
 /**
-  Initialize the Boot Maintenance Utitliy
+  Initialize the Boot Maintenance Utitliy.
 
-
-  @param VOID            EDES_TODO: Add parameter description
-
-  @retval  EFI_SUCCESS      utility ended successfully
-  @retval  others           contain some errors
+  @retval  EFI_SUCCESS      utility ended successfully.
+  @retval  others           contain some errors.
 
 **/
 EFI_STATUS
@@ -1546,7 +1528,7 @@ InitializeBM (
   Start boot maintenance manager
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS If BMM is invoked successfully.
   @return Other value if BMM return unsuccessfully.
@@ -1561,9 +1543,9 @@ BdsStartBootMaint (
   Intialize all the string depositories.
 
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1591,9 +1573,9 @@ GetStringTokenFromDepository (
   Reclaim string depositories by moving the current node pointer to list head..
 
 
-  @param VOID 
+   
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1605,9 +1587,9 @@ ReclaimStringDepository (
   Release resource for all the string depositories.
 
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1641,7 +1623,7 @@ ApplyChangeHandler (
   @param Private         The BMM context data.
   @param CurrentFakeNVMap The current Fack NV Map.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1656,7 +1638,7 @@ DiscardChangeHandler (
   @param Private         The BMM context data.
   @param NewPageId       The original page ID.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1672,7 +1654,7 @@ UpdatePageId (
                          of the file to be boot from.
 
   @retval EFI_SUCCESS    The function completed successfull.
-  @retun                 Other value if the boot from the file fails.
+  @return                 Other value if the boot from the file fails.
 
 **/
 EFI_STATUS
@@ -1742,7 +1724,7 @@ FileExplorerCallback (
   @param CallbackData    The BMM context data.
 
   @retval EFI_SUCCESS If function complete successfully.
-  @retturn Other value if the Setup Browser process BMM's pages and
+  @return Other value if the Setup Browser process BMM's pages and
            return unsuccessfully.
 
 **/

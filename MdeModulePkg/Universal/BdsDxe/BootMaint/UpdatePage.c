@@ -17,9 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Refresh the global UpdateData structure.
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -37,7 +37,7 @@ RefreshUpdateData (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -70,7 +70,7 @@ UpdatePageStart (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -130,7 +130,7 @@ UpdatePageEnd (
                          opcode deletion.
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -161,7 +161,7 @@ CleanUpPage (
                          of the file to be boot from.
 
   @retval EFI_SUCCESS    The function completed successfull.
-  @retun                 Other value if the boot from the file fails.
+  @return                 Other value if the boot from the file fails.
 
 **/
 EFI_STATUS
@@ -203,7 +203,7 @@ BootThisFile (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -241,7 +241,7 @@ UpdateConCOMPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -288,7 +288,7 @@ UpdateBootDelPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -326,7 +326,7 @@ UpdateDrvAddHandlePage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -372,7 +372,7 @@ UpdateDrvDelPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -438,13 +438,13 @@ UpdateDriverAddHandleDescPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Update console page.
 
-  @param UpdatePageId    EDES_TODO: Add parameter description
-  @param ConsoleMenu     EDES_TODO: Add parameter description
+  @param UpdatePageId    The form ID to be updated.
+  @param ConsoleMenu     The console menu list.
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -528,7 +528,7 @@ UpdateConsolePage (
   @param OptionMenu      The new list.
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -597,7 +597,7 @@ UpdateOrderPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -671,7 +671,7 @@ UpdateBootNextPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -713,7 +713,7 @@ UpdateTimeOutPage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -822,7 +822,7 @@ UpdateConModePage (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -998,7 +998,7 @@ UpdateTerminalPage (
   @param UpdatePageId    The form ID.
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1043,7 +1043,7 @@ UpdatePageBody (
   @param OptionIndex     Returns the index number (#### in Boot####).
   @param OptionSize      Return the size of the Boot### variable.
 
-  @return VOID
+  
 
 **/
 VOID *
@@ -1125,7 +1125,7 @@ GetLegacyBootOptionVar (
   @param UpdatePageId    The form ID. It also spefies the legacy device type.
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1179,8 +1179,8 @@ UpdateSetLegacyDeviceOrderPage (
   case FORM_SET_FD_ORDER_ID:
     OptionMenu  = (BM_MENU_OPTION *) &LegacyFDMenu;
     Key         = (UINT16) LEGACY_FD_QUESTION_ID;
-    TypeStr     = StrFloppy;
-    TypeStrHelp = StrFloppyHelp;
+    TypeStr     = STR_FLOPPY;
+    TypeStrHelp = STR_FLOPPY_HELP;
     BbsType     = BBS_FLOPPY;
     LegacyOrder = CallbackData->BmmFakeNvData.LegacyFD;
     OldData     = CallbackData->BmmOldFakeNVData.LegacyFD;
@@ -1189,8 +1189,8 @@ UpdateSetLegacyDeviceOrderPage (
   case FORM_SET_HD_ORDER_ID:
     OptionMenu  = (BM_MENU_OPTION *) &LegacyHDMenu;
     Key         = (UINT16) LEGACY_HD_QUESTION_ID;
-    TypeStr     = StrHardDisk;
-    TypeStrHelp = StrHardDiskHelp;
+    TypeStr     = STR_HARDDISK;
+    TypeStrHelp = STR_HARDDISK_HELP;
     BbsType     = BBS_HARDDISK;
     LegacyOrder = CallbackData->BmmFakeNvData.LegacyHD;
     OldData     = CallbackData->BmmOldFakeNVData.LegacyHD;
@@ -1199,8 +1199,8 @@ UpdateSetLegacyDeviceOrderPage (
   case FORM_SET_CD_ORDER_ID:
     OptionMenu  = (BM_MENU_OPTION *) &LegacyCDMenu;
     Key         = (UINT16) LEGACY_CD_QUESTION_ID;
-    TypeStr     = StrCDROM;
-    TypeStrHelp = StrCDROMHelp;
+    TypeStr     = STR_CDROM;
+    TypeStrHelp = STR_CDROM_HELP;
     BbsType     = BBS_CDROM;
     LegacyOrder = CallbackData->BmmFakeNvData.LegacyCD;
     OldData     = CallbackData->BmmOldFakeNVData.LegacyCD;
@@ -1209,8 +1209,8 @@ UpdateSetLegacyDeviceOrderPage (
   case FORM_SET_NET_ORDER_ID:
     OptionMenu  = (BM_MENU_OPTION *) &LegacyNETMenu;
     Key         = (UINT16) LEGACY_NET_QUESTION_ID;
-    TypeStr     = StrNET;
-    TypeStrHelp = StrNETHelp;
+    TypeStr     = STR_NET;
+    TypeStrHelp = STR_NET_HELP;
     BbsType     = BBS_EMBED_NETWORK;
     LegacyOrder = CallbackData->BmmFakeNvData.LegacyNET;
     OldData     = CallbackData->BmmOldFakeNVData.LegacyNET;
@@ -1219,8 +1219,8 @@ UpdateSetLegacyDeviceOrderPage (
   case FORM_SET_BEV_ORDER_ID:
     OptionMenu  = (BM_MENU_OPTION *) &LegacyBEVMenu;
     Key         = (UINT16) LEGACY_BEV_QUESTION_ID;
-    TypeStr     = StrBEV;
-    TypeStrHelp = StrBEVHelp;
+    TypeStr     = STR_BEV;
+    TypeStrHelp = STR_BEV_HELP;
     BbsType     = BBS_BEV_DEVICE;
     LegacyOrder = CallbackData->BmmFakeNvData.LegacyBEV;
     OldData     = CallbackData->BmmOldFakeNVData.LegacyBEV;
@@ -1329,7 +1329,7 @@ UpdateSetLegacyDeviceOrderPage (
   @param Private         The BMM context data.
   @param NewPageId       The original page ID.
 
-  @return VOID
+  
 
 **/
 VOID
