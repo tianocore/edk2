@@ -16,13 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BBSsupport.h"
 
-EFI_DEVICE_PATH_PROTOCOL  EndDevicePath[] = {
-  END_DEVICE_PATH_TYPE,
-  END_ENTIRE_DEVICE_PATH_SUBTYPE,
-  END_DEVICE_PATH_LENGTH,
-  0
-};
-
 /**
 
   Translate the first n characters of an Ascii string to
@@ -291,7 +284,7 @@ BdsCreateLegacyBootOption (
   //
   UnicodeToAscii (BootDesc, StrSize (BootDesc), HelpString);
   StringLen = AsciiStrLen (HelpString);
-  NewBbsDevPathNode = EfiAllocateZeroPool (sizeof (BBS_BBS_DEVICE_PATH) + StringLen);
+  NewBbsDevPathNode = AllocateZeroPool (sizeof (BBS_BBS_DEVICE_PATH) + StringLen);
   if (NewBbsDevPathNode == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -320,7 +313,7 @@ BdsCreateLegacyBootOption (
     sizeof (BBS_TABLE) +
     sizeof (UINT16);
 
-  Buffer = EfiAllocateZeroPool (BufferSize);
+  Buffer = AllocateZeroPool (BufferSize);
   if (Buffer == NULL) {
     FreePool (NewBbsDevPathNode);
     FreePool (CurrentBbsDevPath);
@@ -369,7 +362,7 @@ BdsCreateLegacyBootOption (
   SafeFreePool (Buffer);
   Buffer = NULL;
 
-  NewBootOrderList = EfiAllocateZeroPool (*BootOrderListSize + sizeof (UINT16));
+  NewBootOrderList = AllocateZeroPool (*BootOrderListSize + sizeof (UINT16));
   if (NULL == NewBootOrderList) {
     FreePool (NewBbsDevPathNode);
     FreePool (CurrentBbsDevPath);
@@ -963,7 +956,7 @@ BdsCreateDevOrder (
   TotalSize += (HeaderSize + sizeof (UINT16) * NETCount);
   TotalSize += (HeaderSize + sizeof (UINT16) * BEVCount);
 
-  DevOrder = EfiAllocateZeroPool (TotalSize);
+  DevOrder = AllocateZeroPool (TotalSize);
   if (NULL == DevOrder) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1151,7 +1144,7 @@ BdsUpdateLegacyDevOrder (
   TotalSize += (HeaderSize + NETCount * sizeof (UINT16));
   TotalSize += (HeaderSize + BEVCount * sizeof (UINT16));
 
-  NewDevOrder = EfiAllocateZeroPool (TotalSize);
+  NewDevOrder = AllocateZeroPool (TotalSize);
   if (NULL == NewDevOrder) {
     return EFI_OUT_OF_RESOURCES;
   }

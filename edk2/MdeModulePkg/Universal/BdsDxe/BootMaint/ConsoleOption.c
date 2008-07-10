@@ -15,11 +15,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BootMaint.h"
 
 /**
-  EDES_TODO: Add function description.
+  Function creates a device path data structure that identically matches the
+  device path passed in.
 
-  @param DevPath         EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param DevPath         A pointer to a device path data structure.
+
+  @return        The new copy of DevPath is created to identically match the input.
+  @retval  NULL  Otherwise, NULL is returned.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL  *
@@ -28,11 +31,12 @@ DevicePathInstanceDup (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Update Com Ports attributes from DevicePath
 
-  @param DevicePath      EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param DevicePath      DevicePath that contains Com ports
+
+  @retval EFI_SUCCESS   The update is successful.
 
 **/
 EFI_STATUS
@@ -41,18 +45,21 @@ UpdateComAttributeFromVariable (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Update the multi-instance device path of Terminal Device based on
+  the global TerminalMenu. If ChangeTernimal is TRUE, the terminal 
+  device path in the Terminal Device in TerminalMenu is also updated.
 
-  @param DevicePath      EDES_TODO: Add parameter description
-  @param ChangeTerminal  EDES_TODO: Add parameter description
+  @param DevicePath      The multi-instance device path.
+  @param ChangeTerminal  TRUE, then device path in the Terminal Device 
+                         in TerminalMenu is also updated; FALSE, no update.
 
-  @return EDES_TODO: Add description for return value
+  @return EFI_SUCCESS    The function completes successfully.
 
 **/
 EFI_STATUS
 ChangeTerminalDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
-  BOOLEAN                   ChangeTerminal
+  IN BOOLEAN                   ChangeTerminal
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *Node;
@@ -78,9 +85,6 @@ ChangeTerminalDevicePath (
     }
 
     NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Com);
-    if (NULL == NewMenuEntry) {
-      return EFI_NOT_FOUND;
-    }
 
     NewTerminalContext = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
     if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) && (DevicePathSubType (Node) == MSG_UART_DP)) {
@@ -162,16 +166,18 @@ ChangeTerminalDevicePath (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Update the device path that describing a terminal device
+  based on the new BaudRate, Data Bits, parity and Stop Bits
+  set.
 
-  @param DevicePath      EDES_TODO: Add parameter description
+  @param DevicePath
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
 ChangeVariableDevicePath (
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *Node;
@@ -237,8 +243,8 @@ ChangeVariableDevicePath (
   Retrieve ACPI UID of UART from device path
 
 
-  @param Handle          EDES_TODO: Add parameter description
-  @param AcpiUid         EDES_TODO: Add parameter description
+  @param Handle          The handle for the UART device.
+  @param AcpiUid         The ACPI UID on output.
 
   @retval  TRUE   Find valid UID from device path
   @retval  FALSE  Can't find
@@ -287,7 +293,7 @@ RetrieveUartUid (
   @param Handles         EFI_SERIAL_IO_PROTOCOL handle buffer
   @param NoHandles       EFI_SERIAL_IO_PROTOCOL handle count
 
-           EDES_TODO: Incomplete Descriptions  None
+  @retval VOID
 
 **/
 VOID
@@ -328,13 +334,15 @@ SortedUartHandle (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Test whether DevicePath is a valid Terminal
 
-  @param DevicePath      EDES_TODO: Add parameter description
-  @param Termi           EDES_TODO: Add parameter description
-  @param Com             EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param DevicePath      DevicePath to be checked
+  @param Termi           If DevicePath is valid Terminal, terminal type is returned.
+  @param Com             If DevicePath is valid Terminal, Com Port type is returned.
+
+  @retval  TRUE         If DevicePath point to a Terminal.
+  @retval  FALSE        If DevicePath does not point to a Terminal.
 
 **/
 BOOLEAN
@@ -511,7 +519,7 @@ LocateSerialIo (
     Vendor.Header.SubType             = MSG_VENDOR_DP;
 
     for (Index2 = 0; Index2 < 4; Index2++) {
-      CopyMem (&Vendor.Guid, &Guid[Index2], sizeof (EFI_GUID));
+      CopyMem (&Vendor.Guid, &TerminalTypeGuid[Index2], sizeof (EFI_GUID));
       SetDevicePathNodeLength (&Vendor.Header, sizeof (VENDOR_DEVICE_PATH));
       NewDevicePath = AppendDevicePathNode (
                         NewTerminalContext->DevicePath,
@@ -550,7 +558,7 @@ LocateSerialIo (
 
   @param DevicePath      DevicePath that contains Com ports
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS   The update is successful.
 
 **/
 EFI_STATUS
@@ -672,8 +680,8 @@ UpdateComAttributeFromVariable (
 
   @param DevPath         A pointer to a device path data structure.
 
-           EDES_TODO: Incomplete Descriptions  The new copy of DevPath is created to identically match the input.
-           EDES_TODO: Incomplete Descriptions  Otherwise, NULL is returned.
+  @return        The new copy of DevPath is created to identically match the input.
+  @retval  NULL  Otherwise, NULL is returned.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -698,7 +706,7 @@ DevicePathInstanceDup (
   //
   NewDevPath = NULL;
   if (Size != 0) {
-    NewDevPath = EfiAllocateZeroPool (Size);
+    NewDevPath = AllocateZeroPool (Size);
     ASSERT (NewDevPath != NULL);
   }
 
@@ -714,11 +722,18 @@ DevicePathInstanceDup (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Build up Console Menu based on types passed in. The type can
+  be BM_CONSOLE_IN_CONTEXT_SELECT, BM_CONSOLE_OUT_CONTEXT_SELECT
+  and BM_CONSOLE_ERR_CONTEXT_SELECT.
 
-  @param ConsoleMenuType EDES_TODO: Add parameter description
+  @param ConsoleMenuType Can be BM_CONSOLE_IN_CONTEXT_SELECT, BM_CONSOLE_OUT_CONTEXT_SELECT
+                         and BM_CONSOLE_ERR_CONTEXT_SELECT.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_UNSUPPORTED The type passed in is not in the 3 types defined.
+  @retval EFI_NOT_FOUND   If the EFI Variable defined in UEFI spec with name "ConOutDev", 
+                          "ConInDev" or "ConErrDev" doesn't exists.
+  @retval EFI_OUT_OF_RESOURCES Not enough resource to complete the operations.
+  @retval EFI_SUCCESS          Function completes successfully.
 
 **/
 EFI_STATUS
@@ -796,7 +811,7 @@ GetConsoleMenu (
   AllCount                = EfiDevicePathInstanceCount (AllDevicePath);
   ConsoleMenu->MenuNumber = 0;
   //
-  // Following is menu building up for Console Out Devices
+  // Following is menu building up for Console Devices selected.
   //
   MultiDevicePath = AllDevicePath;
   Index2          = 0;
@@ -844,10 +859,9 @@ GetConsoleMenu (
   Build up ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
 
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID
 
-           EDES_TODO: Incomplete Descriptions  EFI_SUCCESS
-           EDES_TODO: Incomplete Descriptions  Others
+  @retval EFI_SUCCESS    The function always complete successfully.
 
 **/
 EFI_STATUS
@@ -867,9 +881,7 @@ GetAllConsoles (
 
   @param VOID            EDES_TODO: Add parameter description
 
-           EDES_TODO: Incomplete Descriptions  EFI_SUCCESS
-           EDES_TODO: Incomplete Descriptions  Others
-
+  @retval EFI_SUCCESS    The function always complete successfully.
 **/
 EFI_STATUS
 FreeAllConsoles (
@@ -888,11 +900,11 @@ FreeAllConsoles (
 
 
   @param DevicePath      DevicePath to be checked
-  @param Termi           If is terminal, give its type
-  @param Com             If is Com Port, give its type
+  @param Termi           If DevicePath is valid Terminal, terminal type is returned.
+  @param Com             If DevicePath is valid Terminal, Com Port type is returned.
 
-  @retval  TRUE         If DevicePath point to a Terminal
-                        FALSE
+  @retval  TRUE         If DevicePath point to a Terminal.
+  @retval  FALSE        If DevicePath does not point to a Terminal.
 
 **/
 BOOLEAN
@@ -929,19 +941,19 @@ IsTerminalDevicePath (
   //
   CopyMem (&TempGuid, &Vendor->Guid, sizeof (EFI_GUID));
 
-  if (CompareGuid (&TempGuid, &Guid[0])) {
+  if (CompareGuid (&TempGuid, &TerminalTypeGuid[0])) {
     *Termi      = PC_ANSI;
     IsTerminal  = TRUE;
   } else {
-    if (CompareGuid (&TempGuid, &Guid[1])) {
+    if (CompareGuid (&TempGuid, &TerminalTypeGuid[1])) {
       *Termi      = VT_100;
       IsTerminal  = TRUE;
     } else {
-      if (CompareGuid (&TempGuid, &Guid[2])) {
+      if (CompareGuid (&TempGuid, &TerminalTypeGuid[2])) {
         *Termi      = VT_100_PLUS;
         IsTerminal  = TRUE;
       } else {
-        if (CompareGuid (&TempGuid, &Guid[3])) {
+        if (CompareGuid (&TempGuid, &TerminalTypeGuid[3])) {
           *Termi      = VT_UTF8;
           IsTerminal  = TRUE;
         } else {
@@ -971,9 +983,9 @@ IsTerminalDevicePath (
   Get mode number according to column and row
 
 
-  @param CallbackData    BMM_CALLBACK_DATA
+  @param CallbackData    The BMM context data.
 
-           EDES_TODO: Incomplete Descriptions  None.
+  @return VOID
 
 **/
 VOID

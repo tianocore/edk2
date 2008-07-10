@@ -19,6 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Bugbug: Candidate for a PCD entries
 //
+#define MAX_BBS_ENTRIES 0x100
+
 /**
   EDES_TODO: Add function description.
 
@@ -30,8 +32,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return EDES_TODO: Add description for return value
 
 **/
-#define MAX_BBS_ENTRIES 0x100
-
 VOID
 BdsBuildLegacyDevNameString (
   IN BBS_TABLE                     *CurBBSEntry,

@@ -77,6 +77,10 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  #
+  #This dependency is because of gEfiLegacyBiosProtocolGuid and gEfiDataHubProtocolGuid. It may be removed if a Library class is created to
+  #abstract away definition in Framework specification or PI spec incorporates the Legacy Booting Protocols and Data Hub Protocols.
+  #
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 
@@ -120,7 +124,6 @@
   gEfiHiiStringProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-  gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
@@ -136,7 +139,6 @@
   gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
   gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiAcpiS3SaveProtocolGuid
 
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate

@@ -469,12 +469,17 @@ typedef struct _STRING_DEPOSITORY {
 //
 // For initializing File System menu
 //
+
 /**
-  EDES_TODO: Add function description.
+  This function build the FsOptionMenu list which records all
+  available file system in the system. They includes all instances
+  of EFI_SIMPLE_FILE_SYSTEM_PROTOCOL, all instances of EFI_LOAD_FILE_SYSTEM
+  and all type of legacy boot device.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    BMM context data
 
-  @return EDES_TODO: Add description for return value
+  @retval  EFI_SUCCESS             Success find the file system
+  @retval  EFI_OUT_OF_RESOURCES    Can not create menu entry
 
 **/
 EFI_STATUS
@@ -483,33 +488,15 @@ BOpt_FindFileSystem (
   )
 ;
 
-//
-// For cleaning up File System menu
-//
 /**
-  EDES_TODO: Add function description.
+  Find files under current directory
+  All files and sub-directories in current directory
+  will be stored in DirectoryMenu for future use.
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param FileOption  Pointer for Dir to explore.
 
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-BOpt_FreeFileSystem (
-  VOID
-  )
-;
-
-//
-// For initializing File Navigation menu
-//
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-  @param MenuEntry       EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @retval TRUE         Get files from current dir successfully.
+  @retval FALSE        Can't get files from current dir.
 
 **/
 EFI_STATUS
@@ -519,32 +506,17 @@ BOpt_FindFiles (
   )
 ;
 
-//
-// For cleaning up File Navigation menu
-//
 /**
-  EDES_TODO: Add function description.
 
-  @param VOID            EDES_TODO: Add parameter description
+  Find drivers that will be added as Driver#### variables from handles
+  in current system environment
+  All valid handles in the system except those consume SimpleFs, LoadFile
+  are stored in DriverMenu for future use.
 
-  @return EDES_TODO: Add description for return value
+  @param VOID 
 
-**/
-VOID
-BOpt_FreeFiles (
-  VOID
-  )
-;
-
-//
-// For Initializing handle navigation menu
-//
-/**
-  EDES_TODO: Add function description.
-
-  @param VOID            EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS The function complets successfully.
+  @return Other value if failed to build the DriverMenu.
 
 **/
 EFI_STATUS
@@ -553,29 +525,14 @@ BOpt_FindDrivers (
   )
 ;
 
-//
-// For Cleaning up handle navigation menu
-//
 /**
-  EDES_TODO: Add function description.
 
-  @param VOID            EDES_TODO: Add parameter description
+  Build the BootOptionMenu according to BootOrder Variable.
+  This Routine will access the Boot#### to get EFI_LOAD_OPTION.
 
-  @return EDES_TODO: Add description for return value
+  @param None
 
-**/
-VOID
-BOpt_FreeDrivers(VOID);
-
-//
-// For initializing Boot Option menu
-//
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @return The number of the Var Boot####.
 
 **/
 EFI_STATUS
@@ -583,15 +540,15 @@ BOpt_GetBootOptions (
   IN  BMM_CALLBACK_DATA         *CallbackData
   );
 
-//
-// For Initializing Driver option menu
-//
 /**
-  EDES_TODO: Add function description.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  Build up all DriverOptionMenu
 
-  @return EDES_TODO: Add description for return value
+  @param CallbackData The BMM context data.
+
+  @return EFI_SUCESS The functin completes successfully.
+  @retval EFI_OUT_OF_RESOURCES Not enough memory to compete the operation.
+  
 
 **/
 EFI_STATUS
@@ -599,71 +556,40 @@ BOpt_GetDriverOptions (
   IN  BMM_CALLBACK_DATA         *CallbackData
   );
 
-//
-// For Cleaning up boot option menu
-//
+
 /**
-  EDES_TODO: Add function description.
+  Build the LegacyFDMenu LegacyHDMenu LegacyCDMenu according to LegacyBios.GetBbsInfo().
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID
 
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-BOpt_FreeBootOptions (VOID);
-
-//
-// For cleaning up driver option menu
-//
-/**
-  EDES_TODO: Add function description.
-
-  @param VOID            EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-BOpt_FreeDriverOptions(VOID);
-
-//
-// For Initializing HD/FD/CD/NET/BEV option menu
-//
-/**
-  EDES_TODO: Add function description.
-
-  @param VOID            EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS The function complete successfully.
+  @retval EFI_OUT_OF_RESOURCES No enough memory to complete this function.
 
 **/
 EFI_STATUS
-BOpt_GetLegacyOptions(VOID);
+BOpt_GetLegacyOptions (
+  VOID
+  );
 
-//
-// For cleaning up driver option menu
-//
 /**
-  EDES_TODO: Add function description.
+  Free out resouce allocated from Legacy Boot Options.
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID.
 
 **/
 VOID
-BOpt_FreeLegacyOptions(VOID);
+BOpt_FreeLegacyOptions (
+  VOID
+  );
 
-//
-// this function is used to take place of all other free menu actions
-//
 /**
-  EDES_TODO: Add function description.
+  Free resources allocated in Allocate Rountine
 
-  @param FreeMenu        EDES_TODO: Add parameter description
+  @param FreeMenu        Menu to be freed
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -672,16 +598,15 @@ BOpt_FreeMenu (
   );
 
 
-//
-// Following are the helper functions used
-//
 /**
-  EDES_TODO: Add function description.
 
-  @param Str1            EDES_TODO: Add parameter description
-  @param Str2            EDES_TODO: Add parameter description
+  Append file name to existing file name.
 
-  @return EDES_TODO: Add description for return value
+  @param Str1  The existing file name
+  @param Str2  The file name to be appended
+
+  @return Allocate a new string to hold the appended result.
+          Caller is responsible to free the returned string.
 
 **/
 CHAR16                            *
@@ -691,11 +616,14 @@ BOpt_AppendFileName (
   );
 
 /**
-  EDES_TODO: Add function description.
 
-  @param FileName        EDES_TODO: Add parameter description
+  Check whether current FileName point to a valid
+  Efi Image File.
 
-  @return EDES_TODO: Add description for return value
+  @param FileName  File need to be checked.
+
+  @retval TRUE  Is Efi Image
+  @retval FALSE Not a valid Efi Image
 
 **/
 BOOLEAN
@@ -704,12 +632,14 @@ BOpt_IsEfiImageName (
   );
 
 /**
-  EDES_TODO: Add function description.
 
-  @param Dir             EDES_TODO: Add parameter description
-  @param FileName        EDES_TODO: Add parameter description
+  Check whether current FileName point to a valid Efi Application
 
-  @return EDES_TODO: Add description for return value
+  @param Dir       Pointer to current Directory
+  @param FileName  Pointer to current File name.
+
+  @retval TRUE      Is a valid Efi Application
+  @retval FALSE     not a valid Efi Application
 
 **/
 BOOLEAN
@@ -718,40 +648,42 @@ BOpt_IsEfiApp (
   IN UINT16          *FileName
   );
 
-//
-// Get current unused boot option number
-//
 /**
-  EDES_TODO: Add function description.
 
-  @param VOID            EDES_TODO: Add parameter description
+  Get the Option Number that has not been allocated for use.
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @return The available Option Number.
 
 **/
 UINT16
-BOpt_GetBootOptionNumber (VOID);
+BOpt_GetBootOptionNumber (
+  VOID
+  );
 
-//
-// Get current unused driver option number
-//
 /**
-  EDES_TODO: Add function description.
 
-  @param VOID            EDES_TODO: Add parameter description
+  Get the Option Number that is not in use.
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @return The unused Option Number.
 
 **/
 UINT16
-BOpt_GetDriverOptionNumber (VOID);
+BOpt_GetDriverOptionNumber (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  Create a menu entry give a Menu type.
 
-  @param MenuType        EDES_TODO: Add parameter description
+  @param MenuType        The Menu type to be created.
 
-  @return EDES_TODO: Add description for return value
+
+  @retval NULL           If failed to create the menu.
+  @return                The menu.
 
 **/
 BM_MENU_ENTRY                     *
@@ -760,11 +692,11 @@ BOpt_CreateMenuEntry (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Free up all resource allocated for a BM_MENU_ENTRY.
 
-  @param MenuEntry       EDES_TODO: Add parameter description
+  @param MenuEntry   A pointer to BM_MENU_ENTRY.
 
-  @return EDES_TODO: Add description for return value
+  @retval VOID
 
 **/
 VOID
@@ -773,12 +705,15 @@ BOpt_DestroyMenuEntry (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Get the Menu Entry from the list in Menu Entry List.
 
-  @param MenuOption      EDES_TODO: Add parameter description
-  @param MenuNumber      EDES_TODO: Add parameter description
+  If MenuNumber is great or equal to the number of Menu
+  Entry in the list, then ASSERT.
 
-  @return EDES_TODO: Add description for return value
+  @param MenuOption      The Menu Entry List to read the menu entry.
+  @param MenuNumber      The index of Menu Entry.
+
+  @return The Menu Entry.
 
 **/
 BM_MENU_ENTRY                     *
@@ -788,26 +723,11 @@ BOpt_GetMenuEntry (
   );
 
 //
-// a helper function used to free pool type memory
-//
-/**
-  EDES_TODO: Add function description.
-
-  @param Buffer          EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-SafeFreePool (
-  IN VOID *Buffer
-  );
-
-//
 // Locate all serial io devices for console
 //
 /**
-  EDES_TODO: Add function description.
+  Build a list containing all serial devices
+
 
   @param VOID            EDES_TODO: Add parameter description
 
@@ -815,31 +735,37 @@ SafeFreePool (
 
 **/
 EFI_STATUS
-LocateSerialIo (VOID);
+LocateSerialIo (
+  VOID
+  );
 
 //
 // Initializing Console menu
 //
 /**
-  EDES_TODO: Add function description.
+  Build up ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @retval EFI_SUCCESS    The function always complete successfully.
 
 **/
 EFI_STATUS
-GetAllConsoles(VOID);
+GetAllConsoles(
+  VOID
+  );
 
 //
 // Get current mode information
 //
 /**
-  EDES_TODO: Add function description.
+  Get mode number according to column and row
 
-  @param CallbackData    EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param CallbackData    The BMM context data.
+
+  @return VOID
 
 **/
 VOID
@@ -851,22 +777,26 @@ GetConsoleOutMode (
 // Cleaning up console menu
 //
 /**
-  EDES_TODO: Add function description.
+  Free ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
+
 
   @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
-
+  @retval EFI_SUCCESS    The function always complete successfully.
 **/
 EFI_STATUS
-FreeAllConsoles(VOID);
+FreeAllConsoles (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  Update the device path that describing a terminal device
+  based on the new BaudRate, Data Bits, parity and Stop Bits
+  set.
 
-  @param DevicePath      EDES_TODO: Add parameter description
+  @param DevicePath
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -875,12 +805,15 @@ ChangeVariableDevicePath (
 );
 
 /**
-  EDES_TODO: Add function description.
+  Update the multi-instance device path of Terminal Device based on
+  the global TerminalMenu. If ChangeTernimal is TRUE, the terminal 
+  device path in the Terminal Device in TerminalMenu is also updated.
 
-  @param DevicePath      EDES_TODO: Add parameter description
-  @param ChangeTerminal  EDES_TODO: Add parameter description
+  @param DevicePath      The multi-instance device path.
+  @param ChangeTerminal  TRUE, then device path in the Terminal Device 
+                         in TerminalMenu is also updated; FALSE, no update.
 
-  @return EDES_TODO: Add description for return value
+  @return EFI_SUCCESS    The function completes successfully.
 
 **/
 EFI_STATUS
@@ -892,12 +825,16 @@ ChangeTerminalDevicePath (
 // Variable operation by menu selection
 //
 /**
-  EDES_TODO: Add function description.
+  This function create a currently loaded Boot Option from 
+  the BMM. It then appends this Boot Option to the end of 
+  the "BootOrder" list. It also append this Boot Opotion to the end
+  of BootOptionMenu.
 
-  @param CallbackData    EDES_TODO: Add parameter description
-  @param NvRamMap        EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
+  @param NvRamMap        The file explorer formset internal state.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_OUT_OF_RESOURCES If not enought memory to complete the operation.
+  @retval EFI_SUCCESS          If function completes successfully.
 
 **/
 EFI_STATUS
@@ -907,37 +844,56 @@ Var_UpdateBootOption (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Delete Boot Option that represent a Deleted state in BootOptionMenu.
+  After deleting this boot option, call Var_ChangeBootOrder to
+  make sure BootOrder is in valid state.
+
 
   @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to  
+                        BM_LOAD_CONTEXT marked for deletion is deleted
+  @return Others        If failed to update the "BootOrder" variable after deletion. 
 
 **/
 EFI_STATUS
-Var_DelBootOption (VOID);
+Var_DelBootOption (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  After any operation on Boot####, there will be a discrepancy in BootOrder.
+  Since some are missing but in BootOrder, while some are present but are
+  not reflected by BootOrder. Then a function rebuild BootOrder from
+  scratch by content from BootOptionMenu is needed.
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @retval  EFI_SUCCESS  The boot order is updated successfully.
+  @return               EFI_STATUS other than EFI_SUCCESS if failed to
+                        Set the "BootOrder" EFI Variable.
 
 **/
 EFI_STATUS
-Var_ChangeBootOrder (VOID);
+Var_ChangeBootOrder (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  This function create a currently loaded Drive Option from 
+  the BMM. It then appends this Driver Option to the end of 
+  the "DriverOrder" list. It append this Driver Opotion to the end
+  of DriverOptionMenu.
 
-  @param CallbackData    EDES_TODO: Add parameter description
-  @param HiiHandle       EDES_TODO: Add parameter description
-  @param DescriptionData EDES_TODO: Add parameter description
-  @param OptionalData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
+  @param HiiHandle       The HII handle associated with the BMM formset.
+  @param DescriptionData The description of this driver option.
+  @param OptionalData    The optional load option.
   @param ForceReconnect  EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_OUT_OF_RESOURCES If not enought memory to complete the operation.
+  @retval EFI_SUCCESS          If function completes successfully.
 
 **/
 EFI_STATUS
@@ -950,77 +906,117 @@ Var_UpdateDriverOption (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Delete Load Option that represent a Deleted state in BootOptionMenu.
+  After deleting this Driver option, call Var_ChangeDriverOrder to
+  make sure DriverOrder is in valid state.
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
 
-**/
-EFI_STATUS
-Var_DelDriverOption (VOID);
-
-/**
-  EDES_TODO: Add function description.
-
-  @param VOID            EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS Load Option is successfully updated.
+  @return Other value than EFI_SUCCESS if failed to update "Driver Order" EFI
+          Variable.
 
 **/
 EFI_STATUS
-Var_ChangeDriverOrder (VOID);
+Var_DelDriverOption (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  After any operation on Driver####, there will be a discrepancy in
+  DriverOrder. Since some are missing but in DriverOrder, while some
+  are present but are not reflected by DriverOrder. Then a function
+  rebuild DriverOrder from scratch by content from DriverOptionMenu is
+  needed.
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @retval  EFI_SUCCESS  The driver order is updated successfully.
+  @return               EFI_STATUS other than EFI_SUCCESS if failed to
+                                 Set the "DriverOrder" EFI Variable.
 
 **/
 EFI_STATUS
-Var_UpdateConsoleInpOption (VOID);
+Var_ChangeDriverOrder (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  This function delete and build multi-instance device path ConIn
+  console device.
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
 
+  @retval EFI_SUCCESS    The function complete successfully.
+  @return                The EFI variable can be saved. See gRT->SetVariable 
+                         for detail return information.
 **/
 EFI_STATUS
-Var_UpdateConsoleOutOption (VOID);
+Var_UpdateConsoleInpOption (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  This function delete and build multi-instance device path ConOut
+  console device.
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
 
+  @retval EFI_SUCCESS    The function complete successfully.
+  @return                The EFI variable can be saved. See gRT->SetVariable 
+                         for detail return information.
 **/
 EFI_STATUS
-Var_UpdateErrorOutOption (VOID);
+Var_UpdateConsoleOutOption (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  This function delete and build multi-instance device path ErrOut
+  console device.
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @retval EFI_SUCCESS    The function complete successfully.
+  @return                The EFI variable can be saved. See gRT->SetVariable 
+                         for detail return information.
+**/
+EFI_STATUS
+Var_UpdateErrorOutOption (
+  VOID
+  );
+
+/**
+  Update the device path of "ConOut", "ConIn" and "ErrOut" 
+  based on the new BaudRate, Data Bits, parity and Stop Bits
+  set.
+
+  @param VOID
+
+  @return VOID
 
 **/
 VOID
-Var_UpdateAllConsoleOption (VOID);
+Var_UpdateAllConsoleOption (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  This function update the "BootNext" EFI Variable. If there is 
+  no "BootNex" specified in BMM, this EFI Variable is deleted.
+  It also update the BMM context data specified the "BootNext"
+  vaule.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS    The function complete successfully.
+  @return                The EFI variable can be saved. See gRT->SetVariable 
+                         for detail return information.
 
 **/
 EFI_STATUS
@@ -1029,11 +1025,16 @@ Var_UpdateBootNext (
   );
 
 /**
-  EDES_TODO: Add function description.
+  This function update the "BootOrder" EFI Variable based on
+  BMM Formset's NV map. It then refresh BootOptionMenu
+  with the new "BootOrder" list.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS    The function complete successfully.
+  @retval EFI_SUCCESS    Not enough memory to complete the function.
+  @return                The EFI variable can be saved. See gRT->SetVariable 
+                         for detail return information.
 
 **/
 EFI_STATUS
@@ -1042,11 +1043,16 @@ Var_UpdateBootOrder (
   );
 
 /**
-  EDES_TODO: Add function description.
+  This function update the "DriverOrder" EFI Variable based on
+  BMM Formset's NV map. It then refresh DriverOptionMenu
+  with the new "DriverOrder" list.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS    The function complete successfully.
+  @retval EFI_SUCCESS    Not enough memory to complete the function.
+  @return                The EFI variable can be saved. See gRT->SetVariable 
+                         for detail return information.
 
 **/
 EFI_STATUS
@@ -1055,11 +1061,14 @@ Var_UpdateDriverOrder (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Update the legacy BBS boot option. L"LegacyDevOrder" and EfiLegacyDevOrderGuid EFI Variable
+  is udpated with the new Legacy Boot order. The EFI Variable of "Boot####" and gEfiGlobalVariableGuid
+  is also updated.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The context data for BMM.
 
-  @return EDES_TODO: Add description for return value
+  @return EFI_SUCCESS    The function completed successfully.
+  @retval EFI_NOT_FOUND  If L"LegacyDevOrder" and EfiLegacyDevOrderGuid EFI Variable can be found.
 
 **/
 EFI_STATUS
@@ -1068,11 +1077,12 @@ Var_UpdateBBSOption (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Update the Text Mode of Console.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData  The context data for BMM.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCSS If the Text Mode of Console is updated.
+  @return Other value if the Text Mode of Console is not updated.
 
 **/
 EFI_STATUS
@@ -1084,11 +1094,11 @@ Var_UpdateConMode (
 // Following are page create and refresh functions
 //
 /**
-  EDES_TODO: Add function description.
+  Refresh the global UpdateData structure.
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1097,12 +1107,14 @@ RefreshUpdateData (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Clean up the dynamic opcode at label and form specified by
+  both LabelId. 
 
-  @param LabelId         EDES_TODO: Add parameter description
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param LabelId         It is both the Form ID and Label ID for
+                         opcode deletion.
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1112,55 +1124,12 @@ CleanUpPage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create a lit of boot option from global BootOptionMenu. It
+  allow user to delete the boot option.
 
-  @param CallbackData    EDES_TODO: Add parameter description
-  @param UpdatingMenu    EDES_TODO: Add parameter description
-  @param UpdatingPage    EDES_TODO: Add parameter description
-  @param UpdatingManner  EDES_TODO: Add parameter description
-  @param QuestionIdStart EDES_TODO: Add parameter description
-  @param GotoForm        EDES_TODO: Add parameter description
-  @param GotoAlternateForm EDES_TODO: Add parameter description
-  @param DisplayTokenStart EDES_TODO: Add parameter description
-  @param HelpTokenStart  EDES_TODO: Add parameter description
-  @param KeyValueStart   EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
-
-**/
-EFI_STATUS
-UpdatePage (
-  IN BMM_CALLBACK_DATA                *CallbackData,
-  IN BM_MENU_OPTION                   *UpdatingMenu,
-  IN UINT16                           UpdatingPage,
-  IN UINT16                           UpdatingManner,
-  IN UINT16                           QuestionIdStart,
-  IN UINT16                           GotoForm,
-  IN UINT16                           GotoAlternateForm,
-  IN EFI_STRING_ID                    DisplayTokenStart,
-  IN EFI_STRING_ID                    HelpTokenStart,
-  IN UINT16                           KeyValueStart
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateBootAddPage (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1169,24 +1138,11 @@ UpdateBootDelPage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create a lit of driver option from global DriverMenu.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateDrvAddFilePage (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1195,11 +1151,13 @@ UpdateDrvAddHandlePage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create a lit of driver option from global DriverOptionMenu. It
+  allow user to delete the driver option.
 
-  @param CallbackData    EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param CallbackData    The BMM context data.
+
+  @return VOID
 
 **/
 VOID
@@ -1208,11 +1166,12 @@ UpdateDrvDelPage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Prepare the page to allow user to add description for 
+  a Driver Option.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1221,64 +1180,13 @@ UpdateDriverAddHandleDescPage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Dispatch the correct update page function to call based on
+  the UpdatePageId.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param UpdatePageId    The form ID.
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateBootTimeOut (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateConInPage (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateConOutPage (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateStdErrPage (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param UpdatePageId    EDES_TODO: Add parameter description
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1288,63 +1196,12 @@ UpdatePageBody (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create the dynamic page to allow user to set
+  the "BootNext" vaule.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateCOM1Page (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateCOM2Page (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateBootOrderPage (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-VOID
-UpdateDriverOrderPage (
-  IN BMM_CALLBACK_DATA                *CallbackData
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param CallbackData    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1353,11 +1210,12 @@ UpdateBootNextPage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create the dynamic page to allow user to set
+  the "TimeOut" vaule.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1366,11 +1224,13 @@ UpdateTimeOutPage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create the dynamic page which allows user to 
+  set the property such as Baud Rate, Data Bits,
+  Parity, Stop Bits, Terminal Type.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1379,11 +1239,12 @@ UpdateTerminalPage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Refresh the text mode page
 
-  @param CallbackData    EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param CallbackData    The BMM context data.
+
+  @return VOID
 
 **/
 VOID
@@ -1392,11 +1253,12 @@ UpdateConModePage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create a list of Goto Opcode for all terminal devices logged
+  by TerminaMenu. This list will be inserted to form FORM_CON_COM_SETUP_ID.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1405,12 +1267,13 @@ UpdateConCOMPage (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create a dynamic page so that Legacy Device boot order
+  can be set for specified device type.
 
-  @param UpdatePageId    EDES_TODO: Add parameter description
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param UpdatePageId    The form ID. It also spefies the legacy device type.
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1419,40 +1282,15 @@ UpdateSetLegacyDeviceOrderPage (
   IN BMM_CALLBACK_DATA                *CallbackData
 );
 
-/**
-  EDES_TODO: Add function description.
-
-  @param BbsType         EDES_TODO: Add parameter description
-  @param BbsFlag         EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
-
-**/
-EFI_STATUS
-BootLegacy (
-  IN  UINT16  BbsType,
-  IN  UINT16  BbsFlag
-);
 
 /**
-  EDES_TODO: Add function description.
 
-  @param TerminalNumber  EDES_TODO: Add parameter description
+  Function opens and returns a file handle to the root directory of a volume.
 
-  @return EDES_TODO: Add description for return value
 
-**/
-BM_MENU_ENTRY                     *
-GetCurrentTerminal (
-  UINTN       TerminalNumber
-);
+  @param DeviceHandle    - A handle for a device
 
-/**
-  EDES_TODO: Add function description.
-
-  @param DeviceHandle    EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @return A valid file handle or NULL is returned
 
 **/
 EFI_FILE_HANDLE
@@ -1461,11 +1299,15 @@ EfiLibOpenRoot (
   );
 
 /**
-  EDES_TODO: Add function description.
 
-  @param FHand           EDES_TODO: Add parameter description
+  Function gets the file system information from an open file descriptor,
+  and stores it in a buffer allocated from pool.
 
-  @return EDES_TODO: Add description for return value
+
+  @param FHand           The file handle.
+
+  @return                A pointer to a buffer with file information.
+  @retval                NULL is returned if failed to get Vaolume Label Info.
 
 **/
 EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *
@@ -1474,11 +1316,13 @@ EfiLibFileSystemVolumeLabelInfo (
   );
 
 /**
-  EDES_TODO: Add function description.
 
-  @param FHand           EDES_TODO: Add parameter description
+  Function gets the file information from an open file descriptor, and stores it
+  in a buffer allocated from pool.
 
-  @return EDES_TODO: Add description for return value
+  @param FHand           File Handle.
+
+  @return                A pointer to a buffer with file information or NULL is returned
 
 **/
 EFI_FILE_INFO                     *
@@ -1487,13 +1331,16 @@ EfiLibFileInfo (
   );
 
 /**
-  EDES_TODO: Add function description.
 
-  @param UStr            EDES_TODO: Add parameter description
-  @param Length          EDES_TODO: Add parameter description
-  @param AStr            EDES_TODO: Add parameter description
+  change a Unicode string t ASCII string
 
-  @return EDES_TODO: Add description for return value
+
+  @param UStr            Unicode string
+                         Lenght - most possible length of AStr
+  @param Length          The length of UStr.
+  @param AStr            ASCII string to pass out
+
+  @return Actual length
 
 **/
 UINTN
@@ -1504,11 +1351,11 @@ UnicodeToAscii (
   );
 
 /**
-  EDES_TODO: Add function description.
+  This function converts an input device structure to a Unicode string.
 
-  @param DevPath         EDES_TODO: Add parameter description
+  @param DevPath                  A pointer to the device path structure.
 
-  @return EDES_TODO: Add description for return value
+  @return A new allocated Unicode string that represents the device path.
 
 **/
 CHAR16                            *
@@ -1517,25 +1364,17 @@ DevicePathToStr (
   );
 
 /**
-  EDES_TODO: Add function description.
 
-  @param Size            EDES_TODO: Add parameter description
+  Find the first instance of this Protocol
+  in the system and return it's interface
 
-  @return EDES_TODO: Add description for return value
 
-**/
-VOID                              *
-EfiAllocateZeroPool (
-  IN UINTN            Size
-  );
+  @param ProtocolGuid    Provides the protocol to search for
+  @param Interface       On return, a pointer to the first interface
+                         that matches ProtocolGuid
 
-/**
-  EDES_TODO: Add function description.
-
-  @param ProtocolGuid    EDES_TODO: Add parameter description
-  @param Interface       EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @retval  EFI_SUCCESS      A protocol instance matching ProtocolGuid was found
+  @retval  EFI_NOT_FOUND    No protocol instances were found that match ProtocolGuid
 
 **/
 EFI_STATUS
@@ -1545,13 +1384,15 @@ EfiLibLocateProtocol (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Adjusts the size of a previously allocated buffer.
 
-  @param OldPool         EDES_TODO: Add parameter description
-  @param OldSize         EDES_TODO: Add parameter description
-  @param NewSize         EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param OldPool         - A pointer to the buffer whose size is being adjusted.
+  @param OldSize         - The size of the current buffer.
+  @param NewSize         - The size of the new buffer.
+
+  @return   The newly allocated buffer.
+  @retval   NULL  Allocation failed.
 
 **/
 VOID                              *
@@ -1562,26 +1403,16 @@ EfiReallocatePool (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
+  buffer, and the size of the buffer. If failure return NULL.
 
-  @param DevPath         EDES_TODO: Add parameter description
+  @param  Name                  String part of EFI variable name
+  @param  VendorGuid            GUID part of EFI variable name
+  @param  VariableSize          Returns the size of the EFI variable that was read
 
-  @return EDES_TODO: Add description for return value
-
-**/
-CHAR16                            *
-DevicePathToStr (
-  EFI_DEVICE_PATH_PROTOCOL     *DevPath
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param Name            EDES_TODO: Add parameter description
-  @param VendorGuid      EDES_TODO: Add parameter description
-  @param VarSize         EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @return Dynamically allocated memory that contains a copy of the EFI variable.
+  @return Caller is responsible freeing the buffer.
+  @retval NULL                  Variable was not read
 
 **/
 VOID                              *
@@ -1592,12 +1423,18 @@ BdsLibGetVariableAndSize (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Function deletes the variable specified by VarName and VarGuid.
 
-  @param VarName         EDES_TODO: Add parameter description
-  @param VarGuid         EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VarName         - A Null-terminated Unicode string that is
+                         the name of the vendor's variable.
+                         
+  @param VendorGuid           - A unique identifier for the vendor.
+
+  @retval  EFI_SUCCESS           The variable was found and removed
+  @retval  EFI_UNSUPPORTED       The variable store was inaccessible
+  @retval  EFI_OUT_OF_RESOURCES  The temporary buffer was not available
+  @retval  EFI_NOT_FOUND         The variable was not found
 
 **/
 EFI_STATUS
@@ -1607,11 +1444,12 @@ EfiLibDeleteVariable (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Duplicate a string.
 
-  @param Src             EDES_TODO: Add parameter description
+  @param Src             The source.
 
-  @return EDES_TODO: Add description for return value
+  @return A new string which is duplicated copy of the source.
+  @retval NULL If there is not enough memory.
 
 **/
 CHAR16                            *
@@ -1620,26 +1458,14 @@ EfiStrDuplicate (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Function is used to determine the number of device path instances
+  that exist in a device path.
 
-  @param Multi           EDES_TODO: Add parameter description
-  @param Single          EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param DevicePath      A pointer to a device path data structure.
 
-**/
-BOOLEAN
-EfiLibMatchDevicePaths (
-  IN  EFI_DEVICE_PATH_PROTOCOL *Multi,
-  IN  EFI_DEVICE_PATH_PROTOCOL *Single
-  );
-
-/**
-  EDES_TODO: Add function description.
-
-  @param DevicePath      EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @return This function counts and returns the number of device path instances
+          in DevicePath.
 
 **/
 UINTN
@@ -1648,13 +1474,15 @@ EfiDevicePathInstanceCount (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Create string tokens for a menu from its help strings and display strings
 
-  @param CallbackData    EDES_TODO: Add parameter description
-  @param HiiHandle       EDES_TODO: Add parameter description
-  @param MenuOption      EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param CallbackData    The BMM context data.
+  @param HiiHandle       Hii Handle of the package to be updated.
+  @param MenuOption      The Menu whose string tokens need to be created
+
+  @retval  EFI_SUCCESS      string tokens created successfully
+  @retval  others           contain some errors
 
 **/
 EFI_STATUS
@@ -1665,11 +1493,14 @@ CreateMenuStringToken (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Get a string from the Data Hub record based on 
+  a device path.
 
-  @param DevPath         EDES_TODO: Add parameter description
+  @param DevPath         The device Path.
 
-  @return EDES_TODO: Add description for return value
+  @return A string located from the Data Hub records based on
+          the device path.
+  @retval NULL  If failed to get the String from Data Hub.
 
 **/
 UINT16                            *
@@ -1678,13 +1509,15 @@ EfiLibStrFromDatahub (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Get the index number (#### in Boot####) for the boot option pointed to a BBS legacy device type
+  specified by DeviceType.
 
-  @param DeviceType      EDES_TODO: Add parameter description
-  @param OptionIndex     EDES_TODO: Add parameter description
-  @param OptionSize      EDES_TODO: Add parameter description
+  @param DeviceType      The legacy device type. It can be floppy, network, harddisk, cdrom,
+                         etc.
+  @param OptionIndex     Returns the index number (#### in Boot####).
+  @param OptionSize      Return the size of the Boot### variable.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID                              *
@@ -1695,11 +1528,13 @@ GetLegacyBootOptionVar (
  );
 
 /**
-  EDES_TODO: Add function description.
+  Initialize the Boot Maintenance Utitliy
+
 
   @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @retval  EFI_SUCCESS      utility ended successfully
+  @retval  others           contain some errors
 
 **/
 EFI_STATUS
@@ -1708,11 +1543,13 @@ InitializeBM (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Start boot maintenance manager
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @retval EFI_SUCCESS If BMM is invoked successfully.
+  @return Other value if BMM return unsuccessfully.
 
 **/
 EFI_STATUS
@@ -1721,23 +1558,27 @@ BdsStartBootMaint (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Intialize all the string depositories.
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @return VOID
 
 **/
 VOID
-InitializeStringDepository (VOID);
+InitializeStringDepository (
+  VOID
+  );
 
 /**
-  EDES_TODO: Add function description.
+  Fetch a usable string node from the string depository and return the string token.
+
 
   @param CallbackData    EDES_TODO: Add parameter description
-  @param StringDepository EDES_TODO: Add parameter description
+  @param StringDepository - Pointer of the string depository.
 
-  @return EDES_TODO: Add description for return value
+  @retval  EFI_STRING_ID           String token.
 
 **/
 EFI_STRING_ID
@@ -1747,11 +1588,12 @@ GetStringTokenFromDepository (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Reclaim string depositories by moving the current node pointer to list head..
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID 
+
+  @return VOID
 
 **/
 VOID
@@ -1760,11 +1602,12 @@ ReclaimStringDepository (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Release resource for all the string depositories.
 
-  @param VOID            EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param VOID
+
+  @return VOID
 
 **/
 VOID
@@ -1773,13 +1616,15 @@ CleanUpStringDepository (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Function handling request to apply changes for BMM pages.
 
-  @param Private         EDES_TODO: Add parameter description
-  @param CurrentFakeNVMap EDES_TODO: Add parameter description
-  @param FormId          EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param Private         - Pointer to callback data buffer.
+  @param CurrentFakeNVMap - Pointer to buffer holding data of various values used by BMM
+  @param FormId          - ID of the form which has sent the request to apply change.
+
+  @retval  EFI_SUCCESS       Change successfully applied.
+  @retval  Other             Error occurs while trying to apply changes.
 
 **/
 EFI_STATUS
@@ -1790,12 +1635,13 @@ ApplyChangeHandler (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Discard all changes done to the BMM pages such as Boot Order change,
+  Driver order change.
 
-  @param Private         EDES_TODO: Add parameter description
-  @param CurrentFakeNVMap EDES_TODO: Add parameter description
+  @param Private         The BMM context data.
+  @param CurrentFakeNVMap The current Fack NV Map.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1805,12 +1651,12 @@ DiscardChangeHandler (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Dispatch the display to the next page based on NewPageId.
 
-  @param Private         EDES_TODO: Add parameter description
-  @param NewPageId       EDES_TODO: Add parameter description
+  @param Private         The BMM context data.
+  @param NewPageId       The original page ID.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1820,11 +1666,13 @@ UpdatePageId (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Boot a file selected by user at File Expoloer of BMM.
 
-  @param FileContext     EDES_TODO: Add parameter description
+  @param FileContext     The file context data, which contains the device path
+                         of the file to be boot from.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS    The function completed successfull.
+  @retun                 Other value if the boot from the file fails.
 
 **/
 EFI_STATUS
@@ -1833,12 +1681,14 @@ BootThisFile (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Update the file explower page with the refershed file system.
 
-  @param CallbackData    EDES_TODO: Add parameter description
-  @param KeyValue        EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param CallbackData    BMM context data
+  @param KeyValue        Key value to identify the type of data to expect.
+
+  @retval  TRUE           Inform the caller to create a callback packet to exit file explorer.
+  @retval  FALSE          Indicate that there is no need to exit file explorer.
 
 **/
 BOOLEAN
@@ -1848,16 +1698,30 @@ UpdateFileExplorer (
   );
 
 /**
-  EDES_TODO: Add function description.
+  This function processes the results of changes in configuration.
+  When user select a interactive opcode, this callback will be triggered.
+  Based on the Question(QuestionId) that triggers the callback, the corresponding
+  actions is performed. It handles:
 
-  @param This            EDES_TODO: Add parameter description
-  @param Action          EDES_TODO: Add parameter description
-  @param QuestionId      EDES_TODO: Add parameter description
-  @param Type            EDES_TODO: Add parameter description
-  @param Value           EDES_TODO: Add parameter description
-  @param ActionRequest   EDES_TODO: Add parameter description
+  1) the addition of boot option.
+  2) the addition of driver option.
+  3) exit from file browser
+  4) update of file content if a dir is selected.
+  5) boot the file if a file is selected in "boot from file"
 
-  @return EDES_TODO: Add description for return value
+
+  @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Action          Specifies the type of action taken by the browser.
+  @param QuestionId      A unique value which is sent to the original exporting driver
+                         so that it can identify the type of data to expect.
+  @param Type            The type of value for the question.
+  @param Value           A pointer to the data being sent to the original exporting driver.
+  @param ActionRequest   On return, points to the action requested by the callback function.
+
+  @retval  EFI_SUCCESS           The callback successfully handled the action.
+  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
+  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
+  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
 
 **/
 EFI_STATUS
@@ -1872,11 +1736,14 @@ FileExplorerCallback (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Dispatch BMM formset and FileExplorer formset.
 
-  @param CallbackData    EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param CallbackData    The BMM context data.
+
+  @retval EFI_SUCCESS If function complete successfully.
+  @retturn Other value if the Setup Browser process BMM's pages and
+           return unsuccessfully.
 
 **/
 EFI_STATUS
@@ -1885,12 +1752,15 @@ FormSetDispatcher (
   );
 
 /**
-  EDES_TODO: Add function description.
+  Function returns the value of the specified variable.
 
-  @param Name            EDES_TODO: Add parameter description
-  @param VendorGuid      EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param Name            A Null-terminated Unicode string that is
+                         the name of the vendor's variable.
+  @param VendorGuid      A unique identifier for the vendor.
+
+  @return               The payload of the variable.
+  @retval NULL          If the variable can't be read.
 
 **/
 VOID *
@@ -1921,7 +1791,7 @@ extern COM_ATTR                   BaudRateList[19];
 extern COM_ATTR                   DataBitsList[4];
 extern COM_ATTR                   ParityList[5];
 extern COM_ATTR                   StopBitsList[3];
-extern EFI_GUID                   Guid[4];
+extern EFI_GUID                   TerminalTypeGuid[4];
 extern EFI_HII_UPDATE_DATA        gUpdateData;
 extern STRING_DEPOSITORY          *FileOptionStrDepository;
 extern STRING_DEPOSITORY          *ConsoleOptionStrDepository;

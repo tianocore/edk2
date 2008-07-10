@@ -15,42 +15,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BootMaint.h"
 
 /**
-  Wrap original AllocatePool gBS call
-  and ZeroMem gBS call into a single
-  function in order to decrease code length
-
-
-  @param Size            The size to allocate
-
-  @return  Valid pointer to the allocated buffer
-  @retval  Null for failure
-
-**/
-VOID *
-EfiAllocateZeroPool (
-  IN UINTN            Size
-  )
-{
-  EFI_STATUS  Status;
-  VOID        *Ptr;
-  Status = gBS->AllocatePool (EfiBootServicesData, Size, &Ptr);
-  if (EFI_ERROR (Status)) {
-    Ptr = NULL;
-    return Ptr;
-  }
-
-  ZeroMem (Ptr, Size);
-  return Ptr;
-}
-
-/**
 
   Find the first instance of this Protocol
   in the system and return it's interface
 
 
-  @param ProtocolGuid    - Provides the protocol to search for
-  @param Interface       - On return, a pointer to the first interface
+  @param ProtocolGuid    Provides the protocol to search for
+  @param Interface       On return, a pointer to the first interface
                          that matches ProtocolGuid
 
   @retval  EFI_SUCCESS      A protocol instance matching ProtocolGuid was found
@@ -131,6 +102,7 @@ EfiLibOpenRoot (
 
   @retval  TRUE  if the buffer was reallocated and the caller
                  should try the API again.
+  @retval  FALSE The caller should not call this function again.
 
 **/
 BOOLEAN
@@ -156,7 +128,7 @@ EfiGrowBuffer (
 
     SafeFreePool (*Buffer);
 
-    *Buffer = EfiAllocateZeroPool (BufferSize);
+    *Buffer = AllocateZeroPool (BufferSize);
 
     if (*Buffer != NULL) {
       TryAgain = TRUE;
@@ -179,11 +151,12 @@ EfiGrowBuffer (
   Function returns the value of the specified variable.
 
 
-  @param Name            - A Null-terminated Unicode string that is
+  @param Name            A Null-terminated Unicode string that is
                          the name of the vendor's variable.
-  @param VendorGuid      - A unique identifier for the vendor.
+  @param VendorGuid      A unique identifier for the vendor.
 
   @return               The payload of the variable.
+  @retval NULL          If the variable can't be read.
 
 **/
 VOID *
@@ -244,7 +217,8 @@ EfiLibDeleteVariable (
 
   @param FHand           The file handle.
 
-  @return                A pointer to a buffer with file information or NULL is returned
+  @return                A pointer to a buffer with file information.
+  @retval                NULL is returned if failed to get Vaolume Label Info.
 
 **/
 EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *
@@ -282,7 +256,7 @@ EfiLibFileSystemVolumeLabelInfo (
   @param Src             The source.
 
   @return A new string which is duplicated copy of the source.
-  @retval NULL If there is not enought memory.
+  @retval NULL If there is not enough memory.
 
 **/
 CHAR16 *
@@ -294,7 +268,7 @@ EfiStrDuplicate (
   UINTN   Size;
 
   Size  = StrSize (Src);
-  Dest  = EfiAllocateZeroPool (Size);
+  Dest  = AllocateZeroPool (Size);
   ASSERT (Dest != NULL);
   if (Dest != NULL) {
     CopyMem (Dest, Src, Size);
@@ -348,7 +322,7 @@ EfiLibFileInfo (
   that exist in a device path.
 
 
-  @param DevicePath      - A pointer to a device path data structure.
+  @param DevicePath      A pointer to a device path data structure.
 
   @return This function counts and returns the number of device path instances
           in DevicePath.
@@ -378,9 +352,8 @@ EfiDevicePathInstanceCount (
   @param OldSize         - The size of the current buffer.
   @param NewSize         - The size of the new buffer.
 
-  @retval  EFI_SUCEESS            The requested number of bytes were allocated.
-  @retval  EFI_OUT_OF_RESOURCES   The pool requested could not be allocated.
-  @retval  EFI_INVALID_PARAMETER  The buffer was invalid.
+  @return   The newly allocated buffer.
+  @retval   NULL  Allocation failed.
 
 **/
 VOID *
@@ -394,7 +367,7 @@ EfiReallocatePool (
 
   NewPool = NULL;
   if (NewSize != 0) {
-    NewPool = EfiAllocateZeroPool (NewSize);
+    NewPool = AllocateZeroPool (NewSize);
   }
 
   if (OldPool != NULL) {
@@ -450,6 +423,7 @@ TimeCompare (
 
   @return A string located from the Data Hub records based on
           the device path.
+  @retval NULL  If failed to get the String from Data Hub.
 
 **/
 UINT16 *

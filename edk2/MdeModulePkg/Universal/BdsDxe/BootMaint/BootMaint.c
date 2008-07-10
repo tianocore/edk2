@@ -17,6 +17,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Bds.h"
 #include "FrontPage.h"
 
+EFI_DEVICE_PATH_PROTOCOL  EndDevicePath[] = {
+  END_DEVICE_PATH_TYPE,
+  END_ENTIRE_DEVICE_PATH_SUBTYPE,
+  END_DEVICE_PATH_LENGTH,
+  0
+};
+
+
 EFI_GUID EfiLegacyDevOrderGuid = EFI_LEGACY_DEV_ORDER_VARIABLE_GUID;
 EFI_GUID mBootMaintGuid = BOOT_MAINT_FORMSET_GUID;
 EFI_GUID mFileExplorerGuid = FILE_EXPLORE_FORMSET_GUID;
@@ -54,9 +62,9 @@ FreeAllMenu (
   Create string tokens for a menu from its help strings and display strings
 
 
-  @param CallbackData    EDES_TODO: Add parameter description
-  @param HiiHandle       - Hii Handle of the package to be updated.
-  @param MenuOption      - The Menu whose string tokens need to be created
+  @param CallbackData    The BMM context data.
+  @param HiiHandle       Hii Handle of the package to be updated.
+  @param MenuOption      The Menu whose string tokens need to be created
 
   @retval  EFI_SUCCESS      string tokens created successfully
   @retval  others           contain some errors
@@ -723,12 +731,13 @@ Error:
 }
 
 /**
-  EDES_TODO: Add function description.
+  Discard all changes done to the BMM pages such as Boot Order change,
+  Driver order change.
 
-  @param Private         EDES_TODO: Add parameter description
-  @param CurrentFakeNVMap EDES_TODO: Add parameter description
+  @param Private         The BMM context data.
+  @param CurrentFakeNVMap The current Fack NV Map.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -803,7 +812,7 @@ InitializeBM (
   //
   // Create CallbackData structures for Driver Callback
   //
-  BmmCallbackInfo = EfiAllocateZeroPool (sizeof (BMM_CALLBACK_DATA));
+  BmmCallbackInfo = AllocateZeroPool (sizeof (BMM_CALLBACK_DATA));
   if (BmmCallbackInfo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -811,7 +820,7 @@ InitializeBM (
   //
   // Create LoadOption in BmmCallbackInfo for Driver Callback
   //
-  Ptr = EfiAllocateZeroPool (sizeof (BM_LOAD_CONTEXT) + sizeof (BM_FILE_CONTEXT) + sizeof (BM_HANDLE_CONTEXT) + sizeof (BM_MENU_ENTRY));
+  Ptr = AllocateZeroPool (sizeof (BM_LOAD_CONTEXT) + sizeof (BM_FILE_CONTEXT) + sizeof (BM_HANDLE_CONTEXT) + sizeof (BM_MENU_ENTRY));
   if (Ptr == NULL) {
     SafeFreePool (BmmCallbackInfo);
     return EFI_OUT_OF_RESOURCES;
@@ -917,7 +926,7 @@ InitializeBM (
   // Allocate space for creation of Buffer
   //
   gUpdateData.BufferSize = UPDATE_DATA_SIZE;
-  gUpdateData.Data = EfiAllocateZeroPool (UPDATE_DATA_SIZE);
+  gUpdateData.Data = AllocateZeroPool (UPDATE_DATA_SIZE);
   if (gUpdateData.Data == NULL) {
     SafeFreePool (BmmCallbackInfo->LoadContext);
     SafeFreePool (BmmCallbackInfo);
@@ -1031,11 +1040,11 @@ InitializeBM (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Initialized all Menu Option List.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1060,11 +1069,11 @@ InitAllMenu (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Free up all Menu Option list.
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1085,9 +1094,9 @@ FreeAllMenu (
   Intialize all the string depositories.
 
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID
 
-           EDES_TODO: Description incomplete  None.
+  @return VOID
 
 **/
 VOID
@@ -1096,7 +1105,7 @@ InitializeStringDepository (
   )
 {
   STRING_DEPOSITORY *StringDepository;
-  StringDepository              = EfiAllocateZeroPool (sizeof (STRING_DEPOSITORY) * STRING_DEPOSITORY_NUMBER);
+  StringDepository              = AllocateZeroPool (sizeof (STRING_DEPOSITORY) * STRING_DEPOSITORY_NUMBER);
   FileOptionStrDepository       = StringDepository++;
   ConsoleOptionStrDepository    = StringDepository++;
   BootOptionStrDepository       = StringDepository++;
@@ -1136,7 +1145,7 @@ GetStringTokenFromDepository (
     //
     // If there is no usable node in the list, update the list.
     //
-    NextListNode = EfiAllocateZeroPool (sizeof (STRING_LIST_NODE));
+    NextListNode = AllocateZeroPool (sizeof (STRING_LIST_NODE));
 
     HiiLibNewString (CallbackData->BmmHiiHandle, &(NextListNode->StringToken), L" ");
     ASSERT (NextListNode->StringToken != 0);
@@ -1159,9 +1168,9 @@ GetStringTokenFromDepository (
   Reclaim string depositories by moving the current node pointer to list head..
 
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID 
 
-           EDES_TODO: Description incomplete  None.
+  @return VOID
 
 **/
 VOID
@@ -1183,9 +1192,9 @@ ReclaimStringDepository (
   Release resource for all the string depositories.
 
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID
 
-           EDES_TODO: Description incomplete  None.
+  @return VOID
 
 **/
 VOID
@@ -1223,9 +1232,10 @@ CleanUpStringDepository (
   Start boot maintenance manager
 
 
-  @param VOID            EDES_TODO: Add parameter description
+  @param VOID
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS If BMM is invoked successfully.
+  @return Other value if BMM return unsuccessfully.
 
 **/
 EFI_STATUS
@@ -1272,9 +1282,11 @@ BdsStartBootMaint (
   Dispatch BMM formset and FileExplorer formset.
 
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS If function complete successfully.
+  @retturn Other value if the Setup Browser process BMM's pages and
+           return unsuccessfully.
 
 **/
 EFI_STATUS
@@ -1334,4 +1346,59 @@ FormSetDispatcher (
 
   return Status;
 }
+
+
+/**
+  Deletete the Boot Option from EFI Variable. The Boot Order Arrray
+  is also updated.
+
+  @param OptionNumber    EDES_TODO: Add parameter description
+  @param BootOrder       The Boot Order array.
+  @param BootOrderSize   The size of the Boot Order Array.
+
+  @return Other value if the Boot Option specified by OptionNumber is not deleteed succesfully.
+  @retval EFI_SUCCESS    If function return successfully.
+
+**/
+EFI_STATUS
+BdsDeleteBootOption (
+  IN UINTN                       OptionNumber,
+  IN OUT UINT16                  *BootOrder,
+  IN OUT UINTN                   *BootOrderSize
+  )
+{
+  UINT16      BootOption[100];
+  UINTN       Index;
+  EFI_STATUS  Status;
+  UINTN       Index2Del;
+
+  Status    = EFI_SUCCESS;
+  Index2Del = 0;
+
+  UnicodeSPrint (BootOption, sizeof (BootOption), L"Boot%04x", OptionNumber);
+  Status = EfiLibDeleteVariable (BootOption, &gEfiGlobalVariableGuid);
+  //
+  // adjust boot order array
+  //
+  for (Index = 0; Index < *BootOrderSize / sizeof (UINT16); Index++) {
+    if (BootOrder[Index] == OptionNumber) {
+      Index2Del = Index;
+      break;
+    }
+  }
+
+  if (Index != *BootOrderSize / sizeof (UINT16)) {
+    for (Index = 0; Index < *BootOrderSize / sizeof (UINT16) - 1; Index++) {
+      if (Index >= Index2Del) {
+        BootOrder[Index] = BootOrder[Index + 1];
+      }
+    }
+
+    *BootOrderSize -= sizeof (UINT16);
+  }
+
+  return Status;
+
+}
+
 
