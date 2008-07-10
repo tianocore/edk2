@@ -309,6 +309,11 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterStdErrDriverBinding = {
 /**
   The user Entry Point for module ConSplitter. The user code starts with this function.
 
+  Installs driver module protocols and. Creates virtual device handles for ConIn,
+  ConOut, and StdErr. Installs Simple Text In protocol, Simple Text In Ex protocol,
+  Simple Pointer protocol, Absolute Pointer protocol on those virtual handlers. 
+  Installs Graphics Output protocol and/or UGA Draw protocol if needed.
+
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
 
@@ -318,7 +323,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterStdErrDriverBinding = {
 **/
 EFI_STATUS
 EFIAPI
-InitializeConSplitter(
+ConSplitterDriverEntry(
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
@@ -378,36 +383,6 @@ InitializeConSplitter(
              );
   ASSERT_EFI_ERROR (Status);
 
-
-  //
-  // Call the original Entry Point
-  //
-  Status = ConSplitterDriverEntry (ImageHandle, SystemTable);
-
-  return Status;
-}
-
-
-
-/**
-  Intialize a virtual console device to act as an agrigator of physical console
-  devices.
-
-  @param  ImageHandle              (Standard EFI Image entry -
-                                   EFI_IMAGE_ENTRY_POINT)
-  @param  SystemTable              (Standard EFI Image entry -
-                                   EFI_IMAGE_ENTRY_POINT)
- EFI_SUCCESS
-
-**/
-EFI_STATUS
-EFIAPI
-ConSplitterDriverEntry (
-  IN EFI_HANDLE                       ImageHandle,
-  IN EFI_SYSTEM_TABLE                 *SystemTable
-  )
-{
-  EFI_STATUS  Status;
 
   ASSERT (FeaturePcdGet (PcdConOutGopSupport) ||
           FeaturePcdGet (PcdConOutUgaSupport));
@@ -535,16 +510,18 @@ ConSplitterDriverEntry (
         );
 
   return EFI_SUCCESS;
+
 }
 
 
 /**
-  Construct the ConSplitter.
+  Construct console input devices' private data.
 
   @param  ConInPrivate             A pointer to the TEXT_IN_SPLITTER_PRIVATE_DATA
                                    structure.
 
   @retval EFI_OUT_OF_RESOURCES     Out of resources.
+  @retval other     Out of resources.
 
 **/
 EFI_STATUS
@@ -654,6 +631,15 @@ ConSplitterTextInConstructor (
   return Status;
 }
 
+/**
+  Construct console output devices' private data.
+
+  @param  ConOutPrivate            A pointer to the TEXT_IN_SPLITTER_PRIVATE_DATA
+                                   structure.
+
+  @retval EFI_OUT_OF_RESOURCES     Out of resources.
+
+**/
 EFI_STATUS
 ConSplitterTextOutConstructor (
   TEXT_OUT_SPLITTER_PRIVATE_DATA      *ConOutPrivate
@@ -760,14 +746,14 @@ ConSplitterTextOutConstructor (
 
 
 /**
-  Generic Supported Check
+  Test to see if the specified protocol could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller Handle.
-  @param  Guid                     Guid.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  Guid                The specified protocol guid.
 
-  @retval EFI_UNSUPPORTED          unsupported.
-  @retval EFI_SUCCESS              operation is OK.
+  @retval EFI_SUCCESS         The specified protocol is supported on this device.
+  @retval other               The specified protocol is not supported on this device.
 
 **/
 EFI_STATUS
@@ -820,15 +806,16 @@ ConSplitterSupported (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Console In Supported Check
+  Test to see if Console In Device could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval other               This driver does not support this device
 
 **/
 EFI_STATUS
@@ -846,15 +833,16 @@ ConSplitterConInDriverBindingSupported (
           );
 }
 
-
 /**
-  Standard Error Supported Check
+  Test to see if Simple Pointer protocol could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval other               This driver does not support this device
 
 **/
 EFI_STATUS
@@ -874,13 +862,15 @@ ConSplitterSimplePointerDriverBindingSupported (
 
 
 /**
-  Absolute Pointer Supported Check
+  Test to see if Absolute Pointer protocol could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval other               This driver does not support this device
 
 **/
 EFI_STATUS
@@ -900,13 +890,15 @@ ConSplitterAbsolutePointerDriverBindingSupported (
 
 
 /**
-  Console Out Supported Check
+  Test to see if Console Out Device could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval other               This driver does not support this device
 
 **/
 EFI_STATUS
@@ -924,15 +916,16 @@ ConSplitterConOutDriverBindingSupported (
           );
 }
 
-
 /**
-  Standard Error Supported Check
+  Test to see if Standard Error Device could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval other               This driver does not support this device
 
 **/
 EFI_STATUS
@@ -952,30 +945,37 @@ ConSplitterStdErrDriverBindingSupported (
 
 
 /**
-  Start ConSplitter on ControllerHandle, and create the virtual
-  agrogated console device on first call Start for a SimpleTextIn handle.
+  Start ConSplitter on devcie handle by opening Console Device Guid on device handle 
+  and the console virtual handle. And Get the console interface on controller handle.
+  
+  @param  This                      Protocol instance pointer.
+  @param  ControllerHandle          Handle of device.
+  @param  ConSplitterVirtualHandle  Console virtual Handle.
+  @param  DeviceGuid                The specified Console Device, such as ConInDev,
+                                    ConOutDev.
+  @param  InterfaceGuid             The specified protocol to be opened.
+  @param  Interface                 Protocol interface returned.
 
-  (Standard DriverBinding Protocol Start() function)
-
-  @return EFI_ERROR if a SimpleTextIn protocol is not started.
+  @retval EFI_SUCCESS               This driver supports this device
+  @retval other                     Failed to open the specified Console Device Guid
+                                    or specified protocol.
 
 **/
 EFI_STATUS
-EFIAPI
 ConSplitterStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_HANDLE                      ConSplitterVirtualHandle,
   IN  EFI_GUID                        *DeviceGuid,
   IN  EFI_GUID                        *InterfaceGuid,
-  IN  VOID                            **Interface
+  OUT VOID                            **Interface
   )
 {
   EFI_STATUS  Status;
   VOID        *Instance;
 
   //
-  // Check to see whether the handle has the ConsoleInDevice GUID on it
+  // Check to see whether the ControllerHandle has the InterfaceGuid on it.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -1013,15 +1013,15 @@ ConSplitterStart (
 
 
 /**
-  Start ConSplitter on ControllerHandle, and create the virtual
-  agrogated console device on first call Start for a SimpleTextIn handle.
+  Start Console In Consplitter on device handle. 
+  
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
-
-  @return EFI_STATUS
-  @return EFI_ERROR if a SimpleTextIn protocol is not started.
+  @retval EFI_SUCCESS          Console In Consplitter is added to ControllerHandle.
+  @retval other                Console In Consplitter does not support this device.
 
 **/
 EFI_STATUS
@@ -1032,9 +1032,9 @@ ConSplitterConInDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
   )
 {
-  EFI_STATUS                     Status;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL *TextIn;
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *TextInEx;
+  EFI_STATUS                          Status;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL      *TextIn;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL   *TextInEx;
 
   //
   // Start ConSplitter on ControllerHandle, and create the virtual
@@ -1076,14 +1076,15 @@ ConSplitterConInDriverBindingStart (
 
 
 /**
-  Start ConSplitter on ControllerHandle, and create the virtual
-  agrogated console device on first call Start for a SimpleTextIn handle.
+  Start Simple Pointer Consplitter on device handle. 
+  
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
-
-  @return EFI_ERROR if a SimpleTextIn protocol is not started.
+  @retval EFI_SUCCESS          Simple Pointer Consplitter is added to ControllerHandle.
+  @retval other                Simple Pointer Consplitter does not support this device.
 
 **/
 EFI_STATUS
@@ -1114,14 +1115,15 @@ ConSplitterSimplePointerDriverBindingStart (
 
 
 /**
-  Start ConSplitter on ControllerHandle, and create the virtual
-  agrogated console device on first call Start for a ConIn handle.
+  Start Absolute Pointer Consplitter on device handle. 
+  
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
-
-  @return EFI_ERROR if a AbsolutePointer protocol is not started.
+  @retval EFI_SUCCESS          Absolute Pointer Consplitter is added to ControllerHandle.
+  @retval other                Absolute Pointer Consplitter does not support this device.
 
 **/
 EFI_STATUS
@@ -1153,14 +1155,15 @@ ConSplitterAbsolutePointerDriverBindingStart (
 
 
 /**
-  Start ConSplitter on ControllerHandle, and create the virtual
-  agrogated console device on first call Start for a SimpleTextIn handle.
+  Start Console Out Consplitter on device handle. 
+  
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
-
-  @return EFI_ERROR if a SimpleTextIn protocol is not started.
+  @retval EFI_SUCCESS          Console Out Consplitter is added to ControllerHandle.
+  @retval other                Console Out Consplitter does not support this device.
 
 **/
 EFI_STATUS
@@ -1248,14 +1251,15 @@ ConSplitterConOutDriverBindingStart (
 
 
 /**
-  Start ConSplitter on ControllerHandle, and create the virtual
-  agrogated console device on first call Start for a SimpleTextIn handle.
+  Start Standard Error Consplitter on device handle. 
+  
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
-
-  @return EFI_ERROR if a SimpleTextIn protocol is not started.
+  @retval EFI_SUCCESS          Standard Error Consplitter is added to ControllerHandle.
+  @retval other                Standard Error Consplitter does not support this device.
 
 **/
 EFI_STATUS
@@ -1316,14 +1320,22 @@ ConSplitterStdErrDriverBindingStart (
 
 
 /**
+  Stop ConSplitter on device handle by opening Console Device Guid on device handle 
+  and the console virtual handle.
+  
+  @param  This                      Protocol instance pointer.
+  @param  ControllerHandle          Handle of device.
+  @param  ConSplitterVirtualHandle  Console virtual Handle.
+  @param  DeviceGuid                The specified Console Device, such as ConInDev,
+                                    ConOutDev.
+  @param  InterfaceGuid             The specified protocol to be opened.
+  @param  Interface                 Protocol interface returned.
 
-  (Standard DriverBinding Protocol Stop() function)
-
-  @return None
+  @retval EFI_SUCCESS               Stop ConSplitter on ControllerHandle successfully.
+  @retval other                     Failed to Stop ConSplitter on ControllerHandle.
 
 **/
 EFI_STATUS
-EFIAPI
 ConSplitterStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
@@ -1367,10 +1379,16 @@ ConSplitterStop (
 
 
 /**
+  Stop Console In ConSplitter on ControllerHandle by closing Console In Devcice GUID.
 
-  (Standard DriverBinding Protocol Stop() function)
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @return None
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
 
 **/
 EFI_STATUS
@@ -1427,10 +1445,17 @@ ConSplitterConInDriverBindingStop (
 
 
 /**
+  Stop Simple Pointer protocol ConSplitter on ControllerHandle by closing
+  Simple Pointer protocol.
 
-  (Standard DriverBinding Protocol Stop() function)
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @return None
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
 
 **/
 EFI_STATUS
@@ -1468,10 +1493,17 @@ ConSplitterSimplePointerDriverBindingStop (
 
 
 /**
+  Stop Absolute Pointer protocol ConSplitter on ControllerHandle by closing
+  Absolute Pointer protocol.
 
-  (Standard DriverBinding Protocol Stop() function)
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @return None
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
 
 **/
 EFI_STATUS
@@ -1509,10 +1541,16 @@ ConSplitterAbsolutePointerDriverBindingStop (
 
 
 /**
+  Stop Console Out ConSplitter on device handle by closing Console Out Devcice GUID.
 
-  (Standard DriverBinding Protocol Stop() function)
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @return None
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
 
 **/
 EFI_STATUS
@@ -1551,10 +1589,16 @@ ConSplitterConOutDriverBindingStop (
 
 
 /**
+  Stop Standard Error ConSplitter on ControllerHandle by closing Standard Error GUID.
 
-  (Standard DriverBinding Protocol Stop() function)
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS              Complete successfully.
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
 
 **/
 EFI_STATUS
@@ -1622,8 +1666,7 @@ ConSplitterStdErrDriverBindingStop (
                                    data
 
   @retval EFI_SUCCESS              Buffer size has grown
-  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size
-  @return None
+  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
 
 **/
 EFI_STATUS
@@ -1664,10 +1707,13 @@ ConSplitterGrowBuffer (
 
 
 /**
+  Add Text Input Device in Consplitter Text Input list.
 
+  @param  Private                  Text In Splitter pointer.
+  @param  TextIn                   Simple Text Input protocol pointer.
 
-  @return EFI_SUCCESS
-  @return EFI_OUT_OF_RESOURCES
+  @retval EFI_SUCCESS              Text Input Device added successfully.
+  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
 
 **/
 EFI_STATUS
@@ -1707,10 +1753,13 @@ ConSplitterTextInAddDevice (
 
 
 /**
+  Remove Simple Text Device in Consplitter Absolute Pointer list.
 
+  @param  Private                  Text In Splitter pointer.
+  @param  TextIn                   Simple Text protocol pointer.
 
-  @return EFI_SUCCESS
-  @return EFI_NOT_FOUND
+  @retval EFI_SUCCESS              Simple Text Device removed successfully.
+  @retval EFI_NOT_FOUND            No Simple Text Device found.
 
 **/
 EFI_STATUS
@@ -1738,6 +1787,16 @@ ConSplitterTextInDeleteDevice (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Add Text Input Ex Device in Consplitter Text Input Ex list.
+
+  @param  Private                  Text In Splitter pointer.
+  @param  TextInEx                 Simple Text Ex Input protocol pointer.
+
+  @retval EFI_SUCCESS              Text Input Ex Device added successfully.
+  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
+
+**/
 EFI_STATUS
 ConSplitterTextInExAddDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA         *Private,
@@ -1773,6 +1832,16 @@ ConSplitterTextInExAddDevice (
   return EFI_SUCCESS;
 }
 
+/**
+  Remove Simple Text Ex Device in Consplitter Absolute Pointer list.
+
+  @param  Private                  Text In Splitter pointer.
+  @param  TextInEx                 Simple Text Ex protocol pointer.
+
+  @retval EFI_SUCCESS              Simple Text Ex Device removed successfully.
+  @retval EFI_NOT_FOUND            No Simple Text Ex Device found.
+
+**/
 EFI_STATUS
 ConSplitterTextInExDeleteDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA         *Private,
@@ -1800,10 +1869,13 @@ ConSplitterTextInExDeleteDevice (
 
 
 /**
+  Add Simple Pointer Device in Consplitter Simple Pointer list.
 
+  @param  Private                  Text In Splitter pointer.
+  @param  SimplePointer            Simple Pointer protocol pointer.
 
-  @return EFI_OUT_OF_RESOURCES
-  @return EFI_SUCCESS
+  @retval EFI_SUCCESS              Simple Pointer Device added successfully.
+  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
 
 **/
 EFI_STATUS
@@ -1837,9 +1909,13 @@ ConSplitterSimplePointerAddDevice (
 
 
 /**
+  Remove Simple Pointer Device in Consplitter Absolute Pointer list.
 
+  @param  Private                  Text In Splitter pointer.
+  @param  SimplePointer            Simple Pointer protocol pointer.
 
-  @return None
+  @retval EFI_SUCCESS              Simple Pointer Device removed successfully.
+  @retval EFI_NOT_FOUND            No Simple Pointer Device found.
 
 **/
 EFI_STATUS
@@ -1869,10 +1945,13 @@ ConSplitterSimplePointerDeleteDevice (
 
 
 /**
+  Add Absolute Pointer Device in Consplitter Absolute Pointer list.
 
+  @param  Private                  Text In Splitter pointer.
+  @param  AbsolutePointer          Absolute Pointer protocol pointer.
 
-  @return EFI_OUT_OF_RESOURCES
-  @return EFI_SUCCESS
+  @retval EFI_SUCCESS              Absolute Pointer Device added successfully.
+  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
 
 **/
 EFI_STATUS
@@ -1906,9 +1985,13 @@ ConSplitterAbsolutePointerAddDevice (
 
 
 /**
+  Remove Absolute Pointer Device in Consplitter Absolute Pointer list.
 
+  @param  Private                  Text In Splitter pointer.
+  @param  AbsolutePointer          Absolute Pointer protocol pointer.
 
-  @return None
+  @retval EFI_SUCCESS              Absolute Pointer Device removed successfully.
+  @retval EFI_NOT_FOUND            No Absolute Pointer Device found.
 
 **/
 EFI_STATUS
@@ -1936,13 +2019,6 @@ ConSplitterAbsolutePointerDeleteDevice (
   return EFI_NOT_FOUND;
 }
 
-
-/**
-
-
-  @return None
-
-**/
 EFI_STATUS
 ConSplitterGrowMapTable (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
@@ -2010,9 +2086,13 @@ ConSplitterGrowMapTable (
 
 
 /**
+  Add the device's output mode to console splitter's mode list.
 
-
-  @return None
+  @param  Private               Text Out Splitter pointer
+  @param  TextOut               Simple Text Output protocol pointer.
+  
+  @retval EFI_SUCCESS           Device added successfully.
+  @retval EFI_OUT_OF_RESOURCES  Could not grow the buffer size.
 
 **/
 EFI_STATUS
@@ -2158,11 +2238,12 @@ ConSplitterGetIntersection (
 
 
 /**
+  Add the device's output mode to console splitter's mode list.
 
-  @param  Private                  Private data structure.
-  @param  TextOut                  Text Out Protocol.
-
-  @return None
+  @param  Private               Text Out Splitter pointer
+  @param  TextOut               Simple Text Output protocol pointer.
+  
+  @reture None
 
 **/
 VOID
@@ -2241,10 +2322,10 @@ ConSplitterSyncOutputMode (
 
 
 /**
+  Sync output device between ConOut and StdErr output.
 
-
-  @return EFI_SUCCESS
-  @return EFI_OUT_OF_RESOURCES
+  @retval EFI_SUCCESS              Sync implemented successfully.
+  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
 
 **/
 EFI_STATUS
@@ -2402,9 +2483,14 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
 
 
 /**
+  Add GOP or UGA output mode into Consplitter Text Out list.
 
+  @param  Private               Text Out Splitter pointer.
+  @param  GraphicsOutput        Graphics Output protocol pointer.
+  @param  UgaDraw               UGA Draw protocol pointer.
 
-  @return None
+  @retval EFI_SUCCESS           Output mode added successfully.
+  @retval other                 Failed to add output mode.
 
 **/
 EFI_STATUS
@@ -2751,11 +2837,16 @@ ConsplitterSetConsoleOutMode (
 }
 
 
-
 /**
+  Add Text Output Device in Consplitter Text Output list.
 
+  @param  Private                  Text Out Splitter pointer.
+  @param  TextOut                  Simple Text Output protocol pointer.
+  @param  GraphicsOutput           Graphics Output protocol pointer.
+  @param  UgaDraw                  UGA Draw protocol pointer.
 
-  @return None
+  @retval EFI_SUCCESS              Text Output Device added successfully.
+  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
 
 **/
 EFI_STATUS
@@ -2913,9 +3004,13 @@ ConSplitterTextOutAddDevice (
 
 
 /**
+  Remove Text Out Device in Consplitter Text Out list.
 
+  @param  Private                  Text Out Splitter pointer.
+  @param  TextOut                  Simple Text Output Pointer protocol pointer.
 
-  @return None
+  @retval EFI_SUCCESS              Text Out Device removed successfully.
+  @retval EFI_NOT_FOUND            No Text Out Device found.
 
 **/
 EFI_STATUS
@@ -3127,7 +3222,9 @@ ConSpliterConssoleControlStdInLocked (
   password will cause the check to reset. As long a mConIn.PasswordEnabled is
   TRUE the StdIn splitter will not report any input.
 
-  (Standard EFI_EVENT_NOTIFY)
+  @param  Event                  The Event this notify function registered to.
+  @param  Context                Pointer to the context data registerd to the
+                                 Event.
 
   @return None
 
@@ -3873,9 +3970,10 @@ ConSplitterSimplePointerPrivateGetState (
   be used to test for existance of a keystroke via WaitForEvent () call.
   If the ConIn is password locked make it look like no keystroke is availible
 
-  @param  This                     Protocol instance pointer. State  -
+  @param  This                     A pointer to protocol instance.
+  @param  State                    A pointer to state information on the pointer device
 
-  @retval EFI_SUCCESS              The keystroke information was returned.
+  @retval EFI_SUCCESS              The keystroke information was returned in State.
   @retval EFI_NOT_READY            There was no keystroke data availiable.
   @retval EFI_DEVICE_ERROR         The keydtroke information was not returned due
                                    to hardware errors.

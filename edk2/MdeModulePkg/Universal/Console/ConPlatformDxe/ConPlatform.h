@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _CON_MANAGE_H_
-#define _CON_MANAGE_H_
+#ifndef _CON_PLATFORM_H_
+#define _CON_PLATFORM_H_
 
 #include <Uefi.h>
 #include <Protocol/SimpleTextOut.h>

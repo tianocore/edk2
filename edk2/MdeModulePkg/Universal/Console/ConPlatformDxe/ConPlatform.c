@@ -217,7 +217,7 @@ ConPlatformDriverBindingSupported (
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle
   @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval other                This driver does not support this device
+  @retval other                This driver does not support this device.
 
 **/
 EFI_STATUS
