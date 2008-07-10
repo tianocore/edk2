@@ -1,5 +1,5 @@
 /** @file
-  Dynamically Update the pages
+Dynamically update the pages.
 
 Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -17,10 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Refresh the global UpdateData structure.
 
+  @param VOID
 
-  @param VOID            EDES_TODO: Add parameter description
-
-           EDES_TODO: Incomplete Descriptions  None.
+  @return VOID
 
 **/
 VOID
@@ -32,11 +31,13 @@ RefreshUpdateData (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Add a "Go back to main page" tag in front of the form when there are no
+  "Apply changes" and "Discard changes" tags in the end of the form.
+  
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -64,11 +65,12 @@ UpdatePageStart (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create the "Apply changes" and "Discard changes" tags. And
+  ensure user can return to the main page.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -121,12 +123,14 @@ UpdatePageEnd (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Clean up the dynamic opcode at label and form specified by
+  both LabelId. 
 
-  @param LabelId         EDES_TODO: Add parameter description
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param LabelId         It is both the Form ID and Label ID for
+                         opcode deletion.
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -151,11 +155,13 @@ CleanUpPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Boot a file selected by user at File Expoloer of BMM.
 
-  @param FileContext     EDES_TODO: Add parameter description
+  @param FileContext     The file context data, which contains the device path
+                         of the file to be boot from.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS    The function completed successfull.
+  @retun                 Other value if the boot from the file fails.
 
 **/
 EFI_STATUS
@@ -192,11 +198,12 @@ BootThisFile (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create a list of Goto Opcode for all terminal devices logged
+  by TerminaMenu. This list will be inserted to form FORM_CON_COM_SETUP_ID.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -229,11 +236,12 @@ UpdateConCOMPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create a lit of boot option from global BootOptionMenu. It
+  allow user to delete the boot option.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -276,11 +284,11 @@ UpdateBootDelPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create a lit of driver option from global DriverMenu.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -312,11 +320,13 @@ UpdateDrvAddHandlePage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create a lit of driver option from global DriverOptionMenu. It
+  allow user to delete the driver option.
 
-  @param CallbackData    EDES_TODO: Add parameter description
 
-  @return EDES_TODO: Add description for return value
+  @param CallbackData    The BMM context data.
+
+  @return VOID
 
 **/
 VOID
@@ -357,11 +367,12 @@ UpdateDrvDelPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Prepare the page to allow user to add description for 
+  a Driver Option.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -431,9 +442,9 @@ UpdateDriverAddHandleDescPage (
 
   @param UpdatePageId    EDES_TODO: Add parameter description
   @param ConsoleMenu     EDES_TODO: Add parameter description
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -510,13 +521,14 @@ UpdateConsolePage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Update the page's NV Map if user has changed the order
+  a list. This list can be Boot Order or Driver Order.
 
-  @param UpdatePageId    EDES_TODO: Add parameter description
-  @param OptionMenu      EDES_TODO: Add parameter description
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param UpdatePageId    The form ID to be updated.
+  @param OptionMenu      The new list.
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -538,7 +550,7 @@ UpdateOrderPage (
 
   ZeroMem (CallbackData->BmmFakeNvData.OptionOrder, 100);
 
-  IfrOptionList = EfiAllocateZeroPool (sizeof (IFR_OPTION) * OptionMenu->MenuNumber);
+  IfrOptionList = AllocateZeroPool (sizeof (IFR_OPTION) * OptionMenu->MenuNumber);
   if (NULL == IfrOptionList) {
     return ;
   }
@@ -580,11 +592,12 @@ UpdateOrderPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create the dynamic page to allow user to set
+  the "BootNext" vaule.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -606,7 +619,7 @@ UpdateBootNextPage (
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, &BootOptionMenu);
 
   if (NumberOfOptions > 0) {
-    IfrOptionList = EfiAllocateZeroPool ((NumberOfOptions + 1) * sizeof (IFR_OPTION));
+    IfrOptionList = AllocateZeroPool ((NumberOfOptions + 1) * sizeof (IFR_OPTION));
 
     ASSERT (IfrOptionList);
 
@@ -653,11 +666,12 @@ UpdateBootNextPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create the dynamic page to allow user to set
+  the "TimeOut" vaule.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -697,9 +711,9 @@ UpdateTimeOutPage (
   Refresh the text mode page
 
 
-  @param CallbackData    BMM_CALLBACK_DATA
+  @param CallbackData    The BMM context data.
 
-           EDES_TODO: Incomplete Descriptions  None.
+  @return VOID
 
 **/
 VOID
@@ -744,10 +758,10 @@ UpdateConModePage (
     return;
   }
 
-  IfrOptionList       = EfiAllocateZeroPool (sizeof (IFR_OPTION) * ValidMode);
+  IfrOptionList       = AllocateZeroPool (sizeof (IFR_OPTION) * ValidMode);
   ASSERT(IfrOptionList != NULL);
 
-  ModeToken           = EfiAllocateZeroPool (sizeof (EFI_STRING_ID) * ValidMode);
+  ModeToken           = AllocateZeroPool (sizeof (EFI_STRING_ID) * ValidMode);
   ASSERT(ModeToken != NULL);
 
   //
@@ -802,11 +816,13 @@ UpdateConModePage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create the dynamic page which allows user to 
+  set the property such as Baud Rate, Data Bits,
+  Parity, Stop Bits, Terminal Type.
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -835,12 +851,12 @@ UpdateTerminalPage (
 
   NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
 
-  IfrOptionList       = EfiAllocateZeroPool (sizeof (IFR_OPTION) * 19);
+  IfrOptionList       = AllocateZeroPool (sizeof (IFR_OPTION) * 19);
   if (IfrOptionList == NULL) {
     return ;
   }
 
-  for (Index = 0; Index < 19; Index++) {
+  for (Index = 0; Index < sizeof (BaudRateList) / sizeof (BaudRateList [0]); Index++) {
     CheckFlags = 0;
     if (NewTerminalContext->BaudRate == (UINT64) (BaudRateList[Index].Value)) {
       CheckFlags |= EFI_IFR_OPTION_DEFAULT;
@@ -866,7 +882,7 @@ UpdateTerminalPage (
     &gUpdateData
     );
 
-  for (Index = 0; Index < 4; Index++) {
+  for (Index = 0; Index < sizeof (DataBitsList) / sizeof (DataBitsList[0]); Index++) {
     CheckFlags = 0;
 
     if (NewTerminalContext->DataBits == DataBitsList[Index].Value) {
@@ -893,7 +909,7 @@ UpdateTerminalPage (
     &gUpdateData
     );
 
-  for (Index = 0; Index < 5; Index++) {
+  for (Index = 0; Index < sizeof (ParityList) / sizeof (ParityList[0]); Index++) {
     CheckFlags = 0;
     if (NewTerminalContext->Parity == ParityList[Index].Value) {
       CheckFlags |= EFI_IFR_OPTION_DEFAULT;
@@ -919,7 +935,7 @@ UpdateTerminalPage (
     &gUpdateData
     );
 
-  for (Index = 0; Index < 3; Index++) {
+  for (Index = 0; Index < sizeof (StopBitsList) / sizeof (StopBitsList[0]); Index++) {
     CheckFlags = 0;
     if (NewTerminalContext->StopBits == StopBitsList[Index].Value) {
       CheckFlags |= EFI_IFR_OPTION_DEFAULT;
@@ -976,12 +992,13 @@ UpdateTerminalPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Dispatch the correct update page function to call based on
+  the UpdatePageId.
 
-  @param UpdatePageId    EDES_TODO: Add parameter description
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param UpdatePageId    The form ID.
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1018,13 +1035,15 @@ UpdatePageBody (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Get the index number (#### in Boot####) for the boot option pointed to a BBS legacy device type
+  specified by DeviceType.
 
-  @param DeviceType      EDES_TODO: Add parameter description
-  @param OptionIndex     EDES_TODO: Add parameter description
-  @param OptionSize      EDES_TODO: Add parameter description
+  @param DeviceType      The legacy device type. It can be floppy, network, harddisk, cdrom,
+                         etc.
+  @param OptionIndex     Returns the index number (#### in Boot####).
+  @param OptionSize      Return the size of the Boot### variable.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID *
@@ -1100,12 +1119,13 @@ GetLegacyBootOptionVar (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Create a dynamic page so that Legacy Device boot order
+  can be set for specified device type.
 
-  @param UpdatePageId    EDES_TODO: Add parameter description
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param UpdatePageId    The form ID. It also spefies the legacy device type.
+  @param CallbackData    The BMM context data.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID
@@ -1210,7 +1230,7 @@ UpdateSetLegacyDeviceOrderPage (
 
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, OptionMenu);
 
-  IfrOptionList = EfiAllocateZeroPool (sizeof (IFR_OPTION) * (OptionMenu->MenuNumber + 1));
+  IfrOptionList = AllocateZeroPool (sizeof (IFR_OPTION) * (OptionMenu->MenuNumber + 1));
   if (NULL == IfrOptionList) {
     return ;
   }
@@ -1304,12 +1324,12 @@ UpdateSetLegacyDeviceOrderPage (
 }
 
 /**
-  EDES_TODO: Add function description.
+  Dispatch the display to the next page based on NewPageId.
 
-  @param Private         EDES_TODO: Add parameter description
-  @param NewPageId       EDES_TODO: Add parameter description
+  @param Private         The BMM context data.
+  @param NewPageId       The original page ID.
 
-  @return EDES_TODO: Add description for return value
+  @return VOID
 
 **/
 VOID

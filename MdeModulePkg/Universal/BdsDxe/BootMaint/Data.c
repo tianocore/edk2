@@ -307,7 +307,7 @@ COM_ATTR            StopBitsList[3] = {
 //
 // Guid for messaging path, used in Serial port setting.
 //
-EFI_GUID            Guid[4] = {
+EFI_GUID            TerminalTypeGuid[4] = {
   DEVICE_PATH_MESSAGING_PC_ANSI,
   DEVICE_PATH_MESSAGING_VT_100,
   DEVICE_PATH_MESSAGING_VT_100_PLUS,

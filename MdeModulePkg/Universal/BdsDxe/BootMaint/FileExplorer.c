@@ -18,10 +18,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Update the File Explore page.
 
 
-  @param CallbackData    EDES_TODO: Add parameter description
+  @param CallbackData    The BMM context data.
   @param MenuOption      Pointer to menu options to display.
 
-           EDES_TODO: Incomplete Descriptions  None.
+  @return VOID
 
 **/
 VOID
@@ -212,6 +212,15 @@ UpdateFileExplorer (
 
 /**
   This function processes the results of changes in configuration.
+  When user select a interactive opcode, this callback will be triggered.
+  Based on the Question(QuestionId) that triggers the callback, the corresponding
+  actions is performed. It handles:
+
+  1) the addition of boot option.
+  2) the addition of driver option.
+  3) exit from file browser
+  4) update of file content if a dir is selected.
+  5) boot the file if a file is selected in "boot from file"
 
 
   @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
