@@ -1,5 +1,5 @@
 /** @file
-Private functions used by PCD DXE driver.
+    Help functions used by PCD DXE driver.
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -10,22 +10,32 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name: Service.c
-
 **/
 
 #include "Service.h"
-
 
 PCD_DATABASE * mPcdDatabase;
 
 LIST_ENTRY *mCallbackFnTable;
 
+/**
+  Get the PCD entry pointer in PCD database.
+  
+  This routine will visit PCD database to find the PCD entry according to given
+  token number. The given token number is autogened by build tools and it will be 
+  translated to local token number. Local token number contains PCD's type and 
+  offset of PCD entry in PCD database.
+
+  @param TokenNumber     Token's number, it is autogened by build tools
+  @param GetSize         The size of token's value
+
+  @return PCD entry pointer in PCD database
+
+**/
 VOID *
 GetWorker (
-  UINTN             TokenNumber,
-  UINTN             GetSize
+  IN UINTN             TokenNumber,
+  IN UINTN             GetSize
   )
 {
   UINT32              *LocalTokenNumberTable;
@@ -163,12 +173,24 @@ GetWorker (
   
 }
 
+/**
+  Register the callback function for a PCD entry.
 
+  This routine will register a callback function to a PCD entry by given token number
+  and token space guid.
+  
+  @param TokenNumber        PCD token's number, it is autogened by build tools.
+  @param Guid               PCD token space's guid, 
+                            if not NULL, this PCD is dynamicEx type PCD.
+  @param CallBackFunction   Callback function pointer
 
+  @return EFI_SUCCESS Always success for registering callback function.
+
+**/
 EFI_STATUS
 DxeRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
-  IN  CONST GUID              *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 )
 {
@@ -212,13 +234,24 @@ DxeRegisterCallBackWorker (
   return EFI_SUCCESS;
 }
 
+/**
+  UnRegister the callback function for a PCD entry.
 
+  This routine will unregister a callback function to a PCD entry by given token number
+  and token space guid.
 
+  @param TokenNumber        PCD token's number, it is autogened by build tools.
+  @param Guid               PCD token space's guid.
+                            if not NULL, this PCD is dynamicEx type PCD.
+  @param CallBackFunction   Callback function pointer
 
+  @retval EFI_SUCCESS               Callback function is success to be unregister.
+  @retval EFI_INVALID_PARAMETER     Can not find the PCD entry by given token number.
+**/
 EFI_STATUS
 DxeUnRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
-  IN  CONST GUID              *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 )
 {
@@ -260,8 +293,31 @@ DxeUnRegisterCallBackWorker (
   return EFI_INVALID_PARAMETER;
 }
 
+/**
+  Get next token number in given token space.
+  
+  This routine is used for dynamicEx type PCD. It will firstly scan token space
+  table to get token space according to given token space guid. Then scan given 
+  token number in found token space, if found, then return next token number in 
+  this token space.
 
+  @param Guid            Token space guid. Next token number will be scaned in 
+                         this token space.
+  @param TokenNumber     Token number. 
+                         If PCD_INVALID_TOKEN_NUMBER, return first token number in 
+                         token space table.
+                         If not PCD_INVALID_TOKEN_NUMBER, return next token number
+                         in token space table.
+  @param GuidTable       Token space guid table. It will be used for scan token space
+                         by given token space guid.
+  @param SizeOfGuidTable The size of guid table.
+  @param ExMapTable      DynamicEx token number mapping table.
+  @param SizeOfExMapTable The size of dynamicEx token number mapping table.
 
+  @retval EFI_NOT_FOUND  Can not given token space or token number.
+  @retval EFI_SUCCESS    Success to get next token number.
+
+**/
 EFI_STATUS
 ExGetNextTokeNumber (
   IN      CONST EFI_GUID         *Guid,
@@ -273,44 +329,54 @@ ExGetNextTokeNumber (
   )
 {
   EFI_GUID         *MatchGuid;
-  UINTN            Idx;
+  UINTN            Index;
   UINTN            GuidTableIdx;
   BOOLEAN          Found;
 
+  //
+  // Scan token space guid 
+  // 
   MatchGuid = ScanGuid (GuidTable, SizeOfGuidTable, Guid);
   if (MatchGuid == NULL) {
     return EFI_NOT_FOUND;
   }
 
+  //
+  // Find the token space table in dynamicEx mapping table.
+  //
   Found = FALSE;
   GuidTableIdx = MatchGuid - GuidTable;
-  for (Idx = 0; Idx < SizeOfExMapTable; Idx++) {
-    if (ExMapTable[Idx].ExGuidIndex == GuidTableIdx) {
+  for (Index = 0; Index < SizeOfExMapTable; Index++) {
+    if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
       Found = TRUE;
       break;
     }
   }
 
   if (Found) {
+    //
+    // If given token number is PCD_INVALID_TOKEN_NUMBER, then return the first
+    // token number in found token space.
+    //
     if (*TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
-      *TokenNumber = ExMapTable[Idx].ExTokenNumber;
+      *TokenNumber = ExMapTable[Index].ExTokenNumber;
       return EFI_SUCCESS;
     }
 
-    for ( ; Idx < SizeOfExMapTable; Idx++) {
-      if (ExMapTable[Idx].ExTokenNumber == *TokenNumber) {
-        Idx++;
-        if (Idx == SizeOfExMapTable) {
+    for ( ; Index < SizeOfExMapTable; Index++) {
+      if (ExMapTable[Index].ExTokenNumber == *TokenNumber) {
+        Index ++;
+        if (Index == SizeOfExMapTable) {
           //
           // Exceed the length of ExMap Table
           //
           *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
           return EFI_SUCCESS;
-        } else if (ExMapTable[Idx].ExGuidIndex == GuidTableIdx) {
+        } else if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
           //
           // Found the next match
           //
-          *TokenNumber = ExMapTable[Idx].ExTokenNumber;
+          *TokenNumber = ExMapTable[Index].ExTokenNumber;
           return EFI_SUCCESS;
         } else {
           //
@@ -326,10 +392,15 @@ ExGetNextTokeNumber (
   
   return EFI_NOT_FOUND;
 }
+
+
+/**
+  Initialize the PCD database in DXE phase.
   
+  PCD database in DXE phase also contains PCD database in PEI phase which is copied
+  from GUID Hob.
 
-
-
+**/
 VOID
 BuildPcdDxeDataBase (
   VOID
@@ -337,7 +408,7 @@ BuildPcdDxeDataBase (
 {
   PEI_PCD_DATABASE    *PeiDatabase;
   EFI_HOB_GUID_TYPE   *GuidHob;
-  UINTN               Idx;
+  UINTN               Index;
 
   mPcdDatabase = AllocateZeroPool (sizeof(PCD_DATABASE));
   ASSERT (mPcdDatabase != NULL);
@@ -376,15 +447,21 @@ BuildPcdDxeDataBase (
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
-  for (Idx = 0; Idx + 1 < PCD_TOTAL_TOKEN_NUMBER + 1; Idx++) {
-    InitializeListHead (&mCallbackFnTable[Idx]);
+  for (Index = 0; Index + 1 < PCD_TOTAL_TOKEN_NUMBER + 1; Index++) {
+    InitializeListHead (&mCallbackFnTable[Index]);
   }
-    
-  return;
 }
 
+/**
+  Get Variable which contains HII type PCD entry.
 
+  @param VariableGuid    Variable's guid
+  @param VariableName    Variable's unicode name string
+  @param VariableData    Variable's data pointer, 
+  @param VariableSize    Variable's size.
 
+  @return the status of gRT->GetVariable
+**/
 EFI_STATUS
 GetHiiVariable (
   IN  EFI_GUID      *VariableGuid,
@@ -400,6 +477,9 @@ GetHiiVariable (
   Size = 0;
   Buffer = NULL;
   
+  //
+  // Firstly get the real size of HII variable
+  //
   Status = gRT->GetVariable (
     (UINT16 *)VariableName,
     VariableGuid,
@@ -408,6 +488,9 @@ GetHiiVariable (
     Buffer
     );
   
+  //
+  // Allocate buffer to hold whole variable data according to variable size.
+  //
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Buffer = (UINT8 *) AllocatePool (Size);
 
@@ -429,7 +512,17 @@ GetHiiVariable (
   return Status;
 }
 
+/**
+  Find the local token number according to system SKU ID.
 
+  @param LocalTokenNumber PCD token number
+  @param Size             The size of PCD entry.
+  @param IsPeiDb          If TRUE, the PCD entry is initialized in PEI phase.
+                          If False, the PCD entry is initialized in DXE phase.
+
+  @return Token number according to system SKU ID.
+
+**/
 UINT32
 GetSkuEnabledTokenNumber (
   UINT32    LocalTokenNumber,
@@ -439,7 +532,7 @@ GetSkuEnabledTokenNumber (
 {
   SKU_HEAD              *SkuHead;
   SKU_ID                *SkuIdTable;
-  INTN                  i;
+  INTN                  Index;
   UINT8                 *Value;
   SKU_ID                *PhaseSkuIdTable;
   UINT8                 *PcdDb;
@@ -456,28 +549,31 @@ GetSkuEnabledTokenNumber (
                               
   SkuIdTable  = &PhaseSkuIdTable[SkuHead->SkuIdTableOffset];
         
-  for (i = 0; i < SkuIdTable[0]; i++) {
-    if (mPcdDatabase->PeiDb.Init.SystemSkuId == SkuIdTable[i + 1]) {
+  //
+  // Find the current system's SKU ID entry in SKU ID table.
+  //
+  for (Index = 0; Index < SkuIdTable[0]; Index++) {
+    if (mPcdDatabase->PeiDb.Init.SystemSkuId == SkuIdTable[Index + 1]) {
       break;
     }
   }
-  ASSERT (i < SkuIdTable[0]);
+  ASSERT (Index < SkuIdTable[0]);
 
   switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
-      Value = (UINT8 *) &(((VPD_HEAD *) Value)[i]);
+      Value = (UINT8 *) &(((VPD_HEAD *) Value)[Index]);
       return (UINT32) ((Value - PcdDb) | PCD_TYPE_VPD);
 
     case PCD_TYPE_HII:
-      Value = (UINT8 *) &(((VARIABLE_HEAD *) Value)[i]);
+      Value = (UINT8 *) &(((VARIABLE_HEAD *) Value)[Index]);
       return (UINT32) ((Value - PcdDb) | PCD_TYPE_HII);
 
     case PCD_TYPE_STRING:
-      Value = (UINT8 *) &(((STRING_HEAD *) Value)[i]);
+      Value = (UINT8 *) &(((STRING_HEAD *) Value)[Index]);
       return (UINT32) ((Value - PcdDb) | PCD_TYPE_STRING);
       
     case PCD_TYPE_DATA:
-      Value += Size * i;
+      Value += Size * Index;
       return (UINT32) (Value - PcdDb);
 
     default:
@@ -490,10 +586,19 @@ GetSkuEnabledTokenNumber (
   
 }
 
+/**
+  Invoke the callback function when dynamic PCD entry was set, if this PCD entry 
+  has registered callback function.
 
+  @param ExTokenNumber   DynamicEx PCD's token number, if this PCD entry is dyanmicEx
+                         type PCD.
+  @param Guid            DynamicEx PCD's guid, if this PCD entry is dynamicEx type
+                         PCD.
+  @param TokenNumber     PCD token number generated by build tools.
+  @param Data            Value want to be set for this PCD entry
+  @param Size            The size of value
 
-
-STATIC
+**/
 VOID
 InvokeCallbackOnSet (
   UINT32            ExTokenNumber,
@@ -532,6 +637,16 @@ InvokeCallbackOnSet (
 }
 
 
+/**
+  Wrapper function for setting non-pointer type value for a PCD entry.
+
+  @param TokenNumber     Pcd token number autogenerated by build tools.
+  @param Data            Value want to be set for PCD entry
+  @param Size            Size of value.
+
+  @return status of SetWorker.
+
+**/
 EFI_STATUS
 SetValueWorker (
   IN UINTN                   TokenNumber,
@@ -543,6 +658,21 @@ SetValueWorker (
 }
 
 
+/**
+  Set value for an PCD entry
+
+  @param TokenNumber     Pcd token number autogenerated by build tools.
+  @param Data            Value want to be set for PCD entry
+  @param Size            Size of value.
+  @param PtrType         If TRUE, the type of PCD entry's value is Pointer.
+                         If False, the type of PCD entry's value is not Pointer.
+
+  @retval EFI_INVALID_PARAMETER  If this PCD type is VPD, VPD PCD can not be set.
+  @retval EFI_INVALID_PARAMETER  If Size can not be set to size table.
+  @retval EFI_NOT_FOUND          If value type of PCD entry is intergrate, but not in
+                                 range of UINT8, UINT16, UINT32, UINT64
+  @retval EFI_NOT_FOUND          Can not find the PCD type according to token number.                                
+**/
 EFI_STATUS
 SetWorker (
   IN          UINTN                   TokenNumber,
@@ -581,27 +711,32 @@ SetWorker (
 
   TmpTokenNumber = TokenNumber;
   
+  //
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
-
+  //
   ASSERT (TokenNumber + 1 < PCD_TOTAL_TOKEN_NUMBER + 1);
 
   if (!PtrType) {
     ASSERT (*Size == DxePcdGetSize (TokenNumber + 1));
   }
   
+  //
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
+  //
   IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE);
 
   LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
                                      mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
 
+  //
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
+  //
   if ((TokenNumber + 1 < PEI_NEX_TOKEN_NUMBER + 1) ||
       (TokenNumber + 1 >= PEI_LOCAL_TOKEN_NUMBER + 1 || TokenNumber + 1 < (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER + 1))) {
     InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, *Size);
@@ -717,10 +852,16 @@ SetWorker (
   return Status;
 }
 
+/**
+  Wrapper function for get PCD value for dynamic-ex PCD.
 
+  @param Guid            Token space guid for dynamic-ex PCD.
+  @param ExTokenNumber   Token number for dyanmic-ex PCD.
+  @param GetSize         The size of dynamic-ex PCD value.
 
+  @return PCD entry in PCD database.
 
-
+**/
 VOID *
 ExGetWorker (
   IN CONST EFI_GUID         *Guid,
@@ -731,9 +872,17 @@ ExGetWorker (
   return GetWorker(GetExPcdTokenNumber (Guid, (UINT32) ExTokenNumber), GetSize);
 }
 
+/**
+  Wrapper function for set PCD value for non-Pointer type dynamic-ex PCD.
 
+  @param ExTokenNumber   Token number for dynamic-ex PCD.
+  @param Guid            Token space guid for dynamic-ex PCD.
+  @param Data            Value want to be set.
+  @param SetSize         The size of value.
 
+  @return status of ExSetWorker().
 
+**/
 EFI_STATUS
 ExSetValueWorker (
   IN          UINTN                ExTokenNumber,
@@ -745,7 +894,24 @@ ExSetValueWorker (
   return ExSetWorker (ExTokenNumber, Guid, Data, &SetSize, FALSE);
 }
 
+/**
+  Set value for a dynamic PCD entry.
+  
+  This routine find the local token number according to dynamic-ex PCD's token 
+  space guid and token number firstly, and invoke callback function if this PCD
+  entry registered callback function. Finally, invoken general SetWorker to set
+  PCD value.
+  
+  @param ExTokenNumber   Dynamic-ex PCD token number.
+  @param Guid            Token space guid for dynamic-ex PCD.
+  @param Data            PCD value want to be set
+  @param SetSize         Size of value.
+  @param PtrType         If TRUE, this PCD entry is pointer type.
+                         If FALSE, this PCD entry is not pointer type.
 
+  @return status of SetWorker().
+
+**/
 EFI_STATUS
 ExSetWorker (
   IN          UINTN                ExTokenNumber,
@@ -765,9 +931,21 @@ ExSetWorker (
 
 }
 
+/**
+  Set value for HII-type PCD.
 
+  A HII-type PCD's value is stored in a variable. Setting/Getting the value of 
+  HII-type PCD is to visit this variable.
+  
+  @param VariableGuid    Guid of variable which stored value of a HII-type PCD.
+  @param VariableName    Unicode name of variable which stored value of a HII-type PCD.
+  @param Data            Value want to be set.
+  @param DataSize        Size of value
+  @param Offset          Value offset of HII-type PCD in variable.
 
+  @return status of GetVariable()/SetVariable().
 
+**/
 EFI_STATUS
 SetHiiVariable (
   IN  EFI_GUID     *VariableGuid,
@@ -831,17 +1009,26 @@ SetHiiVariable (
   return Status;
 }
 
+/**
+  Get local token number according to dynamic-ex PCD's {token space guid:token number}
 
+  A dynamic-ex type PCD, developer must provide pair of token space guid: token number
+  in DEC file. PCD database maintain a mapping table that translate pair of {token
+  space guid: token number} to local token number.
+  
+  @param Guid            Token space guid for dynamic-ex PCD entry.
+  @param ExTokenNumber   EDES_TODO: Add parameter description
 
+  @return local token number for dynamic-ex PCD.
 
-
+**/
 UINTN           
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
   IN UINT32                     ExTokenNumber
   )
 {
-  UINT32              i;
+  UINT32              Index;
   DYNAMICEX_MAPPING   *ExMap;
   EFI_GUID            *GuidTable;
   EFI_GUID            *MatchGuid;
@@ -857,10 +1044,10 @@ GetExPcdTokenNumber (
 
       MatchGuidIdx = MatchGuid - GuidTable;
       
-      for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
-        if ((ExTokenNumber == ExMap[i].ExTokenNumber) &&
-            (MatchGuidIdx == ExMap[i].ExGuidIndex)) {
-            return ExMap[i].LocalTokenNumber;
+      for (Index = 0; Index < PEI_EXMAPPING_TABLE_SIZE; Index++) {
+        if ((ExTokenNumber == ExMap[Index].ExTokenNumber) &&
+            (MatchGuidIdx == ExMap[Index].ExGuidIndex)) {
+            return ExMap[Index].LocalTokenNumber;
 
         }
       }
@@ -879,10 +1066,10 @@ GetExPcdTokenNumber (
 
   MatchGuidIdx = MatchGuid - GuidTable;
   
-  for (i = 0; i < DXE_EXMAPPING_TABLE_SIZE; i++) {
-    if ((ExTokenNumber == ExMap[i].ExTokenNumber) &&
-         (MatchGuidIdx == ExMap[i].ExGuidIndex)) {
-        return ExMap[i].LocalTokenNumber;
+  for (Index = 0; Index < DXE_EXMAPPING_TABLE_SIZE; Index++) {
+    if ((ExTokenNumber == ExMap[Index].ExTokenNumber) &&
+         (MatchGuidIdx == ExMap[Index].ExGuidIndex)) {
+        return ExMap[Index].LocalTokenNumber;
     }
   }
 
@@ -891,8 +1078,15 @@ GetExPcdTokenNumber (
   return 0;
 }
 
+/**
+  Get SKU ID tabble from PCD database.
 
-STATIC
+  @param LocalTokenNumberTableIdx Index of local token number in token number table.
+  @param IsPeiPcd                 If TRUE, 
+
+  @return Pointer to SKU ID array table
+
+**/
 SKU_ID *
 GetSkuIdArray (
   IN    UINTN             LocalTokenNumberTableIdx,
@@ -920,7 +1114,17 @@ GetSkuIdArray (
 }
 
 
-STATIC
+/**
+  Get index of PCD entry in size table.
+
+  @param LocalTokenNumberTableIdx Index of this PCD in local token number table.
+  @param LocalTokenNumberTable    Pointer to local token number table in PCD database.
+  @param IsPeiDb                  If TRUE, the pcd entry is initialized in PEI phase,
+                                  If FALSE, the pcd entry is initialized in DXE phase.
+
+  @return index of PCD entry in size table.
+
+**/
 UINTN
 GetSizeTableIndexA (
   IN UINTN        LocalTokenNumberTableIdx,
@@ -928,22 +1132,22 @@ GetSizeTableIndexA (
   IN BOOLEAN      IsPeiDb
   )
 {
-  UINTN       i;
+  UINTN       Index;
   UINTN       SizeTableIdx;
   UINTN       LocalTokenNumber;
   SKU_ID      *SkuIdTable;
   
   SizeTableIdx = 0;
 
-  for (i=0; i<LocalTokenNumberTableIdx; i++) {
-    LocalTokenNumber = LocalTokenNumberTable[i];
+  for (Index=0; Index<LocalTokenNumberTableIdx; Index++) {
+    LocalTokenNumber = LocalTokenNumberTable[Index];
 
     if ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER) {
       //
       // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
       // PCD entry.
       //
-      if (LocalTokenNumber & PCD_TYPE_VPD) {
+      if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
           //
           // We have only one entry for VPD enabled PCD entry:
           // 1) MAX Size.
@@ -964,7 +1168,7 @@ GetSizeTableIndexA (
           // 1) MAX SIZE
           // 2) Current Size for each SKU_ID (It is equal to MaxSku).
           //
-          SkuIdTable = GetSkuIdArray (i, IsPeiDb);
+          SkuIdTable = GetSkuIdArray (Index, IsPeiDb);
           SizeTableIdx += (UINTN)*SkuIdTable + 1;
         }
       }
@@ -977,7 +1181,15 @@ GetSizeTableIndexA (
 
 
 
-STATIC
+/**
+  Wrapper function of getting index of PCD entry in size table.
+  
+  @param LocalTokenNumberTableIdx Index of this PCD in local token number table.
+  @param IsPeiDb                  If TRUE, the pcd entry is initialized in PEI phase,
+                                  If FALSE, the pcd entry is initialized in DXE phase.
+
+  @return index of PCD entry in size table.
+**/
 UINTN
 GetSizeTableIndex (
   IN    UINTN             LocalTokenNumberTableIdx,
@@ -992,12 +1204,19 @@ GetSizeTableIndex (
     LocalTokenNumberTable = mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
   }
   return GetSizeTableIndexA (LocalTokenNumberTableIdx, 
-                              LocalTokenNumberTable,
-                              IsPeiDb);
+                             LocalTokenNumberTable,
+                             IsPeiDb);
 }
 
+/**
+  Get size of POINTER type PCD value.
 
+  @param LocalTokenNumberTableIdx Index of local token number in local token number table.
+  @param MaxSize                  Maxmium size of POINTER type PCD value.
 
+  @return size of POINTER type PCD value.
+
+**/
 UINTN
 GetPtrTypeSize (
   IN    UINTN             LocalTokenNumberTableIdx,
@@ -1008,7 +1227,7 @@ GetPtrTypeSize (
   UINTN       LocalTokenNumber;
   SKU_ID      *SkuIdTable;
   SIZE_INFO   *SizeTable;
-  UINTN       i;
+  UINTN       Index;
   BOOLEAN     IsPeiDb;
   UINT32      *LocalTokenNumberTable;
 
@@ -1038,7 +1257,7 @@ GetPtrTypeSize (
   // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
   // PCD entry.
   //
-  if (LocalTokenNumber & PCD_TYPE_VPD) {
+  if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
       //
       // We have only one entry for VPD enabled PCD entry:
       // 1) MAX Size.
@@ -1060,9 +1279,9 @@ GetPtrTypeSize (
       // 2) Current Size for each SKU_ID (It is equal to MaxSku).
       //
       SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, IsPeiDb);
-      for (i = 0; i < SkuIdTable[0]; i++) {
-        if (SkuIdTable[1 + i] == mPcdDatabase->PeiDb.Init.SystemSkuId) {
-          return SizeTable[SizeTableIdx + 1 + i];
+      for (Index = 0; Index < SkuIdTable[0]; Index++) {
+        if (SkuIdTable[1 + Index] == mPcdDatabase->PeiDb.Init.SystemSkuId) {
+          return SizeTable[SizeTableIdx + 1 + Index];
         }
       }
       return SizeTable[SizeTableIdx + 1];
@@ -1070,8 +1289,16 @@ GetPtrTypeSize (
   }
 }
 
+/**
+  Set size of POINTER type PCD value. The size should not exceed the maxmium size
+  of this PCD value.
 
+  @param LocalTokenNumberTableIdx Index of local token number in local token number table.
+  @param CurrentSize              Size of POINTER type PCD value.
 
+  @retval TRUE  Success to set size of PCD value.
+  @retval FALSE Fail to set size of PCD value.
+**/
 BOOLEAN
 SetPtrTypeSize (
   IN          UINTN             LocalTokenNumberTableIdx,
@@ -1082,14 +1309,16 @@ SetPtrTypeSize (
   UINTN       LocalTokenNumber;
   SKU_ID      *SkuIdTable;
   SIZE_INFO   *SizeTable;
-  UINTN       i;
+  UINTN       Index;
   UINTN       MaxSize;
   BOOLEAN     IsPeiDb;
   UINT32      *LocalTokenNumberTable;
 
+  //
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
+  //
   IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
 
   if (IsPeiDb) {
@@ -1112,7 +1341,7 @@ SetPtrTypeSize (
   // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
   // PCD entry.
   //
-  if (LocalTokenNumber & PCD_TYPE_VPD) {
+  if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
       //
       // We shouldn't come here as we don't support SET for VPD
       //
@@ -1140,9 +1369,9 @@ SetPtrTypeSize (
       // 2) Current Size for each SKU_ID (It is equal to MaxSku).
       //
       SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, IsPeiDb);
-      for (i = 0; i < SkuIdTable[0]; i++) {
-        if (SkuIdTable[1 + i] == mPcdDatabase->PeiDb.Init.SystemSkuId) {
-          SizeTable[SizeTableIdx + 1 + i] = (SIZE_INFO) *CurrentSize;
+      for (Index = 0; Index < SkuIdTable[0]; Index++) {
+        if (SkuIdTable[1 + Index] == mPcdDatabase->PeiDb.Init.SystemSkuId) {
+          SizeTable[SizeTableIdx + 1 + Index] = (SIZE_INFO) *CurrentSize;
           return TRUE;
         }
       }
@@ -1151,4 +1380,3 @@ SetPtrTypeSize (
     }
   }
 }
-
