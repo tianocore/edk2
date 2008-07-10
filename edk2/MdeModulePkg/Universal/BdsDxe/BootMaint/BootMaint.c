@@ -35,9 +35,7 @@ CHAR16  mFileExplorerStorageName[] = L"FeData";
 /**
   Init all memu.
 
-  @param CallbackData    The 
-
-  @return EDES_TODO: Add description for return value
+  @param CallbackData    The BMM context data.
 
 **/
 VOID
@@ -46,11 +44,7 @@ InitAllMenu (
   );
 
 /**
-  EDES_TODO: Add function description.
-
-  @param VOID            EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  Free up all Menu Option list.
 
 **/
 VOID
@@ -737,7 +731,7 @@ Error:
   @param Private         The BMM context data.
   @param CurrentFakeNVMap The current Fack NV Map.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -787,10 +781,8 @@ DiscardChangeHandler (
 }
 
 /**
-  Initialize the Boot Maintenance Utitliy
+  Initialize the Boot Maintenance Utitliy.
 
-
-  @param VOID            EDES_TODO: Add parameter description
 
   @retval  EFI_SUCCESS      utility ended successfully
   @retval  others           contain some errors
@@ -1044,7 +1036,7 @@ InitializeBM (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1071,9 +1063,9 @@ InitAllMenu (
 /**
   Free up all Menu Option list.
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1094,9 +1086,9 @@ FreeAllMenu (
   Intialize all the string depositories.
 
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1119,8 +1111,8 @@ InitializeStringDepository (
   Fetch a usable string node from the string depository and return the string token.
 
 
-  @param CallbackData    EDES_TODO: Add parameter description
-  @param StringDepository - Pointer of the string depository.
+  @param CallbackData    The BMM context data.
+  @param StringDepository  The string repository.
 
   @retval  EFI_STRING_ID           String token.
 
@@ -1168,9 +1160,9 @@ GetStringTokenFromDepository (
   Reclaim string depositories by moving the current node pointer to list head..
 
 
-  @param VOID 
+   
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1192,9 +1184,9 @@ ReclaimStringDepository (
   Release resource for all the string depositories.
 
 
-  @param VOID
+  
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1232,7 +1224,7 @@ CleanUpStringDepository (
   Start boot maintenance manager
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS If BMM is invoked successfully.
   @return Other value if BMM return unsuccessfully.
@@ -1285,7 +1277,7 @@ BdsStartBootMaint (
   @param CallbackData    The BMM context data.
 
   @retval EFI_SUCCESS If function complete successfully.
-  @retturn Other value if the Setup Browser process BMM's pages and
+  @return Other value if the Setup Browser process BMM's pages and
            return unsuccessfully.
 
 **/

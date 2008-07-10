@@ -154,12 +154,7 @@ InitializeBootManager (
 }
 
 /**
-  Hook to enable UI timeout override behavior.
-
-
-  @param VOID            EDES_TODO: Add parameter description
-
-           EDES_TODO: Incomplete Descriptions  NONE
+  Invoke Boot Manager. Hook to enable UI timeout override behavior.
 
 **/
 VOID

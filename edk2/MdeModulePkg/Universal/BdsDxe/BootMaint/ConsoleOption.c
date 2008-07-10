@@ -58,8 +58,8 @@ UpdateComAttributeFromVariable (
 **/
 EFI_STATUS
 ChangeTerminalDevicePath (
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
-  IN BOOLEAN                   ChangeTerminal
+  IN OUT    EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN        BOOLEAN                   ChangeTerminal
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *Node;
@@ -172,7 +172,7 @@ ChangeTerminalDevicePath (
 
   @param DevicePath
 
-  @return VOID
+  
 
 **/
 VOID
@@ -287,7 +287,7 @@ RetrieveUartUid (
 }
 
 /**
-  Sort Uart handles array with Acpi->UID from low to high
+  Sort Uart handles array with Acpi->UID from low to high.
 
 
   @param Handles         EFI_SERIAL_IO_PROTOCOL handle buffer
@@ -353,12 +353,11 @@ IsTerminalDevicePath (
   );
 
 /**
-  Build a list containing all serial devices
+  Build a list containing all serial devices.
 
 
-  @param VOID            EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS The function complete successfully.
+  @retval EFI_UNSUPPORTED No serial ports present.
 
 **/
 EFI_STATUS
@@ -859,7 +858,7 @@ GetConsoleMenu (
   Build up ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
 
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS    The function always complete successfully.
 
@@ -879,7 +878,7 @@ GetAllConsoles (
   Free ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
 
 
-  @param VOID            EDES_TODO: Add parameter description
+              EDES_TODO: Add parameter description
 
   @retval EFI_SUCCESS    The function always complete successfully.
 **/
@@ -985,7 +984,7 @@ IsTerminalDevicePath (
 
   @param CallbackData    The BMM context data.
 
-  @return VOID
+  
 
 **/
 VOID
@@ -1005,7 +1004,7 @@ GetConsoleOutMode (
 
   ConOut   = gST->ConOut;
   MaxMode  = (UINTN) (ConOut->Mode->MaxMode);
-  ModeInfo = EfiLibGetVariable (VarConOutMode, &gEfiGenericPlatformVariableGuid);
+  ModeInfo = EfiLibGetVariable (VAR_CON_OUT_MODE, &gEfiGenericPlatformVariableGuid);
 
   if (ModeInfo != NULL) {
     CurrentCol = ModeInfo->Column;

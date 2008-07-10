@@ -501,11 +501,11 @@ BOpt_FindFileSystem (
 }
 
 /**
-  Free resources allocated in Allocate Rountine
+  Free resources allocated in Allocate Rountine.
 
   @param FreeMenu        Menu to be freed
 
-  @return VOID
+  
 
 **/
 VOID
@@ -531,10 +531,11 @@ BOpt_FreeMenu (
   All files and sub-directories in current directory
   will be stored in DirectoryMenu for future use.
 
-  @param FileOption  Pointer for Dir to explore.
+  @param CallbackData  The BMM context data.
+  @param MenuEntry     The Menu Entry.
 
-  @retval TRUE         Get files from current dir successfully.
-  @retval FALSE        Can't get files from current dir.
+  @retval EFI_SUCCESS         Get files from current dir successfully.
+  @return Other value if can't get files from current dir.
 
 **/
 EFI_STATUS
@@ -684,7 +685,7 @@ BOpt_FindFiles (
 /**
   Build the LegacyFDMenu LegacyHDMenu LegacyCDMenu according to LegacyBios.GetBbsInfo().
 
-  @param VOID
+  
 
   @retval EFI_SUCCESS The function complete successfully.
   @retval EFI_OUT_OF_RESOURCES No enough memory to complete this function.
@@ -824,9 +825,9 @@ BOpt_GetLegacyOptions (
 /**
   Free out resouce allocated from Legacy Boot Options.
 
-  @param VOID.
+  
 
-  @return VOID.
+  .
 
 **/
 VOID
@@ -846,7 +847,7 @@ BOpt_FreeLegacyOptions (
   Build the BootOptionMenu according to BootOrder Variable.
   This Routine will access the Boot#### to get EFI_LOAD_OPTION.
 
-  @param None
+  @param CallbackData The BMM context data.
 
   @return The number of the Var Boot####.
 
@@ -1242,7 +1243,7 @@ BOpt_IsEfiApp (
   All valid handles in the system except those consume SimpleFs, LoadFile
   are stored in DriverMenu for future use.
 
-  @param VOID 
+   
 
   @retval EFI_SUCCESS The function complets successfully.
   @return Other value if failed to build the DriverMenu.
@@ -1333,7 +1334,7 @@ BOpt_FindDrivers (
 
   Get the Option Number that has not been allocated for use.
 
-  @param VOID
+  
 
   @return The available Option Number.
 
@@ -1409,7 +1410,7 @@ BOpt_GetBootOptionNumber (
 
   Get the Option Number that is not in use.
 
-  @param VOID
+  
 
   @return The unused Option Number.
 

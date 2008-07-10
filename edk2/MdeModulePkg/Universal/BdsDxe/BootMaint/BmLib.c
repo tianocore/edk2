@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
 
   Find the first instance of this Protocol
-  in the system and return it's interface
+  in the system and return it's interface.
 
 
   @param ProtocolGuid    Provides the protocol to search for
@@ -174,10 +174,10 @@ EfiLibGetVariable (
   Function deletes the variable specified by VarName and VarGuid.
 
 
-  @param VarName         - A Null-terminated Unicode string that is
+  @param VarName           A Null-terminated Unicode string that is
                          the name of the vendor's variable.
                          
-  @param VendorGuid           - A unique identifier for the vendor.
+  @param VarGuid           A unique identifier for the vendor.
 
   @retval  EFI_SUCCESS           The variable was found and removed
   @retval  EFI_UNSUPPORTED       The variable store was inaccessible
@@ -437,10 +437,12 @@ EfiLibStrFromDatahub (
   UINT64                                      Count;
   EFI_DATA_RECORD_HEADER                      *Record;
   EFI_SUBCLASS_TYPE1_HEADER                   *DataHdr;
-  EFI_GUID                                    MiscGuid = EFI_MISC_SUBCLASS_GUID;
-  EFI_MISC_ONBOARD_DEVICE_DATA                *ob;
+  EFI_GUID                                    MiscGuid;
+  EFI_MISC_ONBOARD_DEVICE_DATA                *Ob;
   EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *Port;
   EFI_TIME                                    CurTime;
+
+  CopyGuid (&MiscGuid, &gEfiMiscSubClassGuid);
 
   Status = gBS->LocateProtocol (
                   &gEfiDataHubProtocolGuid,
@@ -470,9 +472,9 @@ EfiLibStrFromDatahub (
       //
       DataHdr = (EFI_SUBCLASS_TYPE1_HEADER *) (Record + 1);
       if (EFI_MISC_ONBOARD_DEVICE_RECORD_NUMBER == DataHdr->RecordType) {
-        ob = (EFI_MISC_ONBOARD_DEVICE_DATA *) (DataHdr + 1);
-        if (BdsLibMatchDevicePaths ((EFI_DEVICE_PATH_PROTOCOL *) &ob->OnBoardDevicePath, DevPath)) {
-          GetProducerString (&Record->ProducerName, ob->OnBoardDeviceDescription, &Desc);
+        Ob = (EFI_MISC_ONBOARD_DEVICE_DATA *) (DataHdr + 1);
+        if (BdsLibMatchDevicePaths ((EFI_DEVICE_PATH_PROTOCOL *) &Ob->OnBoardDevicePath, DevPath)) {
+          GetProducerString (&Record->ProducerName, Ob->OnBoardDeviceDescription, &Desc);
           return Desc;
         }
       }
