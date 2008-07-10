@@ -40,7 +40,9 @@ DEVICE_MANAGER_MENU_ITEM  mDeviceManagerMenuItemTable[] = {
   (sizeof (mDeviceManagerMenuItemTable) / sizeof (DEVICE_MANAGER_MENU_ITEM))
 
 /**
-  This function processes the results of changes in configuration.
+  This function is invoked if user selected a iteractive opcode from Device Manager's
+  Formset. The decision by user is saved to gCallbackKey for later processing. If
+  user set VBIOS, the new value is saved to EFI variable.
 
 
   @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
@@ -52,9 +54,7 @@ DEVICE_MANAGER_MENU_ITEM  mDeviceManagerMenuItemTable[] = {
   @param ActionRequest   On return, points to the action requested by the callback function.
 
   @retval  EFI_SUCCESS           The callback successfully handled the action.
-  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
-  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
-  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
+  @retval  EFI_INVALID_PARAMETER The setup browser call this function with invalid parameters.
 
 **/
 EFI_STATUS
@@ -112,12 +112,11 @@ DeviceManagerCallback (
 
 /**
 
-  Initialize HII information for the FrontPage
+  This function registers HII packages to HII database.
 
 
-  @param VOID            EDES_TODO: Add parameter description
-
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS This function complete successfully.
+  @return Other value if failed to register HII packages.
 
 **/
 EFI_STATUS
@@ -166,13 +165,17 @@ InitializeDeviceManager (
 
 /**
 
-  Call the browser and display the device manager
+  Call the browser and display the device manager to allow user
+  to configure the platform.
 
+  This function create the dynamic content for device manager. It includes
+  section header for all class of devices, one-of opcode to set VBIOS.
+  
 
-  @param VOID            EDES_TODO: Add parameter description
 
   @retval  EFI_SUCCESS             Operation is successful.
-  @retval  EFI_INVALID_PARAMETER   If the inputs to SendForm function is not valid.
+  @retval  Other values if failed to clean up the dynamic content from HII
+           database.
 
 **/
 EFI_STATUS
