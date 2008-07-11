@@ -45,38 +45,28 @@ EFI_WATCHDOG_TIMER_NOTIFY         mWatchdogTimerNotifyFunction = NULL;
 //
 EFI_EVENT                         mWatchdogTimerEvent;
 
-//
-// Worker Functions
-//
-STATIC
+
+/**
+  Notification function that is called if the watchdog timer is fired.  If a
+  handler has been registered with the Watchdog Timer Architectural Protocol,
+  then that handler is called passing in the time period that has passed that
+  cause the watchdog timer to fire.  Then, a call to the Runtime Service
+  ResetSystem() is made to reset the platform.
+
+
+  @param  Timer     The one-shot timer event that was signaled when the watchdog timer
+                         expired.
+  @param  Context   The context that was registered when the event Timer was created.
+
+  @return None.
+
+**/
 VOID
 EFIAPI
 WatchdogTimerDriverExpires (
   IN EFI_EVENT    Timer,
   IN VOID         *Context
   )
-/*++
-
-  Routine Description:
-
-    Notification function that is called if the watchdog timer is fired.  If a
-    handler has been registered with the Watchdog Timer Architectural Protocol,
-    then that handler is called passing in the time period that has passed that
-    cause the watchdog timer to fire.  Then, a call to the Runtime Service
-    ResetSystem() is made to reset the platform.
-
-  Arguments:
-
-    Timer   - The one-shot timer event that was signaled when the watchdog timer
-              expired.
-
-    Context - The context that was registered when the event Timer was created.
-
-  Returns:
-
-    None.
-
---*/
 {
   REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_MINOR, PcdGet32 (PcdStatusCodeValueEfiWatchDogTimerExpired));
 
@@ -93,16 +83,7 @@ WatchdogTimerDriverExpires (
 }
 
 
-EFI_STATUS
-EFIAPI
-WatchdogTimerDriverRegisterHandler (
-  IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *This,
-  IN EFI_WATCHDOG_TIMER_NOTIFY         NotifyFunction
-  )
-/*++
-
-Routine Description:
-
+/**
   This function registers a handler that is to be invoked when the watchdog
   timer fires.  By default, the EFI_WATCHDOG_TIMER protocol will call the
   Runtime Service ResetSystem() when the watchdog timer fires.  If a
@@ -114,25 +95,21 @@ Routine Description:
   If an attempt is made to uninstall a handler when a handler is not installed,
   then return EFI_INVALID_PARAMETER.
 
-Arguments:
+  @param  This                  The EFI_WATCHDOG_TIMER_ARCH_PROTOCOL instance.
+  @param  NotifyFunction        The function to call when the watchdog timer fires.  If this
+                                is NULL, then the handler will be unregistered.
 
-  This           - The EFI_WATCHDOG_TIMER_ARCH_PROTOCOL instance.
+  @return EFI_SUCCESS           The watchdog timer handler was registered or unregistered.
+  @return EFI_ALREADY_STARTED   NotifyFunction is not NULL, and a handler is already registered.
+  @return EFI_INVALID_PARAMETER NotifyFunction is NULL, and a handler was not previously registered.
 
-  NotifyFunction - The function to call when the watchdog timer fires.  If this
-                   is NULL, then the handler will be unregistered.
-
-Returns:
-
-  EFI_SUCCESS           - The watchdog timer handler was registered or
-                          unregistered.
-
-  EFI_ALREADY_STARTED   - NotifyFunction is not NULL, and a handler is already
-                          registered.
-
-  EFI_INVALID_PARAMETER - NotifyFunction is NULL, and a handler was not
-                          previously registered.
-
---*/
+**/
+EFI_STATUS
+EFIAPI
+WatchdogTimerDriverRegisterHandler (
+  IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *This,
+  IN EFI_WATCHDOG_TIMER_NOTIFY         NotifyFunction
+  )
 {
   if (NotifyFunction == NULL && mWatchdogTimerNotifyFunction == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -147,37 +124,28 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function sets the amount of time to wait before firing the watchdog
+  timer to TimerPeriod 100 nS units.  If TimerPeriod is 0, then the watchdog
+  timer is disabled.
+
+  @param  This              The EFI_WATCHDOG_TIMER_ARCH_PROTOCOL instance.
+  @param  TimerPeriod       The amount of time in 100 nS units to wait before the watchdog
+                            timer is fired.  If TimerPeriod is zero, then the watchdog
+                            timer is disabled.
+
+  @return EFI_SUCCESS       The watchdog timer has been programmed to fire in Time
+                            100 nS units.
+  @return EFI_DEVICE_ERROR  A watchdog timer could not be programmed due to a device
+                            error.
+
+**/
 EFI_STATUS
 EFIAPI
 WatchdogTimerDriverSetTimerPeriod (
   IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *This,
   IN UINT64                            TimerPeriod
   )
-/*++
-
-Routine Description:
-
-  This function sets the amount of time to wait before firing the watchdog
-  timer to TimerPeriod 100 nS units.  If TimerPeriod is 0, then the watchdog
-  timer is disabled.
-
-Arguments:
-
-  This        - The EFI_WATCHDOG_TIMER_ARCH_PROTOCOL instance.
-
-  TimerPeriod - The amount of time in 100 nS units to wait before the watchdog
-                timer is fired.  If TimerPeriod is zero, then the watchdog
-                timer is disabled.
-
-Returns:
-
-  EFI_SUCCESS      - The watchdog timer has been programmed to fire in Time
-                     100 nS units.
-
-  EFI_DEVICE_ERROR - A watchdog timer could not be programmed due to a device
-                     error.
-
---*/
 {
   mWatchdogTimerPeriod = TimerPeriod;
 
@@ -188,36 +156,27 @@ Returns:
                 );
 }
 
+/**
+  This function retrieves the amount of time the system will wait before firing
+  the watchdog timer.  This period is returned in TimerPeriod, and EFI_SUCCESS
+  is returned.  If TimerPeriod is NULL, then EFI_INVALID_PARAMETER is returned.
+
+  @param  This                    The EFI_WATCHDOG_TIMER_ARCH_PROTOCOL instance.
+  @param  TimerPeriod             A pointer to the amount of time in 100 nS units that the system
+                                  will wait before the watchdog timer is fired.  If TimerPeriod of
+                                  zero is returned, then the watchdog timer is disabled.
+
+  @return EFI_SUCCESS             The amount of time that the system will wait before
+                                  firing the watchdog timer was returned in TimerPeriod.
+  @return EFI_INVALID_PARAMETER   TimerPeriod is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 WatchdogTimerDriverGetTimerPeriod (
   IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *This,
   IN UINT64                            *TimerPeriod
   )
-/*++
-
-Routine Description:
-
-  This function retrieves the amount of time the system will wait before firing
-  the watchdog timer.  This period is returned in TimerPeriod, and EFI_SUCCESS
-  is returned.  If TimerPeriod is NULL, then EFI_INVALID_PARAMETER is returned.
-
-Arguments:
-
-  This        - The EFI_WATCHDOG_TIMER_ARCH_PROTOCOL instance.
-
-  TimerPeriod - A pointer to the amount of time in 100 nS units that the system
-                will wait before the watchdog timer is fired.  If TimerPeriod of
-                zero is returned, then the watchdog timer is disabled.
-
-Returns:
-
-  EFI_SUCCESS           - The amount of time that the system will wait before
-                          firing the watchdog timer was returned in TimerPeriod.
-
-  EFI_INVALID_PARAMETER - TimerPeriod is NULL.
-
---*/
 {
   if (TimerPeriod == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -228,33 +187,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Initialize the Watchdog Timer Architectural Protocol driver.
+
+  @param  ImageHandle             ImageHandle of the loaded driver.
+  @param  SystemTable             Pointer to the System Table.
+
+  @return EFI_SUCCESS             Timer Architectural Protocol created.
+
+**/
 EFI_STATUS
 EFIAPI
 WatchdogTimerDriverInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-  Initialize the Watchdog Timer Architectural Protocol driver
-
-Arguments:
-
-  ImageHandle - ImageHandle of the loaded driver
-
-  SystemTable - Pointer to the System Table
-
-Returns:
-
-  EFI_SUCCESS           - Timer Architectural Protocol created
-
-  EFI_OUT_OF_RESOURCES  - Not enough resources available to initialize driver.
-
-  EFI_DEVICE_ERROR      - A device error occured attempting to initialize the driver.
-
---*/
 {
   EFI_STATUS  Status;
 
