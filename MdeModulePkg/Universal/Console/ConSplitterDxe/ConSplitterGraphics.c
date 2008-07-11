@@ -330,6 +330,52 @@ ConSpliterGraphicsOutputSetMode (
   return ReturnStatus;
 }
 
+/**
+  The following table defines actions for BltOperations.
+
+  EfiBltVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY)
+  directly to every pixel of the video display rectangle
+  (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height).
+  Only one pixel will be used from the BltBuffer. Delta is NOT used.
+  EfiBltVideoToBltBuffer - Read data from the video display rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
+  the BltBuffer rectangle (DestinationX, DestinationY )
+  (DestinationX + Width, DestinationY + Height). If DestinationX or
+  DestinationY is not zero then Delta must be set to the length in bytes
+  of a row in the BltBuffer.
+  EfiBltBufferToVideo - Write data from the  BltBuffer rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
+  video display rectangle (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
+  not zero then Delta must be set to the length in bytes of a row in the
+  BltBuffer.
+  EfiBltVideoToVideo - Copy from the video display rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
+  to the video display rectangle (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height).
+  The BltBuffer and Delta  are not used in this mode.
+
+  @param  Private                 Protocol instance pointer.
+  @param  BltBuffer               Buffer containing data to blit into video buffer.
+                                  This buffer has a size of
+                                  Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+  @param  BltOperation            Operation to perform on BlitBuffer and video
+                                  memory
+  @param  SourceX                 X coordinate of source for the BltBuffer.
+  @param  SourceY                 Y coordinate of source for the BltBuffer.
+  @param  DestinationX            X coordinate of destination for the BltBuffer.
+  @param  DestinationY            Y coordinate of destination for the BltBuffer.
+  @param  Width                   Width of rectangle in BltBuffer in pixels.
+  @param  Height                  Hight of rectangle in BltBuffer in pixels. 
+  @param  Delta                   OPTIONAL.
+
+  @retval EFI_SUCCESS             The Blt operation completed.
+  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
+  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video
+                                  buffer.
+
+**/
 EFI_STATUS
 DevNullGraphicsOutputBlt (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA                *Private,
@@ -486,7 +532,7 @@ DevNullGraphicsOutputBlt (
   @param  DestinationY            Y coordinate of destination for the BltBuffer.
   @param  Width                   Width of rectangle in BltBuffer in pixels.
   @param  Height                  Hight of rectangle in BltBuffer in pixels. 
-  @param  Delta                   (not used here).
+  @param  Delta                   OPTIONAL.
 
   @retval EFI_SUCCESS             The Blt operation completed.
   @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
@@ -593,6 +639,20 @@ ConSpliterGraphicsOutputBlt (
   return ReturnStatus;
 }
 
+/**
+  Write data from the buffer to video display based on Graphics Output setting. 
+
+  @param  Private                 Consplitter Text Out pointer.
+  @param  GraphicsOutput          Graphics Output protocol pointer.
+  @param  UgaDraw                 UGA Draw protocol pointer.
+
+  @retval EFI_UNSUPPORTED         No graphics devcie available .
+  @retval EFI_SUCCESS             The Blt operation completed.
+  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
+  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video buffer.
+                 
+
+**/
 EFI_STATUS
 DevNullGopSync (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
@@ -799,6 +859,52 @@ ConSpliterUgaDrawSetMode (
   return ReturnStatus;
 }
 
+/**
+  The following table defines actions for BltOperations.
+
+  EfiBltVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY)
+  directly to every pixel of the video display rectangle
+  (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height).
+  Only one pixel will be used from the BltBuffer. Delta is NOT used.
+  EfiBltVideoToBltBuffer - Read data from the video display rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
+  the BltBuffer rectangle (DestinationX, DestinationY )
+  (DestinationX + Width, DestinationY + Height). If DestinationX or
+  DestinationY is not zero then Delta must be set to the length in bytes
+  of a row in the BltBuffer.
+  EfiBltBufferToVideo - Write data from the  BltBuffer rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
+  video display rectangle (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
+  not zero then Delta must be set to the length in bytes of a row in the
+  BltBuffer.
+  EfiBltVideoToVideo - Copy from the video display rectangle
+  (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
+  to the video display rectangle (DestinationX, DestinationY)
+  (DestinationX + Width, DestinationY + Height).
+  The BltBuffer and Delta  are not used in this mode.
+
+  @param  Private                 Protocol instance pointer.
+  @param  BltBuffer               Buffer containing data to blit into video buffer.
+                                  This buffer has a size of
+                                  Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+  @param  BltOperation            Operation to perform on BlitBuffer and video
+                                  memory
+  @param  SourceX                 X coordinate of source for the BltBuffer.
+  @param  SourceY                 Y coordinate of source for the BltBuffer.
+  @param  DestinationX            X coordinate of destination for the BltBuffer.
+  @param  DestinationY            Y coordinate of destination for the BltBuffer.
+  @param  Width                   Width of rectangle in BltBuffer in pixels.
+  @param  Height                  Hight of rectangle in BltBuffer in pixels. 
+  @param  Delta                   OPTIONAL.
+
+  @retval EFI_SUCCESS             The Blt operation completed.
+  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
+  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video
+                                  buffer.
+
+**/
 EFI_STATUS
 DevNullUgaBlt (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA                *Private,
@@ -955,7 +1061,7 @@ DevNullUgaBlt (
   @param  DestinationY            Y coordinate of destination for the BltBuffer.
   @param  Width                   Width of rectangle in BltBuffer in pixels.
   @param  Height                  Hight of rectangle in BltBuffer in pixels.
-  @param  Delta                   (not used here)
+  @param  Delta                   OPTIONAL.
 
   @retval EFI_SUCCESS             The Blt operation completed.
   @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
@@ -1059,6 +1165,19 @@ ConSpliterUgaDrawBlt (
   return ReturnStatus;
 }
 
+/**
+  Write data from the buffer to video display based on UGA Draw setting. 
+
+  @param  Private                 Consplitter Text Out pointer.
+  @param  GraphicsOutput          Graphics Output protocol pointer.
+  @param  UgaDraw                 UGA Draw protocol pointer.
+
+  @retval EFI_UNSUPPORTED         No graphics devcie available .
+  @retval EFI_SUCCESS             The Blt operation completed.
+  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
+  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video buffer.
+                  
+**/
 EFI_STATUS
 DevNullUgaSync (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
