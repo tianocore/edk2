@@ -218,7 +218,7 @@ BdsLibBootViaBootOption (
     //  machinename is ia32, ia64, x64, ...
     //
     FilePath = FileDevicePath (Handle, DEFAULT_REMOVABLE_FILE_NAME);
-    if (FilePath) {
+    if (FilePath != NULL) {
       Status = gBS->LoadImage (
                       TRUE,
                       mBdsImageHandle,
@@ -582,7 +582,7 @@ MatchPartitionDevicePathNode (
 
 
 /**
-  Delete the boot option associated with the handle passed in
+  Delete the boot option associated with the handle passed in.
 
   @param  Handle                 The handle which present the device path to create
                                  boot option
@@ -944,7 +944,7 @@ BdsLibEnumerateAllBootOption (
     }
   }
 
-  if (NumberBlockIoHandles) {
+  if (NumberBlockIoHandles != 0) {
     gBS->FreePool (BlockIoHandles);
   }
 
@@ -1006,7 +1006,7 @@ BdsLibEnumerateAllBootOption (
     }
   }
 
-  if (NumberFileSystemHandles) {
+  if (NumberFileSystemHandles != 0) {
     gBS->FreePool (FileSystemHandles);
   }
 
@@ -1029,7 +1029,7 @@ BdsLibEnumerateAllBootOption (
     BdsLibBuildOptionFromHandle (SimpleNetworkHandles[Index], BdsBootOptionList, Buffer);
   }
 
-  if (NumberSimpleNetworkHandles) {
+  if (NumberSimpleNetworkHandles != 0) {
     gBS->FreePool (SimpleNetworkHandles);
   }
 
@@ -1083,7 +1083,7 @@ BdsLibEnumerateAllBootOption (
     BdsLibBuildOptionFromShell (FvHandleBuffer[Index], BdsBootOptionList);
   }
 
-  if (FvHandleCount) {
+  if (FvHandleCount != 0) {
     gBS->FreePool (FvHandleBuffer);
   }
   //
@@ -1098,14 +1098,13 @@ BdsLibEnumerateAllBootOption (
 
 
 /**
-  Build the boot option with the handle parsed in
+  Build the boot option with the handle parsed in.
 
   @param  Handle                 The handle which present the device path to create
                                  boot option
   @param  BdsBootOptionList      The header of the link list which indexed all
                                  current boot options
-
-  @return VOID
+  @param  String                 Boot option name.
 
 **/
 VOID
@@ -1128,14 +1127,12 @@ BdsLibBuildOptionFromHandle (
 
 
 /**
-  Build the on flash shell boot option with the handle parsed in
+  Build the on flash shell boot option with the handle parsed in.
 
   @param  Handle                 The handle which present the device path to create
                                  on flash shell boot option
   @param  BdsBootOptionList      The header of the link list which indexed all
                                  current boot options
-
-  @return None
 
 **/
 VOID
@@ -1459,7 +1456,7 @@ BdsLibNetworkBootWithMediaPresent (
 
 
 /**
-  For a bootable Device path, return its boot type
+  For a bootable Device path, return its boot type.
 
   @param  DevicePath                      The bootable device Path to check
 
@@ -1547,8 +1544,8 @@ BdsGetBootTypeFromDevicePath (
   Check whether the Device path in a boot option point to a valide bootable device,
   And if CheckMedia is true, check the device is ready to boot now.
 
-  DevPath -- the Device path in a boot option
-  CheckMedia -- if true, check the device is ready to boot now.
+  @param DevPath -- the Device path in a boot option
+  @param CheckMedia -- if true, check the device is ready to boot now.
 
   @return TRUE      -- the Device path  is valide
   @return FALSE   -- the Device path  is invalide .

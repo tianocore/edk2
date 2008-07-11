@@ -19,21 +19,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 STATIC PERF_HEADER               mPerfHeader;
 STATIC PERF_DATA                 mPerfData;
 
-STATIC
+/**
+  Get the short verion of PDB file name to be
+  used in performance data logging.
+
+  @param PdbFileName     The long PDB file name.
+  @param GaugeString     The output string to be logged by performance logger.
+
+**/
 VOID
 GetShortPdbFileName (
-  CHAR8  *PdbFileName,
-  CHAR8  *GaugeString
+  IN  CONST CHAR8  *PdbFileName,
+  OUT       CHAR8  *GaugeString
   )
-/*++
-
-Routine Description:
-  
-Arguments:
-
-Returns:
-
---*/
 {
   UINTN Index;
   UINTN Index1;
@@ -72,7 +70,15 @@ Returns:
   return ;
 }
 
-STATIC
+/**
+  Get the name from the Driver handle, which can be a handle with
+  EFI_LOADED_IMAGE_PROTOCOL or EFI_DRIVER_BINDING_PROTOCOL installed.
+  This name can be used in performance data logging.
+
+  @param Handle          Driver handle.
+  @param GaugeString     The output string to be logged by performance logger.
+
+**/
 VOID
 GetNameFromHandle (
   IN  EFI_HANDLE     Handle,
@@ -126,25 +132,16 @@ GetNameFromHandle (
   return ;
 }
 
+/**
+
+  Allocates a block of memory and writes performance data of booting into it.
+  OS can processing these record.
+  
+**/
 VOID
 WriteBootToOsPerformanceData (
   VOID
   )
-/*++
-
-Routine Description:
-  
-  Allocates a block of memory and writes performance data of booting to OS into it.
-
-Arguments:
-  
-  None
-  
-Returns:
-
-  None
-
---*/
 {
   EFI_STATUS                Status;
   EFI_PHYSICAL_ADDRESS      AcpiLowMemoryBase;

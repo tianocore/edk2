@@ -21,45 +21,34 @@ EFI_GUID  mEfiDevicePathMessagingUartFlowControlGuid = DEVICE_PATH_MESSAGING_UAR
 EFI_GUID mEfiDevicePathMessagingSASGuid = DEVICE_PATH_MESSAGING_SAS;
 
 
+/**
+
+  Adjusts the size of a previously allocated buffer.
+
+
+  @param OldPool         A pointer to the buffer whose size is being adjusted.
+  @param OldSize         The size of the current buffer.
+  @param NewSize         The size of the new buffer.
+
+  @return The new buffer allocated. If allocatio failed, NULL will be returned.
+
+**/
 VOID *
 ReallocatePool (
   IN VOID                 *OldPool,
   IN UINTN                OldSize,
   IN UINTN                NewSize
   )
-/*++
-
-Routine Description:
-
-  Adjusts the size of a previously allocated buffer.
-
-Arguments:
-
-  OldPool               - A pointer to the buffer whose size is being adjusted.
-
-  OldSize               - The size of the current buffer.
-
-  NewSize               - The size of the new buffer.
-
-Returns:
-
-  EFI_SUCEESS           - The requested number of bytes were allocated.
-
-  EFI_OUT_OF_RESOURCES  - The pool requested could not be allocated.
-
-  EFI_INVALID_PARAMETER - The buffer was invalid.
-
---*/
 {
   VOID  *NewPool;
 
   NewPool = NULL;
-  if (NewSize) {
+  if (NewSize != 0) {
     NewPool = AllocateZeroPool (NewSize);
   }
 
-  if (OldPool) {
-    if (NewPool) {
+  if (OldPool != NULL) {
+    if (NewPool != NULL) {
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
@@ -78,9 +67,11 @@ Returns:
                    allocated.
   @param  fmt      The format string
 
+  @param  ...      Variable argument list.
+
   @return Allocated buffer with the formatted string printed in it.
-  @return The caller must free the allocated buffer.   The buffer
-  @return allocation is not packed.
+          The caller must free the allocated buffer.   The buffer
+          allocation is not packed.
 
 **/
 CHAR16 *
@@ -92,37 +83,37 @@ CatPrint (
   )
 {
   UINT16  *AppendStr;
-  VA_LIST args;
-  UINTN   strsize;
+  VA_LIST Args;
+  UINTN   StringSize;
 
   AppendStr = AllocateZeroPool (0x1000);
   if (AppendStr == NULL) {
     return Str->str;
   }
 
-  VA_START (args, fmt);
-  UnicodeVSPrint (AppendStr, 0x1000, fmt, args);
-  VA_END (args);
+  VA_START (Args, fmt);
+  UnicodeVSPrint (AppendStr, 0x1000, fmt, Args);
+  VA_END (Args);
   if (NULL == Str->str) {
-    strsize   = StrSize (AppendStr);
-    Str->str  = AllocateZeroPool (strsize);
+    StringSize   = StrSize (AppendStr);
+    Str->str  = AllocateZeroPool (StringSize);
     ASSERT (Str->str != NULL);
   } else {
-    strsize = StrSize (AppendStr);
-    strsize += (StrSize (Str->str) - sizeof (UINT16));
+    StringSize = StrSize (AppendStr);
+    StringSize += (StrSize (Str->str) - sizeof (UINT16));
 
     Str->str = ReallocatePool (
                 Str->str,
                 StrSize (Str->str),
-                strsize
+                StringSize
                 );
     ASSERT (Str->str != NULL);
   }
 
   Str->maxlen = MAX_CHAR * sizeof (UINT16);
-  if (strsize < Str->maxlen) {
+  if (StringSize < Str->maxlen) {
     StrCat (Str->str, AppendStr);
-    Str->len = strsize - sizeof (UINT16);
+    Str->len = StringSize - sizeof (UINT16);
   }
 
   gBS->FreePool (AppendStr);
@@ -170,7 +161,7 @@ BdsLibUnpackDevicePath (
   // Allocate space for the unpacked path
   //
   NewPath = AllocateZeroPool (Size);
-  if (NewPath) {
+  if (NewPath != NULL) {
 
     ASSERT (((UINTN) NewPath) % MIN_ALIGNMENT_SIZE == 0);
 
@@ -198,6 +189,16 @@ BdsLibUnpackDevicePath (
   return NewPath;
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathPci (
   IN OUT POOL_PRINT       *Str,
@@ -210,6 +211,16 @@ DevPathPci (
   CatPrint (Str, L"Pci(%x|%x)", (UINTN) Pci->Device, (UINTN) Pci->Function);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathPccard (
   IN OUT POOL_PRINT       *Str,
@@ -222,6 +233,16 @@ DevPathPccard (
   CatPrint (Str, L"Pcmcia(Function%x)", (UINTN) Pccard->FunctionNumber);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathMemMap (
   IN OUT POOL_PRINT       *Str,
@@ -240,6 +261,16 @@ DevPathMemMap (
     );
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathController (
   IN OUT POOL_PRINT       *Str,
@@ -254,12 +285,13 @@ DevPathController (
 
 
 /**
-  Convert Vendor device path to device name
+  Convert Device Path to a Unicode string for printing.
 
-  @param  Str      The buffer store device name
-  @param  DevPath  Pointer to vendor device path
-
-  @return When it return, the device name have been stored in *Str.
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
 
 **/
 VOID
@@ -350,9 +382,9 @@ DevPathVendor (
         CatPrint (
           Str,
           L"%s,%s,%s,",
-          (Info & (0x1 << 4)) ? L"SATA" : L"SAS",
-          (Info & (0x1 << 5)) ? L"External" : L"Internal",
-          (Info & (0x1 << 6)) ? L"Expanded" : L"Direct"
+          ((Info & (0x1 << 4)) != 0) ? L"SATA" : L"SAS",
+          ((Info & (0x1 << 5)) != 0) ? L"External" : L"Internal",
+          ((Info & (0x1 << 6)) != 0) ? L"Expanded" : L"Direct"
           );
         if ((Info & 0x0f) == 1) {
           CatPrint (Str, L"0,");
@@ -393,6 +425,16 @@ DevPathVendor (
 }
 
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathAcpi (
   IN OUT POOL_PRINT       *Str,
@@ -409,6 +451,16 @@ DevPathAcpi (
   }
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathExtendedAcpi (
   IN OUT POOL_PRINT       *Str,
@@ -443,7 +495,7 @@ DevPathExtendedAcpi (
   // find HIDSTR
   //
   Anchor = 16;
-  for (Index = Anchor; Index < Length && AsChar8Array[Index]; Index++) {
+  for (Index = Anchor; Index < Length && AsChar8Array[Index] != '\0'; Index++) {
     ;
   }
   if (Index > Anchor) {
@@ -453,7 +505,7 @@ DevPathExtendedAcpi (
   // find UIDSTR
   //
   Anchor = (UINT16) (Index + 1);
-  for (Index = Anchor; Index < Length && AsChar8Array[Index]; Index++) {
+  for (Index = Anchor; Index < Length && AsChar8Array[Index] != '\0'; Index++) {
     ;
   }
   if (Index > Anchor) {
@@ -463,7 +515,7 @@ DevPathExtendedAcpi (
   // find CIDSTR
   //
   Anchor = (UINT16) (Index + 1);
-  for (Index = Anchor; Index < Length && AsChar8Array[Index]; Index++) {
+  for (Index = Anchor; Index < Length && AsChar8Array[Index] != '\0'; Index++) {
     ;
   }
   if (Index > Anchor) {
@@ -520,6 +572,16 @@ DevPathExtendedAcpi (
 
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathAdrAcpi (
   IN OUT POOL_PRINT       *Str,
@@ -542,6 +604,16 @@ DevPathAdrAcpi (
   CatPrint (Str, L")");
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathAtapi (
   IN OUT POOL_PRINT       *Str,
@@ -559,6 +631,16 @@ DevPathAtapi (
     );
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathScsi (
   IN OUT POOL_PRINT       *Str,
@@ -571,6 +653,16 @@ DevPathScsi (
   CatPrint (Str, L"Scsi(Pun%x,Lun%x)", (UINTN) Scsi->Pun, (UINTN) Scsi->Lun);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathFibre (
   IN OUT POOL_PRINT       *Str,
@@ -583,18 +675,38 @@ DevPathFibre (
   CatPrint (Str, L"Fibre(Wwn%lx,Lun%x)", Fibre->WWN, Fibre->Lun);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPath1394 (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
   )
 {
-  F1394_DEVICE_PATH *F1394;
+  F1394_DEVICE_PATH *F1394Path;
 
-  F1394 = DevPath;
-  CatPrint (Str, L"1394(%g)", &F1394->Guid);
+  F1394Path = DevPath;
+  CatPrint (Str, L"1394(%g)", &F1394Path->Guid);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathUsb (
   IN OUT POOL_PRINT       *Str,
@@ -607,6 +719,16 @@ DevPathUsb (
   CatPrint (Str, L"Usb(%x,%x)", (UINTN) Usb->ParentPortNumber, (UINTN) Usb->InterfaceNumber);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathUsbWWID (
   IN OUT POOL_PRINT       *Str,
@@ -625,6 +747,16 @@ DevPathUsbWWID (
     );
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathLogicalUnit (
   IN OUT POOL_PRINT       *Str,
@@ -637,6 +769,16 @@ DevPathLogicalUnit (
   CatPrint (Str, L"Unit(%x)", (UINTN) LogicalUnit->Lun);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathUsbClass (
   IN OUT POOL_PRINT       *Str,
@@ -657,6 +799,16 @@ DevPathUsbClass (
     );
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathSata (
   IN OUT POOL_PRINT       *Str,
@@ -675,95 +827,145 @@ DevPathSata (
     );
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathI2O (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
   )
 {
-  I2O_DEVICE_PATH *I2O;
+  I2O_DEVICE_PATH *I2OPath;
 
-  I2O = DevPath;
-  CatPrint (Str, L"I2O(%x)", (UINTN) I2O->Tid);
+  I2OPath = DevPath;
+  CatPrint (Str, L"I2O(%x)", (UINTN) I2OPath->Tid);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathMacAddr (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
   )
 {
-  MAC_ADDR_DEVICE_PATH  *MAC;
+  MAC_ADDR_DEVICE_PATH  *MACDevPath;
   UINTN                 HwAddressSize;
   UINTN                 Index;
 
-  MAC           = DevPath;
+  MACDevPath           = DevPath;
 
   HwAddressSize = sizeof (EFI_MAC_ADDRESS);
-  if (MAC->IfType == 0x01 || MAC->IfType == 0x00) {
+  if (MACDevPath->IfType == 0x01 || MACDevPath->IfType == 0x00) {
     HwAddressSize = 6;
   }
 
   CatPrint (Str, L"Mac(");
 
   for (Index = 0; Index < HwAddressSize; Index++) {
-    CatPrint (Str, L"%02x", (UINTN) MAC->MacAddress.Addr[Index]);
+    CatPrint (Str, L"%02x", (UINTN) MACDevPath->MacAddress.Addr[Index]);
   }
 
   CatPrint (Str, L")");
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathIPv4 (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
   )
 {
-  IPv4_DEVICE_PATH  *IP;
+  IPv4_DEVICE_PATH  *IPDevPath;
 
-  IP = DevPath;
+  IPDevPath = DevPath;
   CatPrint (
     Str,
     L"IPv4(%d.%d.%d.%d:%d)",
-    (UINTN) IP->RemoteIpAddress.Addr[0],
-    (UINTN) IP->RemoteIpAddress.Addr[1],
-    (UINTN) IP->RemoteIpAddress.Addr[2],
-    (UINTN) IP->RemoteIpAddress.Addr[3],
-    (UINTN) IP->RemotePort
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[0],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[1],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[2],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[3],
+    (UINTN) IPDevPath->RemotePort
     );
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathIPv6 (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
   )
 {
-  IPv6_DEVICE_PATH  *IP;
+  IPv6_DEVICE_PATH  *IPv6DevPath;
 
-  IP = DevPath;
+  IPv6DevPath = DevPath;
   CatPrint (
     Str,
     L"IPv6(%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
-    (UINTN) IP->RemoteIpAddress.Addr[0],
-    (UINTN) IP->RemoteIpAddress.Addr[1],
-    (UINTN) IP->RemoteIpAddress.Addr[2],
-    (UINTN) IP->RemoteIpAddress.Addr[3],
-    (UINTN) IP->RemoteIpAddress.Addr[4],
-    (UINTN) IP->RemoteIpAddress.Addr[5],
-    (UINTN) IP->RemoteIpAddress.Addr[6],
-    (UINTN) IP->RemoteIpAddress.Addr[7],
-    (UINTN) IP->RemoteIpAddress.Addr[8],
-    (UINTN) IP->RemoteIpAddress.Addr[9],
-    (UINTN) IP->RemoteIpAddress.Addr[10],
-    (UINTN) IP->RemoteIpAddress.Addr[11],
-    (UINTN) IP->RemoteIpAddress.Addr[12],
-    (UINTN) IP->RemoteIpAddress.Addr[13],
-    (UINTN) IP->RemoteIpAddress.Addr[14],
-    (UINTN) IP->RemoteIpAddress.Addr[15]
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[0],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[1],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[2],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[3],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[4],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[5],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[6],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[7],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[8],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[9],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[10],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[11],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[12],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[13],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[14],
+    (UINTN) IPv6DevPath->RemoteIpAddress.Addr[15]
     );
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathInfiniBand (
   IN OUT POOL_PRINT       *Str,
@@ -784,6 +986,16 @@ DevPathInfiniBand (
     );
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathUart (
   IN OUT POOL_PRINT       *Str,
@@ -859,42 +1071,62 @@ DevPathUart (
   }
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathiSCSI (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
   )
 {
-  ISCSI_DEVICE_PATH_WITH_NAME *iSCSI;
+  ISCSI_DEVICE_PATH_WITH_NAME *IScsi;
   UINT16                      Options;
 
   ASSERT (Str != NULL);
   ASSERT (DevPath != NULL);
 
-  iSCSI = DevPath;
+  IScsi = DevPath;
   CatPrint (
     Str,
     L"iSCSI(%s,%x,%lx,",
-    iSCSI->iSCSITargetName,
-    iSCSI->TargetPortalGroupTag,
-    iSCSI->Lun
+    IScsi->iSCSITargetName,
+    IScsi->TargetPortalGroupTag,
+    IScsi->Lun
     );
 
-  Options = iSCSI->LoginOption;
-  CatPrint (Str, L"%s,", ((Options >> 1) & 0x0001) ? L"CRC32C" : L"None");
-  CatPrint (Str, L"%s,", ((Options >> 3) & 0x0001) ? L"CRC32C" : L"None");
-  if ((Options >> 11) & 0x0001) {
+  Options = IScsi->LoginOption;
+  CatPrint (Str, L"%s,", (((Options >> 1) & 0x0001) != 0) ? L"CRC32C" : L"None");
+  CatPrint (Str, L"%s,", (((Options >> 3) & 0x0001) != 0) ? L"CRC32C" : L"None");
+  if (((Options >> 11) & 0x0001) != 0) {
     CatPrint (Str, L"%s,", L"None");
-  } else if ((Options >> 12) & 0x0001) {
+  } else if (((Options >> 12) & 0x0001) != 0) {
     CatPrint (Str, L"%s,", L"CHAP_UNI");
   } else {
     CatPrint (Str, L"%s,", L"CHAP_BI");
 
   }
 
-  CatPrint (Str, L"%s)", (iSCSI->NetworkProtocol == 0) ? L"TCP" : L"reserved");
+  CatPrint (Str, L"%s)", (IScsi->NetworkProtocol == 0) ? L"TCP" : L"reserved");
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathHardDrive (
   IN OUT POOL_PRINT       *Str,
@@ -935,6 +1167,16 @@ DevPathHardDrive (
   }
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathCDROM (
   IN OUT POOL_PRINT       *Str,
@@ -947,6 +1189,16 @@ DevPathCDROM (
   CatPrint (Str, L"CDROM(Entry%x)", (UINTN) Cd->BootEntry);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathFilePath (
   IN OUT POOL_PRINT       *Str,
@@ -959,6 +1211,16 @@ DevPathFilePath (
   CatPrint (Str, L"%s", Fp->PathName);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathMediaProtocol (
   IN OUT POOL_PRINT       *Str,
@@ -971,6 +1233,16 @@ DevPathMediaProtocol (
   CatPrint (Str, L"Media(%g)", &MediaProt->Protocol);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathFvFilePath (
   IN OUT POOL_PRINT       *Str,
@@ -983,6 +1255,16 @@ DevPathFvFilePath (
   CatPrint (Str, L"%g", &FvFilePath->FvFileName);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathBssBss (
   IN OUT POOL_PRINT       *Str,
@@ -1029,6 +1311,16 @@ DevPathBssBss (
   CatPrint (Str, L"Legacy-%s", Type);
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathEndInstance (
   IN OUT POOL_PRINT       *Str,
@@ -1038,6 +1330,16 @@ DevPathEndInstance (
   CatPrint (Str, L",");
 }
 
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
 VOID
 DevPathNodeUnknown (
   IN OUT POOL_PRINT       *Str,
@@ -1289,12 +1591,12 @@ LibDuplicateDevicePathInstance (
   // Make a copy
   //
   NewDevPath = NULL;
-  if (Size) {
+  if (Size != 0) {
     NewDevPath = AllocateZeroPool (Size);
     ASSERT (NewDevPath != NULL);
   }
 
-  if (NewDevPath) {
+  if (NewDevPath != NULL) {
     CopyMem (NewDevPath, DevicePathInst, Size);
   }
 

@@ -12,18 +12,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//@MT:#include "Tiano.h"
-//@MT:#include "EfiDriverLib.h"
-
-//@MT:#include EFI_PROTOCOL_DEFINITION (LegacyBios)
-
 #include "InternalBdsLib.h"
 
 UINT8 mShadowRomFlag = 0;
 
+/**
+  Shadow all opton ROM if the it is not done.
+**/
 VOID
-EFIAPI
-ShadowAllOptionRom()
+ShadowAllOptionRom(
+  VOID
+  )
 {
   EFI_STATUS                Status;
   EFI_LEGACY_BIOS_PROTOCOL  *LegacyBios;

@@ -309,7 +309,7 @@ BdsLibConnectAllDriversToAllControllers (
 
 /**
   Connect the specific Usb device which match the short form device path,
-  and whose bus is determined by Host Controller (Uhci or Ehci)
+  and whose bus is determined by Host Controller (Uhci or Ehci).
 
   @param  HostControllerPI      Uhci (0x00) or Ehci (0x20) or Both uhci and ehci
                                 (0xFF)

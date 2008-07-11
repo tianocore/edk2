@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _BM_MACHINE_H
-#define _BM_MACHINE_H
+#ifndef _BM_MACHINE_H_
+#define _BM_MACHINE_H_
 
 //
 // NOTE: This is not defined in UEFI spec.

@@ -17,8 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define MAX_STRING_LEN        200
 
-static BOOLEAN   mFeaturerSwitch = TRUE;
-static BOOLEAN   mResetRequired = FALSE;
+BOOLEAN   mFeaturerSwitch = TRUE;
+BOOLEAN   mResetRequired = FALSE;
 
 extern UINT16 gPlatformBootTimeOutDefault;
 
@@ -174,8 +174,8 @@ BdsLibLoadDrivers (
 
 
 /**
-  Get the Option Number that does not used
-  Try to locate the specific option variable one by one untile find a free number
+  Get the Option Number that does not used.
+  Try to locate the specific option variable one by one untile find a free number.
 
   @param  VariableName          Indicate if the boot#### or driver#### option
 
@@ -432,7 +432,7 @@ BdsLibRegisterNewOption (
 
 /**
   Build the boot#### or driver#### option from the VariableName, the
-  build boot#### or driver#### will also be linked to BdsCommonOptionList
+  build boot#### or driver#### will also be linked to BdsCommonOptionList.
 
   @param  BdsCommonOptionList   The header of the boot#### or driver#### option
                                 link list
@@ -774,7 +774,7 @@ BdsLibMatchDevicePaths (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathInst;
   UINTN                     Size;
 
-  if (!Multi || !Single) {
+  if (Multi != NULL || Single  != NULL) {
     return FALSE;
   }
 
@@ -820,19 +820,19 @@ BdsLibOutputStrings (
   ...
   )
 {
-  VA_LIST     args;
+  VA_LIST     Args;
   EFI_STATUS  Status;
   CHAR16      *String;
 
   Status = EFI_SUCCESS;
-  VA_START (args, ConOut);
+  VA_START (Args, ConOut);
 
   while (!EFI_ERROR (Status)) {
     //
     // If String is NULL, then it's the end of the list
     //
-    String = VA_ARG (args, CHAR16 *);
-    if (!String) {
+    String = VA_ARG (Args, CHAR16 *);
+    if (String != NULL) {
       break;
     }
 
@@ -992,13 +992,12 @@ SetupResetReminder (
 
 
 /**
-  Get the headers (dos, image, optional header) from an image
+  Get the headers (dos, image, optional header) from an image.
 
   @param  Device                SimpleFileSystem device handle
   @param  FileName              File name for the image
   @param  DosHeader             Pointer to dos header
-  @param  ImageHeader           Pointer to image header
-  @param  OptionalHeader        Pointer to optional header
+  @param  Hdr                   Pointer to optional header
 
   @retval EFI_SUCCESS           Successfully get the machine type.
   @retval EFI_NOT_FOUND         The file is not found.
@@ -1130,30 +1129,25 @@ BdsLibGetImageHeader (
   return Status;
 }
 
+/**
+
+  This routine is a notification function for legayc boot or exit boot
+  service event. It will adjust the memory information for different
+  memory type and save them into the variables for next boot.
+
+
+  @param Event           The event that triggered this notification function.
+  @param Context         Pointer to the notification functions context.
+
+           EDES_TODO: Incomplete Descriptions  None.
+
+**/
 VOID
 EFIAPI
 BdsSetMemoryTypeInformationVariable (
   EFI_EVENT  Event,
   VOID       *Context
   )
-/*++
-
-Routine Description:
-
-  This routine is a notification function for legayc boot or exit boot
-  service event. It will adjust the memory information for different
-  memory type and save them into the variables for next boot
-
-Arguments:
-
-  Event    - The event that triggered this notification function
-  Context  - Pointer to the notification functions context
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_STATUS                   Status;
   EFI_MEMORY_TYPE_INFORMATION  *PreviousMemoryTypeInformation;
@@ -1253,7 +1247,7 @@ Returns:
 
 /**
   This routine register a function to adjust the different type memory page number just before booting
-  and save the updated info into the variable for next boot to use
+  and save the updated info into the variable for next boot to use.
 
 **/
 VOID

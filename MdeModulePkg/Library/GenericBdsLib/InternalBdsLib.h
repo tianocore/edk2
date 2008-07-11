@@ -85,6 +85,12 @@ typedef struct {
   UINT32        Signiture;
 } PERF_HEADER;
 
+/**
+
+  Allocates a block of memory and writes performance data of booting into it.
+  OS can processing these record.
+  
+**/
 VOID
 WriteBootToOsPerformanceData (
   VOID
