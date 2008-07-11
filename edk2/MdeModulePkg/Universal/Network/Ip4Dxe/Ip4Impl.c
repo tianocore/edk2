@@ -796,7 +796,7 @@ Ip4StationAddressValid (
     return FALSE;
   }
 
-  NetBrdcastMask = mIp4AllMasks[MIN (Len, Type << 3)];
+  NetBrdcastMask = gIp4AllMasks[MIN (Len, Type << 3)];
 
   if (Ip == (Ip | ~NetBrdcastMask)) {
     return FALSE;

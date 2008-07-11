@@ -22,6 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#define EFI_SECITON_SIZE_MASK 0x00ffffff
+
 typedef struct {
   EFI_GUID_DEFINED_SECTION  GuidedSectionHeader;
   UINT32                    CRC32Checksum;
@@ -64,7 +66,7 @@ Crc32GuidedSectionGetInfo (
   //
   *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
   *ScratchBufferSize = 0;
-  *OutputBufferSize  = *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff;
+  *OutputBufferSize  = *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & EFI_SECITON_SIZE_MASK;
   *OutputBufferSize  -= ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset;
 
   return EFI_SUCCESS;
@@ -117,7 +119,7 @@ Crc32GuidedSectionHandler (
   //
   Crc32SectionHeader = (CRC32_SECTION_HEADER *) InputSection;
   *OutputBuffer      = (UINT8 *) InputSection + Crc32SectionHeader->GuidedSectionHeader.DataOffset;
-  OutputBufferSize   = *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff; 
+  OutputBufferSize   = *(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & EFI_SECITON_SIZE_MASK; 
   OutputBufferSize   -= Crc32SectionHeader->GuidedSectionHeader.DataOffset;
 
   //
