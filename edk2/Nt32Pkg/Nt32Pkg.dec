@@ -1,62 +1,56 @@
-#/** @file
-# EFI/PI Reference Module Package for All Architectures
+## @file
+# This package is a platform package that provide platform module/library 
+# required by NT32 platform.
 #
-# This DEC file is used for Package Level build.
+# File/Directory Orignazation:
+# |- Sec            : Emulation SecCore for Nt32 platform
+# |- *Pei           : PEIM drivers
+# |- *Dxe           : DXE drivers
+# |- Nt32Pkg.dec    : This file
+# |- Nt32Pkg.dsc    : Nt32 platform DSC file
+# |- Nt32Pkg.fdf    : Flash description file for Nt32Pkg. It is used for creating FD file.
+# |- Include        : Include files for Nt32Pkg
+# 
 #
 # Copyright (c) 2007, Intel Corporation. <BR>
 #
-#  All rights reserved. This program and the accompanying materials
-#    are licensed and made available under the terms and conditions of the BSD License
-#    which accompanies this distribution. The full text of the license may be found at
-#    http://opensource.org/licenses/bsd-license.php
+# All rights reserved. This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
 #
-#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+#
 
-
-################################################################################
+## Basic definitions for Nt32 package.
 #
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
 
 [Defines]
-
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = Nt32Pkg
   PACKAGE_GUID                   = 0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3
   PACKAGE_VERSION                = 0.1
 
-################################################################################
+##
+# Include Paths that are provided by this package.
 #
-# Include Section - list of Include Paths that are provided by this package.
-#                   Comments are used for Keywords and Module Types.
-#
-# Supported Module Types:
-#  SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER
-#
-################################################################################
 [Includes.common]
   Include                        # Root include for the package
 
-
-################################################################################
+##
+# LibraryClasses provided by Nt32Pkg for all architecture. 
 #
-# Library Class Header section - list of Library Class header files that are
-#                                provided by this package.
-#
-################################################################################
 [LibraryClasses.common]
+  ##
+  #  Expose EFI_WIN_NT_THUNK_PROTOCOL's interface, this protocol wrapper all 
+  #  necessary Window API used by Nt32 enumlation environment.
   WinNtLib|Include/Library/WinNtLib.h
 
-################################################################################
+##
+# Guids provided by Nt32Pkg for all architecture.
 #
-# Global Guid Definition section - list of Global Guid C Name Data Structures
-#                                  that are provided by this package.
-#
-################################################################################
 [Guids.common]
   gEfiWinNtPassThroughGuid       = { 0xCC664EB8, 0x3C24, 0x4086, { 0xB6, 0xF6, 0x34, 0xE8, 0x56, 0xBC, 0xE3, 0x6E }}
   gEfiWinNtConsoleGuid           = { 0xBA73672C, 0xA5D3, 0x11D4, { 0xBD, 0x00, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
@@ -69,37 +63,33 @@
   gEfiNt32PkgTokenSpaceGuid      = { 0x0D79A645, 0x1D91, 0x40a6, { 0xA8, 0x1F, 0x61, 0xE6, 0x98, 0x2B, 0x32, 0xB4 }}
   
 
-################################################################################
+##
+# Protocols provided by Nt32Pkg for all architecture.
 #
-# Global Protocols Definition section - list of Global Protocols C Name Data
-#                                  Structures that are provided by this package.
-#
-################################################################################
 [Protocols.common]
   gWinNtBusDriverGuid            = { 0x0419f582, 0x0625, 0x4531, { 0x8a, 0x33, 0x85, 0xa9, 0x96, 0x5c, 0x95, 0xbc }}
   gEfiWinNtThunkProtocolGuid     = { 0x58C518B1, 0x76F3, 0x11D4, { 0xBC, 0xEA, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
   gEfiWinNtIoProtocolGuid        = { 0x96EB4AD6, 0xA32A, 0x11D4, { 0xBC, 0xFD, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }}
 
-################################################################################
+##
+# Ppis provide by Nt32Pkg for all architecture
 #
-# Global Ppis Definition section - list of Global Ppis C Name Data Structures
-#                                  that are provided by this package.
-#
-################################################################################
 [Ppis.common]
+  ## This PPI wrapper all necessary windows API used by PEI driver in NT32 environment.
   gPeiNtThunkPpiGuid             = { 0x98c281e5, 0xf906, 0x43dd, { 0xa9, 0x2b, 0xb0, 0x03, 0xbf, 0x27, 0x65, 0xda }}
+  ## This PPI provide system memory scan interface which simulate real platform perform
+  # memory's auto scan.
   gPeiNtAutoScanPpiGuid          = { 0x0dce384d, 0x007c, 0x4ba5, { 0x94, 0xbd, 0x0f, 0x6e, 0xb6, 0x4d, 0x2a, 0xa9 }}
+  ## This PPI provide interace to loads and relocates a PE/COFF image into memory.
   gNtPeiLoadFilePpiGuid          = { 0xfd0c65eb, 0x0405, 0x4cd2, { 0x8a, 0xee, 0xf4, 0x0, 0xef, 0x13, 0xba, 0xc2 }}
+  ## This PPI instance hold information for an simulated firmware device.
   gNtFwhPpiGuid                  = { 0x4e76928f, 0x50ad, 0x4334, {0xb0, 0x6b, 0xa8, 0x42, 0x13, 0x10, 0x8a, 0x57 }}
   
-################################################################################
+## This section list all "Fixed At Build" type PCD produced by NT32 package.
 #
-# PCD Declarations section - list of all PCDs Declared by this Package
-#                            Only this package should be providing the
-#                            declaration, other packages should not.
+# "Fixed At Build" type PCD can be seems as constant and its value will not be 
+# changed after customized in DSC file.
 #
-################################################################################
-
 [PcdsFixedAtBuild.common]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1|UINT32|0x00001006
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
@@ -117,6 +107,11 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase|0x0|UINT32|0x00001016
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress|0x0|UINT32|0x00001017
 
+## This section list all "Dynamic" type PCD produced by NT32 package.
+# 
+# "Dynamic" type PCD will be managed by PCD database driver at execution time.
+# its value can be modified by PCD_PPI/PCD_PROTOCOL at execution time.
+#
 [PcdsDynamic.common]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtPhysicalDisk|L"E:RW;245760;512"|VOID*|0x00001000
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtVirtualDisk|L"FW;40960;512"|VOID*|0x00001001
@@ -127,6 +122,11 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtConsole|L"Bus Driver Console Window"|VOID*|0x0000100a
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtGop|L"UGA Window 1!UGA Window 2"|VOID*|0x0000100d
 
+## This section list all "PatchableInModule" type PCD produced by NT32 package.
+# "PatchableInModule" type PCD can be seems as global variable and its value is 
+# stored in PE file data section of module. This type PCD mainly is designed for 
+# binary module. 
+#
 [PcdsPatchableInModule.common]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1|UINT32|0x00001006
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
