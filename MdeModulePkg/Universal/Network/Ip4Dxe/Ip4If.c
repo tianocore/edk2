@@ -554,7 +554,7 @@ Ip4SetAddress (
 
   Type                      = NetGetIpClass (IpAddr);
   Len                       = NetGetMaskLength (SubnetMask);
-  Netmask                   = mIp4AllMasks[MIN (Len, Type << 3)];
+  Netmask                   = gIp4AllMasks[MIN (Len, Type << 3)];
   Interface->NetBrdcast     = (IpAddr | ~Netmask);
 
   //

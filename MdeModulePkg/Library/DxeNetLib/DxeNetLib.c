@@ -43,7 +43,7 @@ EFI_DPC_PROTOCOL *mDpc = NULL;
 //
 // All the supported IP4 maskes in host byte order.
 //
-IP4_ADDR  mIp4AllMasks[IP4_MASK_NUM] = {
+IP4_ADDR  gIp4AllMasks[IP4_MASK_NUM] = {
   0x00000000,
   0x80000000,
   0xC0000000,
@@ -104,7 +104,7 @@ NetGetMaskLength (
   INTN                      Index;
 
   for (Index = 0; Index < IP4_MASK_NUM; Index++) {
-    if (NetMask == mIp4AllMasks[Index]) {
+    if (NetMask == gIp4AllMasks[Index]) {
       break;
     }
   }
@@ -179,7 +179,7 @@ Ip4IsUnicast (
   }
 
   if (NetMask == 0) {
-    NetMask = mIp4AllMasks[Class << 3];
+    NetMask = gIp4AllMasks[Class << 3];
   }
 
   if (((Ip &~NetMask) == ~NetMask) || ((Ip &~NetMask) == 0)) {

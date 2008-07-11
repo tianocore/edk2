@@ -409,7 +409,7 @@ DhcpLeaseAcquired (
 
   if (DhcpSb->Netmask == 0) {
     Class           = NetGetIpClass (DhcpSb->ClientAddr);
-    DhcpSb->Netmask = mIp4AllMasks[Class << 3];
+    DhcpSb->Netmask = gIp4AllMasks[Class << 3];
   }
 
   if (DhcpSb->LeaseIoPort != NULL) {
