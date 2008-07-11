@@ -2019,6 +2019,15 @@ ConSplitterAbsolutePointerDeleteDevice (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Reallocate Text Out mode map.
+
+  @param  Private                  Consplitter Text Out pointer.
+
+  @retval EFI_SUCCESS              Buffer size has grown
+  @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
+
+**/
 EFI_STATUS
 ConSplitterGrowMapTable (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
@@ -2240,10 +2249,10 @@ ConSplitterGetIntersection (
 /**
   Add the device's output mode to console splitter's mode list.
 
-  @param  Private               Text Out Splitter pointer
+  @param  Private               Text Out Splitter pointer.
   @param  TextOut               Simple Text Output protocol pointer.
   
-  @reture None
+  @return None
 
 **/
 VOID
@@ -2743,7 +2752,7 @@ Done:
   from ConsoleOutMode variable and set it; if the variable does not exist,
   set to user defined console mode.
 
-  None
+  @param  Private            Consplitter Text Out pointer.
 
   @return None
 
@@ -3154,7 +3163,7 @@ ConSplitterTextInReset (
   Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existance of a keystroke via WaitForEvent () call.
 
-  @param  This                     Protocol instance pointer.
+  @param  Private                  Protocol instance pointer.
   @param  Key                      Driver may perform diagnostics on reset.
 
   @retval EFI_SUCCESS              The keystroke information was returned.
@@ -3304,6 +3313,8 @@ ConSpliterConsoleControlLockStdInEvent (
   timer. If the Password is too big return an error. If the Password is valid
   Copy the Password and enable state variable and then arm the periodic timer
 
+  @param  This                     Console Control protocol pointer.
+  @param  Password                 The password input.
 
   @retval EFI_SUCCESS              Lock the StdIn device
   @retval EFI_INVALID_PARAMETER    Password is NULL
@@ -3894,7 +3905,8 @@ ConSplitterSimplePointerReset (
   Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existance of a keystroke via WaitForEvent () call.
 
-  @param  This                     Protocol instance pointer. State  -
+  @param  Private                  Protocol instance pointer.
+  @param  State                    The state information of simple pointer device.
 
   @retval EFI_SUCCESS              The keystroke information was returned.
   @retval EFI_NOT_READY            There was no keystroke data availiable.
@@ -4298,7 +4310,7 @@ ConSplitterTextOutReset (
   Write a Unicode string to the output device.
 
   @param  This                     Protocol instance pointer.
-  @param  String                   The NULL-terminated Unicode string to be
+  @param  WString                  The NULL-terminated Unicode string to be
                                    displayed on the output device(s). All output
                                    devices must also support the Unicode drawing
                                    defined in this file.
@@ -4379,7 +4391,7 @@ ConSplitterTextOutOutputString (
   target device.
 
   @param  This                     Protocol instance pointer.
-  @param  String                   The NULL-terminated Unicode string to be
+  @param  WString                  The NULL-terminated Unicode string to be
                                    examined for the output device(s).
 
   @retval EFI_SUCCESS              The device(s) are capable of rendering the
@@ -4432,7 +4444,9 @@ ConSplitterTextOutTestString (
 
   @param  This                     Protocol instance pointer.
   @param  ModeNumber               The mode number to return information on.
-  @param  Rows                     Returns the geometry of the text output device
+  @param  Columns                  Returns the columns of the text output device
+                                   for the requested ModeNumber.
+  @param  Rows                     Returns the rows of the text output device
                                    for the requested ModeNumber.
 
   @retval EFI_SUCCESS              The requested mode information was returned.
@@ -4681,9 +4695,12 @@ ConSplitterTextOutClearScreen (
   Sets the current coordinates of the cursor position
 
   @param  This                     Protocol instance pointer.
-  @param  Row                      the position to set the cursor to. Must be
+  @param  Column                   The column position to set the cursor to. Must be
                                    greater than or equal to zero and less than the
-                                   number of columns and rows by QueryMode ().
+                                   number of columns by QueryMode ().
+  @param  Row                      The row position to set the cursor to. Must be
+                                   greater than or equal to zero and less than the
+                                   number of rows by QueryMode ().
 
   @retval EFI_SUCCESS              The operation completed successfully.
   @retval EFI_DEVICE_ERROR         The device had an error and could not complete
