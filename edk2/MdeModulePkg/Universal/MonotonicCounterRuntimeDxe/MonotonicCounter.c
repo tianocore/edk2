@@ -1,7 +1,8 @@
 /** @file
+  
   Produced the Monotonic Counter Services as defined in the DXE CIS.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -40,24 +41,29 @@ CHAR16      *mEfiMtcName = (CHAR16 *) L"MTC";
 //
 EFI_GUID    mEfiMtcGuid = { 0xeb704011, 0x1402, 0x11d3, { 0x8e, 0x77, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
 
-//
-// Worker functions
-//
-STATIC
+/**
+  Returns the low 32 bits of the platform's monotonic counter.
+
+  The platform's monotonic counter is comprised of two 32 bit quantities:  
+  the high 32 bits and the low 32 bits.
+  During boot service time the low 32 bit value is volatile:  it is reset to
+  zero on every system reset and is increased by 1 on every call to this function.
+  This function is only available at boot services time.
+  Before calling ExitBootServices() the operating system would call this function
+  to obtain the current platform monotonic count. 
+
+  @param  Count	                Pointer to returned value.
+
+  @retval EFI_INVALID_PARAMETER If Count is NULL.
+  @retval EFI_SUCCESS           Operation is successful.
+  @retval EFI_UNSUPPORTED       If this function is called at Runtime.
+
+**/
 EFI_STATUS
 EFIAPI
 MonotonicCounterDriverGetNextMonotonicCount (
   OUT UINT64  *Count
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_TPL OldTpl;
 
@@ -116,7 +122,7 @@ Returns:
 
   This function may only be called at Runtime.
 
-  @param[out]   HighCount	Pointer to returned value.
+  @param  HighCount	            Pointer to returned value.
 
   @retval EFI_INVALID_PARAMETER If HighCount is NULL.
   @retval EFI_SUCCESS           Operation is successful.
@@ -125,21 +131,11 @@ Returns:
   @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 MonotonicCounterDriverGetNextHighMonotonicCount (
   OUT UINT32  *HighCount
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_TPL     OldTpl;
 
@@ -175,52 +171,42 @@ Returns:
 
 }
 
-STATIC
+/**
+  Monotonic count event handler.  This handler updates the high monotonic count.
+
+  @param Event           The event to handle.
+  @param Context         The event context.
+
+  @return None.
+
+**/
 VOID
 EFIAPI
 EfiMtcEventHandler (
   IN EFI_EVENT                Event,
   IN VOID                     *Context
   )
-/*++
-
-Routine Description:
-
-  Monotonic count event handler.  This handler updates the high monotonic count.
-
-Arguments:
-
-  Event         The event to handle
-  Context       The event context
-
-Returns:
-
-  EFI_SUCCESS       The event has been handled properly
-  EFI_NOT_FOUND     An error occurred updating the variable.
-
---*/
 {
   UINT32  HighCount;
 
   MonotonicCounterDriverGetNextHighMonotonicCount (&HighCount);
 }
 
+/**
+  The initial function of monotonic counter driver.
+
+  @param  ImageHandle     The handle of image.
+  @param  SystemTable     The pointer to system table.
+
+  @return EFI_SUCCESS     The initialize action is successful.
+
+**/
 EFI_STATUS
 EFIAPI
 MonotonicCounterDriverInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-Arguments:
-  (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
-
-Returns:
-
---*/
 {
   EFI_STATUS  Status;
   UINT32      HighCount;

@@ -27,9 +27,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-//
-// Function Prototypes
-//
+/**
+  The initial function of monotonic counter driver.
+
+  @param  ImageHandle     The handle of image.
+  @param  SystemTable     The pointer to system table.
+
+  @return EFI_SUCCESS     The initialize action is successful.
+
+**/
 EFI_STATUS
 EFIAPI
 MonotonicCounterDriverInitialize (
