@@ -30,7 +30,6 @@
   @param  Delay Number of ticks to delay.
 
 **/
-STATIC
 VOID
 InternalIpfDelay (
   IN      INT64                     Delay

@@ -34,10 +34,10 @@
 #
 
 [Sources.Ia32]
-  x86TimerLib.c
+  X86TimerLib.c
 
 [Sources.X64]
-  x86TimerLib.c
+  X86TimerLib.c
 
 [Sources.IPF]
   IpfTimerLib.c
