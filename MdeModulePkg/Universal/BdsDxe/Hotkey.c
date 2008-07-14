@@ -112,7 +112,7 @@ RegisterHotkey (
   //
 
   KeyOrder = BdsLibGetVariableAndSize (
-               VarKeyOrder,
+               VAR_KEY_ORDER,
                &gEfiGlobalVariableGuid,
                &KeyOrderSize
                );
@@ -211,7 +211,7 @@ RegisterHotkey (
   NewKeyOrder[Index] = RegisterOptionNumber;
 
   Status = gRT->SetVariable (
-                  VarKeyOrder,
+                  VAR_KEY_ORDER,
                   &gEfiGlobalVariableGuid,
                   EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   KeyOrderSize,
@@ -263,7 +263,7 @@ UnregisterHotkey (
   // Adjust key order array
   //
   KeyOrder = BdsLibGetVariableAndSize (
-               VarKeyOrder,
+               VAR_KEY_ORDER,
                &gEfiGlobalVariableGuid,
                &KeyOrderSize
                );
@@ -291,7 +291,7 @@ UnregisterHotkey (
   }
 
   Status = gRT->SetVariable (
-                  VarKeyOrder,
+                  VAR_KEY_ORDER,
                   &gEfiGlobalVariableGuid,
                   EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   KeyOrderSize,
@@ -670,7 +670,7 @@ InitializeHotkeyService (
   // Get valid Key Option List from private EFI variable "KeyOrder"
   //
   KeyOrder = BdsLibGetVariableAndSize (
-               VarKeyOrder,
+               VAR_KEY_ORDER,
                &gEfiGlobalVariableGuid,
                &KeyOrderSize
                );

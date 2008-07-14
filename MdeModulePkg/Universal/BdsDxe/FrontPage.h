@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _FRONT_PAGE_H
-#define _FRONT_PAGE_H
+#ifndef _FRONT_PAGE_H_
+#define _FRONT_PAGE_H_
 
 #include "DeviceMngr/DeviceManager.h"
 #include "BootMaint/BootMaint.h"
@@ -180,7 +180,7 @@ FrontPageCallback (
 **/
 EFI_STATUS
 InitializeFrontPage (
-  IN BOOLEAN    ReInitializeStrings
+  IN BOOLEAN    InitializeHiiData
   );
 
 /**

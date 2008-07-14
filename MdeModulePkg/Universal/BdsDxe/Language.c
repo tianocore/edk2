@@ -253,11 +253,6 @@ FONT_PACK_BIN mFontBin = {
 /**
   Routine to export glyphs to the HII database.  This is in addition to whatever is defined in the Graphics Console driver.
 
-
-  @param VOID
-
-  @return VOID
-
 **/
 VOID
 ExportFonts (
@@ -286,12 +281,10 @@ ExportFonts (
 
 /**
   Determine the current language that will be used
-  based on language related EFI Variables
+  based on language related EFI Variables.
 
 
   @param LangCodesSettingRequired - If required to set LangCode variable
-
-  @return VOID
 
 **/
 VOID

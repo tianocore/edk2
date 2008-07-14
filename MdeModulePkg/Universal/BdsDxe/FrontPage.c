@@ -238,7 +238,7 @@ FrontPageCallback (
 **/
 EFI_STATUS
 InitializeFrontPage (
-  BOOLEAN                         InitializeHiiData
+  IN BOOLEAN                         InitializeHiiData
   )
 {
   EFI_STATUS                  Status;
@@ -595,12 +595,7 @@ ConvertMemorySizeToString (
 }
 
 /**
-  Update the banner information for the Front Page based on DataHub information
-
-
-  @param VOID            No input.
-
-  @return No output.
+  Update the banner information for the Front Page based on DataHub information.
 
 **/
 VOID
