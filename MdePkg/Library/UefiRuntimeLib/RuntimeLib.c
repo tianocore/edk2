@@ -30,7 +30,6 @@ EFI_RUNTIME_SERVICES          *mRT;
   @param[in]  Event   The Event that is being processed
   @param[in]  Context Event Context
 **/
-STATIC
 VOID
 EFIAPI
 RuntimeLibExitBootServicesEvent (
@@ -54,7 +53,6 @@ RuntimeLibExitBootServicesEvent (
   @param[in]    Event   The Event that is being processed
   @param[in]    Context Event Context
 **/
-STATIC
 VOID
 EFIAPI
 RuntimeLibVirtualNotifyEvent (

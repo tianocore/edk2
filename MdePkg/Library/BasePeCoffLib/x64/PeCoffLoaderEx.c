@@ -75,7 +75,7 @@ PeCoffLoaderImageFormatSupported (
   @param  FixupData   Pointer to a buffer to log the fixups.
   @param  Adjust      The offset to adjust the fixup.
 
-  @return Status code.
+  @return EFI_UNSUPPORTED.
 
 **/
 RETURN_STATUS

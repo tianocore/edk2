@@ -71,7 +71,8 @@
   @param  FixupData   Pointer to a buffer to log the fixups.
   @param  Adjust      The offset to adjust the fixup.
 
-  @return Status code.
+  @retval RETURN_SUCCESS Succeed to fix the relocation entry.
+  @retval RETURN_UNSUPPOTED Unrecoganized relocation entry.
 
 **/
 RETURN_STATUS
@@ -227,6 +228,7 @@ PeCoffLoaderRelocateImageEx (
   @param  Machine   Machine type from the PE Header.
 
   @return TRUE if this PE/COFF loader can load the image
+  @return FALSE unrecoganized machine type of image.
 
 **/
 BOOLEAN
@@ -254,6 +256,8 @@ PeCoffLoaderImageFormatSupported (
 
   @retval RETURN_SUCCESS    Data is read from FileOffset from the Handle into
                             the buffer.
+  @retval RETURN_UNSUPPORTED Un-recoganized relocation entry
+                             type.
 **/
 RETURN_STATUS
 PeHotRelocateImageEx (

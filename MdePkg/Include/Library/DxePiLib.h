@@ -54,8 +54,7 @@
     @retval  EFI_DEVICE_ERROR A hardware error occurs during reading from the Firmware Volume.
     @retval  EFI_ACCESS_DENIED  The firmware volume containing the searched Firmware File is configured to disallow reads.
   
-  **/
-
+**/
 EFI_STATUS
 EFIAPI
 PiLibGetSectionFromAnyFv (
@@ -105,8 +104,7 @@ PiLibGetSectionFromAnyFv (
     @retval  EFI_DEVICE_ERROR A hardware error occurs during reading from the Firmware Volume.
     @retval  EFI_ACCESS_DENIED  The firmware volume containing the searched Firmware File is configured to disallow reads.
   
-  **/
-
+**/
 EFI_STATUS
 EFIAPI
 PiLibGetSectionFromCurrentFv (
@@ -157,8 +155,7 @@ PiLibGetSectionFromCurrentFv (
     @retval  EFI_DEVICE_ERROR A hardware error occurs during reading from the Firmware Volume.
     @retval  EFI_ACCESS_DENIED  The firmware volume containing the searched Firmware File is configured to disallow reads.
   
-  **/
-
+**/
 EFI_STATUS
 EFIAPI
 PiLibGetSectionFromCurrentFfs (

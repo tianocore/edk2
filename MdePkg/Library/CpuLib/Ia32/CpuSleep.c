@@ -12,11 +12,15 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
 
+/**
+  Places the CPU in a sleep state until an interrupt is received.
 
+  Places the CPU in a sleep state until an interrupt is received. If interrupts
+  are disabled prior to calling this function, then the CPU will be placed in a
+  sleep state indefinitely.
+
+**/
 VOID
 EFIAPI
 CpuSleep (
