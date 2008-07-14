@@ -21,7 +21,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   that there should be DevicePath Protocol installed on it.
   This routine create a virtual Driver Handle by installing a vendor device
   path on it, so as to use it to invoke HiiDatabase.NewPackageList().
-  The Device Path created is a Vendor Device Path specific to Intel's implemenation.
+  The Device Path created is a Vendor Device Path specific to Intel's implemenation
+  and it is defined as HII_VENDOR_DEVICE_PATH_NODE.
+  
 
   @param  DriverHandle           Handle to be returned
 

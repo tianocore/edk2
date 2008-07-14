@@ -17,6 +17,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 STATIC EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
 
+/**
+  Create GUIDed opcode for banner. Banner opcode
+  EFI_IFR_EXTEND_OP_BANNER is extended opcode specific
+  to Intel's implementation.
+
+  @param  Title                  String ID for title
+  @param  LineNumber             Line number for this banner
+  @param  Alignment              Alignment for this banner, left, center or right
+  @param  Data                   Destination for the created opcode binary
+
+  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
+
+**/
 EFI_STATUS
 EFIAPI
 CreateBannerOpCode (

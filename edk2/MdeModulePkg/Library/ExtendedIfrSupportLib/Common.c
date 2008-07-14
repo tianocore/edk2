@@ -22,6 +22,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_HII_DATABASE_PROTOCOL *gIfrLibHiiDatabase;
 EFI_HII_STRING_PROTOCOL   *gIfrLibHiiString;
 
+/**
+  ExtendedIfrSupportLib's constructor. It locates the required protocol:
+  gEfiHiiDatabaseProtocolGuid and gEfiHiiStringProtocolGuid.
+
+  @param ImageHandle     The firmware allocated handle for the EFI image.
+  
+  @param SystemTable     A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS    This function always completes successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 ExtendedIfrSupportLibConstructor (
@@ -44,6 +55,19 @@ ExtendedIfrSupportLibConstructor (
 
 STATIC EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
 
+/**
+  Extract formset class for given HII handle.
+
+
+  @param Handle          The HII handle.
+  @param Class           Class of the formset.
+  @param FormSetTitle    Formset title string.
+  @param FormSetHelp     Formset help string.
+
+  @retval  EFI_SUCCESS      Successfully extract Class for specified Hii handle.
+  @return  Other values if failed to export packages for the given HII handle.
+
+**/
 EFI_STATUS
 EFIAPI
 IfrLibExtractClassFromHiiHandle (
@@ -52,21 +76,6 @@ IfrLibExtractClassFromHiiHandle (
   OUT     EFI_STRING_ID       *FormSetTitle,
   OUT     EFI_STRING_ID       *FormSetHelp
   )
-/*++
-
-Routine Description:
-  Extract formset class for given HII handle.
-
-Arguments:
-  HiiHandle       - Hii handle
-  Class           - Class of the formset
-  FormSetTitle    - Formset title string
-  FormSetHelp     - Formset help string
-
-Returns:
-  EFI_SUCCESS     - Successfully extract Class for specified Hii handle.
-
---*/
 {
   EFI_STATUS                   Status;
   UINTN                        BufferSize;
