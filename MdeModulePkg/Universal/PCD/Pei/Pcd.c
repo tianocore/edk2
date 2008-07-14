@@ -1,5 +1,7 @@
-/** @file PCD PEIM
-
+/** @file 
+  PCD PEIM manage PCD database to manage all dynamic PCD in PEI phase. PCD PEIM
+  also produce PCD_PPI.
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,13 +11,9 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-
-Module Name: Pcd.c
-
 **/
 
 #include "Service.h"
-
 
 PCD_PPI mPcdPpiInstance = {
   PeiPcdSetSku,
@@ -56,16 +54,23 @@ PCD_PPI mPcdPpiInstance = {
   PeiPcdGetNextTokenSpace
 };
 
-
-
 STATIC EFI_PEI_PPI_DESCRIPTOR  mPpiPCD = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gPcdPpiGuid,
   &mPcdPpiInstance
 };
 
+/**
+  Main entry for PCD PEIM driver.
+  
+  This routine initialize the PCD database for PEI phase and install PCD_PPI.
 
+  @param FfsHeader       Pointer to PEIM FFS header image
+  @param PeiServices     Pointer to EFI_PEI_SERVICES
 
+  @return Status of install PCD_PPI
+
+**/
 EFI_STATUS
 EFIAPI
 PcdPeimInit (
@@ -73,17 +78,34 @@ PcdPeimInit (
   IN EFI_PEI_SERVICES         **PeiServices
   )
 {
-  EFI_STATUS Status;
-
   BuildPcdDatabase ();
-  
-  Status = PeiServicesInstallPpi (&mPpiPCD);
 
-  ASSERT_EFI_ERROR (Status);
-  
-  return EFI_SUCCESS;
+  return PeiServicesInstallPpi (&mPpiPCD);
 }
 
+/**
+  Sets the SKU value for subsequent calls to set or get PCD token values.
+
+  SetSku() sets the SKU Id to be used for subsequent calls to set or get PCD values. 
+  SetSku() is normally called only once by the system.
+
+  For each item (token), the database can hold a single value that applies to all SKUs, 
+  or multiple values, where each value is associated with a specific SKU Id. Items with multiple, 
+  SKU-specific values are called SKU enabled. 
+  
+  The SKU Id of zero is reserved as a default. The valid SkuId range is 1 to 255.  
+  For tokens that are not SKU enabled, the system ignores any set SKU Id and works with the 
+  single value for that token. For SKU-enabled tokens, the system will use the SKU Id set by the 
+  last call to SetSku(). If no SKU Id is set or the currently set SKU Id isn't valid for the specified token, 
+  the system uses the default SKU Id. If the system attempts to use the default SKU Id and no value has been 
+  set for that Id, the results are unpredictable.
+
+  @param[in]  SkuId The SKU value that will be used when the PCD service will retrieve and 
+              set values associated with a PCD token.
+
+  @retval VOID
+
+**/
 VOID
 EFIAPI
 PeiPcdSetSku (
@@ -96,8 +118,17 @@ PeiPcdSetSku (
   return;
 }
 
+/**
+  Retrieves an 8-bit value for a given PCD token.
 
+  Retrieves the current byte-sized value for a PCD token number.  
+  If the TokenNumber is invalid, the results are unpredictable.
+  
+  @param[in]  TokenNumber The PCD token number. 
 
+  @return The UINT8 value.
+  
+**/
 UINT8
 EFIAPI
 PeiPcdGet8 (
@@ -107,8 +138,17 @@ PeiPcdGet8 (
   return *((UINT8 *) GetWorker (TokenNumber, sizeof (UINT8)));
 }
 
+/**
+  Retrieves an 16-bit value for a given PCD token.
 
+  Retrieves the current 16-bits value for a PCD token number.  
+  If the TokenNumber is invalid, the results are unpredictable.
+  
+  @param[in]  TokenNumber The PCD token number. 
 
+  @return The UINT16 value.
+  
+**/
 UINT16
 EFIAPI
 PeiPcdGet16 (
@@ -118,8 +158,17 @@ PeiPcdGet16 (
   return ReadUnaligned16 (GetWorker (TokenNumber, sizeof (UINT16)));
 }
 
+/**
+  Retrieves an 32-bit value for a given PCD token.
 
+  Retrieves the current 32-bits value for a PCD token number.  
+  If the TokenNumber is invalid, the results are unpredictable.
+  
+  @param[in]  TokenNumber The PCD token number. 
 
+  @return The UINT32 value.
+  
+**/
 UINT32
 EFIAPI
 PeiPcdGet32 (
@@ -129,8 +178,17 @@ PeiPcdGet32 (
   return ReadUnaligned32 (GetWorker (TokenNumber, sizeof (UINT32)));
 }
 
+/**
+  Retrieves an 64-bit value for a given PCD token.
 
+  Retrieves the current 64-bits value for a PCD token number.  
+  If the TokenNumber is invalid, the results are unpredictable.
+  
+  @param[in]  TokenNumber The PCD token number. 
 
+  @return The UINT64 value.
+  
+**/
 UINT64
 EFIAPI
 PeiPcdGet64 (
@@ -140,8 +198,19 @@ PeiPcdGet64 (
   return ReadUnaligned64 (GetWorker (TokenNumber, sizeof (UINT64)));
 }
 
+/**
+  Retrieves a pointer to a value for a given PCD token.
 
+  Retrieves the current pointer to the buffer for a PCD token number.  
+  Do not make any assumptions about the alignment of the pointer that 
+  is returned by this function call.  If the TokenNumber is invalid, 
+  the results are unpredictable.
 
+  @param[in]  TokenNumber The PCD token number. 
+
+  @return The pointer to the buffer to be retrived.
+  
+**/
 VOID *
 EFIAPI
 PeiPcdGetPtr (
@@ -151,8 +220,19 @@ PeiPcdGetPtr (
   return GetWorker (TokenNumber, 0);
 }
 
+/**
+  Retrieves a Boolean value for a given PCD token.
 
+  Retrieves the current boolean value for a PCD token number.  
+  Do not make any assumptions about the alignment of the pointer that 
+  is returned by this function call.  If the TokenNumber is invalid, 
+  the results are unpredictable.
 
+  @param[in]  TokenNumber The PCD token number. 
+
+  @return The Boolean value.
+  
+**/
 BOOLEAN
 EFIAPI
 PeiPcdGetBool (
@@ -162,8 +242,17 @@ PeiPcdGetBool (
   return *((BOOLEAN *) GetWorker (TokenNumber, sizeof (BOOLEAN)));
 }
 
+/**
+  Retrieves the size of the value for a given PCD token.
 
+  Retrieves the current size of a particular PCD token.  
+  If the TokenNumber is invalid, the results are unpredictable.
 
+  @param[in]  TokenNumber The PCD token number. 
+
+  @return The size of the value for the PCD token.
+  
+**/
 UINTN
 EFIAPI
 PeiPcdGetSize (
@@ -209,8 +298,20 @@ PeiPcdGetSize (
 
 }
 
+/**
+  Retrieves an 8-bit value for a given PCD token.
 
+  Retrieves the 8-bit value of a particular PCD token.  
+  If the TokenNumber is invalid or the token space
+  specified by Guid does not exist, the results are 
+  unpredictable.
 
+  @param[in]  Guid              The token space for the token number.
+  @param[in]  ExTokenNumber     The PCD token number. 
+
+  @return The size 8-bit value for the PCD token.
+  
+**/
 UINT8
 EFIAPI
 PeiPcdGet8Ex (
@@ -221,8 +322,20 @@ PeiPcdGet8Ex (
   return *((UINT8 *) ExGetWorker (Guid, ExTokenNumber, sizeof (UINT8)));
 }
 
+/**
+  Retrieves an 16-bit value for a given PCD token.
 
+  Retrieves the 16-bit value of a particular PCD token.  
+  If the TokenNumber is invalid or the token space
+  specified by Guid does not exist, the results are 
+  unpredictable.
 
+  @param[in]  Guid          The token space for the token number.
+  @param[in]  ExTokenNumber The PCD token number. 
+
+  @return The size 16-bit value for the PCD token.
+  
+**/
 UINT16
 EFIAPI
 PeiPcdGet16Ex (
@@ -233,8 +346,20 @@ PeiPcdGet16Ex (
   return ReadUnaligned16 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT16)));
 }
 
+/**
+  Retrieves an 32-bit value for a given PCD token.
 
+  Retrieves the 32-bit value of a particular PCD token.  
+  If the TokenNumber is invalid or the token space
+  specified by Guid does not exist, the results are 
+  unpredictable.
 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  ExTokenNumber The PCD token number. 
+
+  @return The size 32-bit value for the PCD token.
+  
+**/
 UINT32
 EFIAPI
 PeiPcdGet32Ex (
@@ -245,8 +370,20 @@ PeiPcdGet32Ex (
   return ReadUnaligned32 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT32)));
 }
 
+/**
+  Retrieves an 64-bit value for a given PCD token.
 
+  Retrieves the 64-bit value of a particular PCD token.  
+  If the TokenNumber is invalid or the token space
+  specified by Guid does not exist, the results are 
+  unpredictable.
 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  ExTokenNumber The PCD token number. 
+
+  @return The size 64-bit value for the PCD token.
+  
+**/
 UINT64
 EFIAPI
 PeiPcdGet64Ex (
@@ -257,8 +394,20 @@ PeiPcdGet64Ex (
   return ReadUnaligned64 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT64)));
 }
 
+/**
+  Retrieves a pointer to a value for a given PCD token.
 
+  Retrieves the current pointer to the buffer for a PCD token number.  
+  Do not make any assumptions about the alignment of the pointer that 
+  is returned by this function call.  If the TokenNumber is invalid, 
+  the results are unpredictable.
 
+  @param[in]  Guid          The token space for the token number.
+  @param[in]  ExTokenNumber The PCD token number. 
+
+  @return The pointer to the buffer to be retrived.
+  
+**/
 VOID *
 EFIAPI
 PeiPcdGetPtrEx (
@@ -269,8 +418,20 @@ PeiPcdGetPtrEx (
   return ExGetWorker (Guid, ExTokenNumber, 0);
 }
 
+/**
+  Retrieves an Boolean value for a given PCD token.
 
+  Retrieves the Boolean value of a particular PCD token.  
+  If the TokenNumber is invalid or the token space
+  specified by Guid does not exist, the results are 
+  unpredictable.
 
+  @param[in]  Guid          The token space for the token number.
+  @param[in]  ExTokenNumber The PCD token number. 
+
+  @return The size Boolean value for the PCD token.
+  
+**/
 BOOLEAN
 EFIAPI
 PeiPcdGetBoolEx (
@@ -281,8 +442,18 @@ PeiPcdGetBoolEx (
   return *((BOOLEAN *) ExGetWorker (Guid, ExTokenNumber, sizeof (BOOLEAN)));
 }
 
+/**
+  Retrieves the size of the value for a given PCD token.
 
+  Retrieves the current size of a particular PCD token.  
+  If the TokenNumber is invalid, the results are unpredictable.
 
+  @param[in]  Guid          The token space for the token number.
+  @param[in]  ExTokenNumber The PCD token number. 
+
+  @return The size of the value for the PCD token.
+  
+**/
 UINTN
 EFIAPI
 PeiPcdGetSizeEx (
@@ -297,8 +468,23 @@ PeiPcdGetSizeEx (
   return PeiPcdGetSize (GetExPcdTokenNumber (Guid, ExTokenNumber));
 }
 
+/**
+  Sets an 8-bit value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSet8 (
@@ -309,8 +495,23 @@ PeiPcdSet8 (
   return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
+/**
+  Sets an 16-bit value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSet16 (
@@ -321,8 +522,23 @@ PeiPcdSet16 (
   return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
+/**
+  Sets an 32-bit value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSet32 (
@@ -333,8 +549,23 @@ PeiPcdSet32 (
   return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
+/**
+  Sets an 64-bit value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSet64 (
@@ -345,7 +576,27 @@ PeiPcdSet64 (
   return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
+/**
+  Sets a value of a specified size for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
+
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in, out] SizeOfBuffer A pointer to the length of the value being set for the PCD token.  
+                              On input, if the SizeOfValue is greater than the maximum size supported 
+                              for this TokenNumber then the output value of SizeOfValue will reflect 
+                              the maximum size supported for this TokenNumber.
+  @param[in]  Buffer The buffer to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSetPtr (
@@ -357,8 +608,23 @@ PeiPcdSetPtr (
   return SetWorker (TokenNumber, Buffer, SizeOfBuffer, TRUE);
 }
 
+/**
+  Sets an Boolean value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSetBool (
@@ -369,8 +635,24 @@ PeiPcdSetBool (
   return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
+/**
+  Sets an 8-bit value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  Guid          The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  ExTokenNumber The PCD token number. 
+  @param[in]  Value         The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSet8Ex (
@@ -382,8 +664,24 @@ PeiPcdSet8Ex (
   return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
+/**
+  Sets an 16-bit value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  ExTokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSet16Ex (
@@ -395,8 +693,24 @@ PeiPcdSet16Ex (
   return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
+/**
+  Sets an 32-bit value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  Guid          The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  ExTokenNumber The PCD token number. 
+  @param[in]  Value         The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSet32Ex (
@@ -408,8 +722,24 @@ PeiPcdSet32Ex (
   return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
+/**
+  Sets an 64-bit value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]  Guid          The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  ExTokenNumber The PCD token number. 
+  @param[in]  Value         The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSet64Ex (
@@ -421,22 +751,58 @@ PeiPcdSet64Ex (
   return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
+/**
+  Sets a value of a specified size for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param[in]        Guid            The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]        ExTokenNumber   The PCD token number. 
+  @param[in, out]   SizeOfBuffer    A pointer to the length of the value being set for the PCD token.  
+                                    On input, if the SizeOfValue is greater than the maximum size supported 
+                                    for this TokenNumber then the output value of SizeOfValue will reflect 
+                                    the maximum size supported for this TokenNumber.
+  @param[in]        Value           The buffer to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSetPtrEx (
-  IN CONST EFI_GUID               *Guid,
-  IN UINTN                        ExTokenNumber,
-  IN UINTN                        *SizeOfBuffer,
-  IN VOID                         *Value
+  IN     CONST EFI_GUID               *Guid,
+  IN     UINTN                        ExTokenNumber,
+  IN OUT UINTN                        *SizeOfBuffer,
+  IN     VOID                         *Value
   )
 {
   return ExSetWorker (ExTokenNumber, Guid, Value, SizeOfBuffer, TRUE);
 }
 
+/**
+  Sets an Boolean value for a given PCD token.
 
+  When the PCD service sets a value, it will check to ensure that the 
+  size of the value being set is compatible with the Token's existing definition.  
+  If it is not, an error will be returned.
 
+  @param [in]  Guid          The 128-bit unique value that designates the namespace from which to extract the value.
+  @param [in]  ExTokenNumber The PCD token number. 
+  @param [in]  Value         The value to set for the PCD token.
+
+  @retval EFI_SUCCESS  Procedure returned successfully.
+  @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
+                                  being set was incompatible with a call to this function.  
+                                  Use GetSize() to retrieve the size of the target data.
+  @retval EFI_NOT_FOUND The PCD service could not find the requested token number.
+  
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdSetBoolEx (
@@ -448,9 +814,18 @@ PeiPcdSetBoolEx (
   return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
+/**
+  Specifies a function to be called anytime the value of a designated token is changed.
 
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  ExTokenNumber The PCD token number. 
+  @param[in]  CallBackFunction The function prototype called when the value associated with the CallBackToken is set.  
 
+  @retval EFI_SUCCESS  The PCD service has successfully established a call event 
+                        for the CallBackToken requested.
+  @retval EFI_NOT_FOUND The PCD service could not find the referenced token number.
 
+**/
 EFI_STATUS
 EFIAPI
 PeiRegisterCallBackOnSet (
@@ -468,8 +843,18 @@ PeiRegisterCallBackOnSet (
   return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, TRUE);
 }
 
+/**
+  Cancels a previously set callback function for a particular PCD token number.
 
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  ExTokenNumber The PCD token number. 
+  @param[in]  CallBackFunction The function prototype called when the value associated with the CallBackToken is set.  
 
+  @retval EFI_SUCCESS  The PCD service has successfully established a call event 
+                        for the CallBackToken requested.
+  @retval EFI_NOT_FOUND The PCD service could not find the referenced token number.
+
+**/
 EFI_STATUS
 EFIAPI
 PcdUnRegisterCallBackOnSet (
@@ -487,8 +872,24 @@ PcdUnRegisterCallBackOnSet (
   return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, FALSE);
 }
 
+/**
+  Retrieves the next valid PCD token for a given namespace.
 
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in, out]  TokenNumber A pointer to the PCD token number to use to find the subsequent token number.  
+                  If the input token namespace or token number does not exist on the platform, 
+                  an error is returned and the value of *TokenNumber is undefined. To retrieve the "first" token, 
+                  have the pointer reference a TokenNumber value of 0. If the input token number is 0 and 
+                  there is no valid token number for this token namespace,  *TokenNumber will be assigned to 
+                  0 and the function return EFI_SUCCESS. If the token number is the last valid token number, 
+                  *TokenNumber will be assigned to 0 and the function return EFI_SUCCESS.
 
+  @retval EFI_SUCCESS  The PCD service retrieved the next valid token number. Or the input token number 
+                        is already the last valid token number in the PCD database. 
+                        In the later case, *TokenNumber is updated with the value of 0.
+  @retval EFI_NOT_FOUND If this input token number and token namespace does not exist on the platform.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdGetNextToken (
@@ -500,7 +901,7 @@ PeiPcdGetNextToken (
   PEI_PCD_DATABASE    *PeiPcdDb;
   EFI_GUID            *MatchGuid;
   DYNAMICEX_MAPPING   *ExMapTable;
-  UINTN               i;
+  UINTN               Index;
   BOOLEAN             Found;
   BOOLEAN             PeiExMapTableEmpty;
 
@@ -547,8 +948,8 @@ PeiPcdGetNextToken (
     //
     // Locate the GUID in ExMapTable first.
     //
-    for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
-      if (ExMapTable[i].ExGuidIndex == GuidTableIdx) {
+    for (Index = 0; Index < PEI_EXMAPPING_TABLE_SIZE; Index++) {
+      if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
         Found = TRUE;
         break;
       }
@@ -556,22 +957,22 @@ PeiPcdGetNextToken (
 
     if (Found) {
       if (*TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
-        *TokenNumber = ExMapTable[i].ExTokenNumber;
+        *TokenNumber = ExMapTable[Index].ExTokenNumber;
          return EFI_SUCCESS;
       }
 
-      for ( ; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
-        if (ExMapTable[i].ExTokenNumber == *TokenNumber) {
-          i++;
-          if (i == PEI_EXMAPPING_TABLE_SIZE) {
+      for ( ; Index < PEI_EXMAPPING_TABLE_SIZE; Index++) {
+        if (ExMapTable[Index].ExTokenNumber == *TokenNumber) {
+          Index++;
+          if (Index == PEI_EXMAPPING_TABLE_SIZE) {
             //
             // Exceed the length of ExMap Table
             //
             *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
             return EFI_SUCCESS;
           }
-          if (ExMapTable[i].ExGuidIndex == GuidTableIdx) {
-            *TokenNumber = ExMapTable[i].ExTokenNumber;
+          if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
+            *TokenNumber = ExMapTable[Index].ExTokenNumber;
             return EFI_SUCCESS;
           } else {
             *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
@@ -586,8 +987,27 @@ PeiPcdGetNextToken (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Retrieves the next valid PCD token namespace for a given namespace.
 
+  @param[in, out]  Guid An indirect pointer to EFI_GUID.  On input it designates 
+                    a known token namespace from which the search will start. On output, 
+                    it designates the next valid token namespace on the platform. If the input 
+                    token namespace does not exist on the platform, an error is returned and 
+                    the value of *Guid is undefined. If *Guid is NULL, then the GUID of the 
+                    first token space of the current platform is assigned to *Guid the function 
+                    return EFI_SUCCESS. If  *Guid is NULL  and there is no namespace exist in 
+                    the platform other than the default (NULL) tokennamespace, *Guid is unchanged 
+                    and the function return EFI_SUCCESS. If this input token namespace is the last 
+                    namespace on the platform, *Guid will be assigned to NULL and the function return 
+                    EFI_SUCCESS. 
 
+  @retval EFI_SUCCESS  The PCD service retrieved the next valid token space Guid. 
+                        Or the input token space Guid is already the last valid token space Guid 
+                        in the PCD database. In the later case, *Guid is updated with the value of NULL.
+  @retval EFI_NOT_FOUND If the input token namespace does not exist on the platform.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiPcdGetNextTokenSpace (
@@ -598,7 +1018,7 @@ PeiPcdGetNextTokenSpace (
   EFI_GUID            *MatchGuid;
   PEI_PCD_DATABASE    *PeiPcdDb;
   DYNAMICEX_MAPPING   *ExMapTable;
-  UINTN               i;
+  UINTN               Index;
   BOOLEAN             Found;
   BOOLEAN             PeiExMapTableEmpty;
 
@@ -644,18 +1064,18 @@ PeiPcdGetNextTokenSpace (
   GuidTableIdx = MatchGuid - PeiPcdDb->Init.GuidTable;
 
   Found = FALSE;
-  for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
-    if (ExMapTable[i].ExGuidIndex == GuidTableIdx) {
+  for (Index = 0; Index < PEI_EXMAPPING_TABLE_SIZE; Index++) {
+    if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
       Found = TRUE;
       break;
     }
   }
 
   if (Found) {
-    i++;
-    for ( ; i < PEI_EXMAPPING_TABLE_SIZE; i++ ) {
-      if (ExMapTable[i].ExGuidIndex != GuidTableIdx ) {
-        *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[i].ExGuidIndex];
+    Index++;
+    for ( ; Index < PEI_EXMAPPING_TABLE_SIZE; Index++ ) {
+      if (ExMapTable[Index].ExGuidIndex != GuidTableIdx ) {
+        *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[Index].ExGuidIndex];
         return EFI_SUCCESS;
       }
     }
@@ -667,6 +1087,19 @@ PeiPcdGetNextTokenSpace (
 
 }
 
+/**
+  Get PCD value's size for POINTER type PCD.
+  
+  The POINTER type PCD's value will be stored into a buffer in specificed size.
+  The max size of this PCD's value is described in PCD's definition in DEC file.
+
+  @param LocalTokenNumberTableIdx Index of PCD token number in PCD token table
+  @param MaxSize                  Maxmium size of PCD's value
+  @param Database                 Pcd database in PEI phase.
+
+  @return PCD value's size for POINTER type PCD.
+
+**/
 UINTN
 GetPtrTypeSize (
   IN    UINTN             LocalTokenNumberTableIdx,
@@ -678,7 +1111,7 @@ GetPtrTypeSize (
   UINTN       LocalTokenNumber;
   SKU_ID      *SkuIdTable;
   SIZE_INFO   *SizeTable;
-  UINTN       i;
+  UINTN       Index;
 
   SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
 
@@ -693,7 +1126,7 @@ GetPtrTypeSize (
   // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
   // PCD entry.
   //
-  if (LocalTokenNumber & PCD_TYPE_VPD) {
+  if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
       //
       // We have only one entry for VPD enabled PCD entry:
       // 1) MAX Size.
@@ -715,9 +1148,9 @@ GetPtrTypeSize (
       // 2) Current Size for each SKU_ID (It is equal to MaxSku).
       //
       SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, Database);
-      for (i = 0; i < SkuIdTable[0]; i++) {
-        if (SkuIdTable[1 + i] == Database->Init.SystemSkuId) {
-          return SizeTable[SizeTableIdx + 1 + i];
+      for (Index = 0; Index < SkuIdTable[0]; Index++) {
+        if (SkuIdTable[1 + Index] == Database->Init.SystemSkuId) {
+          return SizeTable[SizeTableIdx + 1 + Index];
         }
       }
       return SizeTable[SizeTableIdx + 1];
@@ -725,8 +1158,20 @@ GetPtrTypeSize (
   }
 }
 
+/**
+  Set PCD value's size for POINTER type PCD.
+  
+  The POINTER type PCD's value will be stored into a buffer in specificed size.
+  The max size of this PCD's value is described in PCD's definition in DEC file.
 
+  @param LocalTokenNumberTableIdx Index of PCD token number in PCD token table
+  @param CurrentSize              Maxmium size of PCD's value
+  @param Database                 Pcd database in PEI phase.
 
+  @retval TRUE  Success to set PCD's value size, which is not exceed maxmium size
+  @retval FALSE Fail to set PCD's value size, which maybe exceed maxmium size
+
+**/
 BOOLEAN
 SetPtrTypeSize (
   IN          UINTN             LocalTokenNumberTableIdx,
@@ -738,7 +1183,7 @@ SetPtrTypeSize (
   UINTN       LocalTokenNumber;
   SKU_ID      *SkuIdTable;
   SIZE_INFO   *SizeTable;
-  UINTN       i;
+  UINTN       Index;
   UINTN       MaxSize;
   
   SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
@@ -754,7 +1199,7 @@ SetPtrTypeSize (
   // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
   // PCD entry.
   //
-  if (LocalTokenNumber & PCD_TYPE_VPD) {
+  if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
       //
       // We shouldn't come here as we don't support SET for VPD
       //
@@ -782,9 +1227,9 @@ SetPtrTypeSize (
       // 2) Current Size for each SKU_ID (It is equal to MaxSku).
       //
       SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, Database);
-      for (i = 0; i < SkuIdTable[0]; i++) {
-        if (SkuIdTable[1 + i] == Database->Init.SystemSkuId) {
-          SizeTable[SizeTableIdx + 1 + i] = (SIZE_INFO) *CurrentSize;
+      for (Index = 0; Index < SkuIdTable[0]; Index++) {
+        if (SkuIdTable[1 + Index] == Database->Init.SystemSkuId) {
+          SizeTable[SizeTableIdx + 1 + Index] = (SIZE_INFO) *CurrentSize;
           return TRUE;
         }
       }
