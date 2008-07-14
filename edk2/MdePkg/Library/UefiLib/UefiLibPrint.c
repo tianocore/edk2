@@ -26,14 +26,15 @@
   specified by Console and returns the number of Unicode characters that printed
   to it.  If the length of the formatted Unicode string is greater than PcdUefiLibMaxPrintBufferSize,
   then only the first PcdUefiLibMaxPrintBufferSize characters are sent to Console.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
   @param Console  The output console.
   @param Marker   VA_LIST marker for the variable argument list.
-
-  If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
-
+  
+  @return The number of Unicode characters in the produced
+          output buffer not including the Null-terminator.
 **/
 
 STATIC
@@ -79,11 +80,14 @@ InternalPrint (
   characters that printed to ConOut.  If the length of the formatted Unicode
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
   @param ...      VARARG list consumed to process Format.
-  If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @return The number of Unicode characters in the produced
+          output buffer not including the Null-terminator.
 
 **/
 UINTN
@@ -114,12 +118,14 @@ Print (
   characters that printed to StdErr.  If the length of the formatted Unicode
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
-
-  @param Format   Null-terminated Unicode format string.
-  @param ...      VARARG list consumed to process Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
+  @param Format   Null-terminated Unicode format string.
+  @param ...      VARARG list consumed to process Format.
+
+  @return The number of Unicode characters in the produced
+          output buffer not including the Null-terminator.
 **/
 
 UINTN
@@ -150,15 +156,20 @@ ErrorPrint (
   specified by Console and returns the number of ASCII characters that printed
   to it.  If the length of the formatted ASCII string is greater than PcdUefiLibMaxPrintBufferSize,
   then only the first PcdUefiLibMaxPrintBufferSize characters are sent to Console.
+  If Format is NULL, then ASSERT().
+
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+  
 
   @param Format   Null-terminated ASCII format string.
   @param Console  The output console.
   @param Marker   VA_LIST marker for the variable argument list.
 
-  If Format is NULL, then ASSERT().
+  @return The number of Unicode characters in the produced
+          output buffer not including the Null-terminator.
 
 **/
-
 STATIC
 UINTN
 AsciiInternalPrint (
@@ -201,11 +212,14 @@ AsciiInternalPrint (
   characters that printed to ConOut.  If the length of the formatted ASCII
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      VARARG list consumed to process Format.
-  If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @return The number of Ascii characters in the produced
+          output buffer not including the Null-terminator.
 
 **/
 UINTN
@@ -236,11 +250,14 @@ AsciiPrint (
   characters that printed to StdErr.  If the length of the formatted ASCII
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      VARARG list consumed to process Format.
-  If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @return The number of Ascii characters in the produced output
+          buffer not including the Null-terminator.
 
 **/
 UINTN

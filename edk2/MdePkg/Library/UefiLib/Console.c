@@ -24,7 +24,7 @@ typedef struct {
   UINT32  Width;
 } UNICODE_WIDTH_ENTRY;
 
-UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   // General script area
   //

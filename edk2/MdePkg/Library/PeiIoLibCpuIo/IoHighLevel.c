@@ -133,7 +133,7 @@ IoAndThenOr8 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT8
@@ -413,7 +413,7 @@ IoAndThenOr16 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT16
@@ -693,7 +693,7 @@ IoAndThenOr32 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
 
-  @return The value read.
+  @return The value read from Port.
 
 **/
 UINT32
@@ -1536,7 +1536,7 @@ MmioAndThenOr16 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
 
-  @return The value read.
+  @return The value read from Address.
 
 **/
 UINT16

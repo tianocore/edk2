@@ -335,7 +335,7 @@ EfiSetVirtualAddressMap (
   IN CONST EFI_MEMORY_DESCRIPTOR    *VirtualMap
   )
 {
-  return gRT->SetVirtualAddressMap (
+  return mRT->SetVirtualAddressMap (
                 MemoryMapSize,
                 DescriptorSize,
                 DescriptorVersion,
