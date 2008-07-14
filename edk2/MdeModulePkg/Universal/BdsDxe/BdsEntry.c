@@ -74,12 +74,8 @@ BdsInitialize (
 
 /**
 
-  In the loop of attempt to boot for the boot order
-
-
-  @param VOID           No input parameter.
-
-  @retval VOID          No returns.
+  This function attempts to boot for the boot order specified
+  by platform policy.
 
 **/
 VOID

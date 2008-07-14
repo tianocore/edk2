@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _HOTKEY_H
-#define _HOTKEY_H
+#ifndef _HOTKEY_H_
+#define _HOTKEY_H_
 
 #include "Bds.h"
 #include "String.h"
@@ -35,7 +35,7 @@ typedef struct {
 
 #define BDS_HOTKEY_OPTION_FROM_LINK(a) CR (a, BDS_HOTKEY_OPTION, Link, BDS_HOTKEY_OPTION_SIGNATURE)
 
-#define VarKeyOrder       L"KeyOrder"
+#define VAR_KEY_ORDER       L"KeyOrder"
 
 /**
 
@@ -53,7 +53,7 @@ EFI_STATUS
 RegisterHotkey (
   IN EFI_KEY_OPTION     *KeyOption,
   OUT UINT16            *KeyOptionNumber
-)
+  )
 ;
 
 /**
@@ -70,7 +70,7 @@ RegisterHotkey (
 EFI_STATUS
 UnregisterHotkey (
   IN UINT16             KeyOptionNumber
-)
+  )
 ;
 
 
