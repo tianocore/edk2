@@ -33,26 +33,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define GEN_STATUS    0xD4
 #define TOP_SWAP_BIT  (1 << 13)
 
-STATIC
+/**
+
+  Read PCI register value.
+  This is a internal function.
+
+
+  @param Offset          Offset of the register
+
+  @return The pci register value.
+
+**/
 UINT32
 ReadPciRegister (
   IN UINT32                 Offset
   )
-/*++
-
-Routine Description:
-
-  Read PCI register value.
-
-Arguments:
-
-  Offset  - Offset of the register
-
-Returns:
-
-  The value.
-
---*/
 {
   EFI_STATUS                      Status;
   UINT32                          Value;
@@ -82,28 +77,23 @@ Returns:
   return Value;
 }
 
-STATIC
+/**
+
+  Get swap state
+
+  This is a internal function.
+
+  @param FtwLiteDevice   Calling context
+  @param SwapState       Swap state
+
+  @retval  EFI_SUCCESS  State successfully got
+
+**/
 EFI_STATUS
 GetSwapState (
   IN EFI_FTW_LITE_DEVICE    *FtwLiteDevice,
   OUT BOOLEAN               *SwapState
   )
-/*++
-
-Routine Description:
-
-  Get swap state
-
-Arguments:
-
-  FtwLiteDevice - Calling context
-  SwapState     - Swap state
-
-Returns:
-
-  EFI_SUCCESS - State successfully got
-
---*/
 {
   //
   // Top swap status is 13 bit
@@ -113,30 +103,26 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
+/**
+  Set swap state.
+
+  This is a internal function.
+
+  @param FtwLiteDevice   Indicates a pointer to the calling context.
+  @param TopSwap         New swap state
+
+  @retval  EFI_SUCCESS    The function completed successfully
+                          Note:
+                          the Top-Swap bit (bit 13, D31: F0, Offset D4h). Note that
+                          software will not be able to clear the Top-Swap bit until the system is
+                          rebooted without GNT[A]# being pulled down.
+
+**/
 EFI_STATUS
 SetSwapState (
   IN EFI_FTW_LITE_DEVICE    *FtwLiteDevice,
   IN  BOOLEAN               TopSwap
   )
-/*++
-
-Routine Description:
-    Set swap state.
-
-Arguments:
-    FtwLiteDevice  - Indicates a pointer to the calling context.  
-    TopSwap        - New swap state
-
-Returns:
-    EFI_SUCCESS   - The function completed successfully
-
-Note:
-    the Top-Swap bit (bit 13, D31: F0, Offset D4h). Note that
-    software will not be able to clear the Top-Swap bit until the system is
-    rebooted without GNT[A]# being pulled down.
-
---*/
 {
   UINT32                          GenStatus;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
@@ -188,29 +174,25 @@ Note:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Check whether the block is a boot block.
+
+
+  @param FtwLiteDevice   Calling context
+  @param FvBlock         Fvb protocol instance
+  @param Lba             Lba value
+
+  @retval FALSE           This is a boot block.
+  @retval TRUE            This is not a boot block.
+
+**/
 BOOLEAN
 IsBootBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
   EFI_LBA                             Lba
   )
-/*++
-
-Routine Description:
-
-  Check whether the block is a boot block.
-
-Arguments:
-
-  FtwLiteDevice - Calling context
-  FvBlock       - Fvb protocol instance
-  Lba           - Lba value
-
-Returns:
-
-  Is a boot block or not
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *BootFvb;
@@ -225,46 +207,40 @@ Returns:
   return (BOOLEAN) (FvBlock == BootFvb);
 }
 
+/**
+  Copy the content of spare block to a boot block. Size is FTW_BLOCK_SIZE.
+  Spare block is accessed by FTW backup FVB protocol interface. LBA is
+  FtwLiteDevice->FtwSpareLba.
+  Boot block is accessed by BootFvb protocol interface. LBA is 0.
+
+
+  @param FtwLiteDevice   The private data of FTW_LITE driver
+
+  @retval  EFI_SUCCESS               Spare block content is copied to boot block
+  @retval  EFI_INVALID_PARAMETER     Input parameter error
+  @retval  EFI_OUT_OF_RESOURCES      Allocate memory error
+  @retval  EFI_ABORTED               The function could not complete successfully
+                                     Notes:
+                                     FTW will do extra work on boot block update.
+                                     FTW should depend on a protocol of EFI_ADDRESS_RANGE_SWAP_PROTOCOL,
+                                     which is produced by a chipset driver.
+                                     FTW updating boot block steps:
+                                     1. Erase top swap block (0xFFFE-0xFFFEFFFF) and write data to it ready
+                                     2. Read data from top swap block to memory buffer
+                                     3. SetSwapState(EFI_SWAPPED)
+                                     4. Erasing boot block (0xFFFF-0xFFFFFFFF)
+                                     5. Programming boot block until the boot block is ok.
+                                     6. SetSwapState(UNSWAPPED)
+                                     Notes:
+                                     1. Since the SwapState bit is saved in CMOS, FTW can restore and continue
+                                     even in the scenario of power failure.
+                                     2. FTW shall not allow to update boot block when battery state is error.
+
+**/
 EFI_STATUS
 FlushSpareBlockToBootBlock (
   EFI_FTW_LITE_DEVICE      *FtwLiteDevice
   )
-/*++
-
-Routine Description:
-    Copy the content of spare block to a boot block. Size is FTW_BLOCK_SIZE.
-    Spare block is accessed by FTW backup FVB protocol interface. LBA is 
-    FtwLiteDevice->FtwSpareLba.
-    Boot block is accessed by BootFvb protocol interface. LBA is 0.
-
-Arguments:
-    FtwLiteDevice  - The private data of FTW_LITE driver
-
-Returns:
-    EFI_SUCCESS              - Spare block content is copied to boot block
-    EFI_INVALID_PARAMETER    - Input parameter error
-    EFI_OUT_OF_RESOURCES     - Allocate memory error
-    EFI_ABORTED              - The function could not complete successfully
-
-Notes:
-    FTW will do extra work on boot block update.
-    FTW should depend on a protocol of EFI_ADDRESS_RANGE_SWAP_PROTOCOL, 
-    which is produced by a chipset driver.
-
-    FTW updating boot block steps:
-    1. Erase top swap block (0xFFFE-0xFFFEFFFF) and write data to it ready
-    2. Read data from top swap block to memory buffer
-    3. SetSwapState(EFI_SWAPPED)
-    4. Erasing boot block (0xFFFF-0xFFFFFFFF)
-    5. Programming boot block until the boot block is ok.
-    6. SetSwapState(UNSWAPPED)
-
-    Notes:
-     1. Since the SwapState bit is saved in CMOS, FTW can restore and continue 
-     even in the scenario of power failure.
-     2. FTW shall not allow to update boot block when battery state is error.
-
---*/
 {
   EFI_STATUS                          Status;
   UINTN                               Length;

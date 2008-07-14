@@ -32,6 +32,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Fault Tolerant Write Protocol API
 //
+/**
+  Starts a target block update. This function will record data about write
+  in fault tolerant storage and will complete the write in a recoverable
+  manner, ensuring at all times that either the original contents or
+  the modified contents are available.
+
+
+  @param This            Calling context
+  @param FvbHandle       The handle of FVB protocol that provides services for
+                         reading, writing, and erasing the target block.
+  @param Lba             The logical block address of the target block.
+  @param Offset          The offset within the target block to place the data.
+  @param NumBytes        The number of bytes to write to the target block.
+  @param Buffer          The data to write.
+
+  @retval  EFI_SUCCESS           The function completed successfully
+  @retval  EFI_BAD_BUFFER_SIZE   The write would span a target block, which is not
+                                 a valid action.
+  @retval  EFI_ACCESS_DENIED     No writes have been allocated.
+  @retval  EFI_NOT_FOUND         Cannot find FVB by handle.
+  @retval  EFI_OUT_OF_RESOURCES  Cannot allocate memory.
+  @retval  EFI_ABORTED           The function could not complete successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 FtwLiteWrite (
@@ -42,33 +66,6 @@ FtwLiteWrite (
   IN OUT UINTN                             *NumBytes,
   IN VOID                                  *Buffer
   )
-/*++
-
-Routine Description:
-    Starts a target block update. This function will record data about write 
-    in fault tolerant storage and will complete the write in a recoverable 
-    manner, ensuring at all times that either the original contents or 
-    the modified contents are available.
-
-Arguments:
-    This             - Calling context
-    FvbHandle        - The handle of FVB protocol that provides services for 
-                       reading, writing, and erasing the target block.
-    Lba              - The logical block address of the target block.  
-    Offset           - The offset within the target block to place the data.
-    NumBytes         - The number of bytes to write to the target block.
-    Buffer           - The data to write.
-
-Returns:
-    EFI_SUCCESS          - The function completed successfully
-    EFI_BAD_BUFFER_SIZE  - The write would span a target block, which is not 
-                           a valid action.
-    EFI_ACCESS_DENIED    - No writes have been allocated.
-    EFI_NOT_FOUND        - Cannot find FVB by handle.
-    EFI_OUT_OF_RESOURCES - Cannot allocate memory.
-    EFI_ABORTED          - The function could not complete successfully.
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice;
@@ -385,28 +382,25 @@ Returns:
 }
 
 
+/**
+  Write a record with fault tolerant mannaer.
+  Since the content has already backuped in spare block, the write is
+  guaranteed to be completed with fault tolerant manner.
+
+
+  @param FtwLiteDevice   The private data of FTW_LITE driver
+  @param Fvb             The FVB protocol that provides services for
+                         reading, writing, and erasing the target block.
+
+  @retval  EFI_SUCCESS          The function completed successfully
+  @retval  EFI_ABORTED          The function could not complete successfully
+
+**/
 EFI_STATUS
 FtwWriteRecord (
   IN EFI_FTW_LITE_DEVICE                   *FtwLiteDevice,
   IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb
   )
-/*++
-
-Routine Description:
-    Write a record with fault tolerant mannaer.
-    Since the content has already backuped in spare block, the write is 
-    guaranteed to be completed with fault tolerant manner.
-    
-Arguments:
-    FtwLiteDevice       - The private data of FTW_LITE driver
-    Fvb                 - The FVB protocol that provides services for 
-                          reading, writing, and erasing the target block.
-
-Returns:
-    EFI_SUCCESS         - The function completed successfully
-    EFI_ABORTED         - The function could not complete successfully
-
---*/
 {
   EFI_STATUS          Status;
   EFI_FTW_LITE_RECORD *Record;
@@ -471,28 +465,25 @@ Returns:
 }
 
 
+/**
+  Restarts a previously interrupted write. The caller must provide the
+  block protocol needed to complete the interrupted write.
+
+
+  @param FtwLiteDevice   The private data of FTW_LITE driver
+                         FvbHandle           - The handle of FVB protocol that provides services for
+                         reading, writing, and erasing the target block.
+
+  @retval  EFI_SUCCESS          The function completed successfully
+  @retval  EFI_ACCESS_DENIED    No pending writes exist
+  @retval  EFI_NOT_FOUND        FVB protocol not found by the handle
+  @retval  EFI_ABORTED          The function could not complete successfully
+
+**/
 EFI_STATUS
 FtwRestart (
   IN EFI_FTW_LITE_DEVICE    *FtwLiteDevice
   )
-/*++
-
-Routine Description:
-    Restarts a previously interrupted write. The caller must provide the 
-    block protocol needed to complete the interrupted write.
-    
-Arguments:
-    FtwLiteDevice       - The private data of FTW_LITE driver
-    FvbHandle           - The handle of FVB protocol that provides services for 
-                          reading, writing, and erasing the target block.
-
-Returns:
-    EFI_SUCCESS         - The function completed successfully
-    EFI_ACCESS_DENIED   - No pending writes exist
-    EFI_NOT_FOUND       - FVB protocol not found by the handle
-    EFI_ABORTED         - The function could not complete successfully
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_FTW_LITE_RECORD                 *Record;
@@ -539,24 +530,21 @@ Returns:
 }
 
 
+/**
+  Aborts all previous allocated writes.
+
+
+  @param FtwLiteDevice   The private data of FTW_LITE driver
+
+  @retval  EFI_SUCCESS       The function completed successfully
+  @retval  EFI_ABORTED       The function could not complete successfully.
+  @retval  EFI_NOT_FOUND     No allocated writes exist.
+
+**/
 EFI_STATUS
 FtwAbort (
   IN EFI_FTW_LITE_DEVICE    *FtwLiteDevice
   )
-/*++
-
-Routine Description:
-    Aborts all previous allocated writes.
-
-Arguments:
-    FtwLiteDevice    - The private data of FTW_LITE driver
-
-Returns:
-    EFI_SUCCESS      - The function completed successfully
-    EFI_ABORTED      - The function could not complete successfully.
-    EFI_NOT_FOUND    - No allocated writes exist.
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       Offset;
@@ -591,26 +579,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is the entry point of the Fault Tolerant Write driver.
+
+
+  @param ImageHandle     EFI_HANDLE: A handle for the image that is initializing
+                         this driver
+  @param SystemTable     EFI_SYSTEM_TABLE: A pointer to the EFI system table
+
+  @retval  EFI_SUCCESS            FTW has finished the initialization
+  @retval  EFI_ABORTED            FTW initialization error
+
+**/
 EFI_STATUS
 EFIAPI
 InitializeFtwLite (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
-  Routine Description: 
-    This function is the entry point of the Fault Tolerant Write driver.
-  
-  Arguments: 
-    ImageHandle   - EFI_HANDLE: A handle for the image that is initializing 
-                    this driver
-    SystemTable   - EFI_SYSTEM_TABLE: A pointer to the EFI system table
-        
-  Returns:  
-    EFI_SUCCESS           - FTW has finished the initialization
-    EFI_ABORTED           - FTW initialization error
-
---*/
 {
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
   UINTN                               Index;
