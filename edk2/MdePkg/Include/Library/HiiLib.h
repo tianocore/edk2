@@ -178,7 +178,6 @@ HiiLibSetString (
   @retval EFI_INVALID_PARAMETER  The String or StringSize was NULL.
 
 **/
-
 EFI_STATUS
 EFIAPI
 HiiLibGetString (

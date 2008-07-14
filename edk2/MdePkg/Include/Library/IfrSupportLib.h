@@ -224,8 +224,8 @@ CreateGotoOpCode (
 /**
   Create EFI_IFR_ONE_OF_OPTION_OP opcode.
 
-  @param  QuestionId             Question ID
-  @param  OptionList             The list of Options.
+  @param  OptionCount            The number of options.
+  @param  OptionsList            The list of Options.
   @param  Type                   The data type.
   @param  Data                   Destination for the created opcode binary
 
@@ -287,7 +287,7 @@ CreateOneOfOpCode (
   @param  Prompt                 String ID for Prompt
   @param  Help                   String ID for Help
   @param  QuestionFlags          Flags in Question Header
-  @param  Flags                  Flags for ordered list opcode
+  @param  OrderedListFlags       Flags for ordered list opcode
   @param  DataType               Type for option value
   @param  MaxContainers          Maximum count for options in this ordered list
   @param  OptionsList            List of options
@@ -308,7 +308,7 @@ CreateOrderedListOpCode (
   IN      EFI_STRING_ID       Prompt,
   IN      EFI_STRING_ID       Help,
   IN      UINT8               QuestionFlags,
-  IN      UINT8               Flags,
+  IN      UINT8               OrderedListFlags,
   IN      UINT8               DataType,
   IN      UINT8               MaxContainers,
   IN      IFR_OPTION          *OptionsList,

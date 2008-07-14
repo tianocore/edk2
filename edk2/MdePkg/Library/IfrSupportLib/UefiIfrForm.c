@@ -1,4 +1,6 @@
 /** @file
+Utility functions which helps in opcode creation, HII configuration string manipulations, 
+pop up window creations, setup browser persistence data set and get.
 
 Copyright (c) 2007- 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -8,15 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  UefiIfrForm.c
-
-Abstract:
-
-  Common Library Routines to assist handle HII elements.
-
 
 **/
 
@@ -223,7 +216,7 @@ IfrLibCreatePopUp (
 
 
 /**
-  Swap bytes in the buffer.
+  Swap bytes in the buffer. This is a internal function.
 
   @param  Buffer                 Binary buffer.
   @param  BufferSize             Size of the buffer in bytes.
@@ -231,7 +224,6 @@ IfrLibCreatePopUp (
   @return None.
 
 **/
-STATIC
 VOID
 SwapBuffer (
   IN OUT UINT8     *Buffer,
@@ -252,11 +244,10 @@ SwapBuffer (
 
 /**
   Converts the unicode character of the string from uppercase to lowercase.
+  This is a internal function.
 
   @param Str     String to be converted
 
-  @retval VOID
-  
 **/
 VOID
 ToLower (

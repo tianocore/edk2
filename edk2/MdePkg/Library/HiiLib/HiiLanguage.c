@@ -15,6 +15,21 @@
 
 #include "InternalHiiLib.h"
 
+/**
+  Determine what is the current language setting. The space reserved for Lang
+  must be at least RFC_3066_ENTRY_SIZE bytes;
+
+  If Lang is NULL, then ASSERT.
+
+  @param  Lang                   Pointer of system language. Lang will always be filled with 
+                                         a valid RFC 3066 language string. If "PlatformLang" is not
+                                         set in the system, the default language specifed by PcdUefiVariableDefaultPlatformLang
+                                         is returned.
+
+  @return  EFI_SUCCESS     If the EFI Variable with "PlatformLang" is set and return in Lang.
+  @return  EFI_NOT_FOUND If the EFI Variable with "PlatformLang" is not set, but a valid default language is return in Lang.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiLibGetCurrentLanguage (
@@ -46,6 +61,18 @@ HiiLibGetCurrentLanguage (
 }
 
 
+/**
+  Get next language from language code list (with separator ';').
+
+  If LangCode is NULL, then ASSERT.
+  If Lang is NULL, then ASSERT.
+
+  @param  LangCode    On input: point to first language in the list. On
+                                 output: point to next language in the list, or
+                                 NULL if no more language in the list.
+  @param  Lang           The first language in the list.
+
+**/
 VOID
 EFIAPI
 HiiLibGetNextLanguage (
@@ -75,6 +102,18 @@ HiiLibGetNextLanguage (
 }
 
 
+/**
+  This function returns the list of supported languages, in the format specified
+  in UEFI specification Appendix M.
+
+  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
+
+  @param  HiiHandle              The HII package list handle.
+
+  @retval   !NULL  The supported languages.
+  @retval   NULL    If Supported Languages can not be retrived.
+
+**/
 CHAR8 *
 EFIAPI
 HiiLibGetSupportedLanguages (
@@ -118,6 +157,17 @@ HiiLibGetSupportedLanguages (
 }
 
 
+/**
+  This function returns the number of supported languages on HiiHandle.
+
+  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
+  If not enough resource to complete the operation, then ASSERT.
+
+  @param  HiiHandle              The HII package list handle.
+
+  @return The  number of supported languages.
+
+**/
 UINT16
 EFIAPI
 HiiLibGetSupportedLanguageNumber (
@@ -145,6 +195,19 @@ HiiLibGetSupportedLanguageNumber (
   return LangNumber;
 }
 
+/**
+  This function returns the list of supported 2nd languages, in the format specified
+  in UEFI specification Appendix M.
+
+  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
+  If not enough resource to complete the operation, then ASSERT.
+
+  @param  HiiHandle              The HII package list handle.
+  @param  FirstLanguage          Pointer to language name buffer.
+  
+  @return The supported languages.
+
+**/
 CHAR8 *
 EFIAPI
 HiiLibGetSupportedSecondaryLanguages (
