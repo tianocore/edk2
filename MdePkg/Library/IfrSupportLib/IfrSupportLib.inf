@@ -1,7 +1,7 @@
 #/** @file
-# Component name for module UefiEfiIfrSupportLib
+#Utility functions which helps in opcode creation, HII configuration string manipulations, 
+#pop up window creations, setup browser persistence data set and get.
 #
-# FIX ME!
 # Copyright (c) 2007, Intel Corporation. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials

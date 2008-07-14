@@ -14,6 +14,25 @@
 
 
 #include "InternalHiiLib.h"
+
+/**
+  This function adds the string into String Package of each language
+  supported by the package list.
+
+  If String is NULL, then ASSERT.
+  If StringId is NULL, the ASSERT.
+  If PackageList could not be found in the default HII database, then ASSERT.
+
+  @param  PackageList            Handle of the package list where this string will
+                                            be added.
+  @param  StringId               On return, contains the new strings id, which is
+                                          unique within PackageList.
+  @param  String                 Points to the new null-terminated string.
+
+  @retval EFI_SUCCESS             The new string was added successfully.
+  @retval EFI_OUT_OF_RESOURCES   Could not add the string due to lack of resources.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiLibNewString (
@@ -58,6 +77,24 @@ HiiLibNewString (
   
 }
 
+
+/**
+  This function update the specified string in String Package of each language
+  supported by the package list.
+
+  If String is NULL, then ASSERT.
+  If PackageList could not be found in the default HII database, then ASSERT.
+  If StringId is not found in PackageList, then ASSERT.
+
+  @param  PackageList            Handle of the package list where this string will
+                                            be added.
+  @param  StringId               Ths String Id to be updated.
+  @param  String                 Points to the new null-terminated string.
+
+  @retval EFI_SUCCESS            The new string was added successfully.
+  @retval EFI_OUT_OF_RESOURCES   Could not add the string due to lack of resources.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiLibSetString (
@@ -101,6 +138,22 @@ HiiLibSetString (
 }
 
 
+/**
+  Get the string given the StringId and String package Producer's Guid. The caller
+  is responsible to free the *String.
+
+  If PackageList with the matching ProducerGuid is not found, then ASSERT.
+  If PackageList with the matching ProducerGuid is found but no String is
+  specified by StringId is found, then ASSERT.
+
+  @param  ProducerGuid           The Guid of String package list.
+  @param  StringId               The String ID.
+  @param  String                 The output string.
+
+  @retval EFI_SUCCESS            Operation is successful.
+  @retval EFI_OUT_OF_RESOURCES   There is not enought memory in the system.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiLibGetStringFromToken (
@@ -147,6 +200,31 @@ Out:
   return Status;
 }
 
+/**
+  This function try to retrieve string from String package of current language.
+  If fails, it try to retrieve string from String package of first language it support.
+
+  If String is NULL, then ASSERT.
+  If StringSize is NULL, then ASSERT.
+  If PackageList could not be found in the default HII database, then ASSERT.
+  If StringId is not found in PackageList, then ASSERT.
+
+  @param  PackageList     The package list in the HII database to search for
+                                     the specified string.
+  @param  StringId          The string's id, which is unique within
+                                      PackageList.
+  @param  String             Points to the new null-terminated string.
+  @param  StringSize       On entry, points to the size of the buffer pointed
+                                 to by String, in bytes. On return, points to the
+                                 length of the string, in bytes.
+
+  @retval EFI_SUCCESS            The string was returned successfully.
+  @retval EFI_NOT_FOUND          The string specified by StringId is not available.
+  @retval EFI_BUFFER_TOO_SMALL   The buffer specified by StringLength is too small
+                                 to hold the string.
+  @retval EFI_INVALID_PARAMETER  The String or StringSize was NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiLibGetString (
@@ -201,6 +279,24 @@ HiiLibGetString (
 }
 
 
+/**
+  Get string specified by StringId form the HiiHandle. The caller
+  is responsible to free the *String.
+
+  If String is NULL, then ASSERT.
+  If HiiHandle could not be found in the default HII database, then ASSERT.
+  If StringId is not found in PackageList, then ASSERT.
+
+  @param  HiiHandle              The HII handle of package list.
+  @param  StringId               The String ID.
+  @param  String                 The output string.
+
+  @retval EFI_NOT_FOUND          String is not found.
+  @retval EFI_SUCCESS            Operation is successful.
+  @retval EFI_OUT_OF_RESOURCES   There is not enought memory in the system.
+  @retval EFI_INVALID_PARAMETER  The String is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiLibGetStringFromHandle (

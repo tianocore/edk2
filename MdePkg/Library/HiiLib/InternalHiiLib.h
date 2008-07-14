@@ -41,12 +41,26 @@ extern CONST EFI_HII_STRING_PROTOCOL           *mHiiStringProt;
 extern BOOLEAN                           mHiiProtocolsInitialized;
 
 
+/**
+  This function check if the Hii Handle is a valid handle registered
+  in the HII database.
+
+  @param HiiHandle The HII Handle.
+
+  @retval TRUE If it is a valid HII handle.
+  @retval FALSE If it is a invalid HII handle.
+**/
 BOOLEAN
 IsHiiHandleRegistered (
   EFI_HII_HANDLE    HiiHandle
   )
 ;
 
+/**
+
+  This function locate Hii relative protocols for later usage.
+
+**/
 VOID
 LocateHiiProtocols (
   VOID
