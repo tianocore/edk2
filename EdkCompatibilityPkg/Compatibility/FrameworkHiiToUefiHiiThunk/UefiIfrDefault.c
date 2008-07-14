@@ -718,8 +718,8 @@ UefiDefaultsToFrameworkDefaults (
       // Initialize EFI_HII_VARIABLE_PACK
       //
       Pack->Header.Type   = 0;
-      Pack->Header.Length = Size;
-      Pack->VariableNameLength = StrSize (Node->Name);
+      Pack->Header.Length = (UINT32) Size;
+      Pack->VariableNameLength = (UINT32) StrSize (Node->Name);
       CopyMem (&Pack->VariableGuid, &Node->Guid, sizeof (EFI_GUID));
       
       CopyMem ((UINT8 *) Pack + sizeof (EFI_HII_VARIABLE_PACK), Node->Name, StrSize (Node->Name));
