@@ -31,7 +31,7 @@ UINT32  mCrcTable[256];
 /**
   Calculate CRC32 for target data.
 
-  @param  Len                   The target data.
+  @param  Data                  The target data.
   @param  DataSize              The target data size.
   @param  CrcOut                The CRC32 for target data.
 
@@ -68,13 +68,13 @@ RuntimeDriverCalculateCrc32 (
 
 /**
   Reverse bits for 32bit data.
+  This is a internal function.
 
   @param  Value                 The data to be reversed.
 
-  @retrun                       Data reversed.
+  @return                       Data reversed.
 
 **/
-STATIC
 UINT32
 ReverseBits (
   UINT32  Value
@@ -85,7 +85,7 @@ ReverseBits (
 
   NewValue = 0;
   for (Index = 0; Index < 32; Index++) {
-    if (Value & (1 << Index)) {
+    if ((Value & (1 << Index)) != 0) {
       NewValue = NewValue | (1 << (31 - Index));
     }
   }
@@ -95,11 +95,6 @@ ReverseBits (
 
 /**
   Initialize CRC32 table.
-
-  @param  None
-
-  @retrun None
-
 **/
 VOID
 RuntimeDriverInitializeCrc32Table (
@@ -113,7 +108,7 @@ RuntimeDriverInitializeCrc32Table (
   for (TableEntry = 0; TableEntry < 256; TableEntry++) {
     Value = ReverseBits ((UINT32) TableEntry);
     for (Index = 0; Index < 8; Index++) {
-      if (Value & 0x80000000) {
+      if ((Value & 0x80000000) != 0) {
         Value = (Value << 1) ^ 0x04c11db7;
       } else {
         Value = Value << 1;
