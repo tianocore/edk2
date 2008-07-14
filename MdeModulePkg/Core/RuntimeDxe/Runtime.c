@@ -1,21 +1,6 @@
 /** @file
   Runtime Architectural Protocol as defined in the DXE CIS.
 
-Copyright (c) 2006, Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Runtime.c
-
-Abstract:
-
   This code is used to produce the EFI runtime virtual switch over
 
   THIS IS VERY DANGEROUS CODE BE VERY CAREFUL IF YOU CHANGE IT
@@ -47,6 +32,16 @@ Revision History:
   - Move the CalculateCrc32 function from Runtime Arch Protocol to Boot Service.
   Runtime Arch Protocol definition no longer contains CalculateCrc32. Boot Service
   Table now contains an item named CalculateCrc32.
+
+
+Copyright (c) 2006, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -89,28 +84,21 @@ EFI_RUNTIME_ARCH_PROTOCOL     mRuntime = {
 //
 // Worker Functions
 //
-STATIC
+/**
+
+  Calcualte the 32-bit CRC in a EFI table using the Runtime Drivers
+  internal function.  The EFI Boot Services Table can not be used because
+  the EFI Boot Services Table was destroyed at ExitBootServices().
+  This is a internal function.
+
+
+  @param Hdr             Pointer to an EFI standard header
+
+**/
 VOID
 RuntimeDriverCalculateEfiHdrCrc (
   IN OUT EFI_TABLE_HEADER  *Hdr
   )
-/*++
-
-Routine Description:
-
-  Calcualte the 32-bit CRC in a EFI table using the Runtime Drivers
-  internal function.  The EFI Boot Services Table can not be used because
-  the EFI Boot Services Table was destroyed at ExitBootServices()
-
-Arguments:
-
-  Hdr  - Pointer to an EFI standard header
-
-Returns:
-
-  None
-
---*/
 {
   UINT32  Crc;
 
@@ -121,32 +109,27 @@ Returns:
   Hdr->CRC32 = Crc;
 }
 
+/**
+
+  Determines the new virtual address that is to be used on subsequent memory accesses.
+
+
+  @param DebugDisposition Supplies type information for the pointer being converted.
+  @param ConvertAddress  A pointer to a pointer that is to be fixed to be the value needed
+                         for the new virtual address mappings being applied.
+
+  @retval  EFI_SUCCESS              The pointer pointed to by Address was modified.
+  @retval  EFI_NOT_FOUND            The pointer pointed to by Address was not found to be part
+                                    of the current memory map. This is normally fatal.
+  @retval  EFI_INVALID_PARAMETER    One of the parameters has an invalid value.
+
+**/
 EFI_STATUS
 EFIAPI
 RuntimeDriverConvertPointer (
   IN     UINTN  DebugDisposition,
   IN OUT VOID   **ConvertAddress
   )
-/*++
-
-Routine Description:
-
-  Determines the new virtual address that is to be used on subsequent memory accesses.
-
-Arguments:
-
-  DebugDisposition    - Supplies type information for the pointer being converted.
-  ConvertAddress      - A pointer to a pointer that is to be fixed to be the value needed
-                        for the new virtual address mappings being applied.
-
-Returns:
-
-  EFI_SUCCESS             - The pointer pointed to by Address was modified.
-  EFI_NOT_FOUND           - The pointer pointed to by Address was not found to be part
-                            of the current memory map. This is normally fatal.
-  EFI_INVALID_PARAMETER   - One of the parameters has an invalid value.
-
---*/
 {
   UINTN                 Address;
   UINT64                VirtEndOfRange;
@@ -168,7 +151,7 @@ Returns:
   // If this is a null pointer, return if it's allowed
   //
   if (Address == 0) {
-    if (DebugDisposition & EFI_OPTIONAL_POINTER) {
+    if ((DebugDisposition & EFI_OPTIONAL_POINTER) != 0) {
       return EFI_SUCCESS;
     }
 
@@ -204,35 +187,51 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
-STATIC
+/**
+
+  Determines the new virtual address that is to be used on subsequent memory accesses
+  for internal pointers.
+  This is a internal function.
+
+
+  @param ConvertAddress  A pointer to a pointer that is to be fixed to be the value needed
+                         for the new virtual address mappings being applied.
+
+  @retval  EFI_SUCCESS              The pointer pointed to by Address was modified.
+  @retval  EFI_NOT_FOUND            The pointer pointed to by Address was not found to be part
+                                    of the current memory map. This is normally fatal.
+  @retval  EFI_INVALID_PARAMETER    One of the parameters has an invalid value.
+
+**/
 EFI_STATUS
 RuntimeDriverConvertInternalPointer (
   IN OUT VOID   **ConvertAddress
   )
-/*++
-
-Routine Description:
-
-  Determines the new virtual address that is to be used on subsequent memory accesses
-  for internal pointers.
-
-Arguments:
-
-  ConvertAddress  - A pointer to a pointer that is to be fixed to be the value needed
-                    for the new virtual address mappings being applied.
-
-Returns:
-
-  EFI_SUCCESS             - The pointer pointed to by Address was modified.
-  EFI_NOT_FOUND           - The pointer pointed to by Address was not found to be part
-                            of the current memory map. This is normally fatal.
-  EFI_INVALID_PARAMETER   - One of the parameters has an invalid value.
-
---*/
 {
   return RuntimeDriverConvertPointer (0x0, ConvertAddress);
 }
 
+/**
+
+  Changes the runtime addressing mode of EFI firmware from physical to virtual.
+
+
+  @param MemoryMapSize   The size in bytes of VirtualMap.
+  @param DescriptorSize  The size in bytes of an entry in the VirtualMap.
+  @param DescriptorVersion The version of the structure entries in VirtualMap.
+  @param VirtualMap      An array of memory descriptors which contain new virtual
+                         address mapping information for all runtime ranges.
+
+  @retval  EFI_SUCCESS            The virtual address map has been applied.
+  @retval  EFI_UNSUPPORTED        EFI firmware is not at runtime, or the EFI firmware is already in
+                                  virtual address mapped mode.
+  @retval  EFI_INVALID_PARAMETER  DescriptorSize or DescriptorVersion is invalid.
+  @retval  EFI_NO_MAPPING         A virtual address was not supplied for a range in the memory
+                                  map that requires a mapping.
+  @retval  EFI_NOT_FOUND          A virtual address was supplied for an address that is not found
+                                  in the memory map.
+
+**/
 EFI_STATUS
 EFIAPI
 RuntimeDriverSetVirtualAddressMap (
@@ -241,32 +240,6 @@ RuntimeDriverSetVirtualAddressMap (
   IN UINT32                 DescriptorVersion,
   IN EFI_MEMORY_DESCRIPTOR  *VirtualMap
   )
-/*++
-
-Routine Description:
-
-  Changes the runtime addressing mode of EFI firmware from physical to virtual.
-
-Arguments:
-
-  MemoryMapSize     - The size in bytes of VirtualMap.
-  DescriptorSize    - The size in bytes of an entry in the VirtualMap.
-  DescriptorVersion - The version of the structure entries in VirtualMap.
-  VirtualMap        - An array of memory descriptors which contain new virtual
-                      address mapping information for all runtime ranges.
-
-Returns:
-
-  EFI_SUCCESS           - The virtual address map has been applied.
-  EFI_UNSUPPORTED       - EFI firmware is not at runtime, or the EFI firmware is already in
-                          virtual address mapped mode.
-  EFI_INVALID_PARAMETER - DescriptorSize or DescriptorVersion is invalid.
-  EFI_NO_MAPPING        - A virtual address was not supplied for a range in the memory
-                          map that requires a mapping.
-  EFI_NOT_FOUND         - A virtual address was supplied for an address that is not found
-                          in the memory map.
-
---*/
 {
   EFI_STATUS                    Status;
   EFI_RUNTIME_EVENT_ENTRY       *RuntimeEvent;
@@ -388,29 +361,26 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Install Runtime AP. This code includes the EfiDriverLib, but it functions at
+  RT in physical mode. The only Lib services are gBS, gRT, and the DEBUG and
+  ASSERT macros (they do ReportStatusCode).
+
+
+  @param ImageHandle     Image handle of this driver.
+  @param SystemTable     Pointer to the EFI System Table.
+
+  @retval  EFI_SUCEESS  Runtime Driver Architectural Protocol Installed
+  @return  Other value if gBS->InstallMultipleProtocolInterfaces fails. Check
+           gBS->InstallMultipleProtocolInterfaces for details.
+
+**/
 EFI_STATUS
 EFIAPI
 RuntimeDriverInitialize (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
-/*++
-
-Routine Description:
-  Install Runtime AP. This code includes the EfiDriverLib, but it functions at
-  RT in physical mode. The only Lib services are gBS, gRT, and the DEBUG and
-  ASSERT macros (they do ReportStatusCode).
-
-Arguments:
-  (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
-
-Returns:
-
-  EFI_SUCEESS - Runtime Driver Architectural Protocol Installed
-
-  Other       - Return value from gBS->InstallMultipleProtocolInterfaces
-
---*/
 {
   EFI_STATUS                Status;
   EFI_LOADED_IMAGE_PROTOCOL *MyLoadedImage;
