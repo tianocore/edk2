@@ -207,10 +207,10 @@ GetGlyphWidth (
   IN CHAR16  UnicodeChar
   )
 {
-  UINTN               Index;
-  UINTN               Low;
-  UINTN               High;
-  UNICODE_WIDTH_ENTRY *Item;
+  UINTN                     Index;
+  UINTN                     Low;
+  UINTN                     High;
+  CONST UNICODE_WIDTH_ENTRY *Item;
 
   Item  = NULL;
   Low   = 0;
