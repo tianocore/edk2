@@ -527,11 +527,11 @@ Returns:
                                           );
 
               } else {
-                CopyMem (
-                  (VOID*)(UINTN) NewPermenentMemoryBase,
-                  SecCoreData->TemporaryRamBase,
-                  SecCoreData->TemporaryRamSize
-                  );
+                //
+                // In IA32/x64/Itanium architecture, we need platform provide
+                // TEMPORAY_RAM_MIGRATION_PPI.
+                //
+                ASSERT (FALSE);
               }
 
 
