@@ -15,29 +15,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <FtwLite.h>
 
+/**
+
+  Check whether a flash buffer is erased.
+
+
+  @param Polarity        All 1 or all 0
+  @param Buffer          Buffer to check
+  @param BufferSize      Size of the buffer
+
+  @return A BOOLEAN value indicating erased or not.
+
+**/
 BOOLEAN
 IsErasedFlashBuffer (
   IN BOOLEAN         Polarity,
   IN UINT8           *Buffer,
   IN UINTN           BufferSize
   )
-/*++
-
-Routine Description:
-
-  Check whether a flash buffer is erased.
-
-Arguments:
-
-  Polarity    - All 1 or all 0
-  Buffer      - Buffer to check
-  BufferSize  - Size of the buffer
-
-Returns:
-
-  Erased or not.
-
---*/
 {
   UINT8 ErasedValue;
   UINT8 *Ptr;
@@ -49,7 +44,7 @@ Returns:
   }
 
   Ptr = Buffer;
-  while (BufferSize--) {
+  while ((BufferSize--) != 0) {
     if (*Ptr++ != ErasedValue) {
       return FALSE;
     }
@@ -58,27 +53,24 @@ Returns:
   return TRUE;
 }
 
+/**
+  To Erase one block. The size is FTW_BLOCK_SIZE
+
+
+  @param FtwLiteDevice   Calling context
+  @param FvBlock         FVB Protocol interface
+  @param Lba             Lba of the firmware block
+
+  @retval  EFI_SUCCESS    Block LBA is Erased successfully
+  @retval  Others         Error occurs
+
+**/
 EFI_STATUS
 FtwEraseBlock (
   IN EFI_FTW_LITE_DEVICE              *FtwLiteDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
   EFI_LBA                             Lba
   )
-/*++
-
-Routine Description:
-    To Erase one block. The size is FTW_BLOCK_SIZE
-
-Arguments:
-    FtwLiteDevice - Calling context
-    FvBlock       - FVB Protocol interface
-    Lba        - Lba of the firmware block
-
-Returns:
-    EFI_SUCCESS   - Block LBA is Erased successfully
-    Others        - Error occurs
-
---*/
 {
   return FvBlock->EraseBlocks (
                     FvBlock,
@@ -88,25 +80,32 @@ Returns:
                     );
 }
 
+/**
+
+  Erase spare block.
+
+
+  @param FtwLiteDevice   Calling context
+
+  @retval EFI_SUCCESS The erase request was successfully
+                      completed.
+  
+  @retval EFI_ACCESS_DENIED   The firmware volume is in the
+                              WriteDisabled state.
+  @retval EFI_DEVICE_ERROR  The block device is not functioning
+                            correctly and could not be written.
+                            The firmware device may have been
+                            partially erased.
+  @retval EFI_INVALID_PARAMETER One or more of the LBAs listed
+                                in the variable argument list do
+                                not exist in the firmware volume.  
+
+
+**/
 EFI_STATUS
 FtwEraseSpareBlock (
   IN EFI_FTW_LITE_DEVICE   *FtwLiteDevice
   )
-/*++
-
-Routine Description:
-
-  Erase spare block.
-
-Arguments:
-
-  FtwLiteDevice - Calling context
-
-Returns:
-
-  Status code
-
---*/
 {
   return FtwLiteDevice->FtwBackupFvb->EraseBlocks (
                                         FtwLiteDevice->FtwBackupFvb,
@@ -116,25 +115,23 @@ Returns:
                                         );
 }
 
+/**
+  Retrive the proper FVB protocol interface by HANDLE.
+
+
+  @param FvBlockHandle   The handle of FVB protocol that provides services for
+                         reading, writing, and erasing the target block.
+  @param FvBlock         The interface of FVB protocol
+
+  @retval  EFI_SUCCESS          The function completed successfully
+  @retval  EFI_ABORTED          The function could not complete successfully
+
+**/
 EFI_STATUS
 FtwGetFvbByHandle (
   IN EFI_HANDLE                           FvBlockHandle,
   OUT EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  **FvBlock
   )
-/*++
-
-Routine Description:
-    Retrive the proper FVB protocol interface by HANDLE.
-
-Arguments:
-    FvBlockHandle       - The handle of FVB protocol that provides services for 
-                          reading, writing, and erasing the target block.
-    FvBlock             - The interface of FVB protocol
-
-Returns:
-    EFI_SUCCESS         - The function completed successfully
-    EFI_ABORTED         - The function could not complete successfully
---*/
 {
   //
   // To get the FVB protocol interface on the handle
@@ -146,29 +143,23 @@ Returns:
                 );
 }
 
+/**
+
+  Get firmware block by address.
+
+
+  @param Address         Address specified the block
+  @param FvBlock         The block caller wanted
+
+  @retval  EFI_SUCCESS    The protocol instance if found.
+  @retval  EFI_NOT_FOUND  Block not found
+
+**/
 EFI_STATUS
 GetFvbByAddress (
   IN  EFI_PHYSICAL_ADDRESS               Address,
   OUT EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL **FvBlock
   )
-/*++
-
-Routine Description:
-
-  Get firmware block by address.
-
-Arguments:
-
-  Address - Address specified the block
-  FvBlock - The block caller wanted
-
-Returns:
-
-  Status code
-
-  EFI_NOT_FOUND - Block not found
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_HANDLE                          *HandleBuffer;
@@ -225,29 +216,24 @@ Returns:
   return Status;
 }
 
+/**
+
+  Is it in working block?
+
+
+  @param FtwLiteDevice   Calling context
+  @param FvBlock         Fvb protocol instance
+  @param Lba             The block specified
+
+  @return A BOOLEAN value indicating in working block or not.
+
+**/
 BOOLEAN
 IsInWorkingBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
   EFI_LBA                             Lba
   )
-/*++
-
-Routine Description:
-
-  Is it in working block?
-
-Arguments:
-
-  FtwLiteDevice - Calling context
-  FvBlock       - Fvb protocol instance
-  Lba           - The block specified
-
-Returns:
-
-  In working block or not
-
---*/
 {
   //
   // If matching the following condition, the target block is in working block.
@@ -262,32 +248,29 @@ Returns:
     );
 }
 
+/**
+  Copy the content of spare block to a target block. Size is FTW_BLOCK_SIZE.
+  Spare block is accessed by FTW backup FVB protocol interface. LBA is
+  FtwLiteDevice->FtwSpareLba.
+  Target block is accessed by FvBlock protocol interface. LBA is Lba.
+
+
+  @param FtwLiteDevice   The private data of FTW_LITE driver
+  @param FvBlock         FVB Protocol interface to access target block
+  @param Lba             Lba of the target block
+
+  @retval  EFI_SUCCESS               Spare block content is copied to target block
+  @retval  EFI_INVALID_PARAMETER     Input parameter error
+  @retval  EFI_OUT_OF_RESOURCES      Allocate memory error
+  @retval  EFI_ABORTED               The function could not complete successfully
+
+**/
 EFI_STATUS
 FlushSpareBlockToTargetBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
   EFI_LBA                             Lba
   )
-/*++
-
-Routine Description:
-    Copy the content of spare block to a target block. Size is FTW_BLOCK_SIZE.
-    Spare block is accessed by FTW backup FVB protocol interface. LBA is 
-    FtwLiteDevice->FtwSpareLba.
-    Target block is accessed by FvBlock protocol interface. LBA is Lba.
-
-Arguments:
-    FtwLiteDevice  - The private data of FTW_LITE driver
-    FvBlock        - FVB Protocol interface to access target block
-    Lba            - Lba of the target block
-
-Returns:
-    EFI_SUCCESS              - Spare block content is copied to target block
-    EFI_INVALID_PARAMETER    - Input parameter error
-    EFI_OUT_OF_RESOURCES     - Allocate memory error
-    EFI_ABORTED              - The function could not complete successfully
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       Length;
@@ -356,33 +339,29 @@ Returns:
   return Status;
 }
 
+/**
+  Copy the content of spare block to working block. Size is FTW_BLOCK_SIZE.
+  Spare block is accessed by FTW backup FVB protocol interface. LBA is
+  FtwLiteDevice->FtwSpareLba.
+  Working block is accessed by FTW working FVB protocol interface. LBA is
+  FtwLiteDevice->FtwWorkBlockLba.
+
+
+  @param FtwLiteDevice   The private data of FTW_LITE driver
+
+  @retval  EFI_SUCCESS               Spare block content is copied to target block
+  @retval  EFI_OUT_OF_RESOURCES      Allocate memory error
+  @retval  EFI_ABORTED               The function could not complete successfully
+                                     Notes:
+                                     Since the working block header is important when FTW initializes, the
+                                     state of the operation should be handled carefully. The Crc value is
+                                     calculated without STATE element.
+
+**/
 EFI_STATUS
 FlushSpareBlockToWorkingBlock (
   EFI_FTW_LITE_DEVICE          *FtwLiteDevice
   )
-/*++
-
-Routine Description:
-    Copy the content of spare block to working block. Size is FTW_BLOCK_SIZE.
-    Spare block is accessed by FTW backup FVB protocol interface. LBA is 
-    FtwLiteDevice->FtwSpareLba.
-    Working block is accessed by FTW working FVB protocol interface. LBA is 
-    FtwLiteDevice->FtwWorkBlockLba.
-
-Arguments:
-    FtwLiteDevice  - The private data of FTW_LITE driver
-
-Returns:
-    EFI_SUCCESS              - Spare block content is copied to target block
-    EFI_OUT_OF_RESOURCES     - Allocate memory error
-    EFI_ABORTED              - The function could not complete successfully
-
-Notes:
-    Since the working block header is important when FTW initializes, the 
-    state of the operation should be handled carefully. The Crc value is 
-    calculated without STATE element. 
-
---*/
 {
   EFI_STATUS                              Status;
   UINTN                                   Length;
