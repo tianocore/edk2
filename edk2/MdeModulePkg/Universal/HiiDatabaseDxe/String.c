@@ -1,4 +1,6 @@
 /** @file
+Implementation for EFI_HII_STRING_PROTOCOL.
+
 
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -8,17 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-    String.c
-
-Abstract:
-
-    Implementation for EFI_HII_STRING_PROTOCOL.
-
-Revision History
-
 
 **/
 
@@ -38,6 +29,9 @@ CHAR16 mLanguageWindow[16] = {
   font info list or not. (i.e. HII_FONT_INFO is generated.) If not, create
   a HII_FONT_INFO to refer it locally.
 
+  This is a internal function.
+
+
   @param  Private                Hii database private structure.
   @param  StringPackage          HII string package instance.
   @param  FontId                Font identifer, which must be unique within the string package.
@@ -53,7 +47,6 @@ CHAR16 mLanguageWindow[16] = {
   @retval FALSE                  Not referred before calling this function.
 
 **/
-STATIC
 BOOLEAN
 ReferFontInfoLocally (
   IN  HII_DATABASE_PRIVATE_DATA   *Private,
@@ -104,8 +97,12 @@ ReferFontInfoLocally (
 /**
   Convert Ascii string text to unicode string test.
 
-  @param  StringSrc              Points to current null-terminated Ascii string.
-  @param  StringDest             Buffer to store the converted string text.
+  This is a internal function.
+
+
+  @param  StringDest             Buffer to store the string text. If it is NULL,
+                                 only the size will be returned.
+  @param  StringSrc              Points to current null-terminated string.
   @param  BufferSize             Length of the buffer.
 
   @retval EFI_SUCCESS            The string text was outputed successfully.
@@ -114,7 +111,6 @@ ReferFontInfoLocally (
                                  size.
 
 **/
-STATIC
 EFI_STATUS
 ConvertToUnicodeText (
   OUT EFI_STRING       StringDest,
@@ -146,8 +142,11 @@ ConvertToUnicodeText (
   Calculate the size of StringSrc and output it. If StringDest is not NULL,
   copy string text from src to dest.
 
+  This is a internal function.
+
+  @param  StringDest             Buffer to store the string text. If it is NULL,
+                                 only the size will be returned.
   @param  StringSrc              Points to current null-terminated string.
-  @param  StringDest             Buffer to store the string text.
   @param  BufferSize             Length of the buffer.
 
   @retval EFI_SUCCESS            The string text was outputed successfully.
@@ -156,7 +155,6 @@ ConvertToUnicodeText (
                                  size.
 
 **/
-STATIC
 EFI_STATUS
 GetUnicodeStringTextOrSize (
   OUT EFI_STRING       StringDest, OPTIONAL
@@ -194,6 +192,8 @@ GetUnicodeStringTextOrSize (
 /**
   Copy string font info to a buffer.
 
+  This is a internal function.
+
   @param  StringPackage          Hii string package instance.
   @param  FontId                 Font identifier which is unique in a string
                                  package.
@@ -204,7 +204,6 @@ GetUnicodeStringTextOrSize (
   @retval EFI_NOT_FOUND          The specified font id does not exist.
 
 **/
-STATIC
 EFI_STATUS
 GetStringFontInfo (
   IN  HII_STRING_PACKAGE_INSTANCE     *StringPackage,
@@ -567,6 +566,8 @@ FindStringBlock (
 /**
   Parse all string blocks to get a string specified by StringId.
 
+  This is a internal function.
+
   @param  Private                Hii database private structure.
   @param  StringPackage          Hii string package instance.
   @param  StringId               The string's id, which is unique within
@@ -587,7 +588,6 @@ FindStringBlock (
                                  hold the string.
 
 **/
-STATIC
 EFI_STATUS
 GetStringWorker (
   IN HII_DATABASE_PRIVATE_DATA        *Private,
@@ -676,6 +676,8 @@ GetStringWorker (
 /**
   Parse all string blocks to set a String specified by StringId.
 
+  This is a internal function.
+
   @param  Private                HII database driver private structure.
   @param  StringPackage          HII string package instance.
   @param  StringId               The string's id, which is unique within
@@ -693,7 +695,6 @@ GetStringWorker (
                                  task.
 
 **/
-STATIC
 EFI_STATUS
 SetStringWorker (
   IN  HII_DATABASE_PRIVATE_DATA       *Private,
@@ -1557,14 +1558,14 @@ HiiGetLanguages (
                                  FirstLanguage. If there are no secondary
                                  languages, the function  returns successfully, but
                                  this is set to NULL.
-  @param  SecondaryLanguageSize  On entry, points to the size of the buffer pointed
-                                 to  by SecondLanguages, in bytes. On return,
-                                 points to the length of SecondLanguages in bytes.
+  @param  SecondaryLanguagesSize On entry, points to the size of the buffer pointed
+                                 to  by SecondaryLanguages, in bytes. On return,
+                                 points to the length of SecondaryLanguages in bytes.
 
   @retval EFI_SUCCESS            Secondary languages were correctly returned.
-  @retval EFI_INVALID_PARAMETER  FirstLanguage or SecondLanguages or
-                                 SecondLanguagesSize was NULL.
-  @retval EFI_BUFFER_TOO_SMALL   The buffer specified by SecondLanguagesSize is
+  @retval EFI_INVALID_PARAMETER  FirstLanguage or SecondaryLanguages or
+                                 SecondaryLanguagesSize was NULL.
+  @retval EFI_BUFFER_TOO_SMALL   The buffer specified by SecondaryLanguagesSize is
                                  too small to hold the returned information.
                                  SecondLanguageSize is updated to hold the size of
                                  the buffer required.
@@ -1579,8 +1580,8 @@ HiiGetSecondaryLanguages (
   IN CONST EFI_HII_STRING_PROTOCOL   *This,
   IN EFI_HII_HANDLE                  PackageList,
   IN CONST CHAR8                     *FirstLanguage,
-  IN OUT CHAR8                       *SecondLanguages,
-  IN OUT UINTN                       *SecondLanguagesSize
+  IN OUT CHAR8                       *SecondaryLanguages,
+  IN OUT UINTN                       *SecondaryLanguagesSize
   )
 {
   LIST_ENTRY                          *Link;
@@ -1595,7 +1596,7 @@ HiiGetSecondaryLanguages (
   if (This == NULL || PackageList == NULL || FirstLanguage == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  if (SecondLanguages == NULL || SecondLanguagesSize == NULL) {
+  if (SecondaryLanguages == NULL || SecondaryLanguagesSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   if (!IsHiiHandleValid (PackageList)) {
@@ -1637,10 +1638,10 @@ HiiGetSecondaryLanguages (
       Languages++;
 
       ResultSize = AsciiStrSize (Languages);
-      if (ResultSize <= *SecondLanguagesSize) {
-        AsciiStrCpy (SecondLanguages, Languages);
+      if (ResultSize <= *SecondaryLanguagesSize) {
+        AsciiStrCpy (SecondaryLanguages, Languages);
       } else {
-        *SecondLanguagesSize = ResultSize;
+        *SecondaryLanguagesSize = ResultSize;
         return EFI_BUFFER_TOO_SMALL;
       }
 

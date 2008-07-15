@@ -1,4 +1,6 @@
 /** @file
+Implementation for EFI_HII_FONT_PROTOCOL.
+
 
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,23 +11,12 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    Font.c
-
-Abstract:
-
-    Implementation for EFI_HII_FONT_PROTOCOL.
-
-Revision History
-
-
 **/
 
 
 #include "HiiDatabase.h"
 
-static EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
+STATIC EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
   //
   // B     G     R
   //
@@ -51,6 +42,8 @@ static EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
 /**
   Insert a character cell information to the list specified by GlyphInfoList.
 
+  This is a internal function.
+
   @param  CharValue               Unicode character value, which identifies a glyph
                                   block.
   @param  GlyphInfoList           HII_GLYPH_INFO list head.
@@ -61,7 +54,6 @@ static EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
                                   task.
 
 **/
-STATIC
 EFI_STATUS
 NewCell (
   IN  CHAR16                         CharValue,
@@ -94,6 +86,8 @@ NewCell (
 /**
   Get a character cell information from the list specified by GlyphInfoList.
 
+  This is a internal function.
+
   @param  CharValue               Unicode character value, which identifies a glyph
                                   block.
   @param  GlyphInfoList           HII_GLYPH_INFO list head.
@@ -105,7 +99,6 @@ NewCell (
                                   not exist.
 
 **/
-STATIC
 EFI_STATUS
 GetCell (
   IN  CHAR16                         CharValue,
@@ -143,6 +136,8 @@ GetCell (
 /**
   Convert the glyph for a single character into a bitmap.
 
+  This is a internal function.
+
   @param  Private                 HII database driver private data.
   @param  Char                    Character to retrieve.
   @param  StringInfo              Points to the string font and color information
@@ -158,7 +153,6 @@ GetCell (
   @retval EFI_INVALID_PARAMETER   Any input parameter is invalid.
 
 **/
-STATIC
 EFI_STATUS
 GetGlyphBuffer (
   IN  HII_DATABASE_PRIVATE_DATA      *Private,
@@ -266,7 +260,28 @@ GetGlyphBuffer (
   return EFI_NOT_FOUND;
 }
 
-STATIC
+/**
+  Convert bitmap data of the glyph to blt structure.
+
+  This is a internal function.
+
+  @param GlyphBuffer     Buffer points to bitmap data of glyph.
+  @param  Foreground     The color of the "on" pixels in the glyph in the
+                         bitmap.
+  @param  Background     The color of the "off" pixels in the glyph in the
+                         bitmap.
+  @param  ImageWidth     Width of the character or character cell, in
+                         pixels.
+  @param  ImageHeight    Height of the character or character cell, in
+                         pixels.
+  @param  Transparent             If TRUE, the Background color is ignored and all
+                                  "off" pixels in the character's drawn wil use the
+                                  pixel value from BltBuffer.
+  @param  Origin                  On input, points to the origin of the to be
+                                  displayed character, on output, points to the
+                                  next glyph's origin.
+
+**/
 VOID
 NarrowGlyphToBlt (
   IN     UINT8                         *GlyphBuffer,
@@ -278,8 +293,8 @@ NarrowGlyphToBlt (
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL **Origin
   )
 {
-  UINT8                                X;
-  UINT8                                Y;
+  UINT8                                Xpos;
+  UINT8                                Ypos;
   UINT8                                Height;
   UINT8                                Width;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL        *Buffer;
@@ -293,13 +308,13 @@ NarrowGlyphToBlt (
 
   Buffer = *Origin;
 
-  for (Y = 0; Y < Height; Y++) {
-    for (X = 0; X < Width; X++) {
-      if ((GlyphBuffer[Y] & (1 << X)) != 0) {
-        Buffer[Y * ImageWidth + (Width - X - 1)] = Foreground;
+  for (Ypos = 0; Ypos < Height; Ypos++) {
+    for (Xpos = 0; Xpos < Width; Xpos++) {
+      if ((GlyphBuffer[Ypos] & (1 << Xpos)) != 0) {
+        Buffer[Ypos * ImageWidth + (Width - Xpos - 1)] = Foreground;
       } else {
         if (!Transparent) {
-          Buffer[Y * ImageWidth + (Width - X - 1)] = Background;
+          Buffer[Ypos * ImageWidth + (Width - Xpos - 1)] = Background;
         }
       }
     }
@@ -312,23 +327,28 @@ NarrowGlyphToBlt (
 /**
   Convert bitmap data of the glyph to blt structure.
 
+  This is a internal function.
+
   @param  GlyphBuffer             Buffer points to bitmap data of glyph.
   @param  Foreground              The color of the "on" pixels in the glyph in the
                                   bitmap.
   @param  Background              The color of the "off" pixels in the glyph in the
                                   bitmap.
-  @param  Width                   Width of the character or character cell, in
+  @param  ImageWidth              Width of the character or character cell, in
                                   pixels.
-  @param  Height                  Height of the character or character cell, in
+  @param  ImageHeight             Height of the character or character cell, in
                                   pixels.
   @param  Transparent             If TRUE, the Background color is ignored and all
                                   "off" pixels in the character's drawn wil use the
                                   pixel value from BltBuffer.
-  @param  BltBuffer               Points to the blt buffer.
+  @param  Cell                    Points to EFI_HII_GLYPH_INFO structure.
+  @param  Attributes              The attribute of incoming glyph in GlyphBuffer.
+  @param  Origin                  On input, points to the origin of the to be
+                                  displayed character, on output, points to the
+                                  next glyph's origin.
 
 
 **/
-STATIC
 VOID
 GlyphToBlt (
   IN     UINT8                         *GlyphBuffer,
@@ -342,8 +362,8 @@ GlyphToBlt (
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL **Origin
   )
 {
-  UINT8                                X;
-  UINT8                                Y;
+  UINT8                                Xpos;
+  UINT8                                Ypos;
   UINT8                                Data;
   UINT8                                Index;
   UINTN                                OffsetY;
@@ -366,20 +386,20 @@ GlyphToBlt (
   // The glyph's upper left hand corner pixel is the most significant bit of the
   // first bitmap byte.
   //
-  for (Y = 0; Y < Cell->Height; Y++) {
-    OffsetY = BITMAP_LEN_1_BIT (Cell->Width, Y);
+  for (Ypos = 0; Ypos < Cell->Height; Ypos++) {
+    OffsetY = BITMAP_LEN_1_BIT (Cell->Width, Ypos);
 
     //
     // All bits in these bytes are meaningful.
     //
-    for (X = 0; X < Cell->Width / 8; X++) {
-      Data  = *(GlyphBuffer + OffsetY + X);
+    for (Xpos = 0; Xpos < Cell->Width / 8; Xpos++) {
+      Data  = *(GlyphBuffer + OffsetY + Xpos);
       for (Index = 0; Index < 8; Index++) {
         if ((Data & (1 << Index)) != 0) {
-          BltBuffer[Y * ImageWidth + X * 8 + (8 - Index - 1)] = Foreground;
+          BltBuffer[Ypos * ImageWidth + Xpos * 8 + (8 - Index - 1)] = Foreground;
         } else {
           if (!Transparent) {
-            BltBuffer[Y * ImageWidth + X * 8 + (8 - Index - 1)] = Background;
+            BltBuffer[Ypos * ImageWidth + Xpos * 8 + (8 - Index - 1)] = Background;
           }
         }
       }
@@ -389,19 +409,19 @@ GlyphToBlt (
       //
       // There are some padding bits in this byte. Ignore them.
       //
-      Data  = *(GlyphBuffer + OffsetY + X);
+      Data  = *(GlyphBuffer + OffsetY + Xpos);
       for (Index = 0; Index < Cell->Width % 8; Index++) {
         if ((Data & (1 << (8 - Index - 1))) != 0) {
-          BltBuffer[Y * ImageWidth + X * 8 + Index] = Foreground;
+          BltBuffer[Ypos * ImageWidth + Xpos * 8 + Index] = Foreground;
         } else {
           if (!Transparent) {
-            BltBuffer[Y * ImageWidth + X * 8 + Index] = Background;
+            BltBuffer[Ypos * ImageWidth + Xpos * 8 + Index] = Background;
           }
         }
       }
     } // end of if (Width % 8...)
 
-  } // end of for (Y=0...)
+  } // end of for (Ypos=0...)
 
   *Origin = BltBuffer + Cell->Width;
 }
@@ -410,14 +430,16 @@ GlyphToBlt (
 /**
   Convert bitmap data of the glyph to blt structure.
 
+  This is a internal function.
+
   @param  GlyphBuffer             Buffer points to bitmap data of glyph.
   @param  Foreground              The color of the "on" pixels in the glyph in the
                                   bitmap.
   @param  Background              The color of the "off" pixels in the glyph in the
                                   bitmap.
-  @param  Width                   Width of the character or character cell, in
+  @param  ImageWidth              Width of the character or character cell, in
                                   pixels.
-  @param  Height                  Height of the character or character cell, in
+  @param  ImageHeight             Height of the character or character cell, in
                                   pixels.
   @param  Transparent             If TRUE, the Background color is ignored and all
                                   "off" pixels in the character's drawn wil use the
@@ -431,7 +453,6 @@ GlyphToBlt (
   @return Points to the address of next origin node in BltBuffer.
 
 **/
-STATIC
 VOID
 GlyphToImage (
   IN     UINT8                         *GlyphBuffer,
@@ -531,6 +552,8 @@ GlyphToImage (
 /**
   Write the output parameters of FindGlyphBlock().
 
+  This is a internal function.
+
   @param  BufferIn                Buffer which stores the bitmap data of the found
                                   block.
   @param  BufferLen               Length of BufferIn.
@@ -548,7 +571,6 @@ GlyphToImage (
                                   task.
 
 **/
-STATIC
 EFI_STATUS
 WriteOutputParam (
   IN  UINT8                          *BufferIn,
@@ -817,6 +839,8 @@ FindGlyphBlock (
 /**
   Copy a Font Name to a new created EFI_FONT_INFO structure.
 
+  This is a internal function.
+
   @param  FontName                NULL-terminated string.
   @param  FontInfo                a new EFI_FONT_INFO which stores the FontName.
                                   It's caller's responsibility to free this buffer.
@@ -826,7 +850,6 @@ FindGlyphBlock (
                                   task.
 
 **/
-STATIC
 EFI_STATUS
 SaveFontName (
   IN  EFI_STRING                       FontName,
@@ -908,6 +931,8 @@ GetSystemFont (
   Check whether EFI_FONT_DISPLAY_INFO points to system default font and color or
   returns the system default according to the optional inputs.
 
+  This is a internal function.
+
   @param  Private                 HII database driver private data.
   @param  StringInfo              Points to the string output information,
                                   including the color and font.
@@ -920,7 +945,6 @@ GetSystemFont (
   @retval FALSE                   No.
 
 **/
-STATIC
 BOOLEAN
 IsSystemFontInfo (
   IN  HII_DATABASE_PRIVATE_DATA      *Private,
@@ -1318,6 +1342,8 @@ IsFontInfoExisted (
 /**
   Check whether the unicode represents a line break or not.
 
+  This is a internal function.
+
   @param  Char                    Unicode character
 
   @retval 0                       Yes, it is a line break.
@@ -1328,7 +1354,6 @@ IsFontInfoExisted (
   @retval -1                      No, it is not a link break.
 
 **/
-STATIC
 INT8
 IsLineBreak (
   IN  CHAR16    Char
@@ -1413,7 +1438,10 @@ IsLineBreak (
                                   will be allocated to hold the generated image and
                                   the pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
-  @param  BltX,BLTY               Specifies the offset from the left and top edge
+  @param  BltX                    Specifies the offset from the left and top edge
+                                  of the image of the first character cell in the
+                                  image.
+  @param  BltY                    Specifies the offset from the left and top edge
                                   of the image of the first character cell in the
                                   image.
   @param  RowInfoArray            If this is non-NULL on entry, then on exit, this
@@ -1983,7 +2011,10 @@ Exit:
                                   will be allocated to hold the generated image and
                                   the pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
-  @param  BltX,BLTY               Specifies the offset from the left and top edge
+  @param  BltX                    Specifies the offset from the left and top edge
+                                  of the image of the first character cell in the
+                                  image.
+  @param  BltY                    Specifies the offset from the left and top edge
                                   of the image of the first character cell in the
                                   image.
   @param  RowInfoArray            If this is non-NULL on entry, then on exit, this

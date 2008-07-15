@@ -48,7 +48,7 @@ STATIC HII_DATABASE_PRIVATE_DATA mPrivate = {
     HiiGetGlyph,
     HiiGetFontInfo
   },
-#ifndef DISABLE_UNUSED_HII_PROTOCOLS
+#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
   {
     HiiNewImage,
     HiiGetImage,
@@ -104,7 +104,16 @@ STATIC HII_DATABASE_PRIVATE_DATA mPrivate = {
   NULL
 };
 
-STATIC
+/**
+  The default event handler for gHiiKeyboardLayoutChanged
+  event group.
+
+  This is internal function.
+
+  @param Event           The event that triggered this notification function.
+  @param Context         Pointer to the notification functions context.
+
+**/
 VOID
 EFIAPI
 KeyboardLayoutChangeNullEvent (
@@ -115,54 +124,41 @@ KeyboardLayoutChangeNullEvent (
   return;
 }
 
+/**
+  Initialize HII Database.
+
+
+  @param ImageHandle     The image handle.
+  @param SystemTable     The system table.
+
+  @retval EFI_SUCCESS    The Hii database is setup correctly.
+  @return Other value if failed to create the default event for
+          gHiiKeyboardLayoutChanged. Check gBS->CreateEventEx for
+          details. Or failed to insatll the protocols.
+          Check gBS->InstallMultipleProtocolInterfaces for details.
+
+**/
 EFI_STATUS
 EFIAPI
 InitializeHiiDatabase (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-Routine Description:
-  Initialize HII Database
-
-Arguments:
-  (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
-
-Returns:
-  EFI_SUCCESS -
-  other       -
-
---*/
 {
   EFI_STATUS                             Status;
   EFI_HANDLE                             Handle;
-  EFI_HANDLE                             *HandleBuffer;
-  UINTN                                  HandleCount;
 
   //
   // There will be only one HII Database in the system
   // If there is another out there, someone is trying to install us
   // again.  Fail that scenario.
   //
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiHiiDatabaseProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
-
-  //
-  // If there was no error, assume there is an installation and fail to load
-  //
-  if (!EFI_ERROR (Status)) {
-    if (HandleBuffer != NULL) {
-      gBS->FreePool (HandleBuffer);
-    }
-    return EFI_DEVICE_ERROR;
-  }
-
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiDatabaseProtocolGuid);
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiFontProtocolGuid);
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiImageProtocolGuid);
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiStringProtocolGuid);
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiConfigRoutingProtocolGuid);
+  
   InitializeListHead (&mPrivate.DatabaseList);
   InitializeListHead (&mPrivate.DatabaseNotifyList);
   InitializeListHead (&mPrivate.HiiHandleList);
@@ -188,7 +184,7 @@ Returns:
                 &Handle,
                 &gEfiHiiFontProtocolGuid,
                 &mPrivate.HiiFont,
-#ifndef DISABLE_UNUSED_HII_PROTOCOLS
+#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
                 &gEfiHiiImageProtocolGuid,
                 &mPrivate.HiiImage,
 #endif

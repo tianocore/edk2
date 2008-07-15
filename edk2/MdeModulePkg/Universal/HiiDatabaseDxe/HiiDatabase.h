@@ -1,4 +1,5 @@
 /** @file
+Private structures definitions in HiiDatabase.
 
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -8,17 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-    HiiDatabase.h
-
-Abstract:
-
-    Private structures definitions in HiiDatabase.
-
-Revision History
-
 
 **/
 
@@ -251,7 +241,7 @@ typedef struct _HII_DATABASE_PRIVATE_DATA {
   LIST_ENTRY                            DatabaseList;
   LIST_ENTRY                            DatabaseNotifyList;
   EFI_HII_FONT_PROTOCOL                 HiiFont;
-#ifndef DISABLE_UNUSED_HII_PROTOCOLS
+#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
   EFI_HII_IMAGE_PROTOCOL                HiiImage;
 #endif
   EFI_HII_STRING_PROTOCOL               HiiString;
@@ -305,7 +295,7 @@ typedef struct _HII_DATABASE_PRIVATE_DATA {
 //
 
 /**
-  This function checks whether a handle is a valid EFI_HII_HANDLE
+  This function checks whether a handle is a valid EFI_HII_HANDLE.
 
   @param  Handle                  Pointer to a EFI_HII_HANDLE
 
@@ -470,7 +460,10 @@ FindGlyphBlock (
                                   will be allocated to hold the generated image and
                                   the pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
-  @param  BltX,BLTY               Specifies the offset from the left and top edge
+  @param  BltX                    Together with BltX, Specifies the offset from the left and top edge
+                                  of the image of the first character cell in the
+                                  image.
+  @param  BltY                    Together with BltY, Specifies the offset from the left and top edge
                                   of the image of the first character cell in the
                                   image.
   @param  RowInfoArray            If this is non-NULL on entry, then on exit, this
@@ -543,7 +536,10 @@ HiiStringToImage (
                                   will be allocated to hold the generated image and
                                   the pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
-  @param  BltX,BLTY               Specifies the offset from the left and top edge
+  @param  BltX                    Together with BltX, Specifies the offset from the left and top edge
+                                  of the image of the first character cell in the
+                                  image.
+  @param  BltY                    Together with BltY, Specifies the offset from the left and top edge
                                   of the image of the first character cell in the
                                   image.
   @param  RowInfoArray            If this is non-NULL on entry, then on exit, this
@@ -622,7 +618,7 @@ EFIAPI
 HiiGetGlyph (
   IN  CONST EFI_HII_FONT_PROTOCOL    *This,
   IN  CHAR16                         Char,
-  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfo, OPTIONAL
+  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfo,
   OUT EFI_IMAGE_OUTPUT               **Blt,
   OUT UINTN                          *Baseline OPTIONAL
   )
@@ -663,7 +659,7 @@ EFIAPI
 HiiGetFontInfo (
   IN  CONST EFI_HII_FONT_PROTOCOL    *This,
   IN  OUT   EFI_FONT_HANDLE          *FontHandle,
-  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn,
+  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn, OPTIONAL
   OUT       EFI_FONT_DISPLAY_INFO    **StringInfoOut,
   IN  CONST EFI_STRING               String OPTIONAL
   )
@@ -778,6 +774,9 @@ HiiSetImage (
                                   a buffer will be allocated to hold  the generated
                                   image and the pointer updated on exit. It is the
                                   caller's responsibility to free this buffer.
+  @param  BltX                    Specifies the offset from the left and top edge
+                                  of the  output image of the first pixel in the
+                                  image.
   @param  BltY                    Specifies the offset from the left and top edge
                                   of the  output image of the first pixel in the
                                   image.
@@ -821,6 +820,9 @@ HiiDrawImage (
                                   allocated to hold  the generated image and the
                                   pointer updated on exit. It is the caller's
                                   responsibility to free this buffer.
+  @param  BltX                    Specifies the offset from the left and top edge
+                                  of the  output image of the first pixel in the
+                                  image.
   @param  BltY                    Specifies the offset from the left and top edge
                                   of the  output image of the first pixel in the
                                   image.
@@ -1025,7 +1027,7 @@ HiiGetLanguages (
                                   FirstLanguage. If there are no secondary
                                   languages, the function  returns successfully,
                                   but this is set to NULL.
-  @param  SecondaryLanguageSize   On entry, points to the size of the buffer
+  @param  SecondaryLanguagesSize  On entry, points to the size of the buffer
                                   pointed to  by SecondLanguages, in bytes. On
                                   return, points to the length of SecondLanguages
                                   in bytes.
@@ -1048,8 +1050,8 @@ HiiGetSecondaryLanguages (
   IN CONST EFI_HII_STRING_PROTOCOL   *This,
   IN EFI_HII_HANDLE                  PackageList,
   IN CONST CHAR8                     *FirstLanguage,
-  IN OUT CHAR8                       *SecondLanguages,
-  IN OUT UINTN                       *SecondLanguagesSize
+  IN OUT CHAR8                       *SecondaryLanguages,
+  IN OUT UINTN                       *SecondaryLanguagesSize
   )
 ;
 
@@ -1278,7 +1280,7 @@ HiiRegisterPackageNotify (
 
   @param  This                    A pointer to the EFI_HII_DATABASE_PROTOCOL
                                   instance.
-  @param  NotifyHandle            The handle of the notification function being
+  @param  NotificationHandle      The handle of the notification function being
                                   unregistered.
 
   @retval EFI_SUCCESS             Notification is unregistered successfully.

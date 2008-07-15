@@ -1,4 +1,6 @@
-/**@file
+/** @file
+Implement a utility function named R8_EfiLibCompareLanguage.
+
   Copyright (c) 2007 - 2008, Intel Corporation
 
   All rights reserved. This program and the accompanying materials
