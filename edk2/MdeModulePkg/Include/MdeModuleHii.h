@@ -29,10 +29,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Tiano Implementation specific Device Path definition.
 //
+#pragma pack(1)
 typedef struct {
   VENDOR_DEVICE_PATH             VendorDevicePath;
-  UINT32                         MonotonicCount;
+  UINT32                         Reserved;
+  UINT64                         UniqueId;
 } HII_VENDOR_DEVICE_PATH_NODE;
+#pragma pack()
 
 typedef struct {
   HII_VENDOR_DEVICE_PATH_NODE    Node;

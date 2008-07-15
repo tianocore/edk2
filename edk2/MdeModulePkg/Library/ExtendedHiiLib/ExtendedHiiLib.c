@@ -40,6 +40,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePathTemplate = {
       },
       EFI_IFR_TIANO_GUID
     },
+    0,
     0
   },
   {
@@ -74,22 +75,23 @@ HiiLibCreateHiiDriverHandle (
 {
   EFI_STATUS                   Status;
   HII_VENDOR_DEVICE_PATH_NODE  *VendorDevicePath;
-  UINT64                       MonotonicCount;
 
   VendorDevicePath = AllocateCopyPool (sizeof (HII_VENDOR_DEVICE_PATH), &mHiiVendorDevicePathTemplate);
   if (VendorDevicePath == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  gBS->GetNextMonotonicCount (&MonotonicCount);
-  VendorDevicePath->MonotonicCount = (UINT32) MonotonicCount;
+  //
+  // Use memory address as unique ID to distinguish from different device paths
+  //
+  VendorDevicePath->UniqueId = (UINT64) ((UINTN) VendorDevicePath);
 
   *DriverHandle = NULL;
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   DriverHandle,
                   &gEfiDevicePathProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  VendorDevicePath
+                  VendorDevicePath,
+                  NULL
                   );
   if (EFI_ERROR (Status)) {
     return Status;
