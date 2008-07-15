@@ -1,9 +1,6 @@
 /** @file
-  Support for Basic Graphics operations.
-
-  BugBug: Currently *.BMP files are supported. This will be replaced
-          when Tiano graphics format is supported.
-
+  Basic Graphics operations based on UEFI HII, Graphics Output protocol or UGA 
+  Draw protocol.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -123,7 +120,7 @@ GetGraphicsBitMapFromFVEx (
 }
 
 /**
-  Convert a *.BMP graphics image to a GOP/UGA blt buffer. If a NULL Blt buffer
+  Convert a *.BMP graphics image to a GOP blt buffer. If a NULL Blt buffer
   is passed in a GopBlt buffer will be allocated by this routine. If a GopBlt
   buffer is passed in it will be used if it is big enough.
 
@@ -138,38 +135,42 @@ GetGraphicsBitMapFromFVEx (
   @retval EFI_UNSUPPORTED       BmpImage is not a valid *.BMP image
   @retval EFI_BUFFER_TOO_SMALL  The passed in GopBlt buffer is not big enough.
                                 GopBltSize will contain the required size.
-  @retval EFI_OUT_OF_RESOURCES  No enough buffer to allocate
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer to allocate.
 
 **/
 EFI_STATUS
 EFIAPI
 ConvertBmpToGopBlt (
-  IN  VOID      *BmpImage,
-  IN  UINTN     BmpImageSize,
-  IN OUT VOID   **GopBlt,
-  IN OUT UINTN  *GopBltSize,
-  OUT UINTN     *PixelHeight,
-  OUT UINTN     *PixelWidth
+  IN     VOID      *BmpImage,
+  IN     UINTN     BmpImageSize,
+  IN OUT VOID      **GopBlt,
+  IN OUT UINTN     *GopBltSize,
+     OUT UINTN     *PixelHeight,
+     OUT UINTN     *PixelWidth
   )
 {
-  UINT8             *Image;
-  UINT8             *ImageHeader;
-  BMP_IMAGE_HEADER  *BmpHeader;
-  BMP_COLOR_MAP     *BmpColorMap;
+  UINT8                         *Image;
+  UINT8                         *ImageHeader;
+  BMP_IMAGE_HEADER              *BmpHeader;
+  BMP_COLOR_MAP                 *BmpColorMap;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *Blt;
-  UINTN             BltBufferSize;
-  UINTN             Index;
-  UINTN             Height;
-  UINTN             Width;
-  UINTN             ImageIndex;
-  BOOLEAN           IsAllocated;
+  UINTN                         BltBufferSize;
+  UINTN                         Index;
+  UINTN                         Height;
+  UINTN                         Width;
+  UINTN                         ImageIndex;
+  BOOLEAN                       IsAllocated;
 
   BmpHeader = (BMP_IMAGE_HEADER *) BmpImage;
+
   if (BmpHeader->CharB != 'B' || BmpHeader->CharM != 'M') {
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // Doesn't support compress.
+  //
   if (BmpHeader->CompressionType != 0) {
     return EFI_UNSUPPORTED;
   }
@@ -186,9 +187,15 @@ ConvertBmpToGopBlt (
   Image         = ((UINT8 *) BmpImage) + BmpHeader->ImageOffset;
   ImageHeader   = Image;
 
+  //
+  // Calculate the BltBuffer needed size.
+  //
   BltBufferSize = BmpHeader->PixelWidth * BmpHeader->PixelHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
   IsAllocated   = FALSE;
   if (*GopBlt == NULL) {
+    //
+    // GopBlt is not allocated by caller.
+    //
     *GopBltSize = BltBufferSize;
     *GopBlt     = AllocatePool (*GopBltSize);
     IsAllocated = TRUE;
@@ -196,6 +203,9 @@ ConvertBmpToGopBlt (
       return EFI_OUT_OF_RESOURCES;
     }
   } else {
+    //
+    // GopBlt has been allocated by caller.
+    //
     if (*GopBltSize < BltBufferSize) {
       *GopBltSize = BltBufferSize;
       return EFI_BUFFER_TOO_SMALL;
@@ -215,7 +225,7 @@ ConvertBmpToGopBlt (
       switch (BmpHeader->BitPerPixel) {
       case 1:
         //
-        // Convert 1bit BMP to 24-bit color
+        // Convert 1-bit (2 colors) BMP to 24-bit color
         //
         for (Index = 0; Index < 8 && Width < BmpHeader->PixelWidth; Index++) {
           Blt->Red    = BmpColorMap[((*Image) >> (7 - Index)) & 0x1].Red;
@@ -231,7 +241,7 @@ ConvertBmpToGopBlt (
 
       case 4:
         //
-        // Convert BMP Palette to 24-bit color
+        // Convert 4-bit (16 colors) BMP Palette to 24-bit color
         //
         Index       = (*Image) >> 4;
         Blt->Red    = BmpColorMap[Index].Red;
@@ -249,7 +259,7 @@ ConvertBmpToGopBlt (
 
       case 8:
         //
-        // Convert BMP Palette to 24-bit color
+        // Convert 8-bit (256 colors) BMP Palette to 24-bit color
         //
         Blt->Red    = BmpColorMap[*Image].Red;
         Blt->Green  = BmpColorMap[*Image].Green;
@@ -257,14 +267,20 @@ ConvertBmpToGopBlt (
         break;
 
       case 24:
+        //
+        // It is 24-bit BMP.
+        //
         Blt->Blue   = *Image++;
         Blt->Green  = *Image++;
         Blt->Red    = *Image;
         break;
 
       default:
+        //
+        // Other bit format BMP is not supported.
+        //
         if (IsAllocated) {
-          gBS->FreePool (*GopBlt);
+          FreePool (*GopBlt);
           *GopBlt = NULL;
         }
         return EFI_UNSUPPORTED;
@@ -296,7 +312,7 @@ ConvertBmpToGopBlt (
 
   @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo
                           displayed.
-  @retval EFI_UNSUPPORTED Password not found
+  @retval EFI_UNSUPPORTED Password not found.
 
 **/
 EFI_STATUS
@@ -320,12 +336,12 @@ LockKeyboards (
 
 /**
   Use Console Control to turn off UGA based Simple Text Out consoles from going
-  to the UGA device. Put up LogoFile on every UGA device that is a console
+  to the UGA device. Put up LogoFile on every UGA device that is a console.
 
-  @param[in]  LogoFile   File name of logo to display on the center of the screen.
+  @param  LogoFile        File name of logo to display on the center of the screen.
 
   @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo displayed.
-  @retval EFI_UNSUPPORTED Logo not found
+  @retval EFI_UNSUPPORTED Logo not found.
 
 **/
 EFI_STATUS
@@ -338,7 +354,7 @@ EnableQuietBoot (
 }
 
 /**
-  Use Console Control to turn off GOP/UGA based Simple Text Out consoles from going
+  Use Console Control to turn off UGA based Simple Text Out consoles from going
   to the UGA device. Put up LogoFile on every UGA device that is a console
 
   @param  LogoFile    File name of logo to display on the center of the screen.
@@ -347,7 +363,7 @@ EnableQuietBoot (
                       the driver image is loaded will be tried first.
 
   @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo displayed.
-  @retval EFI_UNSUPPORTED Logo not found
+  @retval EFI_UNSUPPORTED Logo not found.
 
 **/
 EFI_STATUS
@@ -380,7 +396,7 @@ EnableQuietBootEx (
   UINT32                        RefreshRate;
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
 
-  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID**)&ConsoleControl);
+  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
@@ -389,21 +405,24 @@ EnableQuietBootEx (
   //
   // Try to open GOP first
   //
-  Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID**)&GraphicsOutput);
+  Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **) &GraphicsOutput);
   if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     GraphicsOutput = NULL;
     //
     // Open GOP failed, try to open UGA
     //
-    Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID**)&UgaDraw);
+    Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **) &UgaDraw);
   }
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
 
   Badging = NULL;
-  Status  = gBS->LocateProtocol (&gEfiOEMBadgingProtocolGuid, NULL, (VOID**)&Badging);
+  Status  = gBS->LocateProtocol (&gEfiOEMBadgingProtocolGuid, NULL, (VOID **) &Badging);
 
+  //
+  // Set console control to graphics mode.
+  //
   Status = ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
@@ -427,6 +446,9 @@ EnableQuietBootEx (
     ImageSize = 0;
 
     if (Badging != NULL) {
+      //
+      // Get image from OEMBadging protocol.
+      //
       Status = Badging->GetImage (
                           Badging,
                           &Instance,
@@ -442,13 +464,16 @@ EnableQuietBootEx (
       }
 
       //
-      // Currently only support BMP format
+      // Currently only support BMP format.
       //
       if (Format != EfiBadgingFormatBMP) {
-        gBS->FreePool (ImageData);
+        SafeFreePool (ImageData);
         continue;
       }
     } else {
+      //
+      // Get the specified image from FV.
+      //
       Status = GetGraphicsBitMapFromFVEx (ImageHandle, LogoFile, (VOID **) &ImageData, &ImageSize);
       if (EFI_ERROR (Status)) {
         return EFI_UNSUPPORTED;
@@ -463,13 +488,13 @@ EnableQuietBootEx (
     Status = ConvertBmpToGopBlt (
               ImageData,
               ImageSize,
-              (VOID**)&Blt,
+              (VOID **) &Blt,
               &BltSize,
               &Height,
               &Width
               );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (ImageData);
+      SafeFreePool (ImageData);
       if (Badging == NULL) {
         return Status;
       } else {
@@ -477,6 +502,9 @@ EnableQuietBootEx (
       }
     }
 
+    //
+    // Caculate the display position according to Attribute.
+    //
     switch (Attribute) {
     case EfiBadgingDisplayAttributeLeftTop:
       DestX = CoordinateX;
@@ -561,8 +589,8 @@ EnableQuietBootEx (
       }
     }
 
-    gBS->FreePool (ImageData);
-    gBS->FreePool (Blt);
+    SafeFreePool (ImageData);
+    SafeFreePool (Blt);
 
     if (Badging == NULL) {
       break;
@@ -594,24 +622,27 @@ DisableQuietBoot (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // Set console control to text mode.
+  //
   return ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
 }
 
 /**
-  Display string worker for: Print, PrintAt, IPrint, IPrintAt.
+  Internal display string worker function.
 
-  @param GraphicsOutput   Graphics output protocol interface
-  @param UgaDraw          UGA draw protocol interface
-  @param Sto              Simple text out protocol interface
-  @param X                X coordinate to start printing
-  @param Y                Y coordinate to start printing
-  @param Foreground       Foreground color
-  @param Background       Background color
-  @param fmt              Format string
-  @param args             Print arguments
+  @param GraphicsOutput   Graphics output protocol interface.
+  @param UgaDraw          UGA draw protocol interface.
+  @param Sto              Simple text out protocol interface.
+  @param X                X coordinate to start printing.
+  @param Y                Y coordinate to start printing.
+  @param Foreground       Foreground color.
+  @param Background       Background color.
+  @param fmt              Format string.
+  @param args             Print arguments.
 
-  @retval EFI_SUCCESS             Success.
-  @retval EFI_OUT_OF_RESOURCES    Out of resources.
+  @return  Number of Characters printed. Zero means no any character 
+           displayed successfully.
 
 **/
 UINTN
@@ -642,13 +673,14 @@ Print (
   EFI_FONT_DISPLAY_INFO          *FontInfo;
   EFI_HII_ROW_INFO               *RowInfoArray;
   UINTN                          RowInfoArraySize;
+  UINTN                          PrintNum;     
 
   //
   // For now, allocate an arbitrarily long buffer
   //
   Buffer = AllocateZeroPool (0x10000);
   if (Buffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    return 0;
   }
 
   HorizontalResolution  = 0;
@@ -673,7 +705,7 @@ Print (
     goto Error;
   }
 
-  UnicodeVSPrint (Buffer, 0x10000, fmt, args);
+  PrintNum = UnicodeVSPrint (Buffer, 0x10000, fmt, args);
 
   UnicodeWeight = (CHAR16 *) Buffer;
 
@@ -686,7 +718,6 @@ Print (
   }
 
   BufferLen = StrLen (Buffer);
-
 
   LineBufferLen = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * EFI_GLYPH_HEIGHT;
   if (EFI_GLYPH_WIDTH * EFI_GLYPH_HEIGHT * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * BufferLen > LineBufferLen) {
@@ -801,22 +832,28 @@ Print (
 Error:
   SafeFreePool (Blt);
   SafeFreePool (FontInfo);
-  gBS->FreePool (Buffer);
-  return Status;
+  FreePool (Buffer);
+
+  if (EFI_ERROR(Status)) {
+    return PrintNum;
+  } else {
+    return 0;
+  }
 }
 
 /**
   Print to graphics screen at the given X,Y coordinates of the graphics screen.
   see definition of Print to find rules for constructing Fmt.
 
-  @param  X            Row to start printing at
-  @param  Y            Column to start printing at
-  @param  ForeGround   Foreground color
-  @param  BackGround   background color
-  @param  Fmt          Print format sting. See definition of Print
-  @param  ...          Argumnet stream defined by Fmt string
+  @param  X            Row to start printing at.
+  @param  Y            Column to start printing at.
+  @param  ForeGround   Foreground color.
+  @param  BackGround   background color.
+  @param  Fmt          Print format sting. See definition of Print.
+  @param  ...          Argumnet stream defined by Fmt string.
 
-  @retval UINTN     Number of Characters printed
+  @return  Number of Characters printed. Zero means no any character 
+           displayed successfully.
 
 **/
 UINTN
@@ -830,12 +867,12 @@ PrintXY (
   ...
   )
 {
-  EFI_HANDLE                    Handle;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL         *UgaDraw;
+  EFI_HANDLE                       Handle;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
+  EFI_UGA_DRAW_PROTOCOL            *UgaDraw;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Sto;
-  EFI_STATUS                    Status;
-  VA_LIST                       Args;
+  EFI_STATUS                       Status;
+  VA_LIST                          Args;
 
   VA_START (Args, Fmt);
 
@@ -844,31 +881,34 @@ PrintXY (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiGraphicsOutputProtocolGuid,
-                  (VOID**)&GraphicsOutput
+                  (VOID **) &GraphicsOutput
                   );
 
   UgaDraw = NULL;
   if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
+    //
+    // If no GOP available, try to open UGA Draw protocol if supported.
+    //
     GraphicsOutput = NULL;
 
     Status = gBS->HandleProtocol (
                     Handle,
                     &gEfiUgaDrawProtocolGuid,
-                    (VOID**)&UgaDraw
+                    (VOID **) &UgaDraw
                     );
   }
   if (EFI_ERROR (Status)) {
-    return Status;
+    return 0;
   }
 
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiSimpleTextOutProtocolGuid,
-                  (VOID**)&Sto
+                  (VOID **) &Sto
                   );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    return 0;
   }
 
   return Print (GraphicsOutput, UgaDraw, Sto, X, Y, ForeGround, BackGround, Fmt, Args);

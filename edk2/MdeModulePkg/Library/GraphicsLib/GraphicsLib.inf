@@ -1,5 +1,5 @@
 #/** @file
-# Graphics Library for UEFI drivers
+# Graphics Library for UEFI drivers.
 #
 # This library provides supports for basic graphic functions.
 # Copyright (c) 2006 - 2007, Intel Corporation.
@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = EdkGraphicsLib
+  BASE_NAME                      = UefiGraphicsLib
   FILE_GUID                      = 08c1a0e4-1208-47f8-a2c5-f42eabee653a
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -46,6 +46,7 @@
   DebugLib
   DxePiLib
   BaseMemoryLib
+  PcdLib
 
 [Protocols]
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
