@@ -75,6 +75,7 @@
 
   @param  ErrorLevel  The error level of the debug message.
   @param  Format      Format string for the debug message to print.
+  @param  ...         The variable argument list.
 
 **/
 VOID
@@ -129,10 +130,10 @@ DebugAssert (
 
   If Length is greater than (MAX_ADDRESS ?Buffer + 1), then ASSERT(). 
 
-  @param   Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
+  @param   Buffer  Pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
   @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
-  @return  Buffer
+  @return  Buffer  Pointer to the target buffer filled with PcdDebugClearMemoryValue.
 
 **/
 VOID *
@@ -201,11 +202,11 @@ DebugCodeEnabled (
   
   Returns TRUE if DEBUG_CLEAR_MEMORY()macro is enabled.
 
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of 
+  This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
+  @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
 
 **/
 BOOLEAN

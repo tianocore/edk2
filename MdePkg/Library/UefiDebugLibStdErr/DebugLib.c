@@ -1,7 +1,7 @@
 /** @file
-  UEFI Debug Library that uses PrintLib to send messages to STDERR.
+  UEFI Debug Lib that sends messages to the Standard Error Device in the EFI System Table.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -41,6 +41,7 @@
 
   @param  ErrorLevel  The error level of the debug message.
   @param  Format      Format string for the debug message to print.
+  @param  ...         The variable argument list.
 
 **/
 VOID
@@ -156,7 +157,7 @@ DebugAssert (
   @param   Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
   @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
-  @return  Buffer
+  @return  Buffer  Pointer to the target buffer filled with PcdDebugClearMemoryValue.
 
 **/
 VOID *
@@ -245,11 +246,11 @@ DebugCodeEnabled (
   
   Returns TRUE if DEBUG_CLEAR_MEMORY()macro is enabled.
 
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of 
+  This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
+  @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
 
 **/
 BOOLEAN

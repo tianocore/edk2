@@ -1,8 +1,7 @@
-
 /** @file
-  Serial I/O Port library functions with no library constructor/destructor
+  Serial I/O Port library functions definition.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,15 +29,15 @@ SerialPortInitialize (
   );
 
 /**
-  Write data to serial device. 
+  Write data from buffer to serial device. 
  
-  If the buffer is NULL, then return 0; 
+  If the Buffer is NULL, then return 0; 
   if NumberOfBytes is zero, then return 0. 
 
   @param  Buffer           Point of data buffer which need to be writed.
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
-  @retval 0                Write data failed.
+  @retval 0                Write data failed, or No data is to be written.
   @retval !0               Actual number of bytes writed to serial device.
 
 **/
@@ -53,13 +52,14 @@ SerialPortWrite (
 /**
   Read data from serial device and save the datas in buffer.
  
-  If the buffer is NULL, then return zero;
+  If the Buffer is NULL, then return zero;
   if NumberOfBytes is zero, then return zero.
 
-  @param  Buffer           Point of data buffer which need to be writed.
-  @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
+  @param  Buffer           Point of data buffer, which contains the data 
+                           returned from the serial device.
+  @param  NumberOfBytes    Number of bytes which will be read.
 
-  @retval 0                Read data failed.
+  @retval 0                Read data failed, No data is to be read.
   @retval !0               Aactual number of bytes read from serial device.
 
 **/

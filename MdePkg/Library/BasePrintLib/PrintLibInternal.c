@@ -1,7 +1,7 @@
 /** @file
-  Print Library worker functions.
+  Print Library internal worker functions.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,16 +34,16 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mHexStr[] = {'0','1','2','3','4','5','
   @param  Character   Character to be placed into Buffer.
   @param  Increment   Character increment in Buffer.
 
-  @return Number of characters printed.
+  @return Buffer      Buffer filled with the input Character.
 
 **/
 CHAR8 *
 BasePrintLibFillBuffer (
-  CHAR8   *Buffer,
-  CHAR8   *EndBuffer,
-  INTN    Length,
-  UINTN   Character,
-  INTN    Increment
+  OUT CHAR8   *Buffer,
+  IN  CHAR8   *EndBuffer,
+  IN  INTN    Length,
+  IN  UINTN   Character,
+  IN  INTN    Increment
   )
 {
   INTN  Index;
@@ -69,7 +69,6 @@ BasePrintLibFillBuffer (
 
 **/
 UINTN
-EFIAPI
 BasePrintLibValueToString (
   IN OUT CHAR8  *Buffer,
   IN INT64      Value,
@@ -89,6 +88,10 @@ BasePrintLibValueToString (
     *(Buffer++) = mHexStr[Remainder];
     Digits++;
   } while (Value != 0);
+
+  //
+  // the length of Buffer string converted from Value
+  //
   return Digits;
 }
 
@@ -149,6 +152,9 @@ BasePrintLibConvertValueToString (
   UINTN  Index;
   UINTN  Radix;
 
+  //
+  // Make sure Buffer is not NULL and Width < MAXIMUM
+  //
   ASSERT (Buffer != NULL);
   ASSERT (Width < MAXIMUM_VALUE_CHARACTERS);
   //
@@ -162,11 +168,16 @@ BasePrintLibConvertValueToString (
   ASSERT (((Flags & COMMA_TYPE) != 0 && (Flags & RADIX_HEX) != 0) == FALSE);
 
   OriginalBuffer = Buffer;
-
+  
+  //
+  // Width is 0 or COMMA_TYPE is set, PREFIX_ZERO is ignored.
+  //
   if (Width == 0 || (Flags & COMMA_TYPE) != 0) {
     Flags &= (~PREFIX_ZERO);
   }
-
+  //
+  // If Width is 0 then a width of  MAXIMUM_VALUE_CHARACTERS is assumed.
+  //
   if (Width == 0) {
     Width = MAXIMUM_VALUE_CHARACTERS - 1;
   }
@@ -174,20 +185,32 @@ BasePrintLibConvertValueToString (
   // Set the tag for the end of the input Buffer.
   //
   EndBuffer = Buffer + Width * Increment;
-
+  
+  //
+  // Convert decimal negative
+  //
   if ((Value < 0) && ((Flags & RADIX_HEX) == 0)) {
     Value = -Value;
     Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, '-', Increment);
     Width--;
   }
-
+  
+  //
+  // Count the length of the value string.
+  //
   Radix = ((Flags & RADIX_HEX) == 0)? 10 : 16;
   Count = BasePrintLibValueToString (ValueBuffer, Value, Radix);
-
+  
+  //
+  // Append Zero
+  //
   if ((Flags & PREFIX_ZERO) != 0) {
     Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Width - Count, '0', Increment);
   }
-
+  
+  //
+  // Print Comma type for every 3 characters
+  //
   Digits = Count % 3;
   if (Digits != 0) {
     Digits = 3 - Digits;
@@ -204,7 +227,10 @@ BasePrintLibConvertValueToString (
       }
     }
   }
-
+  
+  //
+  // Print Null-terminator
+  //
   BasePrintLibFillBuffer (Buffer, EndBuffer + Increment, 1, 0, Increment);
 
   return ((Buffer - OriginalBuffer) / Increment);

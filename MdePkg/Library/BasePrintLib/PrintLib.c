@@ -1,7 +1,7 @@
 /** @file
-  Print Library.
+  Base Print Library instance implementation.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -23,7 +23,7 @@
 #define ERROR_STATUS_NUMBER           24
 #define ASSERT_UNICODE_BUFFER(Buffer) ASSERT ((((UINTN) (Buffer)) & 0x01) == 0)
 
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *StatusString [] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *gStatusString[] = {
   "Success",                      //  RETURN_SUCCESS                = 0
   "Warning Unknown Glyph",        //  RETURN_WARN_UNKNOWN_GLYPH     = 1
   "Warning Delete Failure",       //  RETURN_WARN_DELETE_FAILURE    = 2
@@ -424,12 +424,12 @@ BasePrintLibVSPrint (
           //
           Index = Status & ~MAX_BIT;
           if (Index > 0 && Index <= ERROR_STATUS_NUMBER) {
-            ArgumentString = StatusString [Index + WARNING_STATUS_NUMBER];
+            ArgumentString = gStatusString [Index + WARNING_STATUS_NUMBER];
           }
         } else {
           Index = Status;
           if (Index <= WARNING_STATUS_NUMBER) {
-            ArgumentString = StatusString [Index];
+            ArgumentString = gStatusString [Index];
           }
         }
         if (ArgumentString == ValueBuffer) {
@@ -583,13 +583,14 @@ BasePrintLibVSPrint (
   VA_LIST is used this rountine allows the nesting of Vararg routines. Thus 
   this is the main print working routine.
 
-  @param  Buffer        Character buffer to print the results of the parsing
+  @param  StartOfBuffer Character buffer to print the results of the parsing
                         of Format into.
   @param  BufferSize    Maximum number of characters to put into buffer.
                         Zero means no limit.
   @param  Flags         Intial flags value.
                         Can only have FORMAT_UNICODE and OUTPUT_UNICODE set
   @param  FormatString  Null-terminated format string.
+  @param  ...           The variable argument list.
 
   @return Number of characters printed not including the Null-terminator.
 
@@ -684,7 +685,7 @@ UnicodeVSPrint (
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
-  
+  @param  ...             The variable argument list.
   @return The number of Unicode characters in the produced output buffer not including the
           Null-terminator.
 
@@ -730,7 +731,7 @@ UnicodeSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
@@ -776,7 +777,8 @@ UnicodeVSPrintAsciiFormat (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
+  @param  ...             The variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
           Null-terminator.
@@ -876,7 +878,7 @@ UnicodeValueToString (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
@@ -920,7 +922,8 @@ AsciiVSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
+  @param  ...             The variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.
@@ -943,7 +946,7 @@ AsciiSPrint (
 
 /**
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
-  ASCII format string and a VA_LIST argument list.
+  Unicode format string and a VA_LIST argument list.
   
   Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
   and BufferSize.
@@ -989,7 +992,7 @@ AsciiVSPrintUnicodeFormat (
 
 /**
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
-  ASCII format string and  variable argument list.
+  Unicode format string and  variable argument list.
   
   Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
   and BufferSize.
@@ -1014,6 +1017,7 @@ AsciiVSPrintUnicodeFormat (
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
+  @param  ...             The variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.

@@ -1,8 +1,8 @@
 #/** @file
 # Component description file for Base Print Library.
 #
-# Print Library implementation.
-# Copyright (c) 2007, Intel Corporation.
+# Base Print Library instance implementation.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
