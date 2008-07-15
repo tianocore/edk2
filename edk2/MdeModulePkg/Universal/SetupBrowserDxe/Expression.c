@@ -1,4 +1,5 @@
 /** @file
+Utility functions for expression evaluation.
 
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Expression.c
-
-Abstract:
-
-  Expression evaluation.
-
 
 **/
 
@@ -41,18 +33,19 @@ EFI_UNICODE_COLLATION_PROTOCOL *mUnicodeCollation = NULL;
 
 
 /**
-  Grow size of the stack
+  Grow size of the stack.
+
+  This is an internal function.
 
   @param  Stack                  On input: old stack; On output: new stack
   @param  StackPtr               On input: old stack pointer; On output: new stack
                                  pointer
-  @param  StackPtr               On input: old stack end; On output: new stack end
+  @param  StackEnd               On input: old stack end; On output: new stack end
 
   @retval EFI_SUCCESS            Grow stack success.
   @retval EFI_OUT_OF_RESOURCES   No enough memory for stack space.
 
 **/
-STATIC
 EFI_STATUS
 GrowStack (
   IN OUT EFI_HII_VALUE  **Stack,
@@ -101,12 +94,12 @@ GrowStack (
 
 
 /**
-  Push an element onto the Boolean Stack
+  Push an element onto the Boolean Stack.
 
   @param  Stack                  On input: old stack; On output: new stack
   @param  StackPtr               On input: old stack pointer; On output: new stack
                                  pointer
-  @param  StackPtr               On input: old stack end; On output: new stack end
+  @param  StackEnd               On input: old stack end; On output: new stack end
   @param  Data                   Data to push.
 
   @retval EFI_SUCCESS            Push stack success.
@@ -151,7 +144,7 @@ PushStack (
   @param  Stack                  On input: old stack; On output: new stack
   @param  StackPtr               On input: old stack pointer; On output: new stack
                                  pointer
-  @param  StackPtr               On input: old stack end; On output: new stack end
+  @param  StackEnd               On input: old stack end; On output: new stack end
   @param  Data                   Data to pop.
 
   @retval EFI_SUCCESS            The value was popped onto the stack.
@@ -184,10 +177,6 @@ PopStack (
 
 /**
   Reset stack pointer to begin of the stack.
-
-  None.
-
-  @return None.
 
 **/
 VOID
@@ -261,10 +250,6 @@ PopScope (
 
 /**
   Reset stack pointer to begin of the stack.
-
-  None.
-
-  @return None.
 
 **/
 VOID
@@ -483,8 +468,6 @@ RuleIdToExpression (
 /**
   Locate the Unicode Collation Protocol interface for later use.
 
-  None.
-
   @retval EFI_SUCCESS            Protocol interface initialize success.
   @retval Other                  Protocol interface initialize failed.
 
@@ -513,6 +496,12 @@ InitializeUnicodeCollationProtocol (
   return Status;
 }
 
+/**
+  Convert the input Unicode character to upper.
+
+  @param String  Th Unicode character to be converted.
+
+**/
 VOID
 IfrStrToUpper (
   CHAR16                   *String
@@ -1152,8 +1141,6 @@ Done:
 
   @param  Value                  HII Value to be converted.
 
-  @return None.
-
 **/
 VOID
 ExtendValueToU64 (
@@ -1199,14 +1186,14 @@ ExtendValueToU64 (
 /**
   Compare two Hii value.
 
-  @param  Value1                 Expression value to compare on left-hand
-  @param  Value2                 Expression value to compare on right-hand
-  @param  HiiHandle              Only required for string compare
+  @param  Value1                 Expression value to compare on left-hand.
+  @param  Value2                 Expression value to compare on right-hand.
+  @param  HiiHandle              Only required for string compare.
 
-  @retval EFI_INVALID_PARAMETER  Could not perform comparation on two values
-  @retval 0                      Two operators equeal
-  @retval 0                      Value1 is greater than Value2
-  @retval 0                      Value1 is less than Value2
+  @retval EFI_INVALID_PARAMETER  Could not perform comparation on two values.
+  @retval 0                      Two operators equeal.
+  @return Positive value if Value1 is greater than Value2.
+  @retval Negative value if Value1 is less than Value2.
 
 **/
 INTN

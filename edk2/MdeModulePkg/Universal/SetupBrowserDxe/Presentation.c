@@ -1,4 +1,6 @@
 /** @file
+Utility functions for UI presentation.
+
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-  Presentation.c
-
-Abstract:
-
-  Some presentation routines.
-
 
 **/
 
@@ -33,8 +27,6 @@ UI_MENU_SELECTION  *gCurrentSelection;
   @param  TopRow         Start row of retangle.
   @param  BottomRow      End row of retangle.
   @param  TextAttribute  The character foreground and background.
-
-  @return None.
 
 **/
 VOID
@@ -78,6 +70,14 @@ ClearLines (
   return ;
 }
 
+/**
+  Concatenate a narrow string to another string.
+
+  @param Destination The destination string.
+  @param Source      The source string. The string to be concatenated.
+                     to the end of Destination.
+
+**/
 VOID
 NewStrCat (
   CHAR16                                      *Destination,
@@ -101,6 +101,20 @@ NewStrCat (
   StrCpy (Destination + Length, Source);
 }
 
+/**
+  Count the storage space of a Unicode string.
+
+  This function handles the Unicode string with NARROW_CHAR
+  and WIDE_CHAR control characters. NARROW_HCAR and WIDE_CHAR
+  does not count in the resultant output. If a WIDE_CHAR is 
+  hit, then 2 Unicode character will consume an output storage
+  space with size of CHAR16 till a NARROW_CHAR is hit.
+
+  @param String          The input string to be counted.
+
+  @return Storage space for the input string.
+
+**/
 UINTN
 GetStringWidth (
   CHAR16                                      *String
@@ -157,6 +171,10 @@ GetStringWidth (
   return Count * sizeof (CHAR16);
 }
 
+/**
+  This function displays the page frame.
+
+**/
 VOID
 DisplayPageFrame (
   VOID
@@ -404,6 +422,19 @@ EvaluateFormExpressions (
 | ^"=Move Highlight          <Spacebar> Toggles Checkbox   Esc=Discard Changes |
 +------------------------------------------------------------------------------+
 */
+
+/**
+
+  
+  Display form and wait for user to select one menu option, then return it.
+  
+  @param Selection       On input, Selection tell setup browser the information
+                         about the Selection, form and formset to be displayed.
+                         On output, Selection return the screen item that is selected
+                         by user.
+  @retval EFI_SUCESSS            This function always return successfully for now.
+
+**/
 EFI_STATUS
 DisplayForm (
   IN OUT UI_MENU_SELECTION           *Selection
@@ -529,6 +560,10 @@ DisplayForm (
   return Status;
 }
 
+/**
+  Initialize the HII String Token to the correct values.
+
+**/
 VOID
 InitializeBrowserStrings (
   VOID
@@ -565,6 +600,11 @@ InitializeBrowserStrings (
   return ;
 }
 
+/**
+  Free up the resource allocated for all strings required
+  by Setup Browser.
+
+**/
 VOID
 FreeBrowserStrings (
   VOID
@@ -602,12 +642,10 @@ FreeBrowserStrings (
 
 
 /**
-  Update key's help imformation
+  Update key's help imformation.
 
   @param  MenuOption     The Menu option
   @param  Selected       Whether or not a tag be selected
-
-  @return None
 
 **/
 VOID
@@ -688,7 +726,7 @@ UpdateKeyHelp (
         PrintStringAt (
           SecCol,
           TopRowOfHelp,
-          (Statement->Flags & EFI_IFR_DISPLAY_UINT_HEX) ? gHexNumericInput : gDecNumericInput
+          ((Statement->Flags & EFI_IFR_DISPLAY_UINT_HEX) == EFI_IFR_DISPLAY_UINT_HEX) ? gHexNumericInput : gDecNumericInput
           );
       } else if (Statement->Operand != EFI_IFR_ORDERED_LIST_OP) {
         PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
@@ -754,6 +792,32 @@ UpdateKeyHelp (
   }
 }
 
+/**
+  Functions which are registered to receive notification of
+  database events have this prototype. The actual event is encoded
+  in NotifyType. The following table describes how PackageType,
+  PackageGuid, Handle, and Package are used for each of the
+  notification types.
+
+  @param PackageType  Package type of the notification.
+
+  @param PackageGuid  If PackageType is
+                      EFI_HII_PACKAGE_TYPE_GUID, then this is
+                      the pointer to the GUID from the Guid
+                      field of EFI_HII_PACKAGE_GUID_HEADER.
+                      Otherwise, it must be NULL.
+
+  @param Package  Points to the package referred to by the
+                  notification Handle The handle of the package
+                  list which contains the specified package.
+
+  @param Handle       The HII handle.
+
+  @param NotifyType   The type of change concerning the
+                      database. See
+                      EFI_HII_DATABASE_NOTIFY_TYPE.
+
+**/
 EFI_STATUS
 FormUpdateNotify (
   IN UINT8                              PackageType,
@@ -768,6 +832,19 @@ FormUpdateNotify (
   return EFI_SUCCESS;
 }
 
+/**
+  The worker function that send the displays to the screen. On output,
+  the selection made by user is returned.
+
+  @param Selection       On input, Selection tell setup browser the information
+                         about the Selection, form and formset to be displayed.
+                         On output, Selection return the screen item that is selected
+                         by user.
+
+  @retval EFI_SUCCESS    The page is displayed successfully.
+  @return Other value if the page failed to be diplayed.
+
+**/
 EFI_STATUS
 SetupBrowser (
   IN OUT UI_MENU_SELECTION    *Selection
@@ -844,7 +921,7 @@ SetupBrowser (
     //
     Statement = Selection->Statement;
     if (Statement != NULL) {
-      if (Statement->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) {
+      if ((Statement->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) == EFI_IFR_FLAG_RESET_REQUIRED) {
         gResetRequired = TRUE;
       }
 
@@ -853,7 +930,7 @@ SetupBrowser (
       //
       mHiiPackageListUpdated = FALSE;
 
-      if (Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK && Statement->Operand != EFI_IFR_PASSWORD_OP) {
+      if (((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
         ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
         HiiValue = &Statement->HiiValue;

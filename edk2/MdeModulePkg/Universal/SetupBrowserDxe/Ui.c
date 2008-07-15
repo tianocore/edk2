@@ -1,4 +1,5 @@
 /** @file
+Utility functions for User Interface functions.
 
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -8,17 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Ui.c
-
-Abstract:
-
-  Implementation for UI.
-
-Revision History
-
 
 **/
 
@@ -134,8 +124,6 @@ SCREEN_OPERATION_T0_CONTROL_FLAG  gScreenOperationToControlFlag[] = {
   @param  Size                   Number of bytes to set
   @param  Value                  Value of the set operation.
 
-  @return None
-
 **/
 VOID
 SetUnicodeMem (
@@ -147,7 +135,7 @@ SetUnicodeMem (
   CHAR16  *Ptr;
 
   Ptr = Buffer;
-  while (Size--) {
+  while ((Size--)  != 0) {
     *(Ptr++) = Value;
   }
 }
@@ -155,10 +143,6 @@ SetUnicodeMem (
 
 /**
   Initialize Menu option list.
-
-  None.
-
-  @return None.
 
 **/
 VOID
@@ -172,10 +156,6 @@ UiInitMenu (
 
 /**
   Initialize Menu option list.
-
-  None.
-
-  @return None.
 
 **/
 VOID
@@ -192,12 +172,10 @@ UiInitMenuList (
 
   @param  Selection              Menu selection.
 
-  @return None.
-
 **/
 VOID
 UiRemoveMenuListEntry (
-  IN OUT UI_MENU_SELECTION  *Selection
+  OUT UI_MENU_SELECTION  *Selection
   )
 {
   UI_MENU_LIST  *UiMenuList;
@@ -215,10 +193,6 @@ UiRemoveMenuListEntry (
 
 /**
   Free Menu option linked list.
-
-  None.
-
-  @return None.
 
 **/
 VOID
@@ -241,8 +215,6 @@ UiFreeMenuList (
 
   @param  Selection              Menu selection.
 
-  @return None.
-
 **/
 VOID
 UiAddMenuListEntry (
@@ -264,10 +236,6 @@ UiAddMenuListEntry (
 
 /**
   Free Menu option linked list.
-
-  None.
-
-  @return None.
 
 **/
 VOID
@@ -300,10 +268,6 @@ UiFreeMenu (
 /**
   Free Menu option linked list.
 
-  None.
-
-  @return None.
-
 **/
 VOID
 UiFreeRefreshList (
@@ -325,10 +289,6 @@ UiFreeRefreshList (
 
 /**
   Refresh screen.
-
-  None.
-
-  @return None.
 
 **/
 VOID
@@ -417,7 +377,7 @@ UiWaitForSingleEvent (
   EFI_EVENT   TimerEvent;
   EFI_EVENT   WaitList[2];
 
-  if (Timeout) {
+  if (Timeout != 0) {
     //
     // Create a timer event
     //
@@ -503,8 +463,6 @@ UiWaitForSingleEvent (
   @param  NumberOfLines          Display lines for this Menu Option.
   @param  MenuItemCount          The index for this Option in the Menu.
 
-  @return None.
-
 **/
 VOID
 UiAddMenuOption (
@@ -565,7 +523,7 @@ UiAddMenuOption (
     }
 
     if ((Statement->ValueExpression != NULL) ||
-        (Statement->QuestionFlags & EFI_IFR_FLAG_READ_ONLY)) {
+        ((Statement->QuestionFlags & EFI_IFR_FLAG_READ_ONLY) != 0)) {
       MenuOption->ReadOnly = TRUE;
     }
 
@@ -788,6 +746,15 @@ CreateDialog (
   return EFI_SUCCESS;
 }
 
+/**
+  Draw a pop up windows based on the dimension, number of lines and
+  strings specified.
+
+  @param RequestedWidth  The width of the pop-up.
+  @param NumberOfLines   The number of lines.
+  @param ArrayOfStrings  The array of string to be printed.
+
+**/
 VOID
 CreateSharedPopUp (
   IN  UINTN                       RequestedWidth,
@@ -885,6 +852,16 @@ CreateSharedPopUp (
   PrintChar (Character);
 }
 
+/**
+  Draw a pop up windows based on the dimension, number of lines and
+  strings specified.
+
+  @param RequestedWidth  The width of the pop-up.
+  @param NumberOfLines   The number of lines.
+  @param ArrayOfStrings  The array of string to be printed.
+  @param ...             A series of text strings that displayed in the pop-up.
+
+**/
 VOID
 CreatePopUp (
   IN  UINTN                       RequestedWidth,
@@ -903,8 +880,6 @@ CreatePopUp (
   @param  MessageType            The type of message to be shown.
   @param  Flags                  The flags in Question header.
   @param  State                  Set or clear.
-
-  @return None.
 
 **/
 VOID
@@ -1042,6 +1017,8 @@ GetWidth (
 }
 
 
+STATIC BOOLEAN GetLineByWidthFinished = FALSE;
+
 /**
   Will copy LineWidth amount of a string in the OutputString buffer and return the
   number of CHAR16 characters that were copied into the OutputString buffer.
@@ -1063,12 +1040,11 @@ GetLineByWidth (
   OUT     CHAR16                      **OutputString
   )
 {
-  static BOOLEAN  Finished;
   UINT16          Count;
   UINT16          Count2;
 
-  if (Finished) {
-    Finished = FALSE;
+  if (GetLineByWidthFinished) {
+    GetLineByWidthFinished = FALSE;
     return (UINT16) 0;
   }
 
@@ -1109,7 +1085,7 @@ GetLineByWidth (
       //
       LineWidth = (UINT16) ((StrSize (&InputString[*Index]) - 2) / 2);
       if (LineWidth != 0) {
-        Finished = TRUE;
+        GetLineByWidthFinished = TRUE;
       }
     } else {
       if (Count2 == LineWidth) {
@@ -1147,7 +1123,10 @@ GetLineByWidth (
 /**
   Update display lines for a Menu Option.
 
+  @param  Selection              The user's selection.
   @param  MenuOption             The MenuOption to be checked.
+  @param  OptionalString         The option string.
+  @param  SkipValue              The number of lins to skip.
 
   @retval TRUE                   This Menu Option is selectable.
   @retval FALSE                  This Menu Option could not be selected.
@@ -1157,7 +1136,7 @@ VOID
 UpdateOptionSkipLines (
   IN UI_MENU_SELECTION            *Selection,
   IN UI_MENU_OPTION               *MenuOption,
-  IN CHAR16                       **OptionalString,
+  OUT CHAR16                       **OptionalString,
   IN UINTN                        SkipValue
   )
 {
@@ -1215,13 +1194,14 @@ UpdateOptionSkipLines (
 /**
   Check whether this Menu Option could be highlighted.
 
+  This is an internal function.
+
   @param  MenuOption             The MenuOption to be checked.
 
   @retval TRUE                   This Menu Option is selectable.
   @retval FALSE                  This Menu Option could not be selected.
 
 **/
-STATIC
 BOOLEAN
 IsSelectable (
   UI_MENU_OPTION   *MenuOption
@@ -1239,13 +1219,15 @@ IsSelectable (
 /**
   Determine if the menu is the last menu that can be selected.
 
-  @param  Direction              the scroll direction. False is down. True is up.
+  This is an internal function.
+  
+  @param  Direction              The scroll direction. False is down. True is up.
+  @param  CurrentPos             The current focus.
 
   @return FALSE -- the menu isn't the last menu that can be selected.
   @return TRUE  -- the menu is the last menu that can be selected.
 
 **/
-STATIC
 BOOLEAN
 ValueIsScroll (
   IN  BOOLEAN                     Direction,
@@ -1274,14 +1256,15 @@ ValueIsScroll (
 
 /**
   Move to next selectable statement.
-
+  
+  This is an internal function.
+  
   @param  GoUp                   The navigation direction. TRUE: up, FALSE: down.
   @param  CurrentPosition        Current position.
 
   @return The row distance from current MenuOption to next selectable MenuOption.
 
 **/
-STATIC
 INTN
 MoveToNextStatement (
   IN     BOOLEAN                   GoUp,
@@ -1341,6 +1324,8 @@ MoveToNextStatement (
   Adjust Data and Time position accordingly.
   Data format :      [01/02/2004]      [11:22:33]
   Line number :        0  0    1         0  0  1
+  
+  This is an internal function.
 
   @param  DirectionUp            the up or down direction. False is down. True is
                                  up.
@@ -1352,7 +1337,6 @@ MoveToNextStatement (
   @return data or time opcode, so pad one line when we judge if we are going to scroll outside.
 
 **/
-STATIC
 UINTN
 AdjustDateAndTimePosition (
   IN     BOOLEAN                     DirectionUp,
@@ -1416,9 +1400,9 @@ AdjustDateAndTimePosition (
   If AutoBoot is enabled, then if user doesn't select any option,
   after period of time, it will automatically return the first menu option.
 
+  @param  Selection              Menu selection.
 
-  @return Return the pointer of the menu which selected,
-  @return otherwise return NULL.
+  @retval EFI_SUCESSS            This function always return successfully for now.
 
 **/
 EFI_STATUS
@@ -2348,7 +2332,7 @@ UiDisplayMenu (
           //
           Selection->QuestionId = Statement->RefQuestionId;
 
-          if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK)) {
+          if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
             Selection->Action = UI_ACTION_REFRESH_FORM;
           } else {
             Repaint = TRUE;
