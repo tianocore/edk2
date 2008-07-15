@@ -1,7 +1,7 @@
 /** @file
-  Report Status Code Library public .h file
+  Post Code Library functions defintion.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -28,12 +28,12 @@
   display the 32-bit value on the status reporting device.
   
   PostCode() must actively prevent recursion.  If PostCode() is called while 
-  processing another any other Report Status Code Library function, then 
+  processing another any other Post Code Library function, then 
   PostCode() must return Value immediately.
 
   @param  Value  The 32-bit value to write to the POST card.
 
-  @return  Value
+  @return  Value The 32-bit value to write to the POST card.
 
 **/
 UINT32
@@ -55,16 +55,16 @@ PostCode (
   value on the status reporting device.  
 
   PostCodeWithDescription()must actively prevent recursion.  If 
-  PostCodeWithDescription() is called while processing another any other Report 
-  Status Code Library function, then PostCodeWithDescription() must return Value 
-  immediately.
+  PostCodeWithDescription() is called while processing another any other 
+  Post Code Library function, then PostCodeWithDescription() 
+  must return Value immediately.
 
   @param  Value        The 32-bit value to write to the POST card.
   @param  Description  Pointer to an ASCII string that is a description of the 
                        POST code value.  This is an optional parameter that may 
                        be NULL.
 
-  @return  Value
+  @return  Value       The 32-bit value to write to the POST card.
 
 **/
 UINT32
@@ -97,14 +97,13 @@ PostCodeEnabled (
 /**
   Returns TRUE if POST code descriptions are enabled.
 
-  This function returns TRUE if the 
-  POST_CODE_PROPERTY_POST_CODE_ENABLED bit of 
-  PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
+  This function returns TRUE if the POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED
+  bit of PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
 
-  @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_ENABLED 
-                  bit of PcdPostCodeProperyMask is set.
-  @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_ENABLED 
-                  bit of PcdPostCodeProperyMask is clear.
+  @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of
+                  PcdPostCodeProperyMask is set.
+  @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of
+                  PcdPostCodeProperyMask is clear.
 
 **/
 BOOLEAN
@@ -122,7 +121,7 @@ PostCodeDescriptionEnabled (
 
   @param  Value  The 32-bit value to write to the POST card.
 
-  @return  Value
+  @return  Value The 32-bit value to write to the POST card.
 
 **/
 #define POST_CODE(Value)  PostCodeEnabled() ? PostCode(Value) : Value
@@ -139,6 +138,7 @@ PostCodeDescriptionEnabled (
   @param  Description  Pointer to an ASCII string that is a description of the 
                        POST code value.
 
+  @return Value        The 32-bit value to write to the POST card.
 **/
 #define POST_CODE_WITH_DESCRIPTION(Value,Description)  \
   PostCodeEnabled()                              ?     \

@@ -1,7 +1,7 @@
 /** @file
-  Library that provides print services
+  Library header file that defines print services
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -110,6 +110,7 @@ UnicodeVSPrint (
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
+  @param  ...             The variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
           Null-terminator.
@@ -150,7 +151,7 @@ UnicodeSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
@@ -192,7 +193,8 @@ UnicodeVSPrintAsciiFormat (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
+  @param  ...             The variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
           Null-terminator.
@@ -282,7 +284,7 @@ UnicodeValueToString (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
@@ -323,8 +325,9 @@ AsciiVSPrint (
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
-  
+  @param  FormatString    Null-terminated ASCII format string.
+  @param  ...             The variable argument list. 
+   
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.
 
@@ -340,7 +343,7 @@ AsciiSPrint (
 
 /**
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
-  ASCII format string and a VA_LIST argument list.
+  Unicode format string and a VA_LIST argument list.
   
   Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
   and BufferSize.
@@ -382,7 +385,7 @@ AsciiVSPrintUnicodeFormat (
 
 /**
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
-  ASCII format string and  variable argument list.
+  Unicode format string and  variable argument list.
   
   Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
   and BufferSize.
@@ -407,6 +410,7 @@ AsciiVSPrintUnicodeFormat (
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
+  @param  ...             The variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.

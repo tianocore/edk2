@@ -1,7 +1,7 @@
 /** @file
-  Internal include file for Base UEFI Decompress Libary.
+  Internal data structure defintions for Base UEFI Decompress Libary.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -40,8 +40,8 @@
 #endif
 
 typedef struct {
-  UINT8   *mSrcBase;  ///< Starting address of compressed data
-  UINT8   *mDstBase;  ///< Starting address of decompressed data
+  UINT8   *mSrcBase;  // Starting address of compressed data
+  UINT8   *mDstBase;  // Starting address of decompressed data
   UINT32  mOutBuf;
   UINT32  mInBuf;
 
@@ -64,13 +64,12 @@ typedef struct {
   ///
   /// The length of the field 'Position Set Code Length Array Size' in Block Header.
   /// For UEFI 2.0 de/compression algorithm, mPBit = 4
-  /// For Tiano de/compression algorithm, mPBit = 5
   ///
   UINT8   mPBit;
 } SCRATCH_DATA;
 
 /**
-  Read NumOfBit of bits from source into mBitBuf
+  Read NumOfBit of bits from source into mBitBuf.
 
   Shift mBitBuf NumOfBits left. Read in NumOfBits of bits from source.
 
@@ -85,7 +84,7 @@ FillBuf (
   );
 
 /**
-  Get NumOfBits of bits out from mBitBuf
+  Get NumOfBits of bits out from mBitBuf.
 
   Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent
   NumOfBits of bits from source. Returns NumOfBits of bits that are
@@ -113,7 +112,7 @@ GetBits (
   @param  NumOfChar Number of symbols in the symbol set
   @param  BitLen    Code length array
   @param  TableBits The width of the mapping table
-  @param  Table     The table
+  @param  Table     The table to be created.
 
   @retval  0 OK.
   @retval  BAD_TABLE The table is corrupted.
@@ -198,8 +197,6 @@ DecodeC (
   );
 
 /**
-  Decode the source data and put the resulting data into the destination buffer.
-
   Decode the source data and put the resulting data into the destination buffer.
 
   @param  Sd The global scratch data

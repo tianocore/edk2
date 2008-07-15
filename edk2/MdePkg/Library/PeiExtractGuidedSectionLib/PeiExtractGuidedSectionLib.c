@@ -1,7 +1,7 @@
 /** @file
-  Provide generic extract guided section functions.
+  Provide generic extract guided section functions for PEI phase.
 
-  Copyright (c) 2007, Intel Corporation<BR>
+  Copyright (c) 2007 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -97,6 +97,9 @@ PeiGetExtractGuidedSectionHandlerInfo (
     //
     return EFI_OUT_OF_RESOURCES;
   }
+  //
+  // Init HandlerInfo structure
+  //
   HandlerInfo->Signature = PEI_EXTRACT_HANDLER_INFO_SIGNATURE;
   HandlerInfo->NumberOfExtractHandler     = 0;
   HandlerInfo->ExtractHandlerGuidTable    = (GUID *) (HandlerInfo + 1);
@@ -109,7 +112,9 @@ PeiGetExtractGuidedSectionHandlerInfo (
                                               PcdGet32 (PcdMaximumGuidedExtractHandler) * 
                                               sizeof (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER)
                                              );
-  
+  //
+  // return the created HandlerInfo.
+  //
   *InfoPointer = HandlerInfo;
   return EFI_SUCCESS;
 }
@@ -118,14 +123,14 @@ PeiGetExtractGuidedSectionHandlerInfo (
   Get the supported exract guided section Handler guid list.
   If ExtractHandlerGuidTable = NULL, then ASSERT.
 
-  @param[in, out]  ExtractHandlerGuidTable   The extract Handler guid pointer list.
+  @param[out]  ExtractHandlerGuidTable   The extract Handler guid pointer list.
 
-  @retval  return the number of the supported extract guided Handler.
+  @return the number of the supported extract guided Handler.
 **/
 UINTN
 EFIAPI
 ExtractGuidedSectionGetGuidList (
-  IN OUT  GUID  **ExtractHandlerGuidTable
+  OUT  GUID  **ExtractHandlerGuidTable
   )
 {
   EFI_STATUS Status;
@@ -133,11 +138,17 @@ ExtractGuidedSectionGetGuidList (
 
   ASSERT (ExtractHandlerGuidTable != NULL);
 
+  //
+  // Get all registered handler information
+  //
   Status = PeiGetExtractGuidedSectionHandlerInfo (&HandlerInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
+  //
+  // Get GuidTable and Table Number
+  //
   *ExtractHandlerGuidTable = HandlerInfo->ExtractHandlerGuidTable;
   return HandlerInfo->NumberOfExtractHandler;
 }
@@ -232,8 +243,8 @@ ExtractGuidedSectionRegisterHandlers (
   @param[out] SectionAttribute      The attribute of the input guided section.
 
   @retval  RETURN_SUCCESS           Get the required information successfully.
-  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly. 
-                                    The GUID in InputSection does not match any registered guid list.
+  @retval  RETURN_UNSUPPORTED       Guided section data is not supported.
+  @retval  RETURN_INVALID_PARAMETER The input data is not the valid guided section.
 
 **/
 RETURN_STATUS
@@ -261,7 +272,7 @@ ExtractGuidedSectionGetInfo (
   ASSERT (SectionAttribute != NULL);
 
   //
-  // Get the registered handler information.
+  // Get all registered handler information.
   //
   Status = PeiGetExtractGuidedSectionHandlerInfo (&HandlerInfo);
   if (EFI_ERROR (Status)) {
@@ -281,7 +292,7 @@ ExtractGuidedSectionGetInfo (
   // Not found, the input guided section is not supported. 
   //
   if (Index == HandlerInfo->NumberOfExtractHandler) {
-    return RETURN_INVALID_PARAMETER;
+    return RETURN_UNSUPPORTED;
   }
 
   //
@@ -316,8 +327,8 @@ ExtractGuidedSectionGetInfo (
                             authentication status of the output buffer. 
 
   @retval  RETURN_SUCCESS           Get the output data, size and AuthenticationStatus successfully.
-  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly. 
-                                    The GUID in InputSection does not match any registered guid list.
+  @retval  RETURN_UNSUPPORTED       Guided section data is not supported to be decoded.
+  @retval  RETURN_INVALID_PARAMETER The input data is not the valid guided section.
 
 **/
 RETURN_STATUS
@@ -333,20 +344,25 @@ ExtractGuidedSectionDecode (
   EFI_STATUS Status;
   PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
   
+  //
+  // Check input parameter
+  //
   if (InputSection == NULL) {
     return RETURN_INVALID_PARAMETER;
-  }
-  
+  }  
   ASSERT (OutputBuffer != NULL);
   ASSERT (AuthenticationStatus != NULL);
-  
+
+  //
+  // Get all registered handler information.
+  //  
   Status = PeiGetExtractGuidedSectionHandlerInfo (&HandlerInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
-  // Search the match registered GetInfo handler for the input guided section.
+  // Search the match registered Extract handler for the input guided section.
   //
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
@@ -358,11 +374,11 @@ ExtractGuidedSectionDecode (
   // Not found, the input guided section is not supported. 
   //
   if (Index == HandlerInfo->NumberOfExtractHandler) {
-    return RETURN_INVALID_PARAMETER;
+    return RETURN_UNSUPPORTED;
   }
 
   //
-  // Call the match handler to getinfo for the input section data.
+  // Call the match handler to extract raw data for the input guided section.
   //
   return HandlerInfo->ExtractDecodeHandlerTable [Index] (
             InputSection,

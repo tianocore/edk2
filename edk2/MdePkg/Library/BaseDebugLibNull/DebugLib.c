@@ -1,7 +1,7 @@
 /** @file
-  Base Debug Library that uses PrintLib to print messages to a memory buffer.
+  Null Base Debug Library instance with empty functions.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,10 +28,9 @@
   the message specified by Format and the associated variable argument list to 
   the debug output device.
 
-  If Format is NULL, then ASSERT().
-
   @param  ErrorLevel  The error level of the debug message.
   @param  Format      Format string for the debug message to print.
+  @param  ...         The variable argument list.
 
 **/
 VOID
@@ -180,11 +179,11 @@ DebugCodeEnabled (
   
   Returns TRUE if DEBUG_CLEAR_MEMORY()macro is enabled.
 
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of 
+  This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
+  @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
   
   @return  Always return FALSE.
 

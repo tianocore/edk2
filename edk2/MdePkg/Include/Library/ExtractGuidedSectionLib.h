@@ -1,7 +1,8 @@
 /** @file
-  Extract Guided Section Library class
+  Extract Guided Section Library class defintions, 
+  which can provide many handlers for the different guided section data.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -10,13 +11,12 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  ExtractGuidedSectionLib.h
 **/
 #ifndef __EXTRACT_GUIDED_SECTION_H__
 #define __EXTRACT_GUIDED_SECTION_H__
 
 /**
-  Get information Handler for the input guided section data.
+  Get information for the input guided section data.
   It will ASSERT () if the pointer to OutputBufferSize is NULL.
   It will ASSERT () if the pointer to ScratchBufferSize is NULL.
   It will ASSERT () if the pointer to SectionAttribute is NULL.
@@ -27,7 +27,7 @@
   @param[out] SectionAttribute      The attribute of the input guided section.
 
   @retval  RETURN_SUCCESS           Get the required information successfully.
-  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly.
+  @retval  RETURN_INVALID_PARAMETER The input data is not the valid guided section.
 
 **/
 typedef
@@ -40,21 +40,21 @@ RETURN_STATUS
   );
 
 /**
-  Extract data Handler for one specific guided section.
+  Extract data and Auth from the specific guided section.
   It will ASSERT () if the pointer to OutputBuffer is NULL.
   It will ASSERT () if the pointer to AuthenticationStatus is NULL.
 
   @param[in]  InputSection  Buffer containing the input GUIDed section to be processed. 
-  @param[out] OutputBuffer  OutputBuffer to point to the start of the section's contents.
+  @param[out] OutputBuffer  OutputBuffer directly points to the start of the section's contents,
                             if guided data is not prcessed. Otherwise,
-                            OutputBuffer to contain the output data, which is allocated by the caller.
+                            OutputBuffer contains the output data, which is allocated by the caller.
   @param[out] ScratchBuffer A pointer to a caller-allocated buffer for function internal use. 
   @param[out] AuthenticationStatus 
                             A pointer to a caller-allocated UINT32 that indicates the
                             authentication status of the output buffer. 
 
   @retval  RETURN_SUCCESS               Get the output data and AuthenticationStatus successfully.
-  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly.
+  @retval  RETURN_INVALID_PARAMETER     The input data is not the valid guided section.
 
 **/
 typedef
@@ -70,12 +70,12 @@ RETURN_STATUS
   Register Guided Section Extract and GetInfo Handler.
 
   @param[in]     SectionGuid    The guid matches this Extraction Handler.
-  @param[in]     GetInfoHandler Handler to get info from guided section.
+  @param[in]     GetInfoHandler Handler to get information from guided section.
   @param[in]     DecodeHandler  Handler to extract guided section.
 
   @retval  RETURN_SUCCESS           Register Guided Section Extract Handler successfully.
   @retval  RETURN_OUT_OF_RESOURCES  Resource is not enough to register new Handler. 
-  @retval  RETURN_INVALID_PARAMETER Input pointer to Guid value is not valid.
+  @retval  RETURN_INVALID_PARAMETER Pointer to Guid value is not valid.
 
 **/
 RETURN_STATUS
@@ -88,18 +88,18 @@ ExtractGuidedSectionRegisterHandlers (
 
 /**
   Get the supported exract guided section Handler guid table, which is maintained
-  by library. The caller can directly get this guid table pointer 
+  by library. The caller can directly get the guid table 
   without responsibility to allocate or free this table buffer.  
   It will ASSERT () if ExtractHandlerGuidTable = NULL.
 
-  @param[in, out]  ExtractHandlerGuidTable   The extract Handler guid pointer list.
+  @param[out]  ExtractHandlerGuidTable   The extract Handler guid pointer list.
 
-  @retval  return the number of the supported extract guided Handler.
+  @return the number of the supported extract guided Handler.
 **/
 UINTN
 EFIAPI
 ExtractGuidedSectionGetGuidList (
-  IN OUT  GUID  **ExtractHandlerGuidTable
+  OUT  GUID  **ExtractHandlerGuidTable
   );
 
 /**
@@ -120,7 +120,7 @@ ExtractGuidedSectionGetGuidList (
 
   @retval  RETURN_SUCCESS           Get the required information successfully.
   @retval  RETURN_UNSUPPORTED       Guided section data is not supported.
-  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly.
+  @retval  RETURN_INVALID_PARAMETER The input data is not the valid guided section.
 
 **/
 RETURN_STATUS
@@ -154,7 +154,7 @@ ExtractGuidedSectionGetInfo (
 
   @retval  RETURN_SUCCESS           Get the output data and AuthenticationStatus successfully.
   @retval  RETURN_UNSUPPORTED       Guided section data is not supported to be decoded.
-  @retval  RETURN_INVALID_PARAMETER The input data can't be parsed correctly.
+  @retval  RETURN_INVALID_PARAMETER The input data is not the valid guided section.
 **/
 RETURN_STATUS
 EFIAPI

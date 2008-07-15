@@ -1,7 +1,7 @@
 /** @file
-  Print Library Internal Functions.
+  Base Print Library instance Internal Functions definition.
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef __PRINT_LIB_INTERNAL_H
-#define __PRINT_LIB_INTERNAL_H
+#ifndef __PRINT_LIB_INTERNAL_H__
+#define __PRINT_LIB_INTERNAL_H__
 
 #include <Base.h>
 #include <Library/PrintLib.h>
@@ -91,20 +91,21 @@ BasePrintLibVSPrint (
   VA_LIST is used this rountine allows the nesting of Vararg routines. Thus 
   this is the main print working routine
 
-  @param  Buffer        Character buffer to print the results of the parsing
+  @param  StartOfBuffer Character buffer to print the results of the parsing
                         of Format into.
   @param  BufferSize    Maximum number of characters to put into buffer.
                         Zero means no limit.
   @param  Flags         Intial flags value.
                         Can only have FORMAT_UNICODE and OUTPUT_UNICODE set
   @param  FormatString  Null-terminated format string.
+  @param  ...           The variable argument list.
 
   @return Number of characters printed.
 
 **/
 UINTN
 BasePrintLibSPrint (
-  OUT CHAR8        *Buffer,
+  OUT CHAR8        *StartOfBuffer,
   IN  UINTN        BufferSize,
   IN  UINTN        Flags,
   IN  CONST CHAR8  *FormatString,
@@ -123,16 +124,16 @@ BasePrintLibSPrint (
   @param  Character   Character to be placed into Buffer.
   @param  Increment   Character increment in Buffer.
 
-  @return Number of characters printed.
+  @return Buffer      Buffer filled with the input Character.
 
 **/
 CHAR8 *
 BasePrintLibFillBuffer (
-  CHAR8   *Buffer,
-  CHAR8   *EndBuffer,
-  INTN    Length,
-  UINTN   Character,
-  INTN    Increment
+  OUT CHAR8   *Buffer,
+  IN  CHAR8   *EndBuffer,
+  IN  INTN    Length,
+  IN  UINTN   Character,
+  IN  INTN    Increment
   );
 
 /**
@@ -148,7 +149,6 @@ BasePrintLibFillBuffer (
 
 **/
 UINTN
-EFIAPI
 BasePrintLibValueToString (
   IN OUT CHAR8  *Buffer, 
   IN INT64      Value, 
