@@ -687,6 +687,7 @@ Print (
   VerticalResolution    = 0;
   Blt                   = NULL;
   FontInfo              = NULL;
+  PrintNum              = 0;
 
   if (GraphicsOutput != NULL) {
     HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
@@ -834,7 +835,7 @@ Error:
   SafeFreePool (FontInfo);
   FreePool (Buffer);
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return PrintNum;
   } else {
     return 0;
