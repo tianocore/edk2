@@ -41,7 +41,7 @@
   Ia32/Ia32FtwMisc.c
 
 [Sources.X64]
-  x64/x64FtwMisc.c
+  X64/X64FtwMisc.c
 
 [Sources.IPF]
   Ipf/IpfFtwMisc.c
