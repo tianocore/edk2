@@ -183,7 +183,7 @@ LockKeyboards (
   @param[in]  Fmt          Print format sting. See definition of Print
   @param[in]  ...          Argumnet stream defined by Fmt string
 
-  @retval UINTN     Number of Characters printed
+  @return  Number of Characters printed.
 
 **/
 UINTN
