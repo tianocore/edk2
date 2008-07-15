@@ -15,14 +15,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _CON_PLATFORM_H_
 #define _CON_PLATFORM_H_
 
-#include <Uefi.h>
+#include <PiDxe.h>
+
 #include <Protocol/SimpleTextOut.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/SimpleTextIn.h>
+
 #include <Guid/GlobalVariable.h>
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/StandardErrorDevice.h>
 #include <Guid/ConsoleOutDevice.h>
-#include <Protocol/DevicePath.h>
-#include <Protocol/SimpleTextIn.h>
 #include <Guid/HotPlugDevice.h>
 
 #include <Library/DebugLib.h>
@@ -210,11 +212,11 @@ ConPlatformTextOutDriverBindingStop (
   );
 
 /**
-  Unstall the specific protocol.
+  Uninstall the specified protocol.
 
   @param This            Protocol instance pointer.
-  @param Handle          Handle of device to unstall protocol on.
-  @param ProtocolGuid    The specific protocol need to be uninstalled.
+  @param Handle          Handle of device to uninstall protocol on.
+  @param ProtocolGuid    The specified protocol need to be uninstalled.
 
   @return None.
 
@@ -230,12 +232,11 @@ ConPlatformUnInstallProtocol (
   Read the EFI variable (Name) and return a dynamically allocated
   buffer, and the size of the buffer. On failure return NULL.
 
-
   @param  Name             String part of EFI variable name
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
-          Caller is repsoncible freeing the buffer.
-          NULL - Variable was not read
+          Caller is repsoncible freeing the buffer. Return NULL means Variable 
+          was not read.
 
 **/
 VOID *
@@ -257,8 +258,8 @@ ConPlatformGetVariable (
                          If FALSE, the routine just check whether Single matches
                          with any instance in Multi.
 
-  @return The function returns EFI_SUCCESS if the Single is contained within Multi.
-          Otherwise, EFI_NOT_FOUND is returned.
+  @retval EFI_SUCCESS    If the Single is contained within Multi.
+  @retval EFI_NOT_FOUND  If the Single is not contained within Multi.
 
 **/
 EFI_STATUS
@@ -270,7 +271,7 @@ ConPlatformMatchDevicePaths (
   );
 
 /**
-  Update console devicein console environment variables. 
+  Update console environment variables.
 
   @param  VariableName    Console environment variables, ConOutDev, ConInDev
                           StdErrDev, ConIn or ConOut.

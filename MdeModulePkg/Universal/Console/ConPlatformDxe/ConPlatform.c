@@ -37,8 +37,8 @@ EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding = {
 /**
   The user Entry Point for module ConPlatform. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
-  @param[in] SystemTable    A pointer to the EFI System Table.
+  @param  ImageHandle       The firmware allocated handle for the EFI image.
+  @param  SystemTable       A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
@@ -89,8 +89,8 @@ InitializeConPlatform(
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -118,8 +118,8 @@ ConPlatformTextInDriverBindingSupported (
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -140,7 +140,7 @@ ConPlatformTextOutDriverBindingSupported (
 
 
 /**
-  Test to see if specific Protocol could be supported on the ControllerHandle. 
+  Test to see if the specified Protocol could be supported on the ControllerHandle. 
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -148,8 +148,8 @@ ConPlatformTextOutDriverBindingSupported (
                               device to start.
   @param  ProtocolGuid        The specfic protocol.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -164,8 +164,8 @@ ConPlatformDriverBindingSupported (
   VOID        *Interface;
 
   //
-  // Test to see if this is a physical device by checking to see if
-  // it has a Device Path Protocol
+  // Test to see if this is a physical device by checking if
+  // it has a Device Path Protocol.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -179,7 +179,7 @@ ConPlatformDriverBindingSupported (
     return Status;
   }
   //
-  // Test to see if this device supports the specific Protocol
+  // Test to see if this device supports the specified Protocol.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -620,11 +620,11 @@ ConPlatformTextOutDriverBindingStop (
 
 
 /**
-  Unstall the specific protocol.
+  Uninstall the specified protocol.
 
   @param This            Protocol instance pointer.
-  @param Handle          Handle of device to unstall protocol on.
-  @param ProtocolGuid    The specific protocol need to be uninstalled.
+  @param Handle          Handle of device to uninstall protocol on.
+  @param ProtocolGuid    The specified protocol need to be uninstalled.
 
   @return None.
 
@@ -663,12 +663,11 @@ ConPlatformUnInstallProtocol (
   Read the EFI variable (Name) and return a dynamically allocated
   buffer, and the size of the buffer. On failure return NULL.
 
-
   @param  Name             String part of EFI variable name
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
-          Caller is repsoncible freeing the buffer.
-          NULL - Variable was not read
+          Caller is repsoncible freeing the buffer. Return NULL means Variable 
+          was not read.
 
 **/
 VOID *
@@ -684,7 +683,7 @@ ConPlatformGetVariable (
   Buffer      = NULL;
 
   //
-  // Test to see if the variable exists.  If it doesn't reuturn NULL
+  // Test to see if the variable exists.  If it doesn't, reuturn NULL.
   //
   Status = gRT->GetVariable (
                   Name,
@@ -714,6 +713,9 @@ ConPlatformGetVariable (
                     );
     if (EFI_ERROR (Status)) {
       FreePool (Buffer);
+      //
+      // To make sure Buffer is NULL if any error occurs.
+      //
       Buffer = NULL;
     }
   }
@@ -735,20 +737,21 @@ ConPlatformGetVariable (
                          If FALSE, the routine just check whether Single matches
                          with any instance in Multi.
 
-  @return The function returns EFI_SUCCESS if the Single is contained within Multi.
-          Otherwise, EFI_NOT_FOUND is returned.
+  @retval EFI_SUCCESS    If the Single is contained within Multi.
+  @retval EFI_NOT_FOUND  If the Single is not contained within Multi.
 
 **/
 EFI_STATUS
 ConPlatformMatchDevicePaths (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Multi,
   IN  EFI_DEVICE_PATH_PROTOCOL  *Single,
-  IN  EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath OPTIONAL,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath OPTIONAL,
   IN  BOOLEAN                   Delete
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath1;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath2;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathInst;
   UINTN                     Size;
 
@@ -758,29 +761,42 @@ ConPlatformMatchDevicePaths (
   if ((Multi == NULL) || (Single == NULL)) {
     return EFI_NOT_FOUND;
   }
+
   //
-  // if performing Delete operation, the NewDevicePath must not be NULL.
+  // If performing Delete operation, the NewDevicePath must not be NULL.
   //
-  TempDevicePath  = NULL;
+  if (Delete) {
+    ASSERT (NewDevicePath != NULL);
+  }
+
+  TempDevicePath1 = NULL;
 
   DevicePath      = Multi;
   DevicePathInst  = GetNextDevicePathInstance (&DevicePath, &Size);
 
   //
-  // search for the match of 'Single' in 'Multi'
+  // Search for the match of 'Single' in 'Multi'
   //
   while (DevicePathInst != NULL) {
     if (CompareMem (Single, DevicePathInst, Size) == 0) {
       if (!Delete) {
+        //
+        // If Delete is FALSE, return EFI_SUCCESS if Single is found in Multi.
+        //
         FreePool (DevicePathInst);
         return EFI_SUCCESS;
       }
     } else {
       if (Delete) {
-        TempDevicePath = AppendDevicePathInstance (
-                            NULL,
+        //
+        // Append the mis-matched devcie path into remaining device path.
+        //
+        TempDevicePath2 = AppendDevicePathInstance (
+                            TempDevicePath1,
                             DevicePathInst
                             );
+        SafeFreePool (TempDevicePath1);
+        TempDevicePath1 = TempDevicePath2;
       }
     }
 
@@ -789,7 +805,10 @@ ConPlatformMatchDevicePaths (
   }
 
   if (Delete) {
-    *NewDevicePath = TempDevicePath;
+    //
+    // Return the remaining device path data structure
+    //
+    *NewDevicePath = TempDevicePath1;
     return EFI_SUCCESS;
   }
 
@@ -797,7 +816,7 @@ ConPlatformMatchDevicePaths (
 }
 
 /**
-  Update console devicein console environment variables. 
+  Update console environment variables. 
 
   @param  VariableName    Console environment variables, ConOutDev, ConInDev
                           StdErrDev, ConIn or ConOut.
@@ -831,7 +850,9 @@ ConPlatformUpdateDeviceVariable (
   VariableDevicePath = ConPlatformGetVariable (VariableName);
 
   if (Operation != DELETE) {
-
+    //
+    // Match specified DevicePath in Console Variable.
+    // 
     Status = ConPlatformMatchDevicePaths (
               VariableDevicePath,
               DevicePath,
@@ -884,6 +905,9 @@ ConPlatformUpdateDeviceVariable (
   }
 
   if (NewVariableDevicePath != NULL) {
+    //
+    // Update Console Environment Variable.
+    //
     Status = gRT->SetVariable (
                     VariableName,
                     &gEfiGlobalVariableGuid,
