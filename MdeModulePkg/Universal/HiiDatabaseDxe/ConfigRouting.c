@@ -25,11 +25,13 @@ Revision History
 
 #include "HiiDatabase.h"
 
-#ifndef DISABLE_UNUSED_HII_PROTOCOLS
+#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
 
 /**
   Calculate the number of Unicode characters of the incoming Configuration string,
   not including NULL terminator.
+
+  This is a internal function.
 
   @param  String                 String in <MultiConfigRequest> or
                                  <MultiConfigResp> format.
@@ -37,7 +39,6 @@ Revision History
   @return The number of Unicode characters.
 
 **/
-STATIC
 UINTN
 CalculateConfigStringLen (
   IN EFI_STRING                    String
@@ -71,6 +72,8 @@ CalculateConfigStringLen (
   Convert the hex UNICODE %02x encoding of a UEFI device path to binary
   from <PathHdr> of <ConfigHdr>.
 
+  This is a internal function.
+
   @param  String                 UEFI configuration string
   @param  DevicePath             binary of a UEFI device path.
 
@@ -80,7 +83,6 @@ CalculateConfigStringLen (
                                  binary format.
 
 **/
-STATIC
 EFI_STATUS
 GetDevicePath (
   IN  EFI_STRING                   String,
@@ -143,6 +145,8 @@ GetDevicePath (
 /**
   Extract Storage from all Form Packages in current hii database.
 
+  This is a internal function.
+
   @param  HiiDatabase            EFI_HII_DATABASE_PROTOCOL instance.
   @param  StorageListHead        Storage link List head.
 
@@ -151,7 +155,6 @@ GetDevicePath (
   @retval EFI_SUCCESS            All existing storage is exported.
 
 **/
-STATIC
 EFI_STATUS
 ExportAllStorage (
   IN EFI_HII_DATABASE_PROTOCOL     *HiiDatabase,
@@ -316,6 +319,8 @@ ExportAllStorage (
 /**
   Generate a sub string then output it.
 
+  This is a internal function.
+
   @param  String                 A constant string which is the prefix of the to be
                                  generated string, e.g. GUID=
   @param  BufferLen              The length of the Buffer in bytes.
@@ -329,7 +334,6 @@ ExportAllStorage (
 
 
 **/
-STATIC
 VOID
 GenerateSubStr (
   IN CONST EFI_STRING              String,
@@ -390,6 +394,8 @@ GenerateSubStr (
 /**
   Retrieve the <ConfigBody> from String then output it.
 
+  This is a internal function.
+
   @param  String                 A sub string of a configuration string in
                                  <MultiConfigAltResp> format.
   @param  ConfigBody             Points to the output string. It's caller's
@@ -400,7 +406,6 @@ GenerateSubStr (
   @retval EFI_SUCCESS            All existing storage is exported.
 
 **/
-STATIC
 EFI_STATUS
 OutputConfigBody (
   IN  EFI_STRING                   String,
@@ -444,36 +449,33 @@ OutputConfigBody (
 
 #endif
 
+/**
+  Adjusts the size of a previously allocated buffer.
+
+
+  @param OldPool         A pointer to the buffer whose size is being adjusted.
+  @param OldSize         The size of the current buffer.
+  @param NewSize         The size of the new buffer.
+
+  @return The new buffer allocated.
+
+**/
 VOID *
 ReallocatePool (
   IN VOID                          *OldPool,
   IN UINTN                         OldSize,
   IN UINTN                         NewSize
   )
-/*++
-
-Routine Description:
-  Adjusts the size of a previously allocated buffer.
-
-Arguments:
-  OldPool               - A pointer to the buffer whose size is being adjusted.
-  OldSize               - The size of the current buffer.
-  NewSize               - The size of the new buffer.
-
-Returns:
-  Points to the new buffer
-
---*/
 {
   VOID  *NewPool;
 
   NewPool = NULL;
-  if (NewSize) {
+  if (NewSize != 0) {
     NewPool = AllocateZeroPool (NewSize);
   }
 
-  if (OldPool) {
-    if (NewPool) {
+  if (OldPool != NULL) {
+    if (NewPool != NULL) {
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
@@ -487,6 +489,8 @@ Returns:
 /**
   Append a string to a multi-string format.
 
+  This is a internal function.
+
   @param  MultiString            String in <MultiConfigRequest>,
                                  <MultiConfigAltResp>, or <MultiConfigResp>. On
                                  input, the buffer length of  this string is
@@ -498,7 +502,6 @@ Returns:
   @retval EFI_SUCCESS            AppendString is append to the end of MultiString
 
 **/
-STATIC
 EFI_STATUS
 AppendToMultiString (
   IN OUT EFI_STRING                *MultiString,
@@ -541,6 +544,8 @@ AppendToMultiString (
   or WIDTH or VALUE.
   <BlockConfig> ::= 'OFFSET='<Number>&'WIDTH='<Number>&'VALUE'=<Number>
 
+  This is a internal function.
+
   @param  StringPtr              String in <BlockConfig> format and points to the
                                  first character of <Number>.
   @param  Number                 The output value. Caller takes the responsibility
@@ -553,7 +558,6 @@ AppendToMultiString (
                                  successfully.
 
 **/
-STATIC
 EFI_STATUS
 GetValueOfNumber (
   IN EFI_STRING                    StringPtr,
@@ -656,7 +660,7 @@ HiiConfigRoutingExtractConfig (
   OUT EFI_STRING                             *Results
   )
 {
-#ifndef DISABLE_UNUSED_HII_PROTOCOLS
+#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
 
   HII_DATABASE_PRIVATE_DATA           *Private;
   EFI_STRING                          StringPtr;
@@ -858,7 +862,7 @@ HiiConfigRoutingExportConfig (
   OUT EFI_STRING                             *Results
   )
 {
-#ifndef DISABLE_UNUSED_HII_PROTOCOLS
+#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
 
   EFI_STATUS                          Status;
   HII_DATABASE_PRIVATE_DATA           *Private;
@@ -1085,7 +1089,7 @@ HiiConfigRoutingRouteConfig (
   OUT EFI_STRING                             *Progress
   )
 {
-#ifndef DISABLE_UNUSED_HII_PROTOCOLS
+#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
 
   HII_DATABASE_PRIVATE_DATA           *Private;
   EFI_STRING                          StringPtr;
@@ -1757,22 +1761,33 @@ HiiGetAltCfg (
   OUT EFI_STRING                               *AltCfgResp
   )
 {
-#ifndef DISABLE_UNUSED_HII_PROTOCOLS
+#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
 
   EFI_STATUS                          Status;
   EFI_STRING                          StringPtr;
-  EFI_STRING                          HdrStart = NULL;
-  EFI_STRING                          HdrEnd   = NULL;
+  EFI_STRING                          HdrStart;
+  EFI_STRING                          HdrEnd;
   EFI_STRING                          TmpPtr;
   UINTN                               Length;
-  EFI_STRING                          GuidStr  = NULL;
-  EFI_STRING                          NameStr  = NULL;
-  EFI_STRING                          PathStr  = NULL;
-  EFI_STRING                          AltIdStr = NULL;
-  EFI_STRING                          Result   = NULL;
-  BOOLEAN                             GuidFlag = FALSE;
-  BOOLEAN                             NameFlag = FALSE;
-  BOOLEAN                             PathFlag = FALSE;
+  EFI_STRING                          GuidStr;
+  EFI_STRING                          NameStr;
+  EFI_STRING                          PathStr;
+  EFI_STRING                          AltIdStr;
+  EFI_STRING                          Result;
+  BOOLEAN                             GuidFlag;
+  BOOLEAN                             NameFlag;
+  BOOLEAN                             PathFlag;
+
+  HdrStart = NULL;
+  HdrEnd   = NULL;
+  GuidStr  = NULL;
+  NameStr  = NULL;
+  PathStr  = NULL;
+  AltIdStr = NULL;
+  Result   = NULL;
+  GuidFlag = FALSE;
+  NameFlag = FALSE;
+  PathFlag = FALSE;
 
   if (This == NULL || Configuration == NULL || AltCfgResp == NULL) {
     return EFI_INVALID_PARAMETER;
