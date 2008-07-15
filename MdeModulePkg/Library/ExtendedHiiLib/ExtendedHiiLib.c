@@ -27,7 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Hii vendor device path template
 //
-HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePathTemplate = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePathTemplate = {
   {
     {
       {
