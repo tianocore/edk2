@@ -1,4 +1,19 @@
 /** @file
+Basic Ascii AvSPrintf() function named VSPrint(). VSPrint() enables very
+simple implemenation of SPrint() and Print() to support debug.
+
+You can not Print more than EFI_DRIVER_LIB_MAX_PRINT_BUFFER characters at a
+time. This makes the implementation very simple.
+
+VSPrint, Print, SPrint format specification has the follwoing form
+
+%type
+
+type:
+  'S','s' - argument is an Unicode string
+  'c' - argument is an ascii character
+  '%' - Print a %
+
 
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,32 +24,21 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Print.c
-
-Abstract:
-
-  Basic Ascii AvSPrintf() function named VSPrint(). VSPrint() enables very
-  simple implemenation of SPrint() and Print() to support debug.
-
-  You can not Print more than EFI_DRIVER_LIB_MAX_PRINT_BUFFER characters at a
-  time. This makes the implementation very simple.
-
-  VSPrint, Print, SPrint format specification has the follwoing form
-
-  %type
-
-  type:
-    'S','s' - argument is an Unicode string
-    'c' - argument is an ascii character
-    '%' - Print a %
-
-
 **/
 
 #include "Setup.h"
 
+/**
+  VSPrint worker function that prints a Value as a decimal number in Buffer.
+
+  @param  Buffer     Location to place ascii decimal number string of Value.
+  @param  Flags      Flags to use in printing decimal string, see file header for
+                     details.
+  @param  Value      Decimal value to convert to a string in Buffer.
+
+  @return Number of characters printed.
+
+**/
 UINTN
 ValueToString (
   IN  OUT CHAR16  *Buffer,
@@ -42,22 +46,33 @@ ValueToString (
   IN  INT64       Value
   );
 
+/**
+  The internal function prints to the EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
+  protocol instance.
+
+  @param Column          The position of the output string.
+  @param Row             The position of the output string.
+  @param Out             The EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param Fmt             The format string.
+  @param Args            The additional argument for the variables in the format string.
+
+  @return Number of Unicode character printed.
+
+**/
 UINTN
 PrintInternal (
   IN UINTN                            Column,
   IN UINTN                            Row,
-  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     *Out,
-  IN CHAR16                           *fmt,
-  IN VA_LIST                          args
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Out,
+  IN CHAR16                           *Fmt,
+  IN VA_LIST                          Args
   )
-//
-// Display string worker for: Print, PrintAt, IPrint, IPrintAt
-//
 {
   CHAR16  *Buffer;
   CHAR16  *BackupBuffer;
   UINTN   Index;
   UINTN   PreviousIndex;
+  UINTN   Count;
 
   //
   // For now, allocate an arbitrarily long buffer
@@ -71,7 +86,7 @@ PrintInternal (
     Out->SetCursorPosition (Out, Column, Row);
   }
 
-  UnicodeVSPrint (Buffer, 0x10000, fmt, args);
+  UnicodeVSPrint (Buffer, 0x10000, Fmt, Args);
 
   Out->Mode->Attribute = Out->Mode->Attribute & 0x7f;
 
@@ -79,6 +94,7 @@ PrintInternal (
 
   Index         = 0;
   PreviousIndex = 0;
+  Count         = 0;
 
   do {
     for (; (Buffer[Index] != NARROW_CHAR) && (Buffer[Index] != WIDE_CHAR) && (Buffer[Index] != 0); Index++) {
@@ -97,6 +113,7 @@ PrintInternal (
     // Print this out, we are about to switch widths
     //
     Out->OutputString (Out, &BackupBuffer[PreviousIndex]);
+    Count += StrLen (&BackupBuffer[PreviousIndex]);
 
     //
     // Preserve the current index + 1, since this is where we will start printing from next
@@ -128,31 +145,33 @@ PrintInternal (
   // We hit the end of the string - print it
   //
   Out->OutputString (Out, &BackupBuffer[PreviousIndex]);
+  Count += StrLen (&BackupBuffer[PreviousIndex]);
 
   gBS->FreePool (Buffer);
   gBS->FreePool (BackupBuffer);
-  return EFI_SUCCESS;
+  return Count;
 }
 
 
 /**
-  Prints a formatted unicode string to the default console
+  Prints a formatted unicode string to the default console.
 
-  @param  fmt        Format string
+  @param  Fmt        Format string
+  @param  ...        Variable argument list for format string.
 
-  @return Length of string printed to the console
+  @return Length of string printed to the console.
 
 **/
 UINTN
 ConsolePrint (
-  IN CHAR16   *fmt,
-  ...
+  IN CHAR16   *Fmt,
+  IN ...
   )
 {
-  VA_LIST args;
+  VA_LIST Args;
 
-  VA_START (args, fmt);
-  return PrintInternal ((UINTN) -1, (UINTN) -1, gST->ConOut, fmt, args);
+  VA_START (Args, Fmt);
+  return PrintInternal ((UINTN) -1, (UINTN) -1, gST->ConOut, Fmt, Args);
 }
 
 
@@ -167,7 +186,7 @@ ConsolePrint (
 **/
 UINTN
 PrintString (
-  CHAR16       *String
+  IN CHAR16       *String
   )
 {
   return ConsolePrint (L"%s", String);
@@ -194,10 +213,12 @@ PrintChar (
 
 /**
   Prints a formatted unicode string to the default console, at
-  the supplied cursor position
+  the supplied cursor position.
 
-  @param  Row        The cursor position to print the string at
-  @param  fmt        Format string
+  @param  Column     The cursor position to print the string at.
+  @param  Row        The cursor position to print the string at.
+  @param  Fmt        Format string.
+  @param  ...        Variable argument list for format string.
 
   @return Length of string printed to the console
 
@@ -206,14 +227,14 @@ UINTN
 PrintAt (
   IN UINTN     Column,
   IN UINTN     Row,
-  IN CHAR16    *fmt,
+  IN CHAR16    *Fmt,
   ...
   )
 {
-  VA_LIST args;
+  VA_LIST Args;
 
-  VA_START (args, fmt);
-  return PrintInternal (Column, Row, gST->ConOut, fmt, args);
+  VA_START (Args, Fmt);
+  return PrintInternal (Column, Row, gST->ConOut, Fmt, Args);
 }
 
 
@@ -221,6 +242,7 @@ PrintAt (
   Prints a unicode string to the default console, at
   the supplied cursor position, using L"%s" format.
 
+  @param  Column     The cursor position to print the string at.
   @param  Row        The cursor position to print the string at
   @param  String     String pointer.
 
@@ -242,7 +264,8 @@ PrintStringAt (
   Prints a chracter to the default console, at
   the supplied cursor position, using L"%c" format.
 
-  @param  Row        The cursor position to print the string at
+  @param  Column     The cursor position to print the string at.
+  @param  Row        The cursor position to print the string at.
   @param  Character  Character to print.
 
   @return Length of string printed to the console.
@@ -260,12 +283,12 @@ PrintCharAt (
 
 
 /**
-  VSPrint worker function that prints a Value as a decimal number in Buffer
+  VSPrint worker function that prints a Value as a decimal number in Buffer.
 
   @param  Buffer     Location to place ascii decimal number string of Value.
-  @param  Value      Decimal value to convert to a string in Buffer.
   @param  Flags      Flags to use in printing decimal string, see file header for
                      details.
+  @param  Value      Decimal value to convert to a string in Buffer.
 
   @return Number of characters printed.
 

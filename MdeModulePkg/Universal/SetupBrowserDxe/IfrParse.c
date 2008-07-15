@@ -1,4 +1,6 @@
 /** @file
+Parser for IFR binary encoding.
+
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  IfrParse.c
-
-Abstract:
-
-  Parser for IFR binary encoding.
-
 
 **/
 
@@ -337,7 +330,7 @@ InitializeRequestElement (
     StrLen = UnicodeSPrint (RequestElement, 30 * sizeof (CHAR16), L"&%s", Question->VariableName);
   }
 
-  if ((Question->Operand == EFI_IFR_PASSWORD_OP) && (Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK)) {
+  if ((Question->Operand == EFI_IFR_PASSWORD_OP) && ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK)) {
     //
     // Password with CALLBACK flag is stored in encoded format,
     // so don't need to append it to <ConfigRequest>
@@ -371,11 +364,9 @@ InitializeRequestElement (
 
 
 /**
-  Free resources of a Expression
+  Free resources of a Expression.
 
   @param  FormSet                Pointer of the Expression
-
-  @return None.
 
 **/
 VOID
@@ -402,11 +393,9 @@ DestroyExpression (
 
 
 /**
-  Free resources of a storage
+  Free resources of a storage.
 
   @param  Storage                Pointer of the storage
-
-  @return None.
 
 **/
 VOID
@@ -444,11 +433,9 @@ DestroyStorage (
 
 
 /**
-  Free resources of a Statement
+  Free resources of a Statement.
 
   @param  Statement              Pointer of the Statement
-
-  @return None.
 
 **/
 VOID
@@ -511,11 +498,9 @@ DestroyStatement (
 
 
 /**
-  Free resources of a Form
+  Free resources of a Form.
 
-  @param  Form                   Pointer of the Form
-
-  @return None.
+  @param  Form                   Pointer of the Form.
 
 **/
 VOID
@@ -557,11 +542,9 @@ DestroyForm (
 
 
 /**
-  Free resources allocated for a FormSet
+  Free resources allocated for a FormSet.
 
   @param  FormSet                Pointer of the FormSet
-
-  @return None.
 
 **/
 VOID
@@ -656,8 +639,6 @@ IsExpressionOpCode (
   @param  FormSet                The FormSet to be counted.
   @param  NumberOfStatement      Number of Statemens(Questions)
   @param  NumberOfExpression     Number of Expression OpCodes
-
-  @return None.
 
 **/
 VOID
@@ -791,7 +772,7 @@ ParseOpCodes (
     //
     // If scope bit set, push onto scope stack
     //
-    if (Scope) {
+    if (Scope != 0) {
       PushScope (Operand);
     }
 
@@ -1091,7 +1072,7 @@ ParseOpCodes (
       CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
       CurrentStatement->Flags = ((EFI_IFR_SUBTITLE *) OpCodeData)->Flags;
 
-      if (Scope) {
+      if (Scope != 0) {
         mInScopeSubtitle = TRUE;
       }
       break;
@@ -1187,7 +1168,7 @@ ParseOpCodes (
 
       InitializeRequestElement (FormSet, CurrentStatement);
 
-      if ((Operand == EFI_IFR_ONE_OF_OP) && Scope) {
+      if ((Operand == EFI_IFR_ONE_OF_OP) && Scope != 0) {
         SuppressForOption = TRUE;
       }
       break;
@@ -1208,7 +1189,7 @@ ParseOpCodes (
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_OTHER;
       CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
 
-      if (Scope) {
+      if (Scope != 0) {
         SuppressForOption = TRUE;
       }
       break;
@@ -1320,7 +1301,7 @@ ParseOpCodes (
       //
       InsertTailList (&CurrentStatement->DefaultListHead, &CurrentDefault->Link);
 
-      if (Scope) {
+      if (Scope != 0) {
         InScopeDefault = TRUE;
       }
       break;

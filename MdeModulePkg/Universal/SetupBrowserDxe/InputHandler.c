@@ -1,4 +1,5 @@
 /** @file
+Implementation for handling user input from the User Interfaces.
 
 Copyright (c) 2004 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -8,17 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  InputHandler.c
-
-Abstract:
-
-  Implementation for handling user input from the User Interface
-
-Revision History
-
 
 **/
 
@@ -1130,6 +1120,14 @@ TheKey:
 
 }
 
+/**
+  Wait for a key to be pressed by user.
+
+  @param Key         The key which is pressed by user.
+
+  @retval EFI_SUCCESS The function always completed successfully.
+
+**/
 EFI_STATUS
 WaitForKeyStroke (
   OUT  EFI_INPUT_KEY           *Key

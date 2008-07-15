@@ -1,4 +1,5 @@
 /** @file
+Private MACRO, structure and function definitions for Setup Browser module. 
 
 Copyright (c) 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,20 +10,11 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Setup.h
-
-Abstract:
-
-
-Revision History
-
 
 **/
 
-#ifndef _SETUP_H
-#define _SETUP_H
+#ifndef _SETUP_H_
+#define _SETUP_H_
 
 
 #include <PiDxe.h>
@@ -509,48 +501,98 @@ extern EFI_GUID          gTianoHiiIfrGuid;
 //
 // Global Procedure Defines
 //
+
+/**
+  Initialize the HII String Token to the correct values.
+
+**/
 VOID
 InitializeBrowserStrings (
   VOID
   )
 ;
 
-UINTN
-_Print (
-  IN CHAR16                         *fmt,
-  ...
-  )
-;
+/**
+  Prints a unicode string to the default console,
+  using L"%s" format.
 
+  @param  String     String pointer.
+
+  @return Length of string printed to the console
+
+**/
 UINTN
 PrintString (
-  CHAR16       *String
+  IN CHAR16       *String
   )
 ;
 
+/**
+  Prints a chracter to the default console,
+  using L"%c" format.
+
+  @param  Character  Character to print.
+
+  @return Length of string printed to the console.
+
+**/
 UINTN
 PrintChar (
   CHAR16       Character
   )
 ;
 
+/**
+  Prints a formatted unicode string to the default console, at
+  the supplied cursor position.
+
+  @param  Column     The cursor position to print the string at.
+  @param  Row        The cursor position to print the string at
+  @param  Fmt        Format string
+  @param  ...        Variable argument list for formating string.
+
+  @return Length of string printed to the console
+
+**/
 UINTN
 PrintAt (
   IN UINTN     Column,
   IN UINTN     Row,
-  IN CHAR16    *fmt,
+  IN CHAR16    *Fmt,
   ...
   )
 ;
 
+/**
+  Prints a unicode string to the default console, at
+  the supplied cursor position, using L"%s" format.
+
+  @param  Column     The cursor position to print the string at.
+  @param  Row        The cursor position to print the string at
+  @param  String     String pointer.
+
+  @return Length of string printed to the console
+
+**/
 UINTN
 PrintStringAt (
   IN UINTN     Column,
   IN UINTN     Row,
-  CHAR16       *String
+  IN CHAR16    *String
   )
 ;
 
+/**
+  Prints a chracter to the default console, at
+  the supplied cursor position, using L"%c" format.
+
+  @param  Column     The cursor position to print the string at.
+  @param  Row        The cursor position to print the string at.
+  @param  Character  Character to print.
+
+  @return Length of string printed to the console.
+
+**/
 UINTN
 PrintCharAt (
   IN UINTN     Column,
@@ -559,24 +601,53 @@ PrintCharAt (
   )
 ;
 
+/**
+  Parse opcodes in the formset IFR binary.
+
+  @param  FormSet                Pointer of the FormSet data structure.
+
+  @retval EFI_SUCCESS            Opcode parse success.
+  @retval Other                  Opcode parse fail.
+
+**/
 EFI_STATUS
 ParseOpCodes (
   IN FORM_BROWSER_FORMSET              *FormSet
   )
 ;
 
+/**
+  Free resources allocated for a FormSet.
+
+  @param  FormSet                Pointer of the FormSet
+
+**/
 VOID
 DestroyFormSet (
   IN OUT FORM_BROWSER_FORMSET  *FormSet
   )
 ;
 
+/**
+  This function displays the page frame.
+
+**/
 VOID
 DisplayPageFrame (
   VOID
   )
 ;
 
+/**
+  Create a new string in HII Package List.
+
+  @param  String                 The String to be added
+  @param  HiiHandle              The package list in the HII database to insert the
+                                 specified string.
+
+  @return The output string.
+
+**/
 EFI_STRING_ID
 NewString (
   IN  CHAR16                   *String,
@@ -584,12 +655,32 @@ NewString (
   )
 ;
 
+/**
+  Delete a string from HII Package List.
+
+  @param  StringId               Id of the string in HII database.
+  @param  HiiHandle              The HII package list handle.
+
+  @retval EFI_SUCCESS            The string was deleted successfully.
+
+**/
 EFI_STATUS
 DeleteString (
   IN  EFI_STRING_ID            StringId,
   IN  EFI_HII_HANDLE           HiiHandle
   )
 ;
+
+/**
+  Get the string based on the StringId and HII Package List Handle.
+
+  @param  Token                  The String's ID.
+  @param  HiiHandle              The package list in the HII database to search for
+                                 the specified string.
+
+  @return The output string.
+
+**/
 CHAR16 *
 GetToken (
   IN  EFI_STRING_ID                Token,
@@ -597,6 +688,15 @@ GetToken (
   )
 ;
 
+/**
+  Draw a pop up windows based on the dimension, number of lines and
+  strings specified.
+
+  @param RequestedWidth  The width of the pop-up.
+  @param NumberOfLines   The number of lines.
+  @param ArrayOfStrings  The array of string to be printed.
+
+**/
 VOID
 CreateSharedPopUp (
   IN  UINTN                       RequestedWidth,
@@ -605,6 +705,33 @@ CreateSharedPopUp (
   )
 ;
 
+/**
+  Routine used to abstract a generic dialog interface and return the selected key or string
+
+  @param  NumberOfLines          The number of lines for the dialog box
+  @param  HotKey                 Defines whether a single character is parsed
+                                 (TRUE) and returned in KeyValue or a string is
+                                 returned in StringBuffer.  Two special characters
+                                 are considered when entering a string, a SCAN_ESC
+                                 and an CHAR_CARRIAGE_RETURN.  SCAN_ESC terminates
+                                 string input and returns
+  @param  MaximumStringSize      The maximum size in bytes of a typed in string
+                                 (each character is a CHAR16) and the minimum
+                                 string returned is two bytes
+  @param  StringBuffer           The passed in pointer to the buffer which will
+                                 hold the typed in string if HotKey is FALSE
+  @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
+  @param  String                 Pointer to the first string in the list
+  @param  ...                    A series of (quantity == NumberOfLines) text
+                                 strings which will be used to construct the dialog
+                                 box
+
+  @retval EFI_SUCCESS            Displayed dialog and received user interaction
+  @retval EFI_INVALID_PARAMETER  One of the parameters was invalid (e.g.
+                                 (StringBuffer == NULL) && (HotKey == FALSE))
+  @retval EFI_DEVICE_ERROR       User typed in an ESC character to exit the routine
+
+**/
 EFI_STATUS
 CreateDialog (
   IN  UINTN                       NumberOfLines,
@@ -617,6 +744,18 @@ CreateDialog (
   )
 ;
 
+/**
+  Get Question's current Value.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+  @param  Question               Question to be initialized.
+  @param  Cached                 TRUE:  get from Edit copy FALSE: get from original
+                                 Storage
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
 EFI_STATUS
 GetQuestionValue (
   IN FORM_BROWSER_FORMSET             *FormSet,
@@ -626,6 +765,18 @@ GetQuestionValue (
   )
 ;
 
+/**
+  Save Question Value to edit copy(cached) or Storage(uncached).
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+  @param  Question               Pointer to the Question.
+  @param  Cached                 TRUE:  set to Edit copy FALSE: set to original
+                                 Storage
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
 EFI_STATUS
 SetQuestionValue (
   IN FORM_BROWSER_FORMSET             *FormSet,
@@ -635,6 +786,18 @@ SetQuestionValue (
   )
 ;
 
+/**
+  Perform inconsistent check for a Form.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+  @param  Question               The Question to be validated.
+  @param  Type                   Validation type: InConsistent or NoSubmit
+
+  @retval EFI_SUCCESS            Form validation pass.
+  @retval other                  Form validation failed.
+
+**/
 EFI_STATUS
 ValidateQuestion (
   IN  FORM_BROWSER_FORMSET            *FormSet,
@@ -644,6 +807,15 @@ ValidateQuestion (
   )
 ;
 
+/**
+  Submit a Form.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
 EFI_STATUS
 SubmitForm (
   IN FORM_BROWSER_FORMSET             *FormSet,
@@ -651,6 +823,17 @@ SubmitForm (
   )
 ;
 
+/**
+  Reset Question to its default value.
+
+  @param  FormSet                The form set.
+  @param  Form                   The form.
+  @param  Question               The question.
+  @param  DefaultId              The Class of the default.
+
+  @retval EFI_SUCCESS            Question is reset to default value.
+
+**/
 EFI_STATUS
 GetQuestionDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
@@ -660,12 +843,33 @@ GetQuestionDefault (
   )
 ;
 
+/**
+  Get current setting of Questions.
+
+  @param  FormSet                FormSet data structure.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
 EFI_STATUS
 InitializeCurrentSetting (
   IN OUT FORM_BROWSER_FORMSET             *FormSet
   )
 ;
 
+/**
+  Initialize the internal data structure of a FormSet.
+
+  @param  Handle                 PackageList Handle
+  @param  FormSetGuid            GUID of a formset. If not specified (NULL or zero
+                                 GUID), take the first FormSet found in package
+                                 list.
+  @param  FormSet                FormSet data structure.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_NOT_FOUND          The specified FormSet could not be found.
+
+**/
 EFI_STATUS
 InitializeFormSet (
   IN  EFI_HII_HANDLE                   Handle,
@@ -674,6 +878,16 @@ InitializeFormSet (
   )
 ;
 
+/**
+  Reset Questions in a Form to their default value.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   The Form which to be reset.
+  @param  DefaultId              The Class of the default.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
 EFI_STATUS
 ExtractFormDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
@@ -682,6 +896,15 @@ ExtractFormDefault (
   )
 ;
 
+/**
+  Initialize Question's Edit copy from Storage.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
 EFI_STATUS
 LoadFormConfig (
   IN FORM_BROWSER_FORMSET             *FormSet,
@@ -689,6 +912,16 @@ LoadFormConfig (
   )
 ;
 
+/**
+  Convert setting of Buffer Storage or NameValue Storage to <ConfigResp>.
+
+  @param  Storage                The Storage to be conveted.
+  @param  ConfigResp             The returned <ConfigResp>.
+
+  @retval EFI_SUCCESS            Convert success.
+  @retval EFI_INVALID_PARAMETER  Incorrect storage type.
+
+**/
 EFI_STATUS
 StorageToConfigResp (
   IN FORMSET_STORAGE         *Storage,
@@ -696,6 +929,16 @@ StorageToConfigResp (
   )
 ;
 
+/**
+  Convert <ConfigResp> to settings in Buffer Storage or NameValue Storage.
+
+  @param  Storage                The Storage to receive the settings.
+  @param  ConfigResp             The <ConfigResp> to be converted.
+
+  @retval EFI_SUCCESS            Convert success.
+  @retval EFI_INVALID_PARAMETER  Incorrect storage type.
+
+**/
 EFI_STATUS
 ConfigRespToStorage (
   IN FORMSET_STORAGE         *Storage,
@@ -703,6 +946,15 @@ ConfigRespToStorage (
   )
 ;
 
+/**
+  Fill storage's edit copy with settings requested from Configuration Driver.
+
+  @param  FormSet                FormSet data structure.
+  @param  Storage                Buffer Storage.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
 EFI_STATUS
 LoadStorage (
   IN FORM_BROWSER_FORMSET    *FormSet,
@@ -710,6 +962,23 @@ LoadStorage (
   )
 ;
 
+/**
+  Fetch the Ifr binary data of a FormSet.
+
+  @param  Handle                 PackageList Handle
+  @param  FormSetGuid            GUID of a formset. If not specified (NULL or zero
+                                 GUID), take the first FormSet found in package
+                                 list.
+  @param  BinaryLength           The length of the FormSet IFR binary.
+  @param  BinaryData             The buffer designed to receive the FormSet.
+
+  @retval EFI_SUCCESS            Buffer filled with the requested FormSet.
+                                 BufferLength was updated.
+  @retval EFI_INVALID_PARAMETER  The handle is unknown.
+  @retval EFI_NOT_FOUND          A form or FormSet on the requested handle cannot
+                                 be found with the requested FormId.
+
+**/
 EFI_STATUS
 GetIfrBinaryData (
   IN  EFI_HII_HANDLE   Handle,
@@ -719,6 +988,34 @@ GetIfrBinaryData (
   )
 ;
 
+/**
+  This is the routine which an external caller uses to direct the browser
+  where to obtain it's information.
+
+
+  @param This            The Form Browser protocol instanse.
+  @param Handles         A pointer to an array of Handles.  If HandleCount > 1 we
+                         display a list of the formsets for the handles specified.
+  @param HandleCount     The number of Handles specified in Handle.
+  @param FormSetGuid     This field points to the EFI_GUID which must match the Guid
+                         field in the EFI_IFR_FORM_SET op-code for the specified
+                         forms-based package. If FormSetGuid is NULL, then this
+                         function will display the first found forms package.
+  @param FormId          This field specifies which EFI_IFR_FORM to render as the first
+                         displayable page. If this field has a value of 0x0000, then
+                         the forms browser will render the specified forms in their encoded order.
+                         ScreenDimenions - This allows the browser to be called so that it occupies a
+                         portion of the physical screen instead of dynamically determining the screen dimensions.
+                         ActionRequest   - Points to the action recommended by the form.
+  @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in 
+                          characters.
+  @param ActionRequest       Points to the action recommended by the form.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval  EFI_NOT_FOUND          No valid forms could be found to display.
+
+**/
 EFI_STATUS
 EFIAPI
 SendForm (
@@ -732,6 +1029,33 @@ SendForm (
   )
 ;
 
+/**
+  This function is called by a callback handler to retrieve uncommitted state
+  data from the browser.
+
+  @param  This                   A pointer to the EFI_FORM_BROWSER2_PROTOCOL
+                                 instance.
+  @param  ResultsDataSize        A pointer to the size of the buffer associated
+                                 with ResultsData.
+  @param  ResultsData            A string returned from an IFR browser or
+                                 equivalent. The results string will have no
+                                 routing information in them.
+  @param  RetrieveData           A BOOLEAN field which allows an agent to retrieve
+                                 (if RetrieveData = TRUE) data from the uncommitted
+                                 browser state information or set (if RetrieveData
+                                 = FALSE) data in the uncommitted browser state
+                                 information.
+  @param  VariableGuid           An optional field to indicate the target variable
+                                 GUID name to use.
+  @param  VariableName           An optional field to indicate the target
+                                 human-readable variable name.
+
+  @retval EFI_SUCCESS            The results have been distributed or are awaiting
+                                 distribution.
+  @retval EFI_BUFFER_TOO_SMALL   The ResultsDataSize specified was too small to
+                                 contain the results data.
+
+**/
 EFI_STATUS
 EFIAPI
 BrowserCallback (

@@ -1,4 +1,6 @@
 /** @file
+Entry and initialization module for the browser.
+
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Setup.c
-
-Abstract:
-
-  Entry and initialization module for the browser.
-
 
 **/
 
@@ -180,6 +173,34 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
   },
 };
 
+/**
+  This is the routine which an external caller uses to direct the browser
+  where to obtain it's information.
+
+
+  @param This            The Form Browser protocol instanse.
+  @param Handles         A pointer to an array of Handles.  If HandleCount > 1 we
+                         display a list of the formsets for the handles specified.
+  @param HandleCount     The number of Handles specified in Handle.
+  @param FormSetGuid     This field points to the EFI_GUID which must match the Guid
+                         field in the EFI_IFR_FORM_SET op-code for the specified
+                         forms-based package. If FormSetGuid is NULL, then this
+                         function will display the first found forms package.
+  @param FormId          This field specifies which EFI_IFR_FORM to render as the first
+                         displayable page. If this field has a value of 0x0000, then
+                         the forms browser will render the specified forms in their encoded order.
+                         ScreenDimenions - This allows the browser to be called so that it occupies a
+                         portion of the physical screen instead of dynamically determining the screen dimensions.
+                         ActionRequest   - Points to the action recommended by the form.
+  @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in 
+                          characters.
+  @param ActionRequest       Points to the action recommended by the form.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval  EFI_NOT_FOUND          No valid forms could be found to display.
+
+**/
 EFI_STATUS
 EFIAPI
 SendForm (
@@ -191,34 +212,6 @@ SendForm (
   IN  CONST EFI_SCREEN_DESCRIPTOR      *ScreenDimensions, OPTIONAL
   OUT EFI_BROWSER_ACTION_REQUEST       *ActionRequest  OPTIONAL
   )
-/*++
-
-Routine Description:
-  This is the routine which an external caller uses to direct the browser
-  where to obtain it's information.
-
-Arguments:
-  This            - The Form Browser protocol instanse.
-  Handles         - A pointer to an array of Handles.  If HandleCount > 1 we
-                    display a list of the formsets for the handles specified.
-  HandleCount     - The number of Handles specified in Handle.
-  FormSetGuid     - This field points to the EFI_GUID which must match the Guid
-                    field in the EFI_IFR_FORM_SET op-code for the specified
-                    forms-based package. If FormSetGuid is NULL, then this
-                    function will display the first found forms package.
-  FormId          - This field specifies which EFI_IFR_FORM to render as the first
-                    displayable page. If this field has a value of 0x0000, then
-                    the forms browser will render the specified forms in their encoded order.
-  ScreenDimenions - This allows the browser to be called so that it occupies a
-                    portion of the physical screen instead of dynamically determining the screen dimensions.
-  ActionRequest   - Points to the action recommended by the form.
-
-Returns:
-  EFI_SUCCESS           -  The function completed successfully.
-  EFI_INVALID_PARAMETER -  One of the parameters has an invalid value.
-  EFI_NOT_FOUND         -  No valid forms could be found to display.
-
---*/
 {
   EFI_STATUS            Status;
   UI_MENU_SELECTION     *Selection;
@@ -523,12 +516,13 @@ BrowserCallback (
 
 
 /**
-  Initialize Setup
+  Initialize Setup Browser driver.
 
-  @param  entry                  EFI_IMAGE_ENTRY_POINT)
+  @param ImageHandle     The image handle.
+  @param SystemTable     The system table.
 
-  @retval EFI_SUCCESS            Setup loaded.
-  @retval other                  Setup Error
+  @retval EFI_SUCCESS    The Setup Browser module is initialized correctly..
+  @return Other value if failed to initialize the Setup Browser module.
 
 **/
 EFI_STATUS
@@ -712,8 +706,6 @@ GetToken (
   @param  Dest                   Location to copy string
   @param  Src                    String to copy
 
-  @return NONE
-
 **/
 VOID
 NewStringCpy (
@@ -732,8 +724,6 @@ NewStringCpy (
 
   @param  Dest                   String to added to the end of.
   @param  Src                    String to concatinate.
-
-  @return NONE
 
 **/
 VOID
@@ -766,8 +756,6 @@ NewStringCat (
   Synchronize Storage's Edit copy to Shadow copy.
 
   @param  Storage                The Storage to be synchronized.
-
-  @return NONE
 
 **/
 VOID
@@ -1697,7 +1685,9 @@ SubmitForm (
 /**
   Reset Question to its default value.
 
-  @param  FormSet                FormSet data structure.
+  @param  FormSet                The form set.
+  @param  Form                   The form.
+  @param  Question               The question.
   @param  DefaultId              The Class of the default.
 
   @retval EFI_SUCCESS            Question is reset to default value.
@@ -1780,8 +1770,8 @@ GetQuestionDefault (
       while (!IsNull (&Question->OptionListHead, Link)) {
         Option = QUESTION_OPTION_FROM_LINK (Link);
 
-        if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && (Option->Flags & EFI_IFR_OPTION_DEFAULT)) ||
-            ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && (Option->Flags & EFI_IFR_OPTION_DEFAULT_MFG))
+        if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && ((Option->Flags & EFI_IFR_OPTION_DEFAULT) != 0)) ||
+            ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && ((Option->Flags & EFI_IFR_OPTION_DEFAULT_MFG) != 0))
            ) {
           CopyMem (HiiValue, &Option->Value, sizeof (EFI_HII_VALUE));
 
@@ -1801,8 +1791,8 @@ GetQuestionDefault (
       //
       // Checkbox could only provide Standard and Manufacturing default
       //
-      if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && (Question->Flags & EFI_IFR_CHECKBOX_DEFAULT)) ||
-          ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && (Question->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG))
+      if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && ((Question->Flags & EFI_IFR_CHECKBOX_DEFAULT) != 0)) ||
+          ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && ((Question->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG) != 0))
          ) {
         HiiValue->Value.b = TRUE;
       } else {
