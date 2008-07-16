@@ -14,25 +14,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DevicePath.h"
 
-STATIC
+/**
+  Function unpacks a device path data structure so that all the nodes of a device path
+  are naturally aligned.
+
+  @param DevPath         A pointer to a device path data structure
+
+  @return If the memory for the device path is successfully allocated, then a pointer to the
+          new device path is returned.  Otherwise, NULL is returned.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 UnpackDevicePath (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevPath
   )
-/*++
-
-  Routine Description:
-    Function unpacks a device path data structure so that all the nodes of a device path 
-    are naturally aligned.
-
-  Arguments:
-    DevPath        - A pointer to a device path data structure
-
-  Returns:
-    If the memory for the device path is successfully allocated, then a pointer to the 
-    new device path is returned.  Otherwise, NULL is returned.
-
---*/
 {
   CONST EFI_DEVICE_PATH_PROTOCOL  *Src;
   EFI_DEVICE_PATH_PROTOCOL  *Dest;
@@ -89,39 +84,32 @@ UnpackDevicePath (
   return NewPath;
 }
 
-STATIC
+/**
+  Adjusts the size of a previously allocated buffer.
+
+  @param OldPool         A pointer to the buffer whose size is being adjusted.
+  @param OldSize         The size of the current buffer.
+  @param NewSize         The size of the new buffer.
+
+  @return A pointer to the new buffer or NULL if allocation fails.
+
+**/
 VOID *
 ReallocatePool (
   IN VOID                 *OldPool,
   IN UINTN                OldSize,
   IN UINTN                NewSize
   )
-/*++
-
-  Routine Description:
-    Adjusts the size of a previously allocated buffer.
-
-  Arguments:
-    OldPool               - A pointer to the buffer whose size is being adjusted.
-    OldSize               - The size of the current buffer.
-    NewSize               - The size of the new buffer.
-
-  Returns:
-    EFI_SUCEESS           - The requested number of bytes were allocated.
-    EFI_OUT_OF_RESOURCES  - The pool requested could not be allocated.
-    EFI_INVALID_PARAMETER - The buffer was invalid.
-
---*/
 {
   VOID  *NewPool;
 
   NewPool = NULL;
-  if (NewSize) {
+  if (NewSize != 0) {
     NewPool = AllocateZeroPool (NewSize);
   }
 
-  if (OldPool) {
-    if (NewPool) {
+  if (OldPool != NULL) {
+    if (NewPool != NULL) {
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
@@ -131,30 +119,26 @@ ReallocatePool (
   return NewPool;
 }
 
-STATIC
+/**
+  Concatenates a formatted unicode string to allocated pool. The caller must
+  free the resulting buffer.
+
+  @param Str             Tracks the allocated pool, size in use, and
+                         amount of pool allocated.
+  @param Fmt             The format string
+  @param ...             Variable arguments based on the format string.
+
+  @return Allocated buffer with the formatted string printed in it.
+          The caller must free the allocated buffer. The buffer
+          allocation is not packed.
+
+**/
 CHAR16 *
 CatPrint (
   IN OUT POOL_PRINT   *Str,
   IN CHAR16           *Fmt,
   ...
   )
-/*++
-
-  Routine Description:
-    Concatenates a formatted unicode string to allocated pool.  
-    The caller must free the resulting buffer.
-
-  Arguments:
-    Str         - Tracks the allocated pool, size in use, and 
-                  amount of pool allocated.
-    Fmt         - The format string
-
-  Returns:
-    Allocated buffer with the formatted string printed in it.  
-    The caller must free the allocated buffer.   The buffer
-    allocation is not packed.
-
---*/
 {
   UINT16  *AppendStr;
   VA_LIST Args;
@@ -173,7 +157,7 @@ CatPrint (
     Str->Str  = AllocateZeroPool (Size);
     ASSERT (Str->Str != NULL);
   } else {
-    Size = StrSize (AppendStr)  - sizeof (UINT16);
+    Size = StrSize (AppendStr) - sizeof (UINT16);
     Size = Size + StrSize (Str->Str);
     Str->Str = ReallocatePool (
                 Str->Str,
@@ -193,7 +177,19 @@ CatPrint (
   return Str->Str;
 }
 
-STATIC
+/**
+  Converts a PCI device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextPci (
   IN OUT POOL_PRINT  *Str,
@@ -208,7 +204,19 @@ DevPathToTextPci (
   CatPrint (Str, L"Pci(0x%x,0x%x)", Pci->Device, Pci->Function);
 }
 
-STATIC
+/**
+  Converts a PC Card device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextPccard (
   IN OUT POOL_PRINT  *Str,
@@ -223,7 +231,19 @@ DevPathToTextPccard (
   CatPrint (Str, L"PcCard(0x%x)", Pccard->FunctionNumber);
 }
 
-STATIC
+/**
+  Converts a Memory Map device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextMemMap (
   IN OUT POOL_PRINT  *Str,
@@ -244,7 +264,19 @@ DevPathToTextMemMap (
     );
 }
 
-STATIC
+/**
+  Converts a Vendor device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextVendor (
   IN OUT POOL_PRINT  *Str,
@@ -316,9 +348,9 @@ DevPathToTextVendor (
           CatPrint (
             Str,
             L"%s,%s,%s,",
-            (Info & (0x1 << 4)) ? L"SATA" : L"SAS",
-            (Info & (0x1 << 5)) ? L"External" : L"Internal",
-            (Info & (0x1 << 6)) ? L"Expanded" : L"Direct"
+            ((Info & (0x1 << 4)) != 0) ? L"SATA" : L"SAS",
+            ((Info & (0x1 << 5)) != 0) ? L"External" : L"Internal",
+            ((Info & (0x1 << 6)) != 0) ? L"Expanded" : L"Direct"
             );
           if ((Info & 0x0f) == 1) {
             CatPrint (Str, L"0,");
@@ -359,7 +391,19 @@ DevPathToTextVendor (
   CatPrint (Str, L")");
 }
 
-STATIC
+/**
+  Converts a Controller device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextController (
   IN OUT POOL_PRINT  *Str,
@@ -378,7 +422,19 @@ DevPathToTextController (
     );
 }
 
-STATIC
+/**
+  Converts a ACPI device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextAcpi (
   IN OUT POOL_PRINT  *Str,
@@ -421,11 +477,17 @@ DevPathToTextAcpi (
   }
 }
 
-STATIC
+/**
+  Converts EISA identification to string.
+
+  @param EisaId        The input EISA identification.
+  @param Text          A pointer to the output string.
+
+**/
 VOID
 EisaIdToText (
   IN UINT32         EisaId,
-  IN OUT CHAR16    *Text
+  IN OUT CHAR16     *Text
   )
 {
   CHAR16 PnpIdStr[17];
@@ -446,7 +508,19 @@ EisaIdToText (
     );
 }
 
-STATIC
+/**
+  Converts a ACPI extended HID device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextAcpiEx (
   IN OUT POOL_PRINT  *Str,
@@ -518,7 +592,19 @@ DevPathToTextAcpiEx (
   }
 }
 
-STATIC
+/**
+  Converts a ACPI address device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextAcpiAdr (
   IN OUT POOL_PRINT  *Str,
@@ -543,7 +629,19 @@ DevPathToTextAcpiAdr (
   CatPrint (Str, L")");
 }
 
-STATIC
+/**
+  Converts a ATAPI device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextAtapi (
   IN OUT POOL_PRINT  *Str,
@@ -569,7 +667,19 @@ DevPathToTextAtapi (
   }
 }
 
-STATIC
+/**
+  Converts a SCSI device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextScsi (
   IN OUT POOL_PRINT  *Str,
@@ -584,7 +694,19 @@ DevPathToTextScsi (
   CatPrint (Str, L"Scsi(0x%x,0x%x)", Scsi->Pun, Scsi->Lun);
 }
 
-STATIC
+/**
+  Converts a Fibre device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextFibre (
   IN OUT POOL_PRINT  *Str,
@@ -599,7 +721,19 @@ DevPathToTextFibre (
   CatPrint (Str, L"Fibre(0x%lx,0x%lx)", Fibre->WWN, Fibre->Lun);
 }
 
-STATIC
+/**
+  Converts a 1394 device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToText1394 (
   IN OUT POOL_PRINT  *Str,
@@ -608,16 +742,28 @@ DevPathToText1394 (
   IN BOOLEAN         AllowShortcuts
   )
 {
-  F1394_DEVICE_PATH *F1394;
+  F1394_DEVICE_PATH *F1394DevPath;
 
-  F1394 = DevPath;
+  F1394DevPath = DevPath;
   //
   // Guid has format of IEEE-EUI64
   //
-  CatPrint (Str, L"I1394(%016lx)", F1394->Guid);
+  CatPrint (Str, L"I1394(%016lx)", F1394DevPath->Guid);
 }
 
-STATIC
+/**
+  Converts a USB device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextUsb (
   IN OUT POOL_PRINT  *Str,
@@ -632,7 +778,19 @@ DevPathToTextUsb (
   CatPrint (Str, L"USB(0x%x,0x%x)", Usb->ParentPortNumber, Usb->InterfaceNumber);
 }
 
-STATIC
+/**
+  Converts a USB WWID device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextUsbWWID (
   IN OUT POOL_PRINT  *Str,
@@ -669,7 +827,19 @@ DevPathToTextUsbWWID (
     );
 }
 
-STATIC
+/**
+  Converts a Logic Unit device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextLogicalUnit (
   IN OUT POOL_PRINT  *Str,
@@ -684,7 +854,19 @@ DevPathToTextLogicalUnit (
   CatPrint (Str, L"Unit(0x%x)", LogicalUnit->Lun);
 }
 
-STATIC
+/**
+  Converts a USB class device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextUsbClass (
   IN OUT POOL_PRINT  *Str,
@@ -808,7 +990,19 @@ DevPathToTextUsbClass (
     );
 }
 
-STATIC
+/**
+  Converts a SATA device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextSata (
   IN OUT POOL_PRINT  *Str,
@@ -829,7 +1023,19 @@ DevPathToTextSata (
     );
 }
 
-STATIC
+/**
+  Converts a I20 device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextI2O (
   IN OUT POOL_PRINT  *Str,
@@ -838,13 +1044,25 @@ DevPathToTextI2O (
   IN BOOLEAN         AllowShortcuts
   )
 {
-  I2O_DEVICE_PATH *I2O;
+  I2O_DEVICE_PATH *I2ODevPath;
 
-  I2O = DevPath;
-  CatPrint (Str, L"I2O(0x%x)", I2O->Tid);
+  I2ODevPath = DevPath;
+  CatPrint (Str, L"I2O(0x%x)", I2ODevPath->Tid);
 }
 
-STATIC
+/**
+  Converts a MAC address device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextMacAddr (
   IN OUT POOL_PRINT  *Str,
@@ -853,27 +1071,39 @@ DevPathToTextMacAddr (
   IN BOOLEAN         AllowShortcuts
   )
 {
-  MAC_ADDR_DEVICE_PATH  *MAC;
+  MAC_ADDR_DEVICE_PATH  *MacDevPath;
   UINTN                 HwAddressSize;
   UINTN                 Index;
 
-  MAC           = DevPath;
+  MacDevPath = DevPath;
 
   HwAddressSize = sizeof (EFI_MAC_ADDRESS);
-  if (MAC->IfType == 0x01 || MAC->IfType == 0x00) {
+  if (MacDevPath->IfType == 0x01 || MacDevPath->IfType == 0x00) {
     HwAddressSize = 6;
   }
 
   CatPrint (Str, L"MAC(");
 
   for (Index = 0; Index < HwAddressSize; Index++) {
-    CatPrint (Str, L"%02x", MAC->MacAddress.Addr[Index]);
+    CatPrint (Str, L"%02x", MacDevPath->MacAddress.Addr[Index]);
   }
 
-  CatPrint (Str, L",0x%x)", MAC->IfType);
+  CatPrint (Str, L",0x%x)", MacDevPath->IfType);
 }
 
-STATIC
+/**
+  Converts a IPv4 device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextIPv4 (
   IN OUT POOL_PRINT  *Str,
@@ -882,17 +1112,17 @@ DevPathToTextIPv4 (
   IN BOOLEAN         AllowShortcuts
   )
 {
-  IPv4_DEVICE_PATH  *IP;
+  IPv4_DEVICE_PATH  *IPDevPath;
 
-  IP = DevPath;
-  if (DisplayOnly == TRUE) {
+  IPDevPath = DevPath;
+  if (DisplayOnly) {
     CatPrint (
       Str,
       L"IPv4(%d.%d.%d.%d)",
-      IP->RemoteIpAddress.Addr[0],
-      IP->RemoteIpAddress.Addr[1],
-      IP->RemoteIpAddress.Addr[2],
-      IP->RemoteIpAddress.Addr[3]
+      IPDevPath->RemoteIpAddress.Addr[0],
+      IPDevPath->RemoteIpAddress.Addr[1],
+      IPDevPath->RemoteIpAddress.Addr[2],
+      IPDevPath->RemoteIpAddress.Addr[3]
       );
     return ;
   }
@@ -900,20 +1130,32 @@ DevPathToTextIPv4 (
   CatPrint (
     Str,
     L"IPv4(%d.%d.%d.%d,%s,%s,%d.%d.%d.%d)",
-    IP->RemoteIpAddress.Addr[0],
-    IP->RemoteIpAddress.Addr[1],
-    IP->RemoteIpAddress.Addr[2],
-    IP->RemoteIpAddress.Addr[3],
-    IP->Protocol ? L"TCP" : L"UDP",
-    (IP->StaticIpAddress == TRUE) ? L"Static" : L"DHCP",
-    IP->LocalIpAddress.Addr[0],
-    IP->LocalIpAddress.Addr[1],
-    IP->LocalIpAddress.Addr[2],
-    IP->LocalIpAddress.Addr[3]
+    IPDevPath->RemoteIpAddress.Addr[0],
+    IPDevPath->RemoteIpAddress.Addr[1],
+    IPDevPath->RemoteIpAddress.Addr[2],
+    IPDevPath->RemoteIpAddress.Addr[3],
+    IPDevPath->Protocol ? L"TCP" : L"UDP",
+    (IPDevPath->StaticIpAddress == TRUE) ? L"Static" : L"DHCP",
+    IPDevPath->LocalIpAddress.Addr[0],
+    IPDevPath->LocalIpAddress.Addr[1],
+    IPDevPath->LocalIpAddress.Addr[2],
+    IPDevPath->LocalIpAddress.Addr[3]
     );
 }
 
-STATIC
+/**
+  Converts a IPv6 device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextIPv6 (
   IN OUT POOL_PRINT  *Str,
@@ -922,29 +1164,29 @@ DevPathToTextIPv6 (
   IN BOOLEAN         AllowShortcuts
   )
 {
-  IPv6_DEVICE_PATH  *IP;
+  IPv6_DEVICE_PATH  *IPDevPath;
 
-  IP = DevPath;
-  if (DisplayOnly == TRUE) {
+  IPDevPath = DevPath;
+  if (DisplayOnly) {
     CatPrint (
       Str,
       L"IPv6(%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
-      IP->RemoteIpAddress.Addr[0],
-      IP->RemoteIpAddress.Addr[1],
-      IP->RemoteIpAddress.Addr[2],
-      IP->RemoteIpAddress.Addr[3],
-      IP->RemoteIpAddress.Addr[4],
-      IP->RemoteIpAddress.Addr[5],
-      IP->RemoteIpAddress.Addr[6],
-      IP->RemoteIpAddress.Addr[7],
-      IP->RemoteIpAddress.Addr[8],
-      IP->RemoteIpAddress.Addr[9],
-      IP->RemoteIpAddress.Addr[10],
-      IP->RemoteIpAddress.Addr[11],
-      IP->RemoteIpAddress.Addr[12],
-      IP->RemoteIpAddress.Addr[13],
-      IP->RemoteIpAddress.Addr[14],
-      IP->RemoteIpAddress.Addr[15]
+      IPDevPath->RemoteIpAddress.Addr[0],
+      IPDevPath->RemoteIpAddress.Addr[1],
+      IPDevPath->RemoteIpAddress.Addr[2],
+      IPDevPath->RemoteIpAddress.Addr[3],
+      IPDevPath->RemoteIpAddress.Addr[4],
+      IPDevPath->RemoteIpAddress.Addr[5],
+      IPDevPath->RemoteIpAddress.Addr[6],
+      IPDevPath->RemoteIpAddress.Addr[7],
+      IPDevPath->RemoteIpAddress.Addr[8],
+      IPDevPath->RemoteIpAddress.Addr[9],
+      IPDevPath->RemoteIpAddress.Addr[10],
+      IPDevPath->RemoteIpAddress.Addr[11],
+      IPDevPath->RemoteIpAddress.Addr[12],
+      IPDevPath->RemoteIpAddress.Addr[13],
+      IPDevPath->RemoteIpAddress.Addr[14],
+      IPDevPath->RemoteIpAddress.Addr[15]
       );
     return ;
   }
@@ -952,44 +1194,56 @@ DevPathToTextIPv6 (
   CatPrint (
     Str,
     L"IPv6(%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x,%s,%s,%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
-    IP->RemoteIpAddress.Addr[0],
-    IP->RemoteIpAddress.Addr[1],
-    IP->RemoteIpAddress.Addr[2],
-    IP->RemoteIpAddress.Addr[3],
-    IP->RemoteIpAddress.Addr[4],
-    IP->RemoteIpAddress.Addr[5],
-    IP->RemoteIpAddress.Addr[6],
-    IP->RemoteIpAddress.Addr[7],
-    IP->RemoteIpAddress.Addr[8],
-    IP->RemoteIpAddress.Addr[9],
-    IP->RemoteIpAddress.Addr[10],
-    IP->RemoteIpAddress.Addr[11],
-    IP->RemoteIpAddress.Addr[12],
-    IP->RemoteIpAddress.Addr[13],
-    IP->RemoteIpAddress.Addr[14],
-    IP->RemoteIpAddress.Addr[15],
-    IP->Protocol ? L"TCP" : L"UDP",
-    (IP->StaticIpAddress == TRUE) ? L"Static" : L"DHCP",
-    IP->LocalIpAddress.Addr[0],
-    IP->LocalIpAddress.Addr[1],
-    IP->LocalIpAddress.Addr[2],
-    IP->LocalIpAddress.Addr[3],
-    IP->LocalIpAddress.Addr[4],
-    IP->LocalIpAddress.Addr[5],
-    IP->LocalIpAddress.Addr[6],
-    IP->LocalIpAddress.Addr[7],
-    IP->LocalIpAddress.Addr[8],
-    IP->LocalIpAddress.Addr[9],
-    IP->LocalIpAddress.Addr[10],
-    IP->LocalIpAddress.Addr[11],
-    IP->LocalIpAddress.Addr[12],
-    IP->LocalIpAddress.Addr[13],
-    IP->LocalIpAddress.Addr[14],
-    IP->LocalIpAddress.Addr[15]
+    IPDevPath->RemoteIpAddress.Addr[0],
+    IPDevPath->RemoteIpAddress.Addr[1],
+    IPDevPath->RemoteIpAddress.Addr[2],
+    IPDevPath->RemoteIpAddress.Addr[3],
+    IPDevPath->RemoteIpAddress.Addr[4],
+    IPDevPath->RemoteIpAddress.Addr[5],
+    IPDevPath->RemoteIpAddress.Addr[6],
+    IPDevPath->RemoteIpAddress.Addr[7],
+    IPDevPath->RemoteIpAddress.Addr[8],
+    IPDevPath->RemoteIpAddress.Addr[9],
+    IPDevPath->RemoteIpAddress.Addr[10],
+    IPDevPath->RemoteIpAddress.Addr[11],
+    IPDevPath->RemoteIpAddress.Addr[12],
+    IPDevPath->RemoteIpAddress.Addr[13],
+    IPDevPath->RemoteIpAddress.Addr[14],
+    IPDevPath->RemoteIpAddress.Addr[15],
+    IPDevPath->Protocol ? L"TCP" : L"UDP",
+    (IPDevPath->StaticIpAddress == TRUE) ? L"Static" : L"DHCP",
+    IPDevPath->LocalIpAddress.Addr[0],
+    IPDevPath->LocalIpAddress.Addr[1],
+    IPDevPath->LocalIpAddress.Addr[2],
+    IPDevPath->LocalIpAddress.Addr[3],
+    IPDevPath->LocalIpAddress.Addr[4],
+    IPDevPath->LocalIpAddress.Addr[5],
+    IPDevPath->LocalIpAddress.Addr[6],
+    IPDevPath->LocalIpAddress.Addr[7],
+    IPDevPath->LocalIpAddress.Addr[8],
+    IPDevPath->LocalIpAddress.Addr[9],
+    IPDevPath->LocalIpAddress.Addr[10],
+    IPDevPath->LocalIpAddress.Addr[11],
+    IPDevPath->LocalIpAddress.Addr[12],
+    IPDevPath->LocalIpAddress.Addr[13],
+    IPDevPath->LocalIpAddress.Addr[14],
+    IPDevPath->LocalIpAddress.Addr[15]
     );
 }
 
-STATIC
+/**
+  Converts an Infini Band device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextInfiniBand (
   IN OUT POOL_PRINT  *Str,
@@ -1012,7 +1266,19 @@ DevPathToTextInfiniBand (
     );
 }
 
-STATIC
+/**
+  Converts a UART device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextUart (
   IN OUT POOL_PRINT  *Str,
@@ -1092,7 +1358,19 @@ DevPathToTextUart (
   }
 }
 
-STATIC
+/**
+  Converts an iSCSI device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextiSCSI (
   IN OUT POOL_PRINT  *Str,
@@ -1101,34 +1379,46 @@ DevPathToTextiSCSI (
   IN BOOLEAN         AllowShortcuts
   )
 {
-  ISCSI_DEVICE_PATH_WITH_NAME *iSCSI;
+  ISCSI_DEVICE_PATH_WITH_NAME *ISCSIDevPath;
   UINT16                      Options;
 
-  iSCSI = DevPath;
+  ISCSIDevPath = DevPath;
   CatPrint (
     Str,
     L"iSCSI(%a,0x%x,0x%lx,",
-    iSCSI->iSCSITargetName,
-    iSCSI->TargetPortalGroupTag,
-    iSCSI->Lun
+    ISCSIDevPath->iSCSITargetName,
+    ISCSIDevPath->TargetPortalGroupTag,
+    ISCSIDevPath->Lun
     );
 
-  Options = iSCSI->LoginOption;
-  CatPrint (Str, L"%s,", ((Options >> 1) & 0x0001) ? L"CRC32C" : L"None");
-  CatPrint (Str, L"%s,", ((Options >> 3) & 0x0001) ? L"CRC32C" : L"None");
-  if ((Options >> 11) & 0x0001) {
+  Options = ISCSIDevPath->LoginOption;
+  CatPrint (Str, L"%s,", (((Options >> 1) & 0x0001) != 0) ? L"CRC32C" : L"None");
+  CatPrint (Str, L"%s,", (((Options >> 3) & 0x0001) != 0) ? L"CRC32C" : L"None");
+  if (((Options >> 11) & 0x0001) != 0) {
     CatPrint (Str, L"%s,", L"None");
-  } else if ((Options >> 12) & 0x0001) {
+  } else if (((Options >> 12) & 0x0001) != 0) {
     CatPrint (Str, L"%s,", L"CHAP_UNI");
   } else {
     CatPrint (Str, L"%s,", L"CHAP_BI");
 
   }
 
-  CatPrint (Str, L"%s)", (iSCSI->NetworkProtocol == 0) ? L"TCP" : L"reserved");
+  CatPrint (Str, L"%s)", (ISCSIDevPath->NetworkProtocol == 0) ? L"TCP" : L"reserved");
 }
 
-STATIC
+/**
+  Converts a Hard drive device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextHardDrive (
   IN OUT POOL_PRINT  *Str,
@@ -1174,7 +1464,19 @@ DevPathToTextHardDrive (
   CatPrint (Str, L"0x%lx,0x%lx)", Hd->PartitionStart, Hd->PartitionSize);
 }
 
-STATIC
+/**
+  Converts a CDROM device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextCDROM (
   IN OUT POOL_PRINT  *Str,
@@ -1186,7 +1488,7 @@ DevPathToTextCDROM (
   CDROM_DEVICE_PATH *Cd;
 
   Cd = DevPath;
-  if (DisplayOnly == TRUE) {
+  if (DisplayOnly) {
     CatPrint (Str, L"CDROM(0x%x)", Cd->BootEntry);
     return ;
   }
@@ -1194,7 +1496,19 @@ DevPathToTextCDROM (
   CatPrint (Str, L"CDROM(0x%x,0x%lx,0x%lx)", Cd->BootEntry, Cd->PartitionStart, Cd->PartitionSize);
 }
 
-STATIC
+/**
+  Converts a File device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextFilePath (
   IN OUT POOL_PRINT  *Str,
@@ -1209,7 +1523,19 @@ DevPathToTextFilePath (
   CatPrint (Str, L"%s", Fp->PathName);
 }
 
-STATIC
+/**
+  Converts a Media protocol device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextMediaProtocol (
   IN OUT POOL_PRINT  *Str,
@@ -1224,7 +1550,19 @@ DevPathToTextMediaProtocol (
   CatPrint (Str, L"Media(%g)", &MediaProt->Protocol);
 }
 
-STATIC
+/**
+  Converts a Firmware Volume device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextFv (
   IN OUT POOL_PRINT  *Str,
@@ -1239,7 +1577,19 @@ DevPathToTextFv (
   CatPrint (Str, L"Fv(%g)", &Fv->FvName);
 }
 
-STATIC
+/**
+  Converts a Firmware Volume File device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextFvFile (
   IN OUT POOL_PRINT  *Str,
@@ -1254,7 +1604,19 @@ DevPathToTextFvFile (
   CatPrint (Str, L"FvFile(%g)", &FvFile->FvFileName);
 }
 
-STATIC
+/**
+  Converts a BIOS Boot Specification device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextBBS (
   IN OUT POOL_PRINT  *Str,
@@ -1303,7 +1665,7 @@ DevPathToTextBBS (
     CatPrint (Str, L"BBS(0x%x,%a", Bbs->DeviceType, Bbs->String);
   }
 
-  if (DisplayOnly == TRUE) {
+  if (DisplayOnly) {
     CatPrint (Str, L")");
     return ;
   }
@@ -1311,7 +1673,19 @@ DevPathToTextBBS (
   CatPrint (Str, L",0x%x)", Bbs->StatusFlag);
 }
 
-STATIC
+/**
+  Converts an End-of-Device-Path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextEndInstance (
   IN OUT POOL_PRINT  *Str,
@@ -1323,7 +1697,19 @@ DevPathToTextEndInstance (
   CatPrint (Str, L",");
 }
 
-STATIC
+/**
+  Converts an unknown device path structure to its string representive.
+
+  @param Str             The string representive of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
 VOID
 DevPathToTextNodeUnknown (
   IN OUT POOL_PRINT  *Str,
@@ -1374,31 +1760,28 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE DevPathToTextTable
   {0, 0, NULL}
 };
 
+/**
+  Converts a device node to its string representation.
+
+  @param DeviceNode        A Pointer to the device node to be converted.
+  @param DisplayOnly       If DisplayOnly is TRUE, then the shorter text representation
+                           of the display node is used, where applicable. If DisplayOnly
+                           is FALSE, then the longer text representation of the display node
+                           is used.
+  @param AllowShortcuts    If AllowShortcuts is TRUE, then the shortcut forms of text
+                           representation for a device node can be used, where applicable.
+
+  @return A pointer to the allocated text representation of the device node or NULL if DeviceNode
+          is NULL or there was insufficient memory.
+
+**/
 CHAR16 *
+EFIAPI
 ConvertDeviceNodeToText (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DeviceNode,
   IN BOOLEAN                         DisplayOnly,
   IN BOOLEAN                         AllowShortcuts
   )
-/*++
-
-  Routine Description:
-    Convert a device node to its text representation.
-
-  Arguments:
-    DeviceNode       -   Points to the device node to be converted.
-    DisplayOnly      -   If DisplayOnly is TRUE, then the shorter text representation
-                         of the display node is used, where applicable. If DisplayOnly
-                         is FALSE, then the longer text representation of the display node
-                         is used.
-    AllowShortcuts   -   If AllowShortcuts is TRUE, then the shortcut forms of text
-                         representation for a device node can be used, where applicable.
-
-  Returns:
-    A pointer        -   a pointer to the allocated text representation of the device node.
-    NULL             -   if DeviceNode is NULL or there was insufficient memory.
-
---*/
 {
   POOL_PRINT  Str;
   UINTN       Index;
@@ -1445,31 +1828,28 @@ ConvertDeviceNodeToText (
   return Str.Str;
 }
 
+/**
+  Converts a device path to its text representation.
+
+  @param DevicePath      A Pointer to the device to be converted.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+  @return A pointer to the allocated text representation of the device path or
+          NULL if DeviceNode is NULL or there was insufficient memory.
+
+**/
 CHAR16 *
+EFIAPI
 ConvertDevicePathToText (
   IN CONST EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
   IN BOOLEAN                          DisplayOnly,
   IN BOOLEAN                          AllowShortcuts
   )
-/*++
-
-  Routine Description:
-    Convert a device path to its text representation.
-
-  Arguments:
-    DeviceNode       -   Points to the device path to be converted.
-    DisplayOnly      -   If DisplayOnly is TRUE, then the shorter text representation
-                         of the display node is used, where applicable. If DisplayOnly
-                         is FALSE, then the longer text representation of the display node
-                         is used.
-    AllowShortcuts   -   If AllowShortcuts is TRUE, then the shortcut forms of text
-                         representation for a device node can be used, where applicable.
-
-  Returns:
-    A pointer        -   a pointer to the allocated text representation of the device path.
-    NULL             -   if DeviceNode is NULL or there was insufficient memory.
-
---*/
 {
   POOL_PRINT                Str;
   EFI_DEVICE_PATH_PROTOCOL  *DevPathNode;
@@ -1517,7 +1897,7 @@ ConvertDevicePathToText (
     //
     //  Put a path seperator in if needed
     //
-    if (Str.Len && DumpNode != DevPathToTextEndInstance) {
+    if ((Str.Len != 0) && DumpNode != DevPathToTextEndInstance) {
       if (*(Str.Str + Str.Len / sizeof (CHAR16) - 1) != L',') {
         CatPrint (&Str, L"/");
       }
