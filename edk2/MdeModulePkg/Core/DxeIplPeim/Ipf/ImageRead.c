@@ -57,7 +57,7 @@ PeiImageRead (
    @param ImageContext       A pointer to the structure of 
                              PE_COFF_LOADER_IMAGE_CONTEXT
    
-   @retval EFI_SUCCESS       This function always return EFI_SUCCESS.
+   @retval EFI_SUCCESS       This function always returns EFI_SUCCESS.
 
 **/
 EFI_STATUS

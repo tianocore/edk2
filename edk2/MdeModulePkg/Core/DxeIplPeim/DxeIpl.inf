@@ -1,8 +1,9 @@
 #/** @file
 #  
-#    Component description file for DxeIpl module
+#  Component description file for DxeIpl module
 #  
-#   The responsibility of this module is to load the DXE Core from a Firmware Volume. This implementation i used to load a 32-bit DXE Core.
+#  The responsibility of this module is to load the DXE Core from a Firmware Volume.
+#  This implementation is used to load a 32-bit DXE Core.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
@@ -29,7 +30,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
 
 [Sources.common]
@@ -51,11 +52,6 @@
 [Sources.IPF]
   Ipf/DxeLoadFunc.c
   Ipf/ImageRead.c
-
-[Sources.EBC]
-  X64/DxeLoadFunc.c
-  Ia32/ImageRead.c
-
 
 [Packages]
   MdePkg/MdePkg.dec

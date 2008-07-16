@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Global Descriptor Table (GDT)
 //
-GLOBAL_REMOVE_IF_UNREFERENCED IA32_GDT gGdtEntries [] = {
+GLOBAL_REMOVE_IF_UNREFERENCED IA32_GDT gGdtEntries[] = {
 /* selector { Global Segment Descriptor                              } */  
 /* 0x00 */  {{0,      0,  0,  0,    0,  0,  0,  0,    0,  0, 0,  0,  0}}, //null descriptor 
 /* 0x08 */  {{0xffff, 0,  0,  0x2,  1,  0,  1,  0xf,  0,  0, 1,  1,  0}}, //linear data segment descriptor
@@ -43,10 +43,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED  IA32_DESCRIPTOR gLidtDescriptor = {
   sizeof (X64_IDT_GATE_DESCRIPTOR) * 32 - 1,
   0
 };
-
-
-
-
 
 /**
    Transfers control to DxeCore.
@@ -93,7 +89,7 @@ HandOffToDxeCore (
     TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - 32;
 
     //
-    //  X64 Calling Conventions requires that the stack must be aligned to 16 bytes
+    //  x64 Calling Conventions requires that the stack must be aligned to 16 bytes
     //
     TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, 16);
 
@@ -128,7 +124,6 @@ HandOffToDxeCore (
                  EFI_SIZE_TO_PAGES((SizeOfTemplate + sizeof (X64_IDT_GATE_DESCRIPTOR)) * 32), 
                  &VectorAddress
                  );
-  
       ASSERT_EFI_ERROR (Status);
   
       IdtTable      = (X64_IDT_GATE_DESCRIPTOR *) (UINTN) (VectorAddress + SizeOfTemplate * 32);
@@ -152,7 +147,8 @@ HandOffToDxeCore (
       AsmWriteIdtr (&gLidtDescriptor);
     }
     //
-    // Go to Long Mode. Interrupts will not get turned on until the CPU AP is loaded.
+    // Go to Long Mode and transfer control to DxeCore.
+    // Interrupts will not get turned on until the CPU AP is loaded.
     // Call x64 drivers passing in single argument, a pointer to the HOBs.
     // 
     AsmEnablePaging64 (
@@ -180,7 +176,10 @@ HandOffToDxeCore (
     // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
     //    
     UpdateStackHob (BaseOfStack, STACK_SIZE);
-
+    
+    //
+    // Transfer the control to the entry point of DxeCore.
+    //
     SwitchStack (
       (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
       HobList.Raw,

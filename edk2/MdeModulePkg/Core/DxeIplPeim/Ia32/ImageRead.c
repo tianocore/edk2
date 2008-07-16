@@ -14,10 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeIpl.h"
 
-
-
-
-
 /**
   Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
 
@@ -50,8 +46,6 @@ PeiImageRead (
   //
   // This function assumes 32-bit alignment to increase performance
   //
-//  ASSERT (ALIGN_POINTER (Destination32, sizeof (UINT32)) == Destination32);
-//  ASSERT (ALIGN_POINTER (Source32, sizeof (UINT32)) == Source32);
 
   Length = *ReadSize;
   while (Length-- != 0) {
@@ -72,7 +66,7 @@ PeiImageRead (
    @param ImageContext       A pointer to the structure of 
                              PE_COFF_LOADER_IMAGE_CONTEXT
    
-   @retval EFI_SUCCESS       This function always return EFI_SUCCESS.
+   @retval EFI_SUCCESS       This function always returns EFI_SUCCESS.
 
 **/
 EFI_STATUS
