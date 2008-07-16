@@ -1,5 +1,6 @@
 /** @file
-
+  EFI PEI Core PPI services
+  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,51 +10,43 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Ppi.c
-
-Abstract:
-
-  EFI PEI Core PPI services
-
-Revision History
-
 **/
 
 #include <PeiMain.h>
 
+/**
+
+  Initialize PPI services.
+
+
+  @param PrivateData     Pointer to the PEI Core data.
+  @param OldCoreData     Pointer to old PEI Core data. 
+                         NULL if being run in non-permament memory mode.
+
+**/
 VOID
 InitializePpiServices (
   IN PEI_CORE_INSTANCE *PrivateData,
   IN PEI_CORE_INSTANCE *OldCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize PPI services.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  OldCoreData - Pointer to the PEI Core data.
-                NULL if being run in non-permament memory mode.
-
-Returns:
-  Nothing
-
---*/
 {
   if (OldCoreData == NULL) {
     PrivateData->PpiData.NotifyListEnd = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
     PrivateData->PpiData.DispatchListEnd = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
     PrivateData->PpiData.LastDispatchedNotify = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
   }
-
-  return;
 }
 
+/**
+
+  Migrate the Hob list from the CAR stack to PEI installed memory.
+
+  @param PeiServices         The PEI core services table.
+  @param OldCheckingBottom   The old checking bottom.
+  @param OldCheckingTop      The old checking top.
+  @param NewHandOffHob       The new handoff HOB list.
+
+**/
 VOID
 ConvertPpiPointers (
   IN CONST EFI_PEI_SERVICES                     **PeiServices,
@@ -61,22 +54,6 @@ ConvertPpiPointers (
   IN UINTN                         OldCheckingTop,
   IN EFI_HOB_HANDOFF_INFO_TABLE    *NewHandOffHob
   )
-/*++
-
-Routine Description:
-
-  Migrate the Hob list from the CAR stack to PEI installed memory.
-
-Arguments:
-
-  PeiServices       - The PEI core services table.
-  OldCheckingBottom - The old checking bottom.
-  OldCheckingTop    - The old checking top.
-  NewHandOffHob     - The new handoff HOB list.
-
-Returns:
-
---*/
 {
   PEI_CORE_INSTANCE     *PrivateData;
   UINT8                 Index;
@@ -132,33 +109,25 @@ Returns:
   }
 }
 
+/**
 
+  Install PPI services.
 
+  @param PeiServices     - Pointer to the PEI Service Table
+  @param PpiList         - Pointer to a list of PEI PPI Descriptors.
+
+  @retval EFI_SUCCESS             - if all PPIs in PpiList are successfully installed.
+  @retval EFI_INVALID_PARAMETER   - if PpiList is NULL pointer
+  @retval EFI_INVALID_PARAMETER   - if any PPI in PpiList is not valid
+  @retval EFI_OUT_OF_RESOURCES    - if there is no more memory resource to install PPI
+
+**/
 EFI_STATUS
 EFIAPI
 PeiInstallPpi (
   IN CONST EFI_PEI_SERVICES        **PeiServices,
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )
-/*++
-
-Routine Description:
-
-  Install PPI services.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Service Table
-  PpiList     - Pointer to a list of PEI PPI Descriptors.
-
-Returns:
-
-    EFI_SUCCESS             - if all PPIs in PpiList are successfully installed.
-    EFI_INVALID_PARAMETER   - if PpiList is NULL pointer
-    EFI_INVALID_PARAMETER   - if any PPI in PpiList is not valid
-    EFI_OUT_OF_RESOURCES    - if there is no more memory resource to install PPI
-
---*/
 {
   PEI_CORE_INSTANCE *PrivateData;
   INTN              Index;
@@ -230,7 +199,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
 
+  Re-Install PPI services.
+
+  @param PeiServices     - Pointer to the PEI Service Table
+  @param OldPpi          - Pointer to the old PEI PPI Descriptors.
+  @param NewPpi          - Pointer to the new PEI PPI Descriptors.
+
+  @retval EFI_SUCCESS           - if the operation was successful
+  @retval EFI_INVALID_PARAMETER - if OldPpi or NewPpi is NULL
+  @retval EFI_INVALID_PARAMETER - if NewPpi is not valid
+  @retval EFI_NOT_FOUND         - if the PPI was not in the database
+
+**/
 EFI_STATUS
 EFIAPI
 PeiReInstallPpi (
@@ -238,26 +220,6 @@ PeiReInstallPpi (
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *OldPpi,
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *NewPpi
   )
-/*++
-
-Routine Description:
-
-  Re-Install PPI services.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Service Table
-  OldPpi      - Pointer to the old PEI PPI Descriptors.
-  NewPpi      - Pointer to the new PEI PPI Descriptors.
-
-Returns:
-
-  EFI_SUCCESS           - if the operation was successful
-  EFI_INVALID_PARAMETER - if OldPpi or NewPpi is NULL
-  EFI_INVALID_PARAMETER - if NewPpi is not valid
-  EFI_NOT_FOUND         - if the PPI was not in the database
-
---*/
 {
   PEI_CORE_INSTANCE   *PrivateData;
   INTN                Index;
@@ -308,7 +270,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
 
+  Locate a given named PPI.
+
+
+  @param PeiServices     - Pointer to the PEI Service Table
+  @param Guid            - Pointer to GUID of the PPI.
+  @param Instance        - Instance Number to discover.
+  @param PpiDescriptor   - Pointer to reference the found descriptor. If not NULL,
+                         returns a pointer to the descriptor (includes flags, etc)
+  @param Ppi             - Pointer to reference the found PPI
+
+  @retval EFI_SUCCESS   if the PPI is in the database
+  @retval EFI_NOT_FOUND if the PPI is not in the database
+
+**/
 EFI_STATUS
 EFIAPI
 PeiLocatePpi (
@@ -318,26 +295,6 @@ PeiLocatePpi (
   IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
   IN OUT VOID                **Ppi
   )
-/*++
-
-Routine Description:
-
-  Locate a given named PPI.
-
-Arguments:
-
-  PeiServices   - Pointer to the PEI Service Table
-  Guid          - Pointer to GUID of the PPI.
-  Instance      - Instance Number to discover.
-  PpiDescriptor - Pointer to reference the found descriptor. If not NULL,
-                returns a pointer to the descriptor (includes flags, etc)
-  Ppi           - Pointer to reference the found PPI
-
-Returns:
-
-  Status -  EFI_SUCCESS   if the PPI is in the database
-            EFI_NOT_FOUND if the PPI is not in the database
---*/
 {
   PEI_CORE_INSTANCE   *PrivateData;
   INTN                Index;
@@ -383,31 +340,25 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
 
+  Install a notification for a given PPI.
+
+
+  @param PeiServices     - Pointer to the PEI Service Table
+  @param NotifyList      - Pointer to list of Descriptors to notify upon.
+
+  @retval EFI_SUCCESS           if successful
+  @retval EFI_OUT_OF_RESOURCES  if no space in the database
+  @retval EFI_INVALID_PARAMETER if not a good decriptor
+
+**/
 EFI_STATUS
 EFIAPI
 PeiNotifyPpi (
   IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
   )
-/*++
-
-Routine Description:
-
-  Install a notification for a given PPI.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Service Table
-  NotifyList  - Pointer to list of Descriptors to notify upon.
-
-Returns:
-
-  Status - EFI_SUCCESS           if successful
-           EFI_OUT_OF_RESOURCES  if no space in the database
-           EFI_INVALID_PARAMETER if not a good decriptor
-
---*/
 {
   PEI_CORE_INSTANCE                *PrivateData;
   INTN                             Index;
@@ -507,24 +458,17 @@ Returns:
 }
 
 
+/**
+
+  Process the Notify List at dispatch level.
+
+  @param PrivateData  PeiCore's private data structure.
+
+**/
 VOID
 ProcessNotifyList (
   IN PEI_CORE_INSTANCE  *PrivateData
   )
-/*++
-
-Routine Description:
-
-  Process the Notify List at dispatch level.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Service Table
-
-Returns:
-
---*/
-
 {
   INTN                    TempValue;
 
@@ -577,6 +521,18 @@ Returns:
   return;
 }
 
+/**
+
+  Dispatch notifications.
+
+  @param PrivateData        PeiCore's private data structure
+  @param NotifyType         Type of notify to fire.
+  @param InstallStartIndex  Install Beginning index.
+  @param InstallStopIndex   Install Ending index.
+  @param NotifyStartIndex   Notify Beginning index.
+  @param NotifyStopIndex    Notify Ending index.
+
+**/
 VOID
 DispatchNotify (
   IN PEI_CORE_INSTANCE  *PrivateData,
@@ -586,25 +542,6 @@ DispatchNotify (
   IN INTN                NotifyStartIndex,
   IN INTN                NotifyStopIndex
   )
-/*++
-
-Routine Description:
-
-  Dispatch notifications.
-
-Arguments:
-
-  PeiServices         - Pointer to the PEI Service Table
-  NotifyType          - Type of notify to fire.
-  InstallStartIndex   - Install Beginning index.
-  InstallStopIndex    - Install Ending index.
-  NotifyStartIndex    - Notify Beginning index.
-  NotifyStopIndex    - Notify Ending index.
-
-Returns:  None
-
---*/
-
 {
   INTN                   Index1;
   INTN                   Index2;

@@ -1,5 +1,6 @@
 /** @file
-
+  Pei Core Status Code Support
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,20 +10,26 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  StatusCode.c
-
-Abstract:
-
-  Pei Core Status Code Support
-
-Revision History
-
 **/
 
 #include <PeiMain.h>
 
+/**
+
+  Core version of the Status Code reporter
+
+
+  @param PeiServices     The PEI core services table.
+  @param CodeType        Type of Status Code.
+  @param Value           Value to output for Status Code.
+  @param Instance        Instance Number of this status code.
+  @param CallerId        ID of the caller of this status code.
+  @param Data            Optional data associated with this status code.
+
+  @retval EFI_SUCCESS             if status code is successfully reported
+  @retval EFI_NOT_AVAILABLE_YET   if StatusCodePpi has not been installed
+
+**/
 EFI_STATUS
 EFIAPI
 PeiReportStatusCode (
@@ -33,32 +40,6 @@ PeiReportStatusCode (
   IN CONST EFI_GUID                 *CallerId,
   IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  Core version of the Status Code reporter
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  
-  CodeType    - Type of Status Code.
-  
-  Value       - Value to output for Status Code.
-  
-  Instance    - Instance Number of this status code.
-  
-  CallerId    - ID of the caller of this status code.
-  
-  Data        - Optional data associated with this status code.
-
-Returns:
-
-  Status  - EFI_SUCCESS             if status code is successfully reported
-          - EFI_NOT_AVAILABLE_YET   if StatusCodePpi has not been installed
-
---*/
 {
   EFI_STATUS                Status;
   EFI_PEI_PROGRESS_CODE_PPI *StatusCodePpi;
@@ -86,7 +67,6 @@ Returns:
  
    return Status;   
   } 
-  
   
   return  EFI_NOT_AVAILABLE_YET; 
 }

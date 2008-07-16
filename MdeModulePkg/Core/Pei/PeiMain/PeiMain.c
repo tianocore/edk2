@@ -1,5 +1,6 @@
 /** @file
-
+  Pei Core Main Entry Point
+  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,21 +10,11 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  PeiMain.c
-
-Abstract:
-
-  Pei Core Main Entry Point
-
-Revision History
-
 **/
 
 #include <PeiMain.h>
 
-static EFI_PEI_PPI_DESCRIPTOR mMemoryDiscoveredPpi = {
+STATIC EFI_PEI_PPI_DESCRIPTOR mMemoryDiscoveredPpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiMemoryDiscoveredPpiGuid,
   NULL
@@ -33,7 +24,7 @@ static EFI_PEI_PPI_DESCRIPTOR mMemoryDiscoveredPpi = {
 // Pei Core Module Variables
 //
 //
-static EFI_PEI_SERVICES  mPS = {
+STATIC EFI_PEI_SERVICES  gPs = {
   {
     PEI_SERVICES_SIGNATURE,
     PEI_SERVICES_REVISION,
@@ -74,6 +65,28 @@ static EFI_PEI_SERVICES  mPS = {
   PeiRegisterForShadow
 };
 
+/**
+
+  The entry routine to Pei Core, invoked by PeiMain during transition
+  from SEC to PEI. After switching stack in the PEI core, it will restart
+  with the old core data.
+
+
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+  @param PpiList         Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
+                         An empty PPI list consists of a single descriptor with the end-tag
+                         EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
+                         phase, the PEI Foundation will add these SEC-hosted PPIs to its PPI database such
+                         that both the PEI Foundation and any modules can leverage the associated service
+                         calls and/or code in these early PPIs
+  @param Data            Pointer to old core data that is used to initialize the
+                         core's data areas.
+
+  @retval EFI_NOT_FOUND  Never reach
+
+**/
 EFI_STATUS
 EFIAPI
 PeiCore (
@@ -81,34 +94,6 @@ PeiCore (
   IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpiList,
   IN VOID                              *Data
   )
-/*++
-
-Routine Description:
-
-  The entry routine to Pei Core, invoked by PeiMain during transition
-  from SEC to PEI. After switching stack in the PEI core, it will restart
-  with the old core data.
-
-Arguments:
-
-  SecCoreData          - Points to a data structure containing information about the PEI core's operating
-                         environment, such as the size and location of temporary RAM, the stack location and
-                         the BFV location.
-  PpiList              - Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
-                         An empty PPI list consists of a single descriptor with the end-tag
-                         EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
-                         phase, the PEI Foundation will add these SEC-hosted PPIs to its PPI database such
-                         that both the PEI Foundation and any modules can leverage the associated service
-                         calls and/or code in these early PPIs
-  Data                 - Pointer to old core data that is used to initialize the
-                         core's data areas.
-
-Returns:
-
-  This function never returns
-  EFI_NOT_FOUND        - Never reach
-
---*/
 {
   PEI_CORE_INSTANCE                                     PrivateData;
   EFI_STATUS                                            Status;
@@ -144,14 +129,14 @@ Returns:
     CpuIo = (VOID*)PrivateData.ServiceTableShadow.CpuIo;
     PciCfg = (VOID*)PrivateData.ServiceTableShadow.PciCfg;
     
-    CopyMem (&PrivateData.ServiceTableShadow, &mPS, sizeof (mPS));
+    CopyMem (&PrivateData.ServiceTableShadow, &gPs, sizeof (gPs));
     
     PrivateData.ServiceTableShadow.CpuIo  = CpuIo;
     PrivateData.ServiceTableShadow.PciCfg = PciCfg;
   } else {
     ZeroMem (&PrivateData, sizeof (PEI_CORE_INSTANCE));
     PrivateData.Signature = PEI_CORE_HANDLE_SIGNATURE;
-    CopyMem (&PrivateData.ServiceTableShadow, &mPS, sizeof (mPS));
+    CopyMem (&PrivateData.ServiceTableShadow, &gPs, sizeof (gPs));
   }
 
   PrivateData.PS = &PrivateData.ServiceTableShadow;

@@ -1,5 +1,6 @@
 /** @file
-
+  EFI PEI Core dispatch services
+  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,23 +10,13 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Dispatcher.c
-
-Abstract:
-
-  EFI PEI Core dispatch services
-
-Revision History
-
 **/
 
 #include <PeiMain.h>
 
-//
-//CAR is filled with this initial value during SEC phase
-//
+///
+/// CAR is filled with this initial value during SEC phase
+///
 #define INIT_CAR_VALUE 0x5AA55AA5
 
 typedef struct {
@@ -33,27 +24,21 @@ typedef struct {
   EFI_HANDLE            Handle;
 } PEIM_FILE_HANDLE_EXTENDED_DATA;
 
+/**
+
+  Discover all Peims and optional Apriori file in one FV. There is at most one
+  Apriori file in one FV.
+
+
+  @param Private         - Pointer to the private data passed in from caller
+  @param VolumeHandle    - Fv handle.
+
+**/
 VOID
 DiscoverPeimsAndOrderWithApriori (
   IN  PEI_CORE_INSTANCE    *Private,
   IN  EFI_PEI_FV_HANDLE    VolumeHandle
   )
-/*++
-
-Routine Description:
-
-  Discover all Peims and optional Apriori file in one FV. There is at most one
-  Apriori file in one FV.
-
-Arguments:
-
-  Private          - Pointer to the private data passed in from caller
-  VolumeHandle     - Fv handle.
-Returns:
-
-  NONE
-
---*/
 {
   EFI_STATUS                          Status;
   EFI_PEI_FV_HANDLE                   FileHandle;
@@ -187,6 +172,13 @@ Returns:
 
 }
 
+/**
+  Shadow PeiCore module from flash to installed memory.
+  
+  @param PeiServices     Pointer to PeiService table
+  @param PrivateInMem    PeiCore's private data structure
+
+**/
 VOID*
 ShadowPeiCore(
   EFI_PEI_SERVICES     **PeiServices,
@@ -226,32 +218,23 @@ ShadowPeiCore(
   return (VOID*) ((UINTN) EntryPoint + (UINTN) PeiCore - (UINTN) _ModuleEntryPoint);
 }
 
+/**
+  Conduct PEIM dispatch.
+
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+  @param Private         Pointer to the private data passed in from caller
+
+  @retval EFI_SUCCESS   - Successfully dispatched PEIM.
+  @retval EFI_NOT_FOUND - The dispatch failed.
+
+**/
 VOID
 PeiDispatcher (
   IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *Private
   )
-
-/*++
-
-Routine Description:
-
-  Conduct PEIM dispatch.
-
-Arguments:
-
-  SecCoreData          - Points to a data structure containing information about the PEI core's operating
-                         environment, such as the size and location of temporary RAM, the stack location and
-                         the BFV location.
-  PrivateData          - Pointer to the private data passed in from caller
-  DispatchData         - Pointer to PEI_CORE_DISPATCH_DATA data.
-
-Returns:
-
-  EFI_SUCCESS   - Successfully dispatched PEIM.
-  EFI_NOT_FOUND - The dispatch failed.
-
---*/
 {
   EFI_STATUS                          Status;
   UINT32                              Index1;
@@ -674,32 +657,25 @@ Returns:
 
 }
 
+/**
+  Initialize the Dispatcher's data members
+
+  @param PrivateData     PeiCore's private data structure
+  @param OldCoreData     Old data from SecCore
+                         NULL if being run in non-permament memory mode.
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+
+  @return None.
+
+**/
 VOID
 InitializeDispatcherData (
   IN PEI_CORE_INSTANCE            *PrivateData,
   IN PEI_CORE_INSTANCE            *OldCoreData,
   IN CONST EFI_SEC_PEI_HAND_OFF   *SecCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize the Dispatcher's data members
-
-Arguments:
-
-  PeiServices          - The PEI core services table.
-  OldCoreData          - Pointer to old core data (before switching stack).
-                         NULL if being run in non-permament memory mode.
-  SecCoreData          - Points to a data structure containing information about the PEI core's operating
-                         environment, such as the size and location of temporary RAM, the stack location and
-                         the BFV location.
-
-Returns:
-
-  None.
-
---*/
 {
   if (OldCoreData == NULL) {
     PeiInitializeFv (PrivateData, SecCoreData);
@@ -708,29 +684,25 @@ Returns:
   return;
 }
 
+/**
+  This routine parses the Dependency Expression, if available, and
+  decides if the module can be executed.
 
+
+  @param Private         PeiCore's private data structure
+  @param FileHandle      PEIM's file handle
+  @param PeimCount       Peim count in all dispatched PEIMs.
+
+  @retval TRUE   Can be dispatched
+  @retval FALSE  Cannot be dispatched
+
+**/
 BOOLEAN
 DepexSatisfied (
   IN PEI_CORE_INSTANCE          *Private,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
   IN UINTN                      PeimCount
   )
-/*++
-
-Routine Description:
-
-  This routine parses the Dependency Expression, if available, and
-  decides if the module can be executed.
-
-Arguments:
-  PeiServices - The PEI Service Table
-  CurrentPeimAddress - Address of the PEIM Firmware File under investigation
-
-Returns:
-  TRUE  - Can be dispatched
-  FALSE - Cannot be dispatched
-
---*/
 {
   EFI_STATUS           Status;
   VOID                 *DepexData;
@@ -768,11 +740,11 @@ Returns:
   This routine enable a PEIM to register itself to shadow when PEI Foundation
   discovery permanent memory.
 
-	@param FileHandle  	File handle of a PEIM.
+  @param FileHandle             File handle of a PEIM.
 
-  @retval EFI_NOT_FOUND  				The file handle doesn't point to PEIM itself.
-  @retval EFI_ALREADY_STARTED		Indicate that the PEIM has been registered itself.
-  @retval EFI_SUCCESS						Successfully to register itself.
+  @retval EFI_NOT_FOUND         The file handle doesn't point to PEIM itself.
+  @retval EFI_ALREADY_STARTED   Indicate that the PEIM has been registered itself.
+  @retval EFI_SUCCESS           Successfully to register itself.
 
 **/
 EFI_STATUS
@@ -803,18 +775,16 @@ PeiRegisterForShadow (
   return EFI_SUCCESS;
 }
 
-
-
 /**
   Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
 
-	@param PeiServices          Pointer to the PEI Core Services Table.
-	@param FileHandle  	        File handle of a Fv type file.
+  @param PeiServices          Pointer to the PEI Core Services Table.
+  @param FvFileHandle         File handle of a Fv type file.
   @param AuthenticationState  Pointer to attestation authentication state of image.
 
 
-  @retval EFI_NOT_FOUND  				FV image can't be found.
-  @retval EFI_SUCCESS						Successfully to process it.
+  @retval EFI_NOT_FOUND       FV image can't be found.
+  @retval EFI_SUCCESS         Successfully to process it.
 
 **/
 EFI_STATUS

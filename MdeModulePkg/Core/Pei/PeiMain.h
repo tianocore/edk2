@@ -1,5 +1,6 @@
 /** @file
-
+  Definition of Pei Core Structures and Services
+  
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,16 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  PeiMain.h
-
-Abstract:
-
-  Definition of Pei Core Structures and Services
-
-Revision History
 
 **/
 
@@ -58,9 +49,9 @@ Revision History
 
 #define PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE   0xff
 
-//
-// Pei Core private data structures
-//
+///
+/// Pei Core private data structures
+///
 typedef union {
   EFI_PEI_PPI_DESCRIPTOR      *Ppi;
   EFI_PEI_NOTIFY_DESCRIPTOR   *Notify;
@@ -150,9 +141,6 @@ typedef struct{
 #define PEI_CORE_INSTANCE_FROM_PS_THIS(a) \
   CR(a, PEI_CORE_INSTANCE, PS, PEI_CORE_HANDLE_SIGNATURE)
 
-//
-// BUGBUG: Where does this go really?
-//
 typedef
 EFI_STATUS
 (EFIAPI *PEI_CORE_ENTRY_POINT)(
@@ -161,9 +149,9 @@ EFI_STATUS
   IN PEI_CORE_INSTANCE              *OldCoreData
   );
 
-//
-// Union of temporarily used function pointers (to save stack space)
-//
+///
+/// Union of temporarily used function pointers (to save stack space)
+///
 typedef union {
   PEI_CORE_ENTRY_POINT         PeiCore;
   EFI_PEIM_ENTRY_POINT2        PeimEntry;
@@ -185,6 +173,28 @@ typedef struct {
 //
 // PeiCore function
 //
+/**
+
+  The entry routine to Pei Core, invoked by PeiMain during transition
+  from SEC to PEI. After switching stack in the PEI core, it will restart
+  with the old core data.
+
+
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+  @param PpiList         Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
+                         An empty PPI list consists of a single descriptor with the end-tag
+                         EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
+                         phase, the PEI Foundation will add these SEC-hosted PPIs to its PPI database such
+                         that both the PEI Foundation and any modules can leverage the associated service
+                         calls and/or code in these early PPIs
+  @param Data            Pointer to old core data that is used to initialize the
+                         core's data areas.
+
+  @retval EFI_NOT_FOUND  Never reach
+
+**/
 EFI_STATUS
 EFIAPI
 PeiCore (
@@ -192,40 +202,13 @@ PeiCore (
   IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpList,
   IN VOID                              *Data
   )
-/*++
-
-Routine Description:
-
-  The entry routine to Pei Core, invoked by PeiMain during transition
-  from SEC to PEI. After switching stack in the PEI core, it will restart
-  with the old core data.
-
-Arguments:
-
-  PeiStartupDescriptor - Information and services provided by SEC phase.
-  OldCoreData          - Pointer to old core data that is used to initialize the
-                         core's data areas.
-
-Returns:
-
-  This function never returns
-  EFI_NOT_FOUND        - Never reach
-
---*/
 ;
 
 //
 // Dispatcher support functions
 //
 
-BOOLEAN
-PeimDispatchReadiness (
-  IN EFI_PEI_SERVICES   **PeiServices,
-  IN VOID               *DependencyExpression
-  )
-/*++
-
-Routine Description:
+/**
 
   This is the POSTFIX version of the dependency evaluator.  When a
   PUSH [PPI GUID] is encountered, a pointer to the GUID is stored on
@@ -234,208 +217,117 @@ Routine Description:
   some time savings as not all PPIs must be checked for certain
   operation types (AND, OR).
 
-Arguments:
 
-  PeiServices               - Calling context.
+  @param PeiServices            Calling context.
+  @param DependencyExpression   Pointer to a dependency expression.  The Grammar adheres to
+                                the BNF described above and is stored in postfix notation.
 
-  DependencyExpression      - Pointer to a dependency expression.  The Grammar adheres to
-                              the BNF described above and is stored in postfix notation.
+  @retval TRUE      if it is a well-formed Grammar
+  @retval FALSE     if the dependency expression overflows the evaluation stack
+                    if the dependency expression underflows the evaluation stack
+                    if the dependency expression is not a well-formed Grammar.
 
-Returns:
-
-  Status = EFI_SUCCESS            if it is a well-formed Grammar
-           EFI_INVALID_PARAMETER  if the dependency expression overflows
-                                  the evaluation stack
-           EFI_INVALID_PARAMETER  if the dependency expression underflows
-                                  the evaluation stack
-           EFI_INVALID_PARAMETER  if the dependency expression is not a
-                                  well-formed Grammar.
---*/
+**/
+BOOLEAN
+PeimDispatchReadiness (
+  IN EFI_PEI_SERVICES   **PeiServices,
+  IN VOID               *DependencyExpression
+  )
 ;
 
+/**
+  Conduct PEIM dispatch.
 
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+                         PrivateData          - Pointer to the private data passed in from caller
+                         DispatchData         - Pointer to PEI_CORE_DISPATCH_DATA data.
+  @param Private         EDES_TODO: Add parameter description
+
+  @retval EFI_SUCCESS    Successfully dispatched PEIM.
+  @retval EFI_NOT_FOUND  The dispatch failed.
+
+**/
 VOID
 PeiDispatcher (
   IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *PrivateData
   )
-
-/*++
-
-Routine Description:
-
-  Conduct PEIM dispatch.
-
-Arguments:
-
-  PeiStartupDescriptor - Pointer to IN EFI_PEI_STARTUP_DESCRIPTOR
-  PrivateData          - Pointer to the private data passed in from caller
-  DispatchData         - Pointer to PEI_CORE_DISPATCH_DATA data.
-
-Returns:
-
-  EFI_SUCCESS   - Successfully dispatched PEIM.
-  EFI_NOT_FOUND - The dispatch failed.
-
---*/
 ;
 
+/**
+  Initialize the Dispatcher's data members
 
+  @param PrivateData     PeiCore's private data structure
+  @param OldCoreData     Old data from SecCore
+                         NULL if being run in non-permament memory mode.
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+
+  @return None.
+
+**/
 VOID
 InitializeDispatcherData (
   IN PEI_CORE_INSTANCE            *PrivateData,
   IN PEI_CORE_INSTANCE            *OldCoreData,
   IN CONST EFI_SEC_PEI_HAND_OFF   *SecCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize the Dispatcher's data members
-
-Arguments:
-
-  PeiServices          - The PEI core services table.
-  OldCoreData          - Pointer to old core data (before switching stack).
-                         NULL if being run in non-permament memory mode.
-  PeiStartupDescriptor - Information and services provided by SEC phase.
-
-
-Returns:
-
-  None
-
---*/
 ;
 
+/**
+  This routine parses the Dependency Expression, if available, and
+  decides if the module can be executed.
 
-EFI_STATUS
-FindNextPeim (
-  IN EFI_PEI_SERVICES            **PeiServices,
-  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER     **PeimFileHeader
-  )
-/*++
 
-Routine Description:
-    Given the input file pointer, search for the next matching file in the
-    FFS volume. The search starts from FileHeader inside
-    the Firmware Volume defined by FwVolHeader.
+  @param Private         PeiCore's private data structure
+  @param FileHandle      PEIM's file handle
+  @param PeimCount       Peim count in all dispatched PEIMs.
 
-Arguments:
-    PeiServices - Pointer to the PEI Core Services Table.
+  @retval TRUE   Can be dispatched
+  @retval FALSE  Cannot be dispatched
 
-    FwVolHeader - Pointer to the FV header of the volume to search.
-                     This parameter must point to a valid FFS volume.
-
-    PeimFileHeader  - Pointer to the current file from which to begin searching.
-                  This pointer will be updated upon return to reflect the file found.
-
-Returns:
-    EFI_NOT_FOUND - No files matching the search criteria were found
-    EFI_SUCCESS
-
---*/
-;
-
-BOOLEAN
-Dispatched (
-  IN UINT8  CurrentPeim,
-  IN UINT32 DispatchedPeimBitMap
-  )
-/*++
-
-Routine Description:
-
-  This routine checks to see if a particular PEIM has been dispatched during
-  the PEI core dispatch.
-
-Arguments:
-  CurrentPeim - The PEIM/FV in the bit array to check.
-  DispatchedPeimBitMap - Bit array, each bit corresponds to a PEIM/FV.
-
-Returns:
-  TRUE if PEIM already dispatched
-  FALSE if not
-
---*/
-;
-
-VOID
-SetDispatched (
-  IN EFI_PEI_SERVICES   **PeiServices,
-  IN UINT8              CurrentPeim,
-  OUT UINT32            *DispatchedPeimBitMap
-  )
-/*++
-
-Routine Description:
-
-  This routine sets a PEIM as having been dispatched once its entry
-  point has been invoked.
-
-Arguments:
-
-  PeiServices          - The PEI core services table.
-  CurrentPeim          - The PEIM/FV in the bit array to check.
-  DispatchedPeimBitMap - Bit array, each bit corresponds to a PEIM/FV.
-
-Returns:
-  None
-
---*/
-;
-
+**/
 BOOLEAN
 DepexSatisfied (
   IN PEI_CORE_INSTANCE          *Private,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
   IN UINTN                      PeimCount
   )
-/*++
-
-Routine Description:
-
-  This routine parses the Dependency Expression, if available, and
-  decides if the module can be executed.
-
-Arguments:
-  PeiServices - The PEI Service Table
-  CurrentPeimAddress - Address of the PEIM Firmware File under investigation
-
-Returns:
-  TRUE  - Can be dispatched
-  FALSE - Cannot be dispatched
-
---*/
 ;
 
 //
 // PPI support functions
 //
+/**
+
+  Initialize PPI services.
+
+
+  @param PrivateData     Pointer to the PEI Core data.
+  @param OldCoreData     Pointer to old PEI Core data. 
+                         NULL if being run in non-permament memory mode.
+
+**/
 VOID
 InitializePpiServices (
   IN PEI_CORE_INSTANCE   *PrivateData,
   IN PEI_CORE_INSTANCE   *OldCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize PPI services.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  OldCoreData - Pointer to the PEI Core data.
-                NULL if being run in non-permament memory mode.
-
-Returns:
-  Nothing
-
---*/
 ;
 
+/**
+
+  Migrate the Hob list from the CAR stack to PEI installed memory.
+
+  @param PeiServices         The PEI core services table.
+  @param OldCheckingBottom   The old checking bottom.
+  @param OldCheckingTop      The old checking top.
+  @param NewHandOffHob       The new handoff HOB list.
+
+**/
 VOID
 ConvertPpiPointers (
   IN CONST EFI_PEI_SERVICES                     **PeiServices,
@@ -443,51 +335,43 @@ ConvertPpiPointers (
   IN UINTN                         OldCheckingTop,
   IN EFI_HOB_HANDOFF_INFO_TABLE    *NewHandOffHob
   )
-/*++
-
-Routine Description:
-
-  Migrate the Hob list from the CAR stack to PEI installed memory.
-
-Arguments:
-
-  PeiServices       - The PEI core services table.
-  OldCheckingBottom - The old checking bottom.
-  OldCheckingTop    - The old checking top.
-  NewHandOffHob     - The new handoff HOB list.
-
-Returns:
-
---*/
 ;
 
+/**
+
+  Install PPI services.
+
+  @param PeiServices     - Pointer to the PEI Service Table
+  @param PpiList         - Pointer to a list of PEI PPI Descriptors.
+
+  @retval EFI_SUCCESS             - if all PPIs in PpiList are successfully installed.
+  @retval EFI_INVALID_PARAMETER   - if PpiList is NULL pointer
+  @retval EFI_INVALID_PARAMETER   - if any PPI in PpiList is not valid
+  @retval EFI_OUT_OF_RESOURCES    - if there is no more memory resource to install PPI
+
+**/
 EFI_STATUS
 EFIAPI
 PeiInstallPpi (
   IN CONST EFI_PEI_SERVICES        **PeiServices,
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )
-/*++
-
-Routine Description:
-
-  Install PPI services.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Service Table
-  PpiList     - Pointer to a list of PEI PPI Descriptors.
-
-Returns:
-
-    EFI_SUCCESS             - if all PPIs in PpiList are successfully installed.
-    EFI_INVALID_PARAMETER   - if PpiList is NULL pointer
-    EFI_INVALID_PARAMETER   - if any PPI in PpiList is not valid
-    EFI_OUT_OF_RESOURCES    - if there is no more memory resource to install PPI
-
---*/
 ;
 
+/**
+
+  Re-Install PPI services.
+
+  @param PeiServices     - Pointer to the PEI Service Table
+  @param OldPpi          - Pointer to the old PEI PPI Descriptors.
+  @param NewPpi          - Pointer to the new PEI PPI Descriptors.
+
+  @retval EFI_SUCCESS           - if the operation was successful
+  @retval EFI_INVALID_PARAMETER - if OldPpi or NewPpi is NULL
+  @retval EFI_INVALID_PARAMETER - if NewPpi is not valid
+  @retval EFI_NOT_FOUND         - if the PPI was not in the database
+
+**/
 EFI_STATUS
 EFIAPI
 PeiReInstallPpi (
@@ -495,28 +379,24 @@ PeiReInstallPpi (
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *OldPpi,
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *NewPpi
   )
-/*++
-
-Routine Description:
-
-  Re-Install PPI services.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Service Table
-  OldPpi      - Pointer to the old PEI PPI Descriptors.
-  NewPpi      - Pointer to the new PEI PPI Descriptors.
-
-Returns:
-
-  EFI_SUCCESS           - if the operation was successful
-  EFI_INVALID_PARAMETER - if OldPpi or NewPpi is NULL
-  EFI_INVALID_PARAMETER - if NewPpi is not valid
-  EFI_NOT_FOUND         - if the PPI was not in the database
-
---*/
 ;
 
+/**
+
+  Locate a given named PPI.
+
+
+  @param PeiServices     - Pointer to the PEI Service Table
+  @param Guid            - Pointer to GUID of the PPI.
+  @param Instance        - Instance Number to discover.
+  @param PpiDescriptor   - Pointer to reference the found descriptor. If not NULL,
+                         returns a pointer to the descriptor (includes flags, etc)
+  @param Ppi             - Pointer to reference the found PPI
+
+  @retval EFI_SUCCESS   if the PPI is in the database
+  @retval EFI_NOT_FOUND if the PPI is not in the database
+
+**/
 EFI_STATUS
 EFIAPI
 PeiLocatePpi (
@@ -526,73 +406,54 @@ PeiLocatePpi (
   IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
   IN OUT VOID                    **Ppi
   )
-/*++
-
-Routine Description:
-
-  Locate a given named PPI.
-
-Arguments:
-
-  PeiServices   - Pointer to the PEI Service Table
-  Guid          - Pointer to GUID of the PPI.
-  Instance      - Instance Number to discover.
-  PpiDescriptor - Pointer to reference the found descriptor. If not NULL,
-                returns a pointer to the descriptor (includes flags, etc)
-  Ppi           - Pointer to reference the found PPI
-
-Returns:
-
-  Status -  EFI_SUCCESS   if the PPI is in the database
-            EFI_NOT_FOUND if the PPI is not in the database
---*/
 ;
 
+/**
+
+  Install a notification for a given PPI.
+
+
+  @param PeiServices     - Pointer to the PEI Service Table
+  @param NotifyList      - Pointer to list of Descriptors to notify upon.
+
+  @retval EFI_SUCCESS           if successful
+  @retval EFI_OUT_OF_RESOURCES  if no space in the database
+  @retval EFI_INVALID_PARAMETER if not a good decriptor
+
+**/
 EFI_STATUS
 EFIAPI
 PeiNotifyPpi (
   IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
   )
-/*++
-
-Routine Description:
-
-  Install a notification for a given PPI.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Service Table
-  NotifyList  - Pointer to list of Descriptors to notify upon.
-
-Returns:
-
-  Status - EFI_SUCCESS          if successful
-           EFI_OUT_OF_RESOURCES if no space in the database
-           EFI_INVALID_PARAMETER if not a good decriptor
-
---*/
 ;
 
+/**
+
+  Process the Notify List at dispatch level.
+
+  @param PrivateData  PeiCore's private data structure.
+
+**/
 VOID
 ProcessNotifyList (
   IN PEI_CORE_INSTANCE  *PrivateData
   )
-/*++
-
-Routine Description:
-
-  Process the Notify List at dispatch level.
-
-Arguments:
-
-  PeiServices - Pointer to the PEI Service Table
-
-Returns:
-
---*/
 ;
 
+/**
+
+  Dispatch notifications.
+
+  @param PrivateData        PeiCore's private data structure
+  @param NotifyType         Type of notify to fire.
+  @param InstallStartIndex  Install Beginning index.
+  @param InstallStopIndex   Install Ending index.
+  @param NotifyStartIndex   Notify Beginning index.
+  @param NotifyStopIndex    Notify Ending index.
+
+**/
 VOID
 DispatchNotify (
   IN PEI_CORE_INSTANCE  *PrivateData,
@@ -602,178 +463,138 @@ DispatchNotify (
   IN INTN                NotifyStartIndex,
   IN INTN                NotifyStopIndex
   )
-/*++
-
-Routine Description:
-
-  Dispatch notifications.
-
-Arguments:
-
-  PeiServices         - Pointer to the PEI Service Table
-  NotifyType          - Type of notify to fire.
-  InstallStartIndex   - Install Beginning index.
-  InstallStopIndex    - Install Ending index.
-  NotifyStartIndex    - Notify Beginning index.
-  NotifyStopIndex    - Notify Ending index.
-
-Returns:  None
-
---*/
 ;
 
 //
 // Boot mode support functions
 //
+/**
+  This service enables PEIMs to ascertain the present value of the boot mode.
+
+  @param PeiServices            The PEI core services table.
+  @param BootMode               A pointer to contain the value of the boot mode.
+
+  @retval EFI_SUCCESS           The boot mode was returned successfully.
+  @retval EFI_INVALID_PARAMETER BootMode is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiGetBootMode (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN OUT EFI_BOOT_MODE *BootMode
   )
-/*++
-
-Routine Description:
-
-  This service enables PEIMs to ascertain the present value of the boot mode.
-
-Arguments:
-
-  PeiServices    - The PEI core services table.
-  BootMode       - A pointer to contain the value of the boot mode.
-
-Returns:
-
-  EFI_SUCCESS           - The boot mode was returned successfully.
-  EFI_INVALID_PARAMETER - BootMode is NULL.
-
---*/
 ;
 
+/**
+  This service enables PEIMs to update the boot mode variable.
+
+
+  @param PeiServices     - The PEI core services table.
+  @param BootMode        - The value of the boot mode to set.
+
+  @return EFI_SUCCESS    - The value was successfully updated
+
+**/
 EFI_STATUS
 EFIAPI
 PeiSetBootMode (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN EFI_BOOT_MODE     BootMode
   )
-/*++
-
-Routine Description:
-
-  This service enables PEIMs to update the boot mode variable.
-
-Arguments:
-
-  PeiServices    - The PEI core services table.
-  BootMode       - The value of the boot mode to set.
-
-Returns:
-
-  EFI_SUCCESS    - The value was successfully updated
-
---*/
 ;
 
 //
 // Security support functions
 //
+/**
+
+  Initialize the security services.
+
+
+  @param PeiServices     - The PEI core services table.
+  @param OldCoreData     - Pointer to the old core data.
+                         NULL if being run in non-permament memory mode.
+
+**/
 VOID
 InitializeSecurityServices (
   IN EFI_PEI_SERVICES  **PeiServices,
   IN PEI_CORE_INSTANCE *OldCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize the security services.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  OldCoreData - Pointer to the old core data.
-                NULL if being run in non-permament memory mode.
-Returns:
-
-  None
-
---*/
 ;
 
+/**
+  Verify a Firmware volume
+
+  @param CurrentFvAddress - Pointer to the current Firmware Volume under consideration
+
+  @retval EFI_SUCCESS             - Firmware Volume is legal
+  @retval EFI_SECURITY_VIOLATION  - Firmware Volume fails integrity test
+
+**/
 EFI_STATUS
 VerifyFv (
   IN EFI_FIRMWARE_VOLUME_HEADER  *CurrentFvAddress
   )
-/*++
-
-Routine Description:
-
-  Provide a callout to the OEM FV verification service.
-
-Arguments:
-
-  CurrentFvAddress       - Pointer to the FV under investigation.
-
-Returns:
-
-  Status - EFI_SUCCESS
-
---*/
 ;
 
+/**
 
+  Provide a callout to the security verification service.
+
+
+  @param PrivateData     PeiCore's private data structure
+  @param VolumeHandle    Handle of FV
+  @param FileHandle      Handle of PEIM's ffs
+
+  @retval EFI_SUCCESS              Image is OK
+  @retval EFI_SECURITY_VIOLATION   Image is illegal
+
+**/
 EFI_STATUS
 VerifyPeim (
   IN PEI_CORE_INSTANCE      *PrivateData,
   IN EFI_PEI_FV_HANDLE      VolumeHandle,
   IN EFI_PEI_FILE_HANDLE    FileHandle
   )
-/*++
-
-Routine Description:
-
-  Provide a callout to the security verification service.
-
-Arguments:
-
-  PeiServices          - The PEI core services table.
-  CurrentPeimAddress   - Pointer to the Firmware File under investigation.
-
-Returns:
-
-  EFI_SUCCESS             - Image is OK
-  EFI_SECURITY_VIOLATION  - Image is illegal
-
---*/
 ;
 
+/**
 
+  Gets the pointer to the HOB List.
+
+
+  @param PeiServices                   The PEI core services table.
+  @param HobList                       Pointer to the HOB List.
+
+  @retval EFI_SUCCESS                  Get the pointer of HOB List
+  @retval EFI_NOT_AVAILABLE_YET        the HOB List is not yet published
+  @retval EFI_INVALID_PARAMETER        HobList is NULL (in debug mode)
+
+**/
 EFI_STATUS
 EFIAPI
 PeiGetHobList (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN OUT VOID          **HobList
   )
-/*++
-
-Routine Description:
-
-  Gets the pointer to the HOB List.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  HobList     - Pointer to the HOB List.
-
-Returns:
-
-  EFI_SUCCESS                 - Get the pointer of HOB List
-  EFI_NOT_AVAILABLE_YET       - the HOB List is not yet published
-  EFI_INVALID_PARAMETER       - HobList is NULL (in debug mode)
-
---*/
 ;
 
+/**
+  Add a new HOB to the HOB List.
+
+  @param PeiServices     - The PEI core services table.
+  @param Type            - Type of the new HOB.
+  @param Length          - Length of the new HOB to allocate.
+  @param Hob             - Pointer to the new HOB.
+
+  @return  EFI_SUCCESS           Success to create hob.
+  @retval  EFI_INVALID_PARAMETER if Hob is NULL
+  @retval  EFI_NOT_AVAILABLE_YET if HobList is still not available.
+  @retval  EFI_OUT_OF_RESOURCES  if there is no more memory to grow the Hoblist.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiCreateHob (
@@ -782,58 +603,47 @@ PeiCreateHob (
   IN UINT16            Length,
   IN OUT VOID          **Hob
   )
-/*++
-
-Routine Description:
-
-  Add a new HOB to the HOB List.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  Type        - Type of the new HOB.
-  Length      - Length of the new HOB to allocate.
-  Hob         - Pointer to the new HOB.
-
-Returns:
-
-  Status  - EFI_SUCCESS
-          - EFI_INVALID_PARAMETER if Hob is NULL
-          - EFI_NOT_AVAILABLE_YET if HobList is still not available.
-          - EFI_OUT_OF_RESOURCES if there is no more memory to grow the Hoblist.
-
---*/
 ;
 
+/**
+
+  Builds a Handoff Information Table HOB
+
+  @param BootMode        - Current Bootmode
+  @param MemoryBegin     - Start Memory Address.
+  @param MemoryLength    - Length of Memory.
+
+  @return EFI_SUCCESS Always success to initialize HOB.
+
+**/
 EFI_STATUS
 PeiCoreBuildHobHandoffInfoTable (
   IN EFI_BOOT_MODE         BootMode,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64                MemoryLength
   )
-/*++
-
-Routine Description:
-
-  Builds a Handoff Information Table HOB
-
-Arguments:
-
-  BootMode      - Current Bootmode
-  MemoryBegin   - Start Memory Address.
-  MemoryLength  - Length of Memory.
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
 ;
 
 
 //
 // FFS Fw Volume support functions
 //
+/**
+  Given the input file pointer, search for the next matching file in the
+  FFS volume as defined by SearchType. The search starts from FileHeader inside
+  the Firmware Volume defined by FwVolHeader.
+
+
+  @param PeiServices     Pointer to the PEI Core Services Table.
+  @param SearchType      Filter to find only files of this type.
+                         Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
+  @param VolumeHandle    Pointer to the FV header of the volume to search.
+  @param FileHandle      Pointer to the current file from which to begin searching.
+                         This pointer will be updated upon return to reflect the file found.
+  @retval EFI_NOT_FOUND  No files matching the search criteria were found
+  @retval EFI_SUCCESS    Success to find next file in given volume
+
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsFindNextFile (
@@ -842,32 +652,23 @@ PeiFfsFindNextFile (
   IN EFI_PEI_FV_HANDLE           FwVolHeader,
   IN OUT EFI_PEI_FILE_HANDLE     *FileHeader
   )
-/*++
-
-Routine Description:
-    Given the input file pointer, search for the next matching file in the
-    FFS volume as defined by SearchType. The search starts from FileHeader inside
-    the Firmware Volume defined by FwVolHeader.
-
-Arguments:
-    PeiServices - Pointer to the PEI Core Services Table.
-
-    SearchType - Filter to find only files of this type.
-      Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-
-    FwVolHeader - Pointer to the FV header of the volume to search.
-      This parameter must point to a valid FFS volume.
-
-    FileHeader  - Pointer to the current file from which to begin searching.
-      This pointer will be updated upon return to reflect the file found.
-
-Returns:
-    EFI_NOT_FOUND - No files matching the search criteria were found
-    EFI_SUCCESS
-
---*/
 ;
 
+/**
+  Given the input file pointer, search for the next matching section in the
+  FFS volume.
+
+
+  @param PeiServices     Pointer to the PEI Core Services Table.
+  @param SectionType     Filter to find only sections of this type.
+  @param FileHandle      Pointer to the current file to search.
+  @param SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
+                         NULL if section not found
+
+  @retval EFI_NOT_FOUND  No files matching the search criteria were found
+  @retval EFI_SUCCESS    Success to find section data in given file
+
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsFindSectionData (
@@ -876,26 +677,19 @@ PeiFfsFindSectionData (
   IN EFI_PEI_FILE_HANDLE         FfsFileHeader,
   IN OUT VOID                    **SectionData
   )
-/*++
-
-Routine Description:
-    Given the input file pointer, search for the next matching section in the
-    FFS volume.
-
-Arguments:
-    PeiServices - Pointer to the PEI Core Services Table.
-    SearchType - Filter to find only sections of this type.
-    FfsFileHeader  - Pointer to the current file to search.
-    SectionData - Pointer to the Section matching SectionType in FfsFileHeader.
-                - NULL if section not found
-
-Returns:
-    EFI_NOT_FOUND - No files matching the search criteria were found
-    EFI_SUCCESS
-
---*/
 ;
 
+/**
+  search the firmware volumes by index
+
+  @param PeiServices     The PEI core services table.
+  @param Instance        Instance of FV to find
+  @param VolumeHandle    Pointer to found Volume.
+
+  @retval EFI_INVALID_PARAMETER  FwVolHeader is NULL
+  @retval EFI_SUCCESS            Firmware volume instance successfully found.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiFvFindNextVolume (
@@ -903,61 +697,44 @@ PeiFvFindNextVolume (
   IN UINTN                           Instance,
   IN OUT EFI_PEI_FV_HANDLE           *FwVolHeader
   )
-/*++
-
-Routine Description:
-
-  Return the BFV location
-
-  BugBug -- Move this to the location of this code to where the
-  other FV and FFS support code lives.
-  Also, update to use FindFV for instances #'s >= 1.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  Instance    - Instance of FV to find
-  FwVolHeader - Pointer to contain the data to return
-
-Returns:
-  Pointer to the Firmware Volume instance requested
-
-  EFI_INVALID_PARAMETER     - FwVolHeader is NULL
-
-  EFI_SUCCESS               - Firmware volume instance successfully found.
-
---*/
 ;
 
 //
 // Memory support functions
 //
+/**
+
+  Initialize the memory services.
+
+
+  @param PrivateData     Add parameter description
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+  @param OldCoreData     Pointer to the PEI Core data.
+                         NULL if being run in non-permament memory mode.
+
+**/
 VOID
 InitializeMemoryServices (
   IN PEI_CORE_INSTANCE           *PrivateData,
   IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *OldCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize the memory services.
-
-Arguments:
-
-  PeiServices          - The PEI core services table.
-  PeiStartupDescriptor - Information and services provided by SEC phase.
-  OldCoreData          - Pointer to the PEI Core data.
-                         NULL if being run in non-permament memory mode.
-
-Returns:
-
-  None
-
---*/
 ;
 
+/**
+
+  Install the permanent memory is now available.
+  Creates HOB (PHIT and Stack).
+
+  @param PeiServices     - The PEI core services table.
+  @param MemoryBegin     - Start of memory address.
+  @param MemoryLength    - Length of memory.
+
+  @return EFI_SUCCESS Always success.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiInstallPeiMemory (
@@ -965,26 +742,26 @@ PeiInstallPeiMemory (
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64                MemoryLength
   )
-/*++
-
-Routine Description:
-
-  Install the permanent memory is now available.
-  Creates HOB (PHIT and Stack).
-
-Arguments:
-
-  PeiServices   - The PEI core services table.
-  MemoryBegin   - Start of memory address.
-  MemoryLength  - Length of memory.
-
-Returns:
-
-  Status  - EFI_SUCCESS
-
---*/
 ;
 
+/**
+
+  Memory allocation service on permanent memory,
+  not usable prior to the memory installation.
+
+
+  @param PeiServices     - The PEI core services table.
+  @param MemoryType      - Type of memory to allocate.
+  @param Pages           - Number of pages to allocate.
+  @param Memory          - Pointer of memory allocated.
+
+  @retval EFI_SUCCESS              The allocation was successful
+  @retval EFI_INVALID_PARAMETER    Only AllocateAnyAddress is supported.
+  @retval EFI_NOT_AVAILABLE_YET    Called with permanent memory not available
+  @retval EFI_OUT_OF_RESOURCES     There is not enough HOB heap to satisfy the requirement
+                                   to allocate the number of pages.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiAllocatePages (
@@ -993,32 +770,22 @@ PeiAllocatePages (
   IN UINTN                      Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Memory
   )
-/*++
-
-Routine Description:
-
-  Memory allocation service on permanent memory,
-  not usable prior to the memory installation.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  Type        - Type of allocation.
-  MemoryType  - Type of memory to allocate.
-  Pages       - Number of pages to allocate.
-  Memory      - Pointer of memory allocated.
-
-Returns:
-
-  Status - EFI_SUCCESS              The allocation was successful
-           EFI_INVALID_PARAMETER    Only AllocateAnyAddress is supported.
-           EFI_NOT_AVAILABLE_YET    Called with permanent memory not available
-           EFI_OUT_OF_RESOURCES     There is not enough HOB heap to satisfy the requirement
-                                    to allocate the number of pages.
-
---*/
 ;
 
+/**
+
+  Memory allocation service on the CAR.
+
+
+  @param PeiServices     - The PEI core services table.
+  @param Size            - Amount of memory required
+  @param Buffer          - Address of pointer to the buffer
+
+  @retval EFI_SUCCESS              The allocation was successful
+  @retval EFI_OUT_OF_RESOURCES     There is not enough heap to satisfy the requirement
+                                   to allocate the requested size.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiAllocatePool (
@@ -1026,29 +793,23 @@ PeiAllocatePool (
   IN UINTN                      Size,
   OUT VOID                      **Buffer
   )
-/*++
-
-Routine Description:
-
-  Memory allocation service on the CAR.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-
-  Size        - Amount of memory required
-
-  Buffer      - Address of pointer to the buffer
-
-Returns:
-
-  Status - EFI_SUCCESS              The allocation was successful
-           EFI_OUT_OF_RESOURCES     There is not enough heap to satisfy the requirement
-                                    to allocate the requested size.
-
---*/
 ;
 
+/**
+
+  Routine for load image file.
+
+
+  @param PeiServices     - The PEI core services table.
+  @param FileHandle      - Pointer to the FFS file header of the image.
+  @param EntryPoint      - Pointer to entry point of specified image file for output.
+  @param AuthenticationState - Pointer to attestation authentication state of image.
+
+  @retval EFI_SUCCESS    - Image is successfully loaded.
+  @retval EFI_NOT_FOUND  - Fail to locate necessary PPI
+  @retval Others         - Fail to load file.
+
+**/
 EFI_STATUS
 PeiLoadImage (
   IN  EFI_PEI_SERVICES            **PeiServices,
@@ -1056,28 +817,24 @@ PeiLoadImage (
   OUT    EFI_PHYSICAL_ADDRESS     *EntryPoint,
   OUT    UINT32                   *AuthenticationState
   )
-/*++
-
-Routine Description:
-
-  Get entry point of a Peim file.
-
-Arguments:
-
-  PeiServices                 - Calling context.
-
-  PeimFileHeader              - Peim file's header.
-
-  EntryPoint                  - Entry point of that Peim file.
-
-Returns:
-
-  Status code.
-
---*/
 ;
 
+/**
 
+  Core version of the Status Code reporter
+
+
+  @param PeiServices     The PEI core services table.
+  @param CodeType        Type of Status Code.
+  @param Value           Value to output for Status Code.
+  @param Instance        Instance Number of this status code.
+  @param CallerId        ID of the caller of this status code.
+  @param Data            Optional data associated with this status code.
+
+  @retval EFI_SUCCESS             if status code is successfully reported
+  @retval EFI_NOT_AVAILABLE_YET   if StatusCodePpi has not been installed
+
+**/
 EFI_STATUS
 EFIAPI
 PeiReportStatusCode (
@@ -1088,81 +845,56 @@ PeiReportStatusCode (
   IN CONST EFI_GUID                 *CallerId,
   IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  Core version of the Status Code reporter
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-
-  CodeType    - Type of Status Code.
-
-  Value       - Value to output for Status Code.
-
-  Instance    - Instance Number of this status code.
-
-  CallerId    - ID of the caller of this status code.
-
-  Data        - Optional data associated with this status code.
-
-Returns:
-
-  Status  - EFI_SUCCESS             if status code is successfully reported
-          - EFI_NOT_AVAILABLE_YET   if StatusCodePpi has not been installed
-
---*/
 ;
 
+/**
 
+  Core version of the Reset System
+
+
+  @param PeiServices     - The PEI core services table.
+
+  @retval EFI_NOT_AVAILABLE_YET     PPI not available yet.
+  @retval EFI_DEVICE_ERROR          Did not reset system.
+                                    Otherwise, resets the system.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiResetSystem (
   IN CONST EFI_PEI_SERVICES   **PeiServices
   )
-/*++
-
-Routine Description:
-
-  Core version of the Reset System
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-
-Returns:
-
-  Status  - EFI_NOT_AVAILABLE_YET. PPI not available yet.
-          - EFI_DEVICE_ERROR.   Did not reset system.
-
-  Otherwise, resets the system.
-
---*/
 ;
 
+/**
+
+  Initialize PeiCore Fv List.
+
+
+  @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
+  @param SecCoreData     - Pointer to EFI_SEC_PEI_HAND_OFF.
+
+  @return NONE
+
+**/
 VOID
 PeiInitializeFv (
   IN  PEI_CORE_INSTANCE           *PrivateData,
   IN CONST EFI_SEC_PEI_HAND_OFF   *SecCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize PeiCore Fv List.
-
-Arguments:
-  PrivateData     - Pointer to PEI_CORE_INSTANCE.
-  SecCoreData     - Pointer to EFI_SEC_PEI_HAND_OFF.
-
-Returns:
-  NONE
-
---*/
 ;
 
+/**
+  Process Firmware Volum Information once FvInfoPPI install.
+
+
+  @param PeiServices     - General purpose services available to every PEIM.
+  @param NotifyDescriptor EDES_TODO: Add parameter description
+  @param Ppi             EDES_TODO: Add parameter description
+
+  @retval EFI_SUCCESS if the interface could be successfully installed
+
+**/
 EFI_STATUS
 EFIAPI
 FirmwareVolmeInfoPpiNotifyCallback (
@@ -1170,25 +902,21 @@ FirmwareVolmeInfoPpiNotifyCallback (
   IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
   IN VOID                          *Ppi
   )
-/*++
-
-Routine Description:
-
-  Process Firmware Volum Information once FvInfoPPI install.
-
-Arguments:
-
-  PeiServices - General purpose services available to every PEIM.
-
-Returns:
-
-  Status -  EFI_SUCCESS if the interface could be successfully
-            installed
-
---*/
 ;
 
+/**
 
+  Given the input VolumeHandle, search for the next matching name file.
+
+
+  @param FileName        - File name to search.
+  @param VolumeHandle    - The current FV to search.
+  @param FileHandle      - Pointer to the file matching name in VolumeHandle.
+                         - NULL if file not found
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsFindFileByName (
@@ -1196,103 +924,55 @@ PeiFfsFindFileByName (
   IN  EFI_PEI_FV_HANDLE     VolumeHandle,
   OUT EFI_PEI_FILE_HANDLE   *FileHandle
   )
-/*++
-
-Routine Description:
-
-  Given the input VolumeHandle, search for the next matching name file.
-
-Arguments:
-
-  FileName      - File name to search.
-  VolumeHandle  - The current FV to search.
-  FileHandle    - Pointer to the file matching name in VolumeHandle.
-                - NULL if file not found
-Returns:
-  EFI_STATUS
-
---*/
 ;
 
+/**
 
+  Returns information about a specific file.
+
+
+  @param FileHandle      - The handle to file.
+  @param FileInfo        - Pointer to the file information.
+
+  @retval EFI_INVALID_PARAMETER Invalid FileHandle or FileInfo.
+  @retval EFI_SUCCESS           Success to collect file info.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsGetFileInfo (
   IN EFI_PEI_FILE_HANDLE  FileHandle,
   OUT EFI_FV_FILE_INFO    *FileInfo
   )
-/*++
-
-Routine Description:
-
-  Collect information of given file.
-
-Arguments:
-  FileHandle   - The handle to file.
-  FileInfo     - Pointer to the file information.
-
-Returns:
-  EFI_STATUS
-
---*/
 ;
 
+/**
+
+  Collect information of given Fv Volume.
+
+  @param VolumeHandle    - The handle to Fv Volume.
+  @param VolumeInfo      - The pointer to volume information.
+
+  @retval EFI_INVALID_PARAMETER VolumeInfo is NULL
+  @retval EFI_SUCCESS           Success to collect fv info.
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsGetVolumeInfo (
   IN EFI_PEI_FV_HANDLE  VolumeHandle,
   OUT EFI_FV_INFO       *VolumeInfo
   )
-/*++
-
-Routine Description:
-
-  Collect information of given Fv Volume.
-
-Arguments:
-  VolumeHandle    - The handle to Fv Volume.
-  VolumeInfo      - The pointer to volume information.
-
-Returns:
-  EFI_STATUS
-
---*/
 ;
-
-
-EFI_STATUS
-EFIAPI
-PeiRegisterForShadow (
-  IN EFI_PEI_FILE_HANDLE       FileHandle
-  )
-/*++
-
-Routine Description:
-
-  This routine enable a PEIM to register itself to shadow when PEI Foundation
-  discovery permanent memory.
-
-Arguments:
-  FileHandle  - File handle of a PEIM.
-
-Returns:
-  EFI_NOT_FOUND        - The file handle doesn't point to PEIM itself.
-  EFI_ALREADY_STARTED  - Indicate that the PEIM has been registered itself.
-  EFI_SUCCESS          - Successfully to register itself.
-
---*/
-;
-
 
 /**
   This routine enable a PEIM to register itself to shadow when PEI Foundation
   discovery permanent memory.
 
-	@param FileHandle  	File handle of a PEIM.
+  @param FileHandle             File handle of a PEIM.
 
-  @retval EFI_NOT_FOUND  				The file handle doesn't point to PEIM itself.
-  @retval EFI_ALREADY_STARTED		Indicate that the PEIM has been registered itself.
-  @retval EFI_SUCCESS						Successfully to register itself.
+  @retval EFI_NOT_FOUND         The file handle doesn't point to PEIM itself.
+  @retval EFI_ALREADY_STARTED   Indicate that the PEIM has been registered itself.
+  @retval EFI_SUCCESS           Successfully to register itself.
 
 **/
 EFI_STATUS
@@ -1302,6 +982,23 @@ PeiRegisterForShadow (
   )
 ;
 
+/**
+  Given the input file pointer, search for the next matching file in the
+  FFS volume as defined by SearchType. The search starts from FileHeader inside
+  the Firmware Volume defined by FwVolHeader.
+
+
+  @param FvHandle        Pointer to the FV header of the volume to search
+  @param FileName        File name
+  @param SearchType      Filter to find only files of this type.
+                         Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
+  @param FileHandle      This parameter must point to a valid FFS volume.
+  @param AprioriFile     Pointer to AprioriFile image in this FV if has
+
+  @return EFI_NOT_FOUND  No files matching the search criteria were found
+  @retval EFI_SUCCESS    Success to search given file
+
+**/
 EFI_STATUS
 PeiFindFileEx (
   IN  CONST EFI_PEI_FV_HANDLE        FvHandle,
@@ -1310,63 +1007,34 @@ PeiFindFileEx (
   IN OUT    EFI_PEI_FILE_HANDLE      *FileHandle,
   IN OUT    EFI_PEI_FV_HANDLE        *AprioriFile  OPTIONAL
   )
-/*++
-
-Routine Description:
-    Given the input file pointer, search for the next matching file in the
-    FFS volume as defined by SearchType. The search starts from FileHeader inside
-    the Firmware Volume defined by FwVolHeader.
-
-Arguments:
-    PeiServices - Pointer to the PEI Core Services Table.
-    SearchType - Filter to find only files of this type.
-      Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-    FwVolHeader - Pointer to the FV header of the volume to search.
-      This parameter must point to a valid FFS volume.
-    FileHeader  - Pointer to the current file from which to begin searching.
-      This pointer will be updated upon return to reflect the file found.
-    Flag        - Indicator for if this is for PEI Dispath search
-
-Returns:
-    EFI_NOT_FOUND - No files matching the search criteria were found
-    EFI_SUCCESS
-
---*/
 ;
 
+/**
+
+  Install Pei Load File PPI.
+
+
+  @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
+  @param OldCoreData     - Pointer to PEI_CORE_INSTANCE.
+
+**/
 VOID
 InitializeImageServices (
   IN  PEI_CORE_INSTANCE   *PrivateData,
   IN  PEI_CORE_INSTANCE   *OldCoreData
   )
-/*++
-
-Routine Description:
-
-  Install Pei Load File PPI.
-
-Arguments:
-
-  PrivateData    - Pointer to PEI_CORE_INSTANCE.
-  OldCoreData    - Pointer to PEI_CORE_INSTANCE.
-
-Returns:
-
-  NONE.
-
---*/
 ;
 
 /**
   Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
 
-	@param PeiServices          Pointer to the PEI Core Services Table.
-	@param FileHandle  	        File handle of a Fv type file.
+  @param PeiServices          Pointer to the PEI Core Services Table.
+  @param FileHandle           File handle of a Fv type file.
   @param AuthenticationState  Pointer to attestation authentication state of image.
 
 
-  @retval EFI_NOT_FOUND  				FV image can't be found.
-  @retval EFI_SUCCESS						Successfully to process it.
+  @retval EFI_NOT_FOUND       FV image can't be found.
+  @retval EFI_SUCCESS         Successfully to process it.
 
 **/
 EFI_STATUS

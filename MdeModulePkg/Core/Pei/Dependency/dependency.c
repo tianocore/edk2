@@ -1,4 +1,9 @@
 /** @file
+  PEI Dispatcher Dependency Evaluator
+
+  This routine evaluates a dependency expression (DEPENDENCY_EXPRESSION) to determine
+  if a driver can be scheduled for execution.  The criteria for
+  schedulability is that the dependency expression is satisfied.
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -9,47 +14,30 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  dependency.c
-
-Abstract:
-
-  PEI Dispatcher Dependency Evaluator
-
-  This routine evaluates a dependency expression (DEPENDENCY_EXPRESSION) to determine
-  if a driver can be scheduled for execution.  The criteria for
-  schedulability is that the dependency expression is satisfied.
-  
 **/
 
 #include <PeiMain.h>
 #include "dependency.h"
 
-STATIC
-BOOLEAN
-IsPpiInstalled (
-  IN EFI_PEI_SERVICES  **PeiServices,
-  IN EVAL_STACK_ENTRY  *Stack
-  )
-/*++
-
-Routine Description:
+/**
 
   This routine determines if a PPI has been installed.
   The truth value of a GUID is determined by if the PPI has
   been published and can be queried from the PPI database.
 
-Arguments:
-  PeiServices - The PEI core services table.
-  Stack       - Reference to EVAL_STACK_ENTRY that contains PPI GUID to check
 
-Returns:
+  @param PeiServices     The PEI core services table.
+  @param Stack           Reference to EVAL_STACK_ENTRY that contains PPI GUID to check
 
-  True if the PPI is already installed.
-  False if the PPI has yet to be installed.
+  @retval TRUE  if the PPI is already installed.
+  @retval FALSE if the PPI has yet to be installed.
 
---*/
+**/
+BOOLEAN
+IsPpiInstalled (
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN EVAL_STACK_ENTRY  *Stack
+  )
 {
   VOID        *PeiInstance;
   EFI_STATUS  Status;
@@ -86,15 +74,7 @@ Returns:
   return TRUE;
 }
 
-
-BOOLEAN
-PeimDispatchReadiness (
-  IN EFI_PEI_SERVICES   **PeiServices,
-  IN VOID               *DependencyExpression
-  )
-/*++
-
-Routine Description:
+/**
 
   This is the POSTFIX version of the dependency evaluator.  When a
   PUSH [PPI GUID] is encountered, a pointer to the GUID is stored on
@@ -103,22 +83,22 @@ Routine Description:
   some time savings as not all PPIs must be checked for certain
   operation types (AND, OR).
 
-Arguments:
 
-  PeiServices               - Calling context.
+  @param PeiServices            Calling context.
+  @param DependencyExpression   Pointer to a dependency expression.  The Grammar adheres to
+                                the BNF described above and is stored in postfix notation.
 
-  DependencyExpression      - Pointer to a dependency expression.  The Grammar adheres to 
-                              the BNF described above and is stored in postfix notation.
-Returns:
+  @retval TRUE      if it is a well-formed Grammar
+  @retval FALSE     if the dependency expression overflows the evaluation stack
+                    if the dependency expression underflows the evaluation stack
+                    if the dependency expression is not a well-formed Grammar.
 
-  Status = EFI_SUCCESS            if it is a well-formed Grammar
-           EFI_INVALID_PARAMETER  if the dependency expression overflows
-                                  the evaluation stack
-           EFI_INVALID_PARAMETER  if the dependency expression underflows
-                                  the evaluation stack
-           EFI_INVALID_PARAMETER  if the dependency expression is not a
-                                  well-formed Grammar.
---*/
+**/
+BOOLEAN
+PeimDispatchReadiness (
+  IN EFI_PEI_SERVICES   **PeiServices,
+  IN VOID               *DependencyExpression
+  )
 {
   DEPENDENCY_EXPRESSION_OPERAND  *Iterator;
   EVAL_STACK_ENTRY               *StackPtr;
