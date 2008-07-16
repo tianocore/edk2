@@ -264,7 +264,7 @@ UpdateFormPackageData (
 
 Fail:
   if (!Updated) {
-    gBS->FreePool (*TempBuffer);
+    FreePool (*TempBuffer);
     *TempBufferSize = 0;
     return EFI_NOT_FOUND;
   }
@@ -335,7 +335,7 @@ IfrLibUpdateForm (
 
     Status = HiiDatabase->ExportPackageLists (HiiDatabase, Handle, &BufferSize, HiiPackageList);
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (HiiPackageList);
+      FreePool (HiiPackageList);
       return Status;
     }
   }
@@ -370,7 +370,7 @@ IfrLibUpdateForm (
           }
           CopyMem (UpdateBufferPos, TempBuffer, TempBufferSize);
           UpdateBufferPos += TempBufferSize;
-          gBS->FreePool (TempBuffer);
+          FreePool (TempBuffer);
           continue;
         }
       }
@@ -380,7 +380,7 @@ IfrLibUpdateForm (
     } else if (Status == EFI_NOT_FOUND) {
       break;
     } else {
-      gBS->FreePool (HiiPackageList);
+      FreePool (HiiPackageList);
       return Status;
     }
   }
@@ -391,7 +391,7 @@ IfrLibUpdateForm (
   BufferSize = UpdateBufferPos - (UINT8 *) UpdateBuffer;
   CopyMem (&UpdateBuffer->PackageLength, &BufferSize, sizeof (UINT32));
 
-  gBS->FreePool (HiiPackageList);
+  FreePool (HiiPackageList);
 
   return HiiDatabase->UpdatePackageList (HiiDatabase, Handle, UpdateBuffer);
 }

@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "LibraryInternal.h"
 
-STATIC EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
-
 /**
   Create GUIDed opcode for banner. Banner opcode
   EFI_IFR_EXTEND_OP_BANNER is extended opcode specific

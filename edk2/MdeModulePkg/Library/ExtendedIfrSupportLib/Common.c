@@ -53,7 +53,7 @@ ExtendedIfrSupportLibConstructor (
 
 
 
-STATIC EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
 
 /**
   Extract formset class for given HII handle.
@@ -170,7 +170,7 @@ IfrLibExtractClassFromHiiHandle (
     Offset += PackageHeader.Length;
   }
 
-  gBS->FreePool (HiiPackageList);
+  FreePool (HiiPackageList);
 
   return EFI_SUCCESS;
 }
