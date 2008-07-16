@@ -721,7 +721,7 @@ WaitForSingleEvent (
   EFI_EVENT   TimerEvent;
   EFI_EVENT   WaitList[2];
 
-  if (Timeout) {
+  if (Timeout != 0) {
     //
     // Create a timer event
     //
