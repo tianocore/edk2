@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#include "Pcibus.h"
+#include "PciBus.h"
 
 //
 // PCI Bus Driver Global Variables
