@@ -694,14 +694,14 @@ GetToken (
 
   @param RequestedWidth  The width of the pop-up.
   @param NumberOfLines   The number of lines.
-  @param ArrayOfStrings  The array of string to be printed.
+  @param Marker          The variable argument list for the list of string to be printed.
 
 **/
 VOID
 CreateSharedPopUp (
   IN  UINTN                       RequestedWidth,
   IN  UINTN                       NumberOfLines,
-  IN  CHAR16                      **ArrayOfStrings
+  IN  VA_LIST                     Marker
   )
 ;
 
@@ -739,7 +739,6 @@ CreateDialog (
   IN  UINTN                       MaximumStringSize,
   OUT CHAR16                      *StringBuffer,
   OUT EFI_INPUT_KEY               *KeyValue,
-  IN  CHAR16                      *String,
   ...
   )
 ;

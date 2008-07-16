@@ -364,7 +364,6 @@ UiWaitForSingleEvent (
 
   @param RequestedWidth  The width of the pop-up.
   @param NumberOfLines   The number of lines.
-  @param ArrayOfStrings  The array of string to be printed.
   @param ...             A series of text strings that displayed in the pop-up.
 
 **/
@@ -372,7 +371,6 @@ VOID
 CreatePopUp (
   IN  UINTN                       ScreenWidth,
   IN  UINTN                       NumberOfLines,
-  IN  CHAR16                      *ArrayOfStrings,
   ...
   )
 ;
