@@ -1,7 +1,11 @@
 /** @file
-  This file declares Security2 Architectural PPI.
+  This file declares Pei Security2 PPI.
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  This PPI is installed by some platform PEIM that abstracts the security 
+  policy to the PEI Foundation, namely the case of a PEIM¡¯s authentication 
+  state being returned during the PEI section extraction process.
+
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -26,7 +30,9 @@
 typedef struct _EFI_PEI_SECURITY2_PPI  EFI_PEI_SECURITY2_PPI;
 
 /**
-   
+  Allows the platform builder to implement a security policy 
+  in response to varying file authentication states.
+
   This service is published by some platform PEIM. The purpose of
   this service is to expose a given platform's policy-based
   response to the PEI Foundation. For example, if there is a PEIM
@@ -57,6 +63,8 @@ typedef struct _EFI_PEI_SECURITY2_PPI  EFI_PEI_SECURITY2_PPI;
   state. 3) Lock the firmware hubs in response to an unsigned
   PEIM being discovered. These latter behaviors are platform-
   and market-specific and thus outside the scope of the PEI CIS.
+
+  @param PeiServices   An indirect pointer to the PEI Services Table published by the PEI Foundation.
 
   @param This   Interface pointer that implements the particular
                 EFI_PEI_SECURITY2_PPI instance.

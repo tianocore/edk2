@@ -1,7 +1,7 @@
 /** @file
   Provides decompression services to the PEI Foundatoin.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -23,7 +23,9 @@
 
 typedef struct _EFI_PEI_DECOMPRESS_PPI  EFI_PEI_DECOMPRESS_PPI;
 
-/**                                                              
+/** 
+  Decompress a single compression section in a firmware file.
+                                                               
   Decompresses the data in a compressed section and returns it
   as a series of standard PI Firmware File Sections. The
   required memory is allocated from permanent memory.

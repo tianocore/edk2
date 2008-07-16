@@ -1,7 +1,10 @@
 /** @file
-  This file declares Reset PPI used to reset the platform
+  This file declares Reset PPI used to reset the platform.
+  
+  This PPI is installed by some platform- or chipset-specific PEIM that 
+  abstracts the Reset Service to other agents.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -19,11 +22,20 @@
 #ifndef __RESET_PPI_H__
 #define __RESET_PPI_H__
 
+#include <Pi/PiPeiCis.h>
+
 #define EFI_PEI_RESET_PPI_GUID \
   { \
     0xef398d58, 0x9dfd, 0x4103, {0xbf, 0x94, 0x78, 0xc6, 0xf4, 0xfe, 0x71, 0x2f } \
   }
 
+/**
+  This PPI provides provide a simple reset service. 
+
+  @param ResetSystem
+  A service to reset the entire platform.
+
+**/
 typedef struct {
   EFI_PEI_RESET_SYSTEM  ResetSystem;
 } EFI_PEI_RESET_PPI;

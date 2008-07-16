@@ -1,7 +1,8 @@
 /** @file
   This file declares Temporary RAM Support PPI.
+  This Ppi provides the service that migrates temporary RAM into permanent memory.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -55,7 +56,14 @@ EFI_STATUS
   IN UINTN                    CopySize
 );
 
+/**
+  This service abstracts the ability to migrate contents of the platform early memory store.
 
+  @param ResetSystem
+  Perform the migration of contents of Temporary RAM to Permanent RAM.
+  Terminate the Temporary RAM if it cannot coexist with the Permanent RAM.
+
+**/
 typedef struct {
   TEMPORARY_RAM_MIGRATION   TemporaryRamMigration;
 } TEMPORARY_RAM_SUPPORT_PPI;

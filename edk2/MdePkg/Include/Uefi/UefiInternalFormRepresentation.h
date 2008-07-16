@@ -1,4 +1,3 @@
-
 /** @file
   This file defines the encoding for the VFR (Visual Form Representation) language.
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
@@ -581,6 +580,9 @@ typedef union {
   EFI_STRING_ID   string;
 } EFI_IFR_TYPE_VALUE;
 
+//
+// IFR Opcodes
+//
 #define EFI_IFR_FORM_OP                0x01
 #define EFI_IFR_SUBTITLE_OP            0x02
 #define EFI_IFR_TEXT_OP                0x03

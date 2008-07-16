@@ -1,7 +1,8 @@
 /** @file
   This file declares Status Code PPI.
+  This ppi provides service that allows PEIMs to report status codes.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -19,6 +20,8 @@
 #ifndef __STATUS_CODE_PPI_H__
 #define __STATUS_CODE_PPI_H__
 
+#include <Pi/PiPeiCis.h>
+
 #define EFI_PEI_REPORT_PROGRESS_CODE_PPI_GUID \
   { 0x229832d3, 0x7a30, 0x4b36, {0xb8, 0x27, 0xf4, 0xc, 0xb7, 0xd4, 0x54, 0x36 } }
 
@@ -28,7 +31,7 @@
   of this service in the system.
 
   @param ReportStatusCode
-  Service that allows PEIMs to report status codes. This function is defined in Peicis.h
+  Service that allows PEIMs to report status codes. This function is defined in PiPeicis.h
 
 **/
 typedef struct {

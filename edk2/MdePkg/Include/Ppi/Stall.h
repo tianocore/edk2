@@ -1,9 +1,9 @@
 /** @file
   This file declares Stall PPI.
 
-  This code abstracts the PEI core to provide Stall services.
+  This ppi abstracts the blocking stall service to other agents.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -35,7 +35,7 @@ typedef struct _EFI_PEI_STALL_PPI EFI_PEI_STALL_PPI;
   @param  This           Pointer to the local data for the interface.
   @param  Microseconds   Number of microseconds for which to stall.
 
-  @retval EFI_SUCCESS           The service provided at least the required delay.
+  @retval EFI_SUCCESS    The service provided at least the required delay.
 
 **/
 typedef

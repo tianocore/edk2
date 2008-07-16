@@ -1,7 +1,8 @@
 /** @file
-  This file declares CPU IO PPI that abstracts CPU IO access
+  This PPI provides a set of memory- and I/O-based services. 
+  The perspective of the services is that of the processor, not the bus or system.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -90,7 +91,7 @@ typedef struct {
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT8
+  @return UINT8          An 8-bit value is returned from the I/O space.
 
 **/
 typedef
@@ -108,7 +109,7 @@ UINT8
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT16
+  @return UINT16         A 16-bit value is returned from the I/O space.
 
 **/
 typedef
@@ -126,7 +127,7 @@ UINT16
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT32
+  @return UINT32         A 32-bit value is returned from the I/O space.
 
 **/
 typedef
@@ -144,7 +145,7 @@ UINT32
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT64
+  @return UINT64         A 64-bit value is returned from the I/O space.
 
 **/
 typedef
@@ -242,7 +243,7 @@ VOID
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT8
+  @return UINT8          An 8-bit value is returned from the memory space.
 
 **/
 typedef
@@ -260,7 +261,7 @@ UINT8
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT16
+  @return UINT16         A 16-bit value is returned from the memory space.
 
 **/
 typedef
@@ -278,7 +279,7 @@ UINT16
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT32
+  @return UINT32         A 32-bit value is returned from the memory space.
 
 **/
 typedef
@@ -296,7 +297,7 @@ UINT32
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT64
+  @return UINT64         A 64-bit value is returned from the memory space.
 
 **/
 typedef

@@ -29,6 +29,8 @@ typedef struct _EFI_PEI_FIRMWARE_VOLUME_PPI   EFI_PEI_FIRMWARE_VOLUME_PPI;
 
 
 /**
+  Process a firmware volume and create a volume handle.
+
   Create a volume handle from the information in the buffer. For
   memory-mapped firmware volumes, Buffer and BufferSize refer to
   the start of the firmware volume and the firmware volume size.
@@ -60,34 +62,11 @@ EFI_STATUS
   OUT       EFI_PEI_FV_HANDLE           *FvHandle
 );
 
-
 /**
-  Create a volume handle from the information in the buffer. For
-  memory-mapped firmware volumes, Buffer and BufferSize refer to
-  the start of the firmware volume and the firmware volume size.
-  For non memory-mapped firmware volumes, this points to a
-  buffer which contains the necessary information for creating
-  the firmware volume handle. Normally, these values are derived
-  from the EFI_FIRMWARE_VOLUME_INFO_PPI.
-  
-  
-  @param This         Points to this instance of the
-                      EFI_PEI_FIRMWARE_VOLUME_PPI
-  @param Buffer       Points to the start of the buffer.
-  @param BufferSize   Size of the buffer.
-  @param FvHandle     Points to the returned firmware volume
-                      handle. The firmware volume handle must
-                      be unique within the system. 
+  Finds the next file of the specified type.
 
-
-  @retval EFI_SUCCESS           Firmware volume handle.
-  @retval EFI_VOLUME_CORRUPTED  Volume was corrupt.
-
-**/
-
-/**
-  This service enables PEI modules to discover additional firmware files. The FileHandle must be
-  unique within the system.
+  This service enables PEI modules to discover additional firmware files. 
+  The FileHandle must be unique within the system.
 
   @param This       Points to this instance of the
                     EFI_PEI_FIRMWARE_VOLUME_PPI. SearchType A filter
@@ -104,8 +83,7 @@ EFI_STATUS
 
 
   @retval EFI_SUCCESS   The file was found.
-  @retval EFI_NOT_FOUND The file was not found. FileHandle
-                        contains NULL.
+  @retval EFI_NOT_FOUND The file was not found. FileHandle contains NULL.
 **/ 
 typedef EFI_STATUS
 (EFIAPI *EFI_PEI_FV_FIND_FILE_TYPE)( 
@@ -117,7 +95,8 @@ typedef EFI_STATUS
 
 
 /**
-   
+  Find a file within a volume by its name. 
+  
   This service searches for files with a specific name, within
   either the specified firmware volume or all firmware volumes.
 
@@ -156,6 +135,8 @@ EFI_STATUS
 
 
 /**
+  Returns information about a specific file.
+
   This function returns information about a specific
   file, including its file name, type, attributes, starting
   address and size. 
@@ -211,6 +192,8 @@ EFI_STATUS (EFIAPI *EFI_PEI_FV_GET_INFO)(
 );
 
 /**
+  Find the next matching section in the firmware file.
+  
   This service enables PEI modules to discover sections of a given type within a valid file.
   
   @param This   Points to this instance of the

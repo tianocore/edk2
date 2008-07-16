@@ -2,9 +2,9 @@
   If a GUID-defined section is encountered when doing section extraction, 
   the PEI Foundation or the EFI_PEI_FILE_LOADER_PPI instance 
   calls the appropriate instance of the GUIDed Section Extraction PPI 
-  to extract the section stream contained therein.. 
+  to extract the section stream contained therein. 
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -39,6 +39,9 @@ typedef struct _EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI   EFI_PEI_GUIDED_SECTION_E
 
 
 /**
+  Processes the input section and returns the data contained therein 
+  along with the authentication status.
+
   The ExtractSection() function processes the input section and
   returns a pointer to the section contents. If the section being
   extracted does not require processing (if the section
@@ -85,7 +88,7 @@ typedef struct _EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI   EFI_PEI_GUIDED_SECTION_E
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient
                                 resources to process the request.
   
-  @reteval EFI_INVALID_PARAMETER The GUID in InputSection does
+  @retval EFI_INVALID_PARAMETER The GUID in InputSection does
                                 not match this instance of the
                                 GUIDed Section Extraction PPI.
 **/
