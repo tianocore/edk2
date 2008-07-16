@@ -1128,9 +1128,6 @@ GetLineByWidth (
   @param  OptionalString         The option string.
   @param  SkipValue              The number of lins to skip.
 
-  @retval TRUE                   This Menu Option is selectable.
-  @retval FALSE                  This Menu Option could not be selected.
-
 **/
 VOID
 UpdateOptionSkipLines (
