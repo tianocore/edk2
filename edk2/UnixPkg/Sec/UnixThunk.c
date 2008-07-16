@@ -58,6 +58,7 @@ VOID
 SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs))
 {
   struct itimerval timerval;
+  UINT32 remainder;
 
   if (!settimer_initialized) {
     struct sigaction act;
@@ -73,9 +74,10 @@ SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs))
       printf ("SetTimer: gettimeofday error %s\n", strerror (errno));
     }
   }
-  timerval.it_value.tv_sec = PeriodMs / 1000;
-  timerval.it_value.tv_usec = (PeriodMs % 1000) * 1000;
-  timerval.it_value.tv_sec = PeriodMs / 1000;
+  timerval.it_value.tv_sec = DivU64x32(PeriodMs, 1000);
+  DivU64x32Remainder(PeriodMs, 1000, &remainder);
+  timerval.it_value.tv_usec = remainder * 1000;
+  timerval.it_value.tv_sec = DivU64x32(PeriodMs, 1000);
   timerval.it_interval = timerval.it_value;
   
   if (setitimer (ITIMER_REAL, &timerval, NULL) != 0) {

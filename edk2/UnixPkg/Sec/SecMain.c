@@ -53,17 +53,17 @@ EFI_PEI_PE_COFF_LOADER_PROTOCOL_INSTANCE  mPeiEfiPeiPeCoffLoaderInstance = {
 
 
 
-EFI_PEI_PE_COFF_LOADER_PROTOCOL           *gPeiEfiPeiPeCoffLoader = &mPeiEfiPeiPeCoffLoaderInstance.PeCoff;
+EFI_PEI_PE_COFF_LOADER_PROTOCOL           *gPeiEfiPeiPeCoffLoader    = &mPeiEfiPeiPeCoffLoaderInstance.PeCoff;
 
-UNIX_PEI_LOAD_FILE_PPI                      mSecNtLoadFilePpi     = { SecWinNtPeiLoadFile };
+UNIX_PEI_LOAD_FILE_PPI                    mSecNtLoadFilePpi          = { SecWinNtPeiLoadFile };
 
-PEI_UNIX_AUTOSCAN_PPI                       mSecNtAutoScanPpi     = { SecWinNtPeiAutoScan };
+PEI_UNIX_AUTOSCAN_PPI                     mSecNtAutoScanPpi          = { SecWinNtPeiAutoScan };
 
-PEI_UNIX_THUNK_PPI                          mSecWinNtThunkPpi     = { SecWinNtWinNtThunkAddress };
+PEI_UNIX_THUNK_PPI                        mSecWinNtThunkPpi          = { SecWinNtWinNtThunkAddress };
 
-EFI_PEI_PROGRESS_CODE_PPI                 mSecStatusCodePpi     = { SecPeiReportStatusCode };
+EFI_PEI_PROGRESS_CODE_PPI                 mSecStatusCodePpi          = { SecPeiReportStatusCode };
 
-UNIX_FWH_PPI                                mSecFwhInformationPpi = { SecWinNtFdAddress };
+UNIX_FWH_PPI                              mSecFwhInformationPpi      = { SecWinNtFdAddress };
 
 TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
 
