@@ -57,6 +57,10 @@ HiiLibNewString (
   while (*LangStrings != 0) {
     HiiLibGetNextLanguage (&LangStrings, Lang);
 
+    //
+    // For each language supported by the package,
+    // a string token is created.
+    //
     Status = mHiiStringProt->NewString (
                                  mHiiStringProt,
                                  PackageList,
@@ -119,6 +123,10 @@ HiiLibSetString (
   while (*LangStrings != 0) {
     HiiLibGetNextLanguage (&LangStrings, Lang);
 
+    //
+    // For each language supported by the package,
+    // the string is updated.
+    //
     Status = mHiiStringProt->SetString (
                                  mHiiStringProt,
                                  PackageList,
@@ -195,7 +203,7 @@ HiiLibGetStringFromToken (
 
 Out:
   if (HiiHandleBuffer != NULL) {
-    gBS->FreePool (HiiHandleBuffer);
+    FreePool (HiiHandleBuffer);
   }
   return Status;
 }
@@ -262,7 +270,7 @@ HiiLibGetString (
     
     LangStrings = Languages;
     HiiLibGetNextLanguage (&LangStrings, Lang);
-    gBS->FreePool (Languages);
+    FreePool (Languages);
 
     Status = mHiiStringProt->GetString (
                                  mHiiStringProt,
@@ -318,7 +326,7 @@ HiiLibGetStringFromHandle (
 
   Status = HiiLibGetString (HiiHandle, StringId, *String, &StringSize);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    gBS->FreePool (*String);
+    FreePool (*String);
     *String = AllocateZeroPool (StringSize);
     if (*String == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -336,7 +344,7 @@ HiiLibGetStringFromHandle (
 // Each entry is 5 CHAR8 values long.  The first 3 CHAR8 values are the ISO 639-2 code.
 // The last 2 CHAR8 values are the ISO 639-1 code.
 //
-CHAR8 Iso639ToRfc3066ConversionTable[] =
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 Iso639ToRfc3066ConversionTable[] =
 "\
 aaraa\
 abkab\

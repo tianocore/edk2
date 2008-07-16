@@ -124,7 +124,6 @@ HiiLibGetSupportedLanguages (
   UINTN       BufferSize;
   CHAR8       *LanguageString;
 
-  ASSERT (HiiHandle != NULL);
   ASSERT (IsHiiHandleRegistered (HiiHandle));
   //
   // Collect current supported Languages for given HII handle
@@ -140,7 +139,7 @@ HiiLibGetSupportedLanguages (
   Status = mHiiStringProt->GetLanguages (mHiiStringProt, HiiHandle, LanguageString, &BufferSize);
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    gBS->FreePool (LanguageString);
+    FreePool (LanguageString);
     LanguageString = AllocateZeroPool (BufferSize);
     if (LanguageString == NULL) {
       return NULL;
@@ -190,7 +189,7 @@ HiiLibGetSupportedLanguageNumber (
     HiiLibGetNextLanguage (&LanguageString, Lang);
     LangNumber++;
   }
-  gBS->FreePool (Languages);
+  FreePool (Languages);
 
   return LangNumber;
 }
@@ -235,7 +234,7 @@ HiiLibGetSupportedSecondaryLanguages (
   Status = mHiiStringProt->GetSecondaryLanguages (mHiiStringProt, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    gBS->FreePool (LanguageString);
+    FreePool (LanguageString);
     LanguageString = AllocateZeroPool (BufferSize);
     if (LanguageString == NULL) {
       return NULL;
