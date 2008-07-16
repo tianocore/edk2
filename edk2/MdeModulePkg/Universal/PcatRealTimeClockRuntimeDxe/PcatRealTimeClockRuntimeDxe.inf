@@ -53,6 +53,7 @@
   UefiLib
   DebugLib
   BaseLib
+  PcdLib
 
 [Guids]
   gEfiGenericPlatformVariableGuid               # ALWAYS_CONSUMED
