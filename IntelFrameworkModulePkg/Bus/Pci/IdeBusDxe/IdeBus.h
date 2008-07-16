@@ -38,7 +38,7 @@
 #include <Library/DevicePathLib.h>
 
 #include <IndustryStandard/Pci22.h>
-#include "idedata.h"
+#include "IdeData.h"
 
 //
 // Extra Definition to porting
@@ -115,7 +115,7 @@ extern EFI_DRIVER_BINDING_PROTOCOL      gIDEBusDriverBinding;
 extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL  gIDEBusDriverDiagnostics;
 extern EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gIDEBusDriverDiagnostics2;
 
-#include "ide.h"
+#include "Ide.h"
 
 //
 // Prototypes
