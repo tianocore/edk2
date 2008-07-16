@@ -39,7 +39,7 @@
 [Sources.common]
   PciLib.c
   PciIo.c
-  Pcibus.c
+  PciBus.c
   PciDeviceSupport.c
   ComponentName.c
   ComponentName.h
@@ -64,7 +64,7 @@
   PciDeviceSupport.h
   PciCommand.h
   PciIo.h
-  Pcibus.h
+  PciBus.h
 
 [Packages]
   MdePkg/MdePkg.dec
