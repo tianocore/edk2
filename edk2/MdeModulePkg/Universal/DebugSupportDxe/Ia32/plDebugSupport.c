@@ -180,7 +180,7 @@ Returns:
 
   Status = EFI_SUCCESS;
 
-  if (FeaturePcdGet (PcdNtEmulatorEnable)) {
+  if (!FeaturePcdGet (PcdNtEmulatorEnable)) {
     if (CompareDescriptor (&IdtEntryTable[ExceptionType].NewDesc, &NullDesc)) {
       //
       // we've already installed to this vector
