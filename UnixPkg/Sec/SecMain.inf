@@ -18,7 +18,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SecMain
   FILE_GUID                      = f43be88c-8985-11db-8f78-0040d02b1835
-  MODULE_TYPE                    = SEC
+  MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -73,4 +73,8 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize
 
 [BuildOptions.common]
-  GCC:*_*_IA32_DLINK_FLAGS =
+   GCC:*_*_IA32_DLINK_FLAGS = -o $(BIN_DIR)/SecMain.exe -m elf_i386 -dynamic-linker /lib/ld-linux.so.2 /usr/lib/crt1.o /usr/lib/crti.o -L/usr/X11R6/lib -lXext -lX11 /usr/lib/crtn.o
+   GCC:*_*_*_DLINK2_FLAGS = -lc
+   GCC:*_*_IA32_CC_FLAGS = -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
+   GCC:*_*_IA32_PP_FLAGS = -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+   GCC:*_*_IA32_ASM_FLAGS = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h

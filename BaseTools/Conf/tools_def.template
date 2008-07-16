@@ -497,14 +497,14 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_ELFGCC_IA32_CC_PATH               = DEF(ELFGCC_BIN)/gcc
 *_ELFGCC_IA32_SLINK_PATH            = DEF(ELFGCC_BIN)/ar
 *_ELFGCC_IA32_DLINK_PATH            = DEF(ELFGCC_BIN)/ld
+*_ELFGCC_IA32_DLINK2_PATH           = DEF(ELFGCC_BIN)/ld
 *_ELFGCC_IA32_ASM_PATH              = DEF(ELFGCC_BIN)/gcc
 *_ELFGCC_IA32_PP_PATH               = DEF(ELFGCC_BIN)/gcc
 *_ELFGCC_IA32_VFRPP_PATH            = DEF(ELFGCC_BIN)/gcc
 *_ELFGCC_*_MAKE_PATH                    = make
 
-*_ELFGCC_*_MAKE_FLAGS                   = -i
 *_ELFGCC_IA32_CC_FLAGS                   = -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
-*_ELFGCC_*_DLINK_FLAGS                   = -melf_i386 -nostdlib --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
+*_ELFGCC_*_DLINK_FLAGS                   = -melf_i386 -nostdlib --shared --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
 #*_ELFGCC_*_DLINK_FLAGS                   = -melf_i386 -nostdlib -n -q -Ttext 0x220 --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
 *_ELFGCC_*_ASM_FLAGS                     = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_ELFGCC_*_PP_FLAGS                      = -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
