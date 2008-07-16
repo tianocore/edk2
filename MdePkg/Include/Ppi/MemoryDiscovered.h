@@ -1,10 +1,11 @@
 /** @file
   This file declares Memory Discovered PPI.
-  This PPI is installed by the PEI Foundation at the point of system 
-  evolution when the permanent memory size has been registered and 
-  waiting PEIMs can use the main memory store. 
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  This PPI is published by the PEI Foundation when the main memory is installed. 
+  It is essentially a PPI with no associated interface. Its purpose is to be used
+  as a signal for other PEIMs who can register for a notification on its installation. 
+
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -14,8 +15,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  This PPI is defined in PEI CIS
-  Version 0.91.
+  This PPI is defined in PI
+  Version 1.0.
 
 **/
 

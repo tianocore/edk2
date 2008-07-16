@@ -1,7 +1,8 @@
 /** @file
-  This file declares Read-only Variable Service PPI
+  This file declares Read-only Variable Service2 PPI.
+  This ppi permits read-only access to the UEFI variable store during the PEI phase.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -26,6 +27,8 @@
 typedef struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI  EFI_PEI_READ_ONLY_VARIABLE2_PPI;
 
 /**
+  This service retrieves a variable's value using its name and GUID.
+
   Read the specified variable from the UEFI variable store. If the Data 
   buffer is too small to hold the contents of the variable, 
   the error EFI_BUFFER_TOO_SMALL is returned and DataSize is set to the
@@ -73,6 +76,8 @@ EFI_STATUS
 
 
 /**
+  Return the next variable name and GUID.
+
   This function is called multiple times to retrieve the VariableName 
   and VariableGuid of all variables currently available in the system. 
   On each call, the previous results are passed into the interface, 

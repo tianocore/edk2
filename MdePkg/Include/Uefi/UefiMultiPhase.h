@@ -135,16 +135,6 @@ typedef struct _EFI_CERT_BLOCK_RSA_2048_SHA256 {
                     this case the value is
                     EFI_CERT_BLOCK_RSA_2048_SHA256.
 
-  @param Information  The WIN_CERTIFICATE_UEFI_GUID certificate
-                      type allows new types of certificates to
-                      be developed for driver authentication
-                      without requiring a new certificate type.
-                      The CertType defines the format of the
-                      CertData, which length is defined by the
-                      size of the certificate less the fixed
-                      size of the WIN_CERTIFICATE_UEFI_GUID
-                      structure.
-
 **/
 typedef struct _WIN_CERTIFICATE_UEFI_GUID {
   WIN_CERTIFICATE   Hdr;

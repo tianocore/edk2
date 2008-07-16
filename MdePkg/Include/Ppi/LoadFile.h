@@ -25,6 +25,8 @@
 typedef struct _EFI_PEI_LOAD_FILE_PPI EFI_PEI_LOAD_FILE_PPI;
 
 /**
+  Loads a PEIM into memory for subsequent execution.
+
   This service is the single member function of EFI_LOAD_FILE_PPI. This service separates
   image loading and relocating from the PEI Foundation.
   
@@ -57,11 +59,9 @@ typedef struct _EFI_PEI_LOAD_FILE_PPI EFI_PEI_LOAD_FILE_PPI;
   @retval EFI_OUT_OF_RESOURCES  There was not enough memory.
 
   @retval EFI_LOAD_ERROR      There was no supported image in
-                              the file EFI_INVALID_PARAMETER
-                              FileHandle was not a valid
-                              firmware file handle.
+                              the file.
   @retval EFI_INVALID_PARAMETER   EntryPoint was NULL.
-
+                              Or FileHandle was not a valid firmware file handle.
   @retval EFI_NOT_SUPPORTED   An image requires relocations or
                               is not memory mapped.
    
