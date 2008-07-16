@@ -48,15 +48,13 @@ STATIC HII_DATABASE_PRIVATE_DATA mPrivate = {
     HiiGetGlyph,
     HiiGetFontInfo
   },
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
   {
-    HiiNewImage,
-    HiiGetImage,
-    HiiSetImage,
-    HiiDrawImage,
-    HiiDrawImageId
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
   },
-#endif
   {
     HiiNewString,
     HiiGetString,
@@ -102,6 +100,14 @@ STATIC HII_DATABASE_PRIVATE_DATA mPrivate = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   },
   NULL
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_HII_IMAGE_PROTOCOL mImageProtocol = {
+  HiiNewImage,
+  HiiGetImage,
+  HiiSetImage,
+  HiiDrawImage,
+  HiiDrawImageId
 };
 
 /**
@@ -180,21 +186,35 @@ InitializeHiiDatabase (
   }
 
   Handle = NULL;
-  return gBS->InstallMultipleProtocolInterfaces (
-                &Handle,
-                &gEfiHiiFontProtocolGuid,
-                &mPrivate.HiiFont,
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
-                &gEfiHiiImageProtocolGuid,
-                &mPrivate.HiiImage,
-#endif
-                &gEfiHiiStringProtocolGuid,
-                &mPrivate.HiiString,
-                &gEfiHiiDatabaseProtocolGuid,
-                &mPrivate.HiiDatabase,
-                &gEfiHiiConfigRoutingProtocolGuid,
-                &mPrivate.ConfigRouting,
-                NULL
-                );
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Handle,
+                  &gEfiHiiFontProtocolGuid,
+                  &mPrivate.HiiFont,
+                  &gEfiHiiStringProtocolGuid,
+                  &mPrivate.HiiString,
+                  &gEfiHiiDatabaseProtocolGuid,
+                  &mPrivate.HiiDatabase,
+                  &gEfiHiiConfigRoutingProtocolGuid,
+                  &mPrivate.ConfigRouting,
+                  NULL
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (FeaturePcdGet (PcdSupportHiiImageProtocol)) {
+    CopyMem (&mPrivate.HiiImage, &mImageProtocol, sizeof (mImageProtocol));
+
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Handle,
+                    &gEfiHiiImageProtocolGuid,
+                    &mPrivate.HiiImage,
+                    NULL
+                    );
+
+  }
+
+  return Status;
 }
 

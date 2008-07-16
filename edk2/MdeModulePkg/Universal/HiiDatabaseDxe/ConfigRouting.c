@@ -25,8 +25,6 @@ Revision History
 
 #include "HiiDatabase.h"
 
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
-
 /**
   Calculate the number of Unicode characters of the incoming Configuration string,
   not including NULL terminator.
@@ -447,8 +445,6 @@ OutputConfigBody (
 }
 
 
-#endif
-
 /**
   Adjusts the size of a previously allocated buffer.
 
@@ -660,8 +656,6 @@ HiiConfigRoutingExtractConfig (
   OUT EFI_STRING                             *Results
   )
 {
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
-
   HII_DATABASE_PRIVATE_DATA           *Private;
   EFI_STRING                          StringPtr;
   EFI_STRING                          ConfigRequest;
@@ -677,6 +671,15 @@ HiiConfigRoutingExtractConfig (
   EFI_STRING                          AccessResults;
   UINTN                               RemainSize;
   EFI_STRING                          TmpPtr;
+
+  //
+  // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
+  // as FALSE. But this renders the system to not 100% compliant with
+  // UEFI 2.1. Use this with caution.
+  //
+  if (!FeaturePcdGet (PcdSupportFullConfigRoutingProtocol)) {
+    return EFI_UNSUPPORTED;
+  }
 
   if (This == NULL || Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -826,9 +829,6 @@ HiiConfigRoutingExtractConfig (
   }
 
   return EFI_SUCCESS;
-#else
-  return EFI_UNSUPPORTED;
-#endif
 
 }
 
@@ -862,8 +862,6 @@ HiiConfigRoutingExportConfig (
   OUT EFI_STRING                             *Results
   )
 {
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
-
   EFI_STATUS                          Status;
   HII_DATABASE_PRIVATE_DATA           *Private;
   LIST_ENTRY                          StorageListHdr;
@@ -880,6 +878,15 @@ HiiConfigRoutingExportConfig (
   EFI_STRING                          AccessProgress;
   EFI_STRING                          AccessResults;
   UINTN                               TmpSize;
+
+  //
+  // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
+  // as FALSE. But this renders the system to not 100% compliant with
+  // UEFI 2.1. Use this with caution.
+  //
+  if (!FeaturePcdGet (PcdSupportFullConfigRoutingProtocol)) {
+    return EFI_UNSUPPORTED;
+  }
 
   if (This == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1050,9 +1057,6 @@ HiiConfigRoutingExportConfig (
   }
 
   return EFI_SUCCESS;
-#else
-  return EFI_UNSUPPORTED;
-#endif
 }
 
 
@@ -1089,8 +1093,6 @@ HiiConfigRoutingRouteConfig (
   OUT EFI_STRING                             *Progress
   )
 {
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
-
   HII_DATABASE_PRIVATE_DATA           *Private;
   EFI_STRING                          StringPtr;
   EFI_STRING                          ConfigResp;
@@ -1105,6 +1107,15 @@ HiiConfigRoutingRouteConfig (
   EFI_STRING                          AccessProgress;
   UINTN                               RemainSize;
   EFI_STRING                          TmpPtr;
+
+  //
+  // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
+  // as FALSE. But this renders the system to not 100% compliant with
+  // UEFI 2.1. Use this with caution.
+  //
+  if (!FeaturePcdGet (PcdSupportFullConfigRoutingProtocol)) {
+    return EFI_UNSUPPORTED;
+  }
 
   if (This == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1240,9 +1251,6 @@ HiiConfigRoutingRouteConfig (
   }
 
   return EFI_SUCCESS;
-#else
-  return EFI_UNSUPPORTED;
-#endif
 }
 
 
@@ -1761,8 +1769,6 @@ HiiGetAltCfg (
   OUT EFI_STRING                               *AltCfgResp
   )
 {
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
-
   EFI_STATUS                          Status;
   EFI_STRING                          StringPtr;
   EFI_STRING                          HdrStart;
@@ -1777,6 +1783,15 @@ HiiGetAltCfg (
   BOOLEAN                             GuidFlag;
   BOOLEAN                             NameFlag;
   BOOLEAN                             PathFlag;
+
+  //
+  // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
+  // as FALSE. But this renders the system to not 100% compliant with
+  // UEFI 2.1. Use this with caution.
+  //
+  if (!FeaturePcdGet (PcdSupportFullConfigRoutingProtocol)) {
+    return EFI_UNSUPPORTED;
+  }
 
   HdrStart = NULL;
   HdrEnd   = NULL;
@@ -1944,10 +1959,6 @@ Exit:
   SafeFreePool (Result);
 
   return Status;
-
-#else
-  return EFI_UNSUPPORTED;
-#endif
 
 }
 
