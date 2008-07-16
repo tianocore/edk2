@@ -63,3 +63,5 @@
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
   
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout
