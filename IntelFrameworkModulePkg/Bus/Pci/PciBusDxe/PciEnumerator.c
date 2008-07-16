@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#include "pcibus.h"
+#include "PciBus.h"
 #include "PciEnumerator.h"
 #include "PciResourceSupport.h"
 #include "PciOptionRomSupport.h"

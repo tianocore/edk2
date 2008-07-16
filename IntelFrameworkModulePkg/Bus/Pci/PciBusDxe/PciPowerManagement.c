@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "pcibus.h"
+#include "PciBus.h"
 
 /**
   This function is intended to turn off PWE assertion and

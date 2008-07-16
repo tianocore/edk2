@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#include "pcibus.h"
+#include "PciBus.h"
 #include "PciHotPlugSupport.h"
 
 EFI_PCI_HOT_PLUG_INIT_PROTOCOL  *gPciHotPlugInit;
