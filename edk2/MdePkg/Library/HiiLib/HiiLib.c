@@ -32,6 +32,9 @@ LocateHiiProtocols (
   EFI_STATUS  Status;
 
   if (mHiiProtocolsInitialized) {
+    //
+    // Only need to initialize the protocol instance once.
+    //
     return;
   }
 
@@ -51,6 +54,13 @@ LocateHiiProtocols (
   the GUID of the package list and the list of pointer which point to
   package header that defined by UEFI VFR compiler and StringGather
   tool.
+
+  #pragma pack (push, 1)
+  typedef struct {
+    UINT32                  BinaryLength;
+    EFI_HII_PACKAGE_HEADER  PackageHeader;
+  } TIANO_AUTOGEN_PACKAGES_HEADER;
+  #pragma pack (pop)
 
   If there is not enough resource for the new package list,
   the function will ASSERT.
@@ -86,6 +96,9 @@ InternalHiiLibPreparePackages (
   
   for (Index = 0; Index < NumberOfPackages; Index++) {
     CopyMem (&PackageLength, VA_ARG (Marker, VOID *), sizeof (UINT32));
+    //
+    // Do not count the BinaryLength field.
+    //
     PackageListLength += (PackageLength - sizeof (UINT32));
   }
 
@@ -95,6 +108,7 @@ InternalHiiLibPreparePackages (
   PackageListLength += sizeof (EFI_HII_PACKAGE_HEADER);
   PackageListHeader = AllocateZeroPool (PackageListLength);
   ASSERT (PackageListHeader != NULL);
+  
   CopyMem (&PackageListHeader->PackageListGuid, GuidId, sizeof (EFI_GUID));
   PackageListHeader->PackageLength = PackageListLength;
 
@@ -127,11 +141,11 @@ InternalHiiLibPreparePackages (
   If not enough resource to complete the operation, then ASSERT.
 
   @param  NumberOfPackages       Number of packages.
-  @param  GuidId                          Package GUID.
-  @param  ...                                Variable argument list for packages to be assembled.
+  @param  GuidId                 Package GUID.
+  @param  ...                    Variable argument list for packages to be assembled.
 
   @return EFI_HII_PACKAGE_LIST_HEADER Pointer of EFI_HII_PACKAGE_LIST_HEADER. The function will ASSERT if system has
-                                                                not enough resource to complete the operation.
+                                      not enough resource to complete the operation.
 
 **/
 EFI_HII_PACKAGE_LIST_HEADER *
@@ -222,8 +236,6 @@ HiiLibAddPackages (
   @param  HiiHandle                The handle that was previously registered to the data base that is requested for removal.
                                              List later.
 
-  @return  VOID
-
 **/
 VOID
 EFIAPI
@@ -232,7 +244,7 @@ HiiLibRemovePackages (
   )
 {
   EFI_STATUS Status;
-  ASSERT (HiiHandle != NULL);
+  ASSERT (IsHiiHandleRegistered (HiiHandle));
 
   LocateHiiProtocols ();
 
@@ -328,6 +340,7 @@ HiiLibExtractGuidFromHiiHandle (
   EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
 
   ASSERT (Guid != NULL);
+  ASSERT (IsHiiHandleRegistered (Handle));
 
   //
   // Get HII PackageList
@@ -355,7 +368,7 @@ HiiLibExtractGuidFromHiiHandle (
   //
   CopyMem (Guid, &HiiPackageList->PackageListGuid, sizeof (EFI_GUID));
 
-  gBS->FreePool (HiiPackageList);
+  FreePool (HiiPackageList);
 
   return EFI_SUCCESS;
 }
@@ -425,7 +438,7 @@ HiiLibDevicePathToHiiHandle (
       break;
     }
   }
-  gBS->FreePool (Handles);
+  FreePool (Handles);
 
   if (DriverHandle == NULL) {
     return NULL;
@@ -447,7 +460,7 @@ HiiLibDevicePathToHiiHandle (
                           HiiHandles
                           );
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    gBS->FreePool (HiiHandles);
+    FreePool (HiiHandles);
     HiiHandles = AllocatePool (BufferSize);
     ASSERT (HiiHandles != NULL);
 
@@ -461,7 +474,7 @@ HiiLibDevicePathToHiiHandle (
   }
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (HiiHandles);
+    FreePool (HiiHandles);
     return NULL;
   }
 
@@ -482,7 +495,7 @@ HiiLibDevicePathToHiiHandle (
     }
   }
 
-  gBS->FreePool (HiiHandles);
+  FreePool (HiiHandles);
   return HiiHandle;
 }
 
