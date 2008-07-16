@@ -52,7 +52,8 @@ typedef struct _EFI_PEI_NOTIFY_DESCRIPTOR EFI_PEI_NOTIFY_DESCRIPTOR;
   @param  FileHandle       Pointer to the FFS file header.
   @param  PeiServices      Describes the list of possible PEI Services.
 
-  @return Status code
+  @retval EFI_SUCCESS      The PEI completed successfully.
+  @retval !EFI_SUCCESS     There is error in PEIM.
 
 **/
 typedef
@@ -69,7 +70,7 @@ EFI_STATUS
   @param  NotifyDescriptor Address of the notification descriptor data structure.
   @param  Ppi              Address of the PPI that was installed.
 
-  @return Status code
+  @return Status of the notification.
 **/
 typedef
 EFI_STATUS
@@ -427,8 +428,6 @@ EFI_STATUS
   @param  Source           Pointer to the source buffer of the memory copy
   @param  Length           Number of bytes to copy from Source to Destination.
 
-  @return None
-
 **/
 typedef
 VOID
@@ -444,8 +443,6 @@ VOID
   @param  Buffer           Pointer to the buffer to fill.
   @param  Size             Number of bytes in Buffer to fill.
   @param  Value            Value to fill Buffer with
-
-  @return None
 
 **/
 typedef
@@ -527,7 +524,6 @@ EFI_STATUS
 
   @retval EFI_INVALID_PARAMETER   VolumeHandle or FileHandle or
                                   FileName was NULL.
-
 
 **/
 typedef

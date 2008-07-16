@@ -416,7 +416,7 @@ EFI_STATUS
 /**
   Loads and executed DXE drivers from firmware volumes.
 
-  @return Status code
+  @return Status of dispatching and execution DXE drivers.
 
 **/
 typedef
@@ -432,7 +432,7 @@ EFI_STATUS
   @param  FirmwareVolumeHandle The handle of the firmware volume that contains the file specified by FileName.
   @param  DriverName           A pointer to the name of the file in a firmware volume.
 
-  @return Status code
+  @return Status of clearing SOR.
 
 **/
 typedef
@@ -449,7 +449,8 @@ EFI_STATUS
   @param  FirmwareVolumeHandle The handle of the firmware volume that contains the file specified by FileName.
   @param  DriverName           A pointer to the name of the file in a firmware volume.
 
-  @return Status code
+  @return Status of promoting FFS from untrusted to trusted
+          state.
 
 **/
 typedef
@@ -467,7 +468,7 @@ EFI_STATUS
   @param  Size                 The size, in bytes, of the firmware volume.
   @param  FirmwareVolumeHandle On output, a pointer to the created handle.
 
-  @return Status code
+  @return Status of processing FV.
 
 **/
 typedef

@@ -18,7 +18,7 @@
 #define PCI_CLASS_MASS_STORAGE_SATADPA   0x06
 #define PCI_CLASS_MASS_STORAGE_AHCI      PCI_CLASS_MASS_STORAGE_SATADPA
 
-#pragma pack(push, 1)
+#pragma pack(1)
 
 typedef struct {
   UINT32  Signature;    // "PCIR"
@@ -37,7 +37,7 @@ typedef struct {
   UINT16  DMTFCLPEntryPointOffset;
 } PCI_3_0_DATA_STRUCTURE;
 
-#pragma pack(pop)
+#pragma pack()
 
 
 #include <IndustryStandard/Pci23.h>

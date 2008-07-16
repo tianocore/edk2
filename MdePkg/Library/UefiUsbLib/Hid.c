@@ -24,12 +24,12 @@
   @param  HidDescriptor     Caller allocated buffer to store Usb hid descriptor if
                             successfully returned.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_TIMEOUT
+  @return Status of getting HID descriptor through USB I/O
+          protocol's UsbControlTransfer().
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetHidDescriptor (
   IN  EFI_USB_IO_PROTOCOL        *UsbIo,
   IN  UINT8                      InterfaceNum,
@@ -73,12 +73,12 @@ UsbGetHidDescriptor (
   @param  DescriptorBuffer  Caller allocated buffer to store Usb report descriptor
                             if successfully returned.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_TIMEOUT
+  @return Status of getting Report Class descriptor through USB
+          I/O protocol's UsbControlTransfer().
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetReportDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT8                   InterfaceNum,
@@ -117,18 +117,18 @@ UsbGetReportDescriptor (
 }
 
 /**
-  Get Hid Protocol Request.
+  Get Hid Protocol Request
 
   @param  UsbIo             EFI_USB_IO_PROTOCOL.
-  @param  Interface         Which interface the caller wants to get protocol.
+  @param  Interface         Which interface the caller wants to get protocol
   @param  Protocol          Protocol value returned.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_TIMEOUT
+  @return Status of getting Protocol Request through USB I/O
+          protocol's UsbControlTransfer().
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetProtocolRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -168,19 +168,21 @@ UsbGetProtocolRequest (
 }
 
 
+
 /**
   Set Hid Protocol Request.
 
   @param  UsbIo             EFI_USB_IO_PROTOCOL.
-  @param  Interface         Which interface the caller wants to set protocol.
+  @param  Interface         Which interface the caller wants to
+                            set protocol.
   @param  Protocol          Protocol value the caller wants to set.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_TIMEOUT
+  @return Status of setting Protocol Request through USB I/O
+          protocol's UsbControlTransfer().
 
 **/
 EFI_STATUS
+EFIAPI
 UsbSetProtocolRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -227,12 +229,12 @@ UsbSetProtocolRequest (
   @param  ReportId          Which report the caller wants to set.
   @param  Duration          Idle rate the caller wants to set.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_TIMEOUT
+  @return Status of setting IDLE Request through USB I/O
+          protocol's UsbControlTransfer().
 
 **/
 EFI_STATUS
+EFIAPI
 UsbSetIdleRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -280,12 +282,12 @@ UsbSetIdleRequest (
   @param  ReportId          Which report the caller wants to get.
   @param  Duration          Idle rate the caller wants to get.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_TIMEOUT
+  @return Status of getting IDLE Request through USB I/O
+          protocol's UsbControlTransfer().
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetIdleRequest (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT8                   Interface,
@@ -326,6 +328,7 @@ UsbGetIdleRequest (
 }
 
 
+
 /**
   Hid Set Report request.
 
@@ -336,12 +339,12 @@ UsbGetIdleRequest (
   @param  ReportLen         Length of report descriptor.
   @param  Report            Report Descriptor buffer.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_TIMEOUT
+  @return Status of setting Report Request through USB I/O
+          protocol's UsbControlTransfer().
 
 **/
 EFI_STATUS
+EFIAPI
 UsbSetReportRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,
@@ -394,12 +397,12 @@ UsbSetReportRequest (
   @param  ReportLen         Length of report descriptor.
   @param  Report            Caller allocated buffer to store Report Descriptor.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_TIMEOUT
+  @return Status of getting Report Request through USB I/O
+          protocol's UsbControlTransfer().
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetReportRequest (
   IN EFI_USB_IO_PROTOCOL     *UsbIo,
   IN UINT8                   Interface,

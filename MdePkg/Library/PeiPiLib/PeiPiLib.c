@@ -50,8 +50,6 @@ CONST EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
                                           parent firmware volume name and firmware volume file. If it did not originally come
                                           from a firmware file, these should be NULL
   
-    @retval  VOID
-  
 **/
 VOID
 EFIAPI

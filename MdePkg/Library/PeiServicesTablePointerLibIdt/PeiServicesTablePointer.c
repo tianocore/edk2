@@ -23,7 +23,8 @@
   base addres is used to save the EFI_PEI_SERVICES**.
   For x64, the eight-bytes field immediately prior to new IDT
   base addres is used to save the EFI_PEI_SERVICES**
-  @retval  The pointer to PeiServices.
+  
+  @return  The pointer to PeiServices.
 
 **/
 EFI_PEI_SERVICES **
@@ -43,14 +44,15 @@ GetPeiServicesTablePointer (
 
 /**
   
-  The function returns the pointer to PeiServicee following
+  The function sets the pointer to PeiServicee following
   PI1.0.
   
   For IA32, the four-bytes field immediately prior to new IDT
   base addres is used to save the EFI_PEI_SERVICES**.
   For x64, the eight-bytes field immediately prior to new IDT
   base addres is used to save the EFI_PEI_SERVICES**
-  @retval  The pointer to PeiServices.
+  
+  @param PeiServicesTablePointer  The pointer to PeiServices.
 
 **/
 VOID

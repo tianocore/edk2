@@ -61,6 +61,7 @@
 
 **/
 EFI_STATUS
+EFIAPI
 ScsiTestUnitReadyCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
@@ -103,6 +104,7 @@ ScsiTestUnitReadyCommand (
 
 **/
 EFI_STATUS
+EFIAPI
 ScsiInquiryCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
@@ -150,6 +152,7 @@ ScsiInquiryCommand (
 
 **/
 EFI_STATUS
+EFIAPI
 ScsiModeSense10Command (
   IN  EFI_SCSI_IO_PROTOCOL    *ScsiIo,
   IN  UINT64                  Timeout,
@@ -202,6 +205,7 @@ ScsiModeSense10Command (
 
 **/
 EFI_STATUS
+EFIAPI
 ScsiRequestSenseCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
@@ -290,6 +294,7 @@ ScsiReadCapacityCommand (
 
 **/
 EFI_STATUS
+EFIAPI
 ScsiRead10Command (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
@@ -337,6 +342,7 @@ ScsiRead10Command (
 
 **/
 EFI_STATUS
+EFIAPI
 ScsiWrite10Command (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
