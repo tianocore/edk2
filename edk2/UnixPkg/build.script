@@ -1,6 +1,0 @@
-# Please use this script to produce SecMain executable file temporarily. You can run SecMain in Build/Unix/DEBUG_ELFGCC/IA32 directory.
-#
-cd ../
-source edksetup.sh BaseTools
-build -p UnixPkg/UnixPkg.dsc -t ELFGCC -a IA32
-gcc -m32 -Wl,--start-group Build/Unix/DEBUG_ELFGCC/IA32/MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate/OUTPUT/BaseTimerLibNullTemplate.lib Build/Unix/DEBUG_ELFGCC/IA32/MdePkg/Library/BaseLib/BaseLib/OUTPUT/BaseLib.lib Build/Unix/DEBUG_ELFGCC/IA32/MdePkg/Library/BaseMemoryLib/BaseMemoryLib/OUTPUT/BaseMemoryLib.lib Build/Unix/DEBUG_ELFGCC/IA32/MdePkg/Library/BasePcdLibNull/BasePcdLibNull/OUTPUT/BasePcdLibNull.lib Build/Unix/DEBUG_ELFGCC/IA32/MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull/OUTPUT/BaseDebugLibNull.lib Build/Unix/DEBUG_ELFGCC/IA32/IntelFrameworkModulePkg/Library/BaseReportStatusCodeLib/BaseReportStatusCodeLib/OUTPUT/BaseReportStatusCodeLib.lib Build/Unix/DEBUG_ELFGCC/IA32/MdePkg/Library/BasePeCoffLib/BasePeCoffLib/OUTPUT/BasePeCoffLib.lib Build/Unix/DEBUG_ELFGCC/IA32/MdePkg/Library/BasePrintLib/BasePrintLib/OUTPUT/BasePrintLib.lib Build/Unix/DEBUG_ELFGCC/IA32/UnixPkg/Sec/SecMain/OUTPUT/SecMain.lib  --end-group -o Build/Unix/DEBUG_ELFGCC/IA32/SecMain -L/usr/X11R6/lib -lXext -lX11
