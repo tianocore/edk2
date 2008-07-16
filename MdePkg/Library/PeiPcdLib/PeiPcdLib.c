@@ -29,12 +29,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   The constructor function retrieve the PCD_PPI pointer.
 
-  @param[in] VOID
-  
   @retval PCD_PPI * The pointer to the PCD_PPI.
 
 **/
-STATIC
 PCD_PPI  *
 GetPcdPpiPtr (
   VOID
@@ -48,8 +45,6 @@ GetPcdPpiPtr (
 
   return PcdPpi;
 }
-
-
 
 /**
   Sets the current SKU in the PCD database to the value specified by SkuId.  SkuId is returned.
@@ -79,7 +74,7 @@ LibPcdSetSku (
 /**
   Returns the 8-bit value for the token specified by TokenNumber. 
 
-  @param[in]  The PCD token number to retrieve a current value for.
+  @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
   @retval UINT8 Returns the 8-bit value for the token specified by TokenNumber. 
 
@@ -102,7 +97,7 @@ LibPcdGet8 (
 /**
   Returns the 16-bit value for the token specified by TokenNumber. 
 
-  @param[in]  The PCD token number to retrieve a current value for.
+  @param[in] TokenNumber The PCD token number to retrieve a current value for.
 
   @retval UINT16 Returns the 16-bit value for the token specified by TokenNumber. 
 
@@ -579,9 +574,9 @@ LibPcdSet64 (
   
   If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
   
-  @param[in]  TokenNumber The PCD token number to set a current value for.
-  @param[in,out] SizeOfBuffer The size, in bytes, of Buffer.
-  @param[in]  Value A pointer to the buffer to set.
+  @param[in]        TokenNumber     The PCD token number to set a current value for.
+  @param[in, out]   SizeOfBuffer    The size, in bytes, of Buffer.
+  @param[in]        Buffer          A pointer to the buffer to set.
 
   @retval VOID* Return the pointer for the buffer been set.
 
@@ -956,10 +951,10 @@ LibPcdCancelCallback (
   token number in the token space, then 0 is returned.  If TokenNumber is not 0 and 
   is not in the token space specified by Guid, then ASSERT().
 
-  @param[in]  Pointer to a 128-bit unique value that designates which namespace 
-              to set a value from.  If NULL, then the default token space is used.
-  @param[in]  The previous PCD token number.  If 0, then retrieves the first PCD 
-              token number.
+  @param[in]  Guid          Pointer to a 128-bit unique value that designates which namespace 
+                            to set a value from.  If NULL, then the default token space is used.
+  @param[in]  TokenNumber   The previous PCD token number.  If 0, then retrieves the first PCD 
+                            token number.
 
   @retval UINTN            The next valid token number.
 
@@ -996,8 +991,8 @@ LibPcdGetNextToken (
 
 
   
-  @param[in]  Pointer to a 128-bit unique value that designates from which namespace 
-              to start the search.
+  @param[in]  Guid  Pointer to a 128-bit unique value that designates from which namespace 
+                    to start the search.
 
   @retval CONST GUID *  The next valid token namespace.
 
