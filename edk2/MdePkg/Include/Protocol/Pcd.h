@@ -252,7 +252,8 @@ UINT16
 
   @return The size 32-bit value for the PCD token.
   
-**/typedef
+**/
+typedef
 UINT32
 (EFIAPI *PCD_PROTOCOL_GET_EX_32)(
   IN CONST EFI_GUID    *Guid,
