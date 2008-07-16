@@ -78,7 +78,7 @@ EFI_HII_PACKAGE_LIST_HEADER *
 InternalHiiLibPreparePackages (
   IN UINTN           NumberOfPackages,
   IN CONST EFI_GUID  *GuidId,
-  VA_LIST            Marker
+  IN VA_LIST         Marker
   )
 {
   EFI_HII_PACKAGE_LIST_HEADER *PackageListHeader;

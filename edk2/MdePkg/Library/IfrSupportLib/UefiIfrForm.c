@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Fake <ConfigHdr>
 //
-UINT16 mFakeConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH=0";
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT16 mFakeConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH=0";
 
 /**
   Draw a dialog and return the selected key.
@@ -26,7 +26,7 @@ UINT16 mFakeConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH
   @param  NumberOfLines          The number of lines for the dialog box
   @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
   @param  String                 Pointer to the first string in the list
-  @param  ...                    A series of (quantity == NumberOfLines) text
+  @param  ...                    A series of (quantity == NumberOfLines - 1) text
                                  strings which will be used to construct the dialog
                                  box
 
@@ -109,6 +109,7 @@ IfrLibCreatePopUp (
       LargestString = StringLen;
     }
   }
+  VA_END (Marker);
 
   if ((LargestString + 2) > DimensionsWidth) {
     LargestString = DimensionsWidth - 2;
@@ -250,6 +251,7 @@ SwapBuffer (
 
 **/
 VOID
+EFIAPI
 ToLower (
   IN OUT CHAR16    *Str
   )
@@ -292,7 +294,7 @@ BufferToHexString (
   StrBufferLen = BufferSize * sizeof (CHAR16) + 1;
   Status = BufToHexString (Str, &StrBufferLen, NewBuffer, BufferSize);
 
-  gBS->FreePool (NewBuffer);
+  FreePool (NewBuffer);
   //
   // Convert the uppercase to lowercase since <HexAf> is defined in lowercase format.
   //
@@ -354,6 +356,7 @@ HexStringToBuffer (
 
 **/
 EFI_STATUS
+EFIAPI
 ConfigStringToUnicode (
   IN OUT CHAR16                *UnicodeString,
   IN OUT UINTN                 *StrBufferLen,
@@ -413,6 +416,7 @@ ConfigStringToUnicode (
 
 **/
 EFI_STATUS
+EFIAPI
 UnicodeToConfigString (
   IN OUT CHAR16                *ConfigString,
   IN OUT UINTN                 *StrBufferLen,
@@ -566,6 +570,7 @@ ConstructConfigHdr (
 
 **/
 BOOLEAN
+EFIAPI
 FindBlockName (
   IN OUT CHAR16                *String,
   UINTN                        Offset,
@@ -644,7 +649,7 @@ GetBrowserData (
   )
 {
   EFI_STATUS                      Status;
-  CHAR16                          *ConfigHdr;
+  CONST CHAR16                    *ConfigHdr;
   CHAR16                          *ConfigResp;
   CHAR16                          *StringPtr;
   UINTN                           HeaderLen;
@@ -688,7 +693,7 @@ GetBrowserData (
                            VariableName
                            );
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    gBS->FreePool (ConfigResp);
+    FreePool (ConfigResp);
     ConfigResp = AllocateZeroPool (BufferLen + HeaderLen);
 
     StringPtr = ConfigResp + HeaderLen;
@@ -705,7 +710,7 @@ GetBrowserData (
                              );
   }
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (ConfigResp);
+    FreePool (ConfigResp);
     return Status;
   }
   CopyMem (ConfigResp, ConfigHdr, HeaderLen * sizeof (UINT16));
@@ -720,7 +725,7 @@ GetBrowserData (
                                BufferSize,
                                &Progress
                                );
-  gBS->FreePool (ConfigResp);
+  FreePool (ConfigResp);
 
   return Status;
 }
@@ -756,7 +761,7 @@ SetBrowserData (
   )
 {
   EFI_STATUS                      Status;
-  CHAR16                          *ConfigHdr;
+  CONST CHAR16                    *ConfigHdr;
   CHAR16                          *ConfigResp;
   CHAR16                          *StringPtr;
   UINTN                           HeaderLen;
@@ -825,7 +830,7 @@ SetBrowserData (
                                 &Progress
                                 );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (ConfigResp);
+    FreePool (ConfigResp);
     return Status;
   }
 
@@ -845,6 +850,6 @@ SetBrowserData (
                            NULL,
                            NULL
                            );
-  gBS->FreePool (ConfigResp);
+  FreePool (ConfigResp);
   return Status;
 }

@@ -431,6 +431,7 @@ CreateStringOpCode (
   
 **/
 VOID
+EFIAPI
 ToLower (
   IN OUT CHAR16    *Str
   )
@@ -494,7 +495,9 @@ HexStringToBuffer (
   @retval EFI_SUCCESS          Routine success.
   @retval EFI_BUFFER_TOO_SMALL The string buffer is too small.
 
-**/EFI_STATUS
+**/
+EFI_STATUS
+EFIAPI
 ConfigStringToUnicode (
   IN OUT CHAR16                *UnicodeString,
   IN OUT UINTN                 *StrBufferLen,
@@ -518,7 +521,9 @@ ConfigStringToUnicode (
   @retval EFI_SUCCESS           Routine success.
   @retval EFI_BUFFER_TOO_SMALL  The string buffer is too small.
 
-**/EFI_STATUS
+**/
+EFI_STATUS
+EFIAPI
 UnicodeToConfigString (
   IN OUT CHAR16                *ConfigString,
   IN OUT UINTN                 *StrBufferLen,
@@ -640,7 +645,7 @@ SetBrowserData (
   @param  NumberOfLines          The number of lines for the dialog box
   @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
   @param  String                 Pointer to the first string in the list
-  @param  ...                    A series of (quantity == NumberOfLines) text
+  @param  ...                    A series of (quantity == NumberOfLines - 1) text
                                  strings which will be used to construct the dialog
                                  box
 
