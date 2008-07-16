@@ -1,5 +1,6 @@
 /** @file
-
+  EFI PEI Core Security services
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,19 +10,21 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  Security.c
-
-Abstract:
-
-  EFI PEI Core Security services
-
 **/
 
 #include <PeiMain.h>
 
-STATIC
+/**
+
+  Provide a callback for when the security PPI is installed.
+
+  @param PeiServices     - The PEI core services table.
+  @param NotifyDescriptor - The descriptor for the notification event.
+  @param Ppi             - Pointer to the PPI in question.
+
+  @return Always success
+
+**/
 EFI_STATUS
 EFIAPI
 SecurityPpiNotifyCallback (
@@ -30,33 +33,27 @@ SecurityPpiNotifyCallback (
   IN VOID                       *Ppi
   );
 
-static EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
+STATIC EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
    &gEfiPeiSecurity2PpiGuid,
    SecurityPpiNotifyCallback
 };
 
+/**
+
+  Initialize the security services.
+
+
+  @param PeiServices     - The PEI core services table.
+  @param OldCoreData     - Pointer to the old core data.
+                         NULL if being run in non-permament memory mode.
+
+**/
 VOID
 InitializeSecurityServices (
   IN EFI_PEI_SERVICES  **PeiServices,
   IN PEI_CORE_INSTANCE *OldCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize the security services.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  OldCoreData - Pointer to the old core data.
-                NULL if being run in non-permament memory mode.
-Returns:
-
-  None
-
---*/
 {
   if (OldCoreData == NULL) {
     PeiServicesNotifyPpi (&mNotifyList);
@@ -64,7 +61,17 @@ Returns:
   return;
 }
 
-STATIC
+/**
+
+  Provide a callback for when the security PPI is installed.
+
+  @param PeiServices     - The PEI core services table.
+  @param NotifyDescriptor - The descriptor for the notification event.
+  @param Ppi             - Pointer to the PPI in question.
+
+  @return Always success
+
+**/
 EFI_STATUS
 EFIAPI
 SecurityPpiNotifyCallback (
@@ -72,23 +79,6 @@ SecurityPpiNotifyCallback (
   IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN VOID                       *Ppi
   )
-/*++
-
-Routine Description:
-
-  Provide a callback for when the security PPI is installed.
-
-Arguments:
-
-  PeiServices       - The PEI core services table.
-  NotifyDescriptor  - The descriptor for the notification event.
-  Ppi               - Pointer to the PPI in question.
-
-Returns:
-
-  EFI_SUCCESS - The function is successfully processed.
-
---*/
 {
   PEI_CORE_INSTANCE                       *PrivateData;
 
@@ -106,29 +96,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Provide a callout to the security verification service.
+
+
+  @param PrivateData     PeiCore's private data structure
+  @param VolumeHandle    Handle of FV
+  @param FileHandle      Handle of PEIM's ffs
+
+  @retval EFI_SUCCESS              Image is OK
+  @retval EFI_SECURITY_VIOLATION   Image is illegal
+
+**/
 EFI_STATUS
 VerifyPeim (
   IN PEI_CORE_INSTANCE      *PrivateData,
   IN EFI_PEI_FV_HANDLE      VolumeHandle,
   IN EFI_PEI_FILE_HANDLE    FileHandle
   )
-/*++
-
-Routine Description:
-
-  Provide a callout to the security verification service.
-
-Arguments:
-
-  PeiServices          - The PEI core services table.
-  CurrentPeimAddress   - Pointer to the Firmware File under investigation.
-
-Returns:
-
-  EFI_SUCCESS             - Image is OK
-  EFI_SECURITY_VIOLATION  - Image is illegal
-
---*/
 {
   EFI_STATUS                      Status;
   UINT32                          AuthenticationStatus;
@@ -161,26 +147,19 @@ Returns:
 }
 
 
+/**
+  Verify a Firmware volume.
+
+  @param CurrentFvAddress - Pointer to the current Firmware Volume under consideration
+
+  @retval EFI_SUCCESS             - Firmware Volume is legal
+  @retval EFI_SECURITY_VIOLATION  - Firmware Volume fails integrity test
+
+**/
 EFI_STATUS
 VerifyFv (
   IN EFI_FIRMWARE_VOLUME_HEADER  *CurrentFvAddress
   )
-/*++
-
-Routine Description:
-
-  Verify a Firmware volume
-
-Arguments:
-
-  CurrentFvAddress - Pointer to the current Firmware Volume under consideration
-
-Returns:
-
-  EFI_SUCCESS             - Firmware Volume is legal
-  EFI_SECURITY_VIOLATION  - Firmware Volume fails integrity test
-
---*/
 {
   //
   // Right now just pass the test.  Future can authenticate and/or check the

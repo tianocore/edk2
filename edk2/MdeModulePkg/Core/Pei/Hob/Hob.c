@@ -1,5 +1,6 @@
 /** @file
-
+  This module provide Hand-Off Block manupulation.
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,42 +10,29 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  Hob.c
-
-Abstract:
-
-  EFI PEI Core HOB services
-
 **/
 
 #include <PeiMain.h>
 
+/**
+
+  Gets the pointer to the HOB List.
+
+
+  @param PeiServices                   The PEI core services table.
+  @param HobList                       Pointer to the HOB List.
+
+  @retval EFI_SUCCESS                  Get the pointer of HOB List
+  @retval EFI_NOT_AVAILABLE_YET        the HOB List is not yet published
+  @retval EFI_INVALID_PARAMETER        HobList is NULL (in debug mode)
+
+**/
 EFI_STATUS
 EFIAPI
 PeiGetHobList (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN OUT VOID          **HobList
   )
-/*++
-
-Routine Description:
-
-  Gets the pointer to the HOB List.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  HobList     - Pointer to the HOB List.
-
-Returns:
-
-  EFI_SUCCESS                 - Get the pointer of HOB List
-  EFI_NOT_AVAILABLE_YET       - the HOB List is not yet published
-  EFI_INVALID_PARAMETER       - HobList is NULL (in debug mode)
-            
---*/
 {
   PEI_CORE_INSTANCE *PrivateData;
 
@@ -68,6 +56,20 @@ Returns:
 }
 
 
+/**
+  Add a new HOB to the HOB List.
+
+  @param PeiServices     - The PEI core services table.
+  @param Type            - Type of the new HOB.
+  @param Length          - Length of the new HOB to allocate.
+  @param Hob             - Pointer to the new HOB.
+
+  @return  EFI_SUCCESS           Success to create hob.
+  @retval  EFI_INVALID_PARAMETER if Hob is NULL
+  @retval  EFI_NOT_AVAILABLE_YET if HobList is still not available.
+  @retval  EFI_OUT_OF_RESOURCES  if there is no more memory to grow the Hoblist.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiCreateHob (
@@ -76,27 +78,6 @@ PeiCreateHob (
   IN UINT16            Length,
   IN OUT VOID          **Hob
   )
-/*++
-
-Routine Description:
-
-  Add a new HOB to the HOB List.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  Type        - Type of the new HOB.
-  Length      - Length of the new HOB to allocate.
-  Hob         - Pointer to the new HOB.
-
-Returns:
-
-  Status  - EFI_SUCCESS
-          - EFI_INVALID_PARAMETER if Hob is NULL
-          - EFI_NOT_AVAILABLE_YET if HobList is still not available.
-          - EFI_OUT_OF_RESOURCES if there is no more memory to grow the Hoblist.
-            
---*/
 {
   EFI_STATUS                           Status;
   EFI_HOB_HANDOFF_INFO_TABLE           *HandOffHob;
@@ -142,29 +123,23 @@ Returns:
 }
 
 
+/**
+
+  Builds a Handoff Information Table HOB
+
+  @param BootMode        - Current Bootmode
+  @param MemoryBegin     - Start Memory Address.
+  @param MemoryLength    - Length of Memory.
+
+  @return EFI_SUCCESS Always success to initialize HOB.
+
+**/
 EFI_STATUS
 PeiCoreBuildHobHandoffInfoTable (
   IN EFI_BOOT_MODE         BootMode,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64                MemoryLength
   )
-/*++
-
-Routine Description:
-
-  Builds a Handoff Information Table HOB
-
-Arguments:
-
-  BootMode      - Current Bootmode
-  MemoryBegin   - Start Memory Address.
-  MemoryLength  - Length of Memory.
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
 {
   EFI_HOB_HANDOFF_INFO_TABLE   *Hob;
   EFI_HOB_GENERIC_HEADER       *HobEnd;

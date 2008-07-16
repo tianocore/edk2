@@ -1,5 +1,6 @@
 /** @file
-
+  EFI PEI Core memory services
+  
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -9,45 +10,29 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  MemoryServices.c
-
-Abstract:
-
-  EFI PEI Core memory services
-
 **/
 
 #include <PeiMain.h>
 
+/**
+
+  Initialize the memory services.
+
+
+  @param PrivateData     Add parameter description
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+  @param OldCoreData     Pointer to the PEI Core data.
+                         NULL if being run in non-permament memory mode.
+
+**/
 VOID
 InitializeMemoryServices (
   IN PEI_CORE_INSTANCE           *PrivateData,
   IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *OldCoreData
   )
-/*++
-
-Routine Description:
-
-  Initialize the memory services.
-
-Arguments:
-
-  PeiServices          - The PEI core services table.
-  SecCoreData          - Points to a data structure containing information about the PEI core's operating
-                         environment, such as the size and location of temporary RAM, the stack location and
-                         the BFV location.
-
-  OldCoreData          - Pointer to the PEI Core data.
-                         NULL if being run in non-permament memory mode.
-
-Returns:
-
-  None
-
---*/
 {
   
   PrivateData->SwitchStackSignal      = FALSE;
@@ -85,6 +70,18 @@ Returns:
   return;
 }
 
+/**
+
+  Install the permanent memory is now available.
+  Creates HOB (PHIT and Stack).
+
+  @param PeiServices     - The PEI core services table.
+  @param MemoryBegin     - Start of memory address.
+  @param MemoryLength    - Length of memory.
+
+  @return EFI_SUCCESS Always success.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiInstallPeiMemory (
@@ -92,24 +89,6 @@ PeiInstallPeiMemory (
   IN EFI_PHYSICAL_ADDRESS    MemoryBegin,
   IN UINT64                  MemoryLength
   )
-/*++
-
-Routine Description:
-
-  Install the permanent memory is now available.
-  Creates HOB (PHIT and Stack).
-
-Arguments:
-
-  PeiServices   - The PEI core services table.
-  MemoryBegin   - Start of memory address.
-  MemoryLength  - Length of memory.
-
-Returns:
-
-  Status  - EFI_SUCCESS
-            
---*/
 {
   PEI_CORE_INSTANCE                     *PrivateData;
 
@@ -125,6 +104,24 @@ Returns:
   return EFI_SUCCESS;   
 }
 
+/**
+
+  Memory allocation service on permanent memory,
+  not usable prior to the memory installation.
+
+
+  @param PeiServices     - The PEI core services table.
+  @param MemoryType      - Type of memory to allocate.
+  @param Pages           - Number of pages to allocate.
+  @param Memory          - Pointer of memory allocated.
+
+  @retval EFI_SUCCESS              The allocation was successful
+  @retval EFI_INVALID_PARAMETER    Only AllocateAnyAddress is supported.
+  @retval EFI_NOT_AVAILABLE_YET    Called with permanent memory not available
+  @retval EFI_OUT_OF_RESOURCES     There is not enough HOB heap to satisfy the requirement
+                                   to allocate the number of pages.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiAllocatePages (
@@ -133,29 +130,6 @@ PeiAllocatePages (
   IN UINTN                      Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Memory
   )
-/*++
-
-Routine Description:
-
-  Memory allocation service on permanent memory, 
-  not usable prior to the memory installation.
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-  MemoryType  - Type of memory to allocate.
-  Pages       - Number of pages to allocate.
-  Memory      - Pointer of memory allocated.
-
-Returns:
-
-  Status - EFI_SUCCESS              The allocation was successful
-           EFI_INVALID_PARAMETER    Only AllocateAnyAddress is supported.
-           EFI_NOT_AVAILABLE_YET    Called with permanent memory not available
-           EFI_OUT_OF_RESOURCES     There is not enough HOB heap to satisfy the requirement
-                                    to allocate the number of pages.
-
---*/
 {
   PEI_CORE_INSTANCE                       *PrivateData;
   EFI_PEI_HOB_POINTERS                    Hob;
@@ -232,7 +206,20 @@ Returns:
   }
 }
 
+/**
 
+  Memory allocation service on the CAR.
+
+
+  @param PeiServices     - The PEI core services table.
+  @param Size            - Amount of memory required
+  @param Buffer          - Address of pointer to the buffer
+
+  @retval EFI_SUCCESS              The allocation was successful
+  @retval EFI_OUT_OF_RESOURCES     There is not enough heap to satisfy the requirement
+                                   to allocate the requested size.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiAllocatePool (
@@ -240,27 +227,6 @@ PeiAllocatePool (
   IN UINTN                      Size,
   OUT VOID                      **Buffer
   )
-/*++
-
-Routine Description:
-
-  Memory allocation service on the CAR.  
-
-Arguments:
-
-  PeiServices - The PEI core services table.
-
-  Size        - Amount of memory required
-
-  Buffer      - Address of pointer to the buffer
-
-Returns:
-
-  Status - EFI_SUCCESS              The allocation was successful
-           EFI_OUT_OF_RESOURCES     There is not enough heap to satisfy the requirement
-                                    to allocate the requested size.
-                                    
---*/
 {
   EFI_STATUS               Status;
   EFI_HOB_MEMORY_POOL      *Hob;
