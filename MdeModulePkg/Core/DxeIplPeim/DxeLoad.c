@@ -25,19 +25,19 @@ BOOLEAN gInMemory = FALSE;
 // Module Globals used in the DXE to PEI handoff
 // These must be module globals, so the stack can be switched
 //
-CONST EFI_DXE_IPL_PPI mDxeIplPpi = {
+EFI_DXE_IPL_PPI mDxeIplPpi = {
   DxeLoadCore
 };
 
-CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = {
+EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = {
   CustomGuidedSectionExtract
 };
 
-CONST EFI_PEI_DECOMPRESS_PPI mDecompressPpi = {
+EFI_PEI_DECOMPRESS_PPI mDecompressPpi = {
   Decompress
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
+EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiDxeIplPpiGuid,
@@ -50,7 +50,7 @@ CONST EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
   }
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
+EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
   NULL
@@ -238,15 +238,8 @@ DxeLoadCore (
     PcdGet32(PcdStatusCodeValuePeiHandoffToDxe)
     );
 
-  DEBUG_CODE_BEGIN ();
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading DXE CORE at 0x%10p EntryPoint=0x%10p\n", (VOID *)(UINTN)DxeCoreAddress, FUNCTION_ENTRY_POINT (DxeCoreEntryPoint)));
 
-    EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION       PtrPeImage;
-    PtrPeImage.Pe32 = (EFI_IMAGE_NT_HEADERS32 *) ((UINTN) DxeCoreAddress + ((EFI_IMAGE_DOS_HEADER *) (UINTN) DxeCoreAddress)->e_lfanew);
-     
-    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading DXE CORE at 0x%10p EntryPoint=0x%10p\n", (VOID *)(UINTN)DxeCoreAddress, FUNCTION_ENTRY_POINT (DxeCoreEntryPoint)));
-   
-
-  DEBUG_CODE_END ();
   //
   // Transfer control to the DXE Core
   // The handoff state is simply a pointer to the HOB list
