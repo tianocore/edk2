@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _ATAPI_H
 #define _ATAPI_H
 
-#pragma pack(push, 1)
+#pragma pack(1)
 
 //
 // ATA_IDENTIFY_DATA is defined in ATA-5
@@ -369,7 +369,7 @@ typedef union {
   ATAPI_READ_FORMAT_CAP_CMD ReadFormatCapacity;
 } ATAPI_PACKET_COMMAND;
 
-#pragma pack(pop)
+#pragma pack()
 
 
 #define ATAPI_MAX_DMA_EXT_CMD_SECTORS 0x10000

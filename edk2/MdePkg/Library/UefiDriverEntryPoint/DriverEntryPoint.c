@@ -28,12 +28,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   protocols produced and deallocates pool used by the driver.  Called by the core
   when unloading the driver.
 
-  @param  ImageHandle
+  @param  ImageHandle ImageHandle of the loaded driver.
 
-  @retval EFI_SUCCESS
+  @return Status returned by all unload().
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 _DriverUnloadHandler (

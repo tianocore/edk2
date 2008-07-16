@@ -21,9 +21,7 @@
 //
 // Ensure proper structure formats
 //
-#ifdef _MSC_EXTENSIONS
 #pragma pack(1)
-#endif
 
 //
 // SPCR Revision (defined in spec)
@@ -57,9 +55,7 @@ typedef struct {
   UINT32                                  Reserved2;
 } EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE;
 
-#ifdef _MSC_EXTENSIONS
 #pragma pack()
-#endif
 
 //
 // SPCR Definitions

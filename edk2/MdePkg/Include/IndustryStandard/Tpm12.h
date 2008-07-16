@@ -406,13 +406,13 @@ typedef struct tdTPM_KEY_HANDLE_LIST {
 //
 // Part 2, section 5.10: TPM_KEY_FLAGS
 //
-enum tdTPM_KEY_FLAGS {
+typedef enum tdTPM_KEY_FLAGS {
   redirection                       = 0x00000001,
   migratable                        = 0x00000002,
   isVolatile                        = 0x00000004,
   pcrIgnoredOnRead                  = 0x00000008,
   migrateAuthority                  = 0x00000010
-};
+} TPM_KEY_FLAGS;
 
 //
 // Part 2, section 5.11: TPM_CHANGEAUTH_VALIDATE

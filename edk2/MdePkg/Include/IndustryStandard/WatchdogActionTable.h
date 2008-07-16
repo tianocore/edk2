@@ -56,7 +56,7 @@ typedef struct {
 //
 // WDAT Revision (defined in spec)
 //
-#define EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE_REVISION  0x01
+#define EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE_REVISION       0x01
 
 //
 // WDAT 1.0 Flags

@@ -23,7 +23,7 @@
   The function returns the pointer to PeiServices.
   It will ASSERT() if the pointer to PeiServices is NULL.
 
-  @retval  The pointer to PeiServices.
+  @return  The pointer to PeiServices.
 
 **/
 EFI_PEI_SERVICES **

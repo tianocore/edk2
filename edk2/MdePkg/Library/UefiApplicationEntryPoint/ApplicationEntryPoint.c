@@ -72,8 +72,6 @@ _ModuleEntryPoint (
 
   @param  Status Status returned by the application that is exiting.
   
-  @retval VOID
-
 **/
 VOID
 EFIAPI

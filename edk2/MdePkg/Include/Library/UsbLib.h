@@ -23,6 +23,18 @@
 //
 #define TIMEOUT_VALUE 3 * 1000
 
+/**
+  Get Hid Descriptor
+
+  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  InterfaceNum      Hid interface number
+  @param  HidDescriptor     Caller allocated buffer to store Usb hid descriptor if
+                            successfully returned.
+
+  @return Status of getting HID descriptor through USB I/O
+          protocol's UsbControlTransfer().
+
+**/
 EFI_STATUS
 EFIAPI
 UsbGetHidDescriptor (
@@ -31,6 +43,20 @@ UsbGetHidDescriptor (
   OUT EFI_USB_HID_DESCRIPTOR     *HidDescriptor
   );
 
+
+/**
+  get Report Class descriptor
+
+  @param  UsbIo             EFI_USB_IO_PROTOCOL.
+  @param  InterfaceNum      Report interface number.
+  @param  DescriptorSize    Length of DescriptorBuffer.
+  @param  DescriptorBuffer  Caller allocated buffer to store Usb report descriptor
+                            if successfully returned.
+
+  @return Status of getting Report Class descriptor through USB
+          I/O protocol's UsbControlTransfer().
+
+**/
 EFI_STATUS
 EFIAPI
 UsbGetReportDescriptor (
@@ -40,6 +66,17 @@ UsbGetReportDescriptor (
   OUT UINT8                   *DescriptorBuffer
   );
 
+/**
+  Get Hid Protocol Request
+
+  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  Interface         Which interface the caller wants to get protocol
+  @param  Protocol          Protocol value returned.
+
+  @return Status of getting Protocol Request through USB I/O
+          protocol's UsbControlTransfer().
+
+**/
 EFI_STATUS
 EFIAPI
 UsbGetProtocolRequest (
@@ -48,6 +85,17 @@ UsbGetProtocolRequest (
   IN UINT8                   *Protocol
   );
 
+/**
+  Set Hid Protocol Request
+
+  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  Interface         Which interface the caller wants to set protocol
+  @param  Protocol          Protocol value the caller wants to set.
+
+  @return Status of setting Protocol Request through USB I/O
+          protocol's UsbControlTransfer().
+
+**/
 EFI_STATUS
 EFIAPI
 UsbSetProtocolRequest (
@@ -56,6 +104,18 @@ UsbSetProtocolRequest (
   IN UINT8                   Protocol
   );
 
+/**
+  Set Idel request.
+
+  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  Interface         Which interface the caller wants to set.
+  @param  ReportId          Which report the caller wants to set.
+  @param  Duration          Idle rate the caller wants to set.
+
+  @return Status of setting IDLE Request through USB I/O
+          protocol's UsbControlTransfer().
+
+**/
 EFI_STATUS
 EFIAPI
 UsbSetIdleRequest (
@@ -65,6 +125,18 @@ UsbSetIdleRequest (
   IN UINT8                   Duration
   );
 
+/**
+  Get Idel request.
+
+  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  Interface         Which interface the caller wants to get.
+  @param  ReportId          Which report the caller wants to get.
+  @param  Duration          Idle rate the caller wants to get.
+
+  @return Status of getting IDLE Request through USB I/O
+          protocol's UsbControlTransfer().
+
+**/
 EFI_STATUS
 EFIAPI
 UsbGetIdleRequest (
@@ -74,6 +146,20 @@ UsbGetIdleRequest (
   OUT UINT8                   *Duration
   );
 
+/**
+  Hid Set Report request.
+
+  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  Interface         Which interface the caller wants to set.
+  @param  ReportId          Which report the caller wants to set.
+  @param  ReportType        Type of report.
+  @param  ReportLen         Length of report descriptor.
+  @param  Report            Report Descriptor buffer.
+
+  @return Status of setting Report Request through USB I/O
+          protocol's UsbControlTransfer().
+
+**/
 EFI_STATUS
 EFIAPI
 UsbSetReportRequest (
@@ -85,6 +171,20 @@ UsbSetReportRequest (
   IN UINT8                   *Report
   );
 
+/**
+  Hid Set Report request.
+
+  @param  UsbIo             EFI_USB_IO_PROTOCOL
+  @param  Interface         Which interface the caller wants to set.
+  @param  ReportId          Which report the caller wants to set.
+  @param  ReportType        Type of report.
+  @param  ReportLen         Length of report descriptor.
+  @param  Report            Caller allocated buffer to store Report Descriptor.
+
+  @return Status of getting Report Request through USB I/O
+          protocol's UsbControlTransfer().
+
+**/
 EFI_STATUS
 EFIAPI
 UsbGetReportRequest (
@@ -96,6 +196,21 @@ UsbGetReportRequest (
   IN UINT8                   *Report
   );
 
+/**
+  Usb Get Descriptor
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  Value                  Device Request Value
+  @param  Index                  Device Request Index
+  @param  DescriptorLength       Descriptor Length
+  @param  Descriptor             Descriptor buffer to contain result
+  @param  Status                 Transfer Status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 UsbGetDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
@@ -106,6 +221,21 @@ UsbGetDescriptor (
   OUT UINT32                  *Status
   );
 
+/**
+  Usb Set Descriptor
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  Value                  Device Request Value
+  @param  Index                  Device Request Index
+  @param  DescriptorLength       Descriptor Length
+  @param  Descriptor             Descriptor buffer to set
+  @param  Status                 Transfer Status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 EFIAPI
 UsbSetDescriptor (
@@ -117,6 +247,19 @@ UsbSetDescriptor (
   OUT UINT32                  *Status
   );
 
+/**
+  Usb Get Device Interface
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  Index                  Interface index value
+  @param  AltSetting             Alternate setting
+  @param  Status                 Trasnsfer status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 EFIAPI
 UsbGetInterface (
@@ -126,6 +269,19 @@ UsbGetInterface (
   OUT UINT32                  *Status
   );
 
+/**
+  Usb Set Device Interface
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  InterfaceNo            Interface Number
+  @param  AltSetting             Alternate setting
+  @param  Status                 Trasnsfer status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 EFIAPI
 UsbSetInterface (
@@ -135,6 +291,18 @@ UsbSetInterface (
   OUT UINT32                  *Status
   );
 
+/**
+  Usb Get Device Configuration
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  ConfigValue            Config Value
+  @param  Status                 Transfer Status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 EFIAPI
 UsbGetConfiguration (
@@ -143,6 +311,18 @@ UsbGetConfiguration (
   OUT UINT32                  *Status
   );
 
+/**
+  Usb Set Device Configuration
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  Value                  Configuration Value to set
+  @param  Status                 Transfer status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 EFIAPI
 UsbSetConfiguration (
@@ -151,6 +331,20 @@ UsbSetConfiguration (
   OUT UINT32                  *Status
   );
 
+/**
+  Usb Set Device Feature
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  Recipient              Interface/Device/Endpoint
+  @param  Value                  Request value
+  @param  Target                 Request Index
+  @param  Status                 Transfer status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 EFIAPI
 UsbSetFeature (
@@ -161,6 +355,20 @@ UsbSetFeature (
   OUT UINT32                  *Status
   );
 
+/**
+  Usb Clear Device Feature
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  Recipient              Interface/Device/Endpoint
+  @param  Value                  Request value
+  @param  Target                 Request Index
+  @param  Status                 Transfer status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 EFIAPI
 UsbClearFeature (
@@ -171,6 +379,20 @@ UsbClearFeature (
   OUT UINT32                  *Status
   );
 
+/**
+  Usb Get Device Status
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  Recipient              Interface/Device/Endpoint
+  @param  Target                 Request index
+  @param  DevStatus              Device status
+  @param  Status                 Transfer status
+
+  @retval EFI_INVALID_PARAMETER  Parameter is error
+  @retval EFI_SUCCESS            Success
+  @retval EFI_TIMEOUT            Device has no response
+
+**/
 EFI_STATUS
 EFIAPI
 UsbGetStatus (
@@ -181,9 +403,18 @@ UsbGetStatus (
   OUT UINT32                  *Status
   );
 
-//
-// Clear endpoint stall
-//
+/**
+  Clear endpoint stall
+
+  @param  UsbIo                  EFI_USB_IO_PROTOCOL
+  @param  EndpointNo             Endpoint Number
+  @param  Status                 Transfer Status
+
+  @retval EFI_NOT_FOUND          Can't find the Endpoint
+  @retval EFI_DEVICE_ERROR       Hardware error
+  @retval EFI_SUCCESS            Success
+
+**/
 EFI_STATUS
 EFIAPI
 UsbClearEndpointHalt (
