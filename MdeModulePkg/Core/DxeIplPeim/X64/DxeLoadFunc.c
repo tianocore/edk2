@@ -63,6 +63,9 @@ HandOffToDxeCore (
   //    
   UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, STACK_SIZE);
 
+  //
+  // Transfer the control to the entry point of DxeCore.
+  //
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
     HobList.Raw,
