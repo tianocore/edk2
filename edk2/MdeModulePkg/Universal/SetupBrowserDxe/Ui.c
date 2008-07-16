@@ -548,7 +548,6 @@ UiAddMenuOption (
   @param  StringBuffer           The passed in pointer to the buffer which will
                                  hold the typed in string if HotKey is FALSE
   @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
-  @param  String                 Pointer to the first string in the list
   @param  ...                    A series of (quantity == NumberOfLines) text
                                  strings which will be used to construct the dialog
                                  box
@@ -566,11 +565,11 @@ CreateDialog (
   IN  UINTN                       MaximumStringSize,
   OUT CHAR16                      *StringBuffer,
   OUT EFI_INPUT_KEY               *KeyValue,
-  IN  CHAR16                      *String,
   ...
   )
 {
   VA_LIST       Marker;
+  VA_LIST       MarkerBackup;
   UINTN         Count;
   EFI_INPUT_KEY Key;
   UINTN         LargestString;
@@ -600,7 +599,8 @@ CreateDialog (
   ASSERT (TempString);
   ASSERT (BufferedString);
 
-  VA_START (Marker, String);
+  VA_START (Marker, KeyValue);
+  MarkerBackup = Marker;
 
   //
   // Zero the outgoing buffer
@@ -621,16 +621,13 @@ CreateDialog (
   //
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
 
-  LargestString = (GetStringWidth (String) / 2);
+  LargestString = 0;
 
-  if (*String == L' ') {
-    InputOffset = 1;
-  }
   //
   // Determine the largest string in the dialog box
   // Notice we are starting with 1 since String is the first string
   //
-  for (Count = 1; Count < NumberOfLines; Count++) {
+  for (Count = 0; Count < NumberOfLines; Count++) {
     StackString = VA_ARG (Marker, CHAR16 *);
 
     if (StackString[0] == L' ') {
@@ -653,7 +650,7 @@ CreateDialog (
   //
   // Display the Popup
   //
-  CreateSharedPopUp (LargestString, NumberOfLines, &String);
+  CreateSharedPopUp (LargestString, NumberOfLines, MarkerBackup);
 
   //
   // Take the first key typed and report it back?
@@ -752,14 +749,14 @@ CreateDialog (
 
   @param RequestedWidth  The width of the pop-up.
   @param NumberOfLines   The number of lines.
-  @param ArrayOfStrings  The array of string to be printed.
+  @param Marker          The variable argument list for the list of string to be printed.
 
 **/
 VOID
 CreateSharedPopUp (
   IN  UINTN                       RequestedWidth,
   IN  UINTN                       NumberOfLines,
-  IN  CHAR16                      **ArrayOfStrings
+  IN  VA_LIST                     Marker
   )
 {
   UINTN   Index;
@@ -775,8 +772,6 @@ CreateSharedPopUp (
 
   DimensionsWidth   = gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn;
   DimensionsHeight  = gScreenDimensions.BottomRow - gScreenDimensions.TopRow;
-
-  Count = 0;
 
   gST->ConOut->SetAttribute (gST->ConOut, POPUP_TEXT | POPUP_BACKGROUND);
 
@@ -804,9 +799,10 @@ CreateSharedPopUp (
   Character = BOXDRAW_DOWN_LEFT;
   PrintChar (Character);
   Character = BOXDRAW_VERTICAL;
-  for (Index = Top; Index + 2 < Bottom; Index++) {
-    String = ArrayOfStrings[Count];
-    Count++;
+
+  Count = 0;
+  for (Index = Top; Index + 2 < Bottom; Index++, Count++) {
+    String = VA_ARG (Marker, CHAR16*);
 
     //
     // This will clear the background of the line - we never know who might have been
@@ -858,7 +854,6 @@ CreateSharedPopUp (
 
   @param RequestedWidth  The width of the pop-up.
   @param NumberOfLines   The number of lines.
-  @param ArrayOfStrings  The array of string to be printed.
   @param ...             A series of text strings that displayed in the pop-up.
 
 **/
@@ -866,11 +861,16 @@ VOID
 CreatePopUp (
   IN  UINTN                       RequestedWidth,
   IN  UINTN                       NumberOfLines,
-  IN  CHAR16                      *ArrayOfStrings,
   ...
   )
 {
-  CreateSharedPopUp (RequestedWidth, NumberOfLines, &ArrayOfStrings);
+  VA_LIST Marker;
+
+  VA_START (Marker, NumberOfLines);
+  
+  CreateSharedPopUp (RequestedWidth, NumberOfLines, Marker);
+
+  VA_END (Marker);
 }
 
 
