@@ -14,54 +14,40 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DevicePath.h"
 
-STATIC
+
+/**
+
+  Duplicates a string.
+
+  @param  Src  Source string.
+
+  @return The duplicated string.
+
+**/
 CHAR16 *
 StrDuplicate (
   IN CONST CHAR16  *Src
   )
-/*++
-
-  Routine Description:
-    Duplicate a string
-
-  Arguments:
-    Src - Source string
-
-  Returns:
-    Duplicated string
-
---*/
 {
-  UINTN   Length;
-  CHAR16  *ReturnStr;
-
-  Length = StrLen ((CHAR16 *) Src);
-
-  ReturnStr = AllocateCopyPool ((Length + 1) * sizeof (CHAR16), (VOID *) Src);
-
-  return ReturnStr;
+  return AllocateCopyPool (StrSize (Src), Src);
 }
 
-STATIC
+/**
+
+  Get parameter in a pair of parentheses follow the given node name.
+  For example, given the "Pci(0,1)" and NodeName "Pci", it returns "0,1".
+
+  @param  Str      Device Path Text.
+  @param  NodeName Name of the node.
+
+  @return Parameter text for the node.
+
+**/
 CHAR16 *
 GetParamByNodeName (
   IN CHAR16 *Str,
   IN CHAR16 *NodeName
   )
-/*++
-
-  Routine Description:
-    Get parameter in a pair of parentheses follow the given node name.
-    For example, given the "Pci(0,1)" and NodeName "Pci", it returns "0,1".
-
-  Arguments:
-    Str      - Device Path Text
-    NodeName - Name of the node
-
-  Returns:
-    Parameter text for the node
-
---*/
 {
   CHAR16  *ParamStr;
   CHAR16  *StrPointer;
@@ -113,28 +99,23 @@ GetParamByNodeName (
   return ParamStr;
 }
 
-STATIC
+/**
+  Gets current sub-string from a string list, before return
+  the list header is moved to next sub-string. The sub-string is separated
+  by the specified character. For example, the separator is ',', the string
+  list is "2,0,3", it returns "2", the remain list move to "0,3"
+
+  @param  List        A string list separated by the specified separator
+  @param  Separator   The separator character
+
+  @return A pointer to the current sub-string
+
+**/
 CHAR16 *
 SplitStr (
   IN OUT CHAR16 **List,
   IN     CHAR16 Separator
   )
-/*++
-
-  Routine Description:
-    Get current sub-string from a string list, before return
-    the list header is moved to next sub-string. The sub-string is separated
-    by the specified character. For example, the separator is ',', the string
-    list is "2,0,3", it returns "2", the remain list move to "0,3"
-
-  Arguments:
-    List       - A string list separated by the specified separator
-    Separator  - The separator character
-
-  Returns:
-    pointer    - The current sub-string
-
---*/
 {
   CHAR16  *Str;
   CHAR16  *ReturnStr;
@@ -172,7 +153,14 @@ SplitStr (
   return ReturnStr;
 }
 
-STATIC
+/**
+  Gets the next parameter string from the list.
+
+  @param List            A string list separated by the specified separator
+
+  @return A pointer to the current sub-string
+
+**/
 CHAR16 *
 GetNextParamStr (
   IN OUT CHAR16 **List
@@ -184,26 +172,20 @@ GetNextParamStr (
   return SplitStr (List, L',');
 }
 
-STATIC
+/**
+  Get one device node from entire device path text.
+
+  @param DevicePath      On input, the current Device Path node; on output, the next device path node
+  @param IsInstanceEnd   This node is the end of a device path instance
+
+  @return A device node text or NULL if no more device node available
+
+**/
 CHAR16 *
 GetNextDeviceNodeStr (
   IN OUT CHAR16   **DevicePath,
   OUT    BOOLEAN  *IsInstanceEnd
   )
-/*++
-
-  Routine Description:
-    Get one device node from entire device path text.
-
-  Arguments:
-    Str           - The entire device path text string
-    IsInstanceEnd - This node is the end of a device path instance
-
-  Returns:
-    a pointer     - A device node text
-    NULL          - No more device node available
-
---*/
 {
   CHAR16  *Str;
   CHAR16  *ReturnStr;
@@ -272,43 +254,39 @@ GetNextDeviceNodeStr (
 }
 
 
-STATIC
+/**
+  Skip the leading white space and '0x' or '0X' of a integer string
+
+  @param Str             The integer string
+  @param IsHex           TRUE: Hex string, FALSE: Decimal string
+
+  @return The trimmed Hex string.
+
+**/
 CHAR16 *
 TrimHexStr (
   IN CHAR16   *Str,
   OUT BOOLEAN *IsHex
   )
-/*++
-
-  Routine Description:
-    Skip the leading white space and '0x' or '0X' of a integer string
-
-  Arguments:
-    Str   -  The integer string
-    IsHex -  1: Hex string,  0: Decimal string
-
-  Returns:
-
---*/
 {
   *IsHex = FALSE;
 
   //
   // skip preceeding white space
   //
-  while (*Str && *Str == ' ') {
+  while ((*Str != 0) && *Str == ' ') {
     Str += 1;
   }
   //
   // skip preceeding zeros
   //
-  while (*Str && *Str == '0') {
+  while ((*Str != 0) && *Str == '0') {
     Str += 1;
   }
   //
   // skip preceeding character 'x' or 'X'
   //
-  if (*Str && (*Str == 'x' || *Str == 'X')) {
+  if ((*Str != 0) && (*Str == 'x' || *Str == 'X')) {
     Str += 1;
     *IsHex = TRUE;
   }
@@ -316,24 +294,19 @@ TrimHexStr (
   return Str;
 }
 
-STATIC
+/**
+
+  Convert hex string to uint.
+
+  @param Str             The hex string
+
+  @return A UINTN value represented by Str
+
+**/
 UINTN
 Xtoi (
   IN CHAR16  *Str
   )
-/*++
-
-Routine Description:
-
-  Convert hex string to uint
-
-Arguments:
-
-  Str  -  The string
-  
-Returns:
-
---*/
 {
   UINTN   Rvalue;
   UINTN   Length;
@@ -350,25 +323,19 @@ Returns:
   return Rvalue;
 }
 
-STATIC
-VOID
-Xtoi64 (
-  IN CHAR16  *Str,
-  IN UINT64  *Data
-  )
-/*++
-
-Routine Description:
+/**
 
   Convert hex string to 64 bit data.
 
-Arguments:
+  @param Str             The hex string
+  @param Data            A pointer to the UINT64 value represented by Str
 
-  Str  -  The string
-  
-Returns:
-
---*/
+**/
+VOID
+Xtoi64 (
+  IN  CHAR16  *Str,
+  OUT UINT64  *Data
+  )
 {
   UINTN  Length;
 
@@ -377,46 +344,41 @@ Returns:
   HexStringToBuf ((UINT8 *) Data, &Length, Str, NULL);
 }
 
-STATIC
+/**
+
+  Convert decimal string to uint.
+
+  @param Str             The decimal string
+
+  @return A UINTN value represented by Str
+
+**/
 UINTN
 Dtoi (
-  IN CHAR16  *str
+  IN CHAR16  *Str
   )
-/*++
-
-Routine Description:
-
-  Convert decimal string to uint
-
-Arguments:
-
-  Str  -  The string
-  
-Returns:
-
---*/
 {
   UINTN   Rvalue;
   CHAR16  Char;
   UINTN   High;
   UINTN   Low;
 
-  ASSERT (str != NULL);
+  ASSERT (Str != NULL);
 
   High = (UINTN) -1 / 10;
   Low  = (UINTN) -1 % 10;
   //
   // skip preceeding white space
   //
-  while (*str && *str == ' ') {
-    str += 1;
+  while ((*Str != 0) && *Str == ' ') {
+    Str += 1;
   }
   //
   // convert digits
   //
   Rvalue = 0;
-  Char = *(str++);
-  while (Char) {
+  Char = *(Str++);
+  while (Char != 0) {
     if (Char >= '0' && Char <= '9') {
       if ((Rvalue > High || Rvalue == High) && (Char - '0' > (INTN) Low)) {
         return (UINTN) -1;
@@ -427,52 +389,46 @@ Returns:
       break;
     }
 
-    Char = *(str++);
+    Char = *(Str++);
   }
 
   return Rvalue;
 }
 
-STATIC
+/**
+
+  Convert decimal string to uint.
+
+  @param Str             The decimal string
+  @param Data            A pointer to the UINT64 value represented by Str
+
+**/
 VOID
 Dtoi64 (
-  IN CHAR16  *str,
+  IN CHAR16  *Str,
   OUT UINT64 *Data
   )
-/*++
-
-Routine Description:
-
-  Convert decimal string to uint
-
-Arguments:
-
-  Str  -  The string
-
-Returns:
-
---*/
 {
   UINT64   Rvalue;
   CHAR16   Char;
   UINT64   High;
   UINT64   Low;
 
-  ASSERT (str != NULL);
+  ASSERT (Str != NULL);
   ASSERT (Data != NULL);
 
   //
   // skip preceeding white space
   //
-  while (*str && *str == ' ') {
-    str += 1;
+  while ((*Str != 0) && *Str == ' ') {
+    Str += 1;
   }
   //
   // convert digits
   //
   Rvalue = 0;
-  Char = *(str++);
-  while (Char) {
+  Char = *(Str++);
+  while (Char != 0) {
     if (Char >= '0' && Char <= '9') {
       High = LShiftU64 (Rvalue, 3);
       Low = LShiftU64 (Rvalue, 1);
@@ -481,30 +437,25 @@ Returns:
       break;
     }
 
-    Char = *(str++);
+    Char = *(Str++);
   }
 
   *Data = Rvalue;
 }
 
-STATIC
+/**
+
+  Convert integer string to uint.
+
+  @param Str             The integer string. If leading with "0x" or "0X", it's heximal.
+
+  @return A UINTN value represented by Str
+
+**/
 UINTN
 Strtoi (
   IN CHAR16  *Str
   )
-/*++
-
-Routine Description:
-
-  Convert integer string to uint.
-
-Arguments:
-
-  Str  -  The integer string. If leading with "0x" or "0X", it's heximal.
-
-Returns:
-
---*/
 {
   BOOLEAN IsHex;
 
@@ -517,25 +468,19 @@ Returns:
   }
 }
 
-STATIC
-VOID
-Strtoi64 (
-  IN CHAR16  *Str,
-  IN UINT64  *Data
-  )
-/*++
-
-Routine Description:
+/**
 
   Convert integer string to 64 bit data.
 
-Arguments:
+  @param Str             The integer string. If leading with "0x" or "0X", it's heximal.
+  @param Data            A pointer to the UINT64 value represented by Str
 
-  Str  -  The integer string. If leading with "0x" or "0X", it's heximal.
-
-Returns:
-
---*/
+**/
+VOID
+Strtoi64 (
+  IN  CHAR16  *Str,
+  OUT UINT64  *Data
+  )
 {
   BOOLEAN IsHex;
 
@@ -548,8 +493,17 @@ Returns:
   }
 }
 
-STATIC
-EFI_STATUS 
+/**
+  Converts a list of string to a specified buffer.
+
+  @param Buf             The output buffer that contains the string.
+  @param BufferLength    The length of the buffer
+  @param Str             The input string that contains the hex number
+
+  @retval EFI_SUCCESS    The string was successfully converted to the buffer.
+
+**/
+EFI_STATUS
 StrToBuf (
   OUT UINT8    *Buf,
   IN  UINTN    BufferLength,
@@ -590,7 +544,17 @@ StrToBuf (
   return EFI_SUCCESS;
 }
 
-STATIC
+/**
+  Converts a string to GUID value.
+
+  @param Str              The registry format GUID string that contains the GUID value.
+  @param Guid             A pointer to the converted GUID value.
+
+  @retval EFI_SUCCESS     The GUID string was successfully converted to the GUID value.
+  @retval EFI_UNSUPPORTED The input string is not in registry format.
+  @return others          Some error occurred when converting part of GUID value.
+
+**/
 EFI_STATUS
 StrToGuid (
   IN  CHAR16   *Str,
@@ -608,7 +572,7 @@ StrToGuid (
   }
   Str += ConvertedStrLen;
   if (IS_HYPHEN (*Str)) {
-    Str++;   
+    Str++;
   } else {
     return EFI_UNSUPPORTED;
   }
@@ -653,7 +617,13 @@ StrToGuid (
   return EFI_SUCCESS;
 }
 
-STATIC
+/**
+  Converts a string to IPv4 address
+
+  @param Str             A string representation of IPv4 address.
+  @param IPv4Addr        A pointer to the converted IPv4 address.
+
+**/
 VOID
 StrToIPv4Addr (
   IN OUT CHAR16           **Str,
@@ -667,7 +637,13 @@ StrToIPv4Addr (
   }
 }
 
-STATIC
+/**
+  Converts a string to IPv4 address
+
+  @param Str             A string representation of IPv6 address.
+  @param IPv6Addr        A pointer to the converted IPv6 address.
+
+**/
 VOID
 StrToIPv6Addr (
   IN OUT CHAR16           **Str,
@@ -684,7 +660,14 @@ StrToIPv6Addr (
   }
 }
 
-STATIC
+/**
+  Converts a Unicode string to ASCII string.
+
+  @param Str             The equiventant Unicode string
+  @param AsciiStr        On input, it points to destination ASCII string buffer; on output, it points
+                         to the next ASCII string next to it
+
+**/
 VOID
 StrToAscii (
   IN     CHAR16 *Str,
@@ -705,7 +688,14 @@ StrToAscii (
   *AsciiStr = Dest + 1;
 }
 
-STATIC
+/**
+  Converts a text device path node to Hardware PCI device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to Hardware PCI device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextPci (
   IN CHAR16 *TextDeviceNode
@@ -729,7 +719,14 @@ DevPathFromTextPci (
   return (EFI_DEVICE_PATH_PROTOCOL *) Pci;
 }
 
-STATIC
+/**
+  Converts a text device path node to Hardware PC card device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to Hardware PC card device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextPcCard (
   IN CHAR16 *TextDeviceNode
@@ -750,7 +747,14 @@ DevPathFromTextPcCard (
   return (EFI_DEVICE_PATH_PROTOCOL *) Pccard;
 }
 
-STATIC
+/**
+  Converts a text device path node to Hardware memory map device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to Hardware memory map device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextMemoryMapped (
   IN CHAR16 *TextDeviceNode
@@ -777,7 +781,17 @@ DevPathFromTextMemoryMapped (
   return (EFI_DEVICE_PATH_PROTOCOL *) MemMap;
 }
 
-STATIC
+/**
+  Converts a text device path node to Vendor device path structure based on the input Type
+  and SubType.
+
+  @param TextDeviceNode  The input Text device path node.
+  @param Type            The type of device path node.
+  @param SubType         The subtype of device path node.
+
+  @return A pointer to the newly-created Vendor device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 ConvertFromTextVendor (
   IN CHAR16 *TextDeviceNode,
@@ -811,7 +825,14 @@ ConvertFromTextVendor (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
-STATIC
+/**
+  Converts a text device path node to Vendor Hardware device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Vendor Hardware device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenHw (
   IN CHAR16 *TextDeviceNode
@@ -824,7 +845,14 @@ DevPathFromTextVenHw (
            );
 }
 
-STATIC
+/**
+  Converts a text device path node to Hardware Controller device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Hardware Controller device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextCtrl (
   IN CHAR16 *TextDeviceNode
@@ -844,7 +872,13 @@ DevPathFromTextCtrl (
   return (EFI_DEVICE_PATH_PROTOCOL *) Controller;
 }
 
-STATIC
+/**
+  Converts a string to EisaId.
+
+  @param Text   The input string.
+  @param EisaId A pointer to the output EisaId.
+
+**/
 VOID
 EisaIdFromText (
   IN CHAR16 *Text,
@@ -854,12 +888,20 @@ EisaIdFromText (
   UINTN PnpId;
 
   PnpId = Xtoi (Text + 3);
-  *EisaId = (((Text[0] - '@') & 0x1f) << 10) + 
-            (((Text[1] - '@') & 0x1f) << 5) + 
+  *EisaId = (((Text[0] - '@') & 0x1f) << 10) +
+            (((Text[1] - '@') & 0x1f) << 5) +
             ((Text[2] - '@') & 0x1f) +
             (UINT32) (PnpId << 16);
 }
 
+/**
+  Converts a text device path node to ACPI HID device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created ACPI HID device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAcpi (
   IN CHAR16 *TextDeviceNode
@@ -883,7 +925,15 @@ DevPathFromTextAcpi (
   return (EFI_DEVICE_PATH_PROTOCOL *) Acpi;
 }
 
-STATIC
+/**
+  Converts a text device path node to ACPI HID device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+  @param PnPId           The input plug and play identification.
+
+  @return A pointer to the newly-created ACPI HID device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 ConvertFromTextAcpi (
   IN CHAR16 *TextDeviceNode,
@@ -906,7 +956,14 @@ ConvertFromTextAcpi (
   return (EFI_DEVICE_PATH_PROTOCOL *) Acpi;
 }
 
-STATIC
+/**
+  Converts a text device path node to PCI root device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created PCI root device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextPciRoot (
   IN CHAR16 *TextDeviceNode
@@ -915,7 +972,14 @@ DevPathFromTextPciRoot (
   return ConvertFromTextAcpi (TextDeviceNode, 0x0a03);
 }
 
-STATIC
+/**
+  Converts a text device path node to Floppy device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Floppy device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextFloppy (
   IN CHAR16 *TextDeviceNode
@@ -924,7 +988,14 @@ DevPathFromTextFloppy (
   return ConvertFromTextAcpi (TextDeviceNode, 0x0604);
 }
 
-STATIC
+/**
+  Converts a text device path node to Keyboard device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created  Keyboard device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextKeyboard (
   IN CHAR16 *TextDeviceNode
@@ -933,7 +1004,14 @@ DevPathFromTextKeyboard (
   return ConvertFromTextAcpi (TextDeviceNode, 0x0301);
 }
 
-STATIC
+/**
+  Converts a text device path node to Serial device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Serial device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextSerial (
   IN CHAR16 *TextDeviceNode
@@ -942,7 +1020,14 @@ DevPathFromTextSerial (
   return ConvertFromTextAcpi (TextDeviceNode, 0x0501);
 }
 
-STATIC
+/**
+  Converts a text device path node to Parallel Port device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Parallel Port device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextParallelPort (
   IN CHAR16 *TextDeviceNode
@@ -951,7 +1036,14 @@ DevPathFromTextParallelPort (
   return ConvertFromTextAcpi (TextDeviceNode, 0x0401);
 }
 
-STATIC
+/**
+  Converts a text device path node to ACPI extention device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created ACPI extention device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAcpiEx (
   IN CHAR16 *TextDeviceNode
@@ -995,7 +1087,14 @@ DevPathFromTextAcpiEx (
   return (EFI_DEVICE_PATH_PROTOCOL *) AcpiEx;
 }
 
-STATIC
+/**
+  Converts a text device path node to ACPI extention device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created ACPI extention device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAcpiExp (
   IN CHAR16 *TextDeviceNode
@@ -1040,7 +1139,14 @@ DevPathFromTextAcpiExp (
   return (EFI_DEVICE_PATH_PROTOCOL *) AcpiEx;
 }
 
-STATIC
+/**
+  Converts a text device path node to Parallel Port device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Parallel Port device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAta (
   IN CHAR16 *TextDeviceNode
@@ -1068,7 +1174,14 @@ DevPathFromTextAta (
   return (EFI_DEVICE_PATH_PROTOCOL *) Atapi;
 }
 
-STATIC
+/**
+  Converts a text device path node to SCSI device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created SCSI device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextScsi (
   IN CHAR16 *TextDeviceNode
@@ -1092,7 +1205,14 @@ DevPathFromTextScsi (
   return (EFI_DEVICE_PATH_PROTOCOL *) Scsi;
 }
 
-STATIC
+/**
+  Converts a text device path node to Fibre device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Fibre device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextFibre (
   IN CHAR16 *TextDeviceNode
@@ -1117,29 +1237,43 @@ DevPathFromTextFibre (
   return (EFI_DEVICE_PATH_PROTOCOL *) Fibre;
 }
 
-STATIC
+/**
+  Converts a text device path node to 1394 device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created 1394 device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromText1394 (
   IN CHAR16 *TextDeviceNode
   )
 {
   CHAR16            *GuidStr;
-  F1394_DEVICE_PATH *F1394;
+  F1394_DEVICE_PATH *F1394DevPath;
 
   GuidStr = GetNextParamStr (&TextDeviceNode);
-  F1394  = (F1394_DEVICE_PATH *) CreateDeviceNode (
-                                   MESSAGING_DEVICE_PATH,
-                                   MSG_1394_DP,
-                                   sizeof (F1394_DEVICE_PATH)
-                                   );
+  F1394DevPath  = (F1394_DEVICE_PATH *) CreateDeviceNode (
+                                          MESSAGING_DEVICE_PATH,
+                                          MSG_1394_DP,
+                                          sizeof (F1394_DEVICE_PATH)
+                                          );
 
-  F1394->Reserved = 0;
-  Xtoi64 (GuidStr, &F1394->Guid);
+  F1394DevPath->Reserved = 0;
+  Xtoi64 (GuidStr, &F1394DevPath->Guid);
 
-  return (EFI_DEVICE_PATH_PROTOCOL *) F1394;
+  return (EFI_DEVICE_PATH_PROTOCOL *) F1394DevPath;
 }
 
-STATIC
+/**
+  Converts a text device path node to USB device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsb (
   IN CHAR16 *TextDeviceNode
@@ -1163,28 +1297,42 @@ DevPathFromTextUsb (
   return (EFI_DEVICE_PATH_PROTOCOL *) Usb;
 }
 
-STATIC
+/**
+  Converts a text device path node to I20 device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created I20 device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextI2O (
   IN CHAR16 *TextDeviceNode
   )
 {
   CHAR16          *TIDStr;
-  I2O_DEVICE_PATH *I2O;
+  I2O_DEVICE_PATH *I2ODevPath;
 
-  TIDStr    = GetNextParamStr (&TextDeviceNode);
-  I2O       = (I2O_DEVICE_PATH *) CreateDeviceNode (
+  TIDStr     = GetNextParamStr (&TextDeviceNode);
+  I2ODevPath = (I2O_DEVICE_PATH *) CreateDeviceNode (
                                     MESSAGING_DEVICE_PATH,
                                     MSG_I2O_DP,
                                     sizeof (I2O_DEVICE_PATH)
                                     );
 
-  I2O->Tid  = (UINT32) Strtoi (TIDStr);
+  I2ODevPath->Tid  = (UINT32) Strtoi (TIDStr);
 
-  return (EFI_DEVICE_PATH_PROTOCOL *) I2O;
+  return (EFI_DEVICE_PATH_PROTOCOL *) I2ODevPath;
 }
 
-STATIC
+/**
+  Converts a text device path node to Infini Band device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Infini Band device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextInfiniband (
   IN CHAR16 *TextDeviceNode
@@ -1219,7 +1367,14 @@ DevPathFromTextInfiniband (
   return (EFI_DEVICE_PATH_PROTOCOL *) InfiniBand;
 }
 
-STATIC
+/**
+  Converts a text device path node to Vendor-Defined Messaging device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Vendor-Defined Messaging device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenMsg (
   IN CHAR16 *TextDeviceNode
@@ -1232,7 +1387,14 @@ DevPathFromTextVenMsg (
             );
 }
 
-STATIC
+/**
+  Converts a text device path node to Vendor defined PC-ANSI device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Vendor defined PC-ANSI device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenPcAnsi (
   IN CHAR16 *TextDeviceNode
@@ -1249,7 +1411,14 @@ DevPathFromTextVenPcAnsi (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
-STATIC
+/**
+  Converts a text device path node to Vendor defined VT100 device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Vendor defined VT100 device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenVt100 (
   IN CHAR16 *TextDeviceNode
@@ -1266,7 +1435,14 @@ DevPathFromTextVenVt100 (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
-STATIC
+/**
+  Converts a text device path node to Vendor defined VT100 Plus device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Vendor defined VT100 Plus device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenVt100Plus (
   IN CHAR16 *TextDeviceNode
@@ -1283,7 +1459,14 @@ DevPathFromTextVenVt100Plus (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
-STATIC
+/**
+  Converts a text device path node to Vendor defined UTF8 device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Vendor defined UTF8 device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenUtf8 (
   IN CHAR16 *TextDeviceNode
@@ -1300,7 +1483,14 @@ DevPathFromTextVenUtf8 (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
 
-STATIC
+/**
+  Converts a text device path node to UART Flow Control device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created UART Flow Control device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUartFlowCtrl (
   IN CHAR16 *TextDeviceNode
@@ -1328,7 +1518,14 @@ DevPathFromTextUartFlowCtrl (
   return (EFI_DEVICE_PATH_PROTOCOL *) UartFlowControl;
 }
 
-STATIC
+/**
+  Converts a text device path node to Serial Attached SCSI device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Serial Attached SCSI device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextSAS (
   IN CHAR16 *TextDeviceNode
@@ -1391,7 +1588,14 @@ DevPathFromTextSAS (
   return (EFI_DEVICE_PATH_PROTOCOL *) Sas;
 }
 
-STATIC
+/**
+  Converts a text device path node to Debug Port device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Debug Port device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextDebugPort (
   IN CHAR16 *TextDeviceNode
@@ -1410,7 +1614,14 @@ DevPathFromTextDebugPort (
   return (EFI_DEVICE_PATH_PROTOCOL *) Vend;
 }
 
-STATIC
+/**
+  Converts a text device path node to MAC device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created MAC device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextMAC (
   IN CHAR16 *TextDeviceNode
@@ -1419,25 +1630,32 @@ DevPathFromTextMAC (
   CHAR16                *AddressStr;
   CHAR16                *IfTypeStr;
   UINTN                 Length;
-  MAC_ADDR_DEVICE_PATH  *MAC;
+  MAC_ADDR_DEVICE_PATH  *MACDevPath;
 
   AddressStr    = GetNextParamStr (&TextDeviceNode);
   IfTypeStr     = GetNextParamStr (&TextDeviceNode);
-  MAC           = (MAC_ADDR_DEVICE_PATH *) CreateDeviceNode (
+  MACDevPath    = (MAC_ADDR_DEVICE_PATH *) CreateDeviceNode (
                                               MESSAGING_DEVICE_PATH,
                                               MSG_MAC_ADDR_DP,
                                               sizeof (MAC_ADDR_DEVICE_PATH)
                                               );
 
-  MAC->IfType   = (UINT8) Strtoi (IfTypeStr);
+  MACDevPath->IfType   = (UINT8) Strtoi (IfTypeStr);
 
   Length = sizeof (EFI_MAC_ADDRESS);
-  StrToBuf (&MAC->MacAddress.Addr[0], Length, AddressStr);
+  StrToBuf (&MACDevPath->MacAddress.Addr[0], Length, AddressStr);
 
-  return (EFI_DEVICE_PATH_PROTOCOL *) MAC;
+  return (EFI_DEVICE_PATH_PROTOCOL *) MACDevPath;
 }
 
-STATIC
+/**
+  Converts a text device path node to IPV4 device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created IPV4 device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextIPv4 (
   IN CHAR16 *TextDeviceNode
@@ -1475,7 +1693,14 @@ DevPathFromTextIPv4 (
   return (EFI_DEVICE_PATH_PROTOCOL *) IPv4;
 }
 
-STATIC
+/**
+  Converts a text device path node to IPV6 device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created IPV6 device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextIPv6 (
   IN CHAR16 *TextDeviceNode
@@ -1513,7 +1738,14 @@ DevPathFromTextIPv6 (
   return (EFI_DEVICE_PATH_PROTOCOL *) IPv6;
 }
 
-STATIC
+/**
+  Converts a text device path node to UART device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created UART device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUart (
   IN CHAR16 *TextDeviceNode
@@ -1580,7 +1812,15 @@ DevPathFromTextUart (
   return (EFI_DEVICE_PATH_PROTOCOL *) Uart;
 }
 
-STATIC
+/**
+  Converts a text device path node to USB class device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+  @param UsbClassText    A pointer to USB_CLASS_TEXT structure to be integrated to USB Class Text.
+
+  @return A pointer to the newly-created USB class device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 ConvertFromTextUsbClass (
   IN CHAR16         *TextDeviceNode,
@@ -1613,7 +1853,7 @@ ConvertFromTextUsbClass (
     UsbClass->DeviceSubClass = (UINT8) Strtoi (SubClassStr);
   } else {
     UsbClass->DeviceSubClass = UsbClassText->SubClass;
-  }  
+  }
 
   ProtocolStr = GetNextParamStr (&TextDeviceNode);
 
@@ -1625,7 +1865,14 @@ ConvertFromTextUsbClass (
 }
 
 
-STATIC
+/**
+  Converts a text device path node to USB class device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB class device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbClass (
   IN CHAR16 *TextDeviceNode
@@ -1639,7 +1886,14 @@ DevPathFromTextUsbClass (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB audio device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB audio device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbAudio (
   IN CHAR16 *TextDeviceNode
@@ -1654,7 +1908,14 @@ DevPathFromTextUsbAudio (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB CDC Control device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB CDC Control device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbCDCControl (
   IN CHAR16 *TextDeviceNode
@@ -1669,7 +1930,14 @@ DevPathFromTextUsbCDCControl (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB HID device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB HID device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbHID (
   IN CHAR16 *TextDeviceNode
@@ -1684,7 +1952,14 @@ DevPathFromTextUsbHID (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB Image device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB Image device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbImage (
   IN CHAR16 *TextDeviceNode
@@ -1699,7 +1974,14 @@ DevPathFromTextUsbImage (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB Print device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB Print device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbPrinter (
   IN CHAR16 *TextDeviceNode
@@ -1714,7 +1996,14 @@ DevPathFromTextUsbPrinter (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB mass storage device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB mass storage device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbMassStorage (
   IN CHAR16 *TextDeviceNode
@@ -1729,7 +2018,14 @@ DevPathFromTextUsbMassStorage (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB HUB device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB HUB device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbHub (
   IN CHAR16 *TextDeviceNode
@@ -1744,7 +2040,14 @@ DevPathFromTextUsbHub (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB CDC data device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB CDC data device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbCDCData (
   IN CHAR16 *TextDeviceNode
@@ -1759,7 +2062,14 @@ DevPathFromTextUsbCDCData (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB smart card device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB smart card device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbSmartCard (
   IN CHAR16 *TextDeviceNode
@@ -1774,7 +2084,14 @@ DevPathFromTextUsbSmartCard (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB video device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB video device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbVideo (
   IN CHAR16 *TextDeviceNode
@@ -1789,7 +2106,14 @@ DevPathFromTextUsbVideo (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB diagnostic device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB diagnostic device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbDiagnostic (
   IN CHAR16 *TextDeviceNode
@@ -1804,7 +2128,14 @@ DevPathFromTextUsbDiagnostic (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB wireless device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB wireless device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbWireless (
   IN CHAR16 *TextDeviceNode
@@ -1819,7 +2150,14 @@ DevPathFromTextUsbWireless (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB device firmware update device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB device firmware update device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbDeviceFirmwareUpdate (
   IN CHAR16 *TextDeviceNode
@@ -1835,7 +2173,14 @@ DevPathFromTextUsbDeviceFirmwareUpdate (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB IRDA bridge device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB IRDA bridge device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbIrdaBridge (
   IN CHAR16 *TextDeviceNode
@@ -1851,7 +2196,14 @@ DevPathFromTextUsbIrdaBridge (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB text and measurement device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB text and measurement device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbTestAndMeasurement (
   IN CHAR16 *TextDeviceNode
@@ -1867,7 +2219,14 @@ DevPathFromTextUsbTestAndMeasurement (
   return ConvertFromTextUsbClass (TextDeviceNode, &UsbClassText);
 }
 
-STATIC
+/**
+  Converts a text device path node to USB WWID device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created USB WWID device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUsbWwid (
   IN CHAR16 *TextDeviceNode
@@ -1897,7 +2256,14 @@ DevPathFromTextUsbWwid (
   return (EFI_DEVICE_PATH_PROTOCOL *) UsbWwid;
 }
 
-STATIC
+/**
+  Converts a text device path node to Logic Unit device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Logic Unit device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextUnit (
   IN CHAR16 *TextDeviceNode
@@ -1918,7 +2284,14 @@ DevPathFromTextUnit (
   return (EFI_DEVICE_PATH_PROTOCOL *) LogicalUnit;
 }
 
-STATIC
+/**
+  Converts a text device path node to iSCSI device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created iSCSI device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextiSCSI (
   IN CHAR16 *TextDeviceNode
@@ -1933,7 +2306,7 @@ DevPathFromTextiSCSI (
   CHAR16                      *AuthenticationStr;
   CHAR16                      *ProtocolStr;
   CHAR8                       *AsciiStr;
-  ISCSI_DEVICE_PATH_WITH_NAME *iSCSI;
+  ISCSI_DEVICE_PATH_WITH_NAME *ISCSIDevPath;
 
   NameStr           = GetNextParamStr (&TextDeviceNode);
   PortalGroupStr    = GetNextParamStr (&TextDeviceNode);
@@ -1942,17 +2315,17 @@ DevPathFromTextiSCSI (
   DataDigestStr     = GetNextParamStr (&TextDeviceNode);
   AuthenticationStr = GetNextParamStr (&TextDeviceNode);
   ProtocolStr       = GetNextParamStr (&TextDeviceNode);
-  iSCSI             = (ISCSI_DEVICE_PATH_WITH_NAME *) CreateDeviceNode (
+  ISCSIDevPath      = (ISCSI_DEVICE_PATH_WITH_NAME *) CreateDeviceNode (
                                                         MESSAGING_DEVICE_PATH,
                                                         MSG_ISCSI_DP,
                                                         (UINT16) (sizeof (ISCSI_DEVICE_PATH_WITH_NAME) + StrLen (NameStr))
                                                         );
 
-  AsciiStr = iSCSI->iSCSITargetName;
+  AsciiStr = ISCSIDevPath->iSCSITargetName;
   StrToAscii (NameStr, &AsciiStr);
 
-  iSCSI->TargetPortalGroupTag = (UINT16) Strtoi (PortalGroupStr);
-  Strtoi64 (LunStr, &iSCSI->Lun);
+  ISCSIDevPath->TargetPortalGroupTag = (UINT16) Strtoi (PortalGroupStr);
+  Strtoi64 (LunStr, &ISCSIDevPath->Lun);
 
   Options = 0x0000;
   if (StrCmp (HeaderDigestStr, L"CRC32C") == 0) {
@@ -1971,14 +2344,21 @@ DevPathFromTextiSCSI (
     Options |= 0x1000;
   }
 
-  iSCSI->LoginOption      = (UINT16) Options;
+  ISCSIDevPath->LoginOption      = (UINT16) Options;
 
-  iSCSI->NetworkProtocol  = (UINT16) StrCmp (ProtocolStr, L"TCP");
+  ISCSIDevPath->NetworkProtocol  = (UINT16) StrCmp (ProtocolStr, L"TCP");
 
-  return (EFI_DEVICE_PATH_PROTOCOL *) iSCSI;
+  return (EFI_DEVICE_PATH_PROTOCOL *) ISCSIDevPath;
 }
 
-STATIC
+/**
+  Converts a text device path node to HD device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created HD device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextHD (
   IN CHAR16 *TextDeviceNode
@@ -2031,7 +2411,14 @@ DevPathFromTextHD (
   return (EFI_DEVICE_PATH_PROTOCOL *) Hd;
 }
 
-STATIC
+/**
+  Converts a text device path node to CDROM device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created CDROM device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextCDROM (
   IN CHAR16 *TextDeviceNode
@@ -2040,25 +2427,32 @@ DevPathFromTextCDROM (
   CHAR16            *EntryStr;
   CHAR16            *StartStr;
   CHAR16            *SizeStr;
-  CDROM_DEVICE_PATH *CDROM;
+  CDROM_DEVICE_PATH *CDROMDevPath;
 
   EntryStr              = GetNextParamStr (&TextDeviceNode);
   StartStr              = GetNextParamStr (&TextDeviceNode);
   SizeStr               = GetNextParamStr (&TextDeviceNode);
-  CDROM                 = (CDROM_DEVICE_PATH *) CreateDeviceNode (
+  CDROMDevPath          = (CDROM_DEVICE_PATH *) CreateDeviceNode (
                                                   MEDIA_DEVICE_PATH,
                                                   MEDIA_CDROM_DP,
                                                   sizeof (CDROM_DEVICE_PATH)
                                                   );
 
-  CDROM->BootEntry      = (UINT32) Strtoi (EntryStr);
-  Strtoi64 (StartStr, &CDROM->PartitionStart);
-  Strtoi64 (SizeStr, &CDROM->PartitionSize);
+  CDROMDevPath->BootEntry = (UINT32) Strtoi (EntryStr);
+  Strtoi64 (StartStr, &CDROMDevPath->PartitionStart);
+  Strtoi64 (SizeStr, &CDROMDevPath->PartitionSize);
 
-  return (EFI_DEVICE_PATH_PROTOCOL *) CDROM;
+  return (EFI_DEVICE_PATH_PROTOCOL *) CDROMDevPath;
 }
 
-STATIC
+/**
+  Converts a text device path node to Vendor-defined media device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Vendor-defined media device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextVenMEDIA (
   IN CHAR16 *TextDeviceNode
@@ -2071,7 +2465,14 @@ DevPathFromTextVenMEDIA (
            );
 }
 
-STATIC
+/**
+  Converts a text device path node to File device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created File device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextFilePath (
   IN CHAR16 *TextDeviceNode
@@ -2090,7 +2491,14 @@ DevPathFromTextFilePath (
   return (EFI_DEVICE_PATH_PROTOCOL *) File;
 }
 
-STATIC
+/**
+  Converts a text device path node to Media protocol device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Media protocol device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextMedia (
   IN CHAR16 *TextDeviceNode
@@ -2111,7 +2519,14 @@ DevPathFromTextMedia (
   return (EFI_DEVICE_PATH_PROTOCOL *) Media;
 }
 
-STATIC
+/**
+  Converts a text device path node to firmware volume device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created firmware volume device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextFv (
   IN CHAR16 *TextDeviceNode
@@ -2132,7 +2547,14 @@ DevPathFromTextFv (
   return (EFI_DEVICE_PATH_PROTOCOL *) Fv;
 }
 
-STATIC
+/**
+  Converts a text device path node to firmware file device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created firmware file device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextFvFile (
   IN CHAR16 *TextDeviceNode
@@ -2153,7 +2575,14 @@ DevPathFromTextFvFile (
   return (EFI_DEVICE_PATH_PROTOCOL *) FvFile;
 }
 
-STATIC
+/**
+  Converts a text device path node to BIOS Boot Specification device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created BIOS Boot Specificationa device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextBBS (
   IN CHAR16 *TextDeviceNode
@@ -2198,7 +2627,14 @@ DevPathFromTextBBS (
   return (EFI_DEVICE_PATH_PROTOCOL *) Bbs;
 }
 
-STATIC
+/**
+  Converts a text device path node to SATA device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created SATA device path structure.
+
+**/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextSata (
   IN CHAR16 *TextDeviceNode
@@ -2299,27 +2735,24 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[]
   {NULL, NULL}
 };
 
-EFI_DEVICE_PATH_PROTOCOL *
-ConvertTextToDeviceNode (
-  IN CONST CHAR16 *TextDeviceNode
-  )
-/*++
+/**
+  Convert text to the binary representation of a device node.
 
-  Routine Description:
-    Convert text to the binary representation of a device node.
-
-  Arguments:
-    TextDeviceNode   -   TextDeviceNode points to the text representation of a device
+  @param TextDeviceNode  TextDeviceNode points to the text representation of a device
                          node. Conversion starts with the first character and continues
                          until the first non-device node character.
 
-  Returns:
-    A pointer        -   Pointer to the EFI device node.
-    NULL             -   If TextDeviceNode is NULL or there was insufficient memory or text unsupported.
+  @return A pointer to the EFI device node or NULL if TextDeviceNode is NULL or there was
+          insufficient memory or text unsupported.
 
---*/
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+ConvertTextToDeviceNode (
+  IN CONST CHAR16 *TextDeviceNode
+  )
 {
-  EFI_DEVICE_PATH_PROTOCOL * (*DumpNode) (CHAR16 *);
+  DUMP_NODE                DumpNode;
   CHAR16                   *ParamStr;
   EFI_DEVICE_PATH_PROTOCOL *DeviceNode;
   CHAR16                   *DeviceNodeStr;
@@ -2357,27 +2790,25 @@ ConvertTextToDeviceNode (
   return DeviceNode;
 }
 
-EFI_DEVICE_PATH_PROTOCOL *
-ConvertTextToDevicePath (
-  IN CONST CHAR16 *TextDevicePath
-  )
-/*++
+/**
+  Convert text to the binary representation of a device path.
 
-  Routine Description:
-    Convert text to the binary representation of a device path.
 
-  Arguments:
-    TextDevicePath   -   TextDevicePath points to the text representation of a device
+  @param TextDevicePath  TextDevicePath points to the text representation of a device
                          path. Conversion starts with the first character and continues
                          until the first non-device node character.
 
-  Returns:
-    A pointer        -   Pointer to the allocated device path.
-    NULL             -   If TextDeviceNode is NULL or there was insufficient memory.
+  @return A pointer to the allocated device path or NULL if TextDeviceNode is NULL or
+          there was insufficient memory.
 
---*/
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+ConvertTextToDevicePath (
+  IN CONST CHAR16 *TextDevicePath
+  )
 {
-  EFI_DEVICE_PATH_PROTOCOL * (*DumpNode) (CHAR16 *);
+  DUMP_NODE                DumpNode;
   CHAR16                   *ParamStr;
   EFI_DEVICE_PATH_PROTOCOL *DeviceNode;
   UINTN                    Index;
@@ -2426,9 +2857,9 @@ ConvertTextToDevicePath (
     FreePool (DeviceNode);
     DevicePath = NewDevicePath;
 
-    if (IsInstanceEnd) {
+    if (IsInstanceEnd != 0) {
       DeviceNode = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
-      SetDevicePathInstanceEndNode (DeviceNode);
+      SET_DEVICE_PATH_INSTANCE_END_NODE (DeviceNode);
 
       NewDevicePath = AppendDeviceNodeProtocolInterface (DevicePath, DeviceNode);
       FreePool (DevicePath);

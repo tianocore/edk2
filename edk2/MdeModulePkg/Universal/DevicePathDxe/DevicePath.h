@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _DEVICE_PATH_DRIVER_H
-#define _DEVICE_PATH_DRIVER_H
+#ifndef _DEVICE_PATH_DRIVER_H_
+#define _DEVICE_PATH_DRIVER_H_
 
 #include <PiDxe.h>
 #include <Protocol/DevicePathUtilities.h>
@@ -51,7 +51,7 @@ extern const EFI_GUID mEfiDevicePathMessagingSASGuid;
 #define DEVICE_PATH_INSTANCE_END   2
 #define DEVICE_PATH_END            3
 
-#define SetDevicePathInstanceEndNode(a) {                \
+#define SET_DEVICE_PATH_INSTANCE_END_NODE(a) {                \
     (a)->Type       = END_DEVICE_PATH_TYPE;              \
     (a)->SubType    = END_INSTANCE_DEVICE_PATH_SUBTYPE;  \
     (a)->Length[0]  = sizeof (EFI_DEVICE_PATH_PROTOCOL); \
@@ -67,6 +67,12 @@ typedef struct {
   UINTN   MaxLen;
 } POOL_PRINT;
 
+typedef
+EFI_DEVICE_PATH_PROTOCOL  *
+(*DUMP_NODE) (
+  IN  CHAR16 *DeviceNodeStr
+  );
+
 typedef struct {
   UINT8   Type;
   UINT8   SubType;
@@ -75,7 +81,7 @@ typedef struct {
 
 typedef struct {
   CHAR16                    *DevicePathNodeText;
-  EFI_DEVICE_PATH_PROTOCOL  * (*Function) (CHAR16 *);
+  DUMP_NODE                 Function;
 } DEVICE_PATH_FROM_TEXT_TABLE;
 
 typedef struct {
@@ -148,273 +154,279 @@ typedef struct {
 
 #pragma pack()
 
+/**
+  Converts a device node to its string representation.
+
+  @param DeviceNode        A Pointer to the device node to be converted.
+  @param DisplayOnly       If DisplayOnly is TRUE, then the shorter text representation
+                           of the display node is used, where applicable. If DisplayOnly
+                           is FALSE, then the longer text representation of the display node
+                           is used.
+  @param AllowShortcuts    If AllowShortcuts is TRUE, then the shortcut forms of text
+                           representation for a device node can be used, where applicable.
+
+  @return A pointer to the allocated text representation of the device node or NULL if DeviceNode
+          is NULL or there was insufficient memory.
+
+**/
 CHAR16 *
+EFIAPI
 ConvertDeviceNodeToText (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DeviceNode,
   IN BOOLEAN                         DisplayOnly,
   IN BOOLEAN                         AllowShortcuts
-  )
-/*++
+  );
 
-  Routine Description:
-    Convert a device node to its text representation.
+/**
+  Converts a device path to its text representation.
 
-  Arguments:
-    DeviceNode       -   Points to the device node to be converted.
-    DisplayOnly      -   If DisplayOnly is TRUE, then the shorter text representation
+  @param DevicePath      A Pointer to the device to be converted.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
                          is FALSE, then the longer text representation of the display node
                          is used.
-    AllowShortcuts   -   If AllowShortcuts is TRUE, then the shortcut forms of text
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
                          representation for a device node can be used, where applicable.
 
-  Returns:
-    A pointer        -   a pointer to the allocated text representation of the device node.
-    NULL             -   if DeviceNode is NULL or there was insufficient memory.
+  @return A pointer to the allocated text representation of the device path or
+          NULL if DeviceNode is NULL or there was insufficient memory.
 
---*/
-;
-
+**/
 CHAR16 *
+EFIAPI
 ConvertDevicePathToText (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DeviceNode,
-  IN BOOLEAN                         DisplayOnly,
-  IN BOOLEAN                         AllowShortcuts
-  )
-/*++
+  IN CONST EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
+  IN BOOLEAN                          DisplayOnly,
+  IN BOOLEAN                          AllowShortcuts
+  );
 
-  Routine Description:
-    Convert a device path to its text representation.
+/**
+  Convert text to the binary representation of a device node.
 
-  Arguments:
-    DeviceNode       -   Points to the device path to be converted.
-    DisplayOnly      -   If DisplayOnly is TRUE, then the shorter text representation
-                         of the display node is used, where applicable. If DisplayOnly
-                         is FALSE, then the longer text representation of the display node
-                         is used.
-    AllowShortcuts   -   If AllowShortcuts is TRUE, then the shortcut forms of text
-                         representation for a device node can be used, where applicable.
-
-  Returns:
-    A pointer        -   a pointer to the allocated text representation of the device path.
-    NULL             -   if DeviceNode is NULL or there was insufficient memory.
-
---*/
-;
-
-EFI_DEVICE_PATH_PROTOCOL *
-ConvertTextToDeviceNode (
-  IN CONST CHAR16 *TextDeviceNode
-  )
-/*++
-
-  Routine Description:
-    Convert text to the binary representation of a device node.
-
-  Arguments:
-    TextDeviceNode   -   TextDeviceNode points to the text representation of a device
+  @param TextDeviceNode  TextDeviceNode points to the text representation of a device
                          node. Conversion starts with the first character and continues
                          until the first non-device node character.
 
-  Returns:
-    A pointer        -   Pointer to the EFI device node.
-    NULL             -   if TextDeviceNode is NULL or there was insufficient memory.
+  @return A pointer to the EFI device node or NULL if TextDeviceNode is NULL or there was
+          insufficient memory or text unsupported.
 
---*/
-;
-
+**/
 EFI_DEVICE_PATH_PROTOCOL *
-ConvertTextToDevicePath (
-  IN CONST CHAR16 *TextDevicePath
-  )
-/*++
+EFIAPI
+ConvertTextToDeviceNode (
+  IN CONST CHAR16 *TextDeviceNode
+  );
 
-  Routine Description:
-    Convert text to the binary representation of a device path.
+/**
+  Convert text to the binary representation of a device path.
 
-  Arguments:
-    TextDevicePath   -   TextDevicePath points to the text representation of a device
+
+  @param TextDevicePath  TextDevicePath points to the text representation of a device
                          path. Conversion starts with the first character and continues
                          until the first non-device node character.
 
-  Returns:
-    A pointer        -   Pointer to the allocated device path.
-    NULL             -   if TextDeviceNode is NULL or there was insufficient memory.
+  @return A pointer to the allocated device path or NULL if TextDeviceNode is NULL or
+          there was insufficient memory.
 
---*/
-;
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+ConvertTextToDevicePath (
+  IN CONST CHAR16 *TextDevicePath
+  );
 
+/**
+  Returns the size of a device path in bytes.
+
+  This function returns the size, in bytes, of the device path data structure specified by
+  DevicePath including the end of device path node.  If DevicePath is NULL, then 0 is returned.
+
+  @param  DevicePath                 A pointer to a device path data structure.
+
+  @return The size of a device path in bytes.
+
+**/
 UINTN
+EFIAPI
 GetDevicePathSizeProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-/*++
+  );
 
-  Routine Description:
-    Returns the size of the device path, in bytes.
+/**
+  Creates a new device path by appending a second device path to a first device path.
 
-  Arguments:
-    DevicePath  -   Points to the start of the EFI device path.
+  This function allocates space for a new copy of the device path specified by DevicePath.  If
+  DevicePath is NULL, then NULL is returned.  If the memory is successfully allocated, then the
+  contents of DevicePath are copied to the newly allocated buffer, and a pointer to that buffer
+  is returned.  Otherwise, NULL is returned.
 
-  Returns:
-    Size        -   Size of the specified device path, in bytes, including the end-of-path tag.
+  @param  DevicePath                 A pointer to a device path data structure.
 
---*/
-;
+  @return A pointer to the duplicated device path.
 
+**/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 DuplicateDevicePathProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-/*++
+  );
 
-  Routine Description:
-    Create a duplicate of the specified path.
+/**
+  Creates a new device path by appending a second device path to a first device path.
 
-  Arguments:
-    DevicePath  -   Points to the source EFI device path.
+  This function creates a new device path by appending a copy of SecondDevicePath to a copy of
+  FirstDevicePath in a newly allocated buffer.  Only the end-of-device-path device node from
+  SecondDevicePath is retained. The newly created device path is returned.
+  If FirstDevicePath is NULL, then it is ignored, and a duplicate of SecondDevicePath is returned.
+  If SecondDevicePath is NULL, then it is ignored, and a duplicate of FirstDevicePath is returned.
+  If both FirstDevicePath and SecondDevicePath are NULL, then a copy of an end-of-device-path is
+  returned.
+  If there is not enough memory for the newly allocated buffer, then NULL is returned.
+  The memory for the new device path is allocated from EFI boot services memory. It is the
+  responsibility of the caller to free the memory allocated.
 
-  Returns:
-    Pointer     -   A pointer to the duplicate device path.
-    NULL        -   Insufficient memory.
+  @param  FirstDevicePath            A pointer to a device path data structure.
+  @param  SecondDevicePath           A pointer to a device path data structure.
 
---*/
-;
+  @return A pointer to the new device path.
 
+**/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 AppendDevicePathProtocolInterface (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *Src1,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *Src2
-  )
-/*++
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *FirstDevicePath,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *SecondDevicePath
+  );
 
-  Routine Description:
-    Create a new path by appending the second device path to the first.
+/**
+  Creates a new path by appending the device node to the device path.
 
-  Arguments:
-    Src1      -   Points to the first device path. If NULL, then it is ignored.
-    Src2      -   Points to the second device path. If NULL, then it is ignored.
+  This function creates a new device path by appending a copy of the device node specified by
+  DevicePathNode to a copy of the device path specified by DevicePath in an allocated buffer.
+  The end-of-device-path device node is moved after the end of the appended device node.
+  If DevicePathNode is NULL then a copy of DevicePath is returned.
+  If DevicePath is NULL then a copy of DevicePathNode, followed by an end-of-device path device
+  node is returned.
+  If both DevicePathNode and DevicePath are NULL then a copy of an end-of-device-path device node
+  is returned.
+  If there is not enough memory to allocate space for the new device path, then NULL is returned.
+  The memory is allocated from EFI boot services memory. It is the responsibility of the caller to
+  free the memory allocated.
 
-  Returns:
-    Pointer   -   A pointer to the newly created device path.
-    NULL      -   Memory could not be allocated
-                  or either DevicePath or DeviceNode is NULL.
+  @param  DevicePath                 A pointer to a device path data structure.
+  @param  DevicePathNode             A pointer to a single device path node.
 
---*/
-;
+  @return A pointer to the new device path.
 
+**/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 AppendDeviceNodeProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *DeviceNode
-  )
-/*++
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePathNode
+  );
 
-  Routine Description:
-    Creates a new path by appending the device node to the device path.
+/**
+  Creates a new device path by appending the specified device path instance to the specified device
+  path.
 
-  Arguments:
-    DevicePath   -   Points to the device path.
-    DeviceNode   -   Points to the device node.
+  This function creates a new device path by appending a copy of the device path instance specified
+  by DevicePathInstance to a copy of the device path secified by DevicePath in a allocated buffer.
+  The end-of-device-path device node is moved after the end of the appended device path instance
+  and a new end-of-device-path-instance node is inserted between.
+  If DevicePath is NULL, then a copy if DevicePathInstance is returned.
+  If DevicePathInstance is NULL, then NULL is returned.
+  If there is not enough memory to allocate space for the new device path, then NULL is returned.
+  The memory is allocated from EFI boot services memory. It is the responsibility of the caller to
+  free the memory allocated.
 
-  Returns:
-    Pointer      -   A pointer to the allocated device node.
-    NULL         -   Memory could not be allocated
-                     or either DevicePath or DeviceNode is NULL.
+  @param  DevicePath                 A pointer to a device path data structure.
+  @param  DevicePathInstance         A pointer to a device path instance.
 
---*/
-;
+  @return A pointer to the new device path.
 
+**/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 AppendDevicePathInstanceProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePathInstance
-  )
-/*++
+  );
 
-  Routine Description:
-    Creates a new path by appending the specified device path instance to the specified device path.
+/**
+  Creates a copy of the current device path instance and returns a pointer to the next device path
+  instance.
 
-  Arguments:
-    DevicePath           -   Points to the device path. If NULL, then ignored.
-    DevicePathInstance   -   Points to the device path instance.
+  This function creates a copy of the current device path instance. It also updates DevicePath to
+  point to the next device path instance in the device path (or NULL if no more) and updates Size
+  to hold the size of the device path instance copy.
+  If DevicePath is NULL, then NULL is returned.
+  If there is not enough memory to allocate space for the new device path, then NULL is returned.
+  The memory is allocated from EFI boot services memory. It is the responsibility of the caller to
+  free the memory allocated.
+  If Size is NULL, then ASSERT().
 
-  Returns:
-    Pointer              -   A pointer to the newly created device path
-    NULL                 -   Memory could not be allocated or DevicePathInstance is NULL.
+  @param  DevicePath                 On input, this holds the pointer to the current device path
+                                     instance. On output, this holds the pointer to the next device
+                                     path instance or NULL if there are no more device path
+                                     instances in the device path pointer to a device path data
+                                     structure.
+  @param  Size                       On output, this holds the size of the device path instance, in
+                                     bytes or zero, if DevicePath is NULL.
 
---*/
-;
+  @return A pointer to the current device path instance.
 
+**/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 GetNextDevicePathInstanceProtocolInterface (
-  IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePathInstance,
-  OUT UINTN                         *DevicePathInstanceSize
-  )
-/*++
+  IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePath,
+  OUT UINTN                         *Size
+  );
 
-  Routine Description:
-    Creates a copy of the current device path instance and returns a pointer to the next device path instance.
+/**
+  Determines if a device path is single or multi-instance.
 
-  Arguments:
-    DevicePathInstance       -   On input, this holds the pointer to the current device path
-                                 instance. On output, this holds the pointer to the next
-                                 device path instance or NULL if there are no more device
-                                 path instances in the device path.
-    DevicePathInstanceSize   -   On output, this holds the size of the device path instance,
-                                 in bytes or zero, if DevicePathInstance is zero.
+  This function returns TRUE if the device path specified by DevicePath is multi-instance.
+  Otherwise, FALSE is returned.  If DevicePath is NULL, then FALSE is returned.
 
-  Returns:
-    Pointer                  -   A pointer to the copy of the current device path instance.
-    NULL                     -   DevicePathInstace was NULL on entry or there was insufficient memory.
+  @param  DevicePath                 A pointer to a device path data structure.
 
---*/
-;
+  @retval  TRUE                      DevicePath is multi-instance.
+  @retval  FALSE                     DevicePath is not multi-instance or DevicePath is NULL.
 
+**/
 BOOLEAN
+EFIAPI
 IsDevicePathMultiInstanceProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath
-  )
-/*++
+  );
 
-  Routine Description:
-    Returns whether a device path is multi-instance.
+/**
+  Creates a copy of the current device path instance and returns a pointer to the next device path
+  instance.
 
-  Arguments:
-    DevicePath  -   Points to the device path. If NULL, then ignored.
+  This function creates a new device node in a newly allocated buffer of size NodeLength and
+  initializes the device path node header with NodeType and NodeSubType.  The new device path node
+  is returned.
+  If NodeLength is smaller than a device path header, then NULL is returned.
+  If there is not enough memory to allocate space for the new device path, then NULL is returned.
+  The memory is allocated from EFI boot services memory. It is the responsibility of the caller to
+  free the memory allocated.
 
-  Returns:
-    TRUE        -   The device path has more than one instance
-    FALSE       -   The device path is empty or contains only a single instance.
+  @param  NodeType                   The device node type for the new device node.
+  @param  NodeSubType                The device node sub-type for the new device node.
+  @param  NodeLength                 The length of the new device node.
 
---*/
-;
+  @return The new device path.
 
+**/
 EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
 CreateDeviceNodeProtocolInterface (
   IN UINT8  NodeType,
   IN UINT8  NodeSubType,
   IN UINT16 NodeLength
-  )
-/*++
-
-  Routine Description:
-    Creates a device node
-
-  Arguments:
-    NodeType     -    NodeType is the device node type (EFI_DEVICE_PATH.Type) for
-                      the new device node.
-    NodeSubType  -    NodeSubType is the device node sub-type
-                      EFI_DEVICE_PATH.SubType) for the new device node.
-    NodeLength   -    NodeLength is the length of the device node
-                      (EFI_DEVICE_PATH.Length) for the new device node.
-
-  Returns:
-    Pointer      -    A pointer to the newly created device node.
-    NULL         -    NodeLength is less than
-                      the size of the header or there was insufficient memory.
-
---*/
-;
+  );
 
 #endif
