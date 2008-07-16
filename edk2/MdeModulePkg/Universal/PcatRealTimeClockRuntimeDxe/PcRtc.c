@@ -146,7 +146,7 @@ Returns:
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
   //
-  Status = RtcWaitToUpdate (100000);
+  Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
   	//BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
     //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
@@ -272,7 +272,7 @@ Routine Description:
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
   //
-  Status = RtcWaitToUpdate (100000);
+  Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
   	  //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
       //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
@@ -391,7 +391,7 @@ Routine Description:
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
   //
-  Status = RtcWaitToUpdate (100000);
+  Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
   	 //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
      //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
@@ -504,7 +504,7 @@ Returns:
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
   //
-  Status = RtcWaitToUpdate (100000);
+  Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
   	//BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
     //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
@@ -636,7 +636,7 @@ Returns:
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
   //
-  Status = RtcWaitToUpdate (100000);
+  Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
     //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
     //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
