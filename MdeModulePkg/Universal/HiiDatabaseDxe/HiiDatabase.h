@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/IfrSupportLib.h>
 #include <Library/HiiLib.h>
+#include <Library/PcdLib.h>
 
 #define HII_DATABASE_NOTIFY_GUID \
   { \
@@ -241,9 +242,7 @@ typedef struct _HII_DATABASE_PRIVATE_DATA {
   LIST_ENTRY                            DatabaseList;
   LIST_ENTRY                            DatabaseNotifyList;
   EFI_HII_FONT_PROTOCOL                 HiiFont;
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
   EFI_HII_IMAGE_PROTOCOL                HiiImage;
-#endif
   EFI_HII_STRING_PROTOCOL               HiiString;
   EFI_HII_DATABASE_PROTOCOL             HiiDatabase;
   EFI_HII_CONFIG_ROUTING_PROTOCOL       ConfigRouting;

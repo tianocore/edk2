@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "HiiDatabase.h"
 
-#ifndef _DISABLE_UNUSED_HII_PROTOCOLS_
 
 /**
   Get the imageid of last image block: EFI_HII_IIBT_END_BLOCK when input
@@ -1498,6 +1497,4 @@ HiiDrawImageId (
   SafeFreePool (Image.Bitmap);
   return Status;
 }
-
-#endif
 

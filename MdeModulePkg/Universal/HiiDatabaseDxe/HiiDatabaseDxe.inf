@@ -70,7 +70,10 @@
   gEfiHiiFontProtocolGuid
   gEfiHiiConfigAccessProtocolGuid
 
-
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportFullConfigRoutingProtocol
+  
 [Depex]
   TRUE
 
