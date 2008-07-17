@@ -569,33 +569,11 @@ IsValidWorkSpace (
 ;
 
 /**
-  Reclaim the work space. Get rid of all the completed write records
-  and write records in the Fault Tolerant work space.
-
-
-  @param FtwLiteDevice   Point to private data of FTW driver
-                         FtwSpaceBuffer  - Buffer to contain the reclaimed clean data
-  @param BlockBuffer     The data buffer for the block.
-  @param BufferSize      Size of the FtwSpaceBuffer
-
-  @retval  EFI_SUCCESS            The function completed successfully
-  @retval  EFI_BUFFER_TOO_SMALL   The FtwSpaceBuffer is too small
-  @retval  EFI_ABORTED            The function could not complete successfully.
-
-**/
-EFI_STATUS
-CleanupWorkSpace (
-  IN EFI_FTW_LITE_DEVICE  *FtwLiteDevice,
-  IN OUT UINT8            *BlockBuffer,
-  IN UINTN                BufferSize
-  )
-;
-
-/**
   Reclaim the work space on the working block.
 
 
   @param FtwLiteDevice   Point to private data of FTW driver
+  @param PreserveRecord  Whether to preserve the working record is needed
 
   @retval  EFI_SUCCESS            The function completed successfully
   @retval  EFI_OUT_OF_RESOURCES   Allocate memory error
@@ -604,7 +582,8 @@ CleanupWorkSpace (
 **/
 EFI_STATUS
 FtwReclaimWorkSpace (
-  IN EFI_FTW_LITE_DEVICE  *FtwLiteDevice
+  IN EFI_FTW_LITE_DEVICE  *FtwLiteDevice,
+  IN BOOLEAN              PreserveRecord
   )
 ;
 

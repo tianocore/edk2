@@ -119,7 +119,7 @@ FtwLiteWrite (
   // Check if there is enough free space for allocate a record
   //
   if ((MyOffset + WRITE_TOTAL_SIZE) > FtwLiteDevice->FtwWorkSpaceSize) {
-    Status = FtwReclaimWorkSpace (FtwLiteDevice);
+    Status = FtwReclaimWorkSpace (FtwLiteDevice, TRUE);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "FtwLite: Reclaim work space - %r", Status));
       return EFI_ABORTED;
@@ -827,16 +827,10 @@ InitializeFtwLite (
         );
       InitWorkSpaceHeader (FtwLiteDevice->FtwWorkSpaceHeader);
       //
-      // Write to work space on the working block
+      // Initialize the work space
       //
-      Length = FtwLiteDevice->FtwWorkSpaceSize;
-      Status = FtwLiteDevice->FtwFvBlock->Write (
-                                            FtwLiteDevice->FtwFvBlock,
-                                            FtwLiteDevice->FtwWorkSpaceLba,
-                                            FtwLiteDevice->FtwWorkSpaceBase,
-                                            &Length,
-                                            FtwLiteDevice->FtwWorkSpace
-                                            );
+      Status = FtwReclaimWorkSpace (FtwLiteDevice, FALSE);
+
       if (EFI_ERROR (Status)) {
         return EFI_ABORTED;
       }
@@ -897,7 +891,7 @@ InitializeFtwLite (
         FtwLiteDevice->FtwWorkSpaceSize - Offset
         )) {
     DEBUG ((EFI_D_FTW_LITE, "FtwLite: Workspace is dirty, call reclaim...\n"));
-    Status = FtwReclaimWorkSpace (FtwLiteDevice);
+    Status = FtwReclaimWorkSpace (FtwLiteDevice, TRUE);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_FTW_LITE, "FtwLite: Workspace reclaim - %r\n", Status));
       return EFI_ABORTED;

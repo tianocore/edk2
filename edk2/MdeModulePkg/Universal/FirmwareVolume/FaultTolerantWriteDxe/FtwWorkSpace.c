@@ -210,6 +210,7 @@ FtwGetLastRecord (
 {
   EFI_FTW_LITE_RECORD *Record;
 
+  *FtwLastRecord = NULL;
   Record = (EFI_FTW_LITE_RECORD *) (FtwLiteDevice->FtwWorkSpaceHeader + 1);
   while (Record->WriteCompleted == FTW_VALID_STATE) {
     //
@@ -287,71 +288,11 @@ WorkSpaceRefresh (
     //
     // reclaim work space in working block.
     //
-    Status = FtwReclaimWorkSpace (FtwLiteDevice);
+    Status = FtwReclaimWorkSpace (FtwLiteDevice, TRUE);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_FTW_LITE, "FtwLite: Reclaim workspace - %r\n", Status));
       return EFI_ABORTED;
     }
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Reclaim the work space. Get rid of all the completed write records
-  and write records in the Fault Tolerant work space.
-
-
-  @param FtwLiteDevice   Point to private data of FTW driver
-  @param FtwSpaceBuffer  Buffer to contain the reclaimed clean data
-  @param BufferSize      Size of the FtwSpaceBuffer
-
-  @retval  EFI_SUCCESS            The function completed successfully
-  @retval  EFI_BUFFER_TOO_SMALL   The FtwSpaceBuffer is too small
-  @retval  EFI_ABORTED            The function could not complete successfully.
-
-**/
-EFI_STATUS
-CleanupWorkSpace (
-  IN EFI_FTW_LITE_DEVICE  *FtwLiteDevice,
-  IN OUT UINT8            *FtwSpaceBuffer,
-  IN UINTN                BufferSize
-  )
-{
-  UINTN               Length;
-  EFI_FTW_LITE_RECORD *Record;
-
-  //
-  // To check if the buffer is large enough
-  //
-  Length = FtwLiteDevice->FtwWorkSpaceSize;
-  if (BufferSize < Length) {
-    return EFI_BUFFER_TOO_SMALL;
-  }
-  //
-  // Clear the content of buffer that will save the new work space data
-  //
-  SetMem (FtwSpaceBuffer, Length, FTW_ERASED_BYTE);
-
-  //
-  // Copy EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER to buffer
-  //
-  CopyMem (
-    FtwSpaceBuffer,
-    FtwLiteDevice->FtwWorkSpaceHeader,
-    sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER)
-    );
-
-  //
-  // Get the last record
-  //
-  Record = FtwLiteDevice->FtwLastRecord;
-  if ((Record != NULL) && (Record->WriteAllocated == FTW_VALID_STATE) && (Record->WriteCompleted != FTW_VALID_STATE)) {
-    CopyMem (
-      (UINT8 *) FtwSpaceBuffer + sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
-      Record,
-      WRITE_TOTAL_SIZE
-      );
   }
 
   return EFI_SUCCESS;
@@ -370,7 +311,8 @@ CleanupWorkSpace (
 **/
 EFI_STATUS
 FtwReclaimWorkSpace (
-  IN EFI_FTW_LITE_DEVICE  *FtwLiteDevice
+  IN EFI_FTW_LITE_DEVICE  *FtwLiteDevice,
+  IN BOOLEAN              PreserveRecord
   )
 {
   EFI_STATUS                              Status;
@@ -382,6 +324,7 @@ FtwReclaimWorkSpace (
   UINTN                                   SpareBufferSize;
   UINT8                                   *SpareBuffer;
   EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingBlockHeader;
+  EFI_FTW_LITE_RECORD                     *Record;
 
   DEBUG ((EFI_D_FTW_LITE, "FtwLite: start to reclaim work space\n"));
 
@@ -390,7 +333,7 @@ FtwReclaimWorkSpace (
   //
   TempBufferSize = FtwLiteDevice->SpareAreaLength;
   TempBuffer     = AllocateZeroPool (TempBufferSize);
-  if (TempBuffer != NULL) {
+  if (TempBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -418,11 +361,36 @@ FtwReclaimWorkSpace (
     ((UINTN) (FtwLiteDevice->FtwWorkSpaceLba - FtwLiteDevice->FtwWorkBlockLba)) *
     FtwLiteDevice->SizeOfSpareBlock + FtwLiteDevice->FtwWorkSpaceBase;
 
-  Status = CleanupWorkSpace (
-            FtwLiteDevice,
-            Ptr,
-            FtwLiteDevice->FtwWorkSpaceSize
-            );
+  //
+  // Clear the content of buffer that will save the new work space data
+  //
+  SetMem (Ptr, FtwLiteDevice->FtwWorkSpaceSize, FTW_ERASED_BYTE);
+
+  //
+  // Copy EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER to buffer
+  //
+  CopyMem (
+    Ptr,
+    FtwLiteDevice->FtwWorkSpaceHeader,
+    sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER)
+    );
+  if (PreserveRecord) {
+    //
+    // Get the last record
+    //
+    Status = FtwGetLastRecord (FtwLiteDevice, &FtwLiteDevice->FtwLastRecord);
+    Record = FtwLiteDevice->FtwLastRecord;
+    if (!EFI_ERROR (Status)                       &&
+        Record                 != NULL            &&
+        Record->WriteAllocated == FTW_VALID_STATE &&
+        Record->WriteCompleted != FTW_VALID_STATE) {
+      CopyMem (
+        (UINT8 *) Ptr + sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
+        Record,
+        WRITE_TOTAL_SIZE
+        );
+    }
+  }
 
   CopyMem (
     FtwLiteDevice->FtwWorkSpace,
