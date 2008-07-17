@@ -42,8 +42,8 @@
   Hob/Hob.c
   FwVol/FwVol.c
   Dispatcher/Dispatcher.c
-  Dependency/dependency.c
-  Dependency/dependency.h
+  Dependency/Dependency.c
+  Dependency/Dependency.h
   BootMode/BootMode.c
   PeiMain.h
 
