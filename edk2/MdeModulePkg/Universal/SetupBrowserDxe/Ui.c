@@ -124,6 +124,8 @@ SCREEN_OPERATION_T0_CONTROL_FLAG  gScreenOperationToControlFlag[] = {
   @param  Size                   Number of bytes to set
   @param  Value                  Value of the set operation.
 
+  @return Value.
+
 **/
 VOID
 SetUnicodeMem (
