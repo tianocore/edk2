@@ -291,7 +291,7 @@ EFI_STATUS
 
   @retval EFI_OUT_OF_RESOURCES  An allocation failure occurred.
 
-  @retavl EFI_NOT_FOUND   Name was not found in the firmware
+  @retval EFI_NOT_FOUND   Name was not found in the firmware
                           volume.
 
   @retval EFI_DEVICE_ERROR  A hardware error occurred when

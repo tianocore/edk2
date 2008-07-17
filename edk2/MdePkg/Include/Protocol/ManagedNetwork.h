@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef _EFI_MANAGED_NETWORK_PROTOCOL_H
-#define _EFI_MANAGED_NETWORK_PROTOCOL_H
+#ifndef __EFI_MANAGED_NETWORK_PROTOCOL_H__
+#define __EFI_MANAGED_NETWORK_PROTOCOL_H__
 
 #include <Protocol/SimpleNetwork.h>
 

@@ -54,10 +54,6 @@ typedef struct _UGA_DEVICE {
 }
 UGA_DEVICE, *PUGA_DEVICE;
 
-#ifndef UGA_IO_REQUEST_CODE
-//
-// Prevent conflicts with UGA typedefs.
-//
 typedef enum {
   UgaIoGetVersion             = 1,
   UgaIoGetChildDevice,
@@ -84,8 +80,6 @@ typedef enum {
   UgaIoBtPrivateInterface
 }
 UGA_IO_REQUEST_CODE, *PUGA_IO_REQUEST_CODE;
-
-#endif
 
 typedef struct {
   IN UGA_IO_REQUEST_CODE  ioRequestCode;
@@ -146,32 +140,30 @@ EFI_STATUS
   IN UGA_DEVICE           * Device
   );
 
-
-typedef UGA_STATUS (EFIAPI *PUGA_FW_SERVICE_DISPATCH)(IN PUGA_DEVICE pDevice, IN OUT PUGA_IO_REQUEST pIoRequest);
-
 /**
+  This is the main UGA service dispatch routine for all UGA_IO_REQUEST s.
 
-  Routine Description:
-
-    This is the main UGA service dispatch routine for all UGA_IO_REQUEST s.
-
-  Arguments:
-
-    pDevice    - pDevice specifies a pointer to a device object associated with a 
+  @param pDevice pDevice specifies a pointer to a device object associated with a 
                  device enumerated by a pIoRequest->ioRequestCode of type 
                  UgaIoGetChildDevice. The root device for the EFI_UGA_IO_PROTOCOL 
                  is represented by pDevice being set to NULL.
 
-    pIoRequest - pIoRequest points to a caller allocated buffer that contains data
+  @param pIoRequest 
+                 pIoRequest points to a caller allocated buffer that contains data
                  defined by pIoRequest->ioRequestCode. See Related Definitions for
                  a definition of UGA_IO_REQUEST_CODE s and their associated data 
                  structures.
 
-  Returns:
-
-  Varies depending on pIoRequest.
+  @return UGA_STATUS
 
 **/
+typedef UGA_STATUS 
+(EFIAPI *PUGA_FW_SERVICE_DISPATCH)(
+  IN PUGA_DEVICE pDevice, 
+  IN OUT PUGA_IO_REQUEST pIoRequest
+  );
+
+
 struct _EFI_UGA_IO_PROTOCOL {
   EFI_UGA_IO_PROTOCOL_CREATE_DEVICE CreateDevice;
   EFI_UGA_IO_PROTOCOL_DELETE_DEVICE DeleteDevice;

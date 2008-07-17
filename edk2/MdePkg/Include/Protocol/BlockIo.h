@@ -135,28 +135,28 @@ EFI_STATUS
 
 **/
 typedef struct {
-  UINT32  MediaId;    ///< The curent media Id. If the media changes, this value is changed.
-  BOOLEAN RemovableMedia;  ///< TRUE if the media is removable; otherwise, FALSE.
+  UINT32  MediaId;    /**< The curent media Id. If the media changes, this value is changed.**/
+  BOOLEAN RemovableMedia;  /**< TRUE if the media is removable; otherwise, FALSE.**/
   BOOLEAN MediaPresent;    /**< TRUE if there is a media currently present in the device;
-             othersise, FALSE. THis field shows the media present status
-             as of the most recent ReadBlocks() or WriteBlocks() call.
-        **/
+                             othersise, FALSE. THis field shows the media present status
+                             as of the most recent ReadBlocks() or WriteBlocks() call.
+                           **/
   BOOLEAN LogicalPartition;  /**< TRUE if LBA 0 is the first block of a partition; otherwise
-             FALSE. For media with only one partition this would be TRUE.
-        **/
+                               FALSE. For media with only one partition this would be TRUE.
+                             **/
   BOOLEAN ReadOnly;    /**< TRUE if the media is marked read-only otherwise, FALSE.
-             This field shows the read-only status as of the most recent WriteBlocks () call.
-        **/
-  BOOLEAN WriteCaching;    ///< TRUE if the WriteBlock () function caches write data.
+                            This field shows the read-only status as of the most recent WriteBlocks () call.
+                        **/
+  BOOLEAN WriteCaching;    /**< TRUE if the WriteBlock () function caches write data.**/
 
   UINT32  BlockSize;    /**< The intrinsic block size of the device. If the media changes, then
-             this field is updated.
-        **/
-  UINT32  IoAlign;    ///< Supplies the alignment requirement for any buffer to read or write block(s).
+                          this field is updated.
+                        **/
+  UINT32  IoAlign;      /**< Supplies the alignment requirement for any buffer to read or write block(s).**/
 
   EFI_LBA LastBlock;    /**< The last logical block address on the device.
-             If the media changes, then this field is updated.
-        **/
+                          If the media changes, then this field is updated.
+                         **/
 } EFI_BLOCK_IO_MEDIA;
 
 #define EFI_BLOCK_IO_PROTOCOL_REVISION  0x00010000
