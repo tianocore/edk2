@@ -29,7 +29,7 @@ typedef struct {
 #define WORKING_BLOCK_INVALID 0x2
   UINT8     Reserved : 6;
   UINT8     Reserved3[3];
-  UINT32    WriteQueueSize;
+  UINT64    WriteQueueSize;
   //
   // UINT8                WriteQueue[WriteQueueSize];
   //
