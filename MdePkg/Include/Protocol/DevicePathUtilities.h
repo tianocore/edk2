@@ -32,7 +32,7 @@
 
   @param  DevicePath Points to the start of the EFI device path.
 
-  @revtal Size       Size of the specified device path, in bytes, including the end-of-path tag.
+  @retval Size       Size of the specified device path, in bytes, including the end-of-path tag.
 
 **/
 typedef

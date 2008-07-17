@@ -76,7 +76,6 @@ typedef struct {
   UINT32  DataOffset;
   UINT16  Ds;
   UINT8   Reserved2[10];
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   UINT8   St0Mm0[10], Reserved3[6];
   UINT8   St1Mm1[10], Reserved4[6];
   UINT8   St2Mm2[10], Reserved5[6];
@@ -95,26 +94,10 @@ typedef struct {
   UINT8   Xmm7[16];
   UINT8   Reserved11[14 * 16];
 } EFI_FX_SAVE_STATE_IA32;
-#else
-  UINT8   St0Mm0[10], Reserved3[6];
-  UINT8   St0Mm1[10], Reserved4[6];
-  UINT8   St0Mm2[10], Reserved5[6];
-  UINT8   St0Mm3[10], Reserved6[6];
-  UINT8   St0Mm4[10], Reserved7[6];
-  UINT8   St0Mm5[10], Reserved8[6];
-  UINT8   St0Mm6[10], Reserved9[6];
-  UINT8   St0Mm7[10], Reserved10[6];
-  UINT8   Reserved11[22 * 16];
-} EFI_FX_SAVE_STATE;
-#endif
 
 typedef struct {
   UINT32                 ExceptionData;
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   EFI_FX_SAVE_STATE_IA32 FxSaveState;
-#else
-  EFI_FX_SAVE_STATE      FxSaveState;
-#endif
   UINT32                 Dr0;
   UINT32                 Dr1;
   UINT32                 Dr2;
@@ -199,23 +182,10 @@ typedef struct {
   UINT8   Xmm5[16];
   UINT8   Xmm6[16];
   UINT8   Xmm7[16];
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   //
-  // NOTE: UEFI 2.0 spec definition as follows. It should be updated 
-  // after spec update.
+  // NOTE: UEFI 2.0 spec definition as follows. 
   //
   UINT8   Reserved11[14 * 16];
-#else
-  UINT8   Xmm8[16];
-  UINT8   Xmm9[16];
-  UINT8   Xmm10[16];
-  UINT8   Xmm11[16];
-  UINT8   Xmm12[16];
-  UINT8   Xmm13[16];
-  UINT8   Xmm14[16];
-  UINT8   Xmm15[16];
-  UINT8   Reserved10[6 * 16];
-#endif
 } EFI_FX_SAVE_STATE_X64;
 
 typedef struct {

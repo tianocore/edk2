@@ -544,11 +544,8 @@ PeCoffLoaderRelocateImage (
   //
   if (ImageContext->DestinationAddress != 0) {
     BaseAddress = ImageContext->DestinationAddress;
-  } else if (!(ImageContext->IsTeImage)) {
-    BaseAddress = ImageContext->ImageAddress;
   } else {
-    Hdr.Te      = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
-    BaseAddress = ImageContext->ImageAddress + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize; 
+    BaseAddress = ImageContext->ImageAddress;
   }
 
   if (!(ImageContext->IsTeImage)) {
@@ -597,8 +594,8 @@ PeCoffLoaderRelocateImage (
     }
   } else {
     Hdr.Te             = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
-    Adjust             = (UINT64) (BaseAddress - Hdr.Te->ImageBase);
-    Hdr.Te->ImageBase  = (UINT64) (BaseAddress);
+    Adjust             = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->ImageBase);
+    Hdr.Te->ImageBase  = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
 
     //
     // Find the relocation block
@@ -711,6 +708,13 @@ PeCoffLoaderRelocateImage (
     RelocBase = (EFI_IMAGE_BASE_RELOCATION *) RelocEnd;
   }
 
+  //
+  // Adjust the EntryPoint to match the linked-to address
+  //
+  if (ImageContext->DestinationAddress != 0) {
+     ImageContext->EntryPoint -= (UINT64) ImageContext->ImageAddress;
+     ImageContext->EntryPoint += (UINT64) ImageContext->DestinationAddress;
+  }
   return RETURN_SUCCESS;
 }
 
