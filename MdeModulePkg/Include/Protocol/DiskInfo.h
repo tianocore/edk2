@@ -143,6 +143,12 @@ extern EFI_GUID gEfiDiskInfoScsiInterfaceGuid;
   }
 extern EFI_GUID gEfiDiskInfoUsbInterfaceGuid;
 
+#define EFI_DISK_INFO_AHCI_INTERFACE_GUID \
+  { \
+    0x9e498932, 0x4abc, 0x45af, {0xa3, 0x4d, 0x2, 0x47, 0x78, 0x7b, 0xe7, 0xc6} \
+  }
+extern EFI_GUID gEfiDiskInfoAhciInterfaceGuid;
+
 struct _EFI_DISK_INFO_PROTOCOL {
   EFI_GUID                  Interface;
   EFI_DISK_INFO_INQUIRY     Inquiry;
