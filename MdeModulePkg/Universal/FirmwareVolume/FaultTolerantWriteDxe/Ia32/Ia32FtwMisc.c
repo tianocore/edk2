@@ -258,6 +258,7 @@ FlushSpareBlockToBootBlock (
   Length  = FtwLiteDevice->SpareAreaLength;
   Buffer  = AllocatePool (Length);
   if (Buffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
   //
   // Get TopSwap bit state
