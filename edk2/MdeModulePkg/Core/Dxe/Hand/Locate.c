@@ -139,10 +139,10 @@ CoreLocateHandle (
   }
   
   GetNext = NULL;
+
   //
   // Set initial position
   //
-
   Position.Protocol  = Protocol;
   Position.SearchKey = SearchKey;
   Position.Position  = &gHandleList;
@@ -154,7 +154,6 @@ CoreLocateHandle (
   //
   // Lock the protocol database
   //
-  
   CoreAcquireProtocolLock ();
 
   //
@@ -267,9 +266,8 @@ CoreLocateHandle (
   @param  Interface              Return the interface structure for the matching 
                                  protocol. 
 
-  @retval IHANDLE                An IHANDLE is returned if the next Position is 
-                                 not the end of the list. A NULL_HANDLE is 
-                                 returned if it's the end of the list.
+  @return An pointer to IHANDLE if the next Position is not the end of the list.
+          Otherwise,NULL_HANDLE is returned.
 
 **/
 IHANDLE *
@@ -307,9 +305,8 @@ CoreGetNextLocateAllHandles (
   @param  Interface              Return the interface structure for the matching 
                                  protocol. 
 
-  @retval IHANDLE                An IHANDLE is returned if the next Position is 
-                                 not the end of the list. A NULL_HANDLE is 
-                                 returned if it's the end of the list.
+  @return An pointer to IHANDLE if the next Position is not the end of the list.
+          Otherwise,NULL_HANDLE is returned.
 
 **/
 IHANDLE *
@@ -349,7 +346,6 @@ CoreGetNextLocateByRegisterNotify (
 }
 
 
-
 /**
   Routine to get the next Handle, when you are searching for a given protocol.
 
@@ -357,9 +353,8 @@ CoreGetNextLocateByRegisterNotify (
   @param  Interface              Return the interface structure for the matching 
                                  protocol. 
 
-  @retval IHANDLE                An IHANDLE is returned if the next Position is 
-                                 not the end of the list. A NULL_HANDLE is 
-                                 returned if it's the end of the list.
+  @return An pointer to IHANDLE if the next Position is not the end of the list.
+          Otherwise,NULL_HANDLE is returned.
 
 **/
 IHANDLE *
@@ -408,8 +403,6 @@ CoreGetNextLocateByProtocol (
 
   return Handle;
 }
-
-
 
 
 /**
@@ -529,9 +522,7 @@ CoreLocateDevicePath (
 }
 
 
- 
-
-/**
+ /**
   Return the first Protocol Interface that matches the Protocol GUID. If
   Registration is pasased in return a Protocol Instance that was just add
   to the system. If Retistration is NULL return the first Protocol Interface
@@ -585,7 +576,7 @@ CoreLocateProtocol (
 
   mEfiLocateHandleRequest += 1;
 
-  if (NULL == Registration) {
+  if (Registration == NULL) {
     //
     // Look up the protocol entry and set the head pointer
     //
@@ -601,9 +592,9 @@ CoreLocateProtocol (
     Handle = CoreGetNextLocateByRegisterNotify (&Position, Interface);   
   }
 
-  if (NULL == Handle) {
+  if (Handle == NULL) {
     Status = EFI_NOT_FOUND;
-  } else if (NULL != Registration) {
+  } else if (Registration != NULL) {
     //
     // If this is a search by register notify and a handle was
     // returned, update the register notification position
@@ -617,8 +608,6 @@ Done:
   return Status;
 }
 
-
- 
 
 /**
   Function returns an array of handles that support the requested protocol
@@ -639,7 +628,7 @@ Done:
   @retval EFI_NOT_FOUND          No handles match the search. 
   @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the 
                                  matching results. 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_INVALID_PARAMETER  One or more paramters are not valid.
 
 **/
 EFI_STATUS
@@ -699,7 +688,7 @@ CoreLocateHandleBuffer (
              *Buffer
              );
 
-  *NumberHandles = BufferSize/sizeof(EFI_HANDLE);
+  *NumberHandles = BufferSize / sizeof(EFI_HANDLE);
   if (EFI_ERROR(Status)) {
     *NumberHandles = 0;
   }

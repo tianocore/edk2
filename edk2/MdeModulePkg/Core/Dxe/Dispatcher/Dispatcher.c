@@ -76,7 +76,7 @@ VOID            *mFwVolEventRegistration;
 //
 // List of file types supported by dispatcher
 //
-STATIC EFI_FV_FILETYPE mDxeFileTypes[] = { 
+EFI_FV_FILETYPE mDxeFileTypes[] = { 
   EFI_FV_FILETYPE_DRIVER, 
   EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER, 
   EFI_FV_FILETYPE_DXE_CORE,
@@ -135,7 +135,7 @@ CoreFwVolEventProtocolNotify (
   );
 
 /**
-  Convert FvHandle and DriverName into an EFI device path
+  Convert FvHandle and DriverName into an EFI device path.
 
   @param  Fv                    Fv protocol, needed to read Depex info out of 
                                 FLASH. 
@@ -341,7 +341,7 @@ CoreSchedule (
 
 
 /**
-  Convert a driver from the Untrused back to the Scheduled state
+  Convert a driver from the Untrused back to the Scheduled state.
 
   @param  FirmwareVolumeHandle  The handle of the Firmware Volume that contains 
                                 the firmware  file specified by DriverName. 
@@ -602,8 +602,7 @@ CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
   @param  FvHandle              The handle of a FV that's being tested 
 
   @retval TRUE                  Fv protocol on FvHandle has been processed 
-  @retval FALSE                 Fv protocol on FvHandle has not yet been 
-                                processed
+  @retval FALSE                 Fv protocol on FvHandle has not yet been processed
 
 **/
 BOOLEAN
@@ -700,7 +699,6 @@ CoreFvToDevicePath (
 
 
 
-
 /**
   Add an entry to the mDiscoveredList. Allocate memory to store the DriverEntry,
   and initilize any state variables. Read the Depex from the FV and store it
@@ -739,7 +737,7 @@ CoreAddToDriverList (
   ASSERT (DriverEntry != NULL);
 
   DriverEntry->Signature        = EFI_CORE_DRIVER_ENTRY_SIGNATURE;
-  CopyMem (&DriverEntry->FileName, DriverName, sizeof (EFI_GUID));
+  CopyGuid (&DriverEntry->FileName, DriverName);
   DriverEntry->FvHandle         = FvHandle;
   DriverEntry->Fv               = Fv;
   DriverEntry->FvFileDevicePath = CoreFvToDevicePath (Fv, FvHandle, DriverName);
@@ -821,21 +819,21 @@ CoreProcessFvImageFile (
   //
   // Read the first (and only the first) firmware volume section
   //
-  SectionType = EFI_SECTION_FIRMWARE_VOLUME_IMAGE;
-  FvHeader    = NULL;
-  FvAlignment = 0;
-  Buffer      = NULL;
-  BufferSize  = 0;
+  SectionType   = EFI_SECTION_FIRMWARE_VOLUME_IMAGE;
+  FvHeader      = NULL;
+  FvAlignment   = 0;
+  Buffer        = NULL;
+  BufferSize    = 0;
   AlignedBuffer = NULL;
   Status = Fv->ReadSection (
-                Fv, 
-                DriverName, 
-                SectionType, 
-                0, 
-                &Buffer, 
-                &BufferSize,
-                &AuthenticationStatus
-                );
+                 Fv, 
+                 DriverName, 
+                 SectionType, 
+                 0, 
+                 &Buffer, 
+                 &BufferSize,
+                 &AuthenticationStatus
+                 );
   if (!EFI_ERROR (Status)) {
     //
     // FvImage should be at its required alignment.
@@ -848,6 +846,9 @@ CoreProcessFvImageFile (
     if (FvAlignment < 8) {
       FvAlignment = 8;
     }
+    //
+    // Allocate the aligned buffer for the FvImage.
+    //
     AlignedBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES (BufferSize), (UINTN) FvAlignment);
     if (AlignedBuffer == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -935,12 +936,12 @@ CoreFwVolEventProtocolNotify (
   while (TRUE) {
     BufferSize = sizeof (EFI_HANDLE);
     Status = CoreLocateHandle (
-                    ByRegisterNotify,
-                    NULL,
-                    mFwVolEventRegistration,
-                    &BufferSize,
-                    &FvHandle
-                    );
+               ByRegisterNotify,
+               NULL,
+               mFwVolEventRegistration,
+               &BufferSize,
+               &FvHandle
+               );
     if (EFI_ERROR (Status)) {
       //
       // If no more notification events exit
@@ -968,7 +969,6 @@ CoreFwVolEventProtocolNotify (
     // Since we are about to process this Fv mark it as processed.
     //
     FvIsBeingProcesssed (FvHandle);
-
 
     Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
     if (EFI_ERROR (Status)) {
@@ -1012,7 +1012,7 @@ CoreFwVolEventProtocolNotify (
     //  EFI_FV_FILETYPE_DXE_CORE is processed to produce a Loaded Image protocol for the core
     //  EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE is processed to create a Fvb
     //
-    for (Index = 0; Index < sizeof (mDxeFileTypes)/sizeof (EFI_FV_FILETYPE); Index++) {
+    for (Index = 0; Index < sizeof (mDxeFileTypes) / sizeof (EFI_FV_FILETYPE); Index++) {
       //
       // Initialize the search key
       //
@@ -1125,7 +1125,7 @@ CoreFwVolEventProtocolNotify (
 
 /**
   Initialize the dispatcher. Initialize the notification function that runs when
-  a FV protocol is added to the system.
+  an FV2 protocol is added to the system.
 
 **/
 VOID

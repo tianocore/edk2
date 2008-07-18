@@ -79,7 +79,7 @@ CoreOpenImageFile (
   if (SourceBuffer != NULL) {
     ImageFileHandle->Source     = SourceBuffer;
     ImageFileHandle->SourceSize = SourceSize;
-    *DeviceHandle     = NULL;
+    *DeviceHandle               = NULL;
     CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, FilePath, DeviceHandle);
     if (SourceSize > 0) {
       Status = EFI_SUCCESS;
@@ -252,7 +252,7 @@ CoreOpenImageFile (
             //
             // Read the file into the buffer we allocated
             //
-            ImageFileHandle->SourceSize = (UINTN)FileInfo->FileSize;
+            ImageFileHandle->SourceSize = (UINTN) FileInfo->FileSize;
             ImageFileHandle->FreeBuffer = TRUE;
             Status = FileHandle->Read (FileHandle, &ImageFileHandle->SourceSize, ImageFileHandle->Source);
 
@@ -277,11 +277,11 @@ CoreOpenImageFile (
 
   TempFilePath = *FilePath;
   Status = CoreDevicePathToInterface (
-              &gEfiLoadFileProtocolGuid,
-              &TempFilePath,
-              (VOID*)&LoadFile,
-              DeviceHandle
-              );
+             &gEfiLoadFileProtocolGuid,
+             &TempFilePath,
+             (VOID*) &LoadFile,
+             DeviceHandle
+             );
   if (!EFI_ERROR (Status)) {
     //
     // Call LoadFile with the correct buffer size
@@ -330,7 +330,6 @@ Done:
 
   return Status;
 }
-
 
 
 
@@ -449,7 +448,6 @@ CoreGrowBuffer (
   //
   // If the status code is "buffer too small", resize the buffer
   //
-
   if (*Status == EFI_BUFFER_TOO_SMALL) {
     if (*Buffer != NULL) {
       CoreFreePool (*Buffer);

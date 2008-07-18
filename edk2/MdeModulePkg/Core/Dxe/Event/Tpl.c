@@ -1,5 +1,5 @@
 /** @file
-  Task priority (TPL) function
+  Task priority (TPL) functions.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -52,14 +52,14 @@ CoreHighestSetBit (
   IN UINTN     Number
   )
 {
-  UINTN   msb;
+  UINTN   Msb;
   
-  msb = 31;
-  while ((msb > 0) && ((Number & (UINTN)(1 << msb)) == 0)) {
-    msb--;
+  Msb = 31;
+  while ((Msb > 0) && ((Number & (UINTN)(1 << Msb)) == 0)) {
+    Msb--;
   }
 
-  return msb;
+  return Msb;
 }
 
 

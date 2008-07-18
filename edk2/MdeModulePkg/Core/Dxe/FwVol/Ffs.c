@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <DxeMain.h>
 
-#define PHYSICAL_ADDRESS_TO_POINTER(Address) ((VOID *)((UINTN)(Address)))
-
 
 /**
   Get the FFS file state by checking the highest bit set in the header's state field.
@@ -47,7 +45,7 @@ GetFileState (
     HighestBit >>= 1;
   }
 
-  return (EFI_FFS_FILE_STATE)HighestBit;
+  return (EFI_FFS_FILE_STATE) HighestBit;
 }
 
 
@@ -183,22 +181,21 @@ IsValidFfsHeader (
   *FileState = GetFileState (ErasePolarity, FfsHeader);
 
   switch (*FileState) {
-    case EFI_FILE_HEADER_VALID:
-    case EFI_FILE_DATA_VALID:
-    case EFI_FILE_MARKED_FOR_UPDATE:
-    case EFI_FILE_DELETED:
-      //
-      // Here we need to verify header checksum
-      //
-      return VerifyHeaderChecksum (FfsHeader);
-    
-    case EFI_FILE_HEADER_CONSTRUCTION:
-    case EFI_FILE_HEADER_INVALID:
-    default:
-      return FALSE;
+  case EFI_FILE_HEADER_VALID:
+  case EFI_FILE_DATA_VALID:
+  case EFI_FILE_MARKED_FOR_UPDATE:
+  case EFI_FILE_DELETED:
+    //
+    // Here we need to verify header checksum
+    //
+    return VerifyHeaderChecksum (FfsHeader);
+  
+  case EFI_FILE_HEADER_CONSTRUCTION:
+  case EFI_FILE_HEADER_INVALID:
+  default:
+    return FALSE;
   }
 }
-
 
 
 /**
@@ -223,17 +220,17 @@ IsValidFfsFile (
   FileState = GetFileState (ErasePolarity, FfsHeader);
   switch (FileState) {
 
-    case EFI_FILE_DELETED:
-    case EFI_FILE_DATA_VALID:
-    case EFI_FILE_MARKED_FOR_UPDATE:
-      //
-      // Some other vliadation like file content checksum might be done here.
-      // For performance issue, Tiano only do FileState check.
-      //
-      return TRUE;
+  case EFI_FILE_DELETED:
+  case EFI_FILE_DATA_VALID:
+  case EFI_FILE_MARKED_FOR_UPDATE:
+    //
+    // Some other vliadation like file content checksum might be done here.
+    // For performance issue, Tiano only do FileState check.
+    //
+    return TRUE;
 
-    default:
-      return FALSE;
+  default:
+    return FALSE;
   }
 }
 

@@ -1,7 +1,7 @@
 /** @file
   The file contains the GCD related services in the EFI Boot Services Table.
-    The GCD services are used to manage the memory and I/O regions that 
-    are accessible to the CPU that is executing the DXE core.
+  The GCD services are used to manage the memory and I/O regions that 
+  are accessible to the CPU that is executing the DXE core.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -49,7 +49,10 @@ LIST_ENTRY         mGcdIoSpaceMap      = INITIALIZE_LIST_HEAD_VARIABLE (mGcdIoSp
 
 EFI_GCD_MAP_ENTRY mGcdMemorySpaceMapEntryTemplate = {
   EFI_GCD_MAP_SIGNATURE,
-  { NULL, NULL },
+  { 
+    NULL,
+    NULL
+  },
   0,
   0,
   0,
@@ -62,7 +65,10 @@ EFI_GCD_MAP_ENTRY mGcdMemorySpaceMapEntryTemplate = {
 
 EFI_GCD_MAP_ENTRY mGcdIoSpaceMapEntryTemplate = {
   EFI_GCD_MAP_SIGNATURE,
-  { NULL, NULL },
+  {
+    NULL,
+    NULL
+  },
   0,
   0,
   0,
@@ -85,7 +91,7 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_PRESENT,                 EFI_MEMORY_PRESENT,     FALSE },
   { EFI_RESOURCE_ATTRIBUTE_INITIALIZED,             EFI_MEMORY_INITIALIZED, FALSE },
   { EFI_RESOURCE_ATTRIBUTE_TESTED,                  EFI_MEMORY_TESTED,      FALSE },
-  { 0, 0, FALSE }
+  { 0,                                              0,                      FALSE }
 };
 
 
@@ -147,7 +153,6 @@ CoreReleaseGcdIoLock (
 //
 // GCD Initialization Worker Functions
 //
-
 /**
   Aligns a value to the specified boundary.
 
@@ -292,7 +297,7 @@ CoreInsertGcdMapEntry (
 
 
 /**
-  Merge the Gcd region specified by Link and its adjacent entry
+  Merge the Gcd region specified by Link and its adjacent entry.
 
   @param  Link                   Specify the entry to be merged (with its 
                                  adjacent entry). 
@@ -452,6 +457,7 @@ CoreSearchGcdMapEntry (
     }
     Link = Link->ForwardLink;
   }
+
   return EFI_NOT_FOUND;
 }
 
@@ -478,6 +484,7 @@ CoreCountGcdMapEntry (
     Count++;
     Link = Link->ForwardLink;
   }
+  
   return Count;
 }
 
@@ -655,7 +662,6 @@ CoreConvertSpace (
       if ((Attributes & EFI_MEMORY_RUNTIME) != 0) {
         if ((BaseAddress & EFI_PAGE_MASK) != 0 || (Length & EFI_PAGE_MASK) != 0) {
           Status = EFI_INVALID_PARAMETER;
-
           goto Done;
         }
       }
@@ -677,9 +683,6 @@ CoreConvertSpace (
     goto Done;
   }
 
-  //
-  //
-  //
   if (Operation == GCD_SET_ATTRIBUTES_MEMORY_OPERATION) {
     //
     // Call CPU Arch Protocol to attempt to set attributes on the range
@@ -973,7 +976,7 @@ CoreAllocateSpace (
       }
 
       if (GcdAllocateType == EfiGcdAllocateMaxAddressSearchTopDown ||
-          GcdAllocateType == EfiGcdAllocateAnySearchTopDown           ) {
+          GcdAllocateType == EfiGcdAllocateAnySearchTopDown) {
         if ((Entry->BaseAddress + Length) > MaxAddress) {
           continue;
         }
@@ -1859,10 +1862,9 @@ CoreInitializeMemoryServices (
         //
         // See if this resource descrior HOB describes tested system memory below MaxAddress
         //
-        if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY                                       &&
-            (ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == TESTED_MEMORY_ATTRIBUTES &&
-            ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MaxAddress                            ) {
-
+        if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
+           (ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == TESTED_MEMORY_ATTRIBUTES &&
+            ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MaxAddress) {
           //
           // See if this is the highest tested system memory region below MaxAddress
           //
@@ -1886,11 +1888,8 @@ CoreInitializeMemoryServices (
     MaxAddress = ResourceHob->PhysicalStart;
   } while (Found && MaxMemoryLength < MINIMUM_INITIAL_MEMORY_SIZE);
 
-  //
-  //
-  //
-  if ((Length < MINIMUM_INITIAL_MEMORY_SIZE)                                                 ||
-      (MaxMemoryBaseAddress > BaseAddress && MaxMemoryLength >= MINIMUM_INITIAL_MEMORY_SIZE)    ) {
+  if ((Length < MINIMUM_INITIAL_MEMORY_SIZE) ||
+      (MaxMemoryBaseAddress > BaseAddress && MaxMemoryLength >= MINIMUM_INITIAL_MEMORY_SIZE)) {
     BaseAddress = MaxMemoryBaseAddress;
     Length      = MaxMemoryLength;
     Attributes  = MaxMemoryAttributes;
@@ -1942,14 +1941,14 @@ CoreInitializeMemoryServices (
 **/
 EFI_STATUS
 CoreInitializeGcdServices (
-  IN OUT VOID                  **HobStart,
+  IN OUT VOID              **HobStart,
   IN EFI_PHYSICAL_ADDRESS  MemoryBaseAddress,
   IN UINT64                MemoryLength
   )
 {
-  EFI_PEI_HOB_POINTERS                   Hob;
+  EFI_PEI_HOB_POINTERS               Hob;
   VOID                               *NewHobList;
-  EFI_HOB_HANDOFF_INFO_TABLE  *PhitHob;
+  EFI_HOB_HANDOFF_INFO_TABLE         *PhitHob;
   UINT8                              SizeOfMemorySpace;
   UINT8                              SizeOfIoSpace;
   EFI_HOB_RESOURCE_DESCRIPTOR        *ResourceHob;
@@ -1967,6 +1966,7 @@ CoreInitializeGcdServices (
   UINTN                              Index;
   UINT64                             Capabilities;
   EFI_HOB_CPU *                      CpuHob;
+
   //
   // Cache the PHIT HOB for later use
   //
@@ -2041,7 +2041,6 @@ CoreInitializeGcdServices (
       }
 
       if (GcdMemoryType != EfiGcdMemoryTypeNonExistent) {
-
         //
         // Convert the Resource HOB Attributes to an EFI Memory Capabilities mask
         //

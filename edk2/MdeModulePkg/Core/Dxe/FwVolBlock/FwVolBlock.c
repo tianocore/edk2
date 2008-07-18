@@ -1,9 +1,8 @@
 /** @file
-  Firmware Volume Block protocol.  Consumes FV hobs and creates
-  appropriate block protocols.
-
-  Also consumes NT_NON_MM_FV envinronment variable and produces appropriate
-  block protocols fro them also... (this is TBD)
+  Implementations for Firmware Volume Block protocol.  
+  
+  It consumes FV HOBs and creates read-lonly Firmare Volume Block protocol 
+  instances for each of them.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -27,16 +26,22 @@ EFI_FW_VOL_BLOCK_DEVICE  mFwVolBlock = {
       {
         HARDWARE_DEVICE_PATH,
         HW_MEMMAP_DP,
-        { (UINT8)(sizeof (MEMMAP_DEVICE_PATH)), (UINT8)(sizeof (MEMMAP_DEVICE_PATH) >> 8) }
+        {
+          (UINT8)(sizeof (MEMMAP_DEVICE_PATH)),
+          (UINT8)(sizeof (MEMMAP_DEVICE_PATH) >> 8)
+        }
       },
       EfiMemoryMappedIO,
-      (EFI_PHYSICAL_ADDRESS)0,
-      (EFI_PHYSICAL_ADDRESS)0,
+      (EFI_PHYSICAL_ADDRESS) 0,
+      (EFI_PHYSICAL_ADDRESS) 0,
     },
     {
       END_DEVICE_PATH_TYPE,
       END_ENTIRE_DEVICE_PATH_SUBTYPE,
-      { END_DEVICE_PATH_LENGTH, 0 }      
+      { 
+        END_DEVICE_PATH_LENGTH,
+        0
+      }      
     },
   },
   {
@@ -54,8 +59,6 @@ EFI_FW_VOL_BLOCK_DEVICE  mFwVolBlock = {
   0,
   0
 };
-
-
 
 
 
@@ -195,7 +198,7 @@ FwVolBlockReadBlock (
     return EFI_ACCESS_DENIED;
   }
   
-  LbaIndex = (UINTN)Lba;
+  LbaIndex = (UINTN) Lba;
   if (LbaIndex >= FvbDevice->NumBlocks) {
     //
     // Invalid Lba, read nothing.
@@ -221,8 +224,8 @@ FwVolBlockReadBlock (
   }
   
   LbaStart = FvbDevice->LbaCache[LbaIndex].Base;
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvbDevice->BaseAddress);
-  LbaOffset = (UINT8 *)FwVolHeader + LbaStart + Offset;
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN) FvbDevice->BaseAddress);
+  LbaOffset = (UINT8 *) FwVolHeader + LbaStart + Offset;
 
   //
   // Perform read operation
@@ -412,7 +415,7 @@ ProduceFVBProtocolOnBuffer (
   EFI_FV_BLOCK_MAP_ENTRY        *PtrBlockMapEntry;
   
   FvAlignment = 0;
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)BaseAddress;
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN) BaseAddress;
   //
   // Validate FV Header, if not as expected, return
   //
@@ -450,8 +453,8 @@ ProduceFVBProtocolOnBuffer (
   //
   FvbDev->NumBlocks = 0;
   for (PtrBlockMapEntry = FwVolHeader->BlockMap;
-        PtrBlockMapEntry->NumBlocks != 0;
-        PtrBlockMapEntry++) {
+       PtrBlockMapEntry->NumBlocks != 0;
+       PtrBlockMapEntry++) {
     FvbDev->NumBlocks += PtrBlockMapEntry->NumBlocks;
   }
   //
@@ -468,7 +471,7 @@ ProduceFVBProtocolOnBuffer (
   BlockIndex = 0;
   LinearOffset = 0;
   for (PtrBlockMapEntry = FwVolHeader->BlockMap;
-        PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
+       PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
     for (BlockIndex2 = 0; BlockIndex2 < PtrBlockMapEntry->NumBlocks; BlockIndex2++) {
       FvbDev->LbaCache[BlockIndex].Base = LinearOffset;
       FvbDev->LbaCache[BlockIndex].Length = PtrBlockMapEntry->Length;
@@ -488,12 +491,12 @@ ProduceFVBProtocolOnBuffer (
   // Attach FvVolBlock Protocol to new handle
   //
   Status = CoreInstallMultipleProtocolInterfaces (
-            &FvbDev->Handle,
-            &gEfiFirmwareVolumeBlockProtocolGuid,     &FvbDev->FwVolBlockInstance,
-            &gEfiDevicePathProtocolGuid,              &FvbDev->DevicePath,
-            &gEfiFirmwareVolumeDispatchProtocolGuid,  NULL,
-            NULL
-            );
+             &FvbDev->Handle,
+             &gEfiFirmwareVolumeBlockProtocolGuid,     &FvbDev->FwVolBlockInstance,
+             &gEfiDevicePathProtocolGuid,              &FvbDev->DevicePath,
+             &gEfiFirmwareVolumeDispatchProtocolGuid,  NULL,
+             NULL
+             );
 
   //
   // If they want the handle back, set it.
@@ -527,6 +530,7 @@ FwVolBlockDriverInit (
   )
 {
   EFI_PEI_HOB_POINTERS          FvHob;
+
   //
   // Core Needs Firmware Volumes to function
   //
@@ -538,6 +542,7 @@ FwVolBlockDriverInit (
     ProduceFVBProtocolOnBuffer (FvHob.FirmwareVolume->BaseAddress, FvHob.FirmwareVolume->Length, NULL, NULL);    
     FvHob.Raw = GET_NEXT_HOB (FvHob);
   }
+
   return EFI_SUCCESS;
 }
 
@@ -587,7 +592,7 @@ CoreProcessFirmwareVolume (
   //
   if (!EFI_ERROR(Status)) {
     Ptr = NULL;
-    Status = CoreHandleProtocol (*FVProtocolHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Ptr);
+    Status = CoreHandleProtocol (*FVProtocolHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **) &Ptr);
     if (EFI_ERROR(Status) || (Ptr == NULL)) {
       return EFI_VOLUME_CORRUPTED;
     }

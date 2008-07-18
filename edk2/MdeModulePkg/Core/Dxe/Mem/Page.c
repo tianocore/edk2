@@ -46,8 +46,8 @@ UINTN         mFreeMapStack = 0;
 //
 // This list maintain the free memory map list
 //
-LIST_ENTRY   mFreeMemoryMapEntryList  = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemoryMapEntryList);
-BOOLEAN mMemoryTypeInformationInitialized = FALSE;
+LIST_ENTRY   mFreeMemoryMapEntryList = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemoryMapEntryList);
+BOOLEAN      mMemoryTypeInformationInitialized = FALSE;
 
 EFI_MEMORY_TYPE_STAISTICS mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
   { 0, EFI_MAX_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiReservedMemoryType
@@ -109,8 +109,6 @@ PromoteMemoryResource (
   @param  End                    The last address in the range Must be the last 
                                  byte of a page 
   @param  Attribute              The attributes of the memory range to add 
-
-  @return None.  The range is added to the memory map
 
 **/
 VOID
@@ -613,7 +611,7 @@ CoreFreeMemoryMapStack (
 **/
 VOID
 RemoveMemoryMapEntry (
-  MEMORY_MAP      *Entry
+  IN OUT MEMORY_MAP      *Entry
   )
 {
   RemoveEntryList (&Entry->Link);
@@ -1151,9 +1149,6 @@ Done:
 }
 
 
-
-
-
 /**
   Frees previous allocated pages.
 
@@ -1233,8 +1228,6 @@ CoreFreePages (
   
   return Status;
 }
-
-
 
 
 /**
@@ -1373,7 +1366,7 @@ CoreGetMemoryMap (
         if (mMemoryTypeStatistics[Type].Special                        &&
             mMemoryTypeStatistics[Type].NumberOfPages > 0              &&
             Entry->Start >= mMemoryTypeStatistics[Type].BaseAddress    &&
-            Entry->End   <= mMemoryTypeStatistics[Type].MaximumAddress    ) {
+            Entry->End   <= mMemoryTypeStatistics[Type].MaximumAddress) {
           MemoryMap->Type = Type;
         }
       }
@@ -1467,7 +1460,7 @@ CoreAllocatePoolPages (
     CoreConvertPages (Start, NumberOfPages, PoolType);
   }
 
-  return (VOID *)(UINTN)Start;
+  return (VOID *)(UINTN) Start;
 }
 
 

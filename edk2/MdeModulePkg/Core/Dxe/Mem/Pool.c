@@ -68,13 +68,15 @@ typedef struct {
     LIST_ENTRY       Link;
 } POOL; 
 
+//
+// Pool header for each memory type.
+//
+POOL            mPoolHead[EfiMaxMemoryType];
 
-POOL            PoolHead[EfiMaxMemoryType];
-LIST_ENTRY      PoolHeadList;
-
 //
+// List of pool header to search for the appropriate memory type.
 //
-//
+LIST_ENTRY      mPoolHeadList;
 
 
 /**
@@ -90,14 +92,14 @@ CoreInitializePool (
   UINTN  Index;
 
   for (Type=0; Type < EfiMaxMemoryType; Type++) {
-    PoolHead[Type].Signature  = 0;
-    PoolHead[Type].Used       = 0;
-    PoolHead[Type].MemoryType = (EFI_MEMORY_TYPE) Type;
+    mPoolHead[Type].Signature  = 0;
+    mPoolHead[Type].Used       = 0;
+    mPoolHead[Type].MemoryType = (EFI_MEMORY_TYPE) Type;
     for (Index=0; Index < MAX_POOL_LIST; Index++) {
-        InitializeListHead (&PoolHead[Type].FreeList[Index]);
+        InitializeListHead (&mPoolHead[Type].FreeList[Index]);
     }
   }
-  InitializeListHead (&PoolHeadList);
+  InitializeListHead (&mPoolHeadList);
 }
 
 
@@ -119,12 +121,12 @@ LookupPoolHead (
   UINTN           Index;
 
   if (MemoryType >= 0 && MemoryType < EfiMaxMemoryType) {
-    return &PoolHead[MemoryType];
+    return &mPoolHead[MemoryType];
   }
 
   if (MemoryType < 0) {
 
-    for (Link = PoolHeadList.ForwardLink; Link != &PoolHeadList; Link = Link->ForwardLink) {
+    for (Link = mPoolHeadList.ForwardLink; Link != &mPoolHeadList; Link = Link->ForwardLink) {
       Pool = CR(Link, POOL, Link, POOL_SIGNATURE);
       if (Pool->MemoryType == MemoryType) {
         return Pool;
@@ -143,7 +145,7 @@ LookupPoolHead (
       InitializeListHead (&Pool->FreeList[Index]);
     }
 
-    InsertHeadList (&PoolHeadList, &Pool->Link);
+    InsertHeadList (&mPoolHeadList, &Pool->Link);
 
     return Pool;
   }
@@ -152,7 +154,6 @@ LookupPoolHead (
 }
 
  
-
 
 /**
   Allocate pool of a particular type.
@@ -331,14 +332,13 @@ Done:
     Buffer          = Head->Data;
     DEBUG_CLEAR_MEMORY (Buffer, Size - POOL_OVERHEAD);
 
-    DEBUG (
-      (DEBUG_POOL,
-      "AllocatePoolI: Type %x, Addr %x (len %x) %,d\n",
-       PoolType, 
-       Buffer, 
-       Size - POOL_OVERHEAD, 
-      Pool->Used)
-      );
+    DEBUG ((
+      DEBUG_POOL,
+      "AllocatePoolI: Type %x, Addr %x (len %x) %,d\n", PoolType, 
+      Buffer, 
+      Size - POOL_OVERHEAD, 
+      Pool->Used
+      ));
 
     //
     // Account the allocation
@@ -352,7 +352,6 @@ Done:
   return Buffer;
 }
   
-
 
 
 /**
@@ -372,7 +371,7 @@ CoreFreePool (
 {
   EFI_STATUS Status;
 
-  if (NULL == Buffer) {
+  if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -486,7 +485,7 @@ CoreFreePoolI (
     //
     NewPage = (CHAR8 *)((UINTN)Free & ~((DEFAULT_PAGE_ALLOCATION) -1));
     Free = (POOL_FREE *) &NewPage[0];
-    ASSERT(NULL != Free);
+    ASSERT(Free != NULL);
 
     if (Free->Signature == POOL_FREE_SIGNATURE) {
 

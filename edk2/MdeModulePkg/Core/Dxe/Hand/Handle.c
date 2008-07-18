@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // gProtocolDatabaseLock - Lock to protect the mProtocolDatabase
 // gHandleDatabaseKey    -  The Key to show that the handle has been created/modified
 //
-STATIC LIST_ENTRY      mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
+LIST_ENTRY      mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
 LIST_ENTRY             gHandleList           = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
 EFI_LOCK               gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 UINT64                 gHandleDatabaseKey    = 0;
@@ -139,7 +139,7 @@ CoreFindProtocolEntry (
       // Initialize new protocol entry structure
       //
       ProtEntry->Signature = PROTOCOL_ENTRY_SIGNATURE;
-      CopyMem ((VOID *)&ProtEntry->ProtocolID, Protocol, sizeof (EFI_GUID));
+      CopyGuid ((VOID *)&ProtEntry->ProtocolID, Protocol);
       InitializeListHead (&ProtEntry->Protocols);
       InitializeListHead (&ProtEntry->Notify);
 

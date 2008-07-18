@@ -200,7 +200,7 @@ FvGetNextFile (
   // Return FileType, NameGuid, and Attributes
   //
   *FileType = FfsFileHeader->Type;
-  CopyMem (NameGuid, &FfsFileHeader->Name, sizeof (EFI_GUID));
+  CopyGuid (NameGuid, &FfsFileHeader->Name);
   *Attributes = FfsAttributes2FvFileAttributes (FfsFileHeader->Attributes);
 
   //
@@ -280,7 +280,7 @@ FvReadFile (
   EFI_FFS_FILE_HEADER               *FfsHeader;
   UINTN                             InputBufferSize;
   
-  if (NULL == NameGuid) {
+  if (NameGuid == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -412,7 +412,7 @@ FvReadFileSection (
   UINT8                             *FileBuffer;
   FFS_FILE_LIST_ENTRY               *FfsEntry;
  
-  if (NULL == NameGuid || Buffer == NULL) {
+  if (NameGuid == NULL || Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -434,7 +434,7 @@ FvReadFileSection (
   //
   // Get the last key used by our call to FvReadFile as it is the FfsEntry for this file.
   //  
-  FfsEntry = (FFS_FILE_LIST_ENTRY *)FvDevice->LastKey;
+  FfsEntry = (FFS_FILE_LIST_ENTRY *) FvDevice->LastKey;
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -453,10 +453,10 @@ FvReadFileSection (
   //
   if (FfsEntry->StreamHandle == 0) {
     Status = OpenSectionStream (
-                    FileSize,
-                    FileBuffer,
-                    &FfsEntry->StreamHandle
-                    );
+               FileSize,
+               FileBuffer,
+               &FfsEntry->StreamHandle
+               );
     if (EFI_ERROR (Status)) {
       goto Done;
     }

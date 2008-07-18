@@ -182,7 +182,7 @@ CoreInstallConfigurationTable (
     //
     // Fill in the new entry
     //
-    CopyMem ((VOID *)&EfiConfigurationTable[Index].VendorGuid, Guid, sizeof (EFI_GUID));
+    CopyGuid ((VOID *)&EfiConfigurationTable[Index].VendorGuid, Guid);
     EfiConfigurationTable[Index].VendorTable  = Table;
 
     //

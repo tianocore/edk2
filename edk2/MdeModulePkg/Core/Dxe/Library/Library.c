@@ -120,7 +120,7 @@ CoreAllocateZeroBootServicesPool (
   VOID  *Memory;
 
   Memory = CoreAllocateBootServicesPool (AllocationSize);
-  SetMem (Memory, (Memory == NULL) ? 0 : AllocationSize, 0);
+  ZeroMem (Memory, (Memory == NULL) ? 0 : AllocationSize);
   return Memory;
 }
 
@@ -321,7 +321,7 @@ CoreDevicePathSize (
   //
   // Compute the size and add back in the size of the end device path structure
   //
-  return ((UINTN)DevicePath - (UINTN)Start) + sizeof(EFI_DEVICE_PATH_PROTOCOL);
+  return ((UINTN) DevicePath - (UINTN) Start) + sizeof(EFI_DEVICE_PATH_PROTOCOL);
 }
 
 
@@ -394,8 +394,6 @@ CoreDuplicateDevicePath (
 }
 
 
-
-
 /**
   Function is used to append a Src1 and Src2 together.
 
@@ -445,8 +443,6 @@ CoreAppendDevicePath (
 }
 
 
-
-
 /**
   Create a protocol notification event and return it.
 
@@ -479,25 +475,23 @@ CoreCreateProtocolNotifyEvent (
   //
   // Create the event
   //
-
   Status = CoreCreateEvent (
             EVT_NOTIFY_SIGNAL,
             NotifyTpl,
             NotifyFunction,
             NotifyContext,
-           &Event
+            &Event
             );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Register for protocol notifactions on this event
   //
-
   Status = CoreRegisterProtocolNotify (
-            ProtocolGuid,
-            Event,
-            Registration
-            );
+             ProtocolGuid,
+             Event,
+             Registration
+             );
   ASSERT_EFI_ERROR (Status);
 
   if (SignalFlag) {
