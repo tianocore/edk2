@@ -70,18 +70,18 @@ STATIC UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
   { GEOMETRICSHAPE_DOWN_TRIANGLE,       0x1f, L'v' },
   { GEOMETRICSHAPE_LEFT_TRIANGLE,       0x11, L'<' },
 
-  {  ARROW_LEFT,                         0x3c, L'<' },
-  {  ARROW_UP,                           0x18, L'^' },
-  {  ARROW_RIGHT,                        0x3e, L'>' },
-  {  ARROW_DOWN,                         0x19, L'v' },
+  { ARROW_LEFT,                         0x3c, L'<' },
+  { ARROW_UP,                           0x18, L'^' },
+  { ARROW_RIGHT,                        0x3e, L'>' },
+  { ARROW_DOWN,                         0x19, L'v' },
 
   { 0x0000,                             0x00, L'\0' }
 };
 
-CHAR16 mSetModeString[]            = { ESC, '[', '=', '3', 'h', 0 };
-CHAR16 mSetAttributeString[]       = { ESC, '[', '0', 'm', ESC, '[', '4', '0', 'm', ESC, '[', '4', '0', 'm', 0 };
-CHAR16 mClearScreenString[]        = { ESC, '[', '2', 'J', 0 };
-CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
+STATIC CHAR16 mSetModeString[]            = { ESC, '[', '=', '3', 'h', 0 };
+STATIC CHAR16 mSetAttributeString[]       = { ESC, '[', '0', 'm', ESC, '[', '4', '0', 'm', ESC, '[', '4', '0', 'm', 0 };
+STATIC CHAR16 mClearScreenString[]        = { ESC, '[', '2', 'J', 0 };
+STATIC CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
 
 //
 // Body of the ConOut functions
@@ -89,6 +89,7 @@ CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.Reset().
+
   If ExtendeVerification is TRUE, then perform dependent serial device reset,
   and set display mode to mode 0.
   If ExtendedVerification is FALSE, only set display mode to mode 0.
@@ -152,6 +153,7 @@ TerminalConOutReset (
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.OutputString().
+
   The Unicode string will be converted to terminal expressible data stream
   and send to terminal via serial port.
 
@@ -335,6 +337,7 @@ OutputError:
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.TestString().
+
   If one of the characters in the *Wstring is
   neither valid Unicode drawing characters,
   not ASCII code, then this function will return
@@ -385,6 +388,7 @@ TerminalConOutTestString (
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.QueryMode().
+
   It returns information for an available text mode
   that the terminal supports.
   In this driver, we support text mode 80x25 (mode 0),
@@ -433,6 +437,7 @@ TerminalConOutQueryMode (
 
 /**
   Implements EFI_SIMPLE_TEXT_OUT.SetMode().
+
   Set the terminal to a specified display mode.
   In this driver, we only support mode 0.
 
@@ -782,6 +787,7 @@ TerminalConOutSetCursorPosition (
 
 /**
   Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
+
   In this driver, the cursor cannot be hidden.
 
   @param This      Indicates the calling context.
