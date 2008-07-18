@@ -1,8 +1,8 @@
 /** @file
-  DiskIo driver that layers it's self on every Block IO protocol in the system.
+  DiskIo driver that lays on every BlockIo protocol in the system.
   DiskIo converts a block oriented device to a byte oriented device.
 
-  ReadDisk may have to do reads that are not aligned on sector boundaries.
+  Disk access may have to handle unaligned request about sector boundaries.
   There are three cases:
     UnderRun - The first byte is not on a sector boundary or the read request is
                less than a sector in length.
@@ -22,6 +22,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DiskIo.h"
 
+//
+// Driver binding protocol implementation for DiskIo driver.
+//
 EFI_DRIVER_BINDING_PROTOCOL gDiskIoDriverBinding = {
   DiskIoDriverBindingSupported,
   DiskIoDriverBindingStart,
@@ -31,6 +34,10 @@ EFI_DRIVER_BINDING_PROTOCOL gDiskIoDriverBinding = {
   NULL
 };
 
+//
+// Template for DiskIo private data structure.
+// The pointer to BlockIo protocol interface is assigned dynamically.
+//
 DISK_IO_PRIVATE_DATA        gDiskIoPrivateDataTemplate = {
   DISK_IO_PRIVATE_DATA_SIGNATURE,
   {
@@ -459,7 +466,7 @@ Done:
 
 
 /**
-  Read BufferSize bytes from Offset into Buffer.
+  Writes BufferSize bytes from Buffer into Offset.
   Writes may require a read modify write to support writes that are not
   aligned on sector boundaries. There are three cases:
     UnderRun - The first byte is not on a sector boundary or the write request

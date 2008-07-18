@@ -189,7 +189,7 @@ PartitionInstallGptChildHandles (
   EFI_PARTITION_ENTRY         *PartEntry;
   EFI_PARTITION_ENTRY_STATUS  *PEntryStatus;
   UINTN                       Index;
-  EFI_STATUS                  GptValid;
+  EFI_STATUS                  GptValidStatus;
   HARDDRIVE_DEVICE_PATH       HdDev;
 
   ProtectiveMbr = NULL;
@@ -204,7 +204,7 @@ PartitionInstallGptChildHandles (
   DEBUG ((EFI_D_INFO, " BlockSize : %d \n", BlockSize));
   DEBUG ((EFI_D_INFO, " LastBlock : %x \n", LastBlock));
 
-  GptValid = EFI_NOT_FOUND;
+  GptValidStatus = EFI_NOT_FOUND;
 
   //
   // Allocate a buffer for the Protective MBR
@@ -225,7 +225,7 @@ PartitionInstallGptChildHandles (
                       ProtectiveMbr
                       );
   if (EFI_ERROR (Status)) {
-    GptValid = Status;
+    GptValidStatus = Status;
     goto Done;
   }
   //
@@ -247,7 +247,6 @@ PartitionInstallGptChildHandles (
   }
 
   BackupHeader = AllocateZeroPool (sizeof (EFI_PARTITION_TABLE_HEADER));
-
   if (BackupHeader == NULL) {
     goto Done;
   }
@@ -304,8 +303,8 @@ PartitionInstallGptChildHandles (
                     PartEntry
                     );
   if (EFI_ERROR (Status)) {
-    GptValid = Status;
-    DEBUG ((EFI_D_INFO, " Partition Entry ReadBlocks error\n"));
+    GptValidStatus = Status;
+    DEBUG ((EFI_D_ERROR, " Partition Entry ReadBlocks error\n"));
     goto Done;
   }
 
@@ -327,7 +326,7 @@ PartitionInstallGptChildHandles (
   //
   // If we got this far the GPT layout of the disk is valid and we should return true
   //
-  GptValid = EFI_SUCCESS;
+  GptValidStatus = EFI_SUCCESS;
 
   //
   // Create child device handles
@@ -355,12 +354,12 @@ PartitionInstallGptChildHandles (
     HdDev.PartitionSize   = PartEntry[Index].EndingLBA - PartEntry[Index].StartingLBA + 1;
     CopyMem (HdDev.Signature, &PartEntry[Index].UniquePartitionGUID, sizeof (EFI_GUID));
 
-    DEBUG ((EFI_D_INFO, " Index : %d\n", Index));
-    DEBUG ((EFI_D_INFO, " Start LBA : %x\n", HdDev.PartitionStart));
-    DEBUG ((EFI_D_INFO, " End LBA : %x\n", PartEntry[Index].EndingLBA));
-    DEBUG ((EFI_D_INFO, " Partition size: %x\n", HdDev.PartitionSize));
-    DEBUG ((EFI_D_INFO, " Start : %x", MultU64x32 (PartEntry[Index].StartingLBA, BlockSize)));
-    DEBUG ((EFI_D_INFO, " End : %x\n", MultU64x32 (PartEntry[Index].EndingLBA, BlockSize)));
+    DEBUG ((EFI_D_INFO, " Index : %d\n", (UINT32) Index));
+    DEBUG ((EFI_D_INFO, " Start LBA : %lx\n", (UINT64) HdDev.PartitionStart));
+    DEBUG ((EFI_D_INFO, " End LBA : %lx\n", (UINT64) PartEntry[Index].EndingLBA));
+    DEBUG ((EFI_D_INFO, " Partition size: %lx\n", (UINT64) HdDev.PartitionSize));
+    DEBUG ((EFI_D_INFO, " Start : %lx", MultU64x32 (PartEntry[Index].StartingLBA, BlockSize)));
+    DEBUG ((EFI_D_INFO, " End : %lx\n", MultU64x32 (PartEntry[Index].EndingLBA, BlockSize)));
 
     Status = PartitionInstallChildHandle (
               This,
@@ -395,7 +394,7 @@ Done:
     FreePool (PEntryStatus);
   }
 
-  return GptValid;
+  return GptValidStatus;
 }
 
 
@@ -450,7 +449,7 @@ PartitionValidGptTable (
       !PartitionCheckCrc (BlockSize, &PartHdr->Header) ||
       PartHdr->MyLBA != Lba
       ) {
-    DEBUG ((EFI_D_INFO, " !Valid efi partition table header\n"));
+    DEBUG ((EFI_D_INFO, "Invalid efi partition table header\n"));
     FreePool (PartHdr);
     return FALSE;
   }
@@ -608,7 +607,10 @@ PartitionRestoreGptTable (
 
 Done:
   FreePool (PartHdr);
-  FreePool (Ptr);
+
+  if (Ptr != NULL) {
+    FreePool (Ptr);
+  }
 
   if (EFI_ERROR (Status)) {
     return FALSE;

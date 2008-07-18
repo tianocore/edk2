@@ -32,7 +32,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gDiskIoComponentName2
   "en"
 };
 
-
+//
+// Driver name table for DiskIo module.
+// It is shared by the implementation of ComponentName & ComponentName2 Protocol.
+//
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mDiskIoDriverNameTable[] = {
   {
     "eng;en",
