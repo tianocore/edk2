@@ -182,6 +182,11 @@ BdsLibBootViaBootOption (
     //
     InitializeListHead (&TempBootLists);
     BdsLibRegisterNewOption (&TempBootLists, DevicePath, L"EFI Internal Shell", L"BootOrder");
+    //
+    // free the temporary device path created by BdsLibUpdateFvFileDevicePath()
+    //
+    gBS->FreePool (DevicePath); 
+    DevicePath = Option->DevicePath;
   }
 
   //
@@ -1515,11 +1520,21 @@ BdsGetBootTypeFromDevicePath (
         break;
       case MESSAGING_DEVICE_PATH:
         //
-        // if the device path not only point to driver device, it is not a messaging device path.
+        // Get the last device path node
         //
         LastDeviceNode = NextDevicePathNode (TempDevicePath);
+        if (DevicePathSubType(LastDeviceNode) == MSG_DEVICE_LOGICAL_UNIT_DP) {
+          //
+          // if the next node type is Device Logical Unit, which specify the Logical Unit Number (LUN),
+          // skit it
+          //
+          LastDeviceNode = NextDevicePathNode (LastDeviceNode);
+        }
+        //
+        // if the device path not only point to driver device, it is not a messaging device path,
+        //
         if (!IsDevicePathEndType (LastDeviceNode)) {
-          break;
+          break;        
         }
 
         if (DevicePathSubType(TempDevicePath) == MSG_ATAPI_DP) {
@@ -1615,13 +1630,24 @@ BdsLibIsValidEFIBootOptDevicePath (
   }
 
   //
-  // If the boot option point to a internal Shell, it is a valid EFI boot option,
-  // and assume it is ready to boot now
+  // Check if it's a valid boot option for internal Shell
   //
   if (EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LastDeviceNode) != NULL) {
-     return TRUE;
+    //
+    // If the boot option point to Internal FV shell, make sure it is valid
+    //
+    TempDevicePath = DevPath; 
+    Status = BdsLibUpdateFvFileDevicePath (&TempDevicePath, &gEfiShellFileGuid);
+    if (Status == EFI_ALREADY_STARTED) {
+      return TRUE;
+    } else {
+      if (Status == EFI_SUCCESS) {
+        gBS->FreePool (TempDevicePath); 
+      }
+      return FALSE;
+    }
   }
-
+  
   //
   // If the boot option point to a blockIO device, no matter whether or not it is a removeable device, it is a valid EFI boot option
   //
@@ -1825,6 +1851,7 @@ BdsLibUpdateFvFileDevicePath (
   // Second, if fail to find, try to enumerate all FV
   //
   if (!FindFvFile) {
+    FvHandleBuffer = NULL;
     gBS->LocateHandleBuffer (
           ByProtocol,
           &gEfiFirmwareVolume2ProtocolGuid,
@@ -1857,6 +1884,9 @@ BdsLibUpdateFvFileDevicePath (
       FindFvFile = TRUE;
       FoundFvHandle = FvHandleBuffer[Index];
       break;
+    }
+    if (FvHandleBuffer !=NULL ) {
+      FreePool (FvHandleBuffer);  
     }
   }
 
