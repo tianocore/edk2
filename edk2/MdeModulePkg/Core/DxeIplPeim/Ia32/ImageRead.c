@@ -56,9 +56,6 @@ PeiImageRead (
 }
 
 
-
-
-
 /**
    This function simply retrieves the function pointer of ImageRead in
    ImageContext structure.

@@ -61,6 +61,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 extern BOOLEAN gInMemory;
 
+//
+// This PPI is installed to indicate the end of the PEI usage of memory 
+//
+extern CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi;
+
+
+
 /**
    Loads and relocates a PE/COFF image into memory.
 
@@ -84,19 +91,17 @@ PeiLoadFile (
 
 
 /**
-   Find DxeCore driver from all First Volumes.
+   Searches DxeCore in all firmware Volumes and loads the first instance that contains DxeCore.
 
-   @param FileHandle    Pointer to FFS file to search.
+   @param DxeCoreFileName    A Pointer to the EFI_GUID to contain the output DxeCore GUID file name.
+
+   @return FileHandle of DxeCore to load DxeCore.
    
-   @return EFI_SUCESS   Success to find the FFS in specificed FV
-   @return others       Fail to find the FFS in specificed FV
-
 **/
-EFI_STATUS
+EFI_PEI_FILE_HANDLE
 DxeIplFindDxeCore (
-  OUT EFI_PEI_FILE_HANDLE   *FileHandle
+  OUT EFI_GUID   *DxeCoreFileName
   );
-
 
 
 /**
@@ -145,14 +150,12 @@ DxeLoadCore (
 
    @param DxeCoreEntryPoint         The entrypoint of DxeCore.
    @param HobList                   The start of HobList passed to DxeCore.
-   @param EndOfPeiSignal            The PPI descriptor for EFI_END_OF_PEI_PPI.
 
 **/
 VOID
 HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
-  IN EFI_PEI_HOB_POINTERS   HobList,
-  IN EFI_PEI_PPI_DESCRIPTOR *EndOfPeiSignal
+  IN EFI_PEI_HOB_POINTERS   HobList
   );
 
 

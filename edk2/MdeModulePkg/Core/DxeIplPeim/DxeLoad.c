@@ -25,32 +25,32 @@ BOOLEAN gInMemory = FALSE;
 // Module Globals used in the DXE to PEI handoff
 // These must be module globals, so the stack can be switched
 //
-EFI_DXE_IPL_PPI mDxeIplPpi = {
+CONST EFI_DXE_IPL_PPI mDxeIplPpi = {
   DxeLoadCore
 };
 
-EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = {
+CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = {
   CustomGuidedSectionExtract
 };
 
-EFI_PEI_DECOMPRESS_PPI mDecompressPpi = {
+CONST EFI_PEI_DECOMPRESS_PPI mDecompressPpi = {
   Decompress
 };
 
-EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
+CONST EFI_PEI_PPI_DESCRIPTOR     mPpiList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiDxeIplPpiGuid,
-    &mDxeIplPpi
+    (VOID *) &mDxeIplPpi
   },
   {
     (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiPeiDecompressPpiGuid,
-    &mDecompressPpi
+    (VOID *) &mDecompressPpi
   }
 };
 
-EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
+CONST EFI_PEI_PPI_DESCRIPTOR     gEndOfPeiSignalPpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
   NULL
@@ -102,7 +102,7 @@ PeimInitializeDxeIpl (
         ASSERT (GuidPpi != NULL);
         while (ExtractHandlerNumber-- > 0) {
           GuidPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-          GuidPpi->Ppi   = &mCustomGuidedSectionExtractionPpi;
+          GuidPpi->Ppi   = (VOID *) &mCustomGuidedSectionExtractionPpi;
           GuidPpi->Guid  = &(ExtractHandlerGuidTable [ExtractHandlerNumber]);
           Status = PeiServicesInstallPpi (GuidPpi++);
           ASSERT_EFI_ERROR(Status);
@@ -203,11 +203,7 @@ DxeLoadCore (
   //
   // Look in all the FVs present in PEI and find the DXE Core
   //
-  FileHandle = NULL;
-  Status = DxeIplFindDxeCore (&FileHandle);
-  ASSERT_EFI_ERROR (Status);
-
-  CopyGuid(&DxeCoreFileName, &(((EFI_FFS_FILE_HEADER*)FileHandle)->Name));
+  FileHandle = DxeIplFindDxeCore (&DxeCoreFileName);
 
   //
   // Load the DXE Core from a Firmware Volume, may use LoadFile ppi to do this for save code size.
@@ -244,7 +240,7 @@ DxeLoadCore (
   // Transfer control to the DXE Core
   // The handoff state is simply a pointer to the HOB list
   //
-  HandOffToDxeCore (DxeCoreEntryPoint, HobList, &mPpiSignal);
+  HandOffToDxeCore (DxeCoreEntryPoint, HobList);
   //
   // If we get here, then the DXE Core returned.  This is an error
   // Dxe Core should not return.
@@ -256,41 +252,67 @@ DxeLoadCore (
 }
 
 
-
-
 /**
-   Find DxeCore driver from all First Volumes.
+   Searches DxeCore in all firmware Volumes and loads the first
+   instance that contains DxeCore.
 
-   @param FileHandle    Pointer to FFS file to search.
+   @param DxeCoreFileName    A Pointer to the EFI_GUID to contain
+                             the output DxeCore GUID file name.
+
+   @return FileHandle of DxeCore to load DxeCore.
    
-   @return EFI_SUCESS   Success to find the FFS in specificed FV
-   @return others       Fail to find the FFS in specificed FV
-
 **/
-EFI_STATUS
+EFI_PEI_FILE_HANDLE
 DxeIplFindDxeCore (
-  OUT EFI_PEI_FILE_HANDLE   *FileHandle
+  OUT EFI_GUID   *DxeCoreFileName
   )
 {
-  EFI_STATUS        Status;
-  EFI_STATUS        FileStatus;
-  UINTN             Instance;
-  EFI_PEI_FV_HANDLE VolumeHandle;
+  EFI_STATUS            Status;
+  UINTN                 Instance;
+  EFI_PEI_FV_HANDLE     VolumeHandle;
+  EFI_PEI_FILE_HANDLE   FileHandle;
+  EFI_FV_FILE_INFO      FvFileInfo;
   
   Instance    = 0;
-  *FileHandle = NULL;
-
-  do {
-    Status = PeiServicesFfsFindNextVolume (Instance++, &VolumeHandle);
+  while (TRUE) {
+    //
+    // Traverse all firmware volume instances
+    //
+    Status = PeiServicesFfsFindNextVolume (Instance, &VolumeHandle);
+    //
+    // If some error occurs here, then we cannot find any firmware
+    // volume that may contain DxeCore.
+    //
+    ASSERT_EFI_ERROR (Status);
+    
+    //
+    // Find the DxeCore file type from the beginning in this firmware volume.
+    //
+    FileHandle = NULL;
+    Status = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_DXE_CORE, VolumeHandle, &FileHandle);
     if (!EFI_ERROR (Status)) {
-      FileStatus = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_DXE_CORE, VolumeHandle, FileHandle);
-      if (!EFI_ERROR (FileStatus)) {
-        return FileStatus;
-      }
+      //
+      // Find DxeCore FileHandle in this volume, then we skip other firmware volume.
+      //
+      break;
     }
-  } while (!EFI_ERROR (Status));
+    //
+    // We cannot find DxeCore in this firmware volume, then search the next volume.
+    //
+    Instance++;
+  }
 
-  return EFI_NOT_FOUND;
+  //
+  // Extract the DxeCore GUID file name.
+  //
+  Status = PeiServicesFfsGetFileInfo (FileHandle, &FvFileInfo);
+  ASSERT_EFI_ERROR (Status);
+  CopyGuid (DxeCoreFileName, &FvFileInfo.FileName);
+
+  //
+  // Return the FileHandle to load DxeCore from this volume.
+  //
+  return FileHandle;
 }
 
 
