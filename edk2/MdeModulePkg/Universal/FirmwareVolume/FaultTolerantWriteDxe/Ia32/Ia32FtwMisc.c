@@ -35,51 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
 
-  Read PCI register value.
-  This is a internal function.
-
-
-  @param Offset          Offset of the register
-
-  @return The pci register value.
-
-**/
-UINT32
-ReadPciRegister (
-  IN UINT32                 Offset
-  )
-{
-  EFI_STATUS                      Status;
-  UINT32                          Value;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
-
-  Value   = 0;
-  Status  = gBS->LocateProtocol (&gEfiPciRootBridgeIoProtocolGuid, NULL, (VOID **) &PciRootBridgeIo);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "FtwLite: Locate PCI root bridge io protocol - %r", Status));
-    return 0;
-  }
-
-  Status = PciRootBridgeIo->Pci.Read (
-                                  PciRootBridgeIo,
-                                  EfiPciWidthUint32,
-                                  EFI_PCI_ADDRESS (
-                                    LPC_BUS_NUMBER,
-                                    LPC_DEVICE_NUMBER,
-                                    LPC_IF,
-                                    Offset
-                                    ),
-                                  1,
-                                  &Value
-                                  );
-  ASSERT_EFI_ERROR (Status);
-
-  return Value;
-}
-
-/**
-
-  Get swap state
+  Get swap state.
 
   This is a internal function.
 
@@ -95,10 +51,13 @@ GetSwapState (
   OUT BOOLEAN               *SwapState
   )
 {
+  UINT32 Value;
+  Value = PciRead32(EFI_PCI_ADDRESS (LPC_BUS_NUMBER, LPC_DEVICE_NUMBER, LPC_IF, GEN_STATUS))
+
   //
   // Top swap status is 13 bit
   //
-  *SwapState = (BOOLEAN) ((ReadPciRegister (GEN_STATUS) & TOP_SWAP_BIT) != 0);
+  *SwapState = (BOOLEAN) ((Value & TOP_SWAP_BIT) != 0);
 
   return EFI_SUCCESS;
 }
@@ -131,7 +90,7 @@ SetSwapState (
   //
   // Top-Swap bit (bit 13, D31: F0, Offset D4h)
   //
-  GenStatus = ReadPciRegister (GEN_STATUS);
+  GenStatus = PciRead32(EFI_PCI_ADDRESS (LPC_BUS_NUMBER, LPC_DEVICE_NUMBER, LPC_IF, GEN_STATUS));
 
   //
   // Set 13 bit, according to input NewSwapState
@@ -142,26 +101,10 @@ SetSwapState (
     GenStatus &= ~TOP_SWAP_BIT;
   }
 
-  Status = gBS->LocateProtocol (&gEfiPciRootBridgeIoProtocolGuid, NULL, (VOID **) &PciRootBridgeIo);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "FtwLite: Locate PCI root bridge io protocol - %r", Status));
-    return Status;
-  }
   //
   // Write back the GenStatus register
   //
-  Status = PciRootBridgeIo->Pci.Write (
-                                  PciRootBridgeIo,
-                                  EfiPciWidthUint32,
-                                  EFI_PCI_ADDRESS (
-                                    LPC_BUS_NUMBER,
-                                    LPC_DEVICE_NUMBER,
-                                    LPC_IF,
-                                    GEN_STATUS
-                                    ),
-                                  1,
-                                  &GenStatus
-                                  );
+  PciWrite32(EFI_PCI_ADDRESS (LPC_BUS_NUMBER, LPC_DEVICE_NUMBER, LPC_IF, GEN_STATUS), GenStatus);
 
   DEBUG_CODE_BEGIN ();
     if (TopSwap) {
