@@ -18,13 +18,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Hotkey.h"
 #include "HwErrRecSupport.h"
 
-
+//
+// BDS arch protocol instance initial value.
+//
+// Note: Current BDS not directly get the BootMode, DefaultBoot,
+// TimeoutDefault, MemoryTestLevel value from the BDS arch protocol.
+// Please refer to the library useage of BdsLibGetBootMode, BdsLibGetTimeout 
+// and PlatformBdsDiagnostics in BdsPlatform.c
+//
 EFI_BDS_ARCH_PROTOCOL_INSTANCE  gBdsInstanceTemplate = {
   EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE,
   NULL,
   {BdsEntry},
   0xFFFF,
   TRUE,
+  0,
   EXTENSIVE
 };
 
