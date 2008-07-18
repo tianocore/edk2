@@ -51,7 +51,7 @@ CHAR8 mOtherChars[] = {
   '\0'
 };
 
-STATIC EFI_HANDLE  mHandle = NULL;
+EFI_HANDLE  mHandle = NULL;
 
 //
 // EFI Unicode Collation Protocol supporting ISO 639-2 language code

@@ -32,11 +32,14 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPartitionComponentNa
   "en"
 };
 
-
+//
+// Driver name table for Partition module.
+// It is shared by the implementation of ComponentName & ComponentName2 Protocol.
+//
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPartitionDriverNameTable[] = {
   {
     "eng;en",
-    (CHAR16 *)L"Partition Driver(MBR/GPT/El Torito)"
+    L"Partition Driver(MBR/GPT/El Torito)"
   },
   {
     NULL,

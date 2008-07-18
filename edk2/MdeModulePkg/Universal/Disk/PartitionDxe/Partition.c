@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Partition.h"
 
 //
-// Partition Driver Global Variables
+// Partition Driver Global Variables.
 //
 EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
   PartitionDriverBindingSupported,
@@ -30,7 +30,9 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
   NULL
 };
 
-STATIC 
+//
+// Priortized function list to detect partition table. 
+//
 PARTITION_DETECT_ROUTINE mPartitionDetectRoutineTable[] = {
   PartitionInstallGptChildHandles,
   PartitionInstallElToritoChildHandles,
@@ -98,11 +100,11 @@ PartitionDriverBindingSupported (
   // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
-        ControllerHandle,
-        &gEfiDevicePathProtocolGuid,
-        This->DriverBindingHandle,
-        ControllerHandle
-        );
+         ControllerHandle,
+         &gEfiDevicePathProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
   //
   // Open the IO Abstraction(s) needed to perform the supported test
@@ -402,7 +404,6 @@ PartitionDriverBindingStop (
                                not be reset.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 PartitionReset (
@@ -440,7 +441,6 @@ PartitionReset (
                                 valid for the device.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 PartitionReadBlocks (
@@ -492,7 +492,6 @@ PartitionReadBlocks (
                                 valid for the device.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 PartitionWriteBlocks (
@@ -535,7 +534,6 @@ PartitionWriteBlocks (
   @retval EFI_NO_MEDIA      There is no media in the device.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 PartitionFlushBlocks (

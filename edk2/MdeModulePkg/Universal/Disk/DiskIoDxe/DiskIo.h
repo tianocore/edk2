@@ -1,6 +1,5 @@
 /** @file
-  DiskIo driver that layers it's self on every Block IO protocol in the system.
-  DiskIo converts a block oriented device to a byte oriented device.
+  Master header file for DiskIo driver. It includes the module private defininitions.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -156,7 +155,7 @@ DiskIoReadDisk (
   );
 
 /**
-  Read BufferSize bytes from Offset into Buffer.
+  Writes BufferSize bytes from Buffer into Offset.
   Writes may require a read modify write to support writes that are not
   aligned on sector boundaries. There are three cases:
     UnderRun - The first byte is not on a sector boundary or the write request
