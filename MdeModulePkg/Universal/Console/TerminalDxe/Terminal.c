@@ -119,16 +119,16 @@ TERMINAL_DEV  gTerminalDevTemplate = {
 
 
 /**
-  Test to see if this driver supports ControllerHandle. 
+  Test to see if this driver supports Controller. 
 
   @param  This                Protocol instance pointer.
-  @param  ControllerHandle    Handle of device to test
+  @param  Controller          Handle of device to test
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval EFI_ALREADY_STARTED This driver is already running on this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval EFI_ALREADY_STARTED This driver is already running on this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -230,19 +230,19 @@ TerminalDriverBindingSupported (
 }
 
 /**
-  Start this driver on ControllerHandle by opening a Serial IO protocol,
+  Start this driver on Controller by opening a Serial IO protocol,
   reading Device Path, and creating a child handle with a Simple Text In,
   Simple Text In Ex and Simple Text Out protocol, and device path protocol.
   And store Console Device Environment Variables.
 
   @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to bind driver to
+  @param  Controller           Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
-  @retval EFI_SUCCESS          This driver is added to ControllerHandle
-  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval other                This driver does not support this device
+  @retval EFI_SUCCESS          This driver is added to Controller.
+  @retval EFI_ALREADY_STARTED  This driver is already running on Controller.
+  @retval other                This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -383,7 +383,7 @@ TerminalDriverBindingStart (
     ASSERT (TerminalType <= VTUTF8TYPE);
 
     CopyMem (&DefaultNode->Guid, gTerminalType[TerminalType], sizeof (EFI_GUID));
-    RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL*)DefaultNode;
+    RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) DefaultNode;
   } else {
     //
     // Use the RemainingDevicePath to determine the terminal type
@@ -753,17 +753,17 @@ Error:
 }
 
 /**
-  Stop this driver on ControllerHandle by closing Simple Text In, Simple Text
+  Stop this driver on Controller by closing Simple Text In, Simple Text
   In Ex, Simple Text Out protocol, and removing parent device path from
   Console Device Environment Variables.    
 
   @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on
+  @param  Controller        Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
   @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS       This driver is removed Controller.
   @retval other             This driver could not be removed from this device.
 
 **/
@@ -972,7 +972,7 @@ TerminalFreeNotifyList (
                    TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                    );
     RemoveEntryList (ListHead->ForwardLink);
-    gBS->FreePool (NotifyNode);
+    FreePool (NotifyNode);
   }
 
   return EFI_SUCCESS;
@@ -1172,8 +1172,8 @@ TerminalRemoveConsoleDevVariable (
   @param  VariableSize           Returns the size of the EFI variable that was read
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
-  @return Caller is repsoncible freeing the buffer.
-  @retval NULL                   Variable was not read
+          Caller is repsoncible freeing the buffer. If variable was not read, 
+          NULL regturned.
 
 **/
 VOID *
@@ -1263,53 +1263,40 @@ SetTerminalDevicePath (
   Node.Header.SubType = MSG_VENDOR_DP;
 
   //
-  // generate terminal device path node according to terminal type.
+  // Generate terminal device path node according to terminal type.
   //
   switch (TerminalType) {
 
   case PCANSITYPE:
-    CopyMem (
-      &Node.Guid,
-      &gEfiPcAnsiGuid,
-      sizeof (EFI_GUID)
-      );
+    CopyGuid (&Node.Guid, &gEfiPcAnsiGuid);
     break;
 
   case VT100TYPE:
-    CopyMem (
-      &Node.Guid,
-      &gEfiVT100Guid,
-      sizeof (EFI_GUID)
-      );
+    CopyGuid (&Node.Guid, &gEfiVT100Guid);
     break;
 
   case VT100PLUSTYPE:
-    CopyMem (
-      &Node.Guid,
-      &gEfiVT100PlusGuid,
-      sizeof (EFI_GUID)
-      );
+    CopyGuid (&Node.Guid, &gEfiVT100PlusGuid);
     break;
 
   case VTUTF8TYPE:
-    CopyMem (
-      &Node.Guid,
-      &gEfiVTUTF8Guid,
-      sizeof (EFI_GUID)
-      );
+    CopyGuid (&Node.Guid, &gEfiVTUTF8Guid);
     break;
 
   default:
     return EFI_UNSUPPORTED;
-    break;
   }
 
+  //
+  // Get VENDOR_DEVCIE_PATH size and put into Node.Header
+  //
   SetDevicePathNodeLength (
     &Node.Header,
     sizeof (VENDOR_DEVICE_PATH)
     );
+
   //
-  // append the terminal node onto parent device path
+  // Append the terminal node onto parent device path
   // to generate a complete terminal device path.
   //
   *TerminalDevicePath = AppendDevicePathNode (
@@ -1384,8 +1371,8 @@ InitializeEfiKeyFiFo (
 /**
   The user Entry Point for module Terminal. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
-  @param[in] SystemTable    A pointer to the EFI System Table.
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
+  @param  SystemTable    A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.

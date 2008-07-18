@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Terminal.h"
 
 
-
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existance of a keystroke via WaitForEvent () call.
@@ -601,6 +600,9 @@ TerminalConInCheckForKey (
 
     SerialInTimeOut = 0;
     if (Mode->BaudRate != 0) {
+      //
+      // According to BAUD rate to calculate the timeout value.
+      //
       SerialInTimeOut = (1 + Mode->DataBits + Mode->StopBits) * 2 * 1000000 / (UINTN) Mode->BaudRate;
     }
 
@@ -621,11 +623,11 @@ TerminalConInCheckForKey (
     }
   }
   //
-  //  check whether serial buffer is empty
+  //  Check whether serial buffer is empty.
   //
   Status = SerialIo->GetControl (SerialIo, &Control);
 
-  if (0 != (Control & EFI_SERIAL_INPUT_BUFFER_EMPTY)) {
+  if ((Control & EFI_SERIAL_INPUT_BUFFER_EMPTY) != 0) {
     //
     // Translate all the raw data in RawFIFO into EFI Key,
     // according to different terminal type supported.
@@ -701,6 +703,9 @@ GetOneKeyFromSerial (
   Size    = 1;
   *Output = 0;
 
+  //
+  // Read one key from serial I/O device.
+  //
   Status  = SerialIo->Read (SerialIo, &Size, Output);
 
   if (EFI_ERROR (Status)) {
@@ -1119,36 +1124,39 @@ UnicodeToEfiKeyFlushState (
 {
   EFI_INPUT_KEY Key;
 
-  if (0 != (TerminalDevice->InputState & INPUT_STATE_ESC)) {
+  if ((TerminalDevice->InputState & INPUT_STATE_ESC) != 0) {
     Key.ScanCode    = SCAN_ESC;
     Key.UnicodeChar = 0;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if (0 != (TerminalDevice->InputState & INPUT_STATE_CSI)) {
+  if ((TerminalDevice->InputState & INPUT_STATE_CSI) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = CSI;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if (0 != (TerminalDevice->InputState & INPUT_STATE_LEFTOPENBRACKET)) {
+  if ((TerminalDevice->InputState & INPUT_STATE_LEFTOPENBRACKET) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = LEFTOPENBRACKET;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if (0 != (TerminalDevice->InputState & INPUT_STATE_O)) {
+  if ((TerminalDevice->InputState & INPUT_STATE_O) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = 'O';
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if (0 != (TerminalDevice->InputState & INPUT_STATE_2)) {
+  if ((TerminalDevice->InputState & INPUT_STATE_2) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = '2';
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
+  //
+  // Cancel the timer.
+  //
   gBS->SetTimer (
         TerminalDevice->TwoSecondTimeOut,
         TimerCancel,

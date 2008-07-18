@@ -603,40 +603,40 @@ TerminalConOutEnableCursor (
 ;
 
 /**
-  Test to see if this driver supports ControllerHandle. 
+  Test to see if this driver supports Controller. 
 
   @param  This                Protocol instance pointer.
-  @param  ControllerHandle    Handle of device to test
+  @param  Controller          Handle of device to test
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval EFI_ALREADY_STARTED This driver is already running on this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval EFI_ALREADY_STARTED This driver is already running on this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
 EFIAPI
 TerminalDriverBindingSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
+  IN EFI_HANDLE                     ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
 /**
-  Start this driver on ControllerHandle by opening a Serial IO protocol,
+  Start this driver on Controller by opening a Serial IO protocol,
   reading Device Path, and creating a child handle with a Simple Text In,
   Simple Text In Ex and Simple Text Out protocol, and device path protocol.
   And store Console Device Environment Variables.
 
   @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to bind driver to
+  @param  Controller           Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
-  @retval EFI_SUCCESS          This driver is added to ControllerHandle
-  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval other                This driver does not support this device
+  @retval EFI_SUCCESS          This driver is added to Controller.
+  @retval EFI_ALREADY_STARTED  This driver is already running on Controller.
+  @retval other                This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -647,18 +647,19 @@ TerminalDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+
 /**
-  Stop this driver on ControllerHandle by closing Simple Text In, Simple Text
+  Stop this driver on Controller by closing Simple Text In, Simple Text
   In Ex, Simple Text Out protocol, and removing parent device path from
   Console Device Environment Variables.    
 
   @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on
+  @param  Controller        Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
   @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS       This driver is removed Controller.
   @retval other             This driver could not be removed from this device.
 
 **/
@@ -859,8 +860,8 @@ TerminalRemoveConsoleDevVariable (
   @param  VariableSize           Returns the size of the EFI variable that was read
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
-  @return Caller is repsoncible freeing the buffer.
-  @retval NULL                   Variable was not read
+          Caller is repsoncible freeing the buffer. If variable was not read, 
+          NULL regturned.
 
 **/
 VOID                                *
@@ -1262,7 +1263,7 @@ AnsiRawDataToUnicode (
 **/
 VOID
 UnicodeToEfiKey (
-  IN  TERMINAL_DEV    *PcAnsiDevice
+  IN  TERMINAL_DEV    *TerminalDevice
   )
 ;
 
