@@ -53,14 +53,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED  IA32_DESCRIPTOR gLidtDescriptor = {
 
    @param DxeCoreEntryPoint         The entrypoint of DxeCore.
    @param HobList                   The start of HobList passed to DxeCore.
-   @param EndOfPeiSignal            The PPI descriptor for EFI_END_OF_PEI_PPI.
 
 **/
 VOID
 HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
-  IN EFI_PEI_HOB_POINTERS   HobList,
-  IN EFI_PEI_PPI_DESCRIPTOR *EndOfPeiSignal
+  IN EFI_PEI_HOB_POINTERS   HobList
   )
 {
   EFI_STATUS                Status;
@@ -106,7 +104,7 @@ HandOffToDxeCore (
     //
     // End of PEI phase singal
     //
-    Status = PeiServicesInstallPpi (EndOfPeiSignal);
+    Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
     ASSERT_EFI_ERROR (Status);
     
     AsmWriteCr3 (PageTables);
@@ -169,7 +167,7 @@ HandOffToDxeCore (
     //
     // End of PEI phase singal
     //
-    Status = PeiServicesInstallPpi (EndOfPeiSignal);
+    Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
     ASSERT_EFI_ERROR (Status);
 
     //
