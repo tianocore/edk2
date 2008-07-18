@@ -52,8 +52,6 @@ FV_DEVICE mFvDevice = {
 //
 // FFS helper functions
 //
-
-
 /**
   given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
   copy the volume header into it.
@@ -122,8 +120,6 @@ GetFwVolHeader (
 
   @param  FvDevice              pointer to the FvDevice to be freed. 
 
-  @return None.
-
 **/
 VOID
 FreeFvDeviceResource (
@@ -149,7 +145,7 @@ FreeFvDeviceResource (
 
     CoreFreePool (FfsFileEntry);
 
-    FfsFileEntry = (FFS_FILE_LIST_ENTRY *)NextEntry;
+    FfsFileEntry = (FFS_FILE_LIST_ENTRY *) NextEntry;
   }
 
 
@@ -169,9 +165,9 @@ FreeFvDeviceResource (
 
 
 /**
-  Check if a FV is consistent and allocate cache
+  Check if an FV is consistent and allocate cache for it.
 
-  @param  FvDevice              pointer to the FvDevice to be checked. 
+  @param  FvDevice              A pointer to the FvDevice to be checked. 
 
   @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated. 
   @retval EFI_SUCCESS           FV is consistent and cache is allocated. 
@@ -245,11 +241,11 @@ FvCheck (
         Size -= LbaOffset;
       }
       Status = Fvb->Read (Fvb,
-                          LbaIndex,
-                          LbaOffset,
-                          &Size,
-                          CacheLocation
-                          );
+                      LbaIndex,
+                      LbaOffset,
+                      &Size,
+                      CacheLocation
+                      );
       //
       // Not check EFI_BAD_BUFFER_SIZE, for Size = BlockMap->Length
       //
@@ -288,11 +284,11 @@ FvCheck (
   //
   // Build FFS list
   //
-  FfsHeader = (EFI_FFS_FILE_HEADER *)FvDevice->CachedFv;
+  FfsHeader = (EFI_FFS_FILE_HEADER *) FvDevice->CachedFv;
   TopFvAddress = FvDevice->EndOfCachedFv;
-  while ((UINT8 *)FfsHeader < TopFvAddress) {
+  while ((UINT8 *) FfsHeader < TopFvAddress) {
 
-    TestLength = TopFvAddress - ((UINT8 *)FfsHeader);
+    TestLength = TopFvAddress - ((UINT8 *) FfsHeader);
     if (TestLength > sizeof (EFI_FFS_FILE_HEADER)) {
       TestLength = sizeof (EFI_FFS_FILE_HEADER);
     }
@@ -308,9 +304,7 @@ FvCheck (
       if ((FileState == EFI_FILE_HEADER_INVALID) || 
           (FileState == EFI_FILE_HEADER_CONSTRUCTION)) {
         FfsHeader++;
-      
         continue;
-      
       } else {
         //
         // File system is corrputed
@@ -476,9 +470,9 @@ NotifyFwVolBlock (
         return;
       }
       
-      FvDevice->Fvb         = Fvb;
-      FvDevice->Handle      = Handle;
-      FvDevice->FwVolHeader = FwVolHeader;
+      FvDevice->Fvb             = Fvb;
+      FvDevice->Handle          = Handle;
+      FvDevice->FwVolHeader     = FwVolHeader;
       FvDevice->Fv.ParentHandle = Fvb->ParentHandle;
       
       //

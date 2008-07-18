@@ -416,8 +416,8 @@ CoreLoadPeImage (
     Status = Image->Ebc->CreateThunk (
                            Image->Ebc,
                            Image->Handle,
-                           (VOID *)(UINTN)Image->ImageContext.EntryPoint,
-                           (VOID **)&Image->EntryPoint
+                           (VOID *)(UINTN) Image->ImageContext.EntryPoint,
+                           (VOID **) &Image->EntryPoint
                            );
     if (EFI_ERROR(Status)) {
       goto Done;
@@ -466,20 +466,12 @@ CoreLoadPeImage (
     UINTN StartIndex;
     CHAR8 EfiFileName[256];
 
-    if (Image->ImageContext.Machine != IMAGE_FILE_MACHINE_IA64) {
-      DEBUG ((DEBUG_INFO | DEBUG_LOAD,
-              "Loading driver at 0x%10p EntryPoint=0x%10p ",
-              (VOID *)(UINTN)Image->ImageContext.ImageAddress,
-              (VOID *)(UINTN)Image->ImageContext.EntryPoint));
-    } else {
-      //
-      // For IPF Image, the real entry point should be print.
-      //
-      DEBUG ((DEBUG_INFO | DEBUG_LOAD,
-              "Loading driver at 0x%10p EntryPoint=0x%10p ",
-              (VOID *)(UINTN)Image->ImageContext.ImageAddress,
-              (VOID *)(UINTN)(*(UINT64 *)(UINTN)Image->ImageContext.EntryPoint)));
-    }
+    
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD,
+           "Loading driver at 0x%10p EntryPoint=0x%10p ",
+           (VOID *)(UINTN) Image->ImageContext.ImageAddress,
+           FUNCTION_ENTRY_POINT ((UINTN) Image->ImageContext.EntryPoint)));
+   
 
     //
     // Print Module Name by Pdb file path
@@ -559,7 +551,7 @@ CoreLoadedImageInfo (
   if (!EFI_ERROR (Status)) {
     Image = LOADED_IMAGE_PRIVATE_DATA_FROM_THIS (LoadedImage);
   } else {
-    DEBUG ((DEBUG_LOAD, "CoreLoadedImageInfo: Not an ImageHandle %x\n", ImageHandle));
+    DEBUG ((DEBUG_LOAD, "CoreLoadedImageInfo: Not an ImageHandle %p\n", ImageHandle));
     Image = NULL;
   }
 
@@ -698,7 +690,7 @@ CoreLoadImageCommon (
   Status = CoreHandleProtocol (DeviceHandle, &gEfiDevicePathProtocolGuid, (VOID **)&HandleFilePath);
   if (!EFI_ERROR (Status)) {
     FilePathSize = CoreDevicePathSize (HandleFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
-    FilePath = (EFI_DEVICE_PATH_PROTOCOL *) ( ((UINT8 *)FilePath) + FilePathSize );
+    FilePath = (EFI_DEVICE_PATH_PROTOCOL *) (((UINT8 *)FilePath) + FilePathSize );
   }
 
   //
@@ -1061,12 +1053,7 @@ CoreStartImage (
   DEBUG_CODE_BEGIN ();
     if (Image->ExitDataSize != 0 || Image->ExitData != NULL) {
 
-      DEBUG (
-        (DEBUG_LOAD,
-        "StartImage: ExitDataSize %d, ExitData %x",
-                            Image->ExitDataSize,
-        Image->ExitData)
-        );
+      DEBUG ((DEBUG_LOAD, "StartImage: ExitDataSize %d, ExitData %x", Image->ExitDataSize, Image->ExitData));
       if (Image->ExitData != NULL) {
         DEBUG ((DEBUG_LOAD, " (%hs)", Image->ExitData));
       }

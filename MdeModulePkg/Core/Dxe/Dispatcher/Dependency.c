@@ -1,5 +1,5 @@
 /** @file
-  DXE Dispatcher Dependency Evaluator
+  DXE Dispatcher Dependency Evaluator.
 
   This routine evaluates a dependency expression (DEPENDENCY_EXPRESSION) to determine
   if a driver can be scheduled for execution.  The criteria for
@@ -34,8 +34,7 @@ BOOLEAN *mDepexEvaluationStackPointer = NULL;
   Grow size of the Depex stack
 
   @retval EFI_SUCCESS           Stack successfully growed. 
-  @retval EFI_OUT_OF_RESOURCES  There is not enough system memory to grow the 
-                                stack.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough system memory to grow the stack.
 
 **/
 EFI_STATUS
@@ -85,13 +84,12 @@ GrowDepexStack (
 
 
 /**
-  Push an element onto the Boolean Stack
+  Push an element onto the Boolean Stack.
 
   @param  Value                 BOOLEAN to push. 
 
   @retval EFI_SUCCESS           The value was pushed onto the stack. 
-  @retval EFI_OUT_OF_RESOURCES  There is not enough system memory to grow the 
-                                stack.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough system memory to grow the stack.
 
 **/
 EFI_STATUS
@@ -131,7 +129,7 @@ PushBool (
   @param  Value                 BOOLEAN to pop. 
 
   @retval EFI_SUCCESS           The value was popped onto the stack. 
-  @retval EFI_ACCESS_DENIED     The pop operation underflowed the stack
+  @retval EFI_ACCESS_DENIED     The pop operation underflowed the stack.
 
 **/
 EFI_STATUS 
@@ -163,7 +161,7 @@ PopBool (
   it will be cleared by CoreSchedule(), and then the driver can be
   dispatched.
 
-  @param  DriverEntry           DriverEntry element to update 
+  @param  DriverEntry           DriverEntry element to update .
 
   @retval EFI_SUCCESS           It always works.
 
@@ -203,7 +201,7 @@ CorePreProcessDepex (
   routine in this case. The SOR is just ignored and is a nop in the grammer.
   POSTFIX means all the math is done on top of the stack.
 
-  @param  DriverEntry           DriverEntry element to update 
+  @param  DriverEntry           DriverEntry element to update. 
 
   @retval TRUE                  If driver is ready to run. 
   @retval FALSE                 If driver is not ready to run or some fatal error 
@@ -243,7 +241,7 @@ CoreIsSchedulable (
 
   //
   // Clean out memory leaks in Depex Boolean stack. Leaks are only caused by
-  //  incorrectly formed DEPEX expressions
+  // incorrectly formed DEPEX expressions
   //
   mDepexEvaluationStackPointer = mDepexEvaluationStack;
 

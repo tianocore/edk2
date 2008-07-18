@@ -36,7 +36,7 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
   { &gEfiRuntimeArchProtocolGuid,          (VOID **)&gRuntime,       NULL, NULL, FALSE },
   { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
-  { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE},
+  { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
@@ -47,7 +47,6 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
 
 /**
   Return TRUE if all AP services are availible.
-
 
   @retval EFI_SUCCESS    All AP services are available 
   @retval EFI_NOT_FOUND  At least one AP service is not available
@@ -170,7 +169,6 @@ GenericArchProtocolNotify (
 
 
 
-
 /**
   Creates an event that is fired everytime a Protocol of a specific type is installed.
 
@@ -218,7 +216,7 @@ typedef struct {
   CHAR16                       *GuidString;
 } GUID_TO_STRING_PROTOCOL_ENTRY;
 
-STATIC CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
+CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
   { &gEfiSecurityArchProtocolGuid,         (CHAR16 *)L"Security"           },
   { &gEfiCpuArchProtocolGuid,              (CHAR16 *)L"CPU"                },
   { &gEfiMetronomeArchProtocolGuid,        (CHAR16 *)L"Metronome"          },
@@ -231,7 +229,6 @@ STATIC CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
   { &gEfiCapsuleArchProtocolGuid,          (CHAR16 *)L"Capsule"            },
   { &gEfiMonotonicCounterArchProtocolGuid, (CHAR16 *)L"Monotonic Counter"  },
   { &gEfiResetArchProtocolGuid,            (CHAR16 *)L"Reset"              },
-//  { &gEfiStatusCodeRuntimeProtocolGuid,       (CHAR16 *)L"Status Code"        },
   { &gEfiRealTimeClockArchProtocolGuid,    (CHAR16 *)L"Real Time Clock"    }
 };
 
@@ -246,7 +243,7 @@ CoreDisplayMissingArchProtocols (
   VOID
   )
 {
-  const GUID_TO_STRING_PROTOCOL_ENTRY  *MissingEntry;
+  CONST GUID_TO_STRING_PROTOCOL_ENTRY  *MissingEntry;
   ARCHITECTURAL_PROTOCOL_ENTRY         *Entry;
 
   for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {

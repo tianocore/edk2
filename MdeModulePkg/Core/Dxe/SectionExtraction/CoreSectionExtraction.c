@@ -99,7 +99,6 @@ typedef struct {
 //
 // Local prototypes
 //
-
 /**
   Worker function.  Determine if the input stream:child matches the input type.
 
@@ -123,41 +122,6 @@ ChildIsType (
   IN EFI_GUID                 *SectionDefinitionGuid
   );
 
-#if 0
-/**
-  RPN callback function.  Removes a stale section stream and re-initializes it
-  with an updated AuthenticationStatus.
-
-  @param  Event                  The event that fired 
-  @param  RpnContext             A pointer to the context that allows us to 
-                                 identify the relevent encapsulation...
-
-**/
-VOID
-EFIAPI
-NotifyGuidedExtraction (
-  IN   EFI_EVENT   Event,
-  IN   VOID        *RpnContext
-  );
-#endif
-
-#if 0
-/**
-  Worker function.  Constructor for RPN event if needed to keep AuthenticationStatus
-  cache correct when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears...
-
-  @param  ParentStream           Indicates the parent of the ecnapsulation 
-                                 section (child) 
-  @param  ChildNode              Indicates the child node that is the 
-                                 encapsulation section.
-
-**/
-VOID
-CreateGuidedExtractionRpnEvent (
-  IN CORE_SECTION_STREAM_NODE       *ParentStream,
-  IN CORE_SECTION_CHILD_NODE        *ChildNode
-  );
-#endif
 
 /**
   Worker function.  Search stream database for requested stream handle.
@@ -177,6 +141,7 @@ FindStreamNode (
   OUT CORE_SECTION_STREAM_NODE                  **FoundStream
   );
   
+
 /**
   Worker function  Recursively searches / builds section stream database
   looking for requested section.
@@ -214,6 +179,7 @@ FindChildNode (
   OUT    UINT32                                     *AuthenticationStatus
   );
   
+
 /**
   Worker function.  Constructor for new child nodes.
 
@@ -242,6 +208,7 @@ CreateChildNode (
      OUT CORE_SECTION_CHILD_NODE               **ChildNode
   );
   
+
 /**
   Worker function.  Destructor for child nodes.
 
@@ -252,7 +219,8 @@ VOID
 FreeChildNode (
   IN  CORE_SECTION_CHILD_NODE                   *ChildNode
   );
-  
+
+
 /**
   Worker function.  Constructor for section streams.
 
@@ -294,7 +262,8 @@ OpenSectionStreamEx (
   IN     UINT32                                    AuthenticationStatus,   
      OUT UINTN                                     *SectionStreamHandle
   );
-  
+
+
 /**
   Check if a stream is valid.
 
@@ -309,6 +278,7 @@ IsValidSectionStream (
   IN  VOID              *SectionStream,
   IN  UINTN             SectionStreamLength
   );
+
 
 /**
   The ExtractSection() function processes the input section and
@@ -339,7 +309,6 @@ IsValidSectionStream (
   
   @param This         Indicates the
                       EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
-
   @param InputSection Buffer containing the input GUIDed section
                       to be processed. OutputBuffer OutputBuffer
                       is allocated from boot services pool
@@ -354,7 +323,6 @@ IsValidSectionStream (
                       is stored. If the function returns
                       anything other than EFI_SUCCESS, the value
                       of OutputSize is undefined.
-
   @param AuthenticationStatus A pointer to a caller-allocated
                               UINT32 that indicates the
                               authentication status of the
@@ -403,6 +371,7 @@ CustomGuidedSectionExtract (
   OUT       UINTN                                  *OutputSize,
   OUT       UINT32                                 *AuthenticationStatus
   );  
+
 //
 // Module globals
 //
@@ -491,12 +460,12 @@ OpenSectionStream (
   }
   
   return OpenSectionStreamEx ( 
-          SectionStreamLength, 
-          SectionStream,
-          TRUE,
-          0,
-          SectionStreamHandle
-          );
+           SectionStreamLength, 
+           SectionStream,
+           TRUE,
+           0,
+           SectionStreamHandle
+           );
 }
   
 
@@ -608,14 +577,14 @@ GetSection (
     // There's a requested section type, so go find it and return it...
     //
     Status = FindChildNode (
-                      StreamNode, 
-                      *SectionType, 
-                      &Instance, 
-                      SectionDefinitionGuid,
-                      &ChildNode,
-                      &ChildStreamNode, 
-                      &ExtractedAuthenticationStatus
-                      );
+               StreamNode, 
+               *SectionType, 
+               &Instance, 
+               SectionDefinitionGuid,
+               &ChildNode,
+               &ChildStreamNode, 
+               &ExtractedAuthenticationStatus
+               );
     if (EFI_ERROR (Status)) {
       goto GetSection_Done;
     }
@@ -648,6 +617,7 @@ GetSection (
   
 GetSection_Done:
   CoreRestoreTpl (OldTpl);
+  
   return Status;
 }
 
@@ -744,7 +714,6 @@ ChildIsType (
 }
 
 
-
 /**
   Worker function  Recursively searches / builds section stream database
   looking for requested section.
@@ -797,7 +766,7 @@ FindChildNode (
   }
   
   if (IsListEmpty (&SourceStream->Children) && 
-                   SourceStream->StreamLength >= sizeof (EFI_COMMON_SECTION_HEADER)) {
+      SourceStream->StreamLength >= sizeof (EFI_COMMON_SECTION_HEADER)) {
     //
     // This occurs when a section stream exists, but no child sections
     // have been parsed out yet.  Therefore, extract the first child and add it
@@ -882,7 +851,7 @@ FindChildNode (
       // Round up to 4 byte boundary
       //
       NextChildOffset += 3;
-      NextChildOffset &= ~(UINTN)3;
+      NextChildOffset &= ~(UINTN) 3;
       if (NextChildOffset <= SourceStream->StreamLength - sizeof (EFI_COMMON_SECTION_HEADER)) {
         //
         // There's an unparsed child remaining in the stream, so create a new child node
@@ -898,7 +867,6 @@ FindChildNode (
     }
   }
 }
-
 
 
 /**
@@ -1153,120 +1121,6 @@ CreateChildNode (
 }
 
 
-#if 0
-/**
-  Worker function.  Constructor for RPN event if needed to keep AuthenticationStatus
-  cache correct when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears...
-
-  @param  ParentStream           Indicates the parent of the ecnapsulation 
-                                 section (child) 
-  @param  ChildNode              Indicates the child node that is the 
-                                 encapsulation section.
-
-**/
-VOID
-CreateGuidedExtractionRpnEvent (
-  IN CORE_SECTION_STREAM_NODE       *ParentStream,
-  IN CORE_SECTION_CHILD_NODE        *ChildNode
-  )
-{
-  RPN_EVENT_CONTEXT *Context;
-  
-  //
-  // Allocate new event structure and context
-  //
-  Context = CoreAllocateBootServicesPool (sizeof (RPN_EVENT_CONTEXT));
-  ASSERT (Context != NULL);
-  
-  Context->ChildNode = ChildNode;
-  Context->ParentStream = ParentStream;
- 
-  Context->Event = CoreCreateProtocolNotifyEvent (
-                    Context->ChildNode->EncapsulationGuid,
-                    TPL_NOTIFY,
-                    NotifyGuidedExtraction,
-                    Context,
-                    &Context->Registration,
-                    FALSE
-                    );
-}
-#endif
-
-
-#if 0
-/**
-  RPN callback function.  Removes a stale section stream and re-initializes it
-  with an updated AuthenticationStatus.
-
-  @param  Event                  The event that fired 
-  @param  RpnContext             A pointer to the context that allows us to 
-                                 identify the relevent encapsulation...
-
-**/
-VOID
-EFIAPI
-NotifyGuidedExtraction (
-  IN   EFI_EVENT   Event,
-  IN   VOID        *RpnContext
-  )
-{
-  EFI_STATUS                              Status;
-  EFI_GUID_DEFINED_SECTION                *GuidedHeader;
-  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *GuidedExtraction;
-  VOID                                    *NewStreamBuffer;
-  UINTN                                   NewStreamBufferSize;
-  UINT32                                  AuthenticationStatus;
-  RPN_EVENT_CONTEXT                       *Context;
-  
-  Context = RpnContext;
-  
-  Status = CloseSectionStream (Context->ChildNode->EncapsulatedStreamHandle);
-  if (!EFI_ERROR (Status)) {
-    //
-    // The stream closed successfully, so re-open the stream with correct AuthenticationStatus
-    //
-  
-    GuidedHeader = (EFI_GUID_DEFINED_SECTION *) 
-      (Context->ParentStream->StreamBuffer + Context->ChildNode->OffsetInStream);
-    ASSERT (GuidedHeader->CommonHeader.Type == EFI_SECTION_GUID_DEFINED);
-    
-    Status = CoreLocateProtocol (Context->ChildNode->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
-    ASSERT_EFI_ERROR (Status);
-
-    
-    Status = GuidedExtraction->ExtractSection (
-                                 GuidedExtraction,
-                                 GuidedHeader,
-                                 &NewStreamBuffer,
-                                 &NewStreamBufferSize,
-                                 &AuthenticationStatus
-                                 );
-    ASSERT_EFI_ERROR (Status);
-    //
-    // OR in the parent stream's aggregagate status.
-    //
-    AuthenticationStatus |= Context->ParentStream->AuthenticationStatus & EFI_AUTH_STATUS_ALL;
-    Status = OpenSectionStreamEx (
-               NewStreamBufferSize,
-               NewStreamBuffer,
-               FALSE,
-               AuthenticationStatus,
-               &Context->ChildNode->EncapsulatedStreamHandle
-               );
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  //
-  //  If above, the stream  did not close successfully, it indicates it's
-  //  alread been closed by someone, so just destroy the event and be done with
-  //  it.
-  //
-  
-  CoreCloseEvent (Event);
-  CoreFreePool (Context);
-}  
-#endif
-
 /**
   Worker function.  Destructor for child nodes.
 
@@ -1443,7 +1297,6 @@ FindStreamNode (
 }
 
 
-
 /**
   Check if a stream is valid.
 
@@ -1493,6 +1346,7 @@ IsValidSectionStream (
   return FALSE;
 }
 
+
 /**
   The ExtractSection() function processes the input section and
   allocates a buffer from the pool in which it returns the section
@@ -1522,7 +1376,6 @@ IsValidSectionStream (
   
   @param This         Indicates the
                       EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
-
   @param InputSection Buffer containing the input GUIDed section
                       to be processed. OutputBuffer OutputBuffer
                       is allocated from boot services pool
@@ -1644,7 +1497,7 @@ CustomGuidedSectionExtract (
              OutputBuffer,
              ScratchBuffer,
              AuthenticationStatus
-           );
+             );
   if (EFI_ERROR (Status)) {
     //
     // Decode failed

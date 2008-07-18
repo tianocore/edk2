@@ -71,7 +71,6 @@ CoreRemoveInterfaceFromProtocol (
     //
     // If there's a protocol notify location pointing to this entry, back it up one
     //
-
     for(Link = ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link=Link->ForwardLink) {
       ProtNotify = CR(Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
 
@@ -83,14 +82,11 @@ CoreRemoveInterfaceFromProtocol (
     //
     // Remove the protocol interface entry
     //
-
     RemoveEntryList (&Prot->ByProtocol);
   }
 
   return Prot;
 }
-
-
 
 
 /**
@@ -111,11 +107,11 @@ EFIAPI
 CoreRegisterProtocolNotify (
   IN EFI_GUID       *Protocol,
   IN EFI_EVENT      Event,
-  OUT  VOID           **Registration
+  OUT  VOID         **Registration
   )
 {
-  PROTOCOL_ENTRY      *ProtEntry;
-  PROTOCOL_NOTIFY     *ProtNotify;
+  PROTOCOL_ENTRY    *ProtEntry;
+  PROTOCOL_NOTIFY   *ProtNotify;
   EFI_STATUS        Status;
   
   if ((Protocol == NULL) || (Event == NULL) || (Registration == NULL))  {
@@ -136,9 +132,7 @@ CoreRegisterProtocolNotify (
     //
     // Allocate a new notification record
     //
-
     ProtNotify = CoreAllocateBootServicesPool (sizeof(PROTOCOL_NOTIFY));
-
     if (ProtNotify != NULL) {
       
       ProtNotify->Signature = PROTOCOL_NOTIFY_SIGNATURE;
@@ -168,8 +162,6 @@ CoreRegisterProtocolNotify (
 
   return Status;
 }
-
-
 
 
 /**
@@ -274,11 +266,11 @@ CoreReinstallProtocolInterface (
   //
   CoreReleaseProtocolLock ();
   Status = CoreConnectController (
-                  UserHandle, 
-                  NULL, 
-                  NULL, 
-                  TRUE
-                  );
+             UserHandle, 
+             NULL, 
+             NULL, 
+             TRUE
+             );
   CoreAcquireProtocolLock ();
   
   //

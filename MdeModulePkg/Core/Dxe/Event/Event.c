@@ -92,7 +92,6 @@ CoreReleaseEventLock (
 /**
   Initializes "event" support and populates parts of the System and Runtime Table.
 
-
   @retval EFI_SUCCESS            Always return success
 
 **/
@@ -385,7 +384,7 @@ CoreCreateEventEx (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  SetMem (IEvent, sizeof (IEVENT), 0);
+  ZeroMem (IEvent, sizeof (IEVENT));
 
   IEvent->Signature = EVENT_SIGNATURE;
   IEvent->Type = Type;
@@ -433,9 +432,9 @@ CoreCreateEventEx (
 
 
 /**
-  Signals the event.  Queues the event to be notified if needed
+  Signals the event.  Queues the event to be notified if needed.
 
-  @param  UserEvent              The event to signal 
+  @param  UserEvent              The event to signal .
 
   @retval EFI_INVALID_PARAMETER  Parameters are not valid. 
   @retval EFI_SUCCESS            The event was signaled.
@@ -521,7 +520,7 @@ CoreCheckEvent (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Event->Type & EVT_NOTIFY_SIGNAL) {
+  if ((Event->Type & EVT_NOTIFY_SIGNAL) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -532,7 +531,6 @@ CoreCheckEvent (
     //
     // Queue the wait notify function
     //
-
     CoreAcquireEventLock ();
     if (!Event->SignalCount) {
       CoreNotifyEvent (Event);
@@ -557,7 +555,6 @@ CoreCheckEvent (
 
   return Status;
 }
-
 
 
 
@@ -616,7 +613,6 @@ CoreWaitForEvent (
 }
 
 
-
 /**
   Closes an event and frees the event structure.
 
@@ -648,7 +644,7 @@ CoreCloseEvent (
   //
   // If it's a timer event, make sure it's not pending
   //
-  if (Event->Type & EVT_TIMER) {
+  if ((Event->Type & EVT_TIMER) != 0) {
     CoreSetTimer (Event, TimerCancel, 0);
   }
 

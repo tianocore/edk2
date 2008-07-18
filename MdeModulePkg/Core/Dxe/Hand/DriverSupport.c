@@ -14,41 +14,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <DxeMain.h>
 
-//
-// Driver Support Function Prototypes
-// 
-/**
-  Connects a controller to a driver.
-
-  @param  ControllerHandle                      Handle of the controller to be 
-                                                connected. 
-  @param  ContextDriverImageHandles             DriverImageHandle A pointer to an 
-                                                ordered list of driver image 
-                                                handles. 
-  @param  RemainingDevicePath                   RemainingDevicePath A pointer to 
-                                                the device path that specifies a 
-                                                child  of the controller 
-                                                specified by ControllerHandle. 
-
-  @retval EFI_SUCCESS                           One or more drivers were 
-                                                connected to ControllerHandle. 
-  @retval EFI_OUT_OF_RESOURCES                  No enough system resources to 
-                                                complete the request. 
-  @retval EFI_NOT_FOUND                         No drivers were connected to 
-                                                ControllerHandle.
-
-**/
-EFI_STATUS 
-CoreConnectSingleController (
-  IN  EFI_HANDLE                ControllerHandle,
-  IN  EFI_HANDLE                *ContextDriverImageHandles OPTIONAL,
-  IN  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath       OPTIONAL     
-  );
 
 //
 // Driver Support Functions
 //
-
 /**
   Connects one or more drivers to a controller.
 
@@ -114,10 +83,10 @@ CoreConnectController (
   //
   do {
     ReturnStatus = CoreConnectSingleController (
-                    ControllerHandle,
-                    DriverImageHandle,
-                    AlignedRemainingDevicePath
-                    );
+                     ControllerHandle,
+                     DriverImageHandle,
+                     AlignedRemainingDevicePath
+                     );
   } while (ReturnStatus == EFI_NOT_READY);
 
   //
@@ -269,7 +238,7 @@ AddSortedDriverBindingProtocol (
       Status = CoreHandleProtocol (
                 DriverBindingHandleBuffer[Index],
                 &gEfiDriverBindingProtocolGuid,
-                (VOID **)&DriverBinding
+                (VOID **) &DriverBinding
                 );
       if (EFI_ERROR (Status) || DriverBinding == NULL) {
         continue;
@@ -299,7 +268,7 @@ AddSortedDriverBindingProtocol (
   Status = CoreHandleProtocol(
              DriverBindingHandle,
              &gEfiDriverBindingProtocolGuid,
-             (VOID **)&DriverBinding
+             (VOID **) &DriverBinding
              );
   //
   // If DriverBindingHandle does not support the Driver Binding Protocol then return
@@ -435,7 +404,7 @@ CoreConnectSingleController (
   Status = CoreLocateProtocol (
              &gEfiPlatformDriverOverrideProtocolGuid, 
              NULL, 
-             (VOID **)&PlatformDriverOverride
+             (VOID **) &PlatformDriverOverride
              );
   if (!EFI_ERROR (Status) && (PlatformDriverOverride != NULL)) {
     DriverImageHandle = NULL;
@@ -464,7 +433,7 @@ CoreConnectSingleController (
   Status = CoreHandleProtocol (
              ControllerHandle,  
              &gEfiBusSpecificDriverOverrideProtocolGuid, 
-             (VOID **)&BusSpecificDriverOverride
+             (VOID **) &BusSpecificDriverOverride
              );
   if (!EFI_ERROR (Status) && (BusSpecificDriverOverride != NULL)) {
     DriverImageHandle = NULL;
