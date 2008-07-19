@@ -473,7 +473,7 @@ PeiDispatcher (
               // Update HandOffHob for new installed permenent memory
               //
               OldHandOffTable   = Private->HobList.HandoffInformationTable;
-              OldCheckingBottom = (UINTN)OldHandOffTable;
+              OldCheckingBottom = (UINTN)(SecCoreData->TemporaryRamBase);
               OldCheckingTop    = (UINTN)(OldCheckingBottom + SecCoreData->TemporaryRamSize);
 
               //
@@ -552,7 +552,8 @@ PeiDispatcher (
               ConvertPpiPointers ((CONST EFI_PEI_SERVICES **)PeiServices, 
                                   OldCheckingBottom, 
                                   OldCheckingTop, 
-                                  NewHandOffTable);
+                                  HeapOffset
+                                  );
 
               DEBUG ((EFI_D_INFO, "Stack Hob: BaseAddress=0x%X Length=0x%X\n",
                                   (UINTN)PrivateInMem->StackBase,

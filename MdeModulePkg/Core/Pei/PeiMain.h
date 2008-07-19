@@ -325,15 +325,16 @@ InitializePpiServices (
   @param PeiServices         The PEI core services table.
   @param OldCheckingBottom   The old checking bottom.
   @param OldCheckingTop      The old checking top.
-  @param NewHandOffHob       The new handoff HOB list.
+  @param Fixup               The address difference between
+                             the new Hob list and old Hob list.
 
 **/
 VOID
 ConvertPpiPointers (
-  IN CONST EFI_PEI_SERVICES                     **PeiServices,
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
   IN UINTN                         OldCheckingBottom,
   IN UINTN                         OldCheckingTop,
-  IN EFI_HOB_HANDOFF_INFO_TABLE    *NewHandOffHob
+  IN UINTN                         Fixup
   )
 ;
 
