@@ -44,25 +44,23 @@ InitializePpiServices (
   @param PeiServices         The PEI core services table.
   @param OldCheckingBottom   The old checking bottom.
   @param OldCheckingTop      The old checking top.
-  @param NewHandOffHob       The new handoff HOB list.
+  @param Fixup               The address difference between
+                             the new Hob list and old Hob list.
 
 **/
 VOID
 ConvertPpiPointers (
-  IN CONST EFI_PEI_SERVICES                     **PeiServices,
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
   IN UINTN                         OldCheckingBottom,
   IN UINTN                         OldCheckingTop,
-  IN EFI_HOB_HANDOFF_INFO_TABLE    *NewHandOffHob
+  IN UINTN                         Fixup
   )
 {
   PEI_CORE_INSTANCE     *PrivateData;
   UINT8                 Index;
   PEI_PPI_LIST_POINTERS *PpiPointer;
-  UINTN                 Fixup;
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
-
-  Fixup = (UINTN)NewHandOffHob - OldCheckingBottom;
 
   for (Index = 0; Index < FixedPcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
     if (Index < PrivateData->PpiData.PpiListEnd ||
