@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <ModuleName>DxeDebugLibSerialPort</ModuleName>
-    <ModuleType>DXE_DRIVER</ModuleType>
+    <ModuleName>BaseDebugLibSerialPort</ModuleName>
+    <ModuleType>BASE</ModuleType>
     <GuidValue>BB83F95F-EDBC-4884-A520-CD42AF388FAE</GuidValue>
     <Version>1.0</Version>
     <Abstract>Debug Library for UEFI drivers</Abstract>
