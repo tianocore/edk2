@@ -13,7 +13,7 @@
 
 **/
 
-#include <PiDxe.h>
+#include <Base.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PrintLib.h>

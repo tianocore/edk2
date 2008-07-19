@@ -101,7 +101,7 @@
   MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   MdePkg/Library/DxeMemoryLib/DxeMemoryLib.inf
-  MdePkg/Library/DxeDebugLibSerialPort/DxeDebugLibSerialPort.inf
+  MdePkg/Library/BaseDebugLibSerialPort/DxeDebugLibSerialPort.inf
   MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf

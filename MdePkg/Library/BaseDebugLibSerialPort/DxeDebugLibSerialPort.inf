@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeDebugLibSerialPort
+  BASE_NAME                      = BaseDebugLibSerialPort
   FILE_GUID                      = BB83F95F-EDBC-4884-A520-CD42AF388FAE
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
