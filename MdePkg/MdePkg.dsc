@@ -67,6 +67,7 @@
   MdePkg/Library/BasePrintLib/BasePrintLib.inf
   MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -101,7 +102,6 @@
   MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   MdePkg/Library/DxeMemoryLib/DxeMemoryLib.inf
-  MdePkg/Library/BaseDebugLibSerialPort/DxeDebugLibSerialPort.inf
   MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
