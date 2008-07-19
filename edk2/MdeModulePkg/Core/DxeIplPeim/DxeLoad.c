@@ -304,12 +304,6 @@ DxeIplFindDxeCore (
     //
     Instance++;
   }
-
-  //
-  // We should never reach here.
-  //
-  ASSERT (FALSE);
-  return NULL;
 }
 
 
