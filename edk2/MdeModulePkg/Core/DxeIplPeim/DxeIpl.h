@@ -91,16 +91,15 @@ PeiLoadFile (
 
 
 /**
-   Searches DxeCore in all firmware Volumes and loads the first instance that contains DxeCore.
-
-   @param DxeCoreFileName    A Pointer to the EFI_GUID to contain the output DxeCore GUID file name.
+   Searches DxeCore in all firmware Volumes and loads the first
+   instance that contains DxeCore.
 
    @return FileHandle of DxeCore to load DxeCore.
    
 **/
 EFI_PEI_FILE_HANDLE
 DxeIplFindDxeCore (
-  OUT EFI_GUID   *DxeCoreFileName
+  VOID
   );
 
 

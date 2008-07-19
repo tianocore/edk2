@@ -142,7 +142,7 @@ DxeLoadCore (
   )
 {
   EFI_STATUS                                Status;
-  EFI_GUID                                  DxeCoreFileName;
+  EFI_FV_FILE_INFO                          DxeCoreFileInfo;
   EFI_PHYSICAL_ADDRESS                      DxeCoreAddress;
   UINT64                                    DxeCoreSize;
   EFI_PHYSICAL_ADDRESS                      DxeCoreEntryPoint;
@@ -201,9 +201,9 @@ DxeLoadCore (
   }
 
   //
-  // Look in all the FVs present in PEI and find the DXE Core
+  // Look in all the FVs present in PEI and find the DXE Core FileHandle
   //
-  FileHandle = DxeIplFindDxeCore (&DxeCoreFileName);
+  FileHandle = DxeIplFindDxeCore ();
 
   //
   // Load the DXE Core from a Firmware Volume, may use LoadFile ppi to do this for save code size.
@@ -217,10 +217,16 @@ DxeLoadCore (
   ASSERT_EFI_ERROR (Status);
 
   //
+  // Get the DxeCore File Info from the FileHandle for the DxeCore GUID file name.
+  //
+  Status = PeiServicesFfsGetFileInfo (FileHandle, &DxeCoreFileInfo);
+  ASSERT_EFI_ERROR (Status);
+
+  //
   // Add HOB for the DXE Core
   //
   BuildModuleHob (
-    &DxeCoreFileName,
+    &DxeCoreFileInfo.FileName,
     DxeCoreAddress,
     EFI_SIZE_TO_PAGES ((UINTN) DxeCoreSize) * EFI_PAGE_SIZE,
     DxeCoreEntryPoint
@@ -256,22 +262,18 @@ DxeLoadCore (
    Searches DxeCore in all firmware Volumes and loads the first
    instance that contains DxeCore.
 
-   @param DxeCoreFileName    A Pointer to the EFI_GUID to contain
-                             the output DxeCore GUID file name.
-
    @return FileHandle of DxeCore to load DxeCore.
    
 **/
 EFI_PEI_FILE_HANDLE
 DxeIplFindDxeCore (
-  OUT EFI_GUID   *DxeCoreFileName
+  VOID
   )
 {
   EFI_STATUS            Status;
   UINTN                 Instance;
   EFI_PEI_FV_HANDLE     VolumeHandle;
   EFI_PEI_FILE_HANDLE   FileHandle;
-  EFI_FV_FILE_INFO      FvFileInfo;
   
   Instance    = 0;
   while (TRUE) {
@@ -292,9 +294,10 @@ DxeIplFindDxeCore (
     Status = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_DXE_CORE, VolumeHandle, &FileHandle);
     if (!EFI_ERROR (Status)) {
       //
-      // Find DxeCore FileHandle in this volume, then we skip other firmware volume.
+      // Find DxeCore FileHandle in this volume, then we skip other firmware volume and
+      // return the FileHandle.
       //
-      break;
+      return FileHandle;
     }
     //
     // We cannot find DxeCore in this firmware volume, then search the next volume.
@@ -303,16 +306,10 @@ DxeIplFindDxeCore (
   }
 
   //
-  // Extract the DxeCore GUID file name.
+  // We should never reach here.
   //
-  Status = PeiServicesFfsGetFileInfo (FileHandle, &FvFileInfo);
-  ASSERT_EFI_ERROR (Status);
-  CopyGuid (DxeCoreFileName, &FvFileInfo.FileName);
-
-  //
-  // Return the FileHandle to load DxeCore from this volume.
-  //
-  return FileHandle;
+  ASSERT (FALSE);
+  return NULL;
 }
 
 
@@ -480,11 +477,11 @@ CustomGuidedSectionExtract (
   // Call GetInfo to get the size and attribute of input guided section data.
   //
   Status = ExtractGuidedSectionGetInfo (
-            InputSection,
-            &OutputBufferSize,
-            &ScratchBufferSize,
-            &SectionAttribute
-           );
+             InputSection,
+             &OutputBufferSize,
+             &ScratchBufferSize,
+             &SectionAttribute
+             );
   
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "GetInfo from guided section Failed - %r\n", Status));
