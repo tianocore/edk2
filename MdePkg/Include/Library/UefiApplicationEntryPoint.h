@@ -62,8 +62,6 @@ EfiMain (
 
   @param  Status Status returned by the application that is exiting.
   
-  @retval VOID
-
 **/
 VOID
 EFIAPI
@@ -79,8 +77,6 @@ Exit (
   @param  ImageHandle ImageHandle of the loaded driver.
   @param  SystemTable Pointer to the EFI System Table.
   
-  @retval VOID
-
 **/
 VOID
 EFIAPI
@@ -97,7 +93,6 @@ ProcessLibraryConstructorList (
   @param  ImageHandle ImageHandle of the loaded driver.
   @param  SystemTable Pointer to the EFI System Table.
 
-  @retval VOID
 **/
 VOID
 EFIAPI

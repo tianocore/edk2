@@ -212,6 +212,7 @@ UsbGetReportRequest (
 
 **/
 EFI_STATUS
+EFIAPI
 UsbGetDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Value,

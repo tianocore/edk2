@@ -997,7 +997,7 @@ PciReadBuffer (
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
 
-  @return Size
+  @return Size written to StartAddress.
 
 **/
 UINTN

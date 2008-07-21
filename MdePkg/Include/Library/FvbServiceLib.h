@@ -32,6 +32,7 @@
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbReadBlock (
   IN UINTN                                        Instance,
   IN EFI_LBA                                      Lba,
@@ -58,6 +59,7 @@ EfiFvbReadBlock (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbWriteBlock (
   IN UINTN                                        Instance,
   IN EFI_LBA                                      Lba,
@@ -78,6 +80,7 @@ EfiFvbWriteBlock (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbEraseBlock (
   IN UINTN                                Instance,
   IN EFI_LBA                              Lba
@@ -97,6 +100,7 @@ EfiFvbEraseBlock (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbGetVolumeAttributes (
   IN UINTN                                Instance,
   OUT EFI_FVB_ATTRIBUTES                  *Attributes
@@ -118,6 +122,7 @@ EfiFvbGetVolumeAttributes (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbSetVolumeAttributes (
   IN     UINTN                                Instance,
   IN OUT EFI_FVB_ATTRIBUTES                   *Attributes
@@ -137,6 +142,7 @@ EfiFvbSetVolumeAttributes (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbGetPhysicalAddress (
   IN UINTN                                Instance,
   OUT EFI_PHYSICAL_ADDRESS                *BaseAddress
@@ -160,6 +166,7 @@ EfiFvbGetPhysicalAddress (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbGetBlockSize (
   IN UINTN                                        Instance,
   IN EFI_LBA                                      Lba,
@@ -184,6 +191,7 @@ EfiFvbGetBlockSize (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbEraseCustomBlockRange (
   IN UINTN                                Instance,
   IN EFI_LBA                              StartLba,
