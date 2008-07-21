@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef _IFR_SUPPORT_LIBRARY_H
-#define _IFR_SUPPORT_LIBRARY_H
+#ifndef _IFR_SUPPORT_LIBRARY_H_
+#define _IFR_SUPPORT_LIBRARY_H_
 
 
 #include <Protocol/HiiFont.h>
