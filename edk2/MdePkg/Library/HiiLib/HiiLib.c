@@ -93,7 +93,10 @@ InternalHiiLibPreparePackages (
   PackageListLength = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
 
   MarkerBackup = Marker;
-  
+
+  //
+  // Count the lenth of the final package list.
+  //
   for (Index = 0; Index < NumberOfPackages; Index++) {
     CopyMem (&PackageLength, VA_ARG (Marker, VOID *), sizeof (UINT32));
     //
@@ -115,6 +118,9 @@ InternalHiiLibPreparePackages (
   PackageListData = ((UINT8 *) PackageListHeader) + sizeof (EFI_HII_PACKAGE_LIST_HEADER);
 
   Marker = MarkerBackup;
+  //
+  // Prepare the final package list.
+  //
   for (Index = 0; Index < NumberOfPackages; Index++) {
     PackageArray = (UINT8 *) VA_ARG (Marker, VOID *);
     CopyMem (&PackageLength, PackageArray, sizeof (UINT32));
