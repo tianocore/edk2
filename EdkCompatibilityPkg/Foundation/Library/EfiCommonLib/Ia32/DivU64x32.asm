@@ -56,27 +56,32 @@
 ;---------------------------------------------------------------------------
 
 DivU64x32 PROC
+    push ebp
+    mov ebp, esp
     xor edx, edx                    ; Clear EDX
 
-    mov eax, [esp + 8]              ; Put high 32 bits of 64-bit dividend in EAX
-    mov ecx, [esp + 12]             ; Put 32 bits divisor in ECX
+    mov eax, [ebp + 0Ch]              ; Put high 32 bits of 64-bit dividend in EAX
+    mov ecx, [ebp + 10h]            ; Put 32 bits divisor in ECX
     div ecx                         ; Dividend   Divisor  Quoitent...Remainder
                                     ;  0:EAX  /  ECX   =  EAX      EDX   
 
     push eax                        ; Push quoitent in stack
 
-    mov eax, [esp + 4]              ; Put low 32 bits of 64-bit dividend in EAX              
+    mov eax, [ebp + 8]              ; Put low 32 bits of 64-bit dividend in EAX              
     div ecx                         ; Leave the REMAINDER in EDX as High 32-bit of new dividend
                                     ; Dividend   Divisor  Quoitent...Remainder              
                                     ;  EDX:EAX  /  ECX   =  EAX      EDX               
 
-    mov ecx, [esp + 16]             ; Put &REMAINDER to ecx
+    mov ecx, [ebp + 14h]             ; Put &REMAINDER to ecx
 
     jecxz Label1                    ; If ecx == 0, no remainder exist, return with quoitent in EDX directly 
     mov dword ptr [ecx], edx        ; Put EDX through REMAINDER pointer in ECX 
 
 Label1:
     pop edx                         ; Pop High 32-bit QUOITENT to EDX
+    pop ebp
+
+    ret
 
 DivU64x32 ENDP
     END

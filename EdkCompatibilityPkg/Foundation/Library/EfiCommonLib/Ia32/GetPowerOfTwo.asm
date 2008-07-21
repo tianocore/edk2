@@ -47,7 +47,7 @@
 ;  two and less than Input
 ;
 ;--*/
-GetPowerOfTow PROC
+GetPowerOfTwo PROC
     xor     eax, eax
     mov     edx, eax
     mov     ecx, [esp + 8] ; dword ptr Input[4]
@@ -63,5 +63,5 @@ _F:
 _Exit:
 
     ret
-GetPowerOfTow  ENDP
+GetPowerOfTwo  ENDP
 	END
