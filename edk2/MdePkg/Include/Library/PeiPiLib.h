@@ -35,8 +35,7 @@
                                           parent firmware volume name and firmware volume file. If it did not originally come
                                           from a firmware file, these should be NULL
   
-    @retval  VOID
-  
+ 
   **/
 
 VOID

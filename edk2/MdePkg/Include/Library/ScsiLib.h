@@ -248,6 +248,7 @@ ScsiRequestSenseCommand (
 
 **/
 EFI_STATUS
+EFIAPI
 ScsiReadCapacityCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,

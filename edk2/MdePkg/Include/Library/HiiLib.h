@@ -90,8 +90,6 @@ HiiLibAddPackages (
   @param  HiiHandle                The handle that was previously registered to the data base that is requested for removal.
                                              List later.
 
-  @return  VOID
-
 **/
 VOID
 EFIAPI

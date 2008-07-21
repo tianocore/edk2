@@ -427,8 +427,7 @@ CreateStringOpCode (
 
   @param Str     String to be converted
 
-  @retval VOID
-  
+ 
 **/
 VOID
 EFIAPI
@@ -653,7 +652,6 @@ SetBrowserData (
   @retval EFI_INVALID_PARAMETER  One of the parameters was invalid.
 
 **/
-
 EFI_STATUS
 EFIAPI
 IfrLibCreatePopUp (

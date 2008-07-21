@@ -772,6 +772,8 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   @param ...      VARARG list consumed to process Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @return Number of Unicode characters printed to ConOut.
 
 **/
 UINTN
@@ -795,6 +797,8 @@ Print (
   @param ...      VARARG list consumed to process Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @return Number of Unicode characters printed to StdErr.
 
 **/
 UINTN
@@ -818,6 +822,8 @@ ErrorPrint (
   @param ...      VARARG list consumed to process Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @return Number of ASCII characters printed to ConOut.
 
 **/
 UINTN
@@ -841,6 +847,8 @@ AsciiPrint (
   @param ...      VARARG list consumed to process Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @return Number of ASCII characters printed to ConErr.
 
 **/
 UINTN
