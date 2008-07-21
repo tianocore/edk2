@@ -16,16 +16,16 @@
 #define __EDK_FVB_SERVICE_LIB_H__
 
 /**
-  Reads specified number of bytes into a buffer from the specified block
+  Reads specified number of bytes into a buffer from the specified block.
 
-  @param[in]     Instance    The FV instance to be read from
+  @param[in]     Instance    The FV instance to be read from.
   @param[in]     Lba         The logical block address to be read from
   @param[in]     Offset      Offset into the block at which to begin reading
-  @param[in,out] NumBytes    Pointer that on input contains the total size of
+  @param[in, out] NumBytes    Pointer that on input contains the total size of
                              the buffer. On output, it contains the total number
-                             of bytes read
+                             of bytes read.
   @param[in]     Buffer      Pointer to a caller allocated buffer that will be
-                             used to hold the data read
+                             used to hold the data read.
 
   @retval   EFI_EFI_SUCCESS        Buffer contains data read from FVB
   @retval   EFI_INVALID_PARAMETER  invalid parameter
@@ -43,16 +43,16 @@ EfiFvbReadBlock (
 
 
 /**
-  Writes specified number of bytes from the input buffer to the block
+  Writes specified number of bytes from the input buffer to the block.
 
-  @param[in]     Instance    The FV instance to be read from
+  @param[in]     Instance    The FV instance to be read from.
   @param[in]     Lba         The logical block address to be write to 
   @param[in]     Offset      Offset into the block at which to begin writing
-  @param[in,out] NumBytes    Pointer that on input contains the total size of
+  @param[in, out] NumBytes    Pointer that on input contains the total size of
                              the buffer. On output, it contains the total number
                              of bytes actually written.
   @param[in]     Buffer      Pointer to a caller allocated buffer that contains
-                             the source for the write
+                             the source for the write.
 
   @retval   EFI_EFI_SUCCESS        Buffer written to FVB
   @retval   EFI_INVALID_PARAMETER  invalid parameter
@@ -70,10 +70,10 @@ EfiFvbWriteBlock (
 
 
 /**
-  Erases and initializes a firmware volume block
+  Erases and initializes a firmware volume block.
 
-  @param[in]     Instance    The FV instance to be erased
-  @param[in]     Lba         The logical block address to be erased
+  @param[in]     Instance    The FV instance to be erased.
+  @param[in]     Lba         The logical block address to be erased.
 
   @retval   EFI_EFI_SUCCESS        Lba was erased
   @retval   EFI_INVALID_PARAMETER  invalid parameter
@@ -89,11 +89,11 @@ EfiFvbEraseBlock (
 
 /**
   Retrieves attributes, insures positive polarity of attribute bits, returns
-  resulting attributes in output parameter
+  resulting attributes in output parameter.
 
-  @param[in]     Instance    The FV instance
+  @param[in]     Instance    The FV instance.
   @param[out]    Attributes  The FV instance whose attributes is going to be 
-                             returned
+                             returned.
 
   @retval   EFI_EFI_SUCCESS        Valid Attributes were returned 
   @retval   EFI_INVALID_PARAMETER  invalid parameter
@@ -109,13 +109,13 @@ EfiFvbGetVolumeAttributes (
 
 /**
   Modifies the current settings of the firmware volume according to the 
-  input parameter, and returns the new setting of the volume
+  input parameter, and returns the new setting of the volume.
 
-  @param[in]     Instance    The FV instance
-  @param[in]     Attributes  On input, it is a pointer to EFI_FVB_ATTRIBUTES 
+  @param[in]     Instance    The FV instance.
+  @param[in, out]Attributes  On input, it is a pointer to EFI_FVB_ATTRIBUTES 
                              containing the desired firmware volume settings.
                              On successful return, it contains the new settings
-                             of the firmware volume
+                             of the firmware volume.
 
   @retval   EFI_EFI_SUCCESS        Attributes were updated
   @retval   EFI_INVALID_PARAMETER  invalid parameter
@@ -130,7 +130,7 @@ EfiFvbSetVolumeAttributes (
 
 
 /**
-  Retrieves the physical address of a memory mapped FV
+  Retrieves the physical address of a memory mapped FV.
 
   @param[in]     Instance    The FV instance
   @param[out]    BaseAddress Pointer to a caller allocated EFI_PHYSICAL_ADDRESS 
@@ -150,16 +150,16 @@ EfiFvbGetPhysicalAddress (
 
 
 /**
-  Retrieve the size of a logical block
+  Retrieve the size of a logical block.
 
   @param[in]     Instance    The FV instance
   @param[in]     Lba         Indicates which block to return the size for.
-  @param[out]    BlockSizze  A pointer to a caller allocated UINTN in which
-                             the size of the block is returned
+  @param[out]    BlockSize   A pointer to a caller allocated UINTN in which
+                             the size of the block is returned.
   @param[out]    NumOfBlocks a pointer to a caller allocated UINTN in which the
                              number of consecutive blocks starting with Lba is
                              returned. All blocks in this range have a size of
-                             BlockSize
+                             BlockSize.
 
   @retval   EFI_EFI_SUCCESS        BlockSize  and NumOfBlocks returned
   @retval   EFI_INVALID_PARAMETER  invalid parameter
@@ -176,14 +176,14 @@ EfiFvbGetBlockSize (
 
 
 /**
-  Erases and initializes a specified range of a firmware volume
+  Erases and initializes a specified range of a firmware volume.
 
-  @param[in]     Instance       The FV instance
-  @param[in]     StartLba       The starting logical block index to be erased
+  @param[in]     Instance       The FV instance.
+  @param[in]     StartLba       The starting logical block index to be erased.
   @param[in]     OffsetStartLba Offset into the starting block at which to 
-                                begin erasing    
-  @param[in]     LastLba        The last logical block index to be erased
-  @param[in]     OffsetLastLba  Offset into the last block at which to end erasing     
+                                begin erasing.    
+  @param[in]     LastLba        The last logical block index to be erased.
+  @param[in]     OffsetLastLba  Offset into the last block at which to end erasing.   
 
   @retval   EFI_EFI_SUCCESS        Range was erased 
   @retval   EFI_INVALID_PARAMETER  invalid parameter
