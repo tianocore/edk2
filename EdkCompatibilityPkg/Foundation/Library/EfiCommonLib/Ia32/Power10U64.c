@@ -50,6 +50,8 @@ Returns:
 --*/
 {
   __asm {
+  mov    eax, dword ptr Operand[0]
+  mov    edx, dword ptr Operand[4]
   mov    ecx, Power
   jcxz   _Power10U64_Done
   
@@ -58,6 +60,7 @@ _Power10U64_Wend:
   push   dword ptr Operand[4]
   push   dword ptr Operand[0]
   call   MultU64x32
+  add    esp, 0Ch
   mov    dword ptr Operand[0], eax
   mov    dword ptr Operand[4], edx
   loop   _Power10U64_Wend
