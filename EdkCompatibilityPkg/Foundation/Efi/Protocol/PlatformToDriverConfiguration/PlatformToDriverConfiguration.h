@@ -162,10 +162,10 @@ EFI_STATUS
 //
 // Interface structure for the Platform to Driver Configuration Protocol
 //
-typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL {
+struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL {
   EFI_PLATFORM_TO_DRIVER_CONFIGURATION_QUERY      Query;
   EFI_PLATFORM_TO_DRIVER_CONFIGURATION_RESPONSE   Response;
-} EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL;
+};
 
 extern EFI_GUID gEfiPlatformToDriverConfigurationProtocolGuid;
 extern EFI_GUID gEfiPlatformToDriverConfigurationClpGuid;

@@ -96,10 +96,10 @@ EFI_STATUS
 //
 // Interface structure for the Authentication Info Protocol
 //
-typedef struct _EFI_AUTHENTICATION_INFO_PROTOCOL {
+struct _EFI_AUTHENTICATION_INFO_PROTOCOL {
   EFI_AUTHENTICATION_INFO_PROTOCOL_GET   Get;
   EFI_AUTHENTICATION_INFO_PROTOCOL_SET   Set;
-} EFI_AUTHENTICATION_INFO_PROTOCOL;
+};
 
 extern EFI_GUID gEfiAuthenticationInfoProtocolGuid;
 

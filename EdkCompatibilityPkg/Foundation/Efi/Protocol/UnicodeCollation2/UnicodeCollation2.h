@@ -188,7 +188,7 @@ BOOLEAN
 --*/
 ;
 
-typedef struct _EFI_UNICODE_COLLATION2_PROTOCOL {
+struct _EFI_UNICODE_COLLATION2_PROTOCOL {
   //
   // general
   //
@@ -204,7 +204,7 @@ typedef struct _EFI_UNICODE_COLLATION2_PROTOCOL {
   EFI_UNICODE_COLLATION2_STRTOFAT    StrToFat;
 
   CHAR8                             *SupportedLanguages;
-} EFI_UNICODE_COLLATION2_PROTOCOL;
+};
 
 extern EFI_GUID gEfiUnicodeCollation2ProtocolGuid;
 
