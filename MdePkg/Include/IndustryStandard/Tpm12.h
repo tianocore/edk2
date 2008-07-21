@@ -412,7 +412,7 @@ typedef enum tdTPM_KEY_FLAGS {
   isVolatile                        = 0x00000004,
   pcrIgnoredOnRead                  = 0x00000008,
   migrateAuthority                  = 0x00000010
-} TPM_KEY_FLAGS;
+} TPM_KEY_FLAGS_BITS;
 
 //
 // Part 2, section 5.11: TPM_CHANGEAUTH_VALIDATE
