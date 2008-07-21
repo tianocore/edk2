@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include <PeiMain.h>
-#include "dependency.h"
+#include "Dependency.h"
 
 /**
 
