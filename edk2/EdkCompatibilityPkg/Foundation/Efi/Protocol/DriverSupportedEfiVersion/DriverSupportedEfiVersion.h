@@ -37,10 +37,10 @@ EFI_FORWARD_DECLARATION (EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL);
 //
 // Interface structure for the Driver Supported EFI Version Protocol
 //
-typedef struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
+struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
   UINT32    Length;
   UINT32    FirmwareVersion;
-} EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL;
+};
 
 extern EFI_GUID gEfiDriverSupportedEfiVersionProtocolGuid;
 

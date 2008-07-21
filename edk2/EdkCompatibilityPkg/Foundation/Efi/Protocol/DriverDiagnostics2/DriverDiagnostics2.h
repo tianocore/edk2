@@ -112,10 +112,10 @@ EFI_STATUS
 //
 // Interface structure for the Driver Diagnostics Protocol
 //
-typedef struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL {
+struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL {
   EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS  RunDiagnostics;
   CHAR8                                    *SupportedLanguages;
-} EFI_DRIVER_DIAGNOSTICS2_PROTOCOL;
+};
 
 /*++
 
