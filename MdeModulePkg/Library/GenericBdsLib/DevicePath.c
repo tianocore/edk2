@@ -15,16 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "InternalBdsLib.h"
 
-
-EFI_GUID  mEfiDevicePathMessagingUartFlowControlGuid = DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL;
-
-EFI_GUID mEfiDevicePathMessagingSASGuid = DEVICE_PATH_MESSAGING_SAS;
-
-
 /**
 
   Adjusts the size of a previously allocated buffer.
-
 
   @param OldPool         A pointer to the buffer whose size is being adjusted.
   @param OldSize         The size of the current buffer.
@@ -52,12 +45,11 @@ ReallocatePool (
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
-    gBS->FreePool (OldPool);
+    SafeFreePool (OldPool);
   }
 
   return NewPool;
 }
-
 
 /**
   Concatenates a formatted unicode string to allocated pool.
@@ -116,7 +108,7 @@ CatPrint (
     Str->len = StringSize - sizeof (UINT16);
   }
 
-  gBS->FreePool (AppendStr);
+  SafeFreePool (AppendStr);
   return Str->str;
 }
 
@@ -314,22 +306,6 @@ DevPathVendor (
   switch (DevicePathType (&Vendor->Header)) {
   case HARDWARE_DEVICE_PATH:
     Type = L"Hw";
-// bugbug: nt 32 specific definition
-#if 0
-    //
-    // If the device is a winntbus device, we will give it a readable device name.
-    //
-    if (CompareGuid (&Vendor->Guid, &mEfiWinNtThunkProtocolGuid)) {
-      CatPrint (Str, L"%s", L"WinNtBus");
-      return ;
-    } else if (CompareGuid (&Vendor->Guid, &mEfiWinNtGopGuid)) {
-      CatPrint (Str, L"%s", L"GOP");
-      return ;
-    } else if (CompareGuid (&Vendor->Guid, &mEfiWinNtSerialPortGuid)) {
-      CatPrint (Str, L"%s", L"Serial");
-      return ;
-    }
-#endif
     break;
 
   case MESSAGING_DEVICE_PATH:
@@ -346,7 +322,7 @@ DevPathVendor (
     } else if (CompareGuid (&Vendor->Guid, &gEfiVTUTF8Guid)) {
       CatPrint (Str, L"VenUft8()");
       return ;
-    } else if (CompareGuid (&Vendor->Guid, &mEfiDevicePathMessagingUartFlowControlGuid)) {
+    } else if (CompareGuid (&Vendor->Guid, &gEfiUartDevicePathGuid     )) {
       FlowControlMap = (((UART_FLOW_CONTROL_DEVICE_PATH *) Vendor)->FlowControlMap);
       switch (FlowControlMap & 0x00000003) {
       case 0:
@@ -367,7 +343,7 @@ DevPathVendor (
 
       return ;
 
-    } else if (CompareGuid (&Vendor->Guid, &mEfiDevicePathMessagingSASGuid)) {
+    } else if (CompareGuid (&Vendor->Guid, &gEfiSasDevicePathGuid)) {
       CatPrint (
         Str,
         L"SAS(%lx,%lx,%x,",
@@ -424,7 +400,6 @@ DevPathVendor (
   CatPrint (Str, L")");
 }
 
-
 /**
   Convert Device Path to a Unicode string for printing.
 
@@ -468,6 +443,7 @@ DevPathExtendedAcpi (
   )
 {
   ACPI_EXTENDED_HID_DEVICE_PATH   *ExtendedAcpi;
+  
   //
   // Index for HID, UID and CID strings, 0 for non-exist
   //
@@ -1550,7 +1526,7 @@ DevicePathToStr (
   //
   // Shrink pool used for string allocation
   //
-  gBS->FreePool (DevPath);
+  SafeFreePool (DevPath);
 
 Done:
   NewSize = (Str.len + 1) * sizeof (CHAR16);
@@ -1559,7 +1535,6 @@ Done:
   Str.str[Str.len] = 0;
   return Str.str;
 }
-
 
 /**
   Function creates a device path data structure that identically matches the

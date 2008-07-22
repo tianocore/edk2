@@ -62,8 +62,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/GenericBdsLib.h>
 #include <Library/TimerLib.h>
 
-#include "BmMachine.h"
-
 #define PERFORMANCE_SIGNATURE   EFI_SIGNATURE_32 ('P', 'e', 'r', 'f')
 #define PERF_TOKEN_SIZE         28
 #define PERF_TOKEN_LENGTH       (PERF_TOKEN_SIZE - 1)

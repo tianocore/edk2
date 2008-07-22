@@ -161,6 +161,18 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|10|UINT16|0x40000001
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
 
+[PcdsFixedAtBuild.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\\EFI\\BOOT\\BOOTIA32.EFI"|VOID*|0x40000003
+
+[PcdsFixedAtBuild.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\\EFI\\BOOT\\BOOTX64.EFI"|VOID*|0x40000003
+
+[PcdsFixedAtBuild.IPF]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\\EFI\\BOOT\\BOOTIA64.EFI"|VOID*|0x40000003
+
+[PcdsFixedAtBuild.EBC]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\\EFI\\BOOT\\BOOTEBC.EFI"|VOID*|0x40000003
+  
 [PcdsDynamic.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
