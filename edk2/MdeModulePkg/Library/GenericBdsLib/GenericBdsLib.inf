@@ -39,19 +39,8 @@
   BdsBoot.c
   InternalBdsLib.h
 
-[Sources.Ia32]
-  Ia32/BmMachine.h
-
-[Sources.X64]
-  x64/BmMachine.h
-
 [Sources.IPF]
   Ipf/ShadowRom.c
-  Ipf/BmMachine.h
-
-[Sources.EBC]
-  Ebc/BmMachine.h
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -92,8 +81,9 @@
   gEfiFileInfoGuid                              # ALWAYS_CONSUMED
   gEfiPcAnsiGuid                                # ALWAYS_CONSUMED
   gEfiGenericPlatformVariableGuid               # ALWAYS_CONSUMED
-
-
+  gEfiUartDevicePathGuid                        # ALWAYS_CONSUMED
+  gEfiSasDevicePathGuid                         # ALWAYS_CONSUMED
+  
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
@@ -113,3 +103,4 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName

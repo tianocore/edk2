@@ -221,6 +221,7 @@ WriteBootToOsPerformanceData (
     gBS->FreePages (AcpiLowMemoryBase, 1);
     return ;
   }
+  
   //
   // Get DXE drivers performance
   //
@@ -295,7 +296,7 @@ Done:
   mPerfHeader.Signiture = PERFORMANCE_SIGNATURE;
 
   //
-  // Put performance data to memory
+  // Put performance data to ACPI memory
   //
   CopyMem (
     (UINTN *) (UINTN) AcpiLowMemoryBase,

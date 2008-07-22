@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MAX_STRING_LEN        200
 
 BOOLEAN   mFeaturerSwitch = TRUE;
-BOOLEAN   mResetRequired = FALSE;
+BOOLEAN   mResetRequired  = FALSE;
 
 extern UINT16 gPlatformBootTimeOutDefault;
 
@@ -69,7 +69,6 @@ BdsLibGetTimeout (
   return Timeout;
 }
 
-
 /**
   The function will go through the driver optoin link list, load and start
   every driver the driver optoin device path point to.
@@ -99,6 +98,7 @@ BdsLibLoadDrivers (
   //
   for (Link = BdsDriverLists->ForwardLink; Link != BdsDriverLists; Link = Link->ForwardLink) {
     Option = CR (Link, BDS_COMMON_OPTION, Link, BDS_LOAD_OPTION_SIGNATURE);
+    
     //
     // If a load option is not marked as LOAD_OPTION_ACTIVE,
     // the boot manager will not automatically load the option.
@@ -106,6 +106,7 @@ BdsLibLoadDrivers (
     if (!IS_LOAD_OPTION_TYPE (Option->Attribute, LOAD_OPTION_ACTIVE)) {
       continue;
     }
+    
     //
     // If a driver load option is marked as LOAD_OPTION_FORCE_RECONNECT,
     // then all of the EFI drivers in the system will be disconnected and
@@ -114,6 +115,7 @@ BdsLibLoadDrivers (
     if (IS_LOAD_OPTION_TYPE (Option->Attribute, LOAD_OPTION_FORCE_RECONNECT)) {
       ReconnectAll = TRUE;
     }
+    
     //
     // Make sure the driver path is connected.
     //
@@ -162,6 +164,7 @@ BdsLibLoadDrivers (
       gBS->SetWatchdogTimer (0x0000, 0x0000, 0x0000, NULL);
     }
   }
+  
   //
   // Process the LOAD_OPTION_FORCE_RECONNECT driver option
   //
@@ -171,7 +174,6 @@ BdsLibLoadDrivers (
   }
 
 }
-
 
 /**
   Get the Option Number that does not used.
@@ -187,7 +189,6 @@ BdsLibGetFreeOptionNumber (
   IN  CHAR16    *VariableName
   )
 {
-  UINT16        Number;
   UINTN         Index;
   CHAR16        StrTemp[10];
   UINT16        *OptionBuffer;
@@ -207,18 +208,17 @@ BdsLibGetFreeOptionNumber (
     // try if the option number is used
     //
     OptionBuffer = BdsLibGetVariableAndSize (
-              StrTemp,
-              &gEfiGlobalVariableGuid,
-              &OptionSize
-              );
+                     StrTemp,
+                     &gEfiGlobalVariableGuid,
+                     &OptionSize
+                     );
     if (OptionBuffer == NULL) {
       break;
     }
-    Index++;
-  } while (1);
+    Index ++;
+  } while (TRUE);
 
-  Number = (UINT16) Index;
-  return Number;
+  return ((UINT16) Index);
 }
 
 
@@ -272,6 +272,7 @@ BdsLibRegisterNewOption (
   Description           = NULL;
   OptionOrderPtr        = NULL;
   UpdateDescription     = FALSE;
+  Status                = EFI_SUCCESS;
   ZeroMem (OptionName, sizeof (OptionName));
 
   TempOptionSize = 0;
@@ -300,11 +301,11 @@ BdsLibRegisterNewOption (
     if (OptionPtr == NULL) {
       continue;
     }
-    TempPtr = OptionPtr;
-    TempPtr += sizeof (UINT32) + sizeof (UINT16);
-    Description = (CHAR16 *) TempPtr;
-    TempPtr += StrSize ((CHAR16 *) TempPtr);
-    OptionDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
+    TempPtr         =   OptionPtr;
+    TempPtr         +=  sizeof (UINT32) + sizeof (UINT16);
+    Description     =   (CHAR16 *) TempPtr;
+    TempPtr         +=  StrSize ((CHAR16 *) TempPtr);
+    OptionDevicePath =  (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
 
     //
     // Notes: the description may will change base on the GetStringToken
@@ -314,32 +315,32 @@ BdsLibRegisterNewOption (
         //
         // Got the option, so just return
         //
-        gBS->FreePool (OptionPtr);
-        gBS->FreePool (TempOptionPtr);
+        SafeFreePool (OptionPtr);
+        SafeFreePool (TempOptionPtr);
         return EFI_SUCCESS;
       } else {
         //
         // Option description changed, need update.
         //
         UpdateDescription = TRUE;
-        gBS->FreePool (OptionPtr);
+        SafeFreePool (OptionPtr);
         break;
       }
     }
 
-    gBS->FreePool (OptionPtr);
+    SafeFreePool (OptionPtr);
   }
 
   OptionSize          = sizeof (UINT32) + sizeof (UINT16) + StrSize (String);
-  OptionSize += GetDevicePathSize (DevicePath);
+  OptionSize          += GetDevicePathSize (DevicePath);
   OptionPtr           = AllocateZeroPool (OptionSize);
   TempPtr             = OptionPtr;
   *(UINT32 *) TempPtr = LOAD_OPTION_ACTIVE;
-  TempPtr += sizeof (UINT32);
+  TempPtr             += sizeof (UINT32);
   *(UINT16 *) TempPtr = (UINT16) GetDevicePathSize (DevicePath);
-  TempPtr += sizeof (UINT16);
+  TempPtr             += sizeof (UINT16);
   CopyMem (TempPtr, String, StrSize (String));
-  TempPtr += StrSize (String);
+  TempPtr             += StrSize (String);
   CopyMem (TempPtr, DevicePath, GetDevicePathSize (DevicePath));
 
   if (UpdateDescription) {
@@ -371,12 +372,12 @@ BdsLibRegisterNewOption (
   // Return if only need to update a changed description or fail to set option.
   //
   if (EFI_ERROR (Status) || UpdateDescription) {
-    gBS->FreePool (OptionPtr);
-    gBS->FreePool (TempOptionPtr);
+    SafeFreePool (OptionPtr);
+    SafeFreePool (TempOptionPtr);
     return Status;
   }
 
-  gBS->FreePool (OptionPtr);
+  SafeFreePool (OptionPtr);
 
   //
   // Update the option order variable
@@ -394,11 +395,8 @@ BdsLibRegisterNewOption (
                     sizeof (UINT16),
                     &BootOrderEntry
                     );
-    if (EFI_ERROR (Status)) {
-      gBS->FreePool (TempOptionPtr);
-      return Status;
-    }
-    return EFI_SUCCESS;
+    SafeFreePool (TempOptionPtr);
+    return Status;
   }
 
   //
@@ -417,16 +415,10 @@ BdsLibRegisterNewOption (
                   OrderItemNum * sizeof (UINT16),
                   OptionOrderPtr
                   );
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (TempOptionPtr);
-    gBS->FreePool (OptionOrderPtr);
-    return Status;
-  }
+  SafeFreePool (TempOptionPtr);
+  SafeFreePool (OptionOrderPtr);
 
-  gBS->FreePool (TempOptionPtr);
-  gBS->FreePool (OptionOrderPtr);
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 
@@ -479,15 +471,15 @@ BdsLibVariableToOption (
   //
   // Get the option attribute
   //
-  TempPtr   = Variable;
-  Attribute = *(UINT32 *) Variable;
-  TempPtr += sizeof (UINT32);
+  TempPtr   =  Variable;
+  Attribute =  *(UINT32 *) Variable;
+  TempPtr   += sizeof (UINT32);
 
   //
   // Get the option's device path size
   //
-  FilePathSize = *(UINT16 *) TempPtr;
-  TempPtr += sizeof (UINT16);
+  FilePathSize =  *(UINT16 *) TempPtr;
+  TempPtr      += sizeof (UINT16);
 
   //
   // Get the option's description string
@@ -497,13 +489,13 @@ BdsLibVariableToOption (
   //
   // Get the option's description string size
   //
-  TempPtr += StrSize ((CHAR16 *) TempPtr);
+  TempPtr     += StrSize ((CHAR16 *) TempPtr);
 
   //
   // Get the option's device path
   //
-  DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
-  TempPtr += FilePathSize;
+  DevicePath =  (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
+  TempPtr    += FilePathSize;
 
   LoadOptions     = TempPtr;
   LoadOptionsSize = (UINT32) (VariableSize - (UINTN) (TempPtr - Variable));
@@ -544,16 +536,15 @@ BdsLibVariableToOption (
   //
   if ((Option->Attribute & LOAD_OPTION_ACTIVE) == LOAD_OPTION_ACTIVE) {
     InsertTailList (BdsCommonOptionList, &Option->Link);
-    gBS->FreePool (Variable);
+    SafeFreePool (Variable);
     return Option;
   }
 
-  gBS->FreePool (Variable);
-  gBS->FreePool (Option);
+  SafeFreePool (Variable);
+  SafeFreePool (Option);
   return NULL;
 
 }
-
 
 /**
   Process BootOrder, or DriverOrder variables, by calling
@@ -611,11 +602,10 @@ BdsLibBuildOptionFromVar (
 
   }
 
-  gBS->FreePool (OptionOrder);
+  SafeFreePool (OptionOrder);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Get boot mode by looking up configuration table and parsing HOB list
@@ -635,7 +625,6 @@ BdsLibGetBootMode (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
@@ -689,7 +678,6 @@ BdsLibGetVariableAndSize (
   *VariableSize = BufferSize;
   return Buffer;
 }
-
 
 /**
   Delete the instance in Multi which matches partly with Single instance
@@ -749,7 +737,6 @@ BdsLibDelPartMatchInstance (
   return NewDevicePath;
 }
 
-
 /**
   Function compares a device path data structure to that of all the nodes of a
   second device path instance.
@@ -790,17 +777,16 @@ BdsLibMatchDevicePaths (
     // return success
     //
     if (CompareMem (Single, DevicePathInst, Size) == 0) {
-      gBS->FreePool (DevicePathInst);
+      SafeFreePool (DevicePathInst);
       return TRUE;
     }
 
-    gBS->FreePool (DevicePathInst);
+    SafeFreePool (DevicePathInst);
     DevicePathInst = GetNextDevicePathInstance (&DevicePath, &Size);
   }
 
   return FALSE;
 }
-
 
 /**
   This function prints a series of strings.
@@ -977,8 +963,8 @@ SetupResetReminder (
         IfrLibCreatePopUp (2, &Key, StringBuffer1, StringBuffer2);
       } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
 
-      gBS->FreePool (StringBuffer1);
-      gBS->FreePool (StringBuffer2);
+      SafeFreePool (StringBuffer1);
+      SafeFreePool (StringBuffer2);
       //
       // If the user hits the YES Response key, reset
       //
@@ -989,7 +975,6 @@ SetupResetReminder (
     }
   }
 }
-
 
 /**
   Get the headers (dos, image, optional header) from an image.
@@ -1070,11 +1055,11 @@ BdsLibGetImageHeader (
     if (Status != EFI_BUFFER_TOO_SMALL) {
       goto Done;
     }
-    gBS->FreePool (Info);
+    SafeFreePool (Info);
   } while (TRUE);
 
   FileSize = Info->FileSize;
-  gBS->FreePool (Info);
+  SafeFreePool (Info);
 
   //
   // Read dos header
@@ -1138,8 +1123,6 @@ BdsLibGetImageHeader (
 
   @param Event           The event that triggered this notification function.
   @param Context         Pointer to the notification functions context.
-
-           EDES_TODO: Incomplete Descriptions  None.
 
 **/
 VOID
@@ -1243,7 +1226,6 @@ BdsSetMemoryTypeInformationVariable (
 
   return;
 }
-
 
 /**
   This routine register a function to adjust the different type memory page number just before booting

@@ -40,7 +40,7 @@ IsNvNeed (
     Ptr++;
   }
 
-  if ((*(Ptr-3) == 'D') && (*(Ptr-2) == 'e') && (*(Ptr-1) == 'v')) {
+  if ((*(Ptr - 3) == 'D') && (*(Ptr - 2) == 'e') && (*(Ptr - 1) == 'v')) {
     return FALSE;
   } else {
     return TRUE;
@@ -261,7 +261,7 @@ BdsLibConnectConsoleVariable (
     SafeFreePool(Instance);
   } while (CopyOfDevicePath != NULL);
 
-  gBS->FreePool (StartDevicePath);
+  SafeFreePool (StartDevicePath);
 
   if (!DeviceExist) {
     return EFI_NOT_FOUND;
@@ -339,7 +339,6 @@ BdsLibConnectAllConsoles (
   BdsLibConnectAllDefaultConsoles ();
 
 }
-
 
 /**
   This function will connect console device base on the console
