@@ -278,13 +278,11 @@ typedef enum {
 
 #define STRING_DEPOSITORY_NUMBER        8
 
-//
-// #pragma pack(1)
-//
-// Serial Ports attributes, first one is the value for
-// return from callback function, stringtoken is used to
-// display the value properly
-//
+///
+/// Serial Ports attributes, first one is the value for
+/// return from callback function, stringtoken is used to
+/// display the value properly
+///
 typedef struct {
   UINTN   Value;
   UINT16  StringToken;
@@ -498,8 +496,6 @@ BOpt_FindFiles (
   All valid handles in the system except those consume SimpleFs, LoadFile
   are stored in DriverMenu for future use.
 
-   
-
   @retval EFI_SUCCESS The function complets successfully.
   @return Other value if failed to build the DriverMenu.
 
@@ -637,8 +633,6 @@ BOpt_IsEfiApp (
 
   Get the Option Number that has not been allocated for use.
 
-  
-
   @return The available Option Number.
 
 **/
@@ -650,8 +644,6 @@ BOpt_GetBootOptionNumber (
 /**
 
   Get the Option Number that is not in use.
-
-  
 
   @return The unused Option Number.
 
@@ -1316,26 +1308,6 @@ EfiLibFileInfo (
   );
 
 /**
-
-  change a Unicode string t ASCII string
-
-
-  @param UStr            Unicode string
-                         Lenght - most possible length of AStr
-  @param Length          The length of UStr.
-  @param AStr            ASCII string to pass out
-
-  @return Actual length
-
-**/
-UINTN
-UnicodeToAscii (
-  IN  CHAR16  *UStr,
-  IN  UINTN   Length,
-  OUT CHAR8   *AStr
-  );
-
-/**
   This function converts an input device structure to a Unicode string.
 
   @param DevPath                  A pointer to the device path structure.
@@ -1542,11 +1514,6 @@ BdsStartBootMaint (
 /**
   Intialize all the string depositories.
 
-
-  
-
-  
-
 **/
 VOID
 InitializeStringDepository (
@@ -1571,12 +1538,6 @@ GetStringTokenFromDepository (
 
 /**
   Reclaim string depositories by moving the current node pointer to list head..
-
-
-   
-
-  
-
 **/
 VOID
 ReclaimStringDepository (
@@ -1585,11 +1546,6 @@ ReclaimStringDepository (
 
 /**
   Release resource for all the string depositories.
-
-
-  
-
-  
 
 **/
 VOID
@@ -1623,8 +1579,6 @@ ApplyChangeHandler (
   @param Private         The BMM context data.
   @param CurrentFakeNVMap The current Fack NV Map.
 
-  
-
 **/
 VOID
 DiscardChangeHandler (
@@ -1637,8 +1591,6 @@ DiscardChangeHandler (
 
   @param Private         The BMM context data.
   @param NewPageId       The original page ID.
-
-  
 
 **/
 VOID
@@ -1735,7 +1687,6 @@ FormSetDispatcher (
 
 /**
   Function returns the value of the specified variable.
-
 
   @param Name            A Null-terminated Unicode string that is
                          the name of the vendor's variable.

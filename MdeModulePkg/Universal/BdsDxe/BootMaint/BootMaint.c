@@ -25,12 +25,12 @@ EFI_DEVICE_PATH_PROTOCOL  EndDevicePath[] = {
 };
 
 
-EFI_GUID EfiLegacyDevOrderGuid = EFI_LEGACY_DEV_ORDER_VARIABLE_GUID;
-EFI_GUID mBootMaintGuid = BOOT_MAINT_FORMSET_GUID;
-EFI_GUID mFileExplorerGuid = FILE_EXPLORE_FORMSET_GUID;
+EFI_GUID EfiLegacyDevOrderGuid  = EFI_LEGACY_DEV_ORDER_VARIABLE_GUID;
+EFI_GUID mBootMaintGuid         = BOOT_MAINT_FORMSET_GUID;
+EFI_GUID mFileExplorerGuid      = FILE_EXPLORE_FORMSET_GUID;
 
-CHAR16  mBootMaintStorageName[] = L"BmData";
-CHAR16  mFileExplorerStorageName[] = L"FeData";
+CHAR16  mBootMaintStorageName[]     = L"BmData";
+CHAR16  mFileExplorerStorageName[]  = L"FeData";
 
 /**
   Init all memu.
@@ -102,14 +102,14 @@ CreateMenuStringToken (
   or more named elements from the target driver.
 
 
-  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-  @param Request         - A null-terminated Unicode string in <ConfigRequest> format.
-  @param Progress        - On return, points to a character in the Request string.
+  @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Request         A null-terminated Unicode string in <ConfigRequest> format.
+  @param Progress        On return, points to a character in the Request string.
                          Points to the string's null terminator if request was successful.
                          Points to the most recent '&' before the first failing name/value
                          pair (or the beginning of the string if the failure is in the
                          first name/value pair) if the request was not successful.
-  @param Results         - A null-terminated Unicode string in <ConfigAltResp> format which
+  @param Results         A null-terminated Unicode string in <ConfigAltResp> format which
                          has all values filled in for the names in the Request string.
                          String to be allocated by the called function.
 
@@ -540,10 +540,9 @@ BootMaintCallback (
 /**
   Function handling request to apply changes for BMM pages.
 
-
-  @param Private         - Pointer to callback data buffer.
-  @param CurrentFakeNVMap - Pointer to buffer holding data of various values used by BMM
-  @param FormId          - ID of the form which has sent the request to apply change.
+  @param Private            Pointer to callback data buffer.
+  @param CurrentFakeNVMap   Pointer to buffer holding data of various values used by BMM
+  @param FormId             ID of the form which has sent the request to apply change.
 
   @retval  EFI_SUCCESS       Change successfully applied.
   @retval  Other             Error occurs while trying to apply changes.
@@ -728,10 +727,8 @@ Error:
   Discard all changes done to the BMM pages such as Boot Order change,
   Driver order change.
 
-  @param Private         The BMM context data.
-  @param CurrentFakeNVMap The current Fack NV Map.
-
-  
+  @param Private            The BMM context data.
+  @param CurrentFakeNVMap   The current Fack NV Map.
 
 **/
 VOID

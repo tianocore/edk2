@@ -56,9 +56,6 @@ BdsDeleteAllInvalidLegacyBootOptions (
 
   Add the legacy boot options from BBS table if they do not exist.
 
-
-  
-
   @retval  EFI_SUCCESS        The boot options are added successfully or they are already in boot options.
   @retval  others             An error occurred when creating legacy boot options.
 
@@ -83,13 +80,12 @@ BdsUpdateLegacyDevOrder (
   );
 
 /**
-
   Set the boot priority for BBS entries based on boot option entry and boot order.
 
   @param  Entry             The boot option is to be checked for refresh BBS table.
   
   @retval EFI_SUCCESS       The boot priority for BBS entries is refreshed successfully.
-
+  @return status of BdsSetBootPriority4SameTypeDev()
 **/
 EFI_STATUS
 BdsRefreshBbsTableForBoot (

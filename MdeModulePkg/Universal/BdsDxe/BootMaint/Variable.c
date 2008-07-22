@@ -176,9 +176,6 @@ Var_ChangeBootOrder (
   After deleting this Driver option, call Var_ChangeDriverOrder to
   make sure DriverOrder is in valid state.
 
-
-  
-
   @retval EFI_SUCCESS Load Option is successfully updated.
   @return Other value than EFI_SUCCESS if failed to update "Driver Order" EFI
           Variable.
@@ -236,9 +233,6 @@ Var_DelDriverOption (
   are present but are not reflected by DriverOrder. Then a function
   rebuild DriverOrder from scratch by content from DriverOptionMenu is
   needed.
-
-
-  
 
   @retval  EFI_SUCCESS  The driver order is updated successfully.
   @return               EFI_STATUS other than EFI_SUCCESS if failed to
@@ -319,10 +313,6 @@ Var_ChangeDriverOrder (
   Update the device path of "ConOut", "ConIn" and "ErrOut" 
   based on the new BaudRate, Data Bits, parity and Stop Bits
   set.
-
-  
-
-  
 
 **/
 VOID
@@ -486,9 +476,6 @@ Var_UpdateConsoleOption (
   This function delete and build multi-instance device path ConIn
   console device.
 
-
-  
-
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
                          for detail return information.
@@ -505,9 +492,6 @@ Var_UpdateConsoleInpOption (
   This function delete and build multi-instance device path ConOut
   console device.
 
-
-  
-
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
                          for detail return information.
@@ -523,9 +507,6 @@ Var_UpdateConsoleOutOption (
 /**
   This function delete and build multi-instance device path ErrOut
   console device.
-
-
-  
 
   @retval EFI_SUCCESS    The function complete successfully.
   @return                The EFI variable can be saved. See gRT->SetVariable 
@@ -1272,7 +1253,7 @@ Var_UpdateBBSOption (
       StrSize (LegacyDeviceContext->Description)
       );
 
-    UnicodeToAscii (DescString, StrSize (DescString), DescAsciiString);
+	UnicodeStrToAsciiStr((CONST CHAR16*)&DescString, (CHAR8 *)&DescAsciiString);
 
     NewOptionSize = sizeof (UINT32) + sizeof (UINT16) + StrSize (DescString) +
                     sizeof (BBS_BBS_DEVICE_PATH);

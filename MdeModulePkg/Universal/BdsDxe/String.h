@@ -52,9 +52,6 @@ GetStringById (
 /**
   Initialize HII global accessor for string support
 
-
-  @param VOID
-
   @retval  EFI_SUCCESS  String support initialize success.
 
 **/
@@ -65,9 +62,6 @@ InitializeStringSupport (
 
 /**
   Call the browser and display the front page
-
-
-  @param VOID            No input.
 
   @return   Status code that will be returned by
             EFI_FORM_BROWSER2_PROTOCOL.SendForm ().

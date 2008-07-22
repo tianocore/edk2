@@ -25,9 +25,6 @@ EFI_GUID mBdsStringPackGuid = {
 /**
   Initialize HII global accessor for string support
 
-
-  @param VOID
-
   @retval  EFI_SUCCESS  String support initialize success.
 
 **/

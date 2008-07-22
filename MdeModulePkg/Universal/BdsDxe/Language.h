@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Determine the current language that will be used
   based on language related EFI Variables.
 
-
   @param LangCodesSettingRequired If required to set LangCode variable
 
 **/

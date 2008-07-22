@@ -17,10 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Refresh the global UpdateData structure.
 
-  
-
-  
-
 **/
 VOID
 RefreshUpdateData (
@@ -33,11 +29,8 @@ RefreshUpdateData (
 /**
   Add a "Go back to main page" tag in front of the form when there are no
   "Apply changes" and "Discard changes" tags in the end of the form.
-  
-
+ 
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -69,8 +62,6 @@ UpdatePageStart (
   ensure user can return to the main page.
 
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -129,8 +120,6 @@ UpdatePageEnd (
   @param LabelId         It is both the Form ID and Label ID for
                          opcode deletion.
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -202,9 +191,6 @@ BootThisFile (
   by TerminaMenu. This list will be inserted to form FORM_CON_COM_SETUP_ID.
 
   @param CallbackData    The BMM context data.
-
-  
-
 **/
 VOID
 UpdateConCOMPage (
@@ -240,8 +226,6 @@ UpdateConCOMPage (
   allow user to delete the boot option.
 
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -288,8 +272,6 @@ UpdateBootDelPage (
 
   @param CallbackData    The BMM context data.
 
-  
-
 **/
 VOID
 UpdateDrvAddHandlePage (
@@ -323,10 +305,7 @@ UpdateDrvAddHandlePage (
   Create a lit of driver option from global DriverOptionMenu. It
   allow user to delete the driver option.
 
-
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -371,8 +350,6 @@ UpdateDrvDelPage (
   a Driver Option.
 
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -443,8 +420,6 @@ UpdateDriverAddHandleDescPage (
   @param UpdatePageId    The form ID to be updated.
   @param ConsoleMenu     The console menu list.
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -528,8 +503,6 @@ UpdateConsolePage (
   @param OptionMenu      The new list.
   @param CallbackData    The BMM context data.
 
-  
-
 **/
 VOID
 UpdateOrderPage (
@@ -596,8 +569,6 @@ UpdateOrderPage (
   the "BootNext" vaule.
 
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -671,8 +642,6 @@ UpdateBootNextPage (
 
   @param CallbackData    The BMM context data.
 
-  
-
 **/
 VOID
 UpdateTimeOutPage (
@@ -710,10 +679,7 @@ UpdateTimeOutPage (
 /**
   Refresh the text mode page
 
-
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -821,8 +787,6 @@ UpdateConModePage (
   Parity, Stop Bits, Terminal Type.
 
   @param CallbackData    The BMM context data.
-
-  
 
 **/
 VOID
@@ -998,8 +962,6 @@ UpdateTerminalPage (
   @param UpdatePageId    The form ID.
   @param CallbackData    The BMM context data.
 
-  
-
 **/
 VOID
 UpdatePageBody (
@@ -1042,8 +1004,6 @@ UpdatePageBody (
                          etc.
   @param OptionIndex     Returns the index number (#### in Boot####).
   @param OptionSize      Return the size of the Boot### variable.
-
-  
 
 **/
 VOID *
@@ -1125,7 +1085,6 @@ GetLegacyBootOptionVar (
   @param UpdatePageId    The form ID. It also spefies the legacy device type.
   @param CallbackData    The BMM context data.
 
-  
 
 **/
 VOID
@@ -1328,8 +1287,6 @@ UpdateSetLegacyDeviceOrderPage (
 
   @param Private         The BMM context data.
   @param NewPageId       The original page ID.
-
-  
 
 **/
 VOID

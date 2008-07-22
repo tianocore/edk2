@@ -447,9 +447,6 @@ InitializeFrontPage (
 /**
   Call the browser and display the front page
 
-
-  @param VOID            No input.
-
   @return   Status code that will be returned by
             EFI_FORM_BROWSER2_PROTOCOL.SendForm ().
 
@@ -572,8 +569,6 @@ ConvertProcessorToString (
 
   @param MemorySize      - The size of the memory to process
   @param String          - The string that is created
-
-  @return VOID.
 
 **/
 VOID
