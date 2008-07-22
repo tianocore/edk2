@@ -162,15 +162,23 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
 
 [PcdsFixedAtBuild.IA32]
+  ## Default EFI boot path name for IA32 architecture, this path is relative to 
+  #  EFI boot disk.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\\EFI\\BOOT\\BOOTIA32.EFI"|VOID*|0x40000003
 
 [PcdsFixedAtBuild.X64]
+  ## Default EFI boot path name for X64 architecture, this path is relative to 
+  #  EFI boot disk.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\\EFI\\BOOT\\BOOTX64.EFI"|VOID*|0x40000003
 
 [PcdsFixedAtBuild.IPF]
+  ## Default EFI boot path name for IPF architecture, this path is relative to 
+  #  EFI boot disk.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\\EFI\\BOOT\\BOOTIA64.EFI"|VOID*|0x40000003
 
 [PcdsFixedAtBuild.EBC]
+  ## Default EFI boot path name for EBC architecture, this path is relative to 
+  #  EFI boot disk.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\\EFI\\BOOT\\BOOTEBC.EFI"|VOID*|0x40000003
   
 [PcdsDynamic.common]
