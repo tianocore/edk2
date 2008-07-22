@@ -24,7 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param MenuType        The Menu type to be created.
 
-
   @retval NULL           If failed to create the menu.
   @return                The menu.
 
@@ -37,6 +36,9 @@ BOpt_CreateMenuEntry (
   BM_MENU_ENTRY *MenuEntry;
   UINTN         ContextSize;
 
+  //
+  // Get context size according to menu type
+  //
   switch (MenuType) {
   case BM_LOAD_CONTEXT_SELECT:
     ContextSize = sizeof (BM_LOAD_CONTEXT);
@@ -65,13 +67,15 @@ BOpt_CreateMenuEntry (
   default:
     ContextSize = 0;
     break;
-
   }
 
-  if (0 == ContextSize) {
+  if (ContextSize == 0) {
     return NULL;
   }
 
+  //
+  // Create new menu entry
+  //
   MenuEntry = AllocateZeroPool (sizeof (BM_MENU_ENTRY));
   if (NULL == MenuEntry) {
     return MenuEntry;
@@ -80,8 +84,7 @@ BOpt_CreateMenuEntry (
   MenuEntry->VariableContext = AllocateZeroPool (ContextSize);
   if (NULL == MenuEntry->VariableContext) {
     SafeFreePool (MenuEntry);
-    MenuEntry = NULL;
-    return MenuEntry;
+    return NULL;
   }
 
   MenuEntry->Signature        = BM_MENU_ENTRY_SIGNATURE;
@@ -93,8 +96,6 @@ BOpt_CreateMenuEntry (
   Free up all resource allocated for a BM_MENU_ENTRY.
 
   @param MenuEntry   A pointer to BM_MENU_ENTRY.
-
-  @retval VOID
 
 **/
 VOID
@@ -504,9 +505,6 @@ BOpt_FindFileSystem (
   Free resources allocated in Allocate Rountine.
 
   @param FreeMenu        Menu to be freed
-
-  
-
 **/
 VOID
 BOpt_FreeMenu (
@@ -685,8 +683,6 @@ BOpt_FindFiles (
 /**
   Build the LegacyFDMenu LegacyHDMenu LegacyCDMenu according to LegacyBios.GetBbsInfo().
 
-  
-
   @retval EFI_SUCCESS The function complete successfully.
   @retval EFI_OUT_OF_RESOURCES No enough memory to complete this function.
 
@@ -824,10 +820,6 @@ BOpt_GetLegacyOptions (
 
 /**
   Free out resouce allocated from Legacy Boot Options.
-
-  
-
-  .
 
 **/
 VOID
@@ -1243,8 +1235,6 @@ BOpt_IsEfiApp (
   All valid handles in the system except those consume SimpleFs, LoadFile
   are stored in DriverMenu for future use.
 
-   
-
   @retval EFI_SUCCESS The function complets successfully.
   @return Other value if failed to build the DriverMenu.
 
@@ -1334,8 +1324,6 @@ BOpt_FindDrivers (
 
   Get the Option Number that has not been allocated for use.
 
-  
-
   @return The available Option Number.
 
 **/
@@ -1409,8 +1397,6 @@ BOpt_GetBootOptionNumber (
 /**
 
   Get the Option Number that is not in use.
-
-  
 
   @return The unused Option Number.
 

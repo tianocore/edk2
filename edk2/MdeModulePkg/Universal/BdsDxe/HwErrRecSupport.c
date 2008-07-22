@@ -27,8 +27,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                          non-zero value  - Indicates that the platform implements Hardware Error
                          Record Persistence.
 
-  @return VOID
-
 **/
 VOID
 InitializeHwErrRecSupport (

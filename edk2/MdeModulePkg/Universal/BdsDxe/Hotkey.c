@@ -228,7 +228,6 @@ RegisterHotkey (
 
   Delete Key#### for the given Key Option number.
 
-
   @param KeyOptionNumber Key option number for Key####
 
   @retval  EFI_SUCCESS            Unregister hotkey successfully.
@@ -634,11 +633,8 @@ HotkeyInsertList (
 
   Process all the "Key####" variables, associate Hotkeys with corresponding Boot Options.
 
-
-  @param VOID
-
   @retval  EFI_SUCCESS    Hotkey services successfully initialized.
-
+  @retval  EFI_NOT_FOUND  Can not find the "KeyOrder" variable
 **/
 EFI_STATUS
 InitializeHotkeyService (

@@ -48,8 +48,7 @@ EfiLibLocateProtocol (
 
   Function opens and returns a file handle to the root directory of a volume.
 
-
-  @param DeviceHandle    - A handle for a device
+  @param DeviceHandle    A handle for a device
 
   @return A valid file handle or NULL is returned
 
@@ -96,9 +95,9 @@ EfiLibOpenRoot (
   EFI interfaces.
 
 
-  @param Status          - Current status
-  @param Buffer          - Current allocated buffer, or NULL
-  @param BufferSize      - Current buffer size needed
+  @param Status          Current status
+  @param Buffer          Current allocated buffer, or NULL
+  @param BufferSize      Current buffer size needed
 
   @retval  TRUE  if the buffer was reallocated and the caller
                  should try the API again.
@@ -173,9 +172,8 @@ EfiLibGetVariable (
 /**
   Function deletes the variable specified by VarName and VarGuid.
 
-
   @param VarName           A Null-terminated Unicode string that is
-                         the name of the vendor's variable.
+                           the name of the vendor's variable.
                          
   @param VarGuid           A unique identifier for the vendor.
 

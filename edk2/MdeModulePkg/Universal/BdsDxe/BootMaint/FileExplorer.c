@@ -17,11 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Update the File Explore page.
 
-
   @param CallbackData    The BMM context data.
   @param MenuOption      Pointer to menu options to display.
-
-  
 
 **/
 VOID

@@ -23,9 +23,9 @@ EFI_GUID  mFontPackageGuid = {
 };
 
 typedef struct {
-  //
-  // This 4-bytes total array length is required by HiiLibPreparePackageList()
-  //
+  ///
+  /// This 4-bytes total array length is required by HiiLibPreparePackageList()
+  ///
   UINT32                 Length;
 
   //
@@ -282,7 +282,6 @@ ExportFonts (
 /**
   Determine the current language that will be used
   based on language related EFI Variables.
-
 
   @param LangCodesSettingRequired - If required to set LangCode variable
 

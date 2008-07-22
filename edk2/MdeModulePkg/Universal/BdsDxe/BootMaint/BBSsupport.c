@@ -25,10 +25,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
   @param AStr               Pointer to input Ascii string.
-  @param Size            The number of characters to translate.
+  @param Size               The number of characters to translate.
   @param UStr               Pointer to output Unicode string buffer.
-
-  @return None
 
 **/
 VOID
@@ -53,38 +51,6 @@ AsciiToUnicodeSize (
 }
 
 /**
-
-  change a Unicode string t ASCII string
-
-
-  @param UStr            Unicode string
-                         Lenght - most possible length of AStr
-  @param Length          The length of UStr.
-  @param AStr            ASCII string to pass out
-
-  @return Actual length
-
-**/
-UINTN
-UnicodeToAscii (
-  IN  CHAR16  *UStr,
-  IN  UINTN   Length,
-  OUT CHAR8   *AStr
-  )
-{
-  UINTN Index;
-
-  //
-  // just buffer copy, not character copy
-  //
-  for (Index = 0; Index < Length; Index++) {
-    *AStr++ = (CHAR8) *UStr++;
-  }
-
-  return Index;
-}
-
-/**
   Build Legacy Device Name String according.
 
   @param CurBBSEntry     BBS Table.
@@ -92,15 +58,13 @@ UnicodeToAscii (
   @param BufSize         The buffer size.
   @param BootString      The output string.
 
-  @return VOID           No output.
-
 **/
 VOID
 BdsBuildLegacyDevNameString (
-  IN BBS_TABLE                 *CurBBSEntry,
-  IN UINTN                     Index,
-  IN UINTN                     BufSize,
-  OUT CHAR16                   *BootString
+  IN  BBS_TABLE                 *CurBBSEntry,
+  IN  UINTN                     Index,
+  IN  UINTN                     BufSize,
+  OUT CHAR16                    *BootString
   )
 {
   CHAR16  *Fmt;
@@ -248,7 +212,7 @@ BdsCreateLegacyBootOption (
   BOOLEAN              IndexNotFound;
   BBS_BBS_DEVICE_PATH  *NewBbsDevPathNode;
 
-  if (NULL == (*BootOrderList)) {
+  if ((*BootOrderList) == NULL) {
     CurrentBootOptionNo = 0;
   } else {
     for (ArrayIndex = 0; ArrayIndex < (UINTN) (*BootOrderListSize / sizeof (UINT16)); ArrayIndex++) {
@@ -282,7 +246,8 @@ BdsCreateLegacyBootOption (
   //
   // Create new BBS device path node with description string
   //
-  UnicodeToAscii (BootDesc, StrSize (BootDesc), HelpString);
+  UnicodeStrToAsciiStr ((CONST CHAR16*)&BootDesc, (CHAR8*)&HelpString);
+
   StringLen = AsciiStrLen (HelpString);
   NewBbsDevPathNode = AllocateZeroPool (sizeof (BBS_BBS_DEVICE_PATH) + StringLen);
   if (NewBbsDevPathNode == NULL) {
@@ -431,8 +396,6 @@ BdsIsLegacyBootOption (
 /**
   Delete all the invalid legacy boot options.
 
-  
-
   @retval EFI_SUCCESS             All invalide legacy boot options are deleted.
   @retval EFI_OUT_OF_RESOURCES    Fail to allocate necessary memory.
   @retval EFI_NOT_FOUND           Fail to retrive variable of boot order.
@@ -502,7 +465,10 @@ BdsDeleteAllInvalidLegacyBootOptions (
       SafeFreePool (BootOrder);
       return EFI_OUT_OF_RESOURCES;
     }
-
+  
+    //
+    // Skip Non-Legacy boot options
+    // 
     if (!BdsIsLegacyBootOption (BootOptionVar, &BbsEntry, &BbsIndex)) {
       SafeFreePool (BootOptionVar);
       Index++;
@@ -544,6 +510,9 @@ BdsDeleteAllInvalidLegacyBootOptions (
       );
   }
 
+  //
+  // Adjust the number of boot options.
+  //
   if (BootOrderSize != 0) {
     Status = gRT->SetVariable (
                     L"BootOrder",
@@ -600,6 +569,9 @@ BdsFindLegacyBootOptionByDevType (
     return Found;
   }
 
+  //
+  // Loop all boot option from variable
+  //
   for (BootOrderIndex = 0; BootOrderIndex < BootOptionNum; BootOrderIndex++) {
     Index = (UINTN) BootOrder[BootOrderIndex];
     UnicodeSPrint (BootOption, sizeof (BootOption), L"Boot%04x", Index);
@@ -612,6 +584,9 @@ BdsFindLegacyBootOptionByDevType (
       continue;
     }
 
+    //
+    // Skip Non-legacy boot option
+    //
     if (!BdsIsLegacyBootOption (BootOptionVar, &BbsEntry, BbsIndex)) {
       SafeFreePool (BootOptionVar);
       continue;
@@ -659,6 +634,9 @@ BdsCreateOneLegacyBootOption (
 
   DevPath                       = NULL;
 
+  //
+  // Create device path node.
+  //
   BbsDevPathNode.Header.Type    = BBS_DEVICE_PATH;
   BbsDevPathNode.Header.SubType = BBS_BBS_DP;
   SetDevicePathNodeLength (&BbsDevPathNode.Header, sizeof (BBS_BBS_DEVICE_PATH));
@@ -690,8 +668,6 @@ BdsCreateOneLegacyBootOption (
 /**
 
   Add the legacy boot options from BBS table if they do not exist.
-
-  
 
   @retval EFI_SUCCESS       The boot options are added successfully 
                             or they are already in boot options.
@@ -876,6 +852,9 @@ BdsCreateDevOrder (
   Ptr         = NULL;
   Status      = EFI_SUCCESS;
 
+  //
+  // Count all boot devices
+  //
   for (Index = 0; Index < BbsCount; Index++) {
     if (BbsTable[Index].BootPriority == BBS_IGNORE_ENTRY) {
       continue;
@@ -913,6 +892,9 @@ BdsCreateDevOrder (
   TotalSize += (HeaderSize + sizeof (UINT16) * NETCount);
   TotalSize += (HeaderSize + sizeof (UINT16) * BEVCount);
 
+  //
+  // Create buffer to hold all boot device order
+  //
   DevOrder = AllocateZeroPool (TotalSize);
   if (NULL == DevOrder) {
     return EFI_OUT_OF_RESOURCES;
@@ -960,6 +942,9 @@ BdsCreateDevOrder (
     Ptr = (UINT8 *) BdsFillDevOrderBuf (BbsTable, BBS_BEV_DEVICE, BbsCount, (UINT16 *) Ptr);
   }
 
+  //
+  // Save device order for legacy boot device to variable.
+  //
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
                   &EfiLegacyDevOrderGuid,
@@ -1535,7 +1520,7 @@ PrintBbsTable (
   @param  Entry             The boot option is to be checked for refresh BBS table.
   
   @retval EFI_SUCCESS       The boot priority for BBS entries is refreshed successfully.
-
+  @return status of BdsSetBootPriority4SameTypeDev()
 **/
 EFI_STATUS
 BdsRefreshBbsTableForBoot (

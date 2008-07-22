@@ -19,8 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param CpuIo           A instance of EFI_CPU_IO_PROTOCOL. 
   @param Base            The base address flash region to be locked.
 
-  @return VOID           No return.
-
 **/
 VOID
 BdsLockFv (
@@ -82,6 +80,7 @@ BdsLockFv (
                                   need to do this if an earlier update went awry and we need to
                                   clear the capsule variable so on the next reset PEI does not see it and
                                   think there is a capsule available.
+  @retval EFI_SUCCESS There is no error when processing capsule
 
 **/
 EFI_STATUS

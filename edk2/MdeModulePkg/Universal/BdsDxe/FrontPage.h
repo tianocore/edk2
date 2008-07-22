@@ -229,8 +229,6 @@ TimeCompare (
   @param ConnectAllHappened - The indicater to check if the connect all have
                          already happended.
 
-  @return VOID.
-
 **/
 VOID
 PlatformBdsEnterFrontPage (

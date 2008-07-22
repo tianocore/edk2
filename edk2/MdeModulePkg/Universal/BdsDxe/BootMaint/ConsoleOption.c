@@ -170,9 +170,7 @@ ChangeTerminalDevicePath (
   based on the new BaudRate, Data Bits, parity and Stop Bits
   set.
 
-  @param DevicePath
-
-  
+  @param DevicePath terminal device's path
 
 **/
 VOID
@@ -235,13 +233,10 @@ ChangeVariableDevicePath (
 
     Node = NextDevicePathNode (Node);
   }
-
-  return ;
 }
 
 /**
   Retrieve ACPI UID of UART from device path
-
 
   @param Handle          The handle for the UART device.
   @param AcpiUid         The ACPI UID on output.
@@ -289,12 +284,8 @@ RetrieveUartUid (
 /**
   Sort Uart handles array with Acpi->UID from low to high.
 
-
   @param Handles         EFI_SERIAL_IO_PROTOCOL handle buffer
   @param NoHandles       EFI_SERIAL_IO_PROTOCOL handle count
-
-  @retval VOID
-
 **/
 VOID
 SortedUartHandle (
@@ -558,7 +549,7 @@ LocateSerialIo (
   @param DevicePath      DevicePath that contains Com ports
 
   @retval EFI_SUCCESS   The update is successful.
-
+  @retval EFI_NOT_FOUND Can not find specific menu entry
 **/
 EFI_STATUS
 UpdateComAttributeFromVariable (
@@ -857,9 +848,6 @@ GetConsoleMenu (
 /**
   Build up ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
 
-
-  
-
   @retval EFI_SUCCESS    The function always complete successfully.
 
 **/
@@ -876,9 +864,6 @@ GetAllConsoles (
 
 /**
   Free ConsoleOutMenu, ConsoleInpMenu and ConsoleErrMenu
-
-
-              EDES_TODO: Add parameter description
 
   @retval EFI_SUCCESS    The function always complete successfully.
 **/
@@ -981,11 +966,7 @@ IsTerminalDevicePath (
 /**
   Get mode number according to column and row
 
-
   @param CallbackData    The BMM context data.
-
-  
-
 **/
 VOID
 GetConsoleOutMode (

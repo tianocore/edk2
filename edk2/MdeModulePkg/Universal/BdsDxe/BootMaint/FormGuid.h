@@ -82,14 +82,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define VARSTORE_ID_BOOT_MAINT               0x1000
 #define VARSTORE_ID_FILE_EXPLORER            0x1001
 
-//
-// This is the structure that will be used to store the
-// question's current value. Use it at initialize time to
-// set default value for each question. When using at run
-// time, this map is returned by the callback function,
-// so dynamically changing the question's value will be
-// possible through this mechanism
-//
+///
+/// This is the structure that will be used to store the
+/// question's current value. Use it at initialize time to
+/// set default value for each question. When using at run
+/// time, this map is returned by the callback function,
+/// so dynamically changing the question's value will be
+/// possible through this mechanism
+///
 typedef struct {
   //
   // Three questions displayed at the main page
@@ -195,9 +195,9 @@ typedef struct {
 #define KEY_VALUE_SAVE_AND_EXIT_DRIVER         0x1002
 #define KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER      0x1003
 
-//
-// This is the data structure used by File Explorer formset
-//
+///
+/// This is the data structure used by File Explorer formset
+///
 typedef struct {
   UINT16  DescriptionData[75];
   UINT16  OptionalData[127];

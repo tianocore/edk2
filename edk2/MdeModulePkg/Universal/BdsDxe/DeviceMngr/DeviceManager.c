@@ -114,7 +114,6 @@ DeviceManagerCallback (
 
   This function registers HII packages to HII database.
 
-
   @retval EFI_SUCCESS This function complete successfully.
   @return Other value if failed to register HII packages.
 
@@ -171,8 +170,6 @@ InitializeDeviceManager (
   This function create the dynamic content for device manager. It includes
   section header for all class of devices, one-of opcode to set VBIOS.
   
-
-
   @retval  EFI_SUCCESS             Operation is successful.
   @retval  Other values if failed to clean up the dynamic content from HII
            database.

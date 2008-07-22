@@ -23,9 +23,9 @@ STRING_DEPOSITORY   *DriverOptionStrDepository;
 STRING_DEPOSITORY   *DriverOptionHelpStrDepository;
 STRING_DEPOSITORY   *TerminalStrDepository;
 
-//
-// Terminal type string token storage
-//
+///
+/// Terminal type string token storage
+///
 UINT16              TerminalType[] = {
   STRING_TOKEN(STR_COM_TYPE_0),
   STRING_TOKEN(STR_COM_TYPE_1),
@@ -33,117 +33,117 @@ UINT16              TerminalType[] = {
   STRING_TOKEN(STR_COM_TYPE_3),
 };
 
-//
-// File system selection menu
-//
+///
+/// File system selection menu
+///
 BM_MENU_OPTION      FsOptionMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Console Input Device Selection Menu
-//
+///
+/// Console Input Device Selection Menu
+///
 BM_MENU_OPTION      ConsoleInpMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Console Output Device Selection Menu
-//
+///
+/// Console Output Device Selection Menu
+///
 BM_MENU_OPTION      ConsoleOutMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Error Output Device Selection Menu
-//
+///
+/// Error Output Device Selection Menu
+///
 BM_MENU_OPTION      ConsoleErrMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Boot Option from variable Menu
-//
+///
+/// Boot Option from variable Menu
+///
 BM_MENU_OPTION      BootOptionMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Driver Option from variable menu
-//
+///
+/// Driver Option from variable menu
+///
 BM_MENU_OPTION      DriverOptionMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Legacy FD Info from LegacyBios.GetBbsInfo()
-//
+///
+/// Legacy FD Info from LegacyBios.GetBbsInfo()
+///
 BM_MENU_OPTION      LegacyFDMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Legacy HD Info from LegacyBios.GetBbsInfo()
-//
+///
+/// Legacy HD Info from LegacyBios.GetBbsInfo()
+///
 BM_MENU_OPTION      LegacyHDMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Legacy CD Info from LegacyBios.GetBbsInfo()
-//
+///
+/// Legacy CD Info from LegacyBios.GetBbsInfo()
+///
 BM_MENU_OPTION      LegacyCDMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Legacy NET Info from LegacyBios.GetBbsInfo()
-//
+///
+/// Legacy NET Info from LegacyBios.GetBbsInfo()
+///
 BM_MENU_OPTION      LegacyNETMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Legacy NET Info from LegacyBios.GetBbsInfo()
-//
+///
+/// Legacy NET Info from LegacyBios.GetBbsInfo()
+///
 BM_MENU_OPTION      LegacyBEVMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Files and sub-directories in current directory menu
-//
+///
+/// Files and sub-directories in current directory menu
+///
 BM_MENU_OPTION      DirectoryMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
   0
 };
 
-//
-// Handles in current system selection menu
-//
+///
+/// Handles in current system selection menu
+///
 BM_MENU_OPTION      DriverMenu = {
   BM_MENU_OPTION_SIGNATURE,
   NULL,
@@ -156,9 +156,9 @@ BM_MENU_OPTION      TerminalMenu = {
   0
 };
 
-//
-// Value and string token correspondency for BaudRate
-//
+///
+/// Value and string token correspondency for BaudRate
+///
 COM_ATTR            BaudRateList[19] = {
   {
     115200,
@@ -238,9 +238,9 @@ COM_ATTR            BaudRateList[19] = {
   }
 };
 
-//
-// Value and string token correspondency for DataBits
-//
+///
+/// Value and string token correspondency for DataBits
+///
 COM_ATTR            DataBitsList[4] = {
   {
     5,
@@ -260,9 +260,9 @@ COM_ATTR            DataBitsList[4] = {
   }
 };
 
-//
-// Value and string token correspondency for Parity
-//
+///
+/// Value and string token correspondency for Parity
+///
 COM_ATTR            ParityList[5] = {
   {
     NoParity,
@@ -286,9 +286,9 @@ COM_ATTR            ParityList[5] = {
   }
 };
 
-//
-// Value and string token correspondency for Baudreate
-//
+///
+/// Value and string token correspondency for Baudreate
+///
 COM_ATTR            StopBitsList[3] = {
   {
     OneStopBit,
@@ -304,9 +304,9 @@ COM_ATTR            StopBitsList[3] = {
   }
 };
 
-//
-// Guid for messaging path, used in Serial port setting.
-//
+///
+/// Guid for messaging path, used in Serial port setting.
+///
 EFI_GUID            TerminalTypeGuid[4] = {
   DEVICE_PATH_MESSAGING_PC_ANSI,
   DEVICE_PATH_MESSAGING_VT_100,
