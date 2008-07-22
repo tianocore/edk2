@@ -564,7 +564,7 @@ ConvertProcessorToString (
 }
 
 /**
-  Convert Memory Size to a string
+  Convert Memory Size to a string.
 
 
   @param MemorySize      - The size of the memory to process

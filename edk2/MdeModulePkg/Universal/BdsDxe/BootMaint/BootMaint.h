@@ -673,8 +673,6 @@ BOpt_CreateMenuEntry (
 
   @param MenuEntry   A pointer to BM_MENU_ENTRY.
 
-  @retval VOID
-
 **/
 VOID
 BOpt_DestroyMenuEntry (

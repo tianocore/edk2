@@ -262,10 +262,7 @@ BdsBootDeviceSelect (
   Service routine for BdsInstance->Entry(). Devices are connected, the
   consoles are initialized, and the boot options are tried.
 
-
   @param This            - Protocol Instance structure.
-
-  @retval  EFI_SUCEESS  BDS->Entry has finished executing.
 
 **/
 VOID
