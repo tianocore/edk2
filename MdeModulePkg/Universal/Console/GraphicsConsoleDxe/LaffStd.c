@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "GraphicsConsole.h"
 
-EFI_NARROW_GLYPH  UsStdNarrowGlyphData[] = {
+EFI_NARROW_GLYPH  gUsStdNarrowGlyphData[] = {
   //
   // Unicode glyphs from 0x20 to 0x7e are the same as ASCII characters 0x20 to 0x7e
   //
@@ -284,5 +284,5 @@ ReturnNarrowFontSize (
   //
   // I need the size of this outside of this file, so here is a stub function to do that for me
   //
-  return sizeof (UsStdNarrowGlyphData);
+  return sizeof (gUsStdNarrowGlyphData);
 }

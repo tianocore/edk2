@@ -181,8 +181,7 @@ typedef union {
   EFI_WIDE_GLYPH    WideGlyph;
 } GLYPH_UNION;
 
-extern EFI_NARROW_GLYPH  UsStdNarrowGlyphData[];
-extern EFI_WIDE_GLYPH    UsStdWideGlyphData[];
+extern EFI_NARROW_GLYPH  gUsStdNarrowGlyphData[];
 
 //
 // Device Structure
@@ -440,19 +439,19 @@ GraphicsConsoleConOutEnableCursor (
   );
 
 /**
-  Test to see if Graphics Console could be supported on the ControllerHandle.
+  Test to see if Graphics Console could be supported on the Controller.
 
   Graphics Console could be supported if Graphics Output Protocol or UGA Draw
-  Protocol exists on the ControllerHandle. (UGA Draw Protocol could be shipped
+  Protocol exists on the Controller. (UGA Draw Protocol could be skipped
   if PcdUgaConsumeSupport is set to FALSE.)
 
   @param  This                Protocol instance pointer.
-  @param  ControllerHandle    Handle of device to test.
+  @param  Controller          Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -463,18 +462,19 @@ GraphicsConsoleControllerDriverSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+
 /**
-  Start this driver on ControllerHandle by opening Graphics Output protocol or 
-  UGA Draw protocol, and installing Simple Text Out protocol on ControllerHandle.
+  Start this driver on Controller by opening Graphics Output protocol or 
+  UGA Draw protocol, and installing Simple Text Out protocol on Controller.
   (UGA Draw protocol could be shkipped if PcdUgaConsumeSupport is set to FALSE.)
   
   @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to bind driver to
+  @param  Controller           Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
-  @retval EFI_SUCCESS          This driver is added to ControllerHandle
-  @retval other                This driver does not support this device
+  @retval EFI_SUCCESS          This driver is added to Controller.
+  @retval other                This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -486,20 +486,20 @@ GraphicsConsoleControllerDriverStart (
   );
 
 /**
-  Stop this driver on ControllerHandle by removing Simple Text Out protocol 
-  and closing the Graphics Output Protocol or UGA Draw protocol on ControllerHandle.
+  Stop this driver on Controller by removing Simple Text Out protocol 
+  and closing the Graphics Output Protocol or UGA Draw protocol on Controller.
   (UGA Draw protocol could be shkipped if PcdUgaConsumeSupport is set to FALSE.)
   
 
   @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on
+  @param  Controller        Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
   @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS       This driver is removed Controller.
   @retval EFI_NOT_STARTED   Simple Text Out protocol could not be found the 
-                            ControllerHandle.
+                            Controller.
   @retval other             This driver was not removed from this device.
 
 **/
