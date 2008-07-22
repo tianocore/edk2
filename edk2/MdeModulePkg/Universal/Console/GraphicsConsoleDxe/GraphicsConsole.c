@@ -1,10 +1,5 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
-Remaining Tasks
-  Add all standard Glyphs from UEFI 2.0 Specification
-  Implement optimal automatic Mode creation algorithm
-  Solve palette issues for mixed graphics and text
-  When does this protocol reset the palette?
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -80,7 +75,7 @@ EraseCursor (
   @param  VerticalResolution    User defined vertical resolution.
   @param  CurrentModeNumber     Current specific mode to be check.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS       The mode is supported.
   @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics 
                             devcie supported.
   @retval other             The specific mode does not support user defined 
@@ -97,9 +92,9 @@ CheckModeSupported (
   );
 
 //
-// Globals
+// Graphics Console Devcie Private Data template
 //
-GRAPHICS_CONSOLE_DEV        mGraphicsConsoleDevTemplate = {
+STATIC GRAPHICS_CONSOLE_DEV    mGraphicsConsoleDevTemplate = {
   GRAPHICS_CONSOLE_DEV_SIGNATURE,
   (EFI_GRAPHICS_OUTPUT_PROTOCOL *) NULL,
   (EFI_UGA_DRAW_PROTOCOL *) NULL,
@@ -182,19 +177,19 @@ EFI_DRIVER_BINDING_PROTOCOL gGraphicsConsoleDriverBinding = {
 
 
 /**
-  Test to see if Graphics Console could be supported on the ControllerHandle.
+  Test to see if Graphics Console could be supported on the Controller.
 
   Graphics Console could be supported if Graphics Output Protocol or UGA Draw
-  Protocol exists on the ControllerHandle. (UGA Draw Protocol could be shipped
+  Protocol exists on the Controller. (UGA Draw Protocol could be skipped
   if PcdUgaConsumeSupport is set to FALSE.)
 
   @param  This                Protocol instance pointer.
-  @param  ControllerHandle    Handle of device to test.
+  @param  Controller          Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -294,17 +289,17 @@ Error:
 
 
 /**
-  Start this driver on ControllerHandle by opening Graphics Output protocol or 
-  UGA Draw protocol, and installing Simple Text Out protocol on ControllerHandle.
+  Start this driver on Controller by opening Graphics Output protocol or 
+  UGA Draw protocol, and installing Simple Text Out protocol on Controller.
   (UGA Draw protocol could be shkipped if PcdUgaConsumeSupport is set to FALSE.)
   
   @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to bind driver to
+  @param  Controller           Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
-  @retval EFI_SUCCESS          This driver is added to ControllerHandle
-  @retval other                This driver does not support this device
+  @retval EFI_SUCCESS          This driver is added to Controller.
+  @retval other                This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -390,7 +385,7 @@ GraphicsConsoleControllerDriverStart (
     SimplifiedFont->NumberOfNarrowGlyphs = (UINT16) (NarrowFontSize / sizeof (EFI_NARROW_GLYPH));
 
     Location = (UINT8 *) (&SimplifiedFont->NumberOfWideGlyphs + 1);
-    CopyMem (Location, UsStdNarrowGlyphData, NarrowFontSize);
+    CopyMem (Location, gUsStdNarrowGlyphData, NarrowFontSize);
 
     //
     // Add this simplified font package to a package list then install it.
@@ -509,22 +504,22 @@ GraphicsConsoleControllerDriverStart (
   // Add Mode #0 that must be 80x25
   //
   MaxMode = 0;
-  Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
-  Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
+  Private->ModeData[MaxMode].GopWidth      = HorizontalResolution;
+  Private->ModeData[MaxMode].GopHeight     = VerticalResolution;
   Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-  Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (80 * EFI_GLYPH_WIDTH)) >> 1;
-  Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (25 * EFI_GLYPH_HEIGHT)) >> 1;
+  Private->ModeData[MaxMode].DeltaX        = (HorizontalResolution - (80 * EFI_GLYPH_WIDTH)) >> 1;
+  Private->ModeData[MaxMode].DeltaY        = (VerticalResolution - (25 * EFI_GLYPH_HEIGHT)) >> 1;
   MaxMode++;
 
   //
   // If it is possible to support Mode #1 - 80x50, than add it as an active mode
   //
   if (Rows >= 50) {
-    Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
-    Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
+    Private->ModeData[MaxMode].GopWidth      = HorizontalResolution;
+    Private->ModeData[MaxMode].GopHeight     = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (80 * EFI_GLYPH_WIDTH)) >> 1;
-    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (50 * EFI_GLYPH_HEIGHT)) >> 1;
+    Private->ModeData[MaxMode].DeltaX        = (HorizontalResolution - (80 * EFI_GLYPH_WIDTH)) >> 1;
+    Private->ModeData[MaxMode].DeltaY        = (VerticalResolution - (50 * EFI_GLYPH_HEIGHT)) >> 1;
     MaxMode++;
   }
 
@@ -532,13 +527,13 @@ GraphicsConsoleControllerDriverStart (
   // If it is not to support Mode #1 - 80x50, then skip it
   //
   if (MaxMode < 2) {
-    Private->ModeData[MaxMode].Columns    = 0;
-    Private->ModeData[MaxMode].Rows       = 0;
-    Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
-    Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
+    Private->ModeData[MaxMode].Columns       = 0;
+    Private->ModeData[MaxMode].Rows          = 0;
+    Private->ModeData[MaxMode].GopWidth      = HorizontalResolution;
+    Private->ModeData[MaxMode].GopHeight     = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-    Private->ModeData[MaxMode].DeltaX     = 0;
-    Private->ModeData[MaxMode].DeltaY     = 0;
+    Private->ModeData[MaxMode].DeltaX        = 0;
+    Private->ModeData[MaxMode].DeltaY        = 0;
     MaxMode++;
   }
 
@@ -546,11 +541,11 @@ GraphicsConsoleControllerDriverStart (
   // Add Mode #2 that must be 100x31 (graphic mode >= 800x600)
   //
   if (Columns >= 100 && Rows >= 31) {
-    Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
-    Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
+    Private->ModeData[MaxMode].GopWidth      = HorizontalResolution;
+    Private->ModeData[MaxMode].GopHeight     = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution - (100 * EFI_GLYPH_WIDTH)) >> 1;
-    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution - (31 * EFI_GLYPH_HEIGHT)) >> 1;
+    Private->ModeData[MaxMode].DeltaX        = (HorizontalResolution - (100 * EFI_GLYPH_WIDTH)) >> 1;
+    Private->ModeData[MaxMode].DeltaY        = (VerticalResolution - (31 * EFI_GLYPH_HEIGHT)) >> 1;
     MaxMode++;
   }
 
@@ -558,13 +553,13 @@ GraphicsConsoleControllerDriverStart (
   // Add Mode #3 that uses the entire display for user-defined mode
   //
   if (HorizontalResolution > 800 && VerticalResolution > 600) {
-    Private->ModeData[MaxMode].Columns    = HorizontalResolution/EFI_GLYPH_WIDTH;
-    Private->ModeData[MaxMode].Rows       = VerticalResolution/EFI_GLYPH_HEIGHT;
-    Private->ModeData[MaxMode].GopWidth   = HorizontalResolution;
-    Private->ModeData[MaxMode].GopHeight  = VerticalResolution;
+    Private->ModeData[MaxMode].Columns       = HorizontalResolution/EFI_GLYPH_WIDTH;
+    Private->ModeData[MaxMode].Rows          = VerticalResolution/EFI_GLYPH_HEIGHT;
+    Private->ModeData[MaxMode].GopWidth      = HorizontalResolution;
+    Private->ModeData[MaxMode].GopHeight     = VerticalResolution;
     Private->ModeData[MaxMode].GopModeNumber = ModeNumber;
-    Private->ModeData[MaxMode].DeltaX     = (HorizontalResolution % EFI_GLYPH_WIDTH) >> 1;
-    Private->ModeData[MaxMode].DeltaY     = (VerticalResolution % EFI_GLYPH_HEIGHT) >> 1;
+    Private->ModeData[MaxMode].DeltaX        = (HorizontalResolution % EFI_GLYPH_WIDTH) >> 1;
+    Private->ModeData[MaxMode].DeltaY        = (VerticalResolution % EFI_GLYPH_HEIGHT) >> 1;
     MaxMode++;
   }
 
@@ -598,7 +593,7 @@ GraphicsConsoleControllerDriverStart (
 Error:
   if (EFI_ERROR (Status)) {
     //
-    // Close the GOP or UGA IO Protocol
+    // Close the GOP and UGA Draw Protocol
     //
     if (Private->GraphicsOutput != NULL) {
       gBS->CloseProtocol (
@@ -631,20 +626,20 @@ Error:
 }
 
 /**
-  Stop this driver on ControllerHandle by removing Simple Text Out protocol 
-  and closing the Graphics Output Protocol or UGA Draw protocol on ControllerHandle.
+  Stop this driver on Controller by removing Simple Text Out protocol 
+  and closing the Graphics Output Protocol or UGA Draw protocol on Controller.
   (UGA Draw protocol could be shkipped if PcdUgaConsumeSupport is set to FALSE.)
   
 
   @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on
+  @param  Controller        Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
   @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS       This driver is removed Controller.
   @retval EFI_NOT_STARTED   Simple Text Out protocol could not be found the 
-                            ControllerHandle.
+                            Controller.
   @retval other             This driver was not removed from this device.
 
 **/
@@ -732,7 +727,7 @@ GraphicsConsoleControllerDriverStop (
   @param  VerticalResolution    User defined vertical resolution.
   @param  CurrentModeNumber     Current specific mode to be check.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS       The mode is supported.
   @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics 
                             devcie supported.
   @retval other             The specific mode does not support user defined 
@@ -1640,7 +1635,7 @@ GraphicsConsoleConOutSetCursorPosition (
     goto Done;
   }
 
-  if (((INT32) Column == This->Mode->CursorColumn) && ((INT32) Row == This->Mode->CursorRow)) {
+  if ((This->Mode->CursorColumn == (INT32) Column) && (This->Mode->CursorRow == (INT32) Row)) {
     Status = EFI_SUCCESS;
     goto Done;
   }
@@ -1762,7 +1757,10 @@ DrawUnicodeWeightAtCursorN (
     SafeFreePool (Blt);
     return EFI_OUT_OF_RESOURCES;
   }
-  *(String + Count) = 0;
+  //
+  // Set the end character
+  //
+  *(String + Count) = L'\0';
 
   FontInfo = (EFI_FONT_DISPLAY_INFO *) AllocateZeroPool (sizeof (EFI_FONT_DISPLAY_INFO));
   if (FontInfo == NULL) {
@@ -1770,9 +1768,15 @@ DrawUnicodeWeightAtCursorN (
     SafeFreePool (String);
     return EFI_OUT_OF_RESOURCES;
   }
+  //
+  // Get current foreground and background colors.
+  //
   GetTextColors (This, &FontInfo->ForegroundColor, &FontInfo->BackgroundColor);
 
   if (Private->GraphicsOutput != NULL) {
+    //
+    // If Graphcis Output protocol exists, using HII Font protocol to draw. 
+    //
     Blt->Image.Screen = Private->GraphicsOutput;
 
     Status = mHiiFont->StringToImage (
@@ -1789,6 +1793,10 @@ DrawUnicodeWeightAtCursorN (
                          );
 
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+    //
+    // If Graphics Output protocol cannot be found and PcdUgaConsumeSupport enabled, 
+    // using UGA Draw protocol to draw.
+    //
     ASSERT (Private->UgaDraw!= NULL);
 
     UgaDraw = Private->UgaDraw;
