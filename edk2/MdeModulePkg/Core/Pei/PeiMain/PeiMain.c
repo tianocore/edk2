@@ -20,10 +20,10 @@ STATIC EFI_PEI_PPI_DESCRIPTOR mMemoryDiscoveredPpi = {
   NULL
 };
 
-//
-// Pei Core Module Variables
-//
-//
+///
+/// Pei Core Module Variables
+///
+///
 STATIC EFI_PEI_SERVICES  gPs = {
   {
     PEI_SERVICES_SIGNATURE,
@@ -107,12 +107,20 @@ PeiCore (
   mTick = 0;
   OldCoreData = (PEI_CORE_INSTANCE *) Data;
 
+  //
+  // Record the system tick for first entering PeiCore.
+  // This tick is duration of executing platform seccore module.
+  // 
   if (PerformanceMeasurementEnabled()) {
     if (OldCoreData == NULL) {
       mTick = GetPerformanceCounter ();
     }
   }
 
+  //
+  // PeiCore has been shadowed to memory for first entering, so
+  // just jump to PeiCore in memory here.
+  //
   if (OldCoreData != NULL) {
     ShadowedPeiCore = (PEI_CORE_ENTRY_POINT) (UINTN) OldCoreData->ShadowedPeiCore;
     if (ShadowedPeiCore != NULL) {
@@ -143,7 +151,6 @@ PeiCore (
 
   //
   // Initialize libraries that the PeiCore is linked against
-  // BUGBUG: The FileHandle is passed in as NULL.  Do we look it up or remove it from the lib init?
   //
   ProcessLibraryConstructorList (NULL, &PrivateData.PS);
 
@@ -213,6 +220,10 @@ PeiCore (
   //
   ASSERT(PrivateData.PeiMemoryInstalled == TRUE);
 
+  //
+  // Till now, PEI phase will be finished, get performace count
+  // for computing duration of PEI phase
+  //
   PERF_END (NULL, "PostMem", NULL, 0);
 
   Status = PeiServicesLocatePpi (
@@ -223,6 +234,9 @@ PeiCore (
              );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Enter DxeIpl to load Dxe core.
+  //
   DEBUG ((EFI_D_INFO, "DXE IPL Entry\n"));
   Status = TempPtr.DxeIpl->Entry (
                              TempPtr.DxeIpl,

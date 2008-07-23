@@ -229,7 +229,6 @@ PeimDispatchReadiness (
         // The grammar should never arrive here
         //
         return FALSE;
-        break;
     }
   }
 }

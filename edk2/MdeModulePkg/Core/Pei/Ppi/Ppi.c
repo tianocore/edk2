@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Initialize PPI services.
 
-
   @param PrivateData     Pointer to the PEI Core data.
   @param OldCoreData     Pointer to old PEI Core data. 
                          NULL if being run in non-permament memory mode.
@@ -50,17 +49,14 @@ InitializePpiServices (
 **/
 VOID
 ConvertPpiPointers (
-  IN CONST EFI_PEI_SERVICES        **PeiServices,
-  IN UINTN                         OldCheckingBottom,
-  IN UINTN                         OldCheckingTop,
-  IN UINTN                         Fixup
+  IN PEI_CORE_INSTANCE       *PrivateData,
+  IN UINTN                   OldCheckingBottom,
+  IN UINTN                   OldCheckingTop,
+  IN INTN                    Fixup
   )
 {
-  PEI_CORE_INSTANCE     *PrivateData;
   UINT8                 Index;
   PEI_PPI_LIST_POINTERS *PpiPointer;
-
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
 
   for (Index = 0; Index < FixedPcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
     if (Index < PrivateData->PpiData.PpiListEnd ||
@@ -342,7 +338,6 @@ PeiLocatePpi (
 
   Install a notification for a given PPI.
 
-
   @param PeiServices     - Pointer to the PEI Service Table
   @param NotifyList      - Pointer to list of Descriptors to notify upon.
 
@@ -450,7 +445,6 @@ PeiNotifyPpi (
     LastCallbackNotify,
     PrivateData->PpiData.NotifyListEnd
     );
-
 
   return  EFI_SUCCESS;
 }
@@ -578,7 +572,5 @@ DispatchNotify (
       }
     }
   }
-
-  return;
 }
 

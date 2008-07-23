@@ -75,12 +75,12 @@
   gEfiPeiStatusCodePpiGuid                      # PPI SOMETIMES_CONSUMED
   gEfiPeiResetPpiGuid                           # PPI SOMETIMES_CONSUMED
   gEfiDxeIplPpiGuid                             # PPI ALWAYS_CONSUMED
-  gEfiPeiMemoryDiscoveredPpiGuid                # PPI ALWAYS_PRODUCED
-  gEfiPeiDecompressPpiGuid
-  gEfiPeiFirmwareVolumeInfoPpiGuid
-  gEfiPeiLoadFilePpiGuid
-  gEfiPeiSecurity2PpiGuid
-  gEfiTemporaryRamSupportPpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid                # PPI ALWAYS_CONSUMED
+  gEfiPeiDecompressPpiGuid                      # PPI ALWAYS_CONSUMED
+  gEfiPeiFirmwareVolumeInfoPpiGuid              # PPI ALWAYS_CONSUMED
+  gEfiPeiLoadFilePpiGuid                        # PPI ALWAYS_CONSUMED
+  gEfiPeiSecurity2PpiGuid                       # PPI ALWAYS_CONSUMED
+  gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_CONSUMED
 
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported
@@ -89,7 +89,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize
-
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst
