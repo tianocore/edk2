@@ -1,6 +1,10 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+  Defination for the USB mass storage Bulk-Only Transport protocol.
+  This implementation is based on the "Universal Serial Bus Mass
+  Storage Class Bulk-Only Transport" Revision 1.0, September 31, 1999.
+
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,25 +13,12 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  UsbMassBot.h
-
-Abstract:
-
-  Defination for the USB mass storage Bulk-Only Transport protocol.
-  This implementation is based on the "Universal Serial Bus Mass
-  Storage Class Bulk-Only Transport" Revision 1.0, September 31, 1999.
-
-Revision History
-
-
 **/
 
 #ifndef _EFI_USBMASS_BOT_H_
 #define _EFI_USBMASS_BOT_H_
 
-enum {
+typedef enum {
   //
   // Usb Bulk-Only class specfic request
   //
@@ -61,7 +52,7 @@ enum {
   USB_BOT_SEND_CBW_TIMEOUT     = 3 * USB_MASS_1_SECOND,
   USB_BOT_RECV_CSW_TIMEOUT     = 3 * USB_MASS_1_SECOND,
   USB_BOT_RESET_DEVICE_TIMEOUT = 3 * USB_MASS_1_SECOND
-};
+}USB_BOT_SUBCLASS;
 
 //
 // The CBW (Command Block Wrapper) and CSW (Command Status Wrapper)

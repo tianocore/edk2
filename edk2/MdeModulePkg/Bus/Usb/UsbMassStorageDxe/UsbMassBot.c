@@ -1,5 +1,7 @@
 /** @file
 
+  Implementation of the USB mass storage Bulk-Only Transport protocol.
+
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,23 +11,22 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  UsbMassBot.c
-
-Abstract:
-
-  Implementation of the USB mass storage Bulk-Only Transport protocol.
-
-Revision History
-
-
 **/
 
 #include "UsbMass.h"
 #include "UsbMassBot.h"
 
-STATIC
+/**
+  Reset the mass storage device by BOT protocol.
+
+  @param  Context               The context of the BOT protocol, that is,
+                                USB_BOT_PROTOCOL.
+  @param  ExtendedVerification  The flag controlling the rule of reset dev.
+
+  @retval EFI_SUCCESS           The device is reset.
+  @retval Others                Failed to reset the device..
+
+**/
 EFI_STATUS
 UsbBotResetDevice (
   IN  VOID                    *Context,
@@ -44,9 +45,9 @@ UsbBotResetDevice (
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory
   @retval EFI_UNSUPPORTED       The transport protocol doesn't support the device.
   @retval EFI_SUCCESS           The device is supported and protocol initialized.
+  @retval Other                 The UBS BOT initialization fails.
 
 **/
-STATIC
 EFI_STATUS
 UsbBotInit (
   IN  EFI_USB_IO_PROTOCOL       * UsbIo,
@@ -140,7 +141,7 @@ ON_ERROR:
 
 
 /**
-  Send the command to the device using Bulk-Out endpoint
+  Send the command to the device using Bulk-Out endpoint.
 
   @param  UsbBot                The USB BOT device
   @param  Cmd                   The command to transfer to device
@@ -154,7 +155,6 @@ ON_ERROR:
   @retval Others                Failed to send the command to device
 
 **/
-STATIC
 EFI_STATUS
 UsbBotSendCommand (
   IN USB_BOT_PROTOCOL         *UsbBot,
@@ -232,7 +232,6 @@ UsbBotSendCommand (
   @retval Others                Failed to transfer data
 
 **/
-STATIC
 EFI_STATUS
 UsbBotDataTransfer (
   IN USB_BOT_PROTOCOL         *UsbBot,
@@ -294,17 +293,15 @@ UsbBotDataTransfer (
   and return the high level command execution result in Result. So
   even it returns EFI_SUCCESS, the command may still have failed.
 
-  @param  UsbBot                The USB BOT device
-  @param  TransLen              The expected length of the data
-  @param  Timeout               The time to wait the command to complete
+  @param  UsbBot                The USB BOT device.
+  @param  TransLen              The expected length of the data.
   @param  CmdStatus             The result of the command execution.
 
-  @retval EFI_DEVICE_ERROR      Failed to retrieve the command execute result
   @retval EFI_SUCCESS           Command execute result is retrieved and in the
                                 Result.
+  @retval Other                 Failed to get status.
 
 **/
-STATIC
 EFI_STATUS
 UsbBotGetStatus (
   IN  USB_BOT_PROTOCOL      *UsbBot,
@@ -380,7 +377,7 @@ UsbBotGetStatus (
 
 /**
   Call the Usb mass storage class transport protocol to issue
-  the command/data/status circle to execute the commands
+  the command/data/status circle to execute the commands.
 
   @param  Context               The context of the BOT protocol, that is,
                                 USB_BOT_PROTOCOL
@@ -393,11 +390,10 @@ UsbBotGetStatus (
   @param  Timeout               The time to wait command
   @param  CmdStatus             The result of high level command execution
 
-  @retval EFI_DEVICE_ERROR      Failed to excute command
   @retval EFI_SUCCESS           The command is executed OK, and result in CmdStatus
+  @retval Other                 Failed to excute command
 
 **/
-STATIC
 EFI_STATUS
 UsbBotExecCommand (
   IN  VOID                    *Context,
@@ -455,16 +451,16 @@ UsbBotExecCommand (
 
 
 /**
-  Reset the mass storage device by BOT protocol
+  Reset the mass storage device by BOT protocol.
 
   @param  Context               The context of the BOT protocol, that is,
-                                USB_BOT_PROTOCOL
+                                USB_BOT_PROTOCOL.
+  @param  ExtendedVerification  The flag controlling the rule of reset dev.
 
-  @retval EFI_SUCCESS           The device is reset
-  @retval Others                Failed to reset the device.
+  @retval EFI_SUCCESS           The device is reset.
+  @retval Others                Failed to reset the device..
 
 **/
-STATIC
 EFI_STATUS
 UsbBotResetDevice (
   IN  VOID                    *Context,
@@ -530,48 +526,23 @@ UsbBotResetDevice (
   return Status;
 }
 
-/*++
 
-Routine Description:
+/**
+  Get the max lun of mass storage device.
 
-  Reset the mass storage device by BOT protocol
+  @param  Context          The context of the BOT protocol, that is, USB_BOT_PROTOCOL
+  @param  MaxLun           Return pointer to the max number of lun. Maxlun=1 means lun0 and
+                           lun1 in all.
 
-Arguments:
+  @retval EFI_SUCCESS      Get max lun success.
+  @retval Others           Failed to execute this request.
 
-  Context - The context of the BOT protocol, that is, USB_BOT_PROTOCOL
-  MaxLun  - Return pointer to the max number of lun. Maxlun=1 means lun0 and 
-            lun1 in all.
-
-Returns:
-
-  EFI_SUCCESS - The device is reset
-  Others      - Failed to reset the device.
-
---*/
-STATIC
+**/
 EFI_STATUS
 UsbBotGetMaxLun (
   IN  VOID                    *Context,
   IN  UINT8                   *MaxLun
   )
-/*++
-
-Routine Description:
-
-  Reset the mass storage device by BOT protocol
-
-Arguments:
-
-  Context - The context of the BOT protocol, that is, USB_BOT_PROTOCOL
-  MaxLun  - Return pointer to the max number of lun. Maxlun=1 means lun0 and 
-            lun1 in all.
-
-Returns:
-
-  EFI_SUCCESS - The device is reset
-  Others      - Failed to reset the device.
-
---*/
 {
   USB_BOT_PROTOCOL        *UsbBot;
   EFI_USB_DEVICE_REQUEST  Request;
@@ -612,15 +583,14 @@ Returns:
 }
 
 /**
-  Clean up the resource used by this BOT protocol
+  Clean up the resource used by this BOT protocol.
 
   @param  Context               The context of the BOT protocol, that is,
-                                USB_BOT_PROTOCOL
+                                USB_BOT_PROTOCOL.
 
   @retval EFI_SUCCESS           The resource is cleaned up.
 
 **/
-STATIC
 EFI_STATUS
 UsbBotFini (
   IN  VOID                    *Context

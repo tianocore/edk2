@@ -1,5 +1,7 @@
 /** @file
 
+  The implementation of USB mass storage class device driver.
+
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,17 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  UsbMassImpl.h
-
-Abstract:
-
-  The implementation of USB mass storage class device driver.
-
-Revision History
-
 
 **/
 
@@ -32,17 +23,17 @@ typedef struct _USB_MASS_DEVICE USB_MASS_DEVICE;
 #include "UsbMassCbi.h"
 #include "UsbMassBoot.h"
 
-enum {
-  //
-  // MassStorage raises TPL to TPL_NOTIFY to serialize all its operations
-  // to protect shared data structures.
-  //
-  USB_MASS_TPL          = TPL_NOTIFY,
-  
-  USB_MASS_SIGNATURE    = EFI_SIGNATURE_32 ('U', 's', 'b', 'M')
-};
 
-struct _USB_MASS_DEVICE {
+//
+// MassStorage raises TPL to TPL_NOTIFY to serialize all its operations
+// to protect shared data structures.
+//
+#define  USB_MASS_TPL          TPL_NOTIFY
+
+#define  USB_MASS_SIGNATURE    EFI_SIGNATURE_32 ('U', 's', 'b', 'M')
+
+
+typedef struct _USB_MASS_DEVICE {
   UINT32                    Signature;
   EFI_HANDLE                Controller;
   EFI_USB_IO_PROTOCOL       *UsbIo;
@@ -54,7 +45,7 @@ struct _USB_MASS_DEVICE {
   UINT8                     Pdt;          // Peripheral Device Type
   USB_MASS_TRANSPORT        *Transport;   // USB mass storage transport protocol
   VOID                      *Context;     // Opaque storage for mass transport
-};
+}USB_MASS_DEVICE;
 
 #define USB_MASS_DEVICE_FROM_BLOCKIO(a) \
         CR (a, USB_MASS_DEVICE, BlockIo, USB_MASS_SIGNATURE)

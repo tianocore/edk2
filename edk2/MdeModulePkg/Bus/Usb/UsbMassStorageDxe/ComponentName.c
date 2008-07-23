@@ -1,4 +1,5 @@
 /** @file
+
   UEFI Component Name(2) protocol implementation.
 
 Copyright (c) 2004 - 2007, Intel Corporation
@@ -9,13 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  ComponentName.c
-
-Abstract:
-
 
 **/
 
