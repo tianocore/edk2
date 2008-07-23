@@ -1,5 +1,9 @@
 /** @file
 
+  The implementation of USB mass storage class device driver.
+  The command set supported is "USB Mass Storage Specification
+  for Bootability".
+
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,29 +13,10 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  UsbMassImpl.c
-
-Abstract:
-
-  The implementation of USB mass storage class device driver.
-  The command set supported is "USB Mass Storage Specification
-  for Bootability".
-
-Revision History
-
-
 **/
 
 #include "UsbMassImpl.h"
 
-//
-// The underlying transport protocol. CBI support isn't included
-// in the current build. It is being obseleted by the standard
-// body. If you want to enable it, remove the if directive here,
-// then add the UsbMassCbi.c/.h to the driver's inf file.
-//
 STATIC
 USB_MASS_TRANSPORT *mUsbMassTransport[] = {
   &mUsbCbi0Transport,
@@ -355,7 +340,19 @@ UsbMassInitMedia (
   return Status;
 }
 
-STATIC
+/**
+  Initilize the transport.
+
+  @param  This            The USB mass driver's driver binding.
+  @param  Controller      The device to test.
+  @param  Transport       The pointer to pointer to USB_MASS_TRANSPORT.
+  @param  Context         The passing parameter.
+  @param  MaxLun          Get the MaxLun if is BOT dev.
+
+  @retval EFI_SUCCESS     The initilization is successful.
+  @retval Others          Failed to initilize dev.
+
+**/
 EFI_STATUS
 UsbMassInitTransport (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -425,7 +422,20 @@ ON_EXIT:
   return Status;  
 }
 
-STATIC
+/**
+  Usb mass storage driver initializes multi lun.
+
+  @param  This            The USB mass driver's driver binding.
+  @param  Controller      The device to test.
+  @param  Transport       The pointer to USB_MASS_TRANSPORT.
+  @param  Context         The passing parameter.
+  @param  DevicePath      The remaining device path
+  @param  MaxLun          The MaxLun number passed.
+
+  @retval EFI_SUCCESS     Initialization is success.
+  @retval Other           Initialization fails.
+
+**/
 EFI_STATUS
 UsbMassInitMultiLun (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -576,7 +586,18 @@ ON_ERROR:
   } 
 }
 
-STATIC
+/**
+  Initialize No/Unsupported LUN device.
+
+  @param This             The USB mass driver's driver binding.
+  @param Controller       The device to test.
+  @param Transport        The pointer to USB_MASS_TRANSPORT.
+  @param Context          The passing parameter.
+
+  @retval EFI_SUCCESS     Initialization is success.
+  @retval Other           Initialization fails.
+
+**/
 EFI_STATUS
 UsbMassInitNonLun (
   IN EFI_DRIVER_BINDING_PROTOCOL   *This,
@@ -1006,30 +1027,23 @@ EFI_DRIVER_BINDING_PROTOCOL gUSBMassDriverBinding = {
   NULL
 };
 
+/**
+  The entry point for the driver, which will install the driver binding and
+  component name protocol.
+
+  @param  ImageHandle       The image handle of this driver.
+  @param  SystemTable       The system table.
+
+  @retval EFI_SUCCESS       The protocols are installed OK.
+  @retval Others            Failed to install protocols.
+
+**/
 EFI_STATUS
 EFIAPI
 USBMassStorageEntryPoint (
   IN EFI_HANDLE               ImageHandle,
   IN EFI_SYSTEM_TABLE         *SystemTable
   )
-/*++
-
-Routine Description:
-
-  The entry point for the driver, which will install the driver binding and
-  component name protocol
-
-Arguments:
-
-  ImageHandle - The image handle of this driver
-  SystemTable - The system table
-
-Returns:
-
-  EFI_SUCCESS - the protocols are installed OK
-  Others      - Failed to install protocols.
-
---*/
 {
   EFI_STATUS  Status;
 

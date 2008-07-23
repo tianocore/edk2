@@ -1,20 +1,5 @@
 /** @file
 
-Copyright (c) 2007 - 2008, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  UsbMass.h
-
-Abstract:
-
   Defination for the USB mass storage class driver. The USB mass storage
   class is specified in two layers: the bottom layer is the transportation
   protocol. The top layer is the command set. The transportation layer
@@ -23,8 +8,14 @@ Abstract:
   Control/Bulk/Interrupt transport are two transportation protocol. USB mass
   storage class adopts various industrial standard as its command set.
 
-Revision History
+Copyright (c) 2007 - 2008, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -52,7 +43,7 @@ Revision History
 #define USB_IS_INTERRUPT_ENDPOINT(Attribute)  (((Attribute) & 0x03) == 0x03)
 #define USB_IS_ERROR(Result, Error)           (((Result) & (Error)) != 0)
 
-enum {
+typedef enum {
   //
   // Usb mass storage class code
   //
@@ -81,7 +72,7 @@ enum {
   USB_MASS_CMD_SUCCESS    = 0,
   USB_MASS_CMD_FAIL,
   USB_MASS_CMD_PERSISTENT
-};
+}USB_MASS_DEV_CLASS_AND_VALUE;
 
 typedef
 EFI_STATUS
@@ -142,10 +133,21 @@ typedef struct {
 } USB_MASS_TRANSPORT;
 
 
+/**
+  Use the USB clear feature control transfer to clear the endpoint
+  stall condition.
+
+  @param  UsbIo                  The USB IO protocol to use
+  @param  EndpointAddr           The endpoint to clear stall for
+
+  @retval EFI_SUCCESS            The endpoint stall condtion is clear
+  @retval Others                 Failed to clear the endpoint stall condtion
+
+**/
 EFI_STATUS
 UsbClearEndpointStall (
   IN EFI_USB_IO_PROTOCOL      *UsbIo,
-  IN UINT8                    EndpointAddress
+  IN UINT8                    EndpointAddr
   );
 
 #endif

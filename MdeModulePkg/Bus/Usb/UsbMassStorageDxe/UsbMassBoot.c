@@ -1,5 +1,8 @@
 /** @file
 
+  This file implement the command set of "USB Mass Storage Specification
+  for Bootability".
+
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,42 +12,21 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  UsbMassBoot.c
-
-Abstract:
-
-  This file implement the command set of "USB Mass Storage Specification
-  for Bootability".
-
-Revision History
-
-
 **/
 
 #include "UsbMassImpl.h"
 
 
+/**
+  Return the current TPL.
+
+  @return Current TPL.
+
+**/
 EFI_TPL
 UsbGetCurrentTpl (
   VOID
   )
-/*++
-
-Routine Description:
-
-  return the current TPL, copied from the EDKII glue lib.
-
-Arguments:
-
-  VOID
-
-Returns:
-
-  Current TPL
-
---*/
 {
   EFI_TPL                 Tpl;
 
@@ -57,7 +39,7 @@ Returns:
 /**
   Read an UINT32 from the buffer to avoid byte alignment problems, then
   convert that to the little endia. The USB mass storage bootability spec
-  use big endia
+  use big endia.
 
   @param  Buf                    The buffer contains the first byte of the UINT32
                                  in big endia.
@@ -65,7 +47,6 @@ Returns:
   @return The UINT32 value read from the buffer in little endia.
 
 **/
-STATIC
 UINT32
 UsbBootGetUint32 (
   IN UINT8                  *Buf
@@ -82,13 +63,12 @@ UsbBootGetUint32 (
   Put an UINT32 in little endia to the buffer. The data is converted to
   big endia before writing.
 
-  @param  Buf                    The buffer to write data to
+  @param  Buf                    The buffer to write data to.
   @param  Data32                 The data to write.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UsbBootPutUint32 (
   IN UINT8                  *Buf,
@@ -99,18 +79,16 @@ UsbBootPutUint32 (
   CopyMem (Buf, &Data32, sizeof (UINT32));
 }
 
-
 /**
   Put an UINT16 in little endia to the buffer. The data is converted to
   big endia before writing.
 
-  @param  Buf                    The buffer to write data to
-  @param  Data16                 The data to write
+  @param  Buf                    The buffer to write data to.
+  @param  Data16                 The data to write.
 
-  @return None
+  @return None.
 
 **/
-STATIC
 VOID
 UsbBootPutUint16 (
   IN UINT8                   *Buf,
@@ -121,15 +99,18 @@ UsbBootPutUint16 (
   CopyMem (Buf, &Data16, sizeof (UINT16));
 }
 
-
 /**
   Request sense information via sending Request Sense
   Packet Command.
 
-  @param  UsbMass                The device to be requested sense data
+  @param  UsbMass                The device to be requested sense data.
 
-  @retval EFI_DEVICE_ERROR       Hardware error
-  @retval EFI_SUCCESS            Success
+  @retval EFI_SUCCESS            The command is excuted OK.
+  @retval EFI_DEVICE_ERROR       Failed to request sense.
+  @retval EFI_NO_RESPONSE        The device media doesn't response this request.
+  @retval EFI_INVALID_PARAMETER  The command has some invalid parameters.
+  @retval EFI_WRITE_PROTECTED    The device is write protected.
+  @retval EFI_MEDIA_CHANGED      The device media has been changed.
 
 **/
 EFI_STATUS
@@ -257,7 +238,6 @@ UsbBootRequestSense (
   @retval EFI_MEDIA_CHANGED      The device media has been changed
 
 **/
-STATIC
 EFI_STATUS
 UsbBootExecCmd (
   IN USB_MASS_DEVICE            *UsbMass,
@@ -311,6 +291,7 @@ UsbBootExecCmd (
   @param  DataDir                The direction of data transfer
   @param  Data                   The buffer to hold the data
   @param  DataLen                The length of expected data
+  @param  Timeout                The timeout used to transfer
 
   @retval EFI_SUCCESS            The command is excuted OK
   @retval EFI_DEVICE_ERROR       Failed to request sense
@@ -319,7 +300,6 @@ UsbBootExecCmd (
   @retval EFI_MEDIA_CHANGED      The device media has been changed
 
 **/
-STATIC
 EFI_STATUS
 UsbBootExecCmdWithRetry (
   IN USB_MASS_DEVICE          *UsbMass,
@@ -367,7 +347,6 @@ UsbBootExecCmdWithRetry (
 
   return Status;
 }
-
 
 
 /**
@@ -471,7 +450,8 @@ UsbBootInquiry (
 
   @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
   @retval EFI_DEVICE_ERROR       Something is inconsistent with the disk gemotric.
-
+  @retval Other                  Read capacity request fails.
+ 
 **/
 EFI_STATUS
 UsbBootReadCapacity (
@@ -521,15 +501,14 @@ UsbBootReadCapacity (
   return EFI_SUCCESS;
 }
 
-
 /**
   Retrieves mode sense information via sending Mode Sense
   Packet Command.
 
   @param  UsbMass                The USB_FLOPPY_DEV instance.
 
-  @retval EFI_DEVICE_ERROR       Hardware error
   @retval EFI_SUCCESS            Success
+  @retval Other                  Execute Request command fails.
 
 **/
 EFI_STATUS
@@ -570,7 +549,7 @@ UsbScsiModeSense (
   // devices support this command, so have a try here.
   //
   if (!EFI_ERROR (Status)) {
-    Media->ReadOnly = (BOOLEAN) ((ModeParaHeader.DevicePara & 0x80) ? TRUE : FALSE);
+    Media->ReadOnly = (BOOLEAN) (((ModeParaHeader.DevicePara & 0x80) != 0) ? TRUE : FALSE);
   }
 
   return Status;
@@ -588,7 +567,7 @@ UsbScsiModeSense (
   @param  UsbMass                The device to retireve disk gemotric.
 
   @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
-  @retval EFI_DEVICE_ERROR       Something is inconsistent with the disk gemotric.
+  @retval Other                  Get the parameters failed.
 
 **/
 EFI_STATUS
@@ -646,7 +625,7 @@ UsbBootGetParams (
   @param  UsbMass                The device to retireve disk gemotric.
 
   @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
-  @retval EFI_DEVICE_ERROR       Something is inconsistent with the disk gemotric.
+  @retval Other                  Decect media fails.
 
 **/
 EFI_STATUS

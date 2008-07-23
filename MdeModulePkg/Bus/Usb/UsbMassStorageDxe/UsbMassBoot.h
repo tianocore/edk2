@@ -26,7 +26,7 @@ Revision History
 #ifndef _EFI_USB_MASS_BOOT_H_
 #define _EFI_USB_MASS_BOOT_H_
 
-enum {
+typedef enum {
   //
   // The opcodes of various usb boot commands:
   // INQUIRY/REQUEST_SENSE are "No Timeout Commands" as specified
@@ -101,7 +101,7 @@ enum {
   // 
   //
   USB_BOOT_GENERAL_CMD_TIMEOUT    = 5 * USB_MASS_1_SECOND
-};
+}USB_BOOT_OPTCODE;
 
 //
 // The required commands are INQUIRY, READ CAPACITY, TEST UNIT READY,
@@ -249,21 +249,71 @@ typedef struct {
 #define USB_BOOT_SWAP16(Data16) \
                 ((((Data16) & 0x00ff) << 8) | (((Data16) & 0xff00) >> 8))
 
+
+/**
+  Get the parameters for the USB mass storage media, including
+  the RemovableMedia, block size, and last block number. This
+  function is used both to initialize the media during the
+  DriverBindingStart and to re-initialize it when the media is
+  changed. Althought the RemoveableMedia is unlikely to change,
+  I include it here.
+
+  @param  UsbMass                The device to retireve disk gemotric.
+
+  @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
+  @retval Other                  Get the parameters failed.
+
+**/
 EFI_STATUS
 UsbBootGetParams (
   IN USB_MASS_DEVICE          *UsbMass
   );
 
+
+/**
+  Use the TEST UNIT READY command to check whether it is ready.
+  If it is ready, update the parameters.
+
+  @param  UsbMass                The device to test
+
+  @retval EFI_SUCCESS            The device is ready and parameters are updated.
+  @retval Others                 Device not ready.
+
+**/
 EFI_STATUS
 UsbBootIsUnitReady (
   IN USB_MASS_DEVICE          *UsbMass
   );
 
+
+/**
+  Detect whether the removable media is present and whether it has changed.
+  The Non-removable media doesn't need it.
+
+  @param  UsbMass                The device to retireve disk gemotric.
+
+  @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
+  @retval Other                  Decect media fails.
+
+**/
 EFI_STATUS
 UsbBootDetectMedia (
   IN  USB_MASS_DEVICE       *UsbMass
   );
 
+
+/**
+  Read some blocks from the device.
+
+  @param  UsbMass                The USB mass storage device to read from
+  @param  Lba                    The start block number
+  @param  TotalBlock             Total block number to read
+  @param  Buffer                 The buffer to read to
+
+  @retval EFI_SUCCESS            Data are read into the buffer
+  @retval Others                 Failed to read all the data
+
+**/
 EFI_STATUS
 UsbBootReadBlocks (
   IN  USB_MASS_DEVICE         *UsbMass,
@@ -272,6 +322,19 @@ UsbBootReadBlocks (
   OUT UINT8                   *Buffer
   );
 
+
+/**
+  Write some blocks to the device.
+
+  @param  UsbMass                The USB mass storage device to write to
+  @param  Lba                    The start block number
+  @param  TotalBlock             Total block number to write
+  @param  Buffer                 The buffer to write to
+
+  @retval EFI_SUCCESS            Data are written into the buffer
+  @retval Others                 Failed to write all the data
+
+**/
 EFI_STATUS
 UsbBootWriteBlocks (
   IN  USB_MASS_DEVICE         *UsbMass,
