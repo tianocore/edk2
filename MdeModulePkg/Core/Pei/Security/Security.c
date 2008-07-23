@@ -40,12 +40,10 @@ STATIC EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
 };
 
 /**
-
   Initialize the security services.
 
-
-  @param PeiServices     - The PEI core services table.
-  @param OldCoreData     - Pointer to the old core data.
+  @param PeiServices     The PEI core services table.
+  @param OldCoreData     Pointer to the old core data.
                          NULL if being run in non-permament memory mode.
 
 **/

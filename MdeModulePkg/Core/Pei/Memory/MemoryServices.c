@@ -37,6 +37,10 @@ InitializeMemoryServices (
   
   PrivateData->SwitchStackSignal      = FALSE;
 
+  //
+  // First entering PeiCore, following code will initialized some field
+  // in PeiCore's private data according to hand off data from sec core.
+  //
   if (OldCoreData == NULL) {
 
     PrivateData->PeiMemoryInstalled = FALSE;
@@ -158,8 +162,6 @@ PeiAllocatePages (
     FreeMemoryTop     = &(Hob.HandoffInformationTable->EfiFreeMemoryTop);
     FreeMemoryBottom  = &(Hob.HandoffInformationTable->EfiFreeMemoryBottom);
   }
-
-  
 
   //
   // Check to see if on 4k boundary

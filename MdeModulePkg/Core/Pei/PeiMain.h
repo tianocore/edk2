@@ -58,6 +58,9 @@ typedef union {
   VOID                        *Raw;
 } PEI_PPI_LIST_POINTERS;
 
+///
+/// PPI database structure
+///
 typedef struct {
   INTN                    PpiListEnd;
   INTN                    NotifyListEnd;
@@ -94,12 +97,12 @@ typedef struct {
   UINTN                               SectionIndex;
 } CACHE_SECTION_DATA;
 
-//
-// Pei Core private data structure instance
-//
 
 #define PEI_CORE_HANDLE_SIGNATURE  EFI_SIGNATURE_32('P','e','i','C')
 
+///
+/// Pei Core private data structure instance
+///
 typedef struct{
   UINTN                              Signature;
   EFI_PEI_SERVICES                   *PS;     // Point to ServiceTableShadow
@@ -134,10 +137,9 @@ typedef struct{
   CACHE_SECTION_DATA                 CacheSection;
 } PEI_CORE_INSTANCE;
 
-//
-// Pei Core Instance Data Macros
-//
-
+///
+/// Pei Core Instance Data Macros
+///
 #define PEI_CORE_INSTANCE_FROM_PS_THIS(a) \
   CR(a, PEI_CORE_INSTANCE, PS, PEI_CORE_HANDLE_SIGNATURE)
 
@@ -266,8 +268,6 @@ PeiDispatcher (
                          environment, such as the size and location of temporary RAM, the stack location and
                          the BFV location.
 
-  @return None.
-
 **/
 VOID
 InitializeDispatcherData (
@@ -305,7 +305,6 @@ DepexSatisfied (
 
   Initialize PPI services.
 
-
   @param PrivateData     Pointer to the PEI Core data.
   @param OldCoreData     Pointer to old PEI Core data. 
                          NULL if being run in non-permament memory mode.
@@ -331,10 +330,10 @@ InitializePpiServices (
 **/
 VOID
 ConvertPpiPointers (
-  IN CONST EFI_PEI_SERVICES        **PeiServices,
-  IN UINTN                         OldCheckingBottom,
-  IN UINTN                         OldCheckingTop,
-  IN UINTN                         Fixup
+  IN PEI_CORE_INSTANCE       *PrivateData,
+  IN UINTN                   OldCheckingBottom,
+  IN UINTN                   OldCheckingTop,
+  IN INTN                    Fixup
   )
 ;
 
@@ -512,9 +511,8 @@ PeiSetBootMode (
 
   Initialize the security services.
 
-
-  @param PeiServices     - The PEI core services table.
-  @param OldCoreData     - Pointer to the old core data.
+  @param PeiServices     The PEI core services table.
+  @param OldCoreData     Pointer to the old core data.
                          NULL if being run in non-permament memory mode.
 
 **/
@@ -528,10 +526,10 @@ InitializeSecurityServices (
 /**
   Verify a Firmware volume
 
-  @param CurrentFvAddress - Pointer to the current Firmware Volume under consideration
+  @param CurrentFvAddress           Pointer to the current Firmware Volume under consideration
 
-  @retval EFI_SUCCESS             - Firmware Volume is legal
-  @retval EFI_SECURITY_VIOLATION  - Firmware Volume fails integrity test
+  @retval EFI_SUCCESS               Firmware Volume is legal
+  @retval EFI_SECURITY_VIOLATION    Firmware Volume fails integrity test
 
 **/
 EFI_STATUS

@@ -481,11 +481,19 @@ PeiDispatcher (
               // CAUTION: The new base is computed accounding to gap of new stack.
               //
               NewPermenentMemoryBase = Private->PhysicalMemoryBegin + StackGap;
+              
+              //
+              // Caculate stack offset and heap offset between CAR and new permement 
+              // memory seperately.
+              //
               StackOffset            = (UINTN) NewPermenentMemoryBase - (UINTN) SecCoreData->StackBase;
               HeapOffset             = (INTN) ((UINTN) Private->PhysicalMemoryBegin + Private->StackSize - \
                                                (UINTN) SecCoreData->PeiTemporaryRamBase);
               DEBUG ((EFI_D_INFO, "Heap Offset = 0x%X Stack Offset = 0x%X\n", HeapOffset, StackOffset));
               
+              //
+              // Caculate new HandOffTable and PrivateData address in permenet memory's stack
+              //
               NewHandOffTable        = (EFI_HOB_HANDOFF_INFO_TABLE *)((UINTN)OldHandOffTable + HeapOffset);
               PrivateInMem           = (PEI_CORE_INSTANCE *)((UINTN) (VOID*) Private + StackOffset);
 
@@ -502,6 +510,12 @@ PeiDispatcher (
 
 
               if (!EFI_ERROR (Status)) {
+                //
+                // Temporary Ram support Ppi is provided by platform, it will copy 
+                // temporary memory to permenent memory and do stack switching.
+                // After invoken temporary Ram support, following code's stack is in 
+                // memory but not in CAR.
+                //
                 TemporaryRamSupportPpi->TemporaryRamMigration (
                                           (CONST EFI_PEI_SERVICES **) PeiServices,
                                           (EFI_PHYSICAL_ADDRESS)(UINTN) SecCoreData->TemporaryRamBase,
@@ -549,7 +563,7 @@ PeiDispatcher (
               //
               // We need convert the PPI desciptor's pointer
               //
-              ConvertPpiPointers ((CONST EFI_PEI_SERVICES **)PeiServices, 
+              ConvertPpiPointers (PrivateInMem, 
                                   OldCheckingBottom, 
                                   OldCheckingTop, 
                                   HeapOffset

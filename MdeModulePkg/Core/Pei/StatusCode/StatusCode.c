@@ -43,10 +43,9 @@ PeiReportStatusCode (
 {
   EFI_STATUS                Status;
   EFI_PEI_PROGRESS_CODE_PPI *StatusCodePpi;
-  
 
   //
-  //Locate StatusCode Ppi.
+  // Locate StatusCode Ppi.
   //
   Status = PeiServicesLocatePpi (
              &gEfiPeiStatusCodePpiGuid,         

@@ -10,14 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  FwVol.c
-
-Abstract:
-
-  
-
 **/
 
 #include <PeiMain.h>
@@ -34,7 +26,6 @@ STATIC EFI_PEI_NOTIFY_DESCRIPTOR mNotifyOnFvInfoList = {
 
 /**
   Returns the highest bit set of the State field
-
 
   @param ErasePolarity   Erase Polarity  as defined by EFI_FVB2_ERASE_POLARITY
                          in the Attributes field.
@@ -222,8 +213,8 @@ PeiFindFileEx (
     switch (FileState) {
 
     case EFI_FILE_HEADER_INVALID:
-      FileOffset += sizeof(EFI_FFS_FILE_HEADER);
-      FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + sizeof(EFI_FFS_FILE_HEADER));
+      FileOffset    += sizeof(EFI_FFS_FILE_HEADER);
+      FfsFileHeader =  (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + sizeof(EFI_FFS_FILE_HEADER));
       break;
         
     case EFI_FILE_DATA_VALID:
@@ -234,7 +225,7 @@ PeiFindFileEx (
         return EFI_NOT_FOUND;
       }
 
-      FileLength = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+      FileLength       = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
       FileOccupiedSize = GET_OCCUPIED_SIZE(FileLength, 8);
 
       if (FileName != NULL) {
@@ -262,15 +253,15 @@ PeiFindFileEx (
         return EFI_SUCCESS;
       }
 
-      FileOffset += FileOccupiedSize; 
-      FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
+      FileOffset    += FileOccupiedSize; 
+      FfsFileHeader =  (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
       break;
     
     case EFI_FILE_DELETED:
-      FileLength = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
-      FileOccupiedSize = GET_OCCUPIED_SIZE(FileLength, 8);
-      FileOffset += FileOccupiedSize;
-      FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
+      FileLength       =  *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+      FileOccupiedSize =  GET_OCCUPIED_SIZE(FileLength, 8);
+      FileOffset       += FileOccupiedSize;
+      FfsFileHeader    =  (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
       break;
 
     default:
@@ -284,15 +275,10 @@ PeiFindFileEx (
 }
 
 /**
-
   Initialize PeiCore Fv List.
-
 
   @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
   @param SecCoreData     - Pointer to EFI_SEC_PEI_HAND_OFF.
-
-  @return NONE
-
 **/
 VOID 
 PeiInitializeFv (
