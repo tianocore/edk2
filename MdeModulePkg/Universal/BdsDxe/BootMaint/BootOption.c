@@ -1080,6 +1080,7 @@ BOpt_AppendFileName (
   UINTN   Size1;
   UINTN   Size2;
   CHAR16  *Str;
+  CHAR16  *TmpStr;
   CHAR16  *Ptr;
   CHAR16  *LastSlash;
 
@@ -1087,6 +1088,9 @@ BOpt_AppendFileName (
   Size2 = StrSize (Str2);
   Str   = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
   ASSERT (Str != NULL);
+
+  TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16)); 
+  ASSERT (TmpStr != NULL);
 
   StrCat (Str, Str1);
   if (!((*Str == '\\') && (*(Str + 1) == 0))) {
@@ -1104,13 +1108,25 @@ BOpt_AppendFileName (
       // DO NOT convert the .. if it is at the end of the string. This will
       // break the .. behavior in changing directories.
       //
-      StrCpy (LastSlash, Ptr + 3);
+
+      //
+      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings 
+      // that overlap.
+      //
+      StrCpy (TmpStr, Ptr + 3);
+      StrCpy (LastSlash, TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
       // Convert a "\.\" to a "\"
       //
-      StrCpy (Ptr, Ptr + 2);
+
+      //
+      // Use TmpStr as a backup, as StrCpy in BaseLib does not handle copy of two strings 
+      // that overlap.
+      //
+      StrCpy (TmpStr, Ptr + 2);
+      StrCpy (Ptr, TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\') {
       LastSlash = Ptr;
@@ -1119,6 +1135,8 @@ BOpt_AppendFileName (
     Ptr++;
   }
 
+  FreePool (TmpStr);
+  
   return Str;
 }
 
