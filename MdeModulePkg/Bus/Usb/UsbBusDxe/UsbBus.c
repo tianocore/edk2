@@ -1086,7 +1086,7 @@ UsbBusDriverEntryPoint (
   Check whether USB bus driver support this device.
 
   @param  This                   The USB bus driver binding protocol.
-  @param  Controller             The controller handle to test againist.
+  @param  Controller             The controller handle to check.
   @param  RemainingDevicePath    The remaining device path.
 
   @retval EFI_SUCCESS            The bus supports this controller.
