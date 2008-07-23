@@ -33,11 +33,11 @@
 #
 
 [Sources.common]
-  efikey.c
-  efikey.h
-  keyboard.c
+  EfiKey.c
+  EfiKey.h
+  KeyBoard.c
   ComponentName.c
-  keyboard.h
+  KeyBoard.h
 
 [Packages]
   MdePkg/MdePkg.dec

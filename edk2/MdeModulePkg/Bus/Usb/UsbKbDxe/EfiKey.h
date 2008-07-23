@@ -1,4 +1,7 @@
 /** @file
+
+    Header file for USB Keyboard Driver's Data Structures.
+
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -8,19 +11,9 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    EfiKey.h
-
-Abstract:
-
-    Header file for USB Keyboard Driver's Data Structures
-
-Revision History
-
 **/
-#ifndef _USB_KB_H
-#define _USB_KB_H
+#ifndef _EFI_USB_KB_H_
+#define _EFI_USB_KB_H_
 
 
 #include <PiDxe.h>
@@ -164,7 +157,18 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbKeyboardComponentName2;
 extern EFI_GUID                      gEfiUsbKeyboardDriverGuid;
 extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 
+/**
+  Report Status Code in Usb Keyboard Driver.
+
+  @param  DevicePath            Use this to get Device Path.
+  @param  CodeType              Status Code Type.
+  @param  CodeValue             Status Code Value.
+
+  @return None.
+
+**/
 VOID
+EFIAPI
 KbdReportStatusCode (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
   IN EFI_STATUS_CODE_TYPE      CodeType,
@@ -205,82 +209,81 @@ typedef struct {
 //
 // Simple Text Input Ex protocol functions
 //
+/**
+  The extension routine to reset the input device.
+
+  @param This                     Protocol instance pointer.
+  @param ExtendedVerification     Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS             The device was reset.
+  @retval EFI_DEVICE_ERROR        The device is not functioning properly and could
+                                  not be reset.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
   )
-/*++
-
-  Routine Description:
-    Reset the input device and optionaly run diagnostics
-
-  Arguments:
-    This                 - Protocol instance pointer.
-    ExtendedVerification - Driver may perform diagnostics on reset.
-
-  Returns:
-    EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
-                            not be reset.
-
---*/
 ;
 
+/**
+  Reads the next keystroke from the input device. The WaitForKey Event can
+  be used to test for existance of a keystroke via WaitForEvent () call.
+
+  @param  This                    Protocol instance pointer.
+  @param  KeyData                 A pointer to a buffer that is filled in with the keystroke
+                                  state data for the key that was pressed.
+
+  @return EFI_SUCCESS             The keystroke information was returned successfully.
+  @retval EFI_INVALID_PARAMETER   KeyData is NULL.
+  @retval Other                   Read key stroke information failed.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
   )
-/*++
-
-  Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
-    be used to test for existance of a keystroke via WaitForEvent () call.
-
-  Arguments:
-    This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke 
-                 state data for the key that was pressed.
-
-  Returns:
-    EFI_SUCCESS           - The keystroke information was returned.
-    EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
-                            hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
-
---*/
 ;
 
+/**
+  Set certain state for the input device.
+
+  @param  This                    Protocol instance pointer.
+  @param  KeyToggleState          A pointer to the EFI_KEY_TOGGLE_STATE to set the
+                                  state for the input device.
+
+  @retval EFI_SUCCESS             The device state was set successfully.
+  @retval EFI_UNSUPPORTED         The device does not have the ability to set its state.
+  @retval EFI_INVALID_PARAMETER   KeyToggleState is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
   )
-/*++
-
-  Routine Description:
-    Set certain state for the input device.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
-                            state for the input device.
-                          
-  Returns:                
-    EFI_SUCCESS           - The device state was set successfully.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
-                            not have the setting adjusted.
-    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
-
---*/   
 ;
 
+/**
+  Register a notification function for a particular keystroke for the input device.
+
+  @param  This                        Protocol instance pointer.
+  @param  KeyData                     A pointer to a buffer that is filled in with the keystroke
+                                      information data for the key that was pressed.
+  @param  KeyNotificationFunction     Points to the function to be called when the key
+                                      sequence is typed specified by KeyData.
+  @param  NotifyHandle                Points to the unique handle assigned to the registered notification.
+
+  @retval EFI_SUCCESS                 The notification function was registered successfully.
+  @retval EFI_OUT_OF_RESOURCES        Unable to allocate resources for necesssary data structures.
+  @retval EFI_INVALID_PARAMETER       KeyData or NotifyHandle is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardRegisterKeyNotify (
@@ -289,48 +292,26 @@ USBKeyboardRegisterKeyNotify (
   IN  EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT EFI_HANDLE                         *NotifyHandle
   )
-/*++
-
-  Routine Description:
-    Register a notification function for a particular keystroke for the input device.
-
-  Arguments:
-    This                    - Protocol instance pointer.
-    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
-                              information data for the key that was pressed.
-    KeyNotificationFunction - Points to the function to be called when the key 
-                              sequence is typed specified by KeyData.                        
-    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
-
-  Returns:
-    EFI_SUCCESS             - The notification function was registered successfully.
-    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
-                              
---*/   
 ;
 
+/**
+  Remove a registered notification function from a particular keystroke.
+
+  @param  This                      Protocol instance pointer.
+  @param  NotificationHandle        The handle of the notification function being unregistered.
+
+  @retval EFI_SUCCESS              The notification function was unregistered successfully.
+  @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid or opening gSimpleTextInExNotifyGuid
+                                   on NotificationHandle fails.
+  @retval EFI_NOT_FOUND            Can not find the matching entry in database.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
   )
-/*++
-
-  Routine Description:
-    Remove a registered notification function from a particular keystroke.
-
-  Arguments:
-    This                    - Protocol instance pointer.    
-    NotificationHandle      - The handle of the notification function being unregistered.
-
-  Returns:
-    EFI_SUCCESS             - The notification function was unregistered successfully.
-    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    EFI_NOT_FOUND           - Can not find the matching entry in database.  
-                              
---*/   
 ;
 
 #endif
