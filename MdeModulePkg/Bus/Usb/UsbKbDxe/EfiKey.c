@@ -1,5 +1,7 @@
 /** @file
 
+  USB Keyboard Driver that includes the implementation of interface.
+
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,26 +11,21 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  EfiKey.c
-
-Abstract:
-
-  USB Keyboard Driver
-
-Revision History
-
-
 **/
 
-#include "efikey.h"
-#include "keyboard.h"
+#include "EfiKey.h"
+#include "KeyBoard.h"
 
-//
-// Prototypes
-// Driver model protocol interface
-//
+/**
+  The Usb Keyboard Driver Entry Point.
+
+  @param  ImageHandle       The driver image handle.
+  @param  SystemTable       The system table.
+
+  @return EFI_SUCCESS      The component name protocol is installed.
+  @return Others           Failed to install.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardDriverBindingEntryPoint (
@@ -36,6 +33,16 @@ USBKeyboardDriverBindingEntryPoint (
   IN EFI_SYSTEM_TABLE     *SystemTable
   );
 
+/**
+  Check whether USB keyboard driver support this device.
+
+  @param  This                   The USB keyboard driver binding protocol.
+  @param  Controller             The controller handle to check.
+  @param  RemainingDevicePath    The remaining device path.
+
+  @retval EFI_SUCCESS            The driver supports this controller.
+  @retval EFI_UNSUPPORTED        This device isn't supported.
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardDriverBindingSupported (
@@ -44,6 +51,17 @@ USBKeyboardDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Start running driver on the controller.
+
+  @param  This                   The USB keyboard driver binding instance.
+  @param  Controller             The controller to check.
+  @param  RemainingDevicePath    The remaining device patch.
+
+  @retval EFI_SUCCESS            The controller is controlled by the usb keyboard driver.
+  @return Other                  The keyboard driver doesn't support this controller.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardDriverBindingStart (
@@ -52,6 +70,18 @@ USBKeyboardDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Stop handle the controller by this USB keyboard driver.
+
+  @param  This                   The USB keyboard driver binding protocol.
+  @param  Controller             The controller to release.
+  @param  NumberOfChildren       The number of handles in ChildHandleBuffer.
+  @param  ChildHandleBuffer      The array of child handle.
+
+  @retval EFI_SUCCESS            The controller or children are stopped.
+  @retval EFI_DEVICE_ERROR       Failed to stop the driver.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardDriverBindingStop (
@@ -61,10 +91,16 @@ USBKeyboardDriverBindingStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
 
-//
-// Simple Text In Protocol Interface
-//
-STATIC
+/**
+  Reset Usb Keyboard.
+
+  @param  This                  The protocol instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL.
+  @param  ExtendedVerification  Whether completely reset keyboard or not.
+
+  @retval EFI_SUCCESS           Reset keyboard successfully.
+  @retval EFI_DEVICE_ERROR      Reset keyboard failed.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardReset (
@@ -72,7 +108,17 @@ USBKeyboardReset (
   IN  BOOLEAN                      ExtendedVerification
   );
 
-STATIC
+/**
+  Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.ReadKeyStroke() function.
+
+  @param  This                 The EFI_SIMPLE_TEXT_INPUT_PROTOCOL instance.
+  @param  Key                  A pointer to a buffer that is filled in with the keystroke
+                               information for the key that was pressed.
+
+  @retval EFI_SUCCESS          Read key stroke successfully.
+  @retval Other                Read key stroke failed.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardReadKeyStroke (
@@ -80,7 +126,14 @@ USBKeyboardReadKeyStroke (
   OUT EFI_INPUT_KEY                 *Key
   );
 
-STATIC
+/**
+  Handler function for WaitForKey event.
+
+  @param  Event        Event to be signaled when a key is pressed.
+  @param  Context      Points to USB_KB_DEV instance.
+
+  @return None.
+**/
 VOID
 EFIAPI
 USBKeyboardWaitForKey (
@@ -88,11 +141,17 @@ USBKeyboardWaitForKey (
   IN  VOID                    *Context
   );
 
-//
-//  Helper functions
-//
-STATIC
+/**
+  Check whether there is key pending.
+
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
+
+  @retval EFI_SUCCESS          Have key pending to read.
+  @retval Other                Parse key failed.
+
+**/
 EFI_STATUS
+EFIAPI
 USBKeyboardCheckForKey (
   IN  USB_KB_DEV      *UsbKeyboardDevice
   );
@@ -100,13 +159,36 @@ USBKeyboardCheckForKey (
 EFI_GUID  gEfiUsbKeyboardDriverGuid = {
   0xa05f5f78, 0xfb3, 0x4d10, {0x90, 0x90, 0xac, 0x4, 0x6e, 0xeb, 0x7c, 0x3c}
 };
-STATIC
+
+/**
+  Free keyboard notify list.
+
+  @param  ListHead                The list head.
+
+  @retval EFI_SUCCESS             Free the notify list successfully.
+  @retval EFI_INVALID_PARAMETER   ListHead is invalid.
+
+**/
 EFI_STATUS
+EFIAPI
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
   );  
-STATIC
+
+/**
+  Whether the pressed key matches a registered key or not.
+
+  @param  RegsiteredData    A pointer to a buffer that is filled in with the keystroke
+                            state data for the key that was registered.
+  @param  InputData         A pointer to a buffer that is filled in with the keystroke
+                            state data for the key that was pressed.
+
+  @retval TRUE              Key pressed matches a registered key.
+  @retval FLASE             Match failed.
+
+**/
 BOOLEAN
+EFIAPI
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
@@ -125,24 +207,22 @@ EFI_DRIVER_BINDING_PROTOCOL gUsbKeyboardDriverBinding = {
   NULL
 };
 
+/**
+  The Usb Keyboard Driver Entry Point.
+
+  @param  ImageHandle       The driver image handle.
+  @param  SystemTable       The system table.
+
+  @return EFI_SUCCESS      The component name protocol is installed.
+  @return Others           Failed to install.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardDriverBindingEntryPoint (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-  Routine Description:
-    Driver Entry Point.
-
-  Arguments:
-    ImageHandle - EFI_HANDLE
-    SystemTable - EFI_SYSTEM_TABLE
-  Returns:
-    EFI_STATUS
-
---*/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
@@ -154,16 +234,15 @@ USBKeyboardDriverBindingEntryPoint (
            );
 }
 
-
-
 /**
-  Supported.
+  Check whether USB keyboard driver support this device.
 
-  @param  This                  EFI_DRIVER_BINDING_PROTOCOL
-  @param  Controller            Controller handle
-  @param  RemainingDevicePath   EFI_DEVICE_PATH_PROTOCOL
- EFI_STATUS
+  @param  This                   The USB keyboard driver binding protocol.
+  @param  Controller             The controller handle to check.
+  @param  RemainingDevicePath    The remaining device path.
 
+  @retval EFI_SUCCESS            The driver supports this controller.
+  @retval EFI_UNSUPPORTED        This device isn't supported.
 **/
 EFI_STATUS
 EFIAPI
@@ -212,17 +291,15 @@ USBKeyboardDriverBindingSupported (
   return Status;
 }
 
-
 /**
-  Start.
+  Start running driver on the controller.
 
-  @param  This                  EFI_DRIVER_BINDING_PROTOCOL
-  @param  Controller            Controller handle
-  @param  RemainingDevicePath   EFI_DEVICE_PATH_PROTOCOL
+  @param  This                   The USB keyboard driver binding instance.
+  @param  Controller             The controller to check.
+  @param  RemainingDevicePath    The remaining device patch.
 
-  @retval EFI_SUCCESS           Success
-  @retval EFI_OUT_OF_RESOURCES  Can't allocate memory
-  @retval EFI_UNSUPPORTED       The Start routine fail
+  @retval EFI_SUCCESS            The controller is controlled by the usb keyboard driver.
+  @return Other                  The keyboard driver doesn't support this controller.
 
 **/
 EFI_STATUS
@@ -546,17 +623,16 @@ ErrorExit:
 }
 
 
-
 /**
-  Stop.
+  Stop handle the controller by this USB keyboard driver.
 
-  @param  This                  EFI_DRIVER_BINDING_PROTOCOL
-  @param  Controller            Controller handle
-  @param  NumberOfChildren      Child handle number
-  @param  ChildHandleBuffer     Child handle buffer
+  @param  This                   The USB keyboard driver binding protocol.
+  @param  Controller             The controller to release.
+  @param  NumberOfChildren       The number of handles in ChildHandleBuffer.
+  @param  ChildHandleBuffer      The array of child handle.
 
-  @retval EFI_SUCCESS           Success
-  @retval EFI_UNSUPPORTED       Can't support
+  @retval EFI_SUCCESS            The controller or children are stopped.
+  @retval EFI_DEVICE_ERROR       Failed to stop the driver.
 
 **/
 EFI_STATUS
@@ -668,31 +744,27 @@ USBKeyboardDriverBindingStop (
 
 }
 
-STATIC
+/**
+  Reads the next keystroke from the input device. The WaitForKey Event can
+  be used to test for existance of a keystroke via WaitForEvent () call.
+
+  @param  UsbKeyboardDevice       Usb keyboard's private structure.
+  @param  KeyData                 A pointer to a buffer that is filled in with the keystroke
+                                  state data for the key that was pressed.
+
+  @return EFI_SUCCESS             The keystroke information was returned.
+  @return EFI_NOT_READY           There was no keystroke data availiable.
+  @return EFI_DEVICE_ERROR        The keystroke information was not returned due to
+                                  hardware errors.
+  @return EFI_INVALID_PARAMETER   KeyData is NULL.
+
+**/
 EFI_STATUS
+EFIAPI
 USBKeyboardReadKeyStrokeWorker (
   IN  USB_KB_DEV                        *UsbKeyboardDevice,
   OUT EFI_KEY_DATA                      *KeyData
   )
-/*++
-
-  Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
-    be used to test for existance of a keystroke via WaitForEvent () call.
-
-  Arguments:
-    UsbKeyboardDevice     - Usb keyboard private structure.
-    KeyData               - A pointer to a buffer that is filled in with the keystroke 
-                            state data for the key that was pressed.
-
-  Returns:
-    EFI_SUCCESS           - The keystroke information was returned.
-    EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
-                            hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
-
---*/
 {
 
   EFI_STATUS                        Status;
@@ -741,9 +813,9 @@ USBKeyboardReadKeyStrokeWorker (
   // their corresponding control value (ctrl-a = 0x0001 through ctrl-Z = 0x001A), here switch them back for notification function.
   //
   CopyMem (&OriginalKeyData, KeyData, sizeof (EFI_KEY_DATA));
-  if (UsbKeyboardDevice->CtrlOn) {
+  if (UsbKeyboardDevice->CtrlOn != 0) {
     if (OriginalKeyData.Key.UnicodeChar >= 0x01 && OriginalKeyData.Key.UnicodeChar <= 0x1A) {
-      if (UsbKeyboardDevice->CapsOn) {
+      if (UsbKeyboardDevice->CapsOn != 0) {
         OriginalKeyData.Key.UnicodeChar = (CHAR16)(OriginalKeyData.Key.UnicodeChar + 'A' - 1);
       } else {
         OriginalKeyData.Key.UnicodeChar = (CHAR16)(OriginalKeyData.Key.UnicodeChar + 'a' - 1);
@@ -769,6 +841,17 @@ USBKeyboardReadKeyStrokeWorker (
   return EFI_SUCCESS;
   
 }
+
+/**
+  Reset Usb Keyboard.
+
+  @param  This                  The protocol instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL.
+  @param  ExtendedVerification  Whether completely reset keyboard or not.
+
+  @retval EFI_SUCCESS           Reset keyboard successfully.
+  @retval EFI_DEVICE_ERROR      Reset keyboard failed.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardReset (
@@ -822,14 +905,14 @@ USBKeyboardReset (
 /**
   Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.ReadKeyStroke() function.
 
-  This     The EFI_SIMPLE_TEXT_INPUT_PROTOCOL instance.
-  Key      A pointer to a buffer that is filled in with the keystroke
-  information for the key that was pressed.
+  @param  This                 The EFI_SIMPLE_TEXT_INPUT_PROTOCOL instance.
+  @param  Key                  A pointer to a buffer that is filled in with the keystroke
+                               information for the key that was pressed.
 
-  @retval EFI_SUCCESS           Success
+  @retval EFI_SUCCESS          Read key stroke successfully.
+  @retval Other                Read key stroke failed.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 USBKeyboardReadKeyStroke (
@@ -858,13 +941,11 @@ USBKeyboardReadKeyStroke (
 /**
   Handler function for WaitForKey event.
 
-  Event        Event to be signaled when a key is pressed.
-  Context      Points to USB_KB_DEV instance.
+  @param  Event        Event to be signaled when a key is pressed.
+  @param  Context      Points to USB_KB_DEV instance.
 
-  @return VOID
-
+  @return None.
 **/
-STATIC
 VOID
 EFIAPI
 USBKeyboardWaitForKey (
@@ -889,17 +970,17 @@ USBKeyboardWaitForKey (
 }
 
 
-
 /**
   Check whether there is key pending.
 
-  UsbKeyboardDevice    The USB_KB_DEV instance.
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
 
-  @retval EFI_SUCCESS           Success
+  @retval EFI_SUCCESS          Have key pending to read.
+  @retval Other                Parse key failed.
 
 **/
-STATIC
 EFI_STATUS
+EFIAPI
 USBKeyboardCheckForKey (
   IN  USB_KB_DEV    *UsbKeyboardDevice
   )
@@ -920,18 +1001,18 @@ USBKeyboardCheckForKey (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Report Status Code in Usb Bot Driver
+  Report Status Code in Usb Keyboard Driver.
 
-  @param  DevicePath            Use this to get Device Path
-  @param  CodeType              Status Code Type
-  @param  CodeValue             Status Code Value
+  @param  DevicePath            Use this to get Device Path.
+  @param  CodeType              Status Code Type.
+  @param  CodeValue             Status Code Value.
 
-  @return None
+  @return None.
 
 **/
 VOID
+EFIAPI
 KbdReportStatusCode (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
   IN EFI_STATUS_CODE_TYPE      CodeType,
@@ -945,25 +1026,21 @@ KbdReportStatusCode (
     DevicePath
     );
 }
-STATIC
+
+/**
+  Free keyboard notify list.
+
+  @param  ListHead                The list head.
+
+  @retval EFI_SUCCESS             Free the notify list successfully.
+  @retval EFI_INVALID_PARAMETER   ListHead is invalid.
+
+**/
 EFI_STATUS
+EFIAPI
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-  ListHead   - The list head
-
-Returns:
-
-  EFI_SUCCESS           - Free the notify list successfully
-  EFI_INVALID_PARAMETER - ListHead is invalid.
-
---*/
 {
   KEYBOARD_CONSOLE_IN_EX_NOTIFY *NotifyNode;
 
@@ -984,28 +1061,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
+/**
+  Whether the pressed key matches a registered key or not.
+
+  @param  RegsiteredData    A pointer to a buffer that is filled in with the keystroke
+                            state data for the key that was registered.
+  @param  InputData         A pointer to a buffer that is filled in with the keystroke
+                            state data for the key that was pressed.
+
+  @retval TRUE              Key pressed matches a registered key.
+  @retval FLASE             Match failed.
+
+**/
 BOOLEAN
+EFIAPI
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-  RegsiteredData    - A pointer to a buffer that is filled in with the keystroke 
-                      state data for the key that was registered.
-  InputData         - A pointer to a buffer that is filled in with the keystroke 
-                      state data for the key that was pressed.
-
-Returns:
-  TRUE              - Key be pressed matches a registered key.
-  FLASE             - Match failed. 
-  
---*/
 {
   ASSERT (RegsiteredData != NULL && InputData != NULL);
   
@@ -1033,27 +1106,23 @@ Returns:
 //
 // Simple Text Input Ex protocol functions 
 //
+/**
+  The extension routine to reset the input device.
+
+  @param This                     Protocol instance pointer.
+  @param ExtendedVerification     Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS             The device was reset.
+  @retval EFI_DEVICE_ERROR        The device is not functioning properly and could
+                                  not be reset.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
   )
-/*++
-
-  Routine Description:
-    Reset the input device and optionaly run diagnostics
-
-  Arguments:
-    This                 - Protocol instance pointer.
-    ExtendedVerification - Driver may perform diagnostics on reset.
-
-  Returns:
-    EFI_SUCCESS           - The device was reset.
-    EFI_DEVICE_ERROR      - The device is not functioning properly and could 
-                            not be reset.
-
---*/
 {
   EFI_STATUS                Status;
   USB_KB_DEV                *UsbKeyboardDevice;
@@ -1076,31 +1145,25 @@ USBKeyboardResetEx (
 
 }
 
+/**
+  Reads the next keystroke from the input device. The WaitForKey Event can
+  be used to test for existance of a keystroke via WaitForEvent () call.
+
+  @param  This                    Protocol instance pointer.
+  @param  KeyData                 A pointer to a buffer that is filled in with the keystroke
+                                  state data for the key that was pressed.
+
+  @return EFI_SUCCESS             The keystroke information was returned successfully.
+  @retval EFI_INVALID_PARAMETER   KeyData is NULL.
+  @retval Other                   Read key stroke information failed.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
   )
-/*++
-
-  Routine Description:
-    Reads the next keystroke from the input device. The WaitForKey Event can 
-    be used to test for existance of a keystroke via WaitForEvent () call.
-
-  Arguments:
-    This       - Protocol instance pointer.
-    KeyData    - A pointer to a buffer that is filled in with the keystroke 
-                 state data for the key that was pressed.
-
-  Returns:
-    EFI_SUCCESS           - The keystroke information was returned.
-    EFI_NOT_READY         - There was no keystroke data availiable.
-    EFI_DEVICE_ERROR      - The keystroke information was not returned due to 
-                            hardware errors.
-    EFI_INVALID_PARAMETER - KeyData is NULL.                        
-
---*/
 {
   USB_KB_DEV                        *UsbKeyboardDevice;
 
@@ -1114,30 +1177,24 @@ USBKeyboardReadKeyStrokeEx (
   
 }
 
+/**
+  Set certain state for the input device.
+
+  @param  This                    Protocol instance pointer.
+  @param  KeyToggleState          A pointer to the EFI_KEY_TOGGLE_STATE to set the
+                                  state for the input device.
+
+  @retval EFI_SUCCESS             The device state was set successfully.
+  @retval EFI_UNSUPPORTED         The device does not have the ability to set its state.
+  @retval EFI_INVALID_PARAMETER   KeyToggleState is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
   )
-/*++
-
-  Routine Description:
-    Set certain state for the input device.
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    KeyToggleState        - A pointer to the EFI_KEY_TOGGLE_STATE to set the 
-                            state for the input device.
-                          
-  Returns:                
-    EFI_SUCCESS           - The device state was set successfully.
-    EFI_DEVICE_ERROR      - The device is not functioning correctly and could 
-                            not have the setting adjusted.
-    EFI_UNSUPPORTED       - The device does not have the ability to set its state.
-    EFI_INVALID_PARAMETER - KeyToggleState is NULL.                       
-
---*/   
 {
   USB_KB_DEV                        *UsbKeyboardDevice;
 
@@ -1178,33 +1235,29 @@ USBKeyboardSetState (
   
 }
 
+/**
+  Register a notification function for a particular keystroke for the input device.
+
+  @param  This                        Protocol instance pointer.
+  @param  KeyData                     A pointer to a buffer that is filled in with the keystroke
+                                      information data for the key that was pressed.
+  @param  KeyNotificationFunction     Points to the function to be called when the key
+                                      sequence is typed specified by KeyData.
+  @param  NotifyHandle                Points to the unique handle assigned to the registered notification.
+
+  @retval EFI_SUCCESS                 The notification function was registered successfully.
+  @retval EFI_OUT_OF_RESOURCES        Unable to allocate resources for necesssary data structures.
+  @retval EFI_INVALID_PARAMETER       KeyData or NotifyHandle is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardRegisterKeyNotify (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN  EFI_KEY_DATA                       *KeyData,
   IN  EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
-  OUT EFI_HANDLE                              *NotifyHandle
+  OUT EFI_HANDLE                         *NotifyHandle
   )
-/*++
-
-  Routine Description:
-    Register a notification function for a particular keystroke for the input device.
-
-  Arguments:
-    This                    - Protocol instance pointer.
-    KeyData                 - A pointer to a buffer that is filled in with the keystroke 
-                              information data for the key that was pressed.
-    KeyNotificationFunction - Points to the function to be called when the key 
-                              sequence is typed specified by KeyData.                        
-    NotifyHandle            - Points to the unique handle assigned to the registered notification.                          
-
-  Returns:
-    EFI_SUCCESS             - The notification function was registered successfully.
-    EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
-    EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.                       
-                              
---*/   
 {
   USB_KB_DEV                        *UsbKeyboardDevice;
   EFI_STATUS                        Status;
@@ -1266,27 +1319,24 @@ USBKeyboardRegisterKeyNotify (
   
 }
 
+/**
+  Remove a registered notification function from a particular keystroke.
+
+  @param  This                      Protocol instance pointer.
+  @param  NotificationHandle        The handle of the notification function being unregistered.
+
+  @retval EFI_SUCCESS              The notification function was unregistered successfully.
+  @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid or opening gSimpleTextInExNotifyGuid
+                                   on NotificationHandle fails.
+  @retval EFI_NOT_FOUND            Can not find the matching entry in database.
+
+**/
 EFI_STATUS
 EFIAPI
 USBKeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
   )
-/*++
-
-  Routine Description:
-    Remove a registered notification function from a particular keystroke.
-
-  Arguments:
-    This                    - Protocol instance pointer.    
-    NotificationHandle      - The handle of the notification function being unregistered.
-
-  Returns:
-    EFI_SUCCESS             - The notification function was unregistered successfully.
-    EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    EFI_NOT_FOUND           - Can not find the matching entry in database.  
-                              
---*/   
 {
   USB_KB_DEV                        *UsbKeyboardDevice;
   EFI_STATUS                        Status;

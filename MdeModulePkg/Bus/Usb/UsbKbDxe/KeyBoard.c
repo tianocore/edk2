@@ -1,5 +1,7 @@
 /** @file
 
+  Helper functions for USB Keyboard Driver.
+
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,20 +11,9 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Keyboard.c
-
-Abstract:
-
-  Helper functions for USB Keyboard Driver
-
-Revision History
-
-
 **/
 
-#include "keyboard.h"
+#include "KeyBoard.h"
 #include <Library/UsbLib.h>
 
 //
@@ -140,22 +131,18 @@ UINT8 KeyboardLayoutTable[USB_KEYCODE_MAX_MAKE + 8][5] = {
   {EfiKeyA3,         0,        0,     EFI_RIGHT_LOGO_MODIFIER,      0},  // 0xe7
 };
 
+/**
+  Initialize KeyConvertionTable by using default keyboard layout.
+
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
+  @retval None.
+
+**/
 VOID
+EFIAPI
 LoadDefaultKeyboardLayout (
   IN USB_KB_DEV                 *UsbKeyboardDevice
   )
-/*++
-
-  Routine Description:
-    Initialize KeyConvertionTable by using default keyboard layout.
-
-  Arguments:
-    UsbKeyboardDevice    The USB_KB_DEV instance.
-
-  Returns:
-    None.
-
---*/
 {
   UINTN               Index;
   EFI_KEY_DESCRIPTOR  *KeyDescriptor;
@@ -350,11 +337,12 @@ STATIC KB_MODIFIER  KB_Mod[8] = {
 /**
   Uses USB I/O to check whether the device is a USB Keyboard device.
 
-  UsbIo:    Points to a USB I/O protocol instance.
-
+  @param  UsbIo    Points to a USB I/O protocol instance.
+  @retval None
 
 **/
 BOOLEAN
+EFIAPI
 IsUSBKeyboard (
   IN  EFI_USB_IO_PROTOCOL       *UsbIo
   )
@@ -386,23 +374,17 @@ IsUSBKeyboard (
   return FALSE;
 }
 
+/**
+  Get current keyboard layout from HII database.
 
+  @retval Pointer to EFI_HII_KEYBOARD_LAYOUT.
+
+**/
 EFI_HII_KEYBOARD_LAYOUT *
+EFIAPI
 GetCurrentKeyboardLayout (
   VOID
   )
-/*++
-
-  Routine Description:
-    Get current keyboard layout from HII database.
-
-  Arguments:
-    None.
-
-  Returns:
-    Pointer to EFI_HII_KEYBOARD_LAYOUT.
-
---*/
 {
   EFI_STATUS                Status;
   EFI_HII_DATABASE_PROTOCOL *HiiDatabase;
@@ -451,24 +433,21 @@ GetCurrentKeyboardLayout (
   return KeyboardLayout;
 }
 
+/**
+  Find Key Descriptor in KeyConvertionTable given its scan code.
+
+  @param  UsbKeyboardDevice   The USB_KB_DEV instance.
+  @param  ScanCode            USB scan code.
+
+  @return The Key descriptor in KeyConvertionTable.
+
+**/
 EFI_KEY_DESCRIPTOR *
+EFIAPI
 GetKeyDescriptor (
   IN USB_KB_DEV        *UsbKeyboardDevice,
   IN UINT8             ScanCode
   )
-/*++
-
-  Routine Description:
-    Find Key Descriptor in KeyConvertionTable given its scan code.
-
-  Arguments:
-    UsbKeyboardDevice  -  The USB_KB_DEV instance.
-    ScanCode           -  USB scan code.
-
-  Returns:
-    The Key descriptor in KeyConvertionTable.
-
---*/
 {
   UINT8  Index;
 
@@ -485,24 +464,22 @@ GetKeyDescriptor (
   return &UsbKeyboardDevice->KeyConvertionTable[Index];
 }
 
+/**
+  Find Non-Spacing key for given KeyDescriptor.
+
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
+  @param  KeyDescriptor        Key descriptor.
+
+  @retval NULL                 Key list is empty.
+  @return Other                The Non-Spacing key.
+
+**/
 USB_NS_KEY *
+EFIAPI
 FindUsbNsKey (
   IN USB_KB_DEV          *UsbKeyboardDevice,
   IN EFI_KEY_DESCRIPTOR  *KeyDescriptor
   )
-/*++
-
-  Routine Description:
-    Find Non-Spacing key for given KeyDescriptor.
-
-  Arguments:
-    UsbKeyboardDevice  -  The USB_KB_DEV instance.
-    KeyDescriptor      -  Key descriptor.
-
-  Returns:
-    The Non-Spacing key.
-
---*/
 {
   LIST_ENTRY      *Link;
   USB_NS_KEY      *UsbNsKey;
@@ -521,24 +498,21 @@ FindUsbNsKey (
   return NULL;
 }
 
+/**
+  Find physical key definition for a given Key stroke.
+
+  @param  UsbNsKey          The Non-Spacing key information.
+  @param  KeyDescriptor     The key stroke.
+
+  @return The physical key definition.
+
+**/
 EFI_KEY_DESCRIPTOR *
+EFIAPI
 FindPhysicalKey (
   IN USB_NS_KEY          *UsbNsKey,
   IN EFI_KEY_DESCRIPTOR  *KeyDescriptor
   )
-/*++
-
-  Routine Description:
-    Find physical key definition for a given Key stroke.
-
-  Arguments:
-    UsbNsKey        -  The Non-Spacing key information.
-    KeyDescriptor   -  The key stroke.
-
-  Returns:
-    The physical key definition.
-
---*/
 {
   UINTN               Index;
   EFI_KEY_DESCRIPTOR  *PhysicalKey;
@@ -558,22 +532,19 @@ FindPhysicalKey (
   return KeyDescriptor;
 }
 
+/**
+  The notification function for SET_KEYBOARD_LAYOUT_EVENT.
+
+  @param  Event           The instance of EFI_EVENT.
+  @param  Context         passing parameter.
+
+**/
 VOID
 EFIAPI
 SetKeyboardLayoutEvent (
   EFI_EVENT                  Event,
   VOID                       *Context
   )
-/*++
-
-  Routine Description:
-    The notification function for SET_KEYBOARD_LAYOUT_EVENT.
-
-  Arguments:
-
-  Returns:
-
---*/
 {
   USB_KB_DEV                *UsbKeyboardDevice;
   EFI_HII_KEYBOARD_LAYOUT   *KeyboardLayout;
@@ -668,22 +639,17 @@ SetKeyboardLayoutEvent (
   gBS->FreePool (KeyboardLayout);
 }
 
+/**
+  Destroy resources for Keyboard layout.
+
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
+
+**/
 VOID
+EFIAPI
 ReleaseKeyboardLayoutResources (
   IN USB_KB_DEV              *UsbKeyboardDevice
   )
-/*++
-
-  Routine Description:
-    Destroy resources for Keyboard layout.
-
-  Arguments:
-    UsbKeyboardDevice  -  The USB_KB_DEV instance.
-
-  Returns:
-    None.
-
---*/
 {
   USB_NS_KEY      *UsbNsKey;
   LIST_ENTRY      *Link;
@@ -701,22 +667,20 @@ ReleaseKeyboardLayoutResources (
   }
 }
 
+/**
+  Initialize USB Keyboard layout.
+
+  @param  UsbKeyboardDevice      The USB_KB_DEV instance.
+
+  @retval EFI_SUCCESS            Initialization Success.
+  @retval Other                  Keyboard layout initial failed.
+
+**/
 EFI_STATUS
+EFIAPI
 InitKeyboardLayout (
   IN USB_KB_DEV   *UsbKeyboardDevice
   )
-/*++
-
-  Routine Description:
-    Initialize USB Keyboard layout.
-
-  Arguments:
-    UsbKeyboardDevice    The USB_KB_DEV instance.
-
-  Returns:
-    EFI_SUCCESS  - Success
-    Other        - Keyboard layout initial failed.
---*/
 {
   EFI_HII_KEYBOARD_LAYOUT   *KeyboardLayout;
   EFI_STATUS                Status;
@@ -772,13 +736,14 @@ InitKeyboardLayout (
 /**
   Initialize USB Keyboard device and all private data structures.
 
-  UsbKeyboardDevice    The USB_KB_DEV instance.
+  @param  UsbKeyboardDevice  The USB_KB_DEV instance.
 
-  @retval EFI_SUCCESS        Success
-  @retval EFI_DEVICE_ERROR   Hardware Error
+  @retval EFI_SUCCESS        Initialization is successful.
+  @retval EFI_DEVICE_ERROR   Configure hardware failed.
 
 **/
 EFI_STATUS
+EFIAPI
 InitUSBKeyboard (
   IN USB_KB_DEV   *UsbKeyboardDevice
   )
@@ -895,7 +860,7 @@ InitUSBKeyboard (
   //
   // Set a timer for repeat keys' generation.
   //
-  if (UsbKeyboardDevice->RepeatTimer) {
+  if (UsbKeyboardDevice->RepeatTimer != NULL) {
     gBS->CloseEvent (UsbKeyboardDevice->RepeatTimer);
     UsbKeyboardDevice->RepeatTimer = 0;
   }
@@ -908,7 +873,7 @@ InitUSBKeyboard (
                   &UsbKeyboardDevice->RepeatTimer
                   );
 
-  if (UsbKeyboardDevice->DelayedRecoveryEvent) {
+  if (UsbKeyboardDevice->DelayedRecoveryEvent != NULL) {
     gBS->CloseEvent (UsbKeyboardDevice->DelayedRecoveryEvent);
     UsbKeyboardDevice->DelayedRecoveryEvent = 0;
   }
@@ -928,14 +893,14 @@ InitUSBKeyboard (
 /**
   Handler function for USB Keyboard's asynchronous interrupt transfer.
 
-  Data       A pointer to a buffer that is filled with key data which is
-  retrieved via asynchronous interrupt transfer.
-  DataLength Indicates the size of the data buffer.
-  Context    Pointing to USB_KB_DEV instance.
-  Result     Indicates the result of the asynchronous interrupt transfer.
+  @param  Data             A pointer to a buffer that is filled with key data which is
+                           retrieved via asynchronous interrupt transfer.
+  @param  DataLength       Indicates the size of the data buffer.
+  @param  Context          Pointing to USB_KB_DEV instance.
+  @param  Result           Indicates the result of the asynchronous interrupt transfer.
 
-  @retval EFI_SUCCESS        Success
-  @retval EFI_DEVICE_ERROR   Hardware Error
+  @retval EFI_SUCCESS      Handler is successful.
+  @retval EFI_DEVICE_ERROR Hardware Error
 
 **/
 EFI_STATUS
@@ -1182,7 +1147,7 @@ KeyboardHandler (
 
     case EFI_LEFT_CONTROL_MODIFIER:
     case EFI_RIGHT_CONTROL_MODIFIER:
-      if (UsbKey.Down) {
+      if (UsbKey.Down != 0) {
         UsbKeyboardDevice->CtrlOn = 1;
       } else {
         UsbKeyboardDevice->CtrlOn = 0;
@@ -1191,7 +1156,7 @@ KeyboardHandler (
 
     case EFI_LEFT_ALT_MODIFIER:
     case EFI_RIGHT_ALT_MODIFIER:
-      if (UsbKey.Down) {
+      if (UsbKey.Down != 0) {
         UsbKeyboardDevice->AltOn = 1;
       } else {
         UsbKeyboardDevice->AltOn = 0;
@@ -1199,7 +1164,7 @@ KeyboardHandler (
       break;
 
     case EFI_ALT_GR_MODIFIER:
-      if (UsbKey.Down) {
+      if (UsbKey.Down != 0) {
         UsbKeyboardDevice->AltGrOn = 1;
       } else {
         UsbKeyboardDevice->AltGrOn = 0;
@@ -1210,8 +1175,8 @@ KeyboardHandler (
     // Del Key Code
     //
     case EFI_DELETE_MODIFIER:
-      if (UsbKey.Down) {
-        if (UsbKeyboardDevice->CtrlOn && UsbKeyboardDevice->AltOn) {
+      if (UsbKey.Down != 0) {
+        if ((UsbKeyboardDevice->CtrlOn != 0) && (UsbKeyboardDevice->AltOn != 0)) {
           gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
         }
       }
@@ -1258,14 +1223,15 @@ KeyboardHandler (
 /**
   Retrieves a key character after parsing the raw data in keyboard buffer.
 
-  UsbKeyboardDevice    The USB_KB_DEV instance.
-  KeyChar              Points to the Key character after key parsing.
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
+  @param  KeyChar              Points to the Key character after key parsing.
 
-  @retval EFI_SUCCESS        Success
-  @retval EFI_NOT_READY      Device is not ready
+  @retval EFI_SUCCESS          Parse key is successful.
+  @retval EFI_NOT_READY        Device is not ready.
 
 **/
 EFI_STATUS
+EFIAPI
 USBParseKey (
   IN OUT  USB_KB_DEV  *UsbKeyboardDevice,
   OUT     UINT8       *KeyChar
@@ -1283,7 +1249,7 @@ USBParseKey (
     RemoveKeyCode (&(UsbKeyboardDevice->KeyboardBuffer), &UsbKey);
 
     KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, UsbKey.KeyCode);
-    if (!UsbKey.Down) {
+    if (UsbKey.Down == 0) {
       switch (KeyDescriptor->Modifier) {
 
       //
@@ -1498,7 +1464,7 @@ USBParseKey (
     // When encountered Del Key...
     //
     if (KeyDescriptor->Modifier == EFI_DELETE_MODIFIER) {
-      if (UsbKeyboardDevice->CtrlOn && UsbKeyboardDevice->AltOn) {
+      if ((UsbKeyboardDevice->CtrlOn != 0) && (UsbKeyboardDevice->AltOn != 0)) {
         gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
       }
     }
@@ -1511,21 +1477,21 @@ USBParseKey (
 }
 
 
-
 /**
   Converts USB Keyboard code to EFI Scan Code.
 
-  UsbKeyboardDevice    The USB_KB_DEV instance.
-  KeyChar              Indicates the key code that will be interpreted.
-  Key                  A pointer to a buffer that is filled in with
-  the keystroke information for the key that
-  was pressed.
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
+  @param  KeyChar              Indicates the key code that will be interpreted.
+  @param  Key                  A pointer to a buffer that is filled in with
+                               the keystroke information for the key that
+                               was pressed.
 
-  @retval EFI_NOT_READY      Device is not ready
-  @retval EFI_SUCCESS        Success
+  @retval EFI_NOT_READY        Device is not ready
+  @retval EFI_SUCCESS          Success.
 
 **/
 EFI_STATUS
+EFIAPI
 USBKeyCodeToEFIScanCode (
   IN  USB_KB_DEV      *UsbKeyboardDevice,
   IN  UINT8           KeyChar,
@@ -1570,7 +1536,7 @@ USBKeyCodeToEFIScanCode (
   Key->UnicodeChar = KeyDescriptor->Unicode;
 
   if (KeyDescriptor->AffectedAttribute & EFI_AFFECTED_BY_STANDARD_SHIFT) {
-    if (UsbKeyboardDevice->ShiftOn) {
+    if (UsbKeyboardDevice->ShiftOn != 0) {
       Key->UnicodeChar = KeyDescriptor->ShiftedUnicode;
 
       //
@@ -1582,7 +1548,7 @@ USBKeyCodeToEFIScanCode (
         UsbKeyboardDevice->RightShiftOn = 0;
       }
 
-      if (UsbKeyboardDevice->AltGrOn) {
+      if (UsbKeyboardDevice->AltGrOn != 0) {
         Key->UnicodeChar = KeyDescriptor->ShiftedAltGrUnicode;
       }
     } else {
@@ -1591,14 +1557,14 @@ USBKeyCodeToEFIScanCode (
       //
       Key->UnicodeChar = KeyDescriptor->Unicode;
 
-      if (UsbKeyboardDevice->AltGrOn) {
+      if (UsbKeyboardDevice->AltGrOn != 0) {
         Key->UnicodeChar = KeyDescriptor->AltGrUnicode;
       }
     }
   }
 
   if (KeyDescriptor->AffectedAttribute & EFI_AFFECTED_BY_CAPS_LOCK) {
-    if (UsbKeyboardDevice->CapsOn) {
+    if (UsbKeyboardDevice->CapsOn != 0) {
 
       if (Key->UnicodeChar == KeyDescriptor->Unicode) {
 
@@ -1615,7 +1581,7 @@ USBKeyCodeToEFIScanCode (
   //
   // Translate the CTRL-Alpha characters to their corresponding control value  (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
   //
-  if (UsbKeyboardDevice->CtrlOn) {
+  if (UsbKeyboardDevice->CtrlOn != 0) {
     if (Key->UnicodeChar >= 'a' && Key->UnicodeChar <= 'z') {
       Key->UnicodeChar = (UINT8) (Key->UnicodeChar - 'a' + 1);
     } else if (Key->UnicodeChar >= 'A' && Key->UnicodeChar <= 'Z') {
@@ -1625,7 +1591,7 @@ USBKeyCodeToEFIScanCode (
 
   if (KeyDescriptor->AffectedAttribute & EFI_AFFECTED_BY_NUM_LOCK) {
 
-    if (UsbKeyboardDevice->NumLockOn && !UsbKeyboardDevice->ShiftOn) {
+    if ((UsbKeyboardDevice->NumLockOn != 0) && (UsbKeyboardDevice->ShiftOn == 0)) {
 
       Key->ScanCode = SCAN_NULL;
 
@@ -1696,16 +1662,16 @@ USBKeyCodeToEFIScanCode (
 }
 
 
-
 /**
   Resets USB Keyboard Buffer.
 
   @param  KeyboardBuffer     Points to the USB Keyboard Buffer.
 
-  @retval EFI_SUCCESS        Success
+  @retval EFI_SUCCESS        Init key buffer successfully.
 
 **/
 EFI_STATUS
+EFIAPI
 InitUSBKeyBuffer (
   IN OUT  USB_KB_BUFFER   *KeyboardBuffer
   )
@@ -1723,9 +1689,12 @@ InitUSBKeyBuffer (
 
   @param  KeyboardBuffer     USB Keyboard Buffer.
 
+  @retval TRUE               Key buffer is empty.
+  @retval FALSE              Key buffer is not empty.
 
 **/
 BOOLEAN
+EFIAPI
 IsUSBKeyboardBufferEmpty (
   IN  USB_KB_BUFFER   *KeyboardBuffer
   )
@@ -1737,15 +1706,17 @@ IsUSBKeyboardBufferEmpty (
 }
 
 
-
 /**
   Check whether USB Keyboard buffer is full.
 
   @param  KeyboardBuffer     USB Keyboard Buffer.
 
+  @retval TRUE               Key buffer is full.
+  @retval FALSE              Key buffer is not full.
 
 **/
 BOOLEAN
+EFIAPI
 IsUSBKeyboardBufferFull (
   IN  USB_KB_BUFFER   *KeyboardBuffer
   )
@@ -1753,7 +1724,6 @@ IsUSBKeyboardBufferFull (
   return (BOOLEAN)(((KeyboardBuffer->bTail + 1) % (MAX_KEY_ALLOWED + 1)) ==
                                                         KeyboardBuffer->bHead);
 }
-
 
 
 /**
@@ -1767,6 +1737,7 @@ IsUSBKeyboardBufferFull (
 
 **/
 EFI_STATUS
+EFIAPI
 InsertKeyCode (
   IN OUT  USB_KB_BUFFER *KeyboardBuffer,
   IN      UINT8         Key,
@@ -1806,6 +1777,7 @@ InsertKeyCode (
 
 **/
 EFI_STATUS
+EFIAPI
 RemoveKeyCode (
   IN OUT  USB_KB_BUFFER *KeyboardBuffer,
   OUT     USB_KEY       *UsbKey
@@ -1836,6 +1808,7 @@ RemoveKeyCode (
 
 **/
 EFI_STATUS
+EFIAPI
 SetKeyLED (
   IN  USB_KB_DEV    *UsbKeyboardDevice
   )
