@@ -39,6 +39,7 @@ Abstract:
     Decimal number that represents width of print
 
   type:
+    'p' - arugment is VOID *; printed as hex number
     'X' - argument is a UINTN hex number, prefix '0'
     'x' - argument is a hex number
     'd' - argument is a decimal number
@@ -206,6 +207,27 @@ Returns:
       //
       Format = GetFlagsAndWidth (Format, &Flags, &Width, &Marker);
       switch (*Format) {
+      case 'p':
+        //
+        // Flag space, +, 0, L & l are invalid for type p.
+        //
+        Flags &= ~(PREFIX_BLANK| PREFIX_SIGN | LONG_TYPE);
+        if (sizeof (VOID *) > 4) {
+          Flags |= LONG_TYPE;
+          Value = VA_ARG (Marker, UINT64);
+        } else {
+          Value = VA_ARG (Marker, UINTN);
+        }
+        Flags |= PREFIX_ZERO;
+
+        EfiValueToHexStr (TempBuffer, Value, Flags, Width);
+        UnicodeStr = TempBuffer;
+
+        for ( ;(*UnicodeStr != '\0') && (Index < NumberOfCharacters - 1); UnicodeStr++) {
+          Buffer[Index++] = *UnicodeStr;
+        }
+        break;
+        
       case 'X':
         Flags |= PREFIX_ZERO;
         Width = sizeof (UINT64) * 2;
