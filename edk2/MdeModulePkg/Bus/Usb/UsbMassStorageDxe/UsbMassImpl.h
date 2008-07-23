@@ -33,7 +33,7 @@ typedef struct _USB_MASS_DEVICE USB_MASS_DEVICE;
 #define  USB_MASS_SIGNATURE    EFI_SIGNATURE_32 ('U', 's', 'b', 'M')
 
 
-typedef struct _USB_MASS_DEVICE {
+struct _USB_MASS_DEVICE {
   UINT32                    Signature;
   EFI_HANDLE                Controller;
   EFI_USB_IO_PROTOCOL       *UsbIo;
@@ -45,7 +45,7 @@ typedef struct _USB_MASS_DEVICE {
   UINT8                     Pdt;          // Peripheral Device Type
   USB_MASS_TRANSPORT        *Transport;   // USB mass storage transport protocol
   VOID                      *Context;     // Opaque storage for mass transport
-}USB_MASS_DEVICE;
+};
 
 #define USB_MASS_DEVICE_FROM_BLOCKIO(a) \
         CR (a, USB_MASS_DEVICE, BlockIo, USB_MASS_SIGNATURE)
