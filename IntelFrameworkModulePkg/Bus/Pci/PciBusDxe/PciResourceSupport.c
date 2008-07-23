@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -913,6 +913,25 @@ DegradeResource (
   IN PCI_RESOURCE_NODE *PMem64Node
   )
 {
+  BOOLEAN              HasOprom;
+  PCI_IO_DEVICE        *Temp;
+  LIST_ENTRY           *CurrentLink;
+
+  //
+  // For RootBridge, PPB , P2C, go recursively to traverse all its children
+  // to find if this bridge and downstream has OptionRom.
+  // 
+  HasOprom = FALSE;
+  CurrentLink = Bridge->ChildList.ForwardLink;
+  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+
+    Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    if (Temp->RomSize != 0) {
+      HasOprom = TRUE;
+      break;
+    }    
+    CurrentLink = CurrentLink->ForwardLink;
+  }  
 
   //
   // If bridge doesn't support Prefetchable
@@ -926,9 +945,9 @@ DegradeResource (
       );
   } else {
     //
-    // if no PMem32 request, still keep PMem64. Otherwise degrade to PMem32
+    // if no PMem32 request and no OptionRom request, still keep PMem64. Otherwise degrade to PMem32
     //
-    if (PMem32Node != NULL && PMem32Node->Length != 0 && Bridge->Parent != NULL ) { 
+    if ((PMem32Node != NULL && (PMem32Node->Length != 0 && Bridge->Parent != NULL)) || HasOprom) { 
       //
       // Fixed the issue that there is no resource for 64-bit (above 4G)
       //
