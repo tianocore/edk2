@@ -43,9 +43,9 @@ typedef struct {
   EFI_EVENT_NOTIFY        NotifyFunction;
   VOID                    *NotifyContext;
   EFI_GUID                EventGroup;
-  LIST_ENTRY              NotifyLink; 
+  LIST_ENTRY              NotifyLink;
   BOOLEAN                 ExFlag;
-  
+
   //
   // A list of all runtime events
   //
@@ -66,7 +66,7 @@ typedef struct {
     } Timer;
   } u;
 
-} IEVENT;    
+} IEVENT;
 
 //
 // Internal prototypes
@@ -76,7 +76,7 @@ typedef struct {
 /**
   Dispatches all pending events.
 
-  @param  Priority               The task priority level of event notifications 
+  @param  Priority               The task priority level of event notifications
                                  to dispatch
 
 **/
@@ -90,7 +90,7 @@ CoreDispatchEventNotifies (
 /**
   Return the highest set bit.
 
-  @param  Number  The value to check 
+  @param  Number  The value to check
 
   @return Bit position of the highest set bit
 
@@ -105,13 +105,13 @@ CoreHighestSetBit (
 /**
   Disables CPU interrupts.
 
-  @retval EFI_SUCCESS            If interrupts were disabled in the CPU. 
+  @retval EFI_SUCCESS            If interrupts were disabled in the CPU.
   @retval EFI_INVALID_PARAMETER  State is NULL.
 
 **/
 BOOLEAN
 GetInterruptState (
-  VOID               
+  VOID
   );
 
 //

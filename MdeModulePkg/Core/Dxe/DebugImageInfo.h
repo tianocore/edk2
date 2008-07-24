@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __DEBUG_IMAGE_INFO_H__
 #define __DEBUG_IMAGE_INFO_H__
 
-#define FOUR_MEG_PAGES  0x400  
+#define FOUR_MEG_PAGES  0x400
 #define FOUR_MEG_MASK   ((FOUR_MEG_PAGES * EFI_PAGE_SIZE) - 1)
 
 #define EFI_DEBUG_TABLE_ENTRY_SIZE       (sizeof (VOID *))
@@ -57,9 +57,9 @@ CoreUpdateDebugTableCrc32 (
   Adds a new DebugImageInfo structure to the DebugImageInfo Table.  Re-Allocates
   the table if it's not large enough to accomidate another entry.
 
-  @param  ImageInfoType  type of debug image information 
-  @param  LoadedImage    pointer to the loaded image protocol for the image being 
-                         loaded 
+  @param  ImageInfoType  type of debug image information
+  @param  LoadedImage    pointer to the loaded image protocol for the image being
+                         loaded
   @param  ImageHandle    image handle for the image being loaded
 
 **/

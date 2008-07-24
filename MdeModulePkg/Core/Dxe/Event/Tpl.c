@@ -42,7 +42,7 @@ CoreSetInterruptState (
 /**
   Return the highest set bit.
 
-  @param  Number  The value to check 
+  @param  Number  The value to check
 
   @return Bit position of the highest set bit
 
@@ -53,7 +53,7 @@ CoreHighestSetBit (
   )
 {
   UINTN   Msb;
-  
+
   Msb = 31;
   while ((Msb > 0) && ((Number & (UINTN)(1 << Msb)) == 0)) {
     Msb--;
@@ -69,7 +69,7 @@ CoreHighestSetBit (
   Raise the task priority level to the new level.
   High level is implemented by disabling processor interrupts.
 
-  @param  NewTpl  New task priority level 
+  @param  NewTpl  New task priority level
 
   @return The previous task priority level
 
@@ -129,7 +129,7 @@ CoreRestoreTpl (
   //
 
   if (OldTpl >= TPL_HIGH_LEVEL  &&  NewTpl < TPL_HIGH_LEVEL) {
-    gEfiCurrentTpl = TPL_HIGH_LEVEL;  
+    gEfiCurrentTpl = TPL_HIGH_LEVEL;
   }
 
   //

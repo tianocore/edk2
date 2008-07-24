@@ -48,7 +48,7 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
 /**
   Return TRUE if all AP services are availible.
 
-  @retval EFI_SUCCESS    All AP services are available 
+  @retval EFI_SUCCESS    All AP services are available
   @retval EFI_NOT_FOUND  At least one AP service is not available
 
 **/
@@ -76,7 +76,7 @@ CoreAllEfiServicesAvailable (
   present flag to TRUE. If any constructor is required it is executed. The EFI
   System Table headers are updated.
 
-  @param  Event          The Event that is being processed, not used. 
+  @param  Event          The Event that is being processed, not used.
   @param  Context        Event Context, not used.
 
 **/

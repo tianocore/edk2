@@ -466,12 +466,12 @@ CoreLoadPeImage (
     UINTN StartIndex;
     CHAR8 EfiFileName[256];
 
-    
+
     DEBUG ((DEBUG_INFO | DEBUG_LOAD,
            "Loading driver at 0x%10p EntryPoint=0x%10p ",
            (VOID *)(UINTN) Image->ImageContext.ImageAddress,
            FUNCTION_ENTRY_POINT ((UINTN) Image->ImageContext.EntryPoint)));
-   
+
 
     //
     // Print Module Name by Pdb file path

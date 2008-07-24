@@ -116,7 +116,7 @@ CoreInitializeEventServices (
 /**
   Dispatches all pending events.
 
-  @param  Priority               The task priority level of event notifications 
+  @param  Priority               The task priority level of event notifications
                                  to dispatch
 
 **/
@@ -239,18 +239,18 @@ CoreNotifySignalList (
 /**
   Creates a general-purpose event structure.
 
-  @param  Type                   The type of event to create and its mode and 
-                                 attributes 
-  @param  NotifyTpl              The task priority level of event notifications 
-  @param  NotifyFunction         Pointer to the events notification function 
-  @param  NotifyContext          Pointer to the notification functions context; 
-                                 corresponds to parameter "Context" in the 
-                                 notification function 
-  @param  Event                  Pointer to the newly created event if the call 
-                                 succeeds; undefined otherwise 
+  @param  Type                   The type of event to create and its mode and
+                                 attributes
+  @param  NotifyTpl              The task priority level of event notifications
+  @param  NotifyFunction         Pointer to the events notification function
+  @param  NotifyContext          Pointer to the notification functions context;
+                                 corresponds to parameter "Context" in the
+                                 notification function
+  @param  Event                  Pointer to the newly created event if the call
+                                 succeeds; undefined otherwise
 
-  @retval EFI_SUCCESS            The event structure was created 
-  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value 
+  @retval EFI_SUCCESS            The event structure was created
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value
   @retval EFI_OUT_OF_RESOURCES   The event could not be allocated
 
 **/
@@ -272,20 +272,20 @@ CoreCreateEvent (
 /**
   Creates a general-purpose event structure
 
-  @param  Type                   The type of event to create and its mode and 
-                                 attributes 
-  @param  NotifyTpl              The task priority level of event notifications 
-  @param  NotifyFunction         Pointer to the events notification function 
-  @param  NotifyContext          Pointer to the notification functions context; 
-                                 corresponds to parameter "Context" in the 
-                                 notification function 
-  @param  EventGroup             GUID for EventGroup if NULL act the same as 
-                                 gBS->CreateEvent(). 
-  @param  Event                  Pointer to the newly created event if the call 
-                                 succeeds; undefined otherwise 
+  @param  Type                   The type of event to create and its mode and
+                                 attributes
+  @param  NotifyTpl              The task priority level of event notifications
+  @param  NotifyFunction         Pointer to the events notification function
+  @param  NotifyContext          Pointer to the notification functions context;
+                                 corresponds to parameter "Context" in the
+                                 notification function
+  @param  EventGroup             GUID for EventGroup if NULL act the same as
+                                 gBS->CreateEvent().
+  @param  Event                  Pointer to the newly created event if the call
+                                 succeeds; undefined otherwise
 
-  @retval EFI_SUCCESS            The event structure was created 
-  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value 
+  @retval EFI_SUCCESS            The event structure was created
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value
   @retval EFI_OUT_OF_RESOURCES   The event could not be allocated
 
 **/
@@ -436,7 +436,7 @@ CoreCreateEventEx (
 
   @param  UserEvent              The event to signal .
 
-  @retval EFI_INVALID_PARAMETER  Parameters are not valid. 
+  @retval EFI_INVALID_PARAMETER  Parameters are not valid.
   @retval EFI_SUCCESS            The event was signaled.
 
 **/
@@ -494,10 +494,10 @@ CoreSignalEvent (
 /**
   Check the status of an event.
 
-  @param  UserEvent              The event to check 
+  @param  UserEvent              The event to check
 
-  @retval EFI_SUCCESS            The event is in the signaled state 
-  @retval EFI_NOT_READY          The event is not in the signaled state 
+  @retval EFI_SUCCESS            The event is in the signaled state
+  @retval EFI_NOT_READY          The event is not in the signaled state
   @retval EFI_INVALID_PARAMETER  Event is of type EVT_NOTIFY_SIGNAL
 
 **/
@@ -561,14 +561,14 @@ CoreCheckEvent (
 /**
   Stops execution until an event is signaled.
 
-  @param  NumberOfEvents         The number of events in the UserEvents array 
-  @param  UserEvents             An array of EFI_EVENT 
-  @param  UserIndex              Pointer to the index of the event which 
-                                 satisfied the wait condition 
+  @param  NumberOfEvents         The number of events in the UserEvents array
+  @param  UserEvents             An array of EFI_EVENT
+  @param  UserIndex              Pointer to the index of the event which
+                                 satisfied the wait condition
 
-  @retval EFI_SUCCESS            The event indicated by Index was signaled. 
-  @retval EFI_INVALID_PARAMETER  The event indicated by Index has a notification 
-                                 function or Event was not a valid type 
+  @retval EFI_SUCCESS            The event indicated by Index was signaled.
+  @retval EFI_INVALID_PARAMETER  The event indicated by Index has a notification
+                                 function or Event was not a valid type
   @retval EFI_UNSUPPORTED        The current TPL is not TPL_APPLICATION
 
 **/
@@ -616,9 +616,9 @@ CoreWaitForEvent (
 /**
   Closes an event and frees the event structure.
 
-  @param  UserEvent              Event to close 
+  @param  UserEvent              Event to close
 
-  @retval EFI_INVALID_PARAMETER  Parameters are not valid. 
+  @retval EFI_INVALID_PARAMETER  Parameters are not valid.
   @retval EFI_SUCCESS            The event has been closed
 
 **/

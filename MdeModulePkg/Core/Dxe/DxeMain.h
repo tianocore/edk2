@@ -22,7 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/LoadedImage.h>
 #include <Protocol/GuidedSectionExtraction.h>
-#include <Guid/DebugImageInfoTable.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/Runtime.h>
 #include <Protocol/LoadFile.h>
@@ -30,37 +29,39 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/VariableWrite.h>
 #include <Protocol/PlatformDriverOverride.h>
 #include <Protocol/Variable.h>
-#include <Guid/MemoryTypeInformation.h>
-#include <Guid/FirmwareFileSystem2.h>
-#include <Guid/HobList.h>
 #include <Protocol/Timer.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/Bds.h>
-#include <Guid/FileInfo.h>
 #include <Protocol/RealTimeClock.h>
-#include <Guid/Apriori.h>
 #include <Protocol/WatchdogTimer.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/MonotonicCounter.h>
-#include <Guid/DxeServices.h>
-#include <Guid/MemoryAllocationHob.h>
 #include <Protocol/StatusCode.h>
 #include <Protocol/Decompress.h>
 #include <Protocol/LoadPe32Image.h>
 #include <Protocol/FirmwareVolumeDispatch.h>
 #include <Protocol/Security.h>
 #include <Protocol/Ebc.h>
-#include <Guid/EventLegacyBios.h>
 #include <Protocol/Reset.h>
 #include <Protocol/Cpu.h>
-#include <Guid/EventGroup.h>
 #include <Protocol/Metronome.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/Capsule.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/Performance.h>
-#include <Uefi/UefiTcgPlatform.h>
+#include <Protocol/TcgService.h>
 #include <Protocol/TcgPlatform.h>
+#include <Guid/MemoryTypeInformation.h>
+#include <Guid/FirmwareFileSystem2.h>
+#include <Guid/HobList.h>
+#include <Guid/DebugImageInfoTable.h>
+#include <Guid/FileInfo.h>
+#include <Guid/Apriori.h>
+#include <Guid/DxeServices.h>
+#include <Guid/MemoryAllocationHob.h>
+#include <Guid/EventLegacyBios.h>
+#include <Guid/EventGroup.h>
+
 
 #include <Library/DxeCoreEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -140,7 +141,7 @@ typedef struct {
 #define KNOWN_HANDLE_SIGNATURE  EFI_SIGNATURE_32('k','n','o','w')
 typedef struct {
   UINTN           Signature;
-  LIST_ENTRY      Link;         // mFvHandleList           
+  LIST_ENTRY      Link;         // mFvHandleList
   EFI_HANDLE      Handle;
 } KNOWN_HANDLE;
 
@@ -244,11 +245,11 @@ CoreInitializePool (
   The first descriptor that is added must be general usable
   memory as the addition allocates heap.
 
-  @param  Type                   The type of memory to add 
-  @param  Start                  The starting address in the memory range Must be 
-                                 page aligned 
-  @param  NumberOfPages          The number of pages in the range 
-  @param  Attribute              Attributes of the memory to add 
+  @param  Type                   The type of memory to add
+  @param  Start                  The starting address in the memory range Must be
+                                 page aligned
+  @param  NumberOfPages          The number of pages in the range
+  @param  Attribute              Attributes of the memory to add
 
   @return None.  The range is added to the memory map
 
@@ -290,10 +291,10 @@ CoreAcquireGcdMemoryLock (
   memory descriptor is provided to the memory services.  Then the memory services
   can be used to intialize the GCD map.
 
-  @param  HobStart               The start address of the HOB. 
-  @param  MemoryBaseAddress      Start address of memory region found to init DXE 
-                                 core. 
-  @param  MemoryLength           Length of memory region found to init DXE core. 
+  @param  HobStart               The start address of the HOB.
+  @param  MemoryBaseAddress      Start address of memory region found to init DXE
+                                 core.
+  @param  MemoryLength           Length of memory region found to init DXE core.
 
   @retval EFI_SUCCESS            Memory services successfully initialized.
 
@@ -316,17 +317,17 @@ CoreInitializeMemoryServices (
   can be used to intialize the GCD map. The HobStart will be relocated to a pool
   buffer.
 
-  @param  HobStart               The start address of the HOB 
-  @param  MemoryBaseAddress      Start address of memory region found to init DXE 
-                                 core. 
-  @param  MemoryLength           Length of memory region found to init DXE core. 
+  @param  HobStart               The start address of the HOB
+  @param  MemoryBaseAddress      Start address of memory region found to init DXE
+                                 core.
+  @param  MemoryLength           Length of memory region found to init DXE core.
 
   @retval EFI_SUCCESS            GCD services successfully initialized.
 
 **/
 EFI_STATUS
 CoreInitializeGcdServices (
-  IN OUT VOID                  **HobStart,
+  IN OUT VOID              **HobStart,
   IN EFI_PHYSICAL_ADDRESS  MemoryBaseAddress,
   IN UINT64                MemoryLength
   );
@@ -334,7 +335,6 @@ CoreInitializeGcdServices (
 
 /**
   Initializes "event" support and populates parts of the System and Runtime Table.
-
 
   @retval EFI_SUCCESS            Always return success
 
@@ -349,7 +349,7 @@ CoreInitializeEventServices (
   Add the Image Services to EFI Boot Services Table and install the protocol
   interfaces for this image.
 
-  @param  HobStart                The HOB to initialize 
+  @param  HobStart                The HOB to initialize
 
   @return Status code.
 
@@ -373,8 +373,7 @@ CoreNotifyOnArchProtocolInstallation (
 /**
   Return TRUE if all AP services are availible.
 
-
-  @retval EFI_SUCCESS    All AP services are available 
+  @retval EFI_SUCCESS    All AP services are available
   @retval EFI_NOT_FOUND  At least one AP service is not available
 
 **/
@@ -400,7 +399,7 @@ CalculateEfiHdrCrc (
 /**
   Called by the platform code to process a tick.
 
-  @param  Duration               The number of 100ns elasped since the last call 
+  @param  Duration               The number of 100ns elasped since the last call
                                  to TimerTick
 
 **/
@@ -413,7 +412,7 @@ CoreTimerTick (
 
 /**
   Initialize the dispatcher. Initialize the notification function that runs when
-  a FV protocol is added to the system.
+  an FV2 protocol is added to the system.
 
 **/
 VOID
@@ -428,16 +427,16 @@ CoreInitializeDispatcher (
   routine in this case. The SOR is just ignored and is a nop in the grammer.
   POSTFIX means all the math is done on top of the stack.
 
-  @param  DriverEntry           DriverEntry element to update 
+  @param  DriverEntry           DriverEntry element to update.
 
-  @retval TRUE                  If driver is ready to run. 
-  @retval FALSE                 If driver is not ready to run or some fatal error 
+  @retval TRUE                  If driver is ready to run.
+  @retval FALSE                 If driver is not ready to run or some fatal error
                                 was found.
 
 **/
 BOOLEAN
 CoreIsSchedulable (
-  IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry  
+  IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry
   );
 
 
@@ -448,14 +447,14 @@ CoreIsSchedulable (
   it will be cleared by CoreSchedule(), and then the driver can be
   dispatched.
 
-  @param  DriverEntry           DriverEntry element to update 
+  @param  DriverEntry           DriverEntry element to update .
 
   @retval EFI_SUCCESS           It always works.
 
 **/
 EFI_STATUS
 CorePreProcessDepex (
-  IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry  
+  IN  EFI_CORE_DRIVER_ENTRY   *DriverEntry
   );
 
 
@@ -463,10 +462,10 @@ CorePreProcessDepex (
 /**
   Terminates all boot services.
 
-  @param  ImageHandle            Handle that identifies the exiting image. 
+  @param  ImageHandle            Handle that identifies the exiting image.
   @param  MapKey                 Key to the latest memory map.
 
-  @retval EFI_SUCCESS            Boot Services terminated 
+  @retval EFI_SUCCESS            Boot Services terminated
   @retval EFI_INVALID_PARAMETER  MapKey is incorrect.
 
 **/
@@ -482,10 +481,10 @@ CoreExitBootServices (
   Make sure the memory map is following all the construction rules,
   it is the last time to check memory map error before exit boot services.
 
-  @param  MapKey                 Memory map key 
+  @param  MapKey                 Memory map key
 
-  @retval EFI_INVALID_PARAMETER  Memory map not consistent with construction 
-                                 rules. 
+  @retval EFI_INVALID_PARAMETER  Memory map not consistent with construction
+                                 rules.
   @retval EFI_SUCCESS            Valid memory map.
 
 **/
@@ -512,10 +511,10 @@ CoreNotifySignalList (
   Boot Service called to add, modify, or remove a system configuration table from
   the EFI System Table.
 
-  @param  Guid           Pointer to the GUID for the entry to add, update, or 
-                         remove 
-  @param  Table          Pointer to the configuration table for the entry to add, 
-                         update, or remove, may be NULL. 
+  @param  Guid           Pointer to the GUID for the entry to add, update, or
+                         remove
+  @param  Table          Pointer to the configuration table for the entry to add,
+                         update, or remove, may be NULL.
 
   @return EFI_SUCCESS               Guid, Table pair added, updated, or removed.
   @return EFI_INVALID_PARAMETER     Input GUID not valid.
@@ -536,7 +535,7 @@ CoreInstallConfigurationTable (
   Raise the task priority level to the new level.
   High level is implemented by disabling processor interrupts.
 
-  @param  NewTpl  New task priority level 
+  @param  NewTpl  New task priority level
 
   @return The previous task priority level
 
@@ -569,8 +568,8 @@ CoreRestoreTpl (
 
   @param  Microseconds           The number of microseconds to stall execution.
 
-  @retval EFI_SUCCESS            Execution was stalled for at least the requested 
-                                 amount of microseconds. 
+  @retval EFI_SUCCESS            Execution was stalled for at least the requested
+                                 amount of microseconds.
   @retval EFI_NOT_AVAILABLE_YET  gMetronome is not available yet
 
 **/
@@ -619,12 +618,12 @@ CoreSetWatchdogTimer (
   Wrapper function to CoreInstallProtocolInterfaceNotify.  This is the public API which
   Calls the private one which contains a BOOLEAN parameter for notifications
 
-  @param  UserHandle             The handle to install the protocol handler on, 
-                                 or NULL if a new handle is to be allocated 
-  @param  Protocol               The protocol to add to the handle 
-  @param  InterfaceType          Indicates whether Interface is supplied in 
-                                 native form. 
-  @param  Interface              The interface for the protocol being added 
+  @param  UserHandle             The handle to install the protocol handler on,
+                                 or NULL if a new handle is to be allocated
+  @param  Protocol               The protocol to add to the handle
+  @param  InterfaceType          Indicates whether Interface is supplied in
+                                 native form.
+  @param  Interface              The interface for the protocol being added
 
   @return Status code
 
@@ -642,17 +641,17 @@ CoreInstallProtocolInterface (
 /**
   Installs a protocol interface into the boot services environment.
 
-  @param  UserHandle             The handle to install the protocol handler on, 
-                                 or NULL if a new handle is to be allocated 
-  @param  Protocol               The protocol to add to the handle 
-  @param  InterfaceType          Indicates whether Interface is supplied in 
-                                 native form. 
-  @param  Interface              The interface for the protocol being added 
-  @param  Notify                 indicates whether notify the notification list  
-                                 for this protocol 
+  @param  UserHandle             The handle to install the protocol handler on,
+                                 or NULL if a new handle is to be allocated
+  @param  Protocol               The protocol to add to the handle
+  @param  InterfaceType          Indicates whether Interface is supplied in
+                                 native form.
+  @param  Interface              The interface for the protocol being added
+  @param  Notify                 indicates whether notify the notification list
+                                 for this protocol
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter 
-  @retval EFI_OUT_OF_RESOURCES   No enough buffer to allocate 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_OUT_OF_RESOURCES   No enough buffer to allocate
   @retval EFI_SUCCESS            Protocol interface successfully installed
 
 **/
@@ -673,14 +672,14 @@ CoreInstallProtocolInterfaceNotify (
   occures all the protocols added by this function are removed. This is
   basically a lib function to save space.
 
-  @param  Handle                 The handle to install the protocol handlers on, 
-                                 or NULL if a new handle is to be allocated 
-  @param  ...                    EFI_GUID followed by protocol instance. A NULL 
-                                 terminates the  list. The pairs are the 
-                                 arguments to InstallProtocolInterface(). All the 
-                                 protocols are added to Handle. 
+  @param  Handle                 The handle to install the protocol handlers on,
+                                 or NULL if a new handle is to be allocated
+  @param  ...                    EFI_GUID followed by protocol instance. A NULL
+                                 terminates the  list. The pairs are the
+                                 arguments to InstallProtocolInterface(). All the
+                                 protocols are added to Handle.
 
-  @retval EFI_INVALID_PARAMETER  Handle is NULL. 
+  @retval EFI_INVALID_PARAMETER  Handle is NULL.
   @retval EFI_SUCCESS            Protocol interfaces successfully installed.
 
 **/
@@ -698,11 +697,11 @@ CoreInstallMultipleProtocolInterfaces (
   This function calls UnisatllProtocolInterface() in a loop. This is
   basically a lib function to save space.
 
-  @param  Handle                 The handle to uninstall the protocol 
-  @param  ...                    EFI_GUID followed by protocol instance. A NULL 
-                                 terminates the  list. The pairs are the 
-                                 arguments to UninstallProtocolInterface(). All 
-                                 the protocols are added to Handle. 
+  @param  Handle                 The handle to uninstall the protocol
+  @param  ...                    EFI_GUID followed by protocol instance. A NULL
+                                 terminates the  list. The pairs are the
+                                 arguments to UninstallProtocolInterface(). All
+                                 the protocols are added to Handle.
 
   @return Status code
 
@@ -719,11 +718,11 @@ CoreUninstallMultipleProtocolInterfaces (
 /**
   Reinstall a protocol interface on a device handle.  The OldInterface for Protocol is replaced by the NewInterface.
 
-  @param  UserHandle             Handle on which the interface is to be 
-                                 reinstalled 
-  @param  Protocol               The numeric ID of the interface 
-  @param  OldInterface           A pointer to the old interface 
-  @param  NewInterface           A pointer to the new interface 
+  @param  UserHandle             Handle on which the interface is to be
+                                 reinstalled
+  @param  Protocol               The numeric ID of the interface
+  @param  OldInterface           A pointer to the old interface
+  @param  NewInterface           A pointer to the new interface
 
   @retval EFI_SUCCESS            The protocol interface was installed
   @retval EFI_NOT_FOUND          The OldInterface on the handle was not found
@@ -746,11 +745,11 @@ CoreReinstallProtocolInterface (
   If the last protocol interface is remove from the handle, the
   handle is freed.
 
-  @param  UserHandle             The handle to remove the protocol handler from 
-  @param  Protocol               The protocol, of protocol:interface, to remove 
-  @param  Interface              The interface, of protocol:interface, to remove 
+  @param  UserHandle             The handle to remove the protocol handler from
+  @param  Protocol               The protocol, of protocol:interface, to remove
+  @param  Interface              The interface, of protocol:interface, to remove
 
-  @retval EFI_INVALID_PARAMETER  Protocol is NULL. 
+  @retval EFI_INVALID_PARAMETER  Protocol is NULL.
   @retval EFI_SUCCESS            Protocol interface successfully uninstalled.
 
 **/
@@ -767,10 +766,10 @@ CoreUninstallProtocolInterface (
 /**
   Queries a handle to determine if it supports a specified protocol.
 
-  @param  UserHandle             The handle being queried. 
-  @param  Protocol               The published unique identifier of the protocol. 
-  @param  Interface              Supplies the address where a pointer to the 
-                                 corresponding Protocol Interface is returned. 
+  @param  UserHandle             The handle being queried.
+  @param  Protocol               The published unique identifier of the protocol.
+  @param  Interface              Supplies the address where a pointer to the
+                                 corresponding Protocol Interface is returned.
 
   @return The requested protocol interface for the handle
 
@@ -790,18 +789,18 @@ CoreHandleProtocol (
   invokes it to obtain the protocol interface. Usage information
   is registered in the protocol data base.
 
-  @param  UserHandle             The handle to obtain the protocol interface on 
-  @param  Protocol               The ID of the protocol 
-  @param  Interface              The location to return the protocol interface 
-  @param  ImageHandle            The handle of the Image that is opening the 
-                                 protocol interface specified by Protocol and 
-                                 Interface. 
-  @param  ControllerHandle       The controller handle that is requiring this 
-                                 interface. 
-  @param  Attributes             The open mode of the protocol interface 
-                                 specified by Handle and Protocol. 
+  @param  UserHandle             The handle to obtain the protocol interface on
+  @param  Protocol               The ID of the protocol
+  @param  Interface              The location to return the protocol interface
+  @param  ImageHandle            The handle of the Image that is opening the
+                                 protocol interface specified by Protocol and
+                                 Interface.
+  @param  ControllerHandle       The controller handle that is requiring this
+                                 interface.
+  @param  Attributes             The open mode of the protocol interface
+                                 specified by Handle and Protocol.
 
-  @retval EFI_INVALID_PARAMETER  Protocol is NULL. 
+  @retval EFI_INVALID_PARAMETER  Protocol is NULL.
   @retval EFI_SUCCESS            Get the protocol interface.
 
 **/
@@ -821,11 +820,11 @@ CoreOpenProtocol (
 /**
   Return information about Opened protocols in the system
 
-  @param  UserHandle             The handle to close the protocol interface on 
-  @param  Protocol               The ID of the protocol 
-  @param  EntryBuffer            A pointer to a buffer of open protocol 
-                                 information in the form of 
-                                 EFI_OPEN_PROTOCOL_INFORMATION_ENTRY structures. 
+  @param  UserHandle             The handle to close the protocol interface on
+  @param  Protocol               The ID of the protocol
+  @param  EntryBuffer            A pointer to a buffer of open protocol
+                                 information in the form of
+                                 EFI_OPEN_PROTOCOL_INFORMATION_ENTRY structures.
   @param  EntryCount             Number of EntryBuffer entries
 
 **/
@@ -843,25 +842,25 @@ CoreOpenProtocolInformation (
 /**
   Closes a protocol on a handle that was opened using OpenProtocol().
 
-  @param  UserHandle             The handle for the protocol interface that was 
-                                 previously opened with OpenProtocol(), and is 
-                                 now being closed. 
-  @param  Protocol               The published unique identifier of the protocol. 
-                                 It is the caller's responsibility to pass in a 
-                                 valid GUID. 
-  @param  AgentHandle            The handle of the agent that is closing the 
-                                 protocol interface. 
-  @param  ControllerHandle       If the agent that opened a protocol is a driver 
-                                 that follows the EFI Driver Model, then this 
-                                 parameter is the controller handle that required 
-                                 the protocol interface. If the agent does not 
-                                 follow the EFI Driver Model, then this parameter 
-                                 is optional and may be NULL. 
+  @param  UserHandle             The handle for the protocol interface that was
+                                 previously opened with OpenProtocol(), and is
+                                 now being closed.
+  @param  Protocol               The published unique identifier of the protocol.
+                                 It is the caller's responsibility to pass in a
+                                 valid GUID.
+  @param  AgentHandle            The handle of the agent that is closing the
+                                 protocol interface.
+  @param  ControllerHandle       If the agent that opened a protocol is a driver
+                                 that follows the EFI Driver Model, then this
+                                 parameter is the controller handle that required
+                                 the protocol interface. If the agent does not
+                                 follow the EFI Driver Model, then this parameter
+                                 is optional and may be NULL.
 
-  @retval EFI_SUCCESS            The protocol instance was closed. 
-  @retval EFI_INVALID_PARAMETER  Handle, AgentHandle or ControllerHandle is not a 
-                                 valid EFI_HANDLE. 
-  @retval EFI_NOT_FOUND          Can not find the specified protocol or 
+  @retval EFI_SUCCESS            The protocol instance was closed.
+  @retval EFI_INVALID_PARAMETER  Handle, AgentHandle or ControllerHandle is not a
+                                 valid EFI_HANDLE.
+  @retval EFI_NOT_FOUND          Can not find the specified protocol or
                                  AgentHandle.
 
 **/
@@ -871,7 +870,7 @@ CoreCloseProtocol (
   IN  EFI_HANDLE                UserHandle,
   IN  EFI_GUID                  *Protocol,
   IN  EFI_HANDLE                AgentHandle,
-  IN  EFI_HANDLE                ControllerHandle  
+  IN  EFI_HANDLE                ControllerHandle
   );
 
 
@@ -880,22 +879,22 @@ CoreCloseProtocol (
   Retrieves the list of protocol interface GUIDs that are installed on a handle in a buffer allocated
   from pool.
 
-  @param  UserHandle             The handle from which to retrieve the list of 
-                                 protocol interface GUIDs. 
-  @param  ProtocolBuffer         A pointer to the list of protocol interface GUID 
-                                 pointers that are installed on Handle. 
-  @param  ProtocolBufferCount    A pointer to the number of GUID pointers present 
-                                 in ProtocolBuffer. 
+  @param  UserHandle             The handle from which to retrieve the list of
+                                 protocol interface GUIDs.
+  @param  ProtocolBuffer         A pointer to the list of protocol interface GUID
+                                 pointers that are installed on Handle.
+  @param  ProtocolBufferCount    A pointer to the number of GUID pointers present
+                                 in ProtocolBuffer.
 
-  @retval EFI_SUCCESS            The list of protocol interface GUIDs installed 
-                                 on Handle was returned in ProtocolBuffer. The 
-                                 number of protocol interface GUIDs was returned 
-                                 in ProtocolBufferCount. 
-  @retval EFI_INVALID_PARAMETER  Handle is NULL. 
-  @retval EFI_INVALID_PARAMETER  Handle is not a valid EFI_HANDLE. 
-  @retval EFI_INVALID_PARAMETER  ProtocolBuffer is NULL. 
-  @retval EFI_INVALID_PARAMETER  ProtocolBufferCount is NULL. 
-  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the 
+  @retval EFI_SUCCESS            The list of protocol interface GUIDs installed
+                                 on Handle was returned in ProtocolBuffer. The
+                                 number of protocol interface GUIDs was returned
+                                 in ProtocolBufferCount.
+  @retval EFI_INVALID_PARAMETER  Handle is NULL.
+  @retval EFI_INVALID_PARAMETER  Handle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER  ProtocolBuffer is NULL.
+  @retval EFI_INVALID_PARAMETER  ProtocolBufferCount is NULL.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the
                                  results.
 
 **/
@@ -912,13 +911,13 @@ CoreProtocolsPerHandle (
 /**
   Add a new protocol notification record for the request protocol.
 
-  @param  Protocol               The requested protocol to add the notify 
-                                 registration 
-  @param  Event                  The event to signal 
-  @param  Registration           Returns the registration record 
+  @param  Protocol               The requested protocol to add the notify
+                                 registration
+  @param  Event                  The event to signal
+  @param  Registration           Returns the registration record
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter 
-  @retval EFI_SUCCESS            Successfully returned the registration record 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_SUCCESS            Successfully returned the registration record
                                  that has been added
 
 **/
@@ -927,26 +926,26 @@ EFIAPI
 CoreRegisterProtocolNotify (
   IN EFI_GUID       *Protocol,
   IN EFI_EVENT      Event,
-  OUT  VOID           **Registration
+  OUT  VOID         **Registration
   );
-  
+
 
 
 /**
   Locates the requested handle(s) and returns them in Buffer.
 
-  @param  SearchType             The type of search to perform to locate the 
-                                 handles 
-  @param  Protocol               The protocol to search for 
-  @param  SearchKey              Dependant on SearchType 
-  @param  BufferSize             On input the size of Buffer.  On output the  
-                                 size of data returned. 
-  @param  Buffer                 The buffer to return the results in 
+  @param  SearchType             The type of search to perform to locate the
+                                 handles
+  @param  Protocol               The protocol to search for
+  @param  SearchKey              Dependant on SearchType
+  @param  BufferSize             On input the size of Buffer.  On output the
+                                 size of data returned.
+  @param  Buffer                 The buffer to return the results in
 
-  @retval EFI_BUFFER_TOO_SMALL   Buffer too small, required buffer size is 
-                                 returned in BufferSize. 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter 
-  @retval EFI_SUCCESS            Successfully found the requested handle(s) and 
+  @retval EFI_BUFFER_TOO_SMALL   Buffer too small, required buffer size is
+                                 returned in BufferSize.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_SUCCESS            Successfully found the requested handle(s) and
                                  returns them in Buffer.
 
 **/
@@ -959,21 +958,21 @@ CoreLocateHandle (
   IN OUT UINTN                *BufferSize,
   OUT EFI_HANDLE              *Buffer
   );
-  
+
 
 
 /**
   Locates the handle to a device on the device path that best matches the specified protocol.
 
-  @param  Protocol               The protocol to search for. 
-  @param  DevicePath             On input, a pointer to a pointer to the device 
-                                 path. On output, the device path pointer is 
-                                 modified to point to the remaining part of the 
-                                 devicepath. 
-  @param  Device                 A pointer to the returned device handle. 
+  @param  Protocol               The protocol to search for.
+  @param  DevicePath             On input, a pointer to a pointer to the device
+                                 path. On output, the device path pointer is
+                                 modified to point to the remaining part of the
+                                 devicepath.
+  @param  Device                 A pointer to the returned device handle.
 
-  @retval EFI_SUCCESS            The resulting handle was returned. 
-  @retval EFI_NOT_FOUND          No handles matched the search. 
+  @retval EFI_SUCCESS            The resulting handle was returned.
+  @retval EFI_NOT_FOUND          No handles matched the search.
   @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
 
 **/
@@ -985,28 +984,28 @@ CoreLocateDevicePath (
   OUT EFI_HANDLE                    *Device
   );
 
- 
+
 
 /**
   Function returns an array of handles that support the requested protocol
   in a buffer allocated from pool. This is a version of CoreLocateHandle()
   that allocates a buffer for the caller.
 
-  @param  SearchType             Specifies which handle(s) are to be returned. 
-  @param  Protocol               Provides the protocol to search by.    This 
-                                 parameter is only valid for SearchType 
-                                 ByProtocol. 
-  @param  SearchKey              Supplies the search key depending on the 
-                                 SearchType. 
-  @param  NumberHandles          The number of handles returned in Buffer. 
-  @param  Buffer                 A pointer to the buffer to return the requested 
-                                 array of  handles that support Protocol. 
+  @param  SearchType             Specifies which handle(s) are to be returned.
+  @param  Protocol               Provides the protocol to search by.    This
+                                 parameter is only valid for SearchType
+                                 ByProtocol.
+  @param  SearchKey              Supplies the search key depending on the
+                                 SearchType.
+  @param  NumberHandles          The number of handles returned in Buffer.
+  @param  Buffer                 A pointer to the buffer to return the requested
+                                 array of  handles that support Protocol.
 
-  @retval EFI_SUCCESS            The result array of handles was returned. 
-  @retval EFI_NOT_FOUND          No handles match the search. 
-  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the 
-                                 matching results. 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_SUCCESS            The result array of handles was returned.
+  @retval EFI_NOT_FOUND          No handles match the search.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the
+                                 matching results.
+  @retval EFI_INVALID_PARAMETER  One or more paramters are not valid.
 
 **/
 EFI_STATUS
@@ -1019,7 +1018,7 @@ CoreLocateHandleBuffer (
   OUT EFI_HANDLE                  **Buffer
   );
 
- 
+
 
 /**
   Return the first Protocol Interface that matches the Protocol GUID. If
@@ -1062,7 +1061,7 @@ CoreGetHandleDatabaseKey (
 /**
   Go connect any handles that were created or modified while a image executed.
 
-  @param  Key                    The Key to show that the handle has been 
+  @param  Key                    The Key to show that the handle has been
                                  created/modified
 
 **/
@@ -1076,22 +1075,22 @@ CoreConnectHandlesByKey (
 /**
   Connects one or more drivers to a controller.
 
-  @param  ControllerHandle                      Handle of the controller to be 
-                                                connected. 
-  @param  DriverImageHandle                     DriverImageHandle A pointer to an 
-                                                ordered list of driver image 
-                                                handles. 
-  @param  RemainingDevicePath                   RemainingDevicePath A pointer to 
-                                                the device path that specifies a 
-                                                child of the controller specified 
-                                                by ControllerHandle. 
-  @param  Recursive                             Whether the function would be 
-                                                called recursively or not. 
+  @param  ControllerHandle                      Handle of the controller to be
+                                                connected.
+  @param  DriverImageHandle                     DriverImageHandle A pointer to an
+                                                ordered list of driver image
+                                                handles.
+  @param  RemainingDevicePath                   RemainingDevicePath A pointer to
+                                                the device path that specifies a
+                                                child of the controller specified
+                                                by ControllerHandle.
+  @param  Recursive                             Whether the function would be
+                                                called recursively or not.
 
   @return Status code.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 CoreConnectController (
   IN  EFI_HANDLE                ControllerHandle,
@@ -1105,37 +1104,37 @@ CoreConnectController (
 /**
   Disonnects a controller from a driver
 
-  @param  ControllerHandle                      ControllerHandle The handle of 
-                                                the controller from which 
-                                                driver(s)  are to be 
-                                                disconnected. 
-  @param  DriverImageHandle                     DriverImageHandle The driver to 
-                                                disconnect from ControllerHandle. 
-  @param  ChildHandle                           ChildHandle The handle of the 
-                                                child to destroy. 
+  @param  ControllerHandle                      ControllerHandle The handle of
+                                                the controller from which
+                                                driver(s)  are to be
+                                                disconnected.
+  @param  DriverImageHandle                     DriverImageHandle The driver to
+                                                disconnect from ControllerHandle.
+  @param  ChildHandle                           ChildHandle The handle of the
+                                                child to destroy.
 
-  @retval EFI_SUCCESS                           One or more drivers were 
-                                                disconnected from the controller. 
-  @retval EFI_SUCCESS                           On entry, no drivers are managing 
-                                                ControllerHandle. 
-  @retval EFI_SUCCESS                           DriverImageHandle is not NULL, 
-                                                and on entry DriverImageHandle is 
-                                                not managing ControllerHandle. 
-  @retval EFI_INVALID_PARAMETER                 ControllerHandle is not a valid 
-                                                EFI_HANDLE. 
-  @retval EFI_INVALID_PARAMETER                 DriverImageHandle is not NULL, 
-                                                and it is not a valid EFI_HANDLE. 
-  @retval EFI_INVALID_PARAMETER                 ChildHandle is not NULL, and it 
-                                                is not a valid EFI_HANDLE. 
-  @retval EFI_OUT_OF_RESOURCES                  There are not enough resources 
-                                                available to disconnect any 
-                                                drivers from ControllerHandle. 
-  @retval EFI_DEVICE_ERROR                      The controller could not be 
-                                                disconnected because of a device 
+  @retval EFI_SUCCESS                           One or more drivers were
+                                                disconnected from the controller.
+  @retval EFI_SUCCESS                           On entry, no drivers are managing
+                                                ControllerHandle.
+  @retval EFI_SUCCESS                           DriverImageHandle is not NULL,
+                                                and on entry DriverImageHandle is
+                                                not managing ControllerHandle.
+  @retval EFI_INVALID_PARAMETER                 ControllerHandle is not a valid
+                                                EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER                 DriverImageHandle is not NULL,
+                                                and it is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER                 ChildHandle is not NULL, and it
+                                                is not a valid EFI_HANDLE.
+  @retval EFI_OUT_OF_RESOURCES                  There are not enough resources
+                                                available to disconnect any
+                                                drivers from ControllerHandle.
+  @retval EFI_DEVICE_ERROR                      The controller could not be
+                                                disconnected because of a device
                                                 error.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 CoreDisconnectController (
   IN  EFI_HANDLE  ControllerHandle,
@@ -1148,18 +1147,18 @@ CoreDisconnectController (
 /**
   Allocates pages from the memory map.
 
-  @param  Type                   The type of allocation to perform 
-  @param  MemoryType             The type of memory to turn the allocated pages 
-                                 into 
-  @param  NumberOfPages          The number of pages to allocate 
-  @param  Memory                 A pointer to receive the base allocated memory 
-                                 address 
+  @param  Type                   The type of allocation to perform
+  @param  MemoryType             The type of memory to turn the allocated pages
+                                 into
+  @param  NumberOfPages          The number of pages to allocate
+  @param  Memory                 A pointer to receive the base allocated memory
+                                 address
 
   @return Status. On success, Memory is filled in with the base address allocated
-  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in 
-                                 spec. 
-  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement. 
-  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate. 
+  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in
+                                 spec.
+  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
+  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate.
   @retval EFI_SUCCESS            Pages successfully allocated.
 
 **/
@@ -1177,15 +1176,15 @@ CoreAllocatePages (
 /**
   Frees previous allocated pages.
 
-  @param  Memory                 Base address of memory being freed 
-  @param  NumberOfPages          The number of pages to free 
+  @param  Memory                 Base address of memory being freed
+  @param  NumberOfPages          The number of pages to free
 
-  @retval EFI_NOT_FOUND          Could not find the entry that covers the range 
-  @retval EFI_INVALID_PARAMETER  Address not aligned 
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
+  @retval EFI_INVALID_PARAMETER  Address not aligned
   @return EFI_SUCCESS         -Pages successfully freed.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 CoreFreePages (
   IN EFI_PHYSICAL_ADDRESS   Memory,
@@ -1198,29 +1197,29 @@ CoreFreePages (
   This function returns a copy of the current memory map. The map is an array of
   memory descriptors, each of which describes a contiguous block of memory.
 
-  @param  MemoryMapSize          A pointer to the size, in bytes, of the 
-                                 MemoryMap buffer. On input, this is the size of 
-                                 the buffer allocated by the caller.  On output, 
-                                 it is the size of the buffer returned by the 
-                                 firmware  if the buffer was large enough, or the 
-                                 size of the buffer needed  to contain the map if 
-                                 the buffer was too small. 
-  @param  MemoryMap              A pointer to the buffer in which firmware places 
-                                 the current memory map. 
-  @param  MapKey                 A pointer to the location in which firmware 
-                                 returns the key for the current memory map. 
-  @param  DescriptorSize         A pointer to the location in which firmware 
-                                 returns the size, in bytes, of an individual 
-                                 EFI_MEMORY_DESCRIPTOR. 
-  @param  DescriptorVersion      A pointer to the location in which firmware 
-                                 returns the version number associated with the 
-                                 EFI_MEMORY_DESCRIPTOR. 
+  @param  MemoryMapSize          A pointer to the size, in bytes, of the
+                                 MemoryMap buffer. On input, this is the size of
+                                 the buffer allocated by the caller.  On output,
+                                 it is the size of the buffer returned by the
+                                 firmware  if the buffer was large enough, or the
+                                 size of the buffer needed  to contain the map if
+                                 the buffer was too small.
+  @param  MemoryMap              A pointer to the buffer in which firmware places
+                                 the current memory map.
+  @param  MapKey                 A pointer to the location in which firmware
+                                 returns the key for the current memory map.
+  @param  DescriptorSize         A pointer to the location in which firmware
+                                 returns the size, in bytes, of an individual
+                                 EFI_MEMORY_DESCRIPTOR.
+  @param  DescriptorVersion      A pointer to the location in which firmware
+                                 returns the version number associated with the
+                                 EFI_MEMORY_DESCRIPTOR.
 
-  @retval EFI_SUCCESS            The memory map was returned in the MemoryMap 
-                                 buffer. 
-  @retval EFI_BUFFER_TOO_SMALL   The MemoryMap buffer was too small. The current 
-                                 buffer size needed to hold the memory map is 
-                                 returned in MemoryMapSize. 
+  @retval EFI_SUCCESS            The memory map was returned in the MemoryMap
+                                 buffer.
+  @retval EFI_BUFFER_TOO_SMALL   The MemoryMap buffer was too small. The current
+                                 buffer size needed to hold the memory map is
+                                 returned in MemoryMapSize.
   @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
 
 **/
@@ -1239,13 +1238,13 @@ CoreGetMemoryMap (
 /**
   Allocate pool of a particular type.
 
-  @param  PoolType               Type of pool to allocate 
-  @param  Size                   The amount of pool to allocate 
-  @param  Buffer                 The address to return a pointer to the allocated 
-                                 pool 
+  @param  PoolType               Type of pool to allocate
+  @param  Size                   The amount of pool to allocate
+  @param  Buffer                 The address to return a pointer to the allocated
+                                 pool
 
-  @retval EFI_INVALID_PARAMETER  PoolType not valid 
-  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed. 
+  @retval EFI_INVALID_PARAMETER  PoolType not valid
+  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed.
   @retval EFI_SUCCESS            Pool successfully allocated.
 
 **/
@@ -1262,9 +1261,9 @@ CoreAllocatePool (
 /**
   Frees pool.
 
-  @param  Buffer                 The allocated pool entry to free 
+  @param  Buffer                 The allocated pool entry to free
 
-  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value. 
+  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value.
   @retval EFI_SUCCESS            Pool successfully freed.
 
 **/
@@ -1279,26 +1278,26 @@ CoreFreePool (
 /**
   Loads an EFI image into memory and returns a handle to the image.
 
-  @param  BootPolicy              If TRUE, indicates that the request originates 
-                                  from the boot manager, and that the boot 
-                                  manager is attempting to load FilePath as a 
-                                  boot selection. 
-  @param  ParentImageHandle       The caller's image handle. 
-  @param  FilePath                The specific file path from which the image is 
-                                  loaded. 
-  @param  SourceBuffer            If not NULL, a pointer to the memory location 
-                                  containing a copy of the image to be loaded. 
-  @param  SourceSize              The size in bytes of SourceBuffer. 
-  @param  ImageHandle             Pointer to the returned image handle that is 
-                                  created when the image is successfully loaded. 
+  @param  BootPolicy              If TRUE, indicates that the request originates
+                                  from the boot manager, and that the boot
+                                  manager is attempting to load FilePath as a
+                                  boot selection.
+  @param  ParentImageHandle       The caller's image handle.
+  @param  FilePath                The specific file path from which the image is
+                                  loaded.
+  @param  SourceBuffer            If not NULL, a pointer to the memory location
+                                  containing a copy of the image to be loaded.
+  @param  SourceSize              The size in bytes of SourceBuffer.
+  @param  ImageHandle             Pointer to the returned image handle that is
+                                  created when the image is successfully loaded.
 
-  @retval EFI_SUCCESS             The image was loaded into memory. 
-  @retval EFI_NOT_FOUND           The FilePath was not found. 
-  @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value. 
-  @retval EFI_UNSUPPORTED         The image type is not supported, or the device 
-                                  path cannot be parsed to locate the proper 
-                                  protocol for loading the file. 
-  @retval EFI_OUT_OF_RESOURCES    Image was not loaded due to insufficient 
+  @retval EFI_SUCCESS             The image was loaded into memory.
+  @retval EFI_NOT_FOUND           The FilePath was not found.
+  @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value.
+  @retval EFI_UNSUPPORTED         The image type is not supported, or the device
+                                  path cannot be parsed to locate the proper
+                                  protocol for loading the file.
+  @retval EFI_OUT_OF_RESOURCES    Image was not loaded due to insufficient
                                   resources.
 
 **/
@@ -1318,12 +1317,12 @@ CoreLoadImage (
 /**
   Unloads an image.
 
-  @param  ImageHandle             Handle that identifies the image to be 
-                                  unloaded. 
+  @param  ImageHandle             Handle that identifies the image to be
+                                  unloaded.
 
-  @retval EFI_SUCCESS             The image has been unloaded. 
-  @retval EFI_UNSUPPORTED         The image has been sarted, and does not support 
-                                  unload. 
+  @retval EFI_SUCCESS             The image has been unloaded.
+  @retval EFI_UNSUPPORTED         The image has been sarted, and does not support
+                                  unload.
   @retval EFI_INVALID_PARAMPETER  ImageHandle is not a valid image handle.
 
 **/
@@ -1338,18 +1337,18 @@ CoreUnloadImage (
 /**
   Transfer control to a loaded image's entry point.
 
-  @param  ImageHandle             Handle of image to be started. 
-  @param  ExitDataSize            Pointer of the size to ExitData 
-  @param  ExitData                Pointer to a pointer to a data buffer that 
-                                  includes a Null-terminated Unicode string, 
-                                  optionally followed by additional binary data. 
-                                  The string is a description that the caller may 
-                                  use to further indicate the reason for the 
-                                  image's exit. 
+  @param  ImageHandle             Handle of image to be started.
+  @param  ExitDataSize            Pointer of the size to ExitData
+  @param  ExitData                Pointer to a pointer to a data buffer that
+                                  includes a Null-terminated Unicode string,
+                                  optionally followed by additional binary data.
+                                  The string is a description that the caller may
+                                  use to further indicate the reason for the
+                                  image's exit.
 
-  @retval EFI_INVALID_PARAMETER   Invalid parameter 
-  @retval EFI_OUT_OF_RESOURCES    No enough buffer to allocate 
-  @retval EFI_SUCCESS             Successfully transfer control to the image's 
+  @retval EFI_INVALID_PARAMETER   Invalid parameter
+  @retval EFI_OUT_OF_RESOURCES    No enough buffer to allocate
+  @retval EFI_SUCCESS             Successfully transfer control to the image's
                                   entry point.
 
 **/
@@ -1366,23 +1365,23 @@ CoreStartImage (
 /**
   Terminates the currently loaded EFI image and returns control to boot services.
 
-  @param  ImageHandle             Handle that identifies the image. This 
-                                  parameter is passed to the image on entry. 
-  @param  Status                  The image's exit code. 
-  @param  ExitDataSize            The size, in bytes, of ExitData. Ignored if 
-                                  ExitStatus is EFI_SUCCESS. 
-  @param  ExitData                Pointer to a data buffer that includes a 
-                                  Null-terminated Unicode string, optionally 
-                                  followed by additional binary data. The string 
-                                  is a description that the caller may use to 
-                                  further indicate the reason for the image's 
-                                  exit. 
+  @param  ImageHandle             Handle that identifies the image. This
+                                  parameter is passed to the image on entry.
+  @param  Status                  The image's exit code.
+  @param  ExitDataSize            The size, in bytes, of ExitData. Ignored if
+                                  ExitStatus is EFI_SUCCESS.
+  @param  ExitData                Pointer to a data buffer that includes a
+                                  Null-terminated Unicode string, optionally
+                                  followed by additional binary data. The string
+                                  is a description that the caller may use to
+                                  further indicate the reason for the image's
+                                  exit.
 
-  @retval EFI_INVALID_PARAMETER   Image handle is NULL or it is not current 
-                                  image. 
-  @retval EFI_SUCCESS             Successfully terminates the currently loaded 
-                                  EFI image. 
-  @retval EFI_ACCESS_DENIED       Should never reach there. 
+  @retval EFI_INVALID_PARAMETER   Image handle is NULL or it is not current
+                                  image.
+  @retval EFI_SUCCESS             Successfully terminates the currently loaded
+                                  EFI image.
+  @retval EFI_ACCESS_DENIED       Should never reach there.
   @retval EFI_OUT_OF_RESOURCES    Could not allocate pool
 
 **/
@@ -1400,18 +1399,18 @@ CoreExit (
 /**
   Creates a general-purpose event structure.
 
-  @param  Type                   The type of event to create and its mode and 
-                                 attributes 
-  @param  NotifyTpl              The task priority level of event notifications 
-  @param  NotifyFunction         Pointer to the events notification function 
-  @param  NotifyContext          Pointer to the notification functions context; 
-                                 corresponds to parameter "Context" in the 
-                                 notification function 
-  @param  Event                  Pointer to the newly created event if the call 
-                                 succeeds; undefined otherwise 
+  @param  Type                   The type of event to create and its mode and
+                                 attributes
+  @param  NotifyTpl              The task priority level of event notifications
+  @param  NotifyFunction         Pointer to the events notification function
+  @param  NotifyContext          Pointer to the notification functions context;
+                                 corresponds to parameter "Context" in the
+                                 notification function
+  @param  Event                  Pointer to the newly created event if the call
+                                 succeeds; undefined otherwise
 
-  @retval EFI_SUCCESS            The event structure was created 
-  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value 
+  @retval EFI_SUCCESS            The event structure was created
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value
   @retval EFI_OUT_OF_RESOURCES   The event could not be allocated
 
 **/
@@ -1430,20 +1429,20 @@ CoreCreateEvent (
 /**
   Creates a general-purpose event structure
 
-  @param  Type                   The type of event to create and its mode and 
-                                 attributes 
-  @param  NotifyTpl              The task priority level of event notifications 
-  @param  NotifyFunction         Pointer to the events notification function 
-  @param  NotifyContext          Pointer to the notification functions context; 
-                                 corresponds to parameter "Context" in the 
-                                 notification function 
-  @param  EventGroup             GUID for EventGroup if NULL act the same as 
-                                 gBS->CreateEvent(). 
-  @param  Event                  Pointer to the newly created event if the call 
-                                 succeeds; undefined otherwise 
+  @param  Type                   The type of event to create and its mode and
+                                 attributes
+  @param  NotifyTpl              The task priority level of event notifications
+  @param  NotifyFunction         Pointer to the events notification function
+  @param  NotifyContext          Pointer to the notification functions context;
+                                 corresponds to parameter "Context" in the
+                                 notification function
+  @param  EventGroup             GUID for EventGroup if NULL act the same as
+                                 gBS->CreateEvent().
+  @param  Event                  Pointer to the newly created event if the call
+                                 succeeds; undefined otherwise
 
-  @retval EFI_SUCCESS            The event structure was created 
-  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value 
+  @retval EFI_SUCCESS            The event structure was created
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value
   @retval EFI_OUT_OF_RESOURCES   The event could not be allocated
 
 **/
@@ -1463,15 +1462,15 @@ CoreCreateEventEx (
 /**
   Sets the type of timer and the trigger time for a timer event.
 
-  @param  UserEvent              The timer event that is to be signaled at the 
-                                 specified time 
-  @param  Type                   The type of time that is specified in 
-                                 TriggerTime 
-  @param  TriggerTime            The number of 100ns units until the timer 
-                                 expires 
+  @param  UserEvent              The timer event that is to be signaled at the
+                                 specified time
+  @param  Type                   The type of time that is specified in
+                                 TriggerTime
+  @param  TriggerTime            The number of 100ns units until the timer
+                                 expires
 
-  @retval EFI_SUCCESS            The event has been set to be signaled at the 
-                                 requested time 
+  @retval EFI_SUCCESS            The event has been set to be signaled at the
+                                 requested time
   @retval EFI_INVALID_PARAMETER  Event or Type is not valid
 
 **/
@@ -1486,11 +1485,11 @@ CoreSetTimer (
 
 
 /**
-  Signals the event.  Queues the event to be notified if needed
+  Signals the event.  Queues the event to be notified if needed.
 
-  @param  UserEvent              The event to signal 
+  @param  UserEvent              The event to signal .
 
-  @retval EFI_INVALID_PARAMETER  Parameters are not valid. 
+  @retval EFI_INVALID_PARAMETER  Parameters are not valid.
   @retval EFI_SUCCESS            The event was signaled.
 
 **/
@@ -1505,14 +1504,14 @@ CoreSignalEvent (
 /**
   Stops execution until an event is signaled.
 
-  @param  NumberOfEvents         The number of events in the UserEvents array 
-  @param  UserEvents             An array of EFI_EVENT 
-  @param  UserIndex              Pointer to the index of the event which 
-                                 satisfied the wait condition 
+  @param  NumberOfEvents         The number of events in the UserEvents array
+  @param  UserEvents             An array of EFI_EVENT
+  @param  UserIndex              Pointer to the index of the event which
+                                 satisfied the wait condition
 
-  @retval EFI_SUCCESS            The event indicated by Index was signaled. 
-  @retval EFI_INVALID_PARAMETER  The event indicated by Index has a notification 
-                                 function or Event was not a valid type 
+  @retval EFI_SUCCESS            The event indicated by Index was signaled.
+  @retval EFI_INVALID_PARAMETER  The event indicated by Index has a notification
+                                 function or Event was not a valid type
   @retval EFI_UNSUPPORTED        The current TPL is not TPL_APPLICATION
 
 **/
@@ -1529,9 +1528,9 @@ CoreWaitForEvent (
 /**
   Closes an event and frees the event structure.
 
-  @param  UserEvent              Event to close 
+  @param  UserEvent              Event to close
 
-  @retval EFI_INVALID_PARAMETER  Parameters are not valid. 
+  @retval EFI_INVALID_PARAMETER  Parameters are not valid.
   @retval EFI_SUCCESS            The event has been closed
 
 **/
@@ -1546,10 +1545,10 @@ CoreCloseEvent (
 /**
   Check the status of an event.
 
-  @param  UserEvent              The event to check 
+  @param  UserEvent              The event to check
 
-  @retval EFI_SUCCESS            The event is in the signaled state 
-  @retval EFI_NOT_READY          The event is not in the signaled state 
+  @retval EFI_SUCCESS            The event is in the signaled state
+  @retval EFI_NOT_READY          The event is not in the signaled state
   @retval EFI_INVALID_PARAMETER  Event is of type EVT_NOTIFY_SIGNAL
 
 **/
@@ -1564,10 +1563,10 @@ CoreCheckEvent (
   Adds reserved memory, system memory, or memory-mapped I/O resources to the
   global coherency domain of the processor.
 
-  @param  GcdMemoryType          Memory type of the memory space. 
-  @param  BaseAddress            Base address of the memory space. 
-  @param  Length                 Length of the memory space. 
-  @param  Capabilities           alterable attributes of the memory space. 
+  @param  GcdMemoryType          Memory type of the memory space.
+  @param  BaseAddress            Base address of the memory space.
+  @param  Length                 Length of the memory space.
+  @param  Capabilities           alterable attributes of the memory space.
 
   @retval EFI_SUCCESS            Merged this memory space into GCD map.
 
@@ -1585,16 +1584,16 @@ CoreAddMemorySpace (
   Allocates nonexistent memory, reserved memory, system memory, or memorymapped
   I/O resources from the global coherency domain of the processor.
 
-  @param  GcdAllocateType        The type of allocate operation 
-  @param  GcdMemoryType          The desired memory type 
-  @param  Alignment              Align with 2^Alignment 
-  @param  Length                 Length to allocate 
-  @param  BaseAddress            Base address to allocate 
-  @param  ImageHandle            The image handle consume the allocated space. 
-  @param  DeviceHandle           The device handle consume the allocated space. 
+  @param  GcdAllocateType        The type of allocate operation
+  @param  GcdMemoryType          The desired memory type
+  @param  Alignment              Align with 2^Alignment
+  @param  Length                 Length to allocate
+  @param  BaseAddress            Base address to allocate
+  @param  ImageHandle            The image handle consume the allocated space.
+  @param  DeviceHandle           The device handle consume the allocated space.
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter. 
-  @retval EFI_NOT_FOUND          No descriptor contains the desired space. 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval EFI_NOT_FOUND          No descriptor contains the desired space.
   @retval EFI_SUCCESS            Memory space successfully allocated.
 
 **/
@@ -1614,8 +1613,8 @@ CoreAllocateMemorySpace (
   Frees nonexistent memory, reserved memory, system memory, or memory-mapped
   I/O resources from the global coherency domain of the processor.
 
-  @param  BaseAddress            Base address of the memory space. 
-  @param  Length                 Length of the memory space. 
+  @param  BaseAddress            Base address of the memory space.
+  @param  Length                 Length of the memory space.
 
   @retval EFI_SUCCESS            Space successfully freed.
 
@@ -1631,8 +1630,8 @@ CoreFreeMemorySpace (
   Removes reserved memory, system memory, or memory-mapped I/O resources from
   the global coherency domain of the processor.
 
-  @param  BaseAddress            Base address of the memory space. 
-  @param  Length                 Length of the memory space. 
+  @param  BaseAddress            Base address of the memory space.
+  @param  Length                 Length of the memory space.
 
   @retval EFI_SUCCESS            Successfully remove a segment of memory space.
 
@@ -1647,10 +1646,10 @@ CoreRemoveMemorySpace (
 /**
   Retrieves the descriptor for a memory region containing a specified address.
 
-  @param  BaseAddress            Specified start address 
-  @param  Descriptor             Specified length 
+  @param  BaseAddress            Specified start address
+  @param  Descriptor             Specified length
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCCESS            Successfully get memory space descriptor.
 
 **/
@@ -1665,11 +1664,11 @@ CoreGetMemorySpaceDescriptor (
   Modifies the attributes for a memory region in the global coherency domain of the
   processor.
 
-  @param  BaseAddress            Specified start address 
-  @param  Length                 Specified length 
-  @param  Attributes             Specified attributes 
+  @param  BaseAddress            Specified start address
+  @param  Length                 Specified length
+  @param  Attributes             Specified attributes
 
-  @retval EFI_SUCCESS            Successfully set attribute of a segment of 
+  @retval EFI_SUCCESS            Successfully set attribute of a segment of
                                  memory space.
 
 **/
@@ -1685,11 +1684,11 @@ CoreSetMemorySpaceAttributes (
   Returns a map of the memory resources in the global coherency domain of the
   processor.
 
-  @param  NumberOfDescriptors    Number of descriptors. 
-  @param  MemorySpaceMap         Descriptor array 
+  @param  NumberOfDescriptors    Number of descriptors.
+  @param  MemorySpaceMap         Descriptor array
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter 
-  @retval EFI_OUT_OF_RESOURCES   No enough buffer to allocate 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_OUT_OF_RESOURCES   No enough buffer to allocate
   @retval EFI_SUCCESS            Successfully get memory space map.
 
 **/
@@ -1703,11 +1702,11 @@ CoreGetMemorySpaceMap (
 /**
   Adds reserved I/O or I/O resources to the global coherency domain of the processor.
 
-  @param  GcdIoType              IO type of the segment. 
-  @param  BaseAddress            Base address of the segment. 
-  @param  Length                 Length of the segment. 
+  @param  GcdIoType              IO type of the segment.
+  @param  BaseAddress            Base address of the segment.
+  @param  Length                 Length of the segment.
 
-  @retval EFI_SUCCESS            Merged this segment into GCD map. 
+  @retval EFI_SUCCESS            Merged this segment into GCD map.
   @retval EFI_INVALID_PARAMETER  Parameter not valid
 
 **/
@@ -1723,16 +1722,16 @@ CoreAddIoSpace (
   Allocates nonexistent I/O, reserved I/O, or I/O resources from the global coherency
   domain of the processor.
 
-  @param  GcdAllocateType        The type of allocate operation 
-  @param  GcdIoType              The desired IO type 
-  @param  Alignment              Align with 2^Alignment 
-  @param  Length                 Length to allocate 
-  @param  BaseAddress            Base address to allocate 
-  @param  ImageHandle            The image handle consume the allocated space. 
-  @param  DeviceHandle           The device handle consume the allocated space. 
+  @param  GcdAllocateType        The type of allocate operation
+  @param  GcdIoType              The desired IO type
+  @param  Alignment              Align with 2^Alignment
+  @param  Length                 Length to allocate
+  @param  BaseAddress            Base address to allocate
+  @param  ImageHandle            The image handle consume the allocated space.
+  @param  DeviceHandle           The device handle consume the allocated space.
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter. 
-  @retval EFI_NOT_FOUND          No descriptor contains the desired space. 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval EFI_NOT_FOUND          No descriptor contains the desired space.
   @retval EFI_SUCCESS            IO space successfully allocated.
 
 **/
@@ -1752,8 +1751,8 @@ CoreAllocateIoSpace (
   Frees nonexistent I/O, reserved I/O, or I/O resources from the global coherency
   domain of the processor.
 
-  @param  BaseAddress            Base address of the segment. 
-  @param  Length                 Length of the segment. 
+  @param  BaseAddress            Base address of the segment.
+  @param  Length                 Length of the segment.
 
   @retval EFI_SUCCESS            Space successfully freed.
 
@@ -1769,8 +1768,8 @@ CoreFreeIoSpace (
   Removes reserved I/O or I/O resources from the global coherency domain of the
   processor.
 
-  @param  BaseAddress            Base address of the segment. 
-  @param  Length                 Length of the segment. 
+  @param  BaseAddress            Base address of the segment.
+  @param  Length                 Length of the segment.
 
   @retval EFI_SUCCESS            Successfully removed a segment of IO space.
 
@@ -1785,10 +1784,10 @@ CoreRemoveIoSpace (
 /**
   Retrieves the descriptor for an I/O region containing a specified address.
 
-  @param  BaseAddress            Specified start address 
-  @param  Descriptor             Specified length 
+  @param  BaseAddress            Specified start address
+  @param  Descriptor             Specified length
 
-  @retval EFI_INVALID_PARAMETER  Descriptor is NULL. 
+  @retval EFI_INVALID_PARAMETER  Descriptor is NULL.
   @retval EFI_SUCCESS            Successfully get the IO space descriptor.
 
 **/
@@ -1802,11 +1801,11 @@ CoreGetIoSpaceDescriptor (
 /**
   Returns a map of the I/O resources in the global coherency domain of the processor.
 
-  @param  NumberOfDescriptors    Number of descriptors. 
-  @param  IoSpaceMap             Descriptor array 
+  @param  NumberOfDescriptors    Number of descriptors.
+  @param  IoSpaceMap             Descriptor array
 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter 
-  @retval EFI_OUT_OF_RESOURCES   No enough buffer to allocate 
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_OUT_OF_RESOURCES   No enough buffer to allocate
   @retval EFI_SUCCESS            Successfully get IO space map.
 
 **/
@@ -1826,9 +1825,9 @@ CoreGetIoSpaceMap (
   will be called, and when the Bds() exits the Dispatcher will be called
   again.
 
-  @retval EFI_ALREADY_STARTED    The DXE Dispatcher is already running 
-  @retval EFI_NOT_FOUND          No DXE Drivers were dispatched 
-  @retval EFI_SUCCESS            One or more DXE Drivers were dispatched 
+  @retval EFI_ALREADY_STARTED   The DXE Dispatcher is already running
+  @retval EFI_NOT_FOUND         No DXE Drivers were dispatched
+  @retval EFI_SUCCESS           One or more DXE Drivers were dispatched
 
 **/
 EFI_STATUS
@@ -1841,14 +1840,14 @@ CoreDispatcher (
   Check every driver and locate a matching one. If the driver is found, the Unrequested
   state flag is cleared.
 
-  @param  FirmwareVolumeHandle   The handle of the Firmware Volume that contains 
-                                 the firmware  file specified by DriverName. 
-  @param  DriverName             The Driver name to put in the Dependent state. 
+  @param  FirmwareVolumeHandle  The handle of the Firmware Volume that contains
+                                the firmware  file specified by DriverName.
+  @param  DriverName            The Driver name to put in the Dependent state.
 
-  @retval EFI_SUCCESS            The DriverName was found and it's SOR bit was 
-                                 cleared 
-  @retval EFI_NOT_FOUND          The DriverName does not exist or it's SOR bit 
-                                 was not set. 
+  @retval EFI_SUCCESS           The DriverName was found and it's SOR bit was
+                                cleared
+  @retval EFI_NOT_FOUND         The DriverName does not exist or it's SOR bit was
+                                not set.
 
 **/
 EFI_STATUS
@@ -1860,15 +1859,15 @@ CoreSchedule (
 
 
 /**
-  Convert a driver from the Untrused back to the Scheduled state
+  Convert a driver from the Untrused back to the Scheduled state.
 
-  @param  FirmwareVolumeHandle   The handle of the Firmware Volume that contains 
-                                 the firmware  file specified by DriverName. 
-  @param  DriverName             The Driver name to put in the Scheduled state 
+  @param  FirmwareVolumeHandle  The handle of the Firmware Volume that contains
+                                the firmware  file specified by DriverName.
+  @param  DriverName            The Driver name to put in the Scheduled state
 
-  @retval EFI_SUCCESS            The file was found in the untrusted state, and 
-                                 it was promoted  to the trusted state. 
-  @retval EFI_NOT_FOUND          The file was not found in the untrusted state. 
+  @retval EFI_SUCCESS           The file was found in the untrusted state, and it
+                                was promoted  to the trusted state.
+  @retval EFI_NOT_FOUND         The file was not found in the untrusted state.
 
 **/
 EFI_STATUS
@@ -1884,13 +1883,13 @@ CoreTrust (
   to allocate the proper sized buffer for various
   EFI interfaces.
 
-  @param  Status                 Current status 
-  @param  Buffer                 Current allocated buffer, or NULL 
-  @param  BufferSize             Current buffer size needed 
+  @param  Status                 Current status
+  @param  Buffer                 Current allocated buffer, or NULL
+  @param  BufferSize             Current buffer size needed
 
-  @retval TRUE                   if the buffer was reallocated and the caller 
-                                 should try the API again. 
-  @retval FALSE                  buffer could not be allocated and the caller 
+  @retval TRUE                   if the buffer was reallocated and the caller
+                                 should try the API again.
+  @retval FALSE                  buffer could not be allocated and the caller
                                  should not try the API again.
 
 **/
@@ -1907,8 +1906,8 @@ CoreGrowBuffer (
   libraries, and registers two notification functions.  These notification
   functions are responsible for building the FV stack dynamically.
 
-  @param  ImageHandle           The image handle. 
-  @param  SystemTable           The system table. 
+  @param  ImageHandle           The image handle.
+  @param  SystemTable           The system table.
 
   @retval EFI_SUCCESS           Function successfully returned.
 
@@ -1945,22 +1944,22 @@ InitializeSectionExtraction (
   particular, it can be called by BDS to process a single firmware
   volume found in a capsule.
 
-  @param  FvHeader               pointer to a firmware volume header 
-  @param  Size                   the size of the buffer pointed to by FvHeader 
-  @param  FVProtocolHandle       the handle on which a firmware volume protocol 
-                                 was produced for the firmware volume passed in. 
+  @param  FvHeader               pointer to a firmware volume header
+  @param  Size                   the size of the buffer pointed to by FvHeader
+  @param  FVProtocolHandle       the handle on which a firmware volume protocol
+                                 was produced for the firmware volume passed in.
 
-  @retval EFI_OUT_OF_RESOURCES   if an FVB could not be produced due to lack of  
-                                 system resources 
-  @retval EFI_VOLUME_CORRUPTED   if the volume was corrupted 
-  @retval EFI_SUCCESS            a firmware volume protocol was produced for the 
+  @retval EFI_OUT_OF_RESOURCES   if an FVB could not be produced due to lack of
+                                 system resources
+  @retval EFI_VOLUME_CORRUPTED   if the volume was corrupted
+  @retval EFI_SUCCESS            a firmware volume protocol was produced for the
                                  firmware volume
 
 **/
 EFI_STATUS
 CoreProcessFirmwareVolume (
   IN VOID                             *FvHeader,
-  IN UINTN                            Size, 
+  IN UINTN                            Size,
   OUT EFI_HANDLE                      *FVProtocolHandle
   );
 
@@ -1977,7 +1976,7 @@ VOID
 CoreDisplayMissingArchProtocols (
   VOID
   );
-  
+
 
 /**
   Traverse the discovered list for any drivers that were discovered but not loaded
@@ -2008,7 +2007,7 @@ CoreEfiNotAvailableYetArg0 (
   Place holder function until all the Boot Services and Runtime Services are
   available.
 
-  @param  Arg1                   Undefined 
+  @param  Arg1                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -2023,8 +2022,8 @@ CoreEfiNotAvailableYetArg1 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined 
-  @param  Arg2                   Undefined 
+  @param  Arg1                   Undefined
+  @param  Arg2                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -2040,9 +2039,9 @@ CoreEfiNotAvailableYetArg2 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined 
-  @param  Arg2                   Undefined 
-  @param  Arg3                   Undefined 
+  @param  Arg1                   Undefined
+  @param  Arg2                   Undefined
+  @param  Arg3                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -2059,10 +2058,10 @@ CoreEfiNotAvailableYetArg3 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined 
-  @param  Arg2                   Undefined 
-  @param  Arg3                   Undefined 
-  @param  Arg4                   Undefined 
+  @param  Arg1                   Undefined
+  @param  Arg2                   Undefined
+  @param  Arg3                   Undefined
+  @param  Arg4                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -2080,11 +2079,11 @@ CoreEfiNotAvailableYetArg4 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined 
-  @param  Arg2                   Undefined 
-  @param  Arg3                   Undefined 
-  @param  Arg4                   Undefined 
-  @param  Arg5                   Undefined 
+  @param  Arg1                   Undefined
+  @param  Arg2                   Undefined
+  @param  Arg3                   Undefined
+  @param  Arg4                   Undefined
+  @param  Arg5                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -2103,11 +2102,11 @@ CoreEfiNotAvailableYetArg5 (
 /**
   Searches for a Protocol Interface passed from PEI through a HOB.
 
-  @param  ProtocolGuid           The Protocol GUID to search for in the HOB List 
-  @param  Interface              A pointer to the interface for the Protocol GUID 
+  @param  ProtocolGuid           The Protocol GUID to search for in the HOB List
+  @param  Interface              A pointer to the interface for the Protocol GUID
 
-  @retval EFI_SUCCESS            The Protocol GUID was found and its interface is 
-                                 returned in Interface 
+  @retval EFI_SUCCESS            The Protocol GUID was found and its interface is
+                                 returned in Interface
   @retval EFI_NOT_FOUND          The Protocol GUID was not found in the HOB List
 
 **/
@@ -2147,7 +2146,7 @@ CoreGetPeiProtocol (
                              buffer that is required to decompress the
                              compressed buffer specified by Source and
                              SourceSize.
-   
+
   @retval EFI_SUCCESS        The size of the uncompressed data was returned in
                              DestinationSize and the size of the scratch buffer
                              was returned in ScratchSize.
@@ -2194,7 +2193,7 @@ DxeMainUefiDecompressGetInfo (
                               the decompression.
   @param  ScratchSize         The size of scratch buffer. The size of the
                               scratch buffer needed is obtained from GetInfo().
-  
+
   @retval EFI_SUCCESS         Decompression completed successfully, and the
                               uncompressed buffer is returned in Destination.
   @retval EFI_INVALID_PARAMETER  The source buffer specified by Source and
@@ -2205,7 +2204,7 @@ DxeMainUefiDecompressGetInfo (
 EFI_STATUS
 EFIAPI
 DxeMainUefiDecompress (
-  IN EFI_DECOMPRESS_PROTOCOL              *This,
+  IN     EFI_DECOMPRESS_PROTOCOL          *This,
   IN     VOID                             *Source,
   IN     UINT32                           SourceSize,
   IN OUT VOID                             *Destination,
@@ -2218,14 +2217,14 @@ DxeMainUefiDecompress (
   SEP member function.  This function creates and returns a new section stream
   handle to represent the new section stream.
 
-  @param  SectionStreamLength    Size in bytes of the section stream. 
-  @param  SectionStream          Buffer containing the new section stream. 
-  @param  SectionStreamHandle    A pointer to a caller allocated UINTN that on 
-                                 output contains the new section stream handle. 
+  @param  SectionStreamLength    Size in bytes of the section stream.
+  @param  SectionStream          Buffer containing the new section stream.
+  @param  SectionStreamHandle    A pointer to a caller allocated UINTN that on
+                                 output contains the new section stream handle.
 
   @retval EFI_SUCCESS            The section stream is created successfully.
-  @retval EFI_OUT_OF_RESOURCES   memory allocation failed. 
-  @retval EFI_INVALID_PARAMETER  Section stream does not end concident with end 
+  @retval EFI_OUT_OF_RESOURCES   memory allocation failed.
+  @retval EFI_INVALID_PARAMETER  Section stream does not end concident with end
                                  of last section.
 
 **/
@@ -2312,11 +2311,11 @@ GetSection (
 /**
   SEP member function.  Deletes an existing section stream
 
-  @param  StreamHandleToClose    Indicates the stream to close 
+  @param  StreamHandleToClose    Indicates the stream to close
 
   @retval EFI_SUCCESS            The section stream is closed sucessfully.
-  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed. 
-  @retval EFI_INVALID_PARAMETER  Section stream does not end concident with end 
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+  @retval EFI_INVALID_PARAMETER  Section stream does not end concident with end
                                  of last section.
 
 **/

@@ -1,5 +1,5 @@
 /** @file
-  GCD Operations and data structure used to 
+  GCD Operations and data structure used to
   convert from GCD attributes to EFI Memory Map attributes.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>

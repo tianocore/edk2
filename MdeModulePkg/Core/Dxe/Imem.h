@@ -59,9 +59,9 @@ typedef struct {
   Internal function.  Used by the pool functions to allocate pages
   to back pool allocation requests.
 
-  @param  PoolType               The type of memory for the new pool pages 
-  @param  NumberOfPages          No of pages to allocate 
-  @param  Alignment              Bits to align. 
+  @param  PoolType               The type of memory for the new pool pages
+  @param  NumberOfPages          No of pages to allocate
+  @param  Alignment              Bits to align.
 
   @return The allocated memory, or NULL
 
@@ -78,7 +78,7 @@ CoreAllocatePoolPages (
 /**
   Internal function.  Frees pool pages allocated via AllocatePoolPages ()
 
-  @param  Memory                 The base address to free 
+  @param  Memory                 The base address to free
   @param  NumberOfPages          The number of pages to free
 
 **/
@@ -94,8 +94,8 @@ CoreFreePoolPages (
   Internal function to allocate pool of a particular type.
   Caller must have the memory lock held
 
-  @param  PoolType               Type of pool to allocate 
-  @param  Size                   The amount of pool to allocate 
+  @param  PoolType               Type of pool to allocate
+  @param  Size                   The amount of pool to allocate
 
   @return The allocate pool, or NULL
 
@@ -112,9 +112,9 @@ CoreAllocatePoolI (
   Internal function to free a pool entry.
   Caller must have the memory lock held
 
-  @param  Buffer                 The allocated pool entry to free 
+  @param  Buffer                 The allocated pool entry to free
 
-  @retval EFI_INVALID_PARAMETER  Buffer not valid 
+  @retval EFI_INVALID_PARAMETER  Buffer not valid
   @retval EFI_SUCCESS            Buffer successfully freed.
 
 **/
@@ -149,7 +149,7 @@ CoreReleaseMemoryLock (
 // Internal Global data
 //
 
-extern EFI_LOCK           gMemoryLock; 
+extern EFI_LOCK           gMemoryLock;
 extern LIST_ENTRY         gMemoryMap;
 extern MEMORY_MAP         *gMemoryLastConvert;
 extern LIST_ENTRY         mGcdMemorySpaceMap;

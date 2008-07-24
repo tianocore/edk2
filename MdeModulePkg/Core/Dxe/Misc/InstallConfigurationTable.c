@@ -23,11 +23,11 @@ UINTN mSystemTableAllocateSize = 0;
 /**
   Find a config table by name in system table's ConfigurationTable.
 
-  @param  Guid           The table name to look for 
-  @param  Table          Pointer of the config table 
+  @param  Guid           The table name to look for
+  @param  Table          Pointer of the config table
 
-  @retval EFI_NOT_FOUND  Could not find the table in system table's 
-                         ConfigurationTable. 
+  @retval EFI_NOT_FOUND  Could not find the table in system table's
+                         ConfigurationTable.
   @retval EFI_SUCCESS    Table successfully found.
 
 **/
@@ -56,10 +56,10 @@ CoreGetConfigTable (
   Boot Service called to add, modify, or remove a system configuration table from
   the EFI System Table.
 
-  @param  Guid           Pointer to the GUID for the entry to add, update, or 
-                         remove 
-  @param  Table          Pointer to the configuration table for the entry to add, 
-                         update, or remove, may be NULL. 
+  @param  Guid           Pointer to the GUID for the entry to add, update, or
+                         remove
+  @param  Table          Pointer to the configuration table for the entry to add,
+                         update, or remove, may be NULL.
 
   @return EFI_SUCCESS               Guid, Table pair added, updated, or removed.
   @return EFI_INVALID_PARAMETER     Input GUID not valid.

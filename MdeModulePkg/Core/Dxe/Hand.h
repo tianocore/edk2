@@ -25,7 +25,7 @@ typedef struct {
   UINTN               Signature;
   LIST_ENTRY          AllHandles;     // All handles list of IHANDLE
   LIST_ENTRY          Protocols;      // List of PROTOCOL_INTERFACE's for this handle
-  UINTN               LocateRequest;  // 
+  UINTN               LocateRequest;  //
   UINT64              Key;            // The Handle Database Key value when this handle was last created or modified
 } IHANDLE;
 
@@ -33,7 +33,7 @@ typedef struct {
 
 
 //
-// PROTOCOL_ENTRY - each different protocol has 1 entry in the protocol 
+// PROTOCOL_ENTRY - each different protocol has 1 entry in the protocol
 // database.  Each handler that supports this protocol is listed, along
 // with a list of registered notifies.
 //
@@ -60,10 +60,10 @@ typedef struct {
   LIST_ENTRY                  ByProtocol; // Link on PROTOCOL_ENTRY.Protocols
   PROTOCOL_ENTRY              *Protocol;  // The protocol ID
   VOID                        *Interface; // The interface value
-                                          
+
   LIST_ENTRY                  OpenList;       // OPEN_PROTOCOL_DATA list.
-  UINTN                       OpenListCount;  
-  
+  UINTN                       OpenListCount;
+
   EFI_HANDLE                  ControllerHandle;
 
 } PROTOCOL_INTERFACE;
@@ -104,8 +104,8 @@ typedef struct {
   Finds the protocol entry for the requested protocol.
   The gProtocolDatabaseLock must be owned
 
-  @param  Protocol               The ID of the protocol 
-  @param  Create                 Create a new entry if not found 
+  @param  Protocol               The ID of the protocol
+  @param  Create                 Create a new entry if not found
 
   @return Protocol entry
 
@@ -134,9 +134,9 @@ CoreNotifyProtocolEntry (
   Note: This function doesn't do parameters checking, it's caller's responsibility
   to pass in valid parameters.
 
-  @param  Handle                 The handle to search the protocol on 
-  @param  Protocol               GUID of the protocol 
-  @param  Interface              The interface for the protocol being searched 
+  @param  Handle                 The handle to search the protocol on
+  @param  Protocol               GUID of the protocol
+  @param  Interface              The interface for the protocol being searched
 
   @return Protocol instance (NULL: Not found)
 
@@ -152,9 +152,9 @@ CoreFindProtocolInterface (
 /**
   Removes Protocol from the protocol list (but not the handle list).
 
-  @param  Handle                 The handle to remove protocol on. 
-  @param  Protocol               GUID of the protocol to be moved 
-  @param  Interface              The interface of the protocol 
+  @param  Handle                 The handle to remove protocol on.
+  @param  Protocol               GUID of the protocol to be moved
+  @param  Interface              The interface of the protocol
 
   @return Protocol Entry
 
@@ -170,8 +170,8 @@ CoreRemoveInterfaceFromProtocol (
 /**
   Removes all the events in the protocol database that match Event.
 
-  @param  Event                  The event to search for in the protocol 
-                                 database. 
+  @param  Event                  The event to search for in the protocol
+                                 database.
 
   @return EFI_SUCCESS when done searching the entire database.
 
@@ -184,29 +184,29 @@ CoreUnregisterProtocolNotify (
 /**
   Connects a controller to a driver.
 
-  @param  ControllerHandle                      Handle of the controller to be 
-                                                connected. 
-  @param  ContextDriverImageHandles             DriverImageHandle A pointer to an 
-                                                ordered list of driver image 
-                                                handles. 
-  @param  RemainingDevicePath                   RemainingDevicePath A pointer to 
-                                                the device path that specifies a 
-                                                child  of the controller 
-                                                specified by ControllerHandle. 
+  @param  ControllerHandle                      Handle of the controller to be
+                                                connected.
+  @param  ContextDriverImageHandles             DriverImageHandle A pointer to an
+                                                ordered list of driver image
+                                                handles.
+  @param  RemainingDevicePath                   RemainingDevicePath A pointer to
+                                                the device path that specifies a
+                                                child  of the controller
+                                                specified by ControllerHandle.
 
-  @retval EFI_SUCCESS                           One or more drivers were 
-                                                connected to ControllerHandle. 
-  @retval EFI_OUT_OF_RESOURCES                  No enough system resources to 
-                                                complete the request. 
-  @retval EFI_NOT_FOUND                         No drivers were connected to 
+  @retval EFI_SUCCESS                           One or more drivers were
+                                                connected to ControllerHandle.
+  @retval EFI_OUT_OF_RESOURCES                  No enough system resources to
+                                                complete the request.
+  @retval EFI_NOT_FOUND                         No drivers were connected to
                                                 ControllerHandle.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 CoreConnectSingleController (
   IN  EFI_HANDLE                ControllerHandle,
   IN  EFI_HANDLE                *ContextDriverImageHandles OPTIONAL,
-  IN  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath       OPTIONAL     
+  IN  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath       OPTIONAL
   );
 
 /**
@@ -215,11 +215,11 @@ CoreConnectSingleController (
   Note: This function doesn't do parameters checking, it's caller's responsibility
   to pass in valid parameters.
 
-  @param  UserHandle             The handle on which the protocol is installed 
-  @param  Prot                   The protocol to disconnect drivers from 
+  @param  UserHandle             The handle on which the protocol is installed
+  @param  Prot                   The protocol to disconnect drivers from
 
-  @retval EFI_SUCCESS            Drivers using the protocol interface are all 
-                                 disconnected 
+  @retval EFI_SUCCESS            Drivers using the protocol interface are all
+                                 disconnected
   @retval EFI_ACCESS_DENIED      Failed to disconnect one or all of the drivers
 
 **/
@@ -253,9 +253,9 @@ CoreReleaseProtocolLock (
 /**
   Check whether a handle is a valid EFI_HANDLE
 
-  @param  UserHandle             The handle to check 
+  @param  UserHandle             The handle to check
 
-  @retval EFI_INVALID_PARAMETER  The handle is NULL or not a valid EFI_HANDLE. 
+  @retval EFI_INVALID_PARAMETER  The handle is NULL or not a valid EFI_HANDLE.
   @retval EFI_SUCCESS            The handle is valid EFI_HANDLE.
 
 **/
