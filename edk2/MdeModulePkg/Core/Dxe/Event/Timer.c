@@ -33,7 +33,7 @@ CoreCurrentSystemTime (
   Checks the sorted timer list against the current system time.
   Signals any expired event timer.
 
-  @param  CheckEvent             Not used 
+  @param  CheckEvent             Not used
   @param  Context                Not used
 
 **/
@@ -47,7 +47,7 @@ CoreCheckTimers (
 /**
   Inserts the timer event.
 
-  @param  Event                  Points to the internal structure of timer event 
+  @param  Event                  Points to the internal structure of timer event
                                  to be installed
 
 **/
@@ -108,7 +108,7 @@ CoreCurrentSystemTime (
   CoreAcquireLock (&mEfiSystemTimeLock);
   SystemTime = mEfiSystemTime;
   CoreReleaseLock (&mEfiSystemTimeLock);
-  
+
   return SystemTime;
 }
 
@@ -116,7 +116,7 @@ CoreCurrentSystemTime (
 /**
   Called by the platform code to process a tick.
 
-  @param  Duration               The number of 100ns elasped since the last call 
+  @param  Duration               The number of 100ns elasped since the last call
                                  to TimerTick
 
 **/
@@ -158,7 +158,7 @@ CoreTimerTick (
   Checks the sorted timer list against the current system time.
   Signals any expired event timer.
 
-  @param  CheckEvent             Not used 
+  @param  CheckEvent             Not used
   @param  Context                Not used
 
 **/
@@ -231,7 +231,7 @@ CoreCheckTimers (
 /**
   Inserts the timer event.
 
-  @param  Event                  Points to the internal structure of timer event 
+  @param  Event                  Points to the internal structure of timer event
                                  to be installed
 
 **/
@@ -270,15 +270,15 @@ CoreInsertEventTimer (
 /**
   Sets the type of timer and the trigger time for a timer event.
 
-  @param  UserEvent              The timer event that is to be signaled at the 
-                                 specified time 
-  @param  Type                   The type of time that is specified in 
-                                 TriggerTime 
-  @param  TriggerTime            The number of 100ns units until the timer 
-                                 expires 
+  @param  UserEvent              The timer event that is to be signaled at the
+                                 specified time
+  @param  Type                   The type of time that is specified in
+                                 TriggerTime
+  @param  TriggerTime            The number of 100ns units until the timer
+                                 expires
 
-  @retval EFI_SUCCESS            The event has been set to be signaled at the 
-                                 requested time 
+  @retval EFI_SUCCESS            The event has been set to be signaled at the
+                                 requested time
   @retval EFI_INVALID_PARAMETER  Event or Type is not valid
 
 **/

@@ -24,7 +24,7 @@ EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
 
 EFI_SYSTEM_TABLE_POINTER *mDebugTable = NULL;
 
-    
+
 
 /**
   Creates and initializes the DebugImageInfo Table.  Also creates the configuration
@@ -41,10 +41,10 @@ VOID
 CoreInitializeDebugImageInfoTable (
   VOID
   )
-{ 
+{
   EFI_STATUS                          Status;
   EFI_PHYSICAL_ADDRESS                Mem;
-  UINTN                               NumberOfPages; 
+  UINTN                               NumberOfPages;
 
   //
   // Allocate boot services memory for the structure. It's required to be aligned on
@@ -52,14 +52,14 @@ CoreInitializeDebugImageInfoTable (
   // a 4M aligned address within the memory we just freed, and then allocate memory at that
   // address for our initial structure.
   //
-  NumberOfPages = FOUR_MEG_PAGES + EFI_SIZE_TO_PAGES(sizeof (EFI_SYSTEM_TABLE_POINTER));  
+  NumberOfPages = FOUR_MEG_PAGES + EFI_SIZE_TO_PAGES(sizeof (EFI_SYSTEM_TABLE_POINTER));
 
-  Status = CoreAllocatePages (AllocateAnyPages, EfiBootServicesData, NumberOfPages , &Mem); 
+  Status = CoreAllocatePages (AllocateAnyPages, EfiBootServicesData, NumberOfPages , &Mem);
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR(Status)) {
     return;
   }
-  Status = CoreFreePages (Mem, NumberOfPages); 
+  Status = CoreFreePages (Mem, NumberOfPages);
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR(Status)) {
     return;
@@ -69,8 +69,8 @@ CoreInitializeDebugImageInfoTable (
   // Then allocate memory at that address
   //
   Mem = (Mem + FOUR_MEG_MASK) & (~FOUR_MEG_MASK);
-  
-  Status = CoreAllocatePages (AllocateAddress, EfiBootServicesData, NumberOfPages - FOUR_MEG_PAGES, &Mem); 
+
+  Status = CoreAllocatePages (AllocateAddress, EfiBootServicesData, NumberOfPages - FOUR_MEG_PAGES, &Mem);
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR(Status)) {
     return;
@@ -112,9 +112,9 @@ CoreUpdateDebugTableCrc32 (
   Adds a new DebugImageInfo structure to the DebugImageInfo Table.  Re-Allocates
   the table if it's not large enough to accomidate another entry.
 
-  @param  ImageInfoType  type of debug image information 
-  @param  LoadedImage    pointer to the loaded image protocol for the image being 
-                         loaded 
+  @param  ImageInfoType  type of debug image information
+  @param  LoadedImage    pointer to the loaded image protocol for the image being
+                         loaded
   @param  ImageHandle    image handle for the image being loaded
 
 **/
@@ -124,7 +124,7 @@ CoreNewDebugImageInfoEntry (
   IN  EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage,
   IN  EFI_HANDLE                  ImageHandle
   )
-{    
+{
   EFI_DEBUG_IMAGE_INFO      *Table;
   EFI_DEBUG_IMAGE_INFO      *NewTable;
   UINTN                     Index;
@@ -199,7 +199,7 @@ VOID
 CoreRemoveDebugImageInfoEntry (
   EFI_HANDLE ImageHandle
   )
-{    
+{
   EFI_DEBUG_IMAGE_INFO  *Table;
   UINTN                 Index;
 

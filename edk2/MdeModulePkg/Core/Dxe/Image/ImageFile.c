@@ -20,21 +20,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   will access the file either from a memory copy, from a file
   system interface, or from the load file interface.
 
-  @param  BootPolicy             Policy for Open Image File. 
-  @param  SourceBuffer           Pointer to the memory location containing copy 
-                                 of the image to be loaded. 
-  @param  SourceSize             The size in bytes of SourceBuffer. 
-  @param  FilePath               The specific file path from which the image is 
-                                 loaded 
-  @param  DeviceHandle           Pointer to the return device handle. 
-  @param  ImageFileHandle        Pointer to the image file handle. 
-  @param  AuthenticationStatus   Pointer to a caller-allocated UINT32 in which 
-                                 the authentication status is returned. 
+  @param  BootPolicy             Policy for Open Image File.
+  @param  SourceBuffer           Pointer to the memory location containing copy
+                                 of the image to be loaded.
+  @param  SourceSize             The size in bytes of SourceBuffer.
+  @param  FilePath               The specific file path from which the image is
+                                 loaded
+  @param  DeviceHandle           Pointer to the return device handle.
+  @param  ImageFileHandle        Pointer to the image file handle.
+  @param  AuthenticationStatus   Pointer to a caller-allocated UINT32 in which
+                                 the authentication status is returned.
 
-  @retval EFI_SUCCESS            Image file successfully opened. 
-  @retval EFI_LOAD_ERROR         If the caller passed a copy of the file, and 
-                                 SourceSize is 0. 
-  @retval EFI_INVALID_PARAMETER  File path is not valid. 
+  @retval EFI_SUCCESS            Image file successfully opened.
+  @retval EFI_LOAD_ERROR         If the caller passed a copy of the file, and
+                                 SourceSize is 0.
+  @retval EFI_INVALID_PARAMETER  File path is not valid.
   @retval EFI_NOT_FOUND          File not found.
 
 **/
@@ -175,7 +175,7 @@ CoreOpenImageFile (
       //
       // Duplicate the device path to avoid the access to unaligned device path node.
       // Because the device path consists of one or more FILE PATH MEDIA DEVICE PATH
-      // nodes, It assures the fields in device path nodes are 2 byte aligned. 
+      // nodes, It assures the fields in device path nodes are 2 byte aligned.
       //
       FilePathNode = (FILEPATH_DEVICE_PATH *)CoreDuplicateDevicePath((EFI_DEVICE_PATH_PROTOCOL *)(UINTN)FilePathNode);
       if (FilePathNode == NULL) {
@@ -220,7 +220,7 @@ CoreOpenImageFile (
           FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header);
         }
         //
-        // Free the allocated memory pool 
+        // Free the allocated memory pool
         //
         CoreFreePool(OriginalFilePathNode);
       }
@@ -337,13 +337,13 @@ Done:
   Read image file (specified by UserHandle) into user specified buffer with specified offset
   and length.
 
-  @param  UserHandle             Image file handle 
-  @param  Offset                 Offset to the source file 
-  @param  ReadSize               For input, pointer of size to read; For output, 
-                                 pointer of size actually read. 
-  @param  Buffer                 Buffer to write into 
+  @param  UserHandle             Image file handle
+  @param  Offset                 Offset to the source file
+  @param  ReadSize               For input, pointer of size to read; For output,
+                                 pointer of size actually read.
+  @param  Buffer                 Buffer to write into
 
-  @retval EFI_SUCCESS            Successfully read the specified part of file 
+  @retval EFI_SUCCESS            Successfully read the specified part of file
                                  into buffer.
 
 **/
@@ -382,11 +382,11 @@ CoreReadImageFile (
   Search a handle to a device on a specified device path that supports a specified protocol,
   interface of that protocol on that handle is another output.
 
-  @param  Protocol               The protocol to search for 
-  @param  FilePath               The specified device path 
-  @param  Interface              Interface of the protocol on the handle 
-  @param  Handle                 The handle to the device on the specified device 
-                                 path that supports the protocol. 
+  @param  Protocol               The protocol to search for
+  @param  FilePath               The specified device path
+  @param  Interface              Interface of the protocol on the handle
+  @param  Handle                 The handle to the device on the specified device
+                                 path that supports the protocol.
 
   @return Status code.
 
@@ -414,13 +414,13 @@ CoreDevicePathToInterface (
   to allocate the proper sized buffer for various
   EFI interfaces.
 
-  @param  Status                 Current status 
-  @param  Buffer                 Current allocated buffer, or NULL 
-  @param  BufferSize             Current buffer size needed 
+  @param  Status                 Current status
+  @param  Buffer                 Current allocated buffer, or NULL
+  @param  BufferSize             Current buffer size needed
 
-  @retval TRUE                   if the buffer was reallocated and the caller 
-                                 should try the API again. 
-  @retval FALSE                  buffer could not be allocated and the caller 
+  @retval TRUE                   if the buffer was reallocated and the caller
+                                 should try the API again.
+  @retval FALSE                  buffer could not be allocated and the caller
                                  should not try the API again.
 
 **/

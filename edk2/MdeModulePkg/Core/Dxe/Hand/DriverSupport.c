@@ -21,22 +21,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Connects one or more drivers to a controller.
 
-  @param  ControllerHandle                      Handle of the controller to be 
-                                                connected. 
-  @param  DriverImageHandle                     DriverImageHandle A pointer to an 
-                                                ordered list of driver image 
-                                                handles. 
-  @param  RemainingDevicePath                   RemainingDevicePath A pointer to 
-                                                the device path that specifies a 
-                                                child of the controller specified 
-                                                by ControllerHandle. 
-  @param  Recursive                             Whether the function would be 
-                                                called recursively or not. 
+  @param  ControllerHandle                      Handle of the controller to be
+                                                connected.
+  @param  DriverImageHandle                     DriverImageHandle A pointer to an
+                                                ordered list of driver image
+                                                handles.
+  @param  RemainingDevicePath                   RemainingDevicePath A pointer to
+                                                the device path that specifies a
+                                                child of the controller specified
+                                                by ControllerHandle.
+  @param  Recursive                             Whether the function would be
+                                                called recursively or not.
 
   @return Status code.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 CoreConnectController (
   IN  EFI_HANDLE                ControllerHandle,
@@ -56,7 +56,7 @@ CoreConnectController (
   EFI_HANDLE                           *ChildHandleBuffer;
   UINTN                                ChildHandleCount;
   UINTN                                Index;
-  
+
   //
   // Make sure ControllerHandle is valid
   //
@@ -124,8 +124,8 @@ CoreConnectController (
     //
     for (Link = Handle->Protocols.ForwardLink, ChildHandleCount = 0; Link != &Handle->Protocols; Link = Link->ForwardLink) {
       Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
-      for (ProtLink = Prot->OpenList.ForwardLink; 
-          ProtLink != &Prot->OpenList; 
+      for (ProtLink = Prot->OpenList.ForwardLink;
+          ProtLink != &Prot->OpenList;
           ProtLink = ProtLink->ForwardLink) {
         OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
         if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
@@ -144,8 +144,8 @@ CoreConnectController (
     //
     for (Link = Handle->Protocols.ForwardLink, ChildHandleCount = 0; Link != &Handle->Protocols; Link = Link->ForwardLink) {
       Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
-      for (ProtLink = Prot->OpenList.ForwardLink; 
-          ProtLink != &Prot->OpenList; 
+      for (ProtLink = Prot->OpenList.ForwardLink;
+          ProtLink != &Prot->OpenList;
           ProtLink = ProtLink->ForwardLink) {
         OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
         if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
@@ -169,7 +169,7 @@ CoreConnectController (
         NULL,
         NULL,
         TRUE
-        ); 
+        );
     }
 
     //
@@ -186,17 +186,17 @@ CoreConnectController (
   Add Driver Binding Protocols from Context Driver Image Handles to sorted
   Driver Binding Protocol list.
 
-  @param  DriverBindingHandle                   Handle of the driver binding 
-                                                protocol. 
-  @param  NumberOfSortedDriverBindingProtocols  Number Of sorted driver binding 
-                                                protocols 
-  @param  SortedDriverBindingProtocols          The sorted protocol list. 
-  @param  DriverBindingHandleCount              Driver Binding Handle Count. 
-  @param  DriverBindingHandleBuffer             The buffer of driver binding 
-                                                protocol to be modified. 
-  @param  IsImageHandle                         Indicate whether 
-                                                DriverBindingHandle is an image 
-                                                handle 
+  @param  DriverBindingHandle                   Handle of the driver binding
+                                                protocol.
+  @param  NumberOfSortedDriverBindingProtocols  Number Of sorted driver binding
+                                                protocols
+  @param  SortedDriverBindingProtocols          The sorted protocol list.
+  @param  DriverBindingHandleCount              Driver Binding Handle Count.
+  @param  DriverBindingHandleBuffer             The buffer of driver binding
+                                                protocol to be modified.
+  @param  IsImageHandle                         Indicate whether
+                                                DriverBindingHandle is an image
+                                                handle
 
   @return None.
 
@@ -204,7 +204,7 @@ CoreConnectController (
 VOID
 AddSortedDriverBindingProtocol (
   IN      EFI_HANDLE                   DriverBindingHandle,
-  IN OUT  UINTN                        *NumberOfSortedDriverBindingProtocols, 
+  IN OUT  UINTN                        *NumberOfSortedDriverBindingProtocols,
   IN OUT  EFI_DRIVER_BINDING_PROTOCOL  **SortedDriverBindingProtocols,
   IN      UINTN                        DriverBindingHandleCount,
   IN OUT  EFI_HANDLE                   *DriverBindingHandleBuffer,
@@ -251,7 +251,7 @@ AddSortedDriverBindingProtocol (
       if (DriverBinding->ImageHandle == DriverBindingHandle) {
         AddSortedDriverBindingProtocol (
           DriverBindingHandleBuffer[Index],
-          NumberOfSortedDriverBindingProtocols, 
+          NumberOfSortedDriverBindingProtocols,
           SortedDriverBindingProtocols,
           DriverBindingHandleCount,
           DriverBindingHandleBuffer,
@@ -303,34 +303,34 @@ AddSortedDriverBindingProtocol (
     }
   }
 }
- 
+
 
 /**
   Connects a controller to a driver.
 
-  @param  ControllerHandle                      Handle of the controller to be 
-                                                connected. 
-  @param  ContextDriverImageHandles             DriverImageHandle A pointer to an 
-                                                ordered list of driver image 
-                                                handles. 
-  @param  RemainingDevicePath                   RemainingDevicePath A pointer to 
-                                                the device path that specifies a 
-                                                child  of the controller 
-                                                specified by ControllerHandle. 
+  @param  ControllerHandle                      Handle of the controller to be
+                                                connected.
+  @param  ContextDriverImageHandles             DriverImageHandle A pointer to an
+                                                ordered list of driver image
+                                                handles.
+  @param  RemainingDevicePath                   RemainingDevicePath A pointer to
+                                                the device path that specifies a
+                                                child  of the controller
+                                                specified by ControllerHandle.
 
-  @retval EFI_SUCCESS                           One or more drivers were 
-                                                connected to ControllerHandle. 
-  @retval EFI_OUT_OF_RESOURCES                  No enough system resources to 
-                                                complete the request. 
-  @retval EFI_NOT_FOUND                         No drivers were connected to 
+  @retval EFI_SUCCESS                           One or more drivers were
+                                                connected to ControllerHandle.
+  @retval EFI_OUT_OF_RESOURCES                  No enough system resources to
+                                                complete the request.
+  @retval EFI_NOT_FOUND                         No drivers were connected to
                                                 ControllerHandle.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 CoreConnectSingleController (
   IN  EFI_HANDLE                ControllerHandle,
   IN  EFI_HANDLE                *ContextDriverImageHandles OPTIONAL,
-  IN  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath       OPTIONAL     
+  IN  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath       OPTIONAL
   )
 {
   EFI_STATUS                                 Status;
@@ -363,10 +363,10 @@ CoreConnectSingleController (
   // Get list of all Driver Binding Protocol Instances
   //
   Status = CoreLocateHandleBuffer (
-             ByProtocol,   
-             &gEfiDriverBindingProtocolGuid,  
+             ByProtocol,
+             &gEfiDriverBindingProtocolGuid,
              NULL,
-             &DriverBindingHandleCount, 
+             &DriverBindingHandleCount,
              &DriverBindingHandleBuffer
              );
   if (EFI_ERROR (Status) || (DriverBindingHandleCount == 0)) {
@@ -389,7 +389,7 @@ CoreConnectSingleController (
     for (Index = 0; ContextDriverImageHandles[Index] != NULL; Index++) {
       AddSortedDriverBindingProtocol (
         ContextDriverImageHandles[Index],
-        &NumberOfSortedDriverBindingProtocols, 
+        &NumberOfSortedDriverBindingProtocols,
         SortedDriverBindingProtocols,
         DriverBindingHandleCount,
         DriverBindingHandleBuffer,
@@ -402,8 +402,8 @@ CoreConnectSingleController (
   // Add the Platform Driver Override Protocol drivers for ControllerHandle next
   //
   Status = CoreLocateProtocol (
-             &gEfiPlatformDriverOverrideProtocolGuid, 
-             NULL, 
+             &gEfiPlatformDriverOverrideProtocolGuid,
+             NULL,
              (VOID **) &PlatformDriverOverride
              );
   if (!EFI_ERROR (Status) && (PlatformDriverOverride != NULL)) {
@@ -417,7 +417,7 @@ CoreConnectSingleController (
       if (!EFI_ERROR (Status)) {
         AddSortedDriverBindingProtocol (
           DriverImageHandle,
-          &NumberOfSortedDriverBindingProtocols, 
+          &NumberOfSortedDriverBindingProtocols,
           SortedDriverBindingProtocols,
           DriverBindingHandleCount,
           DriverBindingHandleBuffer,
@@ -431,8 +431,8 @@ CoreConnectSingleController (
   // Get the Bus Specific Driver Override Protocol instance on the Controller Handle
   //
   Status = CoreHandleProtocol (
-             ControllerHandle,  
-             &gEfiBusSpecificDriverOverrideProtocolGuid, 
+             ControllerHandle,
+             &gEfiBusSpecificDriverOverrideProtocolGuid,
              (VOID **) &BusSpecificDriverOverride
              );
   if (!EFI_ERROR (Status) && (BusSpecificDriverOverride != NULL)) {
@@ -445,7 +445,7 @@ CoreConnectSingleController (
       if (!EFI_ERROR (Status)) {
         AddSortedDriverBindingProtocol (
           DriverImageHandle,
-          &NumberOfSortedDriverBindingProtocols, 
+          &NumberOfSortedDriverBindingProtocols,
           SortedDriverBindingProtocols,
           DriverBindingHandleCount,
           DriverBindingHandleBuffer,
@@ -462,7 +462,7 @@ CoreConnectSingleController (
   for (Index = 0; Index < DriverBindingHandleCount; Index++) {
     AddSortedDriverBindingProtocol (
       DriverBindingHandleBuffer[Index],
-      &NumberOfSortedDriverBindingProtocols, 
+      &NumberOfSortedDriverBindingProtocols,
       SortedDriverBindingProtocols,
       DriverBindingHandleCount,
       DriverBindingHandleBuffer,
@@ -480,10 +480,10 @@ CoreConnectSingleController (
   // EFI_NOT_READY, so it will be restarted
   //
   Status = CoreLocateHandleBuffer (
-             ByProtocol,   
-             &gEfiDriverBindingProtocolGuid,  
+             ByProtocol,
+             &gEfiDriverBindingProtocolGuid,
              NULL,
-             &NewDriverBindingHandleCount, 
+             &NewDriverBindingHandleCount,
              &NewDriverBindingHandleBuffer
              );
   CoreFreePool (NewDriverBindingHandleBuffer);
@@ -524,7 +524,7 @@ CoreConnectSingleController (
 
     //
     // Loop through the sorted Driver Binding Protocol Instances in order, and see if
-    // any of the Driver Binding Protocols support the controller specified by 
+    // any of the Driver Binding Protocols support the controller specified by
     // ControllerHandle.
     //
     DriverBinding = NULL;
@@ -533,7 +533,7 @@ CoreConnectSingleController (
       if (SortedDriverBindingProtocols[Index] != NULL) {
         DriverBinding = SortedDriverBindingProtocols[Index];
         Status = DriverBinding->Supported(
-                                  DriverBinding, 
+                                  DriverBinding,
                                   ControllerHandle,
                                   RemainingDevicePath
                                   );
@@ -547,7 +547,7 @@ CoreConnectSingleController (
           //
           PERF_START (DriverBinding->DriverBindingHandle, DRIVERBINDING_START_TOK, NULL, 0);
           Status = DriverBinding->Start (
-                                    DriverBinding, 
+                                    DriverBinding,
                                     ControllerHandle,
                                     RemainingDevicePath
                                     );
@@ -574,7 +574,7 @@ CoreConnectSingleController (
   //
   if (OneStarted) {
     return EFI_SUCCESS;
-  } 
+  }
 
   //
   // If no drivers started and RemainingDevicePath is an End Device Path Node, then return EFI_SUCCESS
@@ -583,7 +583,7 @@ CoreConnectSingleController (
     if (IsDevicePathEnd (RemainingDevicePath)) {
       return EFI_SUCCESS;
     }
-  } 
+  }
 
   //
   // Otherwise, no drivers were started on ControllerHandle, so return EFI_NOT_FOUND
@@ -596,37 +596,37 @@ CoreConnectSingleController (
 /**
   Disonnects a controller from a driver
 
-  @param  ControllerHandle                      ControllerHandle The handle of 
-                                                the controller from which 
-                                                driver(s)  are to be 
-                                                disconnected. 
-  @param  DriverImageHandle                     DriverImageHandle The driver to 
-                                                disconnect from ControllerHandle. 
-  @param  ChildHandle                           ChildHandle The handle of the 
-                                                child to destroy. 
+  @param  ControllerHandle                      ControllerHandle The handle of
+                                                the controller from which
+                                                driver(s)  are to be
+                                                disconnected.
+  @param  DriverImageHandle                     DriverImageHandle The driver to
+                                                disconnect from ControllerHandle.
+  @param  ChildHandle                           ChildHandle The handle of the
+                                                child to destroy.
 
-  @retval EFI_SUCCESS                           One or more drivers were 
-                                                disconnected from the controller. 
-  @retval EFI_SUCCESS                           On entry, no drivers are managing 
-                                                ControllerHandle. 
-  @retval EFI_SUCCESS                           DriverImageHandle is not NULL, 
-                                                and on entry DriverImageHandle is 
-                                                not managing ControllerHandle. 
-  @retval EFI_INVALID_PARAMETER                 ControllerHandle is not a valid 
-                                                EFI_HANDLE. 
-  @retval EFI_INVALID_PARAMETER                 DriverImageHandle is not NULL, 
-                                                and it is not a valid EFI_HANDLE. 
-  @retval EFI_INVALID_PARAMETER                 ChildHandle is not NULL, and it 
-                                                is not a valid EFI_HANDLE. 
-  @retval EFI_OUT_OF_RESOURCES                  There are not enough resources 
-                                                available to disconnect any 
-                                                drivers from ControllerHandle. 
-  @retval EFI_DEVICE_ERROR                      The controller could not be 
-                                                disconnected because of a device 
+  @retval EFI_SUCCESS                           One or more drivers were
+                                                disconnected from the controller.
+  @retval EFI_SUCCESS                           On entry, no drivers are managing
+                                                ControllerHandle.
+  @retval EFI_SUCCESS                           DriverImageHandle is not NULL,
+                                                and on entry DriverImageHandle is
+                                                not managing ControllerHandle.
+  @retval EFI_INVALID_PARAMETER                 ControllerHandle is not a valid
+                                                EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER                 DriverImageHandle is not NULL,
+                                                and it is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER                 ChildHandle is not NULL, and it
+                                                is not a valid EFI_HANDLE.
+  @retval EFI_OUT_OF_RESOURCES                  There are not enough resources
+                                                available to disconnect any
+                                                drivers from ControllerHandle.
+  @retval EFI_DEVICE_ERROR                      The controller could not be
+                                                disconnected because of a device
                                                 error.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 CoreDisconnectController (
   IN  EFI_HANDLE  ControllerHandle,
@@ -677,8 +677,8 @@ CoreDisconnectController (
   // Get list of drivers that are currently managing ControllerHandle
   //
   DriverImageHandleBuffer = NULL;
-  DriverImageHandleCount  = 1;  
-  
+  DriverImageHandleCount  = 1;
+
   if (DriverImageHandle == NULL) {
     //
     // Look at each protocol interface for a match
@@ -688,8 +688,8 @@ CoreDisconnectController (
     CoreAcquireProtocolLock ();
     for (Link = Handle->Protocols.ForwardLink; Link != &Handle->Protocols; Link = Link->ForwardLink) {
       Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
-      for (ProtLink = Prot->OpenList.ForwardLink; 
-           ProtLink != &Prot->OpenList; 
+      for (ProtLink = Prot->OpenList.ForwardLink;
+           ProtLink != &Prot->OpenList;
            ProtLink = ProtLink->ForwardLink) {
         OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
         if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
@@ -698,7 +698,7 @@ CoreDisconnectController (
       }
     }
     CoreReleaseProtocolLock ();
-    
+
     //
     // If there are no drivers managing this controller, then return EFI_SUCCESS
     //
@@ -718,8 +718,8 @@ CoreDisconnectController (
     CoreAcquireProtocolLock ();
     for (Link = Handle->Protocols.ForwardLink; Link != &Handle->Protocols; Link = Link->ForwardLink) {
       Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
-      for (ProtLink = Prot->OpenList.ForwardLink; 
-           ProtLink != &Prot->OpenList; 
+      for (ProtLink = Prot->OpenList.ForwardLink;
+           ProtLink != &Prot->OpenList;
            ProtLink = ProtLink->ForwardLink) {
         OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
         if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
@@ -751,8 +751,8 @@ CoreDisconnectController (
     // Get the Driver Binding Protocol of the driver that is managing this controller
     //
     Status = CoreHandleProtocol (
-               DriverImageHandle,  
-               &gEfiDriverBindingProtocolGuid,   
+               DriverImageHandle,
+               &gEfiDriverBindingProtocolGuid,
                (VOID **)&DriverBinding
                );
     if (EFI_ERROR (Status)) {
@@ -769,14 +769,14 @@ CoreDisconnectController (
     CoreAcquireProtocolLock ();
     for (Link = Handle->Protocols.ForwardLink; Link != &Handle->Protocols; Link = Link->ForwardLink) {
       Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
-      for (ProtLink = Prot->OpenList.ForwardLink; 
-           ProtLink != &Prot->OpenList; 
+      for (ProtLink = Prot->OpenList.ForwardLink;
+           ProtLink != &Prot->OpenList;
            ProtLink = ProtLink->ForwardLink) {
         OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
         if (OpenData->AgentHandle == DriverImageHandle) {
           if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
             ChildBufferCount++;
-          } 
+          }
           if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
             DriverImageHandleValid = TRUE;
           }
@@ -800,8 +800,8 @@ CoreDisconnectController (
         CoreAcquireProtocolLock ();
         for (Link = Handle->Protocols.ForwardLink; Link != &Handle->Protocols; Link = Link->ForwardLink) {
           Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
-          for (ProtLink = Prot->OpenList.ForwardLink; 
-               ProtLink != &Prot->OpenList; 
+          for (ProtLink = Prot->OpenList.ForwardLink;
+               ProtLink != &Prot->OpenList;
                ProtLink = ProtLink->ForwardLink) {
             OpenData = CR (ProtLink, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
             if ((OpenData->AgentHandle == DriverImageHandle) &&
@@ -857,8 +857,8 @@ CoreDisconnectController (
   } else {
     Status = EFI_NOT_FOUND;
   }
-  
-Done:  
+
+Done:
 
   if (DriverImageHandleBuffer != NULL) {
     CoreFreePool (DriverImageHandleBuffer);

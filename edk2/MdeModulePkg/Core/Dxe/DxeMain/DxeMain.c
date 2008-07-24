@@ -227,7 +227,7 @@ EFI_DECOMPRESS_PROTOCOL  gEfiDecompress = {
 /**
   Main entry point to DXE Core.
 
-  @param  HobStart               Pointer to the beginning of the HOB List from PEI. 
+  @param  HobStart               Pointer to the beginning of the HOB List from PEI.
 
   @return This function should never return.
 
@@ -400,7 +400,7 @@ DxeMain (
   // Report Status code before transfer control to BDS
   //
   CoreReportProgressCode (FixedPcdGet32 (PcdStatusCodeValueDxeCoreHandoffToBds));
-  
+
   //
   // Display any drivers that were not dispatched because dependency expression
   // evaluated to false if this is a debug build
@@ -450,7 +450,7 @@ CoreEfiNotAvailableYetArg0 (
   Place holder function until all the Boot Services and Runtime Services are
   available.
 
-  @param  Arg1                   Undefined 
+  @param  Arg1                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -474,8 +474,8 @@ CoreEfiNotAvailableYetArg1 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined 
-  @param  Arg2                   Undefined 
+  @param  Arg1                   Undefined
+  @param  Arg2                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -500,9 +500,9 @@ CoreEfiNotAvailableYetArg2 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined 
-  @param  Arg2                   Undefined 
-  @param  Arg3                   Undefined 
+  @param  Arg1                   Undefined
+  @param  Arg2                   Undefined
+  @param  Arg3                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -528,10 +528,10 @@ CoreEfiNotAvailableYetArg3 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined 
-  @param  Arg2                   Undefined 
-  @param  Arg3                   Undefined 
-  @param  Arg4                   Undefined 
+  @param  Arg1                   Undefined
+  @param  Arg2                   Undefined
+  @param  Arg3                   Undefined
+  @param  Arg4                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -558,11 +558,11 @@ CoreEfiNotAvailableYetArg4 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined 
-  @param  Arg2                   Undefined 
-  @param  Arg3                   Undefined 
-  @param  Arg4                   Undefined 
-  @param  Arg5                   Undefined 
+  @param  Arg1                   Undefined
+  @param  Arg2                   Undefined
+  @param  Arg3                   Undefined
+  @param  Arg4                   Undefined
+  @param  Arg5                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
@@ -591,11 +591,11 @@ CoreEfiNotAvailableYetArg5 (
 /**
   Searches for a Protocol Interface passed from PEI through a HOB.
 
-  @param  ProtocolGuid           The Protocol GUID to search for in the HOB List 
-  @param  Interface              A pointer to the interface for the Protocol GUID 
+  @param  ProtocolGuid           The Protocol GUID to search for in the HOB List
+  @param  Interface              A pointer to the interface for the Protocol GUID
 
-  @retval EFI_SUCCESS            The Protocol GUID was found and its interface is 
-                                 returned in Interface 
+  @retval EFI_SUCCESS            The Protocol GUID was found and its interface is
+                                 returned in Interface
   @retval EFI_NOT_FOUND          The Protocol GUID was not found in the HOB List
 
 **/
@@ -654,10 +654,10 @@ CalculateEfiHdrCrc (
 /**
   Terminates all boot services.
 
-  @param  ImageHandle            Handle that identifies the exiting image. 
+  @param  ImageHandle            Handle that identifies the exiting image.
   @param  MapKey                 Key to the latest memory map.
 
-  @retval EFI_SUCCESS            Boot Services terminated 
+  @retval EFI_SUCCESS            Boot Services terminated
   @retval EFI_INVALID_PARAMETER  MapKey is incorrect.
 
 **/
@@ -673,7 +673,7 @@ CoreExitBootServices (
   EFI_TCG_PLATFORM_PROTOCOL *TcgPlatformProtocol;
 
   //
-  // Measure invocation of ExitBootServices, 
+  // Measure invocation of ExitBootServices,
   // which is defined by TCG_EFI_Platform_1_20_Final Specification
   //
   TcgPlatformProtocol = NULL;
@@ -759,7 +759,7 @@ CoreExitBootServices (
     StatusTemp = TcgPlatformProtocol->MeasureAction (EFI_EXIT_BOOT_SERVICES_SUCCEEDED);
     ASSERT_EFI_ERROR (StatusTemp);
   }
- 
+
   return Status;
 }
 
@@ -793,7 +793,7 @@ CoreExitBootServices (
                              buffer that is required to decompress the
                              compressed buffer specified by Source and
                              SourceSize.
-   
+
   @retval EFI_SUCCESS        The size of the uncompressed data was returned in
                              DestinationSize and the size of the scratch buffer
                              was returned in ScratchSize.
@@ -846,7 +846,7 @@ DxeMainUefiDecompressGetInfo (
                               the decompression.
   @param  ScratchSize         The size of scratch buffer. The size of the
                               scratch buffer needed is obtained from GetInfo().
-  
+
   @retval EFI_SUCCESS         Decompression completed successfully, and the
                               uncompressed buffer is returned in Destination.
   @retval EFI_INVALID_PARAMETER  The source buffer specified by Source and
@@ -869,11 +869,11 @@ DxeMainUefiDecompress (
   EFI_STATUS  Status;
   UINT32      TestDestinationSize;
   UINT32      TestScratchSize;
-  
+
   if (Source == NULL || Destination== NULL || Scratch == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Status = UefiDecompressGetInfo (Source, SourceSize, &TestDestinationSize, &TestScratchSize);
   if (EFI_ERROR (Status)) {
     return Status;

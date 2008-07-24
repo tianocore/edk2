@@ -1,6 +1,6 @@
 /** @file
   Firmware File System driver that produce Firmware Volume protocol.
-  Layers on top of Firmware Block protocol to produce a file abstraction 
+  Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
@@ -56,13 +56,13 @@ FV_DEVICE mFvDevice = {
   given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
   copy the volume header into it.
 
-  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to 
-                                read the volume header 
-  @param  FwVolHeader           Pointer to pointer to allocated buffer in which 
-                                the volume header is returned. 
+  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to
+                                read the volume header
+  @param  FwVolHeader           Pointer to pointer to allocated buffer in which
+                                the volume header is returned.
 
-  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated. 
-  @retval EFI_SUCCESS           Successfully read volume header to the allocated 
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
+  @retval EFI_SUCCESS           Successfully read volume header to the allocated
                                 buffer.
 
 **/
@@ -109,7 +109,7 @@ GetFwVolHeader (
     //
     CoreFreePool (*FwVolHeader);
   }
- 
+
   return Status;
 }
 
@@ -118,7 +118,7 @@ GetFwVolHeader (
 /**
   Free FvDevice resource when error happens
 
-  @param  FvDevice              pointer to the FvDevice to be freed. 
+  @param  FvDevice              pointer to the FvDevice to be freed.
 
 **/
 VOID
@@ -135,7 +135,7 @@ FreeFvDeviceResource (
   FfsFileEntry = (FFS_FILE_LIST_ENTRY *)FvDevice->FfsFileListHeader.ForwardLink;
   while (&FfsFileEntry->Link != &FvDevice->FfsFileListHeader) {
     NextEntry = (&FfsFileEntry->Link)->ForwardLink;
-    
+
     if (FfsFileEntry->StreamHandle != 0) {
       //
       // Close stream and free resources from SEP
@@ -167,10 +167,10 @@ FreeFvDeviceResource (
 /**
   Check if an FV is consistent and allocate cache for it.
 
-  @param  FvDevice              A pointer to the FvDevice to be checked. 
+  @param  FvDevice              A pointer to the FvDevice to be checked.
 
-  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated. 
-  @retval EFI_SUCCESS           FV is consistent and cache is allocated. 
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
+  @retval EFI_SUCCESS           FV is consistent and cache is allocated.
   @retval EFI_VOLUME_CORRUPTED  File system is corrupted.
 
 **/
@@ -199,7 +199,7 @@ FvCheck (
 
   Fvb = FvDevice->Fvb;
   FwVolHeader = FvDevice->FwVolHeader;
- 
+
   Status = Fvb->GetAttributes (Fvb, &FvbAttributes);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -230,7 +230,7 @@ FvCheck (
   LbaIndex = 0;
   LbaOffset = FwVolHeader->HeaderLength;
   while ((BlockMap->NumBlocks != 0) || (BlockMap->Length != 0)) {
-    
+
     for (Index = 0; Index < BlockMap->NumBlocks; Index ++) {
 
       Size = BlockMap->Length;
@@ -252,7 +252,7 @@ FvCheck (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-      
+
       //
       // After we skip Fv Header always read from start of block
       //
@@ -271,7 +271,7 @@ FvCheck (
     FvDevice->ErasePolarity = 1;
   } else {
     FvDevice->ErasePolarity = 0;
-  } 
+  }
 
 
   //
@@ -301,7 +301,7 @@ FvCheck (
     }
 
     if (!IsValidFfsHeader (FvDevice->ErasePolarity, FfsHeader, &FileState)) {
-      if ((FileState == EFI_FILE_HEADER_INVALID) || 
+      if ((FileState == EFI_FILE_HEADER_INVALID) ||
           (FileState == EFI_FILE_HEADER_CONSTRUCTION)) {
         FfsHeader++;
         continue;
@@ -328,7 +328,7 @@ FvCheck (
     FileLength = *(UINT32 *)&FfsHeader->Size[0] & 0x00FFFFFF;
 
     FileState = GetFileState (FvDevice->ErasePolarity, FfsHeader);
-    
+
     //
     // check for non-deleted file
     //
@@ -341,18 +341,18 @@ FvCheck (
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-    
+
       FfsFileEntry->FfsHeader = FfsHeader;
       InsertTailList (&FvDevice->FfsFileListHeader, &FfsFileEntry->Link);
     }
 
     FfsHeader =  (EFI_FFS_FILE_HEADER *)(((UINT8 *)FfsHeader) + FileLength);
-    
+
     //
     // Adjust pointer to the next 8-byte aligned boundry.
     //
     FfsHeader = (EFI_FFS_FILE_HEADER *)(((UINTN)FfsHeader + 7) & ~0x07);
-    
+
   }
 
 Done:
@@ -371,7 +371,7 @@ Done:
   EFI_FIRMWARE_VOLUME2_PROTOCOL on the same handle.  This is the function where
   the actual initialization of the EFI_FIRMWARE_VOLUME2_PROTOCOL is done.
 
-  @param  Event                 The event that occured 
+  @param  Event                 The event that occured
   @param  Context               For EFI compatiblity.  Not used.
 
 **/
@@ -415,13 +415,13 @@ NotifyFwVolBlock (
     if (EFI_ERROR (Status)) {
       continue;
     }
-    
+
     //
     // Get the FirmwareVolumeBlock protocol on that handle
     //
-    Status = CoreHandleProtocol (Handle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **)&Fvb); 
+    Status = CoreHandleProtocol (Handle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **)&Fvb);
     ASSERT_EFI_ERROR (Status);
-    
+
 
     //
     // Make sure the Fv Header is O.K.
@@ -469,12 +469,12 @@ NotifyFwVolBlock (
       if (FvDevice == NULL) {
         return;
       }
-      
+
       FvDevice->Fvb             = Fvb;
       FvDevice->Handle          = Handle;
       FvDevice->FwVolHeader     = FwVolHeader;
       FvDevice->Fv.ParentHandle = Fvb->ParentHandle;
-      
+
       //
       // Install an New FV protocol on the existing handle
       //
@@ -487,7 +487,7 @@ NotifyFwVolBlock (
       ASSERT_EFI_ERROR (Status);
     }
   }
-  
+
   return;
 }
 
@@ -498,8 +498,8 @@ NotifyFwVolBlock (
   libraries, and registers two notification functions.  These notification
   functions are responsible for building the FV stack dynamically.
 
-  @param  ImageHandle           The image handle. 
-  @param  SystemTable           The system table. 
+  @param  ImageHandle           The image handle.
+  @param  SystemTable           The system table.
 
   @retval EFI_SUCCESS           Function successfully returned.
 

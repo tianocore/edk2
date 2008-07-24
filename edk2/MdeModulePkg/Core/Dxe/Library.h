@@ -20,8 +20,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Report status code of type EFI_PROGRESS_CODE by caller ID gEfiCallerIdGuid.
 
-  @param  Value              Describes the class/subclass/operation of the 
-                             hardware or software entity that the Status Code 
+  @param  Value              Describes the class/subclass/operation of the
+                             hardware or software entity that the Status Code
                              relates to.
 
 **/
@@ -35,9 +35,9 @@ CoreReportProgressCode (
   Report status code of type EFI_PROGRESS_CODE by caller ID gEfiCallerIdGuid,
   with a handle as additional information.
 
-  @param  Value              Describes the class/subclass/operation of the 
-                             hardware or software entity that the Status Code 
-                             relates to. 
+  @param  Value              Describes the class/subclass/operation of the
+                             hardware or software entity that the Status Code
+                             relates to.
   @param  Handle             Additional information.
 
 **/
@@ -52,7 +52,7 @@ CoreReportProgressCodeSpecific (
   Raising to the task priority level of the mutual exclusion
   lock, and then acquires ownership of the lock.
 
-  @param  Lock               The lock to acquire 
+  @param  Lock               The lock to acquire
 
   @return Lock owned
 
@@ -70,9 +70,9 @@ CoreAcquireLock (
   multiprocessor support, acquiring the lock only consists
   of raising to the locks TPL.
 
-  @param  Lock               The EFI_LOCK structure to initialize 
+  @param  Lock               The EFI_LOCK structure to initialize
 
-  @retval EFI_SUCCESS        Lock Owned. 
+  @retval EFI_SUCCESS        Lock Owned.
   @retval EFI_ACCESS_DENIED  Reentrant Lock Acquisition, Lock not Owned.
 
 **/
@@ -86,7 +86,7 @@ CoreAcquireLockOrFail (
   Releases ownership of the mutual exclusion lock, and
   restores the previous task priority level.
 
-  @param  Lock               The lock to release 
+  @param  Lock               The lock to release
 
   @return Lock unowned
 
@@ -104,7 +104,7 @@ CoreReleaseLock (
 /**
   Calculate the size of a whole device path.
 
-  @param  DevicePath         The pointer to the device path data. 
+  @param  DevicePath         The pointer to the device path data.
 
   @return Size of device path data structure..
 
@@ -118,9 +118,9 @@ CoreDevicePathSize (
 /**
   Return TRUE is this is a multi instance device path.
 
-  @param  DevicePath         A pointer to a device path data structure. 
+  @param  DevicePath         A pointer to a device path data structure.
 
-  @retval TRUE               If DevicePath is multi instance. FALSE - If 
+  @retval TRUE               If DevicePath is multi instance. FALSE - If
                              DevicePath is not multi instance.
 
 **/
@@ -134,7 +134,7 @@ CoreIsDevicePathMultiInstance (
 /**
   Duplicate a new device path data structure from the old one.
 
-  @param  DevicePath         A pointer to a device path data structure. 
+  @param  DevicePath         A pointer to a device path data structure.
 
   @return A pointer to the new allocated device path data.
   @return Caller must free the memory used by DevicePath if it is no longer needed.
@@ -149,8 +149,8 @@ CoreDuplicateDevicePath (
 /**
   Function is used to append a Src1 and Src2 together.
 
-  @param  Src1               A pointer to a device path data structure. 
-  @param  Src2               A pointer to a device path data structure. 
+  @param  Src1               A pointer to a device path data structure.
+  @param  Src2               A pointer to a device path data structure.
 
   @return A pointer to the new device path is returned.
   @return NULL is returned if space for the new device path could not be allocated from pool.
@@ -167,7 +167,7 @@ CoreAppendDevicePath (
 /**
   Allocate pool of type EfiBootServicesData, the size is specified with AllocationSize.
 
-  @param  AllocationSize     Size to allocate. 
+  @param  AllocationSize     Size to allocate.
 
   @return Pointer of the allocated pool.
 
@@ -181,7 +181,7 @@ CoreAllocateBootServicesPool (
 /**
   Allocate pool of type EfiBootServicesData and zero it, the size is specified with AllocationSize.
 
-  @param  AllocationSize     Size to allocate. 
+  @param  AllocationSize     Size to allocate.
 
   @return Pointer of the allocated pool.
 
@@ -195,11 +195,11 @@ CoreAllocateZeroBootServicesPool (
 /**
   Find a config table by name in system table's ConfigurationTable.
 
-  @param  Guid           The table name to look for 
-  @param  Table          Pointer of the config table 
+  @param  Guid           The table name to look for
+  @param  Table          Pointer of the config table
 
-  @retval EFI_NOT_FOUND  Could not find the table in system table's 
-                         ConfigurationTable. 
+  @retval EFI_NOT_FOUND  Could not find the table in system table's
+                         ConfigurationTable.
   @retval EFI_SUCCESS    Table successfully found.
 
 **/
@@ -213,9 +213,9 @@ CoreGetConfigTable (
 /**
   Allocate pool of specified size with EfiRuntimeServicesData type, and copy specified buffer to this pool.
 
-  @param  AllocationSize     Size to allocate. 
-  @param  Buffer             Specified buffer that will be copy to the allocated 
-                             pool 
+  @param  AllocationSize     Size to allocate.
+  @param  Buffer             Specified buffer that will be copy to the allocated
+                             pool
 
   @return Pointer of the allocated pool.
 
@@ -230,7 +230,7 @@ CoreAllocateRuntimeCopyPool (
 /**
   Allocate pool of type EfiRuntimeServicesData, the size is specified with AllocationSize.
 
-  @param  AllocationSize     Size to allocate. 
+  @param  AllocationSize     Size to allocate.
 
   @return Pointer of the allocated pool.
 
@@ -244,9 +244,9 @@ CoreAllocateRuntimePool (
 /**
   Allocate pool of specified size with EfiBootServicesData type, and copy specified buffer to this pool.
 
-  @param  AllocationSize     Size to allocate. 
-  @param  Buffer             Specified buffer that will be copy to the allocated 
-                             pool 
+  @param  AllocationSize     Size to allocate.
+  @param  Buffer             Specified buffer that will be copy to the allocated
+                             pool
 
   @return Pointer of the allocated pool.
 
@@ -261,14 +261,14 @@ CoreAllocateCopyPool (
 /**
   Create a protocol notification event and return it.
 
-  @param  ProtocolGuid       Protocol to register notification event on. 
-  @param  NotifyTpl          Maximum TPL to signal the NotifyFunction. 
-  @param  NotifyFunction     EFI notification routine. 
-  @param  NotifyContext      Context passed into Event when it is created. 
-  @param  Registration       Registration key returned from 
-                             RegisterProtocolNotify(). 
-  @param  SignalFlag         Boolean value to decide whether kick the event after 
-                             register or not. 
+  @param  ProtocolGuid       Protocol to register notification event on.
+  @param  NotifyTpl          Maximum TPL to signal the NotifyFunction.
+  @param  NotifyFunction     EFI notification routine.
+  @param  NotifyContext      Context passed into Event when it is created.
+  @param  Registration       Registration key returned from
+                             RegisterProtocolNotify().
+  @param  SignalFlag         Boolean value to decide whether kick the event after
+                             register or not.
 
   @return The EFI_EVENT that has been registered to be signaled when a ProtocolGuid
           is added to the system.

@@ -26,7 +26,7 @@
 
   ENTRY_POINT                    = DxeMain
 
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
 
 [Sources.common]
   Library.h
@@ -73,7 +73,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  
+
 [LibraryClasses]
   BaseMemoryLib
   CacheMaintenanceLib

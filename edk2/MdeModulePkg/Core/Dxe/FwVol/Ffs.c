@@ -19,8 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Get the FFS file state by checking the highest bit set in the header's state field.
 
-  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
-  @param  FfsHeader      Points to the FFS file header 
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume
+  @param  FfsHeader      Points to the FFS file header
 
   @return FFS File state
 
@@ -53,11 +53,11 @@ GetFileState (
 /**
   Check if a block of buffer is erased.
 
-  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
-  @param  InBuffer       The buffer to be checked 
-  @param  BufferSize     Size of the buffer in bytes 
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume
+  @param  InBuffer       The buffer to be checked
+  @param  BufferSize     Size of the buffer in bytes
 
-  @retval TRUE           The block of buffer is erased 
+  @retval TRUE           The block of buffer is erased
   @retval FALSE          The block of buffer is not erased
 
 **/
@@ -93,9 +93,9 @@ IsBufferErased (
 /**
   Verify checksum of the firmware volume header.
 
-  @param  FvHeader       Points to the firmware volume header to be checked 
+  @param  FvHeader       Points to the firmware volume header to be checked
 
-  @retval TRUE           Checksum verification passed 
+  @retval TRUE           Checksum verification passed
   @retval FALSE          Checksum verification failed
 
 **/
@@ -128,9 +128,9 @@ VerifyFvHeaderChecksum (
 /**
   Verify checksum of the FFS file header.
 
-  @param  FfsHeader      Points to the FFS file header to be checked 
+  @param  FfsHeader      Points to the FFS file header to be checked
 
-  @retval TRUE           Checksum verification passed 
+  @retval TRUE           Checksum verification passed
   @retval FALSE          Checksum verification failed
 
 **/
@@ -163,11 +163,11 @@ VerifyHeaderChecksum (
 /**
   Check if it's a valid FFS file header.
 
-  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
-  @param  FfsHeader      Points to the FFS file header to be checked 
-  @param  FileState      FFS file state to be returned 
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume
+  @param  FfsHeader      Points to the FFS file header to be checked
+  @param  FileState      FFS file state to be returned
 
-  @retval TRUE           Valid FFS file header 
+  @retval TRUE           Valid FFS file header
   @retval FALSE          Invalid FFS file header
 
 **/
@@ -189,7 +189,7 @@ IsValidFfsHeader (
     // Here we need to verify header checksum
     //
     return VerifyHeaderChecksum (FfsHeader);
-  
+
   case EFI_FILE_HEADER_CONSTRUCTION:
   case EFI_FILE_HEADER_INVALID:
   default:
@@ -202,10 +202,10 @@ IsValidFfsHeader (
   Check if it's a valid FFS file.
   Here we are sure that it has a valid FFS file header since we must call IsValidFfsHeader() first.
 
-  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
-  @param  FfsHeader      Points to the FFS file to be checked 
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume
+  @param  FfsHeader      Points to the FFS file to be checked
 
-  @retval TRUE           Valid FFS file 
+  @retval TRUE           Valid FFS file
   @retval FALSE          Invalid FFS file
 
 **/

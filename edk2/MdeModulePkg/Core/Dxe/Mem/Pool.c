@@ -66,7 +66,7 @@ typedef struct {
     EFI_MEMORY_TYPE  MemoryType;
     LIST_ENTRY       FreeList[MAX_POOL_LIST];
     LIST_ENTRY       Link;
-} POOL; 
+} POOL;
 
 //
 // Pool header for each memory type.
@@ -106,7 +106,7 @@ CoreInitializePool (
 /**
   Look up pool head for specified memory type.
 
-  @param  MemoryType             Memory type of which pool head is looked for 
+  @param  MemoryType             Memory type of which pool head is looked for
 
   @return Pointer of Corresponding pool head.
 
@@ -153,18 +153,18 @@ LookupPoolHead (
   return NULL;
 }
 
- 
+
 
 /**
   Allocate pool of a particular type.
 
-  @param  PoolType               Type of pool to allocate 
-  @param  Size                   The amount of pool to allocate 
-  @param  Buffer                 The address to return a pointer to the allocated 
-                                 pool 
+  @param  PoolType               Type of pool to allocate
+  @param  Size                   The amount of pool to allocate
+  @param  Buffer                 The address to return a pointer to the allocated
+                                 pool
 
-  @retval EFI_INVALID_PARAMETER  PoolType not valid 
-  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed. 
+  @retval EFI_INVALID_PARAMETER  PoolType not valid
+  @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed.
   @retval EFI_SUCCESS            Pool successfully allocated.
 
 **/
@@ -185,9 +185,9 @@ CoreAllocatePool (
        PoolType == EfiConventionalMemory) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   *Buffer = NULL;
-  
+
   //
   // If size is too large, fail it
   // Base on the EFI spec, return status of EFI_OUT_OF_RESOURCES
@@ -215,8 +215,8 @@ CoreAllocatePool (
   Internal function to allocate pool of a particular type.
   Caller must have the memory lock held
 
-  @param  PoolType               Type of pool to allocate 
-  @param  Size                   The amount of pool to allocate 
+  @param  PoolType               Type of pool to allocate
+  @param  Size                   The amount of pool to allocate
 
   @return The allocate pool, or NULL
 
@@ -244,7 +244,7 @@ CoreAllocatePoolI (
   //
   // Adjust the size by the pool header & tail overhead
   //
-  
+
   //
   // Adjusting the Size to be of proper alignment so that
   // we don't get an unaligned access fault later when
@@ -293,7 +293,7 @@ CoreAllocatePoolI (
       FSize = LIST_TO_SIZE(Index);
 
       while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
-        Free = (POOL_FREE *) &NewPage[Offset];          
+        Free = (POOL_FREE *) &NewPage[Offset];
         Free->Signature = POOL_FREE_SIGNATURE;
         Free->Index     = (UINT32)Index;
         InsertHeadList (&Pool->FreeList[Index], &Free->Link);
@@ -319,7 +319,7 @@ Done:
   Buffer = NULL;
 
   if (Head != NULL) {
-    
+
     //
     // If we have a pool buffer, fill in the header & tail info
     //
@@ -334,9 +334,9 @@ Done:
 
     DEBUG ((
       DEBUG_POOL,
-      "AllocatePoolI: Type %x, Addr %x (len %x) %,d\n", PoolType, 
-      Buffer, 
-      Size - POOL_OVERHEAD, 
+      "AllocatePoolI: Type %x, Addr %x (len %x) %,d\n", PoolType,
+      Buffer,
+      Size - POOL_OVERHEAD,
       Pool->Used
       ));
 
@@ -351,15 +351,15 @@ Done:
 
   return Buffer;
 }
-  
+
 
 
 /**
   Frees pool.
 
-  @param  Buffer                 The allocated pool entry to free 
+  @param  Buffer                 The allocated pool entry to free
 
-  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value. 
+  @retval EFI_INVALID_PARAMETER  Buffer is not a valid value.
   @retval EFI_SUCCESS            Pool successfully freed.
 
 **/
@@ -387,9 +387,9 @@ CoreFreePool (
   Internal function to free a pool entry.
   Caller must have the memory lock held
 
-  @param  Buffer                 The allocated pool entry to free 
+  @param  Buffer                 The allocated pool entry to free
 
-  @retval EFI_INVALID_PARAMETER  Buffer not valid 
+  @retval EFI_INVALID_PARAMETER  Buffer not valid
   @retval EFI_SUCCESS            Buffer successfully freed.
 
 **/
@@ -451,7 +451,7 @@ CoreFreePoolI (
   DEBUG ((DEBUG_POOL, "FreePool: %x (len %x) %,d\n", Head->Data, Head->Size - POOL_OVERHEAD, Pool->Used));
 
   //
-  // Determine the pool list 
+  // Determine the pool list
   //
   Index = SIZE_TO_LIST(Size);
   DEBUG_CLEAR_MEMORY (Head, Size);
@@ -480,7 +480,7 @@ CoreFreePoolI (
     InsertHeadList (&Pool->FreeList[Index], &Free->Link);
 
     //
-    // See if all the pool entries in the same page as Free are freed pool 
+    // See if all the pool entries in the same page as Free are freed pool
     // entries
     //
     NewPage = (CHAR8 *)((UINTN)Free & ~((DEFAULT_PAGE_ALLOCATION) -1));
@@ -493,7 +493,7 @@ CoreFreePoolI (
 
       AllFree = TRUE;
       Offset = 0;
-      
+
       while ((Offset < DEFAULT_PAGE_ALLOCATION) && (AllFree)) {
         FSize = LIST_TO_SIZE(Index);
         while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
@@ -510,7 +510,7 @@ CoreFreePoolI (
       if (AllFree) {
 
         //
-        // All of the pool entries in the same page as Free are free pool 
+        // All of the pool entries in the same page as Free are free pool
         // entries
         // Remove all of these pool entries from the free loop lists.
         //
@@ -518,7 +518,7 @@ CoreFreePoolI (
         ASSERT(NULL != Free);
         Index = Free->Index;
         Offset = 0;
-        
+
         while (Offset < DEFAULT_PAGE_ALLOCATION) {
           FSize = LIST_TO_SIZE(Index);
           while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
@@ -539,7 +539,7 @@ CoreFreePoolI (
   }
 
   //
-  // If this is an OS specific memory type, then check to see if the last 
+  // If this is an OS specific memory type, then check to see if the last
   // portion of that memory type has been freed.  If it has, then free the
   // list entry for that memory type
   //

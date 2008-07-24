@@ -1,5 +1,5 @@
 /** @file
-  Firmware Volume Block protocol functions.  
+  Firmware Volume Block protocol functions.
   Consumes FV hobs and creates appropriate block protocols.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
@@ -51,10 +51,10 @@ typedef struct {
   libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
   produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
 
-  @param  ImageHandle            The image handle. 
-  @param  SystemTable            The system table. 
+  @param  ImageHandle            The image handle.
+  @param  SystemTable            The system table.
 
-  @retval EFI_SUCCESS            Successfully initialized firmware volume block 
+  @retval EFI_SUCCESS            Successfully initialized firmware volume block
                                  driver.
 
 **/
@@ -70,8 +70,8 @@ FwVolBlockDriverInit (
 /**
   Retrieves Volume attributes.  No polarity translations are done.
 
-  @param  This                   Calling context 
-  @param  Attributes             output buffer which contains attributes 
+  @param  This                   Calling context
+  @param  Attributes             output buffer which contains attributes
 
   @retval EFI_SUCCESS            The firmware volume attributes were returned.
 
@@ -88,13 +88,13 @@ FwVolBlockGetAttributes (
 /**
   Modifies the current settings of the firmware volume according to the input parameter.
 
-  @param  This                   Calling context 
-  @param  Attributes             input buffer which contains attributes 
+  @param  This                   Calling context
+  @param  Attributes             input buffer which contains attributes
 
-  @retval EFI_SUCCESS            The firmware volume attributes were returned. 
-  @retval EFI_INVALID_PARAMETER  The attributes requested are in conflict with 
-                                 the capabilities as declared in the firmware 
-                                 volume header. 
+  @retval EFI_SUCCESS            The firmware volume attributes were returned.
+  @retval EFI_INVALID_PARAMETER  The attributes requested are in conflict with
+                                 the capabilities as declared in the firmware
+                                 volume header.
   @retval EFI_UNSUPPORTED        Not supported.
 
 **/
@@ -115,18 +115,18 @@ FwVolBlockSetAttributes (
   block of the firmware volume), the EraseBlock() function must return
   EFI_INVALID_PARAMETER without modifying the contents of the firmware volume.
 
-  @param  This                   Calling context 
-  @param  ...                    Starting LBA followed by Number of Lba to erase. 
-                                 a -1 to terminate the list. 
+  @param  This                   Calling context
+  @param  ...                    Starting LBA followed by Number of Lba to erase.
+                                 a -1 to terminate the list.
 
-  @retval EFI_SUCCESS            The erase request was successfully completed. 
-  @retval EFI_ACCESS_DENIED      The firmware volume is in the WriteDisabled 
-                                 state. 
-  @retval EFI_DEVICE_ERROR       The block device is not functioning correctly 
-                                 and could not be written. The firmware device 
-                                 may have been partially erased. 
-  @retval EFI_INVALID_PARAMETER  One or more of the LBAs listed in the variable 
-                                 argument list do 
+  @retval EFI_SUCCESS            The erase request was successfully completed.
+  @retval EFI_ACCESS_DENIED      The firmware volume is in the WriteDisabled
+                                 state.
+  @retval EFI_DEVICE_ERROR       The block device is not functioning correctly
+                                 and could not be written. The firmware device
+                                 may have been partially erased.
+  @retval EFI_INVALID_PARAMETER  One or more of the LBAs listed in the variable
+                                 argument list do
   @retval EFI_UNSUPPORTED        Not supported.
 
 **/
@@ -142,20 +142,20 @@ FwVolBlockEraseBlock (
 /**
   Read the specified number of bytes from the block to the input buffer.
 
-  @param  This                   Indicates the calling context. 
-  @param  Lba                    The starting logical block index to read. 
-  @param  Offset                 Offset into the block at which to begin reading. 
-  @param  NumBytes               Pointer to a UINT32. At entry, *NumBytes 
-                                 contains the total size of the buffer. At exit, 
-                                 *NumBytes contains the total number of bytes 
-                                 actually read. 
-  @param  Buffer                 Pinter to a caller-allocated buffer that 
-                                 contains the destine for the read. 
+  @param  This                   Indicates the calling context.
+  @param  Lba                    The starting logical block index to read.
+  @param  Offset                 Offset into the block at which to begin reading.
+  @param  NumBytes               Pointer to a UINT32. At entry, *NumBytes
+                                 contains the total size of the buffer. At exit,
+                                 *NumBytes contains the total number of bytes
+                                 actually read.
+  @param  Buffer                 Pinter to a caller-allocated buffer that
+                                 contains the destine for the read.
 
-  @retval EFI_SUCCESS            The firmware volume was read successfully. 
-  @retval EFI_BAD_BUFFER_SIZE    The read was attempted across an LBA boundary. 
-  @retval EFI_ACCESS_DENIED      Access denied. 
-  @retval EFI_DEVICE_ERROR       The block device is malfunctioning and could not 
+  @retval EFI_SUCCESS            The firmware volume was read successfully.
+  @retval EFI_BAD_BUFFER_SIZE    The read was attempted across an LBA boundary.
+  @retval EFI_ACCESS_DENIED      Access denied.
+  @retval EFI_DEVICE_ERROR       The block device is malfunctioning and could not
                                  be read.
 
 **/
@@ -169,29 +169,29 @@ FwVolBlockReadBlock (
   IN OUT    UINT8                                *Buffer
   );
 
-  
+
 
 /**
   Writes the specified number of bytes from the input buffer to the block.
 
-  @param  This                   Indicates the calling context. 
-  @param  Lba                    The starting logical block index to write to. 
-  @param  Offset                 Offset into the block at which to begin writing. 
-  @param  NumBytes               Pointer to a UINT32. At entry, *NumBytes 
-                                 contains the total size of the buffer. At exit, 
-                                 *NumBytes contains the total number of bytes 
-                                 actually written. 
-  @param  Buffer                 Pinter to a caller-allocated buffer that 
-                                 contains the source for the write. 
+  @param  This                   Indicates the calling context.
+  @param  Lba                    The starting logical block index to write to.
+  @param  Offset                 Offset into the block at which to begin writing.
+  @param  NumBytes               Pointer to a UINT32. At entry, *NumBytes
+                                 contains the total size of the buffer. At exit,
+                                 *NumBytes contains the total number of bytes
+                                 actually written.
+  @param  Buffer                 Pinter to a caller-allocated buffer that
+                                 contains the source for the write.
 
-  @retval EFI_SUCCESS            The firmware volume was written successfully. 
-  @retval EFI_BAD_BUFFER_SIZE    The write was attempted across an LBA boundary. 
-                                 On output, NumBytes contains the total number of 
-                                 bytes actually written. 
-  @retval EFI_ACCESS_DENIED      The firmware volume is in the WriteDisabled 
-                                 state. 
-  @retval EFI_DEVICE_ERROR       The block device is malfunctioning and could not 
-                                 be written. 
+  @retval EFI_SUCCESS            The firmware volume was written successfully.
+  @retval EFI_BAD_BUFFER_SIZE    The write was attempted across an LBA boundary.
+                                 On output, NumBytes contains the total number of
+                                 bytes actually written.
+  @retval EFI_ACCESS_DENIED      The firmware volume is in the WriteDisabled
+                                 state.
+  @retval EFI_DEVICE_ERROR       The block device is malfunctioning and could not
+                                 be written.
   @retval EFI_UNSUPPORTED        Not supported.
 
 **/
@@ -205,15 +205,15 @@ FwVolBlockWriteBlock (
   IN     UINT8                                *Buffer
   );
 
-    
+
 
 /**
   Get Fvb's base address.
 
-  @param  This                   Indicates the calling context. 
-  @param  Address                Fvb device base address. 
+  @param  This                   Indicates the calling context.
+  @param  Address                Fvb device base address.
 
-  @retval EFI_SUCCESS            Successfully got Fvb's base address. 
+  @retval EFI_SUCCESS            Successfully got Fvb's base address.
   @retval EFI_UNSUPPORTED        Not supported.
 
 **/
@@ -229,17 +229,17 @@ FwVolBlockGetPhysicalAddress (
 /**
   Retrieves the size in bytes of a specific block within a firmware volume.
 
-  @param  This                   Indicates the calling context. 
-  @param  Lba                    Indicates the block for which to return the 
-                                 size. 
-  @param  BlockSize              Pointer to a caller-allocated UINTN in which the 
-                                 size of the block is returned. 
-  @param  NumberOfBlocks         Pointer to a caller-allocated UINTN in which the 
-                                 number of consecutive blocks starting with Lba 
-                                 is returned. All blocks in this range have a 
-                                 size of BlockSize. 
+  @param  This                   Indicates the calling context.
+  @param  Lba                    Indicates the block for which to return the
+                                 size.
+  @param  BlockSize              Pointer to a caller-allocated UINTN in which the
+                                 size of the block is returned.
+  @param  NumberOfBlocks         Pointer to a caller-allocated UINTN in which the
+                                 number of consecutive blocks starting with Lba
+                                 is returned. All blocks in this range have a
+                                 size of BlockSize.
 
-  @retval EFI_SUCCESS            The firmware volume base address is returned. 
+  @retval EFI_SUCCESS            The firmware volume base address is returned.
   @retval EFI_INVALID_PARAMETER  The requested LBA is out of range.
 
 **/
@@ -257,10 +257,10 @@ FwVolBlockGetBlockSize (
   libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
   produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
 
-  @param  ImageHandle            The image handle. 
-  @param  SystemTable            The system table. 
+  @param  ImageHandle            The image handle.
+  @param  SystemTable            The system table.
 
-  @retval EFI_SUCCESS            Successfully initialized firmware volume block 
+  @retval EFI_SUCCESS            Successfully initialized firmware volume block
                                  driver.
 
 **/
@@ -276,16 +276,16 @@ FwVolBlockDriverInit (
   This routine produces a firmware volume block protocol on a given
   buffer.
 
-  @param  BaseAddress            base address of the firmware volume image 
-  @param  Length                 length of the firmware volume image 
-  @param  ParentHandle           handle of parent firmware volume, if this image 
-                                 came from an FV image file in another firmware 
-                                 volume (ala capsules) 
-  @param  FvProtocol             Firmware volume block protocol produced. 
+  @param  BaseAddress            base address of the firmware volume image
+  @param  Length                 length of the firmware volume image
+  @param  ParentHandle           handle of parent firmware volume, if this image
+                                 came from an FV image file in another firmware
+                                 volume (ala capsules)
+  @param  FvProtocol             Firmware volume block protocol produced.
 
-  @retval EFI_VOLUME_CORRUPTED   Volume corrupted. 
-  @retval EFI_OUT_OF_RESOURCES   No enough buffer to be allocated. 
-  @retval EFI_SUCCESS            Successfully produced a FVB protocol on given 
+  @retval EFI_VOLUME_CORRUPTED   Volume corrupted.
+  @retval EFI_OUT_OF_RESOURCES   No enough buffer to be allocated.
+  @retval EFI_SUCCESS            Successfully produced a FVB protocol on given
                                  buffer.
 
 **/

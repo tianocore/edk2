@@ -51,8 +51,8 @@ typedef struct {
   Retrieves attributes, insures positive polarity of attribute bits, returns
   resulting attributes in output parameter.
 
-  @param  This             Calling context 
-  @param  Attributes       output buffer which contains attributes 
+  @param  This             Calling context
+  @param  Attributes       output buffer which contains attributes
 
   @retval EFI_SUCCESS      Successfully got volume attributes
 
@@ -68,9 +68,9 @@ FvGetVolumeAttributes (
 /**
   Sets current attributes for volume
 
-  @param  This             Calling context 
-  @param  Attributes       At input, contains attributes to be set.  At output 
-                           contains new value of FV 
+  @param  This             Calling context
+  @param  Attributes       At input, contains attributes to be set.  At output
+                           contains new value of FV
 
   @retval EFI_UNSUPPORTED  Could not be set.
 
@@ -86,46 +86,46 @@ FvSetVolumeAttributes (
 /**
   Given the input key, search for the next matching file in the volume.
 
-  @param  This                       Indicates the calling context. 
-  @param  Key                        Key is a pointer to a caller allocated 
-                                     buffer that contains implementation specific 
-                                     data that is used to track where to begin 
-                                     the search for the next file. The size of 
-                                     the buffer must be at least This->KeySize 
-                                     bytes long. To reinitialize the search and 
-                                     begin from the beginning of the firmware 
-                                     volume, the entire buffer must be cleared to 
-                                     zero. Other than clearing the buffer to 
-                                     initiate a new search, the caller must not 
-                                     modify the data in the buffer between calls 
-                                     to GetNextFile(). 
-  @param  FileType                   FileType is a pointer to a caller allocated 
-                                     EFI_FV_FILETYPE. The GetNextFile() API can 
-                                     filter it's search for files based on the 
-                                     value of *FileType input. A *FileType input 
-                                     of 0 causes GetNextFile() to search for 
-                                     files of all types.  If a file is found, the 
-                                     file's type is returned in *FileType.  
-                                     *FileType is not modified if no file is 
-                                     found. 
-  @param  NameGuid                   NameGuid is a pointer to a caller allocated 
-                                     EFI_GUID. If a file is found, the file's 
-                                     name is returned in *NameGuid.  *NameGuid is 
-                                     not modified if no file is found. 
-  @param  Attributes                 Attributes is a pointer to a caller 
-                                     allocated EFI_FV_FILE_ATTRIBUTES.  If a file 
-                                     is found, the file's attributes are returned 
-                                     in *Attributes. *Attributes is not modified 
-                                     if no file is found. 
-  @param  Size                       Size is a pointer to a caller allocated 
-                                     UINTN. If a file is found, the file's size 
-                                     is returned in *Size. *Size is not modified 
-                                     if no file is found. 
+  @param  This                       Indicates the calling context.
+  @param  Key                        Key is a pointer to a caller allocated
+                                     buffer that contains implementation specific
+                                     data that is used to track where to begin
+                                     the search for the next file. The size of
+                                     the buffer must be at least This->KeySize
+                                     bytes long. To reinitialize the search and
+                                     begin from the beginning of the firmware
+                                     volume, the entire buffer must be cleared to
+                                     zero. Other than clearing the buffer to
+                                     initiate a new search, the caller must not
+                                     modify the data in the buffer between calls
+                                     to GetNextFile().
+  @param  FileType                   FileType is a pointer to a caller allocated
+                                     EFI_FV_FILETYPE. The GetNextFile() API can
+                                     filter it's search for files based on the
+                                     value of *FileType input. A *FileType input
+                                     of 0 causes GetNextFile() to search for
+                                     files of all types.  If a file is found, the
+                                     file's type is returned in *FileType.
+                                     *FileType is not modified if no file is
+                                     found.
+  @param  NameGuid                   NameGuid is a pointer to a caller allocated
+                                     EFI_GUID. If a file is found, the file's
+                                     name is returned in *NameGuid.  *NameGuid is
+                                     not modified if no file is found.
+  @param  Attributes                 Attributes is a pointer to a caller
+                                     allocated EFI_FV_FILE_ATTRIBUTES.  If a file
+                                     is found, the file's attributes are returned
+                                     in *Attributes. *Attributes is not modified
+                                     if no file is found.
+  @param  Size                       Size is a pointer to a caller allocated
+                                     UINTN. If a file is found, the file's size
+                                     is returned in *Size. *Size is not modified
+                                     if no file is found.
 
-  @retval EFI_SUCCESS                Successfully find the file. 
-  @retval EFI_DEVICE_ERROR           Device error. 
-  @retval EFI_ACCESS_DENIED          Fv could not read. 
-  @retval EFI_NOT_FOUND              No matching file found. 
+  @retval EFI_SUCCESS                Successfully find the file.
+  @retval EFI_DEVICE_ERROR           Device error.
+  @retval EFI_ACCESS_DENIED          Fv could not read.
+  @retval EFI_NOT_FOUND              No matching file found.
   @retval EFI_INVALID_PARAMETER      Invalid parameter
 
 **/
@@ -146,39 +146,39 @@ FvGetNextFile (
   Locates a file in the firmware volume and
   copies it to the supplied buffer.
 
-  @param  This                       Indicates the calling context. 
-  @param  NameGuid                   Pointer to an EFI_GUID, which is the 
-                                     filename. 
-  @param  Buffer                     Buffer is a pointer to pointer to a buffer 
-                                     in which the file or section contents or are 
-                                     returned. 
-  @param  BufferSize                 BufferSize is a pointer to caller allocated 
-                                     UINTN. On input *BufferSize indicates the 
-                                     size in bytes of the memory region pointed 
-                                     to by Buffer. On output, *BufferSize 
-                                     contains the number of bytes required to 
-                                     read the file. 
-  @param  FoundType                  FoundType is a pointer to a caller allocated 
-                                     EFI_FV_FILETYPE that on successful return 
-                                     from Read() contains the type of file read.  
-                                     This output reflects the file type 
-                                     irrespective of the value of the SectionType 
-                                     input. 
-  @param  FileAttributes             FileAttributes is a pointer to a caller 
-                                     allocated EFI_FV_FILE_ATTRIBUTES.  On 
-                                     successful return from Read(), 
-                                     *FileAttributes contains the attributes of 
-                                     the file read. 
-  @param  AuthenticationStatus       AuthenticationStatus is a pointer to a 
-                                     caller allocated UINTN in which the 
-                                     authentication status is returned. 
+  @param  This                       Indicates the calling context.
+  @param  NameGuid                   Pointer to an EFI_GUID, which is the
+                                     filename.
+  @param  Buffer                     Buffer is a pointer to pointer to a buffer
+                                     in which the file or section contents or are
+                                     returned.
+  @param  BufferSize                 BufferSize is a pointer to caller allocated
+                                     UINTN. On input *BufferSize indicates the
+                                     size in bytes of the memory region pointed
+                                     to by Buffer. On output, *BufferSize
+                                     contains the number of bytes required to
+                                     read the file.
+  @param  FoundType                  FoundType is a pointer to a caller allocated
+                                     EFI_FV_FILETYPE that on successful return
+                                     from Read() contains the type of file read.
+                                     This output reflects the file type
+                                     irrespective of the value of the SectionType
+                                     input.
+  @param  FileAttributes             FileAttributes is a pointer to a caller
+                                     allocated EFI_FV_FILE_ATTRIBUTES.  On
+                                     successful return from Read(),
+                                     *FileAttributes contains the attributes of
+                                     the file read.
+  @param  AuthenticationStatus       AuthenticationStatus is a pointer to a
+                                     caller allocated UINTN in which the
+                                     authentication status is returned.
 
-  @retval EFI_SUCCESS                Successfully read to memory buffer. 
-  @retval EFI_WARN_BUFFER_TOO_SMALL  Buffer too small. 
-  @retval EFI_NOT_FOUND              Not found. 
-  @retval EFI_DEVICE_ERROR           Device error. 
-  @retval EFI_ACCESS_DENIED          Could not read. 
-  @retval EFI_INVALID_PARAMETER      Invalid parameter. 
+  @retval EFI_SUCCESS                Successfully read to memory buffer.
+  @retval EFI_WARN_BUFFER_TOO_SMALL  Buffer too small.
+  @retval EFI_NOT_FOUND              Not found.
+  @retval EFI_DEVICE_ERROR           Device error.
+  @retval EFI_ACCESS_DENIED          Could not read.
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
   @retval EFI_OUT_OF_RESOURCES       Not enough buffer to be allocated.
 
 **/
@@ -199,27 +199,27 @@ FvReadFile (
   Locates a section in a given FFS File and
   copies it to the supplied buffer (not including section header).
 
-  @param  This                       Indicates the calling context. 
-  @param  NameGuid                   Pointer to an EFI_GUID, which is the 
-                                     filename. 
-  @param  SectionType                Indicates the section type to return. 
-  @param  SectionInstance            Indicates which instance of sections with a 
-                                     type of SectionType to return. 
-  @param  Buffer                     Buffer is a pointer to pointer to a buffer 
-                                     in which the file or section contents or are 
-                                     returned. 
-  @param  BufferSize                 BufferSize is a pointer to caller allocated 
+  @param  This                       Indicates the calling context.
+  @param  NameGuid                   Pointer to an EFI_GUID, which is the
+                                     filename.
+  @param  SectionType                Indicates the section type to return.
+  @param  SectionInstance            Indicates which instance of sections with a
+                                     type of SectionType to return.
+  @param  Buffer                     Buffer is a pointer to pointer to a buffer
+                                     in which the file or section contents or are
+                                     returned.
+  @param  BufferSize                 BufferSize is a pointer to caller allocated
                                      UINTN.
-  @param  AuthenticationStatus       AuthenticationStatus is a pointer to a 
-                                     caller allocated UINT32 in which the 
-                                     authentication status is returned. 
+  @param  AuthenticationStatus       AuthenticationStatus is a pointer to a
+                                     caller allocated UINT32 in which the
+                                     authentication status is returned.
 
-  @retval EFI_SUCCESS                Successfully read the file section into 
-                                     buffer. 
-  @retval EFI_WARN_BUFFER_TOO_SMALL  Buffer too small. 
-  @retval EFI_NOT_FOUND              Section not found. 
-  @retval EFI_DEVICE_ERROR           Device error. 
-  @retval EFI_ACCESS_DENIED          Could not read. 
+  @retval EFI_SUCCESS                Successfully read the file section into
+                                     buffer.
+  @retval EFI_WARN_BUFFER_TOO_SMALL  Buffer too small.
+  @retval EFI_NOT_FOUND              Section not found.
+  @retval EFI_DEVICE_ERROR           Device error.
+  @retval EFI_ACCESS_DENIED          Could not read.
   @retval EFI_INVALID_PARAMETER      Invalid parameter.
 
 **/
@@ -239,21 +239,21 @@ FvReadFileSection (
 /**
   Writes one or more files to the firmware volume.
 
-  @param  This                   Indicates the calling context. 
-  @param  NumberOfFiles          Number of files. 
-  @param  WritePolicy            WritePolicy indicates the level of reliability 
-                                 for the write in the event of a power failure or 
-                                 other system failure during the write operation. 
-  @param  FileData               FileData is an pointer to an array of 
+  @param  This                   Indicates the calling context.
+  @param  NumberOfFiles          Number of files.
+  @param  WritePolicy            WritePolicy indicates the level of reliability
+                                 for the write in the event of a power failure or
+                                 other system failure during the write operation.
+  @param  FileData               FileData is an pointer to an array of
                                  EFI_FV_WRITE_DATA. Each element of array
-                                 FileData represents a file to be written. 
+                                 FileData represents a file to be written.
 
-  @retval EFI_SUCCESS            Files successfully written to firmware volume 
-  @retval EFI_OUT_OF_RESOURCES   Not enough buffer to be allocated. 
-  @retval EFI_DEVICE_ERROR       Device error. 
-  @retval EFI_WRITE_PROTECTED    Write protected. 
-  @retval EFI_NOT_FOUND          Not found. 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter. 
+  @retval EFI_SUCCESS            Files successfully written to firmware volume
+  @retval EFI_OUT_OF_RESOURCES   Not enough buffer to be allocated.
+  @retval EFI_DEVICE_ERROR       Device error.
+  @retval EFI_WRITE_PROTECTED    Write protected.
+  @retval EFI_NOT_FOUND          Not found.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter.
   @retval EFI_UNSUPPORTED        This function not supported.
 
 **/
@@ -271,11 +271,11 @@ FvWriteFile (
   Return information of type InformationType for the requested firmware
   volume.
 
-  @param  This             Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL. 
-  @param  InformationType  InformationType for requested. 
-  @param  BufferSize       On input, size of Buffer.On output, the amount of data 
-                           returned in Buffer. 
-  @param  Buffer           A poniter to the data buffer to return. 
+  @param  This             Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
+  @param  InformationType  InformationType for requested.
+  @param  BufferSize       On input, size of Buffer.On output, the amount of data
+                           returned in Buffer.
+  @param  Buffer           A poniter to the data buffer to return.
 
   @retval EFI_SUCCESS      Successfully got volume Information.
 
@@ -295,11 +295,11 @@ FvGetVolumeInfo (
   Set information of type InformationType for the requested firmware
   volume.
 
-  @param  This             Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL. 
-  @param  InformationType  InformationType for requested. 
-  @param  BufferSize       On input, size of Buffer.On output, the amount of data 
-                           returned in Buffer. 
-  @param  Buffer           A poniter to the data buffer to return. 
+  @param  This             Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
+  @param  InformationType  InformationType for requested.
+  @param  BufferSize       On input, size of Buffer.On output, the amount of data
+                           returned in Buffer.
+  @param  Buffer           A poniter to the data buffer to return.
 
   @retval EFI_SUCCESS      Successfully set volume Information.
 
@@ -312,7 +312,7 @@ FvSetVolumeInfo (
   IN  UINTN                                     BufferSize,
   IN CONST  VOID                                *Buffer
   );
-  
+
 //
 //Internal functions
 //
@@ -329,11 +329,11 @@ typedef enum {
 /**
   Check if a block of buffer is erased.
 
-  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
-  @param  InBuffer       The buffer to be checked 
-  @param  BufferSize     Size of the buffer in bytes 
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume
+  @param  InBuffer       The buffer to be checked
+  @param  BufferSize     Size of the buffer in bytes
 
-  @retval TRUE           The block of buffer is erased 
+  @retval TRUE           The block of buffer is erased
   @retval FALSE          The block of buffer is not erased
 
 **/
@@ -348,8 +348,8 @@ IsBufferErased (
 /**
   Get the FFS file state by checking the highest bit set in the header's state field.
 
-  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
-  @param  FfsHeader      Points to the FFS file header 
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume
+  @param  FfsHeader      Points to the FFS file header
 
   @return FFS File state
 
@@ -364,8 +364,8 @@ GetFileState (
 /**
   Set the FFS file state.
 
-  @param  State                      The state to be set. 
-  @param  FfsHeader                  Points to the FFS file header 
+  @param  State                      The state to be set.
+  @param  FfsHeader                  Points to the FFS file header
 
   @return None.
 
@@ -380,9 +380,9 @@ SetFileState (
 /**
   Verify checksum of the firmware volume header.
 
-  @param  FvHeader       Points to the firmware volume header to be checked 
+  @param  FvHeader       Points to the firmware volume header to be checked
 
-  @retval TRUE           Checksum verification passed 
+  @retval TRUE           Checksum verification passed
   @retval FALSE          Checksum verification failed
 
 **/
@@ -390,16 +390,16 @@ BOOLEAN
 VerifyFvHeaderChecksum (
   IN EFI_FIRMWARE_VOLUME_HEADER *FvHeader
   );
-    
+
 
 /**
   Check if it's a valid FFS file header.
 
-  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
-  @param  FfsHeader      Points to the FFS file header to be checked 
-  @param  FileState      FFS file state to be returned 
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume
+  @param  FfsHeader      Points to the FFS file header to be checked
+  @param  FileState      FFS file state to be returned
 
-  @retval TRUE           Valid FFS file header 
+  @retval TRUE           Valid FFS file header
   @retval FALSE          Invalid FFS file header
 
 **/
@@ -415,10 +415,10 @@ IsValidFfsHeader (
   Check if it's a valid FFS file.
   Here we are sure that it has a valid FFS file header since we must call IsValidFfsHeader() first.
 
-  @param  ErasePolarity  Erase polarity attribute of the firmware volume 
-  @param  FfsHeader      Points to the FFS file to be checked 
+  @param  ErasePolarity  Erase polarity attribute of the firmware volume
+  @param  FfsHeader      Points to the FFS file to be checked
 
-  @retval TRUE           Valid FFS file 
+  @retval TRUE           Valid FFS file
   @retval FALSE          Invalid FFS file
 
 **/
@@ -433,13 +433,13 @@ IsValidFfsFile (
   given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
   copy the volume header into it.
 
-  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to 
-                                read the volume header 
-  @param  FwVolHeader           Pointer to pointer to allocated buffer in which 
-                                the volume header is returned. 
+  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to
+                                read the volume header
+  @param  FwVolHeader           Pointer to pointer to allocated buffer in which
+                                the volume header is returned.
 
-  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated. 
-  @retval EFI_SUCCESS           Successfully read volume header to the allocated 
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
+  @retval EFI_SUCCESS           Successfully read volume header to the allocated
                                 buffer.
 
 **/
@@ -452,12 +452,12 @@ GetFwVolHeader (
 
 
 /**
-  Check if a FV is consistent and allocate cache
+  Check if an FV is consistent and allocate cache for it.
 
-  @param  FvDevice              pointer to the FvDevice to be checked. 
+  @param  FvDevice              A pointer to the FvDevice to be checked.
 
-  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated. 
-  @retval EFI_SUCCESS           FV is consistent and cache is allocated. 
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
+  @retval EFI_SUCCESS           FV is consistent and cache is allocated.
   @retval EFI_VOLUME_CORRUPTED  File system is corrupted.
 
 **/
