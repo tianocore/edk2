@@ -1,10 +1,10 @@
 /** @file
-  The file provides information about the version of the EFI
+  The protocol provides information about the version of the EFI
   specification that a driver is following. This protocol is
   required for EFI drivers that are on PCI and other plug in
   cards.
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -23,7 +23,7 @@
 
 
 /**
-  
+  @par Protocol Description:  
   The EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL provides a
   mechanism for an EFI driver to publish the version of the EFI   
   specification it conforms to. This protocol must be placed on   
@@ -34,7 +34,7 @@
                 Future versions of this specification may grow
                 the size of the structure.
   
-  @param firmwareVersion The version of the EFI specification
+  @param FirmwareVersion The version of the EFI specification
                          that this driver conforms to.
                          EFI_2_10_SYSTEM_TABLE_REVISION for this
                          version of this specification.

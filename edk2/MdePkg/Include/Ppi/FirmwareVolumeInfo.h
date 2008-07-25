@@ -27,6 +27,7 @@
 typedef struct _EFI_PEI_FIRMWARE_VOLUME_INFO_PPI  EFI_PEI_FIRMWARE_VOLUME_INFO_PPI;
 
 /**
+  @par Ppi Description:
   This PPI describes the location and format of a firmware volume. 
   The FvFormat can be EFI_FIRMWARE_FILE_SYSTEM2_GUID or the GUID for 
   a user-defined format. The  EFI_FIRMWARE_FILE_SYSTEM2_GUID is 

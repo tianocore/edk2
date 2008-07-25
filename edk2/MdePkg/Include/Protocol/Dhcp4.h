@@ -4,7 +4,7 @@
   These protocols are used to collect configuration information for the EFI IPv4 Protocol
   drivers and to provide DHCPv4 server and PXE boot server discovery services.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -420,7 +420,42 @@ EFI_STATUS
   )
 ;
 
+/**
+  @par Protocol Description:
+  This protocol is used to collect configuration information for the EFI IPv4 Protocol drivers
+  and to provide DHCPv4 server and PXE boot server discovery services.
 
+  @param GetModeData 
+  Gets the EFI DHCPv4 Protocol driver status and operational data.
+
+  @param Configure 
+  Initializes, changes, or resets operational settings for the EFI
+  DHCPv4 Protocol driver.
+  
+  @param Start
+  Starts the DHCP configuration process. 
+  
+  @param RenewRebind 
+  Tries to manually extend the lease time by sending a request packet.
+
+  @param Release 
+  Releases the current configuration and returns the EFI DHCPv4
+  Protocol driver to the initial state.
+  
+  @param Stop
+  Stops the DHCP configuration process no matter what state the
+  driver is in. After being stopped, this driver will not automatically
+  communicate with the DHCP server.
+  
+  @param Build 
+  Puts together a DHCP or PXE packet. 
+  
+  @param TransmitReceive 
+  Transmits a DHCP or PXE packet and waits for response packets.
+
+  @param Parse 
+  Parses the packed DHCP or PXE option data. 
+**/
 struct _EFI_DHCP4_PROTOCOL {
   EFI_DHCP4_GET_MODE_DATA      GetModeData;
   EFI_DHCP4_CONFIGURE          Configure;

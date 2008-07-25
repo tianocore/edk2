@@ -2,7 +2,7 @@
   EFI_DEVICE_PATH_TO_TEXT_PROTOCOL as defined in UEFI 2.0.  
   This protocol provides service to convert device nodes and paths to text.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -74,6 +74,17 @@ CHAR16*
   )
 ;    
 
+/**
+  @par Protocol Description:
+  This protocol converts device paths and device nodes to text.
+
+  @param ConvertTextToDeviceNode
+  Convert the device node to text.
+  
+  @param ConvertTextToDevicePath
+  Convert the device path to text.
+  
+**/
 typedef struct {
   EFI_DEVICE_PATH_TO_TEXT_NODE        ConvertDeviceNodeToText;
   EFI_DEVICE_PATH_TO_TEXT_PATH        ConvertDevicePathToText;

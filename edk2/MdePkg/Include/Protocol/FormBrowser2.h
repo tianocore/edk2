@@ -1,9 +1,10 @@
 /** @file
-
-  The file provides services to call for drivers to leverage the
-  EFI configuration driver interface.
+  This protocol is defined in UEFI spec.
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  The EFI_FORM_BROWSER2_PROTOCOL is the interface to call for drivers to 
+  leverage the EFI configuration driver interface.
+  
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -14,8 +15,8 @@
 
 **/
 
-#ifndef __EFI_FORM_BROWSER_H__
-#define __EFI_FORM_BROWSER_H__
+#ifndef __EFI_FORM_BROWSER2_H__
+#define __EFI_FORM_BROWSER2_H__
 
 #define EFI_FORM_BROWSER2_PROTOCOL_GUID \
   {0xb9d4c360, 0xbcfb, 0x4f9b, {0x92, 0x98, 0x53, 0xc1, 0x36, 0x98, 0x22, 0x58 }}
@@ -30,17 +31,18 @@ typedef struct _EFI_FORM_BROWSER2_PROTOCOL   EFI_FORM_BROWSER2_PROTOCOL;
   @param LeftColumn   Value that designates the text column
                       where the browser window will begin from
                       the left-hand side of the screen
-                      RightColumn Value that designates the text
+                      
+  @param RightColumn  Value that designates the text
                       column where the browser window will end
                       on the right-hand side of the screen.
 
-  @param TopRow   Value that designates the text row from the
-                  top of the screen where the browser window
-                  will start.
+  @param TopRow       Value that designates the text row from the
+                      top of the screen where the browser window
+                      will start.
 
-  @param BottomRow  Value that designates the text row from the
-                    bottom of the screen where the browser
-                    window will end. 
+  @param BottomRow    Value that designates the text row from the
+                      bottom of the screen where the browser
+                      window will end. 
 **/
 typedef struct {
   UINTN   LeftColumn;
@@ -58,62 +60,38 @@ typedef UINTN EFI_BROWSER_ACTION_REQUEST;
 
 
 /**
-   
-  This function is the primary interface to the internal
-  forms-based browser. By calling this routine, one is directing
-  the browser to use a variety of passed-in information or
-  primarily use the HII database as the source of information.
+  This function is the primary interface to the internal forms-based browser. 
+  The forms browser will display forms associated with the specified Handles. 
+  The browser will select all forms in packages which have the specified Type 
+  and (for EFI_HII_PACKAGE_TYPE_GUID) the specified PackageGuid.
 
-  @param This   A pointer to the EFI_FORM_BROWSER2_PROTOCOL
-                instance.
+  @param This            A pointer to the EFI_FORM_BROWSER2_PROTOCOL instance
 
-  @param Handle   A pointer to an array of HII handles to
-                  display. This value should correspond to the
-                  value of the HII form package that is required
-                  to be displayed.
+  @param Handles         A pointer to an array of Handles. This value should correspond 
+                         to the value of the HII form package that is required to be displayed. Type
 
-  @param HandleCount  The number of handles in the array
-                      specified by Handle.
+  @param HandleCount     The number of Handles specified in Handle.
 
-  @param SingleUse  If FALSE, the browser operates as a standard
-                    forms processor and exits only when
-                    explicitly requested by the user. If TRUE,
-                    the browser will return immediately after
-                    processing the first user-generated
-                    selection.
+  @param FormSetGuid     This field points to the EFI_GUID which must match the Guid
+                         field in the EFI_IFR_FORM_SET op-code for the specified
+                         forms-based package. If FormSetGuid is NULL, then this
+                         function will display the first found forms package.
 
-  @param ScreenDimensions   Allows the browser to be called so
-                            that it occupies a portion of the
-                            physical screen instead of
-                            dynamically determining the screen
-                            dimensions. If the input values
-                            violate the platform policy then the
-                            dimensions will be dynamically
-                            adjusted to comply.
+  @param FormId          This field specifies which EFI_IFR_FORM to render as the first
+                         displayable page. If this field has a value of 0x0000, then
+                         the forms browser will render the specified forms in their encoded order.
 
-  @param ResetRequired  This BOOLEAN value will tell the caller
-                        if a reset is required based on the data
-                        that might have been changed. The
-                        ResetRequired parameter is primarily
-                        applicable for configuration
-                        applications, and is an optional
-                        parameter.
+  @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in 
+                          characters.
 
-  @retval EFI_SUCCESS   The function completed successfully
+  @param ActionRequest   Points to the action recommended by the form.
+
+  @retval EFI_SUCCESS           The function completed successfully
   
-  @retval EFI_NOT_FOUND   The variable was not found.
+  @retval EFI_NOT_FOUND         The variable was not found.
   
-  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for
-                                the result. DataSize has been
-                                updated with the size needed to
-                                complete the request.
-  
-  @retval EFI_INVALID_PARAMETER   One of the parameters has an
-                                  invalid value.
-  
-  @retval EFI_DEVICE_ERROR  The variable could not be saved due
-                            to a hardware failure.
-  
+  @retval EFI_INVALID_PARAMETER One of the parameters has an
+                                invalid value.  
 **/
 typedef
 EFI_STATUS
@@ -134,15 +112,15 @@ EFI_STATUS
   browser. This routine called this service in the browser to
   retrieve or set certain uncommitted state information.
 
-  @param This   A pointer to the EFI_FORM_BROWSER2_PROTOCOL
-                instance.
+  @param This           A pointer to the EFI_FORM_BROWSER2_PROTOCOL instance.
 
   @param ResultsDataSize  A pointer to the size of the buffer
-                          associated with ResultsData. 
+                          associated with ResultsData. On input, the size in
+                          bytes of ResultsData. On output, the size of data returned in ResultsData.
 
-  @param ResultsData  A string returned from an IFR browser or
-                      equivalent. The results string will have
-                      no routing information in them.
+  @param ResultsData    A string returned from an IFR browser or
+                        equivalent. The results string will have
+                        no routing information in them.
 
   @param RetrieveData   A BOOLEAN field which allows an agent to
                         retrieve (if RetrieveData = TRUE) data
@@ -157,9 +135,8 @@ EFI_STATUS
   @param VariableName   An optional field to indicate the target
                         human-readable variable name.
 
-
-  @retval EFI_SUCCESS   The results have been distributed or are
-                        awaiting distribution.
+  @retval EFI_SUCCESS           The results have been distributed or are
+                                awaiting distribution.
   
   @retval EFI_OUT_OF_RESOURCES  The ResultsDataSize specified
                                 was too small to contain the
@@ -178,16 +155,11 @@ EFI_STATUS
 );
 
 /**
-   
-  This protocol is the interface to call for drivers to leverage
-  the EFI configuration driver interface.
+  @par Protocol Description: 
+  This interface will allow the caller to direct the configuration 
+  driver to use either the HII database or use the passed-in packet of data.
 
-  @param SendForm   Provides direction to the configuration
-                    driver whether to use the HII database or to
-                    use a passed-in set of data. This functions
-                    also establishes a pointer to the calling
-                    driver's callback interface. See the
-                    SendForm() function description.
+  @param SendForm         Browse the specified configuration forms.
 
   @param BrowserCallback  Routine used to expose internal
                           configuration state of the browser.
@@ -195,9 +167,7 @@ EFI_STATUS
                           handler routines which were called by
                           the browser and in-turn need to get
                           additional information from the
-                          browser itself. See the
-                          BrowserCallback() function
-                          description.
+                          browser itself.
 
 **/
 struct _EFI_FORM_BROWSER2_PROTOCOL {

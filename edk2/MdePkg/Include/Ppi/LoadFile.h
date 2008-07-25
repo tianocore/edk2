@@ -1,7 +1,7 @@
 /** @file
   Load image file from fv to memory. 
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -79,6 +79,7 @@ EFI_STATUS
 
 
 /**
+  @par Ppi Description:
   This PPI is a pointer to the Load File service.
   This service will be published by a PEIM. The PEI Foundation
   will use this service to launch the known PEI module images.

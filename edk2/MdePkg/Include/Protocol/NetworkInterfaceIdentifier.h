@@ -1,7 +1,7 @@
 /** @file
   EFI Network Interface Identifier Protocol
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -43,6 +43,48 @@ typedef enum {
   EfiNetworkInterfaceUndi = 1
 } EFI_NETWORK_PROTOCOL_TYPE;
 
+/**  
+  @par Protocol Description:
+  An optional protocol that is used to describe details about the software 
+  layer that is used to produce the Simple Network Protocol. 
+
+  @param Revision
+  The revision of the EFI_NETWORK_INTERFACE_IDENTIFIER protocol.
+
+  @param Id
+  Address of the first byte of the identifying structure for this network 
+  interface. This is only valid when the network interface is started 
+  (see Start()). When the network interface is not started, this field is set to zero.
+
+  @param ImageAddr
+  Address of the unrelocated network interface image.
+
+  @param ImageSize
+  Size of unrelocated network interface image.
+
+  @param StringId
+  A four-character ASCII string that is sent in the class identifier field of
+  option 60 in DHCP. For a Type of EfiNetworkInterfaceUndi, this field is UNDI.
+
+  @param Type
+  Network interface type. This will be set to one of the values 
+  in EFI_NETWORK_INTERFACE_TYPE.
+
+  @param MajorVer
+  Major version number.
+
+  @param MinorVer
+  Minor version number.
+
+  @param Ipv6Supported
+  TRUE if the network interface supports IPv6; otherwise FALSE.
+
+  @param IfNum
+  The network interface number that is being identified by this Network 
+  Interface Identifier Protocol. This field must be less than or equal 
+  to the IFcnt field in the !PXE structure.
+
+**/
 struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
 
   UINT64  Revision;

@@ -3,7 +3,7 @@
 
   Abstraction of a very simple graphics device.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -182,6 +182,27 @@ typedef struct {
   UINTN                                  FrameBufferSize;
 } EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE;
 
+/**
+  @par Protocol Description:
+  Provides a basic abstraction to set video modes and copy pixels to and from 
+  the graphics controller's frame buffer. The linear address of the hardware 
+  frame buffer is also exposed so software can write directly to the video hardware.
+
+  @param QueryMode
+  Returns information for an available graphics mode that the graphics device 
+  and the set of active video output devices supports.
+  
+  @param SetMode 
+  Set the video device into the specified mode and clears the visible portions 
+  of the output display to black.
+  
+  @param Blt
+  Software abstraction to draw on the video device's frame buffer.
+  
+  @param Mode
+  Pointer to EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE data.
+
+**/
 struct _EFI_GRAPHICS_OUTPUT_PROTOCOL {
   EFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE  QueryMode;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE    SetMode;

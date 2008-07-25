@@ -4,7 +4,7 @@
   Abstraction of a very simple input device like a keyboard or serial
   terminal.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -119,6 +119,22 @@ EFI_STATUS
   OUT EFI_INPUT_KEY                       *Key
   )
 ;
+
+/**  
+  @par Protocol Description:
+  The EFI_SIMPLE_TEXT_INPUT_PROTOCOL is used on the ConsoleIn device. 
+  It is the minimum required protocol for ConsoleIn.
+
+  @param Reset
+  Reset the ConsoleIn device.
+
+  @param ReadKeyStroke
+  Returns the next input character.
+
+  @param WaitForKey
+  Event to use with WaitForEvent() to wait for a key to be available.
+
+**/
 
 struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
   EFI_INPUT_RESET     Reset;

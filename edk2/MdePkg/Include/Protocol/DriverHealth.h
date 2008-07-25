@@ -1,7 +1,7 @@
 /** @file
   EFI Driver Health Protocol
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -183,7 +183,8 @@ EFI_STATUS
                            drivers when an attempt is made to repair a bus controller.
                            If will not be NULL when an attempt is made to repair a 
                            child controller produced by the driver.
-  @param  RepairNotify     A notification function that may be used by a driver to 
+  @param  ProgressNotification
+                           A notification function that may be used by a driver to 
                            report the progress of the repair operation.  This is 
                            an optional parameter that may be NULL.  
 

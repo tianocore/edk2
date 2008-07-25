@@ -5,7 +5,7 @@
   The DebugSupport protocol is used by source level debuggers to abstract the
   processor and handle context save and restore operations.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -616,6 +616,33 @@ EFI_STATUS
 //
 // DebugSupport protocol definition
 //
+/**
+  @par Protocol Description:
+  This protocol provides the services to allow the debug agent to register 
+  callback functions that are called either periodically or when specific 
+  processor exceptions occur.
+
+  @param Isa
+  Declares the processor architecture for this instance of the EFI
+  Debug Support protocol.
+
+  @param GetMaximumProcessorIndex
+  Returns the maximum processor index value that may be used.
+
+  @param RegisterPeriodicCallback
+  Registers a callback function that will be invoked periodically
+  and asynchronously to the execution of EFI.
+
+  @param RegisterExceptionCallback
+  Registers a callback function that will be called each time the
+  specified processor exception occurs.
+
+  @param InvalidateInstructionCache
+  Invalidate the instruction cache of the processor. This is required
+  by processor architectures where instruction and data caches are
+  not coherent when instructions in the code under debug has been
+  modified by the debug agent.
+**/
 struct _EFI_DEBUG_SUPPORT_PROTOCOL {
   EFI_INSTRUCTION_SET_ARCHITECTURE  Isa;
   EFI_GET_MAXIMUM_PROCESSOR_INDEX   GetMaximumProcessorIndex;

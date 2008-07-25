@@ -193,7 +193,7 @@ UINTN
 
 
 /**
-  Retrieves an 8-bit value for a given PCD token.
+  Retrieves an 8-bit value for a given PCD token and token space.
 
   Retrieves the 8-bit value of a particular PCD token.  
   If the TokenNumber is invalid or the token space
@@ -216,7 +216,7 @@ UINT8
 
 
 /**
-  Retrieves an 16-bit value for a given PCD token.
+  Retrieves an 16-bit value for a given PCD token and token space.
 
   Retrieves the 16-bit value of a particular PCD token.  
   If the TokenNumber is invalid or the token space
@@ -239,7 +239,7 @@ UINT16
 
 
 /**
-  Retrieves an 32-bit value for a given PCD token.
+  Retrieves an 32-bit value for a given PCD token and token space.
 
   Retrieves the 32-bit value of a particular PCD token.  
   If the TokenNumber is invalid or the token space
@@ -262,7 +262,7 @@ UINT32
 
 
 /**
-  Retrieves an 64-bit value for a given PCD token.
+  Retrieves an 64-bit value for a given PCD token and token space.
 
   Retrieves the 64-bit value of a particular PCD token.  
   If the TokenNumber is invalid or the token space
@@ -285,7 +285,7 @@ UINT64
 
 
 /**
-  Retrieves a pointer to a value for a given PCD token.
+  Retrieves a pointer to a value for a given PCD token and token space.
 
   Retrieves the current pointer to the buffer for a PCD token number.  
   Do not make any assumptions about the alignment of the pointer that 
@@ -308,7 +308,7 @@ VOID *
 
 
 /**
-  Retrieves an Boolean value for a given PCD token.
+  Retrieves an Boolean value for a given PCD token and token space.
 
   Retrieves the Boolean value of a particular PCD token.  
   If the TokenNumber is invalid or the token space
@@ -331,7 +331,7 @@ BOOLEAN
 
 
 /**
-  Retrieves the size of the value for a given PCD token.
+  Retrieves the size of the value for a given PCD token and token space.
 
   Retrieves the current size of a particular PCD token.  
   If the TokenNumber is invalid, the results are unpredictable.
@@ -819,6 +819,104 @@ EFI_STATUS
 //
 // Interface structure for the PCD PPI
 //
+/**
+  @par Ppi Description:
+  This service abstracts the ability to set/get Platform Configuration Database (PCD).
+
+  @param SetSku
+  Sets the SKU value for subsequent calls to set or get PCD token values.
+  
+  @param Get8
+  Retrieves an 8-bit value for a given PCD token.
+
+  @param Get16
+  Retrieves an 16-bit value for a given PCD token.
+
+  @param Get32
+  Retrieves an 32-bit value for a given PCD token.
+
+  @param Get64
+  Retrieves an 64-bit value for a given PCD token.
+
+  @param GetPtr
+  Retrieves a pointer to a value for a given PCD token.
+
+  @param GetBool
+  Retrieves an Boolean value for a given PCD token.
+
+  @param GetSize
+  Retrieves the size of the value for a given PCD token.
+
+  @param Get8Ex
+  Retrieves an 8-bit value for a given PCD token and token space.
+
+  @param Get16Ex
+  Retrieves an 16-bit value for a given PCD token and token space.
+
+  @param Get32Ex
+  Retrieves an 32-bit value for a given PCD token and token space.
+
+  @param Get64Ex
+  Retrieves an 64-bit value for a given PCD token and token space.
+
+  @param GetPtrEx
+  Retrieves a pointer to a value for a given PCD token and token space.
+
+  @param GetBoolEx
+  Retrieves an Boolean value for a given PCD token and token space.
+
+  @param GetSizeEx
+  Retrieves the size of the value for a given PCD token and token space.
+
+  @param Set8
+  Sets an 8-bit value for a given PCD token.
+
+  @param Set16
+  Sets an 16-bit value for a given PCD token.
+
+  @param Set32
+  Sets an 32-bit value for a given PCD token.
+
+  @param Set64
+  Sets an 64-bit value for a given PCD token.
+
+  @param SetPtr
+  Sets the buffer of a specified size for a given PCD token.
+
+  @param SetBool
+  Sets an Boolean value for a given PCD token.
+
+  @param Set8Ex
+  Sets an 8-bit value for a given PCD token and token space.
+
+  @param Set16Ex
+  Sets an 16-bit value for a given PCD token and token space.
+
+  @param Set32Ex
+  Sets an 32-bit value for a given PCD token and token space.
+
+  @param Set64Ex
+  Sets an 64-bit value for a given PCD token and token space.
+
+  @param SetPtrEx
+  Sets the buffer of a specified size for a given PCD token and token space.
+
+  @param SetBoolEx
+  Sets an Boolean value for a given PCD token and token space.
+  
+  @param CallbackOnSet
+  Specifies a function to be called anytime the value of a designated token is changed.
+  
+  @param CancelCallback
+  Cancels a previously set callback function for a particular PCD token number.
+  
+  @param GetNextToken
+  Retrieves the next valid PCD token for a given namespace.
+  
+  @param GetNextTokenSpace
+  Retrieves the next valid PCD token namespace for a given namespace.
+ 
+**/
 typedef struct {
   PCD_PPI_SET_SKU              SetSku;
 

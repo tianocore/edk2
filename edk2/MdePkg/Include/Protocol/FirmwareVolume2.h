@@ -5,7 +5,7 @@
   the system during the DXE phase. The Firmware Volume Protocol also provides
   mechanisms for determining and modifying some attributes of the firmware volume.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -94,11 +94,9 @@ typedef UINT64  EFI_FV_ATTRIBUTES;
   GetVolumeAttributes() function. GetVolumeAttributes() is
   callable only from TPL_NOTIFY and below. Behavior of
   GetVolumeAttributes() at any EFI_TPL above TPL_NOTIFY is
-  undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI
-  2.0 specification.
-  
-  @param  This    Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-                  instance.
+  undefined.
+
+  @param  This          Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.
   
   @param  FvAttributes  Pointer to an EFI_FV_ATTRIBUTES in which
                         the attributes and current settings are
@@ -132,12 +130,9 @@ EFI_STATUS
   prevents further modification to all the attribute bits.
   SetVolumeAttributes() is callable only from TPL_NOTIFY and
   below. Behavior of SetVolumeAttributes() at any EFI_TPL above
-  TPL_NOTIFY is undefined. Type EFI_TPL is defined in
-  RaiseTPL() in the UEFI 2.0 specification.
+  TPL_NOTIFY is undefined.
 
-
-  @param  This  Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-                instance.
+  @param  This          Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.
   
   @param  FvAttributes  On input, FvAttributes is a pointer to
                         an EFI_FV_ATTRIBUTES containing the
@@ -148,10 +143,10 @@ EFI_STATUS
                         modified and the firmware volume
                         settings are not changed.
   
-  @retval EFI_SUCCESS   The requested firmware volume attributes
-                        were set and the resulting
-                        EFI_FV_ATTRIBUTES is returned in
-                        FvAttributes.
+  @retval EFI_SUCCESS           The requested firmware volume attributes
+                                were set and the resulting
+                                EFI_FV_ATTRIBUTES is returned in
+                                FvAttributes.
 
   @retval EFI_INVALID_PARAMETER FvAttributes:EFI_FV_READ_STATUS
                                 is set to 1 on input, but the
@@ -251,37 +246,35 @@ EFI_STATUS
   other output parameters are returned with valid values.
   ReadFile() is callable only from TPL_NOTIFY and below.
   Behavior of ReadFile() at any EFI_TPL above TPL_NOTIFY is
-  undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI
-  2.0 specification.
+  undefined.
+
+  @param  This                  Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.
   
-  @param  This  Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-                instance.
+  @param  NameGuid              Pointer to an EFI_GUID, which is the file
+                                name. All firmware file names are EFI_GUIDs.
+                                A single firmware volume must not have two
+                                valid files with the same file name
+                                EFI_GUID.
   
-  @param  NameGuid  Pointer to an EFI_GUID, which is the file
-                    name. All firmware file names are EFI_GUIDs.
-                    A single firmware volume must not have two
-                    valid files with the same file name
-                    EFI_GUID.
+  @param  Buffer                Pointer to a pointer to a buffer in which the
+                                file contents are returned, not including the
+                                file header.
+
+  @param  BufferSize            Pointer to a caller-allocated UINTN. It
+                                indicates the size of the memory
+                                represented by Buffer.
   
-  @param  Buffer  Pointer to a pointer to a buffer in which the
-                  file contents are returned, not including the
-                  file header.
-  @param  BufferSize  Pointer to a caller-allocated UINTN. It
-                      indicates the size of the memory
-                      represented by Buffer.
+  @param  FoundType             Pointer to a caller-allocated EFI_FV_FILETYPE.
   
-  @param  FoundType   Pointer to a caller-allocated
-                      EFI_FV_FILETYPE.
-  
-  @param  FileAttributes  Pointer to a  caller-allocated
-                          EFI_FV_FILE_ATTRIBUTES.
+  @param  FileAttributes        Pointer to a  caller-allocated
+                                EFI_FV_FILE_ATTRIBUTES.
   
   @param  AuthenticationStatus  Pointer to a caller-allocated
                                 UINT32 in which the
                                 authentication status is
                                 returned.
   
-  @retval EFI_SUCCESS   The call completed successfully.
+  @retval EFI_SUCCESS                 The call completed successfully.
   
   @retval EFI_WARN_BUFFER_TOO_SMALL   The buffer is too small to
                                       contain the requested
@@ -289,17 +282,15 @@ EFI_STATUS
                                       filled and the output is
                                       truncated.
 
-  @retval EFI_OUT_OF_RESOURCES  An allocation failure occurred.
+  @retval EFI_OUT_OF_RESOURCES        An allocation failure occurred.
 
-  @retval EFI_NOT_FOUND   Name was not found in the firmware
-                          volume.
+  @retval EFI_NOT_FOUND               Name was not found in the firmware volume.
 
-  @retval EFI_DEVICE_ERROR  A hardware error occurred when
-                            attempting to access the firmware
-                            volume.
+  @retval EFI_DEVICE_ERROR            A hardware error occurred when
+                                      attempting to access the firmware volume.
 
-  @retval EFI_ACCESS_DENIED The firmware volume is configured to
-                            isallow reads.
+  @retval EFI_ACCESS_DENIED           The firmware volume is configured to
+                                      isallow reads.
 
 **/
 typedef
@@ -343,36 +334,33 @@ EFI_STATUS
   parameters are returned with valid values. ReadSection() is
   callable only from TPL_NOTIFY and below. Behavior of
   ReadSection() at any EFI_TPL above TPL_NOTIFY is
-  undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI
-  2.0 specification.
+  undefined.
 
-
-  @param This   Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-                instance.
+  @param  This                Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.
+ 
+  @param NameGuid             Pointer to an EFI_GUID, which indicates the
+                              file name from which the requested section
+                              will be read.
   
-  @param NameGuid   Pointer to an EFI_GUID, which indicates the
-                    file name from which the requested section
-                    will be read.
+  @param SectionType          Indicates the section type to return.
+                              SectionType in conjunction with
+                              SectionInstance indicates which section to
+                              return.
   
-  @param SectionType  Indicates the section type to return.
-                      SectionType in conjunction with
-                      SectionInstance indicates which section to
-                      return.
+  @param SectionInstance      Indicates which instance of sections
+                              with a type of SectionType to return.
+                              SectionType in conjunction with
+                              SectionInstance indicates which
+                              section to return. SectionInstance is
+                              zero based.
   
-  @param SectionInstance  Indicates which instance of sections
-                          with a type of SectionType to return.
-                          SectionType in conjunction with
-                          SectionInstance indicates which
-                          section to return. SectionInstance is
-                          zero based.
+  @param Buffer               Pointer to a pointer to a buffer in which the
+                              section contents are returned, not including
+                              the section header.
   
-  @param Buffer   Pointer to a pointer to a buffer in which the
-                  section contents are returned, not including
-                  the section header.
-  
-  @param BufferSize   Pointer to a caller-allocated UINTN. It
-                      indicates the size of the memory
-                      represented by Buffer.
+  @param BufferSize           Pointer to a caller-allocated UINTN. It
+                              indicates the size of the memory
+                              represented by Buffer.
   
   @param AuthenticationStatus Pointer to a caller-allocated
                               UINT32 in which the authentication
@@ -462,39 +450,37 @@ typedef struct {
   Architectural Elements 84 August 21, 2006 Version 1.0
   WriteFile() is callable only from TPL_NOTIFY and below.
   Behavior of WriteFile() at any EFI_TPL above TPL_NOTIFY is
-  undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI 2.0
-  specification.
+  undefined. 
 
-  @param This Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-              instance. NumberOfFiles Indicates the number of
-              elements in the array pointed to by FileData.
+  @param This           Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.
 
+  @param NumberOfFiles  Indicates the number of elements in the array pointed to by FileData
 
-  @param WritePolicy  Indicates the level of reliability for the
-                      write in the event of a power failure or
-                      other system failure during the write
-                      operation.
-
-  @param FileData   Pointer to an array of
-                    EFI_FV_WRITE_FILE_DATA. Each element of
-                    FileData[] represents a file to be written.
+  @param WritePolicy    Indicates the level of reliability for the
+                        write in the event of a power failure or
+                        other system failure during the write
+                        operation.
+ 
+  @param FileData       Pointer to an array of
+                        EFI_FV_WRITE_FILE_DATA. Each element of
+                        FileData[] represents a file to be written.
 
 
-  @retval EFI_SUCCESS The write completed successfully.
+  @retval EFI_SUCCESS             The write completed successfully.
   
-  @retval EFI_OUT_OF_RESOURCES  The firmware volume does not
-                                have enough free space to
-                                storefile(s).
+  @retval EFI_OUT_OF_RESOURCES    The firmware volume does not
+                                  have enough free space to
+                                  storefile(s).
   
-  @retval EFI_DEVICE_ERROR  A hardware error occurred when
-                            attempting to access the firmware volume.
+  @retval EFI_DEVICE_ERROR        A hardware error occurred when
+                                  attempting to access the firmware volume.
   
-  @retval EFI_WRITE_PROTECTED   The firmware volume is
-                                configured to disallow writes.
+  @retval EFI_WRITE_PROTECTED     The firmware volume is
+                                  configured to disallow writes.
   
-  @retval EFI_NOT_FOUND   A delete was requested, but the
-                          requested file was not found in the
-                          firmware volume.
+  @retval EFI_NOT_FOUND           A delete was requested, but the
+                                  requested file was not found in the
+                                  firmware volume.
   
   @retval EFI_INVALID_PARAMETER   A delete was requested with a
                                   multiple file write.
@@ -536,22 +522,16 @@ EFI_STATUS
   implementation specific and no semantic content is implied.
   GetNextFile() is callable only from TPL_NOTIFY and below.
   Behavior of GetNextFile() at any EFI_TPL above TPL_NOTIFY is
-  undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI 2.0
-  specification. Status Codes Returned
+  undefined. 
 
+  @param This       Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.
 
-  @param This Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-              instance. Key Pointer to a caller-allocated buffer
-              that contains implementation-specific data that is
-              used to track where to begin the search for the
-              next file. The size of the buffer must be at least
-              This->KeySize bytes long. To re-initialize the
-              search and begin from the beginning of the
-              firmware volume, the entire buffer must be cleared
-              to zero. Other than clearing the buffer to
-              initiate a new search, the caller must not modify
-              the data in the buffer between calls to
-              GetNextFile().
+  @param Key        Pointer to a caller-allocated buffer that contains implementation-specific data that is
+                    used to track where to begin the search for the next file. The size of the buffer must be
+                    at least This->KeySize bytes long. To re-initialize the search and begin from the
+                    beginning of the firmware volume, the entire buffer must be cleared to zero. Other
+                    than clearing the buffer to initiate a new search, the caller must not modify the data in
+                    the buffer between calls to GetNextFile().
 
   @param FileType   Pointer to a caller-allocated
                     EFI_FV_FILETYPE. The GetNextFile() API can
@@ -576,16 +556,16 @@ EFI_STATUS
                     EFI_FV_FILE_ATTRIBUTES is defined in
                     ReadFile().
 
-  @param Size   Pointer to a caller-allocated UINTN. If a
-                matching file is found, the file's size is
-                returned in *Size. If no matching file is found,
-                Size is not modified.
+  @param Size       Pointer to a caller-allocated UINTN. If a
+                    matching file is found, the file's size is
+                    returned in *Size. If no matching file is found,
+                    Size is not modified.
 
-  @retval EFI_SUCCESS The output parameters are filled with data
-                      obtained from the first matching file that
-                      was found.
+  @retval EFI_SUCCESS       The output parameters are filled with data
+                            obtained from the first matching file that
+                            was found.
 
-  @retval FI_NOT_FOUND  No files of type FileType were found.
+  @retval FI_NOT_FOUND      No files of type FileType were found.
 
 
   @retval EFI_DEVICE_ERROR  A hardware error occurred when
@@ -619,28 +599,28 @@ EFI_STATUS
   this specification are required information types that all file
   systems must support.
 
-  @param This A pointer to the EFI_FIRMWARE_VOLUME2_PROTOCOL
-              instance that is the file handle the requested
-              information is for.
+  @param This             A pointer to the EFI_FIRMWARE_VOLUME2_PROTOCOL
+                          instance that is the file handle the requested
+                          information is for.
   
   @param InformationType  The type identifier for the
                           information being requested.
   
-  @param BufferSize   On input, the size of Buffer. On output,
-                      the amount of data returned in Buffer. In
-                      both cases, the size is measured in bytes.
+  @param BufferSize       On input, the size of Buffer. On output,
+                          the amount of data returned in Buffer. In
+                          both cases, the size is measured in bytes.
   
-  @param Buffer   A pointer to the data buffer to return. The
-                  buffer's type is indicated by InformationType.
+  @param Buffer           A pointer to the data buffer to return. The
+                          buffer's type is indicated by InformationType.
   
   
-  @retval EFI_SUCCESS   The information was retrieved.
+  @retval EFI_SUCCESS           The information was retrieved.
   
-  @retval EFI_UNSUPPORTED   The InformationType is not known.
+  @retval EFI_UNSUPPORTED       The InformationType is not known.
   
-  @retval EFI_NO_MEDIA  The device has no medium.
+  @retval EFI_NO_MEDIA          The device has no medium.
   
-  @retval EFI_DEVICE_ERROR  The device reported an error.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
   
   @retval EFI_VOLUME_CORRUPTED  The file system structures are
                                 corrupted.
@@ -669,37 +649,37 @@ EFI_STATUS
   on the requested firmware volume.
 
 
-  @param This   A pointer to the EFI_FIRMWARE_VOLUME2_PROTOCOL
-                instance that is the file handle the information
-                is for.
+  @param This             A pointer to the EFI_FIRMWARE_VOLUME2_PROTOCOL
+                          instance that is the file handle the information
+                          is for.
 
   @param InformationType  The type identifier for the
                           information being set.
 
-  @param BufferSize   The size, in bytes, of Buffer.
+  @param BufferSize       The size, in bytes, of Buffer.
 
-  @param Buffer A pointer to the data buffer to write. The
-                buffer's type is indicated by InformationType.
+  @param Buffer           A pointer to the data buffer to write. The
+                          buffer's type is indicated by InformationType.
 
-  @retval EFI_SUCCESS The information was set.
+  @retval EFI_SUCCESS           The information was set.
 
-  @retval EFI_UNSUPPORTED The InformationType is not known.
+  @retval EFI_UNSUPPORTED       The InformationType is not known.
 
-  @retval EFI_NO_MEDIA  The device has no medium.
+  @retval EFI_NO_MEDIA          The device has no medium.
 
-  @retval EFI_DEVICE_ERROR  The device reported an error.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
 
   @retval EFI_VOLUME_CORRUPTED  The file system structures are
                                 corrupted.
 
 
-  @retval EFI_WRITE_PROTECTED The media is read only.
+  @retval EFI_WRITE_PROTECTED   The media is read only.
 
-  @retval EFI_VOLUME_FULL   The volume is full.
+  @retval EFI_VOLUME_FULL       The volume is full.
 
-  @retval EFI_BAD_BUFFER_SIZE BufferSize is smaller than the
-                              size of the type indicated by
-                              InformationType.
+  @retval EFI_BAD_BUFFER_SIZE   BufferSize is smaller than the
+                                size of the type indicated by
+                                InformationType.
 
 **/
 typedef
@@ -713,6 +693,7 @@ EFI_STATUS
 
 
 /**
+  @par Protocol Description:
   The Firmware Volume Protocol contains the file-level
   abstraction to the firmware volume as well as some firmware
   volume attribute reporting and configuration services. The
@@ -726,45 +707,33 @@ EFI_STATUS
   Protocol.
 
   @param  GetVolumeAttributes   Retrieves volume capabilities
-                                and current settings. See the
-                                GetVolumeAttributes() function
-                                description.
+                                and current settings. 
 
   @param  SetVolumeAttributes   Modifies the current settings of
-                                the firmware volume. See the
-                                SetVolumeAttributes() function
-                                description.
+                                the firmware volume.
 
-  @param  ReadFile  Reads an entire file from the firmware
-                    volume. See the ReadFile() function
-                    description.
+  @param  ReadFile              Reads an entire file from the firmware
+                                volume. 
 
-  @param  ReadSection   Reads a single section from a file into
-                        a buffer.
+  @param  ReadSection           Reads a single section from a file into
+                                a buffer.
 
-  @param  WriteFile   Writes an entire file into the firmware
-                      volume. See the WriteFile() function
-                      description.
+  @param  WriteFile             Writes an entire file into the firmware
+                                volume. 
 
-  @param  GetNextFile Provides service to allow searching the
-                      firmware volume. See the GetNextFile()
-                      function description.
+  @param  GetNextFile           Provides service to allow searching the
+                                firmware volume.
 
-  @param  KeySize   Data field that indicates the size in bytes
-                    of the Key input buffer for the
-                    GetNextFile() API.
+  @param  KeySize               Data field that indicates the size in bytes
+                                of the Key input buffer for the
+                                GetNextFile() API.
 
-  @param  ParentHandle  Handle of the parent firmware volume.
-                        Type EFI_HANDLE is defined in
-                        InstallProtocolInterface() in the UEFI
-                        2.0 specification.
+  @param  ParentHandle          Handle of the parent firmware volume.
 
-  @param  GetInfo   Gets the requested file or volume
-                    information. See the GetInfo() function
-                    description.
-  @param  SetInfo   Sets the requested file information. See the
-                    SetInfo() function description.
+  @param  GetInfo               Gets the requested file or volume
+                                information. 
 
+  @param  SetInfo               Sets the requested file information.
 **/
 struct _EFI_FIRMWARE_VOLUME2_PROTOCOL {
   EFI_FV_GET_ATTRIBUTES   GetVolumeAttributes;

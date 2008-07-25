@@ -4,7 +4,7 @@
   This protocol is used by debug agent to communicate with the
   remote debug host.
   
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -116,6 +116,22 @@ EFI_STATUS
 //
 // DebugPort protocol definition
 //
+/**
+  @par Protocol Description:
+  This protocol provides the communication link between the debug agent and the remote host.
+
+  @param Reset
+  Resets the debugport hardware.
+  
+  @param Write
+  Send a buffer of characters to the debugport device.
+
+  @param Read 
+  Receive a buffer of characters from the debugport device.
+
+  @param Poll 
+  Determine if there is any data available to be read from the debugport device.
+**/ 
 struct _EFI_DEBUGPORT_PROTOCOL {
   EFI_DEBUGPORT_RESET Reset;
   EFI_DEBUGPORT_WRITE Write;

@@ -57,6 +57,7 @@ EFI_STATUS
 );
 
 /**
+  @par Ppi Description:
   This service abstracts the ability to migrate contents of the platform early memory store.
 
   @param ResetSystem

@@ -1,7 +1,11 @@
 /** @file
   EFI_USB_HC_PROTOCOL as defined in EFI 1.10.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  The USB Host Controller Protocol is used by code, typically USB bus drivers, 
+  running in the EFI boot services environment, to perform data transactions 
+  over a USB bus. In addition, it provides an abstraction for the root hub of the USB bus.
+
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -422,6 +426,68 @@ EFI_STATUS
   IN EFI_USB_PORT_FEATURE    PortFeature
   );
 
+
+/**  
+  @par Protocol Description:
+  The EFI_USB_HC_PROTOCOL provides USB host controller management, basic data transactions
+  over a USB bus, and USB root hub access. A device driver that wishes to manage a USB bus in a
+  system retrieves the EFI_USB_HC_PROTOCOL instance that is associated with the USB bus to be
+  managed. A device handle for a USB host controller will minimally contain an
+  EFI_DEVICE_PATH_PROTOCOL instance, and an EFI_USB_HC_PROTOCOL instance. 
+  
+  @param Reset 
+  Software reset of USB. 
+
+  @param GetState 
+  Retrieves the current state of the USB host controller. 
+
+  @param SetState 
+  Sets the USB host controller to a specific state. 
+
+  @param ControlTransfer 
+  Submits a control transfer to a target USB device. 
+
+  @param BulkTransfer 
+  Submits a bulk transfer to a bulk endpoint of a USB device. 
+
+  @param AsyncInterruptTransfer
+  Submits an asynchronous interrupt transfer to an interrupt endpoint
+  of a USB device. 
+
+  @param SyncInterruptTransfer
+  Submits a synchronous interrupt transfer to an interrupt endpoint
+  of a USB device.
+
+  @param IsochronousTransfer 
+  Submits isochronous transfer to an isochronous endpoint of a USB device.
+
+  @param AsyncIsochronousTransfer
+  Submits nonblocking USB isochronous transfer.
+
+  @param GetRootHubPortNumber 
+  Retrieves the number of root hub ports that are produced by the
+  USB host controller. 
+
+  @param GetRootHubPortStatus 
+  Retrieves the status of the specified root hub port. 
+
+  @param SetRootHubPortFeature
+  Sets the feature for the specified root hub port.
+
+  @param ClearRootHubPortFeature
+  Clears the feature for the specified root hub port. 
+
+  @param MajorRevision 
+  The major revision number of the USB host controller. The
+  revision information indicates the release of the Universal Serial
+  Bus Specification with which the host controller is compliant.
+
+  @param MinorRevision 
+  The minor revision number of the USB host controller. The
+  revision information indicates the release of the Universal Serial
+  Bus Specification with which the host controller is compliant.
+ 
+**/
 struct _EFI_USB_HC_PROTOCOL {
   EFI_USB_HC_PROTOCOL_RESET                       Reset;
   EFI_USB_HC_PROTOCOL_GET_STATE                   GetState;

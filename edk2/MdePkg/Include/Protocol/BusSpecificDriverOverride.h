@@ -1,7 +1,12 @@
 /** @file
   Bus Specific Driver Override protocol as defined in the UEFI 2.0 specification.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Bus drivers that have a bus specific algorithm for matching drivers to controllers are
+  required to produce this protocol for each controller. For example, a PCI Bus Driver will produce an
+  instance of this protocol for every PCI controller that has a PCI option ROM that contains one or
+  more UEFI drivers. The protocol instance is attached to the handle of the PCI controller.
+
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -55,6 +60,16 @@ EFI_STATUS
 //
 // Interface structure for the Bus Specific Driver Override Protocol
 //
+/**
+  @par Protocol Description:
+  This protocol matches one or more drivers to a controller. This protocol is produced by a bus driver,
+  and it is installed on the child handles of buses that require a bus specific algorithm for matching
+  drivers to controllers.
+
+  @param GetDriver
+  Uses a bus specific algorithm to retrieve a driver image handle for a controller.
+ 
+**/
 struct _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL {
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_GET_DRIVER GetDriver;
 };

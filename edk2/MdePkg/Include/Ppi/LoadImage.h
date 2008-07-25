@@ -2,7 +2,7 @@
   The file descript the PPI which notifies other drivers 
   of the PEIM being initialized by the PEI Dispatcher.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -27,6 +27,7 @@
 typedef struct _EFI_PEI_LOADED_IMAGE_PPI  EFI_PEI_LOADED_IMAGE_PPI;
 
 /*
+  @par Ppi Description:
   This interface is installed by the PEI Dispatcher after the image has been
   loaded and after all security checks have been performed, 
   to notify other PEIMs of the files which are being loaded.

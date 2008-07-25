@@ -5,7 +5,7 @@
   and PCI Configuration cycles on a PCI Root Bridge. It also provides services to perform 
   defferent types of bus mastering DMA
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -360,6 +360,72 @@ EFI_STATUS
   OUT VOID                                     **Resources
   );
 
+/**  
+  @par Protocol Description:
+  Provides the basic Memory, I/O, PCI configuration, and DMA interfaces that are 
+  used to abstract accesses to PCI controllers behind a PCI Root Bridge Controller. 
+  
+  @param ParentHandle
+  The EFI_HANDLE of the PCI Host Bridge of which this PCI Root Bridge is a member.
+
+  @param PollMem
+  Polls an address in memory mapped I/O space until an exit condition is met, 
+  or a timeout occurs. 
+
+  @param PollIo
+  Polls an address in I/O space until an exit condition is met, or a timeout occurs. 
+
+  @param Mem.Read
+  Allows reads from memory mapped I/O space. 
+
+  @param Mem.Write
+  Allows writes to memory mapped I/O space. 
+
+  @param Io.Read
+  Allows reads from I/O space. 
+
+  @param Io.Write
+  Allows writes to I/O space. 
+
+  @param Pci.Read
+  Allows reads from PCI configuration space. 
+
+  @param Pci.Write
+  Allows writes to PCI configuration space. 
+
+  @param CopyMem
+  Allows one region of PCI root bridge memory space to be copied to another 
+  region of PCI root bridge memory space. 
+
+  @param Map
+  Provides the PCI controller's specific addresses needed to access system memory for DMA. 
+
+  @param Unmap
+  Releases any resources allocated by Map(). 
+
+  @param AllocateBuffer
+  Allocates pages that are suitable for a common buffer mapping. 
+
+  @param FreeBuffer
+  Free pages that were allocated with AllocateBuffer(). 
+
+  @param Flush
+  Flushes all PCI posted write transactions to system memory. 
+
+  @param GetAttributes
+  Gets the attributes that a PCI root bridge supports setting with SetAttributes(), 
+  and the attributes that a PCI root bridge is currently using. 
+
+  @param SetAttributes
+  Sets attributes for a resource range on a PCI root bridge. 
+
+  @param Configuration
+  Gets the current resource settings for this PCI root bridge. 
+
+  @param SegmentNumber
+  The segment number that this PCI root bridge resides.
+
+**/
 struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL {
   EFI_HANDLE                                      ParentHandle;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_POLL_IO_MEM     PollMem;

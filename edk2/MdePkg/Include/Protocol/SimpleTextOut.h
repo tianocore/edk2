@@ -6,7 +6,7 @@
   a single hardware device or a virtual device that is an agregation
   of multiple physical devices.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -162,7 +162,7 @@ typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_RESET)(
-  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL           *This,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN BOOLEAN                                ExtendedVerification
   )
 ;
@@ -349,14 +349,26 @@ EFI_STATUS
 ;
 
 /**
+  @par Data Structure Description:
   Mode Structure pointed to by Simple Text Out protocol.
 
-  MaxMode   - The number of modes supported by QueryMode () and SetMode ().
-  Mode      - The text mode of the output device(s).
-  Attribute - The current character output attribute
-  CursorColumn  - The cursor's column.
-  CursorRow     - The cursor's row.
-  CursorVisible - The cursor is currently visbile or not.
+  @param MaxMode
+  The number of modes supported by QueryMode () and SetMode ().
+  
+  @param Mode
+  The text mode of the output device(s).
+  
+  @param Attribute
+  The current character output attribute
+  
+  @param CursorColumn
+  The cursor's column.
+  
+  @param CursorRow
+  The cursor's row.
+  
+  @param CursorVisible
+  The cursor is currently visbile or not.
 
 **/
 typedef struct {
@@ -372,6 +384,43 @@ typedef struct {
   BOOLEAN CursorVisible;
 } EFI_SIMPLE_TEXT_OUTPUT_MODE;
 
+/**  
+  @par Protocol Description:
+  The SIMPLE_TEXT_OUTPUT protocol is used to control text-based output devices. 
+  It is the minimum required protocol for any handle supplied as the ConsoleOut 
+  or StandardError device. In addition, the minimum supported text mode of such 
+  devices is at least 80 x 25 characters.
+
+  @param Reset
+  Reset the ConsoleOut device. 
+
+  @param OutputString
+  Displays the Unicode string on the device at the current cursor location. 
+
+  @param TestString
+  Tests to see if the ConsoleOut device supports this Unicode string.
+
+  @param QueryMode
+  Queries information concerning the output device's supported text mode. 
+
+  @param SetMode
+  Sets the current mode of the output device. 
+
+  @param SetAttribute
+  Sets the foreground and background color of the text that is output. 
+
+  @param ClearScreen
+  Clears the screen with the currently set background color. 
+
+  @param SetCursorPosition
+  Sets the current cursor position. 
+
+  @param EnableCursor
+  Turns the visibility of the cursor on/off. 
+
+  @param Mode
+  Pointer to SIMPLE_TEXT_OUTPUT_MODE data. 
+**/
 struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
   EFI_TEXT_RESET                Reset;
 

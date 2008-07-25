@@ -1,7 +1,9 @@
 /** @file
-  EFI PXE Base Code CallBack Protocol
+  EFI PXE Base Code CallBack Protocol is as defined in UEFI specification.
+  It is invoked when the PXE Base Code Protocol is about to transmit, has received, 
+  or is waiting to receive a packet.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -86,6 +88,21 @@ EFI_PXE_BASE_CODE_CALLBACK_STATUS
   IN EFI_PXE_BASE_CODE_PACKET             *Packet     OPTIONAL
   );
 
+/**  
+  @par Protocol Description:
+  Protocol that is invoked when the PXE Base Code Protocol is about 
+  to transmit, has received, or is waiting to receive a packet.
+
+  @param Revision
+  The revision of the EFI_PXE_BASE_CODE_PROTOCOL. All future revisions must 
+  be backwards compatible. If a future version is not backwards compatible 
+  it is not the same GUID.
+
+  @param Callback
+  Callback routine used by the PXE Base Code Dhcp(), Discover(), Mtftp(), 
+  UdpWrite(), and Arp() functions.
+
+**/
 struct _EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL {
   UINT64            Revision;
   EFI_PXE_CALLBACK  Callback;

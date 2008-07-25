@@ -1,7 +1,7 @@
 /** @file
   Platform Driver Override protocol as defined in the UEFI 2.1 specification.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -122,6 +122,30 @@ EFI_STATUS
 //
 // Interface structure for the Platform Driver Override Protocol
 //
+/**  
+  @par Protocol Description:
+  This protocol matches one or more drivers to a controller. A platform driver 
+  produces this protocol, and it is installed on a separate handle. This protocol 
+  is used by the ConnectController() boot service to select the best driver 
+  for a controller. All of the drivers returned by this protocol have a higher 
+  precedence than drivers found from an EFI Bus Specific Driver Override Protocol 
+  or drivers found from the general UEFI driver Binding search algorithm. If more 
+  than one driver is returned by this protocol, then the drivers are returned in 
+  order from highest precedence to lowest precedence.
+
+  @param GetDriver
+  Retrieves the image handle of a platform override driver for a controller in the system. 
+
+  @param GetDriverPath
+  Retrieves the device path of a platform override driver for a controller in the system. 
+
+  @param DriverLoaded
+  This function is used after a driver has been loaded using a device path returned 
+  by GetDriverPath(). This function associates a device path to an image handle, 
+  so the image handle can be returned the next time that GetDriver() is called for 
+  the same controller. 
+
+**/
 struct _EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL {
   EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER       GetDriver;
   EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER_PATH  GetDriverPath;

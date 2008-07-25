@@ -4,7 +4,7 @@
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL supports the same languages as
   the corresponding
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation 
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -38,9 +38,7 @@ typedef struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL EFI_SIMPLE_TEXT_INPUT_EX_PROTO
   this specification and is left up to the platform firmware or
   driver to implement.
 
-  @param This A pointer to the EFI_SIMPLE_TEXT_INPUT_PROTOCOL_EX
-              instance. Type EFI_SIMPLE_TEXT_INPUT_PROTOCOL_EX
-              is defined in this section.
+  @param This                 A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
 
   @param ExtendedVerification Indicates that the driver may
                               perform a more exhaustive
@@ -48,7 +46,7 @@ typedef struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL EFI_SIMPLE_TEXT_INPUT_EX_PROTO
                               device during reset.
 
 
-  @retval EFI_SUCCESS The device was reset.
+  @retval EFI_SUCCESS       The device was reset.
   
   @retval EFI_DEVICE_ERROR  The device is not functioning
                             correctly and could not be reset.
@@ -89,8 +87,8 @@ typedef struct _EFI_KEY_STATE {
 /**
   Definition of EFI_KEY_DATA.
 
-  @param Key  The EFI scan code and Unicode value returned from
-              the input device.
+  @param Key      The EFI scan code and Unicode value returned from
+                  the input device.
 
   @param KeyState The current state of various toggled
                   attributes as well as input modifier values.
@@ -185,8 +183,7 @@ typedef struct {
   respective Toggle and Shift state fields should not be active.
 
   
-  @param This   A pointer to the
-                EFI_SIMPLE_TEXT_INPUT_PROTOCOL_EX instance.
+  @param This     A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
 
   @param KeyData  A pointer to a buffer that is filled in with
                   the keystroke state data for the key that was
@@ -214,15 +211,13 @@ EFI_STATUS
   The SetState() function allows the input device hardware to
   have state settings adjusted.
   
-  @param This A pointer to the EFI_SIMPLE_TEXT_INPUT_PROTOCOL_EX
-              instance. Type EFI_SIMPLE_TEXT_INPUT_PROTOCOL_EX
-              is defined in this section.
+  @param This           A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
   
   @param KeyToggleState Pointer to the EFI_KEY_TOGGLE_STATE to
                         set the state for the input device.
   
   
-  @retval EFI_SUCCESS The device state was set appropriately.
+  @retval EFI_SUCCESS       The device state was set appropriately.
 
   @retval EFI_DEVICE_ERROR  The device is not functioning
                             correctly and could not have the
@@ -252,21 +247,19 @@ EFI_STATUS
   The RegisterKeystrokeNotify() function registers a function
   which will be called when a specified keystroke will occur.
   
-  @param This A pointer to the EFI_SIMPLE_TEXT_INPUT_PROTOCOL_EX
-              instance. Type EFI_SIMPLE_TEXT_INPUT_PROTOCOL_EX
-              is defined in this section.
+  @param This                     A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
   
-  @param KeyData  A pointer to a buffer that is filled in with
-                  the keystroke information for the key that was
-                  pressed.
+  @param KeyData                  A pointer to a buffer that is filled in with
+                                  the keystroke information for the key that was
+                                  pressed.
   
   @param KeyNotificationFunction  Points to the function to be
                                   called when the key sequence
                                   is typed specified by KeyData.
   
   
-  @param NotifyHandle Points to the unique handle assigned to
-                      the registered notification.
+  @param NotifyHandle             Points to the unique handle assigned to
+                                  the registered notification.
   
   @retval EFI_SUCCESS           The device state was set
                                 appropriately.
@@ -288,8 +281,7 @@ EFI_STATUS
   The UnregisterKeystrokeNotify() function removes the
   notification which was previously registered.
   
-  @param This A pointer to the EFI_SIMPLE_TEXT_INPUT_PROTOCOL_EX
-              instance.
+  @param This               A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
   
   @param NotificationHandle The handle of the notification
                             function being unregistered.
@@ -314,23 +306,23 @@ EFI_STATUS
   which allows a variety of extended shift state information to be
   returned.
 
-  @param Reset  Reset the ConsoleIn device. See Reset().
+  @param Reset            
+  Reset the ConsoleIn device. See Reset().
 
-  @param ReadKeyStrokeEx  Returns the next input character. See
-                          ReadKeyStrokeEx().
+  @param ReadKeyStrokeEx  
+  Returns the next input character.
 
-  @param WaitForKeyEx   Event to use with WaitForEvent() to wait
-                        for a key to be available.
+  @param WaitForKeyEx   
+  Event to use with WaitForEvent() to wait for a key to be available.
 
-  @param SetState   Set the EFI_KEY_TOGGLE_STATE state settings
-                    for the input device.
+  @param SetState   
+  Set the EFI_KEY_TOGGLE_STATE state settings for the input device.
 
-  @param RegisterKeyNotify  Register a notification function to
-                            be called when a given key sequence
-                            is hit.
+  @param RegisterKeyNotify  
+  Register a notification function to be called when a given key sequence is hit.
 
-  @param UnregisterKeyNotifyRemoves   A specific notification
-                                      function.
+  @param UnregisterKeyNotifyRemoves   
+  A specific notification function.
 
 **/
 struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL{
