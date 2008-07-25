@@ -17,6 +17,10 @@
 //
 
 
+/**
+  Disables CPU interrupts.
+
+**/
 VOID
 EFIAPI
 DisableInterrupts (

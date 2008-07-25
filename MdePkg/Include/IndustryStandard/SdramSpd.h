@@ -1,4 +1,4 @@
-/**@file
+/** @file
   This file contains definitions for the SPD fields on an SDRAM.
     
   Copyright (c) 2007, Intel Corporation
@@ -11,8 +11,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 **/
 
-#ifndef _SDRAM_SPD_H
-#define _SDRAM_SPD_H
+#ifndef _SDRAM_SPD_H_
+#define _SDRAM_SPD_H_
 
 //
 // SDRAM SPD field definitions

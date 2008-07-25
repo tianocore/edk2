@@ -41,6 +41,7 @@ CONST UINT8                           mTimerLibLocalApicDivisor[] = {
 
 **/
 UINTN
+EFIAPI
 InternalX86GetApicBase (
   VOID
   )
@@ -59,6 +60,7 @@ InternalX86GetApicBase (
 
 **/
 UINT32
+EFIAPI
 InternalX86GetTimerFrequency (
   IN      UINTN                     ApicBase
   )
@@ -79,6 +81,7 @@ InternalX86GetTimerFrequency (
 
 **/
 INT32
+EFIAPI
 InternalX86GetTimerTick (
   IN      UINTN                     ApicBase
   )
@@ -97,6 +100,7 @@ InternalX86GetTimerTick (
 
 **/
 VOID
+EFIAPI
 InternalX86Delay (
   IN      UINTN                     ApicBase,
   IN      UINT32                    Delay

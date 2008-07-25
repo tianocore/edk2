@@ -265,7 +265,7 @@ EFIAPI
 InternalMathDivRemU64x32 (
   IN      UINT64                    Dividend,
   IN      UINT32                    Divisor,
-  OUT     UINT32                    *Remainder
+  OUT     UINT32                    *Remainder OPTIONAL
   );
 
 /**
@@ -290,7 +290,7 @@ EFIAPI
 InternalMathDivRemU64x64 (
   IN      UINT64                    Dividend,
   IN      UINT64                    Divisor,
-  OUT     UINT64                    *Remainder
+  OUT     UINT64                    *Remainder OPTIONAL
   );
 
 /**

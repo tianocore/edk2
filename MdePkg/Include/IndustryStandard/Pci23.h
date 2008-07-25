@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _PCI23_H
-#define _PCI23_H
+#ifndef _PCI23_H_
+#define _PCI23_H_
 
 
 #define PCI_EXP_MAX_CONFIG_OFFSET     0x1000

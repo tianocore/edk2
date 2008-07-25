@@ -34,8 +34,8 @@
 /**
   Copy Length bytes from Source to Destination.
 
-  @param  Destination Target of copy
-  @param  Source Place to copy from
+  @param  DestinationBuffer Target of copy
+  @param  SourceBuffer Place to copy from
   @param  Length Number of bytes to copy
 
   @return Destination

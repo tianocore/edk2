@@ -524,7 +524,6 @@ LibPcdSet64 (
   @retval VOID* Return the pointer for the buffer been set.
 
 **/
-
 VOID *
 EFIAPI
 LibPcdSetPtr (

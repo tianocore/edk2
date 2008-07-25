@@ -17,6 +17,17 @@
 //
 
 
+/**
+  Writes a value to Debug Register 6 (DR6).
+
+  Writes and returns a new value to DR6. This function is only available on
+  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+
+  @param  Dr6 The value to write to Dr6.
+
+  @return The value written to Debug Register 6 (DR6).
+
+**/
 UINTN
 EFIAPI
 AsmWriteDr6 (

@@ -113,7 +113,6 @@ ProcessLibraryDestructorList (
           the user.  
  
 **/
-
 EFI_STATUS
 EFIAPI
 ProcessModuleEntryPointList (

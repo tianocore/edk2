@@ -26,8 +26,9 @@
 #include "BaseIoLibIntrinsicInternal.h"
 
 //
-// Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics
+// Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
 //
+
 int            _inp (unsigned short port);
 unsigned short _inpw (unsigned short port);
 unsigned long  _inpd (unsigned short port);

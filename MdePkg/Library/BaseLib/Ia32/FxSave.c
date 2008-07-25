@@ -18,6 +18,16 @@
 #include <BaseLibInternals.h>
 
 
+/**
+  Save the current floating point/SSE/SSE2 context to a buffer.
+
+  Saves the current floating point/SSE/SSE2 state to the buffer specified by
+  Buffer. Buffer must be aligned on a 16-byte boundary. This function is only
+  available on IA-32 and X64.
+
+  @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
+
+**/
 VOID
 EFIAPI
 InternalX86FxSave (

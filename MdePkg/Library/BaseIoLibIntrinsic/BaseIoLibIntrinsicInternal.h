@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Common header file shared by all source files.
 
   This file includes package header files, dependent library classes.

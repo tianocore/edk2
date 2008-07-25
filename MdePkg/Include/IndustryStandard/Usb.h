@@ -129,7 +129,7 @@ typedef struct {
 #pragma pack()
 
 
-enum {
+typedef enum {
   //
   // USB request type
   //
@@ -191,7 +191,7 @@ enum {
   //Use 200 ms to increase the error handling response time
   //
   EFI_USB_INTERRUPT_DELAY = 2000000
-};
+} USB_TYPES_DEFINITION;
 
 
 //

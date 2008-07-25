@@ -1,4 +1,3 @@
-
 /** @file
   Entry point to a PEIM.
 

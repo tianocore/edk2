@@ -17,6 +17,17 @@
 //
 
 
+/**
+  Writes a value to Control Register 3 (CR3).
+
+  Writes and returns a new value to CR3. This function is only available on
+  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+
+  @param  Cr3 The value to write to CR3.
+
+  @return The value written to CR3.
+
+**/
 UINTN
 EFIAPI
 AsmWriteCr3 (

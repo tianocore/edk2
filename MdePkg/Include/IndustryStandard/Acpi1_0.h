@@ -1,5 +1,4 @@
-/** 
-	@file   
+/** @file   
 	ACPI 1.0b definitions from the ACPI Specification, revision 1.0b
 
   Copyright (c) 2006 - 2007, Intel Corporation

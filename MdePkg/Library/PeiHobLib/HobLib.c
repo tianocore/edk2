@@ -210,8 +210,8 @@ GetBootModeHob (
   @return The address of new HOB.
 
 **/
-STATIC
 VOID *
+EFIAPI
 InternalPeiCreateHob (
   IN UINT16                      Type,
   IN UINT16                      Length

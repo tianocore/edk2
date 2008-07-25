@@ -44,7 +44,7 @@ InternalMemCopyMem (
   This function wraps the gBS->SetMem().
 
   @param  Buffer    Memory to set.
-  @param  Length    Number of bytes to set.
+  @param  Size      Number of bytes to set.
   @param  Value     Value of the set operation.
 
   @return Buffer.

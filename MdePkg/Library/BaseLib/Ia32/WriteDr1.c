@@ -17,6 +17,17 @@
 //
 
 
+/**
+  Writes a value to Debug Register 1 (DR1).
+
+  Writes and returns a new value to DR1. This function is only available on
+  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+
+  @param  Dr1 The value to write to Dr1.
+
+  @return The value written to Debug Register 1 (DR1).
+
+**/
 UINTN
 EFIAPI
 AsmWriteDr1 (

@@ -18,6 +18,15 @@
 #include <BaseLibInternals.h>
 
 
+/**
+  Reads the current Global Descriptor Table Register(GDTR) descriptor.
+
+  Reads and returns the current GDTR descriptor and returns it in Gdtr. This
+  function is only available on IA-32 and X64.
+
+  @param  Gdtr  Pointer to a GDTR descriptor.
+
+**/
 VOID
 EFIAPI
 InternalX86ReadGdtr (

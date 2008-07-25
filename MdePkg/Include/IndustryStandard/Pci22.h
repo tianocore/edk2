@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _PCI22_H
-#define _PCI22_H
+#ifndef _PCI22_H_
+#define _PCI22_H_
 
 #define PCI_MAX_SEGMENT 0
 

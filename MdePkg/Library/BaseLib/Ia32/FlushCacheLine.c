@@ -17,6 +17,21 @@
 //
 
 
+/**
+  Flushes a cache line from all the instruction and data caches within the
+  coherency domain of the CPU.
+
+  Flushed the cache line specified by LinearAddress, and returns LinearAddress.
+  This function is only available on IA-32 and X64.
+
+  @param  LinearAddress The address of the cache line to flush. If the CPU is
+                        in a physical addressing mode, then LinearAddress is a
+                        physical address. If the CPU is in a virtual
+                        addressing mode, then LinearAddress is a virtual
+                        address.
+
+  @return LinearAddress
+**/
 VOID *
 EFIAPI
 AsmFlushCacheLine (

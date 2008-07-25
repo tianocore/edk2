@@ -17,6 +17,20 @@
 //
 
 
+/**
+  Executes an MWAIT instruction.
+
+  Executes an MWAIT instruction with the register state specified by Eax and
+  Ecx. Returns Eax. This function is only available on IA-32 and X64.
+
+  @param  Eax The value to load into EAX or RAX before executing the MONITOR
+              instruction.
+  @param  Ecx The value to load into ECX or RCX before executing the MONITOR
+              instruction.
+
+  @return Eax
+
+**/
 UINTN
 EFIAPI
 AsmMwait (

@@ -46,9 +46,12 @@ CONST EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
                                          firmware volume.
     @param  FvInfoSize          Size of the data provided by FvInfo. For memory-mapped firmware volumes, this is
                                          typically the size of the firmware volume.
-    @param  ParentFvName, ParentFileName      If the firmware volume originally came from a firmware file, then these point to the
-                                          parent firmware volume name and firmware volume file. If it did not originally come
-                                          from a firmware file, these should be NULL
+    @param  ParentFvName        If the firmware volume originally came from a firmware file, then these point to the
+                                          parent firmware volume name. If it did not originally come
+                                          from a firmware file, these should be NULL.
+    @param  ParentFileName      If the firmware volume originally came from a firmware file, then these point to the
+                                          firmware volume file. If it did not originally come
+                                          from a firmware file, these should be NULL.
   
 **/
 VOID

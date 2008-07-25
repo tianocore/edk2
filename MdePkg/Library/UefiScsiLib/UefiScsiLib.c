@@ -113,13 +113,13 @@ ScsiTestUnitReadyCommand (
 
   @param[in]     ScsiIo             SCSI IO Protocol to use
   @param[in]     Timeout            The length of timeout period.
-  @param[out]    SenseData          A pointer to output sense data.
+  @param[in]    SenseData          A pointer to output sense data.
   @param[in out] SenseDataLength    On input, the length in bytes of the SenseData buffer. On
                                     output, the number of bytes written to the SenseData buffer.
   @param[out]    HostAdapterStatus  The status of Host Adapter.
   @param[out]    TargetStatus       The status of the target.
-  @param[in]     InquirydataBuffer  A pointer to inquiry data buffer.
-  @param[in,out] InquiryDataLength  The length of inquiry data buffer.
+  @param[in]     InquirydDtaBuffer  A pointer to inquiry data buffer.
+  @param[in out] InquiryDataLength  The length of inquiry data buffer.
   @param[in]     EnableVitalProductData  Boolean to enable Vital Product Data.
 
   @retval EFI_SUCCESS         The status of the unit is tested successfully.
@@ -213,13 +213,13 @@ ScsiInquiryCommand (
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
-  @param[out]    SenseData          A pointer to output sense data.
+  @param[in]    SenseData          A pointer to output sense data.
   @param[in out] SenseDataLength    On input, the length in bytes of the SenseData buffer. On
                                     output, the number of bytes written to the SenseData buffer.
   @param[out]    HostAdapterStatus  The status of Host Adapter.
   @param[out]    TargetStatus       The status of the target.
   @param[in]     DataBuffer         A pointer to input data buffer.
-  @param[in,out] DataLength         The length of input data buffer.
+  @param[in out] DataLength         The length of input data buffer.
   @param[in]     DBDField           The DBD Field (Optional).
   @param[in]     PageControl        Page Control.
   @param[in]     PageCode           Page code.
@@ -402,13 +402,13 @@ ScsiRequestSenseCommand (
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
-  @param[out]    SenseData          A pointer to output sense data.
+  @param[in]    SenseData          A pointer to output sense data.
   @param[in out] SenseDataLength    On input, the length in bytes of the SenseData buffer. On
                                     output, the number of bytes written to the SenseData buffer.
   @param[out]    HostAdapterStatus  The status of Host Adapter.
   @param[out]    TargetStatus       The status of the target.
   @param[out]    DataBuffer         A pointer to a data buffer.
-  @param[in,out] DataLength         The length of data buffer.
+  @param[in out] DataLength         The length of data buffer.
   @param[in]     PMI                Partial medium indicator.
 
   @retval  EFI_SUCCESS                The status of the unit is tested successfully.
@@ -504,13 +504,13 @@ ScsiReadCapacityCommand (
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
-  @param[out]    SenseData          A pointer to output sense data.
+  @param[in]     SenseData          A pointer to output sense data.
   @param[in out] SenseDataLength    On input, the length in bytes of the SenseData buffer. On
                                     output, the number of bytes written to the SenseData buffer.
   @param[out]    HostAdapterStatus  The status of Host Adapter.
   @param[out]    TargetStatus       The status of the target.
   @param[out]    DataBuffer         Read 10 command data.
-  @param[in,out] DataLength         The length of data buffer.
+  @param[in out] DataLength         The length of data buffer.
   @param[in]     StartLba           The start address of LBA.
   @param[in]     SectorSize         The sector size.
 
@@ -606,13 +606,13 @@ ScsiRead10Command (
 
   @param[in]     ScsiIo             SCSI IO Protocol to use
   @param[in]     Timeout            The length of timeout period.
-  @param[out]    SenseData          A pointer to output sense data.
-  @param[in out] SenseDataLength    On input, the length in bytes of the SenseData buffer. On
+  @param[in]    SenseData          A pointer to output sense data.
+  @param[in out]  SenseDataLength   On input, the length in bytes of the SenseData buffer. On
                                     output, the number of bytes written to the SenseData buffer.
   @param[out]    HostAdapterStatus  The status of Host Adapter.
   @param[out]    TargetStatus       The status of the target.
   @param[out]    DataBuffer         A pointer to a data buffer.
-  @param[in,out] DataLength         The length of data buffer.
+  @param[in out] DataLength         The length of data buffer.
   @param[in]     StartLba           The start address of LBA.
   @param[in]     SectorSize         The sector size.
 

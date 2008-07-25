@@ -17,6 +17,15 @@
 //
 
 
+/**
+  Reads the current value of 64-bit MMX Register #2 (MM2).
+
+  Reads and returns the current value of MM2. This function is only available
+  on IA-32 and X64.
+
+  @return The current value of MM2.
+
+**/
 UINT64
 EFIAPI
 AsmReadMm2 (

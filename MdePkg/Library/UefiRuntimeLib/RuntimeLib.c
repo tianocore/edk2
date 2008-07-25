@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Library utility functions for Runtime driver.
 
 Copyright (c) 2006 Intel Corporation. <BR>
@@ -25,7 +25,7 @@ STATIC BOOLEAN                mEfiAtRuntime           = FALSE;
 EFI_RUNTIME_SERVICES          *mRT;
 
 /**
-  Set AtRuntime flag as TRUE after ExitBootServices
+  Set AtRuntime flag as TRUE after ExitBootServices.
 
   @param[in]  Event   The Event that is being processed
   @param[in]  Context Event Context
@@ -120,6 +120,9 @@ RuntimeDriverLibConstruct (
   EfiInitializeRuntimeDriverLib(). If a runtime driver exits with an error,
   it must call this routine to free the allocated resource before the exiting.
 
+  @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
+  @param[in]  SystemTable   A pointer to the EFI System Table.
+
   @retval     EFI_SUCCESS       Shutdown the Runtime Driver Lib successfully
   @retval     EFI_UNSUPPORTED   Runtime Driver lib was not initialized at all
 **/
@@ -146,7 +149,7 @@ RuntimeDriverLibDeconstruct (
 }
 
 /**
-  Return TRUE if ExitBootServices () has been called
+  Return TRUE if ExitBootServices () has been called.
 
   @retval TRUE If ExitBootServices () has been called
 **/
@@ -160,7 +163,7 @@ EfiAtRuntime (
 }
 
 /**
-  Return TRUE if SetVirtualAddressMap () has been called
+  Return TRUE if SetVirtualAddressMap () has been called.
 
   @retval TRUE  If SetVirtualAddressMap () has been called
 **/

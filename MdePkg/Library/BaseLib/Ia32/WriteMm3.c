@@ -17,6 +17,15 @@
 //
 
 
+/**
+  Writes the current value of 64-bit MMX Register #3 (MM3).
+
+  Writes the current value of MM3. This function is only available on IA32 and
+  X64.
+
+  @param  Value The 64-bit value to write to MM3.
+
+**/
 VOID
 EFIAPI
 AsmWriteMm3 (

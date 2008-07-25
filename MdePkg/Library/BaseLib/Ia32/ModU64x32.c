@@ -17,6 +17,20 @@
 //
 
 
+/**
+  Divides a 64-bit unsigned integer by a 32-bit unsigned integer and
+  generates a 32-bit unsigned remainder.
+
+  This function divides the 64-bit unsigned value Dividend by the 32-bit
+  unsigned value Divisor and generates a 32-bit remainder. This function
+  returns the 32-bit unsigned remainder.
+
+  @param  Dividend  A 64-bit unsigned value.
+  @param  Divisor   A 32-bit unsigned value.
+
+  @return Dividend % Divisor
+
+**/
 UINT32
 EFIAPI
 InternalMathModU64x32 (

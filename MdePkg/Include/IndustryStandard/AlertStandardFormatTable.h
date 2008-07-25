@@ -1,5 +1,4 @@
-/** 
-	@file   
+/** @file   
 	ACPI Alert Standard Format Description Table ASF! as described in the ASF2.0 Specification
 
   Copyright (c) 2006 - 2007, Intel Corporation

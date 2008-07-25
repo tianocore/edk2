@@ -1,5 +1,4 @@
-/** 
-    @file   
+/** @file   
   ACPI Watchdog Action Table as defined at
   Microsoft Hardware Watchdog Timer Specification.
 

@@ -18,7 +18,11 @@
 
 
 #include "BaseLibInternals.h"
-
-VOID __chkstk() {
+/**
+  Hack function for passing GCC build.
+**/
+VOID 
+__chkstk() 
+{
 }
 

@@ -1,5 +1,4 @@
-/** 
-	@file   
+/** @file   
   TPM Specification data structures (TCG TPM Specification Version 1.2 Revision 94)
   See http://trustedcomputinggroup.org for latest specification updates
 

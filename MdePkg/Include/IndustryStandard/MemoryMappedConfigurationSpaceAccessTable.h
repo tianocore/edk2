@@ -1,4 +1,4 @@
-/**@file
+/** @file
   ACPI memory mapped configuration space access table definition, defined at 
   in the PCI Firmware Specification, version 3.0 draft version 0.5.
   Specification is available at http://www.pcisig.com.

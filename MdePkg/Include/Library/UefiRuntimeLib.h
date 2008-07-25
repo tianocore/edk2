@@ -355,7 +355,7 @@ EfiUpdateCapsule (
                                 stored in contiguous virtual memory.
   @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
                                 CaspuleHeaderArray.
-  @param  MaxiumCapsuleSize     On output the maximum size that UpdateCapsule() can
+  @param  MaximumCapsuleSize     On output the maximum size that UpdateCapsule() can
                                 support as an argument to UpdateCapsule() via
                                 CapsuleHeaderArray and ScatterGatherList.
                                 Undefined on input.
@@ -411,7 +411,7 @@ EfiQueryCapsuleCapabilities (
 EFI_STATUS
 EFIAPI
 EfiQueryVariableInfo (
-  IN UINT32   Attrubutes,
+  IN UINT32   Attributes,
   OUT UINT64  *MaximumVariableStorageSize,
   OUT UINT64  *RemainingVariableStorageSize,
   OUT UINT64  *MaximumVariableSize

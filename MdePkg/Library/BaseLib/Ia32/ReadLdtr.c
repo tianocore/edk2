@@ -17,6 +17,15 @@
 //
 
 
+/**
+  Reads the current Local Descriptor Table Register(LDTR) selector.
+
+  Reads and returns the current 16-bit LDTR descriptor value. This function is
+  only available on IA-32 and X64.
+
+  @return The current selector of LDT.
+
+**/
 UINT16
 EFIAPI
 AsmReadLdtr (

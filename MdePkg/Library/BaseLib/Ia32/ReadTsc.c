@@ -17,6 +17,15 @@
 //
 
 
+/**
+  Reads the current value of Time Stamp Counter (TSC).
+
+  Reads and returns the current value of TSC. This function is only available
+  on IA-32 and X64.
+
+  @return The current value of TSC
+
+**/
 UINT64
 EFIAPI
 AsmReadTsc (

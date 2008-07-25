@@ -17,6 +17,13 @@
 //
 
 
+/**
+  Executes a INVD instruction.
+
+  Executes a INVD instruction. This function is only available on IA-32 and
+  X64.
+
+**/
 VOID
 EFIAPI
 AsmInvd (
