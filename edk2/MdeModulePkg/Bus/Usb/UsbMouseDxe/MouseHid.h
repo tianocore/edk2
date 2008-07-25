@@ -1,6 +1,8 @@
 /** @file
 
-Copyright (c) 2004, Intel Corporation
+  The interface of HID data structure.
+
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,17 +11,10 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  MouseHid.h
-
-Abstract:
-
-
 **/
 
-#ifndef __MOUSE_HID_H
-#define __MOUSE_HID_H
+#ifndef _EFI_MOUSE_HID_H_
+#define _EFI_MOUSE_HID_H_
 
 #include "UsbMouse.h"
 
@@ -75,6 +70,17 @@ typedef struct {
   UINT32          CollectionStackPtr;
 } HID_PARSER;
 
+/**
+  Parse Mouse Report Descriptor.
+
+  @param  UsbMouse          The instance of USB_MOUSE_DEV
+  @param  ReportDescriptor  Report descriptor to parse
+  @param  ReportSize        Report descriptor size
+
+  @retval EFI_DEVICE_ERROR  Report descriptor error
+  @retval EFI_SUCCESS       Parse descriptor success
+
+**/
 EFI_STATUS
 ParseMouseReportDescriptor (
   IN  USB_MOUSE_DEV   *UsbMouse,

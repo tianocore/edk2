@@ -1,6 +1,8 @@
 /** @file
 
-Copyright (c) 2004 - 2007, Intel Corporation
+  Usb Mouse Driver Binding and Implement SIMPLE_POINTER_PROTOCOL Protocol.
+
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,13 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:
-
-    UsbMouse.c
-
-  Abstract:
-
 
 **/
 
@@ -27,10 +22,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "UsbMouse.h"
 #include "MouseHid.h"
 
-//
-// Prototypes
-// Driver model protocol interface
-//
+/**
+  The USB Mouse driver entry pointer.
+
+  @param  ImageHandle      The driver image handle.
+  @param  SystemTable      The system table.
+
+  @return EFI_SUCCESS      The component name protocol is installed.
+  @return Others           Failed to init the usb driver.
+
+**/
 EFI_STATUS
 EFIAPI
 USBMouseDriverBindingEntryPoint (
@@ -38,6 +39,18 @@ USBMouseDriverBindingEntryPoint (
   IN EFI_SYSTEM_TABLE     *SystemTable
   );
 
+/**
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  that has UsbIoProtocol installed will be supported.
+
+  @param  This                  Protocol instance pointer.
+  @param  Controller            Handle of device to test.
+  @param  RemainingDevicePath   Not used.
+
+  @retval EFI_SUCCESS           This driver supports this device.
+  @retval EFI_UNSUPPORTED       This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 USBMouseDriverBindingSupported (
@@ -46,6 +59,20 @@ USBMouseDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Starting the Usb Mouse Driver.
+
+  @param  This                  Protocol instance pointer.
+  @param  Controller            Handle of device to test
+  @param  RemainingDevicePath   Not used
+
+  @retval EFI_SUCCESS           This driver supports this device.
+  @retval EFI_UNSUPPORTED       This driver does not support this device.
+  @retval EFI_DEVICE_ERROR      This driver cannot be started due to device Error.
+  @retval EFI_OUT_OF_RESOURCES  Can't allocate memory resources.
+  @retval EFI_ALREADY_STARTED   Thios driver has been started.
+
+**/
 EFI_STATUS
 EFIAPI
 USBMouseDriverBindingStart (
@@ -54,6 +81,19 @@ USBMouseDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This                  Protocol instance pointer.
+  @param  Controller            Handle of device to stop driver on.
+  @param  NumberOfChildren      Number of Children in the ChildHandleBuffer.
+  @param  ChildHandleBuffer     List of handles for the children we need to stop.
+
+  @retval EFI_SUCCESS           The controller or children are stopped.
+  @retval Other                 Failed to stop the driver.
+
+**/
 EFI_STATUS
 EFIAPI
 USBMouseDriverBindingStop (
@@ -76,22 +116,43 @@ EFI_DRIVER_BINDING_PROTOCOL gUsbMouseDriverBinding = {
   NULL
 };
 
-//
-// helper functions
-//
-STATIC
+/**
+  Tell if a Usb Controller is a mouse.
+
+  @param  UsbIo                 Protocol instance pointer.
+
+  @retval TRUE                  It is a mouse.
+  @retval FALSE                 It is not a mouse.
+
+**/
 BOOLEAN
 IsUsbMouse (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo
   );
 
-STATIC
+/**
+  Initialize the Usb Mouse Device.
+
+  @param  UsbMouseDev           Device instance to be initialized.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_OUT_OF_RESOURCES  Can't allocate memory.
+  @retval Other                 Init error. 
+
+**/
 EFI_STATUS
 InitializeUsbMouseDevice (
   IN  USB_MOUSE_DEV           *UsbMouseDev
   );
 
-STATIC
+/**
+  Event notification function for SIMPLE_POINTER.WaitForInput event
+  Signal the event if there is input from mouse.
+
+  @param  Event                 Wait Event.
+  @param  Context               Passed parameter to event handler.
+ 
+**/
 VOID
 EFIAPI
 UsbMouseWaitForInput (
@@ -99,10 +160,19 @@ UsbMouseWaitForInput (
   IN  VOID                    *Context
   );
 
-//
-// Mouse interrupt handler
-//
-STATIC
+/**
+  It is called whenever there is data received from async interrupt
+  transfer.
+
+  @param  Data                  Data received.
+  @param  DataLength            Length of Data.
+  @param  Context               Passed in context.
+  @param  Result                Async Interrupt Transfer result.
+
+  @return EFI_SUCCESS           Receive data successfully.
+  @return EFI_DEVICE_ERROR      USB async interrupt transfer fails.
+
+**/
 EFI_STATUS
 EFIAPI
 OnMouseInterruptComplete (
@@ -112,10 +182,17 @@ OnMouseInterruptComplete (
   IN  UINT32      Result
   );
 
-//
-// Mouse Protocol
-//
-STATIC
+/**
+  Get the mouse state, see SIMPLE POINTER PROTOCOL.
+
+  @param  This                  Protocol instance pointer.
+  @param  MouseState            Current mouse state.
+
+  @return EFI_SUCCESS           Get usb mouse status successfully.
+  @return EFI_DEVICE_ERROR      The parameter is error.
+  @return EFI_NOT_READY         Mouse status doesn't change.
+
+**/
 EFI_STATUS
 EFIAPI
 GetMouseState (
@@ -123,7 +200,15 @@ GetMouseState (
   OUT  EFI_SIMPLE_POINTER_STATE     *MouseState
   );
 
-STATIC
+/**
+  Reset the mouse device, see SIMPLE POINTER PROTOCOL.
+
+  @param  This                  Protocol instance pointer.
+  @param  ExtendedVerification  Ignored here.
+
+  @return EFI_SUCCESS           Reset usb mouse successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 UsbMouseReset (
@@ -131,28 +216,23 @@ UsbMouseReset (
   IN BOOLEAN                        ExtendedVerification
   );
 
-//
-// Driver start here
-//
+
+/**
+  The USB Mouse driver entry pointer.
+
+  @param  ImageHandle      The driver image handle.
+  @param  SystemTable      The system table.
+
+  @return EFI_SUCCESS      The component name protocol is installed.
+  @return Others           Failed to init the usb driver.
+
+**/
 EFI_STATUS
 EFIAPI
 USBMouseDriverBindingEntryPoint (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-  Routine Description:
-    Entry point for EFI drivers.
-
-  Arguments:
-   ImageHandle - EFI_HANDLE
-   SystemTable - EFI_SYSTEM_TABLE
-  Returns:
-    EFI_SUCCESS
-    others
-
---*/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
@@ -167,11 +247,11 @@ USBMouseDriverBindingEntryPoint (
 
 /**
   Test to see if this driver supports ControllerHandle. Any ControllerHandle
-  that has UsbHcProtocol installed will be supported.
+  that has UsbIoProtocol installed will be supported.
 
   @param  This                  Protocol instance pointer.
   @param  Controller            Handle of device to test
-  @param  RemainingDevicePath   Not used
+  @param  RemainingDevicePath   Not used.
 
   @retval EFI_SUCCESS           This driver supports this device.
   @retval EFI_UNSUPPORTED       This driver does not support this device.
@@ -225,18 +305,17 @@ USBMouseDriverBindingSupported (
 
 
 /**
-  Starting the Usb Bus Driver
+  Starting the Usb Mouse Driver.
 
   @param  This                  Protocol instance pointer.
-  @param  Controller            Handle of device to test
-  @param  RemainingDevicePath   Not used
+  @param  Controller            Handle of device to test.
+  @param  RemainingDevicePath   Not used.
 
   @retval EFI_SUCCESS           This driver supports this device.
   @retval EFI_UNSUPPORTED       This driver does not support this device.
-  @retval EFI_DEVICE_ERROR      This driver cannot be started due to device Error
-                                EFI_OUT_OF_RESOURCES- Can't allocate memory
-                                resources
-  @retval EFI_ALREADY_STARTED   Thios driver has been started
+  @retval EFI_DEVICE_ERROR      This driver cannot be started due to device Error.
+  @retval EFI_OUT_OF_RESOURCES  Can't allocate memory resources.
+  @retval EFI_ALREADY_STARTED   Thios driver has been started.
 
 **/
 EFI_STATUS
@@ -477,13 +556,12 @@ ErrorExit:
   created by this driver.
 
   @param  This                  Protocol instance pointer.
-  @param  Controller            Handle of device to stop driver on
-  @param  NumberOfChildren      Number of Children in the ChildHandleBuffer
+  @param  Controller            Handle of device to stop driver on.
+  @param  NumberOfChildren      Number of Children in the ChildHandleBuffer.
   @param  ChildHandleBuffer     List of handles for the children we need to stop.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return others
+  @retval EFI_SUCCESS           The controller or children are stopped.
+  @retval Other                 Failed to stop the driver.
 
 **/
 EFI_STATUS
@@ -552,7 +630,7 @@ USBMouseDriverBindingStop (
 
   gBS->CloseEvent (UsbMouseDevice->SimplePointerProtocol.WaitForInput);
 
-  if (UsbMouseDevice->DelayedRecoveryEvent) {
+  if (UsbMouseDevice->DelayedRecoveryEvent != NULL) {
     gBS->CloseEvent (UsbMouseDevice->DelayedRecoveryEvent);
     UsbMouseDevice->DelayedRecoveryEvent = 0;
   }
@@ -576,7 +654,7 @@ USBMouseDriverBindingStop (
   gBS->FreePool (UsbMouseDevice->InterfaceDescriptor);
   gBS->FreePool (UsbMouseDevice->IntEndpointDescriptor);
 
-  if (UsbMouseDevice->ControllerNameTable) {
+  if (UsbMouseDevice->ControllerNameTable != NULL) {
     FreeUnicodeStringTable (UsbMouseDevice->ControllerNameTable);
   }
 
@@ -588,12 +666,12 @@ USBMouseDriverBindingStop (
 
 
 /**
-  Tell if a Usb Controller is a mouse
+  Tell if a Usb Controller is a mouse.
 
   @param  UsbIo                 Protocol instance pointer.
 
-  @retval TRUE                  It is a mouse
-  @retval FALSE                 It is not a mouse
+  @retval TRUE                  It is a mouse.
+  @retval FALSE                 It is not a mouse.
 
 **/
 BOOLEAN
@@ -631,14 +709,13 @@ IsUsbMouse (
 /**
   Initialize the Usb Mouse Device.
 
-  @param  UsbMouseDev           Device instance to be initialized
+  @param  UsbMouseDev           Device instance to be initialized.
 
-  @retval EFI_SUCCESS           Success
-  @retval EFI_DEVICE_ERROR      Init error. EFI_OUT_OF_RESOURCES- Can't allocate
-                                memory
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_OUT_OF_RESOURCES  Can't allocate memory.
+  @retval Other                 Init error. 
 
 **/
-STATIC
 EFI_STATUS
 InitializeUsbMouseDevice (
   IN  USB_MOUSE_DEV           *UsbMouseDev
@@ -748,7 +825,7 @@ InitializeUsbMouseDevice (
 
   gBS->FreePool (ReportDesc);
 
-  if (UsbMouseDev->DelayedRecoveryEvent) {
+  if (UsbMouseDev->DelayedRecoveryEvent != NULL) {
     gBS->CloseEvent (UsbMouseDev->DelayedRecoveryEvent);
     UsbMouseDev->DelayedRecoveryEvent = 0;
   }
@@ -770,15 +847,14 @@ InitializeUsbMouseDevice (
   transfer.
 
   @param  Data                  Data received.
-  @param  DataLength            Length of Data
-  @param  Context               Passed in context
-  @param  Result                Async Interrupt Transfer result
+  @param  DataLength            Length of Data.
+  @param  Context               Passed in context.
+  @param  Result                Async Interrupt Transfer result.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
+  @return EFI_SUCCESS           Receive data successfully.
+  @return EFI_DEVICE_ERROR      USB async interrupt transfer fails.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 OnMouseInterruptComplete (
@@ -855,32 +931,18 @@ OnMouseInterruptComplete (
   return EFI_SUCCESS;
 }
 
-/*
-STATIC VOID
-PrintMouseState(
-    IN  EFI_MOUSE_STATE *MouseState
-    )
-{
-    Aprint("(%x: %x, %x)\n",
-        MouseState->ButtonStates,
-        MouseState->dx,
-        MouseState->dy
-        );
-}
-*/
 
 /**
   Get the mouse state, see SIMPLE POINTER PROTOCOL.
 
   @param  This                  Protocol instance pointer.
-  @param  MouseState            Current mouse state
+  @param  MouseState            Current mouse state.
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return EFI_NOT_READY
+  @return EFI_SUCCESS           Get usb mouse status successfully.
+  @return EFI_DEVICE_ERROR      The parameter is error.
+  @return EFI_NOT_READY         Mouse status doesn't change.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 GetMouseState (
@@ -923,12 +985,11 @@ GetMouseState (
   Reset the mouse device, see SIMPLE POINTER PROTOCOL.
 
   @param  This                  Protocol instance pointer.
-  @param  ExtendedVerification  Ignored here/
+  @param  ExtendedVerification  Ignored here.
 
-  @return EFI_SUCCESS
+  @return EFI_SUCCESS           Reset usb mouse successfully.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 UsbMouseReset (
@@ -959,14 +1020,12 @@ UsbMouseReset (
 
 /**
   Event notification function for SIMPLE_POINTER.WaitForInput event
-  Signal the event if there is input from mouse
+  Signal the event if there is input from mouse.
 
   @param  Event                 Wait Event
   @param  Context               Passed parameter to event handler
- VOID
-
+ 
 **/
-STATIC
 VOID
 EFIAPI
 UsbMouseWaitForInput (
@@ -1023,7 +1082,7 @@ USBMouseRecoveryHandler (
 
 
 /**
-  Report Status Code in Usb Bot Driver
+  Report Status Code in Usb Bot Driver.
 
   @param  DevicePath            Use this to get Device Path
   @param  CodeType              Status Code Type
