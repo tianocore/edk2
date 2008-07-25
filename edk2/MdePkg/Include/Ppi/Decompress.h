@@ -69,7 +69,7 @@ EFI_STATUS
   compression sections will be ignored.
 
   @param  Decompress  Decompress a single compression section in
-                     a firmware file.
+                      a firmware file.
 **/
 struct _EFI_PEI_DECOMPRESS_PPI {
   EFI_PEI_DECOMPRESS_DECOMPRESS Decompress;
