@@ -31,6 +31,7 @@
 
 **/
 VOID
+EFIAPI
 InternalIpfDelay (
   IN      INT64                     Delay
   )

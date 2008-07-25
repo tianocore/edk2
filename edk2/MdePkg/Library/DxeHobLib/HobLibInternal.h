@@ -15,6 +15,16 @@
 #ifndef _DXE_HOB_LIB_INTERNAL_H__
 #define _DXE_HOB_LIB_INTERNAL_H__
 
+/**
+  
+  Initialize Hob list.
+   
+  @param  ImageHandle ImageHandle of the loaded driver.
+  @param  SystemTable Pointer to the EFI System Table.
+
+  @retval  EFI_SUCCESS One or more of the drivers returned a success code.
+  @retval  !EFI_SUCESS The return status from the last driver entry point in the list.
+**/
 EFI_STATUS
 EFIAPI
 HobLibConstructor (

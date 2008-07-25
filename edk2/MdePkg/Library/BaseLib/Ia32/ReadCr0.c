@@ -17,6 +17,16 @@
 //
 
 
+/**
+  Reads the current value of the Control Register 0 (CR0).
+
+  Reads and returns the current value of CR4. This function is only available
+  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  X64.
+
+  @return The value of the Control Register 0 (CR0).
+
+**/
 UINTN
 EFIAPI
 AsmReadCr0 (

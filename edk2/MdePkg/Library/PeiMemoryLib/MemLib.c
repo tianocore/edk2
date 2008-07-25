@@ -48,7 +48,7 @@ InternalMemCopyMem (
   This function wraps the gPS->SetMem ().
   
   @param  Buffer    Memory to set.
-  @param  Length    Number of bytes to set.
+  @param  Size    Number of bytes to set.
   @param  Value     Value of the set operation.
 
   @return Buffer.

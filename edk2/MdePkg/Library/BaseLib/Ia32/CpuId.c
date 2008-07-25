@@ -17,6 +17,31 @@
 //
 
 
+/**
+  Retrieves CPUID information.
+
+  Executes the CPUID instruction with EAX set to the value specified by Index.
+  This function always returns Index.
+  If Eax is not NULL, then the value of EAX after CPUID is returned in Eax.
+  If Ebx is not NULL, then the value of EBX after CPUID is returned in Ebx.
+  If Ecx is not NULL, then the value of ECX after CPUID is returned in Ecx.
+  If Edx is not NULL, then the value of EDX after CPUID is returned in Edx.
+  This function is only available on IA-32 and X64.
+
+  @param  Index The 32-bit value to load into EAX prior to invoking the CPUID
+                instruction.
+  @param  Eax   Pointer to the 32-bit EAX value returned by the CPUID
+                instruction. This is an optional parameter that may be NULL.
+  @param  Ebx   Pointer to the 32-bit EBX value returned by the CPUID
+                instruction. This is an optional parameter that may be NULL.
+  @param  Ecx   Pointer to the 32-bit ECX value returned by the CPUID
+                instruction. This is an optional parameter that may be NULL.
+  @param  Edx   Pointer to the 32-bit EDX value returned by the CPUID
+                instruction. This is an optional parameter that may be NULL.
+
+  @return Index
+
+**/
 UINT32
 EFIAPI
 AsmCpuid (

@@ -36,8 +36,7 @@
                                           from a firmware file, these should be NULL
   
  
-  **/
-
+**/
 VOID
 EFIAPI
 PiLibInstallFvInfoPpi (

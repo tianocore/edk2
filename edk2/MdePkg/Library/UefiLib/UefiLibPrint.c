@@ -36,9 +36,8 @@
   @return The number of Unicode characters in the produced
           output buffer not including the Null-terminator.
 **/
-
-STATIC
 UINTN
+EFIAPI
 InternalPrint (
   IN  CONST CHAR16                     *Format,
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Console,
@@ -170,8 +169,8 @@ ErrorPrint (
           output buffer not including the Null-terminator.
 
 **/
-STATIC
 UINTN
+EFIAPI
 AsciiInternalPrint (
   IN  CONST CHAR8                      *Format,
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Console,

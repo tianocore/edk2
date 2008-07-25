@@ -217,7 +217,7 @@ PeiServicesCreateHob (
 
   @param  Instance              This instance of the firmware volume to find.  The value 0 is the
                                 Boot Firmware Volume (BFV).
-  @param  FwVolHeader           Pointer to the firmware volume header of the volume to return.
+  @param  VolumeHandle          Handle of the firmware volume header of the volume to return.
 
   @retval EFI_SUCCESS           The volume was found.
   @retval EFI_NOT_FOUND         The volume was not found.
@@ -241,9 +241,9 @@ PeiServicesFfsFindNextVolume (
   This service enables PEIMs to discover additional firmware files.
 
   @param  SearchType            A filter to find files only of this type.
-  @param  FwVolHeader           Pointer to the firmware volume header of the volume to search.
+  @param  VolumeHandle          Pointer to the firmware volume header of the volume to search.
                                 This parameter must point to a valid FFS volume.
-  @param  FileHeader            Pointer to the current file from which to begin searching.
+  @param  FileHandle            Handle of the current file from which to begin searching.
 
   @retval EFI_SUCCESS           The file was found.
   @retval EFI_NOT_FOUND         The file was not found.
@@ -267,7 +267,7 @@ PeiServicesFfsFindNextFile (
 /**
   This service enables PEIMs to discover sections of a given type within a valid FFS file.
 
-  @param  SearchType            The value of the section type to find.
+  @param  SectionType           The value of the section type to find.
   @param  FfsFileHeader         A pointer to the file header that contains the set of sections to
                                 be searched.
   @param  SectionData           A pointer to the discovered section, if successful.
@@ -460,6 +460,8 @@ PeiServicesFfsGetFileInfo (
   @param VolumeHandle   The firmware volume to search FileHandle
                         Upon exit, points to the found file's
                         handle or NULL if it could not be found.
+
+  @param FileHandle     The filehandle found in volume.
 
   @retval EFI_SUCCESS             File was found.
 

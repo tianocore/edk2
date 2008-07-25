@@ -64,7 +64,7 @@ StrCpy (
   ASSERT ((UINTN)(Source - Destination) > StrLen (Source));
 
   ReturnValue = Destination;
-  while (*Source) {
+  while (*Source != 0) {
     *(Destination++) = *(Source++);
   }
   *Destination = 0;
@@ -500,8 +500,8 @@ StrStr (
   @retval FALSE Otherwise.
 
 **/
-STATIC
 BOOLEAN
+EFIAPI
 InternalIsDecimalDigitCharacter (
   IN      CHAR16                    Char
   )
@@ -525,8 +525,8 @@ InternalIsDecimalDigitCharacter (
   @retval Unchanged        Otherwise.
 
 **/
-STATIC
 CHAR16
+EFIAPI
 InternalCharToUpper (
   IN      CHAR16                    Char
   )
@@ -551,8 +551,8 @@ InternalCharToUpper (
   @retval UINTN   The numerical value converted.
 
 **/
-STATIC
 UINTN
+EFIAPI
 InternalHexCharToUintn (
   IN      CHAR16                    Char
   )
@@ -578,8 +578,8 @@ InternalHexCharToUintn (
   @retval FALSE Otherwise.
 
 **/
-STATIC
 BOOLEAN
+EFIAPI
 InternalIsHexaDecimalDigitCharacter (
   IN      CHAR16                    Char
   )
@@ -954,8 +954,8 @@ StrHexToUint64 (
   @retval FALSE Otherwise.
 
 **/
-STATIC
 BOOLEAN
+EFIAPI
 InternalAsciiIsDecimalDigitCharacter (
   IN      CHAR8                     Char
   )
@@ -977,8 +977,8 @@ InternalAsciiIsDecimalDigitCharacter (
   @retval FALSE Otherwise.
 
 **/
-STATIC
 BOOLEAN
+EFIAPI
 InternalAsciiIsHexaDecimalDigitCharacter (
   IN      CHAR8                    Char
   )
@@ -1110,7 +1110,7 @@ AsciiStrCpy (
   ASSERT ((UINTN)(Source - Destination) > AsciiStrLen (Source));
 
   ReturnValue = Destination;
-  while (*Source) {
+  while (*Source != 0) {
     *(Destination++) = *(Source++);
   }
   *Destination = 0;
@@ -1170,7 +1170,7 @@ AsciiStrnCpy (
 
   ReturnValue = Destination;
 
-  while (*Source && Length > 0) {
+  while (*Source != 0 && Length > 0) {
     *(Destination++) = *(Source++);
     Length--;
   }
@@ -1298,13 +1298,13 @@ AsciiStrCmp (
   If Value >= 0xA0, then ASSERT().
   If (Value & 0x0F) >= 0x0A, then ASSERT().
 
-  @param  chr   one Ascii character
+  @param  Chr   one Ascii character
 
   @return The uppercase value of Ascii character 
 
 **/
-STATIC
 CHAR8
+EFIAPI
 AsciiToUpper (
   IN      CHAR8                     Chr
   )
@@ -1325,8 +1325,8 @@ AsciiToUpper (
   @retval UINTN   The numerical value converted.
 
 **/
-STATIC
 UINTN
+EFIAPI
 InternalAsciiHexCharToUintn (
   IN      CHAR8                    Char
   )

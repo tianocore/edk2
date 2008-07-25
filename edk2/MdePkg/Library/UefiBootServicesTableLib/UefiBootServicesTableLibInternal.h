@@ -12,9 +12,18 @@
 
 **/
 
-#ifndef _UefiBootServicesTable_Lib_H
-#define _UefiBootServicesTable_Lib_H
+#ifndef _UEFIBOOTSERVICESTABLE_LIB_H_
+#define _UEFIBOOTSERVICESTABLE_LIB_H_
+/**
+  
+  Initialize gBS.
+   
+  @param  ImageHandle ImageHandle of the loaded driver.
+  @param  SystemTable Pointer to the EFI System Table.
 
+  @retval  EFI_SUCCESS One or more of the drivers returned a success code.
+  @retval  !EFI_SUCESS The return status from the last driver entry point in the list.
+**/
 EFI_STATUS
 EFIAPI
 UefiBootServicesTableLibConstructor (

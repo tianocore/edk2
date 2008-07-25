@@ -3675,6 +3675,8 @@ CpuPause (
                       function.
   @param  NewStack    A pointer to the new stack to use for the EntryPoint
                       function.
+  @param  ...         Extended parameters.
+
 
 **/
 VOID
@@ -4930,9 +4932,9 @@ AsmSwitchStackAndBackingStore (
   @param  PalEntryPoint The entry point address of PAL. The address in ar.kr5
                         would be used if this parameter were NULL on input.
   @param  Arg1          The first argument of a PAL call.
-  @param  Arg1          The second argument of a PAL call.
-  @param  Arg1          The third argument of a PAL call.
-  @param  Arg1          The fourth argument of a PAL call.
+  @param  Arg2          The second argument of a PAL call.
+  @param  Arg3          The third argument of a PAL call.
+  @param  Arg4          The fourth argument of a PAL call.
 
   @return The values returned in r8, r9, r10 and r11.
 
@@ -7061,7 +7063,7 @@ AsmDisablePaging32 (
   If EntryPoint is 0, then ASSERT().
   If NewStack is 0, then ASSERT().
 
-  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
+  @param  CodeSelector The 16-bit selector to load in the CS before EntryPoint
                       is called. The descriptor in the GDT that this selector
                       references must be setup for long mode.
   @param  EntryPoint  The 64-bit virtual address of the function to call with
@@ -7102,7 +7104,7 @@ AsmEnablePaging64 (
   If EntryPoint is 0, then ASSERT().
   If NewStack is 0, then ASSERT().
 
-  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
+  @param  CodeSelector The 16-bit selector to load in the CS before EntryPoint
                       is called. The descriptor in the GDT that this selector
                       references must be setup for 32-bit protected mode.
   @param  EntryPoint  The 64-bit virtual address of the function to call with

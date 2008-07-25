@@ -142,7 +142,7 @@ PciSegmentAnd8 (
   If any reserved bits in Address are set, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
-  @param  Andata    The value to AND with the PCI configuration register.
+  @param  AndData    The value to AND with the PCI configuration register.
   @param  OrData    The value to OR with the PCI configuration register.
 
   @return The value written to the PCI configuration register.
@@ -416,7 +416,7 @@ PciSegmentAnd16 (
   If any reserved bits in Address are set, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
-  @param  Andata    The value to AND with the PCI configuration register.
+  @param  AndData    The value to AND with the PCI configuration register.
   @param  OrData    The value to OR with the PCI configuration register.
 
   @return The value written to the PCI configuration register.

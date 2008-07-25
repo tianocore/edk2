@@ -17,6 +17,19 @@
 //
 
 
+/**
+  Shifts a 64-bit integer left between 0 and 63 bits. The low bits
+  are filled with zeros. The shifted value is returned.
+
+  This function shifts the 64-bit value Operand to the left by Count bits. The
+  low Count bits are set to zero. The shifted value is returned.
+
+  @param  Operand The 64-bit operand to shift left.
+  @param  Count   The number of bits to shift left.
+
+  @return Operand << Count
+
+**/
 UINT64
 EFIAPI
 InternalMathLShiftU64 (

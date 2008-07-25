@@ -28,9 +28,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   This empty function ensures that EFI_EVENT_NOTIFY_SIGNAL_ALL is error
   checked correctly since it is now mapped into CreateEventEx() in UEFI 2.0.
+ 
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
 
 **/
-STATIC
 VOID
 EFIAPI
 InternalEmptyFuntion (
@@ -135,7 +138,7 @@ EfiCreateEventLegacyBootEx (
   the EDK/EFI 1.10 form and EDK II/UEFI 2.0 form and allows common code to
   work both ways.
 
-  @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+  @param  ReadyToBootEvent  Returns the EFI event returned from gBS->CreateEvent(Ex).
 
   @retval EFI_SUCCESS       Event was created.
   @retval Other             Event was not created.
@@ -168,7 +171,7 @@ EfiCreateEventReadyToBoot (
   @param  NotifyTpl         The task priority level of the event.
   @param  NotifyFunction    The notification function to call when the event is signaled.
   @param  NotifyContext     The content to pass to NotifyFunction when the event is signaled.
-  @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+  @param  ReadyToBootEvent  Returns the EFI event returned from gBS->CreateEvent(Ex).
 
   @retval EFI_SUCCESS       Event was created.
   @retval Other             Event was not created.
@@ -269,7 +272,7 @@ EfiSignalEventLegacyBoot (
   function points to a location in FvDevicePathNode and it does not allocate
   new memory for the GUID pointer that is returned.
 
-  @param  FvDevicePathNode  Pointer to FV device path to check.
+  @param  FvFileDevicePathNode  Pointer to FV device path to check.
 
   @retval NULL              FvDevicePathNode is not valid.
   @retval Other             FvDevicePathNode is valid and pointer to NameGuid was returned.
@@ -302,7 +305,7 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   is compiled to conform with the UEFI 2.0 specification use the new device path
   else use the old form for backwards compatability.
 
-  @param  FvDevicePathNode  Pointer to a FV device path node to initialize
+  @param  FvFileDevicePathNode  Pointer to a FV device path node to initialize
   @param  NameGuid          FV file name to use in FvDevicePathNode
 
 **/

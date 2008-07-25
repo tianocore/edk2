@@ -17,6 +17,15 @@
 //
 
 
+/**
+  Reads the current value of Data Segment Register (DS).
+
+  Reads and returns the current value of DS. This function is only available on
+  IA-32 and X64.
+
+  @return The current value of DS.
+
+**/
 UINT16
 EFIAPI
 AsmReadDs (

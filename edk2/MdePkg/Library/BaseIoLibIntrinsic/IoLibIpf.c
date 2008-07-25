@@ -147,7 +147,7 @@ IoRead64 (
   operations are serialized.
 
   @param  Port  The I/O port to write.
-  @param  Value The value to write to the I/O port.
+  @param  Data  The value to write to the I/O port.
 
   @return The value written to the I/O port. It equals to the
           input Value instead of the actual value read back from
@@ -172,7 +172,7 @@ IoWrite8 (
   operations are serialized.
 
   @param  Port  The I/O port to write.
-  @param  Value The value to write to the I/O port.
+  @param  Data  The value to write to the I/O port.
 
   @return The value written to the I/O port. It equals to the
           input Value instead of the actual value read back from
@@ -197,7 +197,7 @@ IoWrite16 (
   operations are serialized.
 
   @param  Port  The I/O port to write.
-  @param  Value The value to write to the I/O port.
+  @param  Data  The value to write to the I/O port.
 
   @return The value written to the I/O port. It equals to the
           input Value instead of the actual value read back from

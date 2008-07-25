@@ -139,13 +139,11 @@ PiLibGetSectionFromCurrentFv (
     The data and size is returned by Buffer and Size. The caller is responsible to free the Buffer allocated 
     by this function. This function can only be called at TPL_NOTIFY and below.
     
-    If FvHandle is NULL and WithinImage is TRUE, then ASSERT ();
-    If NameGuid is NULL, then ASSERT();
     If Buffer is NULL, then ASSERT();
     If Size is NULL, then ASSERT().
   
-    @param  NameGuid             The GUID name of a Firmware File.
     @param  SectionType         The Firmware Section type.
+    @param  Instance            Instance number of a section.
     @param  Buffer                  On output, Buffer contains the the data read from the section in the Firmware File found.
     @param  Size                    On output, the size of Buffer.
   

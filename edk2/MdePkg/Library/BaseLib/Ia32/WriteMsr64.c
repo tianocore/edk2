@@ -17,6 +17,23 @@
 //
 
 
+/**
+  Writes a 64-bit value to a Machine Specific Register(MSR), and returns the
+  value.
+
+  Writes the 64-bit value specified by Value to the MSR specified by Index. The
+  64-bit value written to the MSR is returned. No parameter checking is
+  performed on Index or Value, and some of these may cause CPU exceptions. The
+  caller must either guarantee that Index and Value are valid, or the caller
+  must establish proper exception handlers. This function is only available on
+  IA-32 and X64.
+
+  @param  Index The 32-bit MSR index to write.
+  @param  Value The 64-bit value to write to the MSR.
+
+  @return Value
+
+**/
 UINT64
 EFIAPI
 AsmWriteMsr64 (

@@ -79,8 +79,8 @@ GetGraphicsBitMapFromFVEx (
 
   @param[in]      BmpImage      Pointer to BMP file
   @param[in]      BmpImageSize  Number of bytes in BmpImage
-  @param[in,out]  UgaBlt        Buffer containing UGA version of BmpImage.
-  @param[in,out]  UgaBltSize    Size of UgaBlt in bytes.
+  @param[in out]  UgaBlt        Buffer containing UGA version of BmpImage.
+  @param[in out]  UgaBltSize    Size of UgaBlt in bytes.
   @param[out]     PixelHeight   Height of UgaBlt/BmpImage in pixels
   @param[out]     PixelWidth    Width of UgaBlt/BmpImage in pixels
 

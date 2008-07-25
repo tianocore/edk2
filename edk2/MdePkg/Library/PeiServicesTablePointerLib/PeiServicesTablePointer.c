@@ -18,7 +18,7 @@
 
 #include "PeiServicesTablePointerInternal.h"
 
-static EFI_PEI_SERVICES  **gPeiServices;
+STATIC EFI_PEI_SERVICES  **gPeiServices;
 
 /**
   The function set the pointer of PEI services immediately preceding the IDT table
@@ -60,7 +60,7 @@ GetPeiServicesTablePointer (
   The constructor function caches the pointer to PEI services.
   It will always return EFI_SUCCESS.
 
-  @param  FfsHeader   Pointer to FFS header the loaded driver.
+  @param  FileHandle   Handle of FFS header the loaded driver.
   @param  PeiServices Pointer to the PEI services.
 
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.

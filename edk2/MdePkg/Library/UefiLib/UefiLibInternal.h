@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Internal include file for UefiLib.
 
   Copyright (c) 2007, Intel Corporation.<BR>

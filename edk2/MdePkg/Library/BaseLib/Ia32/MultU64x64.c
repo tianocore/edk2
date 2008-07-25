@@ -17,6 +17,20 @@
 //
 
 
+/**
+  Multiples a 64-bit unsigned integer by a 64-bit unsigned integer
+  and generates a 64-bit unsigned result.
+
+  This function multiples the 64-bit unsigned value Multiplicand by the 64-bit
+  unsigned value Multiplier and generates a 64-bit unsigned result. This 64-
+  bit unsigned result is returned.
+
+  @param  Multiplicand  A 64-bit unsigned value.
+  @param  Multiplier    A 64-bit unsigned value.
+
+  @return Multiplicand * Multiplier
+
+**/
 UINT64
 EFIAPI
 InternalMathMultU64x64 (

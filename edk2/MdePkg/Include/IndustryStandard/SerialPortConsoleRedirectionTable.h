@@ -1,4 +1,4 @@
-/**@file
+/** @file
   ACPI Serial Port Console Redirection Table as defined by Microsoft in
   http://www.microsoft.com/whdc/system/platform/server/spcr.mspx
     

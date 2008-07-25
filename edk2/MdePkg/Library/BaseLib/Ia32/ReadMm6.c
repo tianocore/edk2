@@ -17,6 +17,15 @@
 //
 
 
+/**
+  Reads the current value of 64-bit MMX Register #6 (MM6).
+
+  Reads and returns the current value of MM6. This function is only available
+  on IA-32 and X64.
+
+  @return The current value of MM6.
+
+**/
 UINT64
 EFIAPI
 AsmReadMm6 (

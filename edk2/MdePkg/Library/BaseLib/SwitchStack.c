@@ -41,6 +41,7 @@
                       function.
   @param  NewStack    A pointer to the new stack to use for the EntryPoint
                       function.
+  @param  ...         Extended parameters.
 
 **/
 VOID

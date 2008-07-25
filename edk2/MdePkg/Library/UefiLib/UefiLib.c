@@ -27,7 +27,6 @@
   @retval FALSE     Language 1 and language 2 are not the same.
 
 **/
-STATIC
 BOOLEAN
 CompareIso639LanguageCode (
   IN CONST CHAR8  *Language1,
@@ -257,7 +256,7 @@ EfiNamedEventSignal (
 
   @param  VOID
 
-  @retvale EFI_TPL              The current TPL.
+  @retval EFI_TPL              The current TPL.
 
 **/
 EFI_TPL
@@ -308,7 +307,7 @@ EfiInitializeLock (
   priority level of the mutual exclusion lock.  Then, it places the lock in the
   acquired state.
 
-  @param  Priority  The task priority level of the lock.
+  @param  Lock   The task lock with priority level.
 
 **/
 VOID
@@ -457,7 +456,7 @@ EfiTestManagedDevice (
 
   @param  ControllerHandle     A handle for a (parent) controller to test.
   @param  ChildHandle          A child handle to test.
-  @param  ConsumsedGuid        Supplies the protocol that the child controller
+  @param  ProtocolGuid         Supplies the protocol that the child controller
                                opens on its parent controller.
 
   @retval EFI_SUCCESS          ChildHandle is a child of the ControllerHandle.
@@ -1076,7 +1075,7 @@ AddUnicodeString2 (
     while (OldUnicodeStringTable->Language != NULL) {
       LanguageString = OldUnicodeStringTable->Language;
 
-      while (*LanguageString) {
+      while (*LanguageString != 0) {
         for (Index = 0; LanguageString[Index] != 0 && LanguageString[Index] != ';'; Index++);
 
         if (AsciiStrnCmp (Language, LanguageString, Index) == 0) { 

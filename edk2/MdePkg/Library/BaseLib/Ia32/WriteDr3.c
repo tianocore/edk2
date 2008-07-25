@@ -17,6 +17,17 @@
 //
 
 
+/**
+  Writes a value to Debug Register 3 (DR3).
+
+  Writes and returns a new value to DR3. This function is only available on
+  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+
+  @param  Dr3 The value to write to Dr3.
+
+  @return The value written to Debug Register 3 (DR3).
+
+**/
 UINTN
 EFIAPI
 AsmWriteDr3 (

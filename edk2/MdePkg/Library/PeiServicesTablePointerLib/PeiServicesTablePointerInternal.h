@@ -14,13 +14,14 @@
 
 #ifndef _PEI_SERVICE_TABLE_POINTER_INTERNAL_H_
 #define _PEI_SERVICE_TABLE_POINTER_INTERNAL_H_
+
 /**
   The constructor function caches the pointer to PEI services.
   
   The constructor function caches the pointer to PEI services.
   It will always return EFI_SUCCESS.
 
-  @param  FfsHeader   Pointer to FFS header the loaded driver.
+  @param  FileHandle  Handle of FFS header the loaded driver.
   @param  PeiServices Pointer to the PEI services.
 
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.

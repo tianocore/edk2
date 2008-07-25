@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _PCI_H
-#define _PCI_H
+#ifndef _PCI_H_
+#define _PCI_H_
 
 #include <IndustryStandard/Pci30.h>
 

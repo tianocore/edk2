@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _ATAPI_H
-#define _ATAPI_H
+#ifndef _ATAPI_H_
+#define _ATAPI_H_
 
 #pragma pack(1)
 

@@ -17,13 +17,20 @@
 //
 
 
-//
-// Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics
-//
+/**
+  Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
+**/
 void __debugbreak ();
 
 #pragma intrinsic(__debugbreak)
 
+/**
+  Generates a breakpoint on the CPU.
+
+  Generates a breakpoint on the CPU. The breakpoint must be implemented such
+  that code can resume normal execution after the breakpoint.
+
+**/
 VOID
 EFIAPI
 CpuBreakpoint (
