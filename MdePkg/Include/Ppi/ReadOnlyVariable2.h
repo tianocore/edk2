@@ -120,6 +120,7 @@ EFI_STATUS
   );
 
 /**
+  @par Ppi Description:
   This PPI provides a lightweight, read-only variant of the full EFI 
   variable services. 
 

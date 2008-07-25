@@ -1,7 +1,7 @@
 /** @file
-  EFI Driver Configuration Protocol
+  UEFI Driver Configuration2 Protocol
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -44,7 +44,7 @@ typedef enum {
   Allows the user to set controller specific options for a controller that a 
   driver is currently managing.
 
-  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_ PROTOCOL instance.
+  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION2_PROTOCOL instance.
   @param  ControllerHandle The handle of the controller to set options on.
   @param  ChildHandle      The handle of the child controller to set options on.  This
                            is an optional parameter that may be NULL.  It will be NULL
@@ -52,10 +52,9 @@ typedef enum {
                            options for the bus controller.  It will not be NULL for a
                            bus driver that wishes to set options for one of its child
                            controllers.
-  @param  Language         A pointer to a three character ISO 639-2 language identifier.
-                           This is the language of the user interface that should be
-                           presented to the user, and it must match one of the languages
-                           specified in SupportedLanguages.  The number of languages
+  @param  Language         A Null-terminated ASCII string that contains one or more RFC 3066
+                           language codes. This is the list of language codes that this
+                           protocol supports. The number of languages
                            supported by a driver is up to the driver writer.
   @param  ActionRequired   A pointer to the action that the calling agent is required
                            to perform when this function returns.  See "Related
@@ -95,7 +94,7 @@ EFI_STATUS
 /**
   Tests to see if a controller's current configuration options are valid.
 
-  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance.
+  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION2_PROTOCOL instance.
   @param  ControllerHandle The handle of the controller to test if it's current
                            configuration options are valid.
   @param  ChildHandle      The handle of the child controller to test if it's current
@@ -132,7 +131,7 @@ EFI_STATUS
 /**
   Forces a driver to set the default configuration options for a controller.
 
-  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_ PROTOCOL instance.
+  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION2_PROTOCOL instance.
   @param  ControllerHandle The handle of the controller to force default configuration options on.
   @param  ChildHandle      The handle of the child controller to force default configuration options on  This is an optional parameter that may be NULL.  It will be NULL for device drivers.  It will also be NULL for a bus drivers that wish to force default configuration options for the bus controller.  It will not be NULL for a bus driver that wishes to force default configuration options for one of its child controllers.
   @param  DefaultType      The type of default configuration options to force on the controller specified by ControllerHandle and ChildHandle.  See Table 9-1 for legal values.  A DefaultType of 0x00000000 must be supported by this protocol.
@@ -158,16 +157,6 @@ EFI_STATUS
   OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED                *ActionRequired
   );
 
-
-//
-//
-struct _EFI_DRIVER_CONFIGURATION2_PROTOCOL {
-  EFI_DRIVER_CONFIGURATION2_SET_OPTIONS     SetOptions;
-  EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID   OptionsValid;
-  EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS  ForceDefaults;
-  CHAR8                                     *SupportedLanguages;
-};
-
 /**
   Interface structure for the Driver Configuration Protocol.
 
@@ -183,11 +172,21 @@ struct _EFI_DRIVER_CONFIGURATION2_PROTOCOL {
   @param ForceDefaults       Forces a driver to set the default configuration options 
                              for a controller.
 
-  @param SupportedLanguages  A Null-terminated ASCII string that contains one or more 
-                             ISO 639-2 language codes.  This is the list of language 
-                             codes that this protocol supports.
+  @param SupportedLanguages  A Null-terminated ASCII string that
+                             contains one or more RFC 3066
+                             language codes.  This is the list
+                             of language codes that this
+                             protocol supports.
 
 **/
+struct _EFI_DRIVER_CONFIGURATION2_PROTOCOL {
+  EFI_DRIVER_CONFIGURATION2_SET_OPTIONS     SetOptions;
+  EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID   OptionsValid;
+  EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS  ForceDefaults;
+  CHAR8                                     *SupportedLanguages;
+};
+
+
 
 extern EFI_GUID gEfiDriverConfiguration2ProtocolGuid;
 

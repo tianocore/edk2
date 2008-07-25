@@ -42,18 +42,17 @@ typedef UINT32  EFI_HII_OUT_FLAGS;
 
   Definition of EFI_HII_ROW_INFO.
 
-  @param StartIndex The index of the first character in the
-                    string which is displayed on the line.
+  @param StartIndex     The index of the first character in the
+                        string which is displayed on the line.
 
-  @param EndIndex The index of the last character in the string
-                  which is displayed on the line. If this is the
-                  same as StartIndex, then no characters are
-                  displayed.
+  @param EndIndex       The index of the last character in the string
+                        which is displayed on the line. If this is the
+                        same as StartIndex, then no characters are
+                        displayed.
 
-  @param LineHeight The height of the line, in pixels.
+  @param LineHeight     The height of the line, in pixels.
 
-  @param LineWidth  The width of the text on the line, in
-                    pixels.
+  @param LineWidth      The width of the text on the line, in pixels.
 
   @param BaselineOffset The number of pixels above the bottom of
                         the row of the font baseline or 0 if
@@ -129,20 +128,21 @@ typedef struct {
   attempt to match with any font style. This flag cannot be used
   with EFI_FONT_INFO_SYS_STYLE or EFI_FONT_INFO_RESTYLE.
 
-  @param FontInfo Points to the font information or NULL if the
-                  string should use the default system font.
-  
+
   @param ForegroundColor  The color of the "on" pixels in the
                           glyph in the bitmap.
   
   @param BackgroundColor  The color of the "off" pixels in the
                           glyph in the bitmap.
   
-  @param FontInfoMask   The font information mask determines
-                        which portion of the font information
-                        will be used and what to do if the
-                        specific font is not available.
-  
+  @param FontInfoMask     The font information mask determines
+                          which portion of the font information
+                          will be used and what to do if the
+                          specific font is not available.
+
+  @param FontInfo         Points to the font information or NULL if the
+                          string should use the default system font.
+    
 **/
 typedef struct _EFI_FONT_DISPLAY_INFO {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL ForegroundColor;
@@ -172,11 +172,11 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
   EFI_HII_OUT_FLAG_CLIP_CLEAN_X is specified) even though those
   pixels were not drawn. If EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set,
   then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that
-  if a character????s right-most on pixel cannot fit, then it will
+  if a character's right-most on pixel cannot fit, then it will
   not be drawn at all. This flag requires that
   EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_CLIP_CLEAN_Y
   is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP
-  so that if a row????s bottom-most pixel cannot fit, then it will
+  so that if a row's bottom-most pixel cannot fit, then it will
   not be drawn at all. This flag requires that
   EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_WRAP is set,
   then text will be wrapped at the right-most line-break
@@ -185,7 +185,7 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
   the text will behave as if EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set.
   This flag cannot be used with EFI_HII_OUT_FLAG_CLIP_CLEAN_X. If
   EFI_HII_OUT_FLAG_TRANSPARENT is set, then BackgroundColor is
-  ignored and all ????off???? pixels in the character????s drawn
+  ignored and all 'off' pixels in the character's drawn
   will use the pixel value from Blt. This flag cannot be used if
   Blt is NULL upon entry. If EFI_HII_IGNORE_IF_NO_GLYPH is set,
   then characters which have no glyphs are not drawn. Otherwise,
@@ -196,45 +196,44 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
   directly to the output device specified by Screen. Otherwise the
   string will be rendered to the bitmap specified by Bitmap.
 
-  @param This A pointer to the EFI_HII_FONT_PROTOCOL instance.
+  @param This             A pointer to the EFI_HII_FONT_PROTOCOL instance.
 
-  @param Flags  Describes how the string is to be drawn.
+  @param Flags            Describes how the string is to be drawn.
 
-  @param String Points to the null-terminated string to be
-                displayed.
+  @param String           Points to the null-terminated string to be 
 
-  @param StringInfo Points to the string output information,
-                    including the color and font. If NULL, then
-                    the string will be output in the default
-                    system font and color.
+  @param StringInfo       Points to the string output information,
+                          including the color and font. If NULL, then
+                          the string will be output in the default
+                          system font and color.
 
-  @param Blt  If this points to a non-NULL on entry, this points
-              to the image, which is Width pixels wide and
-              Height pixels high. The string will be drawn onto
-              this image and EFI_HII_OUT_FLAG_CLIP is implied.
-              If this points to a NULL on entry, then a buffer
-              will be allocated to hold the generated image and
-              the pointer updated on exit. It is the caller's
-              responsibility to free this buffer.
+  @param Blt              If this points to a non-NULL on entry, this points
+                          to the image, which is Width pixels wide and
+                          Height pixels high. The string will be drawn onto
+                          this image and EFI_HII_OUT_FLAG_CLIP is implied.
+                          If this points to a NULL on entry, then a buffer
+                          will be allocated to hold the generated image and
+                          the pointer updated on exit. It is the caller's
+                          responsibility to free this buffer.
 
-  @param BltX, BltY Specifies the offset from the left and top
-                    edge of the image of the first character
-                    cell in the image.
+  @param BltX, BltY       Specifies the offset from the left and top
+                          edge of the image of the first character
+                          cell in the image.
 
-  @param RowInfoArray If this is non-NULL on entry, then on
-                    exit, this will point to an allocated buffer
-                    containing row information and
-                    RowInfoArraySize will be updated to contain
-                    the number of elements. This array describes
-                    the characters which were at least partially
-                    drawn and the heights of the rows. It is the
-                    caller's responsibility to free this buffer.
+  @param RowInfoArray     If this is non-NULL on entry, then on
+                          exit, this will point to an allocated buffer
+                          containing row information and
+                          RowInfoArraySize will be updated to contain
+                          the number of elements. This array describes
+                          the characters which were at least partially
+                          drawn and the heights of the rows. It is the
+                          caller's responsibility to free this buffer.
 
   @param RowInfoArraySize If this is non-NULL on entry, then on
                           exit it contains the number of
                           elements in RowInfoArray.
 
-  @param ColumnInfoArray If this is non-NULL, then on return it
+  @param ColumnInfoArray  If this is non-NULL, then on return it
                           will be filled with the horizontal
                           offset for each character in the
                           string on the row where it is
@@ -248,14 +247,13 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
                           normalized that some character cells
                           overlap.
 
-  @retval EFI_SUCCESS The string was successfully updated.
+  @retval EFI_SUCCESS           The string was successfully updated.
   
-  @retval EFI_OUT_OF_RESOURCES  Unable to allocate an output
-                                buffer for RowInfoArray or Blt.
+  @retval EFI_OUT_OF_RESOURCES  Unable to allocate an output buffer for RowInfoArray or Blt.
   
-  @retval EFI_INVALID_PARAMETER The String or Blt.
-  @retval EFI_INVALID_PARAMETER Flags were invalid combination..
+  @retval EFI_INVALID_PARAMETER The String or Blt was NULL.
 
+  @retval EFI_INVALID_PARAMETER Flags were invalid combination.
 **/
 typedef
 EFI_STATUS
@@ -292,11 +290,11 @@ EFI_STATUS
   specified by Height (unless EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is
   specified) even though those pixels were not drawn. If
   EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set, then it modifies the
-  behavior of EFI_HII_OUT_FLAG_CLIP so that if a character????s
+  behavior of EFI_HII_OUT_FLAG_CLIP so that if a character's
   right-most on pixel cannot fit, then it will not be drawn at
   all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If
   EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is set, then it modifies the
-  behavior of EFI_HII_OUT_FLAG_CLIP so that if a row????s bottom
+  behavior of EFI_HII_OUT_FLAG_CLIP so that if a row's bottom
   most pixel cannot fit, then it will not be drawn at all. This
   flag requires that EFI_HII_OUT_FLAG_CLIP be set. Draft for
   Review HII Protocols Version 2.1 November 3, 2006 1285 If
@@ -320,12 +318,13 @@ EFI_STATUS
   by Bitmap.
 
 
-  @param This A pointer to the EFI_HII_FONT_PROTOCOL instance.
+  @param This       A pointer to the EFI_HII_FONT_PROTOCOL instance.
 
-  @param Flags  Describes how the string is to be drawn.
+  @param Flags      Describes how the string is to be drawn.
 
-  @param PackageList  The package list in the HII database to
-                      search for the specified string.
+  @param PackageList  
+                    The package list in the HII database to
+                    search for the specified string.
 
   @param StringId   The string's id, which is unique within
                     PackageList.
@@ -339,28 +338,28 @@ EFI_STATUS
                     the string will be output in the default
                     system font and color.
 
-  @param Blt  If this points to a non-NULL on entry, this points
-              to the image, which is Width pixels wide and
-              Height pixels high. The string will be drawn onto
-              this image and EFI_HII_OUT_FLAG_CLIP is implied.
-              If this points to a NULL on entry, then a buffer
-              will be allocated to hold the generated image and
-              the pointer updated on exit. It is the caller's
-              responsibility to free this buffer.
+  @param Blt        If this points to a non-NULL on entry, this points
+                    to the image, which is Width pixels wide and
+                    Height pixels high. The string will be drawn onto
+                    this image and EFI_HII_OUT_FLAG_CLIP is implied.
+                    If this points to a NULL on entry, then a buffer
+                    will be allocated to hold the generated image and
+                    the pointer updated on exit. It is the caller's
+                    responsibility to free this buffer.
 
   @param BltX, BltY Specifies the offset from the left and top
                     edge of the output image of the first
                     character cell in the image.
 
-  @param RowInfoArray If this is non-NULL on entry, then on
-                      exit, this will point to an allocated
-                      buffer containing row information and
-                      RowInfoArraySize will be updated to
-                      contain the number of elements. This array
-                      describes the characters which were at
-                      least partially drawn and the heights of
-                      the rows. It is the caller's
-                      responsibility to free this buffer.
+  @param RowInfoArray     If this is non-NULL on entry, then on
+                          exit, this will point to an allocated
+                          buffer containing row information and
+                          RowInfoArraySize will be updated to
+                          contain the number of elements. This array
+                          describes the characters which were at
+                          least partially drawn and the heights of
+                          the rows. It is the caller's
+                          responsibility to free this buffer.
 
   @param RowInfoArraySize If this is non-NULL on entry, then on
                           exit it contains the number of
@@ -380,7 +379,7 @@ EFI_STATUS
                           some character cells overlap.
 
 
-  @retval EFI_SUCCESS The string was successfully updated.
+  @retval EFI_SUCCESS           The string was successfully updated.
 
   @retval EFI_OUT_OF_RESOURCES  Unable to allocate an output
                                 buffer for RowInfoArray or Blt.
@@ -388,9 +387,9 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER The String or Blt or Height or
                                 Width was NULL.
   @retval EFI_INVALID_PARAMETER The Blt or PackageList was NULL.
-  @retval EFI_INVALID_PARAMETER  Flags were invalid combination.
-  @retval EFI_NOT_FOUND   The specified PackageList is not in the Database or the stringid is not 
-                        in the specified PackageList. 
+  @retval EFI_INVALID_PARAMETER Flags were invalid combination.
+  @retval EFI_NOT_FOUND         The specified PackageList is not in the Database 
+                                or the stringid is not in the specified PackageList. 
 
 **/
 typedef
@@ -415,34 +414,33 @@ EFI_STATUS
 
   Convert the glyph for a single character into a bitmap.
 
-  @param This A pointer to the EFI_HII_FONT_PROTOCOL instance.
+  @param This       A pointer to the EFI_HII_FONT_PROTOCOL instance.
 
-  @param Char Character to retrieve.
+  @param Char       Character to retrieve.
 
   @param StringInfo Points to the string font and color
                     information or NULL if the string should use
                     the default system font and color.
 
-  @param Blt  Thus must point to a NULL on entry. A buffer will
-              be allocated to hold the output and the pointer
-              updated on exit. It is the caller's responsibility
-              to free this buffer.
+  @param Blt        Thus must point to a NULL on entry. A buffer will
+                    be allocated to hold the output and the pointer
+                    updated on exit. It is the caller's responsibility
+                    to free this buffer.
 
-  @param Baseline Number of pixels from the bottom of the bitmap
-                  to the baseline.
+  @param Baseline   Number of pixels from the bottom of the bitmap
+                    to the baseline.
 
 
-  @retval EFI_SUCCESS Glyph bitmap created.
+  @retval EFI_SUCCESS             Glyph bitmap created.
 
-  @retval EFI_OUT_OF_RESOURCES  Unable to allocate the output
-                                buffer Blt.
+  @retval EFI_OUT_OF_RESOURCES    Unable to allocate the output buffer Blt.
 
   @retval EFI_WARN_UNKNOWN_GLYPH  The glyph was unknown and was
                                   replaced with the glyph for
                                   Unicode character 0xFFFD.
 
-  @retval EFI_INVALID_PARAMETER Blt is NULL or Width is NULL or
-                                Height is NULL
+  @retval EFI_INVALID_PARAMETER   Blt is NULL or Width is NULL or
+                                  Height is NULL
 
 
 **/
@@ -463,29 +461,29 @@ EFI_STATUS
   all of the characters in the string must exist in order for a
   candidate font to be returned.
 
-  @param This A pointer to the EFI_HII_FONT_PROTOCOL instance.
+  @param This           A pointer to the EFI_HII_FONT_PROTOCOL instance.
 
-  @param FontHandle On entry, points to the font handle returned
-                    by a previous call to GetFontInfo() or NULL
-                    to start with the first font. On return,
-                    points to the returned font handle or points
-                    to NULL if there are no more matching fonts.
+  @param FontHandle     On entry, points to the font handle returned
+                        by a previous call to GetFontInfo() or NULL
+                        to start with the first font. On return,
+                        points to the returned font handle or points
+                        to NULL if there are no more matching fonts.
 
-  @param StringInfoIn Upon entry, points to the font to return
-                      information about. If NULL, then the information about the system default 
-                      font will be returned.
+  @param StringInfoIn   Upon entry, points to the font to return
+                        information about. If NULL, then the information about the system default 
+                        font will be returned.
 
   @param StringInfoOut  Upon return, contains the matching
                         font's information. If NULL, then no
                         information is returned.
 
-  @param String Points to the string which will be tested to
-                determine if all characters are available. If
-                NULL, then any font is acceptable.
+  @param String         Points to the string which will be tested to
+                        determine if all characters are available. If
+                        NULL, then any font is acceptable.
   
-  @retval EFI_SUCCESS Matching font returned successfully.
+  @retval EFI_SUCCESS            Matching font returned successfully.
   
-  @retval EFI_NOT_FOUND No matching font was found.
+  @retval EFI_NOT_FOUND          No matching font was found.
   
   @retval EFI_INVALID_PARAMETER  StringInfoIn->FontInfoMask is an invalid combination.
 
@@ -503,19 +501,16 @@ EFI_STATUS
 );
 
 /**
+  @par Protocol Description:
+  The protocol provides the service to retrieve the font informations.
 
-  The protocol provides the service to retrieve the font
-  informations;
+  @param StringToImage    Render a string to a bitmap or to the display.
 
-  @param StringToImage  Render a string to a bitmap or to the
-                        display.
+  @param StringIdToImage  Render a string to a bitmap or to the display.
 
-  @param StringIdToImage  Render a string to a bitmap or to the
-                          display.
-  @param GetGlyph Return a specific glyph in a specific font.
+  @param GetGlyph         Return a specific glyph in a specific font.
 
-  @param GetFontInfo  Return font information for a specific
-                      font.
+  @param GetFontInfo      Return font information for a specific font.
 
 **/
 struct _EFI_HII_FONT_PROTOCOL {

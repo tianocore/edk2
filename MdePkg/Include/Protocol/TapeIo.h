@@ -2,7 +2,7 @@
   EFI_TAPE_IO_PROTOCOL as defined in the UEFI 2.0.
   Provide services to control and access a tape device.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -220,6 +220,31 @@ EFI_STATUS
   )
 ;    
 
+/**  
+  @par Protocol Description:
+  The EFI_TAPE_IO_PROTOCOL provides basic sequential operations for tape devices. 
+  These include read, write, rewind, space, write filemarks and reset functions. 
+  Per this specification, a boot application uses the services of this protocol 
+  to load the bootloader image from tape.
+
+  @param TapeRead
+  Read a block of data from the tape. 
+
+  @param TapeWrite
+  Write a block of data to the tape. 
+
+  @param TapeRewind
+  Rewind the tape. 
+
+  @param TapeSpace
+  Position the tape. 
+
+  @param TapeWriteFM
+  Write filemarks to the tape. 
+
+  @param TapeReset
+  Reset the tape device or its parent bus. 
+**/
 struct _EFI_TAPE_IO_PROTOCOL {
   EFI_TAPE_READ           TapeRead;
   EFI_TAPE_WRITE          TapeWrite;

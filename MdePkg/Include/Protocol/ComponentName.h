@@ -1,7 +1,9 @@
 /** @file
-  EFI Component Name Protocol
+  EFI Component Name Protocol as defined in the EFI 1.1 specification.
+  This protocol is used to retrieve user readable names of EFI Drivers 
+  and controllers managed by EFI Drivers.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -112,6 +114,24 @@ EFI_STATUS
 //
 // Interface structure for the Component Name Protocol
 //
+/**
+  @par Protocol Description:
+  This protocol is used to retrieve user readable names of drivers 
+  and controllers managed by UEFI Drivers.
+
+  @param GetDriverName
+  Retrieves a Unicode string that is the user readable name of the driver.
+  
+  @param GetControllerName
+  Retrieves a Unicode string that is the user readable name of a
+  controller that is being managed by a driver.
+  
+  @param SupportedLanguages 
+  A Null-terminated ASCII string that contains one or more
+  ISO 639-2 language codes. This is the list of language codes
+  that this protocol supports.
+  
+**/
 struct _EFI_COMPONENT_NAME_PROTOCOL {
   EFI_COMPONENT_NAME_GET_DRIVER_NAME      GetDriverName;
   EFI_COMPONENT_NAME_GET_CONTROLLER_NAME  GetControllerName;

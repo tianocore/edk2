@@ -3,7 +3,7 @@
   This file provides a definition of the EFI IPv4 Configuration
   Protocol.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -113,6 +113,21 @@ EFI_STATUS
   )
 ;
 
+/**  
+  @par Protocol Description:
+  The EFI_IP4_CONFIG_PROTOCOL driver performs platform- and policy-dependent 
+  configuration for the EFI IPv4 Protocol driver. 
+  
+  @param Start
+  Starts running the configuration policy for the EFI IPv4 Protocol driver. 
+
+  @param Stop
+  Stops running the configuration policy for the EFI IPv4 Protocol driver. 
+
+  @param GetData
+  Returns the default configuration data (if any) for the EFI IPv4 Protocol driver.  
+
+**/
 struct _EFI_IP4_CONFIG_PROTOCOL {
   EFI_IP4_CONFIG_START         Start;
   EFI_IP4_CONFIG_STOP          Stop;

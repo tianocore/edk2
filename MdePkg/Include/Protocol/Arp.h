@@ -10,7 +10,7 @@
   address to hardware address used by a data link protocol.
   
   
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -59,8 +59,8 @@ typedef struct {
 /**
   Assigns a station address (protocol type and network address) to this instance of the ARP cache.
 
-  @param  This                   A pointer to the EFI_ARP_PROTOCOL instance.
-  @param  ConfigData             A pointer to the EFI_ARP_CONFIG_DATA structure.Buffer
+  @param  This                  A pointer to the EFI_ARP_PROTOCOL instance.
+  @param  ConfigData            A pointer to the EFI_ARP_CONFIG_DATA structure.Buffer
 
   @retval EFI_SUCCESS           The new station address was successfully registered.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
@@ -93,10 +93,14 @@ EFI_STATUS
                           nonzero value will override the one given by Configure() if
                           the entry to be added is dynamic entry.
   @param  Overwrite       If TRUE, the matching cache entry will be overwritten with the
-                          supplied parameters. If FALSE, EFI_ACCESS_DENIED
+                          supplied parameters. If FALSE, EFI_ACCESS_DENIED is returned 
+                          if the corresponding cache entry already exists.
 
   @retval EFI_SUCCESS           The entry has been added or updated.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                This is NULL. DenyFlag is FALSE and TargetHwAddress is NULL.
+                                DenyFlag is FALSE and TargetSwAddress is NULL. TargetHwAddress is NULL and TargetSwAddress is NULL. 
+                                Both TargetSwAddress and TargetHwAddress are not NULL when DenyFlag is TRUE.
   @retval EFI_OUT_OF_RESOURCES  The new ARP cache entry could not be allocated.
   @retval EFI_ACCESS_DENIED     The ARP cache entry already exists and Overwrite is not true.
   @retval EFI_NOT_STARTED       The ARP driver instance has not been configured.
@@ -132,6 +136,8 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The requested ARP cache entries were copied into the buffer.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                This is NULL. Both EntryCount and EntryLength are NULL, 
+                                when Refresh is FALSE.
   @retval EFI_NOT_FOUND         No matching entries were found.
   @retval EFI_NOT_STARTED       The ARP driver instance has not been configured.
 
@@ -177,7 +183,7 @@ EFI_STATUS
 /**
   Removes all dynamic ARP cache entries that were added by this interface.
 
-  @param  This                   A pointer to the EFI_ARP_PROTOCOL instance.
+  @param  This                  A pointer to the EFI_ARP_PROTOCOL instance.
                                  
   @retval EFI_SUCCESS           The cache has been flushed.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -251,6 +257,33 @@ EFI_STATUS
   )
 ;  
 
+/**
+  @par Protocol Description:
+  ARP is used to resolve local network protocol addresses into 
+  network hardware addresses.
+
+  @param Configure
+  Adds a new station address (protocol type and network address) to the ARP cache.
+  
+  @param Add
+  Manually inserts an entry to the ARP cache for administrative purpose.
+
+  @param Find
+  Locates one or more entries in the ARP cache.
+
+  @param Delete
+  Removes an entry from the ARP cache.
+  
+  @param Flush
+  Removes all dynamic ARP cache entries of a specified protocol type.
+  
+  @param Request
+  Starts an ARP request session.
+  
+  @param Cancel
+  Abort previous ARP request session.
+
+**/
 struct _EFI_ARP_PROTOCOL {
   EFI_ARP_CONFIGURE         Configure;
   EFI_ARP_ADD               Add;

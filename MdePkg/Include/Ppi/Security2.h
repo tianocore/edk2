@@ -2,7 +2,7 @@
   This file declares Pei Security2 PPI.
 
   This PPI is installed by some platform PEIM that abstracts the security 
-  policy to the PEI Foundation, namely the case of a PEIM¡¯s authentication 
+  policy to the PEI Foundation, namely the case of a PEIM's authentication 
   state being returned during the PEI section extraction process.
 
   Copyright (c) 2006 - 2008, Intel Corporation
@@ -105,7 +105,7 @@ EFI_STATUS
 );
 
 /**
-   
+  @par Ppi Description: 
   This PPI is a means by which the platform builder can indicate
   a response to a PEIM's authentication state. This can be in
   the form of a requirement for the PEI Foundation to skip a

@@ -6,7 +6,7 @@
   so that a multiple drivers can use the underlying hashing services.
   The EFI Service Binding Protocol defines the generic Service Binding Protocol functions.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -130,6 +130,18 @@ EFI_STATUS
   )
 ;    
 
+/**
+  @par Protocol Description:
+  This protocol allows creating a hash of an arbitrary message digest 
+  using one or more hash algorithms.
+
+  @param GetHashSize
+  Return the size of a specific type of resulting hash.
+  
+  @param Hash
+  Create a hash for the specified message.
+
+**/
 struct _EFI_HASH_PROTOCOL {
   EFI_HASH_GET_HASH_SIZE          GetHashSize;
   EFI_HASH_HASH                   Hash;

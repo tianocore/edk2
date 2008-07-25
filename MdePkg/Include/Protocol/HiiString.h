@@ -24,36 +24,34 @@
 
 typedef struct _EFI_HII_STRING_PROTOCOL EFI_HII_STRING_PROTOCOL;
 
-
-
 /**
-  This function adds the string String to the group of strings
-  owned by PackageList, with the specified font information
-  StringFontInfo and returns a new string id.
+  This function adds the string String to the group of strings owned by PackageList, with the
+  specified font information StringFontInfo and returns a new string id.
 
-  @param This A pointer to the EFI_HII_STRING_PROTOCOL instance.
+  @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
+  @param  PackageList            Handle of the package list where this string will
+                                 be added.
+  @param  StringId               On return, contains the new strings id, which is
+                                 unique within PackageList.
+  @param  Language               Points to the language for the new string.
+  @param  LanguageName           Points to the printable language name to associate
+                                 with the passed in  Language field.If LanguageName
+                                 is not NULL and the string package header's
+                                 LanguageName  associated with a given Language is
+                                 not zero, the LanguageName being passed  in will
+                                 be ignored.
+  @param  String                 Points to the new null-terminated string.
+  @param  StringFontInfo         Points to the new string's font information or
+                                 NULL if the string should have the default system
+                                 font, size and style.
 
-  @param PackageList  Handle of the package list where this
-                      string will be added.
-
-  @param Language Points to the language for the new string.
-
-  @param String   Points to the new null-terminated string.
-
-  @param StringFontInfo Points to the new string's font
-                        information or NULL if the string should
-                        have the default system font, size and
-                        style. StringId On return, contains the
-                        new strings id, which is unique within
-                        PackageList.
-
-  @retval EFI_SUCCESS The new string was added successfully
-  
-  @retval EFI_OUT_OF_RESOURCES  Could not add the string.
-  
-  @retval EFI_INVALID_PARAMETER String is NULL or StringId is
-                                NULL or Language is NULL.
-
+  @retval EFI_SUCCESS            The new string was added successfully.
+  @retval EFI_NOT_FOUND          The specified PackageList could not be found in
+                                 database.
+  @retval EFI_OUT_OF_RESOURCES   Could not add the string due to lack of resources.
+  @retval EFI_INVALID_PARAMETER  String is NULL or StringId is NULL or Language is NULL.
+  @retval EFI_INVALID_PARAMETER  The specified StringFontInfo does not exist in
+                                 current database.
 
 **/
 typedef
@@ -70,58 +68,35 @@ EFI_STATUS
 
 
 /**
+  This function retrieves the string specified by StringId which is associated
+  with the specified PackageList in the language Language and copies it into
+  the buffer specified by String.
 
-  This function retrieves the string specified by StringId which
-  is associated with the specified PackageList in the language
-  Language and copies it into the buffer specified by String. If
-  the string specified by StringId is not present in the
-  specified PackageList, then EFI_NOT_FOUND is returned. If the
-  string specified by StringId is present, but not in the
-  specified language then EFI_INVALID_LANGUAGE is returned. If
-  the buffer specified by StringSize is too small to hold the
-  string, then EFI_BUFFER_TOO_SMALL will be returned. StringSize
-  will be updated to the size of buffer actually required to
-  hold the string.
+  @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
+  @param  Language               Points to the language for the retrieved string.
+  @param  PackageList            The package list in the HII database to search for
+                                 the  specified string.
+  @param  StringId               The string's id, which is unique within
+                                 PackageList.
+  @param  String                 Points to the new null-terminated string.
+  @param  StringSize             On entry, points to the size of the buffer pointed
+                                 to by  String, in bytes. On return, points to the
+                                 length of the string, in bytes.
+  @param  StringFontInfo         If not NULL, points to the string's font
+                                 information.  It's caller's responsibility to free
+                                 this buffer.
 
-  @param This A pointer to the EFI_HII_STRING_PROTOCOL instance.
-  
-  @param PackageList  The package list in the HII database to
-                      search for the specified string.
-  
-  @param Language   Points to the language for the retrieved
-                    string.
-  
-  @param StringId   The string's id, which is unique within
-                    PackageList.
-  
-  @param String   Points to the new null-terminated string.
-  
-  @param StringSize On entry, points to the size of the buffer
-                    pointed to by String, in bytes. On return,
-                    points to the length of the string, in
-                    bytes.
-  
-  @param StringFontInfo  Points to a buffer that will be callee allocated and will 
-                      have the string's font information into this buffer.  
-                      The caller is responsible for freeing this buffer.  
-                      If the parameter is NULL a buffer will not be allocated 
-                      and the string font information will not be returned.
-  
-  @retval EFI_SUCCESS The string was returned successfully.
-  
-  @retval EFI_NOT_FOUND The string specified by StringId is not
-                        available. The specified PackageList is not in the database.
-  
-  @retval EFI_INVALID_LANGUAGE  The string specified by StringId
-                                is available but not in the
-                                specified language.
-  
-  @retval EFI_BUFFER_TOO_SMALL  The buffer specified by
-                                StringLength is too small to
-                                hold the string.
-  
-  @retval EFI_INVALID_PARAMETER The String or Language was NULL.
-  
+  @retval EFI_SUCCESS            The string was returned successfully.
+  @retval EFI_NOT_FOUND          The string specified by StringId is not available.
+  @retval EFI_NOT_FOUND          The string specified by StringId is available but
+                                 not in the specified language.
+                                 The specified PackageList is not in the database.
+  @retval EFI_BUFFER_TOO_SMALL   The buffer specified by StringSize is too small to
+                                 hold the string.
+  @retval EFI_INVALID_PARAMETER  The String or Language or StringSize was NULL.
+  @retval EFI_OUT_OF_RESOURCES   There were insufficient resources to complete the
+                                 request.
+
 **/
 typedef
 EFI_STATUS
@@ -136,36 +111,26 @@ EFI_STATUS
 );
 
 /**
-  This function updates the string specified by StringId in the
-  specified PackageList to the text specified by String and,
-  optionally, the font information specified by StringFontInfo.
-  There is no way to change the font information without changing
-  the string text.
+  This function updates the string specified by StringId in the specified PackageList to the text
+  specified by String and, optionally, the font information specified by StringFontInfo.
 
-  @param This A pointer to the EFI_HII_STRING_PROTOCOL instance.
+  @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
+  @param  PackageList            The package list containing the strings.
+  @param  StringId               The string's id, which is unique within
+                                 PackageList.
+  @param  Language               Points to the language for the updated string.
+  @param  String                 Points to the new null-terminated string.
+  @param  StringFontInfo         Points to the string's font information or NULL if
+                                 the  string font information is not changed.
 
-  @param PackageList  The package list containing the strings.
-
-  @param Language Points to the language for the updated string.
-
-  @param StringId The string id, which is unique within
-                  PackageList.
-
-  @param String   Points to the new null-terminated string.
-
-  @param StringFontInfo Points to the string's font information
-                        or NULL if the string font information
-                        is not changed.
-
-  @retval EFI_SUCCESS   The string was successfully updated.
-  
-  @retval EFI_NOT_FOUND The string specified by StringId is not
-                        in the database. The specified PackageList is not in the database.
-  
-  @retval EFI_INVALID_PARAMETER The String or Language was NULL.
-  
-  @retval EFI_OUT_OF_RESOURCES  The system is out of resources
-                                to accomplish the task.
+  @retval EFI_SUCCESS            The string was updated successfully.
+  @retval EFI_NOT_FOUND          The string specified by StringId is not in the
+                                 database.
+  @retval EFI_INVALID_PARAMETER  The String or Language was NULL.
+  @retval EFI_INVALID_PARAMETER  The specified StringFontInfo does not exist in
+                                 current database.
+  @retval EFI_OUT_OF_RESOURCES   The system is out of resources to accomplish the
+                                 task.
 
 **/
 typedef
@@ -181,33 +146,22 @@ EFI_STATUS
 
 
 /**
-
   This function returns the list of supported languages.
 
-  @param This A pointer to the EFI_HII_STRING_PROTOCOL instance.
+  @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
+  @param  PackageList            The package list to examine.
+  @param  Languages              Points to the buffer to hold the returned string.
+  @param  LanguagesSize          On entry, points to the size of the buffer pointed
+                                 to by  Languages, in bytes. On  return, points to
+                                 the length of Languages, in bytes.
 
-  @param PackageList  The package list to examine.
-
-  @param Languages  Points to the buffer to hold the returned
-                    string.
-
-  @param LanguageSize   On entry, points to the size of the
-                        buffer pointed to by Languages, in
-                        bytes. On return, points to the length
-                        of Languages, in bytes.
-
-
-  @retval EFI_SUCCESS The languages were returned successfully.
-  
-  @retval EFI_BUFFER_TOO_SMALL  The LanguagesSize is too small
-                                to hold the list of supported
-                                languages. LanguageSize is
-                                updated to contain the required
-                                size.
-  
-  @retval EFI_INVALID_PARAMETER Languages or LanguagesSize is NULL.
-  @retval EFI_NOT_FOUND The specified PackageList is not in the database.
-
+  @retval EFI_SUCCESS            The languages were returned successfully.
+  @retval EFI_INVALID_PARAMETER  The Languages or LanguagesSize was NULL.
+  @retval EFI_BUFFER_TOO_SMALL   The LanguagesSize is too small to hold the list of
+                                 supported languages. LanguageSize is updated to
+                                 contain the required size.
+  @retval EFI_NOT_FOUND          Could not find string package in specified
+                                 packagelist.
 
 **/
 typedef
@@ -221,50 +175,32 @@ EFI_STATUS
 
 
 /**
+  Each string package has associated with it a single primary language and zero
+  or more secondary languages. This routine returns the secondary languages
+  associated with a package list.
 
-  Each string package has associated with it a single primary
-  language and zero or more secondary languages. This routine
-  returns the secondary languages associated with a package list.
+  @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
+  @param  PackageList            The package list to examine.
+  @param  FirstLanguage          Points to the primary language.
+  @param  SecondaryLanguages     Points to the buffer to hold the returned list of
+                                 secondary languages for the specified
+                                 FirstLanguage. If there are no secondary
+                                 languages, the function  returns successfully, but
+                                 this is set to NULL.
+  @param  SecondaryLanguagesSize On entry, points to the size of the buffer pointed
+                                 to  by SecondaryLanguages, in bytes. On return,
+                                 points to the length of SecondaryLanguages in bytes.
 
-  @param This   A pointer to the EFI_HII_STRING_PROTOCOL
-                instance.
-
-  @param PackageList  The package list to examine.
-
-  @param FirstLanguage  Points to the primary language.
-
-  @param Languages  are specified in the format specified in
-                    Appendix M of the UEFI 2.0 specification.
-
-  @param SecondaryLanguages Points to the buffer to hold the
-                            returned list of secondary languages
-                            for the specified FirstLanguage. If
-                            there are no secondary languages,
-                            the function returns successfully,
-                            but this is set to NULL.
-
-  @param SecondaryLanguageSize  On entry, points to the size of
-                                the buffer pointed to by
-                                Languages, in bytes. On return,
-                                points to the length of
-                                Languages in bytes.
-
-  @retval EFI_SUCCESS   Secondary languages correctly returned
-
-  @retval EFI_BUFFER_TOO_SMALL  The buffer specified by
-                                SecondLanguagesSize is too small
-                                to hold the returned
-                                information. SecondLanguageSize
-                                is updated to hold the size of
-                                the buffer required.
-
-  @retval EFI_INVALID_LANGUAGE  The language specified by
-                                FirstLanguage is not present in
-                                the specified package list.
-
-  @retval EFI_INVALID_PARAMETER FirstLanguage is NULL or
-                                SecondLanguage is NULL.
-  @retval EFI_NOT_FOUND The specified PackageList is not in the database.
+  @retval EFI_SUCCESS            Secondary languages were correctly returned.
+  @retval EFI_INVALID_PARAMETER  FirstLanguage or SecondaryLanguages or
+                                 SecondaryLanguagesSize was NULL.
+  @retval EFI_BUFFER_TOO_SMALL   The buffer specified by SecondaryLanguagesSize is
+                                 too small to hold the returned information.
+                                 SecondLanguageSize is updated to hold the size of
+                                 the buffer required.
+  @retval EFI_INVALID_LANGUAGE   The language specified by FirstLanguage is not
+                                 present in the specified package list.
+  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.                                
 
 **/
 typedef
@@ -279,15 +215,16 @@ EFI_STATUS
 
 
 /**
+  @par Protocol Description:
   Services to manipulate the string.
    
-  @param NewString  Add a new string. GetString Retrieve a
-                    string and related string information.
+  @param NewString              Add a new string. GetString Retrieve a
+                                string and related string information.
 
-  @param SetString  Change a string. 
+  @param SetString              Change a string. 
 
-  @param GetLanguages   List the languages for a particular
-                        package list.
+  @param GetLanguages           List the languages for a particular
+                                package list.
 
   @param GetSecondaryLanguages  List supported secondary
                                 languages for a particular

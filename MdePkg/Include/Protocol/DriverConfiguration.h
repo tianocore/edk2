@@ -1,7 +1,7 @@
 /** @file
   EFI Driver Configuration Protocol
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -33,7 +33,7 @@ typedef struct _EFI_DRIVER_CONFIGURATION_PROTOCOL  EFI_DRIVER_CONFIGURATION_PROT
   Allows the user to set controller specific options for a controller that a 
   driver is currently managing.
 
-  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_ PROTOCOL instance.
+  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance.
   @param  ControllerHandle The handle of the controller to set options on.
   @param  ChildHandle      The handle of the child controller to set options on.  This
                            is an optional parameter that may be NULL.  It will be NULL
@@ -121,7 +121,7 @@ EFI_STATUS
 /**
   Forces a driver to set the default configuration options for a controller.
 
-  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_ PROTOCOL instance.
+  @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance.
   @param  ControllerHandle The handle of the controller to force default configuration options on.
   @param  ChildHandle      The handle of the child controller to force default configuration options on  This is an optional parameter that may be NULL.  It will be NULL for device drivers.  It will also be NULL for a bus drivers that wish to force default configuration options for the bus controller.  It will not be NULL for a bus driver that wishes to force default configuration options for one of its child controllers.
   @param  DefaultType      The type of default configuration options to force on the controller specified by ControllerHandle and ChildHandle.  See Table 9-1 for legal values.  A DefaultType of 0x00000000 must be supported by this protocol.
@@ -148,15 +148,6 @@ EFI_STATUS
   );
 
 
-//
-//
-struct _EFI_DRIVER_CONFIGURATION_PROTOCOL {
-  EFI_DRIVER_CONFIGURATION_SET_OPTIONS    SetOptions;
-  EFI_DRIVER_CONFIGURATION_OPTIONS_VALID  OptionsValid;
-  EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS ForceDefaults;
-  CHAR8                                   *SupportedLanguages;
-};
-
 /**
   Interface structure for the Driver Configuration Protocol.
 
@@ -177,6 +168,13 @@ struct _EFI_DRIVER_CONFIGURATION_PROTOCOL {
                              codes that this protocol supports.
 
 **/
+struct _EFI_DRIVER_CONFIGURATION_PROTOCOL {
+  EFI_DRIVER_CONFIGURATION_SET_OPTIONS    SetOptions;
+  EFI_DRIVER_CONFIGURATION_OPTIONS_VALID  OptionsValid;
+  EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS ForceDefaults;
+  CHAR8                                   *SupportedLanguages;
+};
+
 
 extern EFI_GUID gEfiDriverConfigurationProtocolGuid;
 

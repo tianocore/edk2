@@ -225,6 +225,7 @@ EFI_STATUS
 
 
 /*
+  @par Ppi Description:
   This PPI provides functions for accessing a memory-mapped firmware volume of a specific format.
 
   @param  ProcessVolume       Process a firmware volume and create a volume handle.

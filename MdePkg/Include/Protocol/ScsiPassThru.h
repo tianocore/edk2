@@ -1,7 +1,14 @@
 /** @file
-  SCSI Pass Through protocol.
+  SCSI Pass Through protocol as defined in EFI 1.1.
+  This protocol allows information about a SCSI channel to be collected, 
+  and allows SCSI Request Packets to be sent to any SCSI devices on a SCSI
+  channel even if those devices are not boot devices. This protocol is attached 
+  to the device handle of each SCSI channel in a system that the protocol 
+  supports, and can be used for diagnostics. It may also be used to build 
+  a Block I/O driver for SCSI hard drives and SCSI CD-ROM or DVD drives to
+  allow those devices to become boot devices.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -295,6 +302,37 @@ EFI_STATUS
   )
 ;
 
+/**  
+  @par Protocol Description:
+  The EFI_SCSI_PASS_THRU_PROTOCOL provides information about a SCSI channel and
+  the ability to send SCI Request Packets to any SCSI device attached to that SCSI channel. The
+  information includes the Target ID of the host controller on the SCSI channel, the attributes of
+  the SCSI channel, the printable name for the SCSI controller, and the printable name of the
+  SCSI channel.
+
+  @param Mode 
+  A pointer to the EFI_SCSI_PASS_THRU_MODE data for this SCSI channel.
+
+  @param PassThru 
+  Sends a SCSI Request Packet to a SCSI device that is connected to the SCSI channel.
+
+  @param GetNextDevice 
+  Used to retrieve the list of legal Target IDs and LUNs for the
+  SCSI devices on a SCSI channel. 
+
+  @param BuildDevicePath 
+  Used to allocate and build a device path node for a SCSI device on a SCSI channel.
+
+  @param GetTargetLun 
+  Used to translate a device path node to a Target ID and LUN.
+
+  @param ResetChannel 
+  Resets the SCSI channel. This operation resets all the SCSI
+  devices connected to the SCSI channel.
+
+  @param ResetTarget 
+  Resets a SCSI device that is connected to the SCSI channel. 
+**/
 struct _EFI_SCSI_PASS_THRU_PROTOCOL {
   EFI_SCSI_PASS_THRU_MODE               *Mode;
   EFI_SCSI_PASS_THRU_PASSTHRU           PassThru;

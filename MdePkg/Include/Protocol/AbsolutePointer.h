@@ -2,7 +2,7 @@
   The file provides services that allow information about a
   absolute pointer device to be retrieved.
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -32,12 +32,7 @@ typedef struct _EFI_ABSOLUTE_POINTER_PROTOCOL EFI_ABSOLUTE_POINTER_PROTOCOL;
 /**
   The following data values in the EFI_ABSOLUTE_POINTER_MODE
   interface are read-only and are changed by using the appropriate
-  interface functions:
-  Attributes The following bits are set as needed (or'd
-  together) to indicate the capabilities of the device
-  supported. The remaining bits are undefined and should be
-  returned as 0.
-
+  interface functions.
   
   @param AbsoluteMinX The Absolute Minimum of the device on the
                       x-axis.
@@ -62,6 +57,10 @@ typedef struct _EFI_ABSOLUTE_POINTER_PROTOCOL EFI_ABSOLUTE_POINTER_PROTOCOL;
                       z-axis. If 0 , and the AbsoluteMinX is 0,
                       then the pointer device does not support a
                       zaxis. 
+
+  @param Attributes   The following bits are set as needed (or'd
+                      together) to indicate the capabilities of the device
+                      supported. The remaining bits are undefined and should be 0.
 
 **/
 typedef struct {
@@ -96,15 +95,15 @@ typedef struct {
   process is not defined by this specification and is left up to
   the platform firmware or driver to implement.
 
-  @param This A pointer to the EFI_ABSOLUTE_POINTER_PROTOCOL
-              instance.
+  @param This                 A pointer to the EFI_ABSOLUTE_POINTER_PROTOCOL
+                              instance.
 
   @param ExtendedVerification Indicates that the driver may
                               perform a more exhaustive
                               verification operation of the
                               device during reset.
 
-  @retval EFI_SUCCESS The device was reset.
+  @retval EFI_SUCCESS       The device was reset.
   
   @retval EFI_DEVICE_ERROR  The device is not functioning
                             correctly and could not be reset.
@@ -159,7 +158,7 @@ EFI_STATUS
                   support an z-axis, and this field must be
                   ignored.
 
-  @param ActiveButtons  Bits are set to 1 in this structure item
+  @param ActiveButtons Bits are set to 1 in this structure item
                        to indicate that device buttons are
                        active.
 
@@ -184,17 +183,17 @@ typedef struct {
   information, then EFI_DEVICE_ERROR is returned.
 
 
-  @param This A pointer to the EFI_ABSOLUTE_POINTER_PROTOCOL
-              instance.
+  @param This   A pointer to the EFI_ABSOLUTE_POINTER_PROTOCOL
+                instance.
 
   @param State  A pointer to the state information on the
                 pointer device.
 
-  @retval EFI_SUCCESS The state of the pointer device was
-                      returned in State.
+  @retval EFI_SUCCESS       The state of the pointer device was
+                            returned in State.
 
-  @retval EFI_NOT_READY The state of the pointer device has not
-                        changed since the last call to GetState().
+  @retval EFI_NOT_READY     The state of the pointer device has not
+                            changed since the last call to GetState().
 
   @retval EFI_DEVICE_ERROR  A device error occurred while
                             attempting to retrieve the pointer
@@ -204,12 +203,13 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ABSOLUTE_POINTER_GET_STATE)(
-  IN 		EFI_ABSOLUTE_POINTER_PROTOCOL *This,
-  IN OUT    EFI_ABSOLUTE_POINTER_STATE    *State
+  IN 		EFI_ABSOLUTE_POINTER_PROTOCOL  *This,
+  IN OUT    EFI_ABSOLUTE_POINTER_STATE *State
 );
 
 
 /**
+  @par Protocol Description:
   The EFI_ABSOLUTE_POINTER_PROTOCOL provides a set of services
   for a pointer device that can be used as an input device from an
   application written to this specification. The services include
@@ -219,14 +219,14 @@ EFI_STATUS
   provided.
 
 
-  @param Reset  Resets the pointer device.
+  @param Reset        Resets the pointer device.
 
-  @param GetState Retrieves the current state of the pointer
-                  device.
+  @param GetState     Retrieves the current state of the pointer
+                      device.
 
   @param WaitForInput Event to use with WaitForEvent() to wait
                       for input from the pointer device.
-  @param Mode Pointer to EFI_ABSOLUTE_POINTER_MODE data.
+  @param Mode         Pointer to EFI_ABSOLUTE_POINTER_MODE data.
 
 **/
 struct _EFI_ABSOLUTE_POINTER_PROTOCOL {

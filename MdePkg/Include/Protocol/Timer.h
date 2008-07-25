@@ -1,9 +1,9 @@
 /** @file
-  Timer Architectural Protocol as defined in the DXE CIS
+  Timer Architectural Protocol as defined in PI Specification VOLUME 2 DXE
 
   This code is used to provide the timer tick for the DXE core.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -11,9 +11,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-  @par Revision Reference:
-  Version 0.91B.
 
 **/
 
@@ -37,10 +34,10 @@ typedef struct _EFI_TIMER_ARCH_PROTOCOL   EFI_TIMER_ARCH_PROTOCOL;
   of tyis type to be called for the timer interrupt, so it can know how much 
   time has passed.  This information is used to signal timer based events.  
 
-  @param  Time             Time since the last timer interrupt in 100 ns units. This will
-                           typically be TimerPeriod, but if a timer interrupt is missed, and the
-                           EFI_TIMER_ARCH_PROTOCOL driver can detect missed interrupts, then Time
-                           will contain the actual amount of time since the last interrupt.
+  @param  Time   Time since the last timer interrupt in 100 ns units. This will
+                 typically be TimerPeriod, but if a timer interrupt is missed, and the
+                 EFI_TIMER_ARCH_PROTOCOL driver can detect missed interrupts, then Time
+                 will contain the actual amount of time since the last interrupt.
 
   None.
 
@@ -150,7 +147,7 @@ EFI_STATUS
   registered handler should not be able to distinguish a hardware-generated timer 
   interrupt from a software-generated timer interrupt.
 
-  @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.
+  @param  This                  The EFI_TIMER_ARCH_PROTOCOL instance.
 
   @retval EFI_SUCCESS           The soft timer interrupt was generated.
   @retval EFI_UNSUPPORTEDT      The platform does not support the generation of soft timer interrupts.

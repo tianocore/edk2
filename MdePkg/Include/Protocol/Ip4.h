@@ -11,7 +11,7 @@
     may include support for the Internet Group Management
     Protocol (IGMP).
   
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -163,7 +163,7 @@ typedef struct {
   @param  This          Pointer to the EFI_IP4_PROTOCOL instance.
   @param  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
   @param  MnpConfigData Pointer to the managed network configuration data structure.
-  @param  SnpData       Pointer to the simple network mode data structure.
+  @param  SnpModeData   Pointer to the simple network mode data structure.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -200,7 +200,7 @@ EFI_STATUS
                                 IPv4 address or subnet mask can be changed. The interface must
                                 also be stopped when switching to/from raw packet mode.
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred. The EFI IPv4
-                                 Protocol driver instance is not opened.
+                                Protocol driver instance is not opened.
 
 **/
 typedef 
@@ -402,6 +402,35 @@ EFI_STATUS
   )
 ;  
 
+/**  
+  @par Protocol Description:
+  The EFI IPv4 Protocol implements a simple packet-oriented interface that can be 
+  used by drivers, daemons, and applications to transmit and receive network packets.
+  
+  @param GetModeData
+  Gets the current operational settings for this instance of the EFI IPv4 Protocol driver. 
+
+  @param Configure
+  Changes or resets the operational settings for the EFI IPv4 Protocol. 
+
+  @param Groups
+  Joins and leaves multicast groups. 
+
+  @param Routes
+  Adds and deletes routing table entries. 
+
+  @param Transmit
+  Places outgoing data packets into the transmit queue. 
+
+  @param Receive
+  Places a receiving request into the receiving queue. 
+
+  @param Cancel
+  Aborts a pending transmit or receive request. 
+
+  @param Poll
+  Polls for incoming data packets and processes outgoing data packets. 
+**/
 struct _EFI_IP4_PROTOCOL {
   EFI_IP4_GET_MODE_DATA        GetModeData;
   EFI_IP4_CONFIGURE            Configure;

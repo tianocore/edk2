@@ -61,7 +61,8 @@ EFI_STATUS
 );
 
 
-/**                                                              
+/**
+  @par Ppi Description:                                                              
   This PPI's single member function decompresses a compression
   encapsulated section. It is used by the PEI Foundation to
   process sectioned files. Prior to the installation of this PPI,

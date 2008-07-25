@@ -2,7 +2,7 @@
   The file provides the protocol to install or remove an ACPI
   table from a platform. 
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -39,18 +39,18 @@ typedef struct _EFI_ACPI_TABLE_PROTOCOL EFI_ACPI_TABLE_PROTOCOL;
   longer considered valid.   
 
 
-  @param This A pointer to a EFI_ACPI_TABLE_PROTOCOL.
+  @param This                 A pointer to a EFI_ACPI_TABLE_PROTOCOL.
 
-  @param AcpiTableBuffer  A pointer to a buffer containing the
-                          ACPI table to be installed.
+  @param AcpiTableBuffer      A pointer to a buffer containing the
+                              ACPI table to be installed.
 
   @param AcpiTableBufferSize  Specifies the size, in bytes, of
                               the AcpiTableBuffer buffer.
 
 
-  @param TableKey   Returns a key to refer to the ACPI table.
+  @param TableKey             Returns a key to refer to the ACPI table.
   
-  @retval EFI_SUCCESS The table was successfully inserted
+  @retval EFI_SUCCESS           The table was successfully inserted
   
   @retval EFI_INVALID_PARAMETER Either AcpiTableBuffer is NULL,
                                 TableKey is NULL, or
@@ -83,15 +83,15 @@ EFI_STATUS
   EFI_CONFIGURATION_TABLE pointer to the RSDT is no longer
   considered valid.
 
-  @param This A pointer to a EFI_ACPI_TABLE_PROTOCOL.
+  @param This                   A pointer to a EFI_ACPI_TABLE_PROTOCOL.
 
-  @param TableKey Specifies the table to uninstall. The key was
-                  returned from InstallAcpiTable().
+  @param TableKey               Specifies the table to uninstall. The key was
+                                returned from InstallAcpiTable().
 
-  @retval EFI_SUCCESS The table was successfully inserted
+  @retval EFI_SUCCESS           The table was successfully inserted
 
-  @retval EFI_NOT_FOUND TableKey does not refer to a valid key
-                        for a table entry.
+  @retval EFI_NOT_FOUND         TableKey does not refer to a valid key
+                                for a table entry.
 
   @retval EFI_OUT_OF_RESOURCES  Insufficient resources exist to
                                 complete the request.
@@ -105,12 +105,12 @@ EFI_STATUS
 );
 
 /**
+  @par Protocol Description:
   The EFI_ACPI_TABLE_PROTOCOL provides the ability for a component
   to install and uninstall ACPI tables from a platform.
 
 
-  @param InstallAcpiTable Installs an ACPI table into the
-                          system.
+  @param InstallAcpiTable   Installs an ACPI table into the system.
 
   @param UninstallAcpiTable Removes a previously installed ACPI
                             table from the system.

@@ -1,7 +1,7 @@
 /** @file
-  EFI Driver Family Protocol
+  UEFI Driver Family Protocol
 
-  Copyright (c) 2007, Intel Corporation                                                         
+  Copyright (c) 2007 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -47,6 +47,7 @@ UINT32
   );
 
 /**
+  @par Protocol Description:
   When installed, the Driver Family Override Protocol produces a GUID that represets 
   a family of drivers.  Drivers with the same GUID are members of the same family 
   When drivers are connected to controllers, drivers with a higher revision value 
@@ -55,10 +56,10 @@ UINT32
   Connect Controller uses five rules to build a prioritied list of drivers when 
   a request is made to connect a driver to a controller.  The Driver Family Protocol
   rule is between the Platform Specific Driver Override Protocol and above the 
-  Bus Specific Driver Override Protocol  
+  Bus Specific Driver Override Protocol.  
 
-  @param FamilyGuid    A pointer to the GUID that represnets the family of drivers
-                       that the driver producing this protocol is a member.
+  @param GetVersion
+  This function returns the version value associated with the driver specified by This.
 
 **/
 struct _EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL {

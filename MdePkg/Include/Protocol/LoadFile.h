@@ -7,7 +7,7 @@
 
   UEFI 2.0 can boot from any device that produces a LoadFile protocol.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -77,6 +77,14 @@ EFI_STATUS
   )
 ;
 
+/**  
+  @par Protocol Description:
+  The EFI_LOAD_FILE_PROTOCOL is a simple protocol used to obtain files from arbitrary devices.
+ 
+  @param LoadFile 
+  Causes the driver to load the requested file.
+
+**/
 struct _EFI_LOAD_FILE_PROTOCOL {
   EFI_LOAD_FILE LoadFile;
 };

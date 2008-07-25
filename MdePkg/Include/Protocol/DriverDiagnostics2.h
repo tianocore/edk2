@@ -1,7 +1,7 @@
 /** @file
-  EFI Driver Diagnostics Protocol
+  UEFI Driver Diagnostics2 Protocol
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -27,7 +27,7 @@ typedef struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL  EFI_DRIVER_DIAGNOSTICS2_PROTOC
 /**
   Runs diagnostics on a controller.
 
-  @param  This             A pointer to the EFI_DRIVER_DIAGNOSTICS_PROTOCOL instance.
+  @param  This             A pointer to the EFI_DRIVER_DIAGNOSTICS2_PROTOCOL instance.
   @param  ControllerHandle The handle of the controller to run diagnostics on.
   @param  ChildHandle      The handle of the child controller to run diagnostics on
                            This is an optional parameter that may be NULL.  It will
@@ -38,12 +38,14 @@ typedef struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL  EFI_DRIVER_DIAGNOSTICS2_PROTOC
   @param  DiagnosticType   Indicates type of diagnostics to perform on the controller
                            specified by ControllerHandle and ChildHandle.   See
                            "Related Definitions" for the list of supported types.
-  @param  Language         A pointer to a three character ISO 639-2 language
-                           identifier.  This is the language in which the optional
-                           error message should be returned in Buffer, and it must
-                           match one of the languages specified in SupportedLanguages.
-                           The number of languages supported by a driver is up to
-                           the driver writer.
+  @param  Language         A pointer to a Null-terminated ASCII string
+                           array indicating the language. This is the
+                           language of the driver name that the caller
+                           is requesting, and it must match one of the
+                           languages specified in SupportedLanguages.
+                           The number of languages supported by a
+                           driver is up to the driver writer. Language
+                           is specified in RFC 3066 language code format.
   @param  ErrorType        A GUID that defines the format of the data returned in Buffer.
   @param  BufferSize       The size, in bytes, of the data returned in Buffer.
   @param  Buffer           A buffer that contains a Null-terminated Unicode string
@@ -94,7 +96,7 @@ EFI_STATUS
 //
 
 /**
-  Interface structure for the Driver Diagnostics Protocol.
+  Interface structure for the Driver Diagnostics2 Protocol.
 
   @par Protocol Description:
   Used to perform diagnostics on a controller that an EFI Driver is managing.

@@ -1,7 +1,9 @@
 /** @file
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL as defined in UEFI 2.0.
+  This protocol provides services that allow SCSI Pass Thru commands 
+  to be sent to SCSI devices attached to a SCSI channel.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -312,7 +314,38 @@ EFI_STATUS
   IN OUT UINT8                                     **Target
   )
 ;          
-  
+
+/**  
+  @par Protocol Description:
+  The EFI_EXT_SCSI_PASS_THRU_PROTOCOL provides information about a SCSI channel 
+  and the ability to send SCI Request Packets to any SCSI device attached to 
+  that SCSI channel. The information includes the Target ID of the host controller 
+  on the SCSI channel and the attributes of the SCSI channel.
+
+  @param Mode 
+  A pointer to the EFI_EXT_SCSI_PASS_THRU_MODE data for this SCSI channel. 
+
+  @param PassThru 
+  Sends a SCSI Request Packet to a SCSI device that is Connected to the SCSI channel. 
+
+  @param GetNextTargetLun 
+  Retrieves the list of legal Target IDs and LUNs for the SCSI devices on a SCSI channel. 
+
+  @param BuildDevicePath 
+  Allocates and builds a device path node for a SCSI Device on a SCSI channel. 
+
+  @param GetTargetLun
+  Translates a device path node to a Target ID and LUN. 
+
+  @param ResetChannel
+  Resets the SCSI channel. This operation resets all the SCSI devices connected to the SCSI channel. 
+
+  @param ResetTargetLun
+  Resets a SCSI device that is connected to the SCSI channel. 
+
+  @param GetNextTartget 
+  Retrieves the list of legal Target IDs for the SCSI devices on a SCSI channel. 
+**/  
 struct _EFI_EXT_SCSI_PASS_THRU_PROTOCOL {
   EFI_EXT_SCSI_PASS_THRU_MODE                *Mode;
   EFI_EXT_SCSI_PASS_THRU_PASSTHRU            PassThru;

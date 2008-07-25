@@ -7,7 +7,7 @@
 
   UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -325,6 +325,49 @@ EFI_STATUS
 // 
 #define EFI_FILE_REVISION   EFI_FILE_PROTOCOL_REVISION
 
+/**  
+  @par Protocol Description:
+  The EFI_FILE_PROTOCOL provides file IO access to supported file systems.
+  An EFI_FILE_PROTOCOL provides access to a file's or directory's contents, 
+  and is also a reference to a location in the directory tree of the file system 
+  in which the file resides. With any given file handle, other files may be opened 
+  relative to this file's location, yielding new file handles.
+
+  @param Revision
+  The version of the EFI_FILE_PROTOCOL interface. The version specified 
+  by this specification is 0x00010000. Future versions are required 
+  to be backward compatible to version 1.0.
+
+  @param Open
+  Opens or creates a new file. 
+
+  @param Close
+  Closes the current file handle. 
+
+  @param Delete
+  Deletes a file. 
+
+  @param Read
+  Reads bytes from a file. 
+
+  @param Write
+  Writes bytes to a file. 
+
+  @param GetPosition
+  Returns the current file position. 
+
+  @param SetPosition
+  Sets the current file position. 
+
+  @param GetInfo
+  Gets the requested file or volume information. 
+
+  @param SetInfo
+  Sets the requested file information. 
+
+  @param Flush
+  Flushes all modified data associated with the file to the device. 
+**/
 struct _EFI_FILE_PROTOCOL {
   UINT64                Revision;
   EFI_FILE_OPEN         Open;

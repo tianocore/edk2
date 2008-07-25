@@ -1,10 +1,11 @@
 /** @file
 
-  The file provides services to forward results to PCOL-based
-  handler if EFI HII results processing protocol invokes this
-  protocol.
+  The EFI HII results processing protocol invokes this type of protocol 
+  when it needs to forward results to a driver's configuration handler. 
+  This protocol is published by drivers providing and requesting 
+  configuration data from HII. It may only be invoked by HII.
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -46,14 +47,14 @@ typedef UINTN EFI_BROWSER_ACTION;
   converted from Hex UNICODE to binary) is a reference to a
   string in the associated string pack.
 
-  @param This   Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param This       Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
 
-  @param Request  A null-terminated Unicode string in
-                  <ConfigRequest> format. Note that this
-                  includes the routing information as well as
-                  the configurable name / value pairs. It is
-                  invalid for this string to be in
-                  <MultiConfigRequest> format.
+  @param Request    A null-terminated Unicode string in
+                    <ConfigRequest> format. Note that this
+                    includes the routing information as well as
+                    the configurable name / value pairs. It is
+                    invalid for this string to be in
+                    <MultiConfigRequest> format.
 
   @param Progress   On return, points to a character in the
                     Request string. Points to the string's null
@@ -64,19 +65,19 @@ typedef UINTN EFI_BROWSER_ACTION;
                     name / value pair) if the request was not
                     successful
 
-  @param Results  A null-terminated Unicode string in
-                  <ConfigAltResp> format which has all values
-                  filled in for the names in the Request string.
-                  String to be allocated by the called function.
+  @param Results    A null-terminated Unicode string in
+                    <ConfigAltResp> format which has all values
+                    filled in for the names in the Request string.
+                    String to be allocated by the called function.
 
-  @retval EFI_SUCCESS   The Results string is filled with the
-                        values corresponding to all requested
-                        names.
+  @retval EFI_SUCCESS             The Results string is filled with the
+                                  values corresponding to all requested
+                                  names.
 
-  @retval EFI_OUT_OF_MEMORY   Not enough memory to store the
-                              parts of the results that must be
-                              stored awaiting possible future
-                              protocols.
+  @retval EFI_OUT_OF_MEMORY       Not enough memory to store the
+                                  parts of the results that must be
+                                  stored awaiting possible future
+                                  protocols.
 
   @retval EFI_INVALID_PARAMETER   For example, passing in a NULL
                                   for the Request parameter
@@ -85,13 +86,13 @@ typedef UINTN EFI_BROWSER_ACTION;
                                   Progress parameter would be
                                   set to NULL. 
 
-  @retval EFI_NOT_FOUND   Routing data doesn't match any
-                          known driver. Progress set to the
-                          first character in the routing header.
-                          Note: There is no requirement that the
-                          driver validate the routing data. It
-                          must skip the <ConfigHdr> in order to
-                          process the names.
+  @retval EFI_NOT_FOUND           Routing data doesn't match any
+                                  known driver. Progress set to the
+                                  first character in the routing header.
+                                  Note: There is no requirement that the
+                                  driver validate the routing data. It
+                                  must skip the <ConfigHdr> in order to
+                                  process the names.
 
   @retval EFI_INVALID_PARAMETER   Illegal syntax. Progress set
                                   to most recent & before the
@@ -124,11 +125,12 @@ EFI_STATUS
   format, it may use the ConfigToBlock helper function (above) to
   simplify the job.
 
-  @param This   Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param This           Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
 
   @param Configuration  A null-terminated Unicode string in
-                        <ConfigString> format. Progress a
-                        pointer to a string filled in with the
+                        <ConfigString> format. 
+  
+  @param Progress       A pointer to a string filled in with the
                         offset of the most recent '&' before the
                         first failing name / value pair (or the
                         beginn ing of the string if the failure
@@ -136,20 +138,20 @@ EFI_STATUS
                         the terminating NULL if all was
                         successful.
 
-  @retval EFI_SUCCESS   The results have been distributed or are
-                        awaiting distribution.
+  @retval EFI_SUCCESS             The results have been distributed or are
+                                  awaiting distribution.
   
-  @retval EFI_OUT_OF_MEMORY   Not enough memory to store the
-                              parts of the results that must be
-                              stored awaiting possible future
-                              protocols.
+  @retval EFI_OUT_OF_MEMORY       Not enough memory to store the
+                                  parts of the results that must be
+                                  stored awaiting possible future
+                                  protocols.
   
   @retval EFI_INVALID_PARAMETERS  Passing in a NULL for the
                                   Results parameter would result
                                   in this type of error.
   
-  @retval EFI_NOT_FOUND   Target for the specified routing data
-                          was not found
+  @retval EFI_NOT_FOUND           Target for the specified routing data
+                                  was not found
 
 **/
 typedef
@@ -166,36 +168,24 @@ EFI_STATUS
   This data consists of a unique key that is used to identify
   which data is either being passed back or being asked for.
 
-  @param This   Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param  This                   Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param  Action                 Specifies the type of action taken by the browser.
+  @param  QuestionId             A unique value which is sent to the original
+                                 exporting driver so that it can identify the type
+                                 of data to expect. The format of the data tends to 
+                                 vary based on the opcode that enerated the callback.
+  @param  Type                   The type of value for the question.
+  @param  Value                  A pointer to the data being sent to the original
+                                 exporting driver.
+  @param  ActionRequest          On return, points to the action requested by the
+                                 callback function.
 
-  @param KeyValue   A unique value which is sent to the original
-                    exporting driver so that it can identify the
-                    type of data to expect. The format of the
-                    data tends to vary based on the opcode that
-                    generated the callback.
-
-  @param Data   A pointer to the data being sent to the original
-                exporting driver. The format of the data should
-                be the same as that of the question invoking the
-                callback and will be known to the recipient.
-
-  @retval EFI_SUCCESS   The firmware has successfully stored the
-                        variable and its data as defined by the
-                        Attributes.
-
-  @retval EFI_INVALID_PARAMETER   An invalid combination of
-                                  Attributes bits was supplied,
-                                  or the DataSize exceeds the
-                                  maximum allowed.
-
-  @retval EFI_OUT_OF_RESOURCES  Not enough storage is available
-                                to hold the variable and its
-                                data.
-
-  @retval EFI_DEVICE_ERROR  The variable could not be saved due
-                            to a hardware failure.
-
-
+  @retval EFI_SUCCESS            The callback successfully handled the action.
+  @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the
+                                 variable and its data.
+  @retval EFI_DEVICE_ERROR       The variable could not be saved.
+  @retval EFI_UNSUPPORTED        The specified Action is not supported by the
+                                 callback.
 **/
 typedef
 EFI_STATUS
@@ -209,7 +199,7 @@ EFI_STATUS
   )
   ;
 /**
-   
+  @par Protocol Description:   
   This protocol provides a callable interface between the HII and
   drivers. Only drivers which provide IFR data to HII are required
   to publish this protocol.
@@ -220,14 +210,13 @@ EFI_STATUS
                         analogous to the similarly named
                         function in the HII Routing Protocol.
   
-  @param RouteConfig  This function breaks apart the UNICODE
-                      results strings and returns configuration
-                      information as specified by the request.
+  @param RouteConfig    This function breaks apart the UNICODE
+                        results strings and returns configuration
+                        information as specified by the request.
   
-  @param Callback   This function is called from the
-                    configuration browser to communicate certain
-                    activities that were initiated by a user.
-
+  @param Callback       This function is called from the
+                        configuration browser to communicate certain
+                        activities that were initiated by a user.
 
 **/
 struct _EFI_HII_CONFIG_ACCESS_PROTOCOL {

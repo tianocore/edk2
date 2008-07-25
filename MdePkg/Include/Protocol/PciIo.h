@@ -1,7 +1,8 @@
 /** @file
-  EFI PCI I/O Protocol
+  EFI PCI I/O Protocol provides the basic Memory, I/O, PCI configuration, 
+  and DMA interfaces that a driver uses to access its PCI controller.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -473,9 +474,84 @@ EFI_STATUS
   IN OUT UINT64                       *Length
   );
 
-//
-// Interface structure for the PCI I/O Protocol
-//
+/**  
+  @par Protocol Description:
+  The EFI_PCI_IO_PROTOCOL provides the basic Memory, I/O, PCI configuration, 
+  and DMA interfaces that are used to abstract accesses to PCI controllers. 
+  There is one EFI_PCI_IO_PROTOCOL instance for each PCI controller on a PCI bus. 
+  A device driver that wishes to manage a PCI controller in a system will have to 
+  retrieve the EFI_PCI_IO_PROTOCOL instance that is associated with the PCI controller. 
+
+  @param PollMem
+  Polls an address in PCI memory space until an exit condition is met, or a timeout occurs. 
+
+  @param PollIo
+  Polls an address in PCI I/O space until an exit condition is met, or a timeout occurs. 
+
+  @param Mem.Read
+  Allows BAR relative reads to PCI memory space. 
+
+  @param Mem.Write
+  Allows BAR relative writes to PCI memory space. 
+
+  @param Io.Read
+  Allows BAR relative reads to PCI I/O space. 
+
+  @param Io.Write
+  Allows BAR relative writes to PCI I/O space. 
+
+  @param Pci.Read
+  Allows PCI controller relative reads to PCI configuration space. 
+
+  @param Pci.Write
+  Allows PCI controller relative writes to PCI configuration space. 
+
+  @param CopyMem
+  Allows one region of PCI memory space to be copied to another region of PCI memory space. 
+
+  @param Map
+  Provides the PCI controller's specific address needed to access system memory for DMA. 
+
+  @param Unmap
+  Releases any resources allocated by Map(). 
+
+  @param AllocateBuffer
+  Allocates pages that are suitable for a common buffer mapping. 
+
+  @param FreeBuffer
+  Frees pages that were allocated with AllocateBuffer(). 
+
+  @param Flush
+  Flushes all PCI posted write transactions to system memory. 
+
+  @param GetLocation
+  Retrieves this PCI controller's current PCI bus number, device number, and function number. 
+
+  @param Attributes
+  Performs an operation on the attributes that this PCI controller supports. 
+  The operations include getting the set of supported attributes, retrieving 
+  the current attributes, setting the current
+  attributes, enabling attributes, and disabling attributes. 
+
+  @param GetBarAttributes
+  Gets the attributes that this PCI controller supports setting on a BAR using 
+  SetBarAttributes(), and retrieves the list of resource descriptors for a BAR. 
+
+  @param SetBarAttributes
+  Sets the attributes for a range of a BAR on a PCI controller. 
+
+  @param RomSize
+  The size, in bytes, of the ROM image.
+
+  @param RomImage
+  A pointer to the in memory copy of the ROM image. The PCI Bus Driver is responsible 
+  for allocating memory for the ROM image, and copying the contents of the ROM to memory. 
+  The contents of this buffer are either from the PCI option ROM that can be accessed 
+  through the ROM BAR of the PCI controller, or it is from a platform-specific location. 
+  The Attributes() function can be used to determine from which of these two sources 
+  the RomImage buffer was initialized.
+
+**/
 struct _EFI_PCI_IO_PROTOCOL {
   EFI_PCI_IO_PROTOCOL_POLL_IO_MEM         PollMem;
   EFI_PCI_IO_PROTOCOL_POLL_IO_MEM         PollIo;

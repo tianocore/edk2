@@ -3,7 +3,7 @@
 
   Abstraction of a very simple graphics device.
   
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation 
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -163,7 +163,19 @@ typedef UGA_STATUS
   IN OUT PUGA_IO_REQUEST pIoRequest
   );
 
+/**  
+  @par Protocol Description:
+  Provides a basic abstraction to send I/O requests to the graphics device and any of its children.
 
+  @param CreateDevice 
+  Create a UGA_DEVICE object for a child device of a given parent UGA_DEVICE.
+
+  @param DeleteDevice 
+  Delete the UGA_DEVICE returned from CreateDevice().
+
+  @param DispatchService 
+  Dispatches I/O requests to the display device and its associate child devices.
+**/
 struct _EFI_UGA_IO_PROTOCOL {
   EFI_UGA_IO_PROTOCOL_CREATE_DEVICE CreateDevice;
   EFI_UGA_IO_PROTOCOL_DELETE_DEVICE DeleteDevice;

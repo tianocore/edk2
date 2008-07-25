@@ -297,6 +297,39 @@ EFI_STATUS
   )
 ;
 
+/**  
+  @par Protocol Description:
+  The MNP is used by network applications (and drivers) to 
+  perform raw (unformatted) asynchronous network packet I/O.
+ 
+  @param GetModeData
+  Returns the current MNP child driver operational parameters. 
+  May also support returning underlying Simple Network Protocol (SNP) driver mode data. 
+
+  @param Configure
+  Sets and clears operational parameters for an MNP child driver. 
+
+  @param McastIpToMac
+  Translates a software (IP) multicast address to a hardware (MAC) multicast address. 
+  This function may be unsupported in some MNP implementations. 
+
+  @param Groups
+  Enables and disables receive filters for multicast addresses. 
+  This function may be unsupported in some MNP implementations. 
+
+  @param Transmit
+  Places asynchronous outgoing data packets into the transmit queue. 
+
+  @param Receive
+  Places an asynchronous receiving request into the receiving queue. 
+
+  @param Cancel
+  Aborts a pending transmit or receive request. 
+
+  @param Poll
+  Polls for incoming data packets and processes outgoing data packets. 
+
+**/
 struct _EFI_MANAGED_NETWORK_PROTOCOL {
   EFI_MANAGED_NETWORK_GET_MODE_DATA       GetModeData;
   EFI_MANAGED_NETWORK_CONFIGURE           Configure;

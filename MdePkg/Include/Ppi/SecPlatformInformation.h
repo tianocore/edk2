@@ -102,6 +102,7 @@ EFI_STATUS
 
 
 /**
+  @par Ppi Description:
   This service abstracts platform-specific information. It is necessary 
   to convey this information to the PEI Foundation so that it can 
   discover where to begin dispatching PEIMs.

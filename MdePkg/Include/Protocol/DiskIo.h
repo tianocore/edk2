@@ -5,7 +5,7 @@
   oriented devices. The Disk IO protocol is intended to layer on top of the
   Block IO protocol.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -100,6 +100,22 @@ EFI_STATUS
 // 
 #define EFI_DISK_IO_INTERFACE_REVISION  EFI_DISK_IO_PROTOCOL_REVISION
 
+/**
+  @par Protocol Description:
+  This protocol is used to abstract Block I/O interfaces.
+
+  @param Revision 
+  The revision to which the disk I/O interface adheres. All future
+  revisions must be backwards compatible. If a future version is not
+  backwards compatible, it is not the same GUID.
+
+  @param ReadDisk 
+  Reads data from the disk.
+  
+  @param WriteDisk 
+  Writes data to the disk.
+
+**/
 struct _EFI_DISK_IO_PROTOCOL {
   UINT64          Revision;
   EFI_DISK_READ   ReadDisk;

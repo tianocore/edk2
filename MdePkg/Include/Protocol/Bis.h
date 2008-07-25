@@ -1,7 +1,9 @@
 /** @file
-  This file defines the BIS protocol.
+  BIS protocol are defined in the UEFI specification.
+  The EFI_BIS_PROTOCOL is used to check a digital signature of a data block 
+  against a digital certificate for the purpose of an integrity and authorization check.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -397,6 +399,60 @@ EFI_STATUS
   OUT EFI_BIS_DATA            **SignatureInfo      
   );
 
+/**
+  @par Protocol Description:
+  The EFI_BIS_PROTOCOL is used to check a digital signature of a data block against a digital
+  certificate for the purpose of an integrity and authorization check.
+
+  @param initialize
+  Initializes an application instance of the EFI_BIS protocol,
+  returning a handle for the application instance. Other functions in
+  the EFI_BIS protocol require a valid application instance
+  handle obtained from this function.
+  
+  @param Shutdown 
+  Ends the lifetime of an application instance of the EFI_BIS
+  protocol, invalidating its application instance handle. The
+  application instance handle may no longer be used in other
+  functions in the EFI_BIS protocol.
+
+  @param Free 
+  Frees memory structures allocated and returned by other
+  functions in the EFI_BIS protocol. 
+
+  @param GetBootObjectAuthorizationCertificate
+  Retrieves the current digital certificate (if any) used by the
+  EFI_BIS protocol as the source of authorization for verifying
+  boot objects and altering configuration parameters.
+
+  @param GetBootObjectAuthorizationCheckFlag
+  Retrieves the current setting of the authorization check flag that
+  indicates whether or not authorization checks are required for
+  boot objects.
+
+  @param GetBootObjectAuthorizationUpdateToken
+  Retrieves an uninterpreted token whose value gets included and
+  signed in a subsequent request to alter the configuration
+  parameters, to protect against attempts to replay such a request.
+
+  @param GetSignatureInfo 
+  Retrieves information about the digital signature algorithms
+  supported and the identity of the installed authorization
+  certificate, if any.
+
+  @param UpdateBootObjectAuthorization
+  Requests that the configuration parameters be altered by
+  installing or removing an authorization certificate or changing the
+  setting of the check flag. 
+
+  @param VerifyBootObject
+  Verifies a boot object according to the supplied digital signature
+  and the current authorization certificate and check flag setting.
+
+  @param VerifyObjectWithCredential
+  Verifies a data object according to a supplied digital signature
+  and a supplied digital certificate.  
+**/
 struct _EFI_BIS_PROTOCOL {
   EFI_BIS_INITIALIZE                                  Initialize;
   EFI_BIS_SHUTDOWN                                    Shutdown;

@@ -1,7 +1,8 @@
 /** @file
-  EFI PXE Base Code Protocol definitions.
+  EFI PXE Base Code Protocol definitions, which is used to access PXE-compatible 
+  devices for network access and network booting.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -607,6 +608,63 @@ EFI_STATUS
 // 
 #define EFI_PXE_BASE_CODE_INTERFACE_REVISION  EFI_PXE_BASE_CODE_PROTOCOL_REVISION
 
+/**  
+  @par Protocol Description:
+  The EFI_PXE_BASE_CODE_PROTOCOL is used to control PXE-compatible devices.
+  An EFI_PXE_BASE_CODE_PROTOCOL will be layered on top of an
+  EFI_MANAGED_NETWORK_PROTOCOL protocol in order to perform packet level transactions.
+  The EFI_PXE_BASE_CODE_PROTOCOL handle also supports the
+  EFI_LOAD_FILE_PROTOCOL protocol. This provides a clean way to obtain control from the
+  boot manager if the boot path is from the remote device.
+
+  @param Revision
+  The revision of the EFI_PXE_BASE_CODE_PROTOCOL. All future revisions must 
+  be backwards compatible. If a future version is not backwards compatible 
+  it is not the same GUID.
+
+  @param Start
+  Starts the PXE Base Code Protocol. Mode structure information is not valid and 
+  no other Base Code Protocol functions will operate until the Base Code is started. 
+
+  @param Stop
+  Stops the PXE Base Code Protocol. Mode structure information is unchanged by this function. 
+  No Base Code Protocol functions will operate until the Base Code is restarted. 
+
+  @param Dhcp
+  Attempts to complete a DHCPv4 D.O.R.A. (discover / offer / request / acknowledge) 
+  or DHCPv6 S.A.R.R (solicit / advertise / request / reply) sequence. 
+
+  @param Discover
+  Attempts to complete the PXE Boot Server and/or boot image discovery sequence. 
+
+  @param Mtftp
+  Performs TFTP and MTFTP services. 
+
+  @param UdpWrite
+  Writes a UDP packet to the network interface. 
+
+  @param UdpRead
+  Reads a UDP packet from the network interface. 
+
+  @param SetIpFilter
+  Updates the IP receive filters of the network device. 
+
+  @param Arp
+  Uses the ARP protocol to resolve a MAC address. 
+
+  @param SetParameters
+  Updates the parameters that affect the operation of the PXE Base Code Protocol. 
+
+  @param SetStationIp
+  Updates the station IP address and subnet mask values. 
+
+  @param SetPackets
+  Updates the contents of the cached DHCP and Discover packets. 
+
+  @param Mode
+  Pointer to the EFI_PXE_BASE_CODE_MODE data for this device. 
+
+**/
 struct _EFI_PXE_BASE_CODE_PROTOCOL {
   UINT64                            Revision;
   EFI_PXE_BASE_CODE_START           Start;
