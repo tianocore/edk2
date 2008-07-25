@@ -1,5 +1,5 @@
 /** @file
-  Variable Write Architectural Protocol as defined in the DXE CIS
+  Variable Write Architectural Protocol as defined in PI Specification VOLUME 2 DXE
 
   This code is used to produce the UEFI 2.0 runtime variable services
 
@@ -16,9 +16,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-  @par Revision Reference:
-  Version 0.91B.
 
 **/
 
