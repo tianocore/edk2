@@ -1,6 +1,8 @@
 /** @file
 
-Copyright (c) 2004, Intel Corporation
+  Parse mouse hid descriptor.
+
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,34 +11,21 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Mousehid.c
-
-Abstract:
-  Parse mouse hid descriptor
-
-
 **/
 
 #include "MouseHid.h"
 
 
-//
-// Get an item from report descriptor
-//
-
 /**
-  Get Next Item
+  Get next item from report descriptor.
 
-  @param  StartPos          Start Position
-  @param  EndPos            End Position
-  @param  HidItem           HidItem to return
+  @param  StartPos          Start Position.
+  @param  EndPos            End Position.
+  @param  HidItem           HidItem to return.
 
-  @return Position
+  @return Position.
 
 **/
-STATIC
 UINT8 *
 GetNextItem (
   IN  UINT8    *StartPos,
@@ -129,14 +118,13 @@ GetNextItem (
 
 
 /**
-  Get Item Data
+  Get item data from report descriptor.
 
-  @param  HidItem           HID_ITEM
+  @param  HidItem           The pointer to HID_ITEM.
 
-  @return HidItem Data
+  @return The Data of HidItem.
 
 **/
-STATIC
 UINT32
 GetItemData (
   IN  HID_ITEM *HidItem
@@ -162,14 +150,12 @@ GetItemData (
 
 
 /**
-  Parse Local Item
+  Parse local item from report descriptor.
 
-  @param  UsbMouse          USB_MOUSE_DEV
-  @param  LocalItem         Local Item
-
+  @param  UsbMouse          The instance of USB_MOUSE_DEV
+  @param  LocalItem         The pointer to local hid item
 
 **/
-STATIC
 VOID
 ParseLocalItem (
   IN  USB_MOUSE_DEV   *UsbMouse,
@@ -216,7 +202,14 @@ ParseLocalItem (
   }
 }
 
-STATIC
+
+/**
+  Parse global item from report descriptor.
+
+  @param  UsbMouse          The instance of USB_MOUSE_DEV
+  @param  GlobalItem          The pointer to global hid item
+
+**/
 VOID
 ParseGlobalItem (
   IN  USB_MOUSE_DEV   *UsbMouse,
@@ -247,17 +240,13 @@ ParseGlobalItem (
 }
 
 
-
 /**
-  Parse Main Item
+  Parse main item from report descriptor.
 
-  @param  UsbMouse          TODO: add argument description
-  @param  MainItem          HID_ITEM to parse
-
-  @return VOID
+  @param  UsbMouse         The instance of USB_MOUSE_DEV
+  @param  MainItem          Main hid item to parse
 
 **/
-STATIC
 VOID
 ParseMainItem (
   IN  USB_MOUSE_DEV   *UsbMouse,
@@ -272,15 +261,12 @@ ParseMainItem (
 
 
 /**
-  Parse Hid Item
+  Parse hid item from report descriptor.
 
-  @param  UsbMouse          USB_MOUSE_DEV
-  @param  HidItem           HidItem to parse
-
-  @return VOID
+  @param  UsbMouse          The instance of USB_MOUSE_DEV
+  @param  HidItem           The hid item to parse
 
 **/
-STATIC
 VOID
 ParseHidItem (
   IN  USB_MOUSE_DEV   *UsbMouse,
@@ -311,19 +297,17 @@ ParseHidItem (
     break;
   }
 }
-//
-// A simple parse just read some field we are interested in
-//
+
 
 /**
-  Parse Mouse Report Descriptor
+  Parse Mouse Report Descriptor.
 
-  @param  UsbMouse          USB_MOUSE_DEV
+  @param  UsbMouse          The instance of USB_MOUSE_DEV
   @param  ReportDescriptor  Report descriptor to parse
   @param  ReportSize        Report descriptor size
 
   @retval EFI_DEVICE_ERROR  Report descriptor error
-  @retval EFI_SUCCESS       Success
+  @retval EFI_SUCCESS       Parse descriptor success
 
 **/
 EFI_STATUS
@@ -334,14 +318,14 @@ ParseMouseReportDescriptor (
   )
 {
   UINT8     *DescriptorEnd;
-  UINT8     *ptr;
+  UINT8     *Ptr;
   HID_ITEM  HidItem;
 
   DescriptorEnd = ReportDescriptor + ReportSize;
 
-  ptr           = GetNextItem (ReportDescriptor, DescriptorEnd, &HidItem);
+  Ptr           = GetNextItem (ReportDescriptor, DescriptorEnd, &HidItem);
 
-  while (ptr != NULL) {
+  while (Ptr != NULL) {
     if (HidItem.Format != HID_ITEM_FORMAT_SHORT) {
       //
       // Long Format Item is not supported at current HID revision
@@ -351,7 +335,7 @@ ParseMouseReportDescriptor (
 
     ParseHidItem (UsbMouse, &HidItem);
 
-    ptr = GetNextItem (ptr, DescriptorEnd, &HidItem);
+    Ptr = GetNextItem (Ptr, DescriptorEnd, &HidItem);
   }
 
   UsbMouse->NumberOfButtons                 = (UINT8) (UsbMouse->PrivateData.ButtonMaxIndex - UsbMouse->PrivateData.ButtonMinIndex + 1);
