@@ -1,6 +1,10 @@
 /** @file
-  EFI Usb I/O Protocol
-
+  EFI Usb I/O Protocol as defined in UEFI specification.
+  This protocol is used by code, typically drivers, running in the EFI 
+  boot services environment to access USB devices like USB keyboards, 
+  mice and mass storage devices. In particular, functions for managing devices 
+  on USB buses are defined here.
+  
   Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -173,9 +177,9 @@ EFI_STATUS
                                 executed.
   @param  DataLength            Specifies the length, in bytes, of the data to be received from the
                                 USB device.
-  @param  Context               Data passed to the InterruptCallback function.
   @param  InterruptCallback     The Callback function. This function is called if the asynchronous
                                 interrupt transfer is completed.
+  @param  Context               Data passed to the InterruptCallback function.
 
   @retval EFI_SUCCESS           The asynchronous USB transfer request transfer has been successfully executed.
   @retval EFI_DEVICE_ERROR      The asynchronous USB transfer request failed.
@@ -262,8 +266,8 @@ EFI_STATUS
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB
                                 device or received from USB device.
   @param  DataLength            The size, in bytes, of the data buffer specified by Data.
-  @param  Context               Data passed to the IsochronousCallback() function.
   @param  IsochronousCallback   The IsochronousCallback() function.
+  @param  Context               Data passed to the IsochronousCallback() function.
 
   @retval EFI_SUCCESS           The asynchronous isochronous transfer has been successfully submitted
                                 to the system.
@@ -419,9 +423,54 @@ EFI_STATUS
   OUT UINT16                        *TableSize
   );
 
-//
-//  Protocol Interface Structure
-//
+/**  
+  @par Protocol Description:
+  The EFI_USB_IO_PROTOCOL provides four basic transfers types described 
+  in the USB 1.1 Specification. These include control transfer, interrupt 
+  transfer, bulk transfer and isochronous transfer. The EFI_USB_IO_PROTOCOL 
+  also provides some basic USB device/controller management and configuration 
+  interfaces. A USB device driver uses the services of this protocol to manage USB devices.  
+
+  @param UsbControlTransfer 
+  Accesses the USB Device through USB Control Transfer Pipe. 
+
+  @param UsbBulkTransfer
+  Accesses the USB Device through USB Bulk Transfer Pipe. 
+
+  @param UsbAsyncInterruptTransfer
+  Non-block USB interrupt transfer. 
+
+  @param UsbSyncInterruptTransfer
+  Accesses the USB Device through USB Synchronous
+  Interrupt Transfer Pipe. 
+
+  @param UsbIsochronousTransfer
+  Accesses the USB Device through USB Isochronous Transfer Pipe. 
+
+  @param UsbAsyncIsochronousTransfer
+  Nonblock USB isochronous transfer. 
+
+  @param UsbGetDeviceDescriptor
+  Retrieves the device descriptor of a USB device. 
+
+  @param UsbGetConfigDescriptor
+  Retrieves the activated configuration descriptor of a USB device. 
+
+  @param UsbGetInterfaceDescriptor
+  Retrieves the interface descriptor of a USB Controller. 
+
+  @param UsbGetEndpointDescriptor
+  Retrieves the endpoint descriptor of a USB Controller. 
+
+  @param UsbGetStringDescriptor
+  Retrieves the string descriptor inside a USB Device. 
+
+  @param UsbGetSupportedLanguages
+  Retrieves the array of languages that the USB device supports. 
+
+  @param UsbPortReset
+  Resets and reconfigures the USB controller. 
+**/
 struct _EFI_USB_IO_PROTOCOL {
   //
   // IO transfer

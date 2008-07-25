@@ -1,5 +1,5 @@
 /** @file
-  Watchdog Timer Architectural Protocol as defined in the DXE CIS
+  Watchdog Timer Architectural Protocol as defined in PI Specification VOLUME 2 DXE
 
   Used to provide system watchdog timer services
 
@@ -11,10 +11,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-  @par Revision Reference:
-  Version 0.91B.
-
 **/
 
 #ifndef __ARCH_PROTOCOL_WATCHDOG_TIMER_H__
