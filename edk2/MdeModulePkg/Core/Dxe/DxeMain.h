@@ -1026,13 +1026,13 @@ CoreLocateHandleBuffer (
   to the system. If Retistration is NULL return the first Protocol Interface
   you find.
 
-  @param  Protocol               The protocol to search for 
-  @param  Registration           Optional Registration Key returned from 
-                                 RegisterProtocolNotify() 
-  @param  Interface              Return the Protocol interface (instance). 
+  @param  Protocol               The protocol to search for
+  @param  Registration           Optional Registration Key returned from
+                                 RegisterProtocolNotify()
+  @param  Interface              Return the Protocol interface (instance).
 
-  @retval EFI_SUCCESS            If a valid Interface is returned 
-  @retval EFI_INVALID_PARAMETER  Invalid parameter 
+  @retval EFI_SUCCESS            If a valid Interface is returned
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_NOT_FOUND          Protocol interface not found
 
 **/
