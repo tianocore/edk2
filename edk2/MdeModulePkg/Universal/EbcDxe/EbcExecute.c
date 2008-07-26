@@ -49,13 +49,13 @@ UINT64
     b14:12  - number of bits in this index assigned to natural units (=a)
     ba:11   - constant units = ConstUnits
     b0:a    - natural units = NaturalUnits
-  
+
   Given this info, the offset can be computed by:
     offset = sign_bit * (ConstUnits + NaturalUnits * sizeof(UINTN))
 
   Max offset is achieved with index = 0x7FFF giving an offset of
   0x27B (32-bit machine) or 0x477 (64-bit machine).
-  Min offset is achieved with index = 
+  Min offset is achieved with index =
 
   @param  VmPtr             A pointer to VM context.
   @param  CodeOffset        Offset from IP of the location of the 16-bit index
@@ -179,7 +179,7 @@ VmReadMemN (
 
 /**
   Writes 8-bit data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -189,14 +189,14 @@ VmReadMemN (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -209,7 +209,7 @@ VmWriteMem8 (
 
 /**
   Writes 16-bit data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -219,14 +219,14 @@ VmWriteMem8 (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -239,7 +239,7 @@ VmWriteMem16 (
 
 /**
   Writes 32-bit data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -249,14 +249,14 @@ VmWriteMem16 (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -440,7 +440,7 @@ ConvertStackAddr (
   @param  VmPtr             A pointer to VM context.
   @param  IsSignedOp        Indicates whether the operand is signed or not.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -472,7 +472,7 @@ ExecuteBREAK (
   Instruction syntax:
     JMP64{cs|cc} Immed64
     JMP32{cs|cc} {@}R1 {Immed32|Index32}
-  
+
   Encoding:
     b0.7 -  immediate data present
     b0.6 -  1 = 64 bit immediate data
@@ -557,7 +557,7 @@ ExecuteRET (
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -574,7 +574,7 @@ ExecuteCMP (
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -587,15 +587,15 @@ ExecuteCMPI (
   Execute the MOVxx instructions.
 
   Instruction format:
-    
+
     MOV[b|w|d|q|n]{w|d} {@}R1 {Index16|32}, {@}R2 {Index16|32}
     MOVqq {@}R1 {Index64}, {@}R2 {Index64}
-  
+
     Copies contents of [R2] -> [R1], zero extending where required.
-  
+
     First character indicates the size of the move.
     Second character indicates the size of the index(s).
-  
+
     Invalid to have R1 direct with index.
 
   @param  VmPtr             A pointer to a VM context.
@@ -613,20 +613,20 @@ ExecuteMOVxx (
   Execute the EBC MOVI.
 
   Instruction syntax:
-  
+
     MOVI[b|w|d|q][w|d|q] {@}R1 {Index16}, ImmData16|32|64
-  
+
     First variable character specifies the move size
     Second variable character specifies size of the immediate data
-  
+
     Sign-extend the immediate data to the size of the operation, and zero-extend
     if storing to a register.
-  
+
     Operand1 direct with index/immed is invalid.
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -640,12 +640,12 @@ ExecuteMOVI (
   index value into a register or memory location.
 
   Instruction syntax:
-  
+
     MOVIn[w|d|q] {@}R1 {Index16}, Index16|32|64
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -659,12 +659,12 @@ ExecuteMOVIn (
   Dest <- Ip + ImmData
 
   Instruction syntax:
-  
+
     MOVREL[w|d|q] {@}R1 {Index16}, ImmData16|32|64
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -750,7 +750,7 @@ ExecutePOP (
 
   @param  VmPtr             A pointer to VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -772,7 +772,7 @@ ExecuteSignedDataManip (
 
   @param  VmPtr             A pointer to VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -789,7 +789,7 @@ ExecuteUnsignedDataManip (
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -806,7 +806,7 @@ ExecuteLOADSP (
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -822,15 +822,15 @@ ExecuteSTORESP (
   is a register.
 
   Instruction syntax:
-  
+
     MOVsnd {@}R1 {Indx32}, {@}R2 {Index32|Immed32}
-  
+
     0:7 1=>operand1 index present
     0:6 1=>operand2 index present
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -846,15 +846,15 @@ ExecuteMOVsnd (
   is a register.
 
   Instruction syntax:
-  
+
     MOVsnw {@}R1 {Index16}, {@}R2 {Index16|Immed16}
-  
+
     0:7 1=>operand1 index present
     0:6 1=>operand2 index present
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -1250,7 +1250,7 @@ ExecuteEXTNDD (
 // Once we retrieve the operands for the data manipulation instructions,
 // call these functions to perform the operation.
 //
-STATIC CONST DATA_MANIP_EXEC_FUNCTION mDataManipDispatchTable[] = {
+CONST DATA_MANIP_EXEC_FUNCTION mDataManipDispatchTable[] = {
   ExecuteNOT,
   ExecuteNEG,
   ExecuteADD,
@@ -1272,7 +1272,7 @@ STATIC CONST DATA_MANIP_EXEC_FUNCTION mDataManipDispatchTable[] = {
   ExecuteEXTNDD,
 };
 
-STATIC CONST VM_TABLE_ENTRY           mVmOpcodeTable[] = {
+CONST VM_TABLE_ENTRY           mVmOpcodeTable[] = {
   { ExecuteBREAK },             // opcode 0x00
   { ExecuteJMP },               // opcode 0x01
   { ExecuteJMP8 },              // opcode 0x02
@@ -1336,7 +1336,7 @@ STATIC CONST VM_TABLE_ENTRY           mVmOpcodeTable[] = {
 //
 // Length of JMP instructions, depending on upper two bits of opcode.
 //
-STATIC CONST UINT8                    mJMPLen[] = { 2, 2, 6, 10 };
+CONST UINT8                    mJMPLen[] = { 2, 2, 6, 10 };
 
 //
 // Simple Debugger Protocol GUID
@@ -1536,15 +1536,15 @@ Done:
   Execute the MOVxx instructions.
 
   Instruction format:
-    
+
     MOV[b|w|d|q|n]{w|d} {@}R1 {Index16|32}, {@}R2 {Index16|32}
     MOVqq {@}R1 {Index64}, {@}R2 {Index64}
-  
+
     Copies contents of [R2] -> [R1], zero extending where required.
-  
+
     First character indicates the size of the move.
     Second character indicates the size of the index(s).
-  
+
     Invalid to have R1 direct with index.
 
   @param  VmPtr             A pointer to a VM context.
@@ -1928,7 +1928,7 @@ ExecuteBREAK (
   Instruction syntax:
     JMP64{cs|cc} Immed64
     JMP32{cs|cc} {@}R1 {Immed32|Index32}
-  
+
   Encoding:
     b0.7 -  immediate data present
     b0.6 -  1 = 64 bit immediate data
@@ -2152,20 +2152,20 @@ ExecuteJMP8 (
   Execute the EBC MOVI.
 
   Instruction syntax:
-  
+
     MOVI[b|w|d|q][w|d|q] {@}R1 {Index16}, ImmData16|32|64
-  
+
     First variable character specifies the move size
     Second variable character specifies size of the immediate data
-  
+
     Sign-extend the immediate data to the size of the operation, and zero-extend
     if storing to a register.
-  
+
     Operand1 direct with index/immed is invalid.
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -2278,12 +2278,12 @@ ExecuteMOVI (
   index value into a register or memory location.
 
   Instruction syntax:
-  
+
     MOVIn[w|d|q] {@}R1 {Index16}, Index16|32|64
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -2380,12 +2380,12 @@ ExecuteMOVIn (
   Dest <- Ip + ImmData
 
   Instruction syntax:
-  
+
     MOVREL[w|d|q] {@}R1 {Index16}, ImmData16|32|64
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -2483,15 +2483,15 @@ ExecuteMOVREL (
   is a register.
 
   Instruction syntax:
-  
+
     MOVsnw {@}R1 {Index16}, {@}R2 {Index16|Immed16}
-  
+
     0:7 1=>operand1 index present
     0:6 1=>operand2 index present
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -2576,15 +2576,15 @@ ExecuteMOVsnw (
   is a register.
 
   Instruction syntax:
-  
+
     MOVsnd {@}R1 {Indx32}, {@}R2 {Index32|Immed32}
-  
+
     0:7 1=>operand1 index present
     0:6 1=>operand2 index present
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -3128,7 +3128,7 @@ ExecuteRET (
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -3289,7 +3289,7 @@ ExecuteCMP (
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -4057,7 +4057,7 @@ ExecuteEXTNDD (
 
   @param  VmPtr             A pointer to VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -4087,7 +4087,7 @@ ExecuteSignedDataManip (
 
   @param  VmPtr             A pointer to VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -4118,7 +4118,7 @@ ExecuteUnsignedDataManip (
   @param  VmPtr             A pointer to VM context.
   @param  IsSignedOp        Indicates whether the operand is signed or not.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -4267,7 +4267,7 @@ ExecuteDataManip (
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -4321,7 +4321,7 @@ ExecuteLOADSP (
 
   @param  VmPtr             A pointer to a VM context.
 
-  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.     
+  @retval EFI_UNSUPPORTED   The opcodes/operands is not supported.
   @retval EFI_SUCCESS       The instruction is executed successfully.
 
 **/
@@ -4381,13 +4381,13 @@ ExecuteSTORESP (
     b14:12  - number of bits in this index assigned to natural units (=a)
     ba:11   - constant units = ConstUnits
     b0:a    - natural units = NaturalUnits
-  
+
   Given this info, the offset can be computed by:
     offset = sign_bit * (ConstUnits + NaturalUnits * sizeof(UINTN))
 
   Max offset is achieved with index = 0x7FFF giving an offset of
   0x27B (32-bit machine) or 0x477 (64-bit machine).
-  Min offset is achieved with index = 
+  Min offset is achieved with index =
 
   @param  VmPtr             A pointer to VM context.
   @param  CodeOffset        Offset from IP of the location of the 16-bit index
@@ -4585,7 +4585,7 @@ VmReadIndex64 (
 
 /**
   Writes 8-bit data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -4595,14 +4595,14 @@ VmReadIndex64 (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -4623,7 +4623,7 @@ VmWriteMem8 (
 
 /**
   Writes 16-bit data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -4633,14 +4633,14 @@ VmWriteMem8 (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -4686,7 +4686,7 @@ VmWriteMem16 (
 
 /**
   Writes 32-bit data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -4696,14 +4696,14 @@ VmWriteMem16 (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -4749,7 +4749,7 @@ VmWriteMem32 (
 
 /**
   Writes 64-bit data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -4759,14 +4759,14 @@ VmWriteMem32 (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -4814,7 +4814,7 @@ VmWriteMem64 (
 
 /**
   Writes UINTN data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -4824,14 +4824,14 @@ VmWriteMem64 (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -4862,7 +4862,7 @@ VmWriteMemN (
       MemoryFence ();
       Status = VmWriteMem32 (VmPtr, Addr + Index * sizeof (UINT32), (UINT32) Data);
       MemoryFence ();
-      Data = (UINTN)RShiftU64 ((UINT64)Data, 32);
+      Data = (UINTN) RShiftU64 ((UINT64)Data, 32);
     }
   }
 
@@ -4969,8 +4969,8 @@ VmReadImmed32 (
   //
   // Return unaligned data
   //
-  Data = (UINT32) VmReadCode16 (VmPtr, Offset);
-  Data |= (UINT32) (VmReadCode16 (VmPtr, Offset + 2) << 16);
+  Data  = (UINT32) VmReadCode16 (VmPtr, Offset);
+  Data |= (UINT32)(VmReadCode16 (VmPtr, Offset + 2) << 16);
   return Data;
 }
 
@@ -5011,7 +5011,7 @@ VmReadImmed64 (
   Ptr             = (UINT8 *) &Data64;
   Data32          = VmReadCode32 (VmPtr, Offset);
   *(UINT32 *) Ptr = Data32;
-  Ptr += sizeof (Data32);
+  Ptr            += sizeof (Data32);
   Data32          = VmReadCode32 (VmPtr, Offset + sizeof (UINT32));
   *(UINT32 *) Ptr = Data32;
   return Data64;
@@ -5126,7 +5126,7 @@ VmReadCode64 (
   Ptr             = (UINT8 *) &Data64;
   Data32          = VmReadCode32 (VmPtr, Offset);
   *(UINT32 *) Ptr = Data32;
-  Ptr += sizeof (Data32);
+  Ptr            += sizeof (Data32);
   Data32          = VmReadCode32 (VmPtr, Offset + sizeof (UINT32));
   *(UINT32 *) Ptr = Data32;
   return Data64;
@@ -5340,7 +5340,7 @@ VmReadMemN (
 
 /**
   Returns the version of the EBC virtual machine.
-    
+
   @return The 64-bit version of EBC virtual machine.
 
 **/

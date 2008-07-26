@@ -273,7 +273,7 @@ ExecuteEbcImageEntryPoint (
   // Initialize the stack pointer for the EBC. Get the current system stack
   // pointer and adjust it down by the max needed for the interpreter.
   //
-  Addr            = EbcLLGetStackPointer ();
+  Addr = EbcLLGetStackPointer ();
 
   Status = GetEBCStack(ImageHandle, &VmContext.StackPool, &StackIndex);
   if (EFI_ERROR(Status)) {

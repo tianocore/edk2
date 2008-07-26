@@ -245,7 +245,7 @@ EbcExecute (
 
 /**
   Returns the version of the EBC virtual machine.
-    
+
   @return The 64-bit version of EBC virtual machine.
 
 **/
@@ -256,7 +256,7 @@ GetVmVersion (
 
 /**
   Writes UINTN data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -266,14 +266,14 @@ GetVmVersion (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
@@ -286,7 +286,7 @@ VmWriteMemN (
 
 /**
   Writes 64-bit data to memory address.
-   
+
   This routine is called by the EBC data
   movement instructions that write to memory. Since these writes
   may be to the stack, which looks like (high address on top) this,
@@ -296,14 +296,14 @@ VmWriteMemN (
   [EBC stack]
 
   we need to detect all attempts to write to the EBC entry point argument
-  stack area and adjust the address (which will initially point into the 
+  stack area and adjust the address (which will initially point into the
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
   @param  Addr              Adddress to write to.
   @param  Data              Value to write to Addr.
 
-  @retval EFI_SUCCESS       The instruction is executed successfully.  
+  @retval EFI_SUCCESS       The instruction is executed successfully.
   @retval Other             Some error occurs when writing data to the address.
 
 **/
