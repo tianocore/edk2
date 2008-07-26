@@ -43,7 +43,7 @@
   0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
 
 [LibraryClasses.common]
-  DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  DebugLib|MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   CpuLib|MdePkg/Library/CpuLib/CpuLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -56,7 +56,6 @@
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
-  ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   DxeI2cLib|OptionRomPkg/Library/CirrusLogicI2cLib/CirrusLogic5430I2cLib.inf
 
@@ -80,7 +79,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|0x0
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x27
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000042
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0x0
   gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion|0x0002000a # EFI_2_10_SYSTEM_TABLE_REVISION
 
