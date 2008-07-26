@@ -89,7 +89,7 @@ EbcCreateThunk (
   @param  This                  A pointer to the EFI_EBC_PROTOCOL instance.
   @param  Version               Pointer to where to store the returned version
                                 of the interpreter.
-   
+
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_INVALID_PARAMETER Version pointer is NULL.
 
@@ -184,7 +184,7 @@ InitEbcVmTestProtocol (
 
 /**
   Returns the EFI_UNSUPPORTED Status.
-   
+
   @return EFI_UNSUPPORTED  This function always return EFI_UNSUPPORTED status.
 
 **/
@@ -195,11 +195,11 @@ EbcVmTestUnsupported (
 
 /**
   Registers a callback function that the EBC interpreter calls to flush the
-  processor instruction cache following creation of thunks. 
+  processor instruction cache following creation of thunks.
 
   @param  This        A pointer to the EFI_EBC_PROTOCOL instance.
   @param  Flush       Pointer to a function of type EBC_ICACH_FLUSH.
-   
+
   @retval EFI_SUCCESS The function completed successfully.
 
 **/
@@ -302,7 +302,7 @@ EbcDebugRegisterExceptionCallback (
   @param  Start                 StartSpecifies the physical base of the memory
                                 range to be invalidated.
   @param  Length                Specifies the minimum number of bytes in the
-                                processor's instruction cache to invalidate. 
+                                processor's instruction cache to invalidate.
 
   @retval EFI_SUCCESS           The function completed successfully.
 
@@ -322,29 +322,29 @@ EbcDebugInvalidateInstructionCache (
 // also be global since the execution of an EBC image does not provide
 // a This pointer.
 //
-STATIC EBC_IMAGE_LIST         *mEbcImageList = NULL;
+EBC_IMAGE_LIST         *mEbcImageList = NULL;
 
 //
 // Callback function to flush the icache after thunk creation
 //
-STATIC EBC_ICACHE_FLUSH       mEbcICacheFlush;
+EBC_ICACHE_FLUSH       mEbcICacheFlush;
 
 //
 // These get set via calls by the debug agent
 //
-STATIC EFI_PERIODIC_CALLBACK  mDebugPeriodicCallback                            = NULL;
-STATIC EFI_EXCEPTION_CALLBACK mDebugExceptionCallback[MAX_EBC_EXCEPTION + 1] = {NULL};
-STATIC EFI_GUID               mEfiEbcVmTestProtocolGuid = EFI_EBC_VM_TEST_PROTOCOL_GUID;
+EFI_PERIODIC_CALLBACK  mDebugPeriodicCallback = NULL;
+EFI_EXCEPTION_CALLBACK mDebugExceptionCallback[MAX_EBC_EXCEPTION + 1] = {NULL};
+EFI_GUID               mEfiEbcVmTestProtocolGuid = EFI_EBC_VM_TEST_PROTOCOL_GUID;
 
-STATIC VOID*      mStackBuffer[MAX_STACK_NUM];
-STATIC EFI_HANDLE mStackBufferIndex[MAX_STACK_NUM];
-STATIC UINTN      mStackNum = 0;
+VOID                   *mStackBuffer[MAX_STACK_NUM];
+EFI_HANDLE             mStackBufferIndex[MAX_STACK_NUM];
+UINTN                  mStackNum = 0;
 
 //
 // Event for Periodic callback
 //
-STATIC EFI_EVENT              mEbcPeriodicEvent;
-VM_CONTEXT                    *mVmPtr = NULL;
+EFI_EVENT              mEbcPeriodicEvent;
+VM_CONTEXT             *mVmPtr = NULL;
 
 
 /**
@@ -701,7 +701,7 @@ EbcDebugRegisterExceptionCallback (
   @param  Start                 StartSpecifies the physical base of the memory
                                 range to be invalidated.
   @param  Length                Specifies the minimum number of bytes in the
-                                processor's instruction cache to invalidate. 
+                                processor's instruction cache to invalidate.
 
   @retval EFI_SUCCESS           The function completed successfully.
 
@@ -723,7 +723,7 @@ EbcDebugInvalidateInstructionCache (
   The VM interpreter calls this function when an exception is detected.
 
   @param  ExceptionType          Specifies the processor exception detected.
-  @param  ExceptionFlags         Specifies the exception context. 
+  @param  ExceptionFlags         Specifies the exception context.
   @param  VmPtr                  Pointer to a VM context for passing info to the
                                  EFI debugger.
 
@@ -1120,11 +1120,11 @@ EbcAddImageThunk (
 
 /**
   Registers a callback function that the EBC interpreter calls to flush the
-  processor instruction cache following creation of thunks. 
+  processor instruction cache following creation of thunks.
 
   @param  This        A pointer to the EFI_EBC_PROTOCOL instance.
   @param  Flush       Pointer to a function of type EBC_ICACH_FLUSH.
-   
+
   @retval EFI_SUCCESS The function completed successfully.
 
 **/
@@ -1145,7 +1145,7 @@ EbcRegisterICacheFlush (
   @param  This                  A pointer to the EFI_EBC_PROTOCOL instance.
   @param  Version               Pointer to where to store the returned version
                                 of the interpreter.
-   
+
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_INVALID_PARAMETER Version pointer is NULL.
 
@@ -1168,10 +1168,10 @@ EbcGetVersion (
 /**
   Returns the stack index and buffer assosicated with the Handle parameter.
 
-  @param  Handle                The EFI handle as the index to the EBC stack. 
+  @param  Handle                The EFI handle as the index to the EBC stack.
   @param  StackBuffer           A pointer to hold the returned stack buffer.
   @param  BufferIndex           A pointer to hold the returned stack index.
-   
+
   @retval EFI_OUT_OF_RESOURCES  The Handle parameter does not correspond to any
                                 existing EBC stack.
   @retval EFI_SUCCESS           The stack index and buffer were found and
@@ -1204,10 +1204,10 @@ GetEBCStack(
 }
 
 /**
-  Returns from the EBC stack by stack Index. 
-   
+  Returns from the EBC stack by stack Index.
+
   @param  Index        Specifies which EBC stack to return from.
-   
+
   @retval EFI_SUCCESS  The function completed successfully.
 
 **/
@@ -1221,10 +1221,10 @@ ReturnEBCStack(
 }
 
 /**
-  Returns from the EBC stack associated with the Handle parameter. 
-   
+  Returns from the EBC stack associated with the Handle parameter.
+
   @param  Handle      Specifies the EFI handle to find the EBC stack with.
-   
+
   @retval EFI_SUCCESS The function completed successfully.
 
 **/
@@ -1249,7 +1249,7 @@ ReturnEBCStackByHandle(
 /**
   Allocates memory to hold all the EBC stacks.
 
-  @retval EFI_SUCCESS          The EBC stacks were allocated successfully. 
+  @retval EFI_SUCCESS          The EBC stacks were allocated successfully.
   @retval EFI_OUT_OF_RESOURCES Not enough memory available for EBC stacks.
 
 **/
@@ -1336,7 +1336,7 @@ InitEbcVmTestProtocol (
 
 /**
   Returns the EFI_UNSUPPORTED Status.
-   
+
   @return EFI_UNSUPPORTED  This function always return EFI_UNSUPPORTED status.
 
 **/

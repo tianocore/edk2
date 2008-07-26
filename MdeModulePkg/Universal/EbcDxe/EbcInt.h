@@ -34,11 +34,11 @@ typedef UINT8   *VMIP;      // instruction pointer for the VM
 typedef UINT32  EXCEPTION_FLAGS;
 
 typedef struct {
-  VM_REGISTER       R[8];   // General purpose registers.
-  UINT64            Flags;  // Flags register:
-                            //   0   Set to 1 if the result of the last compare was true
-                            //   1  Set to 1 if stepping
-                            //   2..63 Reserved.
+  VM_REGISTER       R[8];                   // General purpose registers.
+  UINT64            Flags;                  // Flags register:
+                                            //   0   Set to 1 if the result of the last compare was true
+                                            //   1  Set to 1 if stepping
+                                            //   2..63 Reserved.
   VMIP              Ip;                     // Instruction pointer.
   UINTN             LastException;          //
   EXCEPTION_FLAGS   ExceptionFlags;         // to keep track of exceptions
@@ -132,7 +132,7 @@ EbcAddImageThunk (
   The VM interpreter calls this function when an exception is detected.
 
   @param  ExceptionType          Specifies the processor exception detected.
-  @param  ExceptionFlags         Specifies the exception context. 
+  @param  ExceptionFlags         Specifies the exception context.
   @param  VmPtr                  Pointer to a VM context for passing info to the
                                  EFI debugger.
 
@@ -157,13 +157,13 @@ EbcDebugSignalException (
 
 //
 // External low level functions that are native-processor dependent
-// 
+//
 /**
-  The VM thunk code stuffs an EBC entry point into a processor 
+  The VM thunk code stuffs an EBC entry point into a processor
   register. Since we can't use inline assembly to get it from
   the interpreter C code, stuff it into the return value
   register and return.
- 
+
   @return  The contents of the register in which the entry point is passed.
 
 **/
@@ -191,7 +191,7 @@ EbcLLGetStackPointer (
 /**
   This function is called to execute an EBC CALLEX instruction.
   This instruction requires that we thunk out to external native
-  code. For x64, we switch stacks, copy the arguments to the stack 
+  code. For x64, we switch stacks, copy the arguments to the stack
   and jump to the specified function.
   On return, we restore the stack pointer to its original location.
   Destroys no working registers.
@@ -251,10 +251,10 @@ EbcLLGetReturnValue (
 /**
   Returns the stack index and buffer assosicated with the Handle parameter.
 
-  @param  Handle                The EFI handle as the index to the EBC stack. 
+  @param  Handle                The EFI handle as the index to the EBC stack.
   @param  StackBuffer           A pointer to hold the returned stack buffer.
   @param  BufferIndex           A pointer to hold the returned stack index.
-   
+
   @retval EFI_OUT_OF_RESOURCES  The Handle parameter does not correspond to any
                                 existing EBC stack.
   @retval EFI_SUCCESS           The stack index and buffer were found and
@@ -269,10 +269,10 @@ GetEBCStack(
   );
 
 /**
-  Returns from the EBC stack by stack Index. 
-   
+  Returns from the EBC stack by stack Index.
+
   @param  Index        Specifies which EBC stack to return from.
-   
+
   @retval EFI_SUCCESS  The function completed successfully.
 
 **/
@@ -284,7 +284,7 @@ ReturnEBCStack(
 /**
   Allocates memory to hold all the EBC stacks.
 
-  @retval EFI_SUCCESS          The EBC stacks were allocated successfully. 
+  @retval EFI_SUCCESS          The EBC stacks were allocated successfully.
   @retval EFI_OUT_OF_RESOURCES Not enough memory available for EBC stacks.
 
 **/
@@ -305,10 +305,10 @@ FreeEBCStack(
   );
 
 /**
-  Returns from the EBC stack associated with the Handle parameter. 
-   
+  Returns from the EBC stack associated with the Handle parameter.
+
   @param  Handle      Specifies the EFI handle to find the EBC stack with.
-   
+
   @retval EFI_SUCCESS The function completed successfully.
 
 **/
@@ -316,6 +316,8 @@ EFI_STATUS
 ReturnEBCStackByHandle(
   IN EFI_HANDLE Handle
   );
+
+
 //
 // Defines for a simple EBC debugger interface
 //
@@ -329,23 +331,23 @@ typedef struct _EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL EFI_EBC_SIMPLE_DEBUGGER_PROTOCO
 typedef
 EFI_STATUS
 (*EBC_DEBUGGER_SIGNAL_EXCEPTION) (
-  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           * This,
-  IN VM_CONTEXT                                 * VmPtr,
+  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           *This,
+  IN VM_CONTEXT                                 *VmPtr,
   IN EFI_EXCEPTION_TYPE                         ExceptionType
   );
 
 typedef
 VOID
 (*EBC_DEBUGGER_DEBUG) (
-  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           * This,
-  IN VM_CONTEXT                                 * VmPtr
+  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           *This,
+  IN VM_CONTEXT                                 *VmPtr
   );
 
 typedef
 UINT32
 (*EBC_DEBUGGER_DASM) (
-  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           * This,
-  IN VM_CONTEXT                                 * VmPtr,
+  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           *This,
+  IN VM_CONTEXT                                 *VmPtr,
   IN UINT16                                     *DasmString OPTIONAL,
   IN UINT32                                     DasmStringSize
   );
@@ -359,7 +361,7 @@ UINT32
 typedef
 EFI_STATUS
 (*EBC_DEBUGGER_CONFIGURE) (
-  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           * This,
+  IN EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL           *This,
   IN UINT32                                     ConfigId,
   IN UINTN                                      ConfigValue
   );
