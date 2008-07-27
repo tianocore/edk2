@@ -36,7 +36,6 @@
 #define PAL_CACHE_FLUSH_NO_INTERRUPT         0
 
 /**
-
   PAL Procedure - PAL_CACHE_FLUSH.
 
   Flush the instruction or data caches. It is required by IPF.
@@ -46,38 +45,29 @@
 
   @param Index              Index of PAL_CACHE_FLUSH within the
                             list of PAL procedures.
-
   @param CacheType          Unsigned 64-bit integer indicating
                             which cache to flush.
-
   @param Operation          Formatted bit vector indicating the
                             operation of this call.
-
   @param ProgressIndicator  Unsigned 64-bit integer specifying
                             the starting position of the flush
                             operation.
 
-  @return R9      Unsigned 64-bit integer specifying the vector
-                  number of the pending interrupt.
+  @retval 2                 Call completed without error, but a PMI
+                            was taken during the execution of this
+                            procedure.
+  @retval 1                 Call has not completed flushing due to
+                            a pending interrupt.
+  @retval 0                 Call completed without error
+  @retval -2                Invalid argument
+  @retval -3                Call completed with error
 
-  @return R10     Unsigned 64-bit integer specifying the
-                  starting position of the flush operation.
-
-  @return R11     Unsigned 64-bit integer specifying the vector
-                  number of the pending interrupt.
-
-  @return Status  2 - Call completed without error, but a PMI
-                  was taken during the execution of this
-                  procedure.
-
-  @return Status  1 - Call has not completed flushing due to
-                  a pending interrupt.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error
+  @return R9                Unsigned 64-bit integer specifying the vector
+                            number of the pending interrupt.
+  @return R10               Unsigned 64-bit integer specifying the
+                            starting position of the flush operation.
+  @return R11               Unsigned 64-bit integer specifying the vector
+                            number of the pending interrupt.
 
 **/
 #define PAL_CACHE_FLUSH   1
@@ -135,7 +125,6 @@ typedef struct {
 } PAL_CACHE_INFO_RETURN2;
 
 /**
-
   PAL Procedure - PAL_CACHE_INFO.
 
   Return detailed instruction or data cache information. It is
@@ -145,38 +134,29 @@ typedef struct {
 
   @param Index        Index of PAL_CACHE_INFO within the list of
                       PAL procedures.
-
   @param CacheLevel   Unsigned 64-bit integer specifying the
                       level in the cache hierarchy for which
                       information is requested. This value must
                       be between 0 and one less than the value
                       returned in the cache_levels return value
                       from PAL_CACHE_SUMMARY.
-
   @param CacheType    Unsigned 64-bit integer with a value of 1
                       for instruction cache and 2 for data or
                       unified cache. All other values are
                       reserved.
-
   @param Reserved     Should be 0.
 
+  @retval 0           Call completed without error
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error
 
-  @return R9      Detail the characteristics of a given
-                  processor controlled cache in the cache
-                  hierarchy. See PAL_CACHE_INFO_RETURN1.
-
-  @return R10     Detail the characteristics of a given
-                  processor controlled cache in the cache
-                  hierarchy. See PAL_CACHE_INFO_RETURN2.
-
-  @return R11     Reserved with 0.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error
+  @return R9          Detail the characteristics of a given
+                      processor controlled cache in the cache
+                      hierarchy. See PAL_CACHE_INFO_RETURN1.
+  @return R10         Detail the characteristics of a given
+                      processor controlled cache in the cache
+                      hierarchy. See PAL_CACHE_INFO_RETURN2.
+  @return R11         Reserved with 0.
 
 **/
 #define PAL_CACHE_INFO    2
@@ -202,29 +182,25 @@ typedef struct {
 #define PAL_CACHE_INIT_RESTRICTED   1
 
 /**
-
   PAL Procedure - PAL_CACHE_INIT.
 
   Initialize the instruction or data caches. It is required by
   IPF. The PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode.
 
-  @param Index  Index of PAL_CACHE_INIT within the list of PAL
-                procedures.
-
-  @param Level  Unsigned 64-bit integer containing the level of
-                cache to initialize. If the cache level can be
-                initialized independently, only that level will
-                be initialized. Otherwise
-                implementation-dependent side-effects will
-                occur.
-
+  @param Index      Index of PAL_CACHE_INIT within the list of PAL
+                    procedures.
+  @param Level      Unsigned 64-bit integer containing the level of
+                    cache to initialize. If the cache level can be
+                    initialized independently, only that level will
+                    be initialized. Otherwise
+                    implementation-dependent side-effects will
+                    occur.
   @param CacheType  Unsigned 64-bit integer with a value of 1 to
                     initialize the instruction cache, 2 to
                     initialize the data cache, or 3 to
                     initialize both. All other values are
                     reserved.
-
   @param Restrict   Unsigned 64-bit integer with a value of 0 or
                     1. All other values are reserved. If
                     restrict is 1 and initializing the specified
@@ -232,16 +208,12 @@ typedef struct {
                     cause side-effects, PAL_CACHE_INIT will
                     return -4 instead of initializing the cache.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -4 - Call could not initialize the specified
-                  level and cache_type of the cache without
-                  side-effects and restrict was 1.
+  @retval 0         Call completed without error
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
+  @retval -4        Call could not initialize the specified
+                    level and cache_type of the cache without
+                    side-effects and restrict was 1.
 
 **/
 #define PAL_CACHE_INIT    3
@@ -278,7 +250,6 @@ typedef struct {
 } PAL_CACHE_PROTECTION;
 
 /**
-
   PAL Procedure - PAL_CACHE_PROT_INFO.
 
   Return instruction or data cache protection information. It is
@@ -286,39 +257,32 @@ typedef struct {
   Registers calling convention. It could be called at physical
   mode and Virtual mode.
 
-  @param Index  Index of PAL_CACHE_PROT_INFO within the list of
-                PAL procedures.
-
+  @param Index      Index of PAL_CACHE_PROT_INFO within the list of
+                    PAL procedures.
   @param CacheLevel Unsigned 64-bit integer specifying the level
                     in the cache hierarchy for which information
                     is requested. This value must be between 0
                     and one less than the value returned in the
                     cache_levels return value from
                     PAL_CACHE_SUMMARY.
-
   @param CacheType  Unsigned 64-bit integer with a value of 1
                     for instruction cache and 2 for data or
                     unified cache. All other values are
                     reserved.
 
-  @return R9      Detail the characteristics of a given
-                  processor controlled cache in the cache
-                  hierarchy. See PAL_CACHE_PROTECTION[0..1].
+  @retval 0         Call completed without error
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
 
-  @return R10     Detail the characteristics of a given
-                  processor controlled cache in the cache
-                  hierarchy. See PAL_CACHE_PROTECTION[2..3].
-
-  @return R11     Detail the characteristics of a given
-                  processor controlled cache in the cache
-                  hierarchy. See PAL_CACHE_PROTECTION[4..5].
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9        Detail the characteristics of a given
+                    processor controlled cache in the cache
+                    hierarchy. See PAL_CACHE_PROTECTION[0..1].
+  @return R10       Detail the characteristics of a given
+                    processor controlled cache in the cache
+                    hierarchy. See PAL_CACHE_PROTECTION[2..3].
+  @return R11       Detail the characteristics of a given
+                    processor controlled cache in the cache
+                    hierarchy. See PAL_CACHE_PROTECTION[4..5].
 
 **/
 #define PAL_CACHE_PROT_INFO     38
@@ -360,7 +324,6 @@ typedef struct {
 } PAL_PCOC_N_CACHE_INFO2;
 
 /**
-
   PAL Procedure - PAL_CACHE_SHARED_INFO.
 
   Returns information on which logical processors share caches.
@@ -368,53 +331,44 @@ typedef struct {
   Registers calling convention. It could be called at physical
   mode and Virtual mode.
 
-  @param Index  Index of PAL_CACHE_SHARED_INFO within the list
-                of PAL procedures.
+  @param Index       Index of PAL_CACHE_SHARED_INFO within the list
+                     of PAL procedures.
+  @param CacheLevel  Unsigned 64-bit integer specifying the
+                     level in the cache hierarchy for which
+                     information is requested. This value must
+                     be between 0 and one less than the value
+                     returned in the cache_levels return value
+                     from PAL_CACHE_SUMMARY.
+  @param CacheType   Unsigned 64-bit integer with a value of 1
+                     for instruction cache and 2 for data or
+                     unified cache. All other values are
+                     reserved.
+  @param ProcNumber  Unsigned 64-bit integer that specifies for
+                     which logical processor information is
+                     being requested. This input argument must
+                     be zero for the first call to this
+                     procedure and can be a maximum value of
+                     one less than the number of logical
+                     processors sharing this cache, which is
+                     returned by the num_shared return value.
 
-  @param CacheLevel   Unsigned 64-bit integer specifying the
-                      level in the cache hierarchy for which
-                      information is requested. This value must
-                      be between 0 and one less than the value
-                      returned in the cache_levels return value
-                      from PAL_CACHE_SUMMARY.
+  @retval 0          Call completed without error
+  @retval -1         Unimplemented procedure
+  @retval -2         Invalid argument
+  @retval -3         Call completed with error.
 
-  @param CacheType  Unsigned 64-bit integer with a value of 1
-                    for instruction cache and 2 for data or
-                    unified cache. All other values are
-                    reserved.
-
-  @param ProcNumber   Unsigned 64-bit integer that specifies for
-                      which logical processor information is
-                      being requested. This input argument must
-                      be zero for the first call to this
-                      procedure and can be a maximum value of
-                      one less than the number of logical
-                      processors sharing this cache, which is
-                      returned by the num_shared return value.
-
-  @return R9    Unsigned integer that returns the number of
-                logical processors that share the processor
-                cache level and type, for which information was
-                requested.
-
-  @return R10   The format of PAL_PCOC_N_CACHE_INFO1.
-
-  @return R11   The format of PAL_PCOC_N_CACHE_INFO2.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9         Unsigned integer that returns the number of
+                     logical processors that share the processor
+                     cache level and type, for which information was
+                     requested.
+  @return R10        The format of PAL_PCOC_N_CACHE_INFO1.
+  @return R11        The format of PAL_PCOC_N_CACHE_INFO2.
 
 **/
 #define PAL_CACHE_SHARED_INFO   43
 
 
 /**
-
   PAL Procedure - PAL_CACHE_SUMMARY.
 
   Return a summary of the cache hierarchy. It is required by
@@ -425,30 +379,26 @@ typedef struct {
   @param Index  Index of PAL_CACHE_SUMMARY within the list of
                 PAL procedures.
 
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-  @return R9  CacheLevels   Unsigned 64-bit integer denoting the
-                            number of levels of cache
-                            implemented by the processor.
-                            Strictly, this is the number of
-                            levels for which the cache
-                            controller is integrated into the
-                            processor (the cache SRAMs may be
-                            external to the processor).
-
-  @return R10 UniqueCaches  Unsigned 64-bit integer denoting the
-                            number of unique caches implemented
-                            by the processor. This has a maximum
-                            of 2*cache_levels, but may be less
-                            if any of the levels in the cache
-                            hierarchy are unified caches or do
-                            not have both instruction and data
-                            caches.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9    CacheLevels   Unsigned 64-bit integer denoting the
+                              number of levels of cache
+                              implemented by the processor.
+                              Strictly, this is the number of
+                              levels for which the cache
+                              controller is integrated into the
+                              processor (the cache SRAMs may be
+                              external to the processor).
+  @return R10   UniqueCaches  Unsigned 64-bit integer denoting the
+                              number of unique caches implemented
+                              by the processor. This has a maximum
+                              of 2*cache_levels, but may be less
+                              if any of the levels in the cache
+                              hierarchy are unified caches or do
+                              not have both instruction and data
+                              caches.
 
 **/
 #define PAL_CACHE_SUMMARY   4
@@ -464,7 +414,6 @@ typedef struct {
 #define PAL_MEMORY_ATTR_NATPAGE 7
 
 /**
-
   PAL Procedure - PAL_MEM_ATTRIB.
 
   Return a list of supported memory attributes.. It is required
@@ -475,23 +424,19 @@ typedef struct {
   @param Index  Index of PAL_MEM_ATTRIB within the list of PAL
                 procedures.
 
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-  @return R9  Attributes  8-bit vector of memory attributes
-                          implemented by processor. See Virtual
-                          Memory Attributes above.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9    Attributes  8-bit vector of memory attributes
+                            implemented by processor. See Virtual
+                            Memory Attributes above.
 
 **/
 
 #define PAL_MEM_ATTRIB      5
 
 /**
-
   PAL Procedure - PAL_PREFETCH_VISIBILITY.
 
   Used in architected sequence to transition pages from a
@@ -500,28 +445,23 @@ typedef struct {
   Registers calling convention. It could be called at physical
   mode and Virtual mode.
 
-  @param Index  Index of PAL_PREFETCH_VISIBILITY within the list
-                of PAL procedures.
+  @param Index          Index of PAL_PREFETCH_VISIBILITY within the list
+                        of PAL procedures.
+  @param TransitionType Unsigned integer specifying the type
+                        of memory attribute transition that is
+                        being performed.
 
-  @param TransitionType   Unsigned integer specifying the type
-                          of memory attribute transition that is
-                          being performed.
-
-  @return Status  1       Call completed without error; this
-                          call is not necessary on remote
-                          processors.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @retval 1             Call completed without error; this
+                        call is not necessary on remote
+                        processors.
+  @retval 0             Call completed without error
+  @retval -2            Invalid argument
+  @retval -3            Call completed with error.
 
 **/
 #define PAL_PREFETCH_VISIBILITY   41
 
 /**
-
   PAL Procedure - PAL_PTCE_INFO.
 
   Return information needed for ptc.e instruction to purge
@@ -532,27 +472,23 @@ typedef struct {
   @param Index  Index of PAL_PTCE_INFO within the list
                 of PAL procedures.
 
-  @return R9  Unsigned 64-bit integer denoting the beginning
-              address to be used by the first PTCE instruction
-              in the purge loop.
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-  @return R10 Two unsigned 32-bit integers denoting the loop
-              counts of the outer (loop 1) and inner (loop 2)
-              purge loops. count1 (loop 1) is contained in bits
-              63:32 of the parameter, and count2 (loop 2) is
-              contained in bits 31:0 of the parameter.
-
-  @return R11 Two unsigned 32-bit integers denoting the loop
-              strides of the outer (loop 1) and inner (loop 2)
-              purge loops. stride1 (loop 1) is contained in bits
-              63:32 of the parameter, and stride2 (loop 2) is
-              contained in bits 31:0 of the parameter.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9    Unsigned 64-bit integer denoting the beginning
+                address to be used by the first PTCE instruction
+                in the purge loop.
+  @return R10   Two unsigned 32-bit integers denoting the loop
+                counts of the outer (loop 1) and inner (loop 2)
+                purge loops. count1 (loop 1) is contained in bits
+                63:32 of the parameter, and count2 (loop 2) is
+                contained in bits 31:0 of the parameter.
+  @return R11   Two unsigned 32-bit integers denoting the loop
+                strides of the outer (loop 1) and inner (loop 2)
+                purge loops. stride1 (loop 1) is contained in bits
+                63:32 of the parameter, and stride2 (loop 2) is
+                contained in bits 31:0 of the parameter.
 
 **/
 #define PAL_PTCE_INFO     6
@@ -599,7 +535,6 @@ typedef struct {
 } PAL_TC_INFO;
 
 /**
-
   PAL Procedure - PAL_VM_INFO.
 
   Return detailed information about virtual memory features
@@ -607,40 +542,34 @@ typedef struct {
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and Virtual mode.
 
-  @param Index  Index of PAL_VM_INFO within the list
-                of PAL procedures.
-
+  @param Index    Index of PAL_VM_INFO within the list
+                  of PAL procedures.
   @param TcLevel  Unsigned 64-bit integer specifying the level
                   in the TLB hierarchy for which information is
                   required. This value must be between 0 and one
                   less than the value returned in the
                   vm_info_1.num_tc_levels return value from
                   PAL_VM_SUMMARY.
-
   @param TcType   Unsigned 64-bit integer with a value of 1 for
                   instruction translation cache and 2 for data
                   or unified translation cache. All other values
                   are reserved.
 
+  @retval 0       Call completed without error
+  @retval -2      Invalid argument
+  @retval -3      Call completed with error.
+
   @return R9      8-byte formatted value returning information
                   about the specified TC. See PAL_TC_INFO above.
-
   @return R10     64-bit vector containing a bit for each page
                   size supported in the specified TC, where bit
                   position n indicates a page size of 2**n.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
 
 **/
 #define PAL_VM_INFO       7
 
 
 /**
-
   PAL Procedure - PAL_VM_PAGE_SIZE.
 
   Return virtual memory TC and hardware walker page sizes
@@ -651,20 +580,16 @@ typedef struct {
   @param Index  Index of PAL_VM_PAGE_SIZE within the list
                 of PAL procedures.
 
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-  @return R9      64-bit vector containing a bit for each
-                  architected page size that is supported for
-                  TLB insertions and region registers.
-
-  @return R10     64-bit vector containing a bit for each
-                  architected page size supported for TLB purge
-                  operations.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9    64-bit vector containing a bit for each
+                architected page size that is supported for
+                TLB insertions and region registers.
+  @return R10   64-bit vector containing a bit for each
+                architected page size supported for TLB purge
+                operations.
 
 **/
 #define PAL_VM_PAGE_SIZE 34
@@ -746,7 +671,6 @@ typedef struct {
 } PAL_VM_INFO2;
 
 /**
-
   PAL Procedure - PAL_VM_SUMMARY.
 
   Return summary information about virtual memory features
@@ -757,18 +681,14 @@ typedef struct {
   @param Index  Index of PAL_VM_SUMMARY within the list
                 of PAL procedures.
 
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
   @return R9    8-byte formatted value returning global virtual
                 memory information. See PAL_VM_INFO1 above.
-
   @return R10   8-byte formatted value returning global virtual
                 memory information. See PAL_VM_INFO2 above.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
 
 **/
 #define PAL_VM_SUMMARY  8
@@ -784,34 +704,28 @@ typedef struct {
 
 
 /**
-
   PAL Procedure - PAL_VM_TR_READ.
 
   Read contents of a translation register. It is required by
   IPF. The PAL procedure supports the Stacked Register calling
   convention. It could be called at physical mode.
 
-  @param Index  Index of PAL_VM_TR_READ within the list
-                of PAL procedures.
-
+  @param Index      Index of PAL_VM_TR_READ within the list
+                    of PAL procedures.
   @param RegNumber  Unsigned 64-bit number denoting which TR to
                     read.
+  @param TrType     Unsigned 64-bit number denoting whether to
+                    read an ITR (0) or DTR (1). All other values
+                    are reserved.
+  @param TrBuffer   64-bit pointer to the 32-byte memory buffer in
+                    which translation data is returned.
 
-  @param TrType   Unsigned 64-bit number denoting whether to
-                  read an ITR (0) or DTR (1). All other values
-                  are reserved.
+  @retval 0         Call completed without error
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
 
-  @param TrBuffer 64-bit pointer to the 32-byte memory buffer in
-                  which translation data is returned.
-
-  @return R9    Formatted bit vector denoting which fields are
-                valid. See TR_valid above.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9        Formatted bit vector denoting which fields are
+                    valid. See TR_valid above.
 
 **/
 #define PAL_VM_TR_READ  261
@@ -982,7 +896,6 @@ typedef struct {
 
 
 /**
-
   PAL Procedure - PAL_BUS_GET_FEATURES.
 
   Return configurable processor bus interface features and their
@@ -993,25 +906,20 @@ typedef struct {
   @param Index  Index of PAL_BUS_GET_FEATURES within the list
                 of PAL procedures.
 
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
+
   @return R9    64-bit vector of features implemented.
                 (1=implemented, 0=not implemented)
-
   @return R10   64-bit vector of current feature settings.
-
   @return R11   64-bit vector of features controllable by
                 software. (1=controllable, 0= not controllable)
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
 
 **/
 #define PAL_BUS_GET_FEATURES 9
 
 /**
-
   PAL Procedure - PAL_BUS_SET_FEATURES.
 
   Enable or disable configurable features in processor bus
@@ -1019,24 +927,20 @@ typedef struct {
   supports the Static Registers calling convention. It could be
   called at physical mode.
 
-  @param Index  Index of PAL_BUS_SET_FEATURES within the list
-                of PAL procedures.
-
+  @param Index          Index of PAL_BUS_SET_FEATURES within the list
+                        of PAL procedures.
   @param FeatureSelect  64-bit vector denoting desired state of
                         each feature (1=select, 0=non-select).
 
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @retval 0             Call completed without error
+  @retval -2            Invalid argument
+  @retval -3            Call completed with error.
 
 **/
 #define PAL_BUS_SET_FEATURES 10
 
 
 /**
-
   PAL Procedure - PAL_DEBUG_INFO.
 
   Return the number of instruction and data breakpoint
@@ -1048,25 +952,21 @@ typedef struct {
   @param Index  Index of PAL_DEBUG_INFO within the list of PAL
                 procedures.
 
-  @return R9  Unsigned 64-bit integer denoting the number of
-              pairs of instruction debug registers implemented
-              by the processor.
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-  @return R10 Unsigned 64-bit integer denoting the number of
-              pairs of data debug registers implemented by the
-              processor.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9    Unsigned 64-bit integer denoting the number of
+                pairs of instruction debug registers implemented
+                by the processor.
+  @return R10   Unsigned 64-bit integer denoting the number of
+                pairs of data debug registers implemented by the
+                processor.
 
 **/
 #define PAL_DEBUG_INFO  11
 
 /**
-
   PAL Procedure - PAL_FIXED_ADDR.
 
   Return the fixed component of a processor's directed address.
@@ -1077,20 +977,16 @@ typedef struct {
   @param Index  Index of PAL_FIXED_ADDR within the list of PAL
                 procedures.
 
-  @return R9  Fixed geographical address of this processor.
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9    Fixed geographical address of this processor.
 
 **/
 #define PAL_FIXED_ADDR 12
 
 /**
-
   PAL Procedure - PAL_FREQ_BASE.
 
   Return the frequency of the output clock for use by the
@@ -1102,24 +998,19 @@ typedef struct {
   @param Index  Index of PAL_FREQ_BASE within the list of PAL
                 procedures.
 
-  @return R9  Base frequency of the platform if generated by the
-              processor chip.
+  @retval 0     Call completed without error
+  @retval -1    Unimplemented procedure
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9    Base frequency of the platform if generated by the
+                processor chip.
 
 **/
 #define PAL_FREQ_BASE 13
 
 
 /**
-
   PAL Procedure - PAL_FREQ_RATIOS.
 
   Return ratio of processor, bus, and interval time counter to
@@ -1131,29 +1022,25 @@ typedef struct {
   @param Index  Index of PAL_FREQ_RATIOS within the list of PAL
                 procedures.
 
-  @return R9  Ratio of the processor frequency to the input
-              clock of the processor, if the platform clock is
-              generated externally or to the output clock to the
-              platform, if the platform clock is generated by
-              the processor.
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-  @return R10 Ratio of the bus frequency to the input clock of
-              the processor, if the platform clock is generated
-              externally or to the output clock to the platform,
-              if the platform clock is generated by the
-              processor.
-
-  @return R11 Ratio of the interval timer counter rate to input
-              clock of the processor, if the platform clock is
-              generated externally or to the output clock to the
-              platform, if the platform clock is generated by
-              the processor.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9    Ratio of the processor frequency to the input
+                clock of the processor, if the platform clock is
+                generated externally or to the output clock to the
+                platform, if the platform clock is generated by
+                the processor.
+  @return R10   Ratio of the bus frequency to the input clock of
+                the processor, if the platform clock is generated
+                externally or to the output clock to the platform,
+                if the platform clock is generated by the
+                processor.
+  @return R11   Ratio of the interval timer counter rate to input
+                clock of the processor, if the platform clock is
+                generated externally or to the output clock to the
+                platform, if the platform clock is generated by
+                the processor.
 
 **/
 #define PAL_FREQ_RATIOS 14
@@ -1228,7 +1115,6 @@ typedef struct {
 } PAL_LOGICAL_PROCESSORN_INFO2;
 
 /**
-
   PAL Procedure - PAL_LOGICAL_TO_PHYSICAL.
 
   Return information on which logical processors map to a
@@ -1236,9 +1122,8 @@ typedef struct {
   supports the Static Registers calling convention. It could be
   called at physical mode and virtual mode.
 
-  @param Index  Index of PAL_LOGICAL_TO_PHYSICAL within the list of PAL
-                procedures.
-
+  @param Index            Index of PAL_LOGICAL_TO_PHYSICAL within the list of PAL
+                          procedures.
   @param ProcessorNumber  Signed 64-bit integer that specifies
                           for which logical processor
                           information is being requested. When
@@ -1251,21 +1136,14 @@ typedef struct {
                           returned by num_log in the
                           log_overview return value.
 
+  @retval 0               Call completed without error
+  @retval -1              Unimplemented procedure
+  @retval -2              Invalid argument
+  @retval -3              Call completed with error.
 
-  @return R9  The format of PAL_LOGICAL_PROCESSPR_OVERVIEW.
-
-  @return R10 The format of PAL_LOGICAL_PROCESSORN_INFO1.
-
-  @return R11 The format of PAL_LOGICAL_PROCESSORN_INFO2.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9              The format of PAL_LOGICAL_PROCESSPR_OVERVIEW.
+  @return R10             The format of PAL_LOGICAL_PROCESSORN_INFO1.
+  @return R11             The format of PAL_LOGICAL_PROCESSORN_INFO2.
 
 **/
 #define PAL_LOGICAL_TO_PHYSICAL 42
@@ -1300,7 +1178,6 @@ typedef struct {
 } PAL_PERFORMANCE_INFO;
 
 /**
-
   PAL Procedure - PAL_PERF_MON_INFO.
 
   Return the number and type of performance monitors. It is
@@ -1308,21 +1185,17 @@ typedef struct {
   Registers calling convention. It could be called at physical
   mode and virtual mode.
 
-  @param Index  Index of PAL_PERF_MON_INFO within the list of
-                PAL procedures.
-
+  @param Index              Index of PAL_PERF_MON_INFO within the list of
+                            PAL procedures.
   @param PerformanceBuffer  An address to an 8-byte aligned
                             128-byte memory buffer.
 
+  @retval 0                 Call completed without error
+  @retval -2                Invalid argument
+  @retval -3                Call completed with error.
 
-  @return R9  Information about the performance monitors
-              implemented. See PAL_PERFORMANCE_INFO;
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9                Information about the performance monitors
+                            implemented. See PAL_PERFORMANCE_INFO;
 
 **/
 #define PAL_PERF_MON_INFO 15
@@ -1331,7 +1204,6 @@ typedef struct {
 #define PAL_PLATFORM_ADDR_IO_BLOCK_TOKEN                              0x1
 
 /**
-
   PAL Procedure - PAL_PLATFORM_ADDR.
 
   Specify processor interrupt block address and I/O port space
@@ -1339,29 +1211,23 @@ typedef struct {
   Static Registers calling convention. It could be called at
   physical mode and virtual mode.
 
-  @param Index  Index of PAL_PLATFORM_ADDR within the list of
-                PAL procedures.
-
-  @param Type   Unsigned 64-bit integer specifying the type of
-                block. 0 indicates that the processor interrupt
-                block pointer should be initialized. 1 indicates
-                that the processor I/O block pointer should be
-                initialized.
-
+  @param Index    Index of PAL_PLATFORM_ADDR within the list of
+                  PAL procedures.
+  @param Type     Unsigned 64-bit integer specifying the type of
+                  block. 0 indicates that the processor interrupt
+                  block pointer should be initialized. 1 indicates
+                  that the processor I/O block pointer should be
+                  initialized.
   @param Address  Unsigned 64-bit integer specifying the address
                   to which the processor I/O block or interrupt
                   block shall be set. The address must specify
                   an implemented physical address on the
                   processor model, bit 63 is ignored.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure.
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @retval 0       Call completed without error
+  @retval -1      Unimplemented procedure.
+  @retval -2      Invalid argument
+  @retval -3      Call completed with error.
 
 **/
 #define PAL_PLATFORM_ADDR 16
@@ -1712,7 +1578,6 @@ typedef struct {
 } PAL_PROCESSOR_FEATURES;
 
 /**
-
   PAL Procedure - PAL_PROC_GET_FEATURES.
 
   Return configurable processor features and their current
@@ -1720,43 +1585,33 @@ typedef struct {
   Static Registers calling convention. It could be called at
   physical mode and virtual mode.
 
-  @param Index  Index of PAL_PROC_GET_FEATURES within the list of
-                PAL procedures.
-
+  @param Index      Index of PAL_PROC_GET_FEATURES within the list of
+                    PAL procedures.
   @param Reserved   Reserved parameter.
+  @param FeatureSet Feature set information is being requested
+                    for.
 
-  @param FeatureSet   Feature set information is being requested
-                      for.
+  @retval 1         Call completed without error; The
+                    feature_set passed is not supported but a
+                    feature_set of a larger value is supported.
+  @retval 0         Call completed without error
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
+  @retval -8        feature_set passed is beyond the maximum
+                    feature_set supported
 
-
-  @return R9  64-bit vector of features implemented. See
-              PAL_PROCESSOR_FEATURES.
-
-  @return R10 64-bit vector of current feature settings. See
-              PAL_PROCESSOR_FEATURES.
-
-  @return R11 64-bit vector of features controllable by
-              software.
-
-  @return Status  1 - Call completed without error; The
-                  feature_set passed is not supported but a
-                  feature_set of a larger value is supported.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -8 - feature_set passed is beyond the maximum
-                  feature_set supported
+  @return R9        64-bit vector of features implemented. See
+                    PAL_PROCESSOR_FEATURES.
+  @return R10       64-bit vector of current feature settings. See
+                    PAL_PROCESSOR_FEATURES.
+  @return R11       64-bit vector of features controllable by
+                    software.
 
 **/
 #define PAL_PROC_GET_FEATURES 17
 
 
 /**
-
   PAL Procedure - PAL_PROC_SET_FEATURES.
 
   Enable or disable configurable processor features. It is
@@ -1764,30 +1619,22 @@ typedef struct {
   Registers calling convention. It could be called at physical
   mode.
 
-  @param Index  Index of PAL_PROC_SET_FEATURES within the list of
-                PAL procedures.
-
+  @param Index          Index of PAL_PROC_SET_FEATURES within the list of
+                        PAL procedures.
   @param FeatureSelect  64-bit vector denoting desired state of
                         each feature (1=select, 0=non-select).
+  @param FeatureSet     Feature set to apply changes to. See
+                        PAL_PROC_GET_FEATURES for more information
+                        on feature sets.
 
-  @param FeatureSet   Feature set to apply changes to. See
-                      PAL_PROC_GET_FEATURES for more information
-                      on feature sets.
-
-
-
-  @return Status  1 - Call completed without error; The
-                  feature_set passed is not supported but a
-                  feature_set of a larger value is supported
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -8 - feature_set passed is beyond the maximum
-                  feature_set supported
+  @retval 1             Call completed without error; The
+                        feature_set passed is not supported but a
+                        feature_set of a larger value is supported
+  @retval 0             Call completed without error
+  @retval -2            Invalid argument
+  @retval -3            Call completed with error.
+  @retval -8            feature_set passed is beyond the maximum
+                        feature_set supported
 
 **/
 #define PAL_PROC_SET_FEATURES 18
@@ -1803,7 +1650,6 @@ typedef struct {
 
 
 /**
-
   PAL Procedure - PAL_REGISTER_INFO.
 
   Return AR and CR register information. It is required by IPF.
@@ -1811,56 +1657,44 @@ typedef struct {
   convention. It could be called at physical mode and virtual
   mode.
 
-  @param Index  Index of PAL_REGISTER_INFO within the list of
-                PAL procedures.
-
+  @param Index        Index of PAL_REGISTER_INFO within the list of
+                      PAL procedures.
   @param InfoRequest  Unsigned 64-bit integer denoting what
                       register information is requested. See
                       PAL_REGISTER_INFO.InfoRequest above.
 
-  @return R9  64-bit vector denoting information for registers
-              0-63. Bit 0 is register 0, bit 63 is register 63.
+  @retval 0           Call completed without error
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
 
-  @return R10 64-bit vector denoting information for registers
-              64-127. Bit 0 is register 64, bit 63 is register
-              127.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9          64-bit vector denoting information for registers
+                      0-63. Bit 0 is register 0, bit 63 is register 63.
+  @return R10         64-bit vector denoting information for registers
+                      64-127. Bit 0 is register 64, bit 63 is register
+                      127.
 
 **/
 #define PAL_REGISTER_INFO 39
 
 /**
-
   PAL Procedure - PAL_RSE_INFO.
 
   Return RSE information. It is required by IPF. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and virtual mode.
 
-  @param Index  Index of PAL_RSE_INFO within the list of
-                PAL procedures.
-
+  @param Index        Index of PAL_RSE_INFO within the list of
+                      PAL procedures.
   @param InfoRequest  Unsigned 64-bit integer denoting what
                       register information is requested. See
                       PAL_REGISTER_INFO.InfoRequest above.
 
-  @return R9  Number of physical stacked general registers.
+  @retval 0           Call completed without error
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
 
-  @return R10 RSE hints supported by processor.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9          Number of physical stacked general registers.
+  @return R10         RSE hints supported by processor.
 
 **/
 #define PAL_RSE_INFO 19
@@ -1893,34 +1727,28 @@ typedef struct {
 } PAL_VERSION_INFO;
 
 /**
-
   PAL Procedure - PAL_VERSION.
 
   Return version of PAL code. It is required by IPF. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and virtual mode.
 
-  @param Index  Index of PAL_VERSION within the list of
-                PAL procedures.
-
+  @param Index        Index of PAL_VERSION within the list of
+                      PAL procedures.
   @param InfoRequest  Unsigned 64-bit integer denoting what
                       register information is requested. See
                       PAL_REGISTER_INFO.InfoRequest above.
 
-  @return R9  8-byte formatted value returning the minimum PAL
-              version needed for proper operation of the
-              processor. See PAL_VERSION_INFO above.
+  @retval 0           Call completed without error
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
 
-  @return R10 8-byte formatted value returning the current PAL
-              version running on the processor. See
-              PAL_VERSION_INFO above.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9          8-byte formatted value returning the minimum PAL
+                      version needed for proper operation of the
+                      processor. See PAL_VERSION_INFO above.
+  @return R10         8-byte formatted value returning the current PAL
+                      version running on the processor. See
+                      PAL_VERSION_INFO above.
 
 **/
 #define PAL_VERSION 20
@@ -1934,7 +1762,6 @@ typedef struct {
 #define PAL_INIT_PENDING  BIT1
 
 /**
-
   PAL Procedure - PAL_MC_CLEAR_LOG.
 
   Clear all error information from processor error logging
@@ -1945,23 +1772,17 @@ typedef struct {
   @param Index  Index of PAL_MC_CLEAR_LOG within the list of
                 PAL procedures.
 
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-  @return R9  64-bit vector denoting whether an event is
-              pending. See PAL_MC_CLEAR_LOG.pending above.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9    64-bit vector denoting whether an event is
+                pending. See PAL_MC_CLEAR_LOG.pending above.
 
 **/
 #define PAL_MC_CLEAR_LOG 21
 
 /**
-
   PAL Procedure - PAL_MC_DRAIN.
 
   Ensure that all operations that could cause an MCA have
@@ -1972,20 +1793,15 @@ typedef struct {
   @param Index  Index of PAL_MC_DRAIN within the list of PAL
                 procedures.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
 **/
 #define PAL_MC_DRAIN 22
 
 
 /**
-
   PAL Procedure - PAL_MC_DYNAMIC_STATE.
 
   Return Processor Dynamic State for logging by SAL. It is
@@ -1994,23 +1810,17 @@ typedef struct {
 
   @param Index  Index of PAL_MC_DYNAMIC_STATE within the list of PAL
                 procedures.
-
   @param Offset Offset of the next 8 bytes of Dynamic Processor
                 State to return. (multiple of 8).
 
-  @return R9  Unsigned 64-bit integer denoting bytes of Dynamic
-              Processor State returned.
+  @retval 0     Call completed without error
+  @retval -1    Unimplemented procedure.
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
-  @return R10 Next 8 bytes of Dynamic Processor State.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure.
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9    Unsigned 64-bit integer denoting bytes of Dynamic
+                Processor State returned.
+  @return R10   Next 8 bytes of Dynamic Processor State.
 
 **/
 #define PAL_MC_DYNAMIC_STATE 24
@@ -2318,7 +2128,6 @@ typedef struct {
 } PAL_TLB_CHECK_INFO;
 
 /**
-
   PAL Procedure - PAL_MC_ERROR_INFO.
 
   Return Processor Machine Check Information and Processor
@@ -2326,79 +2135,62 @@ typedef struct {
   PAL procedure supports the Static Registers calling
   convention. It could be called at physical and virtual mode.
 
-  @param Index  Index of PAL_MC_ERROR_INFO within the list of PAL
-                procedures.
-
-  @param InfoIndex  Unsigned 64-bit integer identifying the
-                    error information that is being requested.
-                    See PAL_MC_ERROR_INFO.InfoIndex.
-
-  @param LevelIndex   8-byte formatted value identifying the
-                      structure to return error information
-                      on. See PAL_MC_ERROR_INFO_LEVEL_INDEX.
-
+  @param Index            Index of PAL_MC_ERROR_INFO within the list of PAL
+                          procedures.
+  @param InfoIndex        Unsigned 64-bit integer identifying the
+                          error information that is being requested.
+                          See PAL_MC_ERROR_INFO.InfoIndex.
+  @param LevelIndex       8-byte formatted value identifying the
+                          structure to return error information
+                          on. See PAL_MC_ERROR_INFO_LEVEL_INDEX.
   @param ErrorTypeIndex   Unsigned 64-bit integer denoting the
                           type of error information that is
                           being requested for the structure
                           identified in LevelIndex.
 
+  @retval 0               Call completed without error
+  @retval -2              Invalid argument
+  @retval -3              Call completed with error.
+  @retval -6              Argument was valid, but no error
+                          information was available
 
-  @return R9  Error information returned. The format of this
-              value is dependant on the input values passed.
-
-  @return R10 If this value is zero, all the error information
-              specified by err_type_index has been returned. If
-              this value is one, more structure-specific error
-              information is available and the caller needs to
-              make this procedure call again with level_index
-              unchanged and err_type_index, incremented.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -6 - Argument was valid, but no error
-                  information was available
-
+  @return R9              Error information returned. The format of this
+                          value is dependant on the input values passed.
+  @return R10             If this value is zero, all the error information
+                          specified by err_type_index has been returned. If
+                          this value is one, more structure-specific error
+                          information is available and the caller needs to
+                          make this procedure call again with level_index
+                          unchanged and err_type_index, incremented.
 
 **/
 #define PAL_MC_ERROR_INFO 25
 
 /**
-
   PAL Procedure - PAL_MC_EXPECTED.
 
   Set/Reset Expected Machine Check Indicator. It is required by
   IPF. The PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode.
 
-  @param Index  Index of PAL_MC_EXPECTED within the list of PAL
-                procedures.
-
+  @param Index      Index of PAL_MC_EXPECTED within the list of PAL
+                    procedures.
   @param Expected   Unsigned integer with a value of 0 or 1 to
                     set or reset the hardware resource
                     PALE_CHECK examines for expected machine
                     checks.
 
+  @retval 0         Call completed without error
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
 
-  @return R9  Unsigned integer denoting whether a machine check
-              was previously expected.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9        Unsigned integer denoting whether a machine check
+                    was previously expected.
 
 **/
 #define PAL_MC_EXPECTED 23
 
 /**
-
   PAL Procedure - PAL_MC_REGISTER_MEM.
 
   Register min-state save area with PAL for machine checks and
@@ -2406,25 +2198,19 @@ typedef struct {
   Static Registers calling convention. It could be called at
   physical mode.
 
-  @param Index  Index of PAL_MC_REGISTER_MEM within the list of PAL
-                procedures.
-
+  @param Index    Index of PAL_MC_REGISTER_MEM within the list of PAL
+                  procedures.
   @param Address  Physical address of the buffer to be
                   registered with PAL.
 
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @retval 0       Call completed without error
+  @retval -2      Invalid argument
+  @retval -3      Call completed with error.
 
 **/
 #define PAL_MC_REGISTER_MEM 27
 
 /**
-
   PAL Procedure - PAL_MC_RESUME.
 
   Restore minimal architected state and return to interrupted
@@ -2432,18 +2218,15 @@ typedef struct {
   Static Registers calling convention. It could be called at
   physical mode.
 
-  @param Index  Index of PAL_MC_RESUME within the list of PAL
-                procedures.
-
-  @param SetCmci  Unsigned 64 bit integer denoting whether to
-                  set the CMC interrupt. A value of 0 indicates
-                  not to set the interrupt, a value of 1
-                  indicated to set the interrupt, and all other
-                  values are reserved.
-
-  @param SavePtr  Physical address of min-state save area used
-                  to used to restore processor state.
-
+  @param Index        Index of PAL_MC_RESUME within the list of PAL
+                      procedures.
+  @param SetCmci      Unsigned 64 bit integer denoting whether to
+                      set the CMC interrupt. A value of 0 indicates
+                      not to set the interrupt, a value of 1
+                      indicated to set the interrupt, and all other
+                      values are reserved.
+  @param SavePtr      Physical address of min-state save area used
+                      to used to restore processor state.
   @param NewContext   Unsigned 64-bit integer denoting whether
                       the caller is returning to a new context.
                       A value of 0 indicates the caller is
@@ -2451,17 +2234,13 @@ typedef struct {
                       value of 1 indicates that the caller is
                       returning to a new context.
 
-
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
 
 **/
 #define PAL_MC_RESUME 26
 
 /**
-
   PAL Procedure - PAL_HALT.
 
   Enter the low-power HALT state or an implementation-dependent
@@ -2469,35 +2248,27 @@ typedef struct {
   Static Registers calling convention. It could be called at
   physical mode.
 
-  @param Index  Index of PAL_HALT within the list of PAL
-                procedures.
-
-  @param HaltState  Unsigned 64-bit integer denoting low power
-                    state requested.
-
+  @param Index        Index of PAL_HALT within the list of PAL
+                      procedures.
+  @param HaltState    Unsigned 64-bit integer denoting low power
+                      state requested.
   @param IoDetailPtr  8-byte aligned physical address pointer to
                       information on the type of I/O
                       (load/store) requested.
 
+  @retval 0           Call completed without error
+  @retval -1          Unimplemented procedure
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
 
-  @return R9  Value returned if a load instruction is requested
-              in the io_detail_ptr
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9          Value returned if a load instruction is requested
+                      in the io_detail_ptr
 
 **/
 #define PAL_HALT 28
 
 
 /**
-
   PAL Procedure - PAL_HALT_INFO.
 
   Return the low power capabilities of the processor. It is
@@ -2505,26 +2276,20 @@ typedef struct {
   Stacked Registers calling convention. It could be called at
   physical and virtual mode.
 
-  @param Index  Index of PAL_HALT_INFO within the list of PAL
-                procedures.
-
+  @param Index        Index of PAL_HALT_INFO within the list of PAL
+                      procedures.
   @param PowerBuffer  64-bit pointer to a 64-byte buffer aligned
                       on an 8-byte boundary.
 
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @retval 0           Call completed without error
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
 
 **/
 #define PAL_HALT_INFO 257
 
 
 /**
-
   PAL Procedure - PAL_HALT_LIGHT.
 
   Enter the low power LIGHT HALT state. It is required by
@@ -2534,18 +2299,14 @@ typedef struct {
   @param Index  Index of PAL_HALT_LIGHT within the list of PAL
                 procedures.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @retval 0     Call completed without error
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
 
 **/
 #define PAL_HALT_LIGHT 29
 
 /**
-
   PAL Procedure - PAL_CACHE_LINE_INIT.
 
   Initialize tags and data of a cache line for processor
@@ -2553,30 +2314,24 @@ typedef struct {
   Static Registers calling convention. It could be called at
   physical and virtual mode.
 
-  @param Index  Index of PAL_CACHE_LINE_INIT within the list of PAL
-                procedures.
-
-  @param Address  Unsigned 64-bit integer value denoting the
-                  physical address from which the physical page
-                  number is to be generated. The address must be
-                  an implemented physical address, bit 63 must
-                  be zero.
-
+  @param Index      Index of PAL_CACHE_LINE_INIT within the list of PAL
+                    procedures.
+  @param Address    Unsigned 64-bit integer value denoting the
+                    physical address from which the physical page
+                    number is to be generated. The address must be
+                    an implemented physical address, bit 63 must
+                    be zero.
   @param DataValue  64-bit data value which is used to
                     initialize the cache line.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @retval 0         Call completed without error
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
 
 **/
 #define PAL_CACHE_LINE_INIT 31
 
 /**
-
   PAL Procedure - PAL_CACHE_READ.
 
   Read tag and data of a cache line for diagnostic testing. It
@@ -2584,81 +2339,62 @@ typedef struct {
   Satcked Registers calling convention. It could be called at
   physical mode.
 
-  @param Index  Index of PAL_CACHE_READ within the list of PAL
-                procedures.
-
+  @param Index    Index of PAL_CACHE_READ within the list of PAL
+                  procedures.
   @param LineId   8-byte formatted value describing where in the
                   cache to read the data.
-
   @param Address  64-bit 8-byte aligned physical address from
                   which to read the data. The address must be an
                   implemented physical address on the processor
                   model with bit 63 set to zero.
 
-  @return R9  Right-justified value returned from the cache
-              line.
-
-  @return R10 The number of bits returned in data.
-
-  @return R11 The status of the cache line.
-
-
-
-  @return Status  1 - The word at address was found in the
+  @retval 1       The word at address was found in the
                   cache, but the line was invalid.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -5 - The word at address was not found in the
+  @retval 0       Call completed without error
+  @retval -2      Invalid argument
+  @retval -3      Call completed with error.
+  @retval -5      The word at address was not found in the
                   cache.
-
-  @return Status  -7 - The operation requested is not supported
+  @retval -7      The operation requested is not supported
                   for this cache_type and level.
+
+  @return R9      Right-justified value returned from the cache
+                  line.
+  @return R10     The number of bits returned in data.
+  @return R11     The status of the cache line.
 
 **/
 #define PAL_CACHE_READ 259
 
 
 /**
+  PAL Procedure - PAL_CACHE_WRITE.
 
   Write tag and data of a cache for diagnostic testing. It is
   optional. The PAL procedure supports the Satcked Registers
   calling convention. It could be called at physical mode.
 
-  @param Index  Index of PAL_CACHE_WRITE within the list of PAL
-                procedures.
-
+  @param Index    Index of PAL_CACHE_WRITE within the list of PAL
+                  procedures.
   @param LineId   8-byte formatted value describing where in the
                   cache to write the data.
-
   @param Address  64-bit 8-byte aligned physical address at
                   which the data should be written. The address
                   must be an implemented physical address on the
                   processor model with bit 63 set to 0.
-
   @param Data     Unsigned 64-bit integer value to write into
                   the specified part of the cache.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-
-  @return Status  -7 - The operation requested is not supported
+  @retval 0       Call completed without error
+  @retval -2      Invalid argument
+  @retval -3      Call completed with error.
+  @retval -7      The operation requested is not supported
                   for this cache_type and level.
 
 **/
 #define PAL_CACHE_WRITE 260
 
 /**
-
   PAL Procedure - PAL_TEST_INFO.
 
   Returns alignment and size requirements needed for the memory
@@ -2668,9 +2404,8 @@ typedef struct {
   Static Registers calling convention. It could be called at
   physical mode.
 
-  @param Index  Index of PAL_TEST_INFO within the list of PAL
-                procedures.
-
+  @param Index      Index of PAL_TEST_INFO within the list of PAL
+                    procedures.
   @param TestPhase  Unsigned integer that specifies which phase
                     of the processor self-test information is
                     being requested on. A value of 0 indicates
@@ -2679,25 +2414,19 @@ typedef struct {
                     processor self-test. All other values are
                     reserved.
 
-  @return R9  Unsigned 64-bit integer denoting the number of
-              bytes of main memory needed to perform the second
-              phase of processor self-test.
+  @retval 0         Call completed without error
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
 
-  @return R10   Unsigned 64-bit integer denoting the alignment
-                required for the memory buffer.
-
-  @return R11   48-bit wide bit-field indicating if control of
-                the processor self-tests is supported and which
-                bits of the test_control field are defined for
-                use.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9        Unsigned 64-bit integer denoting the number of
+                    bytes of main memory needed to perform the second
+                    phase of processor self-test.
+  @return R10       Unsigned 64-bit integer denoting the alignment
+                    required for the memory buffer.
+  @return R11       48-bit wide bit-field indicating if control of
+                    the processor self-tests is supported and which
+                    bits of the test_control field are defined for
+                    use.
 
 **/
 #define PAL_TEST_INFO 37
@@ -2850,45 +2579,35 @@ typedef struct {
 } PAL_TEST_CONTROL;
 
 /**
-
   PAL Procedure - PAL_TEST_PROC.
 
   Perform late processor self test. It is required by IPF. The
   PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode.
 
-  @param Index  Index of PAL_TEST_PROC within the list of PAL
-                procedures.
-
+  @param Index        Index of PAL_TEST_PROC within the list of PAL
+                      procedures.
   @param TestAddress  64-bit physical address of main memory
                       area to be used by processor self-test.
                       The memory region passed must be
                       cacheable, bit 63 must be zero.
+  @param TestInfo     Input argument specifying the size of the
+                      memory buffer passed and the phase of the
+                      processor self-test that should be run. See
+                      PAL_TEST_INFO.
+  @param TestParam    Input argument specifying the self-test
+                      control word and the allowable memory
+                      attributes that can be used with the memory
+                      buffer. See PAL_TEST_CONTROL.
 
-  @param TestInfo   Input argument specifying the size of the
-                    memory buffer passed and the phase of the
-                    processor self-test that should be run. See
-                    PAL_TEST_INFO.
+  @retval 1           Call completed without error, but hardware
+                      failures occurred during self-test.
+  @retval 0           Call completed without error
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
 
-  @param TestParam  Input argument specifying the self-test
-                    control word and the allowable memory
-                    attributes that can be used with the memory
-                    buffer. See PAL_TEST_CONTROL.
-
-  @return R9  Formatted 8-byte value denoting the state of the
-              processor after self-test
-
-
-
-  @return Status  1 - Call completed without error, but hardware
-                  failures occurred during self-test.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9          Formatted 8-byte value denoting the state of the
+                      processor after self-test
 
 **/
 #define PAL_TEST_PROC 258
@@ -2909,7 +2628,6 @@ typedef struct {
 } PAL_PLATFORM_INFO;
 
 /**
-
   PAL Procedure - PAL_COPY_INFO.
 
   Return information needed to relocate PAL procedures and PAL
@@ -2917,44 +2635,33 @@ typedef struct {
   supports the Static Registers calling convention. It could be
   called at physical mode.
 
-  @param Index  Index of PAL_COPY_INFO within the list of PAL
-                procedures.
-
-  @param CopyType   Unsigned integer denoting type of procedures
-                    for which copy information is requested.
-
-  @param PlatformInfo   8-byte formatted value describing the
-                        number of processors and the number of
-                        interrupt controllers currently enabled
-                        on the system. See PAL_PLATFORM_INFO.
-
-
+  @param Index              Index of PAL_COPY_INFO within the list of PAL
+                            procedures.
+  @param CopyType           Unsigned integer denoting type of procedures
+                            for which copy information is requested.
+  @param PlatformInfo       8-byte formatted value describing the
+                            number of processors and the number of
+                            interrupt controllers currently enabled
+                            on the system. See PAL_PLATFORM_INFO.
   @param McaProcStateInfo   Unsigned integer denoting the number
                             of bytes that SAL needs for the
                             min-state save area for each
                             processor.
 
+  @retval 0                 Call completed without error
+  @retval -2                Invalid argument
+  @retval -3                Call completed with error.
 
-
-  @return R9  Unsigned integer denoting the number of bytes of
-              PAL information that must be copied to main
-              memory.
-
-  @return R10 Unsigned integer denoting the starting alignment
-              of the data to be copied.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9                Unsigned integer denoting the number of bytes of
+                            PAL information that must be copied to main
+                            memory.
+  @return R10               Unsigned integer denoting the starting alignment
+                            of the data to be copied.
 
 **/
 #define PAL_COPY_INFO 30
 
 /**
-
   PAL Procedure - PAL_COPY_PAL.
 
   Relocate PAL procedures and PAL PMI code to memory. It is
@@ -2962,38 +2669,29 @@ typedef struct {
   Registers calling convention. It could be called at physical
   mode.
 
-  @param Index  Index of PAL_COPY_PAL within the list of PAL
-                procedures.
-
+  @param Index          Index of PAL_COPY_PAL within the list of PAL
+                        procedures.
   @param TargetAddress  Physical address of a memory buffer to
                         copy relocatable PAL procedures and PAL
                         PMI code.
+  @param AllocSize      Unsigned integer denoting the size of the
+                        buffer passed by SAL for the copy operation.
+  @param CopyOption     Unsigned integer indicating whether
+                        relocatable PAL code and PAL PMI code
+                        should be copied from firmware address
+                        space to main memory.
 
-  @param AllocSize  Unsigned integer denoting the size of the
-                    buffer passed by SAL for the copy operation.
+  @retval 0             Call completed without error
+  @retval -2            Invalid argument
+  @retval -3            Call completed with error.
 
-
-  @param CopyOption   Unsigned integer indicating whether
-                      relocatable PAL code and PAL PMI code
-                      should be copied from firmware address
-                      space to main memory.
-
-
-  @return R9  Unsigned integer denoting the offset of PAL_PROC
-              in the relocatable segment copied.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @return R9            Unsigned integer denoting the offset of PAL_PROC
+                        in the relocatable segment copied.
 
 **/
 #define PAL_COPY_PAL 256
 
 /**
-
   PAL Procedure - PAL_ENTER_IA_32_ENV.
 
   Enter IA-32 System environment. It is optional. The PAL
@@ -3019,7 +2717,7 @@ typedef struct {
                 procedures.
 
 
-  @return Status  The status is returned in GR4.
+  @retval  The status is returned in GR4.
                   -1 - Un-implemented procedure 0 JMPE detected
                   at privilege level
 
@@ -3063,26 +2761,20 @@ typedef struct {
 #define PAL_ENTER_IA_32_ENV 33
 
 /**
-
   PAL Procedure - PAL_PMI_ENTRYPOINT.
 
   Register PMI memory entrypoints with processor. It is required
   by IPF. The PAL procedure supports the Stacked Registers
   calling convention. It could be called at physical mode.
 
-  @param Index  Index of PAL_PMI_ENTRYPOINT within the list of
-                PAL procedures.
-
+  @param Index        Index of PAL_PMI_ENTRYPOINT within the list of
+                      PAL procedures.
   @param SalPmiEntry  256-byte aligned physical address of SAL
                       PMI entrypoint in memory.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
+  @retval 0           Call completed without error
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
 
 **/
 #define PAL_PMI_ENTRYPOINT 32
@@ -3103,45 +2795,34 @@ typedef struct {
 #define PAL_BRAND_INFO_ID_REQUEST  0
 
 /**
-
   PAL Procedure - PAL_BRAND_INFO.
 
   Provides processor branding information. It is optional by
   IPF. The PAL procedure supports the Stacked Registers calling
   convention. It could be called at physical and Virtual mode.
 
-
-  @param Index  Index of PAL_BRAND_INFO within the list of PAL
-                procedures.
-
+  @param Index        Index of PAL_BRAND_INFO within the list of PAL
+                      procedures.
   @param InfoRequest  Unsigned 64-bit integer specifying the
                       information that is being requested. (See
                       PAL_BRAND_INFO_ID_REQUEST)
+  @param Address      Unsigned 64-bit integer specifying the
+                      address of the 128-byte block to which the
+                      processor brand string shall be written.
 
-  @param Address    Unsigned 64-bit integer specifying the
-                    address of the 128-byte block to which the
-                    processor brand string shall be written.
+  @retval 0           Call completed without error
+  @retval -1          Unimplemented procedure
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
+  @retval -6          Input argument is not implemented.
 
-
-  @return R9  Brand information returned. The format of this
-              value is dependent on the input values passed.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -6 - Input argument is not implemented.
+  @return R9          Brand information returned. The format of this
+                      value is dependent on the input values passed.
 
 **/
 #define PAL_BRAND_INFO  274
 
 /**
-
   PAL Procedure - PAL_GET_HW_POLICY.
 
   Returns the current hardware resource sharing policy of the
@@ -3150,9 +2831,8 @@ typedef struct {
   physical and Virtual mode.
 
 
-  @param Index  Index of PAL_GET_HW_POLICY within the list of PAL
-                procedures.
-
+  @param Index            Index of PAL_GET_HW_POLICY within the list of PAL
+                          procedures.
   @param ProcessorNumber  Unsigned 64-bit integer that specifies
                           for which logical processor
                           information is being requested. This
@@ -3164,28 +2844,20 @@ typedef struct {
                           sharing policy, which is returned by
                           the R10 return value.
 
+  @retval 0               Call completed without error
+  @retval -1              Unimplemented procedure
+  @retval -2              Invalid argument
+  @retval -3              Call completed with error.
+  @retval -9              Call requires PAL memory buffer.
 
-  @return R9  Unsigned 64-bit integer representing the current
-              hardware resource sharing policy.
-
-  @return R10   Unsigned 64-bit integer that returns the number
-                of logical processors impacted by the policy
-                input argument.
-
-  @return R11   Unsigned 64-bit integer containing the logical
-                address of one of the logical processors
-                impacted by policy modification.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @return R9              Unsigned 64-bit integer representing the current
+                          hardware resource sharing policy.
+  @return R10             Unsigned 64-bit integer that returns the number
+                          of logical processors impacted by the policy
+                          input argument.
+  @return R11             Unsigned 64-bit integer containing the logical
+                          address of one of the logical processors
+                          impacted by policy modification.
 
 **/
 #define PAL_GET_HW_POLICY   48
@@ -3200,7 +2872,6 @@ typedef struct {
 #define PAL_SET_HW_POLICY_EXCLUSIVE_HIGH_PRIORITY   3
 
 /**
-
   PAL Procedure - PAL_SET_HW_POLICY.
 
   Sets the current hardware resource sharing policy of the
@@ -3208,29 +2879,21 @@ typedef struct {
   the Static Registers calling convention. It could be called at
   physical and Virtual mode.
 
-
-  @param Index  Index of PAL_SET_HW_POLICY within the list of PAL
-                procedures.
-
+  @param Index    Index of PAL_SET_HW_POLICY within the list of PAL
+                  procedures.
   @param Policy   Unsigned 64-bit integer specifying the hardware
                   resource sharing policy the caller is setting.
                   See Value of PAL_SET_HW_POLICY.Policy above.
 
-
-  @return Status  1 - Call completed successfully but could not
-                      change the hardware policy since a
-                      competing logical processor is set in
-                      exclusive high priority.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval 1       Call completed successfully but could not
+                  change the hardware policy since a
+                  competing logical processor is set in
+                  exclusive high priority.
+  @retval 0       Call completed without error
+  @retval -1      Unimplemented procedure
+  @retval -2      Invalid argument
+  @retval -3      Call completed with error.
+  @retval -9      Call requires PAL memory buffer.
 
 **/
 #define PAL_SET_HW_POLICY   49
@@ -3421,7 +3084,6 @@ typedef struct {
 } PAL_MC_ERROR_DATA_BUFFER_TLB;
 
 /**
-
   PAL Procedure - PAL_MC_ERROR_INJECT.
 
   Injects the requested processor error or returns information
@@ -3430,52 +3092,40 @@ typedef struct {
   procedure supports the Stacked Registers calling convention.
   It could be called at physical and Virtual mode.
 
-
-  @param Index  Index of PAL_MC_ERROR_INJECT within the list of PAL
-                procedures.
-
-  @param ErrorTypeInfo  Unsigned 64-bit integer specifying the
-                        first level error information which
-                        identifies the error structure and
-                        corresponding structure hierarchy, and
-                        the error severity.
-
+  @param Index            Index of PAL_MC_ERROR_INJECT within the list of PAL
+                          procedures.
+  @param ErrorTypeInfo    Unsigned 64-bit integer specifying the
+                          first level error information which
+                          identifies the error structure and
+                          corresponding structure hierarchy, and
+                          the error severity.
   @param ErrorStructInfo  Unsigned 64-bit integer identifying
                           the optional structure specific
                           information that provides the  second
                           level details for the requested error.
-
   @param ErrorDataBuffer  64-bit physical address of a buffer
                           providing additional parameters for
                           the requested error. The address of
                           this buffer must be 8-byte aligned.
 
-  @return R9    64-bit vector specifying the supported error
-                injection capabilities for the input argument
-                combination of struct_hier, err_struct and
-                err_sev fields in ErrorTypeInfo.
+  @retval 0               Call completed without error
+  @retval -1              Unimplemented procedure
+  @retval -2              Invalid argument
+  @retval -3              Call completed with error.
+  @retval -4              Call completed with error; the requested
+                          error could not be injected due to failure in
+                          locating the target location in the specified
+                          structure.
+  @retval -5              Argument was valid, but requested error
+                          injection capability is not supported.
+  @retval -9              Call requires PAL memory buffer.
 
-  @return R10   64-bit vector specifying the architectural
-                resources that are used by the procedure.
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -4 - Call completed with error; the requested
-                  error could not be injected due to failure in
-                  locating the target location in the specified
-                  structure.
-
-  @return Status  -5 - Argument was valid, but requested error
-                  injection capability is not supported.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @return R9              64-bit vector specifying the supported error
+                          injection capabilities for the input argument
+                          combination of struct_hier, err_struct and
+                          err_sev fields in ErrorTypeInfo.
+  @return R10             64-bit vector specifying the architectural
+                          resources that are used by the procedure.
 
 **/
 #define PAL_MC_ERROR_INJECT 276
@@ -3490,7 +3140,6 @@ typedef struct {
 #define PAL_GET_PSTATE_NOW                    3
 
 /**
-
   PAL Procedure - PAL_GET_PSTATE.
 
   Returns the performance index of the processor. It is optional
@@ -3498,13 +3147,20 @@ typedef struct {
   calling convention. It could be called at physical and Virtual
   mode.
 
-
   @param Index  Index of PAL_GET_PSTATE within the list of PAL
                 procedures.
-
   @param Type   Type of performance_index value to be returned
                 by this procedure.See PAL_GET_PSTATE.Type above.
 
+  @retval 1     Call completed without error, but accuracy
+                of performance index has been impacted by a
+                thermal throttling event, or a
+                hardware-initiated event.
+  @retval 0     Call completed without error
+  @retval -1    Unimplemented procedure
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
+  @retval -9    Call requires PAL memory buffer.
 
   @return R9    Unsigned integer denoting the processor
                 performance for the time duration since the last
@@ -3512,21 +3168,6 @@ typedef struct {
                 value returned is between 0 and 100, and is
                 relative to the performance index of the highest
                 available P-state.
-
-  @return Status  1 - Call completed without error, but accuracy
-                  of performance index has been impacted by a
-                  thermal throttling event, or a
-                  hardware-initiated event.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
 
 **/
 #define PAL_GET_PSTATE      262
@@ -3547,7 +3188,6 @@ typedef struct {
 
 
 /**
-
   PAL Procedure - PAL_PSTATE_INFO.
 
   Returns information about the P-states supported by the
@@ -3555,35 +3195,26 @@ typedef struct {
   the Static Registers calling convention. It could be called
   at physical and Virtual mode.
 
-
-  @param Index  Index of PAL_PSTATE_INFO within the list of PAL
-                procedures.
-
+  @param Index          Index of PAL_PSTATE_INFO within the list of PAL
+                        procedures.
   @param PStateBuffer   64-bit pointer to a 256-byte buffer
                         aligned on an 8-byte boundary. See
                         PAL_PSTATE_INFO_BUFFER above.
 
+  @retval 0             Call completed without error
+  @retval -1            Unimplemented procedure
+  @retval -2            Invalid argument
+  @retval -3            Call completed with error.
 
-  @return R9    Unsigned integer denoting the number of P-states
-                supported. The maximum value of this field is 16.
-
-  @return R10   Dependency domain information
-
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
+  @return R9            Unsigned integer denoting the number of P-states
+                        supported. The maximum value of this field is 16.
+  @return R10           Dependency domain information
 
 **/
 #define PAL_PSTATE_INFO     44
 
 
 /**
-
   PAL Procedure - PAL_SET_PSTATE.
 
   To request a processor transition to a given P-state. It is
@@ -3591,39 +3222,26 @@ typedef struct {
   Registers calling convention. It could be called at physical
   and Virtual mode.
 
-
-  @param Index  Index of PAL_SET_PSTATE within the list of PAL
-                procedures.
-
-  @param PState   Unsigned integer denoting the processor
-                  P-state being requested.
-
+  @param Index        Index of PAL_SET_PSTATE within the list of PAL
+                      procedures.
+  @param PState       Unsigned integer denoting the processor
+                      P-state being requested.
   @param ForcePState  Unsigned integer denoting whether the
                       P-state change should be forced for the
                       logical processor.
 
-
-
-
-
-  @return Status  1 - Call completed without error, but
-                  transition request was not accepted
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval 1           Call completed without error, but
+                      transition request was not accepted
+  @retval 0           Call completed without error
+  @retval -1          Unimplemented procedure
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
+  @retval -9          Call requires PAL memory buffer.
 
 **/
 #define PAL_SET_PSTATE      263
 
 /**
-
   PAL Procedure - PAL_SHUTDOWN.
 
   Put the logical processor into a low power state which can be
@@ -3631,23 +3249,18 @@ typedef struct {
   procedure supports the Static Registers calling convention. It
   could be called at physical mode.
 
-
-  @param Index  Index of PAL_SHUTDOWN within the list of PAL
-                procedures.
-
+  @param Index            Index of PAL_SHUTDOWN within the list of PAL
+                          procedures.
   @param NotifyPlatform   8-byte aligned physical address
                           pointer providing details on how to
                           optionally notify the platform that
                           the processor is entering a shutdown
                           state.
 
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval -1              Unimplemented procedure
+  @retval -2              Invalid argument
+  @retval -3              Call completed with error.
+  @retval -9              Call requires PAL memory buffer.
 
 **/
 #define PAL_SHUTDOWN        45
@@ -3664,7 +3277,6 @@ typedef struct {
 } PAL_MEMORY_CONTROL_WORD;
 
 /**
-
   PAL Procedure - PAL_MEMORY_BUFFER.
 
   Provides cacheable memory to PAL for exclusive use during
@@ -3672,43 +3284,33 @@ typedef struct {
   Static Registers calling convention. It could be called at
   physical mode.
 
-
-  @param Index  Index of PAL_MEMORY_BUFFER within the list of PAL
-                procedures.
-
+  @param Index        Index of PAL_MEMORY_BUFFER within the list of PAL
+                      procedures.
   @param BaseAddress  Physical address of the memory buffer
                       allocated for PAL use.
-
-  @param AllocSize  Unsigned integer denoting the size of the
-                    memory buffer.
-
+  @param AllocSize    Unsigned integer denoting the size of the
+                      memory buffer.
   @param ControlWord  Formatted bit vector that provides control
                       options for this procedure. See
                       PAL_MEMORY_CONTROL_WORD above.
 
-  @return R9    Returns the minimum size of the memory buffer
-                required if the alloc_size input argument was
-                not large enough.
+  @retval 1           Call has not completed a buffer relocation
+                      due to a pending interrupt
+  @retval 0           Call completed without error
+  @retval -1          Unimplemented procedure
+  @retval -2          Invalid argument
+  @retval -3          Call completed with error.
+  @retval -9          Call requires PAL memory buffer.
 
-  @return Status  1 - Call has not completed a buffer relocation
-                  due to a pending interrupt
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @return R9          Returns the minimum size of the memory buffer
+                      required if the alloc_size input argument was
+                      not large enough.
 
 **/
 #define PAL_MEMORY_BUFFER   277
 
 
 /**
-
   PAL Procedure - PAL_VP_CREATE.
 
   Initializes a new vpd for the operation of a new virtual
@@ -3716,30 +3318,21 @@ typedef struct {
   The PAL procedure supports the Stacked Registers calling
   convention. It could be called at Virtual mode.
 
-
-  @param Index  Index of PAL_VP_CREATE within the list of PAL
-                procedures.
-
-  @param Vpd    64-bit host virtual pointer to the Virtual
-                Processor Descriptor (VPD).
-
-  @param HostIva  64-bit host virtual pointer to the host IVT
-                  for the virtual processor
-
+  @param Index            Index of PAL_VP_CREATE within the list of PAL
+                          procedures.
+  @param Vpd              64-bit host virtual pointer to the Virtual
+                          Processor Descriptor (VPD).
+  @param HostIva          64-bit host virtual pointer to the host IVT
+                          for the virtual processor
   @param OptionalHandler  64-bit non-zero host-virtual pointer
                           to an optional handler for
                           virtualization intercepts.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval 0               Call completed without error
+  @retval -1              Unimplemented procedure
+  @retval -2              Invalid argument
+  @retval -3              Call completed with error.
+  @retval -9              Call requires PAL memory buffer.
 
 **/
 #define PAL_VP_CREATE       265
@@ -3756,7 +3349,6 @@ typedef struct {
 } PAL_VP_ENV_INFO_RETURN;
 
 /**
-
   PAL Procedure - PAL_VP_ENV_INFO.
 
   Returns the parameters needed to enter a virtual environment.
@@ -3764,42 +3356,33 @@ typedef struct {
   Registers calling convention. It could be called at Virtual
   mode.
 
-
-  @param Index  Index of PAL_VP_ENV_INFO within the list of PAL
-                procedures.
-
-  @param Vpd    64-bit host virtual pointer to the Virtual
-                Processor Descriptor (VPD).
-
-  @param HostIva  64-bit host virtual pointer to the host IVT
-                  for the virtual processor
-
+  @param Index            Index of PAL_VP_ENV_INFO within the list of PAL
+                          procedures.
+  @param Vpd              64-bit host virtual pointer to the Virtual
+                          Processor Descriptor (VPD).
+  @param HostIva          64-bit host virtual pointer to the host IVT
+                          for the virtual processor
   @param OptionalHandler  64-bit non-zero host-virtual pointer
                           to an optional handler for
                           virtualization intercepts.
-  @return R9    Unsigned integer denoting the number of bytes
-                required by the PAL virtual environment buffer
-                during PAL_VP_INIT_ENV
 
-  @return R10   64-bit vector of virtual environment
-                information. See PAL_VP_ENV_INFO_RETURN.
+  @retval 0               Call completed without error
+  @retval -1              Unimplemented procedure
+  @retval -2              Invalid argument
+  @retval -3              Call completed with error.
+  @retval -9              Call requires PAL memory buffer.
 
+  @return R9              Unsigned integer denoting the number of bytes
+                          required by the PAL virtual environment buffer
+                          during PAL_VP_INIT_ENV
+  @return R10             64-bit vector of virtual environment
+                          information. See PAL_VP_ENV_INFO_RETURN.
 
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
 
 **/
 #define PAL_VP_ENV_INFO       266
 
 /**
-
   PAL Procedure - PAL_VP_EXIT_ENV.
 
   Allows a logical processor to exit a virtual environment.
@@ -3807,22 +3390,16 @@ typedef struct {
   Registers calling convention. It could be called at Virtual
   mode.
 
-
   @param Index  Index of PAL_VP_EXIT_ENV within the list of PAL
                 procedures.
-
   @param Iva    Optional 64-bit host virtual pointer to the IVT
                 when this procedure is done
 
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval 0     Call completed without error
+  @retval -1    Unimplemented procedure
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
+  @retval -9    Call requires PAL memory buffer.
 
 **/
 #define PAL_VP_EXIT_ENV       267
@@ -3830,7 +3407,6 @@ typedef struct {
 
 
 /**
-
   PAL Procedure - PAL_VP_INIT_ENV.
 
   Allows a logical processor to enter a virtual environment. It
@@ -3838,13 +3414,10 @@ typedef struct {
   Registers calling convention. It could be called at Virtual
   mode.
 
-
-  @param Index  Index of PAL_VP_INIT_ENV within the list of PAL
-                procedures.
-
+  @param Index          Index of PAL_VP_INIT_ENV within the list of PAL
+                        procedures.
   @param ConfigOptions  64-bit vector of global configuration
                         settings.
-
   @param PhysicalBase   Host physical base address of a block of
                         contiguous physical memory for the PAL
                         virtual environment buffer 1) This
@@ -3853,40 +3426,34 @@ typedef struct {
                         processor to enter the environment will
                         initialize the physical block for
                         virtualization operations.
+  @param VirtualBase    Host virtual base address of the
+                        corresponding physical memory block for
+                        the PAL virtual environment buffer : The
+                        VMM must maintain the host virtual to host
+                        physical data and instruction translations
+                        in TRs for addresses within the allocated
+                        address space. Logical processors in this
+                        virtual environment will use this address
+                        when transitioning to virtual mode
+                        operations.
 
-  @param VirtualBase  Host virtual base address of the
-                      corresponding physical memory block for
-                      the PAL virtual environment buffer : The
-                      VMM must maintain the host virtual to host
-                      physical data and instruction translations
-                      in TRs for addresses within the allocated
-                      address space. Logical processors in this
-                      virtual environment will use this address
-                      when transitioning to virtual mode
-                      operations.
+  @retval 0             Call completed without error
+  @retval -1            Unimplemented procedure
+  @retval -2            Invalid argument
+  @retval -3            Call completed with error.
+  @retval -9            Call requires PAL memory buffer.
 
-  @return R9    Virtualization Service Address - VSA specifies
-                the virtual base address of the PAL
-                virtualization services in this virtual
-                environment.
+  @return R9            Virtualization Service Address - VSA specifies
+                        the virtual base address of the PAL
+                        virtualization services in this virtual
+                        environment.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
 
 **/
 #define PAL_VP_INIT_ENV       268
 
 
 /**
-
   PAL Procedure - PAL_VP_REGISTER.
 
   Register a different host IVT and/or a different optional
@@ -3895,36 +3462,27 @@ typedef struct {
   supports the Stacked Registers calling convention. It could be
   called at Virtual mode.
 
-
-  @param Index  Index of PAL_VP_REGISTER within the list of PAL
-                procedures.
-
-  @param Vpd    64-bit host virtual pointer to the Virtual
-                Processor Descriptor (VPD) host_iva 64-bit host
-                virtual pointer to the host IVT for the virtual
-                processor
-
+  @param Index            Index of PAL_VP_REGISTER within the list of PAL
+                          procedures.
+  @param Vpd              64-bit host virtual pointer to the Virtual
+                          Processor Descriptor (VPD) host_iva 64-bit host
+                          virtual pointer to the host IVT for the virtual
+                          processor
   @param OptionalHandler  64-bit non-zero host-virtual pointer
                           to an optional handler for
                           virtualization intercepts.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval 0               Call completed without error
+  @retval -1              Unimplemented procedure
+  @retval -2              Invalid argument
+  @retval -3              Call completed with error.
+  @retval -9              Call requires PAL memory buffer.
 
 **/
 #define PAL_VP_REGISTER       269
 
 
 /**
-
   PAL Procedure - PAL_VP_RESTORE.
 
   Restores virtual processor state for the specified vpd on the
@@ -3932,35 +3490,26 @@ typedef struct {
   supports the Stacked Registers calling convention. It could be
   called at Virtual mode.
 
-
-  @param Index  Index of PAL_VP_RESTORE within the list of PAL
-                procedures.
-
-  @param Vpd    64-bit host virtual pointer to the Virtual
-                Processor Descriptor (VPD) host_iva 64-bit host
-                virtual pointer to the host IVT for the virtual
-                processor
-
+  @param Index      Index of PAL_VP_RESTORE within the list of PAL
+                    procedures.
+  @param Vpd        64-bit host virtual pointer to the Virtual
+                    Processor Descriptor (VPD) host_iva 64-bit host
+                    virtual pointer to the host IVT for the virtual
+                    processor
   @param PalVector  Vector specifies PAL procedure
                     implementation-specific state to be
                     restored.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval 0         Call completed without error
+  @retval -1        Unimplemented procedure
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
+  @retval -9        Call requires PAL memory buffer.
 
 **/
 #define PAL_VP_RESTORE       270
 
 /**
-
   PAL Procedure - PAL_VP_SAVE.
 
   Saves virtual processor state for the specified vpd on the
@@ -3968,36 +3517,27 @@ typedef struct {
   supports the Stacked Registers calling convention. It could be
   called at Virtual mode.
 
-
-  @param Index  Index of PAL_VP_SAVE within the list of PAL
-                procedures.
-
-  @param Vpd    64-bit host virtual pointer to the Virtual
-                Processor Descriptor (VPD) host_iva 64-bit host
-                virtual pointer to the host IVT for the virtual
-                processor
-
+  @param Index      Index of PAL_VP_SAVE within the list of PAL
+                    procedures.
+  @param Vpd        64-bit host virtual pointer to the Virtual
+                    Processor Descriptor (VPD) host_iva 64-bit host
+                    virtual pointer to the host IVT for the virtual
+                    processor
   @param PalVector  Vector specifies PAL procedure
                     implementation-specific state to be
                     restored.
 
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval 0         Call completed without error
+  @retval -1        Unimplemented procedure
+  @retval -2        Invalid argument
+  @retval -3        Call completed with error.
+  @retval -9        Call requires PAL memory buffer.
 
 **/
 #define PAL_VP_SAVE       271
 
 
 /**
-
   PAL Procedure - PAL_VP_TERMINATE.
 
   Terminates operation for the specified virtual processor. It
@@ -4005,25 +3545,18 @@ typedef struct {
   Registers calling convention. It could be called at Virtual
   mode.
 
-
   @param Index  Index of PAL_VP_TERMINATE within the list of PAL
                 procedures.
+  @param Vpd    64-bit host virtual pointer to the Virtual
+                Processor Descriptor (VPD)
+  @param Iva    Optional 64-bit host virtual pointer to the IVT
+                when this procedure is done.
 
-  @param Vpd  64-bit host virtual pointer to the Virtual
-              Processor Descriptor (VPD)
-
-  @param Iva  Optional 64-bit host virtual pointer to the IVT
-              when this procedure is done.
-
-  @return Status  0 - Call completed without error
-
-  @return Status  -1 - Unimplemented procedure
-
-  @return Status  -2 - Invalid argument
-
-  @return Status  -3 - Call completed with error.
-
-  @return Status  -9 - Call requires PAL memory buffer.
+  @retval 0     Call completed without error
+  @retval -1    Unimplemented procedure
+  @retval -2    Invalid argument
+  @retval -3    Call completed with error.
+  @retval -9    Call requires PAL memory buffer.
 
 **/
 #define PAL_VP_TERMINATE       272
@@ -4046,10 +3579,10 @@ typedef struct {
   returned or undefined result may occur during the execution of the procedure.
   This function is only available on IPF.
 
-  @param Index - The PAL procedure Index number.
-  @param Arg2 - The 2nd parameter for PAL procedure calls.
-  @param Arg3  - The 3rd parameter for PAL procedure calls.
-  @param Arg4  - The 4th parameter for PAL procedure calls.
+  @param Index  The PAL procedure Index number.
+  @param Arg2   The 2nd parameter for PAL procedure calls.
+  @param Arg3   The 3rd parameter for PAL procedure calls.
+  @param Arg4   The 4th parameter for PAL procedure calls.
 
   @return structure returned from the PAL Call procedure, including the status and return value.
 
