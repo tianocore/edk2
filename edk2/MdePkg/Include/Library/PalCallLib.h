@@ -1,7 +1,7 @@
 /** @file
   PAL Call Services
 
-  Copyright (c) 2006 -2007, Intel Corporation All rights
+  Copyright (c) 2006 -2008, Intel Corporation All rights
   reserved. This program and the accompanying materials are
   licensed and made available under the terms and conditions of
   the BSD License which accompanies this distribution.  The full
@@ -3123,7 +3123,7 @@ typedef struct {
                     processor brand string shall be written.
 
 
-  @reture R9  Brand information returned. The format of this
+  @return R9  Brand information returned. The format of this
               value is dependent on the input values passed.
 
 
@@ -3165,7 +3165,7 @@ typedef struct {
                           the R10 return value.
 
 
-  @reture R9  Unsigned 64-bit integer representing the current
+  @return R9  Unsigned 64-bit integer representing the current
               hardware resource sharing policy.
 
   @return R10   Unsigned 64-bit integer that returns the number
