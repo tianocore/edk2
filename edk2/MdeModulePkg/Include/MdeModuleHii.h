@@ -57,6 +57,7 @@ typedef struct {
 #define EFI_IFR_EXTEND_OP_TIMEOUT     0x2
 #define EFI_IFR_EXTEND_OP_CLASS       0x3
 #define EFI_IFR_EXTEND_OP_SUBCLASS    0x4
+#define EFI_IFR_EXTEND_OP_OPTIONKEY   0x5
 
 typedef struct _EFI_IFR_GUID_LABEL {
   EFI_IFR_OP_HEADER   Header;
@@ -111,6 +112,18 @@ typedef struct _EFI_IFR_GUID_SUBCLASS {
   UINT8               ExtendOpCode;
   UINT16              SubClass;
 } EFI_IFR_GUID_SUBCLASS;
+
+//
+// Store the framework vfr option key value
+//
+typedef struct _EFI_IFR_GUID_OPTIONKEY {
+  EFI_IFR_OP_HEADER   Header;
+  EFI_GUID            Guid;
+  UINT8               ExtendOpCode;
+  EFI_QUESTION_ID     QuestionId;
+  EFI_IFR_TYPE_VALUE  OptionValue;
+  EFI_QUESTION_ID     KeyValue;
+} EFI_IFR_GUID_OPTIONKEY;
 
 #pragma pack()
 

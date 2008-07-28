@@ -1,5 +1,5 @@
 /** @file
-  This library provides basic functiosn for UEFI network stack.
+  This library provides basic function for UEFI network stack.
 
 Copyright (c) 2005 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

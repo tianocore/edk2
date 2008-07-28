@@ -123,7 +123,7 @@ EFI_STATUS
 
 //
 // GUIDs for EFI_DISK_INFO_PROTOCOL.Interface. Defines the format of the
-// buffers returned by member functions
+// buffers returned by member functions.
 //
 #define EFI_DISK_INFO_IDE_INTERFACE_GUID \
   { \
