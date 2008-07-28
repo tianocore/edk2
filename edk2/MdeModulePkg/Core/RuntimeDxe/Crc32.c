@@ -1,6 +1,11 @@
 /** @file
   CalculateCrc32 Boot Services as defined in DXE CIS.
 
+  This Boot Services is in the Runtime Driver because this service is
+  also required by SetVirtualAddressMap() when the EFI System Table and
+  EFI Runtime Services Table are converted from physical address to
+  virtual addresses.	This requires that the 32-bit CRC be recomputed.
+
 Copyright (c) 2006, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,17 +14,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Crc32.c
-
-Abstract:
-
-  This Boot Services is in the Runtime Driver because this service is
-  also required by SetVirtualAddressMap() when the EFI System Table and
-  EFI Runtime Services Table are converted from physical address to
-  virtual addresses.  This requires that the 32-bit CRC be recomputed.
 
 **/
 

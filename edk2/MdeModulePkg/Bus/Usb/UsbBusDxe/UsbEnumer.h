@@ -91,16 +91,6 @@ EFI_STATUS
   IN USB_INTERFACE        *UsbIf
   );
 
-struct _USB_HUB_API{
-  USB_HUB_INIT                Init;
-  USB_HUB_GET_PORT_STATUS     GetPortStatus;
-  USB_HUB_CLEAR_PORT_CHANGE   ClearPortChange;
-  USB_HUB_SET_PORT_FEATURE    SetPortFeature;
-  USB_HUB_CLEAR_PORT_FEATURE  ClearPortFeature;
-  USB_HUB_RESET_PORT          ResetPort;
-  USB_HUB_RELEASE             Release;
-};
-
 /**
   Return the endpoint descriptor in this interface.
 

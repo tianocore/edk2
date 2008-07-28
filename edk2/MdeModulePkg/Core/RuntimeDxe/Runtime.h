@@ -1,6 +1,8 @@
 /** @file
   Runtime Architectural Protocol as defined in the DXE CIS.
 
+  This code is used to produce the EFI runtime architectural protocol.
+
 Copyright (c) 2006, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9,15 +11,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Runtime.h
-
-Abstract:
-
-  This code is used to produce the EFI runtime architectural protocol.
 
 **/
 
@@ -43,9 +36,7 @@ Abstract:
 // Function Prototypes
 //
 /**
-
-  Calculate CRC32 for target data
-
+  Calculate CRC32 for target data.
 
   @param Data            The target data.
   @param DataSize        The target data size.
@@ -66,7 +57,6 @@ RuntimeDriverCalculateCrc32 (
 ;
 
 /**
-
   Determines the new virtual address that is to be used on subsequent memory accesses.
 
 
@@ -89,14 +79,12 @@ RuntimeDriverConvertPointer (
 ;
 
 /**
-
   Changes the runtime addressing mode of EFI firmware from physical to virtual.
 
-
-  @param MemoryMapSize   The size in bytes of VirtualMap.
-  @param DescriptorSize  The size in bytes of an entry in the VirtualMap.
-  @param DescriptorVersion The version of the structure entries in VirtualMap.
-  @param VirtualMap      An array of memory descriptors which contain new virtual
+  @param  MemoryMapSize   The size in bytes of VirtualMap.
+  @param  DescriptorSize  The size in bytes of an entry in the VirtualMap.
+  @param  DescriptorVersion The version of the structure entries in VirtualMap.
+  @param  VirtualMap      An array of memory descriptors which contain new virtual
                          address mapping information for all runtime ranges.
 
   @retval  EFI_SUCCESS            The virtual address map has been applied.
@@ -120,7 +108,6 @@ RuntimeDriverSetVirtualAddressMap (
 ;
 
 /**
-
   Initialize CRC32 table.
 
 **/
@@ -131,16 +118,14 @@ RuntimeDriverInitializeCrc32Table (
 ;
 
 /**
-
   Install Runtime AP. This code includes the EfiRuntimeLib, but it only
   functions at RT in physical mode.
 
+  @param  ImageHandle     Image handle of this driver.
+  @param  SystemTable     Pointer to the EFI System Table.
 
-  @param ImageHandle     Image handle of this driver.
-  @param SystemTable     Pointer to the EFI System Table.
-
-  @retval  EFI_SUCEESS  Runtime Driver Architectural Protocol Installed
-  @return  Other value if gBS->InstallMultipleProtocolInterfaces fails. Check
+  @retval EFI_SUCEESS  Runtime Driver Architectural Protocol Installed
+  @return Other value if gBS->InstallMultipleProtocolInterfaces fails. Check
            gBS->InstallMultipleProtocolInterfaces for details.
 
 **/

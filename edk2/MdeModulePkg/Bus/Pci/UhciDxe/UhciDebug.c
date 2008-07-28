@@ -22,8 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  QhSw    Pointer to software QH structure.
 
-  @return None.
-
 **/
 VOID
 UhciDumpQh (
@@ -43,9 +41,6 @@ UhciDumpQh (
   Dump the content of TD structure.
 
   @param  TdSw    Pointer to software TD structure.
-  @param  IsCur   Whether dump the whole list, or only dump the current TD.
-
-  @return None.
 
 **/
 VOID
