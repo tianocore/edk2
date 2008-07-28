@@ -163,15 +163,13 @@ GetUnicodeStringTextOrSize (
   )
 {
   UINTN  StringSize;
-  CHAR16 Zero;
   UINT8  *StringPtr;
 
   ASSERT (StringSrc != NULL && BufferSize != NULL);
 
-  ZeroMem (&Zero, sizeof (CHAR16));
   StringSize = sizeof (CHAR16);
   StringPtr  = StringSrc;
-  while (CompareMem (StringPtr, &Zero, sizeof (CHAR16)) != 0) {
+  while (ReadUnaligned16 ((UINT16 *) StringPtr) != 0) {
     StringSize += sizeof (CHAR16);
     StringPtr += sizeof (CHAR16);
   }
