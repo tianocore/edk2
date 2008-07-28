@@ -85,12 +85,6 @@
 [Guids]
   gEfiMemoryTypeInformationGuid
 
-[FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportTianoDecompress
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportEfiDecompress
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildShareCodeHobs
-
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode

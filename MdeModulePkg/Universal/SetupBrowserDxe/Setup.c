@@ -189,12 +189,9 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
   @param FormId          This field specifies which EFI_IFR_FORM to render as the first
                          displayable page. If this field has a value of 0x0000, then
                          the forms browser will render the specified forms in their encoded order.
-                         ScreenDimenions - This allows the browser to be called so that it occupies a
-                         portion of the physical screen instead of dynamically determining the screen dimensions.
-                         ActionRequest   - Points to the action recommended by the form.
   @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in 
                           characters.
-  @param ActionRequest       Points to the action recommended by the form.
+  @param ActionRequest   Points to the action recommended by the form.
 
   @retval  EFI_SUCCESS            The function completed successfully.
   @retval  EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
