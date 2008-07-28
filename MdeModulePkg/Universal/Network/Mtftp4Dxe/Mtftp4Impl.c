@@ -748,6 +748,11 @@ Mtftp4Start (
   }
 
   //
+  // Set initial status.
+  //
+  Token->Status = EFI_NOT_READY;
+
+  //
   // Build and send an initial requests
   //
   if (Operation == EFI_MTFTP4_OPCODE_WRQ) {
@@ -761,16 +766,15 @@ Mtftp4Start (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  //
-  // Return immediately for asynchronous operation or poll the
-  // instance for synchronous operation.
-  //
-  Token->Status = EFI_NOT_READY;
 
   if (Token->Event != NULL) {
     return EFI_SUCCESS;
   }
 
+  //
+  // Return immediately for asynchronous operation or poll the
+  // instance for synchronous operation.
+  //
   while (Token->Status == EFI_NOT_READY) {
     This->Poll (This);
   }
