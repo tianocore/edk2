@@ -140,7 +140,6 @@ Tools in Python
   where:
 
     build/build.py      - The entry tool of build tools
-    AutoGen/AutoGen.py  - Generate AutoGen.c/.h and makefile only
 
   "build.py" steps:
     1. Run "edksetup.bat"
@@ -150,14 +149,6 @@ Tools in Python
     4. Go to platform or module directory
     5. Run "<python_interpreter.exe> <python_source_dir>/build/build.py" or
        "<python_source_dir>/build/build.py" directly.
-
-  "AutoGen.py" steps:
-    1. Run "edksetup.bat"
-    2. set PYTHONPATH to the local directory of above source
-       (BaseTools/Source/Python)
-    3. Set ACTIVE_PLATFORM in WORKSPACE\Conf
-    4. Run "<python_interpreter.exe> <python_source_dir>/AutoGen/AutoGen.py" or
-       "<python_source_dir>/AutoGen/AutoGen.py"
 
 * Convert Python source to exe file
   The tools written in Python can be coverted into executable program which can
