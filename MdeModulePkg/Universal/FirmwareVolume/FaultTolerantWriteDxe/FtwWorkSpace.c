@@ -302,11 +302,12 @@ WorkSpaceRefresh (
   Reclaim the work space on the working block.
 
 
-  @param FtwLiteDevice   Point to private data of FTW driver
+  @param  FtwLiteDevice          Point to private data of FTW driver
+  @param  PreserveRecord         Whether get the last record or not
 
-  @retval  EFI_SUCCESS            The function completed successfully
-  @retval  EFI_OUT_OF_RESOURCES   Allocate memory error
-  @retval  EFI_ABORTED            The function could not complete successfully
+  @retval EFI_SUCCESS            The function completed successfully
+  @retval EFI_OUT_OF_RESOURCES   Allocate memory error
+  @retval EFI_ABORTED            The function could not complete successfully
 
 **/
 EFI_STATUS
