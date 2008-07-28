@@ -220,13 +220,13 @@ EFI_STATUS
                              with the hash result, and add an entry to the Event Log. 
 
 **/
-typedef struct _EFI_TCG_PROTOCOL {
+struct _EFI_TCG_PROTOCOL {
   EFI_TCG_STATUS_CHECK              StatusCheck;
   EFI_TCG_HASH_ALL                  HashAll;
   EFI_TCG_LOG_EVENT                 LogEvent;
   EFI_TCG_PASS_THROUGH_TO_TPM       PassThroughToTpm;
   EFI_TCG_HASH_LOG_EXTEND_EVENT     HashLogExtendEvent;
-} EFI_TCG_PROTOCOL;
+};
 
 extern EFI_GUID gEfiTcgProtocolGuid;
 
