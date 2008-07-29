@@ -78,7 +78,7 @@ GetPackageDataFromPackageList (
 
 /**
   This is the internal worker function to update the data in
-  a form specified by FormSetGuid, 
+  a form specified by FormSetGuid, FormId and Label.
 
   @param FormSetGuid     The optional Formset GUID.
   @param FormId          The form ID>
