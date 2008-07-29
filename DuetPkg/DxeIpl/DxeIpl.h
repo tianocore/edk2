@@ -20,7 +20,6 @@
 #include <Guid/SystemNvDataGuid.h>
 
 #include <Protocol/Decompress.h>
-#include <Protocol/EdkDecompress.h>
 #include <Protocol/StatusCode.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 

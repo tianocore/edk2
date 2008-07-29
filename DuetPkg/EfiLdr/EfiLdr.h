@@ -26,7 +26,6 @@ Revision History:
 #include "EfiLdrHandoff.h"
 
 #include <Protocol/LoadedImage.h>
-#include <Protocol/EdkDecompress.h>
 #include <IndustryStandard/PeImage.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
