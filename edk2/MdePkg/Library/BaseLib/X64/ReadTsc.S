@@ -29,9 +29,9 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadTsc;
-.align 16;
-_AsmReadTsc:
+.global ASM_PFX(AsmReadTsc)
+.align 16
+ASM_PFX(AsmReadTsc):
     rdtsc
     shl     $0x20, %rdx
     or      %rdx, %rax

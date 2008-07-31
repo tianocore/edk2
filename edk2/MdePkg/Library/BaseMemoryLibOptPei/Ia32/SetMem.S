@@ -21,10 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-    .386:
-    .code:
-
-.globl _InternalMemSetMem
+.globl ASM_PFX(InternalMemSetMem)
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -34,22 +31,20 @@
 #    IN UINT8  Value
 #    )
 #------------------------------------------------------------------------------
-_InternalMemSetMem:
+ASM_PFX(InternalMemSetMem):
     push    %edi
     movl    12(%esp),%ecx
     movb    16(%esp),%al
-    movb    %ah, %al
+    movb    %al, %ah
     shrd    $16, %eax, %edx
     shld    $16, %edx, %eax
-    movl    %edx, %ecx
-    movl    8(%esp),%edi
-    shrd    $2, %ecx, %ecx
-    rep    
-    stosl
     movl    %ecx, %edx
+    movl    8(%esp),%edi
+    shr    $2, %ecx
+    rep stosl
+    movl    %edx, %ecx
     andl    $3, %ecx
-    rep     
-    stosb
+    rep stosb
     movl    8(%esp),%eax
     pop     %edi
     ret

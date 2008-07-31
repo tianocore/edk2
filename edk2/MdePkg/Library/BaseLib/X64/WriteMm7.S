@@ -29,7 +29,7 @@
 #   IN UINT64   Value
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteMm7;
-_AsmWriteMm7:
+.global ASM_PFX(AsmWriteMm7)
+ASM_PFX(AsmWriteMm7):
     movd	%rcx, %mm7
     ret

@@ -19,12 +19,12 @@
 #
 #------------------------------------------------------------------------------
 
-.extern InternalAssertJumpBuffer;
-.global _SetJump;
-_SetJump:
+.extern ASM_PFX(InternalAssertJumpBuffer)
+.global ASM_PFX(SetJump)
+ASM_PFX(SetJump):
     push   %rcx
     add    $0xffffffffffffffe0,%rsp
-    call   _InternalAssertJumpBuffer
+    call   ASM_PFX(InternalAssertJumpBuffer)
     add    $0x20,%rsp
     pop    %rcx
     pop    %rdx

@@ -35,8 +35,8 @@
 #   None
 #
 #------------------------------------------------------------------------------
-.global _InternalSwitchStack;
-_InternalSwitchStack:
+.global ASM_PFX(InternalSwitchStack)
+ASM_PFX(InternalSwitchStack):
     mov     %rcx, %rax
     mov     %rdx, %rcx
     mov     %r8, %rdx

@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMemCopyMem
+.globl ASM_PFX(InternalMemCopyMem)
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -32,7 +32,7 @@
 #    IN UINTN  Count
 #    );
 #------------------------------------------------------------------------------
-_InternalMemCopyMem:
+ASM_PFX(InternalMemCopyMem):
     push    %esi
     push    %edi
     movl    16(%esp), %esi              # esi <- Source
