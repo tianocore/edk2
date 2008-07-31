@@ -79,8 +79,8 @@ ASM_PFX(BackFromUserCode):
     .byte 0x16                          # push ss
     .byte 0xe                           # push cs
     .byte 0x66
-    call    @Base                       # push eip
-@Base: 
+    call    L_Base                       # push eip
+L_Base: 
     .byte 0x66
     pushq   $0                          # reserved high order 32 bits of EFlags
     .byte 0x66, 0x9c                    # pushfd actually
@@ -93,17 +93,17 @@ ASM_PFX(BackFromUserCode):
     .byte 0x66,0xba                     # mov edx, imm32
 _ThunkAttr:  .space  4
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15, %dl
-    jz      @1
+    jz      L_1
     movl    $0x15cd2401,%eax            # mov ax, 2401h & int 15h
     cli                                 # disable interrupts
-    jnc     @2
-@1: 
+    jnc     L_2
+L_1: 
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL, %dl
-    jz      @2
+    jz      L_2
     inb     $0x92,%al
     orb     $2,%al
     outb    %al, $0x92                   # deactivate A20M#
-@2: 
+L_2: 
     movl    %ss,%eax
     lea     IA32_REGS_SIZE(%esp), %bp
     #
@@ -116,9 +116,9 @@ _ThunkAttr:  .space  4
     addw    %ax,%bp                     # add ebp, eax
     movw    %cs,%ax
     shlw    $4,%ax
-    lea     (@64BitCode - @Base)(%ebx, %eax), %ax
-    .byte 0x66,0x2e,0x89,0x87           # mov cs:[bx + (@64Eip - @Base)], eax
-    .word   @64Eip - @Base
+    lea     (L_64BitCode - L_Base)(%ebx, %eax), %ax
+    .byte 0x66,0x2e,0x89,0x87           # mov cs:[bx + (L_64Eip - L_Base)], eax
+    .word   L_64Eip - L_Base
     .byte 0x66,0xb8                     # mov eax, imm32
 SavedCr4:   .space  4
     movq    %rax, %cr4
@@ -126,7 +126,7 @@ SavedCr4:   .space  4
     # rdi in the instruction below is indeed bx in 16-bit code
     #
     .byte 0x66,0x2e                     # 2eh is "cs:" segment override
-    lgdt    (SavedGdt - @Base)(%rdi)
+    lgdt    (SavedGdt - L_Base)(%rdi)
     .byte 0x66
     movl    $0xc0000080,%ecx
     rdmsr
@@ -135,10 +135,10 @@ SavedCr4:   .space  4
     .byte 0x66,0xb8                     # mov eax, imm32
 SavedCr0:    .space      4
     movq    %rax, %cr0
-    .byte 0x66,0xea                     # jmp far cs:@64Bit
-@64Eip:      .space      4
+    .byte 0x66,0xea                     # jmp far cs:L_64Bit
+L_64Eip:      .space      4
 SavedCs:     .space      2
-@64BitCode: 
+L_64BitCode: 
     movq     %r8, %rsp
     ret
 
@@ -170,16 +170,16 @@ ASM_PFX(ToUserCode):
     movl    %esi,%ss                    # set up 16-bit stack segment
     movw    %bx,%sp                     # set up 16-bit stack pointer
     .byte 0x66                          # make the following call 32-bit
-    call    @Base1                       # push eip
-@Base1: 
-    popw    %bp                         # ebp <- address of @Base1
+    call    L_Base1                       # push eip
+L_Base1: 
+    popw    %bp                         # ebp <- address of L_Base1
     pushq   (IA32_REGS_SIZE + 2)(%esp)
     lea     0x0c(%rsi), %eax
     pushq   %rax
     lret                                # execution begins at next instruction
-@RealMode: 
+L_RealMode: 
     .byte 0x66,0x2e                     # CS and operand size override
-    lidt    (_16Idtr - @Base1)(%rsi)
+    lidt    (_16Idtr - L_Base1)(%rsi)
     .byte 0x66,0x61                     # popad
     .byte 0x1f                          # pop ds
     .byte 0x7                           # pop es
@@ -273,14 +273,14 @@ ASM_PFX(InternalAsmThunk16):
     movl    %edx,%ss
     pushfq
     lea     -8(%rdx), %edx
-    lea     @RetFromRealMode, %r8
+    lea     L_RetFromRealMode, %r8
     pushq   %r8
     movl    %cs, %r8d
     movw    %r8w, (SavedCs - SavedCr4)(%rcx)
     movq     %rsp, %r8
     .byte   0xff, 0x69                  #  jmp (_EntryPoint - SavedCr4)(%rcx)
     .byte   _EntryPoint - SavedCr4
-@RetFromRealMode: 
+L_RetFromRealMode: 
     popfq
     lidt    0x38(%rsp)
     lea     -IA32_REGS_SIZE(%rbp), %eax
