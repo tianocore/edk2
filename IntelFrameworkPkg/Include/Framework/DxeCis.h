@@ -31,7 +31,7 @@
 //
 typedef
 VOID
-(EFIAPI *EFI_AP_PROCEDURE) (
+(EFIAPI *EFI_AP_PROCEDURE)(
   IN  VOID                              *Buffer
   );
 
