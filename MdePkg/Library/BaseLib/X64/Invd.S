@@ -29,7 +29,7 @@
 #   VOID
 #   )#
 #------------------------------------------------------------------------------
-.global _AsmInvd;
-_AsmInvd:
+.global ASM_PFX(AsmInvd)
+ASM_PFX(AsmInvd):
     invd
     ret

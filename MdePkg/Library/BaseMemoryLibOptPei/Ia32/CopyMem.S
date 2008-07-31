@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMemCopyMem
+.globl ASM_PFX(InternalMemCopyMem)
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -32,7 +32,7 @@
 #    IN UINTN  Count
 #    );
 #------------------------------------------------------------------------------
-_InternalMemCopyMem:
+ASM_PFX(InternalMemCopyMem):
     push    %esi
     push    %edi
     movl    16(%esp), %esi              # esi <- Source
@@ -43,15 +43,15 @@ _InternalMemCopyMem:
     cmpl    $0, %edx
     je      L_CopyDone
     leal    -1(%esi, %edx), %eax        # eax <- End of Source
-    cmpl    %esi, %edi
+    cmpl    %edi, %esi
     jae     L_CopyBytes
-    cmpl    %eax, %edi
+    cmpl    %edi, %eax
     jb      L_CopyBytes                 # Copy backward if overlapped
-    movl    %esi, %eax                  # esi <- End of Source
+    movl    %eax, %esi                  # esi <- End of Source
     leal    -1(%edi, %edx), %edi        # edi <- End of Destination
     std
 L_CopyBytes:
-    movl    %ecx, %edx
+    movl    %edx, %ecx
     rep
     movsb                               # Copy bytes backward
     cld

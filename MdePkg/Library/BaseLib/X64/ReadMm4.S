@@ -29,9 +29,9 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadMm4;
-.align 16;
-_AsmReadMm4:
+.global ASM_PFX(AsmReadMm4)
+.align 16
+ASM_PFX(AsmReadMm4):
     #DB      48h, 0fh, 7eh, 0e0h
     movd	%mm4, %rax
     ret

@@ -29,8 +29,8 @@
 #   IN UINT16 Ldtr
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteLdtr;
-.align 16;
-_AsmWriteLdtr:
+.global ASM_PFX(AsmWriteLdtr)
+.align 16
+ASM_PFX(AsmWriteLdtr):
     lldt    %cx
     ret

@@ -29,9 +29,9 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _EnableDisableInterrupts;
-.align 16;
-_EnableDisableInterrupts:
+.global ASM_PFX(EnableDisableInterrupts)
+.align 16
+ASM_PFX(EnableDisableInterrupts):
     sti
     cli
     ret

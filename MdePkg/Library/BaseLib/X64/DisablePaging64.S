@@ -35,8 +35,8 @@
 #   );
 #------------------------------------------------------------------------------
 
-.global _InternalX86DisablePaging64
-_InternalX86DisablePaging64:
+.global ASM_PFX(InternalX86DisablePaging64)
+ASM_PFX(InternalX86DisablePaging64):
     cli    
     shl    $0x20,%rcx
     lea    (%rip), %eax
