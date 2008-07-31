@@ -74,7 +74,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_PLATFORM_PHASE_NOTIFY) (
+(EFIAPI *EFI_PCI_PLATFORM_PHASE_NOTIFY)(
   IN EFI_PCI_PLATFORM_PROTOCOL                       *This,
   IN  EFI_HANDLE                                     HostBridge,
   IN  EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE  Phase,
@@ -108,7 +108,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_PLATFORM_PREPROCESS_CONTROLLER) (
+(EFIAPI *EFI_PCI_PLATFORM_PREPROCESS_CONTROLLER)(
   IN  EFI_PCI_PLATFORM_PROTOCOL                      *This,
   IN  EFI_HANDLE                                     HostBridge,
   IN  EFI_HANDLE                                     RootBridge,
@@ -133,7 +133,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_PLATFORM_GET_PLATFORM_POLICY) (
+(EFIAPI *EFI_PCI_PLATFORM_GET_PLATFORM_POLICY)(
   IN  EFI_PCI_PLATFORM_PROTOCOL           *This,
   OUT EFI_PCI_PLATFORM_POLICY             *PciPolicy
 )
@@ -169,7 +169,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCI_PLATFORM_GET_PCI_ROM) (
+(EFIAPI *EFI_PCI_PLATFORM_GET_PCI_ROM)(
   IN   EFI_PCI_PLATFORM_PROTOCOL    *This,
   IN   EFI_HANDLE                   PciHandle,
   OUT  VOID                         **RomImage,

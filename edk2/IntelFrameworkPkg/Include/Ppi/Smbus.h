@@ -67,7 +67,7 @@ typedef struct _EFI_PEI_SMBUS_PPI EFI_PEI_SMBUS_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_SMBUS_PPI_EXECUTE_OPERATION) (
+(EFIAPI *EFI_PEI_SMBUS_PPI_EXECUTE_OPERATION)(
   IN      EFI_PEI_SERVICES          **PeiServices,
   IN EFI_PEI_SMBUS_PPI              *This,
   IN      EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
@@ -93,7 +93,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_SMBUS_NOTIFY_FUNCTION) (
+(EFIAPI *EFI_PEI_SMBUS_NOTIFY_FUNCTION)(
   IN      EFI_PEI_SERVICES              **PeiServices,
   IN EFI_PEI_SMBUS_PPI                  *SmbusPpi,
   IN      EFI_SMBUS_DEVICE_ADDRESS      SlaveAddress,
@@ -126,7 +126,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_SMBUS_PPI_ARP_DEVICE) (
+(EFIAPI *EFI_PEI_SMBUS_PPI_ARP_DEVICE)(
   IN      EFI_PEI_SERVICES          **PeiServices,
   IN EFI_PEI_SMBUS_PPI              *This,
   IN      BOOLEAN                   ArpAll,
@@ -149,7 +149,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_SMBUS_PPI_GET_ARP_MAP) (
+(EFIAPI *EFI_PEI_SMBUS_PPI_GET_ARP_MAP)(
   IN      EFI_PEI_SERVICES          **PeiServices,
   IN EFI_PEI_SMBUS_PPI              *This,
   IN OUT  UINTN                     *Length,
@@ -174,7 +174,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_SMBUS_PPI_NOTIFY) (
+(EFIAPI *EFI_PEI_SMBUS_PPI_NOTIFY)(
   IN      EFI_PEI_SERVICES          **PeiServices,
   IN EFI_PEI_SMBUS_PPI              *This,
   IN      EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,

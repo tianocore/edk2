@@ -63,7 +63,7 @@ typedef struct _EFI_SMM_ACCESS_PROTOCOL  EFI_SMM_ACCESS_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_OPEN) (
+(EFIAPI *EFI_SMM_OPEN)(
   IN EFI_SMM_ACCESS_PROTOCOL         *This,
   UINTN                              DescriptorIndex
   );
@@ -83,7 +83,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_CLOSE) (
+(EFIAPI *EFI_SMM_CLOSE)(
   IN EFI_SMM_ACCESS_PROTOCOL          *This,
   UINTN                               DescriptorIndex
   );
@@ -102,7 +102,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_LOCK) (
+(EFIAPI *EFI_SMM_LOCK)(
   IN EFI_SMM_ACCESS_PROTOCOL         *This,
   UINTN                              DescriptorIndex
   );
@@ -120,7 +120,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_CAPABILITIES) (
+(EFIAPI *EFI_SMM_CAPABILITIES)(
   IN EFI_SMM_ACCESS_PROTOCOL             *This,
   IN OUT UINTN                           *SmramMapSize,
   IN OUT EFI_SMRAM_DESCRIPTOR            *SmramMap

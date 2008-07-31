@@ -64,7 +64,7 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_GET_VARIABLE) (
+(EFIAPI *EFI_PEI_GET_VARIABLE)(
   IN EFI_PEI_SERVICES             **PeiServices,
   IN CHAR16                       *VariableName,
   IN EFI_GUID                     *VendorGuid,
@@ -98,7 +98,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_GET_NEXT_VARIABLE_NAME) (
+(EFIAPI *EFI_PEI_GET_NEXT_VARIABLE_NAME)(
   IN EFI_PEI_SERVICES             **PeiServices,
   IN OUT UINTN                    *VariableNameSize,
   IN OUT CHAR16                   *VariableName,

@@ -68,7 +68,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_CPU_IO) (
+(EFIAPI *EFI_SMM_CPU_IO)(
   IN EFI_SMM_CPU_IO_INTERFACE         *This,
   IN EFI_SMM_IO_WIDTH                 Width,
   IN UINT64                           Address,
@@ -102,7 +102,7 @@ struct _EFI_SMM_CPU_IO_INTERFACE {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMMCORE_ALLOCATE_POOL) (
+(EFIAPI *EFI_SMMCORE_ALLOCATE_POOL)(
   IN EFI_MEMORY_TYPE                PoolType,
   IN UINTN                          Size,
   OUT VOID                          **Buffer
@@ -120,7 +120,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMMCORE_FREE_POOL) (
+(EFIAPI *EFI_SMMCORE_FREE_POOL)(
   IN VOID                   *Buffer
   );
 
@@ -143,7 +143,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMMCORE_ALLOCATE_PAGES) (
+(EFIAPI *EFI_SMMCORE_ALLOCATE_PAGES)(
   IN EFI_ALLOCATE_TYPE      Type,
   IN EFI_MEMORY_TYPE        MemoryType,
   IN UINTN                  NumberOfPages,
@@ -163,14 +163,14 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMMCORE_FREE_PAGES) (
+(EFIAPI *EFI_SMMCORE_FREE_PAGES)(
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
   );
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_STARTUP_THIS_AP) (
+(EFIAPI *EFI_SMM_STARTUP_THIS_AP)(
   IN  EFI_AP_PROCEDURE                    Procedure,
   IN  UINTN                               CpuNumber,
   IN  OUT VOID                            *ProcArguments OPTIONAL
@@ -400,7 +400,7 @@ typedef union {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_HANDLER_ENTRY_POINT) (
+(EFIAPI *EFI_SMM_HANDLER_ENTRY_POINT)(
   IN EFI_HANDLE             SmmImageHandle,
   IN OUT VOID               *CommunicationBuffer OPTIONAL,
   IN OUT UINTN              *SourceSize OPTIONAL
@@ -425,7 +425,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_INSTALL_CONFIGURATION_TABLE) (
+(EFIAPI *EFI_SMM_INSTALL_CONFIGURATION_TABLE)(
   IN EFI_SMM_SYSTEM_TABLE         *SystemTable,
   IN EFI_GUID                     *Guid,
   IN VOID                         *Table,

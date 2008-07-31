@@ -59,7 +59,7 @@ typedef struct _EFI_SECTION_EXTRACTION_PROTOCOL EFI_SECTION_EXTRACTION_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_OPEN_SECTION_STREAM) (
+(EFIAPI *EFI_OPEN_SECTION_STREAM)(
   IN  EFI_SECTION_EXTRACTION_PROTOCOL                   *This,
   IN  UINTN                                             SectionStreamLength,
   IN  VOID                                              *SectionStream,
@@ -104,7 +104,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_SECTION) (
+(EFIAPI *EFI_GET_SECTION)(
   IN EFI_SECTION_EXTRACTION_PROTOCOL                    *This,
   IN UINTN                                              SectionStreamHandle,
   IN EFI_SECTION_TYPE                                   *SectionType,
@@ -127,7 +127,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CLOSE_SECTION_STREAM) (
+(EFIAPI *EFI_CLOSE_SECTION_STREAM)(
   IN EFI_SECTION_EXTRACTION_PROTOCOL                    *This,
   IN UINTN                                              SectionStreamHandle
   );

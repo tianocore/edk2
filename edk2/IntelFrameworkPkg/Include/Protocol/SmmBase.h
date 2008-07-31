@@ -69,7 +69,7 @@ typedef struct _EFI_SMM_BASE_PROTOCOL             EFI_SMM_BASE_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_CALLBACK_ENTRY_POINT) (
+(EFIAPI *EFI_SMM_CALLBACK_ENTRY_POINT)(
   IN EFI_HANDLE             SmmImageHandle,
   IN OUT VOID               *CommunicationBuffer OPTIONAL,
   IN OUT UINTN              *SourceSize OPTIONAL
@@ -100,7 +100,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_REGISTER_HANDLER) (
+(EFIAPI *EFI_SMM_REGISTER_HANDLER)(
   IN EFI_SMM_BASE_PROTOCOL                           *This,
   IN  EFI_DEVICE_PATH_PROTOCOL                       *FilePath,
   IN  VOID                                           *SourceBuffer OPTIONAL,
@@ -125,7 +125,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_UNREGISTER_HANDLER) (
+(EFIAPI *EFI_SMM_UNREGISTER_HANDLER)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   IN EFI_HANDLE                     ImageHandle
   )
@@ -149,7 +149,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_COMMUNICATE) (
+(EFIAPI *EFI_SMM_COMMUNICATE)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   IN EFI_HANDLE                     ImageHandle,
   IN OUT VOID                       *CommunicationBuffer,
@@ -180,7 +180,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_CALLBACK_SERVICE) (
+(EFIAPI *EFI_SMM_CALLBACK_SERVICE)(
   IN EFI_SMM_BASE_PROTOCOL                            *This,
   IN EFI_HANDLE                                       SmmImageHandle,
   IN EFI_SMM_CALLBACK_ENTRY_POINT                     CallbackAddress,
@@ -211,7 +211,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_ALLOCATE_POOL) (
+(EFIAPI *EFI_SMM_ALLOCATE_POOL)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   IN EFI_MEMORY_TYPE                PoolType,
   IN UINTN                          Size,
@@ -234,7 +234,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_FREE_POOL) (
+(EFIAPI *EFI_SMM_FREE_POOL)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   IN VOID                           *Buffer
   )
@@ -251,7 +251,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_INSIDE_OUT) (
+(EFIAPI *EFI_SMM_INSIDE_OUT)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   OUT BOOLEAN                       *InSmm
   )
@@ -273,7 +273,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_GET_SMST_LOCATION) (
+(EFIAPI *EFI_SMM_GET_SMST_LOCATION)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   IN OUT EFI_SMM_SYSTEM_TABLE       **Smst
   )

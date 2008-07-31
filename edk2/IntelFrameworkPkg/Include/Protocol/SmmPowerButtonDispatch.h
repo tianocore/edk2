@@ -67,7 +67,7 @@ typedef struct {
 **/
 typedef
 VOID
-(EFIAPI *EFI_SMM_POWER_BUTTON_DISPATCH) (
+(EFIAPI *EFI_SMM_POWER_BUTTON_DISPATCH)(
   IN  EFI_HANDLE                             DispatchHandle,
   IN  EFI_SMM_POWER_BUTTON_DISPATCH_CONTEXT  *DispatchContext
   );
@@ -97,7 +97,7 @@ VOID
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_POWER_BUTTON_REGISTER) (
+(EFIAPI *EFI_SMM_POWER_BUTTON_REGISTER)(
   IN EFI_SMM_POWER_BUTTON_DISPATCH_PROTOCOL            *This,
   IN  EFI_SMM_POWER_BUTTON_DISPATCH                    DispatchFunction,
   IN  EFI_SMM_POWER_BUTTON_DISPATCH_CONTEXT            *DispatchContext,
@@ -120,7 +120,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_POWER_BUTTON_UNREGISTER) (
+(EFIAPI *EFI_SMM_POWER_BUTTON_UNREGISTER)(
   IN EFI_SMM_POWER_BUTTON_DISPATCH_PROTOCOL             *This,
   IN  EFI_HANDLE                                        DispatchHandle
   );

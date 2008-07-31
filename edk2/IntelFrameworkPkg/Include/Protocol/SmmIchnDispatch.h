@@ -120,7 +120,7 @@ typedef struct {
 **/
 typedef
 VOID
-(EFIAPI *EFI_SMM_ICHN_DISPATCH) (
+(EFIAPI *EFI_SMM_ICHN_DISPATCH)(
   IN  EFI_HANDLE                      DispatchHandle,
   IN  EFI_SMM_ICHN_DISPATCH_CONTEXT   *DispatchContext
   );
@@ -150,7 +150,7 @@ VOID
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_ICHN_REGISTER) (
+(EFIAPI *EFI_SMM_ICHN_REGISTER)(
   IN EFI_SMM_ICHN_DISPATCH_PROTOCOL             *This,
   IN  EFI_SMM_ICHN_DISPATCH                     DispatchFunction,
   IN  EFI_SMM_ICHN_DISPATCH_CONTEXT             *DispatchContext,
@@ -173,7 +173,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_ICHN_UNREGISTER) (
+(EFIAPI *EFI_SMM_ICHN_UNREGISTER)(
   IN EFI_SMM_ICHN_DISPATCH_PROTOCOL             *This,
   IN  EFI_HANDLE                                DispatchHandle
   );
