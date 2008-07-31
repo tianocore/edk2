@@ -133,7 +133,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_SX_UNREGISTER) (
+(EFIAPI *EFI_SMM_SX_UNREGISTER)(
   IN EFI_SMM_SX_DISPATCH_PROTOCOL           *This,
   IN  EFI_HANDLE                            DispatchHandle
   );
