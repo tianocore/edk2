@@ -53,7 +53,7 @@ typedef struct _EFI_FTW_LITE_PROTOCOL EFI_FTW_LITE_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FTW_LITE_WRITE) (
+(EFIAPI * EFI_FTW_LITE_WRITE)(
   IN EFI_FTW_LITE_PROTOCOL             *This,
   IN EFI_HANDLE                        FvbHandle,
   IN EFI_LBA                           Lba,

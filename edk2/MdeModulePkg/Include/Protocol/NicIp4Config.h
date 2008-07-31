@@ -84,7 +84,7 @@ typedef struct {
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_NIC_IP4_CONFIG_GET_INFO) (
+(EFIAPI *EFI_NIC_IP4_CONFIG_GET_INFO)(
   IN EFI_NIC_IP4_CONFIG_PROTOCOL  *This,
   IN OUT UINTN                    *Len,
   OUT NIC_IP4_CONFIG_INFO         *NicConfig     OPTIONAL
@@ -92,7 +92,7 @@ EFI_STATUS
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_NIC_IP4_CONFIG_SET_INFO) (
+(EFIAPI *EFI_NIC_IP4_CONFIG_SET_INFO)(
   IN EFI_NIC_IP4_CONFIG_PROTOCOL  *This,
   IN NIC_IP4_CONFIG_INFO          *NicConfig,    OPTIONAL
   IN BOOLEAN                      ReConfig
@@ -100,7 +100,7 @@ EFI_STATUS
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_NIC_IP4_CONFIG_GET_NAME) (
+(EFIAPI *EFI_NIC_IP4_CONFIG_GET_NAME)(
   IN  EFI_NIC_IP4_CONFIG_PROTOCOL *This,
   IN  UINT16                      *Name,         OPTIONAL
   IN  NIC_ADDR                    *NicAddr       OPTIONAL

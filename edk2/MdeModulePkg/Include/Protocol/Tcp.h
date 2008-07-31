@@ -43,7 +43,7 @@ typedef struct {
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP_WRITE) (
+(EFIAPI *EFI_TCP_WRITE)(
     IN EFI_PXE_BASE_CODE_PROTOCOL        *This,
     IN UINT16                                    OpFlags,
     IN UINT16                                    *UrgentPointer,
@@ -64,7 +64,7 @@ EFI_STATUS
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP_READ) (
+(EFIAPI *EFI_TCP_READ)(
     IN EFI_PXE_BASE_CODE_PROTOCOL        *This,
     IN UINT16                                    OpFlags,
     IN OUT EFI_IP_ADDRESS                        *DestIp,      OPTIONAL
@@ -79,7 +79,7 @@ EFI_STATUS
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP_SET_PORT_FILTER) (
+(EFIAPI *EFI_TCP_SET_PORT_FILTER)(
     IN EFI_PXE_BASE_CODE_PROTOCOL    *This,
     IN EFI_TCP_PORT_FILTER                   *NewFilter
     );

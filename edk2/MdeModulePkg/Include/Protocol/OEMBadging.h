@@ -65,7 +65,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BADGING_GET_IMAGE) (
+(EFIAPI *EFI_BADGING_GET_IMAGE)(
   IN     EFI_OEM_BADGING_PROTOCOL          *This,
   IN OUT UINT32                            *Instance,
      OUT EFI_BADGING_FORMAT                *Format,

@@ -46,7 +46,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PEI_BASE_MEMORY_TEST) (
+(EFIAPI *PEI_BASE_MEMORY_TEST)(
   IN  EFI_PEI_SERVICES                   **PeiServices,
   IN PEI_BASE_MEMORY_TEST_PPI            * This,
   IN  EFI_PHYSICAL_ADDRESS               BeginAddress,
