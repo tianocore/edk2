@@ -3485,7 +3485,7 @@ CalculateCheckSum64 (
 //
 typedef
 VOID
-(EFIAPI *SWITCH_STACK_ENTRY_POINT) (
+(EFIAPI *SWITCH_STACK_ENTRY_POINT)(
   IN      VOID                      *Context1,  OPTIONAL
   IN      VOID                      *Context2   OPTIONAL
   );
