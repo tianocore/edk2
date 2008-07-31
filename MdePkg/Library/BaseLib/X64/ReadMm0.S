@@ -31,7 +31,7 @@
 #------------------------------------------------------------------------------
 .global ASM_PFX(AsmReadMm0)
 .align 16
-ASM_PFX(AsmReadMm0:
+ASM_PFX(AsmReadMm0):
     #DB      48h, 0fh, 7eh, 0c0h
     movd 	%mm0, %rax
     ret
