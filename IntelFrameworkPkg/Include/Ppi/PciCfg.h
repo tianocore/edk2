@@ -54,7 +54,7 @@ typedef struct _EFI_PEI_PCI_CFG_PPI   EFI_PEI_PCI_CFG_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCI_CFG_PPI_IO) (
+(EFIAPI *EFI_PEI_PCI_CFG_PPI_IO)(
   IN EFI_PEI_SERVICES             **PeiServices,
   IN EFI_PEI_PCI_CFG_PPI          *This,
   IN EFI_PEI_PCI_CFG_PPI_WIDTH    Width,
@@ -78,7 +78,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCI_CFG_PPI_RW) (
+(EFIAPI *EFI_PEI_PCI_CFG_PPI_RW)(
   IN EFI_PEI_SERVICES             **PeiServices,
   IN EFI_PEI_PCI_CFG_PPI          *This,
   IN EFI_PEI_PCI_CFG_PPI_WIDTH    Width,

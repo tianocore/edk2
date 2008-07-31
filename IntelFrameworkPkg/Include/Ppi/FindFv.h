@@ -47,7 +47,7 @@ typedef struct _EFI_PEI_FIND_FV_PPI EFI_PEI_FIND_FV_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_FIND_FV_FINDFV) (
+(EFIAPI *EFI_PEI_FIND_FV_FINDFV)(
   IN EFI_PEI_FIND_FV_PPI      *This,
   IN EFI_PEI_SERVICES         **PeiServices,
   UINT8                       *FvNumber,

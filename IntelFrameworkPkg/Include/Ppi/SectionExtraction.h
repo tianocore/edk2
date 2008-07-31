@@ -83,7 +83,7 @@ typedef struct _EFI_PEI_SECTION_EXTRACTION_PPI EFI_PEI_SECTION_EXTRACTION_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_GET_SECTION) (
+(EFIAPI *EFI_PEI_GET_SECTION)(
   IN EFI_PEI_SERVICES                         **PeiServices,
   IN EFI_PEI_SECTION_EXTRACTION_PPI           *This,
   IN EFI_SECTION_TYPE                         *SectionType,

@@ -192,7 +192,7 @@ typedef union {
 **/
 typedef
 BOOLEAN
-(EFIAPI *EFI_LEGACY_BIOS_INT86) (
+(EFIAPI *EFI_LEGACY_BIOS_INT86)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   IN  UINT8                           BiosInt,
   IN OUT  EFI_IA32_REGISTER_SET       *Regs
@@ -218,7 +218,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *EFI_LEGACY_BIOS_FARCALL86) (
+(EFIAPI *EFI_LEGACY_BIOS_FARCALL86)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   IN  UINT16                          Segment,
   IN  UINT16                          Offset,
@@ -243,7 +243,7 @@ BOOLEAN
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_CHECK_ROM) (
+(EFIAPI *EFI_LEGACY_BIOS_CHECK_ROM)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   IN  EFI_HANDLE                      PciHandle,
   OUT VOID                            **RomImage, OPTIONAL
@@ -277,7 +277,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_INSTALL_ROM) (
+(EFIAPI *EFI_LEGACY_BIOS_INSTALL_ROM)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   IN  EFI_HANDLE                      PciHandle,
   IN  VOID                            **RomImage,
@@ -302,7 +302,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_BOOT) (
+(EFIAPI *EFI_LEGACY_BIOS_BOOT)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   IN  BBS_BBS_DEVICE_PATH             *BootOption,
   IN  UINT32                          LoadOptionsSize,
@@ -323,7 +323,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_UPDATE_KEYBOARD_LED_STATUS) (
+(EFIAPI *EFI_LEGACY_BIOS_UPDATE_KEYBOARD_LED_STATUS)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   IN  UINT8                           Leds
   );
@@ -342,7 +342,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_GET_BBS_INFO) (
+(EFIAPI *EFI_LEGACY_BIOS_GET_BBS_INFO)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   OUT UINT16                          *HddCount,
   OUT HDD_INFO                        **HddInfo,
@@ -363,7 +363,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_PREPARE_TO_BOOT_EFI) (
+(EFIAPI *EFI_LEGACY_BIOS_PREPARE_TO_BOOT_EFI)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   OUT UINT16                          *BbsCount,
   OUT BBS_TABLE                       **BbsTable
@@ -387,7 +387,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_BOOT_UNCONVENTIONAL_DEVICE) (
+(EFIAPI *EFI_LEGACY_BIOS_BOOT_UNCONVENTIONAL_DEVICE)(
   IN EFI_LEGACY_BIOS_PROTOCOL         *This,
   IN UDC_ATTRIBUTES                   Attributes,
   IN UINTN                            BbsEntry,
@@ -406,7 +406,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_SHADOW_ALL_LEGACY_OPROMS) (
+(EFIAPI *EFI_LEGACY_BIOS_SHADOW_ALL_LEGACY_OPROMS)(
   IN EFI_LEGACY_BIOS_PROTOCOL *This
   );
 
@@ -429,7 +429,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_GET_LEGACY_REGION) (
+(EFIAPI *EFI_LEGACY_BIOS_GET_LEGACY_REGION)(
   IN EFI_LEGACY_BIOS_PROTOCOL *This,
   IN    UINTN                 LegacyMemorySize,
   IN    UINTN                 Region,
@@ -454,7 +454,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_BIOS_COPY_LEGACY_REGION) (
+(EFIAPI *EFI_LEGACY_BIOS_COPY_LEGACY_REGION)(
   IN EFI_LEGACY_BIOS_PROTOCOL *This,
   IN    UINTN                 LegacyMemorySize,
   IN    VOID                  *LegacyMemoryAddress,

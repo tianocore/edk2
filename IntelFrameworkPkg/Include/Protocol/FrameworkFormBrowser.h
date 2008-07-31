@@ -91,7 +91,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SEND_FORM) (
+(EFIAPI *EFI_SEND_FORM)(
   IN  EFI_FORM_BROWSER_PROTOCOL       *This,
   IN  BOOLEAN                         UseDatabase,
   IN  FRAMEWORK_EFI_HII_HANDLE        *Handle,
@@ -127,7 +127,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_CREATE_POP_UP) (
+(EFIAPI *EFI_CREATE_POP_UP)(
   IN  UINTN                           NumberOfLines,
   IN  BOOLEAN                         HotKey,
   IN  UINTN                           MaximumStringSize,

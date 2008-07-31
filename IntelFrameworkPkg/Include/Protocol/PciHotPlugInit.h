@@ -67,7 +67,7 @@ typedef enum{
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_ROOT_HPC_LIST) (
+(EFIAPI *EFI_GET_ROOT_HPC_LIST)(
   IN EFI_PCI_HOT_PLUG_INIT_PROTOCOL   *This,
   OUT UINTN                           *HpcCount,
   OUT EFI_HPC_LOCATION                **HpcList
@@ -96,7 +96,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_INITIALIZE_ROOT_HPC) (
+(EFIAPI *EFI_INITIALIZE_ROOT_HPC)(
   IN EFI_PCI_HOT_PLUG_INIT_PROTOCOL     *This,
   IN  EFI_DEVICE_PATH_PROTOCOL          *HpcDevicePath,
   IN  UINT64                            HpcPciAddress,
@@ -128,7 +128,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_PCI_HOT_PLUG_PADDING) (
+(EFIAPI *EFI_GET_PCI_HOT_PLUG_PADDING)(
   IN EFI_PCI_HOT_PLUG_INIT_PROTOCOL     *This,
   IN  EFI_DEVICE_PATH_PROTOCOL          *HpcDevicePath,
   IN  UINT64                            HpcPciAddress,

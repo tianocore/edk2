@@ -37,14 +37,14 @@ typedef struct _EFI_ACPI_S3_SAVE_PROTOCOL EFI_ACPI_S3_SAVE_PROTOCOL;
 //
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ACPI_S3_SAVE) (
+(EFIAPI *EFI_ACPI_S3_SAVE)(
   IN EFI_ACPI_S3_SAVE_PROTOCOL      * This,
   IN VOID                           * LegacyMemoryAddress
   );
 
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ACPI_GET_LEGACY_MEMORY_SIZE) (
+(EFIAPI *EFI_ACPI_GET_LEGACY_MEMORY_SIZE)(
   IN  EFI_ACPI_S3_SAVE_PROTOCOL     * This,
   OUT UINTN                         * Size
 );

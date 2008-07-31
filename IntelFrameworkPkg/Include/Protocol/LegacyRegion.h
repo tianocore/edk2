@@ -43,7 +43,7 @@ typedef struct _EFI_LEGACY_REGION_PROTOCOL EFI_LEGACY_REGION_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_REGION_DECODE) (
+(EFIAPI *EFI_LEGACY_REGION_DECODE)(
   IN EFI_LEGACY_REGION_PROTOCOL           *This,
   IN  UINT32                              Start,
   IN  UINT32                              Length,
@@ -63,7 +63,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_REGION_LOCK) (
+(EFIAPI *EFI_LEGACY_REGION_LOCK)(
   IN EFI_LEGACY_REGION_PROTOCOL           *This,
   IN  UINT32                              Start,
   IN  UINT32                              Length,
@@ -84,7 +84,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_REGION_BOOT_LOCK) (
+(EFIAPI *EFI_LEGACY_REGION_BOOT_LOCK)(
   IN EFI_LEGACY_REGION_PROTOCOL           *This,
   IN  UINT32                              Start,
   IN  UINT32                              Length,
@@ -104,7 +104,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_REGION_UNLOCK) (
+(EFIAPI *EFI_LEGACY_REGION_UNLOCK)(
   IN EFI_LEGACY_REGION_PROTOCOL           *This,
   IN  UINT32                              Start,
   IN  UINT32                              Length,

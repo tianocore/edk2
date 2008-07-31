@@ -69,7 +69,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_GET_NUMBER_BLOCK_DEVICES) (
+(EFIAPI *EFI_PEI_GET_NUMBER_BLOCK_DEVICES)(
   IN  EFI_PEI_SERVICES                         **PeiServices,
   IN  EFI_PEI_RECOVERY_BLOCK_IO_PPI            *This,
   OUT UINTN                                    *NumberBlockDevices
@@ -93,7 +93,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_GET_DEVICE_MEDIA_INFORMATION) (
+(EFIAPI *EFI_PEI_GET_DEVICE_MEDIA_INFORMATION)(
   IN  EFI_PEI_SERVICES                         **PeiServices,
   IN  EFI_PEI_RECOVERY_BLOCK_IO_PPI            *This,
   IN  UINTN                                    DeviceIndex,
@@ -123,7 +123,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_READ_BLOCKS) (
+(EFIAPI *EFI_PEI_READ_BLOCKS)(
   IN  EFI_PEI_SERVICES                         **PeiServices,
   IN  EFI_PEI_RECOVERY_BLOCK_IO_PPI            *This,
   IN  UINTN                                    DeviceIndex,

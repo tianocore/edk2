@@ -94,7 +94,7 @@ typedef struct _EFI_DATA_HUB_PROTOCOL EFI_DATA_HUB_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DATA_HUB_LOG_DATA) (
+(EFIAPI *EFI_DATA_HUB_LOG_DATA)(
   IN  EFI_DATA_HUB_PROTOCOL   *This,
   IN  EFI_GUID                *DataRecordGuid,
   IN  EFI_GUID                *ProducerName,
@@ -127,7 +127,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DATA_HUB_GET_NEXT_RECORD) (
+(EFIAPI *EFI_DATA_HUB_GET_NEXT_RECORD)(
   IN EFI_DATA_HUB_PROTOCOL    *This,
   IN OUT  UINT64              *MonotonicCount,
   IN  EFI_EVENT               *FilterDriver OPTIONAL,
@@ -157,7 +157,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DATA_HUB_REGISTER_FILTER_DRIVER) (
+(EFIAPI *EFI_DATA_HUB_REGISTER_FILTER_DRIVER)(
   IN EFI_DATA_HUB_PROTOCOL    *This,
   IN EFI_EVENT                FilterEvent,
   IN EFI_TPL                  FilterTpl,
@@ -178,7 +178,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DATA_HUB_UNREGISTER_FILTER_DRIVER) (
+(EFIAPI *EFI_DATA_HUB_UNREGISTER_FILTER_DRIVER)(
   IN EFI_DATA_HUB_PROTOCOL    *This,
   IN EFI_EVENT                FilterEvent
   );

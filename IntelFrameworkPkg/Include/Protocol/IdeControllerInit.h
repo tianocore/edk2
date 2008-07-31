@@ -286,7 +286,7 @@ typedef union {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IDE_CONTROLLER_GET_CHANNEL_INFO) (
+(EFIAPI *EFI_IDE_CONTROLLER_GET_CHANNEL_INFO)(
   IN EFI_IDE_CONTROLLER_INIT_PROTOCOL *This,
   IN  UINT8                           Channel,
   OUT BOOLEAN                         *Enabled,
@@ -309,7 +309,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IDE_CONTROLLER_NOTIFY_PHASE) (
+(EFIAPI *EFI_IDE_CONTROLLER_NOTIFY_PHASE)(
   IN EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
   IN EFI_IDE_CONTROLLER_ENUM_PHASE     Phase,
   IN UINT8                             Channel
@@ -330,7 +330,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IDE_CONTROLLER_SUBMIT_DATA) (
+(EFIAPI *EFI_IDE_CONTROLLER_SUBMIT_DATA)(
   IN EFI_IDE_CONTROLLER_INIT_PROTOCOL *This,
   IN  UINT8                           Channel,
   IN  UINT8                           Device,
@@ -353,7 +353,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IDE_CONTROLLER_DISQUALIFY_MODE) (
+(EFIAPI *EFI_IDE_CONTROLLER_DISQUALIFY_MODE)(
   IN EFI_IDE_CONTROLLER_INIT_PROTOCOL *This,
   IN  UINT8                           Channel,
   IN  UINT8                           Device,
@@ -376,7 +376,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IDE_CONTROLLER_CALCULATE_MODE) (
+(EFIAPI *EFI_IDE_CONTROLLER_CALCULATE_MODE)(
   IN EFI_IDE_CONTROLLER_INIT_PROTOCOL *This,
   IN  UINT8                           Channel,
   IN  UINT8                           Device,
@@ -402,7 +402,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IDE_CONTROLLER_SET_TIMING) (
+(EFIAPI *EFI_IDE_CONTROLLER_SET_TIMING)(
   IN EFI_IDE_CONTROLLER_INIT_PROTOCOL *This,
   IN  UINT8                           Channel,
   IN  UINT8                           Device,

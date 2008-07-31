@@ -56,7 +56,7 @@ typedef struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI EFI_PEI_DEVICE_RECOVERY_MODUL
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE) (
+(EFIAPI *EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE)(
   IN EFI_PEI_SERVICES                               **PeiServices,
   IN EFI_PEI_DEVICE_RECOVERY_MODULE_PPI             *This,
   OUT UINTN                                         *NumberRecoveryCapsules
@@ -80,7 +80,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO) (
+(EFIAPI *EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO)(
   IN  EFI_PEI_SERVICES                              **PeiServices,
   IN  EFI_PEI_DEVICE_RECOVERY_MODULE_PPI            *This,
   IN  UINTN                                         CapsuleInstance,
@@ -105,7 +105,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE) (
+(EFIAPI *EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE)(
   IN OUT EFI_PEI_SERVICES                         **PeiServices,
   IN EFI_PEI_DEVICE_RECOVERY_MODULE_PPI           *This,
   IN UINTN                                        CapsuleInstance,

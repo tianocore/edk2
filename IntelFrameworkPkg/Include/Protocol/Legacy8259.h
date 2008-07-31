@@ -72,7 +72,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_SET_VECTOR_BASE) (
+(EFIAPI *EFI_LEGACY_8259_SET_VECTOR_BASE)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
   IN  UINT8                             MasterBase,
   IN  UINT8                             SlaveBase
@@ -95,7 +95,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_GET_MASK) (
+(EFIAPI *EFI_LEGACY_8259_GET_MASK)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
   OUT UINT16                            *LegacyMask, OPTIONAL
   OUT UINT16                            *LegacyEdgeLevel, OPTIONAL
@@ -121,7 +121,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_SET_MASK) (
+(EFIAPI *EFI_LEGACY_8259_SET_MASK)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
   IN  UINT16                            *LegacyMask, OPTIONAL
   IN  UINT16                            *LegacyEdgeLevel, OPTIONAL
@@ -149,7 +149,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_SET_MODE) (
+(EFIAPI *EFI_LEGACY_8259_SET_MODE)(
   IN EFI_LEGACY_8259_PROTOCOL         *This,
   IN  EFI_8259_MODE                   Mode,
   IN  UINT16                          *Mask, OPTIONAL
@@ -169,7 +169,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_GET_VECTOR) (
+(EFIAPI *EFI_LEGACY_8259_GET_VECTOR)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
   IN  EFI_8259_IRQ                      Irq,
   OUT UINT8                             *Vector
@@ -188,7 +188,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_ENABLE_IRQ) (
+(EFIAPI *EFI_LEGACY_8259_ENABLE_IRQ)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
   IN  EFI_8259_IRQ                      Irq,
   IN  BOOLEAN                           LevelTriggered
@@ -206,7 +206,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_DISABLE_IRQ) (
+(EFIAPI *EFI_LEGACY_8259_DISABLE_IRQ)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
   IN  EFI_8259_IRQ                      Irq
   );
@@ -227,7 +227,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_GET_INTERRUPT_LINE) (
+(EFIAPI *EFI_LEGACY_8259_GET_INTERRUPT_LINE)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
   IN  EFI_HANDLE                        PciHandle,
   OUT UINT8                             *Vector
@@ -245,7 +245,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_8259_END_OF_INTERRUPT) (
+(EFIAPI *EFI_LEGACY_8259_END_OF_INTERRUPT)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
   IN  EFI_8259_IRQ                      Irq
   );

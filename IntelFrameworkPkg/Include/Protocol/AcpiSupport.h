@@ -82,7 +82,7 @@ typedef struct _EFI_ACPI_SUPPORT_PROTOCOL EFI_ACPI_SUPPORT_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ACPI_GET_ACPI_TABLE) (
+(EFIAPI *EFI_ACPI_GET_ACPI_TABLE)(
   IN EFI_ACPI_SUPPORT_PROTOCOL            *This,
   IN INTN                                 Index,
   OUT VOID                                **Table,
@@ -107,7 +107,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ACPI_SET_ACPI_TABLE) (
+(EFIAPI *EFI_ACPI_SET_ACPI_TABLE)(
   IN EFI_ACPI_SUPPORT_PROTOCOL            *This,
   IN VOID                                 *Table OPTIONAL,
   IN BOOLEAN                              Checksum,
@@ -128,7 +128,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ACPI_PUBLISH_TABLES) (
+(EFIAPI *EFI_ACPI_PUBLISH_TABLES)(
   IN EFI_ACPI_SUPPORT_PROTOCOL            *This,
   IN EFI_ACPI_TABLE_VERSION               Version
   );

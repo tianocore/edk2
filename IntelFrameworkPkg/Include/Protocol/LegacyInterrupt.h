@@ -39,7 +39,7 @@ typedef struct _EFI_LEGACY_INTERRUPT_PROTOCOL EFI_LEGACY_INTERRUPT_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_INTERRUPT_GET_NUMBER_PIRQS) (
+(EFIAPI *EFI_LEGACY_INTERRUPT_GET_NUMBER_PIRQS)(
   IN EFI_LEGACY_INTERRUPT_PROTOCOL            *This,
   OUT UINT8                                   *NumberPirqs
   );
@@ -57,7 +57,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_INTERRUPT_GET_LOCATION) (
+(EFIAPI *EFI_LEGACY_INTERRUPT_GET_LOCATION)(
   IN EFI_LEGACY_INTERRUPT_PROTOCOL            *This,
   OUT UINT8                                   *Bus,
   OUT UINT8                                   *Device,
@@ -77,7 +77,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_INTERRUPT_READ_PIRQ) (
+(EFIAPI *EFI_LEGACY_INTERRUPT_READ_PIRQ)(
   IN EFI_LEGACY_INTERRUPT_PROTOCOL           *This,
   IN  UINT8                                  PirqNumber,
   OUT UINT8                                  *PirqData
@@ -96,7 +96,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_INTERRUPT_WRITE_PIRQ) (
+(EFIAPI *EFI_LEGACY_INTERRUPT_WRITE_PIRQ)(
   IN EFI_LEGACY_INTERRUPT_PROTOCOL           *This,
   IN  UINT8                                  PirqNumber,
   IN UINT8                                   PirqData

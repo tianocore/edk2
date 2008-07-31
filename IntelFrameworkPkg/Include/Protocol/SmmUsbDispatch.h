@@ -62,7 +62,7 @@ typedef struct {
 **/
 typedef
 VOID
-(EFIAPI *EFI_SMM_USB_DISPATCH) (
+(EFIAPI *EFI_SMM_USB_DISPATCH)(
   IN  EFI_HANDLE                    DispatchHandle,
   IN  EFI_SMM_USB_DISPATCH_CONTEXT  *DispatchContext
   );
@@ -92,7 +92,7 @@ VOID
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_USB_REGISTER) (
+(EFIAPI *EFI_SMM_USB_REGISTER)(
   IN EFI_SMM_USB_DISPATCH_PROTOCOL            *This,
   IN  EFI_SMM_USB_DISPATCH                    DispatchFunction,
   IN  EFI_SMM_USB_DISPATCH_CONTEXT            *DispatchContext,
@@ -114,7 +114,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_USB_UNREGISTER) (
+(EFIAPI *EFI_SMM_USB_UNREGISTER)(
   IN EFI_SMM_USB_DISPATCH_PROTOCOL            *This,
   IN  EFI_HANDLE                              DispatchHandle
   );

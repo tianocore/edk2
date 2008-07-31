@@ -75,7 +75,7 @@ typedef struct {
 **/
 typedef
 VOID
-(EFIAPI *EFI_SMM_SX_DISPATCH) (
+(EFIAPI *EFI_SMM_SX_DISPATCH)(
   IN  EFI_HANDLE                    DispatchHandle,
   IN  EFI_SMM_SX_DISPATCH_CONTEXT   *DispatchContext
   );
@@ -111,7 +111,7 @@ VOID
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_SX_REGISTER) (
+(EFIAPI *EFI_SMM_SX_REGISTER)(
   IN EFI_SMM_SX_DISPATCH_PROTOCOL           *This,
   IN  EFI_SMM_SX_DISPATCH                   DispatchFunction,
   IN  EFI_SMM_SX_DISPATCH_CONTEXT           *DispatchContext,

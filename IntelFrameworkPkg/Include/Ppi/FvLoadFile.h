@@ -44,7 +44,7 @@ typedef struct _EFI_PEI_FV_FILE_LOADER_PPI  EFI_PEI_FV_FILE_LOADER_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_FV_LOAD_FILE) (
+(EFIAPI *EFI_PEI_FV_LOAD_FILE)(
   IN EFI_PEI_FV_FILE_LOADER_PPI                 *This,
   IN  EFI_FFS_FILE_HEADER                       *FfsHeader,
   OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,

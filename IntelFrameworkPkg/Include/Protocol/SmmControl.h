@@ -66,7 +66,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_ACTIVATE) (
+(EFIAPI *EFI_SMM_ACTIVATE)(
   IN EFI_SMM_CONTROL_PROTOCOL                             *This,
   IN OUT INT8                                             *ArgumentBuffer OPTIONAL,
   IN OUT UINTN                                            *ArgumentBufferSize OPTIONAL,
@@ -87,7 +87,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_DEACTIVATE) (
+(EFIAPI *EFI_SMM_DEACTIVATE)(
   IN EFI_SMM_CONTROL_PROTOCOL                   *This,
   IN BOOLEAN                                    Periodic OPTIONAL
   );
@@ -103,7 +103,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_GET_REGISTER_INFO) (
+(EFIAPI *EFI_SMM_GET_REGISTER_INFO)(
   IN EFI_SMM_CONTROL_PROTOCOL           *This,
   IN OUT EFI_SMM_CONTROL_REGISTER       *SmiRegister
   );

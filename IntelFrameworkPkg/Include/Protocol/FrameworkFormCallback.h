@@ -113,7 +113,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_NV_READ) (
+(EFIAPI *EFI_NV_READ)(
   IN     EFI_FORM_CALLBACK_PROTOCOL    *This,
   IN     CHAR16                        *VariableName,
   IN     EFI_GUID                      *VendorGuid,
@@ -149,7 +149,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_NV_WRITE) (
+(EFIAPI *EFI_NV_WRITE)(
   IN     EFI_FORM_CALLBACK_PROTOCOL    *This,
   IN     CHAR16                        *VariableName,
   IN     EFI_GUID                      *VendorGuid,
@@ -175,7 +175,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FORM_CALLBACK) (
+(EFIAPI *EFI_FORM_CALLBACK)(
   IN     EFI_FORM_CALLBACK_PROTOCOL    *This,
   IN     UINT16                        KeyValue,
   IN     FRAMEWORK_EFI_IFR_DATA_ARRAY            *Data,

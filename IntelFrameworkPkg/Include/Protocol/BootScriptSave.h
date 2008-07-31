@@ -54,7 +54,7 @@ typedef struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL EFI_BOOT_SCRIPT_SAVE_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BOOT_SCRIPT_WRITE) (
+(EFIAPI *EFI_BOOT_SCRIPT_WRITE)(
   IN EFI_BOOT_SCRIPT_SAVE_PROTOCOL            *This,
   IN UINT16                                   TableName,
   IN UINT16                                   OpCode,
@@ -75,7 +75,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_BOOT_SCRIPT_CLOSE_TABLE) (
+(EFIAPI *EFI_BOOT_SCRIPT_CLOSE_TABLE)(
   IN EFI_BOOT_SCRIPT_SAVE_PROTOCOL            *This,
   IN UINT16                                   TableName,
   OUT EFI_PHYSICAL_ADDRESS                    *Address
