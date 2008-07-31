@@ -61,7 +61,7 @@ typedef struct _EFI_PRINT_PROTOCOL  EFI_PRINT_PROTOCOL;
 **/
 typedef
 UINTN
-(EFIAPI *UNI_VSPRINT) (
+(EFIAPI *UNI_VSPRINT)(
   OUT CHAR16        *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
@@ -103,7 +103,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *UNI_VSPRINT_ASCII) (
+(EFIAPI *UNI_VSPRINT_ASCII)(
   OUT CHAR16       *StartOfBuffer,
   IN  UINTN        BufferSize,
   IN  CONST CHAR8  *FormatString,
@@ -153,7 +153,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *VALUE_TO_UNISTRING) (
+(EFIAPI *VALUE_TO_UNISTRING)(
   IN OUT CHAR16  *Buffer,
   IN UINTN       Flags,
   IN INT64       Value,
@@ -194,7 +194,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_VSPRINT) (
+(EFIAPI *ASCII_VSPRINT)(
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR8   *FormatString,
@@ -236,7 +236,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_VSPRINT_UNI) (
+(EFIAPI *ASCII_VSPRINT_UNI)(
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
@@ -285,7 +285,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *VALUE_TO_ASCIISTRING) (
+(EFIAPI *VALUE_TO_ASCIISTRING)(
   IN OUT CHAR8  *Buffer,
   IN UINTN      Flags,
   IN INT64      Value,

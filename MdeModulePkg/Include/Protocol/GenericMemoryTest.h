@@ -45,7 +45,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_MEMORY_TEST_INIT) (
+(EFIAPI *EFI_MEMORY_TEST_INIT)(
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
   IN  EXTENDMEM_COVERAGE_LEVEL                 Level,
   OUT BOOLEAN                                  *RequireSoftECCInit
@@ -75,7 +75,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PERFORM_MEMORY_TEST) (
+(EFIAPI *EFI_PERFORM_MEMORY_TEST)(
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This,
   OUT UINT64                                   *TestedMemorySize,
   OUT UINT64                                   *TotalMemorySize,
@@ -97,7 +97,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_MEMORY_TEST_FINISHED) (
+(EFIAPI *EFI_MEMORY_TEST_FINISHED)(
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This
   )
 ;
@@ -116,7 +116,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_MEMORY_TEST_COMPATIBLE_RANGE) (
+(EFIAPI *EFI_MEMORY_TEST_COMPATIBLE_RANGE)(
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
   IN  EFI_PHYSICAL_ADDRESS                     StartAddress,
   IN  UINT64                                   Length

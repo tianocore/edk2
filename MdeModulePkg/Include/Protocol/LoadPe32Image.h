@@ -58,7 +58,7 @@ typedef struct _EFI_PE32_IMAGE_PROTOCOL   EFI_PE32_IMAGE_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *LOAD_PE_IMAGE) (
+(EFIAPI *LOAD_PE_IMAGE)(
   IN EFI_PE32_IMAGE_PROTOCOL           *This,
   IN  EFI_HANDLE                       ParentImageHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL         *FilePath,
@@ -85,7 +85,7 @@ EFI_STATUS
 --*/
 typedef
 EFI_STATUS
-(EFIAPI *UNLOAD_PE_IMAGE) (
+(EFIAPI *UNLOAD_PE_IMAGE)(
   IN EFI_PE32_IMAGE_PROTOCOL          *This,
   IN EFI_HANDLE                       ImageHandle
   );

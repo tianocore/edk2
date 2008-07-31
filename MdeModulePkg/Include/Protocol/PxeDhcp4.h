@@ -260,7 +260,7 @@ typedef struct {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_DHCP4_RUN) (
+(EFIAPI *EFI_PXE_DHCP4_RUN)(
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   IN OPTIONAL UINTN         OpLen,
   IN OPTIONAL VOID          *OpList
@@ -269,7 +269,7 @@ EFI_STATUS
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_DHCP4_SETUP) (
+(EFIAPI *EFI_PXE_DHCP4_SETUP)(
   IN EFI_PXE_DHCP4_PROTOCOL          *This,
   IN OPTIONAL EFI_PXE_DHCP4_DATA     * NewData
   );
@@ -277,7 +277,7 @@ EFI_STATUS
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_DHCP4_INIT) (
+(EFIAPI *EFI_PXE_DHCP4_INIT)(
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   IN UINTN                  SecondsTimeout,
   OUT UINTN                 *Offers,
@@ -290,7 +290,7 @@ EFI_STATUS
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_DHCP4_SELECT) (
+(EFIAPI *EFI_PXE_DHCP4_SELECT)(
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   IN UINTN                  SecondsTimeout,
   IN DHCP4_PACKET           * offer
@@ -299,7 +299,7 @@ EFI_STATUS
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_DHCP4_RENEW) (
+(EFIAPI *EFI_PXE_DHCP4_RENEW)(
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   UINTN                     seconds_timeout
   );
@@ -307,7 +307,7 @@ EFI_STATUS
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_DHCP4_REBIND) (
+(EFIAPI *EFI_PXE_DHCP4_REBIND)(
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   UINTN                     seconds_timeout
   );
@@ -315,7 +315,7 @@ EFI_STATUS
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PXE_DHCP4_RELEASE) (
+(EFIAPI *EFI_PXE_DHCP4_RELEASE)(
   IN EFI_PXE_DHCP4_PROTOCOL * This
   );
 

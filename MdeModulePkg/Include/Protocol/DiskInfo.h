@@ -43,7 +43,7 @@ typedef struct _EFI_DISK_INFO_PROTOCOL  EFI_DISK_INFO_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DISK_INFO_INQUIRY) (
+(EFIAPI *EFI_DISK_INFO_INQUIRY)(
   IN EFI_DISK_INFO_PROTOCOL           * This,
   IN OUT VOID                         *InquiryData,
   IN OUT UINT32                       *IntquiryDataSize
@@ -67,7 +67,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DISK_INFO_IDENTIFY) (
+(EFIAPI *EFI_DISK_INFO_IDENTIFY)(
   IN EFI_DISK_INFO_PROTOCOL           * This,
   IN OUT VOID                         *IdentifyData,
   IN OUT UINT32                       *IdentifyDataSize
@@ -92,7 +92,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DISK_INFO_SENSE_DATA) (
+(EFIAPI *EFI_DISK_INFO_SENSE_DATA)(
   IN EFI_DISK_INFO_PROTOCOL           * This,
   IN OUT VOID                         *SenseData,
   IN OUT UINT32                       *SenseDataSize,
@@ -114,7 +114,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DISK_INFO_WHICH_IDE) (
+(EFIAPI *EFI_DISK_INFO_WHICH_IDE)(
   IN EFI_DISK_INFO_PROTOCOL           * This,
   OUT UINT32                          *IdeChannel,
   OUT UINT32                          *IdeDevice

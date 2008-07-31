@@ -44,7 +44,7 @@ typedef struct tdEFI_TCG_PLATFORM_PROTOCOL EFI_TCG_PLATFORM_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCG_MEASURE_PE_IMAGE) (
+(EFIAPI *EFI_TCG_MEASURE_PE_IMAGE)(
   IN      BOOLEAN                   BootPolicy,
   IN      EFI_PHYSICAL_ADDRESS      ImageAddress,
   IN      UINTN                     ImageSize,
@@ -65,7 +65,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCG_MEASURE_ACTION) (
+(EFIAPI *EFI_TCG_MEASURE_ACTION)(
   IN      CHAR8                     *ActionString
   );
 

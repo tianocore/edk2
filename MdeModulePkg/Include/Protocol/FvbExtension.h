@@ -42,7 +42,7 @@ typedef struct _EFI_FVB_EXTENSION_PROTOCOL EFI_FVB_EXTENSION_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_FV_ERASE_CUSTOM_BLOCK) (
+(EFIAPI * EFI_FV_ERASE_CUSTOM_BLOCK)(
   IN EFI_FVB_EXTENSION_PROTOCOL   *This,
   IN EFI_LBA                      StartLba,
   IN UINTN                        OffsetStartLba,
