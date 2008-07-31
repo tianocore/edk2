@@ -652,7 +652,7 @@ LibPcdSetExBool (
 **/
 typedef
 VOID
-(EFIAPI *PCD_CALLBACK) (
+(EFIAPI *PCD_CALLBACK)(
   IN        CONST GUID        *CallBackGuid, OPTIONAL
   IN        UINTN             CallBackToken,
   IN  OUT   VOID              *TokenData,
