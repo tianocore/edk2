@@ -9,7 +9,7 @@
   automatically from a critical fault, such as power failure. 
 
   The implementation uses an FTW Lite (Fault Tolerant Write) Work Space. 
-  This work space is a memory copy of the work space on the Woring Block,
+  This work space is a memory copy of the work space on the Working Block,
   the size of the work space is the FTW_WORK_SPACE_SIZE bytes.
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
@@ -25,19 +25,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <FtwLite.h>
 
-//
-// In write function, we should check the target range to prevent the user
-// from writing Spare block and Working space directly.
-//
-//
-// Fault Tolerant Write Protocol API
-//
 /**
   Starts a target block update. This function will record data about write
   in fault tolerant storage and will complete the write in a recoverable
   manner, ensuring at all times that either the original contents or
-  the modified contents are available.
-
+  the modified contents are available. We should check the target
+  range to prevent the user from writing Spare block and Working 
+  space directly.
 
   @param This            Calling context
   @param FvbHandle       The handle of FVB protocol that provides services for
@@ -383,7 +377,7 @@ FtwLiteWrite (
 
 
 /**
-  Write a record with fault tolerant mannaer.
+  Write a record with fault tolerant manner.
   Since the content has already backuped in spare block, the write is
   guaranteed to be completed with fault tolerant manner.
 
@@ -582,10 +576,8 @@ FtwAbort (
 /**
   This function is the entry point of the Fault Tolerant Write driver.
 
-
-  @param ImageHandle     EFI_HANDLE: A handle for the image that is initializing
-                         this driver
-  @param SystemTable     EFI_SYSTEM_TABLE: A pointer to the EFI system table
+  @param ImageHandle     A handle for the image that is initializing this driver
+  @param SystemTable     A pointer to the EFI system table
 
   @retval  EFI_SUCCESS            FTW has finished the initialization
   @retval  EFI_ABORTED            FTW initialization error
@@ -613,8 +605,7 @@ InitializeFtwLite (
   UINT32                              LbaIndex;
 
   //
-  // Allocate Private data of this driver,
-  // INCLUDING THE FtwWorkSpace[FTW_WORK_SPACE_SIZE].
+  // Allocate Private data of this driver, including the FtwWorkSpace[FTW_WORK_SPACE_SIZE].
   //
   FtwLiteDevice = NULL;
   FtwLiteDevice = AllocatePool (sizeof (EFI_FTW_LITE_DEVICE) + FTW_WORK_SPACE_SIZE);

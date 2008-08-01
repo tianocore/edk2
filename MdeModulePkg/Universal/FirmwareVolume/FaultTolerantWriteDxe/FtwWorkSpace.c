@@ -281,7 +281,7 @@ WorkSpaceRefresh (
   Offset  = (UINTN) (UINT8 *) Record - (UINTN) FtwLiteDevice->FtwWorkSpace;
 
   //
-  // IF work space has error or Record is out of the workspace limit, THEN
+  // If work space has error or Record is out of the workspace limit, THEN
   //   call reclaim.
   //
   if (EFI_ERROR (Status) || (Offset + WRITE_TOTAL_SIZE >= FtwLiteDevice->FtwWorkSpaceSize)) {
