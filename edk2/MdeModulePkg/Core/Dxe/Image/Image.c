@@ -475,7 +475,7 @@ CoreLoadPeImage (
 
 
     DEBUG ((DEBUG_INFO | DEBUG_LOAD,
-           "Loading driver at 0x%10p EntryPoint=0x%10p ",
+           "Loading driver at 0x%11p EntryPoint=0x%11p ",
            (VOID *)(UINTN) Image->ImageContext.ImageAddress,
            FUNCTION_ENTRY_POINT ((UINTN) Image->ImageContext.EntryPoint)));
 
@@ -1026,7 +1026,7 @@ CoreStartImage (
     //
     DEBUG_CODE_BEGIN ();
       if (EFI_ERROR (Image->Status)) {
-        DEBUG ((DEBUG_ERROR, "Error: Image at %10p start failed: %r\n", Image->Info.ImageBase, Image->Status));
+        DEBUG ((DEBUG_ERROR, "Error: Image at %11p start failed: %r\n", Image->Info.ImageBase, Image->Status));
       }
     DEBUG_CODE_END ();
 
