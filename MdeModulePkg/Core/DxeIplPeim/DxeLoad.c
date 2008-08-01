@@ -240,7 +240,7 @@ DxeLoadCore (
     PcdGet32(PcdStatusCodeValuePeiHandoffToDxe)
     );
 
-  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading DXE CORE at 0x%10p EntryPoint=0x%10p\n", (VOID *)(UINTN)DxeCoreAddress, FUNCTION_ENTRY_POINT (DxeCoreEntryPoint)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading DXE CORE at 0x%11p EntryPoint=0x%11p\n", (VOID *)(UINTN)DxeCoreAddress, FUNCTION_ENTRY_POINT (DxeCoreEntryPoint)));
 
   //
   // Transfer control to the DXE Core

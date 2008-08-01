@@ -360,7 +360,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
     //
     PrivateData->AllFv[PrivateData->AllFvCount++] = (EFI_PEI_FV_HANDLE)Fv->FvInfo;
     
-    DEBUG ((EFI_D_INFO, "The %dth FvImage start address is 0x%10p and size is 0x%08x\n", PrivateData->AllFvCount, (VOID *) Fv->FvInfo, Fv->FvInfoSize));
+    DEBUG ((EFI_D_INFO, "The %dth FvImage start address is 0x%11p and size is 0x%08x\n", PrivateData->AllFvCount, (VOID *) Fv->FvInfo, Fv->FvInfoSize));
     //
     // Preprocess all FV type files in this new FileSystem2 Fv image
     //
