@@ -195,7 +195,7 @@ BdsLibBootViaBootOption (
   //
   gBS->RestoreTPL (TPL_APPLICATION);
 
-  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Booting EFI way %S\n", Option->Description));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Booting %S\n", Option->Description));
 
   Status = gBS->LoadImage (
                   TRUE,
