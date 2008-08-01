@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "ConSplitter.h"
 
 //
-// Global Variables
+// Template for Text In Splitter
 //
 STATIC TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE,
@@ -117,19 +117,28 @@ STATIC TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   FALSE
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UGA_DRAW_PROTOCOL gUgaDrawProtocolTemplate = {
+//
+// Template for Uga Draw Protocol
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UGA_DRAW_PROTOCOL mUgaDrawProtocolTemplate = {
   ConSpliterUgaDrawGetMode,
   ConSpliterUgaDrawSetMode,
   ConSpliterUgaDrawBlt
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_PROTOCOL gGraphicsOutputProtocolTemplate = {
+//
+// Template for Graphics Output Protocol
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_PROTOCOL mGraphicsOutputProtocolTemplate = {
   ConSpliterGraphicsOutputQueryMode,
   ConSpliterGraphicsOutputSetMode,
   ConSpliterGraphicsOutputBlt,
   NULL
 };
 
+//
+// Template for Text Out Splitter
+//
 STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
   TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE,
   (EFI_HANDLE) NULL,
@@ -194,6 +203,9 @@ STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
   (INT32 *) NULL
 };
 
+//
+// Template for Standard Error Text Out Splitter
+//
 STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
   TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE,
   (EFI_HANDLE) NULL,
@@ -258,6 +270,9 @@ STATIC TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
   (INT32 *) NULL
 };
 
+//
+// Driver binding instance for Console Input Device
+//
 EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConInDriverBinding = {
   ConSplitterConInDriverBindingSupported,
   ConSplitterConInDriverBindingStart,
@@ -267,6 +282,9 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConInDriverBinding = {
   NULL
 };
 
+//
+// Driver binding instance for Simple Pointer protocol
+//
 EFI_DRIVER_BINDING_PROTOCOL           gConSplitterSimplePointerDriverBinding = {
   ConSplitterSimplePointerDriverBindingSupported,
   ConSplitterSimplePointerDriverBindingStart,
@@ -288,6 +306,9 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterAbsolutePointerDriverBinding =
   NULL
 };
 
+//
+// Driver binding instance for Console Out device
+//
 EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConOutDriverBinding = {
   ConSplitterConOutDriverBindingSupported,
   ConSplitterConOutDriverBindingStart,
@@ -297,6 +318,9 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConOutDriverBinding = {
   NULL
 };
 
+//
+// Driver binding instance for Standard Error device
+//
 EFI_DRIVER_BINDING_PROTOCOL           gConSplitterStdErrDriverBinding = {
   ConSplitterStdErrDriverBindingSupported,
   ConSplitterStdErrDriverBindingStart,
@@ -521,7 +545,8 @@ ConSplitterDriverEntry(
                                    structure.
 
   @retval EFI_OUT_OF_RESOURCES     Out of resources.
-  @retval other     Out of resources.
+  @retval EFI_SUCCESS              Text Input Devcie's private data has been constructed.
+  @retval other                    Failed to construct private data.
 
 **/
 EFI_STATUS
@@ -638,6 +663,7 @@ ConSplitterTextInConstructor (
                                    structure.
 
   @retval EFI_OUT_OF_RESOURCES     Out of resources.
+  @retval EFI_SUCCESS              Text Input Devcie's private data has been constructed.
 
 **/
 EFI_STATUS
@@ -652,11 +678,11 @@ ConSplitterTextOutConstructor (
   // Copy protocols template
   //
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
-    CopyMem (&ConOutPrivate->UgaDraw, &gUgaDrawProtocolTemplate, sizeof (EFI_UGA_DRAW_PROTOCOL));
+    CopyMem (&ConOutPrivate->UgaDraw, &mUgaDrawProtocolTemplate, sizeof (EFI_UGA_DRAW_PROTOCOL));
   }
 
   if (FeaturePcdGet (PcdConOutGopSupport)) {
-    CopyMem (&ConOutPrivate->GraphicsOutput, &gGraphicsOutputProtocolTemplate, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL));
+    CopyMem (&ConOutPrivate->GraphicsOutput, &mGraphicsOutputProtocolTemplate, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL));
   }
 
   //
@@ -735,13 +761,13 @@ ConSplitterTextOutConstructor (
 
     ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
     //
-    // Initial current mode to unknow state, and then set to mode 0
+    // Initial current mode to unknown state, and then set to mode 0
     //
     ConOutPrivate->GraphicsOutput.Mode->Mode = 0xffff;
     ConOutPrivate->GraphicsOutput.SetMode (&ConOutPrivate->GraphicsOutput, 0);
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 
@@ -814,8 +840,8 @@ ConSplitterSupported (
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -841,8 +867,8 @@ ConSplitterConInDriverBindingSupported (
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -869,8 +895,8 @@ ConSplitterSimplePointerDriverBindingSupported (
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -897,8 +923,8 @@ ConSplitterAbsolutePointerDriverBindingSupported (
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -924,8 +950,8 @@ ConSplitterConOutDriverBindingSupported (
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -956,7 +982,7 @@ ConSplitterStdErrDriverBindingSupported (
   @param  InterfaceGuid             The specified protocol to be opened.
   @param  Interface                 Protocol interface returned.
 
-  @retval EFI_SUCCESS               This driver supports this device
+  @retval EFI_SUCCESS               This driver supports this device.
   @retval other                     Failed to open the specified Console Device Guid
                                     or specified protocol.
 
@@ -1052,6 +1078,9 @@ ConSplitterConInDriverBindingStart (
     return Status;
   }
 
+  //
+  // Add this device into Text In devices list.
+  //
   Status = ConSplitterTextInAddDevice (&mConIn, TextIn);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1069,6 +1098,9 @@ ConSplitterConInDriverBindingStart (
     return Status;
   }
 
+  //
+  // Add this device into Text In Ex devices list.
+  //
   Status = ConSplitterTextInExAddDevice (&mConIn, TextInEx);
 
   return Status;
@@ -1098,6 +1130,10 @@ ConSplitterSimplePointerDriverBindingStart (
   EFI_STATUS                  Status;
   EFI_SIMPLE_POINTER_PROTOCOL *SimplePointer;
 
+  //
+  // Start ConSplitter on ControllerHandle, and create the virtual
+  // agrogated console device on first call Start for a SimplePointer handle.
+  //
   Status = ConSplitterStart (
             This,
             ControllerHandle,
@@ -1110,6 +1146,9 @@ ConSplitterSimplePointerDriverBindingStart (
     return Status;
   }
 
+  //
+  // Add this devcie into Simple Pointer devices list.
+  //
   return ConSplitterSimplePointerAddDevice (&mConIn, SimplePointer);
 }
 
@@ -1137,6 +1176,10 @@ ConSplitterAbsolutePointerDriverBindingStart (
   EFI_STATUS                        Status;
   EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer;
 
+  //
+  // Start ConSplitter on ControllerHandle, and create the virtual
+  // agrogated console device on first call Start for a AbsolutePointer handle.
+  //
   Status = ConSplitterStart (
              This,
              ControllerHandle,
@@ -1150,6 +1193,9 @@ ConSplitterAbsolutePointerDriverBindingStart (
     return Status;
   }
 
+  //
+  // Add this devcie into Absolute Pointer devices list.
+  //
   return ConSplitterAbsolutePointerAddDevice (&mConIn, AbsolutePointer);
 }
 
@@ -1179,6 +1225,10 @@ ConSplitterConOutDriverBindingStart (
   EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
   EFI_UGA_DRAW_PROTOCOL            *UgaDraw;
 
+  //
+  // Start ConSplitter on ControllerHandle, and create the virtual
+  // agrogated console device on first call Start for a ConsoleOut handle.
+  //
   Status = ConSplitterStart (
             This,
             ControllerHandle,
@@ -1207,7 +1257,7 @@ ConSplitterConOutDriverBindingStart (
 
   if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
-    // Open UGA_DRAW protocol
+    // Open UGA DRAW protocol
     //
     Status = gBS->OpenProtocol (
                     ControllerHandle,
@@ -1273,6 +1323,10 @@ ConSplitterStdErrDriverBindingStart (
   EFI_STATUS                       Status;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
 
+  //
+  // Start ConSplitter on ControllerHandle, and create the virtual
+  // agrogated console device on first call Start for a StandardError handle.
+  //
   Status = ConSplitterStart (
             This,
             ControllerHandle,
@@ -1320,7 +1374,7 @@ ConSplitterStdErrDriverBindingStart (
 
 
 /**
-  Stop ConSplitter on device handle by opening Console Device Guid on device handle 
+  Stop ConSplitter on device handle by closing Console Device Guid on device handle 
   and the console virtual handle.
   
   @param  This                      Protocol instance pointer.
@@ -1367,6 +1421,7 @@ ConSplitterStop (
         This->DriverBindingHandle,
         ConSplitterVirtualHandle
         );
+
   gBS->CloseProtocol (
         ControllerHandle,
         DeviceGuid,
@@ -1420,12 +1475,18 @@ ConSplitterConInDriverBindingStop (
     return Status;
   }
 
+  //
+  // Remove device from Text Input Ex devices list.
+  //  
   Status = ConSplitterTextInExDeleteDevice (&mConIn, TextInEx);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
 
+  //
+  // Close Simple Text In protocol on controller handle and virtual handle.
+  //
   Status = ConSplitterStop (
             This,
             ControllerHandle,
@@ -1437,9 +1498,10 @@ ConSplitterConInDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
-  // Delete this console input device's data structures.
-  //
+  // Remove device from Text Input devices list.
+  // 
   return ConSplitterTextInDeleteDevice (&mConIn, TextIn);
 }
 
@@ -1474,6 +1536,9 @@ ConSplitterSimplePointerDriverBindingStop (
     return EFI_SUCCESS;
   }
 
+  //
+  // Close Simple Pointer protocol on controller handle and virtual handle.
+  //
   Status = ConSplitterStop (
             This,
             ControllerHandle,
@@ -1485,8 +1550,9 @@ ConSplitterSimplePointerDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
-  // Delete this console input device's data structures.
+  // Remove this device from Simple Pointer device list.
   //
   return ConSplitterSimplePointerDeleteDevice (&mConIn, SimplePointer);
 }
@@ -1522,6 +1588,9 @@ ConSplitterAbsolutePointerDriverBindingStop (
     return EFI_SUCCESS;
   }
 
+  //
+  // Close Absolute Pointer protocol on controller handle and virtual handle.
+  //
   Status = ConSplitterStop (
              This,
              ControllerHandle,
@@ -1533,8 +1602,9 @@ ConSplitterAbsolutePointerDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
-  // Delete this console input device's data structures.
+  // Remove this device from Absolute Pointer device list.
   //
   return ConSplitterAbsolutePointerDeleteDevice (&mConIn, AbsolutePointer);
 }
@@ -1569,6 +1639,9 @@ ConSplitterConOutDriverBindingStop (
     return EFI_SUCCESS;
   }
 
+  //
+  // Close Absolute Pointer protocol on controller handle and virtual handle.
+  //
   Status = ConSplitterStop (
             This,
             ControllerHandle,
@@ -1582,7 +1655,7 @@ ConSplitterConOutDriverBindingStop (
   }
 
   //
-  // Delete this console output device's data structures.
+  // Remove this device from Text Out device list.
   //
   return ConSplitterTextOutDeleteDevice (&mConOut, TextOut);
 }
@@ -1617,6 +1690,9 @@ ConSplitterStdErrDriverBindingStop (
     return EFI_SUCCESS;
   }
 
+  //
+  // Close Standard Error Device on controller handle and virtual handle.
+  //
   Status = ConSplitterStop (
             This,
             ControllerHandle,
@@ -3111,9 +3187,7 @@ ConSplitterTextOutDeleteDevice (
 
   return Status;
 }
-//
-// ConSplitter TextIn member functions
-//
+
 
 /**
   Reset the input device and optionaly run diagnostics
@@ -3280,7 +3354,7 @@ ConSpliterConsoleControlLockStdInEvent (
           BackSpaceString[0]  = CHAR_BACKSPACE;
           BackSpaceString[1]  = 0;
 
-          SpaceString[0]      = ' ';
+          SpaceString[0]      = L' ';
           SpaceString[1]      = 0;
 
           ConSplitterTextOutOutputString (&mConOut.TextOut, BackSpaceString);
@@ -3441,6 +3515,7 @@ ConSplitterTextInWaitForKey (
 
 
 /**
+  Test if the key has been registered on input device.
 
   @param  RegsiteredData           A pointer to a buffer that is filled in with the
                                    keystroke state data for the key that was
@@ -3481,10 +3556,6 @@ IsKeyRegistered (
   return TRUE;
 
 }
-
-//
-// Simple Text Input Ex protocol functions
-//
 
 
 /**
@@ -4064,11 +4135,6 @@ ConSplitterSimplePointerWaitForInput (
     }
   }
 }
-
-//
-// Absolute Pointer Protocol functions
-//
-
 
 /**
   Resets the pointer device hardware.
