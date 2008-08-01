@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2007, Intel Corporation
+Copyright (c) 2005 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -53,7 +53,8 @@ MnpDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
 
   //
   // Test to see if MNP is already installed.
@@ -67,23 +68,36 @@ MnpDriverBindingSupported (
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                   );
   if (!EFI_ERROR (Status)) {
-
     return EFI_ALREADY_STARTED;
   }
 
   //
-  // Test to see if SNP is installed.
+  // Test to open the Simple Network protocol BY_DRIVER.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiSimpleNetworkProtocolGuid,
-                  NULL,
+                  (VOID **) &Snp,
                   This->DriverBindingHandle,
                   ControllerHandle,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
 
-  return Status;
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Close the openned SNP protocol.
+  //
+  gBS->CloseProtocol (
+         ControllerHandle,
+         &gEfiSimpleNetworkProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
+
+  return EFI_SUCCESS;
 }
 
 
