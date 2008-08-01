@@ -30,7 +30,7 @@ STATIC CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL 
 
   @param  This                    Protocol instance pointer.
   @param  Mode                    Are we in text of grahics mode.
-  @param  GopExists               TRUE if GOP Spliter has found a GOP/UGA device
+  @param  GopExists               TRUE if Console Spliter has found a GOP or UGA device
   @param  StdInLocked             TRUE if StdIn device is keyboard locked
 
   @retval EFI_SUCCESS             Mode information returned.
@@ -42,7 +42,7 @@ EFIAPI
 ConSpliterConsoleControlGetMode (
   IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
   OUT EFI_CONSOLE_CONTROL_SCREEN_MODE *Mode,
-  OUT BOOLEAN                         *GopExists,
+  OUT BOOLEAN                         *GopUgaExists,
   OUT BOOLEAN                         *StdInLocked
   )
 {
@@ -57,11 +57,11 @@ ConSpliterConsoleControlGetMode (
 
   *Mode = Private->ConsoleOutputMode;
 
-  if (GopExists != NULL) {
-    *GopExists = FALSE;
+  if (GopUgaExists != NULL) {
+    *GopUgaExists = FALSE;
     for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
       if ((Private->TextOutList[Index].GraphicsOutput != NULL) || (Private->TextOutList[Index].UgaDraw != NULL)) {
-        *GopExists = TRUE;
+        *GopUgaExists = TRUE;
         break;
       }
     }
@@ -207,7 +207,7 @@ ConSpliterGraphicsOutputQueryMode (
 
 
 /**
-  Graphics output protocol interface to set video mode
+  Graphics output protocol interface to set video mode.
 
   @param  This                    Protocol instance pointer.
   @param  ModeNumber              The mode number to be set.
@@ -247,9 +247,6 @@ ConSpliterGraphicsOutputSetMode (
 
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
-  //
-  // GopDevNullSetMode ()
-  //
   ReturnStatus = EFI_SUCCESS;
 
   //
@@ -1349,7 +1346,7 @@ DevNullTextOutOutputString (
         Attribute = NullAttributes + SizeAttribute;
 
         for (Index = 0; Index < MaxColumn; Index++, Screen++, Attribute++) {
-          *Screen     = ' ';
+          *Screen     = L' ';
           *Attribute  = Mode->Attribute;
         }
       } else {
@@ -1545,7 +1542,7 @@ DevNullTextOutClearScreen (
 
   for (Row = 0; Row < Private->DevNullRows; Row++) {
     for (Column = 0; Column < Private->DevNullColumns; Column++, Screen++, Attributes++) {
-      *Screen     = ' ';
+      *Screen     = L' ';
       *Attributes = CurrentAttribute;
     }
     //

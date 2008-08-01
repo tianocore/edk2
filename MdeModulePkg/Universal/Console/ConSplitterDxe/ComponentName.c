@@ -274,6 +274,9 @@ ConSplitterTestControllerHandles (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // Tests whether a controller handle is being managed by a specific driver.
+  //
   Status = EfiTestManagedDevice (
              ControllerHandle,
              DriverBindingHandle,
@@ -283,6 +286,9 @@ ConSplitterTestControllerHandles (
     return Status;
   }
 
+  //
+  // Tests whether a child handle is a child device of the controller.
+  //
   Status = EfiTestChildHandle (
              ControllerHandle,
              ChildHandle,

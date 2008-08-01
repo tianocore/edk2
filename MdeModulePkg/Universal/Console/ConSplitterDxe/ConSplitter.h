@@ -183,40 +183,40 @@ typedef struct {
 } TEXT_OUT_AND_GOP_DATA;
 
 typedef struct {
-  UINT64                             Signature;
-  EFI_HANDLE                         VirtualHandle;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    TextOut;
-  EFI_SIMPLE_TEXT_OUTPUT_MODE        TextOutMode;
-
-  EFI_UGA_DRAW_PROTOCOL              UgaDraw;
-  UINT32                             UgaHorizontalResolution;
-  UINT32                             UgaVerticalResolution;
-  UINT32                             UgaColorDepth;
-  UINT32                             UgaRefreshRate;
-  EFI_UGA_PIXEL                      *UgaBlt;
-
-  EFI_GRAPHICS_OUTPUT_PROTOCOL       GraphicsOutput;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *GraphicsOutputBlt;
+  UINT64                                Signature;
+  EFI_HANDLE                            VirtualHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       TextOut;
+  EFI_SIMPLE_TEXT_OUTPUT_MODE           TextOutMode;
+                                        
+  EFI_UGA_DRAW_PROTOCOL                 UgaDraw;
+  UINT32                                UgaHorizontalResolution;
+  UINT32                                UgaVerticalResolution;
+  UINT32                                UgaColorDepth;
+  UINT32                                UgaRefreshRate;
+  EFI_UGA_PIXEL                         *UgaBlt;
+                                        
+  EFI_GRAPHICS_OUTPUT_PROTOCOL          GraphicsOutput;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL         *GraphicsOutputBlt;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *GraphicsOutputModeBuffer;
-  UINTN                              CurrentNumberOfGraphicsOutput;
-  UINTN                              CurrentNumberOfUgaDraw;
-  BOOLEAN                            HardwareNeedsStarting;
-
-  EFI_CONSOLE_CONTROL_PROTOCOL       ConsoleControl;
-
-  UINTN                              CurrentNumberOfConsoles;
-  TEXT_OUT_AND_GOP_DATA              *TextOutList;
-  UINTN                              TextOutListCount;
-  TEXT_OUT_SPLITTER_QUERY_DATA       *TextOutQueryData;
-  UINTN                              TextOutQueryDataCount;
-  INT32                              *TextOutModeMap;
-
-  EFI_CONSOLE_CONTROL_SCREEN_MODE    ConsoleOutputMode;
-
-  UINTN                              DevNullColumns;
-  UINTN                              DevNullRows;
-  CHAR16                             *DevNullScreen;
-  INT32                              *DevNullAttributes;
+  UINTN                                 CurrentNumberOfGraphicsOutput;
+  UINTN                                 CurrentNumberOfUgaDraw;
+  BOOLEAN                               HardwareNeedsStarting;
+                                        
+  EFI_CONSOLE_CONTROL_PROTOCOL          ConsoleControl;
+                                        
+  UINTN                                 CurrentNumberOfConsoles;
+  TEXT_OUT_AND_GOP_DATA                 *TextOutList;
+  UINTN                                 TextOutListCount;
+  TEXT_OUT_SPLITTER_QUERY_DATA          *TextOutQueryData;
+  UINTN                                 TextOutQueryDataCount;
+  INT32                                 *TextOutModeMap;
+                                        
+  EFI_CONSOLE_CONTROL_SCREEN_MODE       ConsoleOutputMode;
+                                        
+  UINTN                                 DevNullColumns;
+  UINTN                                 DevNullRows;
+  CHAR16                                *DevNullScreen;
+  INT32                                 *DevNullAttributes;
 
 } TEXT_OUT_SPLITTER_PRIVATE_DATA;
 
@@ -276,12 +276,14 @@ ConSplitterDriverEntry (
 ;
 
 /**
-  Construct the ConSplitter.
+  Construct console input devices' private data.
 
   @param  ConInPrivate             A pointer to the TEXT_IN_SPLITTER_PRIVATE_DATA
                                    structure.
 
   @retval EFI_OUT_OF_RESOURCES     Out of resources.
+  @retval EFI_SUCCESS              Console Input Devcie's private data has been constructed.
+  @retval other                    Failed to construct private data.
 
 **/
 EFI_STATUS
@@ -293,10 +295,11 @@ ConSplitterTextInConstructor (
 /**
   Construct console output devices' private data.
 
-  @param  ConInPrivate             A pointer to the TEXT_IN_SPLITTER_PRIVATE_DATA
+  @param  ConOutPrivate            A pointer to the TEXT_IN_SPLITTER_PRIVATE_DATA
                                    structure.
 
   @retval EFI_OUT_OF_RESOURCES     Out of resources.
+  @retval EFI_SUCCESS              Text Input Devcie's private data has been constructed.
 
 **/
 EFI_STATUS
@@ -310,13 +313,15 @@ ConSplitterTextOutConstructor (
 //
 
 /**
-  Console In Supported Check
+  Test to see if Console In Device could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -329,13 +334,15 @@ ConSplitterConInDriverBindingSupported (
 ;
 
 /**
-  Standard Error Supported Check
+  Test to see if Simple Pointer protocol could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -348,13 +355,15 @@ ConSplitterSimplePointerDriverBindingSupported (
 ;
 
 /**
-  Console Out Supported Check
+  Test to see if Console Out Device could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -367,13 +376,15 @@ ConSplitterConOutDriverBindingSupported (
 ;
 
 /**
-  Standard Error Supported Check
+  Test to see if Standard Error Device could be supported on the ControllerHandle. 
 
-  @param  This                     Pointer to protocol.
-  @param  ControllerHandle         Controller handle.
-  @param  RemainingDevicePath      Remaining device path.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_STATUS
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -571,8 +582,8 @@ ConSplitterStdErrDriverBindingStop (
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -1944,7 +1955,7 @@ ConSpliterGraphicsOutputQueryMode (
 ;
 
 /**
-  Graphics output protocol interface to set video mode
+  Graphics output protocol interface to set video mode.
 
   @param  This                    Protocol instance pointer.
   @param  ModeNumber              The mode number to be set.
