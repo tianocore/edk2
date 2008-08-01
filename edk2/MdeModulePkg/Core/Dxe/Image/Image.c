@@ -17,6 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Module Globals
 //
 
+SPIN_LOCK                  mUnloadImageLock;
+
 LOADED_IMAGE_PRIVATE_DATA  *mCurrentImage = NULL;
 
 LOAD_PE32_IMAGE_PRIVATE_DATA  mLoadPe32PrivateData = {
@@ -136,6 +138,11 @@ CoreInitializeImageServices (
   ASSERT_EFI_ERROR (Status);
 
   mCurrentImage = Image;
+
+  //
+  // Initialize spin lock
+  //
+  InitializeSpinLock (&mUnloadImageLock);
 
   //
   // Fill in DXE globals
@@ -1362,13 +1369,14 @@ CoreUnloadImage (
 {
   EFI_STATUS                 Status;
   LOADED_IMAGE_PRIVATE_DATA  *Image;
-  EFI_TPL                    OldTpl;
 
   //
   // Prevent possible reentrance to this function
   // for the same ImageHandle
   //
-  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
+  if (!AcquireSpinLockOrFail (&mUnloadImageLock)) {
+    return EFI_UNSUPPORTED;
+  }
 
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL ) {
@@ -1404,7 +1412,7 @@ CoreUnloadImage (
   }
 
 Done:
-  CoreRestoreTpl (OldTpl);
+  ReleaseSpinLock (&mUnloadImageLock);
   return Status;
 }
 
