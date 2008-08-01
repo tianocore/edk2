@@ -305,7 +305,7 @@ CoreCreateEventEx (
   INTN            Index;
 
 
-  if ((Event == NULL) || (NotifyTpl == TPL_APPLICATION)) {
+  if (Event == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -358,7 +358,7 @@ CoreCreateEventEx (
     // Check for an invalid NotifyFunction or NotifyTpl
     //
     if ((NotifyFunction == NULL) ||
-        (NotifyTpl < TPL_APPLICATION) ||
+        (NotifyTpl <= TPL_APPLICATION) ||
        (NotifyTpl >= TPL_HIGH_LEVEL)) {
       return EFI_INVALID_PARAMETER;
     }
