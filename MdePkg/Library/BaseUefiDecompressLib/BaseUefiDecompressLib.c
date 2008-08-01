@@ -16,6 +16,7 @@
 #include <Base.h>
 
 
+#include <Library/BaseLib.h>
 #include <Library/UefiDecompressLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -689,18 +690,17 @@ UefiDecompressGetInfo (
   ASSERT (DestinationSize != NULL);
   ASSERT (ScratchSize != NULL);
 
-  *ScratchSize  = sizeof (SCRATCH_DATA);
-
   if (SourceSize < 8) {
     return RETURN_INVALID_PARAMETER;
   }
 
-  CopyMem (&CompressedSize, Source, sizeof (UINT32));
-  CopyMem (DestinationSize, (VOID *)((UINT8 *)Source + 4), sizeof (UINT32));
-
+  CompressedSize   = ReadUnaligned32 ((UINT32 *)Source);
   if (SourceSize < (CompressedSize + 8)) {
     return RETURN_INVALID_PARAMETER;
   }
+
+  *ScratchSize  = sizeof (SCRATCH_DATA);
+  *DestinationSize = ReadUnaligned32 ((UINT32 *)Source + 1);
 
   return RETURN_SUCCESS;
 }
