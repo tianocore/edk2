@@ -41,6 +41,7 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
+  BaseLib
   DebugLib
   BaseMemoryLib
   ExtractGuidedSectionLib

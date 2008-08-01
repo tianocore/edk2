@@ -19,6 +19,7 @@
 
 #include <PiPei.h>
 
+#include <Library/BaseLib.h>
 #include <Library/UefiDecompressLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>

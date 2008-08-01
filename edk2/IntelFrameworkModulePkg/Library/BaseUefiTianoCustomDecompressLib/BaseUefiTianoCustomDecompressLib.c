@@ -584,13 +584,13 @@ UefiDecompressGetInfo (
     return RETURN_INVALID_PARAMETER;
   }
 
-  CompressedSize   = *(UINT32 *) Source;
+  CompressedSize   = ReadUnaligned32 ((UINT32 *)Source);
   if (SourceSize < (CompressedSize + 8)) {
     return RETURN_INVALID_PARAMETER;
   }
 
   *ScratchSize  = sizeof (SCRATCH_DATA);
-  *DestinationSize = *((UINT32 *) Source + 1);
+  *DestinationSize = ReadUnaligned32 ((UINT32 *)Source + 1);
 
   return RETURN_SUCCESS;
 }
