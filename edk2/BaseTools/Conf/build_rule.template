@@ -169,7 +169,7 @@
         "$(PP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
         Trim --vfr-file -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
         -mkdir ${d_path} > NUL 2>&1
-        VfrCompile -l --no-pre-processing --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+        "$(VFR)" $(VFR_FLAGS) --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
 
 [Build.Object-File]
     <InputFile>
