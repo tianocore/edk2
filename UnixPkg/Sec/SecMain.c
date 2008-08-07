@@ -994,8 +994,6 @@ SecNt32PeCoffRelocateImage (
   if (Entry != NULL) {
     ImageContext->EntryPoint = Entry;
     printf("Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, Entry);
-  } else {
-    printf("Could not find _ModuleEntryPoint Entry, Module may be built error\n");
   }
 
   SecUnixLoaderBreak ();
