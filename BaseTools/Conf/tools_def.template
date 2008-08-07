@@ -763,3 +763,8 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_MYTOOLS_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC
 *_MYTOOLS_EBC_DLINK_FLAGS                = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER
 
+##################
+# VfrCompiler definitions
+##################
+*_*_*_VFR_PATH                      = VfrCompile.exe
+*_*_*_VFR_FLAGS                     = -l -n
