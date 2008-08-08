@@ -364,13 +364,13 @@ CoreInstallProtocolInterfaceNotify (
   //
   // Print debug message
   //
-  DEBUG((DEBUG_ERROR | DEBUG_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
+  DEBUG((DEBUG_LOAD | DEBUG_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
 
   Status = EFI_OUT_OF_RESOURCES;
   Prot = NULL;
   Handle = NULL;
 
-  ASSERT (NULL != gDxeCoreBS);
+  ASSERT (gDxeCoreBS != NULL);
 
   if (*UserHandle != NULL_HANDLE) {
     Status = CoreHandleProtocol (*UserHandle, Protocol, (VOID **)&ExistingInterface);
@@ -1356,7 +1356,7 @@ CoreOpenProtocolInformation (
 
 Done:
   //
-  // Done. Release the database lock are return
+  // Done. Release the database lock.
   //
   CoreReleaseProtocolLock ();
   return Status;
