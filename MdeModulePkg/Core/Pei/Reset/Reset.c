@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Core version of the Reset System
 
 
-  @param PeiServices     - The PEI core services table.
+  @param PeiServices                An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
 
   @retval EFI_NOT_AVAILABLE_YET     PPI not available yet.
   @retval EFI_DEVICE_ERROR          Did not reset system.

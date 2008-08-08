@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   This service enables PEIMs to ascertain the present value of the boot mode.
 
-  @param PeiServices            The PEI core services table.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param BootMode               A pointer to contain the value of the boot mode.
 
   @retval EFI_SUCCESS           The boot mode was returned successfully.
@@ -58,10 +58,10 @@ PeiGetBootMode (
   This service enables PEIMs to update the boot mode variable.
 
 
-  @param PeiServices     - The PEI core services table.
-  @param BootMode        - The value of the boot mode to set.
+  @param PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param BootMode         The value of the boot mode to set.
 
-  @return EFI_SUCCESS    - The value was successfully updated
+  @return EFI_SUCCESS     The value was successfully updated
 
 **/
 EFI_STATUS
