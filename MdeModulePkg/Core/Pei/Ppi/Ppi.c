@@ -40,7 +40,7 @@ InitializePpiServices (
 
   Migrate the Hob list from the CAR stack to PEI installed memory.
 
-  @param PeiServices         The PEI core services table.
+  @param PrivateData         Pointer to PeiCore's private data structure.
   @param OldCheckingBottom   The old checking bottom.
   @param OldCheckingTop      The old checking top.
   @param Fixup               The address difference between
@@ -105,15 +105,17 @@ ConvertPpiPointers (
 
 /**
 
-  Install PPI services.
+  This function installs an interface in the PEI PPI database by GUID. 
+  The purpose of the service is to publish an interface that other parties
+  can use to call additional PEIMs.
 
-  @param PeiServices     - Pointer to the PEI Service Table
-  @param PpiList         - Pointer to a list of PEI PPI Descriptors.
+  @param PeiServices                An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PpiList                    Pointer to a list of PEI PPI Descriptors.
 
-  @retval EFI_SUCCESS             - if all PPIs in PpiList are successfully installed.
-  @retval EFI_INVALID_PARAMETER   - if PpiList is NULL pointer
-  @retval EFI_INVALID_PARAMETER   - if any PPI in PpiList is not valid
-  @retval EFI_OUT_OF_RESOURCES    - if there is no more memory resource to install PPI
+  @retval EFI_SUCCESS              if all PPIs in PpiList are successfully installed.
+  @retval EFI_INVALID_PARAMETER    if PpiList is NULL pointer
+  @retval EFI_INVALID_PARAMETER    if any PPI in PpiList is not valid
+  @retval EFI_OUT_OF_RESOURCES     if there is no more memory resource to install PPI
 
 **/
 EFI_STATUS
@@ -195,16 +197,19 @@ PeiInstallPpi (
 
 /**
 
-  Re-Install PPI services.
+  This function reinstalls an interface in the PEI PPI database by GUID. 
+  The purpose of the service is to publish an interface that other parties can 
+  use to replace an interface of the same name in the protocol database with a 
+  different interface.
 
-  @param PeiServices     - Pointer to the PEI Service Table
-  @param OldPpi          - Pointer to the old PEI PPI Descriptors.
-  @param NewPpi          - Pointer to the new PEI PPI Descriptors.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param OldPpi                 Pointer to the old PEI PPI Descriptors.
+  @param NewPpi                 Pointer to the new PEI PPI Descriptors.
 
-  @retval EFI_SUCCESS           - if the operation was successful
-  @retval EFI_INVALID_PARAMETER - if OldPpi or NewPpi is NULL
-  @retval EFI_INVALID_PARAMETER - if NewPpi is not valid
-  @retval EFI_NOT_FOUND         - if the PPI was not in the database
+  @retval EFI_SUCCESS           if the operation was successful
+  @retval EFI_INVALID_PARAMETER if OldPpi or NewPpi is NULL
+  @retval EFI_INVALID_PARAMETER if NewPpi is not valid
+  @retval EFI_NOT_FOUND         if the PPI was not in the database
 
 **/
 EFI_STATUS
@@ -269,12 +274,12 @@ PeiReInstallPpi (
   Locate a given named PPI.
 
 
-  @param PeiServices     - Pointer to the PEI Service Table
-  @param Guid            - Pointer to GUID of the PPI.
-  @param Instance        - Instance Number to discover.
-  @param PpiDescriptor   - Pointer to reference the found descriptor. If not NULL,
-                         returns a pointer to the descriptor (includes flags, etc)
-  @param Ppi             - Pointer to reference the found PPI
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param Guid               Pointer to GUID of the PPI.
+  @param Instance           Instance Number to discover.
+  @param PpiDescriptor      Pointer to reference the found descriptor. If not NULL,
+                            returns a pointer to the descriptor (includes flags, etc)
+  @param Ppi                Pointer to reference the found PPI
 
   @retval EFI_SUCCESS   if the PPI is in the database
   @retval EFI_NOT_FOUND if the PPI is not in the database
@@ -285,9 +290,9 @@ EFIAPI
 PeiLocatePpi (
   IN CONST EFI_PEI_SERVICES        **PeiServices,
   IN CONST EFI_GUID                *Guid,
-  IN UINTN                   Instance,
-  IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
-  IN OUT VOID                **Ppi
+  IN UINTN                         Instance,
+  IN OUT EFI_PEI_PPI_DESCRIPTOR    **PpiDescriptor,
+  IN OUT VOID                      **Ppi
   )
 {
   PEI_CORE_INSTANCE   *PrivateData;
@@ -336,10 +341,12 @@ PeiLocatePpi (
 
 /**
 
-  Install a notification for a given PPI.
+  This function installs a notification service to be called back when a given 
+  interface is installed or reinstalled. The purpose of the service is to publish 
+  an interface that other parties can use to call additional PPIs that may materialize later.
 
-  @param PeiServices     - Pointer to the PEI Service Table
-  @param NotifyList      - Pointer to list of Descriptors to notify upon.
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyList         Pointer to list of Descriptors to notify upon.
 
   @retval EFI_SUCCESS           if successful
   @retval EFI_OUT_OF_RESOURCES  if no space in the database
