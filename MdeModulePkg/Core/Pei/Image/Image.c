@@ -502,12 +502,13 @@ PeiLoadImage (
 
 
 /**
+  Initialize image service that install PeiLoadFilePpi.
 
-  Install Pei Load File PPI.
-
-
-  @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
-  @param OldCoreData     - Pointer to PEI_CORE_INSTANCE.
+  @param PrivateData     Pointer to PeiCore's private data structure PEI_CORE_INSTANCE.
+  @param OldCoreData     Pointer to Old PeiCore's private data.
+                         If NULL, PeiCore is entered at first time, stack/heap in temporary memory.
+                         If not NULL, PeiCore is entered at second time, stack/heap has been moved
+                         to permenent memory.
 
 **/
 VOID

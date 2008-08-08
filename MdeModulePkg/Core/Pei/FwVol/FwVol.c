@@ -144,6 +144,9 @@ PeiFileHandleToVolume (
   @param FileName        File name
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
+                         Type PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE is an FFS type 
+                         extension used for PeiFindFileEx. It indicates current
+                         Ffs searching is for all PEIMs can be dispatched by PeiCore.                         
   @param FileHandle      This parameter must point to a valid FFS volume.
   @param AprioriFile     Pointer to AprioriFile image in this FV if has
 
@@ -651,13 +654,13 @@ PeiFvFindNextVolume (
   Given the input VolumeHandle, search for the next matching name file.
 
 
-  @param FileName        - File name to search.
-  @param VolumeHandle    - The current FV to search.
-  @param FileHandle      - Pointer to the file matching name in VolumeHandle.
-                         - NULL if file not found
+  @param FileName        File name to search.
+  @param VolumeHandle    The current FV to search.
+  @param FileHandle      Pointer to the file matching name in VolumeHandle.
+                         NULL if file not found
 
-  @return EFI_STATUS
-
+  @retval EFI_NOT_FOUND  No files matching the search criteria were found
+  @retval EFI_SUCCESS    Success to search given file
 **/
 EFI_STATUS
 EFIAPI 

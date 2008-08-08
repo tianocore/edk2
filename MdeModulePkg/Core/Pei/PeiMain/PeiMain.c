@@ -102,7 +102,7 @@ PeiCore (
   PEI_CORE_INSTANCE                                     *OldCoreData;
   EFI_PEI_CPU_IO_PPI                                    *CpuIo;
   EFI_PEI_PCI_CFG2_PPI                                  *PciCfg;
-  PEI_CORE_ENTRY_POINT                                  ShadowedPeiCore;
+  PEICORE_FUNCTION_POINTER                              ShadowedPeiCore;
 
   mTick = 0;
   OldCoreData = (PEI_CORE_INSTANCE *) Data;
@@ -122,7 +122,7 @@ PeiCore (
   // just jump to PeiCore in memory here.
   //
   if (OldCoreData != NULL) {
-    ShadowedPeiCore = (PEI_CORE_ENTRY_POINT) (UINTN) OldCoreData->ShadowedPeiCore;
+    ShadowedPeiCore = (PEICORE_FUNCTION_POINTER) (UINTN) OldCoreData->ShadowedPeiCore;
     if (ShadowedPeiCore != NULL) {
       OldCoreData->ShadowedPeiCore = NULL;
       ShadowedPeiCore (
