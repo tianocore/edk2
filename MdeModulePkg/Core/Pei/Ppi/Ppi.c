@@ -41,8 +41,10 @@ InitializePpiServices (
   Migrate the Hob list from the CAR stack to PEI installed memory.
 
   @param PrivateData         Pointer to PeiCore's private data structure.
-  @param OldCheckingBottom   The old checking bottom.
-  @param OldCheckingTop      The old checking top.
+  @param OldCheckingBottom   Bottom of temporary memory range. All Ppi in this range
+                             will be fixup for PpiData and PpiDescriptor pointer.
+  @param OldCheckingTop      Top of temporary memory range. All Ppi in this range
+                             will be fixup for PpiData and PpiDescriptor.
   @param Fixup               The address difference between
                              the new Hob list and old Hob list.
 
@@ -114,7 +116,7 @@ ConvertPpiPointers (
 
   @retval EFI_SUCCESS              if all PPIs in PpiList are successfully installed.
   @retval EFI_INVALID_PARAMETER    if PpiList is NULL pointer
-  @retval EFI_INVALID_PARAMETER    if any PPI in PpiList is not valid
+                                   if any PPI in PpiList is not valid
   @retval EFI_OUT_OF_RESOURCES     if there is no more memory resource to install PPI
 
 **/
@@ -147,7 +149,7 @@ PeiInstallPpi (
 
   for (;;) {
     //
-    // Since PpiData is used for NotifyList and InstallList, max resource
+    // Since PpiData is used for NotifyList and PpiList, max resource
     // is reached if the Install reaches the NotifyList
     //
     if (Index == PrivateData->PpiData.NotifyListEnd + 1) {

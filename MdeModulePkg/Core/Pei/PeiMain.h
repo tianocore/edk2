@@ -275,9 +275,7 @@ PeimDispatchReadiness (
 /**
   Conduct PEIM dispatch.
 
-  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
-                         environment, such as the size and location of temporary RAM, the stack location and
-                         the BFV location.
+  @param SecCoreData     Pointer to the data structure containing SEC to PEI handoff data
   @param PrivateData     Pointer to the private data passed in from caller
 
   @retval EFI_SUCCESS    Successfully dispatched PEIM.
@@ -317,10 +315,10 @@ InitializeDispatcherData (
 
   @param Private         PeiCore's private data structure
   @param FileHandle      PEIM's file handle
-  @param PeimCount       Peim count in all dispatched PEIMs.
+  @param PeimCount       The index of last dispatched PEIM.
 
-  @retval TRUE   Can be dispatched
-  @retval FALSE  Cannot be dispatched
+  @retval TRUE           Can be dispatched
+  @retval FALSE          Cannot be dispatched
 
 **/
 BOOLEAN
@@ -352,12 +350,13 @@ InitializePpiServices (
 
 /**
 
-  Convert Ppi description and PpiData pointer in heap after temporary memory
-  is migrated to permenent memory.
-  
-  @param PrivateData         PeiCore's private data structure
-  @param OldCheckingBottom   The old checking bottom.
-  @param OldCheckingTop      The old checking top.
+  Migrate the Hob list from the CAR stack to PEI installed memory.
+
+  @param PrivateData         Pointer to PeiCore's private data structure.
+  @param OldCheckingBottom   Bottom of temporary memory range. All Ppi in this range
+                             will be fixup for PpiData and PpiDescriptor pointer.
+  @param OldCheckingTop      Top of temporary memory range. All Ppi in this range
+                             will be fixup for PpiData and PpiDescriptor.
   @param Fixup               The address difference between
                              the new Hob list and old Hob list.
 
@@ -373,14 +372,14 @@ ConvertPpiPointers (
 
 /**
 
-  Install PPI services.
+  Install PPI services. It is implementation of EFI_PEI_SERVICE.InstallPpi.
 
   @param PeiServices                An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param PpiList                    Pointer to ppi array that want to be installed.
 
   @retval EFI_SUCCESS               if all PPIs in PpiList are successfully installed.
   @retval EFI_INVALID_PARAMETER     if PpiList is NULL pointer
-  @retval EFI_INVALID_PARAMETER     if any PPI in PpiList is not valid
+                                    if any PPI in PpiList is not valid
   @retval EFI_OUT_OF_RESOURCES      if there is no more memory resource to install PPI
 
 **/
@@ -402,7 +401,7 @@ PeiInstallPpi (
 
   @retval EFI_SUCCESS           if the operation was successful
   @retval EFI_INVALID_PARAMETER if OldPpi or NewPpi is NULL
-  @retval EFI_INVALID_PARAMETER if NewPpi is not valid
+                                if NewPpi is not valid
   @retval EFI_NOT_FOUND         if the PPI was not in the database
 
 **/
@@ -1060,7 +1059,7 @@ InitializeImageServices (
   @param PeiServices          An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param FileHandle           File handle of a Fv type file.
   @param AuthenticationState  Pointer to attestation authentication state of image.
-
+                              If return 0, means pass security checking.
 
   @retval EFI_NOT_FOUND       FV image can't be found.
   @retval EFI_SUCCESS         Successfully to process it.

@@ -1,5 +1,8 @@
 #/** @file
-# Component description file for PeiMain module
+# PeiMain module is core module in PEI phase. It take reponsiblities of:
+# 1) Initialize memory, ppi, image services etc, to establish PEIM runtime environment.
+# 2) Dispatch PEIM from discoveried FV.
+# 3) Handoff control to DxeIpl to load dxe core and enter DXE phase.
 #
 # This module provide an DXE CIS compliant implementation.
 # Copyright (c) 2006 - 2007, Intel Corporation
@@ -93,5 +96,3 @@
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst
 
-[BuildOptions.common]
-  MSFT:*_*_*_CC_FLAGS = /Fa$* /FAsc /FR$(@R).SBR
