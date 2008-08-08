@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Core version of the Status Code reporter
 
 
-  @param PeiServices     The PEI core services table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param CodeType        Type of Status Code.
   @param Value           Value to output for Status Code.
   @param Instance        Instance Number of this status code.

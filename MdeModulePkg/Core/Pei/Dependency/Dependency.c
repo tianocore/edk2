@@ -26,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   been published and can be queried from the PPI database.
 
 
-  @param PeiServices     The PEI core services table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param Stack           Reference to EVAL_STACK_ENTRY that contains PPI GUID to check
 
   @retval TRUE  if the PPI is already installed.
@@ -84,7 +84,7 @@ IsPpiInstalled (
   operation types (AND, OR).
 
 
-  @param PeiServices            Calling context.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param DependencyExpression   Pointer to a dependency expression.  The Grammar adheres to
                                 the BNF described above and is stored in postfix notation.
 

@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Gets the pointer to the HOB List.
 
-  @param PeiServices                   The PEI core services table.
+  @param PeiServices                   An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param HobList                       Pointer to the HOB List.
 
   @retval EFI_SUCCESS                  Get the pointer of HOB List
@@ -56,7 +56,7 @@ PeiGetHobList (
 /**
   Add a new HOB to the HOB List.
 
-  @param PeiServices      The PEI core services table.
+  @param PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param Type             Type of the new HOB.
   @param Length           Length of the new HOB to allocate.
   @param Hob              Pointer to the new HOB.

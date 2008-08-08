@@ -175,7 +175,7 @@ DiscoverPeimsAndOrderWithApriori (
 /**
   Shadow PeiCore module from flash to installed memory.
   
-  @param PeiServices     Pointer to PeiService table
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param PrivateInMem    PeiCore's private data structure
 
 **/
@@ -793,7 +793,7 @@ PeiRegisterForShadow (
 /**
   Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
 
-  @param PeiServices          Pointer to the PEI Core Services Table.
+  @param PeiServices          An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param FvFileHandle         File handle of a Fv type file.
   @param AuthenticationState  Pointer to attestation authentication state of image.
 
