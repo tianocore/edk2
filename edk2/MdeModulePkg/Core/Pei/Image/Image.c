@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
   
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -13,32 +13,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include <PeiMain.h>
-
-/**
-  Routine for loading file image.
-
-  @param PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param FileHandle       Pointer to the FFS file header of the image.
-  @param ImageAddressArg  Pointer to PE/TE image.
-  @param ImageSizeArg     Size of PE/TE image.
-  @param EntryPoint       Pointer to entry point of specified image file for output.
-  @param AuthenticationState - Pointer to attestation authentication state of image.
-
-  @retval EFI_SUCCESS    - Image is successfully loaded.
-  @retval EFI_NOT_FOUND  - Fail to locate necessary PPI
-  @retval Others         - Fail to load file.
-
-**/
-EFI_STATUS
-PeiLoadImageLoadImage (
-  IN     EFI_PEI_SERVICES             **PeiServices,
-  IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
-  OUT    UINT64                       *ImageSizeArg,     OPTIONAL
-  OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
-  OUT    UINT32                       *AuthenticationState
-  )
-;
 
 /**
   The wrapper function of PeiLoadImageLoadImage().
@@ -94,27 +68,17 @@ EFIAPI
 PeiImageRead (
   IN     VOID    *FileHandle,
   IN     UINTN   FileOffset,
-  IN OUT UINTN   *ReadSize,
+  IN     UINTN   *ReadSize,
   OUT    VOID    *Buffer
   )
 {
-  CHAR8 *Destination8;
-  CHAR8 *Source8;
-  UINTN Length;
-
-  Destination8  = Buffer;
-  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
-  Length        = *ReadSize;
-  while (Length--) {
-    *(Destination8++) = *(Source8++);
-  }
-
+  CopyMem (Buffer, (VOID *)((UINTN) FileHandle + FileOffset), *ReadSize);
   return EFI_SUCCESS;
 }
 
 /**
 
-  Support routine to return the Image Read.
+  Support routine to get the Image read file function.
 
   @param ImageContext    - The context of the image being loaded
 
@@ -150,6 +114,7 @@ GetImageReadFunction (
 
   @retval EFI_SUCCESS           The file was loaded and relocated
   @retval EFI_OUT_OF_RESOURCES  There was not enough memory to load and relocate the PE/COFF file
+  @retval EFI_INVALID_PARAMETER The image withou .reloc section can't be relocated.
 
 **/
 EFI_STATUS
@@ -223,18 +188,20 @@ LoadAndRelocatePeCoffImage (
 }
 
 /**
-  Routine for loading file image.
+  Loads a PEIM into memory for subsequent execution. If there are compressed 
+  images or images that need to be relocated into memory for performance reasons, 
+  this service performs that transformation.
 
-  @param PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param FileHandle       Pointer to the FFS file header of the image.
   @param ImageAddressArg  Pointer to PE/TE image.
   @param ImageSizeArg     Size of PE/TE image.
   @param EntryPoint       Pointer to entry point of specified image file for output.
   @param AuthenticationState - Pointer to attestation authentication state of image.
 
-  @retval EFI_SUCCESS    - Image is successfully loaded.
-  @retval EFI_NOT_FOUND  - Fail to locate necessary PPI
-  @retval Others         - Fail to load file.
+  @retval EFI_SUCCESS      Image is successfully loaded.
+  @retval EFI_NOT_FOUND    Fail to locate necessary PPI.
+  @retval EFI_UNSUPPORTED  Image Machine Type is not supported.
 
 **/
 EFI_STATUS
@@ -428,18 +395,18 @@ PeiLoadImageLoadImageWrapper (
 }
 
 /**
+  Routine to load image file for subsequent execution by LoadFile Ppi.
+  If any LoadFile Ppi is not found, the build-in support function for the PE32+/TE 
+  XIP image format is used.
 
-  Routine for load image file.
+  @param PeiServices     - An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
+  @param FileHandle      - Pointer to the FFS file header of the image.
+  @param EntryPoint      - Pointer to entry point of specified image file for output.
+  @param AuthenticationState - Pointer to attestation authentication state of image.
 
-
-  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param FileHandle             Pointer to the FFS file header of the image.
-  @param EntryPoint             Pointer to entry point of specified image file for output.
-  @param AuthenticationState    Pointer to attestation authentication state of image.
-
-  @retval EFI_SUCCESS     Image is successfully loaded.
-  @retval EFI_NOT_FOUND   Fail to locate necessary PPI
-  @retval Others          Fail to load file.
+  @retval EFI_SUCCESS    - Image is successfully loaded.
+  @retval EFI_NOT_FOUND  - Fail to locate necessary PPI
+  @retval Others         - Fail to load file.
 
 **/
 EFI_STATUS
@@ -502,13 +469,12 @@ PeiLoadImage (
 
 
 /**
-  Initialize image service that install PeiLoadFilePpi.
 
-  @param PrivateData     Pointer to PeiCore's private data structure PEI_CORE_INSTANCE.
-  @param OldCoreData     Pointer to Old PeiCore's private data.
-                         If NULL, PeiCore is entered at first time, stack/heap in temporary memory.
-                         If not NULL, PeiCore is entered at second time, stack/heap has been moved
-                         to permenent memory.
+  Install Pei Load File PPI.
+
+
+  @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
+  @param OldCoreData     - Pointer to PEI_CORE_INSTANCE.
 
 **/
 VOID
