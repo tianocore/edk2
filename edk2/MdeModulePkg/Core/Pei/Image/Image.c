@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Routine for loading file image.
 
-  @param PeiServices      The PEI core services table.
+  @param PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param FileHandle       Pointer to the FFS file header of the image.
   @param ImageAddressArg  Pointer to PE/TE image.
   @param ImageSizeArg     Size of PE/TE image.
@@ -225,7 +225,7 @@ LoadAndRelocatePeCoffImage (
 /**
   Routine for loading file image.
 
-  @param PeiServices      The PEI core services table.
+  @param PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param FileHandle       Pointer to the FFS file header of the image.
   @param ImageAddressArg  Pointer to PE/TE image.
   @param ImageSizeArg     Size of PE/TE image.
@@ -432,14 +432,14 @@ PeiLoadImageLoadImageWrapper (
   Routine for load image file.
 
 
-  @param PeiServices     - The PEI core services table.
-  @param FileHandle      - Pointer to the FFS file header of the image.
-  @param EntryPoint      - Pointer to entry point of specified image file for output.
-  @param AuthenticationState - Pointer to attestation authentication state of image.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param FileHandle             Pointer to the FFS file header of the image.
+  @param EntryPoint             Pointer to entry point of specified image file for output.
+  @param AuthenticationState    Pointer to attestation authentication state of image.
 
-  @retval EFI_SUCCESS    - Image is successfully loaded.
-  @retval EFI_NOT_FOUND  - Fail to locate necessary PPI
-  @retval Others         - Fail to load file.
+  @retval EFI_SUCCESS     Image is successfully loaded.
+  @retval EFI_NOT_FOUND   Fail to locate necessary PPI
+  @retval Others          Fail to load file.
 
 **/
 EFI_STATUS

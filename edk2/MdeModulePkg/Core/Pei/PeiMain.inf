@@ -95,4 +95,3 @@
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst
-

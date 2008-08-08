@@ -542,7 +542,7 @@ PeiFfsProcessSection (
   FFS volume.
 
 
-  @param PeiServices     Pointer to the PEI Core Services Table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SectionType     Filter to find only sections of this type.
   @param FileHandle      Pointer to the current file to search.
   @param SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
@@ -591,7 +591,7 @@ PeiFfsFindSectionData (
   the Firmware Volume defined by FwVolHeader.
 
 
-  @param PeiServices     Pointer to the PEI Core Services Table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
   @param VolumeHandle    Pointer to the FV header of the volume to search.
@@ -617,7 +617,7 @@ PeiFfsFindNextFile (
 /**
   search the firmware volumes by index
 
-  @param PeiServices     The PEI core services table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param Instance        Instance of FV to find
   @param VolumeHandle    Pointer to found Volume.
 

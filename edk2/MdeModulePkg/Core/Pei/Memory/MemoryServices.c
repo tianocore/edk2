@@ -79,9 +79,9 @@ InitializeMemoryServices (
   Install the permanent memory is now available.
   Creates HOB (PHIT and Stack).
 
-  @param PeiServices     - The PEI core services table.
-  @param MemoryBegin     - Start of memory address.
-  @param MemoryLength    - Length of memory.
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param MemoryBegin        Start of memory address.
+  @param MemoryLength       Length of memory.
 
   @return EFI_SUCCESS Always success.
 
@@ -114,10 +114,10 @@ PeiInstallPeiMemory (
   not usable prior to the memory installation.
 
 
-  @param PeiServices     - The PEI core services table.
-  @param MemoryType      - Type of memory to allocate.
-  @param Pages           - Number of pages to allocate.
-  @param Memory          - Pointer of memory allocated.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param MemoryType      Type of memory to allocate.
+  @param Pages           Number of pages to allocate.
+  @param Memory          Pointer of memory allocated.
 
   @retval EFI_SUCCESS              The allocation was successful
   @retval EFI_INVALID_PARAMETER    Only AllocateAnyAddress is supported.
@@ -213,9 +213,9 @@ PeiAllocatePages (
   Memory allocation service on the CAR.
 
 
-  @param PeiServices     - The PEI core services table.
-  @param Size            - Amount of memory required
-  @param Buffer          - Address of pointer to the buffer
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param Size            Amount of memory required
+  @param Buffer          Address of pointer to the buffer
 
   @retval EFI_SUCCESS              The allocation was successful
   @retval EFI_OUT_OF_RESOURCES     There is not enough heap to satisfy the requirement
