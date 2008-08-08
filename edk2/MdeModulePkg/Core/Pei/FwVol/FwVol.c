@@ -108,7 +108,9 @@ CalculateHeaderChecksum (
   @param FileHandle      Handle of file image
   @param VolumeHandle    Handle of FV
 
-  @return EDES_TODO: Add description for return value
+  @retval TRUE  Success to find FV and return FV handle that contains file by given
+                file name.
+  @retval FALSE Can not find the FV that contains file by given file name.
 
 **/
 BOOLEAN
@@ -315,10 +317,9 @@ PeiInitializeFv (
 /**
   Process Firmware Volum Information once FvInfoPPI install.
 
-
-  @param PeiServices     - General purpose services available to every PEIM.
-  @param NotifyDescriptor EDES_TODO: Add parameter description
-  @param Ppi             EDES_TODO: Add parameter description
+  @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyDescriptor  Address of the notification descriptor data structure.
+  @param Ppi               Address of the PPI that was installed.
 
   @retval EFI_SUCCESS if the interface could be successfully installed
 
@@ -407,14 +408,14 @@ FirmwareVolmeInfoPpiNotifyCallback (
   when meeting an encapsuled section.
 
 
-  @param PeiServices     - General purpose services available to every PEIM.
-                         SearchType   - Filter to find only section of this type.
-  @param SectionType     EDES_TODO: Add parameter description
-  @param Section         - From where to search.
-  @param SectionSize     - The file size to search.
-  @param OutputBuffer    - Pointer to the section to search.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param SectionType     Filter to find only section of this type.
+  @param Section         From where to search.
+  @param SectionSize     The file size to search.
+  @param OutputBuffer    Pointer to the section to search.
 
-  @return EFI_STATUS
+  @retval EFI_NOT_FOUND Can not find the section by given section type.
+  @retval EFI_SUCCESS   Success to find the section and process section correctly.
 
 **/
 EFI_STATUS
