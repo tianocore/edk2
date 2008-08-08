@@ -1,7 +1,7 @@
 /** @file
   Pei Core Firmware File System service routines.
   
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,17 +22,17 @@ STATIC EFI_PEI_NOTIFY_DESCRIPTOR mNotifyOnFvInfoList = {
 
 
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
-  (ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1))
+  ((ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1)))
 
 /**
-  Returns the highest bit set of the State field
+  Returns the file state set by the highest zero bit in the State field
 
   @param ErasePolarity   Erase Polarity  as defined by EFI_FVB2_ERASE_POLARITY
                          in the Attributes field.
   @param FfsHeader       Pointer to FFS File Header.
 
-  @return Returns the highest bit in the State field
-
+  @retval EFI_FFS_FILE_STATE File state is set by the highest none zero bit 
+                             in the header State field.
 **/
 EFI_FFS_FILE_STATE
 GetFileState(
@@ -48,7 +48,10 @@ GetFileState(
   if (ErasePolarity != 0) {
     FileState = (EFI_FFS_FILE_STATE)~FileState;
   }
-
+  
+  //
+  // Get file state set by its highest none zero bit.
+  //
   HighestBit = 0x80;
   while (HighestBit != 0 && (HighestBit & FileState) == 0) {
     HighestBit >>= 1;
@@ -63,7 +66,6 @@ GetFileState(
   @param FileHeader      Pointer to FFS File Header.
 
   @return Checksum of the header.
-          The header is zero byte checksum.
           Zero means the header is good.
           Non-zero means the header is bad.
 **/
@@ -72,45 +74,26 @@ CalculateHeaderChecksum (
   IN EFI_FFS_FILE_HEADER  *FileHeader
   )
 {
-  UINT8   *Ptr;
-  UINTN   Index;
-  UINT8   Sum;
+  EFI_FFS_FILE_HEADER TestFileHeader;
   
-  Sum = 0;
-  Ptr = (UINT8 *)FileHeader;
+  CopyMem (&TestFileHeader, FileHeader, sizeof (EFI_FFS_FILE_HEADER));
+  //
+  // Ingore State and File field in FFS header.
+  //
+  TestFileHeader.State = 0;
+  TestFileHeader.IntegrityCheck.Checksum.File = 0;
 
-  for (Index = 0; Index < sizeof(EFI_FFS_FILE_HEADER) - 3; Index += 4) {
-    Sum = (UINT8)(Sum + Ptr[Index]);
-    Sum = (UINT8)(Sum + Ptr[Index+1]);
-    Sum = (UINT8)(Sum + Ptr[Index+2]);
-    Sum = (UINT8)(Sum + Ptr[Index+3]);
-  }
-
-  for (; Index < sizeof(EFI_FFS_FILE_HEADER); Index++) {
-    Sum = (UINT8)(Sum + Ptr[Index]);
-  }
-  
-  //
-  // State field (since this indicates the different state of file). 
-  //
-  Sum = (UINT8)(Sum - FileHeader->State);
-  //
-  // Checksum field of the file is not part of the header checksum.
-  //
-  Sum = (UINT8)(Sum - FileHeader->IntegrityCheck.Checksum.File);
-
-  return Sum;
+  return CalculateSum8 ((CONST UINT8 *) &TestFileHeader, sizeof (EFI_FFS_FILE_HEADER));
 }
 
 /**
   Find FV handler according some FileHandle in that FV.
 
   @param FileHandle      Handle of file image
-  @param VolumeHandle    Handle of FV
+  @param VolumeHandle    Handle of the found FV, if not found, NULL will be set.
 
-  @retval TRUE  Success to find FV and return FV handle that contains file by given
-                file name.
-  @retval FALSE Can not find the FV that contains file by given file name.
+  @retval TRUE           The corresponding FV handler is found.
+  @retval FALSE          The corresponding FV handler is not found.
 
 **/
 BOOLEAN
@@ -133,22 +116,22 @@ PeiFileHandleToVolume (
       return TRUE;
     }
   }
+  *VolumeHandle = NULL;
   return FALSE;
 }
 
 /**
-  Given the input file pointer, search for the next matching file in the
+  Given the input file pointer, search for the first matching file in the
   FFS volume as defined by SearchType. The search starts from FileHeader inside
   the Firmware Volume defined by FwVolHeader.
-
+  If SearchType is EFI_FV_FILETYPE_ALL, the first FFS file will return without check its file type.
+  If SearchType is PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE, 
+  the first PEIM, or COMBINED PEIM or FV file type FFS file will return.  
 
   @param FvHandle        Pointer to the FV header of the volume to search
   @param FileName        File name
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-                         Type PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE is an FFS type 
-                         extension used for PeiFindFileEx. It indicates current
-                         Ffs searching is for all PEIMs can be dispatched by PeiCore.                         
   @param FileHandle      This parameter must point to a valid FFS volume.
   @param AprioriFile     Pointer to AprioriFile image in this FV if has
 
@@ -316,12 +299,14 @@ PeiInitializeFv (
 
 /**
   Process Firmware Volum Information once FvInfoPPI install.
+  The FV Info will be registered into PeiCore private data structure.
+  And search the inside FV image, if found, the new FV INFO PPI will be installed.
 
-  @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param NotifyDescriptor  Address of the notification descriptor data structure.
   @param Ppi               Address of the PPI that was installed.
 
-  @retval EFI_SUCCESS if the interface could be successfully installed
+  @retval EFI_SUCCESS    The FV Info is registered into PeiCore private data structure.
 
 **/
 EFI_STATUS
@@ -403,19 +388,19 @@ FirmwareVolmeInfoPpiNotifyCallback (
 }
 
 /**
+  Go through the file to search SectionType section. 
+  Search within encapsulation sections (compression and GUIDed) recursively, 
+  until the match section is found.
+  
+  @param PeiServices     - An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param SectionType     - Filter to find only section of this type.
+  @param Section         - From where to search.
+  @param SectionSize     - The file size to search.
+  @param OutputBuffer    - A pointer to the discovered section, if successful.
+                           NULL if section not found
 
-  Go through the file to search SectionType section,
-  when meeting an encapsuled section.
-
-
-  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param SectionType     Filter to find only section of this type.
-  @param Section         From where to search.
-  @param SectionSize     The file size to search.
-  @param OutputBuffer    Pointer to the section to search.
-
-  @retval EFI_NOT_FOUND Can not find the section by given section type.
-  @retval EFI_SUCCESS   Success to find the section and process section correctly.
+  @return EFI_NOT_FOUND    The match section is not found.
+  @return EFI_SUCCESS      The match section is found.
 
 **/
 EFI_STATUS
@@ -538,14 +523,13 @@ PeiFfsProcessSection (
 
 
 /**
-  Given the input file pointer, search for the next matching section in the
+  Given the input file pointer, search for the first matching section in the
   FFS volume.
 
-
-  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param SectionType     Filter to find only sections of this type.
   @param FileHandle      Pointer to the current file to search.
-  @param SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
+  @param SectionData     A pointer to the discovered section, if successful.
                          NULL if section not found
 
   @retval EFI_NOT_FOUND  No files matching the search criteria were found
@@ -615,9 +599,9 @@ PeiFfsFindNextFile (
 
 
 /**
-  search the firmware volumes by index
+  Search the firmware volumes by index
 
-  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param Instance        Instance of FV to find
   @param VolumeHandle    Pointer to found Volume.
 
@@ -651,17 +635,17 @@ PeiFvFindNextVolume (
 
 
 /**
+  Find a file within a volume by its name.
 
-  Given the input VolumeHandle, search for the next matching name file.
+  @param FileName        A pointer to the name of the file to find within the firmware volume.
+  @param VolumeHandle    The firmware volume to search
+  @param FileHandle      Upon exit, points to the found file's handle 
+                         or NULL if it could not be found.
 
+  @retval EFI_SUCCESS            File was found.
+  @retval EFI_NOT_FOUND          File was not found.
+  @retval EFI_INVALID_PARAMETER  VolumeHandle or FileHandle or FileName was NULL.
 
-  @param FileName        File name to search.
-  @param VolumeHandle    The current FV to search.
-  @param FileHandle      Pointer to the file matching name in VolumeHandle.
-                         NULL if file not found
-
-  @retval EFI_NOT_FOUND  No files matching the search criteria were found
-  @retval EFI_SUCCESS    Success to search given file
 **/
 EFI_STATUS
 EFIAPI 
