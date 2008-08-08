@@ -59,14 +59,33 @@ typedef union {
 } PEI_PPI_LIST_POINTERS;
 
 ///
-/// PPI database structure
+/// PPI database structure which contains two link: PpiList and NotifyList. PpiList
+/// is in head of PpiListPtrs array and notify is in end of PpiListPtrs.
 ///
 typedef struct {
+  ///
+  /// index of end of PpiList link list.
+  ///
   INTN                    PpiListEnd;
+  ///
+  /// index of end of notify link list.
+  ///
   INTN                    NotifyListEnd;
+  ///
+  /// index of the dispatched notify list.
+  ///
   INTN                    DispatchListEnd;
+  ///
+  /// index of last installed Ppi description in PpiList link list.
+  ///
   INTN                    LastDispatchedInstall;
+  ///
+  /// index of last dispatched notify in Notify link list.
+  /// 
   INTN                    LastDispatchedNotify;
+  ///
+  /// Ppi database.
+  ///
   PEI_PPI_LIST_POINTERS   PpiListPtrs[FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)];
 } PEI_PPI_DATABASE;
 
@@ -220,7 +239,7 @@ PeiCore (
   operation types (AND, OR).
 
 
-  @param PeiServices            Calling context.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param DependencyExpression   Pointer to a dependency expression.  The Grammar adheres to
                                 the BNF described above and is stored in postfix notation.
 
@@ -243,9 +262,7 @@ PeimDispatchReadiness (
   @param SecCoreData     Points to a data structure containing information about the PEI core's operating
                          environment, such as the size and location of temporary RAM, the stack location and
                          the BFV location.
-                         PrivateData          - Pointer to the private data passed in from caller
-                         DispatchData         - Pointer to PEI_CORE_DISPATCH_DATA data.
-  @param Private         EDES_TODO: Add parameter description
+  @param PrivateData     Pointer to the private data passed in from caller
 
   @retval EFI_SUCCESS    Successfully dispatched PEIM.
   @retval EFI_NOT_FOUND  The dispatch failed.
@@ -362,14 +379,14 @@ PeiInstallPpi (
 
   Re-Install PPI services.
 
-  @param PeiServices     - Pointer to the PEI Service Table
-  @param OldPpi          - Pointer to the old PEI PPI Descriptors.
-  @param NewPpi          - Pointer to the new PEI PPI Descriptors.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param OldPpi                 Pointer to the old PEI PPI Descriptors.
+  @param NewPpi                 Pointer to the new PEI PPI Descriptors.
 
-  @retval EFI_SUCCESS           - if the operation was successful
-  @retval EFI_INVALID_PARAMETER - if OldPpi or NewPpi is NULL
-  @retval EFI_INVALID_PARAMETER - if NewPpi is not valid
-  @retval EFI_NOT_FOUND         - if the PPI was not in the database
+  @retval EFI_SUCCESS           if the operation was successful
+  @retval EFI_INVALID_PARAMETER if OldPpi or NewPpi is NULL
+  @retval EFI_INVALID_PARAMETER if NewPpi is not valid
+  @retval EFI_NOT_FOUND         if the PPI was not in the database
 
 **/
 EFI_STATUS
@@ -386,12 +403,12 @@ PeiReInstallPpi (
   Locate a given named PPI.
 
 
-  @param PeiServices     - Pointer to the PEI Service Table
-  @param Guid            - Pointer to GUID of the PPI.
-  @param Instance        - Instance Number to discover.
-  @param PpiDescriptor   - Pointer to reference the found descriptor. If not NULL,
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param Guid            Pointer to GUID of the PPI.
+  @param Instance        Instance Number to discover.
+  @param PpiDescriptor   Pointer to reference the found descriptor. If not NULL,
                          returns a pointer to the descriptor (includes flags, etc)
-  @param Ppi             - Pointer to reference the found PPI
+  @param Ppi             Pointer to reference the found PPI
 
   @retval EFI_SUCCESS   if the PPI is in the database
   @retval EFI_NOT_FOUND if the PPI is not in the database
@@ -400,8 +417,8 @@ PeiReInstallPpi (
 EFI_STATUS
 EFIAPI
 PeiLocatePpi (
-  IN CONST EFI_PEI_SERVICES            **PeiServices,
-  IN CONST EFI_GUID                    *Guid,
+  IN CONST EFI_PEI_SERVICES      **PeiServices,
+  IN CONST EFI_GUID              *Guid,
   IN UINTN                       Instance,
   IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
   IN OUT VOID                    **Ppi
@@ -413,8 +430,8 @@ PeiLocatePpi (
   Install a notification for a given PPI.
 
 
-  @param PeiServices     - Pointer to the PEI Service Table
-  @param NotifyList      - Pointer to list of Descriptors to notify upon.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyList             Pointer to list of Descriptors to notify upon.
 
   @retval EFI_SUCCESS           if successful
   @retval EFI_OUT_OF_RESOURCES  if no space in the database
@@ -471,7 +488,7 @@ DispatchNotify (
 /**
   This service enables PEIMs to ascertain the present value of the boot mode.
 
-  @param PeiServices            The PEI core services table.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param BootMode               A pointer to contain the value of the boot mode.
 
   @retval EFI_SUCCESS           The boot mode was returned successfully.
@@ -490,10 +507,10 @@ PeiGetBootMode (
   This service enables PEIMs to update the boot mode variable.
 
 
-  @param PeiServices     - The PEI core services table.
-  @param BootMode        - The value of the boot mode to set.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param BootMode        The value of the boot mode to set.
 
-  @return EFI_SUCCESS    - The value was successfully updated
+  @return EFI_SUCCESS    The value was successfully updated
 
 **/
 EFI_STATUS
@@ -511,7 +528,7 @@ PeiSetBootMode (
 
   Initialize the security services.
 
-  @param PeiServices     The PEI core services table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param OldCoreData     Pointer to the old core data.
                          NULL if being run in non-permament memory mode.
 
@@ -564,7 +581,7 @@ VerifyPeim (
   Gets the pointer to the HOB List.
 
 
-  @param PeiServices                   The PEI core services table.
+  @param PeiServices                   An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param HobList                       Pointer to the HOB List.
 
   @retval EFI_SUCCESS                  Get the pointer of HOB List
@@ -583,10 +600,10 @@ PeiGetHobList (
 /**
   Add a new HOB to the HOB List.
 
-  @param PeiServices     - The PEI core services table.
-  @param Type            - Type of the new HOB.
-  @param Length          - Length of the new HOB to allocate.
-  @param Hob             - Pointer to the new HOB.
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param Type               Type of the new HOB.
+  @param Length             Length of the new HOB to allocate.
+  @param Hob                Pointer to the new HOB.
 
   @return  EFI_SUCCESS           Success to create hob.
   @retval  EFI_INVALID_PARAMETER if Hob is NULL
@@ -633,7 +650,7 @@ PeiCoreBuildHobHandoffInfoTable (
   the Firmware Volume defined by FwVolHeader.
 
 
-  @param PeiServices     Pointer to the PEI Core Services Table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
   @param VolumeHandle    Pointer to the FV header of the volume to search.
@@ -658,7 +675,7 @@ PeiFfsFindNextFile (
   FFS volume.
 
 
-  @param PeiServices     Pointer to the PEI Core Services Table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SectionType     Filter to find only sections of this type.
   @param FileHandle      Pointer to the current file to search.
   @param SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
@@ -681,7 +698,7 @@ PeiFfsFindSectionData (
 /**
   search the firmware volumes by index
 
-  @param PeiServices     The PEI core services table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param Instance        Instance of FV to find
   @param VolumeHandle    Pointer to found Volume.
 
@@ -706,7 +723,7 @@ PeiFvFindNextVolume (
   Initialize the memory services.
 
 
-  @param PrivateData     Add parameter description
+  @param PrivateData     PeiCore's private data structure
   @param SecCoreData     Points to a data structure containing information about the PEI core's operating
                          environment, such as the size and location of temporary RAM, the stack location and
                          the BFV location.
@@ -727,9 +744,9 @@ InitializeMemoryServices (
   Install the permanent memory is now available.
   Creates HOB (PHIT and Stack).
 
-  @param PeiServices     - The PEI core services table.
-  @param MemoryBegin     - Start of memory address.
-  @param MemoryLength    - Length of memory.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param MemoryBegin     Start of memory address.
+  @param MemoryLength    Length of memory.
 
   @return EFI_SUCCESS Always success.
 
@@ -749,10 +766,10 @@ PeiInstallPeiMemory (
   not usable prior to the memory installation.
 
 
-  @param PeiServices     - The PEI core services table.
-  @param MemoryType      - Type of memory to allocate.
-  @param Pages           - Number of pages to allocate.
-  @param Memory          - Pointer of memory allocated.
+  @param PeiServices               An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param MemoryType                Type of memory to allocate.
+  @param Pages                     Number of pages to allocate.
+  @param Memory                    Pointer of memory allocated.
 
   @retval EFI_SUCCESS              The allocation was successful
   @retval EFI_INVALID_PARAMETER    Only AllocateAnyAddress is supported.
@@ -776,9 +793,9 @@ PeiAllocatePages (
   Memory allocation service on the CAR.
 
 
-  @param PeiServices     - The PEI core services table.
-  @param Size            - Amount of memory required
-  @param Buffer          - Address of pointer to the buffer
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param Size               Amount of memory required
+  @param Buffer             Address of pointer to the buffer
 
   @retval EFI_SUCCESS              The allocation was successful
   @retval EFI_OUT_OF_RESOURCES     There is not enough heap to satisfy the requirement
@@ -799,14 +816,14 @@ PeiAllocatePool (
   Routine for load image file.
 
 
-  @param PeiServices     - The PEI core services table.
-  @param FileHandle      - Pointer to the FFS file header of the image.
-  @param EntryPoint      - Pointer to entry point of specified image file for output.
-  @param AuthenticationState - Pointer to attestation authentication state of image.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param FileHandle             Pointer to the FFS file header of the image.
+  @param EntryPoint             Pointer to entry point of specified image file for output.
+  @param AuthenticationState    Pointer to attestation authentication state of image.
 
-  @retval EFI_SUCCESS    - Image is successfully loaded.
-  @retval EFI_NOT_FOUND  - Fail to locate necessary PPI
-  @retval Others         - Fail to load file.
+  @retval EFI_SUCCESS     Image is successfully loaded.
+  @retval EFI_NOT_FOUND   Fail to locate necessary PPI
+  @retval Others          Fail to load file.
 
 **/
 EFI_STATUS
@@ -823,12 +840,12 @@ PeiLoadImage (
   Core version of the Status Code reporter
 
 
-  @param PeiServices     The PEI core services table.
-  @param CodeType        Type of Status Code.
-  @param Value           Value to output for Status Code.
-  @param Instance        Instance Number of this status code.
-  @param CallerId        ID of the caller of this status code.
-  @param Data            Optional data associated with this status code.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param CodeType               Type of Status Code.
+  @param Value                  Value to output for Status Code.
+  @param Instance               Instance Number of this status code.
+  @param CallerId               ID of the caller of this status code.
+  @param Data                   Optional data associated with this status code.
 
   @retval EFI_SUCCESS             if status code is successfully reported
   @retval EFI_NOT_AVAILABLE_YET   if StatusCodePpi has not been installed
@@ -851,7 +868,7 @@ PeiReportStatusCode (
   Core version of the Reset System
 
 
-  @param PeiServices     - The PEI core services table.
+  @param PeiServices                An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
 
   @retval EFI_NOT_AVAILABLE_YET     PPI not available yet.
   @retval EFI_DEVICE_ERROR          Did not reset system.
@@ -873,8 +890,6 @@ PeiResetSystem (
   @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
   @param SecCoreData     - Pointer to EFI_SEC_PEI_HAND_OFF.
 
-  @return NONE
-
 **/
 VOID
 PeiInitializeFv (
@@ -886,10 +901,9 @@ PeiInitializeFv (
 /**
   Process Firmware Volum Information once FvInfoPPI install.
 
-
-  @param PeiServices     - General purpose services available to every PEIM.
-  @param NotifyDescriptor EDES_TODO: Add parameter description
-  @param Ppi             EDES_TODO: Add parameter description
+  @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyDescriptor  Address of the notification descriptor data structure.
+  @param Ppi               Address of the PPI that was installed.
 
   @retval EFI_SUCCESS if the interface could be successfully installed
 
@@ -908,10 +922,10 @@ FirmwareVolmeInfoPpiNotifyCallback (
   Given the input VolumeHandle, search for the next matching name file.
 
 
-  @param FileName        - File name to search.
-  @param VolumeHandle    - The current FV to search.
-  @param FileHandle      - Pointer to the file matching name in VolumeHandle.
-                         - NULL if file not found
+  @param FileName        File name to search.
+  @param VolumeHandle    The current FV to search.
+  @param FileHandle      Pointer to the file matching name in VolumeHandle.
+                         NULL if file not found
 
   @return EFI_STATUS
 
@@ -930,8 +944,8 @@ PeiFfsFindFileByName (
   Returns information about a specific file.
 
 
-  @param FileHandle      - The handle to file.
-  @param FileInfo        - Pointer to the file information.
+  @param FileHandle         The handle to file.
+  @param FileInfo           Pointer to the file information.
 
   @retval EFI_INVALID_PARAMETER Invalid FileHandle or FileInfo.
   @retval EFI_SUCCESS           Success to collect file info.
@@ -949,8 +963,8 @@ PeiFfsGetFileInfo (
 
   Collect information of given Fv Volume.
 
-  @param VolumeHandle    - The handle to Fv Volume.
-  @param VolumeInfo      - The pointer to volume information.
+  @param VolumeHandle           The handle to Fv Volume.
+  @param VolumeInfo             The pointer to volume information.
 
   @retval EFI_INVALID_PARAMETER VolumeInfo is NULL
   @retval EFI_SUCCESS           Success to collect fv info.
@@ -1013,8 +1027,8 @@ PeiFindFileEx (
   Install Pei Load File PPI.
 
 
-  @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
-  @param OldCoreData     - Pointer to PEI_CORE_INSTANCE.
+  @param PrivateData        Pointer to PEI_CORE_INSTANCE.
+  @param OldCoreData        Pointer to PEI_CORE_INSTANCE.
 
 **/
 VOID
@@ -1027,7 +1041,7 @@ InitializeImageServices (
 /**
   Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
 
-  @param PeiServices          Pointer to the PEI Core Services Table.
+  @param PeiServices          An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param FileHandle           File handle of a Fv type file.
   @param AuthenticationState  Pointer to attestation authentication state of image.
 
