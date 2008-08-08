@@ -18,9 +18,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Provide a callback for when the security PPI is installed.
 
-  @param PeiServices     - The PEI core services table.
-  @param NotifyDescriptor - The descriptor for the notification event.
-  @param Ppi             - Pointer to the PPI in question.
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyDescriptor   The descriptor for the notification event.
+  @param Ppi                Pointer to the PPI in question.
 
   @return Always success
 
@@ -42,7 +42,7 @@ STATIC EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
 /**
   Initialize the security services.
 
-  @param PeiServices     The PEI core services table.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param OldCoreData     Pointer to the old core data.
                          NULL if being run in non-permament memory mode.
 
@@ -63,9 +63,9 @@ InitializeSecurityServices (
 
   Provide a callback for when the security PPI is installed.
 
-  @param PeiServices     - The PEI core services table.
-  @param NotifyDescriptor - The descriptor for the notification event.
-  @param Ppi             - Pointer to the PPI in question.
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyDescriptor   The descriptor for the notification event.
+  @param Ppi                Pointer to the PPI in question.
 
   @return Always success
 
@@ -150,8 +150,8 @@ VerifyPeim (
 
   @param CurrentFvAddress - Pointer to the current Firmware Volume under consideration
 
-  @retval EFI_SUCCESS             - Firmware Volume is legal
-  @retval EFI_SECURITY_VIOLATION  - Firmware Volume fails integrity test
+  @retval EFI_SUCCESS              Firmware Volume is legal
+  @retval EFI_SECURITY_VIOLATION   Firmware Volume fails integrity test
 
 **/
 EFI_STATUS
