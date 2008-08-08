@@ -1,7 +1,7 @@
 /** @file
   Definition of Pei Core Structures and Services
   
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,6 +47,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/AprioriFileName.h>
 
+///
+/// It is an FFS type extension used for PeiFindFileEx. It indicates current
+/// Ffs searching is for all PEIMs can be dispatched by PeiCore.
+///
 #define PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE   0xff
 
 ///
@@ -162,9 +166,23 @@ typedef struct{
 #define PEI_CORE_INSTANCE_FROM_PS_THIS(a) \
   CR(a, PEI_CORE_INSTANCE, PS, PEI_CORE_HANDLE_SIGNATURE)
 
+/**
+  Function Pointer type for PeiCore function.
+  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+                         environment, such as the size and location of temporary RAM, the stack location and
+                         the BFV location.
+  @param PpiList         Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
+                         An empty PPI list consists of a single descriptor with the end-tag
+                         EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
+                         phase, the PEI Foundation will add these SEC-hosted PPIs to its PPI database such
+                         that both the PEI Foundation and any modules can leverage the associated service
+                         calls and/or code in these early PPIs
+  @param Data            Pointer to old core data that is used to initialize the
+                         core's data areas.
+**/
 typedef
 EFI_STATUS
-(EFIAPI *PEI_CORE_ENTRY_POINT)(
+(EFIAPI *PEICORE_FUNCTION_POINTER)(
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList,
   IN PEI_CORE_INSTANCE              *OldCoreData
@@ -174,7 +192,7 @@ EFI_STATUS
 /// Union of temporarily used function pointers (to save stack space)
 ///
 typedef union {
-  PEI_CORE_ENTRY_POINT         PeiCore;
+  PEICORE_FUNCTION_POINTER     PeiCore;
   EFI_PEIM_ENTRY_POINT2        PeimEntry;
   EFI_PEIM_NOTIFY_ENTRY_POINT  PeimNotifyEntry;
   EFI_DXE_IPL_PPI              *DxeIpl;
@@ -182,8 +200,6 @@ typedef union {
   EFI_PEI_NOTIFY_DESCRIPTOR    *NotifyDescriptor;
   VOID                         *Raw;
 } PEI_CORE_TEMP_POINTERS;
-
-
 
 typedef struct {
   CONST EFI_SEC_PEI_HAND_OFF    *SecCoreData;
@@ -336,9 +352,10 @@ InitializePpiServices (
 
 /**
 
-  Migrate the Hob list from the CAR stack to PEI installed memory.
-
-  @param PeiServices         The PEI core services table.
+  Convert Ppi description and PpiData pointer in heap after temporary memory
+  is migrated to permenent memory.
+  
+  @param PrivateData         PeiCore's private data structure
   @param OldCheckingBottom   The old checking bottom.
   @param OldCheckingTop      The old checking top.
   @param Fixup               The address difference between
@@ -358,13 +375,13 @@ ConvertPpiPointers (
 
   Install PPI services.
 
-  @param PeiServices     - Pointer to the PEI Service Table
-  @param PpiList         - Pointer to a list of PEI PPI Descriptors.
+  @param PeiServices                An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PpiList                    Pointer to ppi array that want to be installed.
 
-  @retval EFI_SUCCESS             - if all PPIs in PpiList are successfully installed.
-  @retval EFI_INVALID_PARAMETER   - if PpiList is NULL pointer
-  @retval EFI_INVALID_PARAMETER   - if any PPI in PpiList is not valid
-  @retval EFI_OUT_OF_RESOURCES    - if there is no more memory resource to install PPI
+  @retval EFI_SUCCESS               if all PPIs in PpiList are successfully installed.
+  @retval EFI_INVALID_PARAMETER     if PpiList is NULL pointer
+  @retval EFI_INVALID_PARAMETER     if any PPI in PpiList is not valid
+  @retval EFI_OUT_OF_RESOURCES      if there is no more memory resource to install PPI
 
 **/
 EFI_STATUS
@@ -653,8 +670,8 @@ PeiCoreBuildHobHandoffInfoTable (
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-  @param VolumeHandle    Pointer to the FV header of the volume to search.
-  @param FileHandle      Pointer to the current file from which to begin searching.
+  @param FwVolHeader     Pointer to the FV header of the volume to search.
+  @param FileHeader      Pointer to the current file from which to begin searching.
                          This pointer will be updated upon return to reflect the file found.
   @retval EFI_NOT_FOUND  No files matching the search criteria were found
   @retval EFI_SUCCESS    Success to find next file in given volume
@@ -674,10 +691,9 @@ PeiFfsFindNextFile (
   Given the input file pointer, search for the next matching section in the
   FFS volume.
 
-
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SectionType     Filter to find only sections of this type.
-  @param FileHandle      Pointer to the current file to search.
+  @param FfsFileHeader   Pointer to the current file to search.
   @param SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
                          NULL if section not found
 
@@ -698,18 +714,18 @@ PeiFfsFindSectionData (
 /**
   search the firmware volumes by index
 
-  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param Instance        Instance of FV to find
-  @param VolumeHandle    Pointer to found Volume.
+  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param Instance               Instance of FV to find
+  @param FwVolHeader            Pointer to found Volume.
 
-  @retval EFI_INVALID_PARAMETER  FwVolHeader is NULL
-  @retval EFI_SUCCESS            Firmware volume instance successfully found.
+  @retval EFI_INVALID_PARAMETER FwVolHeader is NULL
+  @retval EFI_SUCCESS           Firmware volume instance successfully found.
 
 **/
 EFI_STATUS
 EFIAPI
 PeiFvFindNextVolume (
-  IN CONST EFI_PEI_SERVICES                **PeiServices,
+  IN CONST EFI_PEI_SERVICES          **PeiServices,
   IN UINTN                           Instance,
   IN OUT EFI_PEI_FV_HANDLE           *FwVolHeader
   )
@@ -721,7 +737,6 @@ PeiFvFindNextVolume (
 /**
 
   Initialize the memory services.
-
 
   @param PrivateData     PeiCore's private data structure
   @param SecCoreData     Points to a data structure containing information about the PEI core's operating
@@ -921,13 +936,13 @@ FirmwareVolmeInfoPpiNotifyCallback (
 
   Given the input VolumeHandle, search for the next matching name file.
 
-
   @param FileName        File name to search.
   @param VolumeHandle    The current FV to search.
   @param FileHandle      Pointer to the file matching name in VolumeHandle.
                          NULL if file not found
 
-  @return EFI_STATUS
+  @retval EFI_NOT_FOUND  No files matching the search criteria were found
+  @retval EFI_SUCCESS    Success to search given file
 
 **/
 EFI_STATUS
@@ -1023,12 +1038,13 @@ PeiFindFileEx (
 ;
 
 /**
+  Initialize image service that install PeiLoadFilePpi.
 
-  Install Pei Load File PPI.
-
-
-  @param PrivateData        Pointer to PEI_CORE_INSTANCE.
-  @param OldCoreData        Pointer to PEI_CORE_INSTANCE.
+  @param PrivateData     Pointer to PeiCore's private data structure PEI_CORE_INSTANCE.
+  @param OldCoreData     Pointer to Old PeiCore's private data.
+                         If NULL, PeiCore is entered at first time, stack/heap in temporary memory.
+                         If not NULL, PeiCore is entered at second time, stack/heap has been moved
+                         to permenent memory.
 
 **/
 VOID
