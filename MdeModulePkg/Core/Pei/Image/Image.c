@@ -72,7 +72,17 @@ PeiImageRead (
   OUT    VOID    *Buffer
   )
 {
-  CopyMem (Buffer, (VOID *)((UINTN) FileHandle + FileOffset), *ReadSize);
+  CHAR8 *Destination8;
+  CHAR8 *Source8;
+  UINTN Length;
+
+  Destination8  = Buffer;
+  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
+  Length        = *ReadSize;
+  while (Length--) {
+    *(Destination8++) = *(Source8++);
+  }
+
   return EFI_SUCCESS;
 }
 
