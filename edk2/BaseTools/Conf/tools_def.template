@@ -766,5 +766,5 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 ##################
 # VfrCompiler definitions
 ##################
-*_*_*_VFR_PATH                      = VfrCompile.exe
+*_*_*_VFR_PATH                      = VfrCompile
 *_*_*_VFR_FLAGS                     = -l -n
