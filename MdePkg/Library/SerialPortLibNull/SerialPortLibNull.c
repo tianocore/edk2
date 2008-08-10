@@ -73,3 +73,23 @@ SerialPortRead (
   return 0;
 }
 
+/**
+  Poll the serial device to see if there is any data waiting.
+
+  If there is data waiting to be read from the serial port, then return
+  TRUE.  If there is no data waiting to be read from the serial port, then 
+  return FALSE.
+
+  @retval FALSE            There is no data waiting to be read.
+
+**/
+BOOLEAN
+EFIAPI
+SerialPortPoll (
+  VOID
+  )
+{
+  return FALSE; 
+} 
+
+ 

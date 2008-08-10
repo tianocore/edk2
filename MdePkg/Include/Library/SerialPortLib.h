@@ -70,5 +70,21 @@ SerialPortRead (
   IN  UINTN 	NumberOfBytes
   );
 
+/**
+  Poll the serial device to see if there is any data waiting.
+
+  If there is data waiting to be read from the serial port, then return
+  TRUE.  If there is no data waiting to be read from the serial port, then 
+  return FALSE.
+
+  @retval TRUE             Data is waiting to be read.
+  @retval FALSE            There is no data waiting to be read.
+
+**/
+BOOLEAN
+EFIAPI
+SerialPortPoll (
+  VOID
+  );
 
 #endif
