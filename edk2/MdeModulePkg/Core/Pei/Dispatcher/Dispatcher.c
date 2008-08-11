@@ -100,7 +100,7 @@ DiscoverPeimsAndOrderWithApriori (
       Private->AprioriCount -= sizeof (EFI_FFS_FILE_HEADER) - sizeof (EFI_COMMON_SECTION_HEADER);
       Private->AprioriCount /= sizeof (EFI_GUID);
 
-      SetMem (FileGuid, sizeof (FileGuid), 0);
+      ZeroMem (FileGuid, sizeof (FileGuid));
       for (Index = 0; Index < PeimCount; Index++) {
         //
         // Make an array of file name guids that matches the FileHandle array so we can convert
@@ -178,6 +178,7 @@ DiscoverPeimsAndOrderWithApriori (
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param PrivateInMem    PeiCore's private data structure
 
+  @return PeiCore function address after shadowing.
 **/
 VOID*
 ShadowPeiCore(
@@ -215,6 +216,10 @@ ShadowPeiCore(
               );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Compute the PeiCore's function address after shaowed PeiCore.
+  // _ModuleEntryPoint is PeiCore main function entry
+  //
   return (VOID*) ((UINTN) EntryPoint + (UINTN) PeiCore - (UINTN) _ModuleEntryPoint);
 }
 
@@ -791,9 +796,11 @@ PeiRegisterForShadow (
   @param AuthenticationState  Pointer to attestation authentication state of image.
 
 
-  @retval EFI_NOT_FOUND       FV image can't be found.
-  @retval EFI_SUCCESS         Successfully to process it.
-
+  @retval EFI_NOT_FOUND         FV image can't be found.
+  @retval EFI_SUCCESS           Successfully to process it.
+  @retval EFI_OUT_OF_RESOURCES  Can not allocate page when aligning FV image
+  @retval Others                Can not find EFI_SECTION_FIRMWARE_VOLUME_IMAGE section
+  
 **/
 EFI_STATUS
 ProcessFvFile (
@@ -840,11 +847,13 @@ ProcessFvFile (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  
   //
   // Collect FvImage Info.
   //
   Status = PeiFfsGetVolumeInfo (FvImageHandle, &FvImageInfo);
   ASSERT_EFI_ERROR (Status);
+  
   //
   // FvAlignment must be more than 8 bytes required by FvHeader structure.
   //
@@ -852,6 +861,7 @@ ProcessFvFile (
   if (FvAlignment < 8) {
     FvAlignment = 8;
   }
+  
   //
   // Check FvImage
   //
