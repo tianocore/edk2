@@ -247,8 +247,6 @@ PeiDispatcher (
   UINT32                              AuthenticationState;
   EFI_PHYSICAL_ADDRESS                EntryPoint;
   EFI_PEIM_ENTRY_POINT2               PeimEntryPoint;
-  BOOLEAN                             PeimNeedingDispatch;
-  BOOLEAN                             PeimDispatchOnThisPass;
   UINTN                               SaveCurrentPeimCount;
   UINTN                               SaveCurrentFvCount;
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
@@ -332,8 +330,6 @@ PeiDispatcher (
   // satisfied, this dipatcher should run only once.
   //
   do {
-    PeimNeedingDispatch = FALSE;
-    PeimDispatchOnThisPass = FALSE;
 
     for (FvCount = Private->CurrentPeimFvCount; FvCount < Private->FvCount; FvCount++) {
       Private->CurrentPeimFvCount = FvCount;
@@ -359,7 +355,7 @@ PeiDispatcher (
 
         if (Private->Fv[FvCount].PeimState[PeimCount] == PEIM_STATE_NOT_DISPATCHED) {
           if (!DepexSatisfied (Private, PeimFileHandle, PeimCount)) {
-            PeimNeedingDispatch = TRUE;
+            Private->PeimNeedingDispatch = TRUE;
           } else {
             Status = PeiFfsGetFileInfo (PeimFileHandle, &FvFileInfo);
             ASSERT_EFI_ERROR (Status);
@@ -411,7 +407,7 @@ PeiDispatcher (
                   PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
                 }
 
-                PeimDispatchOnThisPass = TRUE;
+                Private->PeimDispatchOnThisPass = TRUE;
               }
 
               REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
@@ -581,11 +577,6 @@ PeiDispatcher (
               PrivateInMem->PeiMemoryInstalled     = TRUE;
 
               //
-              // Restart scan of all PEIMs on next pass
-              //
-              PrivateInMem->CurrentPeimCount = 0;
-
-              //
               // Shadow PEI Core. When permanent memory is avaiable, shadow
               // PEI Core and PEIMs to get high performance.
               //
@@ -668,7 +659,7 @@ PeiDispatcher (
     //  pass. If we did not dispatch a PEIM there is no point in trying again
     //  as it will fail the next time too (nothing has changed).
     //
-  } while (PeimNeedingDispatch && PeimDispatchOnThisPass);
+  } while (Private->PeimNeedingDispatch && Private->PeimDispatchOnThisPass);
 
 }
 
@@ -693,6 +684,8 @@ InitializeDispatcherData (
   )
 {
   if (OldCoreData == NULL) {
+    PrivateData->PeimNeedingDispatch    = FALSE;
+    PrivateData->PeimDispatchOnThisPass = FALSE;
     PeiInitializeFv (PrivateData, SecCoreData);
   }
 
