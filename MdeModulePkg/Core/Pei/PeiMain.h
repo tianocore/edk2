@@ -137,6 +137,8 @@ typedef struct{
   UINTN                              CurrentPeimFvCount;
   UINTN                              CurrentPeimCount;
   EFI_PEI_FILE_HANDLE                CurrentFileHandle;
+  BOOLEAN                            PeimNeedingDispatch;
+  BOOLEAN                            PeimDispatchOnThisPass;
   UINTN                              AllFvCount;
   EFI_PEI_FV_HANDLE                  AllFv[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
   EFI_PEI_HOB_POINTERS               HobList;
