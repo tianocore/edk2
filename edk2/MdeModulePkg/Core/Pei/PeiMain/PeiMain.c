@@ -21,7 +21,8 @@ STATIC EFI_PEI_PPI_DESCRIPTOR mMemoryDiscoveredPpi = {
 };
 
 ///
-/// Pei service instance
+/// Pei Core Module Variables
+///
 ///
 STATIC EFI_PEI_SERVICES  gPs = {
   {
@@ -66,9 +67,10 @@ STATIC EFI_PEI_SERVICES  gPs = {
 
 /**
 
-  This routine is invoked by main entry of PeiMain module during transition
+  The entry routine to Pei Core, invoked by PeiMain during transition
   from SEC to PEI. After switching stack in the PEI core, it will restart
   with the old core data.
+
 
   @param SecCoreData     Points to a data structure containing information about the PEI core's operating
                          environment, such as the size and location of temporary RAM, the stack location and
@@ -81,7 +83,6 @@ STATIC EFI_PEI_SERVICES  gPs = {
                          calls and/or code in these early PPIs
   @param Data            Pointer to old core data that is used to initialize the
                          core's data areas.
-                         If NULL, it is first PeiCore entering.
 
   @retval EFI_NOT_FOUND  Never reach
 
@@ -97,13 +98,13 @@ PeiCore (
   PEI_CORE_INSTANCE                                     PrivateData;
   EFI_STATUS                                            Status;
   PEI_CORE_TEMP_POINTERS                                TempPtr;
-  UINT64                                                Tick;
+  UINT64                                                mTick;
   PEI_CORE_INSTANCE                                     *OldCoreData;
   EFI_PEI_CPU_IO_PPI                                    *CpuIo;
   EFI_PEI_PCI_CFG2_PPI                                  *PciCfg;
   PEICORE_FUNCTION_POINTER                              ShadowedPeiCore;
 
-  Tick = 0;
+  mTick = 0;
   OldCoreData = (PEI_CORE_INSTANCE *) Data;
 
   //
@@ -112,17 +113,16 @@ PeiCore (
   // 
   if (PerformanceMeasurementEnabled()) {
     if (OldCoreData == NULL) {
-      Tick = GetPerformanceCounter ();
+      mTick = GetPerformanceCounter ();
     }
   }
 
+  //
+  // PeiCore has been shadowed to memory for first entering, so
+  // just jump to PeiCore in memory here.
+  //
   if (OldCoreData != NULL) {
     ShadowedPeiCore = (PEICORE_FUNCTION_POINTER) (UINTN) OldCoreData->ShadowedPeiCore;
-    
-    //
-    // PeiCore has been shadowed to memory for first entering, so
-    // just jump to PeiCore in memory here.
-    //
     if (ShadowedPeiCore != NULL) {
       OldCoreData->ShadowedPeiCore = NULL;
       ShadowedPeiCore (
@@ -142,10 +142,6 @@ PeiCore (
     PrivateData.ServiceTableShadow.CpuIo  = CpuIo;
     PrivateData.ServiceTableShadow.PciCfg = PciCfg;
   } else {
-    //
-    // If OldCoreData is NULL, means current is first Peicore's entering.
-    //
-    
     ZeroMem (&PrivateData, sizeof (PEI_CORE_INSTANCE));
     PrivateData.Signature = PEI_CORE_HANDLE_SIGNATURE;
     CopyMem (&PrivateData.ServiceTableShadow, &gPs, sizeof (gPs));
@@ -190,11 +186,11 @@ PeiCore (
       FixedPcdGet32 (PcdStatusCodeValuePeiCoreEntry)
       );
 
-    PERF_START (NULL,"PEI", NULL, Tick);
+    PERF_START (NULL,"PEI", NULL, mTick);
     //
     // If first pass, start performance measurement.
     //
-    PERF_START (NULL,"PreMem", NULL, Tick);
+    PERF_START (NULL,"PreMem", NULL, mTick);
 
     //
     // If SEC provided any PPI services to PEI, install them.
