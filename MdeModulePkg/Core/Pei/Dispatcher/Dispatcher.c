@@ -814,7 +814,7 @@ ProcessFvFile (
   EFI_FV_INFO           FvImageInfo;
   UINT32                FvAlignment;
   VOID                  *FvBuffer;
-  EFI_PEI_HOB_POINTERS  HobFv2;
+  EFI_PEI_HOB_POINTERS  HobPtr;
 
   FvBuffer             = NULL;
   *AuthenticationState = 0;
@@ -823,15 +823,15 @@ ProcessFvFile (
   // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
   // been extracted.
   //
-  HobFv2.Raw = GetHobList ();
-  while ((HobFv2.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobFv2.Raw)) != NULL) {
-    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &HobFv2.FirmwareVolume2->FileName)) {
+  HobPtr.Raw = GetHobList ();
+  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobPtr.Raw)) != NULL) {
+    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &HobPtr.FirmwareVolume2->FileName)) {
       //
       // this FILE has been dispatched, it will not be dispatched again.
       //
       return EFI_SUCCESS;
     }
-    HobFv2.Raw = GET_NEXT_HOB (HobFv2);
+    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
   }
 
   //
@@ -886,12 +886,24 @@ ProcessFvFile (
     );
 
   //
-  // Inform HOB consumer phase, i.e. DXE core, the existance of this FV
+  // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
+  // based on its parent Fvimage is informed or not.
+  // If FvHob of its parent fvimage is built, the extracted FvImage will be built also. 
+  // Or, the extracted FvImage will not be built.
   //
-  BuildFvHob (
-    (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
-    FvImageInfo.FvSize
-  );
+  HobPtr.Raw = GetHobList ();
+  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV, HobPtr.Raw)) != NULL) {
+    if (((EFI_PHYSICAL_ADDRESS) (UINTN)FvFileHandle > HobPtr.FirmwareVolume->BaseAddress) && 
+        ((EFI_PHYSICAL_ADDRESS) (UINTN)FvFileHandle < HobPtr.FirmwareVolume->BaseAddress + HobPtr.FirmwareVolume->Length)) {
+      BuildFvHob (
+        (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
+        FvImageInfo.FvSize
+      );
+      break;
+    }
+    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
+  }
+
   //
   // Makes the encapsulated volume show up in DXE phase to skip processing of
   // encapsulated file again.
