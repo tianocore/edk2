@@ -335,7 +335,16 @@ PeiDispatcher (
   // satisfied, this dipatcher should run only once.
   //
   do {
-
+    //
+    // In case that reenter PeiCore happens, the last pass record is still available.   
+    //
+    if (!Private->PeimDispatcherReenter) {
+      Private->PeimNeedingDispatch      = FALSE;
+      Private->PeimDispatchOnThisPass   = FALSE;
+    } else {
+      Private->PeimDispatcherReenter    = FALSE;
+    }
+    
     for (FvCount = Private->CurrentPeimFvCount; FvCount < Private->FvCount; FvCount++) {
       Private->CurrentPeimFvCount = FvCount;
       VolumeHandle = Private->Fv[FvCount].FvHeader;
@@ -582,6 +591,11 @@ PeiDispatcher (
               PrivateInMem->PeiMemoryInstalled     = TRUE;
 
               //
+              // Indicate that PeiCore reenter
+              //
+              Private->PeimDispatcherReenter  = TRUE;
+              
+              //
               // Shadow PEI Core. When permanent memory is avaiable, shadow
               // PEI Core and PEIMs to get high performance.
               //
@@ -689,8 +703,7 @@ InitializeDispatcherData (
   )
 {
   if (OldCoreData == NULL) {
-    PrivateData->PeimNeedingDispatch    = FALSE;
-    PrivateData->PeimDispatchOnThisPass = FALSE;
+    PrivateData->PeimDispatcherReenter = FALSE;
     PeiInitializeFv (PrivateData, SecCoreData);
   }
 
