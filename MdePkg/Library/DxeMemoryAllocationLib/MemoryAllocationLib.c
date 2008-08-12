@@ -1094,7 +1094,6 @@ SafeFreePool (
 {
   if (Buffer != NULL) {
     FreePool (Buffer);
-    Buffer = NULL;
   }
 }
 
