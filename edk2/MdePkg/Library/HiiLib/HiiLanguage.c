@@ -84,6 +84,7 @@ HiiLibGetNextLanguage (
   CHAR8  *StringPtr;
 
   ASSERT (LangCode != NULL);
+  ASSERT (*LangCode != NULL);
   ASSERT (Lang != NULL);
 
   Index = 0;

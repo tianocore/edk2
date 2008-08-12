@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef __EDK_FVB_SERVICE_LIB_H__
-#define __EDK_FVB_SERVICE_LIB_H__
+#ifndef __FVB_SERVICE_LIB_H__
+#define __FVB_SERVICE_LIB_H__
 
 /**
   Reads specified number of bytes into a buffer from the specified block.
@@ -38,7 +38,7 @@ EfiFvbReadBlock (
   IN EFI_LBA                                      Lba,
   IN UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
-  IN UINT8                                        *Buffer
+  OUT UINT8                                        *Buffer
   );
 
 

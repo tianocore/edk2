@@ -98,12 +98,12 @@ DebugPrint (
   DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then 
   CpuDeadLoop() is called.  If neither of these bits are set, then this function 
   returns immediately after the message is printed to the debug output device.
-  DebugAssert() must actively prevent recusrsion.  If DebugAssert() is called while
+  DebugAssert() must actively prevent recursion.  If DebugAssert() is called while
   processing another DebugAssert(), then DebugAssert() must return immediately.
 
-  If FileName is NULL, then a <FileName> string of ?NULL) Filename?is printed.
+  If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
 
-  If Description is NULL, then a <Description> string of ?NULL) Description?is printed.
+  If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
 
   @param  FileName     Pointer to the name of the source file that generated the assert condition.
   @param  LineNumber   The line number in the source file that generated the assert condition
@@ -128,7 +128,7 @@ DebugAssert (
 
   If Buffer is NULL, then ASSERT().
 
-  If Length is greater than (MAX_ADDRESS ?Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS -Buffer + 1), then ASSERT(). 
 
   @param   Buffer  Pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
   @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 

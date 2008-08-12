@@ -111,7 +111,7 @@ DebugPrint (
   DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then
   CpuDeadLoop() is called.  If neither of these bits are set, then this function
   returns immediately after the message is printed to the debug output device.
-  DebugAssert() must actively prevent recusrsion.  If DebugAssert() is called while
+  DebugAssert() must actively prevent recursion.  If DebugAssert() is called while
   processing another DebugAssert(), then DebugAssert() must return immediately.
 
   If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.

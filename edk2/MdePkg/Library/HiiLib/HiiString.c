@@ -230,7 +230,6 @@ Out:
   @retval EFI_NOT_FOUND          The string specified by StringId is not available.
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by StringLength is too small
                                  to hold the string.
-  @retval EFI_INVALID_PARAMETER  The String or StringSize was NULL.
 
 **/
 EFI_STATUS
