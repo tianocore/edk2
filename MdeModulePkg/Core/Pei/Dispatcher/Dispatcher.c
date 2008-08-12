@@ -100,7 +100,7 @@ DiscoverPeimsAndOrderWithApriori (
       Private->AprioriCount -= sizeof (EFI_FFS_FILE_HEADER) - sizeof (EFI_COMMON_SECTION_HEADER);
       Private->AprioriCount /= sizeof (EFI_GUID);
 
-      ZeroMem (FileGuid, sizeof (FileGuid));
+      SetMem (FileGuid, sizeof (FileGuid), 0);
       for (Index = 0; Index < PeimCount; Index++) {
         //
         // Make an array of file name guids that matches the FileHandle array so we can convert
@@ -178,7 +178,6 @@ DiscoverPeimsAndOrderWithApriori (
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param PrivateInMem    PeiCore's private data structure
 
-  @return PeiCore function address after shadowing.
 **/
 VOID*
 ShadowPeiCore(
@@ -216,10 +215,6 @@ ShadowPeiCore(
               );
   ASSERT_EFI_ERROR (Status);
 
-  //
-  // Compute the PeiCore's function address after shaowed PeiCore.
-  // _ModuleEntryPoint is PeiCore main function entry
-  //
   return (VOID*) ((UINTN) EntryPoint + (UINTN) PeiCore - (UINTN) _ModuleEntryPoint);
 }
 
@@ -252,6 +247,8 @@ PeiDispatcher (
   UINT32                              AuthenticationState;
   EFI_PHYSICAL_ADDRESS                EntryPoint;
   EFI_PEIM_ENTRY_POINT2               PeimEntryPoint;
+  BOOLEAN                             PeimNeedingDispatch;
+  BOOLEAN                             PeimDispatchOnThisPass;
   UINTN                               SaveCurrentPeimCount;
   UINTN                               SaveCurrentFvCount;
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
@@ -335,16 +332,9 @@ PeiDispatcher (
   // satisfied, this dipatcher should run only once.
   //
   do {
-    //
-    // In case that reenter PeiCore happens, the last pass record is still available.   
-    //
-    if (!Private->PeimDispatcherReenter) {
-      Private->PeimNeedingDispatch      = FALSE;
-      Private->PeimDispatchOnThisPass   = FALSE;
-    } else {
-      Private->PeimDispatcherReenter    = FALSE;
-    }
-    
+    PeimNeedingDispatch = FALSE;
+    PeimDispatchOnThisPass = FALSE;
+
     for (FvCount = Private->CurrentPeimFvCount; FvCount < Private->FvCount; FvCount++) {
       Private->CurrentPeimFvCount = FvCount;
       VolumeHandle = Private->Fv[FvCount].FvHeader;
@@ -369,7 +359,7 @@ PeiDispatcher (
 
         if (Private->Fv[FvCount].PeimState[PeimCount] == PEIM_STATE_NOT_DISPATCHED) {
           if (!DepexSatisfied (Private, PeimFileHandle, PeimCount)) {
-            Private->PeimNeedingDispatch = TRUE;
+            PeimNeedingDispatch = TRUE;
           } else {
             Status = PeiFfsGetFileInfo (PeimFileHandle, &FvFileInfo);
             ASSERT_EFI_ERROR (Status);
@@ -421,7 +411,7 @@ PeiDispatcher (
                   PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
                 }
 
-                Private->PeimDispatchOnThisPass = TRUE;
+                PeimDispatchOnThisPass = TRUE;
               }
 
               REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
@@ -591,10 +581,10 @@ PeiDispatcher (
               PrivateInMem->PeiMemoryInstalled     = TRUE;
 
               //
-              // Indicate that PeiCore reenter
+              // Restart scan of all PEIMs on next pass
               //
-              Private->PeimDispatcherReenter  = TRUE;
-              
+              PrivateInMem->CurrentPeimCount = 0;
+
               //
               // Shadow PEI Core. When permanent memory is avaiable, shadow
               // PEI Core and PEIMs to get high performance.
@@ -678,7 +668,7 @@ PeiDispatcher (
     //  pass. If we did not dispatch a PEIM there is no point in trying again
     //  as it will fail the next time too (nothing has changed).
     //
-  } while (Private->PeimNeedingDispatch && Private->PeimDispatchOnThisPass);
+  } while (PeimNeedingDispatch && PeimDispatchOnThisPass);
 
 }
 
@@ -703,7 +693,6 @@ InitializeDispatcherData (
   )
 {
   if (OldCoreData == NULL) {
-    PrivateData->PeimDispatcherReenter = FALSE;
     PeiInitializeFv (PrivateData, SecCoreData);
   }
 
@@ -809,11 +798,9 @@ PeiRegisterForShadow (
   @param AuthenticationState  Pointer to attestation authentication state of image.
 
 
-  @retval EFI_NOT_FOUND         FV image can't be found.
-  @retval EFI_SUCCESS           Successfully to process it.
-  @retval EFI_OUT_OF_RESOURCES  Can not allocate page when aligning FV image
-  @retval Others                Can not find EFI_SECTION_FIRMWARE_VOLUME_IMAGE section
-  
+  @retval EFI_NOT_FOUND       FV image can't be found.
+  @retval EFI_SUCCESS         Successfully to process it.
+
 **/
 EFI_STATUS
 ProcessFvFile (
@@ -827,7 +814,7 @@ ProcessFvFile (
   EFI_FV_INFO           FvImageInfo;
   UINT32                FvAlignment;
   VOID                  *FvBuffer;
-  EFI_PEI_HOB_POINTERS  HobPtr;
+  EFI_PEI_HOB_POINTERS  HobFv2;
 
   FvBuffer             = NULL;
   *AuthenticationState = 0;
@@ -836,15 +823,15 @@ ProcessFvFile (
   // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
   // been extracted.
   //
-  HobPtr.Raw = GetHobList ();
-  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobPtr.Raw)) != NULL) {
-    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &HobPtr.FirmwareVolume2->FileName)) {
+  HobFv2.Raw = GetHobList ();
+  while ((HobFv2.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobFv2.Raw)) != NULL) {
+    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &HobFv2.FirmwareVolume2->FileName)) {
       //
       // this FILE has been dispatched, it will not be dispatched again.
       //
       return EFI_SUCCESS;
     }
-    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
+    HobFv2.Raw = GET_NEXT_HOB (HobFv2);
   }
 
   //
@@ -860,13 +847,11 @@ ProcessFvFile (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
   //
   // Collect FvImage Info.
   //
   Status = PeiFfsGetVolumeInfo (FvImageHandle, &FvImageInfo);
   ASSERT_EFI_ERROR (Status);
-  
   //
   // FvAlignment must be more than 8 bytes required by FvHeader structure.
   //
@@ -874,7 +859,6 @@ ProcessFvFile (
   if (FvAlignment < 8) {
     FvAlignment = 8;
   }
-  
   //
   // Check FvImage
   //
@@ -902,24 +886,12 @@ ProcessFvFile (
     );
 
   //
-  // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
-  // based on its parent Fvimage is informed or not.
-  // If FvHob of its parent fvimage is built, the extracted FvImage will be built also. 
-  // Or, the extracted FvImage will not be built.
+  // Inform HOB consumer phase, i.e. DXE core, the existance of this FV
   //
-  HobPtr.Raw = GetHobList ();
-  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV, HobPtr.Raw)) != NULL) {
-    if (((EFI_PHYSICAL_ADDRESS) (UINTN)FvFileHandle > HobPtr.FirmwareVolume->BaseAddress) && 
-        ((EFI_PHYSICAL_ADDRESS) (UINTN)FvFileHandle < HobPtr.FirmwareVolume->BaseAddress + HobPtr.FirmwareVolume->Length)) {
-      BuildFvHob (
-        (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
-        FvImageInfo.FvSize
-      );
-      break;
-    }
-    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
-  }
-
+  BuildFvHob (
+    (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
+    FvImageInfo.FvSize
+  );
   //
   // Makes the encapsulated volume show up in DXE phase to skip processing of
   // encapsulated file again.
