@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007-2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,16 +17,24 @@
 # "*" is used to indicate that the source files will be processed at the same time.
 # "?" is used to indicate that the source files will be processed one by one.
 #
-# "[" Build.<File-Type>[.<version>][, Build.<File-Type>[.<version>]] "]" <EOL>
+# "[" <File-Type>[.<Build-Type>][.<Arch>][, <File-Type>[.<Build-Type>][.<Arch>]] "]" <EOL>
 #   <InputFile[.<ToolChainFamily>]> <EOL>
-#       [File-Type =] (?|*).<File-Extension> [(\n|,|;) (?|*).<File-Extension>]
+#       (?|*).<File-Extension> [(\n|,) (?|*).<File-Extension>]
 #
 #   <OutputFile[.<ToolChainFamily>]> <EOL>
+#       <FileFullPath>
+#
+#   <ExtraDependency>
 #       <FileFullPath>
 #
 #   <Command[.<ToolChainFamily>]> <EOL>
 #       <Command1>
 #       [<Command2>]
+#
+# <Build-Type> is the MODULE_TYPE in EDK2 or COMPONENT_TYPE  in EDK.
+# Missing <InputFile> will cause an exception and break build.
+# Missing <Command> will cause that related build target won't be generated but
+#   won't break build.
 #
 
 ## Placeholders for string substitution
@@ -89,7 +97,7 @@
 #   Unicode-Text-File
 #
 
-[Build.C-Code-File]
+[C-Code-File]
     <InputFile>
         ?.c
         ?.C
@@ -98,6 +106,8 @@
         ?.cpp
         ?.Cpp
         ?.CPP
+
+    <ExtraDependency>
         $(MAKE_FILE)
 
     <OutputFile>
@@ -109,24 +119,23 @@
     <Command.GCC>
         "$(CC)" -o ${dst} $(CC_FLAGS) $(INC) ${src}
 
-[Build.C-Header-File]
+[C-Header-File]
     <InputFile>
         *.h, *.H
 
     <OutputFile>
-        $(OUTPUT_DIR)(+)$(MODULE_NAME).gch
-        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
 
     <Command>
 
 
-[Build.Assembly-Code-File]
+[Assembly-Code-File.COMMON.COMMON]
     <InputFile.MSFT, InputFile.INTEL>
-        Assembly-Code-File = ?.asm, ?.Asm, ?.ASM
-        $(MAKE_FILE)
+        ?.asm, ?.Asm, ?.ASM
 
     <InputFile.GCC>
         ?.S
+
+    <ExtraDependency>
         $(MAKE_FILE)
 
     <OutputFile>
@@ -142,9 +151,11 @@
         Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
         "$(ASM)" -o ${dst} $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
 
-[Build.Iasm-Code-File]
+[Assembly-Code-File.COMMON.IPF]
     <InputFile>
         ?.s
+
+    <ExtraDependency>
         $(MAKE_FILE)
 
     <OutputFile>
@@ -155,11 +166,13 @@
         Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
         "$(ASM)" -o ${dst} $(ASM_FLAGS) ${d_path}(+)${s_base}.iii
 
-[Build.Visual-Form-Representation-File]
+[Visual-Form-Representation-File]
     <InputFile>
         ?.vfr
         ?.Vfr
         ?.VFR
+
+    <ExtraDependency>
         $(MAKE_FILE)
 
     <OutputFile>
@@ -171,7 +184,7 @@
         -mkdir ${d_path} > NUL 2>&1
         "$(VFR)" $(VFR_FLAGS) --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
 
-[Build.Object-File]
+[Object-File]
     <InputFile>
         *.obj
         *.o
@@ -185,30 +198,11 @@
     <Command.GCC>
         "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) ${src}
 
-#[Build.Object-File, Build.Static-Library-File]
-#BUILD_VERSION =  0x00010000
-#
-#    <InputFile>
-#       Object-File = *.obj
-#       Static-Library-File = *.lib, *.a
-#
-#    <OutputFile>
-#        $(OUTPUT_DIR)(+)$(MODULE_NAME).lib
-#
-#    <Command.MSFT>
-#        "$(SLINK)" /OUT:${dst} $(SLINK_FLAGS) ${src}
-#
-#    <Command.GCC>
-#        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) ${src1} -( ${src2} -)
-#
-[Build.Static-Library-File]
-    <InputFile.MSFT, InputFile.Intel>
+[Static-Library-File]
+    <InputFile>
         ?.lib
-        $(LIBS)
-        $(MAKE_FILE)
 
-    <InputFile.GCC>
-        ?.lib
+    <ExtraDependency>
         $(LIBS)
         $(MAKE_FILE)
 
@@ -221,7 +215,7 @@
     <Command.GCC>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(LIBS) ${src} -\) $(DLINK2_FLAGS)
 
-[Build.Dynamic-Library-File]
+[Dynamic-Library-File]
     <InputFile>
         ?.dll
 
@@ -234,7 +228,7 @@
         $(CP) ${dst} $(BIN_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
 
-[Build.Dependency-Expression-File]
+[Dependency-Expression-File]
     <InputFile>
         ?.dxs, ?.Dxs, ?.DXS
 
@@ -246,32 +240,41 @@
         Trim --source-code -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
         GenDepex -t $(MODULE_TYPE) -o ${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
 
-[Build.Acpi-Source-Language-File]
+[Acpi-Source-Language-File]
     <InputFile>
         ?.asl, ?.Asl, ?.ASL
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_base}.aml
 
+    <ExtraDependency>
+        $(MAKE_FILE)
+
     <Command.MSFT, Command.INTEL>
         "$(PP)" $(APP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
         "$(ASL)" -p ${dst} $(ASL_FLAGS) ${d_path}(+)${s_base}.i
 
-[Build.Acpi-Table-Code-File]
+[Acpi-Table-Code-File]
     <InputFile>
         ?.aslc
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_base}.acpi
 
+    <ExtraDependency>
+        $(MAKE_FILE)
+
     <Command.MSFT, Command.INTEL>
         "$(CC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(INC) ${src}
         "$(DLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         GenFw -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll
 
-[Build.Masm16-Code-File]
+[Masm16-Code-File]
     <InputFile>
         ?.asm16, ?.Asm16, ?.ASM16
+
+    <ExtraDependency>
+        $(MAKE_FILE)
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_base}.com
@@ -281,7 +284,7 @@
         "$(ASM)" /nologo /c /omf /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${src}
         "$(ASMLINK)" $(ASMLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj,${dst},,,,
 
-[Build.Microcode-File]
+[Microcode-File]
     <InputFile>
         ?.txt, ?.TXT, ?.Txt
 
@@ -291,7 +294,7 @@
     <Command>
         GenFw -o ${dst} -m ${src}
 
-[Build.Microcode-Binary-File]
+[Microcode-Binary-File]
     <InputFile>
         *.mcb
 
@@ -302,13 +305,21 @@
         GenFw -o ${dst} -j ${src}
         -$(CP) ${dst} $(BIN_DIR)
 
-[Build.Unicode-Text-File]
+[Unicode-Text-File]
     <InputFile>
         *.uni, *.Uni, *.UNI
 
     <OutputFile>
         $(DEBUG_DIR)(+)AutoGen.c
         $(DEBUG_DIR)(+)AutoGen.h
+
+    <Command>
+
+[EFI-Image-File]
+    <InputFile>
+        ?.efi, ?.Efi, ?.EFI
+
+    <OutputFile>
 
     <Command>
 
