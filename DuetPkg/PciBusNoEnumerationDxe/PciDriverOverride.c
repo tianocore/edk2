@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "pcibus.h"
+#include "PciBus.h"
 
 EFI_STATUS
 EFIAPI

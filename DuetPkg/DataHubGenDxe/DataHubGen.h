@@ -21,14 +21,14 @@ Abstract:
 #define _DATA_HUB_GEN_H_
 
 #include <FrameworkDxe.h>
-#include <IndustryStandard/Smbios.h>
+#include <IndustryStandard/SmBios.h>
 
 #include <Guid/HobList.h>
-#include <Guid/Smbios.h>
+#include <Guid/SmBios.h>
 #include <Guid/DataHubProducer.h>
 #include <Guid/DataHubRecords.h>
 
-#include <Protocol/Datahub.h>
+#include <Protocol/DataHub.h>
 #include <Protocol/FrameworkHii.h>
 #include <Protocol/HiiDatabase.h>
 

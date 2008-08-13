@@ -7,18 +7,19 @@
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
   CUSTOM_MAKEFILE                = Makefile
+  
 [Packages]
   MdePkg/MdePkg.dec
   DuetPkg/DuetPkg.dec
 
 [Sources]
-  bootsect.asm
-  bs16.asm
-  bs32.asm
-  Gpt.asm
-  Mbr.asm
-  Start.asm
-  Start16.asm
-  Start32.asm
-  Efi32.asm
+  bootsect.asm | INTEL
+  bs16.asm | INTEL
+  bs32.asm | INTEL
+  Gpt.asm | INTEL
+  Mbr.asm | INTEL
+  start.asm | INTEL
+  start16.asm | INTEL
+  start32.asm | INTEL
+  efi32.asm | INTEL
 

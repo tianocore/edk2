@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "Pcibus.h"
+#include "PciBus.h"
 
 //
 // This device structure is serviced as a header.
