@@ -56,7 +56,7 @@ SerialPortWrite (
 /**
   Read data from serial device and save the datas in buffer.
 
-  @param  Buffer           Point of data buffer, which contains the data 
+  @param  Buffer           Point of data buffer, which contains the data
                            returned from the serial device.
   @param  NumberOfBytes    Number of bytes which will be read.
 
@@ -77,7 +77,7 @@ SerialPortRead (
   Poll the serial device to see if there is any data waiting.
 
   If there is data waiting to be read from the serial port, then return
-  TRUE.  If there is no data waiting to be read from the serial port, then 
+  TRUE.  If there is no data waiting to be read from the serial port, then
   return FALSE.
 
   @retval FALSE            There is no data waiting to be read.
@@ -89,7 +89,6 @@ SerialPortPoll (
   VOID
   )
 {
-  return FALSE; 
-} 
+  return FALSE;
+}
 
- 
