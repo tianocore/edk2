@@ -479,7 +479,7 @@ CheckForRom (
             Status = gBS->AllocatePool(
                             EfiBootServicesData,
                             ((UINT32)mPciOptionRomTable.PciOptionRomCount + 1) * sizeof(EFI_PCI_OPTION_ROM_DESCRIPTOR),
-                            &TempPciOptionRomDescriptors
+                            (VOID*)&TempPciOptionRomDescriptors
                             );
             if (mPciOptionRomTable.PciOptionRomCount > 0) {
               CopyMem(

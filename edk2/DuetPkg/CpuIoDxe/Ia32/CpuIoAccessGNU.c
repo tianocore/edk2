@@ -45,7 +45,7 @@
 #include "CpuIoAccess.h"
 
 UINT8
-IA32API
+EFIAPI
 CpuIoRead8 (
   IN  UINT16  Port
   )
@@ -59,7 +59,7 @@ CpuIoRead8 (
 }
 
 UINT16
-IA32API
+EFIAPI
 CpuIoRead16 (
   IN  UINT16  Port
   )
@@ -73,7 +73,7 @@ CpuIoRead16 (
 }
 
 UINT32
-IA32API
+EFIAPI
 CpuIoRead32 (
   IN  UINT16  Port
   )
@@ -87,7 +87,7 @@ CpuIoRead32 (
 }
 
 VOID
-IA32API
+EFIAPI
 CpuIoWrite8 (
   IN  UINT16  Port,
   IN  UINT32  Data
@@ -101,7 +101,7 @@ CpuIoWrite8 (
 }
 
 VOID
-IA32API
+EFIAPI
 CpuIoWrite16 (
   IN  UINT16  Port,
   IN  UINT32  Data
@@ -115,7 +115,7 @@ CpuIoWrite16 (
 }
 
 VOID
-IA32API
+EFIAPI
 CpuIoWrite32 (
   IN  UINT16  Port,
   IN  UINT32  Data

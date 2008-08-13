@@ -204,7 +204,7 @@ extern GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gPciBusCompon
 extern EFI_DRIVER_BINDING_PROTOCOL  gPciBusDriverBinding;
 
 extern BOOLEAN                     gFullEnumeration;
-static UINT64                      gAllOne = 0xFFFFFFFFFFFFFFFF;
+static UINT64                      gAllOne = 0xFFFFFFFFFFFFFFFFULL;
 static UINT64                      gAllZero   = 0;
 
 #include "PciIo.h"

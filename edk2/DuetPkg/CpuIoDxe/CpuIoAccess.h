@@ -22,10 +22,8 @@ Abstract:
 #define _CPU_IO_ACCESS_H
 
 
-#define IA32API __cdecl
-
 UINT8
-IA32API
+EFIAPI
 CpuIoRead8 (
   IN  UINT16  Port
   )
@@ -55,7 +53,7 @@ Returns:
    Return read 8 bit value                                                
 --*/
 UINT16
-IA32API
+EFIAPI
 CpuIoRead16 (
   IN  UINT16  Port
   )
@@ -85,7 +83,7 @@ Returns:
    Return read 16 bit value                                                
 --*/
 UINT32
-IA32API
+EFIAPI
 CpuIoRead32 (
   IN  UINT16  Port
   )
@@ -115,7 +113,7 @@ Returns:
    Return read 32 bit value                                                
 --*/
 VOID
-IA32API
+EFIAPI
 CpuIoWrite8 (
   IN  UINT16  Port,
   IN  UINT32  Data
@@ -148,7 +146,7 @@ Returns:
    None                                                
 --*/
 VOID
-IA32API
+EFIAPI
 CpuIoWrite16 (
   IN  UINT16  Port,
   IN  UINT32  Data
@@ -181,7 +179,7 @@ Returns:
    None                                                
 --*/
 VOID
-IA32API
+EFIAPI
 CpuIoWrite32 (
   IN  UINT16  Port,
   IN  UINT32  Data

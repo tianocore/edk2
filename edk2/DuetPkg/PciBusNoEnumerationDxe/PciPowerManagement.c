@@ -21,9 +21,10 @@ Revision History
 
 --*/
 
-#include "Pcibus.h"
+#include "PciBus.h"
 
 EFI_STATUS
+EFIAPI
 ResetPowerManagementFeature (
   IN PCI_IO_DEVICE *PciIoDevice
   )

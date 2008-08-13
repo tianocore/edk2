@@ -38,7 +38,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  Nt32Pkg/Nt32Pkg.dec
   DuetPkg/DuetPkg.dec
 
 [LibraryClasses]

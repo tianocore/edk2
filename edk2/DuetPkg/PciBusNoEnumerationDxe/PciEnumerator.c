@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "Pcibus.h"
+#include "PciBus.h"
 
 EFI_STATUS
 PciEnumerator (

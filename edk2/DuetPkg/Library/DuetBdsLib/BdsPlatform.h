@@ -27,7 +27,7 @@ Abstract:
 
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Acpi.h>
-#include <IndustryStandard/Smbios.h>
+#include <IndustryStandard/SmBios.h>
 #include <IndustryStandard/LegacyBiosMpTable.h>
 
 #include <Library/DebugLib.h>
@@ -48,7 +48,7 @@ Abstract:
 
 #include <Guid/Bmp.h>
 #include <Guid/Acpi.h>
-#include <Guid/Smbios.h>
+#include <Guid/SmBios.h>
 #include <Guid/Mps.h>
 #include <Guid/HobList.h>
 #include <Guid/PciExpressBaseAddress.h>

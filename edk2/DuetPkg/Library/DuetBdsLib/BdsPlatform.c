@@ -73,7 +73,7 @@ Returns:
         // According to UEFI Spec, we should make sure Smbios table, 
         // ACPI table and Mps tables kept in memory of specified type
         //
-        ConvertSystemTable(TableGuidArray[Index], &Table);
+        ConvertSystemTable(TableGuidArray[Index], (VOID**)&Table);
         gBS->InstallConfigurationTable (TableGuidArray[Index], (VOID *)Table);
       }
     }
@@ -83,7 +83,7 @@ Returns:
 }
 
 #define EFI_LDR_MEMORY_DESCRIPTOR_GUID \
-  { 0x7701d7e5, 0x7d1d, 0x4432, 0xa4, 0x68, 0x67, 0x3d, 0xab, 0x8a, 0xde, 0x60 }
+  { 0x7701d7e5, 0x7d1d, 0x4432, {0xa4, 0x68, 0x67, 0x3d, 0xab, 0x8a, 0xde, 0x60 }}
 
 EFI_GUID gEfiLdrMemoryDescriptorGuid = EFI_LDR_MEMORY_DESCRIPTOR_GUID;
 
@@ -177,7 +177,7 @@ UpdateMemoryMap (
     if (MemoryDescHob.MemDesc[Index].PhysicalStart < 0x100000) {
       continue;
     }
-    if (MemoryDescHob.MemDesc[Index].PhysicalStart >= 0x100000000) {
+    if (MemoryDescHob.MemDesc[Index].PhysicalStart >= 0x100000000ULL) {
       continue;
     }
     if ((MemoryDescHob.MemDesc[Index].Type == EfiReservedMemoryType) ||
@@ -557,7 +557,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   DeviceHandle,
                   &gEfiDevicePathProtocolGuid,
-                  &DevicePath
+                  (VOID*)&DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -655,7 +655,7 @@ GetGopDevicePath (
     // Add all the child handles as possible Console Device
     //
     for (Index = 0; Index < GopHandleCount; Index++) {
-      Status = gBS->HandleProtocol (GopHandleBuffer[Index], &gEfiDevicePathProtocolGuid, &TempDevicePath);
+      Status = gBS->HandleProtocol (GopHandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID*)&TempDevicePath);
       if (EFI_ERROR (Status)) {
         continue;
       }
@@ -717,7 +717,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   DeviceHandle,
                   &gEfiDevicePathProtocolGuid,
-                  &DevicePath
+                  (VOID*)&DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -760,7 +760,7 @@ Returns:
   Status = gBS->HandleProtocol (
                   DeviceHandle,
                   &gEfiDevicePathProtocolGuid,
-                  &DevicePath
+                  (VOID*)&DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -821,7 +821,7 @@ Returns:
   }
 
   for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, &PciIo);
+    Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID*)&PciIo);
     if (EFI_ERROR (Status)) {
       continue;
     }
