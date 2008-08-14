@@ -24,16 +24,16 @@
     0xce345171, 0xba0b, 0x11d2, {0x8e, 0x4f, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }
 
-//
-// Protocol GUID name defined in EFI1.1.
-// 
+///
+/// Protocol GUID name defined in EFI1.1.
+/// 
 #define DISK_IO_PROTOCOL  EFI_DISK_IO_PROTOCOL_GUID
 
 typedef struct _EFI_DISK_IO_PROTOCOL EFI_DISK_IO_PROTOCOL;
 
-//
-// Protocol defined in EFI1.1.
-// 
+///
+/// Protocol defined in EFI1.1.
+/// 
 typedef EFI_DISK_IO_PROTOCOL  EFI_DISK_IO;
 
 /**
@@ -95,9 +95,9 @@ EFI_STATUS
 
 #define EFI_DISK_IO_PROTOCOL_REVISION 0x00010000
 
-//
-// Revision defined in EFI1.1
-// 
+///
+/// Revision defined in EFI1.1
+/// 
 #define EFI_DISK_IO_INTERFACE_REVISION  EFI_DISK_IO_PROTOCOL_REVISION
 
 /**

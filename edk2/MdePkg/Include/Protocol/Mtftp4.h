@@ -111,9 +111,9 @@ typedef union {
 
 #pragma pack()
 
-//
-// MTFTP4 option definition
-//
+///
+/// MTFTP4 option definition
+///
 typedef struct {
   UINT8                   *OptionStr;
   UINT8                   *ValueStr;

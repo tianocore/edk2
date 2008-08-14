@@ -17,9 +17,9 @@
 
 #include <PiDxe.h>
 
-//
-// Global ID for the Driver Configuration Protocol defined in UEFI 2.0
-//
+///
+/// Global ID for the Driver Configuration Protocol defined in UEFI 2.0
+///
 #define EFI_DRIVER_CONFIGURATION2_PROTOCOL_GUID \
   { \
     0xbfd7dc1d, 0x24f1, 0x40d9, {0x82, 0xe7, 0x2e, 0x09, 0xbb, 0x6b, 0x4e, 0xbe } \

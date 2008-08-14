@@ -73,14 +73,14 @@ typedef struct {
   UINT32 Attributes;
 } EFI_ABSOLUTE_POINTER_MODE;
 
-//
-// If set, indicates this device supports an alternate button input. 
-// 
+///
+/// If set, indicates this device supports an alternate button input. 
+/// 
 #define EFI_ABSP_SupportsAltActive    0x00000001
 
-//
-// If set, indicates this device returns pressure data in parameter CurrentZ.
-// 
+///
+/// If set, indicates this device returns pressure data in parameter CurrentZ.
+/// 
 #define EFI_ABSP_SupportsPressureAsZ  0x00000002
 
 

@@ -19,9 +19,9 @@
 
 #include <PiDxe.h>
 
-//
-// Global ID for the Component Name Protocol
-//
+///
+/// Global ID for the Component Name Protocol
+///
 #define EFI_COMPONENT_NAME2_PROTOCOL_GUID \
   {0x6a7a5cff, 0xe8d9, 0x4f70, { 0xba, 0xda, 0x75, 0xab, 0x30, 0x25, 0xce, 0x14 } }
 

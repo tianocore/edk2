@@ -30,19 +30,19 @@
 typedef struct _EFI_UNICODE_COLLATION_PROTOCOL  EFI_UNICODE_COLLATION_PROTOCOL;
 
 
-//
-// Protocol GUID name defined in EFI1.1.
-// 
+///
+/// Protocol GUID name defined in EFI1.1.
+/// 
 #define UNICODE_COLLATION_PROTOCOL              EFI_UNICODE_COLLATION_PROTOCOL_GUID
 
-//
-// Protocol defined in EFI1.1.
-// 
+///
+/// Protocol defined in EFI1.1.
+/// 
 typedef EFI_UNICODE_COLLATION_PROTOCOL          UNICODE_COLLATION_INTERFACE;
 
-//
-// Protocol data structures and defines
-//
+///
+/// Protocol data structures and defines
+///
 #define EFI_UNICODE_BYTE_ORDER_MARK (CHAR16) (0xfeff)
 
 //

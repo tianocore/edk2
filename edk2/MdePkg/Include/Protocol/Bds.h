@@ -17,15 +17,15 @@
 #ifndef __ARCH_PROTOCOL_BDS_H__
 #define __ARCH_PROTOCOL_BDS_H__
 
-//
-// Global ID for the BDS Architectural Protocol
-//
+///
+/// Global ID for the BDS Architectural Protocol
+///
 #define EFI_BDS_ARCH_PROTOCOL_GUID \
   { 0x665E3FF6, 0x46CC, 0x11d4, {0x9A, 0x38, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D } }
 
-//
-// Declare forward reference for the BDS Architectural Protocol
-//
+///
+/// Declare forward reference for the BDS Architectural Protocol
+///
 typedef struct _EFI_BDS_ARCH_PROTOCOL   EFI_BDS_ARCH_PROTOCOL;
 
 /**

@@ -25,14 +25,14 @@
 
 typedef struct _EFI_BLOCK_IO_PROTOCOL  EFI_BLOCK_IO_PROTOCOL;
 
-//
-// Protocol GUID name defined in EFI1.1.
-// 
+///
+/// Protocol GUID name defined in EFI1.1.
+/// 
 #define BLOCK_IO_PROTOCOL       EFI_BLOCK_IO_PROTOCOL_GUID
 
-//
-// Protocol defined in EFI1.1.
-// 
+///
+/// Protocol defined in EFI1.1.
+/// 
 typedef EFI_BLOCK_IO_PROTOCOL   EFI_BLOCK_IO;
 
 /**

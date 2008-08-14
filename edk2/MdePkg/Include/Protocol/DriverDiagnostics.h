@@ -17,9 +17,9 @@
 
 #include <PiDxe.h>
 
-//
-// Global ID for the Driver Diagnostics Protocol as defined in UEFI 2.0.
-//
+///
+/// Global ID for the Driver Diagnostics Protocol as defined in UEFI 2.0.
+///
 #define EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID \
   { \
     0x0784924f, 0xe296, 0x11d4, {0x9a, 0x49, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \

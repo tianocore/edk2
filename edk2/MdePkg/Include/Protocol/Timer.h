@@ -17,15 +17,15 @@
 #ifndef __ARCH_PROTOCOL_TIMER_H__
 #define __ARCH_PROTOCOL_TIMER_H__
 
-//
-// Global ID for the Timer Architectural Protocol
-//
+///
+/// Global ID for the Timer Architectural Protocol
+///
 #define EFI_TIMER_ARCH_PROTOCOL_GUID \
   { 0x26baccb3, 0x6f42, 0x11d4, {0xbc, 0xe7, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }
 
-//
-// Declare forward reference for the Timer Architectural Protocol
-//
+///
+/// Declare forward reference for the Timer Architectural Protocol
+///
 typedef struct _EFI_TIMER_ARCH_PROTOCOL   EFI_TIMER_ARCH_PROTOCOL;
 
 /**

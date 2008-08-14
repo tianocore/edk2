@@ -21,9 +21,9 @@
 typedef struct _EFI_HII_IMAGE_PROTOCOL EFI_HII_IMAGE_PROTOCOL;
 
 
-//
-// Flags in EFI_IMAGE_INPUT
-// 
+///
+/// Flags in EFI_IMAGE_INPUT
+/// 
 #define EFI_IMAGE_TRANSPARENT 0x00000001
 
 /**

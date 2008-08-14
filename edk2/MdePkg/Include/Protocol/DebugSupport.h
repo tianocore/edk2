@@ -24,17 +24,17 @@
 
 typedef struct _EFI_DEBUG_SUPPORT_PROTOCOL EFI_DEBUG_SUPPORT_PROTOCOL;
 
-//
-// Debug Support protocol {2755590C-6F3C-42FA-9EA4-A3BA543CDA25}
-//
+///
+/// Debug Support protocol {2755590C-6F3C-42FA-9EA4-A3BA543CDA25}
+///
 #define EFI_DEBUG_SUPPORT_PROTOCOL_GUID \
   { \
     0x2755590C, 0x6F3C, 0x42FA, {0x9E, 0xA4, 0xA3, 0xBA, 0x54, 0x3C, 0xDA, 0x25 } \
   }
 
-//
-// Debug Support definitions
-//
+///
+/// Debug Support definitions
+///
 typedef INTN  EFI_EXCEPTION_TYPE;
 
 //
@@ -448,14 +448,14 @@ typedef struct {
 #define EXCEPT_EBC_INSTRUCTION_ENCODING 8   // malformed instruction
 #define EXCEPT_EBC_BAD_BREAK            9   // BREAK 0 or undefined BREAK
 #define EXCEPT_EBC_STEP                 10  // to support debug stepping
-//
-// For coding convenience, define the maximum valid EBC exception.
-//
+///
+/// For coding convenience, define the maximum valid EBC exception.
+///
 #define MAX_EBC_EXCEPTION EXCEPT_EBC_STEP
 
-//
-//  EBC processor context definition
-//
+///
+///  EBC processor context definition
+///
 typedef struct {
   UINT64  R0;
   UINT64  R1;
@@ -470,9 +470,9 @@ typedef struct {
   UINT64  Ip;
 } EFI_SYSTEM_CONTEXT_EBC;
 
-//
-// Universal EFI_SYSTEM_CONTEXT definition
-//
+///
+/// Universal EFI_SYSTEM_CONTEXT definition
+///
 typedef union {
   EFI_SYSTEM_CONTEXT_EBC  *SystemContextEbc;
   EFI_SYSTEM_CONTEXT_IA32 *SystemContextIa32;

@@ -20,14 +20,14 @@
     0x13AC6DD1, 0x73D0, 0x11D4, {0xB0, 0x6B, 0x00, 0xAA, 0x00, 0xBD, 0x6D, 0xE7 } \
   }
 
-//
-// Protocol Guid Name defined in spec.
-//
+///
+/// Protocol Guid Name defined in spec.
+///
 #define EFI_EBC_PROTOCOL_GUID EFI_EBC_INTERPRETER_PROTOCOL_GUID
 
-//
-// Define for forward reference.
-//
+///
+/// Define for forward reference.
+///
 typedef struct _EFI_EBC_PROTOCOL EFI_EBC_PROTOCOL;
 
 /**

@@ -27,17 +27,17 @@
 #ifndef __ARCH_PROTOCOL_RUNTIME_H__
 #define __ARCH_PROTOCOL_RUNTIME_H__
 
-//
-// Global ID for the Runtime Architectural Protocol
-//
+///
+/// Global ID for the Runtime Architectural Protocol
+///
 #define EFI_RUNTIME_ARCH_PROTOCOL_GUID \
   { 0xb7dfb4e1, 0x52f, 0x449f, {0x87, 0xbe, 0x98, 0x18, 0xfc, 0x91, 0xb7, 0x33 } }
 
 typedef struct _EFI_RUNTIME_ARCH_PROTOCOL  EFI_RUNTIME_ARCH_PROTOCOL;
 
-//
-// LIST_ENTRY from BaseType 
-//
+///
+/// LIST_ENTRY from BaseType 
+///
 typedef LIST_ENTRY EFI_LIST_ENTRY;
 
 typedef struct _EFI_RUNTIME_IMAGE_ENTRY  EFI_RUNTIME_IMAGE_ENTRY;

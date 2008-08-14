@@ -21,9 +21,9 @@
 
 #include <Guid/PcAnsi.h>
 
-//
-// Device Path protocol
-//
+///
+/// Device Path protocol
+///
 #define EFI_DEVICE_PATH_PROTOCOL_GUID \
   { \
     0x9576e91, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
@@ -33,9 +33,9 @@
 // Protocol GUID defined in EFI1.1.
 // 
 
-//
-// Device Path information
-//
+///
+/// Device Path information
+///
 #define DEVICE_PATH_PROTOCOL  EFI_DEVICE_PATH_PROTOCOL_GUID
 
 #pragma pack(1)
@@ -46,14 +46,14 @@ typedef struct {
   UINT8 Length[2];
 } EFI_DEVICE_PATH_PROTOCOL;
 
-//
-// For backward-compatible with EFI1.1.
-// 
+///
+/// For backward-compatible with EFI1.1.
+/// 
 typedef EFI_DEVICE_PATH_PROTOCOL  EFI_DEVICE_PATH;
 
-//
-// Hardware Device Paths
-//
+///
+/// Hardware Device Paths
+///
 #define HARDWARE_DEVICE_PATH      0x01
 
 #define HW_PCI_DP                 0x01
@@ -89,9 +89,9 @@ typedef struct {
   UINT32                          ControllerNumber;
 } CONTROLLER_DEVICE_PATH;
 
-//
-// ACPI Device Paths
-//
+///
+/// ACPI Device Paths
+///
 #define ACPI_DEVICE_PATH          0x02
 
 #define ACPI_DP                   0x01
@@ -107,10 +107,10 @@ typedef struct {
   UINT32                          HID;
   UINT32                          UID;
   UINT32                          CID;
-  //
-  // Optional variable length _HIDSTR
-  // Optional variable length _UIDSTR
-  //
+  ///
+  /// Optional variable length _HIDSTR
+  /// Optional variable length _UIDSTR
+  ///
 } ACPI_EXTENDED_HID_DEVICE_PATH;
 
 //
@@ -151,9 +151,9 @@ typedef struct {
                       (((_Port)           & 0xf) << 4)  |  \
                        ((_Index)          & 0xf) ))
 
-//
-// Messaging Device Paths
-//
+///
+/// Messaging Device Paths
+///
 #define MESSAGING_DEVICE_PATH     0x03
 
 #define MSG_ATAPI_DP              0x01
@@ -426,9 +426,9 @@ typedef struct {
 #define BBS_TYPE_UNKNOWN          0xFF
 
 
-//
-// Union of all possible Device Paths and pointers to Device Paths
-//
+///
+/// Union of all possible Device Paths and pointers to Device Paths
+///
 
 typedef union {
   EFI_DEVICE_PATH_PROTOCOL             DevPath;

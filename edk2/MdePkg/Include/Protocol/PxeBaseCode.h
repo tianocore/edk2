@@ -15,9 +15,9 @@
 #ifndef __PXE_BASE_CODE_PROTOCOL_H__
 #define __PXE_BASE_CODE_PROTOCOL_H__
 
-//
-// PXE Base Code protocol
-//
+///
+/// PXE Base Code protocol
+///
 #define EFI_PXE_BASE_CODE_PROTOCOL_GUID \
   { \
     0x03c4e603, 0xac28, 0x11d3, {0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
@@ -25,20 +25,20 @@
 
 typedef struct _EFI_PXE_BASE_CODE_PROTOCOL  EFI_PXE_BASE_CODE_PROTOCOL;
 
-//
-// Protocol defined in EFI1.1.
-// 
+///
+/// Protocol defined in EFI1.1.
+/// 
 typedef EFI_PXE_BASE_CODE_PROTOCOL  EFI_PXE_BASE_CODE;
 
-//
-// Default IP TTL and ToS.
-//
+///
+/// Default IP TTL and ToS.
+///
 #define DEFAULT_TTL 16
 #define DEFAULT_ToS 0
 
-//
-// ICMP error format
-//
+///
+/// ICMP error format
+///
 typedef struct {
   UINT8   Type;
   UINT8   Code;
@@ -55,17 +55,17 @@ typedef struct {
   UINT8 Data[494];
 } EFI_PXE_BASE_CODE_ICMP_ERROR;
 
-//
-// TFTP error format
-//
+///
+/// TFTP error format
+///
 typedef struct {
   UINT8 ErrorCode;
   CHAR8 ErrorString[127];
 } EFI_PXE_BASE_CODE_TFTP_ERROR;
 
-//
-// IP Receive Filter definitions
-//
+///
+/// IP Receive Filter definitions
+///
 #define EFI_PXE_BASE_CODE_MAX_IPCNT 8
 
 typedef struct {
@@ -80,9 +80,9 @@ typedef struct {
 #define EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS           0x0004
 #define EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST 0x0008
 
-//
-// ARP Cache definitions
-//
+///
+/// ARP Cache definitions
+///
 typedef struct {
   EFI_IP_ADDRESS  IpAddr;
   EFI_MAC_ADDRESS MacAddr;
@@ -136,9 +136,9 @@ typedef UINT16  EFI_PXE_BASE_CODE_UDP_PORT;
 #define EFI_PXE_BASE_CODE_BOOT_LAYER_MASK     0x7FFF
 #define EFI_PXE_BASE_CODE_BOOT_LAYER_INITIAL  0x0000
 
-//
-// Discover() server list structure.
-//
+///
+/// Discover() server list structure.
+///
 typedef struct {
   UINT16          Type;
   BOOLEAN         AcceptAnyResponse;
@@ -146,9 +146,9 @@ typedef struct {
   EFI_IP_ADDRESS  IpAddr;
 } EFI_PXE_BASE_CODE_SRVLIST;
 
-//
-// Discover() information override structure.
-//
+///
+/// Discover() information override structure.
+///
 typedef struct {
   BOOLEAN                   UseMCast;
   BOOLEAN                   UseBCast;
@@ -159,9 +159,9 @@ typedef struct {
   EFI_PXE_BASE_CODE_SRVLIST SrvList[1];
 } EFI_PXE_BASE_CODE_DISCOVER_INFO;
 
-//
-// Mtftp() definitions
-//
+///
+/// Mtftp() definitions
+///
 typedef enum {
   EFI_PXE_BASE_CODE_TFTP_FIRST,
   EFI_PXE_BASE_CODE_TFTP_GET_FILE_SIZE,

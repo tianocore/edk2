@@ -17,9 +17,9 @@
 #ifndef _PXE_BASE_CODE_CALLBACK_H_
 #define _PXE_BASE_CODE_CALLBACK_H_
 
-//
-// Call Back Definitions
-//
+///
+/// Call Back Definitions
+///
 #define EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_GUID \
   { \
     0x245dca21, 0xfb7b, 0x11d3, {0x8f, 0x01, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
@@ -32,14 +32,14 @@
 #define EFI_PXE_BASE_CODE_CALLBACK_INTERFACE_REVISION  \
         EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION
 
-//
-// Protocol definition
-//
+///
+/// Protocol definition
+///
 typedef struct _EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL  EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL;
 
-//
-// Protocol defined in EFI1.1.
-// 
+///
+/// Protocol defined in EFI1.1.
+/// 
 typedef EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL   EFI_PXE_BASE_CODE_CALLBACK;
 
 typedef enum {
