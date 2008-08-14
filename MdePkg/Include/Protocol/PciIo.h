@@ -16,9 +16,9 @@
 #ifndef __PCI_IO_H__
 #define __PCI_IO_H__
 
-//
-// Global ID for the PCI I/O Protocol
-//
+///
+/// Global ID for the PCI I/O Protocol
+///
 #define EFI_PCI_IO_PROTOCOL_GUID \
   { \
     0x4cf5b200, 0x68b8, 0x4ca5, {0x9e, 0xec, 0xb2, 0x3e, 0x3f, 0x50, 0x2, 0x9a } \
@@ -26,9 +26,9 @@
 
 typedef struct _EFI_PCI_IO_PROTOCOL  EFI_PCI_IO_PROTOCOL;
 
-//
-// Prototypes for the PCI I/O Protocol
-//
+///
+/// Prototypes for the PCI I/O Protocol
+///
 typedef enum {
   EfiPciIoWidthUint8      = 0,
   EfiPciIoWidthUint16,
@@ -73,11 +73,11 @@ typedef enum {
 #define EFI_PCI_DEVICE_ENABLE                     (EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY | EFI_PCI_IO_ATTRIBUTE_BUS_MASTER)
 #define EFI_VGA_DEVICE_ENABLE                     (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_IO)
 
-//
-// *******************************************************
-// EFI_PCI_IO_PROTOCOL_OPERATION
-// *******************************************************
-//
+///
+/// *******************************************************
+/// EFI_PCI_IO_PROTOCOL_OPERATION
+/// *******************************************************
+///
 typedef enum {
   EfiPciIoOperationBusMasterRead,
   EfiPciIoOperationBusMasterWrite,
@@ -85,11 +85,11 @@ typedef enum {
   EfiPciIoOperationMaximum
 } EFI_PCI_IO_PROTOCOL_OPERATION;
 
-//
-// *******************************************************
-// EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION
-// *******************************************************
-//
+///
+/// *******************************************************
+/// EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION
+/// *******************************************************
+///
 typedef enum {
   EfiPciIoAttributeOperationGet,
   EfiPciIoAttributeOperationSet,

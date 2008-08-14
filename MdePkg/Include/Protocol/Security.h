@@ -30,9 +30,9 @@
 
 #include <PiDxe.h>
 
-//
-// Global ID for the Security Code Architectural Protocol
-//
+///
+/// Global ID for the Security Code Architectural Protocol
+///
 #define EFI_SECURITY_ARCH_PROTOCOL_GUID  \
   { 0xA46423E3, 0x4617, 0x49f1, {0xB9, 0xFF, 0xD1, 0xBF, 0xA9, 0x11, 0x58, 0x39 } }
 

@@ -30,72 +30,72 @@
 typedef struct _EFI_SIMPLE_NETWORK_PROTOCOL  EFI_SIMPLE_NETWORK_PROTOCOL;
 
 
-//
-// Protocol defined in EFI1.1.
-// 
+///
+/// Protocol defined in EFI1.1.
+/// 
 typedef EFI_SIMPLE_NETWORK_PROTOCOL   EFI_SIMPLE_NETWORK;
 
-//
-// Simple Network Protocol data structures
-//
+///
+/// Simple Network Protocol data structures
+///
 typedef struct {
-  //
-  // Total number of frames received.  Includes frames with errors and
-  // dropped frames.
-  //
+  ///
+  /// Total number of frames received.  Includes frames with errors and
+  /// dropped frames.
+  ///
   UINT64  RxTotalFrames;
 
-  //
-  // Number of valid frames received and copied into receive buffers.
-  //
+  ///
+  /// Number of valid frames received and copied into receive buffers.
+  ///
   UINT64  RxGoodFrames;
 
-  //
-  // Number of frames below the minimum length for the media.
-  // This would be <64 for ethernet.
-  //
+  ///
+  /// Number of frames below the minimum length for the media.
+  /// This would be <64 for ethernet.
+  ///
   UINT64  RxUndersizeFrames;
 
-  //
-  // Number of frames longer than the maxminum length for the
-  // media.  This would be >1500 for ethernet.
-  //
+  ///
+  /// Number of frames longer than the maxminum length for the
+  /// media.  This would be >1500 for ethernet.
+  ///
   UINT64  RxOversizeFrames;
 
-  //
-  // Valid frames that were dropped because receive buffers were full.
-  //
+  ///
+  /// Valid frames that were dropped because receive buffers were full.
+  ///
   UINT64  RxDroppedFrames;
 
-  //
-  // Number of valid unicast frames received and not dropped.
-  //
+  ///
+  /// Number of valid unicast frames received and not dropped.
+  ///
   UINT64  RxUnicastFrames;
 
-  //
-  // Number of valid broadcast frames received and not dropped.
-  //
+  ///
+  /// Number of valid broadcast frames received and not dropped.
+  ///
   UINT64  RxBroadcastFrames;
 
-  //
-  // Number of valid mutlicast frames received and not dropped.
-  //
+  ///
+  /// Number of valid mutlicast frames received and not dropped.
+  ///
   UINT64  RxMulticastFrames;
 
-  //
-  // Number of frames w/ CRC or alignment errors.
-  //
+  ///
+  /// Number of frames w/ CRC or alignment errors.
+  ///
   UINT64  RxCrcErrorFrames;
 
-  //
-  // Total number of bytes received.  Includes frames with errors
-  // and dropped frames.
+  ///
+  /// Total number of bytes received.  Includes frames with errors
+  /// and dropped frames.
   //
   UINT64  RxTotalBytes;
 
-  //
-  // Transmit statistics.
-  //
+  ///
+  /// Transmit statistics.
+  ///
   UINT64  TxTotalFrames;
   UINT64  TxGoodFrames;
   UINT64  TxUndersizeFrames;
@@ -107,14 +107,14 @@ typedef struct {
   UINT64  TxCrcErrorFrames;
   UINT64  TxTotalBytes;
 
-  //
-  // Number of collisions detection on this subnet.
-  //
+  ///
+  /// Number of collisions detection on this subnet.
+  ///
   UINT64  Collisions;
 
-  //
-  // Number of frames destined for unsupported protocol.
-  //
+  ///
+  /// Number of frames destined for unsupported protocol.
+  ///
   UINT64  UnsupportedProtocol;
 
 } EFI_NETWORK_STATISTICS;

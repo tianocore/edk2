@@ -19,9 +19,9 @@
 #define __DEBUG_PORT_H__
 
 
-//
-// DebugPortIo protocol {EBA4E8D2-3858-41EC-A281-2647BA9660D0}
-//
+///
+/// DebugPortIo protocol {EBA4E8D2-3858-41EC-A281-2647BA9660D0}
+///
 #define EFI_DEBUGPORT_PROTOCOL_GUID \
   { \
     0xEBA4E8D2, 0x3858, 0x41EC, {0xA2, 0x81, 0x26, 0x47, 0xBA, 0x96, 0x60, 0xD0 } \

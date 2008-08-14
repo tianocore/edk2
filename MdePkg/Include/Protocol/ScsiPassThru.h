@@ -27,9 +27,9 @@
     0xa59e8fcf, 0xbda0, 0x43bb, {0x90, 0xb1, 0xd3, 0x73, 0x2e, 0xca, 0xa8, 0x77 } \
   }
 
-//
-// Forward reference for pure ANSI compatability
-//
+///
+/// Forward reference for pure ANSI compatability
+///
 typedef struct _EFI_SCSI_PASS_THRU_PROTOCOL  EFI_SCSI_PASS_THRU_PROTOCOL;
 
 #define EFI_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL    0x0001

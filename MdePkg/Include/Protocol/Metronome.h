@@ -17,15 +17,15 @@
 #ifndef __ARCH_PROTOCOL_METRONOME_H__
 #define __ARCH_PROTOCOL_METRONOME_H__
 
-//
-// Global ID for the Metronome Architectural Protocol
-//
+///
+/// Global ID for the Metronome Architectural Protocol
+///
 #define EFI_METRONOME_ARCH_PROTOCOL_GUID \
   { 0x26baccb2, 0x6f42, 0x11d4, {0xbc, 0xe7, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }
 
-//
-// Declare forward reference for the Metronome Architectural Protocol
-//
+///
+/// Declare forward reference for the Metronome Architectural Protocol
+///
 typedef struct _EFI_METRONOME_ARCH_PROTOCOL   EFI_METRONOME_ARCH_PROTOCOL;
 
 /**

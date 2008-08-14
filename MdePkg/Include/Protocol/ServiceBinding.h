@@ -18,9 +18,9 @@
 #ifndef __EFI_SERVICE_BINDING_H__
 #define __EFI_SERVICE_BINDING_H__
 
-//
-// Forward reference for pure ANSI compatability
-//
+///
+/// Forward reference for pure ANSI compatability
+///
 typedef struct _EFI_SERVICE_BINDING_PROTOCOL EFI_SERVICE_BINDING_PROTOCOL;
 
 /**

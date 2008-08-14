@@ -20,9 +20,9 @@
 
 #include <PiDxe.h>
 #include <Protocol/DevicePath.h>
-//
-// Global ID for the ControllerHandle Driver Protocol
-//
+///
+/// Global ID for the ControllerHandle Driver Protocol
+///
 #define EFI_DRIVER_BINDING_PROTOCOL_GUID \
   { \
     0x18a031ab, 0xb443, 0x4d1a, {0xa5, 0xc0, 0xc, 0x9, 0x26, 0x1e, 0x9f, 0x71 } \

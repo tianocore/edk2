@@ -32,14 +32,14 @@ typedef struct _EFI_FILE_PROTOCOL         EFI_FILE_PROTOCOL;
 typedef struct _EFI_FILE_PROTOCOL         *EFI_FILE_HANDLE;
 
 
-//
-// Protocol GUID defined in EFI1.1.
-// 
+///
+/// Protocol GUID defined in EFI1.1.
+/// 
 #define SIMPLE_FILE_SYSTEM_PROTOCOL       EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 
-//
-// Protocol defined in EFI1.1.
-// 
+///
+/// Protocol defined in EFI1.1.
+/// 
 typedef EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   EFI_FILE_IO_INTERFACE;
 typedef struct _EFI_FILE_PROTOCOL         EFI_FILE;
 
@@ -67,9 +67,9 @@ EFI_STATUS
 ;
 
 #define EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION  0x00010000
-//
-// Revision defined in EFI1.1
-// 
+///
+/// Revision defined in EFI1.1
+/// 
 #define EFI_FILE_IO_INTERFACE_REVISION  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION
 
 struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {

@@ -45,19 +45,19 @@ typedef VOID    *BIS_APPLICATION_HANDLE;
 typedef UINT16  BIS_ALG_ID;
 typedef UINT32  BIS_CERT_ID;
 
-//
-// EFI_BIS_DATA type.
-//
-// EFI_BIS_DATA instances obtained from BIS must be freed by calling Free( ).
-//
+///
+/// EFI_BIS_DATA type.
+///
+/// EFI_BIS_DATA instances obtained from BIS must be freed by calling Free( ).
+///
 typedef struct {
   UINT32  Length; // Length of Data in 8 bit bytes.
   UINT8   *Data;  // 32 Bit Flat Address of data.
 } EFI_BIS_DATA;
 
-//
-// EFI_BIS_VERSION type.
-//
+///
+/// EFI_BIS_VERSION type.
+///
 typedef struct {
   UINT32  Major;  // BIS Interface version number.
   UINT32  Minor;  // Build number.
@@ -72,53 +72,53 @@ typedef struct {
 #define BIS_CURRENT_VERSION_MAJOR BIS_VERSION_1
 #define BIS_VERSION_1             1
 
-//
-// EFI_BIS_SIGNATURE_INFO type.
-//
+///
+/// EFI_BIS_SIGNATURE_INFO type.
+///
 typedef struct {
   BIS_CERT_ID CertificateID;  // Truncated hash of platform Boot Object
-  //  authorization certificate.
-  //
+  ///  authorization certificate.
+  ///
   BIS_ALG_ID  AlgorithmID;  // A signature algorithm number.
   UINT16      KeyLength;    // Length of alg. keys in bits.
 } EFI_BIS_SIGNATURE_INFO;
 
-//
-// Currently defined values for EFI_BIS_SIGNATURE_INFO.AlgorithmID.
-// The exact numeric values come from
-//    "Common Data Security Architecture (CDSA) Specification".
-//
+///
+/// Currently defined values for EFI_BIS_SIGNATURE_INFO.AlgorithmID.
+/// The exact numeric values come from
+///    "Common Data Security Architecture (CDSA) Specification".
+///
 #define BIS_ALG_DSA     (41)  // CSSM_ALGID_DSA
 #define BIS_ALG_RSA_MD5 (42)  // CSSM_ALGID_MD5_WITH_RSA
-// Currently defined values for EFI_BIS_SIGNATURE_INFO.CertificateId.
-//
+/// Currently defined values for EFI_BIS_SIGNATURE_INFO.CertificateId.
+///
 #define BIS_CERT_ID_DSA     BIS_ALG_DSA     // CSSM_ALGID_DSA
 #define BIS_CERT_ID_RSA_MD5 BIS_ALG_RSA_MD5 // CSSM_ALGID_MD5_WITH_RSA
-// The  following  is a mask value that gets applied to the truncated hash of a
-// platform  Boot Object Authorization Certificate to create the certificateID.
-// A certificateID must not have any bits set to the value 1 other than bits in
-// this mask.
-//
+/// The  following  is a mask value that gets applied to the truncated hash of a
+/// platform  Boot Object Authorization Certificate to create the certificateID.
+/// A certificateID must not have any bits set to the value 1 other than bits in
+/// this mask.
+///
 #define BIS_CERT_ID_MASK  (0xFF7F7FFF)
 
-//
-// Macros for dealing with the EFI_BIS_DATA object obtained
-// from BIS_GetSignatureInfo()
-// BIS_GET_SIGINFO_COUNT - tells how many EFI_BIS_SIGNATURE_INFO
-//  elements are contained in a EFI_BIS_DATA struct pointed to
-//  by the provided EFI_BIS_DATA*.
-//
+///
+/// Macros for dealing with the EFI_BIS_DATA object obtained
+/// from BIS_GetSignatureInfo()
+/// BIS_GET_SIGINFO_COUNT - tells how many EFI_BIS_SIGNATURE_INFO
+///  elements are contained in a EFI_BIS_DATA struct pointed to
+///  by the provided EFI_BIS_DATA*.
+///
 #define BIS_GET_SIGINFO_COUNT(BisDataPtr) ((BisDataPtr)->Length / sizeof (EFI_BIS_SIGNATURE_INFO))
 
-//
-// BIS_GET_SIGINFO_ARRAY - produces a EFI_BIS_SIGNATURE_INFO*
-//  from a given EFI_BIS_DATA*.
-//
+///
+/// BIS_GET_SIGINFO_ARRAY - produces a EFI_BIS_SIGNATURE_INFO*
+///  from a given EFI_BIS_DATA*.
+///
 #define BIS_GET_SIGINFO_ARRAY(BisDataPtr) ((EFI_BIS_SIGNATURE_INFO *) (BisDataPtr)->Data)
 
-//
-// Support old name for backward compatible
-//
+///
+/// Support old name for backward compatible
+///
 #define BOOT_OBJECT_AUTHORIZATION_PARMSET_GUIDVALUE \
         BOOT_OBJECT_AUTHORIZATION_PARMSET_GUID
 

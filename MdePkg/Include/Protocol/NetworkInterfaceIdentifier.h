@@ -24,19 +24,19 @@
 
 #define EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION    0x00010000
 
-//
-// Revision defined in EFI1.1.
-// 
+///
+/// Revision defined in EFI1.1.
+/// 
 #define EFI_NETWORK_INTERFACE_IDENTIFIER_INTERFACE_REVISION   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION
 
-//
-// Forward reference for pure ANSI compatability
-//
+///
+/// Forward reference for pure ANSI compatability
+///
 typedef struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL;
 
-//
-// Protocol defined in EFI1.1.
-// 
+///
+/// Protocol defined in EFI1.1.
+/// 
 typedef EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL   EFI_NETWORK_INTERFACE_IDENTIFIER_INTERFACE;
 
 typedef enum {

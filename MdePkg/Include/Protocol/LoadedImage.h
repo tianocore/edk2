@@ -30,19 +30,19 @@
     0xbc62157e, 0x3e33, 0x4fec, {0x99, 0x20, 0x2d, 0x3b, 0x36, 0xd7, 0x50, 0xdf } \
   }
 
-//
-// Protocol GUID defined in EFI1.1.
-// 
+///
+/// Protocol GUID defined in EFI1.1.
+/// 
 #define LOADED_IMAGE_PROTOCOL   EFI_LOADED_IMAGE_PROTOCOL_GUID
 
-//
-// EFI_SYSTEM_TABLE & EFI_IMAGE_UNLOAD are defined in EfiApi.h
-//
+///
+/// EFI_SYSTEM_TABLE & EFI_IMAGE_UNLOAD are defined in EfiApi.h
+///
 #define EFI_LOADED_IMAGE_PROTOCOL_REVISION  0x1000
 
-//
-// Revision defined in EFI1.1.
-// 
+///
+/// Revision defined in EFI1.1.
+/// 
 #define EFI_LOADED_IMAGE_INFORMATION_REVISION    EFI_LOADED_IMAGE_PROTOCOL_REVISION
 
 /**  

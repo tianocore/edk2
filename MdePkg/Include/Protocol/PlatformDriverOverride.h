@@ -15,9 +15,9 @@
 #ifndef __EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL_H__
 #define __EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL_H__
 
-//
-// Global ID for the Platform Driver Override Protocol
-//
+///
+/// Global ID for the Platform Driver Override Protocol
+///
 #define EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL_GUID \
   { \
     0x6b30c738, 0xa391, 0x11d4, {0x9a, 0x3b, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \

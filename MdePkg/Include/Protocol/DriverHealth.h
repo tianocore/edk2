@@ -22,9 +22,9 @@
   
 typedef struct _EFI_DRIVER_HEALTH_PROTOCOL  EFI_DRIVER_HEALTH_PROTOCOL;
 
-//
-// EFI_DRIVER_HEALTH_HEALTH_STATUS
-//
+///
+/// EFI_DRIVER_HEALTH_HEALTH_STATUS
+///
 typedef enum {
   EfiDriverHealthStatusHealthy,
   EfiDriverHealthStatusRepairRequired,
@@ -34,9 +34,9 @@ typedef enum {
   EfiDriverHealthStatusRebootRequired
 } EFI_DRIVER_HEALTH_HEALTH_STATUS;
 
-//
-// EFI_DRIVER_HEALTH_HII_MESSAGE
-//
+///
+/// EFI_DRIVER_HEALTH_HII_MESSAGE
+///
 typedef struct {
   EFI_HII_HANDLE  HiiHandle;
   EFI_STRING_ID   StringId;
