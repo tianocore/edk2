@@ -16,9 +16,9 @@
 #ifndef _TPM12_H_
 #define _TPM12_H_
 
-//
-// The start of TPM return codes
-//
+///
+/// The start of TPM return codes
+///
 #define TPM_BASE                    (EFI_MAX_BIT + (EFI_MAX_BIT >> 1))
 
 //
