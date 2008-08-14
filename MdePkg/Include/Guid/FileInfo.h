@@ -37,13 +37,13 @@ typedef struct {
   CHAR16    FileName[1];
 } EFI_FILE_INFO;
 
-//
-// The FileName field of the EFI_FILE_INFO data structure is variable length.
-// Whenever code needs to know the size of the EFI_FILE_INFO data structure, it needs to
-// be the size of the data structure without the FileName field.  The following macro
-// computes this size correctly no matter how big the FileName array is declared.
-// This is required to make the EFI_FILE_INFO data structure ANSI compilant.
-//
+///
+/// The FileName field of the EFI_FILE_INFO data structure is variable length.
+/// Whenever code needs to know the size of the EFI_FILE_INFO data structure, it needs to
+/// be the size of the data structure without the FileName field.  The following macro
+/// computes this size correctly no matter how big the FileName array is declared.
+/// This is required to make the EFI_FILE_INFO data structure ANSI compilant.
+///
 #define SIZE_OF_EFI_FILE_INFO EFI_FIELD_OFFSET (EFI_FILE_INFO, FileName)
 
 extern EFI_GUID gEfiFileInfoGuid;

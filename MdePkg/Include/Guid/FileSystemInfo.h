@@ -29,13 +29,13 @@ typedef struct {
   CHAR16  VolumeLabel[1];
 } EFI_FILE_SYSTEM_INFO;
 
-//
-// The VolumeLabel field of the EFI_FILE_SYSTEM_INFO data structure is variable length.
-// Whenever code needs to know the size of the EFI_FILE_SYSTEM_INFO data structure, it needs
-// to be the size of the data structure without the VolumeLable field.  The following macro
-// computes this size correctly no matter how big the VolumeLable array is declared.
-// This is required to make the EFI_FILE_SYSTEM_INFO data structure ANSI compilant.
-//
+///
+/// The VolumeLabel field of the EFI_FILE_SYSTEM_INFO data structure is variable length.
+/// Whenever code needs to know the size of the EFI_FILE_SYSTEM_INFO data structure, it needs
+/// to be the size of the data structure without the VolumeLable field.  The following macro
+/// computes this size correctly no matter how big the VolumeLable array is declared.
+/// This is required to make the EFI_FILE_SYSTEM_INFO data structure ANSI compilant.
+///
 #define SIZE_OF_EFI_FILE_SYSTEM_INFO  EFI_FIELD_OFFSET (EFI_FILE_SYSTEM_INFO, VolumeLabel)
 
 extern EFI_GUID gEfiFileSystemInfoGuid;
