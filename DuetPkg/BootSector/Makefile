@@ -37,8 +37,12 @@ LIBS =
 
 COMMON_DEPS = 
 
+ifeq ($(TOOLCHAIN_TAG), MSFT)
 all: $(TARGET_FILES)
-            
+else
+all:
+endif
+          
 #=============                
 $(OUTPUT_DIR)\bootsect.obj:$(MODULE_DIR)\bootsect.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\bootsect.obj" /FR"$(OUTPUT_DIR)\bootsect.txt" "$(MODULE_DIR)\bootsect.asm"
