@@ -15,29 +15,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __MODULE_ENTRY_POINT_H__
 #define __MODULE_ENTRY_POINT_H__
 
-//
-// Declare the EFI/UEFI Specification Revision to which this driver is implemented 
-//
+///
+/// Declare the EFI/UEFI Specification Revision to which this driver is implemented 
+///
 extern const UINT32                   _gUefiDriverRevision;
 
-//
-// Declare the number of entry points in the image. 
-//
+///
+/// Declare the number of entry points in the image. 
+///
 extern const UINT8                    _gDriverEntryPointCount;
 
-//
-// Declare the number of unload handler in the image. 
-//
+///
+/// Declare the number of unload handler in the image. 
+///
 extern const UINT8                    _gDriverUnloadImageCount;
 
-//
-// Declare the arrary of Boot Sevice Exit Event callbacks . 
-//
+///
+/// Declare the arrary of Boot Sevice Exit Event callbacks . 
+///
 extern const EFI_EVENT_NOTIFY         _gDriverExitBootServicesEvent[];
 
-//
-// Declare the arrary of Virtual Address Change Event callbacks . 
-//
+///
+/// Declare the arrary of Virtual Address Change Event callbacks . 
+///
 extern const EFI_EVENT_NOTIFY         _gDriverSetVirtualAddressMapEvent[];
 
 /**

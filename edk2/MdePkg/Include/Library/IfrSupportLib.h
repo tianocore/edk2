@@ -63,21 +63,21 @@ typedef struct {
 #pragma pack()
 
 typedef struct {
-  //
-  // Buffer size allocated for Data.
-  //
+  ///
+  /// Buffer size allocated for Data.
+  ///
   UINT32                BufferSize;
 
-  //
-  // Offset in Data to append the newly created opcode binary.
-  // It will be adjusted automatically in Create***OpCode(), and should be
-  // initialized to 0 before invocation of a serial of Create***OpCode()
-  //
+  ///
+  /// Offset in Data to append the newly created opcode binary.
+  /// It will be adjusted automatically in Create***OpCode(), and should be
+  /// initialized to 0 before invocation of a serial of Create***OpCode()
+  ///
   UINT32                Offset;
 
-  //
-  // The destination buffer for created op-codes
-  //
+  ///
+  /// The destination buffer for created op-codes
+  ///
   UINT8                 *Data;
 } EFI_HII_UPDATE_DATA;
 

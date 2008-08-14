@@ -18,9 +18,9 @@
 
 #include <Protocol/UsbIo.h>
 
-//
-// define the timeout time as 3ms
-//
+///
+/// define the timeout time as 3ms
+///
 #define TIMEOUT_VALUE 3 * 1000
 
 /**

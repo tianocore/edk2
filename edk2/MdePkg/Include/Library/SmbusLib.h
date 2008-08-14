@@ -15,9 +15,9 @@
 #ifndef __SMBUS_LIB__
 #define __SMBUS_LIB__
 
-//
-// PEC BIT is bit 22 in SMBUS address
-//
+///
+/// PEC BIT is bit 22 in SMBUS address
+///
 #define SMBUS_LIB_PEC_BIT   (1 << 22)
 
 /**
