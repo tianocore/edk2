@@ -19,11 +19,11 @@
 #ifndef __FIRMWARE_VOLUME_PPI_H__
 #define __FIRMWARE_VOLUME_PPI_H__
 
-//
-// The GUID for this PPI is the same as the firmware volume format GUID.
-// can be EFI_FIRMWARE_FILE_SYSTEM2_GUID or the GUID for a user-defined format. The
-// EFI_FIRMWARE_FILE_SYSTEM2_GUID is the PI Firmware Volume format.
-// 
+///
+/// The GUID for this PPI is the same as the firmware volume format GUID.
+/// can be EFI_FIRMWARE_FILE_SYSTEM2_GUID or the GUID for a user-defined format. The
+/// EFI_FIRMWARE_FILE_SYSTEM2_GUID is the PI Firmware Volume format.
+/// 
 
 typedef struct _EFI_PEI_FIRMWARE_VOLUME_PPI   EFI_PEI_FIRMWARE_VOLUME_PPI;
 

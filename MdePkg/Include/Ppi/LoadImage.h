@@ -26,7 +26,7 @@
 
 typedef struct _EFI_PEI_LOADED_IMAGE_PPI  EFI_PEI_LOADED_IMAGE_PPI;
 
-/*
+/**
   @par Ppi Description:
   This interface is installed by the PEI Dispatcher after the image has been
   loaded and after all security checks have been performed, 
