@@ -36,9 +36,9 @@ typedef struct {
 
 typedef UINT64 PHYSICAL_ADDRESS;
 
-//
-// LIST_ENTRY definition
-//
+///
+/// LIST_ENTRY definition
+///
 typedef struct _LIST_ENTRY LIST_ENTRY;
 
 struct _LIST_ENTRY {

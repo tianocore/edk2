@@ -42,17 +42,17 @@ typedef UINT16                    STRING_REF;
 typedef UINT64                    EFI_PHYSICAL_ADDRESS;
 typedef UINT64                    EFI_VIRTUAL_ADDRESS;
 
-//
-// EFI Time Abstraction:
-//  Year:       2000 - 20XX
-//  Month:      1 - 12
-//  Day:        1 - 31
-//  Hour:       0 - 23
-//  Minute:     0 - 59
-//  Second:     0 - 59
-//  Nanosecond: 0 - 999,999,999
-//  TimeZone:   -1440 to 1440 or 2047
-//
+///
+/// EFI Time Abstraction:
+///  Year:       2000 - 20XX
+///  Month:      1 - 12
+///  Day:        1 - 31
+///  Hour:       0 - 23
+///  Minute:     0 - 59
+///  Second:     0 - 59
+///  Nanosecond: 0 - 999,999,999
+///  TimeZone:   -1440 to 1440 or 2047
+///
 typedef struct {
   UINT16  Year;
   UINT8   Month;

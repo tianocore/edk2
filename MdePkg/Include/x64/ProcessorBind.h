@@ -15,9 +15,9 @@
 #ifndef __PROCESSOR_BIND_H__
 #define __PROCESSOR_BIND_H__
 
-//
-// Define the processor type so other code can make processor based choices
-//
+///
+/// Define the processor type so other code can make processor based choices
+///
 #define MDE_CPU_X64
 
 

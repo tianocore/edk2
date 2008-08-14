@@ -17,14 +17,14 @@
 #ifndef __PI_DEPENDENCY_H__
 #define __PI_DEPENDENCY_H__
 
-// 
-// If present, this must be the first and only opcode
-// 
+/// 
+/// If present, this must be the first and only opcode
+/// 
 #define EFI_DEP_BEFORE        0x00
 
-// 
-// If present, this must be the first and only opcode
-// 
+/// 
+/// If present, this must be the first and only opcode
+/// 
 #define EFI_DEP_AFTER         0x01
 
 #define EFI_DEP_PUSH          0x02
@@ -36,9 +36,9 @@
 #define EFI_DEP_END           0x08
 
 
-// 
-// If present, this must be the first opcode.
-// 
+/// 
+/// If present, this must be the first opcode.
+/// 
 #define EFI_DEP_SOR           0x09
 
 #endif 

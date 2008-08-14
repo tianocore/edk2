@@ -20,9 +20,9 @@
 #ifndef __UEFI_INTERNAL_FORMREPRESENTATION_H__
 #define __UEFI_INTERNAL_FORMREPRESENTATION_H__
 
-//
-// The following types are currently defined:
-//
+///
+/// The following types are currently defined:
+///
 typedef UINT32  RELOFST;
 
 typedef VOID*   EFI_HII_HANDLE;
