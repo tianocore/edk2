@@ -157,9 +157,9 @@ typedef struct {
 #define EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC 0x10b
 
 typedef struct {
-  //
-  // Standard fields.
-  //
+  ///
+  /// Standard fields.
+  ///
   UINT16                    Magic;
   UINT8                     MajorLinkerVersion;
   UINT8                     MinorLinkerVersion;
@@ -169,9 +169,9 @@ typedef struct {
   UINT32                    AddressOfEntryPoint;
   UINT32                    BaseOfCode;
   UINT32                    BaseOfData;
-  //
-  // NT additional fields.
-  //
+  ///
+  /// NT additional fields.
+  ///
   UINT32                    ImageBase;
   UINT32                    SectionAlignment;
   UINT32                    FileAlignment;
@@ -309,11 +309,11 @@ typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
 
 #elif defined (MDE_CPU_EBC)
 
-//
-// This is just to make sure you can cross compile with the EBC compiiler.
-// It does not make sense to have a PE loader coded in EBC. You need to 
-// understand the basic 
-//
+///
+/// This is just to make sure you can cross compile with the EBC compiiler.
+/// It does not make sense to have a PE loader coded in EBC. You need to 
+/// understand the basic 
+///
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_EBC)
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
@@ -723,9 +723,9 @@ typedef struct {
 #define EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG      1
 
 
-//
-// Union of PE32, PE32+, and TE headers
-//
+///
+/// Union of PE32, PE32+, and TE headers
+///
 typedef union {
   EFI_IMAGE_NT_HEADERS32   Pe32;
   EFI_IMAGE_NT_HEADERS64   Pe32Plus;

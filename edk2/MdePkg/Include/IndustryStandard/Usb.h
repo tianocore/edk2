@@ -294,9 +294,9 @@ typedef enum {
 #define EFI_USB_SET_PROTOCOL_REQUEST  0x0b
 
 #pragma pack(1)
-//
-// Descriptor header for Report/Physical Descriptors
-//
+///
+/// Descriptor header for Report/Physical Descriptors
+///
 typedef struct hid_class_descriptor {
   UINT8   DescriptorType;
   UINT16  DescriptorLength;

@@ -20,9 +20,9 @@
 #define _SMBUS_H_
 
 
-//
-// UDID of SMBUS device.
-//
+///
+/// UDID of SMBUS device.
+///
 typedef struct {
   UINT32  VendorSpecificId;
   UINT16  SubsystemDeviceId;
@@ -34,9 +34,9 @@ typedef struct {
   UINT8   DeviceCapabilities;
 } EFI_SMBUS_UDID;
 
-//
-// Smbus Device Address, Smbus Device Command, Smbus Operations
-//
+///
+/// Smbus Device Address, Smbus Device Command, Smbus Operations
+///
 typedef struct {
   UINTN SmbusDeviceAddress : 7;
 } EFI_SMBUS_DEVICE_ADDRESS;

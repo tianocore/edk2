@@ -22,14 +22,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define CDVOL_TYPE_CODED    0x1
 #define CDVOL_TYPE_END      0xFF
 
-//
-// CDROM_VOLUME_DESCRIPTOR.Id
-//
+///
+/// CDROM_VOLUME_DESCRIPTOR.Id
+///
 #define CDVOL_ID  "CD001"
 
-//
-// CDROM_VOLUME_DESCRIPTOR.SystemId
-//
+///
+/// CDROM_VOLUME_DESCRIPTOR.SystemId
+///
 #define CDVOL_ELTORITO_ID "EL TORITO SPECIFICATION"
 
 //
@@ -53,14 +53,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #pragma pack(1)
 
-//
-// El Torito Volume Descriptor
-// Note that the CDROM_VOLUME_DESCRIPTOR does not match the ISO-9660
-// descriptor.  For some reason descriptor used by El Torito is
-// different, but they start the same.   The El Torito descriptor
-// is left shifted 1 byte starting with the SystemId.  (Note this
-// causes the field to get unaligned)
-//
+///
+/// El Torito Volume Descriptor
+/// Note that the CDROM_VOLUME_DESCRIPTOR does not match the ISO-9660
+/// descriptor.  For some reason descriptor used by El Torito is
+/// different, but they start the same.   The El Torito descriptor
+/// is left shifted 1 byte starting with the SystemId.  (Note this
+/// causes the field to get unaligned)
+///
 typedef struct {
   UINT8   Type;
   CHAR8   Id[5];  // CD001
@@ -72,17 +72,17 @@ typedef struct {
   UINT32  VolSpaceSize[2];
 } CDROM_VOLUME_DESCRIPTOR;
 
-//
-// Catalog Entry
-//
+///
+/// Catalog Entry
+///
 typedef union {
   struct {
     CHAR8       Reserved[0x20];
   } Unknown;
 
-  //
-  // Catalog validation entry (Catalog header)
-  //
+  ///
+  /// Catalog validation entry (Catalog header)
+  ///
   struct {
     UINT8   Indicator;
     UINT8   PlatformId;
@@ -92,9 +92,9 @@ typedef union {
     UINT16  Id55AA;
   } Catalog;
 
-  //
-  // Initial/Default Entry or Section Entry
-  //
+  ///
+  /// Initial/Default Entry or Section Entry
+  ///
   struct {
     UINT8   Indicator;
     UINT8   MediaType : 4;
@@ -106,9 +106,9 @@ typedef union {
     UINT32  Lba;
   } Boot;
 
-  //
-  // Section Header Entry
-  //
+  ///
+  /// Section Header Entry
+  ///
   struct {
     UINT8   Indicator;
     UINT8   PlatformId;
