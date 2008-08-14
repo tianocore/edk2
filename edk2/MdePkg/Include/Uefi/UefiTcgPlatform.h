@@ -63,9 +63,9 @@ typedef UINT32                     TCG_EVENTTYPE;
 #define TCG_DIGEST                 TPM_DIGEST
 #define TCG_PCRINDEX               TPM_PCRINDEX
 
-//
-// TCG_PCR_EVENT
-//
+///
+/// TCG_PCR_EVENT
+///
 typedef struct tdTCG_PCR_EVENT {
   TCG_PCRINDEX                      PCRIndex;  // PCRIndex event extended to
   TCG_EVENTTYPE                     EventType; // TCG EFI event type
@@ -74,9 +74,9 @@ typedef struct tdTCG_PCR_EVENT {
   UINT8                             Event[1];  // The event data
 } TCG_PCR_EVENT;
 
-//
-// TCG_PCR_EVENT_HDR
-//
+///
+/// TCG_PCR_EVENT_HDR
+///
 typedef struct tdTCG_PCR_EVENT_HDR {
   TCG_PCRINDEX                      PCRIndex;
   TCG_EVENTTYPE                     EventType;
@@ -84,23 +84,23 @@ typedef struct tdTCG_PCR_EVENT_HDR {
   UINT32                            EventSize;
 } TCG_PCR_EVENT_HDR;
 
-//
-// EFI_PLATFORM_FIRMWARE_BLOB
-//
-// BlobLength should be of type UINTN but we use UINT64 here
-// because PEI is 32-bit while DXE is 64-bit on x64 platforms
-//
+///
+/// EFI_PLATFORM_FIRMWARE_BLOB
+///
+/// BlobLength should be of type UINTN but we use UINT64 here
+/// because PEI is 32-bit while DXE is 64-bit on x64 platforms
+///
 typedef struct tdEFI_PLATFORM_FIRMWARE_BLOB {
   EFI_PHYSICAL_ADDRESS              BlobBase;
   UINT64                            BlobLength;
 } EFI_PLATFORM_FIRMWARE_BLOB;
 
-//
-// EFI_IMAGE_LOAD_EVENT
-//
-// This structure is used in EV_EFI_BOOT_SERVICES_APPLICATION,
-// EV_EFI_BOOT_SERVICES_DRIVER and EV_EFI_RUNTIME_SERVICES_DRIVER
-//
+///
+/// EFI_IMAGE_LOAD_EVENT
+///
+/// This structure is used in EV_EFI_BOOT_SERVICES_APPLICATION,
+/// EV_EFI_BOOT_SERVICES_DRIVER and EV_EFI_RUNTIME_SERVICES_DRIVER
+///
 typedef struct tdEFI_IMAGE_LOAD_EVENT {
   EFI_PHYSICAL_ADDRESS              ImageLocationInMemory;
   UINTN                             ImageLengthInMemory;
@@ -109,24 +109,24 @@ typedef struct tdEFI_IMAGE_LOAD_EVENT {
   EFI_DEVICE_PATH_PROTOCOL          DevicePath[1];
 } EFI_IMAGE_LOAD_EVENT;
 
-//
-// EFI_HANDOFF_TABLE_POINTERS
-//
-// This structure is used in EV_EFI_HANDOFF_TABLES event to facilitate
-// the measurement of given configuration tables.
-//
+///
+/// EFI_HANDOFF_TABLE_POINTERS
+///
+/// This structure is used in EV_EFI_HANDOFF_TABLES event to facilitate
+/// the measurement of given configuration tables.
+///
 typedef struct tdEFI_HANDOFF_TABLE_POINTERS {
   UINTN 	                          NumberOfTables;
   EFI_CONFIGURATION_TABLE           TableEntry[1];
 } EFI_HANDOFF_TABLE_POINTERS;
 
-//
-// EFI_VARIABLE_DATA
-//
-// This structure serves as the header for measuring variables. The name of the
-// variable (in Unicode format) should immediately follow, then the variable
-// data.
-//
+///
+/// EFI_VARIABLE_DATA
+///
+/// This structure serves as the header for measuring variables. The name of the
+/// variable (in Unicode format) should immediately follow, then the variable
+/// data.
+///
 typedef struct tdEFI_VARIABLE_DATA {
   EFI_GUID                          VariableName;
   UINTN                             UnicodeNameLength;

@@ -104,15 +104,15 @@ typedef struct _WIN_CERTIFICATE {
   //UINT8 bCertificate[ANYSIZE_ARRAY];
 } WIN_CERTIFICATE;
 
-//
-// WIN_CERTIFICATE_UEFI_GUID.CertType
-// 
+///
+/// WIN_CERTIFICATE_UEFI_GUID.CertType
+/// 
 #define EFI_CERT_TYPE_RSA2048_SHA256_GUID \
   {0xa7717414, 0xc616, 0x4977, {0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf } }
 
-//
-// WIN_CERTIFICATE_UEFI_GUID.CertData
-// 
+///
+/// WIN_CERTIFICATE_UEFI_GUID.CertData
+/// 
 typedef struct _EFI_CERT_BLOCK_RSA_2048_SHA256 {
   UINT32  HashType;
   UINT8   PublicKey[256];

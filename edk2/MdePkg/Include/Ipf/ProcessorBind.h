@@ -16,9 +16,9 @@
 #define __PROCESSOR_BIND_H__
 
 
-//
-// Define the processor type so other code can make processor based choices
-//
+///
+/// Define the processor type so other code can make processor based choices
+///
 #define MDE_CPU_IPF
 
 
@@ -220,9 +220,9 @@ typedef INT64   INTN;
   #define GLOBAL_REMOVE_IF_UNREFERENCED
 #endif
 
-//
-// A pointer to a function in IPF points to a plabel.
-//
+///
+/// A pointer to a function in IPF points to a plabel.
+///
 typedef struct {
   UINT64  EntryPoint;
   UINT64  GP;
