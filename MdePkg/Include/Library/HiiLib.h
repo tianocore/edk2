@@ -15,10 +15,10 @@
 #ifndef __HII_LIB_H__
 #define __HII_LIB_H__
 
-//
-// Limited buffer size recommended by RFC4646 (4.3.  Length Considerations)
-// (42 characters plus a NULL terminator)
-//
+///
+/// Limited buffer size recommended by RFC4646 (4.3.  Length Considerations)
+/// (42 characters plus a NULL terminator)
+///
 #define RFC_3066_ENTRY_SIZE             (42 + 1)
 
 #define ISO_639_2_ENTRY_SIZE            3

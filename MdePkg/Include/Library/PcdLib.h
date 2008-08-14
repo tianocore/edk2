@@ -30,9 +30,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PcdToken(TokenName)                 _PCD_TOKEN_##TokenName
 
 
-//
-// Feature Flag is in the form of a global constant
-//
+///
+/// Feature Flag is in the form of a global constant
+///
 #define FeaturePcdGet(TokenName)            _PCD_GET_MODE_BOOL_##TokenName
 
 

@@ -15,9 +15,9 @@
 #ifndef __MODULE_ENTRY_POINT_H__
 #define __MODULE_ENTRY_POINT_H__
 
-//
-// Declare the cache of copy of HobList. 
-// 
+///
+/// Declare the cache of copy of HobList. 
+/// 
 extern VOID  *gHobList;
 
 

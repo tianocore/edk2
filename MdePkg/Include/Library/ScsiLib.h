@@ -24,11 +24,11 @@
 #define EFI_SCSI_STALL_1_MILLISECOND  10000
 #define EFI_SCSI_STALL_1_SECOND       10000000
 
-//
-// this macro cannot be directly used by the gBS->Stall(),
-// since the value output by this macro is in 100ns unit,
-// not 1us unit (1us = 1000ns)
-//
+///
+/// this macro cannot be directly used by the gBS->Stall(),
+/// since the value output by this macro is in 100ns unit,
+/// not 1us unit (1us = 1000ns)
+///
 #define EfiScsiStallSeconds(a)  ((a) * EFI_SCSI_STALL_1_SECOND)
 
 

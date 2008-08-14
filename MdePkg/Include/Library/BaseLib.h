@@ -20,15 +20,15 @@
 // These include SPIN_LOCK and BASE_LIBRARY_JUMP_BUFFER
 //
 
-//
-// SPIN_LOCK
-//
+///
+/// SPIN_LOCK
+///
 typedef volatile UINTN              SPIN_LOCK;
 
 #if   defined (MDE_CPU_IA32)
-//
-// IA32 context buffer used by SetJump() and LongJump()
-//
+///
+/// IA32 context buffer used by SetJump() and LongJump()
+///
 typedef struct {
   UINT32                            Ebx;
   UINT32                            Esi;
@@ -42,9 +42,9 @@ typedef struct {
 
 #elif defined (MDE_CPU_IPF)
 
-//
-// IPF context buffer used by SetJump() and LongJump()
-//
+///
+/// IPF context buffer used by SetJump() and LongJump()
+///
 typedef struct {
   UINT64                            F2[2];
   UINT64                            F3[2];
@@ -89,9 +89,9 @@ typedef struct {
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 0x10
 
 #elif defined (MDE_CPU_X64)
-//
-// X64 context buffer used by SetJump() and LongJump()
-//
+///
+/// X64 context buffer used by SetJump() and LongJump()
+///
 typedef struct {
   UINT64                            Rbx;
   UINT64                            Rsp;
@@ -108,9 +108,9 @@ typedef struct {
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 8
 
 #elif defined (MDE_CPU_EBC)
-//
-// EBC context buffer used by SetJump() and LongJump()
-//
+///
+/// EBC context buffer used by SetJump() and LongJump()
+///
 typedef struct {
   UINT64                            R0;
   UINT64                            R1;

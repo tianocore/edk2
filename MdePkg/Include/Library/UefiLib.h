@@ -22,26 +22,26 @@
 #include <Protocol/DriverDiagnostics.h>
 #include <Protocol/DriverDiagnostics2.h>
 
-//
-// Unicode String Table
-//
+///
+/// Unicode String Table
+///
 typedef struct {
   CHAR8   *Language;
   CHAR16  *UnicodeString;
 } EFI_UNICODE_STRING_TABLE;
 
-//
-// EFI Lock Status
-//
+///
+/// EFI Lock Status
+///
 typedef enum {
   EfiLockUninitialized = 0,
   EfiLockReleased      = 1,
   EfiLockAcquired      = 2
 } EFI_LOCK_STATE;
 
-//
-// EFI Lock 
-//
+///
+/// EFI Lock 
+///
 typedef struct {
   EFI_TPL         Tpl;
   EFI_TPL         OwnerTpl;

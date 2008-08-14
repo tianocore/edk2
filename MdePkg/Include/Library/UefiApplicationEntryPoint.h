@@ -15,9 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __UEFI_APPLICATION_ENTRY_POINT_H__
 #define __UEFI_APPLICATION_ENTRY_POINT_H__
 
-//
-// Declare the EFI/UEFI Specification Revision to which this driver is implemented 
-//
+///
+/// Declare the EFI/UEFI Specification Revision to which this driver is implemented 
+///
 extern const UINT32                   _gUefiDriverRevision;
 
 /**

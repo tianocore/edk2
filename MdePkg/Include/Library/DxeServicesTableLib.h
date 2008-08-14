@@ -15,9 +15,9 @@
 #ifndef __DXE_SERVICES_TABLE_LIB_H__
 #define __DXE_SERVICES_TABLE_LIB_H__
 
-//
-// Cache copy of the DXE Services Table
-//
+///
+/// Cache copy of the DXE Services Table
+///
 extern EFI_DXE_SERVICES  *gDS;
 
 #endif

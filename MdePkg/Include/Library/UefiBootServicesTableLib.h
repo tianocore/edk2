@@ -15,19 +15,19 @@
 #ifndef __UEFI_BOOT_SERVICES_TABLE_LIB_H__
 #define __UEFI_BOOT_SERVICES_TABLE_LIB_H__
 
-//
-// Cache the Image Handle
-//
+///
+/// Cache the Image Handle
+///
 extern EFI_HANDLE         gImageHandle;
 
-//
-// Cache pointer to the EFI System Table
-//
+///
+/// Cache pointer to the EFI System Table
+///
 extern EFI_SYSTEM_TABLE   *gST;
 
-//
-// Cache pointer to the EFI Boot Services Table
-//
+///
+/// Cache pointer to the EFI Boot Services Table
+///
 extern EFI_BOOT_SERVICES  *gBS;
 
 #endif

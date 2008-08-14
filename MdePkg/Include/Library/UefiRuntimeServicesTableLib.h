@@ -15,9 +15,9 @@
 #ifndef __UEFI_RUNTIME_SERVICES_TABLE_LIB_H__
 #define __UEFI_RUNTIME_SERVICES_TABLE_LIB_H__
 
-//
-// Cached copy of the EFI Runtime Services Table
-//
+///
+/// Cached copy of the EFI Runtime Services Table
+///
 extern EFI_RUNTIME_SERVICES  *gRT;
 
 #endif
