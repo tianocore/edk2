@@ -24,7 +24,7 @@
   { 0xdbe23aa9, 0xa345, 0x4b97, {0x85, 0xb6, 0xb2, 0x26, 0xf1, 0x61, 0x73, 0x89} }
 
 
-/*
+/**
   This service of the TEMPORARY_RAM_SUPPORT_PPI that migrates temporary RAM into
   permanent memory.
 

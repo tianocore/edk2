@@ -37,9 +37,9 @@ typedef struct _EFI_PEI_PCI_CFG2_PPI   EFI_PEI_PCI_CFG2_PPI;
   ((func) << 8) | \
   ((reg) < 256 ? (reg) : ((UINT64)(reg) << 32)));
 
-//
-// EFI_PEI_PCI_CFG_PPI_WIDTH
-//
+///
+/// EFI_PEI_PCI_CFG_PPI_WIDTH
+///
 typedef enum {
   EfiPeiPciCfgWidthUint8  = 0,
   EfiPeiPciCfgWidthUint16 = 1,
@@ -48,9 +48,9 @@ typedef enum {
   EfiPeiPciCfgWidthMaximum
 } EFI_PEI_PCI_CFG_PPI_WIDTH;
 
-//
-// EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS
-//
+///
+/// EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS
+///
 typedef struct {
   UINT8   Register;
   UINT8   Function;
