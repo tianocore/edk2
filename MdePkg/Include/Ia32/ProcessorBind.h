@@ -15,9 +15,9 @@
 #ifndef __PROCESSOR_BIND_H__
 #define __PROCESSOR_BIND_H__
 
-//
-// Define the processor type so other code can make processor based choices
-//
+///
+/// Define the processor type so other code can make processor based choices
+///
 #define MDE_CPU_IA32
 
 //
@@ -150,20 +150,20 @@ typedef UINT32  UINTN;
 typedef INT32   INTN;
 
 
-//
-// Processor specific defines
-//
+///
+/// Processor specific defines
+///
 #define MAX_BIT     0x80000000
 #define MAX_2_BITS  0xC0000000
 
-//
-// Maximum legal IA-32 address
-//
+///
+/// Maximum legal IA-32 address
+///
 #define MAX_ADDRESS   0xFFFFFFFF
 
-//
-// The stack alignment required for IA-32
-//
+///
+/// The stack alignment required for IA-32
+///
 #define CPU_STACK_ALIGNMENT   sizeof(UINTN)
 
 //
@@ -172,9 +172,9 @@ typedef INT32   INTN;
 // EFI intrinsics are required to modify thier member functions with EFIAPI.
 //
 #if _MSC_EXTENSIONS
-  //
-  // Microsoft* compiler requires _EFIAPI useage, __cdecl is Microsoft* specific C.
-  // 
+  ///
+  /// Microsoft* compiler requires _EFIAPI useage, __cdecl is Microsoft* specific C.
+  /// 
   #define EFIAPI __cdecl  
 #else
   #if __GNUC__
