@@ -15,25 +15,27 @@
 #ifndef __SAL_API_H__
 #define __SAL_API_H__
 
-//
-// FIT Types 
-// Table 2-2 of Intel Itanium Processor Family System Abstraction Layer Specification December 2003
-//
+///
+/// FIT Types 
+/// Table 2-2 of Intel Itanium Processor Family System Abstraction Layer Specification December 2003
+///
 #define EFI_SAL_FIT_FIT_HEADER_TYPE 0x00
 #define EFI_SAL_FIT_PAL_B_TYPE      0x01
-//
-// type from 0x02 to 0x0E is reserved.
-//
+
+///
+/// type from 0x02 to 0x0E is reserved.
+///
 #define EFI_SAL_FIT_PAL_A_TYPE  0x0F
-//
-// OEM-defined type range is from 0x10 to 0x7E. Here we defined the PEI_CORE type as 0x10
-//
+
+///
+/// OEM-defined type range is from 0x10 to 0x7E. Here we defined the PEI_CORE type as 0x10
+///
 #define EFI_SAL_FIT_PEI_CORE_TYPE 0x10
 #define EFI_SAL_FIT_UNUSED_TYPE   0x7F
 
-//
-// EFI_SAL_STATUS 
-//
+///
+/// EFI_SAL_STATUS 
+///
 typedef UINTN EFI_SAL_STATUS;
 
 #define EFI_SAL_SUCCESS               ((EFI_SAL_STATUS) 0)
@@ -55,9 +57,9 @@ typedef struct {
   UINTN           r11;
 } SAL_RETURN_REGS;
 
-//
-//  Delivery Mode of IPF CPU.
-//
+///
+///  Delivery Mode of IPF CPU.
+///
 typedef enum {
   EFI_DELIVERY_MODE_INT,
   EFI_DELIVERY_MODE_MPreserved1,
@@ -616,9 +618,9 @@ typedef struct {
   UINT8           SmbiosBcdTimeStamp[6];
 } SAL_SMBIOS_DEVICE_ERROR_RECORD;
 
-//
-//  Sal Platform Specific Errors Info.
-//
+///
+///  Sal Platform Specific Errors Info.
+///
 #define SAL_PLATFORM_ERROR_RECORD_INFO \
   { \
     0xe429faf7, 0x3cb7, 0x11d4, {0xbc, 0xa7, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
@@ -644,9 +646,9 @@ typedef struct {
   UINT8           OemComponentId[16];
 } SAL_PLATFORM_SPECIFIC_ERROR_RECORD;
 
-//
-// Union of all the possible Sal Record Types
-//
+///
+/// Union of all the possible Sal Record Types
+///
 typedef union {
   SAL_RECORD_HEADER                   *RecordHeader;
   SAL_PROCESSOR_ERROR_RECORD          *SalProcessorRecord;

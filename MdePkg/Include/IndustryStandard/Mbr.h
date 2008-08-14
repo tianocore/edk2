@@ -46,9 +46,9 @@ typedef struct {
   UINT8 SizeInLBA[4];
 } MBR_PARTITION_RECORD;
 
-//
-// MBR Partition table
-//
+///
+/// MBR Partition table
+///
 typedef struct {
   UINT8                 BootStrapCode[440];
   UINT8                 UniqueMbrSignature[4];

@@ -433,9 +433,9 @@ typedef struct {
   UINT8 NextItemPtr;
 } EFI_PCI_CAPABILITY_HDR;
 
-//
-// Capability EFI_PCI_CAPABILITY_ID_PMI
-//
+///
+/// Capability EFI_PCI_CAPABILITY_ID_PMI
+///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
   UINT16                  PMC;
@@ -444,9 +444,9 @@ typedef struct {
   UINT8                   Data;
 } EFI_PCI_CAPABILITY_PMI;
 
-//
-// Capability EFI_PCI_CAPABILITY_ID_AGP
-//
+///
+/// Capability EFI_PCI_CAPABILITY_ID_AGP
+///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
   UINT8                   Rev;
@@ -455,27 +455,27 @@ typedef struct {
   UINT32                  Command;
 } EFI_PCI_CAPABILITY_AGP;
 
-//
-// Capability EFI_PCI_CAPABILITY_ID_VPD
-//
+///
+/// Capability EFI_PCI_CAPABILITY_ID_VPD
+///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
   UINT16                  AddrReg;
   UINT32                  DataReg;
 } EFI_PCI_CAPABILITY_VPD;
 
-//
-// Capability EFI_PCI_CAPABILITY_ID_SLOTID
-//
+///
+/// Capability EFI_PCI_CAPABILITY_ID_SLOTID
+///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
   UINT8                   ExpnsSlotReg;
   UINT8                   ChassisNo;
 } EFI_PCI_CAPABILITY_SLOTID;
 
-//
-// Capability EFI_PCI_CAPABILITY_ID_MSI
-//
+///
+/// Capability EFI_PCI_CAPABILITY_ID_MSI
+///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
   UINT16                  MsgCtrlReg;
@@ -491,19 +491,19 @@ typedef struct {
   UINT16                  MsgDataReg;
 } EFI_PCI_CAPABILITY_MSI64;
 
-//
-// Capability EFI_PCI_CAPABILITY_ID_HOTPLUG
-//
+///
+/// Capability EFI_PCI_CAPABILITY_ID_HOTPLUG
+///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
-  //
-  // not finished - fields need to go here
-  //
+  ///
+  /// not finished - fields need to go here
+  ///
 } EFI_PCI_CAPABILITY_HOTPLUG;
 
-//
-// Capability EFI_PCI_CAPABILITY_ID_PCIX
-//
+///
+/// Capability EFI_PCI_CAPABILITY_ID_PCIX
+///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
   UINT16                  CommandReg;

@@ -23,14 +23,14 @@
 //
 #pragma pack(1)
 
-//
-// SPCR Revision (defined in spec)
-//
+///
+/// SPCR Revision (defined in spec)
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION 0x01
 
-//
-// SPCR Structure Definition
-//
+///
+/// SPCR Structure Definition
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER             Header;
   UINT8                                   InterfaceType;

@@ -272,14 +272,14 @@ typedef struct {
 #define EFI_SCSI_ASC_NO_MEDIA                     (0x3A)
 #define EFI_SCSI_ASC_ILLEGAL_MODE_FOR_THIS_TRACK  (0x64)
 
-//
-// Additional Sense Code Qualifier
-//
+///
+/// Additional Sense Code Qualifier
+///
 #define EFI_SCSI_ASCQ_IN_PROGRESS (0x01)
 
-//
-// Max bytes needed to represent ID of a SCSI device
-//
+///
+/// Max bytes needed to represent ID of a SCSI device
+///
 #define EFI_SCSI_TARGET_MAX_BYTES (0x10)
 
 #endif

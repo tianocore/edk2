@@ -20,14 +20,15 @@
 // Ensure proper structure formats
 //
 #pragma pack(1)
-//
-// ACPI Specification Revision
-//
+
+///
+/// ACPI Specification Revision
+///
 #define EFI_ACPI_3_0_REVISION 0x03
 
-//
-// ACPI 3.0 Generic Address Space definition
-//
+///
+/// ACPI 3.0 Generic Address Space definition
+///
 typedef struct {
   UINT8   AddressSpaceId;
   UINT8   RegisterBitWidth;
@@ -58,9 +59,10 @@ typedef struct {
 //
 // ACPI 3.0 table structures
 //
-//
-// Root System Description Pointer Structure
-//
+
+///
+/// Root System Description Pointer Structure
+///
 typedef struct {
   UINT64  Signature;
   UINT8   Checksum;
@@ -73,14 +75,15 @@ typedef struct {
   UINT8   Reserved[3];
 } EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER;
 
-//
-// RSD_PTR Revision (as defined in ACPI 3.0 spec.)
-//
+///
+/// RSD_PTR Revision (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION 0x02  // ACPISpec30 (Revision 3.0 September 2, 2004) says current value is 2
-//
-// Common table header, this prefaces all ACPI tables, including FACS, but
-// excluding the RSD PTR structure
-//
+
+///
+/// Common table header, this prefaces all ACPI tables, including FACS, but
+/// excluding the RSD PTR structure
+///
 typedef struct {
   UINT32  Signature;
   UINT32  Length;
@@ -91,9 +94,10 @@ typedef struct {
 // No definition needed as it is a common description table header followed by a
 // variable number of UINT32 table pointers.
 //
-//
-// RSDT Revision (as defined in ACPI 3.0 spec.)
-//
+
+///
+/// RSDT Revision (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_TABLE_REVISION 0x01
 
 //
@@ -101,14 +105,15 @@ typedef struct {
 // No definition needed as it is a common description table header followed by a
 // variable number of UINT64 table pointers.
 //
-//
-// XSDT Revision (as defined in ACPI 3.0 spec.)
-//
+
+///
+/// XSDT Revision (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_REVISION 0x01
 
-//
-// Fixed ACPI Description Table Structure (FADT)
-//
+///
+/// Fixed ACPI Description Table Structure (FADT)
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER             Header;
   UINT32                                  FirmwareCtrl;
@@ -164,9 +169,9 @@ typedef struct {
   EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk;
 } EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE;
 
-//
-// FADT Version (as defined in ACPI 3.0 spec.)
-//
+///
+/// FADT Version (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION  0x04
 
 //
@@ -216,9 +221,9 @@ typedef struct {
 #define EFI_ACPI_3_0_FORCE_APIC_CLUSTER_MODEL (1 << 18)
 #define EFI_ACPI_3_0_FORCE_APIC_PHYSICAL_DESTINATION_MODE (1 << 19)
 
-//
-// Firmware ACPI Control Structure
-//
+///
+/// Firmware ACPI Control Structure
+///
 typedef struct {
   UINT32  Signature;
   UINT32  Length;
@@ -231,15 +236,15 @@ typedef struct {
   UINT8   Reserved[31];
 } EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE;
 
-//
-// FACS Version (as defined in ACPI 3.0 spec.)
-//
+///
+/// FACS Version (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION  0x01
 
-//
-// Firmware Control Structure Feature Flags
-// All other bits are reserved and must be set to 0.
-//
+///
+/// Firmware Control Structure Feature Flags
+/// All other bits are reserved and must be set to 0.
+///
 #define EFI_ACPI_3_0_S4BIOS_F (1 << 0)
 
 //
@@ -252,25 +257,25 @@ typedef struct {
 #define EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_REVISION   0x02
 #define EFI_ACPI_3_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_REVISION        0x02
 
-//
-// Multiple APIC Description Table header definition.  The rest of the table
-// must be defined in a platform specific manner.
-//
+///
+/// Multiple APIC Description Table header definition.  The rest of the table
+/// must be defined in a platform specific manner.
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
   UINT32                      LocalApicAddress;
   UINT32                      Flags;
 } EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER;
 
-//
-// MADT Revision (as defined in ACPI 3.0 spec.)
-//
+///
+/// MADT Revision (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION 0x02
 
-//
-// Multiple APIC Flags
-// All other bits are reserved and must be set to 0.
-//
+///
+/// Multiple APIC Flags
+/// All other bits are reserved and must be set to 0.
+///
 #define EFI_ACPI_3_0_PCAT_COMPAT  (1 << 0)
 
 //
@@ -291,9 +296,10 @@ typedef struct {
 //
 // APIC Structure Definitions
 //
-//
-// Processor Local APIC Structure Definition
-//
+
+///
+/// Processor Local APIC Structure Definition
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -302,14 +308,14 @@ typedef struct {
   UINT32  Flags;
 } EFI_ACPI_3_0_PROCESSOR_LOCAL_APIC_STRUCTURE;
 
-//
-// Local APIC Flags.  All other bits are reserved and must be 0.
-//
+///
+/// Local APIC Flags.  All other bits are reserved and must be 0.
+///
 #define EFI_ACPI_3_0_LOCAL_APIC_ENABLED (1 << 0)
 
-//
-// IO APIC Structure
-//
+///
+/// IO APIC Structure
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -319,9 +325,9 @@ typedef struct {
   UINT32  GlobalSystemInterruptBase;
 } EFI_ACPI_3_0_IO_APIC_STRUCTURE;
 
-//
-// Interrupt Source Override Structure
-//
+///
+/// Interrupt Source Override Structure
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -331,9 +337,9 @@ typedef struct {
   UINT16  Flags;
 } EFI_ACPI_3_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE;
 
-//
-// Platform Interrupt Sources Structure Definition
-//
+///
+/// Platform Interrupt Sources Structure Definition
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -355,9 +361,9 @@ typedef struct {
 #define EFI_ACPI_3_0_POLARITY      (3 << 0)
 #define EFI_ACPI_3_0_TRIGGER_MODE  (3 << 2)
 
-//
-// Non-Maskable Interrupt Source Structure
-//
+///
+/// Non-Maskable Interrupt Source Structure
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -365,9 +371,9 @@ typedef struct {
   UINT32  GlobalSystemInterrupt;
 } EFI_ACPI_3_0_NON_MASKABLE_INTERRUPT_SOURCE_STRUCTURE;
 
-//
-// Local APIC NMI Structure
-//
+///
+/// Local APIC NMI Structure
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -376,9 +382,9 @@ typedef struct {
   UINT8   LocalApicLint;
 } EFI_ACPI_3_0_LOCAL_APIC_NMI_STRUCTURE;
 
-//
-// Local APIC Address Override Structure
-//
+///
+/// Local APIC Address Override Structure
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -386,9 +392,9 @@ typedef struct {
   UINT64  LocalApicAddress;
 } EFI_ACPI_3_0_LOCAL_APIC_ADDRESS_OVERRIDE_STRUCTURE;
 
-//
-// IO SAPIC Structure
-//
+///
+/// IO SAPIC Structure
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -398,10 +404,10 @@ typedef struct {
   UINT64  IoSapicAddress;
 } EFI_ACPI_3_0_IO_SAPIC_STRUCTURE;
 
-//
-// Local SAPIC Structure
-// This struct followed by a null-terminated ASCII string - ACPI Processor UID String
-//
+///
+/// Local SAPIC Structure
+/// This struct followed by a null-terminated ASCII string - ACPI Processor UID String
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -413,9 +419,9 @@ typedef struct {
   UINT32  ACPIProcessorUIDValue;
 } EFI_ACPI_3_0_PROCESSOR_LOCAL_SAPIC_STRUCTURE;
 
-//
-// Platform Interrupt Sources Structure
-//
+///
+/// Platform Interrupt Sources Structure
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -428,15 +434,15 @@ typedef struct {
   UINT32  PlatformInterruptSourceFlags;
 } EFI_ACPI_3_0_PLATFORM_INTERRUPT_SOURCES_STRUCTURE;
 
-//
-// Platform Interrupt Source Flags.
-// All other bits are reserved and must be set to 0.
-//
+///
+/// Platform Interrupt Source Flags.
+/// All other bits are reserved and must be set to 0.
+///
 #define EFI_ACPI_3_0_CPEI_PROCESSOR_OVERRIDE     (1 << 0)
 
-//
-// Smart Battery Description Table (SBST)
-//
+///
+/// Smart Battery Description Table (SBST)
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
   UINT32                      WarningEnergyLevel;
@@ -444,16 +450,16 @@ typedef struct {
   UINT32                      CriticalEnergyLevel;
 } EFI_ACPI_3_0_SMART_BATTERY_DESCRIPTION_TABLE;
 
-//
-// SBST Version (as defined in ACPI 3.0 spec.)
-//
+///
+/// SBST Version (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_SMART_BATTERY_DESCRIPTION_TABLE_REVISION 0x01
 
-//
-// Embedded Controller Boot Resources Table (ECDT)
-// The table is followed by a null terminated ASCII string that contains
-// a fully qualified reference to the name space object.
-//
+///
+/// Embedded Controller Boot Resources Table (ECDT)
+/// The table is followed by a null terminated ASCII string that contains
+/// a fully qualified reference to the name space object.
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER             Header;
   EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE  EcControl;
@@ -462,37 +468,37 @@ typedef struct {
   UINT8                                   GpeBit;
 } EFI_ACPI_3_0_EMBEDDED_CONTROLLER_BOOT_RESOURCES_TABLE;
 
-//
-// ECDT Version (as defined in ACPI 3.0 spec.)
-//
+///
+/// ECDT Version (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_EMBEDDED_CONTROLLER_BOOT_RESOURCES_TABLE_REVISION  0x01
 
-//
-// System Resource Affinity Table (SRAT.  The rest of the table
-// must be defined in a platform specific manner.
-//
+///
+/// System Resource Affinity Table (SRAT.  The rest of the table
+/// must be defined in a platform specific manner.
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
   UINT32                      Reserved1;  // Must be set to 1
   UINT64                      Reserved2;
 } EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER;
 
-//
-// SRAT Version (as defined in ACPI 3.0 spec.)
-//
+///
+/// SRAT Version (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION  0x02
 
-//
-// SRAT structure types.
-// All other values between 0x02 an 0xFF are reserved and
-// will be ignored by OSPM.
-//
+///
+/// SRAT structure types.
+/// All other values between 0x02 an 0xFF are reserved and
+/// will be ignored by OSPM.
+///
 #define EFI_ACPI_3_0_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
 #define EFI_ACPI_3_0_MEMORY_AFFINITY                      0x01
 
-//
-// Processor Local APIC/SAPIC Affinity Structure Definition
-//
+///
+/// Processor Local APIC/SAPIC Affinity Structure Definition
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -504,14 +510,14 @@ typedef struct {
   UINT8   Reserved[4];
 } EFI_ACPI_3_0_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY_STRUCTURE;
 
-//
-// Local APIC/SAPIC Flags.  All other bits are reserved and must be 0.
-//
+///
+/// Local APIC/SAPIC Flags.  All other bits are reserved and must be 0.
+///
 #define EFI_ACPI_3_0_PROCESSOR_LOCAL_APIC_SAPIC_ENABLED (1 << 0)
 
-//
-// Memory Affinity Structure Definition
-//
+///
+/// Memory Affinity Structure Definition
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
@@ -533,147 +539,148 @@ typedef struct {
 #define EFI_ACPI_3_0_MEMORY_HOT_PLUGGABLE (1 << 1)
 #define EFI_ACPI_3_0_MEMORY_NONVOLATILE   (1 << 2)
 
-//
-// System Locality Distance Information Table (SLIT).
-// The rest of the table is a matrix.
-//
+///
+/// System Locality Distance Information Table (SLIT).
+/// The rest of the table is a matrix.
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
   UINT64                      NumberOfSystemLocalities;
 } EFI_ACPI_3_0_SYSTEM_LOCALITY_DISTANCE_INFORMATION_TABLE_HEADER;
 
-//
-// SLIT Version (as defined in ACPI 3.0 spec.)
-//
+///
+/// SLIT Version (as defined in ACPI 3.0 spec.)
+///
 #define EFI_ACPI_3_0_SYSTEM_LOCALITY_DISTANCE_INFORMATION_TABLE_REVISION  0x01
 
 //
 // Known table signatures
 //
-//
-// "RSD PTR " Root System Description Pointer
-//
+
+///
+/// "RSD PTR " Root System Description Pointer
+///
 #define EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  0x2052545020445352ULL
 
-//
-// "APIC" Multiple APIC Description Table
-//
+///
+/// "APIC" Multiple APIC Description Table
+///
 #define EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE  0x43495041
 
-//
-// "DSDT" Differentiated System Description Table
-//
+///
+/// "DSDT" Differentiated System Description Table
+///
 #define EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  0x54445344
 
-//
-// "ECDT" Embedded Controller Boot Resources Table
-//
+///
+/// "ECDT" Embedded Controller Boot Resources Table
+///
 #define EFI_ACPI_3_0_EMBEDDED_CONTROLLER_BOOT_RESOURCES_TABLE_SIGNATURE 0x54444345
 
-//
-// "FACP" Fixed ACPI Description Table
-//
+///
+/// "FACP" Fixed ACPI Description Table
+///
 #define EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE 0x50434146
 
-//
-// "FACS" Firmware ACPI Control Structure
-//
+///
+/// "FACS" Firmware ACPI Control Structure
+///
 #define EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE  0x53434146
 
-//
-// "PSDT" Persistent System Description Table
-//
+///
+/// "PSDT" Persistent System Description Table
+///
 #define EFI_ACPI_3_0_PERSISTENT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  0x54445350
 
-//
-// "RSDT" Root System Description Table
-//
+///
+/// "RSDT" Root System Description Table
+///
 #define EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  0x54445352
 
-//
-// "SBST" Smart Battery Specification Table
-//
+///
+/// "SBST" Smart Battery Specification Table
+///
 #define EFI_ACPI_3_0_SMART_BATTERY_SPECIFICATION_TABLE_SIGNATURE  0x54534253
 
-//
-// "SLIT" System Locality Information Table
-//
+///
+/// "SLIT" System Locality Information Table
+///
 #define EFI_ACPI_3_0_SYSTEM_LOCALITY_INFORMATION_TABLE_SIGNATURE  0x54494C53
 
-//
-// "SRAT" System Resource Affinity Table
-//
+///
+/// "SRAT" System Resource Affinity Table
+///
 #define EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE 0x54415253
 
-//
-// "SSDT" Secondary System Description Table
-//
+///
+/// "SSDT" Secondary System Description Table
+///
 #define EFI_ACPI_3_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE 0x54445353
 
-//
-// "XSDT" Extended System Description Table
-//
+///
+/// "XSDT" Extended System Description Table
+///
 #define EFI_ACPI_3_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  0x54445358
 
-//
-// "BOOT" MS Simple Boot Spec
-//
+///
+/// "BOOT" MS Simple Boot Spec
+///
 #define EFI_ACPI_3_0_SIMPLE_BOOT_FLAG_TABLE_SIGNATURE 0x544F4F42
 
-//
-// "CPEP" Corrected Platform Error Polling Table
-// See
-//
+///
+/// "CPEP" Corrected Platform Error Polling Table
+/// See
+///
 #define EFI_ACPI_3_0_CORRECTED_PLATFORM_ERROR_POLLING_TABLE_SIGNATURE 0x50455043
 
-//
-// "DBGP" MS Debug Port Spec
-//
+///
+/// "DBGP" MS Debug Port Spec
+///
 #define EFI_ACPI_3_0_DEBUG_PORT_TABLE_SIGNATURE 0x50474244
 
-//
-// "ETDT" Event Timer Description Table
-//
+///
+/// "ETDT" Event Timer Description Table
+///
 #define EFI_ACPI_3_0_EVENT_TIMER_DESCRIPTION_TABLE_SIGNATURE  0x54445445
 
-//
-// "HPET" IA-PC High Precision Event Timer Table
-//
+///
+/// "HPET" IA-PC High Precision Event Timer Table
+///
 #define EFI_ACPI_3_0_HIGH_PRECISION_EVENT_TIMER_TABLE_SIGNATURE 0x54455048
 
-//
-// "MCFG" PCI Express Memory Mapped Configuration Space Base Address Description Table
-//
+///
+/// "MCFG" PCI Express Memory Mapped Configuration Space Base Address Description Table
+///
 #define EFI_ACPI_3_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE  0x4746434D
 
-//
-// "SPCR" Serial Port Concole Redirection Table
-//
+///
+/// "SPCR" Serial Port Concole Redirection Table
+///
 #define EFI_ACPI_3_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE  0x52435053
 
-//
-// "SPMI" Server Platform Management Interface Table
-//
+///
+/// "SPMI" Server Platform Management Interface Table
+///
 #define EFI_ACPI_3_0_SERVER_PLATFORM_MANAGEMENT_INTERFACE_TABLE_SIGNATURE 0x494D5053
 
-//
-// "TCPA" Trusted Computing Platform Alliance Capabilities Table
-//
+///
+/// "TCPA" Trusted Computing Platform Alliance Capabilities Table
+///
 #define EFI_ACPI_3_0_TRUSTED_COMPUTING_PLATFORM_ALLIANCE_CAPABILITIES_TABLE_SIGNATURE 0x41504354
 
-//
-// "WDRT" Watchdog Resource Table
-//
+///
+/// "WDRT" Watchdog Resource Table
+///
 #define EFI_ACPI_3_0_WATCHDOG_RESOURCE_TABLE_SIGNATURE 0x54524457
 
-//
-// "WDAT" Watchdog Action Table
-//
+///
+/// "WDAT" Watchdog Action Table
+///
 #define EFI_ACPI_3_0_WATCHDOG_ACTION_TABLE_SIGNATURE 0x54414457
 
-//
-// "iBFT" iSCSI Boot Firmware Table
-//
+///
+/// "iBFT" iSCSI Boot Firmware Table
+///
 #define EFI_ACPI_3_0_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE 0x54464269
 
 #pragma pack()

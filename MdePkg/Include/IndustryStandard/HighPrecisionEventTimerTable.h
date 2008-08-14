@@ -22,9 +22,10 @@
 // Ensure proper structure formats
 //
 #pragma pack(1)
-//
-// High Precision Event Timer Table header definition.
-//
+
+///
+/// High Precision Event Timer Table header definition.
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER             Header;
   UINT32                                  EventTimerBlockId;
@@ -34,9 +35,9 @@ typedef struct {
   UINT8                                   PageProtectionAndOemAttribute;
 } EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_HEADER;
 
-//
-// HPET Revision (defined in spec)
-//
+///
+/// HPET Revision (defined in spec)
+///
 #define EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_REVISION  0x01
 
 //

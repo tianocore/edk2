@@ -21,19 +21,19 @@
 //
 #pragma pack (1)
 
-//
-// Information Record header that appears at the beginning of each record
-//
+///
+/// Information Record header that appears at the beginning of each record
+///
 typedef struct {
   UINT8                                Type;
   UINT8                                Reserved;
   UINT16                               RecordLength;
 } EFI_ACPI_ASF_RECORD_HEADER;
 
-//
-// This structure contains information that identifies the system's type 
-// and configuration
-//
+///
+/// This structure contains information that identifies the system's type 
+/// and configuration
+///
 typedef struct {
   EFI_ACPI_ASF_RECORD_HEADER           RecordHeader;
   UINT8                                MinWatchDogResetValue;
@@ -44,9 +44,9 @@ typedef struct {
   UINT8                                Reserved[3];
 } EFI_ACPI_ASF_INFO;
 
-//
-// Alert sensors definition
-//
+///
+/// Alert sensors definition
+///
 #define ASF_ALRT_SENSOR_ARRAY_LENGTH     36
 
 typedef struct {
@@ -58,9 +58,9 @@ typedef struct {
   UINT8                                DeviceArray[ASF_ALRT_SENSOR_ARRAY_LENGTH];
 } EFI_ACPI_ASF_ALRT;
 
-//
-// Alert Remote Control System Actions
-//
+///
+/// Alert Remote Control System Actions
+///
 #define ASF_RCTL_DEVICES_ARRAY_LENGTH      16  
 typedef struct {
   EFI_ACPI_ASF_RECORD_HEADER           RecordHeader;
@@ -70,9 +70,9 @@ typedef struct {
   UINT8                                ControlArray[ASF_RCTL_DEVICES_ARRAY_LENGTH];
 } EFI_ACPI_ASF_RCTL;
 
-//
-// Remote Control Capabilities
-//
+///
+/// Remote Control Capabilities
+///
 typedef struct {
   EFI_ACPI_ASF_RECORD_HEADER           RecordHeader;
   UINT8                                RemoteControlCapabilities[7];
@@ -84,9 +84,9 @@ typedef struct {
   UINT8                                RMCPOEMParameters[2];
 } EFI_ACPI_ASF_RMCP;
 
-//
-// SMBus Devices with fixed addresses
-//
+///
+/// SMBus Devices with fixed addresses
+///
 #define ASF_ADDR_DEVICE_ARRAY_LENGTH      16  
 typedef struct {
   EFI_ACPI_ASF_RECORD_HEADER           RecordHeader;
@@ -104,9 +104,9 @@ typedef struct {
   EFI_ACPI_ASF_ADDR                    AsfAddr;
 } EFI_ACPI_1_0_ASF_DESCRIPTION_TABLE;
 
-//
-// "ASF!" ASF Description Table Signature
-//
+///
+/// "ASF!" ASF Description Table Signature
+///
 #define EFI_ACPI_1_0_ASF_DESCRIPTION_TABLE_SIGNATURE  0x21465341
 
 #pragma pack ()

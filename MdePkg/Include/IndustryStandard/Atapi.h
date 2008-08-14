@@ -20,9 +20,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #pragma pack(1)
 
-//
-// ATA_IDENTIFY_DATA is defined in ATA-5
-//
+///
+/// ATA_IDENTIFY_DATA is defined in ATA-5
+///
 typedef struct {
   UINT16  config;                     /* General Configuration */
   UINT16  cylinders;                  /* Number of Cylinders */
@@ -75,9 +75,9 @@ typedef struct {
   UINT16  reserved_160_255[96];
 } ATA_IDENTIFY_DATA;
 
-//
-// ATAPI_IDENTIFY_DATA is defined in ATA-6
-//
+///
+/// ATAPI_IDENTIFY_DATA is defined in ATA-6
+///
 typedef struct {
     UINT16  config;             // General Configuration
     UINT16  obsolete_1;
@@ -355,10 +355,10 @@ typedef struct {
   UINT8 reserved_11;
 } ATAPI_MODE_SENSE_CMD;
 
-//
-// ATAPI_PACKET_COMMAND is not defined in ATA specification.
-// We add it here for the convenience for ATA/ATAPI module writer. 
-//
+///
+/// ATAPI_PACKET_COMMAND is not defined in ATA specification.
+/// We add it here for the convenience for ATA/ATAPI module writer. 
+///
 typedef union {
   UINT16                    Data16[6];
   ATAPI_TEST_UNIT_READY_CMD TestUnitReady;

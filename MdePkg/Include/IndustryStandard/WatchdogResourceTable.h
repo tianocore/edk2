@@ -21,9 +21,10 @@
 // Ensure proper structure formats
 //
 #pragma pack(1)
-//
-// Watchdog Resource Table definition.
-//
+
+///
+/// Watchdog Resource Table definition.
+///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER             Header;
   EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  ControlRegisterAddress;
