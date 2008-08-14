@@ -38,9 +38,9 @@ typedef struct {
   UINT8   SmbiosBcdRevision;
 } SMBIOS_TABLE_ENTRY_POINT;
 
-//
-// The Smbios structure header
-//
+///
+/// The Smbios structure header
+///
 typedef struct {
   UINT8   Type;
   UINT8   Length;
