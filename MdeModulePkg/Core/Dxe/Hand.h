@@ -64,8 +64,6 @@ typedef struct {
   LIST_ENTRY                  OpenList;       // OPEN_PROTOCOL_DATA list.
   UINTN                       OpenListCount;
 
-  EFI_HANDLE                  ControllerHandle;
-
 } PROTOCOL_INTERFACE;
 
 #define OPEN_PROTOCOL_DATA_SIGNATURE  EFI_SIGNATURE_32('p','o','d','l')
