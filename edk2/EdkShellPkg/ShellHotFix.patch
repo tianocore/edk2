@@ -1,0 +1,346 @@
+Index: drivers/drivers.c
+===================================================================
+--- drivers/drivers.c	(revision 30)
++++ drivers/drivers.c	(working copy)
+@@ -130,6 +130,7 @@
+   UINTN                        StringIndex;
+   UINTN                        Index;
+   CHAR8                        *Language;
++  CHAR8                        *PlatformLanguage;
+   UINTN                        DriverImageHandleCount;
+   EFI_HANDLE                   *DriverImageHandleBuffer;
+   UINTN                        HandleIndex;
+@@ -152,6 +153,7 @@
+   SHELL_VAR_CHECK_PACKAGE      ChkPck;
+ 
+   Language                = NULL;
++  PlatformLanguage        = NULL;
+   DriverImageHandleCount  = 0;
+   DriverImageHandleBuffer = NULL;
+   IsHelp                  = FALSE;
+@@ -241,7 +243,7 @@
+       goto Done;
+     }
+ 
+-    Language = LibGetVariableLang ();
++    Language = LibGetVariable (L"Lang", &gEfiGlobalVariableGuid);
+     if (Language == NULL) {
+       Language = (CHAR8 *)AllocateZeroPool(strlena(LanguageCodeEnglish) + 1);
+       if (Language == NULL) {
+@@ -250,6 +252,15 @@
+       strcpya(Language, LanguageCodeEnglish);
+     }
+ 
++    PlatformLanguage = LibGetVariable (L"PlatformLang", &gEfiGlobalVariableGuid);
++    if (PlatformLanguage == NULL) {
++      PlatformLanguage = (CHAR8 *)AllocateZeroPool(strlena(PlatformLanguageCodeEnglish) + 1);
++      if (PlatformLanguage == NULL) {
++        return EFI_OUT_OF_RESOURCES;
++      }
++      strcpya(PlatformLanguage, PlatformLanguageCodeEnglish);
++    }
++
+     Item = LibCheckVarGetFlag (&ChkPck, L"-l");
+     if (Item) {
+       if (Language != NULL) {
+@@ -314,14 +325,6 @@
+                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                   );
+ 
+-    ComponentName  = NULL;
+-    ComponentName2 = NULL;
+-    Status = LibGetComponentNameProtocol (
+-               DriverImageHandleBuffer[Index],
+-               &ComponentName,
+-               &ComponentName2
+-               );
+-
+     DiagnosticsStatus = BS->OpenProtocol (
+                               DriverImageHandleBuffer[Index],
+                               &gEfiDriverDiagnostics2ProtocolGuid,
+@@ -418,37 +421,73 @@
+     } else {
+       PrintToken (STRING_TOKEN (STR_SHELLENV_PROTID_ONE_VAR_D), HiiHandle, NumberOfChildren);
+     }
+-
+-    Status     = EFI_SUCCESS;
++    
+     DriverName = L"<UNKNOWN>";
+-    SupportedLanguage = NULL;
+-    if (ComponentName != NULL) {
+-      if (ComponentName->GetDriverName != NULL) {
+-        SupportedLanguage = LibConvertSupportedLanguage (ComponentName->SupportedLanguages, Language);
++    Status = BS->OpenProtocol (
++                   DriverImageHandleBuffer[Index],
++                   &gEfiComponentName2ProtocolGuid,
++                   (VOID **) &ComponentName2,
++                   NULL,
++                   NULL,
++                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
++                   );
++    if (!EFI_ERROR (Status)) {
++      //
++      // Driver has Component Name 2 Protocol is available, we get the
++      // driver name var RFC 3066 language code
++      // 
++      Status = ComponentName2->GetDriverName (
++                                 ComponentName2,
++                                 PlatformLanguage,
++                                 &DriverName
++                                 );
++      if (EFI_ERROR (Status)) {
++        //
++        // Current RFC3066 language code fails, we then extract the supported
++        // language from Component Name 2 protocol interface.
++        // 
++        SupportedLanguage =  ExtractSupportedLanguage(ComponentName2->SupportedLanguages, Language);
++        if (SupportedLanguage != NULL) {
++          Status = ComponentName2->GetDriverName (
++                                     ComponentName2,
++                                     SupportedLanguage,
++                                     &DriverName
++                                     );
++          FreePool(SupportedLanguage);
++        }
++      }
++    }
++    if (EFI_ERROR (Status)) {
++      //
++      // In case Component Name 2 protocol is not available or some error occurs
++      // when getting driver name from Component Name 2 protocol, we get driver
++      // name from Component Name protocol.
++      // 
++      Status = BS->OpenProtocol (
++                     DriverImageHandleBuffer[Index],
++                     &gEfiComponentNameProtocolGuid,
++                     (VOID **) &ComponentName,
++                     NULL,
++                     NULL,
++                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
++                     );
++      if (!EFI_ERROR (Status)) {
+         Status = ComponentName->GetDriverName (
+                                   ComponentName,
+-                                  SupportedLanguage,
++                                  Language,
+                                   &DriverName
+                                   );
+       }
+-    } else if (ComponentName2 != NULL) {
+-      if (ComponentName2->GetDriverName != NULL) {
+-        SupportedLanguage = LibConvertSupportedLanguage (ComponentName2->SupportedLanguages, Language);
+-        Status = ComponentName2->GetDriverName (
+-                                   ComponentName2,
+-                                   SupportedLanguage,
+-                                   &DriverName
+-                                   );
+-      }
+     }
+-    if (SupportedLanguage != NULL) {
+-      FreePool (SupportedLanguage);
+-    }
+-
+     if (EFI_ERROR (Status)) {
++      //
++      // Fails to get driver name from either Component Name 2 & Component Name
++      // Protocol, we show "<UNKNOWN>" string as driver name.
++      // 
+       DriverName = L"<UNKNOWN>";
+     }
+ 
++ 
+     for (StringIndex = 0; StringIndex < StrLen (DriverName) && StringIndex < 35; StringIndex++) {
+       FormattedDriverName[StringIndex] = DriverName[StringIndex];
+     }
+@@ -491,6 +530,10 @@
+     FreePool (Language);
+   }
+ 
++  if (PlatformLanguage != NULL) {
++    FreePool (PlatformLanguage);
++  }
++
+   ShellCloseHandleEnumerator ();
+   LibCheckVarFreeVarList (&ChkPck);
+   LibUnInitializeStrings ();
+Index: Library/EfiShellLib.h
+===================================================================
+--- Library/EfiShellLib.h	(revision 30)
++++ Library/EfiShellLib.h	(working copy)
+@@ -174,22 +174,23 @@
+ //
+ //  Environment variable name constants
+ //
+-#define VarLanguageCodes    L"LangCodes"
+-#define VarLanguage         L"Lang"
+-#define VarTimeout          L"Timeout"
+-#define VarConsoleIn        L"ConIn"
+-#define VarConsoleOut       L"ConOut"
+-#define VarErrorOut         L"ErrOut"
+-#define VarBootOption       L"Boot%04x"
+-#define VarBootOrder        L"BootOrder"
+-#define VarBootNext         L"BootNext"
+-#define VarBootCurrent      L"BootCurrent"
+-#define VarDriverOption     L"Driver%04x"
+-#define VarDriverOrder      L"DriverOrder"
+-#define VarConsoleInpDev    L"ConInDev"
+-#define VarConsoleOutDev    L"ConOutDev"
+-#define VarErrorOutDev      L"ErrOutDev"
+-#define LanguageCodeEnglish "eng"
++#define VarLanguageCodes            L"LangCodes"
++#define VarLanguage                 L"Lang"
++#define VarTimeout                  L"Timeout"
++#define VarConsoleIn                L"ConIn"
++#define VarConsoleOut               L"ConOut"
++#define VarErrorOut                 L"ErrOut"
++#define VarBootOption               L"Boot%04x"
++#define VarBootOrder                L"BootOrder"
++#define VarBootNext                 L"BootNext"
++#define VarBootCurrent              L"BootCurrent"
++#define VarDriverOption             L"Driver%04x"
++#define VarDriverOrder              L"DriverOrder"
++#define VarConsoleInpDev            L"ConInDev"
++#define VarConsoleOutDev            L"ConOutDev"
++#define VarErrorOutDev              L"ErrOutDev"
++#define LanguageCodeEnglish         "eng"
++#define PlatformLanguageCodeEnglish "en-US"
+ 
+ #define ISO_639_2_ENTRY_SIZE  3
+ #define RFC_3066_ENTRY_SIZE   12
+@@ -333,4 +334,10 @@
+   IN CHAR8                           *LangCode
+   );
+ 
++CHAR8 *
++ExtractSupportedLanguage (
++  IN CONST CHAR8   *SupportedLanguages,
++  IN CONST CHAR8   *Language
++  );
++
+ #endif
+Index: Library/Misc.c
+===================================================================
+--- Library/Misc.c	(revision 30)
++++ Library/Misc.c	(working copy)
+@@ -1905,13 +1905,13 @@
+   IN VOID         *UserData
+   )
+ {
+-  CHAR8 *Data;
++  UINT8 *Data;
+ 
+   CHAR8 Val[50];
+ 
+   CHAR8 Str[20];
+ 
+-  CHAR8 c;
++  UINT8 c;
+   UINTN Size;
+   UINTN Index;
+   
+@@ -2271,3 +2271,76 @@
+   }
+   return Lang;
+ }
++
++CHAR8 *
++ExtractSupportedLanguage (
++  IN CONST CHAR8   *SupportedLanguages,
++  IN CONST CHAR8   *Language
++  )
++/*++
++
++  Routine Description:
++
++    This function matches the major language code (first two characters) in the
++    SupportedLanguages. The first language code in the SupportedLanguages that
++    matches first two characters of the input Language is returned. If there is no
++    such match, then NULL is returned.
++
++  Arguments:
++
++    SupportedLanguages    -   A Null-terminated ASCII string that contains one
++                              or more supported language codes. 
++
++    LangCode              -   A pointer to a Null-terminated ASCII string
++                              array indicating the RFC 3066 language.
++
++  Returns:
++
++    The RFC3066 language code that matches the major language. 
++
++--*/
++{
++  CONST CHAR8      *CurrentLanguage;
++  CHAR8            *SupportedLanguage;
++  UINTN            LanguageLen;
++
++  CurrentLanguage = SupportedLanguages;
++
++  while (CurrentLanguage != '\0') {
++    //
++    // Search till the end of current language.
++    // 
++    LanguageLen = 0;
++    while (CurrentLanguage[LanguageLen] != ';' && CurrentLanguage[LanguageLen] != '\0') {
++      LanguageLen++;
++    }
++
++    //
++    // should use AsciiStrnCmp(CurrentLanguage, Language, 2) == 0
++    // 
++    if ((CurrentLanguage[0] == Language[0]) && (CurrentLanguage[1] == Language[1])) {
++      //
++      // Match the major language code, then return a new copy of
++      // NULL-terminated SupportedLanguage.
++      //
++      SupportedLanguage = AllocatePool (LanguageLen + 1);
++      CopyMem (SupportedLanguage, (VOID *) CurrentLanguage, LanguageLen);
++
++      SupportedLanguage[LanguageLen] = '\0';
++
++      return SupportedLanguage;
++    }
++    //
++    // Make CurrentLangue point to the next candiate language code.
++    // 
++    CurrentLanguage += LanguageLen;
++    if (*CurrentLanguage == ';') {
++      CurrentLanguage++;
++    }
++  }
++
++  return NULL;
++}
++
++
++
+Index: SmbiosView/PrintInfo.c
+===================================================================
+--- SmbiosView/PrintInfo.c	(revision 30)
++++ SmbiosView/PrintInfo.c	(working copy)
+@@ -1779,7 +1779,7 @@
+   //
+   // MaxSize is determined by follow formula
+   //
+-  MaxSize = 1 << Size;
++  MaxSize = (UINTN) 1 << Size;
+   PrintToken (STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ONE_VAR_MB), HiiHandle, MaxSize);
+ 
+   if (Option >= SHOW_DETAIL) {
+Index: SmbiosView/Smbios.h
+===================================================================
+--- SmbiosView/Smbios.h	(revision 30)
++++ SmbiosView/Smbios.h	(working copy)
+@@ -34,11 +34,6 @@
+ 
+ extern EFI_HII_HANDLE HiiHandle;
+ 
+-#define EFI_SMBIOS_TABLE_GUID \
+-  { \
+-    0xeb9d2d31, 0x2d88, 0x11d3, 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d \
+-  }
+ 
+-extern EFI_GUID       gEfiSmbiosTableGuid;
+ 
+ #endif
