@@ -302,6 +302,8 @@
   ## IF TRUE, Default Keyboard Layout is disabled in Usb KeyBoard device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver|FALSE|BOOLEAN|0x00010200
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkHiiCompatibilitySupport|TRUE|BOOLEAN|0x00012008
+
 [PcdsFixedAtBuild.common]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicate maximum number of callback function
