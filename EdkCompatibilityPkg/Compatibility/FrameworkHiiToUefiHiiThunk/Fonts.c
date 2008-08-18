@@ -19,6 +19,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 UINT8 mGlyphBuffer[EFI_GLYPH_WIDTH * 2 * EFI_GLYPH_HEIGHT];
 
+/**
+  This function is only called by Graphics Console module and GraphicsLib. 
+  EDK II provides a UEFI Graphics Console module. ECP provides a GraphicsLib 
+  complying to UEFI HII.
+  
+  This function will ASSERT and return EFI_UNSUPPORTED.
+
+  @param This            N.A.
+  @param Source          N.A.
+  @param Index           N.A.
+  @param GlyphBuffer     N.A.
+  @param BitWidth        N.A.
+  @param InternalStatus  N.A.
+
+  @return EFI_UNSUPPORTED N.A.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiGetGlyph (
@@ -29,30 +46,30 @@ HiiGetGlyph (
   OUT    UINT16             *BitWidth,
   IN OUT UINT32             *InternalStatus
   )
-/*++
-
-Routine Description:
-  Translates a Unicode character into the corresponding font glyph.
-  If the Source was pointing to a non-spacing character, the next Source[*Index]
-  character will be parsed and OR'd to the GlyphBuffer until a spacing character
-  is found in the Source.  Since non-spacing characters are considered to be the
-  same pixel width as a regular character their BitWidth will be reflected correctly
-  however due to their special attribute, they are considered to be zero advancing width.
-  This basically means that the cursor would not advance, thus the character that follows
-  it would overlay the non-spacing character.  The Index is modified to reflect both the
-  incoming array entry into the Source string but also the outgoing array entry after having
-  parsed the equivalent of a single Glyph's worth of data.
-
-Arguments:
-
-Returns:
-
---*/
 {
   ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
+/**
+  This function is only called by Graphics Console module and GraphicsLib. 
+  EDK II provides a UEFI Graphics Console module. ECP provides a GraphicsLib 
+  complying to UEFI HII.
+  
+  This function will ASSERT and return EFI_UNSUPPORTED.
+
+  @param This            N.A.
+  @param GlyphBuffer     N.A.
+  @param Foreground      N.A.
+  @param Background      N.A.
+  @param Count           N.A.
+  @param Width           N.A.
+  @param Height          N.A.
+  @param BltBuffer       N.A.
+
+  @return EFI_UNSUPPORTED N.A.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiGlyphToBlt (

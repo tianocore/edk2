@@ -17,42 +17,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "UefiIfrDefault.h"
 #include "OpcodeCreation.h"
 
-EFI_STATUS
-EFIAPI
-HiiExportDatabase (
-  IN     EFI_HII_PROTOCOL *This,
-  IN     FRAMEWORK_EFI_HII_HANDLE    Handle,
-  IN OUT UINTN            *BufferSize,
-  OUT    VOID             *Buffer
-  )
-/*++
-
-Routine Description:
-
-  This function allows a program to extract a form or form package that has
-  previously been registered with the EFI HII database.
-
-Arguments:
-
-Returns:
-
---*/
-{
-  ASSERT (FALSE);
-  return EFI_UNSUPPORTED;
-}
-
+//
+// This structure is only intended to be used in this file.
+//
 #pragma pack(push, 1)
 typedef struct {
   EFI_HII_PACK_HEADER            PackageHeader;
   FRAMEWORK_EFI_IFR_FORM_SET     FormSet;
   FRAMEWORK_EFI_IFR_END_FORM_SET EndFormSet;
-} FRAMEWORK_HII_FORMSET_TEMPLATE;
+} FW_HII_FORMSET_TEMPLATE;
 #pragma pack(pop)
 
-FRAMEWORK_HII_FORMSET_TEMPLATE FormSetTemplate = {
+FW_HII_FORMSET_TEMPLATE FormSetTemplate = {
   {
-    sizeof (FRAMEWORK_HII_FORMSET_TEMPLATE),
+    sizeof (FW_HII_FORMSET_TEMPLATE),
     EFI_HII_IFR
   },
   {
@@ -77,6 +55,64 @@ FRAMEWORK_HII_FORMSET_TEMPLATE FormSetTemplate = {
   }
 };
 
+
+/**
+
+  This thunk module only handles UEFI HII packages. The caller of this function 
+  won¡¯t be able to parse the content. Therefore, it is not supported.
+  
+  This function will ASSERT and return EFI_UNSUPPORTED.
+
+  @param This            N.A.
+  @param Handle          N.A.
+  @param BufferSize      N.A.
+  @param Buffer          N.A.
+
+  @retval EFI_UNSUPPORTED
+
+**/
+EFI_STATUS
+EFIAPI
+HiiExportDatabase (
+  IN     EFI_HII_PROTOCOL *This,
+  IN     FRAMEWORK_EFI_HII_HANDLE    Handle,
+  IN OUT UINTN            *BufferSize,
+  OUT    VOID             *Buffer
+  )
+{
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
+
+
+/**
+  This function allows a program to extract a form or form package that has
+  previously been registered with the EFI HII database.
+
+  In this thunk module, this function will create a IFR Package with only 
+  one Formset. Effectively, only the GUID of the Formset is updated and return
+  in this IFR package to caller. This is enable the Framework modules which call 
+  a API named GetStringFromToken. GetStringFromToken retieves a String based on
+  a String Token from a Package List known only by the Formset GUID.
+  
+
+
+  @param This             A pointer to the EFI_HII_PROTOCOL instance.
+  @param Handle           Handle on which the form resides. Type FRAMEWORK_EFI_HII_HANDLE  is defined in
+                          EFI_HII_PROTOCOL.NewPack() in the Packages section.
+  @param FormId           Ignored by this implementation.
+  @param BufferLengthTemp On input, the size of input buffer. On output, it
+                          is the size of FW_HII_FORMSET_TEMPLATE.
+  @param Buffer           The buffer designed to receive the form(s).
+
+  @retval  EFI_SUCCESS            Buffer filled with the requested forms. BufferLength
+                                  was updated.
+  @retval  EFI_INVALID_PARAMETER  The handle is unknown.
+  @retval  EFI_NOT_FOUND          A form on the requested handle cannot be found with the
+                                  requested FormId.
+  @retval  EFI_BUFFER_TOO_SMALL   The buffer provided was not large enough to allow the form to be stored.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiGetForms (
@@ -86,68 +122,57 @@ HiiGetForms (
   IN OUT UINTN              *BufferLengthTemp,
   OUT    UINT8              *Buffer
   )
-/*++
-
-Routine Description:
-
-  This function allows a program to extract a form or form package that has
-  previously been registered with the EFI HII database.
-
-Arguments:
-  This         - A pointer to the EFI_HII_PROTOCOL instance.
-
-  Handle       - Handle on which the form resides. Type FRAMEWORK_EFI_HII_HANDLE  is defined in
-                 EFI_HII_PROTOCOL.NewPack() in the Packages section.
-
-  FormId       - The ID of the form to return. If the ID is zero, the entire form package is returned.
-                 Type EFI_FORM_ID is defined in "Related Definitions" below.
-
-  BufferLength - On input, the length of the Buffer. On output, the length of the returned buffer, if
-                 the length was sufficient and, if it was not, the length that is required to fit the
-                 requested form(s).
-
-  Buffer       - The buffer designed to receive the form(s).
-
-Returns:
-
-  EFI_SUCCESS           -  Buffer filled with the requested forms. BufferLength
-                           was updated.
-
-  EFI_INVALID_PARAMETER -  The handle is unknown.
-
-  EFI_NOT_FOUND         -  A form on the requested handle cannot be found with the
-                           requested FormId.
-
-  EFI_BUFFER_TOO_SMALL  - The buffer provided was not large enough to allow the form to be stored.
-
---*/
 {
-  EFI_HII_THUNK_PRIVATE_DATA                *Private;
-  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *MapEntry;
-  FRAMEWORK_HII_FORMSET_TEMPLATE            *OutputFormSet;
+  HII_THUNK_PRIVATE_DATA                *Private;
+  HII_THUNK_CONTEXT  *ThunkContext;
+  FW_HII_FORMSET_TEMPLATE            *OutputFormSet;
 
-  if (*BufferLengthTemp < sizeof(FRAMEWORK_HII_FORMSET_TEMPLATE)) {
-    *BufferLengthTemp = sizeof(FRAMEWORK_HII_FORMSET_TEMPLATE);
+  if (*BufferLengthTemp < sizeof(FW_HII_FORMSET_TEMPLATE)) {
+    *BufferLengthTemp = sizeof(FW_HII_FORMSET_TEMPLATE);
     return EFI_BUFFER_TOO_SMALL;
   }
   
-  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+  Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  MapEntry = FrameworkHiiHandleToMapDatabaseEntry (Private, Handle);
+  ThunkContext = FwHiiHandleToThunkContext (Private, Handle);
 
-  if (MapEntry == NULL) {
+  if (ThunkContext == NULL) {
     return EFI_NOT_FOUND;
   }
 
-  OutputFormSet = (FRAMEWORK_HII_FORMSET_TEMPLATE *) Buffer;
+  OutputFormSet = (FW_HII_FORMSET_TEMPLATE *) Buffer;
   
-  CopyMem (OutputFormSet, &FormSetTemplate, sizeof (FRAMEWORK_HII_FORMSET_TEMPLATE));
-  CopyMem (&OutputFormSet->FormSet.Guid, &MapEntry->TagGuid, sizeof (EFI_GUID)); 
-  
+  CopyMem (OutputFormSet, &FormSetTemplate, sizeof (FW_HII_FORMSET_TEMPLATE));
+  CopyMem (&OutputFormSet->FormSet.Guid, &ThunkContext->TagGuid, sizeof (EFI_GUID)); 
+
+  OutputFormSet->FormSet.Class = ThunkContext->FormSetClass;
+  OutputFormSet->FormSet.SubClass = ThunkContext->FormSetSubClass;
+  OutputFormSet->FormSet.Help     = ThunkContext->FormSetHelp;
+  OutputFormSet->FormSet.FormSetTitle = ThunkContext->FormSetTitle;
+
   return EFI_SUCCESS;
 }
 
 
+/**
+
+  This function allows a program to extract the NV Image
+  that represents the default storage image
+
+
+  @param This            A pointer to the EFI_HII_PROTOCOL instance.
+  @param Handle          The HII handle from which will have default data retrieved.
+                         UINTN            - Mask used to retrieve the default image.
+  @param DefaultMask     EDES_TODO: Add parameter description
+  @param VariablePackList Callee allocated, tightly-packed, link list data
+                         structure that contain all default varaible packs
+                         from the Hii Database.
+
+  @retval  EFI_NOT_FOUND          If Hii database does not contain any default images.
+  @retval  EFI_INVALID_PARAMETER  Invalid input parameter.
+  @retval  EFI_SUCCESS            Operation successful.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiGetDefaultImage (
@@ -156,36 +181,15 @@ HiiGetDefaultImage (
   IN     UINTN                       DefaultMask,
   OUT    EFI_HII_VARIABLE_PACK_LIST  **VariablePackList
   )
-/*++
-
-  Routine Description:
-
-  This function allows a program to extract the NV Image
-  that represents the default storage image
-
-  Arguments:
-    This             - A pointer to the EFI_HII_PROTOCOL instance.
-    Handle           - The HII handle from which will have default data retrieved.
-    UINTN            - Mask used to retrieve the default image.
-    VariablePackList - Callee allocated, tightly-packed, link list data
-                         structure that contain all default varaible packs
-                         from the Hii Database.
-
-  Returns:
-    EFI_NOT_FOUND         - If Hii database does not contain any default images.
-    EFI_INVALID_PARAMETER - Invalid input parameter.
-    EFI_SUCCESS           - Operation successful.
-
---*/
 {
   LIST_ENTRY        *UefiDefaults;
   EFI_HII_HANDLE    UefiHiiHandle;
   EFI_STATUS        Status;
-  EFI_HII_THUNK_PRIVATE_DATA *Private;
+  HII_THUNK_PRIVATE_DATA *Private;
 
-  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+  Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  UefiHiiHandle = FrameworkHiiHandleToUefiHiiHandle (Private, Handle);
+  UefiHiiHandle = FwHiiHandleToUefiHiiHandle (Private, Handle);
   if (UefiHiiHandle == NULL) {
     ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
@@ -197,7 +201,7 @@ HiiGetDefaultImage (
     goto Done;
   }
 
-  Status = UefiDefaultsToFrameworkDefaults (UefiDefaults, DefaultMask, VariablePackList);
+  Status = UefiDefaultsToFwDefaults (UefiDefaults, DefaultMask, VariablePackList);
 
 Done:
   FreeDefaultList (UefiDefaults);
@@ -205,22 +209,31 @@ Done:
   return Status;
 }
 
+/**
+  EDES_TODO: Add function description.
+
+  @param CallbackHandle  EDES_TODO: Add parameter description
+  @param ThunkContext  EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 EFI_STATUS
-ThunkUpdateFormCallBack (
+UpdateFormCallBack (
   IN       EFI_HANDLE                                CallbackHandle,
-  IN CONST HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry
+  IN CONST HII_THUNK_CONTEXT                         *ThunkContext
   )
 {
   EFI_STATUS                                Status;
-  EFI_FORM_CALLBACK_PROTOCOL                *FrameworkFormCallbackProtocol;
+  EFI_FORM_CALLBACK_PROTOCOL                *FormCallbackProtocol;
   EFI_HII_CONFIG_ACCESS_PROTOCOL            *ConfigAccessProtocol;
   EFI_HANDLE                                UefiDriverHandle;
-  HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE *ConfigAccessProtocolInstance;
+  CONFIG_ACCESS_PRIVATE                     *ConfigAccessPrivate;
   
   Status = gBS->HandleProtocol (
                    CallbackHandle,
                    &gEfiFormCallbackProtocolGuid,
-                   (VOID **) &FrameworkFormCallbackProtocol
+                   (VOID **) &FormCallbackProtocol
                    );
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
@@ -228,7 +241,7 @@ ThunkUpdateFormCallBack (
   
   Status = mHiiDatabase->GetPackageListHandle (
                                         mHiiDatabase,
-                                        HandleMapEntry->UefiHiiHandle,
+                                        ThunkContext->UefiHiiHandle,
                                         &UefiDriverHandle
                                         );
   ASSERT_EFI_ERROR (Status);
@@ -239,17 +252,28 @@ ThunkUpdateFormCallBack (
                    );
   ASSERT_EFI_ERROR (Status);
   
-  ConfigAccessProtocolInstance = HII_TRHUNK_CONFIG_ACCESS_PROTOCOL_INSTANCE_FROM_PROTOCOL (ConfigAccessProtocol);
+  ConfigAccessPrivate = CONFIG_ACCESS_PRIVATE_FROM_PROTOCOL (ConfigAccessProtocol);
   
-  ConfigAccessProtocolInstance->FrameworkFormCallbackProtocol = FrameworkFormCallbackProtocol;
+  ConfigAccessPrivate->FormCallbackProtocol = FormCallbackProtocol;
 
   return EFI_SUCCESS;
 }
 
 
+/**
+  EDES_TODO: Add function description.
+
+  @param HiiPackageList  EDES_TODO: Add parameter description
+  @param PackageIndex    EDES_TODO: Add parameter description
+  @param BufferLen       EDES_TODO: Add parameter description
+  @param Buffer          EDES_TODO: Add parameter description
+
+  @return EDES_TODO: Add description for return value
+
+**/
 STATIC
 EFI_STATUS
-GetPackageDataFromPackageList (
+GetPackageData (
   IN  EFI_HII_PACKAGE_LIST_HEADER *HiiPackageList,
   IN  UINT32                      PackageIndex,
   OUT UINT32                      *BufferLen,
@@ -390,7 +414,7 @@ LocateLabel (
   @retval EFI_SUCCESS       The first found Form ID is returned in FormId.
 **/
 EFI_STATUS
-ThunkLocateFormId (
+LocateFormId (
   IN  EFI_HII_HANDLE Handle,
   IN  EFI_FORM_LABEL Label,
   OUT EFI_GUID       *FormsetGuid,
@@ -419,7 +443,7 @@ ThunkLocateFormId (
   }
 
   for (Index = 0; ; Index++) {
-    Status = GetPackageDataFromPackageList (HiiPackageList, Index, &PackageLength, &Package);
+    Status = GetPackageData (HiiPackageList, Index, &PackageLength, &Package);
     if (!EFI_ERROR (Status)) {
       CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
       if (PackageHeader.Type == EFI_HII_PACKAGE_FORM) {
@@ -439,77 +463,87 @@ Done:
   
   return Status;
 }
-EFI_STATUS
-EFIAPI
-HiiUpdateForm (
-  IN EFI_HII_PROTOCOL       *This,
-  IN FRAMEWORK_EFI_HII_HANDLE          Handle,
-  IN EFI_FORM_LABEL         Label,
-  IN BOOLEAN                AddData,
-  IN FRAMEWORK_EFI_HII_UPDATE_DATA    *Data
-  )
-/*++
-
-Routine Description:
+/**
   This function allows the caller to update a form that has
   previously been registered with the EFI HII database.
 
-Arguments:
-  Handle     - Hii Handle associated with the Formset to modify
-  Label      - Update information starting immediately after this label in the IFR
-  AddData    - If TRUE, add data.  If FALSE, remove data
-  Data       - If adding data, this is the pointer to the data to add
 
-Returns:
-  EFI_SUCCESS - Update success.
-  Other       - Update fail.
+  @param This            EDES_TODO: Add parameter description
+  @param Handle          Hii Handle associated with the Formset to modify
+  @param Label           Update information starting immediately after this label in the IFR
+  @param AddData         If TRUE, add data.  If FALSE, remove data
+  @param Data            If adding data, this is the pointer to the data to add
 
---*/
+  @retval  EFI_SUCCESS  Update success.
+  @retval  Other        Update fail.
+
+**/
+EFI_STATUS
+EFIAPI
+HiiUpdateForm (
+  IN EFI_HII_PROTOCOL                  *This,
+  IN FRAMEWORK_EFI_HII_HANDLE          Handle,
+  IN EFI_FORM_LABEL                    Label,
+  IN BOOLEAN                           AddData,
+  IN FRAMEWORK_EFI_HII_UPDATE_DATA    *Data
+  )
 {
   EFI_STATUS                                Status;
-  EFI_HII_THUNK_PRIVATE_DATA                *Private;
-  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
+  HII_THUNK_PRIVATE_DATA                    *Private;
+  HII_THUNK_CONTEXT                          *ThunkContext;
   EFI_HII_UPDATE_DATA                       *UefiHiiUpdateData;
   EFI_HII_HANDLE                            UefiHiiHandle;
   EFI_GUID                                  FormsetGuid;
   EFI_FORM_ID                               FormId;
+  EFI_TPL                                   OldTpl;
 
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  
+  mInFrameworkUpdatePakcage = TRUE;
   Status = EFI_SUCCESS;
+  UefiHiiUpdateData = NULL;
 
-  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  HandleMapEntry = FrameworkHiiHandleToMapDatabaseEntry (Private, Handle);
+  Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  if (HandleMapEntry == NULL) {
-    return EFI_NOT_FOUND;
+  ThunkContext = FwHiiHandleToThunkContext (Private, Handle);
+
+  if (ThunkContext == NULL) {
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
   
   if (Data->FormSetUpdate) {
-    Status = ThunkUpdateFormCallBack ((EFI_HANDLE) (UINTN) Data->FormCallbackHandle, HandleMapEntry);
+    Status = UpdateFormCallBack ((EFI_HANDLE) (UINTN) Data->FormCallbackHandle, ThunkContext);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Done;
     }
   }
 
-  if (HandleMapEntry->IsPackageListWithOnlyStringPackages) {
-    UefiHiiHandle = TagGuidToUefiIfrHiiHandle (Private, &HandleMapEntry->TagGuid);
+  if ((ThunkContext->IfrPackageCount == 0) && (ThunkContext->StringPackageCount != 0)) {
+    UefiHiiHandle = TagGuidToUefiHiiHandle (Private, &ThunkContext->TagGuid);
   
     if (UefiHiiHandle == NULL) {
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
     }
   } else {
-    UefiHiiHandle = HandleMapEntry->UefiHiiHandle;
+    UefiHiiHandle = ThunkContext->UefiHiiHandle;
   }
 
-  UefiHiiUpdateData = NULL;
+  Status = LocateFormId (UefiHiiHandle, Label, &FormsetGuid, &FormId);
+  if (EFI_ERROR (Status)) {
+    //
+    // Can't find the label.
+    //
+    goto Done;
+  }
 
   if (AddData) {
     if (Data->DataCount != 0) {
-      
-      Status = ThunkFrameworkUpdateDataToUefiUpdateData (Data, AddData, &UefiHiiUpdateData);
-      ASSERT_EFI_ERROR (Status);
 
-      Status = ThunkLocateFormId (UefiHiiHandle, Label, &FormsetGuid, &FormId);
+      ThunkContext = UefiHiiHandleToThunkContext (Private, UefiHiiHandle);
+      Status = FwUpdateDataToUefiUpdateData (ThunkContext, Data, AddData, &UefiHiiUpdateData);
       ASSERT_EFI_ERROR (Status);
 
       Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, AddData, UefiHiiUpdateData);
@@ -517,9 +551,6 @@ Returns:
       
     } 
   } else {
-    Status = ThunkLocateFormId (UefiHiiHandle, Label, &FormsetGuid, &FormId);
-    ASSERT_EFI_ERROR (Status);
-
     //
     // Delete Opcode starting from Labe in FormId found
     //
@@ -529,10 +560,15 @@ Returns:
     ASSERT_EFI_ERROR (Status);
   }
 
+Done:
   if (UefiHiiUpdateData != NULL) {
     SafeFreePool (UefiHiiUpdateData->Data);
     SafeFreePool (UefiHiiUpdateData);
   }
+
+  mInFrameworkUpdatePakcage = FALSE; 
+
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }

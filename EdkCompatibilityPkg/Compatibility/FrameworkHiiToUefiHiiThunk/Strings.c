@@ -1,7 +1,6 @@
 /**@file
-
-  This file contains the keyboard processing code to the HII database.
-
+  This file implements the protocol functions related to string package.
+  
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -40,126 +39,34 @@ Returns:
 }
 
 EFI_STATUS
-GetTagGuidByFrameworkHiiHandle (
-  IN  CONST EFI_HII_THUNK_PRIVATE_DATA  *Private,
-  IN        FRAMEWORK_EFI_HII_HANDLE    FrameworkHiiHandle,
+GetTagGuidByFwHiiHandle (
+  IN  CONST HII_THUNK_PRIVATE_DATA      *Private,
+  IN        FRAMEWORK_EFI_HII_HANDLE    FwHiiHandle,
   OUT       EFI_GUID                    *TagGuid
   )
 {
-  LIST_ENTRY                                *ListEntry;
-  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
+  LIST_ENTRY                                *Link;
+  HII_THUNK_CONTEXT                          *ThunkContext;
 
   ASSERT (TagGuid != NULL);
 
-  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
-       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
-       ListEntry = ListEntry->ForwardLink
-       ) {
+  Link = GetFirstNode (&Private->ThunkContextListHead);
+  while (!IsNull (&Private->ThunkContextListHead, Link)) {
 
-    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
+    ThunkContext = HII_THUNK_CONTEXT_FROM_LINK (Link);
 
-    if (FrameworkHiiHandle == HandleMapEntry->FrameworkHiiHandle) {
-      CopyGuid (TagGuid, &HandleMapEntry->TagGuid);
+    if (FwHiiHandle == ThunkContext->FwHiiHandle) {
+      CopyGuid (TagGuid, &ThunkContext->TagGuid);
       return EFI_SUCCESS;
     }
+
+    Link = GetNextNode (&Private->ThunkContextListHead, Link);
   }
-  
+
   return EFI_NOT_FOUND;
 }
 
-EFI_STATUS
-HiiThunkNewStringForAllStringPackages (
-  IN  CONST EFI_HII_THUNK_PRIVATE_DATA  *Private,
-  OUT CONST EFI_GUID                    *TagGuid,
-  IN        CHAR16                     *Language,
-  IN OUT    STRING_REF                 *Reference,
-  IN        CHAR16                     *NewString
-  )
-{
-  EFI_STATUS                                Status;
-  LIST_ENTRY                                *ListEntry;
-  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
-  EFI_STRING_ID                             StringId1;
-  EFI_STRING_ID                             StringId2;
-  CHAR8                                     *AsciiLanguage;
-  BOOLEAN                                   Found;
 
-  ASSERT (TagGuid != NULL);
-
-  StringId1 = (EFI_STRING_ID) 0;
-  StringId2 = (EFI_STRING_ID) 0;
-  Found = FALSE;
-
-  if (Language == NULL) {
-    AsciiLanguage = NULL;
-  } else {
-    AsciiLanguage = AllocateZeroPool (StrLen (Language) + 1);
-    UnicodeStrToAsciiStr (Language, AsciiLanguage);
-  }
-
-  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
-       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
-       ListEntry = ListEntry->ForwardLink
-       ) {
-
-    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
-
-    if (CompareGuid (TagGuid, &HandleMapEntry->TagGuid)) {
-      Found = TRUE;
-      if (*Reference == 0) {
-        if (AsciiLanguage == NULL) {
-          Status = HiiLibNewString (HandleMapEntry->UefiHiiHandle, &StringId2, NewString);
-        } else {
-          Status = mHiiStringProtocol->NewString (
-                                         mHiiStringProtocol,
-                                         HandleMapEntry->UefiHiiHandle,
-                                         &StringId2,
-                                         AsciiLanguage,
-                                         NULL,
-                                         NewString,
-                                         NULL
-                                         );
-        }
-      } else {
-        if (AsciiLanguage == NULL) {
-          Status = HiiLibSetString (HandleMapEntry->UefiHiiHandle, *Reference, NewString);
-        } else {
-          Status = mHiiStringProtocol->SetString (
-                                       mHiiStringProtocol,
-                                       HandleMapEntry->UefiHiiHandle,
-                                       *Reference,
-                                       AsciiLanguage,
-                                       NewString,
-                                       NULL
-                                       );
-        }
-      }
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-      if (*Reference == 0) {
-        if (StringId1 == (EFI_STRING_ID) 0) {
-          StringId1 = StringId2;
-        } else {
-          if (StringId1 != StringId2) {
-            ASSERT(FALSE);
-            return EFI_INVALID_PARAMETER;
-          }
-        }
-      }
-    }
-  }
-
-  if (Found) {
-    *Reference = StringId1;
-    Status = EFI_SUCCESS;
-  } else {
-    ASSERT (FALSE);
-    Status = EFI_NOT_FOUND;
-  }
-  
-  return Status;
-}
 
 EFI_STATUS
 EFIAPI
@@ -185,16 +92,127 @@ Returns:
 
 --*/
 {
-  EFI_STATUS                 Status;
-  EFI_HII_THUNK_PRIVATE_DATA *Private;
-  EFI_GUID                   TagGuid;
+  EFI_STATUS                                Status;
+  HII_THUNK_PRIVATE_DATA                    *Private;
+  EFI_GUID                                  TagGuid;
+  LIST_ENTRY                                *Link;
+  HII_THUNK_CONTEXT                          *ThunkContext;
+  EFI_STRING_ID                             StringId;
+  EFI_STRING_ID                             LastStringId;
+  CHAR8                                     *AsciiLanguage;
+  BOOLEAN                                   Found;
 
-  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+  //
+  // BugBug: Conver the language to 3066.
+  //
 
-  Status = GetTagGuidByFrameworkHiiHandle (Private, Handle, &TagGuid);
+  LastStringId      = (EFI_STRING_ID) 0;
+  StringId          = (EFI_STRING_ID) 0;
+  Found             = FALSE;
+  AsciiLanguage     = NULL;
+
+  Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+
+  Status = GetTagGuidByFwHiiHandle (Private, Handle, &TagGuid);
   ASSERT_EFI_ERROR (Status);
 
-  Status = HiiThunkNewStringForAllStringPackages (Private, &TagGuid, Language, Reference, NewString);
+  if (Language != NULL) {
+    AsciiLanguage = AllocateZeroPool (StrLen (Language) + 1);
+    UnicodeStrToAsciiStr (Language, AsciiLanguage);
+  }
+
+  Link = GetFirstNode (&Private->ThunkContextListHead);
+  while (!IsNull (&Private->ThunkContextListHead, Link)) {
+    ThunkContext = HII_THUNK_CONTEXT_FROM_LINK (Link);
+
+    if (CompareGuid (&TagGuid, &ThunkContext->TagGuid)) {
+      Found = TRUE;
+      if (*Reference == 0) {
+        //
+        // Create a new string token.
+        //
+        if (AsciiLanguage == NULL) {
+          //
+          // For all languages in the package list.
+          //
+          Status = HiiLibNewString (ThunkContext->UefiHiiHandle, &StringId, NewString);
+        } else {
+          //
+          // For specified language.
+          //
+          Status = mHiiStringProtocol->NewString (
+                                         mHiiStringProtocol,
+                                         ThunkContext->UefiHiiHandle,
+                                         &StringId,
+                                         AsciiLanguage,
+                                         NULL,
+                                         NewString,
+                                         NULL
+                                         );
+        }
+      } else {
+        //
+        // Update the existing string token.
+        //
+        if (AsciiLanguage == NULL) {
+          //
+          // For all languages in the package list.
+          //
+          Status = HiiLibSetString (ThunkContext->UefiHiiHandle, *Reference, NewString);
+        } else {
+          //
+          // For specified language.
+          //
+          Status = mHiiStringProtocol->SetString (
+                                       mHiiStringProtocol,
+                                       ThunkContext->UefiHiiHandle,
+                                       *Reference,
+                                       AsciiLanguage,
+                                       NewString,
+                                       NULL
+                                       );
+        }
+      }
+      if (EFI_ERROR (Status)) {
+        //
+        // Only EFI_INVALID_PARAMETER is defined in HII 0.92 specification.
+        //
+        return EFI_INVALID_PARAMETER;
+      }
+
+      if (*Reference == 0) {
+        //
+        // When creating new string token, make sure all created token is the same
+        // for all string packages registered using FW HII interface.
+        //
+        if (LastStringId == (EFI_STRING_ID) 0) {
+          LastStringId = StringId;
+        } else {
+          if (LastStringId != StringId) {
+            ASSERT(FALSE);
+            return EFI_INVALID_PARAMETER;
+          }
+        }
+      }
+    }
+
+    Link = GetNextNode (&Private->ThunkContextListHead, Link);
+  }
+
+  if (Found) {
+    if (*Reference == 0) {
+      *Reference = StringId;
+    }
+    Status = EFI_SUCCESS;
+  } else {
+    DEBUG((EFI_D_ERROR, "Thunk HiiNewString fails to find the String Packages to update\n"));
+    //
+    // BUGBUG: Remove ths ASSERT when development is done.
+    //
+    ASSERT (FALSE);
+    Status = EFI_NOT_FOUND;
+  }
+  
   //
   // For UNI file, some String may not be defined for a language. This has been true for a lot of platform code.
   // For this case, EFI_NOT_FOUND will be returned. To allow the old code to be run without porting, we don't assert 
@@ -224,8 +242,7 @@ Returns:
 
 --*/
 {
-  ASSERT (FALSE);
-  return EFI_UNSUPPORTED;
+  return EFI_SUCCESS;
 }
 
 typedef struct {
@@ -293,13 +310,13 @@ Returns:
 
 --*/
 {
-  LIST_ENTRY                                *ListEntry;
-  HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY  *HandleMapEntry;
+  LIST_ENTRY                                *Link;
+  HII_THUNK_CONTEXT  *ThunkContext;
   CHAR8                                     *AsciiLanguage;
-  EFI_HII_THUNK_PRIVATE_DATA                *Private;
+  HII_THUNK_PRIVATE_DATA                *Private;
   CHAR8                                     *Rfc3066AsciiLanguage;
 
-  Private = EFI_HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
+  Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
   if (LanguageString == NULL) {
     AsciiLanguage = NULL;
@@ -328,21 +345,20 @@ Returns:
     
   }
 
-  for (ListEntry = Private->HiiThunkHandleMappingDBListHead.ForwardLink;
-       ListEntry != &Private->HiiThunkHandleMappingDBListHead;
-       ListEntry = ListEntry->ForwardLink
-       ) {
+  Link = GetFirstNode (&Private->ThunkContextListHead);
 
-    HandleMapEntry = HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY_FROM_LISTENTRY (ListEntry);
+  while (!IsNull (&Private->ThunkContextListHead, Link)) {
 
-    if (Handle == HandleMapEntry->FrameworkHiiHandle) {
+    ThunkContext = HII_THUNK_CONTEXT_FROM_LINK (Link);
+
+    if (Handle == ThunkContext->FwHiiHandle) {
       if (AsciiLanguage == NULL) {
-        return HiiLibGetString (HandleMapEntry->UefiHiiHandle, Token, StringBuffer, BufferLengthTemp);
+        return HiiLibGetString (ThunkContext->UefiHiiHandle, Token, StringBuffer, BufferLengthTemp);
       } else {
         return mHiiStringProtocol->GetString (
                                      mHiiStringProtocol,
                                      AsciiLanguage,
-                                     HandleMapEntry->UefiHiiHandle,
+                                     ThunkContext->UefiHiiHandle,
                                      Token,
                                      StringBuffer,
                                      BufferLengthTemp,
@@ -350,6 +366,9 @@ Returns:
                                      );
       }
     }
+    
+    
+    Link = GetNextNode (&Private->ThunkContextListHead, Link);
   }
 
   return EFI_NOT_FOUND;

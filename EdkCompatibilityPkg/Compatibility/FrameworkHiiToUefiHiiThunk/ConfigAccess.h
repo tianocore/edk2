@@ -25,16 +25,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
    that Setup Utility can load the Buffer Storage using this protocol.
    
    @param Packages          The framework package list.
-   @param MapEntry          The Thunk Layer Handle Mapping Database Entry.
+   @param ThunkContext          The Thunk Layer Handle Mapping Database Entry.
    
-   @retval  EFI_SUCCESS             The Config Access Protocol is installed successfully.
+   @retval  EFI_SUCCESS         The Config Access Protocol is installed successfully.
    @retval  EFI_OUT_RESOURCE    There is not enough memory.
    
 **/
 EFI_STATUS
-InstallDefaultUefiConfigAccessProtocol (
+InstallDefaultConfigAccessProtocol (
   IN  CONST EFI_HII_PACKAGES                         *Packages,
-  IN  OUT   HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *MapEntry
+  IN  OUT   HII_THUNK_CONTEXT *ThunkContext
+  )
+;
+
+VOID
+UninstallDefaultConfigAccessProtocol (
+  IN  HII_THUNK_CONTEXT                   *ThunkContext
   )
 ;
 
@@ -44,22 +50,22 @@ InstallDefaultUefiConfigAccessProtocol (
   so that data can be read from the data storage such as UEFI Variable or module's
   customized storage exposed by EFI_FRAMEWORK_CALLBACK.
 
-   @param This          Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL
+   @param This        Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL
    @param Request     A null-terminated Unicode string in <ConfigRequest> format. Note that this
-                                includes the routing information as well as the configurable name / value pairs. It is
-                                invalid for this string to be in <MultiConfigRequest> format.
+                      includes the routing information as well as the configurable name / value pairs. It is
+                      invalid for this string to be in <MultiConfigRequest> format.
 
-   @param Progress   On return, points to a character in the Request string. Points to the string's null
-                               terminator if request was successful. Points to the most recent '&' before the first
-                                failing name / value pair (or the beginning of the string if the failure is in the first
-                                name / value pair) if the request was not successful
+   @param Progress    On return, points to a character in the Request string. Points to the string's null
+                      terminator if request was successful. Points to the most recent '&' before the first
+                      failing name / value pair (or the beginning of the string if the failure is in the first
+                      name / value pair) if the request was not successful
    @param Results     A null-terminated Unicode string in <ConfigAltResp> format which has all
-                              values filled in for the names in the Request string. String to be allocated by the called
-                              function.
+                      values filled in for the names in the Request string. String to be allocated by the called
+                      function.
    
    @retval EFI_INVALID_PARAMETER   If there is no Buffer Storage for this Config Access instance.
-   @retval EFI_SUCCESS                    The setting is retrived successfully.
-   @retval !EFI_SUCCESS                  The error returned by UEFI Get Variable or Framework Form Callback Nvread.
+   @retval EFI_SUCCESS             The setting is retrived successfully.
+   @retval !EFI_SUCCESS            The error returned by UEFI Get Variable or Framework Form Callback Nvread.
  **/
 EFI_STATUS
 EFIAPI
@@ -79,14 +85,14 @@ ThunkExtractConfig (
   customized storage exposed by EFI_FRAMEWORK_CALLBACK.
    
    @param This              Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL
-   @param Configuration A null-terminated Unicode string in <ConfigResp> format.
-   @param Progress         A pointer to a string filled in with the offset of the most recent '&' before the first
-                                     failing name / value pair (or the beginning of the string if the failure is in the first
-                                     name / value pair) or the terminating NULL if all was successful.
+   @param Configuration     A null-terminated Unicode string in <ConfigResp> format.
+   @param Progress          A pointer to a string filled in with the offset of the most recent '&' before the first
+                            failing name / value pair (or the beginning of the string if the failure is in the first
+                            name / value pair) or the terminating NULL if all was successful.
    
    @retval EFI_INVALID_PARAMETER   If there is no Buffer Storage for this Config Access instance.
-   @retval EFI_SUCCESS                    The setting is saved successfully.
-   @retval !EFI_SUCCESS                  The error returned by UEFI Set Variable or Framework Form Callback Nvwrite.
+   @retval EFI_SUCCESS             The setting is saved successfully.
+   @retval !EFI_SUCCESS            The error returned by UEFI Set Variable or Framework Form Callback Nvwrite.
 **/  
 EFI_STATUS
 EFIAPI
@@ -102,24 +108,24 @@ ThunkRouteConfig (
   the framework HII module willl do no porting (except some porting works needed for callback for EFI_ONE_OF_OPTION opcode)
   and still work with a UEFI HII SetupBrowser.
    
-   @param This                          Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-   @param Action                       Specifies the type of action taken by the browser. See EFI_BROWSER_ACTION_x.
-   @param QuestionId                A unique value which is sent to the original exporting driver so that it can identify the
-                                                type of data to expect. The format of the data tends to vary based on the opcode that
-                                                generated the callback.
-   @param Type                         The type of value for the question. See EFI_IFR_TYPE_x in
-                                                EFI_IFR_ONE_OF_OPTION.
-   @param Value                        A pointer to the data being sent to the original exporting driver. The type is specified
-                                                by Type. Type EFI_IFR_TYPE_VALUE is defined in
-                                                EFI_IFR_ONE_OF_OPTION.
-   @param ActionRequest             On return, points to the action requested by the callback function. Type
-                                                EFI_BROWSER_ACTION_REQUEST is specified in SendForm() in the Form
-                                                Browser Protocol.
+   @param This                  Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+   @param Action                Specifies the type of action taken by the browser. See EFI_BROWSER_ACTION_x.
+   @param QuestionId            A unique value which is sent to the original exporting driver so that it can identify the
+                                type of data to expect. The format of the data tends to vary based on the opcode that
+                                generated the callback.
+   @param Type                  The type of value for the question. See EFI_IFR_TYPE_x in
+                                EFI_IFR_ONE_OF_OPTION.
+   @param Value                 A pointer to the data being sent to the original exporting driver. The type is specified
+                                by Type. Type EFI_IFR_TYPE_VALUE is defined in
+                                EFI_IFR_ONE_OF_OPTION.
+   @param ActionRequest         On return, points to the action requested by the callback function. Type
+                                EFI_BROWSER_ACTION_REQUEST is specified in SendForm() in the Form
+                                Browser Protocol.
    
    @retval EFI_UNSUPPORTED      If the Framework HII module does not register Callback although it specify the opcode under
-                                                focuse to be INTERRACTIVE.
-   @retval EFI_SUCCESS            The callback complete successfully.
-   @retval !EFI_SUCCESS           The error code returned by EFI_FORM_CALLBACK_PROTOCOL.Callback.
+                                focuse to be INTERRACTIVE.
+   @retval EFI_SUCCESS          The callback complete successfully.
+   @retval !EFI_SUCCESS         The error code returned by EFI_FORM_CALLBACK_PROTOCOL.Callback.
    
  **/
 EFI_STATUS

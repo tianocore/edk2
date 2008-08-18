@@ -28,7 +28,6 @@ FORM_EXPRESSION  *mSuppressExpression;
 FORM_EXPRESSION  *mGrayOutExpression;
 
 EFI_GUID  gZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
-EFI_GUID  gTianoHiiIfrGuid = EFI_IFR_TIANO_GUID;
 
 /**
   Initialize Statement header members.
