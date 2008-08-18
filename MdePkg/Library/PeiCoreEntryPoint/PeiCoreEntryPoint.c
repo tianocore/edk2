@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // The Library classes this module produced
 //
 #include <Library/PeiCoreEntryPoint.h>
+#include <Library/DebugLib.h>
 
 /**
 
@@ -52,6 +53,12 @@ _ModuleEntryPoint(
 )
 {
   ProcessModuleEntryPointList (SecCoreData, PpiList, NULL);
+  
+  //
+  // Should never return
+  //
+  ASSERT(FALSE);
+  CpuDeadLoop ();  
 }
 
 
