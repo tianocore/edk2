@@ -58,3 +58,7 @@
   gEfiDpcProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentName2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+
+[Depex]
+  gEfiDpcProtocolGuid
+  
