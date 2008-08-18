@@ -18,7 +18,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Dhcp4Dxe
   FILE_GUID                      = 94734718-0BBC-47fb-96A5-EE7A5AE6A2AD
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000

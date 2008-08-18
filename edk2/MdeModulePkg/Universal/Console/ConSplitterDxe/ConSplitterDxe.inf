@@ -18,7 +18,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ConSplitterDxe
   FILE_GUID                      = 408edcec-cf6d-477c-a5a8-b4844e3de281
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -79,7 +79,7 @@
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL ALWAYS_PRODUCED
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
   gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
-  gEfiAbsolutePointerProtocolGuid								# PROTOCOL ALWAYS_PRODUCED
+  gEfiAbsolutePointerProtocolGuid               # PROTOCOL ALWAYS_PRODUCED
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport

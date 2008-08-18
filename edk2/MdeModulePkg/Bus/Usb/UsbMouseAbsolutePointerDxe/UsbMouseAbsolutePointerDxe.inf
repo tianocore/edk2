@@ -19,7 +19,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UsbMouseAbsolutePointerDxe
   FILE_GUID                      = 4EA43463-747C-46eb-97FB-B0E5C5F05306
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -55,7 +55,7 @@
 [Protocols]
   gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiAbsolutePointerProtocolGuid								# PROTOCOL ALWAYS_CONSUMED
+  gEfiAbsolutePointerProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError

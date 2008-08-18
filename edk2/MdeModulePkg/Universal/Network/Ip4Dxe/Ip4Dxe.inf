@@ -18,7 +18,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Ip4Dxe
   FILE_GUID                      = 9FB1A1F3-3B71-4324-B39A-745CBB015FFF
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
