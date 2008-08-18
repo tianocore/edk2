@@ -71,3 +71,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText
 
+[Depex]
+  TRUE
+
