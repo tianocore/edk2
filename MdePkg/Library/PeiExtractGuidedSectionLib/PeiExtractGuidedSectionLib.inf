@@ -42,7 +42,7 @@
   DebugLib
   HobLib
 
-[FixedPcd.common]
+[Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler 
 
 

@@ -15,6 +15,40 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UefiIfrLibraryInternal.h"
 
+STATIC CONST EFI_FORM_BROWSER2_PROTOCOL      *mFormBrowser2     = NULL;
+STATIC CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *mHiiConfigRouting = NULL;
+
+/**
+  This function locate FormBrowser2 protocols for later usage.
+
+  @return Status the status to locate protocol.
+**/
+EFI_STATUS
+LocateFormBrowser2Protocols (
+  VOID
+  )
+{
+  EFI_STATUS Status;
+  //
+  // Locate protocols for later usage
+  //
+  if (mFormBrowser2 == NULL) {
+    Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &mFormBrowser2);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+  
+  if (mHiiConfigRouting == NULL) {
+    Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &mHiiConfigRouting);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
 //
 // Fake <ConfigHdr>
 //
@@ -32,6 +66,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT16 mFakeConfigHdr[] = L"GUID=00000000000
 
   @retval EFI_SUCCESS            Displayed dialog and received user interaction
   @retval EFI_INVALID_PARAMETER  One of the parameters was invalid.
+  @retval EFI_OUT_OF_RESOURCES   There is no enough available memory space.
 
 **/
 EFI_STATUS
@@ -86,13 +121,19 @@ IfrLibCreatePopUp2 (
   CurrentAttribute = ConOut->Mode->Attribute;
 
   LineBuffer = AllocateZeroPool (DimensionsWidth * sizeof (CHAR16));
-  ASSERT (LineBuffer != NULL);
+  if (LineBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Determine the largest string in the dialog box
   // Notice we are starting with 1 since String is the first string
   //
   StringArray = AllocateZeroPool (NumberOfLines * sizeof (CHAR16 *));
+  if (StringArray == NULL) {
+    FreePool (LineBuffer);
+    return EFI_OUT_OF_RESOURCES;
+  }
   LargestString = StrLen (String);
   StringArray[0] = String;
 
@@ -100,6 +141,8 @@ IfrLibCreatePopUp2 (
     StackString = VA_ARG (Marker, CHAR16 *);
 
     if (StackString == NULL) {
+      FreePool (LineBuffer);
+      FreePool (StringArray);
       return EFI_INVALID_PARAMETER;
     }
 
@@ -211,7 +254,11 @@ IfrLibCreatePopUp2 (
   ConOut->SetAttribute (ConOut, CurrentAttribute);
   ConOut->EnableCursor (ConOut, TRUE);
 
-  return Status;}
+  FreePool (LineBuffer);
+  FreePool (StringArray);
+
+  return Status;
+}
 
 
 /**
@@ -307,6 +354,7 @@ ToLower (
   @param  BufferSize             Size of the buffer in bytes.
 
   @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_OUT_OF_RESOURCES   There is no enough available memory space.
 
 **/
 EFI_STATUS
@@ -322,6 +370,9 @@ BufferToHexString (
   UINTN       StrBufferLen;
 
   NewBuffer = AllocateCopyPool (BufferSize, Buffer);
+  if (NewBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   SwapBuffer (NewBuffer, BufferSize);
 
   StrBufferLen = BufferSize * sizeof (CHAR16) + 1;
@@ -670,6 +721,7 @@ FindBlockName (
 
   @retval EFI_SUCCESS            Routine success.
   @retval EFI_BUFFER_TOO_SMALL   The intput buffer is too small.
+  @retval EFI_OUT_OF_RESOURCES   There is no enough available memory space.
 
 **/
 EFI_STATUS
@@ -688,18 +740,11 @@ GetBrowserData (
   UINTN                           HeaderLen;
   UINTN                           BufferLen;
   CHAR16                          *Progress;
-  EFI_FORM_BROWSER2_PROTOCOL      *FormBrowser2;
-  EFI_HII_CONFIG_ROUTING_PROTOCOL *HiiConfigRouting;
 
   //
   // Locate protocols for use
   //
-  Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &FormBrowser2);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &HiiConfigRouting);
+  Status = LocateFormBrowser2Protocols ();
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -709,16 +754,22 @@ GetBrowserData (
   //
   ConfigHdr = mFakeConfigHdr;
   HeaderLen = StrLen (ConfigHdr);
-
+  
+  //
+  // First try allocate 0x4000 buffer for the formet storage data.
+  //
   BufferLen = 0x4000;
   ConfigResp = AllocateZeroPool (BufferLen + HeaderLen);
+  if (ConfigResp == NULL) {
+    BufferLen = 0;
+  }
 
   StringPtr = ConfigResp + HeaderLen;
   *StringPtr = L'&';
   StringPtr++;
 
-  Status = FormBrowser2->BrowserCallback (
-                           FormBrowser2,
+  Status = mFormBrowser2->BrowserCallback (
+                           mFormBrowser2,
                            &BufferLen,
                            StringPtr,
                            TRUE,
@@ -726,15 +777,21 @@ GetBrowserData (
                            VariableName
                            );
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    FreePool (ConfigResp);
+    if (ConfigResp != NULL) {
+      FreePool (ConfigResp);
+    }
+
     ConfigResp = AllocateZeroPool (BufferLen + HeaderLen);
+    if (ConfigResp == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     StringPtr = ConfigResp + HeaderLen;
     *StringPtr = L'&';
     StringPtr++;
 
-    Status = FormBrowser2->BrowserCallback (
-                             FormBrowser2,
+    Status = mFormBrowser2->BrowserCallback (
+                             mFormBrowser2,
                              &BufferLen,
                              StringPtr,
                              TRUE,
@@ -751,8 +808,8 @@ GetBrowserData (
   //
   // Convert <ConfigResp> to buffer data
   //
-  Status = HiiConfigRouting->ConfigToBlock (
-                               HiiConfigRouting,
+  Status = mHiiConfigRouting->ConfigToBlock (
+                               mHiiConfigRouting,
                                ConfigResp,
                                Buffer,
                                BufferSize,
@@ -780,6 +837,7 @@ GetBrowserData (
                                  &OFFSET=<Number>&WIDTH=<Number>*
 
   @retval EFI_SUCCESS            Routine success.
+  @retval EFI_OUT_OF_RESOURCES   There is no enough available memory space.
   @retval Other                  Updating Browser uncommitted data failed.
 
 **/
@@ -800,8 +858,6 @@ SetBrowserData (
   UINTN                           HeaderLen;
   UINTN                           BufferLen;
   CHAR16                          *Progress;
-  EFI_FORM_BROWSER2_PROTOCOL      *FormBrowser2;
-  EFI_HII_CONFIG_ROUTING_PROTOCOL *HiiConfigRouting;
   CHAR16                          BlockName[33];
   CHAR16                          *ConfigRequest;
   CHAR16                          *Request;
@@ -809,12 +865,7 @@ SetBrowserData (
   //
   // Locate protocols for use
   //
-  Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &FormBrowser2);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &HiiConfigRouting);
+  Status = LocateFormBrowser2Protocols ();
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -846,6 +897,9 @@ SetBrowserData (
 
   BufferLen = HeaderLen * sizeof (CHAR16) + StrSize (Request);
   ConfigRequest = AllocateZeroPool (BufferLen);
+  if (ConfigRequest == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   CopyMem (ConfigRequest, ConfigHdr, HeaderLen * sizeof (CHAR16));
   StringPtr = ConfigRequest + HeaderLen;
@@ -854,8 +908,8 @@ SetBrowserData (
   //
   // Convert buffer to <ConfigResp>
   //
-  Status = HiiConfigRouting->BlockToConfig (
-                                HiiConfigRouting,
+  Status = mHiiConfigRouting->BlockToConfig (
+                                mHiiConfigRouting,
                                 ConfigRequest,
                                 Buffer,
                                 BufferSize,
@@ -863,7 +917,7 @@ SetBrowserData (
                                 &Progress
                                 );
   if (EFI_ERROR (Status)) {
-    FreePool (ConfigResp);
+    FreePool (ConfigRequest);
     return Status;
   }
 
@@ -875,14 +929,14 @@ SetBrowserData (
   //
   // Change uncommitted data in Browser
   //
-  Status = FormBrowser2->BrowserCallback (
-                           FormBrowser2,
+  Status = mFormBrowser2->BrowserCallback (
+                           mFormBrowser2,
                            &BufferSize,
                            StringPtr,
                            FALSE,
                            NULL,
                            NULL
                            );
-  FreePool (ConfigResp);
+  FreePool (ConfigRequest);
   return Status;
 }

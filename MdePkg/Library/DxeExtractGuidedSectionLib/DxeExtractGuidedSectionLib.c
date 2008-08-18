@@ -21,7 +21,7 @@
 #include <Library/ExtractGuidedSectionLib.h>
 
 STATIC GUID                 *mExtractHandlerGuidTable;
-STATIC UINT32               mNumberOfExtractHandler;
+STATIC UINT32               mNumberOfExtractHandler = 0;
 
 STATIC EXTRACT_GUIDED_SECTION_DECODE_HANDLER   *mExtractDecodeHandlerTable;
 STATIC EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *mExtractGetInfoHandlerTable;
@@ -52,18 +52,16 @@ DxeExtractGuidedSectionLibConstructor (
   
   mExtractDecodeHandlerTable  = (EXTRACT_GUIDED_SECTION_DECODE_HANDLER *) AllocatePool (PcdGet32 (PcdMaximumGuidedExtractHandler) * sizeof (EXTRACT_GUIDED_SECTION_DECODE_HANDLER));
   if (mExtractDecodeHandlerTable == NULL) {
+    FreePool (mExtractHandlerGuidTable);
     return RETURN_OUT_OF_RESOURCES;
   }
 
   mExtractGetInfoHandlerTable = (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *) AllocatePool (PcdGet32 (PcdMaximumGuidedExtractHandler) * sizeof (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER));
   if (mExtractGetInfoHandlerTable == NULL) {
+    FreePool (mExtractHandlerGuidTable);
+    FreePool (mExtractDecodeHandlerTable);
     return RETURN_OUT_OF_RESOURCES;
   }
-  
-  //
-  // the initialized number is Zero.
-  //
-  mNumberOfExtractHandler = 0;
   
   return RETURN_SUCCESS;
 }
@@ -122,17 +120,13 @@ ExtractGuidedSectionRegisterHandlers (
   //
   for (Index = 0; Index < mNumberOfExtractHandler; Index ++) {
     if (CompareGuid (&mExtractHandlerGuidTable[Index], SectionGuid)) {
-      break;
+      //
+      // If the guided handler has been registered before, only update its handler.
+      //
+      mExtractDecodeHandlerTable [Index] = DecodeHandler;
+      mExtractGetInfoHandlerTable [Index] = GetInfoHandler;
+      return RETURN_SUCCESS;
     }
-  }
-
-  //
-  // If the guided handler has been registered before, only update its handler.
-  //
-  if (Index < mNumberOfExtractHandler) {
-    mExtractDecodeHandlerTable [Index] = DecodeHandler;
-    mExtractGetInfoHandlerTable [Index] = GetInfoHandler;
-    return RETURN_SUCCESS;
   }
   
   //
@@ -197,26 +191,22 @@ ExtractGuidedSectionGetInfo (
   //
   for (Index = 0; Index < mNumberOfExtractHandler; Index ++) {
     if (CompareGuid (&mExtractHandlerGuidTable[Index], &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
-      break;
+      //
+      // Call the match handler to getinfo for the input section data.
+      //
+      return mExtractGetInfoHandlerTable [Index] (
+                InputSection,
+                OutputBufferSize,
+                ScratchBufferSize,
+                SectionAttribute
+              );
     }
   }
 
   //
   // Not found, the input guided section is not supported. 
   //
-  if (Index == mNumberOfExtractHandler) {
-    return RETURN_UNSUPPORTED;
-  }
-
-  //
-  // Call the match handler to getinfo for the input section data.
-  //
-  return mExtractGetInfoHandlerTable [Index] (
-            InputSection,
-            OutputBufferSize,
-            ScratchBufferSize,
-            SectionAttribute
-          );
+  return RETURN_UNSUPPORTED;
 }
 
 /**
@@ -270,24 +260,20 @@ ExtractGuidedSectionDecode (
   //
   for (Index = 0; Index < mNumberOfExtractHandler; Index ++) {
     if (CompareGuid (&mExtractHandlerGuidTable[Index], &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
-      break;
+      //
+      // Call the match handler to extract raw data for the input section data.
+      //
+      return mExtractDecodeHandlerTable [Index] (
+                InputSection,
+                OutputBuffer,
+                ScratchBuffer,
+                AuthenticationStatus
+              );
     }
   }
 
   //
   // Not found, the input guided section is not supported. 
   //
-  if (Index == mNumberOfExtractHandler) {
-    return RETURN_UNSUPPORTED;
-  }
-
-  //
-  // Call the match handler to extract raw data for the input section data.
-  //
-  return mExtractDecodeHandlerTable [Index] (
-            InputSection,
-            OutputBuffer,
-            ScratchBuffer,
-            AuthenticationStatus
-          );
+  return RETURN_UNSUPPORTED;
 }

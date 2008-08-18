@@ -196,17 +196,13 @@ ExtractGuidedSectionRegisterHandlers (
   //
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionGuid)) {
-      break;
+      //
+      // If the guided handler has been registered before, only update its handler.
+      //
+      HandlerInfo->ExtractDecodeHandlerTable [Index] = DecodeHandler;
+      HandlerInfo->ExtractGetInfoHandlerTable [Index] = GetInfoHandler;
+      return RETURN_SUCCESS;
     }
-  }
-
-  //
-  // If the guided handler has been registered before, only update its handler.
-  //
-  if (Index < HandlerInfo->NumberOfExtractHandler) {
-    HandlerInfo->ExtractDecodeHandlerTable [Index] = DecodeHandler;
-    HandlerInfo->ExtractGetInfoHandlerTable [Index] = GetInfoHandler;
-    return RETURN_SUCCESS;
   }
 
   //
@@ -284,26 +280,22 @@ ExtractGuidedSectionGetInfo (
   //
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
-      break;
+      //
+      // Call the match handler to getinfo for the input section data.
+      //
+      return HandlerInfo->ExtractGetInfoHandlerTable [Index] (
+                InputSection,
+                OutputBufferSize,
+                ScratchBufferSize,
+                SectionAttribute
+              );
     }
   }
 
   //
   // Not found, the input guided section is not supported. 
   //
-  if (Index == HandlerInfo->NumberOfExtractHandler) {
-    return RETURN_UNSUPPORTED;
-  }
-
-  //
-  // Call the match handler to getinfo for the input section data.
-  //
-  return HandlerInfo->ExtractGetInfoHandlerTable [Index] (
-            InputSection,
-            OutputBufferSize,
-            ScratchBufferSize,
-            SectionAttribute
-          );
+  return RETURN_UNSUPPORTED;
 }
 
 /**
@@ -366,24 +358,20 @@ ExtractGuidedSectionDecode (
   //
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
-      break;
+      //
+      // Call the match handler to extract raw data for the input guided section.
+      //
+      return HandlerInfo->ExtractDecodeHandlerTable [Index] (
+                InputSection,
+                OutputBuffer,
+                ScratchBuffer,
+                AuthenticationStatus
+              );
     }
   }
 
   //
   // Not found, the input guided section is not supported. 
   //
-  if (Index == HandlerInfo->NumberOfExtractHandler) {
-    return RETURN_UNSUPPORTED;
-  }
-
-  //
-  // Call the match handler to extract raw data for the input guided section.
-  //
-  return HandlerInfo->ExtractDecodeHandlerTable [Index] (
-            InputSection,
-            OutputBuffer,
-            ScratchBuffer,
-            AuthenticationStatus
-          );
+  return RETURN_UNSUPPORTED;
 }

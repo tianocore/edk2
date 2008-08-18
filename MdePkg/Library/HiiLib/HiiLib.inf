@@ -22,7 +22,7 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x0002000A
+  EFI_SPECIFICATION_VERSION      = 0x00020000
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
@@ -32,16 +32,19 @@
   HiiLib.c
   HiiString.c
   HiiLanguage.c
-
+  InternalHiiLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
   DebugLib
   PcdLib
   UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
   DevicePathLib
 
 [Protocols]
