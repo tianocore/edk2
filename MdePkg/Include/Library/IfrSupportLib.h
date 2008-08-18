@@ -662,4 +662,28 @@ IfrLibCreatePopUp (
   )
 ;
 
+/**
+  Draw a dialog and return the selected key using Variable Argument List.
+
+  @param  NumberOfLines          The number of lines for the dialog box
+  @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
+  @param  String                 Pointer to the first string in the list
+  @param  Args                   VA_LIST marker for the variable argument list.
+                                 A series of (quantity == NumberOfLines - 1) text
+                                 strings which will be used to construct the dialog
+                                 box
+
+  @retval EFI_SUCCESS            Displayed dialog and received user interaction
+  @retval EFI_INVALID_PARAMETER  One of the parameters was invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+IfrLibCreatePopUp2 (
+  IN  UINTN                       NumberOfLines,
+  OUT EFI_INPUT_KEY               *KeyValue,
+  IN  VA_LIST                     Args
+  )
+;
+
 #endif
