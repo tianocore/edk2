@@ -28,6 +28,22 @@ VOID *gHobList = NULL;
 /**
   Enrty point to DXE core.
 
+  This function is the entry point to the DXE Foundation. The PEI phase, which executes just before
+  DXE, is responsible for loading and invoking the DXE Foundation in system memory. The only
+  parameter that is passed to the DXE Foundation is HobStart. This parameter is a pointer to the
+  HOB list that describes the system state at the hand-off to the DXE Foundation. At a minimum,
+  this system state must include the following:
+    - PHIT HOB
+    - CPU HOB
+    - Description of system memory
+    - Description of one or more firmware volumes
+  The DXE Foundation is also guaranteed that only one processor is running and that the processor is
+  running with interrupts disabled. The implementation of the DXE Foundation must not make any
+  assumptions about where the DXE Foundation will be loaded or where the stack is located. In
+  general, the DXE Foundation should make as few assumptions about the state of the system as
+  possible. This lack of assumptions will allow the DXE Foundation to be portable to the widest
+  variety of system architectures.
+  
   @param  HobStart Pointer of HobList.
 
 **/
