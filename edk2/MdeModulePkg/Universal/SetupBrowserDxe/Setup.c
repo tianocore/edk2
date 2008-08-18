@@ -298,7 +298,7 @@ SendForm (
       // Initialize internal data structures of FormSet
       //
       Status = InitializeFormSet (Selection->Handle, &Selection->FormSetGuid, FormSet);
-      if (EFI_ERROR (Status)) {
+      if (EFI_ERROR (Status) || IsListEmpty (&FormSet->FormListHead)) {
         DestroyFormSet (FormSet);
         break;
       }
