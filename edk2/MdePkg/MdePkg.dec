@@ -290,7 +290,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE|BOOLEAN|0x0000000e
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE|BOOLEAN|0x000000010
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE|BOOLEAN|0x00000011
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate|FALSE|BOOLEAN|0x00000012
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate|FALSE|BOOLEAN|0x00000012             # Indicates whether EFI 1.1 ISO 639-2 language supports are obsolete.
 
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000|UINT32|0x00000001
@@ -329,11 +329,11 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001|UINT32|0x30001000c
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
-  ## Default language is selected for displaying BDS. 
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c              # default platform supported ISO 639-2 languages: Engish & French.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d                      # default current ISO 639-2 language: English.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e # default platform supported RFC 3066 languages: (American) English & French. 
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f            # defualt current RFC 3066 language: (American) English.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c              # Default current ISO 639-2 language: English.
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
