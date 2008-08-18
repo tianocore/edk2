@@ -212,24 +212,24 @@ CoreNotifyOnArchProtocolInstallation (
 // Following is needed to display missing architectural protocols in debug builds
 //
 typedef struct {
-  EFI_GUID                    *ProtocolGuid;
-  CHAR16                       *GuidString;
+  EFI_GUID                     *ProtocolGuid;
+  CHAR8                        *GuidString;
 } GUID_TO_STRING_PROTOCOL_ENTRY;
 
-CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
-  { &gEfiSecurityArchProtocolGuid,         (CHAR16 *)L"Security"           },
-  { &gEfiCpuArchProtocolGuid,              (CHAR16 *)L"CPU"                },
-  { &gEfiMetronomeArchProtocolGuid,        (CHAR16 *)L"Metronome"          },
-  { &gEfiTimerArchProtocolGuid,            (CHAR16 *)L"Timer"              },
-  { &gEfiBdsArchProtocolGuid,              (CHAR16 *)L"Bds"                },
-  { &gEfiWatchdogTimerArchProtocolGuid,    (CHAR16 *)L"Watchdog Timer"     },
-  { &gEfiRuntimeArchProtocolGuid,          (CHAR16 *)L"Runtime"            },
-  { &gEfiVariableArchProtocolGuid,         (CHAR16 *)L"Variable"           },
-  { &gEfiVariableWriteArchProtocolGuid,    (CHAR16 *)L"Variable Write"     },
-  { &gEfiCapsuleArchProtocolGuid,          (CHAR16 *)L"Capsule"            },
-  { &gEfiMonotonicCounterArchProtocolGuid, (CHAR16 *)L"Monotonic Counter"  },
-  { &gEfiResetArchProtocolGuid,            (CHAR16 *)L"Reset"              },
-  { &gEfiRealTimeClockArchProtocolGuid,    (CHAR16 *)L"Real Time Clock"    }
+GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
+  { &gEfiSecurityArchProtocolGuid,         "Security"           },
+  { &gEfiCpuArchProtocolGuid,              "CPU"                },
+  { &gEfiMetronomeArchProtocolGuid,        "Metronome"          },
+  { &gEfiTimerArchProtocolGuid,            "Timer"              },
+  { &gEfiBdsArchProtocolGuid,              "Bds"                },
+  { &gEfiWatchdogTimerArchProtocolGuid,    "Watchdog Timer"     },
+  { &gEfiRuntimeArchProtocolGuid,          "Runtime"            },
+  { &gEfiVariableArchProtocolGuid,         "Variable"           },
+  { &gEfiVariableWriteArchProtocolGuid,    "Variable Write"     },
+  { &gEfiCapsuleArchProtocolGuid,          "Capsule"            },
+  { &gEfiMonotonicCounterArchProtocolGuid, "Monotonic Counter"  },
+  { &gEfiResetArchProtocolGuid,            "Reset"              },
+  { &gEfiRealTimeClockArchProtocolGuid,    "Real Time Clock"    }
 };
 
 
@@ -248,10 +248,9 @@ CoreDisplayMissingArchProtocols (
 
   for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
     if (!Entry->Present) {
-      MissingEntry = MissingProtocols;
       for (MissingEntry = MissingProtocols; TRUE ; MissingEntry++) {
         if (CompareGuid (Entry->ProtocolGuid, MissingEntry->ProtocolGuid)) {
-          DEBUG ((DEBUG_ERROR, "\n%s Arch Protocol not present!!\n", MissingEntry->GuidString));
+          DEBUG ((DEBUG_ERROR, "\n%a Arch Protocol not present!!\n", MissingEntry->GuidString));
           break;
         }
       }
