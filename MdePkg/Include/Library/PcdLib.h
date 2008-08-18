@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Base.h>
 
 #define PCD_INVALID_TOKEN_NUMBER ((UINTN) 0)
+#define PCD_MAX_SKU_ID           0x100
 
 #define PcdToken(TokenName)                 _PCD_TOKEN_##TokenName
 
