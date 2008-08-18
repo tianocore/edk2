@@ -403,6 +403,43 @@ HiiLibGetSupportedLanguageNumber (
 ;
 
 /**
+  Exports the contents of one or all package lists in the HII database into a buffer.
+
+  If Handle is not NULL and not a valid EFI_HII_HANDLE registered in the database, 
+  then ASSERT.
+  If PackageListHeader is NULL, then ASSERT.
+  If PackageListSize is NULL, then ASSERT.
+
+  @param  Handle                 The HII Handle.
+  @param  PackageListHeader      A pointer to a buffer that will contain the results of 
+                                 the export function.
+  @param  PackageListSize        On output, the length of the buffer that is required for the exported data.
+
+  @retval EFI_SUCCESS            Package exported.
+
+  @retval EFI_OUT_OF_RESOURCES   Not enought memory to complete the operations.
+
+**/
+EFI_STATUS 
+EFIAPI
+HiiLibExportPackageLists (
+  IN EFI_HII_HANDLE                    Handle,
+  OUT EFI_HII_PACKAGE_LIST_HEADER      **PackageListHeader,
+  OUT UINTN                            *PackageListSize
+  )
+;
+
+EFI_STATUS
+EFIAPI
+HiiLibListPackageLists (
+  IN        UINT8                     PackageType,
+  IN CONST  EFI_GUID                  *PackageGuid,
+  IN OUT    UINTN                     *HandleBufferLength,
+  OUT       EFI_HII_HANDLE            **Handle
+  )
+;
+
+/**
   Convert language code from RFC3066 to ISO639-2.
 
   LanguageRfc3066 contain a single RFC 3066 code such as

@@ -36,11 +36,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT16 mFakeConfigHdr[] = L"GUID=00000000000
 **/
 EFI_STATUS
 EFIAPI
-IfrLibCreatePopUp (
+IfrLibCreatePopUp2 (
   IN  UINTN                       NumberOfLines,
   OUT EFI_INPUT_KEY               *KeyValue,
-  IN  CHAR16                      *String,
-  ...
+  IN  VA_LIST                     Marker
   )
 {
   UINTN                         Index;
@@ -54,7 +53,6 @@ IfrLibCreatePopUp (
   UINTN                         BottomRow;
   UINTN                         DimensionsWidth;
   UINTN                         DimensionsHeight;
-  VA_LIST                       Marker;
   EFI_INPUT_KEY                 Key;
   UINTN                         LargestString;
   CHAR16                        *StackString;
@@ -66,7 +64,10 @@ IfrLibCreatePopUp (
   EFI_EVENT                     WaitList[2];
   UINTN                         CurrentAttribute;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *ConOut;
+  CHAR16                        *String;
 
+  String = VA_ARG (Marker, CHAR16 *);
+  
   if ((KeyValue == NULL) || (String == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -95,7 +96,6 @@ IfrLibCreatePopUp (
   LargestString = StrLen (String);
   StringArray[0] = String;
 
-  VA_START (Marker, String);
   for (Index = 1; Index < NumberOfLines; Index++) {
     StackString = VA_ARG (Marker, CHAR16 *);
 
@@ -109,7 +109,6 @@ IfrLibCreatePopUp (
       LargestString = StringLen;
     }
   }
-  VA_END (Marker);
 
   if ((LargestString + 2) > DimensionsWidth) {
     LargestString = DimensionsWidth - 2;
@@ -212,9 +211,43 @@ IfrLibCreatePopUp (
   ConOut->SetAttribute (ConOut, CurrentAttribute);
   ConOut->EnableCursor (ConOut, TRUE);
 
+  return Status;}
+
+
+/**
+  Draw a dialog and return the selected key.
+
+  @param  NumberOfLines          The number of lines for the dialog box
+  @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
+  @param  String                 Pointer to the first string in the list
+  @param  ...                    A series of (quantity == NumberOfLines - 1) text
+                                 strings which will be used to construct the dialog
+                                 box
+
+  @retval EFI_SUCCESS            Displayed dialog and received user interaction
+  @retval EFI_INVALID_PARAMETER  One of the parameters was invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+IfrLibCreatePopUp (
+  IN  UINTN                       NumberOfLines,
+  OUT EFI_INPUT_KEY               *KeyValue,
+  IN  CHAR16                      *String,
+  ...
+  )
+{
+  EFI_STATUS                      Status;
+  VA_LIST                         Marker;
+
+  VA_START (Marker, KeyValue);
+
+  Status = IfrLibCreatePopUp2 (NumberOfLines, KeyValue, Marker);
+
+  VA_END (Marker);
+
   return Status;
 }
-
 
 /**
   Swap bytes in the buffer. This is a internal function.
