@@ -56,7 +56,6 @@ typedef struct {
 #define EFI_IFR_EXTEND_OP_TIMEOUT     0x2
 #define EFI_IFR_EXTEND_OP_CLASS       0x3
 #define EFI_IFR_EXTEND_OP_SUBCLASS    0x4
-#define EFI_IFR_EXTEND_OP_OPTIONKEY   0x5
 
 
 typedef struct _EFI_IFR_GUID_LABEL {
