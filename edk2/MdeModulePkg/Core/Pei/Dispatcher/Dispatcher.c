@@ -100,7 +100,7 @@ DiscoverPeimsAndOrderWithApriori (
       Private->AprioriCount -= sizeof (EFI_FFS_FILE_HEADER) - sizeof (EFI_COMMON_SECTION_HEADER);
       Private->AprioriCount /= sizeof (EFI_GUID);
 
-      SetMem (FileGuid, sizeof (FileGuid), 0);
+      ZeroMem (FileGuid, sizeof (FileGuid));
       for (Index = 0; Index < PeimCount; Index++) {
         //
         // Make an array of file name guids that matches the FileHandle array so we can convert
@@ -178,6 +178,7 @@ DiscoverPeimsAndOrderWithApriori (
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param PrivateInMem    PeiCore's private data structure
 
+  @return PeiCore function address after shadowing.
 **/
 VOID*
 ShadowPeiCore(
@@ -215,6 +216,10 @@ ShadowPeiCore(
               );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Compute the PeiCore's function address after shaowed PeiCore.
+  // _ModuleEntryPoint is PeiCore main function entry
+  //
   return (VOID*) ((UINTN) EntryPoint + (UINTN) PeiCore - (UINTN) _ModuleEntryPoint);
 }
 
@@ -247,8 +252,6 @@ PeiDispatcher (
   UINT32                              AuthenticationState;
   EFI_PHYSICAL_ADDRESS                EntryPoint;
   EFI_PEIM_ENTRY_POINT2               PeimEntryPoint;
-  BOOLEAN                             PeimNeedingDispatch;
-  BOOLEAN                             PeimDispatchOnThisPass;
   UINTN                               SaveCurrentPeimCount;
   UINTN                               SaveCurrentFvCount;
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
@@ -332,9 +335,16 @@ PeiDispatcher (
   // satisfied, this dipatcher should run only once.
   //
   do {
-    PeimNeedingDispatch = FALSE;
-    PeimDispatchOnThisPass = FALSE;
-
+    //
+    // In case that reenter PeiCore happens, the last pass record is still available.   
+    //
+    if (!Private->PeimDispatcherReenter) {
+      Private->PeimNeedingDispatch      = FALSE;
+      Private->PeimDispatchOnThisPass   = FALSE;
+    } else {
+      Private->PeimDispatcherReenter    = FALSE;
+    }
+    
     for (FvCount = Private->CurrentPeimFvCount; FvCount < Private->FvCount; FvCount++) {
       Private->CurrentPeimFvCount = FvCount;
       VolumeHandle = Private->Fv[FvCount].FvHeader;
@@ -359,7 +369,7 @@ PeiDispatcher (
 
         if (Private->Fv[FvCount].PeimState[PeimCount] == PEIM_STATE_NOT_DISPATCHED) {
           if (!DepexSatisfied (Private, PeimFileHandle, PeimCount)) {
-            PeimNeedingDispatch = TRUE;
+            Private->PeimNeedingDispatch = TRUE;
           } else {
             Status = PeiFfsGetFileInfo (PeimFileHandle, &FvFileInfo);
             ASSERT_EFI_ERROR (Status);
@@ -411,7 +421,7 @@ PeiDispatcher (
                   PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
                 }
 
-                PeimDispatchOnThisPass = TRUE;
+                Private->PeimDispatchOnThisPass = TRUE;
               }
 
               REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
@@ -581,10 +591,10 @@ PeiDispatcher (
               PrivateInMem->PeiMemoryInstalled     = TRUE;
 
               //
-              // Restart scan of all PEIMs on next pass
+              // Indicate that PeiCore reenter
               //
-              PrivateInMem->CurrentPeimCount = 0;
-
+              PrivateInMem->PeimDispatcherReenter  = TRUE;
+              
               //
               // Shadow PEI Core. When permanent memory is avaiable, shadow
               // PEI Core and PEIMs to get high performance.
@@ -668,7 +678,7 @@ PeiDispatcher (
     //  pass. If we did not dispatch a PEIM there is no point in trying again
     //  as it will fail the next time too (nothing has changed).
     //
-  } while (PeimNeedingDispatch && PeimDispatchOnThisPass);
+  } while (Private->PeimNeedingDispatch && Private->PeimDispatchOnThisPass);
 
 }
 
@@ -693,6 +703,7 @@ InitializeDispatcherData (
   )
 {
   if (OldCoreData == NULL) {
+    PrivateData->PeimDispatcherReenter = FALSE;
     PeiInitializeFv (PrivateData, SecCoreData);
   }
 
@@ -798,9 +809,11 @@ PeiRegisterForShadow (
   @param AuthenticationState  Pointer to attestation authentication state of image.
 
 
-  @retval EFI_NOT_FOUND       FV image can't be found.
-  @retval EFI_SUCCESS         Successfully to process it.
-
+  @retval EFI_NOT_FOUND         FV image can't be found.
+  @retval EFI_SUCCESS           Successfully to process it.
+  @retval EFI_OUT_OF_RESOURCES  Can not allocate page when aligning FV image
+  @retval Others                Can not find EFI_SECTION_FIRMWARE_VOLUME_IMAGE section
+  
 **/
 EFI_STATUS
 ProcessFvFile (
@@ -847,11 +860,13 @@ ProcessFvFile (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  
   //
   // Collect FvImage Info.
   //
   Status = PeiFfsGetVolumeInfo (FvImageHandle, &FvImageInfo);
   ASSERT_EFI_ERROR (Status);
+  
   //
   // FvAlignment must be more than 8 bytes required by FvHeader structure.
   //
@@ -859,6 +874,7 @@ ProcessFvFile (
   if (FvAlignment < 8) {
     FvAlignment = 8;
   }
+  
   //
   // Check FvImage
   //
