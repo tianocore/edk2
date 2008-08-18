@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // The Library classes this module produced
 //
 #include <Library/PeiCoreEntryPoint.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 
 /**
