@@ -462,7 +462,7 @@ DisplayForm (
 
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
-  StringPtr = GetToken (Selection->FormSet->FormSetTitle, Handle);
+  StringPtr = GetToken (Selection->Form->FormTitle, Handle);
 
   if (gClassOfVfr != EFI_FRONT_PAGE_SUBCLASS) {
     gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | TITLE_BACKGROUND);

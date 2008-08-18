@@ -498,6 +498,8 @@ TheKey2:
             PrintChar (RIGHT_NUMERIC_DELIMITER);
           }
         }
+
+        goto EnterCarriageReturn;
         break;
 
       case SCAN_UP:
