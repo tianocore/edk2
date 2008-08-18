@@ -25,6 +25,7 @@ FORM_EXPRESSION  *mSuppressExpression;
 FORM_EXPRESSION  *mGrayOutExpression;
 
 EFI_GUID  gTianoHiiIfrGuid = EFI_IFR_TIANO_GUID;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID  mFrameworkHiiCompatibilityGuid = EFI_IFR_FRAMEWORK_GUID;
 
 
 /**
@@ -88,6 +89,54 @@ CreateStatement (
   return Statement;
 }
 
+EFI_STATUS
+UpdateCheckBoxStringToken (
+  IN CONST FORM_BROWSER_FORMSET *FormSet,
+  IN       FORM_BROWSER_STATEMENT *Statement
+  )
+{
+  CHAR16                  Str[MAXIMUM_VALUE_CHARACTERS];
+  EFI_STRING_ID           Id;
+  EFI_STATUS              Status;
+
+  ASSERT (Statement != NULL);
+  ASSERT (Statement->Operand == EFI_IFR_CHECKBOX_OP);
+  
+  UnicodeValueToString (Str, 0, Statement->VarStoreInfo.VarName, MAXIMUM_VALUE_CHARACTERS - 1);
+  
+  Status = HiiLibNewString (FormSet->HiiHandle, &Id, Str);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Statement->VarStoreInfo.VarName = Id;
+    
+  return EFI_SUCCESS;
+}
+
+BOOLEAN
+IsNextOpCodeGuidedVarEqName (
+  UINT8 *OpCodeData
+  )
+{
+  //
+  // Get next opcode
+  //
+  OpCodeData += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
+  if (*OpCodeData == EFI_IFR_GUID_OP) {
+    if (CompareGuid (&mFrameworkHiiCompatibilityGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
+      //
+      // Specific GUIDed opcodes to support IFR generated from Framework HII VFR 
+      //
+      if ((((EFI_IFR_GUID_VAREQNAME *) OpCodeData)->ExtendOpCode) == EFI_IFR_EXTEND_OP_VAREQNAME) {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
 
 /**
   Initialize Question's members.
@@ -111,6 +160,7 @@ CreateQuestion (
   LIST_ENTRY               *Link;
   FORMSET_STORAGE          *Storage;
   NAME_VALUE_NODE          *NameValueNode;
+  EFI_STATUS               Status;
 
   Statement = CreateStatement (OpCodeData, FormSet, Form);
   if (Statement == NULL) {
@@ -129,6 +179,19 @@ CreateQuestion (
     // VarStoreId of zero indicates no variable storage
     //
     return Statement;
+  }
+
+  //
+  // Take a look at next OpCode to see whether it is a GUIDed opcode to support
+  // Framework Compatibility
+  //
+  if (FeaturePcdGet (PcdFrameworkHiiCompatibilitySupport)) {
+    if ((*OpCodeData == EFI_IFR_CHECKBOX_OP) && IsNextOpCodeGuidedVarEqName (OpCodeData)) {
+      Status = UpdateCheckBoxStringToken (FormSet, Statement);
+      if (EFI_ERROR (Status)) {
+        return NULL;
+      }
+    }
   }
 
   //
@@ -675,6 +738,7 @@ CountOpCodes (
 }
 
 
+
 /**
   Parse opcodes in the formset IFR binary.
 
@@ -1202,6 +1266,7 @@ ParseOpCodes (
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_BOOLEAN;
 
       InitializeRequestElement (FormSet, CurrentStatement);
+
       break;
 
     case EFI_IFR_STRING_OP:
@@ -1509,6 +1574,7 @@ ParseOpCodes (
           break;
         }
       }
+
       break;
 
     //
