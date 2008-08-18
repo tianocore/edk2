@@ -26,51 +26,80 @@ GetGuidOfFirstFormset (
   the HII Thunk to Framework HII code.
 
   @param Private                        The pointer to the private data of Hii Thunk.
-  @param FrameworkHiiHandle     Framework HII Handle returned by  the HII Thunk to Framework HII code.
+  @param FwHiiHandle     Framework HII Handle returned by  the HII Thunk to Framework HII code.
 
   @retval  NULL                           If Framework HII Handle passed in does not have matching UEFI HII handle.
   @retval  !NULL                         If the match is found.
   
 **/
 EFI_HII_HANDLE
-FrameworkHiiHandleToUefiHiiHandle (
-  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
-  IN FRAMEWORK_EFI_HII_HANDLE          FrameworkHiiHandle
+FwHiiHandleToUefiHiiHandle (
+  IN CONST HII_THUNK_PRIVATE_DATA *Private,
+  IN FRAMEWORK_EFI_HII_HANDLE          FwHiiHandle
   )
 ;
 
-HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *
-FrameworkHiiHandleToMapDatabaseEntry (
-  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
-  IN FRAMEWORK_EFI_HII_HANDLE          FrameworkHiiHandle
+HII_THUNK_CONTEXT *
+FwHiiHandleToThunkContext (
+  IN CONST HII_THUNK_PRIVATE_DATA *Private,
+  IN FRAMEWORK_EFI_HII_HANDLE          FwHiiHandle
   )
 ;
 
-HII_TRHUNK_HANDLE_MAPPING_DATABASE_ENTRY *
-UefiHiiHandleToMapDatabaseEntry (
-  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+HII_THUNK_CONTEXT *
+UefiHiiHandleToThunkContext (
+  IN CONST HII_THUNK_PRIVATE_DATA *Private,
   IN EFI_HII_HANDLE                   UefiHiiHandle
   )
 ;
 
 EFI_HII_HANDLE *
-TagGuidToUefiIfrHiiHandle (
-  IN CONST EFI_HII_THUNK_PRIVATE_DATA *Private,
+TagGuidToUefiHiiHandle (
+  IN CONST HII_THUNK_PRIVATE_DATA *Private,
   IN CONST EFI_GUID                   *Guid
   )
 ;
 
 EFI_STATUS
-AssignHiiHandle (
-  IN OUT EFI_HII_THUNK_PRIVATE_DATA *Private,
+AssignFrameworkHiiHandle (
+  IN OUT HII_THUNK_PRIVATE_DATA *Private,
+  IN     BOOLEAN                    FromFwHiiNewPack,
   OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
   )
 ;
 
+HII_THUNK_CONTEXT *
+CreateThunkContextForUefiHiiHandle (
+  IN  HII_THUNK_PRIVATE_DATA     *Private,
+  IN  EFI_HII_HANDLE             UefiHiiHandle
+ )
+;
+
 EFI_STATUS
-AssignPureUefiHiiHandle (
-  IN OUT EFI_HII_THUNK_PRIVATE_DATA *Private,
-  OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
+DestroyThunkContextForUefiHiiHandle (
+  IN HII_THUNK_PRIVATE_DATA     *Private,
+  IN EFI_HII_HANDLE             UefiHiiHandle
+ )
+;
+
+UINTN
+GetPackageCountByType (
+  IN CONST EFI_HII_PACKAGE_LIST_HEADER     *PackageListHeader,
+  IN       UINT8                           PackageType
   )
 ;
+
+EFI_STATUS
+CreateQuestionIdMap (
+  IN    OUT HII_THUNK_CONTEXT  *ThunkContext
+  )
+;
+
+LIST_ENTRY *
+GetMapEntryListHead (
+  IN CONST HII_THUNK_CONTEXT  *ThunkContext,
+  IN       UINT16             VarStoreId
+  )
+;
+
 #endif

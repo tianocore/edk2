@@ -31,7 +31,6 @@
 // Extern Variables
 //
 extern CONST EFI_HII_DATABASE_PROTOCOL            *mHiiDatabase;
-extern CONST EFI_HII_FONT_PROTOCOL                *mHiiFontProtocol;
 extern CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
 extern CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
 extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
@@ -432,8 +431,6 @@ ExtractFormDefault (
   Link = GetFirstNode (&Form->StatementListHead);
   while (!IsNull (&Form->StatementListHead, Link)) {
     Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-    Link = GetNextNode (&Form->StatementListHead, Link);
-
     //
     // Reset Question to its default value
     //
@@ -442,6 +439,7 @@ ExtractFormDefault (
       continue;
     }
 
+    Link = GetNextNode (&Form->StatementListHead, Link);
   }
   return EFI_SUCCESS;
 }
@@ -546,20 +544,20 @@ GetBufferTypeDefaultId (
   OUT       LIST_ENTRY      *UefiDefaultsListHead
   )
 {
-  LIST_ENTRY                  *StorageListEntry;
+  LIST_ENTRY                  *StorageLink;
   FORMSET_STORAGE             *Storage;
   EFI_STATUS                  Status;
 
-  StorageListEntry = GetFirstNode (&FormSet->StorageListHead);
+  StorageLink = GetFirstNode (&FormSet->StorageListHead);
 
-  while (!IsNull (&FormSet->StorageListHead, StorageListEntry)) {
-    Storage = FORMSET_STORAGE_FROM_LINK(StorageListEntry);
+  while (!IsNull (&FormSet->StorageListHead, StorageLink)) {
+    Storage = FORMSET_STORAGE_FROM_LINK(StorageLink);
 
     if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
       Status = GetBufferTypeDefaultIdAndStorageId (DefaultStore, Storage, FormSet, UefiDefaultsListHead);
     }
 
-    StorageListEntry = GetNextNode (&FormSet->StorageListHead, StorageListEntry);
+    StorageLink = GetNextNode (&FormSet->StorageListHead, StorageLink);
   }
   
   return EFI_SUCCESS;
@@ -587,7 +585,7 @@ UefiIfrGetBufferTypeDefaults (
 {
   FORM_BROWSER_FORMSET *FormSet;
   EFI_GUID              FormSetGuid;
-  LIST_ENTRY            *DefaultListEntry;
+  LIST_ENTRY            *DefaultLink;
   FORMSET_DEFAULTSTORE  *DefaultStore;
   EFI_STATUS            Status;
 
@@ -604,14 +602,14 @@ UefiIfrGetBufferTypeDefaults (
   ASSERT (UefiDefaults != NULL);
   InitializeListHead (*UefiDefaults);
 
-  DefaultListEntry = GetFirstNode (&FormSet->DefaultStoreListHead);
-  while (!IsNull (&FormSet->DefaultStoreListHead, DefaultListEntry)) {
-    DefaultStore = FORMSET_DEFAULTSTORE_FROM_LINK(DefaultListEntry);
+  DefaultLink = GetFirstNode (&FormSet->DefaultStoreListHead);
+  while (!IsNull (&FormSet->DefaultStoreListHead, DefaultLink)) {
+    DefaultStore = FORMSET_DEFAULTSTORE_FROM_LINK(DefaultLink);
 
     Status = GetBufferTypeDefaultId (DefaultStore, FormSet, *UefiDefaults);
     ASSERT_EFI_ERROR (Status);
 
-    DefaultListEntry = GetNextNode (&FormSet->DefaultStoreListHead, DefaultListEntry);    
+    DefaultLink = GetNextNode (&FormSet->DefaultStoreListHead, DefaultLink);    
   }
 
   DestroyFormSet (FormSet);
@@ -640,7 +638,7 @@ UefiIfrGetBufferTypeDefaults (
                                                            FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING.
 **/
 EFI_STATUS
-UefiDefaultsToFrameworkDefaults (
+UefiDefaultsToFwDefaults (
   IN     LIST_ENTRY                  *ListHead,
   IN     UINTN                       DefaultMask,
   OUT    EFI_HII_VARIABLE_PACK_LIST  **VariablePackList
@@ -758,19 +756,19 @@ FreeDefaultList (
   IN     LIST_ENTRY                  *ListHead
   )
 {
-  LIST_ENTRY *Node;
+  LIST_ENTRY *Link;
   UEFI_IFR_BUFFER_STORAGE_NODE *Default;
 
-  Node = GetFirstNode (ListHead);
+  Link = GetFirstNode (ListHead);
   
-  while (!IsNull (ListHead, Node)) {
-    Default = UEFI_IFR_BUFFER_STORAGE_NODE_FROM_LIST(Node);
+  while (!IsNull (ListHead, Link)) {
+    Default = UEFI_IFR_BUFFER_STORAGE_NODE_FROM_LIST(Link);
 
-    RemoveEntryList (Node);
+    RemoveEntryList (Link);
    
     DestroyDefaultNode (Default);
     
-    Node = GetFirstNode (ListHead);
+    Link = GetNextNode (ListHead, Link);
   }
 
   FreePool (ListHead);

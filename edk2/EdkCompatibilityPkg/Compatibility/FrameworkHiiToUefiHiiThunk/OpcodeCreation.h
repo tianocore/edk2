@@ -54,6 +54,8 @@ F2UCreateOneOfOptionOpCode (
 
 EFI_STATUS
 F2UCreateOneOfOpCode (
+  IN       HII_THUNK_CONTEXT               *ThunkContext,
+  IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_ONE_OF    *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData,
   OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
@@ -63,6 +65,8 @@ F2UCreateOneOfOpCode (
 
 EFI_STATUS
 F2UCreateOrderedListOpCode (
+  IN       HII_THUNK_CONTEXT               *ThunkContext,
+  IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_ORDERED_LIST *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData,
   OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
@@ -73,6 +77,8 @@ F2UCreateOrderedListOpCode (
 
 EFI_STATUS
 F2UCreateCheckBoxOpCode (
+  IN       HII_THUNK_CONTEXT               *ThunkContext,
+  IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_CHECKBOX  *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
   )
@@ -81,6 +87,8 @@ F2UCreateCheckBoxOpCode (
 
 EFI_STATUS
 F2UCreateNumericOpCode (
+  IN       HII_THUNK_CONTEXT               *ThunkContext,
+  IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_NUMERIC   *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
   )
@@ -89,6 +97,8 @@ F2UCreateNumericOpCode (
 
 EFI_STATUS
 F2UCreateStringOpCode (
+  IN       HII_THUNK_CONTEXT               *ThunkContext,
+  IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_STRING    *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
   )
@@ -103,7 +113,8 @@ F2UCreateBannerOpCode (
 ;
 
 EFI_STATUS
-ThunkFrameworkUpdateDataToUefiUpdateData (
+FwUpdateDataToUefiUpdateData (
+  IN       HII_THUNK_CONTEXT                 *ThunkContext,
   IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *Data,
   IN       BOOLEAN                          AddData,
   OUT      EFI_HII_UPDATE_DATA              **UefiData

@@ -18,11 +18,12 @@
 //
 // VARSTORE ID of 0 for Buffer Storage Type Storage is reserved in UEFI IFR form. But VARSTORE ID
 // 0 in Framework IFR is the default VarStore ID for storage without explicit declaration. So we have
-// to reseved 0xFFEE in UEFI VARSTORE ID to represetn default storage id in Framework IFR.
+// to reseved 0x0001 in UEFI VARSTORE ID to represetn default storage id in Framework IFR.
 // Framework VFR has to be ported or pre-processed to change the default VARSTORE to a VARSTORE
-// with ID equal to 0xFFEE.
+// with ID equal to 0x0001.
 //
-#define RESERVED_VARSTORE_ID 0xFFEE
+#define RESERVED_VARSTORE_ID 0x0001
+#define RESERVED_QUESTION_ID 0xf000
 
 #define UEFI_IFR_BUFFER_STORAGE_NODE_FROM_LIST(a) CR(a, UEFI_IFR_BUFFER_STORAGE_NODE, List, UEFI_IFR_BUFFER_STORAGE_NODE_SIGNATURE)
 #define UEFI_IFR_BUFFER_STORAGE_NODE_SIGNATURE  EFI_SIGNATURE_32 ('I', 'b', 'S', 'n')
@@ -79,7 +80,7 @@ UefiIfrGetBufferTypeDefaults (
 **/
 
 EFI_STATUS
-UefiDefaultsToFrameworkDefaults (
+UefiDefaultsToFwDefaults (
   IN     LIST_ENTRY                  *UefiIfrDefaults,
   IN     UINTN                       DefaultMask,
   OUT    EFI_HII_VARIABLE_PACK_LIST  **VariablePackList

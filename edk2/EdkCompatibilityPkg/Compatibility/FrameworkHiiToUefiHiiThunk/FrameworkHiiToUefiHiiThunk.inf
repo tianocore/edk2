@@ -37,6 +37,8 @@
 #
 
 [Sources.common]
+  ConfigAccess.c
+  ConfigAccess.h
   OpcodeCreation.c
   OpcodeCreation.h
   UefiIfrParserInternal.h
@@ -55,10 +57,10 @@
   Forms.c
   HiiDatabase.h
   HiiDatabase.c
-  ConfigAccess.c
-  ConfigAccess.h
   Utility.c
   Utility.h
+
+  SetupBrowser.c
  
 
 [Packages]
@@ -93,10 +95,8 @@
   gEfiFormBrowserProtocolGuid
 
 [Depex]
-  gEfiHiiImageProtocolGuid AND
   gEfiHiiDatabaseProtocolGuid AND
   gEfiHiiStringProtocolGuid AND
-  gEfiHiiFontProtocolGuid AND
   gEfiHiiConfigRoutingProtocolGuid
 
 
