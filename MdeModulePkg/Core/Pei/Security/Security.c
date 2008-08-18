@@ -62,7 +62,8 @@ InitializeSecurityServices (
 /**
 
   Provide a callback for when the security PPI is installed.
-
+  This routine will cache installed security PPI into PeiCore's private data.
+  
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param NotifyDescriptor   The descriptor for the notification event.
   @param Ppi                Pointer to the PPI in question.
@@ -105,7 +106,7 @@ SecurityPpiNotifyCallback (
 
   @retval EFI_SUCCESS              Image is OK
   @retval EFI_SECURITY_VIOLATION   Image is illegal
-
+  @retval EFI_NOT_FOUND            If security PPI is not installed.
 **/
 EFI_STATUS
 VerifyPeim (
@@ -148,10 +149,9 @@ VerifyPeim (
 /**
   Verify a Firmware volume.
 
-  @param CurrentFvAddress - Pointer to the current Firmware Volume under consideration
+  @param CurrentFvAddress   Pointer to the current Firmware Volume under consideration
 
-  @retval EFI_SUCCESS              Firmware Volume is legal
-  @retval EFI_SECURITY_VIOLATION   Firmware Volume fails integrity test
+  @retval EFI_SUCCESS       Firmware Volume is legal
 
 **/
 EFI_STATUS
