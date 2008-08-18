@@ -2,7 +2,7 @@
 #Utility functions which helps in opcode creation, HII configuration string manipulations, 
 #pop up window creations, setup browser persistence data set and get.
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.
+# Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,7 +21,7 @@
   FILE_GUID                      = bf38668e-e231-4baa-99e4-8c0e4c35dca6
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = IfrSupportLib
+  LIBRARY_CLASS                  = IfrSupportLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -46,20 +46,10 @@
   DevicePathLib
   BaseLib
   UefiBootServicesTableLib
-  UefiRuntimeServicesTableLib
   BaseMemoryLib
   DebugLib
-  PcdLib
-
-[Guids]
-  gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiDatabaseProtocolGuid
-  gEfiHiiStringProtocolGuid
   gEfiHiiConfigRoutingProtocolGuid
   gEfiFormBrowser2ProtocolGuid   
-
-[Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang

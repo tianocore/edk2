@@ -38,8 +38,6 @@
 
 extern CONST EFI_HII_DATABASE_PROTOCOL         *mHiiDatabaseProt;
 extern CONST EFI_HII_STRING_PROTOCOL           *mHiiStringProt;
-extern BOOLEAN                           mHiiProtocolsInitialized;
-
 
 /**
   This function check if the Hii Handle is a valid handle registered

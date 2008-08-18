@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,10 +14,8 @@
 
 #include "InternalHiiLib.h"
 
-CONST EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt;
-CONST EFI_HII_STRING_PROTOCOL     *mHiiStringProt;
-BOOLEAN mHiiProtocolsInitialized = FALSE;
-
+CONST EFI_HII_DATABASE_PROTOCOL   *mHiiDatabaseProt = NULL;
+CONST EFI_HII_STRING_PROTOCOL     *mHiiStringProt = NULL;
 
 /**
 
@@ -31,7 +29,7 @@ LocateHiiProtocols (
 {
   EFI_STATUS  Status;
 
-  if (mHiiProtocolsInitialized) {
+  if (mHiiStringProt != NULL && mHiiDatabaseProt != NULL) {
     //
     // Only need to initialize the protocol instance once.
     //
@@ -43,8 +41,6 @@ LocateHiiProtocols (
 
   Status = gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, (VOID **) &mHiiStringProt);
   ASSERT_EFI_ERROR (Status);
-
-  mHiiProtocolsInitialized = TRUE;
 }
 
 
@@ -112,7 +108,7 @@ InternalHiiLibPreparePackages (
   PackageListHeader = AllocateZeroPool (PackageListLength);
   ASSERT (PackageListHeader != NULL);
   
-  CopyMem (&PackageListHeader->PackageListGuid, GuidId, sizeof (EFI_GUID));
+  CopyGuid (&PackageListHeader->PackageListGuid, GuidId);
   PackageListHeader->PackageLength = PackageListLength;
 
   PackageListData = ((UINT8 *) PackageListHeader) + sizeof (EFI_HII_PACKAGE_LIST_HEADER);
@@ -304,6 +300,7 @@ HiiLibGetHiiHandles (
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
       *HiiHandleBuffer = AllocateZeroPool (BufferLength);
+      ASSERT (*HiiHandleBuffer != NULL);
       Status = mHiiDatabaseProt->ListPackageLists (
                                      mHiiDatabaseProt,
                                      EFI_HII_PACKAGE_TYPE_ALL,
@@ -366,13 +363,14 @@ HiiLibExtractGuidFromHiiHandle (
     Status = mHiiDatabaseProt->ExportPackageLists (mHiiDatabaseProt, Handle, &BufferSize, HiiPackageList);
   }
   if (EFI_ERROR (Status)) {
+    FreePool (HiiPackageList);
     return Status;
   }
 
   //
   // Extract GUID
   //
-  CopyMem (Guid, &HiiPackageList->PackageListGuid, sizeof (EFI_GUID));
+  CopyGuid (Guid, &HiiPackageList->PackageListGuid);
 
   FreePool (HiiPackageList);
 
