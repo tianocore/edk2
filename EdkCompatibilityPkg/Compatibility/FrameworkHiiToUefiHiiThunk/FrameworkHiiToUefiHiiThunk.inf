@@ -97,6 +97,7 @@
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND
   gEfiHiiStringProtocolGuid AND
-  gEfiHiiConfigRoutingProtocolGuid
+  gEfiHiiConfigRoutingProtocolGuid AND
+  gEfiHiiFontProtocolGuid
 
 

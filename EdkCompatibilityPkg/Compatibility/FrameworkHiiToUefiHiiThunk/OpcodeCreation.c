@@ -351,7 +351,9 @@ F2UCreateOneOfOpCode (
 
   UOpcode.Question.Header.Prompt = FwOpcode->Prompt;
   UOpcode.Question.Header.Help = FwOpcode->Help;
- 
+  UOpcode.Question.VarStoreId  = VarStoreId;
+  UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
+  
   //
   // Go over the Framework IFR binary to get the QuestionId for generated UEFI One Of Option opcode
   //
@@ -386,18 +388,18 @@ F2UCreateOneOfOpCode (
         }
 
         InsertTailList (&ThunkContext->OneOfOptionMapListHead, &OneOfOptionMap->Link);
-      } else {      
-        OneOfOptionMapEntry = AllocateZeroPool (sizeof (ONE_OF_OPTION_MAP_ENTRY));
-        ASSERT (OneOfOptionMapEntry != NULL);
-
-        OneOfOptionMapEntry->FwKey = FwOneOfOp->Key;
-        OneOfOptionMapEntry->Signature = ONE_OF_OPTION_MAP_ENTRY_SIGNATURE;
-        
-        CopyMem (&OneOfOptionMapEntry->Value, &FwOneOfOp->Value, FwOpcode->Width);
-
-        ASSERT (OneOfOptionMap != NULL);
-        InsertTailList (&OneOfOptionMap->OneOfOptionMapEntryListHead, &OneOfOptionMapEntry->Link);
       }
+      
+      OneOfOptionMapEntry = AllocateZeroPool (sizeof (ONE_OF_OPTION_MAP_ENTRY));
+      ASSERT (OneOfOptionMapEntry != NULL);
+
+      OneOfOptionMapEntry->FwKey = FwOneOfOp->Key;
+      OneOfOptionMapEntry->Signature = ONE_OF_OPTION_MAP_ENTRY_SIGNATURE;
+      
+      CopyMem (&OneOfOptionMapEntry->Value, &FwOneOfOp->Value, FwOpcode->Width);
+
+      ASSERT (OneOfOptionMap != NULL);
+      InsertTailList (&OneOfOptionMap->OneOfOptionMapEntryListHead, &OneOfOptionMapEntry->Link);
     }
 
     if (FwOneOfOp->Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED) {
@@ -499,6 +501,7 @@ F2UCreateOrderedListOpCode (
   UOpcode.Question.Header.Prompt = FwOpcode->Prompt;
   UOpcode.Question.Header.Help = FwOpcode->Help;
   UOpcode.Question.VarStoreId  = VarStoreId;
+  UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
 
   UOpcode.MaxContainers = FwOpcode->MaxEntries;
 

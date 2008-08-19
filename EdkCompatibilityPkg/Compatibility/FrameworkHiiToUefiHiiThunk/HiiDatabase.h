@@ -211,6 +211,7 @@ typedef struct {
 extern CONST EFI_HII_DATABASE_PROTOCOL            *mHiiDatabase;
 extern CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
 extern CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
+extern CONST EFI_HII_FONT_PROTOCOL                *mHiiFontProtocol;
 extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
 extern CONST EFI_FORM_BROWSER2_PROTOCOL           *mFormBrowser2Protocol;
 

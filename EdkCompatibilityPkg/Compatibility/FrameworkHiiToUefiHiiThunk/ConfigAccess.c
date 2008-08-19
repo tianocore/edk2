@@ -433,7 +433,7 @@ ThunkExtractConfig (
   EFI_STATUS                                  Status;
   CONFIG_ACCESS_PRIVATE                       *ConfigAccess;
   LIST_ENTRY                                  *Link;
-  BUFFER_STORAGE_ENTRY               *BufferStorage;
+  BUFFER_STORAGE_ENTRY                        *BufferStorage;
   VOID                                        *Data;
   UINTN                                       DataSize;
 
@@ -451,20 +451,31 @@ ThunkExtractConfig (
   
   BufferStorage = BUFFER_STORAGE_ENTRY_FROM_LINK (Link);
 
-  if (ConfigAccess->FormCallbackProtocol == NULL ||
-      ConfigAccess->FormCallbackProtocol->NvRead == NULL) {
-    Status = GetUefiVariable (
-               BufferStorage,
-               &Data,
-               &DataSize
-               );
+  if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
+    if (ConfigAccess->FormCallbackProtocol == NULL ||
+        ConfigAccess->FormCallbackProtocol->NvRead == NULL) {
+      Status = GetUefiVariable (
+                 BufferStorage,
+                 &Data,
+                 &DataSize
+                 );
+    } else {
+      Status = CallFormCallBack (
+                 BufferStorage,
+                 ConfigAccess->FormCallbackProtocol,
+                  &Data,
+                  &DataSize
+                 );
+    }
   } else {
-    Status = CallFormCallBack (
-               BufferStorage,
-               ConfigAccess->FormCallbackProtocol,
-                &Data,
-                &DataSize
-               );
+    DataSize = BufferStorage->Size;
+    Data = AllocateCopyPool (DataSize, ConfigAccess->ThunkContext->NvMapOverride);
+    
+    if (Data != NULL) {
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_OUT_OF_RESOURCES;
+    }
   }
   
   if (!EFI_ERROR (Status)) {
@@ -518,7 +529,6 @@ ThunkRouteConfig (
   BOOLEAN                                     DataAllocated;
 
   Data = NULL;
-  DataAllocated = TRUE;
   ConfigAccess = CONFIG_ACCESS_PRIVATE_FROM_PROTOCOL (This);
 
   //
@@ -533,6 +543,7 @@ ThunkRouteConfig (
   BufferStorage = BUFFER_STORAGE_ENTRY_FROM_LINK (Link);
   DataSize2     = BufferStorage->Size;
   if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
+    DataAllocated = TRUE;
     if (ConfigAccess->FormCallbackProtocol == NULL ||
         ConfigAccess->FormCallbackProtocol->NvRead == NULL) {
       Status = GetUefiVariable (
@@ -540,8 +551,6 @@ ThunkRouteConfig (
                  &Data,
                  &DataSize
                  );
-      ASSERT (DataSize == DataSize2);
-      
     } else {
       Status = CallFormCallBack (
                  BufferStorage,
@@ -549,17 +558,20 @@ ThunkRouteConfig (
                   &Data,
                   &DataSize
                  );
-      ASSERT (DataSize == DataSize2);
-      
     }
   } else {
+    //
+    // ConfigToBlock will convert the Config String and update the NvMapOverride accordingly.
+    //
     Status = EFI_SUCCESS;
     Data = ConfigAccess->ThunkContext->NvMapOverride;
     DataSize      = DataSize2;
     DataAllocated = FALSE;
   }  
-  if (EFI_ERROR (Status)) {
-    goto Done;
+  if (EFI_ERROR (Status) || (DataSize2 != DataSize)) {
+    if (Data == NULL) {
+      Data = AllocateZeroPool (DataSize2);
+    }
   }
 
   Status = mHiiConfigRoutingProtocol->ConfigToBlock (
@@ -573,26 +585,28 @@ ThunkRouteConfig (
     goto Done;
   }
 
-  if (ConfigAccess->FormCallbackProtocol == NULL ||
-      ConfigAccess->FormCallbackProtocol->NvWrite == NULL) {
-    Status = gRT->SetVariable (
-                  BufferStorage->Name,
-                  &BufferStorage->Guid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  DataSize,
-                  Data
-                  );
-  } else {
-    Status = ConfigAccess->FormCallbackProtocol->NvWrite (
-                  ConfigAccess->FormCallbackProtocol,  
-                  BufferStorage->Name,
-                  &BufferStorage->Guid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  DataSize,
-                  Data,
-                  &ResetRequired
-                  );
-    
+  if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
+    if (ConfigAccess->FormCallbackProtocol == NULL ||
+        ConfigAccess->FormCallbackProtocol->NvWrite == NULL) {
+      Status = gRT->SetVariable (
+                    BufferStorage->Name,
+                    &BufferStorage->Guid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    DataSize2,
+                    Data
+                    );
+    } else {
+      Status = ConfigAccess->FormCallbackProtocol->NvWrite (
+                    ConfigAccess->FormCallbackProtocol,  
+                    BufferStorage->Name,
+                    &BufferStorage->Guid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    DataSize2,
+                    Data,
+                    &ResetRequired
+                    );
+      
+    }
   }
 
 Done: 
@@ -617,25 +631,27 @@ CreateIfrDataArray (
   UINTN                             BrowserDataSize;
   BUFFER_STORAGE_ENTRY              *BufferStorageEntry;
   LIST_ENTRY                        *Link;
+  EFI_STATUS                        Status;
 
   IfrDataArray = AllocateZeroPool (0x100);
   ASSERT (IfrDataArray != NULL);
 
+  Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
+  ASSERT (!IsNull (&ConfigAccess->BufferStorageListHead, Link));
+  
+  BufferStorageEntry = BUFFER_STORAGE_ENTRY_FROM_LINK(Link);
+  BrowserDataSize = BufferStorageEntry->Size;
+
   if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
-    Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
-
-    ASSERT (!IsNull (&ConfigAccess->BufferStorageListHead, Link));
-
-    BufferStorageEntry = BUFFER_STORAGE_ENTRY_FROM_LINK(Link);
-
-    BrowserDataSize = BufferStorageEntry->Size;
     *NvMapAllocated = TRUE;
     IfrDataArray->NvRamMap = AllocateZeroPool (BrowserDataSize);
-    GetBrowserData (NULL, NULL, &BrowserDataSize, IfrDataArray->NvRamMap);
   } else {
     *NvMapAllocated = FALSE;
     IfrDataArray->NvRamMap = ConfigAccess->ThunkContext->NvMapOverride;
   }
+  
+  Status = GetBrowserData (NULL, NULL, &BrowserDataSize, IfrDataArray->NvRamMap);
+  ASSERT_EFI_ERROR (Status);
 
   IfrDataEntry = (FRAMEWORK_EFI_IFR_DATA_ENTRY *) (IfrDataArray + 1);
 
@@ -654,6 +670,30 @@ CreateIfrDataArray (
   }
 
   return IfrDataArray;
+}
+
+VOID
+SyncBrowserDataForNvMapOverride (
+  IN    CONFIG_ACCESS_PRIVATE         *ConfigAccess
+  )
+{
+  BUFFER_STORAGE_ENTRY              *BufferStorageEntry;
+  LIST_ENTRY                        *Link;
+  EFI_STATUS                        Status;
+  UINTN                             BrowserDataSize;
+
+  if (ConfigAccess->ThunkContext->NvMapOverride != NULL) {
+    
+    Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
+    ASSERT (!IsNull (&ConfigAccess->BufferStorageListHead, Link));
+    
+    BufferStorageEntry = BUFFER_STORAGE_ENTRY_FROM_LINK(Link);
+    BrowserDataSize = BufferStorageEntry->Size;
+
+    Status = SetBrowserData (NULL, NULL, BrowserDataSize, ConfigAccess->ThunkContext->NvMapOverride, NULL);
+    ASSERT_EFI_ERROR (Status);
+  }
+
 }
 
 VOID
@@ -850,6 +890,7 @@ ThunkCallback (
               Data,
               &Packet
               );
+  SyncBrowserDataForNvMapOverride (ConfigAccess);
 
   //
   // Callback require browser to perform action
