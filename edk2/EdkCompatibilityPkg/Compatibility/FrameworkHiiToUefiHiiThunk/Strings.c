@@ -15,6 +15,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "HiiDatabase.h"
 
+typedef struct {
+  CHAR8 *Iso639;
+  CHAR8 *Rfc3066;
+} ISO639TORFC3066MAP;
+
+ISO639TORFC3066MAP Iso639ToRfc3066Map [] = {
+    {"eng", "en-US"},
+    {"fra", "fr-FR"},
+};
+
+CHAR8 *
+ConvertIso639ToRfc3066 (
+  CHAR8 *Iso638Lang
+  )
+{
+  UINTN Index;
+
+  for (Index = 0; Index < sizeof (Iso639ToRfc3066Map) / sizeof (Iso639ToRfc3066Map[0]); Index++) {
+    if (AsciiStrnCmp (Iso638Lang, Iso639ToRfc3066Map[Index].Iso639, AsciiStrSize (Iso638Lang)) == 0) {
+      return Iso639ToRfc3066Map[Index].Rfc3066;
+    }
+  }
+
+  return (CHAR8 *) NULL;
+}
+
+
 EFI_STATUS
 EFIAPI
 HiiTestString (
@@ -37,6 +64,8 @@ Returns:
   ASSERT (FALSE);
   return EFI_SUCCESS;
 }
+
+
 
 EFI_STATUS
 GetTagGuidByFwHiiHandle (
@@ -99,8 +128,9 @@ Returns:
   HII_THUNK_CONTEXT                          *ThunkContext;
   EFI_STRING_ID                             StringId;
   EFI_STRING_ID                             LastStringId;
-  CHAR8                                     *AsciiLanguage;
+  CHAR8                                     AsciiLanguage[ISO_639_2_ENTRY_SIZE + 1];
   BOOLEAN                                   Found;
+  CHAR8                                     *Rfc3066AsciiLanguage;
 
   //
   // BugBug: Conver the language to 3066.
@@ -109,7 +139,7 @@ Returns:
   LastStringId      = (EFI_STRING_ID) 0;
   StringId          = (EFI_STRING_ID) 0;
   Found             = FALSE;
-  AsciiLanguage     = NULL;
+  Rfc3066AsciiLanguage = NULL;
 
   Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
@@ -117,8 +147,11 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   if (Language != NULL) {
-    AsciiLanguage = AllocateZeroPool (StrLen (Language) + 1);
+    ZeroMem (AsciiLanguage, sizeof (AsciiLanguage));;
+    
     UnicodeStrToAsciiStr (Language, AsciiLanguage);
+    Rfc3066AsciiLanguage = ConvertIso639ToRfc3066 (AsciiLanguage);
+    ASSERT (Rfc3066AsciiLanguage != NULL);
   }
 
   Link = GetFirstNode (&Private->ThunkContextListHead);
@@ -131,7 +164,7 @@ Returns:
         //
         // Create a new string token.
         //
-        if (AsciiLanguage == NULL) {
+        if (Rfc3066AsciiLanguage == NULL) {
           //
           // For all languages in the package list.
           //
@@ -144,7 +177,7 @@ Returns:
                                          mHiiStringProtocol,
                                          ThunkContext->UefiHiiHandle,
                                          &StringId,
-                                         AsciiLanguage,
+                                         Rfc3066AsciiLanguage,
                                          NULL,
                                          NewString,
                                          NULL
@@ -154,7 +187,7 @@ Returns:
         //
         // Update the existing string token.
         //
-        if (AsciiLanguage == NULL) {
+        if (Rfc3066AsciiLanguage == NULL) {
           //
           // For all languages in the package list.
           //
@@ -167,7 +200,7 @@ Returns:
                                        mHiiStringProtocol,
                                        ThunkContext->UefiHiiHandle,
                                        *Reference,
-                                       AsciiLanguage,
+                                       Rfc3066AsciiLanguage,
                                        NewString,
                                        NULL
                                        );
@@ -245,42 +278,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
-typedef struct {
-  CHAR8 *Iso639;
-  CHAR8 *Rfc3066;
-} ISO639TORFC3066MAP;
-
-ISO639TORFC3066MAP Iso639ToRfc3066Map [] = {
-    {"eng", "en-US"},
-    {"fra", "fr-FR"},
-};
-
-CHAR8 *
-ConvertIso639ToRfc3066 (
-  CHAR8 *Iso638Lang
-  )
-{
-  UINTN Index;
-
-  for (Index = 0; Index < sizeof (Iso639ToRfc3066Map) / sizeof (Iso639ToRfc3066Map[0]); Index++) {
-    if (AsciiStrnCmp (Iso638Lang, Iso639ToRfc3066Map[Index].Iso639, AsciiStrSize (Iso638Lang)) == 0) {
-      return Iso639ToRfc3066Map[Index].Rfc3066;
-    }
-  }
-
-  return (CHAR8 *) NULL;
-}
-
 EFI_STATUS
 EFIAPI
 HiiGetString (
-  IN     EFI_HII_PROTOCOL    *This,
-  IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
-  IN     STRING_REF          Token,
-  IN     BOOLEAN             Raw,
-  IN     CHAR16              *LanguageString,
-  IN OUT UINTN               *BufferLengthTemp,
-  OUT    EFI_STRING          StringBuffer
+  IN     EFI_HII_PROTOCOL           *This,
+  IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
+  IN     STRING_REF                 Token,
+  IN     BOOLEAN                    Raw,
+  IN     CHAR16                     *LanguageString,
+  IN OUT UINTN                      *BufferLengthTemp,
+  OUT    EFI_STRING                 StringBuffer
   )
 /*++
 
@@ -310,68 +317,62 @@ Returns:
 
 --*/
 {
-  LIST_ENTRY                                *Link;
-  HII_THUNK_CONTEXT  *ThunkContext;
-  CHAR8                                     *AsciiLanguage;
+  CHAR8                                 *Iso639AsciiLanguage;
   HII_THUNK_PRIVATE_DATA                *Private;
-  CHAR8                                     *Rfc3066AsciiLanguage;
+  CHAR8                                 *Rfc3066AsciiLanguage;
+  EFI_HII_HANDLE                        UefiHiiHandle;
+  EFI_STATUS                            Status;
 
   Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  if (LanguageString == NULL) {
-    AsciiLanguage = NULL;
-  } else {
-    AsciiLanguage = AllocateZeroPool (StrLen (LanguageString) + 1);
-    if (AsciiLanguage == NULL) {
+  Iso639AsciiLanguage = NULL;
+  Rfc3066AsciiLanguage = NULL;
+
+  if (LanguageString != NULL) {
+    Iso639AsciiLanguage = AllocateZeroPool (StrLen (LanguageString) + 1);
+    if (Iso639AsciiLanguage == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    UnicodeStrToAsciiStr  (LanguageString, AsciiLanguage);
+    UnicodeStrToAsciiStr  (LanguageString, Iso639AsciiLanguage);
 
-    Rfc3066AsciiLanguage = ConvertIso639ToRfc3066 (AsciiLanguage);
+    //
+    // Caller of Framework HII Interface uses the Language Identification String defined 
+    // in Iso639. So map it to the Language Identifier defined in RFC3066.
+    //
+    Rfc3066AsciiLanguage = ConvertIso639ToRfc3066 (Iso639AsciiLanguage);
 
     //
     // If Rfc3066AsciiLanguage is NULL, more language mapping must be added to 
     // Iso639ToRfc3066Map.
     //
     ASSERT (Rfc3066AsciiLanguage != NULL);
-    //
-    // Caller of Framework HII Interface uses the Language Identification String defined 
-    // in Iso639. So map it to the Language Identifier defined in RFC3066.
-    //
-    if (Rfc3066AsciiLanguage != NULL) {
-      FreePool (AsciiLanguage);
-      AsciiLanguage = AllocateCopyPool (AsciiStrSize (Rfc3066AsciiLanguage), Rfc3066AsciiLanguage);
-    }
     
   }
 
-  Link = GetFirstNode (&Private->ThunkContextListHead);
-
-  while (!IsNull (&Private->ThunkContextListHead, Link)) {
-
-    ThunkContext = HII_THUNK_CONTEXT_FROM_LINK (Link);
-
-    if (Handle == ThunkContext->FwHiiHandle) {
-      if (AsciiLanguage == NULL) {
-        return HiiLibGetString (ThunkContext->UefiHiiHandle, Token, StringBuffer, BufferLengthTemp);
-      } else {
-        return mHiiStringProtocol->GetString (
-                                     mHiiStringProtocol,
-                                     AsciiLanguage,
-                                     ThunkContext->UefiHiiHandle,
-                                     Token,
-                                     StringBuffer,
-                                     BufferLengthTemp,
-                                     NULL
-                                     );
-      }
-    }
-    
-    
-    Link = GetNextNode (&Private->ThunkContextListHead, Link);
+  UefiHiiHandle = FwHiiHandleToUefiHiiHandle (Private, Handle);
+  if (UefiHiiHandle == NULL) {
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
 
-  return EFI_NOT_FOUND;
+  if (Rfc3066AsciiLanguage == NULL) {
+    Status =  HiiLibGetString (UefiHiiHandle, Token, StringBuffer, BufferLengthTemp);
+  } else {
+    Status = mHiiStringProtocol->GetString (
+                                 mHiiStringProtocol,
+                                 Rfc3066AsciiLanguage,
+                                 UefiHiiHandle,
+                                 Token,
+                                 StringBuffer,
+                                 BufferLengthTemp,
+                                 NULL
+                                 );
+  }
+
+Done:
+  SafeFreePool (Iso639AsciiLanguage);
+  
+  return Status;
 }
 
 EFI_STATUS

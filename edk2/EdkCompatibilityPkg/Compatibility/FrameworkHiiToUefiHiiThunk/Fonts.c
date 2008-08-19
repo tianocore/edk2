@@ -16,8 +16,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "HiiDatabase.h"
 
+EFI_NARROW_GLYPH mNarrowGlyphBuffer = {0, 0, {0}};
 
-UINT8 mGlyphBuffer[EFI_GLYPH_WIDTH * 2 * EFI_GLYPH_HEIGHT];
+BOOLEAN                         mSysFontColorCached = FALSE;
+EFI_GRAPHICS_OUTPUT_BLT_PIXEL   mSysFGColor = {0};
+
 
 /**
   This function is only called by Graphics Console module and GraphicsLib. 
@@ -47,8 +50,76 @@ HiiGetGlyph (
   IN OUT UINT32             *InternalStatus
   )
 {
-  ASSERT (FALSE);
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                Status;
+  EFI_IMAGE_OUTPUT          *Blt;
+  EFI_FONT_DISPLAY_INFO     *FontInfo;
+  UINTN                     Xpos;
+  UINTN                     Ypos;
+  UINTN                     BaseLine;
+
+  if (!mSysFontColorCached) {
+    //
+    // Cache the system font's foreground color.
+    //
+    Status = mHiiFontProtocol->GetFontInfo (
+                                 mHiiFontProtocol,
+                                 NULL,
+                                 NULL,
+                                 &FontInfo,
+                                 NULL
+                                 );
+
+    if (!EFI_ERROR (Status)) {
+      ASSERT (StrCmp (FontInfo->FontInfo.FontName, L"sysdefault") == 0);
+      mSysFGColor = FontInfo->ForegroundColor;
+      FreePool (FontInfo);
+
+      mSysFontColorCached = TRUE;
+    }
+    
+  }
+
+  Blt = NULL;
+  Status = mHiiFontProtocol->GetGlyph (
+                               mHiiFontProtocol,
+                               Source[*Index],
+                               NULL,
+                               &Blt,
+                               &BaseLine
+                               );
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // For simplicity, we only handle Narrow Glyph.
+    //
+    ASSERT (Blt->Height == EFI_GLYPH_HEIGHT);
+    ASSERT (Blt->Width == EFI_GLYPH_WIDTH);
+
+    if (Blt->Height == EFI_GLYPH_HEIGHT && Blt->Width == EFI_GLYPH_WIDTH) {
+
+      ZeroMem (&mNarrowGlyphBuffer, sizeof (mNarrowGlyphBuffer));
+      mNarrowGlyphBuffer.UnicodeWeight = *Source;
+      for (Ypos = 0; Ypos < EFI_GLYPH_HEIGHT; Ypos++) {
+        for (Xpos = 0; Xpos < EFI_GLYPH_WIDTH; Xpos++) {
+          if (CompareMem (&Blt->Image.Bitmap[Ypos * EFI_GLYPH_WIDTH + Xpos], &mSysFGColor, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)) == 0) {
+            mNarrowGlyphBuffer.GlyphCol1[Ypos] |= 1 << (EFI_GLYPH_WIDTH - 1 - Xpos);
+          }
+        }
+      }
+
+      *GlyphBuffer = (UINT8 *) &mNarrowGlyphBuffer;
+      *BitWidth    = EFI_GLYPH_WIDTH;
+      *Index += 1;
+    } else {
+      Status = EFI_NOT_FOUND;
+    }
+
+  }
+
+  if (EFI_ERROR (Status)) {
+    *GlyphBuffer = NULL;
+  }
+  return Status;
 }
 
 /**
@@ -83,6 +154,21 @@ HiiGlyphToBlt (
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer
   )
 {
-  ASSERT (FALSE);
-  return EFI_UNSUPPORTED;
+  UINTN X;
+  UINTN Y;
+
+  //
+  // Convert Monochrome bitmap of the Glyph to BltBuffer structure
+  //
+  for (Y = 0; Y < Height; Y++) {
+    for (X = 0; X < Width; X++) {
+      if ((((EFI_NARROW_GLYPH *) GlyphBuffer)->GlyphCol1[Y] & (1 << X)) != 0) {
+        BltBuffer[Y * Width * Count + (Width - X - 1)] = Foreground;
+      } else {
+        BltBuffer[Y * Width * Count + (Width - X - 1)] = Background;
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
 }

@@ -76,6 +76,7 @@ EFI_FORMBROWSER_THUNK_PRIVATE_DATA mBrowserThunkPrivateDataTemplate = {
 CONST EFI_HII_DATABASE_PROTOCOL            *mHiiDatabase;
 CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
 CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
+CONST EFI_HII_FONT_PROTOCOL                *mHiiFontProtocol;
 CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
 CONST EFI_FORM_BROWSER2_PROTOCOL           *mFormBrowser2Protocol;
 
@@ -131,6 +132,13 @@ Returns:
                   &gEfiHiiStringProtocolGuid,
                   NULL,
                   (VOID **) &mHiiStringProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->LocateProtocol (
+                  &gEfiHiiFontProtocolGuid,
+                  NULL,
+                  (VOID **) &mHiiFontProtocol
                   );
   ASSERT_EFI_ERROR (Status);
 
