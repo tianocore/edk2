@@ -20,7 +20,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PciBusDxe
   FILE_GUID                      = 93B80004-9FB3-11d4-9A3A-0090273FC14D
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -115,4 +115,5 @@
 
 [FixedPcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask
+
 

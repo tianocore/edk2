@@ -19,7 +19,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = VgaClassDxe
   FILE_GUID                      = BF89F10D-B205-474f-96E3-7A7BB1B4A407
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -67,4 +67,5 @@
   gEfiVgaMiniPortProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+
 

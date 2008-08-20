@@ -20,7 +20,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Ps2KeyboardDxe
   FILE_GUID                      = 3DC82376-637B-40a6-A8FC-A565417F2C38
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -63,4 +63,5 @@
 
 [Guids]
   gSimpleTextInExNotifyGuid                     # SOMETIMES_CONSUMED
+
 
