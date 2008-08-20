@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "HiiDatabase.h"
+#include "HiiHandle.h"
 
 HII_THUNK_PRIVATE_DATA *mHiiThunkPrivateData;
 
@@ -43,20 +44,6 @@ HII_THUNK_PRIVATE_DATA mHiiThunkPrivateDataTempate = {
     HiiGetKeyboardLayout
   },
 
-  //
-  //StaticHiiHandle
-  //The FRAMEWORK_EFI_HII_HANDLE starts from 1 
-  // and increase upwords untill reach the value of StaticPureUefiHiiHandle. 
-  // The code will assert to prevent overflow.
-  (FRAMEWORK_EFI_HII_HANDLE) 1,
-
-  //
-  //StaticPureUefiHiiHandle
-  //The Static FRAMEWORK_EFI_HII_HANDLE starts from 0xFFFF 
-  // and decrease downwords untill reach the value of StaticHiiHandle. 
-  // The code will assert to prevent overflow.
-  //
-  (FRAMEWORK_EFI_HII_HANDLE) 0xFFFF,
   {
     NULL, NULL                  //HiiHandleLinkList
   },
@@ -111,6 +98,7 @@ Returns:
   UINTN                   BufferLength;
   EFI_HII_HANDLE          *Buffer;
   UINTN                   Index;
+  HII_THUNK_CONTEXT       *ThunkContext;
   
 
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiProtocolGuid);
@@ -118,6 +106,8 @@ Returns:
   Private = AllocateCopyPool (sizeof (HII_THUNK_PRIVATE_DATA), &mHiiThunkPrivateDataTempate);
   ASSERT (Private != NULL);
   InitializeListHead (&Private->ThunkContextListHead);
+
+  InitHiiHandleDatabase ();
 
   mHiiThunkPrivateData = Private;
 
@@ -174,8 +164,10 @@ Returns:
   Status = HiiLibListPackageLists (EFI_HII_PACKAGE_STRINGS, NULL, &BufferLength, &Buffer);
   if (Status == EFI_SUCCESS) {
     for (Index = 0; Index < BufferLength / sizeof (EFI_HII_HANDLE); Index++) {
-      CreateThunkContextForUefiHiiHandle (Private, Buffer[Index]);
-      ASSERT_EFI_ERROR (Status);
+      ThunkContext = CreateThunkContextForUefiHiiHandle (Buffer[Index]);
+      ASSERT (ThunkContext!= NULL);
+      
+      InsertTailList (&Private->ThunkContextListHead, &ThunkContext->Link);
     }
 
     FreePool (Buffer);

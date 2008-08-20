@@ -633,12 +633,14 @@ CreateIfrDataArray (
   LIST_ENTRY                        *Link;
   EFI_STATUS                        Status;
 
+  Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
+  if (IsNull (&ConfigAccess->BufferStorageListHead, Link)) {
+    return NULL;
+  }
+  
   IfrDataArray = AllocateZeroPool (0x100);
   ASSERT (IfrDataArray != NULL);
 
-  Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
-  ASSERT (!IsNull (&ConfigAccess->BufferStorageListHead, Link));
-  
   BufferStorageEntry = BUFFER_STORAGE_ENTRY_FROM_LINK(Link);
   BrowserDataSize = BufferStorageEntry->Size;
 
@@ -702,11 +704,13 @@ DestroyIfrDataArray (
   IN  BOOLEAN                      NvMapAllocated
   )
 {
-  if (NvMapAllocated) {
-    FreePool (Array->NvRamMap);
-  }
+  if (Array != NULL) {
+    if (NvMapAllocated) {
+      FreePool (Array->NvRamMap);
+    }
 
-  FreePool (Array);
+    FreePool (Array);
+  }
 }
 
 
@@ -949,6 +953,7 @@ ThunkCallback (
   if (*ActionRequest == EFI_BROWSER_ACTION_REQUEST_NONE && mHiiPackageListUpdated) {
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
   }
+
 
   DestroyIfrDataArray (Data, NvMapAllocated);
   

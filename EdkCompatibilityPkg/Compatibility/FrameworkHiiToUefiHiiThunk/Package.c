@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "HiiDatabase.h"
+#include "HiiHandle.h"
 
 
 STATIC BOOLEAN mInFrameworkHiiNewPack = FALSE;
@@ -268,124 +269,7 @@ FindStringPackAndAddToPackListWithOnlyIfrPack(
 
 }
 
-HII_THUNK_CONTEXT *
-CreateThunkContext (
-  IN  HII_THUNK_PRIVATE_DATA      *Private,
-  IN  UINTN                       StringPackageCount,
-  IN  UINTN                       IfrPackageCount
-  )
-{
-  EFI_STATUS                   Status;
-  HII_THUNK_CONTEXT            *ThunkContext;
 
-  ThunkContext = AllocateZeroPool (sizeof (HII_THUNK_CONTEXT));
-  ASSERT (ThunkContext != NULL);
-  
-  ThunkContext->Signature = HII_THUNK_CONTEXT_SIGNATURE;
-  ThunkContext->IfrPackageCount = IfrPackageCount;
-  ThunkContext->StringPackageCount = StringPackageCount;
-  Status = AssignFrameworkHiiHandle (Private, TRUE, &ThunkContext->FwHiiHandle);
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  InitializeListHead (&ThunkContext->QuestionIdMapListHead);
-  InitializeListHead (&ThunkContext->OneOfOptionMapListHead);
-
-
-  return ThunkContext;
-     
-}
-
-VOID
-FreeFrameworkHiiHandle (
-  IN  HII_THUNK_PRIVATE_DATA      *Private,
-  IN  FRAMEWORK_EFI_HII_HANDLE    FwHandle
-  )
-{
-  //
-  // TODO: 
-  //
-  
-  return;
-}
-
-VOID
-DestoryOneOfOptionMap (
-  IN LIST_ENTRY     *OneOfOptionMapListHead
-  )
-{
-  ONE_OF_OPTION_MAP         *Map;
-  ONE_OF_OPTION_MAP_ENTRY   *MapEntry;
-  LIST_ENTRY                *Link;
-  LIST_ENTRY                *Link2;
-
-  while (!IsListEmpty (OneOfOptionMapListHead)) {
-    Link = GetFirstNode (OneOfOptionMapListHead);
-    
-    Map = ONE_OF_OPTION_MAP_FROM_LINK (Link);
-
-    while (!IsListEmpty (&Map->OneOfOptionMapEntryListHead)) {
-      Link2 = GetFirstNode (&Map->OneOfOptionMapEntryListHead);
-      
-      MapEntry = ONE_OF_OPTION_MAP_ENTRY_FROM_LINK (Link);
-
-      RemoveEntryList (Link2);
-
-      FreePool (MapEntry);
-    }
-
-    RemoveEntryList (Link);
-    FreePool (Map);
-  }
-}
-
-VOID
-DestroyQuestionIdMap (
-  IN LIST_ENTRY     *QuestionIdMapListHead
-  )
-{
-  QUESTION_ID_MAP           *IdMap;
-  QUESTION_ID_MAP_ENTRY     *IdMapEntry;
-  LIST_ENTRY                *Link;
-  LIST_ENTRY                *Link2;
-
-  while (!IsListEmpty (QuestionIdMapListHead)) {
-    Link = GetFirstNode (QuestionIdMapListHead);
-    
-    IdMap = QUESTION_ID_MAP_FROM_LINK (Link);
-
-    while (!IsListEmpty (&IdMap->MapEntryListHead)) {
-      Link2 = GetFirstNode (&IdMap->MapEntryListHead);
-      
-      IdMapEntry = QUESTION_ID_MAP_ENTRY_FROM_LINK (Link);
-
-      RemoveEntryList (Link2);
-
-      FreePool (IdMapEntry);
-    }
-
-    RemoveEntryList (Link);
-    FreePool (IdMap);
-  }
-}
-
-VOID
-DestroyThunkContext (
-  IN  HII_THUNK_PRIVATE_DATA    *Private,
-  IN HII_THUNK_CONTEXT          *ThunkContext
-  )
-{
-  ASSERT (ThunkContext != NULL);
-
-  FreeFrameworkHiiHandle (Private, ThunkContext->FwHiiHandle);
-
-  DestroyQuestionIdMap (&ThunkContext->QuestionIdMapListHead);
-
-  DestoryOneOfOptionMap (&ThunkContext->OneOfOptionMapListHead);
-
-  FreePool (ThunkContext);
-}
 
 CONST EFI_GUID mAGuid = 
   { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e } };
@@ -420,7 +304,8 @@ UefiRegisterPackageList(
   if (ThunkContext == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
+  ThunkContext->ByFrameworkHiiNewPack = TRUE;
+  
   if (Packages->GuidId == NULL) {
     //
     // UEFI HII Database require Package List GUID must be unique.
@@ -509,7 +394,7 @@ UefiRegisterPackageList(
 
 Done:
   if (EFI_ERROR (Status)) {
-    DestroyThunkContext (Private, ThunkContext);
+    DestroyThunkContext (ThunkContext);
   } else {
     InsertTailList (&Private->ThunkContextListHead, &ThunkContext->Link);
     *Handle = ThunkContext->FwHiiHandle;
@@ -627,7 +512,7 @@ Returns:
 
     RemoveEntryList (&ThunkContext->Link);
 
-    DestroyThunkContext (Private, ThunkContext);
+    DestroyThunkContext (ThunkContext);
   }else {
     Status = EFI_NOT_FOUND;
   }
@@ -669,8 +554,10 @@ NewOrAddPackNotify (
   //
   ThunkContext = UefiHiiHandleToThunkContext (Private, Handle);
   if (ThunkContext == NULL) {
-    ThunkContext = CreateThunkContextForUefiHiiHandle (Private, Handle);
+    ThunkContext = CreateThunkContextForUefiHiiHandle (Handle);
     ASSERT (ThunkContext != NULL);
+
+    InsertTailList (&Private->ThunkContextListHead, &ThunkContext->Link);
   } 
 
 
@@ -769,14 +656,14 @@ RemovePackNotify (
 
   ThunkContext = UefiHiiHandleToThunkContext (Private, Handle);
 
-  if (ThunkContext->FwHiiHandle > Private->StaticHiiHandle) {
+  if (!ThunkContext->ByFrameworkHiiNewPack) {
     if (IsRemovingLastStringPack (Handle)) {
       //
       // If the string package will be removed is the last string package
       // in the package list, we will remove the HII Thunk entry from the
       // database.
       //
-      Status = DestroyThunkContextForUefiHiiHandle (Private, Handle);
+      DestroyThunkContextForUefiHiiHandle (Private, Handle);
     }
   }
 

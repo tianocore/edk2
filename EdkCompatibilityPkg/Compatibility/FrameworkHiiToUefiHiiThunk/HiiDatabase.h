@@ -64,8 +64,6 @@ typedef struct {
   UINTN                    Signature;
   EFI_HANDLE               Handle;
   EFI_HII_PROTOCOL         Hii;
-  FRAMEWORK_EFI_HII_HANDLE StaticHiiHandle;
-  FRAMEWORK_EFI_HII_HANDLE StaticPureUefiHiiHandle;
 
   //
   // The head of link list for all HII_THUNK_CONTEXT.
@@ -140,6 +138,8 @@ typedef struct {
 
   UINTN                     IfrPackageCount;
   UINTN                     StringPackageCount;
+
+  BOOLEAN                   ByFrameworkHiiNewPack;
 
   //
   // The field below is only valid if IsPackageListWithOnlyStringPack is TRUE.
