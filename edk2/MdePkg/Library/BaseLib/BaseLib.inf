@@ -568,6 +568,7 @@
   ChkStkGcc.c  | GCC 
 
 [Sources.IPF]
+  Ipf/AsmCpuMisc.s
   Ipf/AccessGp.s
   Ipf/ReadCpuid.s
   Ipf/ExecFc.s
