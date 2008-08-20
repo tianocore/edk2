@@ -31,9 +31,7 @@
 #
 
 [Sources.common]
-  MemoryAllocationLibInternals.h
   MemoryAllocationLib.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
