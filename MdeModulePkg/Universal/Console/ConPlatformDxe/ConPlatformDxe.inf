@@ -59,11 +59,13 @@
   gEfiGlobalVariableGuid                        # SOMETIMES_CONSUMED L"ErrOut"
 
 [Protocols]
-  gEfiHotPlugDeviceGuid                         # PROTOCOL TO_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL TO_START
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL TO_START
-  gEfiStandardErrorDeviceGuid                   # PROTOCOL BY_START
-  gEfiConsoleOutDeviceGuid                      # PROTOCOL BY_START
-  gEfiConsoleInDeviceGuid                       # PROTOCOL BY_START
 
+[Guids]
+  gEfiHotPlugDeviceGuid
+  gEfiStandardErrorDeviceGuid
+  gEfiConsoleOutDeviceGuid
+  gEfiConsoleInDeviceGuid
+  
