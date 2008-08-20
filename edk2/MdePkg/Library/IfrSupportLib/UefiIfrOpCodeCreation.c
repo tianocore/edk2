@@ -127,6 +127,9 @@ CreateEndOpCode (
   End.Header.Scope   = 0;
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_END to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &End, sizeof (EFI_IFR_END));
   Data->Offset += sizeof (EFI_IFR_END);
 
@@ -174,6 +177,9 @@ CreateDefaultOpCode (
   CopyMem (&Default.Value, Value, sizeof(EFI_IFR_TYPE_VALUE));
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_DEFAULT to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &Default, sizeof (EFI_IFR_DEFAULT));
   Data->Offset += sizeof (EFI_IFR_DEFAULT);
 
@@ -230,6 +236,9 @@ CreateActionOpCode (
   Action.QuestionConfig         = QuestionConfig;
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_ACTION to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &Action, sizeof (EFI_IFR_ACTION));
   Data->Offset += sizeof (EFI_IFR_ACTION);
 
@@ -276,6 +285,9 @@ CreateSubTitleOpCode (
   Subtitle.Flags            = Flags;
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_SUBTITLE to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &Subtitle, sizeof (EFI_IFR_SUBTITLE));
   Data->Offset += sizeof (EFI_IFR_SUBTITLE);
 
@@ -321,6 +333,9 @@ CreateTextOpCode (
   Text.TextTwo          = TextTwo;
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_TEXT to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &Text, sizeof (EFI_IFR_TEXT));
   Data->Offset += sizeof (EFI_IFR_TEXT);
 
@@ -377,6 +392,9 @@ CreateGotoOpCode (
   Goto.FormId                 = FormId;
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_REF to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &Goto, sizeof (EFI_IFR_REF));
   Data->Offset += sizeof (EFI_IFR_REF);
 
@@ -429,6 +447,9 @@ CreateOneOfOptionOpCode (
     OneOfOption.Type          = Type;
 
     LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+    //
+    // CopyMem is used for EFI_IFR_ONF_OF_OPTION to cover the unaligned address access.
+    //
     CopyMem (LocalBuffer, &OneOfOption, sizeof (EFI_IFR_ONE_OF_OPTION));
     Data->Offset += sizeof (EFI_IFR_ONE_OF_OPTION);
   }
@@ -500,6 +521,9 @@ CreateOneOfOpCode (
   ZeroMem ((VOID *) &OneOf.data, sizeof (MINMAXSTEP_DATA));
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_ONF_OF to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &OneOf, sizeof (EFI_IFR_ONE_OF));
   Data->Offset += sizeof (EFI_IFR_ONE_OF);
 
@@ -583,6 +607,9 @@ CreateOrderedListOpCode (
   OrderedList.Flags                           = OrderedListFlags;
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_ORDERED_LIST to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &OrderedList, sizeof (EFI_IFR_ORDERED_LIST));
   Data->Offset += sizeof (EFI_IFR_ORDERED_LIST);
 
@@ -648,6 +675,9 @@ CreateCheckBoxOpCode (
   CheckBox.Flags                           = CheckBoxFlags;
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_CHECKBOX to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &CheckBox, sizeof (EFI_IFR_CHECKBOX));
   Data->Offset += sizeof (EFI_IFR_CHECKBOX);
 
@@ -748,6 +778,9 @@ CreateNumericOpCode (
   CopyMem (&Numeric.data, &MinMaxStep, sizeof (MINMAXSTEP_DATA));
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_NUMERIC to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &Numeric, sizeof (EFI_IFR_NUMERIC));
   Data->Offset += sizeof (EFI_IFR_NUMERIC);
 
@@ -823,6 +856,9 @@ CreateStringOpCode (
   String.Flags                           = StringFlags;
 
   LocalBuffer = (UINT8 *) Data->Data + Data->Offset;
+  //
+  // CopyMem is used for EFI_IFR_STRING to cover the unaligned address access.
+  //
   CopyMem (LocalBuffer, &String, sizeof (EFI_IFR_STRING));
   Data->Offset += sizeof (EFI_IFR_STRING);
 

@@ -119,6 +119,9 @@ InternalHiiLibPreparePackages (
   //
   for (Index = 0; Index < NumberOfPackages; Index++) {
     PackageArray = (UINT8 *) VA_ARG (Marker, VOID *);
+    //
+    // CopyMem is used for UINT32 to cover the unaligned address access.
+    //
     CopyMem (&PackageLength, PackageArray, sizeof (UINT32));
     PackageLength  -= sizeof (UINT32);
     PackageArray += sizeof (UINT32);

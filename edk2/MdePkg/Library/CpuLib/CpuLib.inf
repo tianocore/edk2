@@ -43,7 +43,7 @@
   Ia32/CpuFlushTlb.S | GCC 
 
 [Sources.X64]
-  X64/CpuFlushTlb.asm
+  X64/CpuFlushTlb.asm 
   X64/CpuSleep.asm
 
   X64/CpuSleep.S | GCC 
@@ -62,7 +62,3 @@
 
 [LibraryClasses.Ipf]
 PalCallLib
-
-
-[Pcd.common]
-
