@@ -370,8 +370,6 @@ CoreInstallProtocolInterfaceNotify (
   Prot = NULL;
   Handle = NULL;
 
-  ASSERT (gDxeCoreBS != NULL);
-
   if (*UserHandle != NULL_HANDLE) {
     Status = CoreHandleProtocol (*UserHandle, Protocol, (VOID **)&ExistingInterface);
     if (!EFI_ERROR (Status)) {

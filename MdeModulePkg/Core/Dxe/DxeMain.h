@@ -76,6 +76,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeCoffLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include "DebugImageInfo.h"
 #include "Library.h"
@@ -197,7 +198,6 @@ typedef struct {
 // DXE Core Global Variables
 //
 extern EFI_SYSTEM_TABLE                         *gDxeCoreST;
-extern EFI_BOOT_SERVICES                        *gDxeCoreBS;
 extern EFI_RUNTIME_SERVICES                     *gDxeCoreRT;
 extern EFI_DXE_SERVICES                         *gDxeCoreDS;
 extern EFI_HANDLE                               gDxeCoreImageHandle;

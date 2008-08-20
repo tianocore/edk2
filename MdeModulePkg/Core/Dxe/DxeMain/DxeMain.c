@@ -199,7 +199,6 @@ EFI_RUNTIME_ARCH_PROTOCOL *gRuntime = &gRuntimeTemplate;
 // DXE Core Global Variables for the EFI System Table, Boot Services Table,
 // DXE Services Table, and Runtime Services Table
 //
-EFI_BOOT_SERVICES     *gDxeCoreBS = &mBootServices;
 EFI_DXE_SERVICES      *gDxeCoreDS = &mDxeServices;
 EFI_SYSTEM_TABLE      *gDxeCoreST = NULL;
 
@@ -640,11 +639,11 @@ CalculateEfiHdrCrc (
   Hdr->CRC32 = 0;
 
   //
-  // If gDxeCoreBS->CalculateCrce32 () == CoreEfiNotAvailableYet () then
+  // If gBS->CalculateCrce32 () == CoreEfiNotAvailableYet () then
   //  Crc will come back as zero if we set it to zero here
   //
   Crc = 0;
-  gDxeCoreBS->CalculateCrc32 ((UINT8 *)Hdr, Hdr->HeaderSize, &Crc);
+  gBS->CalculateCrc32 ((UINT8 *)Hdr, Hdr->HeaderSize, &Crc);
   Hdr->CRC32 = Crc;
 }
 
@@ -744,8 +743,8 @@ CoreExitBootServices (
   //
   // Zero out the Boot Service Table
   //
-  ZeroMem (gDxeCoreBS, sizeof (EFI_BOOT_SERVICES));
-  gDxeCoreBS = NULL;
+  ZeroMem (gBS, sizeof (EFI_BOOT_SERVICES));
+  gBS = NULL;
 
   //
   // Update the AtRuntime field in Runtiem AP.

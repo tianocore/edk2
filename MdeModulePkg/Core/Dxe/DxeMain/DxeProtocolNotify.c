@@ -161,7 +161,7 @@ GenericArchProtocolNotify (
   //
   if (Found) {
     CalculateEfiHdrCrc (&gDxeCoreRT->Hdr);
-    CalculateEfiHdrCrc (&gDxeCoreBS->Hdr);
+    CalculateEfiHdrCrc (&gBS->Hdr);
     CalculateEfiHdrCrc (&gDxeCoreST->Hdr);
     CalculateEfiHdrCrc (&gDxeCoreDS->Hdr);
   }
