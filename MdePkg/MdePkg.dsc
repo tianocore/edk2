@@ -80,6 +80,7 @@
   MdePkg/Library/HiiLib/HiiLib.inf
   MdePkg/Library/IfrSupportLib/IfrSupportLib.inf
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
   MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
   MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   MdePkg/Library/PeiMemoryLib/PeiMemoryLib.inf
