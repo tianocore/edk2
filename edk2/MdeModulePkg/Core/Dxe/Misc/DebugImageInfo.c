@@ -104,7 +104,7 @@ CoreUpdateDebugTableCrc32 (
 {
   ASSERT(mDebugTable != NULL);
   mDebugTable->Crc32 = 0;
-  gDxeCoreBS->CalculateCrc32 ((VOID *)mDebugTable, sizeof (EFI_SYSTEM_TABLE_POINTER), &mDebugTable->Crc32);
+  gBS->CalculateCrc32 ((VOID *)mDebugTable, sizeof (EFI_SYSTEM_TABLE_POINTER), &mDebugTable->Crc32);
 }
 
 

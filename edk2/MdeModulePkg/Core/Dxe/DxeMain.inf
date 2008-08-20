@@ -87,6 +87,7 @@
   PeCoffLib
   ExtractGuidedSectionLib
   MemoryAllocationLib
+  UefiBootServicesTableLib
 
 [Guids]
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
