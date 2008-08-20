@@ -16,9 +16,6 @@
 
 /**
   Flushes all the Translation Lookaside Buffers(TLB) entries in a CPU.
-
-  Flushes all the Translation Lookaside Buffers(TLB) entries in a CPU.
-
 **/
 VOID
 EFIAPI
