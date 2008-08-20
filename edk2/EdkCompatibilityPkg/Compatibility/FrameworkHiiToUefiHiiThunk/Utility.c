@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "HiiDatabase.h"
+#include "HiiHandle.h"
 
 EFI_GUID  gFrameworkHiiCompatbilityGuid = EFI_IFR_FRAMEWORK_GUID;
 EFI_GUID  gTianoHiiIfrGuid              = EFI_IFR_TIANO_GUID;
@@ -137,47 +138,8 @@ TagGuidToUefiHiiHandle (
   
 }
 
-BOOLEAN
-IsFrameworkHiiDatabaseHandleDepleted (
-  IN CONST HII_THUNK_PRIVATE_DATA *Private
-  )
-{
-  return (BOOLEAN) (Private->StaticHiiHandle == (UINTN) Private->StaticPureUefiHiiHandle);
-}
 
-EFI_STATUS
-AssignFrameworkHiiHandle (
-  IN OUT HII_THUNK_PRIVATE_DATA     *Private,
-  IN     BOOLEAN                    FromFwHiiNewPack,
-  OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
-  )
-{
-  ASSERT (Handle != NULL);
-
-  if (FromFwHiiNewPack) {
-
-    *Handle = Private->StaticHiiHandle;
-    Private->StaticHiiHandle += 1;
-
-    if (IsFrameworkHiiDatabaseHandleDepleted (Private)) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-  } else {
-
-    *Handle = Private->StaticPureUefiHiiHandle;
-    Private->StaticPureUefiHiiHandle -= 1;
-    
-    if (IsFrameworkHiiDatabaseHandleDepleted (Private)) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-  }
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
+VOID
 DestroyThunkContextForUefiHiiHandle (
   IN HII_THUNK_PRIVATE_DATA     *Private,
   IN EFI_HII_HANDLE             UefiHiiHandle
@@ -188,14 +150,7 @@ DestroyThunkContextForUefiHiiHandle (
   ThunkContext = UefiHiiHandleToThunkContext (Private, UefiHiiHandle);
   ASSERT (ThunkContext != NULL);
 
-  ASSERT (IsListEmpty (&ThunkContext->OneOfOptionMapListHead));
-  ASSERT (IsListEmpty (&ThunkContext->QuestionIdMapListHead));
-  
-  RemoveEntryList (&ThunkContext->Link);
-
-  FreePool (ThunkContext);
-    
-  return EFI_SUCCESS;
+  DestroyThunkContext (ThunkContext);
 }
 
 
@@ -208,7 +163,6 @@ DestroyThunkContextForUefiHiiHandle (
 **/
 HII_THUNK_CONTEXT *
 CreateThunkContextForUefiHiiHandle (
-  IN  HII_THUNK_PRIVATE_DATA     *Private,
   IN  EFI_HII_HANDLE             UefiHiiHandle
  )
 {
@@ -221,7 +175,7 @@ CreateThunkContextForUefiHiiHandle (
   
   ThunkContext->Signature = HII_THUNK_CONTEXT_SIGNATURE;
 
-  Status = AssignFrameworkHiiHandle (Private, FALSE, &ThunkContext->FwHiiHandle);
+  Status = AllocateHiiHandle (&ThunkContext->FwHiiHandle);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
@@ -236,8 +190,6 @@ CreateThunkContextForUefiHiiHandle (
   InitializeListHead (&ThunkContext->QuestionIdMapListHead);
   InitializeListHead (&ThunkContext->OneOfOptionMapListHead);
   
-  InsertTailList (&Private->ThunkContextListHead, &ThunkContext->Link);
-
   return ThunkContext;
 }
 
@@ -469,5 +421,116 @@ GetMapEntryListHead (
   }
   return NULL;
 }
+
+
+HII_THUNK_CONTEXT *
+CreateThunkContext (
+  IN  HII_THUNK_PRIVATE_DATA      *Private,
+  IN  UINTN                       StringPackageCount,
+  IN  UINTN                       IfrPackageCount
+  )
+{
+  EFI_STATUS                   Status;
+  HII_THUNK_CONTEXT            *ThunkContext;
+
+  ThunkContext = AllocateZeroPool (sizeof (HII_THUNK_CONTEXT));
+  ASSERT (ThunkContext != NULL);
+  
+  ThunkContext->Signature = HII_THUNK_CONTEXT_SIGNATURE;
+  ThunkContext->IfrPackageCount = IfrPackageCount;
+  ThunkContext->StringPackageCount = StringPackageCount;
+  Status = AllocateHiiHandle (&ThunkContext->FwHiiHandle);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  InitializeListHead (&ThunkContext->QuestionIdMapListHead);
+  InitializeListHead (&ThunkContext->OneOfOptionMapListHead);
+
+
+  return ThunkContext;
+     
+}
+
+VOID
+DestroyThunkContext (
+  IN HII_THUNK_CONTEXT          *ThunkContext
+  )
+{
+  ASSERT (ThunkContext != NULL);
+
+  FreeHiiHandle (ThunkContext->FwHiiHandle);
+
+  DestroyQuestionIdMap (&ThunkContext->QuestionIdMapListHead);
+
+  DestoryOneOfOptionMap (&ThunkContext->OneOfOptionMapListHead);
+
+  RemoveEntryList (&ThunkContext->Link);
+
+  FreePool (ThunkContext);
+}
+
+
+VOID
+DestroyQuestionIdMap (
+  IN LIST_ENTRY     *QuestionIdMapListHead
+  )
+{
+  QUESTION_ID_MAP           *IdMap;
+  QUESTION_ID_MAP_ENTRY     *IdMapEntry;
+  LIST_ENTRY                *Link;
+  LIST_ENTRY                *Link2;
+
+  while (!IsListEmpty (QuestionIdMapListHead)) {
+    Link = GetFirstNode (QuestionIdMapListHead);
+    
+    IdMap = QUESTION_ID_MAP_FROM_LINK (Link);
+
+    while (!IsListEmpty (&IdMap->MapEntryListHead)) {
+      Link2 = GetFirstNode (&IdMap->MapEntryListHead);
+      
+      IdMapEntry = QUESTION_ID_MAP_ENTRY_FROM_LINK (Link);
+
+      RemoveEntryList (Link2);
+
+      FreePool (IdMapEntry);
+    }
+
+    RemoveEntryList (Link);
+    FreePool (IdMap);
+  }
+}
+
+VOID
+DestoryOneOfOptionMap (
+  IN LIST_ENTRY     *OneOfOptionMapListHead
+  )
+{
+  ONE_OF_OPTION_MAP         *Map;
+  ONE_OF_OPTION_MAP_ENTRY   *MapEntry;
+  LIST_ENTRY                *Link;
+  LIST_ENTRY                *Link2;
+
+  while (!IsListEmpty (OneOfOptionMapListHead)) {
+    Link = GetFirstNode (OneOfOptionMapListHead);
+    
+    Map = ONE_OF_OPTION_MAP_FROM_LINK (Link);
+
+    while (!IsListEmpty (&Map->OneOfOptionMapEntryListHead)) {
+      Link2 = GetFirstNode (&Map->OneOfOptionMapEntryListHead);
+      
+      MapEntry = ONE_OF_OPTION_MAP_ENTRY_FROM_LINK (Link);
+
+      RemoveEntryList (Link2);
+
+      FreePool (MapEntry);
+    }
+
+    RemoveEntryList (Link);
+    FreePool (Map);
+  }
+}
+
+
 
 

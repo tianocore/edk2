@@ -70,12 +70,11 @@ AssignFrameworkHiiHandle (
 
 HII_THUNK_CONTEXT *
 CreateThunkContextForUefiHiiHandle (
-  IN  HII_THUNK_PRIVATE_DATA     *Private,
   IN  EFI_HII_HANDLE             UefiHiiHandle
  )
 ;
 
-EFI_STATUS
+VOID
 DestroyThunkContextForUefiHiiHandle (
   IN HII_THUNK_PRIVATE_DATA     *Private,
   IN EFI_HII_HANDLE             UefiHiiHandle
@@ -99,6 +98,33 @@ LIST_ENTRY *
 GetMapEntryListHead (
   IN CONST HII_THUNK_CONTEXT  *ThunkContext,
   IN       UINT16             VarStoreId
+  )
+;
+
+HII_THUNK_CONTEXT *
+CreateThunkContext (
+  IN  HII_THUNK_PRIVATE_DATA      *Private,
+  IN  UINTN                       StringPackageCount,
+  IN  UINTN                       IfrPackageCount
+  )
+;
+
+VOID
+DestroyThunkContext (
+  IN HII_THUNK_CONTEXT          *ThunkContext
+  )
+;
+
+VOID
+DestroyQuestionIdMap (
+  IN LIST_ENTRY     *QuestionIdMapListHead
+  )
+;
+
+
+VOID
+DestoryOneOfOptionMap (
+  IN LIST_ENTRY     *OneOfOptionMapListHead
   )
 ;
 

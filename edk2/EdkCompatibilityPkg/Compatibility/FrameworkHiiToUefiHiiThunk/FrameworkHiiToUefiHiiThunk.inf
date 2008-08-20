@@ -37,6 +37,8 @@
 #
 
 [Sources.common]
+  HiiHandle.c
+  HiiHandle.h
   ConfigAccess.c
   ConfigAccess.h
   OpcodeCreation.c
