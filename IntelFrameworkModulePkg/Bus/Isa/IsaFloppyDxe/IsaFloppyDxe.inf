@@ -27,7 +27,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IsaFloppyDxe
   FILE_GUID                      = 0abd8284-6da3-4616-971a-83a5148067ba
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -64,4 +64,5 @@
   gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
   gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+
 

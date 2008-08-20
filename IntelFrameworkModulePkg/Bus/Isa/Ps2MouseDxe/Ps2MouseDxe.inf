@@ -20,7 +20,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Ps2MouseDxe
   FILE_GUID                      = 202A2B0E-9A31-4812-B291-8747DF152439
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -55,4 +55,5 @@
   gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
   gEfiSimplePointerProtocolGuid                 # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+
 
