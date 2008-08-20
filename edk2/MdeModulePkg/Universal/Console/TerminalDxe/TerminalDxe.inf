@@ -67,9 +67,9 @@
   gEfiVT100PlusGuid                             # SOMETIMES_CONSUMED
   gEfiPcAnsiGuid                                # SOMETIMES_CONSUMED
   gSimpleTextInExNotifyGuid                     # SOMETIMES_CONSUMED
-
-[Protocols]
   gEfiHotPlugDeviceGuid                         # PROTOCOL SOMETIMES_CONSUMED
+  
+[Protocols]
   gEfiSerialIoProtocolGuid                      # PROTOCOL TO_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
