@@ -90,10 +90,8 @@
 
 [Guids]
   gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED  System Table
-  gEfiUgaIoProtocolGuid                         # ALWAYS_CONSUMED     System Table
   gEfiPciHotplugDeviceGuid                      # PRIVATE
   gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED
-
 
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
@@ -107,7 +105,7 @@
   gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL TO_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiIncompatiblePciDeviceSupportProtocolGuid  # PROTOCOL TO_START
-
+  gEfiUgaIoProtocolGuid                         # ALWAYS_CONSUMED     System Table
 
 [FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable
