@@ -520,18 +520,18 @@ struct _EFI_MTFTP4_PROTOCOL {
 };
 
 struct _EFI_MTFTP4_TOKEN {
-  OUT EFI_STATUS                  Status;
-  IN  EFI_EVENT                   Event;
-  IN  EFI_MTFTP4_OVERRIDE_DATA    *OverrideData;
-  IN  UINT8                       *Filename;
-  IN  UINT8                       *ModeStr;
-  IN  UINT32                      OptionCount;
-  IN  EFI_MTFTP4_OPTION           *OptionList;
-  IN  OUT UINT64                  BufferSize;
-  IN  OUT VOID                    *Buffer;
-  IN  EFI_MTFTP4_CHECK_PACKET     CheckPacket;
-  IN  EFI_MTFTP4_TIMEOUT_CALLBACK TimeoutCallback;
-  IN  EFI_MTFTP4_PACKET_NEEDED    PacketNeeded;
+  EFI_STATUS                  Status;
+  EFI_EVENT                   Event;
+  EFI_MTFTP4_OVERRIDE_DATA    *OverrideData;
+  UINT8                       *Filename;
+  UINT8                       *ModeStr;
+  UINT32                      OptionCount;
+  EFI_MTFTP4_OPTION           *OptionList;
+  OUT UINT64                  BufferSize;
+  OUT VOID                    *Buffer;
+  EFI_MTFTP4_CHECK_PACKET     CheckPacket;
+  EFI_MTFTP4_TIMEOUT_CALLBACK TimeoutCallback;
+  EFI_MTFTP4_PACKET_NEEDED    PacketNeeded;
 };
 
 extern EFI_GUID gEfiMtftp4ServiceBindingProtocolGuid;
