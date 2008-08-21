@@ -236,19 +236,7 @@
   
   ## This feature flag can be used to enable or disable the PCD service PEIM to handle DynamicEX PCD. 
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseExEnabled|TRUE|BOOLEAN|0x00010033
-  
-  ## If this feature is enabled, then the DXE IPL must support decompressing files compressed with the EFI Compression algorithm.
-  #  This feature flag is deprecated.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportEfiDecompress|TRUE|BOOLEAN|0x00010034
-  
-  ## If this feature is enabled, then the DXE IPL must support decompressing files compressed with the Tiano Compression algorithm.
-  #  This feature flag is deprecated.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportTianoDecompress|TRUE|BOOLEAN|0x00010035
-  
-  ## If this feature is enabled, then the DXE IPL must support decompressing files compressed with the Custom Compression algorithm.
-  #  This feature flag is deprecated.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE|BOOLEAN|0x00010036
-  
+ 
   ## If TRUE, then the Device Path To Text Protocol should be produced by the platform.
   #  It can be disabled to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|TRUE|BOOLEAN|0x00010037
@@ -256,10 +244,7 @@
   ## If TRUE, then the Device Path From Text Protocol should be produced by the platform.
   #  It can be disabled to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE|BOOLEAN|0x00010038
- 
-  ## If this feature is enabled, DXE IPL will build a series of HOBs to share code with DXE Core.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildShareCodeHobs|FALSE|BOOLEAN|0x0001003c
-  
+    
   ## If this PCD is set as TRUE, the code specific to NT emulator will be endabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE|BOOLEAN|0x0001003e
   
@@ -303,6 +288,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver|FALSE|BOOLEAN|0x00010200
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkHiiCompatibilitySupport|TRUE|BOOLEAN|0x00012008
+  
+  ## IF TRUE, the PeiCore will handle the framework FvHob and install FvInfo PPI for it.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkFvHobCompatibilitySupport|FALSE|BOOLEAN|0x00012009
 
 [PcdsFixedAtBuild.common]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.

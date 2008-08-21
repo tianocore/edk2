@@ -612,17 +612,51 @@ PeiFfsFindNextFile (
 EFI_STATUS 
 EFIAPI
 PeiFvFindNextVolume (
-  IN CONST EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES         **PeiServices,
   IN     UINTN                      Instance,
   IN OUT EFI_PEI_FV_HANDLE          *VolumeHandle
   )
 {
-  PEI_CORE_INSTANCE   *Private;
+  PEI_CORE_INSTANCE        *Private;
+  UINTN                    Index;
+  BOOLEAN                  Match;
+  EFI_HOB_FIRMWARE_VOLUME  *FvHob;
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   if (VolumeHandle == NULL) {
    return EFI_INVALID_PARAMETER;
-  } 
+  }
+  
+  //
+  // Handle Framework FvHob and Install FvInfo Ppi for it.
+  //
+  if (FeaturePcdGet (PcdFrameworkFvHobCompatibilitySupport)) {
+    //
+    // Loop to search the wanted FirmwareVolume which supports FFS
+    //
+    FvHob = (EFI_HOB_FIRMWARE_VOLUME *)GetFirstHob (EFI_HOB_TYPE_FV);
+    while (FvHob != NULL) {
+      for (Index = 0, Match = FALSE; Index < Private->AllFvCount; Index++) {
+        if ((EFI_PEI_FV_HANDLE)(UINTN)FvHob->BaseAddress == Private->AllFv[Index]) {
+          Match = TRUE;
+          break;
+        }
+      }
+      //
+      // If Not Found, Install FvInfo Ppi for it.
+      //
+      if (!Match) {
+        PiLibInstallFvInfoPpi (
+          NULL,
+          (VOID *)(UINTN)FvHob->BaseAddress,
+          (UINT32)FvHob->Length,
+          NULL,
+          NULL
+          );
+      }
+      FvHob = (EFI_HOB_FIRMWARE_VOLUME *)GetNextHob (EFI_HOB_TYPE_FV, (VOID *)((UINTN)FvHob + FvHob->Header.HobLength)); 
+    }
+  }
 
   if (Instance >= Private->AllFvCount) {
    VolumeHandle = NULL;
