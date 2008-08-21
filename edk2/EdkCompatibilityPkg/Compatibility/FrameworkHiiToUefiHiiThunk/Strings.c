@@ -132,10 +132,6 @@ Returns:
   BOOLEAN                                   Found;
   CHAR8                                     *Rfc3066AsciiLanguage;
 
-  //
-  // BugBug: Conver the language to 3066.
-  //
-
   LastStringId      = (EFI_STRING_ID) 0;
   StringId          = (EFI_STRING_ID) 0;
   Found             = FALSE;

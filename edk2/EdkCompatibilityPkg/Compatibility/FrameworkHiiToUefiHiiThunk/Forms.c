@@ -38,8 +38,7 @@ FW_HII_FORMSET_TEMPLATE FormSetTemplate = {
       FRAMEWORK_EFI_IFR_FORM_SET_OP,
       sizeof (FRAMEWORK_EFI_IFR_FORM_SET)
     },
-    //Guid
-    {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}},
+    {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}}, //Guid
     0,
     0,
     0,
@@ -116,11 +115,11 @@ HiiExportDatabase (
 EFI_STATUS
 EFIAPI
 HiiGetForms (
-  IN     EFI_HII_PROTOCOL   *This,
-  IN     FRAMEWORK_EFI_HII_HANDLE      Handle,
-  IN     EFI_FORM_ID        FormId,
-  IN OUT UINTN              *BufferLengthTemp,
-  OUT    UINT8              *Buffer
+  IN     EFI_HII_PROTOCOL             *This,
+  IN     FRAMEWORK_EFI_HII_HANDLE     Handle,
+  IN     EFI_FORM_ID                  FormId,
+  IN OUT UINTN                        *BufferLengthTemp,
+  OUT    UINT8                        *Buffer
   )
 {
   HII_THUNK_PRIVATE_DATA                *Private;

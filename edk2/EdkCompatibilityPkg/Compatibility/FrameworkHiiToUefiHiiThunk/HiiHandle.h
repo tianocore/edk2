@@ -1,6 +1,5 @@
 /**@file
-
-  This file contains utility functions by HII Thunk Modules.
+  This file is for functins related to assign and free Framework HII handle number.
   
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

@@ -45,7 +45,10 @@ HII_THUNK_PRIVATE_DATA mHiiThunkPrivateDataTempate = {
   },
 
   {
-    NULL, NULL                  //HiiHandleLinkList
+    ///
+    /// HiiHandleLinkList
+    ///
+    NULL, NULL                  
   },
 };
 

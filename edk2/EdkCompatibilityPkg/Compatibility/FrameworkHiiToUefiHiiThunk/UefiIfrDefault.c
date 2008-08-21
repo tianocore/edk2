@@ -26,6 +26,7 @@
 
 #include "UefiIfrParser.h"
 #include "UefiIfrDefault.h"
+#include "HiiDatabase.h"
 
 //
 // Extern Variables
