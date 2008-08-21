@@ -16,11 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _HII_THUNK_UTILITY_H
 #define _HII_THUNK_UTILITY_H
 
-EFI_GUID *
-GetGuidOfFirstFormset (
-  CONST EFI_HII_FORM_PACKAGE * FormPackage
-);
-
 /**
   Find the UefiHiiHandle based on a Framework HII Handle returned by
   the HII Thunk to Framework HII code.
@@ -60,14 +55,6 @@ TagGuidToUefiHiiHandle (
   )
 ;
 
-EFI_STATUS
-AssignFrameworkHiiHandle (
-  IN OUT HII_THUNK_PRIVATE_DATA *Private,
-  IN     BOOLEAN                    FromFwHiiNewPack,
-  OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
-  )
-;
-
 HII_THUNK_CONTEXT *
 CreateThunkContextForUefiHiiHandle (
   IN  EFI_HII_HANDLE             UefiHiiHandle
@@ -90,6 +77,12 @@ GetPackageCountByType (
 
 EFI_STATUS
 CreateQuestionIdMap (
+  IN    OUT HII_THUNK_CONTEXT  *ThunkContext
+  )
+;
+
+VOID
+GetAttributesOfFirstFormSet (
   IN    OUT HII_THUNK_CONTEXT  *ThunkContext
   )
 ;
