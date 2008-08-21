@@ -251,8 +251,8 @@
         $(MAKE_FILE)
 
     <Command.MSFT, Command.INTEL>
-        "$(PP)" $(APP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
-        "$(ASL)" -p ${dst} $(ASL_FLAGS) ${d_path}(+)${s_base}.i
+        "$(ASLPP)" $(ASLPP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_dir}(+)${s_base}.i
+        "$(ASL)" -p ${dst} $(ASL_FLAGS) ${d_path}(+)${s_dir}(+)${s_base}.i
 
 [Acpi-Table-Code-File]
     <InputFile>
@@ -265,8 +265,8 @@
         $(MAKE_FILE)
 
     <Command.MSFT, Command.INTEL>
-        "$(CC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(INC) ${src}
-        "$(DLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(ASLCC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         GenFw -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll
 
 [Masm16-Code-File]
