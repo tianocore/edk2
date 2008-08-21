@@ -76,29 +76,8 @@ GetPackageCount (
   return EFI_SUCCESS;
 }
 
-/**
-  Removes a node from a doubly linked list, and returns the node that follows
-  the removed node.
-
-  Removes the node Entry from a doubly linked list. It is up to the caller of
-  this function to release the memory used by this node if that is required. On
-  exit, the node following Entry in the doubly linked list is returned. If
-  Entry is the only node in the linked list, then the head node of the linked
-  list is returned.
-
-  If Entry is NULL, then ASSERT().
-  If Entry is the head node of an empty list, then ASSERT().
-  If PcdMaximumLinkedListLength is not zero, and the number of nodes in the
-  linked list containing Entry, including the Entry node, is greater than
-  or equal to PcdMaximumLinkedListLength, then ASSERT().
-
-  @param  Entry A pointer to a node in a linked list
-
-  @return Entry
-
-**/
-EFI_STATUS
-FindPackListWithOnlyIfrPackAndAddStringPack (
+VOID
+UpdatePackListWithOnlyIfrPack (
   IN       HII_THUNK_PRIVATE_DATA      *Private,
   IN       HII_THUNK_CONTEXT            *StringPackageThunkContext,
   IN CONST EFI_HII_PACKAGE_LIST_HEADER *StringPackageListHeader
@@ -129,19 +108,14 @@ FindPackListWithOnlyIfrPackAndAddStringPack (
                                               ThunkContext->UefiHiiHandle,
                                               StringPackageListHeader
                                               );
-        ASSERT (Status != EFI_NOT_FOUND);
+        ASSERT_EFI_ERROR (Status);
         
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
       }
     }
     
     Link = GetNextNode (&Private->ThunkContextListHead, Link);
   }
   
-
-  return EFI_NOT_FOUND;
 }
 
 
@@ -206,24 +180,27 @@ PrepareUefiPackageListFromFrameworkHiiPackages (
 }
 
 VOID
-GenerateGuidId (
-  IN      CONST EFI_GUID * InGuid,
-  OUT           EFI_GUID * OutGuid
+GenerateRandomGuid (
+  OUT           EFI_GUID * Guid
   )
 {
-  UINT64                   MonotonicCount;
+  EFI_STATUS      Status;
+  static EFI_GUID GuidBase = { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e }};
+  UINT64          MonotonicCount;
 
-  CopyMem (OutGuid, InGuid, sizeof (EFI_GUID));
+  CopyGuid (Guid, &GuidBase);
   
-  gBS->GetNextMonotonicCount (&MonotonicCount);
+  Status = gBS->GetNextMonotonicCount (&MonotonicCount);
+  ASSERT_EFI_ERROR (Status);
+  
   //
   // Use Monotonic Count as a psedo random number generator.
   //
-  *((UINT64 *) OutGuid) = *((UINT64 *) OutGuid) + MonotonicCount;
+  *((UINT64 *) Guid) = *((UINT64 *) Guid) + MonotonicCount;
 }
 
 EFI_STATUS
-FindStringPackAndAddToPackListWithOnlyIfrPack(
+FindStringPackAndUpdatePackListWithOnlyIfrPack (
   IN HII_THUNK_PRIVATE_DATA          *Private,
   IN HII_THUNK_CONTEXT                *IfrThunkContext
   )
@@ -259,21 +236,22 @@ FindStringPackAndAddToPackListWithOnlyIfrPack(
         
         FreePool (StringPackageListHeader);
         return EFI_SUCCESS;
+
       }
     }
 
     Link = GetNextNode (&Private->ThunkContextListHead, Link);
   }
 
+  ASSERT (FALSE);
   return EFI_NOT_FOUND;
-
+  
 }
 
 
-
-CONST EFI_GUID mAGuid = 
-  { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e } };
-
+//
+// 
+//
 EFI_STATUS
 UefiRegisterPackageList(
   IN  HII_THUNK_PRIVATE_DATA      *Private,
@@ -285,7 +263,7 @@ UefiRegisterPackageList(
   UINTN                       StringPackageCount;
   UINTN                       IfrPackageCount;
   EFI_HII_PACKAGE_LIST_HEADER *PackageListHeader;
-  HII_THUNK_CONTEXT            *ThunkContext;
+  HII_THUNK_CONTEXT           *ThunkContext;
   EFI_GUID                    GuidId;
 
   PackageListHeader = NULL;
@@ -297,6 +275,7 @@ UefiRegisterPackageList(
     //
     // HII Thunk only handle package with 0 or 1 IFR package. 
     //
+    ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
@@ -316,18 +295,15 @@ UefiRegisterPackageList(
     // GUID.
     //
     ASSERT (StringPackageCount >=1 && IfrPackageCount == 1);
-    Packages->GuidId = &GuidId;
-    GenerateGuidId (&mAGuid, Packages->GuidId);
+    GenerateRandomGuid (&GuidId);
   } else {
-    //BugBug We need fix this.
-    //ASSERT (StringPackageCount == 0 || IfrPackageCount == 0);
     CopyGuid (&GuidId, Packages->GuidId);
   }
 
   //
   // Record the Package List GUID, it is used as a name for the package list by Framework HII.
   //
-  CopyGuid (&ThunkContext->TagGuid, Packages->GuidId);
+  CopyGuid (&ThunkContext->TagGuid, &GuidId);
 
   if ((StringPackageCount == 0) && (IfrPackageCount != 0)) {
     //
@@ -335,7 +311,7 @@ UefiRegisterPackageList(
     // In Framework HII implementation, Packages->GuidId is used as an identifier to associate 
     // a PackageList with only IFR to a Package list the with String package.
     //
-    GenerateGuidId (Packages->GuidId, &GuidId);
+    GenerateRandomGuid (&GuidId);
   }
 
   //
@@ -364,18 +340,14 @@ UefiRegisterPackageList(
   if (IfrPackageCount == 0) {
     if (StringPackageCount != 0) {
       //
-      // Find if there is Package List with only IFR Package in the databasee with the same
-      // tag. If found, add the String Package to this Package List.
+      // Look for a Package List with only IFR Package with the same GUID name.
+      // If found one, add the String Packages to it.
       //
-      Status = FindPackListWithOnlyIfrPackAndAddStringPack (
-                  Private,
-                  ThunkContext,
-                  PackageListHeader
-                );
-
-      if (Status == EFI_NOT_FOUND) {
-        Status = EFI_SUCCESS;
-      }
+      UpdatePackListWithOnlyIfrPack (
+          Private,
+          ThunkContext,
+          PackageListHeader
+      );
     }
   } else {
     CreateQuestionIdMap (ThunkContext);
@@ -384,11 +356,14 @@ UefiRegisterPackageList(
       //
       // Register the Package List to UEFI HII first.
       //
-      Status = FindStringPackAndAddToPackListWithOnlyIfrPack (
+      Status = FindStringPackAndUpdatePackListWithOnlyIfrPack (
                   Private,
                   ThunkContext
                   );
-      ASSERT_EFI_ERROR (Status);
+
+      if (EFI_ERROR (Status)) {
+        goto Done;
+      }
     }
   }
 
@@ -511,14 +486,12 @@ Returns:
     }
 
     RemoveEntryList (&ThunkContext->Link);
-
     DestroyThunkContext (ThunkContext);
   }else {
     Status = EFI_NOT_FOUND;
   }
 
   mInFrameworkHiiRemovePack = FALSE;
-  
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -560,71 +533,14 @@ NewOrAddPackNotify (
     InsertTailList (&Private->ThunkContextListHead, &ThunkContext->Link);
   } 
 
-
   if (PackageType == EFI_HII_PACKAGE_FORM) {
-    Status = CreateQuestionIdMap (ThunkContext);
+    GetAttributesOfFirstFormSet (ThunkContext);
   }
 
   return Status;  
 }
 
-
-BOOLEAN
-IsRemovingLastStringPack (
-  IN EFI_HII_HANDLE                     Handle
-  )
-{
-  EFI_HII_PACKAGE_LIST_HEADER *HiiPackageList;
-  UINTN                        BufferSize;
-  EFI_STATUS                   Status;
-  EFI_HII_PACKAGE_HEADER       *PackageHeader;
-  UINTN                        StringPackageCount;
-
-  HiiPackageList = NULL;
-  BufferSize = 0;
-  StringPackageCount = 0;
-
-  Status = HiiLibExportPackageLists (Handle, &HiiPackageList, &BufferSize);
-  ASSERT_EFI_ERROR (Status);
-  
-  PackageHeader = (EFI_HII_PACKAGE_HEADER *) ((UINT8 *) HiiPackageList + sizeof (EFI_HII_PACKAGE_LIST_HEADER));
-
-  while (PackageHeader->Type != EFI_HII_PACKAGE_END) {
-    switch (PackageHeader->Type) {
-      case EFI_HII_PACKAGE_STRINGS:
-        StringPackageCount++;
-
-        if (StringPackageCount > 1) {
-          //
-          // More than one String Pack in the package list
-          //
-          FreePool (HiiPackageList);
-          return FALSE;
-        }
-      break;      
-
-      default:
-        break;
-    }
-    //
-    // goto header of next package
-    //
-    PackageHeader = (EFI_HII_PACKAGE_HEADER *) ((UINT8 *) PackageHeader + PackageHeader->Length);
-  }
-
-
-  //
-  // We will always be notified for the removal of String Pack from a package list.
-  // So StringPackageCount must be one at this point.
-  //
-  ASSERT (StringPackageCount == 1);
-  
-  FreePool (HiiPackageList);
-  return TRUE;
-}
-
-
-
+//
 // Framework HII module may cache a GUID as the name of the package list.
 // Then search for the Framework HII handle database for the handle matching
 // this GUID
@@ -639,9 +555,11 @@ RemovePackNotify (
   IN EFI_HII_DATABASE_NOTIFY_TYPE       NotifyType
   )
 {
-  EFI_STATUS   Status;
-  HII_THUNK_PRIVATE_DATA *Private;
-  HII_THUNK_CONTEXT * ThunkContext;
+  EFI_STATUS                  Status;
+  HII_THUNK_PRIVATE_DATA      *Private;
+  HII_THUNK_CONTEXT           *ThunkContext;
+  EFI_HII_PACKAGE_LIST_HEADER *HiiPackageList;
+  UINTN                        BufferSize;
 
   Status = EFI_SUCCESS;
 
@@ -657,7 +575,10 @@ RemovePackNotify (
   ThunkContext = UefiHiiHandleToThunkContext (Private, Handle);
 
   if (!ThunkContext->ByFrameworkHiiNewPack) {
-    if (IsRemovingLastStringPack (Handle)) {
+    Status = HiiLibExportPackageLists (Handle, &HiiPackageList, &BufferSize);
+    ASSERT_EFI_ERROR (Status);
+
+    if (GetPackageCountByType (HiiPackageList, EFI_HII_PACKAGE_STRINGS) == 1) {
       //
       // If the string package will be removed is the last string package
       // in the package list, we will remove the HII Thunk entry from the
@@ -665,6 +586,8 @@ RemovePackNotify (
       //
       DestroyThunkContextForUefiHiiHandle (Private, Handle);
     }
+
+    FreePool (HiiPackageList);
   }
 
   return Status;

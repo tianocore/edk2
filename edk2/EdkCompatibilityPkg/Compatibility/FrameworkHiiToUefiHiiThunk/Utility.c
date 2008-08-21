@@ -21,29 +21,6 @@ EFI_GUID  gFrameworkHiiCompatbilityGuid = EFI_IFR_FRAMEWORK_GUID;
 EFI_GUID  gTianoHiiIfrGuid              = EFI_IFR_TIANO_GUID;
 
 
-EFI_GUID *
-GetGuidOfFirstFormset (
-  CONST EFI_HII_FORM_PACKAGE * FormPackage
-) 
-{
-  UINT8                   *StartOfNextPackage;
-  EFI_IFR_OP_HEADER       *OpCodeData;
-
-  StartOfNextPackage = (UINT8 *) FormPackage + FormPackage->Header.Length;
-  OpCodeData = (EFI_IFR_OP_HEADER *) (FormPackage + 1);
-
-  while ((UINT8 *) OpCodeData < StartOfNextPackage) {
-    if (OpCodeData->OpCode == EFI_IFR_FORM_SET_OP) {
-      return AllocateCopyPool (sizeof(EFI_GUID), &(((EFI_IFR_FORM_SET *) OpCodeData)->Guid));
-    }
-    OpCodeData = (EFI_IFR_OP_HEADER *) ((UINT8 *) OpCodeData + OpCodeData->Length);
-  }
-
-  ASSERT (FALSE);
-
-  return NULL;
-}
-
 EFI_HII_HANDLE
 FwHiiHandleToUefiHiiHandle (
   IN CONST HII_THUNK_PRIVATE_DATA      *Private,
@@ -239,6 +216,94 @@ GetOneOfOptionMapEntryListHead (
   return NULL;
 }
 
+VOID
+GetAttributesOfFirstFormSet (
+  IN    OUT HII_THUNK_CONTEXT  *ThunkContext
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_HII_PACKAGE_LIST_HEADER   *List;
+  EFI_HII_PACKAGE_HEADER        *Package;
+  UINTN                         Size;
+  EFI_IFR_OP_HEADER             *OpCode;
+  UINTN                         Offset;
+  EFI_IFR_GUID_CLASS            *Class;
+  EFI_IFR_FORM_SET              *FormSet;
+  EFI_IFR_GUID_SUBCLASS         *SubClass;
+
+  Status = HiiLibExportPackageLists (ThunkContext->UefiHiiHandle, &List, &Size);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // There must be at least one EFI_HII_PACKAGE_FORM in the package list.
+  //
+  ASSERT (GetPackageCountByType (List, EFI_HII_PACKAGE_FORM) >= 1);
+
+  //
+  // Skip the package list header.
+  //
+  Package = (EFI_HII_PACKAGE_HEADER *) (List + 1);
+
+  while (Package->Type != EFI_HII_PACKAGE_END) {
+
+    if (Package->Type == EFI_HII_PACKAGE_FORM) {
+
+      //
+      // Skip the package header
+      //
+      Offset = sizeof (EFI_HII_PACKAGE_HEADER);
+      while (Offset < Package->Length) {
+        OpCode = (EFI_IFR_OP_HEADER *)((UINT8 *) Package + Offset);
+
+        switch (OpCode->OpCode) {
+        case EFI_IFR_FORM_SET_OP:
+          FormSet = (EFI_IFR_FORM_SET *) OpCode;
+          ThunkContext->FormSetTitle = FormSet->FormSetTitle;
+          ThunkContext->FormSetHelp  = FormSet->Help;
+          break;
+          
+
+        case EFI_IFR_GUID_OP:
+          Class = (EFI_IFR_GUID_CLASS*) OpCode;
+          if (CompareGuid (&Class->Guid, &gTianoHiiIfrGuid)) {
+            Class = (EFI_IFR_GUID_CLASS *) OpCode;
+
+            switch (Class->ExtendOpCode) {
+              case EFI_IFR_EXTEND_OP_CLASS:
+                ThunkContext->FormSetClass = Class->Class;
+                break;
+              case EFI_IFR_EXTEND_OP_SUBCLASS:
+                SubClass = (EFI_IFR_GUID_SUBCLASS *) OpCode;
+                ThunkContext->FormSetSubClass = SubClass->SubClass;
+                break;
+
+              default:
+                break;
+            }
+          }
+          break;
+          
+        default:
+          break;
+        
+        }
+
+        Offset += OpCode->Length;
+      }
+      //
+      // The attributes of first FormSet is ready now.
+      //
+      FreePool (List);
+      return;
+      
+      break;
+    }
+
+    Package = (EFI_HII_PACKAGE_HEADER *) (UINT8 *) Package + Package->Length;
+  }
+
+}
+
 
 EFI_STATUS
 CreateQuestionIdMap (
@@ -262,6 +327,7 @@ CreateQuestionIdMap (
   ONE_OF_OPTION_MAP             *OneOfOptionMap;
   ONE_OF_OPTION_MAP_ENTRY       *OneOfOptionMapEntry;
   EFI_IFR_GUID_CLASS            *Class;
+  EFI_IFR_GUID_SUBCLASS         *SubClass;
   
 
   Status = HiiLibExportPackageLists (ThunkContext->UefiHiiHandle, &List, &Size);
@@ -371,7 +437,8 @@ CreateQuestionIdMap (
                 ThunkContext->FormSetClass = Class->Class;
                 break;
               case EFI_IFR_EXTEND_OP_SUBCLASS:
-                ThunkContext->FormSetSubClass = ((EFI_IFR_GUID_SUBCLASS *) Class)->SubClass;
+                SubClass = (EFI_IFR_GUID_SUBCLASS *) OpCode;
+                ThunkContext->FormSetSubClass = SubClass->SubClass;
                 break;
 
               default:
@@ -489,7 +556,7 @@ DestroyQuestionIdMap (
     while (!IsListEmpty (&IdMap->MapEntryListHead)) {
       Link2 = GetFirstNode (&IdMap->MapEntryListHead);
       
-      IdMapEntry = QUESTION_ID_MAP_ENTRY_FROM_LINK (Link);
+      IdMapEntry = QUESTION_ID_MAP_ENTRY_FROM_LINK (Link2);
 
       RemoveEntryList (Link2);
 
@@ -519,7 +586,7 @@ DestoryOneOfOptionMap (
     while (!IsListEmpty (&Map->OneOfOptionMapEntryListHead)) {
       Link2 = GetFirstNode (&Map->OneOfOptionMapEntryListHead);
       
-      MapEntry = ONE_OF_OPTION_MAP_ENTRY_FROM_LINK (Link);
+      MapEntry = ONE_OF_OPTION_MAP_ENTRY_FROM_LINK (Link2);
 
       RemoveEntryList (Link2);
 
