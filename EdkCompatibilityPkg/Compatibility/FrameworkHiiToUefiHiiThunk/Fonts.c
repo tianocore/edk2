@@ -1,5 +1,4 @@
 /**@file
-
   This file contains the Glyph related function.
 
 Copyright (c) 2006 - 2008, Intel Corporation

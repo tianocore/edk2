@@ -1,7 +1,7 @@
 /**@file
 
   This file contains global defines and prototype definitions
-  for the HII database.
+  for the Framework HII to Uefi HII Thunk Module.
   
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -51,6 +51,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <MdeModuleHii.h>
 
+
+//
+// VARSTORE ID of 0 for Buffer Storage Type Storage is reserved in UEFI IFR form. But VARSTORE ID
+// 0 in Framework IFR is the default VarStore ID for storage without explicit declaration. So we have
+// to reseved 0x0001 in UEFI VARSTORE ID to represetn default storage id in Framework IFR.
+// Framework VFR has to be ported or pre-processed to change the default VARSTORE to a VARSTORE
+// with ID equal to 0x0001.
+//
+#define RESERVED_VARSTORE_ID 0x0001
+
+
 #pragma pack (push, 1)
 typedef struct {
   UINT32                  BinaryLength;
@@ -79,11 +90,11 @@ typedef struct {
 #define ONE_OF_OPTION_MAP_ENTRY_FROM_LINK(Record) CR(Record, ONE_OF_OPTION_MAP_ENTRY, Link, ONE_OF_OPTION_MAP_ENTRY_SIGNATURE)
 #define ONE_OF_OPTION_MAP_ENTRY_SIGNATURE            EFI_SIGNATURE_32 ('O', 'O', 'M', 'E')
 typedef struct {
-  UINT32          Signature;
-  LIST_ENTRY      Link;
+  UINT32              Signature;
+  LIST_ENTRY          Link;
 
-  UINT16             FwKey;
-  EFI_IFR_TYPE_VALUE Value;
+  UINT16              FwKey;
+  EFI_IFR_TYPE_VALUE  Value;
   
 } ONE_OF_OPTION_MAP_ENTRY;
 
@@ -92,14 +103,14 @@ typedef struct {
 #define ONE_OF_OPTION_MAP_FROM_LINK(Record) CR(Record, ONE_OF_OPTION_MAP, Link, ONE_OF_OPTION_MAP_SIGNATURE)
 #define ONE_OF_OPTION_MAP_SIGNATURE            EFI_SIGNATURE_32 ('O', 'O', 'O', 'M')
 typedef struct {
-  UINT32          Signature;
-  LIST_ENTRY      Link;       
+  UINT32            Signature;
+  LIST_ENTRY        Link;       
 
-  UINT8           ValueType; //EFI_IFR_TYPE_NUM_* 
+  UINT8             ValueType; //EFI_IFR_TYPE_NUM_* 
 
-  EFI_QUESTION_ID     QuestionId;
+  EFI_QUESTION_ID   QuestionId;
 
-  LIST_ENTRY      OneOfOptionMapEntryListHead; //ONE_OF_OPTION_MAP_ENTRY
+  LIST_ENTRY        OneOfOptionMapEntryListHead; //ONE_OF_OPTION_MAP_ENTRY
 } ONE_OF_OPTION_MAP;
 
 
@@ -220,34 +231,19 @@ extern HII_THUNK_PRIVATE_DATA                     *mHiiThunkPrivateData;
 extern BOOLEAN                                    mInFrameworkUpdatePakcage;
 
 
-//
-// Prototypes
-//
-
-//
-// Public Interface Prototypes
-//
-EFI_STATUS
-EFIAPI
-InitializeHiiDatabase (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_SYSTEM_TABLE       *SystemTable
-  )
-;
-
 EFI_STATUS
 EFIAPI
 HiiNewPack (
-  IN  EFI_HII_PROTOCOL      *This,
-  IN  EFI_HII_PACKAGES      *PackageList,
-  OUT FRAMEWORK_EFI_HII_HANDLE         *Handle
+  IN  EFI_HII_PROTOCOL              *This,
+  IN  EFI_HII_PACKAGES              *PackageList,
+  OUT FRAMEWORK_EFI_HII_HANDLE      *Handle
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiRemovePack (
-  IN EFI_HII_PROTOCOL    *This,
+  IN EFI_HII_PROTOCOL               *This,
   IN FRAMEWORK_EFI_HII_HANDLE       Handle
   )
 ;
@@ -255,31 +251,31 @@ HiiRemovePack (
 EFI_STATUS
 EFIAPI
 HiiFindHandles (
-  IN     EFI_HII_PROTOCOL    *This,
-  IN OUT UINT16              *HandleBufferLength,
-  OUT    FRAMEWORK_EFI_HII_HANDLE       *Handle
+  IN     EFI_HII_PROTOCOL           *This,
+  IN OUT UINT16                     *HandleBufferLength,
+  OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiExportDatabase (
-  IN     EFI_HII_PROTOCOL *This,
-  IN     FRAMEWORK_EFI_HII_HANDLE    Handle,
-  IN OUT UINTN            *BufferSize,
-  OUT    VOID             *Buffer
+  IN     EFI_HII_PROTOCOL           *This,
+  IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
+  IN OUT UINTN                      *BufferSize,
+  OUT    VOID                       *Buffer
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiGetGlyph (
-  IN     EFI_HII_PROTOCOL    *This,
-  IN     CHAR16              *Source,
-  IN OUT UINT16              *Index,
-  OUT    UINT8               **GlyphBuffer,
-  OUT    UINT16              *BitWidth,
-  IN OUT UINT32              *InternalStatus
+  IN     EFI_HII_PROTOCOL           *This,
+  IN     CHAR16                     *Source,
+  IN OUT UINT16                     *Index,
+  OUT    UINT8                      **GlyphBuffer,
+  OUT    UINT16                     *BitWidth,
+  IN OUT UINT32                     *InternalStatus
   )
 ;
 
@@ -311,116 +307,107 @@ HiiNewString (
 EFI_STATUS
 EFIAPI
 HiiGetString (
-  IN     EFI_HII_PROTOCOL    *This,
-  IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
-  IN     STRING_REF          Token,
-  IN     BOOLEAN             Raw,
-  IN     CHAR16              *LanguageString,
-  IN OUT UINTN               *BufferLength,
-  OUT    EFI_STRING          StringBuffer
+  IN     EFI_HII_PROTOCOL           *This,
+  IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
+  IN     STRING_REF                 Token,
+  IN     BOOLEAN                    Raw,
+  IN     CHAR16                     *LanguageString,
+  IN OUT UINTN                      *BufferLength,
+  OUT    EFI_STRING                 StringBuffer
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiResetStrings (
-  IN     EFI_HII_PROTOCOL    *This,
-  IN     FRAMEWORK_EFI_HII_HANDLE       Handle
+  IN     EFI_HII_PROTOCOL           *This,
+  IN     FRAMEWORK_EFI_HII_HANDLE   Handle
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiTestString (
-  IN     EFI_HII_PROTOCOL    *This,
-  IN     CHAR16              *StringToTest,
-  IN OUT UINT32              *FirstMissing,
-  OUT    UINT32              *GlyphBufferSize
+  IN     EFI_HII_PROTOCOL           *This,
+  IN     CHAR16                     *StringToTest,
+  IN OUT UINT32                     *FirstMissing,
+  OUT    UINT32                     *GlyphBufferSize
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiGetPrimaryLanguages (
-  IN  EFI_HII_PROTOCOL      *This,
-  IN  FRAMEWORK_EFI_HII_HANDLE         Handle,
-  OUT EFI_STRING            *LanguageString
+  IN  EFI_HII_PROTOCOL              *This,
+  IN  FRAMEWORK_EFI_HII_HANDLE      Handle,
+  OUT EFI_STRING                    *LanguageString
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiGetSecondaryLanguages (
-  IN  EFI_HII_PROTOCOL      *This,
-  IN  FRAMEWORK_EFI_HII_HANDLE         Handle,
-  IN  CHAR16                *PrimaryLanguage,
-  OUT EFI_STRING            *LanguageString
+  IN  EFI_HII_PROTOCOL                *This,
+  IN  FRAMEWORK_EFI_HII_HANDLE        Handle,
+  IN  CHAR16                          *PrimaryLanguage,
+  OUT EFI_STRING                      *LanguageString
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiGetLine (
-  IN     EFI_HII_PROTOCOL    *This,
+  IN     EFI_HII_PROTOCOL               *This,
   IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
-  IN     STRING_REF          Token,
-  IN OUT UINT16              *Index,
-  IN     UINT16              LineWidth,
-  IN     CHAR16              *LanguageString,
-  IN OUT UINT16              *BufferLength,
-  OUT    EFI_STRING          StringBuffer
+  IN     STRING_REF                     Token,
+  IN OUT UINT16                         *Index,
+  IN     UINT16                         LineWidth,
+  IN     CHAR16                         *LanguageString,
+  IN OUT UINT16                         *BufferLength,
+  OUT    EFI_STRING                     StringBuffer
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiGetForms (
-  IN     EFI_HII_PROTOCOL    *This,
+  IN     EFI_HII_PROTOCOL               *This,
   IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
-  IN     EFI_FORM_ID         FormId,
-  IN OUT UINTN               *BufferLength,
-  OUT    UINT8               *Buffer
+  IN     EFI_FORM_ID                    FormId,
+  IN OUT UINTN                          *BufferLength,
+  OUT    UINT8                          *Buffer
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiGetDefaultImage (
-  IN     EFI_HII_PROTOCOL           *This,
-  IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
-  IN     UINTN                      DefaultMask,
-  OUT    EFI_HII_VARIABLE_PACK_LIST **VariablePackList
+  IN     EFI_HII_PROTOCOL               *This,
+  IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
+  IN     UINTN                          DefaultMask,
+  OUT    EFI_HII_VARIABLE_PACK_LIST     **VariablePackList
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiUpdateForm (
-  IN EFI_HII_PROTOCOL       *This,
-  IN FRAMEWORK_EFI_HII_HANDLE          Handle,
-  IN EFI_FORM_LABEL         Label,
-  IN BOOLEAN                AddData,
-  IN FRAMEWORK_EFI_HII_UPDATE_DATA    *Data
+  IN EFI_HII_PROTOCOL                   *This,
+  IN FRAMEWORK_EFI_HII_HANDLE           Handle,
+  IN EFI_FORM_LABEL                     Label,
+  IN BOOLEAN                            AddData,
+  IN FRAMEWORK_EFI_HII_UPDATE_DATA      *Data
   )
 ;
 
 EFI_STATUS
 EFIAPI
 HiiGetKeyboardLayout (
-  IN     EFI_HII_PROTOCOL    *This,
-  OUT    UINT16              *DescriptorCount,
-  OUT    FRAMEWORK_EFI_KEY_DESCRIPTOR  *Descriptor
+  IN     EFI_HII_PROTOCOL               *This,
+  OUT    UINT16                         *DescriptorCount,
+  OUT    FRAMEWORK_EFI_KEY_DESCRIPTOR   *Descriptor
   )
 ;
-
-EFI_STATUS
-HiiCompareLanguage (
-  IN  CHAR16                *LanguageStringLocation,
-  IN  CHAR16                *Language
-  )
-;
-
-
 
 EFI_STATUS
 EFIAPI 
@@ -429,12 +416,13 @@ ThunkSendForm (
   IN  BOOLEAN                         UseDatabase,
   IN  FRAMEWORK_EFI_HII_HANDLE        *Handle,
   IN  UINTN                           HandleCount,
-  IN  FRAMEWORK_EFI_IFR_PACKET                  *Packet, OPTIONAL
+  IN  FRAMEWORK_EFI_IFR_PACKET        *Packet, OPTIONAL
   IN  EFI_HANDLE                      CallbackHandle, OPTIONAL
   IN  UINT8                           *NvMapOverride, OPTIONAL
-  IN  FRAMEWORK_EFI_SCREEN_DESCRIPTOR            *ScreenDimensions, OPTIONAL
+  IN  FRAMEWORK_EFI_SCREEN_DESCRIPTOR *ScreenDimensions, OPTIONAL
   OUT BOOLEAN                         *ResetRequired OPTIONAL
-  );
+  )
+;
 
 EFI_STATUS
 EFIAPI 
@@ -446,7 +434,8 @@ ThunkCreatePopUp (
   OUT EFI_INPUT_KEY                   *KeyValue,
   IN  CHAR16                          *String,
   ...
-  );
+  )
+;
 
 EFI_STATUS
 EFIAPI

@@ -717,7 +717,7 @@ typedef struct {
 
 EFI_STATUS
 F2UCreateNumericOpCode (
-  IN       HII_THUNK_CONTEXT               *ThunkContext,
+  IN       HII_THUNK_CONTEXT           *ThunkContext,
   IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_NUMERIC   *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
@@ -755,10 +755,7 @@ F2UCreateNumericOpCode (
   UOpcode.Question.Header.Help = FwOpcode->Help;
 
   UOpcode.Question.QuestionId    = FwOpcode->Key;
-  //
-  // BUGBUG RESERVED_VARSTORE_ID should be passed in.
-  //
-  UOpcode.Question.VarStoreId    = RESERVED_VARSTORE_ID;
+  UOpcode.Question.VarStoreId    = VarStoreId;
   UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
 
   UOpcode.Question.Flags  = (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));

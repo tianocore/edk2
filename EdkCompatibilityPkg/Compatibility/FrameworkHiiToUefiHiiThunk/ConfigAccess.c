@@ -398,6 +398,31 @@ GetUefiVariable (
   return Status;
 }
 
+BUFFER_STORAGE_ENTRY *
+GetBufferStorageEntry (
+  IN      CONFIG_ACCESS_PRIVATE       *ConfigAccess,
+  IN      UINT16                      VarStoreId
+  )
+{
+  LIST_ENTRY                                  *Link;
+  BUFFER_STORAGE_ENTRY                        *BufferStorage;
+
+  Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
+
+  while (!IsNull (&ConfigAccess->BufferStorageListHead, Link)) {
+    BufferStorage = BUFFER_STORAGE_ENTRY_FROM_LINK (Link);
+
+    if (BufferStorage->VarStoreId == VarStoreId) {
+      return BufferStorage;
+    }
+
+    Link = GetNextNode (&ConfigAccess->BufferStorageListHead, Link);
+  }
+
+  return NULL;
+}
+
+
 /**
 
   This function implement the EFI_HII_CONFIG_ACCESS_PROTOCOL.ExtractConfig
@@ -432,7 +457,6 @@ ThunkExtractConfig (
 {
   EFI_STATUS                                  Status;
   CONFIG_ACCESS_PRIVATE                       *ConfigAccess;
-  LIST_ENTRY                                  *Link;
   BUFFER_STORAGE_ENTRY                        *BufferStorage;
   VOID                                        *Data;
   UINTN                                       DataSize;
@@ -443,13 +467,7 @@ ThunkExtractConfig (
   //
   // For now, only one var varstore is supported so that we don't need to parse the Configuration string.
   //
-  Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
-  if (Link == NULL) {
-    ASSERT (FALSE);
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  BufferStorage = BUFFER_STORAGE_ENTRY_FROM_LINK (Link);
+  BufferStorage = GetBufferStorageEntry (ConfigAccess, (UINT16) RESERVED_VARSTORE_ID);
 
   if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
     if (ConfigAccess->FormCallbackProtocol == NULL ||
@@ -519,7 +537,6 @@ ThunkRouteConfig (
 {
   EFI_STATUS                                  Status;
   CONFIG_ACCESS_PRIVATE                       *ConfigAccess;
-  LIST_ENTRY                                  *Link;
   BUFFER_STORAGE_ENTRY                        *BufferStorage;
   UINT8                                       *Data;
   UINTN                                       DataSize;
@@ -534,13 +551,8 @@ ThunkRouteConfig (
   //
   // For now, only one var varstore is supported so that we don't need to parse the Configuration string.
   //
-  Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
-  if (Link == NULL) {
-    ASSERT (FALSE);
-    return EFI_INVALID_PARAMETER;
-  }
+  BufferStorage = GetBufferStorageEntry (ConfigAccess, (UINT16) RESERVED_VARSTORE_ID);
 
-  BufferStorage = BUFFER_STORAGE_ENTRY_FROM_LINK (Link);
   DataSize2     = BufferStorage->Size;
   if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
     DataAllocated = TRUE;
@@ -901,17 +913,10 @@ ThunkCallback (
   //
   if (EFI_ERROR (Status)) {
     if (Packet != NULL) {
-      //
-      // BUGBUG: need to restore the changing question to default value
-      //
-
       do {
         IfrLibCreatePopUp (1, &Key, Packet->String);
-
       } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-      
     }
-
     //
     // Error Code in Status is discarded.
     //
@@ -943,7 +948,7 @@ ThunkCallback (
                            NotifyHandle
                            );
   //
-  // UEFI SetupBrowser handles scenario differently with Framework SetupBrowser when call back function 
+  // UEFI SetupBrowser behaves differently with Framework SetupBrowser when call back function 
   // update any forms in HII database. UEFI SetupBrowser will re-parse the displaying form package and load
   // the values from variable storages. Framework SetupBrowser will only re-parse the displaying form packages.
   // To make sure customer's previous changes is saved and the changing question behaves as expected, we

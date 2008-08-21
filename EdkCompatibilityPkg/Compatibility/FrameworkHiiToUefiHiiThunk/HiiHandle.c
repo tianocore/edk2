@@ -1,5 +1,5 @@
 /**@file
-  Framework HII handle database allocation and deallocation functins.
+  This file is for functins related to assign and free Framework HII handle number.
   
 Copyright (c) 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

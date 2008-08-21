@@ -37,7 +37,7 @@ ThunkSendForm (
 
   if (!UseDatabase) {
     //
-    // Packet, CallbackHandle.
+    // ThunkSendForm only support displays forms registered into the HII database.
     //
     return EFI_UNSUPPORTED;
   }

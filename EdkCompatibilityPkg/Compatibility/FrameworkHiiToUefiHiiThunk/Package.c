@@ -43,7 +43,7 @@ GetPackageCount (
   
   for (Index = 0; Index < Packages->NumberOfPackages; Index++) {
     //
-    // BugBug: The current UEFI HII build tool generate a binary in the format defined in: 
+    // The current UEFI HII build tool generate a binary in the format defined by 
     // TIANO_AUTOGEN_PACKAGES_HEADER. We assume that all packages generated in
     // this binary is with same package type. So the returned IfrPackageCount and StringPackageCount
     // may not be the exact number of valid package number in the binary generated 
