@@ -347,7 +347,10 @@ PeiDispatcher (
     
     for (FvCount = Private->CurrentPeimFvCount; FvCount < Private->FvCount; FvCount++) {
       Private->CurrentPeimFvCount = FvCount;
-      VolumeHandle = Private->Fv[FvCount].FvHeader;
+      //
+      // Get this Fv Handle by PeiService FvFindNextVolume.
+      //
+      PeiFvFindNextVolume (PeiServices, FvCount, &VolumeHandle);
 
       if (Private->CurrentPeimCount == 0) {
         //

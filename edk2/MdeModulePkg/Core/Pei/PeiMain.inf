@@ -95,3 +95,5 @@
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkFvHobCompatibilitySupport
+  
