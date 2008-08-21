@@ -350,7 +350,7 @@ PeiDispatcher (
       //
       // Get this Fv Handle by PeiService FvFindNextVolume.
       //
-      PeiFvFindNextVolume (PeiServices, FvCount, &VolumeHandle);
+      PeiFvFindNextVolume ((CONST EFI_PEI_SERVICES **) PeiServices, FvCount, &VolumeHandle);
 
       if (Private->CurrentPeimCount == 0) {
         //
