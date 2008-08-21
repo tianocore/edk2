@@ -600,7 +600,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_ICC_*_APP_FLAGS                        = /nologo /E /TC
 *_ICC_*_PP_FLAGS                         = /nologo /E /TC /FIAutoGen.h
 
-*_ICC_*_ASLCC_FLAGS                      = /GL- /Y- /TC /WX-
+*_ICC_*_ASLCC_FLAGS                      = /Y- /TC /WX-
 *_ICC_*_ASLDLINK_FLAGS                   = /NODEFAULTLIB /ENTRY:main /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
 *_ICC_*_ASLPP_FLAGS                      = /nologo /EP /C
 
