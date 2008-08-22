@@ -1,7 +1,7 @@
 /** @file
   Mde PI library functions.
 
-  Copyright (c) 2007, Intel Corporation<BR>
+  Copyright (c) 2007 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -111,6 +111,10 @@ GetSectionFromFv (
   EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
   UINT32                        AuthenticationStatus;
 
+  ASSERT (NameGuid != NULL);
+  ASSERT (Buffer != NULL);
+  ASSERT (Size != NULL);
+  
   ASSERT (FvHandle != NULL);
 
   Status = gBS->HandleProtocol (
