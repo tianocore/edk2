@@ -1,7 +1,7 @@
 /** @file
-  HOB Library.
+  HOB Library implemenation for Dxe Phase.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,7 +22,6 @@
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-#include "HobLibInternal.h"
 
 STATIC VOID  *mHobList = NULL;
 
@@ -47,10 +46,11 @@ HobLibConstructor (
 {
   EFI_STATUS  Status;
 
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &mHobList);
+	Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &mHobList);
   ASSERT_EFI_ERROR (Status);
   ASSERT (mHobList != NULL);
-  return Status;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -201,7 +201,7 @@ GetFirstGuidHob (
   Get the Boot Mode from the HOB list.
 
   This function returns the system boot mode information from the 
-  PHIT HOB in HOB list.
+  PHIT HOB in HOB list. If PHIT HOB is NULL, then ASSERT().
 
   @param  VOID
 
@@ -217,6 +217,7 @@ GetBootModeHob (
   EFI_HOB_HANDOFF_INFO_TABLE    *HandOffHob;
 
   HandOffHob = (EFI_HOB_HANDOFF_INFO_TABLE *) GetHobList ();
+  ASSERT (HandOffHob != NULL);
 
   return  HandOffHob->BootMode;
 }
