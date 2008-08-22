@@ -31,9 +31,7 @@
 #
 
 [Sources.common]
-  InternalHobLib.h
   HobLib.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,4 +40,5 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  DxeCoreEntryPoint
 

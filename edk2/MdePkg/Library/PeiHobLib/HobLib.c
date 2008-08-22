@@ -1,7 +1,7 @@
 /** @file
-  HOB Library.
+  Provide Hob Library functions for Pei phase.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2007 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -176,8 +176,8 @@ GetFirstGuidHob (
 /**
   Get the Boot Mode from the HOB list.
 
-  This function returns the system boot mode information from the 
-  PHIT HOB in HOB list.
+  This function returns the system boot mode information 
+  by PeiCore GetBootMode Service.
 
   @param  VOID
 
@@ -443,13 +443,8 @@ BuildFv2Hob (
 /**
   Builds a Capsule Volume HOB.
 
-  This function builds a Capsule Volume HOB.
-  It can only be invoked during PEI phase;
-  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
-  If there is no additional space for HOB creation, then ASSERT().
-
-  @param  BaseAddress   The base address of the Capsule Volume.
-  @param  Length        The size of the Capsule Volume in bytes.
+  This function is not supported, because Capsule Volume Hob is the platform
+  specific. It is not the common defintion in PI and UEFI spec.
 
 **/
 VOID
