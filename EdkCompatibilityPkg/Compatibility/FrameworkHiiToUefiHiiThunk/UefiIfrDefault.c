@@ -760,16 +760,14 @@ FreeDefaultList (
   LIST_ENTRY *Link;
   UEFI_IFR_BUFFER_STORAGE_NODE *Default;
 
-  Link = GetFirstNode (ListHead);
-  
-  while (!IsNull (ListHead, Link)) {
+  while (!IsListEmpty (ListHead)) {
+    Link = GetFirstNode (ListHead);
+    
     Default = UEFI_IFR_BUFFER_STORAGE_NODE_FROM_LIST(Link);
 
     RemoveEntryList (Link);
    
     DestroyDefaultNode (Default);
-    
-    Link = GetNextNode (ListHead, Link);
   }
 
   FreePool (ListHead);
