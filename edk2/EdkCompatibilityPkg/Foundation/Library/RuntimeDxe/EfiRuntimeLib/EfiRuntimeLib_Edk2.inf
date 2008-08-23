@@ -1,0 +1,81 @@
+#/*++
+#
+# Copyright (c) 2004 - 2007, Intel Corporation                                                         
+# All rights reserved. This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+# 
+#  Module Name:
+#
+#    EfiRuntimeLib.inf
+#
+#  Abstract:
+#
+#    Component description file for the EFI runtime library.
+#
+#--*/
+
+[defines]
+BASE_NAME       = EfiRuntimeLib
+COMPONENT_TYPE  = LIBRARY
+
+[sources.common]
+  Debug.c
+  Event.c
+  Io.c
+  LibGlobals.c
+  GetImage.c
+  RtDevicePath.c
+
+[sources.ia32]
+  ia32/RuntimeLib.c
+  ia32/IoLib.c
+  ia32/Lock.c
+  ia32/PlatformIoLib.c
+  ia32/Fvb.c
+
+[sources.x64]
+  x64/RuntimeLib.c
+  x64/IoLib.c
+  x64/Lock.c
+  x64/PlatformIoLib.c
+  x64/Fvb.c
+  x64/RuntimeLibAsm.asm     | MSFT
+  x64/RuntimeLibAsm.asm     | INTEL
+
+[sources.ipf]
+  Ipf/RuntimeLib.c
+  Ipf/Lock.c
+  Ipf/Fvb.c
+  Ipf/EsalLib.s
+  Ipf/IpfCpuCache.s
+
+[sources.ebc]
+  Ebc/RuntimeLib.c
+
+[includes.common]
+  $(EDK_SOURCE)/Foundation
+  $(EDK_SOURCE)/Foundation/Framework
+  $(EDK_SOURCE)/Foundation/Efi
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
+  $(EDK_SOURCE)/Foundation/Core/Dxe
+  $(EDK_SOURCE)/Foundation/Library/Dxe/Include
+
+[libraries.common]
+  EdkGuidLib
+  EdkProtocolLib
+  EdkFrameworkProtocolLib
+  EfiGuidLib
+  EfiProtocolLib
+  ArchProtocolLib
+  EfiCommonLib
+
+[nmake.common]
+
