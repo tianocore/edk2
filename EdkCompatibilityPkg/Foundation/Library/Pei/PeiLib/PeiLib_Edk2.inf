@@ -42,13 +42,16 @@ COMPONENT_TYPE    = LIBRARY
   ia32/Processor.c
   ia32/ProcessorAsms.Asm         |MSFT
   ia32/ProcessorAsms.Asm         |INTEL
+  ia32/ProcessorAsms.S           |GCC
   ia32/SupportItpDebug.asm       |MSFT
   ia32/SupportItpDebug.asm       |INTEL
   ia32/EfiJump.h
   ia32/ReadIdt.asm               |MSFT
   ia32/ReadIdt.asm               |INTEL
+  ia32/ReadIdt.S                 |GCC
   ia32/WriteIdt.asm              |MSFT
   ia32/WriteIdt.asm              |INTEL
+  ia32/WriteIdt.S                |GCC
   ia32/PeiServicePointer.c
 
 [sources.x64]
