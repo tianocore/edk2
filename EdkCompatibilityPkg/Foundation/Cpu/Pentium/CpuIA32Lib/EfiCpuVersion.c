@@ -59,14 +59,14 @@ Arguments:
     if (Model != NULL) {
       *Model = (UINT8) ((Register.RegEax >> 4) & 0xF);
       if (TempFamilyId == 0x6 || TempFamilyId == 0xF) {
-        *Model |= (Register.RegEax >> 12) & 0xF0;
+        *Model = (UINT8) (*Model  | ((Register.RegEax >> 12) & 0xF0));
       }
     }
   
     if (FamilyId != NULL) {
       *FamilyId = TempFamilyId;
       if (TempFamilyId == 0xF) {
-        *FamilyId = *FamilyId + (UINT16) ((Register.RegEax >> 20) & 0xFF);
+        *FamilyId = (UINT8 ) (*FamilyId + (UINT16) ((Register.RegEax >> 20) & 0xFF));
       }
     }
   } 
