@@ -652,6 +652,7 @@ UefiDefaultsToFwDefaults (
   UINT16                            DefaultId;
   EFI_HII_VARIABLE_PACK             *Pack;
   EFI_HII_VARIABLE_PACK_LIST        *PackList;
+  UINTN                             Index;
 
   if (DefaultMask == FRAMEWORK_EFI_IFR_FLAG_DEFAULT) {
     DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
@@ -685,6 +686,11 @@ UefiDefaultsToFwDefaults (
     List = GetNextNode (ListHead, List);  
   }
 
+  if (Count == 0) {
+    *VariablePackList = NULL;
+    return EFI_NOT_FOUND;
+  }
+
   Size = Size + Count * (sizeof (EFI_HII_VARIABLE_PACK_LIST) + sizeof (EFI_HII_VARIABLE_PACK));
   
   *VariablePackList = AllocateZeroPool (Size);
@@ -694,6 +700,7 @@ UefiDefaultsToFwDefaults (
 
   PackList = (EFI_HII_VARIABLE_PACK_LIST *) *VariablePackList;
   Pack     = (EFI_HII_VARIABLE_PACK *) (PackList + 1);
+  Index = 0;
   while (!IsNull (ListHead, List)) {
     Node = UEFI_IFR_BUFFER_STORAGE_NODE_FROM_LIST(List);
 
@@ -727,10 +734,13 @@ UefiDefaultsToFwDefaults (
       Size += sizeof (EFI_HII_VARIABLE_PACK_LIST);
 
       //
-      // initialize EFI_HII_VARIABLE_PACK_LIST
+      // Initialize EFI_HII_VARIABLE_PACK_LIST
       //
       PackList->VariablePack = Pack;
-      PackList->NextVariablePack = (EFI_HII_VARIABLE_PACK_LIST *)((UINT8 *) PackList + Size);
+      Index++;
+      if (Index < Count) {
+        PackList->NextVariablePack = (EFI_HII_VARIABLE_PACK_LIST *)((UINT8 *) PackList + Size);
+      }
             
     }
     
