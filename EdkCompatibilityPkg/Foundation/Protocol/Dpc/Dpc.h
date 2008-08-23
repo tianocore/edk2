@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -96,7 +96,7 @@ EFI_STATUS
 //
 // DPC Protocol structure
 //
-typedef struct _EFI_DPC_PROTOCOL {
+struct _EFI_DPC_PROTOCOL {
   EFI_DPC_QUEUE_DPC     QueueDpc;
   EFI_DPC_DISPATCH_DPC  DispatchDpc;
 };
