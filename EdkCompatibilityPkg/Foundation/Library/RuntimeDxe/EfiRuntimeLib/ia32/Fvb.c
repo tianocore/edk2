@@ -40,7 +40,7 @@ Key:
 UINTN             mFvbCount;
 VOID              *mFvbRegistration;
 VOID              *mFvbExtRegistration;
-static EFI_EVENT  mEfiFvbVirtualNotifyEvent;
+//static EFI_EVENT  mEfiFvbVirtualNotifyEvent;
 BOOLEAN           gEfiFvbInitialized = FALSE;
 EFI_EVENT         mFvbEvent;
 
