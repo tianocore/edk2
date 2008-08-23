@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -140,7 +140,7 @@ GetImageEx (
     Status = gBS->HandleProtocol (
                ImageHandle,
                &gEfiLoadedImageProtocolGuid,
-               &LoadedImage
+               (VOID **) &LoadedImage
                );
     if (EFI_ERROR (Status)) {
       return Status;
@@ -152,7 +152,7 @@ GetImageEx (
                   #else
                     &gEfiFirmwareVolume2ProtocolGuid,
                   #endif
-                    &ImageFv
+                    (VOID **) &ImageFv
                     );
     if (!EFI_ERROR (Status)) {
       Status = GetImageFromFv (ImageFv, NameGuid, SectionType, Buffer, Size);

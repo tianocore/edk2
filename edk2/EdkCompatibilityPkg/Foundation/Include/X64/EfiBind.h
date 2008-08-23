@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation                                                         
+Copyright (c) 2005 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -252,7 +252,11 @@ typedef int64_t   intn_t;
 // For symbol name in GNU assembly code, an extra "_" is necessary
 //
 #if __GNUC__
-  #define ASM_PFX(name) _##name    
+  #if defined(linux)
+    #define ASM_PFX(name) name
+  #else
+    #define ASM_PFX(name) _##name
+  #endif 
 #endif
 
 #endif

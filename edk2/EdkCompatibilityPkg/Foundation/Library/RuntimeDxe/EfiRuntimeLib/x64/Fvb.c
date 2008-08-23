@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation                                                         
+Copyright (c) 2005 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -215,7 +215,7 @@ Returns:
     //  We check Runtime here, because it has no reason to register
     //  a boot time FVB protocol.
     //
-    Status = gBS->HandleProtocol (Handle, &gEfiFirmwareVolumeBlockProtocolGuid, &Fvb);
+    Status = gBS->HandleProtocol (Handle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **) &Fvb);
     ASSERT_EFI_ERROR (Status);
     if (IsMemoryRuntime (Fvb)) {
       //
@@ -228,7 +228,7 @@ Returns:
       mFvbEntry[UpdateIndex].Fvb          = Fvb;
       mFvbEntry[UpdateIndex].FvbExtension = NULL;
 
-      Status = gBS->HandleProtocol (Handle, &gEfiFvbExtensionProtocolGuid, &FvbExtension);
+      Status = gBS->HandleProtocol (Handle, &gEfiFvbExtensionProtocolGuid, (VOID **) &FvbExtension);
       if ((Status == EFI_SUCCESS) && IsMemoryRuntime (FvbExtension)) {
         mFvbEntry[UpdateIndex].FvbExtension = FvbExtension;
       }

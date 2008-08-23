@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -62,7 +62,7 @@ Returns:
                              PeiServices,
                              EFI_HOB_TYPE_MEMORY_ALLOCATION,
                              sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE),
-                             &Hob
+                             (VOID **) &Hob
                              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -125,7 +125,7 @@ Returns:
                              PeiServices,
                              EFI_HOB_TYPE_RESOURCE_DESCRIPTOR,
                              sizeof (EFI_HOB_RESOURCE_DESCRIPTOR),
-                             &Hob
+                             (VOID **) &Hob
                              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -223,7 +223,7 @@ Returns:
              PeiServices,
              Guid,
              DataLength,
-             &Hob
+             (VOID **) &Hob
              );
 
   if (EFI_ERROR (Status)) {
@@ -276,7 +276,7 @@ Returns:
                              PeiServices,
                              EFI_HOB_TYPE_FV,
                              sizeof (EFI_HOB_FIRMWARE_VOLUME),
-                             &Hob
+                             (VOID **) &Hob
                              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -325,7 +325,7 @@ Returns:
                              PeiServices,
                              EFI_HOB_TYPE_CPU,
                              sizeof (EFI_HOB_CPU),
-                             &Hob
+                             (VOID **) &Hob
                              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -378,7 +378,7 @@ Returns:
                              PeiServices,
                              EFI_HOB_TYPE_MEMORY_ALLOCATION,
                              sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK),
-                             &Hob
+                             (VOID **) &Hob
                              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -436,7 +436,7 @@ Returns:
                              PeiServices,
                              EFI_HOB_TYPE_MEMORY_ALLOCATION,
                              sizeof (EFI_HOB_MEMORY_ALLOCATION_BSP_STORE),
-                             &Hob
+                             (VOID **) &Hob
                              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -496,7 +496,7 @@ Returns:
                              PeiServices,
                              EFI_HOB_TYPE_MEMORY_ALLOCATION,
                              sizeof (EFI_HOB_MEMORY_ALLOCATION),
-                             &Hob
+                             (VOID **) &Hob
                              );
   if (EFI_ERROR (Status)) {
     return Status;

@@ -1,6 +1,6 @@
 #/*++
 #
-#  Copyright (c) 2004 - 2007, Intel Corporation                                                         
+#  Copyright (c) 2004 - 2008, Intel Corporation                                                         
 #  All rights reserved. This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
 #  which accompanies this distribution.  The full text of the license may be found at        
@@ -85,12 +85,20 @@ COMPONENT_TYPE  = LIBRARY
   Math.c
   
 [sources.x64]
-  x64/EfiCopyMemRep1.asm
-  x64/EfiSetMemRep4.asm
-  x64/EfiZeroMemRep4.asm
-#  x64/EfiCopyMem.asm
-#  x64/EfiSetMem.asm
-#  x64/EfiZeroMem.asm
+  x64/EfiCopyMemRep1.asm	  | MSFT
+  x64/EfiSetMemRep4.asm     | MSFT
+  x64/EfiZeroMemRep4.asm    | MSFT
+#  x64/EfiCopyMem.asm			  | MSFT
+#  x64/EfiSetMem.asm        | MSFT
+#  x64/EfiZeroMem.asm       | MSFT
+
+  x64/EfiCopyMemRep1.asm	  | INTEL
+  x64/EfiSetMemRep4.asm     | INTEL
+  x64/EfiZeroMemRep4.asm    | INTEL
+#  x64/EfiCopyMem.asm			  | INTEL
+#  x64/EfiSetMem.asm        | INTEL
+#  x64/EfiZeroMem.asm       | INTEL
+
   Math.c
 
 [includes.common]
