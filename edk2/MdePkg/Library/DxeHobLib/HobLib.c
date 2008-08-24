@@ -34,7 +34,8 @@ STATIC VOID  *mHobList = NULL;
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
   
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+  @retval EFI_SUCCESS   The constructor successfully gets HobList.
+  @retval Other value   The constructor can't get HobList.
 
 **/
 EFI_STATUS
@@ -50,7 +51,7 @@ HobLibConstructor (
   ASSERT_EFI_ERROR (Status);
   ASSERT (mHobList != NULL);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**

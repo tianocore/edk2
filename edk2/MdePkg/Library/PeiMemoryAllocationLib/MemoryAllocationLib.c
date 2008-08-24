@@ -1,7 +1,8 @@
 /** @file
-  Support routines for memory allocation routines for use with drivers.
+  Support routines for memory allocation routines 
+  based on PeiService for PEI phase drivers.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -17,7 +18,6 @@
 
 
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -51,7 +51,7 @@ InternalAllocatePages (
 
   Status = PeiServicesAllocatePages (MemoryType, Pages, &Memory);
   if (EFI_ERROR (Status)) {
-    Memory = 0;
+    return NULL;
   }
   return (VOID *) (UINTN) Memory;
 }
@@ -511,7 +511,7 @@ AllocateReservedZeroPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
   @param  PoolType              The type of pool to allocate.
   @param  AllocationSize        The number of bytes to allocate and zero.
@@ -547,7 +547,7 @@ InternalAllocateCopyPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.
@@ -582,7 +582,7 @@ AllocateCopyPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.
@@ -608,7 +608,7 @@ AllocateRuntimeCopyPool (
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
   If Buffer is NULL, then ASSERT().
-  If AllocationSize is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
   @param  AllocationSize        The number of bytes to allocate and zero.
   @param  Buffer                The buffer to copy to the allocated buffer.
