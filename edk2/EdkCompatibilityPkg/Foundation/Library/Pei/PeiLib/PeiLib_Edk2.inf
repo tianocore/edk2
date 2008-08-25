@@ -45,6 +45,7 @@ COMPONENT_TYPE    = LIBRARY
   ia32/ProcessorAsms.S           |GCC
   ia32/SupportItpDebug.asm       |MSFT
   ia32/SupportItpDebug.asm       |INTEL
+  ia32/SupportItpDebug.S         |GCC
   ia32/EfiJump.h
   ia32/ReadIdt.asm               |MSFT
   ia32/ReadIdt.asm               |INTEL
