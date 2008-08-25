@@ -1,7 +1,7 @@
 #/** @file
 #
 # This Package provides headers and libraries that conform to EFI/PI Industry standards.
-# Copyright (c) 2007, Intel Corporation.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 # All rights reserved.
 #    This program and the accompanying materials are licensed and made available under
@@ -43,6 +43,7 @@
   UefiRuntimeLib|Include/Library/UefiRuntimeLib.h
   UefiLib|Include/Library/UefiLib.h
   UefiDriverEntryPoint|Include/Library/UefiDriverEntryPoint.h
+  ## UEFI Decompress Library Functions defintion for UEFI compress algorithm
   UefiDecompressLib|Include/Library/UefiDecompressLib.h
   UefiBootServicesTableLib|Include/Library/UefiBootServicesTableLib.h
   UefiApplicationEntryPoint|Include/Library/UefiApplicationEntryPoint.h
@@ -82,9 +83,11 @@
   BaseLib|Include/Library/BaseLib.h
   BasePeCoffLib|Include/Library/PeCoffLib.h
   GraphicsLib|Include/Library/GraphicsLib.h
+  ## Extract Guided Section Library class defintions that provides many handlers for the different guided section data.
   ExtractGuidedSectionLib|Include/Library/ExtractGuidedSectionLib.h
   IfrSupportLib|Include/Library/IfrSupportLib.h
   PeiPiLib|Include/Library/PeiPiLib.h
+  ## Serial I/O Port library functions definition.
   SerialPortLib|Include/Library/SerialPortLib.h
   DxePiLib|Include/Library/DxePiLib.h
   
@@ -368,6 +371,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1|UINT8|0x00000023
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024  # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
+
 
 [PcdsDynamic.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
