@@ -1,5 +1,5 @@
 /** @file
-  I/O Library.
+  I/O Library. The implementations are based on EFI_PEI_SERVICE->CpuIo interface.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -521,7 +521,7 @@ MmioRead64 (
   //
   // Make sure Address is aligned on a 64-bit boundary.
   //
-  ASSERT ((Address & 7) == 0);
+  ASSERT ((Address & 7) == (sizeof (UINT64) - 1));
   return CpuIo->MemRead64 (PeiServices, CpuIo, (UINT64) Address);
 
 }
