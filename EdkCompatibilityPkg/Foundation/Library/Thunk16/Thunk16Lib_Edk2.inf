@@ -29,6 +29,7 @@ COMPONENT_TYPE       = LIBRARY
   Ia32/Thunk16.asm  | INTEL 
   Ia32/Fx.asm       | MSFT
   Ia32/Fx.asm       | INTEL
+  Ia32/Fx.S         | GCC
 
 [sources.x64]
   X64/Thunk16.asm   | MSFT
