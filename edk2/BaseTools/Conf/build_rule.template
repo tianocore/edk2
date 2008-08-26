@@ -286,7 +286,7 @@
 
 [Microcode-File]
     <InputFile>
-        ?.txt, ?.TXT, ?.Txt
+        ?.txt, ?.TXT, ?.Txt, ?.mut
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_base}.mcb
