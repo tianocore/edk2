@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 /*++
 
@@ -342,7 +342,7 @@ FvReadFile (
     //
     // Caller passed in a pointer so allocate buffer for them
     //
-    *Buffer = CoreAllocateBootServicesPool (FileSize);
+    *Buffer = AllocatePool (FileSize);
     if (*Buffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }

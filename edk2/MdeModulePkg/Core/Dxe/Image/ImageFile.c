@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 
 /**
@@ -177,7 +177,7 @@ CoreOpenImageFile (
       // Because the device path consists of one or more FILE PATH MEDIA DEVICE PATH
       // nodes, It assures the fields in device path nodes are 2 byte aligned.
       //
-      FilePathNode = (FILEPATH_DEVICE_PATH *)CoreDuplicateDevicePath((EFI_DEVICE_PATH_PROTOCOL *)(UINTN)FilePathNode);
+      FilePathNode = (FILEPATH_DEVICE_PATH *)DuplicateDevicePath((EFI_DEVICE_PATH_PROTOCOL *)(UINTN)FilePathNode);
       if (FilePathNode == NULL) {
         FileHandle->Close (FileHandle);
         Status = EFI_OUT_OF_RESOURCES;
@@ -247,7 +247,7 @@ CoreOpenImageFile (
           //
           // Allocate space for the file
           //
-          ImageFileHandle->Source = CoreAllocateBootServicesPool ((UINTN)FileInfo->FileSize);
+          ImageFileHandle->Source = AllocatePool ((UINTN)FileInfo->FileSize);
           if (ImageFileHandle->Source != NULL) {
             //
             // Read the file into the buffer we allocated
@@ -453,7 +453,7 @@ CoreGrowBuffer (
       CoreFreePool (*Buffer);
     }
 
-    *Buffer = CoreAllocateBootServicesPool (BufferSize);
+    *Buffer = AllocatePool (BufferSize);
     if (*Buffer != NULL) {
       TryAgain = TRUE;
     } else {

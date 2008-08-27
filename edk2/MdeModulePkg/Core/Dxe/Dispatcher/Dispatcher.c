@@ -37,7 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 //
 // The Driver List contains one copy of every driver that has been discovered.
@@ -638,7 +638,7 @@ FvIsBeingProcesssed (
 {
   KNOWN_HANDLE  *KnownHandle;
 
-  KnownHandle = CoreAllocateBootServicesPool (sizeof (KNOWN_HANDLE));
+  KnownHandle = AllocatePool (sizeof (KNOWN_HANDLE));
   ASSERT (KnownHandle != NULL);
 
   KnownHandle->Signature = KNOWN_HANDLE_SIGNATURE;
@@ -688,7 +688,7 @@ CoreFvToDevicePath (
     mFvDevicePath.End.SubType = END_ENTIRE_DEVICE_PATH_SUBTYPE;
     SetDevicePathNodeLength (&mFvDevicePath.End, sizeof (EFI_DEVICE_PATH_PROTOCOL));
 
-    FileNameDevicePath = CoreAppendDevicePath (
+    FileNameDevicePath = AppendDevicePath (
                             FvDevicePath,
                             (EFI_DEVICE_PATH_PROTOCOL *)&mFvDevicePath
                             );
@@ -733,7 +733,7 @@ CoreAddToDriverList (
   // Create the Driver Entry for the list. ZeroPool initializes lots of variables to
   // NULL or FALSE.
   //
-  DriverEntry = CoreAllocateZeroBootServicesPool (sizeof (EFI_CORE_DRIVER_ENTRY));
+  DriverEntry = AllocateZeroPool (sizeof (EFI_CORE_DRIVER_ENTRY));
   ASSERT (DriverEntry != NULL);
 
   DriverEntry->Signature        = EFI_CORE_DRIVER_ENTRY_SIGNATURE;
@@ -876,7 +876,7 @@ CoreProcessFvImageFile (
     // ReadSection or Produce FVB failed, Free data buffer
     //
     if (Buffer != NULL) {
-      CoreFreePool (Buffer);
+      FreePool (Buffer);
     }
 
     if (AlignedBuffer != NULL) {
@@ -1043,7 +1043,7 @@ CoreFwVolEventProtocolNotify (
                 mFvDevicePath.End.SubType = END_ENTIRE_DEVICE_PATH_SUBTYPE;
                 SetDevicePathNodeLength (&mFvDevicePath.End, sizeof (EFI_DEVICE_PATH_PROTOCOL));
 
-                gDxeCoreLoadedImage->FilePath = CoreDuplicateDevicePath (
+                gDxeCoreLoadedImage->FilePath = DuplicateDevicePath (
                                                   (EFI_DEVICE_PATH_PROTOCOL *)&mFvDevicePath
                                                   );
                 gDxeCoreLoadedImage->DeviceHandle = FvHandle;

@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 #define MINIMUM_INITIAL_MEMORY_SIZE 0x10000
 
@@ -235,12 +235,12 @@ CoreAllocateGcdMapEntry (
   IN OUT EFI_GCD_MAP_ENTRY  **BottomEntry
   )
 {
-  *TopEntry = CoreAllocateZeroBootServicesPool (sizeof (EFI_GCD_MAP_ENTRY));
+  *TopEntry = AllocateZeroPool (sizeof (EFI_GCD_MAP_ENTRY));
   if (*TopEntry == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  *BottomEntry = CoreAllocateZeroBootServicesPool (sizeof (EFI_GCD_MAP_ENTRY));
+  *BottomEntry = AllocateZeroPool (sizeof (EFI_GCD_MAP_ENTRY));
   if (*BottomEntry == NULL) {
     CoreFreePool (*TopEntry);
     return EFI_OUT_OF_RESOURCES;
@@ -1401,7 +1401,7 @@ CoreGetMemorySpaceMap (
   //
   // Allocate the MemorySpaceMap
   //
-  *MemorySpaceMap = CoreAllocateBootServicesPool (*NumberOfDescriptors * sizeof (EFI_GCD_MEMORY_SPACE_DESCRIPTOR));
+  *MemorySpaceMap = AllocatePool (*NumberOfDescriptors * sizeof (EFI_GCD_MEMORY_SPACE_DESCRIPTOR));
   if (*MemorySpaceMap == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -1649,7 +1649,7 @@ CoreGetIoSpaceMap (
   //
   // Allocate the IoSpaceMap
   //
-  *IoSpaceMap = CoreAllocateBootServicesPool (*NumberOfDescriptors * sizeof (EFI_GCD_IO_SPACE_DESCRIPTOR));
+  *IoSpaceMap = AllocatePool (*NumberOfDescriptors * sizeof (EFI_GCD_IO_SPACE_DESCRIPTOR));
   if (*IoSpaceMap == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -1983,7 +1983,7 @@ CoreInitializeGcdServices (
   //
   // Initialize the GCD Memory Space Map
   //
-  Entry = CoreAllocateCopyPool (sizeof (EFI_GCD_MAP_ENTRY), &mGcdMemorySpaceMapEntryTemplate);
+  Entry = AllocateCopyPool (sizeof (EFI_GCD_MAP_ENTRY), &mGcdMemorySpaceMapEntryTemplate);
   ASSERT (Entry != NULL);
 
   Entry->EndAddress = LShiftU64 (1, SizeOfMemorySpace) - 1;
@@ -1993,7 +1993,7 @@ CoreInitializeGcdServices (
   //
   // Initialize the GCD I/O Space Map
   //
-  Entry = CoreAllocateCopyPool (sizeof (EFI_GCD_MAP_ENTRY), &mGcdIoSpaceMapEntryTemplate);
+  Entry = AllocateCopyPool (sizeof (EFI_GCD_MAP_ENTRY), &mGcdIoSpaceMapEntryTemplate);
   ASSERT (Entry != NULL);
 
   Entry->EndAddress = LShiftU64 (1, SizeOfIoSpace) - 1;
@@ -2128,7 +2128,7 @@ CoreInitializeGcdServices (
   //
   // Relocate HOB List to an allocated pool buffer.
   //
-  NewHobList = CoreAllocateCopyPool (
+  NewHobList = AllocateCopyPool (
                  (UINTN)PhitHob->EfiFreeMemoryBottom - (UINTN)(*HobStart),
                  *HobStart
                  );

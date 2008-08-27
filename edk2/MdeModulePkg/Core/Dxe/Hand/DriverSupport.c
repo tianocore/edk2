@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 
 //
@@ -72,7 +72,7 @@ CoreConnectController (
   //
   AlignedRemainingDevicePath = NULL;
   if (RemainingDevicePath != NULL) {
-    AlignedRemainingDevicePath = CoreDuplicateDevicePath (RemainingDevicePath);
+    AlignedRemainingDevicePath = DuplicateDevicePath (RemainingDevicePath);
   }
 
   //
@@ -137,7 +137,7 @@ CoreConnectController (
     //
     // Allocate a handle buffer for ControllerHandle's children
     //
-    ChildHandleBuffer = CoreAllocateBootServicesPool (ChildHandleCount * sizeof(EFI_HANDLE));
+    ChildHandleBuffer = AllocatePool (ChildHandleCount * sizeof(EFI_HANDLE));
 
     //
     // Fill in a handle buffer with ControllerHandle's children
@@ -376,7 +376,7 @@ CoreConnectSingleController (
   //
   // Allocate a duplicate array for the sorted Driver Binding Protocol Instances
   //
-  SortedDriverBindingProtocols = CoreAllocateBootServicesPool (sizeof (VOID *) * DriverBindingHandleCount);
+  SortedDriverBindingProtocols = AllocatePool (sizeof (VOID *) * DriverBindingHandleCount);
   if (SortedDriverBindingProtocols == NULL) {
     CoreFreePool (DriverBindingHandleBuffer);
     return EFI_OUT_OF_RESOURCES;
@@ -707,7 +707,7 @@ CoreDisconnectController (
       goto Done;
     }
 
-    DriverImageHandleBuffer = CoreAllocateBootServicesPool (sizeof (EFI_HANDLE) * DriverImageHandleCount);
+    DriverImageHandleBuffer = AllocatePool (sizeof (EFI_HANDLE) * DriverImageHandleCount);
     if (DriverImageHandleBuffer == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Done;
@@ -789,7 +789,7 @@ CoreDisconnectController (
       ChildHandleValid = FALSE;
       ChildBuffer = NULL;
       if (ChildBufferCount != 0) {
-        ChildBuffer = CoreAllocateBootServicesPool (sizeof (EFI_HANDLE) * ChildBufferCount);
+        ChildBuffer = AllocatePool (sizeof (EFI_HANDLE) * ChildBufferCount);
         if (ChildBuffer == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;

@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 
 //
@@ -132,7 +132,7 @@ CoreFindProtocolEntry (
   // allocate a new entry
   //
   if ((ProtEntry == NULL) && Create) {
-    ProtEntry = CoreAllocateBootServicesPool (sizeof(PROTOCOL_ENTRY));
+    ProtEntry = AllocatePool (sizeof(PROTOCOL_ENTRY));
 
     if (ProtEntry != NULL) {
       //
@@ -393,7 +393,7 @@ CoreInstallProtocolInterfaceNotify (
   //
   // Allocate a new protocol interface structure
   //
-  Prot = CoreAllocateZeroBootServicesPool (sizeof(PROTOCOL_INTERFACE));
+  Prot = AllocateZeroPool (sizeof(PROTOCOL_INTERFACE));
   if (Prot == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -404,7 +404,7 @@ CoreInstallProtocolInterfaceNotify (
   //
   Handle = (IHANDLE *)*UserHandle;
   if (Handle == NULL) {
-    Handle = CoreAllocateZeroBootServicesPool (sizeof(IHANDLE));
+    Handle = AllocateZeroPool (sizeof(IHANDLE));
     if (Handle == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Done;
@@ -1145,7 +1145,7 @@ CoreOpenProtocol (
   //
   // Create new entry
   //
-  OpenData = CoreAllocateBootServicesPool (sizeof(OPEN_PROTOCOL_DATA));
+  OpenData = AllocatePool (sizeof(OPEN_PROTOCOL_DATA));
   if (OpenData == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
   } else {
@@ -1331,7 +1331,7 @@ CoreOpenProtocolInformation (
     Size = Count * sizeof(EFI_OPEN_PROTOCOL_INFORMATION_ENTRY);
   }
 
-  Buffer = CoreAllocateBootServicesPool (Size);
+  Buffer = AllocatePool (Size);
   if (Buffer == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -1434,7 +1434,7 @@ CoreProtocolsPerHandle (
     goto Done;
   }
 
-  Buffer = CoreAllocateBootServicesPool (sizeof (EFI_GUID *) * ProtocolCount);
+  Buffer = AllocatePool (sizeof (EFI_GUID *) * ProtocolCount);
   if (Buffer == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -1505,7 +1505,7 @@ CoreConnectHandlesByKey (
     }
   }
 
-  HandleBuffer = CoreAllocateBootServicesPool (Count * sizeof (EFI_HANDLE));
+  HandleBuffer = AllocatePool (Count * sizeof (EFI_HANDLE));
   if (HandleBuffer == NULL) {
     CoreReleaseProtocolLock ();
     return;

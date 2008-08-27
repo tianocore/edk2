@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 
 EFI_FW_VOL_BLOCK_DEVICE  mFwVolBlock = {
@@ -438,7 +438,7 @@ ProduceFVBProtocolOnBuffer (
   //
   // Allocate EFI_FW_VOL_BLOCK_DEVICE
   //
-  FvbDev = CoreAllocateCopyPool (sizeof (EFI_FW_VOL_BLOCK_DEVICE), &mFwVolBlock);
+  FvbDev = AllocateCopyPool (sizeof (EFI_FW_VOL_BLOCK_DEVICE), &mFwVolBlock);
   if (FvbDev == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -460,7 +460,7 @@ ProduceFVBProtocolOnBuffer (
   //
   // Second, allocate the cache
   //
-  FvbDev->LbaCache = CoreAllocateBootServicesPool (FvbDev->NumBlocks * sizeof (LBA_CACHE));
+  FvbDev->LbaCache = AllocatePool (FvbDev->NumBlocks * sizeof (LBA_CACHE));
   if (FvbDev->LbaCache == NULL) {
     CoreFreePool (FvbDev);
     return EFI_OUT_OF_RESOURCES;

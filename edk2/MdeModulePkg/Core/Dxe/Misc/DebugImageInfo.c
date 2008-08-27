@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 
 EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
@@ -152,7 +152,7 @@ CoreNewDebugImageInfoEntry (
     //  Table is full, so re-allocate another page for a larger table...
     //
     TableSize = MaxTableIndex * EFI_DEBUG_TABLE_ENTRY_SIZE;
-    NewTable = CoreAllocateZeroBootServicesPool (TableSize + EFI_PAGE_SIZE);
+    NewTable = AllocateZeroPool (TableSize + EFI_PAGE_SIZE);
     if (NewTable == NULL) {
       mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
       return;
@@ -175,7 +175,7 @@ CoreNewDebugImageInfoEntry (
   //
   // Allocate data for new entry
   //
-  Table[Index].NormalImage = CoreAllocateZeroBootServicesPool (sizeof (EFI_DEBUG_IMAGE_INFO_NORMAL));
+  Table[Index].NormalImage = AllocateZeroPool (sizeof (EFI_DEBUG_IMAGE_INFO_NORMAL));
   if (Table[Index].NormalImage != NULL) {
     //
     // Update the entry

@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 #define POOL_FREE_SIGNATURE   EFI_SIGNATURE_32('p','f','r','0')
 typedef struct {
