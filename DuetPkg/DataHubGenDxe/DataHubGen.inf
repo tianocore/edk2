@@ -17,7 +17,7 @@
 #
 #    Component description file for DataHubGen module.
 #
---*/
+#--*/
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -52,15 +52,15 @@
 [Guids.common]
   gEfiProcessorSubClassGuid
   gEfiMiscSubClassGuid
-  gEfiDataHubProtocolGuid
   gEfiSmbiosTableGuid
   gEfiMiscProducerGuid
   gEfiMemorySubClassGuid
   gEfiMemoryProducerGuid
-  gEfiHiiProtocolGuid
 
 [Protocols]
   gEfiHiiDatabaseProtocolGuid
-
+  gEfiDataHubProtocolGuid
+  gEfiHiiProtocolGuid
+  
 [Depex]
   gEfiDataHubProtocolGuid AND gEfiHiiDatabaseProtocolGuid
