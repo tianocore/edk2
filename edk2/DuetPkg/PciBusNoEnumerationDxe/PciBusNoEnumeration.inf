@@ -68,5 +68,7 @@
   gEfiPciIoProtocolGuid
   gEfiDevicePathProtocolGuid
   gEfiBusSpecificDriverOverrideProtocolGuid
-  gEfiPciOptionRomTableGuid
   gEfiDecompressProtocolGuid
+  
+[Guids]
+  gEfiPciOptionRomTableGuid

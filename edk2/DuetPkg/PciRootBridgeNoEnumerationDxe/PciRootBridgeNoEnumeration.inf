@@ -63,8 +63,8 @@
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid
   gEfiDeviceIoProtocolGuid
-  gEfiPciExpressBaseAddressGuid
   gEfiCpuIoProtocolGuid
 
 [Guids]
   gEfiPciOptionRomTableGuid
+  gEfiPciExpressBaseAddressGuid
