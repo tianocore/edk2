@@ -261,9 +261,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x1f
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
