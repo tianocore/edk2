@@ -113,7 +113,7 @@
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
-  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MemoryAllocationLib|MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
@@ -259,6 +259,7 @@
   }
 
   MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
+  MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
   MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
