@@ -34,6 +34,7 @@ COMPONENT_TYPE  = LIBRARY
 [sources.x64]
   x64/Cpu.asm       | MSFT
   x64/Cpu.asm       | INTEL
+  x64/Cpu.S         | GCC
 
 [includes.common]
   $(EDK_SOURCE)/Foundation/Efi
