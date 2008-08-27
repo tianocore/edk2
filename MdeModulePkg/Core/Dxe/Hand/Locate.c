@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 //
 // ProtocolRequest - Last LocateHandle request ID
@@ -450,12 +450,12 @@ CoreLocateDevicePath (
 
   *Device = NULL_HANDLE;
   SourcePath = *DevicePath;
-  SourceSize = CoreDevicePathSize (SourcePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
+  SourceSize = GetDevicePathSize (SourcePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
 
   //
   // The source path can only have 1 instance
   //
-  if (CoreIsDevicePathMultiInstance (SourcePath)) {
+  if (IsDevicePathMultiInstance (SourcePath)) {
     DEBUG((DEBUG_ERROR, "LocateDevicePath: Device path has too many instances\n"));
     return EFI_INVALID_PARAMETER;
   }
@@ -482,7 +482,7 @@ CoreLocateDevicePath (
     //
     // Check if DevicePath is first part of SourcePath
     //
-    Size = CoreDevicePathSize (TmpDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
+    Size = GetDevicePathSize (TmpDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
     if ((Size <= SourceSize) && CompareMem (SourcePath, TmpDevicePath, Size) == 0) {
       //
       // If the size is equal to the best match, then we
@@ -672,7 +672,7 @@ CoreLocateHandleBuffer (
     return Status;
   }
 
-  *Buffer = CoreAllocateBootServicesPool (BufferSize);
+  *Buffer = AllocatePool (BufferSize);
   if (*Buffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }

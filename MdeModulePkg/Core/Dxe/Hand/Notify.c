@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 
 /**
@@ -132,7 +132,7 @@ CoreRegisterProtocolNotify (
     //
     // Allocate a new notification record
     //
-    ProtNotify = CoreAllocateBootServicesPool (sizeof(PROTOCOL_NOTIFY));
+    ProtNotify = AllocatePool (sizeof(PROTOCOL_NOTIFY));
     if (ProtNotify != NULL) {
 
       ProtNotify->Signature = PROTOCOL_NOTIFY_SIGNATURE;

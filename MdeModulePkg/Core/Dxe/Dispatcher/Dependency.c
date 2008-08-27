@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 //
 // Global stack used to evaluate dependency expressions
@@ -50,7 +50,7 @@ GrowDepexStack (
     Size = Size + (mDepexEvaluationStackEnd - mDepexEvaluationStack);
   }
 
-  NewStack = CoreAllocateBootServicesPool (Size * sizeof (BOOLEAN));
+  NewStack = AllocatePool (Size * sizeof (BOOLEAN));
   if (NewStack == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -68,7 +68,7 @@ GrowDepexStack (
     //
     // Free The Old Stack
     //
-    CoreFreePool (mDepexEvaluationStack);
+    FreePool (mDepexEvaluationStack);
   }
 
   //

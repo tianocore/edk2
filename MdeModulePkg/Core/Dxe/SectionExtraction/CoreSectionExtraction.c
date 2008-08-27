@@ -38,7 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 //
 // Local defines and typedefs
@@ -607,7 +607,7 @@ GetSection (
     //
     // Callee allocated buffer.  Allocate buffer and return size.
     //
-    *Buffer = CoreAllocateBootServicesPool (CopySize);
+    *Buffer = AllocatePool (CopySize);
     if (*Buffer == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto GetSection_Done;
@@ -918,7 +918,7 @@ CreateChildNode (
   //
   // Allocate a new node
   //
-  *ChildNode = CoreAllocateBootServicesPool (sizeof (CORE_SECTION_CHILD_NODE));
+  *ChildNode = AllocatePool (sizeof (CORE_SECTION_CHILD_NODE));
   Node = *ChildNode;
   if (Node == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -951,7 +951,7 @@ CreateChildNode (
       //
       if (CompressionHeader->UncompressedLength > 0) {
         NewStreamBufferSize = CompressionHeader->UncompressedLength;
-        NewStreamBuffer = CoreAllocateBootServicesPool (NewStreamBufferSize);
+        NewStreamBuffer = AllocatePool (NewStreamBufferSize);
         if (NewStreamBuffer == NULL) {
           CoreFreePool (Node);
           return EFI_OUT_OF_RESOURCES;
@@ -984,7 +984,7 @@ CreateChildNode (
           ASSERT_EFI_ERROR (Status);
           ASSERT (NewStreamBufferSize == CompressionHeader->UncompressedLength);
 
-          ScratchBuffer = CoreAllocateBootServicesPool (ScratchSize);
+          ScratchBuffer = AllocatePool (ScratchSize);
           if (ScratchBuffer == NULL) {
             CoreFreePool (Node);
             CoreFreePool (NewStreamBuffer);
@@ -1202,7 +1202,7 @@ OpenSectionStreamEx (
   //
   // Allocate a new stream
   //
-  NewStream = CoreAllocateBootServicesPool (sizeof (CORE_SECTION_STREAM_NODE));
+  NewStream = AllocatePool (sizeof (CORE_SECTION_STREAM_NODE));
   if (NewStream == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1213,7 +1213,7 @@ OpenSectionStreamEx (
     // data in
     //
     if (SectionStreamLength > 0) {
-      NewStream->StreamBuffer = CoreAllocateBootServicesPool (SectionStreamLength);
+      NewStream->StreamBuffer = AllocatePool (SectionStreamLength);
       if (NewStream->StreamBuffer == NULL) {
         CoreFreePool (NewStream);
         return EFI_OUT_OF_RESOURCES;
@@ -1473,7 +1473,7 @@ CustomGuidedSectionExtract (
     //
     // Allocate scratch buffer
     //
-    ScratchBuffer = CoreAllocateBootServicesPool (ScratchBufferSize);
+    ScratchBuffer = AllocatePool (ScratchBufferSize);
     if (ScratchBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1483,7 +1483,7 @@ CustomGuidedSectionExtract (
     //
     // Allocate output buffer
     //
-    AllocatedOutputBuffer = CoreAllocateBootServicesPool (OutputBufferSize);
+    AllocatedOutputBuffer = AllocatePool (OutputBufferSize);
     if (AllocatedOutputBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }

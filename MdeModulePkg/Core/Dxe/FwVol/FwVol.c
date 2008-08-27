@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 #define KEYSIZE       sizeof (UINTN)
 
@@ -87,7 +87,7 @@ GetFwVolHeader (
   //
   // Allocate a buffer for the caller
   //
-  *FwVolHeader = CoreAllocateBootServicesPool (TempFvh.HeaderLength);
+  *FwVolHeader = AllocatePool (TempFvh.HeaderLength);
   if (*FwVolHeader == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -210,7 +210,7 @@ FvCheck (
   // the header to check to make sure the volume is valid
   //
   Size = (UINTN)(FwVolHeader->FvLength - FwVolHeader->HeaderLength);
-  FvDevice->CachedFv = CoreAllocateBootServicesPool (Size);
+  FvDevice->CachedFv = AllocatePool (Size);
 
   if (FvDevice->CachedFv == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -336,7 +336,7 @@ FvCheck (
       //
       // Create a FFS list entry for each non-deleted file
       //
-      FfsFileEntry = CoreAllocateZeroBootServicesPool (sizeof (FFS_FILE_LIST_ENTRY));
+      FfsFileEntry = AllocateZeroPool (sizeof (FFS_FILE_LIST_ENTRY));
       if (FfsFileEntry == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
@@ -465,7 +465,7 @@ NotifyFwVolBlock (
       //
       // No FwVol protocol on the handle so create a new one
       //
-      FvDevice = CoreAllocateCopyPool (sizeof (FV_DEVICE), &mFvDevice);
+      FvDevice = AllocateCopyPool (sizeof (FV_DEVICE), &mFvDevice);
       if (FvDevice == NULL) {
         return;
       }

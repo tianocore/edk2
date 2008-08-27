@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 //
 // Module Globals
 //
@@ -340,7 +340,7 @@ CoreLoadPeImage (
   //
   if ((Attribute & EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION) != 0) {
     if (Image->ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) {
-      Image->ImageContext.FixupData = CoreAllocateRuntimePool ((UINTN)(Image->ImageContext.FixupDataSize));
+      Image->ImageContext.FixupData = AllocateRuntimePool ((UINTN)(Image->ImageContext.FixupDataSize));
       if (Image->ImageContext.FixupData == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
@@ -444,7 +444,7 @@ CoreLoadPeImage (
       //
       // Make a list off all the RT images so we can let the RT AP know about them.
       //
-      Image->RuntimeData = CoreAllocateRuntimePool (sizeof(EFI_RUNTIME_IMAGE_ENTRY));
+      Image->RuntimeData = AllocateRuntimePool (sizeof(EFI_RUNTIME_IMAGE_ENTRY));
       if (Image->RuntimeData == NULL) {
         goto Done;
       }
@@ -685,7 +685,7 @@ CoreLoadImageCommon (
   //
   // Allocate a new image structure
   //
-  Image = CoreAllocateZeroBootServicesPool (sizeof(LOADED_IMAGE_PRIVATE_DATA));
+  Image = AllocateZeroPool (sizeof(LOADED_IMAGE_PRIVATE_DATA));
   if (Image == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -696,7 +696,7 @@ CoreLoadImageCommon (
   FilePath = OriginalFilePath;
   Status = CoreHandleProtocol (DeviceHandle, &gEfiDevicePathProtocolGuid, (VOID **)&HandleFilePath);
   if (!EFI_ERROR (Status)) {
-    FilePathSize = CoreDevicePathSize (HandleFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
+    FilePathSize = GetDevicePathSize (HandleFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
     FilePath = (EFI_DEVICE_PATH_PROTOCOL *) (((UINT8 *)FilePath) + FilePathSize );
   }
 
@@ -707,7 +707,7 @@ CoreLoadImageCommon (
   Image->Info.SystemTable  = gDxeCoreST;
   Image->Info.DeviceHandle = DeviceHandle;
   Image->Info.Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
-  Image->Info.FilePath     = CoreDuplicateDevicePath (FilePath);
+  Image->Info.FilePath     = DuplicateDevicePath (FilePath);
   Image->Info.ParentHandle = ParentImageHandle;
 
 
@@ -774,7 +774,7 @@ CoreLoadImageCommon (
   // otherwise Loaded Image Device Path Protocol is installed with a NULL interface pointer.
   //
   if (OriginalFilePath != NULL) {
-    Image->LoadedImageDevicePath = CoreDuplicateDevicePath (OriginalFilePath);
+    Image->LoadedImageDevicePath = DuplicateDevicePath (OriginalFilePath);
   }
 
   //
@@ -1000,7 +1000,7 @@ CoreStartImage (
   // JumpContext must be aligned on a CPU specific boundary.
   // Overallocate the buffer and force the required alignment
   //
-  Image->JumpBuffer = CoreAllocateBootServicesPool (sizeof (BASE_LIBRARY_JUMP_BUFFER) + BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
+  Image->JumpBuffer = AllocatePool (sizeof (BASE_LIBRARY_JUMP_BUFFER) + BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
   if (Image->JumpBuffer == NULL) {
     PERF_END (ImageHandle, START_IMAGE_TOK, NULL, 0);
     return EFI_OUT_OF_RESOURCES;
@@ -1322,7 +1322,7 @@ CoreExit (
   //
   if (ExitData != NULL) {
     Image->ExitDataSize = ExitDataSize;
-    Image->ExitData = CoreAllocateBootServicesPool (Image->ExitDataSize);
+    Image->ExitData = AllocatePool (Image->ExitDataSize);
     if (Image->ExitData == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Done;

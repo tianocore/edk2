@@ -12,45 +12,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <DxeMain.h>
+#include "DxeMain.h"
 
 #define CONFIG_TABLE_SIZE_INCREASED 0x10
 
 UINTN mSystemTableAllocateSize = 0;
-
-
-
-/**
-  Find a config table by name in system table's ConfigurationTable.
-
-  @param  Guid           The table name to look for
-  @param  Table          Pointer of the config table
-
-  @retval EFI_NOT_FOUND  Could not find the table in system table's
-                         ConfigurationTable.
-  @retval EFI_SUCCESS    Table successfully found.
-
-**/
-EFI_STATUS
-CoreGetConfigTable (
-  IN EFI_GUID *Guid,
-  OUT VOID    **Table
-  )
-{
-  UINTN Index;
-
-  for (Index = 0; Index < gDxeCoreST->NumberOfTableEntries; Index++) {
-    if (CompareGuid (Guid, &(gDxeCoreST->ConfigurationTable[Index].VendorGuid))) {
-      *Table = gDxeCoreST->ConfigurationTable[Index].VendorTable;
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
-
-
 
 /**
   Boot Service called to add, modify, or remove a system configuration table from
@@ -149,7 +115,7 @@ CoreInstallConfigurationTable (
       // Allocate a table with one additional entry.
       //
       mSystemTableAllocateSize += (CONFIG_TABLE_SIZE_INCREASED * sizeof (EFI_CONFIGURATION_TABLE));
-      EfiConfigurationTable = CoreAllocateRuntimePool (mSystemTableAllocateSize);
+      EfiConfigurationTable = AllocateRuntimePool (mSystemTableAllocateSize);
       if (EfiConfigurationTable == NULL) {
         //
         // If a new table could not be allocated, then return an error.
