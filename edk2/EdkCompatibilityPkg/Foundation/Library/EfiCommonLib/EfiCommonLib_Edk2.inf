@@ -99,6 +99,10 @@ COMPONENT_TYPE  = LIBRARY
 #  x64/EfiSetMem.asm        | INTEL
 #  x64/EfiZeroMem.asm       | INTEL
 
+  x64/EfiCopyMemRep1.S	    | GCC
+  x64/EfiSetMemRep4.S       | GCC
+  x64/EfiZeroMemRep4.S      | GCC
+
   Math.c
 
 [includes.common]
