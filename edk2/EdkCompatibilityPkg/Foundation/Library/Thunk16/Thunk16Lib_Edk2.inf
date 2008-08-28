@@ -35,8 +35,10 @@ COMPONENT_TYPE       = LIBRARY
 [sources.x64]
   X64/Thunk16.asm   | MSFT
   X64/Thunk16.asm   | INTEL
+  X64/Thunk16.S     | GCC
   X64/Fx.asm        | MSFT
   X64/Fx.asm        | INTEL
+  X64/Fx.S          | GCC
 
 [includes.common]
   .
