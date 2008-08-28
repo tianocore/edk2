@@ -38,7 +38,8 @@ COMPONENT_TYPE  = LIBRARY
   ia32/PlatformIoLib.c
   ia32/Fvb.c
   ia32/CpuFlushCache.c		| MSFT
-  ia32/CpuFlushCache.asm    | INTEL
+  ia32/CpuFlushCache.asm  | INTEL
+  ia32/CpuFlushCache.S    | GCC
 
 [sources.x64]
   x64/RuntimeLib.c
@@ -48,6 +49,7 @@ COMPONENT_TYPE  = LIBRARY
   x64/Fvb.c
   x64/RuntimeLibAsm.asm     | MSFT
   x64/RuntimeLibAsm.asm     | INTEL
+  x64/RuntimeLibAsm.S       | GCC
 
 [sources.ipf]
   Ipf/RuntimeLib.c

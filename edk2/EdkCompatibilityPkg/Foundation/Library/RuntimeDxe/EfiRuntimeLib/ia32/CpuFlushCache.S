@@ -19,12 +19,14 @@
 #
 #--*/
 #---------------------------------------------------------------------------
+#include <EfiBind.h>
+
     .586p: 
     #.MODEL flat,C
     .code: 
 
 #---------------------------------------------------------------------------
-.globl ASM_PFX(EfiCpuFlushCache)
+.global ASM_PFX(EfiCpuFlushCache)
 
 #
 #//
@@ -57,6 +59,3 @@ ASM_PFX(EfiCpuFlushCache):
     wbinvd
     xorl                    %eax, %eax
     ret
-
-
-
