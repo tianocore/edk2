@@ -62,8 +62,10 @@ COMPONENT_TYPE    = LIBRARY
   x64/Processor.c
   x64/ProcessorAsms.Asm          |MSFT
   x64/ProcessorAsms.Asm          |INTEL
+  x64/ProcessorAsms.S            |GCC
   x64/SupportItpDebug.asm        |MSFT
   x64/SupportItpDebug.asm        |INTEL
+  x64/SupportItpDebug.S          |GCC
   x64/EfiJump.h
   x64/PeiServicePointer.c
 
