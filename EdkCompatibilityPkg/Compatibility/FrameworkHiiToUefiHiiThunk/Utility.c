@@ -429,7 +429,7 @@ CreateQuestionIdMap (
               
               InsertTailList (OneOfOptinMapEntryListHead, &OneOfOptionMapEntry->Link);
             }
-          }else if (CompareGuid (&OptionMap->Guid, &gTianoHiiIfrGuid)) {
+          }else if (CompareMem (&OptionMap->Guid, &gTianoHiiIfrGuid, sizeof (EFI_GUID))) {
             Class = (EFI_IFR_GUID_CLASS *) OpCode;
 
             switch (Class->ExtendOpCode) {
