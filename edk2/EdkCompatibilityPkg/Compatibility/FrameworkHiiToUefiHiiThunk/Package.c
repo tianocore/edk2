@@ -184,19 +184,13 @@ GenerateRandomGuid (
   OUT           EFI_GUID * Guid
   )
 {
-  EFI_STATUS      Status;
-  static EFI_GUID GuidBase = { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e }};
-  UINT64          MonotonicCount;
+  EFI_GUID        GuidBase = { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e }};
+  static  UINT64  Count = 0;
 
   CopyGuid (Guid, &GuidBase);
-  
-  Status = gBS->GetNextMonotonicCount (&MonotonicCount);
-  ASSERT_EFI_ERROR (Status);
-  
-  //
-  // Use Monotonic Count as a psedo random number generator.
-  //
-  *((UINT64 *) Guid) = *((UINT64 *) Guid) + MonotonicCount;
+
+  Count++;  
+  *((UINT64 *) Guid) = *((UINT64 *) Guid) + Count;
 }
 
 EFI_STATUS
