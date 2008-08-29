@@ -104,7 +104,7 @@ TagGuidToUefiHiiHandle (
   while (!IsNull (&Private->ThunkContextListHead, Link)) {
     ThunkContext = HII_THUNK_CONTEXT_FROM_LINK (Link);
 
-    if (CompareGuid (Guid, &ThunkContext->TagGuid) && (ThunkContext->IfrPackageCount != 0)) {
+    if (CompareMem (Guid, &ThunkContext->TagGuid, sizeof (EFI_GUID) == 0) && (ThunkContext->IfrPackageCount != 0)) {
       return ThunkContext->UefiHiiHandle;
     }
 
@@ -265,7 +265,7 @@ GetAttributesOfFirstFormSet (
 
         case EFI_IFR_GUID_OP:
           Class = (EFI_IFR_GUID_CLASS*) OpCode;
-          if (CompareGuid (&Class->Guid, &gTianoHiiIfrGuid)) {
+          if (CompareMem (&Class->Guid, &gTianoHiiIfrGuid, sizeof (EFI_GUID)) == 0) {
             Class = (EFI_IFR_GUID_CLASS *) OpCode;
 
             switch (Class->ExtendOpCode) {
@@ -406,7 +406,7 @@ CreateQuestionIdMap (
        
         case EFI_IFR_GUID_OP:
           OptionMap = (EFI_IFR_GUID_OPTIONKEY *) OpCode;
-          if (CompareGuid (&OptionMap->Guid, &gFrameworkHiiCompatbilityGuid)) {
+          if (CompareMem (&OptionMap->Guid, &gFrameworkHiiCompatbilityGuid, sizeof (EFI_GUID)) == 0) {
             if (OptionMap->ExtendOpCode == EFI_IFR_EXTEND_OP_OPTIONKEY) {
               OneOfOptinMapEntryListHead = GetOneOfOptionMapEntryListHead (ThunkContext, OptionMap->QuestionId);
               if (OneOfOptinMapEntryListHead == NULL) {
@@ -429,7 +429,7 @@ CreateQuestionIdMap (
               
               InsertTailList (OneOfOptinMapEntryListHead, &OneOfOptionMapEntry->Link);
             }
-          }else if (CompareMem (&OptionMap->Guid, &gTianoHiiIfrGuid, sizeof (EFI_GUID))) {
+         } else if (CompareMem (&OptionMap->Guid, &gTianoHiiIfrGuid, sizeof (EFI_GUID)) == 0) {
             Class = (EFI_IFR_GUID_CLASS *) OpCode;
 
             switch (Class->ExtendOpCode) {
