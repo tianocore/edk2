@@ -212,8 +212,8 @@ Out:
   This function try to retrieve string from String package of current language.
   If fails, it try to retrieve string from String package of first language it support.
 
-  If String is NULL, then ASSERT.
   If StringSize is NULL, then ASSERT.
+  If String is NULL and *StringSize is not 0, then ASSERT.
   If PackageList could not be found in the default HII database, then ASSERT.
   If StringId is not found in PackageList, then ASSERT.
 
@@ -247,8 +247,8 @@ HiiLibGetString (
   CHAR8       Lang[RFC_3066_ENTRY_SIZE];
   CHAR8       CurrentLang[RFC_3066_ENTRY_SIZE];
 
-  ASSERT (String != NULL);
   ASSERT (StringSize != NULL);
+  ASSERT (!(*StringSize != 0 && String == NULL));
   ASSERT (IsHiiHandleRegistered (PackageList));
 
   HiiLibGetCurrentLanguage (CurrentLang);
