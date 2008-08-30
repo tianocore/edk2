@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define  _CAPSULE_RUNTIME_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Capsule.h>
 #include <Guid/CapsuleVendor.h>

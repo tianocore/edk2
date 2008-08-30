@@ -19,7 +19,7 @@ Abstract:
 
 **/
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <WinNtDxe.h>
 #include <Protocol/RealTimeClock.h>
 #include <Library/DebugLib.h>

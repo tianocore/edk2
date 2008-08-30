@@ -22,8 +22,6 @@ Abstract:
 #ifndef _PLAT_OVER_MNGR_H_
 #define _PLAT_OVER_MNGR_H_
 
-#include <Uefi.h>
-
 #include <PiDxe.h>
 
 #include <Protocol/HiiConfigAccess.h>

@@ -13,7 +13,7 @@
 **/
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>

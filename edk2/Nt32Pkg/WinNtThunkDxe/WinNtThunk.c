@@ -29,7 +29,7 @@ Abstract:
 //
 // The package level header files this module uses
 //
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <WinNtDxe.h>
 //
 // The protocols, PPI and GUID defintions for this module

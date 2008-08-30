@@ -13,7 +13,7 @@
 **/
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Library/DebugLib.h>
 #include <Library/ScsiLib.h>
 #include <Library/BaseMemoryLib.h>

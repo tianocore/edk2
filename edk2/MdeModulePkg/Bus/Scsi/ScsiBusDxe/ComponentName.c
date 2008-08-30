@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 
 #include <Protocol/ScsiPassThru.h>

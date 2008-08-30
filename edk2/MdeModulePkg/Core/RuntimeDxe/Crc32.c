@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 UINT32  mCrcTable[256];
 

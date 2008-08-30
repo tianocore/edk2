@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _EFI_USB_BUS_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Usb2HostController.h>
 #include <Protocol/UsbHostController.h>

@@ -24,7 +24,7 @@ Revision History
 #ifndef _DRIVER_SAMPLE_H
 #define _DRIVER_SAMPLE_H
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/FormBrowser2.h>

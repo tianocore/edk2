@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __HII_DATABASE_PRIVATE_H__
 #define __HII_DATABASE_PRIVATE_H__
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/ConsoleControl.h>
 #include <Protocol/DevicePath.h>

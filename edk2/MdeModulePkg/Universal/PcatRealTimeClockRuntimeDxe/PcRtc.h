@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _RTC_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/RealTimeClock.h>
 #include <Guid/GenericPlatformVariable.h>
