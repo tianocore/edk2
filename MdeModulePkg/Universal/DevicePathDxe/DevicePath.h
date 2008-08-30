@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _DEVICE_PATH_DRIVER_H_
 #define _DEVICE_PATH_DRIVER_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Protocol/DevicePathUtilities.h>
 #include <Protocol/DebugPort.h>
 #include <Protocol/DevicePathToText.h>

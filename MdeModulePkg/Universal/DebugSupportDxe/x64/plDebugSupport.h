@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _PLDEBUG_SUPPORT_H
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>

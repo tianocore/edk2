@@ -19,7 +19,7 @@ Abstract:
 
 **/
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <WinNtDxe.h>
 #include <Protocol/Reset.h>
 #include <Library/DebugLib.h>

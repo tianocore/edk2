@@ -25,7 +25,7 @@ Abstract:
 #define _TIMER_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <WinNtDxe.h>
 #include <Protocol/Timer.h>
 #include <Protocol/Cpu.h>

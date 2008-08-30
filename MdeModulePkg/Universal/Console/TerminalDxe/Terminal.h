@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _TERMINAL_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/SerialIo.h>
 #include <Guid/GlobalVariable.h>

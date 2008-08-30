@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _EBC_INT_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/DebugSupport.h>
 #include <Protocol/Ebc.h>

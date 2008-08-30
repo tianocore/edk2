@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _RUNTIME_H_
 #define _RUNTIME_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/Runtime.h>
 #include <Library/BaseLib.h>

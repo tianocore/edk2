@@ -14,7 +14,7 @@
 **/
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 
 #include <Library/MemoryAllocationLib.h>

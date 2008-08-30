@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _USB_MOUSE_ABSOLUTE_POINTER_H
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/AbsolutePointer.h>
 #include <Protocol/UsbIo.h>

@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _EFI_USBMASS_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/BlockIo.h>
 #include <Protocol/UsbIo.h>

@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Statements that include other header files
 //
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/VariableWrite.h>
 #include <Protocol/Variable.h>

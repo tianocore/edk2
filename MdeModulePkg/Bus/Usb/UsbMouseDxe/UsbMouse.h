@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _EFI_USB_MOUSE_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/SimplePointer.h>
 #include <Protocol/UsbIo.h>

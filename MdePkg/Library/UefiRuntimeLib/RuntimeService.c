@@ -6,7 +6,7 @@
   OS virtual address space. All pointer values are different for a virtual 
   mapping than from the normal physical mapping at boot services time.
 
-  Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation.<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -17,9 +17,7 @@
 
 **/
 
-#include <PiDxe.h>
-
-#include <RuntimeLibInternal.h>
+#include "RuntimeLibInternal.h"
 
 
 /**
@@ -54,7 +52,7 @@ EfiResetSystem (
                        capabilities.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -95,7 +93,7 @@ EfiSetTime (
   @param  Time    Current alarm clock setting.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -118,7 +116,7 @@ EfiGetWakeupTime (
   @param  Time   Point to alarm clock setting.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -145,7 +143,7 @@ EfiSetWakeupTime (
   @param  Data         Point to return Data-Buffer.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -176,7 +174,7 @@ EfiGetVariable (
                            As output, returns the VendorGuid of the current variable.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -203,7 +201,7 @@ EfiGetNextVariableName (
   @param  Data         Point to the content of the variable.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -226,7 +224,7 @@ EfiSetVariable (
   @param  HighCount Pointer to returned value.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -248,7 +246,7 @@ EfiGetNextHighMonotonicCount (
                              applied.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -269,7 +267,7 @@ EfiConvertPointer (
   @param  ListHead           Head of linked list to convert.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS
@@ -281,6 +279,13 @@ EfiConvertList (
 {
   LIST_ENTRY  *Link;
   LIST_ENTRY  *NextLink;
+  
+  //
+  // For NULL List, return EFI_SUCCESS
+  //
+  if (ListHead == NULL) {
+    return EFI_SUCCESS;
+  }
 
   //
   // Convert all the ForwardLink & BackLink pointers in the list

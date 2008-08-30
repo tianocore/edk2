@@ -20,7 +20,7 @@ Abstract:
 #ifndef _SNP_NT32_H_
 #define _SNP_NT32_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/DevicePath.h>

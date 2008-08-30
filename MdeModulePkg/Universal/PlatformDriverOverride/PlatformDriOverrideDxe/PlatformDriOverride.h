@@ -21,7 +21,7 @@ Abstract:
 #ifndef PLATFORM_DRI_OVERRIDE_H_
 #define PLATFORM_DRI_OVERRIDE_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>

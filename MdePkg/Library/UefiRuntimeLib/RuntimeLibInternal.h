@@ -15,7 +15,7 @@
 #ifndef __RUNTIMELIBINTERNAL_H__
 #define __RUNTIMELIBINTERNAL_H__
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Library/UefiRuntimeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>

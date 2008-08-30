@@ -22,7 +22,7 @@ Abstract:
 #ifndef _NT_THUNK_METRONOME_H_
 #define _NT_THUNK_METRONOME_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <WinNtDxe.h>
 #include <Protocol/Metronome.h>
 #include <Library/BaseLib.h>

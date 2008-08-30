@@ -2,7 +2,7 @@
 # Runtime driver library
 #
 # Instance of runtime driver library, Hook VitualAddressChange and
-#  BooterviceExit event and provide runtime service.
+#  BooterviceExit event and provide runtime service for non IPF processor types.
 # Copyright (c) 2006 - 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -29,7 +29,7 @@
   DESTRUCTOR                     = RuntimeDriverLibDeconstruct
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 

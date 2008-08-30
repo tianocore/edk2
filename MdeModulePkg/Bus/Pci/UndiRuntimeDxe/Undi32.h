@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _UNDI_32_H_
 #define _UNDI_32_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Guid/EventGroup.h>
 #include <Protocol/PciIo.h>

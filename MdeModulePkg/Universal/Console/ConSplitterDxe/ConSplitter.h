@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _CON_SPLITTER_H_
 #define _CON_SPLITTER_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Guid/PrimaryStandardErrorDevice.h>
 #include <Guid/PrimaryConsoleOutDevice.h>
 #include <Protocol/GraphicsOutput.h>

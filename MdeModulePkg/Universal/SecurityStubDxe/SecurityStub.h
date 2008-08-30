@@ -19,7 +19,7 @@
 //
 // Common header files for this module.
 //
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Protocol/Security.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>

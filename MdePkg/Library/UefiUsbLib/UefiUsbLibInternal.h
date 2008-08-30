@@ -16,7 +16,7 @@
 #ifndef __UEFI_USB_LIB_INTERNAL_H_
 #define __UEFI_USB_LIB_INTERNAL_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Library/UsbLib.h>
 #include <Library/BaseMemoryLib.h>
 

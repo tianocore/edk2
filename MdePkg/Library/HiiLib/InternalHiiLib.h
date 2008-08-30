@@ -15,7 +15,7 @@
 #ifndef __INTERNAL_HII_LIB_H__
 #define __INTERNAL_HII_LIB_H__
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>

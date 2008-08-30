@@ -12,14 +12,8 @@
 
 **/
 
-
-#include <PiDxe.h>
-
-
-#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Uefi.h>
 #include <Library/DebugLib.h>
-
-#include "UefiRuntimeServicesTableLibInternal.h"
 
 EFI_RUNTIME_SERVICES  *gRT = NULL;
 
