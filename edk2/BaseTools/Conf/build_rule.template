@@ -254,9 +254,24 @@
         "$(ASLPP)" $(ASLPP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_dir}(+)${s_base}.i
         "$(ASL)" -p ${dst} $(ASL_FLAGS) ${d_path}(+)${s_dir}(+)${s_base}.i
 
+[C-Code-File.AcpiTable]
+    <InputFile>
+        ?.c
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_base}.acpi
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command.MSFT, Command.INTEL>
+        "$(ASLCC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        GenFw -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll
+
 [Acpi-Table-Code-File]
     <InputFile>
-        ?.aslc
+        ?.aslc, ?.act
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_base}.acpi
