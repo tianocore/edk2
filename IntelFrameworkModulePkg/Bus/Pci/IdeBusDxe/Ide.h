@@ -683,7 +683,7 @@ PioReadWriteData (
 EFI_STATUS
 AtapiTestUnitReady (
   IN  IDE_BLK_IO_DEV  *IdeDev,
-  OUT UINTN           *SenseCount
+  OUT SENSE_RESULT	  *SResult  
   )
 ;
 
@@ -715,7 +715,7 @@ AtapiRequestSense (
 EFI_STATUS
 AtapiReadCapacity (
   IN  IDE_BLK_IO_DEV  *IdeDev,
-  OUT UINTN           *SenseCount
+  OUT SENSE_RESULT	  *SResult  
   )
 ;
 
