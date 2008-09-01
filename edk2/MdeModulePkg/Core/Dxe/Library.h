@@ -16,38 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _DXE_LIBRARY_H_
 
 
-
-/**
-  Report status code of type EFI_PROGRESS_CODE by caller ID gEfiCallerIdGuid.
-
-  @param  Value              Describes the class/subclass/operation of the
-                             hardware or software entity that the Status Code
-                             relates to.
-
-**/
-VOID
-CoreReportProgressCode (
-  IN  EFI_STATUS_CODE_VALUE   Value
-  );
-
-
-/**
-  Report status code of type EFI_PROGRESS_CODE by caller ID gEfiCallerIdGuid,
-  with a handle as additional information.
-
-  @param  Value              Describes the class/subclass/operation of the
-                             hardware or software entity that the Status Code
-                             relates to.
-  @param  Handle             Additional information.
-
-**/
-VOID
-CoreReportProgressCodeSpecific (
-  IN  EFI_STATUS_CODE_VALUE   Value,
-  IN  EFI_HANDLE              Handle
-  );
-
-
 /**
   Raising to the task priority level of the mutual exclusion
   lock, and then acquires ownership of the lock.

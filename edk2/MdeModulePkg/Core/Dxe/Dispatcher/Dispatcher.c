@@ -492,14 +492,21 @@ CoreDispatcher (
 
       CoreReleaseDispatcherLock ();
 
-      CoreReportProgressCodeSpecific (
+ 
+      REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
+        EFI_PROGRESS_CODE,
         FixedPcdGet32(PcdStatusCodeValueDxeDriverBegin),
-        DriverEntry->ImageHandle
+        &DriverEntry->ImageHandle,
+        sizeof (DriverEntry->ImageHandle)
         );
+
       Status = CoreStartImage (DriverEntry->ImageHandle, NULL, NULL);
-      CoreReportProgressCodeSpecific (
+
+      REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
+        EFI_PROGRESS_CODE,
         FixedPcdGet32(PcdStatusCodeValueDxeDriverEnd),
-        DriverEntry->ImageHandle
+        &DriverEntry->ImageHandle,
+        sizeof (DriverEntry->ImageHandle)
         );
 
       ReturnStatus = EFI_SUCCESS;

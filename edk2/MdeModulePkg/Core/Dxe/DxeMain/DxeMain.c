@@ -303,7 +303,10 @@ DxeMain (
   //
   // Report Status Code here for DXE_ENTRY_POINT once it is available
   //
-  CoreReportProgressCode (FixedPcdGet32(PcdStatusCodeValueDxeCoreEntry));
+  REPORT_STATUS_CODE (
+    EFI_PROGRESS_CODE,
+    FixedPcdGet32(PcdStatusCodeValueDxeCoreEntry)
+    );
 
   //
   // Create the aligned system table pointer structure that is used by external
@@ -398,7 +401,10 @@ DxeMain (
   //
   // Report Status code before transfer control to BDS
   //
-  CoreReportProgressCode (FixedPcdGet32 (PcdStatusCodeValueDxeCoreHandoffToBds));
+  REPORT_STATUS_CODE (
+    EFI_PROGRESS_CODE,
+    FixedPcdGet32 (PcdStatusCodeValueDxeCoreHandoffToBds)
+    );
 
   //
   // Display any drivers that were not dispatched because dependency expression
@@ -720,9 +726,10 @@ CoreExitBootServices (
   //
   // Report that ExitBootServices() has been called
   //
-  // We are using gEfiCallerIdGuid as the caller ID for Dxe Core
-  //
-  CoreReportProgressCode (FixedPcdGet32 (PcdStatusCodeValueBootServiceExit));
+  REPORT_STATUS_CODE (
+    EFI_PROGRESS_CODE,
+    FixedPcdGet32 (PcdStatusCodeValueBootServiceExit)
+    );
 
   //
   // Clear the non-runtime values of the EFI System Table

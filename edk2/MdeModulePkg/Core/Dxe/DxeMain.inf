@@ -89,6 +89,7 @@
   MemoryAllocationLib
   UefiBootServicesTableLib
   DevicePathLib
+  ReportStatusCodeLib
 
 [Guids]
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED

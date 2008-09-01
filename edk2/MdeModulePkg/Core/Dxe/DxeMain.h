@@ -78,6 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #include "DebugImageInfo.h"
 #include "Library.h"
