@@ -36,18 +36,8 @@ EFI_GUID                           *gDxeCoreFileName;
 EFI_LOADED_IMAGE_PROTOCOL          *gDxeCoreLoadedImage;
 
 //
-// BugBug: I'n not runtime, but is the PPI?
-//
-EFI_STATUS_CODE_PROTOCOL     gStatusCodeInstance = {
-  NULL
-};
-
-EFI_STATUS_CODE_PROTOCOL     *gStatusCode    = &gStatusCodeInstance;
-
-//
 // DXE Core Module Variables
 //
-
 EFI_BOOT_SERVICES mBootServices = {
   {
     EFI_BOOT_SERVICES_SIGNATURE,                                                          // Signature
@@ -294,11 +284,6 @@ DxeMain (
   //
   Status = CoreInstallConfigurationTable (&gEfiMemoryTypeInformationGuid, &gMemoryTypeInformation);
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Initialize the ReportStatusCode with PEI version, if available
-  //
-  CoreGetPeiProtocol (&gEfiStatusCodeRuntimeProtocolGuid, (VOID **) &gStatusCode->ReportStatusCode);
 
   //
   // Report Status Code here for DXE_ENTRY_POINT once it is available
@@ -592,42 +577,6 @@ CoreEfiNotAvailableYetArg5 (
 }
 
 
-
-/**
-  Searches for a Protocol Interface passed from PEI through a HOB.
-
-  @param  ProtocolGuid           The Protocol GUID to search for in the HOB List
-  @param  Interface              A pointer to the interface for the Protocol GUID
-
-  @retval EFI_SUCCESS            The Protocol GUID was found and its interface is
-                                 returned in Interface
-  @retval EFI_NOT_FOUND          The Protocol GUID was not found in the HOB List
-
-**/
-EFI_STATUS
-CoreGetPeiProtocol (
-  IN EFI_GUID  *ProtocolGuid,
-  IN VOID      **Interface
-  )
-{
-  EFI_HOB_GUID_TYPE   *GuidHob;
-  VOID                *Buffer;
-
-  GuidHob = GetFirstGuidHob (ProtocolGuid);
-  if (GuidHob == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  Buffer = GET_GUID_HOB_DATA (GuidHob);
-  ASSERT (Buffer != NULL);
-
-  *Interface = (VOID *)(*(UINTN *)(Buffer));
-
-  return EFI_SUCCESS;
-}
-
-
-
 /**
   Calcualte the 32-bit CRC in a EFI table using the service provided by the
   gRuntime service.
@@ -652,8 +601,6 @@ CalculateEfiHdrCrc (
   gBS->CalculateCrc32 ((UINT8 *)Hdr, Hdr->HeaderSize, &Crc);
   Hdr->CRC32 = Crc;
 }
-
-
 
 
 /**

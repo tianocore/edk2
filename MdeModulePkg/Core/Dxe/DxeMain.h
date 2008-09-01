@@ -129,14 +129,6 @@ typedef struct {
   BOOLEAN                     Present;
 } ARCHITECTURAL_PROTOCOL_ENTRY;
 
-typedef struct {
-  EFI_STATUS_CODE_DATA  DataHeader;
-  EFI_HANDLE            Handle;
-} EFI_DXE_DEVICE_HANDLE_EXTENDED_DATA;
-
-#define EFI_STATUS_CODE_DXE_CORE_GUID \
-  { 0x335984bd, 0xe805, 0x409a, { 0xb8, 0xf8, 0xd2, 0x7e, 0xce, 0x5f, 0xf7, 0xa6 } }
-
 //
 // DXE Dispatcher Data structures
 //
@@ -213,7 +205,6 @@ extern EFI_METRONOME_ARCH_PROTOCOL              *gMetronome;
 extern EFI_TIMER_ARCH_PROTOCOL                  *gTimer;
 extern EFI_SECURITY_ARCH_PROTOCOL               *gSecurity;
 extern EFI_BDS_ARCH_PROTOCOL                    *gBds;
-extern EFI_STATUS_CODE_PROTOCOL                 *gStatusCode;
 
 extern EFI_TPL                                  gEfiCurrentTpl;
 
@@ -2098,24 +2089,6 @@ CoreEfiNotAvailableYetArg5 (
   UINTN Arg3,
   UINTN Arg4,
   UINTN Arg5
-  );
-
-
-/**
-  Searches for a Protocol Interface passed from PEI through a HOB.
-
-  @param  ProtocolGuid           The Protocol GUID to search for in the HOB List
-  @param  Interface              A pointer to the interface for the Protocol GUID
-
-  @retval EFI_SUCCESS            The Protocol GUID was found and its interface is
-                                 returned in Interface
-  @retval EFI_NOT_FOUND          The Protocol GUID was not found in the HOB List
-
-**/
-EFI_STATUS
-CoreGetPeiProtocol (
-  IN EFI_GUID  *ProtocolGuid,
-  IN VOID      **Interface
   );
 
 
