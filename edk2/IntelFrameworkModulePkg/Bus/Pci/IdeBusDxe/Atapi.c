@@ -805,7 +805,7 @@ PioReadWriteData (
 
   @param[in] *IdeDev     Pointer pointing to IDE_BLK_IO_DEV data structure, used
                          to record all the information of the IDE device.
-  @param[in] *SenseCount Sense count for this packet command
+  @param[in] *SResult    Sense result for this packet command.
 
   @retval EFI_SUCCESS      Device is accessible.
   @retval EFI_DEVICE_ERROR Device is not accessible.
@@ -814,13 +814,12 @@ PioReadWriteData (
 EFI_STATUS
 AtapiTestUnitReady (
   IN  IDE_BLK_IO_DEV  *IdeDev,
-  OUT UINTN           *SenseCount
+  OUT SENSE_RESULT    *SResult  
   )
 {
   ATAPI_PACKET_COMMAND  Packet;
   EFI_STATUS            Status;
-
-  *SenseCount = 0;
+  UINTN 				SenseCount;
 
   //
   // fill command packet
@@ -836,12 +835,12 @@ AtapiTestUnitReady (
     return Status;
   }
 
-  Status = AtapiRequestSense (IdeDev, SenseCount);
+  Status = AtapiRequestSense (IdeDev, &SenseCount);
   if (EFI_ERROR (Status)) {
-    *SenseCount = 0;
     return Status;
   }
 
+  ParseSenseData (IdeDev, SenseCount, SResult);
   return EFI_SUCCESS;
 }
 
@@ -964,7 +963,7 @@ AtapiRequestSense (
 
   @param[in] *IdeDev    Pointer pointing to IDE_BLK_IO_DEV data structure, used
                         to record all the information of the IDE device.
-  @param[in] SenseCount Sense count for this packet command
+  @param[in] SResult    Sense result for this packet command
 
   @retval EFI_SUCCESS      Read Capacity Command finally completes successfully.
   @retval EFI_DEVICE_ERROR Read Capacity Command failed because of device error.
@@ -976,7 +975,7 @@ AtapiRequestSense (
 EFI_STATUS
 AtapiReadCapacity (
   IN  IDE_BLK_IO_DEV  *IdeDev,
-  OUT UINTN               *SenseCount
+  OUT SENSE_RESULT	  *SResult  
   )
 {
   //
@@ -985,14 +984,13 @@ AtapiReadCapacity (
   EFI_STATUS                Status;
   EFI_STATUS                SenseStatus;
   ATAPI_PACKET_COMMAND      Packet;
+  UINTN 					SenseCount;
 
   //
   // used for capacity data returned from ATAPI device
   //
   ATAPI_READ_CAPACITY_DATA        Data;
   ATAPI_READ_FORMAT_CAPACITY_DATA FormatData;
-
-  *SenseCount = 0;
 
   ZeroMem (&Data, sizeof (Data));
   ZeroMem (&FormatData, sizeof (FormatData));
@@ -1026,16 +1024,15 @@ AtapiReadCapacity (
   }
 
   if (Status == EFI_TIMEOUT) {
-    *SenseCount = 0;
     return Status;
   }
 
-  SenseStatus = AtapiRequestSense (IdeDev, SenseCount);
+  SenseStatus = AtapiRequestSense (IdeDev, &SenseCount);
 
   if (!EFI_ERROR (SenseStatus)) {
-
-    if (!EFI_ERROR (Status)) {
-
+	ParseSenseData (IdeDev, SenseCount, SResult);			 
+															 
+	if (!EFI_ERROR (Status) && *SResult == SenseNoSenseKey) {
       if (IdeDev->Type == IdeCdRom) {
 
         IdeDev->BlkIo.Media->LastBlock = (Data.LastLba3 << 24) |
@@ -1043,18 +1040,7 @@ AtapiReadCapacity (
           (Data.LastLba1 << 8) |
           Data.LastLba0;
 
-        if (IdeDev->BlkIo.Media->LastBlock != 0) {
-
-          IdeDev->BlkIo.Media->BlockSize = (Data.BlockSize3 << 24) |
-            (Data.BlockSize2 << 16) |
-            (Data.BlockSize1 << 8) |
-            Data.BlockSize0;
-
-          IdeDev->BlkIo.Media->MediaPresent = TRUE;
-        } else {
-          IdeDev->BlkIo.Media->MediaPresent = FALSE;
-          return EFI_DEVICE_ERROR;
-        }
+		IdeDev->BlkIo.Media->MediaPresent = TRUE;
 
         IdeDev->BlkIo.Media->ReadOnly = TRUE;
 
@@ -1101,7 +1087,6 @@ AtapiReadCapacity (
     return EFI_SUCCESS;
 
   } else {
-    *SenseCount = 0;
     return EFI_DEVICE_ERROR;
   }
 }
@@ -1145,7 +1130,6 @@ AtapiDetectMedia (
   EFI_BLOCK_IO_MEDIA            OldMediaInfo;
   UINTN                         RetryTimes;
   UINTN                         RetryNotReady;
-  UINTN                         SenseCount;
   SENSE_RESULT                  SResult;
   BOOLEAN                       WriteProtected;
 
@@ -1168,7 +1152,7 @@ AtapiDetectMedia (
   RetryTimes = 5;
   while (RetryTimes != 0) {
 
-    Status = AtapiTestUnitReady (IdeDev, &SenseCount);
+    Status = AtapiTestUnitReady (IdeDev, &SResult);
 
     if (EFI_ERROR (Status)) {
       //
@@ -1189,9 +1173,6 @@ AtapiDetectMedia (
       //
       continue;
     } else {
-
-      ParseSenseData (IdeDev, SenseCount, &SResult);
-
       switch (SResult) {
       case SenseNoSenseKey:
         if (IdeDev->BlkIo.Media->MediaPresent) {
@@ -1245,15 +1226,12 @@ AtapiDetectMedia (
 
     while (RetryTimes != 0) {
 
-      Status = AtapiReadCapacity (IdeDev, &SenseCount);
+      Status = AtapiReadCapacity (IdeDev, &SResult);
 
       if (EFI_ERROR (Status)) {
         RetryTimes--;
         continue;
       } else {
-
-        ParseSenseData (IdeDev, SenseCount, &SResult);
-
         switch (SResult) {
         case SenseNoSenseKey:
           goto Done;
