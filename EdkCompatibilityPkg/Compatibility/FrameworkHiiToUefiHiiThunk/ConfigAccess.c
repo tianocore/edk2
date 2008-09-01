@@ -1,3 +1,4 @@
+
 /**@file
   This file contains functions related to Config Access Protocols installed by
   by HII Thunk Modules which is used to thunk UEFI Config Access Callback to 
@@ -644,13 +645,47 @@ CreateIfrDataArray (
   BUFFER_STORAGE_ENTRY              *BufferStorageEntry;
   LIST_ENTRY                        *Link;
   EFI_STATUS                        Status;
+  UINTN                             Size;
+  UINTN                             StringSize;
+  EFI_STRING                        String;
+
+  String = NULL;
 
   Link = GetFirstNode (&ConfigAccess->BufferStorageListHead);
   if (IsNull (&ConfigAccess->BufferStorageListHead, Link)) {
     return NULL;
   }
-  
-  IfrDataArray = AllocateZeroPool (0x100);
+
+  switch (Type) {
+    case EFI_IFR_TYPE_NUM_SIZE_8:
+    case EFI_IFR_TYPE_NUM_SIZE_16:
+    case EFI_IFR_TYPE_NUM_SIZE_32:
+    case EFI_IFR_TYPE_NUM_SIZE_64:
+    case EFI_IFR_TYPE_BOOLEAN:
+      Size = sizeof (*Value);
+      break;
+
+    case EFI_IFR_TYPE_STRING:
+      StringSize = 0;
+      Status = HiiLibGetString (ConfigAccess->ThunkContext->UefiHiiHandle, Value->string, String, &StringSize);
+      ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+
+      String = AllocateZeroPool (StringSize);
+      ASSERT (String != NULL);
+
+      Status = HiiLibGetString (ConfigAccess->ThunkContext->UefiHiiHandle, Value->string, String, &StringSize);
+      ASSERT_EFI_ERROR (Status);
+
+      Size = StringSize;
+      break;
+      
+    default:
+      ASSERT (FALSE);
+      Size = 0;
+      break;
+  }
+
+  IfrDataArray = AllocateZeroPool (sizeof (FRAMEWORK_EFI_IFR_DATA_ARRAY) + sizeof (FRAMEWORK_EFI_IFR_DATA_ENTRY) + Size);
   ASSERT (IfrDataArray != NULL);
 
   BufferStorageEntry = BUFFER_STORAGE_ENTRY_FROM_LINK(Link);
@@ -678,6 +713,11 @@ CreateIfrDataArray (
       CopyMem (&IfrDataEntry->Data, &(Value->u8), sizeof (*Value));
       break;
 
+    case EFI_IFR_TYPE_STRING:
+      ASSERT (String != NULL);
+      StrCpy ((CHAR16 *) &IfrDataEntry->Data, String);
+      FreePool (String);
+      break;
     default:
       ASSERT (FALSE);
       break;
