@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi.h>
 
 #include <Protocol/Print.h>
+#include <Protocol/Print2.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/FormBrowser2.h>
@@ -172,7 +173,7 @@ typedef struct {
   // Produced protocol
   //
   EFI_FORM_BROWSER2_PROTOCOL         FormBrowser2;
-  EFI_PRINT_PROTOCOL                 Print;
+  EFI_PRINT2_PROTOCOL                Print;
 
 } SETUP_DRIVER_PRIVATE_DATA;
 
@@ -454,7 +455,6 @@ extern UINTN                 gFunctionKeySetting;
 extern BOOLEAN               gResetRequired;
 extern BOOLEAN               gNvUpdateRequired;
 extern EFI_HII_HANDLE        gHiiHandle;
-extern BOOLEAN               gFirstIn;
 extern UINT16                gDirection;
 extern EFI_SCREEN_DESCRIPTOR gScreenDimensions;
 extern BOOLEAN               gUpArrow;
@@ -491,6 +491,7 @@ extern CHAR16            *gMiniString;
 extern CHAR16            *gPlusString;
 extern CHAR16            *gMinusString;
 extern CHAR16            *gAdjustNumber;
+extern CHAR16            *gSaveChanges;
 
 extern CHAR16            gPromptBlockWidth;
 extern CHAR16            gOptionBlockWidth;

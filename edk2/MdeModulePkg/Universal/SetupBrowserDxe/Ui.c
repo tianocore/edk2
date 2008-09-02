@@ -2828,6 +2828,7 @@ UiDisplayMenu (
 
       if (!EFI_ERROR (Status)) {
         Selection->Action = UI_ACTION_REFRESH_FORM;
+        Selection->Statement = NULL;
 
         //
         // Show NV update flag on status bar

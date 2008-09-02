@@ -69,6 +69,7 @@
 
 [Protocols]
   gEfiPrintProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
+  gEfiPrint2ProtocolGuid
   gEfiHiiConfigAccessProtocolGuid
   gEfiHiiStringProtocolGuid
   gEfiFormBrowser2ProtocolGuid

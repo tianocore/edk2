@@ -328,6 +328,7 @@ ProcessOptions (
     //
     // Initialize Option value array
     //
+
     if (Question->BufferValue[0] == 0) {
       GetQuestionDefault (Selection->FormSet, Selection->Form, Question, 0);
     }
