@@ -887,12 +887,16 @@ PlatformBdsEnterFrontPage (
     Status = ShowProgress (TimeoutDefault);
     gBS->RaiseTPL (TPL_APPLICATION);
 
+    //
+    // Ensure screen is clear when switch Console from Graphics mode to Text mode
+    //
+    gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+    gST->ConOut->ClearScreen (gST->ConOut);
+
     if (EFI_ERROR (Status)) {
       //
       // Timeout or user press enter to continue
       //
-      gST->ConOut->EnableCursor (gST->ConOut, TRUE);
-      gST->ConOut->ClearScreen (gST->ConOut);
       goto Exit;
     }
   }
