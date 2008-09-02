@@ -1250,19 +1250,9 @@ BdsStartBootMaint (
   BdsLibEnumerateAllBootOption (&BdsBootOptionList);
 
   //
-  // Drop the TPL level from TPL_APPLICATION to TPL_APPLICATION
-  //
-  gBS->RestoreTPL (TPL_APPLICATION);
-
-  //
   // Init the BMM
   //
   Status = InitializeBM ();
-
-  //
-  // Raise the TPL level back to TPL_APPLICATION
-  //
-  gBS->RaiseTPL (TPL_APPLICATION);
 
   return Status;
 }

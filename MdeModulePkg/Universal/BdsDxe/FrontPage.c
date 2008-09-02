@@ -467,12 +467,6 @@ CallFrontPage (
     (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_PC_INPUT_WAIT)
     );
 
-
-  //
-  // Drop the TPL level from TPL_APPLICATION to TPL_APPLICATION
-  //
-  gBS->RestoreTPL (TPL_APPLICATION);
-
   ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
   Status = gFormBrowser2->SendForm (
                             gFormBrowser2,
@@ -490,7 +484,6 @@ CallFrontPage (
     EnableResetRequired ();
   }
 
-  gBS->RaiseTPL (TPL_APPLICATION);
   return Status;
 }
 
@@ -883,9 +876,7 @@ PlatformBdsEnterFrontPage (
   }
 
   if (TimeoutDefault != 0xffff) {
-    gBS->RestoreTPL (TPL_APPLICATION);
     Status = ShowProgress (TimeoutDefault);
-    gBS->RaiseTPL (TPL_APPLICATION);
 
     //
     // Ensure screen is clear when switch Console from Graphics mode to Text mode
@@ -979,9 +970,7 @@ PlatformBdsEnterFrontPage (
   //
   //Will leave browser, check any reset required change is applied? if yes, reset system
   //
-  gBS->RestoreTPL (TPL_APPLICATION);
   SetupResetReminder ();
-  gBS->RaiseTPL (TPL_APPLICATION);
 
 Exit:
   //

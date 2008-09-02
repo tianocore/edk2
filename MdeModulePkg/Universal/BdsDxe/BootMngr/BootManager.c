@@ -255,11 +255,6 @@ CallBootManager (
     );
   FreePool (UpdateData.Data);
 
-  //
-  // Drop the TPL level from TPL_APPLICATION to TPL_APPLICATION
-  //
-  gBS->RestoreTPL (TPL_APPLICATION);
-
   ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
   Status = gFormBrowser2->SendForm (
                            gFormBrowser2,
@@ -275,7 +270,6 @@ CallBootManager (
   }
 
   if (gOption == NULL) {
-    gBS->RaiseTPL (TPL_APPLICATION);
     return ;
   }
 
@@ -283,11 +277,6 @@ CallBootManager (
   //Will leave browser, check any reset required change is applied? if yes, reset system
   //
   SetupResetReminder ();
-
-  //
-  // Raise the TPL level back to TPL_APPLICATION
-  //
-  gBS->RaiseTPL (TPL_APPLICATION);
 
   //
   // parse the selected option
@@ -304,11 +293,6 @@ CallBootManager (
                   gST->ConOut,
                   GetStringById (STRING_TOKEN (STR_ANY_KEY_CONTINUE))
                   );
-    gBS->RestoreTPL (TPL_APPLICATION);
-    //
-    // BdsLibUiWaitForSingleEvent (gST->ConIn->WaitForKey, 0);
-    //
-    gBS->RaiseTPL (TPL_APPLICATION);
     gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
   }
 }
