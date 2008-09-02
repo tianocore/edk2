@@ -24,7 +24,12 @@ SETUP_DRIVER_PRIVATE_DATA  mPrivateData = {
     BrowserCallback
   },
   {
-    UnicodeVSPrint
+    UnicodeVSPrint,
+    UnicodeVSPrintAsciiFormat,
+    UnicodeValueToString,                         
+    AsciiVSPrint,          
+    AsciiVSPrintUnicodeFormat,
+    AsciiValueToString
   }
 };
 
@@ -39,7 +44,6 @@ UINTN                 gFunctionKeySetting;
 BOOLEAN               gResetRequired;
 BOOLEAN               gNvUpdateRequired;
 EFI_HII_HANDLE        gHiiHandle;
-BOOLEAN               gFirstIn;
 UINT16                gDirection;
 EFI_SCREEN_DESCRIPTOR gScreenDimensions;
 BOOLEAN               gUpArrow;
@@ -76,6 +80,7 @@ CHAR16            *gMiniString;
 CHAR16            *gPlusString;
 CHAR16            *gMinusString;
 CHAR16            *gAdjustNumber;
+CHAR16            *gSaveChanges;
 
 CHAR16            gPromptBlockWidth;
 CHAR16            gOptionBlockWidth;
@@ -274,11 +279,8 @@ SendForm (
   //
   // Ensure we are in Text mode
   //
-  if (gFirstIn) {
-    gFirstIn = FALSE;
-    gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
-    DisableQuietBoot ();
-  }
+  gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
+  DisableQuietBoot ();
 
   for (Index = 0; Index < HandleCount; Index++) {
     Selection = AllocateZeroPool (sizeof (UI_MENU_SELECTION));
@@ -576,7 +578,6 @@ InitializeSetup (
   //
   // Initialize Driver private data
   //
-  gFirstIn = TRUE;
   BannerData = AllocateZeroPool (sizeof (BANNER_DATA));
   ASSERT (BannerData != NULL);
 
@@ -595,6 +596,19 @@ InitializeSetup (
   //
   // Install Print protocol
   //
+  Status = gBS->InstallProtocolInterface (
+                  &mPrivateData.Handle,
+                  &gEfiPrint2ProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mPrivateData.Print
+                  );
+
+  //
+  // Install Ecp Print protocol, which is defined in
+  // Edk\Foundation\Protocol\Print\Print.h with protocol
+  // GUID of { 0xdf2d868e, 0x32fc, 0x4cf0, {0x8e, 0x6b, 0xff, 0xd9, 0x5d, 0x13, 0x43, 0xd0 }}
+  // This is support previous module that written to consume this protocol.
+  // 
   Status = gBS->InstallProtocolInterface (
                   &mPrivateData.Handle,
                   &gEfiPrintProtocolGuid,
