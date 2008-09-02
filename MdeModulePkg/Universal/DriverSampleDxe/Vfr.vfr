@@ -276,7 +276,7 @@ formset
               flags    = INTERACTIVE,
               key      = 0x1236,
               minsize  = 6,
-              maxsize  = 20,
+              maxsize  = 40,
     endstring;
 
     //
@@ -392,7 +392,7 @@ formset
 
     date    year varid  = Date.Year,    // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
             prompt      = STRING_TOKEN(STR_DATE_PROMPT),
-            help        = STRING_TOKEN(STR_DATE_YEAR_HELP),
+            help        = STRING_TOKEN(STR_DATE_HELP),
             minimum     = 1998,
             maximum     = 2099,
             step        = 1,
@@ -400,7 +400,7 @@ formset
 
             month varid = Date.Month,    // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
             prompt      = STRING_TOKEN(STR_DATE_PROMPT),
-            help        = STRING_TOKEN(STR_DATE_MONTH_HELP),
+            help        = STRING_TOKEN(STR_DATE_HELP),
             minimum     = 1,
             maximum     = 12,
             step        = 1,
@@ -408,7 +408,7 @@ formset
 
             day varid   = Date.Day,          // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
             prompt      = STRING_TOKEN(STR_DATE_PROMPT),
-            help        = STRING_TOKEN(STR_DATE_DAY_HELP),
+            help        = STRING_TOKEN(STR_DATE_HELP),
             minimum     = 1,
             maximum     = 31,
             step        = 0x1,
@@ -445,7 +445,7 @@ formset
 
     time    hour varid  = Time.Hours,         // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
             prompt      = STRING_TOKEN(STR_TIME_PROMPT),
-            help        = STRING_TOKEN(STR_TIME_HOUR_HELP),
+            help        = STRING_TOKEN(STR_TIME_HELP),
             minimum     = 0,
             maximum     = 23,
             step        = 1,
@@ -453,7 +453,7 @@ formset
 
             minute varid  = Time.Minutes,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
             prompt        = STRING_TOKEN(STR_TIME_PROMPT),
-            help          = STRING_TOKEN(STR_TIME_MINUTE_HELP),
+            help          = STRING_TOKEN(STR_TIME_HELP),
             minimum       = 0,
             maximum       = 59,
             step          = 1,
@@ -461,7 +461,7 @@ formset
 
             second varid  = Time.Seconds,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
             prompt        = STRING_TOKEN(STR_TIME_PROMPT),
-            help          = STRING_TOKEN(STR_TIME_SECOND_HELP),
+            help          = STRING_TOKEN(STR_TIME_HELP),
             minimum       = 0,
             maximum       = 59,
             step          = 1,
