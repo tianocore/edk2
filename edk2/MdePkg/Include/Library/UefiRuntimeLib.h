@@ -139,7 +139,7 @@ EFIAPI
 EfiGetVariable (
   IN      CHAR16                   *VariableName,
   IN      EFI_GUID                 *VendorGuid,
-  OUT     UINT32                   *Attributes,
+  OUT     UINT32                   *Attributes OPTIONAL,
   IN OUT  UINTN                    *DataSize,
   OUT     VOID                     *Data
   );
@@ -220,6 +220,7 @@ EfiGetNextHighMonotonicCount (
 
 **/
 VOID
+EFIAPI
 EfiResetSystem (
   IN EFI_RESET_TYPE               ResetType,
   IN EFI_STATUS                   ResetStatus,
