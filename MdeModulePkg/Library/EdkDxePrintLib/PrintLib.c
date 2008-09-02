@@ -18,12 +18,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
-#include <Protocol/Print.h>
+#include <Protocol/Print2.h>
 
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-static EFI_PRINT_PROTOCOL  *gPrintProtocol = NULL;
+static EFI_PRINT2_PROTOCOL  *gPrintProtocol = NULL;
 
 EFI_STATUS
 EFIAPI
@@ -34,7 +34,7 @@ InternalLocatePrintProtocol (
 
   if (gPrintProtocol == NULL) {
     Status = gBS->LocateProtocol (
-                    &gEfiPrintProtocolGuid,
+                    &gEfiPrint2ProtocolGuid,
                     NULL,
                     (VOID **)&gPrintProtocol
                     );
