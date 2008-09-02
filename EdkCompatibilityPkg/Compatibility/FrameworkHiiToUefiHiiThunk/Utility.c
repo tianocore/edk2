@@ -328,6 +328,13 @@ CreateQuestionIdMap (
   ONE_OF_OPTION_MAP_ENTRY       *OneOfOptionMapEntry;
   EFI_IFR_GUID_CLASS            *Class;
   EFI_IFR_GUID_SUBCLASS         *SubClass;
+  UINT8                         OneOfType;
+  EFI_IFR_ONE_OF                *OneOfOpcode;
+
+  //
+  // Set to a invalid value.
+  //
+  OneOfType = (UINT8) -1;
   
 
   Status = HiiLibExportPackageLists (ThunkContext->UefiHiiHandle, &List, &Size);
@@ -402,6 +409,11 @@ CreateQuestionIdMap (
             InsertTailList (QuestionIdMapEntryListHead, &IdMapEntry->Link);
           }
 
+          if (OpCode->OpCode == EFI_IFR_ONE_OF_OP) {
+            OneOfOpcode = (EFI_IFR_ONE_OF *) OpCode;
+            OneOfType   = OneOfOpcode->Flags & EFI_IFR_NUMERIC_SIZE;
+          }
+
           break;
        
         case EFI_IFR_GUID_OP:
@@ -415,7 +427,12 @@ CreateQuestionIdMap (
 
                 OneOfOptionMap->Signature = ONE_OF_OPTION_MAP_SIGNATURE;
                 OneOfOptionMap->QuestionId = OptionMap->QuestionId;
-                OneOfOptionMap->ValueType = EFI_IFR_TYPE_NUM_SIZE_8;
+
+                //
+                // Make sure OneOfType is initialized.
+                //
+                ASSERT (OneOfType != (UINT8) -1);
+                OneOfOptionMap->ValueType = OneOfType;
                 InitializeListHead (&OneOfOptionMap->OneOfOptionMapEntryListHead);
                 OneOfOptinMapEntryListHead = &OneOfOptionMap->OneOfOptionMapEntryListHead;
                 InsertTailList (&ThunkContext->OneOfOptionMapListHead, &OneOfOptionMap->Link);
