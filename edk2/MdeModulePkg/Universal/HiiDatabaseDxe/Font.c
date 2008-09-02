@@ -1730,7 +1730,6 @@ HiiStringToImage (
         if (LineHeight < Cell[Index].Height) {
           LineHeight = (UINTN) Cell[Index].Height;
         }
-        BaseLineOffset += (UINTN) Cell[Index].OffsetY;
 
         if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0 &&
             (Flags & EFI_HII_OUT_FLAG_WRAP) == 0 &&
@@ -1799,7 +1798,7 @@ HiiStringToImage (
         if (Index > 0) {
           RowInfo[RowIndex].EndIndex       = Index - 1;
           RowInfo[RowIndex].LineWidth      = LineWidth - Cell[Index].AdvanceX;
-          RowInfo[RowIndex].BaselineOffset = BaseLineOffset - Cell[Index].OffsetY;
+          RowInfo[RowIndex].BaselineOffset = BaseLineOffset;
           if (LineHeight > Cell[Index - 1].Height) {
             LineHeight = Cell[Index - 1].Height;
           }
@@ -2497,10 +2496,10 @@ HiiGetFontInfo (
   FontInfo->FontStyle = InfoOut.FontInfo.FontStyle;
 
   if (IsFontInfoExisted (Private, FontInfo, &InfoOut.FontInfoMask, LocalFontHandle, &GlobalFont)) {
+    //
+    // Test to guarantee all characters are available in the found font.
+    //    
     if (String != NULL) {
-      //
-      // Test to guarantee all characters are available in the found font.
-      //
       StringIn = String;
       while (*StringIn != 0) {
         Status = FindGlyphBlock (GlobalFont->FontPackage, *StringIn, NULL, NULL, NULL);
@@ -2510,29 +2509,27 @@ HiiGetFontInfo (
         }
         StringIn++;
       }
-
-      //
-      // Write to output parameter
-      //
-      if (StringInfoOut != NULL) {
-        StringInfoOutLen = sizeof (EFI_FONT_DISPLAY_INFO) - sizeof (EFI_FONT_INFO) + GlobalFont->FontInfoSize;
-        *StringInfoOut   = (EFI_FONT_DISPLAY_INFO *) AllocateZeroPool (StringInfoOutLen);
-        if (*StringInfoOut == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          LocalFontHandle = NULL;
-          goto Exit;
-        }
-        CopyMem (*StringInfoOut, &InfoOut, sizeof (EFI_FONT_DISPLAY_INFO));
-        CopyMem (&(*StringInfoOut)->FontInfo, GlobalFont->FontInfo, GlobalFont->FontInfoSize);
-      }
-      LocalFontHandle = GlobalFont->Entry.ForwardLink;
-
-      Status = EFI_SUCCESS;
-      goto Exit;
     }
-  } else {
-    LocalFontHandle = NULL;
-  }
+    //
+    // Write to output parameter
+    //
+    if (StringInfoOut != NULL) {
+      StringInfoOutLen = sizeof (EFI_FONT_DISPLAY_INFO) - sizeof (EFI_FONT_INFO) + GlobalFont->FontInfoSize;
+      *StringInfoOut   = (EFI_FONT_DISPLAY_INFO *) AllocateZeroPool (StringInfoOutLen);      
+      if (*StringInfoOut == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        LocalFontHandle = NULL;
+        goto Exit;
+      }
+      
+      CopyMem (*StringInfoOut, &InfoOut, sizeof (EFI_FONT_DISPLAY_INFO));
+      CopyMem (&(*StringInfoOut)->FontInfo, GlobalFont->FontInfo, GlobalFont->FontInfoSize);
+    }
+    
+    LocalFontHandle = GlobalFont->Entry.ForwardLink;    
+    Status = EFI_SUCCESS;
+    goto Exit;
+  }  
 
   Status = EFI_NOT_FOUND;
 

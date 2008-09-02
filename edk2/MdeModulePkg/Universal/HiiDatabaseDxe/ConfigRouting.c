@@ -664,6 +664,7 @@ HiiConfigRoutingExtractConfig (
   EFI_STATUS                          Status;
   LIST_ENTRY                          *Link;
   HII_DATABASE_RECORD                 *Database;
+  UINT8                               *DevicePathPkg;
   UINT8                               *CurrentDevicePath;
   EFI_HANDLE                          DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
@@ -750,8 +751,9 @@ HiiConfigRoutingExtractConfig (
          Link = Link->ForwardLink
         ) {
       Database = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
-      CurrentDevicePath = Database->PackageList->DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
-      if (CurrentDevicePath != NULL) {
+   
+      if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
+        CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
         if (CompareMem (
               DevicePath,
               CurrentDevicePath,
@@ -877,7 +879,6 @@ HiiConfigRoutingExportConfig (
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
   EFI_STRING                          AccessResults;
-  UINTN                               TmpSize;
 
   //
   // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
@@ -943,9 +944,11 @@ HiiConfigRoutingExportConfig (
     // Generate a <ConfigRequest> with one <ConfigHdr> and zero <RequestElement>.
     // It means extract all possible configurations from this specific driver.
     //
-    TmpSize = StrLen (L"GUID=&NAME=&PATH=");
-    RequestSize   = (TmpSize + 32 +  StrLen (Storage->Name) * 4)
-                     * sizeof (CHAR16) + PathHdrSize;
+    RequestSize = (StrLen (L"GUID=&NAME=&PATH=") + 32) * sizeof (CHAR16) + PathHdrSize;
+    if (Storage->Name != NULL) {
+      RequestSize += StrLen (Storage->Name) * 4 * sizeof (CHAR16);
+    }
+    
     ConfigRequest = (EFI_STRING) AllocateZeroPool (RequestSize);
     if (ConfigRequest == NULL) {
       SafeFreePool (PathHdr);
@@ -976,10 +979,12 @@ HiiConfigRoutingExportConfig (
     StrnCpy (StringPtr, L"NAME=", StrLen (L"NAME="));
     StringPtr += StrLen (L"NAME=");
 
-    Length = (StrLen (Storage->Name) * 4 + 1) * sizeof (CHAR16);
-    Status = UnicodeToConfigString (StringPtr, &Length, Storage->Name);
-    ASSERT_EFI_ERROR (Status);
-    StringPtr += StrLen (Storage->Name) * 4;
+    if (Storage->Name != NULL) {
+      Length = (StrLen (Storage->Name) * 4 + 1) * sizeof (CHAR16);
+      Status = UnicodeToConfigString (StringPtr, &Length, Storage->Name);
+      ASSERT_EFI_ERROR (Status);
+      StringPtr += StrLen (Storage->Name) * 4;
+    }
     
     *StringPtr = L'&';
     StringPtr++;
@@ -1101,6 +1106,7 @@ HiiConfigRoutingRouteConfig (
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
   LIST_ENTRY                          *Link;
   HII_DATABASE_RECORD                 *Database;
+  UINT8                               *DevicePathPkg;
   UINT8                               *CurrentDevicePath;
   EFI_HANDLE                          DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
@@ -1180,8 +1186,9 @@ HiiConfigRoutingRouteConfig (
          Link = Link->ForwardLink
         ) {
       Database = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
-      CurrentDevicePath = Database->PackageList->DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
-      if (CurrentDevicePath != NULL) {
+
+      if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
+        CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
         if (CompareMem (
               DevicePath,
               CurrentDevicePath,
@@ -1355,7 +1362,19 @@ HiiBlockToConfig (
     Status = EFI_INVALID_PARAMETER;
     goto Exit;
   }
-  while (*StringPtr++ != L'&');
+
+  while (*StringPtr != L'&' && *StringPtr != 0) {
+    StringPtr++;
+  }
+  if (*StringPtr == 0) {
+    *Progress = StringPtr;
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
+  //
+  // Skip '&'
+  //
+  StringPtr++;
 
   //
   // Copy <ConfigHdr> and an additional '&' to <ConfigResp>
@@ -1604,7 +1623,19 @@ HiiConfigToBlock (
     Status = EFI_INVALID_PARAMETER;
     goto Exit;
   }
-  while (*StringPtr++ != L'&');
+
+  while (*StringPtr != L'&' && *StringPtr != 0) {
+    StringPtr++;
+  }
+  if (*StringPtr == 0) {
+    *Progress = StringPtr;
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
+  //
+  // Skip '&'
+  //
+  StringPtr++;
 
   //
   // Parse each <ConfigElement> if exists
