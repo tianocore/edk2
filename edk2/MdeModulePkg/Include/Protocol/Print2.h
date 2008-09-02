@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __PPRINT2_H__
 #define __PPRINT2_H__
 
-#define EFI_PRINT_PROTOCOL_GUID  \
+#define EFI_PRINT2_PROTOCOL_GUID  \
    { 0x5bcc3dbc, 0x8c57, 0x450a, { 0xbb, 0xc, 0xa1, 0xc0, 0xbd, 0xde, 0x48, 0xc } }
 
 //
