@@ -174,13 +174,9 @@ BootThisFile (
   //
   gST->ConOut->ClearScreen (gST->ConOut);
 
-  gBS->RaiseTPL (TPL_APPLICATION);
-
   ExitDataSize  = 0;
 
   Status        = BdsLibBootViaBootOption (Option, Option->DevicePath, &ExitDataSize, &ExitData);
-
-  gBS->RestoreTPL (TPL_APPLICATION);
 
   return Status;
 

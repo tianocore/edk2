@@ -348,11 +348,6 @@ CallDeviceManager (
     &UpdateData[0]
     );
 
-  //
-  // Drop the TPL level from TPL_APPLICATION to TPL_APPLICATION
-  //
-  gBS->RestoreTPL (TPL_APPLICATION);
-
   ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
   Status = gFormBrowser2->SendForm (
                            gFormBrowser2,
@@ -411,8 +406,6 @@ CallDeviceManager (
     FreePool (UpdateData[Index].Data);
   }
   FreePool (HiiHandles);
-
-  gBS->RaiseTPL (TPL_APPLICATION);
 
   return Status;
 }

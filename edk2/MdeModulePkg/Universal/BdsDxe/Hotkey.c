@@ -327,7 +327,6 @@ HotkeyCallback (
   BDS_COMMON_OPTION  *BootOption;
   UINTN              ExitDataSize;
   CHAR16             *ExitData;
-  EFI_TPL            OldTpl;
   EFI_STATUS         Status;
   EFI_KEY_DATA       *HotkeyData;
 
@@ -402,17 +401,9 @@ HotkeyCallback (
       //
       gST->ConOut->Reset (gST->ConOut, FALSE);
 
-      //
-      // BdsLibBootViaBootOption() is expected to be invoked at TPL level TPL_APPLICATION,
-      // so raise the TPL to TPL_APPLICATION first, then restore it
-      //
-      OldTpl = gBS->RaiseTPL (TPL_APPLICATION);
-
       mHotkeyCallbackPending = TRUE;
       Status = BdsLibBootViaBootOption (BootOption, BootOption->DevicePath, &ExitDataSize, &ExitData);
       mHotkeyCallbackPending = FALSE;
-
-      gBS->RestoreTPL (OldTpl);
 
       if (EFI_ERROR (Status)) {
         //
