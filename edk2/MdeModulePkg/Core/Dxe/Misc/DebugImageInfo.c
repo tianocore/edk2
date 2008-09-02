@@ -30,12 +30,6 @@ EFI_SYSTEM_TABLE_POINTER *mDebugTable = NULL;
   Creates and initializes the DebugImageInfo Table.  Also creates the configuration
   table and registers it into the system table.
 
-  Note:
-    This function allocates memory, frees it, and then allocates memory at an
-    address within the initial allocation. Since this function is called early
-    in DXE core initialization (before drivers are dispatched), this should not
-    be a problem.
-
 **/
 VOID
 CoreInitializeDebugImageInfoTable (
@@ -43,44 +37,13 @@ CoreInitializeDebugImageInfoTable (
   )
 {
   EFI_STATUS                          Status;
-  EFI_PHYSICAL_ADDRESS                Mem;
-  UINTN                               NumberOfPages;
 
   //
-  // Allocate boot services memory for the structure. It's required to be aligned on
-  // a 4M boundary, so allocate a 4M block (plus what we require), free it up, calculate
-  // a 4M aligned address within the memory we just freed, and then allocate memory at that
-  // address for our initial structure.
-  //
-  NumberOfPages = FOUR_MEG_PAGES + EFI_SIZE_TO_PAGES(sizeof (EFI_SYSTEM_TABLE_POINTER));
-
-  Status = CoreAllocatePages (AllocateAnyPages, EfiBootServicesData, NumberOfPages , &Mem);
-  ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR(Status)) {
-    return;
-  }
-  Status = CoreFreePages (Mem, NumberOfPages);
-  ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR(Status)) {
-    return;
-  }
-  //
-  // Now get a 4M aligned address within the memory range we were given.
-  // Then allocate memory at that address
-  //
-  Mem = (Mem + FOUR_MEG_MASK) & (~FOUR_MEG_MASK);
-
-  Status = CoreAllocatePages (AllocateAddress, EfiBootServicesData, NumberOfPages - FOUR_MEG_PAGES, &Mem);
-  ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR(Status)) {
-    return;
-  }
-  //
-  // We now have a 4M aligned page allocated, so fill in the data structure.
+  // Allocate 4M aligned page for the structure and fill in the data.
   // Ideally we would update the CRC now as well, but the service may not yet be available.
   // See comments in the CoreUpdateDebugTableCrc32() function below for details.
   //
-  mDebugTable = (EFI_SYSTEM_TABLE_POINTER *)(UINTN)Mem;
+  mDebugTable = AllocateAlignedPages (EFI_SIZE_TO_PAGES (sizeof (EFI_SYSTEM_TABLE_POINTER)), FOUR_MEG_ALIGNMENT); 
   mDebugTable->Signature = EFI_SYSTEM_TABLE_SIGNATURE;
   mDebugTable->EfiSystemTableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) gDxeCoreST;
   mDebugTable->Crc32 = 0;
