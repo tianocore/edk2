@@ -190,11 +190,6 @@ BdsLibBootViaBootOption (
     DevicePath = Option->DevicePath;
   }
 
-  //
-  // Drop the TPL level from TPL_APPLICATION to TPL_APPLICATION
-  //
-  gBS->RestoreTPL (TPL_APPLICATION);
-
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Booting %S\n", Option->Description));
 
   Status = gBS->LoadImage (
@@ -284,11 +279,6 @@ Done:
         0,
         &Option->BootCurrent
         );
-
-  //
-  // Raise the TPL level back to TPL_APPLICATION
-  //
-  gBS->RaiseTPL (TPL_APPLICATION);
 
   return Status;
 }
