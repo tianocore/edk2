@@ -85,7 +85,6 @@
   PrintLib
 
 [Protocols]
-  gEfiHiiProtocolGuid
   gEfiHiiImageProtocolGuid
   gEfiHiiDatabaseProtocolGuid
   gEfiHiiStringProtocolGuid
@@ -94,7 +93,8 @@
   gEfiHiiConfigAccessProtocolGuid
   gEfiFormCallbackProtocolGuid
   gEfiUnicodeCollation2ProtocolGuid
-  gEfiFormBrowserProtocolGuid
+  gEfiHiiCompatibilityProtocolGuid
+  gEfiFormBrowserCompatibilityProtocolGuid
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND
