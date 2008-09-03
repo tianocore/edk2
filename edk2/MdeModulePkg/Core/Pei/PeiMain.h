@@ -147,14 +147,9 @@ typedef struct{
   BOOLEAN                            PeiMemoryInstalled;
   EFI_PHYSICAL_ADDRESS               StackBase;
   UINT64                             StackSize;
-  VOID                               *BottomOfCarHeap;
-  VOID                               *TopOfCarHeap;
   VOID                               *CpuIo;
   EFI_PEI_SECURITY2_PPI              *PrivateSecurityPpi;
   EFI_PEI_SERVICES                   ServiceTableShadow;
-  UINTN                              SizeOfTemporaryMemory;
-  UINTN                              SizeOfCacheAsRam;
-  VOID                               *MaxTopOfCarHeap;
   EFI_PEI_PPI_DESCRIPTOR             *XipLoadFile;
   EFI_PHYSICAL_ADDRESS               PhysicalMemoryBegin;
   UINT64                             PhysicalMemoryLength;

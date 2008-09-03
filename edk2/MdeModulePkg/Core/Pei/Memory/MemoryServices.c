@@ -34,7 +34,7 @@ InitializeMemoryServices (
   )
 {
   
-  PrivateData->SwitchStackSignal      = FALSE;
+  PrivateData->SwitchStackSignal    = FALSE;
 
   //
   // First entering PeiCore, following code will initialized some field
@@ -43,24 +43,11 @@ InitializeMemoryServices (
   if (OldCoreData == NULL) {
 
     PrivateData->PeiMemoryInstalled = FALSE;
-
-    PrivateData->BottomOfCarHeap        = SecCoreData->PeiTemporaryRamBase; 
-    PrivateData->TopOfCarHeap           = (VOID *)((UINTN)(PrivateData->BottomOfCarHeap) + SecCoreData->PeiTemporaryRamSize);
-    PrivateData->SizeOfTemporaryMemory  = SecCoreData->TemporaryRamSize;
-    PrivateData->StackSize              = (UINT64) SecCoreData->StackSize;
-    
-    DEBUG_CODE_BEGIN ();
-      PrivateData->SizeOfCacheAsRam = SecCoreData->PeiTemporaryRamSize + SecCoreData->StackSize;
-      PrivateData->MaxTopOfCarHeap  = (VOID *) ((UINTN) PrivateData->BottomOfCarHeap + (UINTN) PrivateData->SizeOfCacheAsRam);
-      PrivateData->StackBase        = (EFI_PHYSICAL_ADDRESS) (UINTN) SecCoreData->StackBase;
-      PrivateData->StackSize        = (UINT64) SecCoreData->StackSize;
-    DEBUG_CODE_END ();
-
-    PrivateData->HobList.Raw = PrivateData->BottomOfCarHeap;
+    PrivateData->HobList.Raw        = SecCoreData->PeiTemporaryRamBase;
     
     PeiCoreBuildHobHandoffInfoTable (
       BOOT_WITH_FULL_CONFIGURATION,
-      (EFI_PHYSICAL_ADDRESS) (UINTN) PrivateData->BottomOfCarHeap,
+      (EFI_PHYSICAL_ADDRESS) (UINTN) SecCoreData->PeiTemporaryRamBase,
       (UINTN) SecCoreData->PeiTemporaryRamSize
       );
 
