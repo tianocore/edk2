@@ -1,6 +1,9 @@
 /** @file
   PEI Services Table Pointer Library for IA-32 and X64.
 
+  According to PI specification, the peiservice pointer is stored prior at IDT
+  table in IA32 and x64 architecture.
+  
   Copyright (c) 2006 - 2007, Intel Corporation.<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
