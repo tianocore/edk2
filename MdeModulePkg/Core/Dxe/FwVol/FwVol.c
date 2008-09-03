@@ -182,7 +182,7 @@ FvCheck (
   EFI_STATUS                            Status;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb;
   EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
-  EFI_FVB_ATTRIBUTES                    FvbAttributes;
+  EFI_FVB_ATTRIBUTES_2                  FvbAttributes;
   EFI_FV_BLOCK_MAP_ENTRY                *BlockMap;
   FFS_FILE_LIST_ENTRY                   *FfsFileEntry;
   EFI_FFS_FILE_HEADER                   *FfsHeader;

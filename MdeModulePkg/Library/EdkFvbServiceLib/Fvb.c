@@ -452,7 +452,7 @@ EfiFvbEraseBlock (
 EFI_STATUS
 EfiFvbGetVolumeAttributes (
   IN UINTN                                Instance,
-  OUT EFI_FVB_ATTRIBUTES                  *Attributes
+  OUT EFI_FVB_ATTRIBUTES_2                *Attributes
   )
 {
   ASSERT (Attributes != NULL);
@@ -474,7 +474,7 @@ EfiFvbGetVolumeAttributes (
 
    @param Instance        The FV instance whose attributes is going to be
                           modified
-   @param Attributes      On input, it is a pointer to EFI_FVB_ATTRIBUTES
+   @param Attributes      On input, it is a pointer to EFI_FVB_ATTRIBUTES_2
                           containing the desired firmware volume settings.
                           On successful return, it contains the new settings
                           of the firmware volume
@@ -486,7 +486,7 @@ EfiFvbGetVolumeAttributes (
 EFI_STATUS
 EfiFvbSetVolumeAttributes (
   IN     UINTN                                Instance,
-  IN OUT EFI_FVB_ATTRIBUTES                   *Attributes
+  IN OUT EFI_FVB_ATTRIBUTES_2                 *Attributes
   )
 {
   ASSERT (Attributes != NULL);

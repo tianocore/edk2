@@ -80,7 +80,7 @@ EFI_STATUS
 EFIAPI
 FwVolBlockGetAttributes (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
-  OUT       EFI_FVB_ATTRIBUTES                  *Attributes
+  OUT       EFI_FVB_ATTRIBUTES_2                *Attributes
   );
 
 
@@ -102,7 +102,7 @@ EFI_STATUS
 EFIAPI
 FwVolBlockSetAttributes (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
-  IN CONST  EFI_FVB_ATTRIBUTES                  *Attributes
+  IN CONST  EFI_FVB_ATTRIBUTES_2                *Attributes
   );
 
 
