@@ -35,6 +35,11 @@
     0xd7ad636e, 0xb997, 0x459b, {0xbf, 0x3f, 0x88, 0x46, 0x89, 0x79, 0x80, 0xe1} \
   }
 
+#define EFI_HII_COMPATIBILITY_PROTOCOL_GUID \
+  { \
+    0x5542cce1, 0xdf5c, 0x4d1b, { 0xab, 0xca, 0x36, 0x4f, 0x77, 0xd3, 0x99, 0xfb } \
+  }
+
 // BugBug:
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // If UGA goes away we need to put this some place. I'm not sure where?
@@ -819,5 +824,7 @@ struct _EFI_HII_PROTOCOL {
 };
 
 extern EFI_GUID gEfiHiiProtocolGuid;
+extern EFI_GUID gEfiHiiCompatibilityProtocolGuid;
+
 
 #endif
