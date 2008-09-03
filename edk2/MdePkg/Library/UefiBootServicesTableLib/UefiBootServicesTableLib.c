@@ -1,5 +1,6 @@
 /** @file
-  UEFI Boot Services Table Library.
+  This library retrieve the EFI_BOOT_SERVICES pointer from EFI system table in 
+  library's constructor.
 
   Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -17,7 +18,6 @@
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
-#include "UefiBootServicesTableLibInternal.h"
 
 EFI_HANDLE         gImageHandle = NULL;
 EFI_SYSTEM_TABLE   *gST         = NULL;
