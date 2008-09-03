@@ -35,7 +35,7 @@ typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
 ///
 /// type of EFI FVB attribute
 /// 
-typedef UINT32  EFI_FVB_ATTRIBUTES;
+typedef UINT32  EFI_FVB_ATTRIBUTES_2;
 
 // 
 // Attributes bit definitions
@@ -103,7 +103,7 @@ typedef struct {
   EFI_GUID                  FileSystemGuid;
   UINT64                    FvLength;
   UINT32                    Signature;
-  EFI_FVB_ATTRIBUTES        Attributes;
+  EFI_FVB_ATTRIBUTES_2      Attributes;
   UINT16                    HeaderLength;
   UINT16                    Checksum;
   UINT16                    ExtHeaderOffset;

@@ -103,7 +103,7 @@ EFI_STATUS
 EFIAPI
 EfiFvbGetVolumeAttributes (
   IN UINTN                                Instance,
-  OUT EFI_FVB_ATTRIBUTES                  *Attributes
+  OUT EFI_FVB_ATTRIBUTES_2                *Attributes
   );
 
 
@@ -112,7 +112,7 @@ EfiFvbGetVolumeAttributes (
   input parameter, and returns the new setting of the volume.
 
   @param[in]     Instance    The FV instance.
-  @param[in, out]Attributes  On input, it is a pointer to EFI_FVB_ATTRIBUTES 
+  @param[in, out]Attributes  On input, it is a pointer to EFI_FVB_ATTRIBUTES_2 
                              containing the desired firmware volume settings.
                              On successful return, it contains the new settings
                              of the firmware volume.
@@ -125,7 +125,7 @@ EFI_STATUS
 EFIAPI
 EfiFvbSetVolumeAttributes (
   IN     UINTN                                Instance,
-  IN OUT EFI_FVB_ATTRIBUTES                   *Attributes
+  IN OUT EFI_FVB_ATTRIBUTES_2                   *Attributes
   );
 
 
