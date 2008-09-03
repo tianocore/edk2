@@ -163,6 +163,28 @@ Index: drivers/drivers.c
    ShellCloseHandleEnumerator ();
    LibCheckVarFreeVarList (&ChkPck);
    LibUnInitializeStrings ();
+Index: edit/libFileBuffer.c
+===================================================================
+--- edit/libFileBuffer.c	(revision 30)
++++ edit/libFileBuffer.c	(working copy)
+@@ -735,7 +735,7 @@
+   UINTN                           LineSize;
+   VOID                            *Buffer;
+   CHAR16                          *UnicodeBuffer;
+-  CHAR8                           *AsciiBuffer;
++  UINT8                           *AsciiBuffer;
+   UINTN                           FileSize;
+   EFI_FILE_HANDLE                 Handle;
+   BOOLEAN                         CreateFile;
+@@ -1047,7 +1047,7 @@
+       //
+       // Unicode file
+       //
+-      if (AsciiBuffer[0] == 0xff && AsciiBuffer[1] == 0xfe) {
++      if ((FileSize >= 2) && (*((UINT16 *) Buffer) == EFI_UNICODE_BYTE_ORDER_MARK)) {
+         //
+         // Unicode file's size should be even
+         //
 Index: Library/EfiShellLib.h
 ===================================================================
 --- Library/EfiShellLib.h	(revision 30)
@@ -315,6 +337,43 @@ Index: Library/Misc.c
 +
 +
 +
+Index: shellenv/batch.c
+===================================================================
+--- shellenv/batch.c	(revision 30)
++++ shellenv/batch.c	(working copy)
+@@ -2074,17 +2074,17 @@
+ --*/
+ {
+   //
+-  // UNICODE byte-order-mark is two bytes
++  // UNICODE byte-order-mark is 16 bits
+   //
+-  CHAR8       Buffer8[2];
++  UINT16      Uint16;
+   UINTN       BufSize;
+   EFI_STATUS  Status;
+ 
+   //
+   //  Read the first two bytes to check for byte order mark
+   //
+-  BufSize = sizeof (Buffer8);
+-  Status  = File->Read (File, &BufSize, Buffer8);
++  BufSize = sizeof (Uint16);
++  Status  = File->Read (File, &BufSize, &Uint16);
+   if (EFI_ERROR (Status)) {
+     return Status;
+   }
+@@ -2098,9 +2098,8 @@
+   //  otherwise assume it is ASCII.  UNICODE byte order mark on
+   //  IA little endian is first byte 0xff and second byte 0xfe
+   //
+-  if ((Buffer8[0] | (Buffer8[1] << 8)) == EFI_UNICODE_BYTE_ORDER_MARK) {
++  if ((BufSize == 2) && (Uint16 == EFI_UNICODE_BYTE_ORDER_MARK)) {
+     *IsAscii = FALSE;
+-
+   } else {
+     *IsAscii = TRUE;
+   }
 Index: SmbiosView/PrintInfo.c
 ===================================================================
 --- SmbiosView/PrintInfo.c	(revision 30)
