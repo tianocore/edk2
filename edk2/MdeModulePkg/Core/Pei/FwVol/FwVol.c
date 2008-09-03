@@ -307,6 +307,7 @@ PeiInitializeFv (
   @param Ppi               Address of the PPI that was installed.
 
   @retval EFI_SUCCESS    The FV Info is registered into PeiCore private data structure.
+  @return if not EFI_SUCESS, fail to verify FV.
 
 **/
 EFI_STATUS
@@ -342,6 +343,13 @@ FirmwareVolmeInfoPpiNotifyCallback (
         return EFI_SUCCESS;
       }
     }
+    
+    Status = VerifyFv ((EFI_FIRMWARE_VOLUME_HEADER*)Fv->FvInfo);
+    if (EFI_ERROR(Status)) {
+      DEBUG ((EFI_D_ERROR, "Fail to verify FV which address is 0x%11p", (VOID *) Fv->FvInfo));
+      return Status;
+    }
+    
     PrivateData->Fv[PrivateData->FvCount++].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Fv->FvInfo;
 
     //
