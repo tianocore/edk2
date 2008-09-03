@@ -32,6 +32,11 @@
     0xe5a1333e, 0xe1b4, 0x4d55, {0xce, 0xeb, 0x35, 0xc3, 0xef, 0x13, 0x34, 0x43 } \
   }
 
+#define EFI_FORM_BROWSER_COMPATIBILITY_PROTOCOL_GUID \
+  { \
+    0xe5a1333e, 0xe1b4, 0x4d55, {0xce, 0xeb, 0x35, 0xc3, 0xef, 0x13, 0x34, 0x43 } \
+  }
+
 typedef struct _EFI_FORM_BROWSER_PROTOCOL EFI_FORM_BROWSER_PROTOCOL;
 
 typedef struct {
@@ -158,5 +163,7 @@ struct _EFI_FORM_BROWSER_PROTOCOL {
 };
 
 extern EFI_GUID gEfiFormBrowserProtocolGuid;
+extern EFI_GUID gEfiFormBrowserCompatibilityProtocolGuid;
+
 
 #endif
