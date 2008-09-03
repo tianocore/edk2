@@ -1,6 +1,9 @@
 /** @file
   UEFI Runtime Services Table Library.
 
+  This library instance retrieve EFI_RUNTIME_SERVICES pointer from EFI system table
+  in library's constructor.
+
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
