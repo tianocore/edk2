@@ -463,7 +463,7 @@ PeiDispatcher (
               //
               // Reserve the size of new stack at bottom of physical memory
               //
-              OldPeiStackSize = Private->StackSize;
+              OldPeiStackSize = (UINT64) SecCoreData->StackSize;
               NewPeiStackSize = (RShiftU64 (Private->PhysicalMemoryLength, 1) + EFI_PAGE_MASK) & ~EFI_PAGE_MASK;
               if (FixedPcdGet32(PcdPeiCoreMaxPeiStackSize) > (UINT32) NewPeiStackSize) {
                 Private->StackSize = NewPeiStackSize;
