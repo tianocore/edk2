@@ -1,6 +1,7 @@
 /** @file
   Provides the services to get the entry point to a PE/COFF image that has either been 
-  loaded into memory or is executing at it¡¯s linked address
+  loaded into memory or is executing at it's linked address.
+
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
