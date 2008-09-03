@@ -821,3 +821,137 @@ PeiFfsGetVolumeInfo (
   return EFI_SUCCESS;
 }
 
+/**
+  Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
+
+  @param PeiServices          An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param FvFileHandle         File handle of a Fv type file.
+  @param AuthenticationState  Pointer to attestation authentication state of image.
+
+
+  @retval EFI_NOT_FOUND         FV image can't be found.
+  @retval EFI_SUCCESS           Successfully to process it.
+  @retval EFI_OUT_OF_RESOURCES  Can not allocate page when aligning FV image
+  @retval Others                Can not find EFI_SECTION_FIRMWARE_VOLUME_IMAGE section
+  
+**/
+EFI_STATUS
+ProcessFvFile (
+  IN  EFI_PEI_SERVICES      **PeiServices,
+  IN  EFI_PEI_FILE_HANDLE   FvFileHandle,
+  OUT UINT32                *AuthenticationState
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PEI_FV_HANDLE     FvImageHandle;
+  EFI_FV_INFO           FvImageInfo;
+  UINT32                FvAlignment;
+  VOID                  *FvBuffer;
+  EFI_PEI_HOB_POINTERS  HobPtr;
+
+  FvBuffer             = NULL;
+  *AuthenticationState = 0;
+
+  //
+  // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
+  // been extracted.
+  //
+  HobPtr.Raw = GetHobList ();
+  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobPtr.Raw)) != NULL) {
+    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &HobPtr.FirmwareVolume2->FileName)) {
+      //
+      // this FILE has been dispatched, it will not be dispatched again.
+      //
+      return EFI_SUCCESS;
+    }
+    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
+  }
+
+  //
+  // Find FvImage in FvFile
+  //
+  Status = PeiFfsFindSectionData (
+             (CONST EFI_PEI_SERVICES **) PeiServices,
+             EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+             FvFileHandle,
+             (VOID **)&FvImageHandle
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  //
+  // Collect FvImage Info.
+  //
+  Status = PeiFfsGetVolumeInfo (FvImageHandle, &FvImageInfo);
+  ASSERT_EFI_ERROR (Status);
+  
+  //
+  // FvAlignment must be more than 8 bytes required by FvHeader structure.
+  //
+  FvAlignment = 1 << ((FvImageInfo.FvAttributes & EFI_FVB2_ALIGNMENT) >> 16);
+  if (FvAlignment < 8) {
+    FvAlignment = 8;
+  }
+  
+  //
+  // Check FvImage
+  //
+  if ((UINTN) FvImageInfo.FvStart % FvAlignment != 0) {
+    FvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvImageInfo.FvSize), FvAlignment);
+    if (FvBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    CopyMem (FvBuffer, FvImageInfo.FvStart, (UINTN) FvImageInfo.FvSize);
+    //
+    // Update FvImageInfo after reload FvImage to new aligned memory
+    //
+    PeiFfsGetVolumeInfo ((EFI_PEI_FV_HANDLE) FvBuffer, &FvImageInfo);
+  }
+
+  //
+  // Install FvPpi and Build FvHob
+  //
+  PiLibInstallFvInfoPpi (
+    NULL,
+    FvImageInfo.FvStart,
+    (UINT32) FvImageInfo.FvSize,
+    &(FvImageInfo.FvName),
+    &(((EFI_FFS_FILE_HEADER*)FvFileHandle)->Name)
+    );
+
+  //
+  // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
+  // based on its parent Fvimage is informed or not.
+  // If FvHob of its parent fvimage is built, the extracted FvImage will be built also. 
+  // Or, the extracted FvImage will not be built.
+  //
+  HobPtr.Raw = GetHobList ();
+  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV, HobPtr.Raw)) != NULL) {
+    if (((EFI_PHYSICAL_ADDRESS) (UINTN)FvFileHandle > HobPtr.FirmwareVolume->BaseAddress) && 
+        ((EFI_PHYSICAL_ADDRESS) (UINTN)FvFileHandle < HobPtr.FirmwareVolume->BaseAddress + HobPtr.FirmwareVolume->Length)) {
+      BuildFvHob (
+        (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
+        FvImageInfo.FvSize
+      );
+      break;
+    }
+    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
+  }
+
+  //
+  // Makes the encapsulated volume show up in DXE phase to skip processing of
+  // encapsulated file again.
+  //
+  BuildFv2Hob (
+    (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
+    FvImageInfo.FvSize,
+    &FvImageInfo.FvName,
+    &(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name)
+    );
+
+  return EFI_SUCCESS;
+}
+
+
