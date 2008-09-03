@@ -1,5 +1,9 @@
 /** @file
-  DXE Library.
+  This library produce EFI_DXE_SERVICE pointer in global EFI system table. It should
+  be linked to a DXE driver who use gBS.
+  
+  This library contains contruct function to retrieve EFI_DXE_SERIVCE, this construct
+  function will be invoked in DXE driver's autogen file.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -17,8 +21,6 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
-
-#include "DxeServicesTableLibInternal.h"
 
 //
 // Cache copy of the DXE Services Table

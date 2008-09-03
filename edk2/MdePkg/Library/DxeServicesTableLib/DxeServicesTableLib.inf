@@ -1,8 +1,7 @@
 #/** @file
-# Component description file for Dxe Services Table Library.
-#
 # DXE Services Table Library that retrieves a pointer to the DXE Services
-#  Table from the Configuration Table in the EFI System Table.
+# Table from the Configuration Table in the EFI System Table.
+#
 # Copyright (c) 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
