@@ -1,5 +1,5 @@
 /** @file
-  Base Post Code Library instance based on Debug Library.
+  The instance of Post Code Library that layers on top of a Debug Library instance.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials                          
@@ -12,10 +12,7 @@
 
 **/
 
-
-
 #include <Base.h>
-
 
 #include <Library/PostCodeLib.h>
 #include <Library/DebugLib.h>
@@ -36,7 +33,7 @@
 
   @param   Value  The 32-bit value to write to the POST card.
 
-  @return  Value  The 32-bit value to write to the POST card.
+  @return  The 32-bit value to write to the POST card.
 
 **/
 UINT32
@@ -71,7 +68,7 @@ PostCode (
                        POST code value.  This is an optional parameter that may 
                        be NULL.
 
-  @return  Value       The 32-bit value to write to the POST card.
+  @return The 32-bit value to write to the POST card.
 
 **/
 UINT32

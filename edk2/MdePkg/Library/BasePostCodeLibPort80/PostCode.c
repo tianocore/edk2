@@ -12,10 +12,7 @@
 
 **/
 
-
-
 #include <Base.h>
-
 
 #include <Library/PostCodeLib.h>
 #include <Library/PcdLib.h>
@@ -36,7 +33,7 @@
 
   @param  Value  The 32-bit value to write to the POST card.
 
-  @return  Value The 32-bit value to write to the POST card.
+  @return The 32-bit value to write to the POST card.
 
 **/
 UINT32
@@ -71,7 +68,7 @@ PostCode (
                        POST code value.  This is an optional parameter that may 
                        be NULL. Ihis parameter is ignored in this implementation. 
 
-  @return  Value       The 32-bit value to write to the POST card.
+  @return The 32-bit value to write to the POST card.
 
 **/
 UINT32
