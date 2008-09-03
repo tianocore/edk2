@@ -35,7 +35,7 @@ FvGetVolumeAttributes (
   EFI_STATUS                                Status;
   FV_DEVICE                                 *FvDevice;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL        *Fvb;
-  EFI_FVB_ATTRIBUTES                        FvbAttributes;
+  EFI_FVB_ATTRIBUTES_2                      FvbAttributes;
 
   FvDevice = FV_DEVICE_FROM_THIS (This);
   Fvb = FvDevice->Fvb;
