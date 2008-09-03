@@ -31,9 +31,9 @@ typedef struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL EFI_FIRMWARE_VOLUME_BLOCK_PRO
 
   @param This       Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
 
-  @param Attributes Pointer to EFI_FVB_ATTRIBUTES in which the
+  @param Attributes Pointer to EFI_FVB_ATTRIBUTES_2 in which the
                     attributes and current settings are
-                    returned. Type EFI_FVB_ATTRIBUTES is defined
+                    returned. Type EFI_FVB_ATTRIBUTES_2 is defined
                     in EFI_FIRMWARE_VOLUME_HEADER.
 
   @retval EFI_SUCCESS The firmware volume attributes were
@@ -44,7 +44,7 @@ typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_GET_ATTRIBUTES)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
-  OUT       EFI_FVB_ATTRIBUTES                  *Attributes
+  OUT       EFI_FVB_ATTRIBUTES_2                *Attributes
 );
 
 
@@ -55,11 +55,11 @@ EFI_STATUS
   @param This         Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
 
   @param Attributes   On input, Attributes is a pointer to
-                      EFI_FVB_ATTRIBUTES that contains the
+                      EFI_FVB_ATTRIBUTES_2 that contains the
                       desired firmware volume settings. On
                       successful return, it contains the new
                       settings of the firmware volume. Type
-                      EFI_FVB_ATTRIBUTES is defined in
+                      EFI_FVB_ATTRIBUTES_2 is defined in
                       EFI_FIRMWARE_VOLUME_HEADER.
   
   @retval EFI_SUCCESS           The firmware volume attributes were returned.
@@ -74,7 +74,7 @@ typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_SET_ATTRIBUTES)(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
-  IN OUT    EFI_FVB_ATTRIBUTES                  *Attributes
+  IN OUT    EFI_FVB_ATTRIBUTES_2                *Attributes
 );
 
 

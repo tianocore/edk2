@@ -513,15 +513,12 @@ EFI_STATUS
 
   @param FileName       A pointer to the name of the file to
                         find within the firmware volume.
-
   @param VolumeHandle   The firmware volume to search FileHandle
                         Upon exit, points to the found file's
                         handle or NULL if it could not be found.
 
   @retval EFI_SUCCESS             File was found.
-
   @retval EFI_NOT_FOUND           File was not found.
-
   @retval EFI_INVALID_PARAMETER   VolumeHandle or FileHandle or
                                   FileName was NULL.
 
@@ -538,20 +535,16 @@ EFI_STATUS
 /**
    
   @param FileName   Name of the file.
-
   @param FileType   File type. See EFI_FV_FILETYPE, which is
                     defined in the Platform Initialization
                     Firmware Storage Specification.
-
   @param FileAttributes   Attributes of the file. Type
                           EFI_FV_FILE_ATTRIBUTES is defined in
                           the Platform Initialization Firmware
                           Storage Specification.
-
   @param Buffer   Points to the file's data (not the header).
                   Not valid if EFI_FV_FILE_ATTRIB_MEMORY_MAPPED
                   is zero.
-
   @param BufferSize   Size of the file's data.
 
 **/
@@ -564,22 +557,18 @@ typedef struct {
 } EFI_FV_FILE_INFO;
 
 /**
-   
   This function returns information about a specific file,
   including its file name, type, attributes, starting address and
   size. If the firmware volume is not memory mapped then the
   Buffer member will be NULL.
 
   @param FileHandle   Handle of the file.
-
   @param FileInfo     Upon exit, points to the file's
                       information.
 
   @retval EFI_SUCCESS             File information returned.
-  
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
   
 **/
@@ -594,7 +583,7 @@ EFI_STATUS
 /**
    
   @param FvAttributes   Attributes of the firmware volume. Type
-                        EFI_FVB_ATTRIBUTES is defined in the
+                        EFI_FVB_ATTRIBUTES_2 is defined in the
                         Platform Initialization Firmware Storage
                         Specficiation.
 
@@ -616,11 +605,11 @@ EFI_STATUS
 
 **/
 typedef struct {
-  EFI_FVB_ATTRIBUTES  FvAttributes;
-  EFI_GUID            FvFormat;
-  EFI_GUID            FvName;
-  VOID                *FvStart;
-  UINT64              FvSize;
+  EFI_FVB_ATTRIBUTES_2  FvAttributes;
+  EFI_GUID              FvFormat;
+  EFI_GUID              FvName;
+  VOID                  *FvStart;
+  UINT64                FvSize;
 } EFI_FV_INFO;
 
 /**
@@ -635,10 +624,8 @@ typedef struct {
                         information.
 
   @retval EFI_SUCCESS             File information returned.
-  
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
 
 **/
@@ -664,14 +651,12 @@ EFI_STATUS
   @param FileHandle   PEIM's file handle. Must be the currently
                       executing PEIM.
   
-  @retval EFI_SUCCESS   The PEIM was successfully registered for
-                        shadowing.
-
+  @retval EFI_SUCCESS           The PEIM was successfully registered for
+                                shadowing.
   @retval EFI_ALREADY_STARTED   The PEIM was previously
                                 registered for shadowing.
-
-  @retval EFI_NOT_FOUND   The FileHandle does not refer to a
-                          valid file handle.
+  @retval EFI_NOT_FOUND         The FileHandle does not refer to a
+                                valid file handle.
 
 **/
 typedef
