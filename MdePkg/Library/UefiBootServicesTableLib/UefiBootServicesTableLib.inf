@@ -1,7 +1,9 @@
 #/** @file
 # UEFI Boot Services Table Library
-#
-# Library to abstract Framework extensions that conflict with UEFI 2.0 Specification
+# 
+# This library retrieve the EFI_BOOT_SERVICES pointer from EFI system table in 
+# library's constructor.
+# 
 # Copyright (c) 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -32,7 +34,6 @@
 
 [Sources.common]
   UefiBootServicesTableLib.c
-  UefiBootServicesTableLibInternal.h
 
 [Packages]
   MdePkg/MdePkg.dec
