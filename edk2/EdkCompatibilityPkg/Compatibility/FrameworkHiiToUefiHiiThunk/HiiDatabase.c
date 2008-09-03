@@ -104,7 +104,8 @@ Returns:
   HII_THUNK_CONTEXT       *ThunkContext;
   
 
-  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiProtocolGuid);
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiHiiCompatibilityProtocolGuid);
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiFormBrowserCompatibilityProtocolGuid);
 
   Private = AllocateCopyPool (sizeof (HII_THUNK_PRIVATE_DATA), &mHiiThunkPrivateDataTempate);
   ASSERT (Private != NULL);
@@ -158,7 +159,7 @@ Returns:
   //
   Status = gBS->InstallProtocolInterface (
                   &Private->Handle,
-                  &gEfiHiiProtocolGuid,
+                  &gEfiHiiCompatibilityProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   (VOID *) &Private->Hii
                   );
@@ -229,7 +230,7 @@ Returns:
   mBrowserThunkPrivateDataTemplate.ThunkPrivate = Private;
   Status = gBS->InstallProtocolInterface (
                   &mBrowserThunkPrivateDataTemplate.Handle,
-                  &gEfiFormBrowserProtocolGuid,
+                  &gEfiFormBrowserCompatibilityProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   (VOID *) &mBrowserThunkPrivateDataTemplate.FormBrowser
                   );
