@@ -22,8 +22,7 @@
 STATIC EFI_PEI_SERVICES  **gPeiServices;
 
 /**
-  The function set the pointer of PEI services immediately preceding the IDT table
-  according to PI specification.
+  The function cache the pointer of PEI services to global variable.
   
   @param    PeiServices   The address of PeiServices pointer.
 **/
