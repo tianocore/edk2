@@ -1,7 +1,7 @@
 /** @file
-  Tiano PE/COFF loader.
-
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Provides the services to get the entry point to a PE/COFF image that has either been 
+  loaded into memory or is executing at it¡¯s linked address
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,7 +14,6 @@
 
 
 #include <Base.h>
-
 
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/DebugLib.h>
@@ -52,7 +51,7 @@ PeCoffLoaderGetEntryPoint (
   ASSERT (EntryPoint != NULL);
 
   DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
-  if (EFI_IMAGE_DOS_SIGNATURE == DosHdr->e_magic) {
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //
     // DOS image header is present, so read the PE header after the DOS image header.
     //
@@ -104,7 +103,7 @@ PeCoffLoaderGetMachineType (
   ASSERT (Pe32Data != NULL);
 
   DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
-  if (EFI_IMAGE_DOS_SIGNATURE == DosHdr->e_magic) {
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //
     // DOS image header is present, so read the PE header after the DOS image header.
     //
@@ -116,9 +115,9 @@ PeCoffLoaderGetMachineType (
     Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
   }
 
-  if (EFI_TE_IMAGE_HEADER_SIGNATURE == Hdr.Te->Signature) {
+  if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
     return Hdr.Te->Machine;
-  } else if (EFI_IMAGE_NT_SIGNATURE == Hdr.Pe32->Signature)  {
+  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
     return Hdr.Pe32->FileHeader.Machine;
   }
 
@@ -168,7 +167,7 @@ PeCoffLoaderGetPdbPointer (
   NumberOfRvaAndSizes = 0;
 
   DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
-  if (EFI_IMAGE_DOS_SIGNATURE == DosHdr->e_magic) {
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //
     // DOS image header is present, so read the PE header after the DOS image header.
     //
@@ -180,7 +179,7 @@ PeCoffLoaderGetPdbPointer (
     Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
   }
 
-  if (EFI_TE_IMAGE_HEADER_SIGNATURE == Hdr.Te->Signature) {
+  if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
     if (Hdr.Te->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress != 0) {
       DirectoryEntry  = &Hdr.Te->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG];
       TEImageAdjust   = sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize;
@@ -188,7 +187,7 @@ PeCoffLoaderGetPdbPointer (
                     Hdr.Te->DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress +
                     TEImageAdjust);
     }
-  } else if (EFI_IMAGE_NT_SIGNATURE == Hdr.Pe32->Signature) {
+  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
     //
     // NOTE: We use Machine field to identify PE32/PE32+, instead of Magic.
     //       It is due to backward-compatibility, for some system might
@@ -215,7 +214,7 @@ PeCoffLoaderGetPdbPointer (
       Magic = Hdr.Pe32->OptionalHeader.Magic;
     }
 
-    if (EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC == Magic) {
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset get Debug Directory Entry
       //
@@ -239,7 +238,7 @@ PeCoffLoaderGetPdbPointer (
     return NULL;
   }
 
-  if (NULL == DebugEntry || NULL == DirectoryEntry) {
+  if (DebugEntry == NULL || DirectoryEntry == NULL) {
     return NULL;
   }
 
