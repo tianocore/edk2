@@ -1,5 +1,8 @@
 /** @file
   PEI Services Table Pointer Library.
+  
+  This library is used for PEIM which does executed from flash device directly but
+  executed in memory.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -15,8 +18,6 @@
 #include <PiPei.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/DebugLib.h>
-
-#include "PeiServicesTablePointerInternal.h"
 
 STATIC EFI_PEI_SERVICES  **gPeiServices;
 
