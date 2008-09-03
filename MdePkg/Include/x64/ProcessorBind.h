@@ -31,11 +31,22 @@
 
 #if __INTEL_COMPILER
 //
+// Disable ICC's remark #593: "LocalVariable" was set but never used
+// This is legal ANSI C code so we disable the remark that is turned on with -Wall
+//
+#pragma warning ( disable : 593 )
+
+//
+// Disable ICC's remark #869: "Parameter" was never referenced warning.
+// This is legal ANSI C code so we disable the remark that is turned on with -Wall
+//
+#pragma warning ( disable : 869 )
+
+//
 // Disable ICC's remark #1418: external function definition with no prior declaration.
 // This is legal ANSI C code so we disable the remark that is turned on with /W4
 //
 #pragma warning ( disable : 1418 )
-
 
 //
 // Disable ICC's remark #1419: external declaration in primary source file
@@ -46,8 +57,8 @@
 #endif
 
 
-#if _MSC_EXTENSIONS 
-    
+#if _MSC_EXTENSIONS
+
 //
 // Disable warning that make it impossible to compile at /W4
 // This only works for Microsoft* tools
