@@ -33,13 +33,10 @@
 
 [Sources]
   PeiServicesTablePointer.c
-  InternalPeiServicesTablePointer.h
 
 
 [LibraryClasses]
   DebugLib
-  BaseMemoryLib
-  PeiServicesLib
   BaseLib
 
 
