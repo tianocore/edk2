@@ -100,7 +100,7 @@ UpdateCheckBoxStringToken (
   EFI_STATUS              Status;
 
   ASSERT (Statement != NULL);
-  ASSERT (Statement->Operand == EFI_IFR_CHECKBOX_OP);
+  ASSERT (Statement->Operand == EFI_IFR_NUMERIC_OP);
   
   UnicodeValueToString (Str, 0, Statement->VarStoreInfo.VarName, MAXIMUM_VALUE_CHARACTERS - 1);
   
@@ -186,7 +186,7 @@ CreateQuestion (
   // Framework Compatibility
   //
   if (FeaturePcdGet (PcdFrameworkHiiCompatibilitySupport)) {
-    if ((*OpCodeData == EFI_IFR_CHECKBOX_OP) && IsNextOpCodeGuidedVarEqName (OpCodeData)) {
+    if ((*OpCodeData == EFI_IFR_NUMERIC_OP) && IsNextOpCodeGuidedVarEqName (OpCodeData)) {
       Status = UpdateCheckBoxStringToken (FormSet, Statement);
       if (EFI_ERROR (Status)) {
         return NULL;
