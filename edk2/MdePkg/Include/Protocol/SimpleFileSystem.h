@@ -63,8 +63,7 @@ EFI_STATUS
 (EFIAPI *EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME)(
   IN EFI_SIMPLE_FILE_SYSTEM_PROTOCOL    *This,
   OUT EFI_FILE_PROTOCOL                 **Root
-  )
-;
+  );
 
 #define EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION  0x00010000
 ///
@@ -105,8 +104,7 @@ EFI_STATUS
   IN CHAR16                   *FileName,
   IN UINT64                   OpenMode,
   IN UINT64                   Attributes
-  )
-;
+  );
 
 //
 // Open modes
@@ -138,8 +136,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_FILE_CLOSE)(
   IN EFI_FILE  *This
-  )
-;
+  );
 
 /**
   Close and delete the file handle
@@ -154,8 +151,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_FILE_DELETE)(
   IN EFI_FILE  *This
-  )
-;
+  );
 
 /**
   Read data from the file.
@@ -177,8 +173,7 @@ EFI_STATUS
   IN EFI_FILE_PROTOCOL        *This,
   IN OUT UINTN                *BufferSize,
   OUT VOID                    *Buffer
-  )
-;
+  );
 
 /**
   Write data from to the file.
@@ -203,8 +198,7 @@ EFI_STATUS
   IN EFI_FILE_PROTOCOL        *This,
   IN OUT UINTN                *BufferSize,
   IN VOID                     *Buffer
-  )
-;
+  );
 
 /**
   Set a files current position
@@ -221,8 +215,7 @@ EFI_STATUS
 (EFIAPI *EFI_FILE_SET_POSITION)(
   IN EFI_FILE_PROTOCOL        *This,
   IN UINT64                   Position
-  )
-;
+  );
 
 /**
   Get a files current position
@@ -239,8 +232,7 @@ EFI_STATUS
 (EFIAPI *EFI_FILE_GET_POSITION)(
   IN EFI_FILE_PROTOCOL        *This,
   OUT UINT64                  *Position
-  )
-;
+  );
 
 /**
   Get information about a file
@@ -267,8 +259,7 @@ EFI_STATUS
   IN EFI_GUID                 *InformationType,
   IN OUT UINTN                *BufferSize,
   OUT VOID                    *Buffer
-  )
-;
+  );
 
 /**
   Set information about a file
@@ -294,8 +285,7 @@ EFI_STATUS
   IN EFI_GUID                 *InformationType,
   IN UINTN                    BufferSize,
   IN VOID                     *Buffer
-  )
-;
+  );
 
 /**
   Flush data back for the file handle
@@ -316,8 +306,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_FILE_FLUSH)(
   IN EFI_FILE  *This
-  )
-;
+  );
 
 #define EFI_FILE_PROTOCOL_REVISION   0x00010000
 //

@@ -71,8 +71,7 @@ EFI_STATUS
 SkipVGAAperture (
   OUT UINT64   *Start,
   IN  UINT64   Length
-  )
-;
+  );
 
 /**
   This function is used to skip ISA aliasing aperture
@@ -86,8 +85,7 @@ EFI_STATUS
 SkipIsaAliasAperture (
   OUT UINT64   *Start,
   IN  UINT64   Length
-  )
-;
+  );
 
 /**
   This function inserts a resource node into the resource list.
@@ -102,8 +100,7 @@ EFI_STATUS
 InsertResourceNode (
   PCI_RESOURCE_NODE *Bridge,
   PCI_RESOURCE_NODE *ResNode
-  )
-;
+  );
 
 /**
 
@@ -130,8 +127,7 @@ MergeResourceTree (
   PCI_RESOURCE_NODE *Dst,
   PCI_RESOURCE_NODE *Res,
   BOOLEAN           TypeMerge
-  )
-;
+  );
 
 /**
   This function is used to calculate the IO16 aperture
@@ -144,8 +140,7 @@ MergeResourceTree (
 EFI_STATUS
 CalculateApertureIo16 (
   IN PCI_RESOURCE_NODE *Bridge
-  )
-;
+  );
 
 /**
   This function is used to calculate the resource aperture
@@ -158,8 +153,7 @@ CalculateApertureIo16 (
 EFI_STATUS
 CalculateResourceAperture (
   IN PCI_RESOURCE_NODE *Bridge
-  )
-;
+  );
 
 /**
   Get IO/Memory resource infor for given PCI device
@@ -181,8 +175,7 @@ GetResourceFromDevice (
   PCI_RESOURCE_NODE *PMem32Node,
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
-  )
-;
+  );
 
 /**
   This function is used to create a resource node
@@ -202,8 +195,7 @@ CreateResourceNode (
   IN UINT8                 Bar,
   IN PCI_BAR_TYPE          ResType,
   IN PCI_RESOURCE_USAGE    ResUsage
-  )
-;
+  );
 
 /**
   This routine is used to extract resource request from
@@ -226,8 +218,7 @@ CreateResourceMap (
   IN PCI_RESOURCE_NODE *PMem32Node,
   IN PCI_RESOURCE_NODE *Mem64Node,
   IN PCI_RESOURCE_NODE *PMem64Node
-  )
-;
+  );
 
 /**
   This function is used to do the resource padding for a specific platform
@@ -249,8 +240,7 @@ ResourcePaddingPolicy (
   PCI_RESOURCE_NODE *PMem32Node,
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
-  )
-;
+  );
 
 /**
   This function is used to degrade resource if the upstream bridge 
@@ -275,8 +265,7 @@ DegradeResource (
   IN PCI_RESOURCE_NODE *PMem32Node,
   IN PCI_RESOURCE_NODE *Mem64Node,
   IN PCI_RESOURCE_NODE *PMem64Node
-  )
-;
+  );
 
 /**
   Test whether bridge device support decode resource
@@ -291,8 +280,7 @@ BOOLEAN
 BridgeSupportResourceDecode (
   IN PCI_IO_DEVICE *Bridge,
   IN UINT32        Decode
-  )
-;
+  );
 
 /**
   This function is used to program the resource allocated 
@@ -308,8 +296,7 @@ EFI_STATUS
 ProgramResource (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Bridge
-  )
-;
+  );
 
 /**
   Program Bar register.
@@ -323,8 +310,7 @@ EFI_STATUS
 ProgramBar (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
-  )
-;
+  );
 
 /**
   Program PPB apperture
@@ -338,8 +324,7 @@ EFI_STATUS
 ProgramPpbApperture (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
-  )
-;
+  );
 
 /**
   Program parent bridge for oprom
@@ -355,8 +340,7 @@ ProgrameUpstreamBridgeForRom (
   IN PCI_IO_DEVICE   *PciDevice,
   IN UINT32          OptionRomBase,
   IN BOOLEAN         Enable
-  )
-;
+  );
 
 /**
   Test whether resource exists for a bridge
@@ -368,8 +352,7 @@ ProgrameUpstreamBridgeForRom (
 BOOLEAN
 ResourceRequestExisted (
   IN PCI_RESOURCE_NODE *Bridge
-  )
-;
+  );
 
 /**
   Initialize resource pool structure.
@@ -381,8 +364,7 @@ EFI_STATUS
 InitializeResourcePool (
   PCI_RESOURCE_NODE   *ResourcePool,
   PCI_BAR_TYPE        ResourceType
-  )
-;
+  );
 
 /**
   Get all resource information for given Pci device
@@ -414,8 +396,7 @@ GetResourceMap (
   PCI_RESOURCE_NODE  *PMem32Pool,
   PCI_RESOURCE_NODE  *Mem64Pool,
   PCI_RESOURCE_NODE  *PMem64Pool
-  )
-;
+  );
 
 /**
   Destory given resource tree
@@ -427,8 +408,7 @@ GetResourceMap (
 EFI_STATUS
 DestroyResourceTree (
   IN PCI_RESOURCE_NODE *Bridge
-  )
-;
+  );
 
 /**
   Record the reserved resource and insert to reserved list.
@@ -444,8 +424,7 @@ RecordReservedResource (
   IN UINT64         Length,
   IN PCI_BAR_TYPE   ResType,
   IN PCI_IO_DEVICE  *Bridge
-  )
-;
+  );
 
 /**
   Insert resource padding for P2C
@@ -467,8 +446,7 @@ ResourcePaddingForCardBusBridge (
   PCI_RESOURCE_NODE *PMem32Node,
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
-  )
-;
+  );
 
 /**
   Program P2C register for given resource node
@@ -482,8 +460,7 @@ EFI_STATUS
 ProgramP2C (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
-  )
-;
+  );
 
 /**
   Create padding resource node.
@@ -506,8 +483,7 @@ ApplyResourcePadding (
   PCI_RESOURCE_NODE *PMem32Node,
   PCI_RESOURCE_NODE *Mem64Node,
   PCI_RESOURCE_NODE *PMem64Node
-  )
-;
+  );
 
 /**
   Get padding resource for PPB
@@ -519,8 +495,7 @@ ApplyResourcePadding (
 VOID
 GetResourcePaddingPpb (
   IN  PCI_IO_DEVICE                  *PciIoDevice
-  )
-;
+  );
 
 /**
   Reset and all bus number from specific bridge.
@@ -532,7 +507,6 @@ EFI_STATUS
 ResetAllPpbBusNumber (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber
-  )
-;
+  );
 
 #endif

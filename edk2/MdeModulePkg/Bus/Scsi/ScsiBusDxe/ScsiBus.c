@@ -60,8 +60,7 @@ EFIAPI
 ScsiioToPassThruPacket (
   IN      EFI_SCSI_IO_SCSI_REQUEST_PACKET         *Packet,
   IN OUT  EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *CommandPacket
-  )
-;
+  );
 
 
 STATIC
@@ -70,16 +69,14 @@ EFIAPI
 PassThruToScsiioPacket (
   IN     EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *ScsiPacket,
   IN OUT EFI_SCSI_IO_SCSI_REQUEST_PACKET         *Packet
-  )
-;
+  );
 STATIC
 VOID
 EFIAPI
 NotifyFunction (
   EFI_EVENT  Event,
   VOID       *Context
-  )
-;
+  );
 
 /**
   The user Entry Point for module ScsiBus. The user code starts with this function.

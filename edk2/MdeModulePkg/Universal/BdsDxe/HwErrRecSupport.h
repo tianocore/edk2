@@ -34,7 +34,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID
 InitializeHwErrRecSupport (
   IN UINT16       HwErrRecSupportLevel
-  )
-;
+  );
 
 #endif

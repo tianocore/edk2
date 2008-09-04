@@ -111,8 +111,7 @@ UINT16
 UhciReadReg (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
   IN UINT32                  Offset
-  )
-;
+  );
 
 
 
@@ -131,8 +130,7 @@ UhciWriteReg (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
   IN UINT32                  Offset,
   IN UINT16                  Data
-  )
-;
+  );
 
 
 
@@ -151,8 +149,7 @@ UhciSetRegBit (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
   IN UINT32                  Offset,
   IN UINT16                  Bit
-  )
-;
+  );
 
 
 
@@ -171,8 +168,7 @@ UhciClearRegBit (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
   IN UINT32                  Offset,
   IN UINT16                  Bit
-  )
-;
+  );
 
 
 /**
@@ -187,8 +183,7 @@ UhciClearRegBit (
 VOID
 UhciAckAllInterrupt (
   IN  USB_HC_DEV          *Uhc
-  )
-;
+  );
 
 
 /**
@@ -205,8 +200,7 @@ EFI_STATUS
 UhciStopHc (
   IN USB_HC_DEV         *Uhc,
   IN UINTN              Timeout
-  )
-;
+  );
 
 
 
@@ -222,8 +216,7 @@ UhciStopHc (
 BOOLEAN
 UhciIsHcWorking (
   IN EFI_PCI_IO_PROTOCOL     *PciIo
-  )
-;
+  );
 
 
 /**
@@ -240,8 +233,7 @@ VOID
 UhciSetFrameListBaseAddr (
   IN EFI_PCI_IO_PROTOCOL     *PciIo,
   IN VOID                    *Addr
-  )
-;
+  );
 
 
 /**
@@ -255,6 +247,5 @@ UhciSetFrameListBaseAddr (
 VOID
 UhciTurnOffUsbEmulation (
   IN EFI_PCI_IO_PROTOCOL     *PciIo
-  )
-;
+  );
 #endif

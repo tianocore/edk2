@@ -109,8 +109,7 @@ EFI_STATUS
   OUT UINT8                 *MaxSpeed,
   OUT UINT8                 *PortNumber,
   OUT UINT8                 *Is64BitCapable
-  )
-;
+  );
 
 #define EFI_USB_HC_RESET_GLOBAL             0x0001
 #define EFI_USB_HC_RESET_HOST_CONTROLLER    0x0002
@@ -139,8 +138,7 @@ EFI_STATUS
 (EFIAPI *EFI_USB2_HC_PROTOCOL_RESET)(
   IN EFI_USB2_HC_PROTOCOL   *This,
   IN UINT16                 Attributes
-  )
-;
+  );
 
 /**
 
@@ -200,8 +198,7 @@ EFI_STATUS
 (EFIAPI *EFI_USB2_HC_PROTOCOL_GET_STATE)(
   IN CONST  EFI_USB2_HC_PROTOCOL    *This,
   OUT       EFI_USB_HC_STATE        *State
-)
-;
+);
 
 /**
   Sets the USB host controller to a specific state.
@@ -220,8 +217,7 @@ EFI_STATUS
 (EFIAPI *EFI_USB2_HC_PROTOCOL_SET_STATE)(
   IN EFI_USB2_HC_PROTOCOL    *This,
   IN EFI_USB_HC_STATE        State
-  )
-;
+  );
 
 /**
   Submits control transfer to a target USB device.
@@ -266,8 +262,7 @@ EFI_STATUS
   IN     UINTN                              TimeOut,
   IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator,
   OUT    UINT32                             *TransferResult
-  )
-;
+  );
 
 #define EFI_USB_MAX_BULK_BUFFER_NUM 10
 
@@ -315,8 +310,7 @@ EFI_STATUS
   IN     UINTN                              TimeOut,
   IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator,
   OUT    UINT32                             *TransferResult
-  )
-;
+  );
 
 /**
   Submits an asynchronous interrupt transfer to an interrupt endpoint of a USB device.
@@ -365,8 +359,7 @@ EFI_STATUS
   IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR                  *Translator      OPTIONAL,
   IN     EFI_ASYNC_USB_TRANSFER_CALLBACK                     CallBackFunction OPTIONAL,
   IN     VOID                                                *Context         OPTIONAL
-  )
-;
+  );
 
 /**
   Submits synchronous interrupt transfer to an interrupt endpoint of a USB device.
@@ -412,8 +405,7 @@ EFI_STATUS
   IN     UINTN                                       TimeOut,
   IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR          *Translator,
   OUT    UINT32                                      *TransferResult
-  )
-;
+  );
 
 #define EFI_USB_MAX_ISO_BUFFER_NUM  7
 #define EFI_USB_MAX_ISO_BUFFER_NUM1 2
@@ -457,8 +449,7 @@ EFI_STATUS
   IN     UINTN                              DataLength,
   IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator,
   OUT    UINT32                             *TransferResult
-  )
-;
+  );
 
 /**
   Submits nonblocking isochronous transfer to an isochronous endpoint of a USB device.
@@ -502,8 +493,7 @@ EFI_STATUS
   IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator,
   IN     EFI_ASYNC_USB_TRANSFER_CALLBACK    IsochronousCallBack,
   IN     VOID                               *Context OPTIONAL
-  )
-;
+  );
 
 /**
   Retrieves the current status of a USB root hub port.
@@ -524,8 +514,7 @@ EFI_STATUS
   IN CONST  EFI_USB2_HC_PROTOCOL    *This,
   IN CONST  UINT8                   PortNumber,
   OUT       EFI_USB_PORT_STATUS     *PortStatus
-  )
-;
+  );
 
 /**
   Sets a feature for the specified root hub port.
@@ -546,8 +535,7 @@ EFI_STATUS
   IN EFI_USB2_HC_PROTOCOL    *This,
   IN UINT8                   PortNumber,
   IN EFI_USB_PORT_FEATURE    PortFeature
-  )
-;
+  );
 
 /**
   Clears a feature for the specified root hub port.
@@ -568,8 +556,7 @@ EFI_STATUS
   IN EFI_USB2_HC_PROTOCOL    *This,
   IN UINT8                   PortNumber,
   IN EFI_USB_PORT_FEATURE    PortFeature
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

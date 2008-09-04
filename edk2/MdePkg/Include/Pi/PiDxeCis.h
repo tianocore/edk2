@@ -183,8 +183,7 @@ EFI_STATUS
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
   IN UINT64                Capabilities
-  )
-;
+  );
 
 /**
   Allocates nonexistent memory, reserved memory, system memory, or memorymapped
@@ -226,8 +225,7 @@ EFI_STATUS
   IN OUT EFI_PHYSICAL_ADDRESS                *BaseAddress,
   IN     EFI_HANDLE                          ImageHandle,
   IN     EFI_HANDLE                          DeviceHandle OPTIONAL
-  )
-;
+  );
 
 /**
   Frees nonexistent memory, reserved memory, system memory, or memory-mapped
@@ -252,8 +250,7 @@ EFI_STATUS
 (EFIAPI *EFI_FREE_MEMORY_SPACE)(
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
-  )
-;
+  );
 
 /**
   Removes reserved memory, system memory, or memory-mapped I/O resources from
@@ -281,8 +278,7 @@ EFI_STATUS
 (EFIAPI *EFI_REMOVE_MEMORY_SPACE)(
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
-  )
-;
+  );
 
 /**
   Retrieves the descriptor for a memory region containing a specified address.
@@ -301,8 +297,7 @@ EFI_STATUS
 (EFIAPI *EFI_GET_MEMORY_SPACE_DESCRIPTOR)(
   IN  EFI_PHYSICAL_ADDRESS             BaseAddress,
   OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Descriptor
-  )
-;
+  );
 
 /**
   Modifies the attributes for a memory region in the global coherency domain of the
@@ -330,8 +325,7 @@ EFI_STATUS
   IN EFI_PHYSICAL_ADDRESS         BaseAddress,
   IN UINT64                       Length,
   IN UINT64                       Attributes
-  )
-;
+  );
 
 /**
   Returns a map of the memory resources in the global coherency domain of the
@@ -353,8 +347,7 @@ EFI_STATUS
 (EFIAPI *EFI_GET_MEMORY_SPACE_MAP)(
   OUT UINTN                            *NumberOfDescriptors,
   OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR  **MemorySpaceMap
-  )
-;
+  );
 
 /**
   Adds reserved I/O or I/O resources to the global coherency domain of the processor.
@@ -386,8 +379,7 @@ EFI_STATUS
   IN EFI_GCD_IO_TYPE       GcdIoType,
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
-  )
-;
+  );
 
 /**
   Allocates nonexistent I/O, reserved I/O, or I/O resources from the global coherency
@@ -423,8 +415,7 @@ EFI_STATUS
   IN OUT EFI_PHYSICAL_ADDRESS                *BaseAddress,
   IN     EFI_HANDLE                          ImageHandle,
   IN     EFI_HANDLE                          DeviceHandle OPTIONAL
-  )
-;
+  );
 
 /**
   Frees nonexistent I/O, reserved I/O, or I/O resources from the global coherency
@@ -449,8 +440,7 @@ EFI_STATUS
 (EFIAPI *EFI_FREE_IO_SPACE)(
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
-  )
-;
+  );
 
 /**
   Removes reserved I/O or I/O resources from the global coherency domain of the
@@ -480,8 +470,7 @@ EFI_STATUS
 (EFIAPI *EFI_REMOVE_IO_SPACE)(
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
-  )
-;
+  );
 
 /**
   Retrieves the descriptor for an I/O region containing a specified address.
@@ -500,8 +489,7 @@ EFI_STATUS
 (EFIAPI *EFI_GET_IO_SPACE_DESCRIPTOR)(
   IN  EFI_PHYSICAL_ADDRESS         BaseAddress,
   OUT EFI_GCD_IO_SPACE_DESCRIPTOR  *Descriptor
-  )
-;
+  );
 
 /**
   Returns a map of the I/O resources in the global coherency domain of the processor.
@@ -523,8 +511,7 @@ EFI_STATUS
 (EFIAPI *EFI_GET_IO_SPACE_MAP)(
   OUT UINTN                        *NumberOfDescriptors,
   OUT EFI_GCD_IO_SPACE_DESCRIPTOR  **IoSpaceMap
-  )
-;
+  );
 
 
 
@@ -548,8 +535,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_DISPATCH)(
   VOID
-  )
-;
+  );
 
 /**
   Clears the Schedule on Request (SOR) flag for a component that is stored in a firmware volume.
@@ -567,8 +553,7 @@ EFI_STATUS
 (EFIAPI *EFI_SCHEDULE)(
   IN EFI_HANDLE  FirmwareVolumeHandle,
   IN CONST EFI_GUID    *FileName
-  )
-;
+  );
 
 /**
   Promotes a file stored in a firmware volume from the untrusted to the trusted state.
@@ -586,8 +571,7 @@ EFI_STATUS
 (EFIAPI *EFI_TRUST)(
   IN EFI_HANDLE  FirmwareVolumeHandle,
   IN CONST EFI_GUID    *FileName
-  )
-;
+  );
 
 /**
   Creates a firmware volume handle for a firmware volume that is present in system memory.
@@ -613,8 +597,7 @@ EFI_STATUS
   IN CONST VOID                       *FirmwareVolumeHeader,
   IN UINTN                            Size,
   OUT EFI_HANDLE                      *FirmwareVolumeHandle
-  )
-;
+  );
 
 //
 // DXE Services Table

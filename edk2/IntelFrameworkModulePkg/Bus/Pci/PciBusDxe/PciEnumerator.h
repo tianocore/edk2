@@ -29,8 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 PciEnumerator (
   IN EFI_HANDLE                    Controller
-  )
-;
+  );
 
 /**
   Enumerate PCI root bridge
@@ -46,8 +45,7 @@ EFI_STATUS
 PciRootBridgeEnumerator (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc,
   IN PCI_IO_DEVICE                                     *RootBridgeDev
-  )
-;
+  );
 
 /**
   This routine is used to process option rom on a certain root bridge
@@ -63,8 +61,7 @@ ProcessOptionRom (
   IN PCI_IO_DEVICE *Bridge,
   IN UINT64        RomBase,
   IN UINT64        MaxLength
-  )
-;
+  );
 
 /**
   This routine is used to assign bus number to the given PCI bus system
@@ -80,8 +77,7 @@ PciAssignBusNumber (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber,
   OUT UINT8                             *SubBusNumber
-  )
-;
+  );
 
 /**
   This routine is used to determine the root bridge attribute by interfacing
@@ -97,8 +93,7 @@ EFI_STATUS
 DetermineRootBridgeAttributes (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc,
   IN PCI_IO_DEVICE                                    *RootBridgeDev
-  )
-;
+  );
 
 /**
   Get Max Option Rom size on this bridge
@@ -109,8 +104,7 @@ DetermineRootBridgeAttributes (
 UINT64
 GetMaxOptionRomSize (
   IN PCI_IO_DEVICE   *Bridge
-  )
-;
+  );
 
 /**
   Process attributes of devices on this host bridge
@@ -124,8 +118,7 @@ GetMaxOptionRomSize (
 EFI_STATUS
 PciHostBridgeDeviceAttribute (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
-  )
-;
+  );
 
 /**
   Get resource allocation status from the ACPI pointer
@@ -147,8 +140,7 @@ GetResourceAllocationStatus (
   OUT UINT64  *PMem32ResStatus,
   OUT UINT64  *Mem64ResStatus,
   OUT UINT64  *PMem64ResStatus
-  )
-;
+  );
 
 /**
   Remove a PCI device from device pool and mark its bar
@@ -161,8 +153,7 @@ GetResourceAllocationStatus (
 EFI_STATUS
 RejectPciDevice (
   IN PCI_IO_DEVICE       *PciDevice
-  )
-;
+  );
 
 /**
   Determine whethter a PCI device can be rejected
@@ -174,8 +165,7 @@ RejectPciDevice (
 BOOLEAN
 IsRejectiveDevice (
   IN  PCI_RESOURCE_NODE   *PciResNode
-  )
-;
+  );
 
 /**
   Compare two resource node and get the larger resource consumer
@@ -189,8 +179,7 @@ PCI_RESOURCE_NODE *
 GetLargerConsumerDevice (
   IN  PCI_RESOURCE_NODE   *PciResNode1,
   IN  PCI_RESOURCE_NODE   *PciResNode2
-  )
-;
+  );
 
 /**
   Get the max resource consumer in the host resource pool
@@ -202,8 +191,7 @@ GetLargerConsumerDevice (
 PCI_RESOURCE_NODE *
 GetMaxResourceConsumerDevice (
   IN  PCI_RESOURCE_NODE   *ResPool
-  )
-;
+  );
 
 /**
   Adjust host bridge allocation so as to reduce resource requirement
@@ -231,8 +219,7 @@ PciHostBridgeAdjustAllocation (
   IN  UINT64              PMem32ResStatus,
   IN  UINT64              Mem64ResStatus,
   IN  UINT64              PMem64ResStatus
-  )
-;
+  );
 
 /**
   Summary requests for all resource type, and contruct ACPI resource
@@ -255,8 +242,7 @@ ConstructAcpiResourceRequestor (
   IN PCI_RESOURCE_NODE  *Mem64Node,
   IN PCI_RESOURCE_NODE  *PMem64Node,
   OUT VOID              **pConfig
-  )
-;
+  );
 
 /**
   Get resource base from a acpi configuration descriptor.
@@ -278,8 +264,7 @@ GetResourceBase (
   OUT UINT64  *PMem32Base,
   OUT UINT64  *Mem64Base,
   OUT UINT64  *PMem64Base
-  )
-;
+  );
 
 /**
   Enumerate pci bridge, allocate resource and determine attribute
@@ -293,8 +278,7 @@ GetResourceBase (
 EFI_STATUS
 PciBridgeEnumerator (
   IN PCI_IO_DEVICE                                     *BridgeDev
-  )
-;
+  );
 
 /**
   Allocate all kinds of resource for bridge
@@ -307,8 +291,7 @@ PciBridgeEnumerator (
 EFI_STATUS
 PciBridgeResourceAllocator (
   IN PCI_IO_DEVICE  *Bridge
-  )
-;
+  );
 
 /**
   Get resource base address for a pci bridge device
@@ -330,8 +313,7 @@ GetResourceBaseFromBridge (
   OUT UINT64        *PMem32Base,
   OUT UINT64        *Mem64Base,
   OUT UINT64        *PMem64Base
-  )
-;
+  );
 
 /**
   Process Option Rom on this host bridge
@@ -344,8 +326,7 @@ GetResourceBaseFromBridge (
 EFI_STATUS
 PciHostBridgeP2CProcess (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
-  )
-;
+  );
 
 /**
    These are the notifications from the PCI bus driver that it is about to enter a certain 
@@ -413,8 +394,7 @@ EFI_STATUS
 NotifyPhase (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc,
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE       Phase
-  )
-;
+  );
 
 /**
    Provides the hooks from the PCI bus driver to every PCI controller (device/function) at various
@@ -450,8 +430,7 @@ PreprocessController (
   IN UINT8                                          Device,
   IN UINT8                                          Func,
   IN EFI_PCI_CONTROLLER_RESOURCE_ALLOCATION_PHASE   Phase
-  )
-;
+  );
 
 /**
   Hot plug request notify.
@@ -475,8 +454,7 @@ PciHotPlugRequestNotify (
   IN EFI_DEVICE_PATH_PROTOCOL         * RemainingDevicePath OPTIONAL,
   IN OUT UINT8                        *NumberOfChildren,
   IN OUT EFI_HANDLE                   * ChildHandleBuffer
-  )
-;
+  );
 
 /**
   Search hostbridge according to given handle
@@ -486,8 +464,7 @@ PciHotPlugRequestNotify (
 BOOLEAN
 SearchHostBridgeHandle (
   IN EFI_HANDLE RootBridgeHandle
-  )
-;
+  );
 
 /**
   Add host bridge handle to global variable for enumating.
@@ -497,7 +474,6 @@ SearchHostBridgeHandle (
 EFI_STATUS
 AddHostBridgeEnumerator (
   IN EFI_HANDLE HostBridgeHandle
-  )
-;
+  );
 
 #endif

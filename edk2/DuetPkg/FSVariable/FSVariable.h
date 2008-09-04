@@ -105,16 +105,14 @@ EFIAPI
 VariableServiceInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-;
+  );
 
 VOID
 EFIAPI
 VariableClassAddressChangeEvent (
   IN EFI_EVENT        Event,
   IN VOID             *Context
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -124,8 +122,7 @@ GetVariable (
   OUT     UINT32            *Attributes OPTIONAL,
   IN OUT  UINTN             *DataSize,
   OUT     VOID              *Data
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -133,8 +130,7 @@ GetNextVariableName (
   IN OUT  UINTN             *VariableNameSize,
   IN OUT  CHAR16            *VariableName,
   IN OUT  EFI_GUID          *VendorGuid
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -144,8 +140,7 @@ SetVariable (
   IN UINT32                  Attributes,
   IN UINTN                   DataSize,
   IN VOID                    *Data
-  )
-;
+  );
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 EFI_STATUS
@@ -155,8 +150,7 @@ QueryVariableInfo (
   OUT UINT64                 *MaximumVariableStorageSize,
   OUT UINT64                 *RemainingVariableStorageSize,
   OUT UINT64                 *MaximumVariableSize
-  )
-;
+  );
 #endif // EFI_SPECIFICATION_VERSION >= 0x00020000
 
 #endif

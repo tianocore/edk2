@@ -47,8 +47,7 @@ EFI_STATUS
   IN EFI_DISK_INFO_PROTOCOL           * This,
   IN OUT VOID                         *InquiryData,
   IN OUT UINT32                       *IntquiryDataSize
-  )
-;
+  );
 
 
 /**
@@ -71,8 +70,7 @@ EFI_STATUS
   IN EFI_DISK_INFO_PROTOCOL           * This,
   IN OUT VOID                         *IdentifyData,
   IN OUT UINT32                       *IdentifyDataSize
-  )
-;
+  );
 
 
 /**
@@ -97,8 +95,7 @@ EFI_STATUS
   IN OUT VOID                         *SenseData,
   IN OUT UINT32                       *SenseDataSize,
   OUT UINT8                           *SenseDataNumber
-  )
-;
+  );
 
 /**
   Return the results of the Request Sense command to a drive in SenseData.
@@ -118,8 +115,7 @@ EFI_STATUS
   IN EFI_DISK_INFO_PROTOCOL           * This,
   OUT UINT32                          *IdeChannel,
   OUT UINT32                          *IdeDevice
-  )
-;
+  );
 
 //
 // GUIDs for EFI_DISK_INFO_PROTOCOL.Interface. Defines the format of the

@@ -113,8 +113,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 KbcSelfTest (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
-  )
-;
+  );
 
 /**
   Issue command to enable keyboard AUX functionality.
@@ -126,8 +125,7 @@ KbcSelfTest (
 EFI_STATUS
 KbcEnableAux (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
-  )
-;
+  );
 
 /**
   Issue command to disable keyboard AUX functionality.
@@ -139,8 +137,7 @@ KbcEnableAux (
 EFI_STATUS
 KbcDisableAux (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
-  )
-;
+  );
 
 /**
   Issue command to enable keyboard.
@@ -152,8 +149,7 @@ KbcDisableAux (
 EFI_STATUS
 KbcEnableKb (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
-  )
-;
+  );
 
 /**
   Issue command to disable keyboard.
@@ -165,8 +161,7 @@ KbcEnableKb (
 EFI_STATUS
 KbcDisableKb (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
-  )
-;
+  );
 
 /**
   Issue command to check keyboard status.
@@ -180,8 +175,7 @@ EFI_STATUS
 CheckKbStatus (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   OUT BOOLEAN                             *KeyboardEnable
-  )
-;
+  );
 
 /**
   Issue command to reset keyboard.
@@ -193,8 +187,7 @@ CheckKbStatus (
 EFI_STATUS
 PS2MouseReset (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
-  )
-;
+  );
 
 /**
   Issue command to set mouse's sample rate
@@ -208,8 +201,7 @@ EFI_STATUS
 PS2MouseSetSampleRate (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_SR                             SampleRate
-  )
-;
+  );
 
 /**
   Issue command to set mouse's resolution.
@@ -223,8 +215,7 @@ EFI_STATUS
 PS2MouseSetResolution (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_RE                             Resolution
-  )
-;
+  );
 
 /**
   Issue command to set mouse's scaling.
@@ -238,8 +229,7 @@ EFI_STATUS
 PS2MouseSetScaling (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN MOUSE_SF                             Scaling
-  )
-;
+  );
 
 /**
   Issue command to enable Ps2 mouse.
@@ -251,8 +241,7 @@ PS2MouseSetScaling (
 EFI_STATUS
 PS2MouseEnable (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo
-  )
-;
+  );
 
 /**
   Get mouse packet . Only care first 3 bytes
@@ -266,8 +255,7 @@ PS2MouseEnable (
 EFI_STATUS
 PS2MouseGetPacket (
   PS2_MOUSE_ABSOLUTE_POINTER_DEV     *MouseAbsolutePointerDev
-  )
-;
+  );
 
 /**
   Read data via IsaIo protocol with given number.

@@ -51,8 +51,7 @@ extern CONST EFI_HII_STRING_PROTOCOL           *mHiiStringProt;
 BOOLEAN
 IsHiiHandleRegistered (
   EFI_HII_HANDLE    HiiHandle
-  )
-;
+  );
 
 /**
 
@@ -62,7 +61,6 @@ IsHiiHandleRegistered (
 VOID
 LocateHiiProtocols (
   VOID
-  )
-;
+  );
 
 #endif

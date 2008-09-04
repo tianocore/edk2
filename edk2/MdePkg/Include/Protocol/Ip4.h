@@ -177,8 +177,7 @@ EFI_STATUS
   OUT       EFI_IP4_MODE_DATA               *Ip4ModeData     OPTIONAL,
   OUT       EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData   OPTIONAL,
   OUT       EFI_SIMPLE_NETWORK_MODE         *SnpModeData     OPTIONAL
-  )
-;  
+  );  
 
 /**
   Assigns an IPv4 address and subnet mask to this EFI IPv4 Protocol driver instance.
@@ -208,8 +207,7 @@ EFI_STATUS
 (EFIAPI *EFI_IP4_CONFIGURE)(
   IN EFI_IP4_PROTOCOL    *This,
   IN EFI_IP4_CONFIG_DATA *IpConfigData     OPTIONAL
-  )
-;  
+  );  
 
 /**
   Joins and leaves multicast groups.
@@ -241,8 +239,7 @@ EFI_STATUS
   IN EFI_IP4_PROTOCOL    *This,
   IN BOOLEAN             JoinFlag,
   IN EFI_IPv4_ADDRESS    *GroupAddress  OPTIONAL
-  )
-;    
+  );    
 
 /**
   Adds and deletes routing table entries.
@@ -281,8 +278,7 @@ EFI_STATUS
   IN EFI_IPv4_ADDRESS    *SubnetAddress,
   IN EFI_IPv4_ADDRESS    *SubnetMask,
   IN EFI_IPv4_ADDRESS    *GatewayAddress  
-  )
-;  
+  );  
 
 /**
   Places outgoing data packets into the transmit queue.
@@ -314,8 +310,7 @@ EFI_STATUS
 (EFIAPI *EFI_IP4_TRANSMIT)(
   IN EFI_IP4_PROTOCOL          *This,
   IN EFI_IP4_COMPLETION_TOKEN  *Token
-  )
-;    
+  );    
 
 /**
   Places a receiving request into the receiving queue.
@@ -346,8 +341,7 @@ EFI_STATUS
 (EFIAPI *EFI_IP4_RECEIVE)(
   IN EFI_IP4_PROTOCOL          *This,
   IN EFI_IP4_COMPLETION_TOKEN  *Token
-  )
-;      
+  );      
 
 /**
   Abort an asynchronous transmit or receive request.
@@ -376,8 +370,7 @@ EFI_STATUS
 (EFIAPI *EFI_IP4_CANCEL)(
   IN EFI_IP4_PROTOCOL          *This,
   IN EFI_IP4_COMPLETION_TOKEN  *Token OPTIONAL
-  )
-;      
+  );      
   
 /**
   Polls for incoming data packets and processes outgoing data packets.
@@ -399,8 +392,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_IP4_POLL)(
   IN EFI_IP4_PROTOCOL          *This
-  )
-;  
+  );  
 
 /**  
   @par Protocol Description:

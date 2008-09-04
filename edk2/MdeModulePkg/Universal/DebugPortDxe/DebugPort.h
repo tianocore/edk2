@@ -97,8 +97,7 @@ EFI_STATUS
 DebugPortEntryPoint (
   IN EFI_HANDLE                     ImageHandle,
   IN EFI_SYSTEM_TABLE               *SystemTable
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -106,8 +105,7 @@ DebugPortSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -115,8 +113,7 @@ DebugPortStart (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -125,8 +122,7 @@ DebugPortStop (
   IN  EFI_HANDLE                     Controller,
   IN  UINTN                          NumberOfChildren,
   IN  EFI_HANDLE                     *ChildHandleBuffer
-  )
-;
+  );
 
 //
 // EFI Component Name Functions
@@ -265,8 +261,7 @@ EFI_STATUS
 EFIAPI
 DebugPortReset (
   IN EFI_DEBUGPORT_PROTOCOL         *This
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -275,8 +270,7 @@ DebugPortRead (
   IN UINT32                         Timeout,
   IN OUT UINTN                      *BufferSize,
   IN VOID                           *Buffer
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -285,14 +279,12 @@ DebugPortWrite (
   IN UINT32                         Timeout,
   IN OUT UINTN                      *BufferSize,
   OUT VOID                          *Buffer
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 DebugPortPoll (
   IN EFI_DEBUGPORT_PROTOCOL         *This
-  )
-;
+  );
 
 #endif

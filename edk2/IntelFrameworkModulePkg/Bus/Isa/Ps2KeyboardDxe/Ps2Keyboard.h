@@ -146,8 +146,7 @@ EFIAPI
 InstallPs2KeyboardDriver (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
-  )
-;
+  );
 
 #define KEYBOARD_8042_DATA_REGISTER     0x60
 #define KEYBOARD_8042_STATUS_REGISTER   0x64
@@ -197,8 +196,7 @@ InstallPs2KeyboardDriver (
 EFI_STATUS
 UpdateStatusLights (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  )
-;
+  );
 
 /**
   write key to keyboard
@@ -214,8 +212,7 @@ EFI_STATUS
 KeyboardRead (
   IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
   OUT UINT8                   *Data
-  )
-;
+  );
 
 /**
   Get scancode from scancode buffer
@@ -231,8 +228,7 @@ KeyboardRead (
 EFI_STATUS
 KeyGetchar (
   IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  )
-;
+  );
 
 /**
   Perform 8042 controller and keyboard Initialization
@@ -249,8 +245,7 @@ EFI_STATUS
 InitKeyboard (
   IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN BOOLEAN                     ExtendedVerification
-  )
-;
+  );
 
 /**
   Disable the keyboard interface of the 8042 controller
@@ -263,8 +258,7 @@ InitKeyboard (
 EFI_STATUS
 DisableKeyboard (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  )
-;
+  );
 
 /**
   Timer event handler: read a series of scancodes from 8042
@@ -282,8 +276,7 @@ EFIAPI
 KeyboardTimerHandler (
   IN EFI_EVENT    Event,
   IN VOID         *Context
-  )
-;
+  );
 
 /**
   logic reset keyboard
@@ -301,8 +294,7 @@ EFIAPI
 KeyboardEfiReset (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   IN  BOOLEAN                         ExtendedVerification
-  )
-;
+  );
 
 /**
   Implement SIMPLE_TEXT_IN.ReadKeyStroke().
@@ -318,8 +310,7 @@ EFIAPI
 KeyboardReadKeyStroke (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   OUT EFI_INPUT_KEY                   *Key
-  )
-;
+  );
 
 /**
   Event notification function for SIMPLE_TEXT_IN.WaitForKey event
@@ -334,8 +325,7 @@ EFIAPI
 KeyboardWaitForKey (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
-  )
-;
+  );
 
 /**
   Read status register
@@ -348,8 +338,7 @@ KeyboardWaitForKey (
 UINT8
 KeyReadStatusRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  )
-;
+  );
 
 /**
   Check whether there is Ps/2 Keyboard device in system by 0xF4 Keyboard Command
@@ -365,8 +354,7 @@ BOOLEAN
 EFIAPI
 CheckKeyboardConnect (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  )
-;
+  );
 
 /**
   Event notification function for SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx event
@@ -381,8 +369,7 @@ EFIAPI
 KeyboardWaitForKeyEx (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
-  )
-;  
+  );  
 
 //
 // Simple Text Input Ex protocol function prototypes
@@ -404,8 +391,7 @@ EFIAPI
 KeyboardEfiResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
-  )
-;
+  );
 
 /**
     Reads the next keystroke from the input device. The WaitForKey Event can 
@@ -428,8 +414,7 @@ EFIAPI
 KeyboardReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
-  )
-;
+  );
 
 /**
   Set certain state for the input device.
@@ -450,8 +435,7 @@ EFIAPI
 KeyboardSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
-  )
-;
+  );
 
 /**
     Register a notification function for a particular keystroke for the input device.
@@ -475,8 +459,7 @@ KeyboardRegisterKeyNotify (
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT EFI_HANDLE                        *NotifyHandle
-  )
-;
+  );
 
 /**
     Remove a registered notification function from a particular keystroke.
@@ -495,7 +478,6 @@ EFIAPI
 KeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
-  )
-;
+  );
 
 #endif

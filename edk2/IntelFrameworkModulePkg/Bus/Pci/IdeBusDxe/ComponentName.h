@@ -160,7 +160,6 @@ IDEBusComponentNameGetControllerName (
 VOID
 AddName (
   IN  IDE_BLK_IO_DEV               *IdeBlkIoDevicePtr
-  )
-;
+  );
 
 #endif

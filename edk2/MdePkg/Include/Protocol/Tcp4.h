@@ -185,8 +185,7 @@ EFI_STATUS
   OUT       EFI_IP4_MODE_DATA                  *Ip4ModeData    OPTIONAL,
   OUT       EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData  OPTIONAL,
   OUT       EFI_SIMPLE_NETWORK_MODE            *SnpModeData    OPTIONAL
-  )
-;
+  );
 
 /**
   Initialize or brutally reset the operational parameters for this EFI TCPv4 instance.
@@ -213,8 +212,7 @@ EFI_STATUS
 (EFIAPI *EFI_TCP4_CONFIGURE)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_CONFIG_DATA                *TcpConfigData OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -258,8 +256,7 @@ EFI_STATUS
   IN EFI_IPv4_ADDRESS                    *SubnetAddress,
   IN EFI_IPv4_ADDRESS                    *SubnetMask,
   IN EFI_IPv4_ADDRESS                    *GatewayAddress
-  )
-;
+  );
 
 /**
   Initiate a nonblocking TCP connection request for an active TCP instance.
@@ -288,8 +285,7 @@ EFI_STATUS
 (EFIAPI *EFI_TCP4_CONNECT)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_CONNECTION_TOKEN           *ConnectionToken
-  )
-;
+  );
 
 
 /**
@@ -318,8 +314,7 @@ EFI_STATUS
 (EFIAPI *EFI_TCP4_ACCEPT)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_LISTEN_TOKEN               *ListenToken
-  )
-;
+  );
 
 /**
   Queues outgoing data into the transmit queue.
@@ -357,8 +352,7 @@ EFI_STATUS
 (EFIAPI *EFI_TCP4_TRANSMIT)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_IO_TOKEN                   *Token
-  )
-;
+  );
 
 
 /**
@@ -401,8 +395,7 @@ EFI_STATUS
 (EFIAPI *EFI_TCP4_RECEIVE)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_IO_TOKEN                   *Token
-  )
-;
+  );
 
 /**
   Disconnecting a TCP connection gracefully or reset a TCP connection. This function is a
@@ -432,8 +425,7 @@ EFI_STATUS
 (EFIAPI *EFI_TCP4_CLOSE)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_CLOSE_TOKEN                *CloseToken
-  )
-;
+  );
 
 /**
   Abort an asynchronous connection, listen, transmission or receive request.
@@ -461,8 +453,7 @@ EFI_STATUS
 (EFIAPI *EFI_TCP4_CANCEL)(
   IN EFI_TCP4_PROTOCOL                   *This,
   IN EFI_TCP4_COMPLETION_TOKEN           *Token OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -482,8 +473,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TCP4_POLL)(
   IN EFI_TCP4_PROTOCOL                   *This
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

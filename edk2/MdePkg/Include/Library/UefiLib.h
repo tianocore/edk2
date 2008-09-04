@@ -417,8 +417,7 @@ LookupUnicodeString2 (
   IN CONST EFI_UNICODE_STRING_TABLE  *UnicodeStringTable,
   OUT CHAR16                         **UnicodeString,
   IN BOOLEAN                         Iso639Language
-  )
-;
+  );
 
 /**
   This function adds a Unicode string to UnicodeStringTable.
@@ -529,8 +528,7 @@ AddUnicodeString2 (
   IN EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
   IN CONST CHAR16              *UnicodeString,
   IN BOOLEAN                   Iso639Language
-  )
-;
+  );
 
 /**
   This function frees the table of Unicode strings in UnicodeStringTable.

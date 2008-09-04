@@ -148,35 +148,30 @@ add_v2p (
   EFI_PCI_IO_PROTOCOL_OPERATION type,
   VOID                          *vaddr,
   UINTN                         bsize
-  )
-;
+  );
 
 EFI_STATUS
 find_v2p (
   struct s_v2p **v2p,
   VOID         *vaddr
-  )
-;
+  );
 
 EFI_STATUS
 del_v2p (
   VOID *vaddr
-  )
-;
+  );
 
 extern
 VOID 
 snp_undi32_callback_block_30 (
   IN UINT32 Enable
-  )
-;
+  );
 
 extern
 VOID 
 snp_undi32_callback_delay_30 (
   IN UINT64 MicroSeconds
-  )
-;
+  );
 
 extern
 VOID 
@@ -185,32 +180,28 @@ snp_undi32_callback_memio_30 (
   IN UINT8      NumBytes,
   IN UINT64     MemOrPortAddress,
   IN OUT UINT64 BufferPtr
-  )
-;
+  );
 
 extern
 VOID 
 snp_undi32_callback_v2p_30 (
   IN UINT64     CpuAddr,
   IN OUT UINT64 DeviceAddrPtr
-  )
-;
+  );
 
 extern
 VOID 
 snp_undi32_callback_block (
   IN UINT64 UniqueId,
   IN UINT32 Enable
-  )
-;
+  );
 
 extern
 VOID 
 snp_undi32_callback_delay (
   IN UINT64 UniqueId,
   IN UINT64 MicroSeconds
-  )
-;
+  );
 
 extern
 VOID 
@@ -220,8 +211,7 @@ snp_undi32_callback_memio (
   IN UINT8      NumBytes,
   IN UINT64     MemOrPortAddr,
   IN OUT UINT64 BufferPtr
-  )
-;
+  );
 
 extern
 VOID 
@@ -231,8 +221,7 @@ snp_undi32_callback_map (
   IN UINT32     NumBytes,
   IN UINT32     Direction,
   IN OUT UINT64 DeviceAddrPtr
-  )
-;
+  );
 
 extern
 VOID 
@@ -242,8 +231,7 @@ snp_undi32_callback_unmap (
   IN UINT32             NumBytes,
   IN UINT32             Direction,
   IN UINT64 DeviceAddr  // not a pointer to device address
-  )
-;
+  );
 
 extern
 VOID 
@@ -253,24 +241,21 @@ snp_undi32_callback_sync (
   IN UINT32             NumBytes,
   IN UINT32             Direction,
   IN UINT64 DeviceAddr  // not a pointer to device address
-  )
-;
+  );
 
 extern
 EFI_STATUS 
 EFIAPI
 snp_undi32_start (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this
-  )
-;
+  );
 
 extern
 EFI_STATUS 
 EFIAPI
 snp_undi32_stop (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -279,8 +264,7 @@ snp_undi32_initialize (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this,
   IN UINTN                       extra_rx_buffer_size OPTIONAL,
   IN UINTN                       extra_tx_buffer_size OPTIONAL
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -288,16 +272,14 @@ EFIAPI
 snp_undi32_reset (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *this,
   IN BOOLEAN                      ExtendedVerification
-  )
-;
+  );
 
 extern
 EFI_STATUS 
 EFIAPI
 snp_undi32_shutdown (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *this
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -309,8 +291,7 @@ snp_undi32_receive_filters (
   IN BOOLEAN                     reset_mcast_filter,
   IN UINTN                       mcast_filter_count OPTIONAL,
   IN EFI_MAC_ADDRESS             * mcast_filter OPTIONAL
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -319,8 +300,7 @@ snp_undi32_station_address (
   IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
   IN BOOLEAN                     reset,
   IN EFI_MAC_ADDRESS             *new OPTIONAL
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -330,8 +310,7 @@ snp_undi32_statistics (
   IN BOOLEAN                      reset,
   IN OUT UINTN                    *statistics_size OPTIONAL,
   IN OUT EFI_NETWORK_STATISTICS   * statistics_table OPTIONAL
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -341,8 +320,7 @@ snp_undi32_mcast_ip_to_mac (
   IN BOOLEAN                     IPv6,
   IN EFI_IP_ADDRESS              *IP,
   OUT EFI_MAC_ADDRESS            *MAC
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -353,8 +331,7 @@ snp_undi32_nvdata (
   IN UINTN                       offset,
   IN UINTN                       buffer_size,
   IN OUT VOID                    *buffer
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -363,8 +340,7 @@ snp_undi32_get_status (
   IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
   OUT UINT32                     *interrupt_status OPTIONAL,
   OUT VOID                       **tx_buffer OPTIONAL
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -377,8 +353,7 @@ snp_undi32_transmit (
   IN EFI_MAC_ADDRESS             * src_addr OPTIONAL,
   IN EFI_MAC_ADDRESS             * dest_addr OPTIONAL,
   IN UINT16                      *protocol OPTIONAL
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -391,8 +366,7 @@ snp_undi32_receive (
   OUT EFI_MAC_ADDRESS            * src_addr OPTIONAL,
   OUT EFI_MAC_ADDRESS            * dest_addr OPTIONAL,
   OUT UINT16                     *protocol OPTIONAL
-  )
-;
+  );
 
 typedef
 EFI_STATUS
@@ -424,8 +398,7 @@ EFIAPI
 InitializeSnpNiiDriver (
   IN EFI_HANDLE       ImageHandle,
   IN EFI_SYSTEM_TABLE *SystemTable
-  )
-;
+  );
 
 #define SNP_MEM_PAGES(x)  (((x) - 1) / 4096 + 1)
 

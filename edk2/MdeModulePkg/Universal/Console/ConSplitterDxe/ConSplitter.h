@@ -272,8 +272,7 @@ EFIAPI
 ConSplitterDriverEntry (
   IN EFI_HANDLE                       ImageHandle,
   IN EFI_SYSTEM_TABLE                 *SystemTable
-  )
-;
+  );
 
 /**
   Construct console input devices' private data.
@@ -289,8 +288,7 @@ ConSplitterDriverEntry (
 EFI_STATUS
 ConSplitterTextInConstructor (
   TEXT_IN_SPLITTER_PRIVATE_DATA       *Private
-  )
-;
+  );
 
 /**
   Construct console output devices' private data.
@@ -305,8 +303,7 @@ ConSplitterTextInConstructor (
 EFI_STATUS
 ConSplitterTextOutConstructor (
   TEXT_OUT_SPLITTER_PRIVATE_DATA      *Private
-  )
-;
+  );
 
 //
 // Driver Binding Functions
@@ -330,8 +327,7 @@ ConSplitterConInDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Test to see if Simple Pointer protocol could be supported on the ControllerHandle. 
@@ -351,8 +347,7 @@ ConSplitterSimplePointerDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Test to see if Console Out Device could be supported on the ControllerHandle. 
@@ -372,8 +367,7 @@ ConSplitterConOutDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Test to see if Standard Error Device could be supported on the ControllerHandle. 
@@ -393,8 +387,7 @@ ConSplitterStdErrDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Start Console In Consplitter on device handle. 
@@ -414,8 +407,7 @@ ConSplitterConInDriverBindingStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Start Simple Pointer Consplitter on device handle. 
@@ -435,8 +427,7 @@ ConSplitterSimplePointerDriverBindingStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Start Console Out Consplitter on device handle. 
@@ -456,8 +447,7 @@ ConSplitterConOutDriverBindingStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Start Standard Error Consplitter on device handle. 
@@ -477,8 +467,7 @@ ConSplitterStdErrDriverBindingStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Stop Console In ConSplitter on ControllerHandle by closing Console In Devcice GUID.
@@ -500,8 +489,7 @@ ConSplitterConInDriverBindingStop (
   IN  EFI_HANDLE                      ControllerHandle,
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
-  )
-;
+  );
 
 /**
   Stop Simple Pointer protocol ConSplitter on ControllerHandle by closing
@@ -524,8 +512,7 @@ ConSplitterSimplePointerDriverBindingStop (
   IN  EFI_HANDLE                      ControllerHandle,
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
-  )
-;
+  );
 
 /**
   Stop Console Out ConSplitter on ControllerHandle by closing Console Out Devcice GUID.
@@ -547,8 +534,7 @@ ConSplitterConOutDriverBindingStop (
   IN  EFI_HANDLE                      ControllerHandle,
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
-  )
-;
+  );
 
 /**
   Stop Standard Error ConSplitter on ControllerHandle by closing Standard Error GUID.
@@ -570,8 +556,7 @@ ConSplitterStdErrDriverBindingStop (
   IN  EFI_HANDLE                      ControllerHandle,
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
-  )
-;
+  );
 
 
 /**
@@ -592,8 +577,7 @@ ConSplitterAbsolutePointerDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Start Absolute Pointer Consplitter on device handle. 
@@ -613,8 +597,7 @@ ConSplitterAbsolutePointerDriverBindingStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      ControllerHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Stop Absolute Pointer protocol ConSplitter on ControllerHandle by closing
@@ -637,8 +620,7 @@ ConSplitterAbsolutePointerDriverBindingStop (
   IN  EFI_HANDLE                      ControllerHandle,
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
-  )
-;
+  );
 
 /**
   Add Absolute Pointer Device in Consplitter Absolute Pointer list.
@@ -654,8 +636,7 @@ EFI_STATUS
 ConSplitterAbsolutePointerAddDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA     *Private,
   IN  EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer
-  )
-;
+  );
 
 /**
   Remove Absolute Pointer Device in Consplitter Absolute Pointer list.
@@ -671,8 +652,7 @@ EFI_STATUS
 ConSplitterAbsolutePointerDeleteDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA     *Private,
   IN  EFI_ABSOLUTE_POINTER_PROTOCOL     *AbsolutePointer
-  )
-;
+  );
 
 //
 // Absolute Pointer protocol interfaces
@@ -695,8 +675,7 @@ EFIAPI
 ConSplitterAbsolutePointerReset (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
   IN BOOLEAN                         ExtendedVerification
-  )
-;
+  );
 
 
 /**
@@ -719,8 +698,7 @@ EFIAPI
 ConSplitterAbsolutePointerGetState (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
   IN OUT EFI_ABSOLUTE_POINTER_STATE  *State
-  )
-;
+  );
 
 /**
   This event agregates all the events of the pointer devices in the splitter.
@@ -740,8 +718,7 @@ EFIAPI
 ConSplitterAbsolutePointerWaitForInput (
   IN  EFI_EVENT                       Event,
   IN  VOID                            *Context
-  )
-;
+  );
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -1000,8 +977,7 @@ ConSplitterAbsolutePointerComponentNameGetControllerName (
   IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
   IN  CHAR8                                           *Language,
   OUT CHAR16                                          **ControllerName
-  )
-;
+  );
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -1179,8 +1155,7 @@ EFI_STATUS
 ConSplitterTextInAddDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA      *Private,
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *TextIn
-  )
-;
+  );
 
 /**
   Remove Simple Text Device in Consplitter Absolute Pointer list.
@@ -1196,8 +1171,7 @@ EFI_STATUS
 ConSplitterTextInDeleteDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA      *Private,
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *TextIn
-  )
-;
+  );
 
 //
 // SimplePointer Constuctor/Destructor functions
@@ -1217,8 +1191,7 @@ EFI_STATUS
 ConSplitterSimplePointerAddDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA   *Private,
   IN  EFI_SIMPLE_POINTER_PROTOCOL     *SimplePointer
-  )
-;
+  );
 
 /**
   Remove Simple Pointer Device in Consplitter Absolute Pointer list.
@@ -1234,8 +1207,7 @@ EFI_STATUS
 ConSplitterSimplePointerDeleteDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA   *Private,
   IN  EFI_SIMPLE_POINTER_PROTOCOL     *SimplePointer
-  )
-;
+  );
 
 //
 // TextOut Constuctor/Destructor functions
@@ -1259,8 +1231,7 @@ ConSplitterTextOutAddDevice (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *TextOut,
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *GraphicsOutput,
   IN  EFI_UGA_DRAW_PROTOCOL              *UgaDraw
-  )
-;
+  );
 
 /**
   Remove Text Out Device in Consplitter Text Out list.
@@ -1276,8 +1247,7 @@ EFI_STATUS
 ConSplitterTextOutDeleteDevice (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA     *Private,
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *TextOut
-  )
-;
+  );
 
 //
 // TextIn I/O Functions
@@ -1299,8 +1269,7 @@ EFIAPI
 ConSplitterTextInReset (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *This,
   IN  BOOLEAN                            ExtendedVerification
-  )
-;
+  );
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -1321,8 +1290,7 @@ EFIAPI
 ConSplitterTextInReadKeyStroke (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *This,
   OUT EFI_INPUT_KEY                      *Key
-  )
-;
+  );
 
 /**
   Add Text Input Ex Device in Consplitter Text Input Ex list.
@@ -1338,8 +1306,7 @@ EFI_STATUS
 ConSplitterTextInExAddDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA         *Private,
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL     *TextInEx
-  )
-;
+  );
 
 /**
   Remove Simple Text Ex Device in Consplitter Absolute Pointer list.
@@ -1355,8 +1322,7 @@ EFI_STATUS
 ConSplitterTextInExDeleteDevice (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA         *Private,
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL     *TextInEx
-  )
-;
+  );
 
 //
 // Simple Text Input Ex protocol function prototypes
@@ -1379,8 +1345,7 @@ EFIAPI
 ConSplitterTextInResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
-  )
-;
+  );
 
 
 /**
@@ -1404,8 +1369,7 @@ EFIAPI
 ConSplitterTextInReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
-  )
-;
+  );
 
 
 /**
@@ -1428,8 +1392,7 @@ EFIAPI
 ConSplitterTextInSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
-  )
-;
+  );
 
 
 /**
@@ -1458,8 +1421,7 @@ ConSplitterTextInRegisterKeyNotify (
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT EFI_HANDLE                        *NotifyHandle
-  )
-;
+  );
 
 
 /**
@@ -1480,8 +1442,7 @@ EFIAPI
 ConSplitterTextInUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
-  )
-;
+  );
 
 /**
   This event agregates all the events of the ConIn devices in the spliter.
@@ -1501,8 +1462,7 @@ EFIAPI
 ConSplitterTextInWaitForKey (
   IN  EFI_EVENT                       Event,
   IN  VOID                            *Context
-  )
-;
+  );
 /**
   Return TRUE if StdIn is locked. The ConIn device on the virtual handle is
   the only device locked.
@@ -1516,8 +1476,7 @@ ConSplitterTextInWaitForKey (
 BOOLEAN
 ConSpliterConssoleControlStdInLocked (
   VOID
-  )
-;
+  );
 /**
   This timer event will fire when StdIn is locked. It will check the key
   sequence on StdIn to see if it matches the password. Any error in the
@@ -1536,8 +1495,7 @@ EFIAPI
 ConSpliterConsoleControlLockStdInEvent (
   IN  EFI_EVENT                       Event,
   IN  VOID                            *Context
-  )
-;
+  );
 
 /**
   If Password is NULL unlock the password state variable and set the event
@@ -1557,8 +1515,7 @@ EFIAPI
 ConSpliterConsoleControlLockStdIn (
   IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
   IN  CHAR16                          *Password
-  )
-;
+  );
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -1578,8 +1535,7 @@ EFIAPI
 ConSplitterTextInPrivateReadKeyStroke (
   IN  TEXT_IN_SPLITTER_PRIVATE_DATA   *Private,
   OUT EFI_INPUT_KEY                   *Key
-  )
-;
+  );
 
 /**
   Reset the input device and optionaly run diagnostics
@@ -1597,8 +1553,7 @@ EFIAPI
 ConSplitterSimplePointerReset (
   IN  EFI_SIMPLE_POINTER_PROTOCOL     *This,
   IN  BOOLEAN                         ExtendedVerification
-  )
-;
+  );
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -1619,8 +1574,7 @@ EFIAPI
 ConSplitterSimplePointerGetState (
   IN  EFI_SIMPLE_POINTER_PROTOCOL     *This,
   IN OUT EFI_SIMPLE_POINTER_STATE     *State
-  )
-;
+  );
 
 /**
   This event agregates all the events of the ConIn devices in the spliter.
@@ -1640,8 +1594,7 @@ EFIAPI
 ConSplitterSimplePointerWaitForInput (
   IN  EFI_EVENT                       Event,
   IN  VOID                            *Context
-  )
-;
+  );
 
 //
 // TextOut I/O Functions
@@ -1664,8 +1617,7 @@ EFIAPI
 ConSplitterTextOutReset (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  BOOLEAN                            ExtendedVerification
-  )
-;
+  );
 
 /**
   Write a Unicode string to the output device.
@@ -1691,8 +1643,7 @@ EFIAPI
 ConSplitterTextOutOutputString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  CHAR16                             *WString
-  )
-;
+  );
 
 /**
   Verifies that all characters in a Unicode string can be output to the
@@ -1714,8 +1665,7 @@ EFIAPI
 ConSplitterTextOutTestString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  CHAR16                             *WString
-  )
-;
+  );
 
 /**
   Returns information for an available text mode that the output device(s)
@@ -1741,8 +1691,7 @@ ConSplitterTextOutQueryMode (
   IN  UINTN                              ModeNumber,
   OUT UINTN                              *Columns,
   OUT UINTN                              *Rows
-  )
-;
+  );
 
 /**
   Sets the output device(s) to a specified mode.
@@ -1761,8 +1710,7 @@ EFIAPI
 ConSplitterTextOutSetMode (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  UINTN                              ModeNumber
-  )
-;
+  );
 
 /**
   Sets the background and foreground colors for the OutputString () and
@@ -1786,8 +1734,7 @@ EFIAPI
 ConSplitterTextOutSetAttribute (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  UINTN                              Attribute
-  )
-;
+  );
 
 /**
   Clears the output device(s) display to the currently selected background
@@ -1805,8 +1752,7 @@ EFI_STATUS
 EFIAPI
 ConSplitterTextOutClearScreen (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This
-  )
-;
+  );
 
 /**
   Sets the current coordinates of the cursor position
@@ -1833,8 +1779,7 @@ ConSplitterTextOutSetCursorPosition (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  UINTN                              Column,
   IN  UINTN                              Row
-  )
-;
+  );
 
 
 /**
@@ -1856,8 +1801,7 @@ EFIAPI
 ConSplitterTextOutEnableCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  BOOLEAN                            Visible
-  )
-;
+  );
 
 /**
   Take the passed in Buffer of size SizeOfCount and grow the buffer
@@ -1879,8 +1823,7 @@ ConSplitterGrowBuffer (
   IN  UINTN                           SizeOfCount,
   IN  UINTN                           *Count,
   IN OUT  VOID                        **Buffer
-  )
-;
+  );
 
 /**
   Return the current video mode information. Also returns info about existence
@@ -1903,8 +1846,7 @@ ConSpliterConsoleControlGetMode (
   OUT EFI_CONSOLE_CONTROL_SCREEN_MODE *Mode,
   OUT BOOLEAN                         *GopExists,
   OUT BOOLEAN                         *StdInLocked
-  )
-;
+  );
 
 /**
   Set the current mode to either text or graphics. Graphics is
@@ -1923,8 +1865,7 @@ EFIAPI
 ConSpliterConsoleControlSetMode (
   IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
   IN  EFI_CONSOLE_CONTROL_SCREEN_MODE Mode
-  )
-;
+  );
 
 /**
   Return the current video mode information.
@@ -1951,8 +1892,7 @@ ConSpliterGraphicsOutputQueryMode (
   IN  UINT32                            ModeNumber,
   OUT UINTN                              *SizeOfInfo,
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
-  )
-;
+  );
 
 /**
   Graphics output protocol interface to set video mode.
@@ -1971,8 +1911,7 @@ EFIAPI
 ConSpliterGraphicsOutputSetMode (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
   IN  UINT32                       ModeNumber
-  )
-;
+  );
 
 /**
   The following table defines actions for BltOperations.
@@ -2033,8 +1972,7 @@ ConSpliterGraphicsOutputBlt (
   IN  UINTN                                         Width,
   IN  UINTN                                         Height,
   IN  UINTN                                         Delta         OPTIONAL
-  )
-;
+  );
 
 /**
   Write data from the buffer to video display based on Graphics Output setting. 
@@ -2055,8 +1993,7 @@ DevNullGopSync (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput,
   IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
-  )
-;
+  );
 
 /**
   Return the current video mode information.
@@ -2080,8 +2017,7 @@ ConSpliterUgaDrawGetMode (
   OUT UINT32                          *VerticalResolution,
   OUT UINT32                          *ColorDepth,
   OUT UINT32                          *RefreshRate
-  )
-;
+  );
 
 /**
   Return the current video mode information.
@@ -2105,8 +2041,7 @@ ConSpliterUgaDrawSetMode (
   IN UINT32                           VerticalResolution,
   IN UINT32                           ColorDepth,
   IN UINT32                           RefreshRate
-  )
-;
+  );
 
 /**
   The following table defines actions for BltOperations.
@@ -2167,8 +2102,7 @@ ConSpliterUgaDrawBlt (
   IN  UINTN                                         Width,
   IN  UINTN                                         Height,
   IN  UINTN                                         Delta         OPTIONAL
-  )
-;
+  );
 
 /**
   Write data from the buffer to video display based on UGA Draw setting. 
@@ -2188,8 +2122,7 @@ DevNullUgaSync (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput,
   IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
-  )
-;
+  );
 
 /**
   Write a Unicode string to the output device.
@@ -2215,8 +2148,7 @@ EFI_STATUS
 DevNullTextOutOutputString (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  CHAR16                          *WString
-  )
-;
+  );
 
 /**
   Sets the output device(s) to a specified mode.
@@ -2235,8 +2167,7 @@ EFI_STATUS
 DevNullTextOutSetMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  UINTN                           ModeNumber
-  )
-;
+  );
 
 /**
   Clears the output device(s) display to the currently selected background
@@ -2253,8 +2184,7 @@ DevNullTextOutSetMode (
 EFI_STATUS
 DevNullTextOutClearScreen (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
-  )
-;
+  );
 
 /**
   Sets the current coordinates of the cursor position.
@@ -2278,8 +2208,7 @@ DevNullTextOutSetCursorPosition (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  UINTN                           Column,
   IN  UINTN                           Row
-  )
-;
+  );
 
 /**
   Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
@@ -2296,8 +2225,7 @@ EFI_STATUS
 DevNullTextOutEnableCursor (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  BOOLEAN                         Visible
-  )
-;
+  );
 
 /**
   Take the DevNull TextOut device and update the Simple Text Out on every
@@ -2312,7 +2240,6 @@ DevNullTextOutEnableCursor (
 EFI_STATUS
 DevNullSyncStdOut (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
-  )
-;
+  );
 
 #endif

@@ -97,8 +97,7 @@ EFI_STATUS
   IN  CONST EFI_HASH_PROTOCOL     *This,
   IN  CONST EFI_GUID              *HashAlgorithm,
   OUT UINTN                       *HashSize
-  )
-;      
+  );      
 
 /**
   Returns the size of the hash which results from a specific algorithm.
@@ -127,8 +126,7 @@ EFI_STATUS
   IN CONST UINT8                  *Message,
   IN UINT64                       MessageSize,
   IN OUT EFI_HASH_OUTPUT          *Hash
-  )
-;    
+  );    
 
 /**
   @par Protocol Description:

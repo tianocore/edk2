@@ -508,8 +508,7 @@ FdcControllerDriverSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Create floppy control instance on controller.
@@ -526,8 +525,7 @@ FdcControllerDriverStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  )
-;
+  );
 
 /**
   Stop this driver on ControllerHandle. Support stoping any child handles
@@ -550,8 +548,7 @@ FdcControllerDriverStop (
   IN EFI_HANDLE                   Controller,
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
-  )
-;
+  );
 
 //
 // EFI Block I/O Protocol Functions
@@ -573,8 +570,7 @@ EFIAPI
 FdcReset (
   IN EFI_BLOCK_IO_PROTOCOL  *This,
   IN BOOLEAN                ExtendedVerification
-  )
-;
+  );
 
 /**
   Flush block via fdd controller
@@ -587,8 +583,7 @@ EFI_STATUS
 EFIAPI
 FddFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
-  )
-;
+  );
 
 /**
   Read the requested number of blocks from the device   
@@ -618,8 +613,7 @@ FddReadBlocks (
   IN  EFI_LBA                LBA,
   IN  UINTN                  BufferSize,
   OUT VOID                   *Buffer
-  )
-;
+  );
 
 /**
   Write a specified number of blocks to the device   
@@ -649,8 +643,7 @@ FddWriteBlocks (
   IN EFI_LBA                LBA,
   IN UINTN                  BufferSize,
   IN VOID                   *Buffer
-  )
-;
+  );
 
 //
 // Prototypes of internal functions
@@ -667,8 +660,7 @@ FddWriteBlocks (
 EFI_STATUS
 DiscoverFddDevice (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
 
@@ -682,8 +674,7 @@ DiscoverFddDevice (
 EFI_STATUS
 FddIdentify (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
 
@@ -699,8 +690,7 @@ FddIdentify (
 EFI_STATUS
 FddReset (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
 
@@ -717,8 +707,7 @@ FddReset (
 EFI_STATUS
 MotorOn (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
 
@@ -734,8 +723,7 @@ MotorOn (
 EFI_STATUS
 MotorOff (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
   Detect the disk in the drive is changed or not
@@ -751,8 +739,7 @@ MotorOff (
 EFI_STATUS
 DisketChanged (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
   Do the Specify command, this command sets DMA operation
@@ -768,8 +755,7 @@ DisketChanged (
 EFI_STATUS
 Specify (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
   Set the head of floppy drive to track 0
@@ -782,8 +768,7 @@ Specify (
 EFI_STATUS
 Recalibrate (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
   Set the head of floppy drive to the new cylinder
@@ -799,8 +784,7 @@ EFI_STATUS
 Seek (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN EFI_LBA         Lba
-  )
-;
+  );
 
 /**
   Do the Sense Interrupt Status command, this command
@@ -820,8 +804,7 @@ SenseIntStatus (
   IN     FDC_BLK_IO_DEV  *FdcDev,
   IN OUT UINT8           *StatusRegister0,
   IN OUT UINT8           *PresentCylinderNumber
-  )
-;
+  );
 
 /**
   Do the Sense Drive Status command
@@ -838,8 +821,7 @@ EFI_STATUS
 SenseDrvStatus (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN EFI_LBA         Lba
-  )
-;
+  );
 
 /**
   Update the disk media properties and if necessary
@@ -854,8 +836,7 @@ SenseDrvStatus (
 EFI_STATUS
 DetectMedia (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
   Set the data rate and so on
@@ -867,8 +848,7 @@ DetectMedia (
 EFI_STATUS
 Setup (
   IN FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 /**
   Read or Write a number of blocks in the same cylinder
@@ -889,8 +869,7 @@ ReadWriteDataSector (
   IN EFI_LBA         Lba,
   IN UINTN           NumberOfBlocks,
   IN BOOLEAN         Read
-  )
-;
+  );
 
 /**
   Fill in FDD command's parameter
@@ -905,8 +884,7 @@ FillPara (
   IN FDC_BLK_IO_DEV       *FdcDev,
   IN EFI_LBA              Lba,
   IN FDD_COMMAND_PACKET1  *Command
-  )
-;
+  );
 
 /**
   Read result byte from Data Register of FDC
@@ -923,8 +901,7 @@ EFI_STATUS
 DataInByte (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT8           *Pointer
-  )
-;
+  );
 
 /**
   Write command byte to Data Register of FDC
@@ -940,8 +917,7 @@ EFI_STATUS
 DataOutByte (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT8           *Pointer
-  )
-;
+  );
 
 /**
   Detect the specified floppy logic drive is busy or
@@ -959,8 +935,7 @@ EFI_STATUS
 FddWaitForBSYClear (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINTN           TimeoutInSeconds
-  )
-;
+  );
 
 /**
 
@@ -979,8 +954,7 @@ FddDRQReady (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN BOOLEAN         Dio,
   IN UINTN           TimeoutInSeconds
-  )
-;
+  );
 
 /**
   Set FDC control structure's attribute according to
@@ -999,8 +973,7 @@ EFI_STATUS
 CheckResult (
   IN     FDD_RESULT_PACKET  *Result,
   IN OUT FDC_BLK_IO_DEV     *FdcDev
-  )
-;
+  );
 
 /**
   Check the drive status information
@@ -1014,8 +987,7 @@ CheckResult (
 EFI_STATUS
 CheckStatus3 (
   IN UINT8 StatusRegister3
-  )
-;
+  );
 
 /**
   Calculate the number of block in the same cylinder
@@ -1034,8 +1006,7 @@ GetTransferBlockCount (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN EFI_LBA         LBA,
   IN UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   When the Timer(2s) off, turn the drive's motor off
@@ -1050,8 +1021,7 @@ EFIAPI
 FddTimerProc (
   IN EFI_EVENT  Event,
   IN VOID       *Context
-  )
-;
+  );
 
 /**
   Read I/O port for FDC
@@ -1064,8 +1034,7 @@ UINT8
 FdcReadPort (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT32          Offset
-  )
-;
+  );
 
 /**
   Write I/O port for FDC
@@ -1080,8 +1049,7 @@ FdcWritePort (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN UINT32          Offset,
   IN UINT8           Data
-  )
-;
+  );
 
 /**
   Read or Write a number of blocks to floppy device
@@ -1117,8 +1085,7 @@ FddReadWriteBlocks (
   IN  UINTN                  BufferSize,
   IN  BOOLEAN                Operation,
   OUT VOID                   *Buffer
-  )
-;
+  );
 
 /**
   Common interface for free cache 
@@ -1129,8 +1096,7 @@ FddReadWriteBlocks (
 VOID
 FdcFreeCache (
   IN    FDC_BLK_IO_DEV  *FdcDev
-  )
-;
+  );
 
 #endif
 

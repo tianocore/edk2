@@ -59,8 +59,7 @@ VOID
 EFIAPI
 PlatformBdsInit (
   IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData
-  )
-;
+  );
 
 /**
   The function will excute with as the platform policy, current policy
@@ -78,8 +77,7 @@ PlatformBdsPolicyBehavior (
   IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData,
   IN LIST_ENTRY                      *DriverOptionList,
   IN LIST_ENTRY                      *BootOptionList
-  )
-;
+  );
 
 /**
   Hook point after a boot attempt fails.
@@ -97,8 +95,7 @@ PlatformBdsBootFail (
   IN  EFI_STATUS         Status,
   IN  CHAR16             *ExitData,
   IN  UINTN              ExitDataSize
-  )
-;
+  );
 
 /**
   Hook point after a boot attempt succeeds. We don't expect a boot option to
@@ -113,8 +110,7 @@ VOID
 EFIAPI
 PlatformBdsBootSuccess (
   IN  BDS_COMMON_OPTION *Option
-  )
-;
+  );
 
 
 /**
@@ -127,6 +123,5 @@ EFI_STATUS
 EFIAPI
 PlatformBdsLockNonUpdatableFlash (
   VOID
-  )
-;
+  );
 #endif

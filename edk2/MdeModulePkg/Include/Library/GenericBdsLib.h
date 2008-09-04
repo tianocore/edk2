@@ -1048,8 +1048,7 @@ EFIAPI
 DevPathVendor (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
-  )
-;
+  );
 
 /**
   Concatenates a formatted unicode string to allocated pool.
@@ -1070,7 +1069,6 @@ CatPrint (
   IN OUT POOL_PRINT   *Str,
   IN CHAR16           *fmt,
   ...
-  )
-;
+  );
 #endif
 

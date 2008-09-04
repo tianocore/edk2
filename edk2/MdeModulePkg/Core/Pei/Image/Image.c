@@ -36,8 +36,7 @@ PeiLoadImageLoadImageWrapper (
   OUT    UINT64                       *ImageSizeArg,     OPTIONAL
   OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
   OUT    UINT32                       *AuthenticationState
-  )
-;
+  );
 
 STATIC EFI_PEI_LOAD_FILE_PPI   mPeiLoadImagePpi = {
   PeiLoadImageLoadImageWrapper

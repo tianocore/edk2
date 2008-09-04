@@ -79,8 +79,7 @@ InitializeMemoryTest (
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
   IN  EXTENDMEM_COVERAGE_LEVEL                 Level,
   OUT BOOLEAN                                  *RequireSoftECCInit
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -90,15 +89,13 @@ GenPerformMemoryTest (
   OUT UINT64                                   *TotalMemorySize,
   OUT BOOLEAN                                  *ErrorOut,
   IN BOOLEAN                                   TestAbort
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 GenMemoryTestFinished (
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -106,7 +103,6 @@ GenCompatibleRangeTest (
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
   IN  EFI_PHYSICAL_ADDRESS                     StartAddress,
   IN  UINT64                                   Length
-  )
-;
+  );
 
 #endif

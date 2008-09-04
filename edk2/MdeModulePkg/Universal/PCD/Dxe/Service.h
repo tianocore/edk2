@@ -75,8 +75,7 @@ VOID
 EFIAPI
 DxePcdSetSku (
   IN  UINTN                  SkuId
-  )
-;
+  );
 
 /**
   Retrieves an 8-bit value for a given PCD token.
@@ -93,8 +92,7 @@ UINT8
 EFIAPI
 DxePcdGet8 (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 16-bit value for a given PCD token.
@@ -111,8 +109,7 @@ UINT16
 EFIAPI
 DxePcdGet16 (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 32-bit value for a given PCD token.
@@ -129,8 +126,7 @@ UINT32
 EFIAPI
 DxePcdGet32 (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 64-bit value for a given PCD token.
@@ -147,8 +143,7 @@ UINT64
 EFIAPI
 DxePcdGet64 (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves a pointer to a value for a given PCD token.
@@ -167,8 +162,7 @@ VOID *
 EFIAPI
 DxePcdGetPtr (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves a Boolean value for a given PCD token.
@@ -187,8 +181,7 @@ BOOLEAN
 EFIAPI
 DxePcdGetBool (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves the size of the value for a given PCD token.
@@ -205,8 +198,7 @@ UINTN
 EFIAPI
 DxePcdGetSize (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 8-bit value for a given PCD token.
@@ -227,8 +219,7 @@ EFIAPI
 DxePcdGet8Ex (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 16-bit value for a given PCD token.
@@ -249,8 +240,7 @@ EFIAPI
 DxePcdGet16Ex (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 32-bit value for a given PCD token.
@@ -271,8 +261,7 @@ EFIAPI
 DxePcdGet32Ex (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 64-bit value for a given PCD token.
@@ -293,8 +282,7 @@ EFIAPI
 DxePcdGet64Ex (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves a pointer to a value for a given PCD token.
@@ -315,8 +303,7 @@ EFIAPI
 DxePcdGetPtrEx (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an Boolean value for a given PCD token.
@@ -337,8 +324,7 @@ EFIAPI
 DxePcdGetBoolEx (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves the size of the value for a given PCD token.
@@ -357,8 +343,7 @@ EFIAPI
 DxePcdGetSizeEx (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Sets an 8-bit value for a given PCD token.
@@ -382,8 +367,7 @@ EFIAPI
 DxePcdSet8 (
   IN UINTN             TokenNumber,
   IN UINT8             Value
-  )
-;
+  );
 
 /**
   Sets an 16-bit value for a given PCD token.
@@ -407,8 +391,7 @@ EFIAPI
 DxePcdSet16 (
   IN UINTN             TokenNumber,
   IN UINT16             Value
-  )
-;
+  );
 
 /**
   Sets an 32-bit value for a given PCD token.
@@ -432,8 +415,7 @@ EFIAPI
 DxePcdSet32 (
   IN UINTN             TokenNumber,
   IN UINT32             Value
-  )
-;
+  );
 
 /**
   Sets an 64-bit value for a given PCD token.
@@ -457,8 +439,7 @@ EFIAPI
 DxePcdSet64 (
   IN UINTN             TokenNumber,
   IN UINT64            Value
-  )
-;
+  );
 
 
 /**
@@ -488,8 +469,7 @@ DxePcdSetPtr (
   IN        UINTN             TokenNumber,
   IN OUT    UINTN             *SizeOfBuffer,
   IN        VOID              *Buffer
-  )
-;
+  );
 
 /**
   Sets an Boolean value for a given PCD token.
@@ -513,8 +493,7 @@ EFIAPI
 DxePcdSetBool (
   IN UINTN             TokenNumber,
   IN BOOLEAN           Value
-  )
-;
+  );
 
 
 /**
@@ -541,8 +520,7 @@ DxePcdSet8Ex (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber,
   IN UINT8             Value
-  )
-;
+  );
 
 /**
   Sets an 16-bit value for a given PCD token.
@@ -568,8 +546,7 @@ DxePcdSet16Ex (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber,
   IN UINT16            Value
-  )
-;
+  );
 
 /**
   Sets an 32-bit value for a given PCD token.
@@ -595,8 +572,7 @@ DxePcdSet32Ex (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber,
   IN UINT32             Value
-  )
-;
+  );
 
 /**
   Sets an 64-bit value for a given PCD token.
@@ -622,8 +598,7 @@ DxePcdSet64Ex (
   IN CONST EFI_GUID        *Guid,
   IN UINTN             TokenNumber,
   IN UINT64            Value
-  )
-;
+  );
 
 /**
   Sets a value of a specified size for a given PCD token.
@@ -654,8 +629,7 @@ DxePcdSetPtrEx (
   IN        UINTN             TokenNumber,
   IN OUT    UINTN             *SizeOfBuffer,
   IN        VOID              *Buffer
-  )
-;
+  );
 
 /**
   Sets an Boolean value for a given PCD token.
@@ -681,8 +655,7 @@ DxePcdSetBoolEx (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN BOOLEAN           Value
-  )
-;
+  );
 
 /**
   Specifies a function to be called anytime the value of a designated token is changed.
@@ -702,8 +675,7 @@ DxeRegisterCallBackOnSet (
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
-  )
-;
+  );
 
 /**
   Cancels a previously set callback function for a particular PCD token number.
@@ -723,8 +695,7 @@ DxeUnRegisterCallBackOnSet (
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
-  )
-;
+  );
 
 /**
   Retrieves the next valid PCD token for a given namespace.
@@ -749,8 +720,7 @@ EFIAPI
 DxePcdGetNextToken (
   IN CONST EFI_GUID               *Guid, OPTIONAL
   IN OUT   UINTN                  *TokenNumber
-  )
-;
+  );
 
 /**
   Get next token space in PCD database according to given token space guid.
@@ -771,8 +741,7 @@ EFI_STATUS
 EFIAPI
 DxePcdGetNextTokenSpace (
   IN OUT CONST EFI_GUID               **Guid
-  )
-;
+  );
 
 typedef struct {
   LIST_ENTRY              Node;
@@ -800,8 +769,7 @@ SetValueWorker (
   IN UINTN                   TokenNumber,
   IN VOID                    *Data,
   IN UINTN                   Size
-  )
-;
+  );
 
 /**
   Set value for an PCD entry
@@ -824,8 +792,7 @@ SetWorker (
   IN          VOID                      *Data,
   IN OUT      UINTN                     *Size,
   IN          BOOLEAN                   PtrType
-  )
-;
+  );
 
 /**
   Wrapper function for set PCD value for non-Pointer type dynamic-ex PCD.
@@ -844,8 +811,7 @@ ExSetValueWorker (
   IN          CONST EFI_GUID       *Guid,
   IN          VOID                 *Data,
   IN          UINTN                SetSize
-  )
-;
+  );
 
 /**
   Set value for a dynamic PCD entry.
@@ -872,8 +838,7 @@ ExSetWorker (
   IN      VOID                 *Data,
   IN OUT  UINTN                *Size,
   IN      BOOLEAN              PtrType
-  )
-;
+  );
 
 /**
   Get the PCD entry pointer in PCD database.
@@ -893,8 +858,7 @@ VOID *
 GetWorker (
   IN UINTN             TokenNumber,
   IN UINTN             GetSize
-  )
-;
+  );
 
 /**
   Wrapper function for get PCD value for dynamic-ex PCD.
@@ -911,8 +875,7 @@ ExGetWorker (
   IN CONST EFI_GUID         *Guid,
   IN UINTN                  ExTokenNumber,
   IN UINTN                  GetSize
-  )
-;
+  );
 
 /**
   Find the local token number according to system SKU ID.
@@ -930,8 +893,7 @@ GetSkuEnabledTokenNumber (
   UINT32 LocalTokenNumber,
   UINTN  Size,
   BOOLEAN IsPeiDb
-  )
-;
+  );
 
 /**
   Get Variable which contains HII type PCD entry.
@@ -949,8 +911,7 @@ GetHiiVariable (
   IN  UINT16        *VariableName,
   OUT UINT8          **VariableData,
   OUT UINTN         *VariableSize
-  )
-;
+  );
 
 /**
   Set value for HII-type PCD.
@@ -974,8 +935,7 @@ SetHiiVariable (
   IN  CONST VOID   *Data,
   IN  UINTN        DataSize,
   IN  UINTN        Offset
-  )
-;
+  );
 
 /**
   Register the callback function for a PCD entry.
@@ -996,8 +956,7 @@ DxeRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
-  )
-;
+  );
 
 /**
   UnRegister the callback function for a PCD entry.
@@ -1018,8 +977,7 @@ DxeUnRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
-  )
-;
+  );
 
 /**
   Initialize the PCD database in DXE phase.
@@ -1031,8 +989,7 @@ DxeUnRegisterCallBackWorker (
 VOID
 BuildPcdDxeDataBase (
   VOID
-  )
-;
+  );
 
 /**
   Get local token number according to dynamic-ex PCD's {token space guid:token number}
@@ -1051,8 +1008,7 @@ UINTN
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
   IN UINT32                     ExTokenNumber
-  )
-;
+  );
 
 /**
   Get next token number in given token space.
@@ -1087,8 +1043,7 @@ ExGetNextTokeNumber (
   IN      UINTN             SizeOfGuidTable,
   IN      DYNAMICEX_MAPPING *ExMapTable,
   IN      UINTN             SizeOfExMapTable
-  )
-;
+  );
 
 /**
   Get size of POINTER type PCD value.
@@ -1103,8 +1058,7 @@ UINTN
 GetPtrTypeSize (
   IN    UINTN             LocalTokenNumberTableIdx,
   OUT   UINTN             *MaxSize
-  )
-;
+  );
 
 /**
   Set size of POINTER type PCD value. The size should not exceed the maxmium size
@@ -1120,8 +1074,7 @@ BOOLEAN
 SetPtrTypeSize (
   IN          UINTN             LocalTokenNumberTableIdx,
   IN    OUT   UINTN             *CurrentSize
-  )
-;
+  );
 
 extern EFI_GUID gPcdDataBaseHobGuid;
 

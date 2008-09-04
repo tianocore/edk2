@@ -46,7 +46,6 @@ PreparePackages (
   IN UINTN           NumberOfPackages,
   IN CONST EFI_GUID  *Guid OPTIONAL,
   ...
-  )
-;
+  );
 
 #endif

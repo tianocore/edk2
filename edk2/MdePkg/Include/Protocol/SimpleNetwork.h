@@ -179,8 +179,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SIMPLE_NETWORK_START)(
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
-  )
-;
+  );
 
 /**
   Changes the state of a network interface from "started" to "stopped".
@@ -198,8 +197,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SIMPLE_NETWORK_STOP)(
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
-  )
-;
+  );
 
 /**
   Resets a network adapter and allocates the transmit and receive buffers 
@@ -233,8 +231,7 @@ EFI_STATUS
   IN EFI_SIMPLE_NETWORK_PROTOCOL                    *This,
   IN UINTN                                          ExtraRxBufferSize  OPTIONAL,
   IN UINTN                                          ExtraTxBufferSize  OPTIONAL
-  )
-;
+  );
 
 /**
   Resets a network adapter and re-initializes it with the parameters that were 
@@ -257,8 +254,7 @@ EFI_STATUS
 (EFIAPI *EFI_SIMPLE_NETWORK_RESET)(
   IN EFI_SIMPLE_NETWORK_PROTOCOL   *This,
   IN BOOLEAN                       ExtendedVerification
-  )
-;
+  );
 
 /**
   Resets a network adapter and leaves it in a state that is safe for 
@@ -277,8 +273,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SIMPLE_NETWORK_SHUTDOWN)(
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
-  )
-;
+  );
 
 /**
   Manages the multicast receive filters of a network interface.
@@ -313,8 +308,7 @@ EFI_STATUS
   IN BOOLEAN                                                 ResetMCastFilter,
   IN UINTN                                                   MCastFilterCnt     OPTIONAL,
   IN EFI_MAC_ADDRESS                                         *MCastFilter OPTIONAL
-  )
-;
+  );
 
 /**
   Modifies or resets the current station address, if supported.
@@ -337,8 +331,7 @@ EFI_STATUS
   IN EFI_SIMPLE_NETWORK_PROTOCOL            *This,
   IN BOOLEAN                                Reset,
   IN EFI_MAC_ADDRESS                        *New OPTIONAL
-  )
-;
+  );
 
 /**
   Resets or collects the statistics on a network interface.
@@ -368,8 +361,7 @@ EFI_STATUS
   IN BOOLEAN                              Reset,
   IN OUT UINTN                            *StatisticsSize   OPTIONAL,
   OUT EFI_NETWORK_STATISTICS              *StatisticsTable  OPTIONAL
-  )
-;
+  );
 
 /**
   Converts a multicast IP address to a multicast HW MAC address.
@@ -399,8 +391,7 @@ EFI_STATUS
   IN BOOLEAN                              IPv6,
   IN EFI_IP_ADDRESS                       *IP,
   OUT EFI_MAC_ADDRESS                     *MAC
-  )
-;
+  );
 
 /**
   Performs read and write operations on the NVRAM device attached to a 
@@ -430,8 +421,7 @@ EFI_STATUS
   IN UINTN                                Offset,
   IN UINTN                                BufferSize,
   IN OUT VOID                             *Buffer
-  )
-;
+  );
 
 /**
   Reads the current interrupt status and recycled transmit buffer status from 
@@ -464,8 +454,7 @@ EFI_STATUS
   IN EFI_SIMPLE_NETWORK_PROTOCOL          *This,
   OUT UINT32                              *InterruptStatus OPTIONAL,
   OUT VOID                                **TxBuf OPTIONAL
-  )
-;
+  );
 
 /**
   Places a packet in the transmit queue of a network interface.
@@ -510,8 +499,7 @@ EFI_STATUS
   IN EFI_MAC_ADDRESS                      *SrcAddr  OPTIONAL,
   IN EFI_MAC_ADDRESS                      *DestAddr OPTIONAL,
   IN UINT16                               *Protocol OPTIONAL
-  )
-;
+  );
 
 /**
   Receives a packet from a network interface.
@@ -555,8 +543,7 @@ EFI_STATUS
   OUT EFI_MAC_ADDRESS                     *SrcAddr    OPTIONAL,
   OUT EFI_MAC_ADDRESS                     *DestAddr   OPTIONAL,
   OUT UINT16                              *Protocol   OPTIONAL
-  )
-;
+  );
 
 #define EFI_SIMPLE_NETWORK_PROTOCOL_REVISION  0x00010000
 

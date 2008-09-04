@@ -106,8 +106,7 @@ EFI_STATUS
   IN  EFI_MANAGED_NETWORK_PROTOCOL     *This,
   OUT EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData  OPTIONAL,
   OUT EFI_SIMPLE_NETWORK_MODE          *SnpModeData    OPTIONAL
-  )
-;
+  );
 
 /**
   Sets or clears the operational parameters for the MNP child driver.
@@ -133,8 +132,7 @@ EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_CONFIGURE)(
   IN EFI_MANAGED_NETWORK_PROTOCOL     *This,
   IN EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData  OPTIONAL
-  )
-;
+  );
 
 /**
   Translates an IP multicast address to a hardware (MAC) multicast address.
@@ -164,8 +162,7 @@ EFI_STATUS
   IN  BOOLEAN                       Ipv6Flag,
   IN  EFI_IP_ADDRESS                *IpAddress,
   OUT EFI_MAC_ADDRESS               *MacAddress
-  )
-;
+  );
 
 /**
   Enables and disables receive filters for multicast address.
@@ -194,8 +191,7 @@ EFI_STATUS
   IN EFI_MANAGED_NETWORK_PROTOCOL  *This,
   IN BOOLEAN                       JoinFlag,
   IN EFI_MAC_ADDRESS               *MacAddress  OPTIONAL
-  )
-;
+  );
 
 /**
   Places asynchronous outgoing data packets into the transmit queue.
@@ -218,8 +214,7 @@ EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_TRANSMIT)(
   IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
   IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
-  )
-;
+  );
 
 /**
   Places an asynchronous receiving request into the receiving queue.
@@ -245,8 +240,7 @@ EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_RECEIVE)(
   IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
   IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
-  )
-;
+  );
 
 
 /**
@@ -273,8 +267,7 @@ EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_CANCEL)(
   IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
   IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token  OPTIONAL
-  )
-;
+  );
 
 /**
   Polls for incoming data packets and processes outgoing data packets.
@@ -294,8 +287,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_MANAGED_NETWORK_POLL)(
   IN EFI_MANAGED_NETWORK_PROTOCOL    *This
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

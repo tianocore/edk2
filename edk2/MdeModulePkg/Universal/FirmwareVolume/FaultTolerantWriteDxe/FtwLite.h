@@ -150,8 +150,7 @@ EFIAPI
 InitializeFtwLite (
   IN EFI_HANDLE                 ImageHandle,
   IN EFI_SYSTEM_TABLE           *SystemTable
-  )
-;
+  );
 
 //
 // Fault Tolerant Write Protocol API
@@ -189,8 +188,7 @@ FtwLiteWrite (
   IN UINTN                                      Offset,
   IN OUT UINTN                                 *NumBytes,
   IN VOID                                       *Buffer
-  )
-;
+  );
 
 //
 // Internal functions
@@ -213,8 +211,7 @@ FtwLiteWrite (
 EFI_STATUS
 FtwRestart (
   IN EFI_FTW_LITE_DEVICE    *FtwLiteDevice
-  )
-;
+  );
 
 /**
   Aborts all previous allocated writes.
@@ -230,8 +227,7 @@ FtwRestart (
 EFI_STATUS
 FtwAbort (
   IN EFI_FTW_LITE_DEVICE    *FtwLiteDevice
-  )
-;
+  );
 
 
 /**
@@ -252,8 +248,7 @@ EFI_STATUS
 FtwWriteRecord (
   IN EFI_FTW_LITE_DEVICE                   *FtwLiteDevice,
   IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb
-  )
-;
+  );
 
 /**
   To Erase one block. The size is FTW_BLOCK_SIZE
@@ -272,8 +267,7 @@ FtwEraseBlock (
   IN EFI_FTW_LITE_DEVICE              *FtwLiteDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
   EFI_LBA                             Lba
-  )
-;
+  );
 
 /**
 
@@ -299,8 +293,7 @@ FtwEraseBlock (
 EFI_STATUS
 FtwEraseSpareBlock (
   IN EFI_FTW_LITE_DEVICE   *FtwLiteDevice
-  )
-;
+  );
 
 /**
   Retrive the proper FVB protocol interface by HANDLE.
@@ -318,8 +311,7 @@ EFI_STATUS
 FtwGetFvbByHandle (
   IN EFI_HANDLE                           FvBlockHandle,
   OUT EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  **FvBlock
-  )
-;
+  );
 
 /**
 
@@ -337,8 +329,7 @@ EFI_STATUS
 GetFvbByAddress (
   IN  EFI_PHYSICAL_ADDRESS               Address,
   OUT EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL **FvBlock
-  )
-;
+  );
 
 /**
 
@@ -357,8 +348,7 @@ IsInWorkingBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
   EFI_LBA                             Lba
-  )
-;
+  );
 
 /**
 
@@ -378,8 +368,7 @@ IsBootBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
   EFI_LBA                             Lba
-  )
-;
+  );
 
 /**
   Copy the content of spare block to a target block. Size is FTW_BLOCK_SIZE.
@@ -403,8 +392,7 @@ FlushSpareBlockToTargetBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice,
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
   EFI_LBA                             Lba
-  )
-;
+  );
 
 /**
   Copy the content of spare block to working block. Size is FTW_BLOCK_SIZE.
@@ -428,8 +416,7 @@ FlushSpareBlockToTargetBlock (
 EFI_STATUS
 FlushSpareBlockToWorkingBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice
-  )
-;
+  );
 
 /**
   Copy the content of spare block to a boot block. Size is FTW_BLOCK_SIZE.
@@ -450,8 +437,7 @@ FlushSpareBlockToWorkingBlock (
 EFI_STATUS
 FlushSpareBlockToBootBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice
-  )
-;
+  );
 
 /**
   Update a bit of state on a block device. The location of the bit is
@@ -477,8 +463,7 @@ FtwUpdateFvState (
   IN EFI_LBA                             Lba,
   IN UINTN                               Offset,
   IN UINT8                               NewBit
-  )
-;
+  );
 
 /**
   Get the last Write record pointer.
@@ -497,8 +482,7 @@ EFI_STATUS
 FtwGetLastRecord (
   IN  EFI_FTW_LITE_DEVICE  *FtwLiteDevice,
   OUT EFI_FTW_LITE_RECORD  **FtwLastRecord
-  )
-;
+  );
 
 /**
 
@@ -517,8 +501,7 @@ IsErasedFlashBuffer (
   IN BOOLEAN         Polarity,
   IN UINT8           *Buffer,
   IN UINTN           BufferSize
-  )
-;
+  );
 
 /**
   Initialize a work space when there is no work space.
@@ -533,8 +516,7 @@ IsErasedFlashBuffer (
 EFI_STATUS
 InitWorkSpaceHeader (
   IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingHeader
-  )
-;
+  );
 
 /**
   Read from working block to refresh the work space in memory.
@@ -549,8 +531,7 @@ InitWorkSpaceHeader (
 EFI_STATUS
 WorkSpaceRefresh (
   IN EFI_FTW_LITE_DEVICE  *FtwLiteDevice
-  )
-;
+  );
 
 /**
   Check to see if it is a valid work space.
@@ -565,8 +546,7 @@ WorkSpaceRefresh (
 BOOLEAN
 IsValidWorkSpace (
   IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingHeader
-  )
-;
+  );
 
 /**
   Reclaim the work space on the working block.
@@ -584,7 +564,6 @@ EFI_STATUS
 FtwReclaimWorkSpace (
   IN EFI_FTW_LITE_DEVICE  *FtwLiteDevice,
   IN BOOLEAN              PreserveRecord
-  )
-;
+  );
 
 #endif

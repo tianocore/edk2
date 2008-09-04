@@ -54,8 +54,7 @@ EFI_STATUS
   OUT UINT32                              *Attributes,
   IN OUT UINTN                            *EdidSize,
   IN OUT UINT8                            **Edid
-  )
-;
+  );
 
 /**
   @par Protocol Description:

@@ -203,28 +203,24 @@ extern PLATFORM_ROOT_BRIDGE_DEVICE_PATH  gPlatformRootBridge0;
 VOID
 PlatformBdsInit (
   IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData
-  )
-;
+  );
 
 VOID
 PlatformBdsPolicyBehavior (
   IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData,
   IN LIST_ENTRY                  *DriverOptionList,
   IN LIST_ENTRY                  *BootOptionList
-  )
-;
+  );
 
 VOID
 PlatformBdsGetDriverOption (
   IN LIST_ENTRY               *BdsDriverLists
-  )
-;
+  );
 
 EFI_STATUS
 BdsMemoryTest (
   EXTENDMEM_COVERAGE_LEVEL Level
-  )
-;
+  );
 
 EFI_STATUS
 PlatformBdsShowProgress (
@@ -234,14 +230,12 @@ PlatformBdsShowProgress (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL ProgressColor,
   UINTN                         Progress,
   UINTN                         PreviousValue
-  )
-;
+  );
 
 VOID
 PlatformBdsConnectSequence (
   VOID
-  )
-;
+  );
 
 VOID
 PlatformBdsBootFail (
@@ -249,64 +243,54 @@ PlatformBdsBootFail (
   IN  EFI_STATUS         Status,
   IN  CHAR16             *ExitData,
   IN  UINTN              ExitDataSize
-  )
-;
+  );
 
 VOID
 PlatformBdsBootSuccess (
   IN  BDS_COMMON_OPTION *Option
-  )
-;
+  );
 
 EFI_STATUS
 ProcessCapsules (
   EFI_BOOT_MODE BootMode
-  )
-;
+  );
 
 EFI_STATUS
 PlatformBdsConnectConsole (
   IN BDS_CONSOLE_CONNECT_ENTRY   *PlatformConsole
-  )
-;
+  );
 
 EFI_STATUS
 PlatformBdsNoConsoleAction (
   VOID
-  )
-;
+  );
 
 EFI_STATUS
 ConvertMpsTable (
   IN OUT  VOID     **Table
-  )
-;
+  );
   
 EFI_STATUS
 ConvertSmbiosTable (
   IN OUT VOID       **Table
-  )
-;
+  );
   
 EFI_STATUS
 ConvertAcpiTable (
  IN      UINTN      TableLen,
  IN OUT  VOID       **Table
-  )
-;
+  );
 
 EFI_STATUS
 ConvertSystemTable (
  IN     EFI_GUID   *TableGuid,
  IN OUT VOID       **Table
-  )
-;
+  );
 
 VOID
 PlatformBdsEnterFrontPage (
   IN UINT16                 TimeoutDefault,
   IN BOOLEAN                ConnectAllHappened
-  )
-;
+  );
 
 #endif // _PLATFORM_SPECIFIC_BDS_PLATFORM_H_

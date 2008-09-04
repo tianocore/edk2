@@ -70,8 +70,7 @@ PiLibGetSectionFromAnyFv (
   IN  UINTN                         SectionInstance,
   OUT VOID                          **Buffer,
   OUT UINTN                         *Size
-  )
-;
+  );
 
 /**
   Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
@@ -123,8 +122,7 @@ PiLibGetSectionFromCurrentFv (
   IN  UINTN                         SectionInstance,
   OUT VOID                          **Buffer,
   OUT UINTN                         *Size
-  )
-;
+  );
 
 
 /**
@@ -170,8 +168,7 @@ PiLibGetSectionFromCurrentFfs (
   IN  UINTN                         SectionInstance,
   OUT VOID                          **Buffer,
   OUT UINTN                         *Size
-  )
-;
+  );
 
 #endif
 

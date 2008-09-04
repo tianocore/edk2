@@ -35,8 +35,7 @@ PciRomAddImageMapping (
   IN UINT8       Func,
   IN UINT64      RomAddress,
   IN UINT64      RomLength
-  )
-;
+  );
 /**
   Load all option rom image to PCI driver list.
   
@@ -49,8 +48,7 @@ PciRomGetRomResourceFromPciOptionRomTable (
   IN EFI_DRIVER_BINDING_PROTOCOL      *This,
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   PCI_IO_DEVICE                       *PciIoDevice
-  )
-;
+  );
 
 /**
   Get Option rom driver's mapping for PCI device.
@@ -61,7 +59,6 @@ PciRomGetRomResourceFromPciOptionRomTable (
 EFI_STATUS
 PciRomGetImageMapping (
   PCI_IO_DEVICE                       *PciIoDevice
-  )
-;
+  );
 
 #endif

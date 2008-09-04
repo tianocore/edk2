@@ -146,14 +146,12 @@ extern EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL  gCirrusLogic5430DriverSupporte
 EFI_STATUS
 CirrusLogic5430UgaDrawConstructor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
-  )
-;
+  );
 
 EFI_STATUS
 CirrusLogic5430UgaDrawDestructor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
-  )
-;
+  );
 
 //
 // Graphics Output Hardware abstraction internal worker functions
@@ -161,14 +159,12 @@ CirrusLogic5430UgaDrawDestructor (
 EFI_STATUS
 CirrusLogic5430GraphicsOutputConstructor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
-  )
-;
+  );
 
 EFI_STATUS
 CirrusLogic5430GraphicsOutputDestructor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
-  )
-;
+  );
 
 
 //
@@ -190,8 +186,7 @@ CirrusLogic5430ControllerDriverSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -209,8 +204,7 @@ CirrusLogic5430ControllerDriverStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -230,8 +224,7 @@ CirrusLogic5430ControllerDriverStop (
   IN EFI_HANDLE                   Controller,
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
-  )
-;
+  );
 
 //
 // EFI Component Name Functions

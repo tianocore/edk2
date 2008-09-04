@@ -64,8 +64,7 @@ EFIAPI
 PeimInitializeVariableServices (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -76,8 +75,7 @@ PeiGetVariable (
   OUT UINT32                      *Attributes OPTIONAL,
   IN OUT UINTN                    *DataSize,
   OUT VOID                        *Data
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -88,8 +86,7 @@ PeiGetVariable2 (
   OUT       UINT32                          *Attributes,
   IN OUT    UINTN                           *DataSize,
   OUT       VOID                            *Data
-  )
-;  
+  );  
   
 EFI_STATUS
 EFIAPI
@@ -98,8 +95,7 @@ PeiGetNextVariableName2 (
   IN OUT UINTN                              *VariableNameSize,
   IN OUT CHAR16                             *VariableName,
   IN OUT EFI_GUID                           *VariableGuid
-  )
-;
+  );
   
 EFI_STATUS
 EFIAPI
@@ -108,8 +104,7 @@ PeiGetNextVariableName (
   IN OUT UINTN                    *VariableNameSize,
   IN OUT CHAR16                   *VariableName,
   IN OUT EFI_GUID                 *VendorGuid
-  )
-;
+  );
 
 /**
   Get one variable by the index count.

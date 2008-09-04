@@ -29,8 +29,7 @@ EFI_STATUS
 EFIAPI
 SupportCapsuleImage (
   IN EFI_CAPSULE_HEADER *CapsuleHeader
-  )
-;
+  );
 
 /**
   The firmware implements to process the capsule image.
@@ -44,8 +43,7 @@ EFI_STATUS
 EFIAPI
 ProcessCapsuleImage (
   IN EFI_CAPSULE_HEADER *CapsuleHeader
-  )
-;
+  );
 
 #endif
 

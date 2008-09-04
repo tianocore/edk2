@@ -179,8 +179,7 @@ EFI_STATUS
   IN EFI_MTFTP4_TOKEN     *Token,
   IN UINT16               PacketLen,
   IN EFI_MTFTP4_PACKET    *Paket
-  )
-;
+  );
 
 /**
   Timeout callback funtion.            
@@ -201,8 +200,7 @@ EFI_STATUS
 (EFIAPI *EFI_MTFTP4_TIMEOUT_CALLBACK)( 
   IN EFI_MTFTP4_PROTOCOL  *This,
   IN EFI_MTFTP4_TOKEN     *Token
-  )
-;
+  );
 
 /**
   a callback function that the caller provides to feed data to the
@@ -226,8 +224,7 @@ EFI_STATUS
   IN  EFI_MTFTP4_TOKEN    *Token,
   IN  OUT UINT16          *Length,
   OUT VOID                **Buffer
-  )
-;
+  );
 
 
 /**
@@ -246,8 +243,7 @@ EFI_STATUS
 (EFIAPI *EFI_MTFTP4_GET_MODE_DATA)(
   IN  EFI_MTFTP4_PROTOCOL     *This,
   OUT EFI_MTFTP4_MODE_DATA    *ModeData
-  )
-;
+  );
 
 
 /**
@@ -277,8 +273,7 @@ EFI_STATUS
 (EFIAPI *EFI_MTFTP4_CONFIGURE)(
   IN EFI_MTFTP4_PROTOCOL       *This,
   IN EFI_MTFTP4_CONFIG_DATA    *MtftpConfigData OPTIONAL
-  )
-;   
+  );   
     
     
 /**
@@ -324,8 +319,7 @@ EFI_STATUS
   IN  EFI_MTFTP4_OPTION        *OptionList,
   OUT UINT32                   *PacketLength,
   OUT EFI_MTFTP4_PACKET        **Packet        OPTIONAL
-  )
-;
+  );
 
 /**
   Parses the options in an MTFTPv4 OACK packet.
@@ -357,8 +351,7 @@ EFI_STATUS
   IN  EFI_MTFTP4_PACKET        *Packet,
   OUT UINT32                   *OptionCount,
   OUT EFI_MTFTP4_OPTION        **OptionList OPTIONAL
-  )
-;  
+  );  
 
 
 /**
@@ -384,8 +377,7 @@ EFI_STATUS
 (EFIAPI *EFI_MTFTP4_READ_FILE)(
   IN EFI_MTFTP4_PROTOCOL       *This,
   IN EFI_MTFTP4_TOKEN          *Token
-  )
-;  
+  );  
   
 
 
@@ -415,8 +407,7 @@ EFI_STATUS
 (EFIAPI *EFI_MTFTP4_WRITE_FILE)(
   IN EFI_MTFTP4_PROTOCOL       *This,
   IN EFI_MTFTP4_TOKEN          *Token
-  )
-;  
+  );  
   
 
 /**
@@ -446,8 +437,7 @@ EFI_STATUS
 (EFIAPI *EFI_MTFTP4_READ_DIRECTORY)(
   IN EFI_MTFTP4_PROTOCOL       *This,
   IN EFI_MTFTP4_TOKEN          *Token
-  )
-;    
+  );    
 
 /**
   Polls for incoming data packets and processes outgoing data packets.
@@ -468,8 +458,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_MTFTP4_POLL)(
   IN EFI_MTFTP4_PROTOCOL       *This
-  )
-;                                                                                                                 
+  );                                                                                                                 
                                                                                                                   
 /**  
   The EFI MTFTPv4 Protocol provides basic services for client-side unicast 

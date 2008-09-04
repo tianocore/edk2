@@ -120,8 +120,7 @@ PxeDhcp4Run (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   IN OPTIONAL UINTN                  OpLen,
   IN OPTIONAL VOID                   *OpList
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -129,8 +128,7 @@ EFIAPI
 PxeDhcp4Setup (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   IN EFI_PXE_DHCP4_DATA     *Data
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -140,8 +138,7 @@ PxeDhcp4Init (
   IN UINTN                  seconds_timeout,
   OUT UINTN                 *offer_list_entries,
   OUT DHCP4_PACKET          **offer_list
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -150,8 +147,7 @@ PxeDhcp4Select (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   IN UINTN                  seconds_timeout,
   IN DHCP4_PACKET           *offer_list
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -159,8 +155,7 @@ EFIAPI
 PxeDhcp4Renew (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   UINTN                     seconds_timeout
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -168,16 +163,14 @@ EFIAPI
 PxeDhcp4Rebind (
   IN EFI_PXE_DHCP4_PROTOCOL *This,
   UINTN                     seconds_timeout
-  )
-;
+  );
 
 extern
 EFI_STATUS 
 EFIAPI
 PxeDhcp4Release (
   IN EFI_PXE_DHCP4_PROTOCOL *This
-  )
-;
+  );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -188,15 +181,13 @@ extern
 UINT16 
 htons (
   UINTN n
-  )
-;
+  );
 
 extern
 UINT32 
 htonl (
   UINTN n
-  )
-;
+  );
 
 extern
 VOID 
@@ -204,8 +195,7 @@ EFIAPI
 timeout_notify (
   IN EFI_EVENT Event,
   IN VOID      *Context
-  )
-;
+  );
 
 extern
 VOID 
@@ -213,8 +203,7 @@ EFIAPI
 periodic_notify (
   IN EFI_EVENT Event,
   IN VOID      *Context
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -223,16 +212,14 @@ find_opt (
   IN UINT8        OpCode,
   IN UINTN        Skip,
   OUT DHCP4_OP    **OpPtr
-  )
-;
+  );
 
 extern
 EFI_STATUS 
 add_opt (
   IN DHCP4_PACKET *Packet,
   IN DHCP4_OP     *OpPtr
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -240,30 +227,26 @@ start_udp (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
   IN OPTIONAL EFI_IP_ADDRESS         *station_ip,
   IN OPTIONAL EFI_IP_ADDRESS         *subnet_mask
-  )
-;
+  );
 
 extern
 VOID 
 stop_udp (
   IN PXE_DHCP4_PRIVATE_DATA *Private
-  )
-;
+  );
 
 extern
 EFI_STATUS 
 start_receive_events (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
   IN UINTN                  seconds_timeout
-  )
-;
+  );
 
 extern
 VOID 
 stop_receive_events (
   IN PXE_DHCP4_PRIVATE_DATA *Private
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -274,8 +257,7 @@ tx_udp (
   IN EFI_IP_ADDRESS         *src_ip,
   IN VOID                   *buffer,
   IN UINTN                  BufferSize
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -286,8 +268,7 @@ rx_udp (
   IN OUT EFI_IP_ADDRESS     *dest_ip,
   IN OUT EFI_IP_ADDRESS     *src_ip,
   IN UINT16                 op_flags
-  )
-;
+  );
 
 extern
 EFI_STATUS 
@@ -309,8 +290,7 @@ tx_rx_udp (
       IN UINTN rx_pkt_size
     ),
   IN UINTN seconds_timeout
-  )
-;
+  );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

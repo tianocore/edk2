@@ -44,8 +44,7 @@ EFI_STATUS
   IN EFI_ISCSI_INITIATOR_NAME_PROTOCOL *This,
   IN OUT UINTN                         *BufferSize,
   OUT VOID                             *Buffer
-  )
-;
+  );
 
   
 
@@ -70,8 +69,7 @@ typedef EFI_STATUS
   IN EFI_ISCSI_INITIATOR_NAME_PROTOCOL *This,
   IN OUT UINTN                         *BufferSize,
   IN VOID                              *Buffer
-  )
-;  
+  );  
 
 /**  
   @par Protocol Description:

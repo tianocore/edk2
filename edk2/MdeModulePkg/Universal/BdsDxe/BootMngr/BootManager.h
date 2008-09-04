@@ -79,8 +79,7 @@ BootManagerCallback (
   IN  UINT8                                  Type,
   IN  EFI_IFR_TYPE_VALUE                     *Value,
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
-  )
-;
+  );
 
 /**
 
@@ -92,8 +91,7 @@ BootManagerCallback (
 EFI_STATUS
 InitializeBootManager (
   VOID
-  )
-;
+  );
 
 /**
   This funtion invokees Boot Manager. If all devices have not a chance to be connected,
@@ -105,7 +103,6 @@ InitializeBootManager (
 VOID
 CallBootManager (
   VOID
-  )
-;
+  );
 
 #endif

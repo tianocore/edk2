@@ -76,8 +76,7 @@ VOID
 EFIAPI
 PeiPcdSetSku (
   IN  UINTN                  SkuId
-  )
-;
+  );
 
 /**
   Retrieves an 8-bit value for a given PCD token.
@@ -94,8 +93,7 @@ UINT8
 EFIAPI
 PeiPcdGet8 (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 16-bit value for a given PCD token.
@@ -112,8 +110,7 @@ UINT16
 EFIAPI
 PeiPcdGet16 (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 32-bit value for a given PCD token.
@@ -130,8 +127,7 @@ UINT32
 EFIAPI
 PeiPcdGet32 (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 64-bit value for a given PCD token.
@@ -148,8 +144,7 @@ UINT64
 EFIAPI
 PeiPcdGet64 (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves a pointer to a value for a given PCD token.
@@ -168,8 +163,7 @@ VOID *
 EFIAPI
 PeiPcdGetPtr (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves a Boolean value for a given PCD token.
@@ -188,8 +182,7 @@ BOOLEAN
 EFIAPI
 PeiPcdGetBool (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves the size of the value for a given PCD token.
@@ -206,8 +199,7 @@ UINTN
 EFIAPI
 PeiPcdGetSize (
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 8-bit value for a given PCD token.
@@ -228,8 +220,7 @@ EFIAPI
 PeiPcdGet8Ex (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 16-bit value for a given PCD token.
@@ -250,8 +241,7 @@ EFIAPI
 PeiPcdGet16Ex (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 32-bit value for a given PCD token.
@@ -272,8 +262,7 @@ EFIAPI
 PeiPcdGet32Ex (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an 64-bit value for a given PCD token.
@@ -294,8 +283,7 @@ EFIAPI
 PeiPcdGet64Ex (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves a pointer to a value for a given PCD token.
@@ -316,8 +304,7 @@ EFIAPI
 PeiPcdGetPtrEx (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves an Boolean value for a given PCD token.
@@ -338,8 +325,7 @@ EFIAPI
 PeiPcdGetBoolEx (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves the size of the value for a given PCD token.
@@ -358,8 +344,7 @@ EFIAPI
 PeiPcdGetSizeEx (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber
-  )
-;
+  );
 
 /**
   Sets an 8-bit value for a given PCD token.
@@ -383,8 +368,7 @@ EFIAPI
 PeiPcdSet8 (
   IN UINTN             TokenNumber,
   IN UINT8             Value
-  )
-;
+  );
 
 /**
   Sets an 16-bit value for a given PCD token.
@@ -408,8 +392,7 @@ EFIAPI
 PeiPcdSet16 (
   IN UINTN             TokenNumber,
   IN UINT16            Value
-  )
-;
+  );
 
 /**
   Sets an 32-bit value for a given PCD token.
@@ -433,8 +416,7 @@ EFIAPI
 PeiPcdSet32 (
   IN UINTN             TokenNumber,
   IN UINT32            Value
-  )
-;
+  );
 
 /**
   Sets an 64-bit value for a given PCD token.
@@ -458,8 +440,7 @@ EFIAPI
 PeiPcdSet64 (
   IN UINTN             TokenNumber,
   IN UINT64            Value
-  )
-;
+  );
 
 /**
   Sets a value of a specified size for a given PCD token.
@@ -488,8 +469,7 @@ PeiPcdSetPtr (
   IN        UINTN             TokenNumber,
   IN OUT    UINTN             *SizeOfBuffer,
   IN        VOID              *Buffer
-  )
-;
+  );
 
 /**
   Sets an Boolean value for a given PCD token.
@@ -513,8 +493,7 @@ EFIAPI
 PeiPcdSetBool (
   IN UINTN             TokenNumber,
   IN BOOLEAN           Value
-  )
-;
+  );
 
 /**
   Sets an 8-bit value for a given PCD token.
@@ -540,8 +519,7 @@ PeiPcdSet8Ex (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN UINT8             Value
-  )
-;
+  );
 
 /**
   Sets an 16-bit value for a given PCD token.
@@ -567,8 +545,7 @@ PeiPcdSet16Ex (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN UINT16            Value
-  )
-;
+  );
 
 /**
   Sets an 32-bit value for a given PCD token.
@@ -594,8 +571,7 @@ PeiPcdSet32Ex (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN UINT32            Value
-  )
-;
+  );
 
 /**
   Sets an 64-bit value for a given PCD token.
@@ -621,8 +597,7 @@ PeiPcdSet64Ex (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN UINT64            Value
-  )
-;
+  );
 
 /**
   Sets a value of a specified size for a given PCD token.
@@ -653,8 +628,7 @@ PeiPcdSetPtrEx (
   IN        UINTN             TokenNumber,
   IN OUT    UINTN             *SizeOfBuffer,
   IN        VOID              *Buffer
-  )
-;
+  );
 
 /**
   Sets an Boolean value for a given PCD token.
@@ -680,8 +654,7 @@ PeiPcdSetBoolEx (
   IN CONST EFI_GUID    *Guid,
   IN UINTN             TokenNumber,
   IN BOOLEAN           Value
-  )
-;
+  );
 
 /**
   Specifies a function to be called anytime the value of a designated token is changed.
@@ -701,8 +674,7 @@ PeiRegisterCallBackOnSet (
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  UINTN                   TokenNumber,
   IN  PCD_PPI_CALLBACK        CallBackFunction
-  )
-;
+  );
 
 /**
   Cancels a previously set callback function for a particular PCD token number.
@@ -722,8 +694,7 @@ PcdUnRegisterCallBackOnSet (
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  UINTN                   TokenNumber,
   IN  PCD_PPI_CALLBACK        CallBackFunction
-  )
-;
+  );
 
 /**
   Retrieves the next valid PCD token for a given namespace.
@@ -748,8 +719,7 @@ EFIAPI
 PeiPcdGetNextToken (
   IN CONST EFI_GUID           *Guid, OPTIONAL
   IN OUT  UINTN               *TokenNumber
-  )
-;
+  );
 
 /**
   Retrieves the next valid PCD token namespace for a given namespace.
@@ -776,8 +746,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdGetNextTokenSpace (
   IN OUT CONST EFI_GUID           **Guid
-  )
-;
+  );
 
 
 /* Internal Function definitions */
@@ -790,8 +759,7 @@ PeiPcdGetNextTokenSpace (
 PEI_PCD_DATABASE *
 GetPcdDatabase (
   VOID
-  )
-;
+  );
 
 /**
   Wrapper function for setting non-pointer type value for a PCD entry.
@@ -808,8 +776,7 @@ SetValueWorker (
   IN          UINTN              TokenNumber,
   IN          VOID               *Data,
   IN          UINTN              Size
-  )
-;
+  );
 
 /**
   Set value for an PCD entry
@@ -832,8 +799,7 @@ SetWorker (
   IN          VOID               *Data,
   IN OUT      UINTN              *Size,
   IN          BOOLEAN            PtrType
-  )
-;
+  );
 
 /**
   Wrapper function for set PCD value for non-Pointer type dynamic-ex PCD.
@@ -852,8 +818,7 @@ ExSetValueWorker (
   IN          CONST EFI_GUID       *Guid,
   IN          VOID                 *Data,
   IN          UINTN                Size
-  )
-;
+  );
 
 /**
   Set value for a dynamic PCD entry.
@@ -880,8 +845,7 @@ ExSetWorker (
   IN      VOID                 *Data,
   IN OUT  UINTN                *Size,
   IN      BOOLEAN              PtrType
-  )
-;
+  );
 
 /**
   Get the PCD entry pointer in PCD database.
@@ -901,8 +865,7 @@ VOID *
 GetWorker (
   IN UINTN                TokenNumber,
   IN UINTN                GetSize
-  )
-;
+  );
 
 /**
   Wrapper function for get PCD value for dynamic-ex PCD.
@@ -919,8 +882,7 @@ ExGetWorker (
   IN CONST EFI_GUID   *Guid,
   IN UINTN            ExTokenNumber,
   IN UINTN            GetSize
-  )
-;
+  );
 
 typedef struct {
   UINTN   TokenNumber;
@@ -945,8 +907,7 @@ UINTN
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
   IN UINTN                      ExTokenNumber
-  )
-;
+  );
 
 /**
   The function registers the CallBackOnSet fucntion
@@ -976,8 +937,7 @@ PeiRegisterCallBackWorker (
 VOID
 BuildPcdDatabase (
   VOID
-  )
-;
+  );
 
 /**
   Get SKU ID tabble from PCD database.
@@ -992,8 +952,7 @@ SKU_ID *
 GetSkuIdArray (
   IN    UINTN             LocalTokenNumberTableIdx,
   IN    PEI_PCD_DATABASE  *Database
-  )
-;
+  );
 
 /**
   Get index of PCD entry in size table.
@@ -1008,8 +967,7 @@ UINTN
 GetSizeTableIndex (
   IN    UINTN             LocalTokenNumberTableIdx,
   IN    PEI_PCD_DATABASE  *Database
-  )
-;
+  );
 
 /**
   Get PCD value's size for POINTER type PCD.
@@ -1029,8 +987,7 @@ GetPtrTypeSize (
   IN    UINTN             LocalTokenNumberTableIdx,
   OUT   UINTN             *MaxSize,
   IN    PEI_PCD_DATABASE  *Database
-  )
-;
+  );
 
 /**
   Set PCD value's size for POINTER type PCD.
@@ -1051,8 +1008,7 @@ SetPtrTypeSize (
   IN          UINTN             LocalTokenNumberTableIdx,
   IN    OUT   UINTN             *CurrentSize,
   IN          PEI_PCD_DATABASE  *Database
-  )
-;
+  );
 
 
 extern EFI_GUID gPcdDataBaseHobGuid;

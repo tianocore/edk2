@@ -79,8 +79,7 @@ EFI_STATUS
   IN  EFI_HANDLE                                     HostBridge,
   IN  EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE  Phase,
   IN  EFI_PCI_CHIPSET_EXECUTION_PHASE                ChipsetPhase
-)
-;
+);
 
 
 /**
@@ -115,8 +114,7 @@ EFI_STATUS
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS    PciAddress,
   IN  EFI_PCI_CONTROLLER_RESOURCE_ALLOCATION_PHASE   Phase,
   IN  EFI_PCI_CHIPSET_EXECUTION_PHASE                ChipsetPhase
-)
-;
+);
 
 
 /**
@@ -136,8 +134,7 @@ EFI_STATUS
 (EFIAPI *EFI_PCI_PLATFORM_GET_PLATFORM_POLICY)(
   IN  EFI_PCI_PLATFORM_PROTOCOL           *This,
   OUT EFI_PCI_PLATFORM_POLICY             *PciPolicy
-)
-;
+);
 
 
 /**
@@ -174,8 +171,7 @@ EFI_STATUS
   IN   EFI_HANDLE                   PciHandle,
   OUT  VOID                         **RomImage,
   OUT  UINTN                        *RomSize
-)
-;
+);
 
 /**
   @par Protocol Description:

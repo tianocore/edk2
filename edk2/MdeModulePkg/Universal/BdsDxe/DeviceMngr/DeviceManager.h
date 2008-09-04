@@ -98,8 +98,7 @@ DeviceManagerCallback (
   IN  UINT8                                  Type,
   IN  EFI_IFR_TYPE_VALUE                     *Value,
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
-  )
-;
+  );
 
 /**
 
@@ -112,8 +111,7 @@ DeviceManagerCallback (
 EFI_STATUS
 InitializeDeviceManager (
   VOID
-  )
-;
+  );
 
 /**
 
@@ -131,7 +129,6 @@ InitializeDeviceManager (
 EFI_STATUS
 CallDeviceManager (
   VOID
-  )
-;
+  );
 
 #endif

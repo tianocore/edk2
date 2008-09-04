@@ -35,8 +35,7 @@ EFI_STATUS
 EFIAPI
 HiiLibCreateHiiDriverHandle (
   OUT EFI_HANDLE               *DriverHandle
-  )
-;
+  );
 
 /**
   Destroy the Driver Handle created by CreateHiiDriverHandle().
@@ -52,8 +51,7 @@ VOID
 EFIAPI
 HiiLibDestroyHiiDriverHandle (
   IN EFI_HANDLE                 DriverHandle
-  )
-;
+  );
 
 
 #endif

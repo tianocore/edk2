@@ -199,8 +199,7 @@ EFI_STATUS
 (EFIAPI *EFI_DHCP4_GET_MODE_DATA)(
   IN  EFI_DHCP4_PROTOCOL      *This,
   OUT EFI_DHCP4_MODE_DATA     *Dhcp4ModeData
-  )
-;
+  );
 
 /**
   Initializes, changes, or resets the operational settings for the EFI DHCPv4 Protocol driver.
@@ -226,8 +225,7 @@ EFI_STATUS
 (EFIAPI *EFI_DHCP4_CONFIGURE)(
   IN EFI_DHCP4_PROTOCOL       *This,
   IN EFI_DHCP4_CONFIG_DATA    *Dhcp4CfgData  OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -261,8 +259,7 @@ EFI_STATUS
 (EFIAPI *EFI_DHCP4_START)(
   IN EFI_DHCP4_PROTOCOL       *This,
   IN EFI_EVENT                CompletionEvent   OPTIONAL
-  )
-;
+  );
 
 /**
   Extends the lease time by sending a request packet.
@@ -296,8 +293,7 @@ EFI_STATUS
   IN EFI_DHCP4_PROTOCOL       *This,
   IN BOOLEAN                  RebindRequest,
   IN EFI_EVENT                CompletionEvent  OPTIONAL
-  )
-;
+  );
 
 /**
   Releases the current address configuration.
@@ -314,8 +310,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_DHCP4_RELEASE)(
   IN EFI_DHCP4_PROTOCOL       *This
-  )
-;
+  );
 
 /**
   Stops the current address configuration.
@@ -330,8 +325,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_DHCP4_STOP)(
   IN EFI_DHCP4_PROTOCOL       *This
-  )
-;
+  );
 
 /**
   Builds a DHCP packet, given the options to be appended or deleted or replaced.
@@ -365,8 +359,7 @@ EFI_STATUS
   IN  UINT32                  AppendCount,
   IN  EFI_DHCP4_PACKET_OPTION *AppendList[]       OPTIONAL,
   OUT EFI_DHCP4_PACKET        **NewPacket
-  )
-;
+  );
 /**
   Transmits a DHCP formatted packet and optionally waits for responses.
 
@@ -387,8 +380,7 @@ EFI_STATUS
 (EFIAPI *EFI_DHCP4_TRANSMIT_RECEIVE)(
   IN EFI_DHCP4_PROTOCOL                *This,
   IN EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token
-  )
-;
+  );
 
 
 /**
@@ -417,8 +409,7 @@ EFI_STATUS
   IN EFI_DHCP4_PACKET          *Packet,
   IN OUT UINT32                *OptionCount,
   OUT EFI_DHCP4_PACKET_OPTION  *PacketOptionList[]  OPTIONAL
-  )
-;
+  );
 
 /**
   @par Protocol Description:

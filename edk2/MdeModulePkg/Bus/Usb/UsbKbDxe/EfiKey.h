@@ -225,8 +225,7 @@ EFIAPI
 USBKeyboardResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
-  )
-;
+  );
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -246,8 +245,7 @@ EFIAPI
 USBKeyboardReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
-  )
-;
+  );
 
 /**
   Set certain state for the input device.
@@ -266,8 +264,7 @@ EFIAPI
 USBKeyboardSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
-  )
-;
+  );
 
 /**
   Register a notification function for a particular keystroke for the input device.
@@ -291,8 +288,7 @@ USBKeyboardRegisterKeyNotify (
   IN  EFI_KEY_DATA                       *KeyData,
   IN  EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT EFI_HANDLE                         *NotifyHandle
-  )
-;
+  );
 
 /**
   Remove a registered notification function from a particular keystroke.
@@ -311,8 +307,7 @@ EFIAPI
 USBKeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
-  )
-;
+  );
 
 #endif
 

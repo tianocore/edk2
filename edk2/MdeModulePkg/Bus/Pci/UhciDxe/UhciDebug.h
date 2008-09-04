@@ -28,8 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID
 UhciDumpQh (
   IN UHCI_QH_SW         *QhSw
-  )
-;
+  );
 
 
 /**
@@ -43,7 +42,6 @@ UhciDumpQh (
 VOID
 UhciDumpTds (
   IN UHCI_TD_SW           *TdSw
-  )
-;
+  );
 
 #endif

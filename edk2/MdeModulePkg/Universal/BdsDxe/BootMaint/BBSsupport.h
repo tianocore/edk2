@@ -63,8 +63,7 @@ BdsDeleteAllInvalidLegacyBootOptions (
 EFI_STATUS
 BdsAddNonExistingLegacyBootOptions (
   VOID
-  )
-;
+  );
 
 /**
 

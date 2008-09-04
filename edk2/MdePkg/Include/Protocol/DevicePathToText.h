@@ -47,8 +47,7 @@ CHAR16*
   IN CONST EFI_DEVICE_PATH_PROTOCOL   *DeviceNode,
   IN BOOLEAN                          DisplayOnly,
   IN BOOLEAN                          AllowShortcuts
-  )
-;      
+  );      
 
 /**
   Convert a device path to its text representation.
@@ -71,8 +70,7 @@ CHAR16*
   IN CONST EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
   IN BOOLEAN                          DisplayOnly,
   IN BOOLEAN                          AllowShortcuts
-  )
-;    
+  );    
 
 /**
   @par Protocol Description:

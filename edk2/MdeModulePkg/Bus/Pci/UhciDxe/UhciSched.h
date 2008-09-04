@@ -96,8 +96,7 @@ struct _UHCI_ASYNC_REQUEST{
 EFI_STATUS
 UhciInitFrameList (
   IN USB_HC_DEV         *Uhc
-  )
-;
+  );
 
 /**
   Destory FrameList buffer.
@@ -110,8 +109,7 @@ UhciInitFrameList (
 VOID
 UhciDestoryFrameList (
   IN USB_HC_DEV           *Uhc
-  )
-;
+  );
 
 
 /**
@@ -126,8 +124,7 @@ UhciDestoryFrameList (
 UINTN
 UhciConvertPollRate (
   IN  UINTN               Interval
-  )
-;
+  );
 
 
 /**
@@ -144,8 +141,7 @@ VOID
 UhciLinkQhToFrameList (
   UINT32                  *FrameBase,
   UHCI_QH_SW              *Qh
-  )
-;
+  );
 
 
 /**
@@ -163,8 +159,7 @@ VOID
 UhciUnlinkQhFromFrameList (
   UINT32                *FrameBase,
   UHCI_QH_SW            *Qh
-  )
-;
+  );
 
 
 /**
@@ -189,8 +184,7 @@ UhciExecuteTransfer (
   IN  UINTN               TimeOut,
   IN  BOOLEAN             IsLow,
   OUT UHCI_QH_RESULT      *QhResult
-  )
-;
+  );
 
 
 /**
@@ -228,8 +222,7 @@ UhciCreateAsyncReq (
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback,
   IN VOID                             *Context,
   IN BOOLEAN                          IsLow
-  )
-;
+  );
 
 
 /**
@@ -251,8 +244,7 @@ UhciRemoveAsyncReq (
   IN  UINT8               DevAddr,
   IN  UINT8               EndPoint,
   OUT UINT8               *Toggle
-  )
-;
+  );
 
 
 /**
@@ -266,8 +258,7 @@ UhciRemoveAsyncReq (
 VOID
 UhciFreeAllAsyncReq (
   IN USB_HC_DEV           *Uhc
-  )
-;
+  );
 
 
 /**
@@ -283,7 +274,6 @@ VOID
 UhciMonitorAsyncReqList (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
-  )
-;
+  );
 
 #endif

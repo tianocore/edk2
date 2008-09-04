@@ -30,8 +30,7 @@ VOID
 EhcDumpQtd (
   IN EHC_QTD              *Qtd,
   IN CHAR8                *Msg
-  )
-;
+  );
 
 
 /**
@@ -49,8 +48,7 @@ EhcDumpQh (
   IN EHC_QH               *Qh,
   IN CHAR8                *Msg,
   IN BOOLEAN              DumpBuf
-  )
-;
+  );
 
 
 /**
@@ -66,7 +64,6 @@ VOID
 EhcDumpBuf (
   IN UINT8                *Buf,
   IN UINTN                Len
-  )
-;
+  );
 
 #endif

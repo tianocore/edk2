@@ -81,39 +81,33 @@ typedef struct {
 VOID
 PlatformBdsGetDriverOption (
   IN LIST_ENTRY                   *BdsDriverLists
-  )
-;
+  );
 
 EFI_STATUS
 BdsMemoryTest (
   EXTENDMEM_COVERAGE_LEVEL Level
-  )
-;
+  );
 
 VOID
 PlatformBdsConnectSequence (
   VOID
-  )
-;
+  );
 
 
 EFI_STATUS
 ProcessCapsules (
   EFI_BOOT_MODE BootMode
-  )
-;
+  );
 
 EFI_STATUS
 PlatformBdsConnectConsole (
   IN BDS_CONSOLE_CONNECT_ENTRY   *PlatformConsole
-  )
-;
+  );
 
 EFI_STATUS
 PlatformBdsNoConsoleAction (
   VOID
-  )
-;
+  );
 
 VOID
 PlatformBdsEnterFrontPage (

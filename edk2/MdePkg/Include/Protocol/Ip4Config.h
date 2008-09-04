@@ -65,8 +65,7 @@ EFI_STATUS
   IN EFI_IP4_CONFIG_PROTOCOL   *This,
   IN EFI_EVENT                 DoneEvent,
   IN EFI_EVENT                 ReconfigEvent
-  )
-;
+  );
 
 /**
   Stops running the configuration policy for the EFI IPv4 Protocol driver.
@@ -82,8 +81,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_IP4_CONFIG_STOP)(
   IN EFI_IP4_CONFIG_PROTOCOL   *This
-  )
-;
+  );
 
 /**
   Returns the default configuration data (if any) for the EFI IPv4 Protocol driver.
@@ -110,8 +108,7 @@ EFI_STATUS
   IN EFI_IP4_CONFIG_PROTOCOL   *This,
   IN OUT UINTN                 *IpConfigDataSize,
   OUT EFI_IP4_IPCONFIG_DATA    *IpConfigData    OPTIONAL
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

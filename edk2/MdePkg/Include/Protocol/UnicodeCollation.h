@@ -67,8 +67,7 @@ INTN
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN CHAR16                                 *Str1,
   IN CHAR16                                 *Str2
-  )
-;
+  );
 
 /**
   Performs a case-insensitive comparison of a Null-terminated Unicode 
@@ -88,8 +87,7 @@ BOOLEAN
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN CHAR16                                 *String,
   IN CHAR16                                 *Pattern
-  )
-;
+  );
 
 /**
   Converts all the Unicode characters in a Null-terminated Unicode string to 
@@ -104,8 +102,7 @@ VOID
 (EFIAPI *EFI_UNICODE_COLLATION_STRLWR)(
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN OUT CHAR16                             *Str
-  )
-;
+  );
 
 /**
   Converts all the Unicode characters in a Null-terminated Unicode string to upper
@@ -120,8 +117,7 @@ VOID
 (EFIAPI *EFI_UNICODE_COLLATION_STRUPR)(
   IN EFI_UNICODE_COLLATION_PROTOCOL         *This,
   IN OUT CHAR16                             *Str
-  )
-;
+  );
 
 /**
   Converts an 8.3 FAT file name in an OEM character set to a Null-terminated 
@@ -142,8 +138,7 @@ VOID
   IN UINTN                                  FatSize,
   IN CHAR8                                  *Fat,
   OUT CHAR16                                *String
-  )
-;
+  );
 
 /**
   Converts a Null-terminated Unicode string to legal characters in a FAT 
@@ -167,8 +162,7 @@ BOOLEAN
   IN CHAR16                                 *String,
   IN UINTN                                  FatSize,
   OUT CHAR8                                 *Fat
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

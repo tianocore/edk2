@@ -525,8 +525,7 @@ GraphicsConsoleControllerDriverStop (
 EFI_STATUS
 EfiLocateHiiProtocol (
   VOID
-  )
-;
+  );
 
 
 #endif

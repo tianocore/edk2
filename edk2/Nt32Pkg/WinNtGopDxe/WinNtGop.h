@@ -188,8 +188,7 @@ extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 EFI_STATUS
 WinNtGopSupported (
   IN  EFI_WIN_NT_IO_PROTOCOL  *WinNtIo
-  )
-;
+  );
 
 
 /**
@@ -203,8 +202,7 @@ WinNtGopSupported (
 EFI_STATUS
 WinNtGopConstructor (
   IN  GOP_PRIVATE_DATA    *Private
-  )
-;
+  );
 
 
 /**
@@ -218,8 +216,7 @@ WinNtGopConstructor (
 EFI_STATUS
 WinNtGopDestructor (
   IN  GOP_PRIVATE_DATA    *Private
-  )
-;
+  );
 
 //
 // UEFI 2.0 driver model prototypes for Win NT GOP
@@ -240,8 +237,7 @@ EFIAPI
 WinNtGopInitialize (
   IN EFI_HANDLE            ImageHandle,
   IN EFI_SYSTEM_TABLE      *SystemTable
-  )
-;
+  );
 
 
 /**
@@ -260,8 +256,7 @@ WinNtGopDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      Handle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 
 /**
@@ -280,8 +275,7 @@ WinNtGopDriverBindingStart (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      Handle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
-  )
-;
+  );
 
 
 /**
@@ -302,8 +296,7 @@ WinNtGopDriverBindingStop (
   IN  EFI_HANDLE                   Handle,
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   *ChildHandleBuffer
-  )
-;
+  );
 
 
 /**
@@ -319,8 +312,7 @@ EFI_STATUS
 GopPrivateAddQ (
   IN  GOP_PRIVATE_DATA    *Private,
   IN  EFI_INPUT_KEY       Key
-  )
-;
+  );
 
 
 /**
@@ -334,8 +326,7 @@ GopPrivateAddQ (
 EFI_STATUS
 WinNtGopInitializeSimpleTextInForWindow (
   IN  GOP_PRIVATE_DATA    *Private
-  )
-;
+  );
 
 
 /**
@@ -349,8 +340,7 @@ WinNtGopInitializeSimpleTextInForWindow (
 EFI_STATUS
 WinNtGopDestroySimpleTextInForWindow (
   IN  GOP_PRIVATE_DATA    *Private
-  )
-;
+  );
 
 
 

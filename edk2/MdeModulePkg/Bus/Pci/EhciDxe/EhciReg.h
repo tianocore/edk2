@@ -128,8 +128,7 @@ UINT32
 EhcReadCapRegister (
   IN  USB2_HC_DEV         *Ehc,
   IN  UINT32              Offset
-  )
-;
+  );
 
 
 /**
@@ -145,8 +144,7 @@ UINT32
 EhcReadOpReg (
   IN  USB2_HC_DEV         *Ehc,
   IN  UINT32              Offset
-  )
-;
+  );
 
 
 /**
@@ -164,8 +162,7 @@ EhcWriteOpReg (
   IN USB2_HC_DEV          *Ehc,
   IN UINT32               Offset,
   IN UINT32               Data
-  )
-;
+  );
 
 
 /**
@@ -180,8 +177,7 @@ EhcWriteOpReg (
 VOID
 EhcClearLegacySupport (
   IN USB2_HC_DEV          *Ehc
-  )
-;
+  );
 
 
 
@@ -200,8 +196,7 @@ EFI_STATUS
 EhcSetAndWaitDoorBell (
   IN  USB2_HC_DEV         *Ehc,
   IN  UINT32               Timeout
-  )
-;
+  );
 
 
 /**
@@ -215,8 +210,7 @@ EhcSetAndWaitDoorBell (
 VOID
 EhcAckAllInterrupt (
   IN  USB2_HC_DEV         *Ehc
-  )
-;
+  );
 
 
 
@@ -232,8 +226,7 @@ EhcAckAllInterrupt (
 BOOLEAN
 EhcIsHalt (
   IN USB2_HC_DEV          *Ehc
-  )
-;
+  );
 
 
 /**
@@ -248,8 +241,7 @@ EhcIsHalt (
 BOOLEAN
 EhcIsSysError (
   IN USB2_HC_DEV          *Ehc
-  )
-;
+  );
 
 
 /**
@@ -266,8 +258,7 @@ EFI_STATUS
 EhcResetHC (
   IN USB2_HC_DEV          *Ehc,
   IN UINT32               Timeout
-  )
-;
+  );
 
 
 /**
@@ -284,8 +275,7 @@ EFI_STATUS
 EhcHaltHC (
   IN USB2_HC_DEV         *Ehc,
   IN UINT32              Timeout
-  )
-;
+  );
 
 
 /**
@@ -302,8 +292,7 @@ EFI_STATUS
 EhcRunHC (
   IN USB2_HC_DEV          *Ehc,
   IN UINT32               Timeout
-  )
-;
+  );
 
 
 
@@ -325,7 +314,6 @@ EhcRunHC (
 EFI_STATUS
 EhcInitHC (
   IN USB2_HC_DEV          *Ehc
-  )
-;
+  );
 
 #endif

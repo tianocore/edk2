@@ -26,8 +26,7 @@ EFI_STATUS
 EFIAPI
 AcpiS3ResumeOs (
   VOID
-  )
-;
+  );
 
 #endif
 

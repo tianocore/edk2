@@ -49,8 +49,7 @@ typedef
 VOID
 (*DEBUG_PROC) (
   VOID
-  )
-;
+  );
 
 typedef struct {
   DESCRIPTOR  OrigDesc;

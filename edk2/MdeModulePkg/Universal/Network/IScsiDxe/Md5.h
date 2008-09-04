@@ -48,8 +48,7 @@ typedef struct _MD5_CTX {
 EFI_STATUS
 MD5Init (
   IN MD5_CTX  *Md5Ctx
-  )
-;
+  );
 
 /**
   the external interface of Md5 algorithm
@@ -69,8 +68,7 @@ MD5Update (
   IN MD5_CTX  *Md5Ctx,
   IN VOID     *Data,
   IN UINTN    DataLen
-  )
-;
+  );
 
 /**
   accumulate the MD5 value of every data segment and generate the finial
@@ -88,7 +86,6 @@ EFI_STATUS
 MD5Final (
   IN  MD5_CTX  *Md5Ctx,
   OUT UINT8    *HashVal
-  )
-;
+  );
 
 #endif // _MD5_H

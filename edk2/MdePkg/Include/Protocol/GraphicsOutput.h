@@ -72,8 +72,7 @@ EFI_STATUS
   IN  UINT32                                ModeNumber,
   OUT UINTN                                 *SizeOfInfo,
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
-  )
-;
+  );
 
 /**
   Return the current video mode information.
@@ -91,8 +90,7 @@ EFI_STATUS
 (EFIAPI *EFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE)(
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL *This,
   IN  UINT32                       ModeNumber
-  )
-;
+  );
 
 typedef struct {
   UINT8 Blue;

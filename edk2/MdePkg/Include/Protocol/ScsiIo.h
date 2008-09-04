@@ -96,8 +96,7 @@ EFI_STATUS
 (EFIAPI *EFI_SCSI_IO_PROTOCOL_GET_DEVICE_TYPE)(
   IN  EFI_SCSI_IO_PROTOCOL            *This,
   OUT UINT8                           *DeviceType
-  )
-;
+  );
 
 /**
   Retrieves the device location in the SCSI channel.
@@ -118,8 +117,7 @@ EFI_STATUS
   IN EFI_SCSI_IO_PROTOCOL           *This,
   IN OUT UINT8                      **Target,
   OUT UINT64                        *Lun
-  )
-;
+  );
 
 /**
   Resets the SCSI Bus that the SCSI Controller is attached to.
@@ -138,8 +136,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SCSI_IO_PROTOCOL_RESET_BUS)(
   IN EFI_SCSI_IO_PROTOCOL     *This
-  )
-;
+  );
 
 /**
   Resets the SCSI Controller that the device handle specifies.
@@ -159,8 +156,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SCSI_IO_PROTOCOL_RESET_DEVICE)(
   IN EFI_SCSI_IO_PROTOCOL     *This
-  )
-;
+  );
 
 
 /**
@@ -217,8 +213,7 @@ EFI_STATUS
   IN EFI_SCSI_IO_PROTOCOL                   *This,
   IN OUT  EFI_SCSI_IO_SCSI_REQUEST_PACKET   *Packet,
   IN EFI_EVENT                              Event  OPTIONAL
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

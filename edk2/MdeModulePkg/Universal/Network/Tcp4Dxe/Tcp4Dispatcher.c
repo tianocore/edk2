@@ -141,8 +141,7 @@ Tcp4GetMode (
 
       Option->EnableNagle         = (BOOLEAN) (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_NAGLE));
       Option->EnableTimeStamp     = (BOOLEAN) (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_TS));
-      Option->EnableWindowScaling = (BOOLEAN) (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_WS))
-;
+      Option->EnableWindowScaling = (BOOLEAN) (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_WS));
 
       Option->EnableSelectiveAck      = FALSE;
       Option->EnablePathMtuDiscovery  = FALSE;

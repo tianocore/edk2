@@ -60,8 +60,7 @@ BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
-  )
-;
+  );
 
 /**
     Reads the next keystroke from the input device. The WaitForKey Event can 

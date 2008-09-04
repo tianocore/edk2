@@ -76,8 +76,7 @@ EFI_STATUS
   IN EFI_TAPE_IO_PROTOCOL *This,
   IN OUT UINTN            *BufferSize,
   OUT VOID                *Buffer
-  )
-;    
+  );    
 
 /**
   Writes to the tape.
@@ -113,8 +112,7 @@ EFI_STATUS
   IN EFI_TAPE_IO_PROTOCOL *This,
   IN UINTN                *BufferSize,
   IN VOID                 *Buffer
-  )
-; 
+  ); 
   
 
 /**
@@ -135,8 +133,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TAPE_REWIND)(
   IN EFI_TAPE_IO_PROTOCOL *This
-  )
-;   
+  );   
 
 
 /**
@@ -166,8 +163,7 @@ EFI_STATUS
   IN EFI_TAPE_IO_PROTOCOL *This,
   INTN                    Direction,
   UINTN                   Type
-  )
-;   
+  );   
 
 
 /**
@@ -193,8 +189,7 @@ EFI_STATUS
 (EFIAPI *EFI_TAPE_WRITEFM)(
   IN EFI_TAPE_IO_PROTOCOL *This,
   IN UINTN                Count
-  )
-;   
+  );   
 
 
 /**
@@ -217,8 +212,7 @@ EFI_STATUS
 (EFIAPI *EFI_TAPE_RESET)(
   IN EFI_TAPE_IO_PROTOCOL *This,
   IN BOOLEAN              ExtendedVerification
-  )
-;    
+  );    
 
 /**  
   @par Protocol Description:

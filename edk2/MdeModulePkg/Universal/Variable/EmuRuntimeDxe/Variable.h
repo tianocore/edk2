@@ -86,24 +86,21 @@ EFIAPI
 VariableCommonInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 VariableServiceInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-;
+  );
 
 VOID
 EFIAPI
 VariableClassAddressChangeEvent (
   IN EFI_EVENT        Event,
   IN VOID             *Context
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -115,8 +112,7 @@ GetVariable (
   OUT     VOID              *Data,
   IN      VARIABLE_GLOBAL   * Global,
   IN      UINT32            Instance
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -126,8 +122,7 @@ GetNextVariableName (
   IN OUT  EFI_GUID          *VendorGuid,
   IN      VARIABLE_GLOBAL   *Global,
   IN      UINT32            Instance
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -141,8 +136,7 @@ SetVariable (
   IN UINTN                   *VolatileOffset,
   IN UINTN                   *NonVolatileOffset,
   IN UINT32                  Instance
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -153,7 +147,6 @@ QueryVariableInfo (
   OUT UINT64                 *MaximumVariableSize,
   IN  VARIABLE_GLOBAL        *Global,
   IN  UINT32                 Instance
-  )
-;
+  );
 
 #endif

@@ -53,8 +53,7 @@ EFI_STATUS
 RegisterHotkey (
   IN EFI_KEY_OPTION     *KeyOption,
   OUT UINT16            *KeyOptionNumber
-  )
-;
+  );
 
 /**
 
@@ -70,8 +69,7 @@ RegisterHotkey (
 EFI_STATUS
 UnregisterHotkey (
   IN UINT16             KeyOptionNumber
-  )
-;
+  );
 
 
 /**
@@ -87,7 +85,6 @@ UnregisterHotkey (
 EFI_STATUS
 InitializeHotkeyService (
   VOID
-  )
-;
+  );
 
 #endif

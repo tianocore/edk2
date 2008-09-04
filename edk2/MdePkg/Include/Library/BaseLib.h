@@ -622,8 +622,7 @@ CHAR16
 EFIAPI
 NibbleToHexChar (
   IN UINT8      Nibble
-  )
-;
+  );
 
 /** 
   Convert binary buffer to a Unicode String in a specified sequence. 
@@ -660,8 +659,7 @@ BufToHexString (
   IN OUT       UINTN                *StringLen,
   IN     CONST UINT8                *Buffer,
   IN           UINTN                BufferSizeInBytes
-  )
-;
+  );
 
 
 /**
@@ -705,8 +703,7 @@ HexStringToBuf (
   IN OUT       UINTN                    *BufferSizeInBytes,
   IN     CONST CHAR16                   *String,
   OUT          UINTN                    *ConvertedStrLen  OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -730,8 +727,7 @@ EFIAPI
 IsHexDigit (
   OUT UINT8      *Digit,
   IN  CHAR16      Char
-  )
-;
+  );
 
 /**
   Convert one Null-terminated Unicode string to a Null-terminated

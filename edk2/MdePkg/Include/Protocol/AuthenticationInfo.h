@@ -84,8 +84,7 @@ EFI_STATUS
   IN  EFI_AUTHENTICATION_INFO_PROTOCOL *This,
   IN  EFI_HANDLE                       *ControllerHandle,
   OUT VOID                             *Buffer
-  )
-;  
+  );  
 
 /**
   Set the Authentication information for a given controller handle.
@@ -108,8 +107,7 @@ EFI_STATUS
   IN EFI_AUTHENTICATION_INFO_PROTOCOL  *This,
   IN EFI_HANDLE                        *ControllerHandle,
   IN VOID                              *Buffer
-  )
-;  
+  );  
 
 /**
   @par Protocol Description:
