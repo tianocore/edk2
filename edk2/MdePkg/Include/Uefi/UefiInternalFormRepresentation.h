@@ -1427,17 +1427,6 @@ typedef struct {
   // EFI_HII_KEYBOARD_LAYOUT Layout[];
 } EFI_HII_KEYBOARD_PACKAGE_HDR;
 
-//typedef struct {
-//  CHAR16                  Language[];           // RFC4646 Language Code
-//  CHAR16                  Space;
-//  CHAR16                  DescriptionString[];
-//} EFI_DESCRIPTION_STRING;
-
-//typedef struct {
-//  UINT16                  DescriptionCount;
-//  EFI_DESCRIPTION_STRING  DescriptionString[];
-//} EFI_DESCRIPTION_STRING_BUNDLE;
-
 //
 // Modifier values
 //
