@@ -78,13 +78,11 @@ extern UINT8  gBreakSet;
 VOID
 DebugSerialPrint (
   IN UINT8    *OutputString
-  )
-;
+  );
 
 VOID
 DebugSerialWrite (
   IN UINT8  Character
-  )
-;
+  );
 
 #endif

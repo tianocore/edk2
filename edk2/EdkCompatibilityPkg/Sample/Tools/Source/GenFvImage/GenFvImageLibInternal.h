@@ -206,7 +206,6 @@ EFI_STATUS
 ParseFvInf (
   IN MEMORY_FILE  *InfFile,
   IN FV_INFO      *FvInfo
-  )
-;
+  );
 
 #endif

@@ -89,8 +89,7 @@ MyCheck (
   BOOLEAN      Final,
   UINT8        File[],
   UINTN        Line
-  )
-;
+  );
 //
 // *++
 // Description:
@@ -121,8 +120,7 @@ MyAlloc (
   UINTN      Size,
   UINT8      File[],
   UINTN      Line
-  )
-;
+  );
 //
 // *++
 // Description:
@@ -153,8 +151,7 @@ MyRealloc (
   UINTN      Size,
   UINT8      File[],
   UINTN      Line
-  )
-;
+  );
 //
 // *++
 // Description:
@@ -185,8 +182,7 @@ MyFree (
   VOID       *Ptr,
   UINT8      File[],
   UINTN      Line
-  )
-;
+  );
 //
 // *++
 // Description:

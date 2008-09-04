@@ -40,8 +40,7 @@ VOID
 MemoryInitializeStatusCode (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
-  )
-;
+  );
 
 //
 // Status code reporting function
@@ -54,7 +53,6 @@ MemoryReportStatusCode (
   IN UINT32                   Instance,
   IN EFI_GUID                 * CallerId,
   IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
-  )
-;
+  );
 
 #endif

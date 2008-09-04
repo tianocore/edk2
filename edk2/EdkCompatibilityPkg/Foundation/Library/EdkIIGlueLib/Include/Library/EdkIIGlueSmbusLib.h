@@ -71,8 +71,7 @@ EFIAPI
 SmBusQuickRead (
   IN  UINTN                     SmBusAddress,
   OUT RETURN_STATUS             *Status       OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS quick write command.
@@ -96,8 +95,7 @@ EFIAPI
 SmBusQuickWrite (
   IN  UINTN                     SmBusAddress,
   OUT RETURN_STATUS             *Status       OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS receive byte command.
@@ -123,8 +121,7 @@ EFIAPI
 SmBusReceiveByte (
   IN  UINTN          SmBusAddress,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS send byte command.
@@ -152,8 +149,7 @@ SmBusSendByte (
   IN  UINTN          SmBusAddress,
   IN  UINT8          Value,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS read data byte command.
@@ -178,8 +174,7 @@ EFIAPI
 SmBusReadDataByte (
   IN  UINTN          SmBusAddress,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS write data byte command.
@@ -207,8 +202,7 @@ SmBusWriteDataByte (
   IN  UINTN          SmBusAddress,
   IN  UINT8          Value,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS read data word command.
@@ -233,8 +227,7 @@ EFIAPI
 SmBusReadDataWord (
   IN  UINTN          SmBusAddress,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS write data word command.
@@ -262,8 +255,7 @@ SmBusWriteDataWord (
   IN  UINTN          SmBusAddress,
   IN  UINT16         Value,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS process call command.
@@ -291,8 +283,7 @@ SmBusProcessCall (
   IN  UINTN          SmBusAddress,
   IN  UINT16         Value,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS read block command.
@@ -323,8 +314,7 @@ SmBusReadBlock (
   IN  UINTN          SmBusAddress,
   OUT VOID           *Buffer,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS write block command.
@@ -353,8 +343,7 @@ SmBusWriteBlock (
   IN  UINTN          SmBusAddress,
   OUT VOID           *Buffer,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 /**
   Executes an SMBUS block process call command.
@@ -387,8 +376,7 @@ SmBusBlockProcessCall (
   IN  VOID           *WriteBuffer,
   OUT VOID           *ReadBuffer,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
+  );
 
 
 #endif

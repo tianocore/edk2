@@ -122,23 +122,20 @@ EFIAPI
 SetEsalVirtualEntryPoint (
   IN  UINT64  EntryPoint,
   IN  UINT64  Gp
-  )
-;
+  );
 
 SAL_RETURN_REGS
 EFIAPI
 SetEsalPhysicalEntryPoint (
   IN  UINT64  EntryPoint,
   IN  UINT64  Gp
-  )
-;
+  );
 
 SAL_RETURN_REGS
 EFIAPI
 GetEsalEntryPoint (
   VOID
-  )
-;
+  );
 
 
 #endif

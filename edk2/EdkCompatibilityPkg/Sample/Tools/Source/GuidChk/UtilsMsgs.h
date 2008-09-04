@@ -25,8 +25,7 @@ Abstract:
 STATUS
 GetUtilityStatus (
   VOID
-  )
-;
+  );
 
 //
 // If someone prints an error message and didn't specify a source file name,
@@ -36,8 +35,7 @@ GetUtilityStatus (
 VOID
 SetUtilityName (
   INT8 *ProgramName
-  )
-;
+  );
 
 void
 Error (
@@ -47,8 +45,7 @@ Error (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 Warning (
@@ -58,8 +55,7 @@ Warning (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 DebugMsg (
@@ -69,21 +65,18 @@ DebugMsg (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 SetDebugMsgMask (
   UINT32    MsgMask
-  )
-;
+  );
 
 void
 ParserSetPosition (
   INT8    *SourceFileName,
   UINT32  LineNum
-  )
-;
+  );
 
 void
 ParserError (
@@ -91,8 +84,7 @@ ParserError (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 ParserWarning (
@@ -100,7 +92,6 @@ ParserWarning (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 #endif

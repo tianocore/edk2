@@ -37,8 +37,7 @@ CHAR16 *
 GetToken (
   IN  EFI_STRING_ID                Token,
   IN  EFI_HII_HANDLE               HiiHandle
-  )
-;
+  );
 
 /**
   Create a new string in HII Package List.
@@ -54,8 +53,7 @@ EFI_STRING_ID
 NewString (
   IN  CHAR16                   *String,
   IN  EFI_HII_HANDLE           HiiHandle
-  )
-;
+  );
 
 #endif
 

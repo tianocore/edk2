@@ -237,16 +237,14 @@ HiiNewPack (
   IN  EFI_HII_PROTOCOL              *This,
   IN  EFI_HII_PACKAGES              *PackageList,
   OUT FRAMEWORK_EFI_HII_HANDLE      *Handle
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 HiiRemovePack (
   IN EFI_HII_PROTOCOL               *This,
   IN FRAMEWORK_EFI_HII_HANDLE       Handle
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -254,8 +252,7 @@ HiiFindHandles (
   IN     EFI_HII_PROTOCOL           *This,
   IN OUT UINT16                     *HandleBufferLength,
   OUT    FRAMEWORK_EFI_HII_HANDLE   *Handle
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -264,8 +261,7 @@ HiiExportDatabase (
   IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
   IN OUT UINTN                      *BufferSize,
   OUT    VOID                       *Buffer
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -276,8 +272,7 @@ HiiGetGlyph (
   OUT    UINT8                      **GlyphBuffer,
   OUT    UINT16                     *BitWidth,
   IN OUT UINT32                     *InternalStatus
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -290,8 +285,7 @@ HiiGlyphToBlt (
   IN     UINTN                         Width,
   IN     UINTN                         Height,
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -301,8 +295,7 @@ HiiNewString (
   IN     FRAMEWORK_EFI_HII_HANDLE Handle,
   IN OUT STRING_REF              *Reference,
   IN     CHAR16                  *NewString
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -314,16 +307,14 @@ HiiGetString (
   IN     CHAR16                     *LanguageString,
   IN OUT UINTN                      *BufferLength,
   OUT    EFI_STRING                 StringBuffer
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 HiiResetStrings (
   IN     EFI_HII_PROTOCOL           *This,
   IN     FRAMEWORK_EFI_HII_HANDLE   Handle
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -332,8 +323,7 @@ HiiTestString (
   IN     CHAR16                     *StringToTest,
   IN OUT UINT32                     *FirstMissing,
   OUT    UINT32                     *GlyphBufferSize
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -341,8 +331,7 @@ HiiGetPrimaryLanguages (
   IN  EFI_HII_PROTOCOL              *This,
   IN  FRAMEWORK_EFI_HII_HANDLE      Handle,
   OUT EFI_STRING                    *LanguageString
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -351,8 +340,7 @@ HiiGetSecondaryLanguages (
   IN  FRAMEWORK_EFI_HII_HANDLE        Handle,
   IN  CHAR16                          *PrimaryLanguage,
   OUT EFI_STRING                      *LanguageString
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -365,8 +353,7 @@ HiiGetLine (
   IN     CHAR16                         *LanguageString,
   IN OUT UINT16                         *BufferLength,
   OUT    EFI_STRING                     StringBuffer
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -376,8 +363,7 @@ HiiGetForms (
   IN     EFI_FORM_ID                    FormId,
   IN OUT UINTN                          *BufferLength,
   OUT    UINT8                          *Buffer
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -386,8 +372,7 @@ HiiGetDefaultImage (
   IN     FRAMEWORK_EFI_HII_HANDLE       Handle,
   IN     UINTN                          DefaultMask,
   OUT    EFI_HII_VARIABLE_PACK_LIST     **VariablePackList
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -397,8 +382,7 @@ HiiUpdateForm (
   IN EFI_FORM_LABEL                     Label,
   IN BOOLEAN                            AddData,
   IN FRAMEWORK_EFI_HII_UPDATE_DATA      *Data
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -406,8 +390,7 @@ HiiGetKeyboardLayout (
   IN     EFI_HII_PROTOCOL               *This,
   OUT    UINT16                         *DescriptorCount,
   OUT    FRAMEWORK_EFI_KEY_DESCRIPTOR   *Descriptor
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI 
@@ -421,8 +404,7 @@ ThunkSendForm (
   IN  UINT8                           *NvMapOverride, OPTIONAL
   IN  FRAMEWORK_EFI_SCREEN_DESCRIPTOR *ScreenDimensions, OPTIONAL
   OUT BOOLEAN                         *ResetRequired OPTIONAL
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI 
@@ -434,8 +416,7 @@ ThunkCreatePopUp (
   OUT EFI_INPUT_KEY                   *KeyValue,
   IN  CHAR16                          *String,
   ...
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -445,8 +426,7 @@ RemovePackNotify (
   IN CONST EFI_HII_PACKAGE_HEADER       *Package,
   IN EFI_HII_HANDLE                     Handle,
   IN EFI_HII_DATABASE_NOTIFY_TYPE       NotifyType
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -456,8 +436,7 @@ NewOrAddPackNotify (
   IN CONST EFI_HII_PACKAGE_HEADER       *Package,
   IN EFI_HII_HANDLE                     Handle,
   IN EFI_HII_DATABASE_NOTIFY_TYPE       NotifyType
-  )
-;
+  );
 
 #include "Utility.h"
 #include "ConfigAccess.h"

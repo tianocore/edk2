@@ -27,16 +27,14 @@ IdToQuestion (
   IN FORM_BROWSER_FORMSET  *FormSet,
   IN FORM_BROWSER_FORM     *Form,
   IN UINT16                QuestionId
-  )
-;
+  );
 
 
 FORM_EXPRESSION *
 IdToExpression (
   IN FORM_BROWSER_FORM  *Form,
   IN UINT8              RuleId
-  )
-;
+  );
 
  
 #endif

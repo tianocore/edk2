@@ -31,13 +31,11 @@ Abstract:
 void
 CFVConstructor (
   VOID
-  )
-;
+  );
 void
 CFVDestructor (
   VOID
-  )
-;
+  );
 
 int
 CFVAddFVFile (
@@ -50,27 +48,23 @@ CFVAddFVFile (
   char  *Apriori,
   char  *BaseName,
   char  *Guid
-  )
-;
+  );
 
 int
 CFVSetXRefFileName (
   char    *FileName
-  )
-;
+  );
 
 int
 CFVWriteInfFiles (
   DSC_FILE  *DSC,
   FILE      *MakeFptr
-  )
-;
+  );
 
 int
 NonFFSFVWriteInfFiles (
   DSC_FILE  *DSC,
   char      *FileName
-  )
-;
+  );
 
 #endif // ifndef _FW_VOLUME_H_

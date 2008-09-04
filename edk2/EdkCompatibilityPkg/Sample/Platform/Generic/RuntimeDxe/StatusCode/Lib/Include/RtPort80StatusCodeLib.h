@@ -38,7 +38,6 @@ RtPort80ReportStatusCode (
   IN UINT32                   Instance,
   IN EFI_GUID                 * CallerId,
   IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
-  )
-;
+  );
 
 #endif

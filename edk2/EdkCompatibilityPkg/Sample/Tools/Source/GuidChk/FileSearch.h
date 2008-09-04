@@ -64,45 +64,38 @@ typedef struct {
 STATUS
 FileSearchInit (
   FILE_SEARCH_DATA    *FSData
-  )
-;
+  );
 
 STATUS
 FileSearchDestroy (
   FILE_SEARCH_DATA    *FSData
-  )
-;
+  );
 
 STATUS
 FileSearchStart (
   FILE_SEARCH_DATA    *FSData,
   char                *FileMask,
   UINT32              SearchFlags
-  )
-;
+  );
 
 STATUS
 FileSearchFindNext (
   FILE_SEARCH_DATA    *FSData
-  )
-;
+  );
 
 STATUS
 FileSearchExcludeDirs (
   FILE_SEARCH_DATA    *FSData,
   STRING_LIST         *StrList
-  )
-;
+  );
 STATUS
 FileSearchExcludeExtensions (
   FILE_SEARCH_DATA    *FSData,
   STRING_LIST         *StrList
-  )
-;
+  );
 STATUS
 FileSearchExcludeFiles (
   FILE_SEARCH_DATA    *FSData,
   STRING_LIST         *StrList
-  )
-;
+  );
 #endif

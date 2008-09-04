@@ -52,8 +52,7 @@ StriColl (
   IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
   IN CHAR16                           *Str1,
   IN CHAR16                           *Str2
-  )
-;
+  );
 
 /**
   Converts all the Unicode characters in a Null-terminated Unicode string to 
@@ -68,8 +67,7 @@ EFIAPI
 StrLwr (
   IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
   IN OUT CHAR16                       *Str
-  )
-;
+  );
 
 /**
   Converts all the Unicode characters in a Null-terminated Unicode string to upper
@@ -84,8 +82,7 @@ EFIAPI
 StrUpr (
   IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
   IN OUT CHAR16                       *Str
-  )
-;
+  );
 
 /**
   Performs a case-insensitive comparison of a Null-terminated Unicode 
@@ -105,8 +102,7 @@ MetaiMatch (
   IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
   IN CHAR16                           *String,
   IN CHAR16                           *Pattern
-  )
-;
+  );
 
 /**
   Converts an 8.3 FAT file name in an OEM character set to a Null-terminated 
@@ -127,8 +123,7 @@ FatToStr (
   IN UINTN                            FatSize,
   IN CHAR8                            *Fat,
   OUT CHAR16                          *String
-  )
-;
+  );
 
 /**
   Converts a Null-terminated Unicode string to legal characters in a FAT 
@@ -152,8 +147,7 @@ StrToFat (
   IN CHAR16                           *String,
   IN UINTN                            FatSize,
   OUT CHAR8                           *Fat
-  )
-;
+  );
 
 #define UC_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('_', 'U', 'C', '_')
 

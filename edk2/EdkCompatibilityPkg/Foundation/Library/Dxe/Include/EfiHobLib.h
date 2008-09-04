@@ -215,8 +215,7 @@ GetNextFirmwareVolume2Hob (
   OUT    EFI_PHYSICAL_ADDRESS  *BaseAddress,
   OUT    UINT64                *Length,
   OUT    EFI_GUID              *FileName
-  )
-;
+  );
 #endif
 
 EFI_STATUS

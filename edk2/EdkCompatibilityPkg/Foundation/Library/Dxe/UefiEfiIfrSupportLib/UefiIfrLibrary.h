@@ -280,8 +280,7 @@ CreateOneOfOptionOpCode (
   IN     IFR_OPTION           *OptionsList,
   IN     UINT8                Type,
   IN OUT EFI_HII_UPDATE_DATA  *Data
-  )
-;
+  );
 
 EFI_STATUS
 CreateOneOfOpCode (
