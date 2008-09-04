@@ -29,7 +29,7 @@
   Include/Ia32
 
 [Includes.X64]
-  Include/x64
+  Include/X64
 
 [Includes.IPF]
   Include/Ipf
