@@ -114,8 +114,7 @@ RETURN_STATUS
 EFIAPI
 GluePeCoffLoaderGetImageInfo (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  )
-;
+  );
 
 /**
   Applies relocation fixups to a PE/COFF image that was loaded with PeCoffLoaderLoadImage().
@@ -141,8 +140,7 @@ RETURN_STATUS
 EFIAPI
 GluePeCoffLoaderRelocateImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  )
-;
+  );
 
 /**
   Loads a PE/COFF image into memory.
@@ -171,8 +169,7 @@ RETURN_STATUS
 EFIAPI
 GluePeCoffLoaderLoadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  )
-;
+  );
 
 
 /**
@@ -194,8 +191,7 @@ PeCoffLoaderImageReadFromMemory (
   IN     UINTN   FileOffset,
   IN OUT UINTN   *ReadSize,
   OUT    VOID    *Buffer
-  )
-;
+  );
 
 
 /**
@@ -219,8 +215,7 @@ PeCoffLoaderRelocateImageForRuntime (
   IN  PHYSICAL_ADDRESS        VirtImageBase,
   IN  UINTN                   ImageSize,
   IN  VOID                    *RelocationData
-  )
-;
+  );
 
 
 #endif

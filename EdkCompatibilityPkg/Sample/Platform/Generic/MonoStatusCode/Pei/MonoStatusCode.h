@@ -67,8 +67,7 @@ EFIAPI
 InstallMonoStatusCode (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
-  )
-;
+  );
 
 //
 // This is the platform function to initialize the listeners desired by the
@@ -78,8 +77,7 @@ VOID
 PlatformInitializeStatusCode (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
-  )
-;
+  );
 
 //
 // This is the platform function that calls all of the listeners desired by the
@@ -94,8 +92,7 @@ PlatformReportStatusCode (
   IN UINT32                   Instance,
   IN EFI_GUID                 * CallerId,
   IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
-  )
-;
+  );
 
 //
 // Platform independent function Declarations
@@ -108,8 +105,7 @@ EFIAPI
 InitializeMonoStatusCode (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
-  )
-;
+  );
 
 //
 // Convert a DXE status code call into a PEI status code call.
@@ -122,8 +118,7 @@ TranslateDxeStatusCodeToPeiStatusCode (
   IN UINT32                   Instance,
   IN EFI_GUID                 * CallerId,
   IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
-  )
-;
+  );
 
 //
 // Publish a HOB that contains the listener to be used by DXE.
@@ -132,7 +127,6 @@ EFI_STATUS
 EFIAPI
 InitializeDxeReportStatusCode (
   IN EFI_PEI_SERVICES       **PeiServices
-  )
-;
+  );
 
 #endif

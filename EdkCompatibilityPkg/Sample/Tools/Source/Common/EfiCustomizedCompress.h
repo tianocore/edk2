@@ -24,8 +24,7 @@ Abstract:
 EFI_STATUS
 SetCustomizedCompressionType (
   IN  CHAR8   *Type
-  )
-;
+  );
 
 /*++
 
@@ -49,8 +48,7 @@ CustomizedGetInfo (
   IN      UINT32  SrcSize,
   OUT     UINT32  *DstSize,
   OUT     UINT32  *ScratchSize
-  )
-;
+  );
 
 /*++
 
@@ -79,8 +77,7 @@ CustomizedDecompress (
   IN      UINT32  DstSize,
   IN OUT  VOID    *Scratch,
   IN      UINT32  ScratchSize
-  )
-;
+  );
 
 /*++
 
@@ -110,8 +107,7 @@ CustomizedCompress (
   IN      UINT32  SrcSize,
   IN      UINT8   *DstBuffer,
   IN OUT  UINT32  *DstSize
-  )
-;
+  );
 
 /*++
 

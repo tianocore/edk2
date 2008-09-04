@@ -51,7 +51,6 @@ typedef struct _STRING_LIST {
 int
 CreateGuidList (
   INT8    *OutFileName
-  )
-;
+  );
 
 #endif // #ifndef _COMMON_UTILS_H_

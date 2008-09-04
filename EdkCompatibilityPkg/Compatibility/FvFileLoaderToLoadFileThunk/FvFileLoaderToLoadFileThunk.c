@@ -50,8 +50,7 @@ FrameworkLoadFile (
   OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
   OUT UINT64                                    *ImageSize,
   OUT EFI_PHYSICAL_ADDRESS                      *EntryPoint
-  )
-;
+  );
 
 EFI_PEI_FV_FILE_LOADER_PPI mLoadFilePpi = {
   FrameworkLoadFile

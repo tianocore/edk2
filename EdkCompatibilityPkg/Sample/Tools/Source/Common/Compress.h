@@ -36,8 +36,7 @@ TianoCompress (
   IN      UINT32  SrcSize,
   IN      UINT8   *DstBuffer,
   IN OUT  UINT32  *DstSize
-  )
-;
+  );
 
 /*++
 
@@ -52,8 +51,7 @@ EfiCompress (
   IN      UINT32  SrcSize,
   IN      UINT8   *DstBuffer,
   IN OUT  UINT32  *DstSize
-  )
-;
+  );
 
 /*++
 

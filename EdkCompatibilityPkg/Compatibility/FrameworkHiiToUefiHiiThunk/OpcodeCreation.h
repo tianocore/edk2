@@ -19,38 +19,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 UCreateEndOfOpcode (
   OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-;
+  );
 
 EFI_STATUS
 F2UCreateSubtitleOpCode (
   IN CONST FRAMEWORK_EFI_IFR_SUBTITLE  *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-;
+  );
 
 EFI_STATUS
 F2UCreateTextOpCode (
   IN CONST FRAMEWORK_EFI_IFR_TEXT      *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-;
+  );
 
 
 EFI_STATUS
 F2UCreateGotoOpCode (
   IN CONST FRAMEWORK_EFI_IFR_REF       *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-;
+  );
 
 EFI_STATUS
 F2UCreateOneOfOptionOpCode (
   IN CONST FRAMEWORK_EFI_IFR_ONE_OF_OPTION    *FwOpcode,
   IN       UINTN                              Width,
   OUT      EFI_HII_UPDATE_DATA                *UefiData
-  )
-;
+  );
 
 EFI_STATUS
 F2UCreateOneOfOpCode (
@@ -60,8 +55,7 @@ F2UCreateOneOfOpCode (
   OUT      EFI_HII_UPDATE_DATA         *UefiData,
   OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
   OUT      UINTN                       *DataCount
-  )
-;
+  );
 
 EFI_STATUS
 F2UCreateOrderedListOpCode (
@@ -71,8 +65,7 @@ F2UCreateOrderedListOpCode (
   OUT      EFI_HII_UPDATE_DATA         *UefiData,
   OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
   OUT      UINTN                       *DataCount
-  )
-;
+  );
 
 
 EFI_STATUS
@@ -81,8 +74,7 @@ F2UCreateCheckBoxOpCode (
   IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_CHECKBOX  *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-;
+  );
 
 
 EFI_STATUS
@@ -91,8 +83,7 @@ F2UCreateNumericOpCode (
   IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_NUMERIC   *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-;
+  );
 
 
 EFI_STATUS
@@ -101,16 +92,14 @@ F2UCreateStringOpCode (
   IN       UINT16                      VarStoreId,
   IN CONST FRAMEWORK_EFI_IFR_STRING    *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-;
+  );
 
 
 EFI_STATUS
 F2UCreateBannerOpCode (
   IN CONST FRAMEWORK_EFI_IFR_BANNER    *FwOpcode,
   OUT      EFI_HII_UPDATE_DATA         *UefiData
-  )
-;
+  );
 
 EFI_STATUS
 FwUpdateDataToUefiUpdateData (
@@ -118,7 +107,6 @@ FwUpdateDataToUefiUpdateData (
   IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *Data,
   IN       BOOLEAN                          AddData,
   OUT      EFI_HII_UPDATE_DATA              **UefiData
-  )
-;
+  );
 #endif
 

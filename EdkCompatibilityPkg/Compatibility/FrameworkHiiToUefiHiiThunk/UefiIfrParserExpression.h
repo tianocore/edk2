@@ -27,8 +27,7 @@
 VOID
 ResetScopeStack (
   VOID
-  )
-;
+  );
 
 /**
   Push an Operand onto the Stack
@@ -43,8 +42,7 @@ ResetScopeStack (
 EFI_STATUS
 PushScope (
   IN UINT8   Operand
-  )
-;
+  );
 
 
 /**
@@ -60,8 +58,7 @@ PushScope (
 EFI_STATUS
 PopScope (
   OUT UINT8     *Operand
-  )
-;
+  );
 
 /**
   Zero extend integer/boolean/date/time to UINT64 for comparing.
@@ -74,8 +71,7 @@ PopScope (
 VOID
 ExtendValueToU64 (
   IN  EFI_HII_VALUE   *Value
-  )
-;
+  );
 
 /**
   Compare two Hii value.
@@ -95,7 +91,6 @@ CompareHiiValue (
   IN  EFI_HII_VALUE   *Value1,
   IN  EFI_HII_VALUE   *Value2,
   IN  EFI_HII_HANDLE  HiiHandle OPTIONAL
-  )
-;
+  );
 
 #endif

@@ -62,8 +62,7 @@ GenerateFvImage (
   OUT UINT8   **SymImage,
   OUT UINTN   *SymImageSize,
   OUT CHAR8   **SymFileName
-  )
-;
+  );
 
 /*++
 
@@ -94,8 +93,7 @@ EFI_STATUS
 UpdatePeiCoreEntryInFit (
   IN FIT_TABLE     *FitTablePtr,
   IN UINT64        PeiCorePhysicalAddress
-  )
-;
+  );
 
 /*++
 
@@ -118,8 +116,7 @@ Returns:
 VOID
 UpdateFitCheckSum (
   IN FIT_TABLE   *FitTablePtr
-  )
-;
+  );
 
 /*++
 

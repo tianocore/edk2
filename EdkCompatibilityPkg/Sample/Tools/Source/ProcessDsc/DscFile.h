@@ -70,40 +70,33 @@ int
 DSCFileSetFile (
   DSC_FILE *DSC,
   char     *FileName
-  )
-;
+  );
 SECTION *
 DSCFileFindSection (
   DSC_FILE *DSC,
   char     *Name
-  )
-;
+  );
 int
 DSCFileSavePosition (
   DSC_FILE *DSC
-  )
-;
+  );
 int
 DSCFileRestorePosition (
   DSC_FILE *DSC
-  )
-;
+  );
 char    *
 DSCFileGetLine (
   DSC_FILE *DSC,
   char     *Line,
   int      LineLen
-  )
-;
+  );
 int
 DSCFileInit (
   DSC_FILE *DSC
-  )
-;
+  );
 int
 DSCFileDestroy (
   DSC_FILE *DSC
-  )
-;
+  );
 
 #endif // ifndef _DSC_FILE_H_

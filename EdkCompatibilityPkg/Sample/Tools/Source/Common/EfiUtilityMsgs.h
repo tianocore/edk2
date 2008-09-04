@@ -53,8 +53,7 @@ GetUtilityStatus (
 void
 SetUtilityName (
   INT8 *ProgramName
-  )
-;
+  );
 
 void
 Error (
@@ -64,8 +63,7 @@ Error (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 Warning (
@@ -75,8 +73,7 @@ Warning (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 DebugMsg (
@@ -86,21 +83,18 @@ DebugMsg (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 SetDebugMsgMask (
   UINT32    MsgMask
-  )
-;
+  );
 
 void
 ParserSetPosition (
   INT8    *SourceFileName,
   UINT32  LineNum
-  )
-;
+  );
 
 void
 ParserError (
@@ -108,8 +102,7 @@ ParserError (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 ParserWarning (
@@ -117,16 +110,14 @@ ParserWarning (
   INT8    *OffendingText,
   INT8    *MsgFmt,
   ...
-  )
-;
+  );
 
 void
 SetPrintLimits (
   UINT32  NumErrors,
   UINT32  NumWarnings,
   UINT32  NumWarningsPlusErrors
-  )
-;
+  );
 
 #ifdef __cplusplus
 }

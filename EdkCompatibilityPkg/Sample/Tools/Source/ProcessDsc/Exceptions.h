@@ -31,27 +31,22 @@ Abstract:
 int
 InitExceptions (
   VOID
-  )
-;
+  );
 int
 TryException (
   VOID
-  )
-;
+  );
 char  *
 CatchException (
   VOID
-  )
-;
+  );
 int
 ExceptionThrown (
   VOID
-  )
-;
+  );
 int
 ThrowException (
   char *EMsg
-  )
-;
+  );
 
 #endif // ifndef _EXCEPTIONS_H_

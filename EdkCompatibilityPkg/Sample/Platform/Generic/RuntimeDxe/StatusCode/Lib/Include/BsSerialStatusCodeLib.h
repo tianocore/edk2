@@ -35,8 +35,7 @@ EFIAPI
 BsSerialInitializeStatusCode (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-;
+  );
 
 //
 // Status code reporting function
@@ -49,7 +48,6 @@ BsSerialReportStatusCode (
   IN UINT32                   Instance,
   IN EFI_GUID                 * CallerId,
   IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
-  )
-;
+  );
 
 #endif

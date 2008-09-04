@@ -26,8 +26,7 @@ CalculateCrc32 (
   IN  UINT8                             *Data,
   IN  UINTN                             DataSize,
   IN OUT UINT32                         *CrcOut
-  )
-;
+  );
 
 /*++
 

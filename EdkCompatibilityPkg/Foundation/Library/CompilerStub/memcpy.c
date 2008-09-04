@@ -32,8 +32,7 @@ memcpy (
   OUT VOID        *Dest,
   IN  const VOID  *Src,
   IN  UINTN       Count
-  )
-;
+  );
 
 #ifdef _MSC_EXTENSIONS
 #pragma intrinsic(memcpy)

@@ -142,8 +142,7 @@ VOID
 IA32API
 EfiHalt (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                               
 Routine Description:                                                
@@ -157,8 +156,7 @@ VOID
 IA32API
 EfiWbinvd (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                               
 Routine Description:                                                
@@ -172,8 +170,7 @@ VOID
 IA32API
 EfiInvd (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -188,8 +185,7 @@ IA32API
 EfiCpuid (
   IN  UINT32                 RegisterInEax,
   OUT EFI_CPUID_REGISTER     *Regs
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -226,8 +222,7 @@ UINT64
 IA32API
 EfiReadMsr (
   IN UINT32     Index
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -243,8 +238,7 @@ IA32API
 EfiWriteMsr (
   IN UINT32     Index,
   IN UINT64     Value
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -259,8 +253,7 @@ UINT64
 IA32API
 EfiReadTsc (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -274,8 +267,7 @@ VOID
 IA32API
 EfiDisableCache (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -289,8 +281,7 @@ VOID
 IA32API
 EfiEnableCache (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -304,8 +295,7 @@ UINT32
 IA32API
 EfiGetEflags (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -319,8 +309,7 @@ VOID
 IA32API
 EfiDisableInterrupts (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                
@@ -334,8 +323,7 @@ VOID
 IA32API
 EfiEnableInterrupts (
   VOID
-  )
-;
+  );
 
 /*++                                                                                                                          
 Routine Description:                                                

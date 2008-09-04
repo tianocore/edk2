@@ -111,8 +111,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_KEY_NOTIFY_FUNCTION) (
   IN  EFI_KEY_DATA                      *KeyData
-  )
-;
+  );
 
 typedef
 EFI_STATUS

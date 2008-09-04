@@ -31,8 +31,7 @@ memset (
   OUT VOID    *Dest,
   IN  UINTN   Char,
   IN  UINTN   Count
-  )
-;
+  );
 
 #ifdef _MSC_EXTENSIONS
 #pragma intrinsic(memset)

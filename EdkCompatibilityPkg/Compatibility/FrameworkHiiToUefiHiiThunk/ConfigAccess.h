@@ -35,14 +35,12 @@ EFI_STATUS
 InstallDefaultConfigAccessProtocol (
   IN  CONST EFI_HII_PACKAGES                         *Packages,
   IN  OUT   HII_THUNK_CONTEXT *ThunkContext
-  )
-;
+  );
 
 VOID
 UninstallDefaultConfigAccessProtocol (
   IN  HII_THUNK_CONTEXT                   *ThunkContext
-  )
-;
+  );
 
 /**
 
@@ -74,8 +72,7 @@ ThunkExtractConfig (
   IN  CONST EFI_STRING                       Request,
   OUT EFI_STRING                             *Progress,
   OUT EFI_STRING                             *Results
-  )
-;
+  );
 
 
 /**
@@ -100,8 +97,7 @@ ThunkRouteConfig (
   IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
   IN  CONST EFI_STRING                       Configuration,
   OUT EFI_STRING                             *Progress
-  )
-;
+  );
 
 /**
   Wrap the EFI_HII_CONFIG_ACCESS_PROTOCOL.CallBack to EFI_FORM_CALLBACK_PROTOCOL.Callback. Therefor,
@@ -137,8 +133,7 @@ ThunkCallback (
   IN  UINT8                                  Type,
   IN  EFI_IFR_TYPE_VALUE                     *Value,
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
-  )
-;
+  );
 
 #endif
 

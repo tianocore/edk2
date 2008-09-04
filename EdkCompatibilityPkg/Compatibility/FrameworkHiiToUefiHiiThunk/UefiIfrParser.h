@@ -295,20 +295,17 @@ EvaluateExpression (
   IN FORM_BROWSER_FORMSET  *FormSet,
   IN FORM_BROWSER_FORM     *Form,
   IN OUT FORM_EXPRESSION   *Expression
-  )
-;
+  );
 
 EFI_STATUS
 ParseOpCodes (
   IN FORM_BROWSER_FORMSET              *FormSet
-  )
-;
+  );
 
 VOID
 DestroyFormSet (
   IN OUT FORM_BROWSER_FORMSET  *FormSet
-  )
-;
+  );
 
 #endif
 

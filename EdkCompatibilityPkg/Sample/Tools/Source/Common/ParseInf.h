@@ -43,8 +43,7 @@ ReadLine (
   IN MEMORY_FILE    *InputFile,
   IN OUT CHAR8      *InputBuffer,
   IN UINT32         MaxLength
-  )
-;
+  );
 
 /*++
 
@@ -73,8 +72,7 @@ BOOLEAN
 FindSection (
   IN MEMORY_FILE    *InputFile,
   IN CHAR8          *Section
-  )
-;
+  );
 
 /*++
 
@@ -101,8 +99,7 @@ FindToken (
   IN CHAR8          *Token,
   IN UINTN          Instance,
   OUT CHAR8         *Value
-  )
-;
+  );
 
 /*++
 
@@ -131,8 +128,7 @@ EFI_STATUS
 StringToGuid (
   IN CHAR8        *AsciiGuidBuffer,
   OUT EFI_GUID    *GuidBuffer
-  )
-;
+  );
 
 /*++
 
@@ -157,8 +153,7 @@ AsciiStringToUint64 (
   IN CONST CHAR8  *AsciiString,
   IN BOOLEAN      IsHex,
   OUT UINT64      *ReturnValue
-  )
-;
+  );
 
 /*++
 
@@ -185,8 +180,7 @@ CHAR8 *
 ReadLineInStream (
   IN FILE       *InputFile,
   IN OUT CHAR8  *InputBuffer
-  )
-;
+  );
 
 /*++
 
@@ -209,8 +203,7 @@ BOOLEAN
 FindSectionInStream (
   IN FILE       *InputFile,
   IN CHAR8      *Section
-  )
-;
+  );
 
 /*++
 

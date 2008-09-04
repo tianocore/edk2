@@ -35,8 +35,7 @@ EFIAPI
 RtMemoryInitializeStatusCode (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-;
+  );
 
 //
 // Status code reporting function
@@ -49,8 +48,7 @@ RtMemoryReportStatusCode (
   IN UINT32                   Instance,
   IN EFI_GUID                 * CallerId,
   IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
-  )
-;
+  );
 
 //
 // Playback all prior status codes to a listener
@@ -69,7 +67,6 @@ VOID
 EFIAPI
 PlaybackStatusCodes (
   IN PLATFORM_REPORT_STATUS_CODE  ReportStatusCode
-  )
-;
+  );
 
 #endif

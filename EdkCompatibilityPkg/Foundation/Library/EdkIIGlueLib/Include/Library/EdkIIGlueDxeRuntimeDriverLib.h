@@ -168,8 +168,7 @@ EfiGetVariable (
   OUT     UINT32                   *Attributes,
   IN OUT  UINTN                    *DataSize,
   OUT     VOID                     *Data
-  )
-;
+  );
 
 /**
   Enumerates variable's name.

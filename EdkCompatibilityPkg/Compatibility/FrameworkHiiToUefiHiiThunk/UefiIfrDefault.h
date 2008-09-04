@@ -74,8 +74,7 @@ UefiDefaultsToFwDefaults (
   IN     LIST_ENTRY                  *UefiIfrDefaults,
   IN     UINTN                       DefaultMask,
   OUT    EFI_HII_VARIABLE_PACK_LIST  **VariablePackList
-  )
-;
+  );
 
 /**
   Free up all buffer allocated for the link list of UEFI_IFR_BUFFER_STORAGE_NODE.
@@ -92,8 +91,7 @@ UefiDefaultsToFwDefaults (
 VOID
 FreeDefaultList (
   IN     LIST_ENTRY                  *UefiIfrDefaults
-  )
-;
+  );
 
 #endif
 

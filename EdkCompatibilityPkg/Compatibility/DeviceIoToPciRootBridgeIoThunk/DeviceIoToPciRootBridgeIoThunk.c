@@ -61,8 +61,7 @@ DeviceIoMemRead (
   IN     UINT64                   Address,
   IN     UINTN                    Count,
   IN OUT VOID                     *Buffer
-  )
-;
+  );
 
 
 /**
@@ -89,8 +88,7 @@ DeviceIoMemWrite (
   IN     UINT64                    Address,
   IN     UINTN                     Count,
   IN OUT VOID                      *Buffer
-  )
-;
+  );
 
 /**
   Perform reading I/O space of device.
@@ -116,8 +114,7 @@ DeviceIoIoRead (
   IN     UINT64                   Address,
   IN     UINTN                    Count,
   IN OUT VOID                     *Buffer
-  )
-;
+  );
 
 /**
   Perform writing I/O space of device.
@@ -143,8 +140,7 @@ DeviceIoIoWrite (
   IN     UINT64                    Address,
   IN     UINTN                     Count,
   IN OUT VOID                      *Buffer
-  )
-;
+  );
 
 /**
   Perform reading PCI configuration space of device
@@ -170,8 +166,7 @@ DeviceIoPciRead (
   IN     UINT64                   Address,
   IN     UINTN                    Count,
   IN OUT VOID                     *Buffer
-  )
-;
+  );
 
 /**
   Perform writing PCI configuration space of device.
@@ -197,8 +192,7 @@ DeviceIoPciWrite (
   IN     UINT64                    Address,
   IN     UINTN                     Count,
   IN OUT VOID                      *Buffer
-  )
-;
+  );
 
 /**
   Provides an EFI Device Path for a PCI device with the given PCI configuration space address.
@@ -224,8 +218,7 @@ DeviceIoPciDevicePath (
   IN     EFI_DEVICE_IO_PROTOCOL        *This,
   IN     UINT64                        Address,
   IN OUT EFI_DEVICE_PATH_PROTOCOL      **PciDevicePath
-  )
-;
+  );
 
 /**
   Provides the device-specific addresses needed to access system memory.
@@ -260,8 +253,7 @@ DeviceIoMap (
   IN OUT UINTN                    *NumberOfBytes,
   OUT    EFI_PHYSICAL_ADDRESS     *DeviceAddress,
   OUT    VOID                     **Mapping
-  )
-;
+  );
 
 /**
   Completes the Map() operation and releases any corresponding resources.
@@ -279,8 +271,7 @@ EFIAPI
 DeviceIoUnmap (
   IN EFI_DEVICE_IO_PROTOCOL   *This,
   IN VOID                     *Mapping
-  )
-;
+  );
 
 /**
   Allocates pages that are suitable for an EFIBusMasterCommonBuffer mapping.
@@ -308,8 +299,7 @@ DeviceIoAllocateBuffer (
   IN     EFI_MEMORY_TYPE           MemoryType,
   IN     UINTN                     Pages,
   IN OUT EFI_PHYSICAL_ADDRESS      *PhysicalAddress
-  )
-;
+  );
 
 /**
   Flushes any posted write data to the device.
@@ -325,8 +315,7 @@ EFI_STATUS
 EFIAPI
 DeviceIoFlush (
   IN EFI_DEVICE_IO_PROTOCOL  *This
-  )
-;
+  );
 
 /**
   Frees pages that were allocated with AllocateBuffer().
@@ -348,8 +337,7 @@ DeviceIoFreeBuffer (
   IN EFI_DEVICE_IO_PROTOCOL   *This,
   IN UINTN                    Pages,
   IN EFI_PHYSICAL_ADDRESS     HostAddress
-  )
-;
+  );
 
 
 #define DEVICE_IO_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('D', 'e', 'I', 'O')
