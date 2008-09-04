@@ -1,7 +1,7 @@
 /** @file
   PI PEI master include file. This file should match the PI spec.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -282,7 +282,7 @@ EFI_STATUS
   IN CONST EFI_PEI_SERVICES            **PeiServices,
   IN UINT16                            Type,
   IN UINT16                            Length,
-  OUT VOID                             **Hob
+  IN OUT VOID                          **Hob
   );
 
 /**
@@ -297,7 +297,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The volume was found.
   @retval EFI_NOT_FOUND         The volume was not found.
-  @retval EFI_INVALID_PARAMETER VolHandle is NULL
+  @retval EFI_INVALID_PARAMETER VolumeHandle is NULL.
 
 **/
 typedef

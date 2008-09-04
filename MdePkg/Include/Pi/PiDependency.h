@@ -1,7 +1,7 @@
 /** @file
   Present the dependency expression values in PI.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -18,12 +18,14 @@
 #define __PI_DEPENDENCY_H__
 
 /// 
-/// If present, this must be the first and only opcode
+/// If present, this must be the first and only opcode,
+/// EFI_DEP_BEFORE is only used by DXE driver.
 /// 
 #define EFI_DEP_BEFORE        0x00
 
 /// 
-/// If present, this must be the first and only opcode
+/// If present, this must be the first and only opcode,
+/// EFI_DEP_AFTER is only used by DXE driver.
 /// 
 #define EFI_DEP_AFTER         0x01
 
@@ -37,7 +39,8 @@
 
 
 /// 
-/// If present, this must be the first opcode.
+/// If present, this must be the first opcode,
+/// EFI_DEP_SOR is only used by DXE driver.
 /// 
 #define EFI_DEP_SOR           0x09
 
