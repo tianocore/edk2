@@ -26,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   An empty function to pass error checking of CreateEventEx ().
 
-  This empty function ensures that EFI_EVENT_NOTIFY_SIGNAL_ALL is error
+  This empty function ensures that EVT_NOTIFY_SIGNAL_ALL is error
   checked correctly since it is now mapped into CreateEventEx() in UEFI 2.0.
  
   @param  Event                 Event whose notification function is being invoked.
