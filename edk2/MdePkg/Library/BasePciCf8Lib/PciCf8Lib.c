@@ -27,32 +27,19 @@
 #define PCI_CONFIGURATION_ADDRESS_PORT  0xCF8
 #define PCI_CONFIGURATION_DATA_PORT     0xCFC
 
-//
-// Declare macro to convert PCI Library formatted address to CF8 formatted address
-//
-// PCI Library formatted address    CF8 Formatted Address
-// =============================    ======================
-//    Bits 00..11  Register           Bits 00..07  Register
-//    Bits 12..14  Function           Bits 08..10  Function
-//    Bits 15..19  Device             Bits 11..15  Device
-//    Bits 20..27  Bus                Bits 16..23  Bus
-//    Bits 28..31  Reserved(MBZ)      Bits 24..30  Reserved(MBZ)
-//                                    Bits 31..31  Must be 1
-//
-
 /**
-  Assert the validity of a PCI address. A valid PCI address should contain 1's
-  only in the low 28 bits.
+  Convert a PCI Library address to PCI CF8 formatted address.
 
-  @param  A The address to validate.
-  @param  M Additional bits to assert to be zero.
-
-**/
-#define ASSERT_INVALID_PCI_ADDRESS(A,M) \
-  ASSERT (((A) & (~0xffff0ff | (M))) == 0)
-
-/**
-  Convert a PCI Express address to PCI CF8 address.
+  Declare macro to convert PCI Library address to PCI CF8 formatted address.
+  Bit fields of PCI Library and CF8 formatted address is as follows:
+  PCI Library formatted address    CF8 Formatted Address
+ =============================    ======================
+    Bits 00..11  Register           Bits 00..07  Register
+    Bits 12..14  Function           Bits 08..10  Function
+    Bits 15..19  Device             Bits 11..15  Device
+    Bits 20..27  Bus                Bits 16..23  Bus
+    Bits 28..31  Reserved(MBZ)      Bits 24..30  Reserved(MBZ)
+                                    Bits 31..31  Must be 1
 
   @param  A The address to convert.
 
@@ -61,6 +48,17 @@
 **/
 #define PCI_TO_CF8_ADDRESS(A) \
   ((UINT32) ((((A) >> 4) & 0x00ffff00) | ((A) & 0xfc) | 0x80000000))
+
+/**
+  Assert the validity of a PCI CF8 address. A valid PCI CF8 address should contain 1's
+  only in the low 28 bits, excluding bits 08..11.
+
+  @param  A The address to validate.
+  @param  M Additional bits to assert to be zero.
+
+**/
+#define ASSERT_INVALID_PCI_ADDRESS(A,M) \
+  ASSERT (((A) & (~0xffff0ff | (M))) == 0)
 
 /**
   Reads an 8-bit PCI configuration register.

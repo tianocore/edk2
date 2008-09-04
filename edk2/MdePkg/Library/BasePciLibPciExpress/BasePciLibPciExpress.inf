@@ -1,5 +1,5 @@
 #/** @file
-# This driver impements one PCI Library based on PCI Express Library.
+# This module impements one PCI Library based on PCI Express Library.
 #
 # PCI Library that uses the 256 MB PCI Express MMIO window to perform PCI
 #  Configuration cycles. Layers on one PCI Express Library instance.

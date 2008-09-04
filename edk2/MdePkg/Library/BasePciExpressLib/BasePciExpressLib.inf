@@ -1,5 +1,5 @@
 #/** @file
-# This driver implements one PCI Express Library instance.
+# This module implements one PCI Express Library instance.
 #
 # PCI Express Library that uses the 256 MB PCI Express MMIO window to perform
 #  PCI Configuration cycles. Layers on top of an I/O Library instance.
