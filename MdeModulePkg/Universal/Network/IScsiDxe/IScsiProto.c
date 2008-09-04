@@ -235,7 +235,7 @@ IScsiCreateConnection (
   Conn->CID             = Session->NextCID++;
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER,
+                  EVT_TIMER,
                   TPL_CALLBACK,
                   NULL,
                   NULL,

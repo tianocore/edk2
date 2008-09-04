@@ -696,7 +696,7 @@ InitKeyboardLayout (
   // Register SET_KEYBOARD_LAYOUT_EVENT notification
   //
   Status = gBS->CreateEventEx (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   SetKeyboardLayoutEvent,
                   UsbKeyboardDevice,

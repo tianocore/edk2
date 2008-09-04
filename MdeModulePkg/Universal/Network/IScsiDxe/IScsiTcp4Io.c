@@ -162,7 +162,7 @@ Tcp4IoCreateSocket (
   // Create events for variuos asynchronous operations.
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   Tcp4IoCommonNotify,
                   &Tcp4Io->IsConnDone,
@@ -173,7 +173,7 @@ Tcp4IoCreateSocket (
   }
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   Tcp4IoCommonNotify,
                   &Tcp4Io->IsTxDone,
@@ -184,7 +184,7 @@ Tcp4IoCreateSocket (
   }
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   Tcp4IoCommonNotify,
                   &Tcp4Io->IsRxDone,
@@ -195,7 +195,7 @@ Tcp4IoCreateSocket (
   }
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   Tcp4IoCommonNotify,
                   &Tcp4Io->IsCloseDone,
