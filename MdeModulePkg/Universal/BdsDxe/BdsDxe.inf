@@ -141,7 +141,7 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
 
 [FeaturePcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDepricate
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHardwareErrorRecord
   gEfiMdeModulePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
