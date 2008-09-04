@@ -20,7 +20,6 @@
 #ifndef __PEI_CPUIO_PPI_H__
 #define __PEI_CPUIO_PPI_H__
 
-#include <ProcessorBind.h>
 #include <Pi/PiPeiCis.h>
 
 #define EFI_PEI_CPU_IO_PPI_INSTALLED_GUID \
@@ -52,12 +51,13 @@ typedef enum {
 /**
   Memory-based access services and I/O-based access services.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Width          The width of the access. Enumerated in bytes.
-  @param  Address        The physical address of the access.
-  @param  Count          The number of accesses to perform.
-  @param  Buffer         A pointer to the buffer of data.
+  @param  PeiServices           An indirect pointer to the PEI Services Table
+                                published by the PEI Foundation.
+  @param  This                  Pointer to local data for the interface.
+  @param  Width                 The width of the access. Enumerated in bytes.
+  @param  Address               The physical address of the access.
+  @param  Count                 The number of accesses to perform.
+  @param  Buffer                A pointer to the buffer of data.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_YET_AVAILABLE The service has not been installed.
@@ -66,8 +66,8 @@ typedef enum {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_MEM)(
-  IN  EFI_PEI_SERVICES                  **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI                *This,
+  IN  CONST EFI_PEI_SERVICES            **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI          *This,
   IN  EFI_PEI_CPU_IO_PPI_WIDTH          Width,
   IN  UINT64                            Address,
   IN  UINTN                             Count,
@@ -80,7 +80,13 @@ EFI_STATUS
 /// *******************************************************
 ///
 typedef struct {
+  ///
+  /// This service provides the various modalities of memory and I/O read.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_MEM Read;
+  ///
+  /// This service provides the various modalities of memory and I/O write.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_MEM Write;
 } EFI_PEI_CPU_IO_PPI_ACCESS;
 
@@ -91,15 +97,15 @@ typedef struct {
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT8          An 8-bit value is returned from the I/O space.
+  @return An 8-bit value returned from the I/O space.
 
 **/
 typedef
 UINT8
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ8)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address
   );
 
 /**
@@ -109,15 +115,15 @@ UINT8
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT16         A 16-bit value is returned from the I/O space.
+  @return A 16-bit value returned from the I/O space.
 
 **/
 typedef
 UINT16
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ16)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address
   );
 
 /**
@@ -127,15 +133,15 @@ UINT16
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT32         A 32-bit value is returned from the I/O space.
+  @return A 32-bit value returned from the I/O space.
 
 **/
 typedef
 UINT32
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ32)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address
   );
 
 /**
@@ -145,15 +151,15 @@ UINT32
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT64         A 64-bit value is returned from the I/O space.
+  @return A 64-bit value returned from the I/O space.
 
 **/
 typedef
 UINT64
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_READ64)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address
   );
 
 /**
@@ -164,16 +170,14 @@ UINT64
   @param  Address        The physical address of the access.
   @param  Data           The data to write.
 
-  @return None
-
 **/
 typedef
 VOID
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE8)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address,
-  IN  UINT8                   Data
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address,
+  IN  UINT8                         Data
   );
 
 /**
@@ -184,16 +188,14 @@ VOID
   @param  Address        The physical address of the access.
   @param  Data           The data to write.
 
-  @return None
-
 **/
 typedef
 VOID
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE16)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address,
-  IN  UINT16                  Data
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address,
+  IN  UINT16                        Data
   );
 
 /**
@@ -204,16 +206,14 @@ VOID
   @param  Address        The physical address of the access.
   @param  Data           The data to write.
 
-  @return None
-
 **/
 typedef
 VOID
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE32)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address,
-  IN  UINT32                  Data
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address,
+  IN  UINT32                        Data
   );
 
 /**
@@ -224,248 +224,236 @@ VOID
   @param  Address        The physical address of the access.
   @param  Data           The data to write.
 
-  @return None
-
 **/
 typedef
 VOID
 (EFIAPI *EFI_PEI_CPU_IO_PPI_IO_WRITE64)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address,
-  IN  UINT64                  Data
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address,
+  IN  UINT64                        Data
   );
 
 /**
-  8-bit Memory read operations.
+  8-bit memory read operations.
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT8          An 8-bit value is returned from the memory space.
+  @return An 8-bit value returned from the memory space.
 
 **/
 typedef
 UINT8
 (EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ8)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address
   );
 
 /**
-  16-bit Memory read operations.
+  16-bit memory read operations.
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT16         A 16-bit value is returned from the memory space.
+  @return A 16-bit value returned from the memory space.
 
 **/
 typedef
 UINT16
 (EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ16)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address
   );
 
 /**
-  32-bit Memory read operations.
+  32-bit memory read operations.
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT32         A 32-bit value is returned from the memory space.
+  @return A 32-bit value returned from the memory space.
 
 **/
 typedef
 UINT32
 (EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ32)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address
   );
 
 /**
-  64-bit Memory read operations.
+  64-bit memory read operations.
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
 
-  @return UINT64         A 64-bit value is returned from the memory space.
+  @return A 64-bit value returned from the memory space.
 
 **/
 typedef
 UINT64
 (EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_READ64)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address
   );
 
 /**
-  8-bit Memory write operations.
+  8-bit memory write operations.
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
   @param  Data           The data to write.
-
-  @return None
 
 **/
 typedef
 VOID
 (EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE8)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address,
-  IN  UINT8                   Data
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address,
+  IN  UINT8                         Data
   );
 
 /**
-  16-bit Memory write operations.
+  16-bit memory write operations.
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
   @param  Data           The data to write.
-
-  @return None
 
 **/
 typedef
 VOID
 (EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE16)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address,
-  IN  UINT16                  Data
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address,
+  IN  UINT16                        Data
   );
 
 /**
-  32-bit Memory write operations.
+  32-bit memory write operations.
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
   @param  Data           The data to write.
-
-  @return None
 
 **/
 typedef
 VOID
 (EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE32)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address,
-  IN  UINT32                  Data
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address,
+  IN  UINT32                        Data
   );
 
 /**
-  64-bit Memory write operations.
+  64-bit memory write operations.
 
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
   @param  Data           The data to write.
 
-  @return None
-
 **/
 typedef
 VOID
 (EFIAPI *EFI_PEI_CPU_IO_PPI_MEM_WRITE64)(
-  IN  EFI_PEI_SERVICES        **PeiServices,
-  IN  EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                  Address,
-  IN  UINT64                  Data
+  IN  CONST EFI_PEI_SERVICES        **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
+  IN  UINT64                        Address,
+  IN  UINT64                        Data
   );
 
-/**
-  @par Ppi Description:
-  EFI_PEI_CPU_IO_PPI provides a set of memory and I/O-based services.
-  The perspective of the services is that of the processor, not the bus or system.
-
-  @param Mem
-  Collection of memory-access services.
-
-  @param I/O
-  Collection of I/O-access services.
-
-  @param IoRead8
-  8-bit read service.
-
-  @param IoRead16
-  16-bit read service.
-
-  @param IoRead32
-  32-bit read service.
-
-  @param IoRead64
-  64-bit read service.
-
-  @param IoWrite8
-  8-bit write service.
-
-  @param IoWrite16
-  16-bit write service.
-
-  @param IoWrite32
-  32-bit write service.
-
-  @param IoWrite64
-  64-bit write service.
-
-  @param MemRead8
-  8-bit read service.
-
-  @param MemRead16
-  16-bit read service.
-
-  @param MemRead32
-  32-bit read service.
-
-  @param MemRead64
-  64-bit read service.
-
-  @param MemWrite8
-  8-bit write service.
-
-  @param MemWrite16
-  16-bit write service.
-
-  @param MemWrite32
-  32-bit write service.
-
-  @param MemWrite64
-  64-bit write service.
-
-**/
+///
+/// EFI_PEI_CPU_IO_PPI provides a set of memory and I/O-based services.
+/// The perspective of the services is that of the processor, not the bus or system.
+///
 struct _EFI_PEI_CPU_IO_PPI {
+  ///
+  /// Collection of memory-access services.
+  ///
   EFI_PEI_CPU_IO_PPI_ACCESS       Mem;
+  ///
+  /// Collection of I/O-access services.
+  ///
   EFI_PEI_CPU_IO_PPI_ACCESS       Io;
+  ///
+  /// 8-bit I/O read service.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_READ8     IoRead8;
+  ///
+  /// 16-bit I/O read service.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_READ16    IoRead16;
+  ///
+  /// 32-bit I/O read service.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_READ32    IoRead32;
+  ///
+  /// 64-bit I/O read service.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_READ64    IoRead64;
+  ///
+  /// 8-bit I/O write service.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_WRITE8    IoWrite8;
+  ///
+  /// 16-bit I/O write service.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_WRITE16   IoWrite16;
+  ///
+  /// 32-bit I/O write service.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_WRITE32   IoWrite32;
+  ///
+  /// 64-bit I/O write service.
+  ///
   EFI_PEI_CPU_IO_PPI_IO_WRITE64   IoWrite64;
+  ///
+  /// 8-bit memory read service.
+  ///
   EFI_PEI_CPU_IO_PPI_MEM_READ8    MemRead8;
+  ///
+  /// 16-bit memory read service.
+  ///
   EFI_PEI_CPU_IO_PPI_MEM_READ16   MemRead16;
+  ///
+  /// 32-bit memory read service.
+  ///
   EFI_PEI_CPU_IO_PPI_MEM_READ32   MemRead32;
+  ///
+  /// 64-bit memory read service.
+  ///
   EFI_PEI_CPU_IO_PPI_MEM_READ64   MemRead64;
+  ///
+  /// 8-bit memory write service.
+  ///
   EFI_PEI_CPU_IO_PPI_MEM_WRITE8   MemWrite8;
+  ///
+  /// 16-bit memory write service.
+  ///
   EFI_PEI_CPU_IO_PPI_MEM_WRITE16  MemWrite16;
+  ///
+  /// 32-bit memory write service.
+  ///
   EFI_PEI_CPU_IO_PPI_MEM_WRITE32  MemWrite32;
+  ///
+  /// 64-bit memory write service.
+  ///
   EFI_PEI_CPU_IO_PPI_MEM_WRITE64  MemWrite64;
 };
 

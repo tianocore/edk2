@@ -19,8 +19,8 @@
 
 **/
 
-#ifndef __END_OF_PEI_SIGNAL_PPI_H__
-#define __END_OF_PEI_SIGNAL_PPI_H__
+#ifndef __END_OF_PEI_PHASE_PPI_H__
+#define __END_OF_PEI_PHASE_PPI_H__
 
 #define EFI_PEI_END_OF_PEI_PHASE_PPI_GUID \
   { \
