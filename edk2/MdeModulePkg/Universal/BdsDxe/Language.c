@@ -305,7 +305,7 @@ InitializeLanguage (
 
   LangCodes = (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLangCodes);
   if (LangCodesSettingRequired) {
-    if (!FeaturePcdGet (PcdUefiVariableDefaultLangDepricate)) {
+    if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
       //
       // UEFI 2.1 depricated this variable so we support turning it off
       //
@@ -329,7 +329,7 @@ InitializeLanguage (
                     );
   }
 
-  if (!FeaturePcdGet (PcdUefiVariableDefaultLangDepricate)) {
+  if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
     //
     // UEFI 2.1 depricated this variable so we support turning it off
     //

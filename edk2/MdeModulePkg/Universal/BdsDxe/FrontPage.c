@@ -179,7 +179,7 @@ FrontPageCallback (
                     Lang
                     );
 
-    if (!FeaturePcdGet (PcdUefiVariableDefaultLangDepricate)) {
+    if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
       //
       // Set UEFI deprecated variable "Lang" for backwards compatibility
       //
