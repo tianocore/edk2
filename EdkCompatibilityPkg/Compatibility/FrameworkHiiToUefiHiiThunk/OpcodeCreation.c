@@ -44,6 +44,21 @@ AppendToUpdateBuffer (
   return EFI_SUCCESS;
 }
 
+EFI_QUESTION_ID
+AssignQuestionId (
+  IN  UINT16    FwQuestionId
+  )
+{
+  if (FwQuestionId == 0) {
+    //
+    // In UEFI IFR, the Question ID can't be zero. Zero means no storage.
+    // So use 0xABBA as a Question ID.
+    //
+    return 0xABBA;
+  } else {
+    return FwQuestionId;
+  }
+}
 
 
 EFI_STATUS
@@ -368,7 +383,7 @@ F2UCreateOneOfOpCode (
       if (UOpcode.Question.QuestionId == 0) {
         Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
         if (EFI_ERROR (Status)) {
-          UOpcode.Question.QuestionId = FwOneOfOp->Key;
+          UOpcode.Question.QuestionId = AssignQuestionId (FwOneOfOp->Key);
         }
 
         OneOfOptionMap = AllocateZeroPool (sizeof (ONE_OF_OPTION_MAP));
@@ -382,6 +397,7 @@ F2UCreateOneOfOpCode (
           break;
         case 2:
           OneOfOptionMap->ValueType = EFI_IFR_TYPE_NUM_SIZE_16;
+          break;
         default:
           ASSERT (FALSE);
           break;
@@ -416,7 +432,7 @@ F2UCreateOneOfOpCode (
     //
     Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
     if (EFI_ERROR (Status)) {
-      UOpcode.Question.QuestionId = FwOpcode->QuestionId;
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId);
     }
   }
   
@@ -519,7 +535,7 @@ F2UCreateOrderedListOpCode (
       if (UOpcode.Question.QuestionId == 0) {
         Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
         if (EFI_ERROR (Status)) {
-          UOpcode.Question.QuestionId = FwOneOfOp->Key;
+          UOpcode.Question.QuestionId = AssignQuestionId (FwOneOfOp->Key);
         }
 
       }
@@ -535,7 +551,7 @@ F2UCreateOrderedListOpCode (
   if (UOpcode.Question.QuestionId == 0) {
     Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
     if (EFI_ERROR (Status)) {
-      UOpcode.Question.QuestionId = FwOpcode->QuestionId;
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId);
     }
   }
  
@@ -626,7 +642,7 @@ F2UCreateCheckBoxOpCode (
       //
       // Add a new opcode and it will not trigger call back. So we just reuse the FW QuestionId.
       //
-      UOpcode.Question.QuestionId = FwOpcode->QuestionId;
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId);
     }
   } else {
     UOpcode.Question.QuestionId    = FwOpcode->Key;
@@ -735,7 +751,7 @@ F2UCreateNumericOpCode (
       //
       // Add a new opcode and it will not trigger call back. So we just reuse the FW QuestionId.
       //
-      UOpcode.Question.QuestionId = FwOpcode->QuestionId;
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId);
     }
   } else {
     UOpcode.Question.QuestionId    = FwOpcode->Key;
@@ -747,14 +763,11 @@ F2UCreateNumericOpCode (
   // We need to create a nested default value for the UEFI Numeric Opcode.
   // So turn on the scope.
   //
-  if (FwOpcode->Default != 0) {
-    UOpcode.Header.Scope = 1;
-  }
+  UOpcode.Header.Scope = 1;
 
   UOpcode.Question.Header.Prompt = FwOpcode->Prompt;
   UOpcode.Question.Header.Help = FwOpcode->Help;
 
-  UOpcode.Question.QuestionId    = FwOpcode->Key;
   UOpcode.Question.VarStoreId    = VarStoreId;
   UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
 
@@ -770,12 +783,12 @@ F2UCreateNumericOpCode (
   switch (FwOpcode->Width) {
     case 1: 
     {
-      UOpcode.Flags           =  EFI_IFR_NUMERIC_SIZE_2 | EFI_IFR_DISPLAY_UINT_DEC; 
+      UOpcode.Flags           =  EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC; 
       break;
     } 
     case 2: 
     {
-      UOpcode.Flags           =  EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC; 
+      UOpcode.Flags           =  EFI_IFR_NUMERIC_SIZE_2 | EFI_IFR_DISPLAY_UINT_DEC; 
       break;
     }
     default: 
@@ -793,34 +806,32 @@ F2UCreateNumericOpCode (
   //
   // We need to create a default value.
   //
-  if (FwOpcode->Default != 0) {
-    ZeroMem (&UOpcodeDefault, sizeof (UOpcodeDefault));
-    UOpcodeDefault.Header.Length = sizeof (UOpcodeDefault);
-    UOpcodeDefault.Header.OpCode = EFI_IFR_DEFAULT_OP;
+  ZeroMem (&UOpcodeDefault, sizeof (UOpcodeDefault));
+  UOpcodeDefault.Header.Length = sizeof (UOpcodeDefault);
+  UOpcodeDefault.Header.OpCode = EFI_IFR_DEFAULT_OP;
 
-    UOpcodeDefault.DefaultId = 0;
+  UOpcodeDefault.DefaultId = 0;
 
-    switch (FwOpcode->Width) {
-      case 1: 
-      {
-        UOpcodeDefault.Type = EFI_IFR_TYPE_NUM_SIZE_8;
-        break;
-      } 
-      case 2: 
-      {
-        UOpcodeDefault.Type = EFI_IFR_TYPE_NUM_SIZE_16;
-        break;
-      }
+  switch (FwOpcode->Width) {
+    case 1: 
+    {
+      UOpcodeDefault.Type = EFI_IFR_TYPE_NUM_SIZE_8;
+      break;
+    } 
+    case 2: 
+    {
+      UOpcodeDefault.Type = EFI_IFR_TYPE_NUM_SIZE_16;
+      break;
     }
-
-    CopyMem (&UOpcodeDefault.Value.u8, &FwOpcode->Default, FwOpcode->Width);
-
-    Status = AppendToUpdateBuffer ((UINT8 *) &UOpcodeDefault, sizeof(UOpcodeDefault), UefiData);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    Status = UCreateEndOfOpcode (UefiData);
   }
+
+  CopyMem (&UOpcodeDefault.Value.u8, &FwOpcode->Default, FwOpcode->Width);
+
+  Status = AppendToUpdateBuffer ((UINT8 *) &UOpcodeDefault, sizeof(UOpcodeDefault), UefiData);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = UCreateEndOfOpcode (UefiData);
 
   return Status;
 }
@@ -1034,6 +1045,11 @@ FwUpdateDataToUefiUpdateData (
 
       case FRAMEWORK_EFI_IFR_END_ONE_OF_OP:
         Status = UCreateEndOfOpcode (UefiOpCode);
+        DataCount = 1;
+        break;
+
+      case FRAMEWORK_EFI_IFR_NUMERIC_OP:
+        Status = F2UCreateNumericOpCode (ThunkContext, VarStoreId, (FRAMEWORK_EFI_IFR_NUMERIC *) FwOpCode, UefiOpCode);
         DataCount = 1;
         break;
 

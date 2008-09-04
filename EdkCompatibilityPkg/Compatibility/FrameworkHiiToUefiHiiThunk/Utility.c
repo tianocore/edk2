@@ -90,8 +90,8 @@ UefiHiiHandleToThunkContext (
   return NULL;
 }
 
-EFI_HII_HANDLE *
-TagGuidToUefiHiiHandle (
+HII_THUNK_CONTEXT *
+TagGuidToIfrPackThunkContext (
   IN CONST HII_THUNK_PRIVATE_DATA *Private,
   IN CONST EFI_GUID                   *Guid
   )
@@ -104,8 +104,8 @@ TagGuidToUefiHiiHandle (
   while (!IsNull (&Private->ThunkContextListHead, Link)) {
     ThunkContext = HII_THUNK_CONTEXT_FROM_LINK (Link);
 
-    if (CompareMem (Guid, &ThunkContext->TagGuid, sizeof (EFI_GUID) == 0) && (ThunkContext->IfrPackageCount != 0)) {
-      return ThunkContext->UefiHiiHandle;
+    if (CompareGuid (Guid, &ThunkContext->TagGuid) && (ThunkContext->IfrPackageCount != 0)) {
+      return ThunkContext;
     }
 
     Link = GetNextNode (&Private->ThunkContextListHead, Link);

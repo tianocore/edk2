@@ -129,6 +129,7 @@ Returns:
   EFI_STRING_ID                             StringId;
   EFI_STRING_ID                             LastStringId;
   CHAR8                                     AsciiLanguage[ISO_639_2_ENTRY_SIZE + 1];
+  CHAR16                                    LanguageCopy[ISO_639_2_ENTRY_SIZE + 1];
   BOOLEAN                                   Found;
   CHAR8                                     *Rfc3066AsciiLanguage;
 
@@ -144,8 +145,9 @@ Returns:
 
   if (Language != NULL) {
     ZeroMem (AsciiLanguage, sizeof (AsciiLanguage));;
-    
-    UnicodeStrToAsciiStr (Language, AsciiLanguage);
+    ZeroMem (LanguageCopy, sizeof (LanguageCopy));
+    CopyMem (LanguageCopy, Language, ISO_639_2_ENTRY_SIZE * sizeof (CHAR16));
+    UnicodeStrToAsciiStr (LanguageCopy, AsciiLanguage);
     Rfc3066AsciiLanguage = ConvertIso639ToRfc3066 (AsciiLanguage);
     ASSERT (Rfc3066AsciiLanguage != NULL);
   }

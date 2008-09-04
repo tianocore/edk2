@@ -248,6 +248,7 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
 //
 EFI_STATUS
 UefiRegisterPackageList(
+  IN  EFI_HII_PROTOCOL               *This,
   IN  HII_THUNK_PRIVATE_DATA      *Private,
   IN  EFI_HII_PACKAGES            *Packages,
   OUT FRAMEWORK_EFI_HII_HANDLE    *Handle
@@ -273,12 +274,6 @@ UefiRegisterPackageList(
     return EFI_UNSUPPORTED;
   }
 
-  ThunkContext = CreateThunkContext (Private, StringPackageCount, IfrPackageCount);
-  if (ThunkContext == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  ThunkContext->ByFrameworkHiiNewPack = TRUE;
-  
   if (Packages->GuidId == NULL) {
     //
     // UEFI HII Database require Package List GUID must be unique.
@@ -291,9 +286,24 @@ UefiRegisterPackageList(
     ASSERT (StringPackageCount >=1 && IfrPackageCount == 1);
     GenerateRandomGuid (&GuidId);
   } else {
+    ThunkContext = TagGuidToIfrPackThunkContext (Private, Packages->GuidId);
+    
+    if (IfrPackageCount > 0 && 
+        StringPackageCount > 0 && 
+        (ThunkContext!= NULL)) {
+        DEBUG((EFI_D_WARN, "Framework code registers HII package list with the same GUID more than once.\n"));
+        DEBUG((EFI_D_WARN, "This package list should be already registered. Just return successfully.\n"));
+        HiiRemovePack (This, ThunkContext->FwHiiHandle);
+    }
     CopyGuid (&GuidId, Packages->GuidId);
   }
 
+  ThunkContext = CreateThunkContext (Private, StringPackageCount, IfrPackageCount);
+  if (ThunkContext == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  ThunkContext->ByFrameworkHiiNewPack = TRUE;
+  
   //
   // Record the Package List GUID, it is used as a name for the package list by Framework HII.
   //
@@ -426,6 +436,7 @@ Returns:
   Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
   Status = UefiRegisterPackageList (
+              This,
               Private,
               Packages,
               Handle
@@ -479,7 +490,6 @@ Returns:
       UninstallDefaultConfigAccessProtocol (ThunkContext);
     }
 
-    RemoveEntryList (&ThunkContext->Link);
     DestroyThunkContext (ThunkContext);
   }else {
     Status = EFI_NOT_FOUND;
