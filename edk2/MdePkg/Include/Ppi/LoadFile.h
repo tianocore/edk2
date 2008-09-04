@@ -27,70 +27,48 @@ typedef struct _EFI_PEI_LOAD_FILE_PPI EFI_PEI_LOAD_FILE_PPI;
 /**
   Loads a PEIM into memory for subsequent execution.
 
-  This service is the single member function of EFI_LOAD_FILE_PPI. This service separates
-  image loading and relocating from the PEI Foundation.
+  This service is the single member function of EFI_LOAD_FILE_PPI.
+  This service separates image loading and relocating from the PEI Foundation.
   
-  @param This                 Interface pointer that implements
-                              the Load File PPI instance.
+  @param This                   Interface pointer that implements
+                                the Load File PPI instance.
+  @param FileHandle             File handle of the file to load.
+  @param ImageAddress           Pointer to the address of the loaded image.
+  @param ImageSize              Pointer to the size of the loaded image.
+  @param EntryPoint             Pointer to the entry point of the image.
+  @param AuthenticationState    On exit, points to the attestation
+                                authentication state of the image
+                                or 0 if no attestation was performed.
 
-  @param FileHandle           File handle of the file to load.
-                              Type EFI_PEI_FILE_HANDLE is defined in
-                              FfsFindNextFile().
-
-  @param ImageAddress         Pointer to the address of the
-                              loaded image.
-
-  @param ImageSize            Pointer to the size of the loaded
-                              image.
-
-  @param EntryPoint           Pointer to the entry point of the
-                              image.
-
-  @param AuthenticationState  On exit, points to the attestation
-                              authentication state of the image
-                              or 0 if no attestation was
-                              performed. The format of
-                              AuthenticationState is defined in
-                              EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI.ExtractSection()
-
-
-  @retval EFI_SUCCESS         The image was loaded successfully.
-
+  @retval EFI_SUCCESS           The image was loaded successfully.
   @retval EFI_OUT_OF_RESOURCES  There was not enough memory.
-
-  @retval EFI_LOAD_ERROR      There was no supported image in
-                              the file.
-  @retval EFI_INVALID_PARAMETER   EntryPoint was NULL.
-                              Or FileHandle was not a valid firmware file handle.
-  @retval EFI_NOT_SUPPORTED   An image requires relocations or
-                              is not memory mapped.
+  @retval EFI_LOAD_ERROR        There was no supported image in the file.
+  @retval EFI_INVALID_PARAMETER FileHandle was not a valid firmware file handle.
+  @retval EFI_INVALID_PARAMETER EntryPoint was NULL.
+  @retval EFI_NOT_SUPPORTED     An image requires relocations or is not
+                                memory mapped.
    
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_LOAD_FILE)(
-  IN CONST  EFI_PEI_LOAD_FILE_PPI   *This,
-  IN CONST  EFI_PEI_FILE_HANDLE     FileHandle,
-  OUT       EFI_PHYSICAL_ADDRESS    *ImageAddress,
-  OUT       UINT64                  *ImageSize,
-  OUT       EFI_PHYSICAL_ADDRESS    *EntryPoint,
-  OUT       UINT32                  *AuthenticationState
+  IN  CONST  EFI_PEI_LOAD_FILE_PPI   *This,
+  IN  EFI_PEI_FILE_HANDLE            FileHandle,
+  OUT EFI_PHYSICAL_ADDRESS           *ImageAddress,
+  OUT UINT64                         *ImageSize,
+  OUT EFI_PHYSICAL_ADDRESS           *EntryPoint,
+  OUT UINT32                         *AuthenticationState
 );
 
-
-/**
-  @par Ppi Description:
-  This PPI is a pointer to the Load File service.
-  This service will be published by a PEIM. The PEI Foundation
-  will use this service to launch the known PEI module images.
-  
-  
-  @param LoadFile  Loads a PEIM into memory for subsequent
-                   execution. See the LoadFile() function
-                   description.
-  
-**/
+///
+/// This PPI is a pointer to the Load File service.
+/// This service will be published by a PEIM. The PEI Foundation
+/// will use this service to launch the known PEI module images.
+///
 struct _EFI_PEI_LOAD_FILE_PPI {
+  ///
+  /// Loads a PEIM into memory for subsequent execution.
+  ///
   EFI_PEI_LOAD_FILE LoadFile;
 };
 
