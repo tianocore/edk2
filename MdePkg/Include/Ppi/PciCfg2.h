@@ -22,7 +22,6 @@
 #ifndef __PEI_PCI_CFG2_H__
 #define __PEI_PCI_CFG2_H__
 
-#include <ProcessorBind.h>
 #include <Pi/PiPeiCis.h>
 
 #define EFI_PEI_PCI_CFG2_PPI_GUID \
@@ -52,10 +51,29 @@ typedef enum {
 /// EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS
 ///
 typedef struct {
+  ///
+  /// 8-bit register offset within the PCI configuration space for a given device's function
+  /// space.
+  ///
   UINT8   Register;
+  ///
+  /// Only the 3 least-significant bits are used to encode one of 8 possible functions within a
+  /// given device.
+  ///
   UINT8   Function;
+  ///
+  /// Only the 5 least-significant bits are used to encode one of 32 possible devices.
+  ///
   UINT8   Device;
+  ///
+  /// 8-bit value to encode between 0 and 255 buses.
+  ///
   UINT8   Bus;
+  ///
+  /// Register number in PCI configuration space. If this field is zero, then Register is used
+  /// for the register number. If this field is non-zero, then Register is ignored and this field
+  /// is used for the register number.
+  ///
   UINT32  ExtendedRegister;
 } EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS;
 
@@ -131,8 +149,8 @@ EFI_STATUS
   IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
   IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
   IN        UINT64                    Address,
-  IN CONST  VOID                      *SetBits,
-  IN CONST  VOID                      *ClearBits
+  IN        VOID                      *SetBits,
+  IN        VOID                      *ClearBits
 );
 
 /**
