@@ -29,7 +29,6 @@
 
 
 /**
-
   Prints a debug message to the debug output device if the specified error level is enabled.
 
   If any bit in ErrorLevel is also set in PcdDebugPrintErrorLevel, then print 
@@ -81,7 +80,6 @@ DebugPrint (
 
 
 /**
-
   Prints an assert message containing a filename, line number, and description.  
   This may be followed by a breakpoint or a dead loop.
 
@@ -135,7 +133,6 @@ DebugAssert (
 
 
 /**
-
   Fills a target buffer with PcdDebugClearMemoryValue, and returns the target buffer.
 
   This function fills Length bytes of Buffer with the value specified by 
@@ -148,7 +145,7 @@ DebugAssert (
   @param   Buffer  Pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
   @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
-  @return  Buffer  Pointer to the target buffer filled with PcdDebugClearMemoryValue.
+  @return  Buffer filled with PcdDebugClearMemoryValue.
 
 **/
 VOID *
@@ -171,7 +168,6 @@ DebugClearMemory (
 
 
 /**
-  
   Returns TRUE if ASSERT() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of 
@@ -192,8 +188,7 @@ DebugAssertEnabled (
 
 
 /**
-  
-  Returns TRUE if DEBUG()macros are enabled.
+  Returns TRUE if the DEBUG() macro is enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
@@ -213,8 +208,7 @@ DebugPrintEnabled (
 
 
 /**
-  
-  Returns TRUE if DEBUG_CODE()macros are enabled.
+  Returns TRUE if the DEBUG_CODE() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
@@ -234,8 +228,7 @@ DebugCodeEnabled (
 
 
 /**
-  
-  Returns TRUE if DEBUG_CLEAR_MEMORY()macro is enabled.
+  Returns TRUE if the DEBUG_CLEAR_MEMORY() macro is enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.

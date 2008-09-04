@@ -1,7 +1,7 @@
 /** @file
   Cache Maintenance Functions.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,10 +12,6 @@
 
 **/
 
-
-//
-// Include common header file for this module.
-//
 #include <Base.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseLib.h>
@@ -26,9 +22,6 @@
   Invalidates the entire instruction cache in cache coherency domain of the
   calling CPU.
 
-  Invalidates the entire instruction cache in cache coherency domain of the
-  calling CPU.
-
 **/
 VOID
 EFIAPI
@@ -36,7 +29,7 @@ InvalidateInstructionCache (
   VOID
   )
 {
-  PalCall (PAL_CACHE_FLUSH, PAL_CACHE_FLUSH_INSTRUCTION_ALL, PAL_CACHE_FLUSH_INVALIDATE_LINES, 0);
+  PalCall (PAL_CACHE_FLUSH, PAL_CACHE_FLUSH_INSTRUCTION_ALL, PAL_CACHE_FLUSH_INVALIDATE_LINES | PAL_CACHE_FLUSH_NO_INTERRUPT, 0);
 }
 
 /**
@@ -61,7 +54,7 @@ InvalidateInstructionCache (
 
   @param  Length  The number of bytes to invalidate from the instruction cache.
 
-  @return Address of cahce invalidation.
+  @return Address of cache invalidation.
 
 **/
 VOID *
@@ -71,6 +64,7 @@ InvalidateInstructionCacheRange (
   IN      UINTN                     Length
   )
 {
+  ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
   return IpfFlushCacheRange (Address, Length);
 }
 
@@ -90,7 +84,7 @@ WriteBackInvalidateDataCache (
   VOID
   )
 {
-  PalCall (PAL_CACHE_FLUSH, PAL_CACHE_FLUSH_DATA_ALL, PAL_CACHE_FLUSH_INVALIDATE_LINES, 0);
+  PalCall (PAL_CACHE_FLUSH, PAL_CACHE_FLUSH_DATA_ALL, PAL_CACHE_FLUSH_INVALIDATE_LINES | PAL_CACHE_FLUSH_NO_INTERRUPT, 0);
 }
 
 /**
@@ -172,7 +166,7 @@ WriteBackDataCache (
                   mode, then Address is a virtual address.
   @param  Length  The number of bytes to write back from the data cache.
 
-  @return Address of cache wrote in main memory.
+  @return Address of cache written in main memory.
 
 **/
 VOID *
@@ -204,6 +198,10 @@ InvalidateDataCache (
   VOID
   )
 {
+  //
+  // Invalidation of entire data cache without writing back is not supported on
+  // IPF architecture, so write back and invalidate operation is performed.
+  //
   WriteBackInvalidateDataCache ();
 }
 
@@ -241,5 +239,10 @@ InvalidateDataCacheRange (
   IN      UINTN                     Length
   )
 {
+  ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
+  //
+  // Invalidation of a data cache range without writing back is not supported on
+  // IPF architecture, so write back and invalidate operation is performed.
+  //
   return IpfFlushCacheRange (Address, Length);
 }

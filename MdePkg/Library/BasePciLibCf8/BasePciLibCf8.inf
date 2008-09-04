@@ -1,5 +1,5 @@
 #/** @file
-# This driver implements one PCI Library instance based on PCI CF8 Library.
+# This module implements one PCI Library instance based on PCI CF8 Library.
 #
 # PCI Library that uses I/O ports 0xCF8 and 0xCFC to perform
 #  PCI Configuration cycles. Layers on top of one PCI CF8 Library instance.
