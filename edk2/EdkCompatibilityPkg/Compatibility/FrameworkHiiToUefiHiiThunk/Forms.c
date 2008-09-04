@@ -519,13 +519,10 @@ HiiUpdateForm (
     }
   }
 
-  if ((ThunkContext->IfrPackageCount == 0) && (ThunkContext->StringPackageCount != 0)) {
-    UefiHiiHandle = TagGuidToUefiHiiHandle (Private, &ThunkContext->TagGuid);
-  
-    if (UefiHiiHandle == NULL) {
-      Status = EFI_INVALID_PARAMETER;
-      goto Done;
-    }
+  if (ThunkContext->IfrPackageCount == 0) {
+    ASSERT (FALSE);
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
   } else {
     UefiHiiHandle = ThunkContext->UefiHiiHandle;
   }

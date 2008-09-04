@@ -45,8 +45,8 @@ UefiHiiHandleToThunkContext (
   IN EFI_HII_HANDLE                   UefiHiiHandle
   );
 
-EFI_HII_HANDLE *
-TagGuidToUefiHiiHandle (
+HII_THUNK_CONTEXT *
+TagGuidToIfrPackThunkContext (
   IN CONST HII_THUNK_PRIVATE_DATA *Private,
   IN CONST EFI_GUID                   *Guid
   );
