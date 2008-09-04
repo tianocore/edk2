@@ -133,7 +133,7 @@ GetImageReadFunction (
 EFI_STATUS
 EFIAPI
 DxeLoadCore (
-  IN EFI_DXE_IPL_PPI       *This,
+  IN CONST EFI_DXE_IPL_PPI *This,
   IN EFI_PEI_SERVICES      **PeiServices,
   IN EFI_PEI_HOB_POINTERS  HobList
   );
