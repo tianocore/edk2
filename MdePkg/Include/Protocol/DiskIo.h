@@ -61,8 +61,7 @@ EFI_STATUS
   IN UINT64                       Offset,
   IN UINTN                        BufferSize,
   OUT VOID                        *Buffer
-  )
-;
+  );
 
 /**
   Read BufferSize bytes from Offset into Buffer.
@@ -90,8 +89,7 @@ EFI_STATUS
   IN UINT64                       Offset,
   IN UINTN                        BufferSize,
   IN VOID                         *Buffer
-  )
-;
+  );
 
 #define EFI_DISK_IO_PROTOCOL_REVISION 0x00010000
 

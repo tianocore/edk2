@@ -49,8 +49,7 @@ EFI_STATUS
   IN EFI_DRIVER_BINDING_PROTOCOL            *This,
   IN EFI_HANDLE                             ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL               *RemainingDevicePath OPTIONAL
-  )
-;
+  );
 
 /**
   Start this driver on ControllerHandle.
@@ -71,8 +70,7 @@ EFI_STATUS
   IN EFI_DRIVER_BINDING_PROTOCOL            *This,
   IN EFI_HANDLE                             ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL               *RemainingDevicePath OPTIONAL
-  )
-;
+  );
 
 /**
   Stop this driver on ControllerHandle.
@@ -94,8 +92,7 @@ EFI_STATUS
   IN  EFI_HANDLE                            ControllerHandle,
   IN  UINTN                                 NumberOfChildren,
   IN  EFI_HANDLE                            *ChildHandleBuffer OPTIONAL
-  )
-;
+  );
 
 //
 // Interface structure for the ControllerHandle Driver Protocol

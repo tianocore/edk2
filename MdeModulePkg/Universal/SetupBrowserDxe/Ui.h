@@ -180,8 +180,7 @@ extern UI_MENU_SELECTION   *gCurrentSelection;
 VOID
 UiInitMenu (
   VOID
-  )
-;
+  );
 
 /**
   Initialize Menu option list.
@@ -190,8 +189,7 @@ UiInitMenu (
 VOID
 UiInitMenuList (
   VOID
-  )
-;
+  );
 
 /**
   Remove a Menu in list, and return FormId/QuestionId for previous Menu.
@@ -202,8 +200,7 @@ UiInitMenuList (
 VOID
 UiRemoveMenuListEntry (
   OUT UI_MENU_SELECTION  *Selection
-  )
-;
+  );
 
 /**
   Free Menu option linked list.
@@ -212,8 +209,7 @@ UiRemoveMenuListEntry (
 VOID
 UiFreeMenuList (
   VOID
-  )
-;
+  );
 
 /**
   Add one menu entry to the linked lst
@@ -224,8 +220,7 @@ UiFreeMenuList (
 VOID
 UiAddMenuListEntry (
   IN UI_MENU_SELECTION            *Selection
-  )
-;
+  );
 
 /**
   Free Menu option linked list.
@@ -234,8 +229,7 @@ UiAddMenuListEntry (
 VOID
 UiFreeMenu (
   VOID
-  )
-;
+  );
 
 /**
   Add one menu option by specified description and context.
@@ -254,8 +248,7 @@ UiAddMenuOption (
   IN FORM_BROWSER_STATEMENT  *Statement,
   IN UINT16                  NumberOfLines,
   IN UINT16                  MenuItemCount
-  )
-;
+  );
 
 /**
   Display menu and wait for user to select one menu option, then return it.
@@ -271,8 +264,7 @@ UiAddMenuOption (
 EFI_STATUS
 UiDisplayMenu (
   IN OUT UI_MENU_SELECTION           *Selection
-  )
-;
+  );
 
 /**
   Free up the resource allocated for all strings required
@@ -282,8 +274,7 @@ UiDisplayMenu (
 VOID
 FreeBrowserStrings (
   VOID
-  )
-;
+  );
 
 /**
   The worker function that send the displays to the screen. On output,
@@ -301,8 +292,7 @@ FreeBrowserStrings (
 EFI_STATUS
 SetupBrowser (
   IN OUT UI_MENU_SELECTION    *Selection
-  )
-;
+  );
 
 /**
   VSPrint worker function that prints a Value as a decimal number in Buffer.
@@ -320,8 +310,7 @@ ValueToString (
   IN CHAR16   *Buffer,
   IN BOOLEAN  Flags,
   IN INT64    Value
-  )
-;
+  );
 
 /**
   Set Buffer to Value for Size bytes.
@@ -336,8 +325,7 @@ SetUnicodeMem (
   IN VOID   *Buffer,
   IN UINTN  Size,
   IN CHAR16 Value
-  )
-;
+  );
 
 /**
   Wait for a given event to fire, or for an optional timeout to expire.
@@ -355,8 +343,7 @@ UiWaitForSingleEvent (
   IN EFI_EVENT                Event,
   IN UINT64                   Timeout, OPTIONAL
   IN UINT8                    RefreshInterval OPTIONAL
-  )
-;
+  );
 
 /**
   Draw a pop up windows based on the dimension, number of lines and
@@ -372,8 +359,7 @@ CreatePopUp (
   IN  UINTN                       ScreenWidth,
   IN  UINTN                       NumberOfLines,
   ...
-  )
-;
+  );
 
 /**
   Get string or password input from user.
@@ -391,8 +377,7 @@ ReadString (
   IN  UI_MENU_OPTION              *MenuOption,
   IN  CHAR16                      *Prompt,
   OUT CHAR16                      *StringPtr
-  )
-;
+  );
 
 /**
   Get selection for OneOf and OrderedList (Left/Right will be ignored).
@@ -408,8 +393,7 @@ EFI_STATUS
 GetSelectionInputPopUp (
   IN  UI_MENU_SELECTION           *Selection,
   IN  UI_MENU_OPTION              *MenuOption
-  )
-;
+  );
 
 /**
   This routine reads a numeric value from the user input.
@@ -425,8 +409,7 @@ EFI_STATUS
 GetNumericInput (
   IN  UI_MENU_SELECTION           *Selection,
   IN  UI_MENU_OPTION              *MenuOption
-  )
-;
+  );
 
 /**
   Update status bar on the bottom of menu.
@@ -441,8 +424,7 @@ UpdateStatusBar (
   IN  UINTN                       MessageType,
   IN  UINT8                       Flags,
   IN  BOOLEAN                     State
-  )
-;
+  );
 
 /**
   Process Question Config.
@@ -458,8 +440,7 @@ EFI_STATUS
 ProcessQuestionConfig (
   IN  UI_MENU_SELECTION       *Selection,
   IN  FORM_BROWSER_STATEMENT  *Question
-  )
-;
+  );
 
 /**
   Print Question Value according to it's storage width and display attributes.
@@ -477,8 +458,7 @@ PrintFormattedNumber (
   IN FORM_BROWSER_STATEMENT   *Question,
   IN OUT CHAR16               *FormattedNumber,
   IN UINTN                    BufferSize
-  )
-;
+  );
 
 /**
   Search an Option of a Question by its value.
@@ -494,8 +474,7 @@ QUESTION_OPTION *
 ValueToOption (
   IN FORM_BROWSER_STATEMENT   *Question,
   IN EFI_HII_VALUE            *OptionValue
-  )
-;
+  );
 
 /**
   Process a Question's Option (whether selected or un-selected).
@@ -515,8 +494,7 @@ ProcessOptions (
   IN  UI_MENU_OPTION              *MenuOption,
   IN  BOOLEAN                     Selected,
   OUT CHAR16                      **OptionString
-  )
-;
+  );
 
 /**
   Process the help string: Split StringPtr to several lines of strings stored in
@@ -532,8 +510,7 @@ ProcessHelpString (
   IN  CHAR16                      *StringPtr,
   OUT CHAR16                      **FormattedString,
   IN  UINTN                       RowCount
-  )
-;
+  );
 
 /**
   Update key's help imformation.
@@ -546,8 +523,7 @@ VOID
 UpdateKeyHelp (
   IN  UI_MENU_OPTION              *MenuOption,
   IN  BOOLEAN                     Selected
-  )
-;
+  );
 
 /**
   Clear retangle with specified text attribute.
@@ -566,8 +542,7 @@ ClearLines (
   UINTN                                       TopRow,
   UINTN                                       BottomRow,
   UINTN                                       TextAttribute
-  )
-;
+  );
 
 /**
   Count the storage space of a Unicode string.
@@ -586,8 +561,7 @@ ClearLines (
 UINTN
 GetStringWidth (
   CHAR16                                      *String
-  )
-;
+  );
 
 /**
   Will copy LineWidth amount of a string in the OutputString buffer and return the
@@ -608,8 +582,7 @@ GetLineByWidth (
   IN      UINT16                      LineWidth,
   IN OUT  UINTN                       *Index,
   OUT     CHAR16                      **OutputString
-  )
-;
+  );
 
 /**
   Get the supported width for a particular op-code
@@ -624,8 +597,7 @@ UINT16
 GetWidth (
   IN FORM_BROWSER_STATEMENT        *Statement,
   IN EFI_HII_HANDLE                 Handle
-  )
-;
+  );
 
 /**
   Concatenate a narrow string to another string.
@@ -639,8 +611,7 @@ VOID
 NewStrCat (
   CHAR16                                      *Destination,
   CHAR16                                      *Source
-  )
-;
+  );
 
 /**
   Wait for a key to be pressed by user.
@@ -653,8 +624,7 @@ NewStrCat (
 EFI_STATUS
 WaitForKeyStroke (
   OUT  EFI_INPUT_KEY           *Key
-  )
-;
+  );
 
 /**
   Reset stack pointer to begin of the stack.
@@ -663,8 +633,7 @@ WaitForKeyStroke (
 VOID
 ResetScopeStack (
   VOID
-  )
-;
+  );
 
 /**
   Push an Operand onto the Stack
@@ -679,8 +648,7 @@ ResetScopeStack (
 EFI_STATUS
 PushScope (
   IN UINT8   Operand
-  )
-;
+  );
 
 /**
   Pop an Operand from the Stack
@@ -695,8 +663,7 @@ PushScope (
 EFI_STATUS
 PopScope (
   OUT UINT8     *Operand
-  )
-;
+  );
 
 /**
   Get Form given its FormId.
@@ -712,8 +679,7 @@ FORM_BROWSER_FORM *
 IdToForm (
   IN FORM_BROWSER_FORMSET  *FormSet,
   IN UINT16                FormId
-  )
-;
+  );
 
 /**
   Search a Question in Formset scope using its QuestionId.
@@ -731,8 +697,7 @@ IdToQuestion (
   IN FORM_BROWSER_FORMSET  *FormSet,
   IN FORM_BROWSER_FORM     *Form,
   IN UINT16                QuestionId
-  )
-;
+  );
 
 /**
   Zero extend integer/boolean/date/time to UINT64 for comparing.
@@ -743,8 +708,7 @@ IdToQuestion (
 VOID
 ExtendValueToU64 (
   IN  EFI_HII_VALUE   *Value
-  )
-;
+  );
 
 /**
   Compare two Hii value.
@@ -764,8 +728,7 @@ CompareHiiValue (
   IN  EFI_HII_VALUE   *Value1,
   IN  EFI_HII_VALUE   *Value2,
   IN  EFI_HII_HANDLE  HiiHandle OPTIONAL
-  )
-;
+  );
 
 /**
   Evaluate the result of a HII expression
@@ -788,7 +751,6 @@ EvaluateExpression (
   IN FORM_BROWSER_FORMSET  *FormSet,
   IN FORM_BROWSER_FORM     *Form,
   IN OUT FORM_EXPRESSION   *Expression
-  )
-;
+  );
 
 #endif // _UI_H

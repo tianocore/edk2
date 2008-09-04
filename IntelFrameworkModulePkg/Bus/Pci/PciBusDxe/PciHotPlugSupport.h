@@ -43,8 +43,7 @@ EFIAPI
 PciHPCInitialized (
   IN EFI_EVENT    Event,
   IN VOID         *Context
-  )
-;
+  );
 
 /**
   Compare two device path
@@ -59,8 +58,7 @@ BOOLEAN
 EfiCompareDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath1,
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath2
-  )
-;
+  );
 
 /**
   Init hot plug support and root hot plug private data.
@@ -69,8 +67,7 @@ EfiCompareDevicePath (
 EFI_STATUS
 InitializeHotPlugSupport (
   VOID
-  )
-;
+  );
 
 /**
   Test whether PCI device is hot plug bus.
@@ -83,8 +80,7 @@ InitializeHotPlugSupport (
 EFI_STATUS
 IsPciHotPlugBus (
   PCI_IO_DEVICE                       *PciIoDevice
-  )
-;
+  );
 
 /**
   Test whether device path is for root pci hot plug bus
@@ -99,8 +95,7 @@ BOOLEAN
 IsRootPciHotPlugBus (
   IN EFI_DEVICE_PATH_PROTOCOL         *HpbDevicePath,
   OUT UINTN                           *HpIndex
-  )
-;
+  );
 
 /**
   Test whether device path is for root pci hot plug controller
@@ -115,8 +110,7 @@ BOOLEAN
 IsRootPciHotPlugController (
   IN EFI_DEVICE_PATH_PROTOCOL         *HpcDevicePath,
   OUT UINTN                           *HpIndex
-  )
-;
+  );
 
 /**
   Wrapper for creating event object for HPC 
@@ -130,8 +124,7 @@ EFI_STATUS
 CreateEventForHpc (
   IN UINTN       HpIndex,
   OUT EFI_EVENT  *Event
-  )
-;
+  );
 
 /**
   Wait for all root HPC initialized.
@@ -141,8 +134,7 @@ CreateEventForHpc (
 EFI_STATUS
 AllRootHPCInitialized (
   IN  UINTN           TimeoutInMicroSeconds
-  )
-;
+  );
 
 /**
   Check HPC capability register block
@@ -155,8 +147,7 @@ AllRootHPCInitialized (
 EFI_STATUS
 IsSHPC (
   PCI_IO_DEVICE                       *PciIoDevice
-  )
-;
+  );
 
 /**
   Get resource padding for hot plug bus
@@ -169,7 +160,6 @@ IsSHPC (
 EFI_STATUS
 GetResourcePaddingForHpb (
   IN PCI_IO_DEVICE *PciIoDevice
-  )
-;
+  );
 
 #endif

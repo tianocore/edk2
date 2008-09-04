@@ -135,8 +135,7 @@ EFI_STATUS
   IN UINT64                                         Lun,
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
   IN EFI_EVENT                                      Event     OPTIONAL
-  )
-;      
+  );      
 
 /**
   Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on a SCSI channel. These       
@@ -170,8 +169,7 @@ EFI_STATUS
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
   IN OUT UINT8                                      **Target,
   IN OUT UINT64                                     *Lun
-  )
-;   
+  );   
 
 /**
   Used to allocate and build a device path node for a SCSI device on a SCSI channel.
@@ -207,8 +205,7 @@ EFI_STATUS
   IN UINT8                                         *Target,
   IN UINT64                                        Lun,
   IN OUT EFI_DEVICE_PATH_PROTOCOL                  **DevicePath
-  )
-;     
+  );     
 
 /**
   Used to translate a device path node to a Target ID and LUN.
@@ -236,8 +233,7 @@ EFI_STATUS
   IN EFI_DEVICE_PATH_PROTOCOL                      *DevicePath,
   OUT UINT8                                        **Target,
   OUT UINT64                                       *Lun
-  )
-;       
+  );       
 
 /**
   Resets a SCSI channel. This operation resets all the SCSI devices connected to the SCSI channel.
@@ -254,8 +250,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_EXT_SCSI_PASS_THRU_RESET_CHANNEL)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This
-  )
-;    
+  );    
   
 /**
   Resets a SCSI logical unit that is connected to a SCSI channel.
@@ -282,8 +277,7 @@ EFI_STATUS
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
   IN UINT8                                         *Target,
   IN UINT64                                        Lun
-  )
-;         
+  );         
 
 /**
   Used to retrieve the list of legal Target IDs for SCSI devices on a SCSI channel. These can either     
@@ -312,8 +306,7 @@ EFI_STATUS
 (EFIAPI *EFI_EXT_SCSI_PASS_THRU_GET_NEXT_TARGET)(
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
   IN OUT UINT8                                     **Target
-  )
-;          
+  );          
 
 /**  
   @par Protocol Description:

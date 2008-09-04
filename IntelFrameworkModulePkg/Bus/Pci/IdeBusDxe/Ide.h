@@ -39,8 +39,7 @@ DeRegisterIdeDevice (
   IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN  EFI_HANDLE                     Controller,
   IN  EFI_HANDLE                     Handle
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -59,8 +58,7 @@ EnableIdeDevice (
   IN EFI_PCI_IO_PROTOCOL                 *PciIo,
   IN EFI_DEVICE_PATH_PROTOCOL            *ParentDevicePath,
   IN EFI_DEVICE_PATH_PROTOCOL            *RemainingDevicePath
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -75,8 +73,7 @@ UINT8
 IDEReadPortB (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -95,8 +92,7 @@ IDEReadPortWMultiple (
   IN  UINT16                Port,
   IN  UINTN                 Count,
   OUT  VOID                 *Buffer
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -113,8 +109,7 @@ IDEWritePortB (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port,
   IN  UINT8                 Data
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -131,8 +126,7 @@ IDEWritePortW (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port,
   IN  UINT16                Data
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -151,8 +145,7 @@ IDEWritePortWMultiple (
   IN  UINT16                Port,
   IN  UINTN                 Count,
   IN  VOID                  *Buffer
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -167,8 +160,7 @@ EFI_STATUS
 GetIdeRegistersBaseAddr (
   IN  EFI_PCI_IO_PROTOCOL         *PciIo,
   OUT IDE_REGISTERS_BASE_ADDR     *IdeRegsBaseAddr
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -181,8 +173,7 @@ GetIdeRegistersBaseAddr (
 EFI_STATUS
 ReassignIdeResources (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -195,8 +186,7 @@ ReassignIdeResources (
 EFI_STATUS
 DiscoverIdeDevice (
   IN IDE_BLK_IO_DEV *IdeDev
-  )
-;
+  );
 
 /**
   This interface is used to initialize all state data related to the
@@ -208,8 +198,7 @@ DiscoverIdeDevice (
 EFI_STATUS
 InitializeIDEChannelData (
   VOID
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -222,8 +211,7 @@ InitializeIDEChannelData (
 EFI_STATUS
 DetectIDEController (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -238,8 +226,7 @@ EFI_STATUS
 DRQClear (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -254,8 +241,7 @@ EFI_STATUS
 DRQClear2 (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -270,8 +256,7 @@ EFI_STATUS
 DRQReady (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -286,8 +271,7 @@ EFI_STATUS
 DRQReady2 (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -302,8 +286,7 @@ EFI_STATUS
 WaitForBSYClear (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -318,8 +301,7 @@ EFI_STATUS
 WaitForBSYClear2 (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -334,8 +316,7 @@ EFI_STATUS
 DRDYReady (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           DelayInMilliSeconds
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -350,8 +331,7 @@ EFI_STATUS
 DRDYReady2 (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           DelayInMilliSeconds
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -368,8 +348,7 @@ SwapStringChars (
   IN CHAR8  *Destination,
   IN CHAR8  *Source,
   IN UINT32 Size
-  )
-;
+  );
 
 //
 //  ATA device functions' prototype
@@ -385,8 +364,7 @@ SwapStringChars (
 EFI_STATUS
 ATAIdentify (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -399,8 +377,7 @@ ATAIdentify (
 VOID
 PrintAtaModuleName (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -429,8 +406,7 @@ AtaPioDataIn (
   IN  UINT8           SectorNumber,
   IN  UINT8           CylinderLsb,
   IN  UINT8           CylinderMsb
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -459,8 +435,7 @@ AtaPioDataOut (
   IN  UINT8           SectorNumber,
   IN  UINT8           CylinderLsb,
   IN  UINT8           CylinderMsb
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -473,8 +448,7 @@ AtaPioDataOut (
 EFI_STATUS
 CheckErrorStatus (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -493,8 +467,7 @@ AtaReadSectors (
   IN  VOID            *DataBuffer,
   IN  EFI_LBA         Lba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -513,8 +486,7 @@ AtaWriteSectors (
   IN  VOID            *BufferData,
   IN  EFI_LBA         Lba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -527,8 +499,7 @@ AtaWriteSectors (
 EFI_STATUS
 AtaSoftReset (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -549,8 +520,7 @@ AtaBlkIoReadBlocks (
   IN EFI_LBA          LBA,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -571,8 +541,7 @@ AtaBlkIoWriteBlocks (
   IN EFI_LBA          LBA,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
-  )
-;
+  );
 
 //
 // ATAPI device functions' prototype
@@ -588,8 +557,7 @@ AtaBlkIoWriteBlocks (
 EFI_STATUS
 ATAPIIdentify (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -602,8 +570,7 @@ ATAPIIdentify (
 EFI_STATUS
 AtapiInquiry (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -624,8 +591,7 @@ AtapiPacketCommandIn (
   IN  UINT16                *Buffer,
   IN  UINT32                ByteCount,
   IN  UINTN                 TimeOut
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -646,8 +612,7 @@ AtapiPacketCommandOut (
   IN  UINT16                *Buffer,
   IN  UINT32                ByteCount,
   IN  UINTN                 TimeOut
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -668,8 +633,7 @@ PioReadWriteData (
   IN  UINT32          ByteCount,
   IN  BOOLEAN         Read,
   IN  UINTN           TimeOut
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -684,8 +648,7 @@ EFI_STATUS
 AtapiTestUnitReady (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   OUT SENSE_RESULT	  *SResult  
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -700,8 +663,7 @@ EFI_STATUS
 AtapiRequestSense (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   OUT UINTN           *SenseCounts
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -716,8 +678,7 @@ EFI_STATUS
 AtapiReadCapacity (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   OUT SENSE_RESULT	  *SResult  
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -732,8 +693,7 @@ EFI_STATUS
 AtapiDetectMedia (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   OUT BOOLEAN         *MediaChange
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -752,8 +712,7 @@ AtapiReadSectors (
   IN  VOID            *Buffer,
   IN  EFI_LBA         Lba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -772,8 +731,7 @@ AtapiWriteSectors (
   IN  VOID            *Buffer,
   IN  EFI_LBA         Lba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -786,8 +744,7 @@ AtapiWriteSectors (
 EFI_STATUS
 AtapiSoftReset (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -808,8 +765,7 @@ AtapiBlkIoReadBlocks (
   IN EFI_LBA          LBA,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -830,8 +786,7 @@ AtapiBlkIoWriteBlocks (
   IN EFI_LBA          LBA,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -848,8 +803,7 @@ ParseSenseData (
   IN IDE_BLK_IO_DEV     *IdeDev,
   IN UINTN              SenseCount,
   OUT SENSE_RESULT      *Result
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -862,8 +816,7 @@ ParseSenseData (
 EFI_STATUS
 AtapiReadPendingData (
   IN IDE_BLK_IO_DEV     *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -878,8 +831,7 @@ EFI_STATUS
 IsLS120orZipWriteProtected (
   IN  IDE_BLK_IO_DEV    *IdeDev,
   OUT BOOLEAN           *WriteProtected
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -892,8 +844,7 @@ IsLS120orZipWriteProtected (
 VOID
 ReleaseIdeResources (
   IN  IDE_BLK_IO_DEV  *IdeBlkIoDevice
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -908,8 +859,7 @@ EFI_STATUS
 SetDeviceTransferMode (
   IN IDE_BLK_IO_DEV       *IdeDev,
   IN ATA_TRANSFER_MODE    *TransferMode
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -924,8 +874,7 @@ EFI_STATUS
 ReadNativeMaxAddress (
   IN  IDE_BLK_IO_DEV                *IdeDev,
   OUT EFI_LBA                       *NativeMaxAddress
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -942,8 +891,7 @@ SetMaxAddress (
   IN  IDE_BLK_IO_DEV                *IdeDev,
   IN  EFI_LBA                       MaxAddress,
   IN  BOOLEAN                       bVolatile
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -970,8 +918,7 @@ AtaNonDataCommandIn (
   IN  UINT8           LbaLow,
   IN  UINT8           LbaMiddle,
   IN  UINT8           LbaHigh
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -994,8 +941,7 @@ AtaNonDataCommandInExt (
   IN  UINT16          Feature,
   IN  UINT16          SectorCount,
   IN  EFI_LBA         LbaAddress
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1014,8 +960,7 @@ AtaReadSectorsExt (
   IN  VOID            *DataBuffer,
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1034,8 +979,7 @@ AtaWriteSectorsExt (
   IN  VOID            *DataBuffer,
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1054,8 +998,7 @@ AtaUdmaReadExt (
   IN  VOID            *DataBuffer,
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1074,8 +1017,7 @@ AtaUdmaRead (
   IN  VOID            *DataBuffer,
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1094,8 +1036,7 @@ AtaUdmaWriteExt (
   IN  VOID            *DataBuffer,
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   Perform an ATA Udma operation (Read, ReadExt, Write, WriteExt).
@@ -1129,8 +1070,7 @@ DoAtaUdma (
   IN  EFI_LBA             StartLba,
   IN  UINTN               NumberOfBlocks,
   IN  ATA_UDMA_OPERATION  UdmaOp
-  )
-;
+  );
 
 
 /**
@@ -1150,8 +1090,7 @@ AtaUdmaWrite (
   IN  VOID            *DataBuffer,
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1174,8 +1113,7 @@ AtaCommandIssueExt (
   IN  UINT16          Feature,
   IN  UINT16          SectorCount,
   IN  EFI_LBA         LbaAddress
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1198,8 +1136,7 @@ AtaCommandIssue (
   IN  UINT16          Feature,
   IN  UINT16          SectorCount,
   IN  EFI_LBA         LbaAddress
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1212,8 +1149,7 @@ AtaCommandIssue (
 EFI_STATUS
 AtaAtapi6Identify (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 
 /**
@@ -1227,8 +1163,7 @@ AtaAtapi6Identify (
 VOID
 AtaSMARTSupport (
   IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1251,8 +1186,7 @@ AtaPioDataInExt (
   IN  UINT8           AtaCommand,
   IN  EFI_LBA         StartLba,
   IN  UINT16          SectorCount
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1275,8 +1209,7 @@ AtaPioDataOutExt (
   IN  UINT8           AtaCommand,
   IN  EFI_LBA         StartLba,
   IN  UINT16          SectorCount
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1291,8 +1224,7 @@ EFI_STATUS
 SetDriveParameters (
   IN IDE_BLK_IO_DEV       *IdeDev,
   IN ATA_DRIVE_PARMS      *DriveParameters
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -1305,8 +1237,7 @@ SetDriveParameters (
 EFI_STATUS
 EnableInterrupt (
   IN IDE_BLK_IO_DEV       *IdeDev
-  )
-;
+  );
 
 /**
   Clear pending IDE interrupt before OS loader/kernel take control of the IDE device.
@@ -1322,7 +1253,6 @@ EFIAPI
 ClearInterrupt (
   IN EFI_EVENT  Event,
   IN VOID       *Context
-  )
-;
+  );
 
 #endif

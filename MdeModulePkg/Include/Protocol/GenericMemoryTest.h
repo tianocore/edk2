@@ -49,8 +49,7 @@ EFI_STATUS
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
   IN  EXTENDMEM_COVERAGE_LEVEL                 Level,
   OUT BOOLEAN                                  *RequireSoftECCInit
-  )
-;
+  );
 
 
 /**
@@ -81,8 +80,7 @@ EFI_STATUS
   OUT UINT64                                   *TotalMemorySize,
   OUT BOOLEAN                                  *ErrorOut,
   IN BOOLEAN                                   IfTestAbort
-  )
-;
+  );
 
 
 /**
@@ -99,8 +97,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_MEMORY_TEST_FINISHED)(
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This
-  )
-;
+  );
 
 /**
   Provide capability to test compatible range which used by some sepcial
@@ -120,8 +117,7 @@ EFI_STATUS
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
   IN  EFI_PHYSICAL_ADDRESS                     StartAddress,
   IN  UINT64                                   Length
-  )
-;
+  );
 
 struct _EFI_GENERIC_MEMORY_TEST_PROTOCOL {
   EFI_MEMORY_TEST_INIT              MemoryTestInit;

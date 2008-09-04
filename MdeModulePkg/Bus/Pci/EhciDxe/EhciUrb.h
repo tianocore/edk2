@@ -261,8 +261,7 @@ EhcCreateQtd (
   IN UINT8                PktId,
   IN UINT8                Toggle,
   IN UINTN                MaxPacket
-  )
-;
+  );
 
 
 
@@ -279,8 +278,7 @@ EHC_QH *
 EhcCreateQh (
   IN USB2_HC_DEV          *Ehci,
   IN USB_ENDPOINT         *Ep
-  )
-;
+  );
 
 
 /**
@@ -296,8 +294,7 @@ VOID
 EhcFreeUrb (
   IN USB2_HC_DEV          *Ehc,
   IN URB                  *Urb
-  )
-;
+  );
 
 
 /**
@@ -337,6 +334,5 @@ EhcCreateUrb (
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
   IN VOID                               *Context,
   IN UINTN                              Interval
-  )
-;
+  );
 #endif

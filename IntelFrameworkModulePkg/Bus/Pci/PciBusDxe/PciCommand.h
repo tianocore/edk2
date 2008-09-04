@@ -79,8 +79,7 @@ PciOperateRegister (
   IN  UINT8         Offset,
   IN  UINT8         Operation,
   OUT UINT16        *PtrCommand
-  )
-;
+  );
 
 /**
   check the cpability of this device supports
@@ -93,8 +92,7 @@ PciOperateRegister (
 BOOLEAN
 PciCapabilitySupport (
   IN PCI_IO_DEVICE  *PciIoDevice
-  )
-;
+  );
 
 /**
   Locate cap reg.
@@ -114,8 +112,7 @@ LocateCapabilityRegBlock (
   IN UINT8          CapId,
   IN OUT UINT8      *Offset,
   OUT UINT8         *NextRegBlock OPTIONAL
-  )
-;
+  );
 
 
 #define PciReadCommandRegister(a,b) \

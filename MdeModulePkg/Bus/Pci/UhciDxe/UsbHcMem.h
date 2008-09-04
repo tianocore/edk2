@@ -89,8 +89,7 @@ UsbHcInitMemPool (
   IN EFI_PCI_IO_PROTOCOL  *PciIo,
   IN BOOLEAN              Check4G,
   IN UINT32               Which4G
-  )
-;
+  );
 
 
 /**
@@ -105,8 +104,7 @@ UsbHcInitMemPool (
 EFI_STATUS
 UsbHcFreeMemPool (
   IN USBHC_MEM_POOL       *Pool
-  )
-;
+  );
 
 
 
@@ -124,8 +122,7 @@ VOID *
 UsbHcAllocateMem (
   IN  USBHC_MEM_POOL      *Pool,
   IN  UINTN               Size
-  )
-;
+  );
 
 
 
@@ -144,6 +141,5 @@ UsbHcFreeMem (
   IN USBHC_MEM_POOL       *Pool,
   IN VOID                 *Mem,
   IN UINTN                Size
-  )
-;
+  );
 #endif

@@ -107,8 +107,7 @@ VOID
 UhciLinkTdToQh (
   IN UHCI_QH_SW           *Qh,
   IN UHCI_TD_SW           *Td
-  )
-;
+  );
 
 
 /**
@@ -124,8 +123,7 @@ VOID
 UhciUnlinkTdFromQh (
   IN UHCI_QH_SW           *Qh,
   IN UHCI_TD_SW           *Td
-  )
-;
+  );
 
 
 /**
@@ -146,8 +144,7 @@ UhciMapUserRequest (
   IN  OUT VOID            *Request,
   OUT UINT8               **MappedAddr,
   OUT VOID                **Map
-  )
-;
+  );
 
 
 /**
@@ -174,8 +171,7 @@ UhciMapUserData (
   OUT UINT8                   *PktId,
   OUT UINT8                   **MappedAddr,
   OUT VOID                    **Map
-  )
-;
+  );
 
 
 /**
@@ -191,8 +187,7 @@ VOID
 UhciDestoryTds (
   IN USB_HC_DEV           *Uhc,
   IN UHCI_TD_SW           *FirstTd
-  )
-;
+  );
 
 
 /**
@@ -208,8 +203,7 @@ UHCI_QH_SW *
 UhciCreateQh (
   IN  USB_HC_DEV        *Uhc,
   IN  UINTN             Interval
-  )
-;
+  );
 
 
 /**
@@ -237,8 +231,7 @@ UhciCreateCtrlTds (
   IN UINTN                DataLen,
   IN UINT8                MaxPacket,
   IN BOOLEAN              IsLow
-  )
-;
+  );
 
 
 /**
@@ -268,7 +261,6 @@ UhciCreateBulkOrIntTds (
   IN OUT UINT8            *DataToggle,
   IN UINT8                MaxPacket,
   IN BOOLEAN              IsLow
-  )
-;
+  );
 
 #endif

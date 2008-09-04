@@ -56,8 +56,7 @@ typedef struct {
 void
 InstallHotPlugRequestProtocol (
   IN  EFI_STATUS                    *Status
-  )
-;
+  );
 
 /**
   Install protocol gEfiPciHotplugDeviceGuid into hotplug device
@@ -69,8 +68,7 @@ InstallHotPlugRequestProtocol (
 VOID
 InstallPciHotplugGuid (
   IN  PCI_IO_DEVICE                  *PciIoDevice
-  )
-;
+  );
 
 /**
   UnInstall protocol gEfiPciHotplugDeviceGuid into hotplug device
@@ -82,8 +80,7 @@ InstallPciHotplugGuid (
 VOID
 UninstallPciHotplugGuid (
   IN  PCI_IO_DEVICE                  *PciIoDevice
-  )
-;
+  );
 
 /**
   Retrieve the BAR information via PciIo interface
@@ -93,8 +90,7 @@ UninstallPciHotplugGuid (
 VOID
 GetBackPcCardBar (
   IN  PCI_IO_DEVICE                  *PciIoDevice
-  )
-;
+  );
 
 /**
   Remove rejected pci device from specific root bridge
@@ -109,8 +105,7 @@ EFI_STATUS
 RemoveRejectedPciDevices (
   EFI_HANDLE        RootBridgeHandle,
   IN PCI_IO_DEVICE  *Bridge
-  )
-;
+  );
 
 /**
   Wrapper function for allocating resource for pci host bridge.
@@ -121,20 +116,17 @@ RemoveRejectedPciDevices (
 EFI_STATUS
 PciHostBridgeResourceAllocator (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
-  )
-;
+  );
 
 EFI_STATUS
 PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
-  )
-;
+  );
 
 EFI_STATUS
 PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
-  )
-;
+  );
 
 /**
   Wapper function of scanning pci bus and assign bus number to the given PCI bus system
@@ -154,8 +146,7 @@ PciScanBus (
   IN UINT8                              StartBusNumber,
   OUT UINT8                             *SubBusNumber,
   OUT UINT8                             *PaddedBusRange
-  )
-;
+  );
 
 EFI_STATUS
 PciScanBus_WithHotPlugDeviceSupport (
@@ -163,8 +154,7 @@ PciScanBus_WithHotPlugDeviceSupport (
   IN UINT8                              StartBusNumber,
   OUT UINT8                             *SubBusNumber,
   OUT UINT8                             *PaddedBusRange
-  )
-;
+  );
 
 EFI_STATUS
 PciScanBus_WithoutHotPlugDeviceSupport (
@@ -172,8 +162,7 @@ PciScanBus_WithoutHotPlugDeviceSupport (
   IN UINT8                              StartBusNumber,
   OUT UINT8                             *SubBusNumber,
   OUT UINT8                             *PaddedBusRange
-  )
-;
+  );
 
 /**
   Process Option Rom on this host bridge
@@ -186,8 +175,7 @@ PciScanBus_WithoutHotPlugDeviceSupport (
 EFI_STATUS
 PciRootBridgeP2CProcess (
   IN PCI_IO_DEVICE *Bridge
-  )
-;
+  );
 
 /**
   Process Option Rom on this host bridge
@@ -200,8 +188,7 @@ PciRootBridgeP2CProcess (
 EFI_STATUS
 PciHostBridgeP2CProcess (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
-  )
-;
+  );
 
 /**
   This function is used to enumerate the entire host bridge
@@ -217,8 +204,7 @@ PciHostBridgeP2CProcess (
 EFI_STATUS
 PciHostBridgeEnumerator (
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc
-  )
-;
+  );
 
 /**
   Read PCI configuration space through EFI_PCI_IO_PROTOCOL.

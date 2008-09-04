@@ -29,8 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 EhcInitSched (
   IN USB2_HC_DEV          *Ehc
-  )
-;
+  );
 
 
 /**
@@ -44,8 +43,7 @@ EhcInitSched (
 VOID
 EhcFreeSched (
   IN USB2_HC_DEV          *Ehc
-  )
-;
+  );
 
 
 /**
@@ -65,8 +63,7 @@ VOID
 EhcLinkQhToAsync (
   IN USB2_HC_DEV          *Ehc,
   IN EHC_QH               *Qh
-  )
-;
+  );
 
 
 /**
@@ -83,8 +80,7 @@ VOID
 EhcUnlinkQhFromAsync (
   IN USB2_HC_DEV          *Ehc,
   IN EHC_QH               *Qh
-  )
-;
+  );
 
 
 /**
@@ -102,8 +98,7 @@ VOID
 EhcLinkQhToPeriod (
   IN USB2_HC_DEV          *Ehc,
   IN EHC_QH               *Qh
-  )
-;
+  );
 
 
 /**
@@ -120,8 +115,7 @@ VOID
 EhcUnlinkQhFromPeriod (
   IN USB2_HC_DEV          *Ehc,
   IN EHC_QH               *Qh
-  )
-;
+  );
 
 
 
@@ -142,8 +136,7 @@ EhcExecTransfer (
   IN  USB2_HC_DEV         *Ehc,
   IN  URB                 *Urb,
   IN  UINTN               TimeOut
-  )
-;
+  );
 
 
 /**
@@ -165,8 +158,7 @@ EhciDelAsyncIntTransfer (
   IN  UINT8               DevAddr,
   IN  UINT8               EpNum,
   OUT UINT8               *DataToggle
-  )
-;
+  );
 
 
 /**
@@ -180,8 +172,7 @@ EhciDelAsyncIntTransfer (
 VOID
 EhciDelAllAsyncIntTransfers (
   IN USB2_HC_DEV          *Ehc
-  )
-;
+  );
 
 
 /**
@@ -197,7 +188,6 @@ VOID
 EhcMoniteAsyncRequests (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
-  )
-;
+  );
 
 #endif

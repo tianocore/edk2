@@ -75,8 +75,7 @@ EFI_STATUS
 (EFIAPI *EFI_ARP_CONFIGURE)(
   IN EFI_ARP_PROTOCOL       *This,
   IN EFI_ARP_CONFIG_DATA    *ConfigData   OPTIONAL
-  )
-;  
+  );  
 
 /**
   Inserts an entry to the ARP cache.
@@ -115,8 +114,7 @@ EFI_STATUS
   IN VOID                   *TargetHwAddress  OPTIONAL,
   IN UINT32                 TimeoutValue,
   IN BOOLEAN                Overwrite
-  )
-;  
+  );  
 
 /**
   Locates one or more entries in the ARP cache.
@@ -152,8 +150,7 @@ EFI_STATUS
   OUT UINT32                *EntryCount       OPTIONAL,
   OUT EFI_ARP_FIND_DATA     **Entries         OPTIONAL,
   IN BOOLEAN                Refresh
-  )
-;  
+  );  
 
 
 /**
@@ -177,8 +174,7 @@ EFI_STATUS
   IN EFI_ARP_PROTOCOL       *This,
   IN BOOLEAN                BySwAddress,
   IN VOID                   *AddressBuffer   OPTIONAL
-  )
-;  
+  );  
 
 /**
   Removes all dynamic ARP cache entries that were added by this interface.
@@ -195,8 +191,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_ARP_FLUSH)(
   IN EFI_ARP_PROTOCOL       *This
-  )
-;  
+  );  
 
 /**
   Starts an ARP request session.
@@ -229,8 +224,7 @@ EFI_STATUS
   IN VOID                   *TargetSwAddress  OPTIONAL,
   IN EFI_EVENT              ResolvedEvent     OPTIONAL,
   OUT VOID                  *TargetHwAddress  
-  )
-;  
+  );  
 
 /**
   Cancels an ARP request session.
@@ -254,8 +248,7 @@ EFI_STATUS
   IN EFI_ARP_PROTOCOL       *This, 
   IN VOID                   *TargetSwAddress  OPTIONAL,
   IN EFI_EVENT              ResolvedEvent     OPTIONAL
-  )
-;  
+  );  
 
 /**
   @par Protocol Description:

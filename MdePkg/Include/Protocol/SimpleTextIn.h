@@ -96,8 +96,7 @@ EFI_STATUS
 (EFIAPI *EFI_INPUT_RESET)(
   IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL       *This,
   IN BOOLEAN                              ExtendedVerification
-  )
-;
+  );
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can 
@@ -117,8 +116,7 @@ EFI_STATUS
 (EFIAPI *EFI_INPUT_READ_KEY)(
   IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL       *This,
   OUT EFI_INPUT_KEY                       *Key
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

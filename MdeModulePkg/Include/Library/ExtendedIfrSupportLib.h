@@ -37,8 +37,7 @@ CreateBannerOpCode (
   IN      UINT16              LineNumber,
   IN      UINT8               Alignment,
   IN OUT  EFI_HII_UPDATE_DATA *Data
-  )
-;
+  );
 
 /**
   This function allows the caller to update a form that has
@@ -71,8 +70,7 @@ IfrLibUpdateForm (
   IN UINT16                    Label,
   IN BOOLEAN                   Insert,
   IN EFI_HII_UPDATE_DATA       *Data
-  )
-;
+  );
 
 /**
   Extract formset class for given HII handle.
@@ -100,8 +98,7 @@ IfrLibExtractClassFromHiiHandle (
   OUT     UINT16              *Class,
   OUT     EFI_STRING_ID       *FormSetTitle,
   OUT     EFI_STRING_ID       *FormSetHelp
-  )
-;
+  );
 
 /**
   Configure the buffer accrording to ConfigBody strings in the format of
@@ -124,8 +121,7 @@ IfrLibExtractDefault(
   IN UINTN                        *BufferSize,
   UINTN                           Number,
   ...
-  )
-;
+  );
 
 #endif
 

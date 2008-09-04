@@ -511,8 +511,7 @@ extern EFI_GUID          gTianoHiiIfrGuid;
 VOID
 InitializeBrowserStrings (
   VOID
-  )
-;
+  );
 
 /**
   Prints a unicode string to the default console,
@@ -526,8 +525,7 @@ InitializeBrowserStrings (
 UINTN
 PrintString (
   IN CHAR16       *String
-  )
-;
+  );
 
 /**
   Prints a chracter to the default console,
@@ -541,8 +539,7 @@ PrintString (
 UINTN
 PrintChar (
   CHAR16       Character
-  )
-;
+  );
 
 /**
   Prints a formatted unicode string to the default console, at
@@ -562,8 +559,7 @@ PrintAt (
   IN UINTN     Row,
   IN CHAR16    *Fmt,
   ...
-  )
-;
+  );
 
 /**
   Prints a unicode string to the default console, at
@@ -581,8 +577,7 @@ PrintStringAt (
   IN UINTN     Column,
   IN UINTN     Row,
   IN CHAR16    *String
-  )
-;
+  );
 
 /**
   Prints a chracter to the default console, at
@@ -600,8 +595,7 @@ PrintCharAt (
   IN UINTN     Column,
   IN UINTN     Row,
   CHAR16       Character
-  )
-;
+  );
 
 /**
   Parse opcodes in the formset IFR binary.
@@ -615,8 +609,7 @@ PrintCharAt (
 EFI_STATUS
 ParseOpCodes (
   IN FORM_BROWSER_FORMSET              *FormSet
-  )
-;
+  );
 
 /**
   Free resources allocated for a FormSet.
@@ -627,8 +620,7 @@ ParseOpCodes (
 VOID
 DestroyFormSet (
   IN OUT FORM_BROWSER_FORMSET  *FormSet
-  )
-;
+  );
 
 /**
   This function displays the page frame.
@@ -637,8 +629,7 @@ DestroyFormSet (
 VOID
 DisplayPageFrame (
   VOID
-  )
-;
+  );
 
 /**
   Create a new string in HII Package List.
@@ -654,8 +645,7 @@ EFI_STRING_ID
 NewString (
   IN  CHAR16                   *String,
   IN  EFI_HII_HANDLE           HiiHandle
-  )
-;
+  );
 
 /**
   Delete a string from HII Package List.
@@ -670,8 +660,7 @@ EFI_STATUS
 DeleteString (
   IN  EFI_STRING_ID            StringId,
   IN  EFI_HII_HANDLE           HiiHandle
-  )
-;
+  );
 
 /**
   Get the string based on the StringId and HII Package List Handle.
@@ -687,8 +676,7 @@ CHAR16 *
 GetToken (
   IN  EFI_STRING_ID                Token,
   IN  EFI_HII_HANDLE               HiiHandle
-  )
-;
+  );
 
 /**
   Draw a pop up windows based on the dimension, number of lines and
@@ -704,8 +692,7 @@ CreateSharedPopUp (
   IN  UINTN                       RequestedWidth,
   IN  UINTN                       NumberOfLines,
   IN  VA_LIST                     Marker
-  )
-;
+  );
 
 /**
   Routine used to abstract a generic dialog interface and return the selected key or string
@@ -742,8 +729,7 @@ CreateDialog (
   OUT CHAR16                      *StringBuffer,
   OUT EFI_INPUT_KEY               *KeyValue,
   ...
-  )
-;
+  );
 
 /**
   Get Question's current Value.
@@ -763,8 +749,7 @@ GetQuestionValue (
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
   IN BOOLEAN                          Cached
-  )
-;
+  );
 
 /**
   Save Question Value to edit copy(cached) or Storage(uncached).
@@ -784,8 +769,7 @@ SetQuestionValue (
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
   IN BOOLEAN                          Cached
-  )
-;
+  );
 
 /**
   Perform inconsistent check for a Form.
@@ -805,8 +789,7 @@ ValidateQuestion (
   IN  FORM_BROWSER_FORM               *Form,
   IN  FORM_BROWSER_STATEMENT          *Question,
   IN  UINTN                           Type
-  )
-;
+  );
 
 /**
   Submit a Form.
@@ -821,8 +804,7 @@ EFI_STATUS
 SubmitForm (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form
-  )
-;
+  );
 
 /**
   Reset Question to its default value.
@@ -841,8 +823,7 @@ GetQuestionDefault (
   IN FORM_BROWSER_FORM                *Form,
   IN FORM_BROWSER_STATEMENT           *Question,
   IN UINT16                           DefaultId
-  )
-;
+  );
 
 /**
   Get current setting of Questions.
@@ -855,8 +836,7 @@ GetQuestionDefault (
 EFI_STATUS
 InitializeCurrentSetting (
   IN OUT FORM_BROWSER_FORMSET             *FormSet
-  )
-;
+  );
 
 /**
   Initialize the internal data structure of a FormSet.
@@ -876,8 +856,7 @@ InitializeFormSet (
   IN  EFI_HII_HANDLE                   Handle,
   IN OUT EFI_GUID                      *FormSetGuid,
   OUT FORM_BROWSER_FORMSET             *FormSet
-  )
-;
+  );
 
 /**
   Reset Questions in a Form to their default value.
@@ -894,8 +873,7 @@ ExtractFormDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN  FORM_BROWSER_FORM               *Form,
   IN UINT16                           DefaultId
-  )
-;
+  );
 
 /**
   Initialize Question's Edit copy from Storage.
@@ -910,8 +888,7 @@ EFI_STATUS
 LoadFormConfig (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form
-  )
-;
+  );
 
 /**
   Convert setting of Buffer Storage or NameValue Storage to <ConfigResp>.
@@ -927,8 +904,7 @@ EFI_STATUS
 StorageToConfigResp (
   IN FORMSET_STORAGE         *Storage,
   IN CHAR16                  **ConfigResp
-  )
-;
+  );
 
 /**
   Convert <ConfigResp> to settings in Buffer Storage or NameValue Storage.
@@ -944,8 +920,7 @@ EFI_STATUS
 ConfigRespToStorage (
   IN FORMSET_STORAGE         *Storage,
   IN CHAR16                  *ConfigResp
-  )
-;
+  );
 
 /**
   Fill storage's edit copy with settings requested from Configuration Driver.
@@ -960,8 +935,7 @@ EFI_STATUS
 LoadStorage (
   IN FORM_BROWSER_FORMSET    *FormSet,
   IN FORMSET_STORAGE         *Storage
-  )
-;
+  );
 
 /**
   Fetch the Ifr binary data of a FormSet.
@@ -986,8 +960,7 @@ GetIfrBinaryData (
   IN OUT EFI_GUID      *FormSetGuid,
   OUT UINTN            *BinaryLength,
   OUT UINT8            **BinaryData
-  )
-;
+  );
 
 /**
   This is the routine which an external caller uses to direct the browser
@@ -1027,8 +1000,7 @@ SendForm (
   IN  UINT16                           FormId, OPTIONAL
   IN  CONST EFI_SCREEN_DESCRIPTOR      *ScreenDimensions, OPTIONAL
   OUT EFI_BROWSER_ACTION_REQUEST       *ActionRequest  OPTIONAL
-  )
-;
+  );
 
 /**
   This function is called by a callback handler to retrieve uncommitted state
@@ -1066,7 +1038,6 @@ BrowserCallback (
   IN BOOLEAN                           RetrieveData,
   IN CONST EFI_GUID                    *VariableGuid, OPTIONAL
   IN CONST CHAR16                      *VariableName  OPTIONAL
-  )
-;
+  );
 
 #endif

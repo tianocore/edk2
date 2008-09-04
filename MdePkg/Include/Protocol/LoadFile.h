@@ -74,8 +74,7 @@ EFI_STATUS
   IN BOOLEAN                          BootPolicy,
   IN OUT UINTN                        *BufferSize,
   IN VOID                             *Buffer OPTIONAL
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

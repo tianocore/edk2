@@ -34,8 +34,7 @@ PciDevicePresent (
   UINT8                               Bus,
   UINT8                               Device,
   UINT8                               Func
-  )
-;
+  );
 
 /**
   Collect all the resource information under this root bridge
@@ -49,8 +48,7 @@ EFI_STATUS
 PciPciDeviceInfoCollector (
   IN PCI_IO_DEVICE                      *Bridge,
   UINT8                                 StartBusNumber
-  )
-;
+  );
 
 /**
   Seach required device and get PCI device info block
@@ -70,8 +68,7 @@ PciSearchDevice (
   UINT8                                 Device,
   UINT8                                 Func,
   PCI_IO_DEVICE                         **PciDevice
-  )
-;
+  );
 
 /**
   Create PCI private data for PCI device
@@ -91,8 +88,7 @@ GatherDeviceInfo (
   UINT8                               Bus,
   UINT8                               Device,
   UINT8                               Func
-  )
-;
+  );
 
 /**
   Create private data for bridge device's PPB.
@@ -112,8 +108,7 @@ GatherPpbInfo (
   UINT8                               Bus,
   UINT8                               Device,
   UINT8                               Func
-  )
-;
+  );
 
 /**
   Create private data for hotplug bridge device
@@ -133,8 +128,7 @@ GatherP2CInfo (
   UINT8                               Bus,
   UINT8                               Device,
   UINT8                               Func
-  )
-;
+  );
 
 /**
   Create device path for pci deivce
@@ -148,8 +142,7 @@ EFI_DEVICE_PATH_PROTOCOL  *
 CreatePciDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL *ParentDevicePath,
   IN  PCI_IO_DEVICE            *PciIoDevice
-  )
-;
+  );
 
 /**
   Check the bar is existed or not.
@@ -169,8 +162,7 @@ BarExisted (
   IN UINTN         Offset,
   OUT UINT32       *BarLengthValue,
   OUT UINT32       *OriginalBarValue
-  )
-;
+  );
 
 /**
   Test whether the device can support attributes 
@@ -190,8 +182,7 @@ PciTestSupportedAttribute (
   IN UINT16                             *BridgeControl,
   IN UINT16                             *OldCommand,
   IN UINT16                             *OldBridgeControl
-  )
-;
+  );
 
 /**
   Set the supported or current attributes of a PCI device
@@ -208,8 +199,7 @@ PciSetDeviceAttribute (
   IN UINT16                             Command,
   IN UINT16                             BridgeControl,
   IN UINTN                              Option
-  )
-;
+  );
 
 /**
   Determine if the device can support Fast Back to Back attribute
@@ -221,8 +211,7 @@ EFI_STATUS
 GetFastBackToBackSupport (
   IN PCI_IO_DEVICE                      *PciIoDevice,
   IN UINT8                              StatusIndex
-  )
-;
+  );
 
 /**
  Determine the related attributes of all devices under a Root Bridge
@@ -233,8 +222,7 @@ GetFastBackToBackSupport (
 EFI_STATUS
 DetermineDeviceAttribute (
   IN PCI_IO_DEVICE                      *PciIoDevice
-  )
-;
+  );
 
 /**
   This routine is used to update the bar information for those incompatible PCI device
@@ -245,8 +233,7 @@ DetermineDeviceAttribute (
 EFI_STATUS
 UpdatePciInfo (
   IN PCI_IO_DEVICE  *PciIoDevice
-  )
-;
+  );
 
 /**
   This routine will update the alignment with the new alignment
@@ -259,8 +246,7 @@ VOID
 SetNewAlign (
   IN UINT64 *Alignment,
   IN UINT64 NewAlignment
-  )
-;
+  );
 
 /**
   Parse PCI bar bit.
@@ -276,8 +262,7 @@ PciParseBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
   IN UINTN          Offset,
   IN UINTN          BarIndex
-  )
-;
+  );
 
 /**
   This routine is used to initialize the bar of a PCI device
@@ -288,8 +273,7 @@ PciParseBar (
 EFI_STATUS
 InitializePciDevice (
   IN PCI_IO_DEVICE *PciIoDevice
-  )
-;
+  );
 
 /**
   Init PPB for bridge device
@@ -299,8 +283,7 @@ InitializePciDevice (
 EFI_STATUS
 InitializePpb (
   IN PCI_IO_DEVICE *PciIoDevice
-  )
-;
+  );
 
 /**
   Init private data for Hotplug bridge device
@@ -310,8 +293,7 @@ InitializePpb (
 EFI_STATUS
 InitializeP2C (
   IN PCI_IO_DEVICE *PciIoDevice
-  )
-;
+  );
 
 /**
   Create and initiliaze general PCI I/O device instance for
@@ -332,8 +314,7 @@ CreatePciIoDevice (
   UINT8                               Bus,
   UINT8                               Device,
   UINT8                               Func
-  )
-;
+  );
 
 /**
   This routine is used to enumerate entire pci bus system
@@ -347,8 +328,7 @@ CreatePciIoDevice (
 EFI_STATUS
 PciEnumeratorLight (
   IN EFI_HANDLE                    Controller
-  )
-;
+  );
 
 /**
   Get bus range.
@@ -367,14 +347,12 @@ PciGetBusRange (
   OUT    UINT16                             *MinBus,
   OUT    UINT16                             *MaxBus,
   OUT    UINT16                             *BusRange
-  )
-;
+  );
 
 EFI_STATUS
 StartManagingRootBridge (
   IN PCI_IO_DEVICE *RootBridgeDev
-  )
-;
+  );
 
 /**
   This routine can be used to check whether a PCI device should be rejected when light enumeration
@@ -388,7 +366,6 @@ StartManagingRootBridge (
 BOOLEAN
 IsPciDeviceRejected (
   IN PCI_IO_DEVICE *PciIoDevice
-  )
-;
+  );
 
 #endif

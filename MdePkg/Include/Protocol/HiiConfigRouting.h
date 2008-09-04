@@ -389,8 +389,7 @@ EFI_STATUS
   IN  CONST EFI_DEVICE_PATH_PROTOCOL           *DevicePath,  
   IN  CONST UINT16                             *AltCfgId,
   OUT EFI_STRING                               *AltCfgResp 
-  )
-;
+  );
 
 /**
   @par Protocol Description:   

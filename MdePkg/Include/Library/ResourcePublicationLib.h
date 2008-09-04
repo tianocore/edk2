@@ -36,7 +36,6 @@ EFIAPI
 PublishSystemMemory (
   IN PHYSICAL_ADDRESS       MemoryBegin,
   IN UINT64                 MemoryLength
-  )
-;
+  );
 
 #endif

@@ -431,8 +431,7 @@ EFI_STATUS
 IpFilter (
   PXE_BASECODE_DEVICE            *Private,
   IN EFI_PXE_BASE_CODE_IP_FILTER *Filter
-  )
-;
+  );
 
 //
 // //////////////////////////////////////////////////////////////////////
@@ -452,8 +451,7 @@ UdpWrite (
   IN VOID                                     *HeaderPtr, OPTIONAL
   IN UINTN                                    *BufferSizePtr,
   IN VOID                                     *BufferPtr
-  )
-;
+  );
 
 //
 // /////////////////////////////////////////////////////////////////////
@@ -473,22 +471,19 @@ UdpRead (
   IN OUT UINTN                      *BufferSizePtr,
   IN VOID                           *BufferPtr,
   IN EFI_EVENT                      TimeoutEvent
-  )
-;
+  );
 
 VOID
 IgmpLeaveGroup (
   PXE_BASECODE_DEVICE *Private,
   EFI_IP_ADDRESS      *
-  )
-;
+  );
 
 VOID
 IgmpJoinGroup (
   PXE_BASECODE_DEVICE *Private,
   EFI_IP_ADDRESS      *
-  )
-;
+  );
 
 //
 // convert number to zero filled ascii value of length lth
@@ -498,8 +493,7 @@ CvtNum (
   UINTN Number,
   UINT8 *BufferPtr,
   INTN  BufferLen
-  )
-;
+  );
 
 //
 // convert number to ascii string at ptr
@@ -508,8 +502,7 @@ VOID
 UtoA10 (
   UINTN Number,
   UINT8 *BufferPtr
-  )
-;
+  );
 
 //
 // convert ascii numeric string to UINTN
@@ -517,14 +510,12 @@ UtoA10 (
 UINTN
 AtoU (
   UINT8 *BufferPtr
-  )
-;
+  );
 
 UINT64
 AtoU64 (
   UINT8 *BufferPtr
-  )
-;
+  );
 
 //
 // calculate the internet checksum (RFC 1071)
@@ -534,8 +525,7 @@ UINT16
 IpChecksum (
   UINT16 *MessagePtr,
   UINTN  ByteLength
-  )
-;
+  );
 
 //
 // do checksum on non contiguous header and data
@@ -546,8 +536,7 @@ IpChecksum2 (
   UINTN  HeaderLength,
   UINT16 *Message,
   UINTN  MessageLength
-  )
-;
+  );
 
 //
 // update checksum when only a single word changes
@@ -557,21 +546,18 @@ UpdateChecksum (
   UINT16 OldChecksum,
   UINT16 OldWord,
   UINT16 NewWord
-  )
-;
+  );
 
 VOID
 SeedRandom (
   IN PXE_BASECODE_DEVICE  *Private,
   IN UINT16               InitialSeed
-  )
-;
+  );
 
 UINT16
 Random (
   IN PXE_BASECODE_DEVICE  *Private
-  )
-;
+  );
 
 EFI_STATUS
 SendPacket (
@@ -582,30 +568,26 @@ SendPacket (
   VOID                          *HardwareAddress,
   UINT16                        MediaProtocol,
   IN EFI_PXE_BASE_CODE_FUNCTION Function
-  )
-;
+  );
 
 VOID
 HandleArpReceive (
   PXE_BASECODE_DEVICE *Private,
   ARP_PACKET          *ArpPacketPtr,
   VOID                *HeaderPtr
-  )
-;
+  );
 
 VOID
 HandleIgmp (
   PXE_BASECODE_DEVICE *Private,
   IGMPV2_MESSAGE      *IgmpMessageptr,
   UINTN               IgmpMessageLen
-  )
-;
+  );
 
 VOID
 IgmpCheckTimers (
   PXE_BASECODE_DEVICE *Private
-  )
-;  // poll when doing a receive
+  );  // poll when doing a receive
 // return hw add of IP and TRUE if available, otherwise FALSE
 //
 BOOLEAN
@@ -613,16 +595,14 @@ GetHwAddr (
   IN PXE_BASECODE_DEVICE  *Private,
   EFI_IP_ADDRESS          *ProtocolAddressPtr,
   EFI_MAC_ADDRESS         *HardwareAddressPtr
-  )
-;
+  );
 
 EFI_STATUS
 DoArp (
   IN PXE_BASECODE_DEVICE  *Private,
   IN EFI_IP_ADDRESS       *ProtocolAddressPtr,
   OUT EFI_MAC_ADDRESS     *HardwareAddressptr
-  )
-;
+  );
 
 BOOLEAN
 OnSameSubnet (
@@ -630,15 +610,13 @@ OnSameSubnet (
   EFI_IP_ADDRESS  *Ip1,
   EFI_IP_ADDRESS  *Ip2,
   EFI_IP_ADDRESS  *SubnetMask
-  )
-;
+  );
 
 VOID
 IpAddRouter (
   PXE_BASECODE_DEVICE *Private,
   EFI_IP_ADDRESS      *RouterIp
-  )
-;
+  );
 
 #define Ip4AddRouter(Private, Ipv4Ptr)  IpAddRouter (Private, (EFI_IP_ADDRESS *) Ipv4Ptr)
 
@@ -656,8 +634,7 @@ Ipv4Xmt (
   VOID                        *Data,
   UINTN                       DataLen,
   EFI_PXE_BASE_CODE_FUNCTION  Function
-  )
-;
+  );
 
 //
 // send ipv4 packet with ipv4 option
@@ -673,8 +650,7 @@ Ipv4SendWOp (
   UINTN                       OptionLen,
   UINT32                      DestIp,
   EFI_PXE_BASE_CODE_FUNCTION  Function
-  )
-;
+  );
 
 //
 // send MsgLth message at MsgPtr - higher level protocol header already in xmtbuf, length HdrSize
@@ -690,8 +666,7 @@ Ip4Send (
   IN UINTN                HeaderSize,   // protocol header byte length
   IN UINT8                *MsgPtr,      // pointer to data
   IN UINTN                MsgLength
-  )
-;                                    // data byte length
+  );                                    // data byte length
 // receive up to MsgLth message into MsgPtr for protocol Prot
 // return message length, src/dest ips if select any, and pointer to protocol header
 //
@@ -707,15 +682,13 @@ IpReceive (
   UINT8                     *MsgPtr,    // pointer to data buffer
   UINTN                     *MsgLenPtr, // pointer to data buffer length/ O - returned data length
   IN EFI_EVENT              TimeoutEvent
-  )
-;
+  );
 
 #if 0
 VOID
 WaitForTxComplete (
   IN PXE_BASECODE_DEVICE    *Private
-  )
-;
+  );
 #endif
 //
 // routine to cycle waiting for a receive or timeout
@@ -728,8 +701,7 @@ WaitForReceive (
   IN OUT UINTN                  *HeaderSizePtr,
   IN OUT UINTN                  *BufferSizePtr,
   IN OUT UINT16                 *ProtocolPtr
-  )
-;
+  );
 
 #endif /* _IP_H_ */
 

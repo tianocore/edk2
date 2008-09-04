@@ -60,8 +60,7 @@ EFI_STATUS
   IN UINTN                             Offset,
   IN UINTN                             *NumBytes,
   IN VOID                              *Buffer
-  )
-;
+  );
 
 //
 // Protocol declaration

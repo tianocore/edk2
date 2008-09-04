@@ -49,8 +49,7 @@ EFI_STATUS
   OUT EFI_CONSOLE_CONTROL_SCREEN_MODE   *Mode,
   OUT BOOLEAN                           *GopUgaExists,  OPTIONAL  
   OUT BOOLEAN                           *StdInLocked    OPTIONAL
-  )
-;
+  );
 
 /**
   Set the current video mode to either text or graphics. 
@@ -68,8 +67,7 @@ EFI_STATUS
 (EFIAPI *EFI_CONSOLE_CONTROL_PROTOCOL_SET_MODE)(
   IN  EFI_CONSOLE_CONTROL_PROTOCOL      *This,
   OUT EFI_CONSOLE_CONTROL_SCREEN_MODE   Mode
-  )
-;
+  );
 
 /**
   Copy the Password and enable state variable and then arm the periodic timer
@@ -84,8 +82,7 @@ EFI_STATUS
 (EFIAPI *EFI_CONSOLE_CONTROL_PROTOCOL_LOCK_STD_IN)(
   IN  EFI_CONSOLE_CONTROL_PROTOCOL      *This,
   IN CHAR16                             *Password
-  )
-;
+  );
 
 struct _EFI_CONSOLE_CONTROL_PROTOCOL {
   EFI_CONSOLE_CONTROL_PROTOCOL_GET_MODE           GetMode;

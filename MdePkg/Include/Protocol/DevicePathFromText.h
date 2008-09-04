@@ -41,8 +41,7 @@ typedef
 EFI_DEVICE_PATH_PROTOCOL*
 (EFIAPI *EFI_DEVICE_PATH_FROM_TEXT_NODE)(
   IN CONST CHAR16                 *TextDeviceNode
-  )
-;    
+  );    
   
 
 /**
@@ -60,8 +59,7 @@ typedef
 EFI_DEVICE_PATH_PROTOCOL*
 (EFIAPI *EFI_DEVICE_PATH_FROM_TEXT_PATH)(
   IN CONST CHAR16                 *TextDevicePath
-  )
-;  
+  );  
 
 /**
   @par Protocol Description:

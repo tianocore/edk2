@@ -419,8 +419,7 @@ ConvertRtcTimeToEfiTime (
   IN OUT EFI_TIME        *Time,
   IN     UINT8           Century,
   IN     RTC_REGISTER_B  RegisterB
-  )
-;
+  );
 
 EFI_STATUS
 RtcWaitToUpdate (

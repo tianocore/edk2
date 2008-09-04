@@ -236,8 +236,7 @@ PeiCore (
   IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData,
   IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpList,
   IN VOID                              *Data
-  )
-;
+  );
 
 //
 // Dispatcher support functions
@@ -267,8 +266,7 @@ BOOLEAN
 PeimDispatchReadiness (
   IN EFI_PEI_SERVICES   **PeiServices,
   IN VOID               *DependencyExpression
-  )
-;
+  );
 
 /**
   Conduct PEIM dispatch.
@@ -284,8 +282,7 @@ VOID
 PeiDispatcher (
   IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *PrivateData
-  )
-;
+  );
 
 /**
   Initialize the Dispatcher's data members
@@ -303,8 +300,7 @@ InitializeDispatcherData (
   IN PEI_CORE_INSTANCE            *PrivateData,
   IN PEI_CORE_INSTANCE            *OldCoreData,
   IN CONST EFI_SEC_PEI_HAND_OFF   *SecCoreData
-  )
-;
+  );
 
 /**
   This routine parses the Dependency Expression, if available, and
@@ -324,8 +320,7 @@ DepexSatisfied (
   IN PEI_CORE_INSTANCE          *Private,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
   IN UINTN                      PeimCount
-  )
-;
+  );
 
 //
 // PPI support functions
@@ -343,8 +338,7 @@ VOID
 InitializePpiServices (
   IN PEI_CORE_INSTANCE   *PrivateData,
   IN PEI_CORE_INSTANCE   *OldCoreData
-  )
-;
+  );
 
 /**
 
@@ -365,8 +359,7 @@ ConvertPpiPointers (
   IN UINTN                   OldCheckingBottom,
   IN UINTN                   OldCheckingTop,
   IN INTN                    Fixup
-  )
-;
+  );
 
 /**
 
@@ -386,8 +379,7 @@ EFIAPI
 PeiInstallPpi (
   IN CONST EFI_PEI_SERVICES        **PeiServices,
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
-  )
-;
+  );
 
 /**
 
@@ -409,8 +401,7 @@ PeiReInstallPpi (
   IN CONST EFI_PEI_SERVICES        **PeiServices,
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *OldPpi,
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *NewPpi
-  )
-;
+  );
 
 /**
 
@@ -436,8 +427,7 @@ PeiLocatePpi (
   IN UINTN                       Instance,
   IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
   IN OUT VOID                    **Ppi
-  )
-;
+  );
 
 /**
 
@@ -457,8 +447,7 @@ EFIAPI
 PeiNotifyPpi (
   IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
-  )
-;
+  );
 
 /**
 
@@ -470,8 +459,7 @@ PeiNotifyPpi (
 VOID
 ProcessNotifyList (
   IN PEI_CORE_INSTANCE  *PrivateData
-  )
-;
+  );
 
 /**
 
@@ -493,8 +481,7 @@ DispatchNotify (
   IN INTN                InstallStopIndex,
   IN INTN                NotifyStartIndex,
   IN INTN                NotifyStopIndex
-  )
-;
+  );
 
 //
 // Boot mode support functions
@@ -514,8 +501,7 @@ EFIAPI
 PeiGetBootMode (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN OUT EFI_BOOT_MODE *BootMode
-  )
-;
+  );
 
 /**
   This service enables PEIMs to update the boot mode variable.
@@ -532,8 +518,7 @@ EFIAPI
 PeiSetBootMode (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN EFI_BOOT_MODE     BootMode
-  )
-;
+  );
 
 //
 // Security support functions
@@ -551,8 +536,7 @@ VOID
 InitializeSecurityServices (
   IN EFI_PEI_SERVICES  **PeiServices,
   IN PEI_CORE_INSTANCE *OldCoreData
-  )
-;
+  );
 
 /**
   Verify a Firmware volume
@@ -566,8 +550,7 @@ InitializeSecurityServices (
 EFI_STATUS
 VerifyFv (
   IN EFI_FIRMWARE_VOLUME_HEADER  *CurrentFvAddress
-  )
-;
+  );
 
 /**
 
@@ -587,8 +570,7 @@ VerifyPeim (
   IN PEI_CORE_INSTANCE      *PrivateData,
   IN EFI_PEI_FV_HANDLE      VolumeHandle,
   IN EFI_PEI_FILE_HANDLE    FileHandle
-  )
-;
+  );
 
 /**
 
@@ -608,8 +590,7 @@ EFIAPI
 PeiGetHobList (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN OUT VOID          **HobList
-  )
-;
+  );
 
 /**
   Add a new HOB to the HOB List.
@@ -632,8 +613,7 @@ PeiCreateHob (
   IN UINT16            Type,
   IN UINT16            Length,
   IN OUT VOID          **Hob
-  )
-;
+  );
 
 /**
 
@@ -651,8 +631,7 @@ PeiCoreBuildHobHandoffInfoTable (
   IN EFI_BOOT_MODE         BootMode,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64                MemoryLength
-  )
-;
+  );
 
 
 //
@@ -681,8 +660,7 @@ PeiFfsFindNextFile (
   IN UINT8                       SearchType,
   IN EFI_PEI_FV_HANDLE           FwVolHeader,
   IN OUT EFI_PEI_FILE_HANDLE     *FileHeader
-  )
-;
+  );
 
 /**
   Given the input file pointer, search for the next matching section in the
@@ -705,8 +683,7 @@ PeiFfsFindSectionData (
   IN EFI_SECTION_TYPE            SectionType,
   IN EFI_PEI_FILE_HANDLE         FfsFileHeader,
   IN OUT VOID                    **SectionData
-  )
-;
+  );
 
 /**
   search the firmware volumes by index
@@ -725,8 +702,7 @@ PeiFvFindNextVolume (
   IN CONST EFI_PEI_SERVICES          **PeiServices,
   IN UINTN                           Instance,
   IN OUT EFI_PEI_FV_HANDLE           *FwVolHeader
-  )
-;
+  );
 
 //
 // Memory support functions
@@ -748,8 +724,7 @@ InitializeMemoryServices (
   IN PEI_CORE_INSTANCE           *PrivateData,
   IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
   IN PEI_CORE_INSTANCE           *OldCoreData
-  )
-;
+  );
 
 /**
 
@@ -769,8 +744,7 @@ PeiInstallPeiMemory (
   IN CONST EFI_PEI_SERVICES      **PeiServices,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64                MemoryLength
-  )
-;
+  );
 
 /**
 
@@ -797,8 +771,7 @@ PeiAllocatePages (
   IN EFI_MEMORY_TYPE            MemoryType,
   IN UINTN                      Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Memory
-  )
-;
+  );
 
 /**
 
@@ -820,8 +793,7 @@ PeiAllocatePool (
   IN CONST EFI_PEI_SERVICES           **PeiServices,
   IN UINTN                      Size,
   OUT VOID                      **Buffer
-  )
-;
+  );
 
 /**
 
@@ -844,8 +816,7 @@ PeiLoadImage (
   IN  EFI_PEI_FILE_HANDLE         FileHandle,
   OUT    EFI_PHYSICAL_ADDRESS     *EntryPoint,
   OUT    UINT32                   *AuthenticationState
-  )
-;
+  );
 
 /**
 
@@ -872,8 +843,7 @@ PeiReportStatusCode (
   IN UINT32                   Instance,
   IN CONST EFI_GUID                 *CallerId,
   IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
-  )
-;
+  );
 
 /**
 
@@ -891,8 +861,7 @@ EFI_STATUS
 EFIAPI
 PeiResetSystem (
   IN CONST EFI_PEI_SERVICES   **PeiServices
-  )
-;
+  );
 
 /**
 
@@ -907,8 +876,7 @@ VOID
 PeiInitializeFv (
   IN  PEI_CORE_INSTANCE           *PrivateData,
   IN CONST EFI_SEC_PEI_HAND_OFF   *SecCoreData
-  )
-;
+  );
 
 /**
   Process Firmware Volum Information once FvInfoPPI install.
@@ -926,8 +894,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
   IN EFI_PEI_SERVICES              **PeiServices,
   IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
   IN VOID                          *Ppi
-  )
-;
+  );
 
 /**
 
@@ -948,8 +915,7 @@ PeiFfsFindFileByName (
   IN  CONST EFI_GUID        *FileName,
   IN  EFI_PEI_FV_HANDLE     VolumeHandle,
   OUT EFI_PEI_FILE_HANDLE   *FileHandle
-  )
-;
+  );
 
 /**
 
@@ -968,8 +934,7 @@ EFIAPI
 PeiFfsGetFileInfo (
   IN EFI_PEI_FILE_HANDLE  FileHandle,
   OUT EFI_FV_FILE_INFO    *FileInfo
-  )
-;
+  );
 
 /**
 
@@ -986,8 +951,7 @@ EFIAPI
 PeiFfsGetVolumeInfo (
   IN EFI_PEI_FV_HANDLE  VolumeHandle,
   OUT EFI_FV_INFO       *VolumeInfo
-  )
-;
+  );
 
 /**
   This routine enable a PEIM to register itself to shadow when PEI Foundation
@@ -1004,8 +968,7 @@ EFI_STATUS
 EFIAPI
 PeiRegisterForShadow (
   IN EFI_PEI_FILE_HANDLE       FileHandle
-  )
-;
+  );
 
 /**
   Given the input file pointer, search for the next matching file in the
@@ -1031,8 +994,7 @@ PeiFindFileEx (
   IN        EFI_FV_FILETYPE          SearchType,
   IN OUT    EFI_PEI_FILE_HANDLE      *FileHandle,
   IN OUT    EFI_PEI_FV_HANDLE        *AprioriFile  OPTIONAL
-  )
-;
+  );
 
 /**
   Initialize image service that install PeiLoadFilePpi.
@@ -1048,8 +1010,7 @@ VOID
 InitializeImageServices (
   IN  PEI_CORE_INSTANCE   *PrivateData,
   IN  PEI_CORE_INSTANCE   *OldCoreData
-  )
-;
+  );
 
 /**
   Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.

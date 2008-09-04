@@ -89,8 +89,7 @@ EFI_STATUS
   IN EFI_SECURITY_ARCH_PROTOCOL     *This,
   IN  UINT32                        AuthenticationStatus,
   IN  EFI_DEVICE_PATH_PROTOCOL      *File
-  )
-;
+  );
 
 //
 // Interface stucture for the Timer Architectural Protocol

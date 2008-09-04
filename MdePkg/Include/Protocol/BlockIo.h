@@ -51,8 +51,7 @@ EFI_STATUS
 (EFIAPI *EFI_BLOCK_RESET)(
   IN EFI_BLOCK_IO_PROTOCOL          *This,
   IN BOOLEAN                        ExtendedVerification
-  )
-;
+  );
 
 /**
   Read BufferSize bytes from Lba into Buffer.
@@ -80,8 +79,7 @@ EFI_STATUS
   IN EFI_LBA                        Lba,
   IN UINTN                          BufferSize,
   OUT VOID                          *Buffer
-  )
-;
+  );
 
 /**
   Write BufferSize bytes from Lba into Buffer.
@@ -110,8 +108,7 @@ EFI_STATUS
   IN EFI_LBA                        Lba,
   IN UINTN                          BufferSize,
   IN VOID                           *Buffer
-  )
-;
+  );
 
 /**
   Flush the Block Device.
@@ -127,8 +124,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_BLOCK_FLUSH)(
   IN EFI_BLOCK_IO_PROTOCOL  *This
-  )
-;
+  );
 
 /**
   Block IO read only mode data and updated only via members of BlockIO

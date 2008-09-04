@@ -135,8 +135,7 @@ EFIAPI
 IDEBusControllerDriverEntryPoint (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -154,8 +153,7 @@ IDEBusDriverBindingSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -173,8 +171,7 @@ IDEBusDriverBindingStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -194,8 +191,7 @@ IDEBusDriverBindingStop (
   IN  EFI_HANDLE                  Controller,
   IN  UINTN                       NumberOfChildren,
   IN  EFI_HANDLE                  *ChildHandleBuffer
-  )
-;
+  );
 
 //
 // EFI Driver Configuration Functions
@@ -257,8 +253,7 @@ EFIAPI
 IDEBlkIoReset (
   IN  EFI_BLOCK_IO_PROTOCOL       *This,
   IN  BOOLEAN                     ExtendedVerification
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -280,8 +275,7 @@ IDEBlkIoReadBlocks (
   IN  EFI_LBA                     LBA,
   IN  UINTN                       BufferSize,
   OUT VOID                        *Buffer
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -303,8 +297,7 @@ IDEBlkIoWriteBlocks (
   IN  EFI_LBA                     LBA,
   IN  UINTN                       BufferSize,
   IN  VOID                        *Buffer
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -318,8 +311,7 @@ EFI_STATUS
 EFIAPI
 IDEBlkIoFlushBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL       *This
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -334,8 +326,7 @@ EFI_STATUS
 IDERegisterDecodeEnableorDisable (
   IN  EFI_PCI_IO_PROTOCOL         *PciIo,
   IN  BOOLEAN                     Enable
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -353,8 +344,7 @@ IDEDiskInfoInquiry (
   IN EFI_DISK_INFO_PROTOCOL       *This,
   IN OUT VOID                     *InquiryData,
   IN OUT UINT32                   *IntquiryDataSize
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -372,8 +362,7 @@ IDEDiskInfoIdentify (
   IN EFI_DISK_INFO_PROTOCOL       *This,
   IN OUT VOID                     *IdentifyData,
   IN OUT UINT32                   *IdentifyDataSize
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -393,8 +382,7 @@ IDEDiskInfoSenseData (
   IN OUT VOID                     *SenseData,
   IN OUT UINT32                   *SenseDataSize,
   OUT UINT8                       *SenseDataNumber
-  )
-;
+  );
 
 /**
   TODO: Add function description
@@ -412,7 +400,6 @@ IDEDiskInfoWhichIde (
   IN EFI_DISK_INFO_PROTOCOL       *This,
   OUT UINT32                      *IdeChannel,
   OUT UINT32                      *IdeDevice
-  )
-;
+  );
 
 #endif

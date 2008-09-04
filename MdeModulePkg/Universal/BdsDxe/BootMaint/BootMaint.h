@@ -467,8 +467,7 @@ typedef struct _STRING_DEPOSITORY {
 EFI_STATUS
 BOpt_FindFileSystem (
   IN BMM_CALLBACK_DATA          *CallbackData
-  )
-;
+  );
 
 /**
   Find files under current directory
@@ -486,8 +485,7 @@ EFI_STATUS
 BOpt_FindFiles (
   IN BMM_CALLBACK_DATA          *CallbackData,
   IN BM_MENU_ENTRY              *MenuEntry
-  )
-;
+  );
 
 /**
 
@@ -503,8 +501,7 @@ BOpt_FindFiles (
 EFI_STATUS
 BOpt_FindDrivers (
   VOID
-  )
-;
+  );
 
 /**
 
@@ -776,8 +773,7 @@ FreeAllConsoles (
 VOID
 ChangeVariableDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-;
+  );
 
 /**
   Update the multi-instance device path of Terminal Device based on

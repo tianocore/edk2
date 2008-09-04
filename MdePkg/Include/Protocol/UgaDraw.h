@@ -49,8 +49,7 @@ EFI_STATUS
   OUT UINT32                *VerticalResolution,
   OUT UINT32                *ColorDepth,
   OUT UINT32                *RefreshRate
-  )
-;
+  );
 
 /**
   Set the current video mode information.
@@ -73,8 +72,7 @@ EFI_STATUS
   IN  UINT32                VerticalResolution,
   IN  UINT32                ColorDepth,
   IN  UINT32                RefreshRate
-  )
-;
+  );
 
 typedef struct {
   UINT8 Blue;

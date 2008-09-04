@@ -23,8 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 GetOpRomInfo (
   IN PCI_IO_DEVICE    *PciIoDevice
-  )
-;
+  );
 
 /**
   Load option rom image for specified PCI device
@@ -39,8 +38,7 @@ EFI_STATUS
 LoadOpRomImage (
   IN PCI_IO_DEVICE   *PciDevice,
   IN UINT64          RomBase
-  )
-;
+  );
 
 /**
   enable/disable oprom decode
@@ -59,8 +57,7 @@ RomDecode (
   IN UINT8           RomBarIndex,
   IN UINT32          RomBar,
   IN BOOLEAN         Enable
-  )
-;
+  );
 
 /**
   Process the oprom image.
@@ -70,7 +67,6 @@ RomDecode (
 EFI_STATUS
 ProcessOpRomImage (
   PCI_IO_DEVICE   *PciDevice
-  )
-;
+  );
 
 #endif

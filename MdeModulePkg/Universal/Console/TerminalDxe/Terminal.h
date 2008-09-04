@@ -181,8 +181,7 @@ EFIAPI
 InitializeTerminal (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.Reset().
@@ -201,8 +200,7 @@ EFIAPI
 TerminalConInReset (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL    *This,
   IN  BOOLEAN                           ExtendedVerification
-  )
-;
+  );
 
 
 /**
@@ -223,8 +221,7 @@ EFIAPI
 TerminalConInReadKeyStroke (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   OUT EFI_INPUT_KEY                   *Key
-  )
-;
+  );
 
 /**
   Check if the key already has been registered.
@@ -244,8 +241,7 @@ BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
-  )
-;
+  );
 
 /**
   Event notification function for EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx event
@@ -262,8 +258,7 @@ EFIAPI
 TerminalConInWaitForKeyEx (
   IN  EFI_EVENT       Event,
   IN  VOID            *Context
-  )
-;
+  );
 
 //
 // Simple Text Input Ex protocol prototypes
@@ -285,8 +280,7 @@ EFIAPI
 TerminalConInResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
-  )
-;
+  );
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -309,8 +303,7 @@ EFIAPI
 TerminalConInReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   OUT EFI_KEY_DATA                      *KeyData
-  )
-;
+  );
 
 /**
   Set certain state for the input device.
@@ -332,8 +325,7 @@ EFIAPI
 TerminalConInSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
-  )
-;
+  );
 
 /**
   Register a notification function for a particular keystroke for the input device.
@@ -361,8 +353,7 @@ TerminalConInRegisterKeyNotify (
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT EFI_HANDLE                        *NotifyHandle
-  )
-;
+  );
 
 /**
   Remove a registered notification function from a particular keystroke.
@@ -382,8 +373,7 @@ EFIAPI
 TerminalConInUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
-  )
-;
+  );
 
 /**
   Event notification function for EFI_SIMPLE_TEXT_INPUT_PROTOCOL.WaitForKey event
@@ -400,8 +390,7 @@ EFIAPI
 TerminalConInWaitForKey (
   IN  EFI_EVENT     Event,
   IN  VOID          *Context
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.Reset().
@@ -423,8 +412,7 @@ EFIAPI
 TerminalConOutReset (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
   IN  BOOLEAN                            ExtendedVerification
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.OutputString().
@@ -447,8 +435,7 @@ EFIAPI
 TerminalConOutOutputString (
   IN   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  CHAR16                            *WString
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.TestString().
@@ -469,8 +456,7 @@ EFIAPI
 TerminalConOutTestString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  CHAR16                           *WString
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.QueryMode().
@@ -496,8 +482,7 @@ TerminalConOutQueryMode (
   IN  UINTN                            ModeNumber,
   OUT UINTN                            *Columns,
   OUT UINTN                            *Rows
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_OUT.SetMode().
@@ -518,8 +503,7 @@ EFIAPI
 TerminalConOutSetMode (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  UINTN                            ModeNumber
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetAttribute().
@@ -538,8 +522,7 @@ EFIAPI
 TerminalConOutSetAttribute (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  UINTN                            Attribute
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.ClearScreen().
@@ -557,8 +540,7 @@ EFI_STATUS
 EFIAPI
 TerminalConOutClearScreen (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
-  )
-;
+  );
 
 /**
   Implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetCursorPosition().
@@ -579,8 +561,7 @@ TerminalConOutSetCursorPosition (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  UINTN                            Column,
   IN  UINTN                            Row
-  )
-;
+  );
 
 /**
   Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
@@ -599,8 +580,7 @@ EFIAPI
 TerminalConOutEnableCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  BOOLEAN                          Visible
-  )
-;
+  );
 
 /**
   Test to see if this driver supports Controller. 
@@ -816,8 +796,7 @@ TerminalComponentNameGetControllerName (
 EFI_STATUS
 TerminalConInCheckForKey (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This
-  )
-;
+  );
 
 /**
   Update terminal device path in Console Device Environment Variables.
@@ -832,8 +811,7 @@ VOID
 TerminalUpdateConsoleDevVariable (
   IN CHAR16                    *VariableName,
   IN EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath
-  )
-;
+  );
 
 /**
   Remove console device variable.
@@ -848,8 +826,7 @@ VOID
 TerminalRemoveConsoleDevVariable (
   IN CHAR16                    *VariableName,
   IN EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath
-  )
-;
+  );
 
 /**
   Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
@@ -869,8 +846,7 @@ TerminalGetVariableAndSize (
   IN  CHAR16              *Name,
   IN  EFI_GUID            *VendorGuid,
   OUT UINTN               *VariableSize
-  )
-;
+  );
 
 /**
   Build termial device path according to terminal type.
@@ -889,8 +865,7 @@ SetTerminalDevicePath (
   IN  UINT8                       TerminalType,
   IN  EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath,
   OUT EFI_DEVICE_PATH_PROTOCOL    **TerminalDevicePath
-  )
-;
+  );
 
 /**
   Initialize the Raw Data FIFO.
@@ -903,8 +878,7 @@ SetTerminalDevicePath (
 VOID
 InitializeRawFiFo (
   IN  TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Initialize the Unicode FIFO.
@@ -917,8 +891,7 @@ InitializeRawFiFo (
 VOID
 InitializeUnicodeFiFo (
   IN  TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Initialize the EFI Key FIFO.
@@ -931,8 +904,7 @@ InitializeUnicodeFiFo (
 VOID
 InitializeEfiKeyFiFo (
   IN  TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Get one key out of serial buffer.
@@ -950,8 +922,7 @@ EFI_STATUS
 GetOneKeyFromSerial (
   EFI_SERIAL_IO_PROTOCOL  *SerialIo,
   UINT8                   *Input
-  )
-;
+  );
 
 /**
   Insert one byte raw data into the Raw Data FIFO.
@@ -968,8 +939,7 @@ BOOLEAN
 RawFiFoInsertOneKey (
   TERMINAL_DEV  *TerminalDevice,
   UINT8         Input
-  )
-;
+  );
 
 /**
   Remove one pre-fetched key out of the Raw Data FIFO.
@@ -985,8 +955,7 @@ BOOLEAN
 RawFiFoRemoveOneKey (
   TERMINAL_DEV  *TerminalDevice,
   UINT8         *Output
-  )
-;
+  );
 
 /**
   Clarify whether Raw Data FIFO buffer is empty.
@@ -1000,8 +969,7 @@ RawFiFoRemoveOneKey (
 BOOLEAN
 IsRawFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Clarify whether Raw Data FIFO buffer is full.
@@ -1015,8 +983,7 @@ IsRawFiFoEmpty (
 BOOLEAN
 IsRawFiFoFull (
   TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Insert one pre-fetched key into the FIFO buffer.
@@ -1033,8 +1000,7 @@ BOOLEAN
 EfiKeyFiFoInsertOneKey (
   TERMINAL_DEV      *TerminalDevice,
   EFI_INPUT_KEY     Key
-  )
-;
+  );
 
 /**
   Remove one pre-fetched key out of the FIFO buffer.
@@ -1050,8 +1016,7 @@ BOOLEAN
 EfiKeyFiFoRemoveOneKey (
   TERMINAL_DEV  *TerminalDevice,
   EFI_INPUT_KEY *Output
-  )
-;
+  );
 
 /**
   Clarify whether FIFO buffer is empty.
@@ -1065,8 +1030,7 @@ EfiKeyFiFoRemoveOneKey (
 BOOLEAN
 IsEfiKeyFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Clarify whether FIFO buffer is full.
@@ -1080,8 +1044,7 @@ IsEfiKeyFiFoEmpty (
 BOOLEAN
 IsEfiKeyFiFoFull (
   TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Insert one pre-fetched key into the Unicode FIFO buffer.
@@ -1098,8 +1061,7 @@ BOOLEAN
 UnicodeFiFoInsertOneKey (
   TERMINAL_DEV      *TerminalDevice,
   UINT16            Input
-  )
-;
+  );
 
 /**
   Remove one pre-fetched key out of the Unicode FIFO buffer.
@@ -1115,8 +1077,7 @@ BOOLEAN
 UnicodeFiFoRemoveOneKey (
   TERMINAL_DEV  *TerminalDevice,
   UINT16        *Output
-  )
-;
+  );
 
 /**
   Clarify whether Unicode FIFO buffer is empty.
@@ -1130,8 +1091,7 @@ UnicodeFiFoRemoveOneKey (
 BOOLEAN
 IsUnicodeFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Clarify whether Unicode FIFO buffer is full.
@@ -1145,8 +1105,7 @@ IsUnicodeFiFoEmpty (
 BOOLEAN
 IsUnicodeFiFoFull (
   TERMINAL_DEV  *TerminalDevice
-  )
-;
+  );
 
 /**
   Count Unicode FIFO buffer.
@@ -1159,8 +1118,7 @@ IsUnicodeFiFoFull (
 UINT8
 UnicodeFiFoGetKeyCount (
   TERMINAL_DEV    *TerminalDevice
-  )
-;
+  );
 
 /**
   Translate raw data into Unicode (according to different encode), and 
@@ -1174,8 +1132,7 @@ UnicodeFiFoGetKeyCount (
 VOID
 TranslateRawDataToEfiKey (
   IN  TERMINAL_DEV      *TerminalDevice
-  )
-;
+  );
 
 //
 // internal functions for PC ANSI
@@ -1193,8 +1150,7 @@ TranslateRawDataToEfiKey (
 VOID
 AnsiRawDataToUnicode (
   IN  TERMINAL_DEV    *TerminalDevice
-  )
-;
+  );
 
 /**
   Converts a stream of Unicode characters from a terminal input device into EFI Keys that
@@ -1264,8 +1220,7 @@ AnsiRawDataToUnicode (
 VOID
 UnicodeToEfiKey (
   IN  TERMINAL_DEV    *TerminalDevice
-  )
-;
+  );
 
 /**
   Check if input string is valid Ascii string, valid EFI control characters
@@ -1282,8 +1237,7 @@ EFI_STATUS
 AnsiTestString (
   IN  TERMINAL_DEV    *TerminalDevice,
   IN  CHAR16          *WString
-  )
-;
+  );
 
 //
 // internal functions for VTUTF8
@@ -1301,8 +1255,7 @@ AnsiTestString (
 VOID
 VTUTF8RawDataToUnicode (
   IN  TERMINAL_DEV    *VtUtf8Device
-  )
-;
+  );
 
 /**
   Check if input string is valid VT-UTF8 string.
@@ -1317,8 +1270,7 @@ EFI_STATUS
 VTUTF8TestString (
   IN  TERMINAL_DEV    *TerminalDevice,
   IN  CHAR16          *WString
-  )
-;
+  );
 
 /** 
   Translate one Unicode character into VT-UTF8 characters.
@@ -1343,8 +1295,7 @@ UnicodeToUtf8 (
   IN  CHAR16      Unicode,
   OUT UTF8_CHAR   *Utf8Char,
   OUT UINT8       *ValidBytes
-  )
-;
+  );
 
 /**
   Get one valid VT-UTF8 characters set from Raw Data FIFO.
@@ -1362,8 +1313,7 @@ GetOneValidUtf8Char (
   IN  TERMINAL_DEV      *Utf8Device,
   OUT UTF8_CHAR         *Utf8Char,
   OUT UINT8             *ValidBytes
-  )
-;
+  );
 
 /** 
   Translate VT-UTF8 characters into one Unicode character.
@@ -1387,8 +1337,7 @@ Utf8ToUnicode (
   IN  UTF8_CHAR       Utf8Char,
   IN  UINT8           ValidBytes,
   OUT CHAR16          *UnicodeChar
-  )
-;
+  );
 
 //
 // functions for boxdraw unicode
@@ -1411,8 +1360,7 @@ TerminalIsValidTextGraphics (
   IN  CHAR16  Graphic,
   OUT CHAR8   *PcAnsi, OPTIONAL
   OUT CHAR8   *Ascii OPTIONAL
-  )
-;
+  );
 
 /**
   Detects if a valid ASCII char.
@@ -1426,8 +1374,7 @@ TerminalIsValidTextGraphics (
 BOOLEAN
 TerminalIsValidAscii (
   IN  CHAR16  Ascii
-  )
-;
+  );
 
 /**
   Detects if a valid EFI control character.
@@ -1441,7 +1388,6 @@ TerminalIsValidAscii (
 BOOLEAN
 TerminalIsValidEfiCntlChar (
   IN  CHAR16  CharC
-  )
-;
+  );
 
 #endif

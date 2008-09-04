@@ -25,8 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 InitializePciIoInstance (
   PCI_IO_DEVICE  *PciIoDevice
-  )
-;
+  );
 
 /**
   Verifies access to a PCI Base Address Register (BAR)
@@ -50,8 +49,7 @@ PciIoVerifyBarAccess (
   IN EFI_PCI_IO_PROTOCOL_WIDTH    Width,
   IN UINTN                        Count,
   UINT64                          *Offset
-  )
-;
+  );
 
 /**
   Verifies access to a PCI Config Header
@@ -71,8 +69,7 @@ PciIoVerifyConfigAccess (
   IN EFI_PCI_IO_PROTOCOL_WIDTH  Width,
   IN UINTN                      Count,
   IN UINT64                     *Offset
-  )
-;
+  );
 
 /**
   Reads from the I/O space of a PCI Root Bridge. Returns when either the polling exit criteria is
@@ -104,8 +101,7 @@ PciIoPollMem (
   IN  UINT64                     Value,
   IN  UINT64                     Delay,
   OUT UINT64                     *Result
-  )
-;
+  );
 
 /**                                                                 
   Reads from the I/O space of a PCI Root Bridge. Returns when either the polling exit criteria is
@@ -136,8 +132,7 @@ PciIoPollIo (
   IN  UINT64                     Value,
   IN  UINT64                     Delay,
   OUT UINT64                     *Result
-  )
-;
+  );
 
 /**                                                                 
   Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
@@ -168,8 +163,7 @@ PciIoMemRead (
   IN     UINT64                     Offset,
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
-  )
-;
+  );
 
 /**                                                                 
   Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
@@ -200,8 +194,7 @@ PciIoMemWrite (
   IN     UINT64                     Offset,
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
-  )
-;
+  );
 
 /**                                                                 
   Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
@@ -232,8 +225,7 @@ PciIoIoRead (
   IN     UINT64                     Offset,
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
-  )
-;
+  );
 
 /**                                                                 
   Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
@@ -264,8 +256,7 @@ PciIoIoWrite (
   IN     UINT64                     Offset,
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
-  )
-;
+  );
 
 /**                                                                 
   Enable a PCI driver to access PCI controller registers in PCI configuration space.
@@ -293,8 +284,7 @@ PciIoConfigRead (
   IN     UINT32                     Offset,
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
-  )
-;
+  );
 
 /**                                                                 
   Enable a PCI driver to access PCI controller registers in PCI configuration space.
@@ -322,8 +312,7 @@ PciIoConfigWrite (
   IN     UINT32                     Offset,
   IN     UINTN                      Count,
   IN OUT VOID                       *Buffer
-  )
-;
+  );
 
 /**                                                                 
   Enables a PCI driver to copy one region of PCI memory space to another region of PCI
@@ -363,8 +352,7 @@ PciIoCopyMem (
   IN     UINT8                        SrcBarIndex,
   IN     UINT64                       SrcOffset,
   IN     UINTN                        Count
-  )
-;
+  );
 
 /**                                                                 
   Provides the PCI controller-Cspecific addresses needed to access system memory.
@@ -394,8 +382,7 @@ PciIoMap (
   IN OUT UINTN                          *NumberOfBytes,
   OUT    EFI_PHYSICAL_ADDRESS           *DeviceAddress,
   OUT    VOID                           **Mapping
-  )
-;
+  );
 
 /**                                                                 
   Completes the Map() operation and releases any corresponding resources.
@@ -412,8 +399,7 @@ EFIAPI
 PciIoUnmap (
   IN  EFI_PCI_IO_PROTOCOL  *This,
   IN  VOID                 *Mapping
-  )
-;
+  );
 
 /**                                                                 
   Allocates pages that are suitable for an EfiPciIoOperationBusMasterCommonBuffer
@@ -444,8 +430,7 @@ PciIoAllocateBuffer (
   IN  UINTN                 Pages,
   OUT VOID                  **HostAddress,
   IN  UINT64                Attributes
-  )
-;
+  );
 
 /**                                                                 
   Frees memory that was allocated with AllocateBuffer().
@@ -465,8 +450,7 @@ PciIoFreeBuffer (
   IN  EFI_PCI_IO_PROTOCOL   *This,
   IN  UINTN                 Pages,
   IN  VOID                  *HostAddress
-  )
-;
+  );
 
 /**                                                                 
   Flushes all PCI posted write transactions from a PCI host bridge to system memory.
@@ -483,8 +467,7 @@ EFI_STATUS
 EFIAPI
 PciIoFlush (
   IN  EFI_PCI_IO_PROTOCOL  *This
-  )
-;
+  );
 
 /**                                                                 
   Retrieves this PCI controller's current PCI bus number, device number, and function number.
@@ -507,8 +490,7 @@ PciIoGetLocation (
   OUT UINTN                *Bus,
   OUT UINTN                *Device,
   OUT UINTN                *Function
-  )
-;
+  );
 
 /**
   Check BAR type for PCI resource.
@@ -525,8 +507,7 @@ CheckBarType (
   IN PCI_IO_DEVICE       *PciIoDevice,
   UINT8                  BarIndex,
   PCI_BAR_TYPE           BarType
-  )
-;
+  );
 
 /**
   Set/Disable new attributes to a Root Bridge
@@ -543,8 +524,7 @@ ModifyRootBridgeAttributes (
   IN  PCI_IO_DEVICE                            *PciIoDevice,
   IN  UINT64                                   Attributes,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation
-  )
-;
+  );
 
 /**
   Check whether this device can be enable/disable to snoop
@@ -559,8 +539,7 @@ EFI_STATUS
 SupportPaletteSnoopAttributes (
   IN  PCI_IO_DEVICE                            *PciIoDevice,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation
-  )
-;
+  );
 
 /**                                                                 
   Performs an operation on the attributes that this PCI controller supports. The operations include
@@ -588,8 +567,7 @@ PciIoAttributes (
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation,
   IN  UINT64                                   Attributes,
   OUT UINT64                                   *Result OPTIONAL
-  )
-;
+  );
 
 /**                                                                 
   Gets the attributes that this PCI controller supports setting on a BAR using
@@ -620,8 +598,7 @@ PciIoGetBarAttributes (
   IN  UINT8                          BarIndex,
   OUT UINT64                         *Supports, OPTIONAL
   OUT VOID                           **Resources OPTIONAL
-  )
-;
+  );
 
 /**                                                                 
   Sets the attributes for a range of a BAR on a PCI controller.
@@ -655,8 +632,7 @@ PciIoSetBarAttributes (
   IN     UINT8                        BarIndex,
   IN OUT UINT64                       *Offset,
   IN OUT UINT64                       *Length
-  )
-;
+  );
 
 /**
   Program parent bridge's attribute recurrently.
@@ -678,8 +654,7 @@ UpStreamBridgesAttributes (
   IN  PCI_IO_DEVICE                            *PciIoDevice,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation,
   IN  UINT64                                   Attributes
-  )
-;
+  );
 
 /**
   Test whether two Pci device has same parent bridge.
@@ -693,7 +668,6 @@ BOOLEAN
 PciDevicesOnTheSamePath (
   IN PCI_IO_DEVICE        *PciDevice1,
   IN PCI_IO_DEVICE        *PciDevice2
-  )
-;
+  );
 
 #endif

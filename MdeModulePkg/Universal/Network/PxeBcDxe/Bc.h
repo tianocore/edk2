@@ -188,16 +188,14 @@ PxebcBisStart (
   PXE_BASECODE_DEVICE     *Private,
   BIS_APPLICATION_HANDLE  *BisAppHandle,
   EFI_BIS_DATA            **BisDataSigInfo
-  )
-;
+  );
 
 VOID
 PxebcBisStop (
   EFI_BIS_PROTOCOL        *Bis,
   BIS_APPLICATION_HANDLE  BisAppHandle,
   EFI_BIS_DATA            *BisDataSigInfo
-  )
-;
+  );
 
 BOOLEAN
 PxebcBisVerify (
@@ -206,14 +204,12 @@ PxebcBisVerify (
   UINTN                   FileBufferLength,
   VOID                    *CredentialBuffer,
   UINTN                   CredentialBufferLength
-  )
-;
+  );
 
 BOOLEAN
 PxebcBisDetect (
   PXE_BASECODE_DEVICE *Private
-  )
-;
+  );
 
 //
 // Global Variables
@@ -240,31 +236,27 @@ EFIAPI
 InitializeBCDriver (
   IN EFI_HANDLE                       ImageHandle,
   IN EFI_SYSTEM_TABLE                 *SystemTable
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 BcStart (
   IN EFI_PXE_BASE_CODE_PROTOCOL       *This,
   IN BOOLEAN                          UseIpv6
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 BcStop (
   IN EFI_PXE_BASE_CODE_PROTOCOL       *This
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 BcDhcp (
   IN EFI_PXE_BASE_CODE_PROTOCOL       *This,
   IN BOOLEAN                          SortOffers
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -274,8 +266,7 @@ BcDiscover (
   IN UINT16                           *Layer,
   IN BOOLEAN                          UseBis,
   IN EFI_PXE_BASE_CODE_DISCOVER_INFO  * Info OPTIONAL
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -290,8 +281,7 @@ BcMtftp (
   IN UINT8                            *Filename,
   IN EFI_PXE_BASE_CODE_MTFTP_INFO     * Info OPTIONAL,
   IN BOOLEAN                          DontUseBuffer
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -307,8 +297,7 @@ BcUdpWrite (
   IN VOID                             *HeaderPtr, OPTIONAL
   IN UINTN                            *BufferSize,
   IN VOID                             *BufferPtr
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -323,8 +312,7 @@ BcUdpRead (
   IN VOID                             *HeaderPtr, OPTIONAL
   IN OUT UINTN                        *BufferSize,
   IN VOID                             *BufferPtr
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -345,8 +333,7 @@ BcTcpWrite (
   IN VOID                             *HeaderPtr, OPTIONAL
   IN UINTN                            *BufferSize,
   IN VOID                             *BufferPtr
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -361,8 +348,7 @@ BcTcpRead (
   IN VOID                             *HeaderPtr, OPTIONAL
   IN OUT UINTN                        *BufferSize,
   IN VOID                             *BufferPtr
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -370,16 +356,14 @@ BcArp (
   IN EFI_PXE_BASE_CODE_PROTOCOL       * This,
   IN EFI_IP_ADDRESS                   * IpAddr,
   IN EFI_MAC_ADDRESS                  * MacAddr OPTIONAL
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
 BcIpFilter (
   IN EFI_PXE_BASE_CODE_PROTOCOL       *This,
   IN EFI_PXE_BASE_CODE_IP_FILTER      *NewFilter
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -390,8 +374,7 @@ BcSetParameters (
   IN UINT8                            *NewTTL, OPTIONAL
   IN UINT8                            *NewToS, OPTIONAL
   IN BOOLEAN                          *NewMakeCallback OPTIONAL
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -399,8 +382,7 @@ BcSetStationIP (
   IN EFI_PXE_BASE_CODE_PROTOCOL       * This,
   IN EFI_IP_ADDRESS                   * NewStationIp, OPTIONAL
   IN EFI_IP_ADDRESS                   * NewSubnetMask OPTIONAL
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -418,8 +400,7 @@ BcSetPackets (
   IN EFI_PXE_BASE_CODE_PACKET         * NewPxeDiscover, OPTIONAL
   IN EFI_PXE_BASE_CODE_PACKET         * NewPxeReply, OPTIONAL
   IN EFI_PXE_BASE_CODE_PACKET         * NewPxeBisReply OPTIONAL
-  )
-;
+  );
 
 EFI_STATUS
 EFIAPI
@@ -429,15 +410,13 @@ LoadFile (
   IN BOOLEAN                          BootPolicy,
   IN OUT UINTN                        *BufferSize,
   IN VOID                             *Buffer
-  )
-;
+  );
 
 EFI_STATUS
 PxeBcLibGetSmbiosSystemGuidAndSerialNumber (
   IN  EFI_GUID    *SystemGuid,
   OUT CHAR8       **SystemSerialNumber
-  )
-;
+  );
 
 #include "Ip.h"
 #include "Dhcp.h"

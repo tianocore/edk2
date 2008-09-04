@@ -37,8 +37,7 @@ typedef struct {
 EFI_STATUS
 InitializePciDriverOverrideInstance (
   PCI_IO_DEVICE  *PciIoDevice
-  )
-;
+  );
 
 /**
   Add an overriding driver image
@@ -53,8 +52,7 @@ EFI_STATUS
 AddDriver (
   IN PCI_IO_DEVICE     *PciIoDevice,
   IN EFI_HANDLE        DriverImageHandle
-  )
-;
+  );
 
 
 /**
@@ -71,7 +69,6 @@ EFIAPI
 GetDriver (
   IN EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN OUT EFI_HANDLE                                         *DriverImageHandle
-  )
-;
+  );
 
 #endif

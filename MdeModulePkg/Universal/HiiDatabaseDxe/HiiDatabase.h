@@ -305,8 +305,7 @@ typedef struct _HII_DATABASE_PRIVATE_DATA {
 BOOLEAN
 IsHiiHandleValid (
   EFI_HII_HANDLE Handle
-  )
-;
+  );
 
 
 /**
@@ -338,8 +337,7 @@ IsFontInfoExisted (
   IN  EFI_FONT_INFO_MASK        *FontInfoMask,   OPTIONAL
   IN  EFI_FONT_HANDLE           FontHandle,      OPTIONAL
   OUT HII_GLOBAL_FONT_INFO      **GlobalFontInfo OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -362,8 +360,7 @@ GetSystemFont (
   IN  HII_DATABASE_PRIVATE_DATA      *Private,
   OUT EFI_FONT_DISPLAY_INFO          **FontInfo,
   OUT UINTN                          *FontInfoSize OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -399,8 +396,7 @@ FindStringBlock (
   OUT UINT8                           **StringBlockAddr, OPTIONAL
   OUT UINTN                           *StringTextOffset, OPTIONAL
   OUT EFI_STRING_ID                   *LastStringId OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -431,8 +427,7 @@ FindGlyphBlock (
   OUT UINT8                          **GlyphBuffer, OPTIONAL
   OUT EFI_HII_GLYPH_INFO             *Cell, OPTIONAL
   OUT UINTN                          *GlyphBufferLen OPTIONAL
-  )
-;
+  );
 
 //
 // EFI_HII_FONT_PROTOCOL protocol interfaces
@@ -506,8 +501,7 @@ HiiStringToImage (
   OUT EFI_HII_ROW_INFO               **RowInfoArray    OPTIONAL,
   OUT UINTN                          *RowInfoArraySize OPTIONAL,
   OUT UINTN                          *ColumnInfoArray  OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -586,8 +580,7 @@ HiiStringIdToImage (
   OUT EFI_HII_ROW_INFO               **RowInfoArray    OPTIONAL,
   OUT UINTN                          *RowInfoArraySize OPTIONAL,
   OUT UINTN                          *ColumnInfoArray  OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -620,8 +613,7 @@ HiiGetGlyph (
   IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfo,
   OUT EFI_IMAGE_OUTPUT               **Blt,
   OUT UINTN                          *Baseline OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -661,8 +653,7 @@ HiiGetFontInfo (
   IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn, OPTIONAL
   OUT       EFI_FONT_DISPLAY_INFO    **StringInfoOut,
   IN  CONST EFI_STRING               String OPTIONAL
-  )
-;
+  );
 
 //
 // EFI_HII_IMAGE_PROTOCOL interfaces
@@ -694,8 +685,7 @@ HiiNewImage (
   IN  EFI_HII_HANDLE                 PackageList,
   OUT EFI_IMAGE_ID                   *ImageId,
   IN  CONST EFI_IMAGE_INPUT          *Image
-  )
-;
+  );
 
 
 /**
@@ -726,8 +716,7 @@ HiiGetImage (
   IN  EFI_HII_HANDLE                 PackageList,
   IN  EFI_IMAGE_ID                   ImageId,
   OUT EFI_IMAGE_INPUT                *Image
-  )
-;
+  );
 
 
 /**
@@ -753,8 +742,7 @@ HiiSetImage (
   IN EFI_HII_HANDLE                  PackageList,
   IN EFI_IMAGE_ID                    ImageId,
   IN CONST EFI_IMAGE_INPUT           *Image
-  )
-;
+  );
 
 
 /**
@@ -795,8 +783,7 @@ HiiDrawImage (
   IN OUT EFI_IMAGE_OUTPUT            **Blt,
   IN UINTN                           BltX,
   IN UINTN                           BltY
-  )
-;
+  );
 
 
 /**
@@ -893,8 +880,7 @@ HiiNewString (
   IN  CONST CHAR16                    *LanguageName, OPTIONAL
   IN  CONST EFI_STRING                String,
   IN  CONST EFI_FONT_INFO             *StringFontInfo OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -941,8 +927,7 @@ HiiGetString (
   OUT EFI_STRING                      String,
   IN  OUT UINTN                       *StringSize,
   OUT EFI_FONT_INFO                   **StringFontInfo OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -976,8 +961,7 @@ HiiSetString (
   IN CONST CHAR8                      *Language,
   IN CONST EFI_STRING                 String,
   IN CONST EFI_FONT_INFO              *StringFontInfo OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -1008,8 +992,7 @@ HiiGetLanguages (
   IN EFI_HII_HANDLE                   PackageList,
   IN OUT CHAR8                        *Languages,
   IN OUT UINTN                        *LanguagesSize
-  )
-;
+  );
 
 
 /**
@@ -1051,8 +1034,7 @@ HiiGetSecondaryLanguages (
   IN CONST CHAR8                     *FirstLanguage,
   IN OUT CHAR8                       *SecondaryLanguages,
   IN OUT UINTN                       *SecondaryLanguagesSize
-  )
-;
+  );
 
 //
 // EFI_HII_DATABASE_PROTOCOL protocol interfaces
@@ -1085,8 +1067,7 @@ HiiNewPackageList (
   IN CONST EFI_HII_PACKAGE_LIST_HEADER  *PackageList,
   IN CONST EFI_HANDLE                   DriverHandle,
   OUT EFI_HII_HANDLE                    *Handle
-  )
-;
+  );
 
 
 /**
@@ -1109,8 +1090,7 @@ EFIAPI
 HiiRemovePackageList (
   IN CONST EFI_HII_DATABASE_PROTOCOL    *This,
   IN EFI_HII_HANDLE                     Handle
-  )
-;
+  );
 
 
 /**
@@ -1137,8 +1117,7 @@ HiiUpdatePackageList (
   IN CONST EFI_HII_DATABASE_PROTOCOL    *This,
   IN EFI_HII_HANDLE                     Handle,
   IN CONST EFI_HII_PACKAGE_LIST_HEADER  *PackageList
-  )
-;
+  );
 
 
 /**
@@ -1183,8 +1162,7 @@ HiiListPackageLists (
   IN  CONST EFI_GUID                    *PackageGuid,
   IN  OUT UINTN                         *HandleBufferLength,
   OUT EFI_HII_HANDLE                    *Handle
-  )
-;
+  );
 
 
 /**
@@ -1221,8 +1199,7 @@ HiiExportPackageLists (
   IN  EFI_HII_HANDLE                    Handle,
   IN  OUT UINTN                         *BufferSize,
   OUT EFI_HII_PACKAGE_LIST_HEADER       *Buffer
-  )
-;
+  );
 
 
 /**
@@ -1270,8 +1247,7 @@ HiiRegisterPackageNotify (
   IN  CONST EFI_HII_DATABASE_NOTIFY     PackageNotifyFn,
   IN  EFI_HII_DATABASE_NOTIFY_TYPE      NotifyType,
   OUT EFI_HANDLE                        *NotifyHandle
-  )
-;
+  );
 
 
 /**
@@ -1292,8 +1268,7 @@ EFIAPI
 HiiUnregisterPackageNotify (
   IN CONST EFI_HII_DATABASE_PROTOCOL    *This,
   IN EFI_HANDLE                         NotificationHandle
-  )
-;
+  );
 
 
 /**
@@ -1325,8 +1300,7 @@ HiiFindKeyboardLayouts (
   IN  CONST EFI_HII_DATABASE_PROTOCOL   *This,
   IN  OUT UINT16                        *KeyGuidBufferLength,
   OUT EFI_GUID                          *KeyGuidBuffer
-  )
-;
+  );
 
 
 /**
@@ -1357,8 +1331,7 @@ HiiGetKeyboardLayout (
   IN  CONST EFI_GUID                          *KeyGuid,
   IN OUT UINT16                         *KeyboardLayoutLength,
   OUT EFI_HII_KEYBOARD_LAYOUT           *KeyboardLayout
-  )
-;
+  );
 
 
 /**
@@ -1383,8 +1356,7 @@ EFIAPI
 HiiSetKeyboardLayout (
   IN CONST EFI_HII_DATABASE_PROTOCOL          *This,
   IN CONST EFI_GUID                           *KeyGuid
-  )
-;
+  );
 
 
 /**
@@ -1409,8 +1381,7 @@ HiiGetPackageListHandle (
   IN  CONST EFI_HII_DATABASE_PROTOCOL         *This,
   IN  EFI_HII_HANDLE                    PackageListHandle,
   OUT EFI_HANDLE                        *DriverHandle
-  )
-;
+  );
 
 //
 // EFI_HII_CONFIG_ROUTING_PROTOCOL interfaces
@@ -1463,8 +1434,7 @@ HiiConfigRoutingExtractConfig (
   IN  CONST EFI_STRING                       Request,
   OUT EFI_STRING                             *Progress,
   OUT EFI_STRING                             *Results
-  )
-;
+  );
 
 
 /**
@@ -1493,8 +1463,7 @@ EFIAPI
 HiiConfigRoutingExportConfig (
   IN  CONST EFI_HII_CONFIG_ROUTING_PROTOCOL  *This,
   OUT EFI_STRING                             *Results
-  )
-;
+  );
 
 
 /**
@@ -1528,8 +1497,7 @@ HiiConfigRoutingRouteConfig (
   IN  CONST EFI_HII_CONFIG_ROUTING_PROTOCOL  *This,
   IN  CONST EFI_STRING                       Configuration,
   OUT EFI_STRING                             *Progress
-  )
-;
+  );
 
 
 
@@ -1581,8 +1549,7 @@ HiiBlockToConfig (
   IN  CONST UINTN                            BlockSize,
   OUT EFI_STRING                             *Config,
   OUT EFI_STRING                             *Progress
-  )
-;
+  );
 
 
 /**
@@ -1639,8 +1606,7 @@ HiiConfigToBlock (
   IN OUT UINT8                                 *Block,
   IN OUT UINTN                                 *BlockSize,
   OUT    EFI_STRING                            *Progress
-  )
-;
+  );
 
 
 /**
@@ -1693,8 +1659,7 @@ HiiGetAltCfg (
   IN  CONST EFI_DEVICE_PATH_PROTOCOL           *DevicePath,
   IN  CONST UINT16                             *AltCfgId,
   OUT EFI_STRING                               *AltCfgResp
-  )
-;
+  );
 
 
 //

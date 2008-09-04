@@ -27,7 +27,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID
 InitializeLanguage (
   BOOLEAN LangCodesSettingRequired
-  )
-;
+  );
 
 #endif // _LANGUAGE_H_

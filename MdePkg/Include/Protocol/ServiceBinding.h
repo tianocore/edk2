@@ -43,8 +43,7 @@ EFI_STATUS
 (EFIAPI *EFI_SERVICE_BINDING_CREATE_CHILD)(
   IN     EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN OUT EFI_HANDLE                    *ChildHandle
-  )
-;
+  );
 
 /**
   Destroys a child handle with a set of I/O services.
@@ -66,8 +65,7 @@ EFI_STATUS
 (EFIAPI *EFI_SERVICE_BINDING_DESTROY_CHILD)(
   IN EFI_SERVICE_BINDING_PROTOCOL          *This,
   IN EFI_HANDLE                            ChildHandle
-  )
-;
+  );
 
 /**  
   @par Protocol Description:

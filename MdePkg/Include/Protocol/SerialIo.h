@@ -97,8 +97,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SERIAL_RESET)(
   IN EFI_SERIAL_IO_PROTOCOL *This
-  )
-;
+  );
 
 /**
   Sets the baud rate, receive FIFO depth, transmit/receice time out, parity, 
@@ -136,8 +135,7 @@ EFI_STATUS
   IN EFI_PARITY_TYPE                Parity,
   IN UINT8                          DataBits,
   IN EFI_STOP_BITS_TYPE             StopBits
-  )
-;
+  );
 
 /**
   Set the control bits on a serial device
@@ -155,8 +153,7 @@ EFI_STATUS
 (EFIAPI *EFI_SERIAL_SET_CONTROL_BITS)(
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   IN UINT32                         Control
-  )
-;
+  );
 
 /**
   Retrieves the status of thecontrol bits on a serial device
@@ -173,8 +170,7 @@ EFI_STATUS
 (EFIAPI *EFI_SERIAL_GET_CONTROL_BITS)(
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   OUT UINT32                        *Control
-  )
-;
+  );
 
 /**
   Writes data to a serial device.
@@ -195,8 +191,7 @@ EFI_STATUS
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   IN OUT UINTN                      *BufferSize,
   IN VOID                           *Buffer
-  )
-;
+  );
 
 /**
   Writes data to a serial device.
@@ -217,8 +212,7 @@ EFI_STATUS
   IN EFI_SERIAL_IO_PROTOCOL         *This,
   IN OUT UINTN                      *BufferSize,
   OUT VOID                          *Buffer
-  )
-;
+  );
 
 /**
   @par Data Structure Description:

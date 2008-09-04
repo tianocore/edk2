@@ -145,8 +145,7 @@ EFI_STATUS
   OUT EFI_IP4_MODE_DATA                *Ip4ModeData    OPTIONAL,
   OUT EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData  OPTIONAL,
   OUT EFI_SIMPLE_NETWORK_MODE          *SnpModeData    OPTIONAL
-  )
-;  
+  );  
   
 
 /**
@@ -176,8 +175,7 @@ EFI_STATUS
 (EFIAPI *EFI_UDP4_CONFIGURE)(
   IN EFI_UDP4_PROTOCOL      *This,
   IN EFI_UDP4_CONFIG_DATA   *UdpConfigData OPTIONAL
-  )
-;  
+  );  
 
 /**
   Joins and leaves multicast groups.
@@ -210,8 +208,7 @@ EFI_STATUS
   IN EFI_UDP4_PROTOCOL      *This,
   IN BOOLEAN                JoinFlag,
   IN EFI_IPv4_ADDRESS       *MulticastAddress    OPTIONAL
-  )
-;   
+  );   
 
 /**
   Adds and deletes routing table entries.
@@ -241,8 +238,7 @@ EFI_STATUS
   IN EFI_IPv4_ADDRESS       *SubnetAddress,
   IN EFI_IPv4_ADDRESS       *SubnetMask,
   IN EFI_IPv4_ADDRESS       *GatewayAddress
-  )
-;     
+  );     
 
 /**
   Polls for incoming data packets and processes outgoing data packets.
@@ -259,8 +255,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_UDP4_POLL)(
   IN EFI_UDP4_PROTOCOL      *This
-  )
-;   
+  );   
 
 /**
   Places an asynchronous receive request into the receiving queue.
@@ -287,8 +282,7 @@ EFI_STATUS
 (EFIAPI *EFI_UDP4_RECEIVE)(
   IN EFI_UDP4_PROTOCOL          *This,
   IN EFI_UDP4_COMPLETION_TOKEN  *Token
-  )
-;   
+  );   
 
 /**
   Queues outgoing data packets into the transmit queue.
@@ -318,8 +312,7 @@ EFI_STATUS
 (EFIAPI *EFI_UDP4_TRANSMIT)(
   IN EFI_UDP4_PROTOCOL           *This,
   IN EFI_UDP4_COMPLETION_TOKEN   *Token
-  )
-;     
+  );     
 
 /**
   Aborts an asynchronous transmit or receive request.
@@ -347,8 +340,7 @@ EFI_STATUS
 (EFIAPI *EFI_UDP4_CANCEL)(
   IN EFI_UDP4_PROTOCOL          *This,
   IN EFI_UDP4_COMPLETION_TOKEN  *Token  OPTIONAL
-  )
-;       
+  );       
 
 /**  
   @par Protocol Description:

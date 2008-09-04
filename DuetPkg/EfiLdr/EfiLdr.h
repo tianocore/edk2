@@ -87,7 +87,6 @@ typedef
 VOID
 (* EFI_MAIN_ENTRYPOINT) (
     IN EFILDRHANDOFF  *Handoff
-    )
-;
+    );
 
 #endif //_DUET_EFI_LOADER_H_

@@ -164,8 +164,7 @@ EFI_STATUS
 (EFIAPI *EFI_TEXT_RESET)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN BOOLEAN                                ExtendedVerification
-  )
-;
+  );
 
 /**
   Write a Unicode string to the output device.
@@ -190,8 +189,7 @@ EFI_STATUS
 (EFIAPI *EFI_TEXT_STRING)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN CHAR16                                 *String
-  )
-;
+  );
 
 /**
   Verifies that all characters in a Unicode string can be output to the 
@@ -212,8 +210,7 @@ EFI_STATUS
 (EFIAPI *EFI_TEXT_TEST_STRING)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN CHAR16                                 *String
-  )
-;
+  );
 
 /**
   Returns information for an available text mode that the output device(s)
@@ -238,8 +235,7 @@ EFI_STATUS
   IN UINTN                                  ModeNumber,
   OUT UINTN                                 *Columns,
   OUT UINTN                                 *Rows
-  )
-;
+  );
 
 /**
   Sets the output device(s) to a specified mode.
@@ -257,8 +253,7 @@ EFI_STATUS
 (EFIAPI *EFI_TEXT_SET_MODE)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  ModeNumber
-  )
-;
+  );
 
 /**
   Sets the background and foreground colors for the OutputString () and
@@ -279,8 +274,7 @@ EFI_STATUS
 (EFIAPI *EFI_TEXT_SET_ATTRIBUTE)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  Attribute
-  )
-;
+  );
 
 /**
   Clears the output device(s) display to the currently selected background 
@@ -297,8 +291,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TEXT_CLEAR_SCREEN)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *This
-  )
-;
+  );
 
 /**
   Sets the current coordinates of the cursor position
@@ -323,8 +316,7 @@ EFI_STATUS
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN UINTN                                  Column,
   IN UINTN                                  Row
-  )
-;
+  );
 
 /**
   Makes the cursor visible or invisible
@@ -345,8 +337,7 @@ EFI_STATUS
 (EFIAPI *EFI_TEXT_ENABLE_CURSOR)(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
   IN BOOLEAN                                Visible
-  )
-;
+  );
 
 /**
   @par Data Structure Description:

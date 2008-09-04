@@ -107,8 +107,7 @@ EFI_STATUS
   IN  UINTN                                          SourceSize,
   OUT EFI_HANDLE                                     *ImageHandle,
   IN  BOOLEAN                                        LegacyIA32Binary OPTIONAL
-  )
-;
+  );
 
 /**
   Remove a given driver SMRAM.  This is the equivalent of performing
@@ -128,8 +127,7 @@ EFI_STATUS
 (EFIAPI *EFI_SMM_UNREGISTER_HANDLER)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   IN EFI_HANDLE                     ImageHandle
-  )
-;
+  );
 
 /**
   The SMM Inter-module Communicate Service Communicate() function
@@ -154,8 +152,7 @@ EFI_STATUS
   IN EFI_HANDLE                     ImageHandle,
   IN OUT VOID                       *CommunicationBuffer,
   IN OUT UINTN                      *SourceSize
-  )
-;
+  );
 
 /**
   Register a callback to execute within SMM.
@@ -186,8 +183,7 @@ EFI_STATUS
   IN EFI_SMM_CALLBACK_ENTRY_POINT                     CallbackAddress,
   IN BOOLEAN                                          MakeLast OPTIONAL,
   IN BOOLEAN                                          FloatingPointSave OPTIONAL
-  )
-;
+  );
 
 /**
   The SmmAllocatePool() function allocates a memory region of Size bytes from memory of
@@ -216,8 +212,7 @@ EFI_STATUS
   IN EFI_MEMORY_TYPE                PoolType,
   IN UINTN                          Size,
   OUT VOID                          **Buffer
-  )
-;
+  );
 
 /**
   The SmmFreePool() function returns the memory specified by Buffer to the system.
@@ -237,8 +232,7 @@ EFI_STATUS
 (EFIAPI *EFI_SMM_FREE_POOL)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   IN VOID                           *Buffer
-  )
-;
+  );
 
 /**
   This routine tells caller if execution context is SMM or not.
@@ -254,8 +248,7 @@ EFI_STATUS
 (EFIAPI *EFI_SMM_INSIDE_OUT)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   OUT BOOLEAN                       *InSmm
-  )
-;
+  );
 
 /**
   The GetSmstLocation() function returns the locatin of the System Management
@@ -276,8 +269,7 @@ EFI_STATUS
 (EFIAPI *EFI_SMM_GET_SMST_LOCATION)(
   IN EFI_SMM_BASE_PROTOCOL          *This,
   IN OUT EFI_SMM_SYSTEM_TABLE       **Smst
-  )
-;
+  );
 
 /**
   @par Protocol Description:

@@ -53,8 +53,7 @@ RuntimeDriverCalculateCrc32 (
   IN  VOID    *Data,
   IN  UINTN   DataSize,
   OUT UINT32  *CrcOut
-  )
-;
+  );
 
 /**
   Determines the new virtual address that is to be used on subsequent memory accesses.
@@ -75,8 +74,7 @@ EFIAPI
 RuntimeDriverConvertPointer (
   IN     UINTN  DebugDisposition,
   IN OUT VOID   **ConvertAddress
-  )
-;
+  );
 
 /**
   Changes the runtime addressing mode of EFI firmware from physical to virtual.
@@ -104,8 +102,7 @@ RuntimeDriverSetVirtualAddressMap (
   IN UINTN                  DescriptorSize,
   IN UINT32                 DescriptorVersion,
   IN EFI_MEMORY_DESCRIPTOR  *VirtualMap
-  )
-;
+  );
 
 /**
   Initialize CRC32 table.
@@ -114,8 +111,7 @@ RuntimeDriverSetVirtualAddressMap (
 VOID
 RuntimeDriverInitializeCrc32Table (
   VOID
-  )
-;
+  );
 
 /**
   Install Runtime AP. This code includes the EfiRuntimeLib, but it only
@@ -134,7 +130,6 @@ EFIAPI
 RuntimeDriverInitialize (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
-  )
-;
+  );
 
 #endif

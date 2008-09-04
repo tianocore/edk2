@@ -20,8 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 InitializePciDevicePool (
   VOID
-  )
-;
+  );
 
 /**
   Insert a root bridge into PCI device pool
@@ -32,8 +31,7 @@ InitializePciDevicePool (
 EFI_STATUS
 InsertRootBridge (
   PCI_IO_DEVICE *RootBridge
-  )
-;
+  );
 
 /**
   This function is used to insert a PCI device node under
@@ -47,8 +45,7 @@ EFI_STATUS
 InsertPciDevice (
   PCI_IO_DEVICE *Bridge,
   PCI_IO_DEVICE *PciDeviceNode
-  )
-;
+  );
 
 /**
   Destroy root bridge and remove it from deivce tree.
@@ -59,8 +56,7 @@ InsertPciDevice (
 EFI_STATUS
 DestroyRootBridge (
   IN PCI_IO_DEVICE *RootBridge
-  )
-;
+  );
 
 /**
   Destroy all the pci device node under the bridge.
@@ -72,8 +68,7 @@ DestroyRootBridge (
 EFI_STATUS
 DestroyPciDeviceTree (
   IN PCI_IO_DEVICE *Bridge
-  )
-;
+  );
 
 /**
   Destroy all device nodes under the root bridge
@@ -86,8 +81,7 @@ DestroyPciDeviceTree (
 EFI_STATUS
 DestroyRootBridgeByHandle (
   EFI_HANDLE Controller
-  )
-;
+  );
 
 /**
   This function registers the PCI IO device. It creates a handle for this PCI IO device
@@ -107,8 +101,7 @@ RegisterPciDevice (
   IN  EFI_HANDLE                     Controller,
   IN  PCI_IO_DEVICE                  *PciIoDevice,
   OUT EFI_HANDLE                     *Handle OPTIONAL
-  )
-;
+  );
 
 /**
   This function is used to remove the whole PCI devices from the bridge.
@@ -122,8 +115,7 @@ EFI_STATUS
 RemoveAllPciDeviceOnBridge (
   EFI_HANDLE               RootBridgeHandle,
   PCI_IO_DEVICE            *Bridge
-  )
-;
+  );
 
 /**
 
@@ -140,8 +132,7 @@ EFI_STATUS
 DeRegisterPciDevice (
   IN  EFI_HANDLE                     Controller,
   IN  EFI_HANDLE                     Handle
-  )
-;
+  );
 
 /**
   Start to manage the PCI device on specified the root bridge or PCI-PCI Bridge
@@ -165,8 +156,7 @@ StartPciDevicesOnBridge (
   IN EFI_DEVICE_PATH_PROTOCOL            *RemainingDevicePath,
   IN OUT UINT8                           *NumberOfChildren,
   IN OUT EFI_HANDLE                      *ChildHandleBuffer
-  )
-;
+  );
 
 /**
   Start to manage all the PCI devices it found previously under 
@@ -178,8 +168,7 @@ StartPciDevicesOnBridge (
 EFI_STATUS
 StartPciDevices (
   IN EFI_HANDLE                         Controller
-  )
-;
+  );
 
 /**
   Create root bridge device
@@ -191,8 +180,7 @@ StartPciDevices (
 PCI_IO_DEVICE *
 CreateRootBridge (
   IN EFI_HANDLE RootBridgeHandle
-  )
-;
+  );
 
 /**
   Get root bridge device instance by specific handle
@@ -204,14 +192,12 @@ CreateRootBridge (
 PCI_IO_DEVICE *
 GetRootBridgeByHandle (
   EFI_HANDLE RootBridgeHandle
-  )
-;
+  );
 
 BOOLEAN
 RootBridgeExisted (
   IN EFI_HANDLE RootBridgeHandle
-  )
-;
+  );
 
 /**
   Judege whether Pci device existed
@@ -225,8 +211,7 @@ BOOLEAN
 PciDeviceExisted (
   IN PCI_IO_DEVICE    *Bridge,
   IN PCI_IO_DEVICE    *PciIoDevice
-  )
-;
+  );
 
 /**
   Active VGA device
@@ -238,8 +223,7 @@ PciDeviceExisted (
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheSameSegment (
   IN PCI_IO_DEVICE        *VgaDevice
-  )
-;
+  );
 
 /**
   Active VGA device on root bridge
@@ -251,8 +235,7 @@ ActiveVGADeviceOnTheSameSegment (
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheRootBridge (
   IN PCI_IO_DEVICE        *RootBridge
-  )
-;
+  );
 
 /**
   Get HPC PCI address according to its device path
@@ -268,8 +251,7 @@ GetHpcPciAddress (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   IN  EFI_DEVICE_PATH_PROTOCOL         *HpcDevicePath,
   OUT UINT64                           *PciAddress
-  )
-;
+  );
 
 /**
   Get HPC PCI address according to its device path
@@ -284,8 +266,7 @@ GetHpcPciAddressFromRootBridge (
   IN  PCI_IO_DEVICE                    *RootBridge,
   IN  EFI_DEVICE_PATH_PROTOCOL         *RemainingDevicePath,
   OUT UINT64                           *PciAddress
-  )
-;
+  );
 
 /**
   Destroy a pci device node.
@@ -297,7 +278,6 @@ GetHpcPciAddressFromRootBridge (
 EFI_STATUS
 FreePciDevice (
   IN PCI_IO_DEVICE *PciIoDevice
-  )
-;
+  );
 
 #endif

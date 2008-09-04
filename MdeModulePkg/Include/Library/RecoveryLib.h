@@ -26,8 +26,7 @@ EFI_STATUS
 EFIAPI
 PeiRecoverFirmware (
   VOID
-  )
-;
+  );
 
 #endif
 
