@@ -266,7 +266,7 @@ FileStorageConstructor (
   // add notify on SFS's installation.
 
   Status = gBS->CreateEvent (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
                   OnSimpleFileSystemInstall,
                   Dev,

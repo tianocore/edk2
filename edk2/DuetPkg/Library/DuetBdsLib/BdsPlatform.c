@@ -1189,7 +1189,7 @@ Returns:
   // Create a 300ms duration event to ensure user has enough input time to enter Setup
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_TIMER,
+                  EVT_TIMER,
                   0,
                   NULL,
                   NULL,

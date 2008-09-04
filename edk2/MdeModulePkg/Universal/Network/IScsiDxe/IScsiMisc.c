@@ -581,7 +581,7 @@ IScsiCreateDriverData (
   // as to abort the iSCSI session.
   //
   Status = gBS->CreateEvent (
-                  EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
                   TPL_CALLBACK,
                   IScsiOnExitBootService,
                   Private,

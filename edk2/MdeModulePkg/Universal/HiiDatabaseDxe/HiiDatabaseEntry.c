@@ -174,7 +174,7 @@ InitializeHiiDatabase (
   // Create a event with EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID group type.
   //
   Status = gBS->CreateEventEx (
-                  EFI_EVENT_NOTIFY_SIGNAL,
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   KeyboardLayoutChangeNullEvent,
                   NULL,

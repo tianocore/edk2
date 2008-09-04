@@ -120,8 +120,8 @@ BdsLibBootViaBootOption (
 
   //
   // Notes: this code can be remove after the s3 script table
-  // hook on the event EFI_EVENT_SIGNAL_READY_TO_BOOT or
-  // EFI_EVENT_SIGNAL_LEGACY_BOOT
+  // hook on the event EVT_SIGNAL_READY_TO_BOOT or
+  // EVT_SIGNAL_LEGACY_BOOT
   //
   Status = gBS->LocateProtocol (&gEfiAcpiS3SaveProtocolGuid, NULL, (VOID **) &AcpiS3Save);
   if (!EFI_ERROR (Status)) {
@@ -142,7 +142,7 @@ BdsLibBootViaBootOption (
     }
   }
   //
-  // Signal the EFI_EVENT_SIGNAL_READY_TO_BOOT event
+  // Signal the EVT_SIGNAL_READY_TO_BOOT event
   //
   EfiSignalEventReadyToBoot();
   
