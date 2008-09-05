@@ -299,7 +299,7 @@ GetAttributesOfFirstFormSet (
       break;
     }
 
-    Package = (EFI_HII_PACKAGE_HEADER *) (UINT8 *) Package + Package->Length;
+    Package = (EFI_HII_PACKAGE_HEADER *) ((UINT8 *) Package + Package->Length);
   }
 
 }
