@@ -578,22 +578,29 @@ RemovePackNotify (
 
   ThunkContext = UefiHiiHandleToThunkContext (Private, Handle);
 
-  if (!ThunkContext->ByFrameworkHiiNewPack) {
-    Status = HiiLibExportPackageLists (Handle, &HiiPackageList, &BufferSize);
-    ASSERT_EFI_ERROR (Status);
+  //
+  // BugBug: Change to ASSERT if HII Database fix the bug and to also invoke 
+  // NEW_PACK_NOTIFY for package (String Package) created internally.
+  //
+  if (ThunkContext != NULL) {
+    if (!ThunkContext->ByFrameworkHiiNewPack) {
+      Status = HiiLibExportPackageLists (Handle, &HiiPackageList, &BufferSize);
+      ASSERT_EFI_ERROR (Status);
 
-    if (GetPackageCountByType (HiiPackageList, EFI_HII_PACKAGE_STRINGS) == 1) {
-      //
-      // If the string package will be removed is the last string package
-      // in the package list, we will remove the HII Thunk entry from the
-      // database.
-      //
-      DestroyThunkContextForUefiHiiHandle (Private, Handle);
+      if (GetPackageCountByType (HiiPackageList, EFI_HII_PACKAGE_STRINGS) == 1) {
+        //
+        // If the string package will be removed is the last string package
+        // in the package list, we will remove the HII Thunk entry from the
+        // database.
+        //
+        DestroyThunkContextForUefiHiiHandle (Private, Handle);
+      }
+
+      FreePool (HiiPackageList);
     }
-
-    FreePool (HiiPackageList);
   }
 
+  
   return Status;
 }
 
