@@ -61,6 +61,6 @@ FreeHiiHandle (
 
   Num = (UINT16) Handle;
 
-  ASSERT ((mHandle [Num / 8] & (~(1 << (Num % 8)))) != 0);
+  ASSERT ((mHandle [Num / 8] & (1 << (Num % 8))) != 0);
   mHandle [Num / 8] &= (~(1 << (Num % 8)));
 }

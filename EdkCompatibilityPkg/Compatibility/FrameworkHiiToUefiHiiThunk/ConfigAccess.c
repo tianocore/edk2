@@ -997,6 +997,11 @@ ThunkCallback (
   //
   if (*ActionRequest == EFI_BROWSER_ACTION_REQUEST_NONE && mHiiPackageListUpdated) {
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+  } else {
+    if (ConfigAccess->ThunkContext->FormSetSubClass == EFI_FRONT_PAGE_SUBCLASS ||
+        ConfigAccess->ThunkContext->FormSetSubClass == EFI_SINGLE_USE_SUBCLASS) {
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    }
   }
 
 
