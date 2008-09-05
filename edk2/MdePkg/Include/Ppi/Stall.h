@@ -41,8 +41,8 @@ typedef struct _EFI_PEI_STALL_PPI EFI_PEI_STALL_PPI;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_STALL)(
-  IN EFI_PEI_SERVICES           **PeiServices,
-  IN EFI_PEI_STALL_PPI          *This,
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
+  IN CONST EFI_PEI_STALL_PPI    *This,
   IN UINTN                      Microseconds
   );
 
