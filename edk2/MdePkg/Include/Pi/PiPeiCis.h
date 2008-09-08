@@ -613,7 +613,8 @@ typedef struct {
 } EFI_FV_INFO;
 
 /**
-   
+  Returns information about the specified volume.
+  
   This function returns information about a specific firmware
   volume, including its name, type, attributes, starting address
   and size.
@@ -637,7 +638,8 @@ EFI_STATUS
   );
 
 /**
-   
+  Register a PEIM so that it will be shadowed and called again.
+  
   This service registers a file handle so that after memory is
   available, the PEIM will be re-loaded into permanent memory and
   re-initialized. The PEIM registered this way will always be
@@ -648,8 +650,8 @@ EFI_STATUS
   initialized after permanent memory is installed, even the first
   time.
 
-  @param FileHandle   PEIM's file handle. Must be the currently
-                      executing PEIM.
+  @param FileHandle             PEIM's file handle. Must be the currently
+                                executing PEIM.
   
   @retval EFI_SUCCESS           The PEIM was successfully registered for
                                 shadowing.
@@ -722,6 +724,7 @@ struct _EFI_PEI_SERVICES {
   EFI_PEI_SET_MEM             SetMem;
   //
   // Status Code
+  //
   EFI_PEI_REPORT_STATUS_CODE  ReportStatusCode;
   //
   // Reset
@@ -736,6 +739,7 @@ struct _EFI_PEI_SERVICES {
   EFI_PEI_PCI_CFG2_PPI        *PciCfg;
   //
   // Future Installed Services
+  //
   EFI_PEI_FFS_FIND_BY_NAME    FfsFindFileByName;
   EFI_PEI_FFS_GET_FILE_INFO   FfsGetFileInfo;
   EFI_PEI_FFS_GET_VOLUME_INFO FfsGetVolumeInfo;
@@ -809,6 +813,7 @@ typedef struct _EFI_SEC_PEI_HAND_OFF {
 
 
 /**
+  Entry point of PEI Foundation.
 
   This function is the entry point for the PEI Foundation, which
   allows the SEC phase to pass information about the stack,
@@ -826,8 +831,7 @@ typedef struct _EFI_SEC_PEI_HAND_OFF {
                         information about the PEI core's
                         operating environment, such as the size
                         and location of temporary RAM, the stack
-                        location and the BFV location. The type
-                        EFI_SEC_PEI_HAND_OFF is
+                        location and the BFV location.
 
   @param PpiList        Points to a list of one or more PPI
                         descriptors to be installed initially by

@@ -1,7 +1,7 @@
 /** @file
   Include file matches things in PI for multiple module types.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -93,7 +93,7 @@ typedef struct {
 
 
 //
-// Bit values for AuthenticationStatus
+// Bit values for Authentication Status
 //
 #define EFI_AUTH_STATUS_PLATFORM_OVERRIDE   0x01
 #define EFI_AUTH_STATUS_IMAGE_SIGNED        0x02
