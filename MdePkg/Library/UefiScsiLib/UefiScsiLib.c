@@ -20,9 +20,23 @@
 
 #include <IndustryStandard/Scsi.h>
 
+//
+// bit5..7 are for Logical unit number
+// 11100000b (0xe0)
+//
+#define EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK 0xe0
+
+//
+// Scsi Command Length six or ten
+//
+#define EFI_SCSI_OP_LENGTH_SIX 0x6
+#define EFI_SCSI_OP_LENGTH_TEN 0xa
 
 /**
   Function test the ready status of the SCSI unit.
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
@@ -67,7 +81,7 @@ ScsiTestUnitReadyCommand (
   UINT8                           *Target;
   UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
-  UINT8                           Cdb[6];
+  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIX];
 
   ASSERT (SenseDataLength != NULL);
   ASSERT (HostAdapterStatus != NULL);
@@ -78,7 +92,7 @@ ScsiTestUnitReadyCommand (
   }
 
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, 6);
+  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_SIX);
 
   CommandPacket.Timeout         = Timeout;
   CommandPacket.InDataBuffer    = NULL;
@@ -94,8 +108,8 @@ ScsiTestUnitReadyCommand (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_TEST_UNIT_READY;
-  Cdb[1]                        = (UINT8) (Lun & 0xe0);
-  CommandPacket.CdbLength       = (UINT8) 6;
+  Cdb[1]                        = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
+  CommandPacket.CdbLength       = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
   CommandPacket.SenseDataLength = *SenseDataLength;
 
   Status                        = ScsiIo->ExecuteScsiCommand (ScsiIo, &CommandPacket, NULL);
@@ -110,6 +124,10 @@ ScsiTestUnitReadyCommand (
 
 /**
   Function to submit SCSI inquiry command.
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If InquiryDataLength is NULL, then ASSERT().
 
   @param[in]     ScsiIo             SCSI IO Protocol to use
   @param[in]     Timeout            The length of timeout period.
@@ -159,7 +177,7 @@ ScsiInquiryCommand (
   UINT8                           *Target;
   UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
-  UINT8                           Cdb[6];
+  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIX];
 
   ASSERT (SenseDataLength != NULL);
   ASSERT (HostAdapterStatus != NULL);
@@ -171,7 +189,7 @@ ScsiInquiryCommand (
   }
 
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, 6);
+  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_SIX);
 
   CommandPacket.Timeout         = Timeout;
   CommandPacket.InDataBuffer    = InquiryDataBuffer;
@@ -184,7 +202,7 @@ ScsiInquiryCommand (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]  = EFI_SCSI_OP_INQUIRY;
-  Cdb[1]  = (UINT8) (Lun & 0xe0);
+  Cdb[1]  = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   if (EnableVitalProductData) {
     Cdb[1] |= 0x01;
   }
@@ -194,7 +212,7 @@ ScsiInquiryCommand (
   }
 
   Cdb[4]                      = (UINT8) (*InquiryDataLength);
-  CommandPacket.CdbLength     = (UINT8) 6;
+  CommandPacket.CdbLength     = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
   CommandPacket.DataDirection = EFI_SCSI_DATA_IN;
 
   Status                      = ScsiIo->ExecuteScsiCommand (ScsiIo, &CommandPacket, NULL);
@@ -210,6 +228,10 @@ ScsiInquiryCommand (
 
 /**
   Function to submit SCSI mode sense 10 command.
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
@@ -263,7 +285,7 @@ ScsiModeSense10Command (
   UINT8                           *Target;
   UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
-  UINT8                           Cdb[10];
+  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
   ASSERT (SenseDataLength != NULL);
   ASSERT (HostAdapterStatus != NULL);
@@ -275,7 +297,7 @@ ScsiModeSense10Command (
   }
 
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, 10);
+  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_TEN);
 
   CommandPacket.Timeout         = Timeout;
   CommandPacket.InDataBuffer    = DataBuffer;
@@ -289,12 +311,18 @@ ScsiModeSense10Command (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_MODE_SEN10;
-  Cdb[1]                        = (UINT8) ((Lun & 0xe0) + ((DBDField << 3) & 0x08));
+  //
+  // DBDField is in Cdb[1] bit3 of (bit7..0)
+  //
+  Cdb[1]                        = (UINT8) ((Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK) + ((DBDField << 3) & 0x08));
+  //
+  // PageControl is in Cdb[2] bit7..6, PageCode is in Cdb[2] bit5..0
+  //
   Cdb[2]                        = (UINT8) ((PageControl & 0xc0) | (PageCode & 0x3f));
   Cdb[7]                        = (UINT8) (*DataLength >> 8);
   Cdb[8]                        = (UINT8) (*DataLength);
 
-  CommandPacket.CdbLength       = 10;
+  CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_TEN;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_IN;
   CommandPacket.SenseDataLength = *SenseDataLength;
 
@@ -311,6 +339,9 @@ ScsiModeSense10Command (
 
 /**
   Function to submit SCSI request sense command.
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
@@ -355,7 +386,7 @@ ScsiRequestSenseCommand (
   UINT8                           *Target;
   UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
-  UINT8                           Cdb[6];
+  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIX];
 
   ASSERT (SenseDataLength != NULL);
   ASSERT (HostAdapterStatus != NULL);
@@ -366,7 +397,7 @@ ScsiRequestSenseCommand (
   }
 
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, 6);
+  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_SIX);
 
   CommandPacket.Timeout         = Timeout;
   CommandPacket.InDataBuffer    = SenseData;
@@ -380,10 +411,10 @@ ScsiRequestSenseCommand (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_REQUEST_SENSE;
-  Cdb[1]                        = (UINT8) (Lun & 0xe0);
+  Cdb[1]                        = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[4]                        = (UINT8) (*SenseDataLength);
 
-  CommandPacket.CdbLength       = (UINT8) 6;
+  CommandPacket.CdbLength       = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_IN;
   CommandPacket.SenseDataLength = 0;
 
@@ -399,6 +430,10 @@ ScsiRequestSenseCommand (
 
 /**
   Function to submit read capacity command.
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
@@ -448,7 +483,7 @@ ScsiReadCapacityCommand (
   UINT8                           *Target;
   UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
-  UINT8                           Cdb[10];
+  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
   ASSERT (SenseDataLength != NULL);
   ASSERT (HostAdapterStatus != NULL);
@@ -460,7 +495,7 @@ ScsiReadCapacityCommand (
   }
 
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, 10);
+  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_TEN);
 
   CommandPacket.Timeout         = Timeout;
   CommandPacket.InDataBuffer    = DataBuffer;
@@ -474,7 +509,7 @@ ScsiReadCapacityCommand (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]  = EFI_SCSI_OP_READ_CAPACITY;
-  Cdb[1]  = (UINT8) (Lun & 0xe0);
+  Cdb[1]  = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   if (!PMI) {
     //
     // Partial medium indicator,if PMI is FALSE, the Cdb.2 ~ Cdb.5 MUST BE ZERO.
@@ -484,7 +519,7 @@ ScsiReadCapacityCommand (
     Cdb[8] |= 0x01;
   }
 
-  CommandPacket.CdbLength       = 10;
+  CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_TEN;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_IN;
   CommandPacket.SenseDataLength = *SenseDataLength;
 
@@ -501,6 +536,10 @@ ScsiReadCapacityCommand (
 
 /**
   Function to submit read 10 command.
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
@@ -552,7 +591,7 @@ ScsiRead10Command (
   UINT8                           *Target;
   UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
-  UINT8                           Cdb[10];
+  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
   ASSERT (SenseDataLength != NULL);
   ASSERT (HostAdapterStatus != NULL);
@@ -564,7 +603,7 @@ ScsiRead10Command (
   }
 
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, 10);
+  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_TEN);
 
   CommandPacket.Timeout         = Timeout;
   CommandPacket.InDataBuffer    = DataBuffer;
@@ -578,7 +617,7 @@ ScsiRead10Command (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_READ10;
-  Cdb[1]                        = (UINT8) (Lun & 0xe0);
+  Cdb[1]                        = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[2]                        = (UINT8) (StartLba >> 24);
   Cdb[3]                        = (UINT8) (StartLba >> 16);
   Cdb[4]                        = (UINT8) (StartLba >> 8);
@@ -586,7 +625,7 @@ ScsiRead10Command (
   Cdb[7]                        = (UINT8) (SectorSize >> 8);
   Cdb[8]                        = (UINT8) (SectorSize & 0xff);
 
-  CommandPacket.CdbLength       = 10;
+  CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_TEN;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_IN;
   CommandPacket.SenseDataLength = *SenseDataLength;
 
@@ -603,6 +642,10 @@ ScsiRead10Command (
 
 /**
   Function to submit SCSI write 10 command.
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
 
   @param[in]     ScsiIo             SCSI IO Protocol to use
   @param[in]     Timeout            The length of timeout period.
@@ -654,7 +697,7 @@ ScsiWrite10Command (
   UINT8                           *Target;
   UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
-  UINT8                           Cdb[10];
+  UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
   ASSERT (SenseDataLength != NULL);
   ASSERT (HostAdapterStatus != NULL);
@@ -666,7 +709,7 @@ ScsiWrite10Command (
   }
 
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, 10);
+  ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_TEN);
 
   CommandPacket.Timeout         = Timeout;
   CommandPacket.OutDataBuffer    = DataBuffer;
@@ -680,7 +723,7 @@ ScsiWrite10Command (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_WRITE10;
-  Cdb[1]                        = (UINT8) (Lun & 0xe0);
+  Cdb[1]                        = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[2]                        = (UINT8) (StartLba >> 24);
   Cdb[3]                        = (UINT8) (StartLba >> 16);
   Cdb[4]                        = (UINT8) (StartLba >> 8);
@@ -688,7 +731,7 @@ ScsiWrite10Command (
   Cdb[7]                        = (UINT8) (SectorSize >> 8);
   Cdb[8]                        = (UINT8) SectorSize;
 
-  CommandPacket.CdbLength       = 10;
+  CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_TEN;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_OUT;
   CommandPacket.SenseDataLength = *SenseDataLength;
 
