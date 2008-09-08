@@ -131,8 +131,6 @@ typedef union {
 #define EFI_WARN_BUFFER_TOO_SMALL RETURN_WARN_BUFFER_TOO_SMALL
 
 
-#define NULL_HANDLE               ((VOID *) 0)
-
 //
 // Define macro to encode the status code.
 // 
