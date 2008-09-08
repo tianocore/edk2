@@ -28,7 +28,7 @@
 
   This function fills Length bytes of Buffer with zeros, and returns Buffer.
   If Length > 0 and Buffer is NULL, then ASSERT().
-  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT().
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   @param  Buffer      Pointer to the target buffer to fill with zeros.
   @param  Length      Number of bytes in Buffer to fill with zeros.
