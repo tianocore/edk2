@@ -112,7 +112,7 @@ DebugAssert (
   CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
 
   //
-  // Generate the ASSERT() message in Unicode format
+  // Generate the ASSERT() message in Ascii format
   //
   AsciiSPrint (Buffer, sizeof (Buffer), "ASSERT %a(%d): %a\n", FileName, LineNumber, Description);
 
