@@ -45,7 +45,7 @@ IHANDLE *
                                  protocol.
 
   @return An pointer to IHANDLE if the next Position is not the end of the list.
-          Otherwise,NULL_HANDLE is returned.
+          Otherwise,NULL is returned.
 
 **/
 IHANDLE *
@@ -63,7 +63,7 @@ CoreGetNextLocateAllHandles (
                                  protocol.
 
   @return An pointer to IHANDLE if the next Position is not the end of the list.
-          Otherwise,NULL_HANDLE is returned.
+          Otherwise,NULL is returned.
 
 **/
 IHANDLE *
@@ -80,7 +80,7 @@ CoreGetNextLocateByRegisterNotify (
                                  protocol.
 
   @return An pointer to IHANDLE if the next Position is not the end of the list.
-          Otherwise,NULL_HANDLE is returned.
+          Otherwise,NULL is returned.
 
 **/
 IHANDLE *
@@ -264,7 +264,7 @@ CoreLocateHandle (
                                  protocol.
 
   @return An pointer to IHANDLE if the next Position is not the end of the list.
-          Otherwise,NULL_HANDLE is returned.
+          Otherwise,NULL is returned.
 
 **/
 IHANDLE *
@@ -283,7 +283,7 @@ CoreGetNextLocateAllHandles (
   //
   // If not at the end of the list, get the handle
   //
-  Handle      = NULL_HANDLE;
+  Handle      = NULL;
   *Interface  = NULL;
   if (Position->Position != &gHandleList) {
     Handle = CR (Position->Position, IHANDLE, AllHandles, EFI_HANDLE_SIGNATURE);
@@ -303,7 +303,7 @@ CoreGetNextLocateAllHandles (
                                  protocol.
 
   @return An pointer to IHANDLE if the next Position is not the end of the list.
-          Otherwise,NULL_HANDLE is returned.
+          Otherwise,NULL is returned.
 
 **/
 IHANDLE *
@@ -317,7 +317,7 @@ CoreGetNextLocateByRegisterNotify (
   PROTOCOL_INTERFACE  *Prot;
   LIST_ENTRY          *Link;
 
-  Handle      = NULL_HANDLE;
+  Handle      = NULL;
   *Interface  = NULL;
   ProtNotify = Position->SearchKey;
 
@@ -351,7 +351,7 @@ CoreGetNextLocateByRegisterNotify (
                                  protocol.
 
   @return An pointer to IHANDLE if the next Position is not the end of the list.
-          Otherwise,NULL_HANDLE is returned.
+          Otherwise,NULL is returned.
 
 **/
 IHANDLE *
@@ -364,7 +364,7 @@ CoreGetNextLocateByProtocol (
   LIST_ENTRY          *Link;
   PROTOCOL_INTERFACE  *Prot;
 
-  Handle      = NULL_HANDLE;
+  Handle      = NULL;
   *Interface  = NULL;
   for (; ;) {
     //
@@ -377,7 +377,7 @@ CoreGetNextLocateByProtocol (
     // If not at the end, return the handle
     //
     if (Link == &Position->ProtEntry->Protocols) {
-      Handle = NULL_HANDLE;
+      Handle = NULL;
       break;
     }
 
@@ -448,7 +448,7 @@ CoreLocateDevicePath (
     return  EFI_INVALID_PARAMETER;
   }
 
-  *Device = NULL_HANDLE;
+  *Device = NULL;
   SourcePath = *DevicePath;
   SourceSize = GetDevicePathSize (SourcePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
 
