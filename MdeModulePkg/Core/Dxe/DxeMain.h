@@ -90,12 +90,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Exec.h"
 #include "Hand.h"
 
-
-//
-// Modifier for EFI DXE Services
-//
-#define EFI_DXESERVICE
-
 //
 // attributes for reserved memory before it is promoted to system memory
 //
