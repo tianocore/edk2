@@ -16,7 +16,6 @@
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
-#include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
 
@@ -35,8 +34,6 @@ CONST UINT8                           mTimerLibLocalApicDivisor[] = {
 /**
   Internal function to retrieve the base address of local APIC.
 
-  Internal function to retrieve the base address of local APIC.
-
   @return The base address of local APIC
 
 **/
@@ -50,8 +47,6 @@ InternalX86GetApicBase (
 }
 
 /**
-  Internal function to return the frequency of the local APIC timer.
-
   Internal function to return the frequency of the local APIC timer.
 
   @param  ApicBase  The base address of memory mapped registers of local APIC.
@@ -71,8 +66,6 @@ InternalX86GetTimerFrequency (
 }
 
 /**
-  Internal function to read the current tick counter of local APIC.
-
   Internal function to read the current tick counter of local APIC.
 
   @param  ApicBase  The base address of memory mapped registers of local APIC.
