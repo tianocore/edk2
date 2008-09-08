@@ -44,7 +44,7 @@ PiLibInstallFvInfoPpi (
   IN CONST VOID                    *FvInfo,
   IN       UINT32                  FvInfoSize,
   IN CONST EFI_GUID                *ParentFvName, OPTIONAL
-  IN CONST EFI_GUID                *PraentFileName OPTIONAL
+  IN CONST EFI_GUID                *ParentFileName OPTIONAL
 );
 
 #endif
