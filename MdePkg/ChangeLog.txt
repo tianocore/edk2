@@ -142,4 +142,4 @@ EDK_4067:  Non-Compatible: qwang12
           
 
 EDK_5835:  Non-Compatible: qwang12
-  Class General Definitions: Remove NULL_HANDLE. All modules that referenced NULL_HANDLE should be updated to use NULL. 
+  Class General Definitions: NULL_HANDLE definition is removed from UefiBaseType.h. If any modules referencs NULL_HANDLE, they should be updated to use NULL. 
