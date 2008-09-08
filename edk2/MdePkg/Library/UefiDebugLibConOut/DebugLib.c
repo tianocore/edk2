@@ -54,7 +54,6 @@ DebugPrint (
   )
 {
   CHAR16   Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-  CHAR8    AsciiBuffer[MAX_DEBUG_MESSAGE_LENGTH];
   VA_LIST  Marker;
 
   //
@@ -73,8 +72,7 @@ DebugPrint (
   // Convert the DEBUG() message to a Unicode String
   //
   VA_START (Marker, Format);
-  AsciiVSPrint (AsciiBuffer, sizeof (AsciiBuffer), Format, Marker);
-  AsciiStrToUnicodeStr (AsciiBuffer, Buffer);
+  UnicodeVSPrintAsciiFormat (Buffer, MAX_DEBUG_MESSAGE_LENGTH,  Format, Marker);
   VA_END (Marker);
 
 
@@ -119,14 +117,19 @@ DebugAssert (
   )
 {
   CHAR16  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-  CHAR8   AsciiBuffer[MAX_DEBUG_MESSAGE_LENGTH];
 
   //
   // Generate the ASSERT() message in Unicode format
   //
-  AsciiSPrint (AsciiBuffer, sizeof (AsciiBuffer), "ASSERT %a(%d): %a\n", FileName, LineNumber, Description);
-  AsciiStrToUnicodeStr (AsciiBuffer, Buffer);
-
+  UnicodeSPrintAsciiFormat (
+    Buffer, 
+    MAX_DEBUG_MESSAGE_LENGTH, 
+    "ASSERT %a(%d): %a\n", 
+    FileName, 
+    LineNumber, 
+    Description
+    );
+    
   //
   // Send the print string to the Console Output device
   //
