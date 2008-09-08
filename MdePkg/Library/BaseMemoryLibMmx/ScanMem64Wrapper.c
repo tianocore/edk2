@@ -36,7 +36,7 @@
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
   If Length is not aligned on a 64-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
   @param  Buffer      Pointer to the target buffer to scan.
   @param  Length      Number of bytes in Buffer to scan.

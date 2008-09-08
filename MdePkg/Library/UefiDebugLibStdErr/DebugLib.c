@@ -152,7 +152,7 @@ DebugAssert (
 
   If Buffer is NULL, then ASSERT().
 
-  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
   @param   Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
   @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
