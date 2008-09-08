@@ -1,7 +1,7 @@
 /** @file
   MDE PI library functions and macros for PEI phase
 
-  Copyright (c) 2007, Intel Corporation                                                         
+  Copyright (c) 2007 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -23,13 +23,12 @@
 #include <Library/PeiPiLib.h>
 #include <Library/BaseMemoryLib.h>
 
-
-CONST EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
-  EFI_FIRMWARE_FILE_SYSTEM2_GUID,
-  NULL,
-  0,    //FvInfoSize
-  NULL, //ParentFvName
-  NULL //ParentFileName;
+CONST EFI_PEI_PPI_DESCRIPTOR     mPpiListTemplate [] = {
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiPeiFirmwareVolumeInfoPpiGuid,
+    NULL
+  }
 };
 
 /**
@@ -57,35 +56,34 @@ CONST EFI_PEI_FIRMWARE_VOLUME_INFO_PPI mFvInfoPpiTemplate = {
 VOID
 EFIAPI
 PiLibInstallFvInfoPpi (
-  IN EFI_GUID                *FvFormat, OPTIONAL
-  IN VOID                    *FvInfo,
-  IN UINT32                  FvInfoSize,
-  IN EFI_GUID                *ParentFvName, OPTIONAL
-  IN EFI_GUID                *ParentFileName OPTIONAL
+  IN CONST EFI_GUID                *FvFormat, OPTIONAL
+  IN CONST VOID                    *FvInfo,
+  IN       UINT32                  FvInfoSize,
+  IN CONST EFI_GUID                *ParentFvName, OPTIONAL
+  IN CONST EFI_GUID                *ParentFileName OPTIONAL
   )
 {
-  
   EFI_STATUS                       Status;   
   EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *FvInfoPpi;
   EFI_PEI_PPI_DESCRIPTOR           *FvInfoPpiDescriptor;
 
-  FvInfoPpi = AllocateCopyPool (sizeof (*FvInfoPpi), &mFvInfoPpiTemplate);
+  FvInfoPpi = AllocateZeroPool (sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI));
   ASSERT( FvInfoPpi != NULL);
 
   if (FvFormat != NULL) {
-    CopyMem (&FvInfoPpi->FvFormat, FvFormat, sizeof (*FvFormat));
+    CopyGuid (&FvInfoPpi->FvFormat, FvFormat);
+  } else {
+    CopyGuid (&FvInfoPpi->FvFormat, &gEfiFirmwareFileSystem2Guid);
   }
-  FvInfoPpi->FvInfo = (VOID *) (UINTN) FvInfo;
-  FvInfoPpi->FvInfoSize = (UINT32) FvInfoSize;
-  FvInfoPpi->ParentFvName = ParentFvName;
-  FvInfoPpi->ParentFileName = ParentFileName;
+  FvInfoPpi->FvInfo = (VOID *) FvInfo;
+  FvInfoPpi->FvInfoSize = FvInfoSize;
+  FvInfoPpi->ParentFvName = (EFI_GUID *) ParentFvName;
+  FvInfoPpi->ParentFileName = (EFI_GUID *) ParentFileName;
 
 
-  FvInfoPpiDescriptor = AllocatePool (sizeof(EFI_PEI_PPI_DESCRIPTOR));
+  FvInfoPpiDescriptor = AllocateCopyPool (sizeof(EFI_PEI_PPI_DESCRIPTOR), mPpiListTemplate);
   ASSERT (FvInfoPpiDescriptor != NULL);
 
-  FvInfoPpiDescriptor->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-  FvInfoPpiDescriptor->Guid  = &gEfiPeiFirmwareVolumeInfoPpiGuid;
   FvInfoPpiDescriptor->Ppi   = (VOID *) FvInfoPpi;
   Status = PeiServicesInstallPpi (FvInfoPpiDescriptor);
   ASSERT_EFI_ERROR (Status);
