@@ -170,6 +170,7 @@ typedef enum {
   USB_DESC_TYPE_INTERFACE = 0x04,
   USB_DESC_TYPE_ENDPOINT  = 0x05,
   USB_DESC_TYPE_HID       = 0x21,
+  USB_DESC_TYPE_REPORT    = 0x22,
 
   //
   // Features to be cleared by CLEAR_FEATURE requests
@@ -197,6 +198,17 @@ typedef enum {
 //
 // HID constants definition, see HID rev1.0
 //
+
+//
+// HID standard GET_DESCRIPTOR request.
+//
+#define USB_HID_GET_DESCRIPTOR_REQ_TYPE  0x81
+
+//
+// HID specific requests.
+//
+#define USB_HID_CLASS_GET_REQ_TYPE       0xa1
+#define USB_HID_CLASS_SET_REQ_TYPE       0x21
 
 //
 // HID report item format

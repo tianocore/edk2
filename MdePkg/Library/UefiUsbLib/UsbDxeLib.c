@@ -1,7 +1,7 @@
 /** @file
 
-  The library provides the USB descritor, interface and protocol
-  operations.
+  The library provides the USB Standard Device Requests defined 
+  in Usb specification 9.4 section.
   
   Copyright (c) 2004 - 2007, Intel Corporation All rights
   reserved. This program and the accompanying materials are
@@ -12,7 +12,6 @@
   
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-  
 
 **/
 
