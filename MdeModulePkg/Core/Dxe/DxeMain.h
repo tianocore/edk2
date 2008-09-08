@@ -106,7 +106,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependecy expression
 ///                        to save time.  A EFI_DEP_PUSH is evauated one an
-///                        replaced with EFI_DEP_REPLACE_TRUE
+///                        replaced with EFI_DEP_REPLACE_TRUE. If PI spec's Vol 2
+///                        Driver Execution Environment Core Interface use 0xff
+///                        as new DEPEX opcode. EFI_DEP_REPLACE_TRUE should be
+///                        defined to a new value that is not conflicting with PI spec.
 ///
 #define EFI_DEP_REPLACE_TRUE  0xff
 
