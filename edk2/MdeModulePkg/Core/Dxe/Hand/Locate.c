@@ -334,7 +334,7 @@ CoreGetNextLocateByRegisterNotify (
     Link = ProtNotify->Position->ForwardLink;
     if (Link != &ProtNotify->Protocol->Protocols) {
       Prot = CR (Link, PROTOCOL_INTERFACE, ByProtocol, PROTOCOL_INTERFACE_SIGNATURE);
-      Handle = (IHANDLE *) Prot->Handle;
+      Handle = Prot->Handle;
       *Interface = Prot->Interface;
     }
   }
@@ -385,7 +385,7 @@ CoreGetNextLocateByProtocol (
     // Get the handle
     //
     Prot = CR(Link, PROTOCOL_INTERFACE, ByProtocol, PROTOCOL_INTERFACE_SIGNATURE);
-    Handle = (IHANDLE *) Prot->Handle;
+    Handle = Prot->Handle;
     *Interface = Prot->Interface;
 
     //
