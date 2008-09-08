@@ -975,7 +975,7 @@ CoreStartImage (
   UINTN                         SetJumpFlag;
 
   Image = CoreLoadedImageInfo (ImageHandle);
-  if (Image == NULL_HANDLE  ||  Image->Started) {
+  if (Image == NULL  ||  Image->Started) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1143,7 +1143,7 @@ CoreUnloadAndCloseImage (
   //
   // Free our references to the image handle
   //
-  if (Image->Handle != NULL_HANDLE) {
+  if (Image->Handle != NULL) {
 
     Status = CoreLocateHandleBuffer (
                AllHandles,
@@ -1289,7 +1289,7 @@ CoreExit (
   OldTpl = CoreRaiseTpl (TPL_NOTIFY);
 
   Image = CoreLoadedImageInfo (ImageHandle);
-  if (Image == NULL_HANDLE) {
+  if (Image == NULL) {
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }

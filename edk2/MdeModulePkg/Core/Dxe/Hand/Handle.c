@@ -370,7 +370,7 @@ CoreInstallProtocolInterfaceNotify (
   Prot = NULL;
   Handle = NULL;
 
-  if (*UserHandle != NULL_HANDLE) {
+  if (*UserHandle != NULL) {
     Status = CoreHandleProtocol (*UserHandle, Protocol, (VOID **)&ExistingInterface);
     if (!EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
@@ -564,7 +564,7 @@ CoreInstallMultipleProtocolInterfaces (
       DeviceHandle = NULL;
       DevicePath   = Interface;
       Status = CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &DevicePath, &DeviceHandle);
-      if (!EFI_ERROR (Status) && (DeviceHandle != NULL_HANDLE) && IsDevicePathEnd(DevicePath)) {
+      if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd(DevicePath)) {
         Status = EFI_ALREADY_STARTED;
         continue;
       }
@@ -1219,7 +1219,7 @@ CoreCloseProtocol (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  if (ControllerHandle != NULL_HANDLE) {
+  if (ControllerHandle != NULL) {
     Status = CoreValidateHandle (ControllerHandle);
     if (EFI_ERROR (Status)) {
       return Status;
