@@ -141,3 +141,5 @@ EDK_4067:  Non-Compatible: qwang12
               ...
           
 
+EDK_5835:  Non-Compatible: qwang12
+  Class General Definitions: Remove NULL_HANDLE. All modules that referenced NULL_HANDLE should be updated to use NULL. 
