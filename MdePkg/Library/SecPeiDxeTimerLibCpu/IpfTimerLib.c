@@ -15,9 +15,6 @@
 #include <Base.h>
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
-#include <Library/IoLib.h>
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
 #include <Library/PalCallLib.h>
 
 
