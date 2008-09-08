@@ -55,7 +55,7 @@ typedef struct {
 #define PROTOCOL_INTERFACE_SIGNATURE  EFI_SIGNATURE_32('p','i','f','c')
 typedef struct {
   UINTN                       Signature;
-  EFI_HANDLE                  Handle;     // Back pointer
+  IHANDLE                     *Handle;    // Back pointer
   LIST_ENTRY                  Link;       // Link on IHANDLE.Protocols
   LIST_ENTRY                  ByProtocol; // Link on PROTOCOL_ENTRY.Protocols
   PROTOCOL_ENTRY              *Protocol;  // The protocol ID
