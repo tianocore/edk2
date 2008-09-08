@@ -59,7 +59,6 @@
   IoLib
 
 [LibraryClasses.IPF]
-  DebugLib
   PalCallLib
 
 
