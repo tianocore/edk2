@@ -156,7 +156,7 @@ typedef struct {
 typedef EFI_COMMON_SECTION_HEADER EFI_DXE_DEPEX_SECTION;
 
 ///
-/// Leaf section witch contains a PI FV.
+/// Leaf section which contains a PI FV.
 /// 
 typedef EFI_COMMON_SECTION_HEADER EFI_FIRMWARE_VOLUME_IMAGE_SECTION;
 
@@ -220,7 +220,7 @@ typedef struct {
 
 ///
 /// Leaf section which contains a numeric build number and
-/// an optional unicode string that represent the file revision. 
+/// an optional unicode string that represents the file revision. 
 /// 
 typedef struct {
   EFI_COMMON_SECTION_HEADER   CommonHeader;
