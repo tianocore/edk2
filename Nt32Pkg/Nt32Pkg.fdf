@@ -24,7 +24,7 @@
 # existing system flash.
 #
 ################################################################################
-[FD.Fv_Recovery]
+[FD.Nt32]
 BaseAddress   = 0x0|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress  #The base address of the FLASH Device.
 Size          = 0x002a0000                                           #The size in bytes of the FLASH Device
 ErasePolarity = 1
@@ -231,19 +231,13 @@ FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
       }
     }
   }
+
 FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
-    SECTION COMPRESS PI_STD {
-      SECTION GUIDED {
-        SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
-      }
-    }
+    SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
   }
+
 FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
-    SECTION COMPRESS PI_STD {
-      SECTION GUIDED {
-        SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-      }
-    }
+    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
   }
 
 
