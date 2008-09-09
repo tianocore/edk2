@@ -521,7 +521,7 @@ MmioRead64 (
   //
   // Make sure Address is aligned on a 64-bit boundary.
   //
-  ASSERT ((Address & 7) == (sizeof (UINT64) - 1));
+  ASSERT ((Address & (sizeof (UINT64) - 1)) == 0);
   return CpuIo->MemRead64 (PeiServices, CpuIo, (UINT64) Address);
 
 }
