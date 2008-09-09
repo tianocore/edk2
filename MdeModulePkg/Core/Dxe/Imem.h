@@ -151,6 +151,5 @@ CoreReleaseMemoryLock (
 
 extern EFI_LOCK           gMemoryLock;
 extern LIST_ENTRY         gMemoryMap;
-extern MEMORY_MAP         *gMemoryLastConvert;
 extern LIST_ENTRY         mGcdMemorySpaceMap;
 #endif
