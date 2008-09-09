@@ -24,8 +24,3 @@ EFI_LOCK          gMemoryLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 // MemoryMap - the current memory map
 //
 LIST_ENTRY        gMemoryMap  = INITIALIZE_LIST_HEAD_VARIABLE (gMemoryMap);
-
-//
-// MemoryLastConvert - the last memory descriptor used for a conversion request
-//
-MEMORY_MAP        *gMemoryLastConvert;
