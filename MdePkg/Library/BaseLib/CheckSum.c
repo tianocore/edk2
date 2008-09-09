@@ -31,8 +31,8 @@
   If Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
-  @param  Buffer			Pointer to the buffer to carry out the sum operation.
-  @param  Length	    The size, in bytes, of Buffer .
+  @param  Buffer      Pointer to the buffer to carry out the sum operation.
+  @param  Length      The size, in bytes, of Buffer .
 
   @return Sum         The sum of Buffer with carry bits dropped during additions.
 
@@ -70,9 +70,8 @@ CalculateSum8 (
   If Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-
-  @param  Buffer			Pointer to the buffer to carry out the checksum operation.
-  @param  Length	    The size, in bytes, of Buffer.
+  @param  Buffer      Pointer to the buffer to carry out the checksum operation.
+  @param  Length      The size, in bytes, of Buffer.
 
   @return Checksum	  The 2's complement checksum of Buffer.
 
@@ -107,8 +106,8 @@ CalculateCheckSum8 (
   If Length is not aligned on a 16-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer			Pointer to the buffer to carry out the sum operation.
-  @param  Length	    The size, in bytes, of Buffer.
+  @param  Buffer      Pointer to the buffer to carry out the sum operation.
+  @param  Length      The size, in bytes, of Buffer.
 
   @return Sum         The sum of Buffer with carry bits dropped during additions.
 
@@ -152,8 +151,8 @@ CalculateSum16 (
   If Length is not aligned on a 16-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
-  @param  Buffer			Pointer to the buffer to carry out the checksum operation.
-  @param  Length	    The size, in bytes, of Buffer.
+  @param  Buffer      Pointer to the buffer to carry out the checksum operation.
+  @param  Length      The size, in bytes, of Buffer.
 
   @return Checksum	  The 2's complement checksum of Buffer.
 
@@ -189,8 +188,8 @@ CalculateCheckSum16 (
   If Length is not aligned on a 32-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer			Pointer to the buffer to carry out the sum operation.
-  @param  Length	    The size, in bytes, of Buffer.
+  @param  Buffer      Pointer to the buffer to carry out the sum operation.
+  @param  Length      The size, in bytes, of Buffer.
 
   @return Sum         The sum of Buffer with carry bits dropped during additions.
 
@@ -234,8 +233,8 @@ CalculateSum32 (
   If Length is not aligned on a 32-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
-  @param  Buffer			Pointer to the buffer to carry out the checksum operation.
-  @param  Length	    The size, in bytes, of Buffer.
+  @param  Buffer      Pointer to the buffer to carry out the checksum operation.
+  @param  Length      The size, in bytes, of Buffer.
 
   @return Checksum	  The 2's complement checksum of Buffer.
 
@@ -271,8 +270,8 @@ CalculateCheckSum32 (
   If Length is not aligned on a 64-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer			Pointer to the buffer to carry out the sum operation.
-  @param  Length	    The size, in bytes, of Buffer.
+  @param  Buffer      Pointer to the buffer to carry out the sum operation.
+  @param  Length      The size, in bytes, of Buffer.
 
   @return Sum         The sum of Buffer with carry bits dropped during additions.
 
@@ -316,8 +315,8 @@ CalculateSum64 (
   If Length is not aligned on a 64-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
-  @param  Buffer			Pointer to the buffer to carry out the checksum operation.
-  @param  Length	    The size, in bytes, of Buffer.
+  @param  Buffer      Pointer to the buffer to carry out the checksum operation.
+  @param  Length      The size, in bytes, of Buffer.
 
   @return Checksum	  The 2's complement checksum of Buffer.
 

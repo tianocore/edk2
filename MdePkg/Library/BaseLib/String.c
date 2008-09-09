@@ -229,8 +229,8 @@ StrSize (
   @param  FirstString   Pointer to a Null-terminated Unicode string.
   @param  SecondString  Pointer to a Null-terminated Unicode string.
 
-  @retval 0   FirstString is identical to SecondString.
-  @retval !=0 FirstString is not identical to SecondString.
+  @retval 0      FirstString is identical to SecondString.
+  @return others FirstString is not identical to SecondString.
 
 **/
 INTN
@@ -279,8 +279,8 @@ StrCmp (
   @param  SecondString  Pointer to a Null-terminated Unicode string.
   @param  Length        Maximum number of Unicode characters to compare.
 
-  @retval 0   FirstString is identical to SecondString.
-  @retval !=0 FirstString is not identical to SecondString.
+  @retval 0      FirstString is identical to SecondString.
+  @return others FirstString is not identical to SecondString.
 
 **/
 INTN
@@ -438,7 +438,7 @@ StrnCat (
   @param  SearchString  Pointer to a Null-terminated Unicode string to search for.
 
   @retval NULL            If the SearchString does not appear in String.
-  @retval !NULL           If there is a match.
+  @return others          If there is a match.
 
 **/
 CHAR16 *
@@ -1265,8 +1265,8 @@ AsciiStrSize (
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
 
-  @retval 0   FirstString is identical to SecondString.
-  @retval !=0 FirstString is not identical to SecondString.
+  @retval 0      FirstString is identical to SecondString.
+  @return others FirstString is not identical to SecondString.
 
 **/
 INTN
@@ -1362,10 +1362,10 @@ InternalAsciiHexCharToUintn (
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
 
-  @retval 0   FirstString is identical to SecondString using case insensitive
-              comparisons.
-  @retval !=0 FirstString is not identical to SecondString using case
-              insensitive comparisons.
+  @retval 0      FirstString is identical to SecondString using case insensitive
+                 comparisons.
+  @return others FirstString is not identical to SecondString using case
+                 insensitive comparisons.
 
 **/
 INTN
@@ -1420,8 +1420,8 @@ AsciiStriCmp (
   @param  SecondString  Pointer to a Null-terminated ASCII string.
   @param  Length        Maximum number of ASCII characters to compare.
                         
-  @retval 0   FirstString is identical to SecondString.
-  @retval !=0 FirstString is not identical to SecondString.
+  @retval 0      FirstString is identical to SecondString.
+  @return others FirstString is not identical to SecondString.
 
 **/
 INTN
@@ -1568,7 +1568,7 @@ AsciiStrnCat (
   @param  SearchString    Pointer to a Null-terminated ASCII string to search for.
 
   @retval NULL            If the SearchString does not appear in String.
-  @retval !NULL           If there is a match.
+  @return others          If there is a match.
 
 **/
 CHAR8 *
@@ -2103,7 +2103,7 @@ NibbleToHexChar (
 /** 
   Convert binary buffer to a Unicode String in a specified sequence. 
 
-  This function converts bytes in the binary Buffer Buf to a Unicode String Str. 
+  This function converts bytes in the memory block pointed by Buffer to a Unicode String Str. 
   Each byte will be represented by two Unicode characters. For example, byte 0xA1 will 
   be converted into two Unicode character L'A' and L'1'. In the output String, the Unicode Character 
   for the Most Significant Nibble will be put before the Unicode Character for the Least Significant
@@ -2278,6 +2278,10 @@ HexStringToBuf (
   L'A' will be converted to 0x0A. 
 
   If Digit is NULL, then ASSERT.
+  
+  @param  Digit       The output hexadecimal digit.
+
+  @param  Char        The input Unicode character.
 
   @retval TRUE        Char is in the range of Hexadecimal number. Digit is updated
                       to the byte value of the number.
