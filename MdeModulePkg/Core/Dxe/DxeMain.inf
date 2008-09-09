@@ -32,7 +32,7 @@
   Library.h
   Imem.h
   Image.h
-  Hand.h
+  Handle.h
   Gcd.h
   FwVolDriver.h
   FwVolBlock.h
