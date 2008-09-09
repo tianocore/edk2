@@ -88,7 +88,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Imem.h"
 #include "Image.h"
 #include "Exec.h"
-#include "Hand.h"
+#include "Handle.h"
 
 //
 // attributes for reserved memory before it is promoted to system memory
