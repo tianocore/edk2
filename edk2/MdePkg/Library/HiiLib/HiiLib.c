@@ -149,8 +149,7 @@ InternalHiiLibPreparePackages (
   @param  GuidId                 Package GUID.
   @param  ...                    Variable argument list for packages to be assembled.
 
-  @return EFI_HII_PACKAGE_LIST_HEADER Pointer of EFI_HII_PACKAGE_LIST_HEADER. The function will ASSERT if system has
-                                      not enough resource to complete the operation.
+  @return Pointer of EFI_HII_PACKAGE_LIST_HEADER.
 
 **/
 EFI_HII_PACKAGE_LIST_HEADER *
