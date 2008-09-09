@@ -1,5 +1,6 @@
 /** @file
-  UEFI Device Path Library.
+  Library instance that implement UEFI Device Path Library class based on protocol
+  gEfiDevicePathUtilitiesProtocolGuid.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -24,8 +25,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-
-#include "UefiDevicePathLibInternal.h"
 
 STATIC EFI_DEVICE_PATH_UTILITIES_PROTOCOL          *mDevicePathUtilities = NULL;
 
@@ -245,7 +244,7 @@ GetNextDevicePathInstance (
   @param  NodeSubType                The device node sub-type for the new device node.
   @param  NodeLength                 The length of the new device node.
 
-  @return The new device path.
+  @return A pointer to the new created file device path 
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -325,7 +324,7 @@ DevicePathFromHandle (
                                      may be NULL.
   @param  FileName                   A pointer to a Null-terminated Unicode string.
 
-  @return The allocated device path.
+  @return A pointer to the new created file device path 
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *

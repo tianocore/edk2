@@ -1,7 +1,7 @@
 #/** @file
-# Component description file for the entry point to a EFIDXE Drivers
+# Library instance implement the library class UefiDevicePathLib defined in Mde
+# library specification.
 #
-# Library to abstract Framework extensions that conflict with UEFI 2.0 Specification
 # Copyright (c) 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
