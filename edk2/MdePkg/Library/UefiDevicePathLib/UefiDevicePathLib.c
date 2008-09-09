@@ -77,7 +77,7 @@ GetDevicePathSize (
   //
   // Compute the size and add back in the size of the end device path structure
   //
-  return ((UINTN) DevicePath - (UINTN) Start) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  return ((UINTN) DevicePath - (UINTN) Start) + EfiDevicePathNodeLength (DevicePath);
 }
 
 /**
@@ -99,7 +99,6 @@ DuplicateDevicePath (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
   UINTN                     Size;
 
   //
@@ -113,9 +112,8 @@ DuplicateDevicePath (
   //
   // Allocate space for duplicate device path
   //
-  NewDevicePath = AllocateCopyPool (Size, DevicePath);
 
-  return NewDevicePath;
+  return AllocateCopyPool (Size, DevicePath);
 }
 
 /**
@@ -168,7 +166,7 @@ AppendDevicePath (
   //
   Size1         = GetDevicePathSize (FirstDevicePath);
   Size2         = GetDevicePathSize (SecondDevicePath);
-  Size          = Size1 + Size2 - sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  Size          = Size1 + Size2 - EFI_END_DEVICE_PATH_LENGTH;
 
   NewDevicePath = AllocatePool (Size);
 
@@ -178,7 +176,7 @@ AppendDevicePath (
     // Over write FirstDevicePath EndNode and do the copy
     //
     DevicePath2 = (EFI_DEVICE_PATH_PROTOCOL *) ((CHAR8 *) NewDevicePath +
-                  (Size1 - sizeof (EFI_DEVICE_PATH_PROTOCOL)));
+                  (Size1 - EFI_END_DEVICE_PATH_LENGTH));
     CopyMem (DevicePath2, SecondDevicePath, Size2);
   }
 
@@ -226,7 +224,7 @@ AppendDevicePathNode (
   //
   NodeLength = DevicePathNodeLength (DevicePathNode);
 
-  TempDevicePath = AllocatePool (NodeLength + sizeof (EFI_DEVICE_PATH_PROTOCOL));
+  TempDevicePath = AllocatePool (NodeLength + EFI_END_DEVICE_PATH_LENGTH);
   if (TempDevicePath == NULL) {
     return NULL;
   }
@@ -398,7 +396,7 @@ GetNextDevicePathInstance (
   @param  NodeSubType                The device node sub-type for the new device node.
   @param  NodeLength                 The length of the new device node.
 
-  @return The new device path.
+  @return A pointer to the new create device path.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -510,7 +508,7 @@ DevicePathFromHandle (
                                      may be NULL.
   @param  FileName                   A pointer to a Null-terminated Unicode string.
 
-  @return The allocated device path.
+  @return A pointer to the new created file device path.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
