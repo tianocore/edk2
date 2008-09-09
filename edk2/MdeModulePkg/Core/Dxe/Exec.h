@@ -20,9 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // EFI_EVENT
 //
-
-
-
 #define EVENT_SIGNATURE         EFI_SIGNATURE_32('e','v','n','t')
 typedef struct {
   UINTN                   Signature;
@@ -101,35 +98,9 @@ CoreHighestSetBit (
   );
 
 
-
-/**
-  Disables CPU interrupts.
-
-  @retval EFI_SUCCESS            If interrupts were disabled in the CPU.
-  @retval EFI_INVALID_PARAMETER  State is NULL.
-
-**/
-BOOLEAN
-GetInterruptState (
-  VOID
-  );
-
 //
 // Exported functions
 //
-
-
-/**
-  A function out of date, should be removed.
-
-**/
-VOID
-CoreEventVirtualAddressFixup (
-  VOID
-  );
-
-
-
 /**
   Initializes timer support.
 
