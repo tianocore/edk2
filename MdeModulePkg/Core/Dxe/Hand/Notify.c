@@ -1,5 +1,5 @@
 /** @file
-  UEFI notify infrastructure
+  Support functions for UEFI protocol notification infrastructure.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -213,8 +213,8 @@ CoreReinstallProtocolInterface (
   //
   Prot = CoreFindProtocolInterface (UserHandle, Protocol, OldInterface);
   if (Prot == NULL) {
-    CoreReleaseProtocolLock ();
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
 
   //
@@ -228,8 +228,7 @@ CoreReinstallProtocolInterface (
     //
     // One or more drivers refused to release, so return the error
     //
-    CoreReleaseProtocolLock ();
-    return Status;
+    goto Done;
   }
 
   //
@@ -238,8 +237,8 @@ CoreReinstallProtocolInterface (
   Prot = CoreRemoveInterfaceFromProtocol (Handle, Protocol, OldInterface);
 
   if (Prot == NULL) {
-    CoreReleaseProtocolLock ();
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
 
   ProtEntry = Prot->Protocol;
@@ -265,12 +264,15 @@ CoreReinstallProtocolInterface (
   // Release the lock and connect all drivers to UserHandle
   //
   CoreReleaseProtocolLock ();
-  Status = CoreConnectController (
-             UserHandle,
-             NULL,
-             NULL,
-             TRUE
-             );
+  //
+  // Return code is ignored on purpose.
+  //
+  CoreConnectController (
+    UserHandle,
+    NULL,
+    NULL,
+    TRUE
+    );
   CoreAcquireProtocolLock ();
 
   //
@@ -280,5 +282,8 @@ CoreReinstallProtocolInterface (
 
   CoreReleaseProtocolLock ();
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Done:
+  return Status;
 }
