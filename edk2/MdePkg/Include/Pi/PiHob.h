@@ -84,9 +84,11 @@ typedef struct {
   /// 
   EFI_GUID              Name;
 
+  ///
   /// The base address of memory allocated by this HOB. Type
   /// EFI_PHYSICAL_ADDRESS is defined in AllocatePages() in the UEFI 2.0
   /// specification.
+  ///
   EFI_PHYSICAL_ADDRESS  MemoryBaseAddress;
 
   /// 
@@ -155,7 +157,7 @@ typedef struct {
 } EFI_HOB_MEMORY_ALLOCATION_MODULE;
 
 ///
-/// type of Recount type 
+/// Resource type 
 /// 
 typedef UINT32 EFI_RESOURCE_TYPE;
 
