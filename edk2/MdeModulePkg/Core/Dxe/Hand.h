@@ -86,9 +86,9 @@ typedef struct {
 #define PROTOCOL_NOTIFY_SIGNATURE       EFI_SIGNATURE_32('p','r','t','n')
 typedef struct {
   UINTN               Signature;
-  PROTOCOL_ENTRY      *Protocol;
   LIST_ENTRY          Link;                   // All notifications for this protocol
-  EFI_EVENT           Event;                  // Event to notify
+  PROTOCOL_ENTRY      *Protocol;
+  EFI_EVENT           Event;                  // Event to notify //
   LIST_ENTRY          *Position;              // Last position notified
 } PROTOCOL_NOTIFY;
 
