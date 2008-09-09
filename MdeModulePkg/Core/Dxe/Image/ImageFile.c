@@ -14,6 +14,36 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeMain.h"
 
+/**
+  Search a handle to a device on a specified device path that supports a specified protocol,
+  interface of that protocol on that handle is another output.
+
+  @param  Protocol               The protocol to search for
+  @param  FilePath               The specified device path
+  @param  Interface              Interface of the protocol on the handle
+  @param  Handle                 The handle to the device on the specified device
+                                 path that supports the protocol.
+
+  @return Status code.
+
+**/
+EFI_STATUS
+CoreDevicePathToInterface (
+  IN EFI_GUID                     *Protocol,
+  IN EFI_DEVICE_PATH_PROTOCOL     **FilePath,
+  OUT VOID                        **Interface,
+  OUT EFI_HANDLE                  *Handle
+  )
+{
+  EFI_STATUS                      Status;
+
+  Status = CoreLocateDevicePath (Protocol, FilePath, Handle);
+  if (!EFI_ERROR (Status)) {
+    Status = CoreHandleProtocol (*Handle, Protocol, Interface);
+  }
+  return Status;
+}
+
 
 /**
   Opens a file for (simple) reading.  The simple read abstraction
@@ -376,38 +406,6 @@ CoreReadImageFile (
   CopyMem (Buffer, (CHAR8 *)FHand->Source + Offset, *ReadSize);
   return EFI_SUCCESS;
 }
-
-
-/**
-  Search a handle to a device on a specified device path that supports a specified protocol,
-  interface of that protocol on that handle is another output.
-
-  @param  Protocol               The protocol to search for
-  @param  FilePath               The specified device path
-  @param  Interface              Interface of the protocol on the handle
-  @param  Handle                 The handle to the device on the specified device
-                                 path that supports the protocol.
-
-  @return Status code.
-
-**/
-EFI_STATUS
-CoreDevicePathToInterface (
-  IN EFI_GUID                     *Protocol,
-  IN EFI_DEVICE_PATH_PROTOCOL     **FilePath,
-  OUT VOID                        **Interface,
-  OUT EFI_HANDLE                  *Handle
-  )
-{
-  EFI_STATUS                      Status;
-
-  Status = CoreLocateDevicePath (Protocol, FilePath, Handle);
-  if (!EFI_ERROR (Status)) {
-    Status = CoreHandleProtocol (*Handle, Protocol, Interface);
-  }
-  return Status;
-}
-
 
 /**
   Helper function called as part of the code needed
