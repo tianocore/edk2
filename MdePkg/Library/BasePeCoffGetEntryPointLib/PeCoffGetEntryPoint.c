@@ -247,7 +247,7 @@ PeCoffLoaderGetPdbPointer (
   // Scan the directory to find the debug entry.
   // 
   for (DirCount = 0; DirCount < DirectoryEntry->Size; DirCount += sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY), DebugEntry++) {
-    if (EFI_IMAGE_DEBUG_TYPE_CODEVIEW == DebugEntry->Type) {
+    if (DebugEntry->Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
       if (DebugEntry->SizeOfData > 0) {
         CodeViewEntryPointer = (VOID *) ((UINTN) DebugEntry->RVA + ((UINTN)Pe32Data) + (UINTN)TEImageAdjust);
         switch (* (UINT32 *) CodeViewEntryPointer) {
