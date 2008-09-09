@@ -41,7 +41,7 @@ typedef struct {
 #define PROTOCOL_ENTRY_SIGNATURE        EFI_SIGNATURE_32('p','r','t','e')
 typedef struct {
   UINTN               Signature;
-  LIST_ENTRY          AllEntries;             // All entries
+  LIST_ENTRY          AllEntries;             // Link Entry inserted to mProtocolDatabase
   EFI_GUID            ProtocolID;             // ID of the protocol
   LIST_ENTRY          Protocols;              // All protocol interfaces
   LIST_ENTRY          Notify;                 // Registerd notification handlers
@@ -55,8 +55,8 @@ typedef struct {
 #define PROTOCOL_INTERFACE_SIGNATURE  EFI_SIGNATURE_32('p','i','f','c')
 typedef struct {
   UINTN                       Signature;
-  IHANDLE                     *Handle;    // Back pointer
   LIST_ENTRY                  Link;       // Link on IHANDLE.Protocols
+  IHANDLE                     *Handle;    // Back pointer
   LIST_ENTRY                  ByProtocol; // Link on PROTOCOL_ENTRY.Protocols
   PROTOCOL_ENTRY              *Protocol;  // The protocol ID
   VOID                        *Interface; // The interface value
@@ -70,7 +70,7 @@ typedef struct {
 
 typedef struct {
   UINTN                       Signature;
-  LIST_ENTRY                  Link;
+  LIST_ENTRY                  Link;      //Link on PROTOCOL_INTERFACE.OpenList
 
   EFI_HANDLE                  AgentHandle;
   EFI_HANDLE                  ControllerHandle;
