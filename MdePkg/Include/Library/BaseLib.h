@@ -7219,5 +7219,6 @@ AsmPrepareAndThunk16 (
   );
 
 #endif
+#endif
 
 
