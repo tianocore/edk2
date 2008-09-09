@@ -72,34 +72,6 @@ GetGraphicsBitMapFromFVEx (
   OUT UINTN         *ImageSize
   );
 
-/**
-  Convert a *.BMP graphics image to a UGA blt buffer. If a NULL UgaBlt buffer
-  is passed in a UgaBlt buffer will be allocated by this routine. If a UgaBlt
-  buffer is passed in it will be used if it is big enough.
-
-  @param[in]      BmpImage      Pointer to BMP file
-  @param[in]      BmpImageSize  Number of bytes in BmpImage
-  @param[in out]  UgaBlt        Buffer containing UGA version of BmpImage.
-  @param[in out]  UgaBltSize    Size of UgaBlt in bytes.
-  @param[out]     PixelHeight   Height of UgaBlt/BmpImage in pixels
-  @param[out]     PixelWidth    Width of UgaBlt/BmpImage in pixels
-
-  @retval EFI_SUCCESS           UgaBlt and UgaBltSize are returned. 
-  @retval EFI_UNSUPPORTED       BmpImage is not a valid *.BMP image
-  @retval EFI_BUFFER_TOO_SMALL  The passed in UgaBlt buffer is not big enough.
-                                UgaBltSize will contain the required size.
-**/
-EFI_STATUS
-EFIAPI
-ConvertBmpToUgaBlt (
-  IN  VOID      *BmpImage,
-  IN  UINTN     BmpImageSize,
-  IN OUT VOID   **UgaBlt,
-  IN OUT UINTN  *UgaBltSize,
-  OUT UINTN     *PixelHeight,
-  OUT UINTN     *PixelWidth
-  );
-
 
 /**
   Use Console Control to turn off UGA based Simple Text Out consoles from going

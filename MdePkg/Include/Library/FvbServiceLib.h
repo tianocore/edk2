@@ -24,7 +24,7 @@
   @param[in, out] NumBytes    Pointer that on input contains the total size of
                              the buffer. On output, it contains the total number
                              of bytes read.
-  @param[in]     Buffer      Pointer to a caller allocated buffer that will be
+  @param[out]     Buffer      Pointer to a caller allocated buffer that will be
                              used to hold the data read.
 
   @retval   EFI_EFI_SUCCESS        Buffer contains data read from FVB
@@ -38,7 +38,7 @@ EfiFvbReadBlock (
   IN EFI_LBA                                      Lba,
   IN UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
-  OUT UINT8                                        *Buffer
+  OUT UINT8                                       *Buffer
   );
 
 
