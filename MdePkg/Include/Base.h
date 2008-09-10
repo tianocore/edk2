@@ -217,19 +217,20 @@ typedef CHAR8 *VA_LIST;
 #define _CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - (CHAR8 *) &(((TYPE *) 0)->Field)))
 
 ///
+///  ALIGN_VALUE - aligns a value up to the next boundary of the given alignment.
+///
+#define ALIGN_VALUE(Value, Alignment) ((Value) + (((Alignment) - (Value)) & ((Alignment) - 1)))
+
+///
 ///  ALIGN_POINTER - aligns a pointer to the lowest boundry
 ///
-#define ALIGN_POINTER(p, s) ((VOID *) ((UINTN)(p) + (((s) - ((UINTN) (p))) & ((s) - 1))))
+#define ALIGN_POINTER(Pointer, Alignment) ((VOID *) (ALIGN_VALUE ((UINTN)(Pointer), (Alignment))))
 
 ///
 ///  ALIGN_VARIABLE - aligns a variable up to the next natural boundry for int size of a processor
 ///
-#define ALIGN_VARIABLE(Value, Adjustment) \
-  Adjustment = 0U; \
-  if ((UINTN) (Value) % sizeof (UINTN)) { \
-    (Adjustment) = (UINTN)(sizeof (UINTN) - ((UINTN) (Value) % sizeof (UINTN))); \
-  } \
-  (Value) = (UINTN)((UINTN) (Value) + (UINTN) (Adjustment))
+#define ALIGN_VARIABLE(Value)  ALIGN_VALUE ((Value), sizeof (UINTN))
+  
 
 //
 // Return the maximum of two operands. 
