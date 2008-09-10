@@ -157,6 +157,7 @@ EFI_STATUS
 EFIAPI 
 PeiLibPciCfgModify (
   IN EFI_PEI_SERVICES         **PeiServices,
+  IN PEI_PCI_CFG_PPI          *PciCfg,
   IN PEI_PCI_CFG_PPI_WIDTH    Width,
   IN UINT64                   Address,
   IN UINTN                    SetBits,
@@ -187,6 +188,7 @@ Routine Description:
    it will be updated to the following code which call this library API:
       PeiLibPciCfgModify (
           PeiServices,
+          PciCfg,
           Width,
           Address,
           SetBits,
@@ -199,7 +201,9 @@ Arguments:
   
   PeiServices     An indirect pointer to the PEI Services Table
                           published by the PEI Foundation.
-
+  PciCfg          A pointer to the this pointer of EFI_PEI_PCI_CFG_PPI. 
+                          This parameter is unused as a place holder to make
+                          the parameter list identical to PEI_PCI_CFG_PPI_RW.
   Width           The width of the access. Enumerated in bytes. Type
                           EFI_PEI_PCI_CFG_PPI_WIDTH is defined in Read().
 
