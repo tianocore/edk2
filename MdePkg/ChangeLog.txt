@@ -143,3 +143,12 @@ EDK_4067:  Non-Compatible: qwang12
 
 EDK_5835:  Non-Compatible: qwang12
   Class General Definitions: NULL_HANDLE definition is removed from UefiBaseType.h. If any modules referencs NULL_HANDLE, they should be updated to use NULL. 
+  
+EDK_5869:  Non-Compatible: qhuang8
+  Class General Definitions: Update the macro ALIGN_VARIALBE to drop the second parameter.
+  
+		Code Change:
+			The macro ALIGN_VARIABLE in base.h is changed to keep the first paramter
+
+		Possible Impacts:
+			Modules using this macro, it needs to adapt to new interface.
