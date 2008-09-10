@@ -143,6 +143,7 @@ CoreConnectController (
     //
     ChildHandleBuffer = AllocatePool (ChildHandleCount * sizeof(EFI_HANDLE));
     if (ChildHandleBuffer == NULL) {
+      CoreReleaseProtocolLock ();
       return EFI_OUT_OF_RESOURCES;
     }
 
