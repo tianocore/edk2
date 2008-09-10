@@ -236,7 +236,6 @@ CoreAllocatePoolI (
   UINTN       Index;
   UINTN       FSize;
   UINTN       Offset;
-  UINTN       Adjustment;
   UINTN       NoPages;
 
   ASSERT_LOCKED (&gMemoryLock);
@@ -250,7 +249,7 @@ CoreAllocatePoolI (
   // we don't get an unaligned access fault later when
   // pool_Tail is being initialized
   //
-  ALIGN_VARIABLE (Size, Adjustment);
+  Size = ALIGN_VARIABLE (Size);
 
   Size += POOL_OVERHEAD;
   Index = SIZE_TO_LIST(Size);
