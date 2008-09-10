@@ -280,10 +280,10 @@ CoreReinstallProtocolInterface (
   //
   CoreNotifyProtocolEntry (ProtEntry);
 
-  CoreReleaseProtocolLock ();
-
   Status = EFI_SUCCESS;
 
 Done:
+  CoreReleaseProtocolLock ();
+
   return Status;
 }
