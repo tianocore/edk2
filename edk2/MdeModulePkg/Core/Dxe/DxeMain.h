@@ -1562,6 +1562,7 @@ CoreCheckEvent (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreAddMemorySpace (
   IN EFI_GCD_MEMORY_TYPE   GcdMemoryType,
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -1588,6 +1589,7 @@ CoreAddMemorySpace (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreAllocateMemorySpace (
   IN     EFI_GCD_ALLOCATE_TYPE  GcdAllocateType,
   IN     EFI_GCD_MEMORY_TYPE    GcdMemoryType,
@@ -1610,6 +1612,7 @@ CoreAllocateMemorySpace (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreFreeMemorySpace (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
@@ -1627,6 +1630,7 @@ CoreFreeMemorySpace (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreRemoveMemorySpace (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
@@ -1644,6 +1648,7 @@ CoreRemoveMemorySpace (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreGetMemorySpaceDescriptor (
   IN  EFI_PHYSICAL_ADDRESS             BaseAddress,
   OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Descriptor
@@ -1663,6 +1668,7 @@ CoreGetMemorySpaceDescriptor (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreSetMemorySpaceAttributes (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
@@ -1683,6 +1689,7 @@ CoreSetMemorySpaceAttributes (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreGetMemorySpaceMap (
   OUT UINTN                            *NumberOfDescriptors,
   OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR  **MemorySpaceMap
@@ -1701,6 +1708,7 @@ CoreGetMemorySpaceMap (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreAddIoSpace (
   IN EFI_GCD_IO_TYPE       GcdIoType,
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -1726,6 +1734,7 @@ CoreAddIoSpace (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreAllocateIoSpace (
   IN     EFI_GCD_ALLOCATE_TYPE  GcdAllocateType,
   IN     EFI_GCD_IO_TYPE        GcdIoType,
@@ -1748,6 +1757,7 @@ CoreAllocateIoSpace (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreFreeIoSpace (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
@@ -1765,6 +1775,7 @@ CoreFreeIoSpace (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreRemoveIoSpace (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length
@@ -1782,6 +1793,7 @@ CoreRemoveIoSpace (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreGetIoSpaceDescriptor (
   IN  EFI_PHYSICAL_ADDRESS         BaseAddress,
   OUT EFI_GCD_IO_SPACE_DESCRIPTOR  *Descriptor
@@ -1800,6 +1812,7 @@ CoreGetIoSpaceDescriptor (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreGetIoSpaceMap (
   OUT UINTN                        *NumberOfDescriptors,
   OUT EFI_GCD_IO_SPACE_DESCRIPTOR  **IoSpaceMap
@@ -1947,6 +1960,7 @@ InitializeSectionExtraction (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreProcessFirmwareVolume (
   IN VOID                             *FvHeader,
   IN UINTN                            Size,

@@ -566,6 +566,7 @@ FwVolBlockDriverInit (
 
 **/
 EFI_STATUS
+EFIAPI
 CoreProcessFirmwareVolume (
   IN VOID                             *FvHeader,
   IN UINTN                            Size,
