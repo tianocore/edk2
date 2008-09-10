@@ -112,7 +112,9 @@ Abstract:
 // [BuildOptions]
 //   *_*_*_CC_FLAGS = /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xC0000000
 //
+#ifndef EDKII_GLUE_PciExpressBaseAddress
 #define EDKII_GLUE_PciExpressBaseAddress        PCD_EDKII_GLUE_PciExpressBaseAddress
+#endif
 
 //
 //
