@@ -144,7 +144,7 @@
     <Command.MSFT, Command.INTEL>
         "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
         Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
-        "$(ASM)" /Fo${dst} $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
+        "$(ASM)" /Fo${dst} $(ASM_FLAGS) /I${s_path} $(INC) ${d_path}(+)${s_base}.iii
 
     <Command.GCC>
         "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
@@ -245,21 +245,21 @@
         ?.asl, ?.Asl, ?.ASL
 
     <OutputFile>
-        $(OUTPUT_DIR)(+)${s_base}.aml
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml
 
     <ExtraDependency>
         $(MAKE_FILE)
 
     <Command.MSFT, Command.INTEL>
-        "$(ASLPP)" $(ASLPP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_dir}(+)${s_base}.i
-        "$(ASL)" -p ${dst} $(ASL_FLAGS) ${d_path}(+)${s_dir}(+)${s_base}.i
+        "$(ASLPP)" $(ASLPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        "$(ASL)" -p ${dst} $(ASL_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
 
 [C-Code-File.AcpiTable]
     <InputFile>
         ?.c
 
     <OutputFile>
-        $(OUTPUT_DIR)(+)${s_base}.acpi
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.acpi
 
     <ExtraDependency>
         $(MAKE_FILE)
@@ -274,7 +274,7 @@
         ?.aslc, ?.act
 
     <OutputFile>
-        $(OUTPUT_DIR)(+)${s_base}.acpi
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.acpi
 
     <ExtraDependency>
         $(MAKE_FILE)
