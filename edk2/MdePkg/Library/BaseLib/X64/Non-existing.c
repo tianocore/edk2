@@ -1,7 +1,7 @@
 /** @file
   Non-existing BaseLib functions on x64
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,7 +12,8 @@
 
 **/
 
-#include "../BaseLibInternals.h"
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 
 /**
   Enables the 32-bit paging mode on the CPU.
@@ -57,7 +58,7 @@ InternalX86EnablePaging32 (
   )
 {
   //
-  // This function cannot work on X64 platform
+  // This function cannot work on x64 platform
   //
   ASSERT (FALSE);
 }
@@ -102,7 +103,7 @@ InternalX86DisablePaging32 (
   )
 {
   //
-  // This function cannot work on X64 platform
+  // This function cannot work on x64 platform
   //
   ASSERT (FALSE);
 }
