@@ -28,8 +28,10 @@ Abstract:
 // Structures are all packed on 1-byte alignment
 //
 
+#ifndef __GNUC__
 #pragma pack (push)
 #pragma pack (1)
+#endif
 
 //
 // Part 2, section 2.2: Basic types & Helper redefinitions
@@ -1839,6 +1841,8 @@ typedef struct tdTPM_RSP_COMMAND_HDR {
   TPM_RESULT                        returnCode;
 } TPM_RSP_COMMAND_HDR;
 
+#ifndef __GNUC__
 #pragma pack (pop)
+#endif
 
 #endif  // _TPM12_H_
