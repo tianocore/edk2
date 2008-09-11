@@ -28,10 +28,20 @@ Abstract:
 
 #include EFI_PROTOCOL_DEFINITION (Hii)
 
+//
+// EFI_FORM_BROWSER_PROTOCOL_GUID has been changed from the one defined in Framework HII 0.92 as the
+// Setup Browser protocol produced by HII Thunk Layer support the UEFI IFR and UEF String Package format.
+//
 #define EFI_FORM_BROWSER_PROTOCOL_GUID \
   { \
-    0xe5a1333e, 0xe1b4, 0x4d55, {0xce, 0xeb, 0x35, 0xc3, 0xef, 0x13, 0x34, 0x43} \
+    0xfb7c852, 0xadca, 0x4853, {0x8d, 0xf, 0xfb, 0xa7, 0x1b, 0x1c, 0xe1, 0x1a} \
   }
+
+
+//#define EFI_FORM_BROWSER_PROTOCOL_GUID \
+//  { \
+//    0xe5a1333e, 0xe1b4, 0x4d55, {0xce, 0xeb, 0x35, 0xc3, 0xef, 0x13, 0x34, 0x43} \
+//  }
 
 //
 // Forward reference for pure ANSI compatability
