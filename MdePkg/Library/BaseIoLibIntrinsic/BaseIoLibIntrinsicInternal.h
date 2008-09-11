@@ -3,7 +3,7 @@
 
   This file includes package header files, dependent library classes.
 
-  Copyright (c) 2007, Intel Corporation.
+  Copyright (c) 2007 - 2008, Intel Corporation.
   All rights reserved. This program and the accompanying materials
    are licensed and made available under the terms and conditions of the BSD License
    which accompanies this distribution. The full text of the license may be found at
@@ -19,10 +19,8 @@
 
 #include <Base.h>
 
-
 #include <Library/IoLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
 
 #endif

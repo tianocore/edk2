@@ -2,7 +2,7 @@
   I/O Library. This file has compiler specifics for ICC as there
   is no ANSI C standard for doing IO.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR> All rights
+  Copyright (c) 2006 - 2008, Intel Corporation<BR> All rights
   reserved. This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -350,9 +350,6 @@ IoWrite16 (
     out dx, ax
   }
 
-  //
-  // Never reached return statement.
-  //
   return Value;
 }
 

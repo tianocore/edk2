@@ -1,7 +1,7 @@
 /** @file
   I/O Library MMIO Buffer Functions.
 
-  Copyright (c) 2007, Intel Corporation<BR>
+  Copyright (c) 2007 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -220,7 +220,7 @@ MmioReadBuffer64 (
 
 
   @param  StartAddress    Starting address for the MMIO region to be copied to.
-  @param  Length     Size in bytes of the copy.
+  @param  Length          Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
   @return Size in bytes of the copy.
@@ -266,7 +266,7 @@ MmioWriteBuffer8 (
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  StartAddress    Starting address for the MMIO region to be copied to.
-  @param  Length     Size in bytes of the copy.
+  @param  Length          Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
   @return Size in bytes of the copy.
@@ -320,7 +320,7 @@ MmioWriteBuffer16 (
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  StartAddress    Starting address for the MMIO region to be copied to.
-  @param  Length     Size in bytes of the copy.
+  @param  Length          Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
   @return Size in bytes of the copy.
@@ -373,7 +373,7 @@ MmioWriteBuffer32 (
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  StartAddress    Starting address for the MMIO region to be copied to.
-  @param  Length     Size in bytes of the copy.
+  @param  Length          Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
   @return Size in bytes of the copy.
