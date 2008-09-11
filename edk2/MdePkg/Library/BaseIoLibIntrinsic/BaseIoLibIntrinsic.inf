@@ -2,8 +2,8 @@
 # Component description file for Intrinsic Base Io Library
 #
 # I/O Library that uses compiler intrinsics to perform IN and OUT instructions
-#  for IA-32 and x64. It also performs direct memory access for MMIO services.
-# Copyright (c) 2007, Intel Corporation.
+#  for IA-32, x64 and IPF. It also performs direct memory access for MMIO services.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -33,23 +33,21 @@
 [Sources.common]
   IoLibMmioBuffer.c
   BaseIoLibIntrinsicInternal.h
+  IoHighLevel.c
 
 [Sources.Ia32]
-  IoHighLevel.c
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
   IoLibIcc.c    | INTEL
   IoLib.c
 
 [Sources.X64]
-  IoHighLevel.c
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
   IoLibIcc.c    | INTEL
   IoLib.c
 
 [Sources.IPF]
-  IoHighLevel.c
   IoLibIpf.c
 
 [Packages]

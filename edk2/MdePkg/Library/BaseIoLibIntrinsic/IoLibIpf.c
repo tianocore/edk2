@@ -1,7 +1,7 @@
 /** @file
   Common I/O Library routines.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,10 +12,9 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
+
 #include "BaseIoLibIntrinsicInternal.h"
+#include <Library/PcdLib.h>
 
 #define MAP_PORT_BASE_TO_MEM(_Port) \
     ((((_Port) & 0xfffc) << 10) | ((_Port) & 0x0fff))
