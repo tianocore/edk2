@@ -1140,13 +1140,12 @@ CoreInitializeDispatcher (
   VOID
   )
 {
-  mFwVolEvent = CoreCreateProtocolNotifyEvent (
+  mFwVolEvent = EfiCreateProtocolNotifyEvent (
                   &gEfiFirmwareVolume2ProtocolGuid,
                   TPL_CALLBACK,
                   CoreFwVolEventProtocolNotify,
                   NULL,
-                  &mFwVolEventRegistration,
-                  TRUE
+                  &mFwVolEventRegistration
                   );
 }
 
