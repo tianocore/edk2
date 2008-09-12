@@ -166,7 +166,7 @@ ErrorExit:
       //
       // Flush the Mnp Service Data.
       //
-      MnpFlushServiceData (MnpServiceData);
+      MnpFlushServiceData (MnpServiceData, This->DriverBindingHandle);
     }
 
     gBS->FreePool (MnpServiceData);
@@ -250,7 +250,7 @@ MnpDriverBindingStop (
     //
     // Flush the Mnp service data.
     //
-    MnpFlushServiceData (MnpServiceData);
+    MnpFlushServiceData (MnpServiceData, This->DriverBindingHandle);
 
     gBS->FreePool (MnpServiceData);
   } else {

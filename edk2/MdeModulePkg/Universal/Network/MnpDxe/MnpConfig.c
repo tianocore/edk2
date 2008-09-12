@@ -469,7 +469,8 @@ ERROR:
 **/
 VOID
 MnpFlushServiceData (
-  MNP_SERVICE_DATA  *MnpServiceData
+  IN MNP_SERVICE_DATA  *MnpServiceData,
+  IN EFI_HANDLE        ImageHandle
   )
 {
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
@@ -516,7 +517,7 @@ MnpFlushServiceData (
   gBS->CloseProtocol (
         MnpServiceData->ControllerHandle,
         &gEfiSimpleNetworkProtocolGuid,
-        This->DriverBindingHandle,
+        ImageHandle,
         MnpServiceData->ControllerHandle
         );
 }
