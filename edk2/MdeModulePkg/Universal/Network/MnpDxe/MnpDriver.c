@@ -169,16 +169,6 @@ ErrorExit:
       MnpFlushServiceData (MnpServiceData);
     }
 
-    //
-    // Close the Simple Network Protocol.
-    //
-    gBS->CloseProtocol (
-          ControllerHandle,
-          &gEfiSimpleNetworkProtocolGuid,
-          This->DriverBindingHandle,
-          ControllerHandle
-          );
-
     gBS->FreePool (MnpServiceData);
   }
 
