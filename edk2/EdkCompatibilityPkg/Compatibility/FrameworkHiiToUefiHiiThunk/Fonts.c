@@ -87,13 +87,10 @@ HiiGetGlyph (
                                &BaseLine
                                );
 
-  if (!EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status) && (Status != EFI_WARN_UNKNOWN_GLYPH)) {
     //
     // For simplicity, we only handle Narrow Glyph.
     //
-    ASSERT (Blt->Height == EFI_GLYPH_HEIGHT);
-    ASSERT (Blt->Width == EFI_GLYPH_WIDTH);
-
     if (Blt->Height == EFI_GLYPH_HEIGHT && Blt->Width == EFI_GLYPH_WIDTH) {
 
       ZeroMem (&mNarrowGlyphBuffer, sizeof (mNarrowGlyphBuffer));
@@ -115,7 +112,10 @@ HiiGetGlyph (
 
   }
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Status == EFI_WARN_UNKNOWN_GLYPH)) {
+    if (Status == EFI_WARN_UNKNOWN_GLYPH) {
+      Status = EFI_NOT_FOUND;
+    }
     *GlyphBuffer = NULL;
   }
   return Status;
