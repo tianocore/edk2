@@ -65,30 +65,4 @@ CoreReleaseLock (
   );
 
 
-/**
-  Create a protocol notification event and return it.
-
-  @param  ProtocolGuid       Protocol to register notification event on.
-  @param  NotifyTpl          Maximum TPL to signal the NotifyFunction.
-  @param  NotifyFunction     EFI notification routine.
-  @param  NotifyContext      Context passed into Event when it is created.
-  @param  Registration       Registration key returned from
-                             RegisterProtocolNotify().
-  @param  SignalFlag         Boolean value to decide whether kick the event after
-                             register or not.
-
-  @return The EFI_EVENT that has been registered to be signaled when a ProtocolGuid
-          is added to the system.
-
-**/
-EFI_EVENT
-CoreCreateProtocolNotifyEvent (
-  IN EFI_GUID             *ProtocolGuid,
-  IN EFI_TPL              NotifyTpl,
-  IN EFI_EVENT_NOTIFY     NotifyFunction,
-  IN VOID                 *NotifyContext,
-  OUT VOID                **Registration,
-  IN  BOOLEAN             SignalFlag
-  );
-
 #endif

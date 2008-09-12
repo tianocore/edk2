@@ -511,13 +511,12 @@ FwVolDriverInit (
   IN EFI_SYSTEM_TABLE             *SystemTable
   )
 {
-  gEfiFwVolBlockEvent = CoreCreateProtocolNotifyEvent (
+  gEfiFwVolBlockEvent = EfiCreateProtocolNotifyEvent (
                           &gEfiFirmwareVolumeBlockProtocolGuid,
                           TPL_CALLBACK,
                           NotifyFwVolBlock,
                           NULL,
-                          &gEfiFwVolBlockNotifyReg,
-                          TRUE
+                          &gEfiFwVolBlockNotifyReg
                           );
   return EFI_SUCCESS;
 }
