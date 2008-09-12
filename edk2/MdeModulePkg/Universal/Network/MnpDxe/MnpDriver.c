@@ -238,16 +238,6 @@ MnpDriverBindingStop (
            );
 
     //
-    // Close the openned Snp protocol.
-    //
-    gBS->CloseProtocol (
-           ControllerHandle,
-           &gEfiSimpleNetworkProtocolGuid,
-           This->DriverBindingHandle,
-           ControllerHandle
-           );
-
-    //
     // Flush the Mnp service data.
     //
     MnpFlushServiceData (MnpServiceData, This->DriverBindingHandle);
