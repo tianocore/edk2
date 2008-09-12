@@ -22,13 +22,11 @@ Abstract:
 
 #include "EdkIIGlueDxe.h"
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 //
 // Global pointer to the Status Code Protocol
 //
 static EFI_STATUS_CODE_PROTOCOL  *gStatusCode = NULL;
 
-#endif
 
 /**
   Internal worker function that reports a status code through the Status Code Protocol
@@ -63,32 +61,32 @@ InternalReportStatusCode (
   IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL  
   )
 {
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
-
   EFI_STATUS  Status;
 
-  //
-  // If gStatusCode is NULL, then see if a Status Code Protocol instance is present 
-  // in the handle database.
-  //
-  if (gStatusCode == NULL) {
-    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
-    if (EFI_ERROR (Status) || gStatusCode == NULL) {
-      return EFI_UNSUPPORTED;
-    }
+  if (gRT == NULL) {
+    return EFI_UNSUPPORTED;
   }
 
-  //
-  // A Status Code Protocol is present in the handle database, so pass in all the  
-  // parameters to the ReportStatusCode() service of the Status Code Protocol
-  //
-  return (gStatusCode->ReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
+  if (gRT->Hdr.Revision >= 0x00020000) {
+    //
+    // If gStatusCode is NULL, then see if a Status Code Protocol instance is present 
+    // in the handle database.
+    //
+    if (gStatusCode == NULL) {
+      Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
+      if (EFI_ERROR (Status) || gStatusCode == NULL) {
+        return EFI_UNSUPPORTED;
+      }
+    }
 
-#else
-
-  return (gRT->ReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
-
-#endif
+    //
+    // A Status Code Protocol is present in the handle database, so pass in all the  
+    // parameters to the ReportStatusCode() service of the Status Code Protocol
+    //
+    return (gStatusCode->ReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
+  } else {
+    return (gRT->ReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
+  }
 
 }
 
