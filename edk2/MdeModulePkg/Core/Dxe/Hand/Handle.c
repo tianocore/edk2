@@ -916,7 +916,11 @@ CoreGetProtocolInterface (
   @param  Interface              Supplies the address where a pointer to the
                                  corresponding Protocol Interface is returned.
 
-  @return The requested protocol interface for the handle
+  @retval EFI_SUCCESS            The interface information for the specified protocol was returned.
+  @retval EFI_UNSUPPORTED        The device does not support the specified protocol.
+  @retval EFI_INVALID_PARAMETER  Handle is not a valid EFI_HANDLE..
+  @retval EFI_INVALID_PARAMETER  Protocol is NULL.
+  @retval EFI_INVALID_PARAMETER  Interface is NULL.
 
 **/
 EFI_STATUS
@@ -1274,10 +1278,14 @@ Done:
 
   @param  UserHandle             The handle to close the protocol interface on
   @param  Protocol               The ID of the protocol
-  @param  EntryBuffer            A pointer to a buffer of open protocol
-                                 information in the form of
-                                 EFI_OPEN_PROTOCOL_INFORMATION_ENTRY structures.
+  @param  EntryBuffer            A pointer to a buffer of open protocol information in the
+                                 form of EFI_OPEN_PROTOCOL_INFORMATION_ENTRY structures.
   @param  EntryCount             Number of EntryBuffer entries
+
+  @retval EFI_SUCCESS            The open protocol information was returned in EntryBuffer, 
+                                 and the number of entries was returned EntryCount.
+  @retval EFI_NOT_FOUND          Handle does not support the protocol specified by Protocol.
+  @retval EFI_OUT_OF_RESOURCES   There are not enough resources available to allocate EntryBuffer.
 
 **/
 EFI_STATUS
