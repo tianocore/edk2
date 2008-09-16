@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _EXEC_H_
-#define _EXEC_H_
+#ifndef __EVENT_H__
+#define __EVENT_H__
 
 #define VALID_TPL(a)            ((a) <= TPL_HIGH_LEVEL)
 
