@@ -51,10 +51,10 @@ typedef struct {
   Retrieves attributes, insures positive polarity of attribute bits, returns
   resulting attributes in output parameter.
 
-  @param  This             Calling context
-  @param  Attributes       output buffer which contains attributes
+  @param  This             Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
+  @param  Attributes       output buffer which contains attributes.
 
-  @retval EFI_SUCCESS      Successfully got volume attributes
+  @retval EFI_SUCCESS      Successfully got volume attributes.
 
 **/
 EFI_STATUS
@@ -68,9 +68,9 @@ FvGetVolumeAttributes (
 /**
   Sets current attributes for volume
 
-  @param  This             Calling context
+  @param  This             Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
   @param  Attributes       At input, contains attributes to be set.  At output
-                           contains new value of FV
+                           contains new value of FV.
 
   @retval EFI_UNSUPPORTED  Could not be set.
 
@@ -86,7 +86,7 @@ FvSetVolumeAttributes (
 /**
   Given the input key, search for the next matching file in the volume.
 
-  @param  This                       Indicates the calling context.
+  @param  This                       Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
   @param  Key                        Key is a pointer to a caller allocated
                                      buffer that contains implementation specific
                                      data that is used to track where to begin
@@ -146,7 +146,7 @@ FvGetNextFile (
   Locates a file in the firmware volume and
   copies it to the supplied buffer.
 
-  @param  This                       Indicates the calling context.
+  @param  This                       Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
   @param  NameGuid                   Pointer to an EFI_GUID, which is the
                                      filename.
   @param  Buffer                     Buffer is a pointer to pointer to a buffer
@@ -199,7 +199,7 @@ FvReadFile (
   Locates a section in a given FFS File and
   copies it to the supplied buffer (not including section header).
 
-  @param  This                       Indicates the calling context.
+  @param  This                       Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
   @param  NameGuid                   Pointer to an EFI_GUID, which is the
                                      filename.
   @param  SectionType                Indicates the section type to return.
@@ -239,7 +239,7 @@ FvReadFileSection (
 /**
   Writes one or more files to the firmware volume.
 
-  @param  This                   Indicates the calling context.
+  @param  This                   Pointer to EFI_FIRMWARE_VOLUME2_PROTOCOL.
   @param  NumberOfFiles          Number of files.
   @param  WritePolicy            WritePolicy indicates the level of reliability
                                  for the write in the event of a power failure or

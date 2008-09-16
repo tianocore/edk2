@@ -83,6 +83,9 @@ GetFwVolHeader (
   //
   FvhLength = sizeof (EFI_FIRMWARE_VOLUME_HEADER);
   Status = Fvb->Read (Fvb, 0, 0, &FvhLength, (UINT8 *)&TempFvh);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Allocate a buffer for the caller
@@ -494,9 +497,9 @@ NotifyFwVolBlock (
 
 
 /**
-  This routine is the driver initialization entry point.  It initializes the
-  libraries, and registers two notification functions.  These notification
-  functions are responsible for building the FV stack dynamically.
+  This routine is the driver initialization entry point.  It registers
+  a notification function.  This notification function are responsible
+  for building the FV stack dynamically.
 
   @param  ImageHandle           The image handle.
   @param  SystemTable           The system table.
