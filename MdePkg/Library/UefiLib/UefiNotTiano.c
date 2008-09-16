@@ -1,8 +1,8 @@
 /** @file
-  Library functions that abstract areas of conflict between Tiano an UEFI 2.0.
+  Library functions that abstract areas of conflict between framework and UEFI 2.0.
 
-  Help Port Framework/Tiano code that has conflicts with UEFI 2.0 by hiding the
-  oldconflicts with library functions and supporting implementations of the old
+  Help Port Framework code that has conflicts with UEFI 2.0 by hiding the
+  old conflicts with library functions and supporting implementations of the old
   (EDK/EFI 1.10) and new (EDK II/UEFI 2.0) way. This module is a DXE driver as
   it contains DXE enum extensions for EFI event services.
 
@@ -129,7 +129,7 @@ EfiCreateEventLegacyBootEx (
 }
 
 /**
-  Create a Read to Boot Event.
+  Create a "Ready to Boot" Event.
 
   Tiano extended the CreateEvent Type enum to add a ready to boot event type.
   This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
@@ -271,7 +271,8 @@ EfiSignalEventLegacyBoot (
   else use the old form for backwards compatability. The return value to this
   function points to a location in FvDevicePathNode and it does not allocate
   new memory for the GUID pointer that is returned.
-
+  If FvDevicePathNode is NULL, then ASSERT().
+  
   @param  FvFileDevicePathNode  Pointer to FV device path to check.
 
   @retval NULL              FvDevicePathNode is not valid.
@@ -304,6 +305,8 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   device path is defined for Tiano extensions of device path. If the code
   is compiled to conform with the UEFI 2.0 specification use the new device path
   else use the old form for backwards compatability.
+  If FvDevicePathNode is NULL, then ASSERT().
+  If NameGuid is NULL, then ASSERT().
 
   @param  FvFileDevicePathNode  Pointer to a FV device path node to initialize
   @param  NameGuid          FV file name to use in FvDevicePathNode

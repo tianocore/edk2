@@ -47,6 +47,8 @@ CompareIso639LanguageCode (
   Table for a table with a GUID that matches TableGuid.  If a match is found,
   then a pointer to the configuration table is returned in Table, and EFI_SUCCESS
   is returned.  If a matching GUID is not found, then EFI_NOT_FOUND is returned.
+  If TableGuid is NULL, then ASSERT().
+  If Table is NULL, then ASSERT().
 
   @param  TableGuid       Pointer to table's GUID type..
   @param  Table           Pointer to the table associated with TableGuid in the EFI System Table.
@@ -146,6 +148,9 @@ EfiCreateProtocolNotifyEvent(
   This function creates an event using NotifyTpl, NoifyFunction, and NotifyContext.
   This event is signaled with EfiNamedEventSignal().  This provide the ability for
   one or more listeners on the same event named by the GUID specified by Name.
+  If Name is NULL, then ASSERT().
+  If NotifyTpl is not a legal TPL value, then ASSERT().
+  If NotifyFunction is NULL, then ASSERT().
 
   @param  Name                  Supplies GUID name of the event.
   @param  NotifyTpl             Supplies the task priority level of the event notifications.
@@ -171,6 +176,10 @@ EfiNamedEventListen (
   EFI_EVENT   Event;
   VOID        *RegistrationLocal;
 
+  ASSERT (Name != NULL);
+  ASSERT (NotifyFunction != NULL);
+  ASSERT (NotifyTpl <= TPL_HIGH_LEVEL);
+  
   //
   // Create event
   //
@@ -204,7 +213,7 @@ EfiNamedEventListen (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -242,7 +251,7 @@ EfiNamedEventSignal (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -279,6 +288,8 @@ EfiGetCurrentTpl (
   and returns the lock.  Each lock provides mutual exclusion access at its task
   priority level.  Since there is no preemption or multiprocessor support in EFI,
   acquiring the lock only consists of raising to the locks TPL.
+  If Lock is NULL, then ASSERT().
+  If Priority is not a valid TPL value, then ASSERT().
 
   @param  Lock       A pointer to the lock data structure to initialize.
   @param  Priority   EFI TPL associated with the lock.
@@ -306,6 +317,9 @@ EfiInitializeLock (
   This function raises the system's current task priority level to the task
   priority level of the mutual exclusion lock.  Then, it places the lock in the
   acquired state.
+  If Lock is NULL, then ASSERT().
+  If Lock is not initialized, then ASSERT().
+  If Lock is already in the acquired state, then ASSERT().
 
   @param  Lock   The task lock with priority level.
 
@@ -671,6 +685,7 @@ LookupUnicodeString (
 
 **/
 EFI_STATUS
+
 EFIAPI
 LookupUnicodeString2 (
   IN CONST CHAR8                     *Language,
