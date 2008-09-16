@@ -274,12 +274,11 @@ CoreAcquireGcdMemoryLock (
 
 
 /**
-  External function. Initializes the GCD and memory services based on the memory
-  descriptor HOBs.  This function is responsible for priming the GCD map and the
-  memory map, so memory allocations and resource allocations can be made.  The first
-  part of this function can not depend on any memory services until at least one
-  memory descriptor is provided to the memory services.  Then the memory services
-  can be used to intialize the GCD map.
+  External function. Initializes memory services based on the memory
+  descriptor HOBs.  This function is responsible for priming the memory
+  map, so memory allocations and resource allocations can be made.
+  The first part of this function can not depend on any memory services
+  until at least one memory descriptor is provided to the memory services.
 
   @param  HobStart               The start address of the HOB.
   @param  MemoryBaseAddress      Start address of memory region found to init DXE
@@ -301,11 +300,8 @@ CoreInitializeMemoryServices (
 /**
   External function. Initializes the GCD and memory services based on the memory
   descriptor HOBs.  This function is responsible for priming the GCD map and the
-  memory map, so memory allocations and resource allocations can be made.  The first
-  part of this function can not depend on any memory services until at least one
-  memory descriptor is provided to the memory services.  Then the memory services
-  can be used to intialize the GCD map. The HobStart will be relocated to a pool
-  buffer.
+  memory map, so memory allocations and resource allocations can be made. The
+  HobStart will be relocated to a pool buffer.
 
   @param  HobStart               The start address of the HOB
   @param  MemoryBaseAddress      Start address of memory region found to init DXE

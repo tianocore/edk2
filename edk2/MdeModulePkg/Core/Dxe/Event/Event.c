@@ -90,7 +90,7 @@ CoreReleaseEventLock (
 
 
 /**
-  Initializes "event" support and populates parts of the System and Runtime Table.
+  Initializes "event" support.
 
   @retval EFI_SUCCESS            Always return success
 
