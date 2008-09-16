@@ -29,7 +29,7 @@ STATIC EFI_PEI_SERVICES  **gPeiServices;
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
-  EFI_PEI_SERVICES  **PeiServices
+  IN EFI_PEI_SERVICES  **PeiServices
   )
 {
   gPeiServices = PeiServices;
