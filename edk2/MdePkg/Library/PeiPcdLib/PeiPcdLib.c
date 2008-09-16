@@ -56,7 +56,7 @@ GetPcdPpiPointer (
   @param[in]  System sku id. The SKU value that will be used when the PCD service will retrieve and 
               set values.
 
-  @retval SKU_ID Return the SKU ID that just be set.
+  @return Return the SKU ID that just be set.
 
 **/
 UINTN
@@ -80,7 +80,7 @@ LibPcdSetSku (
 
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINT8 Returns the 8-bit value for the token specified by TokenNumber. 
+  @return Returns the 8-bit value for the token specified by TokenNumber. 
 
 **/
 UINT8
@@ -99,7 +99,7 @@ LibPcdGet8 (
 
   @param[in] TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINT16 Returns the 16-bit value for the token specified by TokenNumber. 
+  @return Returns the 16-bit value for the token specified by TokenNumber. 
 
 **/
 UINT16
@@ -118,7 +118,7 @@ LibPcdGet16 (
 
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINT32 Returns the 32-bit value for the token specified by TokenNumber.
+  @return Returns the 32-bit value for the token specified by TokenNumber.
 
 **/
 UINT32
@@ -137,7 +137,7 @@ LibPcdGet32 (
 
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINT64 Returns the 64-bit value for the token specified by TokenNumber.
+  @return Returns the 64-bit value for the token specified by TokenNumber.
 
 **/
 UINT64
@@ -156,7 +156,7 @@ LibPcdGet64 (
 
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval VOID* Returns the pointer to the token specified by TokenNumber.
+  @return Returns the pointer to the token specified by TokenNumber.
 
 **/
 VOID *
@@ -175,7 +175,7 @@ LibPcdGetPtr (
 
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval BOOLEAN Returns the Boolean value of the token specified by TokenNumber. 
+  @return Returns the Boolean value of the token specified by TokenNumber. 
 
 **/
 BOOLEAN 
@@ -194,7 +194,7 @@ LibPcdGetBool (
 
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINTN Returns the size of the token specified by TokenNumber. 
+  @return Returns the size of the token specified by TokenNumber. 
 
 **/
 UINTN
@@ -216,7 +216,7 @@ LibPcdGetSize (
               which namespace to retrieve a value from.
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINT8 Return the UINT8.
+  @return Return the UINT8.
 
 **/
 UINT8
@@ -241,7 +241,7 @@ LibPcdGetEx8 (
               which namespace to retrieve a value from.
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINT16 Return the UINT16.
+  @return Return the UINT16.
 
 **/
 UINT16
@@ -267,7 +267,7 @@ LibPcdGetEx16 (
               which namespace to retrieve a value from.
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINT32 Return the UINT32.
+  @return Return the UINT32.
 
 **/
 UINT32
@@ -293,7 +293,7 @@ LibPcdGetEx32 (
               which namespace to retrieve a value from.
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINT64 Return the UINT64.
+  @return Return the UINT64.
 
 **/
 UINT64
@@ -317,7 +317,7 @@ LibPcdGetEx64 (
               which namespace to retrieve a value from.
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval VOID* Return the VOID* pointer.
+  @return Return the VOID* pointer.
 
 **/
 VOID *
@@ -342,7 +342,7 @@ LibPcdGetExPtr (
               which namespace to retrieve a value from.
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval BOOLEAN Return the BOOLEAN.
+  @return Return the BOOLEAN.
 
 **/
 BOOLEAN
@@ -366,7 +366,7 @@ LibPcdGetExBool (
               which namespace to retrieve a value from.
   @param[in]  TokenNumber The PCD token number to retrieve a current value for.
 
-  @retval UINTN Return the size.
+  @return Return the size.
 
 **/
 UINTN
@@ -390,7 +390,7 @@ LibPcdGetExSize (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The 8-bit value to set.
 
-  @retval UINT8 Return the value been set.
+  @return Return the value been set.
 
 **/
 UINT8
@@ -419,7 +419,7 @@ LibPcdSet8 (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The 16-bit value to set.
 
-  @retval UINT16 Return the value been set.
+  @return Return the value been set.
 
 **/
 UINT16
@@ -448,7 +448,7 @@ LibPcdSet16 (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The 32-bit value to set.
 
-  @retval UINT32 Return the value been set.
+  @return Return the value been set.
 
 **/
 UINT32
@@ -477,7 +477,7 @@ LibPcdSet32 (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The 64-bit value to set.
 
-  @retval UINT64 Return the value been set.
+  @return Return the value been set.
 
 **/
 UINT64
@@ -517,7 +517,7 @@ LibPcdSet64 (
                                     In out, returns actual size of buffer is set.
   @param[in]        Buffer          A pointer to the buffer to set.
 
-  @retval VOID* Return the pointer for the buffer been set.
+  @return Return the pointer for the buffer been set.
 
 **/
 VOID *
@@ -555,7 +555,7 @@ LibPcdSetPtr (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The boolean value to set.
 
-  @retval BOOLEAN Return the value been set.
+  @return Return the value been set.
 
 **/
 BOOLEAN
@@ -587,7 +587,7 @@ LibPcdSetBool (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The 8-bit value to set.
 
-  @retval UINT8 Return the value been set.
+  @return Return the value been set.
 
 **/
 UINT8
@@ -622,7 +622,7 @@ LibPcdSetEx8 (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The 16-bit value to set.
 
-  @retval UINT16 Return the value been set.
+  @return Return the value been set.
 
 **/
 UINT16
@@ -655,7 +655,7 @@ LibPcdSetEx16 (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The 32-bit value to set.
 
-  @retval UINT32 Return the value been set.
+  @return Return the value been set.
 
 **/
 UINT32
@@ -690,7 +690,7 @@ LibPcdSetEx32 (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The 64-bit value to set.
 
-  @retval UINT64 Return the value been set.
+  @return Return the value been set.
 
 **/
 UINT64
@@ -729,7 +729,7 @@ LibPcdSetEx64 (
                   In out, returns actual size of buffer is set.
   @param[in]  Buffer A pointer to the buffer to set.
 
-  @retval VOID * Return the pinter to the buffer been set.
+  @return Return the pinter to the buffer been set.
 
 **/
 VOID *
@@ -770,7 +770,7 @@ LibPcdSetExPtr (
   @param[in]  TokenNumber The PCD token number to set a current value for.
   @param[in]  Value The Boolean value to set.
 
-  @retval Boolean Return the value been set.
+  @return Return the value been set.
 
 **/
 BOOLEAN
@@ -873,7 +873,7 @@ LibPcdCancelCallback (
   @param[in]  TokenNumber   The previous PCD token number.  If 0, then retrieves the first PCD 
                             token number.
 
-  @retval UINTN            The next valid token number.
+  @return The next valid token number.
 
 **/
 UINTN                      
@@ -908,7 +908,7 @@ LibPcdGetNextToken (
   @param[in]  Guid  Pointer to a 128-bit unique value that designates from which namespace 
                     to start the search.
 
-  @retval CONST GUID *  The next valid token namespace.
+  @return The next valid token namespace.
 
 **/
 GUID *           
@@ -946,6 +946,8 @@ LibPcdGetNextTokenSpace (
   @param[in, out] SizeOfBuffer  A pointer to the size, in bytes, of Buffer.
                                 In out, returns actual size of buffer is set.
   @param[in] Buffer             A pointer to the buffer to used to set the target variable.
+  
+  @return Return the pinter to the buffer been set.
 
 **/
 VOID *
