@@ -39,10 +39,10 @@
 #define UEFI_LANGUAGE_VARIABLE          L"PlatformLang"
 #define UEFI_LANGUAGE_CODES_VARIABLE    L"PlatformLangCodes"
 
-//
-// Limited buffer size recommended by RFC4646 (4.3.  Length Considerations)
-// (42 characters plus a NULL terminator)
-//
+///
+/// Limited buffer size recommended by RFC3066
+/// (42 characters plus a NULL terminator)
+///
 #define RFC_3066_ENTRY_SIZE             (42 + 1)
 #define ISO_639_2_ENTRY_SIZE            3
 
@@ -50,9 +50,6 @@
 
 #define QUESTION_FLAGS              (EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY)
 #define QUESTION_FLAGS_MASK         (~QUESTION_FLAGS)
-
-extern EFI_HII_DATABASE_PROTOCOL *gIfrLibHiiDatabase;
-extern EFI_HII_STRING_PROTOCOL   *gIfrLibHiiString;
 
 #pragma pack(1)
 typedef struct {
@@ -312,8 +309,8 @@ CreateOrderedListOpCode (
   IN      UINT8               DataType,
   IN      UINT8               MaxContainers,
   IN      IFR_OPTION          *OptionsList,
-  IN     UINTN                OptionCount,
-  IN OUT EFI_HII_UPDATE_DATA  *Data
+  IN      UINTN               OptionCount,
+  IN OUT  EFI_HII_UPDATE_DATA *Data
   )
 ;
 
@@ -554,7 +551,7 @@ EFIAPI
 ConstructConfigHdr (
   IN OUT CHAR16                *ConfigHdr,
   IN OUT UINTN                 *StrBufferLen,
-  IN EFI_GUID                  *Guid,
+  IN CONST EFI_GUID            *Guid,
   IN CHAR16                    *Name, OPTIONAL
   IN EFI_HANDLE                *DriverHandle
   )
@@ -576,8 +573,8 @@ BOOLEAN
 EFIAPI
 FindBlockName (
   IN OUT CHAR16                *String,
-  UINTN                        Offset,
-  UINTN                        Width
+  IN UINTN                     Offset,
+  IN UINTN                     Width
   )
 ;
 
@@ -601,10 +598,10 @@ FindBlockName (
 EFI_STATUS
 EFIAPI
 GetBrowserData (
-  EFI_GUID                   *VariableGuid, OPTIONAL
-  CHAR16                     *VariableName, OPTIONAL
-  UINTN                      *BufferSize,
-  UINT8                      *Buffer
+  IN CONST EFI_GUID          *VariableGuid, OPTIONAL
+  IN CONST CHAR16            *VariableName, OPTIONAL
+  IN OUT UINTN               *BufferSize,
+  IN OUT UINT8               *Buffer
   )
 ;
 
@@ -630,11 +627,11 @@ GetBrowserData (
 EFI_STATUS
 EFIAPI
 SetBrowserData (
-  EFI_GUID                   *VariableGuid, OPTIONAL
-  CHAR16                     *VariableName, OPTIONAL
-  UINTN                      BufferSize,
-  UINT8                      *Buffer,
-  CHAR16                     *RequestElement  OPTIONAL
+  IN CONST EFI_GUID          *VariableGuid, OPTIONAL
+  IN CONST CHAR16            *VariableName, OPTIONAL
+  IN UINTN                   BufferSize,
+  IN CONST UINT8             *Buffer,
+  IN CONST CHAR16            *RequestElement  OPTIONAL
   )
 ;
 

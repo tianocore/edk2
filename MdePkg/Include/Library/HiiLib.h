@@ -16,7 +16,7 @@
 #define __HII_LIB_H__
 
 ///
-/// Limited buffer size recommended by RFC4646 (4.3.  Length Considerations)
+/// Limited buffer size recommended by RFC3066
 /// (42 characters plus a NULL terminator)
 ///
 #define RFC_3066_ENTRY_SIZE             (42 + 1)
@@ -30,8 +30,8 @@
   If not enough resource to complete the operation, then ASSERT.
 
   @param  NumberOfPackages       Number of packages.
-  @param  GuidId                          Package GUID.
-  @param  ...                                Variable argument list for packages to be assembled.
+  @param  GuidId                 Package GUID.
+  @param  ...                    Variable argument list for packages to be assembled.
 
   @return Pointer of EFI_HII_PACKAGE_LIST_HEADER.
 

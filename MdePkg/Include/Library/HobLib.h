@@ -373,15 +373,34 @@ BuildMemoryAllocationHob (
   IN EFI_MEMORY_TYPE             MemoryType
   );
 
+///
+/// Get a HOB's type from HOB header
+///
 #define GET_HOB_TYPE(Hob)     ((Hob).Header->HobType)
+
+///
+/// Get a HOB's length from HOB header
+///
 #define GET_HOB_LENGTH(Hob)   ((Hob).Header->HobLength)
+
+///
+/// Get the pointer to next HOB in HOB List
+///
 #define GET_NEXT_HOB(Hob)     ((Hob).Raw + GET_HOB_LENGTH (Hob))
+
+///
+/// Judge if the HOB is the end of HOB List
+///
 #define END_OF_HOB_LIST(Hob)  (GET_HOB_TYPE (Hob) == (UINT16)EFI_HOB_TYPE_END_OF_HOB_LIST)
 
-//
-// Get the data and data size field of GUID 
-//
+///
+/// Get the pointer to data field of GUID HOB 
+///
 #define GET_GUID_HOB_DATA(GuidHob)      ((VOID *) (((UINT8 *) &((GuidHob)->Name)) + sizeof (EFI_GUID)))
+
+///
+/// Get the data size of GUID HOB
+///
 #define GET_GUID_HOB_DATA_SIZE(GuidHob) (((GuidHob)->Header).HobLength - sizeof (EFI_HOB_GUID_TYPE))
 
 #endif
