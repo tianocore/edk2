@@ -64,7 +64,6 @@
   Event/Tpl.c
   Event/Timer.c
   Event/Event.c
-  Event/ExecData.c
   Dispatcher/Dependency.c
   Dispatcher/Dispatcher.c
   DxeMain/DxeProtocolNotify.c
