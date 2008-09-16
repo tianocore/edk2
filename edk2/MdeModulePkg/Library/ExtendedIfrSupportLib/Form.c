@@ -14,6 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "LibraryInternal.h"
 
+extern EFI_HII_DATABASE_PROTOCOL *gIfrLibHiiDatabase;
+
 /**
   Get the specified package from a package list based on an index.
   The Buffer on output is updated to point to a package header in
