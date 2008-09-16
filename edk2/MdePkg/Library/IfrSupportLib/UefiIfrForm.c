@@ -566,7 +566,7 @@ EFIAPI
 ConstructConfigHdr (
   IN OUT CHAR16                *ConfigHdr,
   IN OUT UINTN                 *StrBufferLen,
-  IN EFI_GUID                  *Guid,
+  IN CONST EFI_GUID            *Guid,
   IN CHAR16                    *Name, OPTIONAL
   IN EFI_HANDLE                *DriverHandle
   )
@@ -657,8 +657,8 @@ BOOLEAN
 EFIAPI
 FindBlockName (
   IN OUT CHAR16                *String,
-  UINTN                        Offset,
-  UINTN                        Width
+  IN UINTN                     Offset,
+  IN UINTN                     Width
   )
 {
   EFI_STATUS  Status;
@@ -727,10 +727,10 @@ FindBlockName (
 EFI_STATUS
 EFIAPI
 GetBrowserData (
-  EFI_GUID                   *VariableGuid, OPTIONAL
-  CHAR16                     *VariableName, OPTIONAL
-  UINTN                      *BufferSize,
-  UINT8                      *Buffer
+  IN CONST EFI_GUID              *VariableGuid, OPTIONAL
+  IN CONST CHAR16                *VariableName, OPTIONAL
+  IN OUT UINTN                   *BufferSize,
+  IN OUT UINT8                   *Buffer
   )
 {
   EFI_STATUS                      Status;
@@ -844,11 +844,11 @@ GetBrowserData (
 EFI_STATUS
 EFIAPI
 SetBrowserData (
-  EFI_GUID                   *VariableGuid, OPTIONAL
-  CHAR16                     *VariableName, OPTIONAL
-  UINTN                      BufferSize,
-  UINT8                      *Buffer,
-  CHAR16                     *RequestElement  OPTIONAL
+  IN CONST EFI_GUID          *VariableGuid, OPTIONAL
+  IN CONST CHAR16            *VariableName, OPTIONAL
+  IN UINTN                   BufferSize,
+  IN CONST UINT8             *Buffer,
+  IN CONST CHAR16            *RequestElement  OPTIONAL
   )
 {
   EFI_STATUS                      Status;
@@ -860,7 +860,7 @@ SetBrowserData (
   CHAR16                          *Progress;
   CHAR16                          BlockName[33];
   CHAR16                          *ConfigRequest;
-  CHAR16                          *Request;
+  CONST CHAR16                    *Request;
 
   //
   // Locate protocols for use
