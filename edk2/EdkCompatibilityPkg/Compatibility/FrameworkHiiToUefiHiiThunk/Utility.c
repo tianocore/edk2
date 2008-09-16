@@ -216,6 +216,85 @@ GetOneOfOptionMapEntryListHead (
   return NULL;
 }
 
+EFI_HII_PACKAGE_HEADER *
+GetIfrPackage (
+  IN CONST EFI_HII_PACKAGES               *Packages
+  )
+{
+  UINTN                         Index;
+  TIANO_AUTOGEN_PACKAGES_HEADER **TianoAutogenPackageHdrArray;
+
+  ASSERT (Packages != NULL);
+
+  TianoAutogenPackageHdrArray = (TIANO_AUTOGEN_PACKAGES_HEADER **) (((UINT8 *) &Packages->GuidId) + sizeof (Packages->GuidId));
+  
+  for (Index = 0; Index < Packages->NumberOfPackages; Index++) {
+    //
+    // The current UEFI HII build tool generate a binary in the format defined by 
+    // TIANO_AUTOGEN_PACKAGES_HEADER. We assume that all packages generated in
+    // this binary is with same package type. So the returned IfrPackageCount and StringPackageCount
+    // may not be the exact number of valid package number in the binary generated 
+    // by HII Build tool.
+    //
+    switch (TianoAutogenPackageHdrArray[Index]->PackageHeader.Type) {
+      case EFI_HII_PACKAGE_FORM:
+        return &TianoAutogenPackageHdrArray[Index]->PackageHeader;
+        break;
+      case EFI_HII_PACKAGE_STRINGS:
+      case EFI_HII_PACKAGE_SIMPLE_FONTS:
+        break;
+
+      //
+      // The following fonts are invalid for a module that using Framework to UEFI thunk layer.
+      //
+      case EFI_HII_PACKAGE_KEYBOARD_LAYOUT:
+      case EFI_HII_PACKAGE_FONTS:
+      case EFI_HII_PACKAGE_IMAGES:
+      default:
+        ASSERT (FALSE);
+        return NULL;
+        break;
+    }
+  }
+
+  return NULL;
+}
+
+VOID
+GetFormSetGuid (
+  IN  EFI_HII_PACKAGE_HEADER  *Package,
+  OUT EFI_GUID                *FormSetGuid
+  )
+{
+  UINTN                         Offset;
+  EFI_IFR_OP_HEADER             *OpCode;
+  EFI_IFR_FORM_SET              *FormSet;
+
+  Offset = sizeof (EFI_HII_PACKAGE_HEADER);
+  while (Offset < Package->Length) {
+    OpCode = (EFI_IFR_OP_HEADER *)((UINT8 *) Package + Offset);
+
+    switch (OpCode->OpCode) {
+    case EFI_IFR_FORM_SET_OP:
+      FormSet = (EFI_IFR_FORM_SET *) OpCode;
+      CopyGuid (FormSetGuid, &FormSet->Guid);
+      return;
+      
+      default:
+        break;
+      
+    }
+    Offset += OpCode->Length;
+  }
+
+  //
+  // A proper IFR must have a formset opcode.
+  //
+  ASSERT (FALSE);
+
+}
+
+
 VOID
 GetAttributesOfFirstFormSet (
   IN    OUT HII_THUNK_CONTEXT  *ThunkContext

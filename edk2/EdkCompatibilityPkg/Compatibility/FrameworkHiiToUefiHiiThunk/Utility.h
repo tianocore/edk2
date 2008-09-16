@@ -107,4 +107,17 @@ DestoryOneOfOptionMap (
   IN LIST_ENTRY     *OneOfOptionMapListHead
   );
 
+VOID
+GetFormSetGuid (
+  IN  EFI_HII_PACKAGE_HEADER  *Package,
+  OUT EFI_GUID                *FormSetGuid
+  )
+;
+
+EFI_HII_PACKAGE_HEADER *
+GetIfrPackage (
+  IN CONST EFI_HII_PACKAGES               *Packages
+  )
+;
+
 #endif
