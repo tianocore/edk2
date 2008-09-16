@@ -56,7 +56,7 @@
 //
 // Set structure alignment to 1-byte
 //
-#pragma pack (push, 1)
+#pragma pack (1)
 
 typedef UINT32                     TCG_EVENTTYPE;
 
@@ -144,7 +144,7 @@ typedef struct tdEFI_GPT_DATA {
 //
 // Restore original structure alignment
 //
-#pragma pack (pop)
+#pragma pack ()
 
 #endif
 

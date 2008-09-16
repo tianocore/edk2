@@ -2101,7 +2101,7 @@ DoDhcpDora (
     // now look for DHCP onlys and a Proxy
     //
     for (Index = 0; Index < NumOffers; ++Index) {
-      INT8  Index2;
+      INTN  Index2;
 
       //
       // ignore proxies, bootps, non DHCP onlys, and bootable DHCPS
