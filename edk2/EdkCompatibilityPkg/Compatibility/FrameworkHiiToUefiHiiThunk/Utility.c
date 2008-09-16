@@ -277,7 +277,7 @@ GetFormSetGuid (
     switch (OpCode->OpCode) {
     case EFI_IFR_FORM_SET_OP:
       FormSet = (EFI_IFR_FORM_SET *) OpCode;
-      CopyGuid (FormSetGuid, &FormSet->Guid);
+      CopyMem (FormSetGuid, &FormSet->Guid, sizeof (EFI_GUID));
       return;
       
       default:

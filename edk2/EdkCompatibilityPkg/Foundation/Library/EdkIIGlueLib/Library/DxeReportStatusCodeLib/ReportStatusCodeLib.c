@@ -85,7 +85,10 @@ InternalReportStatusCode (
     //
     return (gStatusCode->ReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
   } else {
+#if (EFI_SPECIFICATION_VERSION < 0x00020000)
     return (gRT->ReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
+#endif
+    return EFI_UNSUPPORTED;
   }
 
 }
