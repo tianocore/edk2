@@ -308,26 +308,37 @@ UefiRegisterPackageList(
   }
 
   //
-  // UEFI HII database does not allow two package list with the same GUID.
-  // In Framework HII implementation, Packages->GuidId is used as an identifier to associate 
-  // a PackageList with only IFR to a Package list the with String package.
-  //
-  GenerateRandomGuid (&GuidId);
-
-  //
   // UEFI HII require EFI_HII_CONFIG_ACCESS_PROTOCOL to be installed on a EFI_HANDLE, so
   // that Setup Utility can load the Buffer Storage using this protocol.
   //
   if (IfrPackageCount != 0) {
     InstallDefaultConfigAccessProtocol (Packages, ThunkContext);
   }
-  PackageListHeader = PrepareUefiPackageListFromFrameworkHiiPackages (Packages, &GuidId);
+  PackageListHeader = PrepareUefiPackageListFromFrameworkHiiPackages (Packages, &ThunkContext->TagGuid);
   Status = mHiiDatabase->NewPackageList (
               mHiiDatabase,
               PackageListHeader,  
               ThunkContext->UefiHiiDriverHandle,
               &ThunkContext->UefiHiiHandle
               );
+  if (Status == EFI_INVALID_PARAMETER) {
+    SafeFreePool (PackageListHeader);
+    
+    //
+    // UEFI HII database does not allow two package list with the same GUID.
+    // In Framework HII implementation, Packages->GuidId is used as an identifier to associate 
+    // a PackageList with only IFR to a Package list the with String package.
+    //
+    GenerateRandomGuid (&GuidId);
+
+    PackageListHeader = PrepareUefiPackageListFromFrameworkHiiPackages (Packages, &GuidId);
+    Status = mHiiDatabase->NewPackageList (
+                mHiiDatabase,
+                PackageListHeader,  
+                ThunkContext->UefiHiiDriverHandle,
+                &ThunkContext->UefiHiiHandle
+                );
+  }
 
   //
   // BUGBUG: Remove when development is done
