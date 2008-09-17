@@ -1,5 +1,8 @@
 /**@file
-  Support for Basic Graphics operations.
+  Library supports diplaying graphical splash screen,
+  locking of keyboard input and printing character on
+  screen. These basic graphics operations are based on UEFI HII, 
+  Graphics Output protocol or UGA Draw protocol.
 
   BugBug: Currently *.BMP files are supported. This will be replaced
           when Tiano graphics format is supported.
