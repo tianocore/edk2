@@ -39,8 +39,7 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
   { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE },
-  { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
-  { NULL,                                  (VOID **)NULL,            NULL, NULL, FALSE }
+  { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE }
 };
 
 
@@ -57,10 +56,10 @@ CoreAllEfiServicesAvailable (
   VOID
   )
 {
-  ARCHITECTURAL_PROTOCOL_ENTRY  *Entry;
+  UINTN        Index;
 
-  for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
-    if (!Entry->Present) {
+  for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
+    if (!mArchProtocols[Index].Present) {
       return EFI_NOT_FOUND;
     }
   }
@@ -93,9 +92,11 @@ GenericArchProtocolNotify (
   BOOLEAN                         Found;
   LIST_ENTRY                      *Link;
   LIST_ENTRY                      TempLinkNode;
+  UINTN                           Index;
 
   Found = FALSE;
-  for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
+  for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
+    Entry = &mArchProtocols[Index];
 
     Status = CoreLocateProtocol (Entry->ProtocolGuid, Entry->Registration, &Protocol);
     if (EFI_ERROR (Status)) {
@@ -180,8 +181,10 @@ CoreNotifyOnArchProtocolInstallation (
 {
   EFI_STATUS                      Status;
   ARCHITECTURAL_PROTOCOL_ENTRY    *Entry;
+  UINTN                           Index;
 
-  for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
+  for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
+    Entry = &mArchProtocols[Index];
 
     //
     // Create the event
@@ -245,8 +248,10 @@ CoreDisplayMissingArchProtocols (
 {
   CONST GUID_TO_STRING_PROTOCOL_ENTRY  *MissingEntry;
   ARCHITECTURAL_PROTOCOL_ENTRY         *Entry;
+  UINTN                                Index;
 
-  for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
+  for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
+    Entry = &mArchProtocols[Index];
     if (!Entry->Present) {
       for (MissingEntry = MissingProtocols; TRUE ; MissingEntry++) {
         if (CompareGuid (Entry->ProtocolGuid, MissingEntry->ProtocolGuid)) {
