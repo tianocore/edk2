@@ -84,20 +84,6 @@ CoreDispatchEventNotifies (
 
 
 
-/**
-  Return the highest set bit.
-
-  @param  Number  The value to check
-
-  @return Bit position of the highest set bit
-
-**/
-UINTN
-CoreHighestSetBit (
-  IN UINTN     Number
-  );
-
-
 //
 // Exported functions
 //
