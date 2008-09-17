@@ -575,6 +575,7 @@ CoreInstallMultipleProtocolInterfaces (
     //
     Status = CoreInstallProtocolInterface (Handle, Protocol, EFI_NATIVE_INTERFACE, Interface);
   }
+  VA_END (Args);
 
   //
   // If there was an error, remove all the interfaces that were installed without any errors
@@ -589,6 +590,8 @@ CoreInstallMultipleProtocolInterfaces (
       Interface = VA_ARG (Args, VOID *);
       CoreUninstallProtocolInterface (*Handle, Protocol, Interface);
     }
+    VA_END (Args);
+    
     *Handle = OldHandle;
   }
 
@@ -844,6 +847,7 @@ CoreUninstallMultipleProtocolInterfaces (
     //
     Status = CoreUninstallProtocolInterface (Handle, Protocol, Interface);
   }
+  VA_END (Args);
 
   //
   // If there was an error, add all the interfaces that were
@@ -859,6 +863,7 @@ CoreUninstallMultipleProtocolInterfaces (
       Interface = VA_ARG(Args, VOID *);
       CoreInstallProtocolInterface (&Handle, Protocol, EFI_NATIVE_INTERFACE, Interface);
     }
+    VA_END (Args);
   }
 
   return Status;
