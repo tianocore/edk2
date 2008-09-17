@@ -1094,14 +1094,13 @@ ConSplitterConInDriverBindingStart (
                   mConIn.VirtualHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (!EFI_ERROR (Status)) {
+    //
+    // If Simple Text Input Ex protocol exists,
+    // add this device into Text In Ex devices list.
+    //
+    Status = ConSplitterTextInExAddDevice (&mConIn, TextInEx);
   }
-
-  //
-  // Add this device into Text In Ex devices list.
-  //
-  Status = ConSplitterTextInExAddDevice (&mConIn, TextInEx);
 
   return Status;
 }
@@ -1455,10 +1454,10 @@ ConSplitterConInDriverBindingStop (
   IN  EFI_HANDLE                      *ChildHandleBuffer
   )
 {
-  EFI_STATUS                     Status;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL *TextIn;
-
+  EFI_STATUS                        Status;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL    *TextIn;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *TextInEx;
+
   if (NumberOfChildren == 0) {
     return EFI_SUCCESS;
   }
@@ -1471,18 +1470,16 @@ ConSplitterConInDriverBindingStop (
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (!EFI_ERROR (Status)) {
+    //
+    // If Simple Text Input Ex protocol exists,
+    // remove device from Text Input Ex devices list.
+    //  
+    Status = ConSplitterTextInExDeleteDevice (&mConIn, TextInEx);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
-
-  //
-  // Remove device from Text Input Ex devices list.
-  //  
-  Status = ConSplitterTextInExDeleteDevice (&mConIn, TextInEx);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
 
   //
   // Close Simple Text In protocol on controller handle and virtual handle.
