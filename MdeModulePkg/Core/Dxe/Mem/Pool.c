@@ -76,7 +76,7 @@ POOL            mPoolHead[EfiMaxMemoryType];
 //
 // List of pool header to search for the appropriate memory type.
 //
-LIST_ENTRY      mPoolHeadList;
+LIST_ENTRY      mPoolHeadList = INITIALIZE_LIST_HEAD_VARIABLE (mPoolHeadList);
 
 
 /**
@@ -99,7 +99,6 @@ CoreInitializePool (
         InitializeListHead (&mPoolHead[Type].FreeList[Index]);
     }
   }
-  InitializeListHead (&mPoolHeadList);
 }
 
 
@@ -333,10 +332,10 @@ Done:
 
     DEBUG ((
       DEBUG_POOL,
-      "AllocatePoolI: Type %x, Addr %x (len %x) %,d\n", PoolType,
+      "AllocatePoolI: Type %x, Addr %p (len %lx) %,ld\n", PoolType,
       Buffer,
-      Size - POOL_OVERHEAD,
-      Pool->Used
+      (UINT64)(Size - POOL_OVERHEAD),
+      (UINT64) Pool->Used
       ));
 
     //
@@ -345,7 +344,7 @@ Done:
     Pool->Used += Size;
 
   } else {
-    DEBUG ((DEBUG_ERROR | DEBUG_POOL, "AllocatePool: failed to allocate %d bytes\n", Size));
+    DEBUG ((DEBUG_ERROR | DEBUG_POOL, "AllocatePool: failed to allocate %ld bytes\n", (UINT64) Size));
   }
 
   return Buffer;
@@ -409,19 +408,19 @@ CoreFreePoolI (
   UINTN       Offset;
   BOOLEAN     AllFree;
 
-  ASSERT(NULL != Buffer);
+  ASSERT(Buffer != NULL);
   //
   // Get the head & tail of the pool entry
   //
   Head = CR (Buffer, POOL_HEAD, Data, POOL_HEAD_SIGNATURE);
-  ASSERT(NULL != Head);
+  ASSERT(Head != NULL);
 
   if (Head->Signature != POOL_HEAD_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
   }
 
   Tail = HEAD_TO_TAIL (Head);
-  ASSERT(NULL != Tail);
+  ASSERT(Tail != NULL);
 
   //
   // Debug
@@ -447,7 +446,7 @@ CoreFreePoolI (
     return EFI_INVALID_PARAMETER;
   }
   Pool->Used -= Size;
-  DEBUG ((DEBUG_POOL, "FreePool: %x (len %x) %,d\n", Head->Data, Head->Size - POOL_OVERHEAD, Pool->Used));
+  DEBUG ((DEBUG_POOL, "FreePool: %p (len %lx) %,ld\n", Head->Data, (UINT64)(Head->Size - POOL_OVERHEAD), (UINT64) Pool->Used));
 
   //
   // Determine the pool list
@@ -473,7 +472,7 @@ CoreFreePoolI (
     // Put the pool entry onto the free pool list
     //
     Free = (POOL_FREE *) Head;
-    ASSERT(NULL != Free);
+    ASSERT(Free != NULL);
     Free->Signature = POOL_FREE_SIGNATURE;
     Free->Index     = (UINT32)Index;
     InsertHeadList (&Pool->FreeList[Index], &Free->Link);
@@ -497,7 +496,7 @@ CoreFreePoolI (
         FSize = LIST_TO_SIZE(Index);
         while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
           Free = (POOL_FREE *) &NewPage[Offset];
-          ASSERT(NULL != Free);
+          ASSERT(Free != NULL);
           if (Free->Signature != POOL_FREE_SIGNATURE) {
             AllFree = FALSE;
           }
@@ -514,7 +513,7 @@ CoreFreePoolI (
         // Remove all of these pool entries from the free loop lists.
         //
         Free = (POOL_FREE *) &NewPage[0];
-        ASSERT(NULL != Free);
+        ASSERT(Free != NULL);
         Index = Free->Index;
         Offset = 0;
 
@@ -522,7 +521,7 @@ CoreFreePoolI (
           FSize = LIST_TO_SIZE(Index);
           while (Offset + FSize <= DEFAULT_PAGE_ALLOCATION) {
             Free = (POOL_FREE *) &NewPage[Offset];
-            ASSERT(NULL != Free);
+            ASSERT(Free != NULL);
             RemoveEntryList (&Free->Link);
             Offset += FSize;
           }
