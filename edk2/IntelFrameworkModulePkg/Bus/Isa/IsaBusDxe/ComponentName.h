@@ -14,9 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_ISA_BUS_COMPONENT_NAME_H
 #define _EFI_ISA_BUS_COMPONENT_NAME_H
 
-//
-// Include common header file for this module.
-//
 #include "InternalIsaBus.h"
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gIsaBusComponentName;
