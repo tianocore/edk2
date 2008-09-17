@@ -87,100 +87,6 @@ EFI_MEMORY_TYPE_INFORMATION gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
   { EfiMaxMemoryType,           0 }
 };
 
-//
-// Internal prototypes
-//
-/**
-  Find untested but initialized memory regions in GCD map and convert them to be DXE allocatable.
-
-**/
-VOID
-PromoteMemoryResource (
-  VOID
-  );
-
-/**
-  Internal function.  Adds a ranges to the memory map.
-  The range must not already exist in the map.
-
-  @param  Type                   The type of memory range to add
-  @param  Start                  The starting address in the memory range Must be
-                                 paged aligned
-  @param  End                    The last address in the range Must be the last
-                                 byte of a page
-  @param  Attribute              The attributes of the memory range to add
-
-**/
-VOID
-CoreAddRange (
-  IN EFI_MEMORY_TYPE          Type,
-  IN EFI_PHYSICAL_ADDRESS     Start,
-  IN EFI_PHYSICAL_ADDRESS     End,
-  IN UINT64                   Attribute
-  );
-
-/**
-  Internal function.  Moves any memory descriptors that are on the
-  temporary descriptor stack to heap.
-
-**/
-VOID
-CoreFreeMemoryMapStack (
-  VOID
-  );
-
-/**
-  Internal function.  Converts a memory range to the specified type.
-  The range must exist in the memory map.
-
-  @param  Start                  The first address of the range Must be page
-                                 aligned
-  @param  NumberOfPages          The number of pages to convert
-  @param  NewType                The new type for the memory range
-
-  @retval EFI_INVALID_PARAMETER  Invalid parameter
-  @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified
-                                 range  or convertion not allowed.
-  @retval EFI_SUCCESS            Successfully converts the memory range to the
-                                 specified type.
-
-**/
-EFI_STATUS
-CoreConvertPages (
-  IN UINT64           Start,
-  IN UINT64           NumberOfPages,
-  IN EFI_MEMORY_TYPE  NewType
-  );
-
-/**
-  Internal function.  Removes a descriptor entry.
-
-  @param  Entry                  The entry to remove
-
-**/
-VOID
-RemoveMemoryMapEntry (
-  IN OUT MEMORY_MAP      *Entry
-  );
-
-/**
-  Internal function.  Deque a descriptor entry from the mFreeMemoryMapEntryList.
-  If the list is emtry, then allocate a new page to refuel the list.
-  Please Note this algorithm to allocate the memory map descriptor has a property
-  that the memory allocated for memory entries always grows, and will never really be freed
-  For example, if the current boot uses 2000 memory map entries at the maximum point, but
-  ends up with only 50 at the time the OS is booted, then the memory associated with the 1950
-  memory map entries is still allocated from EfiBootServicesMemory.
-
-
-  @return The Memory map descriptor dequed from the mFreeMemoryMapEntryList
-
-**/
-MEMORY_MAP *
-AllocateMemoryMapEntry (
-  VOID
-  );
-
 
 /**
   Enter critical section by gaining lock on gMemoryLock.
@@ -208,6 +114,253 @@ CoreReleaseMemoryLock (
   CoreReleaseLock (&gMemoryLock);
 }
 
+
+
+
+/**
+  Internal function.  Removes a descriptor entry.
+
+  @param  Entry                  The entry to remove
+
+**/
+VOID
+RemoveMemoryMapEntry (
+  IN OUT MEMORY_MAP      *Entry
+  )
+{
+  RemoveEntryList (&Entry->Link);
+  Entry->Link.ForwardLink = NULL;
+
+  if (Entry->FromPages) {
+    //
+    // Insert the free memory map descriptor to the end of mFreeMemoryMapEntryList
+    //
+    InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
+  }
+}
+
+/**
+  Internal function.  Adds a ranges to the memory map.
+  The range must not already exist in the map.
+
+  @param  Type                   The type of memory range to add
+  @param  Start                  The starting address in the memory range Must be
+                                 paged aligned
+  @param  End                    The last address in the range Must be the last
+                                 byte of a page
+  @param  Attribute              The attributes of the memory range to add
+
+**/
+VOID
+CoreAddRange (
+  IN EFI_MEMORY_TYPE          Type,
+  IN EFI_PHYSICAL_ADDRESS     Start,
+  IN EFI_PHYSICAL_ADDRESS     End,
+  IN UINT64                   Attribute
+  )
+{
+  LIST_ENTRY        *Link;
+  MEMORY_MAP        *Entry;
+
+  ASSERT ((Start & EFI_PAGE_MASK) == 0);
+  ASSERT (End > Start) ;
+
+  ASSERT_LOCKED (&gMemoryLock);
+
+  DEBUG ((DEBUG_PAGE, "AddRange: %lx-%lx to %d\n", Start, End, Type));
+
+  //
+  // Memory map being altered so updated key
+  //
+  mMemoryMapKey += 1;
+
+  //
+  // UEFI 2.0 added an event group for notificaiton on memory map changes.
+  // So we need to signal this Event Group every time the memory map changes.
+  // If we are in EFI 1.10 compatability mode no event groups will be
+  // found and nothing will happen we we call this function. These events
+  // will get signaled but since a lock is held around the call to this
+  // function the notificaiton events will only be called after this funciton
+  // returns and the lock is released.
+  //
+  CoreNotifySignalList (&gEfiEventMemoryMapChangeGuid);
+
+  //
+  // Look for adjoining memory descriptor
+  //
+
+  // Two memory descriptors can only be merged if they have the same Type
+  // and the same Attribute
+  //
+
+  Link = gMemoryMap.ForwardLink;
+  while (Link != &gMemoryMap) {
+    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    Link  = Link->ForwardLink;
+
+    if (Entry->Type != Type) {
+      continue;
+    }
+
+    if (Entry->Attribute != Attribute) {
+      continue;
+    }
+
+    if (Entry->End + 1 == Start) {
+
+      Start = Entry->Start;
+      RemoveMemoryMapEntry (Entry);
+
+    } else if (Entry->Start == End + 1) {
+
+      End = Entry->End;
+      RemoveMemoryMapEntry (Entry);
+    }
+  }
+
+  //
+  // Add descriptor
+  //
+
+  mMapStack[mMapDepth].Signature     = MEMORY_MAP_SIGNATURE;
+  mMapStack[mMapDepth].FromPages      = FALSE;
+  mMapStack[mMapDepth].Type          = Type;
+  mMapStack[mMapDepth].Start         = Start;
+  mMapStack[mMapDepth].End           = End;
+  mMapStack[mMapDepth].VirtualStart  = 0;
+  mMapStack[mMapDepth].Attribute     = Attribute;
+  InsertTailList (&gMemoryMap, &mMapStack[mMapDepth].Link);
+
+  mMapDepth += 1;
+  ASSERT (mMapDepth < MAX_MAP_DEPTH);
+
+  return ;
+}
+
+/**
+  Internal function.  Deque a descriptor entry from the mFreeMemoryMapEntryList.
+  If the list is emtry, then allocate a new page to refuel the list.
+  Please Note this algorithm to allocate the memory map descriptor has a property
+  that the memory allocated for memory entries always grows, and will never really be freed
+  For example, if the current boot uses 2000 memory map entries at the maximum point, but
+  ends up with only 50 at the time the OS is booted, then the memory associated with the 1950
+  memory map entries is still allocated from EfiBootServicesMemory.
+
+
+  @return The Memory map descriptor dequed from the mFreeMemoryMapEntryList
+
+**/
+MEMORY_MAP *
+AllocateMemoryMapEntry (
+  VOID
+  )
+{
+  MEMORY_MAP*            FreeDescriptorEntries;
+  MEMORY_MAP*            Entry;
+  UINTN                  Index;
+
+  if (IsListEmpty (&mFreeMemoryMapEntryList)) {
+    //
+    // The list is empty, to allocate one page to refuel the list
+    //
+    FreeDescriptorEntries = CoreAllocatePoolPages (EfiBootServicesData, EFI_SIZE_TO_PAGES(DEFAULT_PAGE_ALLOCATION), DEFAULT_PAGE_ALLOCATION);
+    if(FreeDescriptorEntries != NULL) {
+      //
+      // Enque the free memmory map entries into the list
+      //
+      for (Index = 0; Index< DEFAULT_PAGE_ALLOCATION / sizeof(MEMORY_MAP); Index++) {
+        FreeDescriptorEntries[Index].Signature = MEMORY_MAP_SIGNATURE;
+        InsertTailList (&mFreeMemoryMapEntryList, &FreeDescriptorEntries[Index].Link);
+      }
+    } else {
+      return NULL;
+    }
+  }
+  //
+  // dequeue the first descriptor from the list
+  //
+  Entry = CR (mFreeMemoryMapEntryList.ForwardLink, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+  RemoveEntryList (&Entry->Link);
+
+  return Entry;
+}
+
+
+/**
+  Internal function.  Moves any memory descriptors that are on the
+  temporary descriptor stack to heap.
+
+**/
+VOID
+CoreFreeMemoryMapStack (
+  VOID
+  )
+{
+  MEMORY_MAP      *Entry;
+  MEMORY_MAP      *Entry2;
+  LIST_ENTRY      *Link2;
+
+  ASSERT_LOCKED (&gMemoryLock);
+
+  //
+  // If already freeing the map stack, then return
+  //
+  if (mFreeMapStack != 0) {
+    return ;
+  }
+
+  //
+  // Move the temporary memory descriptor stack into pool
+  //
+  mFreeMapStack += 1;
+
+  while (mMapDepth != 0) {
+    //
+    // Deque an memory map entry from mFreeMemoryMapEntryList
+    //
+    Entry = AllocateMemoryMapEntry ();
+
+    ASSERT (Entry);
+
+    //
+    // Update to proper entry
+    //
+    mMapDepth -= 1;
+
+    if (mMapStack[mMapDepth].Link.ForwardLink != NULL) {
+
+      //
+      // Move this entry to general memory
+      //
+      RemoveEntryList (&mMapStack[mMapDepth].Link);
+      mMapStack[mMapDepth].Link.ForwardLink = NULL;
+
+      CopyMem (Entry , &mMapStack[mMapDepth], sizeof (MEMORY_MAP));
+      Entry->FromPages = TRUE;
+
+      //
+      // Find insertion location
+      //
+      for (Link2 = gMemoryMap.ForwardLink; Link2 != &gMemoryMap; Link2 = Link2->ForwardLink) {
+        Entry2 = CR (Link2, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+        if (Entry2->FromPages && Entry2->Start > Entry->Start) {
+          break;
+        }
+      }
+
+      InsertTailList (Link2, &Entry->Link);
+
+    } else {
+      //
+      // This item of mMapStack[mMapDepth] has already been dequeued from gMemoryMap list,
+      // so here no need to move it to memory.
+      //
+      InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
+    }
+  }
+
+  mFreeMapStack -= 1;
+}
 
 /**
   Find untested but initialized memory regions in GCD map and convert them to be DXE allocatable.
@@ -421,255 +574,6 @@ CoreAddMemoryDescriptor (
   }
 
   mMemoryTypeInformationInitialized = TRUE;
-}
-
-
-
-/**
-  Internal function.  Adds a ranges to the memory map.
-  The range must not already exist in the map.
-
-  @param  Type                   The type of memory range to add
-  @param  Start                  The starting address in the memory range Must be
-                                 paged aligned
-  @param  End                    The last address in the range Must be the last
-                                 byte of a page
-  @param  Attribute              The attributes of the memory range to add
-
-**/
-VOID
-CoreAddRange (
-  IN EFI_MEMORY_TYPE          Type,
-  IN EFI_PHYSICAL_ADDRESS     Start,
-  IN EFI_PHYSICAL_ADDRESS     End,
-  IN UINT64                   Attribute
-  )
-{
-  LIST_ENTRY        *Link;
-  MEMORY_MAP        *Entry;
-
-  ASSERT ((Start & EFI_PAGE_MASK) == 0);
-  ASSERT (End > Start) ;
-
-  ASSERT_LOCKED (&gMemoryLock);
-
-  DEBUG ((DEBUG_PAGE, "AddRange: %lx-%lx to %d\n", Start, End, Type));
-
-  //
-  // Memory map being altered so updated key
-  //
-  mMemoryMapKey += 1;
-
-  //
-  // UEFI 2.0 added an event group for notificaiton on memory map changes.
-  // So we need to signal this Event Group every time the memory map changes.
-  // If we are in EFI 1.10 compatability mode no event groups will be
-  // found and nothing will happen we we call this function. These events
-  // will get signaled but since a lock is held around the call to this
-  // function the notificaiton events will only be called after this funciton
-  // returns and the lock is released.
-  //
-  CoreNotifySignalList (&gEfiEventMemoryMapChangeGuid);
-
-  //
-  // Look for adjoining memory descriptor
-  //
-
-  // Two memory descriptors can only be merged if they have the same Type
-  // and the same Attribute
-  //
-
-  Link = gMemoryMap.ForwardLink;
-  while (Link != &gMemoryMap) {
-    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-    Link  = Link->ForwardLink;
-
-    if (Entry->Type != Type) {
-      continue;
-    }
-
-    if (Entry->Attribute != Attribute) {
-      continue;
-    }
-
-    if (Entry->End + 1 == Start) {
-
-      Start = Entry->Start;
-      RemoveMemoryMapEntry (Entry);
-
-    } else if (Entry->Start == End + 1) {
-
-      End = Entry->End;
-      RemoveMemoryMapEntry (Entry);
-    }
-  }
-
-  //
-  // Add descriptor
-  //
-
-  mMapStack[mMapDepth].Signature     = MEMORY_MAP_SIGNATURE;
-  mMapStack[mMapDepth].FromPages      = FALSE;
-  mMapStack[mMapDepth].Type          = Type;
-  mMapStack[mMapDepth].Start         = Start;
-  mMapStack[mMapDepth].End           = End;
-  mMapStack[mMapDepth].VirtualStart  = 0;
-  mMapStack[mMapDepth].Attribute     = Attribute;
-  InsertTailList (&gMemoryMap, &mMapStack[mMapDepth].Link);
-
-  mMapDepth += 1;
-  ASSERT (mMapDepth < MAX_MAP_DEPTH);
-
-  return ;
-}
-
-
-/**
-  Internal function.  Moves any memory descriptors that are on the
-  temporary descriptor stack to heap.
-
-**/
-VOID
-CoreFreeMemoryMapStack (
-  VOID
-  )
-{
-  MEMORY_MAP      *Entry;
-  MEMORY_MAP      *Entry2;
-  LIST_ENTRY      *Link2;
-
-  ASSERT_LOCKED (&gMemoryLock);
-
-  //
-  // If already freeing the map stack, then return
-  //
-  if (mFreeMapStack != 0) {
-    return ;
-  }
-
-  //
-  // Move the temporary memory descriptor stack into pool
-  //
-  mFreeMapStack += 1;
-
-  while (mMapDepth != 0) {
-    //
-    // Deque an memory map entry from mFreeMemoryMapEntryList
-    //
-    Entry = AllocateMemoryMapEntry ();
-
-    ASSERT (Entry);
-
-    //
-    // Update to proper entry
-    //
-    mMapDepth -= 1;
-
-    if (mMapStack[mMapDepth].Link.ForwardLink != NULL) {
-
-      //
-      // Move this entry to general memory
-      //
-      RemoveEntryList (&mMapStack[mMapDepth].Link);
-      mMapStack[mMapDepth].Link.ForwardLink = NULL;
-
-      CopyMem (Entry , &mMapStack[mMapDepth], sizeof (MEMORY_MAP));
-      Entry->FromPages = TRUE;
-
-      //
-      // Find insertion location
-      //
-      for (Link2 = gMemoryMap.ForwardLink; Link2 != &gMemoryMap; Link2 = Link2->ForwardLink) {
-        Entry2 = CR (Link2, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-        if (Entry2->FromPages && Entry2->Start > Entry->Start) {
-          break;
-        }
-      }
-
-      InsertTailList (Link2, &Entry->Link);
-
-    } else {
-      //
-      // This item of mMapStack[mMapDepth] has already been dequeued from gMemoryMap list,
-      // so here no need to move it to memory.
-      //
-      InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
-    }
-  }
-
-  mFreeMapStack -= 1;
-}
-
-
-/**
-  Internal function.  Removes a descriptor entry.
-
-  @param  Entry                  The entry to remove
-
-**/
-VOID
-RemoveMemoryMapEntry (
-  IN OUT MEMORY_MAP      *Entry
-  )
-{
-  RemoveEntryList (&Entry->Link);
-  Entry->Link.ForwardLink = NULL;
-
-  if (Entry->FromPages) {
-    //
-    // Insert the free memory map descriptor to the end of mFreeMemoryMapEntryList
-    //
-    InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
-  }
-}
-
-
-/**
-  Internal function.  Deque a descriptor entry from the mFreeMemoryMapEntryList.
-  If the list is emtry, then allocate a new page to refuel the list.
-  Please Note this algorithm to allocate the memory map descriptor has a property
-  that the memory allocated for memory entries always grows, and will never really be freed
-  For example, if the current boot uses 2000 memory map entries at the maximum point, but
-  ends up with only 50 at the time the OS is booted, then the memory associated with the 1950
-  memory map entries is still allocated from EfiBootServicesMemory.
-
-
-  @return The Memory map descriptor dequed from the mFreeMemoryMapEntryList
-
-**/
-MEMORY_MAP *
-AllocateMemoryMapEntry (
-  VOID
-  )
-{
-  MEMORY_MAP*            FreeDescriptorEntries;
-  MEMORY_MAP*            Entry;
-  UINTN                  Index;
-
-  if (IsListEmpty (&mFreeMemoryMapEntryList)) {
-    //
-    // The list is empty, to allocate one page to refuel the list
-    //
-    FreeDescriptorEntries = CoreAllocatePoolPages (EfiBootServicesData, EFI_SIZE_TO_PAGES(DEFAULT_PAGE_ALLOCATION), DEFAULT_PAGE_ALLOCATION);
-    if(FreeDescriptorEntries != NULL) {
-      //
-      // Enque the free memmory map entries into the list
-      //
-      for (Index = 0; Index< DEFAULT_PAGE_ALLOCATION / sizeof(MEMORY_MAP); Index++) {
-        FreeDescriptorEntries[Index].Signature = MEMORY_MAP_SIGNATURE;
-        InsertTailList (&mFreeMemoryMapEntryList, &FreeDescriptorEntries[Index].Link);
-      }
-    } else {
-      return NULL;
-    }
-  }
-  //
-  // dequeue the first descriptor from the list
-  //
-  Entry = CR (mFreeMemoryMapEntryList.ForwardLink, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-  RemoveEntryList (&Entry->Link);
-
-  return Entry;
 }
 
 
