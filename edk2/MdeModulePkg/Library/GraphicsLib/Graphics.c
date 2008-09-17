@@ -1,6 +1,8 @@
 /** @file
-  Basic Graphics operations based on UEFI HII, Graphics Output protocol or UGA 
-  Draw protocol.
+  Library supports diplaying graphical splash screen,
+  locking of keyboard input and printing character on
+  screen. These basic graphics operations are based on UEFI HII, 
+  Graphics Output protocol or UGA Draw protocol.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
