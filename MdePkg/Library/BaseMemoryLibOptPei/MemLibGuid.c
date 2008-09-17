@@ -21,9 +21,7 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
+
 #include "MemLibInternals.h"
 
 

@@ -12,9 +12,7 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
+
 
 /**
   Flush TLB of current processor.

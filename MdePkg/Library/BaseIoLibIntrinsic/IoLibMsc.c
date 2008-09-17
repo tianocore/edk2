@@ -20,9 +20,7 @@
 **/
 
 
-//
-// Include common header file for this module.
-//
+
 #include "BaseIoLibIntrinsicInternal.h"
 
 //

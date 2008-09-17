@@ -14,9 +14,7 @@
 
 
 
-//
-// Include common header file for this module.
-//
+
 #include "UefiLibInternal.h"
 
 typedef struct {
