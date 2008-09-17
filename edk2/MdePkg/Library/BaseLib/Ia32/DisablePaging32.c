@@ -12,9 +12,7 @@
 
 **/
 
-//
-// Include common header file for this module.
-//
+
 #include <BaseLibInternals.h>
 
 #if _MSC_EXTENSIONS
