@@ -1,5 +1,7 @@
 /** @file
-  Graphics Library
+  Library supports diplaying graphical splash screen,
+  locking of keyboard input and printing character on
+  screen.
 
   Copyright (c) 2006 - 2008, Intel Corporation.<BR>
   All rights reserved. This program and the accompanying materials                          
