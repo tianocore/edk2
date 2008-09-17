@@ -332,7 +332,7 @@ CoreOpenImageFile (
       }
     }
 
-    if (!EFI_ERROR (Status) || Status == EFI_ALREADY_STARTED) {
+    if (!EFI_ERROR (Status)) {
       ImageFileHandle->FreeBuffer = TRUE;
       goto Done;
     }
@@ -341,7 +341,7 @@ CoreOpenImageFile (
   //
   // Nothing else to try
   //
-  DEBUG ((DEBUG_LOAD|DEBUG_WARN, "CoreOpenImageFile: Device did not support a known load protocol\n"));
+  DEBUG ((DEBUG_LOAD | DEBUG_WARN, "CoreOpenImageFile: Device did not support a known load protocol\n"));
   Status = EFI_NOT_FOUND;
 
 Done:
@@ -349,7 +349,7 @@ Done:
   //
   // If the file was not accessed, clean up
   //
-  if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
+  if (EFI_ERROR (Status)) {
     if (ImageFileHandle->FreeBuffer) {
       //
       // Free the source buffer if we allocated it
