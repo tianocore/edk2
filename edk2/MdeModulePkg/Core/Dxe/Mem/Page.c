@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_DEFAULT_PAGE_ALLOCATION_ALIGNMENT  (EFI_PAGE_SIZE)
 
 //
-// Entry for tracking the memory regions for each memory type to help cooalese like memory types
+// Entry for tracking the memory regions for each memory type to coalesce similar memory types
 //
 typedef struct {
   EFI_PHYSICAL_ADDRESS  BaseAddress;
@@ -221,7 +221,7 @@ PromoteMemoryResource (
   LIST_ENTRY                       *Link;
   EFI_GCD_MAP_ENTRY                *Entry;
 
-  DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "Promote the memory resource\n"));
+  DEBUG ((DEBUG_PAGE, "Promote the memory resource\n"));
 
   CoreAcquireGcdMemoryLock ();
 
@@ -754,7 +754,7 @@ CoreConvertPages (
     // Debug code - verify conversion is allowed
     //
     if (!(NewType == EfiConventionalMemory ? 1 : 0) ^ (Entry->Type == EfiConventionalMemory ? 1 : 0)) {
-      DEBUG ((DEBUG_ERROR , "ConvertPages: Incompatible memory types\n"));
+      DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "ConvertPages: Incompatible memory types\n"));
       return EFI_NOT_FOUND;
     }
 
@@ -1516,19 +1516,19 @@ CoreTerminateMemoryMap (
       Entry = CR(Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
       if (Entry->Attribute & EFI_MEMORY_RUNTIME) {
         if (Entry->Type == EfiACPIReclaimMemory || Entry->Type == EfiACPIMemoryNVS) {
-          DEBUG((DEBUG_ERROR, "ExitBootServices: ACPI memory entry has RUNTIME attribute set.\n"));
-          CoreReleaseMemoryLock ();
-          return EFI_INVALID_PARAMETER;
+          DEBUG((DEBUG_ERROR | DEBUG_PAGE, "ExitBootServices: ACPI memory entry has RUNTIME attribute set.\n"));
+          Status =  EFI_INVALID_PARAMETER;
+          goto Done;
         }
         if (Entry->Start & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) {
-          DEBUG((DEBUG_ERROR, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
-          CoreReleaseMemoryLock ();
-          return EFI_INVALID_PARAMETER;
+          DEBUG((DEBUG_ERROR | DEBUG_PAGE, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
+          Status =  EFI_INVALID_PARAMETER;
+          goto Done;
         }
         if ((Entry->End + 1) & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) {
-          DEBUG((DEBUG_ERROR, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
-          CoreReleaseMemoryLock ();
-          return EFI_INVALID_PARAMETER;
+          DEBUG((DEBUG_ERROR | DEBUG_PAGE, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
+          Status =  EFI_INVALID_PARAMETER;
+          goto Done;
         }
       }
     }
@@ -1544,6 +1544,7 @@ CoreTerminateMemoryMap (
     Status = EFI_INVALID_PARAMETER;
   }
 
+Done:
   CoreReleaseMemoryLock ();
 
   return Status;
