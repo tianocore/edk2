@@ -35,35 +35,6 @@ CoreSetInterruptState (
   }
 }
 
-//
-// Return the highest set bit
-//
-
-/**
-  Return the highest set bit.
-
-  @param  Number  The value to check
-
-  @return Bit position of the highest set bit
-
-**/
-UINTN
-CoreHighestSetBit (
-  IN UINTN     Number
-  )
-{
-  UINTN   Msb;
-
-  Msb = 31;
-  while ((Msb > 0) && ((Number & (UINTN)(1 << Msb)) == 0)) {
-    Msb--;
-  }
-
-  return Msb;
-}
-
-
-
 
 /**
   Raise the task priority level to the new level.
@@ -135,9 +106,8 @@ CoreRestoreTpl (
   //
   // Dispatch any pending events
   //
-
-  while ((-2 << NewTpl) & gEventPending) {
-    gEfiCurrentTpl = CoreHighestSetBit (gEventPending);
+  while (((-2 << NewTpl) & gEventPending) != 0) {
+    gEfiCurrentTpl = HighBitSet64 (gEventPending);
     if (gEfiCurrentTpl < TPL_HIGH_LEVEL) {
       CoreSetInterruptState (TRUE);
     }
