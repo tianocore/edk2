@@ -1,5 +1,7 @@
 #/** @file
-# Graphics Library for UEFI drivers.
+#   Library supports diplaying graphical splash screen,
+#   locking of keyboard input and printing character on
+#   screen.
 #
 # This library provides supports for basic graphic functions.
 # Copyright (c) 2006 - 2007, Intel Corporation.
