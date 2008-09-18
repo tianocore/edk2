@@ -18,6 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Search a handle to a device on a specified device path that supports a specified protocol,
   interface of that protocol on that handle is another output.
 
+
+
   @param  Protocol               The protocol to search for
   @param  FilePath               The specified device path
   @param  Interface              Interface of the protocol on the handle
@@ -261,18 +263,28 @@ CoreOpenImageFile (
         // figure out how big the file is.
         //
         FileInfo = NULL;
-        FileInfoSize = sizeof (EFI_FILE_INFO);
-        while (CoreGrowBuffer (&Status, (VOID **)&FileInfo, FileInfoSize)) {
-          //
-          // Automatically allocate buffer of the correct size and make the call
-          //
-          Status = FileHandle->GetInfo (
-                                FileHandle,
-                                &gEfiFileInfoGuid,
-                                &FileInfoSize,
-                                FileInfo
-                                );
+        FileInfoSize = 0;
+        Status = FileHandle->GetInfo (
+                              FileHandle,
+                              &gEfiFileInfoGuid,
+                              &FileInfoSize,
+                              FileInfo
+                              );
+        if (Status == EFI_BUFFER_TOO_SMALL) {
+          FileInfo = AllocatePool (FileInfoSize);
+          if (FileInfo != NULL) {
+            Status = FileHandle->GetInfo (
+                                  FileHandle,
+                                  &gEfiFileInfoGuid,
+                                  &FileInfoSize,
+                                  FileInfo
+                                  );
+          } else {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto Done;
+          }
         }
+        
         if (!EFI_ERROR (Status)) {
           //
           // Allocate space for the file
@@ -290,6 +302,7 @@ CoreOpenImageFile (
             // Close the file since we are done
             //
             FileHandle->Close (FileHandle);
+            CoreFreePool (FileInfo);
           } else {
             Status = EFI_OUT_OF_RESOURCES;
           }
@@ -316,23 +329,31 @@ CoreOpenImageFile (
     //
     // Call LoadFile with the correct buffer size
     //
-    while (CoreGrowBuffer (&Status, (VOID **)&ImageFileHandle->Source, ImageFileHandle->SourceSize)) {
-      Status = LoadFile->LoadFile (
-                           LoadFile,
-                           TempFilePath,
-                           BootPolicy,
-                           &ImageFileHandle->SourceSize,
-                           ImageFileHandle->Source
-                           );
-      //
-      // If success or other error happens, stop loop
-      //
-      if (Status != EFI_BUFFER_TOO_SMALL) {
-        break;
+    ASSERT (ImageFileHandle->SourceSize == 0);
+    ASSERT (ImageFileHandle->Source == NULL);
+    Status = LoadFile->LoadFile (
+                         LoadFile,
+                         TempFilePath,
+                         BootPolicy,
+                         &ImageFileHandle->SourceSize,
+                         ImageFileHandle->Source
+                         );
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      ImageFileHandle->Source = AllocatePool (ImageFileHandle->SourceSize);
+      if (ImageFileHandle->Source == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+      } else {
+        Status = LoadFile->LoadFile (
+                             LoadFile,
+                             TempFilePath,
+                             BootPolicy,
+                             &ImageFileHandle->SourceSize,
+                             ImageFileHandle->Source
+                             );
       }
     }
 
-    if (!EFI_ERROR (Status)) {
+    if (!EFI_ERROR (Status) || Status == EFI_ALREADY_STARTED) {
       ImageFileHandle->FreeBuffer = TRUE;
       goto Done;
     }
@@ -341,15 +362,14 @@ CoreOpenImageFile (
   //
   // Nothing else to try
   //
-  DEBUG ((DEBUG_LOAD | DEBUG_WARN, "CoreOpenImageFile: Device did not support a known load protocol\n"));
+  DEBUG ((DEBUG_LOAD|DEBUG_WARN, "CoreOpenImageFile: Device did not support a known load protocol\n"));
   Status = EFI_NOT_FOUND;
 
 Done:
-
   //
   // If the file was not accessed, clean up
   //
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
     if (ImageFileHandle->FreeBuffer) {
       //
       // Free the source buffer if we allocated it
@@ -406,68 +426,4 @@ CoreReadImageFile (
   CopyMem (Buffer, (CHAR8 *)FHand->Source + Offset, *ReadSize);
   return EFI_SUCCESS;
 }
-
-/**
-  Helper function called as part of the code needed
-  to allocate the proper sized buffer for various
-  EFI interfaces.
-
-  @param  Status                 Current status
-  @param  Buffer                 Current allocated buffer, or NULL
-  @param  BufferSize             Current buffer size needed
-
-  @retval TRUE                   if the buffer was reallocated and the caller
-                                 should try the API again.
-  @retval FALSE                  buffer could not be allocated and the caller
-                                 should not try the API again.
-
-**/
-BOOLEAN
-CoreGrowBuffer (
-  IN OUT EFI_STATUS   *Status,
-  IN OUT VOID         **Buffer,
-  IN UINTN            BufferSize
-  )
-{
-  BOOLEAN         TryAgain;
-
-  TryAgain = FALSE;
-  //
-  // If this is an initial request, buffer will be null with a new buffer size
-  //
-  if (*Buffer == NULL) {
-    *Status = EFI_BUFFER_TOO_SMALL;
-  }
-
-  if (BufferSize == 0) {
-    return TRUE;
-  }
-
-  //
-  // If the status code is "buffer too small", resize the buffer
-  //
-  if (*Status == EFI_BUFFER_TOO_SMALL) {
-    if (*Buffer != NULL) {
-      CoreFreePool (*Buffer);
-    }
-
-    *Buffer = AllocatePool (BufferSize);
-    if (*Buffer != NULL) {
-      TryAgain = TRUE;
-    } else {
-      *Status = EFI_OUT_OF_RESOURCES;
-    }
-  }
-
-  //
-  // If there's an error, free the buffer
-  //
-  if ((!TryAgain) && (EFI_ERROR (*Status)) && (*Buffer != NULL)) {
-    CoreFreePool (*Buffer);
-    *Buffer = NULL;
-  }
-
-  return TryAgain;
-}
-
 
