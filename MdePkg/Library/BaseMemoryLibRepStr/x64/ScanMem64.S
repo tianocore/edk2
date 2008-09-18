@@ -22,11 +22,13 @@
 #
 # Notes:
 #
-#   The following BaseMemoryLib instances share the same version of this file:
+#   The following BaseMemoryLib instances contain the same copy of this file:
 #
 #       BaseMemoryLibRepStr
 #       BaseMemoryLibMmx
 #       BaseMemoryLibSse2
+#       BaseMemoryLibOptDxe
+#       BaseMemoryLibOptPei
 #
 #------------------------------------------------------------------------------
 

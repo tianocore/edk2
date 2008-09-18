@@ -12,12 +12,14 @@
 
   Module Name:  CopyMemWrapper.c
 
-  The following BaseMemoryLib instances share the same version of this file:
+  The following BaseMemoryLib instances contain the same copy of this file:
 
     BaseMemoryLib
     BaseMemoryLibMmx
     BaseMemoryLibSse2
     BaseMemoryLibRepStr
+    BaseMemoryLibOptDxe
+    BaseMemoryLibOptPei
     PeiMemoryLib
     DxeMemoryLib
 
@@ -49,7 +51,7 @@ CopyMem (
   IN UINTN       Length
   )
 {
-  if (0 == Length) {
+  if (Length == 0) {
     return DestinationBuffer;
   }
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)DestinationBuffer));

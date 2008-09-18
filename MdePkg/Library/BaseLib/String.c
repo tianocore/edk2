@@ -289,7 +289,7 @@ StrnCmp (
   IN      UINTN                     Length
   )
 {
-  if (0 == Length) {
+  if (Length == 0) {
     return 0;
   }
 
@@ -1151,7 +1151,7 @@ AsciiStrnCpy (
 {
   CHAR8                             *ReturnValue;
 
-  if (0 == Length) {
+  if (Length == 0) {
     return Destination;
   }
 
@@ -1430,7 +1430,7 @@ AsciiStrnCmp (
   IN      UINTN                     Length
   )
 {
-  if (0 == Length) {
+  if (Length == 0) {
     return 0;
   }
 

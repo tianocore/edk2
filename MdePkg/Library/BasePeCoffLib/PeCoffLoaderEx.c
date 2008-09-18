@@ -1,36 +1,37 @@
 /** @file
-  x64 Specific relocation fixups.
+  Specific relocation fixups for none Itanium architecture.
 
-Copyright (c) 2005 - 2006 Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
 #include "BasePeCoffLibInternals.h"
 
+
 /**
-  Performs an x64 specific relocation fixup.
+  Performs an IA-32 specific relocation fixup.
 
-  @param  Reloc       Pointer to the relocation record
-  @param  Fixup       Pointer to the address to fix up
-  @param  FixupData   Pointer to a buffer to log the fixups
-  @param  Adjust      The offset to adjust the fixup
+  @param  Reloc       Pointer to the relocation record.
+  @param  Fixup       Pointer to the address to fix up.
+  @param  FixupData   Pointer to a buffer to log the fixups.
+  @param  Adjust      The offset to adjust the fixup.
 
-  @retval RETURN_SUCCESS      Success to perform relocation
-  @retval RETURN_UNSUPPORTED  Unsupported.
+  @retval EFI_UNSUPPORTED Unsupported now.
+
 **/
 RETURN_STATUS
 PeCoffLoaderRelocateImageEx (
-  IN     UINT16       *Reloc,
-  IN OUT CHAR8        *Fixup, 
-  IN OUT CHAR8        **FixupData,
-  IN     UINT64       Adjust
+  IN UINT16      *Reloc,
+  IN OUT CHAR8   *Fixup,
+  IN OUT CHAR8   **FixupData,
+  IN UINT64      Adjust
   )
 {
   return RETURN_UNSUPPORTED;
@@ -64,9 +65,8 @@ PeCoffLoaderImageFormatSupported (
   return FALSE;
 }
 
-
 /**
-  Performs an X64 specific re-relocation fixup and is a no-op on other
+  Performs an Itanium-based specific re-relocation fixup and is a no-op on other
   instruction sets. This is used to re-relocated the image into the EFI virtual
   space for runtime calls.
 
@@ -75,7 +75,7 @@ PeCoffLoaderImageFormatSupported (
   @param  FixupData   Pointer to a buffer to log the fixups.
   @param  Adjust      The offset to adjust the fixup.
 
-  @return EFI_UNSUPPORTED.
+  @return Always return UNSUPPORTED.
 
 **/
 RETURN_STATUS
@@ -88,3 +88,4 @@ PeHotRelocateImageEx (
 {
   return RETURN_UNSUPPORTED;
 }
+

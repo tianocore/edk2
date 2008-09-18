@@ -10,12 +10,14 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  The following BaseMemoryLib instances share the same version of this file:
+  The following BaseMemoryLib instances contain the same copy of this file:
 
     BaseMemoryLib
     BaseMemoryLibMmx
     BaseMemoryLibSse2
     BaseMemoryLibRepStr
+    BaseMemoryLibOptDxe
+    BaseMemoryLibOptPei
     PeiMemoryLib
     DxeMemoryLib
 
@@ -53,14 +55,14 @@ SetMem32 (
   IN UINT32  Value
   )
 {
-  if (0 == Length) {
+  if (Length == 0) {
     return Buffer;
   }
 
   ASSERT (Buffer != NULL);
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Buffer));
-  ASSERT (0 == (((UINTN)Buffer) & (sizeof (Value) - 1)));
-  ASSERT (0 == (Length & (sizeof (Value) - 1)));
+  ASSERT ((((UINTN)Buffer) & (sizeof (Value) - 1)) == 0);
+  ASSERT ((Length & (sizeof (Value) - 1)) == 0);
 
   return InternalMemSetMem32 (Buffer, Length / sizeof (Value), Value);
 }
