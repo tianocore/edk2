@@ -108,7 +108,7 @@ GetLocalTime (EFI_TIME *Time)
   tm = localtime (&t);
 
   Time->Year = 1900 + tm->tm_year;
-  Time->Month = tm->tm_mon;
+  Time->Month = tm->tm_mon + 1;
   Time->Day = tm->tm_mday;
   Time->Hour = tm->tm_hour;
   Time->Minute = tm->tm_min;
