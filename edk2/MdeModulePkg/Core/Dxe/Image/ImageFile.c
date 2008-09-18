@@ -353,7 +353,7 @@ CoreOpenImageFile (
       }
     }
 
-    if (!EFI_ERROR (Status) || Status == EFI_ALREADY_STARTED) {
+    if (!EFI_ERROR (Status)) {
       ImageFileHandle->FreeBuffer = TRUE;
       goto Done;
     }
@@ -369,7 +369,7 @@ Done:
   //
   // If the file was not accessed, clean up
   //
-  if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
+  if (EFI_ERROR (Status)) {
     if (ImageFileHandle->FreeBuffer) {
       //
       // Free the source buffer if we allocated it
