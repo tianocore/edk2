@@ -31,9 +31,19 @@ ConvertIso639ToRfc3066 (
   )
 {
   UINTN Index;
+  CHAR8 AsciiLanguage[ISO_639_2_ENTRY_SIZE + 1];
+  
+  AsciiStrnCpy (AsciiLanguage, Iso638Lang, sizeof (AsciiLanguage));
+  for (Index = 0; Index < ISO_639_2_ENTRY_SIZE + 1; Index ++) {
+  	if (AsciiLanguage [Index] == 0) {
+  		break;
+  	} else if (AsciiLanguage [Index] >= 'A' && AsciiLanguage [Index] <= 'Z') {
+  		AsciiLanguage [Index] = AsciiLanguage [Index] - 'A' + 'a';
+  	}
+  }
 
   for (Index = 0; Index < sizeof (Iso639ToRfc3066Map) / sizeof (Iso639ToRfc3066Map[0]); Index++) {
-    if (AsciiStrnCmp (Iso638Lang, Iso639ToRfc3066Map[Index].Iso639, AsciiStrSize (Iso638Lang)) == 0) {
+    if (AsciiStrnCmp (AsciiLanguage, Iso639ToRfc3066Map[Index].Iso639, AsciiStrSize (AsciiLanguage)) == 0) {
       return Iso639ToRfc3066Map[Index].Rfc3066;
     }
   }

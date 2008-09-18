@@ -49,6 +49,7 @@ typedef STRING_REF            EFI_PROCESSOR_MANUFACTURER_DATA;
 typedef STRING_REF            EFI_PROCESSOR_SERIAL_NUMBER_DATA;
 
 typedef STRING_REF            EFI_PROCESSOR_ASSET_TAG_DATA;
+typedef STRING_REF            EFI_PROCESSOR_PART_NUMBER_DATA;
 
 typedef struct {
   UINT32  ProcessorSteppingId:4;
@@ -332,12 +333,40 @@ typedef UINT8   EFI_PROCESSOR_CORE_COUNT_DATA;
 typedef UINT8   EFI_PROCESSOR_ENABLED_CORE_COUNT_DATA;
 typedef UINT8   EFI_PROCESSOR_THREAD_COUNT_DATA;
 
+typedef EFI_EXP_BASE10_DATA   EFI_PROCESSOR_MAX_FSB_FREQUENCY_DATA;
+
 typedef struct {
   UINT16  Reserved              :1;
   UINT16  Unknown               :1;
   UINT16  Capable64Bit          :1;
   UINT16  Reserved2             :13;
 } EFI_PROCESSOR_CHARACTERISTICS_DATA;
+
+typedef struct {
+  EFI_PROCESSOR_SOCKET_NAME_DATA          ProcessorSocketName;
+  EFI_PROCESSOR_TYPE_DATA                 ProcessorType;
+  EFI_PROCESSOR_FAMILY_DATA               ProcessorFamily;
+  EFI_PROCESSOR_MANUFACTURER_DATA         ProcessorManufacturer;
+  EFI_PROCESSOR_ID_DATA                   ProcessorId;
+  EFI_PROCESSOR_VERSION_DATA              ProcessorVersion;
+  EFI_PROCESSOR_VOLTAGE_DATA              ProcessorVoltage;
+  EFI_PROCESSOR_FSB_FREQUENCY_DATA        ProcessorFsbFrequency;
+  EFI_PROCESSOR_MAX_CORE_FREQUENCY_DATA   ProcessorMaxCoreFrequency;  
+  EFI_PROCESSOR_CORE_FREQUENCY_DATA       ProcessorCoreFrequency;
+  EFI_PROCESSOR_STATUS_DATA               ProcessorStatus;  
+  EFI_PROCESSOR_SOCKET_TYPE_DATA          ProcessorSocketType;
+  EFI_CACHE_ASSOCIATION_DATA              ProcessorL1LinkData;
+  EFI_CACHE_ASSOCIATION_DATA              ProcessorL2LinkData;
+  EFI_CACHE_ASSOCIATION_DATA              ProcessorL3LinkData;
+  EFI_PROCESSOR_SERIAL_NUMBER_DATA        ProcessorSerialNumber;
+  EFI_PROCESSOR_ASSET_TAG_DATA            ProcessorAssetTag;
+  EFI_PROCESSOR_PART_NUMBER_DATA          ProcessorPartNumber;
+  EFI_PROCESSOR_CORE_COUNT_DATA           ProcessorCoreCount;
+  EFI_PROCESSOR_ENABLED_CORE_COUNT_DATA   ProcessorEnabledCoreCount;
+  EFI_PROCESSOR_THREAD_COUNT_DATA         ProcessorThreadCount;
+  EFI_PROCESSOR_CHARACTERISTICS_DATA      ProcessorCharacteristics;
+  EFI_PROCESSOR_FAMILY2_DATA              ProcessorFamily2;
+} EFI_PROCESSOR_SOCKET_DATA;
 
 typedef enum {
   ProcessorCoreFrequencyRecordType = 1,
@@ -368,7 +397,9 @@ typedef enum {
   ProcessorEnabledCoreCountRecordType = 26,
   ProcessorThreadCountRecordType = 27,
   ProcessorCharacteristicsRecordType = 28,
-  ProcessorFamily2RecordType = 29
+  ProcessorFamily2RecordType = 29,
+  ProcessorPartNumberRecordType = 30,
+  ProcessorSocketRecordType = 31
 } EFI_CPU_VARIABLE_RECORD_TYPE;
 
 typedef union {
@@ -393,6 +424,7 @@ typedef union {
   EFI_PROCESSOR_SOCKET_TYPE_DATA          ProcessorSocketType;
   EFI_PROCESSOR_SOCKET_NAME_DATA          ProcessorSocketName;
   EFI_PROCESSOR_ASSET_TAG_DATA            ProcessorAssetTag;
+  EFI_PROCESSOR_PART_NUMBER_DATA          ProcessorPartNumber;
   EFI_PROCESSOR_HEALTH_STATUS             ProcessorHealthStatus;
   EFI_PROCESSOR_PACKAGE_NUMBER_DATA       ProcessorPackageNumber;
   EFI_PROCESSOR_CORE_COUNT_DATA           ProcessorCoreCount;
@@ -400,6 +432,7 @@ typedef union {
   EFI_PROCESSOR_THREAD_COUNT_DATA         ProcessorThreadCount;
   EFI_PROCESSOR_CHARACTERISTICS_DATA      ProcessorCharacteristics;
   EFI_PROCESSOR_FAMILY2_DATA              ProcessorFamily2;
+  EFI_PROCESSOR_SOCKET_DATA               ProcessorSocket;
 } EFI_CPU_VARIABLE_RECORD;
 
 typedef struct {

@@ -277,7 +277,7 @@ GetFormSetGuid (
     switch (OpCode->OpCode) {
     case EFI_IFR_FORM_SET_OP:
       FormSet = (EFI_IFR_FORM_SET *) OpCode;
-      CopyMem (FormSetGuid, &FormSet->Guid, sizeof (EFI_GUID));
+      CopyGuid (FormSetGuid, (EFI_GUID *)(VOID *)&FormSet->Guid);
       return;
       
       default:
@@ -344,7 +344,7 @@ GetAttributesOfFirstFormSet (
 
         case EFI_IFR_GUID_OP:
           Class = (EFI_IFR_GUID_CLASS*) OpCode;
-          if (CompareMem (&Class->Guid, &gTianoHiiIfrGuid, sizeof (EFI_GUID)) == 0) {
+          if (CompareGuid ((EFI_GUID *)(VOID *)&Class->Guid, &gTianoHiiIfrGuid) == 0) {
             Class = (EFI_IFR_GUID_CLASS *) OpCode;
 
             switch (Class->ExtendOpCode) {
@@ -497,7 +497,7 @@ CreateQuestionIdMap (
        
         case EFI_IFR_GUID_OP:
           OptionMap = (EFI_IFR_GUID_OPTIONKEY *) OpCode;
-          if (CompareMem (&OptionMap->Guid, &gFrameworkHiiCompatbilityGuid, sizeof (EFI_GUID)) == 0) {
+          if (CompareGuid ((EFI_GUID *)(VOID *)&OptionMap->Guid, &gFrameworkHiiCompatbilityGuid) == 0) {
             if (OptionMap->ExtendOpCode == EFI_IFR_EXTEND_OP_OPTIONKEY) {
               OneOfOptinMapEntryListHead = GetOneOfOptionMapEntryListHead (ThunkContext, OptionMap->QuestionId);
               if (OneOfOptinMapEntryListHead == NULL) {
@@ -525,7 +525,7 @@ CreateQuestionIdMap (
               
               InsertTailList (OneOfOptinMapEntryListHead, &OneOfOptionMapEntry->Link);
             }
-         } else if (CompareMem (&OptionMap->Guid, &gTianoHiiIfrGuid, sizeof (EFI_GUID)) == 0) {
+         } else if (CompareGuid ((EFI_GUID *)(VOID *)&OptionMap->Guid, &gTianoHiiIfrGuid) == 0) {
             Class = (EFI_IFR_GUID_CLASS *) OpCode;
 
             switch (Class->ExtendOpCode) {
