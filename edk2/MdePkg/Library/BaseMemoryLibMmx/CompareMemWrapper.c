@@ -12,12 +12,14 @@
 
   Module Name:  CompareMemWrapper.c
 
-  The following BaseMemoryLib instances share the same version of this file:
+  The following BaseMemoryLib instances contain the same copy of this file:
 
     BaseMemoryLib
     BaseMemoryLibMmx
     BaseMemoryLibSse2
     BaseMemoryLibRepStr
+    BaseMemoryLibOptDxe
+    BaseMemoryLibOptPei
     PeiMemoryLib
     DxeMemoryLib
 
@@ -32,8 +34,8 @@
   If all Length bytes of the two buffers are identical, then 0 is returned.  Otherwise, the
   value returned is the first mismatched byte in SourceBuffer subtracted from the first
   mismatched byte in DestinationBuffer.
-  If Length > 0 and DestinationBuffer is NULL and Length > 0, then ASSERT().
-  If Length > 0 and SourceBuffer is NULL and Length > 0, then ASSERT().
+  If Length > 0 and DestinationBuffer is NULL, then ASSERT().
+  If Length > 0 and SourceBuffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT(). 
   If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT(). 
 

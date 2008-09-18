@@ -13,7 +13,7 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  The following IoLib instances share the same version of this file:
+  The following IoLib instances contain the same copy of this file:
 
     BaseIoLibIntrinsic
     DxeIoLibCpuIo

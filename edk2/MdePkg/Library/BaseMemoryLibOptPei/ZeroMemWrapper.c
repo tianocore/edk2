@@ -10,12 +10,14 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  The following BaseMemoryLib instances share the same version of this file:
+  The following BaseMemoryLib instances contain the same copy of this file:
 
     BaseMemoryLib
     BaseMemoryLibMmx
     BaseMemoryLibSse2
     BaseMemoryLibRepStr
+    BaseMemoryLibOptDxe
+    BaseMemoryLibOptPei
     PeiMemoryLib
     DxeMemoryLib
 
@@ -46,7 +48,7 @@ ZeroMem (
   IN UINTN  Length
   )
 {
-  ASSERT (!(NULL == Buffer && Length > 0));
+  ASSERT (!(Buffer == NULL && Length > 0));
   ASSERT (Length <= (MAX_ADDRESS - (UINTN)Buffer + 1));
   return InternalMemZeroMem (Buffer, Length);
 }

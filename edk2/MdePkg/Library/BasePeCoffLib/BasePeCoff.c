@@ -1,10 +1,8 @@
 /** @file
-  Tiano PE/COFF loader.
-
-  This PE/COFF loader supports loading any PE32 or PE32+ image type, but
+  Base PE/COFF loader supports loading any PE32/PE32+ or TE image, but
   only supports relocating IA32, X64, IPF, and EBC images.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,9 +12,6 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
-
-
 
 #include "BasePeCoffLibInternals.h"
 
@@ -120,8 +115,12 @@ PeCoffLoaderGetPeHeader (
     ImageContext->IsTeImage         = TRUE;
     ImageContext->Machine           = Hdr.Te->Machine;
     ImageContext->ImageType         = (UINT16)(Hdr.Te->Subsystem);
+    //
+    // For TeImage, SectionAlignment is undefined to be set to Zero
+    // ImageSize can be calculated.
+    //
     ImageContext->ImageSize         = 0;
-    ImageContext->SectionAlignment  = 4096;
+    ImageContext->SectionAlignment  = 0;
     ImageContext->SizeOfHeaders     = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN)Hdr.Te->BaseOfCode - (UINTN)Hdr.Te->StrippedSize;
 
   } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
@@ -173,9 +172,9 @@ PeCoffLoaderGetPeHeader (
 /**
   Retrieves information about a PE/COFF image.
 
-  Computes the PeCoffHeaderOffset, ImageAddress, ImageSize, DestinationAddress, CodeView,
-  PdbPointer, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva
-  fields of the ImageContext structure.  If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.
+  Computes the PeCoffHeaderOffset, ImageAddress, ImageSize, DestinationAddress, RelocationsStripped, 
+  SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva fields of the ImageContext structure. 
+  If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.
   If the PE/COFF image accessed through the ImageRead service in the ImageContext structure is not
   a supported PE/COFF image type, then return RETURN_UNSUPPORTED.  If any errors occur while
   computing the fields of ImageContext, then the error status is returned in the ImageError field of
@@ -209,7 +208,7 @@ PeCoffLoaderGetImageInfo (
   UINT32                                NumberOfRvaAndSizes;
   UINT16                                Magic;
 
-  if (NULL == ImageContext) {
+  if (ImageContext == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
   //
@@ -412,11 +411,10 @@ PeCoffLoaderGetImageInfo (
       // section headers in the Section Table must appear in order of the RVA
       // values for the corresponding sections. So the ImageSize can be determined
       // by the RVA and the VirtualSize of the last section header in the
-      // Section Table.
+      // Section Table.  
       //
       if ((++Index) == (UINTN)Hdr.Te->NumberOfSections) {
-        ImageContext->ImageSize = (SectionHeader.VirtualAddress + SectionHeader.Misc.VirtualSize +
-                                   ImageContext->SectionAlignment - 1) & ~(ImageContext->SectionAlignment - 1);
+        ImageContext->ImageSize = (SectionHeader.VirtualAddress + SectionHeader.Misc.VirtualSize);
       }
 
       SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
@@ -908,7 +906,7 @@ PeCoffLoaderLoadImage (
       Size = (UINTN) Section->SizeOfRawData;
     }
 
-    if (Section->SizeOfRawData) {
+    if (Section->SizeOfRawData > 0) {
       if (!(ImageContext->IsTeImage)) {
         Status = ImageContext->ImageRead (
                                 ImageContext->Handle,
@@ -1213,12 +1211,15 @@ PeCoffLoaderRelocateImageForRuntime (
     RelocBaseEnd  = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(ImageBase + RelocDir->VirtualAddress + RelocDir->Size);
   } else {
     //
-    // Cannot find relocations, cannot continue
+    // Cannot find relocations, cannot continue to relocate the image, ASSERT for this invalid image.
     //
     ASSERT (FALSE);
     return ;
   }
-
+  
+  //
+  // ASSERT for the invalid image when RelocBase and RelocBaseEnd are both NULL.
+  //
   ASSERT (RelocBase != NULL && RelocBaseEnd != NULL);
 
   //
@@ -1286,7 +1287,7 @@ PeCoffLoaderRelocateImageForRuntime (
 
       case EFI_IMAGE_REL_BASED_HIGHADJ:
         //
-        // Not implemented, but not used in UEFI 2.0
+        // Not valid Relocation type for UEFI image, ASSERT
         //
         ASSERT (FALSE);
         break;
