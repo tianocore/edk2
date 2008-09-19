@@ -231,7 +231,6 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   EdkCompatibilityPkg/Compatibility/DeviceIoToPciRootBridgeIoThunk/DeviceIoToPciRootBridgeIoThunk.inf
   EdkCompatibilityPkg/Compatibility/FrameworkHiiToUefiHiiThunk/FrameworkHiiToUefiHiiThunk.inf
   EdkCompatibilityPkg/Compatibility/FvFileLoaderToLoadFileThunk/FvFileLoaderToLoadFileThunk.inf
-  EdkCompatibilityPkg/Compatibility/FvInfoToFvHobThunk/FvInfoToFvHobThunk.inf
   EdkCompatibilityPkg/Compatibility/FvToFv2Thunk/FvToFv2Thunk.inf
   EdkCompatibilityPkg/Compatibility/Fv2ToFvThunk/Fv2ToFvThunk.inf
   EdkCompatibilityPkg/Compatibility/PciCfg2ToPciCfgThunk/PciCfg2ToPciCfgThunk.inf
