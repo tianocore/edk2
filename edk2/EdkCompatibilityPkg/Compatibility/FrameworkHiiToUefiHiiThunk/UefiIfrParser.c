@@ -979,7 +979,7 @@ ParseOpCodes (
       //
       // check the formset GUID
       //
-      if (CompareGuid ((EFI_GUID *)(VOID *)&FormSet->Guid, (EFI_GUID *)(VOID *)&((EFI_IFR_FORM_SET *) OpCodeData)->Guid) != 0) {
+      if (!CompareGuid ((EFI_GUID *)(VOID *)&FormSet->Guid, (EFI_GUID *)(VOID *)&((EFI_IFR_FORM_SET *) OpCodeData)->Guid)) {
         return EFI_INVALID_PARAMETER;
       }
 
