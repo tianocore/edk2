@@ -294,6 +294,12 @@
   
   ## IF TRUE, the PeiCore will handle the framework FvHob and install FvInfo PPI for it.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkFvHobCompatibilitySupport|FALSE|BOOLEAN|0x00012009
+  
+  ##
+  #  IF TRUE, HelloWorld Application will print the verbose information.
+  #  This PCD is a sample to explain FeatureFlag PCD usage.
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable|TRUE|BOOLEAN|0x0001200a
 
 [PcdsFixedAtBuild.common]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
@@ -363,6 +369,18 @@
 
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
+  
+  ##
+  #  This PCD defines the print string.
+  #  This PCD is a sample to explain FixedAtBuild String PCD usage.
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004
+
+  ##
+  #  This PCD defines the times to print hello world string.
+  #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
 
 [PcdsFixedAtBuild.IA32]
   ## Default EFI boot path name for IA32 architecture, this path is relative to 
@@ -410,6 +428,18 @@
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
 
+  ##
+  #  This PCD defines the print string.
+  #  This PCD is a sample to explain Dynamic PCD usage.
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004
+
+  ##
+  #  This PCD defines the times to print hello world string.
+  #  This PCD is a sample to explain Dynamic UINT32 PCD usage.
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
+
 [PcdsPatchableInModule.common]
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
@@ -438,6 +468,12 @@
 
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
+
+  ##
+  #  This PCD defines the times to print hello world string.
+  #  This PCD is a sample to explain Patchable UINT32 PCD usage.
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
 
 [PcdsFeatureFlag.IA32]
   ## If TRUE, the DXE IPL will load a 64-bit DxeCore.

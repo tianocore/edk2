@@ -31,18 +31,29 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   HelloWorld.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
-
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
   UefiApplicationEntryPoint
   UefiLib
   DebugLib
+  PcdLib
 
+[Guids]
 
+[Ppis]
+
+[Protocols]
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes
