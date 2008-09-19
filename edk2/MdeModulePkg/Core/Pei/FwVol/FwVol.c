@@ -923,22 +923,11 @@ ProcessFvFile (
 
   //
   // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
-  // based on its parent Fvimage is informed or not.
-  // If FvHob of its parent fvimage is built, the extracted FvImage will be built also. 
-  // Or, the extracted FvImage will not be built.
   //
-  HobPtr.Raw = GetHobList ();
-  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV, HobPtr.Raw)) != NULL) {
-    if (((EFI_PHYSICAL_ADDRESS) (UINTN)FvFileHandle > HobPtr.FirmwareVolume->BaseAddress) && 
-        ((EFI_PHYSICAL_ADDRESS) (UINTN)FvFileHandle < HobPtr.FirmwareVolume->BaseAddress + HobPtr.FirmwareVolume->Length)) {
-      BuildFvHob (
-        (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
-        FvImageInfo.FvSize
-      );
-      break;
-    }
-    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
-  }
+  BuildFvHob (
+    (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
+    FvImageInfo.FvSize
+  );
 
   //
   // Makes the encapsulated volume show up in DXE phase to skip processing of
