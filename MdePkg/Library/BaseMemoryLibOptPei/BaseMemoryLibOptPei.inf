@@ -1,5 +1,5 @@
 #/** @file
-# Component description file for RepStr Base Memory Library
+# Component description file for Base Memory Optimization Pei Library
 #
 # Base Memory Library that uses REP string instructions for
 #  high performance and small size. Optimized for use in PEI.

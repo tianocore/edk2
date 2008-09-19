@@ -1,9 +1,9 @@
 #/** @file
-# Component description file for RepStr Base Memory Library
+# Component description file for Base Memory Optimization Dxe Library.
 #
-# Base Memory Library that uses REP string instructions for
-#  high performance and small size. Optimized for use in PEI.
-# Copyright (c) 2007, Intel Corporation
+# Base Memory Library that uses MMX registers for high performance.
+#  Optimized for use in DXE.
+# Copyright (c) 2007 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
