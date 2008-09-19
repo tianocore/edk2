@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -401,72 +401,84 @@ PxeBcCheckSelectedOffer (
     if (!PxeBcTryBinl (Private, Private->SelectedOffer - 1)) {
       Status = EFI_NO_RESPONSE;
     }
-  } else if ((SelectedOffer->OfferType == DHCP4_PACKET_TYPE_DHCP_ONLY) &&
-           (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL)) {
+  } else if (SelectedOffer->OfferType == DHCP4_PACKET_TYPE_DHCP_ONLY) {
     //
-    // The selected offer to finish the D.O.R.A. is a DHCP only offer and
-    // bootfile name is not provided in this offer, we need try proxy offers
-    // to get the bootfile name or the discovery info
+    // The selected offer to finish the D.O.R.A. is a DHCP only offer, we need 
+    // try proxy offers if there are some, othewise the bootfile name must be 
+    // set in this DHCP only offer.
     //
-    ProxyOfferIndex = Private->NumOffers;
-
-    if (Private->SortOffers) {
+    if (Private->GotProxyOffer) {
       //
-      // Choose proxy offer from the type we stored during DHCP offer selection
+      // Get rid of the compiler warning.
       //
-      ASSERT (Private->ProxyIndex[Private->ProxyOfferType] > 0);
+      ProxyOfferIndex = 0;
+      if (Private->SortOffers) {
+        //
+        // The offers are sorted before selecting, the proxy offer type must be
+        // already determined.
+        //
+        ASSERT (Private->ProxyIndex[Private->ProxyOfferType] > 0);
 
-      if (Private->ProxyOfferType == DHCP4_PACKET_TYPE_BINL) {
-        //
-        // We buffer all received BINL proxy offers, try them all one by one
-        //
-        if (!PxeBcTryBinlProxy (Private, &ProxyOfferIndex)) {
-          Status = EFI_NO_RESPONSE;
+        if (Private->ProxyOfferType == DHCP4_PACKET_TYPE_BINL) {
+          //
+          // We buffer all received BINL proxy offers, try them all one by one
+          //
+          if (!PxeBcTryBinlProxy (Private, &ProxyOfferIndex)) {
+            Status = EFI_NO_RESPONSE;
+          }
+        } else {
+          //
+          // For other types, only one proxy offer is buffered.
+          //
+          ProxyOfferIndex = Private->ProxyIndex[Private->ProxyOfferType] - 1;
         }
       } else {
         //
-        // For other types, only one proxy offer is buffered.
+        // The proxy offer type is not determined, choose proxy offer in the 
+        // received order.
         //
-        ProxyOfferIndex = Private->ProxyIndex[Private->ProxyOfferType] - 1;
-      }
-    } else {
-      //
-      // Choose proxy offer in the received order.
-      //
-      Status = EFI_NO_RESPONSE;
+        Status = EFI_NO_RESPONSE;
 
-      for (Index = 0; Index < Private->NumOffers; Index++) {
+        for (Index = 0; Index < Private->NumOffers; Index++) {
 
-        Offer = &Private->Dhcp4Offers[Index].Packet.Offer;
-        if (!IS_PROXY_DHCP_OFFER (Offer)) {
-          //
-          // Skip non proxy dhcp offers.
-          //
-          continue;
-        }
-
-        if (Private->Dhcp4Offers[Index].OfferType == DHCP4_PACKET_TYPE_BINL) {
-          //
-          // Try BINL
-          //
-          if (!PxeBcTryBinl (Private, Index)) {
+          Offer = &Private->Dhcp4Offers[Index].Packet.Offer;
+          if (!IS_PROXY_DHCP_OFFER (Offer)) {
             //
-            // Failed, skip to the next offer
+            // Skip non proxy dhcp offers.
             //
             continue;
           }
+
+          if (Private->Dhcp4Offers[Index].OfferType == DHCP4_PACKET_TYPE_BINL) {
+            //
+            // Try BINL
+            //
+            if (!PxeBcTryBinl (Private, Index)) {
+              //
+              // Failed, skip to the next offer
+              //
+              continue;
+            }
+          }
+
+          Private->ProxyOfferType = Private->Dhcp4Offers[Index].OfferType;
+          ProxyOfferIndex         = Index;
+          Status                  = EFI_SUCCESS;
+          break;
         }
-
-        Status = EFI_SUCCESS;
-        break;
       }
-    }
 
-    if (!EFI_ERROR (Status) && (Private->ProxyOfferType != DHCP4_PACKET_TYPE_BINL)) {
+      if (!EFI_ERROR (Status) && (Private->ProxyOfferType != DHCP4_PACKET_TYPE_BINL)) {
+        //
+        // Copy the proxy offer to Mode and set the flag
+        //
+        PxeBcCopyProxyOffer (Private, ProxyOfferIndex);
+      }
+    } else {
       //
-      // Copy the proxy offer to Mode and set the flag
+      // No proxy offer is received, the bootfile name MUST be set.
       //
-      PxeBcCopyProxyOffer (Private, ProxyOfferIndex);
+      ASSERT (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL);
     }
   }
 
@@ -560,6 +572,8 @@ PxeBcCacheDhcpOffer (
       //
       // It's a proxy dhcp offer with no your address, including pxe10, wfm11a or binl offer.
       //
+      Private->GotProxyOffer = TRUE;
+
       if (OfferType == DHCP4_PACKET_TYPE_BINL) {
         //
         // Cache all binl offers.
@@ -609,7 +623,6 @@ PxeBcSelectOffer (
   UINT32            Index;
   UINT32            OfferIndex;
   EFI_DHCP4_PACKET  *Offer;
-  BOOLEAN           GotProxyOffer;
 
   Private->SelectedOffer = 0;
 
@@ -688,15 +701,6 @@ PxeBcSelectOffer (
     //
     // Try the offers in the received order.
     //
-    GotProxyOffer = FALSE;
-    for (Index = 0; Index < DHCP4_PACKET_TYPE_MAX; Index++) {
-
-      GotProxyOffer = (BOOLEAN) (Private->ProxyIndex[Index] > 0);
-      if (GotProxyOffer) {
-        break;
-      }
-    }
-
     for (Index = 0; Index < Private->NumOffers; Index++) {
 
       Offer = &Private->Dhcp4Offers[Index].Packet.Offer;
@@ -709,7 +713,7 @@ PxeBcSelectOffer (
       }
 
       if ((Private->Dhcp4Offers[Index].OfferType == DHCP4_PACKET_TYPE_DHCP_ONLY) &&
-          ((!GotProxyOffer) && (Private->Dhcp4Offers[Index].Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL))) {
+          ((!Private->GotProxyOffer) && (Private->Dhcp4Offers[Index].Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL))) {
         //
         // DHCP only offer but no proxy offer received and no bootfile option in this offer
         //

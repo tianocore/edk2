@@ -103,6 +103,7 @@ struct _PXEBC_PRIVATE_DATA {
   UINT8                                     MacLen;
 
   BOOLEAN                                   SortOffers;
+  BOOLEAN                                   GotProxyOffer;
   UINT32                                    NumOffers;
   UINT32                                    SelectedOffer;
   UINT32                                    ProxyOfferType;
