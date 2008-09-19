@@ -133,26 +133,14 @@ _DriverUnloadHandler (
   EFI_HANDLE ImageHandle
   )
 {
-  EFI_STATUS  Status;
-
   //
-  // Call the unload handlers for all the modules
+  // Call the unload handlers for all the modules.
+  // 
+  // Note: All libraries were constructed in SMM space, 
+  // therefore we can not destruct them in Unload 
+  // handler.
   //
-  Status = ProcessModuleUnloadList (ImageHandle);
-
-  //
-  // If the driver specific unload handler does not return an error, then call all of the
-  // library destructors.  If the unload handler returned an error, then the driver can not be
-  // unloaded, and the library destructors should not be called
-  //
-  if (!EFI_ERROR (Status)) {
-    ProcessLibraryDestructorList (ImageHandle, gST);
-  }
-
-  //
-  // Return the status from the driver specific unload handler
-  //
-  return Status;
+  return ProcessModuleUnloadList (ImageHandle);
 }
 
 /**
