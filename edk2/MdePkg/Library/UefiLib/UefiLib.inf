@@ -53,7 +53,7 @@
   BaseMemoryLib
   BaseLib
   UefiBootServicesTableLib
-
+  UefiRuntimeServicesTableLib
 
 [Guids]
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
@@ -72,10 +72,15 @@
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
 
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable
+
+[Guids]  
+  gEfiGlobalVariableGuid 
+
 

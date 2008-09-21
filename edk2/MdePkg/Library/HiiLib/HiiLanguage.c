@@ -16,52 +16,6 @@
 #include "InternalHiiLib.h"
 
 /**
-  Determine what is the current language setting. The space reserved for Lang
-  must be at least RFC_3066_ENTRY_SIZE bytes;
-
-  If Lang is NULL, then ASSERT.
-
-  @param  Lang                   Pointer of system language. Lang will always be filled with 
-                                         a valid RFC 3066 language string. If "PlatformLang" is not
-                                         set in the system, the default language specifed by PcdUefiVariableDefaultPlatformLang
-                                         is returned.
-
-  @return  EFI_SUCCESS     If the EFI Variable with "PlatformLang" is set and return in Lang.
-  @return  EFI_NOT_FOUND If the EFI Variable with "PlatformLang" is not set, but a valid default language is return in Lang.
-
-**/
-EFI_STATUS
-EFIAPI
-HiiLibGetCurrentLanguage (
-  OUT     CHAR8               *Lang
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       Size;
-
-  ASSERT (Lang != NULL);
-
-  //
-  // Get current language setting
-  //
-  Size = RFC_3066_ENTRY_SIZE;
-  Status = gRT->GetVariable (
-                  L"PlatformLang",
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &Size,
-                  Lang
-                  );
-
-  if (EFI_ERROR (Status)) {
-    AsciiStrCpy (Lang, (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang));
-  }
-
-  return Status;
-}
-
-
-/**
   Get next language from language code list (with separator ';').
 
   If LangCode is NULL, then ASSERT.
@@ -136,8 +90,6 @@ HiiLibGetSupportedLanguages (
     return NULL;
   }
 
-  LocateHiiProtocols ();
-  
   Status = mHiiStringProt->GetLanguages (mHiiStringProt, HiiHandle, LanguageString, &BufferSize);
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
@@ -232,8 +184,6 @@ HiiLibGetSupportedSecondaryLanguages (
     return NULL;
   }
 
-  LocateHiiProtocols ();
-  
   Status = mHiiStringProt->GetSecondaryLanguages (mHiiStringProt, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
