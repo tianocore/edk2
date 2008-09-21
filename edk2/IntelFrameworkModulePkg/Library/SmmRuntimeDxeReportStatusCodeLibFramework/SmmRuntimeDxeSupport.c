@@ -32,6 +32,8 @@ EFI_STATUS_CODE_DATA  *mStatusCodeData;
 STATIC
 BOOLEAN               mInSmm;
 
+EFI_SMM_BASE_PROTOCOL *mSmmBase;
+
 STATIC
 EFI_RUNTIME_SERVICES  *mRT;
 
@@ -123,7 +125,6 @@ ReportStatusCodeLibConstruct (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_SMM_BASE_PROTOCOL *SmmBase;
   EFI_STATUS            Status;
 
   mBS = SystemTable->BootServices;
@@ -133,12 +134,12 @@ ReportStatusCodeLibConstruct (
   // the SMM driver must be success to locate protocol.
   // 
   ASSERT (mBS != NULL);
-  Status = mBS->LocateProtocol (&gEfiSmmBaseProtocolGuid, NULL, (VOID **) &SmmBase);
+  Status = mBS->LocateProtocol (&gEfiSmmBaseProtocolGuid, NULL, (VOID **) &mSmmBase);
   if (!EFI_ERROR (Status)) {
-    SmmBase->InSmm (SmmBase, &mInSmm);
+    mSmmBase->InSmm (mSmmBase, &mInSmm);
     if (mInSmm) {
-      Status = SmmBase->SmmAllocatePool (
-                           SmmBase,
+      Status = mSmmBase->SmmAllocatePool (
+                           mSmmBase,
                            EfiRuntimeServicesData, 
                            sizeof (EFI_STATUS_CODE_DATA) + EFI_STATUS_CODE_DATA_MAX_SIZE, 
                            (VOID **) &mStatusCodeData
@@ -207,18 +208,22 @@ ReportStatusCodeLibDestruct (
 {
   EFI_STATUS  Status;
 
-  //
-  // Close SetVirtualAddressMap () notify function
-  //
-  ASSERT (mBS != NULL);
-  Status = mBS->CloseEvent (mVirtualAddressChangeEvent);
-  ASSERT_EFI_ERROR (Status);
-  Status = mBS->CloseEvent (mExitBootServicesEvent);
-  ASSERT_EFI_ERROR (Status);
+  if (!mInSmm) {
+    //
+    // Close SetVirtualAddressMap () notify function
+    //
+    ASSERT (mBS != NULL);
+    Status = mBS->CloseEvent (mVirtualAddressChangeEvent);
+    ASSERT_EFI_ERROR (Status);
+    Status = mBS->CloseEvent (mExitBootServicesEvent);
+    ASSERT_EFI_ERROR (Status);
 
-  mBS->FreePool (mStatusCodeData);
+    mBS->FreePool (mStatusCodeData);
+  } else {
+    mSmmBase->SmmFreePool (mSmmBase, mStatusCodeData);
+  }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
