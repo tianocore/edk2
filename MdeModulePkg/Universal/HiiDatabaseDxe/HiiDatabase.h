@@ -38,7 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/IfrSupportLib.h>
-#include <Library/HiiLib.h>
+#include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 
 #define HII_DATABASE_NOTIFY_GUID \

@@ -58,7 +58,7 @@
   BaseMemoryLib
   DebugLib
   IfrSupportLib
-  HiiLib
+  UefiLib
 
 [Protocols]
   gEfiConsoleControlProtocolGuid                
