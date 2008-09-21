@@ -251,7 +251,7 @@ HiiLibGetString (
   ASSERT (!(*StringSize != 0 && String == NULL));
   ASSERT (IsHiiHandleRegistered (PackageList));
 
-  HiiLibGetCurrentLanguage (CurrentLang);
+  GetCurrentLanguage (CurrentLang);
 
   Status = mHiiStringProt->GetString (
                                mHiiStringProt,

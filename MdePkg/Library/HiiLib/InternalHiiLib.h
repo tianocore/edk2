@@ -21,8 +21,6 @@
 #include <Protocol/HiiString.h>
 #include <Protocol/DevicePath.h>
 
-#include <Guid/GlobalVariable.h>
-
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/HiiLib.h>
@@ -32,6 +30,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/UefiLib.h>
 
 #define HII_LIB_DEFAULT_STRING_SIZE     0x200
 
@@ -51,16 +50,6 @@ extern CONST EFI_HII_STRING_PROTOCOL           *mHiiStringProt;
 BOOLEAN
 IsHiiHandleRegistered (
   EFI_HII_HANDLE    HiiHandle
-  );
-
-/**
-
-  This function locate Hii relative protocols for later usage.
-
-**/
-VOID
-LocateHiiProtocols (
-  VOID
   );
 
 #endif
