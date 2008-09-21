@@ -2086,7 +2086,7 @@ HiiStringIdToImage (
   if (Language != NULL) {
     AsciiStrCpy (CurrentLang, (CHAR8 *) Language);
   } else {
-    HiiLibGetCurrentLanguage (CurrentLang);
+    GetCurrentLanguage (CurrentLang);
   }
 
   //

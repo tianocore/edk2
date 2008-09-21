@@ -332,7 +332,7 @@ InitializeFrontPage (
   //
   // Get current language setting
   //
-  HiiLibGetCurrentLanguage (CurrentLang);
+  GetCurrentLanguage (CurrentLang);
 
   //
   // Allocate space for creation of UpdateData Buffer
