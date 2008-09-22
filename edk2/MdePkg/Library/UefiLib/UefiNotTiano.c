@@ -43,15 +43,16 @@ InternalEmptyFuntion (
 }
 
 /**
-  Create a Legacy Boot Event.
-
-  Tiano extended the CreateEvent Type enum to add a legacy boot event type.
-  This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
-  added and now it's possible to not voilate the UEFI specification by
-  declaring a GUID for the legacy boot event class. This library supports
-  the EDK/EFI 1.10 form and EDK II/UEFI 2.0 form and allows common code to
-  work both ways.
-
+  Creates an EFI event in the Legacy Boot Event Group.  Prior to UEFI 2.0 this 
+  was done via a non blessed UEFI extensions and this library abstracts the 
+  implementation mechanism of this event from the caller.
+  
+  This function abstracts the creation of the Legacy Boot Event.  The Framework 
+  moved from a proprietary to UEFI 2.0 based mechanism.  This library abstracts 
+  the caller from how this event is created to prevent to code form having to 
+  change with the version of the specification supported.
+  If LegacyBootEvent is NULL, then ASSERT().
+  
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
 
   @retval EFI_SUCCESS       Event was created.
@@ -127,14 +128,15 @@ EfiCreateEventLegacyBootEx (
 }
 
 /**
-  Create a "Ready to Boot" Event.
-
-  Tiano extended the CreateEvent Type enum to add a ready to boot event type.
-  This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
-  added and now it's possible to not voilate the UEFI specification and use
-  the ready to boot event class defined in UEFI 2.0. This library supports
-  the EDK/EFI 1.10 form and EDK II/UEFI 2.0 form and allows common code to
-  work both ways.
+  Create an EFI event in the Ready To Boot Event Group.  Prior to UEFI 2.0 this 
+  was done via a non-standard UEFI extension, and this library abstracts the 
+  implementation mechanism of this event from the caller.
+  
+  This function abstracts the creation of the Ready to Boot Event.  The Framework 
+  moved from a proprietary to UEFI 2.0-based mechanism.  This library abstracts 
+  the caller from how this event is created to prevent the code form having to 
+  change with the version of the specification supported.
+  If ReadyToBootEvent is NULL, then ASSERT().
 
   @param  ReadyToBootEvent  Returns the EFI event returned from gBS->CreateEvent(Ex).
 
@@ -259,16 +261,14 @@ EfiSignalEventLegacyBoot (
 
 
 /**
-  Check to see if the Firmware Volume (FV) Media Device Path is valid
+  The Framework FwVol Device Path changed to conform to the UEFI 2.0 specification.  
+  This library function abstracts validating a device path node.
 
-  Tiano extended the EFI 1.10 device path nodes. Tiano does not own this enum
-  so as we move to UEFI 2.0 support we must use a mechanism that conforms with
-  the UEFI 2.0 specification to define the FV device path. An UEFI GUIDed
-  device path is defined for Tiano extensions of device path. If the code
-  is compiled to conform with the UEFI 2.0 specification use the new device path
-  else use the old form for backwards compatability. The return value to this
-  function points to a location in FvDevicePathNode and it does not allocate
-  new memory for the GUID pointer that is returned.
+  Check the MEDIA_FW_VOL_FILEPATH_DEVICE_PATH data structure to see if it's valid.  
+  If it is valid, then return the GUID file name from the device path node.  
+  Otherwise, return NULL.  This device path changed in the DXE CIS version 0.92 
+  in a non back ward compatible way to not conflict with the UEFI 2.0 specification.  
+  This function abstracts the differences from the caller.
   If FvDevicePathNode is NULL, then ASSERT().
   
   @param  FvFileDevicePathNode  Pointer to FV device path to check.
@@ -295,14 +295,13 @@ EfiGetNameGuidFromFwVolDevicePathNode (
 
 
 /**
-  Initialize a Firmware Volume (FV) Media Device Path node.
+  The Framework FwVol Device Path changed to conform to the UEFI 2.0 specification.  
+  This library function abstracts initializing a device path node.
 
-  Tiano extended the EFI 1.10 device path nodes. Tiano does not own this enum
-  so as we move to UEFI 2.0 support we must use a mechanism that conforms with
-  the UEFI 2.0 specification to define the FV device path. An UEFI GUIDed
-  device path is defined for Tiano extensions of device path. If the code
-  is compiled to conform with the UEFI 2.0 specification use the new device path
-  else use the old form for backwards compatability.
+  Initialize the MEDIA_FW_VOL_FILEPATH_DEVICE_PATH data structure.  This device 
+  path changed in the DXE CIS version 0.92 in a non back ward compatible way to 
+  not conflict with the UEFI 2.0 specification.  This function abstracts the 
+  differences from the caller.
   If FvDevicePathNode is NULL, then ASSERT().
   If NameGuid is NULL, then ASSERT().
 
