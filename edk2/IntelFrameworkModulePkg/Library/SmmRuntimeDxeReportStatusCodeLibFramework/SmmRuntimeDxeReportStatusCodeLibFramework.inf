@@ -49,6 +49,7 @@
   BaseLib
   DebugLib
   UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
   OemHookStatusCodeLib
 
 [Guids]
