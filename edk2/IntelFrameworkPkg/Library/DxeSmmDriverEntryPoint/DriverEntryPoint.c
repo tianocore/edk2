@@ -26,8 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 
 
-EFI_BOOT_SERVICES  *mBS;
-
 /**
   This function returns the size, in bytes,
   of the device path data structure specified by DevicePath.
@@ -103,15 +101,19 @@ SmmAppendDevicePath (
   Size2         = SmmGetDevicePathSize (SecondDevicePath);
   Size          = Size1 + Size2 - sizeof (EFI_DEVICE_PATH_PROTOCOL);
 
-  Status = mBS->AllocatePool (EfiBootServicesData, Size, (VOID **) &NewDevicePath);
+  Status = gBS->AllocatePool (EfiBootServicesData, Size, (VOID **) &NewDevicePath);
 
   if (EFI_SUCCESS == Status) {
-    mBS->CopyMem ((VOID *) NewDevicePath, (VOID *) FirstDevicePath, Size1);
+    //
+    // CopyMem in gBS is used as this service should always be ready. We didn't choose
+    // to use a BaseMemoryLib function as such library instance may have constructor.
+    //
+    gBS->CopyMem ((VOID *) NewDevicePath, (VOID *) FirstDevicePath, Size1);
     //
     // Over write Src1 EndNode and do the copy
     //
     DevicePath2 = (EFI_DEVICE_PATH_PROTOCOL *) ((CHAR8 *) NewDevicePath + (Size1 - sizeof (EFI_DEVICE_PATH_PROTOCOL)));
-    mBS->CopyMem ((VOID *) DevicePath2, (VOID *) SecondDevicePath, Size2);
+    gBS->CopyMem ((VOID *) DevicePath2, (VOID *) SecondDevicePath, Size2);
   }
 
   return NewDevicePath;
@@ -171,12 +173,12 @@ _ModuleEntryPoint (
   //
   // Cache a pointer to the Boot Services Table
   //
-  mBS = SystemTable->BootServices;
+  gBS = SystemTable->BootServices;
 
   //
   // Retrieve the Loaded Image Protocol
   //
-  Status = mBS->HandleProtocol (
+  Status = gBS->HandleProtocol (
                   ImageHandle,
                   &gEfiLoadedImageProtocolGuid,
                   (VOID*)&LoadedImage
@@ -186,7 +188,7 @@ _ModuleEntryPoint (
   //
   // Retrieve SMM Base Protocol
   //
-  Status = mBS->LocateProtocol (
+  Status = gBS->LocateProtocol (
                   &gEfiSmmBaseProtocolGuid,
                   NULL,
                   (VOID **) &SmmBase
@@ -205,7 +207,7 @@ _ModuleEntryPoint (
     //
     // Retrieve the Device Path Protocol from the DeviceHandle tha this driver was loaded from
     //
-    Status = mBS->HandleProtocol (
+    Status = gBS->HandleProtocol (
                     LoadedImage->DeviceHandle,
                     &gEfiDevicePathProtocolGuid,
                     (VOID*)&ImageDevicePath
@@ -235,7 +237,7 @@ _ModuleEntryPoint (
   // Optionally install the unload handler
   //
   if (_gDriverUnloadImageCount > 0) {
-    Status = mBS->HandleProtocol (
+    Status = gBS->HandleProtocol (
                     ImageHandle,
                     &gEfiLoadedImageProtocolGuid,
                     (VOID **)&LoadedImage
