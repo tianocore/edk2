@@ -1,7 +1,7 @@
 /** @file
   Status code Runtime Protocol as defined in PI Specification VOLUME 2 DXE
 
-  The StatusCode () Tiano service is added to the EFI system table and the 
+  The StatusCode () service is added to the EFI system table and the 
   EFI_STATUS_CODE_ARCH_PROTOCOL_GUID protocol is registered with a NULL 
   pointer.
 
