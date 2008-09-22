@@ -38,9 +38,6 @@ STATIC
 EFI_RUNTIME_SERVICES  *mRT;
 
 STATIC
-EFI_BOOT_SERVICES     *mBS;
-
-STATIC
 BOOLEAN               mHaveExitedBootServices = FALSE;
 
 /**
@@ -59,12 +56,17 @@ InternalGetReportStatusCode (
 
   if (mInSmm) {
     return (EFI_REPORT_STATUS_CODE) OemHookStatusCodeReport;
-  } else if (mRT->Hdr.Revision < 0x20000) {
+  } else if (mRT != NULL && mRT->Hdr.Revision < 0x20000) {
     return ((FRAMEWORK_EFI_RUNTIME_SERVICES*)mRT)->ReportStatusCode;
   } else if (!mHaveExitedBootServices) {
-    Status = mBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**)&StatusCodeProtocol);
-    if (!EFI_ERROR (Status) && StatusCodeProtocol != NULL) {
-      return StatusCodeProtocol->ReportStatusCode;
+  	//
+  	// Check gBS just in case. ReportStatusCode is called before gBS is initialized.
+  	//
+    if (gBS != NULL) {
+      Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**)&StatusCodeProtocol);
+      if (!EFI_ERROR (Status) && StatusCodeProtocol != NULL) {
+        return StatusCodeProtocol->ReportStatusCode;
+      }
     }
   }
 
@@ -127,14 +129,11 @@ ReportStatusCodeLibConstruct (
 {
   EFI_STATUS            Status;
 
-  mBS = SystemTable->BootServices;
-
   //
   // SMM driver depends on the SMM BASE protocol.
   // the SMM driver must be success to locate protocol.
   // 
-  ASSERT (mBS != NULL);
-  Status = mBS->LocateProtocol (&gEfiSmmBaseProtocolGuid, NULL, (VOID **) &mSmmBase);
+  Status = gBS->LocateProtocol (&gEfiSmmBaseProtocolGuid, NULL, (VOID **) &mSmmBase);
   if (!EFI_ERROR (Status)) {
     mSmmBase->InSmm (mSmmBase, &mInSmm);
     if (mInSmm) {
@@ -157,7 +156,7 @@ ReportStatusCodeLibConstruct (
   mRT     = gRT;
   mInSmm  = FALSE;
 
-  mBS->AllocatePool (EfiRuntimeServicesData, sizeof (EFI_STATUS_CODE_DATA) + EFI_STATUS_CODE_DATA_MAX_SIZE, (VOID **)&mStatusCodeData);
+  gBS->AllocatePool (EfiRuntimeServicesData, sizeof (EFI_STATUS_CODE_DATA) + EFI_STATUS_CODE_DATA_MAX_SIZE, (VOID **)&mStatusCodeData);
   ASSERT (NULL != mStatusCodeData);
   //
   // Cache the report status code service
@@ -167,7 +166,7 @@ ReportStatusCodeLibConstruct (
   //
   // Register the call back of virtual address change
   // 
-  Status = mBS->CreateEvent (
+  Status = gBS->CreateEvent (
                   EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
                   TPL_NOTIFY,
                   ReportStatusCodeLibVirtualAddressChange,
@@ -180,7 +179,7 @@ ReportStatusCodeLibConstruct (
   //
   // Register the call back of virtual address change
   // 
-  Status = mBS->CreateEvent (
+  Status = gBS->CreateEvent (
                   EVT_SIGNAL_EXIT_BOOT_SERVICES,
                   TPL_NOTIFY,
                   ReportStatusCodeLibExitBootServices,
@@ -212,13 +211,13 @@ ReportStatusCodeLibDestruct (
     //
     // Close SetVirtualAddressMap () notify function
     //
-    ASSERT (mBS != NULL);
-    Status = mBS->CloseEvent (mVirtualAddressChangeEvent);
+    ASSERT (gBS != NULL);
+    Status = gBS->CloseEvent (mVirtualAddressChangeEvent);
     ASSERT_EFI_ERROR (Status);
-    Status = mBS->CloseEvent (mExitBootServicesEvent);
+    Status = gBS->CloseEvent (mExitBootServicesEvent);
     ASSERT_EFI_ERROR (Status);
 
-    mBS->FreePool (mStatusCodeData);
+    gBS->FreePool (mStatusCodeData);
   } else {
     mSmmBase->SmmFreePool (mSmmBase, mStatusCodeData);
   }
