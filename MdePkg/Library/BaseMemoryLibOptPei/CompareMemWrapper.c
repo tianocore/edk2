@@ -45,7 +45,7 @@
   @param  SourceBuffer      Pointer to the source buffer to compare.
   @param  Length            Number of bytes to compare.
 
-  @return 0                 All Length bytes of the two buffers are identical.
+  @retval 0                 All Length bytes of the two buffers are identical.
   @retval Non-zero          The first mismatched byte in SourceBuffer subtracted from the first
                             mismatched byte in DestinationBuffer.
 
