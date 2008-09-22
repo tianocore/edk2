@@ -100,6 +100,7 @@
   gEfiHiiDatabaseProtocolGuid AND
   gEfiHiiStringProtocolGuid AND
   gEfiHiiConfigRoutingProtocolGuid AND
-  gEfiHiiFontProtocolGuid
+  gEfiHiiFontProtocolGuid AND
+  gEfiFormBrowser2ProtocolGuid
 
 
