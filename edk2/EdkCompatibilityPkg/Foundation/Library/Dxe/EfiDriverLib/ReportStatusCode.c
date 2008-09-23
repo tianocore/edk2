@@ -23,9 +23,7 @@ Abstract:
 #include EFI_GUID_DEFINITION (StatusCodeDataTypeId)
 #include EFI_ARCH_PROTOCOL_DEFINITION (StatusCode)
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 STATIC EFI_STATUS_CODE_PROTOCOL  *gStatusCode = NULL;
-#endif
 
 EFI_STATUS
 EfiLibReportStatusCode (
@@ -58,34 +56,37 @@ Returns:
 --*/
 {
   EFI_STATUS  Status;
-
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000) 
-  if (gStatusCode == NULL) {
-    if (gBS == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
-    if (EFI_ERROR (Status) || gStatusCode == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-  }
-  Status = gStatusCode->ReportStatusCode (Type, Value, Instance, CallerId, Data);
-  return Status;
-#else
-  if (gRT == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-  //
-  // Check whether EFI_RUNTIME_SERVICES has Tiano Extension
-  //
+  
   Status = EFI_UNSUPPORTED;
-  if (gRT->Hdr.Revision     == EFI_SPECIFICATION_VERSION     &&
-      gRT->Hdr.HeaderSize   == sizeof (EFI_RUNTIME_SERVICES) &&
-      gRT->ReportStatusCode != NULL) {
-    Status = gRT->ReportStatusCode (Type, Value, Instance, CallerId, Data);
-  }
-  return Status;
+
+  if (gRT->Hdr.Revision >= 0x00020000) {
+	  if (gStatusCode == NULL) {
+	    if (gBS == NULL) {
+	      return EFI_UNSUPPORTED;
+	    }
+	    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
+	    if (EFI_ERROR (Status) || gStatusCode == NULL) {
+	      return EFI_UNSUPPORTED;
+	    }
+	  }
+	  Status = gStatusCode->ReportStatusCode (Type, Value, Instance, CallerId, Data);
+	} else {
+	  if (gRT == NULL) {
+	    return EFI_UNSUPPORTED;
+	  }
+	  //
+	  // Check whether EFI_RUNTIME_SERVICES has Tiano Extension
+	  //
+	  Status = EFI_UNSUPPORTED;
+#if (EFI_SPECIFICATION_VERSION < 0x00020000)
+	  if (gRT->Hdr.Revision     == EFI_SPECIFICATION_VERSION     &&
+	      gRT->Hdr.HeaderSize   == sizeof (EFI_RUNTIME_SERVICES) &&
+	      gRT->ReportStatusCode != NULL) {
+	    Status = gRT->ReportStatusCode (Type, Value, Instance, CallerId, Data);
 #endif
+	  }
+	}
+  return Status;
 }
 
 EFI_STATUS
