@@ -124,6 +124,10 @@ LookupPoolHead (
     return &mPoolHead[MemoryType];
   }
 
+  //
+  // MemoryType values in the range 0x80000000..0xFFFFFFFF are reserved for use by UEFI 
+  // OS loaders that are provided by operating system vendors
+  //
   if (MemoryType < 0) {
 
     for (Link = mPoolHeadList.ForwardLink; Link != &mPoolHeadList; Link = Link->ForwardLink) {

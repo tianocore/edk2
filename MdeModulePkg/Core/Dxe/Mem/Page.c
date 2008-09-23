@@ -35,18 +35,20 @@ typedef struct {
 //
 UINTN     mMemoryMapKey = 0;
 
-//
-// mMapStack - space to use as temp storage to build new map descriptors
-// mMapDepth - depth of new descriptor stack
-//
-
 #define MAX_MAP_DEPTH 6
+
+///
+/// mMapDepth - depth of new descriptor stack
+///
 UINTN         mMapDepth = 0;
+///
+/// mMapStack - space to use as temp storage to build new map descriptors
+///
 MEMORY_MAP    mMapStack[MAX_MAP_DEPTH];
 UINTN         mFreeMapStack = 0;
-//
-// This list maintain the free memory map list
-//
+///
+/// This list maintain the free memory map list
+///
 LIST_ENTRY   mFreeMemoryMapEntryList = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemoryMapEntryList);
 BOOLEAN      mMemoryTypeInformationInitialized = FALSE;
 
@@ -1287,7 +1289,10 @@ CoreGetMemoryMap (
     if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) ||
         (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo)) {
       if ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME) {
-
+        // 
+        // Create EFI_MEMORY_DESCRIPTOR for every Reserved and MMIO GCD entries
+        // that are marked for runtime use
+        //
         MemoryMap->PhysicalStart = GcdMapEntry->BaseAddress;
         MemoryMap->VirtualStart  = 0;
         MemoryMap->NumberOfPages = RShiftU64 ((GcdMapEntry->EndAddress - GcdMapEntry->BaseAddress + 1), EFI_PAGE_SHIFT);
