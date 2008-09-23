@@ -314,9 +314,11 @@ CoreLoadPeImage (
   }
 
   Image->ImageBasePage = Image->ImageContext.ImageAddress;
-  Image->ImageContext.ImageAddress =
-      (Image->ImageContext.ImageAddress + Image->ImageContext.SectionAlignment - 1) &
-      ~((UINTN)Image->ImageContext.SectionAlignment - 1);
+  if (!Image->ImageContext.IsTeImage) {
+	  Image->ImageContext.ImageAddress =
+	      (Image->ImageContext.ImageAddress + Image->ImageContext.SectionAlignment - 1) &
+	      ~((UINTN)Image->ImageContext.SectionAlignment - 1);
+  }
 
   //
   // Load the image from the file into the allocated memory
