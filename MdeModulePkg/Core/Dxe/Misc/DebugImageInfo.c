@@ -24,7 +24,9 @@ EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
 
 EFI_SYSTEM_TABLE_POINTER *mDebugTable = NULL;
 
+#define FOUR_MEG_ALIGNMENT   0x400000
 
+#define EFI_DEBUG_TABLE_ENTRY_SIZE       (sizeof (VOID *))
 
 /**
   Creates and initializes the DebugImageInfo Table.  Also creates the configuration

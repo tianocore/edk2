@@ -313,17 +313,6 @@ FvSetVolumeInfo (
   IN CONST  VOID                                *Buffer
   );
 
-//
-//Internal functions
-//
-typedef enum {
-  EfiCheckSumUint8    = 0,
-  EfiCheckSumUint16   = 1,
-  EfiCheckSumUint32   = 2,
-  EfiCheckSumUint64   = 3,
-  EfiCheckSumMaximum  = 4
-} EFI_CHECKSUM_TYPE;
-
 
 
 /**

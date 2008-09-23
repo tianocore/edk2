@@ -19,10 +19,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define FVB_DEVICE_SIGNATURE       EFI_SIGNATURE_32('_','F','V','B')
 
+
 typedef struct {
   UINTN                       Base;
   UINTN                       Length;
 } LBA_CACHE;
+
 
 typedef struct {
   MEMMAP_DEVICE_PATH          MemMapDevPath;
@@ -41,30 +43,9 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS                  BaseAddress;
 } EFI_FW_VOL_BLOCK_DEVICE;
 
+
 #define FVB_DEVICE_FROM_THIS(a) \
   CR(a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
-
-
-
-/**
-  This routine is the driver initialization entry point.  It initializes the
-  libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
-  produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
-
-  @param  ImageHandle            The image handle.
-  @param  SystemTable            The system table.
-
-  @retval EFI_SUCCESS            Successfully initialized firmware volume block
-                                 driver.
-
-**/
-EFI_STATUS
-EFIAPI
-FwVolBlockDriverInit (
-  IN EFI_HANDLE                 ImageHandle,
-  IN EFI_SYSTEM_TABLE           *SystemTable
-  );
-
 
 
 /**
@@ -252,49 +233,5 @@ FwVolBlockGetBlockSize (
   IN OUT    UINTN                               *NumberOfBlocks
   );
 
-/**
-  This routine is the driver initialization entry point.  It initializes the
-  libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
-  produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
-
-  @param  ImageHandle            The image handle.
-  @param  SystemTable            The system table.
-
-  @retval EFI_SUCCESS            Successfully initialized firmware volume block
-                                 driver.
-
-**/
-EFI_STATUS
-EFIAPI
-FwVolBlockDriverInit (
-  IN EFI_HANDLE                 ImageHandle,
-  IN EFI_SYSTEM_TABLE           *SystemTable
-  );
-
-
-/**
-  This routine produces a firmware volume block protocol on a given
-  buffer.
-
-  @param  BaseAddress            base address of the firmware volume image
-  @param  Length                 length of the firmware volume image
-  @param  ParentHandle           handle of parent firmware volume, if this image
-                                 came from an FV image file in another firmware
-                                 volume (ala capsules)
-  @param  FvProtocol             Firmware volume block protocol produced.
-
-  @retval EFI_VOLUME_CORRUPTED   Volume corrupted.
-  @retval EFI_OUT_OF_RESOURCES   No enough buffer to be allocated.
-  @retval EFI_SUCCESS            Successfully produced a FVB protocol on given
-                                 buffer.
-
-**/
-EFI_STATUS
-ProduceFVBProtocolOnBuffer (
-  IN EFI_PHYSICAL_ADDRESS   BaseAddress,
-  IN UINT64                 Length,
-  IN EFI_HANDLE             ParentHandle,
-  OUT EFI_HANDLE            *FvProtocol  OPTIONAL
-  );
 
 #endif

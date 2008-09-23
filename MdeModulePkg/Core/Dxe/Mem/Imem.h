@@ -16,16 +16,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _IMEM_H_
 
 #if defined (MDE_CPU_IPF)
-//
-// For Itanium machines make the default allocations 8K aligned
-//
+///
+/// For Itanium machines make the default allocations 8K aligned
+///
 #define EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT  (EFI_PAGE_SIZE * 2)
 #define DEFAULT_PAGE_ALLOCATION                     (EFI_PAGE_SIZE * 2)
 
 #else
-//
-// For genric EFI machines make the default allocations 4K aligned
-//
+///
+/// For genric EFI machines make the default allocations 4K aligned
+///
 #define EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT  (EFI_PAGE_SIZE)
 #define DEFAULT_PAGE_ALLOCATION                     (EFI_PAGE_SIZE)
 

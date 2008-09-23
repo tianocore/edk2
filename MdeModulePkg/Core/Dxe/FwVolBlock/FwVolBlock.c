@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "DxeMain.h"
+#include "FwVolBlock.h"
 
 
 EFI_FW_VOL_BLOCK_DEVICE  mFwVolBlock = {
@@ -511,9 +512,7 @@ ProduceFVBProtocolOnBuffer (
 
 
 /**
-  This routine is the driver initialization entry point.  It initializes the
-  libraries, consumes FV hobs and NT_NON_MM_FV environment variable and
-  produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
+  This routine consumes FV hobs and produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
 
   @param  ImageHandle            The image handle.
   @param  SystemTable            The system table.
