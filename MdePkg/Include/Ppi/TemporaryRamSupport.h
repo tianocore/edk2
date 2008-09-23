@@ -29,22 +29,15 @@
   permanent memory.
 
   @param PeiServices            Pointer to the PEI Services Table.
-
   @param TemporaryMemoryBase    Source Address in temporary memory from which the SEC or PEIM will copy the
                                 Temporary RAM contents.
-
   @param PermanentMemoryBase    Destination Address in permanent memory into which the SEC or PEIM will copy the
                                 Temporary RAM contents.
-
   @param CopySize               Amount of memory to migrate from temporary to permanent memory.
 
-
-
   @retval EFI_SUCCESS           The data was successfully returned.
-
-  @retval EFI_INVALID_PARAMETER PermanentMemoryBase + CopySize >
-                                TemporaryMemoryBase when TemporaryMemoryBase >
-                                PermanentMemoryBase.
+  @retval EFI_INVALID_PARAMETER PermanentMemoryBase + CopySize > TemporaryMemoryBase when
+                                TemporaryMemoryBase > PermanentMemoryBase.
 
 **/
 typedef
@@ -56,16 +49,14 @@ EFI_STATUS
   IN UINTN                    CopySize
 );
 
-/**
-  @par Ppi Description:
-  This service abstracts the ability to migrate contents of the platform early memory store.
-
-  @param ResetSystem
-  Perform the migration of contents of Temporary RAM to Permanent RAM.
-  Terminate the Temporary RAM if it cannot coexist with the Permanent RAM.
-
-**/
+///
+/// This service abstracts the ability to migrate contents of the platform early memory store.
+///
 typedef struct {
+  ///
+  /// Perform the migration of contents of Temporary RAM to Permanent RAM.
+  /// Terminate the Temporary RAM if it cannot coexist with the Permanent RAM.
+  ///
   TEMPORARY_RAM_MIGRATION   TemporaryRamMigration;
 } TEMPORARY_RAM_SUPPORT_PPI;
 
