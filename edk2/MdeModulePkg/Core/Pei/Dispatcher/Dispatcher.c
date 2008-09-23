@@ -477,10 +477,8 @@ PeiDispatcher (
               // But if new stack is smaller than the size of old stack, we also reserve
               // the size of old stack at bottom of permenent memory.
               //
-              StackGap = 0;
-              if (Private->StackSize > OldPeiStackSize) {
-                StackGap = Private->StackSize - OldPeiStackSize;
-              }
+              ASSERT (Private->StackSize >= OldPeiStackSize);
+              StackGap = Private->StackSize - OldPeiStackSize;
 
               //
               // Update HandOffHob for new installed permenent memory
