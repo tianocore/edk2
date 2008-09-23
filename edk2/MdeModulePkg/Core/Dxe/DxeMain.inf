@@ -29,19 +29,11 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF
 
 [Sources.common]
-  Library.h
-  Imem.h
-  Image.h
-  Handle.h
-  Gcd.h
-  FwVolDriver.h
-  FwVolBlock.h
-  Event.h
   DxeMain.h
-  DebugImageInfo.h
   SectionExtraction/CoreSectionExtraction.c
   Image/ImageFile.c
   Image/Image.c
+  Image/Image.h
   Misc/DebugImageInfo.c
   Misc/Stall.c
   Misc/SetWatchdogTimer.c
@@ -51,19 +43,25 @@
   Hand/Notify.c
   Hand/Locate.c
   Hand/Handle.c
+  Hand/Handle.h
   Gcd/Gcd.c
+  Gcd/Gcd.h
   Mem/Pool.c
   Mem/Page.c
   Mem/MemData.c
+  Mem/Imem.h
   FwVolBlock/FwVolBlock.c
+  FwVolBlock/FwVolBlock.h
   FwVol/FwVolWrite.c
   FwVol/FwVolRead.c
   FwVol/FwVolAttrib.c
   FwVol/Ffs.c
   FwVol/FwVol.c
+  FwVol/FwVolDriver.h
   Event/Tpl.c
   Event/Timer.c
   Event/Event.c
+  Event/Event.h
   Dispatcher/Dependency.c
   Dispatcher/Dispatcher.c
   DxeMain/DxeProtocolNotify.c

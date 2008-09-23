@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "DxeMain.h"
+#include "FwVolDriver.h"
 
-/*++
-
-Required Alignment    Alignment Value in FFS       Alignment Value in
+/**
+Required Alignment             Alignment Value in FFS         Alignment Value in
 (bytes)                        Attributes Field               Firmware Volume Interfaces
 1                                    0                                     0
 2                                    0                                     1
@@ -29,9 +29,7 @@ Required Alignment    Alignment Value in FFS       Alignment Value in
 4 KB                                 5                                     12
 32 KB                                6                                     15
 64 KB                                7                                     16
-
---*/
-
+**/
 UINT8 mFvAttributes[] = {0, 4, 7, 9, 10, 12, 15, 16};
 
 

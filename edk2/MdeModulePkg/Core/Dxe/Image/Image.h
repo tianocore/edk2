@@ -16,41 +16,48 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
-
-
 #define LOADED_IMAGE_PRIVATE_DATA_SIGNATURE   EFI_SIGNATURE_32('l','d','r','i')
 
 typedef struct {
     UINTN                       Signature;
-    EFI_HANDLE                  Handle;         // Image handle
-    UINTN                       Type;           // Image type
-
-    BOOLEAN                     Started;        // If entrypoint has been called
-
-    EFI_IMAGE_ENTRY_POINT       EntryPoint;     // The image's entry point
-    EFI_LOADED_IMAGE_PROTOCOL   Info;           // loaded image protocol
-
-    EFI_PHYSICAL_ADDRESS        ImageBasePage;  // Location in memory
-    UINTN                       NumberOfPages;  // Number of pages
-
-    CHAR8                       *FixupData;     // Original fixup data
-
-    EFI_TPL                     Tpl;            // Tpl of started image
-    EFI_STATUS                  Status;         // Status returned by started image
-
-    UINTN                       ExitDataSize;   // Size of ExitData from started image
-    VOID                        *ExitData;      // Pointer to exit data from started image
-    VOID                        *JumpBuffer;    // Pointer to pool allocation for context save/retore
-    BASE_LIBRARY_JUMP_BUFFER    *JumpContext;   // Pointer to buffer for context save/retore
-    UINT16                      Machine;        // Machine type from PE image
-
-    EFI_EBC_PROTOCOL            *Ebc;           // EBC Protocol pointer
-
-    EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   // Runtime image list
-
-    EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  // Pointer to Loaded Image Device Path Protocl
-
-    PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; // PeCoffLoader ImageContext
+	/// Image handle
+    EFI_HANDLE                  Handle;   
+	/// Image type
+    UINTN                       Type;           
+	/// If entrypoint has been called
+    BOOLEAN                     Started;        
+	/// The image's entry point
+    EFI_IMAGE_ENTRY_POINT       EntryPoint;     
+	/// loaded image protocol
+    EFI_LOADED_IMAGE_PROTOCOL   Info;           
+	/// Location in memory
+    EFI_PHYSICAL_ADDRESS        ImageBasePage;  
+	/// Number of pages
+    UINTN                       NumberOfPages;  
+	/// Original fixup data
+    CHAR8                       *FixupData;     
+	/// Tpl of started image
+    EFI_TPL                     Tpl;            
+	/// Status returned by started image
+    EFI_STATUS                  Status;         
+	/// Size of ExitData from started image
+    UINTN                       ExitDataSize;   
+	/// Pointer to exit data from started image
+    VOID                        *ExitData;      
+	/// Pointer to pool allocation for context save/retore
+    VOID                        *JumpBuffer;    
+	/// Pointer to buffer for context save/retore
+    BASE_LIBRARY_JUMP_BUFFER    *JumpContext;  
+	/// Machine type from PE image
+    UINT16                      Machine;        
+	/// EBC Protocol pointer
+    EFI_EBC_PROTOCOL            *Ebc;           
+	/// Runtime image list
+    EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   
+	/// Pointer to Loaded Image Device Path Protocl
+    EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  
+	/// PeCoffLoader ImageContext
+    PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; 
 
 } LOADED_IMAGE_PRIVATE_DATA;
 
@@ -58,18 +65,17 @@ typedef struct {
           CR(a, LOADED_IMAGE_PRIVATE_DATA, Info, LOADED_IMAGE_PRIVATE_DATA_SIGNATURE)
 
 
-
 #define LOAD_PE32_IMAGE_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32('l','p','e','i')
 
 typedef struct {
     UINTN                       Signature;
-    EFI_HANDLE                  Handle;         // Image handle
+	/// Image handle
+    EFI_HANDLE                  Handle;         
     EFI_PE32_IMAGE_PROTOCOL     Pe32Image;
 } LOAD_PE32_IMAGE_PRIVATE_DATA;
 
 #define LOAD_PE32_IMAGE_PRIVATE_DATA_FROM_THIS(a) \
           CR(a, LOAD_PE32_IMAGE_PRIVATE_DATA, Pe32Image, LOAD_PE32_IMAGE_PRIVATE_DATA_SIGNATURE)
-
 
 
 //
@@ -82,11 +88,6 @@ typedef struct {
   VOID                *Source;
   UINTN               SourceSize;
 } IMAGE_FILE_HANDLE;
-
-
-//
-// Abstractions for reading image contents
-//
 
 
 /**
@@ -147,25 +148,6 @@ CoreReadImageFile (
   IN OUT UINTN   *ReadSize,
   OUT    VOID    *Buffer
   );
-
-
-/**
-  A function out of date, should be removed.
-
-  @param  ImageFileHandle        Handle of the file to close
-
-**/
-VOID
-EFIAPI
-CoreCloseImageFile (
-  IN IMAGE_FILE_HANDLE *ImageFileHandle
-  );
-
-
-
-//
-// Exported Image functions
-//
 
 
 /**

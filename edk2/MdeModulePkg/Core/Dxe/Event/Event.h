@@ -15,7 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EVENT_H__
 #define __EVENT_H__
 
+
 #define VALID_TPL(a)            ((a) <= TPL_HIGH_LEVEL)
+extern  UINTN                   gEventPending;
+
 
 //
 // EFI_EVENT
@@ -25,37 +28,30 @@ typedef struct {
   UINTN                   Signature;
   UINT32                  Type;
   UINT32                  SignalCount;
-
-  //
-  // Entry if the event is registered to be signalled
-  //
-
+  ///
+  /// Entry if the event is registered to be signalled
+  ///
   LIST_ENTRY              SignalLink;
-
-  //
-  // Notification information for this event
-  //
-
+  ///
+  /// Notification information for this event
+  ///
   EFI_TPL                 NotifyTpl;
   EFI_EVENT_NOTIFY        NotifyFunction;
   VOID                    *NotifyContext;
   EFI_GUID                EventGroup;
   LIST_ENTRY              NotifyLink;
   BOOLEAN                 ExFlag;
-
-  //
-  // A list of all runtime events
-  //
+  ///
+  /// A list of all runtime events
+  ///
   EFI_RUNTIME_EVENT_ENTRY   RuntimeData;
-
-  //
-  // Information by event type
-  //
-
+  ///
+  /// Information by event type
+  ///
   union {
-    //
-    // For timer events
-    //
+    ///
+    /// For timer events
+    ///
     struct {
       LIST_ENTRY      Link;
       UINT64          TriggerTime;
@@ -83,10 +79,6 @@ CoreDispatchEventNotifies (
   );
 
 
-
-//
-// Exported functions
-//
 /**
   Initializes timer support.
 
@@ -95,14 +87,5 @@ VOID
 CoreInitializeTimer (
   VOID
   );
-
-//
-// extern data declarations
-//
-
-extern EFI_LOCK       gEventQueueLock;
-extern UINTN          gEventPending;
-extern LIST_ENTRY     gEventQueue[];
-extern LIST_ENTRY     gEventSignalQueue;
 
 #endif

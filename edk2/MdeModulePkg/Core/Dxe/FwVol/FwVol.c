@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "DxeMain.h"
+#include "FwVolDriver.h"
 
-#define KEYSIZE       sizeof (UINTN)
 
 //
 // Protocol notify related globals
@@ -34,8 +34,8 @@ FV_DEVICE mFvDevice = {
     FvReadFile,
     FvReadFileSection,
     FvWriteFile,
-    FvGetNextFile,
-    KEYSIZE,
+    FvGetNextFile,   
+	sizeof (UINTN),
     NULL,
     FvGetVolumeInfo,
     FvSetVolumeInfo
