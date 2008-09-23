@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2005 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -42,9 +42,7 @@ EFI_CPU_IO_PROTOCOL         *gCpuIo;
 BOOLEAN                     mEfiAtRuntime = FALSE;
 FVB_ENTRY                   *mFvbEntry;
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 static EFI_STATUS_CODE_PROTOCOL  *gStatusCode = NULL;
-#endif
 
 EFI_STATUS
 EfiConvertPointer (
@@ -213,12 +211,10 @@ Returns:
   // Update global for Runtime Services Table and IO
   //
   EfiConvertInternalPointer ((VOID **) &gCpuIo);
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   if (gStatusCode != NULL) {
     EfiConvertInternalPointer ((VOID **) &gStatusCode->ReportStatusCode);
     EfiConvertInternalPointer ((VOID **) &gStatusCode);
   }
-#endif
   EfiConvertInternalPointer ((VOID **) &mRT);
 
   //
@@ -274,12 +270,10 @@ Returns:
   Status  = EfiLibGetSystemConfigurationTable (&gEfiDxeServicesTableGuid, (VOID **) &gDS);
   ASSERT_EFI_ERROR (Status);
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
   if (EFI_ERROR (Status)) {
     gStatusCode = NULL;
   }
-#endif
 
   Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &gCpuIo);
   if (EFI_ERROR (Status)) {
@@ -405,12 +399,10 @@ Returns:
   mRT = SystemTable->RuntimeServices;
   ASSERT (mRT != NULL);
 
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
   if (EFI_ERROR (Status)) {
     gStatusCode = NULL;
   }
-#endif
 
   Status  = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &gCpuIo);
   if (EFI_ERROR (Status)) {
@@ -664,7 +656,6 @@ Returns:
   return mRT->SetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
 }
 
-
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 
 EFI_STATUS
@@ -702,6 +693,7 @@ Returns:
 }
 
 #endif
+
 
 EFI_STATUS
 EfiGetNextHighMonotonicCount (
@@ -789,31 +781,35 @@ Returns:
 --*/
 {
   EFI_STATUS  Status;
-
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000) 
-  if (gStatusCode == NULL) {
-    if (EfiAtRuntime ()) {
-      return EFI_UNSUPPORTED;
-    }
-    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
-    if (EFI_ERROR (Status) || gStatusCode == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-  }
-  Status = gStatusCode->ReportStatusCode (CodeType, Value, Instance, CallerId, Data);
-#else
-  if (mRT == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-  //
-  // Check whether EFI_RUNTIME_SERVICES has Tiano Extension
-  //
+  
   Status = EFI_UNSUPPORTED;
-  if (mRT->Hdr.Revision     == EFI_SPECIFICATION_VERSION     &&
-      mRT->Hdr.HeaderSize   == sizeof (EFI_RUNTIME_SERVICES) &&
-      mRT->ReportStatusCode != NULL) {
+
+  if (mRT->Hdr.Revision >= 0x00020000) {
+	  if (gStatusCode == NULL) {
+	    if (EfiAtRuntime ()) {
+	      return EFI_UNSUPPORTED;
+	    }
+	    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID **)&gStatusCode);
+	    if (EFI_ERROR (Status) || gStatusCode == NULL) {
+	      return EFI_UNSUPPORTED;
+	    }
+	  }
+	  Status = gStatusCode->ReportStatusCode (CodeType, Value, Instance, CallerId, Data);
+	} else {
+	  if (mRT == NULL) {
+	    return EFI_UNSUPPORTED;
+	  }
+	  //
+	  // Check whether EFI_RUNTIME_SERVICES has Tiano Extension
+	  //
+	  Status = EFI_UNSUPPORTED;
+#if (EFI_SPECIFICATION_VERSION < 0x00020000)
+	  if (mRT->Hdr.Revision     == EFI_SPECIFICATION_VERSION     &&
+	      mRT->Hdr.HeaderSize   == sizeof (EFI_RUNTIME_SERVICES) &&
+	      mRT->ReportStatusCode != NULL) {
     Status = mRT->ReportStatusCode (CodeType, Value, Instance, CallerId, Data);
-  }
 #endif
+	  }
+	}
   return Status;
 }
