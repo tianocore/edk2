@@ -288,12 +288,16 @@ EFI_STATUS
 /**
   The purpose of the service is to abstract the capability of the PEI 
   Foundation to discover instances of firmware volumes in the system. 
-  Given the input file pointer, this service searches for the next 
-  matching file in the Firmware File System (FFS) volume.
+
+  This service enables PEIMs to discover additional firmware volumes. The PEI Foundation uses this
+  service to abstract the locations and formats of various firmware volumes. These volumes include
+  the Boot Firmware Volume and any other volumes exposed by EFI_PEI_FV_PPI. The service
+  returns a volume handle of type EFI_PEI_FV_HANDLE, which must be unique within the system.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param  Instance         This instance of the firmware volume to find. The value 0 is the Boot Firmware Volume (BFV).
-  @param  VolumeHandle   On exit, points to the next volumn handle or NULL if it does not exist.
+  @param  Instance         This instance of the firmware volume to find.
+                           The value 0 is the Boot Firmware Volume (BFV).
+  @param  VolumeHandle     On exit, points to the next volumn handle or NULL if it does not exist.
 
   @retval EFI_SUCCESS           The volume was found.
   @retval EFI_NOT_FOUND         The volume was not found.
@@ -309,21 +313,24 @@ EFI_STATUS
   );
 
 /**
-  The purpose of the service is to abstract the capability of the PEI 
-  Foundation to discover instances of firmware files in the system. 
-  Given the input file pointer, this service searches for the next matching 
-  file in the Firmware File System (FFS) volume.
+  Searches for the next matching file in the firmware volume.
+
+  This service enables PEIMs to discover firmware files within a specified volume.
+  To find the first instance of a firmware file, pass a FileHandle value of NULL into the service.
+  The service returns a file handle of type EFI_PEI_FILE_HANDLE, which must be unique within
+  the system.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  SearchType       A filter to find files only of this type.
-  @param  FwVolHeader      Pointer to the firmware volume header of the volume to search.This parameter 
-                           must point to a valid FFS volume.
-  @param  FileHeader       Pointer to the current file from which to begin searching.This pointer will be 
-                           updated upon return to reflect the file found.
+  @param  FvHandle         Handle of firmware volume in which to search.
+  @param  FileHandle       On entry, points to the current handle from which to begin searching
+                           or NULL to start at the beginning of the firmware volume.
+                           On exit, points the file handle of the next file in the volume or NULL
+                           if there are no more files.
 
-  @retval EFI_SUCCESS           The file was found.
-  @retval EFI_NOT_FOUND         The file was not found.
-  @retval EFI_NOT_FOUND         The header checksum was not zero.
+  @retval EFI_SUCCESS      The file was found.
+  @retval EFI_NOT_FOUND    The file was not found.
+  @retval EFI_NOT_FOUND    The header checksum was not zero.
 
 **/
 typedef
@@ -331,21 +338,27 @@ EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_NEXT_FILE2)(
   IN CONST EFI_PEI_SERVICES                **PeiServices,
   IN EFI_FV_FILETYPE                       SearchType,
-  IN EFI_PEI_FV_HANDLE                     VolumeHandle,
+  IN CONST EFI_PEI_FV_HANDLE               FvHandle,
   IN OUT EFI_PEI_FILE_HANDLE               *FileHandle
   );
 
 /**
-  Given the input file pointer, this service searches for the next 
-  matching file in the Firmware File System (FFS) volume. 
+  Searches for the next matching section within the specified file.
+
+  This service enables PEI modules to discover the first section of a given type within a valid file.
+  This service will search within encapsulation sections (compression and GUIDed) as well. It will
+  search inside of a GUIDed section or a compressed section, but may not, for example, search a
+  GUIDed section inside a GUIDes section.
+  This service will not search within compression sections or GUIDed sections which require
+  extraction if memory is not present.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  SectionType      The value of the section type to find.
-  @param  FfsFileHeader    A pointer to the file header that contains the set of sections to be searched.
+  @param  FileHandle       Handle of the firmware file to search.
   @param  SectionData      A pointer to the discovered section, if successful.
 
-  @retval EFI_SUCCESS           The section was found.
-  @retval EFI_NOT_FOUND         The section was not found.
+  @retval EFI_SUCCESS      The section was found.
+  @retval EFI_NOT_FOUND    The section was not found.
 
 **/
 typedef
@@ -354,7 +367,7 @@ EFI_STATUS
   IN CONST EFI_PEI_SERVICES            **PeiServices,
   IN EFI_SECTION_TYPE                  SectionType,
   IN EFI_PEI_FILE_HANDLE               FileHandle,
-  IN OUT VOID                          **SectionData
+  OUT VOID                             **SectionData
   );
 
 /**
@@ -398,7 +411,7 @@ EFI_STATUS
   IN CONST EFI_PEI_SERVICES     **PeiServices,
   IN EFI_MEMORY_TYPE            MemoryType,
   IN UINTN                      Pages,
-  IN OUT EFI_PHYSICAL_ADDRESS   *Memory
+  OUT EFI_PHYSICAL_ADDRESS      *Memory
   );
 
 /**
@@ -456,6 +469,11 @@ VOID
 /**
   This service publishes an interface that allows PEIMs to report status codes.
 
+  ReportStatusCode() is called by PEIMs that wish to report status information on their
+  progress. The principal use model is for a PEIM to emit one of the standard 32-bit error codes. This
+  will allow a platform owner to ascertain the state of the system, especially under conditions where
+  the full consoles might not have been installed.
+
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  Type             Indicates the type of status code being reported.
   @param  Value            Describes the current status of a hardware or
@@ -491,10 +509,13 @@ EFI_STATUS
 /**
   Resets the entire platform.
 
+  This service resets the entire platform, including all processors
+  and devices, and reboots the system.
+  This service will never return EFI_SUCCESS.  
+
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES
                            table published by the PEI Foundation.
 
-  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_AVAILABLE_YET The service has not been installed yet.
 
 **/
@@ -505,7 +526,8 @@ EFI_STATUS
   );
 
 /**
-   
+  Find a file within a volume by its name.
+
   This service searches for files with a specific name, within
   either the specified firmware volume or all firmware volumes.
   The service returns a file handle of type EFI_PEI_FILE_HANDLE,
@@ -513,8 +535,8 @@ EFI_STATUS
 
   @param FileName       A pointer to the name of the file to
                         find within the firmware volume.
-  @param VolumeHandle   The firmware volume to search FileHandle
-                        Upon exit, points to the found file's
+  @param VolumeHandle   The firmware volume to search.
+  @param FileHandle     Upon exit, points to the found file's
                         handle or NULL if it could not be found.
 
   @retval EFI_SUCCESS             File was found.
@@ -526,37 +548,42 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_BY_NAME)(
-  IN CONST  EFI_GUID            *FileName,
-  IN CONST  EFI_PEI_FV_HANDLE   VolumeHandle,
-  OUT       EFI_PEI_FILE_HANDLE *FileHandle
+  IN  CONST  EFI_GUID            *FileName,
+  IN  EFI_PEI_FV_HANDLE          VolumeHandle,
+  OUT EFI_PEI_FILE_HANDLE        *FileHandle
   );
 
-
-/**
-   
-  @param FileName   Name of the file.
-  @param FileType   File type. See EFI_FV_FILETYPE, which is
-                    defined in the Platform Initialization
-                    Firmware Storage Specification.
-  @param FileAttributes   Attributes of the file. Type
-                          EFI_FV_FILE_ATTRIBUTES is defined in
-                          the Platform Initialization Firmware
-                          Storage Specification.
-  @param Buffer   Points to the file's data (not the header).
-                  Not valid if EFI_FV_FILE_ATTRIB_MEMORY_MAPPED
-                  is zero.
-  @param BufferSize   Size of the file's data.
-
-**/
+///
+/// Information of FV file.
+///
 typedef struct {
+  ///
+  /// Name of the file.
+  ///
   EFI_GUID                FileName;
+  ///
+  /// File type.
+  ///
   EFI_FV_FILETYPE         FileType;
+  ///
+  /// Attributes of the file.
+  ///
   EFI_FV_FILE_ATTRIBUTES  FileAttributes;
+  ///
+  /// Points to the file's data (not the header).
+  /// Not valid if EFI_FV_FILE_ATTRIB_MEMORY_MAPPED
+  /// is zero.
+  ///
   VOID                    *Buffer;
+  ///
+  /// Size of the file’s data.
+  ///
   UINT32                  BufferSize;
 } EFI_FV_FILE_INFO;
 
 /**
+  Returns information about a specific file.
+
   This function returns information about a specific file,
   including its file name, type, attributes, starting address and
   size. If the firmware volume is not memory mapped then the
@@ -575,46 +602,41 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_GET_FILE_INFO)(
-  IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
+  IN  EFI_PEI_FILE_HANDLE         FileHandle,
   OUT EFI_FV_FILE_INFO            *FileInfo
   );
 
-
-/**
-   
-  @param FvAttributes   Attributes of the firmware volume. Type
-                        EFI_FVB_ATTRIBUTES_2 is defined in the
-                        Platform Initialization Firmware Storage
-                        Specficiation.
-
-  @param FvFormat       Format of the firmware volume. For PI
-                        Architecture Firmware Volumes, this can
-                        be copied from FileSystemGuid in
-                        EFI_FIRMWARE_VOLUME_HEADER.
-
-  @param FvName         Name of the firmware volume. For PI
-                        Architecture Firmware Volumes, this can
-                        be copied from VolumeName in the
-                        extended header of
-                        EFI_FIRMWARE_VOLUME_HEADER.
-
-  @param FvStart        Points to the first byte of the firmware
-                        volume, if bit EFI_FVB_MEMORY_MAPPED is
-                        set in FvAttributes. FvSize Size of the
-                        firmware volume.
-
-**/
+///
+/// Information of FV volume.
+///
 typedef struct {
+  ///
+  /// Attributes of the firmware volume.
+  ///
   EFI_FVB_ATTRIBUTES_2  FvAttributes;
+  ///
+  /// Format of the firmware volume.
+  ///
   EFI_GUID              FvFormat;
+  ///
+  /// Name of the firmware volume.
+  ///
   EFI_GUID              FvName;
+  ///
+  /// Points to the first byte of the firmware
+  /// volume, if bit EFI_FVB_MEMORY_MAPPED is
+  /// set in FvAttributes.
+  ///
   VOID                  *FvStart;
+  ///
+  /// Size of the firmware volume.
+  ///
   UINT64                FvSize;
 } EFI_FV_INFO;
 
 /**
   Returns information about the specified volume.
-  
+
   This function returns information about a specific firmware
   volume, including its name, type, attributes, starting address
   and size.
@@ -639,7 +661,7 @@ EFI_STATUS
 
 /**
   Register a PEIM so that it will be shadowed and called again.
-  
+
   This service registers a file handle so that after memory is
   available, the PEIM will be re-loaded into permanent memory and
   re-initialized. The PEIM registered this way will always be
@@ -650,7 +672,7 @@ EFI_STATUS
   initialized after permanent memory is installed, even the first
   time.
 
-  @param FileHandle             PEIM's file handle. Must be the currently
+  @param  FileHandle            PEIM's file handle. Must be the currently
                                 executing PEIM.
   
   @retval EFI_SUCCESS           The PEIM was successfully registered for
@@ -690,59 +712,111 @@ EFI_STATUS
 /// - Creating Hand-Off Blocks (HOBs)
 ///
 struct _EFI_PEI_SERVICES {
+  ///
+  /// The table header for the PEI Services Table.
+  ///
   EFI_TABLE_HEADER            Hdr;
-  //
-  // PPI Functions
-  //
+  ///
+  /// Installs an interface in the PEI PEIM-to-PEIM
+  /// Interface (PPI) database by GUID.
+  ///
   EFI_PEI_INSTALL_PPI         InstallPpi;
+  ///
+  /// Reinstalls an interface in the PEI PPI database by GUID.
+  ///
   EFI_PEI_REINSTALL_PPI       ReInstallPpi;
+  ///
+  /// Locates an interface in the PEI PPI database by GUID.
+  ///
   EFI_PEI_LOCATE_PPI          LocatePpi;
+  ///
+  /// Installs the notification service to be called back
+  /// upon the installation or reinstallation of a given interface.
+  ///
   EFI_PEI_NOTIFY_PPI          NotifyPpi;
-  //
-  // Boot Mode Functions
-  //
+  ///
+  /// Returns the present value of the boot mode.
+  ///
   EFI_PEI_GET_BOOT_MODE       GetBootMode;
+  ///
+  /// Sets the value of the boot mode.
+  ///
   EFI_PEI_SET_BOOT_MODE       SetBootMode;
-  //
-  // HOB Functions
-  //
+  ///
+  /// Returns the pointer to the list of Hand-Off Blocks (HOBs) in memory.
+  ///
   EFI_PEI_GET_HOB_LIST        GetHobList;
+  ///
+  /// Abstracts the creation of HOB headers.
+  ///
   EFI_PEI_CREATE_HOB          CreateHob;
-  //
-  // Firmware Volume Functions
-  //
+  ///
+  /// Discovers instances of firmware volumes in the system.
+  ///
   EFI_PEI_FFS_FIND_NEXT_VOLUME2   FfsFindNextVolume;
+  ///
+  /// Discovers instances of firmware files in the system.
+  ///
   EFI_PEI_FFS_FIND_NEXT_FILE2     FfsFindNextFile;
+  ///
+  /// Searches for a section in a firmware file.
+  ///
   EFI_PEI_FFS_FIND_SECTION_DATA2  FfsFindSectionData;
-  //
-  // PEI Memory Functions
-  //
+  ///
+  /// Registers the found memory configuration with the PEI Foundation.
+  ///
   EFI_PEI_INSTALL_PEI_MEMORY  InstallPeiMemory;
+  ///
+  /// Allocates memory ranges that are managed by the PEI Foundation.
+  ///
   EFI_PEI_ALLOCATE_PAGES      AllocatePages;
+  ///
+  /// Allocate memory ranges that are managed by the PEI Foundation.
+  ///
   EFI_PEI_ALLOCATE_POOL       AllocatePool;
+  ///
+  /// Copies the contents of one buffer to another buffer.
+  ///
   EFI_PEI_COPY_MEM            CopyMem;
+  ///
+  /// Fills a buffer with a specified value.
+  ///
   EFI_PEI_SET_MEM             SetMem;
-  //
-  // Status Code
-  //
+  ///
+  /// Provides an interface that a PEIM can call to report a status code.
+  ///
   EFI_PEI_REPORT_STATUS_CODE  ReportStatusCode;
-  //
-  // Reset
-  //
+  ///
+  /// Resets the entire platform.
+  ///
   EFI_PEI_RESET_SYSTEM        ResetSystem;
-  //
-  // (the following interfaces are installed by publishing PEIM)
-  //
-  // I/O Abstractions
-  //
+  ///
+  /// Provides an interface that a PEIM can call to execute
+  /// an I/O transaction. This interface is installed by provider
+  /// PEIM by copying the interface into the PEI Service table.
+  ///
   EFI_PEI_CPU_IO_PPI          *CpuIo;
+  ///
+  /// Provides an interface that a PEIM can call to execute PCI
+  /// Configuration transactions. This interface is installed by
+  /// provider PEIM by copying the interface into the EFI_PEI_SERVICES table.
+  ///
   EFI_PEI_PCI_CFG2_PPI        *PciCfg;
-  //
-  // Future Installed Services
-  //
+  ///
+  /// Discovers firmware files within a volume by name.
+  ///
   EFI_PEI_FFS_FIND_BY_NAME    FfsFindFileByName;
+  ///
+  /// Return information about a particular file.
+  ///
   EFI_PEI_FFS_GET_FILE_INFO   FfsGetFileInfo;
+  ///
+  /// Return information about a particular volume.
+  ///
   EFI_PEI_FFS_GET_VOLUME_INFO FfsGetVolumeInfo;
+  ///
+  /// Register a driver to be re-loaded when memory is available.
+  ///
   EFI_PEI_REGISTER_FOR_SHADOW RegisterForShadow;
 };
 
@@ -753,61 +827,61 @@ struct _EFI_PEI_SERVICES {
 /// temporary RAM, the stack location and BFV location.
 /// 
 typedef struct _EFI_SEC_PEI_HAND_OFF {
-  //
-  // Size of the data structure.
-  // 
+  ///
+  /// Size of the data structure.
+  /// 
   UINT16  DataSize;
 
-  //
-  // Points to the first byte of the boot firmware volume, 
-  // which the PEI Dispatcher should search for 
-  // PEI modules.
-  // 
+  ///
+  /// Points to the first byte of the boot firmware volume, 
+  /// which the PEI Dispatcher should search for 
+  /// PEI modules.
+  /// 
   VOID    *BootFirmwareVolumeBase;
 
-  //
-  // Size of the boot firmware volume, in bytes.
-  // 
+  ///
+  /// Size of the boot firmware volume, in bytes.
+  /// 
   UINTN   BootFirmwareVolumeSize;
 
-  //
-  // Points to the first byte of the temporary RAM.
-  // 
+  ///
+  /// Points to the first byte of the temporary RAM.
+  /// 
   VOID    *TemporaryRamBase;
 
-  //
-  // Size of the temporary RAM, in bytes.
-  // 
+  ///
+  /// Size of the temporary RAM, in bytes.
+  /// 
   UINTN   TemporaryRamSize;
 
-  //
-  // Points to the first byte of the temporary RAM 
-  // available for use by the PEI Foundation. The area 
-  // described by PeiTemporaryRamBase and PeiTemporaryRamSize 
-  // must not extend outside beyond the area described by
-  // TemporaryRamBase & TemporaryRamSize. This area should not
-  // overlap with the area reported by StackBase and 
-  // StackSize.
-  //
+  ///
+  /// Points to the first byte of the temporary RAM 
+  /// available for use by the PEI Foundation. The area 
+  /// described by PeiTemporaryRamBase and PeiTemporaryRamSize 
+  /// must not extend outside beyond the area described by
+  /// TemporaryRamBase & TemporaryRamSize. This area should not
+  /// overlap with the area reported by StackBase and 
+  /// StackSize.
+  ///
   VOID    *PeiTemporaryRamBase;
 
-  //
-  // Size of the available temporary RAM available for 
-  // use by the PEI Foundation, in bytes.
-  // 
+  ///
+  /// Size of the available temporary RAM available for 
+  /// use by the PEI Foundation, in bytes.
+  /// 
   UINTN   PeiTemporaryRamSize;
 
-  //
-  // Points to the first byte of the stack. 
-  // This are may be part of the memory described by 
-  // TemporaryRamBase and TemporaryRamSize 
-  // or may be an entirely separate area.
-  // 
+  ///
+  /// Points to the first byte of the stack. 
+  /// This are may be part of the memory described by 
+  /// TemporaryRamBase and TemporaryRamSize 
+  /// or may be an entirely separate area.
+  /// 
   VOID    *StackBase;
 
-  //
-  // Size of the stack, in bytes.
-  // 
+  ///
+  /// Size of the stack, in bytes.
+  /// 
   UINTN   StackSize;
 } EFI_SEC_PEI_HAND_OFF;
 
