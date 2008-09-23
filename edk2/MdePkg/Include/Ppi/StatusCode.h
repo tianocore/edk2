@@ -25,16 +25,21 @@
 #define EFI_PEI_REPORT_PROGRESS_CODE_PPI_GUID \
   { 0x229832d3, 0x7a30, 0x4b36, {0xb8, 0x27, 0xf4, 0xc, 0xb7, 0xd4, 0x54, 0x36 } }
 
-/**
-  @par Ppi Description:
-  This ppi provides the sevice to report status code. There can be only one instance 
-  of this service in the system.
+//
+// EFI_PEI_PROGRESS_CODE_PPI.ReportStatusCode() is equivalent to the
+// PEI Service ReportStatusCode().
+// It is defined in PiPeiCis.h. 
+//
 
-  @param ReportStatusCode
-  Service that allows PEIMs to report status codes. This function is defined in PiPeicis.h
-
-**/
+///
+/// This PPI provides the sevice to report status code.
+/// There can be only one instance of this service in the system.
+///
 typedef struct {
+  ///
+  /// Service that allows PEIMs to report status codes.
+  /// This function is defined in PiPeicis.h.
+  ///
   EFI_PEI_REPORT_STATUS_CODE  ReportStatusCode;
 } EFI_PEI_PROGRESS_CODE_PPI;
 
