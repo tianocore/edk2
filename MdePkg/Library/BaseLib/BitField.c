@@ -1,7 +1,7 @@
 /** @file
   Bit field functions of BaseLib.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,9 +11,6 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
-
-
 
 #include "BaseLibInternals.h"
 
@@ -135,7 +132,7 @@ BitFieldRead8 (
   IN      UINTN                     EndBit
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 8);
   ASSERT (StartBit <= EndBit);
   return (UINT8)BitFieldReadUint (Operand, StartBit, EndBit);
 }
@@ -171,7 +168,7 @@ BitFieldWrite8 (
   IN      UINT8                     Value
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 8);
   ASSERT (StartBit <= EndBit);
   return BitFieldAndThenOr8 (Operand, StartBit, EndBit, 0, Value);
 }
@@ -208,7 +205,7 @@ BitFieldOr8 (
   IN      UINT8                     OrData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 8);
   ASSERT (StartBit <= EndBit);
   return (UINT8)BitFieldOrUint (Operand, StartBit, EndBit, OrData);
 }
@@ -245,7 +242,7 @@ BitFieldAnd8 (
   IN      UINT8                     AndData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 8);
   ASSERT (StartBit <= EndBit);
   return (UINT8)BitFieldAndUint (Operand, StartBit, EndBit, AndData);
 }
@@ -285,7 +282,7 @@ BitFieldAndThenOr8 (
   IN      UINT8                     OrData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 8);
   ASSERT (StartBit <= EndBit);
   return BitFieldOr8 (
            BitFieldAnd8 (Operand, StartBit, EndBit, AndData),
@@ -322,7 +319,7 @@ BitFieldRead16 (
   IN      UINTN                     EndBit
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 16);
   ASSERT (StartBit <= EndBit);
   return (UINT16)BitFieldReadUint (Operand, StartBit, EndBit);
 }
@@ -358,7 +355,7 @@ BitFieldWrite16 (
   IN      UINT16                    Value
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 16);
   ASSERT (StartBit <= EndBit);
   return BitFieldAndThenOr16 (Operand, StartBit, EndBit, 0, Value);
 }
@@ -395,7 +392,7 @@ BitFieldOr16 (
   IN      UINT16                    OrData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 16);
   ASSERT (StartBit <= EndBit);
   return (UINT16)BitFieldOrUint (Operand, StartBit, EndBit, OrData);
 }
@@ -432,7 +429,7 @@ BitFieldAnd16 (
   IN      UINT16                    AndData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 16);
   ASSERT (StartBit <= EndBit);
   return (UINT16)BitFieldAndUint (Operand, StartBit, EndBit, AndData);
 }
@@ -472,7 +469,7 @@ BitFieldAndThenOr16 (
   IN      UINT16                    OrData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 16);
   ASSERT (StartBit <= EndBit);
   return BitFieldOr16 (
            BitFieldAnd16 (Operand, StartBit, EndBit, AndData),
@@ -509,7 +506,7 @@ BitFieldRead32 (
   IN      UINTN                     EndBit
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
   return (UINT32)BitFieldReadUint (Operand, StartBit, EndBit);
 }
@@ -545,7 +542,7 @@ BitFieldWrite32 (
   IN      UINT32                    Value
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
   return BitFieldAndThenOr32 (Operand, StartBit, EndBit, 0, Value);
 }
@@ -582,7 +579,7 @@ BitFieldOr32 (
   IN      UINT32                    OrData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
   return (UINT32)BitFieldOrUint (Operand, StartBit, EndBit, OrData);
 }
@@ -619,7 +616,7 @@ BitFieldAnd32 (
   IN      UINT32                    AndData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
   return (UINT32)BitFieldAndUint (Operand, StartBit, EndBit, AndData);
 }
@@ -659,7 +656,7 @@ BitFieldAndThenOr32 (
   IN      UINT32                    OrData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
   return BitFieldOr32 (
            BitFieldAnd32 (Operand, StartBit, EndBit, AndData),
@@ -696,7 +693,7 @@ BitFieldRead64 (
   IN      UINTN                     EndBit
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 64);
   ASSERT (StartBit <= EndBit);
   return RShiftU64 (Operand & ~LShiftU64 ((UINT64)-2, EndBit), StartBit);
 }
@@ -732,7 +729,7 @@ BitFieldWrite64 (
   IN      UINT64                    Value
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 64);
   ASSERT (StartBit <= EndBit);
   return BitFieldAndThenOr64 (Operand, StartBit, EndBit, 0, Value);
 }
@@ -772,7 +769,7 @@ BitFieldOr64 (
   UINT64  Value1;
   UINT64  Value2;
 
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 64);
   ASSERT (StartBit <= EndBit);
 
   Value1 = LShiftU64 (OrData, StartBit);
@@ -816,7 +813,7 @@ BitFieldAnd64 (
   UINT64  Value1;
   UINT64  Value2;
   
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 64);
   ASSERT (StartBit <= EndBit);
 
   Value1 = LShiftU64 (~AndData, StartBit);
@@ -860,7 +857,7 @@ BitFieldAndThenOr64 (
   IN      UINT64                    OrData
   )
 {
-  ASSERT (EndBit < sizeof (Operand) * 8);
+  ASSERT (EndBit < 64);
   ASSERT (StartBit <= EndBit);
   return BitFieldOr64 (
            BitFieldAnd64 (Operand, StartBit, EndBit, AndData),
