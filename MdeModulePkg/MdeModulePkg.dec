@@ -365,7 +365,7 @@
 
   ## Default timeout value for displaying progressing bar in before boot OS.
   #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|10|UINT16|0x40000001
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
 
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
@@ -423,7 +423,7 @@
 
   ## Default timeout value for displaying progressing bar in before boot OS.
   #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|10|UINT16|0x40000001
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
 
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
@@ -464,7 +464,7 @@
 
   ## Default timeout value for displaying progressing bar in before boot OS.
   #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|10|UINT16|0x40000001
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
 
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
