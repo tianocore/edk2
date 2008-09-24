@@ -26,19 +26,19 @@
   @return The bit field read.
 
 **/
-unsigned int
+UINTN
 EFIAPI
 BitFieldReadUint (
-  IN      unsigned int              Operand,
+  IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit
   )
 {
   //
-  // ~((unsigned int)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
+  // ~((UINTN)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
   // are 1's while bit[EndBit + 1] thru the most significant bit are 0's.
   //
-  return (Operand & ~((unsigned int)-2 << EndBit)) >> StartBit;
+  return (Operand & ~((UINTN)-2 << EndBit)) >> StartBit;
 }
 
 /**
@@ -57,20 +57,20 @@ BitFieldReadUint (
   @return The new value.
 
 **/
-unsigned int
+UINTN
 EFIAPI
 BitFieldOrUint (
-  IN      unsigned int              Operand,
+  IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
-  IN      unsigned int              OrData
+  IN      UINTN                     OrData
   )
 {
   //
-  // ~((unsigned int)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
+  // ~((UINTN)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
   // are 1's while bit[EndBit + 1] thru the most significant bit are 0's.
   //
-  return Operand | ((OrData << StartBit) & ~((unsigned int) -2 << EndBit));
+  return Operand | ((OrData << StartBit) & ~((UINTN) -2 << EndBit));
 }
 
 /**
@@ -89,20 +89,20 @@ BitFieldOrUint (
   @return The new value.
 
 **/
-unsigned int
+UINTN
 EFIAPI
 BitFieldAndUint (
-  IN      unsigned int              Operand,
+  IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
-  IN      unsigned int              AndData
+  IN      UINTN                     AndData
   )
 {
   //
-  // ~((unsigned int)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
+  // ~((UINTN)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
   // are 1's while bit[EndBit + 1] thru the most significant bit are 0's.
   //
-  return Operand & ~((~AndData << StartBit) & ~((unsigned int) -2 << EndBit));
+  return Operand & ~((~AndData << StartBit) & ~((UINTN)-2 << EndBit));
 }
 
 /**
