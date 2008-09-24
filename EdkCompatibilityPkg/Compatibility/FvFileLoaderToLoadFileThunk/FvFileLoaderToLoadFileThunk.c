@@ -78,6 +78,12 @@ InitPeim (
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
+  //
+  // This thunk module can only be used together with a PI PEI core, as we 
+  // assume PeiServices Pointer Table can be located in a standard way defined
+  // in PI spec.
+  //
+  ASSERT ((*PeiServices)->Hdr.Revision >= 0x00010000);
   return (*PeiServices)->InstallPpi (PeiServices, &mPpiFrameworkLoadFile);
 }
 
