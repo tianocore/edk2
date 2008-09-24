@@ -230,7 +230,7 @@ Returns:
 EFI_STATUS
 FvbGetVolumeAttributes (
   IN UINTN                                Instance,
-  OUT EFI_FVB_ATTRIBUTES                  *Attributes,
+  OUT EFI_FVB_ATTRIBUTES_2                  *Attributes,
   IN ESAL_FWB_GLOBAL                      *Global,
   IN BOOLEAN                              Virtual
   )
@@ -401,7 +401,7 @@ Returns:
 
 --*/
 {
-  EFI_FVB_ATTRIBUTES  Attributes;
+  EFI_FVB_ATTRIBUTES_2  Attributes;
   UINTN               LbaAddress;
   UINTN               LbaLength;
   EFI_STATUS          Status;
@@ -486,7 +486,7 @@ Returns:
 
 --*/
 {
-  EFI_FVB_ATTRIBUTES  Attributes;
+  EFI_FVB_ATTRIBUTES_2  Attributes;
   UINTN               LbaAddress;
   UINTN               LbaLength;
   EFI_STATUS          Status;
@@ -563,7 +563,7 @@ Returns:
 --*/
 {
 
-  EFI_FVB_ATTRIBUTES  Attributes;
+  EFI_FVB_ATTRIBUTES_2  Attributes;
   UINTN               LbaAddress;
   UINTN               LbaLength;
   EFI_STATUS          Status;
@@ -707,7 +707,7 @@ Returns:
 EFI_STATUS
 FvbSetVolumeAttributes (
   IN UINTN                                Instance,
-  IN OUT EFI_FVB_ATTRIBUTES               *Attributes,
+  IN OUT EFI_FVB_ATTRIBUTES_2               *Attributes,
   IN ESAL_FWB_GLOBAL                      *Global,
   IN BOOLEAN                              Virtual
   )
@@ -720,7 +720,7 @@ Routine Description:
 Arguments:
   Instance              - The FV instance whose attributes is going to be 
                           modified
-  Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES 
+  Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES_2 
                           containing the desired firmware volume settings.
                           On successful return, it contains the new settings
                           of the firmware volume
@@ -738,13 +738,13 @@ Returns:
 --*/
 {
   EFI_FW_VOL_INSTANCE *FwhInstance;
-  EFI_FVB_ATTRIBUTES  OldAttributes;
-  EFI_FVB_ATTRIBUTES  *AttribPtr;
+  EFI_FVB_ATTRIBUTES_2  OldAttributes;
+  EFI_FVB_ATTRIBUTES_2  *AttribPtr;
   UINT32              Capabilities;
   UINT32              OldStatus;
   UINT32              NewStatus;
   EFI_STATUS          Status;
-  EFI_FVB_ATTRIBUTES  UnchangedAttributes;
+  EFI_FVB_ATTRIBUTES_2  UnchangedAttributes;
 
 
   //
@@ -753,7 +753,7 @@ Returns:
   Status = GetFvbInstance (Instance, Global, &FwhInstance, Virtual);
   ASSERT_EFI_ERROR (Status);
 
-  AttribPtr     = (EFI_FVB_ATTRIBUTES *) &(FwhInstance->VolumeHeader.Attributes);
+  AttribPtr     = (EFI_FVB_ATTRIBUTES_2 *) &(FwhInstance->VolumeHeader.Attributes);
   OldAttributes = *AttribPtr;
   Capabilities  = OldAttributes & (EFI_FVB2_READ_DISABLED_CAP | \
                                    EFI_FVB2_READ_ENABLED_CAP | \
@@ -920,7 +920,7 @@ EFI_STATUS
 EFIAPI
 FvbProtocolGetAttributes (
   IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  OUT EFI_FVB_ATTRIBUTES                          *Attributes
+  OUT EFI_FVB_ATTRIBUTES_2                          *Attributes
   )
 /*++
 
@@ -947,7 +947,7 @@ EFI_STATUS
 EFIAPI
 FvbProtocolSetAttributes (
   IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  IN OUT EFI_FVB_ATTRIBUTES                       *Attributes
+  IN OUT EFI_FVB_ATTRIBUTES_2                       *Attributes
   )
 /*++
 
