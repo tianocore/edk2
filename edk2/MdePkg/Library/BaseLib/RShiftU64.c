@@ -1,7 +1,7 @@
 /** @file
   Math worker functions.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,9 +11,6 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
-
-
 
 #include "BaseLibInternals.h"
 
@@ -39,6 +36,6 @@ RShiftU64 (
   IN      UINTN                     Count
   )
 {
-  ASSERT (Count < sizeof (Operand) * 8);
+  ASSERT (Count < 64);
   return InternalMathRShiftU64 (Operand, Count);
 }
