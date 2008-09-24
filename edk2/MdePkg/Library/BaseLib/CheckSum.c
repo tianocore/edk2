@@ -2,7 +2,7 @@
   Utility functions to generate checksum based on 2's complement
   algorithm.
 
-  Copyright (c) 2007, Intel Corporation<BR>
+  Copyright (c) 2007 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,8 +38,8 @@
 UINT8
 EFIAPI
 CalculateSum8 (
-  IN      CONST UINT8     	        *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT8        *Buffer,
+  IN      UINTN              Length
   )
 {
   UINT8     Sum;
@@ -71,14 +71,14 @@ CalculateSum8 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum	  The 2's complement checksum of Buffer.
+  @return Checksum    The 2's complement checksum of Buffer.
 
 **/
 UINT8
 EFIAPI
 CalculateCheckSum8 (
-  IN      CONST UINT8     	        *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT8        *Buffer,
+  IN      UINTN              Length
   )
 {
   UINT8     CheckSum;
@@ -113,8 +113,8 @@ CalculateCheckSum8 (
 UINT16
 EFIAPI
 CalculateSum16 (
-  IN      CONST UINT16    	        *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT16       *Buffer,
+  IN      UINTN              Length
   )
 {
   UINT16    Sum;
@@ -152,14 +152,14 @@ CalculateSum16 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum	  The 2's complement checksum of Buffer.
+  @return Checksum    The 2's complement checksum of Buffer.
 
 **/
 UINT16
 EFIAPI
 CalculateCheckSum16 (
-  IN      CONST UINT16    	        *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT16         *Buffer,
+  IN      UINTN                Length
   )
 {
   UINT16     CheckSum;
@@ -195,8 +195,8 @@ CalculateCheckSum16 (
 UINT32
 EFIAPI
 CalculateSum32 (
-  IN      CONST UINT32    	        *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT32         *Buffer,
+  IN      UINTN                Length
   )
 {
   UINT32    Sum;
@@ -234,14 +234,14 @@ CalculateSum32 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum	  The 2's complement checksum of Buffer.
+  @return Checksum    The 2's complement checksum of Buffer.
 
 **/
 UINT32
 EFIAPI
 CalculateCheckSum32 (
-  IN      CONST UINT32    	        *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT32         *Buffer,
+  IN      UINTN                Length
   )
 {
   UINT32     CheckSum;
@@ -277,8 +277,8 @@ CalculateCheckSum32 (
 UINT64
 EFIAPI
 CalculateSum64 (
-  IN      CONST UINT64    	        *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT64         *Buffer,
+  IN      UINTN                Length
   )
 {
   UINT64    Sum;
@@ -316,14 +316,14 @@ CalculateSum64 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum	  The 2's complement checksum of Buffer.
+  @return Checksum    The 2's complement checksum of Buffer.
 
 **/
 UINT64
 EFIAPI
 CalculateCheckSum64 (
-  IN      CONST UINT64    	        *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT64         *Buffer,
+  IN      UINTN                Length
   )
 {
   UINT64     CheckSum;

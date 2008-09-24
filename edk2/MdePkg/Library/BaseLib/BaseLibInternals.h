@@ -1,7 +1,7 @@
 /** @file
   Declaration of internal functions in BaseLib.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,19 +21,6 @@
 #include <Library/DebugLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
-
-
-#define QUIENT_MAX_UINTN_DIVIDED_BY_10      ((UINTN) -1 / 10)
-#define REMINDER_MAX_UINTN_DIVIDED_BY_10    ((UINTN) -1 % 10)
-
-#define QUIENT_MAX_UINTN_DIVIDED_BY_16      ((UINTN) -1 / 16)
-#define REMINDER_MAX_UINTN_DIVIDED_BY_16    ((UINTN) -1 % 16)
-
-#define QUIENT_MAX_UINT64_DIVIDED_BY_10      ((UINT64) -1 / 10)
-#define REMINDER_MAX_UINT64_DIVIDED_BY_10    ((UINT64) -1 % 10)
-
-#define QUIENT_MAX_UINT64_DIVIDED_BY_16      ((UINT64) -1 / 16)
-#define REMINDER_MAX_UINT64_DIVIDED_BY_16    ((UINT64) -1 % 16)
 
 //
 // Math functions
@@ -150,7 +137,7 @@ InternalMathRRotU64 (
 
   @param  Operand A 64-bit unsigned value.
 
-  @return The byte swaped Operand.
+  @return The byte swapped Operand.
 
 **/
 UINT64
@@ -209,7 +196,7 @@ InternalMathMultU64x64 (
   unsigned value Divisor and generates a 64-bit unsigned quotient. This
   function returns the 64-bit unsigned quotient.
 
-   @param  Dividend  A 64-bit unsigned value.
+  @param  Dividend  A 64-bit unsigned value.
   @param  Divisor   A 32-bit unsigned value.
 
   @return Dividend / Divisor
@@ -295,12 +282,12 @@ InternalMathDivRemU64x64 (
 
 /**
   Divides a 64-bit signed integer by a 64-bit signed integer and
-  generates a  64-bit signed result and a optional 64-bit signed remainder.
+  generates a 64-bit signed result and an optional 64-bit signed remainder.
 
-  This function divides the 64-bit unsigned value Dividend by the 64-bit
-  unsigned value Divisor and generates a 64-bit unsigned quotient. If Remainder
-  is not NULL, then the 64-bit unsigned remainder is returned in Remainder.
-  This function returns the 64-bit unsigned quotient.
+  This function divides the 64-bit signed value Dividend by the 64-bit
+  signed value Divisor and generates a 64-bit signed quotient. If Remainder
+  is not NULL, then the 64-bit signed remainder is returned in Remainder.
+  This function returns the 64-bit signed quotient.
 
   @param  Dividend  A 64-bit signed value.
   @param  Divisor   A 64-bit signed value.
@@ -354,7 +341,7 @@ InternalSwitchStack (
 
 
 /**
-  Worker function that locates the Node in the List
+  Worker function that locates the Node in the List.
 
   By searching the List, finds the location of the Node in List. At the same time,
   verifies the validity of this list.
@@ -474,7 +461,7 @@ InternalSyncCompareExchange64 (
 
 
 /**
-  Worker function that returns a bit field from Operand
+  Worker function that returns a bit field from Operand.
 
   Returns the bitfield specified by the StartBit and the EndBit from Operand.
 
