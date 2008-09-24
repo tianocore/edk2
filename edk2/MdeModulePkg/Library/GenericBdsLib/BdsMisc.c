@@ -45,27 +45,16 @@ BdsLibGetTimeout (
   //
   Size    = sizeof (UINT16);
   Status  = gRT->GetVariable (L"Timeout", &gEfiGlobalVariableGuid, NULL, &Size, &Timeout);
-  if (!EFI_ERROR (Status)) {
-    return Timeout;
+  if (EFI_ERROR (Status)) {
+    //
+    // According to UEFI 2.0 spec, it should treat the Timeout value as 0xffff
+    // (default value PcdPlatformBootTimeOutDefault) when L"Timeout" variable is not present.
+    // To make the current EFI Automatic-Test activity possible, platform can choose other value
+    // for automatic boot when the variable is not present.
+    //
+    Timeout = PcdGet16 (PcdPlatformBootTimeOutDefault);
   }
-  //
-  // To make the current EFI Automatic-Test activity possible, just add
-  // following code to make AutoBoot enabled when this variable is not
-  // present.
-  // This code should be removed later.
-  //
-  Timeout = PcdGet16 (PcdPlatformBootTimeOutDefault);
 
-  //
-  // Notes: Platform should set default variable if non exists on all error cases!!!
-  //
-  Status = gRT->SetVariable (
-                  L"Timeout",
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                  sizeof (UINT16),
-                  &Timeout
-                  );
   return Timeout;
 }
 
