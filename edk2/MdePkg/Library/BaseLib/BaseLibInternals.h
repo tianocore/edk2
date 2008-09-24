@@ -472,10 +472,10 @@ InternalSyncCompareExchange64 (
   @return The bit field read.
 
 **/
-unsigned int
+UINTN
 EFIAPI
 BitFieldReadUint (
-  IN      unsigned int              Operand,
+  IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit
   );
@@ -497,13 +497,13 @@ BitFieldReadUint (
   @return The new value.
 
 **/
-unsigned int
+UINTN
 EFIAPI
 BitFieldOrUint (
-  IN      unsigned int              Operand,
+  IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
-  IN      unsigned int              OrData
+  IN      UINTN                     OrData
   );
 
 
@@ -523,13 +523,13 @@ BitFieldOrUint (
   @return The new value.
 
 **/
-unsigned int
+UINTN
 EFIAPI
 BitFieldAndUint (
-  IN      unsigned int              Operand,
+  IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
-  IN      unsigned int              AndData
+  IN      UINTN                     AndData
   );
 
 
