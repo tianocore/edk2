@@ -12,10 +12,7 @@
 
 **/
 
-
 #include <Base.h>
-
-
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 
@@ -24,7 +21,7 @@
 
   @param  MicroSeconds  The minimum number of microseconds to delay.
 
-  @return MicroSeconds.
+  @return The value of MicroSeconds inputted.
 
 **/
 UINTN
@@ -42,7 +39,7 @@ MicroSecondDelay (
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
-  @return NanoSeconds.
+  @return The value of NanoSeconds inputted.
 
 **/
 UINTN

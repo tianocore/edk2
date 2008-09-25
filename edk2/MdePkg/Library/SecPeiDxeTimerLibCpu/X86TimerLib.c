@@ -121,7 +121,7 @@ InternalX86Delay (
 
   @param  MicroSeconds  The minimum number of microseconds to delay.
 
-  @return MicroSeconds
+  @return The value of MicroSeconds inputted.
 
 **/
 UINTN
@@ -153,7 +153,7 @@ MicroSecondDelay (
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
-  @return NanoSeconds
+  @return The value of NanoSeconds inputted.
 
 **/
 UINTN
@@ -179,8 +179,6 @@ NanoSecondDelay (
 }
 
 /**
-  Retrieves the current value of a 64-bit free running performance counter.
-
   Retrieves the current value of a 64-bit free running performance counter. The
   counter can either count up by 1 or count down by 1. If the physical
   performance counter counts by a larger increment, then the counter values
