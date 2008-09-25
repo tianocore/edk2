@@ -158,6 +158,8 @@
   Ia32/CpuId.c | MSFT 
   Ia32/CpuBreakpoint.c | MSFT 
   Ia32/ARShiftU64.c | MSFT 
+  Ia32/Thunk16.asm | MSFT
+  Ia32/EnablePaging64.asm | MSFT
   SynchronizationMsc.c  | MSFT
 
   Ia32/Wbinvd.asm | INTEL 
@@ -252,10 +254,9 @@
   Ia32/CpuId.asm | INTEL 
   Ia32/CpuBreakpoint.asm | INTEL 
   Ia32/ARShiftU64.asm | INTEL 
+  Ia32/Thunk16.asm | INTEL
+  Ia32/EnablePaging64.asm | INTEL
   Synchronization.c | INTEL
-
-  Ia32/Thunk16.asm
-  Ia32/EnablePaging64.asm
 
   Ia32/Thunk16.S | GCC 
   Ia32/CpuBreakpoint.S | GCC 
@@ -357,20 +358,20 @@
   Ia32/InternalSwitchStack.c
   Ia32/Non-existing.c
   Unaligned.c
-  x86WriteIdtr.c
-  x86WriteGdtr.c
-  x86Thunk.c
-  x86ReadIdtr.c
-  x86ReadGdtr.c
-  x86Msr.c
-  x86MemoryFence.c
-  x86GetInterruptState.c
-  x86FxSave.c
-  x86FxRestore.c
-  x86EnablePaging64.c
-  x86EnablePaging32.c
-  x86DisablePaging64.c
-  x86DisablePaging32.c
+  X86WriteIdtr.c
+  X86WriteGdtr.c
+  X86Thunk.c
+  X86ReadIdtr.c
+  X86ReadGdtr.c
+  X86Msr.c
+  X86MemoryFence.c
+  X86GetInterruptState.c
+  X86FxSave.c
+  X86FxRestore.c
+  X86EnablePaging64.c
+  X86EnablePaging32.c
+  X86DisablePaging64.c
+  X86DisablePaging32.c
 
 [Sources.X64]
   X64/Thunk16.asm
@@ -468,20 +469,20 @@
   X64/Non-existing.c
   Math64.c
   Unaligned.c
-  x86WriteIdtr.c
-  x86WriteGdtr.c
-  x86Thunk.c
-  x86ReadIdtr.c
-  x86ReadGdtr.c
-  x86Msr.c
-  x86MemoryFence.c
-  x86GetInterruptState.c
-  x86FxSave.c
-  x86FxRestore.c
-  x86EnablePaging64.c
-  x86EnablePaging32.c
-  x86DisablePaging64.c
-  x86DisablePaging32.c
+  X86WriteIdtr.c
+  X86WriteGdtr.c
+  X86Thunk.c
+  X86ReadIdtr.c
+  X86ReadGdtr.c
+  X86Msr.c
+  X86MemoryFence.c
+  X86GetInterruptState.c
+  X86FxSave.c
+  X86FxRestore.c
+  X86EnablePaging64.c
+  X86EnablePaging32.c
+  X86DisablePaging64.c
+  X86DisablePaging32.c
   X64/WriteMsr64.S | GCC 
   X64/WriteMm7.S | GCC 
   X64/WriteMm6.S | GCC 
