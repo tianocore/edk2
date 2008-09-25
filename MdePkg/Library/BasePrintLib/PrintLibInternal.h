@@ -24,14 +24,10 @@
 //
 // Print primitives
 //
-//#define LEFT_JUSTIFY      0x01
 #define PREFIX_SIGN       0x02
 #define PREFIX_BLANK      0x04
-//#define COMMA_TYPE        0x08
 #define LONG_TYPE         0x10
-//#define PREFIX_ZERO       0x20
 #define OUTPUT_UNICODE    0x40
-//#define RADIX_HEX         0x80
 #define FORMAT_UNICODE    0x100
 #define PAD_TO_WIDTH      0x200
 #define ARGUMENT_UNICODE  0x400
