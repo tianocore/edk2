@@ -3,7 +3,7 @@
 #
 # Base Memory Library that uses REP string instructions for
 #  high performance and small size. Optimized for use in PEI.
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -70,17 +70,17 @@
   MemLibGuid.c
 
 [Sources.X64]
-  x64/ScanMem64.asm
-  x64/ScanMem32.asm
-  x64/ScanMem16.asm
-  x64/ScanMem8.asm
-  x64/CompareMem.asm
-  x64/ZeroMem.asm
-  x64/SetMem64.asm
-  x64/SetMem32.asm
-  x64/SetMem16.asm
-  x64/SetMem.asm
-  x64/CopyMem.asm
+  X64/ScanMem64.asm
+  X64/ScanMem32.asm
+  X64/ScanMem16.asm
+  X64/ScanMem8.asm
+  X64/CompareMem.asm
+  X64/ZeroMem.asm
+  X64/SetMem64.asm
+  X64/SetMem32.asm
+  X64/SetMem16.asm
+  X64/SetMem.asm
+  X64/CopyMem.asm
   ScanMem64Wrapper.c
   ScanMem32Wrapper.c
   ScanMem16Wrapper.c
