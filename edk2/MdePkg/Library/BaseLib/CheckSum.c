@@ -13,9 +13,7 @@
 
 **/
 
-
 #include <BaseLibInternals.h>
-
 
 /**
   Calculate the sum of all elements in a buffer in unit of UINT8. 
@@ -32,7 +30,7 @@
   @param  Buffer      Pointer to the buffer to carry out the sum operation.
   @param  Length      The size, in bytes, of Buffer .
 
-  @return Sum         The sum of Buffer with carry bits dropped during additions.
+  @return The sum of Buffer with carry bits dropped during additions.
 
 **/
 UINT8
@@ -71,7 +69,7 @@ CalculateSum8 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum    The 2's complement checksum of Buffer.
+  @return The 2's complement checksum of Buffer.
 
 **/
 UINT8
@@ -107,7 +105,7 @@ CalculateCheckSum8 (
   @param  Buffer      Pointer to the buffer to carry out the sum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Sum         The sum of Buffer with carry bits dropped during additions.
+  @return The sum of Buffer with carry bits dropped during additions.
 
 **/
 UINT16
@@ -152,7 +150,7 @@ CalculateSum16 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum    The 2's complement checksum of Buffer.
+  @return The 2's complement checksum of Buffer.
 
 **/
 UINT16
@@ -189,7 +187,7 @@ CalculateCheckSum16 (
   @param  Buffer      Pointer to the buffer to carry out the sum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Sum         The sum of Buffer with carry bits dropped during additions.
+  @return The sum of Buffer with carry bits dropped during additions.
 
 **/
 UINT32
@@ -234,7 +232,7 @@ CalculateSum32 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum    The 2's complement checksum of Buffer.
+  @return The 2's complement checksum of Buffer.
 
 **/
 UINT32
@@ -271,7 +269,7 @@ CalculateCheckSum32 (
   @param  Buffer      Pointer to the buffer to carry out the sum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Sum         The sum of Buffer with carry bits dropped during additions.
+  @return The sum of Buffer with carry bits dropped during additions.
 
 **/
 UINT64
@@ -316,7 +314,7 @@ CalculateSum64 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum    The 2's complement checksum of Buffer.
+  @return The 2's complement checksum of Buffer.
 
 **/
 UINT64
