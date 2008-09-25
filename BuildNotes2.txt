@@ -1,29 +1,28 @@
 Intel(R) Platform Innovation Framework for EFI
-EFI Development Kit II Prime (EDK II Prime)
+EFI Development Kit II (EDK II)
 Root Package 1.00
-2008-05-15
+2008-05-22
 
 Intel is a trademark or registered trademark of Intel Corporation or its
 subsidiaries in the United States and other countries.
 * Other names and brands may be claimed as the property of others.
 Copyright (c) 2007 - 2008, Intel Corporation  All rights reserved.
 
-EDK II Prime packages are in the development phase. They consist of:
+EDK II packages are in the development phase. They consist of:
 
   BuildNotes2.txt         - The build notes for this package
-  MdePkg                  - Industry-standard headers and libraries
   BaseTools               - Build -specific tools that are designed to help the
                             developer create and modify drivers and libraries
-  IntelFrameworkPkg       - Tiano/Framework Includes and Libraries
-  MdeModulePkg            - UEFI 2.1/PI 1.0 compliant modules
-  IntelFrameworkModulePKg - Tiano/Framework Includes and Libraries
-  Nt32Pkg                 - UEFI 2.1/PI 1.0 emulation environment for Windows
-  FatBinPkg               - Binaries built from the FatPkg 
+  DuetPkg                 - UEFI 2.1.PI 1.0 boot image creation platform
   EdkShellBinPkg          - Binaries of full shell, minimum shell and commands
-
-Note:
-  EdkShellBinPkg is supported to support both EDK II build and EDKII Prime
-  build by having several module description files.
+  FatBinPkg               - Binaries built from the FatPkg 
+  IntelFrameworkPkg       - Tiano/Framework Includes and Libraries
+  IntelFrameworkModulePKg - Tiano/Framework Includes and Libraries
+  MdeModulePkg            - UEFI 2.1/PI 1.0 compliant modules
+  MdePkg                  - Industry-standard headers and libraries
+  Nt32Pkg                 - UEFI 2.1/PI 1.0 emulation environment for Windows
+  OptionRomPkg            - UEFI 2.1 peripheral drivers
+  UnixPkg                 - UEFI 2.1/PI 1.0 emulation environment for Unix
 
 
 -------------------------------------------------------------------------------
