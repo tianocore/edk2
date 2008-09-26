@@ -166,3 +166,15 @@ EDK_5939:  Non-Compatible: qwang12
 				2) Remove HiiLib from [LibraryClass] if HiiLibGetCurrentLanguage is the only API from original HiiLib referenced by this module.
 				3) Add UefiLib to [LibraryClasses.common.Module Type] for the affected module if UefiLib is not in the list.
 				
+EDK_5989:  Non-Compatible: qwang12
+  Library API name changed:
+   In IfrSupportLib,
+	 Rename BufToHexString to BufInReverseOrderToHexString 
+   Rename HexStringToBuf to HexStringToBufInReverseOrder
+
+Possible Impacts:
+			All module that reference BufToHexString or HexStringToBuf should be updated in the following step:
+			  0) Change HiiLibGetCurrentLanguage to GetCurrentLanguage.
+				1) Change BufToHexString to BufInReverseOrderToHexString 
+			  2) Change HexStringToBuf to HexStringToBufInReverseOrder
+				
