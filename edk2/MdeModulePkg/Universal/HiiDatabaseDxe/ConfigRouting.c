@@ -131,7 +131,7 @@ GetDevicePath (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  HexStringToBuffer (*DevicePath, &Length, DevicePathString);
+  HexStringToBufInReverseOrder (*DevicePath, &Length, DevicePathString);
 
   SafeFreePool (DevicePathString);
 
@@ -366,7 +366,7 @@ GenerateSubStr (
 
   switch (Flag) {
   case 1:
-    Status = BufferToHexString (StringHeader, (UINT8 *) Buffer, BufferLen);
+    Status = BufInReverseOrderToHexString (StringHeader, (UINT8 *) Buffer, BufferLen);
     break;
   case 2:
     Status = UnicodeToConfigString (StringHeader, &Length, (CHAR16 *) Buffer);
@@ -937,7 +937,7 @@ HiiConfigRoutingExportConfig (
     if (PathHdr == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    Status = BufferToHexString (PathHdr, (UINT8 *) DevicePath, Length);
+    Status = BufInReverseOrderToHexString (PathHdr, (UINT8 *) DevicePath, Length);
     ASSERT_EFI_ERROR (Status);
 
     //
@@ -964,7 +964,7 @@ HiiConfigRoutingExportConfig (
     StrnCpy (StringPtr, L"GUID=", StrLen (L"GUID="));
     StringPtr += StrLen (L"GUID=");
 
-    Status = BufferToHexString (StringPtr, (UINT8 *) (&Storage->Guid), sizeof (EFI_GUID));
+    Status = BufInReverseOrderToHexString (StringPtr, (UINT8 *) (&Storage->Guid), sizeof (EFI_GUID));
     ASSERT_EFI_ERROR (Status);
     
     StringPtr += 32;

@@ -2285,7 +2285,7 @@ UiDisplayMenu (
           BufferSize = StrLen (StringPtr) / 2;
           DevicePath = AllocatePool (BufferSize);
 
-          HexStringToBuffer ((UINT8 *) DevicePath, &BufferSize, StringPtr);
+          HexStringToBufInReverseOrder ((UINT8 *) DevicePath, &BufferSize, StringPtr);
           Selection->Handle = HiiLibDevicePathToHiiHandle (DevicePath);
           if (Selection->Handle == NULL) {
             //
