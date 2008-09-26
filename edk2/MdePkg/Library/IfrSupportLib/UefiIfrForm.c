@@ -359,7 +359,7 @@ ToLower (
 **/
 EFI_STATUS
 EFIAPI
-BufferToHexString (
+BufInReverseOrderToHexString (
   IN OUT CHAR16    *Str,
   IN UINT8         *Buffer,
   IN UINTN         BufferSize
@@ -400,11 +400,13 @@ BufferToHexString (
   @param  Str                    String to be converted from.
 
   @retval EFI_SUCCESS            The function completed successfully.
+  @retval RETURN_BUFFER_TOO_SMALL   The input BufferSize is too small to hold the output. BufferSize
+                                 will be updated to the size required for the converstion.
 
 **/
 EFI_STATUS
 EFIAPI
-HexStringToBuffer (
+HexStringToBufInReverseOrder (
   IN OUT UINT8         *Buffer,
   IN OUT UINTN         *BufferSize,
   IN CHAR16            *Str
@@ -435,7 +437,7 @@ HexStringToBuffer (
                                       If return EFI_BUFFER_TOO_SMALL, containg length of string buffer desired.
   @param ConfigString   Binary representation of Unicode String, <string> := (<HexCh>4)+
 
-  @retval EFI_SUCCESS          Routine success.
+  @retval EFI_SUCCESS          Operation completes successfully.
   @retval EFI_BUFFER_TOO_SMALL The string buffer is too small.
 
 **/
@@ -495,7 +497,7 @@ ConfigStringToUnicode (
                                       If return EFI_BUFFER_TOO_SMALL, containg length of string buffer desired.
   @param  UnicodeString  Original Unicode string.
 
-  @retval EFI_SUCCESS           Routine success.
+  @retval EFI_SUCCESS           Operation completes successfully.
   @retval EFI_BUFFER_TOO_SMALL  The string buffer is too small.
 
 **/
@@ -557,7 +559,7 @@ UnicodeToConfigString (
   @param  DriverHandle           Driver handle which contains the routing
                                  information: PATH.
 
-  @retval EFI_SUCCESS            Routine success.
+  @retval EFI_SUCCESS            Operation completes successfully.
   @retval EFI_BUFFER_TOO_SMALL   The ConfigHdr string buffer is too small.
 
 **/
@@ -620,7 +622,7 @@ ConstructConfigHdr (
 
   StrCpy (StrPtr, L"GUID=");
   StrPtr += 5;
-  BufferToHexString (StrPtr, (UINT8 *) Guid, sizeof (EFI_GUID));
+  BufInReverseOrderToHexString (StrPtr, (UINT8 *) Guid, sizeof (EFI_GUID));
   StrPtr += 32;
 
   //
@@ -636,7 +638,7 @@ ConstructConfigHdr (
 
   StrCpy (StrPtr, L"&PATH=");
   StrPtr += 6;
-  BufferToHexString (StrPtr, (UINT8 *) DevicePath, DevicePathSize);
+  BufInReverseOrderToHexString (StrPtr, (UINT8 *) DevicePath, DevicePathSize);
 
   return EFI_SUCCESS;
 }
@@ -719,7 +721,7 @@ FindBlockName (
                                  desired.
   @param  Buffer                 Buffer to hold retrived data.
 
-  @retval EFI_SUCCESS            Routine success.
+  @retval EFI_SUCCESS            Operation completes successfully.
   @retval EFI_BUFFER_TOO_SMALL   The intput buffer is too small.
   @retval EFI_OUT_OF_RESOURCES   There is no enough available memory space.
 
@@ -836,7 +838,7 @@ GetBrowserData (
                                  Browser. <RequestElement> ::=
                                  &OFFSET=<Number>&WIDTH=<Number>*
 
-  @retval EFI_SUCCESS            Routine success.
+  @retval EFI_SUCCESS            Operation completes successfully.
   @retval EFI_OUT_OF_RESOURCES   There is no enough available memory space.
   @retval Other                  Updating Browser uncommitted data failed.
 

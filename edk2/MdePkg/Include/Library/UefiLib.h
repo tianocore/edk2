@@ -23,12 +23,6 @@
 #include <Protocol/DriverDiagnostics2.h>
 
 ///
-/// Limited buffer size recommended by RFC3066
-/// (42 characters plus a NULL terminator)
-///
-#define RFC_3066_ENTRY_SIZE             (42 + 1)
-
-///
 /// Unicode String Table
 ///
 typedef struct {
