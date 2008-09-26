@@ -16,8 +16,6 @@
 #define __HII_LIB_H__
 
 
-#define ISO_639_2_ENTRY_SIZE            3
-
 /**
   Assemble EFI_HII_PACKAGE_LIST according to the passed in packages.
 

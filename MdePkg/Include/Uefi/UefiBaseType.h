@@ -169,4 +169,17 @@ typedef union {
 #define EFI_MAX_BIT               MAX_BIT
 #define EFI_MAX_ADDRESS           MAX_ADDRESS
 
+
+///
+/// Limited buffer size for a language code recommended by RFC3066
+/// (42 characters plus a NULL terminator)
+///
+#define RFC_3066_ENTRY_SIZE             (42 + 1)
+
+///
+/// The size of a 3 character ISO639 language code.
+///
+#define ISO_639_2_ENTRY_SIZE            3
+
+
 #endif

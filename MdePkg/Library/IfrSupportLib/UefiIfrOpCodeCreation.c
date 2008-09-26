@@ -103,7 +103,7 @@ IsValidCheckboxFlags (
 
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
 
 **/
@@ -139,11 +139,13 @@ CreateEndOpCode (
 /**
   Create EFI_IFR_DEFAULT_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  Value                  Value for the default
   @param  Type                   Type for the default
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   @retval EFI_INVALID_PARAMETER The type is not valid.
 
@@ -189,6 +191,8 @@ CreateDefaultOpCode (
 /**
   Create EFI_IFR_ACTION_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  QuestionId             Question ID
   @param  Prompt                 String ID for Prompt
   @param  Help                   String ID for Help
@@ -196,7 +200,7 @@ CreateDefaultOpCode (
   @param  QuestionConfig         String ID for configuration
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   @retval EFI_INVALID_PARAMETER If QuestionFlags is not valid.
 
@@ -248,13 +252,15 @@ CreateActionOpCode (
 /**
   Create EFI_IFR_SUBTITLE_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  Prompt                 String ID for Prompt
   @param  Help                   String ID for Help
   @param  Flags                  Subtitle opcode flags
   @param  Scope                  Subtitle Scope bit
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   
 **/
@@ -298,12 +304,14 @@ CreateSubTitleOpCode (
 /**
   Create EFI_IFR_TEXT_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  Prompt                 String ID for Prompt
   @param  Help                   String ID for Help
   @param  TextTwo                String ID for text two
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
 
 **/
@@ -345,6 +353,8 @@ CreateTextOpCode (
 /**
   Create EFI_IFR_REF_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  FormId                 Destination Form ID
   @param  Prompt                 String ID for Prompt
   @param  Help                   String ID for Help
@@ -352,7 +362,7 @@ CreateTextOpCode (
   @param  QuestionId             Question ID
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   @retval EFI_INVALID_PARAMETER If QuestionFlags is not valid.
 
@@ -404,13 +414,16 @@ CreateGotoOpCode (
 /**
   Create EFI_IFR_ONE_OF_OPTION_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  OptionCount            The number of options.
   @param  OptionsList            The list of Options.
   @param  Type                   The data type.
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
+  @retval EFI_INVALID_PARAMETER If OptionCount is not zero but OptionsList is NULL.
 
 **/
 EFI_STATUS
@@ -460,6 +473,8 @@ CreateOneOfOptionOpCode (
 /**
   Create EFI_IFR_ONE_OF_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  QuestionId             Question ID
   @param  VarStoreId             Storage ID
   @param  VarOffset              Offset in Storage
@@ -471,7 +486,7 @@ CreateOneOfOptionOpCode (
   @param  OptionCount            Number of options in option list
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   @retval EFI_INVALID_PARAMETER If QuestionFlags is not valid.
 
@@ -537,6 +552,8 @@ CreateOneOfOpCode (
 /**
   Create EFI_IFR_ORDERED_LIST_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  QuestionId             Question ID
   @param  VarStoreId             Storage ID
   @param  VarOffset              Offset in Storage
@@ -550,7 +567,7 @@ CreateOneOfOpCode (
   @param  OptionCount            Number of options in option list
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   @retval EFI_INVALID_PARAMETER If QuestionFlags is not valid.
 
@@ -623,6 +640,8 @@ CreateOrderedListOpCode (
 /**
   Create EFI_IFR_CHECKBOX_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  QuestionId             Question ID
   @param  VarStoreId             Storage ID
   @param  VarOffset              Offset in Storage
@@ -632,7 +651,7 @@ CreateOrderedListOpCode (
   @param  CheckBoxFlags          Flags for checkbox opcode
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   @retval EFI_INVALID_PARAMETER If QuestionFlags is not valid.
 
@@ -687,6 +706,8 @@ CreateCheckBoxOpCode (
 /**
   Create EFI_IFR_NUMERIC_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  QuestionId             Question ID
   @param  VarStoreId             Storage ID
   @param  VarOffset              Offset in Storage
@@ -700,7 +721,7 @@ CreateCheckBoxOpCode (
   @param  Default                Numeric default value
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   @retval EFI_INVALID_PARAMETER If QuestionFlags is not valid.
 
@@ -798,6 +819,8 @@ CreateNumericOpCode (
 /**
   Create EFI_IFR_STRING_OP opcode.
 
+  If Data is NULL or Data->Data is NULL, then ASSERT.
+
   @param  QuestionId             Question ID
   @param  VarStoreId             Storage ID
   @param  VarOffset              Offset in Storage
@@ -809,7 +832,7 @@ CreateNumericOpCode (
   @param  MaxSize                String maximum length
   @param  Data                   Destination for the created opcode binary
 
-  @retval EFI_SUCCESS            Opcode create success
+  @retval EFI_SUCCESS            Opcode is created successfully.
   @retval EFI_BUFFER_TOO_SMALL The space reserved in Data field is too small.
   @retval EFI_INVALID_PARAMETER If QuestionFlags is not valid.
 
