@@ -44,10 +44,10 @@ COMPONENT_TYPE  = LIBRARY
   ../Hob/Hob.c
 
 [sources.ia32]
-  ia32/PerformancePrimitives.c
+  Ia32/PerformancePrimitives.c
 
 [sources.x64]
-  x64/PerformancePrimitives.c
+  X64/PerformancePrimitives.c
 
 [sources.ipf]
   Ipf/PerformancePrimitives.s

@@ -30,7 +30,7 @@ COMPONENT_TYPE  = LIBRARY
   IA32/CpuIA32.c
 
 [sources.x64]
-  x64/Cpu.asm
+  X64/Cpu.asm
 [includes.common]
   $(EDK_SOURCE)/Foundation/Efi
   $(EDK_SOURCE)/Foundation/Efi/Include

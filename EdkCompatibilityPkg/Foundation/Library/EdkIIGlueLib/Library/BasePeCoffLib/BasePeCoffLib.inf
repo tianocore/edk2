@@ -30,7 +30,7 @@ COMPONENT_TYPE  = LIBRARY
   Ia32/PeCoffLoaderEx.c
 
 [sources.x64]
-  x64/PeCoffLoaderEx.c
+  X64/PeCoffLoaderEx.c
 
 [sources.ipf]
   Ipf/PeCoffLoaderEx.c

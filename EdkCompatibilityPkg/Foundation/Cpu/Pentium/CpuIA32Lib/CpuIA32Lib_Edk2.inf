@@ -32,9 +32,9 @@ COMPONENT_TYPE  = LIBRARY
   IA32/CpuIA32.S    | GCC
 
 [sources.x64]
-  x64/Cpu.asm       | MSFT
-  x64/Cpu.asm       | INTEL
-  x64/Cpu.S         | GCC
+  X64/Cpu.asm       | MSFT
+  X64/Cpu.asm       | INTEL
+  X64/Cpu.S         | GCC
 
 [includes.common]
   $(EDK_SOURCE)/Foundation/Efi

@@ -85,23 +85,23 @@ COMPONENT_TYPE  = LIBRARY
   Math.c
   
 [sources.x64]
-  x64/EfiCopyMemRep1.asm	  | MSFT
-  x64/EfiSetMemRep4.asm     | MSFT
-  x64/EfiZeroMemRep4.asm    | MSFT
-#  x64/EfiCopyMem.asm			  | MSFT
-#  x64/EfiSetMem.asm        | MSFT
-#  x64/EfiZeroMem.asm       | MSFT
+  X64/EfiCopyMemRep1.asm	  | MSFT
+  X64/EfiSetMemRep4.asm     | MSFT
+  X64/EfiZeroMemRep4.asm    | MSFT
+#  X64/EfiCopyMem.asm			  | MSFT
+#  X64/EfiSetMem.asm        | MSFT
+#  X64/EfiZeroMem.asm       | MSFT
 
-  x64/EfiCopyMemRep1.asm	  | INTEL
-  x64/EfiSetMemRep4.asm     | INTEL
-  x64/EfiZeroMemRep4.asm    | INTEL
-#  x64/EfiCopyMem.asm			  | INTEL
-#  x64/EfiSetMem.asm        | INTEL
-#  x64/EfiZeroMem.asm       | INTEL
+  X64/EfiCopyMemRep1.asm	  | INTEL
+  X64/EfiSetMemRep4.asm     | INTEL
+  X64/EfiZeroMemRep4.asm    | INTEL
+#  X64/EfiCopyMem.asm			  | INTEL
+#  X64/EfiSetMem.asm        | INTEL
+#  X64/EfiZeroMem.asm       | INTEL
 
-  x64/EfiCopyMemRep1.S	    | GCC
-  x64/EfiSetMemRep4.S       | GCC
-  x64/EfiZeroMemRep4.S      | GCC
+  X64/EfiCopyMemRep1.S	    | GCC
+  X64/EfiSetMemRep4.S       | GCC
+  X64/EfiZeroMemRep4.S      | GCC
 
   Math.c
 
