@@ -35,27 +35,27 @@ COMPONENT_TYPE    = LIBRARY
   FindFv.c
 
 [sources.ia32]
-#  ia32/Math.c
-  ia32/PeCoffLoaderEx.c
-  ia32/PeCoffLoaderEx.h
-  ia32/PerformancePrimitives.c
-  ia32/Processor.c
-  ia32/ProcessorAsms.Asm
-  ia32/SupportItpDebug.asm
-  ia32/EfiJump.h
-  ia32/ReadIdt.asm
-  ia32/WriteIdt.asm
-  ia32/PeiServicePointer.c
+#  Ia32/Math.c
+  Ia32/PeCoffLoaderEx.c
+  Ia32/PeCoffLoaderEx.h
+  Ia32/PerformancePrimitives.c
+  Ia32/Processor.c
+  Ia32/ProcessorAsms.Asm
+  Ia32/SupportItpDebug.asm
+  Ia32/EfiJump.h
+  Ia32/ReadIdt.asm
+  Ia32/WriteIdt.asm
+  Ia32/PeiServicePointer.c
 
 [sources.x64]
-  x64/PeCoffLoaderEx.c
-  x64/PeCoffLoaderEx.h
-  x64/PerformancePrimitives.c
-  x64/Processor.c
-  x64/ProcessorAsms.Asm
-  x64/SupportItpDebug.asm
-  x64/EfiJump.h
-  x64/PeiServicePointer.c
+  X64/PeCoffLoaderEx.c
+  X64/PeCoffLoaderEx.h
+  X64/PerformancePrimitives.c
+  X64/Processor.c
+  X64/ProcessorAsms.Asm
+  X64/SupportItpDebug.asm
+  X64/EfiJump.h
+  X64/PeiServicePointer.c
 
 [sources.ipf]
 #  Ipf/Math.c

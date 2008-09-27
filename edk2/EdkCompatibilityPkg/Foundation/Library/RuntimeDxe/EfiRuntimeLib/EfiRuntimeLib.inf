@@ -32,20 +32,20 @@ COMPONENT_TYPE  = LIBRARY
   RtDevicePath.c
 
 [sources.ia32]
-  ia32/RuntimeLib.c
-  ia32/IoLib.c
-  ia32/Lock.c
-  ia32/PlatformIoLib.c
-  ia32/Fvb.c
-  ia32/CpuFlushCache.c
+  Ia32/RuntimeLib.c
+  Ia32/IoLib.c
+  Ia32/Lock.c
+  Ia32/PlatformIoLib.c
+  Ia32/Fvb.c
+  Ia32/CpuFlushCache.c
 
 [sources.x64]
-  x64/RuntimeLib.c
-  x64/IoLib.c
-  x64/Lock.c
-  x64/PlatformIoLib.c
-  x64/Fvb.c
-  x64/RuntimeLibAsm.asm
+  X64/RuntimeLib.c
+  X64/IoLib.c
+  X64/Lock.c
+  X64/PlatformIoLib.c
+  X64/Fvb.c
+  X64/RuntimeLibAsm.asm
 
 [sources.ipf]
   Ipf/RuntimeLib.c

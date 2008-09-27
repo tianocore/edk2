@@ -33,10 +33,10 @@ COMPONENT_TYPE  = LIBRARY
 #  Ia32/memset.asm
   
 [sources.x64]  
-  x64/memcpyRep1.asm
-  x64/memsetRep4.asm
-#  x64/memcpy.asm
-#  x64/memset.asm
+  X64/memcpyRep1.asm
+  X64/memsetRep4.asm
+#  X64/memcpy.asm
+#  X64/memset.asm
   
 [sources.Ipf]  
   memcpy.c

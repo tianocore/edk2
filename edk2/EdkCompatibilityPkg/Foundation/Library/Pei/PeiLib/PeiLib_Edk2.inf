@@ -35,39 +35,39 @@ COMPONENT_TYPE    = LIBRARY
   FindFv.c
 
 [sources.ia32]
-#  ia32/Math.c
-  ia32/PeCoffLoaderEx.c
-  ia32/PeCoffLoaderEx.h
-  ia32/PerformancePrimitives.c
-  ia32/Processor.c
-  ia32/ProcessorAsms.Asm         |MSFT
-  ia32/ProcessorAsms.Asm         |INTEL
-  ia32/ProcessorAsms.S           |GCC
-  ia32/SupportItpDebug.asm       |MSFT
-  ia32/SupportItpDebug.asm       |INTEL
-  ia32/SupportItpDebug.S         |GCC
-  ia32/EfiJump.h
-  ia32/ReadIdt.asm               |MSFT
-  ia32/ReadIdt.asm               |INTEL
-  ia32/ReadIdt.S                 |GCC
-  ia32/WriteIdt.asm              |MSFT
-  ia32/WriteIdt.asm              |INTEL
-  ia32/WriteIdt.S                |GCC
-  ia32/PeiServicePointer.c
+#  Ia32/Math.c
+  Ia32/PeCoffLoaderEx.c
+  Ia32/PeCoffLoaderEx.h
+  Ia32/PerformancePrimitives.c
+  Ia32/Processor.c
+  Ia32/ProcessorAsms.Asm         |MSFT
+  Ia32/ProcessorAsms.Asm         |INTEL
+  Ia32/ProcessorAsms.S           |GCC
+  Ia32/SupportItpDebug.asm       |MSFT
+  Ia32/SupportItpDebug.asm       |INTEL
+  Ia32/SupportItpDebug.S         |GCC
+  Ia32/EfiJump.h
+  Ia32/ReadIdt.asm               |MSFT
+  Ia32/ReadIdt.asm               |INTEL
+  Ia32/ReadIdt.S                 |GCC
+  Ia32/WriteIdt.asm              |MSFT
+  Ia32/WriteIdt.asm              |INTEL
+  Ia32/WriteIdt.S                |GCC
+  Ia32/PeiServicePointer.c
 
 [sources.x64]
-  x64/PeCoffLoaderEx.c
-  x64/PeCoffLoaderEx.h
-  x64/PerformancePrimitives.c
-  x64/Processor.c
-  x64/ProcessorAsms.Asm          |MSFT
-  x64/ProcessorAsms.Asm          |INTEL
-  x64/ProcessorAsms.S            |GCC
-  x64/SupportItpDebug.asm        |MSFT
-  x64/SupportItpDebug.asm        |INTEL
-  x64/SupportItpDebug.S          |GCC
-  x64/EfiJump.h
-  x64/PeiServicePointer.c
+  X64/PeCoffLoaderEx.c
+  X64/PeCoffLoaderEx.h
+  X64/PerformancePrimitives.c
+  X64/Processor.c
+  X64/ProcessorAsms.Asm          |MSFT
+  X64/ProcessorAsms.Asm          |INTEL
+  X64/ProcessorAsms.S            |GCC
+  X64/SupportItpDebug.asm        |MSFT
+  X64/SupportItpDebug.asm        |INTEL
+  X64/SupportItpDebug.S          |GCC
+  X64/EfiJump.h
+  X64/PeiServicePointer.c
 
 [sources.ipf]
 #  Ipf/Math.c
