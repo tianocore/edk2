@@ -22,7 +22,7 @@ BASE_NAME            = Thunk16Lib
 COMPONENT_TYPE       = LIBRARY
 
 [sources.common]
-  x86Thunk.c
+  X86Thunk.c
 
 [sources.ia32]
   Ia32/Thunk16.asm  | MSFT

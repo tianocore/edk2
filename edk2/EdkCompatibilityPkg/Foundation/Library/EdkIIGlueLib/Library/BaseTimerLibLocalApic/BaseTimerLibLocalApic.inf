@@ -25,12 +25,12 @@ COMPONENT_TYPE  = LIBRARY
 
 [sources.common]
 [sources.ia32]
-  x86TimerLib.c
-  Ia32/x86LocalApicTimerInitialize.asm
+  X86TimerLib.c
+  Ia32/X86LocalApicTimerInitialize.asm
 
 [sources.x64]
-  x86TimerLib.c
-  X64/x86LocalApicTimerInitialize.asm
+  X86TimerLib.c
+  X64/X86LocalApicTimerInitialize.asm
 
 [sources.ipf]
   Ipf/IpfTimerLib.c
