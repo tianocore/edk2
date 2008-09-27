@@ -4,7 +4,7 @@
 # This is a binary module containing multiple binary shell applications.
 #  All .efi file tagged with "ToolCode="DUMMY"" in following file list are raw EFI application
 #  file, and they are can be run in shell environment.
-# Copyright (c) 2006, Intel Corporation.
+# Copyright (c) 2006 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -33,11 +33,11 @@
 #
 
 [Binaries.Ia32]
-  PE32|ia32/Shell.efi|*
+  PE32|Ia32/Shell.efi|*
 
 [Binaries.X64]
-  PE32|x64/Shell.efi|*
+  PE32|X64/Shell.efi|*
  
 [Binaries.IPF]
-  PE32|ipf/Shell.efi|*
+  PE32|Ipf/Shell.efi|*
  

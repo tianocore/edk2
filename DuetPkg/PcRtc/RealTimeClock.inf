@@ -1,6 +1,6 @@
 #/*++
 # 
-# Copyright (c) 2005, Intel Corporation                                                         
+# Copyright (c) 2005 - 2008, Intel Corporation                                                         
 # All rights reserved. This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -48,7 +48,7 @@
   Ia32/RealTimeClock.c
 
 [Sources.x64]
-  x64/RealTimeClock.c
+  X64/RealTimeClock.c
 
 [Sources.ipf]
   Ipf/RealTimeClock.c
