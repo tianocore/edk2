@@ -22,6 +22,8 @@ EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
   NULL        // EFI_DEBUG_IMAGE_INFO            *EfiDebugImageInfoTable;
 };
 
+UINTN mMaxTableEntries = 0;
+
 EFI_SYSTEM_TABLE_POINTER *mDebugTable = NULL;
 
 #define FOUR_MEG_ALIGNMENT   0x400000
@@ -93,7 +95,6 @@ CoreNewDebugImageInfoEntry (
   EFI_DEBUG_IMAGE_INFO      *Table;
   EFI_DEBUG_IMAGE_INFO      *NewTable;
   UINTN                     Index;
-  UINTN                     MaxTableIndex;
   UINTN                     TableSize;
 
   //
@@ -102,21 +103,24 @@ CoreNewDebugImageInfoEntry (
   mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 
   Table = mDebugInfoTableHeader.EfiDebugImageInfoTable;
-  MaxTableIndex = mDebugInfoTableHeader.TableSize;
-
-  for (Index = 0; Index < MaxTableIndex; Index++) {
-    if (Table[Index].NormalImage == NULL) {
-      //
-      // We have found a free entry so exit the loop
-      //
-      break;
+  
+  if (mDebugInfoTableHeader.TableSize < mMaxTableEntries) {
+    //
+    // We still have empty entires in the Table, find the first empty entry.
+    //
+    Index = 0;
+    while (Table[Index].NormalImage != NULL) {
+      Index++;
     }
-  }
-  if (Index == MaxTableIndex) {
+    //
+    // There must be an empty entry in the in the table.
+    //
+    ASSERT (Index < mMaxTableEntries);
+  } else {
     //
     //  Table is full, so re-allocate another page for a larger table...
     //
-    TableSize = MaxTableIndex * EFI_DEBUG_TABLE_ENTRY_SIZE;
+    TableSize = mMaxTableEntries * EFI_DEBUG_TABLE_ENTRY_SIZE;
     NewTable = AllocateZeroPool (TableSize + EFI_PAGE_SIZE);
     if (NewTable == NULL) {
       mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
@@ -135,8 +139,14 @@ CoreNewDebugImageInfoEntry (
     //
     Table = NewTable;
     mDebugInfoTableHeader.EfiDebugImageInfoTable = NewTable;
-    mDebugInfoTableHeader.TableSize += EFI_PAGE_SIZE / EFI_DEBUG_TABLE_ENTRY_SIZE;
+    //
+    // Enlarge the max table entries and set the first empty entry index to
+    // be the original max table entries.
+    //
+    Index             = mMaxTableEntries;
+    mMaxTableEntries += EFI_PAGE_SIZE / EFI_DEBUG_TABLE_ENTRY_SIZE;
   }
+
   //
   // Allocate data for new entry
   //
@@ -148,6 +158,11 @@ CoreNewDebugImageInfoEntry (
     Table[Index].NormalImage->ImageInfoType               = (UINT32) ImageInfoType;
     Table[Index].NormalImage->LoadedImageProtocolInstance = LoadedImage;
     Table[Index].NormalImage->ImageHandle                 = ImageHandle;
+    //
+    // Increase the number of EFI_DEBUG_IMAGE_INFO elements and set the mDebugInfoTable in modified status.
+    //
+    mDebugInfoTableHeader.TableSize++;
+    mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
   }
   mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 }
@@ -172,7 +187,7 @@ CoreRemoveDebugImageInfoEntry (
 
   Table = mDebugInfoTableHeader.EfiDebugImageInfoTable;
 
-  for (Index = 0; Index < mDebugInfoTableHeader.TableSize; Index++) {
+  for (Index = 0; Index < mMaxTableEntries; Index++) {
     if (Table[Index].NormalImage != NULL && Table[Index].NormalImage->ImageHandle == ImageHandle) {
       //
       // Found a match. Free up the record, then NULL the pointer to indicate the slot
@@ -180,6 +195,11 @@ CoreRemoveDebugImageInfoEntry (
       //
       CoreFreePool (Table[Index].NormalImage);
       Table[Index].NormalImage = NULL;
+      //
+      // Decrease the number of EFI_DEBUG_IMAGE_INFO elements and set the mDebugInfoTable in modified status.
+      //
+      mDebugInfoTableHeader.TableSize--;
+      mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
       break;
     }
   }
