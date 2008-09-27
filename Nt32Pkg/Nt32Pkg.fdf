@@ -227,7 +227,7 @@ INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
-        SECTION PE32 = EdkShellBinPkg/FullShell/ia32/Shell_Full.efi
+        SECTION PE32 = EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi
       }
     }
   }
