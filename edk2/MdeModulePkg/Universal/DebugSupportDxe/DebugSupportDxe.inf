@@ -2,7 +2,7 @@
 # Component description file for DebugSupport module.
 #
 # This driver installs DebugSupport protocol for the selected processor.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -41,17 +41,17 @@
   Ia32/AsmFuncs.asm
 
 [Sources.X64]
-  x64/plDebugSupport.c
-  x64/plDebugSupport.h
-  x64/AsmFuncs.S
-  x64/AsmFuncs.asm
+  X64/plDebugSupport.c
+  X64/plDebugSupport.h
+  X64/AsmFuncs.S
+  X64/AsmFuncs.asm
 
 [Sources.IPF]
-  ipf/plDebugSupport.h
-  ipf/plDebugSupport.c
-  ipf/Ds64Macros.i
-  ipf/common.i
-  ipf/AsmFuncs.s
+  Ipf/plDebugSupport.h
+  Ipf/plDebugSupport.c
+  Ipf/Ds64Macros.i
+  Ipf/common.i
+  Ipf/AsmFuncs.s
 
 
 [Packages]
