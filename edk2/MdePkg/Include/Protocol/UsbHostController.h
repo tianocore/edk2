@@ -150,7 +150,7 @@ EFI_STATUS
                                 direction of the target USB device. Each endpoint address 
                                 supports data transfer in one direction except the control 
                                 endpoint (whose default endpoint address is 0). It is the 
-                                caller’s responsibility to make sure that the EndPointAddress 
+                                caller's responsibility to make sure that the EndPointAddress 
                                 represents a bulk endpoint.                 
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
                                 transfer endpoint is capable of sending or receiving.     
@@ -195,7 +195,7 @@ EFI_STATUS
                                 direction of the target USB device. Each endpoint address
                                 supports data transfer in one direction except the control
                                 endpoint (whose default endpoint address is zero). It is the
-                                caller’s responsibility to make sure that the
+                                caller's responsibility to make sure that the
                                 EndPointAddress represents an interrupt endpoint.     
   @param  IsSlowDevice          Indicates whether the target device is slow device or full-speed
                                 device.                                                                          
@@ -253,7 +253,7 @@ EFI_STATUS
                                 direction of the target USB device. Each endpoint address
                                 supports data transfer in one direction except the control
                                 endpoint (whose default endpoint address is zero). It is the
-                                caller’s responsibility to make sure that the
+                                caller's responsibility to make sure that the
                                 EndPointAddress represents an interrupt endpoint.  
   @param  IsSlowDevice          Indicates whether the target device is slow device or full-speed
                                 device.                                                                          
@@ -303,7 +303,7 @@ EFI_STATUS
   @param  EndPointAddress       The combination of an endpoint number and an endpoint
                                 direction of the target USB device. Each endpoint address
                                 supports data transfer in one direction except the control
-                                endpoint (whose default endpoint address is 0). It is the caller’s
+                                endpoint (whose default endpoint address is 0). It is the caller's
                                 responsibility to make sure that the EndPointAddress
                                 represents an isochronous endpoint.                  
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
@@ -344,7 +344,7 @@ EFI_STATUS
                                 direction of the target USB device. Each endpoint address
                                 supports data transfer in one direction except the control
                                 endpoint (whose default endpoint address is zero). It is the
-                                caller’s responsibility to make sure that the
+                                caller's responsibility to make sure that the
                                 EndPointAddress represents an isochronous endpoint.             
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
                                 transfer endpoint is capable of sending or receiving. For isochronous 
