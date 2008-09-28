@@ -140,8 +140,8 @@ EFI_STATUS
                                 otherwise EFI_INVALID_PARAMETER is returned. If 
                                 the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER 
                                 is returned. The MSB of this parameter indicates 
-                                the endpoint direction. The number “1” stands for 
-                                an IN endpoint, and “0” stands for an OUT endpoint.
+                                the endpoint direction. The number "1" stands for 
+                                an IN endpoint, and "0" stands for an OUT endpoint.
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB
                                 device or received from USB device.
   @param  DataLength            The size, in bytes, of the data buffer specified by Data.
@@ -184,8 +184,8 @@ EFI_STATUS
                                 otherwise EFI_INVALID_PARAMETER is returned. If 
                                 the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER 
                                 is returned. The MSB of this parameter indicates 
-                                the endpoint direction. The number “1” stands for 
-                                an IN endpoint, and “0” stands for an OUT endpoint.
+                                the endpoint direction. The number "1" stands for 
+                                an IN endpoint, and "0" stands for an OUT endpoint.
   @param  IsNewTransfer         If TRUE, a new transfer will be submitted to USB controller. If
                                 FALSE, the interrupt transfer is deleted from the device's interrupt
                                 transfer queue.
@@ -227,8 +227,8 @@ EFI_STATUS
                                 otherwise EFI_INVALID_PARAMETER is returned. If 
                                 the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER 
                                 is returned. The MSB of this parameter indicates 
-                                the endpoint direction. The number “1” stands for 
-                                an IN endpoint, and “0” stands for an OUT endpoint.
+                                the endpoint direction. The number "1" stands for 
+                                an IN endpoint, and "0" stands for an OUT endpoint.
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB
                                 device or received from USB device.
   @param  DataLength            On input, then size, in bytes, of the buffer Data. On output, the
@@ -267,8 +267,8 @@ EFI_STATUS
                                 otherwise EFI_INVALID_PARAMETER is returned. If 
                                 the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER 
                                 is returned. The MSB of this parameter indicates 
-                                the endpoint direction. The number “1” stands for 
-                                an IN endpoint, and “0” stands for an OUT endpoint.
+                                the endpoint direction. The number "1" stands for 
+                                an IN endpoint, and "0" stands for an OUT endpoint.
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB
                                 device or received from USB device.
   @param  DataLength            The size, in bytes, of the data buffer specified by Data.
@@ -302,8 +302,8 @@ EFI_STATUS
                                 otherwise EFI_INVALID_PARAMETER is returned. If 
                                 the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER 
                                 is returned. The MSB of this parameter indicates 
-                                the endpoint direction. The number “1” stands for 
-                                an IN endpoint, and “0” stands for an OUT endpoint.
+                                the endpoint direction. The number "1" stands for 
+                                an IN endpoint, and "0" stands for an OUT endpoint.
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB
                                 device or received from USB device.
   @param  DataLength            The size, in bytes, of the data buffer specified by Data.
