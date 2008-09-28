@@ -17,8 +17,6 @@
 #ifndef __UGA_DRAW_H__
 #define __UGA_DRAW_H__
 
-#include <PiDxe.h>
-
 
 #define EFI_UGA_DRAW_PROTOCOL_GUID \
   { \
@@ -30,11 +28,11 @@ typedef struct _EFI_UGA_DRAW_PROTOCOL EFI_UGA_DRAW_PROTOCOL;
 /**
   Return the current video mode information.
 
-  @param  This                  Protocol instance pointer.
-  @param  HorizontalResolution  Current video horizontal resolution in pixels
-  @param  VerticalResolution    Current video vertical resolution in pixels
-  @param  ColorDepth            Current video color depth in bits per pixel
-  @param  RefreshRate           Current video refresh rate in Hz.
+  @param  This                  The EFI_UGA_DRAW_PROTOCOL instance.
+  @param  HorizontalResolution  The size of video screen in pixels in the X dimension.
+  @param  VerticalResolution    The size of video screen in pixels in the Y dimension.
+  @param  ColorDepth            Number of bits per pixel, currently defined to be 32.
+  @param  RefreshRate           The refresh rate of the monitor in Hertz.
 
   @retval EFI_SUCCESS           Mode information returned.
   @retval EFI_NOT_STARTED       Video display is not initialized. Call SetMode ()
@@ -54,11 +52,11 @@ EFI_STATUS
 /**
   Set the current video mode information.
 
-  @param  This                 Protocol instance pointer.
-  @param  HorizontalResolution Current video horizontal resolution in pixels
-  @param  VerticalResolution   Current video vertical resolution in pixels
-  @param  ColorDepth           Current video color depth in bits per pixel
-  @param  RefreshRate          Current video refresh rate in Hz.
+  @param  This                 The EFI_UGA_DRAW_PROTOCOL instance.
+  @param  HorizontalResolution The size of video screen in pixels in the X dimension.
+  @param  VerticalResolution   The size of video screen in pixels in the Y dimension.
+  @param  ColorDepth           Number of bits per pixel, currently defined to be 32.
+  @param  RefreshRate          The refresh rate of the monitor in Hertz.
 
   @retval EFI_SUCCESS          Mode information returned.
   @retval EFI_NOT_STARTED      Video display is not initialized. Call SetMode ()
@@ -86,43 +84,40 @@ typedef union {
   UINT32        Raw;
 } EFI_UGA_PIXEL_UNION;
 
+/**
+ Enumration value for actions of Blt operations.
+ **/
 typedef enum {
-  EfiUgaVideoFill,
-  EfiUgaVideoToBltBuffer,
-  EfiUgaBltBufferToVideo,
-  EfiUgaVideoToVideo,
-  EfiUgaBltMax
+  EfiUgaVideoFill,          ///< Write data from the  BltBuffer pixel (SourceX, SourceY)
+                            ///< directly to every pixel of the video display rectangle
+                            ///< (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height).
+                            ///< Only one pixel will be used from the BltBuffer. Delta is NOT used.
+                            
+  EfiUgaVideoToBltBuffer,   ///< Read data from the video display rectangle
+                            ///< (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
+                            ///< the BltBuffer rectangle (DestinationX, DestinationY )
+                            ///< (DestinationX + Width, DestinationY + Height). If DestinationX or
+                            ///< DestinationY is not zero then Delta must be set to the length in bytes
+                            ///< of a row in the BltBuffer.
+                            
+  EfiUgaBltBufferToVideo,   ///< Write data from the  BltBuffer rectangle
+                            ///< (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
+                            ///< video display rectangle (DestinationX, DestinationY)
+                            ///< (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
+                            ///< not zero then Delta must be set to the length in bytes of a row in the
+                            ///< BltBuffer.
+  
+  EfiUgaVideoToVideo,       ///< Copy from the video display rectangle (SourceX, SourceY)
+                            ///< (SourceX + Width, SourceY + Height) .to the video display rectangle
+                            ///< (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height).
+                            ///< The BltBuffer and Delta  are not used in this mode.
+                            
+  EfiUgaBltMax              ///< Maxmimum value for enumration value of Blt operation. If a Blt operation
+                            ///< larger or equal to this enumration value, it is invalid.
 } EFI_UGA_BLT_OPERATION;
 
 /**
-  Type specifying a pointer to a function to perform an UGA Blt operation.
-
-    The following table defines actions for BltOperations:
-
-    <B>EfiUgaVideoFill</B> - Write data from the  BltBuffer pixel (SourceX, SourceY)
-      directly to every pixel of the video display rectangle
-      (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height).
-      Only one pixel will be used from the BltBuffer. Delta is NOT used.
-
-    <B>EfiUgaVideoToBltBuffer</B> - Read data from the video display rectangle
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
-      the BltBuffer rectangle (DestinationX, DestinationY )
-      (DestinationX + Width, DestinationY + Height). If DestinationX or
-      DestinationY is not zero then Delta must be set to the length in bytes
-      of a row in the BltBuffer.
-
-    <B>EfiUgaBltBufferToVideo</B> - Write data from the  BltBuffer rectangle
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
-      video display rectangle (DestinationX, DestinationY)
-      (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
-      not zero then Delta must be set to the length in bytes of a row in the
-      BltBuffer.
-
-    <B>EfiUgaVideoToVideo</B> - Copy from the video display rectangle (SourceX, SourceY)
-     (SourceX + Width, SourceY + Height) .to the video display rectangle
-     (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height).
-     The BltBuffer and Delta  are not used in this mode.
-
+    Blt a rectangle of pixels on the graphics screen.
 
     @param[in] This          - Protocol instance pointer.
     @param[in] BltBuffer     - Buffer containing data to blit into video buffer. This
