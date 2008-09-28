@@ -18,6 +18,10 @@
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 
+#define APIC_LVTERR     0x370
+#define APIC_TMICT      0x380   
+#define APIC_TMCCT      0x390
+#define APIC_TDCR       0x3e0
 
 //
 // The following array is used in calculating the frequency of local APIC
@@ -62,7 +66,7 @@ InternalX86GetTimerFrequency (
 {
   return
     PcdGet32(PcdFSBClock) /
-    mTimerLibLocalApicDivisor[MmioBitFieldRead32 (ApicBase + 0x3e0, 0, 3)];
+    mTimerLibLocalApicDivisor[MmioBitFieldRead32 (ApicBase + APIC_TDCR, 0, 3)];
 }
 
 /**
@@ -79,7 +83,7 @@ InternalX86GetTimerTick (
   IN      UINTN                     ApicBase
   )
 {
-  return MmioRead32 (ApicBase + 0x390);
+  return MmioRead32 (ApicBase + APIC_TMCCT);
 }
 
 /**
@@ -232,12 +236,12 @@ GetPerformanceCounterProperties (
   ApicBase = InternalX86GetApicBase ();
 
   if (StartValue != NULL) {
-    *StartValue = MmioRead32 (ApicBase + 0x380);
+    *StartValue = MmioRead32 (ApicBase + APIC_TMICT);
   }
 
   if (EndValue != NULL) {
     *EndValue = 0;
   }
 
-  return (UINT64) InternalX86GetTimerFrequency (ApicBase);;
+  return (UINT64) InternalX86GetTimerFrequency (ApicBase);
 }
