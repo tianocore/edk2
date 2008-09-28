@@ -142,6 +142,9 @@ EFI_STATUS
   @param  This      A pointer to the EFI_TAPE_IO_PROTOCOL instance.
   @param  Direction Direction and number of data blocks or filemarks to space over on media.
   @param  Type      Type of mark to space over on media.
+                    The following Type marks are mandatory:
+                    BLOCK type    : 0 
+                    FILEMARK type : 1
 
   @retval EFI_SUCCESS       The media was successfully repositioned.
   @retval EFI_END_OF_MEDIA  Beginning or end of media was reached before the
