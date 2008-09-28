@@ -1,5 +1,5 @@
 /** @file
-  Library supports diplaying graphical splash screen,
+  Library supports displaying graphical splash screen,
   locking of keyboard input and printing character on
   screen.
 
@@ -30,11 +30,12 @@
                             buffer will be allocated.
   @param[out] ImageSize     Size of the graphics Image in bytes. Zero if no image found.
 
-  @retval   EFI_INVALID_PARAMETER  invalid parameter
-  @retval   EFI_UNSUPPORTED        Range can not be erased
-  @retval   EFI_SUCCESS            Image and ImageSize are valid. 
-  @retval   EFI_BUFFER_TOO_SMALL   Image not big enough. ImageSize has required size
-  @retval   EFI_NOT_FOUND          FileNameGuid not found
+  @retval  EFI_SUCCESS          The image is found and data and size is returned.
+  @retval  EFI_UNSUPPORTED      FvHandle does not support EFI_FIRMWARE_VOLUME2_PROTOCOL.
+  @retval  EFI_NOT_FOUND        The image specified by NameGuid and SectionType can't be found.
+  @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
+  @retval  EFI_DEVICE_ERROR	    A hardware error occurs during reading from the Firmware Volume.
+  @retval  EFI_ACCESS_DENIED    The firmware volume containing the searched Firmware File is configured to disallow reads.
 
 **/
 EFI_STATUS
@@ -58,11 +59,12 @@ GetGraphicsBitMapFromFV (
                             buffer will be allocated.
   @param[out] ImageSize     Size of the graphics Image in bytes. Zero if no image found.
 
-  @retval   EFI_INVALID_PARAMETER  invalid parameter
-  @retval   EFI_UNSUPPORTED        Range can not be erased
-  @retval   EFI_SUCCESS            Image and ImageSize are valid. 
-  @retval   EFI_BUFFER_TOO_SMALL   Image not big enough. ImageSize has required size
-  @retval   EFI_NOT_FOUND          FileNameGuid not found
+  @retval  EFI_SUCCESS          The image is found and data and size is returned.
+  @retval  EFI_UNSUPPORTED      FvHandle does not support EFI_FIRMWARE_VOLUME2_PROTOCOL.
+  @retval  EFI_NOT_FOUND        The image specified by NameGuid and SectionType can't be found.
+  @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
+  @retval  EFI_DEVICE_ERROR	    A hardware error occurs during reading from the Firmware Volume.
+  @retval  EFI_ACCESS_DENIED    The firmware volume containing the searched Firmware File is configured to disallow reads.
 
 **/
 EFI_STATUS
@@ -134,8 +136,7 @@ DisableQuietBoot (
 
   @param[in]  Password   Password used to lock ConIn device.
 
-  @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo
-                          displayed.
+  @retval EFI_SUCCESS     lock the Console In Spliter virtual handle successfully.
   @retval EFI_UNSUPPORTED Password not found
 
 **/
@@ -147,7 +148,7 @@ LockKeyboards (
 
 
 /**
-  Print to graphics screen at the given X,Y coordinates of the graphics screen.
+  Print Unicode string to graphics screen at the given X,Y coordinates of the graphics screen.
   see definition of Print to find rules for constructing Fmt.
 
   @param[in]  X            Row to start printing at
