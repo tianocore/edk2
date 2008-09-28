@@ -141,43 +141,38 @@ EFI_STATUS
   );
 
 /**
-
-  @param EfiUsbHcStateHalt          The host controller is in halt
-                                    state. No USB transactions can occur
-                                    while in this state. The host
-                                    controller can enter this state for
-                                    three reasons: 1) After host
-                                    controller hardware reset. 2)
-                                    Explicitly set by software. 3)
-                                    Triggered by a fatal error such as
-                                    consistency check failure.
-
-
-  @param EfiUsbHcStateOperational   The host controller is in an
-                                    operational state. When in
-                                    this state, the host
-                                    controller can execute bus
-                                    traffic. This state must be
-                                    explicitly set to enable the
-                                    USB bus traffic.
-
-
-  @param EfiUsbHcStateSuspend       The host controller is in the
-                                    suspend state. No USB
-                                    transactions can occur while in
-                                    this state. The host controller
-                                    enters this state for the
-                                    following reasons: 1) Explicitly
-                                    set by software. 2) Triggered
-                                    when there is no bus traffic for
-                                    3 microseconds.
-
+  Enumration value for status of USB HC.
 **/
 typedef enum {
-  EfiUsbHcStateHalt,
-  EfiUsbHcStateOperational,
-  EfiUsbHcStateSuspend,
-  EfiUsbHcStateMaximum
+  EfiUsbHcStateHalt,                ///< The host controller is in halt
+                                    ///< state. No USB transactions can occur
+                                    ///< while in this state. The host
+                                    ///< controller can enter this state for
+                                    ///< three reasons: 1) After host
+                                    ///< controller hardware reset. 2)
+                                    ///< Explicitly set by software. 3)
+                                    ///< Triggered by a fatal error such as
+                                    ///< consistency check failure.
+                                    
+  EfiUsbHcStateOperational,         ///< The host controller is in an
+                                    ///< operational state. When in
+                                    ///< this state, the host
+                                    ///< controller can execute bus
+                                    ///< traffic. This state must be
+                                    ///< explicitly set to enable the
+                                    ///< USB bus traffic.
+                                    
+  EfiUsbHcStateSuspend,             ///< The host controller is in the
+                                    ///< suspend state. No USB
+                                    ///< transactions can occur while in
+                                    ///< this state. The host controller
+                                    ///< enters this state for the
+                                    ///< following reasons: 1) Explicitly
+                                    ///< set by software. 2) Triggered
+                                    ///< when there is no bus traffic for
+                                    ///< 3 microseconds.
+                                    
+  EfiUsbHcStateMaximum              ///< Maximum value for enumration value of HC status.
 } EFI_USB_HC_STATE;
 
 /**
