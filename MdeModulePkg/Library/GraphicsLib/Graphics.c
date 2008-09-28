@@ -312,8 +312,7 @@ ConvertBmpToGopBlt (
 
   @param  Password        Password used to lock ConIn device.
 
-  @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo
-                          displayed.
+  @retval EFI_SUCCESS     lock the Console In Spliter virtual handle successfully.
   @retval EFI_UNSUPPORTED Password not found.
 
 **/
@@ -845,7 +844,7 @@ Error:
 }
 
 /**
-  Print to graphics screen at the given X,Y coordinates of the graphics screen.
+  Print Unicode string to graphics screen at the given X,Y coordinates of the graphics screen.
   see definition of Print to find rules for constructing Fmt.
 
   @param  X            Row to start printing at.
