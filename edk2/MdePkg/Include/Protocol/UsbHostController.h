@@ -106,7 +106,8 @@ EFI_STATUS
                                 transfer endpoint is capable of sending or receiving.     
   @param  Request               A pointer to the USB device request that will be sent to the USB
                                 device.
-  @param  TransferDirection     Specifies the data direction for the transfer.  
+  @param  TransferDirection     Specifies the data direction for the transfer. There are three 
+                                values available, EfiUsbDataIn, EfiUsbDataOut and EfiUsbNoData.
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB  
                                 device or received from USB device.                            
   @param  DataLength            On input, indicates the size, in bytes, of the data buffer specified
@@ -145,8 +146,12 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint
-                                direction of the target USB device.                  
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
+                                direction of the target USB device. Each endpoint address 
+                                supports data transfer in one direction except the control 
+                                endpoint (whose default endpoint address is 0). It is the 
+                                caller’s responsibility to make sure that the EndPointAddress 
+                                represents a bulk endpoint.                 
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
                                 transfer endpoint is capable of sending or receiving.     
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB  
@@ -186,21 +191,32 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint
-                                direction of the target USB device.   
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
+                                direction of the target USB device. Each endpoint address 
+                                supports data transfer in one direction except the control 
+                                endpoint (whose default endpoint address is 0). It is the 
+                                caller’s responsibility to make sure that the EndPointAddress 
+                                represents a bulk endpoint.      
   @param  IsSlowDevice          Indicates whether the target device is slow device or full-speed
                                 device.                                                                          
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
                                 transfer endpoint is capable of sending or receiving.     
   @param  IsNewTransfer         If TRUE, an asynchronous interrupt pipe is built between the host                       
-                                and the target interrupt endpoint. If FALSE, the specified       
-  @param  DataToggle            A pointer to the data toggle value.      
+                                and the target interrupt endpoint. If FALSE, the specified asynchronous 
+                                interrupt pipe is canceled. If TRUE, and an interrupt transfer exists 
+                                for the target end point, then EFI_INVALID_PARAMETER is returned.      
+  @param  DataToggle            A pointer to the data toggle value. On input, it is valid when 
+                                IsNewTransfer is TRUE, and it indicates the initial data toggle 
+                                value the asynchronous interrupt transfer should adopt. On output, 
+                                it is valid when IsNewTransfer is FALSE, and it is updated to indicate 
+                                the data toggle value of the subsequent asynchronous interrupt transfer.     
   @param  PollingInterval       Indicates the interval, in milliseconds, that the asynchronous
-                                interrupt transfer is polled.                                                                                                      asynchronous interrupt pipe is canceled.                         
+                                interrupt transfer is polled. 
   @param  DataLength            Indicates the length of data to be received at the rate specified by
                                 PollingInterval from the target asynchronous interrupt              
-                                endpoint.                                                             
-  @param  CallBackFunction      The Callback function.                                
+                                endpoint. This parameter is only required when IsNewTransfer is TRUE.                                                            
+  @param  CallBackFunction      The Callback function. This function is called at the rate specified by 
+                                PollingInterval. This parameter is only required when IsNewTransfer is TRUE.                               
   @param  Context               The context that is passed to the CallBackFunction.
                                 
   @retval EFI_SUCCESS           The asynchronous interrupt transfer request has been successfully
@@ -233,8 +249,12 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint
-                                direction of the target USB device.   
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
+                                direction of the target USB device. Each endpoint address 
+                                supports data transfer in one direction except the control 
+                                endpoint (whose default endpoint address is 0). It is the 
+                                caller’s responsibility to make sure that the EndPointAddress 
+                                represents a bulk endpoint.   
   @param  IsSlowDevice          Indicates whether the target device is slow device or full-speed
                                 device.                                                                          
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
@@ -243,7 +263,10 @@ EFI_STATUS
                                 device or received from USB device.                                                                                            asynchronous interrupt pipe is canceled.                         
   @param  DataLength            On input, the size, in bytes, of the data buffer specified by Data.
                                 On output, the number of bytes transferred.                          
-  @param  DataToggle            A pointer to the data toggle value.                                
+  @param  DataToggle            A pointer to the data toggle value. On input, it indicates the initial 
+                                data toggle value the synchronous interrupt transfer should adopt; 
+                                on output, it is updated to indicate the data toggle value of the 
+                                subsequent synchronous interrupt transfer.                               
   @param  TimeOut               Indicates the maximum time, in milliseconds, which the transfer    
                                 is allowed to complete.                                            
   @param  TransferResult        A pointer to the detailed result information from the synchronous
@@ -277,8 +300,12 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint
-                                direction of the target USB device.                  
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
+                                direction of the target USB device. Each endpoint address 
+                                supports data transfer in one direction except the control 
+                                endpoint (whose default endpoint address is 0). It is the 
+                                caller’s responsibility to make sure that the EndPointAddress 
+                                represents a bulk endpoint.                   
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
                                 transfer endpoint is capable of sending or receiving.       
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB
@@ -313,15 +340,23 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint
-                                direction of the target USB device.                  
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
+                                direction of the target USB device. Each endpoint address 
+                                supports data transfer in one direction except the control 
+                                endpoint (whose default endpoint address is 0). It is the 
+                                caller’s responsibility to make sure that the EndPointAddress 
+                                represents a bulk endpoint.                  
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
-                                transfer endpoint is capable of sending or receiving.       
+                                transfer endpoint is capable of sending or receiving. For isochronous 
+                                endpoints, this value is used to reserve the bus time in the schedule, 
+                                required for the perframe data payloads. The pipe may, on an ongoing basis,
+                                actually use less bandwidth than that reserved.      
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB
                                 device or received from USB device.                                                                                            asynchronous interrupt pipe is canceled.                         
   @param  DataLength            Specifies the length, in bytes, of the data to be sent to or received
                                 from the USB device.                                                 
-  @param  IsochronousCallback   The Callback function.
+  @param  IsochronousCallback   The Callback function.This function is called if the requested
+                                isochronous transfer is completed.
   @param  Context               Data passed to the IsochronousCallback function. This is
                                 an optional parameter and may be NULL.
                                 
@@ -366,7 +401,9 @@ EFI_STATUS
     
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  PortNumber            Specifies the root hub port from which the status is to be retrieved.
-                                This value is zero based.
+                                This value is zero based. For example, if a root hub has two ports,
+                                then the first port is numbered 0, and the second port is
+                                numbered 1.
   @param  PortStatus            A pointer to the current port status bits and port status change bits.                                
                                 
   @retval EFI_SUCCESS           The status of the USB root hub port specified by PortNumber
@@ -387,7 +424,9 @@ EFI_STATUS
     
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  PortNumber            Specifies the root hub port from which the status is to be retrieved.
-                                This value is zero based.
+                                This value is zero based. For example, if a root hub has two ports,
+                                then the first port is numbered 0, and the second port is
+                                numbered 1.
   @param  PortFeature           Indicates the feature selector associated with the feature set
                                 request.
                                 
@@ -408,8 +447,10 @@ EFI_STATUS
   Clears a feature for the specified root hub port.
     
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
-  @param  PortNumber            Specifies the root hub port from which the status is to be cleared.
-                                This value is zero based.
+  @param  PortNumber            Specifies the root hub port from which the status is to be retrieved.
+                                This value is zero based. For example, if a root hub has two ports,
+                                then the first port is numbered 0, and the second port is
+                                numbered 1.
   @param  PortFeature           Indicates the feature selector associated with the feature clear
                                 request.
                                 
