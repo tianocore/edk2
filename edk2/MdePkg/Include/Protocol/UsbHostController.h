@@ -191,12 +191,12 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
-                                direction of the target USB device. Each endpoint address 
-                                supports data transfer in one direction except the control 
-                                endpoint (whose default endpoint address is 0). It is the 
-                                caller’s responsibility to make sure that the EndPointAddress 
-                                represents a bulk endpoint.      
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint
+                                direction of the target USB device. Each endpoint address
+                                supports data transfer in one direction except the control
+                                endpoint (whose default endpoint address is zero). It is the
+                                caller’s responsibility to make sure that the
+                                EndPointAddress represents an interrupt endpoint.     
   @param  IsSlowDevice          Indicates whether the target device is slow device or full-speed
                                 device.                                                                          
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
@@ -249,12 +249,12 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
-                                direction of the target USB device. Each endpoint address 
-                                supports data transfer in one direction except the control 
-                                endpoint (whose default endpoint address is 0). It is the 
-                                caller’s responsibility to make sure that the EndPointAddress 
-                                represents a bulk endpoint.   
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint
+                                direction of the target USB device. Each endpoint address
+                                supports data transfer in one direction except the control
+                                endpoint (whose default endpoint address is zero). It is the
+                                caller’s responsibility to make sure that the
+                                EndPointAddress represents an interrupt endpoint.  
   @param  IsSlowDevice          Indicates whether the target device is slow device or full-speed
                                 device.                                                                          
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
@@ -300,12 +300,12 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
-                                direction of the target USB device. Each endpoint address 
-                                supports data transfer in one direction except the control 
-                                endpoint (whose default endpoint address is 0). It is the 
-                                caller’s responsibility to make sure that the EndPointAddress 
-                                represents a bulk endpoint.                   
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint
+                                direction of the target USB device. Each endpoint address
+                                supports data transfer in one direction except the control
+                                endpoint (whose default endpoint address is 0). It is the caller’s
+                                responsibility to make sure that the EndPointAddress
+                                represents an isochronous endpoint.                  
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
                                 transfer endpoint is capable of sending or receiving.       
   @param  Data                  A pointer to the buffer of data that will be transmitted to USB
@@ -340,12 +340,12 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_USB_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB, which is
                                 assigned during USB enumeration.                                
-  @param  EndPointAddress       The combination of an endpoint number and an endpoint 
-                                direction of the target USB device. Each endpoint address 
-                                supports data transfer in one direction except the control 
-                                endpoint (whose default endpoint address is 0). It is the 
-                                caller’s responsibility to make sure that the EndPointAddress 
-                                represents a bulk endpoint.                  
+  @param  EndPointAddress       The combination of an endpoint number and an endpoint
+                                direction of the target USB device. Each endpoint address
+                                supports data transfer in one direction except the control
+                                endpoint (whose default endpoint address is zero). It is the
+                                caller’s responsibility to make sure that the
+                                EndPointAddress represents an isochronous endpoint.             
   @param  MaximumPacketLength   Indicates the maximum packet size that the default control 
                                 transfer endpoint is capable of sending or receiving. For isochronous 
                                 endpoints, this value is used to reserve the bus time in the schedule, 
