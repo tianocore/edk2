@@ -27,17 +27,17 @@ COMPONENT_TYPE       = LIBRARY
   RtPlatformStatusCode.c
 
 [includes.common]
-  $(EDK_SOURCE)\Foundation\Framework
-  $(EDK_SOURCE)\Foundation
-  $(EDK_SOURCE)\Foundation\Efi
+  $(EDK_SOURCE)/Foundation/Framework
+  $(EDK_SOURCE)/Foundation
+  $(EDK_SOURCE)/Foundation/Efi
   .
-  $(EDK_SOURCE)\Sample\Platform\Generic\RuntimeDxe\StatusCode\Lib\Include
-  $(EDK_SOURCE)\Foundation\Include
-  $(EDK_SOURCE)\Foundation\Efi\Include
-  $(EDK_SOURCE)\Foundation\Framework\Include
-  $(EDK_SOURCE)\Foundation\Include\IndustryStandard
-  $(EDK_SOURCE)\Foundation\Core\Dxe
-  $(EDK_SOURCE)\Foundation\Library\Dxe\Include
+  $(EDK_SOURCE)/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/Include
+  $(EDK_SOURCE)/Foundation/Include
+  $(EDK_SOURCE)/Foundation/Efi/Include
+  $(EDK_SOURCE)/Foundation/Framework/Include
+  $(EDK_SOURCE)/Foundation/Include/IndustryStandard
+  $(EDK_SOURCE)/Foundation/Core/Dxe
+  $(EDK_SOURCE)/Foundation/Library/Dxe/Include
 
 [libraries.common]
   HobLib
