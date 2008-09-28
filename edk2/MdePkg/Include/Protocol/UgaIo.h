@@ -94,8 +94,7 @@ typedef struct {
 /**
   Dynamically allocate storage for a child UGA_DEVICE .
 
-  @param[in]     This            The EFI_UGA_IO_PROTOCOL instance. Type EFI_UGA_IO_PROTOCOL is 
-                                 defined in Section 10.7.
+  @param[in]     This            The EFI_UGA_IO_PROTOCOL instance. 
   @param[in]     ParentDevice    ParentDevice specifies a pointer to the parent device of Device.
   @param[in]     DeviceData      A pointer to UGA_DEVICE_DATA returned from a call to DispatchService()
                                  with a UGA_DEVICE of Parent and an IoRequest of type UgaIoGetChildDevice.      
