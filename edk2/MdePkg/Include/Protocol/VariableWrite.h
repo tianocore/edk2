@@ -1,13 +1,25 @@
 /** @file
   Variable Write Architectural Protocol as defined in PI Specification VOLUME 2 DXE
 
-  This code is used to produce the UEFI 2.0 runtime variable services
+  This provides the services required to set nonvolatile environment variables. 
+  This protocol must be produced by a runtime DXE driver and may be consumed only 
+  by the DXE Foundation.
 
-  The SetVariable () UEFI 2.0 services may be updated to the EFI system table and the 
-  EFI_VARIABLE_WRITE_ARCH_PROTOCOL_GUID protocol is registered with a NULL pointer.
-
-  No CRC of the EFI system table is required, as it is done in the DXE core.
-
+  The DXE driver that produces this protocol must be a runtime driver. This driver 
+  may update the SetVariable() field of the UEFI Runtime Services Table.
+  
+  After the UEFI Runtime Services Table has been initialized, the driver must 
+  install the EFI_VARIABLE_WRITE_ARCH_PROTOCOL_GUID on a new handle with a NULL 
+  interface pointer. The installation of this protocol informs the DXE Foundation 
+  that the write services for nonvolatile environment variables are now available 
+  and that the DXE Foundation must update the 32-bit CRC of the UEFI Runtime Services 
+  Table. The full complement of environment variable services are not available 
+  until both this protocol and EFI_VARIABLE_ARCH_PROTOCOL are installed. DXE drivers 
+  that require read-only access or read/write access to volatile environment variables
+  must have the EFI_VARIABLE_WRITE_ARCH_PROTOCOL in their dependency expressions.
+  DXE drivers that require write access to nonvolatile environment variables must 
+  have this architectural protocol in their dependency expressions.  
+  
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         

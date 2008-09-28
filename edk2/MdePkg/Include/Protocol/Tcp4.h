@@ -33,7 +33,7 @@
 typedef struct _EFI_TCP4_PROTOCOL EFI_TCP4_PROTOCOL;
 
 typedef struct {
-  EFI_HANDLE        InstanceHandle;
+  EFI_HANDLE              InstanceHandle;
   EFI_IPv4_ADDRESS        LocalAddress;
   UINT16                  LocalPort;
   EFI_IPv4_ADDRESS        RemoteAddress;

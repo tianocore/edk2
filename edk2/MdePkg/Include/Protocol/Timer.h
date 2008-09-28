@@ -31,7 +31,7 @@ typedef struct _EFI_TIMER_ARCH_PROTOCOL   EFI_TIMER_ARCH_PROTOCOL;
 /**
   This function of this type is called when a timer interrupt fires.  This 
   function executes at TPL_HIGH_LEVEL.  The DXE Core will register a funtion
-  of tyis type to be called for the timer interrupt, so it can know how much 
+  of this type to be called for the timer interrupt, so it can know how much 
   time has passed.  This information is used to signal timer based events.  
 
   @param  Time   Time since the last timer interrupt in 100 ns units. This will
