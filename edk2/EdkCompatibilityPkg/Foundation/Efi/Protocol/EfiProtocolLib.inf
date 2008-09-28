@@ -125,8 +125,8 @@ COMPONENT_TYPE=   LIBRARY
   Ip4Config/Ip4Config.c
   LoadedImage/LoadedImage.h
   LoadedImage/LoadedImage.c
-  LoadedImageDevicePath\LoadedImageDevicePath.h
-  LoadedImageDevicePath\LoadedImageDevicePath.c
+  LoadedImageDevicePath/LoadedImageDevicePath.h
+  LoadedImageDevicePath/LoadedImageDevicePath.c
   LoadFile/LoadFile.h
   LoadFile/LoadFile.c
   ManagedNetwork/ManagedNetwork.h
