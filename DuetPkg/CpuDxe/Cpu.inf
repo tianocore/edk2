@@ -38,11 +38,13 @@
   UefiBootServicesTableLib
 
 [Sources.IA32]
-  Ia32/CpuInterrupt.asm | INTEL
+  Ia32/CpuInterrupt.asm |INTEL
+  Ia32/CpuInterrupt.asm |MSFT
 
 [Sources.X64]
   X64/CpuInterrupt.asm | INTEL
-
+  X64/CpuInterrupt.asm | MSFT
+  
 [Sources.common]
   Cpu.c
   CpuDxe.h
