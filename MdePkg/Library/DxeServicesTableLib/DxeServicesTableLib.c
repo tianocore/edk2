@@ -6,7 +6,7 @@
   DXE driver declare that use DxeServicesTableLib library class and link to this 
   library instance.
 
-  Please attention this library instance can not be used after EFI_SYSTEM_TABLE is 
+  Please attention this library instance can not be used util EFI_SYSTEM_TABLE was 
   initialized.
   
   This library contains contruct function to retrieve EFI_DXE_SERIVCE, this construct
