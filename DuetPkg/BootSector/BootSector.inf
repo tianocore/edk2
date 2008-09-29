@@ -14,12 +14,21 @@
 
 [Sources]
   bootsect.asm | INTEL
+  bootsect.asm | MSFT
   bs16.asm | INTEL
+  bs16.asm | MSFT
   bs32.asm | INTEL
+  bs32.asm | MSFT
   Gpt.asm | INTEL
+  Gpt.asm | MSFT
   Mbr.asm | INTEL
+  Mbr.asm | MSFT
   start.asm | INTEL
+  start.asm | MSFT
   start16.asm | INTEL
+  start16.asm | MSFT
   start32.asm | INTEL
+  start32.asm | MSFT
   efi32.asm | INTEL
+  efi32.asm | MSFT
 
