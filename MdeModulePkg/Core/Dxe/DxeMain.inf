@@ -17,7 +17,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeMain
+  BASE_NAME                      = DxeCore
   FILE_GUID                      = D6A2CB7F-6A18-4e2f-B43B-9920A733700A
   MODULE_TYPE                    = DXE_CORE
   VERSION_STRING                 = 1.0
