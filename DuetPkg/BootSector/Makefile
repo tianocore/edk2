@@ -37,11 +37,7 @@ LIBS =
 
 COMMON_DEPS = 
 
-ifeq ($(TOOLCHAIN_TAG), MSFT)
 all: $(TARGET_FILES)
-else
-all:
-endif
           
 #=============                
 $(OUTPUT_DIR)\bootsect.obj:$(MODULE_DIR)\bootsect.asm
