@@ -1,5 +1,4 @@
 
-
 [Defines]
   PLATFORM_NAME                  = DuetPkg
   PLATFORM_GUID                  = 199E24E0-0989-42aa-87F2-611A8C397E72
@@ -49,7 +48,8 @@
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   TimerLib|DuetPkg/Library/DuetTimerLib/DuetTimerLib.inf
-
+  UsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  
 [LibraryClasses.common.DXE_DRIVER]
   MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
