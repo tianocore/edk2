@@ -19,9 +19,14 @@
 #include <Library/SerialPortLib.h>
 
 /**
-  Programmed hardware of Serial port.
-
-  @return    Always return RETURN_UNSUPPORTED.
+  Initialize the serial device hardware.
+  
+  If no initialization is required, then return RETURN_SUCCESS.
+  If the serial device was successfuly initialized, then return RETURN_SUCCESS.
+  If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
+  
+  @retval RETURN_SUCCESS        The serial device was initialized.
+  @retval RETURN_DEVICE_ERROR   The serail device could not be initialized.
 
 **/
 RETURN_STATUS
@@ -34,12 +39,22 @@ SerialPortInitialize (
 }
 
 /**
-  Write data to serial device.
+  Write data from buffer to serial device. 
+ 
+  Writes NumberOfBytes data bytes from Buffer to the serial device.  
+  The number of bytes actually written to the serial device is returned.
+  If the return value is less than NumberOfBytes, then the write operation failed.
 
-  @param  Buffer           Point of data buffer which need to be writed.
-  @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
+  If Buffer is NULL, then ASSERT(). 
 
-  @retval 0                No data is to be written.
+  If NumberOfBytes is zero, then return 0.
+
+  @param  Buffer           Pointer to the data buffer to be written.
+  @param  NumberOfBytes    Number of bytes to written to the serial device.
+
+  @retval 0                NumberOfBytes is 0.
+  @retval >0               The number of bytes written to the serial device.  
+                           If this value is less than NumberOfBytes, then the read operation failed.
 
 **/
 UINTN
@@ -54,13 +69,14 @@ SerialPortWrite (
 
 
 /**
-  Read data from serial device and save the datas in buffer.
+  Reads data from a serial device into a buffer.
 
-  @param  Buffer           Point of data buffer, which contains the data
-                           returned from the serial device.
-  @param  NumberOfBytes    Number of bytes which will be read.
+  @param  Buffer           Pointer to the data buffer to store the data read from the serial device.
+  @param  NumberOfBytes    Number of bytes to read from the serial device.
 
-  @retval 0                No data is to be read.
+  @retval 0                NumberOfBytes is 0.
+  @retval >0               The number of bytes read from the serial device.  
+                           If this value is less than NumberOfBytes, then the read operation failed.
 
 **/
 UINTN
