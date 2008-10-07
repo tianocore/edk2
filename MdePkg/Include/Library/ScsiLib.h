@@ -46,7 +46,7 @@
 
   @param[in]     ScsiIo             A pointer to SCSI IO protocol.
   @param[in]     Timeout            The length of timeout period.
-  @param[out]    SenseData          A pointer to output sense data.
+  @param[in]     SenseData          A pointer to output sense data.
   @param[out]    SenseDataLength    The length of output sense data.
   @param[out]    HostAdapterStatus  The status of Host Adapter.
   @param[out]    TargetStatus       The status of the target.
@@ -74,7 +74,7 @@ EFIAPI
 ScsiTestUnitReadyCommand (
   IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN  UINT64                Timeout,
-  OUT VOID                  *SenseData,
+  IN  VOID                  *SenseData,
   OUT UINT8                 *SenseDataLength,
   OUT UINT8                 *HostAdapterStatus,
   OUT UINT8                 *TargetStatus
