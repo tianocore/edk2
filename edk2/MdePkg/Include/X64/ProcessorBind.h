@@ -31,12 +31,6 @@
 
 #if __INTEL_COMPILER
 //
-// Disable ICC's remark #593: "LocalVariable" was set but never used
-// This is legal ANSI C code so we disable the remark that is turned on with -Wall
-//
-#pragma warning ( disable : 593 )
-
-//
 // Disable ICC's remark #869: "Parameter" was never referenced warning.
 // This is legal ANSI C code so we disable the remark that is turned on with -Wall
 //
