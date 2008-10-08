@@ -1014,6 +1014,7 @@ BdsLibGetImageHeader (
                      &Root
                      );
   if (EFI_ERROR (Status)) {
+    Root = NULL;
     goto Done;
   }
 
