@@ -132,19 +132,6 @@ EFI_STATUS
   or drivers found from the general UEFI driver Binding search algorithm. If more 
   than one driver is returned by this protocol, then the drivers are returned in 
   order from highest precedence to lowest precedence.
-
-  @param GetDriver
-  Retrieves the image handle of a platform override driver for a controller in the system. 
-
-  @param GetDriverPath
-  Retrieves the device path of a platform override driver for a controller in the system. 
-
-  @param DriverLoaded
-  This function is used after a driver has been loaded using a device path returned 
-  by GetDriverPath(). This function associates a device path to an image handle, 
-  so the image handle can be returned the next time that GetDriver() is called for 
-  the same controller. 
-
 **/
 struct _EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL {
   EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER       GetDriver;
