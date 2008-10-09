@@ -90,13 +90,14 @@ SerialPortRead (
 }
 
 /**
-  Poll the serial device to see if there is any data waiting.
+  Polls a serial device to see if there is any data waiting to be read.
 
-  If there is data waiting to be read from the serial port, then return
-  TRUE.  If there is no data waiting to be read from the serial port, then
-  return FALSE.
+  Polls aserial device to see if there is any data waiting to be read.
+  If there is data waiting to be read from the serial device, then TRUE is returned.
+  If there is no data waiting to be read from the serial device, then FALSE is returned.
 
-  @retval FALSE            There is no data waiting to be read.
+  @retval TRUE             Data is waiting to be read from the serial device.
+  @retval FALSE            There is no data waiting to be read from the serial device.
 
 **/
 BOOLEAN
