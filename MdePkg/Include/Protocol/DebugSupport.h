@@ -58,13 +58,13 @@ typedef INTN  EFI_EXCEPTION_TYPE;
 #define EXCEPT_IA32_MACHINE_CHECK   18
 #define EXCEPT_IA32_SIMD            19
 
-//
-//  IA-32 processor context definition
-//
-//
-// FXSAVE_STATE
-// FP / MMX / XMM registers (see fxrstor instruction definition)
-//
+///
+///  IA-32 processor context definition
+///
+///
+/// FXSAVE_STATE
+/// FP / MMX / XMM registers (see fxrstor instruction definition)
+///
 typedef struct {
   UINT16  Fcw;
   UINT16  Fsw;
@@ -152,12 +152,12 @@ typedef struct {
 #define EXCEPT_X64_MACHINE_CHECK   18
 #define EXCEPT_X64_SIMD            19
 
-//
-//  X64 processor context definition
-//
-// FXSAVE_STATE
-// FP / MMX / XMM registers (see fxrstor instruction definition)
-//
+///
+///  X64 processor context definition
+///
+/// FXSAVE_STATE
+/// FP / MMX / XMM registers (see fxrstor instruction definition)
+///
 typedef struct {
   UINT16  Fcw;
   UINT16  Fsw;
@@ -278,9 +278,9 @@ typedef struct {
 #define EXCEPT_IPF_IA32_INTERCEPT 46
 #define EXCEPT_IPF_IA32_INTERRUPT 47
 
-//
-//  IPF processor context definition
-//
+///
+///  IPF processor context definition
+///
 typedef struct {
   //
   // The first reserved field is necessary to preserve alignment for the correct
@@ -510,14 +510,14 @@ VOID
   IN OUT EFI_SYSTEM_CONTEXT               SystemContext
   );
 
-//
-// Machine type definition
-//
+///
+/// Machine type definition
+///
 typedef enum {
-  IsaIa32 = IMAGE_FILE_MACHINE_I386, // 0x014C
-  IsaX64  = IMAGE_FILE_MACHINE_X64,   // 0x8664
-  IsaIpf  = IMAGE_FILE_MACHINE_IA64,  // 0x0200
-  IsaEbc  = IMAGE_FILE_MACHINE_EBC    // 0x0EBC
+  IsaIa32 = IMAGE_FILE_MACHINE_I386,  ///< 0x014C
+  IsaX64  = IMAGE_FILE_MACHINE_X64,   ///< 0x8664
+  IsaIpf  = IMAGE_FILE_MACHINE_IA64,  ///< 0x0200
+  IsaEbc  = IMAGE_FILE_MACHINE_EBC    ///< 0x0EBC
 } EFI_INSTRUCTION_SET_ARCHITECTURE;
 
 
@@ -621,27 +621,6 @@ EFI_STATUS
   This protocol provides the services to allow the debug agent to register 
   callback functions that are called either periodically or when specific 
   processor exceptions occur.
-
-  @param Isa
-  Declares the processor architecture for this instance of the EFI
-  Debug Support protocol.
-
-  @param GetMaximumProcessorIndex
-  Returns the maximum processor index value that may be used.
-
-  @param RegisterPeriodicCallback
-  Registers a callback function that will be invoked periodically
-  and asynchronously to the execution of EFI.
-
-  @param RegisterExceptionCallback
-  Registers a callback function that will be called each time the
-  specified processor exception occurs.
-
-  @param InvalidateInstructionCache
-  Invalidate the instruction cache of the processor. This is required
-  by processor architectures where instruction and data caches are
-  not coherent when instructions in the code under debug has been
-  modified by the debug agent.
 **/
 struct _EFI_DEBUG_SUPPORT_PROTOCOL {
   EFI_INSTRUCTION_SET_ARCHITECTURE  Isa;

@@ -158,25 +158,18 @@ EFI_STATUS
   @par Protocol Description:
   This protocol is used to retrieve user readable names of drivers 
   and controllers managed by UEFI Drivers.
-
-  @param GetDriverName
-  Retrieves a Unicode string that is the user readable name of the driver.
-  
-  @param GetControllerName
-  Retrieves a Unicode string that is the user readable name of a
-  controller that is being managed by a driver.
-  
-  @param SupportedLanguages 
-  A Null-terminated ASCII string array that contains one or more
-  supported language codes. This is the list of language codes that
-  this protocol supports. The number of languages supported by a
-  driver is up to the driver writer. SupportedLanguages is
-  specified in RFC 3066 format.
-  
 **/
 struct _EFI_COMPONENT_NAME2_PROTOCOL {
   EFI_COMPONENT_NAME2_GET_DRIVER_NAME      GetDriverName;
   EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME  GetControllerName;
+
+  ///
+  /// A Null-terminated ASCII string array that contains one or more
+  /// supported language codes. This is the list of language codes that
+  /// this protocol supports. The number of languages supported by a
+  /// driver is up to the driver writer. SupportedLanguages is
+  /// specified in RFC 3066 format.  
+  ///
   CHAR8                                    *SupportedLanguages;
 };
 
