@@ -101,20 +101,13 @@ EFI_STATUS
 /**
   @par Protocol Description:
   This protocol is used to abstract Block I/O interfaces.
-
-  @param Revision 
-  The revision to which the disk I/O interface adheres. All future
-  revisions must be backwards compatible. If a future version is not
-  backwards compatible, it is not the same GUID.
-
-  @param ReadDisk 
-  Reads data from the disk.
-  
-  @param WriteDisk 
-  Writes data to the disk.
-
 **/
 struct _EFI_DISK_IO_PROTOCOL {
+  ///
+  /// The revision to which the disk I/O interface adheres. All future
+  /// revisions must be backwards compatible. If a future version is not
+  /// backwards compatible, it is not the same GUID.
+  ///
   UINT64          Revision;
   EFI_DISK_READ   ReadDisk;
   EFI_DISK_WRITE  WriteDisk;

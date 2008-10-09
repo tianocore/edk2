@@ -217,39 +217,19 @@ EFI_STATUS
   @par Protocol Description:
   This protocol provides the basic Memory, I/O, and PCI interfaces that 
   are used to abstract accesses to devices.
-
-  @param Mem 
-  Allows reads and writes to memory mapped I/O space.
-
-  @param Io 
-  Allows reads and writes to I/O space.
-
-  @param Pci 
-  Allows reads and writes to PCI configuration space.
-
-  @param Map 
-  Provides the device specific addresses needed to access system memory for DMA. 
-
-  @param PciDevicePath 
-  Provides an EFI Device Path for a PCI device with the given PCI
-  configuration space address.
-
-  @param Unmap 
-  Releases any resources allocated by Map(). 
-
-  @param AllocateBuffer 
-  Allocates pages that are suitable for a common buffer mapping. 
-
-  @param Flush 
-  Flushes any posted write data to the device. 
-
-  @param FreeBuffer 
-  Free pages that were allocated with AllocateBuffer(). 
-
 **/ 
 struct _EFI_DEVICE_IO_PROTOCOL {
+  ///
+  /// Allows reads and writes to memory mapped I/O space.
+  ///
   EFI_IO_ACCESS           Mem;
+  ///
+  /// Allows reads and writes to I/O space.
+  ///
   EFI_IO_ACCESS           Io;
+  ///
+  /// Allows reads and writes to PCI configuration space.
+  ///
   EFI_IO_ACCESS           Pci;
   EFI_IO_MAP              Map;
   EFI_PCI_DEVICE_PATH     PciDevicePath;

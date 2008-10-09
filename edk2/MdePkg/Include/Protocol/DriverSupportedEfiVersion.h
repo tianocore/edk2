@@ -29,19 +29,17 @@
   specification it conforms to. This protocol must be placed on   
   the drivers image handle when the driver's entry point is   
   called.
-  
-  @param Length The size, in bytes, of the entire structure.
-                Future versions of this specification may grow
-                the size of the structure.
-  
-  @param FirmwareVersion The version of the EFI specification
-                         that this driver conforms to.
-                         EFI_2_10_SYSTEM_TABLE_REVISION for this
-                         version of this specification.
-
 **/ 
 typedef struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
+  ///
+  /// The size, in bytes, of the entire structure. Future versions of this 
+  /// specification may grow the size of the structure.
+  /// 
   UINT32 Length;
+  ///
+  /// The version of the EFI specification that this driver conforms to.
+  /// EFI_2_10_SYSTEM_TABLE_REVISION for this version of this specification.  
+  ///
   UINT32 FirmwareVersion;
 } EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL;
 

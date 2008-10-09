@@ -173,30 +173,6 @@ BOOLEAN
 /**
   @par Protocol Description:
   This protocol is used to creates and manipulates device paths and device nodes.
-
-  @param GetDevicePathSize 
-  Returns the size of the specified device path, in bytes.
-
-  @param DuplicateDevicePath
-  Duplicates a device path structure.
- 
-  @param AppendDeviceNode 
-  Appends the device node to the specified device path.
-
-  @param AppendDevicePath 
-  Appends the device path to the specified device path.
-
-  @param AppendDevicePathInstance
-  Appends a device path instance to another device path.
-
-  @param GetNextDevicePathInstance
-  Retrieves the next device path instance from a device path data structure.
-
-  @param IsDevicePathMultiInstance
-  Returns TRUE if this is a multi-instance device path.
-
-  @param CreateDeviceNode 
-  Allocates memory for a device node with the specified type and sub-type.
 **/ 
 typedef struct {
   EFI_DEVICE_PATH_UTILS_GET_DEVICE_PATH_SIZE GetDevicePathSize;

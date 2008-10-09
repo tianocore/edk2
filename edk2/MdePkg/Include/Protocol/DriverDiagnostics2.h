@@ -91,26 +91,18 @@ EFI_STATUS
   OUT CHAR16                                                **Buffer
   );
 
-
-//
-//
-
 /**
   Interface structure for the Driver Diagnostics2 Protocol.
 
   @par Protocol Description:
   Used to perform diagnostics on a controller that an EFI Driver is managing.
-
-  @param RunDiagnostics      Runs diagnostics on a controller.
-  @param SupportedLanguages  A Null-terminated ASCII string that
-                             contains one or more RFC 3066
-                             language codes.  This is the list
-                             of language codes that this
-                             protocol supports.
-
 **/
 struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL {
   EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS RunDiagnostics;
+  ///
+  /// A Null-terminated ASCII string that contains one or more RFC 3066
+  /// language codes.  This is the list of language codes that this protocol supports.  
+  ///    
   CHAR8                                   *SupportedLanguages;
 };
 
