@@ -144,22 +144,6 @@ EFI_STATUS
   loaded into option ROMs. The image loader will load the EBC image, perform standard relocations,
   and invoke the CreateThunk() service to create a thunk for the EBC image's entry point. The
   image can then be run using the standard EFI start image services.
-
-  @param CreateThunk 
-  Creates a thunk for an EBC image entry point or protocol service,
-  and returns a pointer to the thunk. 
-  
-  @param UnloadImage 
-  Called when an EBC image is unloaded to allow the interpreter to
-  perform any cleanup associated with the image execution. 
-  
-  @param RegisterICacheFlush
-  Called to register a callback function that the EBC interpreter can
-  call to flush the processor instruction cache after creating thunks.
-  
-  @param GetVersion 
-  Called to get the version of the associated EBC interpreter.
-
 **/
 struct _EFI_EBC_PROTOCOL {
   EFI_EBC_CREATE_THUNK          CreateThunk;

@@ -705,35 +705,6 @@ EFI_STATUS
   for example. This level of firmware volume implementation
   detail is not visible to the consumers of the Firmware Volume
   Protocol.
-
-  @param  GetVolumeAttributes   Retrieves volume capabilities
-                                and current settings. 
-
-  @param  SetVolumeAttributes   Modifies the current settings of
-                                the firmware volume.
-
-  @param  ReadFile              Reads an entire file from the firmware
-                                volume. 
-
-  @param  ReadSection           Reads a single section from a file into
-                                a buffer.
-
-  @param  WriteFile             Writes an entire file into the firmware
-                                volume. 
-
-  @param  GetNextFile           Provides service to allow searching the
-                                firmware volume.
-
-  @param  KeySize               Data field that indicates the size in bytes
-                                of the Key input buffer for the
-                                GetNextFile() API.
-
-  @param  ParentHandle          Handle of the parent firmware volume.
-
-  @param  GetInfo               Gets the requested file or volume
-                                information. 
-
-  @param  SetInfo               Sets the requested file information.
 **/
 struct _EFI_FIRMWARE_VOLUME2_PROTOCOL {
   EFI_FV_GET_ATTRIBUTES   GetVolumeAttributes;
@@ -742,7 +713,17 @@ struct _EFI_FIRMWARE_VOLUME2_PROTOCOL {
   EFI_FV_READ_SECTION     ReadSection;
   EFI_FV_WRITE_FILE       WriteFile;
   EFI_FV_GET_NEXT_FILE    GetNextFile;
+  
+  ///
+  /// Data field that indicates the size in bytes
+  /// of the Key input buffer for the
+  /// GetNextFile() API.  
+  ///
   UINT32                  KeySize;
+  
+  ///
+  /// Handle of the parent firmware volume.
+  ///
   EFI_HANDLE              ParentHandle;
   EFI_FV_GET_INFO         GetInfo;
   EFI_FV_SET_INFO         SetInfo;

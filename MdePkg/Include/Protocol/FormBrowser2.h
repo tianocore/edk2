@@ -158,23 +158,11 @@ EFI_STATUS
   @par Protocol Description: 
   This interface will allow the caller to direct the configuration 
   driver to use either the HII database or use the passed-in packet of data.
-
-  @param SendForm         Browse the specified configuration forms.
-
-  @param BrowserCallback  Routine used to expose internal
-                          configuration state of the browser.
-                          This is primarily used by callback
-                          handler routines which were called by
-                          the browser and in-turn need to get
-                          additional information from the
-                          browser itself.
-
 **/
 struct _EFI_FORM_BROWSER2_PROTOCOL {
   EFI_SEND_FORM2         SendForm;
   EFI_BROWSER_CALLBACK2  BrowserCallback;
 } ;
-
 
 extern EFI_GUID gEfiFormBrowser2ProtocolGuid;
 

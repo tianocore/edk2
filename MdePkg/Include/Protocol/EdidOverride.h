@@ -58,12 +58,11 @@ EFI_STATUS
   @par Protocol Description:
   This protocol is produced by the platform to allow the platform to provide 
   EDID information to the producer of the Graphics Output protocol.
-
-  @param GetEdid 
-  Returns EDID values and attributes that the Video BIOS must use. 
-
 **/
 struct _EFI_EDID_OVERRIDE_PROTOCOL {
+  ///
+  /// Returns EDID values and attributes that the Video BIOS must use. 
+  ///
   EFI_EDID_OVERRIDE_PROTOCOL_GET_EDID   GetEdid;
 };
                                              

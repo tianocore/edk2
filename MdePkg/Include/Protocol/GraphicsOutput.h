@@ -102,41 +102,53 @@ typedef union {
   UINT32                        Raw;
 } EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION;
 
+///
+/// actions for BltOperations
+///
 typedef enum {
+  ///
+  /// Write data from the  BltBuffer pixel (SourceX, SourceY) 
+  /// directly to every pixel of the video display rectangle 
+  /// (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height). 
+  /// Only one pixel will be used from the BltBuffer. Delta is NOT used.  
+  ///
   EfiBltVideoFill,
+  
+  ///
+  /// Read data from the video display rectangle 
+  /// (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in 
+  /// the BltBuffer rectangle (DestinationX, DestinationY ) 
+  /// (DestinationX + Width, DestinationY + Height). If DestinationX or 
+  /// DestinationY is not zero then Delta must be set to the length in bytes 
+  /// of a row in the BltBuffer.  
+  ///
   EfiBltVideoToBltBuffer,
+  
+  ///
+  /// Write data from the  BltBuffer rectangle 
+  /// (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the 
+  /// video display rectangle (DestinationX, DestinationY) 
+  /// (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is 
+  /// not zero then Delta must be set to the length in bytes of a row in the 
+  /// BltBuffer.
+  ///
   EfiBltBufferToVideo, 
+  
+  ///
+  /// Copy from the video display rectangle (SourceX, SourceY)
+  /// (SourceX + Width, SourceY + Height) .to the video display rectangle 
+  /// (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height). 
+  /// The BltBuffer and Delta  are not used in this mode.
+  /// EfiBltVideoToVideo,
+  ///
   EfiBltVideoToVideo,
+  
   EfiGraphicsOutputBltOperationMax
 } EFI_GRAPHICS_OUTPUT_BLT_OPERATION;
 
 /**
-  The following table defines actions for BltOperations:
-
-  <B>EfiBltVideoFill</B> - Write data from the  BltBuffer pixel (SourceX, SourceY) 
-  directly to every pixel of the video display rectangle 
-  (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height). 
-  Only one pixel will be used from the BltBuffer. Delta is NOT used.
-
-  <B>EfiBltVideoToBltBuffer</B> - Read data from the video display rectangle 
-  (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in 
-  the BltBuffer rectangle (DestinationX, DestinationY ) 
-  (DestinationX + Width, DestinationY + Height). If DestinationX or 
-  DestinationY is not zero then Delta must be set to the length in bytes 
-  of a row in the BltBuffer.
-
-  <B>EfiBltBufferToVideo</B> - Write data from the  BltBuffer rectangle 
-  (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the 
-  video display rectangle (DestinationX, DestinationY) 
-  (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is 
-  not zero then Delta must be set to the length in bytes of a row in the 
-  BltBuffer.
-
-  <B>EfiBltVideoToVideo</B> - Copy from the video display rectangle (SourceX, SourceY)
-  (SourceX + Width, SourceY + Height) .to the video display rectangle 
-  (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height). 
-  The BltBuffer and Delta  are not used in this mode.
-
+  Blt a rectangle of pixels on the graphics screen. Blt stands for BLock Transfer.
+  
   @param  This         Protocol instance pointer.
   @param  BltBuffer    Buffer containing data to blit into video buffer. This
                        buffer has a size of Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
@@ -183,21 +195,6 @@ typedef struct {
   Provides a basic abstraction to set video modes and copy pixels to and from 
   the graphics controller's frame buffer. The linear address of the hardware 
   frame buffer is also exposed so software can write directly to the video hardware.
-
-  @param QueryMode
-  Returns information for an available graphics mode that the graphics device 
-  and the set of active video output devices supports.
-  
-  @param SetMode 
-  Set the video device into the specified mode and clears the visible portions 
-  of the output display to black.
-  
-  @param Blt
-  Software abstraction to draw on the video device's frame buffer.
-  
-  @param Mode
-  Pointer to EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE data.
-
 **/
 struct _EFI_GRAPHICS_OUTPUT_PROTOCOL {
   EFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE  QueryMode;

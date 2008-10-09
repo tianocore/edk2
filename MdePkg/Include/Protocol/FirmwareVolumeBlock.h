@@ -263,9 +263,9 @@ EFI_STATUS
 
 
 
-//
-// EFI_LBA_LIST_TERMINATOR
-//
+///
+/// EFI_LBA_LIST_TERMINATOR
+///
 #define EFI_LBA_LIST_TERMINATOR   0xFFFFFFFFFFFFFFFFULL
 
 
@@ -322,8 +322,6 @@ EFI_STATUS
   ...
 );
 
-
-
 /**
   @par Protocol Description:
   The Firmware Volume Block Protocol is the low-level interface
@@ -347,33 +345,6 @@ EFI_STATUS
   Firmware Volume Protocol abstracts the file system that is
   used to format the firmware volume and the hardware
   device-hardening features that may be present.
-
-
-  @param GetPhysicalAddress   Retrieves the memory-mapped
-                              address of the firmware volume.
-
-  @param GetBlockSize   Retrieves the size for a specific block.
-                        Also returns the number of consecutive
-                        similarly sized blocks.
-
-  @param Read           Reads n bytes into a buffer from the firmware
-                        volume hardware.
-
-  @param Write          Writes n bytes from a buffer into the firmware
-                        volume hardware.
-
-  @param EraseBlocks    Erases specified block(s) and sets all
-                        values as indicated by the
-                        EFI_FVB_ERASE_POLARITY bit. See the
-                        EraseBlocks() function description. Type
-                        EFI_FVB_ERASE_POLARITY is defined in
-                        EFI_FIRMWARE_VOLUME_HEADER. ParentHandle
-                        Handle of the parent firmware volume.
-  
-  @param GetAttributes  Retrieves the current volume attributes.
-  
-  @param SetAttributes  Sets the current volume attributes.
-
 **/
 struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
   EFI_FVB_GET_ATTRIBUTES        GetAttributes;
@@ -383,6 +354,9 @@ struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
   EFI_FVB_READ                  Read;
   EFI_FVB_WRITE                 Write;
   EFI_FVB_ERASE_BLOCKS          EraseBlocks;
+  ///
+  /// Handle of the parent firmware volume.
+  ///  
   EFI_HANDLE                    ParentHandle;
 };
 
