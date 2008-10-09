@@ -62,8 +62,6 @@ EFI_STATUS
   This protocol must be produced by a runtime DXE driver and may be consumed 
   only by the DXE Foundation.
 
-  @param  ReportStatusCode Emit a status code.
-
 **/
 typedef struct _EFI_STATUS_CODE_PROTOCOL {
   EFI_REPORT_STATUS_CODE         ReportStatusCode;

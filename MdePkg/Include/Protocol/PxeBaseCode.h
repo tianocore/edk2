@@ -616,56 +616,13 @@ EFI_STATUS
   The EFI_PXE_BASE_CODE_PROTOCOL handle also supports the
   EFI_LOAD_FILE_PROTOCOL protocol. This provides a clean way to obtain control from the
   boot manager if the boot path is from the remote device.
-
-  @param Revision
-  The revision of the EFI_PXE_BASE_CODE_PROTOCOL. All future revisions must 
-  be backwards compatible. If a future version is not backwards compatible 
-  it is not the same GUID.
-
-  @param Start
-  Starts the PXE Base Code Protocol. Mode structure information is not valid and 
-  no other Base Code Protocol functions will operate until the Base Code is started. 
-
-  @param Stop
-  Stops the PXE Base Code Protocol. Mode structure information is unchanged by this function. 
-  No Base Code Protocol functions will operate until the Base Code is restarted. 
-
-  @param Dhcp
-  Attempts to complete a DHCPv4 D.O.R.A. (discover / offer / request / acknowledge) 
-  or DHCPv6 S.A.R.R (solicit / advertise / request / reply) sequence. 
-
-  @param Discover
-  Attempts to complete the PXE Boot Server and/or boot image discovery sequence. 
-
-  @param Mtftp
-  Performs TFTP and MTFTP services. 
-
-  @param UdpWrite
-  Writes a UDP packet to the network interface. 
-
-  @param UdpRead
-  Reads a UDP packet from the network interface. 
-
-  @param SetIpFilter
-  Updates the IP receive filters of the network device. 
-
-  @param Arp
-  Uses the ARP protocol to resolve a MAC address. 
-
-  @param SetParameters
-  Updates the parameters that affect the operation of the PXE Base Code Protocol. 
-
-  @param SetStationIp
-  Updates the station IP address and subnet mask values. 
-
-  @param SetPackets
-  Updates the contents of the cached DHCP and Discover packets. 
-
-  @param Mode
-  Pointer to the EFI_PXE_BASE_CODE_MODE data for this device. 
-
 **/
 struct _EFI_PXE_BASE_CODE_PROTOCOL {
+  ///
+  ///  The revision of the EFI_PXE_BASE_CODE_PROTOCOL. All future revisions must 
+  ///  be backwards compatible. If a future version is not backwards compatible 
+  ///  it is not the same GUID.
+  ///
   UINT64                            Revision;
   EFI_PXE_BASE_CODE_START           Start;
   EFI_PXE_BASE_CODE_STOP            Stop;

@@ -558,70 +558,13 @@ EFI_STATUS
   to a network adapter. Once the network adapter initializes, 
   the EFI_SIMPLE_NETWORK_PROTOCOL protocol provides services that 
   allow packets to be transmitted and received.
-  
-  @param Revision
-  Revision of the EFI_SIMPLE_NETWORK_PROTOCOL. All future revisions must 
-  be backwards compatible. If a future version is not backwards compatible 
-  it is not the same GUID.
-
-  @param Start
-  Prepares the network interface for further command operations. 
-  No other EFI_SIMPLE_NETWORK_PROTOCOL interface functions will operate 
-  until this call is made. 
-
-  @param Stop
-  Stops further network interface command processing. 
-  No other EFI_SIMPLE_NETWORK_PROTOCOL interface functions will operate 
-  after this call is made until another Start() call is made. 
-
-  @param Initialize
-  Resets the network adapter and allocates the transmit and receive buffers. 
-
-  @param Reset
-  Resets the network adapter and reinitializes it with the parameters 
-  provided in the previous call to Initialize(). 
-
-  @param Shutdown
-  Resets the network adapter and leaves it in a state safe for another driver 
-  to initialize. The memory buffers assigned in the Initialize() call are released. 
-  After this call, only the Initialize() or Stop() calls may be used. 
-
-  @param ReceiveFilters
-  Enables and disables the receive filters for the network interface and, 
-  if supported, manages the filtered multicast 
-  HW MAC (Hardware Media Access Control) address list. 
-
-  @param StationAddress
-  Modifies or resets the current station address, if supported. 
-
-  @param Statistics
-  Collects statistics from the network interface and allows the statistics to be reset. 
-
-  @param MCastIpToMac
-  Maps a multicast IP address to a multicast HW MAC address. 
-
-  @param NvData
-  Reads and writes the contents of the NVRAM devices attached to the network interface. 
-
-  @param GetStatus
-  Reads the current interrupt status and the list of recycled transmit 
-  buffers from the network interface. 
-
-  @param Transmit
-  Places a packet in the transmit queue. 
-
-  @param Receive
-  Retrieves a packet from the receive queue, along with the status 
-  flags that describe the packet type. 
-
-  @param WaitForPacket
-  Event used with WaitForEvent() to wait for a packet to be received.
-
-  @param Mode
-  Pointer to the EFI_SIMPLE_NETWORK_MODE data for the device. 
-
 **/
 struct _EFI_SIMPLE_NETWORK_PROTOCOL {
+  ///
+  /// Revision of the EFI_SIMPLE_NETWORK_PROTOCOL. All future revisions must 
+  /// be backwards compatible. If a future version is not backwards compatible 
+  /// it is not the same GUID.
+  ///
   UINT64                              Revision;
   EFI_SIMPLE_NETWORK_START            Start;
   EFI_SIMPLE_NETWORK_STOP             Stop;
@@ -636,6 +579,9 @@ struct _EFI_SIMPLE_NETWORK_PROTOCOL {
   EFI_SIMPLE_NETWORK_GET_STATUS       GetStatus;
   EFI_SIMPLE_NETWORK_TRANSMIT         Transmit;
   EFI_SIMPLE_NETWORK_RECEIVE          Receive;
+  ///
+  /// Event used with WaitForEvent() to wait for a packet to be received.
+  ///
   EFI_EVENT                           WaitForPacket;
   EFI_SIMPLE_NETWORK_MODE             *Mode;
 };

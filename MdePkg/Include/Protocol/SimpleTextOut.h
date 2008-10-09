@@ -379,36 +379,6 @@ typedef struct {
   It is the minimum required protocol for any handle supplied as the ConsoleOut 
   or StandardError device. In addition, the minimum supported text mode of such 
   devices is at least 80 x 25 characters.
-
-  @param Reset
-  Reset the ConsoleOut device. 
-
-  @param OutputString
-  Displays the Unicode string on the device at the current cursor location. 
-
-  @param TestString
-  Tests to see if the ConsoleOut device supports this Unicode string.
-
-  @param QueryMode
-  Queries information concerning the output device's supported text mode. 
-
-  @param SetMode
-  Sets the current mode of the output device. 
-
-  @param SetAttribute
-  Sets the foreground and background color of the text that is output. 
-
-  @param ClearScreen
-  Clears the screen with the currently set background color. 
-
-  @param SetCursorPosition
-  Sets the current cursor position. 
-
-  @param EnableCursor
-  Turns the visibility of the cursor on/off. 
-
-  @param Mode
-  Pointer to SIMPLE_TEXT_OUTPUT_MODE data. 
 **/
 struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
   EFI_TEXT_RESET                Reset;

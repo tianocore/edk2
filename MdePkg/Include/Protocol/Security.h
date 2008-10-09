@@ -110,11 +110,6 @@ EFI_STATUS
   wrapped in an Authentication Section.  See the Firmware File System 
   Specification for details on the GUIDed Section Extraction Protocol and 
   Authentication Sections.
-
-  @param FileAuthenticationState
-  This service is called upon fault with respect to 
-  the authentication of a section of a file.
-
 **/
 struct _EFI_SECURITY_ARCH_PROTOCOL {
   EFI_SECURITY_FILE_AUTHENTICATION_STATE  FileAuthenticationState;

@@ -321,43 +321,13 @@ EFI_STATUS
   and is also a reference to a location in the directory tree of the file system 
   in which the file resides. With any given file handle, other files may be opened 
   relative to this file's location, yielding new file handles.
-
-  @param Revision
-  The version of the EFI_FILE_PROTOCOL interface. The version specified 
-  by this specification is 0x00010000. Future versions are required 
-  to be backward compatible to version 1.0.
-
-  @param Open
-  Opens or creates a new file. 
-
-  @param Close
-  Closes the current file handle. 
-
-  @param Delete
-  Deletes a file. 
-
-  @param Read
-  Reads bytes from a file. 
-
-  @param Write
-  Writes bytes to a file. 
-
-  @param GetPosition
-  Returns the current file position. 
-
-  @param SetPosition
-  Sets the current file position. 
-
-  @param GetInfo
-  Gets the requested file or volume information. 
-
-  @param SetInfo
-  Sets the requested file information. 
-
-  @param Flush
-  Flushes all modified data associated with the file to the device. 
 **/
 struct _EFI_FILE_PROTOCOL {
+  ///
+  /// The version of the EFI_FILE_PROTOCOL interface. The version specified 
+  /// by this specification is 0x00010000. Future versions are required 
+  /// to be backward compatible to version 1.0.
+  ///
   UINT64                Revision;
   EFI_FILE_OPEN         Open;
   EFI_FILE_CLOSE        Close;

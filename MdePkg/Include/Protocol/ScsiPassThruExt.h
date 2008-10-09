@@ -314,30 +314,6 @@ EFI_STATUS
   and the ability to send SCI Request Packets to any SCSI device attached to 
   that SCSI channel. The information includes the Target ID of the host controller 
   on the SCSI channel and the attributes of the SCSI channel.
-
-  @param Mode 
-  A pointer to the EFI_EXT_SCSI_PASS_THRU_MODE data for this SCSI channel. 
-
-  @param PassThru 
-  Sends a SCSI Request Packet to a SCSI device that is Connected to the SCSI channel. 
-
-  @param GetNextTargetLun 
-  Retrieves the list of legal Target IDs and LUNs for the SCSI devices on a SCSI channel. 
-
-  @param BuildDevicePath 
-  Allocates and builds a device path node for a SCSI Device on a SCSI channel. 
-
-  @param GetTargetLun
-  Translates a device path node to a Target ID and LUN. 
-
-  @param ResetChannel
-  Resets the SCSI channel. This operation resets all the SCSI devices connected to the SCSI channel. 
-
-  @param ResetTargetLun
-  Resets a SCSI device that is connected to the SCSI channel. 
-
-  @param GetNextTartget 
-  Retrieves the list of legal Target IDs for the SCSI devices on a SCSI channel. 
 **/  
 struct _EFI_EXT_SCSI_PASS_THRU_PROTOCOL {
   EFI_EXT_SCSI_PASS_THRU_MODE                *Mode;
