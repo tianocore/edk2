@@ -271,39 +271,13 @@ typedef struct {
   The Serial I/O protocol is used to communicate with UART-style serial devices. 
   These can be standard UART serial ports in PC-AT systems, serial ports attached 
   to a USB interface, or potentially any character-based I/O device.
-
-  @param Revision
-  The revision to which the EFI_SERIAL_IO_PROTOCOL adheres. All future revisions 
-  must be backwards compatible. If a future version is not back wards compatible, 
-  it is not the same GUID.
-
-  @param Reset
-  Resets the hardware device.
-
-  @param SetAttributes
-  Sets communication parameters for a serial device. These include 
-  the baud rate, receive FIFO depth, transmit/receive time out, parity, data bits, 
-  and stop bit attributes.
-
-  @param SetControl
-  Sets the control bits on a serial device. These include Request to 
-  Send and Data Terminal Ready.
-
-  @param GetControl
-  Reads the status of the control bits on a serial device. These include 
-  Clear to Send, Data Set Ready, Ring Indicator, and Carrier Detect.
-
-  @param Write
-  Sends a buffer of characters to a serial device.
-
-  @param Read
-  Receives a buffer of characters from a serial device.
-
-  @param Mode
-  Pointer to SERIAL_IO_MODE data. 
-  
 **/
 struct _EFI_SERIAL_IO_PROTOCOL {
+  ///
+  /// The revision to which the EFI_SERIAL_IO_PROTOCOL adheres. All future revisions 
+  /// must be backwards compatible. If a future version is not back wards compatible, 
+  /// it is not the same GUID.
+  ///
   UINT32                      Revision;
   EFI_SERIAL_RESET            Reset;
   EFI_SERIAL_SET_ATTRIBUTES   SetAttributes;

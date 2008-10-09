@@ -78,12 +78,6 @@ EFI_STATUS
   required behavior, not to specify the required implementation. Each consumer of 
   a software protocol is responsible for calling CreateChild() when it requires the 
   protocol and calling DestroyChild() when it is finished with that protocol.
-
-  @param CreateChild
-  Creates a child handle and installs a protocol.
-
-  @param DestroyChild
-  Destroys a child handle with a protocol installed on it.
 **/
 struct _EFI_SERVICE_BINDING_PROTOCOL {
   EFI_SERVICE_BINDING_CREATE_CHILD         CreateChild;
