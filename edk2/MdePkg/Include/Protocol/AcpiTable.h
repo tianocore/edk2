@@ -108,13 +108,6 @@ EFI_STATUS
   @par Protocol Description:
   The EFI_ACPI_TABLE_PROTOCOL provides the ability for a component
   to install and uninstall ACPI tables from a platform.
-
-
-  @param InstallAcpiTable   Installs an ACPI table into the system.
-
-  @param UninstallAcpiTable Removes a previously installed ACPI
-                            table from the system.
-
 **/   
 struct _EFI_ACPI_TABLE_PROTOCOL {
   EFI_ACPI_TABLE_INSTALL_ACPI_TABLE   InstallAcpiTable;

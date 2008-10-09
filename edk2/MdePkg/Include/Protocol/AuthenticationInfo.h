@@ -41,9 +41,9 @@ typedef struct {
 
 typedef struct {
   AUTH_NODE_HEADER Header;
-  EFI_IPv6_ADDRESS RadiusIpAddr;             // IPv4 or IPv6 address
+  EFI_IPv6_ADDRESS RadiusIpAddr;             ///< IPv4 or IPv6 address
   UINT16           Reserved;
-  EFI_IPv6_ADDRESS NasIpAddr;                // IPv4 or IPv6 address
+  EFI_IPv6_ADDRESS NasIpAddr;                ///< IPv4 or IPv6 address
   UINT16           NasSecretLength; 
   UINT8            *NasSecret;      
   UINT16           ChapSecretLength;
@@ -113,13 +113,6 @@ EFI_STATUS
   @par Protocol Description:
   This protocol is used on any device handle to obtain authentication 
   information associated with the physical or logical device.
-
-  @param Get
-  Used to retrieve the Authentication Information associated with the controller handle
-  
-  @param Set
-  Used to set the Authentication information associated with the controller handle
-  
 **/  
 struct _EFI_AUTHENTICATION_INFO_PROTOCOL {
   EFI_AUTHENTICATION_PROTOCOL_INFO_GET Get;
