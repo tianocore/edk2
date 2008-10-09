@@ -21,7 +21,6 @@
 #include <Protocol/DriverConfiguration.h>
 #include <Protocol/DriverDiagnostics.h>
 #include <Protocol/DriverDiagnostics2.h>
-//#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/LoadedImage.h>
 
 #include <Guid/EventGroup.h>
