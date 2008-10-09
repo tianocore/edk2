@@ -33,44 +33,20 @@ typedef struct _EFI_ABSOLUTE_POINTER_PROTOCOL EFI_ABSOLUTE_POINTER_PROTOCOL;
   The following data values in the EFI_ABSOLUTE_POINTER_MODE
   interface are read-only and are changed by using the appropriate
   interface functions.
-  
-  @param AbsoluteMinX The Absolute Minimum of the device on the
-                      x-axis.
-
-  @param AbsoluteMinY The Absolute Minimum of the device on the
-                      y axis.
-
-  @param AbsoluteMinZ The Absolute Minimum of the device on the
-                      z-axis.
-
-  @param AbsoluteMaxX The Absolute Maximum of the device on the
-                      x-axis. If 0, and the AbsoluteMinX is 0,
-                      then the pointer device does not support a
-                      xaxis.
-
-  @param AbsoluteMaxY The Absolute Maximum of the device on the
-                      y -axis. If 0,, and the AbsoluteMinX is 0,
-                      then the pointer device does not support a
-                      yaxis.
-
-  @param AbsoluteMaxZ The Absolute Maximum of the device on the
-                      z-axis. If 0 , and the AbsoluteMinX is 0,
-                      then the pointer device does not support a
-                      zaxis. 
-
-  @param Attributes   The following bits are set as needed (or'd
-                      together) to indicate the capabilities of the device
-                      supported. The remaining bits are undefined and should be 0.
-
 **/
 typedef struct {
-  UINT64 AbsoluteMinX;
-  UINT64 AbsoluteMinY;
-  UINT64 AbsoluteMinZ;
-  UINT64 AbsoluteMaxX;
-  UINT64 AbsoluteMaxY;
-  UINT64 AbsoluteMaxZ;
-  UINT32 Attributes;
+  UINT64 AbsoluteMinX; ///< The Absolute Minimum of the device on the x-axis
+  UINT64 AbsoluteMinY; ///< The Absolute Minimum of the device on the y axis.
+  UINT64 AbsoluteMinZ; ///< The Absolute Minimum of the device on the z-axis
+  UINT64 AbsoluteMaxX; ///< The Absolute Maximum of the device on the x-axis. If 0, and the 
+                       ///< AbsoluteMinX is 0, then the pointer device does not support a xaxis
+  UINT64 AbsoluteMaxY; ///< The Absolute Maximum of the device on the y -axis. If 0, and the 
+                       ///< AbsoluteMinX is 0, then the pointer device does not support a yaxis.
+  UINT64 AbsoluteMaxZ; ///< The Absolute Maximum of the device on the z-axis. If 0 , and the 
+                       ///< AbsoluteMinX is 0, then the pointer device does not support a zaxis
+  UINT32 Attributes;   ///< The following bits are set as needed (or'd together) to indicate the 
+                       ///< capabilities of the device supported. The remaining bits are undefined 
+                       ///< and should be 0
 } EFI_ABSOLUTE_POINTER_MODE;
 
 ///
@@ -116,57 +92,49 @@ EFI_STATUS
   IN BOOLEAN                       ExtendedVerification
 );
 
+///
+/// This bit is set if the touch sensor is active.
+///
+#define EFI_ABSP_TouchActive  0x00000001 
 
-
-
-/**
-  Definitions of bits within ActiveButtons.
-  
-  @param EFI_ABSP_TouchActive This bit is set if the touch
-                              sensor is active.
-  
-  @param EFI_ABS_AltActive    This bit is set if the alt sensor,
-                              such as pen-side button, is
-                              active.
-**/
-#define EFI_ABSP_TouchActive  0x00000001
+///
+/// This bit is set if the alt sensor, such as pen-side button, is active
+/// 
 #define EFI_ABS_AltActive     0x00000002
 
 
 /**
   Definition of EFI_ABSOLUTE_POINTER_STATE.
-  
-  @param CurrentX The unsigned position of the activation on the
-                  x axis If the AboluteMinX and the AboluteMaxX
-                  fields of the EFI_ABSOLUTE_POINTER_MODE
-                  structure are both 0, then this pointer device
-                  does not support an x-axis, and this field
-                  must be ignored.
-
-  @param CurrentY The unsigned position of the activation on the
-                  x axis If the AboluteMinY and the AboluteMaxY
-                  fields of the EFI_ABSOLUTE_POINTER_MODE
-                  structure are both 0, then this pointer device
-                  does not support an y-axis, and this field
-                  must be ignored.
-
-  @param CurrentZ The unsigned position of the activation on the
-                  x axis, or the pressure measurement. If the
-                  AboluteMinZ and the AboluteMaxZ fields of the
-                  EFI_ABSOLUTE_POINTER_MODE structure are
-                  both 0, then this pointer device does not
-                  support an z-axis, and this field must be
-                  ignored.
-
-  @param ActiveButtons Bits are set to 1 in this structure item
-                       to indicate that device buttons are
-                       active.
-
 **/
 typedef struct {
+  ///
+  /// The unsigned position of the activation on the x axis If the AboluteMinX 
+  /// and the AboluteMaxX fields of the EFI_ABSOLUTE_POINTER_MODE structure are 
+  /// both 0, then this pointer device does not support an x-axis, and this field
+  /// must be ignored.
+  ///
   UINT64 CurrentX;
+  
+  ///
+  /// The unsigned position of the activation on the x axis If the AboluteMinY 
+  /// and the AboluteMaxY fields of the EFI_ABSOLUTE_POINTER_MODE structure are 
+  /// both 0, then this pointer device does not support an y-axis, and this field
+  /// must be ignored.  
+  ///
   UINT64 CurrentY;
+  
+  ///
+  /// The unsigned position of the activation on the x axis, or the pressure 
+  /// measurement. If the AboluteMinZ and the AboluteMaxZ fields of the 
+  /// EFI_ABSOLUTE_POINTER_MODE structure are both 0, then this pointer device 
+  /// does not support an z-axis, and this field must be ignored.  
+  ///
   UINT64 CurrentZ;
+  
+  ///
+  /// Bits are set to 1 in this structure item to indicate that device buttons are
+  /// active.
+  ///
   UINT32 ActiveButtons;
 } EFI_ABSOLUTE_POINTER_STATE;
 
@@ -218,20 +186,13 @@ EFI_STATUS
   device. In addition certain data items describing the device are
   provided.
 
-
-  @param Reset        Resets the pointer device.
-
-  @param GetState     Retrieves the current state of the pointer
-                      device.
-
-  @param WaitForInput Event to use with WaitForEvent() to wait
-                      for input from the pointer device.
-  @param Mode         Pointer to EFI_ABSOLUTE_POINTER_MODE data.
-
 **/
 struct _EFI_ABSOLUTE_POINTER_PROTOCOL {
   EFI_ABSOLUTE_POINTER_RESET      Reset;
   EFI_ABSOLUTE_POINTER_GET_STATE  GetState;
+  ///
+  /// Event to use with WaitForEvent() to wait for input from the pointer device.  
+  ///
   EFI_EVENT                       WaitForInput;
   EFI_ABSOLUTE_POINTER_MODE       *Mode;
 };
