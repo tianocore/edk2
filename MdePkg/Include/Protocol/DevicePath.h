@@ -110,6 +110,7 @@ typedef struct {
   ///
   /// Optional variable length _HIDSTR
   /// Optional variable length _UIDSTR
+  /// Optional variable length _CIDSTR
   ///
 } ACPI_EXTENDED_HID_DEVICE_PATH;
 

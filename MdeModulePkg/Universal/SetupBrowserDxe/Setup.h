@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _SETUP_H_
 
 
-#include <Uefi.h>
+#include <PiDxe.h>
 
 #include <Protocol/Print.h>
 #include <Protocol/Print2.h>

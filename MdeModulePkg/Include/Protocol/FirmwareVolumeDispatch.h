@@ -17,8 +17,6 @@
 #ifndef __FIRMWARE_VOLUME_DISPATCH_H__
 #define __FIRMWARE_VOLUME_DISPATCH_H__
 
-#include <PiDxe.h>
-
 #define EFI_FIRMWARE_VOLUME_DISPATCH_PROTOCOL_GUID \
   { 0x7aa35a69, 0x506c, 0x444f, {0xa7, 0xaf, 0x69, 0x4b, 0xf5, 0x6f, 0x71, 0xc8 } }
 
