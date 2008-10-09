@@ -48,27 +48,27 @@ typedef enum {
 //
 // Complete PCI address generater
 //
-#define EFI_PCI_IO_PASS_THROUGH_BAR               0xff    // Special BAR that passes a memory or I/O cycle through unchanged
-#define EFI_PCI_IO_ATTRIBUTE_MASK                 0x077f  // All the following I/O and Memory cycles
-#define EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO   0x0001  // I/O cycles 0x0000-0x00FF (10 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_ISA_IO               0x0002  // I/O cycles 0x0100-0x03FF or greater (10 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO       0x0004  // I/O cycles 0x3C6, 0x3C8, 0x3C9 (10 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY           0x0008  // MEM cycles 0xA0000-0xBFFFF (24 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_VGA_IO               0x0010  // I/O cycles 0x3B0-0x3BB and 0x3C0-0x3DF (10 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO       0x0020  // I/O cycles 0x1F0-0x1F7, 0x3F6, 0x3F7 (10 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_IDE_SECONDARY_IO     0x0040  // I/O cycles 0x170-0x177, 0x376, 0x377 (10 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE 0x0080  // Map a memory range so write are combined
-#define EFI_PCI_IO_ATTRIBUTE_IO                   0x0100  // Enable the I/O decode bit in the PCI Config Header
-#define EFI_PCI_IO_ATTRIBUTE_MEMORY               0x0200  // Enable the Memory decode bit in the PCI Config Header
-#define EFI_PCI_IO_ATTRIBUTE_BUS_MASTER           0x0400  // Enable the DMA bit in the PCI Config Header
-#define EFI_PCI_IO_ATTRIBUTE_MEMORY_CACHED        0x0800  // Map a memory range so all r/w accesses are cached
-#define EFI_PCI_IO_ATTRIBUTE_MEMORY_DISABLE       0x1000  // Disable a memory range
-#define EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE      0x2000  // Clear for an add-in PCI Device
-#define EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM         0x4000  // Clear for a physical PCI Option ROM accessed through ROM BAR
-#define EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE   0x8000  // Clear for PCI controllers that can not genrate a DAC
-#define EFI_PCI_IO_ATTRIBUTE_ISA_IO_16            0x10000 // I/O cycles 0x0100-0x03FF or greater (16 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16    0x20000 // I/O cycles 0x3C6, 0x3C8, 0x3C9 (16 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_VGA_IO_16            0x30000 // I/O cycles 0x3B0-0x3BB and 0x3C0-0x3DF (16 bit decode)
+#define EFI_PCI_IO_PASS_THROUGH_BAR               0xff    ///< Special BAR that passes a memory or I/O cycle through unchanged
+#define EFI_PCI_IO_ATTRIBUTE_MASK                 0x077f  ///< All the following I/O and Memory cycles
+#define EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO   0x0001  ///< I/O cycles 0x0000-0x00FF (10 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_ISA_IO               0x0002  ///< I/O cycles 0x0100-0x03FF or greater (10 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO       0x0004  ///< I/O cycles 0x3C6, 0x3C8, 0x3C9 (10 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY           0x0008  ///< MEM cycles 0xA0000-0xBFFFF (24 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_VGA_IO               0x0010  ///< I/O cycles 0x3B0-0x3BB and 0x3C0-0x3DF (10 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO       0x0020  ///< I/O cycles 0x1F0-0x1F7, 0x3F6, 0x3F7 (10 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_IDE_SECONDARY_IO     0x0040  ///< I/O cycles 0x170-0x177, 0x376, 0x377 (10 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE 0x0080  ///< Map a memory range so write are combined
+#define EFI_PCI_IO_ATTRIBUTE_IO                   0x0100  ///< Enable the I/O decode bit in the PCI Config Header
+#define EFI_PCI_IO_ATTRIBUTE_MEMORY               0x0200  ///< Enable the Memory decode bit in the PCI Config Header
+#define EFI_PCI_IO_ATTRIBUTE_BUS_MASTER           0x0400  ///< Enable the DMA bit in the PCI Config Header
+#define EFI_PCI_IO_ATTRIBUTE_MEMORY_CACHED        0x0800  ///< Map a memory range so all r/w accesses are cached
+#define EFI_PCI_IO_ATTRIBUTE_MEMORY_DISABLE       0x1000  ///< Disable a memory range
+#define EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE      0x2000  ///< Clear for an add-in PCI Device
+#define EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM         0x4000  ///< Clear for a physical PCI Option ROM accessed through ROM BAR
+#define EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE   0x8000  ///< Clear for PCI controllers that can not genrate a DAC
+#define EFI_PCI_IO_ATTRIBUTE_ISA_IO_16            0x10000 ///< I/O cycles 0x0100-0x03FF or greater (16 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16    0x20000 ///< I/O cycles 0x3C6, 0x3C8, 0x3C9 (16 bit decode)
+#define EFI_PCI_IO_ATTRIBUTE_VGA_IO_16            0x30000 ///< I/O cycles 0x3B0-0x3BB and 0x3C0-0x3DF (16 bit decode)
 
 #define EFI_PCI_DEVICE_ENABLE                     (EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY | EFI_PCI_IO_ATTRIBUTE_BUS_MASTER)
 #define EFI_VGA_DEVICE_ENABLE                     (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_IO)
@@ -481,76 +481,6 @@ EFI_STATUS
   There is one EFI_PCI_IO_PROTOCOL instance for each PCI controller on a PCI bus. 
   A device driver that wishes to manage a PCI controller in a system will have to 
   retrieve the EFI_PCI_IO_PROTOCOL instance that is associated with the PCI controller. 
-
-  @param PollMem
-  Polls an address in PCI memory space until an exit condition is met, or a timeout occurs. 
-
-  @param PollIo
-  Polls an address in PCI I/O space until an exit condition is met, or a timeout occurs. 
-
-  @param Mem.Read
-  Allows BAR relative reads to PCI memory space. 
-
-  @param Mem.Write
-  Allows BAR relative writes to PCI memory space. 
-
-  @param Io.Read
-  Allows BAR relative reads to PCI I/O space. 
-
-  @param Io.Write
-  Allows BAR relative writes to PCI I/O space. 
-
-  @param Pci.Read
-  Allows PCI controller relative reads to PCI configuration space. 
-
-  @param Pci.Write
-  Allows PCI controller relative writes to PCI configuration space. 
-
-  @param CopyMem
-  Allows one region of PCI memory space to be copied to another region of PCI memory space. 
-
-  @param Map
-  Provides the PCI controller's specific address needed to access system memory for DMA. 
-
-  @param Unmap
-  Releases any resources allocated by Map(). 
-
-  @param AllocateBuffer
-  Allocates pages that are suitable for a common buffer mapping. 
-
-  @param FreeBuffer
-  Frees pages that were allocated with AllocateBuffer(). 
-
-  @param Flush
-  Flushes all PCI posted write transactions to system memory. 
-
-  @param GetLocation
-  Retrieves this PCI controller's current PCI bus number, device number, and function number. 
-
-  @param Attributes
-  Performs an operation on the attributes that this PCI controller supports. 
-  The operations include getting the set of supported attributes, retrieving 
-  the current attributes, setting the current
-  attributes, enabling attributes, and disabling attributes. 
-
-  @param GetBarAttributes
-  Gets the attributes that this PCI controller supports setting on a BAR using 
-  SetBarAttributes(), and retrieves the list of resource descriptors for a BAR. 
-
-  @param SetBarAttributes
-  Sets the attributes for a range of a BAR on a PCI controller. 
-
-  @param RomSize
-  The size, in bytes, of the ROM image.
-
-  @param RomImage
-  A pointer to the in memory copy of the ROM image. The PCI Bus Driver is responsible 
-  for allocating memory for the ROM image, and copying the contents of the ROM to memory. 
-  The contents of this buffer are either from the PCI option ROM that can be accessed 
-  through the ROM BAR of the PCI controller, or it is from a platform-specific location. 
-  The Attributes() function can be used to determine from which of these two sources 
-  the RomImage buffer was initialized.
-
 **/
 struct _EFI_PCI_IO_PROTOCOL {
   EFI_PCI_IO_PROTOCOL_POLL_IO_MEM         PollMem;
@@ -568,7 +498,20 @@ struct _EFI_PCI_IO_PROTOCOL {
   EFI_PCI_IO_PROTOCOL_ATTRIBUTES          Attributes;
   EFI_PCI_IO_PROTOCOL_GET_BAR_ATTRIBUTES  GetBarAttributes;
   EFI_PCI_IO_PROTOCOL_SET_BAR_ATTRIBUTES  SetBarAttributes;
+  
+  ///
+  /// The size, in bytes, of the ROM image.
+  ///
   UINT64                                  RomSize;
+
+  ///
+  /// A pointer to the in memory copy of the ROM image. The PCI Bus Driver is responsible 
+  /// for allocating memory for the ROM image, and copying the contents of the ROM to memory. 
+  /// The contents of this buffer are either from the PCI option ROM that can be accessed 
+  /// through the ROM BAR of the PCI controller, or it is from a platform-specific location. 
+  /// The Attributes() function can be used to determine from which of these two sources 
+  /// the RomImage buffer was initialized.
+  /// 
   VOID                                    *RomImage;
 };
 

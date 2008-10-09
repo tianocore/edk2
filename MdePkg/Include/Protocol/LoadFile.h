@@ -79,10 +79,6 @@ EFI_STATUS
 /**  
   @par Protocol Description:
   The EFI_LOAD_FILE_PROTOCOL is a simple protocol used to obtain files from arbitrary devices.
- 
-  @param LoadFile 
-  Causes the driver to load the requested file.
-
 **/
 struct _EFI_LOAD_FILE_PROTOCOL {
   EFI_LOAD_FILE LoadFile;

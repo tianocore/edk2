@@ -48,72 +48,60 @@
 /**  
   @par Protocol Description:
   Can be used on any image handle to obtain information about the loaded image.
-
-  @param Revision
-  Defines the revision of the EFI_LOADED_IMAGE_PROTOCOL structure. 
-  All future revisions will be backward compatible to the current revision.
-
-  @param ParentHandle
-  Parent image's image handle. NULL if the image is loaded directly from 
-  the firmware's boot manager. 
-
-  @param SystemTable
-  The image's EFI system table pointer. 
-
-  @param DeviceHandle
-  The device handle that the EFI Image was loaded from. 
-
-  @param FilePath
-  A pointer to the file path portion specific to DeviceHandle 
-  that the EFI Image was loaded from. 
-
-  @param Reserved
-  Reserved. DO NOT USE.
-
-  @param LoadOptionsSize
-  The size in bytes of LoadOptions.
-
-  @param LoadOptions
-  A pointer to the image's binary load options.
-
-  @param ImageBase
-  The base address at which the image was loaded.
-
-  @param ImageSize
-  The size in bytes of the loaded image.
-
-  @param ImageCodeType
-  The memory 
-
-  @param ImageDataType
-  The memory 
-
-  @param Unload
-  Function that unloads the image. 
-
 **/
 typedef struct {
+  ///
+  /// Defines the revision of the EFI_LOADED_IMAGE_PROTOCOL structure. 
+  /// All future revisions will be backward compatible to the current revision.
+  ///
   UINT32                    Revision;
+
+  ///
+  /// Parent image's image handle. NULL if the image is loaded directly from 
+  /// the firmware's boot manager. 
+  ///
   EFI_HANDLE                ParentHandle;
   EFI_SYSTEM_TABLE          *SystemTable;
 
   //
   // Source location of image
   //
+  ///
+  /// The device handle that the EFI Image was loaded from. 
+  ///
   EFI_HANDLE                DeviceHandle;
+  
+  ///
+  /// A pointer to the file path portion specific to DeviceHandle 
+  /// that the EFI Image was loaded from. 
+  ///
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
-  VOID                      *Reserved;
+  VOID                      *Reserved;       ///< Reserved. DO NOT USE.
 
   //
   // Images load options
   //
+  ///
+  /// The size in bytes of LoadOptions.
+  ///
   UINT32                    LoadOptionsSize;
+  
+  ///
+  /// A pointer to the image's binary load options.
+  ///
   VOID                      *LoadOptions;
 
   //
   // Location of where image was loaded
   //
+  ///
+  /// The base address at which the image was loaded.
+  ///
   VOID                      *ImageBase;
+  
+  ///
+  /// The size in bytes of the loaded image.
+  ///
   UINT64                    ImageSize;
   EFI_MEMORY_TYPE           ImageCodeType;
   EFI_MEMORY_TYPE           ImageDataType;

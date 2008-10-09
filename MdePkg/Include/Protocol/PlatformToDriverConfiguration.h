@@ -130,61 +130,60 @@ EFI_STATUS
   IN OUT    UINTN       *ParameterBlockSize
 );
 
-/**
-
-  @param EfiPlatformConfigurationActionNone
-          The controller specified by ControllerHandle is still
-          in a usable state, it's configuration has been updated
-          via parsing the ParameterBlock. If required by the
-          parameter block and the module supports an NVRAM store
-          the configuration information from PB was successfully
-          saved to the NVRAM. No actions are required before
-          this controller can be used again with the updated
-          configuration settings.
-
-
-  @param EfiPlatformConfigurationStopController 
-          The driver has detected that the controller specified
-          by ControllerHandle  is not in a usable state, and it
-          needs to be stopped. The calling agent can use the
-          DisconnectControservice to perform this operation, and
-          it should be performed as soon as possible.
-
-  @param EfiPlatformConfigurationRestartController
-          This controller specified by ControllerHandle needs to
-          be stopped and restarted before it can be used again.
-          The calling agent can use the DisconnectController()
-          and ConnectController() services to perform this
-          operation. The restart operation can be delayed  until
-          all of the configuratiooptions have been set.
-
-
-  @param EfiPlatformConfigurationRestartPlatform
-          A configuration change has been made that requires the
-          platform to be restarted before the controller
-          specified by ControllerHandle can be used again. The
-          calling agent can use the ResetSystem() services to
-          perform this operation. The restart operation can be
-          delayed until all of the configuration options have
-          been set.
-
-  @param EfiPlatformConfigurationActionNvramFailed 
-          The controller specified by ControllerHandle is still
-          in a usable state; its configuration has been updated
-          via parsing the ParameterBlock. The driver tried to
-          update the driver's private NVRAM store with
-          information from ParameterBlock and failed. No actions
-          are required before this controller can be used again
-          with the updated configuration settings, but these
-          configuration settings are not guaranteed to persist
-          after ControllerHandle is stopped.
-
-**/
 typedef enum {
+  ///
+  ///  The controller specified by ControllerHandle is still
+  ///  in a usable state, it's configuration has been updated
+  ///  via parsing the ParameterBlock. If required by the
+  ///  parameter block and the module supports an NVRAM store
+  ///  the configuration information from PB was successfully
+  ///  saved to the NVRAM. No actions are required before
+  ///  this controller can be used again with the updated
+  ///  configuration settings.
+  ///
   EfiPlatformConfigurationActionNone              = 0,
+  
+  ///
+  ///  The driver has detected that the controller specified
+  ///  by ControllerHandle  is not in a usable state, and it
+  ///  needs to be stopped. The calling agent can use the
+  ///  DisconnectControservice to perform this operation, and
+  ///  it should be performed as soon as possible.  
+  ///
   EfiPlatformConfigurationActionStopController    = 1,
+  
+  ///
+  ///  This controller specified by ControllerHandle needs to
+  ///  be stopped and restarted before it can be used again.
+  ///  The calling agent can use the DisconnectController()
+  ///  and ConnectController() services to perform this
+  ///  operation. The restart operation can be delayed  until
+  ///  all of the configuratiooptions have been set.  
+  ///
   EfiPlatformConfigurationActionRestartController = 2,
+  
+  ///
+  ///  A configuration change has been made that requires the
+  ///  platform to be restarted before the controller
+  ///  specified by ControllerHandle can be used again. The
+  ///  calling agent can use the ResetSystem() services to
+  ///  perform this operation. The restart operation can be
+  ///  delayed until all of the configuration options have
+  ///  been set.  
+  ///
   EfiPlatformConfigurationActionRestartPlatform   = 3,
+
+  ///
+  ///  The controller specified by ControllerHandle is still
+  ///  in a usable state; its configuration has been updated
+  ///  via parsing the ParameterBlock. The driver tried to
+  ///  update the driver's private NVRAM store with
+  ///  information from ParameterBlock and failed. No actions
+  ///  are required before this controller can be used again
+  ///  with the updated configuration settings, but these
+  ///  configuration settings are not guaranteed to persist
+  ///  after ControllerHandle is stopped. 
+  /// 
   EfiPlatformConfigurationActionNvramFailed       = 4,
   EfiPlatformConfigurationActionMaximum
 } EFI_PLATFORM_CONFIGURATION_ACTION;
@@ -298,84 +297,64 @@ struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL {
   versions of the DMTF SM CLP Specification require changes to the
   parameter block definition, newer ParameterTypeGuid will be
   used.
-
-  @param CLPCommand       A pointer to the DMTF SM CLP command line
-                          null-terminated string that the driver is
-                          required to parse and process when this
-                          EFI_SUCCESS The platform return parameter
-                          information for ControllerHandle.
-                          EFI_NOT_FOUND Instance was not found.
-                          EFI_INVALID_PARAMETER ControllerHandle is
-                          not a valid EFI_HANDLE.
-                          EFI_INVALID_PARAMETER Instance is zero.
-                          function is called. See the DMTF SM CLP
-                          Specification 1.0 Final Standard for
-                          details on the format and syntax of the
-                          CLP command line string. CLPCommand buffer
-                          is allocated by the producer of the
-                          EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOOL.
-
-  @param CLPCommandLength The length of the CLP Command in bytes.
-
-  @param CLPReturnString  A pointer to the CLP return status
-                          string that the driver is required to
-                          provide to the calling agent. The
-                          calling agent may parse and/ or pass
-                          this for processing and user feedback.
-                          The SM CLP Command Response string
-                          buffer is filled in by the UEFI driver
-                          in the "keyword=value" format
-                          described in the SM CLP Specification,
-                          unless otherwise requested via the SM
-                          CLP Coutput option in the Command Line
-                          string buffer. UEFI driver's support
-                          for this default "keyword=value"
-                          output format is required if the UEFI
-                          driver supports this protocol, while
-                          support for other SM CLP output
-                          formats is optional (the UEFI Driver
-                          should return an EFI_UNSUPPORTED if
-                          the SM CLP Coutput option requested by
-                          the caller is not supported by the
-                          UEFI Driver). CLPReturnString buffer
-                          is allocated by the consumer of the
-                          EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOC
-                          OL and undefined prior to the call to
-                          Response().
-
-  @param CLPReturnStringLength  The length of the CLP return
-                                status string in bytes.
-
-  @param CLPReturnStatus  SM CLP Command Status (see DMTF SM CLP
-                          Specification 1.0 Final Standard -
-                          Table 4) CLPErrorValue SM CLP
-                          Processing Error Value (see DMTF SM
-                          CLP Specification 1.0 Final Standard -
-                          Table 6). This field is filled in by
-                          the consumer of the
-                          EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOC 
-                          OL and undefined prior to the call to
-                          Response().
-
-  @param CLPMessageCode   Bit 15: OEM Message Code Flag 0 =
-                          Message Code is an SM CLP Probable
-                          Cause Value. (see SM CLP Specification
-                          Table 11) 1 = Message Code is OEM
-                          Specific Bits 14-0: Message Code This
-                          field is filled in by the consumer of
-                          the
-                          EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOC
-                          OL and undefined prior to the call to
-                          Response().
-
 **/
 typedef struct {
+  ///
+  ///  A pointer to the DMTF SM CLP command line null-terminated string that the 
+  ///  driver is required to parse and process when this EFI_SUCCESS The platform 
+  ///  return parameter information for ControllerHandle. EFI_NOT_FOUND Instance 
+  ///  was not found. EFI_INVALID_PARAMETER ControllerHandle is not a valid 
+  ///  EFI_HANDLE. EFI_INVALID_PARAMETER Instance is zero. function is called. 
+  ///  See the DMTF SM CLP Specification 1.0 Final Standard for details on the 
+  ///  format and syntax of the CLP command line string. CLPCommand buffer
+  ///  is allocated by the producer of the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOOL.
+  ///
   CHAR8   *CLPCommand;
+  
+  ///
+  /// The length of the CLP Command in bytes.
+  ///
   UINT32  CLPCommandLength;
+  
+  ///
+  ///  A pointer to the CLP return status string that the driver is required to
+  ///  provide to the calling agent. The calling agent may parse and/ or pass
+  ///  this for processing and user feedback. The SM CLP Command Response string
+  ///  buffer is filled in by the UEFI driver in the "keyword=value" format
+  ///  described in the SM CLP Specification, unless otherwise requested via the SM
+  ///  CLP Coutput option in the Command Line string buffer. UEFI driver's support
+  ///  for this default "keyword=value" output format is required if the UEFI
+  ///  driver supports this protocol, while support for other SM CLP output
+  ///  formats is optional (the UEFI Driver should return an EFI_UNSUPPORTED if
+  ///  the SM CLP Coutput option requested by the caller is not supported by the
+  ///  UEFI Driver). CLPReturnString buffer is allocated by the consumer of the
+  ///  EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOC OL and undefined prior to the call to
+  ///  Response().  
+  ///
   CHAR8   *CLPReturnString;
+  
+  ///
+  /// The length of the CLP return status string in bytes.
+  ///
   UINT32  CLPReturnStringLength;
+  
+  ///
+  ///  SM CLP Command Status (see DMTF SM CLP Specification 1.0 Final Standard -
+  ///  Table 4) CLPErrorValue SM CLP Processing Error Value (see DMTF SM
+  ///  CLP Specification 1.0 Final Standard - Table 6). This field is filled in by
+  ///  the consumer of the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOC 
+  ///  OL and undefined prior to the call to Response().  
+  ///
   UINT8   CLPCmdStatus;
   UINT8   CLPErrorValue;
+  
+  ///
+  ///  Bit 15: OEM Message Code Flag 0 = Message Code is an SM CLP Probable
+  ///  Cause Value. (see SM CLP Specification Table 11) 1 = Message Code is OEM
+  ///  Specific Bits 14-0: Message Code This field is filled in by the consumer of
+  ///  the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOC OL and undefined prior to the call to
+  ///  Response(). 
+  /// 
   UINT16  CLPMsgCode;
 } EFI_CONFIGURE_CLP_PARAMETER_BLK;
 

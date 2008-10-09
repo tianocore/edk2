@@ -468,34 +468,6 @@ EFI_STATUS
   The EFI_MTFTP4_PROTOCOL is designed to be used by UEFI drivers and applications 
   to transmit and receive data files. The EFI MTFTPv4 Protocol driver uses 
   the underlying EFI UDPv4 Protocol driver and EFI IPv4 Protocol driver.
-
-  @param GetModeData
-  Reads the current operational settings. 
-
-  @param Configure
-  Initializes, changes, or resets the operational settings for 
-  this instance of the EFI MTFTPv4 Protocol driver. 
-
-  @param GetInfo
-  Retrieves information about a file from an MTFTPv4 server. 
-
-  @param ParseOptions
-  Parses the options in an MTFTPv4 OACK (options acknowledgement) packet. 
-
-  @param ReadFile
-  Downloads a file from an MTFTPv4 server. 
-
-  @param WriteFile
-  Uploads a file to an MTFTPv4 server. This function may be unsupported 
-  in some EFI implementations. 
-
-  @param ReadDirectory
-  Downloads a related file directory from an MTFTPv4 server. This function 
-  may be unsupported in some EFI implementations. 
-
-  @param Poll
-  Polls for incoming data packets and processes outgoing data packets. 
-
 **/  
 struct _EFI_MTFTP4_PROTOCOL {
   EFI_MTFTP4_GET_MODE_DATA     GetModeData;

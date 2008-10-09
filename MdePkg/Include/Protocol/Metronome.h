@@ -57,9 +57,6 @@ EFI_STATUS
    IN UINT32                        TickNumber
   );
 
-//
-//
-
 /**
   Interface stucture for the Metronome Architectural Protocol.
 
@@ -74,17 +71,17 @@ EFI_STATUS
   function and the first tick is between 0 and TickPeriod 100 nS 
   units.  If you want to guarantee that at least TickPeriod time 
   has elapsed, wait for two ticks.
-
-  @param TickPeriod
-  The period of platform's known time source in 100 nS units.  
-  This value on any platform must be at least 10 uS, and must not 
-  exceed 200 uS.  The value in this field is a constant that must 
-  not be modified after the Metronome architectural protocol is 
-  installed.  All consumers must treat this as a read-only field.
-
 **/
 struct _EFI_METRONOME_ARCH_PROTOCOL {
   EFI_METRONOME_WAIT_FOR_TICK  WaitForTick;
+  
+  ///
+  /// The period of platform's known time source in 100 nS units.  
+  /// This value on any platform must be at least 10 uS, and must not 
+  /// exceed 200 uS.  The value in this field is a constant that must 
+  /// not be modified after the Metronome architectural protocol is 
+  /// installed.  All consumers must treat this as a read-only field.  
+  ///
   UINT32                       TickPeriod;
 };
 
