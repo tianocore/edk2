@@ -261,52 +261,6 @@ EFI_STATUS
   Foundation. This includes flushing caches, enabling and disabling interrupts, hooking interrupt
   vectors and exception vectors, reading internal processor timers, resetting the processor, and
   determining the processor frequency.
-
-  @param FlushDataCache
-  Flushes a range of the processor's data cache. If the processor does 
-  not contain a data cache, or the data cache is fully coherent, then this 
-  function can just return EFI_SUCCESS. If the processor does not support 
-  flushing a range of addresses from the data cache, then the entire data 
-  cache must be flushed. 
-
-  @param EnableInterrupt   
-  Enables interrupt processing by the processor.
-
-  @param DisableInterrupt  
-  Disables interrupt processing by the processor.
-
-  @param GetInterruptState 
-  Retrieves the processor's current interrupt state.
-
-  @param Init
-  Generates an INIT on the processor. If a processor cannot programmatically 
-  generate an INIT without help from external hardware, then this function 
-  returns EFI_UNSUPPORTED.
-
-  @param RegisterInterruptHandler
-  Associates an interrupt service routine with one of the processor's interrupt 
-  vectors. This function is typically used by the EFI_TIMER_ARCH_PROTOCOL to 
-  hook the timer interrupt in a system. It can also be used by the debugger to 
-  hook exception vectors.
-
-  @param GetTimerValue       
-  Returns the value of one of the processor's internal timers.
-
-  @param SetMemoryAttributes 
-  Attempts to set the attributes of a memory region.
-
-  @param NumberOfTimers
-  The number of timers that are available in a processor. The value in this 
-  field is a constant that must not be modified after the CPU Architectural 
-  Protocol is installed. All consumers must treat this as a read-only field.
-
-  @param DmaBufferAlignment
-  The size, in bytes, of the alignment required for DMA buffer allocations. 
-  This is typically the size of the largest data cache line in the platform. 
-  The value in this field is a constant that must not be modified after the 
-  CPU Architectural Protocol is installed. All consumers must treat this as 
-  a read-only field.
-
 **/
 struct _EFI_CPU_ARCH_PROTOCOL {
   EFI_CPU_FLUSH_DATA_CACHE            FlushDataCache;
@@ -317,7 +271,19 @@ struct _EFI_CPU_ARCH_PROTOCOL {
   EFI_CPU_REGISTER_INTERRUPT_HANDLER  RegisterInterruptHandler;
   EFI_CPU_GET_TIMER_VALUE             GetTimerValue;
   EFI_CPU_SET_MEMORY_ATTRIBUTES       SetMemoryAttributes;
+  ///
+  /// The number of timers that are available in a processor. The value in this 
+  /// field is a constant that must not be modified after the CPU Architectural 
+  /// Protocol is installed. All consumers must treat this as a read-only field.
+  ///
   UINT32                              NumberOfTimers;
+  ///
+  /// The size, in bytes, of the alignment required for DMA buffer allocations. 
+  /// This is typically the size of the largest data cache line in the platform. 
+  /// The value in this field is a constant that must not be modified after the 
+  /// CPU Architectural Protocol is installed. All consumers must treat this as 
+  /// a read-only field.  
+  ///
   UINT32                              DmaBufferAlignment;
 };
 

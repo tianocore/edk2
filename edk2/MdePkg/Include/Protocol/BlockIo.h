@@ -128,85 +128,77 @@ EFI_STATUS
 
 /**
   Block IO read only mode data and updated only via members of BlockIO
-  
-  @param MediaId
-  The curent media Id. If the media changes, this value is changed.
-  
-  @param RemovableMedia
-  TRUE if the media is removable; otherwise, FALSE.
-  
-  @param MediaPresent
-  TRUE if there is a media currently present in the device;
-  othersise, FALSE. THis field shows the media present status
-  as of the most recent ReadBlocks() or WriteBlocks() call.
-
-  @param LogicalPartition
-  TRUE if LBA 0 is the first block of a partition; otherwise
-  FALSE. For media with only one partition this would be TRUE.
-  
-  @param ReadOnly
-  TRUE if the media is marked read-only otherwise, FALSE.
-  This field shows the read-only status as of the most recent WriteBlocks () call.
-  
-  @param WriteCaching
-  TRUE if the WriteBlock () function caches write data.
-
-  @param BlockSize
-  The intrinsic block size of the device. If the media changes, then
-  this field is updated.  
-
-  @param IoAlign
-  Supplies the alignment requirement for any buffer to read or write block(s).
-  
-  @param LastBlock
-  The last logical block address on the device.
-  If the media changes, then this field is updated.   
-
 **/
 typedef struct {
-  UINT32  MediaId;    
+  ///
+  /// The curent media Id. If the media changes, this value is changed.
+  ///
+  UINT32  MediaId;         
+   
+  ///
+  /// TRUE if the media is removable; otherwise, FALSE.
+  ///    
   BOOLEAN RemovableMedia;
+  
+  ///
+  /// TRUE if there is a media currently present in the device;
+  /// othersise, FALSE. THis field shows the media present status
+  /// as of the most recent ReadBlocks() or WriteBlocks() call.  
+  ///
   BOOLEAN MediaPresent;
+
+  ///
+  /// TRUE if LBA 0 is the first block of a partition; otherwise
+  /// FALSE. For media with only one partition this would be TRUE.
+  ///
   BOOLEAN LogicalPartition;
+  
+  ///
+  /// TRUE if the media is marked read-only otherwise, FALSE.
+  /// This field shows the read-only status as of the most recent WriteBlocks () call.
+  ///
   BOOLEAN ReadOnly;
+  
+  ///
+  /// TRUE if the WriteBlock () function caches write data.
+  ///
   BOOLEAN WriteCaching; 
+  
+  ///
+  /// The intrinsic block size of the device. If the media changes, then
+  /// this field is updated.  
+  ///
   UINT32  BlockSize; 
+  
+  ///
+  /// Supplies the alignment requirement for any buffer to read or write block(s).
+  ///
   UINT32  IoAlign; 
+  
+  ///
+  /// The last logical block address on the device.
+  /// If the media changes, then this field is updated. 
+  ///
   EFI_LBA LastBlock; 
 } EFI_BLOCK_IO_MEDIA;
 
 #define EFI_BLOCK_IO_PROTOCOL_REVISION  0x00010000
-//
-// Revision defined in EFI1.1.
-// 
+
+///
+/// Revision defined in EFI1.1.
+/// 
 #define EFI_BLOCK_IO_INTERFACE_REVISION   EFI_BLOCK_IO_PROTOCOL_REVISION
 
 /**
   @par Protocol Description:
   This protocol provides control over block devices.
-
-  @param Revision 
-  The revision to which the block IO interface adheres. All future
-  revisions must be backwards compatible. If a future version is not
-  back wards compatible, it is not the same GUID.
-  
-  @param Media 
-  A pointer to the EFI_BLOCK_IO_MEDIA data for this device.
-
-  @param Reset 
-  Resets the block device hardware.
-
-  @param ReadBlocks 
-  Reads the requested number of blocks from the device. 
-
-  @param WriteBlocks 
-  Writes the requested number of blocks to the device. 
-
-  @param FlushBlocks 
-  Flushes and cache blocks. This function is optional and only
-  needs to be supported on block devices that cache writes. 
 **/
 struct _EFI_BLOCK_IO_PROTOCOL {
+  ///
+  /// The revision to which the block IO interface adheres. All future
+  /// revisions must be backwards compatible. If a future version is not
+  /// back wards compatible, it is not the same GUID.
+  ///
   UINT64              Revision;
 
   EFI_BLOCK_IO_MEDIA  *Media;
