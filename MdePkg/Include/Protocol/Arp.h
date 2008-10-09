@@ -9,7 +9,6 @@
   The EFI ARP Protocol provides services to map IP network
   address to hardware address used by a data link protocol.
   
-  
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -37,19 +36,19 @@
 typedef struct _EFI_ARP_PROTOCOL EFI_ARP_PROTOCOL;
 
 typedef struct {
-UINT32                      Size;
-BOOLEAN                     DenyFlag;
-BOOLEAN                     StaticFlag;
-UINT16                      HwAddressType;
-UINT16                      SwAddressType;
-UINT8                       HwAddressLength;
-UINT8                       SwAddressLength;
+  UINT32                      Size;
+  BOOLEAN                     DenyFlag;
+  BOOLEAN                     StaticFlag;
+  UINT16                      HwAddressType;
+  UINT16                      SwAddressType;
+  UINT8                       HwAddressLength;
+  UINT8                       SwAddressLength;
 } EFI_ARP_FIND_DATA;
 
 typedef struct {
-  UINT16                    SwAddressType;      // Host byte order
+  UINT16                    SwAddressType;      ///< Host byte order
   UINT8                     SwAddressLength;
-  VOID                      *StationAddress;    // Network byte order
+  VOID                      *StationAddress;    ///< Network byte order
   UINT32                    EntryTimeOut;
   UINT32                    RetryCount;
   UINT32                    RetryTimeOut;
@@ -254,28 +253,6 @@ EFI_STATUS
   @par Protocol Description:
   ARP is used to resolve local network protocol addresses into 
   network hardware addresses.
-
-  @param Configure
-  Adds a new station address (protocol type and network address) to the ARP cache.
-  
-  @param Add
-  Manually inserts an entry to the ARP cache for administrative purpose.
-
-  @param Find
-  Locates one or more entries in the ARP cache.
-
-  @param Delete
-  Removes an entry from the ARP cache.
-  
-  @param Flush
-  Removes all dynamic ARP cache entries of a specified protocol type.
-  
-  @param Request
-  Starts an ARP request session.
-  
-  @param Cancel
-  Abort previous ARP request session.
-
 **/
 struct _EFI_ARP_PROTOCOL {
   EFI_ARP_CONFIGURE         Configure;

@@ -66,12 +66,6 @@ VOID
   back to the dispatcher.  Once the required boot devices are available, then 
   the boot device can be used to load and invoke an OS or a system utility.
 
-  @par Protocol Parameters:
-  Entry - The entry point to BDS.  This call does not take any parameters, 
-  and the return value can be ignored.  If it returns, then the 
-  dispatcher must be invoked again, if it never returns, then an 
-  operating system or a system utility have been invoked.
-
 **/
 struct _EFI_BDS_ARCH_PROTOCOL {
   EFI_BDS_ENTRY Entry;
