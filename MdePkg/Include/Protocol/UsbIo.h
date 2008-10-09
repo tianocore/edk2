@@ -480,46 +480,6 @@ EFI_STATUS
   transfer, bulk transfer and isochronous transfer. The EFI_USB_IO_PROTOCOL 
   also provides some basic USB device/controller management and configuration 
   interfaces. A USB device driver uses the services of this protocol to manage USB devices.  
-
-  @param UsbControlTransfer 
-  Accesses the USB Device through USB Control Transfer Pipe. 
-
-  @param UsbBulkTransfer
-  Accesses the USB Device through USB Bulk Transfer Pipe. 
-
-  @param UsbAsyncInterruptTransfer
-  Non-block USB interrupt transfer. 
-
-  @param UsbSyncInterruptTransfer
-  Accesses the USB Device through USB Synchronous
-  Interrupt Transfer Pipe. 
-
-  @param UsbIsochronousTransfer
-  Accesses the USB Device through USB Isochronous Transfer Pipe. 
-
-  @param UsbAsyncIsochronousTransfer
-  Nonblock USB isochronous transfer. 
-
-  @param UsbGetDeviceDescriptor
-  Retrieves the device descriptor of a USB device. 
-
-  @param UsbGetConfigDescriptor
-  Retrieves the activated configuration descriptor of a USB device. 
-
-  @param UsbGetInterfaceDescriptor
-  Retrieves the interface descriptor of a USB Controller. 
-
-  @param UsbGetEndpointDescriptor
-  Retrieves the endpoint descriptor of a USB Controller. 
-
-  @param UsbGetStringDescriptor
-  Retrieves the string descriptor inside a USB Device. 
-
-  @param UsbGetSupportedLanguages
-  Retrieves the array of languages that the USB device supports. 
-
-  @param UsbPortReset
-  Resets and reconfigures the USB controller. 
 **/
 struct _EFI_USB_IO_PROTOCOL {
   //

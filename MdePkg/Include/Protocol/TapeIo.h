@@ -224,23 +224,6 @@ EFI_STATUS
   Per this specification, a boot application uses the services of this protocol 
   to load the bootloader image from tape.
 
-  @param TapeRead
-  Read a block of data from the tape. 
-
-  @param TapeWrite
-  Write a block of data to the tape. 
-
-  @param TapeRewind
-  Rewind the tape. 
-
-  @param TapeSpace
-  Position the tape. 
-
-  @param TapeWriteFM
-  Write filemarks to the tape. 
-
-  @param TapeReset
-  Reset the tape device or its parent bus. 
 **/
 struct _EFI_TAPE_IO_PROTOCOL {
   EFI_TAPE_READ           TapeRead;

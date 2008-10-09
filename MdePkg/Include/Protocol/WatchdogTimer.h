@@ -134,18 +134,6 @@ EFI_STATUS
   will be passed to a handler if one has been registered.  If no handler has 
   been registered, or the registered handler returns, then the system will be 
   reset by calling the Runtime Service ResetSystem().
-
-  @param  RegisterHandler  Registers a handler that is invoked when the watchdog
-                           timer fires.
-
-  @param  SetTimerPeriod   Sets the amount of time in 100 ns units to wait before the
-                           watchdog timer is fired. If this function is supported,
-                           then the watchdog timer period will be rounded up to the
-                           nearest supported watchdog timer period.
-
-  @param  GetTimerPeriod   Retrieves the amount of time in 100 ns units that the
-                           system will wait before the watchdog timer is fired.
-
 **/
 struct _EFI_WATCHDOG_TIMER_ARCH_PROTOCOL {
   EFI_WATCHDOG_TIMER_REGISTER_HANDLER  RegisterHandler;

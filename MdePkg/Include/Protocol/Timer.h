@@ -170,29 +170,6 @@ EFI_STATUS
   periodic timer interrupt.  When a timer interrupt occurs, the handler is 
   passed the amount of time that has passed since the previous timer 
   interrupt.
-
-  @param RegisterHandler
-  Registers a handler that will be called each time the 
-  timer interrupt fires.  TimerPeriod defines the minimum 
-  time between timer interrupts, so TimerPeriod will also 
-  be the minimum time between calls to the registered 
-  handler.
-
-  @param SetTimerPeriod
-  Sets the period of the timer interrupt in 100 nS units.  
-  This function is optional, and may return EFI_UNSUPPORTED.  
-  If this function is supported, then the timer period will 
-  be rounded up to the nearest supported timer period.
-
-  @param GetTimerPeriod
-  Retrieves the period of the timer interrupt in 100 nS units.
-
-  @param GenerateSoftInterrupt
-  Generates a soft timer interrupt that simulates the firing of 
-  the timer interrupt. This service can be used to invoke the 
-  registered handler if the timer interrupt has been masked for 
-  a period of time.
-
 **/
 struct _EFI_TIMER_ARCH_PROTOCOL {
   EFI_TIMER_REGISTER_HANDLER          RegisterHandler;

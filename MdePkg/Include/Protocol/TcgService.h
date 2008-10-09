@@ -201,17 +201,6 @@ EFI_STATUS
   @par Protocol Description:
   The EFI_TCG Protocol abstracts TCG activity.
 
-  @param  StatusCheck        This service provides information on the TPM.
-  @param  HashAll            This service abstracts the capability to do a hash 
-                             operation on a data buffer.
-  @param  LogEvent           This service abstracts the capability to add 
-                             an entry to the Event Log.
-  @param  PassThroughToTPM   This service provides a pass-through capability 
-                             from the caller to the system's TPM.
-  @param  HashLogExtendEvent This service abstracts the capability to do a hash 
-                             operation on a data buffer, extend a specific TPM PCR 
-                             with the hash result, and add an entry to the Event Log. 
-
 **/
 struct _EFI_TCG_PROTOCOL {
   EFI_TCG_STATUS_CHECK              StatusCheck;
