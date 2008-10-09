@@ -339,19 +339,6 @@ IN        UINTN                   BltY
 /**
   @par Protocol Description:  
   Services to access to images in the images database.
-
-  @param NewImage    Add a new image.
-
-  @param GetImage    Retrieve an image and related font
-                     information.
-
-  @param SetImage    Change an image.
-  
-  @param DrawImage   Renders an image to a bitmap or to the display.
-  
-  @param DrawImageId Render an image to a bitmap or the screen containing 
-                     the contents of the specified image.
-
 **/
 struct _EFI_HII_IMAGE_PROTOCOL {
   EFI_HII_NEW_IMAGE     NewImage;

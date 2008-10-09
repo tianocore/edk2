@@ -23,10 +23,11 @@
 typedef struct _EFI_HII_DATABASE_PROTOCOL EFI_HII_DATABASE_PROTOCOL;
 
 
-//
-// EFI_HII_DATABASE_NOTIFY_TYPE
-// 
+///
+/// EFI_HII_DATABASE_NOTIFY_TYPE
+/// 
 typedef UINTN   EFI_HII_DATABASE_NOTIFY_TYPE;
+
 #define EFI_HII_DATABASE_NOTIFY_NEW_PACK    0x00000001
 #define EFI_HII_DATABASE_NOTIFY_REMOVE_PACK 0x00000002
 #define EFI_HII_DATABASE_NOTIFY_EXPORT_PACK 0x00000004
@@ -493,46 +494,10 @@ EFI_STATUS
 /**
   @par Protocol Description:
   Database manager for HII-related data structures.
-
-  @param NewPackageList     Add a new package list to the HII database.
-
-  @param RemovePackageList  Remove a package list from the HII
-                            database.
-
-  @param UpdatePackageList  Update a package list in the HII
-                            database.
-
-  @param ListPackageLists   List the handles of the package
-                            lists within the HII database. 
-
-  @param ExportPackageLists Export package lists from the HII
-                            database.
-
-  @param RegisterPackageNotify  
-                            Register notification when
-                            packages of a certain type are
-                            installed.
-
-  @param UnregisterPackageNotify 
-                            Unregister notification of packages.
-
-  @param FindKeyboardLayouts  
-                            Retrieves a list of the keyboard
-                            layouts in the system.
-
-  @param GetKeyboardLayout  Allows a program to extract the
-                            current keyboard layout. See the
-                            GetKeyboardLayout() function
-                            description.
-
-  @param SetKeyboardLayout  Changes the current keyboard layout.
-                            See the SetKeyboardLayout() function
-
-
 **/
 struct _EFI_HII_DATABASE_PROTOCOL {
-  EFI_HII_DATABASE_NEW_PACK                    NewPackageList;
-  EFI_HII_DATABASE_REMOVE_PACK                 RemovePackageList;
+  EFI_HII_DATABASE_NEW_PACK           NewPackageList;
+  EFI_HII_DATABASE_REMOVE_PACK        RemovePackageList;
   EFI_HII_DATABASE_UPDATE_PACK        UpdatePackageList;
   EFI_HII_DATABASE_LIST_PACKS         ListPackageLists;
   EFI_HII_DATABASE_EXPORT_PACKS       ExportPackageLists;

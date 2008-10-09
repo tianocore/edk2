@@ -133,10 +133,6 @@ EFI_STATUS
   of the GUIDed Section Extraction Protocol must have the same interface structure, they do not all
   have the same GUID. The GUID that is associated with an instance of the GUIDed Section
   Extraction Protocol is used to correlate it with the GUIDed section type that it is intended to process.
-
-  @param ExtractSection
-  Takes the GUIDed section as input and produces the section stream data.
-
 **/
 struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL {
   EFI_EXTRACT_GUIDED_SECTION  ExtractSection;

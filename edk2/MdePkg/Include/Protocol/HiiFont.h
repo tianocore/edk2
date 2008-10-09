@@ -25,10 +25,11 @@ typedef struct _EFI_HII_FONT_PROTOCOL EFI_HII_FONT_PROTOCOL;
 
 typedef VOID    *EFI_FONT_HANDLE;
 
-//
-// EFI_HII_OUT_FLAGS
-// 
+///
+/// EFI_HII_OUT_FLAGS
+/// 
 typedef UINT32  EFI_HII_OUT_FLAGS;
+
 #define EFI_HII_OUT_FLAG_CLIP         0x00000001
 #define EFI_HII_OUT_FLAG_WRAP         0x00000002
 #define EFI_HII_OUT_FLAG_CLIP_CLEAN_Y 0x00000004
@@ -39,38 +40,32 @@ typedef UINT32  EFI_HII_OUT_FLAGS;
 #define EFI_HII_DIRECT_TO_SCREEN      0x00000080
 
 /**
-
   Definition of EFI_HII_ROW_INFO.
-
-  @param StartIndex     The index of the first character in the
-                        string which is displayed on the line.
-
-  @param EndIndex       The index of the last character in the string
-                        which is displayed on the line. If this is the
-                        same as StartIndex, then no characters are
-                        displayed.
-
-  @param LineHeight     The height of the line, in pixels.
-
-  @param LineWidth      The width of the text on the line, in pixels.
-
-  @param BaselineOffset The number of pixels above the bottom of
-                        the row of the font baseline or 0 if
-                        none.
-
 **/
 typedef struct _EFI_HII_ROW_INFO {
+  ///
+  /// The index of the first character in the string which is displayed on the line.
+  ///
   UINTN   StartIndex;
+  ///
+  /// The index of the last character in the string which is displayed on the line.
+  /// If this is the same as StartIndex, then no characters are displayed.  
+  ///
   UINTN   EndIndex;
-  UINTN   LineHeight;
-  UINTN   LineWidth;
+  UINTN   LineHeight; ///< The height of the line, in pixels.
+  UINTN   LineWidth;  ///< The width of the text on the line, in pixels.
+  
+  ///
+  /// The number of pixels above the bottom of the row of the font baseline or 0 if none.  
+  ///
   UINTN   BaselineOffset;
 } EFI_HII_ROW_INFO;
 
-//
-// EFI_FONT_INFO_MASK
-// 
+///
+/// EFI_FONT_INFO_MASK
+/// 
 typedef UINT32  EFI_FONT_INFO_MASK;
+
 #define EFI_FONT_INFO_SYS_FONT        0x00000001
 #define EFI_FONT_INFO_SYS_SIZE        0x00000002
 #define EFI_FONT_INFO_SYS_STYLE       0x00000004
@@ -87,7 +82,7 @@ typedef UINT32  EFI_FONT_INFO_MASK;
 // 
 typedef struct {
   EFI_HII_FONT_STYLE FontStyle;
-  UINT16             FontSize; // character cell height in pixels
+  UINT16             FontSize;      ///< character cell height in pixels
   CHAR16             FontName[1];
 } EFI_FONT_INFO;
 
@@ -127,22 +122,6 @@ typedef struct {
   EFI_FONT_INFO_ANY_STYLE is specified, then the system may
   attempt to match with any font style. This flag cannot be used
   with EFI_FONT_INFO_SYS_STYLE or EFI_FONT_INFO_RESTYLE.
-
-
-  @param ForegroundColor  The color of the "on" pixels in the
-                          glyph in the bitmap.
-  
-  @param BackgroundColor  The color of the "off" pixels in the
-                          glyph in the bitmap.
-  
-  @param FontInfoMask     The font information mask determines
-                          which portion of the font information
-                          will be used and what to do if the
-                          specific font is not available.
-
-  @param FontInfo         Points to the font information or NULL if the
-                          string should use the default system font.
-    
 **/
 typedef struct _EFI_FONT_DISPLAY_INFO {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL ForegroundColor;
@@ -503,15 +482,6 @@ EFI_STATUS
 /**
   @par Protocol Description:
   The protocol provides the service to retrieve the font informations.
-
-  @param StringToImage    Render a string to a bitmap or to the display.
-
-  @param StringIdToImage  Render a string to a bitmap or to the display.
-
-  @param GetGlyph         Return a specific glyph in a specific font.
-
-  @param GetFontInfo      Return font information for a specific font.
-
 **/
 struct _EFI_HII_FONT_PROTOCOL {
   EFI_HII_STRING_TO_IMAGE     StringToImage;

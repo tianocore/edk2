@@ -114,16 +114,6 @@ EFI_STATUS
   @par Protocol Description:
   The EFI_IP4_CONFIG_PROTOCOL driver performs platform- and policy-dependent 
   configuration for the EFI IPv4 Protocol driver. 
-  
-  @param Start
-  Starts running the configuration policy for the EFI IPv4 Protocol driver. 
-
-  @param Stop
-  Stops running the configuration policy for the EFI IPv4 Protocol driver. 
-
-  @param GetData
-  Returns the default configuration data (if any) for the EFI IPv4 Protocol driver.  
-
 **/
 struct _EFI_IP4_CONFIG_PROTOCOL {
   EFI_IP4_CONFIG_START         Start;

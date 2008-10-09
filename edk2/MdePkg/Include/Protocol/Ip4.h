@@ -398,30 +398,6 @@ EFI_STATUS
   @par Protocol Description:
   The EFI IPv4 Protocol implements a simple packet-oriented interface that can be 
   used by drivers, daemons, and applications to transmit and receive network packets.
-  
-  @param GetModeData
-  Gets the current operational settings for this instance of the EFI IPv4 Protocol driver. 
-
-  @param Configure
-  Changes or resets the operational settings for the EFI IPv4 Protocol. 
-
-  @param Groups
-  Joins and leaves multicast groups. 
-
-  @param Routes
-  Adds and deletes routing table entries. 
-
-  @param Transmit
-  Places outgoing data packets into the transmit queue. 
-
-  @param Receive
-  Places a receiving request into the receiving queue. 
-
-  @param Cancel
-  Aborts a pending transmit or receive request. 
-
-  @param Poll
-  Polls for incoming data packets and processes outgoing data packets. 
 **/
 struct _EFI_IP4_PROTOCOL {
   EFI_IP4_GET_MODE_DATA        GetModeData;
