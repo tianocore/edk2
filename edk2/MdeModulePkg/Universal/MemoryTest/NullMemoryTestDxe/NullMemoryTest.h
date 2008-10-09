@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _NULL_MEMORY_TEST_H
 
 
-#include <Uefi.h>
+#include <PiDxe.h>
 
 
 #include <Protocol/GenericMemoryTest.h>

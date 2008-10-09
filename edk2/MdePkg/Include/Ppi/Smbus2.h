@@ -21,7 +21,6 @@
 #ifndef __PEI_SMBUS2_PPI_H__
 #define __PEI_SMBUS2_PPI_H__
 
-#include <PiPei.h>
 #include <IndustryStandard/SmBus.h>
 
 #define EFI_PEI_SMBUS2_PPI_GUID \

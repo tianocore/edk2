@@ -15,8 +15,6 @@
 #ifndef __EFI_DRIVER_DIAGNOSTICS_H__
 #define __EFI_DRIVER_DIAGNOSTICS_H__
 
-#include <PiDxe.h>
-
 ///
 /// Global ID for the Driver Diagnostics Protocol as defined in UEFI 2.0.
 ///

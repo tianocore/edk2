@@ -24,7 +24,6 @@
 #define __STATUS_CODE_RUNTIME_PROTOCOL_H__
 
 #include <Pi/PiMultiPhase.h>
-#include <Uefi/UefiBaseType.h>
 
 #define EFI_STATUS_CODE_RUNTIME_PROTOCOL_GUID  \
 { 0xd2b2b828, 0x826, 0x48a7,  { 0xb3, 0xdf, 0x98, 0x3c, 0x0, 0x60, 0x24, 0xf0 } }
