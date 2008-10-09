@@ -25,7 +25,6 @@
 
 typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
 
-
 /**
    
   This function allows the caller to request the current
@@ -396,32 +395,6 @@ EFI_STATUS
   This protocol defines the configuration routing interfaces
   between external applications and the HII. There may only be one
   instance of this protocol in the system.
-  
-  @param ExtractConfig
-  This function allows a caller to extract the current configuration for 
-  one or more named elements from one or more drivers.
-
-  @param ExportConfig
-  This function allows the caller to request the current configuration for 
-  the entirety of the current HII database and returns the data 
-  in a null-terminated Unicode string.
-
-  @param RouteConfig
-  This function processes the results of processing forms and routes it 
-  to the appropriate handlers or storage.
-
-  @param BlockToConfig
-  This helper function is to be called by drivers to map configuration data 
-  stored in byte array ("block") formats such as UEFI Variables into current 
-  configuration strings.
-
-  @param ConfigToBlock
-  This helper function is to be called by drivers to map configuration strings 
-  to configurations stored in byte array ("block") formats such as UEFI Variables.
-
-  @param GetAltConfig
-  This helper function is to be called by drivers to extract portions of a larger configuration string.
-
 **/
 struct _EFI_HII_CONFIG_ROUTING_PROTOCOL {
   EFI_HII_ROUTING_EXTRACT_CONFIG  ExtractConfig;

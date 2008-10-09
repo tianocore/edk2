@@ -217,19 +217,6 @@ EFI_STATUS
 /**
   @par Protocol Description:
   Services to manipulate the string.
-   
-  @param NewString              Add a new string. GetString Retrieve a
-                                string and related string information.
-
-  @param SetString              Change a string. 
-
-  @param GetLanguages           List the languages for a particular
-                                package list.
-
-  @param GetSecondaryLanguages  List supported secondary
-                                languages for a particular
-                                primary language.
-
 **/
 struct _EFI_HII_STRING_PROTOCOL {
   EFI_HII_NEW_STRING        NewString;

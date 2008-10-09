@@ -74,11 +74,6 @@ typedef EFI_STATUS
 /**  
   @par Protocol Description:
   iSCSI Initiator Name Protocol for setting and obtaining the iSCSI Initiator Name. 
-  
-  @param Get Used to retrieve the iSCSI Initiator Name.
-
-  @param Set Used to set the iSCSI Initiator Name.
-
 **/
 struct _EFI_ISCSI_INITIATOR_NAME_PROTOCOL {
   EFI_ISCSI_INITIATOR_NAME_GET         Get;

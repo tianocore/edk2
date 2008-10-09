@@ -198,26 +198,12 @@ EFI_STATUS
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
   ;
+  
 /**
   @par Protocol Description:   
   This protocol provides a callable interface between the HII and
   drivers. Only drivers which provide IFR data to HII are required
   to publish this protocol.
-
-  @param ExtractConfig  This function breaks apart the UNICODE
-                        request strings routing them to the
-                        appropriate drivers. This function is
-                        analogous to the similarly named
-                        function in the HII Routing Protocol.
-  
-  @param RouteConfig    This function breaks apart the UNICODE
-                        results strings and returns configuration
-                        information as specified by the request.
-  
-  @param Callback       This function is called from the
-                        configuration browser to communicate certain
-                        activities that were initiated by a user.
-
 **/
 struct _EFI_HII_CONFIG_ACCESS_PROTOCOL {
   EFI_HII_ACCESS_EXTRACT_CONFIG     ExtractConfig;
