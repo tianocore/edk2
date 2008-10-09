@@ -232,15 +232,6 @@ EFI_STATUS
   configuration changes to take affect.  Figure 2-1 below shows all the possible 
   health states of a controller and the legal transitions between the health states. 
 
-  @param GetHealthStatus     Retrieves the health status of a controller in the 
-                             platform.  This function can also optionally return 
-                             warning messages, error messages, and a set of HII 
-                             Forms that may be repair a controller that is not 
-                             properly configured.
-  @param Repair              Performs a repair operation on a controller in the 
-                             platform.  This function can optionally report repair 
-                             progress information back to the platform.
-
 **/
 struct _EFI_DRIVER_HEALTH_PROTOCOL {
   EFI_DRIVER_HEALTH_GET_HEALTH_STATUS  GetHealthStatus;

@@ -24,7 +24,6 @@
   { \
     0x107a772b, 0xd5e1, 0x11d4, {0x9a, 0x46, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
   }
-
  
 typedef struct _EFI_DRIVER_CONFIGURATION_PROTOCOL  EFI_DRIVER_CONFIGURATION_PROTOCOL;
 
@@ -153,24 +152,16 @@ EFI_STATUS
   @par Protocol Description:  
   Used to set configuration options for a controller that an EFI Driver is managing.
 
-  @param SetOptions          Allows the use to set drivers specific configuration 
-                             options for a controller that the driver is currently managing.
-                             
-  @param OptionsValid        Tests to see if a controller's current configuration 
-                             options are valid. 
-                             
-  @param ForceDefaults       Forces a driver to set the default configuration options 
-                             for a controller.
-
-  @param SupportedLanguages  A Null-terminated ASCII string that contains one or more 
-                             ISO 639-2 language codes.  This is the list of language 
-                             codes that this protocol supports.
-
 **/
 struct _EFI_DRIVER_CONFIGURATION_PROTOCOL {
   EFI_DRIVER_CONFIGURATION_SET_OPTIONS    SetOptions;
   EFI_DRIVER_CONFIGURATION_OPTIONS_VALID  OptionsValid;
   EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS ForceDefaults;
+  ///
+  /// A Null-terminated ASCII string that contains one or more 
+  /// ISO 639-2 language codes.  This is the list of language 
+  /// codes that this protocol supports.  
+  ///
   CHAR8                                   *SupportedLanguages;
 };
 

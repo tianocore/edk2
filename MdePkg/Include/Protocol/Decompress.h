@@ -113,17 +113,6 @@ EFI_STATUS
   @par Protocol Description:
   Provides a decompression service.
 
-  @param GetInfo
-  Given the compressed source buffer, this function retrieves the
-  size of the uncompressed destination buffer and the size of the
-  scratch buffer required to perform the decompression. It is the
-  caller's responsibility to allocate the destination buffer and the
-  scratch buffer prior to calling EFI_DECOMPRESS_PROTOCOL.Decompress().
-
-  @param Decompresss
-  Decompresses a compressed source buffer into an uncompressed
-  destination buffer. It is the caller's responsibility to allocate the
-  destination buffer and a scratch buffer prior to making this call.
 **/ 
 struct _EFI_DECOMPRESS_PROTOCOL {
   EFI_DECOMPRESS_GET_INFO   GetInfo;
