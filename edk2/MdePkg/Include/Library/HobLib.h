@@ -17,9 +17,10 @@
 
 /**
   Returns the pointer to the HOB list.
+  ASSERT() if the HOB list returned by GetHobList() is NULL.
 
   This function returns the pointer to first HOB in the list.
-
+  
   @return The pointer to the HOB list.
 
 **/

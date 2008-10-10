@@ -85,6 +85,7 @@ typedef struct {
   VOID                              *FixupData;
   ///
   /// Is set by PeCoffLoaderGetImageInfo() to the Section Alignment in the PE/COFF header
+  /// If the image is a TE image, then this field is set to 0.
   ///
   UINT32                            SectionAlignment;
   ///
@@ -159,13 +160,15 @@ typedef struct {
 /**
   Retrieves information about a PE/COFF image.
 
-  Computes the PeCoffHeaderOffset, ImageAddress, ImageSize, DestinationAddress, CodeView,
-  PdbPointer, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva
-  fields of the ImageContext structure.  If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.
-  If the PE/COFF image accessed through the ImageRead service in the ImageContext structure is not
-  a supported PE/COFF image type, then return RETURN_UNSUPPORTED.  If any errors occur while
-  computing the fields of ImageContext, then the error status is returned in the ImageError field of
-  ImageContext. 
+  Computes the PeCoffHeaderOffset, IsTeImage, ImageType, ImageAddress, ImageSize, 
+  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and 
+  DebugDirectoryEntryRva fields of the ImageContext structure.  
+  If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.  
+  If the PE/COFF image accessed through the ImageRead service in the ImageContext 
+  structure is not a supported PE/COFF image type, then return RETURN_UNSUPPORTED.  
+  If any errors occur while computing the fields of ImageContext, 
+  then the error status is returned in the ImageError field of ImageContext.  
+  If the image is a TE image, then SectionAlignment is set to 0.
 
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.
