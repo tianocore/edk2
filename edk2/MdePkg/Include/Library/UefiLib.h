@@ -1,5 +1,9 @@
 /** @file
-  MDE UEFI library functions and macros
+  The UEFI Library provides functions and macros that simplify the development of 
+  UEFI Drivers and UEFI Applications.  These functions and macros help manage EFI 
+  events, build simple locks utilizing EFI Task Priority Levels (TPLs), install 
+  EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
+  and print messages on the console output and standard error devices.
 
   Copyright (c) 2006 - 2007, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

@@ -1,11 +1,9 @@
 #/** @file
-# Component description file for the entry point to a EFIDXE Drivers
-#
-# Library to abstract Framework extensions that conflict with UEFI 2.0 Specification
-#
-#  Help Port Framework/Tinao code that has conflicts with UEFI 2.0 by hiding the oldconflicts with library functions and supporting implementations of the old
-#  (EDK/EFI 1.10) and new (EDK II/UEFI 2.0) way. This module is a DXE driver as it contains DXE enum extensions for EFI event services.
-# Copyright (c) 2007, Intel Corporation.
+#  The UEFI Library provides functions and macros that simplify the development of 
+#  UEFI Drivers and UEFI Applications.  These functions and macros help manage EFI 
+#  events, build simple locks utilizing EFI Task Priority Levels (TPLs), install 
+#  EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
+#  and print messages on the console output and standard error devices.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
