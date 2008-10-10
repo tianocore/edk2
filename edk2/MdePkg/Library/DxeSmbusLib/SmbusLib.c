@@ -42,7 +42,7 @@ SmBusQuickRead (
   ASSERT (!SMBUS_LIB_PEC (SmBusAddress));
   ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusQuickRead, SmBusAddress, 0, NULL, Status);
 }
@@ -74,7 +74,7 @@ SmBusQuickWrite (
   ASSERT (!SMBUS_LIB_PEC (SmBusAddress));
   ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusQuickWrite, SmBusAddress, 0, NULL, Status);
 }
@@ -109,7 +109,7 @@ SmBusReceiveByte (
 
   ASSERT (SMBUS_LIB_COMMAND (SmBusAddress) == 0);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)  == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusReceiveByte, SmBusAddress, 1, &Byte, Status);
 
@@ -148,7 +148,7 @@ SmBusSendByte (
 
   ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   Byte   = Value;
   InternalSmBusExec (EfiSmbusSendByte, SmBusAddress, 1, &Byte, Status);
@@ -184,7 +184,7 @@ SmBusReadDataByte (
   UINT8   Byte;
 
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusReadByte, SmBusAddress, 1, &Byte, Status);
 
@@ -222,7 +222,7 @@ SmBusWriteDataByte (
   UINT8   Byte;
 
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   Byte = Value;
   InternalSmBusExec (EfiSmbusWriteByte, SmBusAddress, 1, &Byte, Status);
@@ -258,7 +258,7 @@ SmBusReadDataWord (
   UINT16  Word;
 
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusReadWord, SmBusAddress, 2, &Word, Status);
 
@@ -296,7 +296,7 @@ SmBusWriteDataWord (
   UINT16  Word;
 
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   Word = Value;
   InternalSmBusExec (EfiSmbusWriteWord, SmBusAddress, 2, &Word, Status);
@@ -333,7 +333,7 @@ SmBusProcessCall (
   )
 {
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusProcessCall, SmBusAddress, 2, &Value, Status);
 
@@ -373,7 +373,7 @@ SmBusReadBlock (
 {
   ASSERT (Buffer != NULL);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   return InternalSmBusExec (EfiSmbusReadBlock, SmBusAddress, 0x20, Buffer, Status);
 }
@@ -412,7 +412,7 @@ SmBusWriteBlock (
   ASSERT (Buffer != NULL);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) >= 1);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) <= 32);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   Length = SMBUS_LIB_LENGTH (SmBusAddress);
   return InternalSmBusExec (EfiSmbusWriteBlock, SmBusAddress, Length, Buffer, Status);
@@ -457,7 +457,7 @@ SmBusBlockProcessCall (
   ASSERT (ReadBuffer  != NULL);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) >= 1);
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) <= 32);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESERVED (SmBusAddress) == 0);
 
   Length = SMBUS_LIB_LENGTH (SmBusAddress);
   //
