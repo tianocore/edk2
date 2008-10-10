@@ -139,6 +139,8 @@ EFI_STATUS
 
 
 /**
+  Reads the specified number of bytes into a buffer from the specified block.
+
   The Read() function reads the requested number of bytes from the
   requested block and stores them in the provided buffer.
   Implementations should be mindful that the firmware volume
@@ -194,6 +196,8 @@ EFI_STATUS
 );
 
 /**
+  Writes the specified number of bytes from the input buffer to the block.
+
   The Write() function writes the specified number of bytes from
   the provided buffer to the specified block and offset. If the
   firmware volume is sticky write, the caller must ensure that
@@ -270,6 +274,8 @@ EFI_STATUS
 
 
 /**
+  Erases and initializes a firmware volume block.
+
   The EraseBlocks() function erases one or more blocks as denoted
   by the variable argument list. The entire parameter list of
   blocks must be verified before erasing any blocks. If a block is

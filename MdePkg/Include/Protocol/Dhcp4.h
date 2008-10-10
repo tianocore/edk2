@@ -331,7 +331,7 @@ EFI_STATUS
   Builds a DHCP packet, given the options to be appended or deleted or replaced.
 
   @param  This        Pointer to the EFI_DHCP4_PROTOCOL instance.
- @param  SeedPacket  Initial packet to be used as a base for building new packet.
+  @param  SeedPacket  Initial packet to be used as a base for building new packet.
   @param  DeleteCount Number of opcodes in the DeleteList.
   @param  DeleteList  List of opcodes to be deleted from the seed packet.
                       Ignored if DeleteCount is zero.
