@@ -1,8 +1,8 @@
 #/** @file
 # Component description file for Base Memory Optimization Dxe Library.
 #
-# Base Memory Library that uses MMX registers for high performance.
-#  Optimized for use in DXE.
+# Base Memory Library that is optimized for use in DXE phase.  
+# Uses REP, MMX, XMM registers as required for best performance.
 # Copyright (c) 2007 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials

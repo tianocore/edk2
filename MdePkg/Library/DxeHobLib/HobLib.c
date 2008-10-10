@@ -56,6 +56,7 @@ HobLibConstructor (
 
 /**
   Returns the pointer to the HOB list.
+  ASSERT() if the HOB list returned by GetHobList() is NULL.
 
   This function returns the pointer to first HOB in the list.
 
@@ -68,6 +69,7 @@ GetHobList (
   VOID
   )
 {
+	ASSERT (mHobList != NULL);
   return mHobList;
 }
 
@@ -218,7 +220,6 @@ GetBootModeHob (
   EFI_HOB_HANDOFF_INFO_TABLE    *HandOffHob;
 
   HandOffHob = (EFI_HOB_HANDOFF_INFO_TABLE *) GetHobList ();
-  ASSERT (HandOffHob != NULL);
 
   return  HandOffHob->BootMode;
 }
