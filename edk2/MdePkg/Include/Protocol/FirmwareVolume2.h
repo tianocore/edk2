@@ -85,7 +85,8 @@ typedef UINT64  EFI_FV_ATTRIBUTES;
 #define EFI_FV2_ALIGNMENT_2G            0x00000000001F0000ULL
 
 /**
-  
+  Returns the attributes and current settings of the firmware volume.
+
   Because of constraints imposed by the underlying firmware
   storage, an instance of the Firmware Volume Protocol may not
   be to able to support all possible variations of this
@@ -116,6 +117,8 @@ EFI_STATUS
 
 
 /**
+  Modifies the current settings of the firmware volume according to the input parameter.
+  
   The SetVolumeAttributes() function is used to set configurable
   firmware volume attributes. Only EFI_FV_READ_STATUS,
   EFI_FV_WRITE_STATUS, and EFI_FV_LOCK_STATUS may be modified, and
@@ -209,11 +212,13 @@ EFI_STATUS
 
 
 /**
+  Retrieves a file and/or file information from the firmware volume.
+
   ReadFile() is used to retrieve any file from a firmware volume
   during the DXE phase. The actual binary encoding of the file in
   the firmware volume media may be in any arbitrary format as long
-  as it does the following: ?It is accessed using the Firmware
-  Volume Protocol. ?The image that is returned follows the image
+  as it does the following: It is accessed using the Firmware
+  Volume Protocol. The image that is returned follows the image
   format defined in Code Definitions: PI Firmware File Format.
   If the input value of Buffer==NULL, it indicates the caller is
   requesting only that the type, attributes, and size of the
@@ -308,12 +313,12 @@ EFI_STATUS
 
 
 /**
+  Locates the requested section within a file and returns it in a buffer.
+
   ReadSection() is used to retrieve a specific section from a file
   within a firmware volume. The section returned is determined
   using a depth-first, left-to-right search algorithm through all
-  sections found in the specified file. See
-   ????Firmware File Sections???? on page 9 for more details about
-  sections. The output buffer is specified by a double indirection
+  sections found in the specified file. The output buffer is specified by a double indirection
   of the Buffer parameter. The input value of Buffer is used to
   determine if the output buffer is caller allocated or is
   dynamically allocated by ReadSection(). If the input value of
@@ -432,6 +437,8 @@ typedef struct {
 } EFI_FV_WRITE_FILE_DATA;
 
 /**
+  Locates the requested section within a file and returns it in a buffer.
+
   WriteFile() is used to write one or more files to a firmware
   volume. Each file to be written is described by an
   EFI_FV_WRITE_FILE_DATA structure. The caller must ensure that
@@ -506,6 +513,9 @@ EFI_STATUS
 
 
 /**
+	Retrieves information about the next file in the firmware volume store 
+	that matches the search criteria.
+
   GetNextFile() is the interface that is used to search a firmware
   volume for a particular file. It is called successively until
   the desired file is located or the function returns
@@ -589,6 +599,8 @@ EFI_STATUS
 );
 
 /**
+  Return information about a firmware volume.
+
   The GetInfo() function returns information of type
   InformationType for the requested firmware volume. If the volume
   does not support the requested information type, then
@@ -644,6 +656,7 @@ EFI_STATUS
 
 
 /**
+  Sets information about a firmware volume.
 
   The SetInfo() function sets information of type InformationType
   on the requested firmware volume.

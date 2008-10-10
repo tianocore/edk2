@@ -60,6 +60,8 @@ typedef UINTN EFI_BROWSER_ACTION_REQUEST;
 
 
 /**
+  Initialize the browser to display the specified configuration forms.
+
   This function is the primary interface to the internal forms-based browser. 
   The forms browser will display forms associated with the specified Handles. 
   The browser will select all forms in packages which have the specified Type 
@@ -68,7 +70,7 @@ typedef UINTN EFI_BROWSER_ACTION_REQUEST;
   @param This            A pointer to the EFI_FORM_BROWSER2_PROTOCOL instance
 
   @param Handles         A pointer to an array of Handles. This value should correspond 
-                         to the value of the HII form package that is required to be displayed. Type
+                         to the value of the HII form package that is required to be displayed.
 
   @param HandleCount     The number of Handles specified in Handle.
 
@@ -107,7 +109,8 @@ EFI_STATUS
 
 
 /**
-   
+  This function is called by a callback handler to retrieve uncommitted state data from the browser.
+
   This routine is called by a routine which was called by the
   browser. This routine called this service in the browser to
   retrieve or set certain uncommitted state information.
