@@ -656,26 +656,47 @@ Returns:
   //
 
   //
-  // Reinstall all ADDED variables
+  // Reinstall all ADDED variables as long as they are not identical to Updating Variable
   // 
   Variable = GetStartPointer (VariableStoreHeader);
   while (IsValidVariableHeader (Variable)) {
     NextVariable = GetNextVariablePtr (Variable);
     if (Variable->State == VAR_ADDED) {
+      if (UpdatingVariable != NULL) {
+        if (UpdatingVariable == Variable) {
+          Variable = NextVariable;
+          continue;
+        }
+        if (CompareGuid (&Variable->VendorGuid, &UpdatingVariable->VendorGuid)    &&
+            NameSizeOfVariable(Variable) == NameSizeOfVariable (UpdatingVariable) &&
+            CompareMem (GetVariableNamePtr (Variable), GetVariableNamePtr (UpdatingVariable), NameSizeOfVariable (Variable)) == 0 ) {
+          Variable = NextVariable;
+          continue;
+        }
+      }
       VariableSize = (UINTN) NextVariable - (UINTN) Variable;
       CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
       CurrPtr += VariableSize;
     }
-
     Variable = NextVariable;
   }
+
+  //
+  // Reinstall the variable being updated if it is not NULL
+  //
+  if (UpdatingVariable != NULL) {
+    VariableSize = (UINTN)(GetNextVariablePtr (UpdatingVariable)) - (UINTN)UpdatingVariable;
+    CopyMem (CurrPtr, (UINT8 *) UpdatingVariable, VariableSize);
+    CurrPtr += VariableSize;
+  }
+
   //
   // Reinstall all in delete transition variables
   // 
   Variable      = GetStartPointer (VariableStoreHeader);
   while (IsValidVariableHeader (Variable)) {
     NextVariable = GetNextVariablePtr (Variable);
-    if (Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+    if (Variable != UpdatingVariable && Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
 
       //
       // Buffer has cached all ADDED variable. 
@@ -693,12 +714,7 @@ Returns:
            ) {
           Point0 = (VOID *) GetVariableNamePtr (AddedVariable);
           Point1 = (VOID *) GetVariableNamePtr (Variable);
-          if (!CompareMem (
-                Point0,
-                Point1,
-                NameSizeOfVariable (AddedVariable)
-                )
-             ) {
+          if (CompareMem (Point0, Point1, NameSizeOfVariable (AddedVariable)) == 0) {
             FoundAdded = TRUE;
             break;
           }
@@ -706,11 +722,12 @@ Returns:
         AddedVariable = NextAddedVariable;
       }
       if (!FoundAdded) {
+        //
+        // Promote VAR_IN_DELETED_TRANSITION to VAR_ADDED
+        //
         VariableSize = (UINTN) NextVariable - (UINTN) Variable;
         CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
-        if (Variable != UpdatingVariable) {
-          ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
-        }
+        ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
         CurrPtr += VariableSize;
       }
     }
