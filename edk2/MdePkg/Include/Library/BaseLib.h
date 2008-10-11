@@ -1370,7 +1370,7 @@ BcdToDecimal8 (
 LIST_ENTRY *
 EFIAPI
 InitializeListHead (
-  IN      LIST_ENTRY                *ListHead
+  IN OUT  LIST_ENTRY                *ListHead
   );
 
 
@@ -1398,8 +1398,8 @@ InitializeListHead (
 LIST_ENTRY *
 EFIAPI
 InsertHeadList (
-  IN      LIST_ENTRY                *ListHead,
-  IN      LIST_ENTRY                *Entry
+  IN OUT  LIST_ENTRY                *ListHead,
+  IN OUT  LIST_ENTRY                *Entry
   );
 
 
@@ -1427,8 +1427,8 @@ InsertHeadList (
 LIST_ENTRY *
 EFIAPI
 InsertTailList (
-  IN      LIST_ENTRY                *ListHead,
-  IN      LIST_ENTRY                *Entry
+  IN OUT  LIST_ENTRY                *ListHead,
+  IN OUT  LIST_ENTRY                *Entry
   );
 
 
@@ -1513,11 +1513,13 @@ IsListEmpty (
 
 
 /**
-  Determines if a node in a doubly linked list is null.
+  Determines if a node in a doubly linked list is the head node of a the same
+  doubly linked list.  This function is typically used to terminate a loop that
+  traverses all the nodes in a doubly linked list starting with the head node.
 
-  Returns FALSE if Node is one of the nodes in the doubly linked list specified
-  by List. Otherwise, TRUE is returned. List must have been initialized with
-  InitializeListHead().
+  Returns TRUE if Node is equal to List.  Returns FALSE if Node is one of the
+  nodes in the doubly linked list specified by List.  List must have been
+  initialized with InitializeListHead().
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
@@ -1600,8 +1602,8 @@ IsNodeAtEnd (
 LIST_ENTRY *
 EFIAPI
 SwapListEntries (
-  IN      LIST_ENTRY                *FirstEntry,
-  IN      LIST_ENTRY                *SecondEntry
+  IN OUT  LIST_ENTRY                *FirstEntry,
+  IN OUT  LIST_ENTRY                *SecondEntry
   );
 
 
@@ -3081,7 +3083,7 @@ InitializeSpinLock (
 SPIN_LOCK *
 EFIAPI
 AcquireSpinLock (
-  IN      SPIN_LOCK                 *SpinLock
+  IN OUT  SPIN_LOCK                 *SpinLock
   );
 
 
@@ -3105,7 +3107,7 @@ AcquireSpinLock (
 BOOLEAN
 EFIAPI
 AcquireSpinLockOrFail (
-  IN      SPIN_LOCK                 *SpinLock
+  IN OUT  SPIN_LOCK                 *SpinLock
   );
 
 
@@ -3126,7 +3128,7 @@ AcquireSpinLockOrFail (
 SPIN_LOCK *
 EFIAPI
 ReleaseSpinLock (
-  IN      SPIN_LOCK                 *SpinLock
+  IN OUT  SPIN_LOCK                 *SpinLock
   );
 
 

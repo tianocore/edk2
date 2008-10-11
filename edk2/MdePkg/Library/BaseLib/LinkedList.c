@@ -1,7 +1,7 @@
 /** @file
   Linked List Library Functions.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -289,11 +289,13 @@ IsListEmpty (
 }
 
 /**
-  Determines if a node in a doubly linked list is null.
+  Determines if a node in a doubly linked list is the head node of a the same
+  doubly linked list.  This function is typically used to terminate a loop that
+  traverses all the nodes in a doubly linked list starting with the head node.
 
-  Returns FALSE if Node is one of the nodes in the doubly linked list specified
-  by List. Otherwise, TRUE is returned. List must have been initialized with
-  InitializeListHead().
+  Returns TRUE if Node is equal to List.  Returns FALSE if Node is one of the
+  nodes in the doubly linked list specified by List.  List must have been
+  initialized with InitializeListHead().
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
