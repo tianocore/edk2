@@ -63,7 +63,7 @@ GetPeCoffLoaderStucture (
                 &gEfiPeiPeCoffLoaderGuid,
                 0,
                 NULL,
-                &mPeiEfiPeiPeCoffLoader
+                (VOID**)&mPeiEfiPeiPeCoffLoader
                 );
     
     //
