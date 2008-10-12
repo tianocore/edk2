@@ -151,7 +151,7 @@ OemHookStatusCodeReport (
               mStdOut,
               Buffer,
               CharCount,
-              &CharCount,
+              (LPDWORD)&CharCount,
               NULL
               );
 
@@ -245,7 +245,7 @@ OemHookStatusCodeReport (
             mStdOut,
             Buffer,
             CharCount,
-            &CharCount,
+            (LPDWORD)&CharCount,
             NULL
             );
 

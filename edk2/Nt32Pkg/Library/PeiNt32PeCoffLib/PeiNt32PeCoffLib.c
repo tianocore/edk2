@@ -64,11 +64,11 @@ PeiNt32PeCoffLibConstructor (
     // GuidHob is not ready, try to locate PeCoffLoader guid structure.
     //
     Status = (*PeiServices)->LocatePpi (
-                              PeiServices,
+                              (const EFI_PEI_SERVICES **)PeiServices,
                               &gEfiPeiPeCoffLoaderGuid,
                               0,
                               NULL,
-                              &mPeiEfiPeiPeCoffLoader
+                              (VOID**)&mPeiEfiPeiPeCoffLoader
                               );
     
     //

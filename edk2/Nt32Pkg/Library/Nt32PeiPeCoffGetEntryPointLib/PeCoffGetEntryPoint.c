@@ -71,7 +71,7 @@ Returns:
              &gNtPeiLoadFilePpiGuid,
              0,
              &PpiDescriptor,
-             &PeiNtService
+             (VOID**)&PeiNtService
              );
   ASSERT_EFI_ERROR (Status);
 
