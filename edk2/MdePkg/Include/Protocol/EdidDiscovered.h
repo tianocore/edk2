@@ -23,10 +23,9 @@
     0x1c0c34f6, 0xd380, 0x41fa, {0xa0, 0x49, 0x8a, 0xd0, 0x6c, 0x1a, 0x66, 0xaa } \
   }
 
-/**
-  @par Protocol Description:
-  This protocol contains the EDID information retrieved from a video output device.
-**/
+///
+/// This protocol contains the EDID information retrieved from a video output device.
+///
 typedef struct {
   ///
   /// The size, in bytes, of the Edid buffer. 0 if no EDID information

@@ -61,20 +61,16 @@ struct _EFI_RUNTIME_EVENT_ENTRY {
   EFI_LIST_ENTRY          Link;
 };
 
-//
-// Interface stucture for the Runtime Architectural Protocol
-//
-/**
-  @par Protocol Description:
-  Allows the runtime functionality of the DXE Foundation to be contained in a 
-  separate driver. It also provides hooks for the DXE Foundation to export 
-  information that is needed at runtime. As such, this protocol allows the DXE 
-  Foundation to manage runtime drivers and events. This protocol also implies 
-  that the runtime services required to transition to virtual mode, 
-  SetVirtualAddressMap() and ConvertPointer(), have been registered into the 
-  EFI Runtime Table in the EFI System Partition.  This protocol must be produced 
-  by a runtime DXE driver and may only be consumed by the DXE Foundation.
-**/
+///
+/// Allows the runtime functionality of the DXE Foundation to be contained in a 
+/// separate driver. It also provides hooks for the DXE Foundation to export 
+/// information that is needed at runtime. As such, this protocol allows the DXE 
+/// Foundation to manage runtime drivers and events. This protocol also implies 
+/// that the runtime services required to transition to virtual mode, 
+/// SetVirtualAddressMap() and ConvertPointer(), have been registered into the 
+/// EFI Runtime Table in the EFI System Partition.  This protocol must be produced 
+/// by a runtime DXE driver and may only be consumed by the DXE Foundation.
+///
 struct _EFI_RUNTIME_ARCH_PROTOCOL {
   ///
   /// A list of type EFI_RUNTIME_IMAGE_ENTRY.

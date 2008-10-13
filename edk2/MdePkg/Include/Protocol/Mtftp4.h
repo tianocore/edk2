@@ -460,15 +460,11 @@ EFI_STATUS
   IN EFI_MTFTP4_PROTOCOL       *This
   );                                                                                                                 
                                                                                                                   
-/**  
-  The EFI MTFTPv4 Protocol provides basic services for client-side unicast 
-  and/or multicast TFTP operations.
-
-  @par Protocol Description:
-  The EFI_MTFTP4_PROTOCOL is designed to be used by UEFI drivers and applications 
-  to transmit and receive data files. The EFI MTFTPv4 Protocol driver uses 
-  the underlying EFI UDPv4 Protocol driver and EFI IPv4 Protocol driver.
-**/  
+///
+/// The EFI_MTFTP4_PROTOCOL is designed to be used by UEFI drivers and applications 
+/// to transmit and receive data files. The EFI MTFTPv4 Protocol driver uses 
+/// the underlying EFI UDPv4 Protocol driver and EFI IPv4 Protocol driver.
+///  
 struct _EFI_MTFTP4_PROTOCOL {
   EFI_MTFTP4_GET_MODE_DATA     GetModeData;
   EFI_MTFTP4_CONFIGURE         Configure;

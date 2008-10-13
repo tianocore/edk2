@@ -56,13 +56,11 @@ EFI_STATUS
   IN EFI_STATUS_CODE_DATA     *Data      OPTIONAL
   );
 
-/**
-  @par Protocol Description:
-  Provides the service required to report a status code to the platform firmware.
-  This protocol must be produced by a runtime DXE driver and may be consumed 
-  only by the DXE Foundation.
-
-**/
+///
+/// Provides the service required to report a status code to the platform firmware.
+/// This protocol must be produced by a runtime DXE driver and may be consumed 
+/// only by the DXE Foundation.
+///
 typedef struct _EFI_STATUS_CODE_PROTOCOL {
   EFI_REPORT_STATUS_CODE         ReportStatusCode;
 } EFI_STATUS_CODE_PROTOCOL;

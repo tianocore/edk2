@@ -84,10 +84,6 @@ EFI_STATUS
 /// trusted.
 ///
 struct _EFI_PEI_SECURITY2_PPI {
-  ///
-  /// Allows the platform builder to implement a security policy
-  /// in response to varying file authentication states.
-  ///
   EFI_PEI_SECURITY_AUTHENTICATION_STATE   AuthenticationState;
 };
 

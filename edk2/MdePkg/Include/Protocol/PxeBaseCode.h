@@ -608,15 +608,14 @@ EFI_STATUS
 // 
 #define EFI_PXE_BASE_CODE_INTERFACE_REVISION  EFI_PXE_BASE_CODE_PROTOCOL_REVISION
 
-/**  
-  @par Protocol Description:
-  The EFI_PXE_BASE_CODE_PROTOCOL is used to control PXE-compatible devices.
-  An EFI_PXE_BASE_CODE_PROTOCOL will be layered on top of an
-  EFI_MANAGED_NETWORK_PROTOCOL protocol in order to perform packet level transactions.
-  The EFI_PXE_BASE_CODE_PROTOCOL handle also supports the
-  EFI_LOAD_FILE_PROTOCOL protocol. This provides a clean way to obtain control from the
-  boot manager if the boot path is from the remote device.
-**/
+///
+/// The EFI_PXE_BASE_CODE_PROTOCOL is used to control PXE-compatible devices.
+/// An EFI_PXE_BASE_CODE_PROTOCOL will be layered on top of an
+/// EFI_MANAGED_NETWORK_PROTOCOL protocol in order to perform packet level transactions.
+/// The EFI_PXE_BASE_CODE_PROTOCOL handle also supports the
+/// EFI_LOAD_FILE_PROTOCOL protocol. This provides a clean way to obtain control from the
+/// boot manager if the boot path is from the remote device.
+///
 struct _EFI_PXE_BASE_CODE_PROTOCOL {
   ///
   ///  The revision of the EFI_PXE_BASE_CODE_PROTOCOL. All future revisions must 
@@ -636,6 +635,9 @@ struct _EFI_PXE_BASE_CODE_PROTOCOL {
   EFI_PXE_BASE_CODE_SET_PARAMETERS  SetParameters;
   EFI_PXE_BASE_CODE_SET_STATION_IP  SetStationIp;
   EFI_PXE_BASE_CODE_SET_PACKETS     SetPackets;
+  ///
+  /// Pointer to the EFI_PXE_BASE_CODE_MODE data for this device.
+  ///
   EFI_PXE_BASE_CODE_MODE            *Mode;
 };
 

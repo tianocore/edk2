@@ -383,77 +383,27 @@ VOID
 /// The perspective of the services is that of the processor, not the bus or system.
 ///
 struct _EFI_PEI_CPU_IO_PPI {
-  ///
-  /// Collection of memory-access services.
-  ///
-  EFI_PEI_CPU_IO_PPI_ACCESS       Mem;
-  ///
-  /// Collection of I/O-access services.
-  ///
-  EFI_PEI_CPU_IO_PPI_ACCESS       Io;
-  ///
-  /// 8-bit I/O read service.
-  ///
+  EFI_PEI_CPU_IO_PPI_ACCESS       Mem;      ///< Collection of memory-access services.
+  EFI_PEI_CPU_IO_PPI_ACCESS       Io;       ///< Collection of I/O-access services.
+
   EFI_PEI_CPU_IO_PPI_IO_READ8     IoRead8;
-  ///
-  /// 16-bit I/O read service.
-  ///
   EFI_PEI_CPU_IO_PPI_IO_READ16    IoRead16;
-  ///
-  /// 32-bit I/O read service.
-  ///
   EFI_PEI_CPU_IO_PPI_IO_READ32    IoRead32;
-  ///
-  /// 64-bit I/O read service.
-  ///
   EFI_PEI_CPU_IO_PPI_IO_READ64    IoRead64;
-  ///
-  /// 8-bit I/O write service.
-  ///
+
   EFI_PEI_CPU_IO_PPI_IO_WRITE8    IoWrite8;
-  ///
-  /// 16-bit I/O write service.
-  ///
   EFI_PEI_CPU_IO_PPI_IO_WRITE16   IoWrite16;
-  ///
-  /// 32-bit I/O write service.
-  ///
   EFI_PEI_CPU_IO_PPI_IO_WRITE32   IoWrite32;
-  ///
-  /// 64-bit I/O write service.
-  ///
   EFI_PEI_CPU_IO_PPI_IO_WRITE64   IoWrite64;
-  ///
-  /// 8-bit memory read service.
-  ///
+
   EFI_PEI_CPU_IO_PPI_MEM_READ8    MemRead8;
-  ///
-  /// 16-bit memory read service.
-  ///
   EFI_PEI_CPU_IO_PPI_MEM_READ16   MemRead16;
-  ///
-  /// 32-bit memory read service.
-  ///
   EFI_PEI_CPU_IO_PPI_MEM_READ32   MemRead32;
-  ///
-  /// 64-bit memory read service.
-  ///
   EFI_PEI_CPU_IO_PPI_MEM_READ64   MemRead64;
-  ///
-  /// 8-bit memory write service.
-  ///
+
   EFI_PEI_CPU_IO_PPI_MEM_WRITE8   MemWrite8;
-  ///
-  /// 16-bit memory write service.
-  ///
   EFI_PEI_CPU_IO_PPI_MEM_WRITE16  MemWrite16;
-  ///
-  /// 32-bit memory write service.
-  ///
   EFI_PEI_CPU_IO_PPI_MEM_WRITE32  MemWrite32;
-  ///
-  /// 64-bit memory write service.
-  ///
   EFI_PEI_CPU_IO_PPI_MEM_WRITE64  MemWrite64;
 };
 

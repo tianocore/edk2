@@ -109,11 +109,10 @@ EFI_STATUS
   IN VOID                              *Buffer
   );  
 
-/**
-  @par Protocol Description:
-  This protocol is used on any device handle to obtain authentication 
-  information associated with the physical or logical device.
-**/  
+///
+/// This protocol is used on any device handle to obtain authentication 
+/// information associated with the physical or logical device.
+///
 struct _EFI_AUTHENTICATION_INFO_PROTOCOL {
   EFI_AUTHENTICATION_PROTOCOL_INFO_GET Get;
   EFI_AUTHENTICATION_PROTOCOL_INFO_SET Set;

@@ -274,12 +274,11 @@ EFI_STATUS
 );
 
 
-/**
-  @par Protocol Description:
-  The EFI_SMBUS_HC_PROTOCOL provides SMBus host controller management and basic data
-  transactions over SMBus. There is one EFI_SMBUS_HC_PROTOCOL instance for each SMBus
-  host controller.
-**/
+///
+/// The EFI_SMBUS_HC_PROTOCOL provides SMBus host controller management and basic data
+/// transactions over SMBus. There is one EFI_SMBUS_HC_PROTOCOL instance for each SMBus
+/// host controller.
+///
 struct _EFI_SMBUS_HC_PROTOCOL {
   EFI_SMBUS_HC_EXECUTE_OPERATION    Execute;
   EFI_SMBUS_HC_PROTOCOL_ARP_DEVICE  ArpDevice;

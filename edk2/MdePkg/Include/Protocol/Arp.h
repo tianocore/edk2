@@ -249,11 +249,10 @@ EFI_STATUS
   IN EFI_EVENT              ResolvedEvent     OPTIONAL
   );  
 
-/**
-  @par Protocol Description:
-  ARP is used to resolve local network protocol addresses into 
-  network hardware addresses.
-**/
+///
+/// ARP is used to resolve local network protocol addresses into 
+/// network hardware addresses.
+///
 struct _EFI_ARP_PROTOCOL {
   EFI_ARP_CONFIGURE         Configure;
   EFI_ARP_ADD               Add;

@@ -209,23 +209,9 @@ EFI_STATUS
 ///  its SMBus controller and the slave devices attached to it.
 ///
 struct _EFI_PEI_SMBUS2_PPI {
-  ///
-  /// Executes the SMBus operation to an SMBus slave device.
-  ///
   EFI_PEI_SMBUS2_PPI_EXECUTE_OPERATION  Execute;
-  ///
-  /// Allows an SMBus 2.0 device(s) to be Address Resolution Protocol (ARP).
-  ///
   EFI_PEI_SMBUS2_PPI_ARP_DEVICE         ArpDevice;
-  ///
-  /// Allows a PEIM to retrieve the address that was allocated by the SMBus 
-  /// host controller during enumeration/ARP.
-  ///
   EFI_PEI_SMBUS2_PPI_GET_ARP_MAP        GetArpMap;
-  ///
-  /// Allows a driver to register for a callback to the SMBus host 
-  /// controller driver when the bus issues a notification to the bus controller PEIM.
-  ///
   EFI_PEI_SMBUS2_PPI_NOTIFY             Notify;
   ///
   /// Identifier which uniquely identifies this SMBus controller in a system.

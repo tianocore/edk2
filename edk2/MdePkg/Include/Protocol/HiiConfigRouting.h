@@ -390,12 +390,11 @@ EFI_STATUS
   OUT EFI_STRING                               *AltCfgResp 
   );
 
-/**
-  @par Protocol Description:   
-  This protocol defines the configuration routing interfaces
-  between external applications and the HII. There may only be one
-  instance of this protocol in the system.
-**/
+///
+/// This protocol defines the configuration routing interfaces
+/// between external applications and the HII. There may only be one
+/// instance of this protocol in the system.
+///
 struct _EFI_HII_CONFIG_ROUTING_PROTOCOL {
   EFI_HII_ROUTING_EXTRACT_CONFIG  ExtractConfig;
   EFI_HII_ROUTING_EXPORT_CONFIG   ExportConfig;

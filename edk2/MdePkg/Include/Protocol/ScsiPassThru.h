@@ -296,15 +296,17 @@ EFI_STATUS
   IN UINT64                                  Lun
   );
 
-/**  
-  @par Protocol Description:
-  The EFI_SCSI_PASS_THRU_PROTOCOL provides information about a SCSI channel and
-  the ability to send SCI Request Packets to any SCSI device attached to that SCSI channel. The
-  information includes the Target ID of the host controller on the SCSI channel, the attributes of
-  the SCSI channel, the printable name for the SCSI controller, and the printable name of the
-  SCSI channel.
-**/
+///
+/// The EFI_SCSI_PASS_THRU_PROTOCOL provides information about a SCSI channel and
+/// the ability to send SCI Request Packets to any SCSI device attached to that SCSI channel. The
+/// information includes the Target ID of the host controller on the SCSI channel, the attributes of
+/// the SCSI channel, the printable name for the SCSI controller, and the printable name of the
+/// SCSI channel.
+///
 struct _EFI_SCSI_PASS_THRU_PROTOCOL {
+  ///
+  /// A pointer to the EFI_SCSI_PASS_THRU_MODE data for this SCSI channel.
+  ///
   EFI_SCSI_PASS_THRU_MODE               *Mode;
   EFI_SCSI_PASS_THRU_PASSTHRU           PassThru;
   EFI_SCSI_PASS_THRU_GET_NEXT_DEVICE    GetNextDevice;

@@ -189,10 +189,9 @@ typedef struct {
 /// 
 #define EFI_BLOCK_IO_INTERFACE_REVISION   EFI_BLOCK_IO_PROTOCOL_REVISION
 
-/**
-  @par Protocol Description:
-  This protocol provides control over block devices.
-**/
+///
+///  This protocol provides control over block devices.
+///
 struct _EFI_BLOCK_IO_PROTOCOL {
   ///
   /// The revision to which the block IO interface adheres. All future
@@ -200,7 +199,9 @@ struct _EFI_BLOCK_IO_PROTOCOL {
   /// back wards compatible, it is not the same GUID.
   ///
   UINT64              Revision;
-
+  ///
+  /// Pointer to the EFI_BLOCK_IO_MEDIA data for this device.
+  ///
   EFI_BLOCK_IO_MEDIA  *Media;
 
   EFI_BLOCK_RESET     Reset;

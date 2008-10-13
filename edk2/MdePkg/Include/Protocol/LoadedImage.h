@@ -45,10 +45,9 @@
 /// 
 #define EFI_LOADED_IMAGE_INFORMATION_REVISION    EFI_LOADED_IMAGE_PROTOCOL_REVISION
 
-/**  
-  @par Protocol Description:
-  Can be used on any image handle to obtain information about the loaded image.
-**/
+///
+/// Can be used on any image handle to obtain information about the loaded image.
+///
 typedef struct {
   ///
   /// Defines the revision of the EFI_LOADED_IMAGE_PROTOCOL structure. 
@@ -61,6 +60,10 @@ typedef struct {
   /// the firmware's boot manager. 
   ///
   EFI_HANDLE                ParentHandle;
+
+  ///
+  /// the image's EFI system table pointer.
+  ///
   EFI_SYSTEM_TABLE          *SystemTable;
 
   //
@@ -103,12 +106,17 @@ typedef struct {
   /// The size in bytes of the loaded image.
   ///
   UINT64                    ImageSize;
+
+  ///
+  /// The memory type that the code sections were loaded as.
+  ///
   EFI_MEMORY_TYPE           ImageCodeType;
+
+  ///
+  /// The memory type that the data sections were loaded as.
+  ///
   EFI_MEMORY_TYPE           ImageDataType;
 
-  //
-  // If the driver image supports a dynamic unload request
-  //
   EFI_IMAGE_UNLOAD          Unload;
 
 } EFI_LOADED_IMAGE_PROTOCOL;

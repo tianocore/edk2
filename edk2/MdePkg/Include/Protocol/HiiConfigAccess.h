@@ -199,12 +199,11 @@ EFI_STATUS
   )
   ;
   
-/**
-  @par Protocol Description:   
-  This protocol provides a callable interface between the HII and
-  drivers. Only drivers which provide IFR data to HII are required
-  to publish this protocol.
-**/
+///
+/// This protocol provides a callable interface between the HII and
+/// drivers. Only drivers which provide IFR data to HII are required
+/// to publish this protocol.
+///
 struct _EFI_HII_CONFIG_ACCESS_PROTOCOL {
   EFI_HII_ACCESS_EXTRACT_CONFIG     ExtractConfig;
   EFI_HII_ACCESS_ROUTE_CONFIG       RouteConfig;

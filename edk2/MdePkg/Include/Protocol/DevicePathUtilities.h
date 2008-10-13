@@ -170,10 +170,9 @@ BOOLEAN
   IN CONST EFI_DEVICE_PATH_PROTOCOL         *DevicePath
   );                                                                                                       
   
-/**
-  @par Protocol Description:
-  This protocol is used to creates and manipulates device paths and device nodes.
-**/ 
+///
+/// This protocol is used to creates and manipulates device paths and device nodes.
+/// 
 typedef struct {
   EFI_DEVICE_PATH_UTILS_GET_DEVICE_PATH_SIZE GetDevicePathSize;
   EFI_DEVICE_PATH_UTILS_DUP_DEVICE_PATH      DuplicateDevicePath;

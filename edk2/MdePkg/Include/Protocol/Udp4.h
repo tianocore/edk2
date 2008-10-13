@@ -342,14 +342,13 @@ EFI_STATUS
   IN EFI_UDP4_COMPLETION_TOKEN  *Token  OPTIONAL
   );       
 
-/**  
-  @par Protocol Description:
-  The EFI_UDP4_PROTOCOL defines an EFI UDPv4 Protocol session that can be used 
-  by any network drivers, applications, or daemons to transmit or receive UDP packets. 
-  This protocol instance can either be bound to a specified port as a service or 
-  connected to some remote peer as an active client. Each instance has its own settings, 
-  such as the routing table and group table, which are independent from each other.
-**/
+///
+/// The EFI_UDP4_PROTOCOL defines an EFI UDPv4 Protocol session that can be used 
+/// by any network drivers, applications, or daemons to transmit or receive UDP packets. 
+/// This protocol instance can either be bound to a specified port as a service or 
+/// connected to some remote peer as an active client. Each instance has its own settings, 
+/// such as the routing table and group table, which are independent from each other.
+///
 struct _EFI_UDP4_PROTOCOL {
   EFI_UDP4_GET_MODE_DATA        GetModeData;
   EFI_UDP4_CONFIGURE            Configure;

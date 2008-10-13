@@ -65,9 +65,6 @@ EFI_STATUS
 /// The DXE IPL PPI may use PEI services to locate and load the DXE Foundation.
 ///
 struct _EFI_DXE_IPL_PPI {
-  ///
-  /// The entry point to the DXE IPL PPI.
-  ///
   EFI_DXE_IPL_ENTRY Entry;
 };
 

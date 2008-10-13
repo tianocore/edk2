@@ -67,18 +67,17 @@ EFI_STATUS
   IN EFI_HANDLE                            ChildHandle
   );
 
-/**  
-  @par Protocol Description:
-  The EFI_SERVICE_BINDING_PROTOCOL provides member functions to create and destroy 
-  child handles. A driver is responsible for adding protocols to the child handle 
-  in CreateChild() and removing protocols in DestroyChild(). It is also required 
-  that the CreateChild() function opens the parent protocol BY_CHILD_CONTROLLER 
-  to establish the parent-child relationship, and closes the protocol in DestroyChild().
-  The pseudo code for CreateChild() and DestroyChild() is provided to specify the 
-  required behavior, not to specify the required implementation. Each consumer of 
-  a software protocol is responsible for calling CreateChild() when it requires the 
-  protocol and calling DestroyChild() when it is finished with that protocol.
-**/
+///
+/// The EFI_SERVICE_BINDING_PROTOCOL provides member functions to create and destroy 
+/// child handles. A driver is responsible for adding protocols to the child handle 
+/// in CreateChild() and removing protocols in DestroyChild(). It is also required 
+/// that the CreateChild() function opens the parent protocol BY_CHILD_CONTROLLER 
+/// to establish the parent-child relationship, and closes the protocol in DestroyChild().
+/// The pseudo code for CreateChild() and DestroyChild() is provided to specify the 
+/// required behavior, not to specify the required implementation. Each consumer of 
+/// a software protocol is responsible for calling CreateChild() when it requires the 
+/// protocol and calling DestroyChild() when it is finished with that protocol.
+///
 struct _EFI_SERVICE_BINDING_PROTOCOL {
   EFI_SERVICE_BINDING_CREATE_CHILD         CreateChild;
   EFI_SERVICE_BINDING_DESTROY_CHILD        DestroyChild;

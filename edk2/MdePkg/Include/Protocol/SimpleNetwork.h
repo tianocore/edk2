@@ -552,13 +552,12 @@ EFI_STATUS
 // 
 #define EFI_SIMPLE_NETWORK_INTERFACE_REVISION   EFI_SIMPLE_NETWORK_PROTOCOL_REVISION
 
-/**  
-  @par Protocol Description:
-  The EFI_SIMPLE_NETWORK_PROTOCOL protocol is used to initialize access 
-  to a network adapter. Once the network adapter initializes, 
-  the EFI_SIMPLE_NETWORK_PROTOCOL protocol provides services that 
-  allow packets to be transmitted and received.
-**/
+///
+/// The EFI_SIMPLE_NETWORK_PROTOCOL protocol is used to initialize access 
+/// to a network adapter. Once the network adapter initializes, 
+/// the EFI_SIMPLE_NETWORK_PROTOCOL protocol provides services that 
+/// allow packets to be transmitted and received.
+///
 struct _EFI_SIMPLE_NETWORK_PROTOCOL {
   ///
   /// Revision of the EFI_SIMPLE_NETWORK_PROTOCOL. All future revisions must 
@@ -583,6 +582,9 @@ struct _EFI_SIMPLE_NETWORK_PROTOCOL {
   /// Event used with WaitForEvent() to wait for a packet to be received.
   ///
   EFI_EVENT                           WaitForPacket;
+  ///
+  /// Pointer to the EFI_SIMPLE_NETWORK_MODE data for the device.
+  ///
   EFI_SIMPLE_NETWORK_MODE             *Mode;
 };
 

@@ -373,13 +373,12 @@ typedef struct {
   BOOLEAN CursorVisible;
 } EFI_SIMPLE_TEXT_OUTPUT_MODE;
 
-/**  
-  @par Protocol Description:
-  The SIMPLE_TEXT_OUTPUT protocol is used to control text-based output devices. 
-  It is the minimum required protocol for any handle supplied as the ConsoleOut 
-  or StandardError device. In addition, the minimum supported text mode of such 
-  devices is at least 80 x 25 characters.
-**/
+///
+/// The SIMPLE_TEXT_OUTPUT protocol is used to control text-based output devices. 
+/// It is the minimum required protocol for any handle supplied as the ConsoleOut 
+/// or StandardError device. In addition, the minimum supported text mode of such 
+/// devices is at least 80 x 25 characters.
+///
 struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
   EFI_TEXT_RESET                Reset;
 
@@ -394,9 +393,9 @@ struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
   EFI_TEXT_SET_CURSOR_POSITION  SetCursorPosition;
   EFI_TEXT_ENABLE_CURSOR        EnableCursor;
 
-  //
-  // Current mode
-  //
+  ///
+  /// Pointer to SIMPLE_TEXT_OUTPUT_MODE data.
+  ///
   EFI_SIMPLE_TEXT_OUTPUT_MODE   *Mode;
 };
 

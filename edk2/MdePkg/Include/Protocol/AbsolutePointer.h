@@ -176,17 +176,15 @@ EFI_STATUS
 );
 
 
-/**
-  @par Protocol Description:
-  The EFI_ABSOLUTE_POINTER_PROTOCOL provides a set of services
-  for a pointer device that can be used as an input device from an
-  application written to this specification. The services include
-  the ability to reset the pointer device, retrieve the state of
-  the pointer device, and retrieve the capabilities of the pointer
-  device. In addition certain data items describing the device are
-  provided.
-
-**/
+///
+/// The EFI_ABSOLUTE_POINTER_PROTOCOL provides a set of services
+/// for a pointer device that can be used as an input device from an
+/// application written to this specification. The services include
+/// the ability to reset the pointer device, retrieve the state of
+/// the pointer device, and retrieve the capabilities of the pointer
+/// device. In addition certain data items describing the device are
+/// provided.
+///
 struct _EFI_ABSOLUTE_POINTER_PROTOCOL {
   EFI_ABSOLUTE_POINTER_RESET      Reset;
   EFI_ABSOLUTE_POINTER_GET_STATE  GetState;
@@ -194,6 +192,9 @@ struct _EFI_ABSOLUTE_POINTER_PROTOCOL {
   /// Event to use with WaitForEvent() to wait for input from the pointer device.  
   ///
   EFI_EVENT                       WaitForInput;
+  ///
+  /// Pointer to EFI_ABSOLUTE_POINTER_MODE data.
+  ///
   EFI_ABSOLUTE_POINTER_MODE       *Mode;
 };
 

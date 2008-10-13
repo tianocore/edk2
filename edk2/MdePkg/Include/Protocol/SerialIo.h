@@ -266,12 +266,11 @@ typedef struct {
 #define EFI_SERIAL_IO_PROTOCOL_REVISION    0x00010000
 #define SERIAL_IO_INTERFACE_REVISION  EFI_SERIAL_IO_PROTOCOL_REVISION
 
-/**  
-  @par Protocol Description:
-  The Serial I/O protocol is used to communicate with UART-style serial devices. 
-  These can be standard UART serial ports in PC-AT systems, serial ports attached 
-  to a USB interface, or potentially any character-based I/O device.
-**/
+///
+/// The Serial I/O protocol is used to communicate with UART-style serial devices. 
+/// These can be standard UART serial ports in PC-AT systems, serial ports attached 
+/// to a USB interface, or potentially any character-based I/O device.
+///
 struct _EFI_SERIAL_IO_PROTOCOL {
   ///
   /// The revision to which the EFI_SERIAL_IO_PROTOCOL adheres. All future revisions 
@@ -285,7 +284,9 @@ struct _EFI_SERIAL_IO_PROTOCOL {
   EFI_SERIAL_GET_CONTROL_BITS GetControl;
   EFI_SERIAL_WRITE            Write;
   EFI_SERIAL_READ             Read;
-
+  ///
+  /// Pointer to SERIAL_IO_MODE data.
+  ///
   EFI_SERIAL_IO_MODE          *Mode;
 };
 

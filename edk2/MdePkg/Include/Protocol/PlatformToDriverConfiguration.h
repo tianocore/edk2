@@ -253,29 +253,18 @@ EFI_STATUS
 );
 
 
-/**
-  @par Protocol Description:
-  The EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL is used by the
-  UEFI driver to query the platform for configuration information.
-  The UEFI driver calls Query() multiple times to get
-  configuration information from the platform. For every call to
-  Query() there must be a matching call to Response() so the
-  UEFI driver can inform the platform how it used the
-  information passed in from Query(). It's legal for a UEFI
-  driver to use Response() to inform the platform it does not
-  understand the data returned via Query() and thus no action was
-  taken.
-
-  @param  Query     Called by the UEFI Driver Start() function to
-                    get configuration information from the
-                    platform.
-  
-  @param  Response  Called by the UEFI Driver Start() function
-                    to let the platform know how UEFI driver
-                    processed the data return from Query.
-  
-
-**/
+///
+/// The EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL is used by the
+/// UEFI driver to query the platform for configuration information.
+/// The UEFI driver calls Query() multiple times to get
+/// configuration information from the platform. For every call to
+/// Query() there must be a matching call to Response() so the
+/// UEFI driver can inform the platform how it used the
+/// information passed in from Query(). It's legal for a UEFI
+/// driver to use Response() to inform the platform it does not
+/// understand the data returned via Query() and thus no action was
+/// taken.
+///
 struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL {
   EFI_PLATFORM_TO_DRIVER_CONFIGURATION_QUERY    Query;
   EFI_PLATFORM_TO_DRIVER_CONFIGURATION_RESPONSE Response;

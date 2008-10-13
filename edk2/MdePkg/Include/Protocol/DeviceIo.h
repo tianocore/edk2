@@ -213,11 +213,10 @@ EFI_STATUS
   IN EFI_PHYSICAL_ADDRESS             HostAddress
   );
 
-/**
-  @par Protocol Description:
-  This protocol provides the basic Memory, I/O, and PCI interfaces that 
-  are used to abstract accesses to devices.
-**/ 
+///
+/// This protocol provides the basic Memory, I/O, and PCI interfaces that 
+/// are used to abstract accesses to devices.
+///
 struct _EFI_DEVICE_IO_PROTOCOL {
   ///
   /// Allows reads and writes to memory mapped I/O space.

@@ -336,10 +336,9 @@ IN        UINTN                   BltY
 );
 
 
-/**
-  @par Protocol Description:  
-  Services to access to images in the images database.
-**/
+///
+/// Services to access to images in the images database.
+///
 struct _EFI_HII_IMAGE_PROTOCOL {
   EFI_HII_NEW_IMAGE     NewImage;
   EFI_HII_GET_IMAGE     GetImage;

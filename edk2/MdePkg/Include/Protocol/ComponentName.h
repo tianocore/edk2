@@ -109,14 +109,10 @@ EFI_STATUS
   OUT CHAR16                                                  **ControllerName
   );
 
-//
-// Interface structure for the Component Name Protocol
-//
-/**
-  @par Protocol Description:
-  This protocol is used to retrieve user readable names of drivers 
-  and controllers managed by UEFI Drivers.
-**/
+///
+/// This protocol is used to retrieve user readable names of drivers 
+/// and controllers managed by UEFI Drivers.
+///
 struct _EFI_COMPONENT_NAME_PROTOCOL {
   EFI_COMPONENT_NAME_GET_DRIVER_NAME      GetDriverName;
   EFI_COMPONENT_NAME_GET_CONTROLLER_NAME  GetControllerName;

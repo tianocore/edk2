@@ -197,11 +197,9 @@ EFI_STATUS
      OUT  EFI_PHYSICAL_ADDRESS      *EventLogLastEntry
   );
 
-/**
-  @par Protocol Description:
-  The EFI_TCG Protocol abstracts TCG activity.
-
-**/
+///
+/// The EFI_TCG Protocol abstracts TCG activity.
+///
 struct _EFI_TCG_PROTOCOL {
   EFI_TCG_STATUS_CHECK              StatusCheck;
   EFI_TCG_HASH_ALL                  HashAll;

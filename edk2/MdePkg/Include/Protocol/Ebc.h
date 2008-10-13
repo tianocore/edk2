@@ -133,18 +133,12 @@ EFI_STATUS
   IN OUT UINT64                 *Version
   );
 
-//
-// Prototype for the actual EBC protocol interface
-//
-/**
-  This protocol provides the services that allow execution of EBC images.
-
-  @par Protocol Description:
-  The EFI EBC protocol provides services to load and execute EBC images, which will typically be
-  loaded into option ROMs. The image loader will load the EBC image, perform standard relocations,
-  and invoke the CreateThunk() service to create a thunk for the EBC image's entry point. The
-  image can then be run using the standard EFI start image services.
-**/
+///
+/// The EFI EBC protocol provides services to load and execute EBC images, which will typically be
+/// loaded into option ROMs. The image loader will load the EBC image, perform standard relocations,
+/// and invoke the CreateThunk() service to create a thunk for the EBC image's entry point. The
+/// image can then be run using the standard EFI start image services.
+///
 struct _EFI_EBC_PROTOCOL {
   EFI_EBC_CREATE_THUNK          CreateThunk;
   EFI_EBC_UNLOAD_IMAGE          UnloadImage;

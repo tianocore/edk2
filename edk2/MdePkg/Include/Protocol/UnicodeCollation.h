@@ -164,11 +164,10 @@ BOOLEAN
   OUT CHAR8                                 *Fat
   );
 
-/**  
-  @par Protocol Description:
-  The EFI_UNICODE_COLLATION_PROTOCOL is used to perform case-insensitive 
-  comparisons of Unicode strings. 
-**/
+///
+/// The EFI_UNICODE_COLLATION_PROTOCOL is used to perform case-insensitive 
+/// comparisons of Unicode strings. 
+///
 struct _EFI_UNICODE_COLLATION_PROTOCOL {
   //
   // general
@@ -185,7 +184,7 @@ struct _EFI_UNICODE_COLLATION_PROTOCOL {
   EFI_UNICODE_COLLATION_STRTOFAT    StrToFat;
   
   ///
-  /// LanguagesA Null-terminated ASCII string array that contains one or more 
+  /// A Null-terminated ASCII string array that contains one or more 
   /// language codes. This array is specified in RFC 4646 format.
   ///
   CHAR8                             *SupportedLanguages;

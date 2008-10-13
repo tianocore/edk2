@@ -160,17 +160,14 @@ EFI_STATUS
   );
 
 
-/**
-  Interface stucture for the Timer Architectural Protocol.
-
-  @par Protocol Description:
-  This protocol provides the services to initialize a periodic timer 
-  interrupt, and to register a handler that is called each time the timer
-  interrupt fires.  It may also provide a service to adjust the rate of the
-  periodic timer interrupt.  When a timer interrupt occurs, the handler is 
-  passed the amount of time that has passed since the previous timer 
-  interrupt.
-**/
+///
+/// This protocol provides the services to initialize a periodic timer 
+/// interrupt, and to register a handler that is called each time the timer
+/// interrupt fires.  It may also provide a service to adjust the rate of the
+/// periodic timer interrupt.  When a timer interrupt occurs, the handler is 
+/// passed the amount of time that has passed since the previous timer 
+/// interrupt.
+///
 struct _EFI_TIMER_ARCH_PROTOCOL {
   EFI_TIMER_REGISTER_HANDLER          RegisterHandler;
   EFI_TIMER_SET_TIMER_PERIOD          SetTimerPeriod;

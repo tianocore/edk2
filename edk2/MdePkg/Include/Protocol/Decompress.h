@@ -109,11 +109,9 @@ EFI_STATUS
   IN     UINT32                           ScratchSize
   );
 
-/**
-  @par Protocol Description:
-  Provides a decompression service.
-
-**/ 
+///
+/// Provides a decompression service.
+///
 struct _EFI_DECOMPRESS_PROTOCOL {
   EFI_DECOMPRESS_GET_INFO   GetInfo;
   EFI_DECOMPRESS_DECOMPRESS Decompress;

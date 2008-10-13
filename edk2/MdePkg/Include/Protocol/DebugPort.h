@@ -113,13 +113,9 @@ EFI_STATUS
   IN EFI_DEBUGPORT_PROTOCOL               *This
   );
 
-//
-// DebugPort protocol definition
-//
-/**
-  @par Protocol Description:
-  This protocol provides the communication link between the debug agent and the remote host.
-**/ 
+///
+/// This protocol provides the communication link between the debug agent and the remote host.
+///
 struct _EFI_DEBUGPORT_PROTOCOL {
   EFI_DEBUGPORT_RESET Reset;
   EFI_DEBUGPORT_WRITE Write;

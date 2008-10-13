@@ -53,10 +53,6 @@ EFI_STATUS
 /// This service abstracts the ability to migrate contents of the platform early memory store.
 ///
 typedef struct {
-  ///
-  /// Perform the migration of contents of Temporary RAM to Permanent RAM.
-  /// Terminate the Temporary RAM if it cannot coexist with the Permanent RAM.
-  ///
   TEMPORARY_RAM_MIGRATION   TemporaryRamMigration;
 } TEMPORARY_RAM_SUPPORT_PPI;
 

@@ -46,22 +46,17 @@ UINT32
   IN EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL    *This
   );
 
-/**
-  @par Protocol Description:
-  When installed, the Driver Family Override Protocol produces a GUID that represets 
-  a family of drivers.  Drivers with the same GUID are members of the same family 
-  When drivers are connected to controllers, drivers with a higher revision value 
-  in the same driver family are connected with a higher priority than drivers 
-  with a lower revision value in the same driver family.  The EFI Boot Service
-  Connect Controller uses five rules to build a prioritied list of drivers when 
-  a request is made to connect a driver to a controller.  The Driver Family Protocol
-  rule is between the Platform Specific Driver Override Protocol and above the 
-  Bus Specific Driver Override Protocol.  
-
-  @param GetVersion
-  This function returns the version value associated with the driver specified by This.
-
-**/
+///
+/// When installed, the Driver Family Override Protocol produces a GUID that represets 
+/// a family of drivers.  Drivers with the same GUID are members of the same family 
+/// When drivers are connected to controllers, drivers with a higher revision value 
+/// in the same driver family are connected with a higher priority than drivers 
+/// with a lower revision value in the same driver family.  The EFI Boot Service
+/// Connect Controller uses five rules to build a prioritied list of drivers when 
+/// a request is made to connect a driver to a controller.  The Driver Family Protocol
+/// rule is between the Platform Specific Driver Override Protocol and above the 
+/// Bus Specific Driver Override Protocol.  
+///
 struct _EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL {
   EFI_DRIVER_FAMILY_OVERRIDE_GET_VERSION GetVersion;
 };

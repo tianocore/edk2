@@ -91,12 +91,9 @@ EFI_STATUS
   OUT CHAR16                                                **Buffer
   );
 
-/**
-  Interface structure for the Driver Diagnostics2 Protocol.
-
-  @par Protocol Description:
-  Used to perform diagnostics on a controller that an EFI Driver is managing.
-**/
+///
+/// Used to perform diagnostics on a controller that an EFI Driver is managing.
+///
 struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL {
   EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS RunDiagnostics;
   ///

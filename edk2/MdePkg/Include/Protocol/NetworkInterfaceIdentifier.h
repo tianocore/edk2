@@ -43,11 +43,10 @@ typedef enum {
   EfiNetworkInterfaceUndi = 1
 } EFI_NETWORK_PROTOCOL_TYPE;
 
-/**  
-  @par Protocol Description:
-  An optional protocol that is used to describe details about the software 
-  layer that is used to produce the Simple Network Protocol. 
-**/
+///
+/// An optional protocol that is used to describe details about the software 
+/// layer that is used to produce the Simple Network Protocol. 
+///
 struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
   ///
   /// The revision of the EFI_NETWORK_INTERFACE_IDENTIFIER protocol.

@@ -813,13 +813,9 @@ EFI_STATUS
   IN  OUT    CONST EFI_GUID      **Guid
   );
 
-//
-// Interface structure for the PCD Protocol
-//
-/**
-  @par Protocol Description:
-  This service abstracts the ability to set/get Platform Configuration Database (PCD).
-**/
+///
+/// This service abstracts the ability to set/get Platform Configuration Database (PCD).
+///
 typedef struct {
   PCD_PROTOCOL_SET_SKU              SetSku;
 

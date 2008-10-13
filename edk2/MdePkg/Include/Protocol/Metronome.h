@@ -57,21 +57,11 @@ EFI_STATUS
    IN UINT32                        TickNumber
   );
 
-/**
-  Interface stucture for the Metronome Architectural Protocol.
-
-  @par Protocol Description:
-  This protocol provides access to a known time source in the platform to the
-  core.  The core uses this known time source to produce core services that 
-  require calibrated delays.  
-
-  @param WaitForTick
-  Waits for a specified number of ticks from a known time source 
-  in the platform.  The actual time passed between entry of this 
-  function and the first tick is between 0 and TickPeriod 100 nS 
-  units.  If you want to guarantee that at least TickPeriod time 
-  has elapsed, wait for two ticks.
-**/
+///
+/// This protocol provides access to a known time source in the platform to the
+/// core.  The core uses this known time source to produce core services that 
+/// require calibrated delays.  
+///
 struct _EFI_METRONOME_ARCH_PROTOCOL {
   EFI_METRONOME_WAIT_FOR_TICK  WaitForTick;
   

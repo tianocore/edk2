@@ -76,10 +76,9 @@ EFI_STATUS
   IN VOID                             *Buffer OPTIONAL
   );
 
-/**  
-  @par Protocol Description:
-  The EFI_LOAD_FILE_PROTOCOL is a simple protocol used to obtain files from arbitrary devices.
-**/
+///
+/// The EFI_LOAD_FILE_PROTOCOL is a simple protocol used to obtain files from arbitrary devices.
+///
 struct _EFI_LOAD_FILE_PROTOCOL {
   EFI_LOAD_FILE LoadFile;
 };

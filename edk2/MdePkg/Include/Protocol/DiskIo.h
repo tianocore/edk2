@@ -98,10 +98,9 @@ EFI_STATUS
 /// 
 #define EFI_DISK_IO_INTERFACE_REVISION  EFI_DISK_IO_PROTOCOL_REVISION
 
-/**
-  @par Protocol Description:
-  This protocol is used to abstract Block I/O interfaces.
-**/
+///
+/// This protocol is used to abstract Block I/O interfaces.
+///
 struct _EFI_DISK_IO_PROTOCOL {
   ///
   /// The revision to which the disk I/O interface adheres. All future

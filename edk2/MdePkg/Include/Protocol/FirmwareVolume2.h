@@ -705,20 +705,19 @@ EFI_STATUS
 );
 
 
-/**
-  @par Protocol Description:
-  The Firmware Volume Protocol contains the file-level
-  abstraction to the firmware volume as well as some firmware
-  volume attribute reporting and configuration services. The
-  Firmware Volume Protocol is the interface used by all parts of
-  DXE that are not directly involved with managing the firmware
-  volume itself. This abstraction allows many varied types of
-  firmware volume implementations. A firmware volume may be a
-  flash device or it may be a file in the UEFI system partition,
-  for example. This level of firmware volume implementation
-  detail is not visible to the consumers of the Firmware Volume
-  Protocol.
-**/
+///
+/// The Firmware Volume Protocol contains the file-level
+/// abstraction to the firmware volume as well as some firmware
+/// volume attribute reporting and configuration services. The
+/// Firmware Volume Protocol is the interface used by all parts of
+/// DXE that are not directly involved with managing the firmware
+/// volume itself. This abstraction allows many varied types of
+/// firmware volume implementations. A firmware volume may be a
+/// flash device or it may be a file in the UEFI system partition,
+/// for example. This level of firmware volume implementation
+/// detail is not visible to the consumers of the Firmware Volume
+/// Protocol.
+///
 struct _EFI_FIRMWARE_VOLUME2_PROTOCOL {
   EFI_FV_GET_ATTRIBUTES   GetVolumeAttributes;
   EFI_FV_SET_ATTRIBUTES   SetVolumeAttributes;

@@ -397,11 +397,10 @@ EFI_STATUS
   OUT EFI_BIS_DATA            **SignatureInfo      
   );
 
-/**
-  @par Protocol Description:
-  The EFI_BIS_PROTOCOL is used to check a digital signature of a data block against a digital
-  certificate for the purpose of an integrity and authorization check.
-**/
+///
+/// The EFI_BIS_PROTOCOL is used to check a digital signature of a data block against a digital
+/// certificate for the purpose of an integrity and authorization check.
+///
 struct _EFI_BIS_PROTOCOL {
   EFI_BIS_INITIALIZE                                  Initialize;
   EFI_BIS_SHUTDOWN                                    Shutdown;

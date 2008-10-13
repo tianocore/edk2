@@ -491,10 +491,9 @@ EFI_STATUS
   OUT       EFI_HANDLE                *DriverHandle
 );
 
-/**
-  @par Protocol Description:
-  Database manager for HII-related data structures.
-**/
+///
+/// Database manager for HII-related data structures.
+///
 struct _EFI_HII_DATABASE_PROTOCOL {
   EFI_HII_DATABASE_NEW_PACK           NewPackageList;
   EFI_HII_DATABASE_REMOVE_PACK        RemovePackageList;

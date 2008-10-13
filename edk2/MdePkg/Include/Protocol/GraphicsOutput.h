@@ -190,16 +190,18 @@ typedef struct {
   UINTN                                  FrameBufferSize;
 } EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE;
 
-/**
-  @par Protocol Description:
-  Provides a basic abstraction to set video modes and copy pixels to and from 
-  the graphics controller's frame buffer. The linear address of the hardware 
-  frame buffer is also exposed so software can write directly to the video hardware.
-**/
+///
+/// Provides a basic abstraction to set video modes and copy pixels to and from 
+/// the graphics controller's frame buffer. The linear address of the hardware 
+/// frame buffer is also exposed so software can write directly to the video hardware.
+///
 struct _EFI_GRAPHICS_OUTPUT_PROTOCOL {
   EFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE  QueryMode;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE    SetMode;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_BLT         Blt;
+  ///
+  /// Pointer to EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE data.
+  ///
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE        *Mode;
 };
 

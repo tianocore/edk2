@@ -314,14 +314,13 @@ EFI_STATUS
 // 
 #define EFI_FILE_REVISION   EFI_FILE_PROTOCOL_REVISION
 
-/**  
-  @par Protocol Description:
-  The EFI_FILE_PROTOCOL provides file IO access to supported file systems.
-  An EFI_FILE_PROTOCOL provides access to a file's or directory's contents, 
-  and is also a reference to a location in the directory tree of the file system 
-  in which the file resides. With any given file handle, other files may be opened 
-  relative to this file's location, yielding new file handles.
-**/
+///
+/// The EFI_FILE_PROTOCOL provides file IO access to supported file systems.
+/// An EFI_FILE_PROTOCOL provides access to a file's or directory's contents, 
+/// and is also a reference to a location in the directory tree of the file system 
+/// in which the file resides. With any given file handle, other files may be opened 
+/// relative to this file's location, yielding new file handles.
+///
 struct _EFI_FILE_PROTOCOL {
   ///
   /// The version of the EFI_FILE_PROTOCOL interface. The version specified 

@@ -146,13 +146,9 @@ EFI_STATUS
   );
 
 
-/**
-  Interface structure for the Driver Configuration Protocol.
-
-  @par Protocol Description:  
-  Used to set configuration options for a controller that an EFI Driver is managing.
-
-**/
+///
+/// Used to set configuration options for a controller that an EFI Driver is managing.
+///
 struct _EFI_DRIVER_CONFIGURATION_PROTOCOL {
   EFI_DRIVER_CONFIGURATION_SET_OPTIONS    SetOptions;
   EFI_DRIVER_CONFIGURATION_OPTIONS_VALID  OptionsValid;

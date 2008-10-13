@@ -715,109 +715,68 @@ struct _EFI_PEI_SERVICES {
   ///
   /// The table header for the PEI Services Table.
   ///
-  EFI_TABLE_HEADER            Hdr;
-  ///
-  /// Installs an interface in the PEI PEIM-to-PEIM
-  /// Interface (PPI) database by GUID.
-  ///
-  EFI_PEI_INSTALL_PPI         InstallPpi;
-  ///
-  /// Reinstalls an interface in the PEI PPI database by GUID.
-  ///
-  EFI_PEI_REINSTALL_PPI       ReInstallPpi;
-  ///
-  /// Locates an interface in the PEI PPI database by GUID.
-  ///
-  EFI_PEI_LOCATE_PPI          LocatePpi;
-  ///
-  /// Installs the notification service to be called back
-  /// upon the installation or reinstallation of a given interface.
-  ///
-  EFI_PEI_NOTIFY_PPI          NotifyPpi;
-  ///
-  /// Returns the present value of the boot mode.
-  ///
-  EFI_PEI_GET_BOOT_MODE       GetBootMode;
-  ///
-  /// Sets the value of the boot mode.
-  ///
-  EFI_PEI_SET_BOOT_MODE       SetBootMode;
-  ///
-  /// Returns the pointer to the list of Hand-Off Blocks (HOBs) in memory.
-  ///
-  EFI_PEI_GET_HOB_LIST        GetHobList;
-  ///
-  /// Abstracts the creation of HOB headers.
-  ///
-  EFI_PEI_CREATE_HOB          CreateHob;
-  ///
-  /// Discovers instances of firmware volumes in the system.
-  ///
+  EFI_TABLE_HEADER                Hdr;
+
+  //
+  // PPI Functions
+  //
+  EFI_PEI_INSTALL_PPI             InstallPpi;
+  EFI_PEI_REINSTALL_PPI           ReInstallPpi;
+  EFI_PEI_LOCATE_PPI              LocatePpi;
+  EFI_PEI_NOTIFY_PPI              NotifyPpi;
+
+  //
+  // Boot Mode Functions
+  //
+  EFI_PEI_GET_BOOT_MODE           GetBootMode;
+  EFI_PEI_SET_BOOT_MODE           SetBootMode;
+
+  //
+  // HOB Functions
+  //
+  EFI_PEI_GET_HOB_LIST            GetHobList;
+  EFI_PEI_CREATE_HOB              CreateHob;
+
+  //
+  // Firmware Volume Functions
+  //
   EFI_PEI_FFS_FIND_NEXT_VOLUME2   FfsFindNextVolume;
-  ///
-  /// Discovers instances of firmware files in the system.
-  ///
   EFI_PEI_FFS_FIND_NEXT_FILE2     FfsFindNextFile;
-  ///
-  /// Searches for a section in a firmware file.
-  ///
   EFI_PEI_FFS_FIND_SECTION_DATA2  FfsFindSectionData;
-  ///
-  /// Registers the found memory configuration with the PEI Foundation.
-  ///
-  EFI_PEI_INSTALL_PEI_MEMORY  InstallPeiMemory;
-  ///
-  /// Allocates memory ranges that are managed by the PEI Foundation.
-  ///
-  EFI_PEI_ALLOCATE_PAGES      AllocatePages;
-  ///
-  /// Allocate memory ranges that are managed by the PEI Foundation.
-  ///
-  EFI_PEI_ALLOCATE_POOL       AllocatePool;
-  ///
-  /// Copies the contents of one buffer to another buffer.
-  ///
-  EFI_PEI_COPY_MEM            CopyMem;
-  ///
-  /// Fills a buffer with a specified value.
-  ///
-  EFI_PEI_SET_MEM             SetMem;
-  ///
-  /// Provides an interface that a PEIM can call to report a status code.
-  ///
-  EFI_PEI_REPORT_STATUS_CODE  ReportStatusCode;
-  ///
-  /// Resets the entire platform.
-  ///
-  EFI_PEI_RESET_SYSTEM        ResetSystem;
-  ///
-  /// Provides an interface that a PEIM can call to execute
-  /// an I/O transaction. This interface is installed by provider
-  /// PEIM by copying the interface into the PEI Service table.
-  ///
-  EFI_PEI_CPU_IO_PPI          *CpuIo;
-  ///
-  /// Provides an interface that a PEIM can call to execute PCI
-  /// Configuration transactions. This interface is installed by
-  /// provider PEIM by copying the interface into the EFI_PEI_SERVICES table.
-  ///
-  EFI_PEI_PCI_CFG2_PPI        *PciCfg;
-  ///
-  /// Discovers firmware files within a volume by name.
-  ///
-  EFI_PEI_FFS_FIND_BY_NAME    FfsFindFileByName;
-  ///
-  /// Return information about a particular file.
-  ///
-  EFI_PEI_FFS_GET_FILE_INFO   FfsGetFileInfo;
-  ///
-  /// Return information about a particular volume.
-  ///
-  EFI_PEI_FFS_GET_VOLUME_INFO FfsGetVolumeInfo;
-  ///
-  /// Register a driver to be re-loaded when memory is available.
-  ///
-  EFI_PEI_REGISTER_FOR_SHADOW RegisterForShadow;
+
+  //
+  // PEI Memory Functions
+  //
+  EFI_PEI_INSTALL_PEI_MEMORY      InstallPeiMemory;
+  EFI_PEI_ALLOCATE_PAGES          AllocatePages;
+  EFI_PEI_ALLOCATE_POOL           AllocatePool;
+  EFI_PEI_COPY_MEM                CopyMem;
+  EFI_PEI_SET_MEM                 SetMem;
+
+  //
+  // Status Code
+  //
+  EFI_PEI_REPORT_STATUS_CODE      ReportStatusCode;
+
+  //
+  // Reset
+  //
+  EFI_PEI_RESET_SYSTEM            ResetSystem;
+
+  //
+  // (the following interfaces are installed by publishing PEIM)
+  // I/O Abstractions
+  //
+  EFI_PEI_CPU_IO_PPI              *CpuIo;
+  EFI_PEI_PCI_CFG2_PPI            *PciCfg;
+
+  //
+  // Future Installed Services
+  //
+  EFI_PEI_FFS_FIND_BY_NAME        FfsFindFileByName;
+  EFI_PEI_FFS_GET_FILE_INFO       FfsGetFileInfo;
+  EFI_PEI_FFS_GET_VOLUME_INFO     FfsGetVolumeInfo;
+  EFI_PEI_REGISTER_FOR_SHADOW     RegisterForShadow;
 };
 
 
