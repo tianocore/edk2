@@ -358,11 +358,10 @@ EFI_STATUS
   OUT VOID                                     **Resources
   );
 
-/**  
-  @par Protocol Description:
-  Provides the basic Memory, I/O, PCI configuration, and DMA interfaces that are 
-  used to abstract accesses to PCI controllers behind a PCI Root Bridge Controller. 
-**/
+///
+/// Provides the basic Memory, I/O, PCI configuration, and DMA interfaces that are 
+/// used to abstract accesses to PCI controllers behind a PCI Root Bridge Controller. 
+///
 struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL {
   ///
   /// The EFI_HANDLE of the PCI Host Bridge of which this PCI Root Bridge is a member.

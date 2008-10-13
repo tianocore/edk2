@@ -22,13 +22,12 @@
     0xbd8c1056, 0x9f36, 0x44ec, {0x92, 0xa8, 0xa6, 0x33, 0x7f, 0x81, 0x79, 0x86 } \
   }
 
-/**
-  @par Protocol Description:
-  This protocol contains the EDID information for an active video output device. This is either the
-  EDID information retrieved from the EFI_EDID_OVERRIDE_PROTOCOL if an override is
-  available, or an identical copy of the EDID information from the
-  EFI_EDID_DISCOVERED_PROTOCOL if no overrides are available.
-**/
+///
+/// This protocol contains the EDID information for an active video output device. This is either the
+/// EDID information retrieved from the EFI_EDID_OVERRIDE_PROTOCOL if an override is
+/// available, or an identical copy of the EDID information from the
+/// EFI_EDID_DISCOVERED_PROTOCOL if no overrides are available.
+///
 typedef struct {
   ///
   /// The size, in bytes, of the Edid buffer. 0 if no EDID information

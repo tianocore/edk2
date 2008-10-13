@@ -474,14 +474,13 @@ EFI_STATUS
   IN OUT UINT64                       *Length
   );
 
-/**  
-  @par Protocol Description:
-  The EFI_PCI_IO_PROTOCOL provides the basic Memory, I/O, PCI configuration, 
-  and DMA interfaces that are used to abstract accesses to PCI controllers. 
-  There is one EFI_PCI_IO_PROTOCOL instance for each PCI controller on a PCI bus. 
-  A device driver that wishes to manage a PCI controller in a system will have to 
-  retrieve the EFI_PCI_IO_PROTOCOL instance that is associated with the PCI controller. 
-**/
+///
+/// The EFI_PCI_IO_PROTOCOL provides the basic Memory, I/O, PCI configuration, 
+/// and DMA interfaces that are used to abstract accesses to PCI controllers. 
+/// There is one EFI_PCI_IO_PROTOCOL instance for each PCI controller on a PCI bus. 
+/// A device driver that wishes to manage a PCI controller in a system will have to 
+/// retrieve the EFI_PCI_IO_PROTOCOL instance that is associated with the PCI controller. 
+///
 struct _EFI_PCI_IO_PROTOCOL {
   EFI_PCI_IO_PROTOCOL_POLL_IO_MEM         PollMem;
   EFI_PCI_IO_PROTOCOL_POLL_IO_MEM         PollIo;

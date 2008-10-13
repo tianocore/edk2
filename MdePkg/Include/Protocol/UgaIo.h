@@ -162,10 +162,9 @@ typedef UGA_STATUS
   IN OUT PUGA_IO_REQUEST pIoRequest
   );
 
-/**  
-  @par Protocol Description:
-  Provides a basic abstraction to send I/O requests to the graphics device and any of its children.
-**/
+///
+/// Provides a basic abstraction to send I/O requests to the graphics device and any of its children.
+///
 struct _EFI_UGA_IO_PROTOCOL {
   EFI_UGA_IO_PROTOCOL_CREATE_DEVICE CreateDevice;
   EFI_UGA_IO_PROTOCOL_DELETE_DEVICE DeleteDevice;

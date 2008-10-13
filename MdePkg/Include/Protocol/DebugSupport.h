@@ -613,16 +613,15 @@ EFI_STATUS
   IN UINT64                              Length
   );
 
-//
-// DebugSupport protocol definition
-//
-/**
-  @par Protocol Description:
-  This protocol provides the services to allow the debug agent to register 
-  callback functions that are called either periodically or when specific 
-  processor exceptions occur.
-**/
+///
+/// This protocol provides the services to allow the debug agent to register 
+/// callback functions that are called either periodically or when specific 
+/// processor exceptions occur.
+///
 struct _EFI_DEBUG_SUPPORT_PROTOCOL {
+  ///
+  /// Declares the processor architecture for this instance of the EFI Debug Support protocol.
+  ///
   EFI_INSTRUCTION_SET_ARCHITECTURE  Isa;
   EFI_GET_MAXIMUM_PROCESSOR_INDEX   GetMaximumProcessorIndex;
   EFI_REGISTER_PERIODIC_CALLBACK    RegisterPeriodicCallback;

@@ -88,12 +88,10 @@ EFI_PXE_BASE_CODE_CALLBACK_STATUS
   IN EFI_PXE_BASE_CODE_PACKET             *Packet     OPTIONAL
   );
 
-/**  
-  @par Protocol Description:
-  Protocol that is invoked when the PXE Base Code Protocol is about 
-  to transmit, has received, or is waiting to receive a packet.
-
-**/
+///
+/// Protocol that is invoked when the PXE Base Code Protocol is about 
+/// to transmit, has received, or is waiting to receive a packet.
+///
 struct _EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL {
   ///
   ///  The revision of the EFI_PXE_BASE_CODE_PROTOCOL. All future revisions must 

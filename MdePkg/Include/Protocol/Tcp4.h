@@ -475,14 +475,13 @@ EFI_STATUS
   IN EFI_TCP4_PROTOCOL                   *This
   );
 
-/**  
-  @par Protocol Description:
-  The EFI_TCP4_PROTOCOL defines the EFI TCPv4 Protocol child to be used by 
-  any network drivers or applications to send or receive data stream. 
-  It can either listen on a specified port as a service or actively connected 
-  to remote peer as a client. Each instance has its own independent settings, 
-  such as the routing table.
-**/
+///
+/// The EFI_TCP4_PROTOCOL defines the EFI TCPv4 Protocol child to be used by 
+/// any network drivers or applications to send or receive data stream. 
+/// It can either listen on a specified port as a service or actively connected 
+/// to remote peer as a client. Each instance has its own independent settings, 
+/// such as the routing table.
+///
 struct _EFI_TCP4_PROTOCOL {
   EFI_TCP4_GET_MODE_DATA                 GetModeData;
   EFI_TCP4_CONFIGURE                     Configure;

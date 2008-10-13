@@ -108,14 +108,10 @@ EFI_STATUS
   IN  EFI_HANDLE                            *ChildHandleBuffer OPTIONAL
   );
 
-//
-// Interface structure for the ControllerHandle Driver Protocol
-//
-/**
-  @par Protocol Description:
-  This protocol provides the services required to determine if a driver supports a given controller. 
-  If a controller is supported, then it also provides routines to start and stop the controller.
-**/
+///
+/// This protocol provides the services required to determine if a driver supports a given controller. 
+/// If a controller is supported, then it also provides routines to start and stop the controller.
+///
 struct _EFI_DRIVER_BINDING_PROTOCOL {
   EFI_DRIVER_BINDING_SUPPORTED  Supported;
   EFI_DRIVER_BINDING_START      Start;

@@ -479,10 +479,9 @@ EFI_STATUS
   IN CONST  EFI_STRING            String OPTIONAL
 );
 
-/**
-  @par Protocol Description:
-  The protocol provides the service to retrieve the font informations.
-**/
+///
+/// The protocol provides the service to retrieve the font informations.
+///
 struct _EFI_HII_FONT_PROTOCOL {
   EFI_HII_STRING_TO_IMAGE     StringToImage;
   EFI_HII_STRING_ID_TO_IMAGE  StringIdToImage;

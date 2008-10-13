@@ -151,16 +151,10 @@ EFI_STATUS
   IN  UINTN                                   Delta         OPTIONAL
   );
 
-/** 
-  This protocol provides a basic abstraction to set video modes and 
-  copy pixels to and from the graphics controller's frame buffer. 
-
-  @par Protocol Description:
-  The EFI_UGA_DRAW_PROTOCOL provides a software abstraction to allow pixels to be drawn
-  directly to the frame buffer. The EFI_UGA_DRAW_PROTOCOL is designed to be lightweight and
-  to support the basic needs of graphics output prior to Operating System boot.  
-
-**/
+///
+/// This protocol provides a basic abstraction to set video modes and 
+/// copy pixels to and from the graphics controller's frame buffer. 
+///
 struct _EFI_UGA_DRAW_PROTOCOL {
   EFI_UGA_DRAW_PROTOCOL_GET_MODE  GetMode;
   EFI_UGA_DRAW_PROTOCOL_SET_MODE  SetMode;

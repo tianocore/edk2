@@ -217,14 +217,12 @@ EFI_STATUS
   IN BOOLEAN              ExtendedVerification
   );    
 
-/**  
-  @par Protocol Description:
-  The EFI_TAPE_IO_PROTOCOL provides basic sequential operations for tape devices. 
-  These include read, write, rewind, space, write filemarks and reset functions. 
-  Per this specification, a boot application uses the services of this protocol 
-  to load the bootloader image from tape.
-
-**/
+///
+/// The EFI_TAPE_IO_PROTOCOL provides basic sequential operations for tape devices. 
+/// These include read, write, rewind, space, write filemarks and reset functions. 
+/// Per this specification, a boot application uses the services of this protocol 
+/// to load the bootloader image from tape.
+///
 struct _EFI_TAPE_IO_PROTOCOL {
   EFI_TAPE_READ           TapeRead;
   EFI_TAPE_WRITE          TapeWrite;

@@ -121,20 +121,17 @@ EFI_STATUS
   );
 
 
-/**
-  Interface stucture for the Watchdog Timer Architectural Protocol.
-
-  @par Protocol Description:
-  This protocol provides the services required to implement the Boot Service 
-  SetWatchdogTimer().  It provides a service to set the amount of time to wait 
-  before firing the watchdog timer, and it also provides a service to register 
-  a handler that is invoked when the watchdog timer fires.  This protocol can 
-  implement the watchdog timer by using the event and timer Boot Services, or 
-  it can make use of custom hardware.  When the watchdog timer fires, control 
-  will be passed to a handler if one has been registered.  If no handler has 
-  been registered, or the registered handler returns, then the system will be 
-  reset by calling the Runtime Service ResetSystem().
-**/
+///
+/// This protocol provides the services required to implement the Boot Service 
+/// SetWatchdogTimer().  It provides a service to set the amount of time to wait 
+/// before firing the watchdog timer, and it also provides a service to register 
+/// a handler that is invoked when the watchdog timer fires.  This protocol can 
+/// implement the watchdog timer by using the event and timer Boot Services, or 
+/// it can make use of custom hardware.  When the watchdog timer fires, control 
+/// will be passed to a handler if one has been registered.  If no handler has 
+/// been registered, or the registered handler returns, then the system will be 
+/// reset by calling the Runtime Service ResetSystem().
+///
 struct _EFI_WATCHDOG_TIMER_ARCH_PROTOCOL {
   EFI_WATCHDOG_TIMER_REGISTER_HANDLER  RegisterHandler;
   EFI_WATCHDOG_TIMER_SET_TIMER_PERIOD  SetTimerPeriod;

@@ -300,12 +300,12 @@ EFI_STATUS
 );
 
 
-/**
-  The EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL is used on the ConsoleIn
-  device. It is an extension to the Simple Text Input protocol
-  which allows a variety of extended shift state information to be
-  returned.
-**/
+///
+/// The EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL is used on the ConsoleIn
+/// device. It is an extension to the Simple Text Input protocol
+/// which allows a variety of extended shift state information to be
+/// returned.
+///
 struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL{
   EFI_INPUT_RESET_EX              Reset;
   EFI_INPUT_READ_KEY_EX           ReadKeyStrokeEx;

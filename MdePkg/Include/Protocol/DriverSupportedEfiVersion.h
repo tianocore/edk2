@@ -22,14 +22,13 @@
   { 0x5c198761, 0x16a8, 0x4e69, { 0x97, 0x2c, 0x89, 0xd6, 0x79, 0x54, 0xf8, 0x1d } }
 
 
-/**
-  @par Protocol Description:  
-  The EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL provides a
-  mechanism for an EFI driver to publish the version of the EFI   
-  specification it conforms to. This protocol must be placed on   
-  the drivers image handle when the driver's entry point is   
-  called.
-**/ 
+///
+/// The EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL provides a
+/// mechanism for an EFI driver to publish the version of the EFI   
+/// specification it conforms to. This protocol must be placed on   
+/// the drivers image handle when the driver's entry point is   
+/// called.
+///
 typedef struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
   ///
   /// The size, in bytes, of the entire structure. Future versions of this 

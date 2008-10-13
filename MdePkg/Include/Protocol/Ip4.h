@@ -394,11 +394,10 @@ EFI_STATUS
   IN EFI_IP4_PROTOCOL          *This
   );  
 
-/**  
-  @par Protocol Description:
-  The EFI IPv4 Protocol implements a simple packet-oriented interface that can be 
-  used by drivers, daemons, and applications to transmit and receive network packets.
-**/
+///
+/// The EFI IPv4 Protocol implements a simple packet-oriented interface that can be 
+/// used by drivers, daemons, and applications to transmit and receive network packets.
+///
 struct _EFI_IP4_PROTOCOL {
   EFI_IP4_GET_MODE_DATA        GetModeData;
   EFI_IP4_CONFIGURE            Configure;

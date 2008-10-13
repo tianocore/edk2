@@ -128,11 +128,10 @@ EFI_STATUS
   IN OUT EFI_HASH_OUTPUT          *Hash
   );    
 
-/**
-  @par Protocol Description:
-  This protocol allows creating a hash of an arbitrary message digest 
-  using one or more hash algorithms.
-**/
+///
+/// This protocol allows creating a hash of an arbitrary message digest 
+/// using one or more hash algorithms.
+///
 struct _EFI_HASH_PROTOCOL {
   EFI_HASH_GET_HASH_SIZE          GetHashSize;
   EFI_HASH_HASH                   Hash;

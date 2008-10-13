@@ -157,11 +157,10 @@ EFI_STATUS
   IN CONST  CHAR16                    *VariableName OPTIONAL
 );
 
-/**
-  @par Protocol Description: 
-  This interface will allow the caller to direct the configuration 
-  driver to use either the HII database or use the passed-in packet of data.
-**/
+///
+/// This interface will allow the caller to direct the configuration 
+/// driver to use either the HII database or use the passed-in packet of data.
+///
 struct _EFI_FORM_BROWSER2_PROTOCOL {
   EFI_SEND_FORM2         SendForm;
   EFI_BROWSER_CALLBACK2  BrowserCallback;

@@ -36,10 +36,6 @@
 /// There can be only one instance of this service in the system.
 ///
 typedef struct {
-  ///
-  /// Service that allows PEIMs to report status codes.
-  /// This function is defined in PiPeicis.h.
-  ///
   EFI_PEI_REPORT_STATUS_CODE  ReportStatusCode;
 } EFI_PEI_PROGRESS_CODE_PPI;
 

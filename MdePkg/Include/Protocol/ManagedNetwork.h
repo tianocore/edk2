@@ -289,11 +289,10 @@ EFI_STATUS
   IN EFI_MANAGED_NETWORK_PROTOCOL    *This
   );
 
-/**  
-  @par Protocol Description:
-  The MNP is used by network applications (and drivers) to 
-  perform raw (unformatted) asynchronous network packet I/O.
-**/
+///
+/// The MNP is used by network applications (and drivers) to 
+/// perform raw (unformatted) asynchronous network packet I/O.
+///
 struct _EFI_MANAGED_NETWORK_PROTOCOL {
   EFI_MANAGED_NETWORK_GET_MODE_DATA       GetModeData;
   EFI_MANAGED_NETWORK_CONFIGURE           Configure;

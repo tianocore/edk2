@@ -55,18 +55,14 @@ VOID
   IN EFI_BDS_ARCH_PROTOCOL  *This
   );
 
-/**
-  Interface stucture for the BDS Architectural Protocol.
-
-  @par Protocol Description:
-  The EFI_BDS_ARCH_PROTOCOL transfers control from DXE to an operating 
-  system or a system utility.  If there are not enough drivers initialized 
-  when this protocol is used to access the required boot device(s), then 
-  this protocol should add drivers to the dispatch queue and return control 
-  back to the dispatcher.  Once the required boot devices are available, then 
-  the boot device can be used to load and invoke an OS or a system utility.
-
-**/
+///
+/// The EFI_BDS_ARCH_PROTOCOL transfers control from DXE to an operating 
+/// system or a system utility.  If there are not enough drivers initialized 
+/// when this protocol is used to access the required boot device(s), then 
+/// this protocol should add drivers to the dispatch queue and return control 
+/// back to the dispatcher.  Once the required boot devices are available, then 
+/// the boot device can be used to load and invoke an OS or a system utility.
+///
 struct _EFI_BDS_ARCH_PROTOCOL {
   EFI_BDS_ENTRY Entry;
 };

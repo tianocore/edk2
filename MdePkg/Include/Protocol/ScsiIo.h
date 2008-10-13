@@ -215,10 +215,9 @@ EFI_STATUS
   IN EFI_EVENT                              Event  OPTIONAL
   );
 
-/**  
-  @par Protocol Description:
-  Provides services to manage and communicate with SCSI devices.
-**/
+///
+/// Provides services to manage and communicate with SCSI devices.
+///
 struct _EFI_SCSI_IO_PROTOCOL {
   EFI_SCSI_IO_PROTOCOL_GET_DEVICE_TYPE      GetDeviceType;
   EFI_SCSI_IO_PROTOCOL_GET_DEVICE_LOCATION  GetDeviceLocation;

@@ -104,11 +104,10 @@ EFI_STATUS
   IN UINTN                         TableKey
 );
 
-/**
-  @par Protocol Description:
-  The EFI_ACPI_TABLE_PROTOCOL provides the ability for a component
-  to install and uninstall ACPI tables from a platform.
-**/   
+///
+/// The EFI_ACPI_TABLE_PROTOCOL provides the ability for a component
+/// to install and uninstall ACPI tables from a platform.
+///
 struct _EFI_ACPI_TABLE_PROTOCOL {
   EFI_ACPI_TABLE_INSTALL_ACPI_TABLE   InstallAcpiTable;
   EFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE UninstallAcpiTable;

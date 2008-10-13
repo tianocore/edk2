@@ -119,20 +119,16 @@ EFI_STATUS
   IN EFI_HANDLE                                     DriverImageHandle
   );
 
-//
-// Interface structure for the Platform Driver Override Protocol
-//
-/**  
-  @par Protocol Description:
-  This protocol matches one or more drivers to a controller. A platform driver 
-  produces this protocol, and it is installed on a separate handle. This protocol 
-  is used by the ConnectController() boot service to select the best driver 
-  for a controller. All of the drivers returned by this protocol have a higher 
-  precedence than drivers found from an EFI Bus Specific Driver Override Protocol 
-  or drivers found from the general UEFI driver Binding search algorithm. If more 
-  than one driver is returned by this protocol, then the drivers are returned in 
-  order from highest precedence to lowest precedence.
-**/
+///
+/// This protocol matches one or more drivers to a controller. A platform driver 
+/// produces this protocol, and it is installed on a separate handle. This protocol 
+/// is used by the ConnectController() boot service to select the best driver 
+/// for a controller. All of the drivers returned by this protocol have a higher 
+/// precedence than drivers found from an EFI Bus Specific Driver Override Protocol 
+/// or drivers found from the general UEFI driver Binding search algorithm. If more 
+/// than one driver is returned by this protocol, then the drivers are returned in 
+/// order from highest precedence to lowest precedence.
+///
 struct _EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL {
   EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER       GetDriver;
   EFI_PLATFORM_DRIVER_OVERRIDE_GET_DRIVER_PATH  GetDriverPath;

@@ -95,10 +95,6 @@ EFI_STATUS
 /// therein.
 ///  
 struct _EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI {
-  ///  
-  /// Takes the GUIDed section as input and
-  /// produces the section stream data.
-  ///
   EFI_PEI_EXTRACT_GUIDED_SECTION ExtractSection;
 };
 

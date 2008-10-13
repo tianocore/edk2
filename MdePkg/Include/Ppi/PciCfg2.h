@@ -153,24 +153,17 @@ EFI_STATUS
   IN        VOID                      *ClearBits
 );
 
-/**
-  @par Ppi Description:
-  The EFI_PEI_PCI_CFG_PPI interfaces are used to abstract accesses to PCI
-  controllers behind a PCI root bridge controller.
-
-  @param Read     PCI read services.  See the Read() function description.
-
-  @param Write    PCI write services.  See the Write() function description.
-
-  @param Modify   PCI read-modify-write services.  See the Modify() function description.
-
-  @param Segment  The PCI bus segment which the specified functions will access.
-
-**/
+///
+/// The EFI_PEI_PCI_CFG_PPI interfaces are used to abstract accesses to PCI
+/// controllers behind a PCI root bridge controller.
+///
 struct _EFI_PEI_PCI_CFG2_PPI {
   EFI_PEI_PCI_CFG2_PPI_IO  Read;
   EFI_PEI_PCI_CFG2_PPI_IO  Write;
   EFI_PEI_PCI_CFG2_PPI_RW  Modify;
+  ///
+  /// The PCI bus segment which the specified functions will access.
+  ///
   UINT16                  Segment;
 };
 

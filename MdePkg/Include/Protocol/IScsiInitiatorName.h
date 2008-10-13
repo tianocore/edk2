@@ -71,10 +71,9 @@ typedef EFI_STATUS
   IN VOID                              *Buffer
   );  
 
-/**  
-  @par Protocol Description:
-  iSCSI Initiator Name Protocol for setting and obtaining the iSCSI Initiator Name. 
-**/
+///
+/// iSCSI Initiator Name Protocol for setting and obtaining the iSCSI Initiator Name. 
+///
 struct _EFI_ISCSI_INITIATOR_NAME_PROTOCOL {
   EFI_ISCSI_INITIATOR_NAME_GET         Get;
   EFI_ISCSI_INITIATOR_NAME_SET         Set;

@@ -156,9 +156,6 @@ EFI_STATUS
 /// discover where to begin dispatching PEIMs.
 ///
 struct _EFI_SEC_PLATFORM_INFORMATION_PPI {
-  ///
-  /// Conveys state information out of the SEC phase into PEI.
-  ///
   EFI_SEC_PLATFORM_INFORMATION  PlatformInformation;
 };
 

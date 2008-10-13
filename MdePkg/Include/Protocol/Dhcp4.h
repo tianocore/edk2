@@ -411,11 +411,10 @@ EFI_STATUS
   OUT EFI_DHCP4_PACKET_OPTION  *PacketOptionList[]  OPTIONAL
   );
 
-/**
-  @par Protocol Description:
-  This protocol is used to collect configuration information for the EFI IPv4 Protocol drivers
-  and to provide DHCPv4 server and PXE boot server discovery services.
-**/
+///
+/// This protocol is used to collect configuration information for the EFI IPv4 Protocol drivers
+/// and to provide DHCPv4 server and PXE boot server discovery services.
+///
 struct _EFI_DHCP4_PROTOCOL {
   EFI_DHCP4_GET_MODE_DATA      GetModeData;
   EFI_DHCP4_CONFIGURE          Configure;

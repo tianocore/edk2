@@ -255,13 +255,12 @@ EFI_STATUS
   );
 
 
-/**
-  @par Protocol Description:
-  The EFI_CPU_ARCH_PROTOCOL is used to abstract processor-specific functions from the DXE
-  Foundation. This includes flushing caches, enabling and disabling interrupts, hooking interrupt
-  vectors and exception vectors, reading internal processor timers, resetting the processor, and
-  determining the processor frequency.
-**/
+///
+/// The EFI_CPU_ARCH_PROTOCOL is used to abstract processor-specific functions from the DXE
+/// Foundation. This includes flushing caches, enabling and disabling interrupts, hooking interrupt
+/// vectors and exception vectors, reading internal processor timers, resetting the processor, and
+/// determining the processor frequency.
+///
 struct _EFI_CPU_ARCH_PROTOCOL {
   EFI_CPU_FLUSH_DATA_CACHE            FlushDataCache;
   EFI_CPU_ENABLE_INTERRUPT            EnableInterrupt;

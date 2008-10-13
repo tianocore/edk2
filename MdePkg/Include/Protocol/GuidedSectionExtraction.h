@@ -126,14 +126,13 @@ EFI_STATUS
 );
 
 
-/**
-  @par Protocol Description:
-  Typically, protocol interface structures are identified by associating them with a GUID. Each
-  instance of a protocol with a given GUID must have the same interface structure. While all instances
-  of the GUIDed Section Extraction Protocol must have the same interface structure, they do not all
-  have the same GUID. The GUID that is associated with an instance of the GUIDed Section
-  Extraction Protocol is used to correlate it with the GUIDed section type that it is intended to process.
-**/
+///
+/// Typically, protocol interface structures are identified by associating them with a GUID. Each
+/// instance of a protocol with a given GUID must have the same interface structure. While all instances
+/// of the GUIDed Section Extraction Protocol must have the same interface structure, they do not all
+/// have the same GUID. The GUID that is associated with an instance of the GUIDed Section
+/// Extraction Protocol is used to correlate it with the GUIDed section type that it is intended to process.
+///
 struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL {
   EFI_EXTRACT_GUIDED_SECTION  ExtractSection;
 };

@@ -468,15 +468,13 @@ EFI_STATUS
   );
 
 
-/**  
-  @par Protocol Description:
-  The EFI_USB_HC_PROTOCOL provides USB host controller management, basic data transactions
-  over a USB bus, and USB root hub access. A device driver that wishes to manage a USB bus in a
-  system retrieves the EFI_USB_HC_PROTOCOL instance that is associated with the USB bus to be
-  managed. A device handle for a USB host controller will minimally contain an
-  EFI_DEVICE_PATH_PROTOCOL instance, and an EFI_USB_HC_PROTOCOL instance. 
-
-**/
+///
+/// The EFI_USB_HC_PROTOCOL provides USB host controller management, basic data transactions
+/// over a USB bus, and USB root hub access. A device driver that wishes to manage a USB bus in a
+/// system retrieves the EFI_USB_HC_PROTOCOL instance that is associated with the USB bus to be
+/// managed. A device handle for a USB host controller will minimally contain an
+/// EFI_DEVICE_PATH_PROTOCOL instance, and an EFI_USB_HC_PROTOCOL instance. 
+///
 struct _EFI_USB_HC_PROTOCOL {
   EFI_USB_HC_PROTOCOL_RESET                       Reset;
   EFI_USB_HC_PROTOCOL_GET_STATE                   GetState;

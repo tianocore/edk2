@@ -473,14 +473,13 @@ EFI_STATUS
   OUT UINT16                        *TableSize
   );
 
-/**  
-  @par Protocol Description:
-  The EFI_USB_IO_PROTOCOL provides four basic transfers types described 
-  in the USB 1.1 Specification. These include control transfer, interrupt 
-  transfer, bulk transfer and isochronous transfer. The EFI_USB_IO_PROTOCOL 
-  also provides some basic USB device/controller management and configuration 
-  interfaces. A USB device driver uses the services of this protocol to manage USB devices.  
-**/
+///
+/// The EFI_USB_IO_PROTOCOL provides four basic transfers types described 
+/// in the USB 1.1 Specification. These include control transfer, interrupt 
+/// transfer, bulk transfer and isochronous transfer. The EFI_USB_IO_PROTOCOL 
+/// also provides some basic USB device/controller management and configuration 
+/// interfaces. A USB device driver uses the services of this protocol to manage USB devices.  
+///
 struct _EFI_USB_IO_PROTOCOL {
   //
   // IO transfer

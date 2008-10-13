@@ -65,9 +65,6 @@ EFI_STATUS
 /// compression sections will be ignored.
 ///
 struct _EFI_PEI_DECOMPRESS_PPI {
-  ///
-  /// Decompress a single compression section in a firmware file.
-  ///
   EFI_PEI_DECOMPRESS_DECOMPRESS Decompress;
 };
 

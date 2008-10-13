@@ -89,28 +89,11 @@ EFI_STATUS
   IN  EFI_DEVICE_PATH_PROTOCOL      *File
   );
 
-//
-// Interface stucture for the Timer Architectural Protocol
-//
-/**
-  @par Protocol Description:
-
-  The EFI_SECURITY_ARCH_PROTOCOL is used to abstract platform-specific policy
-  from the DXE core.  This includes locking flash upon failure to authenticate, 
-  attestation logging, and other exception operations.
-
-  The driver that produces the EFI_SECURITY_ARCH_PROTOCOL may also optionally 
-  install the EFI_SECURITY_POLICY_PROTOCOL_GUID onto a new handle with a NULL 
-  interface.  The existence of this GUID in the protocol database means that 
-  the GUIDed Section Extraction Protocol should authenticate the contents of 
-  an Authentication Section.  The expectation is that the GUIDed Section 
-  Extraction protocol will look for the existence of the EFI_SECURITY_POLICY_ 
-  PROTOCOL_GUID in the protocol database.  If it exists, then the publication 
-  thereof is taken as an injunction to attempt an authentication of any section 
-  wrapped in an Authentication Section.  See the Firmware File System 
-  Specification for details on the GUIDed Section Extraction Protocol and 
-  Authentication Sections.
-**/
+///
+/// The EFI_SECURITY_ARCH_PROTOCOL is used to abstract platform-specific policy
+/// from the DXE core.  This includes locking flash upon failure to authenticate, 
+/// attestation logging, and other exception operations.
+///
 struct _EFI_SECURITY_ARCH_PROTOCOL {
   EFI_SECURITY_FILE_AUTHENTICATION_STATE  FileAuthenticationState;
 };

@@ -66,9 +66,6 @@ EFI_STATUS
 /// will use this service to launch the known PEI module images.
 ///
 struct _EFI_PEI_LOAD_FILE_PPI {
-  ///
-  /// Loads a PEIM into memory for subsequent execution.
-  ///
   EFI_PEI_LOAD_FILE LoadFile;
 };
 

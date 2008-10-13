@@ -39,10 +39,6 @@
 /// This PPI provides provide a simple reset service. 
 ///
 typedef struct {
-  ///
-  /// A service to reset the entire platform.
-  /// This function is defined in PiPeicis.h.
-  ///
   EFI_PEI_RESET_SYSTEM  ResetSystem;
 } EFI_PEI_RESET_PPI;
 

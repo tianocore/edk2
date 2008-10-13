@@ -214,10 +214,9 @@ EFI_STATUS
 );
 
 
-/**
-  @par Protocol Description:
-  Services to manipulate the string.
-**/
+///
+/// Services to manipulate the string.
+///
 struct _EFI_HII_STRING_PROTOCOL {
   EFI_HII_NEW_STRING        NewString;
   EFI_HII_GET_STRING        GetString;
