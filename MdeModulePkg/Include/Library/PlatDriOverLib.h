@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _PLAT_DRI_OVER_LIB_H_
 #define _PLAT_DRI_OVER_LIB_H_
 
-#include <PiDxe.h>
 #include <Protocol/PlatformDriverOverride.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/DriverBinding.h>

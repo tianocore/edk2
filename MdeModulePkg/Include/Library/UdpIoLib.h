@@ -16,8 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _UDP4IO_H_
 #define _UDP4IO_H_
 
-#include <PiDxe.h>
-
 #include <Protocol/Udp4.h>
 
 #include <Library/UdpIoLib.h>

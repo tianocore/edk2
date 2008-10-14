@@ -22,7 +22,6 @@ Abstract:
 #ifndef _DPC_LIB_H_
 #define _DPC_LIB_H_
 
-#include <PiDxe.h>
 #include <Protocol/Dpc.h>
 
 /**

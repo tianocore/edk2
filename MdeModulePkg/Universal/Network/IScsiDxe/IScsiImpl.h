@@ -22,6 +22,8 @@ Abstract:
 #ifndef _ISCSI_IMPL_H_
 #define _ISCSI_IMPL_H_
 
+#include <Uefi.h>
+
 #include <Library/NetLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>

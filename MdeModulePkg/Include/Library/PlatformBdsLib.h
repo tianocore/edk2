@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __PLATFORM_BDS_LIB_H_
 #define __PLATFORM_BDS_LIB_H_
 
-#include <PiDxe.h>
 #include <Protocol/Bds.h>
 #include <Protocol/GenericMemoryTest.h>
 
