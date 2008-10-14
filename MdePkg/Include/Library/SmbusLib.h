@@ -30,7 +30,7 @@
 
 **/
 #define SMBUS_LIB_ADDRESS(SlaveAddress,Command,Length,Pec)  \
-  ( ((Pec) ? SMBUS_LIB_PEC_BIT: 0)      | \
+  ( ((Pec) ? BIT22: 0)                  | \
     (((SlaveAddress) & 0x7f) << 1)      | \
     (((Command)      & 0xff) << 8)      | \
     (((Length)       & 0x3f) << 16)       \
