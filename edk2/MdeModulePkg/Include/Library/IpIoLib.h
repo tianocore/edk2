@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _IP_IO_H_
 #define _IP_IO_H_
 
-#include <PiDxe.h>
 #include <Protocol/Ip4.h>
 #include <Library/IpIoLib.h>
 #include <Library/NetLib.h>

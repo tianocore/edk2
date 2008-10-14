@@ -20,6 +20,7 @@ Abstract:
 
 **/
 
+#include <Uefi.h>
 
 #include <Library/NetLib.h>
 #include <Library/DebugLib.h>

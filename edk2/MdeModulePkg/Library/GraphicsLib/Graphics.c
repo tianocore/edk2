@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#include <Uefi.h>
+#include <PiDxe.h>
 
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/OEMBadging.h>

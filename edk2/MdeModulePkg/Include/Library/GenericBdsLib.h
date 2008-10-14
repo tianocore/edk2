@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _GENERIC_BDS_LIB_H_
 #define _GENERIC_BDS_LIB_H_
 
-#include <PiDxe.h>
 #include <Protocol/HiiDatabase.h>
 #include <IndustryStandard/PeImage.h>
 
