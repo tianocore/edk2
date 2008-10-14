@@ -913,7 +913,7 @@ Returns:
 
 UINTN
 CountSeperatorsInString (
-  IN  const CHAR16   *String,
+  IN  CONST CHAR16   *String,
   IN  CHAR16         Seperator
   )
 /*++
