@@ -70,11 +70,11 @@ Returns:
   // Get the Fwh Information PPI
   //
   Status = (**PeiServices).LocatePpi (
-                            PeiServices,
+                            (const EFI_PEI_SERVICES **)PeiServices,
                             &gNtFwhPpiGuid, // GUID
                             0,              // INSTANCE
                             &PpiDescriptor, // EFI_PEI_PPI_DESCRIPTOR
-                            &FwhPpi         // PPI
+                            (VOID**)&FwhPpi         // PPI
                             );
   ASSERT_EFI_ERROR (Status);
 

@@ -168,7 +168,7 @@ Returns:
   //
   // Locate data hub protocol.
   //
-  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
+  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, (VOID**)&DataHub);
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Could not locate DataHub protocol.  %r\n", Status));

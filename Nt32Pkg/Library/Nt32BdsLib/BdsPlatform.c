@@ -320,7 +320,7 @@ Returns:
     // console directly.
     //
     BdsLibConnectAllDefaultConsoles ();
-    PlatformBdsDiagnostics (IGNORE, TRUE);
+    PlatformBdsDiagnostics ((EXTENDMEM_COVERAGE_LEVEL)IGNORE, TRUE);
 
     //
     // Perform some platform specific connect sequence
@@ -379,7 +379,7 @@ Returns:
       PlatformBdsNoConsoleAction ();
     }
 
-    PlatformBdsDiagnostics (IGNORE, TRUE);
+    PlatformBdsDiagnostics ((EXTENDMEM_COVERAGE_LEVEL)IGNORE, TRUE);
 
     //
     // Perform some platform specific connect sequence

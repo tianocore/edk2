@@ -69,11 +69,11 @@ Returns:
   DEBUG ((EFI_D_ERROR, "NT 32 WinNT Stuff PEIM Loaded\n"));
 
   Status = (**PeiServices).LocatePpi (
-                            PeiServices,
+                            (const EFI_PEI_SERVICES **)PeiServices,
                             &gPeiNtThunkPpiGuid,  // GUID
                             0,                    // INSTANCE
                             &PpiDescriptor,       // EFI_PEI_PPI_DESCRIPTOR
-                            &PeiNtService         // PPI
+                            (VOID**)&PeiNtService         // PPI
                             );
   ASSERT_EFI_ERROR (Status);
 

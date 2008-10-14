@@ -73,11 +73,11 @@ Returns:
   // Get the PEI NT Autoscan PPI
   //
   Status = (**PeiServices).LocatePpi (
-                            PeiServices,
+                            (const EFI_PEI_SERVICES **)PeiServices,
                             &gPeiNtAutoScanPpiGuid, // GUID
                             0,                      // INSTANCE
                             &PpiDescriptor,         // EFI_PEI_PPI_DESCRIPTOR
-                            &PeiNtService           // PPI
+                            (VOID**)&PeiNtService           // PPI
                             );
   ASSERT_EFI_ERROR (Status);
 
@@ -85,11 +85,11 @@ Returns:
   // Get the Memory Test PPI
   //
   Status = (**PeiServices).LocatePpi (
-                            PeiServices,
+                            (const EFI_PEI_SERVICES **)PeiServices,
                             &gPeiBaseMemoryTestPpiGuid,
                             0,
                             NULL,
-                            &MemoryTestPpi
+                            (VOID**)&MemoryTestPpi
                             );
   ASSERT_EFI_ERROR (Status);
 
@@ -124,7 +124,7 @@ Returns:
         //
         // Register the "tested" memory with the PEI Core
         //
-        Status = (**PeiServices).InstallPeiMemory (PeiServices, MemoryBase, MemorySize);
+        Status = (**PeiServices).InstallPeiMemory ((const EFI_PEI_SERVICES **)PeiServices, MemoryBase, MemorySize);
         ASSERT_EFI_ERROR (Status);
 
         Attributes |= EFI_RESOURCE_ATTRIBUTE_TESTED;

@@ -1080,10 +1080,10 @@ EFI_STATUS
 EFIAPI
 FvbProtocolWrite (
   IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  IN CONST EFI_LBA                                      Lba,
-  IN CONST UINTN                                        Offset,
-  IN OUT UINTN                                    *NumBytes,
-  IN CONST UINT8                                        *Buffer
+  IN       EFI_LBA                                      Lba,
+  IN       UINTN                                        Offset,
+  IN OUT   UINTN                                    *NumBytes,
+  IN       UINT8                                        *Buffer
   )
 /*++
 
@@ -1263,7 +1263,7 @@ Returns:
   Ptr           = (UINT16 *) FwVolHeader;
   Checksum      = 0;
   while (HeaderLength > 0) {
-    Checksum = Checksum + (*Ptr);
+    Checksum = (UINT16)(Checksum + (*Ptr));
     HeaderLength--;
     Ptr++;
   }
@@ -1492,7 +1492,7 @@ Returns:
       Status = gBS->HandleProtocol (
                       FwbHandle,
                       &gEfiFirmwareVolumeBlockProtocolGuid,
-                      &OldFwbInterface
+                      (VOID**)&OldFwbInterface
                       );
       ASSERT_EFI_ERROR (Status);
 
