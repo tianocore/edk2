@@ -536,7 +536,9 @@ Returns:
   EFI_STATUS  Status;
   UINTN       Result;
   EFI_HANDLE  Handle;
-
+  EFI_HANDLE  hSourceProcessHandle;
+  EFI_HANDLE  hSourceHandle;
+  EFI_HANDLE  hTargetProcessHandle;
   //
   // Make sure the Timer Architectural Protocol is not already installed in the system
   //
@@ -545,16 +547,19 @@ Returns:
   //
   // Get the CPU Architectural Protocol instance
   //
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, &mCpu);
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID**)&mCpu);
   ASSERT_EFI_ERROR (Status);
 
   //
   //  Get our handle so the timer tick thread can suspend
   //
+  hSourceProcessHandle = gWinNt->GetCurrentProcess ();
+  hSourceHandle        = gWinNt->GetCurrentThread ();
+  hTargetProcessHandle = gWinNt->GetCurrentProcess ();
   Result = gWinNt->DuplicateHandle (
-                    gWinNt->GetCurrentProcess (),
-                    gWinNt->GetCurrentThread (),
-                    gWinNt->GetCurrentProcess (),
+                    hSourceProcessHandle,
+                    hSourceHandle,
+                    hTargetProcessHandle,
                     &mNtMainThreadHandle,
                     0,
                     FALSE,

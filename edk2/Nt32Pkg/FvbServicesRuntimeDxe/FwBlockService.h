@@ -194,10 +194,10 @@ EFI_STATUS
 EFIAPI
 FvbProtocolWrite (
   IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  IN CONST EFI_LBA                                      Lba,
-  IN CONST UINTN                                        Offset,
-  IN OUT UINTN                                    *NumBytes,
-  IN CONST UINT8                                        *Buffer
+  IN       EFI_LBA                                      Lba,
+  IN       UINTN                                        Offset,
+  IN OUT   UINTN                                        *NumBytes,
+  IN       UINT8                                        *Buffer
   );
 
 EFI_STATUS

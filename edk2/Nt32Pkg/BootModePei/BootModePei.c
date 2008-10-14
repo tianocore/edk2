@@ -86,14 +86,14 @@ Returns:
   //
   BootMode  = BOOT_WITH_FULL_CONFIGURATION;
 
-  Status    = (**PeiServices).SetBootMode (PeiServices, (UINT8) BootMode);
+  Status    = (**PeiServices).SetBootMode ((const EFI_PEI_SERVICES **)PeiServices, (UINT8) BootMode);
   ASSERT_EFI_ERROR (Status);
 
-  Status = (**PeiServices).InstallPpi (PeiServices, &mPpiListBootMode);
+  Status = (**PeiServices).InstallPpi ((const EFI_PEI_SERVICES **)PeiServices, &mPpiListBootMode);
   ASSERT_EFI_ERROR (Status);
 
   if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    Status = (**PeiServices).InstallPpi (PeiServices, &mPpiListRecoveryBootMode);
+    Status = (**PeiServices).InstallPpi ((const EFI_PEI_SERVICES **)PeiServices, &mPpiListRecoveryBootMode);
     ASSERT_EFI_ERROR (Status);
   }
 

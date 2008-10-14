@@ -158,7 +158,6 @@ Returns:
   UINTN                 Index;
   UINTN                 Index1;
   UINTN                 Index2;
-  UINTN                 PeiIndex;
   CHAR16                *FileName;
   CHAR16                *FileNamePtr;
   BOOLEAN               Done;
@@ -185,7 +184,7 @@ Returns:
   gSystemMemoryCount  = CountSeperatorsInString (MemorySizeStr, '!') + 1;
   gSystemMemory       = calloc (gSystemMemoryCount, sizeof (NT_SYSTEM_MEMORY));
   if (gSystemMemory == NULL) {
-    printf ("ERROR : Can not allocate memory for %s.  Exiting.\n", MemorySizeStr);
+    wprintf (L"ERROR : Can not allocate memory for %s.  Exiting.\n", MemorySizeStr);
     exit (1);
   }
   //
@@ -194,7 +193,7 @@ Returns:
   gFdInfoCount  = CountSeperatorsInString (FirmwareVolumesStr, '!') + 1;
   gFdInfo       = calloc (gFdInfoCount, sizeof (NT_FD_INFO));
   if (gFdInfo == NULL) {
-    printf ("ERROR : Can not allocate memory for %s.  Exiting.\n", FirmwareVolumesStr);
+    wprintf (L"ERROR : Can not allocate memory for %s.  Exiting.\n", FirmwareVolumesStr);
     exit (1);
   }
   //
@@ -220,7 +219,7 @@ Returns:
     *StackPointer = 0x5AA55AA5;
   }
   
-  printf ("  SEC passing in %d bytes of temp RAM to PEI\n", InitialStackMemorySize);
+  wprintf (L"  SEC passing in %d bytes of temp RAM to PEI\n", InitialStackMemorySize);
 
   //
   // Open All the firmware volumes and remember the info in the gFdInfo global
@@ -233,7 +232,7 @@ Returns:
 
   StrCpy (FileNamePtr, (CHAR16*)FirmwareVolumesStr);
 
-  for (Done = FALSE, Index = 0, PeiIndex = 0, PeiCoreFile = NULL; !Done; Index++) {
+  for (Done = FALSE, Index = 0, PeiCoreFile = NULL; !Done; Index++) {
     FileName = FileNamePtr;
     for (Index1 = 0; (FileNamePtr[Index1] != '!') && (FileNamePtr[Index1] != 0); Index1++)
       ;
@@ -255,7 +254,7 @@ Returns:
               &gFdInfo[Index].Size
               );
     if (EFI_ERROR (Status)) {
-      printf ("ERROR : Can not open Firmware Device File %S (%r).  Exiting.\n", FileName, Status);
+      printf ("ERROR : Can not open Firmware Device File %S (0x%X).  Exiting.\n", FileName, Status);
       exit (1);
     }
 
@@ -275,7 +274,6 @@ Returns:
       //
       Status = SecFfsFindPeiCore ((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) gFdInfo[Index].Address, &PeiCoreFile);
       if (!EFI_ERROR (Status)) {
-        PeiIndex = Index;
         printf (" contains SEC Core");
       }
     }
@@ -476,7 +474,7 @@ Returns:
     //
     // Processes ASSERT ()
     //
-    printf ("ASSERT %s(%d): %s\n", Filename, LineNumber, Description);
+    printf ("ASSERT %s(%d): %s\n", Filename, (int)LineNumber, Description);
 
   } else if (ReportStatusCodeExtractDebugInfo (Data, &ErrorLevel, &Marker, &Format)) {
     //
@@ -571,7 +569,6 @@ Returns:
 --*/
 {
   EFI_STATUS                  Status;
-  EFI_PHYSICAL_ADDRESS        TopOfMemory;
   VOID                        *TopOfStack;
   UINT64                      PeiCoreSize;
   EFI_PHYSICAL_ADDRESS        PeiCoreEntryPoint;
@@ -582,7 +579,6 @@ Returns:
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
   //
-  TopOfMemory  = LargestRegion + LargestRegionSize;
   PeiStackSize = (UINTN)RShiftU64((UINT64)STACK_SIZE,1);
 
   //
@@ -595,7 +591,6 @@ Returns:
   // |-----------| <---- TemporaryRamBase
   // 
   TopOfStack  = (VOID *)(LargestRegion + PeiStackSize);
-  TopOfMemory = LargestRegion + PeiStackSize;
 
   //
   // Reservet space for storing PeiCore's parament in stack.

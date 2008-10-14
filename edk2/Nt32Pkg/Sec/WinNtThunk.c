@@ -47,6 +47,10 @@ Abstract:
 #pragma warning(disable : 4232)
 #pragma warning(disable : 4996)
 
+#if __INTEL_COMPILER
+#pragma warning ( disable : 144 )  
+#endif
+
 EFI_WIN_NT_THUNK_PROTOCOL mWinNtThunkTable = {
   EFI_WIN_NT_THUNK_PROTOCOL_SIGNATURE,
   GetProcAddress,

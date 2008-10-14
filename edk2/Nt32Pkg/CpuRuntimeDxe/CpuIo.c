@@ -319,7 +319,7 @@ Returns:
     Count = 1;
   }
 
-  Width = Width & 0x03;
+  Width = (EFI_CPU_IO_PROTOCOL_WIDTH)(Width & 0x03);
   if (Address - 1 + (1 << Width) * Count > Limit) {
     return EFI_UNSUPPORTED;
   }

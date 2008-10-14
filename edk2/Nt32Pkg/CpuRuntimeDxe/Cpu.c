@@ -254,9 +254,6 @@ Returns:
 // TODO:    This - add argument and description to function comment
 // TODO:    InitType - add argument and description to function comment
 {
-  CPU_ARCH_PROTOCOL_PRIVATE *Private;
-
-  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
@@ -291,7 +288,6 @@ Returns:
 // TODO:    InterruptType - add argument and description to function comment
 // TODO:    InterruptHandler - add argument and description to function comment
 {
-  CPU_ARCH_PROTOCOL_PRIVATE *Private;
 
   //
   // Do parameter checking for EFI spec conformance
@@ -302,7 +298,6 @@ Returns:
   //
   // Do nothing for Nt32 emulation
   //
-  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
@@ -381,8 +376,6 @@ Returns:
 // TODO:    Attributes - add argument and description to function comment
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
-  CPU_ARCH_PROTOCOL_PRIVATE *Private;
-
   //
   // Check for invalid parameter for Spec conformance
   //
@@ -393,7 +386,6 @@ Returns:
   //
   // Do nothing for Nt32 emulation
   //
-  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
@@ -426,7 +418,7 @@ Returns:
   //
   // Locate DataHub protocol.
   //
-  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, &DataHub);
+  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, (VOID**)&DataHub);
   if (EFI_ERROR (Status)) {
     return;
   }
