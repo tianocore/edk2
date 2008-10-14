@@ -61,7 +61,7 @@ HiiLibConstructor (
   typedef struct {
     UINT32                  BinaryLength;
     EFI_HII_PACKAGE_HEADER  PackageHeader;
-  } TIANO_AUTOGEN_PACKAGES_HEADER;
+  } EDKII_AUTOGEN_PACKAGES_HEADER;
   #pragma pack (pop)
 
   If there is not enough resource for the new package list,
