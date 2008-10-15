@@ -24,13 +24,17 @@ Abstract:
 
 #define VARIABLE_STORE_SIGNATURE  EFI_SIGNATURE_32 ('$', 'V', 'S', 'S')
 
+#ifndef MAX_VARIABLE_SIZE
 #define MAX_VARIABLE_SIZE         1024
+#endif
 
 //
 // Enlarges the hardware error record maximum variable size to 32K bytes
 //
 #if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
+#ifndef MAX_HARDWARE_ERROR_VARIABLE_SIZE
 #define MAX_HARDWARE_ERROR_VARIABLE_SIZE 0x8000
+#endif
 #endif
 
 #define VARIABLE_DATA             0x55AA
