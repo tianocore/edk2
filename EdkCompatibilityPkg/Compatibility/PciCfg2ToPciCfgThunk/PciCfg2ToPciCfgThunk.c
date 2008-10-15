@@ -439,7 +439,7 @@ PciCfg2Modify (
 
   Status = (*PeiServices)->LocatePpi (
              PeiServices,
-             &gEcpPeiPciCfgPpiGuid,
+             &gEfiPciCfgPpiInServiceTableGuid,
              0,
              NULL,
              (VOID **)&PciCfg
