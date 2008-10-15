@@ -27,8 +27,6 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/PcdLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/UefiLib.h>
 
