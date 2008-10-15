@@ -514,7 +514,7 @@ LibPcdSet64 (
   maximum size supported by TokenNumber and return NULL to 
   indicate that the set operation was not actually performed. 
   
-  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
+  If SizeOfBuffer > 0 and Buffer is NULL, then ASSERT().
   
   @param[in]      TokenNumber   The PCD token number to set a current value for.
   @param[in, out] SizeOfBuffer  The size, in bytes, of Buffer.

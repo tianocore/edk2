@@ -175,24 +175,6 @@ PlatOverMngrInit (
   ZeroMem (mControllerToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
   ZeroMem (mDriverImageProtocol, MAX_CHOICE_NUM * sizeof (EFI_LOADED_IMAGE_PROTOCOL *));
 
-  //
-  // Show the page
-  //
-  Status = FormBrowser2->SendForm (
-                           FormBrowser2,
-                           &CallbackInfo->RegisteredHandle,
-                           1,
-                           NULL,
-                           0,
-                           NULL,
-                           NULL
-                           );
-
-  Status = HiiDatabase->RemovePackageList (HiiDatabase, CallbackInfo->RegisteredHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   return EFI_SUCCESS;
 }
 

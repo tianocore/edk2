@@ -19,7 +19,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatOverMngr
   FILE_GUID                      = 56D95BFE-F991-4898-B3BE-B8F37C927F48
-  MODULE_TYPE                    = UEFI_APPLICATION
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -47,7 +47,7 @@
 [LibraryClasses]
   BaseLib
   UefiBootServicesTableLib
-  UefiApplicationEntryPoint
+  UefiDriverEntryPoint
   UefiLib
   DebugLib
   PlatDriOverLib
