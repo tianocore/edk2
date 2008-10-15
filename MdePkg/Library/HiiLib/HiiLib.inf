@@ -44,8 +44,6 @@
   BaseMemoryLib
   BaseLib
   DebugLib
-  PcdLib
-  UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
   DevicePathLib
   UefiLib
