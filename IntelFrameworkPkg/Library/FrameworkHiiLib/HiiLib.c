@@ -21,8 +21,6 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/BaseMemoryLib.h>
-
 
 EFI_HII_PROTOCOL *mHii = NULL;
 

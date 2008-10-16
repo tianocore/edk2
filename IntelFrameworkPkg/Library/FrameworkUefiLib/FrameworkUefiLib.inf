@@ -40,7 +40,8 @@
   Console.c
   UefiLib.c
   UefiDriverModel.c
-
+  FrameworkUefiLib.h
+  
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec

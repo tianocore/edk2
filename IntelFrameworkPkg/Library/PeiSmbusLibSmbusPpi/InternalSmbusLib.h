@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Library/SmbusLib.h>
 #include <Library/DebugLib.h>
-#include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/BaseMemoryLib.h>
 
