@@ -44,8 +44,6 @@
   UefiBootServicesTableLib
   WinNtLib
   UefiDriverEntryPoint
-  DebugLib
-
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED

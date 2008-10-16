@@ -43,7 +43,6 @@
   UefiBootServicesTableLib
   WinNtLib
   UefiDriverEntryPoint
-  DebugLib
   BaseLib
 
 [Protocols]

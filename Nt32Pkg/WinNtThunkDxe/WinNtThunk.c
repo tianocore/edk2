@@ -39,7 +39,6 @@ Abstract:
 //
 // The Library classes this module consumes
 //
-#include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/WinNtLib.h>
 #include <Library/UefiBootServicesTableLib.h>
