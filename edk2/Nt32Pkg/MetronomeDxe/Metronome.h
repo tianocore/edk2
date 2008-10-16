@@ -26,7 +26,6 @@ Abstract:
 #include <WinNtDxe.h>
 #include <Protocol/Metronome.h>
 #include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/WinNtLib.h>
 #include <Library/UefiBootServicesTableLib.h>

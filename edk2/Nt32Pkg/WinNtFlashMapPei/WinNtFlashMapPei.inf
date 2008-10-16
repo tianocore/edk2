@@ -41,9 +41,7 @@
 
 [LibraryClasses]
   PcdLib
-  BaseMemoryLib
   PeiServicesLib
-  HobLib
   PeimEntryPoint
   DebugLib
 

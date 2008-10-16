@@ -48,9 +48,9 @@
   MemoryAllocationLib
   BaseMemoryLib
   UefiDriverEntryPoint
-  HiiLib
   DebugLib
-
+  HiiLib
+  
 [Guids]
   gEfiProcessorSubClassGuid                     # SOMETIMES_CONSUMED
   gEfiProcessorProducerGuid                     # SOMETIMES_CONSUMED

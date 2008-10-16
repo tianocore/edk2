@@ -65,7 +65,6 @@
 [LibraryClasses]
   DevicePathLib
   UefiBootServicesTableLib
-  MemoryAllocationLib
   BaseMemoryLib
   UefiDriverEntryPoint
   UefiLib
