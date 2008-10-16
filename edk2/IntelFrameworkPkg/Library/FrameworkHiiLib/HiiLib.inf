@@ -43,7 +43,6 @@
 [LibraryClasses]
   MemoryAllocationLib
   DebugLib
-  BaseMemoryLib
   UefiBootServicesTableLib
 
 [Protocols]
