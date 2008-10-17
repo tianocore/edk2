@@ -574,7 +574,7 @@ DispatchNotify (
           NotifyDescriptor->Notify
           ));
         NotifyDescriptor->Notify (
-                            GetPeiServicesTablePointer (),
+                            (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
                             NotifyDescriptor,
                             (PrivateData->PpiData.PpiListPtrs[Index2].Ppi)->Ppi
                             );
