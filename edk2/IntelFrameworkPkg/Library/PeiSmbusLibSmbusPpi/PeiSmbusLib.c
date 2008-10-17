@@ -1,7 +1,7 @@
 /** @file
   Implementation of SmBusLib class library for PEI phase.
 
-Copyright (c) 2006, Intel Corporation<BR>
+Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -69,7 +69,7 @@ InternalSmBusExec (
   )
 {
   EFI_PEI_SMBUS_PPI         *SmbusPpi;
-  EFI_PEI_SERVICES          **PeiServices;
+  CONST EFI_PEI_SERVICES    **PeiServices;
   RETURN_STATUS             ReturnStatus;
   EFI_SMBUS_DEVICE_ADDRESS  SmbusDeviceAddress;
 
@@ -78,7 +78,7 @@ InternalSmBusExec (
   SmbusDeviceAddress.SmbusDeviceAddress = SMBUS_LIB_SLAVE_ADDRESS (SmBusAddress);
 
   ReturnStatus = SmbusPpi->Execute (
-                             PeiServices,
+                             (EFI_PEI_SERVICES  **) PeiServices,
                              SmbusPpi,
                              SmbusDeviceAddress,
                              SMBUS_LIB_COMMAND (SmBusAddress),
