@@ -188,3 +188,11 @@ Possible Impacts:
 			<Uefi.h> is removed from the Protocol/PPI/GUID/Libary header file. If the module can build before the update but failed after the update
 			because of some undefined basic data type such as "EFI_GUID", module developer should include the module type header file accordingly.
 				
+EDK_6129:  Non-Compatible: qwang12
+
+Base on PI spec, GetPeiServicesTablePointer in PeiServicesTablePointer library is updated to return CONST EFI_PEI_SERVICES**. This is a incompatible changes. All file that reference this must be updated.
+
+Possible Impacts:
+			Customer's module that reference GetPeiServicesTablePointer in PeiServicesTablePointer library may need to updated. Otherwise
+			a build break (mismatch of data type) may occur.
+			
