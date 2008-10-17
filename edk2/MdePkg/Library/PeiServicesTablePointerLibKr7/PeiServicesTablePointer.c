@@ -26,15 +26,15 @@
   @return  The pointer to PeiServices.
 
 **/
-EFI_PEI_SERVICES **
+CONST EFI_PEI_SERVICES **
 EFIAPI
 GetPeiServicesTablePointer (
   VOID
   )
 {
-  EFI_PEI_SERVICES  **PeiServices;
+  CONST EFI_PEI_SERVICES  **PeiServices;
 
-  PeiServices = (EFI_PEI_SERVICES **)(UINTN)AsmReadKr7 ();
+  PeiServices = (CONST EFI_PEI_SERVICES **)(UINTN)AsmReadKr7 ();
   ASSERT (PeiServices != NULL);
   return PeiServices;
 }

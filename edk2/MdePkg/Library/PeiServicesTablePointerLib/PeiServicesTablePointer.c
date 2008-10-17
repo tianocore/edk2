@@ -4,7 +4,7 @@
   This library is used for PEIM which does executed from flash device directly but
   executed in memory.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -44,13 +44,13 @@ SetPeiServicesTablePointer (
   @retval  The pointer to PeiServices.
 
 **/
-EFI_PEI_SERVICES **
+CONST EFI_PEI_SERVICES **
 GetPeiServicesTablePointer (
   VOID
   )
 {
   ASSERT (gPeiServices != NULL);
-  return gPeiServices;
+  return (CONST EFI_PEI_SERVICES **) gPeiServices;
 }
 
 

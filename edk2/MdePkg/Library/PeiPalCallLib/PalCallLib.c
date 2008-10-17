@@ -70,7 +70,7 @@ PalCall (
   //
   // Get PEI Service Table Pointer
   //
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
 
   //
   // Locate SEC Platform Information PPI

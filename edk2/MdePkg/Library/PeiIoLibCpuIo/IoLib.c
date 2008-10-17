@@ -1,7 +1,7 @@
 /** @file
   I/O Library. The implementations are based on EFI_PEI_SERVICE->CpuIo interface.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ IoRead8 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
@@ -75,7 +75,7 @@ IoWrite8 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
@@ -106,7 +106,7 @@ IoRead16 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -141,7 +141,7 @@ IoWrite16 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -175,7 +175,7 @@ IoRead32 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -210,7 +210,7 @@ IoWrite32 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -244,7 +244,7 @@ IoRead64 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -279,7 +279,7 @@ IoWrite64 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -313,7 +313,7 @@ MmioRead8 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
@@ -344,7 +344,7 @@ MmioWrite8 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
@@ -375,7 +375,7 @@ MmioRead16 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -411,7 +411,7 @@ MmioWrite16 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -445,7 +445,7 @@ MmioRead32 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -481,7 +481,7 @@ MmioWrite32 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -515,7 +515,7 @@ MmioRead64 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
@@ -550,7 +550,7 @@ MmioWrite64 (
   CONST EFI_PEI_SERVICES            **PeiServices;
   EFI_PEI_CPU_IO_PPI                *CpuIo;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //

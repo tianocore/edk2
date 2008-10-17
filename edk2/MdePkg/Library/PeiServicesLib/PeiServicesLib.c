@@ -1,7 +1,7 @@
 /** @file
   Implementation for PEI Services Library.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,7 @@ PeiServicesInstallPpi (
 {
   CONST EFI_PEI_SERVICES  **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES  **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->InstallPpi (PeiServices, PpiList);
 }
 
@@ -67,7 +67,7 @@ PeiServicesReInstallPpi (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->ReInstallPpi (PeiServices, OldPpi, NewPpi);
 }
 
@@ -95,7 +95,7 @@ PeiServicesLocatePpi (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->LocatePpi (PeiServices, Guid, Instance, PpiDescriptor, Ppi);
 }
 
@@ -121,7 +121,7 @@ PeiServicesNotifyPpi (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->NotifyPpi (PeiServices, NotifyList);
 }
 
@@ -142,7 +142,7 @@ PeiServicesGetBootMode (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->GetBootMode (PeiServices, BootMode);
 }
 
@@ -162,7 +162,7 @@ PeiServicesSetBootMode (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->SetBootMode (PeiServices, BootMode);
 }
 
@@ -183,7 +183,7 @@ PeiServicesGetHobList (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->GetHobList (PeiServices, HobList);
 }
 
@@ -208,7 +208,7 @@ PeiServicesCreateHob (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->CreateHob (PeiServices, Type, Length, Hob);
 }
 
@@ -233,7 +233,7 @@ PeiServicesFfsFindNextVolume (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->FfsFindNextVolume (PeiServices, Instance, VolumeHandle);
 }
 
@@ -260,7 +260,7 @@ PeiServicesFfsFindNextFile (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->FfsFindNextFile (PeiServices, SearchType, VolumeHandle, FileHandle);
 }
 
@@ -286,7 +286,7 @@ PeiServicesFfsFindSectionData (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->FfsFindSectionData (PeiServices, SectionType, FfsFileHeader, SectionData);
 }
 
@@ -311,7 +311,7 @@ PeiServicesInstallPeiMemory (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->InstallPeiMemory (PeiServices, MemoryBegin, MemoryLength);
 }
 
@@ -339,7 +339,7 @@ PeiServicesAllocatePages (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->AllocatePages (PeiServices, MemoryType, Pages, Memory);
 }
 
@@ -363,7 +363,7 @@ PeiServicesAllocatePool (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->AllocatePool (PeiServices, Size, Buffer);
 }
 
@@ -384,7 +384,7 @@ PeiServicesResetSystem (
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) GetPeiServicesTablePointer ();
+  PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->ResetSystem (PeiServices);
 }
 
@@ -411,7 +411,7 @@ PeiServicesRegisterForShadow (
   IN  EFI_PEI_FILE_HANDLE FileHandle
   )
 {
-  EFI_PEI_SERVICES **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
   PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->RegisterForShadow (FileHandle);
@@ -442,7 +442,7 @@ PeiServicesFfsGetFileInfo (
   OUT EFI_FV_FILE_INFO            *FileInfo
   )
 {
-  EFI_PEI_SERVICES **PeiServices;
+  CONST EFI_PEI_SERVICES **PeiServices;
 
   PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->FfsGetFileInfo (FileHandle, FileInfo);
