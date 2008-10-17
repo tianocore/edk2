@@ -177,4 +177,14 @@ Possible Impacts:
 			  0) Change HiiLibGetCurrentLanguage to GetCurrentLanguage.
 				1) Change BufToHexString to BufInReverseOrderToHexString 
 			  2) Change HexStringToBuf to HexStringToBufInReverseOrder
+
+EDK_6111:  Non-Compatible: qwang12
+  Module type Include file is not included on default.
+   In Protocol/PPI/GUID/Libary header file, the "#include" of the module type header file such as <Base.h>, <PiPei.h>, <PiDxe.h> and 
+   <Uefi.h> are removed. The module (DXE driver, UEFI Driver, PEIM) should include these files if required.
+
+Possible Impacts:
+			Customer's module (DXE driver, UEFI Driver, PEIM) may failed to build as module type header file such as <Base.h>, <PiPei.h>, <PiDxe.h>
+			<Uefi.h> is removed from the Protocol/PPI/GUID/Libary header file. If the module can build before the update but failed after the update
+			because of some undefined basic data type such as "EFI_GUID", module developer should include the module type header file accordingly.
 				
