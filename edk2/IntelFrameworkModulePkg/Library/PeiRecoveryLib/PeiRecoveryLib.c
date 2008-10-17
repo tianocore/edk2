@@ -1,7 +1,7 @@
 /**@file
   Recovery Library. This library class defines a set of methods related do recovery.
 
-Copyright (c) 2006 - 2007 Intel Corporation
+Copyright (c) 2006 - 2008 Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -41,6 +41,6 @@ PeiRecoverFirmware (
              );
   ASSERT_EFI_ERROR (Status);
 
-  return PeiRecovery->LoadRecoveryCapsule (GetPeiServicesTablePointer(), PeiRecovery);
+  return PeiRecovery->LoadRecoveryCapsule ((EFI_PEI_SERVICES  **) GetPeiServicesTablePointer(), PeiRecovery);
 }
 
