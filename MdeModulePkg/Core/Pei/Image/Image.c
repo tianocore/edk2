@@ -215,7 +215,7 @@ LoadAndRelocatePeCoffImage (
 **/
 EFI_STATUS
 PeiLoadImageLoadImage (
-  IN     EFI_PEI_SERVICES             **PeiServices,
+  IN     CONST EFI_PEI_SERVICES       **PeiServices,
   IN     EFI_PEI_FILE_HANDLE          FileHandle,
   OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
   OUT    UINT64                       *ImageSizeArg,     OPTIONAL

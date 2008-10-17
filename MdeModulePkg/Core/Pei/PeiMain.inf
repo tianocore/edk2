@@ -68,6 +68,8 @@
   CacheMaintenanceLib
   PeCoffLib
   PeiPiLib
+  PeiServicesTablePointerLib
+  
 
 [Guids]
   gPeiAprioriFileNameGuid
