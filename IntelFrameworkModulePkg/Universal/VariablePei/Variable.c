@@ -355,7 +355,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 FindVariable (
-  IN EFI_PEI_SERVICES         **PeiServices,
+  IN        EFI_PEI_SERVICES   **PeiServices,
   IN CONST  CHAR16            *VariableName,
   IN CONST  EFI_GUID          *VendorGuid,
   OUT VARIABLE_POINTER_TRACK  *PtrTrack
@@ -581,7 +581,7 @@ PeiGetVariable2 (
 
 {
   return PeiGetVariable (
-           GetPeiServicesTablePointer (),
+           (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
            (CHAR16*)VariableName,
            (EFI_GUID*)VariableGuid,
            Attributes,
@@ -703,7 +703,7 @@ PeiGetNextVariableName2 (
 
 {
   return PeiGetNextVariableName (
-           GetPeiServicesTablePointer (),
+           (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
            VariableNameSize,
            VariableName,
            VariableGuid
