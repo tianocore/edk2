@@ -14,7 +14,7 @@
 #ifndef _ACPI_2_0_H_
 #define _ACPI_2_0_H_
 
-#include <IndustryStandard/Acpi1_0.h>
+#include <IndustryStandard/Acpi10.h>
 
 //
 // Ensure proper structure formats
