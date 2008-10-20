@@ -1,6 +1,6 @@
 /** @file   
-  ACPI Watchdog Action Table as defined at
-  Microsoft Hardware Watchdog Timer Specification.
+  ACPI Watchdog Action Table (WADT) as defined at
+  Microsoft Hardware Watchdog Timers Design Specification
 
   Copyright (c) 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
@@ -41,6 +41,9 @@ typedef struct {
   UINT32                                  NumberWatchdogInstructionEntries;
 } EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE;
 
+///
+/// Watchdog Instruction Entries
+///
 typedef struct {
   UINT8                                   WatchdogAction;
   UINT8                                   InstructionFlags;
@@ -57,9 +60,9 @@ typedef struct {
 ///
 #define EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE_REVISION       0x01
 
-///
-/// WDAT 1.0 Flags
-///
+//
+// WDAT 1.0 Flags
+//
 #define EFI_ACPI_WDAT_1_0_WATCHDOG_ENABLED                0x1
 #define EFI_ACPI_WDAT_1_0_WATCHDOG_STOPPED_IN_SLEEP_STATE 0x80
 

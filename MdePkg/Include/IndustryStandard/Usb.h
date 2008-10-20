@@ -1,7 +1,7 @@
 /** @file
-  Support for USB 1.1 standard.
+  Support for USB 2.0 standard.
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +17,7 @@
 
 //
 // Standard device request and request type
-// By [Spec-USB20/Chapter-9.4]
+// USB 2.0 spec, Section 9.4
 //
 #define USB_DEV_GET_STATUS                  0x00
 #define USB_DEV_GET_STATUS_REQ_TYPE_D       0x80 // Receiver : Device
@@ -63,6 +63,11 @@
 // USB standard descriptors and reqeust
 //
 #pragma pack(1)
+
+///
+/// Format of Setup Data for USB Device Requests
+/// USB 2.0 spec, Section 9.3
+///
 typedef struct {
   UINT8           RequestType;
   UINT8           Request;
@@ -71,6 +76,10 @@ typedef struct {
   UINT16          Length;
 } USB_DEVICE_REQUEST;
 
+///
+/// Standard Device Descriptor
+/// USB 2.0 spec, Section 9.6.1
+///
 typedef struct {
   UINT8           Length;
   UINT8           DescriptorType;
@@ -88,6 +97,10 @@ typedef struct {
   UINT8           NumConfigurations;
 } USB_DEVICE_DESCRIPTOR;
 
+///
+/// Standard Configuration Descriptor
+/// USB 2.0 spec, Section 9.6.3
+///
 typedef struct {
   UINT8           Length;
   UINT8           DescriptorType;
@@ -99,6 +112,10 @@ typedef struct {
   UINT8           MaxPower;
 } USB_CONFIG_DESCRIPTOR;
 
+///
+/// Standard Interface Descriptor
+/// USB 2.0 spec, Section 9.6.5
+///
 typedef struct {
   UINT8           Length;
   UINT8           DescriptorType;
@@ -111,6 +128,10 @@ typedef struct {
   UINT8           Interface;
 } USB_INTERFACE_DESCRIPTOR;
 
+///
+/// Standard Endpoint Descriptor
+/// USB 2.0 spec, Section 9.6.6
+///
 typedef struct {
   UINT8           Length;
   UINT8           DescriptorType;
@@ -120,6 +141,10 @@ typedef struct {
   UINT8           Interval;
 } USB_ENDPOINT_DESCRIPTOR;
 
+///
+/// UNICODE String Descriptor
+/// USB 2.0 spec, Section 9.6.7
+///
 typedef struct {
   UINT8           Length;
   UINT8           DescriptorType;
@@ -196,7 +221,8 @@ typedef enum {
 
 
 //
-// HID constants definition, see HID rev1.0
+// HID constants definition, see Device Class Definition
+// for Human Interface Devices (HID) rev1.11
 //
 
 //
@@ -314,6 +340,10 @@ typedef struct hid_class_descriptor {
   UINT16  DescriptorLength;
 } EFI_USB_HID_CLASS_DESCRIPTOR;
 
+///
+/// The HID descriptor identifies the length and type
+/// of subordinate descriptors for a device.
+///
 typedef struct hid_descriptor {
   UINT8                         Length;
   UINT8                         DescriptorType;

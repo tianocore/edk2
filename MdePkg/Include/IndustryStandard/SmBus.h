@@ -1,8 +1,7 @@
 /** @file
-  This file declares the SMBus definitions defined in SmBus Specifciation
-  V2.0.
+  This file declares the SMBus definitions defined in SmBus Specifciation V2.0.
 
-  Copyright (c) 2007, Intel Corporation                                                         
+  Copyright (c) 2007 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -10,9 +9,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-  @par Revision Reference:
-  These definitions are defined in System Management Bus (SmBus) Specification V2.0.
 
 **/
 
@@ -35,12 +31,15 @@ typedef struct {
 } EFI_SMBUS_UDID;
 
 ///
-/// Smbus Device Address, Smbus Device Command, Smbus Operations
+/// Smbus Device Address
 ///
 typedef struct {
   UINTN SmbusDeviceAddress : 7;
 } EFI_SMBUS_DEVICE_ADDRESS;
 
+///
+/// Smbus Operations
+///
 typedef enum _EFI_SMBUS_OPERATION
 {
   EfiSmbusQuickRead,
