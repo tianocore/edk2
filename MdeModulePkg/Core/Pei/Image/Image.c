@@ -78,7 +78,7 @@ PeiImageRead (
   Destination8  = Buffer;
   Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
   Length        = *ReadSize;
-  while (Length--) {
+  while ((Length--) > 0) {
     *(Destination8++) = *(Source8++);
   }
 

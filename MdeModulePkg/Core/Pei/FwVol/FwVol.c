@@ -163,7 +163,7 @@ PeiFindFileEx (
   FileHeader  = (EFI_FFS_FILE_HEADER **)FileHandle;
 
   FvLength = FwVolHeader->FvLength;
-  if (FwVolHeader->Attributes & EFI_FVB2_ERASE_POLARITY) {
+  if ((FwVolHeader->Attributes & EFI_FVB2_ERASE_POLARITY) != 0) {
     ErasePolarity = 1;
   } else {
     ErasePolarity = 0;

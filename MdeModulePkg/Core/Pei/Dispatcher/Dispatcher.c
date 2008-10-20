@@ -231,9 +231,6 @@ ShadowPeiCore(
                          the BFV location.
   @param Private         Pointer to the private data passed in from caller
 
-  @retval EFI_SUCCESS   - Successfully dispatched PEIM.
-  @retval EFI_NOT_FOUND - The dispatch failed.
-
 **/
 VOID
 PeiDispatcher (
