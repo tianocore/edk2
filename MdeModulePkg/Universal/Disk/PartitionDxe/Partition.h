@@ -85,6 +85,15 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gPartitionComponentName2;
                                    (((UINT8 *) a)[2] << 16) |    \
                                    (((UINT8 *) a)[3] << 24) )
 
+
+//
+// GPT Partition Entry Status
+//
+typedef struct {
+  BOOLEAN OutOfRange;
+  BOOLEAN Overlap;
+} EFI_PARTITION_ENTRY_STATUS;
+
 //
 // Function Prototypes
 //
