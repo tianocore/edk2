@@ -178,7 +178,7 @@ PeiServicesSetBootMode (
 EFI_STATUS
 EFIAPI
 PeiServicesGetHobList (
-  IN OUT VOID                   **HobList
+  OUT VOID                   **HobList
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
@@ -203,7 +203,7 @@ EFIAPI
 PeiServicesCreateHob (
   IN UINT16                     Type,
   IN UINT16                     Length,
-  IN OUT VOID                   **Hob
+  OUT VOID                      **Hob
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
