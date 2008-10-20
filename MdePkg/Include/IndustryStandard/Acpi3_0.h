@@ -1,5 +1,5 @@
 /** @file   
-    ACPI 3.0 definitions from the ACPI Specification Revision 3.0 September 2, 2004
+  ACPI 3.0 definitions from the ACPI Specification Revision 3.0b October 10, 2006
 
   Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
@@ -20,11 +20,6 @@
 // Ensure proper structure formats
 //
 #pragma pack(1)
-
-///
-/// ACPI Specification Revision
-///
-#define EFI_ACPI_3_0_REVISION 0x03
 
 ///
 /// ACPI 3.0 Generic Address Space definition
@@ -76,9 +71,9 @@ typedef struct {
 } EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER;
 
 ///
-/// RSD_PTR Revision (as defined in ACPI 3.0 spec.)
+/// RSD_PTR Revision (as defined in ACPI 3.0b spec.)
 ///
-#define EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION 0x02  // ACPISpec30 (Revision 3.0 September 2, 2004) says current value is 2
+#define EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION 0x02  ///< ACPISpec (Revision 3.0b) says current value is 2
 
 ///
 /// Common table header, this prefaces all ACPI tables, including FACS, but
@@ -91,8 +86,8 @@ typedef struct {
 
 //
 // Root System Description Table
-// No definition needed as it is a common description table header followed by a
-// variable number of UINT32 table pointers.
+// No definition needed as it is a common description table header, the same with 
+// EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT32 table pointers.
 //
 
 ///
@@ -102,8 +97,8 @@ typedef struct {
 
 //
 // Extended System Description Table
-// No definition needed as it is a common description table header followed by a
-// variable number of UINT64 table pointers.
+// No definition needed as it is a common description table header, the same with 
+// EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT64 table pointers.
 //
 
 ///
@@ -251,8 +246,8 @@ typedef struct {
 // Differentiated System Description Table,
 // Secondary System Description Table
 // and Persistent System Description Table,
-// no definition needed as they are common description table header followed by a
-// definition block.
+// no definition needed as they are common description table header, the same with
+// EFI_ACPI_DESCRIPTION_HEADER, followed by a definition block.
 //
 #define EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_REVISION   0x02
 #define EFI_ACPI_3_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_REVISION        0x02

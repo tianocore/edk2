@@ -1,7 +1,7 @@
 /** @file   
 	ACPI 2.0 definitions from the ACPI Specification, revision 2.0
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -20,10 +20,6 @@
 // Ensure proper structure formats
 //
 #pragma pack(1)
-//
-// ACPI Specification Revision
-//
-#define EFI_ACPI_2_0_REVISION 0x02
 
 ///
 /// ACPI 2.0 Generic Address Space definition
@@ -81,8 +77,8 @@ typedef struct {
 
 //
 // Root System Description Table
-// No definition needed as it is a common description table header followed by a
-// variable number of UINT32 table pointers.
+// No definition needed as it is a common description table header, the same with 
+// EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT32 table pointers.
 //
 
 ///
@@ -92,8 +88,8 @@ typedef struct {
 
 //
 // Extended System Description Table
-// No definition needed as it is a common description table header followed by a
-// variable number of UINT64 table pointers.
+// No definition needed as it is a common description table header, the same with 
+// EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT64 table pointers.
 //
 
 ///
