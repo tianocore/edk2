@@ -52,8 +52,8 @@ GetPcdPpiPointer (
   Sets the current SKU in the PCD database to the value specified by SkuId.  SkuId is returned.
   If SkuId not less than PCD_MAX_SKU_ID, then ASSERT().
   
-  @param[in]  System sku id. The SKU value that will be used when the PCD service will retrieve and 
-              set values.
+  @param[in]  SkuId     System sku id. The SKU value that will be used when the PCD service will retrieve and 
+                        set values.
 
   @return Return the SKU ID that just be set.
 
@@ -805,8 +805,6 @@ LibPcdSetExBool (
   @param[in]  NotificationFunction The function to call when the token 
               specified by Guid and TokenNumber is set.
 
-  @retval VOID
-
 **/
 VOID
 EFIAPI
@@ -835,8 +833,6 @@ LibPcdCallbackOnSet (
   @param[in]  Guid Specify the GUID token space.
   @param[in]  TokenNumber Specify the token number.
   @param[in]  NotificationFunction The callback function to be unregistered.
-
-  @retval VOID
 
 **/
 VOID
