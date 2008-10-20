@@ -333,7 +333,7 @@ EFIAPI
 EfiUpdateCapsule (
   IN EFI_CAPSULE_HEADER       **CapsuleHeaderArray,
   IN UINTN                    CapsuleCount,
-  IN EFI_PHYSICAL_ADDRESS     ScatterGatherList
+  IN EFI_PHYSICAL_ADDRESS     ScatterGatherList OPTIONAL
   );
 
 
