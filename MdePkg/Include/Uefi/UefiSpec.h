@@ -1,11 +1,11 @@
 /** @file
-  Include file that supportes UEFI.
+  Include file that supports UEFI.
 
-  This include file must only contain things defined in the UEFI 2.0 specification.
-  If a code construct is defined in the UEFI 2.0 specification it must be included
+  This include file must only contain things defined in the UEFI 2.1 specification.
+  If a code construct is defined in the UEFI 2.1 specification it must be included
   by this include file.
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -47,27 +47,32 @@ typedef enum {
 #define EFI_UNSPECIFIED_TIMEZONE  0x07FF
 
 //
-// possible caching types for the memory range
+// Memory cacheability attributes
 //
 #define EFI_MEMORY_UC   0x0000000000000001ULL
 #define EFI_MEMORY_WC   0x0000000000000002ULL
 #define EFI_MEMORY_WT   0x0000000000000004ULL
 #define EFI_MEMORY_WB   0x0000000000000008ULL
 #define EFI_MEMORY_UCE  0x0000000000000010ULL
-
 //
-// physical memory protection on range
+// Physical memory protection attributes
 //
 #define EFI_MEMORY_WP   0x0000000000001000ULL
 #define EFI_MEMORY_RP   0x0000000000002000ULL
 #define EFI_MEMORY_XP   0x0000000000004000ULL
-
-///
-/// range requires a runtime mapping
-///
+//
+// Runtime memory attribute
+//
 #define EFI_MEMORY_RUNTIME  0x8000000000000000ULL
 
+///
+/// Memory descriptor version number
+///
 #define EFI_MEMORY_DESCRIPTOR_VERSION 1
+
+///
+/// Definition of memory descriptor
+///
 typedef struct {
   UINT32                Type;
   EFI_PHYSICAL_ADDRESS  PhysicalStart;
@@ -137,6 +142,10 @@ EFI_STATUS
   Returns the current memory map.
 
   @param  MemoryMapSize         A pointer to the size, in bytes, of the MemoryMap buffer.
+                                On input, this is the size of the buffer allocated by the caller.
+                                On output, it is the size of the buffer returned by the firmware if
+                                the buffer was large enough, or the size of the buffer needed to contain
+                                the map if the buffer was too small.
   @param  MemoryMap             A pointer to the buffer in which firmware places the current memory
                                 map.
   @param  MapKey                A pointer to the location in which firmware returns the key for the
@@ -265,14 +274,20 @@ EFI_STATUS
 
   @param  ControllerHandle      The handle of the controller from which driver(s) are to be disconnected.
   @param  DriverImageHandle     The driver to disconnect from ControllerHandle.
+                                If DriverImageHandle is NULL, then all the drivers currently managing
+                                ControllerHandle are disconnected from ControllerHandle.
   @param  ChildHandle           The handle of the child to destroy.
+                                If ChildHandle is NULL, then all the children of ControllerHandle are
+                                destroyed before the drivers are disconnected from ControllerHandle.
 
   @retval EFI_SUCCESS           1) One or more drivers were disconnected from the controller.
                                 2) On entry, no drivers are managing ControllerHandle.
                                 3) DriverImageHandle is not NULL, and on entry
                                    DriverImageHandle is not managing ControllerHandle.
-
-  @retval EFI_INVALID_PARAMETER One ore more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER 1) ControllerHandle is not a valid EFI_HANDLE.
+                                2) DriverImageHandle is not NULL, and it is not a valid EFI_HANDLE.
+                                3) ChildHandle is not NULL, and it is not a valid EFI_HANDLE.
+                                4) DriverImageHandle does not support the EFI_DRIVER_BINDING_PROTOCOL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to disconnect any drivers from
                                 ControllerHandle.
   @retval EFI_DEVICE_ERROR      The controller could not be disconnected because of a device error.
@@ -357,7 +372,7 @@ VOID
   Creates an event.
 
   @param  Type                  The type of event to create and its mode and attributes.
-  @param  NotifyTpl             Pointer to the notification function's context.
+  @param  NotifyTpl             The task priority level of event notifications, if needed.
   @param  NotifyFunction        Pointer to the event's notification function, if any.
   @param  NotifyContext         Pointer to the notification function's context; corresponds to parameter
                                 Context in the notification function.
@@ -383,11 +398,13 @@ EFI_STATUS
   Creates an event in a group.
 
   @param  Type                  The type of event to create and its mode and attributes.
-  @param  NotifyTpl             Pointer to the notification function's context.
+  @param  NotifyTpl             The task priority level of event notifications,if needed.
   @param  NotifyFunction        Pointer to the event's notification function, if any.
   @param  NotifyContext         Pointer to the notification function's context; corresponds to parameter
                                 Context in the notification function.
   @param  EventGroup            Pointer to the unique identifier of the group to which this event belongs.
+                                If this is NULL, then the function behaves as if the parameters were passed
+                                to CreateEvent.
   @param  Event                 Pointer to the newly created event if the call succeeds; undefined
                                 otherwise.
 
@@ -400,13 +417,16 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_CREATE_EVENT_EX)(
   IN       UINT32                 Type,
-  IN       EFI_TPL                NotifyTpl      OPTIONAL,
+  IN       EFI_TPL                NotifyTpl,
   IN       EFI_EVENT_NOTIFY       NotifyFunction OPTIONAL,
   IN CONST VOID                   *NotifyContext OPTIONAL,
   IN CONST EFI_GUID               *EventGroup    OPTIONAL,
   OUT      EFI_EVENT              *Event
   );
 
+///
+/// Timer delay types
+///
 typedef enum {
   TimerCancel,
   TimerPeriodic,
@@ -419,6 +439,11 @@ typedef enum {
   @param  Event                 The timer event that is to be signaled at the specified time.
   @param  Type                  The type of time that is specified in TriggerTime.
   @param  TriggerTime           The number of 100ns units until the timer expires.
+                                A TriggerTime of 0 is legal.
+                                If Type is TimerRelative and TriggerTime is 0, then the timer
+                                event will be signaled on the next timer tick.
+                                If Type is TimerPeriodic and TriggerTime is 0, then the timer
+                                event will be signaled on every timer tick.
 
   @retval EFI_SUCCESS           The event has been set to be signaled at the requested time.
   @retval EFI_INVALID_PARAMETER Event or Type is not valid.
@@ -500,7 +525,7 @@ EFI_STATUS
 
 
 //
-// Task priority level (name defined in spec).
+// Task priority level
 //
 #define TPL_APPLICATION       4
 #define TPL_CALLBACK          8
@@ -513,7 +538,7 @@ EFI_STATUS
 
   @param  NewTpl                The new task priority level.
 
-  @retval                       Previous task priority level
+  @return Previous task priority level
 
 **/
 typedef
@@ -525,7 +550,7 @@ EFI_TPL
 /**
   Restores a task's priority level to its previous value.
 
-  @param  OldTpl                The previous task priority level to restore
+  @param  OldTpl                The previous task priority level to restore.
 
 **/
 typedef
@@ -546,11 +571,15 @@ VOID
                                 On output the size of data returned in Data.
   @param  Data                  The buffer to return the contents of the variable.
 
-  @retval EFI_SUCCESS           The function completed successfully.
-  @retval EFI_NOT_FOUND         The variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the result.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-  @retval EFI_DEVICE_ERROR      The variable could not be retrieved due to a hardware error.
+  @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_NOT_FOUND          The variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL   The DataSize is too small for the result.
+  @retval EFI_INVALID_PARAMETER  VariableName is NULL.
+  @retval EFI_INVALID_PARAMETER  VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER  DataSize is NULL.
+  @retval EFI_INVALID_PARAMETER  The DataSize is not too small and Data is NULL.
+  @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
+  @retval EFI_SECURITY_VIOLATION The variable could not be retrieved due to an authentication failure.
 
 **/
 typedef
@@ -577,7 +606,9 @@ EFI_STATUS
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
   @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the result.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER VariableNameSize is NULL.
+  @retval EFI_INVALID_PARAMETER VariableName is NULL.
+  @retval EFI_INVALID_PARAMETER VendorGuid is NULL.
   @retval EFI_DEVICE_ERROR      The variable could not be retrieved due to a hardware error.
 
 **/
@@ -599,12 +630,17 @@ EFI_STATUS
   @param  DataSize              The size in bytes of the Data buffer.
   @param  Data                  The contents for the variable.
 
-  @retval EFI_SUCCESS           The firmware has successfully stored the variable and its data as
-                                defined by the Attributes.
-  @retval EFI_WRITE_PROTECTED   The variable in question is read-only.
-  @retval EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-  @retval EFI_DEVICE_ERROR      The variable could not be retrieved due to a hardware error.
+  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
+                                 defined by the Attributes.
+  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the
+                                 DataSize exceeds the maximum allowed.
+  @retval EFI_INVALID_PARAMETER  VariableName is an empty Unicode string.
+  @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the variable and its data.
+  @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
+  @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
+  @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
+  @retval EFI_SECURITY_VIOLATION The variable could not be retrieved due to an authentication failure.
+  @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
 
 **/
 typedef
@@ -618,10 +654,10 @@ EFI_STATUS
   );
 
 
-//
-// This provides the capabilities of the
-// real time clock device as exposed through the EFI interfaces.
-//
+///
+/// This provides the capabilities of the
+/// real time clock device as exposed through the EFI interfaces.
+///
 typedef struct {
   UINT32    Resolution;
   UINT32    Accuracy;
@@ -672,8 +708,11 @@ EFI_STATUS
   @param  Time                  The current alarm setting.
 
   @retval EFI_SUCCESS           The alarm settings were returned.
-  @retval EFI_INVALID_PARAMETER Any parameter is NULL.
+  @retval EFI_INVALID_PARAMETER Enabled is NULL.
+  @retval EFI_INVALID_PARAMETER Pending is NULL.
+  @retval EFI_INVALID_PARAMETER Time is NULL.
   @retval EFI_DEVICE_ERROR      The wakeup time could not be retrieved due to a hardware error.
+  @retval EFI_UNSUPPORTED       A wakeup timer is not supported on this platform.
 
 **/
 typedef
@@ -689,6 +728,7 @@ EFI_STATUS
 
   @param  Enabled               Enable or disable the wakeup alarm.
   @param  Time                  If Enable is TRUE, the time to set the wakeup alarm for.
+                                If Enable is FALSE, then this parameter is optional, and may be NULL.
 
   @retval EFI_SUCCESS           If Enable is TRUE, then the wakeup alarm was enabled. If
                                 Enable is FALSE, then the wakeup alarm was disabled.
@@ -705,13 +745,15 @@ EFI_STATUS
   );
 
 /**
-  This is the declaration of an EFI image entry point. This can be the entry point to an application
-  written to this specification, an EFI boot service driver, or an EFI runtime driver.
+  This is the declaration of an EFI image entry point. This entry point is
+  the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers including
+  both device drivers and bus drivers.
 
-  @param  ImageHandle           Handle that identifies the loaded image.
-  @param  SystemTable           System Table for this image.
+  @param  ImageHandle           The firmware allocated handle for the UEFI image.
+  @param  SystemTable           A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 
 **/
 typedef
@@ -729,16 +771,16 @@ EFI_STATUS
                                 FilePath as a boot selection. Ignored if SourceBuffer is
                                 not NULL.
   @param  ParentImageHandle     The caller's image handle.
-  @param  FilePath              The DeviceHandle specific file path from which the image is
+  @param  DevicePath            The DeviceHandle specific file path from which the image is
                                 loaded.
   @param  SourceBuffer          If not NULL, a pointer to the memory location containing a copy
                                 of the image to be loaded.
-  @param  SourceSize            The size in bytes of SourceBuffer.
+  @param  SourceSize            The size in bytes of SourceBuffer. Ignored if SourceBuffer is NULL.
   @param  ImageHandle           Pointer to the returned image handle that is created when the
                                 image is successfully loaded.
 
   @retval EFI_SUCCESS           Image was loaded into memory correctly.
-  @retval EFI_NOT_FOUND         Both SourceBuffer and FilePath are NULL.
+  @retval EFI_NOT_FOUND         Both SourceBuffer and DevicePath are NULL.
   @retval EFI_INVALID_PARAMETER One or more parametes are invalid.
   @retval EFI_UNSUPPORTED       The image type is not supported.
   @retval EFI_OUT_OF_RESOURCES  Image was not loaded due to insufficient resources.
@@ -752,7 +794,7 @@ EFI_STATUS
 (EFIAPI *EFI_IMAGE_LOAD)(
   IN  BOOLEAN                      BootPolicy,
   IN  EFI_HANDLE                   ParentImageHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *FilePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath,
   IN  VOID                         *SourceBuffer OPTIONAL,
   IN  UINTN                        SourceSize,
   OUT EFI_HANDLE                   *ImageHandle
@@ -768,7 +810,7 @@ EFI_STATUS
 
   @retval EFI_INVALID_PARAMETER ImageHandle is either an invalid image handle or the image
                                 has already been initialized with StartImage
-  @retval Exit code from image  Exit code from image
+  @return Exit code from image
 
 **/
 typedef
@@ -811,7 +853,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The image has been unloaded.
   @retval EFI_INVALID_PARAMETER ImageHandle is not a valid image handle.
   @retval EFI_UNSUPPORTED       The image has been started, and does not support unload.
-  @retval                       Exit code from the image's unload handler
+  @return Exit code from the image's unload handler
 
 **/
 typedef
@@ -877,9 +919,9 @@ EFI_STATUS
   IN CHAR16                   *WatchdogData OPTIONAL
   );
 
-//
-// Enumeration of reset types.
-//
+///
+/// Enumeration of reset types.
+///
 typedef enum {
   EfiResetCold,
   EfiResetWarm,
@@ -949,7 +991,9 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The 32-bit CRC was computed for the data buffer and returned in
                                 Crc32.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER Data is NULL.
+  @retval EFI_INVALID_PARAMETER Crc32 is NULL.
+  @retval EFI_INVALID_PARAMETER DataSize is 0.
 
 **/
 typedef
@@ -1014,7 +1058,10 @@ typedef enum {
 
   @retval EFI_SUCCESS           The protocol interface was installed.
   @retval EFI_OUT_OF_RESOURCES  Space for a new handle could not be allocated.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER Handle is NULL.
+  @retval EFI_INVALID_PARAMETER Protocol is NULL.
+  @retval EFI_INVALID_PARAMETER InterfaceType is not EFI_NATIVE_INTERFACE.
+  @retval EFI_INVALID_PARAMETER Protocol is already installed on the handle specified by Handle.
 
 **/
 typedef
@@ -1061,7 +1108,8 @@ EFI_STATUS
   @retval EFI_ACCESS_DENIED     The protocol interface could not be reinstalled,
                                 because OldInterface is still being used by a
                                 driver that will not release it.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER Handle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER Protocol is NULL.
 
 **/
 typedef
@@ -1086,7 +1134,8 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         The interface was not found.
   @retval EFI_ACCESS_DENIED     The interface was not removed because the interface
                                 is still being used by a driver.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER Handle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER Protocol is NULL.
 
 **/
 typedef
@@ -1122,9 +1171,12 @@ EFI_STATUS
   @param  Protocol              The published unique identifier of the protocol.
   @param  Interface             Supplies the address where a pointer to the corresponding Protocol
                                 Interface is returned.
+
   @retval EFI_SUCCESS           The interface information for the specified protocol was returned.
   @retval EFI_UNSUPPORTED       The device does not support the specified protocol.
-  @retval EFI_INVALID_PARAMETER One of the protocol interfaces was not previously installed on Handle.
+  @retval EFI_INVALID_PARAMETER Handle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER Protocol is NULL.
+  @retval EFI_INVALID_PARAMETER Interface is NULL.
 
 **/
 typedef
@@ -1174,9 +1226,9 @@ EFI_STATUS
 (EFIAPI *EFI_OPEN_PROTOCOL)(
   IN  EFI_HANDLE                Handle,
   IN  EFI_GUID                  *Protocol,
-  OUT VOID                      **Interface,
+  OUT VOID                      **Interface, OPTIONAL
   IN  EFI_HANDLE                AgentHandle,
-  IN  EFI_HANDLE                ControllerHandle, OPTIONAL
+  IN  EFI_HANDLE                ControllerHandle,
   IN  UINT32                    Attributes
   );
 
@@ -1187,15 +1239,16 @@ EFI_STATUS
   @param  Handle                The handle for the protocol interface that was previously opened
                                 with OpenProtocol(), and is now being closed.
   @param  Protocol              The published unique identifier of the protocol.
-  @param  Interface             Supplies the address where a pointer to the corresponding Protocol
-                                Interface is returned.
   @param  AgentHandle           The handle of the agent that is closing the protocol interface.
   @param  ControllerHandle      If the agent that opened a protocol is a driver that follows the
                                 UEFI Driver Model, then this parameter is the controller handle
                                 that required the protocol interface.
 
   @retval EFI_SUCCESS           The protocol instance was closed.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER 1) Handle is not a valid EFI_HANDLE.
+                                2) AgentHandle is not a valid EFI_HANDLE.
+                                3) ControllerHandle is not NULL and ControllerHandle is not a valid EFI_HANDLE.
+                                4) Protocol is NULL.
   @retval EFI_NOT_FOUND         1) Handle does not support the protocol specified by Protocol.
                                 2) The protocol interface specified by Handle and Protocol is not
                                    currently open by AgentHandle and ControllerHandle.
@@ -1238,7 +1291,7 @@ EFI_STATUS
 (EFIAPI *EFI_OPEN_PROTOCOL_INFORMATION)(
   IN  EFI_HANDLE                          Handle,
   IN  EFI_GUID                            *Protocol,
-  IN  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY **EntryBuffer,
+  OUT EFI_OPEN_PROTOCOL_INFORMATION_ENTRY **EntryBuffer,
   OUT UINTN                               *EntryCount
   );
 
@@ -1257,7 +1310,10 @@ EFI_STATUS
                                 ProtocolBuffer. The number of protocol interface GUIDs was
                                 returned in ProtocolBufferCount.
   @retval EFI_OUT_OF_RESOURCES  There is not enough pool memory to store the results.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER Handle is NULL.
+  @retval EFI_INVALID_PARAMETER Handle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ProtocolBuffer is NULL.
+  @retval EFI_INVALID_PARAMETER ProtocolBufferCount is NULL.
 
 **/
 typedef
@@ -1278,7 +1334,9 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The notification event has been registered.
   @retval EFI_OUT_OF_RESOURCES  Space for the notification event could not be allocated.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER Protocol is NULL.
+  @retval EFI_INVALID_PARAMETER Event is NULL.
+  @retval EFI_INVALID_PARAMETER Registration is NULL.
 
 **/
 typedef
@@ -1311,7 +1369,11 @@ typedef enum {
   @retval EFI_SUCCESS           The array of handles was returned.
   @retval EFI_NOT_FOUND         No handles match the search.
   @retval EFI_BUFFER_TOO_SMALL  The BufferSize is too small for the result.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER SearchType is not a member of EFI_LOCATE_SEARCH_TYPE.
+  @retval EFI_INVALID_PARAMETER SearchType is ByRegisterNotify and SearchKey is NULL.
+  @retval EFI_INVALID_PARAMETER SearchType is ByProtocol and Protocol is NULL.
+  @retval EFI_INVALID_PARAMETER One or more matches are found and BufferSize is NULL.
+  @retval EFI_INVALID_PARAMETER BufferSize is large enough for the result and Buffer is NULL.
 
 **/
 typedef
@@ -1335,7 +1397,9 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The resulting handle was returned.
   @retval EFI_NOT_FOUND         No handles match the search.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER Protocol is NULL.
+  @retval EFI_INVALID_PARAMETER DevicePath is NULL.
+  @retval EFI_INVALID_PARAMETER A handle matched the search and Device is NULL.
 
 **/
 typedef
@@ -1371,7 +1435,8 @@ EFI_STATUS
   Returns an array of handles that support the requested protocol in a buffer allocated from pool.
 
   @param  SearchType            Specifies which handle(s) are to be returned.
-  @param  Protocol              Specifies the protocol to search by.
+  @param  Protocol              Provides the protocol to search by.
+                                This parameter is only valid for a SearchType of ByProtocol.
   @param  SearchKey             Supplies the search key depending on the SearchType.
   @param  NoHandles             The number of handles returned in Buffer.
   @param  Buffer                A pointer to the buffer to return the requested array of handles that
@@ -1381,7 +1446,8 @@ EFI_STATUS
                                 handles in Buffer was returned in NoHandles.
   @retval EFI_NOT_FOUND         No handles match the search.
   @retval EFI_OUT_OF_RESOURCES  There is not enough pool memory to store the matching results.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER NoHandles is NULL.
+  @retval EFI_INVALID_PARAMETER Buffer is NULL.
 
 **/
 typedef
@@ -1433,6 +1499,11 @@ typedef struct {
   UINT32            CapsuleImageSize;
 } EFI_CAPSULE_HEADER;
 
+//
+// The EFI System Table entry must point to an array of capsules
+// that contain the same CapsuleGuid value. The array must be
+// prefixed by a UINT32 that represents the size of the array of capsules.
+//
 typedef struct {
   UINT32   CapsuleArrayNumber;
   VOID*    CapsulePtr[1];
@@ -1461,6 +1532,8 @@ typedef struct {
                                 capsule has been successfully processed by the firmware.
   @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
   @retval EFI_INVALID_PARAMETER CapsuleSize is NULL.
+  @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform.
+  @retval EFI_OUT_OF_RESOURCES  There were insufficient resources to process the capsule.
 
 **/
 typedef
@@ -1487,6 +1560,7 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform, and
                                 MaximumCapsuleSize and ResetType are undefined.
   @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL.
+  @retval EFI_OUT_OF_RESOURCES  There were insufficient resources to process the query request.
 
 **/
 typedef
@@ -1543,7 +1617,13 @@ EFI_STATUS
 #define EFI_RUNTIME_SERVICES_SIGNATURE  0x56524553544e5552ULL
 #define EFI_RUNTIME_SERVICES_REVISION   EFI_2_10_SYSTEM_TABLE_REVISION
 
+///
+/// EFI Runtime Services Table
+///
 typedef struct {
+  ///
+  /// The table header for the EFI Runtime Services Table.
+  ///
   EFI_TABLE_HEADER                Hdr;
 
   //
@@ -1589,7 +1669,13 @@ typedef struct {
 #define EFI_BOOT_SERVICES_SIGNATURE   0x56524553544f4f42ULL
 #define EFI_BOOT_SERVICES_REVISION    EFI_2_10_SYSTEM_TABLE_REVISION
 
+///
+/// EFI Boot Services Table
+///
 typedef struct {
+  ///
+  /// The table header for the EFI Boot Services Table.
+  ///
   EFI_TABLE_HEADER                Hdr;
 
   //
@@ -1678,32 +1764,85 @@ typedef struct {
   //
   EFI_COPY_MEM                      CopyMem;
   EFI_SET_MEM                       SetMem;
-
   EFI_CREATE_EVENT_EX               CreateEventEx;
 } EFI_BOOT_SERVICES;
 
-//
-// Contains a set of GUID/pointer pairs comprised of the ConfigurationTable field in the
-// EFI System Table.
-//
+///
+/// Contains a set of GUID/pointer pairs comprised of the ConfigurationTable field in the
+/// EFI System Table.
+///
 typedef struct{
+  ///
+  /// The 128-bit GUID value that uniquely identifies the system configuration table.
+  ///
   EFI_GUID                          VendorGuid;
+  ///
+  /// A pointer to the table associated with VendorGuid.
+  ///
   VOID                              *VendorTable;
 } EFI_CONFIGURATION_TABLE;
 
+///
+/// EFI System Table
+///
 struct _EFI_SYSTEM_TABLE {
+  ///
+  /// The table header for the EFI System Table.
+  ///
   EFI_TABLE_HEADER                  Hdr;
+  ///
+  /// A pointer to a null terminated Unicode string that identifies
+  /// the vendor that produces the system firmware for the platform.
+  ///
   CHAR16                            *FirmwareVendor;
+  ///
+  /// A firmware vendor specific value that identifies the revision
+  /// of the system firmware for the platform.
+  ///
   UINT32                            FirmwareRevision;
+  ///
+  /// The handle for the active console input device.
+  ///
   EFI_HANDLE                        ConsoleInHandle;
+  ///
+  /// A pointer to the SIMPLE_INPUT_PROTOCOL interface that is
+  /// associated with ConsoleInHandle.
+  ///
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL    *ConIn;
+  ///
+  /// The handle for the active console output device.
+  ///
   EFI_HANDLE                        ConsoleOutHandle;
+  ///
+  /// A pointer to the SIMPLE_TEXT_OUTPUT_PROTOCOL interface
+  /// that is associated with ConsoleOutHandle.
+  ///
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *ConOut;
+  ///
+  /// The handle for the active standard error console device.
+  ///
   EFI_HANDLE                        StandardErrorHandle;
+  ///
+  /// A pointer to the SIMPLE_TEXT_OUTPUT_PROTOCOL interface
+  /// that is associated with StandardErrorHandle.
+  ///
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *StdErr;
+  ///
+  /// A pointer to the EFI Runtime Services Table.
+  ///
   EFI_RUNTIME_SERVICES              *RuntimeServices;
+  ///
+  /// A pointer to the EFI Boot Services Table.
+  ///
   EFI_BOOT_SERVICES                 *BootServices;
+  ///
+  /// The number of system configuration tables in the buffer ConfigurationTable.
+  ///
   UINTN                             NumberOfTableEntries;
+  ///
+  /// A pointer to the system configuration tables.
+  /// The number of entries in the table is NumberOfTableEntries.
+  ///
   EFI_CONFIGURATION_TABLE           *ConfigurationTable;
 };
 
@@ -1733,7 +1872,7 @@ typedef union {
     UINT32  SysReqPessed    : 1;
     UINT32  Reserved        : 16;
     UINT32  InputKeyCount   : 2;
-  }       Options;
+  } Options;
   UINT32  PackedValue;
 } HOT_KEY_EFI_KEY_DATA;
 
@@ -1759,7 +1898,6 @@ typedef struct {
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_IA32    L"\\EFI\\BOOT\\BOOTIA32.EFI"
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_IA64    L"\\EFI\\BOOT\\BOOTIA64.EFI"
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_X64     L"\\EFI\\BOOT\\BOOTX64.EFI"
-#define EFI_REMOVABLE_MEDIA_FILE_NAME_EBC     L"\\EFI\\BOOT\\BOOTEBC.EFI"
 
 #if   defined (MDE_CPU_IA32)
   #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_IA32
@@ -1768,7 +1906,6 @@ typedef struct {
 #elif defined (MDE_CPU_X64)
   #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_X64
 #elif defined (MDE_CPU_EBC)
-  #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_EBC
 #else
   #error Unknown Processor Type
 #endif

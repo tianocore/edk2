@@ -32,45 +32,31 @@ typedef UINT16  EFI_QUESTION_ID;
 typedef UINT16  EFI_STRING_ID;
 typedef UINT16  EFI_FORM_ID;
 typedef UINT16  EFI_VARSTORE_ID;
+
 typedef UINT16  EFI_DEFAULT_ID;
+
 typedef UINT32  EFI_HII_FONT_STYLE;
 
 
 
 #pragma pack(1)
 
+//
+// Definitions for Package Lists and Package Headers
+// Section 27.3.1
+//
 
 ///
-/// HII package list
+/// The header found at the start of each package list.
 ///
 typedef struct {
   EFI_GUID               PackageListGuid;
   UINT32                 PackageLength;
 } EFI_HII_PACKAGE_LIST_HEADER;
 
-/**
-    
-  Each package starts with a header, as defined above, which  
-  indicates the size and type of the package. When added to a  
-  pointer pointing to the start of the header, Length points at  
-  the next package. The package lists form a package list when  
-  concatenated together and terminated with an  
-  EFI_HII_PACKAGE_HEADER with a Type of EFI_HII_PACKAGE_END. The  
-  type EFI_HII_PACKAGE_TYPE_GUID is used for vendor-defined HII  
-  packages, whose contents are determined by the Guid. The range  
-  of package types starting with EFI_HII_PACKAGE_TYPE_SYSTEM_BEGIN  
-  through EFI_HII_PACKAGE_TYPE_SYSTEM_END are reserved for system  
-  firmware implementers.  
-  
-  @param Length The size of the package in bytes.
-  
-  @param Type   The package type. See EFI_HII_PACKAGE_TYPE_x,
-                below.
-  
-  @param Data   The package data, the format of which is
-                determined by Type.
-  
-**/
+///
+/// The header found at the start of each package.
+///
 typedef struct {
   UINT32  Length:24;
   UINT32  Type:8;
@@ -78,7 +64,7 @@ typedef struct {
 } EFI_HII_PACKAGE_HEADER;
 
 //
-// EFI_HII_PACKAGE_TYPE_x.
+// Value of HII package type
 // 
 #define EFI_HII_PACKAGE_TYPE_ALL             0x00
 #define EFI_HII_PACKAGE_TYPE_GUID            0x01
@@ -94,16 +80,17 @@ typedef struct {
 #define EFI_HII_PACKAGE_TYPE_SYSTEM_END      0xFF
 
 //
-// Simplified Font Package
+// Definitions for Simplified Font Package
+// Section 27.3.2
 //
 
-#define EFI_GLYPH_HEIGHT                     19
-#define EFI_GLYPH_WIDTH                      8
 //
 // Contents of EFI_NARROW_GLYPH.Attributes
 //
 #define EFI_GLYPH_NON_SPACING                0x01
 #define EFI_GLYPH_WIDE                       0x02
+#define EFI_GLYPH_HEIGHT                     19
+#define EFI_GLYPH_WIDTH                      8
 
 typedef struct {
   CHAR16                 UnicodeWeight;
@@ -119,7 +106,10 @@ typedef struct {
   UINT8                  Pad[3];
 } EFI_WIDE_GLYPH;
 
-
+///
+/// A simplified font package consists of a font header
+/// followed by a series of glyph structures.
+///
 typedef struct _EFI_HII_SIMPLE_FONT_PACKAGE_HDR {
   EFI_HII_PACKAGE_HEADER Header;
   UINT16                 NumberOfNarrowGlyphs;
@@ -129,9 +119,13 @@ typedef struct _EFI_HII_SIMPLE_FONT_PACKAGE_HDR {
 } EFI_HII_SIMPLE_FONT_PACKAGE_HDR;
 
 //
-// Font Package
+// Definitions for Font Package
+// Section 27.3.3
 //
 
+//
+// Value for font style
+//
 #define EFI_HII_FONT_STYLE_NORMAL            0x00000000
 #define EFI_HII_FONT_STYLE_BOLD              0x00000001
 #define EFI_HII_FONT_STYLE_ITALIC            0x00000002
@@ -149,6 +143,12 @@ typedef struct _EFI_HII_GLYPH_INFO {
   INT16                  AdvanceX;
 } EFI_HII_GLYPH_INFO;
 
+///
+/// The fixed header consists of a standard record header and
+/// then the character values in this section, the flags
+/// (including the encoding method) and the offsets of the glyph
+/// information, the glyph bitmaps and the character map.
+///
 typedef struct _EFI_HII_FONT_PACKAGE_HDR {
   EFI_HII_PACKAGE_HEADER Header;
   UINT32                 HdrSize;
@@ -158,6 +158,9 @@ typedef struct _EFI_HII_FONT_PACKAGE_HDR {
   CHAR16                 FontFamily[1];
 } EFI_HII_FONT_PACKAGE_HDR;
 
+//
+// Value of different glyph info block types
+//
 #define EFI_HII_GIBT_END                  0x00
 #define EFI_HII_GIBT_GLYPH                0x10
 #define EFI_HII_GIBT_GLYPHS               0x11
@@ -174,6 +177,10 @@ typedef struct _EFI_HII_FONT_PACKAGE_HDR {
 typedef struct _EFI_HII_GLYPH_BLOCK {
   UINT8                  BlockType;
 } EFI_HII_GLYPH_BLOCK;
+
+//
+// Definition of different glyph info block types
+//
 
 typedef struct _EFI_HII_GIBT_DEFAULTS_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
@@ -210,25 +217,25 @@ typedef struct _EFI_HII_GIBT_EXT4_BLOCK {
 typedef struct _EFI_HII_GIBT_GLYPH_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
   EFI_HII_GLYPH_INFO     Cell;
-  UINT8                  BitmapData[1]; // the number of bytes per bitmap can be calculated by ((Cell.Width+7)/8)*Cell.Height
+  UINT8                  BitmapData[1];
 } EFI_HII_GIBT_GLYPH_BLOCK;
 
 typedef struct _EFI_HII_GIBT_GLYPHS_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
   EFI_HII_GLYPH_INFO     Cell;
   UINT16                 Count;  
-  UINT8                  BitmapData[1]; // the number of bytes per bitmap can be calculated by ((Cell.Width+7)/8)*Cell.Height
+  UINT8                  BitmapData[1];
 } EFI_HII_GIBT_GLYPHS_BLOCK;
 
 typedef struct _EFI_HII_GIBT_GLYPH_DEFAULT_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
-  UINT8                  BitmapData[1]; // the number of bytes per bitmap can be calculated by ((Global.Cell.Width+7)/8)*Global.Cell.Height
+  UINT8                  BitmapData[1];
 } EFI_HII_GIBT_GLYPH_DEFAULT_BLOCK;
 
 typedef struct _EFI_HII_GIBT_GLYPHS_DEFAULT_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
   UINT16                 Count;
-  UINT8                  BitmapData[1]; // the number of bytes per bitmap can be calculated by ((Global.Cell.Width+7)/8)*Global.Cell.Height
+  UINT8                  BitmapData[1];
 } EFI_HII_GIBT_GLYPHS_DEFAULT_BLOCK;
 
 typedef struct _EFI_HII_GIBT_SKIP1_BLOCK {
@@ -242,16 +249,27 @@ typedef struct _EFI_HII_GIBT_SKIP2_BLOCK {
 } EFI_HII_GIBT_SKIP2_BLOCK;
 
 //
-// Device Path Package
+// Definitions for Device Path Package
+// Section 27.3.4
 //
+
+///
+/// The device path package is used to carry a device path
+/// associated with the package list.
+///
 typedef struct _EFI_HII_DEVICE_PATH_PACKAGE {
   EFI_HII_PACKAGE_HEADER   Header;
   // EFI_DEVICE_PATH_PROTOCOL DevicePath[];
 } EFI_HII_DEVICE_PATH_PACKAGE;
 
 //
-// GUID Package
+// Definitions for GUID Package
+// Section 27.3.5
 //
+
+///
+/// The GUID package is used to carry data where the format is defined by a GUID.
+///
 typedef struct _EFI_HII_GUID_PACKAGE_HDR {
   EFI_HII_PACKAGE_HEADER  Header;
   EFI_GUID                Guid;
@@ -259,12 +277,17 @@ typedef struct _EFI_HII_GUID_PACKAGE_HDR {
 } EFI_HII_GUID_PACKAGE_HDR;
 
 //
-// String Package
+// Definitions for String Package
+// Section 27.3.6
 //
 
 #define UEFI_CONFIG_LANG  L"x-UEFI"
-#define UEFI_CONFIG_LANG2 L"x-i-UEFI"     // BUGBUG, spec need to be updated.
+#define UEFI_CONFIG_LANG2 L"x-i-UEFI"
 
+///
+/// The fixed header consists of a standard record header and then the string identifiers
+/// contained in this section and the offsets of the string and language information.
+///
 typedef struct _EFI_HII_STRING_PACKAGE_HDR {
   EFI_HII_PACKAGE_HEADER  Header;
   UINT32                  HdrSize;
@@ -278,6 +301,9 @@ typedef struct {
   UINT8                   BlockType;
 } EFI_HII_STRING_BLOCK;
 
+//
+// Value of different string information block types
+//
 #define EFI_HII_SIBT_END                     0x00
 #define EFI_HII_SIBT_STRING_SCSU             0x10
 #define EFI_HII_SIBT_STRING_SCSU_FONT        0x11
@@ -294,6 +320,10 @@ typedef struct {
 #define EFI_HII_SIBT_EXT2                    0x31
 #define EFI_HII_SIBT_EXT4                    0x32
 #define EFI_HII_SIBT_FONT                    0x40
+
+//
+// Definition of different string information block types
+//
 
 typedef struct _EFI_HII_SIBT_DUPLICATE_BLOCK {
   EFI_HII_STRING_BLOCK    Header;
@@ -389,7 +419,8 @@ typedef struct _EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK {
 } EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK;
 
 //
-// Image Packages
+// Definitions for Image Package
+// Section 27.3.7
 //
 
 typedef struct _EFI_HII_IMAGE_PACKAGE_HDR {
@@ -402,6 +433,9 @@ typedef struct _EFI_HII_IMAGE_BLOCK {
   UINT8                   BlockType;
 } EFI_HII_IMAGE_BLOCK;
 
+//
+// Value of different image information block types
+//
 #define EFI_HII_IIBT_END               0x00
 #define EFI_HII_IIBT_IMAGE_1BIT        0x10
 #define EFI_HII_IIBT_IMAGE_1BIT_TRANS  0x11
@@ -418,6 +452,10 @@ typedef struct _EFI_HII_IMAGE_BLOCK {
 #define EFI_HII_IIBT_EXT1              0x30
 #define EFI_HII_IIBT_EXT2              0x31
 #define EFI_HII_IIBT_EXT4              0x32
+
+//
+// Definition of different image information block types
+//
 
 typedef struct _EFI_HII_IIBT_END_BLOCK {
   EFI_HII_IMAGE_BLOCK          Header;
@@ -538,6 +576,10 @@ typedef struct _EFI_HII_IIBT_SKIP2_BLOCK {
   UINT16                       SkipCount;
 } EFI_HII_IIBT_SKIP2_BLOCK;
 
+//
+// Definitions for Palette Information
+//
+
 typedef struct _EFI_HII_IMAGE_PALETTE_INFO_HEADER {
   UINT16                       PaletteCount;
 } EFI_HII_IMAGE_PALETTE_INFO_HEADER;
@@ -548,9 +590,13 @@ typedef struct _EFI_HII_IMAGE_PALETTE_INFO {
 } EFI_HII_IMAGE_PALETTE_INFO;
 
 //
-// Forms Package
+// Definitions for Forms Package
+// Section 27.3.8
 //
 
+///
+/// The Forms package is used to carry forms-based encoding data.
+///
 typedef struct _EFI_HII_FORM_PACKAGE {
   EFI_HII_PACKAGE_HEADER       Header;
   // EFI_IFR_OP_HEADER         OpCodeHeader;
@@ -672,6 +718,10 @@ typedef union {
 #define EFI_IFR_CATENATE_OP            0x5E
 #define EFI_IFR_GUID_OP                0x5F
 
+//
+// Definitions of IFR Standard Headers
+// Section 27.3.8.2
+//
 
 typedef struct _EFI_IFR_OP_HEADER {
   UINT8                    OpCode;
@@ -695,17 +745,27 @@ typedef struct _EFI_IFR_QUESTION_HEADER {
   UINT8                    Flags;
 } EFI_IFR_QUESTION_HEADER;
 
+//
+// Flag values of EFI_IFR_QUESTION_HEADER
+//
 #define EFI_IFR_FLAG_READ_ONLY         0x01
 #define EFI_IFR_FLAG_CALLBACK          0x04
 #define EFI_IFR_FLAG_RESET_REQUIRED    0x10
 #define EFI_IFR_FLAG_OPTIONS_ONLY      0x80
 
+//
+// Definition for Opcode Reference
+// Section 27.3.8.3
+//
 typedef struct _EFI_IFR_DEFAULTSTORE {
   EFI_IFR_OP_HEADER        Header;
   EFI_STRING_ID            DefaultName;
   UINT16                   DefaultId;
 } EFI_IFR_DEFAULTSTORE;
 
+//
+// Default Identifier of default store 
+//
 #define EFI_HII_DEFAULT_CLASS_STANDARD       0x0000
 #define EFI_HII_DEFAULT_CLASS_MANUFACTURING  0x0001
 #define EFI_HII_DEFAULT_CLASS_SAFE           0x0002
@@ -855,6 +915,9 @@ typedef struct _EFI_IFR_DATE {
   UINT8                    Flags;
 } EFI_IFR_DATE;
 
+//
+// Flags that describe the behavior of the question.
+//
 #define EFI_QF_DATE_YEAR_SUPPRESS      0x01
 #define EFI_QF_DATE_MONTH_SUPPRESS     0x02
 #define EFI_QF_DATE_DAY_SUPPRESS       0x04
@@ -894,16 +957,19 @@ typedef struct _EFI_IFR_NUMERIC {
   MINMAXSTEP_DATA          data;
 } EFI_IFR_NUMERIC;
 
+//
+// Flags related to the numeric question
+//
 #define EFI_IFR_NUMERIC_SIZE           0x03
-#define EFI_IFR_NUMERIC_SIZE_1         0x00
-#define EFI_IFR_NUMERIC_SIZE_2         0x01
-#define EFI_IFR_NUMERIC_SIZE_4         0x02
-#define EFI_IFR_NUMERIC_SIZE_8         0x03
+#define   EFI_IFR_NUMERIC_SIZE_1       0x00
+#define   EFI_IFR_NUMERIC_SIZE_2       0x01
+#define   EFI_IFR_NUMERIC_SIZE_4       0x02
+#define   EFI_IFR_NUMERIC_SIZE_8       0x03
 
 #define EFI_IFR_DISPLAY                0x30
-#define EFI_IFR_DISPLAY_INT_DEC        0x00
-#define EFI_IFR_DISPLAY_UINT_DEC       0x10
-#define EFI_IFR_DISPLAY_UINT_HEX       0x20
+#define   EFI_IFR_DISPLAY_INT_DEC      0x00
+#define   EFI_IFR_DISPLAY_UINT_DEC     0x10
+#define   EFI_IFR_DISPLAY_UINT_HEX     0x20
 
 typedef struct _EFI_IFR_ONE_OF {
   EFI_IFR_OP_HEADER        Header;
@@ -945,14 +1011,17 @@ typedef struct _EFI_IFR_TIME {
   UINT8                    Flags;
 } EFI_IFR_TIME;
 
+//
+// A bit-mask that determines which unique settings are active for this opcode.
+//
 #define QF_TIME_HOUR_SUPPRESS          0x01
 #define QF_TIME_MINUTE_SUPPRESS        0x02
 #define QF_TIME_SECOND_SUPPRESS        0x04
 
 #define QF_TIME_STORAGE                0x30
-#define QF_TIME_STORAGE_NORMAL         0x00
-#define QF_TIME_STORAGE_TIME           0x10
-#define QF_TIME_STORAGE_WAKEUP         0x20
+#define   QF_TIME_STORAGE_NORMAL       0x00
+#define   QF_TIME_STORAGE_TIME         0x10
+#define   QF_TIME_STORAGE_WAKEUP       0x20
 
 typedef struct _EFI_IFR_DISABLE_IF {
   EFI_IFR_OP_HEADER        Header;
@@ -994,6 +1063,9 @@ typedef struct _EFI_IFR_ONE_OF_OPTION {
   EFI_IFR_TYPE_VALUE       Value;
 } EFI_IFR_ONE_OF_OPTION;
 
+//
+// Types of the option's value.
+//
 #define EFI_IFR_TYPE_NUM_SIZE_8        0x00
 #define EFI_IFR_TYPE_NUM_SIZE_16       0x01
 #define EFI_IFR_TYPE_NUM_SIZE_32       0x02
@@ -1036,11 +1108,6 @@ typedef struct _EFI_IFR_EQ_ID_LIST {
   UINT16                   ValueList[1];
 } EFI_IFR_EQ_ID_LIST;
 
-typedef struct _EFI_IFR_QUESTION_REF1 {
-  EFI_IFR_OP_HEADER        Header;
-  EFI_QUESTION_ID          QuestionId;
-} EFI_IFR_QUESTION_REF1;
-
 typedef struct _EFI_IFR_UINT8 {
   EFI_IFR_OP_HEADER        Header;
   UINT8 Value;
@@ -1051,10 +1118,6 @@ typedef struct _EFI_IFR_UINT16 {
   UINT16                   Value;
 } EFI_IFR_UINT16;
 
-typedef struct _EFI_IFR_QUESTION_REF2 {
-  EFI_IFR_OP_HEADER        Header;
-} EFI_IFR_QUESTION_REF2;
-
 typedef struct _EFI_IFR_UINT32 {
   EFI_IFR_OP_HEADER        Header;
   UINT32                   Value;
@@ -1064,6 +1127,15 @@ typedef struct _EFI_IFR_UINT64 {
   EFI_IFR_OP_HEADER        Header;
   UINT64 Value;
 } EFI_IFR_UINT64;
+
+typedef struct _EFI_IFR_QUESTION_REF1 {
+  EFI_IFR_OP_HEADER        Header;
+  EFI_QUESTION_ID          QuestionId;
+} EFI_IFR_QUESTION_REF1;
+
+typedef struct _EFI_IFR_QUESTION_REF2 {
+  EFI_IFR_OP_HEADER        Header;
+} EFI_IFR_QUESTION_REF2;
 
 typedef struct _EFI_IFR_QUESTION_REF3 {
   EFI_IFR_OP_HEADER        Header;
@@ -1142,11 +1214,23 @@ typedef struct _EFI_IFR_TO_BOOLEAN {
   EFI_IFR_OP_HEADER        Header;
 } EFI_IFR_TO_BOOLEAN;
 
+//
+// For EFI_IFR_TO_STRING, when converting from
+// unsigned integers, these flags control the format:
+// 0 = unsigned decimal
+// 1 = signed decimal
+// 2 = hexadecimal (lower-case alpha)
+// 3 = hexadecimal (upper-case alpha)
+//
 #define EFI_IFR_STRING_UNSIGNED_DEC      0
 #define EFI_IFR_STRING_SIGNED_DEC        1
 #define EFI_IFR_STRING_LOWERCASE_HEX     2
 #define EFI_IFR_STRING_UPPERCASE_HEX     3
-
+//
+// When converting from a buffer, these flags control the format:
+// 0 = ASCII
+// 8 = Unicode
+//
 #define EFI_IFR_STRING_ASCII             0
 #define EFI_IFR_STRING_UNICODE           8
 
@@ -1247,6 +1331,9 @@ typedef struct _EFI_IFR_CONDITIONAL {
   EFI_IFR_OP_HEADER        Header;
 } EFI_IFR_CONDITIONAL;
 
+//
+// Flags governing the matching criteria of EFI_IFR_FIND
+//
 #define EFI_IFR_FF_CASE_SENSITIVE    0x00
 #define EFI_IFR_FF_CASE_INSENSITIVE  0x01
 
@@ -1263,6 +1350,10 @@ typedef struct _EFI_IFR_TOKEN {
   EFI_IFR_OP_HEADER        Header;
 } EFI_IFR_TOKEN;
 
+//
+// Flags specifying whether to find the first matching string
+// or the first non-matching string.
+//
 #define EFI_IFR_FLAGS_FIRST_MATCHING     0x00
 #define EFI_IFR_FLAGS_FIRST_NON_MATCHING 0x01
 
@@ -1272,7 +1363,9 @@ typedef struct _EFI_IFR_SPAN {
 } EFI_IFR_SPAN;
 
 //
-// Keyboard Package
+// Definitions for Keyboard Package
+// Section 27.3.9
+// Releated definitions are in Section of EFI_HII_DATABASE_PROTOCOL
 //
 
 typedef enum {    
