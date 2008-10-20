@@ -1,19 +1,20 @@
-#/** @file
+##  @file  MdeModulePkg.dec
+#
 # Mde Module Package Reference Implementations
 #
 # This module provides headers and libraries that conform to EFI/PI Industry standards.
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #
 # All rights reserved.
-#    This program and the accompanying materials are licensed and made available under
-#    the terms and conditions of the BSD License which accompanies this distribution.
-#    The full text of the license may be found at
-#    http://opensource.org/licenses/bsd-license.php
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
 #
-#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 
 [Defines]
@@ -27,44 +28,47 @@
 
 
 [LibraryClasses.common]
-  ## IpIo layer upon EFI IP4 Protocol.
+  ##  @libraryclass  IpIo layer upon EFI IP4 Protocol.
   IpIoLib|Include/Library/IpIoLib.h
   
-  ## Basic function for UEFI network stack.
+  ##  @libraryclass  Basic function for UEFI network stack.
   NetLib|Include/Library/NetLib.h
 
-  ## Defines a set of methods to reset whole system.
+  ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
   
-  ## The helper routines to access UDP service.
+  ##  @libraryclass  The helper routines to access UDP service.
   UdpIoLib|Include/Library/UdpIoLib.h
   
-  ## Defines a set of methods related do S3 mode.
+  ##  @libraryclass  Defines a set of methods related do S3 mode.
   S3Lib|Include/Library/S3Lib.h
   
-  ## Defines a set of methods related recovery mode.
+  ##  @libraryclass  Defines a set of methods related recovery mode.
   RecoveryLib|Include/Library/RecoveryLib.h
   
-  ## Basic platform driver override functions.
+  ##  @libraryclass  Basic platform driver override functions.
   PlatDriOverLib|Include/Library/PlatDriOverLib.h
   
-  ## Includes two extended HII functions to create and destory Hii Package 
-  #  by create the virtual Driver Handle.
+  ##  @libraryclass  Includes two extended HII functions to create and destory Hii Package 
+  #                  by create the virtual Driver Handle.
+  ##
   ExtendedHiiLib|Include/Library/ExtendedHiiLib.h
   
-  ## Defines APIs that is related to IFR operations but specific to EDK II implementation.
+  ##  @libraryclass  Defines APIs that is related to IFR operations but specific to EDK II
+  #                  implementation.
+  ##
   ExtendedIfrSupportLib|Include/Library/ExtendedIfrSupportLib.h
   
-  ## Defines a set of interfaces on how to process capusle image update.
+  ##  @libraryclass  Defines a set of interfaces on how to process capusle image update.
   CapsuleLib|Include/Library/CapsuleLib.h
   
-  ## Platform BDS library definition about platform specific behavior.
+  ##  @libraryclass  Platform BDS library definition about platform specific behavior.
   PlatformBdsLib|Include/Library/PlatformBdsLib.h
   
-  ## Generic BDS library definition, include the data structure and function.
+  ##  @libraryclass  Generic BDS library definition, include the data structure and function.
   GenericBdsLib|Include/Library/GenericBdsLib.h
   
-  ## Library for Deferred Procedure Calls.
+  ##  @libraryclass  Library for Deferred Procedure Calls.
   DpcLib|Include/Library/DpcLib.h
 
 [Guids.common]
