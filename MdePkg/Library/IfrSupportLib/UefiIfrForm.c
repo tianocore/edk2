@@ -59,8 +59,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT16 mFakeConfigHdr[] = L"GUID=00000000000
 
   @param  NumberOfLines          The number of lines for the dialog box
   @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
-  @param  String                 Pointer to the first string in the list
-  @param  ...                    A series of (quantity == NumberOfLines - 1) text
+  @param  Marker                 A series of (quantity == NumberOfLines - 1) text
                                  strings which will be used to construct the dialog
                                  box
 
