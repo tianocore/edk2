@@ -1,7 +1,7 @@
 /** @file
   EFI Guid Partition Table Format Definition.
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,10 @@
 #ifndef __UEFI_GPT_H__
 #define __UEFI_GPT_H__
 
+///
+/// The primary GUID Partition Table Header must be
+/// located in LBA 1 (i.e., the second logical block).
+///
 #define PRIMARY_PART_HEADER_LBA 1
 
 ///
@@ -51,14 +55,6 @@ typedef struct {
   UINT64    Attributes;
   CHAR16    PartitionName[36];
 } EFI_PARTITION_ENTRY;
-
-///
-/// GPT Partition Entry Status
-///
-typedef struct {
-  BOOLEAN OutOfRange;
-  BOOLEAN Overlap;
-} EFI_PARTITION_ENTRY_STATUS;
 
 #pragma pack()
 #endif
