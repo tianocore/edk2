@@ -12,9 +12,6 @@
 
 **/
 
-
-
-
 #include "BaseLibInternals.h"
 
 #define SPIN_LOCK_RELEASED          ((UINTN) 1)
