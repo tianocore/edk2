@@ -32,7 +32,7 @@ EFI_STATUS
 EFIAPI
 PeiGetBootMode (
   IN  CONST EFI_PEI_SERVICES  **PeiServices,
-  OUT       EFI_BOOT_MODE     *BootMode
+  IN  OUT   EFI_BOOT_MODE     *BootMode
   )
 {
   PEI_CORE_INSTANCE             *PrivateData;    
