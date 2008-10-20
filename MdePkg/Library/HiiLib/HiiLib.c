@@ -615,7 +615,7 @@ EFIAPI
 HiiLibListPackageLists (
   IN        UINT8                     PackageType,
   IN CONST  EFI_GUID                  *PackageGuid,
-  OUT    UINTN                        *HandleBufferLength,
+  IN OUT    UINTN                     *HandleBufferLength,
   OUT       EFI_HII_HANDLE            **HandleBuffer
   )
 {
