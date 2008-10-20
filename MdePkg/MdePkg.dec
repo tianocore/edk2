@@ -1,18 +1,18 @@
-#/** @file
+##  @file  MdePkg.dec
 #
 # This Package provides headers and libraries that conform to EFI/PI Industry standards.
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #
 # All rights reserved.
-#    This program and the accompanying materials are licensed and made available under
-#    the terms and conditions of the BSD License which accompanies this distribution.
-#    The full text of the license may be found at
-#    http://opensource.org/licenses/bsd-license.php
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# 
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
-#**/
+##
 
 
 [Defines]
@@ -38,61 +38,170 @@
   Include/Ebc
 
 [LibraryClasses.common]
+  ##  @libraryclass  Provides most usb APIs to support the Hid requests defined in Usb Hid 1.1 spec 
+  #                  and the standard requests defined in Usb 1.1 spec.
+  ##
   UsbLib|Include/Library/UsbLib.h
+
+  ##  @libraryclass  Provides a service to retrieve a pointer to the EFI Runtime Services Table.
   UefiRuntimeServicesTableLib|Include/Library/UefiRuntimeServicesTableLib.h
+
+  ##  @libraryclass  Provides library functions for each of the UEFI Runtime Services.
   UefiRuntimeLib|Include/Library/UefiRuntimeLib.h
+
+  ##  @libraryclass  Provides library functions for common UEFI operations.
+  #                  Only available to DXE and UEFI module types.
+  ##
   UefiLib|Include/Library/UefiLib.h
+
+  ##  @libraryclass  Module entry point library for UEFI drivers, DXE Drivers and DXE Runtime Drivers
   UefiDriverEntryPoint|Include/Library/UefiDriverEntryPoint.h
-  ## UEFI Decompress Library Functions defintion for UEFI compress algorithm
+
+  ##  @libraryclass  UEFI Decompress Library Functions defintion for UEFI compress algorithm
   UefiDecompressLib|Include/Library/UefiDecompressLib.h
+
+  ##  @libraryclass  Provides a service to retrieve a pointer to the EFI Boot Services Table.
   UefiBootServicesTableLib|Include/Library/UefiBootServicesTableLib.h
+
+  ##  @libraryclass  Module entry point library for UEFI Applications.
   UefiApplicationEntryPoint|Include/Library/UefiApplicationEntryPoint.h
+
+  ##  @libraryclass  Provides calibrated delay and performance counter services.
   TimerLib|Include/Library/TimerLib.h
+
+  ##  @libraryclass  Provides library functions to access SMBUS devices.
   SmbusLib|Include/Library/SmbusLib.h
+
+  ##  @libraryclass  Provides the functions to submit Scsi commands defined in SCSI-2 specification for scsi device.
   ScsiLib|Include/Library/ScsiLib.h
+
+  ##  @libraryclass  Provides a service to publish discovered system resources.
   ResourcePublicationLib|Include/Library/ResourcePublicationLib.h
+
+  ##  @libraryclass  Provides services to log status code records.
   ReportStatusCodeLib|Include/Library/ReportStatusCodeLib.h
+
+  ##  @libraryclass  Provides services to print a formatted string to a buffer.
+  #                  All combinations of Unicode and ASCII strings are supported.
+  ##
   PrintLib|Include/Library/PrintLib.h
+
+  ##  @libraryclass  Provides services to send progress/error codes to a POST card.
   PostCodeLib|Include/Library/PostCodeLib.h
+
+  ##  @libraryclass  Provides services to log the execution times and retrieve them later.
   PerformanceLib|Include/Library/PerformanceLib.h
+
+  ##  @libraryclass  Provides a service to retrieve a pointer to the PEI Services Table.
   PeiServicesTablePointerLib|Include/Library/PeiServicesTablePointerLib.h
+
+  ##  @libraryclass  Provides library functions for all PEI Services.
   PeiServicesLib|Include/Library/PeiServicesLib.h
+
+  ##  @libraryclass  Module entry point library for PEIM.
   PeimEntryPoint|Include/Library/PeimEntryPoint.h
+
+  ##  @libraryclass  Module entry point library for PEI core.
   PeiCoreEntryPoint|Include/Library/PeiCoreEntryPoint.h
+
+  ##  @libraryclass  Provides services to load and relocate a PE/COFF image.
   PeCoffLib|Include/Library/PeCoffLib.h
+
+  ##  @libraryclass  Provides a service to retrieve the PE/COFF entry point from a PE/COFF image.
   PeCoffGetEntryPointLib|Include/Library/PeCoffGetEntryPointLib.h
+
+  ##  @libraryclass  Provides services to access PCI Configuration Space on a platform with multiple PCI segments.
   PciSegmentLib|Include/Library/PciSegmentLib.h
+
+  ##  @libraryclass  Provides services to access PCI Configuration Space.
   PciLib|Include/Library/PciLib.h
+
+  ##  @libraryclass  Provides services to access PCI Configuration Space using the MMIO PCI Express window.
   PciExpressLib|Include/Library/PciExpressLib.h
+
+  ##  @libraryclass  Provides services to access PCI Configuration Space using the I/O ports 0xCF8 and 0xCFC.
   PciCf8Lib|Include/Library/PciCf8Lib.h
+
+  ##  @libraryclass  Provides library services to get and set Platform Configuration Database entries.
   PcdLib|Include/Library/PcdLib.h
+
+  ##  @libraryclass  Provides services to allocate and free memory buffers of various memory types and alignments.
   MemoryAllocationLib|Include/Library/MemoryAllocationLib.h
+
+  ##  @libraryclass  Provide services to access I/O Ports and MMIO registers.
   IoLib|Include/Library/IoLib.h
-  IfrSupportLib|Include/Library/IfrSupportLib.h
+
+  ##  @libraryclass  Provides services to create and parse HOBs.
   HobLib|Include/Library/HobLib.h
+
+  ##  @libraryclass  Provides HII related functions.
   HiiLib|Include/Library/HiiLib.h
+
+  ##  @libraryclass  Provides all FVB runtime services defined in PI specification FVB protocol to provide
+  #                  low level control interfaces over block-oriented firmware devices.
+  ##
   FvbServiceLib|Include/Library/FvbServiceLib.h
+
+  ##  @libraryclass  Module entry point library for DXE SMM Driver.
   DxeSmmDriverEntryPoint|Include/Library/DxeSmmDriverEntryPoint.h
+
+  ##  @libraryclass  Provides a service to retrieve a pointer to the DXE Services Table.
+  #                  Only available to DXE module types.
+  ##
   DxeServicesTableLib|Include/Library/DxeServicesTableLib.h
+
+  ##  @libraryclass  Module entry point library for DXE core.
   DxeCoreEntryPoint|Include/Library/DxeCoreEntryPoint.h
+
+  ##  @libraryclass  Provides library functions to construct and parse UEFI Device Paths.
   DevicePathLib|Include/Library/DevicePathLib.h
+
+  ##  @libraryclass  Provides services to print debug and assert messages to a debug output device.
   DebugLib|Include/Library/DebugLib.h
+
+  ##  @libraryclass  Provides CPU architecture specific functions that can not be defined in the Base Library
+  #                  due to dependencies on the PAL Library
+  ##
   CpuLib|Include/Library/CpuLib.h
+
+  ##  @libraryclass  Provides services to maintain instruction and data caches.
   CacheMaintenanceLib|Include/Library/CacheMaintenanceLib.h
+
+  ##  @libraryclass  Provides copy memory, fill memory, zero memory, and GUID functions. 
   BaseMemoryLib|Include/Library/BaseMemoryLib.h
+
+  ##  @libraryclass  Provides string functions, linked list functions, math functions, synchronization functions
+  #                  and CPU architecture specific functions.
+  ##
   BaseLib|Include/Library/BaseLib.h
-  BasePeCoffLib|Include/Library/PeCoffLib.h
+
+  ##  @libraryclass  supports displaying graphical splash screen, locking of keyboard input and
+  #                  printing character on screen.
+  ##
   GraphicsLib|Include/Library/GraphicsLib.h
-  ## Extract Guided Section Library class defintions that provides many handlers for the different guided section data.
+
+  ##  @libraryclass  Extract Guided Section Library class defintions that provides many handlers
+  #                  for the different guided section data.
+  ##
   ExtractGuidedSectionLib|Include/Library/ExtractGuidedSectionLib.h
+
+  ##  @libraryclass  Provides a set of interfaces to do IFR opcode creation and interact with a UEFI Form Browser.
   IfrSupportLib|Include/Library/IfrSupportLib.h
+
+  ##  @libraryclass  Provides a set of PI library functions and macros for PEI phase.
   PeiPiLib|Include/Library/PeiPiLib.h
-  ## Serial I/O Port library functions definition.
+
+  ##  @libraryclass  Defines a set of Serial Port I/O interfaces.
   SerialPortLib|Include/Library/SerialPortLib.h
+
+  ##  @libraryclass  Provides a set of PI library functions and macros for DXE phase.
   DxePiLib|Include/Library/DxePiLib.h
   
 [LibraryClasses.IPF]
+  ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
   SalLib|Include/Library/SalLib.h
+
+  ##  @libraryclass  The PAL Library provides a service to make a PAL CALL.
   PalCallLib|Include/Library/PalCallLib.h
 
 [Guids.common]
