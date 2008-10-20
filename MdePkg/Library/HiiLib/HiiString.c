@@ -495,8 +495,8 @@ zulzu\
 EFI_STATUS
 EFIAPI
 ConvertRfc3066LanguageToIso639Language (
-  CHAR8   *LanguageRfc3066,
-  CHAR8   *LanguageIso639
+  IN  CHAR8   *LanguageRfc3066,
+  OUT CHAR8   *LanguageIso639
   )
 {
   UINTN  Index;
