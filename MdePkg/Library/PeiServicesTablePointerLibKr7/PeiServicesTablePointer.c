@@ -40,29 +40,6 @@ GetPeiServicesTablePointer (
 }
 
 /**
-  The constructor function caches the pointer to PEI services.
-
-  The constructor function caches the pointer to PEI services.
-  It will always return EFI_SUCCESS.
-
-  @param  FfsHeader   Pointer to FFS header the loaded driver.
-  @param  PeiServices Pointer to the PEI services.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
-
-**/
-EFI_STATUS
-EFIAPI
-PeiServicesTablePointerLibConstructor (
-  IN EFI_PEI_FILE_HANDLE  *FfsHeader,
-  IN EFI_PEI_SERVICES     **PeiServices
-  )
-{
-  AsmWriteKr7 ((UINT64)(UINTN)PeiServices);
-  return EFI_SUCCESS;
-}
-
-/**
   The function set the pointer of PEI services in KR7 register 
   according to PI specification.
   
