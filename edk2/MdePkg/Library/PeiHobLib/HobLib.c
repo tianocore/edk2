@@ -444,8 +444,13 @@ BuildFv2Hob (
 /**
   Builds a Capsule Volume HOB.
 
-  This function is not supported, because Capsule Volume Hob is the platform
-  specific. It is not the common defintion in PI and UEFI spec.
+  This function builds a Capsule Volume HOB.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The base address of the Capsule Volume.
+  @param  Length        The size of the Capsule Volume in bytes.
 
 **/
 VOID
