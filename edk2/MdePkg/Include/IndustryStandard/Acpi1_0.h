@@ -1,7 +1,7 @@
 /** @file   
 	ACPI 1.0b definitions from the ACPI Specification, revision 1.0b
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -42,11 +42,14 @@ typedef struct {
 
 #pragma pack()
 //
-// Define for Pci Host Bridge Resource Allocation
+// Define for Desriptor
 //
 #define ACPI_ADDRESS_SPACE_DESCRIPTOR 0x8A
 #define ACPI_END_TAG_DESCRIPTOR       0x79
 
+//
+// Resource Type
+//
 #define ACPI_ADDRESS_SPACE_TYPE_MEM   0x00
 #define ACPI_ADDRESS_SPACE_TYPE_IO    0x01
 #define ACPI_ADDRESS_SPACE_TYPE_BUS   0x02
@@ -56,11 +59,11 @@ typedef struct {
 ///
 #define ACPI_TIMER_FREQUENCY       3579545
 
-//
-// Make sure structures match spec
-//
-#pragma pack(1)
 
+//
+// The commond definition of QWORD, DWORD, and WORD
+// Address Space Descriptors
+//
 typedef struct {
   UINT8   Desc;
   UINT16  Len;
@@ -115,9 +118,6 @@ typedef struct {
 #define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_TRANSLATION          (1 << 5)
 #define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_STATIC               (0 << 5)
 
-#pragma pack()
-
-
 //
 // Ensure proper structure formats
 //
@@ -139,8 +139,8 @@ typedef struct {
 
 //
 // Root System Description Table
-// No definition needed as it is a common description table header followed by a
-// variable number of UINT32 table pointers.
+// No definition needed as it is a common description table header, the same with 
+// EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT32 table pointers.
 //
 
 ///
@@ -256,7 +256,7 @@ typedef struct {
 
 //
 // Multiple APIC Description Table APIC structure types
-// All other values between 0x09 an 0xFF are reserved and
+// All other values between 0x05 an 0xFF are reserved and
 // will be ignored by OSPM.
 //
 #define EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC           0x00
