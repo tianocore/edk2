@@ -12,9 +12,6 @@
 
 **/
 
-
-
-
 #include "BaseLibInternals.h"
 
 #define QUOTIENT_MAX_UINTN_DIVIDED_BY_10      ((UINTN) -1 / 10)
@@ -504,7 +501,6 @@ StrStr (
   decimal character. The valid decimal character is from
   L'0' to L'9'.
 
-
   @param  Char  The character to check against.
 
   @retval TRUE  If the Char is a decmial character.
@@ -528,7 +524,6 @@ InternalIsDecimalDigitCharacter (
   which maps to a valid small-case ASCII character, i.e.
   L'a' to L'z'. For other Unicode character, the input character
   is returned directly.
-
 
   @param  Char  The character to convert.
 
