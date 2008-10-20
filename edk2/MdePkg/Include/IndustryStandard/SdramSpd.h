@@ -1,7 +1,7 @@
 /** @file
   This file contains definitions for the SPD fields on an SDRAM.
     
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -32,12 +32,12 @@
 #define SPD_SDRAM_CAS_LATENCY           18
 #define SPD_SDRAM_MODULE_ATTR           21
 
-#define SPD_SDRAM_TCLK1_PULSE           9   // cycle time for highest cas latency
-#define SPD_SDRAM_TAC1_PULSE            10  // access time for highest cas latency
-#define SPD_SDRAM_TCLK2_PULSE           23  // cycle time for 2nd highest cas latency
-#define SPD_SDRAM_TAC2_PULSE            24  // access time for 2nd highest cas latency
-#define SPD_SDRAM_TCLK3_PULSE           25  // cycle time for 3rd highest cas latency
-#define SPD_SDRAM_TAC3_PULSE            26  // access time for 3rd highest cas latency
+#define SPD_SDRAM_TCLK1_PULSE           9   ///< cycle time for highest cas latency
+#define SPD_SDRAM_TAC1_PULSE            10  ///< access time for highest cas latency
+#define SPD_SDRAM_TCLK2_PULSE           23  ///< cycle time for 2nd highest cas latency
+#define SPD_SDRAM_TAC2_PULSE            24  ///< access time for 2nd highest cas latency
+#define SPD_SDRAM_TCLK3_PULSE           25  ///< cycle time for 3rd highest cas latency
+#define SPD_SDRAM_TAC3_PULSE            26  ///< access time for 3rd highest cas latency
 #define SPD_SDRAM_MIN_PRECHARGE         27
 #define SPD_SDRAM_ACTIVE_MIN            28
 #define SPD_SDRAM_RAS_CAS               29
@@ -47,15 +47,15 @@
 //
 // Memory Type Definitions
 //
-#define SPD_VAL_SDR_TYPE  4 // SDR SDRAM memory
-#define SPD_VAL_DDR_TYPE  7 // DDR SDRAM memory
-#define SPD_VAL_DDR2_TYPE 8 // DDR2 SDRAM memory
+#define SPD_VAL_SDR_TYPE  4 ///< SDR SDRAM memory
+#define SPD_VAL_DDR_TYPE  7 ///< DDR SDRAM memory
+#define SPD_VAL_DDR2_TYPE 8 ///< DDR2 SDRAM memory
 //
 // ECC Type Definitions
 //
-#define SPD_ECC_TYPE_NONE   0x00  // No error checking
-#define SPD_ECC_TYPE_PARITY 0x01  // No error checking
-#define SPD_ECC_TYPE_ECC    0x02  // Error checking only
+#define SPD_ECC_TYPE_NONE   0x00  ///< No error checking
+#define SPD_ECC_TYPE_PARITY 0x01  ///< No error checking
+#define SPD_ECC_TYPE_ECC    0x02  ///< Error checking only
 //
 // Module Attributes (Bit positions)
 //

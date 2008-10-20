@@ -1,8 +1,7 @@
 /** @file
-  Industry Standard Definitions of SMBIOS tables.
+  Industry Standard Definitions of SMBIOS Table Specification v2.6
 
-
-  Copyright (c) 2006 - 2007, Intel Corporation All rights
+  Copyright (c) 2006 - 2008, Intel Corporation All rights
   reserved. This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at        
@@ -11,15 +10,13 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  @par Revision Reference: SMBIOS 2.0
-  
 **/
 
 #ifndef __SMBIOS_STANDARD_H__
 #define __SMBIOS_STANDARD_H__
-//
-// Smbios Table Entry Point Structure
-//
+///
+/// Smbios Table Entry Point Structure
+///
 #pragma pack(1)
 typedef struct {
   UINT8   AnchorString[4];
@@ -49,6 +46,9 @@ typedef struct {
 
 typedef UINT8 SMBIOS_TABLE_STRING;
 
+///
+/// BIOS Information (Type 0)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Vendor;
@@ -64,6 +64,9 @@ typedef struct {
   UINT8                 EmbeddedControllerFirmwareMinorRelease;
 } SMBIOS_TABLE_TYPE0;
 
+///
+/// System Information (Type 1)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Manufacturer;
@@ -76,6 +79,9 @@ typedef struct {
   SMBIOS_TABLE_STRING   Family;
 } SMBIOS_TABLE_TYPE1;
 
+///
+/// Base Board (or Module) Information (Type 2)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Manufacturer;
@@ -97,6 +103,9 @@ typedef struct {
   UINT8                 ContainedElementMaximum;
 } CONTAINED_ELEMENT;
 
+///
+/// System Enclosure or Chassis (Type 3)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Manufacturer;
@@ -116,6 +125,9 @@ typedef struct {
   CONTAINED_ELEMENT     ContainedElements[1];
 } SMBIOS_TABLE_TYPE3;
 
+///
+/// Processor Information (Type 4)
+///
 typedef struct { 
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 Socket;
@@ -149,6 +161,9 @@ typedef struct {
   UINT16                ProcessorFamily2;
 } SMBIOS_TABLE_TYPE4;
 
+///
+/// Memory Controller Information (Type 5, Obsolete)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 ErrDetectMethod;
@@ -161,9 +176,11 @@ typedef struct {
   UINT8                 MemoryModuleVoltage;
   UINT8                 AssociatedMemorySlotNum;
   UINT16                MemoryModuleConfigHandles[1];
-//  UINT8                 EnableErrCorrectCapabilities;
 } SMBIOS_TABLE_TYPE5;
 
+///
+/// Memory Module Information (Type 6, Obsolete)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   SocketDesignation;
@@ -175,6 +192,9 @@ typedef struct {
   UINT8                 ErrorStatus;
 } SMBIOS_TABLE_TYPE6;
 
+///
+/// Cache Information (Type 7)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   SocketDesignation;
@@ -189,6 +209,9 @@ typedef struct {
   UINT8                 Associativity;
 } SMBIOS_TABLE_TYPE7;
 
+///
+/// Port Connector Information (Type 8)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   InternalReferenceDesignator;
@@ -198,6 +221,9 @@ typedef struct {
   UINT8                 PortType;
 } SMBIOS_TABLE_TYPE8;
 
+///
+/// System Slots (Type 9)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   SlotDesignation;
@@ -221,21 +247,33 @@ typedef struct {
   SMBIOS_TABLE_STRING   DescriptionString;
 } DEVICE_STRUCT;
 
+///
+/// On Board Devices Information (Type 10, obsolete)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   DEVICE_STRUCT         Device[1];
 } SMBIOS_TABLE_TYPE10;
 
+///
+/// OEM Strings (Type 11)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 StringCount;
 } SMBIOS_TABLE_TYPE11;
 
+///
+/// System Configuration Options (Type 12)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 StringCount;
 } SMBIOS_TABLE_TYPE12;
 
+///
+/// BIOS Language Information (Type 13)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 InstallableLanguages;
@@ -249,6 +287,9 @@ typedef struct {
   UINT16                ItemHandle;
 } GROUP_STRUCT;
 
+///
+/// Group Associations (Type 14)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   GroupName;
@@ -260,6 +301,9 @@ typedef struct {
   UINT8                 DataFormatType;
 } EVENT_LOG_TYPE;
 
+///
+/// System Event Log (Type 15)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT16                LogAreaLength;
@@ -275,6 +319,9 @@ typedef struct {
   EVENT_LOG_TYPE        EventLogTypeDescriptors[1];
 } SMBIOS_TABLE_TYPE15;
 
+///
+/// Physical Memory Array (Type 16)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 Location;
@@ -285,6 +332,9 @@ typedef struct {
   UINT16                NumberOfMemoryDevices;
 } SMBIOS_TABLE_TYPE16;
 
+///
+/// Memory Device (Type 17)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT16                MemoryArrayHandle;
@@ -309,6 +359,9 @@ typedef struct {
   UINT8                 Attributes;
 } SMBIOS_TABLE_TYPE17;
 
+///
+/// 32-bit Memory Error Information (Type 18)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 ErrorType;
@@ -320,6 +373,9 @@ typedef struct {
   UINT32                ErrorResolution;
 } SMBIOS_TABLE_TYPE18;
 
+///
+/// Memory Array Mapped Address (Type 19)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT32                StartingAddress;
@@ -328,6 +384,9 @@ typedef struct {
   UINT8                 PartitionWidth;
 } SMBIOS_TABLE_TYPE19;
 
+///
+/// Memory Device Mapped Address (Type 20)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT32                StartingAddress;
@@ -339,6 +398,9 @@ typedef struct {
   UINT8                 InterleavedDataDepth;
 } SMBIOS_TABLE_TYPE20;
 
+///
+/// Built-in Pointing Device (Type 21)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 Type;
@@ -346,6 +408,9 @@ typedef struct {
   UINT8                 NumberOfButtons;
 } SMBIOS_TABLE_TYPE21;
 
+///
+/// Portable Battery (Type 22)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Location;
@@ -365,6 +430,9 @@ typedef struct {
   UINT32                OEMSpecific;
 } SMBIOS_TABLE_TYPE22;
 
+///
+/// System Reset (Type 23)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 Capabilities;
@@ -374,11 +442,17 @@ typedef struct {
   UINT16                Timeout;
 } SMBIOS_TABLE_TYPE23;
 
+///
+/// Hardware Security (Type 24)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 HardwareSecuritySettings;
 } SMBIOS_TABLE_TYPE24;
 
+///
+/// System Power Controls (Type 25)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 NextScheduledPowerOnMonth;
@@ -388,6 +462,9 @@ typedef struct {
   UINT8                 NextScheduledPowerOnSecond;
 } SMBIOS_TABLE_TYPE25;
 
+///
+/// Voltage Probe (Type 26)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Description;
@@ -401,6 +478,9 @@ typedef struct {
   UINT16                NominalValue;
 } SMBIOS_TABLE_TYPE26;
 
+///
+/// Cooling Device (Type 27)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT16                TemperatureProbeHandle;
@@ -410,6 +490,9 @@ typedef struct {
   UINT16                NominalSpeed;
 } SMBIOS_TABLE_TYPE27;
 
+///
+/// Temperature Probe (Type 28)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Description;
@@ -423,6 +506,9 @@ typedef struct {
   UINT16                NominalValue;
 } SMBIOS_TABLE_TYPE28;
 
+///
+/// Electrical Current Probe (Type 29)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Description;
@@ -436,12 +522,18 @@ typedef struct {
   UINT16                NominalValue;
 } SMBIOS_TABLE_TYPE29;
 
+///
+/// Out-of-Band Remote Access (Type 30)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   ManufacturerName;
   UINT8                 Connections;
 } SMBIOS_TABLE_TYPE30;
 
+///
+/// Boot Integrity Services (BIS) Entry Point (Type 31)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 Checksum;
@@ -453,12 +545,18 @@ typedef struct {
   UINT32                Reserved4;
 } SMBIOS_TABLE_TYPE31;
 
+///
+/// System Boot Information (Type 32)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 Reserved[6];
   UINT8                 BootStatus[1];
 } SMBIOS_TABLE_TYPE32;
 
+///
+/// 64-bit Memory Error Information (Type 33)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 ErrorType;
@@ -470,6 +568,9 @@ typedef struct {
   UINT32                ErrorResolution;
 } SMBIOS_TABLE_TYPE33;
 
+///
+/// Management Device (Type 34)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Description;
@@ -478,6 +579,9 @@ typedef struct {
   UINT8                 AddressType;
 } SMBIOS_TABLE_TYPE34;
 
+///
+/// Management Device Component (Type 35)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   SMBIOS_TABLE_STRING   Description;
@@ -486,6 +590,9 @@ typedef struct {
   UINT16                ThresholdHandle;
 } SMBIOS_TABLE_TYPE35;
 
+///
+/// Management Device Threshold Data (Type 36)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT16                LowerThresholdNonCritical;
@@ -501,6 +608,9 @@ typedef struct {
   UINT16                DeviceHandle;
 } MEMORY_DEVICE;
 
+///
+/// Memory Channel (Type 37)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 ChannelType;
@@ -509,6 +619,9 @@ typedef struct {
   MEMORY_DEVICE         MemoryDevice[1];
 } SMBIOS_TABLE_TYPE37;
 
+///
+/// IPMI Device Information (Type 38)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 InterfaceType;
@@ -520,6 +633,9 @@ typedef struct {
   UINT8                 InterruptNumber;
 } SMBIOS_TABLE_TYPE38;
 
+///
+/// System Power Supply (Type 39)
+///
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 PowerUnitGroup;
@@ -537,9 +653,6 @@ typedef struct {
   UINT16                InputCurrentProbeHandle;
 } SMBIOS_TABLE_TYPE39;
 
-//
-// Add type 40 and type 41 for smbios 2.6
-//
 typedef struct {                       
   UINT8                   EntryLength; 
   UINT16                  ReferencedHandle;
@@ -548,12 +661,18 @@ typedef struct {
   UINT8                   Value[1];
 }ADDITIONAL_INFORMATION_ENTRY;
 
+///
+/// Additional Information (Type 40)
+///
 typedef struct {
   SMBIOS_STRUCTURE                      Hdr;
   UINT8                                 NumberOfAdditionalInformationEntries;
   ADDITIONAL_INFORMATION_ENTRY          AdditionalInfoEntries[1];  
 } SMBIOS_TABLE_TYPE40;
 
+///
+/// Onboard Devices Extended Information (Type 41)
+///
 typedef struct {
   SMBIOS_STRUCTURE        Hdr;
   SMBIOS_TABLE_STRING     ReferenceDesignation;
@@ -564,14 +683,23 @@ typedef struct {
   UINT8                   DevFuncNum;  
 } SMBIOS_TABLE_TYPE41;
 
+///
+/// Inactive (Type 126)
+///
 typedef struct {
   SMBIOS_STRUCTURE   Hdr;
 } SMBIOS_TABLE_TYPE126;
 
+///
+/// End-of-Table (Type 127)
+///
 typedef struct {
   SMBIOS_STRUCTURE   Hdr;
 } SMBIOS_TABLE_TYPE127;
 
+///
+/// Union of all the possible SMBIOS record types
+///
 typedef union {
   SMBIOS_STRUCTURE      *Hdr;
   SMBIOS_TABLE_TYPE0    *Type0;

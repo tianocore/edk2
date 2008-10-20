@@ -2,7 +2,7 @@
   ACPI Serial Port Console Redirection Table as defined by Microsoft in
   http://www.microsoft.com/whdc/system/platform/server/spcr.mspx
     
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -29,7 +29,7 @@
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION 0x01
 
 ///
-/// SPCR Structure Definition
+/// Serial Port Console Redirection Table Format
 ///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER             Header;
@@ -64,14 +64,31 @@ typedef struct {
 //
 // Interface Type
 //
+
+///
+/// Full 16550 interface
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16550   0
+///
+/// Full 16450 interface
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16450   1
 
 //
 // Interrupt Type
 //
+
+///
+/// PC-AT-compatible dual-8259 IRQ interrupt
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259    0x1
+///
+/// I/O APIC interrupt (Global System Interrupt)
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_APIC    0x2
+///
+/// I/O SAPIC interrupt (Global System Interrupt)
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_SAPIC   0x4
 
 //
@@ -95,8 +112,18 @@ typedef struct {
 //
 // Flow Control
 //
+
+///
+/// DCD required for transmit
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_FLOW_CONTROL_DCD       0x1
+///
+/// RTS/CTS hardware flow control
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_FLOW_CONTROL_RTS_CTS   0x2
+///
+///  XON/XOFF software control
+///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_FLOW_CONTROL_XON_XOFF  0x4
 
 //
