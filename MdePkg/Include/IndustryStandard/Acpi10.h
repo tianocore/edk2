@@ -59,7 +59,10 @@ typedef struct {
 ///
 #define ACPI_TIMER_FREQUENCY       3579545
 
-
+//
+// Ensure proper structure formats
+//
+#pragma pack(1)
 //
 // The commond definition of QWORD, DWORD, and WORD
 // Address Space Descriptors
@@ -76,6 +79,8 @@ typedef struct {
   UINT64  AddrTranslationOffset;
   UINT64  AddrLen;
 } EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR;
+
+#pragma pack()
 
 typedef struct {
   UINT8 Desc;
