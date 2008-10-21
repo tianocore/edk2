@@ -149,7 +149,9 @@ InternalMemZeroMem (
   @param  Length            Length of DestinationBuffer and SourceBuffer memory
                             regions to compare. Must be non-zero.
 
-  @retval 0     if MemOne == MemTwo
+  @return 0                 All Length bytes of the two buffers are identical.
+  @retval Non-zero          The first mismatched byte in SourceBuffer subtracted from the first
+                            mismatched byte in DestinationBuffer.
 
 **/
 INTN
