@@ -1424,18 +1424,18 @@ CoreTerminateMemoryMap (
 
     for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
       Entry = CR(Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-      if (Entry->Attribute & EFI_MEMORY_RUNTIME) {
+      if ((Entry->Attribute & EFI_MEMORY_RUNTIME) != 0) {
         if (Entry->Type == EfiACPIReclaimMemory || Entry->Type == EfiACPIMemoryNVS) {
           DEBUG((DEBUG_ERROR | DEBUG_PAGE, "ExitBootServices: ACPI memory entry has RUNTIME attribute set.\n"));
           Status =  EFI_INVALID_PARAMETER;
           goto Done;
         }
-        if (Entry->Start & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) {
+        if ((Entry->Start & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) != 0) {
           DEBUG((DEBUG_ERROR | DEBUG_PAGE, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
           Status =  EFI_INVALID_PARAMETER;
           goto Done;
         }
-        if ((Entry->End + 1) & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) {
+        if (((Entry->End + 1) & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) != 0) {
           DEBUG((DEBUG_ERROR | DEBUG_PAGE, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
           Status =  EFI_INVALID_PARAMETER;
           goto Done;

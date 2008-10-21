@@ -303,7 +303,7 @@ FwVolBlockGetPhysicalAddress (
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  if (FvbDevice->FvbAttributes & EFI_FVB2_MEMORY_MAPPED) {
+  if ((FvbDevice->FvbAttributes & EFI_FVB2_MEMORY_MAPPED) != 0) {
     *Address = FvbDevice->BaseAddress;
     return EFI_SUCCESS;
   }

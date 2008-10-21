@@ -172,7 +172,7 @@ CoreDispatchEventNotifies (
     // Only clear the SIGNAL status if it is a SIGNAL type event.
     // WAIT type events are only cleared in CheckEvent()
     //
-    if (Event->Type & EVT_NOTIFY_SIGNAL) {
+    if ((Event->Type & EVT_NOTIFY_SIGNAL) != 0) {
       Event->SignalCount = 0;
     }
 
@@ -496,7 +496,7 @@ CoreSignalEvent (
     //
     // If signalling type is a notify function, queue it
     //
-    if (Event->Type & EVT_NOTIFY_SIGNAL) {
+    if ((Event->Type & EVT_NOTIFY_SIGNAL) != 0) {
       if (Event->ExFlag) {
         //
         // The CreateEventEx() style requires all members of the Event Group
@@ -552,13 +552,13 @@ CoreCheckEvent (
 
   Status = EFI_NOT_READY;
 
-  if (!Event->SignalCount && (Event->Type & EVT_NOTIFY_WAIT)) {
+  if ((Event->SignalCount == 0) && ((Event->Type & EVT_NOTIFY_WAIT) != 0)) {
 
     //
     // Queue the wait notify function
     //
     CoreAcquireEventLock ();
-    if (!Event->SignalCount) {
+    if (Event->SignalCount == 0) {
       CoreNotifyEvent (Event);
     }
     CoreReleaseEventLock ();
@@ -568,10 +568,10 @@ CoreCheckEvent (
   // If the even looks signalled, get the lock and clear it
   //
 
-  if (Event->SignalCount) {
+  if (Event->SignalCount != 0) {
     CoreAcquireEventLock ();
 
-    if (Event->SignalCount) {
+    if (Event->SignalCount != 0) {
       Event->SignalCount = 0;
       Status = EFI_SUCCESS;
     }
