@@ -48,57 +48,24 @@ typedef enum {
 /// layer that is used to produce the Simple Network Protocol. 
 ///
 struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
-  ///
-  /// The revision of the EFI_NETWORK_INTERFACE_IDENTIFIER protocol.
-  ///
-  UINT64  Revision;
-  
-  ///
-  /// Address of the first byte of the identifying structure for this network 
-  /// interface. This is only valid when the network interface is started 
-  /// (see Start()). When the network interface is not started, this field is set to zero.
-  ///
-  UINT64  ID;
-  
-  ///
-  /// Address of the first byte of the identifying structure for this
-  /// network interface.  This is set to zero if there is no structure.
-  ///
-  /// For PXE/UNDI this is the first byte of the !PXE structure.
-  ///
-  UINT64  ImageAddr;
-  
-  ///
-  /// Size of unrelocated network interface image.
-  ///
-  UINT32  ImageSize;
-  
-  ///
-  /// A four-character ASCII string that is sent in the class identifier field of
-  /// option 60 in DHCP. For a Type of EfiNetworkInterfaceUndi, this field is UNDI.
-  ///
-  CHAR8   StringId[4];
-  
-  ///
-  /// Network interface type. This will be set to one of the values 
-  /// in EFI_NETWORK_INTERFACE_TYPE.
-  ///
-  UINT8   Type;
-  
-  UINT8   MajorVer;     ///< Major version number.
-  UINT8   MinorVer;     ///< Minor version number.
-  
-  ///
-  /// TRUE if the network interface supports IPv6; otherwise FALSE.\
-  ///
-  BOOLEAN Ipv6Supported;
+  UINT64    Revision;   ///< The revision of the EFI_NETWORK_INTERFACE_IDENTIFIER protocol.
+  UINT64    ID;         ///< Address of the first byte of the identifying structure for this network 
+                        ///< interface. This is only valid when the network interface is started 
+                        ///< (see Start()). When the network interface is not started, this field is set to zero.
+  UINT64    ImageAddr;  ///< Address of the first byte of the identifying structure for this
+                        ///< network interface.  This is set to zero if there is no structure.
+  UINT32    ImageSize;  ///< Size of unrelocated network interface image.
+  CHAR8     StringId[4];///< A four-character ASCII string that is sent in the class identifier field of
+                        ///< option 60 in DHCP. For a Type of EfiNetworkInterfaceUndi, this field is UNDI.
+  UINT8     Type;       ///< Network interface type. This will be set to one of the values 
+                        ///< in EFI_NETWORK_INTERFACE_TYPE.
+  UINT8     MajorVer;   ///< Major version number.
+  UINT8     MinorVer;   ///< Minor version number.
+  BOOLEAN   Ipv6Supported; ///< TRUE if the network interface supports IPv6; otherwise FALSE.
+  UINT8     IfNum;      ///< The network interface number that is being identified by this Network 
+                        ///< Interface Identifier Protocol. This field must be less than or equal 
+                        ///< to the IFcnt field in the !PXE structure.
 
-  ///
-  /// The network interface number that is being identified by this Network 
-  /// Interface Identifier Protocol. This field must be less than or equal 
-  /// to the IFcnt field in the !PXE structure.
-  ///
-  UINT8   IfNum;
 };
 
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid;
