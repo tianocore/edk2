@@ -62,7 +62,7 @@ InternalMemCopyMem (
 VOID *
 EFIAPI
 InternalMemSetMem (
-  OUT     VOID                      *Buffer,
+  IN      VOID                      *Buffer,
   IN      UINTN                     Length,
   IN      UINT8                     Value
   );
