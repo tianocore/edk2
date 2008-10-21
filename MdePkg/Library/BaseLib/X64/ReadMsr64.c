@@ -27,7 +27,6 @@ unsigned __int64 __readmsr (int register);
   @return Value read from MSR.
 
 **/
-
 UINT64
 EFIAPI
 AsmReadMsr64 (
