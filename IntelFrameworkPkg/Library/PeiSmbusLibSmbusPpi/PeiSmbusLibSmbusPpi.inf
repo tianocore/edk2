@@ -46,7 +46,7 @@
   BaseMemoryLib
   PeiServicesLib
   DebugLib
-
+  PeiServicesTablePointerLib
 
 [Ppis]
   gEfiPeiSmbusPpiGuid                           # PPI ALWAYS_CONSUMED

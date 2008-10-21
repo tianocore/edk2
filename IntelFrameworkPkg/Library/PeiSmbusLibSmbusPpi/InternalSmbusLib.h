@@ -25,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/PeiServicesTablePointerLib.h>
 
 //
 // Declaration for internal functions
