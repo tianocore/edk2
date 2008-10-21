@@ -46,7 +46,7 @@ InternalMemSetMem (
   volatile UINT8                    *Pointer;
 
   Pointer = (UINT8*)Buffer;
-  while (Size-- != 0) {
+  while (Length-- != 0) {
     *(Pointer++) = Value;
   }
   return Buffer;
