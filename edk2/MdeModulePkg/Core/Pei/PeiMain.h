@@ -809,7 +809,7 @@ PeiAllocatePool (
 **/
 EFI_STATUS
 PeiLoadImage (
-  IN  EFI_PEI_SERVICES            **PeiServices,
+  IN  CONST EFI_PEI_SERVICES      **PeiServices,
   IN  EFI_PEI_FILE_HANDLE         FileHandle,
   OUT    EFI_PHYSICAL_ADDRESS     *EntryPoint,
   OUT    UINT32                   *AuthenticationState
@@ -1023,9 +1023,9 @@ InitializeImageServices (
 **/
 EFI_STATUS
 ProcessFvFile (
-  IN  EFI_PEI_SERVICES      **PeiServices,
-  IN  EFI_PEI_FILE_HANDLE   FvFileHandle,
-  OUT UINT32                *AuthenticationState
+  IN  CONST EFI_PEI_SERVICES **PeiServices,
+  IN  EFI_PEI_FILE_HANDLE    FvFileHandle,
+  OUT UINT32                 *AuthenticationState
   );
 
 #endif

@@ -387,7 +387,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
         //
         // Process FvFile to install FvInfo ppi and build FvHob
         // 
-        ProcessFvFile (PeiServices, FileHandle, &AuthenticationStatus);
+        ProcessFvFile ((CONST EFI_PEI_SERVICES **) PeiServices, FileHandle, &AuthenticationStatus);
       }
     } while (FileHandle != NULL);
   }
@@ -837,9 +837,9 @@ PeiFfsGetVolumeInfo (
 **/
 EFI_STATUS
 ProcessFvFile (
-  IN  EFI_PEI_SERVICES      **PeiServices,
-  IN  EFI_PEI_FILE_HANDLE   FvFileHandle,
-  OUT UINT32                *AuthenticationState
+  IN  CONST EFI_PEI_SERVICES      **PeiServices,
+  IN  EFI_PEI_FILE_HANDLE         FvFileHandle,
+  OUT UINT32                      *AuthenticationState
   )
 {
   EFI_STATUS            Status;
@@ -871,7 +871,7 @@ ProcessFvFile (
   // Find FvImage in FvFile
   //
   Status = PeiFfsFindSectionData (
-             (CONST EFI_PEI_SERVICES **) PeiServices,
+             PeiServices,
              EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
              FvFileHandle,
              (VOID **)&FvImageHandle

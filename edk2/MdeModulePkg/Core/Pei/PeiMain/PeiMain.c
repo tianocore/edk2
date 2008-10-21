@@ -165,7 +165,7 @@ PeiCore (
   //
   // Save PeiServicePointer so that it can be retrieved anywhere.
   //
-  SetPeiServicesTablePointer(&PrivateData.PS);
+  SetPeiServicesTablePointer((CONST EFI_PEI_SERVICES **) &PrivateData.PS);
   
   if (OldCoreData != NULL) {
 

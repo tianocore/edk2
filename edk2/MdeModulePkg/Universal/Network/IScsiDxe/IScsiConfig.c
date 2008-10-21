@@ -451,7 +451,7 @@ IScsiFormCallback (
   CHAR8                     Ip4String[IP4_STR_MAX_SIZE];
   CHAR8                     LunString[ISCSI_LUN_STR_MAX_LEN];
   UINT64                    Lun;
-  STRING_REF                DeviceFormTitleToken;
+  EFI_STRING_ID             DeviceFormTitleToken;
   ISCSI_CONFIG_IFR_NVDATA   *IfrNvData;
   ISCSI_CONFIG_FORM_ENTRY   *ConfigFormEntry;
   EFI_IP_ADDRESS            HostIp;
@@ -675,7 +675,7 @@ IScsiFormCallback (
       ASSERT (ConfigFormEntry != NULL);
 
       UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
-      DeviceFormTitleToken = (STRING_REF) STR_ISCSI_DEVICE_FORM_TITLE;
+      DeviceFormTitleToken = (EFI_STRING_ID) STR_ISCSI_DEVICE_FORM_TITLE;
       HiiLibSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString);
 
       IScsiConvertDeviceConfigDataToIfrNvData (ConfigFormEntry, IfrNvData);
@@ -800,13 +800,13 @@ IScsiConfigUpdateForm (
         ZeroMem (&ConfigFormEntry->AuthConfigData, sizeof (ConfigFormEntry->AuthConfigData));
       }
       //
-      // Compose the Port string and create a new STRING_REF.
+      // Compose the Port string and create a new EFI_STRING_ID.
       //
       UnicodeSPrint (PortString, 128, L"Port %s", ConfigFormEntry->MacString);
       HiiLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleToken, PortString);
 
       //
-      // Compose the help string of this port and create a new STRING_REF.
+      // Compose the help string of this port and create a new EFI_STRING_ID.
       //
       UnicodeSPrint (PortString, 128, L"Set the iSCSI parameters on port %s", ConfigFormEntry->MacString);
       HiiLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleHelpToken, PortString);
