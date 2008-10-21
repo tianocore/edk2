@@ -48,8 +48,6 @@ typedef UINT64                    EFI_LBA;
 typedef UINT64                    EFI_PHYSICAL_ADDRESS;
 typedef UINT64                    EFI_VIRTUAL_ADDRESS;
 
-typedef UINT16                    STRING_REF;
-
 ///
 /// EFI Time Abstraction:
 ///  Year:       1998 - 20XX

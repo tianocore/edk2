@@ -65,7 +65,7 @@ GetPeiServicesTablePointer (
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
-  IN EFI_PEI_SERVICES ** PeiServicesTablePointer
+  IN CONST EFI_PEI_SERVICES ** PeiServicesTablePointer
   )
 {
   IA32_DESCRIPTOR   Idtr;
