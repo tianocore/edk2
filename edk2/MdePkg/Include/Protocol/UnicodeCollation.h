@@ -169,9 +169,6 @@ BOOLEAN
 /// comparisons of Unicode strings. 
 ///
 struct _EFI_UNICODE_COLLATION_PROTOCOL {
-  //
-  // general
-  //
   EFI_UNICODE_COLLATION_STRICOLL    StriColl;
   EFI_UNICODE_COLLATION_METAIMATCH  MetaiMatch;
   EFI_UNICODE_COLLATION_STRLWR      StrLwr;
