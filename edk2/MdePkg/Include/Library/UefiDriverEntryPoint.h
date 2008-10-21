@@ -41,7 +41,7 @@ extern const EFI_EVENT_NOTIFY         _gDriverExitBootServicesEvent[];
 extern const EFI_EVENT_NOTIFY         _gDriverSetVirtualAddressMapEvent[];
 
 /**
-  Enrty point to DXE SMM Driver.
+  Enrty point to DXE Driver.
 
   @param  ImageHandle ImageHandle of the loaded driver.
   @param  SystemTable Pointer to the EFI System Table.
