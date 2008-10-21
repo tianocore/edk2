@@ -26,6 +26,7 @@
 
 #include <PiPei.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/FrameworkHii.h>
 
 #define EFI_PROCESSOR_SUBCLASS_VERSION    0x00010000
 
