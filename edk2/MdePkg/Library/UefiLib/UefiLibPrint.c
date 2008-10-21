@@ -124,7 +124,6 @@ Print (
   @return The number of Unicode characters in the produced
           output buffer not including the Null-terminator.
 **/
-
 UINTN
 EFIAPI
 ErrorPrint (
