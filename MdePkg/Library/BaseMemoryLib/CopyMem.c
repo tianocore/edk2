@@ -1,10 +1,9 @@
 /** @file
-  Implementation of the EfiCopyMem routine. This function is broken
-  out into its own source file so that it can be excluded from a
-  build for a particular platform easily if an optimized version
-  is desired.
+  Implementation of the InternalMemCopyMem routine. This function is broken
+  out into its own source file so that it can be excluded from a build for a
+  particular platform easily if an optimized version is desired.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,8 +23,8 @@
   Copy Length bytes from Source to Destination.
 
   @param  Destination Target of copy
-  @param  Source Place to copy from
-  @param  Length Number of bytes to copy
+  @param  Source      Place to copy from
+  @param  Length      Number of bytes to copy
 
   @return Destination
 

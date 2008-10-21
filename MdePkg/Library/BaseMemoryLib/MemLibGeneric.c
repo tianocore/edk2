@@ -1,7 +1,12 @@
 /** @file
   Architecture Independent Base Memory Library Implementation.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  The following BaseMemoryLib instances contain the same copy of this file:
+    BaseMemoryLib
+    PeiMemoryLib
+    DxeMemoryLib
+
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -9,12 +14,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  The following BaseMemoryLib instances contain the same copy of this file:
-
-    BaseMemoryLib
-    PeiMemoryLib
-    DxeMemoryLib
 
 **/
 
@@ -122,7 +121,9 @@ InternalMemZeroMem (
   @param  Length            Length of DestinationBuffer and SourceBuffer memory
                             regions to compare. Must be non-zero.
 
-  @retval 0     if MemOne == MemTwo
+  @return 0                 All Length bytes of the two buffers are identical.
+  @retval Non-zero          The first mismatched byte in SourceBuffer subtracted from the first
+                            mismatched byte in DestinationBuffer.
 
 **/
 INTN
