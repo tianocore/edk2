@@ -640,7 +640,7 @@ CoreDisconnectControllersUsingProtocolInterface (
           (Link != &Prot->OpenList) && !ItemFound;
           Link = Link->ForwardLink ) {
       OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
-      if (OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) {
+      if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
         ItemFound = TRUE;
         CoreReleaseProtocolLock ();
         Status = CoreDisconnectController (UserHandle, OpenData->AgentHandle, NULL);
@@ -663,8 +663,8 @@ CoreDisconnectControllersUsingProtocolInterface (
             (Link != &Prot->OpenList) && !ItemFound;
             Link = Link->ForwardLink ) {
         OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
-        if (OpenData->Attributes &
-            (EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL | EFI_OPEN_PROTOCOL_GET_PROTOCOL | EFI_OPEN_PROTOCOL_TEST_PROTOCOL)) {
+        if ((OpenData->Attributes &
+            (EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL | EFI_OPEN_PROTOCOL_GET_PROTOCOL | EFI_OPEN_PROTOCOL_TEST_PROTOCOL)) != 0) {
           ItemFound = TRUE;
           RemoveEntryList (&OpenData->Link);
           Prot->OpenListCount--;
@@ -1086,14 +1086,14 @@ CoreOpenProtocol (
     ExactMatch =  (BOOLEAN)((OpenData->AgentHandle == ImageHandle) &&
                             (OpenData->Attributes == Attributes)  &&
                             (OpenData->ControllerHandle == ControllerHandle));
-    if (OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) {
+    if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
       ByDriver = TRUE;
       if (ExactMatch) {
         Status = EFI_ALREADY_STARTED;
         goto Done;
       }
     }
-    if (OpenData->Attributes & EFI_OPEN_PROTOCOL_EXCLUSIVE) {
+    if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_EXCLUSIVE) != 0) {
       Exclusive = TRUE;
     } else if (ExactMatch) {
       OpenData->OpenCount++;
@@ -1127,7 +1127,7 @@ CoreOpenProtocol (
         Disconnect = FALSE;
         for ( Link = Prot->OpenList.ForwardLink; (Link != &Prot->OpenList) && (!Disconnect); Link = Link->ForwardLink) {
           OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
-          if (OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) {
+          if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
             Disconnect = TRUE;
             CoreReleaseProtocolLock ();
             Status = CoreDisconnectController (UserHandle, OpenData->AgentHandle, NULL);

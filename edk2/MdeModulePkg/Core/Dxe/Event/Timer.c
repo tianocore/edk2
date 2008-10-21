@@ -260,7 +260,7 @@ CoreSetTimer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Type < 0 || Type > TimerRelative  || !(Event->Type & EVT_TIMER)) {
+  if (Type < 0 || Type > TimerRelative  || (Event->Type & EVT_TIMER) == 0) {
     return EFI_INVALID_PARAMETER;
   }
 
