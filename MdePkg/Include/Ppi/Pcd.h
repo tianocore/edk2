@@ -18,6 +18,8 @@
 #define PCD_PPI_GUID \
   { 0x6e81c58, 0x4ad7, 0x44bc, { 0x83, 0x90, 0xf1, 0x2, 0x65, 0xf7, 0x24, 0x80 } }
 
+#define PCD_INVALID_TOKEN_NUMBER ((UINTN) 0)
+
 
 /**
   Sets the SKU value for subsequent calls to set or get PCD token values.
@@ -205,7 +207,7 @@ typedef
 UINT8
 (EFIAPI *PCD_PPI_GET_EX_8)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN       UINTN       TokenNumber
   );
 
 
@@ -228,7 +230,7 @@ typedef
 UINT16
 (EFIAPI *PCD_PPI_GET_EX_16)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN              TokenNumber
+  IN       UINTN       TokenNumber
   );
 
 
@@ -251,7 +253,7 @@ typedef
 UINT32
 (EFIAPI *PCD_PPI_GET_EX_32)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN       UINTN       TokenNumber
   );
 
 
@@ -274,7 +276,7 @@ typedef
 UINT64
 (EFIAPI *PCD_PPI_GET_EX_64)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN       UINTN       TokenNumber
   );
 
 
@@ -297,7 +299,7 @@ typedef
 VOID *
 (EFIAPI *PCD_PPI_GET_EX_POINTER)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN       UINTN       TokenNumber
   );
 
 
@@ -320,7 +322,7 @@ typedef
 BOOLEAN
 (EFIAPI *PCD_PPI_GET_EX_BOOLEAN)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN       UINTN       TokenNumber
   );
 
 
@@ -341,7 +343,7 @@ typedef
 UINTN
 (EFIAPI *PCD_PPI_GET_EX_SIZE)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN       UINTN       TokenNumber
   );
 
 
@@ -448,9 +450,6 @@ EFI_STATUS
   IN UINT64            Value
   );
 
-
-
-
 /**
   Sets a value of a specified size for a given PCD token.
 
@@ -459,7 +458,7 @@ EFI_STATUS
   If it is not, an error will be returned.
 
   @param[in]      TokenNumber  The PCD token number. 
-  @param[in, out] SizeOfBuffer A pointer to the length of the value being set for the PCD token.  
+  @param[in, out] SizeOfValue  A pointer to the length of the value being set for the PCD token.  
                                On input, if the SizeOfValue is greater than the maximum size supported 
                                for this TokenNumber then the output value of SizeOfValue will reflect 
                                the maximum size supported for this TokenNumber.
@@ -476,17 +475,9 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_POINTER)(
   IN        UINTN             TokenNumber,
-  IN OUT    UINTN             *SizeOfBuffer,
+  IN OUT    UINTN             *SizeOfValue,
   IN        VOID              *Buffer
   );
-///EFI_STATUS 
-///(EFIAPI *PCD_PPI_SET_POINTER) (
-///IN PCD_TOKEN_NUMBER			TokenNumber,
-///IN UINTN					SizeOfValue,
-///IN VOID					*Buffer
-///  );
-
-
 
 /**
   Sets an Boolean value for a given PCD token.
@@ -536,8 +527,8 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_8)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN UINT8             Value
+  IN       UINTN       TokenNumber,
+  IN       UINT8       Value
   );
 
 
@@ -564,8 +555,8 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_16)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN UINT16            Value
+  IN       UINTN       TokenNumber,
+  IN       UINT16      Value
   );
 
 
@@ -592,8 +583,8 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_32)(
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN UINT32            Value
+  IN       UINTN       TokenNumber,
+  IN       UINT32      Value
   );
 
 
@@ -619,9 +610,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_64)(
-  IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN UINT64            Value
+  IN CONST EFI_GUID     *Guid,
+  IN       UINTN        TokenNumber,
+  IN       UINT64       Value
   );
 
 
@@ -635,7 +626,7 @@ EFI_STATUS
 
   @param[in]      Guid         The 128-bit unique value that designates the namespace from which to extract the value.
   @param[in]      TokenNumber  The PCD token number. 
-  @param[in, out] SizeOfBuffer A pointer to the length of the value being set for the PCD token.  
+  @param[in, out] SizeOfValue  A pointer to the length of the value being set for the PCD token.  
                                On input, if the SizeOfValue is greater than the maximum size supported 
                                for this TokenNumber then the output value of SizeOfValue will reflect 
                                the maximum size supported for this TokenNumber.
@@ -651,21 +642,11 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_POINTER)(
-  IN        CONST EFI_GUID    *Guid,
-  IN        UINTN             TokenNumber,
-  IN OUT    UINTN             *SizeOfBuffer,
-  IN        VOID              *Buffer
+  IN CONST EFI_GUID          *Guid,
+  IN       UINTN             TokenNumber,
+  IN OUT   UINTN             *SizeOfValue,
+  IN       VOID              *Buffer
   );
-/// different with PCD Spec 0.54
-///EFI_STATUS 
-///(EFIAPI *PCD_PPI_SET_EX_POINTER) (
-///  IN CONST EFI_GUID			*Guid,
-///  IN PCD_TOKEN_NUMBER		TokenNumber,
-///  IN UINTN					      SizeOfValue,
-///  IN VOID					      *Buffer
-///  );
-///
-
 
 /**
   Sets an Boolean value for a given PCD token.
@@ -688,9 +669,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_BOOLEAN)(
-  IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN BOOLEAN           Value
+  IN CONST EFI_GUID          *Guid,
+  IN       UINTN             TokenNumber,
+  IN       BOOLEAN           Value
   );
 
 
@@ -716,10 +697,10 @@ EFI_STATUS
 typedef
 VOID
 (EFIAPI *PCD_PPI_CALLBACK)(
-  IN      CONST EFI_GUID   *CallBackGuid, OPTIONAL
-  IN      UINTN            CallBackToken,
-  IN  OUT VOID             *TokenData,
-  IN      UINTN            TokenDataSize
+  IN CONST EFI_GUID         *CallBackGuid, OPTIONAL
+  IN       UINTN            CallBackToken,
+  IN OUT   VOID             *TokenData,
+  IN       UINTN            TokenDataSize
   );
 
 
@@ -739,9 +720,9 @@ VOID
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_CALLBACK_ONSET)(
-  IN  CONST EFI_GUID         *Guid, OPTIONAL
-  IN  UINTN                  TokenNumber,
-  IN  PCD_PPI_CALLBACK       CallBackFunction
+  IN  CONST EFI_GUID               *Guid, OPTIONAL
+  IN        UINTN                  TokenNumber,
+  IN        PCD_PPI_CALLBACK       CallBackFunction
   );
 
 
@@ -761,9 +742,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_CANCEL_CALLBACK)(
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
-  IN  UINTN                   TokenNumber,
-  IN  PCD_PPI_CALLBACK        CallBackFunction
+  IN  CONST EFI_GUID                *Guid, OPTIONAL
+  IN        UINTN                   TokenNumber,
+  IN        PCD_PPI_CALLBACK        CallBackFunction
   );
 
 
@@ -793,7 +774,7 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_GET_NEXT_TOKEN)(
   IN CONST EFI_GUID           *Guid, OPTIONAL
-  IN OUT  UINTN               *TokenNumber
+  IN OUT   UINTN              *TokenNumber
   );
 
 
