@@ -443,16 +443,16 @@ LibPcdSet64 (
 
 /**
   Sets a buffer for the token specified by TokenNumber to the value 
-  specified by Buffer and SizeOfValue.  Buffer is returned.  
-  If SizeOfValue is greater than the maximum size support by TokenNumber, 
-  then set SizeOfValue to the maximum size supported by TokenNumber and 
+  specified by Buffer and SizeOfBuffer.  Buffer is returned.  
+  If SizeOfBuffer is greater than the maximum size support by TokenNumber, 
+  then set SizeOfBuffer to the maximum size supported by TokenNumber and 
   return NULL to indicate that the set operation was not actually performed.  
 
-  If SizeOfValue is set to MAX_ADDRESS, then SizeOfValue must be set to the 
+  If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be set to the 
   maximum size supported by TokenName and NULL must be returned.
   
-  If SizeOfValue is NULL, then ASSERT().
-  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
+  If SizeOfBuffer is NULL, then ASSERT().
+  If SizeOfBuffer > 0 and Buffer is NULL, then ASSERT().
   
   @param[in]      TokenNumber   The PCD token number to set a current value for.
   @param[in,out]  SizeOfBuffer  The size, in bytes, of Buffer.
@@ -578,14 +578,14 @@ LibPcdSetEx64 (
 
 /**
   Sets a buffer for the token specified by TokenNumber to the value specified by 
-  Buffer and SizeOfValue.  Buffer is returned.  If SizeOfValue is greater than 
-  the maximum size support by TokenNumber, then set SizeOfValue to the maximum size 
+  Buffer and SizeOfBuffer.  Buffer is returned.  If SizeOfBuffer is greater than 
+  the maximum size support by TokenNumber, then set SizeOfBuffer to the maximum size 
   supported by TokenNumber and return NULL to indicate that the set operation 
   was not actually performed. 
   
   If Guid is NULL, then ASSERT().
-  If SizeOfValue is NULL, then ASSERT().
-  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
+  If SizeOfBuffer is NULL, then ASSERT().
+  If SizeOfBuffer > 0 and Buffer is NULL, then ASSERT().
   
   @param[in]  Guid              Pointer to a 128-bit unique value that 
                                 designates which namespace to set a value from.
@@ -749,15 +749,15 @@ LibPcdGetNextTokenSpace (
 
 /**
   Sets the PCD entry specified by PatchVariable to the value specified by Buffer 
-  and SizeOfValue.  Buffer is returned.  If SizeOfValue is greater than 
-  MaximumDatumSize, then set SizeOfValue to MaximumDatumSize and return 
+  and SizeOfBuffer.  Buffer is returned.  If SizeOfBuffer is greater than 
+  MaximumDatumSize, then set SizeOfBuffer to MaximumDatumSize and return 
   NULL to indicate that the set operation was not actually performed.  
-  If SizeOfValue is set to MAX_ADDRESS, then SizeOfValue must be set to 
+  If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be set to 
   MaximumDatumSize and NULL must be returned.
   
   If PatchVariable is NULL, then ASSERT().
-  If SizeOfValue is NULL, then ASSERT().
-  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
+  If SizeOfBuffer is NULL, then ASSERT().
+  If SizeOfBuffer > 0 and Buffer is NULL, then ASSERT().
 
   @param[in] PatchVariable      A pointer to the global variable in a module that is 
                                 the target of the set operation.
