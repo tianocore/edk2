@@ -67,8 +67,8 @@ typedef struct _ISCSI_CONFIG_FORM_ENTRY {
   LIST_ENTRY                    Link;
   EFI_HANDLE                    Controller;
   CHAR16                        MacString[95];
-  STRING_REF                    PortTitleToken;
-  STRING_REF                    PortTitleHelpToken;
+  EFI_STRING_ID                 PortTitleToken;
+  EFI_STRING_ID                 PortTitleHelpToken;
 
   ISCSI_SESSION_CONFIG_NVDATA   SessionConfigData;
   ISCSI_CHAP_AUTH_CONFIG_NVDATA AuthConfigData;
