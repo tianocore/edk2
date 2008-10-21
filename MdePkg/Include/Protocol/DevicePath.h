@@ -49,16 +49,16 @@
   that make up the Device Path.
 **/
 typedef struct {
-  UINT8 Type;       ///< 0x01 - Hardware Device Path
-                    ///< 0x02 – ACPI Device Path
-                    ///< 0x03 – Messaging Device Path
-                    ///< 0x04 – Media Device Path
-                    ///< 0x05 – BIOS Boot Specification Device Path
-                    ///< 0x7F – End of Hardware Device Path
+  UINT8 Type;       ///< 0x01 Hardware Device Path
+                    ///< 0x02 ACPI Device Path
+                    ///< 0x03 Messaging Device Path
+                    ///< 0x04 Media Device Path
+                    ///< 0x05 BIOS Boot Specification Device Path
+                    ///< 0x7F End of Hardware Device Path
                     
   UINT8 SubType;    ///< Varies by Type
-                    ///< 0xFF – End Entire Device Path, or
-                    ///< 0x01 – End This Instance of a Device Path and start a new
+                    ///< 0xFF End Entire Device Path, or
+                    ///< 0x01 End This Instance of a Device Path and start a new
                     ///< Device Path
                     
   UINT8 Length[2];  ///< Specific Device Path data. Type and Sub-Type define
