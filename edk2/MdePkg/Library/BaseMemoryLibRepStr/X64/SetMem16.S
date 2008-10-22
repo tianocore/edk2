@@ -34,9 +34,9 @@
 #    IN UINT16 Value
 #    )
 #------------------------------------------------------------------------------
-.intel_syntax
-.globl _InternalMemSetMem16
-_InternalMemSetMem16:
+.intel_syntax noprefix
+.globl ASM_PFX(InternalMemSetMem16)
+ASM_PFX(InternalMemSetMem16):
     push    rdi
     mov     rdi, rcx
     mov     rax, r8

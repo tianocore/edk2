@@ -1,5 +1,5 @@
 #
-# ConvertAsm.py: Automatically generated from SetMem32.asm
+# ConvertAsm.py: Automatically generated from SetMem64.asm
 #
 #------------------------------------------------------------------------------
 #
@@ -14,11 +14,11 @@
 #
 # Module Name:
 #
-#   SetMem32.S
+#   SetMem64.S
 #
 # Abstract:
 #
-#   SetMem32 function
+#   SetMem64 function
 #
 # Notes:
 #
@@ -27,22 +27,22 @@
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  EFIAPI
-#  InternalMemSetMem32 (
+#  InternalMemSetMem64 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
-#    IN UINT32 Value
-#    );
+#    IN UINT64 Value
+#    )
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemSetMem32)
-ASM_PFX(InternalMemSetMem32):
-    push    rdi
-    mov     rdi, rcx
-    mov     rax, r8
-    xchg    rcx, rdx
-    rep     stosd
-    mov     rax, rdx
-    pop     rdi
+.globl ASM_PFX(InternalMemSetMem64)
+ASM_PFX(InternalMemSetMem64):
+    movq    mm0, r8                     #Value
+    mov     rax, rcx                    #rax <- Buffer
+    xchg    rcx, rdx                    #rcx <- Count
+L0:
+    movntq  [rdx], mm0
+    add     rdx, 8
+    loop    L0
+    mfence
     ret
 

@@ -41,27 +41,44 @@ ASM_PFX(InternalMemCopyMem):
     push    rdi
     mov     rsi, rdx                    # rsi <- Source
     mov     rdi, rcx                    # rdi <- Destination
-    lea     r9, [rsi + r8 - 1]          # r9 <- End of Source
-    cmp     rsi, rdi
+    lea     r9, [rsi + r8 - 1]          # r9 <- Last byte of Source
+    cmp     rsi, rdi                    
     mov     rax, rdi                    # rax <- Destination as return value
-    jae     _InternalMemCopyMem_al_0000
-    cmp     r9, rdi
-    jae     _atSym_CopyBackward               # Copy backward if overlapped
-_InternalMemCopyMem_al_0000:
+    jae     _InternalMemCopyMem_al_0000 # Copy forward if Source > Destination
+    cmp     r9, rdi                     # Overlapped?
+    jae     _atSym_CopyBackward         # Copy backward if overlapped
+_InternalMemCopyMem_al_0000:            
+    xor     rcx, rcx                    
+    sub     rcx, rdi                    # rcx <- -rdi
+    and     rcx, 15                     # rcx + rsi should be 16 bytes aligned
+    jz      _InternalMemCopyMem_al_0001 # skip if rcx == 0
+    cmp     rcx, r8
+    cmova   rcx, r8
+    sub     r8, rcx
+    rep     movsb
+_InternalMemCopyMem_al_0001:
     mov     rcx, r8
-    and     r8, 7
-    shr     rcx, 3
-    rep     movsq                       # Copy as many Qwords as possible
-    jmp     _atSym_CopyBytes
+    and     r8, 15
+    shr     rcx, 4                      # rcx <- # of DQwords to copy
+    jz      _atSym_CopyBytes
+    movdqa  [rsp + 0x18], xmm0           # save xmm0 on stack
+_InternalMemCopyMem_al_0002:
+    movdqu  xmm0, [rsi]                 # rsi may not be 16-byte aligned
+    movntdq [rdi], xmm0                 # rdi should be 16-byte aligned
+    add     rsi, 16
+    add     rdi, 16
+    loop    _InternalMemCopyMem_al_0002
+    mfence
+    movdqa  xmm0, [rsp + 0x18]           # restore xmm0
+    jmp     _atSym_CopyBytes            # copy remaining bytes
 _atSym_CopyBackward:
-    mov     rsi, r9                     # rsi <- End of Source
-    lea     rdi, [rdi + r8 - 1]         # esi <- End of Destination
-    std                                 # set direction flag
+    mov     rsi, r9                     # rsi <- Last byte of Source
+    lea     rdi, [rdi + r8 - 1]         # rdi <- Last byte of Destination
+    std
 _atSym_CopyBytes:
     mov     rcx, r8
-    rep     movsb                       # Copy bytes backward
+    rep     movsb
     cld
     pop     rdi
     pop     rsi
     ret
-

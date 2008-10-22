@@ -1,5 +1,5 @@
 #
-# ConvertAsm.py: Automatically generated from SetMem32.asm
+# ConvertAsm.py: Automatically generated from SetMem16.asm
 #
 #------------------------------------------------------------------------------
 #
@@ -14,11 +14,11 @@
 #
 # Module Name:
 #
-#   SetMem32.S
+#   SetMem16.S
 #
 # Abstract:
 #
-#   SetMem32 function
+#   SetMem16 function
 #
 # Notes:
 #
@@ -28,21 +28,34 @@
 #------------------------------------------------------------------------------
 #  VOID *
 #  EFIAPI
-#  InternalMemSetMem32 (
+#  InternalMemSetMem16 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
-#    IN UINT32 Value
-#    );
+#    IN UINT16 Value
+#    )
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemSetMem32)
-ASM_PFX(InternalMemSetMem32):
+.globl ASM_PFX(InternalMemSetMem16)
+ASM_PFX(InternalMemSetMem16):
     push    rdi
-    mov     rdi, rcx
     mov     rax, r8
-    xchg    rcx, rdx
-    rep     stosd
-    mov     rax, rdx
+    movq    mm0, rax
+    mov     r8, rcx
+    mov     rdi, r8
+    mov     rcx, rdx
+    and     edx, 3
+    shr     rcx, 2
+    jz      L_SetWords
+    pshufw  mm0, mm0, 0x0
+L0:
+    movntq  [rdi], mm0
+    add     rdi, 8
+    loop    L0
+    mfence
+L_SetWords:
+    mov     ecx, edx
+    rep     stosw
+    mov     rax, r8
     pop     rdi
     ret
 

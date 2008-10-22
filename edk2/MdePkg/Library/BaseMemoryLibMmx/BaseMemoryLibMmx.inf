@@ -85,6 +85,17 @@
   X64/SetMem16.asm
   X64/SetMem.asm
   X64/CopyMem.asm
+  X64/ScanMem64.S
+  X64/ScanMem32.S
+  X64/ScanMem16.S
+  X64/ScanMem8.S
+  X64/CompareMem.S
+  X64/SetMem64.S
+  X64/SetMem32.S
+  X64/SetMem16.S
+  X64/ZeroMem.S
+  X64/SetMem.S
+  X64/CopyMem.S
 
 
 [LibraryClasses]
