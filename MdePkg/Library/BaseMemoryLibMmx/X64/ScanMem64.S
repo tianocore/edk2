@@ -1,5 +1,5 @@
 #
-# ConvertAsm.py: Automatically generated from SetMem32.asm
+# ConvertAsm.py: Automatically generated from ScanMem64.asm
 #
 #------------------------------------------------------------------------------
 #
@@ -14,35 +14,43 @@
 #
 # Module Name:
 #
-#   SetMem32.S
+#   ScanMem64.S
 #
 # Abstract:
 #
-#   SetMem32 function
+#   ScanMem64 function
 #
 # Notes:
 #
+#   The following BaseMemoryLib instances contain the same copy of this file:
+#
+#       BaseMemoryLibRepStr
+#       BaseMemoryLibMmx
+#       BaseMemoryLibSse2
+#       BaseMemoryLibOptDxe
+#       BaseMemoryLibOptPei
+#
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-#  VOID *
-#  EFIAPI
-#  InternalMemSetMem32 (
-#    IN VOID   *Buffer,
-#    IN UINTN  Count,
-#    IN UINT32 Value
-#    );
+# CONST VOID *
+# EFIAPI
+# InternalMemScanMem64 (
+#   IN      CONST VOID                *Buffer,
+#   IN      UINTN                     Length,
+#   IN      UINT64                    Value
+#   );
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemSetMem32)
-ASM_PFX(InternalMemSetMem32):
+.globl ASM_PFX(InternalMemScanMem64)
+ASM_PFX(InternalMemScanMem64):
     push    rdi
     mov     rdi, rcx
     mov     rax, r8
-    xchg    rcx, rdx
-    rep     stosd
-    mov     rax, rdx
+    mov     rcx, rdx
+    repne   scasq
+    lea     rax, [rdi - 8]
+    cmovnz  rax, rcx
     pop     rdi
     ret
-

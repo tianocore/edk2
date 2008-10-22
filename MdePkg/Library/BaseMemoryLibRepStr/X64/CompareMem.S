@@ -42,9 +42,9 @@
 #   IN      UINTN                     Length
 #   );
 #------------------------------------------------------------------------------
-.intel_syntax
-.globl _InternalMemCompareMem
-_InternalMemCompareMem:
+.intel_syntax noprefix
+.globl ASM_PFX(InternalMemCompareMem)
+ASM_PFX(InternalMemCompareMem):
     push    rsi
     push    rdi
     mov     rsi, rcx

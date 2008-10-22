@@ -32,6 +32,18 @@
 
 [Sources.common]
   MemLibInternals.h
+  ScanMem64Wrapper.c
+  ScanMem32Wrapper.c
+  ScanMem16Wrapper.c
+  ScanMem8Wrapper.c
+  ZeroMemWrapper.c
+  CompareMemWrapper.c
+  SetMem64Wrapper.c
+  SetMem32Wrapper.c
+  SetMem16Wrapper.c
+  SetMemWrapper.c
+  CopyMemWrapper.c
+  MemLibGuid.c
 
 [Sources.Ia32]
   Ia32/ScanMem64.S
@@ -56,18 +68,6 @@
   Ia32/SetMem16.asm
   Ia32/SetMem.asm
   Ia32/CopyMem.asm
-  ScanMem64Wrapper.c
-  ScanMem32Wrapper.c
-  ScanMem16Wrapper.c
-  ScanMem8Wrapper.c
-  ZeroMemWrapper.c
-  CompareMemWrapper.c
-  SetMem64Wrapper.c
-  SetMem32Wrapper.c
-  SetMem16Wrapper.c
-  SetMemWrapper.c
-  CopyMemWrapper.c
-  MemLibGuid.c
 
 [Sources.X64]
   X64/ScanMem64.S
@@ -92,19 +92,6 @@
   X64/SetMem16.asm
   X64/SetMem.asm
   X64/CopyMem.asm
-  ScanMem64Wrapper.c
-  ScanMem32Wrapper.c
-  ScanMem16Wrapper.c
-  ScanMem8Wrapper.c
-  ZeroMemWrapper.c
-  CompareMemWrapper.c
-  SetMem64Wrapper.c
-  SetMem32Wrapper.c
-  SetMem16Wrapper.c
-  SetMemWrapper.c
-  CopyMemWrapper.c
-  MemLibGuid.c
-
 
 [Packages]
   MdePkg/MdePkg.dec

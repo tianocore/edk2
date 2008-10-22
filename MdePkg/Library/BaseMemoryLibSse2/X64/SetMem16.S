@@ -1,5 +1,5 @@
 #
-# ConvertAsm.py: Automatically generated from SetMem32.asm
+# ConvertAsm.py: Automatically generated from SetMem16.asm
 #
 #------------------------------------------------------------------------------
 #
@@ -14,11 +14,11 @@
 #
 # Module Name:
 #
-#   SetMem32.S
+#   SetMem16.S
 #
 # Abstract:
 #
-#   SetMem32 function
+#   SetMem16 function
 #
 # Notes:
 #
@@ -28,21 +28,44 @@
 #------------------------------------------------------------------------------
 #  VOID *
 #  EFIAPI
-#  InternalMemSetMem32 (
+#  InternalMemSetMem16 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
-#    IN UINT32 Value
-#    );
+#    IN UINT16 Value
+#    )
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemSetMem32)
-ASM_PFX(InternalMemSetMem32):
+.globl ASM_PFX(InternalMemSetMem16)
+ASM_PFX(InternalMemSetMem16):
     push    rdi
     mov     rdi, rcx
+    mov     r9, rdi
+    xor     rcx, rcx
+    sub     rcx, rdi
+    and     rcx, 15
     mov     rax, r8
-    xchg    rcx, rdx
-    rep     stosd
-    mov     rax, rdx
+    jz      L0
+    shr     rcx, 1
+    cmp     rcx, rdx
+    cmova   rcx, rdx
+    sub     rdx, rcx
+    rep     stosw
+L0:
+    mov     rcx, rdx
+    and     edx, 7
+    shr     rcx, 3
+    jz      _SetWords_L2
+    movd    xmm0, eax
+    pshuflw xmm0, xmm0, 0
+    movlhps xmm0, xmm0
+L1:
+    movntdq [rdi], xmm0
+    add     rdi, 16
+    loop    L1
+    mfence
+_SetWords_L2:
+    mov     ecx, edx
+    rep     stosw
+    mov     rax, r9
     pop     rdi
     ret
-

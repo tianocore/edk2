@@ -34,9 +34,9 @@
 #    IN UINTN  Count
 #    )
 #------------------------------------------------------------------------------
-.intel_syntax
-.globl _InternalMemCopyMem
-_InternalMemCopyMem:
+.intel_syntax noprefix
+.globl ASM_PFX(InternalMemCopyMem)
+ASM_PFX(InternalMemCopyMem):
     push    rsi
     push    rdi
     mov     rsi, rdx                    # rsi <- Source

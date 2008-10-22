@@ -1,5 +1,5 @@
 #
-# ConvertAsm.py: Automatically generated from SetMem32.asm
+# ConvertAsm.py: Automatically generated from ZeroMem.asm
 #
 #------------------------------------------------------------------------------
 #
@@ -14,11 +14,11 @@
 #
 # Module Name:
 #
-#   SetMem32.S
+#   ZeroMem.S
 #
 # Abstract:
 #
-#   SetMem32 function
+#   ZeroMem function
 #
 # Notes:
 #
@@ -27,22 +27,40 @@
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  EFIAPI
-#  InternalMemSetMem32 (
+#  InternalMemZeroMem (
 #    IN VOID   *Buffer,
-#    IN UINTN  Count,
-#    IN UINT32 Value
+#    IN UINTN  Count
 #    );
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemSetMem32)
-ASM_PFX(InternalMemSetMem32):
+.globl ASM_PFX(InternalMemZeroMem)
+ASM_PFX(InternalMemZeroMem):
     push    rdi
     mov     rdi, rcx
+    xor     rcx, rcx
+    xor     eax, eax
+    sub     rcx, rdi
+    and     rcx, 15
+    mov     r8, rdi
+    jz      L0
+    cmp     rcx, rdx
+    cmova   rcx, rdx
+    sub     rdx, rcx
+    rep     stosb
+L0:
+    mov     rcx, rdx
+    and     edx, 15
+    shr     rcx, 4
+    jz      _ZeroBytes_L2
+    pxor    xmm0, xmm0
+L1:
+    movntdq [rdi], xmm0                 # rdi should be 16-byte aligned
+    add     rdi, 16
+    loop    L1
+    mfence
+_ZeroBytes_L2:
+    mov     ecx, edx
+    rep     stosb
     mov     rax, r8
-    xchg    rcx, rdx
-    rep     stosd
-    mov     rax, rdx
     pop     rdi
     ret
-
