@@ -54,6 +54,9 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
 
+typedef UINT16                    STRING_REF;
+typedef UINT32                    RELOFST;
+
 typedef struct _EFI_HII_PROTOCOL  EFI_HII_PROTOCOL;
 
 typedef UINT16                    FRAMEWORK_EFI_HII_HANDLE;
