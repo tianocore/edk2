@@ -1,7 +1,7 @@
 /** @file
   This includes some definitions introduced in UEFI that will be used in both PEI and DXE phases.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -70,38 +70,32 @@ typedef struct {
 #define WIN_CERT_TYPE_EFI_PKCS115   0x0EF0
 #define WIN_CERT_TYPE_EFI_GUID      0x0EF1
 
-/**
-   
-  The WIN_CERTIFICATE structure is part of the PE/COFF
-  specification and has the following definition:
-
-  @param dwLength   The length of the entire certificate,
-                    including the length of the header, in
-                    bytes.
-
-  @param wRevision  The revision level of the WIN_CERTIFICATE
-                    structure. The current revision level is
-                    0x0200.
-
-  @param wCertificateType   The certificate type. See
-                            WIN_CERT_TYPE_xxx for the UEFI
-                            certificate types. The UEFI
-                            specification reserves the range of
-                            certificate type values from 0x0EF0
-                            to 0x0EFF.
-
-  @param bCertificate   The actual certificate. The format of
-                        the certificate depends on
-                        wCertificateType. The format of the UEFI
-                        certificates is defined below.
-
-
-**/
+///
+/// The WIN_CERTIFICATE structure is part of the PE/COFF specification.
+///
 typedef struct _WIN_CERTIFICATE {
+  ///
+  /// The length of the entire certificate,  
+  /// including the length of the header, in bytes.                                
+  ///
   UINT32  dwLength;
+  ///
+  /// The revision level of the WIN_CERTIFICATE 
+  /// structure. The current revision level is 0x0200.                                   
+  ///
   UINT16  wRevision;
+  ///
+  /// The certificate type. See WIN_CERT_TYPE_xxx for the UEFI      
+  /// certificate types. The UEFI specification reserves the range of 
+  /// certificate type values from 0x0EF0 to 0x0EFF.                          
+  ///
   UINT16  wCertificateType;
-  //UINT8 bCertificate[ANYSIZE_ARRAY];
+  ///
+  /// The following is the actual certificate. The format of   
+  /// the certificate depends on wCertificateType.
+  ///
+  /// UINT8 bCertificate[ANYSIZE_ARRAY];
+  ///
 } WIN_CERTIFICATE;
 
 ///
@@ -110,9 +104,9 @@ typedef struct _WIN_CERTIFICATE {
 #define EFI_CERT_TYPE_RSA2048_SHA256_GUID \
   {0xa7717414, 0xc616, 0x4977, {0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf } }
 
-///
-/// WIN_CERTIFICATE_UEFI_GUID.CertData
-/// 
+//
+// WIN_CERTIFICATE_UEFI_GUID.CertData
+// 
 typedef struct _EFI_CERT_BLOCK_RSA_2048_SHA256 {
   UINT32  HashType;
   UINT8   PublicKey[256];
@@ -120,97 +114,95 @@ typedef struct _EFI_CERT_BLOCK_RSA_2048_SHA256 {
 } EFI_CERT_BLOCK_RSA_2048_SHA256;
 
 
-/**
-   
-  @param Hdr  This is the standard WIN_CERTIFICATE header, where
-              wCertificateType is set to
-              WIN_CERT_TYPE_UEFI_GUID.
-
-  @param CertType   This is the unique id which determines the
-                    format of the CertData. In this case, the
-                    value is EFI_CERT_TYPE_RSA2048_SHA256_GUID.
-
-  @param CertData   This is the certificate data. The format of
-                    the data is determined by the CertType. In
-                    this case the value is
-                    EFI_CERT_BLOCK_RSA_2048_SHA256.
-
-**/
+///
+/// Certificate which encapsulates a GUID-specific digital signature
+///
 typedef struct _WIN_CERTIFICATE_UEFI_GUID {
+  ///
+  /// This is the standard WIN_CERTIFICATE header, where
+  /// wCertificateType is set to WIN_CERT_TYPE_UEFI_GUID. 
+  ///                         
   WIN_CERTIFICATE   Hdr;
+  ///
+  /// This is the unique id which determines the 
+  /// format of the CertData. In this case, the  
+  /// value is EFI_CERT_TYPE_RSA2048_SHA256_GUID.
+  ///
   EFI_GUID          CertType;
-  // UINT8            CertData[ANYSIZE_ARRAY];
+  /// 
+  /// The following is the certificate data. The format of
+  /// the data is determined by the CertType. In this case the value is                     
+  /// EFI_CERT_BLOCK_RSA_2048_SHA256.            
+  ///
+  /// UINT8            CertData[ANYSIZE_ARRAY];
+  ///
 } WIN_CERTIFICATE_UEFI_GUID;
 
 
-/**
-   
-  Certificate which encapsulates the RSASSA_PKCS1-v1_5 digital
-  signature.
-  
-  The WIN_CERTIFICATE_UEFI_PKCS1_15 structure is derived from
-  WIN_CERTIFICATE and encapsulate the information needed to  
-  implement the RSASSA-PKCS1-v1_5 digital signature algorithm as  
-  specified in RFC2437.  
-  
-  @param Hdr  This is the standard WIN_CERTIFICATE header, where
-              wCertificateType is set to
-              WIN_CERT_TYPE_UEFI_PKCS1_15.
-  
-  @param HashAlgorithm  This is the hashing algorithm which was
-                        performed on the UEFI executable when
-                        creating the digital signature. It is
-                        one of the enumerated values pre-defined
-                        in Section 26.4.1. See
-                        EFI_HASH_ALGORITHM_x.
-  
-  @param Signature  This is the actual digital signature. The
-                    size of the signature is the same size as
-                    the key (1024-bit key is 128 bytes) and can
-                    be determined by subtracting the length of
-                    the other parts of this header from the
-                    total length of the certificate as found in
-                    Hdr.dwLength.
-
-**/
-typedef struct _WIN_CERTIFICATE_EFI_PKCS1_15 {
+///   
+/// Certificate which encapsulates the RSASSA_PKCS1-v1_5 digital signature.
+///  
+/// The WIN_CERTIFICATE_UEFI_PKCS1_15 structure is derived from
+/// WIN_CERTIFICATE and encapsulate the information needed to  
+/// implement the RSASSA-PKCS1-v1_5 digital signature algorithm as  
+/// specified in RFC2437.  
+///  
+typedef struct _WIN_CERTIFICATE_EFI_PKCS1_15 {     
+  ///
+  /// This is the standard WIN_CERTIFICATE header, where 
+  /// wCertificateType is set to WIN_CERT_TYPE_UEFI_PKCS1_15.                       
+  ///
   WIN_CERTIFICATE Hdr;
+  ///
+  /// This is the hashing algorithm which was performed on the
+  /// UEFI executable when creating the digital signature. 
+  ///
   EFI_GUID        HashAlgorithm;
-  // UINT8 Signature[ANYSIZE_ARRAY];
+  ///
+  /// The following is the actual digital signature. The   
+  /// size of the signature is the same size as the key 
+  /// (1024-bit key is 128 bytes) and can be determined by 
+  /// subtracting the length of the other parts of this header
+  /// from the total length of the certificate as found in 
+  /// Hdr.dwLength.                               
+  ///
+  /// UINT8 Signature[ANYSIZE_ARRAY];
+  ///
 } WIN_CERTIFICATE_EFI_PKCS1_15;
 
 
-/**
-   
-  AuthInfo is a WIN_CERTIFICATE using the wCertificateType
-  WIN_CERTIFICATE_UEFI_GUID and the CertType
-  EFI_CERT_TYPE_RSA2048_SHA256. If the attribute specifies
-  authenticated access, then the Data buffer should begin with an
-  authentication descriptor prior to the data payload and DataSize
-  should reflect the the data.and descriptor size. The caller
-  shall digest the Monotonic Count value and the associated data
-  for the variable update using the SHA-256 1-way hash algorithm.
-  The ensuing the 32-byte digest will be signed using the private
-  key associated w/ the public/private 2048-bit RSA key-pair. The
-  WIN_CERTIFICATE shall be used to describe the signature of the
-  Variable data *Data. In addition, the signature will also
-  include the MonotonicCount value to guard against replay attacks
-  
-  @param  MonotonicCount  Included in the signature of
-                          AuthInfo.Used to ensure freshness/no
-                          replay. Incremented during each
-                          "Write" access.
-  
-  @param AuthInfo   Provides the authorization for the variable
-                    access. It is a signature across the
-                    variable data and the  Monotonic Count
-                    value. Caller uses Private key that is
-                    associated with a public key that has been
-                    provisioned via the key exchange.
 
-**/
+///   
+/// AuthInfo is a WIN_CERTIFICATE using the wCertificateType
+/// WIN_CERTIFICATE_UEFI_GUID and the CertType
+/// EFI_CERT_TYPE_RSA2048_SHA256. If the attribute specifies
+/// authenticated access, then the Data buffer should begin with an
+/// authentication descriptor prior to the data payload and DataSize
+/// should reflect the the data.and descriptor size. The caller
+/// shall digest the Monotonic Count value and the associated data
+/// for the variable update using the SHA-256 1-way hash algorithm.
+/// The ensuing the 32-byte digest will be signed using the private
+/// key associated w/ the public/private 2048-bit RSA key-pair. The
+/// WIN_CERTIFICATE shall be used to describe the signature of the
+/// Variable data *Data. In addition, the signature will also
+/// include the MonotonicCount value to guard against replay attacks
+///  
 typedef struct {
+  ///
+  /// Included in the signature of        
+  /// AuthInfo.Used to ensure freshness/no
+  /// replay. Incremented during each     
+  /// "Write" access.   
+  ///                  
   UINT64                      MonotonicCount;
+  ///
+  /// Provides the authorization for the variable 
+  /// access. It is a signature across the        
+  /// variable data and the  Monotonic Count      
+  /// value. Caller uses Private key that is      
+  /// associated with a public key that has been  
+  /// provisioned via the key exchange.           
+  ///
   WIN_CERTIFICATE_UEFI_GUID   AuthInfo;
 } EFI_VARIABLE_AUTHENTICATION;
 

@@ -1,8 +1,7 @@
 /** @file
-  
   TCG EFI Platform Definition in TCG_EFI_Platform_1_20_Final
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -40,8 +39,6 @@
 #define EV_EFI_PLATFORM_FIRMWARE_BLOB       (EV_EFI_EVENT_BASE + 8)
 #define EV_EFI_HANDOFF_TABLES               (EV_EFI_EVENT_BASE + 9)
 
-#define TSS_EVENT_DATA_MAX_SIZE   256
-
 #define EFI_CALLING_EFI_APPLICATION         \
   "Calling EFI Application from Boot Option"
 #define EFI_RETURNING_FROM_EFI_APPLICATOIN  \
@@ -64,15 +61,17 @@ typedef UINT32                     TCG_EVENTTYPE;
 #define TCG_PCRINDEX               TPM_PCRINDEX
 
 ///
-/// TCG_PCR_EVENT
+/// Event Log Entry Structure Definition
 ///
 typedef struct tdTCG_PCR_EVENT {
-  TCG_PCRINDEX                      PCRIndex;  // PCRIndex event extended to
-  TCG_EVENTTYPE                     EventType; // TCG EFI event type
-  TCG_DIGEST                        Digest;    // Value extended into PCRIndex
-  UINT32                            EventSize; // Size of the event data
-  UINT8                             Event[1];  // The event data
+  TCG_PCRINDEX                      PCRIndex;  ///< PCRIndex event extended to
+  TCG_EVENTTYPE                     EventType; ///< TCG EFI event type
+  TCG_DIGEST                        Digest;    ///< Value extended into PCRIndex
+  UINT32                            EventSize; ///< Size of the event data
+  UINT8                             Event[1];  ///< The event data
 } TCG_PCR_EVENT;
+
+#define TSS_EVENT_DATA_MAX_SIZE   256
 
 ///
 /// TCG_PCR_EVENT_HDR
@@ -116,7 +115,7 @@ typedef struct tdEFI_IMAGE_LOAD_EVENT {
 /// the measurement of given configuration tables.
 ///
 typedef struct tdEFI_HANDOFF_TABLE_POINTERS {
-  UINTN 	                          NumberOfTables;
+  UINTN                             NumberOfTables;
   EFI_CONFIGURATION_TABLE           TableEntry[1];
 } EFI_HANDOFF_TABLE_POINTERS;
 
@@ -132,7 +131,7 @@ typedef struct tdEFI_VARIABLE_DATA {
   UINTN                             UnicodeNameLength;
   UINTN                             VariableDataLength;
   CHAR16                            UnicodeName[1];
-  INT8                              VariableData[1];  // Driver or platform-specific data
+  INT8                              VariableData[1];  ///< Driver or platform-specific data
 } EFI_VARIABLE_DATA;
 
 typedef struct tdEFI_GPT_DATA {
