@@ -46,14 +46,14 @@ ASM_PFX(InternalMemSetMem64):
     dec     rcx
 L0:
     shr     rcx, 1
-    jz      _SetQwords_L2
+    jz      L_SetQwords
     movlhps xmm0, xmm0
 L1:
     movntdq [rdx], xmm0
     lea     rdx, [rdx + 16]
     loop    L1
     mfence
-_SetQwords_L2:
+L_SetQwords:
     jnc     L2
     mov     [rdx], r8
 L2:

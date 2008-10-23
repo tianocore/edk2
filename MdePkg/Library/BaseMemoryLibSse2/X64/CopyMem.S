@@ -44,38 +44,38 @@ ASM_PFX(InternalMemCopyMem):
     lea     r9, [rsi + r8 - 1]          # r9 <- Last byte of Source
     cmp     rsi, rdi                    
     mov     rax, rdi                    # rax <- Destination as return value
-    jae     _InternalMemCopyMem_al_0000 # Copy forward if Source > Destination
+    jae     L0                          # Copy forward if Source > Destination
     cmp     r9, rdi                     # Overlapped?
-    jae     _atSym_CopyBackward         # Copy backward if overlapped
-_InternalMemCopyMem_al_0000:            
+    jae     L_CopyBackward              # Copy backward if overlapped
+L0:            
     xor     rcx, rcx                    
     sub     rcx, rdi                    # rcx <- -rdi
     and     rcx, 15                     # rcx + rsi should be 16 bytes aligned
-    jz      _InternalMemCopyMem_al_0001 # skip if rcx == 0
+    jz      L1                          # skip if rcx == 0
     cmp     rcx, r8
     cmova   rcx, r8
     sub     r8, rcx
     rep     movsb
-_InternalMemCopyMem_al_0001:
+L1:
     mov     rcx, r8
     and     r8, 15
     shr     rcx, 4                      # rcx <- # of DQwords to copy
-    jz      _atSym_CopyBytes
-    movdqa  [rsp + 0x18], xmm0           # save xmm0 on stack
-_InternalMemCopyMem_al_0002:
+    jz      L_CopyBytes
+    movdqa  [rsp + 0x18], xmm0          # save xmm0 on stack
+L2:
     movdqu  xmm0, [rsi]                 # rsi may not be 16-byte aligned
     movntdq [rdi], xmm0                 # rdi should be 16-byte aligned
     add     rsi, 16
     add     rdi, 16
-    loop    _InternalMemCopyMem_al_0002
+    loop    L2
     mfence
-    movdqa  xmm0, [rsp + 0x18]           # restore xmm0
-    jmp     _atSym_CopyBytes            # copy remaining bytes
-_atSym_CopyBackward:
+    movdqa  xmm0, [rsp + 0x18]          # restore xmm0
+    jmp     L_CopyBytes                 # copy remaining bytes
+L_CopyBackward:
     mov     rsi, r9                     # rsi <- Last byte of Source
     lea     rdi, [rdi + r8 - 1]         # rdi <- Last byte of Destination
     std
-_atSym_CopyBytes:
+L_CopyBytes:
     mov     rcx, r8
     rep     movsb
     cld

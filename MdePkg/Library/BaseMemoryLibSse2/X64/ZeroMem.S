@@ -51,14 +51,14 @@ L0:
     mov     rcx, rdx
     and     edx, 15
     shr     rcx, 4
-    jz      _ZeroBytes_L2
+    jz      L_ZeroBytes
     pxor    xmm0, xmm0
 L1:
     movntdq [rdi], xmm0                 # rdi should be 16-byte aligned
     add     rdi, 16
     loop    L1
     mfence
-_ZeroBytes_L2:
+L_ZeroBytes:
     mov     ecx, edx
     rep     stosb
     mov     rax, r8
