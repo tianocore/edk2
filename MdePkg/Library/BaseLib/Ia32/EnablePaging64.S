@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   EnablePaging64.Asm
+#   EnablePaging64.S
 #
 # Abstract:
 #
@@ -58,6 +58,6 @@ LongStart:                              # long mode starts here
     .byte   0x67, 0x48
     movl    0x18(%esp), %esp            # mov rsp, [esp + 18h]
     .byte   0x48
-    addl    $0x-20, %esp                # add rsp, -20h
+    addl    $0x-0x20, %esp                # add rsp, -20h
     call    *%ebx                       # call rbx
     jmp     .
