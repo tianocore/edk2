@@ -1,7 +1,10 @@
 /** @file
-  Switch Stack functions.
+  Implementation of SetJump() and LongJump() on EBC.
+  
+  SetJump() and LongJump() are not currently supported for the EBC processor type.
+  Implementation for EBC just returns 0 for SetJump(), and ASSERT() for LongJump().
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,23 +16,6 @@
 **/
 
 #include <BaseLibInternals.h>
-
-/**
-  Worker function that checks ASSERT condition for JumpBuffer
-
-  Checks ASSERT condition for JumpBuffer.
-
-  If JumpBuffer is NULL, then ASSERT().
-  For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
-
-  @param  JumpBuffer    A pointer to CPU context buffer.
-
-**/
-VOID
-EFIAPI
-InternalAssertJumpBuffer (
-  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
-  );
 
 /**
   Saves the current CPU context that can be restored with a call to LongJump() and returns 0.
@@ -59,7 +45,7 @@ SetJump (
 
   Restores the CPU context from the buffer specified by JumpBuffer.
   This function never returns to the caller.
-  Instead is resumes execution based on the state of JumpBuffer.
+  Instead it resumes execution based on the state of JumpBuffer.
 
   @param  JumpBuffer    A pointer to CPU context buffer.
   @param  Value         The value to return when the SetJump() context is restored.
