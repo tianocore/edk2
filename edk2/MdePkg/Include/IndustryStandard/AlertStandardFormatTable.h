@@ -1,7 +1,7 @@
 /** @file   
 	ACPI Alert Standard Format Description Table ASF! as described in the ASF2.0 Specification
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -45,30 +45,60 @@ typedef struct {
 } EFI_ACPI_ASF_INFO;
 
 ///
+/// ASF Alert Data
+///
+typedef struct {
+  UINT8                                DeviceAddress;
+  UINT8                                Command;
+  UINT8                                DataMask;
+  UINT8                                CompareValue;
+  UINT8                                EventSenseType;
+  UINT8                                EventType;
+  UINT8                                EventOffset;
+  UINT8                                EventSourceType;
+  UINT8                                EventSeverity;
+  UINT8                                SensorNumber;
+  UINT8                                Entity;
+  UINT8                                EntityInstance;
+} EFI_ACPI_ASF_ALERTDATA;
+
+///
 /// Alert sensors definition
 ///
-#define ASF_ALRT_SENSOR_ARRAY_LENGTH     36
-
 typedef struct {
   EFI_ACPI_ASF_RECORD_HEADER           RecordHeader;
   UINT8                                AssertionEventBitMask;
   UINT8                                DeassertionEventBitMask;
   UINT8                                NumberOfAlerts;
-  UINT8                                ArrayElementLength;
-  UINT8                                DeviceArray[ASF_ALRT_SENSOR_ARRAY_LENGTH];
+  UINT8                                ArrayElementLength; ///< For ASF version 1.0 and later, this filed is set to 0x0C
+  ///
+  /// EFI_ACPI_ASF_ALERTDATA           DeviceArray[ANYSIZE_ARRAY];
+  ///
 } EFI_ACPI_ASF_ALRT;
+
+///
+/// Alert Control Data
+///
+typedef struct {
+  UINT8                                Function;
+  UINT8                                DeviceAddress;
+  UINT8                                Command;
+  UINT8                                DataValue;
+} EFI_ACPI_ASF_CONTROLDATA;       
 
 ///
 /// Alert Remote Control System Actions
 ///
-#define ASF_RCTL_DEVICES_ARRAY_LENGTH      16  
 typedef struct {
   EFI_ACPI_ASF_RECORD_HEADER           RecordHeader;
   UINT8                                NumberOfControls;
-  UINT8                                ArrayElementLength;
+  UINT8                                ArrayElementLength; ///< For ASF version 1.0 and later, this filed is set to 0x4
   UINT16                               RctlReserved;
-  UINT8                                ControlArray[ASF_RCTL_DEVICES_ARRAY_LENGTH];
+  ///
+  /// EFI_ACPI_ASF_CONTROLDATA;        DeviceArray[ANYSIZE_ARRAY];
+  ///
 } EFI_ACPI_ASF_RCTL;
+
 
 ///
 /// Remote Control Capabilities
@@ -87,27 +117,29 @@ typedef struct {
 ///
 /// SMBus Devices with fixed addresses
 ///
-#define ASF_ADDR_DEVICE_ARRAY_LENGTH      16  
 typedef struct {
   EFI_ACPI_ASF_RECORD_HEADER           RecordHeader;
   UINT8                                SEEPROMAddress;
   UINT8                                NumberOfDevices;
-  UINT8                                FixedSmbusAddresses[ASF_ADDR_DEVICE_ARRAY_LENGTH];
+  ///
+  /// UINT8                            FixedSmbusAddresses[ANYSIZE_ARRAY];
+  ///
 } EFI_ACPI_ASF_ADDR;
 
-typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER          Header;
-  EFI_ACPI_ASF_INFO                    AsfInfo;
-  EFI_ACPI_ASF_ALRT                    AsfAlert;
-  EFI_ACPI_ASF_RCTL                    AsfRctl;
-  EFI_ACPI_ASF_RMCP                    AsfRmcp;
-  EFI_ACPI_ASF_ADDR                    AsfAddr;
-} EFI_ACPI_1_0_ASF_DESCRIPTION_TABLE;
+///
+/// ASF! Description Table Header
+///
+typedef EFI_ACPI_DESCRIPTION_HEADER EFI_ACPI_ASF_DESCRIPTION_HEADER;
+
+///
+/// The revision stored in ASF! DESCRIPTION TABLE as BCD value
+///
+#define EFI_ACPI_2_0_ASF_DESCRIPTION_TABLE_REVISION   0x20
 
 ///
 /// "ASF!" ASF Description Table Signature
 ///
-#define EFI_ACPI_1_0_ASF_DESCRIPTION_TABLE_SIGNATURE  0x21465341
+#define EFI_ACPI_ASF_DESCRIPTION_TABLE_SIGNATURE  EFI_SIGNATURE_32 ('A', 'S', 'F', '!')
 
 #pragma pack ()
 
