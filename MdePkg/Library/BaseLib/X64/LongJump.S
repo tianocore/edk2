@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   LongJump.Asm
+#   LongJump.S
 #
 # Abstract:
 #

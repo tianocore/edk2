@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -39,14 +39,13 @@
 ASM_PFX(InternalX86DisablePaging64):
     cli    
     shl    $0x20,%rcx
-    lea    (%rip), %eax
-    mov    %eax,%ecx
+    lea    L1, %eax
+    mov    %r8d, %esi 
+    or     %rax, %rcx
+    mov    %r9d, %edi 
+    mov    0x28(%rsp), %eax
     push   %rcx
-    mov    %edx,%ebx
-    mov    %r8d,%esi
-    mov    %r9d,%edi
-    mov    0x28(%rsp),%eax
-    lret   
+    ret
 L1:
     mov    %eax,%esp
     mov    %cr0,%rax
@@ -61,6 +60,6 @@ L1:
     mov    %rax,%cr4
     push   %rdi
     push   %rsi
-    callq  *%rbx
+    callq  *%rdx
     jmp    .
 
