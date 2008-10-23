@@ -54,7 +54,7 @@ L0:
     mov     rcx, rdx
     and     edx, 7
     shr     rcx, 3
-    jz      _SetWords_L2
+    jz      L_SetWords
     movd    xmm0, eax
     pshuflw xmm0, xmm0, 0
     movlhps xmm0, xmm0
@@ -63,7 +63,7 @@ L1:
     add     rdi, 16
     loop    L1
     mfence
-_SetWords_L2:
+L_SetWords:
     mov     ecx, edx
     rep     stosw
     mov     rax, r9

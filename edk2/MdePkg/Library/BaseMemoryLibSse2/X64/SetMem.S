@@ -53,9 +53,9 @@ L0:
     mov     rcx, rdx
     and     rdx, 15
     shr     rcx, 4
-    jz      _SetBytes_L2
+    jz      L_SetBytes
     mov     ah, al                      # ax <- Value repeats twice
-    movdqa  [rsp + 0x10], xmm0           # save xmm0
+    movdqa  [rsp + 0x10], xmm0          # save xmm0
     movd    xmm0, eax                   # xmm0[0..16] <- Value repeats twice
     pshuflw xmm0, xmm0, 0               # xmm0[0..63] <- Value repeats 8 times
     movlhps xmm0, xmm0                  # xmm0 <- Value repeats 16 times
@@ -64,8 +64,8 @@ L1:
     add     rdi, 16
     loop    L1
     mfence
-    movdqa  xmm0, [rsp + 0x10]           # restore xmm0
-_SetBytes_L2:
+    movdqa  xmm0, [rsp + 0x10]          # restore xmm0
+L_SetBytes:
     mov     ecx, edx                    # high 32 bits of rcx are always zero
     rep     stosb
     mov     rax, r9                     # rax <- Return value
