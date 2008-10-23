@@ -1,7 +1,7 @@
 /** @file
   Legacy Master Boot Record Format Definition.
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -16,8 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _MBR_H_
 
 #define MBR_SIGNATURE               0xaa55
-#define MIN_MBR_DEVICE_SIZE         0x80000
-#define MBR_ERRATA_PAD              0x40000 // 128 MB
 
 #define EXTENDED_DOS_PARTITION      0x05
 #define EXTENDED_WINDOWS_PARTITION  0x0F

@@ -1,9 +1,9 @@
 /** @file
   ACPI memory mapped configuration space access table definition, defined at 
-  in the PCI Firmware Specification, version 3.0 draft version 0.5.
+  in the PCI Firmware Specification, version 3.0.
   Specification is available at http://www.pcisig.com.
     
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        

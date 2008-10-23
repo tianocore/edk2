@@ -1,9 +1,8 @@
 /** @file
-
   The definition for iSCSI Boot Firmware Table, it's defined in
-  Microsoft iBFT document.
-
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Microsoft iBFT document. 
+  
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -22,6 +21,9 @@
 #define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_REVISION            0x01
 #define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_ALIGNMENT 8
 
+///
+/// Structure Type/ID
+///
 typedef enum {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_RESERVED_STRUCTURE_ID = 0,
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_ID,
@@ -31,6 +33,10 @@ typedef enum {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_EXTERNSIONS_STRUCTURE_ID
 } EFI_ACPI_ISCSI_ID_DEFINITIONS;
 
+///
+/// from the definition of IP_PREFIX_ORIGIN Enumeration in MSDN,
+/// not defined in Microsoft iBFT document.
+///
 typedef enum {
   IpPrefixOriginOther = 0,
   IpPrefixOriginManual,
@@ -42,6 +48,9 @@ typedef enum {
 
 #pragma pack(1)
 
+///
+/// iBF Table Header
+///
 typedef struct {
   UINT32  Signature;
   UINT32  Length;
@@ -52,6 +61,9 @@ typedef struct {
   UINT8   Reserved[24];
 } EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER;
 
+///
+/// Common Header of Boot Firmware Table Structure 
+///
 typedef struct {
   UINT8   StructureId;
   UINT8   Version;
@@ -60,9 +72,9 @@ typedef struct {
   UINT8   Flags;
 } EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER;
 
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_VERSION            0x1
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_FLAG_BOOT_FAILOVER 0x1
-
+///
+/// Control Structure
+///
 typedef struct {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER  Header;
   UINT16                                               Extensions;
@@ -73,10 +85,12 @@ typedef struct {
   UINT16                                               Target1Offset;  
 } EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE;
 
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_VERSION            0x1
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_FLAG_BLOCK_VALID   0x1
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_FLAG_BOOT_SELECTED 0x2
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_VERSION            0x1
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_FLAG_BOOT_FAILOVER 0x1
 
+///
+/// Initiator Structure
+///
 typedef struct {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER  Header;
   EFI_IPv6_ADDRESS                                     ISnsServer;
@@ -87,11 +101,13 @@ typedef struct {
   UINT16                                               IScsiNameOffset;
 } EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE;
 
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_VERSION            0x1
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_FLAG_BLOCK_VALID   0x1
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_FLAG_BOOT_SELECTED 0x2
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_FLAG_GLOBAL        0x4
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_VERSION            0x1
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_FLAG_BLOCK_VALID   0x1 
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_FLAG_BOOT_SELECTED 0x2 
 
+///
+/// NIC Structure
+///
 typedef struct {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER  Header;
   EFI_IPv6_ADDRESS                                     Ip;
@@ -108,12 +124,14 @@ typedef struct {
   UINT16                                               HostNameOffset;
 } EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE;
 
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_VERSION            0x1
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_BLOCK_VALID   0x1
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_BOOT_SELECTED 0x2
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_RADIUS_CHAP   0x4
-#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_RADIUS_RCHAP  0x8
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_VERSION            0x1
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_FLAG_BLOCK_VALID   0x1
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_FLAG_BOOT_SELECTED 0x2
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_FLAG_GLOBAL        0x4
 
+///
+/// Target Structure
+///
 typedef struct {
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER  Header;
   EFI_IPv6_ADDRESS                                     Ip;
@@ -132,6 +150,12 @@ typedef struct {
   UINT16                                               ReverseCHAPSecretLength;
   UINT16                                               ReverseCHAPSecretOffset;
 } EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE;
+
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_VERSION            0x1
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_BLOCK_VALID   0x1
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_BOOT_SELECTED 0x2
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_RADIUS_CHAP   0x4
+#define EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_RADIUS_RCHAP  0x8
 
 #pragma pack()
 
