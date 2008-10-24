@@ -43,20 +43,20 @@
 #define IMM64_IC_INST_WORD_POS_X        12
 #define IMM64_IC_VAL_POS_X              21
 
-#define IMM64_IMM41a_INST_WORD_X        1
-#define IMM64_IMM41a_SIZE_X             10
-#define IMM64_IMM41a_INST_WORD_POS_X    14
-#define IMM64_IMM41a_VAL_POS_X          22
+#define IMM64_IMM41A_INST_WORD_X        1
+#define IMM64_IMM41A_SIZE_X             10
+#define IMM64_IMM41A_INST_WORD_POS_X    14
+#define IMM64_IMM41A_VAL_POS_X          22
 
-#define IMM64_IMM41b_INST_WORD_X        1
-#define IMM64_IMM41b_SIZE_X             8
-#define IMM64_IMM41b_INST_WORD_POS_X    24
-#define IMM64_IMM41b_VAL_POS_X          32
+#define IMM64_IMM41B_INST_WORD_X        1
+#define IMM64_IMM41B_SIZE_X             8
+#define IMM64_IMM41B_INST_WORD_POS_X    24
+#define IMM64_IMM41B_VAL_POS_X          32
 
-#define IMM64_IMM41c_INST_WORD_X        2
-#define IMM64_IMM41c_SIZE_X             23
-#define IMM64_IMM41c_INST_WORD_POS_X    0
-#define IMM64_IMM41c_VAL_POS_X          40
+#define IMM64_IMM41C_INST_WORD_X        2
+#define IMM64_IMM41C_SIZE_X             23
+#define IMM64_IMM41C_INST_WORD_POS_X    0
+#define IMM64_IMM41C_VAL_POS_X          40
 
 #define IMM64_SIGN_INST_WORD_X          3
 #define IMM64_SIGN_SIZE_X               1
@@ -83,7 +83,7 @@ PeCoffLoaderRelocateImageEx (
   IN UINT64      Adjust
   )
 {
-  UINT64      *F64;
+  UINT64      *Fixup64;
   UINT64      FixupVal;
 
   switch ((*Reloc) >> 12) {
@@ -129,10 +129,10 @@ PeCoffLoaderRelocateImageEx (
                 );
 
       EXT_IMM64(FixupVal,
-                (UINT32 *)Fixup + IMM64_IMM41a_INST_WORD_X,
-                IMM64_IMM41a_SIZE_X,
-                IMM64_IMM41a_INST_WORD_POS_X,
-                IMM64_IMM41a_VAL_POS_X
+                (UINT32 *)Fixup + IMM64_IMM41A_INST_WORD_X,
+                IMM64_IMM41A_SIZE_X,
+                IMM64_IMM41A_INST_WORD_POS_X,
+                IMM64_IMM41A_VAL_POS_X
                 );
 
       //
@@ -172,24 +172,24 @@ PeCoffLoaderRelocateImageEx (
                 );
 
       INS_IMM64(FixupVal,
-                ((UINT32 *)Fixup + IMM64_IMM41a_INST_WORD_X),
-                IMM64_IMM41a_SIZE_X,
-                IMM64_IMM41a_INST_WORD_POS_X,
-                IMM64_IMM41a_VAL_POS_X
+                ((UINT32 *)Fixup + IMM64_IMM41A_INST_WORD_X),
+                IMM64_IMM41A_SIZE_X,
+                IMM64_IMM41A_INST_WORD_POS_X,
+                IMM64_IMM41A_VAL_POS_X
                 );
 
       INS_IMM64(FixupVal,
-                ((UINT32 *)Fixup + IMM64_IMM41b_INST_WORD_X),
-                IMM64_IMM41b_SIZE_X,
-                IMM64_IMM41b_INST_WORD_POS_X,
-                IMM64_IMM41b_VAL_POS_X
+                ((UINT32 *)Fixup + IMM64_IMM41B_INST_WORD_X),
+                IMM64_IMM41B_SIZE_X,
+                IMM64_IMM41B_INST_WORD_POS_X,
+                IMM64_IMM41B_VAL_POS_X
                 );
 
       INS_IMM64(FixupVal,
-                ((UINT32 *)Fixup + IMM64_IMM41c_INST_WORD_X),
-                IMM64_IMM41c_SIZE_X,
-                IMM64_IMM41c_INST_WORD_POS_X,
-                IMM64_IMM41c_VAL_POS_X
+                ((UINT32 *)Fixup + IMM64_IMM41C_INST_WORD_X),
+                IMM64_IMM41C_SIZE_X,
+                IMM64_IMM41C_INST_WORD_POS_X,
+                IMM64_IMM41C_VAL_POS_X
                 );
 
       INS_IMM64(FixupVal,
@@ -199,10 +199,10 @@ PeCoffLoaderRelocateImageEx (
                 IMM64_SIGN_VAL_POS_X
                 );
 
-      F64 = (UINT64 *) Fixup;
+      Fixup64 = (UINT64 *) Fixup;
       if (*FixupData != NULL) {
         *FixupData = ALIGN_POINTER(*FixupData, sizeof(UINT64));
-        *(UINT64 *)(*FixupData) = *F64;
+        *(UINT64 *)(*FixupData) = *Fixup64;
         *FixupData = *FixupData + sizeof(UINT64);
       }
       break;
@@ -267,24 +267,24 @@ PeHotRelocateImageEx (
   IN UINT64      Adjust
   )
 {
-  UINT64  *F64;
+  UINT64  *Fixup64;
   UINT64  FixupVal;
 
   switch ((*Reloc) >> 12) {
   case EFI_IMAGE_REL_BASED_DIR64:
-    F64         = (UINT64 *) Fixup;
+    Fixup64     = (UINT64 *) Fixup;
     *FixupData  = ALIGN_POINTER (*FixupData, sizeof (UINT64));
-    if (*(UINT64 *) (*FixupData) == *F64) {
-      *F64 = *F64 + (UINT64) Adjust;
+    if (*(UINT64 *) (*FixupData) == *Fixup64) {
+      *Fixup64 = *Fixup64 + (UINT64) Adjust;
     }
 
     *FixupData = *FixupData + sizeof (UINT64);
     break;
 
   case EFI_IMAGE_REL_BASED_IA64_IMM64:
-    F64         = (UINT64 *) Fixup;
+    Fixup64     = (UINT64 *) Fixup;
     *FixupData  = ALIGN_POINTER (*FixupData, sizeof (UINT64));
-    if (*(UINT64 *) (*FixupData) == *F64) {
+    if (*(UINT64 *) (*FixupData) == *Fixup64) {
       //
       // Align it to bundle address before fixing up the
       // 64-bit immediate value of the movl instruction.
@@ -330,10 +330,10 @@ PeHotRelocateImageEx (
 
       EXT_IMM64 (
         FixupVal,
-        (UINT32 *) Fixup + IMM64_IMM41a_INST_WORD_X,
-        IMM64_IMM41a_SIZE_X,
-        IMM64_IMM41a_INST_WORD_POS_X,
-        IMM64_IMM41a_VAL_POS_X
+        (UINT32 *) Fixup + IMM64_IMM41A_INST_WORD_X,
+        IMM64_IMM41A_SIZE_X,
+        IMM64_IMM41A_INST_WORD_POS_X,
+        IMM64_IMM41A_VAL_POS_X
         );
 
       //
@@ -378,26 +378,26 @@ PeHotRelocateImageEx (
 
       INS_IMM64 (
         FixupVal,
-        ((UINT32 *) Fixup + IMM64_IMM41a_INST_WORD_X),
-        IMM64_IMM41a_SIZE_X,
-        IMM64_IMM41a_INST_WORD_POS_X,
-        IMM64_IMM41a_VAL_POS_X
+        ((UINT32 *) Fixup + IMM64_IMM41A_INST_WORD_X),
+        IMM64_IMM41A_SIZE_X,
+        IMM64_IMM41A_INST_WORD_POS_X,
+        IMM64_IMM41A_VAL_POS_X
         );
 
       INS_IMM64 (
         FixupVal,
-        ((UINT32 *) Fixup + IMM64_IMM41b_INST_WORD_X),
-        IMM64_IMM41b_SIZE_X,
-        IMM64_IMM41b_INST_WORD_POS_X,
-        IMM64_IMM41b_VAL_POS_X
+        ((UINT32 *) Fixup + IMM64_IMM41B_INST_WORD_X),
+        IMM64_IMM41B_SIZE_X,
+        IMM64_IMM41B_INST_WORD_POS_X,
+        IMM64_IMM41B_VAL_POS_X
         );
 
       INS_IMM64 (
         FixupVal,
-        ((UINT32 *) Fixup + IMM64_IMM41c_INST_WORD_X),
-        IMM64_IMM41c_SIZE_X,
-        IMM64_IMM41c_INST_WORD_POS_X,
-        IMM64_IMM41c_VAL_POS_X
+        ((UINT32 *) Fixup + IMM64_IMM41C_INST_WORD_X),
+        IMM64_IMM41C_SIZE_X,
+        IMM64_IMM41C_INST_WORD_POS_X,
+        IMM64_IMM41C_VAL_POS_X
         );
 
       INS_IMM64 (
@@ -408,7 +408,7 @@ PeHotRelocateImageEx (
         IMM64_SIGN_VAL_POS_X
         );
 
-      *(UINT64 *) (*FixupData) = *F64;
+      *(UINT64 *) (*FixupData) = *Fixup64;
     }
 
     *FixupData = *FixupData + sizeof (UINT64);
