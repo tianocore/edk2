@@ -704,8 +704,6 @@ LibPcdSetExBool (
   @param[in]  NotificationFunction The function to call when the token 
               specified by Guid and TokenNumber is set.
 
-  @retval VOID
-
 **/
 VOID
 EFIAPI
@@ -727,8 +725,6 @@ LibPcdCallbackOnSet (
   @param[in]  Guid Specify the GUID token space.
   @param[in]  TokenNumber Specify the token number.
   @param[in]  NotificationFunction The callback function to be unregistered.
-
-  @retval VOID
 
 **/
 VOID

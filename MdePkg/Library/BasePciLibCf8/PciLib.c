@@ -54,7 +54,7 @@ PciRead8 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 
@@ -382,7 +382,7 @@ PciRead16 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 
@@ -710,7 +710,7 @@ PciRead32 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 
