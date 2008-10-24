@@ -591,11 +591,11 @@
   Ipf/CpuBreakpointMsc.c | MSFT
   Ipf/Unaligned.c
   Ipf/SwitchStack.s
-  Ipf/longjmp.s
-  Ipf/setjmp.s
+  Ipf/LongJmp.s
+  Ipf/SetJmp.s
   Ipf/PalCallStatic.s
-  Ipf/ia_64gen.h
-  Ipf/asm.h
+  Ipf/Ia64gen.h
+  Ipf/Asm.h
   Math64.c
   Synchronization.c     | INTEL 
   SynchronizationMsc.c  | MSFT 
