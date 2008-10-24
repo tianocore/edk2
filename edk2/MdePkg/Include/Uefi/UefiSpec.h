@@ -84,8 +84,7 @@ typedef struct {
 ///
 /// Build macros to find next EFI_MEMORY_DESCRIPTOR.
 ///
-#define NextMemoryDescriptor(_Ptr, _Size)   ((EFI_MEMORY_DESCRIPTOR *) (((UINT8 *) (_Ptr)) + (_Size)))
-#define NEXT_MEMORY_DESCRIPTOR(_Ptr, _Size) NextMemoryDescriptor (_Ptr, _Size)
+#define NEXT_MEMORY_DESCRIPTOR(_Ptr, _Size)   ((EFI_MEMORY_DESCRIPTOR *) (((UINT8 *) (_Ptr)) + (_Size)))
 
 ///
 /// Declare forward referenced data structures
