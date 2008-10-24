@@ -1,7 +1,7 @@
 /** @file
   AsmMwait function
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,21 +12,18 @@
 
 **/
 
-
-
-
 /**
   Executes an MWAIT instruction.
 
   Executes an MWAIT instruction with the register state specified by Eax and
   Ecx. Returns Eax. This function is only available on IA-32 and X64.
 
-  @param  Eax The value to load into EAX or RAX before executing the MONITOR
-              instruction.
-  @param  Ecx The value to load into ECX or RCX before executing the MONITOR
-              instruction.
+  @param  RegisterEax The value to load into EAX or RAX before executing the MONITOR
+                      instruction.
+  @param  RegisterEcx The value to load into ECX or RCX before executing the MONITOR
+                      instruction.
 
-  @return Eax
+  @return RegisterEax
 
 **/
 UINTN

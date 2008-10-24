@@ -1,7 +1,7 @@
 /** @file
   AsmCpuid function.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,9 +11,6 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
-
-
 
 /**
   Retrieves CPUID information.
@@ -26,16 +23,16 @@
   If Edx is not NULL, then the value of EDX after CPUID is returned in Edx.
   This function is only available on IA-32 and X64.
 
-  @param  Index The 32-bit value to load into EAX prior to invoking the CPUID
-                instruction.
-  @param  Eax   Pointer to the 32-bit EAX value returned by the CPUID
-                instruction. This is an optional parameter that may be NULL.
-  @param  Ebx   Pointer to the 32-bit EBX value returned by the CPUID
-                instruction. This is an optional parameter that may be NULL.
-  @param  Ecx   Pointer to the 32-bit ECX value returned by the CPUID
-                instruction. This is an optional parameter that may be NULL.
-  @param  Edx   Pointer to the 32-bit EDX value returned by the CPUID
-                instruction. This is an optional parameter that may be NULL.
+  @param  Index         The 32-bit value to load into EAX prior to invoking the CPUID
+                        instruction.
+  @param  RegisterEax   Pointer to the 32-bit EAX value returned by the CPUID
+                        instruction. This is an optional parameter that may be NULL.
+  @param  RegisterEbx   Pointer to the 32-bit EBX value returned by the CPUID
+                        instruction. This is an optional parameter that may be NULL.
+  @param  RegisterEcx   Pointer to the 32-bit ECX value returned by the CPUID
+                        instruction. This is an optional parameter that may be NULL.
+  @param  RegisterEdx   Pointer to the 32-bit EDX value returned by the CPUID
+                        instruction. This is an optional parameter that may be NULL.
 
   @return Index
 
