@@ -1121,9 +1121,6 @@ typedef struct tdTPM_AUDIT_EVENT_OUT {
 //
 // Part 2, section 16: Return Codes
 //
-#ifndef TPM_BASE
-#error "TPM Error Codes require definition of TPM_BASE"
-#endif
 
 #define TPM_VENDOR_ERROR            TPM_Vendor_Specific32
 #define TPM_NON_FATAL               0x00000800
