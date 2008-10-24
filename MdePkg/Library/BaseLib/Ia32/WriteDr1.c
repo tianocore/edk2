@@ -1,7 +1,7 @@
 /** @file
   AsmWriteDr1 function
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,16 +12,13 @@
 
 **/
 
-
-
-
 /**
   Writes a value to Debug Register 1 (DR1).
 
   Writes and returns a new value to DR1. This function is only available on
   IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
 
-  @param  Dr1 The value to write to Dr1.
+  @param  Value The value to write to Dr1.
 
   @return The value written to Debug Register 1 (DR1).
 
