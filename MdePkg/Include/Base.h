@@ -57,34 +57,18 @@ struct _LIST_ENTRY {
 // Modifiers for Data Types used to self document code.
 // This concept is borrowed for UEFI specification.
 //
-#ifndef IN
-//
-// Some other envirnments use this construct, so #ifndef to prevent
-// mulitple definition.
-//
 #define IN
 #define OUT
 #define OPTIONAL
-#endif
 
-//
-// Constants. They may exist in other build structures, so #ifndef them.
-//
-#ifndef TRUE
 //
 //  UEFI specification claims 1 and 0. We are concerned about the 
 //  complier portability so we did it this way.
 //
 #define TRUE  ((BOOLEAN)(1==1))
-#endif
-
-#ifndef FALSE
 #define FALSE ((BOOLEAN)(0==1))
-#endif
 
-#ifndef NULL
 #define NULL  ((VOID *) 0)
-#endif
 
 #define  BIT0     0x00000001
 #define  BIT1     0x00000002
@@ -196,14 +180,10 @@ struct _LIST_ENTRY {
 //
 // Also support coding convention rules for var arg macros
 //
-#ifndef VA_START
-
 typedef CHAR8 *VA_LIST;
 #define VA_START(ap, v) (ap = (VA_LIST) & (v) + _INT_SIZE_OF (v))
 #define VA_ARG(ap, t)   (*(t *) ((ap += _INT_SIZE_OF (t)) - _INT_SIZE_OF (t)))
 #define VA_END(ap)      (ap = (VA_LIST) 0)
-
-#endif
 
 //
 // Macro that returns the byte offset of a field in a data structure. 
