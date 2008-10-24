@@ -24,7 +24,6 @@
 #
 #------------------------------------------------------------------------------
 
-
 #------------------------------------------------------------------------------
 #  VOID *
 #  EFIAPI
@@ -41,34 +40,43 @@ ASM_PFX(InternalMemCopyMem):
     push    rdi
     mov     rsi, rdx                    # rsi <- Source
     mov     rdi, rcx                    # rdi <- Destination
-    lea     r9, [rsi + r8 - 1]          # r9 <- End of Source
+    lea     r9, [rsi + r8 - 1]          # r9 <- Last byte of Source
     cmp     rsi, rdi
     mov     rax, rdi                    # rax <- Destination as return value
-    jae     L0
-    cmp     r9, rdi
-    jae     L_CopyBackward              # Copy backward if overlapped
+    jae     L0                          # Copy forward if Source > Destination
+    cmp     r9, rdi                     # Overlapped?
+    jae     @CopyBackward               # Copy backward if overlapped
 L0:
-    mov     rcx, r8
-    and     r8, 7
-    shr     rcx, 3                      # rcx <- # of Qwords to copy
-    jz      L_CopyBytes
-    movd    r10, mm0                    # (Save mm0 in r10)
+    xor     rcx, rcx
+    sub     rcx, rdi                    # rcx <- -rdi
+    and     rcx, 15                     # rcx + rsi should be 16 bytes aligned
+    jz      L1                          # skip if rcx == 0
+    cmp     rcx, r8
+    cmova   rcx, r8
+    sub     r8, rcx
+    rep     movsb
 L1:
-    movq    mm0, [rsi]
-    movntq  [rdi], mm0
-    add     rsi, 8
-    add     rdi, 8
-    loop    L1
+    mov     rcx, r8
+    and     r8, 15
+    shr     rcx, 4                      # rcx <- # of DQwords to copy
+    jz      L_CopyBytes
+    movdqa  [rsp + 0x18], xmm0           # save xmm0 on stack
+L2:
+    movdqu  xmm0, [rsi]                 # rsi may not be 16-byte aligned
+    movntdq [rdi], xmm0                 # rdi should be 16-byte aligned
+    add     rsi, 16
+    add     rdi, 16
+    loop    L2
     mfence
-    movd    mm0, r10                    # (Restore mm0)
-    jmp     L_CopyBytes
+    movdqa  xmm0, [rsp + 0x18]           # restore xmm0
+    jmp     L_CopyBytes                  # copy remaining bytes
 L_CopyBackward:
-    mov     rsi, r9                     # rsi <- End of Source
-    lea     rdi, [rdi + r8 - 1]         # rdi <- End of Destination
-    std                                 # set direction flag
+    mov     rsi, r9                     # rsi <- Last byte of Source
+    lea     rdi, [rdi + r8 - 1]         # rdi <- Last byte of Destination
+    std
 L_CopyBytes:
     mov     rcx, r8
-    rep     movsb                       # Copy bytes backward
+    rep     movsb
     cld
     pop     rdi
     pop     rsi

@@ -42,8 +42,9 @@ ASM_PFX(InternalMemZeroMem):
     mov     rcx, rdx
     shr     rcx, 3
     and     rdx, 7
+    cld
     rep     stosq
-    mov     ecx, edx
+    mov     rcx, rdx
     rep     stosb
     pop     rax
     pop     rdi
