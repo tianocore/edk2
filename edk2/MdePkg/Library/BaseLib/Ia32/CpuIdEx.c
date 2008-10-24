@@ -28,16 +28,16 @@
                         CPUID instruction.
   @param  SubIndex      The 32-bit value to load into ECX prior to invoking the
                         CPUID instruction.
-  @param  Eax           Pointer to the 32-bit EAX value returned by the CPUID
+  @param  RegisterEax   Pointer to the 32-bit EAX value returned by the CPUID
                         instruction. This is an optional parameter that may be
                         NULL.
-  @param  Ebx           Pointer to the 32-bit EBX value returned by the CPUID
+  @param  RegisterEbx   Pointer to the 32-bit EBX value returned by the CPUID
                         instruction. This is an optional parameter that may be
                         NULL.
-  @param  Ecx           Pointer to the 32-bit ECX value returned by the CPUID
+  @param  RegisterEcx   Pointer to the 32-bit ECX value returned by the CPUID
                         instruction. This is an optional parameter that may be
                         NULL.
-  @param  Edx           Pointer to the 32-bit EDX value returned by the CPUID
+  @param  RegisterEdx   Pointer to the 32-bit EDX value returned by the CPUID
                         instruction. This is an optional parameter that may be
                         NULL.
 
@@ -49,10 +49,10 @@ EFIAPI
 AsmCpuidEx (
   IN      UINT32                    Index,
   IN      UINT32                    SubIndex,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
-  OUT     UINT32                    *Edx   OPTIONAL
+  OUT     UINT32                    *RegisterEax,  OPTIONAL
+  OUT     UINT32                    *RegisterEbx,  OPTIONAL
+  OUT     UINT32                    *RegisterEcx,  OPTIONAL
+  OUT     UINT32                    *RegisterEdx   OPTIONAL
   )
 {
   _asm {
@@ -60,20 +60,20 @@ AsmCpuidEx (
     mov     ecx, SubIndex
     cpuid
     push    ecx
-    mov     ecx, Eax
+    mov     ecx, RegisterEax
     jecxz   SkipEax
     mov     [ecx], eax
 SkipEax:
-    mov     ecx, Ebx
+    mov     ecx, RegisterEbx
     jecxz   SkipEbx
     mov     [ecx], ebx
 SkipEbx:
     pop     eax
-    mov     ecx, Ecx
+    mov     ecx, RegisterEcx
     jecxz   SkipEcx
     mov     [ecx], eax
 SkipEcx:
-    mov     ecx, Edx
+    mov     ecx, RegisterEdx
     jecxz   SkipEdx
     mov     [ecx], edx
 SkipEdx:
