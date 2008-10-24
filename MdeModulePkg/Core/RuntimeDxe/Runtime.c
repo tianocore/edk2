@@ -181,7 +181,7 @@ RuntimeDriverConvertPointer (
       }
     }
 
-    VirtEntry = NextMemoryDescriptor (VirtEntry, mVirtualMapDescriptorSize);
+    VirtEntry = NEXT_MEMORY_DESCRIPTOR (VirtEntry, mVirtualMapDescriptorSize);
   }
 
   return EFI_NOT_FOUND;

@@ -1281,7 +1281,7 @@ CoreGetMemoryMap (
       MemoryMap->Attribute |= EFI_MEMORY_RUNTIME;
     }
 
-    MemoryMap = NextMemoryDescriptor (MemoryMap, Size);
+    MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, Size);
   }
 
   for (Link = mGcdMemorySpaceMap.ForwardLink; Link != &mGcdMemorySpaceMap; Link = Link->ForwardLink) {
@@ -1308,7 +1308,7 @@ CoreGetMemoryMap (
           }
         }
 
-        MemoryMap = NextMemoryDescriptor (MemoryMap, Size);
+        MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, Size);
       }
     }
   }
