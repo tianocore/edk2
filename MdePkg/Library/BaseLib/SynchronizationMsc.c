@@ -20,6 +20,7 @@
 /**
   Microsoft Visual Studio 7.1 Function Prototypes for read write barrier Intrinsics.
 **/
+
 void    _ReadWriteBarrier (void);
 #pragma intrinsic(_ReadWriteBarrier)
 

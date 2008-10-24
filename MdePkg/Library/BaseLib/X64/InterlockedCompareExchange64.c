@@ -15,6 +15,7 @@
 /**
   Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
 **/
+
 __int64 _InterlockedCompareExchange64(
    __int64 volatile * Destination,
    __int64 Exchange,

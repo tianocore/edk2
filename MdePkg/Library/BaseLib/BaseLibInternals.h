@@ -303,7 +303,7 @@ InternalMathDivRemS64x64 (
   IN      INT64                     Dividend,
   IN      INT64                     Divisor,
   OUT     INT64                     *Remainder  OPTIONAL
- );
+  );
 
 /**
   Transfers control to a function starting with a new stack.
