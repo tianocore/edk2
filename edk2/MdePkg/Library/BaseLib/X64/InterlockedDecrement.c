@@ -15,6 +15,7 @@
 /**
   Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
 **/
+
 long _InterlockedDecrement(
    long * lpAddend
 );

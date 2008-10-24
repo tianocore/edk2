@@ -15,6 +15,7 @@
 /**
   Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
 **/
+
 void __writemsr (unsigned long Register, unsigned __int64 Value);
 
 #pragma intrinsic(__writemsr)

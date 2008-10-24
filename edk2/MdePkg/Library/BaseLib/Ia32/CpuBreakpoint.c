@@ -18,6 +18,7 @@
 /**
   Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
 **/
+
 void __debugbreak ();
 
 #pragma intrinsic(__debugbreak)
