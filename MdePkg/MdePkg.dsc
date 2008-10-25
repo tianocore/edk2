@@ -53,7 +53,7 @@
   MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/BaseLib/BaseLib.inf
-  MdePkg/Library/CpuLib/CpuLib.inf
+  MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
@@ -72,13 +72,13 @@
   MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MdePkg/Library/PeiHobLib/PeiHobLib.inf
-  MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   MdePkg/Library/DxePcdLib/DxePcdLib.inf
   MdePkg/Library/DxePiLib/DxePiLib.inf
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  MdePkg/Library/HiiLib/HiiLib.inf
-  MdePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  MdePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  MdePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
   MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
@@ -91,7 +91,7 @@
   MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   MdePkg/Library/PeiSmbusLibSmbus2Ppi/PeiSmbusLibSmbus2Ppi.inf
-  MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
+  MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
@@ -102,12 +102,13 @@
   MdePkg/Library/UefiLib/UefiLib.inf
   MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-  MdePkg/Library/DxeMemoryLib/DxeMemoryLib.inf
+  MdePkg/Library/UefiMemoryLib/UefiMemoryLib.inf
   MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
-  
+  MdePkg/Library/FvbServiceLib/FvbServiceLib.inf
+  MdePkg/Library/GraphicsLib/GraphicsLib.inf
 
 [Components.IA32]
   MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf
@@ -133,3 +134,5 @@
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
   MdePkg/Library/BasePalCallLibNull/BasePalCallLibNull.inf
+  MdePkg/Library/PeiPalLib/PeiPalLib.inf
+  MdePkg/Library/DxePalLib/DxePalLib.inf
