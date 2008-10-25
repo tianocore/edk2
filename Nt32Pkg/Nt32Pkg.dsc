@@ -52,25 +52,25 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  SerialPortLib|MdePkg/Library/SerialPortLibNull/SerialPortLibNull.inf
+  SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
-  CpuLib|MdePkg/Library/CpuLib/CpuLib.inf
+  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
-  GraphicsLib|MdeModulePkg/Library/GraphicsLib/GraphicsLib.inf
-  FvbServiceLib|MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
+  GraphicsLib|MdePkg/Library/GraphicsLib/GraphicsLib.inf
+  FvbServiceLib|MdePkg/Library/FvbServiceLib/FvbServiceLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
-  HiiLib|MdePkg/Library/HiiLib/HiiLib.inf
+  HiiLib|MdePkg/Library/UefiHiiLib/UefiHiiLib.inf
   ExtendedHiiLib|MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
   S3Lib|MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   RecoveryLib|MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
-  IfrSupportLib|MdePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  IfrSupportLib|MdePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
   ExtendedIfrSupportLib|MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
-  IfrSupportLib|MdePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  IfrSupportLib|MdePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
   GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   PlatformBdsLib|Nt32Pkg/Library/Nt32BdsLib/Nt32BdsLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
@@ -112,7 +112,7 @@
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
@@ -158,7 +158,7 @@
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
@@ -175,7 +175,7 @@
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
@@ -195,7 +195,7 @@
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
@@ -219,7 +219,7 @@
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
