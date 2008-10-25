@@ -17,7 +17,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = IfrSupportLib
+  BASE_NAME                      = UefiIfrSupportLib
   FILE_GUID                      = bf38668e-e231-4baa-99e4-8c0e4c35dca6
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
