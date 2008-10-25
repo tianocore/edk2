@@ -44,9 +44,9 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-  HiiLib|MdePkg/Library/HiiLib/HiiLib.inf
+  HiiLib|MdePkg/Library/UefiHiiLib/UefiHiiLib.inf
   ExtendedHiiLib|MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
-  IfrSupportLib|MdePkg/Library/IfrSupportLib/IfrSupportLib.inf
+  IfrSupportLib|MdePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
   ExtendedIfrSupportLib|MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -69,7 +69,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
-  MemoryAllocationLib|MdePkg/Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
 
 [BuildOptions]
   GCC:*_*_IA32_CC_FLAGS     = -DEFI32 $(GCC_MACRO)
