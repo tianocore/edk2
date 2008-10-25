@@ -1,9 +1,8 @@
 #/** @file
-# Component description file for Dxe Memory Library.
+# Library instance for HII common routines.
 #
-# Base Memory Library implementation that uses EFI Boot Services
-#  where possible for size reduction.
-# Copyright (c) 2006, Intel Corporation.
+# This library instance implements the common HII routines.
+# Copyright (c) 2006, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,43 +16,44 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeMemoryLib
-  FILE_GUID                      = f1bbe03d-2f28-4dee-bec7-d98d7a30c36a
+  BASE_NAME                      = UefiHiiLib
+  FILE_GUID                      = 3143687A-7C80-404e-B5FE-2D88980E1B1C
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseMemoryLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
+  CONSTRUCTOR                    = HiiLibConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 [Sources.common]
-  ScanMem64Wrapper.c
-  ScanMem32Wrapper.c
-  ScanMem16Wrapper.c
-  ScanMem8Wrapper.c
-  ZeroMemWrapper.c
-  CompareMemWrapper.c
-  SetMem64Wrapper.c
-  SetMem32Wrapper.c
-  SetMem16Wrapper.c
-  SetMemWrapper.c
-  CopyMemWrapper.c
-  MemLibGeneric.c
-  MemLibGuid.c
-  MemLib.c
-  MemLibInternals.h
-
+  HiiLib.c
+  HiiString.c
+  HiiLanguage.c
+  InternalHiiLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
 
-
 [LibraryClasses]
+  MemoryAllocationLib
+  BaseMemoryLib
   BaseLib
-  UefiBootServicesTableLib
   DebugLib
+  UefiBootServicesTableLib
+  DevicePathLib
+  UefiLib
 
+[Protocols]
+  gEfiHiiDatabaseProtocolGuid  # ALWAYS_CONSUMED
+  gEfiHiiStringProtocolGuid    # ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid  
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid AND
+  gEfiHiiStringProtocolGuid
+  

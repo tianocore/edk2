@@ -1,0 +1,54 @@
+# @file
+# Instance of PAL Library Class
+#
+# This library implements the PAL Library Class for the early dxe drivers that need PAL calls before the 
+# Extended SAL PAL services are available
+# Copyright (c) 2007, Intel Corporation. All rights reserved.
+#
+#  This software and associated documentation (if any) is furnished
+#  under a license and may only be used or copied in accordance
+#  with the terms of the license. Except as permitted by such
+#  license, no part of this software or documentation may be
+#  reproduced, stored in a retrieval system, or transmitted in any
+#  form or by any means without the express written consent of
+#  Intel Corporation.
+#
+#
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxePalLib
+  FILE_GUID                      = B05D4251-5BA5-46f2-A011-46CC46D9A590
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PalCallLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_DRIVER 
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IPF
+#
+
+[Sources.IPF]
+  DxePalCallLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  ItaniumFamilyCpuPkg/ItaniumFamilyCpuPkg.dec
+  ItaniumPlatformPkg/ItaniumPlatformPkg.dec 
+
+[LibraryClasses]
+  BaseLib
+  HobLib
+  UefiLib
+  DebugLib
+
+[Guids]
+  gEfiHobListGuid                               # ALWAYS_CONSUMED
+  gPalEntryHobGuid                              # ALWAYS_CONSUMED
+  gEfiSalSystemTableGuid                        # ALWAYS_CONSUMED

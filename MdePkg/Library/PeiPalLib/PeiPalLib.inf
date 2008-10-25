@@ -2,7 +2,7 @@
 # Component description file for Pei PAL call Library
 #
 # PAL Call Library implementation to wrap the PAL call in PEI.
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved.
 #  This software and associated documentation (if any) is furnished
@@ -18,7 +18,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PeiPalCallLib
+  BASE_NAME                      = PeiPalLib
   FILE_GUID                      = B53DC524-6B98-4584-940B-8F1363DEF09E
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -34,7 +34,7 @@
 #
 
 [Sources.common]
-  PalCallLib.c
+  PeiPalLib.c
 
 
 [Packages]

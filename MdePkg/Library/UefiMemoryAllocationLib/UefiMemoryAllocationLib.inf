@@ -1,8 +1,9 @@
 #/** @file
-# Library instance for HII common routines.
+# Component description file for Dxe Memory Allocation Library
 #
-# This library instance implements the common HII routines.
-# Copyright (c) 2006, Intel Corporation
+# Memory Allocation Library that uses EFI Boot Services to allocate
+#  and free memory.
+# Copyright (c) 2007 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,44 +17,29 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = HiiLib
-  FILE_GUID                      = 3143687A-7C80-404e-B5FE-2D88980E1B1C
+  BASE_NAME                      = UefiMemoryAllocationLib
+  FILE_GUID                      = 4674739d-3195-4fb2-8094-ac1d22d00194
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = MemoryAllocationLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  CONSTRUCTOR                    = HiiLibConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 [Sources.common]
-  HiiLib.c
-  HiiString.c
-  HiiLanguage.c
-  InternalHiiLib.h
+  MemoryAllocationLib.c
+
 
 [Packages]
   MdePkg/MdePkg.dec
 
+
 [LibraryClasses]
-  MemoryAllocationLib
-  BaseMemoryLib
-  BaseLib
   DebugLib
+  BaseMemoryLib
   UefiBootServicesTableLib
-  DevicePathLib
-  UefiLib
 
-[Protocols]
-  gEfiHiiDatabaseProtocolGuid  # ALWAYS_CONSUMED
-  gEfiHiiStringProtocolGuid    # ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid  
-
-[Depex]
-  gEfiHiiDatabaseProtocolGuid AND
-  gEfiHiiStringProtocolGuid
-  

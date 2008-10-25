@@ -15,7 +15,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SerialPortLibNull
+  BASE_NAME                      = BaseSerialPortLibNull
   FILE_GUID                      = E4541241-8897-411a-91F8-7D7E45837146
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -29,7 +29,7 @@
 #
 
 [Sources.common]
-  SerialPortLibNull.c
+  BaseSerialPortLibNull.c
 
 
 [Packages]
