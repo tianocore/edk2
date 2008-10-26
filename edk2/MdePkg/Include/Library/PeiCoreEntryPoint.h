@@ -44,7 +44,7 @@ EFIAPI
 _ModuleEntryPoint(
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
-);
+  );
 
 /**
   Wrapper of enrty point to PEI core.
