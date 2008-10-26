@@ -606,12 +606,16 @@ Returns:
   UINT8                 *ValidBuffer;
   UINTN                 MaximumBufferSize;
   UINTN                 VariableSize;
+  UINTN                 VariableNameSize;
+  UINTN                 UpdatingVariableNameSize;
   UINTN                 NameSize;
   UINT8                 *CurrPtr;
   VOID                  *Point0;
   VOID                  *Point1;
   BOOLEAN               FoundAdded;
   EFI_STATUS            Status;
+  CHAR16                *VariableNamePtr;
+  CHAR16                *UpdatingVariableNamePtr;
 
   VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) VariableBase);
 
@@ -667,9 +671,15 @@ Returns:
           Variable = NextVariable;
           continue;
         }
+
+        VariableNameSize         = NameSizeOfVariable(Variable);
+        UpdatingVariableNameSize = NameSizeOfVariable(UpdatingVariable);
+
+        VariableNamePtr         = GetVariableNamePtr (Variable);
+        UpdatingVariableNamePtr = GetVariableNamePtr (UpdatingVariable);
         if (CompareGuid (&Variable->VendorGuid, &UpdatingVariable->VendorGuid)    &&
-            NameSizeOfVariable(Variable) == NameSizeOfVariable (UpdatingVariable) &&
-            CompareMem (GetVariableNamePtr (Variable), GetVariableNamePtr (UpdatingVariable), NameSizeOfVariable (Variable)) == 0 ) {
+            VariableNameSize == UpdatingVariableNameSize &&
+            CompareMem (VariableNamePtr, UpdatingVariableNamePtr, VariableNameSize) == 0 ) {
           Variable = NextVariable;
           continue;
         }
