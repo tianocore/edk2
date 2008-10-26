@@ -17,7 +17,7 @@
 
 #include <IndustryStandard/Tpm12.h>
 
-#include <Protocol/DevicePath.h>
+#include <Uefi.h>
 
 //
 // Standard event types
