@@ -455,7 +455,7 @@ LibPcdSet64 (
   If SizeOfBuffer > 0 and Buffer is NULL, then ASSERT().
   
   @param[in]      TokenNumber   The PCD token number to set a current value for.
-  @param[in,out]  SizeOfBuffer  The size, in bytes, of Buffer.
+  @param[in, out] SizeOfBuffer  The size, in bytes, of Buffer.
   @param[in]      Buffer        Value A pointer to the buffer to set.
 
   @return Return the pointer for the buffer been set.
