@@ -199,8 +199,8 @@ typedef struct _PCI_IO_DEVICE {
 //
 // Global Variables
 //
-extern GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gPciBusComponentName;
-extern GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gPciBusComponentName2;
+extern EFI_COMPONENT_NAME_PROTOCOL gPciBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gPciBusComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL  gPciBusDriverBinding;
 
 extern BOOLEAN                     gFullEnumeration;
