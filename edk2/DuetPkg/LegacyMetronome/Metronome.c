@@ -34,74 +34,8 @@ EFI_METRONOME_ARCH_PROTOCOL mMetronome = {
 };
 
 //
-// The CPU I/O Protocol used to access system hardware
-//
-EFI_CPU_IO_PROTOCOL         *mCpuIo = NULL;
-
-//
 // Worker Functions
 //
-VOID
-IoWrite8 (
-  UINT16  Port,
-  UINT8   Data
-  )
-/*++
-
-Routine Description:
-
-  Write an 8 bit value to an I/O port and save it to the S3 script
-
-Arguments:
-
-Returns: 
-
-  None.
-
---*/
-// TODO:    Port - add argument and description to function comment
-// TODO:    Data - add argument and description to function comment
-{
-  mCpuIo->Io.Write (
-              mCpuIo,
-              EfiCpuIoWidthUint8,
-              Port,
-              1,
-              &Data
-              );
-
-}
-
-UINT8
-ReadRefresh (
-  VOID
-  )
-/*++
-
-Routine Description:
-
-  Read the refresh bit from the REFRESH_PORT
-
-Arguments:
-
-Returns: 
-
-  None.
-
---*/
-{
-  UINT8 Data;
-
-  mCpuIo->Io.Read (
-              mCpuIo,
-              EfiCpuIoWidthUint8,
-              REFRESH_PORT,
-              1,
-              &Data
-              );
-  return (UINT8) (Data & REFRESH_ON);
-}
-
 EFI_STATUS
 EFIAPI
 WaitForTick (
@@ -130,10 +64,8 @@ Returns:
   // Wait for TickNumber toggles of the Refresh bit
   //
   for (; TickNumber != 0x00; TickNumber--) {
-    while (ReadRefresh () == REFRESH_ON)
-      ;
-    while (ReadRefresh () == REFRESH_OFF)
-      ;
+    while ((IoRead8(REFRESH_PORT) & REFRESH_ON) == REFRESH_ON);
+    while ((IoRead8(REFRESH_PORT) & REFRESH_ON) == REFRESH_OFF);
   }
 
   return EFI_SUCCESS;
@@ -170,14 +102,6 @@ Returns:
   // Make sure the Metronome Architectural Protocol is not already installed in the system
   //
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiMetronomeArchProtocolGuid);
-
-  //
-  // Get the CPU I/O Protocol that this driver requires
-  // If the CPU I/O Protocol is not found, then ASSERT because the dependency expression
-  // should guarantee that it is present in the handle database.
-  //
-  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, &mCpuIo);
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Program port 61 timer 1 as refresh timer. We could use ACPI timer in the
