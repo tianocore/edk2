@@ -1,7 +1,12 @@
 /** @file
   Support for PCI 2.2 standard.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  This file includes the definitions in the following specifications,
+    PCI Local Bus Specification, 2.0
+    PCI-to-PCI Bridge Architecture Specification,
+    PC Card Standard, 8.0
+
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -16,16 +21,10 @@
 #define _PCI22_H_
 
 #define PCI_MAX_SEGMENT 0
-
 #define PCI_MAX_BUS     255
-
 #define PCI_MAX_DEVICE  31
 #define PCI_MAX_FUNC    7
 
-//
-// Command
-//
-#define PCI_VGA_PALETTE_SNOOP_DISABLED  0x20
 
 #pragma pack(1)
 typedef struct {
@@ -61,6 +60,9 @@ typedef struct {
   PCI_DEVICE_HEADER_TYPE_REGION Device;
 } PCI_TYPE00;
 
+///
+/// defined in PCI-to-PCI Bridge Architecture Specification
+///
 typedef struct {
   UINT32  Bar[2];
   UINT8   PrimaryBus;
@@ -96,162 +98,191 @@ typedef union {
   PCI_TYPE01  Bridge;
 } PCI_TYPE_GENERIC;
 
+/// 
+/// CardBus Conroller Configuration Space, defined in PC Card Standard. 8.0
+///
 typedef struct {
-  UINT32  CardBusSocketReg; // Cardus Socket/ExCA Base
-  // Address Register
-  //
-  UINT16  Reserved;
-  UINT16  SecondaryStatus;      // Secondary Status
-  UINT8   PciBusNumber;         // PCI Bus Number
-  UINT8   CardBusBusNumber;     // CardBus Bus Number
-  UINT8   SubordinateBusNumber; // Subordinate Bus Number
-  UINT8   CardBusLatencyTimer;  // CardBus Latency Timer
-  UINT32  MemoryBase0;          // Memory Base Register 0
-  UINT32  MemoryLimit0;         // Memory Limit Register 0
+  UINT32  CardBusSocketReg;     ///< Cardus Socket/ExCA Base
+  UINT8   Cap_Ptr;
+  UINT8   Reserved;
+  UINT16  SecondaryStatus;      ///< Secondary Status
+  UINT8   PciBusNumber;         ///< PCI Bus Number
+  UINT8   CardBusBusNumber;     ///< CardBus Bus Number
+  UINT8   SubordinateBusNumber; ///< Subordinate Bus Number
+  UINT8   CardBusLatencyTimer;  ///< CardBus Latency Timer
+  UINT32  MemoryBase0;          ///< Memory Base Register 0
+  UINT32  MemoryLimit0;         ///< Memory Limit Register 0
   UINT32  MemoryBase1;
   UINT32  MemoryLimit1;
   UINT32  IoBase0;
-  UINT32  IoLimit0;             // I/O Base Register 0
-  UINT32  IoBase1;              // I/O Limit Register 0
+  UINT32  IoLimit0;             ///< I/O Base Register 0
+  UINT32  IoBase1;              ///< I/O Limit Register 0
   UINT32  IoLimit1;
-  UINT8   InterruptLine;        // Interrupt Line
-  UINT8   InterruptPin;         // Interrupt Pin
-  UINT16  BridgeControl;        // Bridge Control
+  UINT8   InterruptLine;        ///< Interrupt Line
+  UINT8   InterruptPin;         ///< Interrupt Pin
+  UINT16  BridgeControl;        ///< Bridge Control
 } PCI_CARDBUS_CONTROL_REGISTER;
 
-//
-// Definitions of PCI class bytes and manipulation macros.
-//
+///
+/// Definitions of PCI class bytes and manipulation macros.
+///
 #define PCI_CLASS_OLD                 0x00
-#define PCI_CLASS_OLD_OTHER           0x00
-#define PCI_CLASS_OLD_VGA             0x01
+#define   PCI_CLASS_OLD_OTHER           0x00
+#define   PCI_CLASS_OLD_VGA             0x01
 
 #define PCI_CLASS_MASS_STORAGE        0x01
-#define PCI_CLASS_MASS_STORAGE_SCSI   0x00
-#define PCI_CLASS_MASS_STORAGE_IDE    0x01  // obsolete
-#define PCI_CLASS_IDE                 0x01
-#define PCI_CLASS_MASS_STORAGE_FLOPPY 0x02
-#define PCI_CLASS_MASS_STORAGE_IPI    0x03
-#define PCI_CLASS_MASS_STORAGE_RAID   0x04
-#define PCI_CLASS_MASS_STORAGE_OTHER  0x80
+#define   PCI_CLASS_MASS_STORAGE_SCSI   0x00
+#define   PCI_CLASS_MASS_STORAGE_IDE    0x01
+#define   PCI_CLASS_MASS_STORAGE_FLOPPY 0x02
+#define   PCI_CLASS_MASS_STORAGE_IPI    0x03
+#define   PCI_CLASS_MASS_STORAGE_RAID   0x04
+#define   PCI_CLASS_MASS_STORAGE_OTHER  0x80
 
 #define PCI_CLASS_NETWORK             0x02
-#define PCI_CLASS_NETWORK_ETHERNET    0x00
-#define PCI_CLASS_ETHERNET            0x00  // obsolete
-#define PCI_CLASS_NETWORK_TOKENRING   0x01
-#define PCI_CLASS_NETWORK_FDDI        0x02
-#define PCI_CLASS_NETWORK_ATM         0x03
-#define PCI_CLASS_NETWORK_ISDN        0x04
-#define PCI_CLASS_NETWORK_OTHER       0x80
+#define   PCI_CLASS_NETWORK_ETHERNET    0x00  
+#define   PCI_CLASS_NETWORK_TOKENRING   0x01
+#define   PCI_CLASS_NETWORK_FDDI        0x02
+#define   PCI_CLASS_NETWORK_ATM         0x03
+#define   PCI_CLASS_NETWORK_ISDN        0x04
+#define   PCI_CLASS_NETWORK_OTHER       0x80
 
 #define PCI_CLASS_DISPLAY             0x03
-#define PCI_CLASS_DISPLAY_CTRL        0x03  // obsolete
-#define PCI_CLASS_DISPLAY_VGA         0x00
-#define PCI_CLASS_VGA                 0x00  // obsolete
-#define PCI_CLASS_DISPLAY_XGA         0x01
-#define PCI_CLASS_DISPLAY_3D          0x02
-#define PCI_CLASS_DISPLAY_OTHER       0x80
-#define PCI_CLASS_DISPLAY_GFX         0x80
-#define PCI_CLASS_GFX                 0x80  // obsolete
-#define PCI_CLASS_BRIDGE              0x06
-#define PCI_CLASS_BRIDGE_HOST         0x00
-#define PCI_CLASS_BRIDGE_ISA          0x01
-#define PCI_CLASS_ISA                 0x01  // obsolete
-#define PCI_CLASS_BRIDGE_EISA         0x02
-#define PCI_CLASS_BRIDGE_MCA          0x03
-#define PCI_CLASS_BRIDGE_P2P          0x04
-#define PCI_CLASS_BRIDGE_PCMCIA       0x05
-#define PCI_CLASS_BRIDGE_NUBUS        0x06
-#define PCI_CLASS_BRIDGE_CARDBUS      0x07
-#define PCI_CLASS_BRIDGE_RACEWAY      0x08
-#define PCI_CLASS_BRIDGE_ISA_PDECODE  0x80
-#define PCI_CLASS_ISA_POSITIVE_DECODE 0x80  // obsolete
+#define   PCI_CLASS_DISPLAY_VGA         0x00
+#define     PCI_IF_VGA_VGA                0x00
+#define     PCI_IF_VGA_8514               0x01
+#define   PCI_CLASS_DISPLAY_XGA         0x01
+#define   PCI_CLASS_DISPLAY_3D          0x02
+#define   PCI_CLASS_DISPLAY_OTHER       0x80  
+#define   PCI_CLASS_DISPLAY_GFX         0x80
 
-#define PCI_CLASS_SCC                 0x07  // Simple communications controllers 
-#define PCI_SUBCLASS_SERIAL           0x00
-#define PCI_IF_GENERIC_XT             0x00
-#define PCI_IF_16450                  0x01
-#define PCI_IF_16550                  0x02
-#define PCI_IF_16650                  0x03
-#define PCI_IF_16750                  0x04
-#define PCI_IF_16850                  0x05
-#define PCI_IF_16950                  0x06
-#define PCI_SUBCLASS_PARALLEL         0x01
-#define PCI_IF_PARALLEL_PORT          0x00
-#define PCI_IF_BI_DIR_PARALLEL_PORT   0x01
-#define PCI_IF_ECP_PARALLEL_PORT      0x02
-#define PCI_IF_1284_CONTROLLER        0x03
-#define PCI_IF_1284_DEVICE            0xFE
-#define PCI_SUBCLASS_MULTIPORT_SERIAL 0x02
-#define PCI_SUBCLASS_MODEM            0x03
-#define PCI_IF_GENERIC_MODEM          0x00
-#define PCI_IF_16450_MODEM            0x01
-#define PCI_IF_16550_MODEM            0x02
-#define PCI_IF_16650_MODEM            0x03
-#define PCI_IF_16750_MODEM            0x04
-#define PCI_SUBCLASS_OTHER            0x80
+#define PCI_CLASS_MEDIA               0x04
+#define   PCI_CLASS_MEDIA_VIDEO         0x00
+#define   PCI_CLASS_MEDIA_AUDIO         0x01
+#define   PCI_CLASS_MEDIA_TELEPHONE     0x02
+#define   PCI_CLASS_MEDIA_OTHER         0x80
+
+#define PCI_CLASS_MEMORY_CONTROLLER   0x05
+#define   PCI_CLASS_MEMORY_RAM          0x00
+#define   PCI_CLASS_MEMORY_FLASH        0x01
+#define   PCI_CLASS_MEMORY_OTHER        0x80
+
+#define PCI_CLASS_BRIDGE              0x06
+#define   PCI_CLASS_BRIDGE_HOST         0x00
+#define   PCI_CLASS_BRIDGE_ISA          0x01
+#define   PCI_CLASS_BRIDGE_EISA         0x02
+#define   PCI_CLASS_BRIDGE_MCA          0x03
+#define   PCI_CLASS_BRIDGE_P2P          0x04
+#define     PCI_IF_BRIDGE_P2P             0x00
+#define     PCI_IF_BRIDGE_P2P_SUBTRACTIVE 0x01
+#define   PCI_CLASS_BRIDGE_PCMCIA       0x05
+#define   PCI_CLASS_BRIDGE_NUBUS        0x06
+#define   PCI_CLASS_BRIDGE_CARDBUS      0x07
+#define   PCI_CLASS_BRIDGE_RACEWAY      0x08
+#define   PCI_CLASS_BRIDGE_OTHER        0x80
+#define   PCI_CLASS_BRIDGE_ISA_PDECODE  0x80
+
+#define PCI_CLASS_SCC                 0x07  ///< Simple communications controllers 
+#define   PCI_SUBCLASS_SERIAL           0x00
+#define     PCI_IF_GENERIC_XT             0x00
+#define     PCI_IF_16450                  0x01
+#define     PCI_IF_16550                  0x02
+#define     PCI_IF_16650                  0x03
+#define     PCI_IF_16750                  0x04
+#define     PCI_IF_16850                  0x05
+#define     PCI_IF_16950                  0x06
+#define   PCI_SUBCLASS_PARALLEL         0x01
+#define     PCI_IF_PARALLEL_PORT          0x00
+#define     PCI_IF_BI_DIR_PARALLEL_PORT   0x01
+#define     PCI_IF_ECP_PARALLEL_PORT      0x02
+#define     PCI_IF_1284_CONTROLLER        0x03
+#define     PCI_IF_1284_DEVICE            0xFE
+#define   PCI_SUBCLASS_MULTIPORT_SERIAL 0x02
+#define   PCI_SUBCLASS_MODEM            0x03
+#define     PCI_IF_GENERIC_MODEM          0x00
+#define     PCI_IF_16450_MODEM            0x01
+#define     PCI_IF_16550_MODEM            0x02
+#define     PCI_IF_16650_MODEM            0x03
+#define     PCI_IF_16750_MODEM            0x04
+#define   PCI_SUBCLASS_SCC_OTHER          0x80
 
 #define PCI_CLASS_SYSTEM_PERIPHERAL   0x08
-#define PCI_SUBCLASS_PIC              0x00
-#define PCI_IF_8259_PIC               0x00
-#define PCI_IF_ISA_PIC                0x01
-#define PCI_IF_EISA_PIC               0x02
-#define PCI_IF_APIC_CONTROLLER        0x10 // I/O APIC interrupt controller , 32 bye none-prefectable memory.  
-#define PCI_IF_APIC_CONTROLLER2       0x20 
-#define PCI_SUBCLASS_TIMER            0x02
-#define PCI_IF_8254_TIMER             0x00
-#define PCI_IF_ISA_TIMER              0x01
-#define PCI_EISA_TIMER                0x02
-#define PCI_SUBCLASS_RTC              0x03
-#define PCI_IF_GENERIC_RTC            0x00
-#define PCI_IF_ISA_RTC                0x00
-#define PCI_SUBCLASS_PNP_CONTROLLER   0x04 // HotPlug Controller
+#define   PCI_SUBCLASS_PIC              0x00
+#define     PCI_IF_8259_PIC               0x00
+#define     PCI_IF_ISA_PIC                0x01
+#define     PCI_IF_EISA_PIC               0x02
+#define     PCI_IF_APIC_CONTROLLER        0x10  ///< I/O APIC interrupt controller , 32 bye none-prefectable memory.  
+#define     PCI_IF_APIC_CONTROLLER2       0x20 
+#define   PCI_SUBCLASS_DMA              0x01
+#define     PCI_IF_8237_DMA               0x00
+#define     PCI_IF_ISA_DMA                0x01
+#define     PCI_IF_EISA_DMA               0x02
+#define   PCI_SUBCLASS_TIMER            0x02
+#define     PCI_IF_8254_TIMER             0x00
+#define     PCI_IF_ISA_TIMER              0x01
+#define     PCI_IF_EISA_TIMER             0x02
+#define   PCI_SUBCLASS_RTC              0x03
+#define     PCI_IF_GENERIC_RTC            0x00
+#define     PCI_IF_ISA_RTC                0x00
+#define   PCI_SUBCLASS_PNP_CONTROLLER   0x04    ///< HotPlug Controller
+#define   PCI_SUBCLASS_PERIPHERAL_OTHER 0x80
 
 #define PCI_CLASS_INPUT_DEVICE        0x09
-#define PCI_SUBCLASS_KEYBOARD         0x00
-#define PCI_SUBCLASS_PEN              0x01
-#define PCI_SUBCLASS_MOUSE_CONTROLLER 0x02
-#define PCI_SUBCLASS_SCAN_CONTROLLER  0x03
-#define PCI_SUBCLASS_GAMEPORT         0x04
+#define   PCI_SUBCLASS_KEYBOARD         0x00
+#define   PCI_SUBCLASS_PEN              0x01
+#define   PCI_SUBCLASS_MOUSE_CONTROLLER 0x02
+#define   PCI_SUBCLASS_SCAN_CONTROLLER  0x03
+#define   PCI_SUBCLASS_GAMEPORT         0x04
+#define     PCI_IF_GAMEPORT               0x00
+#define     PCI_IF_GAMEPORT1              0x01
+#define   PCI_SUBCLASS_INPUT_OTHER      0x80
 
 #define PCI_CLASS_DOCKING_STATION     0x0A
 
 #define PCI_CLASS_PROCESSOR           0x0B
-#define PCI_SUBCLASS_PROC_386         0x00
-#define PCI_SUBCLASS_PROC_486         0x01
-#define PCI_SUBCLASS_PROC_PENTIUM     0x02
-#define PCI_SUBCLASS_PROC_ALPHA       0x10
-#define PCI_SUBCLASS_PROC_POWERPC     0x20
-#define PCI_SUBCLASS_PROC_MIPS        0x30
-#define PCI_SUBCLASS_PROC_CO_PORC     0x40 // Co-Processor
+#define   PCI_SUBCLASS_PROC_386         0x00
+#define   PCI_SUBCLASS_PROC_486         0x01
+#define   PCI_SUBCLASS_PROC_PENTIUM     0x02
+#define   PCI_SUBCLASS_PROC_ALPHA       0x10
+#define   PCI_SUBCLASS_PROC_POWERPC     0x20
+#define   PCI_SUBCLASS_PROC_MIPS        0x30
+#define   PCI_SUBCLASS_PROC_CO_PORC     0x40 ///< Co-Processor
 
 #define PCI_CLASS_SERIAL              0x0C
-#define PCI_CLASS_SERIAL_FIREWIRE     0x00
-#define PCI_CLASS_SERIAL_ACCESS_BUS   0x01
-#define PCI_CLASS_SERIAL_SSA          0x02
-#define PCI_CLASS_SERIAL_USB          0x03
-#define PCI_IF_EHCI                   0x20
-#define PCI_CLASS_SERIAL_FIBRECHANNEL 0x04
-#define PCI_CLASS_SERIAL_SMB          0x05
+#define   PCI_CLASS_SERIAL_FIREWIRE     0x00
+#define     PCI_IF_1394                   0x00
+#define     PCI_IF_1394_OPEN_HCI          0x10
+#define   PCI_CLASS_SERIAL_ACCESS_BUS   0x01
+#define   PCI_CLASS_SERIAL_SSA          0x02
+#define   PCI_CLASS_SERIAL_USB          0x03
+#define     PCI_IF_UHCI                   0x00
+#define     PCI_IF_OHCI                   0x10
+#define     PCI_IF_USB_OTHER              0x80
+#define     PCI_IF_USB_DEVICE             0xFE
+#define   PCI_CLASS_SERIAL_FIBRECHANNEL 0x04
+#define   PCI_CLASS_SERIAL_SMB          0x05
 
 #define PCI_CLASS_WIRELESS            0x0D
-#define PCI_SUBCLASS_IRDA             0x00
-#define PCI_SUBCLASS_IR               0x01
-#define PCI_SUBCLASS_RF               0x02
+#define   PCI_SUBCLASS_IRDA             0x00
+#define   PCI_SUBCLASS_IR               0x01
+#define   PCI_SUBCLASS_RF               0x02
+#define   PCI_SUBCLASS_WIRELESS_OTHER   0x80
 
 #define PCI_CLASS_INTELLIGENT_IO      0x0E
 
 #define PCI_CLASS_SATELLITE           0x0F
-#define PCI_SUBCLASS_TV               0x01
-#define PCI_SUBCLASS_AUDIO            0x02
-#define PCI_SUBCLASS_VOICE            0x03
-#define PCI_SUBCLASS_DATA             0x04
+#define   PCI_SUBCLASS_TV               0x01
+#define   PCI_SUBCLASS_AUDIO            0x02
+#define   PCI_SUBCLASS_VOICE            0x03
+#define   PCI_SUBCLASS_DATA             0x04
 
-#define PCI_SECURITY_CONTROLLER       0x10 // Encryption and decryption controller
-#define PCI_SUBCLASS_NET_COMPUT       0x00
-#define PCI_SUBCLASS_ENTERTAINMENT    0x10 
+#define PCI_SECURITY_CONTROLLER       0x10   ///< Encryption and decryption controller
+#define   PCI_SUBCLASS_NET_COMPUT       0x00
+#define   PCI_SUBCLASS_ENTERTAINMENT    0x10 
+#define   PCI_SUBCLASS_SECURITY_OTHER   0x80
 
 #define PCI_CLASS_DPIO                0x11
+#define   PCI_SUBCLASS_DPIO             0x00
+#define   PCI_SUBCLASS_DPIO_OTHER       0x80
 
 #define IS_CLASS1(_p, c)              ((_p)->Hdr.ClassCode[2] == (c))
 #define IS_CLASS2(_p, c, s)           (IS_CLASS1 (_p, c) && ((_p)->Hdr.ClassCode[1] == (s)))
@@ -272,18 +303,25 @@ typedef struct {
 #define IS_PCI_16550_SERIAL(_p)       IS_CLASS3 (_p, PCI_CLASS_SCC, PCI_SUBCLASS_SERIAL, PCI_IF_16550)
 #define IS_PCI_USB(_p)                IS_CLASS2 (_p, PCI_CLASS_SERIAL, PCI_CLASS_SERIAL_USB)
 
+//
+// the definition of Header Type 
+//
 #define HEADER_TYPE_DEVICE            0x00
 #define HEADER_TYPE_PCI_TO_PCI_BRIDGE 0x01
 #define HEADER_TYPE_CARDBUS_BRIDGE    0x02
-
 #define HEADER_TYPE_MULTI_FUNCTION    0x80
+//
+// Mask of Header type
+//
 #define HEADER_LAYOUT_CODE            0x7f
 
 #define IS_PCI_BRIDGE(_p)             (((_p)->Hdr.HeaderType & HEADER_LAYOUT_CODE) == (HEADER_TYPE_PCI_TO_PCI_BRIDGE))
 #define IS_CARDBUS_BRIDGE(_p)         (((_p)->Hdr.HeaderType & HEADER_LAYOUT_CODE) == (HEADER_TYPE_CARDBUS_BRIDGE))
 #define IS_PCI_MULTI_FUNC(_p)         ((_p)->Hdr.HeaderType & HEADER_TYPE_MULTI_FUNCTION)
 
-#define PCI_DEVICE_ROMBAR             0x30
+///
+/// Rom Base Address in Bridge, defined in PCI-to-PCI Bridge Architecure Specification,
+///
 #define PCI_BRIDGE_ROMBAR             0x38
 
 #define PCI_MAX_BAR                   0x0006
@@ -301,27 +339,29 @@ typedef struct {
 #define PCI_BIST_OFFSET                             0x0F
 #define PCI_BASE_ADDRESSREG_OFFSET                  0x10
 #define PCI_CARDBUS_CIS_OFFSET                      0x28
-#define PCI_SVID_OFFSET                             0x2C // SubSystem Vendor id
+#define PCI_SVID_OFFSET                             0x2C ///< SubSystem Vendor id
 #define PCI_SUBSYSTEM_VENDOR_ID_OFFSET              0x2C
-#define PCI_SID_OFFSET                              0x2E // SubSystem ID
+#define PCI_SID_OFFSET                              0x2E ///< SubSystem ID
 #define PCI_SUBSYSTEM_ID_OFFSET                     0x2E
 #define PCI_EXPANSION_ROM_BASE                      0x30
 #define PCI_CAPBILITY_POINTER_OFFSET                0x34
-#define PCI_INT_LINE_OFFSET                         0x3C // Interrupt Line Register
-#define PCI_INT_PIN_OFFSET                          0x3D // Interrupt Pin Register
-#define PCI_MAXGNT_OFFSET                           0x3E // Max Grant Register
-#define PCI_MAXLAT_OFFSET                           0x3F // Max Latency Register
+#define PCI_INT_LINE_OFFSET                         0x3C ///< Interrupt Line Register
+#define PCI_INT_PIN_OFFSET                          0x3D ///< Interrupt Pin Register
+#define PCI_MAXGNT_OFFSET                           0x3E ///< Max Grant Register
+#define PCI_MAXLAT_OFFSET                           0x3F ///< Max Latency Register
 
-#define PCI_BRIDGE_CONTROL_REGISTER_OFFSET          0x3E
-#define PCI_BRIDGE_STATUS_REGISTER_OFFSET           0x1E
+///
+/// defined in PCI-to-PCI Bridge Architecture Specification
+///
+#define PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET      0x18   
+#define PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET    0x19   
+#define PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET  0x1a   
+#define PCI_BRIDGE_STATUS_REGISTER_OFFSET           0x1E   
+#define PCI_BRIDGE_CONTROL_REGISTER_OFFSET          0x3E   
 
-#define PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET      0x18
-#define PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET    0x19
-#define PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET  0x1a
-
-//
-// Interrupt Line "Unknown" or "No connection" value defined for x86 based system
-//
+///
+/// Interrupt Line "Unknown" or "No connection" value defined for x86 based system
+///
 #define PCI_INT_LINE_UNKNOWN                        0xFF               
 
 typedef union {
@@ -338,85 +378,55 @@ typedef union {
 
 #pragma pack()
 
-#define PCI_EXPANSION_ROM_HEADER_SIGNATURE              0xaa55
-#define PCI_DATA_STRUCTURE_SIGNATURE                    EFI_SIGNATURE_32 ('P', 'C', 'I', 'R')
-#define PCI_CODE_TYPE_PCAT_IMAGE                        0x00
-#define PCI_CODE_TYPE_EFI_IMAGE                         0x03
-#define EFI_PCI_EXPANSION_ROM_HEADER_COMPRESSED         0x0001
+#define EFI_PCI_COMMAND_IO_SPACE                        BIT0   ///< 0x0001
+#define EFI_PCI_COMMAND_MEMORY_SPACE                    BIT1   ///< 0x0002
+#define EFI_PCI_COMMAND_BUS_MASTER                      BIT2   ///< 0x0004
+#define EFI_PCI_COMMAND_SPECIAL_CYCLE                   BIT3   ///< 0x0008
+#define EFI_PCI_COMMAND_MEMORY_WRITE_AND_INVALIDATE     BIT4   ///< 0x0010
+#define EFI_PCI_COMMAND_VGA_PALETTE_SNOOP               BIT5   ///< 0x0020
+#define EFI_PCI_COMMAND_PARITY_ERROR_RESPOND            BIT6   ///< 0x0040
+#define EFI_PCI_COMMAND_STEPPING_CONTROL                BIT7   ///< 0x0080
+#define EFI_PCI_COMMAND_SERR                            BIT8   ///< 0x0100
+#define EFI_PCI_COMMAND_FAST_BACK_TO_BACK               BIT9   ///< 0x0200
 
-#define EFI_PCI_COMMAND_IO_SPACE                        0x0001
-#define EFI_PCI_COMMAND_MEMORY_SPACE                    0x0002
-#define EFI_PCI_COMMAND_BUS_MASTER                      0x0004
-#define EFI_PCI_COMMAND_SPECIAL_CYCLE                   0x0008
-#define EFI_PCI_COMMAND_MEMORY_WRITE_AND_INVALIDATE     0x0010
-#define EFI_PCI_COMMAND_VGA_PALETTE_SNOOP               0x0020
-#define EFI_PCI_COMMAND_PARITY_ERROR_RESPOND            0x0040
-#define EFI_PCI_COMMAND_STEPPING_CONTROL                0x0080
-#define EFI_PCI_COMMAND_SERR                            0x0100
-#define EFI_PCI_COMMAND_FAST_BACK_TO_BACK               0x0200
+///
+/// defined in PCI-to-PCI Bridge Architecture Specification
+///
+#define EFI_PCI_BRIDGE_CONTROL_PARITY_ERROR_RESPONSE    BIT0   ///< 0x0001
+#define EFI_PCI_BRIDGE_CONTROL_SERR                     BIT1   ///< 0x0002
+#define EFI_PCI_BRIDGE_CONTROL_ISA                      BIT2   ///< 0x0004
+#define EFI_PCI_BRIDGE_CONTROL_VGA                      BIT3   ///< 0x0008
+#define EFI_PCI_BRIDGE_CONTROL_VGA_16                   BIT4   ///< 0x0010
+#define EFI_PCI_BRIDGE_CONTROL_MASTER_ABORT             BIT5   ///< 0x0020
+#define EFI_PCI_BRIDGE_CONTROL_RESET_SECONDARY_BUS      BIT6   ///< 0x0040
+#define EFI_PCI_BRIDGE_CONTROL_FAST_BACK_TO_BACK        BIT7   ///< 0x0080
+#define EFI_PCI_BRIDGE_CONTROL_PRIMARY_DISCARD_TIMER    BIT8   ///< 0x0100
+#define EFI_PCI_BRIDGE_CONTROL_SECONDARY_DISCARD_TIMER  BIT9   ///< 0x0200
+#define EFI_PCI_BRIDGE_CONTROL_TIMER_STATUS             BIT10  ///< 0x0400
+#define EFI_PCI_BRIDGE_CONTROL_DISCARD_TIMER_SERR       BIT11  ///< 0x0800
 
-#define EFI_PCI_BRIDGE_CONTROL_PARITY_ERROR_RESPONSE    0x0001
-#define EFI_PCI_BRIDGE_CONTROL_SERR                     0x0002
-#define EFI_PCI_BRIDGE_CONTROL_ISA                      0x0004
-#define EFI_PCI_BRIDGE_CONTROL_VGA                      0x0008
-#define EFI_PCI_BRIDGE_CONTROL_VGA_16                   0x0010
-#define EFI_PCI_BRIDGE_CONTROL_MASTER_ABORT             0x0020
-#define EFI_PCI_BRIDGE_CONTROL_RESET_SECONDARY_BUS      0x0040
-#define EFI_PCI_BRIDGE_CONTROL_FAST_BACK_TO_BACK        0x0080
-#define EFI_PCI_BRIDGE_CONTROL_PRIMARY_DISCARD_TIMER    0x0100
-#define EFI_PCI_BRIDGE_CONTROL_SECONDARY_DISCARD_TIMER  0x0200
-#define EFI_PCI_BRIDGE_CONTROL_TIMER_STATUS             0x0400
-#define EFI_PCI_BRIDGE_CONTROL_DISCARD_TIMER_SERR       0x0800
-
-//
-// Following are the PCI-CARDBUS bridge control bit
-//
-#define EFI_PCI_BRIDGE_CONTROL_IREQINT_ENABLE       0x0080
-#define EFI_PCI_BRIDGE_CONTROL_RANGE0_MEMORY_TYPE   0x0100
-#define EFI_PCI_BRIDGE_CONTROL_RANGE1_MEMORY_TYPE   0x0200
-#define EFI_PCI_BRIDGE_CONTROL_WRITE_POSTING_ENABLE 0x0400
+///
+/// Following are the PCI-CARDBUS bridge control bit, defined in PC Card Standard
+///
+#define EFI_PCI_BRIDGE_CONTROL_IREQINT_ENABLE           BIT7   ///< 0x0080
+#define EFI_PCI_BRIDGE_CONTROL_RANGE0_MEMORY_TYPE       BIT8   ///< 0x0100
+#define EFI_PCI_BRIDGE_CONTROL_RANGE1_MEMORY_TYPE       BIT9   ///< 0x0200
+#define EFI_PCI_BRIDGE_CONTROL_WRITE_POSTING_ENABLE     BIT10  ///< 0x0400
 
 //
 // Following are the PCI status control bit
 //
-#define EFI_PCI_STATUS_CAPABILITY             0x0010
-#define EFI_PCI_STATUS_66MZ_CAPABLE           0x0020
-#define EFI_PCI_FAST_BACK_TO_BACK_CAPABLE     0x0080
-#define EFI_PCI_MASTER_DATA_PARITY_ERROR      0x0100
+#define EFI_PCI_STATUS_CAPABILITY                       BIT4   ///< 0x0010
+#define EFI_PCI_STATUS_66MZ_CAPABLE                     BIT5   ///< 0x0020
+#define EFI_PCI_FAST_BACK_TO_BACK_CAPABLE               BIT7   ///< 0x0080
+#define EFI_PCI_MASTER_DATA_PARITY_ERROR                BIT8   ///< 0x0100
 
-#define EFI_PCI_CAPABILITY_PTR                0x34
+///
+/// defined in PC Card Standard
+///
 #define EFI_PCI_CARDBUS_BRIDGE_CAPABILITY_PTR 0x14
 
 #pragma pack(1)
-typedef struct {
-  UINT16  Signature;    // 0xaa55
-  UINT8   Reserved[0x16];
-  UINT16  PcirOffset;
-} PCI_EXPANSION_ROM_HEADER;
-
-typedef struct {
-  UINT16  Signature;    // 0xaa55
-  UINT8   Size512;
-  UINT8   InitEntryPoint[3];
-  UINT8   Reserved[0x12];
-  UINT16  PcirOffset;
-} EFI_LEGACY_EXPANSION_ROM_HEADER;
-
-typedef struct {
-  UINT32  Signature;    // "PCIR"
-  UINT16  VendorId;
-  UINT16  DeviceId;
-  UINT16  Reserved0;
-  UINT16  Length;
-  UINT8   Revision;
-  UINT8   ClassCode[3];
-  UINT16  ImageLength;
-  UINT16  CodeRevision;
-  UINT8   CodeType;
-  UINT8   Indicator;
-  UINT16  Reserved1;
-} PCI_DATA_STRUCTURE;
-
 //
 // PCI Capability List IDs and records
 //
@@ -426,15 +436,13 @@ typedef struct {
 #define EFI_PCI_CAPABILITY_ID_SLOTID  0x04
 #define EFI_PCI_CAPABILITY_ID_MSI     0x05
 #define EFI_PCI_CAPABILITY_ID_HOTPLUG 0x06
-#define EFI_PCI_CAPABILITY_ID_PCIX    0x07
-
 typedef struct {
   UINT8 CapabilityID;
   UINT8 NextItemPtr;
 } EFI_PCI_CAPABILITY_HDR;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_PMI
+/// Capability EFI_PCI_CAPABILITY_ID_PMI, defined in PCI Power Management Interface Specifiction
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -445,7 +453,7 @@ typedef struct {
 } EFI_PCI_CAPABILITY_PMI;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_AGP
+/// Capability EFI_PCI_CAPABILITY_ID_AGP, defined in Accelerated Graphics Port Interface Specification
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -456,7 +464,7 @@ typedef struct {
 } EFI_PCI_CAPABILITY_AGP;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_VPD
+/// Capability EFI_PCI_CAPABILITY_ID_VPD, in PCI2.2 Spec.
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -465,7 +473,7 @@ typedef struct {
 } EFI_PCI_CAPABILITY_VPD;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_SLOTID
+/// Capability EFI_PCI_CAPABILITY_ID_SLOTID, defined in PCI-to-PCI Bridge Architeture Specification
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -474,7 +482,7 @@ typedef struct {
 } EFI_PCI_CAPABILITY_SLOTID;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_MSI
+/// Capability EFI_PCI_CAPABILITY_ID_MSI, defined in PCI2.2
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -492,7 +500,7 @@ typedef struct {
 } EFI_PCI_CAPABILITY_MSI64;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_HOTPLUG
+/// Capability EFI_PCI_CAPABILITY_ID_HOTPLUG, defined in CompactPCI Hot Swap Specification PICMG 2.1, R1.0
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -500,23 +508,6 @@ typedef struct {
   /// not finished - fields need to go here
   ///
 } EFI_PCI_CAPABILITY_HOTPLUG;
-
-///
-/// Capability EFI_PCI_CAPABILITY_ID_PCIX
-///
-typedef struct {
-  EFI_PCI_CAPABILITY_HDR  Hdr;
-  UINT16                  CommandReg;
-  UINT32                  StatusReg;
-} EFI_PCI_CAPABILITY_PCIX;
-
-typedef struct {
-  EFI_PCI_CAPABILITY_HDR  Hdr;
-  UINT16                  SecStatusReg;
-  UINT32                  StatusReg;
-  UINT32                  SplitTransCtrlRegUp;
-  UINT32                  SplitTransCtrlRegDn;
-} EFI_PCI_CAPABILITY_PCIX_BRDG;
 
 #define DEVICE_ID_NOCARE    0xFFFF
 
@@ -535,12 +526,11 @@ typedef struct {
 #define PCI_BAR_IDX5        0x05
 #define PCI_BAR_ALL         0xFF
 
-//
-// EFI PCI Option ROM definitions
-// 
-
-#define EFI_ROOT_BRIDGE_LIST                            'eprb'
-#define EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE       0x0EF1
+///
+/// EFI PCI Option ROM definitions
+/// 
+#define EFI_ROOT_BRIDGE_LIST                            'eprb'  
+#define EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE       0x0EF1  ///< defined in UEFI Spec.
 
 typedef struct {
   UINT8 Register;
@@ -550,10 +540,47 @@ typedef struct {
   UINT8 Reserved[4];
 } DEFIO_PCI_ADDR;
 
+#define PCI_EXPANSION_ROM_HEADER_SIGNATURE              0xaa55
+#define PCI_DATA_STRUCTURE_SIGNATURE                    EFI_SIGNATURE_32 ('P', 'C', 'I', 'R')
+#define PCI_CODE_TYPE_PCAT_IMAGE                        0x00
+#define EFI_PCI_EXPANSION_ROM_HEADER_COMPRESSED         0x0001  ///<defined in UEFI spec.
+
 typedef struct {
-  UINT16  Signature;    // 0xaa55
+  UINT16  Signature;    ///< 0xaa55
+  UINT8   Reserved[0x16];
+  UINT16  PcirOffset;
+} PCI_EXPANSION_ROM_HEADER;
+
+typedef struct {
+  UINT16  Signature;    ///< 0xaa55
+  UINT8   Size512;
+  UINT8   InitEntryPoint[3];
+  UINT8   Reserved[0x12];
+  UINT16  PcirOffset;
+} EFI_LEGACY_EXPANSION_ROM_HEADER;
+
+typedef struct {
+  UINT32  Signature;    ///< "PCIR"
+  UINT16  VendorId;
+  UINT16  DeviceId;
+  UINT16  Reserved0;
+  UINT16  Length;
+  UINT8   Revision;
+  UINT8   ClassCode[3];
+  UINT16  ImageLength;
+  UINT16  CodeRevision;
+  UINT8   CodeType;
+  UINT8   Indicator;
+  UINT16  Reserved1;
+} PCI_DATA_STRUCTURE;
+
+///
+/// defined in EFI/UEFI Spec
+///
+typedef struct {
+  UINT16  Signature;    ///< 0xaa55
   UINT16  InitializationSize;
-  UINT32  EfiSignature; // 0x0EF1
+  UINT32  EfiSignature; ///< 0x0EF1
   UINT16  EfiSubsystem;
   UINT16  EfiMachineType;
   UINT16  CompressionType;

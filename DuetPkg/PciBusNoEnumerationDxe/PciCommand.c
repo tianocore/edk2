@@ -420,7 +420,7 @@ Returns:
       PciIoDevice->PciIo.Pci.Read (
                                &PciIoDevice->PciIo,
                                EfiPciIoWidthUint32,
-                               EFI_PCI_CAPABILITY_PTR,
+                               PCI_CAPBILITY_POINTER_OFFSET,
                                1,
                                &Temp
                                );

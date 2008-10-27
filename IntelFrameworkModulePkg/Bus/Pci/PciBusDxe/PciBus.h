@@ -46,7 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/PciIncompatibleDeviceSupportLib.h>
 
-#include <IndustryStandard/Pci23.h>
+#include <IndustryStandard/Pci.h>
 #include <IndustryStandard/PeImage.h>
 #include <IndustryStandard/Acpi.h>
 #include "ComponentName.h"

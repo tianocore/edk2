@@ -115,14 +115,14 @@ Returns:
         //
         // See if this is a standard PCI to ISA Bridge from the Base Code and Class Code
         //
-        if (Pci.Hdr.ClassCode[1] == PCI_CLASS_ISA) {
+        if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA) {
           Status = EFI_SUCCESS;
         } 
 
         //
         // See if this is an Intel PCI to ISA bridge in Positive Decode Mode
         //
-        if (Pci.Hdr.ClassCode[1] == PCI_CLASS_ISA_POSITIVE_DECODE &&
+        if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE &&
             Pci.Hdr.VendorId == 0x8086 && 
             Pci.Hdr.DeviceId == 0x7110) {
           Status = EFI_SUCCESS;
