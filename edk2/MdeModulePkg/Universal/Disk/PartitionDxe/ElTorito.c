@@ -111,8 +111,8 @@ PartitionInstallElToritoChildHandles (
     //
     // Check for valid volume descriptor signature
     //
-    if (VolDescriptor->Type == CDVOL_TYPE_END ||
-        CompareMem (VolDescriptor->Id, CDVOL_ID, sizeof (VolDescriptor->Id)) != 0
+    if (VolDescriptor->Unknown.Type == CDVOL_TYPE_END ||
+        CompareMem (VolDescriptor->Unknown.Id, CDVOL_ID, sizeof (VolDescriptor->Unknown.Id)) != 0
         ) {
       //
       // end of Volume descriptor list
@@ -123,19 +123,19 @@ PartitionInstallElToritoChildHandles (
     // Read the Volume Space Size from Primary Volume Descriptor 81-88 byte,
     // the 32-bit numerical values is stored in Both-byte orders
     //
-    if (VolDescriptor->Type == CDVOL_TYPE_CODED) {
-      VolSpaceSize = VolDescriptor->VolSpaceSize[0];
+    if (VolDescriptor->PrimaryVolume.Type == CDVOL_TYPE_CODED) {
+      VolSpaceSize = VolDescriptor->PrimaryVolume.VolSpaceSize[0];
     }
     //
     // Is it an El Torito volume descriptor?
     //
-    if (CompareMem (VolDescriptor->SystemId, CDVOL_ELTORITO_ID, sizeof (CDVOL_ELTORITO_ID) - 1) != 0) {
+    if (CompareMem (VolDescriptor->BootRecordVolume.SystemId, CDVOL_ELTORITO_ID, sizeof (CDVOL_ELTORITO_ID) - 1) != 0) {
       continue;
     }
     //
     // Read in the boot El Torito boot catalog
     //
-    Lba = UNPACK_INT32 (VolDescriptor->EltCatalog);
+    Lba = UNPACK_INT32 (VolDescriptor->BootRecordVolume.EltCatalog);
     if (Lba > Media->LastBlock) {
       continue;
     }
