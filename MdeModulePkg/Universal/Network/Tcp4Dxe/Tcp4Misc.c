@@ -521,7 +521,7 @@ TcpSetState (
 {
   DEBUG (
     (EFI_D_INFO,
-    "Tcb (%x) state %s --> %s\n",
+    "Tcb (%p) state %s --> %s\n",
     Tcb,
     mTcpStateName[Tcb->State],
     mTcpStateName[State])
@@ -726,7 +726,7 @@ TcpOnAppClose (
   if (!IsListEmpty (&Tcb->RcvQue) || GET_RCV_DATASIZE (Tcb->Sk)) {
 
     DEBUG ((EFI_D_WARN, "TcpOnAppClose: connection reset "
-      "because data is lost for TCB %x\n", Tcb));
+      "because data is lost for TCB %p\n", Tcb));
 
     TcpResetConnection (Tcb);
     TcpClose (Tcb);
@@ -841,13 +841,13 @@ TcpOnAppConsume (
       if (TcpOld < Tcb->RcvMss) {
 
         DEBUG ((EFI_D_INFO, "TcpOnAppConsume: send a window"
-          " update for a window closed Tcb(%x)\n", Tcb));
+          " update for a window closed Tcb(%p)\n", Tcb));
 
         TcpSendAck (Tcb);
       } else if (Tcb->DelayedAck == 0) {
 
         DEBUG ((EFI_D_INFO, "TcpOnAppConsume: scheduled a delayed"
-          " ACK to update window for Tcb(%x)\n", Tcb));
+          " ACK to update window for Tcb(%p)\n", Tcb));
 
         Tcb->DelayedAck = 1;
       }
@@ -887,7 +887,7 @@ TcpOnAppAbort (
   )
 {
   DEBUG ((EFI_D_WARN, "TcpOnAppAbort: connection reset "
-    "issued by application for TCB %x\n", Tcb));
+    "issued by application for TCB %p\n", Tcb));
 
   switch (Tcb->State) {
   case TCP_SYN_RCVD:

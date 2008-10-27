@@ -983,7 +983,7 @@ UsbRootHubInit (
     return Status;
   }
 
-  DEBUG (( EFI_D_INFO, "UsbRootHubInit: root hub %x - max speed %d, %d ports\n",
+  DEBUG (( EFI_D_INFO, "UsbRootHubInit: root hub %p - max speed %d, %d ports\n",
               HubIf, MaxSpeed, NumOfPort));
 
   HubIf->IsHub      = TRUE;
@@ -1274,7 +1274,7 @@ UsbRootHubRelease (
   IN USB_INTERFACE        *HubIf
   )
 {
-  DEBUG (( EFI_D_INFO, "UsbRootHubRelease: root hub released for hub %x\n", HubIf));
+  DEBUG (( EFI_D_INFO, "UsbRootHubRelease: root hub released for hub %p\n", HubIf));
 
   gBS->SetTimer (HubIf->HubNotify, TimerCancel, USB_ROOTHUB_POLL_INTERVAL);
   gBS->CloseEvent (HubIf->HubNotify);

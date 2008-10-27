@@ -1197,7 +1197,7 @@ CoreStartImage (
   DEBUG_CODE_BEGIN ();
     if (Image->ExitDataSize != 0 || Image->ExitData != NULL) {
 
-      DEBUG ((DEBUG_LOAD, "StartImage: ExitDataSize %d, ExitData %x", Image->ExitDataSize, Image->ExitData));
+      DEBUG ((DEBUG_LOAD, "StartImage: ExitDataSize %d, ExitData %p", Image->ExitDataSize, Image->ExitData));
       if (Image->ExitData != NULL) {
         DEBUG ((DEBUG_LOAD, " (%hs)", Image->ExitData));
       }

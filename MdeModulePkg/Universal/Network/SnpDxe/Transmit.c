@@ -188,9 +188,9 @@ pxe_transmit (
   //
   DEBUG ((EFI_D_NET, "\nsnp->undi.transmit()  "));
   DEBUG ((EFI_D_NET, "\nsnp->cdb.OpCode  == %x", snp->cdb.OpCode));
-  DEBUG ((EFI_D_NET, "\nsnp->cdb.CPBaddr == %X", snp->cdb.CPBaddr));
-  DEBUG ((EFI_D_NET, "\nsnp->cdb.DBaddr  == %X", snp->cdb.DBaddr));
-  DEBUG ((EFI_D_NET, "\ncpb->FrameAddr   == %X\n", cpb->FrameAddr));
+  DEBUG ((EFI_D_NET, "\nsnp->cdb.CPBaddr == %LX", snp->cdb.CPBaddr));
+  DEBUG ((EFI_D_NET, "\nsnp->cdb.DBaddr  == %LX", snp->cdb.DBaddr));
+  DEBUG ((EFI_D_NET, "\ncpb->FrameAddr   == %LX\n", cpb->FrameAddr));
 
   (*snp->issue_undi32_command) ((UINT64) (UINTN) &snp->cdb);
 

@@ -1595,7 +1595,7 @@ EhcDriverBindingStart (
     );
 
 
-  DEBUG ((EFI_D_INFO, "EhcDriverBindingStart: EHCI started for controller @ %x\n", Controller));
+  DEBUG ((EFI_D_INFO, "EhcDriverBindingStart: EHCI started for controller @ %p\n", Controller));
   return EFI_SUCCESS;
 
 UNINSTALL_USBHC:

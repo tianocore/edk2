@@ -106,7 +106,7 @@ TcpConnectTimeout (
 {
   if (!TCP_CONNECTED (Tcb->State)) {
     DEBUG ((EFI_D_ERROR, "TcpConnectTimeout: connection closed "
-      "because conenction timer timeout for TCB %x\n", Tcb));
+      "because conenction timer timeout for TCB %p\n", Tcb));
 
     if (EFI_ABORTED == Tcb->Sk->SockError) {
       SOCK_ERROR (Tcb->Sk, EFI_TIMEOUT);
@@ -114,7 +114,7 @@ TcpConnectTimeout (
 
     if (TCP_SYN_RCVD == Tcb->State) {
       DEBUG ((EFI_D_WARN, "TcpConnectTimeout: send reset because "
-        "connection timer timeout for TCB %x\n", Tcb));
+        "connection timer timeout for TCB %p\n", Tcb));
 
       TcpResetConnection (Tcb);
 
@@ -142,7 +142,7 @@ TcpRexmitTimeout (
   UINT32  FlightSize;
 
   DEBUG ((EFI_D_WARN, "TcpRexmitTimeout: transmission "
-    "timeout for TCB %x\n", Tcb));
+    "timeout for TCB %p\n", Tcb));
 
   //
   // Set the congestion window. FlightSize is the
@@ -160,7 +160,7 @@ TcpRexmitTimeout (
       !TCP_TIMER_ON (Tcb->EnabledTimer, TCP_TIMER_CONNECT)) {
 
     DEBUG ((EFI_D_ERROR, "TcpRexmitTimeout: connection closed "
-      "because too many timeouts for TCB %x\n", Tcb));
+      "because too many timeouts for TCB %p\n", Tcb));
 
     if (EFI_ABORTED == Tcb->Sk->SockError) {
       SOCK_ERROR (Tcb->Sk, EFI_TIMEOUT);
@@ -260,7 +260,7 @@ TcpFinwait2Timeout (
   )
 {
   DEBUG ((EFI_D_WARN, "TcpFinwait2Timeout: connection closed "
-    "because FIN_WAIT2 timer timeouts for TCB %x\n", Tcb));
+    "because FIN_WAIT2 timer timeouts for TCB %p\n", Tcb));
 
   TcpClose (Tcb);
 }
@@ -281,7 +281,7 @@ Tcp2MSLTimeout (
   )
 {
   DEBUG ((EFI_D_WARN, "Tcp2MSLTimeout: connection closed "
-    "because TIME_WAIT timer timeouts for TCB %x\n", Tcb));
+    "because TIME_WAIT timer timeouts for TCB %p\n", Tcb));
 
   TcpClose (Tcb);
 }
