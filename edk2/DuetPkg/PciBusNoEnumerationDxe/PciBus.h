@@ -36,7 +36,7 @@ Revision History
 
 #include <Guid/PciOptionRomTable.h>
 
-#include <IndustryStandard/Pci23.h>
+#include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/PeImage.h>
 
