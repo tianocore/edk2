@@ -42,7 +42,29 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
   { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE }
 };
 
+//
+// Following is needed to display missing architectural protocols in debug builds
+//
+typedef struct {
+  EFI_GUID                     *ProtocolGuid;
+  CHAR8                        *GuidString;
+} GUID_TO_STRING_PROTOCOL_ENTRY;
 
+GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
+  { &gEfiSecurityArchProtocolGuid,         "Security"           },
+  { &gEfiCpuArchProtocolGuid,              "CPU"                },
+  { &gEfiMetronomeArchProtocolGuid,        "Metronome"          },
+  { &gEfiTimerArchProtocolGuid,            "Timer"              },
+  { &gEfiBdsArchProtocolGuid,              "Bds"                },
+  { &gEfiWatchdogTimerArchProtocolGuid,    "Watchdog Timer"     },
+  { &gEfiRuntimeArchProtocolGuid,          "Runtime"            },
+  { &gEfiVariableArchProtocolGuid,         "Variable"           },
+  { &gEfiVariableWriteArchProtocolGuid,    "Variable Write"     },
+  { &gEfiCapsuleArchProtocolGuid,          "Capsule"            },
+  { &gEfiMonotonicCounterArchProtocolGuid, "Monotonic Counter"  },
+  { &gEfiResetArchProtocolGuid,            "Reset"              },
+  { &gEfiRealTimeClockArchProtocolGuid,    "Real Time Clock"    }
+};
 
 /**
   Return TRUE if all AP services are availible.
@@ -210,30 +232,6 @@ CoreNotifyOnArchProtocolInstallation (
 
   }
 }
-
-//
-// Following is needed to display missing architectural protocols in debug builds
-//
-typedef struct {
-  EFI_GUID                     *ProtocolGuid;
-  CHAR8                        *GuidString;
-} GUID_TO_STRING_PROTOCOL_ENTRY;
-
-GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
-  { &gEfiSecurityArchProtocolGuid,         "Security"           },
-  { &gEfiCpuArchProtocolGuid,              "CPU"                },
-  { &gEfiMetronomeArchProtocolGuid,        "Metronome"          },
-  { &gEfiTimerArchProtocolGuid,            "Timer"              },
-  { &gEfiBdsArchProtocolGuid,              "Bds"                },
-  { &gEfiWatchdogTimerArchProtocolGuid,    "Watchdog Timer"     },
-  { &gEfiRuntimeArchProtocolGuid,          "Runtime"            },
-  { &gEfiVariableArchProtocolGuid,         "Variable"           },
-  { &gEfiVariableWriteArchProtocolGuid,    "Variable Write"     },
-  { &gEfiCapsuleArchProtocolGuid,          "Capsule"            },
-  { &gEfiMonotonicCounterArchProtocolGuid, "Monotonic Counter"  },
-  { &gEfiResetArchProtocolGuid,            "Reset"              },
-  { &gEfiRealTimeClockArchProtocolGuid,    "Real Time Clock"    }
-};
 
 
 /**
