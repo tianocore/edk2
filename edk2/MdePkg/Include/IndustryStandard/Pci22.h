@@ -541,7 +541,7 @@ typedef struct {
 } DEFIO_PCI_ADDR;
 
 #define PCI_EXPANSION_ROM_HEADER_SIGNATURE              0xaa55
-#define PCI_DATA_STRUCTURE_SIGNATURE                    EFI_SIGNATURE_32 ('P', 'C', 'I', 'R')
+#define PCI_DATA_STRUCTURE_SIGNATURE                    SIGNATURE_32 ('P', 'C', 'I', 'R')
 #define PCI_CODE_TYPE_PCAT_IMAGE                        0x00
 #define EFI_PCI_EXPANSION_ROM_HEADER_COMPRESSED         0x0001  ///<defined in UEFI spec.
 

@@ -51,10 +51,10 @@
 ///
 /// EXE file formats
 ///
-#define EFI_IMAGE_DOS_SIGNATURE     0x5A4D      ///< MZ
-#define EFI_IMAGE_OS2_SIGNATURE     0x454E      ///< NE
-#define EFI_IMAGE_OS2_SIGNATURE_LE  0x454C      ///< LE
-#define EFI_IMAGE_NT_SIGNATURE      0x00004550  ///< PE00
+#define EFI_IMAGE_DOS_SIGNATURE     SIGNATURE_16('M', 'Z')
+#define EFI_IMAGE_OS2_SIGNATURE     SIGNATURE_16('N', 'E')
+#define EFI_IMAGE_OS2_SIGNATURE_LE  SIGNATURE_16('L', 'E')
+#define EFI_IMAGE_NT_SIGNATURE      SIGNATURE_32('P', 'E', '0', '0')
 
 ///
 /// PE images can start with an optional DOS header, so if an image is run
@@ -681,7 +681,7 @@ typedef struct {
 ///
 /// Debug Data Structure defined in Microsoft C++
 ///
-#define CODEVIEW_SIGNATURE_NB10 0x3031424E  // "NB10"
+#define CODEVIEW_SIGNATURE_NB10  SIGNATURE_32('N', 'B', '1', '0')
 typedef struct {
   UINT32  Signature;                        ///< "NB10"
   UINT32  Unknown;
@@ -695,7 +695,7 @@ typedef struct {
 ///
 /// Debug Data Structure defined in Microsoft C++
 ///
-#define CODEVIEW_SIGNATURE_RSDS 0x53445352  // "RSDS"
+#define CODEVIEW_SIGNATURE_RSDS  SIGNATURE_32('R', 'S', 'D', 'S')
 typedef struct {
   UINT32  Signature;                        ///< "RSDS"
   UINT32  Unknown;
@@ -724,7 +724,7 @@ typedef struct {
 } EFI_TE_IMAGE_HEADER;
 
 
-#define EFI_TE_IMAGE_HEADER_SIGNATURE 0x5A56      ///< "VZ"
+#define EFI_TE_IMAGE_HEADER_SIGNATURE  SIGNATURE_16('V', 'Z')
 
 //
 // Data directory indexes in our TE image header

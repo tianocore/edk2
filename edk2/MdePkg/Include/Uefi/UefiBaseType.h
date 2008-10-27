@@ -157,11 +157,10 @@ typedef union {
 //
 // Define macros to build data structure signatures from characters.
 //
-#define EFI_SIGNATURE_16(A, B)        ((A) | (B << 8))
-#define EFI_SIGNATURE_32(A, B, C, D)  (EFI_SIGNATURE_16 (A, B) | (EFI_SIGNATURE_16 (C, D) << 16))
-#define EFI_SIGNATURE_64(A, B, C, D, E, F, G, H) \
-    (EFI_SIGNATURE_32 (A, B, C, D) | ((UINT64) (EFI_SIGNATURE_32 (E, F, G, H)) << 32))
-
+#define EFI_SIGNATURE_16(A, B)                    SIGNATURE_16 (A, B)
+#define EFI_SIGNATURE_32(A, B, C, D)              SIGNATURE_32 (A, B, C, D)
+#define EFI_SIGNATURE_64(A, B, C, D, E, F, G, H)  SIGNATURE_64 (A, B, C, D, E, F, G, H)
+    
 
 ///
 ///  Returns the byte offset to a field within a structure
