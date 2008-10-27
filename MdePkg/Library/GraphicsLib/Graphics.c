@@ -646,7 +646,7 @@ DisableQuietBoot (
 
 **/
 UINTN
-Print (
+VPrintXY (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput,
   IN EFI_UGA_DRAW_PROTOCOL            *UgaDraw,
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Sto,
@@ -912,6 +912,6 @@ PrintXY (
     return 0;
   }
 
-  return Print (GraphicsOutput, UgaDraw, Sto, X, Y, ForeGround, BackGround, Fmt, Args);
+  return VPrintXY (GraphicsOutput, UgaDraw, Sto, X, Y, ForeGround, BackGround, Fmt, Args);
 }
 
