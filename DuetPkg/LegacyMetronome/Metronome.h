@@ -27,11 +27,11 @@ Abstract:
 //
 #include <PiDxe.h>
 
-#include <Protocol/CpuIo.h>
 #include <Protocol/Metronome.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/IoLib.h>
 
 //
 // Private definitions
