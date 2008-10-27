@@ -35,16 +35,16 @@
   BaseLib
   DebugLib
   UefiDriverEntryPoint
+  IoLib
 
 [Sources.common]
   Timer.h
   Timer.c
 
 [Protocols]
-  gEfiCpuIoProtocolGuid
   gEfiCpuArchProtocolGuid
   gEfiLegacy8259ProtocolGuid
   gEfiTimerArchProtocolGuid
 
 [Depex]
-  gEfiCpuIoProtocolGuid AND gEfiCpuArchProtocolGuid AND gEfiLegacy8259ProtocolGuid
+  gEfiCpuArchProtocolGuid AND gEfiLegacy8259ProtocolGuid

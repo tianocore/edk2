@@ -43,11 +43,6 @@ EFI_TIMER_ARCH_PROTOCOL   mTimer = {
 EFI_CPU_ARCH_PROTOCOL     *mCpu;
 
 //
-// Pointer to the CPU I/O Protocol instance
-//
-EFI_CPU_IO_PROTOCOL       *mCpuIo;
-
-//
 // Pointer to the Legacy 8259 Protocol instance
 //
 EFI_LEGACY_8259_PROTOCOL  *mLegacy8259;
@@ -86,11 +81,9 @@ Returns:
 
 --*/
 {
-  UINT8 Data;
-
-  Data = 0x36;
-  mCpuIo->Io.Write (mCpuIo, EfiCpuIoWidthUint8, TIMER_CONTROL_PORT, 1, &Data);
-  mCpuIo->Io.Write (mCpuIo, EfiCpuIoWidthFifoUint8, TIMER0_COUNT_PORT, 2, &Count);
+  IoWrite8 (TIMER_CONTROL_PORT, 0x36);
+  IoWrite8 (TIMER0_COUNT_PORT, (UINT8)(Count & 0xff));
+  IoWrite8 (TIMER0_COUNT_PORT, (UINT8)((Count >> 8) & 0xff));
 }
 
 VOID
@@ -262,6 +255,7 @@ Returns:
     //
     mLegacy8259->DisableIrq (mLegacy8259, Efi8259Irq0);
   } else {
+
     //
     // Convert TimerPeriod into 8254 counts
     //
@@ -434,12 +428,6 @@ Returns:
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiTimerArchProtocolGuid);
 
   //
-  // Find the CPU I/O Protocol.
-  //
-  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &mCpuIo);
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Find the CPU architectural protocol.
   //
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **) &mCpu);
@@ -481,11 +469,11 @@ Returns:
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mTimerHandle,
-                  &gEfiTimerArchProtocolGuid,
-                  &mTimer,
+                  &gEfiTimerArchProtocolGuid, &mTimer,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
+
