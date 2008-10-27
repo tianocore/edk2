@@ -15,11 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "8259.h"
 
 //
-// Global for the CPU I/O Protocol that is consumed by this driver
-//
-EFI_CPU_IO_PROTOCOL       *mCpuIo;
-
-//
 // Global for the Legacy 8259 Protocol that is prodiced by this driver
 //
 EFI_LEGACY_8259_PROTOCOL  m8259 = {
@@ -50,52 +45,6 @@ UINT16                    mLegacyModeEdgeLevel    = 0x0000;
 //
 // Worker Functions
 //
-VOID
-IoWrite8 (
-  IN UINT16  Port,
-  IN UINT8   Value
-  )
-/**
-
-  Routine Description:
-    Writes an I/O port using the CPU I/O Protocol
-
-  Arguments:
-    Register   - I/O Port to write
-    Value      - The 8 bit value to write to Port
-
-  Returns:
-    None
-
-**/
-{
-  mCpuIo->Io.Write (mCpuIo, EfiCpuIoWidthUint8, Port, 1, &Value);
-}
-
-UINT8
-IoRead8 (
-  IN UINT16  Port
-  )
-/**
-
-  Routine Description:
-    Writes an I/O port using the CPU I/O Protocol
-
-  Arguments:
-    Register   - I/O Port to write
-    Value      - The 8 bit value to write to Port
-
-  Returns:
-    None
-
-**/
-{
-  UINT8 Value;
-
-  mCpuIo->Io.Read (mCpuIo, EfiCpuIoWidthUint8, Port, 1, &Value);
-  return Value;
-}
-
 VOID
 Interrupt8259WriteMask (
   IN UINT16  Mask,
@@ -621,12 +570,6 @@ Returns:
   EFI_8259_IRQ Irq;
 
   //
-  // Find the CPU I/O Protocol
-  //
-  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &mCpuIo);
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Clear all pending interrupt
   //
   for (Irq = Efi8259Irq0; Irq <= Efi8259Irq15; Irq++) {
@@ -652,7 +595,6 @@ Returns:
                   EFI_NATIVE_INTERFACE,
                   &m8259
                   );
-
   return Status;
 }
 

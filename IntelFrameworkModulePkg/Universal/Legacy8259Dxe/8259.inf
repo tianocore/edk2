@@ -37,6 +37,7 @@
   UefiBootServicesTableLib
   DebugLib
   UefiDriverEntryPoint
+  IoLib
 
 [Sources.common]
   8259.c
@@ -44,7 +45,6 @@
 
 [Protocols]
   gEfiLegacy8259ProtocolGuid
-  gEfiCpuIoProtocolGuid
 
 [Depex]
-  gEfiCpuIoProtocolGuid
+  TRUE

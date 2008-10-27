@@ -23,11 +23,11 @@ Abstract:
 
 #include <FrameworkDxe.h>
 
-#include <Protocol/CpuIo.h>
 #include <Protocol/Legacy8259.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
+#include <Library/IoLib.h>
 
 //
 // 8259 Hardware definitions
