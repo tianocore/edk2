@@ -994,7 +994,7 @@ UsbBusBuildProtocol (
 
   UsbBus->Devices[0] = RootHub;
 
-  DEBUG ((EFI_D_INFO, "UsbBusStart: usb bus started on %x, root hub %x\n", Controller, RootIf));
+  DEBUG ((EFI_D_INFO, "UsbBusStart: usb bus started on %p, root hub %p\n", Controller, RootIf));
   return EFI_SUCCESS;
 
 FREE_ROOTHUB:
@@ -1355,7 +1355,7 @@ UsbBusControllerDriverStop (
     return EFI_SUCCESS;
   }
 
-  DEBUG (( EFI_D_INFO, "UsbBusStop: usb bus stopped on %x\n", Controller));
+  DEBUG (( EFI_D_INFO, "UsbBusStop: usb bus stopped on %p\n", Controller));
 
   //
   // Locate USB_BUS for the current host controller

@@ -1329,7 +1329,7 @@ LoadFile (
   //
   // The following line is only used for passing ICC build.
   //
-  DEBUG ((EFI_D_INFO, "FilePath = %x\n", FilePath));
+  DEBUG ((EFI_D_INFO, "FilePath = %p\n", FilePath));
 
   //
   //

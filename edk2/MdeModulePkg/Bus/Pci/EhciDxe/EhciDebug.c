@@ -145,7 +145,7 @@ EhcDumpQh (
     DEBUG ((EFI_D_INFO, Msg));
   }
 
-  DEBUG ((EFI_D_INFO, "Queue head @ 0x%x, interval %d, next qh %x\n",
+  DEBUG ((EFI_D_INFO, "Queue head @ 0x%p, interval %d, next qh %x\n",
                                 Qh, Qh->Interval, Qh->NextQh));
 
   QhHw = &Qh->QhHw;
