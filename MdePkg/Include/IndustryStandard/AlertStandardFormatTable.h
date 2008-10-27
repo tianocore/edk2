@@ -139,7 +139,7 @@ typedef EFI_ACPI_DESCRIPTION_HEADER EFI_ACPI_ASF_DESCRIPTION_HEADER;
 ///
 /// "ASF!" ASF Description Table Signature
 ///
-#define EFI_ACPI_ASF_DESCRIPTION_TABLE_SIGNATURE  EFI_SIGNATURE_32 ('A', 'S', 'F', '!')
+#define EFI_ACPI_ASF_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32 ('A', 'S', 'F', '!')
 
 #pragma pack ()
 

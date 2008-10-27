@@ -58,12 +58,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #pragma pack(1)
 
 /// 
-/// El Torito Volume Descriptor
-/// Note that the CDROM_VOLUME_DESCRIPTOR does not match the ISO-9660
-/// descriptor.  For some reason descriptor used by El Torito is
-/// different, but they start the same.   The El Torito descriptor
-/// is left shifted 1 byte starting with the SystemId.  (Note this
-/// causes the field to get unaligned)
+/// CD-ROM Volume Descriptor
 /// 
 typedef union { 
   struct {

@@ -1,5 +1,4 @@
 /** @file
-
   Root include file for Mde Package Base type modules
 
   This is the include file for any module of type base. Base modules only use 
@@ -281,6 +280,14 @@ typedef INTN RETURN_STATUS;
 #define RETURN_WARN_DELETE_FAILURE   ENCODE_WARNING (2)
 #define RETURN_WARN_WRITE_FAILURE    ENCODE_WARNING (3)
 #define RETURN_WARN_BUFFER_TOO_SMALL ENCODE_WARNING (4)
+
+//
+// Define macros to build data structure signatures from characters.
+//
+#define SIGNATURE_16(A, B)        ((A) | (B << 8))
+#define SIGNATURE_32(A, B, C, D)  (SIGNATURE_16 (A, B) | (SIGNATURE_16 (C, D) << 16))
+#define SIGNATURE_64(A, B, C, D, E, F, G, H) \
+    (SIGNATURE_32 (A, B, C, D) | ((UINT64) (SIGNATURE_32 (E, F, G, H)) << 32))
 
 #endif
 
