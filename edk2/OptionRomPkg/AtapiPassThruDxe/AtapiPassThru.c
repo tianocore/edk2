@@ -163,7 +163,7 @@ Returns:
     return EFI_UNSUPPORTED;
   }
 
-  if (Pci.Hdr.ClassCode[2] != PCI_CLASS_MASS_STORAGE || Pci.Hdr.ClassCode[1] != PCI_CLASS_IDE) {
+  if (Pci.Hdr.ClassCode[2] != PCI_CLASS_MASS_STORAGE || Pci.Hdr.ClassCode[1] != PCI_CLASS_MASS_STORAGE_IDE) {
 
     Status = EFI_UNSUPPORTED;
   }

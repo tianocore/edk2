@@ -218,7 +218,7 @@ static UINT64                      gAllZero   = 0;
 #include "PciPowerManagement.h"
 
 
-#define IS_ISA_BRIDGE(_p)       IS_CLASS2 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_ISA)  
-#define IS_INTEL_ISA_BRIDGE(_p) (IS_CLASS2 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_ISA_POSITIVE_DECODE) && ((_p)->Hdr.VendorId == 0x8086) && ((_p)->Hdr.DeviceId == 0x7110))
+#define IS_ISA_BRIDGE(_p)       IS_CLASS2 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA)  
+#define IS_INTEL_ISA_BRIDGE(_p) (IS_CLASS2 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA_PDECODE) && ((_p)->Hdr.VendorId == 0x8086) && ((_p)->Hdr.DeviceId == 0x7110))
 
 #endif

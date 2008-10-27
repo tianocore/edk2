@@ -68,7 +68,7 @@ Returns:
   //
   // 0x30
   //
-  RomBarIndex = PCI_DEVICE_ROMBAR;
+  RomBarIndex = PCI_EXPANSION_ROM_BASE;
 
   if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
     //
@@ -174,7 +174,7 @@ Returns:
   //
   // 0x30
   //
-  RomBarIndex = PCI_DEVICE_ROMBAR;
+  RomBarIndex = PCI_EXPANSION_ROM_BASE;
   if (IS_PCI_BRIDGE (&(PciDevice->Pci))) {
     //
     // if is ppb

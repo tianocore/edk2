@@ -1,7 +1,7 @@
 /** @file
   Support for PCI 3.0 standard.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -15,13 +15,28 @@
 #ifndef __PCI30_H__
 #define __PCI30_H__
 
+
+#include <IndustryStandard/Pci23.h>
+
+///
+/// Definitions of PCI class bytes and manipulation macros.
+///
 #define PCI_CLASS_MASS_STORAGE_SATADPA   0x06
-#define PCI_CLASS_MASS_STORAGE_AHCI      PCI_CLASS_MASS_STORAGE_SATADPA
+#define   PCI_IF_MASS_STORAGE_SATA         0x00
+#define   PCI_IF_MASS_STORAGE_AHCI         0x01
+
+///
+/// PCI Capability List IDs and records
+///
+#define EFI_PCI_CAPABILITY_ID_PCIEXP  0x10
 
 #pragma pack(1)
 
+///
+/// defined in PCI Firmware Specification
+///
 typedef struct {
-  UINT32  Signature;    // "PCIR"
+  UINT32  Signature;    ///< "PCIR"
   UINT16  VendorId;
   UINT16  DeviceId;
   UINT16  DeviceListOffset;
@@ -38,8 +53,5 @@ typedef struct {
 } PCI_3_0_DATA_STRUCTURE;
 
 #pragma pack()
-
-
-#include <IndustryStandard/Pci23.h>
 
 #endif

@@ -146,7 +146,7 @@ LocateCapabilityRegBlock (
       PciIoRead (
                   &PciIoDevice->PciIo,
                   EfiPciIoWidthUint8,
-                  EFI_PCI_CAPABILITY_PTR,
+                  PCI_CAPBILITY_POINTER_OFFSET,
                   1,
                   &CapabilityPtr
                 );
