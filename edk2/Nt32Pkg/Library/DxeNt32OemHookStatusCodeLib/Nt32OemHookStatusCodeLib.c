@@ -209,7 +209,7 @@ OemHookStatusCodeReport (
       CharCount += AsciiSPrint (
                      &Buffer[CharCount - 1],
                      (EFI_STATUS_CODE_DATA_MAX_SIZE - (sizeof (Buffer[0]) * CharCount)),
-                     " %x",
+                     " %p",
                      Data
                      );
     }
