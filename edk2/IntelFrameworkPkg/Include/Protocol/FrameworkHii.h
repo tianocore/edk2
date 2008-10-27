@@ -3,7 +3,7 @@
   be used by resources which want to publish IFR/Font/String data and have it
   collected by the Configuration engine.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -60,10 +60,6 @@ typedef UINT32                    RELOFST;
 typedef struct _EFI_HII_PROTOCOL  EFI_HII_PROTOCOL;
 
 typedef UINT16                    FRAMEWORK_EFI_HII_HANDLE;
-
-typedef UINT16                    STRING_REF;
-
-typedef UINT32                    RELOFST;
 
 //
 // Global definition
