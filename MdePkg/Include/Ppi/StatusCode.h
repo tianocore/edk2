@@ -12,8 +12,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  This PPI is defined in PI.
-  Version 1.00.
+  This PPI is introduced in PI Version 1.0.
 
 **/
 
@@ -28,7 +27,7 @@
 //
 // EFI_PEI_PROGRESS_CODE_PPI.ReportStatusCode() is equivalent to the
 // PEI Service ReportStatusCode().
-// It is defined in PiPeiCis.h. 
+// It is introduced in PIPeiCis.h. 
 //
 
 ///

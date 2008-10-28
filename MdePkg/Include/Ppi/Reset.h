@@ -14,8 +14,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  This PPI is defined in PI.
-  Version 1.0.
+  This PPI is introduced in PI Version 1.0.
 
 **/
 
@@ -32,7 +31,7 @@
 //
 // EFI_PEI_RESET_PPI.ResetSystem() is equivalent to the
 // PEI Service ResetSystem().
-// It is defined in PiPeiCis.h. 
+// It is introduced in PIPeiCis.h. 
 //
 
 ///
