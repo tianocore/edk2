@@ -3,7 +3,7 @@
   list of FV filenames that the DXE dispatcher will schedule reguardless of
   the dependency grammer.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -13,7 +13,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  GUID defined in DXE CIS spec version 0.91B
+  GUID introduced in PI Version 1.0.
 
 **/
 
