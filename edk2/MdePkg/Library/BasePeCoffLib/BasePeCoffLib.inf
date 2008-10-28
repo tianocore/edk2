@@ -1,7 +1,6 @@
 #/** @file
-# Component description file for Base PE/COFF Library
+# PE/COFF Loader Library implementation.
 #
-# Base PE/COFF Loader Library implementation.
 # Copyright (c) 2006 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

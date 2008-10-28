@@ -1,8 +1,9 @@
 #/** @file
-# This module implements one PCI Express Library instance.
+# Instance of PCI Express Library using the 256 MB PCI Express MMIO window.
 #
 # PCI Express Library that uses the 256 MB PCI Express MMIO window to perform
 #  PCI Configuration cycles. Layers on top of an I/O Library instance.
+#
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

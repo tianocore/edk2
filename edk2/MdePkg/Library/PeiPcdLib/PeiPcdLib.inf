@@ -1,9 +1,8 @@
 #/** @file
-# PCD Library instance implemented with PCD PPI.
+# Instance of PCD Library using PCD PPI.
 #
-# This library instance implement the APIs listed 
-#  in PCD library class defined in MDE library specification.
-#  It is used by module in PEI phase.
+# PCD Library that uses the PCD PPI to access Dynamic and DynamicEx PCD entries
+#
 # Copyright (c) 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials

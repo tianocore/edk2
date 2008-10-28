@@ -1,10 +1,9 @@
 #/** @file
-# PCD Library instance implemented with PCD Protocol
+# Instance of PCD Library using PCD Protocol.
 #
-# This library instance implement the APIs listed 
-#  in PCD library class defined in MDE library specification.
-#  It is used by modules in DXE phase.
-# Copyright (c) 2007, Intel Corporation.
+# PCD Library that uses the PCD Protocol to access Dynamic and DynamicEx PCD entries.
+#
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

@@ -1,8 +1,9 @@
 #/** @file
-# Component description file for Base Cache Maintenance Library
+# Instance of Cache Maintenance Library using Base Library services.
 #
 # Cache Maintenance Library that uses Base Library services to maintain caches.
 #  This library assumes there are no chipset dependencies required to maintain caches.
+#
 # Copyright (c) 2007 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials

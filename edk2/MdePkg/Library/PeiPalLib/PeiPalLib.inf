@@ -1,7 +1,9 @@
 #/** @file
-# Component description file for Pei PAL call Library
+# Instance of PAL Library using a PPI for PAL entrypoint .
 #
-# PAL Call Library implementation to wrap the PAL call in PEI.
+# Instance of PAL Library that uses a PPI to retrieve the PAL
+# Entry Point and layers on top of AsmPalCall() in the Base Library
+#
 # Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved.

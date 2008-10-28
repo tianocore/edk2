@@ -1,7 +1,6 @@
 #/** @file
-# Component description file for NULL PalCall Library.
+# Null instance of PAL Library with empty functions.
 #
-# PalCall Library with empty functions.
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

@@ -1,7 +1,5 @@
 #/** @file
-# Component description file library instance for PiLib for DXE phase.
-#
-# Library to abstract utility functions that is related to PI Specification.
+# Instance of PI Library for DXE phase.
 #
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #

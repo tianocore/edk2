@@ -1,6 +1,8 @@
 #/** @file
+#  Instance of Debug Library using Console Output Device.
 #
 #  Debug Lib that sends messages to the Console Output Device in the EFI System Table.
+#
 #  Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

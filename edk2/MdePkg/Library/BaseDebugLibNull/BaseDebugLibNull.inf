@@ -1,5 +1,5 @@
 #/** @file
-# Null Base Debug Library instance with empty functions.
+# Debug Library with empty functions.
 #
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #

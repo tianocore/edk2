@@ -1,5 +1,5 @@
 #/** @file
-#  Null Serial Port library instance with empty functions
+#  Null instance of Serial Port Library with empty functions.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation.
 #

@@ -1,8 +1,9 @@
 #/** @file
-# Component description file for Dxe Memory Allocation Library
+# Instance of Memory Allocation Library using EFI Boot Services.
 #
 # Memory Allocation Library that uses EFI Boot Services to allocate
 #  and free memory.
+#
 # Copyright (c) 2007 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
