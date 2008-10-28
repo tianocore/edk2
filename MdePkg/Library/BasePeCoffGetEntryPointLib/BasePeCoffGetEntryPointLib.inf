@@ -1,7 +1,6 @@
 #/** @file
-# Component description file Base PE/Coff Get Entry Point Library.
-#
 # PE/COFF Entry Point Library implementation.
+#
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

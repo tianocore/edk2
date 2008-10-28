@@ -1,6 +1,7 @@
 #/** @file
+#  Instance of Debug Library using the Standard Error Device.
 #
-#  UEFI Debug Lib that sends messages to the Standard Error Device in the EFI System Table.
+#  Debug Lib that sends messages to the the Standard Error Device in the EFI System Table.
 #
 #  Copyright (c) 2007 - 2008, Intel Corporation.
 #

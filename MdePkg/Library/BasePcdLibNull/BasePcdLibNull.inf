@@ -1,5 +1,8 @@
 #/** @file
-# Component description file for NULL PCD Library.
+# Instance of PCD Library without support of dynamic PCD entries.
+#
+# PCD Library that only provides access to Feature Flag, Fixed At Build,
+# and Binary Patch typed PCD entries. Access to Dynamic PCD entries is ignored.
 #
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #

@@ -1,12 +1,13 @@
 #/** @file
-# Timer Library implementation for Boot Timer moudles that require timer services.
+# Instance of Timer Library only using CPU resources.
 #
-# Timer Library that uses CPU resources to provide calibrated
-#  delays on IA-32 and x64, and uses ITC on IPF. Note: Because CpuLocalApci
-#  and ITC could be programmed by OS, it cannot be used by SMM drivers
-#  and runtime drivers, ACPI timer is recommended for SMM drivers and RUNTIME
-#  drivers.
-# Copyright (c) 2007, Intel Corporation.
+# Timer Library that only uses CPU resources to provide calibrated delays
+#  on IA-32, x64, and IPF.
+# Note: Because CPU Local APIC and ITC could be programmed by OS, it cannot be
+#  used by SMM drivers and runtime drivers, ACPI timer is recommended for SMM
+#  drivers and runtime drivers.
+#
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

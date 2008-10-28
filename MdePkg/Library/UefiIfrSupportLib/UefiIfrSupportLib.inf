@@ -1,6 +1,8 @@
 #/** @file
-#Utility functions which helps in opcode creation, HII configuration string manipulations, 
-#pop up window creations, setup browser persistence data set and get.
+# Instance of IFR Support Library.
+#
+# This library contains functions to do IFR opcode creation and utility
+# functions to help module to interact with a UEFI Form Browser.
 #
 # Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.
 #

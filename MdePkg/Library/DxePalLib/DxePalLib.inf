@@ -1,8 +1,9 @@
 # @file
-# Instance of PAL Library Class
+# Instance of PAL Library retrieving PAL entrypoint from HOB.
 #
-# This library implements the PAL Library Class for the early dxe drivers that need PAL calls before the 
-# Extended SAL PAL services are available
+# Instance of PAL Library that uses a HOB to retrieve the PAL
+# Entry Point and layers on top of AsmPalCall() in the Base Library.
+#
 # Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.
 #
 #  This software and associated documentation (if any) is furnished

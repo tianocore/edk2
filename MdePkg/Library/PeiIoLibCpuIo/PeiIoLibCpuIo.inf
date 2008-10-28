@@ -1,8 +1,9 @@
 #/** @file
-# Component description file for Cpu Io Pei Io Library
+# Instance of I/O Library using CPU I/O PPI.
 #
 # I/O Library implementation that uses the CPU I/O PPI for I/O
 #  and MMIO operations.
+#
 # Copyright (c) 2006 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

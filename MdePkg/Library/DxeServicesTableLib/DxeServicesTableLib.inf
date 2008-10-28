@@ -1,4 +1,6 @@
 #/** @file
+# Instance of DXE Services Table Library using EFI Configuration Table.
+#
 # DXE Services Table Library that retrieves a pointer to the DXE Services
 # Table from the Configuration Table in the EFI System Table.
 #

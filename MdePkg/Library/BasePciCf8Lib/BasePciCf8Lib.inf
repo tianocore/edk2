@@ -1,8 +1,9 @@
 #/** @file
-# This module implements PCI CF8 Library instance.
+# Instance of PCI CF8 Library using I/O ports 0xCF8 and 0xCFC.
 #
 # PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
 #  Layers on top of an I/O Library instance.
+#
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

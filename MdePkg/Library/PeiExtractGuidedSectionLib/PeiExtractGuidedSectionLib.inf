@@ -1,7 +1,8 @@
 #/** @file
-# Component description file for PEIM ExtractGuidedSection Library
+# Instance of ExtractGuidedSection Library for PEI phase.
 #
 # This library provides generic extract guided section functions for PEIM and PEI_CORE module.
+#
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

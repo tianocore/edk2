@@ -1,7 +1,8 @@
 #/** @file
-# FvbService Library for UEFI drivers
+# Instance of FVB Service Library.
 #
-# This library instance provide sevice functions to access Firmware Volume Block protocol.
+# This library instance provides service functions to access Firmware Volume Block protocol.
+#
 # Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
