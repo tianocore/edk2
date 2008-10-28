@@ -1,7 +1,7 @@
 #/** @file
 # EFI/PI Reference Module Package for All Architectures
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -253,116 +253,103 @@
 ################################################################################
 
 [Components.common]
-  MdeModulePkg/Core/Pei/PeiMain.inf
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+
+  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+  MdeModulePkg/Bus/Pci/UndiRuntimeDxe/UndiRuntimeDxe.inf
+  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
+
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
   }
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  MdeModulePkg/Core/Pei/PeiMain.inf
+  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 
-  MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
+  MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
-  MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-  MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
-  MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
-
+  MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
+  MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
   MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
-  MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
-  MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
-
+  MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
-
-  MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
-  MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
-
-  MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
+  MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
   MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
   MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
-
+  MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
+  MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
+  MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
 
-  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+  MdeModulePkg/Universal/DebugPortDxe/DebugPortDxe.inf
+  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
+  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
+  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
+  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
 
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
+  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
   MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
+  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
   MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
   MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
   MdeModulePkg/Universal/Network/PxeBcDxe/PxeBcDxe.inf
-  MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/Network/PxeDhcp4Dxe/PxeDhcp4Dxe.inf
   MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
   MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
-  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
+  MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
 
-  MdeModulePkg/Universal/PlatformDriverOverride/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
-  MdeModulePkg/Universal/PlatformDriverOverride/PlatOverMngr/PlatOverMngr.inf
-
-  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
-
-  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
-  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
-
-  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-
-  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
-  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
-  MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
-  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-
-  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
-  MdeModulePkg/Universal/DebugPortDxe/DebugPortDxe.inf
+  MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/PcatSingleSegmentPciCfg2Pei.inf
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
-  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
-  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
-  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
-  MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/PcatSingleSegmentPciCfg2Pei.inf
-  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
-  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-  MdeModulePkg/Bus/Pci/UndiRuntimeDxe/UndiRuntimeDxe.inf
-  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-  MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
-  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
-
-  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  MdeModulePkg/Universal/Variable/Application/VariableInfo.inf
-
-  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  MdeModulePkg/Universal/PlatformDriverOverride/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+  MdeModulePkg/Universal/PlatformDriverOverride/PlatOverMngr/PlatOverMngr.inf
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
-  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
-  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+  MdeModulePkg/Universal/Variable/Application/VariableInfo.inf
+  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
-[Components.IA32]
-  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-  MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
-  MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-  MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
 
-[Components.X64]
-  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+[Components.IA32, Components.X64]
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
+  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+
 
 [Components.IPF]
-  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
+  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+
 
 [Components.EBC]
   #
