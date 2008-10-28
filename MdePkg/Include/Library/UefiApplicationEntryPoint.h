@@ -18,7 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Declare the EFI/UEFI Specification Revision to which this driver is implemented 
 ///
-extern const UINT32                   _gUefiDriverRevision;
+extern CONST UINT32        _gUefiDriverRevision;
+
 
 /**
   Enrty point to UEFI Application.
