@@ -54,7 +54,7 @@
 #define EFI_IMAGE_DOS_SIGNATURE     SIGNATURE_16('M', 'Z')
 #define EFI_IMAGE_OS2_SIGNATURE     SIGNATURE_16('N', 'E')
 #define EFI_IMAGE_OS2_SIGNATURE_LE  SIGNATURE_16('L', 'E')
-#define EFI_IMAGE_NT_SIGNATURE      SIGNATURE_32('P', 'E', '0', '0')
+#define EFI_IMAGE_NT_SIGNATURE      SIGNATURE_32('P', 'E', '\0', '\0')
 
 ///
 /// PE images can start with an optional DOS header, so if an image is run
