@@ -55,7 +55,6 @@
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
   gEfiOEMBadgingProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiFontProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 

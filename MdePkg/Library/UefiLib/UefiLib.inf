@@ -65,8 +65,6 @@
   gEfiDriverConfigurationProtocolGuid           # SOMETIMES_CONSUMED
   gEfiDriverDiagnosticsProtocolGuid             # SOMETIMES_CONSUMED
   gEfiDriverDiagnostics2ProtocolGuid             # SOMETIMES_CONSUMED
-  gEfiFirmwareVolume2ProtocolGuid               # ALWAYS_CONSUMED
-
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize
