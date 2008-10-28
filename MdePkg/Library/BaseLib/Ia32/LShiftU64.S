@@ -33,7 +33,7 @@ ASM_PFX(InternalMathLShiftU64):
     movb    12(%esp), %cl
     xorl    %eax, %eax
     movl    4(%esp), %edx
-    testb   $32, %cl
+    testb   $32, %cl                    # Count >= 32?
     cmovz   %edx, %eax
     cmovz   0x8(%esp), %edx
     shld    %cl, %eax, %edx

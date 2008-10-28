@@ -33,10 +33,10 @@
 #   );
 #------------------------------------------------------------------------------
 ASM_PFX(InternalMathRShiftU64):
-    movb    12(%esp), %cl
+    movb    12(%esp), %cl               # cl <- Count
     xorl    %edx, %edx
     movl    8(%esp), %eax
-    testb   $32, %cl
+    testb   $32, %cl                    # Count >= 32?
     cmovz   %eax, %edx
     cmovz   0x4(%esp), %eax
     shrdl   %cl, %edx, %eax

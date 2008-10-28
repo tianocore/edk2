@@ -38,7 +38,7 @@ ASM_PFX(InternalMathLRotU64):
     shldl   %cl, %eax, %edx
     rorl    %cl, %ebx
     shldl   %cl, %ebx, %eax
-    testb   $32, %cl
+    testb   $32, %cl                    # Count >= 32?
     cmovnz  %eax, %ecx
     cmovnz  %edx, %eax
     cmovnz  %ecx, %edx

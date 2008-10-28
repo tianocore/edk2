@@ -38,8 +38,8 @@ ASM_PFX(InternalMathRRotU64):
     shrdl   %cl, %edx, %eax
     roll    %cl, %ebx
     shrdl   %cl, %ebx, %edx
-    testb   $32, %cl
-    cmovnz  %eax, %ecx
+    testb   $32, %cl                    # Count >= 32?
+    cmovnz  %eax, %ecx                  # switch eax & edx if Count >= 32
     cmovnz  %edx, %eax
     cmovnz  %ecx, %edx
     pop     %ebx

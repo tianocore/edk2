@@ -31,8 +31,8 @@
 #------------------------------------------------------------------------------
 .globl ASM_PFX(InternalMathSwapBytes64)
 ASM_PFX(InternalMathSwapBytes64):
-    movl    8(%esp), %eax
-    movl    4(%esp), %edx
+    movl    8(%esp), %eax               # eax <- upper 32 bits
+    movl    4(%esp), %edx               # edx <- lower 32 bits
     bswapl  %eax
     bswapl  %edx
     ret

@@ -30,15 +30,15 @@
 #   );
 #------------------------------------------------------------------------------
 ASM_PFX(InternalMathMultU64x64):
-    push    %ebx
-    movl    8(%esp), %ebx
-    movl    16(%esp), %edx
-    movl    %ebx, %ecx
-    movl    %edx, %eax
-    imull   20(%esp), %ebx
-    imull   12(%esp), %edx
-    addl    %edx, %ebx
-    mull    %ecx
-    addl    %ebx, %edx
+    push    %ebx                                     
+    movl    8(%esp), %ebx             # ebx <- M1[0..31]                
+    movl    16(%esp), %edx            # edx <- M2[0..31]                                   
+    movl    %ebx, %ecx                                                  
+    movl    %edx, %eax                
+    imull   20(%esp), %ebx            # ebx <- M1[0..31] * M2[32..63]   
+    imull   12(%esp), %edx            # edx <- M1[32..63] * M2[0..31]   
+    addl    %edx, %ebx                # carries are abandoned           
+    mull    %ecx                      # edx:eax <- M1[0..31] * M2[0..31]
+    addl    %ebx, %edx                # carries are abandoned           
     pop     %ebx
     ret

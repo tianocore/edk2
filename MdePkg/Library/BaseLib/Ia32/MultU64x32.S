@@ -35,7 +35,7 @@
 ASM_PFX(InternalMathMultU64x32):
     movl    12(%esp), %ecx
     movl    %ecx, %eax
-    imull   8(%esp), %ecx
+    imull   8(%esp), %ecx               # overflow not detectable
     mull    0x4(%esp)
     addl    %ecx, %edx
     ret
