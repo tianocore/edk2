@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006, Intel Corporation
+; Copyright (c) 2006 - 2008, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -40,14 +40,14 @@ InternalX86EnablePaging64 PROC
     call    @Base
 @Base:
     add     dword ptr [rsp], @F - @Base ; offset for far retf, seg is the 1st arg
-    mov     rax, cr4                    ; mov eax, cr4
+    mov     rax, cr4
     or      al, (1 SHL 5)
     mov     cr4, rax                    ; enable PAE
     mov     ecx, 0c0000080h
     rdmsr
     or      ah, 1                       ; set LME
     wrmsr
-    mov     rax, cr0                    ; mov eax, cr0
+    mov     rax, cr0
     bts     eax, 31
     mov     cr0, rax                    ; enable paging
     retf

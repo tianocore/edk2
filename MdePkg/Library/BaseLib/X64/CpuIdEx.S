@@ -38,7 +38,7 @@ ASM_PFX(AsmCpuidEx):
     push    %rbx
     movl    %ecx,%eax
     movl    %edx,%ecx
-    push    %rax
+    push    %rax                  # save Index on stack
     cpuid
     mov     0x38(%rsp), %r10
     test    %r10, %r10
@@ -57,6 +57,6 @@ L3:
     jrcxz   L4
     mov     %edx, (%rcx)
 L4: 
-    pop     %rax
+    pop     %rax                  # restore Index to rax as return value
     pop     %rbx
     ret
