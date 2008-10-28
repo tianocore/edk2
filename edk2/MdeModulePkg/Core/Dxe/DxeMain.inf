@@ -1,8 +1,5 @@
 #/** @file
-#  
-#    Component description file for DxeMain module.
-#  
-#   This module provide an DXE CIS compliant implementation of DXE Core.
+#  This module provides an implementation of DXE Core that is compliant with DXE CIS.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
