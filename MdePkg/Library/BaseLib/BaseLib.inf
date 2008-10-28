@@ -354,7 +354,7 @@
   Ia32/LShiftU64.S | GCC 
   SynchronizationGcc.c  | GCC
 
-  Ia32DivS64x64Remainder.c
+  Ia32/DivS64x64Remainder.c
   Ia32/InternalSwitchStack.c
   Ia32/Non-existing.c
   Unaligned.c
