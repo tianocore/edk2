@@ -51,5 +51,3 @@
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigRoutingProtocolGuid
-  gEfiFormBrowser2ProtocolGuid   

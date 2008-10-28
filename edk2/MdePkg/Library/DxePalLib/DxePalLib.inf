@@ -49,6 +49,5 @@
   DebugLib
 
 [Guids]
-  gEfiHobListGuid                               # ALWAYS_CONSUMED
   gPalEntryHobGuid                              # ALWAYS_CONSUMED
   gEfiSalSystemTableGuid                        # ALWAYS_CONSUMED
