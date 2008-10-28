@@ -21,6 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi.h>
 
 #include <Protocol/DevicePath.h>
+#include <Protocol/HiiConfigRouting.h>
+#include <Protocol/FormBrowser2.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
