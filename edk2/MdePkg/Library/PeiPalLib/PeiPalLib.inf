@@ -22,7 +22,7 @@
   FILE_GUID                      = B53DC524-6B98-4584-940B-8F1363DEF09E
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PalCallLib|PEI_CORE PEIM SEC
+  LIBRARY_CLASS                  = PalCallLib|PEIM PEI_CORE
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
