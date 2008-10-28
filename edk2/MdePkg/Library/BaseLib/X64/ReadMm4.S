@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -32,6 +32,5 @@
 .global ASM_PFX(AsmReadMm4)
 .align 16
 ASM_PFX(AsmReadMm4):
-    #DB      48h, 0fh, 7eh, 0e0h
     movd	%mm4, %rax
     ret

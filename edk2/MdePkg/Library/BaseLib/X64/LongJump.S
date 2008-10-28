@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 -2008, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -38,5 +38,5 @@ ASM_PFX(InternalLongJump):
     mov     0x30(%rcx), %r13
     mov     0x38(%rcx), %r14
     mov     0x40(%rcx), %r15
-    mov     %rdx, %rax
+    mov     %rdx, %rax          # set return value
     jmp     *0x48(%rcx)
