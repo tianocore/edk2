@@ -26,7 +26,9 @@
   ENTRY_POINT                    = PeimInitializePciCfg
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
 #
 
 [Sources.common]

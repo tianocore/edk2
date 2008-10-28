@@ -111,6 +111,7 @@
   MdePkg/Library/GraphicsLib/GraphicsLib.inf
 
 [Components.IA32]
+  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf
   MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
   MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
@@ -121,6 +122,7 @@
   MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
 
 [Components.X64]
+  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf
   MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
   MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
@@ -131,8 +133,12 @@
   MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
 
 [Components.IPF]
+  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
   MdePkg/Library/BasePalCallLibNull/BasePalCallLibNull.inf
   MdePkg/Library/PeiPalLib/PeiPalLib.inf
   MdePkg/Library/DxePalLib/DxePalLib.inf
+
+[Components.EBC]
+  MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
