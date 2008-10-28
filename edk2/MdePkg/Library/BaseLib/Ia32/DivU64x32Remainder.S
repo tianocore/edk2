@@ -31,16 +31,16 @@
 #   );
 #------------------------------------------------------------------------------
 ASM_PFX(InternalMathDivRemU64x32):
-    movl    12(%esp), %ecx
-    movl    8(%esp), %eax
+    movl    12(%esp), %ecx          # ecx <- divisor
+    movl    8(%esp), %eax           # eax <- dividend[32..63]
     xorl    %edx, %edx
-    divl    %ecx
+    divl    %ecx                    # eax <- quotient[32..63], edx <- remainder
     push    %eax
-    movl    8(%esp), %eax
-    divl    %ecx
-    movl    20(%esp), %ecx
-    jecxz   L1
+    movl    8(%esp), %eax           # eax <- dividend[0..31]
+    divl    %ecx                    # eax <- quotient[0..31]
+    movl    20(%esp), %ecx          # ecx <- Remainder
+    jecxz   L1                      # abandon remainder if Remainder == NULL
     movl    %edx, (%ecx)
 L1:
-    pop     %edx
+    pop     %edx                    # edx <- quotient[32..63]
     ret

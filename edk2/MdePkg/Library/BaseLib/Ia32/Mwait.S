@@ -34,5 +34,5 @@
 ASM_PFX(AsmMwait):
     movl    4(%esp), %eax
     movl    8(%esp), %ecx
-    mwait   %eax, %ecx
+    mwait   %eax, %ecx                  # mwait
     ret

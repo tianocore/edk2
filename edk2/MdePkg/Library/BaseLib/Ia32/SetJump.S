@@ -30,15 +30,15 @@
 #------------------------------------------------------------------------------
 ASM_PFX(SetJump):
     pushl   0x4(%esp)
-    call    ASM_PFX(InternalAssertJumpBuffer)
+    call    ASM_PFX(InternalAssertJumpBuffer)               # To validate JumpBuffer
     pop     %ecx
-    pop     %ecx
+    pop     %ecx                                            # ecx <- return address
     movl    (%esp), %edx
     movl    %ebx, (%edx)
     movl    %esi, 4(%edx)
     movl    %edi, 8(%edx)
     movl    %ebp, 12(%edx)
     movl    %esp, 16(%edx)
-    movl    %ecx, 20(%edx)
+    movl    %ecx, 20(%edx)                                  # eip value to restore in LongJump
     xorl    %eax, %eax
     jmp     *%ecx

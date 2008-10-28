@@ -38,15 +38,15 @@ ASM_PFX(InternalX86DisablePaging32):
     movl    8(%esp), %ecx
     movl    12(%esp), %edx
     pushfl
-    pop     %edi
+    pop     %edi                        # save EFLAGS to edi
     cli
     movl    %cr0, %eax
     btrl    $31, %eax
     movl    16(%esp), %esp
     movl    %eax, %cr0
     push    %edi
-    popfl
+    popfl                               # restore EFLAGS from edi
     push    %edx
     push    %ecx
     call    *%ebx
-    jmp     .
+    jmp     .                           # EntryPoint() should not return

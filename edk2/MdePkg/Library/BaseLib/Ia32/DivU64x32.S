@@ -34,8 +34,8 @@ ASM_PFX(InternalMathDivU64x32):
     movl    12(%esp), %ecx
     xorl    %edx, %edx
     divl    %ecx
-    push    %eax
+    push    %eax                    # save quotient on stack
     movl    8(%esp), %eax
     divl    %ecx
-    pop     %edx
+    pop     %edx                    # restore high-order dword of the quotient
     ret

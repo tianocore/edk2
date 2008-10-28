@@ -36,7 +36,7 @@
 #------------------------------------------------------------------------------
 ASM_PFX(InternalX86EnablePaging64):
     cli
-    movl    $LongStart, (%esp)
+    movl    $LongStart, (%esp)          # offset for far retf, seg is the 1st arg
     movl    %cr4, %eax
     orb     $0x20, %al
     movl    %eax, %cr4                  # enable PAE
@@ -45,11 +45,11 @@ ASM_PFX(InternalX86EnablePaging64):
     orb     $1, %ah                     # set LME
     wrmsr
     movl    %cr0, %eax
-    btsl    $31, %eax
+    btsl    $31, %eax                   # set PG
     movl    %eax, %cr0                  # enable paging
-    lret
+    lret                                # topmost 2 dwords hold the address
 LongStart:                              # long mode starts here
-    .byte   0x67, 0x48
+    .byte   0x67, 0x48                  # 32-bit address size, 64-bit operand size
     movl    (%esp), %ebx                # mov rbx, [esp]
     .byte   0x67, 0x48
     movl    8(%esp), %ecx               # mov rcx, [esp + 8]
@@ -58,6 +58,6 @@ LongStart:                              # long mode starts here
     .byte   0x67, 0x48
     movl    0x18(%esp), %esp            # mov rsp, [esp + 18h]
     .byte   0x48
-    addl    $0x-0x20, %esp                # add rsp, -20h
+    addl    $0x-0x20, %esp              # add rsp, -20h
     call    *%ebx                       # call rbx
-    jmp     .
+    jmp     .                           # no one should get here

@@ -31,6 +31,6 @@
 #   );
 #------------------------------------------------------------------------------
 ASM_PFX(InternalX86FxRestore):
-    movl    4(%esp), %eax
+    movl    4(%esp), %eax               # Buffer must be 16-byte aligned
     fxrstor (%eax)
     ret
