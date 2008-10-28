@@ -230,7 +230,7 @@ typedef struct {
   @retval EFI_NOT_FOUND  Never reach
 
 **/
-EFI_STATUS
+VOID
 EFIAPI
 PeiCore (
   IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData,

@@ -31,8 +31,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
-  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES    **PeiServices
   )
 {
   if (_gPeimRevision != 0) {
@@ -45,12 +45,12 @@ _ModuleEntryPoint (
   //
   // Call constructor for all libraries
   //
-  ProcessLibraryConstructorList (FfsHeader, PeiServices);
+  ProcessLibraryConstructorList (FileHandle, PeiServices);
 
   //
   // Call the driver entry point
   //
-  return ProcessModuleEntryPointList (FfsHeader, PeiServices);
+  return ProcessModuleEntryPointList (FileHandle, PeiServices);
 }
 
 
@@ -66,9 +66,9 @@ _ModuleEntryPoint (
 EFI_STATUS
 EFIAPI
 EfiMain (
-  IN EFI_PEI_FILE_HANDLE  *FfsHeader,
-  IN EFI_PEI_SERVICES     **PeiServices
+  IN EFI_PEI_FILE_HANDLE      FileHandle,
+  IN CONST EFI_PEI_SERVICES   **PeiServices
   )
 {
-  return _ModuleEntryPoint (FfsHeader, PeiServices);
+  return _ModuleEntryPoint (FileHandle, PeiServices);
 }

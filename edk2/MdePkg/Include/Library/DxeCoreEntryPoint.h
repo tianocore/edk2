@@ -16,7 +16,7 @@
 #define __MODULE_ENTRY_POINT_H__
 
 ///
-/// Declare the cache of copy of HobList. 
+/// Global variable that contains a pointer to the Hob List passed into the DXE Core entry point. 
 /// 
 extern VOID  *gHobList;
 

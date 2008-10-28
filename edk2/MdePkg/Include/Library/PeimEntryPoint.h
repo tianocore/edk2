@@ -18,7 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Declare the EFI/UEFI Specification Revision to which this driver is implemented 
 ///
-extern const UINT32                   _gPeimRevision;
+extern CONST UINT32       _gPeimRevision;
+
 
 /**
   Image entry point of Peim.
@@ -32,8 +33,8 @@ extern const UINT32                   _gPeimRevision;
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
-  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES    **PeiServices
   );
 
 
@@ -49,8 +50,8 @@ _ModuleEntryPoint (
 EFI_STATUS
 EFIAPI
 EfiMain (
-  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES    **PeiServices
   );
 
 
@@ -64,8 +65,8 @@ EfiMain (
 VOID
 EFIAPI
 ProcessLibraryConstructorList (
-  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES    **PeiServices
   );
 
 
@@ -79,8 +80,8 @@ ProcessLibraryConstructorList (
 VOID
 EFIAPI
 ProcessLibraryDestructorList (
-  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES    **PeiServices
   );
 
 
@@ -96,8 +97,8 @@ ProcessLibraryDestructorList (
 EFI_STATUS
 EFIAPI
 ProcessModuleEntryPointList (
-  IN EFI_PEI_FILE_HANDLE       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES    **PeiServices
   );
 
 #endif

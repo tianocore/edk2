@@ -18,27 +18,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Declare the EFI/UEFI Specification Revision to which this driver is implemented 
 ///
-extern const UINT32                   _gUefiDriverRevision;
-
-///
-/// Declare the number of entry points in the image. 
-///
-extern const UINT8                    _gDriverEntryPointCount;
+extern CONST UINT32                   _gUefiDriverRevision;
 
 ///
 /// Declare the number of unload handler in the image. 
 ///
-extern const UINT8                    _gDriverUnloadImageCount;
+extern CONST UINT8                    _gDriverUnloadImageCount;
 
-///
-/// Declare the arrary of Boot Sevice Exit Event callbacks . 
-///
-extern const EFI_EVENT_NOTIFY         _gDriverExitBootServicesEvent[];
-
-///
-/// Declare the arrary of Virtual Address Change Event callbacks . 
-///
-extern const EFI_EVENT_NOTIFY         _gDriverSetVirtualAddressMapEvent[];
 
 /**
   Enrty point to DXE Driver.
