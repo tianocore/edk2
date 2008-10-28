@@ -29,12 +29,12 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 #  VIRTUAL_ADDRESS_MAP_CALLBACK  =  FvbVirtualAddressChangeNotifyEvent
 #
 
-[Sources]
+[Sources.common]
   Fvb.h
   Fvb.c
 

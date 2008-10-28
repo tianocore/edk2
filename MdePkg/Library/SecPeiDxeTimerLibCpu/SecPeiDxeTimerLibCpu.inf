@@ -33,10 +33,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
 
-[Sources.Ia32]
-  X86TimerLib.c
-
-[Sources.X64]
+[Sources.Ia32, Sources.X64]
   X86TimerLib.c
 
 [Sources.IPF]
@@ -50,11 +47,7 @@
 [LibraryClasses]
   BaseLib
 
-[LibraryClasses.IA32]
-  PcdLib
-  IoLib
-
-[LibraryClasses.X64]
+[LibraryClasses.IA32, LibraryClasses.X64]
   PcdLib
   IoLib
 
@@ -62,9 +55,6 @@
   PalCallLib
 
 
-[Pcd.IA32]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
-
-[Pcd.X64]
+[Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock
 
