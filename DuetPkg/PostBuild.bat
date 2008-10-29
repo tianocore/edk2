@@ -5,8 +5,7 @@
 @REM 
 
 @set BUILD_DIR=%WORKSPACE%\Build\DuetPkg\DEBUG_MYTOOLS
-@REM @set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
-@set BASETOOLS_DIR=m:\tree\BaseTools\Bin\Win32
+@set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
 @set PROCESSOR=""
 
 @if "%1"=="" goto NoArch
@@ -20,7 +19,7 @@
 @%BASETOOLS_DIR%\TianoCompress -e -o %BUILD_DIR%\FV\DUETEFIMAINFV.z %BUILD_DIR%\FV\DUETEFIMAINFV.Fv
 
 @echo Compressing DxeMain.efi ...
-@%BASETOOLS_DIR%\TianoCompress -e -o %BUILD_DIR%\FV\DxeMain.z %BUILD_DIR%\%PROCESSOR%\DxeMain.efi
+@%BASETOOLS_DIR%\TianoCompress -e -o %BUILD_DIR%\FV\DxeMain.z %BUILD_DIR%\%PROCESSOR%\DxeCore.efi
 
 @echo Compressing DxeIpl.efi ...
 @%BASETOOLS_DIR%\TianoCompress -e -o %BUILD_DIR%\FV\DxeIpl.z %BUILD_DIR%\%PROCESSOR%\DxeIpl.efi
