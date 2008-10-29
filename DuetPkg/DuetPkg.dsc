@@ -36,7 +36,7 @@
   ExtendedIfrSupportLib|MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
   GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
-  GraphicsLib|MdePkg/Library/GraphicsLib/GraphicsLib.inf
+  GraphicsLib|MdeModulePkg/Library/GraphicsLib/GraphicsLib.inf
   ExtendedHiiLib|MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   DxePiLib|MdePkg/Library/DxePiLib/DxePiLib.inf

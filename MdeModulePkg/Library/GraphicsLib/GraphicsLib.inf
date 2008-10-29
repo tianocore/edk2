@@ -1,10 +1,10 @@
 #/** @file
-# Instance of Graphics Library.
+#   Library supports diplaying graphical splash screen,
+#   locking of keyboard input and printing character on
+#   screen.
 #
-# This library supports displaying graphical splash screen,
-# locking of keyboard input and printing character on screen.
-#
-# Copyright (c) 2006 - 2008, Intel Corporation.
+# This library provides supports for basic graphic functions.
+# Copyright (c) 2006 - 2007, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -24,6 +24,7 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = GraphicsLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
 
 
 #
@@ -54,6 +55,7 @@
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
   gEfiOEMBadgingProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiFontProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 

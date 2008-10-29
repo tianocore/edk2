@@ -78,8 +78,6 @@
   MdePkg/Library/DxePiLib/DxePiLib.inf
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  MdePkg/Library/FvbServiceLib/FvbServiceLib.inf
-  MdePkg/Library/GraphicsLib/GraphicsLib.inf
 
 
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
@@ -128,7 +126,6 @@
 [Components.IPF]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/BasePalCallLibNull/BasePalCallLibNull.inf
-  MdePkg/Library/DxePalLib/DxePalLib.inf
   MdePkg/Library/PeiPalLib/PeiPalLib.inf
   MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
