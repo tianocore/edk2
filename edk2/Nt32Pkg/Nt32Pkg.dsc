@@ -60,8 +60,8 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
-  GraphicsLib|MdePkg/Library/GraphicsLib/GraphicsLib.inf
-  FvbServiceLib|MdePkg/Library/FvbServiceLib/FvbServiceLib.inf
+  GraphicsLib|MdeModulePkg/Library/GraphicsLib/GraphicsLib.inf
+  FvbServiceLib|MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   HiiLib|MdePkg/Library/UefiHiiLib/UefiHiiLib.inf
