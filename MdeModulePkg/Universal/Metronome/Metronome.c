@@ -1,19 +1,5 @@
-/*++
-
-Copyright (c) 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  Metronome.c
-
-Abstract:
+/** @file
+  Produces the Metronome Architectural Protocol on top of Timer Library.
 
   This is a generic implementation of the Metronome Architectural Protocol that
   layers on top of an instance of the Timer Library.  The Timer Library provides
@@ -25,7 +11,16 @@ Abstract:
   overflows that could occur for long delays if only nanoseconds were used and also
   provides the greatest accuracy for small delays. 
 
---*/
+Copyright (c) 2008, Intel Corporation                                                         
+All rights reserved. This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
 
 #include <PiDxe.h>
 #include <Protocol/Metronome.h>
