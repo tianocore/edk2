@@ -53,7 +53,6 @@
   MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/BaseLib/BaseLib.inf
   MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
