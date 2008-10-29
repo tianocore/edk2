@@ -484,7 +484,6 @@ typedef union {
 //
 // Sense Key
 //
-#define ATA_REQUEST_SENSE_ERROR (0x70)
 #define ATA_SK_NO_SENSE         (0x0)
 #define ATA_SK_RECOVERY_ERROR   (0x1)
 #define ATA_SK_NOT_READY        (0x2)
