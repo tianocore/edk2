@@ -360,7 +360,12 @@ PeiLoadFile (
   //
   // Allocate Memory for the image
   //
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
+  Status = PeiServicesAllocatePages (
+             EfiBootServicesCode, 
+             EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize), 
+             &ImageContext.ImageAddress
+             );
+  ASSERT_EFI_ERROR (Status);
   ASSERT (ImageContext.ImageAddress != 0);
 
   //
