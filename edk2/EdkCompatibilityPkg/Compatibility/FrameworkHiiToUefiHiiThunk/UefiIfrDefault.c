@@ -713,7 +713,7 @@ UefiDefaultsToFwDefaults (
       //
       // In UEFI, 0 is defined to be invalid for EFI_IFR_VARSTORE.VarStoreId.
       // So the default storage of Var Store in VFR from a Framework module 
-      // should be translated to 0xFFEE.
+      // should be translated to 0x0001 (RESERVED_VARSTORE_ID).
       //
       if (Node->StoreId == RESERVED_VARSTORE_ID) {
         Pack->VariableId = 0;
