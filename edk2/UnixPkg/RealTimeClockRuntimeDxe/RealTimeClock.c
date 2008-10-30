@@ -52,7 +52,6 @@ InitializeRealTimeClock (
   IN EFI_SYSTEM_TABLE                    *SystemTable
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixGetTime (
@@ -101,7 +100,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSetTime (
@@ -143,7 +141,6 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixGetWakeupTime (
@@ -179,7 +176,6 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSetWakeupTime (
@@ -308,7 +304,7 @@ Returns:
 --*/
 {
 
-  static const INTN  DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  STATIC const INTN  DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
   if (Time->Day < 1 ||
       Time->Day > DayOfMonth[Time->Month - 1] ||

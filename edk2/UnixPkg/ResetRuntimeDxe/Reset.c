@@ -38,7 +38,6 @@ InitializeUnixReset (
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
-STATIC
 VOID
 EFIAPI
 UnixResetSystem (
@@ -87,7 +86,6 @@ Returns:
   return Status;
 }
 
-STATIC
 VOID
 EFIAPI
 UnixResetSystem (

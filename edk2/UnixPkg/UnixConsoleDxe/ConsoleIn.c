@@ -32,7 +32,6 @@ Abstract:
 //
 // Private worker functions
 //
-STATIC
 EFI_STATUS
 UnixSimpleTextInCheckKey (
   UNIX_SIMPLE_TEXT_PRIVATE_DATA  *Private
@@ -67,7 +66,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 UnixConvertInputRecordToEfiKey (
   IN  char c,
@@ -100,7 +98,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextInReadKeyStroke (
@@ -143,7 +140,6 @@ Returns:
   return Status;
 }
 
-STATIC
 VOID
 EFIAPI
 UnixSimpleTextInWaitForKey (
@@ -177,7 +173,6 @@ Returns:
   }
 }
 
-STATIC
 EFI_STATUS
 UnixSimpleTextInCheckKey (
   UNIX_SIMPLE_TEXT_PRIVATE_DATA   *Private

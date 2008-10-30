@@ -49,7 +49,7 @@ EFI_COMPONENT_NAME_PROTOCOL     gUnixConsoleComponentName = {
   "eng"
 };
 
-static EFI_UNICODE_STRING_TABLE mUnixConsoleDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE mUnixConsoleDriverNameTable[] = {
   { "eng", L"Unix Text Console Driver" },
   { NULL , NULL }
 };

@@ -1078,7 +1078,6 @@ Returns:
   return Status;
 }
 
-STATIC
 VOID
 UnixSystemTimeToEfiTime (
   EFI_UNIX_THUNK_PROTOCOL        *UnixThunk,
@@ -1120,7 +1119,6 @@ Returns:
   }
 }
 
-STATIC
 EFI_STATUS
 UnixSimpleFileSystemFileInfo (
   UNIX_EFI_FILE_PRIVATE          *PrivateFile,

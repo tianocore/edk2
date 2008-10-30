@@ -49,7 +49,7 @@ EFI_COMPONENT_NAME_PROTOCOL     gUnixUgaComponentName = {
   "eng"
 };
 
-static EFI_UNICODE_STRING_TABLE mUnixUgaDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE mUnixUgaDriverNameTable[] = {
   { "eng", L"Unix Universal Graphics Adapter Driver" },
   { NULL , NULL }
 };

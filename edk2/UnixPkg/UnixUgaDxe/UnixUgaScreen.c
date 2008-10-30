@@ -24,9 +24,8 @@ Abstract:
 #include "UnixUga.h"
 
 EFI_UNIX_THUNK_PROTOCOL *mUnix;
-static EFI_EVENT          mUgaScreenExitBootServicesEvent;
+EFI_EVENT          mUgaScreenExitBootServicesEvent;
 
-STATIC
 EFI_STATUS
 UnixUgaStartWindow (
   IN  UGA_PRIVATE_DATA    *Private,
@@ -36,7 +35,6 @@ UnixUgaStartWindow (
   IN  UINT32              RefreshRate
   );
 
-STATIC
 VOID
 EFIAPI
 KillNtUgaThread (
@@ -308,7 +306,6 @@ Returns:
 }
 
 
-STATIC
 EFI_STATUS
 UnixUgaStartWindow (
   IN  UGA_PRIVATE_DATA    *Private,
@@ -416,7 +413,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 VOID
 EFIAPI
 KillNtUgaThread (

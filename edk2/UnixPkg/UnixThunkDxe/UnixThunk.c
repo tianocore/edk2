@@ -40,7 +40,7 @@ Abstract:
 //
 // WinNtThunk Device Path Protocol Instance
 //
-static UNIX_THUNK_DEVICE_PATH mUnixThunkDevicePath = {
+UNIX_THUNK_DEVICE_PATH mUnixThunkDevicePath = {
   {
     {
       HARDWARE_DEVICE_PATH,

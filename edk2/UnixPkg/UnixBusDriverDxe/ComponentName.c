@@ -49,7 +49,7 @@ EFI_COMPONENT_NAME_PROTOCOL     gUnixBusDriverComponentName = {
   "eng"
 };
 
-static EFI_UNICODE_STRING_TABLE mUnixBusDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE mUnixBusDriverNameTable[] = {
   { "eng", L"Unix Bus Driver" },
   { NULL , NULL }
 };

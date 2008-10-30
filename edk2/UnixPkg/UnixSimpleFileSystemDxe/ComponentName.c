@@ -49,7 +49,7 @@ EFI_COMPONENT_NAME_PROTOCOL     gUnixSimpleFileSystemComponentName = {
   "eng"
 };
 
-static EFI_UNICODE_STRING_TABLE mUnixSimpleFileSystemDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE mUnixSimpleFileSystemDriverNameTable[] = {
   {
     "eng",
     L"Unix Simple File System Driver"

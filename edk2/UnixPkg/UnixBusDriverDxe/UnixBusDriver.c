@@ -95,7 +95,7 @@ EFI_UNIX_UGA            - Builds UGA Windows of Width and Height
 //
 // Define GUID for the Unix Bus Driver
 //
-static EFI_GUID gUnixBusDriverGuid = {
+EFI_GUID gUnixBusDriverGuid = {
   0x419f582, 0x625, 0x4531, {0x8a, 0x33, 0x85, 0xa9, 0x96, 0x5c, 0x95, 0xbc}
 };
 
@@ -117,7 +117,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gUnixBusDriverBinding = {
 // Table to map UNIX Environment variable to the GUID that should be in
 // device path.
 //
-static UNIX_PCD_ENTRY  mPcdEnvironment[] = {
+UNIX_PCD_ENTRY  mPcdEnvironment[] = {
   {PcdToken(PcdUnixConsole),       &gEfiUnixConsoleGuid},
   {PcdToken(PcdUnixUga),           &gEfiUnixUgaGuid},
   {PcdToken(PcdUnixFileSystem),    &gEfiUnixFileSystemGuid},
