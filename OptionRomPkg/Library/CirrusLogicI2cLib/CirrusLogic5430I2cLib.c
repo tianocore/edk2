@@ -37,9 +37,8 @@
   @param  Data         The date to write.
 
 **/
-STATIC
 VOID
-outb (
+I2cOutb (
   EFI_PCI_IO_PROTOCOL    *PciIo,
   UINTN                  Address,
   UINT8                  Data
@@ -63,9 +62,8 @@ outb (
   return byte value read from PCI I/O space.
 
 **/
-STATIC
 UINT8
-inb (
+I2cInb (
   EFI_PCI_IO_PROTOCOL    *PciIo,
   UINTN                  Address
   )
@@ -93,15 +91,14 @@ inb (
   @retval 1            High on I2C Data or I2C Clock Pin.
 
 **/
-STATIC
 UINT8
 I2cPinRead (
   EFI_PCI_IO_PROTOCOL    *PciIo,
   UINT8                  Bit
   )
 {
-  outb (PciIo, SEQ_ADDRESS_REGISTER, I2C_CONTROL);
-  return (UINT8) ((inb (PciIo, SEQ_DATA_REGISTER) >> Bit ) & 0xfe);
+  I2cOutb (PciIo, SEQ_ADDRESS_REGISTER, I2C_CONTROL);
+  return (UINT8) ((I2cInb (PciIo, SEQ_DATA_REGISTER) >> Bit ) & 0xfe);
 }
 
 
@@ -113,7 +110,6 @@ I2cPinRead (
   @param  Value              1 or 0 stands for Set or Clear I2C Data and I2C Clock Pins.
 
 **/
-STATIC
 VOID
 I2cPinWrite (
   EFI_PCI_IO_PROTOCOL    *PciIo,
@@ -122,10 +118,10 @@ I2cPinWrite (
   )
 {
   UINT8        Byte;
-  outb (PciIo, SEQ_ADDRESS_REGISTER, I2C_CONTROL);
-  Byte = (UINT8) (inb (PciIo, SEQ_DATA_REGISTER) & (UINT8) ~(1 << Bit)) ;
+  I2cOutb (PciIo, SEQ_ADDRESS_REGISTER, I2C_CONTROL);
+  Byte = (UINT8) (I2cInb (PciIo, SEQ_DATA_REGISTER) & (UINT8) ~(1 << Bit)) ;
   Byte = (UINT8) (Byte | ((Value & 0x01) << Bit));
-  outb (PciIo, SEQ_DATA_REGISTER, (UINT8) (Byte | 0x40));
+  I2cOutb (PciIo, SEQ_DATA_REGISTER, (UINT8) (Byte | 0x40));
   return;
 }
 
@@ -133,7 +129,6 @@ I2cPinWrite (
   Read/write delay acoording to I2C Bus Speed.
 
 **/
-STATIC
 VOID
 I2cDelay (
   VOID
@@ -149,7 +144,6 @@ I2cDelay (
   @param  Data               The byte data to write.
 
 **/
-STATIC
 VOID
 I2cSendByte (
   EFI_PCI_IO_PROTOCOL    *PciIo,
@@ -175,7 +169,6 @@ I2cSendByte (
 
   Return the byte data read from I2C Data Pin.
 **/
-STATIC
 UINT8
 I2cReceiveByte (
   EFI_PCI_IO_PROTOCOL    *PciIo
@@ -205,7 +198,6 @@ I2cReceiveByte (
   @param  PciIo              The pointer to PCI_IO_PROTOCOL.
 
 **/
-STATIC
 BOOLEAN
 I2cWaitAck (
   EFI_PCI_IO_PROTOCOL    *PciIo
@@ -231,7 +223,6 @@ I2cWaitAck (
   @param  PciIo              The pointer to PCI_IO_PROTOCOL.
 
 **/
-STATIC
 VOID
 I2cSendAck (
   EFI_PCI_IO_PROTOCOL    *PciIo
@@ -249,7 +240,6 @@ I2cSendAck (
   @param  PciIo              The pointer to PCI_IO_PROTOCOL.
 
 **/
-STATIC
 VOID
 I2cStart (
   EFI_PCI_IO_PROTOCOL    *PciIo
@@ -273,7 +263,6 @@ I2cStart (
   @param  PciIo              The pointer to PCI_IO_PROTOCOL.
 
 **/
-STATIC
 VOID
 I2cStop (
   EFI_PCI_IO_PROTOCOL    *PciIo

@@ -105,7 +105,6 @@ EDID_TIMING mVbeEstablishedEdidTiming[] = {
   @retval EFI_SUCCESS
 
 **/
-STATIC
 EFI_STATUS
 ReadEdidData (
   CIRRUS_LOGIC_5430_PRIVATE_DATA     *Private,
@@ -164,7 +163,6 @@ ReadEdidData (
   @return The 32 bit unique key for search.
 
 **/
-STATIC
 UINT32
 CalculateEdidKey (
   EDID_TIMING       *EdidTiming
@@ -189,7 +187,6 @@ CalculateEdidKey (
   @retval FALSE                  Not found.
 
 **/
-STATIC
 BOOLEAN
 SearchEdidTiming (
   VALID_EDID_TIMING *ValidEdidTiming,
@@ -220,7 +217,6 @@ SearchEdidTiming (
   @retval FALSE                  The EDID data is invalid.
 
 **/
-STATIC
 BOOLEAN
 ParseEdidData (
   UINT8                         *EdidBuffer,
