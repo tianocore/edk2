@@ -27,14 +27,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Event for Set Virtual Map Changed Event
 //
-STATIC EFI_EVENT mSetVirtualMapChangedEvent = NULL;
+EFI_EVENT mSetVirtualMapChangedEvent = NULL;
 
 //
 // Lib will ASSERT if more FVB devices than this are added to the system.
 //
-STATIC FVB_ENTRY          *mFvbEntry;
-STATIC EFI_EVENT          mFvbRegistration;
-STATIC UINTN              mFvbCount;
+FVB_ENTRY          *mFvbEntry;
+EFI_EVENT          mFvbRegistration;
+UINTN              mFvbCount;
 
 /**
   Check whether an address is runtime memory or not.
@@ -135,7 +135,6 @@ IsRuntimeMemory (
   @param Context    Event Context
 
 **/
-STATIC
 VOID
 EFIAPI
 FvbNotificationEvent (
