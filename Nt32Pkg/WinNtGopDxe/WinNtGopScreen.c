@@ -27,7 +27,7 @@ Abstract:
 EFI_WIN_NT_THUNK_PROTOCOL *mWinNt;
 DWORD                     mTlsIndex         = TLS_OUT_OF_INDEXES;
 DWORD                     mTlsIndexUseCount = 0;  // lets us know when we can free mTlsIndex.
-static EFI_EVENT          mGopScreenExitBootServicesEvent;
+EFI_EVENT          mGopScreenExitBootServicesEvent;
 GOP_MODE_DATA mGopModeData[] = {
     {800, 600, 0, 0},
     {640, 480, 0, 0},
@@ -45,7 +45,6 @@ WinNtGopStartWindow (
   IN  UINT32              RefreshRate
   );
 
-STATIC
 VOID
 EFIAPI
 KillNtGopThread (
@@ -53,7 +52,6 @@ KillNtGopThread (
   IN VOID       *Context
   );
 
-STATIC
 VOID
 WinNtGopConvertParamToEfiKeyShiftState (
   IN  GOP_PRIVATE_DATA  *Private,
@@ -93,7 +91,6 @@ WinNtGopConvertParamToEfiKeyShiftState (
   }
 }
 
-STATIC
 VOID
 WinNtGopConvertParamToEfiKey (
   IN  GOP_PRIVATE_DATA  *Private,
@@ -1110,7 +1107,6 @@ WinNtGopDestructor (
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 KillNtGopThread (

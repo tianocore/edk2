@@ -188,7 +188,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoDriverBindingSupported (
@@ -215,7 +214,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoDriverBindingStart (
@@ -242,7 +240,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoDriverBindingStop (
@@ -271,7 +268,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoReset (
@@ -294,7 +290,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoSetAttributes (
@@ -329,7 +324,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoSetControl (
@@ -354,7 +348,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoGetControl (
@@ -379,7 +372,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoWrite (
@@ -406,7 +398,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoRead (

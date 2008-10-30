@@ -40,13 +40,11 @@
 //
 // Cache of WinNtThunk protocol
 //
-STATIC
 EFI_WIN_NT_THUNK_PROTOCOL   *mWinNt;
 
 //
 // Cache of standard output handle .
 //
-STATIC
 HANDLE                      mStdOut;
 
 /**

@@ -48,7 +48,7 @@ Abstract:
 //
 // WinNtThunk Device Path Protocol Instance
 //
-static WIN_NT_THUNK_DEVICE_PATH mWinNtThunkDevicePath = {
+WIN_NT_THUNK_DEVICE_PATH mWinNtThunkDevicePath = {
   {
     HARDWARE_DEVICE_PATH,
     HW_VENDOR_DP,

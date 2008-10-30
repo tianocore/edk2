@@ -187,7 +187,6 @@ Returns:
 //
 // Block IO protocol member functions
 //
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtBlockIoReadBlocks (
@@ -218,7 +217,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtBlockIoWriteBlocks (
@@ -249,7 +247,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtBlockIoFlushBlocks (
@@ -272,7 +269,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtBlockIoResetBlock (
@@ -300,7 +296,6 @@ Returns:
 //
 // Private Worker functions
 //
-STATIC
 EFI_STATUS
 WinNtBlockIoCreateMapping (
   IN EFI_WIN_NT_IO_PROTOCOL             *WinNtIo,
@@ -336,7 +331,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 WinNtBlockIoReadWriteCommon (
   IN  WIN_NT_BLOCK_IO_PRIVATE *Private,
@@ -368,7 +362,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 WinNtBlockIoError (
   IN WIN_NT_BLOCK_IO_PRIVATE      *Private
@@ -390,7 +383,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 WinNtBlockIoOpenDevice (
   WIN_NT_BLOCK_IO_PRIVATE         *Private
@@ -412,7 +404,6 @@ Returns:
 --*/
 ;
 
-STATIC
 CHAR16                                    *
 GetNextElementPastTerminator (
   IN  CHAR16  *EnvironmentVariable,

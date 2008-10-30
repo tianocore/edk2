@@ -144,7 +144,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gWinNtBusDriverBinding = {
 // Table to map NT Environment variable to the GUID that should be in
 // device path.
 //
-static NT_PCD_ENTRY  mPcdEnvironment[] = {
+NT_PCD_ENTRY  mPcdEnvironment[] = {
   PcdToken(PcdWinNtConsole),       &gEfiWinNtConsoleGuid,
   PcdToken(PcdWinNtGop),           &gEfiWinNtGopGuid,
   PcdToken(PcdWinNtSerialPort),    &gEfiWinNtSerialPortGuid,

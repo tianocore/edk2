@@ -97,7 +97,6 @@ InitializeWinNtSerialIo(
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoDriverBindingSupported (
@@ -228,7 +227,6 @@ Error:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoDriverBindingStart (
@@ -534,7 +532,6 @@ Error:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoDriverBindingStop (
@@ -662,7 +659,6 @@ Returns:
 // Serial IO Protocol member functions
 //
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoReset (
@@ -709,7 +705,6 @@ Returns:
                 );
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoSetAttributes (
@@ -975,7 +970,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoSetControl (
@@ -1071,7 +1065,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoGetControl (
@@ -1186,7 +1179,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoWrite (
@@ -1290,7 +1282,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSerialIoRead (

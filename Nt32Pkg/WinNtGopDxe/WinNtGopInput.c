@@ -158,7 +158,6 @@ GopPrivateCheckQ (
   return EFI_SUCCESS;
 }
 
-STATIC
 BOOLEAN
 GopPrivateIsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
@@ -205,7 +204,6 @@ Returns:
 }
 
 
-STATIC
 VOID
 GopPrivateInvokeRegisteredFunction (
   IN GOP_PRIVATE_DATA                     *Private,
@@ -245,7 +243,6 @@ Returns:
   }    
 }
 
-STATIC
 EFI_STATUS
 GopPrivateUpdateStatusLight (
   IN GOP_PRIVATE_DATA                     *Private
@@ -277,7 +274,6 @@ Returns:
 }
 
 
-STATIC
 EFI_STATUS
 GopPrivateResetWorker (
   IN GOP_PRIVATE_DATA                     *Private
@@ -338,7 +334,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 GopPrivateReadKeyStrokeWorker (
   IN GOP_PRIVATE_DATA                   *Private,
@@ -491,7 +486,6 @@ WinNtGopSimpleTextInReset (
   @return TODO: add return values
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtGopSimpleTextInReadKeyStroke (
@@ -525,7 +519,6 @@ WinNtGopSimpleTextInReadKeyStroke (
   @return TODO: add return values
 
 **/
-STATIC
 VOID
 EFIAPI
 WinNtGopSimpleTextInWaitForKey (
@@ -570,7 +563,6 @@ WinNtGopSimpleTextInWaitForKey (
 // Simple Text Input Ex protocol functions
 //
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtGopSimpleTextInExResetEx (
@@ -598,7 +590,6 @@ WinNtGopSimpleTextInExResetEx (
   return GopPrivateResetWorker (Private);
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtGopSimpleTextInExReadKeyStrokeEx (
