@@ -23,14 +23,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 typedef struct _PERFORMANCE_PROTOCOL PERFORMANCE_PROTOCOL;
 
+#define SEC_TOK                         "SEC"
 #define DXE_TOK                         "DXE"
 #define SHELL_TOK                       "SHELL"
 #define PEI_TOK                         "PEI"
 #define BDS_TOK                         "BDS"
-#define DRIVERBINDING_START_TOK         "DriverBinding:Start"
-#define DRIVERBINDING_SUPPORT_TOK       "DriverBinding:Support"
-#define START_IMAGE_TOK                 "StartImage"
-#define LOAD_IMAGE_TOK                  "LoadImage"
+#define DRIVERBINDING_START_TOK         "DB:Start:"
+#define DRIVERBINDING_SUPPORT_TOK       "DB:Support:"
+#define START_IMAGE_TOK                 "StartImage:"
+#define LOAD_IMAGE_TOK                  "LoadImage:"
 
 //
 // DXE_PERFORMANCE_STRING_SIZE must be a multiple of 8.
