@@ -189,6 +189,9 @@ PeiCore (
       EFI_PROGRESS_CODE,
       FixedPcdGet32 (PcdStatusCodeValuePeiCoreEntry)
       );
+      
+    PERF_START (NULL, "SEC", NULL, 1);
+    PERF_END (NULL, "SEC", NULL, Tick);
 
     PERF_START (NULL,"PEI", NULL, Tick);
     //
