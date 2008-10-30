@@ -1291,7 +1291,7 @@ Returns:
     return Status;
   }
 
-  while (PciGetBusRange (Descriptors, &MinBus, &MaxBus, NULL) == EFI_SUCCESS) {
+  while (PciGetBusRange (&Descriptors, &MinBus, &MaxBus, NULL) == EFI_SUCCESS) {
 
     //
     // Create a device node for root bridge device with a NULL host bridge controller handle
@@ -1335,7 +1335,7 @@ Returns:
 
 EFI_STATUS
 PciGetBusRange (
-  IN     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptors,
+  IN     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  **Descriptors,
   OUT    UINT16                             *MinBus,
   OUT    UINT16                             *MaxBus,
   OUT    UINT16                             *BusRange
@@ -1360,23 +1360,23 @@ Returns:
 --*/
 {
 
-  while (Descriptors->Desc != ACPI_END_TAG_DESCRIPTOR) {
-    if (Descriptors->ResType == ACPI_ADDRESS_SPACE_TYPE_BUS) {
+  while ((*Descriptors)->Desc != ACPI_END_TAG_DESCRIPTOR) {
+    if ((*Descriptors)->ResType == ACPI_ADDRESS_SPACE_TYPE_BUS) {
       if (MinBus != NULL) {
-        *MinBus = (UINT16)Descriptors->AddrRangeMin;
+        *MinBus = (UINT16)(*Descriptors)->AddrRangeMin;
       }
 
       if (MaxBus != NULL) {
-        *MaxBus = (UINT16)Descriptors->AddrRangeMax;
+        *MaxBus = (UINT16)(*Descriptors)->AddrRangeMax;
       }
 
       if (BusRange != NULL) {
-        *BusRange = (UINT16)Descriptors->AddrLen;
+        *BusRange = (UINT16)(*Descriptors)->AddrLen;
       }
       return EFI_SUCCESS;
     }
 
-    Descriptors ++;
+    (*Descriptors)++;
   }
 
   return EFI_NOT_FOUND;

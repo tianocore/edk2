@@ -310,7 +310,7 @@ Returns:
           return Status;
         }
 
-        PciGetBusRange (Descriptors, &MinBus, &MaxBus, NULL);
+        PciGetBusRange (&Descriptors, &MinBus, &MaxBus, NULL);
         if ((MinBus <= PciOptionRomDescriptor->Bus) && (PciOptionRomDescriptor->Bus <= MaxBus)) {
           Status = PciRomLoadEfiDriversFromRomImage (This, PciOptionRomDescriptor);
           PciOptionRomDescriptor->DontLoadEfiRom |= 2;
