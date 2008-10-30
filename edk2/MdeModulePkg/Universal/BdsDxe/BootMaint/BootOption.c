@@ -83,7 +83,7 @@ BOpt_CreateMenuEntry (
 
   MenuEntry->VariableContext = AllocateZeroPool (ContextSize);
   if (NULL == MenuEntry->VariableContext) {
-    SafeFreePool (MenuEntry);
+    FreePool (MenuEntry);
     return NULL;
   }
 
@@ -116,59 +116,65 @@ BOpt_DestroyMenuEntry (
   switch (MenuEntry->ContextSelection) {
   case BM_LOAD_CONTEXT_SELECT:
     LoadContext = (BM_LOAD_CONTEXT *) MenuEntry->VariableContext;
-    SafeFreePool (LoadContext->FilePathList);
-    SafeFreePool (LoadContext->LoadOption);
-    SafeFreePool (LoadContext->OptionalData);
-    SafeFreePool (LoadContext);
+    FreePool (LoadContext->FilePathList);
+    FreePool (LoadContext->LoadOption);
+    if (LoadContext->OptionalData != NULL) {
+      FreePool (LoadContext->OptionalData);
+    }
+    FreePool (LoadContext);
     break;
 
   case BM_FILE_CONTEXT_SELECT:
     FileContext = (BM_FILE_CONTEXT *) MenuEntry->VariableContext;
 
     if (!FileContext->IsRoot) {
-      SafeFreePool (FileContext->DevicePath);
+      FreePool (FileContext->DevicePath);
     } else {
       if (FileContext->FHandle != NULL) {
         FileContext->FHandle->Close (FileContext->FHandle);
       }
     }
 
-    SafeFreePool (FileContext->FileName);
-    SafeFreePool (FileContext->Info);
-    SafeFreePool (FileContext);
+    if (FileContext->FileName != NULL) {
+      FreePool (FileContext->FileName);
+    }
+    if (FileContext->Info != NULL) {
+      FreePool (FileContext->Info);
+    }
+    FreePool (FileContext);
     break;
 
   case BM_CONSOLE_CONTEXT_SELECT:
     ConsoleContext = (BM_CONSOLE_CONTEXT *) MenuEntry->VariableContext;
-    SafeFreePool (ConsoleContext->DevicePath);
-    SafeFreePool (ConsoleContext);
+    FreePool (ConsoleContext->DevicePath);
+    FreePool (ConsoleContext);
     break;
 
   case BM_TERMINAL_CONTEXT_SELECT:
     TerminalContext = (BM_TERMINAL_CONTEXT *) MenuEntry->VariableContext;
-    SafeFreePool (TerminalContext->DevicePath);
-    SafeFreePool (TerminalContext);
+    FreePool (TerminalContext->DevicePath);
+    FreePool (TerminalContext);
     break;
 
   case BM_HANDLE_CONTEXT_SELECT:
     HandleContext = (BM_HANDLE_CONTEXT *) MenuEntry->VariableContext;
-    SafeFreePool (HandleContext);
+    FreePool (HandleContext);
     break;
 
   case BM_LEGACY_DEV_CONTEXT_SELECT:
     LegacyDevContext = (BM_LEGACY_DEVICE_CONTEXT *) MenuEntry->VariableContext;
-    SafeFreePool (LegacyDevContext);
+    FreePool (LegacyDevContext);
 
   default:
     break;
   }
 
-  SafeFreePool (MenuEntry->DisplayString);
+  FreePool (MenuEntry->DisplayString);
   if (NULL != MenuEntry->HelpString) {
-    SafeFreePool (MenuEntry->HelpString);
+    FreePool (MenuEntry->HelpString);
   }
 
-  SafeFreePool (MenuEntry);
+  FreePool (MenuEntry);
 }
 
 /**
@@ -278,7 +284,7 @@ BOpt_FindFileSystem (
       if (BlkIo->Media->RemovableMedia) {
         Buffer = AllocateZeroPool (BlkIo->Media->BlockSize);
         if (NULL == Buffer) {
-          SafeFreePool (BlkIoHandle);
+          FreePool (BlkIoHandle);
           return EFI_OUT_OF_RESOURCES;
         }
 
@@ -289,10 +295,10 @@ BOpt_FindFileSystem (
                 BlkIo->Media->BlockSize,
                 Buffer
                 );
-        SafeFreePool (Buffer);
+        FreePool (Buffer);
       }
     }
-    SafeFreePool (BlkIoHandle);
+    FreePool (BlkIoHandle);
   }
 
   //
@@ -332,7 +338,7 @@ BOpt_FindFileSystem (
       //
       MenuEntry = BOpt_CreateMenuEntry (BM_FILE_CONTEXT_SELECT);
       if (NULL == MenuEntry) {
-        SafeFreePool (SimpleFsHandle);
+        FreePool (SimpleFsHandle);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -390,7 +396,7 @@ BOpt_FindFileSystem (
   }
 
   if (NoSimpleFsHandles != 0) {
-    SafeFreePool (SimpleFsHandle);
+    FreePool (SimpleFsHandle);
   }
   //
   // Searching for handles that support Load File protocol
@@ -407,7 +413,7 @@ BOpt_FindFileSystem (
     for (Index = 0; Index < NoLoadFileHandles; Index++) {
       MenuEntry = BOpt_CreateMenuEntry (BM_FILE_CONTEXT_SELECT);
       if (NULL == MenuEntry) {
-        SafeFreePool (LoadFileHandle);
+        FreePool (LoadFileHandle);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -438,7 +444,7 @@ BOpt_FindFileSystem (
   }
 
   if (NoLoadFileHandles != 0) {
-    SafeFreePool (LoadFileHandle);
+    FreePool (LoadFileHandle);
   }
 
   //
@@ -676,7 +682,7 @@ BOpt_FindFiles (
   }
 
   DirectoryMenu.MenuNumber = OptionNumber;
-  SafeFreePool (DirInfo);
+  FreePool (DirInfo);
   return EFI_SUCCESS;
 }
 
@@ -898,7 +904,7 @@ BOpt_GetBootOptions (
 
   if (BootNext != NULL) {
     if (BootNextSize != sizeof (UINT16)) {
-      SafeFreePool (BootNext);
+      FreePool (BootNext);
       BootNext = NULL;
     }
   }
@@ -923,7 +929,7 @@ BOpt_GetBootOptions (
     }
 
     CopyMem (LoadOption, LoadOptionFromVar, BootOptionSize);
-    SafeFreePool (LoadOptionFromVar);
+    FreePool (LoadOptionFromVar);
 
     if (BootNext != NULL) {
       BootNextFlag = (BOOLEAN) (*BootNext == BootOrderList[Index]);
@@ -932,7 +938,7 @@ BOpt_GetBootOptions (
     }
 
     if (0 == (*((UINT32 *) LoadOption) & LOAD_OPTION_ACTIVE)) {
-      SafeFreePool (LoadOption);
+      FreePool (LoadOption);
       continue;
     }
     //
@@ -1054,8 +1060,12 @@ BOpt_GetBootOptions (
     MenuCount++;
   }
 
-  SafeFreePool (BootNext);
-  SafeFreePool (BootOrderList);
+  if (BootNext != NULL) {
+    FreePool (BootNext);
+  }
+  if (BootOrderList != NULL) {
+    FreePool (BootOrderList);
+  }
   BootOptionMenu.MenuNumber = MenuCount;
   return MenuCount;
 }
@@ -1318,7 +1328,7 @@ BOpt_FindDrivers (
 
     NewMenuEntry = BOpt_CreateMenuEntry (BM_HANDLE_CONTEXT_SELECT);
     if (NULL == NewMenuEntry) {
-      SafeFreePool (DevicePathHandle);
+      FreePool (DevicePathHandle);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -1332,7 +1342,10 @@ BOpt_FindDrivers (
     InsertTailList (&DriverMenu.Head, &NewMenuEntry->Link);
 
   }
-  SafeFreePool (DevicePathHandle);
+
+  if (DevicePathHandle != NULL) {
+    FreePool (DevicePathHandle);
+  }
 
   DriverMenu.MenuNumber = OptionNumber;
   return EFI_SUCCESS;
@@ -1545,7 +1558,7 @@ BOpt_GetDriverOptions (
     }
 
     CopyMem (LoadOption, LoadOptionFromVar, DriverOptionSize);
-    SafeFreePool (LoadOptionFromVar);
+    FreePool (LoadOptionFromVar);
 
     NewMenuEntry = BOpt_CreateMenuEntry (BM_LOAD_CONTEXT_SELECT);
     if (NULL == NewMenuEntry) {
@@ -1631,7 +1644,9 @@ BOpt_GetDriverOptions (
 
   }
 
-  SafeFreePool (DriverOrderList);
+  if (DriverOrderList != NULL) {
+    FreePool (DriverOrderList);
+  }
   DriverOptionMenu.MenuNumber = Index;
   return EFI_SUCCESS;
 

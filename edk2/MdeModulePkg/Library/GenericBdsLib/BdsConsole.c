@@ -126,7 +126,9 @@ BdsLibUpdateConsoleVariable (
       //
       TempNewDevicePath = NewDevicePath;
       NewDevicePath = AppendDevicePathInstance (NewDevicePath, CustomizedConDevicePath);
-      SafeFreePool(TempNewDevicePath);
+      if (TempNewDevicePath != NULL) {
+        FreePool(TempNewDevicePath);
+      }
     }
   }
 
@@ -157,10 +159,16 @@ BdsLibUpdateConsoleVariable (
         );
 
   if (VarConsole == NewDevicePath) {
-    SafeFreePool(VarConsole);
+    if (VarConsole != NULL) {
+      FreePool(VarConsole);
+    }
   } else {
-    SafeFreePool(VarConsole);
-    SafeFreePool(NewDevicePath);
+    if (VarConsole != NULL) {
+      FreePool(VarConsole);
+    }
+    if (NewDevicePath) {
+      FreePool(NewDevicePath);
+    }
   }
 
   return EFI_SUCCESS;
@@ -258,10 +266,10 @@ BdsLibConnectConsoleVariable (
         DeviceExist = TRUE;
       }
     }
-    SafeFreePool(Instance);
+    FreePool(Instance);
   } while (CopyOfDevicePath != NULL);
 
-  SafeFreePool (StartDevicePath);
+  FreePool (StartDevicePath);
 
   if (!DeviceExist) {
     return EFI_NOT_FOUND;
@@ -312,7 +320,10 @@ BdsLibConnectAllConsoles (
     BdsLibUpdateConsoleVariable (L"ConIn", ConDevicePath, NULL);
   }
 
-  SafeFreePool(HandleBuffer);
+  if (HandleBuffer != NULL) {
+    FreePool(HandleBuffer);
+    HandleBuffer = NULL;
+  }
 
   gBS->LocateHandleBuffer (
           ByProtocol,
@@ -331,7 +342,9 @@ BdsLibConnectAllConsoles (
     BdsLibUpdateConsoleVariable (L"ErrOut", ConDevicePath, NULL);
   }
 
-  SafeFreePool(HandleBuffer);
+  if (HandleBuffer != NULL) {
+    FreePool(HandleBuffer);
+  }
 
   //
   // Connect all console variables

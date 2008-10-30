@@ -288,7 +288,7 @@ Output1bitPixel (
   ZeroMem (PaletteValue, sizeof (PaletteValue));
   CopyRgbToGopPixel (&PaletteValue[0], &Palette->PaletteValue[0], 1);
   CopyRgbToGopPixel (&PaletteValue[1], &Palette->PaletteValue[1], 1);
-  SafeFreePool (Palette);
+  FreePool (Palette);
 
   //
   // Convert the pixel from one bit to corresponding color.
@@ -373,7 +373,7 @@ Output4bitPixel (
 
   ZeroMem (PaletteValue, sizeof (PaletteValue));
   CopyRgbToGopPixel (PaletteValue, Palette->PaletteValue, PaletteNum);
-  SafeFreePool (Palette);
+  FreePool (Palette);
 
   //
   // Convert the pixel from 4 bit to corresponding color.
@@ -446,7 +446,7 @@ Output8bitPixel (
   PaletteNum = (UINT16)(Palette->PaletteSize / sizeof (EFI_HII_RGB_PIXEL));
   ZeroMem (PaletteValue, sizeof (PaletteValue));
   CopyRgbToGopPixel (PaletteValue, Palette->PaletteValue, PaletteNum);
-  SafeFreePool (Palette);
+  FreePool (Palette);
 
   //
   // Convert the pixel from 8 bits to corresponding color.
@@ -679,7 +679,7 @@ HiiNewImage (
       ImagePackage->ImageBlock,
       ImagePackage->ImageBlockSize - sizeof (EFI_HII_IIBT_END_BLOCK)
       );
-    SafeFreePool (ImagePackage->ImageBlock);
+    FreePool (ImagePackage->ImageBlock);
     ImagePackage->ImageBlock = ImageBlock;
     ImageBlock += ImagePackage->ImageBlockSize - sizeof (EFI_HII_IIBT_END_BLOCK);
     //
@@ -687,8 +687,7 @@ HiiNewImage (
     //
     NewBlock = AllocateZeroPool (NewBlockSize);
     if (NewBlock == NULL) {
-      SafeFreePool (ImagePackage->ImageBlock);
-      ImagePackage->ImageBlock = NULL;
+      FreePool (ImagePackage->ImageBlock);
       return EFI_OUT_OF_RESOURCES;
     }
     NewBlockPtr = NewBlock;
@@ -735,7 +734,7 @@ HiiNewImage (
     ImagePackage->ImageBlockSize = (UINT32) BlockSize;
     ImagePackage->ImageBlock = (UINT8 *) AllocateZeroPool (BlockSize);
     if (ImagePackage->ImageBlock == NULL) {
-      SafeFreePool (ImagePackage);
+      FreePool (ImagePackage);
       return EFI_OUT_OF_RESOURCES;
     }
     ImageBlock = ImagePackage->ImageBlock;
@@ -745,8 +744,8 @@ HiiNewImage (
     //
     NewBlock = AllocateZeroPool (NewBlockSize);
     if (NewBlock == NULL) {
-      SafeFreePool (ImagePackage->ImageBlock);
-      SafeFreePool (ImagePackage);
+      FreePool (ImagePackage->ImageBlock);
+      FreePool (ImagePackage);
       return EFI_OUT_OF_RESOURCES;
     }
     NewBlockPtr = NewBlock;
@@ -774,7 +773,7 @@ HiiNewImage (
   CopyGopToRgbPixel ((EFI_HII_RGB_PIXEL *) NewBlock, ImageIn->Bitmap, ImageIn->Width * ImageIn->Height);
 
   CopyMem (ImageBlock, NewBlockPtr, NewBlockSize);
-  SafeFreePool (NewBlockPtr);
+  FreePool (NewBlockPtr);
 
   //
   // Append the block end
@@ -1156,7 +1155,7 @@ HiiSetImage (
   BlockSize = ImagePackage->ImageBlockSize + NewBlockSize - OldBlockSize;
   Block = (UINT8 *) AllocateZeroPool (BlockSize);
   if (Block == NULL) {
-    SafeFreePool (NewBlock);
+    FreePool (NewBlock);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1169,8 +1168,8 @@ HiiSetImage (
   BlockPtr += NewBlockSize;
   CopyMem (BlockPtr, ImageBlock + OldBlockSize, Part2Size);
 
-  SafeFreePool (ImagePackage->ImageBlock);
-  SafeFreePool (NewBlock);
+  FreePool (ImagePackage->ImageBlock);
+  FreePool (NewBlock);
   ImagePackage->ImageBlock     = Block;
   ImagePackage->ImageBlockSize = BlockSize;
   ImagePackage->ImagePkgHdr.Header.Length += NewBlockSize - OldBlockSize;
@@ -1366,7 +1365,7 @@ HiiDrawImage (
 
     }
 
-    SafeFreePool (BltBuffer);
+    FreePool (BltBuffer);
     return Status;
 
   } else {
@@ -1384,7 +1383,7 @@ HiiDrawImage (
 
     ImageOut = (EFI_IMAGE_OUTPUT *) AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
     if (ImageOut == NULL) {
-      SafeFreePool (BltBuffer);
+      FreePool (BltBuffer);
       return EFI_OUT_OF_RESOURCES;
     }
     ImageOut->Width        = (UINT16) Width;
@@ -1397,14 +1396,14 @@ HiiDrawImage (
     //
     Status = GetSystemFont (Private, &FontInfo, NULL);
     if (EFI_ERROR (Status)) {
-      SafeFreePool (BltBuffer);
-      SafeFreePool (ImageOut);
+      FreePool (BltBuffer);
+      FreePool (ImageOut);
       return Status;
     }
     for (Index = 0; Index < Width * Height; Index++) {
       BltBuffer[Index] = FontInfo->BackgroundColor;
     }
-    SafeFreePool (FontInfo);
+    FreePool (FontInfo);
 
     //
     // Draw the incoming image to the new created image.
@@ -1494,7 +1493,9 @@ HiiDrawImageId (
   // Draw this image.
   //
   Status = HiiDrawImage (This, Flags, &Image, Blt, BltX, BltY);
-  SafeFreePool (Image.Bitmap);
+  if (Image.Bitmap != NULL) {
+    FreePool (Image.Bitmap);
+  }
   return Status;
 }
 

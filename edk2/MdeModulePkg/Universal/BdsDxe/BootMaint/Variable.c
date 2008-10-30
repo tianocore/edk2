@@ -122,7 +122,7 @@ Var_ChangeBootOrder (
   //
   if (BootOrderList != NULL) {
     EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
-    SafeFreePool (BootOrderList);
+    FreePool (BootOrderList);
     BootOrderList = NULL;
   }
   //
@@ -268,7 +268,7 @@ Var_ChangeDriverOrder (
   //
   if (DriverOrderList != NULL) {
     EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
-    SafeFreePool (DriverOrderList);
+    FreePool (DriverOrderList);
     DriverOrderList = NULL;
   }
 
@@ -407,7 +407,7 @@ Var_UpdateConsoleOption (
   ConDevicePath = EfiLibGetVariable (ConsoleName, &gEfiGlobalVariableGuid);
   if (ConDevicePath != NULL) {
     EfiLibDeleteVariable (ConsoleName, &gEfiGlobalVariableGuid);
-    SafeFreePool (ConDevicePath);
+    FreePool (ConDevicePath);
     ConDevicePath = NULL;
   };
 
@@ -689,10 +689,11 @@ Var_UpdateDriverOption (
                   NewDriverOrderList
                   );
   ASSERT_EFI_ERROR (Status);
-  SafeFreePool (DriverOrderList);
+  if (DriverOrderList != NULL) {
+    FreePool (DriverOrderList);
+  }
   DriverOrderList = NULL;
-  SafeFreePool (NewDriverOrderList);
-  NewDriverOrderList = NULL;
+  FreePool (NewDriverOrderList);
   InsertTailList (&DriverOptionMenu.Head, &NewMenuEntry->Link);
   DriverOptionMenu.MenuNumber++;
 
@@ -849,6 +850,7 @@ Var_UpdateBootOption (
 
   if (BootOrderList != NULL) {
     EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
+    FreePool (BootOrderList);
   }
 
   Status = gRT->SetVariable (
@@ -860,9 +862,7 @@ Var_UpdateBootOption (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  SafeFreePool (BootOrderList);
-  BootOrderList = NULL;
-  SafeFreePool (NewBootOrderList);
+  FreePool (NewBootOrderList);
   NewBootOrderList = NULL;
   InsertTailList (&BootOptionMenu.Head, &NewMenuEntry->Link);
   BootOptionMenu.MenuNumber++;
@@ -976,6 +976,7 @@ Var_UpdateBootOrder (
   //
   if (BootOrderList != NULL) {
     EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
+    FreePool (BootOrderList);
   }
 
   for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
@@ -989,8 +990,7 @@ Var_UpdateBootOrder (
                   BootOrderListSize,
                   NewBootOrderList
                   );
-  SafeFreePool (BootOrderList);
-  SafeFreePool (NewBootOrderList);
+  FreePool (NewBootOrderList);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1048,6 +1048,7 @@ Var_UpdateDriverOrder (
   //
   if (DriverOrderList != NULL) {
     EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
+    FreePool (DriverOrderList);
   }
 
   for (Index = 0; Index < DriverOrderListSize; Index++) {
@@ -1064,8 +1065,6 @@ Var_UpdateDriverOrder (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  SafeFreePool (DriverOrderList);
 
   BOpt_FreeMenu (&DriverOptionMenu);
   BOpt_GetDriverOptions (CallbackData);
@@ -1190,13 +1189,13 @@ Var_UpdateBBSOption (
   }
 
   if (VarData >= VarData + VarSize) {
-    SafeFreePool (OriginalPtr);
+    FreePool (OriginalPtr);
     return EFI_NOT_FOUND;
   }
 
   NewOrder = (UINT16 *) AllocateZeroPool (DevOrder->Length - sizeof (UINT16));
   if (NULL == NewOrder) {
-    SafeFreePool (VarData);
+    FreePool (VarData);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1229,7 +1228,7 @@ Var_UpdateBBSOption (
     NewOrder,
     DevOrder->Length - sizeof (UINT16)
     );
-  SafeFreePool (NewOrder);
+  FreePool (NewOrder);
 
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
@@ -1239,7 +1238,7 @@ Var_UpdateBBSOption (
                   OriginalPtr
                   );
 
-  SafeFreePool (OriginalPtr);
+  FreePool (OriginalPtr);
 
   //
   // Update Optional Data of Boot####
@@ -1371,8 +1370,8 @@ Var_UpdateBBSOption (
                     NewOptionPtr
                     );
 
-    SafeFreePool (NewOptionPtr);
-    SafeFreePool (BootOptionVar);
+    FreePool (NewOptionPtr);
+    FreePool (BootOptionVar);
   }
 
   BOpt_GetBootOptions (CallbackData);

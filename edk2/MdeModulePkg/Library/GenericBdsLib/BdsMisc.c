@@ -304,25 +304,27 @@ BdsLibRegisterNewOption (
         //
         // Got the option, so just return
         //
-        SafeFreePool (OptionPtr);
-        SafeFreePool (TempOptionPtr);
+        FreePool (OptionPtr);
+        FreePool (TempOptionPtr);
         return EFI_SUCCESS;
       } else {
         //
         // Option description changed, need update.
         //
         UpdateDescription = TRUE;
-        SafeFreePool (OptionPtr);
+        FreePool (OptionPtr);
         break;
       }
     }
 
-    SafeFreePool (OptionPtr);
+    FreePool (OptionPtr);
   }
 
   OptionSize          = sizeof (UINT32) + sizeof (UINT16) + StrSize (String);
   OptionSize          += GetDevicePathSize (DevicePath);
   OptionPtr           = AllocateZeroPool (OptionSize);
+  ASSERT (OptionPtr != NULL);
+  
   TempPtr             = OptionPtr;
   *(UINT32 *) TempPtr = LOAD_OPTION_ACTIVE;
   TempPtr             += sizeof (UINT32);
@@ -361,12 +363,12 @@ BdsLibRegisterNewOption (
   // Return if only need to update a changed description or fail to set option.
   //
   if (EFI_ERROR (Status) || UpdateDescription) {
-    SafeFreePool (OptionPtr);
-    SafeFreePool (TempOptionPtr);
+    FreePool (OptionPtr);
+    FreePool (TempOptionPtr);
     return Status;
   }
 
-  SafeFreePool (OptionPtr);
+  FreePool (OptionPtr);
 
   //
   // Update the option order variable
@@ -384,7 +386,7 @@ BdsLibRegisterNewOption (
                     sizeof (UINT16),
                     &BootOrderEntry
                     );
-    SafeFreePool (TempOptionPtr);
+    FreePool (TempOptionPtr);
     return Status;
   }
 
@@ -393,6 +395,8 @@ BdsLibRegisterNewOption (
   //
   OrderItemNum = (TempOptionSize / sizeof (UINT16)) + 1 ;
   OptionOrderPtr = AllocateZeroPool ( OrderItemNum * sizeof (UINT16));
+  ASSERT (OptionOrderPtr!= NULL);
+  
   CopyMem (OptionOrderPtr, TempOptionPtr, (OrderItemNum - 1) * sizeof (UINT16));
 
   OptionOrderPtr[Index] = RegisterOptionNumber;
@@ -404,8 +408,8 @@ BdsLibRegisterNewOption (
                   OrderItemNum * sizeof (UINT16),
                   OptionOrderPtr
                   );
-  SafeFreePool (TempOptionPtr);
-  SafeFreePool (OptionOrderPtr);
+  FreePool (TempOptionPtr);
+  FreePool (OptionOrderPtr);
 
   return Status;
 }
@@ -525,12 +529,12 @@ BdsLibVariableToOption (
   //
   if ((Option->Attribute & LOAD_OPTION_ACTIVE) == LOAD_OPTION_ACTIVE) {
     InsertTailList (BdsCommonOptionList, &Option->Link);
-    SafeFreePool (Variable);
+    FreePool (Variable);
     return Option;
   }
 
-  SafeFreePool (Variable);
-  SafeFreePool (Option);
+  FreePool (Variable);
+  FreePool (Option);
   return NULL;
 
 }
@@ -591,7 +595,7 @@ BdsLibBuildOptionFromVar (
 
   }
 
-  SafeFreePool (OptionOrder);
+  FreePool (OptionOrder);
 
   return EFI_SUCCESS;
 }
@@ -716,9 +720,11 @@ BdsLibDelPartMatchInstance (
       //
       TempNewDevicePath = NewDevicePath;
       NewDevicePath = AppendDevicePathInstance (NewDevicePath, Instance);
-      SafeFreePool(TempNewDevicePath);
+      if (TempNewDevicePath != NULL) {
+        FreePool(TempNewDevicePath);
+      }
     }
-    SafeFreePool(Instance);
+    FreePool(Instance);
     Instance = GetNextDevicePathInstance (&Multi, &InstanceSize);
     InstanceSize  -= END_DEVICE_PATH_LENGTH;
   }
@@ -766,11 +772,11 @@ BdsLibMatchDevicePaths (
     // return success
     //
     if (CompareMem (Single, DevicePathInst, Size) == 0) {
-      SafeFreePool (DevicePathInst);
+      FreePool (DevicePathInst);
       return TRUE;
     }
 
-    SafeFreePool (DevicePathInst);
+    FreePool (DevicePathInst);
     DevicePathInst = GetNextDevicePathInstance (&DevicePath, &Size);
   }
 
@@ -952,8 +958,8 @@ SetupResetReminder (
         IfrLibCreatePopUp (2, &Key, StringBuffer1, StringBuffer2);
       } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
 
-      SafeFreePool (StringBuffer1);
-      SafeFreePool (StringBuffer2);
+      FreePool (StringBuffer1);
+      FreePool (StringBuffer2);
       //
       // If the user hits the YES Response key, reset
       //
@@ -1043,13 +1049,14 @@ BdsLibGetImageHeader (
       break;
     }
     if (Status != EFI_BUFFER_TOO_SMALL) {
+      FreePool (Info);
       goto Done;
     }
-    SafeFreePool (Info);
+    FreePool (Info);
   } while (TRUE);
 
   FileSize = Info->FileSize;
-  SafeFreePool (Info);
+  FreePool (Info);
 
   //
   // Read dos header

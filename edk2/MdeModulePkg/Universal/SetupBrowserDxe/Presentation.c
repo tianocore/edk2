@@ -611,34 +611,34 @@ FreeBrowserStrings (
   VOID
   )
 {
-  SafeFreePool (gFunctionOneString);
-  SafeFreePool (gFunctionTwoString);
-  SafeFreePool (gFunctionNineString);
-  SafeFreePool (gFunctionTenString);
-  SafeFreePool (gEnterString);
-  SafeFreePool (gEnterCommitString);
-  SafeFreePool (gEscapeString);
-  SafeFreePool (gMoveHighlight);
-  SafeFreePool (gMakeSelection);
-  SafeFreePool (gDecNumericInput);
-  SafeFreePool (gHexNumericInput);
-  SafeFreePool (gToggleCheckBox);
-  SafeFreePool (gPromptForData);
-  SafeFreePool (gPromptForPassword);
-  SafeFreePool (gPromptForNewPassword);
-  SafeFreePool (gConfirmPassword);
-  SafeFreePool (gPassowordInvalid);
-  SafeFreePool (gConfirmError);
-  SafeFreePool (gPressEnter);
-  SafeFreePool (gEmptyString);
-  SafeFreePool (gAreYouSure);
-  SafeFreePool (gYesResponse);
-  SafeFreePool (gNoResponse);
-  SafeFreePool (gMiniString);
-  SafeFreePool (gPlusString);
-  SafeFreePool (gMinusString);
-  SafeFreePool (gAdjustNumber);
-  SafeFreePool (gSaveChanges);
+  FreePool (gFunctionOneString);
+  FreePool (gFunctionTwoString);
+  FreePool (gFunctionNineString);
+  FreePool (gFunctionTenString);
+  FreePool (gEnterString);
+  FreePool (gEnterCommitString);
+  FreePool (gEscapeString);
+  FreePool (gMoveHighlight);
+  FreePool (gMakeSelection);
+  FreePool (gDecNumericInput);
+  FreePool (gHexNumericInput);
+  FreePool (gToggleCheckBox);
+  FreePool (gPromptForData);
+  FreePool (gPromptForPassword);
+  FreePool (gPromptForNewPassword);
+  FreePool (gConfirmPassword);
+  FreePool (gPassowordInvalid);
+  FreePool (gConfirmError);
+  FreePool (gPressEnter);
+  FreePool (gEmptyString);
+  FreePool (gAreYouSure);
+  FreePool (gYesResponse);
+  FreePool (gNoResponse);
+  FreePool (gMiniString);
+  FreePool (gPlusString);
+  FreePool (gMinusString);
+  FreePool (gAdjustNumber);
+  FreePool (gSaveChanges);
   return ;
 }
 

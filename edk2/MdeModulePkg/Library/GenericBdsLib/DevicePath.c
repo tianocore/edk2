@@ -45,7 +45,7 @@ ReallocatePool (
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
-    SafeFreePool (OldPool);
+    FreePool (OldPool);
   }
 
   return NewPool;
@@ -108,7 +108,7 @@ CatPrint (
     Str->len = StringSize - sizeof (UINT16);
   }
 
-  SafeFreePool (AppendStr);
+  FreePool (AppendStr);
   return Str->str;
 }
 
@@ -1594,7 +1594,7 @@ DevicePathToStr (
   //
   // Shrink pool used for string allocation
   //
-  SafeFreePool (DevPath);
+  FreePool (DevPath);
 
 Done:
   NewSize = (Str.len + 1) * sizeof (CHAR16);

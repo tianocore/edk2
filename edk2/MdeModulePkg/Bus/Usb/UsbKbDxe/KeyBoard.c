@@ -651,7 +651,9 @@ ReleaseKeyboardLayoutResources (
   USB_NS_KEY      *UsbNsKey;
   LIST_ENTRY      *Link;
 
-  SafeFreePool (UsbKeyboardDevice->KeyConvertionTable);
+  if (UsbKeyboardDevice->KeyConvertionTable != NULL) {
+    FreePool (UsbKeyboardDevice->KeyConvertionTable);
+  }
   UsbKeyboardDevice->KeyConvertionTable = NULL;
 
   while (!IsListEmpty (&UsbKeyboardDevice->NsKeyList)) {
@@ -659,8 +661,8 @@ ReleaseKeyboardLayoutResources (
     UsbNsKey = USB_NS_KEY_FORM_FROM_LINK (Link);
     RemoveEntryList (&UsbNsKey->Link);
 
-    gBS->FreePool (UsbNsKey->NsKey);
-    gBS->FreePool (UsbNsKey);
+    FreePool (UsbNsKey->NsKey);
+    FreePool (UsbNsKey);
   }
 }
 

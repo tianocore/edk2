@@ -712,9 +712,15 @@ IfrCatenate (
   Result->Value.string = NewString (StringPtr, FormSet->HiiHandle);
 
 Done:
-  SafeFreePool (String[0]);
-  SafeFreePool (String[1]);
-  SafeFreePool (StringPtr);
+  if (String[0] != NULL) {
+    FreePool (String[0]);
+  }
+  if (String[1] != NULL) {
+    FreePool (String[1]);
+  }  
+  if (StringPtr != NULL) {
+    FreePool (StringPtr);
+  }
 
   return Status;
 }
@@ -770,8 +776,12 @@ IfrMatch (
   Result->Value.b = mUnicodeCollation->MetaiMatch (mUnicodeCollation, String[0], String[1]);
 
 Done:
-  SafeFreePool (String[0]);
-  SafeFreePool (String[1]);
+  if (String[0] != NULL) {
+    FreePool (String[0]);
+  }
+  if (String[1] != NULL) {
+    FreePool (String[1]);
+  }  
 
   return Status;
 }
@@ -855,8 +865,12 @@ IfrFind (
   }
 
 Done:
-  SafeFreePool (String[0]);
-  SafeFreePool (String[1]);
+  if (String[0] != NULL) {
+    FreePool (String[0]);
+  }
+  if (String[1] != NULL) {
+    FreePool (String[1]);
+  }  
 
   return Status;
 }
@@ -1025,8 +1039,12 @@ IfrToken (
   Result->Value.string = NewString (SubString, FormSet->HiiHandle);
 
 Done:
-  SafeFreePool (String[0]);
-  SafeFreePool (String[1]);
+  if (String[0] != NULL) {
+    FreePool (String[0]);
+  }
+  if (String[1] != NULL) {
+    FreePool (String[1]);
+  }  
 
   return Status;
 }
@@ -1129,8 +1147,12 @@ IfrSpan (
   Result->Value.u64 = StringPtr - String[1];
 
 Done:
-  SafeFreePool (String[0]);
-  SafeFreePool (String[1]);
+  if (String[0] != NULL) {
+    FreePool (String[0]);
+  }
+  if (String[1] != NULL) {
+    FreePool (String[1]);
+  }  
 
   return Status;
 }

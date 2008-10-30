@@ -549,7 +549,7 @@ UpdateOrderPage (
       );
   }
 
-  SafeFreePool (IfrOptionList);
+  FreePool (IfrOptionList);
 
   UpdatePageEnd (CallbackData);
 
@@ -626,7 +626,7 @@ UpdateBootNextPage (
       &gUpdateData
       );
 
-    SafeFreePool (IfrOptionList);
+    FreePool (IfrOptionList);
   }
 
   UpdatePageEnd (CallbackData);
@@ -771,8 +771,8 @@ UpdateConModePage (
     ValidMode,
     &gUpdateData
     );
-  SafeFreePool (IfrOptionList);
-  SafeFreePool (ModeToken);
+  FreePool (IfrOptionList);
+  FreePool (ModeToken);
 
   UpdatePageEnd (CallbackData);
 }
@@ -946,7 +946,7 @@ UpdateTerminalPage (
     &gUpdateData
     );
 
-  SafeFreePool (IfrOptionList);
+  FreePool (IfrOptionList);
 
   UpdatePageEnd (CallbackData);
 }
@@ -1063,14 +1063,14 @@ GetLegacyBootOptionVar (
         (BBS_BBS_DP == DevicePath->SubType)
         ) {
       *OptionIndex = OrderBuffer[Index];
-      SafeFreePool (OrderBuffer);
+      FreePool (OrderBuffer);
       return OptionBuffer;
     } else {
-      SafeFreePool (OptionBuffer);
+      FreePool (OptionBuffer);
     }
   }
 
-  SafeFreePool (OrderBuffer);
+  FreePool (OrderBuffer);
   return NULL;
 }
 
@@ -1271,7 +1271,7 @@ UpdateSetLegacyDeviceOrderPage (
   CopyMem (OldData, LegacyOrder, 100);
 
   if (IfrOptionList != NULL) {
-    SafeFreePool (IfrOptionList);
+    FreePool (IfrOptionList);
     IfrOptionList = NULL;
   }
 
