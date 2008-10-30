@@ -35,7 +35,6 @@ InitializeNtReset (
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
-STATIC
 VOID
 EFIAPI
 WinNtResetSystem (
@@ -85,7 +84,6 @@ Returns:
   return Status;
 }
 
-STATIC
 VOID
 EFIAPI
 WinNtResetSystem (

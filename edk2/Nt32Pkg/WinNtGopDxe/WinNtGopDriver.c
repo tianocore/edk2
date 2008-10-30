@@ -23,7 +23,6 @@ Abstract:
 **/
 #include "WinNtGop.h"
 
-STATIC
 EFI_STATUS
 FreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead

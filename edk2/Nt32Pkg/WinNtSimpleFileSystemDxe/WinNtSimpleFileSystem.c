@@ -1406,7 +1406,6 @@ Returns:
   return Status;
 }
 
-STATIC
 VOID
 WinNtSystemTimeToEfiTime (
   IN SYSTEMTIME             *SystemTime,
@@ -1908,7 +1907,6 @@ Done:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 WinNtSimpleFileSystemFileInfo (
   IN     WIN_NT_EFI_FILE_PRIVATE  *PrivateFile,

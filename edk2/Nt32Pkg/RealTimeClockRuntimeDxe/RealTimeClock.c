@@ -50,7 +50,6 @@ InitializeRealTimeClock (
   IN EFI_SYSTEM_TABLE                    *SystemTable
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtGetTime (
@@ -116,7 +115,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSetTime (
@@ -183,7 +181,6 @@ Returns:
   }
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtGetWakeupTime (
@@ -219,7 +216,6 @@ Returns:
   return EFI_UNSUPPORTED;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 WinNtSetWakeupTime (
