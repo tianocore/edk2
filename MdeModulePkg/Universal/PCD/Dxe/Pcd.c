@@ -23,7 +23,7 @@ Module Name: Pcd.c
 // host all distinct TokenSpace guid in both
 // PEI ExMap and DXE ExMap.
 //
-STATIC EFI_GUID *TmpTokenSpaceBuffer[PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZE] = { 0 };
+EFI_GUID *TmpTokenSpaceBuffer[PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZE] = { 0 };
 
 ///
 /// PCD database lock.
@@ -73,7 +73,7 @@ PCD_PROTOCOL mPcdInstance = {
 //
 // Static global to reduce the code size
 //
-STATIC EFI_HANDLE mNewHandle = NULL;
+EFI_HANDLE mNewHandle = NULL;
 
 /**
   Main entry for PCD DXE driver.

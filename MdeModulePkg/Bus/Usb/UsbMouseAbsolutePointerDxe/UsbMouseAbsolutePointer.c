@@ -77,19 +77,16 @@ EFI_DRIVER_BINDING_PROTOCOL gUsbMouseAbsolutePointerDriverBinding = {
 //
 // helper functions
 //
-STATIC
 BOOLEAN
 IsUsbMouseAbsolutePointer (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo
   );
 
-STATIC
 EFI_STATUS
 InitializeUsbMouseAbsolutePointerDevice (
   IN  USB_MOUSE_ABSOLUTE_POINTER_DEV           *UsbMouseAbsolutePointerDev
   );
 
-STATIC
 VOID
 EFIAPI
 UsbMouseAbsolutePointerWaitForInput (
@@ -100,7 +97,6 @@ UsbMouseAbsolutePointerWaitForInput (
 //
 // Mouse interrupt handler
 //
-STATIC
 EFI_STATUS
 EFIAPI
 OnMouseAbsolutePointerInterruptComplete (
@@ -113,7 +109,6 @@ OnMouseAbsolutePointerInterruptComplete (
 //
 // Mouse simulate TouchPad, Using AbsolutePointer Protocol
 //
-STATIC
 EFI_STATUS
 EFIAPI
 GetMouseAbsolutePointerState (
@@ -121,7 +116,6 @@ GetMouseAbsolutePointerState (
   OUT  EFI_ABSOLUTE_POINTER_STATE     *MouseAbsolutePointerState
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 UsbMouseAbsolutePointerReset (
@@ -638,7 +632,6 @@ IsUsbMouseAbsolutePointer (
                                 memory
 
 **/
-STATIC
 EFI_STATUS
 InitializeUsbMouseAbsolutePointerDevice (
   IN  USB_MOUSE_ABSOLUTE_POINTER_DEV           *UsbMouseAbsolutePointerDev
@@ -775,7 +768,6 @@ InitializeUsbMouseAbsolutePointerDevice (
   @return EFI_DEVICE_ERROR
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 OnMouseAbsolutePointerInterruptComplete (
@@ -860,7 +852,6 @@ OnMouseAbsolutePointerInterruptComplete (
   @return EFI_NOT_READY
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 GetMouseAbsolutePointerState (
@@ -909,7 +900,6 @@ GetMouseAbsolutePointerState (
   @return EFI_SUCCESS
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 UsbMouseAbsolutePointerReset (
@@ -945,7 +935,6 @@ UsbMouseAbsolutePointerReset (
  VOID
 
 **/
-STATIC
 VOID
 EFIAPI
 UsbMouseAbsolutePointerWaitForInput (

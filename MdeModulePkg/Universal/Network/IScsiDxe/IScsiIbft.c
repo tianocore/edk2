@@ -30,7 +30,6 @@ Abstract:
   @retval None.
 
 **/
-STATIC
 VOID
 IScsiInitIbfTableHeader (
   IN EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Header
@@ -61,7 +60,6 @@ IScsiInitIbfTableHeader (
   @retval None.
 
 **/
-STATIC
 VOID
 IScsiInitControlSection (
   IN EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Table,
@@ -106,7 +104,6 @@ IScsiInitControlSection (
   @retval None.
 
 **/
-STATIC
 VOID
 IScsiAddHeapItem (
   IN OUT UINT8  **Heap,
@@ -135,7 +132,6 @@ IScsiAddHeapItem (
   @retval None.
 
 **/
-STATIC
 VOID
 IScsiFillInitiatorSection (
   IN     EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Table,
@@ -197,7 +193,6 @@ IScsiFillInitiatorSection (
   @retval None.
 
 **/
-STATIC
 VOID
 IScsiMapV4ToV6Addr (
   IN  EFI_IPv4_ADDRESS *V4,
@@ -225,7 +220,6 @@ IScsiMapV4ToV6Addr (
   @retval UINT16          The composited representation of the NIC PCI location.
 
 **/
-STATIC
 UINT16
 IScsiGetNICPciLocation (
   IN EFI_HANDLE  Controller
@@ -279,7 +273,6 @@ IScsiGetNICPciLocation (
   @retval EFI_MAC_ADDRESS * The mac address.
 
 **/
-STATIC
 EFI_MAC_ADDRESS *
 IScsiGetMacAddress (
   IN EFI_HANDLE  Controller
@@ -312,7 +305,6 @@ IScsiGetMacAddress (
   @retval None.
 
 **/
-STATIC
 VOID
 IScsiFillNICAndTargetSections (
   IN     EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Table,

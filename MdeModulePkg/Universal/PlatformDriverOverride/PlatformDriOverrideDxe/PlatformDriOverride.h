@@ -28,7 +28,6 @@ Abstract:
 #include <Library/BaseLib.h>
 #include <Library/PlatDriOverLib.h>
 
-STATIC
 EFI_STATUS
 EFIAPI
 GetDriver (
@@ -37,7 +36,6 @@ GetDriver (
   IN OUT EFI_HANDLE                                     * DriverImageHandle
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 GetDriverPath (
@@ -46,7 +44,6 @@ GetDriverPath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL                       **DriverImagePath
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 DriverLoaded (

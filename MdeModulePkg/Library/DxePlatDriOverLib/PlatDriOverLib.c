@@ -20,7 +20,7 @@ Abstract:
 
 #include "PlatDriOver.h"
 
-STATIC LIST_ENTRY   mDevicePathStack = INITIALIZE_LIST_HEAD_VARIABLE (mDevicePathStack);
+LIST_ENTRY   mDevicePathStack = INITIALIZE_LIST_HEAD_VARIABLE (mDevicePathStack);
 
 
 /**

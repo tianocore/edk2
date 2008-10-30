@@ -36,7 +36,6 @@ Abstract:
   @retval Others                 Failed to retrieve the IP4 route table.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiIp4GetModeData (
@@ -821,7 +820,6 @@ Ip4StationAddressValid (
   @retval EFI_SUCCESS            The instance is configured.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiIp4Configure (
@@ -1050,7 +1048,6 @@ Ip4Groups (
   @retval Otherwise              It failed to change the setting.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiIp4Groups (
@@ -1112,7 +1109,6 @@ ON_EXIT:
   @retval Others                 Failed to modify the route table
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiIp4Routes (
@@ -1204,7 +1200,6 @@ ON_EXIT:
                                  context.
 
 **/
-STATIC
 EFI_STATUS
 Ip4TokenExist (
   IN NET_MAP                *Map,
@@ -1237,7 +1232,6 @@ Ip4TokenExist (
   @retval EFI_SUCCESS            The token is OK
 
 **/
-STATIC
 EFI_STATUS
 Ip4TxTokenValid (
   IN EFI_IP4_COMPLETION_TOKEN   *Token,
@@ -1365,7 +1359,6 @@ Ip4TxTokenValid (
   @return None
 
 **/
-STATIC
 VOID
 Ip4FreeTxToken (
   IN VOID                   *Context
@@ -1411,7 +1404,6 @@ Ip4FreeTxToken (
   @return None
 
 **/
-STATIC
 VOID
 Ip4OnPacketSent (
   IP4_PROTOCOL              *Ip4Instance,
@@ -1458,7 +1450,6 @@ Ip4OnPacketSent (
                                  for transmission.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiIp4Transmit (
@@ -1644,7 +1635,6 @@ ON_EXIT:
   @retval EFI_SUCCESS            The receive request has been issued.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiIp4Receive (
@@ -1722,7 +1712,6 @@ ON_EXIT:
   @retval EFI_ABORTED            The user's Token (Token != NULL) is cancelled.
 
 **/
-STATIC
 EFI_STATUS
 Ip4CancelTxTokens (
   IN NET_MAP                *Map,
@@ -1778,7 +1767,6 @@ Ip4CancelTxTokens (
                                  cancelled.
 
 **/
-STATIC
 EFI_STATUS
 Ip4CancelRxTokens (
   IN NET_MAP                *Map,
@@ -1901,7 +1889,6 @@ Ip4Cancel (
   @retval EFI_SUCCESS            The Token is cancelled.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiIp4Cancel (
@@ -1949,7 +1936,6 @@ ON_EXIT:
   @retval EFI_NOT_STARTED        The IP4 child hasn't been configured.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiIp4Poll (

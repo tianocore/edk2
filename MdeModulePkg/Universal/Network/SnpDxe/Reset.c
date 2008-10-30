@@ -30,7 +30,6 @@ Revision history:
   @return other for failed calls
 
 **/
-STATIC
 EFI_STATUS
 pxe_reset (
   SNP_DRIVER *snp

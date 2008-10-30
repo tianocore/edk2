@@ -1390,7 +1390,6 @@ badcdb:
   @return None
 
 **/
-STATIC
 UINT8
 ChkSum (
   IN  VOID   *Buffer,

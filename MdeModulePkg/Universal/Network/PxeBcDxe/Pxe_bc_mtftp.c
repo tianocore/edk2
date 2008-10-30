@@ -77,7 +77,6 @@ Swap64 (
   @return other :=
 
 **/
-STATIC
 EFI_STATUS
 TftpUdpRead (
   PXE_BASECODE_DEVICE         *Private,
@@ -167,7 +166,6 @@ TftpUdpRead (
 
 
 **/
-STATIC
 VOID
 SendError (
   PXE_BASECODE_DEVICE         *Private,
@@ -207,7 +205,6 @@ SendError (
 
 
 **/
-STATIC
 EFI_STATUS
 SendAckAndGetData (
   PXE_BASECODE_DEVICE         *Private,
@@ -336,7 +333,6 @@ SendAckAndGetData (
 
 
 **/
-STATIC
 EFI_STATUS
 LockStepReceive (
   PXE_BASECODE_DEVICE         *Private,
@@ -478,12 +474,12 @@ LockStepReceive (
 //
 // some literals
 //
-STATIC UINT8                      Mode[]          = MODE_BINARY;
-STATIC UINT8                      BlockSizeOp[]   = OP_BLKSIZE;
-STATIC UINT8                      TsizeOp[]       = OP_TFRSIZE;
-STATIC UINT8                      OverwriteOp[]   = OP_OVERWRITE;
-STATIC UINT8                      BigBlkNumOp[]   = OP_BIGBLKNUM;
-STATIC EFI_PXE_BASE_CODE_UDP_PORT TftpRequestPort = TFTP_OPEN_PORT;
+UINT8                      Mode[]          = MODE_BINARY;
+UINT8                      BlockSizeOp[]   = OP_BLKSIZE;
+UINT8                      TsizeOp[]       = OP_TFRSIZE;
+UINT8                      OverwriteOp[]   = OP_OVERWRITE;
+UINT8                      BigBlkNumOp[]   = OP_BIGBLKNUM;
+EFI_PXE_BASE_CODE_UDP_PORT TftpRequestPort = TFTP_OPEN_PORT;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -492,7 +488,6 @@ STATIC EFI_PXE_BASE_CODE_UDP_PORT TftpRequestPort = TFTP_OPEN_PORT;
   @return Pointer to value field if option found or NULL if not found.
 
 **/
-STATIC
 UINT8 *
 FindOption (
   UINT8 *OptionPtr,
@@ -521,7 +516,6 @@ FindOption (
 #define TSIZEOP     2 // transfer size
 #define OVERWRITEOP 4 // overwrite
 #define BIGBLKNUMOP 8 // big block numbers
-STATIC
 EFI_STATUS
 TftpRwReq (
   UINT16                      Req,
@@ -616,7 +610,6 @@ TftpRwReq (
 
 
 **/
-STATIC
 EFI_STATUS
 TftpRwReqwResp (
   UINT16                      Req,
@@ -738,7 +731,6 @@ TftpRwReqwResp (
 
 
 **/
-STATIC
 EFI_STATUS
 MtftpListen (
   PXE_BASECODE_DEVICE           *Private,
@@ -873,7 +865,6 @@ MtftpListen (
   @retval GOTUNI  returns NO_DATA go will go to TFTP session)
 
 **/
-STATIC
 EFI_STATUS
 MtftpOpen (
   PXE_BASECODE_DEVICE                                               * Private,
@@ -1069,7 +1060,6 @@ MtftpOpen (
 
 
 **/
-STATIC
 EFI_STATUS
 MtftpDownload (
   PXE_BASECODE_DEVICE           *Private,
@@ -1247,7 +1237,6 @@ MtftpDownload (
 
 
 **/
-STATIC
 EFI_STATUS
 TftpInfo (
   PXE_BASECODE_DEVICE         *Private,
@@ -1410,7 +1399,6 @@ TftpInfo (
 
 
 **/
-STATIC
 EFI_STATUS
 TftpDownload (
   PXE_BASECODE_DEVICE         *Private,
@@ -1578,7 +1566,6 @@ TftpDownload (
 
 
 **/
-STATIC
 EFI_STATUS
 TftpUpload (
   PXE_BASECODE_DEVICE *Private,

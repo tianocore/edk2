@@ -43,7 +43,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval The index of log entry in the array.
 
 **/
-STATIC
 PEI_PERFORMANCE_LOG_HEADER *
 InternalGetPerformanceHobLog (
   VOID
@@ -91,7 +90,6 @@ InternalGetPerformanceHobLog (
   @retval The index of log entry in the array.
 
 **/
-STATIC
 UINT32
 InternalSearchForLogEntry (
   IN PEI_PERFORMANCE_LOG_HEADER *PeiPerformanceLog,

@@ -421,7 +421,6 @@ ON_ERROR:
   @retval FALSE                This is unrelated packet.
 
 **/
-STATIC
 BOOLEAN
 Ip4CancelPacketFragments (
   IP4_LINK_TX_TOKEN   *Frame,

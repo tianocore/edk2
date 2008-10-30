@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Misc. functions local to this module..
 //
-STATIC
 VOID
 GetDebugPortVariable (
   DEBUGPORT_DEVICE            *DebugPortDevice

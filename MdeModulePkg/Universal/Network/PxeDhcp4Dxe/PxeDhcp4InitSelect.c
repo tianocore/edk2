@@ -30,7 +30,6 @@ Abstract:
 /**
 
 **/
-STATIC
 INTN
 offer_verify (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
@@ -146,9 +145,8 @@ offer_verify (
 /**
 
 **/
-STATIC
 INTN
-acknak_verify (
+acknak_verify_initselect (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
   IN DHCP4_PACKET           *tx_pkt,
   IN DHCP4_PACKET           *rx_pkt,
@@ -717,7 +715,7 @@ PxeDhcp4Select (
                 NULL,
                 &request,
                 &acknak,
-                &acknak_verify,
+                &acknak_verify_initselect,
                 seconds_timeout
                 );
 

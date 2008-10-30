@@ -21,11 +21,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Definitions for internet group management protocol version 2 message
 // structure Per RFC 2236, November 1997
 //
-STATIC UINT8      RouterAlertOption[4]  = { 0x80 | 20, 4, 0, 0 };
-STATIC IPV4_ADDR  AllRoutersGroup       = { { 224, 0, 0, 2 } };
+UINT8      RouterAlertOption[4]  = { 0x80 | 20, 4, 0, 0 };
+IPV4_ADDR  AllRoutersGroup       = { { 224, 0, 0, 2 } };
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 VOID
 ClearGroupTimer (
   PXE_BASECODE_DEVICE *Private,
@@ -54,7 +53,6 @@ ClearGroupTimer (
 
 
 **/
-STATIC
 VOID
 SetGroupTimer (
   PXE_BASECODE_DEVICE *Private,
@@ -107,7 +105,6 @@ SetGroupTimer (
 
 
 **/
-STATIC
 VOID
 SendIgmpMessage (
   PXE_BASECODE_DEVICE *Private,
@@ -143,7 +140,6 @@ SendIgmpMessage (
 
 
 **/
-STATIC
 VOID
 ReportIgmp (
   PXE_BASECODE_DEVICE *Private,
@@ -208,7 +204,6 @@ IgmpCheckTimers (
   @return other := Group ID#
 
 **/
-STATIC
 INTN
 FindMulticastGroup (
   PXE_BASECODE_DEVICE *Private,

@@ -121,7 +121,6 @@ Ip4DriverBindingSupported (
   return Status;
 }
 
-STATIC
 EFI_STATUS
 Ip4CleanService (
   IN IP4_SERVICE            *IpSb
@@ -141,7 +140,6 @@ Ip4CleanService (
   @retval EFI_SUCCESS            A new IP4 service binding private is created.
 
 **/
-STATIC
 EFI_STATUS
 Ip4CreateService (
   IN  EFI_HANDLE            Controller,

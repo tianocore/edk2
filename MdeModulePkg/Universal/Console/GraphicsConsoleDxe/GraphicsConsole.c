@@ -94,7 +94,7 @@ CheckModeSupported (
 //
 // Graphics Console Devcie Private Data template
 //
-STATIC GRAPHICS_CONSOLE_DEV    mGraphicsConsoleDevTemplate = {
+GRAPHICS_CONSOLE_DEV    mGraphicsConsoleDevTemplate = {
   GRAPHICS_CONSOLE_DEV_SIGNATURE,
   (EFI_GRAPHICS_OUTPUT_PROTOCOL *) NULL,
   (EFI_UGA_DRAW_PROTOCOL *) NULL,
@@ -132,11 +132,11 @@ EFI_HII_DATABASE_PROTOCOL   *mHiiDatabase;
 EFI_HII_FONT_PROTOCOL       *mHiiFont;
 BOOLEAN                     mFirstAccessFlag = TRUE;
 
-STATIC EFI_GUID             mFontPackageListGuid = {0xf5f219d3, 0x7006, 0x4648, 0xac, 0x8d, 0xd6, 0x1d, 0xfb, 0x7b, 0xc6, 0xad};
+EFI_GUID             mFontPackageListGuid = {0xf5f219d3, 0x7006, 0x4648, 0xac, 0x8d, 0xd6, 0x1d, 0xfb, 0x7b, 0xc6, 0xad};
 
-STATIC CHAR16               mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
+CHAR16               mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
-STATIC EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
+EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
   //
   // B     G     R
   //
@@ -158,13 +158,13 @@ STATIC EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
   {0xff, 0xff, 0xff, 0x00}  // WHITE
 };
 
-STATIC EFI_NARROW_GLYPH     mCursorGlyph = {
+EFI_NARROW_GLYPH     mCursorGlyph = {
   0x0000,
   0x00,
   { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF }
 };
 
-STATIC CHAR16       SpaceStr[] = { NARROW_CHAR, ' ', 0 };
+CHAR16       SpaceStr[] = { NARROW_CHAR, ' ', 0 };
 
 EFI_DRIVER_BINDING_PROTOCOL gGraphicsConsoleDriverBinding = {
   GraphicsConsoleControllerDriverSupported,

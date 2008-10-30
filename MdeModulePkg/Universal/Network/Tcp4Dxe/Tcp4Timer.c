@@ -24,37 +24,31 @@ Abstract:
 
 UINT32    mTcpTick = 1000;
 
-STATIC
 VOID
 TcpConnectTimeout (
   IN TCP_CB *Tcb
   );
 
-STATIC
 VOID
 TcpRexmitTimeout (
   IN TCP_CB *Tcb
   );
 
-STATIC
 VOID
 TcpProbeTimeout (
   IN TCP_CB *Tcb
   );
 
-STATIC
 VOID
 TcpKeepaliveTimeout (
   IN TCP_CB *Tcb
   );
 
-STATIC
 VOID
 TcpFinwait2Timeout (
   IN TCP_CB *Tcb
   );
 
-STATIC
 VOID
 Tcp2MSLTimeout (
   IN TCP_CB *Tcb
@@ -98,7 +92,6 @@ TcpClose (
   @return None.
 
 **/
-STATIC
 VOID
 TcpConnectTimeout (
   IN TCP_CB *Tcb
@@ -133,7 +126,6 @@ TcpConnectTimeout (
   @return None.
 
 **/
-STATIC
 VOID
 TcpRexmitTimeout (
   IN TCP_CB *Tcb
@@ -188,7 +180,6 @@ TcpRexmitTimeout (
   @return None.
 
 **/
-STATIC
 VOID
 TcpProbeTimeout (
   IN TCP_CB *Tcb
@@ -219,7 +210,6 @@ TcpProbeTimeout (
   @return None.
 
 **/
-STATIC
 VOID
 TcpKeepaliveTimeout (
   IN TCP_CB *Tcb
@@ -253,7 +243,6 @@ TcpKeepaliveTimeout (
   @return None.
 
 **/
-STATIC
 VOID
 TcpFinwait2Timeout (
   IN TCP_CB *Tcb
@@ -274,7 +263,6 @@ TcpFinwait2Timeout (
   @return None.
 
 **/
-STATIC
 VOID
 Tcp2MSLTimeout (
   IN TCP_CB *Tcb
@@ -297,7 +285,6 @@ Tcp2MSLTimeout (
   @return None.
 
 **/
-STATIC
 VOID
 TcpUpdateTimer (
   IN TCP_CB *Tcb

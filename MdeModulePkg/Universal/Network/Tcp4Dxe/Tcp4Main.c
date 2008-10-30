@@ -35,7 +35,6 @@ Abstract:
   @retval EFI_INVALID_PARAMETER    The integrity check is failed.
 
 **/
-STATIC
 EFI_STATUS
 Tcp4ChkDataBuf (
   IN UINT32                 DataLen,

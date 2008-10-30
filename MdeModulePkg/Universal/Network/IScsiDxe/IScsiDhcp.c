@@ -40,7 +40,6 @@ Abstract:
   @retval EFI_INVALID_PARAMETER The RootPath is mal-formatted.
 
 **/
-STATIC
 EFI_STATUS
 IScsiDhcpExtractRootPath (
   IN CHAR8                        *RootPath,
@@ -204,7 +203,6 @@ ON_EXIT:
                            in the Dhcp4Event.
 
 **/
-STATIC
 EFI_STATUS
 IScsiDhcpSelectOffer (
   IN  EFI_DHCP4_PROTOCOL  * This,

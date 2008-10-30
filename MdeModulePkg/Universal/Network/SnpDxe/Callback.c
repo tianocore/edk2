@@ -22,8 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // them in the snp structure because we will not know which snp structure
 // in the callback context!
 //
-STATIC BOOLEAN              mInitializeLock = TRUE;
-STATIC EFI_LOCK             mLock;
+BOOLEAN              mInitializeLock = TRUE;
+EFI_LOCK             mLock;
 
 //
 // End Global variables

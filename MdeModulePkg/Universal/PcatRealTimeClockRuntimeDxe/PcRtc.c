@@ -14,21 +14,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PcRtc.h"
 
-STATIC
 INTN
 CompareHMS (
   IN EFI_TIME   *From,
   IN EFI_TIME   *To
   );
 
-STATIC
 BOOLEAN
 IsWithinOneDay (
   IN EFI_TIME   *From,
   IN EFI_TIME   *To
   );
 
-STATIC
 UINT8
 RtcRead (
   IN  UINT8 Address
@@ -53,7 +50,6 @@ Returns:
   return IoRead8 (PCAT_RTC_DATA_REGISTER);
 }
 
-STATIC
 VOID
 RtcWrite (
   IN  UINT8   Address,
@@ -1034,7 +1030,6 @@ Returns:
   }
 }
 
-STATIC
 INTN
 CompareHMS (
   IN EFI_TIME   *From,
@@ -1071,7 +1066,6 @@ Returns:
   }
 }
 
-STATIC
 BOOLEAN
 IsWithinOneDay (
   IN EFI_TIME  *From,

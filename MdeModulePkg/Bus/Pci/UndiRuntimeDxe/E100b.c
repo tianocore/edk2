@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Undi32.h"
 
-static UINT8 basic_config_cmd[22] = {
+UINT8 basic_config_cmd[22] = {
                     22,        0x08,
                     0,           0,
                     0, (UINT8)0x80,
@@ -255,7 +255,6 @@ OutLong (
   @return TODO: add return values
 
 **/
-STATIC
 UINTN
 MapIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -318,7 +317,6 @@ MapIt (
   @return TODO: add return values
 
 **/
-STATIC
 VOID
 UnMapIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -357,7 +355,6 @@ UnMapIt (
 
 **/
 // TODO:    MicroSeconds - add argument and description to function comment
-STATIC
 VOID
 DelayIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -381,7 +378,6 @@ DelayIt (
 
 **/
 // TODO:    flag - add argument and description to function comment
-STATIC
 VOID
 BlockIt (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -404,7 +400,6 @@ BlockIt (
   @return TODO: add return values
 
 **/
-STATIC
 UINT8
 Load_Base_Regs (
   NIC_DATA_INSTANCE *AdapterInfo
@@ -449,7 +444,6 @@ Load_Base_Regs (
   @return TODO: add return values
 
 **/
-STATIC
 UINT8
 IssueCB (
   NIC_DATA_INSTANCE *AdapterInfo,
@@ -509,7 +503,6 @@ IssueCB (
   @return TODO: add return values
 
 **/
-STATIC
 UINT8
 Configure (
   NIC_DATA_INSTANCE *AdapterInfo
@@ -636,7 +629,6 @@ E100bSetupIAAddr (
 
 
 **/
-STATIC
 VOID
 StopRU (
   IN NIC_DATA_INSTANCE *AdapterInfo
@@ -673,7 +665,6 @@ StopRU (
   @retval -1                              Already Started
 
 **/
-STATIC
 INT8
 StartRU (
   NIC_DATA_INSTANCE *AdapterInfo
@@ -1766,7 +1757,6 @@ Recycle_RFD (
 #define EE_READ_CMD   6 // 110b
 #define EE_ERASE_CMD  (7 << 6)
 
-STATIC
 VOID
 shift_bits_out (
   IN NIC_DATA_INSTANCE *AdapterInfo,
@@ -1834,7 +1824,6 @@ Returns:
   @return TODO: add return values
 
 **/
-STATIC
 UINT16
 shift_bits_in (
   IN NIC_DATA_INSTANCE *AdapterInfo
@@ -1885,7 +1874,6 @@ shift_bits_in (
   @retval FALSE                           if it fails to get the exclusive access
 
 **/
-STATIC
 BOOLEAN
 E100bSetEepromLockOut (
   IN NIC_DATA_INSTANCE  *AdapterInfo
@@ -1932,7 +1920,6 @@ E100bSetEepromLockOut (
   @return None
 
 **/
-STATIC
 VOID
 E100bReSetEepromLockOut (
   IN NIC_DATA_INSTANCE  *AdapterInfo
@@ -3353,7 +3340,6 @@ CommandWaitForCompletion (
   @return TODO: add return values
 
 **/
-STATIC
 INT8
 SoftwareReset (
   NIC_DATA_INSTANCE *AdapterInfo

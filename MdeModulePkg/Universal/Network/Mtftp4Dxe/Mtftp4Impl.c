@@ -22,7 +22,6 @@ Abstract:
 
 #include "Mtftp4Impl.h"
 
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4ReadFile (
@@ -41,7 +40,6 @@ EfiMtftp4ReadFile (
   @retval EFI_SUCCESS            The operation parameter is saved in ModeData
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4GetModeData (
@@ -158,7 +156,6 @@ Mtftp4CleanOperation (
   @retval EFI_SUCCESS            The instance is configured for operation.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4Configure (
@@ -251,7 +248,6 @@ EfiMtftp4Configure (
   @retval EFI_ABORTED            Abort the ReadFile operation and return.
 
 **/
-STATIC
 EFI_STATUS
 Mtftp4GetInfoCheckPacket (
   IN EFI_MTFTP4_PROTOCOL    *This,
@@ -322,7 +318,6 @@ Mtftp4GetInfoCheckPacket (
   @retval Others                 Failed to get the information.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4GetInfo (
@@ -399,7 +394,6 @@ EfiMtftp4GetInfo (
   @retval EFI_SUCCESS            The packet is parsed.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4ParseOptions (
@@ -444,7 +438,6 @@ EfiMtftp4ParseOptions (
   @return TRUE if the override data is valid, otherwise FALSE.
 
 **/
-STATIC
 BOOLEAN
 Mtftp4OverrideValid (
   IN MTFTP4_PROTOCOL          *Instance,
@@ -547,7 +540,6 @@ Mtftp4GetMapping (
                                  session to unicast receive.
 
 **/
-STATIC
 EFI_STATUS
 Mtftp4ConfigUnicastPort (
   IN UDP_IO_PORT            *UdpIo,
@@ -613,7 +605,6 @@ Mtftp4ConfigUnicastPort (
   @retval EFI_SUCCESS            The operation is successfully started.
 
 **/
-STATIC
 EFI_STATUS
 Mtftp4Start (
   IN EFI_MTFTP4_PROTOCOL    *This,
@@ -801,7 +792,6 @@ ON_ERROR:
   @retval Others                 Some error happened.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4ReadFile (
@@ -825,7 +815,6 @@ EfiMtftp4ReadFile (
   @retval Others                 Some error happened.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4WriteFile (
@@ -850,7 +839,6 @@ EfiMtftp4WriteFile (
   @retval Others                 Some error happened.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4ReadDirectory (
@@ -872,7 +860,6 @@ EfiMtftp4ReadDirectory (
   @retval EFI_DEVICE_ERROR       The MTFTP session has been destoried.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EfiMtftp4Poll (

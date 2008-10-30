@@ -22,7 +22,7 @@ Abstract:
 
 #include "IScsiImpl.h"
 
-STATIC CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFabcdef";
+CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFabcdef";
 
 /**
   Removes (trims) specified leading and trailing characters from a string.
@@ -35,7 +35,6 @@ STATIC CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFabcdef";
   @retval NONE.
 
 **/
-static
 VOID
 StrTrim (
   IN OUT CHAR16   *str,

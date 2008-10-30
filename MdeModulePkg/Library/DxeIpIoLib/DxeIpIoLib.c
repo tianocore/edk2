@@ -58,7 +58,7 @@ EFI_IP4_CONFIG_DATA  mIpIoDefaultIpConfigData = {
   0
 };
 
-STATIC ICMP_ERROR_INFO  mIcmpErrMap[10] = {
+ICMP_ERROR_INFO  mIcmpErrMap[10] = {
   {FALSE, TRUE},
   {FALSE, TRUE},
   {TRUE, TRUE},
@@ -71,14 +71,12 @@ STATIC ICMP_ERROR_INFO  mIcmpErrMap[10] = {
   {FALSE, TRUE}
 };
 
-STATIC
 VOID
 EFIAPI
 IpIoTransmitHandlerDpc (
   IN VOID      *Context
   );
 
-STATIC
 VOID
 EFIAPI
 IpIoTransmitHandler (
@@ -101,7 +99,6 @@ IpIoTransmitHandler (
   @retval other                 The required operation failed.
 
 **/
-STATIC
 EFI_STATUS
 IpIoCreateIpChildOpenProtocol (
   IN  EFI_HANDLE  ControllerHandle,
@@ -164,7 +161,6 @@ IpIoCreateIpChildOpenProtocol (
   @retval other                 The required operation failed.
 
 **/
-STATIC
 EFI_STATUS
 IpIoCloseProtocolDestroyIpChild (
   IN EFI_HANDLE  ControllerHandle,
@@ -209,7 +205,6 @@ IpIoCloseProtocolDestroyIpChild (
   @retval EFI_ABORTED           This type of ICMP packet is not supported.
 
 **/
-STATIC
 EFI_STATUS
 IpIoIcmpHandler (
   IN IP_IO                *IpIo,
@@ -341,7 +336,6 @@ IpIoIcmpHandler (
   @return None.
 
 **/
-STATIC
 VOID
 IpIoExtFree (
   IN VOID  *Event
@@ -366,7 +360,6 @@ IpIoExtFree (
   @return resource limit occurred.
 
 **/
-STATIC
 IP_IO_SEND_ENTRY *
 IpIoCreateSndEntry (
   IN IP_IO             *IpIo,
@@ -502,7 +495,6 @@ ReleaseSndEntry:
   @return None.
 
 **/
-STATIC
 VOID
 IpIoDestroySndEntry (
   IN IP_IO_SEND_ENTRY  *SndEntry
@@ -535,7 +527,6 @@ IpIoDestroySndEntry (
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 IpIoTransmitHandlerDpc (
@@ -571,7 +562,6 @@ IpIoTransmitHandlerDpc (
 
 **/
 
-STATIC
 VOID
 EFIAPI
 IpIoTransmitHandler (
@@ -594,7 +584,6 @@ IpIoTransmitHandler (
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 IpIoDummyHandlerDpc (
@@ -631,7 +620,6 @@ IpIoDummyHandlerDpc (
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 IpIoDummyHandler (
@@ -655,7 +643,6 @@ IpIoDummyHandler (
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 IpIoListenHandlerDpc (
@@ -757,7 +744,6 @@ Resume:
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 IpIoListenHandler (

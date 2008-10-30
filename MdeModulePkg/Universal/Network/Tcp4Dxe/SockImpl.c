@@ -20,7 +20,6 @@ Abstract:
 
 #include "SockImpl.h"
 
-STATIC
 UINT32
 SockTcpDataToRcv (
   IN  SOCK_BUFFER   *SockBuffer,
@@ -28,7 +27,6 @@ SockTcpDataToRcv (
   IN  UINT32        BufLen
   );
 
-STATIC
 VOID
 SockProcessSndToken (
   IN SOCKET *Sock
@@ -56,7 +54,6 @@ SockFreeFoo (
   @return The length of the data can be retreived.
 
 **/
-STATIC
 UINT32
 SockTcpDataToRcv (
   IN  SOCK_BUFFER    *SockBuffer,
@@ -312,7 +309,6 @@ SockProcessTcpSndData (
   @return None.
 
 **/
-STATIC
 VOID
 SockFlushPendingToken (
   IN SOCKET         *Sock,
@@ -350,7 +346,6 @@ SockFlushPendingToken (
   @return None.
 
 **/
-STATIC
 VOID
 SockWakeConnToken (
   IN SOCKET *Sock
@@ -378,7 +373,6 @@ SockWakeConnToken (
   @return None.
 
 **/
-STATIC
 VOID
 SockWakeListenToken (
   IN SOCKET *Sock
@@ -425,7 +419,6 @@ SockWakeListenToken (
   @return None.
 
 **/
-STATIC
 VOID
 SockWakeRcvToken (
   IN SOCKET *Sock
@@ -472,7 +465,6 @@ SockWakeRcvToken (
   @return None.
 
 **/
-STATIC
 VOID
 SockProcessSndToken (
   IN SOCKET *Sock

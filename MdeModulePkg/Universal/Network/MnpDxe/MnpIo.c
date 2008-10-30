@@ -405,7 +405,6 @@ MnpInstanceDeliverPacket (
   @return None.
 
 **/
-STATIC
 VOID
 MnpDeliverPacket (
   IN MNP_SERVICE_DATA  *MnpServiceData
@@ -488,7 +487,6 @@ MnpRecycleRxData (
   @return None.
 
 **/
-STATIC
 VOID
 MnpQueueRcvdPacket (
   IN MNP_INSTANCE_DATA  *Instance,
@@ -550,7 +548,6 @@ MnpQueueRcvdPacket (
   @return The received packet matches the instance's receive filters or not.
 
 **/
-STATIC
 BOOLEAN
 MnpMatchPacket (
   IN MNP_INSTANCE_DATA                 *Instance,
@@ -632,7 +629,6 @@ MnpMatchPacket (
   @return None.
 
 **/
-STATIC
 VOID
 MnpAnalysePacket (
   IN  MNP_SERVICE_DATA                  *MnpServiceData,
@@ -729,7 +725,6 @@ MnpAnalysePacket (
   @return Pointer to a MNP_RXDATA_WRAP which wraps the RxData.
 
 **/
-STATIC
 MNP_RXDATA_WRAP *
 MnpWrapRxData (
   IN MNP_INSTANCE_DATA                 *Instance,
@@ -787,7 +782,6 @@ MnpWrapRxData (
   @return None.
 
 **/
-STATIC
 VOID
 MnpEnqueuePacket (
   IN MNP_SERVICE_DATA   *MnpServiceData,

@@ -38,7 +38,6 @@ Revision history:
   @retval Other               error return from undi call.
 
 **/
-STATIC
 EFI_STATUS
 pxe_fillheader (
   SNP_DRIVER      *snp,
@@ -151,7 +150,6 @@ pxe_fillheader (
   @retval Other               error return from undi call.
 
 **/
-STATIC
 EFI_STATUS
 pxe_transmit (
   SNP_DRIVER *snp,

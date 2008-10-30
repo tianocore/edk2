@@ -119,7 +119,6 @@ IpAddRouter (
 //
 // return router ip to use for DestIp (0 if none)
 //
-STATIC
 EFI_IP_ADDRESS *
 GetRouterIp (
   PXE_BASECODE_DEVICE *Private,
@@ -471,7 +470,6 @@ Ip4Send (
 //
 // return true if dst IP in receive header matched with what's enabled
 //
-STATIC
 BOOLEAN
 IPgood (
   PXE_BASECODE_DEVICE *Private,

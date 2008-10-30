@@ -33,7 +33,7 @@ SecurityPpiNotifyCallback (
   IN VOID                       *Ppi
   );
 
-STATIC EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
+EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
    &gEfiPeiSecurity2PpiGuid,
    SecurityPpiNotifyCallback

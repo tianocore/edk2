@@ -23,10 +23,10 @@ Abstract:
 // Definitions for ARP
 // Per RFC 826
 //
-STATIC ARP_HEADER ArpHeader;
+ARP_HEADER ArpHeader;
 
 #pragma pack(1)
-STATIC struct {
+struct {
   UINT8       MediaHeader[14];
   ARP_HEADER  ArpHeader;
   UINT8       ArpData[64];
@@ -307,7 +307,6 @@ GetHwAddr (
   @return other := ARP request could not be sent
 
 **/
-STATIC
 EFI_STATUS
 SendRequest (
   IN PXE_BASECODE_DEVICE  *Private,

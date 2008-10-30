@@ -42,7 +42,6 @@ LIST_ENTRY      mIScsiConfigFormList = {
   @retval None.
 
 **/
-STATIC
 VOID
 IScsiIpToStr (
   IN  EFI_IPv4_ADDRESS  *Ip,
@@ -218,7 +217,6 @@ IScsiUpdateDeviceList (
   @retval The iSCSI configuration form entry found.
 
 **/
-STATIC
 ISCSI_CONFIG_FORM_ENTRY *
 IScsiGetConfigFormEntryByIndex (
   IN UINT32 Index
@@ -253,7 +251,6 @@ IScsiGetConfigFormEntryByIndex (
   @retval None.
 
 **/
-STATIC
 VOID
 IScsiConvertDeviceConfigDataToIfrNvData (
   IN ISCSI_CONFIG_FORM_ENTRY  *ConfigFormEntry,

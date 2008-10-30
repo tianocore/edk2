@@ -31,9 +31,8 @@ Abstract:
   @return 1 = accept, stop waiting
 
 **/
-STATIC
 INTN
-acknak_verify (
+acknak_verify_renewrebind (
   IN PXE_DHCP4_PRIVATE_DATA *Private,
   IN DHCP4_PACKET           *tx_pkt,
   IN DHCP4_PACKET           *rx_pkt,
@@ -171,7 +170,6 @@ acknak_verify (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 EFI_STATUS
 EFIAPI
 renew_rebind (
@@ -338,7 +336,7 @@ renew_rebind (
                 &subnet_mask,
                 &Request,
                 &AckNak,
-                &acknak_verify,
+                &acknak_verify_renewrebind,
                 seconds_timeout
                 );
 

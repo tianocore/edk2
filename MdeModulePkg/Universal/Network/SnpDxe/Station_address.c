@@ -103,7 +103,6 @@ pxe_get_stn_addr (
 
 
 **/
-STATIC
 EFI_STATUS
 pxe_set_stn_addr (
   SNP_DRIVER      *snp,

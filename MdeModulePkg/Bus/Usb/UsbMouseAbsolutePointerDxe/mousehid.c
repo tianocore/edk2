@@ -36,7 +36,6 @@ Abstract:
   @return Position
 
 **/
-STATIC
 UINT8 *
 GetNextItem (
   IN  UINT8    *StartPos,
@@ -136,7 +135,6 @@ GetNextItem (
   @return HidItem Data
 
 **/
-STATIC
 UINT32
 GetItemData (
   IN  HID_ITEM *HidItem
@@ -169,7 +167,6 @@ GetItemData (
 
 
 **/
-STATIC
 VOID
 ParseLocalItem (
   IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
@@ -216,7 +213,6 @@ ParseLocalItem (
   }
 }
 
-STATIC
 VOID
 ParseGlobalItem (
   IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
@@ -257,7 +253,6 @@ ParseGlobalItem (
   @return VOID
 
 **/
-STATIC
 VOID
 ParseMainItem (
   IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,
@@ -280,7 +275,6 @@ ParseMainItem (
   @return VOID
 
 **/
-STATIC
 VOID
 ParseHidItem (
   IN  USB_MOUSE_ABSOLUTE_POINTER_DEV   *UsbMouseAbsolutePointer,

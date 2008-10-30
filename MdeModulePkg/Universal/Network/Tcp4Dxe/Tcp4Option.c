@@ -22,7 +22,6 @@ Abstract:
 
 #include "Tcp4Main.h"
 
-STATIC
 UINT16
 TcpGetUint16 (
   IN UINT8 *Buf
@@ -44,7 +43,6 @@ TcpGetUint16 (
 //   CopyMem (Buf, &Data, sizeof (UINT16));
 // }
 
-STATIC
 UINT32
 TcpGetUint32 (
   IN UINT8 *Buf
@@ -55,7 +53,6 @@ TcpGetUint32 (
   return NTOHL (Value);
 }
 
-STATIC
 VOID
 TcpPutUint32 (
   IN UINT8  *Buf,

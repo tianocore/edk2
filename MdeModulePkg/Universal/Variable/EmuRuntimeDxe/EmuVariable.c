@@ -26,7 +26,6 @@ ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
-STATIC
 VOID
 AcquireLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
@@ -42,7 +41,6 @@ AcquireLockOnlyAtBootTime (
 // when EfiAcquireLock in UefiLib can handle the
 // the call in UEFI Runtimer driver in RT phase.
 //
-STATIC
 VOID
 ReleaseLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
@@ -53,7 +51,6 @@ ReleaseLockOnlyAtBootTime (
   }
 }
 
-STATIC
 UINT8 *
 GetVariableDataPtr (
   IN  VARIABLE_HEADER   *Variable
@@ -83,7 +80,6 @@ Returns:
   return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + Variable->NameSize + GET_PAD_SIZE (Variable->NameSize));
 }
 
-STATIC
 VARIABLE_HEADER *
 GetNextVariablePtr (
   IN  VARIABLE_HEADER   *Variable
@@ -123,7 +119,6 @@ Returns:
   return VarHeader;
 }
 
-STATIC
 VARIABLE_HEADER *
 GetEndPointer (
   IN VARIABLE_STORE_HEADER       *VolHeader
@@ -150,7 +145,6 @@ Returns:
   return (VARIABLE_HEADER *) ((UINTN) VolHeader + VolHeader->Size);
 }
 
-STATIC
 EFI_STATUS
 FindVariable (
   IN  CHAR16                  *VariableName,
@@ -796,7 +790,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 InitializeVariableStore (
   OUT EFI_PHYSICAL_ADDRESS  *VariableBase,

@@ -44,7 +44,6 @@ CHAR8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
   @retval EFI_SUCCESS            The packet has been parsed into the Options array.
 
 **/
-STATIC
 EFI_STATUS
 Mtftp4FillOptions (
   IN  EFI_MTFTP4_PACKET     *Packet,
@@ -260,7 +259,6 @@ NetStringToU32 (
   @retval EFI_SUCCESS            The IP is parsed into the Ip
 
 **/
-STATIC
 EFI_STATUS
 NetStringToIp (
   IN  UINT8                 *Str,
@@ -317,7 +315,6 @@ NetStringToIp (
   @retval EFI_SUCCESS            The multicast value is parsed into the Option
 
 **/
-STATIC
 EFI_STATUS
 Mtftp4ExtractMcast (
   IN UINT8                  *Value,

@@ -54,7 +54,7 @@ PCD_PPI mPcdPpiInstance = {
   PeiPcdGetNextTokenSpace
 };
 
-STATIC EFI_PEI_PPI_DESCRIPTOR  mPpiPCD = {
+EFI_PEI_PPI_DESCRIPTOR  mPpiPCD = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gPcdPpiGuid,
   &mPcdPpiInstance
