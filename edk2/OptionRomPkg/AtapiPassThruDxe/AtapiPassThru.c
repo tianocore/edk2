@@ -13,12 +13,12 @@
 #include "AtapiPassThru.h"
 
 
-static SCSI_COMMAND_SET     gEndTable = { 0xff, (DATA_DIRECTION) 0xff };
+SCSI_COMMAND_SET     gEndTable = { 0xff, (DATA_DIRECTION) 0xff };
 
 ///
 /// This table contains all the supported ATAPI commands.
 ///
-static SCSI_COMMAND_SET     gSupportedATAPICommands[] = {
+SCSI_COMMAND_SET     gSupportedATAPICommands[] = {
   { OP_INQUIRY,                     DataIn  },
   { OP_LOAD_UNLOAD_CD,              NoData  },
   { OP_MECHANISM_STATUS,            DataIn  },

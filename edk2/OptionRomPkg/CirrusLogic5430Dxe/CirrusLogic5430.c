@@ -718,7 +718,6 @@ SetDefaultPalette (
   TODO: add return values
 
 **/
-STATIC
 VOID
 ClearScreen (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
