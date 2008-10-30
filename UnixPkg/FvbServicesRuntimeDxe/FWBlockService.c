@@ -1213,7 +1213,6 @@ Returns:
           );
 }
 
-STATIC
 EFI_STATUS
 ValidateFvHeader (
   EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader

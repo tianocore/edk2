@@ -83,7 +83,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixUgaSimpleTextInReadKeyStroke (
@@ -130,7 +129,6 @@ Returns:
   return Status;
 }
 
-STATIC
 VOID
 EFIAPI
 UnixUgaSimpleTextInWaitForKey (

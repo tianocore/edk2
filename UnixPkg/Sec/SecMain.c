@@ -133,7 +133,6 @@ SecSwitchStack (
   UINT32   PermenentMemoryBase
   );
 
-STATIC
 EFI_PHYSICAL_ADDRESS *
 MapMemory (
   INTN fd,
@@ -141,7 +140,6 @@ MapMemory (
   INTN   prot,
   INTN   flags);
 
-STATIC
 EFI_STATUS
 MapFile (
   IN  CHAR8                     *FileName,

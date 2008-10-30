@@ -66,10 +66,10 @@ typedef struct
   EFI_INPUT_KEY keys[NBR_KEYS];
 } UGA_IO_PRIVATE;
 
-static void
+void
 HandleEvents(UGA_IO_PRIVATE *drv);
 
-static void
+void
 fill_shift_mask (struct uga_drv_shift_mask *sm, unsigned long mask)
 {
   sm->shift = 0;
@@ -87,7 +87,7 @@ fill_shift_mask (struct uga_drv_shift_mask *sm, unsigned long mask)
   sm->csize = 8 - sm->size;
 }
 
-static int
+int
 TryCreateShmImage(UGA_IO_PRIVATE *drv)
 {
   drv->image = XShmCreateImage (drv->display, drv->visual,
@@ -139,7 +139,6 @@ TryCreateShmImage(UGA_IO_PRIVATE *drv)
   return 1;
 }
 
-static
 EFI_STATUS
 UgaClose (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
 {
@@ -163,7 +162,6 @@ UgaClose (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
   return EFI_SUCCESS;
 }
 
-static
 EFI_STATUS
 UgaSize(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height)
 {
@@ -220,7 +218,7 @@ UgaSize(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height)
   return EFI_SUCCESS;
 }
 
-static void
+void
 handleKeyEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
 {
   KeySym keysym;
@@ -270,7 +268,7 @@ handleKeyEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
   drv->key_count++;
 }
 
-static void
+void
 Redraw(UGA_IO_PRIVATE *drv, UINTN X, UINTN Y, UINTN Width, UINTN Height)
 {
   if (drv->use_shm)
@@ -282,7 +280,7 @@ Redraw(UGA_IO_PRIVATE *drv, UINTN X, UINTN Y, UINTN Width, UINTN Height)
   XFlush(drv->display);
 }
 
-static void
+void
 HandleEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
 {
   switch (ev->type)
@@ -313,7 +311,7 @@ HandleEvent(UGA_IO_PRIVATE *drv, XEvent *ev)
     }
 }
 
-static void
+void
 HandleEvents(UGA_IO_PRIVATE *drv)
 {
   while (XPending(drv->display) != 0)
@@ -325,7 +323,6 @@ HandleEvents(UGA_IO_PRIVATE *drv)
     }
 }
 
-static
 unsigned long
 UgaPixelToColor (UGA_IO_PRIVATE *drv, EFI_UGA_PIXEL pixel)
 {
@@ -334,7 +331,6 @@ UgaPixelToColor (UGA_IO_PRIVATE *drv, EFI_UGA_PIXEL pixel)
     | ((pixel.Blue >> drv->b.csize) << drv->b.shift);
 }
 
-static
 EFI_UGA_PIXEL
 UgaColorToPixel (UGA_IO_PRIVATE *drv, unsigned long val)
 {
@@ -349,7 +345,6 @@ UgaColorToPixel (UGA_IO_PRIVATE *drv, unsigned long val)
   return res;
 }
 
-static
 EFI_STATUS
 UgaCheckKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
 {
@@ -364,7 +359,6 @@ UgaCheckKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
   }
 }
 
-static
 EFI_STATUS
 UgaGetKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key)
 {

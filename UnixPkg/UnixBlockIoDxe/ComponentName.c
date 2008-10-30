@@ -49,7 +49,7 @@ EFI_COMPONENT_NAME_PROTOCOL     gUnixBlockIoComponentName = {
   "eng"
 };
 
-static EFI_UNICODE_STRING_TABLE mUnixBlockIoDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE mUnixBlockIoDriverNameTable[] = {
   { "eng", L"Unix Block I/O Driver" },
   { NULL , NULL }
 };

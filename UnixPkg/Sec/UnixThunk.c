@@ -34,11 +34,11 @@ Abstract:
 #include "SecMain.h"
 #include "Library/UnixLib.h"
 
-static int settimer_initialized;
-static struct timeval settimer_timeval;
-static void (*settimer_callback)(UINT64 delta);
+int settimer_initialized;
+struct timeval settimer_timeval;
+void (*settimer_callback)(UINT64 delta);
 
-static void
+void
 settimer_handler (int sig)
 {
   struct timeval timeval;
@@ -53,7 +53,6 @@ settimer_handler (int sig)
     (*settimer_callback)(delta);
 }
 
-static
 VOID
 SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs))
 {
@@ -119,10 +118,10 @@ GetLocalTime (EFI_TIME *Time)
     | (tm->tm_isdst > 0 ? EFI_TIME_IN_DAYLIGHT : 0);
 }
 
-static void
+void
 TzSet (void)
 {
-  static int done = 0;
+  STATIC int done = 0;
   if (!done) {
     tzset ();
     done = 1;

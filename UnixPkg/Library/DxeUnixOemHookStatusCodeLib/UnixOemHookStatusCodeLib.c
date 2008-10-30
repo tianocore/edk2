@@ -28,13 +28,11 @@
 //
 // Cache of UnixThunk protocol 
 //
-STATIC
 EFI_UNIX_THUNK_PROTOCOL   *mUnix;
 
 //
 // Cache of standard output handle . 
 //
-STATIC
 int                      mStdOut;
 
 /**

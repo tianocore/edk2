@@ -99,7 +99,6 @@ typedef struct {
 // Simple Text Out protocol member functions
 //
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutReset (
@@ -124,7 +123,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutOutputString (
@@ -149,7 +147,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutTestString (
@@ -174,7 +171,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutQueryMode (
@@ -227,7 +223,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutSetAttribute (
@@ -252,7 +247,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutClearScreen (
@@ -275,7 +269,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutSetCursorPosition (
@@ -302,7 +295,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutEnableCursor (
@@ -377,7 +369,6 @@ Returns:
 //
 // Simple Text In protocol member functions.
 //
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextInReset (
@@ -402,7 +393,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextInReadKeyStroke (
@@ -427,7 +417,6 @@ Returns:
 --*/
 ;
 
-STATIC
 VOID
 EFIAPI
 UnixSimpleTextInWaitForKey (

@@ -27,28 +27,24 @@ Abstract:
 //
 
 #if 0
-STATIC
 VOID
 UnixSimpleTextOutScrollScreen (
   IN OUT  UNIX_SIMPLE_TEXT_PRIVATE_DATA *Console
   );
 
 #endif
-STATIC
 VOID
 UnixSimpleTextOutPutChar (
   IN OUT  UNIX_SIMPLE_TEXT_PRIVATE_DATA     *Console,
   IN      CHAR16                              Char
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutSetAttribute (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *This,
   IN UINTN                          Attribute
   );
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutSetMode (
@@ -62,7 +58,7 @@ UnixSimpleTextOutSetMode (
 #define MAX_SIMPLE_TEXT_OUT_MODE  \
         (sizeof(mUnixSimpleTextOutSupportedModes)/sizeof(UNIX_SIMPLE_TEXT_OUT_MODE))
 
-STATIC UNIX_SIMPLE_TEXT_OUT_MODE  mUnixSimpleTextOutSupportedModes[] = {
+UNIX_SIMPLE_TEXT_OUT_MODE  mUnixSimpleTextOutSupportedModes[] = {
   { 80, 25 },         
 #if 0
   { 80, 50 },         
@@ -72,7 +68,6 @@ STATIC UNIX_SIMPLE_TEXT_OUT_MODE  mUnixSimpleTextOutSupportedModes[] = {
 #endif
 };
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutReset (
@@ -106,7 +101,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutOutputString (
@@ -170,7 +164,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 VOID
 UnixSimpleTextOutPutChar (
   IN OUT  UNIX_SIMPLE_TEXT_PRIVATE_DATA   *Console,
@@ -198,7 +191,6 @@ Returns:
 }
 
 #if 0
-STATIC
 VOID
 UnixSimpleTextOutScrollScreen (
   IN OUT  UNIX_SIMPLE_TEXT_PRIVATE_DATA *Console
@@ -223,7 +215,6 @@ Returns:
 #endif
 
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutTestString (
@@ -258,7 +249,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutQueryMode (
@@ -301,7 +291,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutSetMode (
@@ -342,7 +331,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutSetAttribute (
@@ -378,7 +366,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutClearScreen (
@@ -429,7 +416,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutSetCursorPosition (
@@ -488,7 +474,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixSimpleTextOutEnableCursor (

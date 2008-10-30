@@ -57,7 +57,6 @@ EFI_DRIVER_BINDING_PROTOCOL gUnixSerialIoDriverBinding = {
   NULL
 };
 
-STATIC
 UINTN
 ConvertBaud2Unix (
   UINT64 BaudRate
@@ -133,7 +132,6 @@ ConvertBaud2Unix (
   return -1;
 }
 
-STATIC
 UINTN
 ConvertByteSize2Unix (
   UINT8 DataBit
@@ -154,7 +152,6 @@ ConvertByteSize2Unix (
   return -1;
 }
 
-STATIC
 VOID
 ConvertParity2Unix (
   struct termios    *Options,
@@ -184,7 +181,6 @@ ConvertParity2Unix (
   }
 }
 
-STATIC 
 VOID
 ConvertStopBit2Unix (
   struct termios      *Options,

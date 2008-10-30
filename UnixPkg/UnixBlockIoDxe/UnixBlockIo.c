@@ -67,7 +67,6 @@ Abstract:
 //
 // Block IO protocol member functions
 //
-STATIC
 EFI_STATUS
 EFIAPI
 UnixBlockIoReadBlocks (
@@ -98,7 +97,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixBlockIoWriteBlocks (
@@ -129,7 +127,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixBlockIoFlushBlocks (
@@ -152,7 +149,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixBlockIoResetBlock (
@@ -180,7 +176,6 @@ Returns:
 //
 // Private Worker functions
 //
-STATIC
 EFI_STATUS
 UnixBlockIoCreateMapping (
   IN EFI_UNIX_IO_PROTOCOL             *UnixIo,
@@ -215,7 +210,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 UnixBlockIoReadWriteCommon (
   IN  UNIX_BLOCK_IO_PRIVATE *Private,
@@ -247,7 +241,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 UnixBlockIoError (
   IN UNIX_BLOCK_IO_PRIVATE      *Private
@@ -269,7 +262,6 @@ Returns:
 --*/
 ;
 
-STATIC
 EFI_STATUS
 UnixBlockIoOpenDevice (
   UNIX_BLOCK_IO_PRIVATE         *Private
@@ -291,7 +283,6 @@ Returns:
 --*/
 ;
 
-STATIC
 CHAR16                                    *
 GetNextElementPastTerminator (
   IN  CHAR16  *EnvironmentVariable,
@@ -596,7 +587,6 @@ Returns:
   return Status;
 }
 
-STATIC
 CHAR16 *
 GetNextElementPastTerminator (
   IN  CHAR16  *EnvironmentVariable,
@@ -632,7 +622,6 @@ Returns:
   return Ptr;
 }
 
-STATIC
 EFI_STATUS
 UnixBlockIoCreateMapping (
   IN EFI_UNIX_IO_PROTOCOL             *UnixIo,
@@ -747,7 +736,6 @@ Returns:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 UnixBlockIoOpenDevice (
   UNIX_BLOCK_IO_PRIVATE                 *Private
@@ -855,7 +843,6 @@ Done:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 UnixBlockIoError (
   IN UNIX_BLOCK_IO_PRIVATE      *Private
@@ -930,7 +917,6 @@ Returns:
 #endif
 }
 
-STATIC
 EFI_STATUS
 UnixBlockIoReadWriteCommon (
   IN  UNIX_BLOCK_IO_PRIVATE     *Private,
@@ -1026,7 +1012,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixBlockIoReadBlocks (
@@ -1092,7 +1077,6 @@ Done:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixBlockIoWriteBlocks (
@@ -1160,7 +1144,6 @@ Done:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixBlockIoFlushBlocks (
@@ -1184,7 +1167,6 @@ UnixBlockIoFlushBlocks (
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 UnixBlockIoResetBlock (

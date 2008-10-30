@@ -49,7 +49,7 @@ EFI_COMPONENT_NAME_PROTOCOL     gUnixSerialIoComponentName = {
   "eng"
 };
 
-static EFI_UNICODE_STRING_TABLE mUnixSerialIoDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE mUnixSerialIoDriverNameTable[] = {
   { "eng", L"Unix Serial I/O Driver" },
   { NULL , NULL }
 };
