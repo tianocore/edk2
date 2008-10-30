@@ -26,7 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   checked correctly since it is now mapped into CreateEventEx() in UEFI 2.0.
 
 **/
-STATIC
 VOID
 EFIAPI
 InternalEmptyFuntion (
