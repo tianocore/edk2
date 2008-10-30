@@ -378,7 +378,9 @@ Returns:
   }
 
 Done:
-  SafeFreePool (Iso639AsciiLanguage);
+	if (Iso639AsciiLanguage != NULL) {
+    FreePool (Iso639AsciiLanguage);
+  }
   
   return Status;
 }

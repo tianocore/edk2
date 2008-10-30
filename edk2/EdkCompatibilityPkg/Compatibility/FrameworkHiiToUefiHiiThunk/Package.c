@@ -322,7 +322,7 @@ UefiRegisterPackageList(
               &ThunkContext->UefiHiiHandle
               );
   if (Status == EFI_INVALID_PARAMETER) {
-    SafeFreePool (PackageListHeader);
+    FreePool (PackageListHeader);
     
     //
     // UEFI HII database does not allow two package list with the same GUID.
@@ -386,7 +386,9 @@ Done:
     *Handle = ThunkContext->FwHiiHandle;
   }
 
-  SafeFreePool (PackageListHeader);
+	if (PackageListHeader != NULL) {
+    FreePool (PackageListHeader);
+  }
   
   return Status;
 }

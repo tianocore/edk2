@@ -508,7 +508,9 @@ ThunkExtractConfig (
                                             );
   }
 
-  SafeFreePool (Data);
+  if (Data != NULL) {
+    FreePool (Data);
+  }
   return Status;
 }
 

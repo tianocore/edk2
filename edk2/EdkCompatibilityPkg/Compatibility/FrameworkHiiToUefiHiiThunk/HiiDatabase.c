@@ -408,7 +408,9 @@ Returns:
 
 Done:
   FreePool (LangCodes3066);
-  SafeFreePool (LangCodes639);
+  if (LangCodes639 != NULL) {
+    FreePool (LangCodes639);
+  }
 
   return Status;
 }
@@ -491,11 +493,18 @@ Returns:
   *LanguageString = AsciiStrToUnicodeStr (SecLangCodes639, UnicodeSecLangCodes639);
 
 Done:
-  
-  SafeFreePool (PrimaryLang639);
-  SafeFreePool (SecLangCodes639);
-  SafeFreePool (SecLangCodes3066);
-  SafeFreePool (UnicodeSecLangCodes639);
+  if (PrimaryLang639 != NULL) {
+    FreePool (PrimaryLang639);
+  }
+  if (SecLangCodes639 != NULL) {
+    FreePool (SecLangCodes639);
+  }
+  if (SecLangCodes3066 != NULL) {
+    FreePool (SecLangCodes3066);
+  }
+  if (UnicodeSecLangCodes639 != NULL) {
+    FreePool (UnicodeSecLangCodes639);
+  }
   
   return Status;
 }
