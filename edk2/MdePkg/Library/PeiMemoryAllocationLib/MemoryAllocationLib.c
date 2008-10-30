@@ -650,22 +650,3 @@ FreePool (
 }
 
 
-/**
-  Frees buffer that were previously allocated with one of the
-  memory allocation functions in the Memory Allocation Library.
-
-  @param  Buffer                Pointer to the buffer of pages
-                                to free.
-
-**/
-VOID
-EFIAPI
-SafeFreePool (
-  IN VOID   *Buffer
-  )
-{
-  //
-  // PEI phase does not support to free pool, so leave it as NOP.
-  //
-}
-
