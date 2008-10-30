@@ -391,7 +391,6 @@ AddOpCode (
   
   @return the statue of locating HII protocol
 **/
-STATIC
 EFI_STATUS
 GetHiiInterface (
   OUT     EFI_HII_PROTOCOL    **Hii

@@ -22,8 +22,8 @@
 //
 // Globle varible to cache pointer to CpuIo protocol.
 //
-STATIC EFI_CPU_IO_PROTOCOL              *mCpuIo = NULL;
-STATIC EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *mPciRootBridgeIo = NULL;
+EFI_CPU_IO_PROTOCOL              *mCpuIo = NULL;
+EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *mPciRootBridgeIo = NULL;
 
 /**
   The constructor function caches the pointer to CpuIo protocol.

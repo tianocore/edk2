@@ -24,7 +24,6 @@
   @retval FALSE     Language 1 and language 2 are not the same.
 
 **/
-STATIC
 BOOLEAN
 CompareIso639LanguageCode (
   IN CONST CHAR8  *Language1,

@@ -36,7 +36,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return The size of a device path in bytes.
 
 **/
-STATIC
 UINTN
 EFIAPI
 SmmGetDevicePathSize (

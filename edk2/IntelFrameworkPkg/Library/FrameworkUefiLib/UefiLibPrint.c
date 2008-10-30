@@ -33,7 +33,6 @@
 
 **/
 
-STATIC
 UINTN
 InternalPrint (
   IN  CONST CHAR16                     *Format,
@@ -156,7 +155,6 @@ ErrorPrint (
 
 **/
 
-STATIC
 UINTN
 AsciiInternalPrint (
   IN  CONST CHAR8                      *Format,
