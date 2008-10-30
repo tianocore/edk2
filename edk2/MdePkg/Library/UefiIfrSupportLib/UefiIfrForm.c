@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "UefiIfrLibraryInternal.h"
 
 CONST EFI_FORM_BROWSER2_PROTOCOL      *mFormBrowser2     = NULL;
-CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *mHiiConfigRouting = NULL;
+CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *mIfrSupportLibHiiConfigRouting = NULL;
 
 /**
   This function locate FormBrowser2 protocols for later usage.
@@ -39,8 +39,8 @@ LocateFormBrowser2Protocols (
     }
   }
   
-  if (mHiiConfigRouting == NULL) {
-    Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &mHiiConfigRouting);
+  if (mIfrSupportLibHiiConfigRouting == NULL) {
+    Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &mIfrSupportLibHiiConfigRouting);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -809,8 +809,8 @@ GetBrowserData (
   //
   // Convert <ConfigResp> to buffer data
   //
-  Status = mHiiConfigRouting->ConfigToBlock (
-                               mHiiConfigRouting,
+  Status = mIfrSupportLibHiiConfigRouting->ConfigToBlock (
+                               mIfrSupportLibHiiConfigRouting,
                                ConfigResp,
                                Buffer,
                                BufferSize,
@@ -909,8 +909,8 @@ SetBrowserData (
   //
   // Convert buffer to <ConfigResp>
   //
-  Status = mHiiConfigRouting->BlockToConfig (
-                                mHiiConfigRouting,
+  Status = mIfrSupportLibHiiConfigRouting->BlockToConfig (
+                                mIfrSupportLibHiiConfigRouting,
                                 ConfigRequest,
                                 Buffer,
                                 BufferSize,
