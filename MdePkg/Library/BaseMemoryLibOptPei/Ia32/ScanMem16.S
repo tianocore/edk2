@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   ScanMem16.Asm
+#   ScanMem16.S
 #
 # Abstract:
 #

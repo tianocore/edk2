@@ -46,7 +46,7 @@ ASM_PFX(InternalMemCopyMem):
     mov     rax, rdi                    # rax <- Destination as return value
     jae     _InternalMemCopyMem_al_0000
     cmp     r9, rdi
-    jae     _atSym_CopyBackward               # Copy backward if overlapped
+    jae     _atSym_CopyBackward         # Copy backward if overlapped
 _InternalMemCopyMem_al_0000:
     mov     rcx, r8
     and     r8, 7

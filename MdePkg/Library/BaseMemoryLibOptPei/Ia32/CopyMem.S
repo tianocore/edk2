@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   CopyMem.Asm
+#   CopyMem.S
 #
 # Abstract:
 #

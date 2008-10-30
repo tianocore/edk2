@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   ScanMem8.Asm
+#   ScanMem8.S
 #
 # Abstract:
 #
