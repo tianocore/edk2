@@ -1,7 +1,7 @@
 /** @file
-  Serial I/O Port library functions with no library constructor/destructor
+  UART Serial Port library instance with empty functions.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,11 +12,10 @@
 
 **/
 
-
 #include <Base.h>
 
-#include <Library/IoLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/IoLib.h>
 
 //---------------------------------------------
 // UART Register Offsets
@@ -42,17 +41,25 @@
 #define LSR_RXDA                0x01
 #define DLAB                    0x01
 
-UINT16  gComBase = 0x3f8;
-UINTN   gBps = 115200;
-UINT8   gData = 8;
-UINT8   gStop = 1;
-UINT8   gParity = 0;
+//---------------------------------------------
+// UART Settings
+//---------------------------------------------
+UINT16  gUartBase = 0x3F8;
+UINTN   gBps      = 115200;
+UINT8   gData     = 8;
+UINT8   gStop     = 1;
+UINT8   gParity   = 0;
 UINT8   gBreakSet = 0;
-/*
 
-  Programmed hardware of Serial port.
-
-  @return    Always return EFI_UNSUPPORTED.
+/**
+  Initialize the serial device hardware.
+  
+  If no initialization is required, then return RETURN_SUCCESS.
+  If the serial device was successfuly initialized, then return RETURN_SUCCESS.
+  If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
+  
+  @retval RETURN_SUCCESS        The serial device was initialized.
+  @retval RETURN_DEVICE_ERROR   The serail device could not be initialized.
 
 **/
 RETURN_STATUS
@@ -61,49 +68,58 @@ SerialPortInitialize (
   VOID
   )
 {
-  UINTN           Divisor;
-  UINT8           OutputData;
-  UINT8           Data;
+  UINTN  Divisor;
+  UINT8  OutputData;
+  UINT8  Data;
 
- //
+  //
   // Map 5..8 to 0..3
   //
-  Data = (UINT8) (gData - (UINT8)5);
+  Data = (UINT8) (gData - (UINT8) 5);
 
   //
   // Calculate divisor for baud generator
   //
-  Divisor = 115200 / gBps; 
+  Divisor = 115200 / gBps;
   
   //
   // Set communications format
   //
-  OutputData = (UINT8)((DLAB << 7) | ((gBreakSet << 6) | ((gParity << 3) | ((gStop << 2) | Data))));
-  IoWrite8 (gComBase + LCR_OFFSET, OutputData);
+  OutputData = (UINT8) ((DLAB << 7) | (gBreakSet << 6) | (gParity << 3) | (gStop << 2) | Data);
+  IoWrite8 ((UINTN) (gUartBase + LCR_OFFSET), OutputData);
 
   //
   // Configure baud rate
   //
-  IoWrite8 (gComBase + BAUD_HIGH_OFFSET, (UINT8)(Divisor >> 8));
-  IoWrite8 (gComBase + BAUD_LOW_OFFSET, (UINT8)(Divisor & 0xff));
+  IoWrite8 ((UINTN) (gUartBase + BAUD_HIGH_OFFSET), (UINT8) (Divisor >> 8));
+  IoWrite8 ((UINTN) (gUartBase + BAUD_LOW_OFFSET), (UINT8) (Divisor & 0xff));
 
   //
   // Switch back to bank 0
   //
-  OutputData = (UINT8)((~DLAB<<7)|((gBreakSet<<6)|((gParity<<3)|((gStop<<2)| Data))));
-  IoWrite8 (gComBase + LCR_OFFSET, OutputData);
+  OutputData = (UINT8) ((~DLAB << 7) | (gBreakSet << 6) | (gParity << 3) | (gStop << 2) | Data);
+  IoWrite8 ((UINTN) (gUartBase + LCR_OFFSET), OutputData);
 
   return RETURN_SUCCESS;
 }
 
 /**
-  Write data to serial device.
+  Write data from buffer to serial device. 
+ 
+  Writes NumberOfBytes data bytes from Buffer to the serial device.  
+  The number of bytes actually written to the serial device is returned.
+  If the return value is less than NumberOfBytes, then the write operation failed.
 
-  @param  Buffer           Point of data buffer which need to be writed.
-  @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
+  If Buffer is NULL, then ASSERT(). 
 
-  @retval 0                Write data failed.
-  @retval !0               Actual number of bytes writed to serial device.
+  If NumberOfBytes is zero, then return 0.
+
+  @param  Buffer           Pointer to the data buffer to be written.
+  @param  NumberOfBytes    Number of bytes to written to the serial device.
+
+  @retval 0                NumberOfBytes is 0.
+  @retval >0               The number of bytes written to the serial device.  
+                           If this value is less than NumberOfBytes, then the read operation failed.
 
 **/
 UINTN
@@ -113,39 +129,38 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
 )
 {
-  UINTN Result;
-  UINT8 Data;
+  UINTN  Result;
+  UINT8  Data;
 
-  if (NULL == Buffer) {
+  if (Buffer == NULL) {
     return 0;
   }
 
   Result = NumberOfBytes;
 
   while (NumberOfBytes--) {
-      //
-      // Wait for the serail port to be ready.
-      //
-      do {
-        Data = IoRead8 (gComBase + LSR_OFFSET);
-      } while ((Data & LSR_TXRDY) == 0);
-
-      IoWrite8 (gComBase, *Buffer++);
+    //
+    // Wait for the serail port to be ready.
+    //
+    do {
+      Data = IoRead8 ((UINT16) gUartBase + LSR_OFFSET);
+    } while ((Data & LSR_TXRDY) == 0);
+    IoWrite8 ((UINT16) gUartBase, *Buffer++);
   }
 
   return Result;
-
 }
 
 
 /**
-  Read data from serial device and save the datas in buffer.
+  Reads data from a serial device into a buffer.
 
-  @param  Buffer           Point of data buffer which need to be writed.
-  @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
+  @param  Buffer           Pointer to the data buffer to store the data read from the serial device.
+  @param  NumberOfBytes    Number of bytes to read from the serial device.
 
-  @retval 0                Read data failed.
-  @retval !0               Aactual number of bytes read from serial device.
+  @retval 0                NumberOfBytes is 0.
+  @retval >0               The number of bytes read from the serial device.  
+                           If this value is less than NumberOfBytes, then the read operation failed.
 
 **/
 UINTN
@@ -155,6 +170,53 @@ SerialPortRead (
   IN  UINTN     NumberOfBytes
 )
 {
-  return 0;
+  UINTN  Result;
+  UINT8  Data;
+
+  if (NULL == Buffer) {
+    return 0;
+  }
+
+  Result = NumberOfBytes;
+
+  while (NumberOfBytes--) {
+    //
+    // Wait for the serail port to be ready.
+    //
+    do {
+      Data = IoRead8 ((UINT16) gUartBase + LSR_OFFSET);
+    } while ((Data & LSR_RXDA) == 0);
+
+    *Buffer++ = IoRead8 ((UINT16) gUartBase);
+  }
+
+  return Result;
+}
+
+/**
+  Polls a serial device to see if there is any data waiting to be read.
+
+  Polls aserial device to see if there is any data waiting to be read.
+  If there is data waiting to be read from the serial device, then TRUE is returned.
+  If there is no data waiting to be read from the serial device, then FALSE is returned.
+
+  @retval TRUE             Data is waiting to be read from the serial device.
+  @retval FALSE            There is no data waiting to be read from the serial device.
+
+**/
+BOOLEAN
+EFIAPI
+SerialPortPoll (
+  VOID
+  )
+{
+  UINT8  Data;
+
+  //
+  // Read the serial port status.
+  //
+  Data = IoRead8 ((UINT16) gUartBase + LSR_OFFSET);
+
+  return (BOOLEAN) ((Data & LSR_RXDA) != 0);
 }
 
