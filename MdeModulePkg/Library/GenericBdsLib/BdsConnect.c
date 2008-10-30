@@ -176,7 +176,7 @@ BdsLibConnectDevicePath (
   } while (DevicePath != NULL);
 
   if (CopyOfDevicePath != NULL) {
-    SafeFreePool (CopyOfDevicePath);
+    FreePool (CopyOfDevicePath);
   }
   //
   // All handle with DevicePath exists in the handle database
@@ -220,7 +220,9 @@ BdsLibConnectAllEfi (
     Status = gBS->ConnectController (HandleBuffer[Index], NULL, NULL, TRUE);
   }
 
-  SafeFreePool (HandleBuffer);
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
 
   return EFI_SUCCESS;
 }
@@ -263,7 +265,9 @@ BdsLibDisconnectAllEfi (
     Status = gBS->DisconnectController (HandleBuffer[Index], NULL, NULL);
   }
 
-  SafeFreePool (HandleBuffer);
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
 
   return EFI_SUCCESS;
 }

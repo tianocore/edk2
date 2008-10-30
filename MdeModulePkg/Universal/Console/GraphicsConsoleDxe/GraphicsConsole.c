@@ -393,8 +393,8 @@ GraphicsConsoleControllerDriverStart (
     PackageList = HiiLibPreparePackageList (1, &mFontPackageListGuid, Package);
     Status = mHiiDatabase->NewPackageList (mHiiDatabase, PackageList, NULL, &(Private->HiiHandle));
     ASSERT_EFI_ERROR (Status);
-    SafeFreePool (PackageList);
-    SafeFreePool (Package);
+    FreePool (PackageList);
+    FreePool (Package);
 
     mFirstAccessFlag = FALSE;
   }
@@ -1205,8 +1205,10 @@ GraphicsConsoleConOutTestString (
                          &Blt,
                          NULL
                          );
-    SafeFreePool (Blt);
-    Blt = NULL;
+    if (Blt != NULL) {
+      FreePool (Blt);
+      Blt = NULL;
+    }
     Count++;
 
     if (EFI_ERROR (Status)) {
@@ -1754,7 +1756,7 @@ DrawUnicodeWeightAtCursorN (
 
   String = AllocateCopyPool ((Count + 1) * sizeof (CHAR16), UnicodeWeight);
   if (String == NULL) {
-    SafeFreePool (Blt);
+    FreePool (Blt);
     return EFI_OUT_OF_RESOURCES;
   }
   //
@@ -1764,8 +1766,8 @@ DrawUnicodeWeightAtCursorN (
 
   FontInfo = (EFI_FONT_DISPLAY_INFO *) AllocateZeroPool (sizeof (EFI_FONT_DISPLAY_INFO));
   if (FontInfo == NULL) {
-    SafeFreePool (Blt);
-    SafeFreePool (String);
+    FreePool (Blt);
+    FreePool (String);
     return EFI_OUT_OF_RESOURCES;
   }
   //
@@ -1803,8 +1805,8 @@ DrawUnicodeWeightAtCursorN (
 
     Blt->Image.Bitmap = AllocateZeroPool (Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     if (Blt->Image.Bitmap == NULL) {
-      SafeFreePool (Blt);
-      SafeFreePool (String);
+      FreePool (Blt);
+      FreePool (String);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -1847,15 +1849,21 @@ DrawUnicodeWeightAtCursorN (
                           );
     }
 
-    SafeFreePool (RowInfoArray);
-    SafeFreePool (Blt->Image.Bitmap);
+    FreePool (RowInfoArray);
+    FreePool (Blt->Image.Bitmap);
   } else {
     Status = EFI_UNSUPPORTED;
   }
 
-  SafeFreePool (Blt);
-  SafeFreePool (String);
-  SafeFreePool (FontInfo);
+  if (Blt != NULL) {
+    FreePool (Blt);
+  }
+  if (String != NULL) {
+    FreePool (String);
+  }
+  if (FontInfo != NULL) {
+    FreePool (FontInfo);
+  }
   return Status;
 }
 

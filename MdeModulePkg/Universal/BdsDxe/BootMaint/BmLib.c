@@ -125,7 +125,9 @@ EfiGrowBuffer (
   TryAgain = FALSE;
   if (*Status == EFI_BUFFER_TOO_SMALL) {
 
-    SafeFreePool (*Buffer);
+    if (*Buffer != NULL) {
+      FreePool (*Buffer);
+    }
 
     *Buffer = AllocateZeroPool (BufferSize);
 
@@ -139,7 +141,7 @@ EfiGrowBuffer (
   // If there's an error, free the buffer
   //
   if (!TryAgain && EFI_ERROR (*Status) && (*Buffer != NULL)) {
-    SafeFreePool (*Buffer);
+    FreePool (*Buffer);
     *Buffer = NULL;
   }
 
@@ -201,7 +203,7 @@ EfiLibDeleteVariable (
     //
     Status = gRT->SetVariable (VarName, VarGuid, VAR_FLAG, 0, NULL);
     ASSERT (!EFI_ERROR (Status));
-    SafeFreePool (VarBuf);
+    FreePool (VarBuf);
   }
 
   return Status;
@@ -373,7 +375,7 @@ EfiReallocatePool (
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
-    SafeFreePool (OldPool);
+    FreePool (OldPool);
   }
 
   return NewPool;

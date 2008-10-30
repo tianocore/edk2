@@ -724,7 +724,9 @@ NewStringCpy (
   IN CHAR16           *Src
   )
 {
-  SafeFreePool (*Dest);
+  if (*Dest != NULL) {
+    FreePool (*Dest);
+  }
   *Dest = AllocateCopyPool (StrSize (Src), Src);
   ASSERT (*Dest != NULL);
 }
@@ -865,7 +867,9 @@ SetValueByName (
     Node = NAME_VALUE_NODE_FROM_LINK (Link);
 
     if (StrCmp (Name, Node->Name) == 0) {
-      SafeFreePool (Node->EditValue);
+      if (Node->EditValue != NULL) {
+        FreePool (Node->EditValue);
+      }
       Node->EditValue = AllocateCopyPool (StrSize (Value), Value);
       ASSERT (Node->EditValue != NULL);
       return EFI_SUCCESS;

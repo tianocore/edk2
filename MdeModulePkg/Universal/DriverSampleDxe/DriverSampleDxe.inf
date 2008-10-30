@@ -70,5 +70,5 @@
 
 
 [Depex]
-  gEfiSimpleTextOutProtocolGuid AND gEfiHiiDatabaseProtocolGuid
+  gEfiSimpleTextOutProtocolGuid AND gEfiHiiDatabaseProtocolGuid AND gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
 

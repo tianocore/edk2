@@ -1024,7 +1024,9 @@ IsSystemFontInfo (
 
 Exit:
   if (SystemInfo == NULL) {
-    SafeFreePool (SystemDefault);    
+    if (SystemDefault != NULL) {
+      FreePool (SystemDefault);
+    }
   }
   return Flag;
 }
@@ -1646,7 +1648,9 @@ HiiStringToImage (
     Status = GetGlyphBuffer (Private, *StringPtr, FontInfo, &GlyphBuf[Index], &Cell[Index], &Attributes[Index]);
     if (Status == EFI_NOT_FOUND) {
       if ((Flags & EFI_HII_IGNORE_IF_NO_GLYPH) == EFI_HII_IGNORE_IF_NO_GLYPH) {
-        SafeFreePool (GlyphBuf[Index]);
+        if (GlyphBuf[Index] != NULL) {
+          FreePool (GlyphBuf[Index]);
+        }
         GlyphBuf[Index] = NULL;
         StringPtr++;
       } else {
@@ -1871,11 +1875,11 @@ HiiStringToImage (
                                         0
                                         );
         if (EFI_ERROR (Status)) {
-          SafeFreePool (BltBuffer);
+          FreePool (BltBuffer);
           goto Exit;
         }
 
-        SafeFreePool (BltBuffer);
+        FreePool (BltBuffer);
 
       } else {
         for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
@@ -1938,7 +1942,7 @@ HiiStringToImage (
     Image->Height = 600;
     Image->Image.Bitmap = AllocateZeroPool (Image->Width * Image->Height *sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     if (Image->Image.Bitmap == NULL) {
-      SafeFreePool (Image);
+      FreePool (Image);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -1970,16 +1974,34 @@ HiiStringToImage (
 Exit:
 
   for (Index = 0; Index < MAX_STRING_LENGTH; Index++) {
-    SafeFreePool (GlyphBuf[Index]);
+    if (GlyphBuf[Index] != NULL) {
+      FreePool (GlyphBuf[Index]);
+    }
   }
-  SafeFreePool (StringIn);
-  SafeFreePool (StringIn2);
-  SafeFreePool (StringInfoOut);
-  SafeFreePool (RowInfo);
-  SafeFreePool (SystemDefault);
-  SafeFreePool (GlyphBuf);
-  SafeFreePool (Cell);
-  SafeFreePool (Attributes);
+  if (StringIn != NULL) {
+    FreePool (StringIn);
+  }
+  if (StringIn2 != NULL) {
+    FreePool (StringIn2);
+  }
+  if (StringInfoOut != NULL) {
+    FreePool (StringInfoOut);
+  }
+  if (RowInfo != NULL) {
+    FreePool (RowInfo);
+  }
+  if (SystemDefault != NULL) {
+    FreePool (SystemDefault);
+  }
+  if (GlyphBuf != NULL) {
+    FreePool (GlyphBuf);
+  }
+  if (Cell != NULL) {
+    FreePool (Cell);
+  }
+  if (Attributes != NULL) {
+    FreePool (Attributes);
+  }
 
   return Status;
 }
@@ -2113,7 +2135,7 @@ HiiStringIdToImage (
                                 &StringFontInfo
                                 );
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    SafeFreePool (String);
+    FreePool (String);
     String = (EFI_STRING) AllocateZeroPool (StringSize);
     if (String == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -2180,9 +2202,15 @@ HiiStringIdToImage (
            );
 
 Exit:
-  SafeFreePool (String);
-  SafeFreePool (StringFontInfo);
-  SafeFreePool (NewStringInfo);
+  if (String != NULL) {
+    FreePool (String);
+  }
+  if (StringFontInfo != NULL) {
+    FreePool (StringFontInfo);
+  }
+  if (NewStringInfo != NULL) {
+    FreePool (NewStringInfo);
+  }
 
   return Status;
 }
@@ -2296,7 +2324,7 @@ HiiGetGlyph (
 
   Image->Image.Bitmap = AllocateZeroPool (Image->Width * Image->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
   if (Image->Image.Bitmap == NULL) {
-    SafeFreePool (Image);
+    FreePool (Image);
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
@@ -2337,10 +2365,18 @@ Exit:
     }
   }
 
-  SafeFreePool (SystemDefault);
-  SafeFreePool (StringInfoOut);
-  SafeFreePool (String);
-  SafeFreePool (GlyphBuffer);
+  if (SystemDefault != NULL) {
+   FreePool (SystemDefault);
+  }
+  if (StringInfoOut != NULL) {
+    FreePool (StringInfoOut);
+  }
+  if (String != NULL) {
+    FreePool (String);
+  }
+  if (GlyphBuffer != NULL) {
+    FreePool (GlyphBuffer);
+  }
 
   return Status;
 }
@@ -2539,8 +2575,12 @@ Exit:
     *FontHandle = LocalFontHandle;
   }
 
-  SafeFreePool (SystemDefault);
-  SafeFreePool (FontInfo);
+  if (SystemDefault != NULL) {
+   FreePool (SystemDefault);
+  }
+  if (FontInfo != NULL) {
+   FreePool (FontInfo);
+  }
   return Status;
 }
 

@@ -324,7 +324,8 @@ BdsCreateLegacyBootOption (
                   Buffer
                   );
 
-  SafeFreePool (Buffer);
+  FreePool (Buffer);
+  
   Buffer = NULL;
 
   NewBootOrderList = AllocateZeroPool (*BootOrderListSize + sizeof (UINT16));
@@ -334,11 +335,10 @@ BdsCreateLegacyBootOption (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  if (NULL != *BootOrderList) {
+  if (*BootOrderList != NULL) {
     CopyMem (NewBootOrderList, *BootOrderList, *BootOrderListSize);
+    FreePool (*BootOrderList);
   }
-
-  SafeFreePool (*BootOrderList);
 
   BootOrderLastIndex                    = (UINTN) (*BootOrderListSize / sizeof (UINT16));
   NewBootOrderList[BootOrderLastIndex]  = CurrentBootOptionNo;
@@ -462,7 +462,9 @@ BdsDeleteAllInvalidLegacyBootOptions (
                       &BootOptionSize
                       );
     if (NULL == BootOptionVar) {
-      SafeFreePool (BootOrder);
+      if (BootOrder != NULL) {
+        FreePool (BootOrder);
+      }
       return EFI_OUT_OF_RESOURCES;
     }
   
@@ -470,7 +472,9 @@ BdsDeleteAllInvalidLegacyBootOptions (
     // Skip Non-Legacy boot options
     // 
     if (!BdsIsLegacyBootOption (BootOptionVar, &BbsEntry, &BbsIndex)) {
-      SafeFreePool (BootOptionVar);
+      if (BootOptionVar!= NULL) {
+        FreePool (BootOptionVar);
+      }
       Index++;
       continue;
     }
@@ -499,7 +503,9 @@ BdsDeleteAllInvalidLegacyBootOptions (
       continue;
     }
 
-    SafeFreePool (BootOptionVar);
+    if (BootOptionVar != NULL) {
+      FreePool (BootOptionVar);
+    }
     //
     // should delete
     //
@@ -525,7 +531,9 @@ BdsDeleteAllInvalidLegacyBootOptions (
     EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
   }
 
-  SafeFreePool (BootOrder);
+  if (BootOrder != NULL) {
+    FreePool (BootOrder);
+  }
 
   return Status;
 }
@@ -588,19 +596,19 @@ BdsFindLegacyBootOptionByDevType (
     // Skip Non-legacy boot option
     //
     if (!BdsIsLegacyBootOption (BootOptionVar, &BbsEntry, BbsIndex)) {
-      SafeFreePool (BootOptionVar);
+      FreePool (BootOptionVar);
       continue;
     }
 
     if (BbsEntry->DeviceType != DevType) {
-      SafeFreePool (BootOptionVar);
+      FreePool (BootOptionVar);
       continue;
     }
 
     *Attribute    = *(UINT32 *) BootOptionVar;
     *OptionNumber = Index;
     Found         = TRUE;
-    SafeFreePool (BootOptionVar);
+    FreePool (BootOptionVar);
     break;
   }
 
@@ -767,7 +775,7 @@ BdsAddNonExistingLegacyBootOptions (
   }
 
   if (BootOrder != NULL) {
-    SafeFreePool (BootOrder);
+    FreePool (BootOrder);
   }
 
   return Status;
@@ -952,7 +960,7 @@ BdsCreateDevOrder (
                   TotalSize,
                   DevOrder
                   );
-  SafeFreePool (DevOrder);
+  FreePool (DevOrder);
 
   return Status;
 }
@@ -1382,7 +1390,7 @@ BdsUpdateLegacyDevOrder (
     }
   }
 
-  SafeFreePool (DevOrder);
+  FreePool (DevOrder);
 
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
@@ -1391,7 +1399,7 @@ BdsUpdateLegacyDevOrder (
                   TotalSize,
                   NewDevOrder
                   );
-  SafeFreePool (NewDevOrder);
+  FreePool (NewDevOrder);
 
   return Status;
 }
@@ -1442,7 +1450,7 @@ BdsSetBootPriority4SameTypeDev (
   }
 
   if (DevOrder >= OrigBuffer + DevOrderSize) {
-    SafeFreePool (OrigBuffer);
+    FreePool (OrigBuffer);
     return EFI_NOT_FOUND;
   }
 
@@ -1463,7 +1471,7 @@ BdsSetBootPriority4SameTypeDev (
     }
   }
 
-  SafeFreePool (OrigBuffer);
+  FreePool (OrigBuffer);
   return EFI_SUCCESS;
 }
 
@@ -1619,7 +1627,7 @@ BdsRefreshBbsTableForBoot (
     Ptr += StrSize ((UINT16 *) Ptr);
     DevPath = (EFI_DEVICE_PATH_PROTOCOL *) Ptr;
     if (BBS_DEVICE_PATH != DevPath->Type || BBS_BBS_DP != DevPath->SubType) {
-      SafeFreePool (BootOptionVar);
+      FreePool (BootOptionVar);
       continue;
     }
 
@@ -1628,7 +1636,7 @@ BdsRefreshBbsTableForBoot (
       //
       // We don't want to process twice for a device type
       //
-      SafeFreePool (BootOptionVar);
+      FreePool (BootOptionVar);
       continue;
     }
 
@@ -1637,14 +1645,14 @@ BdsRefreshBbsTableForBoot (
               LocalBbsTable,
               &Priority
               );
-    SafeFreePool (BootOptionVar);
+    FreePool (BootOptionVar);
     if (EFI_ERROR (Status)) {
       break;
     }
   }
 
   if (BootOrder != NULL) {
-    SafeFreePool (BootOrder);
+    FreePool (BootOrder);
   }
   //
   // For debug

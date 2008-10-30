@@ -127,13 +127,13 @@ GetDevicePath (
   Length /= 2;
   *DevicePath = (UINT8 *) AllocateZeroPool (Length);
   if (*DevicePath == NULL) {
-    SafeFreePool (DevicePathString);
+    FreePool (DevicePathString);
     return EFI_OUT_OF_RESOURCES;
   }
 
   HexStringToBufInReverseOrder (*DevicePath, &Length, DevicePathString);
 
-  SafeFreePool (DevicePathString);
+  FreePool (DevicePathString);
 
   return EFI_SUCCESS;
 
@@ -202,7 +202,9 @@ ExportAllStorage (
                );
   }
   if (EFI_ERROR (Status)) {
-    SafeFreePool (HandleBuffer);
+    if (HandleBuffer != NULL) {
+      FreePool (HandleBuffer);
+    }
     return Status;
   }
 
@@ -219,8 +221,8 @@ ExportAllStorage (
       Status = HiiExportPackageLists (HiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
     }
     if (EFI_ERROR (Status)) {
-      SafeFreePool (HandleBuffer);
-      SafeFreePool (HiiPackageList);
+      FreePool (HandleBuffer);
+      FreePool (HiiPackageList);
       return Status;
     }
 
@@ -270,9 +272,9 @@ ExportAllStorage (
 
         Status = HiiGetPackageListHandle (HiiDatabase, HiiHandle, &DriverHandle);
         if (EFI_ERROR (Status)) {
-          SafeFreePool (HandleBuffer);
-          SafeFreePool (HiiPackageList);
-          SafeFreePool (Storage);
+          FreePool (HandleBuffer);
+          FreePool (HiiPackageList);
+          FreePool (Storage);
           return Status;
         }
         Storage->DriverHandle = DriverHandle;
@@ -305,10 +307,10 @@ ExportAllStorage (
       }
     }
 
-    SafeFreePool (HiiPackageList);
+    FreePool (HiiPackageList);
   }
 
-  SafeFreePool (HandleBuffer);
+  FreePool (HandleBuffer);
 
   return EFI_SUCCESS;
 }
@@ -603,7 +605,9 @@ GetValueOfNumber (
   Status  = EFI_SUCCESS;
 
 Exit:
-  SafeFreePool (Str);
+  if (Str != NULL) {
+    FreePool (Str);
+  }
   return Status;
 }
 
@@ -738,7 +742,7 @@ HiiConfigRoutingExtractConfig (
     //
     Status = GetDevicePath (ConfigRequest, (UINT8 **) &DevicePath);
     if (EFI_ERROR (Status)) {
-      SafeFreePool (ConfigRequest);
+      FreePool (ConfigRequest);
       return Status;
     }
 
@@ -765,7 +769,7 @@ HiiConfigRoutingExtractConfig (
       }
     }
 
-    SafeFreePool (DevicePath);
+    FreePool (DevicePath);
 
     if (DriverHandle == NULL) {
       //
@@ -773,7 +777,7 @@ HiiConfigRoutingExtractConfig (
       // Set Progress to the 'G' in "GUID" of the routing header.
       //
       *Progress = StringPtr;
-      SafeFreePool (ConfigRequest);
+      FreePool (ConfigRequest);
       return EFI_NOT_FOUND;
     }
 
@@ -802,7 +806,7 @@ HiiConfigRoutingExtractConfig (
       for (TmpPtr = StringPtr; CompareMem (TmpPtr, AccessProgress, RemainSize) != 0; TmpPtr++);
       *Progress = TmpPtr;
 
-      SafeFreePool (ConfigRequest);
+      FreePool (ConfigRequest);
       return Status;
     }
 
@@ -812,9 +816,9 @@ HiiConfigRoutingExtractConfig (
     ASSERT (*AccessProgress == 0);
     Status = AppendToMultiString (Results, AccessResults);
     ASSERT_EFI_ERROR (Status);
-    SafeFreePool (AccessResults);
+    FreePool (AccessResults);
     AccessResults = NULL;
-    SafeFreePool (ConfigRequest);
+    FreePool (ConfigRequest);
     ConfigRequest = NULL;
 
     //
@@ -951,7 +955,7 @@ HiiConfigRoutingExportConfig (
     
     ConfigRequest = (EFI_STRING) AllocateZeroPool (RequestSize);
     if (ConfigRequest == NULL) {
-      SafeFreePool (PathHdr);
+      FreePool (PathHdr);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -997,7 +1001,7 @@ HiiConfigRoutingExportConfig (
     StringPtr += StrLen (L"PATH=");
     StrCpy (StringPtr, PathHdr);
 
-    SafeFreePool (PathHdr);
+    FreePool (PathHdr);
     PathHdr = NULL;
 
     //
@@ -1021,6 +1025,8 @@ HiiConfigRoutingExportConfig (
                     );
     ASSERT_EFI_ERROR (Status);
 
+    AccessProgress = NULL;
+    AccessResults  = NULL;
     Status = ConfigAccess->ExtractConfig (
                              ConfigAccess,
                              ConfigRequest,
@@ -1028,8 +1034,13 @@ HiiConfigRoutingExportConfig (
                              &AccessResults
                              );
     if (EFI_ERROR (Status)) {
-      SafeFreePool (ConfigRequest);
-      SafeFreePool (AccessResults);
+      FreePool (ConfigRequest);
+      if (AccessProgress != NULL) {
+        FreePool (AccessProgress);
+      }
+      if (AccessResults != NULL) {
+        FreePool (AccessResults);
+      }
       return EFI_INVALID_PARAMETER;
     }
 
@@ -1039,9 +1050,9 @@ HiiConfigRoutingExportConfig (
     ASSERT (*AccessProgress == 0);
     Status = AppendToMultiString (Results, AccessResults);
     ASSERT_EFI_ERROR (Status);
-    SafeFreePool (AccessResults);
+    FreePool (AccessResults);
     AccessResults = NULL;
-    SafeFreePool (ConfigRequest);
+    FreePool (ConfigRequest);
     ConfigRequest = NULL;
 
   }
@@ -1057,8 +1068,8 @@ HiiConfigRoutingExportConfig (
                 HII_FORMSET_STORAGE_SIGNATURE
                 );
     RemoveEntryList (&Storage->Entry);
-    SafeFreePool (Storage->Name);
-    SafeFreePool (Storage);
+    FreePool (Storage->Name);
+    FreePool (Storage);
   }
 
   return EFI_SUCCESS;
@@ -1173,7 +1184,7 @@ HiiConfigRoutingRouteConfig (
     //
     Status = GetDevicePath (ConfigResp, (UINT8 **) &DevicePath);
     if (EFI_ERROR (Status)) {
-      SafeFreePool (ConfigResp);
+      FreePool (ConfigResp);
       return Status;
     }
 
@@ -1200,7 +1211,7 @@ HiiConfigRoutingRouteConfig (
       }
     }
 
-    SafeFreePool (DevicePath);
+    FreePool (DevicePath);
 
     if (DriverHandle == NULL) {
       //
@@ -1208,7 +1219,7 @@ HiiConfigRoutingRouteConfig (
       // Set Progress to the 'G' in "GUID" of the routing header.
       //
       *Progress = StringPtr;
-      SafeFreePool (ConfigResp);
+      FreePool (ConfigResp);
       return EFI_NOT_FOUND;
     }
 
@@ -1237,11 +1248,11 @@ HiiConfigRoutingRouteConfig (
       for (TmpPtr = StringPtr; CompareMem (TmpPtr, AccessProgress, RemainSize) != 0; TmpPtr++);
       *Progress = TmpPtr;
 
-      SafeFreePool (ConfigResp);
+      FreePool (ConfigResp);
       return Status;
     }
 
-    SafeFreePool (ConfigResp);
+    FreePool (ConfigResp);
     ConfigResp = NULL;
 
     //
@@ -1408,7 +1419,7 @@ HiiBlockToConfig (
       TmpBuffer,
       (((Length + 1) / 2) < sizeof (UINTN)) ? ((Length + 1) / 2) : sizeof (UINTN)
       );
-    SafeFreePool (TmpBuffer);
+    FreePool (TmpBuffer);
 
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&WIDTH=", StrLen (L"&WIDTH=")) != 0) {
@@ -1432,7 +1443,7 @@ HiiBlockToConfig (
       TmpBuffer,
       (((Length + 1) / 2) < sizeof (UINTN)) ? ((Length + 1) / 2) : sizeof (UINTN)
       );
-    SafeFreePool (TmpBuffer);
+    FreePool (TmpBuffer);
 
     StringPtr += Length;
     if (*StringPtr != 0 && *StringPtr != L'&') {
@@ -1471,7 +1482,7 @@ HiiBlockToConfig (
     ASSERT_EFI_ERROR (Status);
     ToLower (ValueStr);
 
-    SafeFreePool (Value);
+    FreePool (Value);
     Value = NULL;
 
     //
@@ -1493,8 +1504,8 @@ HiiBlockToConfig (
 
     AppendToMultiString (Config, ConfigElement);
 
-    SafeFreePool (ConfigElement);
-    SafeFreePool (ValueStr);
+    FreePool (ConfigElement);
+    FreePool (ValueStr);
     ConfigElement = NULL;
     ValueStr = NULL;
 
@@ -1519,11 +1530,16 @@ HiiBlockToConfig (
   return EFI_SUCCESS;
 
 Exit:
-
-  SafeFreePool (*Config);
-  SafeFreePool (ValueStr);
-  SafeFreePool (Value);
-  SafeFreePool (ConfigElement);
+  FreePool (*Config);
+  if (ValueStr != NULL) {
+    FreePool (ValueStr);
+  }
+  if (Value != NULL) {
+    FreePool (Value);
+  }
+  if (ConfigElement) {
+    FreePool (ConfigElement);
+  }
 
   return Status;
 
@@ -1658,7 +1674,7 @@ HiiConfigToBlock (
       TmpBuffer,
       (((Length + 1) / 2) < sizeof (UINTN)) ? ((Length + 1) / 2) : sizeof (UINTN)
       );
-    SafeFreePool (TmpBuffer);
+    FreePool (TmpBuffer);
 
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&WIDTH=", StrLen (L"&WIDTH=")) != 0) {
@@ -1682,7 +1698,7 @@ HiiConfigToBlock (
       TmpBuffer,
       (((Length + 1) / 2) < sizeof (UINTN)) ? ((Length + 1) / 2) : sizeof (UINTN)
       );
-    SafeFreePool (TmpBuffer);
+    FreePool (TmpBuffer);
 
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&VALUE=", StrLen (L"&VALUE=")) != 0) {
@@ -1719,7 +1735,7 @@ HiiConfigToBlock (
     CopyMem (Block + Offset, Value, Width);
     *BlockSize = Offset + Width - 1;
 
-    SafeFreePool (Value);
+    FreePool (Value);
     Value = NULL;
 
     //
@@ -1743,7 +1759,9 @@ HiiConfigToBlock (
 
 Exit:
 
-  SafeFreePool (Value);
+  if (Value != NULL) {
+    FreePool (Value);
+  }
   return Status;
 }
 
@@ -1983,11 +2001,21 @@ Exit:
     }
   }
 
-  SafeFreePool (GuidStr);
-  SafeFreePool (NameStr);
-  SafeFreePool (PathStr);
-  SafeFreePool (AltIdStr);
-  SafeFreePool (Result);
+  if (GuidStr != NULL) {
+    FreePool (GuidStr);
+  }
+  if (NameStr != NULL) {
+    FreePool (NameStr);
+  }
+  if (PathStr != NULL) {
+    FreePool (PathStr);
+  }
+  if (AltIdStr != NULL) {
+    FreePool (AltIdStr);
+  }
+  if (Result != NULL) {
+    FreePool (Result);
+  }
 
   return Status;
 

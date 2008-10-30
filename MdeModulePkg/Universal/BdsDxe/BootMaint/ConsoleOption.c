@@ -419,7 +419,7 @@ LocateSerialIo (
     if (CompareMem (&Acpi->HID, &Match, sizeof (UINT32)) == 0) {
       NewMenuEntry = BOpt_CreateMenuEntry (BM_TERMINAL_CONTEXT_SELECT);
       if (NewMenuEntry == NULL) {
-        SafeFreePool (Handles);
+        FreePool (Handles);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -472,7 +472,9 @@ LocateSerialIo (
       TerminalMenu.MenuNumber++;
     }
   }
-  SafeFreePool (Handles);
+  if (Handles != NULL) {
+    FreePool (Handles);
+  }
 
   //
   // Get L"ConOut", L"ConIn" and L"ErrOut" from the Var
@@ -515,7 +517,9 @@ LocateSerialIo (
                         NewTerminalContext->DevicePath,
                         (EFI_DEVICE_PATH_PROTOCOL *) &Vendor
                         );
-      SafeFreePool (NewMenuEntry->HelpString);
+      if (NewMenuEntry->HelpString != NULL) {
+        FreePool (NewMenuEntry->HelpString);
+      }
       //
       // NewMenuEntry->HelpString = DevicePathToStr (NewDevicePath);
       // NewMenuEntry->DisplayString = NewMenuEntry->HelpString;
@@ -999,6 +1003,6 @@ GetConsoleOutMode (
         }
       }
     }
+    FreePool (ModeInfo);
   }
-  SafeFreePool (ModeInfo);
 }

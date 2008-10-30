@@ -467,7 +467,9 @@ EnableQuietBootEx (
       // Currently only support BMP format.
       //
       if (Format != EfiBadgingFormatBMP) {
-        SafeFreePool (ImageData);
+        if (ImageData != NULL) {
+          FreePool (ImageData);
+        }
         continue;
       }
     } else {
@@ -494,7 +496,9 @@ EnableQuietBootEx (
               &Width
               );
     if (EFI_ERROR (Status)) {
-      SafeFreePool (ImageData);
+      if (ImageData != NULL) {
+        FreePool (ImageData);
+      }
       if (Badging == NULL) {
         return Status;
       } else {
@@ -589,8 +593,12 @@ EnableQuietBootEx (
       }
     }
 
-    SafeFreePool (ImageData);
-    SafeFreePool (Blt);
+    if (ImageData != NULL) {
+      FreePool (ImageData);
+    }
+    if (Blt != NULL) {
+      FreePool (Blt);
+    }
 
     if (Badging == NULL) {
       break;
@@ -780,8 +788,8 @@ Print (
 
     Blt->Image.Bitmap = AllocateZeroPool (Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     if (Blt->Image.Bitmap == NULL) {
-      SafeFreePool (Blt);
-      SafeFreePool (Buffer);
+      FreePool (Blt);
+      FreePool (Buffer);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -824,15 +832,23 @@ Print (
                           );
     }
 
-    SafeFreePool (RowInfoArray);
-    SafeFreePool (Blt->Image.Bitmap);
+    if (RowInfoArray != NULL) {
+      FreePool (RowInfoArray);
+    }
+    if (Blt->Image.Bitmap != NULL) {
+      FreePool (Blt->Image.Bitmap);
+    }
   } else {
     Status = EFI_UNSUPPORTED;
   }
 
 Error:
-  SafeFreePool (Blt);
-  SafeFreePool (FontInfo);
+  if (Blt != NULL) {
+    FreePool (Blt);
+  }
+  if (FontInfo != NULL) { 
+    FreePool (FontInfo);
+  }
   FreePool (Buffer);
 
   if (EFI_ERROR (Status)) {

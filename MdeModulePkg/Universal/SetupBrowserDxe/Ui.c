@@ -2137,7 +2137,9 @@ UiDisplayMenu (
             gDirection = SCAN_LEFT;
           }
           Status = ProcessOptions (Selection, MenuOption, TRUE, &OptionString);
-          SafeFreePool (OptionString);
+          if (OptionString != NULL) {
+            FreePool (OptionString);
+          }
         }
         break;
 

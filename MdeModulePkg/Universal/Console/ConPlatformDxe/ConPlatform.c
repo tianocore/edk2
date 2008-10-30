@@ -795,7 +795,9 @@ ConPlatformMatchDevicePaths (
                             TempDevicePath1,
                             DevicePathInst
                             );
-        SafeFreePool (TempDevicePath1);
+        if (TempDevicePath1 != NULL) {
+          FreePool (TempDevicePath1);
+        }
         TempDevicePath1 = TempDevicePath2;
       }
     }

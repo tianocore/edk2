@@ -58,7 +58,7 @@ GenerateHiiDatabaseRecord (
 
   DatabaseRecord->PackageList = AllocateZeroPool (sizeof (HII_DATABASE_PACKAGE_LIST_INSTANCE));
   if (DatabaseRecord->PackageList == NULL) {
-    SafeFreePool (DatabaseRecord);
+    FreePool (DatabaseRecord);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -78,8 +78,8 @@ GenerateHiiDatabaseRecord (
   //
   HiiHandle = (HII_HANDLE *) AllocateZeroPool (sizeof (HII_HANDLE));
   if (HiiHandle == NULL) {
-    SafeFreePool (DatabaseRecord->PackageList);
-    SafeFreePool (DatabaseRecord);
+    FreePool (DatabaseRecord->PackageList);
+    FreePool (DatabaseRecord);
     return EFI_OUT_OF_RESOURCES;
   }
   HiiHandle->Signature = HII_HANDLE_SIGNATURE;
@@ -340,8 +340,9 @@ InvokeRegisteredFunction (
     }
   }
 
-  SafeFreePool (Buffer);
-  Buffer = NULL;
+  if (Buffer != NULL) {
+    FreePool (Buffer);
+  }
 
   return EFI_SUCCESS;
 }
@@ -390,7 +391,7 @@ InsertGuidPackage (
   }
   GuidPackage->GuidPkg = (UINT8 *) AllocateZeroPool (PackageHeader.Length);
   if (GuidPackage->GuidPkg == NULL) {
-    SafeFreePool (GuidPackage);
+    FreePool (GuidPackage);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -524,8 +525,8 @@ RemoveGuidPackages (
     RemoveEntryList (&Package->GuidEntry);
     CopyMem (&PackageHeader, Package->GuidPkg, sizeof (EFI_HII_PACKAGE_HEADER));
     PackageList->PackageListHdr.PackageLength -= PackageHeader.Length;
-    SafeFreePool (Package->GuidPkg);
-    SafeFreePool (Package);
+    FreePool (Package->GuidPkg);
+    FreePool (Package);
   }
 
   return EFI_SUCCESS;
@@ -579,7 +580,7 @@ InsertFormPackage (
 
   FormPackage->IfrData = (UINT8 *) AllocateZeroPool (PackageHeader.Length - sizeof (EFI_HII_PACKAGE_HEADER));
   if (FormPackage->IfrData == NULL) {
-    SafeFreePool (FormPackage);
+    FreePool (FormPackage);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -738,8 +739,8 @@ RemoveFormPackages (
 
     RemoveEntryList (&Package->IfrEntry);
     PackageList->PackageListHdr.PackageLength -= Package->FormPkgHdr.Length;
-    SafeFreePool (Package->IfrData);
-    SafeFreePool (Package);
+    FreePool (Package->IfrData);
+    FreePool (Package);
 
   }
 
@@ -809,11 +810,11 @@ InsertStringPackage (
   for (Link = PackageList->StringPkgHdr.ForwardLink; Link != &PackageList->StringPkgHdr; Link = Link->ForwardLink) {
     StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
     if (R8_EfiLibCompareLanguage (Language, StringPackage->StringPkgHdr->Language)) {
-      SafeFreePool (Language);
+      FreePool (Language);
       return EFI_UNSUPPORTED;
     }
   }
-  SafeFreePool (Language);
+  FreePool (Language);
 
   //
   // Create a String package node
@@ -876,9 +877,15 @@ InsertStringPackage (
 
 Error:
 
-  SafeFreePool (StringPackage->StringBlock);
-  SafeFreePool (StringPackage->StringPkgHdr);
-  SafeFreePool (StringPackage);
+  if (StringPackage->StringBlock != NULL) {
+    FreePool (StringPackage->StringBlock);
+  }
+  if (StringPackage->StringPkgHdr != NULL) {
+    FreePool (StringPackage->StringPkgHdr);
+  }
+  if (StringPackage != NULL) {
+    FreePool (StringPackage);
+  }
   return Status;
 
 }
@@ -1014,8 +1021,8 @@ RemoveStringPackages (
 
     RemoveEntryList (&Package->StringEntry);
     PackageList->PackageListHdr.PackageLength -= Package->StringPkgHdr->Header.Length;
-    SafeFreePool (Package->StringBlock);
-    SafeFreePool (Package->StringPkgHdr);
+    FreePool (Package->StringBlock);
+    FreePool (Package->StringPkgHdr);
     //
     // Delete font information
     //
@@ -1027,10 +1034,10 @@ RemoveStringPackages (
                    HII_FONT_INFO_SIGNATURE
                    );
       RemoveEntryList (&FontInfo->Entry);
-      SafeFreePool (FontInfo);
+      FreePool (FontInfo);
     }
 
-    SafeFreePool (Package);
+    FreePool (Package);
   }
 
   return EFI_SUCCESS;
@@ -1169,11 +1176,21 @@ InsertFontPackage (
 
 Error:
 
-  SafeFreePool (FontPkgHdr);
-  SafeFreePool (FontInfo);
-  SafeFreePool (FontPackage->GlyphBlock);
-  SafeFreePool (FontPackage);
-  SafeFreePool (GlobalFont);
+  if (FontPkgHdr != NULL) {
+    FreePool (FontPkgHdr);
+  }
+  if (FontInfo != NULL) {
+    FreePool (FontInfo);
+  }
+  if (FontPackage->GlyphBlock != NULL) {
+    FreePool (FontPackage->GlyphBlock);
+  }
+  if (FontPackage != NULL) {
+    FreePool (FontPackage);
+  }
+  if (GlobalFont != NULL) {
+    FreePool (GlobalFont);
+  }
 
   return Status;
 
@@ -1313,8 +1330,11 @@ RemoveFontPackages (
 
     RemoveEntryList (&Package->FontEntry);
     PackageList->PackageListHdr.PackageLength -= Package->FontPkgHdr->Header.Length;
-    SafeFreePool (Package->GlyphBlock);
-    SafeFreePool (Package->FontPkgHdr);
+
+    if (Package->GlyphBlock != NULL) {
+      FreePool (Package->GlyphBlock);
+    }
+    FreePool (Package->FontPkgHdr);
     //
     // Delete default character cell information
     //
@@ -1326,7 +1346,7 @@ RemoveFontPackages (
                     HII_GLYPH_INFO_SIGNATURE
                     );
       RemoveEntryList (&GlyphInfo->Entry);
-      SafeFreePool (GlyphInfo);
+      FreePool (GlyphInfo);
     }
 
     //
@@ -1336,13 +1356,13 @@ RemoveFontPackages (
       GlobalFont = CR (Link, HII_GLOBAL_FONT_INFO, Entry, HII_GLOBAL_FONT_INFO_SIGNATURE);
       if (GlobalFont->FontPackage == Package) {
         RemoveEntryList (&GlobalFont->Entry);
-        SafeFreePool (GlobalFont->FontInfo);
-        SafeFreePool (GlobalFont);
+        FreePool (GlobalFont->FontInfo);
+        FreePool (GlobalFont);
         break;
       }
     }
 
-    SafeFreePool (Package);
+    FreePool (Package);
   }
 
   return EFI_SUCCESS;
@@ -1430,7 +1450,7 @@ InsertImagePackage (
 
     ImagePackage->PaletteBlock = (UINT8 *) AllocateZeroPool (PaletteSize);
     if (ImagePackage->PaletteBlock == NULL) {
-      SafeFreePool (ImagePackage);
+      FreePool (ImagePackage);
       return EFI_OUT_OF_RESOURCES;
     }
     CopyMem (
@@ -1450,8 +1470,8 @@ InsertImagePackage (
                 sizeof (EFI_HII_IMAGE_PACKAGE_HDR) - PaletteSize;
     ImagePackage->ImageBlock = (UINT8 *) AllocateZeroPool (ImageSize);
     if (ImagePackage->ImageBlock == NULL) {
-      SafeFreePool (ImagePackage->PaletteBlock);
-      SafeFreePool (ImagePackage);
+      FreePool (ImagePackage->PaletteBlock);
+      FreePool (ImagePackage);
       return EFI_OUT_OF_RESOURCES;
     }
     CopyMem (
@@ -1611,9 +1631,11 @@ RemoveImagePackages (
 
   PackageList->PackageListHdr.PackageLength -= Package->ImagePkgHdr.Header.Length;
 
-  SafeFreePool (Package->ImageBlock);
-  SafeFreePool (Package->PaletteBlock);
-  SafeFreePool (Package);
+  FreePool (Package->ImageBlock);
+  if (Package->PaletteBlock != NULL) {
+    FreePool (Package->PaletteBlock);
+  }
+  FreePool (Package);
 
   PackageList->ImagePkg = NULL;
 
@@ -1691,8 +1713,12 @@ InsertSimpleFontPackage (
 
 Error:
 
-  SafeFreePool (SimpleFontPackage->SimpleFontPkgHdr);
-  SafeFreePool (SimpleFontPackage);
+  if (SimpleFontPackage->SimpleFontPkgHdr != NULL) {
+    FreePool (SimpleFontPackage->SimpleFontPkgHdr);
+  }
+  if (SimpleFontPackage != NULL) {
+    FreePool (SimpleFontPackage);
+  }
   return Status;
 }
 
@@ -1817,8 +1843,8 @@ RemoveSimpleFontPackages (
 
     RemoveEntryList (&Package->SimpleFontEntry);
     PackageList->PackageListHdr.PackageLength -= Package->SimpleFontPkgHdr->Header.Length;
-    SafeFreePool (Package->SimpleFontPkgHdr);
-    SafeFreePool (Package);
+    FreePool (Package->SimpleFontPkgHdr);
+    FreePool (Package);
   }
 
   return EFI_SUCCESS;
@@ -2003,7 +2029,7 @@ RemoveDevicePathPackage (
   CopyMem (&Header, Package, sizeof (EFI_HII_PACKAGE_HEADER));
   PackageList->PackageListHdr.PackageLength -= Header.Length;
 
-  SafeFreePool (Package);
+  FreePool (Package);
 
   PackageList->DevicePathPkg = NULL;
 
@@ -2132,8 +2158,12 @@ InsertKeyboardLayoutPackage (
 
 Error:
 
-  SafeFreePool (KeyboardLayoutPackage->KeyboardPkg);
-  SafeFreePool (KeyboardLayoutPackage);
+  if (KeyboardLayoutPackage->KeyboardPkg != NULL) {
+    FreePool (KeyboardLayoutPackage->KeyboardPkg);
+  }
+  if (KeyboardLayoutPackage != NULL) {
+    FreePool (KeyboardLayoutPackage);
+  }
 
   return Status;
 }
@@ -2265,8 +2295,8 @@ RemoveKeyboardLayoutPackages (
     RemoveEntryList (&Package->KeyboardEntry);
     CopyMem (&PackageHeader, Package->KeyboardPkg, sizeof (EFI_HII_PACKAGE_HEADER));
     PackageList->PackageListHdr.PackageLength -= PackageHeader.Length;
-    SafeFreePool (Package->KeyboardPkg);
-    SafeFreePool (Package);
+    FreePool (Package->KeyboardPkg);
+    FreePool (Package);
   }
 
   return EFI_SUCCESS;
@@ -2850,9 +2880,9 @@ HiiRemovePackageList (
       ASSERT (Private->HiiHandleCount >= 0);
 
       HiiHandle->Signature = 0;
-      SafeFreePool (HiiHandle);
-      SafeFreePool (Node->PackageList);
-      SafeFreePool (Node);
+      FreePool (HiiHandle);
+      FreePool (Node->PackageList);
+      FreePool (Node);
 
       return EFI_SUCCESS;
     }
@@ -3387,8 +3417,7 @@ HiiUnregisterPackageNotify (
                       NULL
                       );
       ASSERT_EFI_ERROR (Status);
-      SafeFreePool (Notify);
-      Notify = NULL;
+      FreePool (Notify);
 
       return EFI_SUCCESS;
     }
@@ -3670,7 +3699,9 @@ HiiSetKeyboardLayout (
   // Backup current keyboard layout.
   //
   CopyMem (&Private->CurrentLayoutGuid, KeyGuid, sizeof (EFI_GUID));
-  SafeFreePool(Private->CurrentLayout);
+  if (Private->CurrentLayout != NULL) {
+    FreePool(Private->CurrentLayout);
+  }
   Private->CurrentLayout = KeyboardLayout;
 
   //

@@ -511,7 +511,7 @@ FindStringBlock (
         //        
         StringPackage->FontId++;
 
-        SafeFreePool (FontInfo);
+        FreePool (FontInfo);
       }
 
       BlockSize += Ext2.Length;
@@ -814,7 +814,7 @@ SetStringWorker (
       TmpSize
       );
 
-    SafeFreePool (StringPackage->StringBlock);
+    FreePool (StringPackage->StringBlock);
     StringPackage->StringBlock = Block;
     StringPackage->StringPkgHdr->Header.Length += (UINT32) (BlockSize - OldBlockSize);
     break;
@@ -847,7 +847,7 @@ SetStringWorker (
       OldBlockSize - (StringTextPtr - StringPackage->StringBlock) - StringSize
       );
 
-    SafeFreePool (StringPackage->StringBlock);
+    FreePool (StringPackage->StringBlock);
     StringPackage->StringBlock = Block;
     StringPackage->StringPkgHdr->Header.Length += (UINT32) (BlockSize - OldBlockSize);
     break;
@@ -898,7 +898,7 @@ SetStringWorker (
 
   CopyMem (BlockPtr, StringPackage->StringBlock, OldBlockSize);
 
-  SafeFreePool (StringPackage->StringBlock);
+  FreePool (StringPackage->StringBlock);
   StringPackage->StringBlock = Block;
   StringPackage->StringPkgHdr->Header.Length += Ext2.Length;
 
@@ -1043,7 +1043,7 @@ HiiNewString (
     HeaderSize = (UINT32) (AsciiStrSize ((CHAR8 *) Language) - 1 + sizeof (EFI_HII_STRING_PACKAGE_HDR));
     StringPackage->StringPkgHdr = AllocateZeroPool (HeaderSize);
     if (StringPackage->StringPkgHdr == NULL) {
-      SafeFreePool (StringPackage);
+      FreePool (StringPackage);
       return EFI_OUT_OF_RESOURCES;
     }
     StringPackage->StringPkgHdr->Header.Type      = EFI_HII_PACKAGE_STRINGS;
@@ -1063,8 +1063,8 @@ HiiNewString (
     BlockSize     = Ucs2BlockSize + sizeof (EFI_HII_SIBT_END_BLOCK);
     StringPackage->StringBlock = (UINT8 *) AllocateZeroPool (BlockSize);
     if (StringPackage->StringBlock == NULL) {
-      SafeFreePool (StringPackage->StringPkgHdr);
-      SafeFreePool (StringPackage);
+      FreePool (StringPackage->StringPkgHdr);
+      FreePool (StringPackage);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -1139,7 +1139,7 @@ HiiNewString (
     // Append a EFI_HII_SIBT_END block to the end.
     //
     *BlockPtr = EFI_HII_SIBT_END;
-    SafeFreePool (StringPackage->StringBlock);
+    FreePool (StringPackage->StringBlock);
     StringPackage->StringBlock = StringBlock;
     StringPackage->StringPkgHdr->Header.Length += Ucs2BlockSize;
     PackageListNode->PackageListHdr.PackageLength += Ucs2BlockSize;
@@ -1180,7 +1180,7 @@ HiiNewString (
       // Append a EFI_HII_SIBT_END block to the end.
       //
       *BlockPtr = EFI_HII_SIBT_END;
-      SafeFreePool (StringPackage->StringBlock);
+      FreePool (StringPackage->StringBlock);
       StringPackage->StringBlock = StringBlock;
       StringPackage->StringPkgHdr->Header.Length += Ucs2FontBlockSize;
       PackageListNode->PackageListHdr.PackageLength += Ucs2FontBlockSize;
@@ -1240,7 +1240,7 @@ HiiNewString (
       // Append a EFI_HII_SIBT_END block to the end.
       //
       *BlockPtr = EFI_HII_SIBT_END;
-      SafeFreePool (StringPackage->StringBlock);
+      FreePool (StringPackage->StringBlock);
       StringPackage->StringBlock = StringBlock;
       StringPackage->StringPkgHdr->Header.Length += FontBlockSize + Ucs2FontBlockSize;
       PackageListNode->PackageListHdr.PackageLength += FontBlockSize + Ucs2FontBlockSize;
