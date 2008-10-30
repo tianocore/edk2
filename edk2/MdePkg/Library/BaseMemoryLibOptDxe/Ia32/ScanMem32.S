@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   ScanMem32.Asm
+#   ScanMem32.S
 #
 # Abstract:
 #

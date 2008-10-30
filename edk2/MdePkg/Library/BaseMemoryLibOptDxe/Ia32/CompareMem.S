@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   CompareMem.Asm
+#   CompareMem.S
 #
 # Abstract:
 #

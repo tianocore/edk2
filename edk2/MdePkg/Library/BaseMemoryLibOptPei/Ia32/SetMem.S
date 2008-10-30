@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   SetMem.Asm
+#   SetMem.S
 #
 # Abstract:
 #

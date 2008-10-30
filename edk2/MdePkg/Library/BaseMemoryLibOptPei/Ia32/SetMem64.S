@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   SetMem64.Asm
+#   SetMem64.S
 #
 # Abstract:
 #

@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   ZeroMem.Asm
+#   ZeroMem.S
 #
 # Abstract:
 #

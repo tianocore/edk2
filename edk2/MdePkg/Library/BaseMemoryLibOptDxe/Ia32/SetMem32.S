@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   SetMem32.Asm
+#   SetMem32.S
 #
 # Abstract:
 #
