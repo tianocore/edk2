@@ -28,22 +28,19 @@ VOID             *mSFSRegistration;
 // Prototypes
 //
 
-STATIC
 VOID
 EFIAPI
-OnVirtualAddressChange (
+OnVirtualAddressChangeFs (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 FileEraseStore(
   IN VARIABLE_STORAGE     *This
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 FileWriteStore (
@@ -53,7 +50,6 @@ FileWriteStore (
   IN VOID                 *Buffer
   );
 
-STATIC
 EFI_STATUS
 OpenStore (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Device,
@@ -65,7 +61,6 @@ OpenStore (
 //
 // Implementation below:
 //
-STATIC
 VOID
 FileClose (
   IN  EFI_FILE                   *File
@@ -173,7 +168,6 @@ CheckStoreExists (
 // read the store_header, init store_header if it has not been inited (read sth. about format/heathy)
 // reclaim space using scratch memory
 
-STATIC
 VOID
 EFIAPI
 OnSimpleFileSystemInstall (
@@ -282,11 +276,10 @@ FileStorageConstructor (
   ASSERT_EFI_ERROR (Status);
 
   *VarStore       = &Dev->VarStore;
-  *GoVirtualEvent = OnVirtualAddressChange;
+  *GoVirtualEvent = OnVirtualAddressChangeFs;
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 FileEraseStore(
@@ -320,7 +313,6 @@ FileEraseStore(
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 FileWriteStore (
@@ -358,10 +350,9 @@ FileWriteStore (
   return Status;
 }
 
-STATIC
 VOID
 EFIAPI
-OnVirtualAddressChange (
+OnVirtualAddressChangeFs (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
   )
@@ -375,7 +366,6 @@ OnVirtualAddressChange (
   EfiConvertPointer (0, (VOID **) &Dev->VarStore.Write);
 }
 
-STATIC
 EFI_STATUS
 OpenStore (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Device,

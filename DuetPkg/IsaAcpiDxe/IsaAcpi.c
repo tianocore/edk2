@@ -31,7 +31,7 @@ Revision History
 //
 // COM 1 UART Controller
 //
-static EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom1DeviceResources[] = {
+EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom1DeviceResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x3f8, 0x3ff},
   {EfiIsaAcpiResourceInterrupt, 0, 4,     0},
   {EfiIsaAcpiResourceEndOfList, 0, 0,     0}
@@ -40,7 +40,7 @@ static EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom1DeviceResources[] = {
 //
 // COM 2 UART Controller
 //
-static EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom2DeviceResources[] = {
+EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom2DeviceResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x2f8, 0x2ff},
   {EfiIsaAcpiResourceInterrupt, 0, 3,     0},
   {EfiIsaAcpiResourceEndOfList, 0, 0,     0}
@@ -49,7 +49,7 @@ static EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiCom2DeviceResources[] = {
 //
 // PS/2 Keyboard Controller
 //
-static EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2KeyboardDeviceResources[] = {
+EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2KeyboardDeviceResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x60, 0x64},
   {EfiIsaAcpiResourceInterrupt, 0, 1,     0},
   {EfiIsaAcpiResourceEndOfList, 0, 0,     0}
@@ -58,7 +58,7 @@ static EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2KeyboardDeviceResources[] = {
 //
 // PS/2 Mouse Controller
 //
-static EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2MouseDeviceResources[] = {
+EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2MouseDeviceResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x60, 0x64},
   {EfiIsaAcpiResourceInterrupt, 0, 12,     0},
   {EfiIsaAcpiResourceEndOfList, 0, 0,     0}
@@ -67,7 +67,7 @@ static EFI_ISA_ACPI_RESOURCE  mPcatIsaAcpiPs2MouseDeviceResources[] = {
 //
 // Floppy Disk Controller
 //
-static EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiFloppyResources[] = {
+EFI_ISA_ACPI_RESOURCE mPcatIsaAcpiFloppyResources[] = {
   {EfiIsaAcpiResourceIo,        0, 0x3f0, 0x3f7},
   {EfiIsaAcpiResourceInterrupt, 0, 6,     0},
   {EfiIsaAcpiResourceDma,       EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_COMPATIBLE | EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_8 | EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SINGLE_MODE, 2,     0},

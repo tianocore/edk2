@@ -267,7 +267,7 @@ PciIoSetBarAttributes(
 //
 // Pci Io Protocol Interface
 //
-static EFI_PCI_IO_PROTOCOL  PciIoInterface = {
+EFI_PCI_IO_PROTOCOL  PciIoInterface = {
   PciIoPollMem,
   PciIoPollIo,
   {

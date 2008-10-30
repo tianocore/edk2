@@ -46,8 +46,8 @@ Revision History
 //
 // Local variables for performing SAL Proc calls
 //
-static PLABEL         mSalProcPlabel;
-static CALL_SAL_PROC  mGlobalSalProc;
+PLABEL         mSalProcPlabel;
+CALL_SAL_PROC  mGlobalSalProc;
 
 EFI_STATUS
 PcatRootBridgeIoIoRead (

@@ -35,15 +35,13 @@ VARIABLE_STORE_HEADER mStoreHeaderTemplate = {
 //
 VARIABLE_GLOBAL  *mGlobal;
 
-STATIC
 VOID
 EFIAPI
-OnVirtualAddressChange (
+OnVirtualAddressChangeFsv (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   );
 
-STATIC
 VOID
 EFIAPI
 OnSimpleFileSystemInstall (
@@ -51,7 +49,6 @@ OnSimpleFileSystemInstall (
   IN VOID             *Context
   );
 
-STATIC
 BOOLEAN
 IsValidVariableHeader (
   IN  VARIABLE_HEADER   *Variable
@@ -81,7 +78,6 @@ Returns:
   return TRUE;
 }
 
-STATIC
 VARIABLE_STORE_STATUS
 GetVariableStoreStatus (
   IN VARIABLE_STORE_HEADER *VarStoreHeader
@@ -121,7 +117,6 @@ Returns:
   }
 }
 
-STATIC
 UINT8 *
 GetVariableDataPtr (
   IN  VARIABLE_HEADER   *Variable
@@ -148,7 +143,6 @@ Returns:
   return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + Variable->NameSize + GET_PAD_SIZE (Variable->NameSize));
 }
 
-STATIC
 VARIABLE_HEADER *
 GetNextVariablePtr (
   IN  VARIABLE_HEADER   *Variable
@@ -178,7 +172,6 @@ Returns:
   return (VARIABLE_HEADER *) ((UINTN) GetVariableDataPtr (Variable) + Variable->DataSize + GET_PAD_SIZE (Variable->DataSize));
 }
 
-STATIC
 VARIABLE_HEADER *
 GetEndPointer (
   IN VARIABLE_STORE_HEADER       *VarStoreHeader
@@ -250,7 +243,6 @@ Returns:
   return FALSE;
 }
 
-STATIC
 EFI_STATUS
 Reclaim (
   IN  VARIABLE_STORAGE_TYPE StorageType,
@@ -374,7 +366,6 @@ Returns:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 FindVariable (
   IN  CHAR16                  *VariableName,
@@ -1305,10 +1296,9 @@ Returns:
 
 
 
-STATIC
 VOID
 EFIAPI
-OnVirtualAddressChange (
+OnVirtualAddressChangeFsv (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   )

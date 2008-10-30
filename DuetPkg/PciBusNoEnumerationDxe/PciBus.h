@@ -204,8 +204,8 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gPciBusComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL  gPciBusDriverBinding;
 
 extern BOOLEAN                     gFullEnumeration;
-static UINT64                      gAllOne = 0xFFFFFFFFFFFFFFFFULL;
-static UINT64                      gAllZero   = 0;
+extern UINT64                      gAllOne;
+extern UINT64                      gAllZero;
 
 #include "PciIo.h"
 #include "PciCommand.h"

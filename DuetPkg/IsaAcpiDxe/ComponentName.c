@@ -58,7 +58,7 @@ EFI_COMPONENT_NAME_PROTOCOL  gPcatIsaAcpiComponentName = {
 };
 
 
-static EFI_UNICODE_STRING_TABLE mPcatIsaAcpiDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE mPcatIsaAcpiDriverNameTable[] = {
   {
     "eng;en",
     L"PC-AT ISA Device Enumeration Driver"

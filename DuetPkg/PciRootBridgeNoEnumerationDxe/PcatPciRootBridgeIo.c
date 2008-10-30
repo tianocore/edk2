@@ -189,7 +189,6 @@ PcatRootBridgeIoConfiguration (
 //
 // Private Function Prototypes
 //
-STATIC 
 EFI_STATUS
 EFIAPI
 PcatRootBridgeIoMemRW (
@@ -979,7 +978,6 @@ PcatRootBridgeIoConfiguration (
 // Internal function
 //
 
-STATIC 
 EFI_STATUS
 EFIAPI
 PcatRootBridgeIoMemRW (

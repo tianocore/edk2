@@ -31,7 +31,7 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
 } EFI_PCI_ROOT_BRIDGE_DEVICE_PATH;
 
-static EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath = {
+EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath = {
   {
     ACPI_DEVICE_PATH,
     ACPI_DP,

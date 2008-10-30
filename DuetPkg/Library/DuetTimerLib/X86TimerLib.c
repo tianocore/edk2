@@ -40,7 +40,6 @@ CONST UINT8                           mTimerLibLocalApicDivisor[] = {
   @return The base address of local APIC
 
 **/
-STATIC
 UINTN
 InternalX86GetApicBase (
   VOID
@@ -59,7 +58,6 @@ InternalX86GetApicBase (
   @return The frequency of the timer in Hz.
 
 **/
-STATIC
 UINT32
 InternalX86GetTimerFrequency (
   IN      UINTN                     ApicBase
@@ -80,7 +78,6 @@ InternalX86GetTimerFrequency (
   @return The tick counter read.
 
 **/
-STATIC
 INT32
 InternalX86GetTimerTick (
   IN      UINTN                     ApicBase
@@ -99,7 +96,6 @@ InternalX86GetTimerTick (
   @param  Delay     A period of time to delay in ticks.
 
 **/
-STATIC
 VOID
 InternalX86Delay (
   IN      UINTN                     ApicBase,

@@ -31,13 +31,12 @@ typedef struct {
   UINT8       Func;
 } EFI_PCI_ROM_IMAGE_MAPPING;
 
-static UINTN                      mNumberOfPciRomImages     = 0;
-static UINTN                      mMaxNumberOfPciRomImages  = 0;
-static EFI_PCI_ROM_IMAGE_MAPPING  *mRomImageTable           = NULL;
+UINTN                      mNumberOfPciRomImages     = 0;
+UINTN                      mMaxNumberOfPciRomImages  = 0;
+EFI_PCI_ROM_IMAGE_MAPPING  *mRomImageTable           = NULL;
 
-static CHAR16 mHexDigit[17] = L"0123456789ABCDEF";
+CHAR16 mHexDigit[17] = L"0123456789ABCDEF";
 
-static
 VOID
 PciRomAddImageMapping (
   IN EFI_HANDLE  ImageHandle,
@@ -77,7 +76,6 @@ PciRomAddImageMapping (
   mNumberOfPciRomImages++;
 }
 
-static
 VOID
 HexToString (
   CHAR16  *String,
