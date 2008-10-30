@@ -558,8 +558,10 @@ HiiUpdateForm (
 
 Done:
   if (UefiHiiUpdateData != NULL) {
-    SafeFreePool (UefiHiiUpdateData->Data);
-    SafeFreePool (UefiHiiUpdateData);
+    if (UefiHiiUpdateData->Data != NULL) {
+      FreePool (UefiHiiUpdateData->Data);
+    }
+    FreePool (UefiHiiUpdateData);
   }
 
   mInFrameworkUpdatePakcage = FALSE; 

@@ -462,9 +462,9 @@ DestroyDefaultNode (
   IN UEFI_IFR_BUFFER_STORAGE_NODE        *Node
   )
 {
-  SafeFreePool (Node->Buffer);
-  SafeFreePool (Node->Name);
-  SafeFreePool (Node);
+  FreePool (Node->Buffer);
+  FreePool (Node->Name);
+  FreePool (Node);
 }
 
 

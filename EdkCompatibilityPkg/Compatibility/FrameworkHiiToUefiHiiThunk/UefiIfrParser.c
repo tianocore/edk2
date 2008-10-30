@@ -386,7 +386,9 @@ DestroyExpression (
     OpCode = EXPRESSION_OPCODE_FROM_LINK (Link);
     RemoveEntryList (&OpCode->Link);
 
-    SafeFreePool (OpCode->ValueList);
+    if (OpCode->ValueList != NULL) {
+      FreePool (OpCode->ValueList);
+    }
   }
 
   //
@@ -416,25 +418,25 @@ DestroyStorage (
     return;
   }
 
-  SafeFreePool (Storage->Name);
-  SafeFreePool (Storage->Buffer);
-  SafeFreePool (Storage->EditBuffer);
+  FreePool (Storage->Name);
+  FreePool (Storage->Buffer);
+  FreePool (Storage->EditBuffer);
 
   while (!IsListEmpty (&Storage->NameValueListHead)) {
     Link = GetFirstNode (&Storage->NameValueListHead);
     NameValueNode = NAME_VALUE_NODE_FROM_LINK (Link);
     RemoveEntryList (&NameValueNode->Link);
 
-    SafeFreePool (NameValueNode->Name);
-    SafeFreePool (NameValueNode->Value);
-    SafeFreePool (NameValueNode->EditValue);
-    SafeFreePool (NameValueNode);
+    FreePool (NameValueNode->Name);
+    FreePool (NameValueNode->Value);
+    FreePool (NameValueNode->EditValue);
+    FreePool (NameValueNode);
   }
 
-  SafeFreePool (Storage->ConfigHdr);
-  SafeFreePool (Storage->ConfigRequest);
+  FreePool (Storage->ConfigHdr);
+  FreePool (Storage->ConfigRequest);
 
-  gBS->FreePool (Storage);
+  FreePool (Storage);
 }
 
 
@@ -500,9 +502,14 @@ DestroyStatement (
     DestroyExpression (Expression);
   }
 
-  SafeFreePool (Statement->VariableName);
-  SafeFreePool (Statement->BlockName);
+  if (Statement->VariableName != NULL) {
+    FreePool (Statement->VariableName);
+  }
+  if (Statement->BlockName != NULL) {
+    FreePool (Statement->BlockName);
+  }
 }
+
 
 
 /**
@@ -572,7 +579,7 @@ DestroyFormSet (
   //
   // Free IFR binary buffer
   //
-  SafeFreePool (FormSet->IfrBinaryData);
+  FreePool (FormSet->IfrBinaryData);
 
   //
   // Free FormSet Storage
@@ -613,10 +620,14 @@ DestroyFormSet (
     }
   }
 
-  SafeFreePool (FormSet->StatementBuffer);
-  SafeFreePool (FormSet->ExpressionBuffer);
+  if (FormSet->StatementBuffer != NULL) {
+    FreePool (FormSet->StatementBuffer);
+  }
+  if (FormSet->ExpressionBuffer != NULL) {
+    FreePool (FormSet->ExpressionBuffer);
+  }
 
-  SafeFreePool (FormSet);
+  FreePool (FormSet);
 }
 
 
