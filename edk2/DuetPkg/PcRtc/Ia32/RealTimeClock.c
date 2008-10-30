@@ -17,7 +17,7 @@ Abstract:
 --*/
 #include "RealTimeClock.h"
 
-static PC_RTC_MODULE_GLOBALS  mModuleGlobal;
+PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 
 EFI_STATUS
 EFIAPI

@@ -74,6 +74,9 @@ EFI_DRIVER_BINDING_PROTOCOL                   gPciBusDriverBinding = {
 };
 
 BOOLEAN gFullEnumeration;
+
+UINT64 gAllOne    = 0xFFFFFFFFFFFFFFFFULL;
+UINT64 gAllZero   = 0;
  
 //
 // PCI Bus Driver Support Functions

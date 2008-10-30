@@ -24,7 +24,6 @@ Revision History:
 #include "PeLoader.h"
 #include "TianoDecompress.h"
 
-STATIC
 VOID
 SystemHang(
   VOID
@@ -52,7 +51,7 @@ EfiLoader (
   UINTN                 BfvBase;
   EFI_MAIN_ENTRYPOINT   EfiMainEntrypoint;
   CHAR8                 PrintBuffer[256];
-  static EFILDRHANDOFF  Handoff;
+  STATIC EFILDRHANDOFF  Handoff;
 
   ClearScreen();
   

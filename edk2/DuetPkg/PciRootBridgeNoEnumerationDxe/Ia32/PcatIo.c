@@ -22,8 +22,8 @@ Revision History
 
 #include "PcatPciRootBridge.h"
 
-static BOOLEAN                  mPciOptionRomTableInstalled = FALSE;
-static EFI_PCI_OPTION_ROM_TABLE mPciOptionRomTable          = {0, NULL};
+BOOLEAN                  mPciOptionRomTableInstalled = FALSE;
+EFI_PCI_OPTION_ROM_TABLE mPciOptionRomTable          = {0, NULL};
 
 EFI_STATUS
 EFIAPI
@@ -210,7 +210,6 @@ PcatRootBridgeIoPciRW (
   return EFI_SUCCESS;
 }
 
-static
 VOID
 ScanPciBus(
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *IoDev,
@@ -299,7 +298,6 @@ ScanPciBus(
   }
 }
 
-static
 VOID
 CheckForRom (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *IoDev,
@@ -525,7 +523,6 @@ CheckForRom (
   IoDev->Pci.Write (IoDev, EfiPciWidthUint32, Address, sizeof(PciHeader)/sizeof(UINT32), &PciHeader);
 }
 
-static
 VOID
 SaveCommandRegister (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *IoDev,
@@ -563,7 +560,6 @@ SaveCommandRegister (
   IoDev->Pci.Write (IoDev, EfiPciWidthUint16, Address, 1, &Command);
 }
 
-static
 VOID
 RestoreCommandRegister (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *IoDev,

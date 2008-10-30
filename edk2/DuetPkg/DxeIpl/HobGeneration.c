@@ -669,7 +669,7 @@ PrepareHobNvStorage (
            +-------------------+
 */
 {
-  static VARIABLE_STORE_HEADER VarStoreHeader = {
+  STATIC VARIABLE_STORE_HEADER VarStoreHeader = {
     VARIABLE_STORE_SIGNATURE,
     0xffffffff,                 // will be fixed in Variable driver
     VARIABLE_STORE_FORMATTED,
@@ -678,7 +678,7 @@ PrepareHobNvStorage (
     0
   };
   
-  static EFI_FIRMWARE_VOLUME_HEADER NvStorageFvbHeader = {
+  STATIC EFI_FIRMWARE_VOLUME_HEADER NvStorageFvbHeader = {
     {
       0,
     },  // ZeroVector[16]
@@ -705,7 +705,7 @@ PrepareHobNvStorage (
     }
   };
 
-  static EFI_FV_BLOCK_MAP_ENTRY BlockMapEntryEnd = {0, 0};
+  STATIC EFI_FV_BLOCK_MAP_ENTRY BlockMapEntryEnd = {0, 0};
 
   EFI_PHYSICAL_ADDRESS StorageFvbBase;
   EFI_PHYSICAL_ADDRESS FtwFvbBase;

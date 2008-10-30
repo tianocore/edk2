@@ -319,7 +319,6 @@ Returns:
 }
 
 #if CPU_EXCEPTION_DEBUG_OUTPUT
-STATIC
 VOID
 DumpExceptionDataDebugOut (
   IN EFI_EXCEPTION_TYPE   InterruptType,
@@ -530,7 +529,6 @@ DumpExceptionDataDebugOut (
 }
 #endif
 
-STATIC
 UINTN
 SPrint (
   IN OUT    CHAR16  *Buffer,
@@ -614,7 +612,6 @@ SPrint (
   return Index;
 }
 
-STATIC
 VOID
 DumpExceptionDataVgaOut (
   IN EFI_EXCEPTION_TYPE   InterruptType,
@@ -894,7 +891,6 @@ DumpExceptionDataVgaOut (
 }
 
 #if CPU_EXCEPTION_VGA_SWITCH
-STATIC
 UINT16
 SwitchVideoMode (
   UINT16    NewVideoMode

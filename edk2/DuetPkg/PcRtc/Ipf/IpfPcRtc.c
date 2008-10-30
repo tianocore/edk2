@@ -25,7 +25,7 @@ Abstract:
 //
 // Don't use directly after virtual address have been registered.
 //
-static PC_RTC_MODULE_GLOBALS  mModuleGlobal;
+PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 
 SAL_RETURN_REGS
 PcRtcEsalServicesClassCommonEntry (

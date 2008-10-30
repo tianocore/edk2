@@ -1272,7 +1272,6 @@ Returns:
           );
 }
 
-STATIC
 EFI_STATUS
 ValidateFvHeader (
   EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader
@@ -1405,7 +1404,6 @@ GetFvbHeader (
   return EFI_SUCCESS;
 }
 
-STATIC
 VOID
 EFIAPI
 OnSimpleFileSystemInstall (
@@ -1501,7 +1499,6 @@ OnSimpleFileSystemInstall (
   }
 }
 
-STATIC
 VOID
 FvbInstallSfsNotify (
   VOID

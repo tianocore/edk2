@@ -55,7 +55,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPciBusComponentName2
 };
 
 
-STATIC EFI_UNICODE_STRING_TABLE mPciBusDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE mPciBusDriverNameTable[] = {
   { "eng;en", L"PCI Bus Driver" },
   { NULL, NULL }
 };

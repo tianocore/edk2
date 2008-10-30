@@ -21,7 +21,6 @@ Revision History:
 #include "Debug.h"
 #include "Support.h"
 
-STATIC
 EFI_STATUS
 EfiLdrPeCoffLoadPeRelocate (
   IN EFILDR_LOADED_IMAGE      *Image,
@@ -31,7 +30,6 @@ EfiLdrPeCoffLoadPeRelocate (
   IN EFI_MEMORY_DESCRIPTOR    *EfiMemoryDescriptor
   );
 
-STATIC
 EFI_STATUS
 EfiLdrPeCoffImageRead (
     IN VOID                 *FHand,
@@ -40,7 +38,6 @@ EfiLdrPeCoffImageRead (
     OUT VOID                *Buffer
     );
 
-STATIC
 VOID *
 EfiLdrPeCoffImageAddress (
   IN EFILDR_LOADED_IMAGE     *Image,
@@ -404,7 +401,6 @@ PrintHeader ('M');
   return Status;
 }
 
-STATIC
 EFI_STATUS
 EfiLdrPeCoffLoadPeRelocate (
   IN EFILDR_LOADED_IMAGE      *Image,
@@ -537,7 +533,6 @@ PrintHeader ('Q');
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EfiLdrPeCoffImageRead (
   IN VOID                 *FHand,
@@ -551,7 +546,6 @@ EfiLdrPeCoffImageRead (
   return EFI_SUCCESS;
 }
 
-STATIC
 VOID *
 EfiLdrPeCoffImageAddress (
   IN EFILDR_LOADED_IMAGE     *Image,

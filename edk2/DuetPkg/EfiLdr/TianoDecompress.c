@@ -74,7 +74,6 @@ typedef struct {
   UINT8   mPBit;
 } SCRATCH_DATA;
 
-STATIC
 VOID
 FillBuf (
   IN  SCRATCH_DATA  *Sd,
@@ -124,7 +123,6 @@ Returns: (VOID)
   Sd->mBitBuf |= Sd->mSubBitBuf >> Sd->mBitCount;
 }
 
-STATIC
 UINT32
 GetBits (
   IN  SCRATCH_DATA  *Sd,
@@ -158,7 +156,6 @@ Returns:
   return OutBits;
 }
 
-STATIC
 UINT16
 MakeTable (
   IN  SCRATCH_DATA  *Sd,
@@ -288,7 +285,6 @@ Returns:
   return 0;
 }
 
-STATIC
 UINT32
 DecodeP (
   IN  SCRATCH_DATA  *Sd
@@ -342,7 +338,6 @@ Returns:
   return Pos;
 }
 
-STATIC
 UINT16
 ReadPTLen (
   IN  SCRATCH_DATA  *Sd,
@@ -419,7 +414,6 @@ Returns:
   return MakeTable (Sd, nn, Sd->mPTLen, 8, Sd->mPTTable);
 }
 
-STATIC
 VOID
 ReadCLen (
   SCRATCH_DATA  *Sd
@@ -509,7 +503,6 @@ Returns: (VOID)
   return ;
 }
 
-STATIC
 UINT16
 DecodeC (
   SCRATCH_DATA  *Sd
@@ -575,7 +568,6 @@ Returns:
   return Index2;
 }
 
-STATIC
 VOID
 Decode (
   SCRATCH_DATA  *Sd

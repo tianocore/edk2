@@ -22,22 +22,19 @@ Revision History
 --*/
 #include "FSVariable.h"
 
-STATIC
 VOID
 EFIAPI
-OnVirtualAddressChange (
+OnVirtualAddressChangeMs (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 MemEraseStore(
   IN VARIABLE_STORAGE   *This
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 MemWriteStore (
@@ -74,15 +71,14 @@ MemStorageConstructor (
   DEBUG ((EFI_D_ERROR, "VStorage: Size = 0x%x\n", Size));
   
   *VarStore       = &Dev->VarStore;
-  *GoVirtualEvent = OnVirtualAddressChange;
+  *GoVirtualEvent = OnVirtualAddressChangeMs;
 
   return EFI_SUCCESS;
 }
 
-STATIC
 VOID
 EFIAPI
-OnVirtualAddressChange (
+OnVirtualAddressChangeMs (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
   )
@@ -96,7 +92,6 @@ OnVirtualAddressChange (
   EfiConvertPointer (0, (VOID**)&Dev->VarStore.Write);
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 MemEraseStore(
@@ -111,7 +106,6 @@ MemEraseStore(
 }
 
 
-STATIC
 EFI_STATUS
 EFIAPI
 MemWriteStore (
