@@ -196,3 +196,13 @@ Possible Impacts:
 			Customer's module that reference GetPeiServicesTablePointer in PeiServicesTablePointer library may need to updated. Otherwise
 			a build break (mismatch of data type) may occur.
 			
+EDK_6307:  Non-Compatible: qwang12
+
+Remove SafeFreePool from MemoryAllocationLib as this API's name is misleading. Its implementation only check if a pointer is NULL. If a garbage pointer is passed in, the gBS->FreePool will still ASSERT in debug build and return error code. 
+
+It is recommended that module writer should keep track how a pointer is allocated and free it after use.
+
+Possible Impacts:
+			Customer's module that reference SafeFreePool need to updated. Otherwise
+			a build break may occur.
+			
