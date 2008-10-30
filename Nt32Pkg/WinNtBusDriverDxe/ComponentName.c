@@ -360,7 +360,7 @@ WinNtBusDriverComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiWinNtIoProtocolGuid,
-                  &WinNtIo,
+                  (VOID **) &WinNtIo,
                   gWinNtBusDriverBinding.DriverBindingHandle,
                   ChildHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
