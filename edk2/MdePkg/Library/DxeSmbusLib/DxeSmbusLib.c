@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Globle varible to cache pointer to Smbus protocol.
 //
-STATIC EFI_SMBUS_HC_PROTOCOL      *mSmbus = NULL;
+EFI_SMBUS_HC_PROTOCOL      *mSmbus = NULL;
 
 /**
   The constructor function caches the pointer to Smbus protocol.

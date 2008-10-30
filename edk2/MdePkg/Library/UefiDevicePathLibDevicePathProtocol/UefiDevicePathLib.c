@@ -26,7 +26,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-STATIC EFI_DEVICE_PATH_UTILITIES_PROTOCOL          *mDevicePathUtilities = NULL;
+EFI_DEVICE_PATH_UTILITIES_PROTOCOL          *mDevicePathUtilities = NULL;
 
 /**
   The constructor function caches the pointer to DevicePathUtilites protocol.
@@ -361,4 +361,3 @@ FileDevicePath (
 
   return DevicePath;
 }
-

@@ -23,7 +23,7 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 
-STATIC VOID  *mHobList = NULL;
+VOID  *mHobList = NULL;
 
 /**
   The constructor function caches the pointer to HOB list.

@@ -19,7 +19,7 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/DebugLib.h>
 
-STATIC CONST EFI_PEI_SERVICES  **gPeiServices;
+CONST EFI_PEI_SERVICES  **gPeiServices;
 
 /**
   The function cache the pointer of PEI services to global variable.

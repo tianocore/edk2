@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UefiIfrLibraryInternal.h"
 
-STATIC CONST EFI_FORM_BROWSER2_PROTOCOL      *mFormBrowser2     = NULL;
-STATIC CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *mHiiConfigRouting = NULL;
+CONST EFI_FORM_BROWSER2_PROTOCOL      *mFormBrowser2     = NULL;
+CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *mHiiConfigRouting = NULL;
 
 /**
   This function locate FormBrowser2 protocols for later usage.
