@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 IDT_ENTRY   *IdtEntryTable  = NULL;
 DESCRIPTOR  NullDesc        = {0, 0};
 
-STATIC
 EFI_STATUS
 CreateEntryStub (
   IN EFI_EXCEPTION_TYPE     ExceptionType,
@@ -72,7 +71,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 HookEntry (
   IN EFI_EXCEPTION_TYPE            ExceptionType,
@@ -119,7 +117,6 @@ Returns:
   return Status;
 }
 
-STATIC
 EFI_STATUS
 UnhookEntry (
   IN EFI_EXCEPTION_TYPE           ExceptionType

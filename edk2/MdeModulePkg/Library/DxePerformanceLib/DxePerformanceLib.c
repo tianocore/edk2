@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/PcdLib.h>
 
-STATIC PERFORMANCE_PROTOCOL    *mPerformance = NULL;
+PERFORMANCE_PROTOCOL    *mPerformance = NULL;
 
 /**
   The constructor function caches the pointer to Performance protocol.
@@ -34,7 +34,6 @@ STATIC PERFORMANCE_PROTOCOL    *mPerformance = NULL;
   @retval Other           Performance protocol is not located to log performance.
 
 **/
-STATIC
 EFI_STATUS
 GetPerformanceProtocol (
   VOID

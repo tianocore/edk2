@@ -50,11 +50,10 @@ EFI_DRIVER_BINDING_PROTOCOL gSCSIBusDriverBinding = {
 // structure in the SCSIBusDriverBindingStop(). Then we can
 // Close all opened protocols and release this structure.
 //
-STATIC EFI_GUID  mScsiBusProtocolGuid = EFI_SCSI_BUS_PROTOCOL_GUID;
+EFI_GUID  mScsiBusProtocolGuid = EFI_SCSI_BUS_PROTOCOL_GUID;
 
-STATIC VOID  *WorkingBuffer;
+VOID  *WorkingBuffer;
 
-STATIC
 EFI_STATUS
 EFIAPI
 ScsiioToPassThruPacket (
@@ -63,14 +62,12 @@ ScsiioToPassThruPacket (
   );
 
 
-STATIC
 EFI_STATUS
 EFIAPI
 PassThruToScsiioPacket (
   IN     EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *ScsiPacket,
   IN OUT EFI_SCSI_IO_SCSI_REQUEST_PACKET         *Packet
   );
-STATIC
 VOID
 EFIAPI
 NotifyFunction (
@@ -1201,7 +1198,6 @@ Returns:
 }
 
 
-STATIC
 EFI_STATUS
 EFIAPI
 ScsiioToPassThruPacket (
@@ -1255,7 +1251,6 @@ Returns:
 }
 
 
-STATIC
 EFI_STATUS
 EFIAPI
 PassThruToScsiioPacket (
@@ -1302,7 +1297,6 @@ Returns:
 
 
 
-STATIC
 VOID
 EFIAPI
 NotifyFunction (

@@ -99,7 +99,6 @@ mIp4SupportedIcmp [23] = {
   @retval EFI_SUCCESS            Successfully updated the route caches
 
 **/
-STATIC
 EFI_STATUS
 Ip4ProcessIcmpRedirect (
   IN IP4_SERVICE            *IpSb,
@@ -176,7 +175,6 @@ Ip4ProcessIcmpRedirect (
   @retval EFI_SUCCESS            The ICMP error is processed successfully.
 
 **/
-STATIC
 EFI_STATUS
 Ip4ProcessIcmpError (
   IN IP4_SERVICE            *IpSb,

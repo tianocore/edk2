@@ -20,7 +20,6 @@ Revision history:
 
 #include "Snp.h"
 
-STATIC
 /**
   this routine calls undi to get the status of the interrupts, get the list of
   transmit buffers that completed transmitting!

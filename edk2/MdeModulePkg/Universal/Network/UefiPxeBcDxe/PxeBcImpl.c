@@ -32,7 +32,6 @@ Abstract:
   @retval others                  If error occurs when updating arp cache
 
 **/
-STATIC
 EFI_STATUS
 UpdateArpCache (
   IN EFI_PXE_BASE_CODE_PROTOCOL     * This
@@ -74,7 +73,6 @@ UpdateArpCache (
   @param  Context            Context of the timer event
 
 **/
-STATIC
 VOID
 EFIAPI
 ArpCacheUpdateTimeout (
@@ -92,7 +90,6 @@ ArpCacheUpdateTimeout (
   @param  Context
 
 **/
-STATIC
 BOOLEAN
 FindInArpCache (
   EFI_PXE_BASE_CODE_MODE    *PxeBcMode,
@@ -121,7 +118,6 @@ FindInArpCache (
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 IcmpErrorListenHandlerDpc (
@@ -208,7 +204,6 @@ Resume:
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 IcmpErrorListenHandler (
@@ -1232,7 +1227,6 @@ ON_EXIT:
   @retval FLASE              The UDP package doesn't matches IP filters
 
 **/
-STATIC
 BOOLEAN
 CheckIpByFilter (
   EFI_PXE_BASE_CODE_MODE    *PxeBcMode,

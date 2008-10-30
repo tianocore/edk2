@@ -32,7 +32,6 @@
    @return The PCI address with PCI_LIB_ADDRESS format.
 
 **/
-STATIC
 UINTN
 PciCfgAddressConvert (
   EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *Address

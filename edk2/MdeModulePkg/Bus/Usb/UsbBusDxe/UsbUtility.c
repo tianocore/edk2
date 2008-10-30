@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Use a shor form Usb class Device Path, which could match any usb device, in WantedUsbIoDPList to indicate all Usb devices
 // are wanted Usb devices
 //
-STATIC USB_CLASS_FORMAT_DEVICE_PATH mAllUsbClassDevicePath = {
+USB_CLASS_FORMAT_DEVICE_PATH mAllUsbClassDevicePath = {
   {
     {
       MESSAGING_DEVICE_PATH,

@@ -27,9 +27,9 @@ EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL gPlatformDriverOverride = {
   DriverLoaded
 };
 
-STATIC  LIST_ENTRY      mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
-STATIC  BOOLEAN         mEnvironmentVariableRead = FALSE;
-STATIC  EFI_HANDLE      mCallerImageHandle;
+LIST_ENTRY      mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
+BOOLEAN         mEnvironmentVariableRead = FALSE;
+EFI_HANDLE      mCallerImageHandle;
 
 
 EFI_STATUS
@@ -81,7 +81,6 @@ Returns:
                                  GetDriver().
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 GetDriver (
@@ -152,7 +151,6 @@ GetDriver (
 
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 GetDriverPath (
@@ -172,7 +170,6 @@ GetDriverPath (
 
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 DriverLoaded (

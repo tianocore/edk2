@@ -274,7 +274,6 @@ TcpComputeRtt (
   @return 0, the data is successfully trimmed.
 
 **/
-STATIC
 INTN
 TcpTrimSegment (
   IN NET_BUF   *Nbuf,

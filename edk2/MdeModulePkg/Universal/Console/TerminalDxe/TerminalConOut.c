@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // ASCII. The ASCII mapping we just made up.
 //
 //
-STATIC UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
+UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
   { BOXDRAW_HORIZONTAL,                 0xc4, L'-' },
   { BOXDRAW_VERTICAL,                   0xb3, L'|' },
   { BOXDRAW_DOWN_RIGHT,                 0xda, L'/' },
@@ -78,10 +78,10 @@ STATIC UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
   { 0x0000,                             0x00, L'\0' }
 };
 
-STATIC CHAR16 mSetModeString[]            = { ESC, '[', '=', '3', 'h', 0 };
-STATIC CHAR16 mSetAttributeString[]       = { ESC, '[', '0', 'm', ESC, '[', '4', '0', 'm', ESC, '[', '4', '0', 'm', 0 };
-STATIC CHAR16 mClearScreenString[]        = { ESC, '[', '2', 'J', 0 };
-STATIC CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
+CHAR16 mSetModeString[]            = { ESC, '[', '=', '3', 'h', 0 };
+CHAR16 mSetAttributeString[]       = { ESC, '[', '0', 'm', ESC, '[', '4', '0', 'm', ESC, '[', '4', '0', 'm', 0 };
+CHAR16 mClearScreenString[]        = { ESC, '[', '2', 'J', 0 };
+CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
 
 //
 // Body of the ConOut functions

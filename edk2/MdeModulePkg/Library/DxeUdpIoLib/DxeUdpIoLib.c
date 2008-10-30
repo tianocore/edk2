@@ -32,14 +32,12 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
 
-STATIC
 VOID
 EFIAPI
 UdpIoOnDgramSentDpc (
   IN VOID                   *Context
   );
 
-STATIC
 VOID
 EFIAPI
 UdpIoOnDgramSent (
@@ -47,7 +45,6 @@ UdpIoOnDgramSent (
   IN VOID                   *Context
   );
 
-STATIC
 VOID
 EFIAPI
 UdpIoOnDgramRcvd (
@@ -69,7 +66,6 @@ UdpIoOnDgramRcvd (
   @return The wrapped transmission request or NULL if failed to allocate resources.
 
 **/
-STATIC
 UDP_TX_TOKEN *
 UdpIoWrapTx (
   IN UDP_IO_PORT            *UdpIo,
@@ -355,7 +351,6 @@ FREE_MEM:
   @return None
 
 **/
-STATIC
 VOID
 UdpIoCancelDgrams (
   IN UDP_IO_PORT            *UdpIo,
@@ -476,7 +471,6 @@ UdpIoCleanPort (
   @return None
 
 **/
-STATIC
 VOID
 EFIAPI
 UdpIoOnDgramSentDpc (
@@ -503,7 +497,6 @@ UdpIoOnDgramSentDpc (
   @return None
 
 **/
-STATIC
 VOID
 EFIAPI
 UdpIoOnDgramSent (
@@ -579,7 +572,6 @@ UdpIoSendDatagram (
   @return TRUE if the packet is to be cancelled, otherwise FALSE.
 
 **/
-STATIC
 BOOLEAN
 UdpIoCancelSingleDgram (
   IN UDP_TX_TOKEN           *Token,
@@ -626,7 +618,6 @@ UdpIoCancelSentDatagram (
   @return None
 
 **/
-STATIC
 VOID
 UdpIoRecycleDgram (
   IN VOID                   *Context
@@ -649,7 +640,6 @@ UdpIoRecycleDgram (
   @return None
 
 **/
-STATIC
 VOID
 EFIAPI
 UdpIoOnDgramRcvdDpc (
@@ -730,7 +720,6 @@ UdpIoOnDgramRcvdDpc (
   @return None
 
 **/
-STATIC
 VOID
 EFIAPI
 UdpIoOnDgramRcvd (

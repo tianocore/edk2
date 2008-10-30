@@ -17,7 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UsbMassImpl.h"
 
-STATIC
 USB_MASS_TRANSPORT *mUsbMassTransport[] = {
   &mUsbCbi0Transport,
   &mUsbCbi1Transport,

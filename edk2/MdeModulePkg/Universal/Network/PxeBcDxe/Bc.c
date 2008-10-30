@@ -345,7 +345,6 @@ UpdateChecksum (
   @retval 1                    Callbacks are not active on the handle
 
 **/
-STATIC
 BOOLEAN
 SetMakeCallback (
   IN PXE_BASECODE_DEVICE *Private

@@ -21,7 +21,7 @@ Abstract:
 
 #include "IScsiImpl.h"
 
-static UINT32 mDataSegPad = 0;
+UINT32 mDataSegPad = 0;
 
 /**
   Attach the iSCSI connection to the iSCSI session. 

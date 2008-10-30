@@ -84,7 +84,6 @@ EFI_SERVICE_BINDING_PROTOCOL mTcp4ServiceBinding = {
   @retval other                  The timer is not created.
 
 **/
-STATIC
 EFI_STATUS
 Tcp4CreateTimer (
   VOID
@@ -130,7 +129,6 @@ Tcp4CreateTimer (
   @return None.
 
 **/
-STATIC
 VOID
 Tcp4DestroyTimer (
   VOID

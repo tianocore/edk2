@@ -33,7 +33,6 @@ Abstract:
   @return NULL if failed to allocate memory, otherwise the created block range.
 
 **/
-STATIC
 MTFTP4_BLOCK_RANGE *
 Mtftp4AllocateRange (
   IN UINT16                 Start,
@@ -372,7 +371,6 @@ Mtftp4SendError (
   @return None
 
 **/
-STATIC
 VOID
 Mtftp4OnPacketSent (
   NET_BUF                   *Packet,

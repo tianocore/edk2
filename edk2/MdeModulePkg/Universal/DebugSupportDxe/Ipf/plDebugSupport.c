@@ -33,7 +33,6 @@ typedef struct {
   VOID (*RegisteredCallback) ();
 } IVT_ENTRY;
 
-STATIC
 EFI_STATUS
 ManageIvtEntryTable (
   IN  EFI_EXCEPTION_TYPE                ExceptionType,
@@ -41,7 +40,6 @@ ManageIvtEntryTable (
   IN  VOID                  (*NewCallback) ()
   );
 
-STATIC
 VOID
 HookEntry (
   IN  EFI_EXCEPTION_TYPE                ExceptionType,
@@ -49,25 +47,21 @@ HookEntry (
   IN  VOID                  (*NewCallback) ()
   );
 
-STATIC
 VOID
 UnhookEntry (
   IN  EFI_EXCEPTION_TYPE    ExceptionType
   );
 
-STATIC
 VOID
 ChainExternalInterrupt (
   IN  VOID                  (*NewCallback) ()
   );
 
-STATIC
 VOID
 UnchainExternalInterrupt (
   VOID
   );
 
-STATIC
 VOID
 GetHandlerEntryPoint (
   UINTN                     HandlerIndex,
@@ -162,7 +156,7 @@ Returns:
   
 --*/
 {
-  static BOOLEAN  InHandler = FALSE;
+  STATIC BOOLEAN  InHandler = FALSE;
 
   DEBUG_CODE_BEGIN ();
     if (InHandler) {
@@ -195,7 +189,6 @@ Returns:
   InHandler = FALSE;
 }
 
-STATIC
 VOID
 GetHandlerEntryPoint (
   UINTN   HandlerIndex,
@@ -238,7 +231,6 @@ Returns:
   *EntryPoint = (VOID *) TempPtr;
 }
 
-STATIC
 EFI_STATUS
 ManageIvtEntryTable (
   IN  EFI_EXCEPTION_TYPE                                         ExceptionType,
@@ -321,7 +313,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 VOID
 HookEntry (
   IN  EFI_EXCEPTION_TYPE  ExceptionType,
@@ -376,7 +367,6 @@ Returns:
   IvtEntryTable[ExceptionType].RegisteredCallback = NewCallback;
 }
 
-STATIC
 VOID
 UnhookEntry (
   IN  EFI_EXCEPTION_TYPE  ExceptionType
@@ -414,7 +404,6 @@ Returns:
   InstructionCacheFlush (B0Ptr, 5);
 }
 
-STATIC
 VOID
 ChainExternalInterrupt (
   IN  VOID  (*NewCallback) ()
@@ -442,7 +431,6 @@ Returns:
   InstructionCacheFlush (Start, 0x400);
 }
 
-STATIC
 VOID
 UnchainExternalInterrupt (
   VOID

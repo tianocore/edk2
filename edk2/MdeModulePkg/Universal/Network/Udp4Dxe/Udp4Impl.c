@@ -25,7 +25,6 @@ Abstract:
 
 UINT16  mUdp4RandomPort;
 
-STATIC
 VOID
 EFIAPI
 Udp4CheckTimeout (
@@ -33,7 +32,6 @@ Udp4CheckTimeout (
   IN VOID       *Context
   );
 
-STATIC
 BOOLEAN
 Udp4FindInstanceByPort (
   IN LIST_ENTRY        *InstanceList,
@@ -41,7 +39,6 @@ Udp4FindInstanceByPort (
   IN UINT16            Port
   );
 
-STATIC
 VOID
 Udp4DgramSent (
   IN EFI_STATUS  Status,
@@ -50,7 +47,6 @@ Udp4DgramSent (
   IN VOID        *NotifyData
   );
 
-STATIC
 VOID
 Udp4DgramRcvd (
   IN EFI_STATUS            Status,
@@ -60,7 +56,6 @@ Udp4DgramRcvd (
   IN VOID                  *Context
   );
 
-STATIC
 EFI_STATUS
 Udp4CancelTokens (
   IN NET_MAP       *Map,
@@ -68,14 +63,12 @@ Udp4CancelTokens (
   IN VOID          *Arg OPTIONAL
   );
 
-STATIC
 BOOLEAN
 Udp4MatchDgram (
   IN UDP4_INSTANCE_DATA     *Instance,
   IN EFI_UDP4_SESSION_DATA  *Udp4Session
   );
 
-STATIC
 VOID
 EFIAPI
 Udp4RecycleRxDataWrap (
@@ -83,7 +76,6 @@ Udp4RecycleRxDataWrap (
   IN VOID       *Context
   );
 
-STATIC
 UDP4_RXDATA_WRAP *
 Udp4WrapRxData (
   IN UDP4_INSTANCE_DATA     *Instance,
@@ -91,7 +83,6 @@ Udp4WrapRxData (
   IN EFI_UDP4_RECEIVE_DATA  *RxData
   );
 
-STATIC
 UINTN
 Udp4EnqueueDgram (
   IN UDP4_SERVICE_DATA      *Udp4Service,
@@ -99,13 +90,11 @@ Udp4EnqueueDgram (
   IN EFI_UDP4_RECEIVE_DATA  *RxData
   );
 
-STATIC
 VOID
 Udp4DeliverDgram (
   IN UDP4_SERVICE_DATA  *Udp4Service
   );
 
-STATIC
 VOID
 Udp4Demultiplex (
   IN UDP4_SERVICE_DATA     *Udp4Service,
@@ -113,7 +102,6 @@ Udp4Demultiplex (
   IN NET_BUF               *Packet
   );
 
-STATIC
 VOID
 Udp4IcmpHandler (
   IN UDP4_SERVICE_DATA     *Udp4Service,
@@ -122,7 +110,6 @@ Udp4IcmpHandler (
   IN NET_BUF               *Packet
   );
 
-STATIC
 VOID
 Udp4SendPortUnreach (
   IN IP_IO                 *IpIo,
@@ -270,7 +257,6 @@ Udp4CleanService (
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 Udp4CheckTimeout (
@@ -397,7 +383,6 @@ Udp4CleanInstance (
   @return Is the specified <Address, Port> pair found or not.
 
 **/
-STATIC
 BOOLEAN
 Udp4FindInstanceByPort (
   IN LIST_ENTRY        *InstanceList,
@@ -870,7 +855,6 @@ Udp4RemoveToken (
   @return None.
 
 **/
-STATIC
 VOID
 Udp4DgramSent (
   IN EFI_STATUS  Status,
@@ -910,7 +894,6 @@ Udp4DgramSent (
   @return None.
 
 **/
-STATIC
 VOID
 Udp4DgramRcvd (
   IN EFI_STATUS            Status,
@@ -1008,7 +991,6 @@ Udp4LeaveGroup (
                                  cancelled.
 
 **/
-STATIC
 EFI_STATUS
 Udp4CancelTokens (
   IN NET_MAP       *Map,
@@ -1146,7 +1128,6 @@ Udp4InstanceCancelToken (
   @return The udp datagram matches the receiving requirments of the Instance or not.
 
 **/
-STATIC
 BOOLEAN
 Udp4MatchDgram (
   IN UDP4_INSTANCE_DATA     *Instance,
@@ -1220,7 +1201,6 @@ Udp4MatchDgram (
   @return None.
 
 **/
-STATIC
 VOID
 EFIAPI
 Udp4RecycleRxDataWrap (
@@ -1263,7 +1243,6 @@ Udp4RecycleRxDataWrap (
   @return Pointer to the structure wrapping the RxData and the Packet.
 
 **/
-STATIC
 UDP4_RXDATA_WRAP *
 Udp4WrapRxData (
   IN UDP4_INSTANCE_DATA     *Instance,
@@ -1321,7 +1300,6 @@ Udp4WrapRxData (
   @return The times this datagram is enqueued.
 
 **/
-STATIC
 UINTN
 Udp4EnqueueDgram (
   IN UDP4_SERVICE_DATA      *Udp4Service,
@@ -1441,7 +1419,6 @@ Udp4InstanceDeliverDgram (
   @return None.
 
 **/
-STATIC
 VOID
 Udp4DeliverDgram (
   IN UDP4_SERVICE_DATA  *Udp4Service
@@ -1480,7 +1457,6 @@ Udp4DeliverDgram (
   @return None.
 
 **/
-STATIC
 VOID
 Udp4Demultiplex (
   IN UDP4_SERVICE_DATA     *Udp4Service,
@@ -1572,7 +1548,6 @@ Udp4Demultiplex (
   @return None.
 
 **/
-STATIC
 VOID
 Udp4SendPortUnreach (
   IN IP_IO                 *IpIo,
@@ -1675,7 +1650,6 @@ Udp4SendPortUnreach (
   @return None.
 
 **/
-STATIC
 VOID
 Udp4IcmpHandler (
   IN UDP4_SERVICE_DATA     *Udp4Service,

@@ -23,7 +23,6 @@ Abstract:
 #define TCP_COMP_VAL(Min, Max, Default, Val) \
   ((((Val) <= (Max)) && ((Val) >= (Min))) ? (Val) : (Default))
 
-STATIC
 EFI_STATUS
 Tcp4Route (
   IN TCP_CB           *Tcb,
@@ -84,7 +83,6 @@ Returns:
                                  instance hasn't been started.
 
 **/
-STATIC
 EFI_STATUS
 Tcp4GetMode (
   IN TCP_CB         *Tcb,
@@ -167,7 +165,6 @@ Tcp4GetMode (
   @retval EFI_OUT_OF_RESOURCES   No port can be allocated.
 
 **/
-STATIC
 EFI_STATUS
 Tcp4Bind (
   IN EFI_TCP4_ACCESS_POINT *AP
@@ -230,7 +227,6 @@ Tcp4Bind (
   @retval EFI_SUCCESS            The operation is completed successfully.
 
 **/
-STATIC
 VOID
 Tcp4FlushPcb (
   IN TCP_CB *Tcb
@@ -264,7 +260,6 @@ Tcp4FlushPcb (
   NetbufFreeList (&Tcb->RcvQue);
 }
 
-STATIC
 EFI_STATUS
 Tcp4AttachPcb (
   IN SOCKET  *Sk
@@ -307,7 +302,6 @@ Tcp4AttachPcb (
   return EFI_SUCCESS;
 }
 
-STATIC
 VOID
 Tcp4DetachPcb (
   IN SOCKET  *Sk
@@ -344,7 +338,6 @@ Tcp4DetachPcb (
   @retval EFI_OUT_OF_RESOURCES   Failed due to resource limit.
 
 **/
-STATIC
 EFI_STATUS
 Tcp4ConfigurePcb (
   IN SOCKET               *Sk,

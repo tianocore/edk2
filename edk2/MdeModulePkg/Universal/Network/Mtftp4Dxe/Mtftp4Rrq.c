@@ -371,7 +371,6 @@ Mtftp4RrqOackValid (
   @retval Others                Failed to configure the UDP child.
 
 **/
-STATIC
 EFI_STATUS
 Mtftp4RrqConfigMcastPort (
   IN UDP_IO_PORT            *McastIo,

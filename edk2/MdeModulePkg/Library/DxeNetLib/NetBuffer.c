@@ -41,7 +41,6 @@ Abstract:
                                 allocation failed due to resource limit.
 
 **/
-STATIC
 NET_BUF *
 NetbufAllocStruct (
   IN UINT32                 BlockNum,
@@ -152,7 +151,6 @@ FreeNBuf:
   @return None.
 
 **/
-STATIC
 VOID
 NetbufFreeVector (
   IN NET_VECTOR             *Vector
@@ -415,7 +413,6 @@ NetbufGetByte (
   @return None.
 
 **/
-STATIC
 VOID
 NetbufSetBlock (
   IN NET_BUF                *Nbuf,
@@ -458,7 +455,6 @@ NetbufSetBlock (
   @return None.
 
 **/
-STATIC
 VOID
 NetbufSetBlockOp (
   IN NET_BUF                *Nbuf,
@@ -492,7 +488,6 @@ NetbufSetBlockOp (
   @return NONE
 
 **/
-STATIC
 VOID
 NetbufGetFragmentFree (
   IN VOID                   *Arg
@@ -1120,7 +1115,6 @@ NetbufAllocSpace (
   @return None.
 
 **/
-STATIC
 VOID
 NetblockTrim (
   IN NET_BLOCK_OP           *BlockOp,

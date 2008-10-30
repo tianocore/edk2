@@ -22,21 +22,21 @@ Abstract:
 
 #include "Md5.h"
 
-STATIC CONST UINT32  MD5_K[][2] = {
+CONST UINT32  MD5_K[][2] = {
   { 0, 1 },
   { 1, 5 },
   { 5, 3 },
   { 0, 7 }
 };
 
-STATIC CONST UINT32  MD5_S[][4] = {
+CONST UINT32  MD5_S[][4] = {
   { 7, 22, 17, 12 },
   { 5, 20, 14, 9 },
   { 4, 23, 16 ,11 },
   { 6, 21, 15, 10 },
 };
 
-STATIC CONST UINT32  MD5_T[] = {
+CONST UINT32  MD5_T[] = {
   0xD76AA478, 0xE8C7B756, 0x242070DB, 0xC1BDCEEE,
   0xF57C0FAF, 0x4787C62A, 0xA8304613, 0xFD469501,
   0x698098D8, 0x8B44F7AF, 0xFFFF5BB1, 0x895CD7BE,
@@ -55,7 +55,7 @@ STATIC CONST UINT32  MD5_T[] = {
   0xF7537E82, 0xBD3AF235, 0x2AD7D2BB, 0xEB86D391
 };
 
-STATIC CONST UINT8 Md5HashPadding[] =
+CONST UINT8 Md5HashPadding[] =
 {
   0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -116,7 +116,7 @@ UINT32
   IN UINT32  C
   );
 
-STATIC CONST MD5_TRANSFORM_FUNC MD5_F[] = {
+CONST MD5_TRANSFORM_FUNC MD5_F[] = {
   TF1,
   TF2,
   TF3,
@@ -131,7 +131,6 @@ STATIC CONST MD5_TRANSFORM_FUNC MD5_F[] = {
   @retval NONE.
 
 **/
-STATIC
 VOID
 MD5Transform (
   IN MD5_CTX  *Md5Ctx
@@ -188,7 +187,6 @@ MD5Transform (
 
   @retval NONE.
 **/
-STATIC
 VOID
 MD5UpdateBlock (
   IN MD5_CTX      *Md5Ctx,

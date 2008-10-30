@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Static English keyboard layout
 // Format:<efi key>, <unicode without shift>, <unicode with shift>, <Modifier>, <AffectedAttribute>
 //
-STATIC
 UINT8 KeyboardLayoutTable[USB_KEYCODE_MAX_MAKE + 8][5] = {
   {EfiKeyC1,         'a',      'A',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x04
   {EfiKeyB5,         'b',      'B',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x05
@@ -168,7 +167,6 @@ LoadDefaultKeyboardLayout (
 //
 // EFI_KEY to USB Scan Code convertion table
 //
-STATIC
 UINT8 UsbScanCodeConvertionTable[] = {
   0xe0,  //  EfiKeyLCtrl
   0xe3,  //  EfiKeyA0
@@ -280,7 +278,6 @@ UINT8 UsbScanCodeConvertionTable[] = {
 //
 // Keyboard Layout Modifier to EFI Scan Code convertion table
 //
-STATIC
 UINT8 EfiScanCodeConvertionTable[] = {
   SCAN_NULL,       // EFI_NULL_MODIFIER
   SCAN_NULL,       // EFI_LEFT_CONTROL_MODIFIER
@@ -321,7 +318,7 @@ UINT8 EfiScanCodeConvertionTable[] = {
 EFI_GUID  mKeyboardLayoutEventGuid = EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID;
 
 
-STATIC KB_MODIFIER  KB_Mod[8] = {
+KB_MODIFIER  KB_Mod[8] = {
   { MOD_CONTROL_L,  0xe0 }, // 11100000
   { MOD_CONTROL_R,  0xe4 }, // 11100100
   { MOD_SHIFT_L,    0xe1 }, // 11100001

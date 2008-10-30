@@ -31,25 +31,25 @@ Abstract:
 
 #include "PlatOverMngr.h"
 
-STATIC  EFI_GUID      mPlatformOverridesManagerGuid = PLAT_OVER_MNGR_GUID;
+EFI_GUID      mPlatformOverridesManagerGuid = PLAT_OVER_MNGR_GUID;
 
-STATIC  LIST_ENTRY    mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
+LIST_ENTRY    mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
 
-STATIC  EFI_HANDLE    *mDevicePathHandleBuffer;
-STATIC  EFI_HANDLE    *mDriverImageHandleBuffer;
+EFI_HANDLE    *mDevicePathHandleBuffer;
+EFI_HANDLE    *mDriverImageHandleBuffer;
 
-STATIC UINTN         mSelectedCtrIndex;
-STATIC EFI_STRING_ID mControllerToken[MAX_CHOICE_NUM];
+UINTN         mSelectedCtrIndex;
+EFI_STRING_ID mControllerToken[MAX_CHOICE_NUM];
 
-STATIC UINTN                        mDriverImageHandleCount;
-STATIC EFI_STRING_ID                mDriverImageToken[MAX_CHOICE_NUM];
-STATIC EFI_STRING_ID                mDriverImageFilePathToken[MAX_CHOICE_NUM];
-STATIC EFI_LOADED_IMAGE_PROTOCOL    *mDriverImageProtocol[MAX_CHOICE_NUM];
-STATIC EFI_DEVICE_PATH_PROTOCOL     *mControllerDevicePathProtocol[MAX_CHOICE_NUM];
-STATIC UINTN                        mSelectedDriverImageNum;
-STATIC UINTN                        mLastSavedDriverImageNum;
-STATIC CHAR8                        mLanguage[RFC_3066_ENTRY_SIZE];
-STATIC UINT16                       mCurrentPage;
+UINTN                        mDriverImageHandleCount;
+EFI_STRING_ID                mDriverImageToken[MAX_CHOICE_NUM];
+EFI_STRING_ID                mDriverImageFilePathToken[MAX_CHOICE_NUM];
+EFI_LOADED_IMAGE_PROTOCOL    *mDriverImageProtocol[MAX_CHOICE_NUM];
+EFI_DEVICE_PATH_PROTOCOL     *mControllerDevicePathProtocol[MAX_CHOICE_NUM];
+UINTN                        mSelectedDriverImageNum;
+UINTN                        mLastSavedDriverImageNum;
+CHAR8                        mLanguage[RFC_3066_ENTRY_SIZE];
+UINT16                       mCurrentPage;
 
 /**
   The driver Entry Point. The funciton will export a disk device class formset and

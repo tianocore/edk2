@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-static EFI_PRINT2_PROTOCOL  *gPrintProtocol = NULL;
+EFI_PRINT2_PROTOCOL  *gPrintProtocol = NULL;
 
 EFI_STATUS
 EFIAPI

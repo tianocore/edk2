@@ -242,7 +242,6 @@ del_v2p (
   return EFI_NOT_FOUND;
 }
 
-STATIC
 EFI_STATUS
 issue_hwundi_command (
   UINT64 cdb
@@ -280,7 +279,6 @@ Returns:
   @return If ptr is NULL or len is zero, zero is returned.
 
 **/
-STATIC
 UINT8
 calc_8bit_cksum (
   VOID  *ptr,

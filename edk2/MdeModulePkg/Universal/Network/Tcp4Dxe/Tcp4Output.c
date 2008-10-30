@@ -22,7 +22,7 @@ Abstract:
 
 #include "Tcp4Main.h"
 
-STATIC UINT8  mTcpOutFlag[] = {
+UINT8  mTcpOutFlag[] = {
   0,                          // TCP_CLOSED
   0,                          // TCP_LISTEN
   TCP_FLG_SYN,                // TCP_SYN_SENT
@@ -122,7 +122,6 @@ TcpRcvWinNow (
   @return The value of the local receive window size used to fill the outing segment.
 
 **/
-STATIC
 UINT16
 TcpComputeWnd (
   IN TCP_CB  *Tcb,
@@ -295,7 +294,6 @@ SetPersistTimer:
   @retval other   Error condition occurred.
 
 **/
-STATIC
 INTN
 TcpTransmitSegment (
   IN TCP_CB  *Tcb,

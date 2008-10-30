@@ -37,7 +37,6 @@ Abstract:
   @return the point to just created reassemble entry.
 
 **/
-STATIC
 IP4_ASSEMBLE_ENTRY *
 Ip4CreateAssembleEntry (
   IN IP4_ADDR               Dst,
@@ -80,7 +79,6 @@ Ip4CreateAssembleEntry (
   @return None
 
 **/
-STATIC
 VOID
 Ip4FreeAssembleEntry (
   IN IP4_ASSEMBLE_ENTRY     *Assemble
@@ -164,7 +162,6 @@ Ip4CleanAssembleTable (
   @return None
 
 **/
-STATIC
 VOID
 Ip4TrimPacket (
   IN NET_BUF                *Packet,
@@ -208,7 +205,6 @@ Ip4TrimPacket (
   @return None
 
 **/
-STATIC
 VOID
 Ip4OnFreeFragments (
   IN VOID                   *Arg
@@ -231,7 +227,6 @@ Ip4OnFreeFragments (
   @return packet if all the fragments of the packet have arrived.
 
 **/
-STATIC
 NET_BUF *
 Ip4Reassemble (
   IN IP4_ASSEMBLE_TABLE     *Table,
@@ -795,7 +790,6 @@ Ip4InstanceEnquePacket (
   @return None
 
 **/
-STATIC
 VOID
 EFIAPI
 Ip4OnRecyclePacket (

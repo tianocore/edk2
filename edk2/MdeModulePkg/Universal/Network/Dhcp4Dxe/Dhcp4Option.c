@@ -27,7 +27,7 @@ Abstract:
 // to validate a dhcp message. Refere the comments of the
 // DHCP_OPTION_FORMAT structure.
 //
-STATIC DHCP_OPTION_FORMAT DhcpOptionFormats[] = {
+DHCP_OPTION_FORMAT DhcpOptionFormats[] = {
   {DHCP_TAG_NETMASK,        DHCP_OPTION_IP,     1, 1  , TRUE},
   {DHCP_TAG_TIME_OFFSET,    DHCP_OPTION_INT32,  1, 1  , FALSE},
   {DHCP_TAG_ROUTER,         DHCP_OPTION_IP,     1, -1 , TRUE},

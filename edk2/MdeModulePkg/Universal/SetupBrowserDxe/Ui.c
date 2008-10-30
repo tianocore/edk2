@@ -1019,7 +1019,7 @@ GetWidth (
 }
 
 
-STATIC BOOLEAN GetLineByWidthFinished = FALSE;
+BOOLEAN GetLineByWidthFinished = FALSE;
 
 /**
   Will copy LineWidth amount of a string in the OutputString buffer and return the

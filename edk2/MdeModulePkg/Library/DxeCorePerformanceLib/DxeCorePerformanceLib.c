@@ -54,7 +54,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 StartGauge (
@@ -88,7 +87,6 @@ StartGauge (
   @retval EFI_NOT_FOUND           The specified measurement record could not be found.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EndGauge (
@@ -116,7 +114,6 @@ EndGauge (
   @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 GetGauge (
@@ -127,8 +124,8 @@ GetGauge (
 //
 // Definition for global variables.
 //
-STATIC GAUGE_DATA_HEADER    *mGaugeData;
-STATIC UINT32               mMaxGaugeRecords;
+GAUGE_DATA_HEADER    *mGaugeData;
+UINT32               mMaxGaugeRecords;
 
 EFI_HANDLE           mHandle = NULL;
 PERFORMANCE_PROTOCOL mPerformanceInterface = {
@@ -156,7 +153,6 @@ PERFORMANCE_PROTOCOL mPerformanceInterface = {
   @retval The index of gauge entry in the array.
 
 **/
-STATIC
 UINT32
 InternalSearchForGaugeEntry (
   IN CONST VOID                 *Handle,  OPTIONAL
@@ -214,7 +210,6 @@ InternalSearchForGaugeEntry (
   @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 StartGauge (
@@ -297,7 +292,6 @@ StartGauge (
   @retval EFI_NOT_FOUND           The specified measurement record could not be found.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 EndGauge (
@@ -342,7 +336,6 @@ EndGauge (
   @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 GetGauge (
@@ -379,7 +372,6 @@ GetGauge (
   to DXE performance data structures.
 
 **/
-STATIC
 VOID
 InternalGetPeiPerformance (
   VOID

@@ -15,9 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <BaseMemoryTest.h>
 #include <Library/PeiServicesLib.h>
 
-static PEI_BASE_MEMORY_TEST_PPI mPeiBaseMemoryTestPpi = { BaseMemoryTest };
+PEI_BASE_MEMORY_TEST_PPI mPeiBaseMemoryTestPpi = { BaseMemoryTest };
 
-static EFI_PEI_PPI_DESCRIPTOR   PpiListPeiBaseMemoryTest = {
+EFI_PEI_PPI_DESCRIPTOR   PpiListPeiBaseMemoryTest = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gPeiBaseMemoryTestPpiGuid,
   &mPeiBaseMemoryTestPpi

@@ -32,7 +32,6 @@ Abstract:
                                FALSE, the specific Event is not in the List.
 
 **/
-STATIC
 BOOLEAN
 SockTokenExistedInList (
   IN LIST_ENTRY     *List,

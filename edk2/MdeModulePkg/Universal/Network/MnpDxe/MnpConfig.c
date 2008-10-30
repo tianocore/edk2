@@ -52,26 +52,22 @@ EFI_MANAGED_NETWORK_CONFIG_DATA mMnpDefaultConfigData = {
   FALSE
 };
 
-STATIC
 EFI_STATUS
 MnpAddFreeNbuf (
   IN MNP_SERVICE_DATA  *MnpServiceData,
   IN UINTN             Count
   );
 
-STATIC
 EFI_STATUS
 MnpStartSnp (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *Snp
   );
 
-STATIC
 EFI_STATUS
 MnpStopSnp (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *Snp
   );
 
-STATIC
 EFI_STATUS
 MnpStart (
   IN MNP_SERVICE_DATA  *MnpServiceData,
@@ -79,19 +75,16 @@ MnpStart (
   IN BOOLEAN           EnableSystemPoll
   );
 
-STATIC
 EFI_STATUS
 MnpStop (
   IN MNP_SERVICE_DATA  *MnpServiceData
   );
 
-STATIC
 EFI_STATUS
 MnpConfigReceiveFilters (
   IN MNP_SERVICE_DATA  *MnpServiceData
   );
 
-STATIC
 EFI_STATUS
 MnpGroupOpAddCtrlBlk (
   IN MNP_INSTANCE_DATA        *Instance,
@@ -101,7 +94,6 @@ MnpGroupOpAddCtrlBlk (
   IN UINT32                   HwAddressSize
   );
 
-STATIC
 BOOLEAN
 MnpGroupOpDelCtrlBlk (
   IN MNP_INSTANCE_DATA        *Instance,
@@ -121,7 +113,6 @@ MnpGroupOpDelCtrlBlk (
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate a NET_BUF structure.
 
 **/
-STATIC
 EFI_STATUS
 MnpAddFreeNbuf (
   IN MNP_SERVICE_DATA  *MnpServiceData,
@@ -679,7 +670,6 @@ MnpCancelTokens (
   @retval Other                 Some error occurs.
 
 **/
-STATIC
 EFI_STATUS
 MnpStartSnp (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *Snp
@@ -714,7 +704,6 @@ MnpStartSnp (
   @retval Other                 Some error occurs.
 
 **/
-STATIC
 EFI_STATUS
 MnpStopSnp (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *Snp
@@ -754,7 +743,6 @@ MnpStopSnp (
   @retval Other                 Some error occurs.
 
 **/
-STATIC
 EFI_STATUS
 MnpStart (
   IN MNP_SERVICE_DATA  *MnpServiceData,
@@ -843,7 +831,6 @@ ErrorExit:
   @retval Other                 Some error occurs.
 
 **/
-STATIC
 EFI_STATUS
 MnpStop (
   IN MNP_SERVICE_DATA  *MnpServiceData
@@ -1087,7 +1074,6 @@ MnpConfigureInstance (
                                 of memory resource.
 
 **/
-STATIC
 EFI_STATUS
 MnpConfigReceiveFilters (
   IN MNP_SERVICE_DATA  *MnpServiceData
@@ -1249,7 +1235,6 @@ MnpConfigReceiveFilters (
   @retval EFI_OUT_OF_RESOURCE   Failed due to lack of memory resources.
 
 **/
-STATIC
 EFI_STATUS
 MnpGroupOpAddCtrlBlk (
   IN MNP_INSTANCE_DATA        *Instance,
@@ -1315,7 +1300,6 @@ MnpGroupOpAddCtrlBlk (
   @return The group address controlled by the control block is no longer used or not.
 
 **/
-STATIC
 BOOLEAN
 MnpGroupOpDelCtrlBlk (
   IN MNP_INSTANCE_DATA        *Instance,

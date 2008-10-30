@@ -486,7 +486,6 @@ NetMapGetCount (
   @return The allocated item or NULL
 
 **/
-STATIC
 NET_MAP_ITEM *
 NetMapAllocItem (
   IN NET_MAP                *Map
@@ -609,7 +608,6 @@ NetMapInsertTail (
   @return TRUE if the item is in the netmap, otherwise FALSE.
 
 **/
-STATIC
 BOOLEAN
 NetItemInMap (
   IN NET_MAP                *Map,
@@ -1116,7 +1114,6 @@ NetLibGetMacString (
   @retval FALSE          If the default address is acquired from DHCP.
 
 **/
-STATIC
 BOOLEAN
 NetLibDefaultAddressIsStatic (
   IN EFI_HANDLE  Controller

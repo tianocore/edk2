@@ -34,7 +34,6 @@ Abstract:
   @return route entry.
 
 **/
-STATIC
 IP4_ROUTE_ENTRY *
 Ip4CreateRouteEntry (
   IN IP4_ADDR               Dest,
@@ -70,7 +69,6 @@ Ip4CreateRouteEntry (
   @return NONE
 
 **/
-STATIC
 VOID
 Ip4FreeRouteEntry (
   IN IP4_ROUTE_ENTRY    *RtEntry
@@ -97,7 +95,6 @@ Ip4FreeRouteEntry (
   @return to the created route cache entry.
 
 **/
-STATIC
 IP4_ROUTE_CACHE_ENTRY *
 Ip4CreateRouteCacheEntry (
   IN IP4_ADDR               Dst,
@@ -292,7 +289,6 @@ Ip4FreeRouteTable (
   @return None
 
 **/
-STATIC
 VOID
 Ip4PurgeRouteCache (
   IN IP4_ROUTE_CACHE        *RtCache,
@@ -482,7 +478,6 @@ Ip4FindRouteCache (
   @return most specific route to the Dst.
 
 **/
-STATIC
 IP4_ROUTE_ENTRY *
 Ip4FindRouteEntry (
   IN IP4_ROUTE_TABLE        *RtTable,

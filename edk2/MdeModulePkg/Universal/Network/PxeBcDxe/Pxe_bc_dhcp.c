@@ -22,12 +22,12 @@ Abstract:
 
 #include "PxeArch.h"
 
-STATIC EFI_PXE_BASE_CODE_UDP_PORT DhcpServerPort        = DHCP_SERVER_PORT;
-STATIC EFI_PXE_BASE_CODE_UDP_PORT DHCPClientPort        = DHCP_CLIENT_PORT;
-STATIC EFI_PXE_BASE_CODE_UDP_PORT PseudoDhcpServerPort  = PXE_DISCOVERY_PORT;
+EFI_PXE_BASE_CODE_UDP_PORT DhcpServerPort        = DHCP_SERVER_PORT;
+EFI_PXE_BASE_CODE_UDP_PORT DHCPClientPort        = DHCP_CLIENT_PORT;
+EFI_PXE_BASE_CODE_UDP_PORT PseudoDhcpServerPort  = PXE_DISCOVERY_PORT;
 #define PSEUDO_DHCP_CLIENT_PORT PseudoDhcpServerPort
-STATIC EFI_IP_ADDRESS             BroadcastIP       = {{0xffffffff}};
-STATIC EFI_IP_ADDRESS             DefaultSubnetMask = {{0xffffff00}};
+EFI_IP_ADDRESS             BroadcastIP       = {{0xffffffff}};
+EFI_IP_ADDRESS             DefaultSubnetMask = {{0xffffff00}};
 
 typedef union {
   DHCPV4_OP_STRUCT          *OpPtr;
@@ -50,7 +50,7 @@ typedef union {
 // option structure for DHCPREQUEST at end of DISCOVER options
 // and for DHCPDECLINE
 //
-STATIC const struct requestopendstr {
+const struct requestopendstr {
   DHCPV4_OP_REQUESTED_IP  OpReqIP;
   DHCPV4_OP_SERVER_IP     DhcServerIpPtr;
   UINT8                   End[1];
@@ -87,7 +87,7 @@ PXE_OP_BOOT_ITEM                DefaultBootItem = {
 //
 // PXE discovery control default structure
 //
-STATIC PXE_OP_DISCOVERY_CONTROL DefaultDisCtl = {
+PXE_OP_DISCOVERY_CONTROL DefaultDisCtl = {
   { VEND_PXE_DISCOVERY_CONTROL, DHCPV4_OPTION_LENGTH(PXE_OP_DISCOVERY_CONTROL) },
   0
 };
@@ -120,7 +120,7 @@ typedef struct {            // discoveropendstr {
 // common option beginning for all our DHCP messages except
 // DHCPDECLINE and DHCPRELEASE
 //
-STATIC struct optionsstr {
+struct optionsstr {
   UINT8                       DhcpCookie[4];
   DHCPV4_OP_MESSAGE_TYPE      DhcpMessageType;
   DHCPV4_OP_MAX_MESSAGE_SIZE  DhcpMaxMessageSize;
@@ -246,7 +246,7 @@ struct opreleasestr {
 // value 0 -> not of interest, else value is index into PXE OPTION array
 // option values from 1 to MAX_OUR_PXE_OPT
 //
-STATIC UINT8  ourPXEopts[MAX_OUR_PXE_OPT] = {
+UINT8  ourPXEopts[MAX_OUR_PXE_OPT] = {
   VEND_PXE_MTFTP_IP_IX,             // multicast IP address of bootfile for MTFTP listen
   VEND_PXE_MTFTP_CPORT_IX,          // UDP Port to monitor for MTFTP responses - Intel order
   VEND_PXE_MTFTP_SPORT_IX,          // Server UDP Port for MTFTP open - Intel order
@@ -327,7 +327,7 @@ STATIC UINT8  ourPXEopts[MAX_OUR_PXE_OPT] = {
 // value 0 -> not of interest, else value is index into OPTION array
 // option values from 1 to MAX_OUR_OPT
 //
-STATIC UINT8  OurDhcpOptions[MAX_OUR_OPT] = {
+UINT8  OurDhcpOptions[MAX_OUR_OPT] = {
   OP_SUBNET_MASK_IX,                      // OP_SUBNET_MASK   1   // data is the subnet mask
   OP_TIME_OFFSET_IX,                      // OP_TIME_OFFSET   2   // data is the time offset of subnet to UTC in seconds
   OP_ROUTER_LIST_IX,                      // OP_ROUTER_LIST   3   // list of routers on subnet
@@ -527,7 +527,6 @@ PxeBcLibGetSmbiosSystemGuidAndSerialNumber (
 //
 // add router list to list
 //
-STATIC
 VOID
 Ip4AddRouterList (
   PXE_BASECODE_DEVICE *Private,
@@ -553,7 +552,6 @@ Ip4AddRouterList (
 //
 // send ARP for our IP - fail if someone has it
 //
-STATIC
 BOOLEAN
 SetStationIP (
   PXE_BASECODE_DEVICE *Private
@@ -613,7 +611,6 @@ SetStationIP (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 VOID
 AddRouters (
   PXE_BASECODE_DEVICE *Private,
@@ -627,7 +624,6 @@ AddRouters (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 EFI_STATUS
 DoUdpWrite (
   PXE_BASECODE_DEVICE         *Private,
@@ -665,7 +661,6 @@ typedef struct {
   UINT8 x[4];
 } C4Str;
 
-STATIC
 VOID
 InitDhcpv4TxBuf (
   PXE_BASECODE_DEVICE *Private
@@ -741,7 +736,6 @@ InitDhcpv4TxBuf (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 UINT32
 DecodePxeOptions (
   DHCP_RECEIVE_BUFFER *RxBufPtr,
@@ -789,7 +783,6 @@ DecodePxeOptions (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 VOID
 DecodeOptions (
   DHCP_RECEIVE_BUFFER *RxBufPtr,
@@ -897,7 +890,6 @@ Parse (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 VOID
 CopyParseRxBuf (
   PXE_BASECODE_DEVICE *Private,
@@ -919,7 +911,6 @@ CopyParseRxBuf (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 VOID
 CopyProxyRxBuf (
   PXE_BASECODE_DEVICE *Private,
@@ -931,7 +922,6 @@ CopyProxyRxBuf (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 VOID
 CopyParse (
   PXE_BASECODE_DEVICE       *Private,
@@ -1401,7 +1391,6 @@ GetOffers (
 //
 // send DHCPDECLINE
 //
-STATIC
 VOID
 DeclineOffer (
   PXE_BASECODE_DEVICE *Private
@@ -1447,7 +1436,6 @@ DeclineOffer (
 //
 // send DHCPRELEASE
 //
-STATIC
 BOOLEAN
 Release (
   PXE_BASECODE_DEVICE *Private
@@ -1498,7 +1486,6 @@ Release (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 BOOLEAN
 GetBINLAck (
   PXE_BASECODE_DEVICE *Private,
@@ -1583,7 +1570,6 @@ GetBINLAck (
 // make sure we can get BINL
 // send DHCPREQUEST to PXE server
 //
-STATIC
 BOOLEAN
 TryBINL (
   PXE_BASECODE_DEVICE *Private,
@@ -1672,7 +1658,6 @@ TryBINL (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 BOOLEAN
 TryFinishBINL (
   PXE_BASECODE_DEVICE *Private,
@@ -1687,7 +1672,6 @@ TryFinishBINL (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 BOOLEAN
 TryFinishProxyBINL (
   PXE_BASECODE_DEVICE *Private
@@ -1709,7 +1693,6 @@ TryFinishProxyBINL (
 //
 // try to finish DORA - send DHCP request, wait for ACK, check with ARP
 //
-STATIC
 BOOLEAN
 TryFinishDORA (
   PXE_BASECODE_DEVICE *Private,
@@ -1848,7 +1831,6 @@ TryFinishDORA (
 //
 // try a DHCP server of appropriate type
 //
-STATIC
 BOOLEAN
 TryDHCPFinishDORA (
   PXE_BASECODE_DEVICE *Private,
@@ -1878,7 +1860,6 @@ TryDHCPFinishDORA (
 //
 // try a DHCP only server and a proxy of appropriate type
 //
-STATIC
 BOOLEAN
 TryProxyFinishDORA (
   PXE_BASECODE_DEVICE *Private,
@@ -1919,7 +1900,6 @@ TryProxyFinishDORA (
 //
 // getting to the bottom of the barrel
 //
-STATIC
 BOOLEAN
 TryAnyWithBootfileFinishDORA (
   PXE_BASECODE_DEVICE *Private
@@ -1970,7 +1950,6 @@ TryAnyWithBootfileFinishDORA (
 
 /* DoDhcpDora()
  */
-STATIC
 EFI_STATUS
 DoDhcpDora (
   PXE_BASECODE_DEVICE *Private,
@@ -2390,7 +2369,6 @@ BcDhcp (
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-STATIC
 BOOLEAN
 VerifyCredentialOption (
   UINT8 *tx,
@@ -2728,7 +2706,6 @@ DoDiscover (
 
 
 **/
-STATIC
 EFI_STATUS
 Discover (
   PXE_BASECODE_DEVICE                 *Private,

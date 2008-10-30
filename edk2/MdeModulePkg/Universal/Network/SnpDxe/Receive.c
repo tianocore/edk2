@@ -39,7 +39,6 @@ Revision history:
 
 
 **/
-STATIC
 EFI_STATUS
 pxe_receive (
   SNP_DRIVER      *snp,

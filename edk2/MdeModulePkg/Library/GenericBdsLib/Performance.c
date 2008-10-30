@@ -16,8 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "InternalBdsLib.h"
 
-STATIC PERF_HEADER               mPerfHeader;
-STATIC PERF_DATA                 mPerfData;
+PERF_HEADER               mPerfHeader;
+PERF_DATA                 mPerfData;
 
 /**
   Get the short verion of PDB file name to be

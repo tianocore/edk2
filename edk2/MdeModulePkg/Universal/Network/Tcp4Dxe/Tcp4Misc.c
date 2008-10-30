@@ -186,7 +186,6 @@ TcpInitTcbPeer (
   @return Pointer to the TCP_CB with the least number of wildcard, if NULL no match is found.
 
 **/
-STATIC
 TCP_CB *
 TcpLocateListenTcb (
   IN TCP_PEER *Local,
