@@ -262,7 +262,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiDevicePathProtocolGuid,
-                  &ParentDevicePath,
+                  (VOID **) &ParentDevicePath,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -285,7 +285,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiWinNtThunkProtocolGuid,
-                  &WinNtThunk,
+                  (VOID **) &WinNtThunk,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -345,7 +345,6 @@ Returns:
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS                      Status;
-  EFI_STATUS                      InstallStatus;
   EFI_WIN_NT_THUNK_PROTOCOL       *WinNtThunk;
   EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
   WIN_NT_BUS_DEVICE               *WinNtBusDevice;
@@ -370,7 +369,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiDevicePathProtocolGuid,
-                  &ParentDevicePath,
+                  (VOID **) &ParentDevicePath,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -382,7 +381,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiWinNtThunkProtocolGuid,
-                  &WinNtThunk,
+                  (VOID **) &WinNtThunk,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -433,7 +432,6 @@ Returns:
   // Loop on the Variable list. Parse each variable to produce a set of handles that
   // represent virtual hardware devices.
   //
-  InstallStatus   = EFI_NOT_FOUND;
   for (Index = 0; Index < NT_PCD_ARRAY_SIZE; Index++) {
     PcdTempStr = (VOID *)LibPcdGetPtr (mPcdEnvironment[Index].Token);
     ASSERT (PcdTempStr != NULL);
@@ -563,14 +561,11 @@ Returns:
           Status = gBS->OpenProtocol (
                           ControllerHandle,
                           &gEfiWinNtThunkProtocolGuid,
-                          &WinNtThunk,
+                          (VOID **) &WinNtThunk,
                           This->DriverBindingHandle,
                           WinNtDevice->Handle,
                           EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                           );
-          if (!EFI_ERROR (Status)) {
-            InstallStatus = EFI_SUCCESS;
-          }
         }
       }
 
@@ -635,7 +630,7 @@ Returns:
     Status = gBS->OpenProtocol (
                     ControllerHandle,
                     &gWinNtBusDriverGuid,
-                    &WinNtBusDevice,
+                    (VOID **) &WinNtBusDevice,
                     This->DriverBindingHandle,
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -678,7 +673,7 @@ Returns:
     Status = gBS->OpenProtocol (
                     ChildHandleBuffer[Index],
                     &gEfiWinNtIoProtocolGuid,
-                    &WinNtIo,
+                    (VOID **) &WinNtIo,
                     This->DriverBindingHandle,
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
