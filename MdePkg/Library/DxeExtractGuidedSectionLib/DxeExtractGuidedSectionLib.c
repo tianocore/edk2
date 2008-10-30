@@ -20,11 +20,11 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
-STATIC GUID                 *mExtractHandlerGuidTable;
-STATIC UINT32               mNumberOfExtractHandler = 0;
+GUID                 *mExtractHandlerGuidTable;
+UINT32               mNumberOfExtractHandler = 0;
 
-STATIC EXTRACT_GUIDED_SECTION_DECODE_HANDLER   *mExtractDecodeHandlerTable;
-STATIC EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *mExtractGetInfoHandlerTable;
+EXTRACT_GUIDED_SECTION_DECODE_HANDLER   *mExtractDecodeHandlerTable;
+EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *mExtractGetInfoHandlerTable;
 
 /**
   Construtor allocates the global memory to store the registered guid and Handler list.

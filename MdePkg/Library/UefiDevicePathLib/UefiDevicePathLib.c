@@ -34,7 +34,7 @@
 //
 // Template for an end-of-device path node.
 //
-STATIC EFI_DEVICE_PATH_PROTOCOL  mEndDevicePath = {
+EFI_DEVICE_PATH_PROTOCOL  mEndDevicePath = {
   END_DEVICE_PATH_TYPE,
   END_ENTIRE_DEVICE_PATH_SUBTYPE,
   {

@@ -18,10 +18,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// Driver Lib Module Globals
 ///
 
-STATIC EFI_EVENT              mEfiVirtualNotifyEvent;
-STATIC EFI_EVENT              mEfiExitBootServicesEvent;
-STATIC BOOLEAN                mEfiGoneVirtual         = FALSE;
-STATIC BOOLEAN                mEfiAtRuntime           = FALSE;
+EFI_EVENT              mEfiVirtualNotifyEvent;
+EFI_EVENT              mEfiExitBootServicesEvent;
+BOOLEAN                mEfiGoneVirtual         = FALSE;
+BOOLEAN                mEfiAtRuntime           = FALSE;
 EFI_RUNTIME_SERVICES          *mRT;
 
 /**
