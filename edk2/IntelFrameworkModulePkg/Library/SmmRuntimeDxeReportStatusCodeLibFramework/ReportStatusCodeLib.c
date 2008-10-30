@@ -77,7 +77,6 @@ InternalReportStatusCode (
   @return  The size, in bytes, of DevicePath.
 
 **/
-STATIC
 UINTN
 InternalReportStatusCodeDevicePathSize (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath

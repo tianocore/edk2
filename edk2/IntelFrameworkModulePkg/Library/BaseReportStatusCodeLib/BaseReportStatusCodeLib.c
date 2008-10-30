@@ -47,7 +47,6 @@
   @retval  EFI_UNSUPPORTED       Status Code Protocol is not available.
 
 **/
-STATIC
 EFI_STATUS
 InternalReportStatusCode (
   IN EFI_STATUS_CODE_TYPE     Type,
@@ -69,7 +68,6 @@ InternalReportStatusCode (
   @return  The size, in bytes, of DevicePath.
 
 **/
-STATIC
 UINTN
 InternalReportStatusCodeDevicePathSize (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath

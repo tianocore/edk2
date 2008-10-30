@@ -2009,7 +2009,6 @@ PciHostBridgeEnumerator (
    @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 
 **/
-STATIC
 EFI_STATUS
 ReadConfigData (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,  OPTIONAL
@@ -2166,7 +2165,6 @@ ReadConfigData (
   @retval EFI_SUCCESS         The data has been updated.
 
 **/
-STATIC
 EFI_STATUS
 UpdateConfigData (
   IN       EFI_PCI_DEVICE_INFO                    *PciDeviceInfo,
@@ -2242,7 +2240,6 @@ UpdateConfigData (
    @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 
 **/
-STATIC
 EFI_STATUS
 WriteConfigData (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,  OPTIONAL
@@ -2417,7 +2414,6 @@ WriteConfigData (
   @retval EFI_SUCCESS         Pci device device information has been abstracted.
 
 **/
-STATIC
 EFI_STATUS
 GetPciDeviceDeviceInfo (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,  OPTIONAL
@@ -2523,7 +2519,6 @@ GetPciDeviceDeviceInfo (
   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 
 **/
-STATIC
 EFI_STATUS
 PciIncompatibilityCheckRead (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,   OPTIONAL
@@ -2590,7 +2585,6 @@ PciIncompatibilityCheckRead (
   @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 
 **/
-STATIC
 EFI_STATUS
 PciIncompatibilityCheckWrite (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,   OPTIONAL

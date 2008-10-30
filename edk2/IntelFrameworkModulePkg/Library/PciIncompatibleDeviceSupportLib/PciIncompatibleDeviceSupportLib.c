@@ -22,7 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @retval returns EFI_SUCCESS if two PCI device matched.
 **/
-STATIC
 EFI_STATUS
 DeviceCheck (
   IN  EFI_PCI_DEVICE_INFO      *PciDeviceInfo,

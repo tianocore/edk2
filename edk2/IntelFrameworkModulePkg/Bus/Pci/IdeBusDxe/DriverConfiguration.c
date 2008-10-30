@@ -38,7 +38,6 @@ EFI_DRIVER_CONFIGURATION_PROTOCOL gIDEBusDriverConfiguration = {
   @retval  EFI_NOT_FOUND TODO: Add description for return value
 
 **/
-STATIC
 EFI_STATUS
 GetResponse (
   VOID

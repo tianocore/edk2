@@ -29,14 +29,12 @@ CONST EFI_GUID gZeroGuid  = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 //
 // Worker functions private to this file
 //
-STATIC
 DATA_HUB_FILTER_DRIVER  *
 FindFilterDriverByEvent (
   IN  LIST_ENTRY      *Head,
   IN  EFI_EVENT       Event
   );
 
-STATIC
 EFI_DATA_RECORD_HEADER  *
 GetNextDataRecord (
   IN  LIST_ENTRY          *Head,
@@ -59,7 +57,6 @@ GetNextDataRecord (
   @retval EFI_OUT_OF_RESOURCES  - If data was not logged due to lack of system 
                                   resources.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 DataHubLogData (
@@ -193,7 +190,6 @@ DataHubLogData (
   @retval EFI_OUT_OF_RESOURCES    - Record was not returned due to lack of system resources.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 DataHubGetNextRecord (
@@ -314,7 +310,6 @@ DataHubGetNextRecord (
                             system resources.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 DataHubRegisterFilterDriver (
@@ -393,7 +388,6 @@ DataHubRegisterFilterDriver (
   @retval EFI_NOT_FOUND - If FilterEvent does not exist
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 DataHubUnregisterFilterDriver (
@@ -441,7 +435,6 @@ DataHubUnregisterFilterDriver (
   @retval NULL - If Event is not in the list
 
 **/
-STATIC
 DATA_HUB_FILTER_DRIVER *
 FindFilterDriverByEvent (
   IN  LIST_ENTRY      *Head,
@@ -479,7 +472,6 @@ FindFilterDriverByEvent (
   @retval NULL - If no data record exists.
 
 **/
-STATIC
 EFI_DATA_RECORD_HEADER *
 GetNextDataRecord (
   IN  LIST_ENTRY          *Head,

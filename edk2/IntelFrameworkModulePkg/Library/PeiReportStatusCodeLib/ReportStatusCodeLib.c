@@ -55,7 +55,6 @@
   @retval  EFI_UNSUPPORTED       Status Code Protocol is not available.
 
 **/
-STATIC
 EFI_STATUS
 InternalReportStatusCode (
   IN EFI_STATUS_CODE_TYPE     Type,

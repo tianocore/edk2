@@ -25,9 +25,9 @@ typedef struct {
   UINT64      RomLength;
 } EFI_PCI_ROM_IMAGE_MAPPING;
 
-static UINTN                      mNumberOfPciRomImages     = 0;
-static UINTN                      mMaxNumberOfPciRomImages  = 0;
-static EFI_PCI_ROM_IMAGE_MAPPING  *mRomImageTable           = NULL;
+UINTN                      mNumberOfPciRomImages     = 0;
+UINTN                      mMaxNumberOfPciRomImages  = 0;
+EFI_PCI_ROM_IMAGE_MAPPING  *mRomImageTable           = NULL;
 
 /**
   Add the Rom Image to internal database for later PCI light enumeration

@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Internal use only
 //
-STATIC
 EFI_STATUS
 ReportErrorStatusCode (
   IN PCI_IO_DEVICE               *PciIoDevice,
@@ -32,7 +31,7 @@ ReportErrorStatusCode (
 //
 // Pci Io Protocol Interface
 //
-static EFI_PCI_IO_PROTOCOL  PciIoInterface = {
+EFI_PCI_IO_PROTOCOL  PciIoInterface = {
   PciIoPollMem,
   PciIoPollIo,
   {
@@ -67,7 +66,6 @@ static EFI_PCI_IO_PROTOCOL  PciIoInterface = {
   @param PciIoDevice Pci device instance
   @param Code        status code
 **/
-STATIC
 EFI_STATUS
 ReportErrorStatusCode (
   IN PCI_IO_DEVICE               *PciIoDevice,

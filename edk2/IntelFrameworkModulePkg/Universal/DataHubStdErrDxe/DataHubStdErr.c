@@ -38,7 +38,6 @@ EFI_EVENT             mDataHubStdErrEvent;
   @param Event    - The event that occured, not used
   @param Context  - DataHub Protocol Pointer
 **/
-STATIC
 VOID
 EFIAPI
 DataHubStdErrEventHandler (

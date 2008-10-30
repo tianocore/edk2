@@ -20,24 +20,18 @@
 #include <Library/OemHookStatusCodeLib.h>
 #include <Protocol/SmmBase.h>
 
-STATIC 
 EFI_EVENT             mVirtualAddressChangeEvent;
 
-STATIC 
 EFI_EVENT             mExitBootServicesEvent;
 
-STATIC
 EFI_STATUS_CODE_DATA  *mStatusCodeData;
 
-STATIC
 BOOLEAN               mInSmm;
 
 EFI_SMM_BASE_PROTOCOL *mSmmBase;
 
-STATIC
 EFI_RUNTIME_SERVICES  *mRT;
 
-STATIC
 BOOLEAN               mHaveExitedBootServices = FALSE;
 
 /**
@@ -80,7 +74,6 @@ InternalGetReportStatusCode (
   @param[in]    Event   The Event that is being processed
   @param[in]    Context Event Context
 **/
-STATIC
 VOID
 EFIAPI
 ReportStatusCodeLibVirtualAddressChange (
@@ -101,7 +94,6 @@ ReportStatusCodeLibVirtualAddressChange (
   @param[in]    Event   The Event that is being processed
   @param[in]    Context Event Context
 **/
-STATIC
 VOID
 EFIAPI
 ReportStatusCodeLibExitBootServices (

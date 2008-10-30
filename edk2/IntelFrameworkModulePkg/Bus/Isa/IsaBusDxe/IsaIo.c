@@ -37,7 +37,7 @@ EFI_ISA_IO_PROTOCOL IsaIoInterface = {
   NULL
 };
 
-static EFI_ISA_DMA_REGISTERS  DmaRegisters[8] = {
+EFI_ISA_DMA_REGISTERS  DmaRegisters[8] = {
   {
     0x00,
     0x87,
@@ -777,7 +777,6 @@ IsaIoCopyMem (
   @retval EFI_OUT_OF_RESOURCES  - The memory pages could not be allocated.
 
 **/
-STATIC
 EFI_STATUS
 IsaIoMap_OnlySupportSlaveReadWrite (
   IN     EFI_ISA_IO_PROTOCOL                                  *This,
@@ -1018,7 +1017,6 @@ IsaIoMap_OnlySupportSlaveReadWrite (
   @retval EFI_OUT_OF_RESOURCES  - The memory pages could not be allocated.
 
 **/
-STATIC
 EFI_STATUS
 IsaIoMap_FullSupport (
   IN     EFI_ISA_IO_PROTOCOL                                  *This,

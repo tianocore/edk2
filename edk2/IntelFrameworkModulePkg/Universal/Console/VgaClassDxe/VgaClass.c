@@ -65,7 +65,7 @@ InitializeVgaClass(
 //
 // Local variables
 //
-static CHAR16               CrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
+CHAR16               CrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
 typedef struct {
   CHAR16  Unicode;
@@ -79,7 +79,7 @@ typedef struct {
 // ASCII. The ASCII mapping we just made up.
 //
 //
-STATIC UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
+UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
   {
     BOXDRAW_HORIZONTAL,
     0xc4,
@@ -347,7 +347,6 @@ STATIC UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
 //
 // Private worker functions
 //
-STATIC
 VOID
 SetVideoCursorPosition (
   IN  VGA_CLASS_DEV  *VgaClassDev,
@@ -356,7 +355,6 @@ SetVideoCursorPosition (
   IN  UINTN          MaxColumn
   );
 
-STATIC
 VOID
 WriteCrtc (
   IN  VGA_CLASS_DEV  *VgaClassDev,
@@ -364,7 +362,6 @@ WriteCrtc (
   IN  UINT8          Data
   );
 
-STATIC
 BOOLEAN
 LibIsValidTextGraphics (
   IN  CHAR16  Graphic,
@@ -372,13 +369,11 @@ LibIsValidTextGraphics (
   OUT CHAR8   *Ascii OPTIONAL
   );
 
-STATIC
 BOOLEAN
 IsValidAscii (
   IN  CHAR16  Ascii
   );
 
-STATIC
 BOOLEAN
 IsValidEfiCntlChar (
   IN  CHAR16  c
@@ -1116,7 +1111,6 @@ VgaClassSetMode (
   @param MaxColumn   max logic column
   
 **/
-STATIC
 VOID
 SetVideoCursorPosition (
   IN  VGA_CLASS_DEV  *VgaClassDev,
@@ -1147,7 +1141,6 @@ SetVideoCursorPosition (
   @param Address      address
   @param Data         data
 **/
-STATIC
 VOID
 WriteCrtc (
   IN  VGA_CLASS_DEV  *VgaClassDev,
@@ -1184,7 +1177,6 @@ WriteCrtc (
   @return TRUE if Gpaphic is a supported Unicode Box Drawing character.
 
 **/
-STATIC
 BOOLEAN
 LibIsValidTextGraphics (
   IN  CHAR16  Graphic,
@@ -1225,7 +1217,6 @@ LibIsValidTextGraphics (
   @param Ascii character
   @return whether is an ASCII char.
 **/
-STATIC
 BOOLEAN
 IsValidAscii (
   IN  CHAR16  Ascii
@@ -1244,7 +1235,6 @@ IsValidAscii (
   @param c character
   @return whether is diplaying control character.
 **/
-STATIC
 BOOLEAN
 IsValidEfiCntlChar (
   IN  CHAR16  c

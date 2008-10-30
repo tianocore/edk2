@@ -83,7 +83,6 @@ FddFlushBlocks (
   @param This  Pointer of FDC_BLK_IO_DEV instance
   @param Read  Error type: read or write?
 **/
-STATIC
 VOID
 FddReportStatus (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,

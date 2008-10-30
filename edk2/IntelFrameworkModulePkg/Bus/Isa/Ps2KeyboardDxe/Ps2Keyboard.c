@@ -44,7 +44,6 @@ KbdControllerDriverStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
 
-STATIC
 EFI_STATUS
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
@@ -514,7 +513,6 @@ KbdControllerDriverStop (
   
   @param ListHead  Pointer to list head
 **/
-STATIC
 EFI_STATUS
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead

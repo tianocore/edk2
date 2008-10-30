@@ -19,17 +19,17 @@ Module Name:
 //
 // Module globals
 //
-static EFI_PEI_READ_ONLY_VARIABLE_PPI mVariablePpi = {
+EFI_PEI_READ_ONLY_VARIABLE_PPI mVariablePpi = {
   PeiGetVariable,
   PeiGetNextVariableName
 };
 
-static EFI_PEI_READ_ONLY_VARIABLE2_PPI mVariable2Ppi = {
+EFI_PEI_READ_ONLY_VARIABLE2_PPI mVariable2Ppi = {
   PeiGetVariable2,
   PeiGetNextVariableName2
 };
 
-static EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable[] = {
+EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable[] = {
   {
     (EFI_PEI_PPI_DESCRIPTOR_PPI),
     &gEfiPeiReadOnlyVariable2PpiGuid,
@@ -117,7 +117,6 @@ GetEndPointer (
   @retval FALSE           Variable header is not valid.
 
 **/
-STATIC
 BOOLEAN
 EFIAPI
 IsValidVariableHeader (
@@ -258,7 +257,6 @@ GetNextVariablePtr (
   @retval EfiInvalid    Variable store is invalid
 
 **/
-STATIC
 VARIABLE_STORE_STATUS
 EFIAPI
 GetVariableStoreStatus (
@@ -299,7 +297,6 @@ GetVariableStoreStatus (
   @retval EFI_NOT_FOUND  - Variable not found
 
 **/
-STATIC
 EFI_STATUS
 CompareWithValidVariable (
   IN  VARIABLE_HEADER               *Variable,
@@ -351,7 +348,6 @@ CompareWithValidVariable (
   @retval EFI_INVALID_PARAMETER  - Invalid variable name
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 FindVariable (
