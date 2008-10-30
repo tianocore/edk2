@@ -16,12 +16,10 @@
 
 #include "PeiStatusCode.h"
 
-STATIC
 EFI_PEI_PROGRESS_CODE_PPI     mStatusCodePpi           = {
   ReportDispatcher
   };
 
-STATIC
 EFI_PEI_PPI_DESCRIPTOR        mStatusCodePpiDescriptor = {
   EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
   &gEfiPeiStatusCodePpiGuid,

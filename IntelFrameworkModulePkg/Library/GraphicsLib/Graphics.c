@@ -141,7 +141,6 @@ GetGraphicsBitMapFromFV (
   @retval EFI_OUT_OF_RESOURCES  - No enough buffer to allocate
 
 **/
-STATIC
 EFI_STATUS
 ConvertBmpToGopBlt (
   IN  VOID      *BmpImage,
@@ -569,7 +568,7 @@ DisableQuietBoot (
   return ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
 }
 
-static EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
+EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
   { 0x00, 0x00, 0x00, 0x00 },
   { 0x98, 0x00, 0x00, 0x00 },
   { 0x00, 0x98, 0x00, 0x00 },
@@ -614,7 +613,6 @@ static EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
   @retval EFI_OUT_OF_RESOURCES    -  out of resources
 
 **/
-STATIC
 UINTN
 _IPrint (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput,

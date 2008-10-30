@@ -878,7 +878,6 @@ GetFastBackToBackSupport (
   
   @retval EFI_SUCCESS Success Operation.
 **/
-STATIC
 EFI_STATUS
 ProcessOptionRomLight (
   IN PCI_IO_DEVICE                      *PciIoDevice

@@ -40,7 +40,6 @@
   (means enable media status notification) is called.
 
 **/
-STATIC
 EFI_STATUS
 LS120GetMediaStatus (
   IN  IDE_BLK_IO_DEV  *IdeDev
@@ -121,7 +120,6 @@ LS120GetMediaStatus (
   If command failed.
 
 **/
-STATIC
 EFI_STATUS
 LS120EnableMediaStatus (
   IN  IDE_BLK_IO_DEV  *IdeDev,

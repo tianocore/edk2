@@ -17,18 +17,13 @@
 //
 // Initialize FIFO to cache records.
 //
-STATIC
 LIST_ENTRY                mRecordsFifo          = INITIALIZE_LIST_HEAD_VARIABLE (mRecordsFifo);
-STATIC
 LIST_ENTRY                mRecordsBuffer        = INITIALIZE_LIST_HEAD_VARIABLE (mRecordsBuffer);
-STATIC
 UINT32                    mLogDataHubStatus     = 0;
-STATIC
 EFI_EVENT                 mLogDataHubEvent;
 //
 // Cache data hub protocol.
 //
-STATIC
 EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
 
 
@@ -41,7 +36,6 @@ EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
   @retval  !NULL  Point to buffer of record.
 
 **/
-STATIC
 DATA_HUB_STATUS_CODE_DATA_RECORD *
 AcquireRecordBuffer (
   VOID
@@ -97,7 +91,6 @@ AcquireRecordBuffer (
   @return   NULL    the FIFO of record is empty.
 
 **/
-STATIC
 DATA_HUB_STATUS_CODE_DATA_RECORD *
 RetrieveRecord (
   VOID
@@ -131,7 +124,6 @@ RetrieveRecord (
                      from AcquireRecordBuffer.
 
 **/
-STATIC
 VOID
 ReleaseRecord (
   DATA_HUB_STATUS_CODE_DATA_RECORD  *RecordData
@@ -274,7 +266,6 @@ DataHubStatusCodeReportWorker (
   @param  Context     Context of the event.
 
 **/
-STATIC
 VOID
 EFIAPI
 LogDataHubEventCallBack (

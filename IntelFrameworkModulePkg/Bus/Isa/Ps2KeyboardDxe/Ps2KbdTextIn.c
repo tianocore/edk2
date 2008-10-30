@@ -55,7 +55,6 @@ KeyboardCheckForKey (
   @retval FALSE             - Match failed. 
   
 **/
-STATIC
 BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
@@ -79,7 +78,6 @@ IsKeyRegistered (
     @retval EFI_INVALID_PARAMETER - KeyData is NULL.                        
 
 **/
-STATIC
 EFI_STATUS
 KeyboardReadKeyStrokeWorker (
   IN  KEYBOARD_CONSOLE_IN_DEV           *ConsoleInDev,
@@ -354,7 +352,6 @@ KeyboardCheckForKey (
   @retval FLASE             - Match failed. 
   
 **/
-STATIC
 BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,

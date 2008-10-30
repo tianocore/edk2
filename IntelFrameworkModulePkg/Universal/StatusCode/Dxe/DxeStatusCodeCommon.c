@@ -17,7 +17,7 @@
 //
 // Event for Exit Boot Services Callback
 //
-STATIC EFI_EVENT mExitBootServicesEvent = NULL;
+EFI_EVENT mExitBootServicesEvent = NULL;
 
 /**
   Report status code to all supported device.
@@ -59,7 +59,6 @@ ReportDispatcher (
 //
 // Declaration of status code protocol.
 //
-STATIC
 EFI_STATUS_CODE_PROTOCOL  mEfiStatusCodeProtocol  = {
   ReportDispatcher
 };

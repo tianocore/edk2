@@ -18,34 +18,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Function declarations
 //
-STATIC
 UINT8
 KeyReadDataRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
   );
 
-STATIC
 VOID
 KeyWriteDataRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   );
 
-STATIC
 VOID
 KeyWriteCommandRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   );
 
-STATIC
 VOID
 KeyboardError (
   IN KEYBOARD_CONSOLE_IN_DEV*ConsoleIn,
   IN CHAR16                 *ErrMsg // should be a unicode string
   );
 
-STATIC
 EFI_STATUS
 GetScancodeBufHead (
   KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
@@ -53,7 +48,6 @@ GetScancodeBufHead (
   OUT UINT8                *Buf
   );
 
-STATIC
 EFI_STATUS
 PopScancodeBufHead (
   KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
@@ -61,28 +55,25 @@ PopScancodeBufHead (
   OUT UINT8                *Buf
   );
 
-STATIC
 EFI_STATUS
 KeyboardWrite (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   );
 
-STATIC
 EFI_STATUS
 KeyboardCommand (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Data
   );
 
-STATIC
 EFI_STATUS
 KeyboardWaitForValue (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
   IN UINT8                   Value
   );
 
-STATIC struct {
+struct {
   UINT8  ScanCode;
   UINT16  EfiScanCode;
   CHAR16  UnicodeChar;
@@ -630,7 +621,7 @@ ConvertKeyboardScanCodeToEfiKey[] = {
 //
 // The WaitForValue time out
 //
-STATIC UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
+UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
 
 /**
   Read data register 
@@ -640,7 +631,6 @@ STATIC UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
   @return return the value 
 
 **/
-STATIC
 UINT8
 KeyReadDataRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
@@ -673,7 +663,6 @@ KeyReadDataRegister (
   @param Data      value wanted to be written
 
 **/
-STATIC
 VOID
 KeyWriteDataRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
@@ -742,7 +731,6 @@ KeyReadStatusRegister (
 
 **/
 
-STATIC
 VOID
 KeyWriteCommandRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
@@ -773,7 +761,6 @@ KeyWriteCommandRegister (
   @param ErrMsg    Unicode string of error message
   
 **/
-STATIC
 VOID
 KeyboardError (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
@@ -909,7 +896,6 @@ KeyboardTimerHandler (
   @retval EFI_SUCCESS success to scan the keyboard code
   @retval EFI_NOT_READY invalid parameter
 **/
-STATIC
 EFI_STATUS
 GetScancodeBufHead (
   KEYBOARD_CONSOLE_IN_DEV    *ConsoleIn,
@@ -962,7 +948,6 @@ GetScancodeBufHead (
   @retval EFI_SUCCESS success to scan the keyboard code
   @retval EFI_NOT_READY invalid parameter
 **/
-STATIC
 EFI_STATUS
 PopScancodeBufHead (
   KEYBOARD_CONSOLE_IN_DEV   *ConsoleIn,
@@ -1058,7 +1043,6 @@ KeyboardRead (
   @retval EFI_SUCCESS - GC_TODO: Add description for return value
 
 **/
-STATIC
 EFI_STATUS
 KeyboardWrite (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
@@ -1104,7 +1088,6 @@ KeyboardWrite (
   @retval EFI_SUCCESS Success to issue keyboard command
 
 **/
-STATIC
 EFI_STATUS
 KeyboardCommand (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
@@ -1169,7 +1152,6 @@ KeyboardCommand (
   @retval EFI_SUCCESS Success to get specific value in given time.
   
 **/
-STATIC
 EFI_STATUS
 KeyboardWaitForValue (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
