@@ -541,11 +541,13 @@ CoreConnectSingleController (
     for (Index = 0; (Index < NumberOfSortedDriverBindingProtocols) && !DriverFound; Index++) {
       if (SortedDriverBindingProtocols[Index] != NULL) {
         DriverBinding = SortedDriverBindingProtocols[Index];
+        PERF_START (DriverBinding->DriverBindingHandle, DRIVERBINDING_SUPPORT_TOK, NULL, 0);
         Status = DriverBinding->Supported(
                                   DriverBinding,
                                   ControllerHandle,
                                   RemainingDevicePath
                                   );
+        PERF_END (DriverBinding->DriverBindingHandle, DRIVERBINDING_SUPPORT_TOK, NULL, 0);
         if (!EFI_ERROR (Status)) {
           SortedDriverBindingProtocols[Index] = NULL;
           DriverFound = TRUE;

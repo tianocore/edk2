@@ -79,6 +79,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/TimerLib.h>
 
 //
 // attributes for reserved memory before it is promoted to system memory
