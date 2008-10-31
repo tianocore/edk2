@@ -305,7 +305,9 @@ BdsLibRegisterNewOption (
         // Got the option, so just return
         //
         FreePool (OptionPtr);
-        FreePool (TempOptionPtr);
+        if (TempOptionPtr != NULL) {
+          FreePool (TempOptionPtr);
+        }
         return EFI_SUCCESS;
       } else {
         //
@@ -364,7 +366,9 @@ BdsLibRegisterNewOption (
   //
   if (EFI_ERROR (Status) || UpdateDescription) {
     FreePool (OptionPtr);
-    FreePool (TempOptionPtr);
+    if (TempOptionPtr != NULL) {
+      FreePool (TempOptionPtr);
+    }
     return Status;
   }
 
@@ -386,7 +390,9 @@ BdsLibRegisterNewOption (
                     sizeof (UINT16),
                     &BootOrderEntry
                     );
-    FreePool (TempOptionPtr);
+    if (TempOptionPtr != NULL) {
+      FreePool (TempOptionPtr);
+    }
     return Status;
   }
 
