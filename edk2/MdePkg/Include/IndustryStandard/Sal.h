@@ -344,8 +344,8 @@ typedef struct _SAL_UPDATE_PAL_INFO_BLOCK {
 #pragma pack(1)
 typedef struct {
   ///
-  /// The ASCII string representation of “SST_”, which confirms the presence of the table.
-  ///
+  /// The ASCII string representation of "SST_" which confirms the presence of the table. 
+  /// 
   UINT32  Signature;
   ///
   /// The length of the entire table in bytes, starting from offset zero and including the

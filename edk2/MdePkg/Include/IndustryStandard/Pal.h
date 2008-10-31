@@ -1,5 +1,5 @@
 /** @file
-  Main PAL API's defined in Intel Itanium Architecture Software Developer’s Manual.
+  Main PAL API's defined in Intel Itanium Architecture Software Developer's Manual.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
