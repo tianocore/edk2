@@ -12,7 +12,7 @@
 
 **/
 
-#include <BaseLibInternals.h>
+#include "BaseLibInternals.h"
 
 /**
   Transfers control to a function starting with a new stack.

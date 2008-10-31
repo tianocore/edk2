@@ -13,7 +13,7 @@
 **/
 
 
-#include <BaseLibInternals.h>
+#include "BaseLibInternals.h"
 
 #pragma intrinsic (_enable)
 #pragma intrinsic (_disable)

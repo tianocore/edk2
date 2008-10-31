@@ -12,7 +12,7 @@
 
 **/
 
-#include <BaseLibInternals.h>
+#include "BaseLibInternals.h"
 
 /**
   Reads a 16-bit value from memory that may be unaligned.

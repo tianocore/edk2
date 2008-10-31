@@ -15,7 +15,7 @@
 
 **/
 
-#include <BaseLibInternals.h>
+#include "BaseLibInternals.h"
 
 /**
   Saves the current CPU context that can be restored with a call to LongJump() and returns 0.
