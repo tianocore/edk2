@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <RuntimeLibInternal.h>
+#include "RuntimeLibInternal.h"
 
 ///
 /// Driver Lib Module Globals
