@@ -623,6 +623,8 @@ ConvertKeyboardScanCodeToEfiKey[] = {
 //
 UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
 
+BOOLEAN          mEnableMouseInterface;
+
 /**
   Read data register 
 
@@ -1639,11 +1641,10 @@ InitKeyboard (
   EFI_STATUS              Status;
   EFI_STATUS              Status1;
   UINT8                   CommandByte;
-  STATIC BOOLEAN          EnableMouseInterface;
   EFI_PS2_POLICY_PROTOCOL *Ps2Policy;
 
   Status                = EFI_SUCCESS;
-  EnableMouseInterface  = TRUE;
+  mEnableMouseInterface  = TRUE;
 
   //
   // Get Ps2 policy to set this
@@ -1703,9 +1704,9 @@ InitKeyboard (
     // Test the mouse enabling bit
     //
     if (CommandByte & 0x20) {
-      EnableMouseInterface = FALSE;
+      mEnableMouseInterface = FALSE;
     } else {
-      EnableMouseInterface = TRUE;
+      mEnableMouseInterface = TRUE;
     }
 
   } else {
@@ -1751,7 +1752,7 @@ InitKeyboard (
     //
     // Don't enable mouse interface later
     //
-    EnableMouseInterface = FALSE;
+    mEnableMouseInterface = FALSE;
 
   }
 
@@ -1936,7 +1937,7 @@ InitKeyboard (
   //
 Done:
 
-  if (EnableMouseInterface) {
+  if (mEnableMouseInterface) {
     //
     // Enable mouse interface
     //
