@@ -19,8 +19,7 @@
 //--
 .file  "IpfCpuCache.s"
 
-#include  "IpfMacro.i"
-//#include  "IpfDefines.h"
+#include <IpfMacro.i>
 
 //
 //  Invalidates a range of instruction cache lines in the cache coherency domain
