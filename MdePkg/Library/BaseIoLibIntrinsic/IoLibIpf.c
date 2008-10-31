@@ -66,7 +66,7 @@ InternalGetMemoryMapAddress (
 UINT8
 EFIAPI
 IoRead8 (
-  IN  UINT64                 Port
+  IN  UINTN                  Port
   )
 {
   return MmioRead8 (InternalGetMemoryMapAddress (Port));
@@ -87,7 +87,7 @@ IoRead8 (
 UINT16
 EFIAPI
 IoRead16 (
-  IN  UINT64                 Port
+  IN  UINTN                  Port
   )
 {
   return MmioRead16 (InternalGetMemoryMapAddress (Port));
@@ -108,7 +108,7 @@ IoRead16 (
 UINT32
 EFIAPI
 IoRead32 (
-  IN  UINT64                 Port
+  IN  UINTN                  Port
   )
 {
   return MmioRead32 (InternalGetMemoryMapAddress (Port));
@@ -156,7 +156,7 @@ IoRead64 (
 UINT8
 EFIAPI
 IoWrite8 (
-  IN  UINT64                 Port,
+  IN  UINTN                  Port,
   IN  UINT8                  Data
   )
 {
@@ -181,7 +181,7 @@ IoWrite8 (
 UINT16
 EFIAPI
 IoWrite16 (
-  IN  UINT64                 Port,
+  IN  UINTN                  Port,
   IN  UINT16                 Data
   )
 {
@@ -206,7 +206,7 @@ IoWrite16 (
 UINT32
 EFIAPI
 IoWrite32 (
-  IN  UINT64                 Port,
+  IN  UINTN                  Port,
   IN  UINT32                 Data
   )
 {
