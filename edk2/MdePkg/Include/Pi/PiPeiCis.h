@@ -576,7 +576,7 @@ typedef struct {
   ///
   VOID                    *Buffer;
   ///
-  /// Size of the file’s data.
+  /// Size of the file's data.
   ///
   UINT32                  BufferSize;
 } EFI_FV_FILE_INFO;
