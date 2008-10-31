@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <ConPlatform.h>
+#include "ConPlatform.h"
 
 //
 // EFI Component Name Protocol
