@@ -22,8 +22,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Image entry point of Peim.
 
-  @param  FfsHeader   Pointer to FFS header the loaded driver.
-  @param  PeiServices An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
+  @param  FileHandle  Handle of the file being invoked. 
+                      Type EFI_PEI_FILE_HANDLE is defined in FfsFindNextFile().
+  @param  PeiServices Describes the list of possible PEI Services.
 
   @return  Status returned by entry points of Peims.
 
@@ -57,8 +58,9 @@ _ModuleEntryPoint (
 /**
   Wrapper of Peim image entry point.
 
-  @param  FfsHeader   Pointer to FFS header the loaded driver.
-  @param  PeiServices An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
+  @param  FileHandle  Handle of the file being invoked. 
+                      Type EFI_PEI_FILE_HANDLE is defined in FfsFindNextFile().
+  @param  PeiServices Describes the list of possible PEI Services.
 
   @return  Status returned by entry points of Peims.
 
