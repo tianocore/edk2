@@ -151,7 +151,7 @@ ScsiTestUnitReadyCommand (
   @param[in, out] SenseDataLength    The length of output sense data.
   @param[out]    HostAdapterStatus  The status of Host Adapter.
   @param[out]    TargetStatus       The status of the target.
-  @param[in, out] InquirydataBuffer  A pointer to inquiry data buffer.
+  @param[in, out] InquiryDataBuffer  A pointer to inquiry data buffer.
   @param[in, out] InquiryDataLength  The length of inquiry data buffer.
   @param[in]     EnableVitalProductData  Boolean to enable Vital Product Data.
 
