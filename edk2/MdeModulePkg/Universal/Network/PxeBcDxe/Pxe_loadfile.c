@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,7 @@ typedef union {
   UINT8                     *BytePtr;
 } UNION_PTR;
 
-
+UINTN  mPropeller;
 
 /**
   PxeBc callback routine for status updates and aborts.
@@ -68,13 +68,11 @@ bc_callback (
   IN EFI_PXE_BASE_CODE_PACKET             * PacketPtr OPTIONAL
   )
 {
-  STATIC UINTN  Propeller;
-
   EFI_INPUT_KEY Key;
   UINTN         Row;
   UINTN         Col;
 
-  Propeller = 0;
+  mPropeller = 0;
   //
   // Resolve Warning 4 unreferenced parameter problem
   //
@@ -139,10 +137,10 @@ bc_callback (
     Row = gST->ConOut->Mode->CursorRow;
     Col = gST->ConOut->Mode->CursorColumn;
 
-    AsciiPrint ("%c", "/-\\|"[Propeller]);
+    AsciiPrint ("%c", "/-\\|"[mPropeller]);
     gST->ConOut->SetCursorPosition (gST->ConOut, Col, Row);
 
-    Propeller = (Propeller + 1) & 3;
+    mPropeller = (mPropeller + 1) & 3;
   }
 
   return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE;

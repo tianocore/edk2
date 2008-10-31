@@ -1,7 +1,7 @@
 /** @file
 Utility functions for User Interface functions.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -115,6 +115,8 @@ SCREEN_OPERATION_T0_CONTROL_FLAG  gScreenOperationToControlFlag[] = {
     CfUiPageDown
   }
 };
+
+BOOLEAN  mInputError;
 
 
 /**
@@ -892,7 +894,6 @@ UpdateStatusBar (
   )
 {
   UINTN           Index;
-  STATIC BOOLEAN  InputError;
   CHAR16          *NvUpdateMessage;
   CHAR16          *InputErrorMessage;
 
@@ -908,14 +909,14 @@ UpdateStatusBar (
         gScreenDimensions.BottomRow - 1,
         InputErrorMessage
         );
-      InputError = TRUE;
+      mInputError = TRUE;
     } else {
       gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT_HIGHLIGHT);
       for (Index = 0; Index < (GetStringWidth (InputErrorMessage) - 2) / 2; Index++) {
         PrintAt (gScreenDimensions.LeftColumn + gPromptBlockWidth + Index, gScreenDimensions.BottomRow - 1, L"  ");
       }
 
-      InputError = FALSE;
+      mInputError = FALSE;
     }
     break;
 
@@ -947,7 +948,7 @@ UpdateStatusBar (
     break;
 
   case REFRESH_STATUS_BAR:
-    if (InputError) {
+    if (mInputError) {
       UpdateStatusBar (INPUT_ERROR, Flags, TRUE);
     }
 
