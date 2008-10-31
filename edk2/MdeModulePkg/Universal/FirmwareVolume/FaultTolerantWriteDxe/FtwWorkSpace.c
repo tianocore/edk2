@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#include <FtwLite.h>
+#include "FtwLite.h"
 
 /**
   Check to see if it is a valid work space.
