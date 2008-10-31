@@ -1,7 +1,7 @@
 /**@file
   IPF specific debug support functions
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -16,6 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // private header files
 //
 #include "plDebugSupport.h"
+
+BOOLEAN  mInHandler = FALSE;
 
 typedef struct {
   UINT64  low;
@@ -156,26 +158,24 @@ Returns:
   
 --*/
 {
-  STATIC BOOLEAN  InHandler = FALSE;
-
   DEBUG_CODE_BEGIN ();
-    if (InHandler) {
+    if (mInHandler) {
       DEBUG ((EFI_D_INFO, "ERROR: Re-entered debugger!\n"
                                     "       ExceptionType == %X\n"
                                     "       Context       == %X\n"
                                     "       Context.SystemContextIpf->CrIip  == %X\n"
                                     "       Context.SystemContextIpf->CrIpsr == %X\n"
-                                    "       InHandler     == %X\n",
+                                    "       mInHandler     == %X\n",
                                     ExceptionType, 
                                     Context, 
                                     Context.SystemContextIpf->CrIip,
                                     Context.SystemContextIpf->CrIpsr,
-                                    InHandler));
+                                    mInHandler));
     }
   DEBUG_CODE_END ();
 
-  ASSERT (!InHandler);
-  InHandler = TRUE;
+  ASSERT (!mInHandler);
+  mInHandler = TRUE;
   if (IvtEntryTable[ExceptionType].RegisteredCallback != NULL) {
     if (ExceptionType != EXCEPT_IPF_EXTERNAL_INTERRUPT) {
       IvtEntryTable[ExceptionType].RegisteredCallback (ExceptionType, Context.SystemContextIpf);
@@ -186,7 +186,7 @@ Returns:
     ASSERT (0);
   }
 
-  InHandler = FALSE;
+  mInHandler = FALSE;
 }
 
 VOID
