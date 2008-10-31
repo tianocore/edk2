@@ -76,7 +76,7 @@ typedef struct {
 /// 
 typedef struct {
   ///
-  /// A GUID that defines the memory allocation region¡¯s type and purpose, as well as
+  /// A GUID that defines the memory allocation region's type and purpose, as well as
   /// other fields within the memory allocation HOB. This GUID is used to define the
   /// additional data within the HOB that may be present for the memory allocation HOB.
   /// Type EFI_GUID is defined in InstallProtocolInterface() in the UEFI 2.0
