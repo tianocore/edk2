@@ -90,10 +90,10 @@ typedef struct {
   @param  Arg0               Functional identifier.
                              The upper 32 bits are ignored and only the lower 32 bits
                              are used. The following functional identifiers are defined:
-                             0x01XXXXXX – Architected SAL functional group.
-                             0x02XXXXXX to 0x03XXXXXX – OEM SAL functional group. Each OEM is
+                             0x01XXXXXX - Architected SAL functional group.
+                             0x02XXXXXX to 0x03XXXXXX - OEM SAL functional group. Each OEM is
                              allowed to use the entire range in the 0x02XXXXXX to 0x03XXXXXX range.
-                             0x04XXXXXX to 0xFFFFFFFF – Reserved.
+                             0x04XXXXXX to 0xFFFFFFFF - Reserved.
   @param  Arg1               The first parameter of the architected/OEM specific SAL functions.
   @param  Arg2               The second parameter of the architected/OEM specific SAL functions.
   @param  Arg3               The third parameter passed to the ESAL function based
@@ -303,7 +303,7 @@ typedef struct {
 // Parameter and return value of EFI_SAL_UPDATE_PAL
 //
 // Return parameter provides additional information on the
-// failure when the status field contains a value of –3,
+// failure when the status field contains a value of -3,
 // returned in r9.
 //
 #define EFI_SAL_UPDATE_BAD_PAL_VERSION  ((UINT64) -1)
