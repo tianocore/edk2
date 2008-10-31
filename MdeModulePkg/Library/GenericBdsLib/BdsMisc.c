@@ -305,9 +305,7 @@ BdsLibRegisterNewOption (
         // Got the option, so just return
         //
         FreePool (OptionPtr);
-        if (TempOptionPtr != NULL) {
-          FreePool (TempOptionPtr);
-        }
+        FreePool (TempOptionPtr);
         return EFI_SUCCESS;
       } else {
         //
