@@ -22,6 +22,8 @@ Abstract:
 
 #include "MiscSubclassDriver.h"
 
+BOOLEAN  mDone = FALSE;
+
 //
 //
 //
@@ -69,8 +71,6 @@ Returns:
       LogRecordData was NULL.
 --*/
 {
-  STATIC BOOLEAN  Done = FALSE;
-
   //
   // First check for invalid parameters.
   //
@@ -86,7 +86,7 @@ Returns:
   //
   // Is this the first time through this function?
   //
-  if (!Done) {
+  if (!mDone) {
     //
     // Yes, this is the first time.  Inspect/Change the contents of the
     // RecordData structure.
@@ -100,19 +100,19 @@ Returns:
     //
     // ((EFI_MISC_SYSTEM_MANUFACTURER_DATA *)RecordData)->SystemWakeupType = %%TBD
     //
-    // Set Done flag to TRUE for next pass through this function.
+    // Set mDone flag to TRUE for next pass through this function.
     // Set *LogRecordData to TRUE so data will get logged to Data Hub.
     //
-    Done            = TRUE;
+    mDone            = TRUE;
     *LogRecordData  = TRUE;
   } else {
     //
-    // No, this is the second time.  Reset the state of the Done flag
+    // No, this is the second time.  Reset the state of the mDone flag
     // to FALSE and tell the data logger that there is no more data
     // to be logged for this record type.  If any memory allocations
     // were made by earlier passes, they must be released now.
     //
-    Done            = FALSE;
+    mDone            = FALSE;
     *LogRecordData  = FALSE;
   }
 
