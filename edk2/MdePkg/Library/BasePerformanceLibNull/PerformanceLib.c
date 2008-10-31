@@ -1,7 +1,7 @@
 /** @file
   Base Performance Library which provides no service.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,9 +43,9 @@
 RETURN_STATUS
 EFIAPI
 StartPerformanceMeasurement (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,
-  IN CONST CHAR8  *Module,
+  IN CONST VOID   *Handle,   OPTIONAL
+  IN CONST CHAR8  *Token,    OPTIONAL
+  IN CONST CHAR8  *Module,   OPTIONAL
   IN UINT64       TimeStamp
   )
 {
@@ -79,8 +79,8 @@ RETURN_STATUS
 EFIAPI
 EndPerformanceMeasurement (
   IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,
-  IN CONST CHAR8  *Module,
+  IN CONST CHAR8  *Token,   OPTIONAL
+  IN CONST CHAR8  *Module,  OPTIONAL
   IN UINT64       TimeStamp
   )
 {
