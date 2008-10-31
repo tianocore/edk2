@@ -15,7 +15,7 @@
 #ifndef __UEFI_BASETYPE_H__
 #define __UEFI_BASETYPE_H__
 
-#include "Base.h"
+#include <Base.h>
 
 //
 // Basical data type definitions introduced in UEFI.
