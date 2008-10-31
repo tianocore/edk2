@@ -13,7 +13,7 @@
 
 **/
 
-#include <BaseLibInternals.h>
+#include "BaseLibInternals.h"
 
 /**
   Calculate the sum of all elements in a buffer in unit of UINT8. 

@@ -12,7 +12,7 @@
 
 **/
 
-#include <BaseLibInternals.h>
+#include "BaseLibInternals.h"
 
 /**
   Worker function that Divides a 64-bit signed integer by a 64-bit signed integer and

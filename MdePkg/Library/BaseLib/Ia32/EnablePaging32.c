@@ -12,7 +12,7 @@
 
 **/
 
-#include <BaseLibInternals.h>
+#include "BaseLibInternals.h"
 
 /**
   Enables the 32-bit paging mode on the CPU.
