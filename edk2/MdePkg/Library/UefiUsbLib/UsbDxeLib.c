@@ -15,7 +15,7 @@
 
 **/
 
-#include <UefiUsbLibInternal.h>
+#include "UefiUsbLibInternal.h"
 
 
 /**

@@ -14,7 +14,7 @@
 
 **/
 
-#include <UefiUsbLibInternal.h>
+#include "UefiUsbLibInternal.h"
 
 //  
 //  Hid RequestType Bits specifying characteristics of request.
