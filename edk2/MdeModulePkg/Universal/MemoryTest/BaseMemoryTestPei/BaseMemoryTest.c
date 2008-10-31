@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <BaseMemoryTest.h>
+#include "BaseMemoryTest.h"
 #include <Library/PeiServicesLib.h>
 
 PEI_BASE_MEMORY_TEST_PPI mPeiBaseMemoryTestPpi = { BaseMemoryTest };
