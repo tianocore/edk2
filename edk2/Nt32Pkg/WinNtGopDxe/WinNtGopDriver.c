@@ -132,7 +132,7 @@ WinNtGopDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiWinNtIoProtocolGuid,
-                  &WinNtIo,
+                  (VOID **) &WinNtIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -185,7 +185,7 @@ WinNtGopDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiWinNtIoProtocolGuid,
-                  &WinNtIo,
+                  (VOID **) &WinNtIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -309,7 +309,7 @@ WinNtGopDriverBindingStop (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiGraphicsOutputProtocolGuid,
-                  &GraphicsOutput,
+                  (VOID **) &GraphicsOutput,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

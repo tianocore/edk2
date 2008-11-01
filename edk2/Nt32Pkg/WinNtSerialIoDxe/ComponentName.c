@@ -345,7 +345,7 @@ WinNtSerialIoComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiSerialIoProtocolGuid,
-                  &SerialIo,
+                  (VOID **) &SerialIo,
                   gWinNtSerialIoDriverBinding.DriverBindingHandle,
                   ChildHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

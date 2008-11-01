@@ -132,7 +132,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiDevicePathProtocolGuid,
-                  &ParentDevicePath,
+                  (VOID **) &ParentDevicePath,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -155,7 +155,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiWinNtIoProtocolGuid,
-                  &WinNtIo,
+                  (VOID **) &WinNtIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -271,7 +271,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiDevicePathProtocolGuid,
-                  &ParentDevicePath,
+                  (VOID **) &ParentDevicePath,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -286,7 +286,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiWinNtIoProtocolGuid,
-                  &WinNtIo,
+                  (VOID **) &WinNtIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -327,7 +327,7 @@ Returns:
         Status = gBS->OpenProtocol (
                         OpenInfoBuffer[Index].ControllerHandle,
                         &gEfiSerialIoProtocolGuid,
-                        &SerialIo,
+                        (VOID **) &SerialIo,
                         This->DriverBindingHandle,
                         Handle,
                         EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -494,7 +494,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiWinNtIoProtocolGuid,
-                  &WinNtIo,
+                  (VOID **) &WinNtIo,
                   This->DriverBindingHandle,
                   Private->Handle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -597,7 +597,7 @@ Returns:
     Status = gBS->OpenProtocol (
                     ChildHandleBuffer[Index],
                     &gEfiSerialIoProtocolGuid,
-                    &SerialIo,
+                    (VOID **) &SerialIo,
                     This->DriverBindingHandle,
                     Handle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL

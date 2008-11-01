@@ -366,7 +366,7 @@ WinNtSimpleFileSystemComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiSimpleFileSystemProtocolGuid,
-                  &SimpleFileSystem,
+                  (VOID **) &SimpleFileSystem,
                   gWinNtSimpleFileSystemDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

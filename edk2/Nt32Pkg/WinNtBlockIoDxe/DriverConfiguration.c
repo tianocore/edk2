@@ -154,7 +154,7 @@ WinNtBlockIoDriverConfigurationSetOptions (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiWinNtIoProtocolGuid,
-                  &BlockIo,
+                  (VOID **) &BlockIo,
                   gWinNtBlockIoDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -239,7 +239,7 @@ WinNtBlockIoDriverConfigurationOptionsValid (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiWinNtIoProtocolGuid,
-                  &BlockIo,
+                  (VOID **) &BlockIo,
                   gWinNtBlockIoDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -315,7 +315,7 @@ WinNtBlockIoDriverConfigurationForceDefaults (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiWinNtIoProtocolGuid,
-                  &BlockIo,
+                  (VOID **) &BlockIo,
                   gWinNtBlockIoDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
