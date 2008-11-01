@@ -362,7 +362,7 @@ WinNtGopComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiGraphicsOutputProtocolGuid,
-                  &GraphicsOutput,
+                  (VOID **) &GraphicsOutput,
                   gWinNtGopDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

@@ -338,7 +338,7 @@ WinNtBlockIoComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiBlockIoProtocolGuid,
-                  &BlockIo,
+                  (VOID **) &BlockIo,
                   gWinNtBlockIoDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

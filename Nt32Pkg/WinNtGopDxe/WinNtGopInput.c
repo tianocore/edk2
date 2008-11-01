@@ -813,7 +813,7 @@ WinNtGopSimpleTextInExUnregisterKeyNotify (
   Status = gBS->OpenProtocol (
                   NotificationHandle,
                   &gSimpleTextInExNotifyGuid,
-                  NULL,
+                  (VOID **) NULL,
                   NULL,
                   NULL,
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL

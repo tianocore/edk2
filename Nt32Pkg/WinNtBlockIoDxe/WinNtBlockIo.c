@@ -158,7 +158,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiWinNtIoProtocolGuid,
-                  &WinNtIo,
+                  (VOID **) &WinNtIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -233,7 +233,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiWinNtIoProtocolGuid,
-                  &WinNtIo,
+                  (VOID **) &WinNtIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -360,7 +360,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiBlockIoProtocolGuid,
-                  &BlockIo,
+                  (VOID **) &BlockIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
