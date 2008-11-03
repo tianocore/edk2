@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #pragma pack(1)
 
-
 ///
 /// ATAPI_IDENTIFY_DATA is defined in ATA-6
 ///
@@ -85,7 +84,7 @@ typedef struct {
 } ATAPI_IDENTIFY_DATA;
 
 ///
-/// the front of part is defined in ATAPI Removable Rewritable Specification
+/// Quiry Standard Data fomrat, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 peripheral_type;
@@ -102,14 +101,15 @@ typedef struct {
   UINT8 vendor_specific_36_55[55 - 36 + 1];
   UINT8 reserved_56_95[95 - 56 + 1];
   ///
-  /// Some more fields, the sizeof (ATAPI_INQUIRY_DATA) is 255
+  /// Vendor specific parameters fields, the sizeof (ATAPI_INQUIRY_DATA) is 255
   /// since allocation_length is one byte in ATAPI_INQUIRY_CMD.
   ///
   UINT8 vendor_specific_96_255[254 - 96 + 1];
 } ATAPI_INQUIRY_DATA;
 
-
-
+///
+/// Request Sense Standard Data, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+///
 typedef struct {
   UINT8 error_code : 7;
   UINT8 valid : 1;
@@ -142,7 +142,11 @@ typedef struct {
 } ATAPI_REQUEST_SENSE_DATA;
 
 ///
-/// READ CAPACITY Data
+/// The followings are defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+///
+
+///
+/// READ CAPACITY Data 
 ///
 typedef struct {
   UINT8 LastLba3;
@@ -156,7 +160,7 @@ typedef struct {
 } ATAPI_READ_CAPACITY_DATA;
 
 ///
-/// Capacity List Header + Current/Maximum Capacity Descriptor
+/// Capacity List Header + Current/Maximum Capacity Descriptor,
 ///
 typedef struct {
   UINT8 reserved_0;
@@ -267,21 +271,6 @@ typedef struct {
   UINT8 reserved_10;
   UINT8 reserved_11;
 } ATAPI_READ_FORMAT_CAP_CMD;
-
-typedef struct {
-  UINT8 peripheral_type;
-  UINT8 RMB;
-  UINT8 version;
-  UINT8 response_data_format;
-  UINT8 addnl_length;
-  UINT8 reserved_5;
-  UINT8 reserved_6;
-  UINT8 reserved_7;
-  UINT8 vendor_info[8];
-  UINT8 product_id[12];
-  UINT8 eeprom_product_code[4];
-  UINT8 firmware_rev_level[4];
-} ATAPI_USB_INQUIRY_DATA;
 
 ///
 /// MODE SENSE Command
