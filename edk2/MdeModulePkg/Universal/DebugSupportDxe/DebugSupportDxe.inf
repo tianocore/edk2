@@ -35,22 +35,22 @@
   DebugSupport.c
 
 [Sources.Ia32]
-  Ia32/plDebugSupport.c
-  Ia32/plDebugSupport.h
+  Ia32/PlDebugSupport.c
+  Ia32/PlDebugSupport.h
   Ia32/AsmFuncs.S
   Ia32/AsmFuncs.asm
 
 [Sources.X64]
-  X64/plDebugSupport.c
-  X64/plDebugSupport.h
+  X64/PlDebugSupport.c
+  X64/PlDebugSupport.h
   X64/AsmFuncs.S
   X64/AsmFuncs.asm
 
 [Sources.IPF]
-  Ipf/plDebugSupport.h
-  Ipf/plDebugSupport.c
+  Ipf/PlDebugSupport.h
+  Ipf/PlDebugSupport.c
   Ipf/Ds64Macros.i
-  Ipf/common.i
+  Ipf/Common.i
   Ipf/AsmFuncs.s
 
 

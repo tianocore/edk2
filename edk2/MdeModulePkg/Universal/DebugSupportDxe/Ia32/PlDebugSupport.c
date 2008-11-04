@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // private header files
 //
-#include "plDebugSupport.h"
+#include "PlDebugSupport.h"
 
 //
 // This the global main table to keep track of the interrupts

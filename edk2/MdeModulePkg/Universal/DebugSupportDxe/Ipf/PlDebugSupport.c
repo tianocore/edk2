@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // private header files
 //
-#include "plDebugSupport.h"
+#include "PlDebugSupport.h"
 
 BOOLEAN  mInHandler = FALSE;
 
