@@ -83,22 +83,56 @@ typedef struct {
 
 #define DEBUGPORT_DRIVER_VERSION          1
 
-#define EfiIsUartDevicePath(dp)           (DevicePathType (dp) == MESSAGING_DEVICE_PATH && DevicePathSubType (dp) == MSG_UART_DP)
+#define IS_UART_DEVICEPATH(dp)           (DevicePathType (dp) == MESSAGING_DEVICE_PATH && DevicePathSubType (dp) == MSG_UART_DP)
 
 //
 // globals
 //
 extern DEBUGPORT_DEVICE  *gDebugPortDevice;
 
-//
-// Driver binding interface functions...
-//
+/**
+  Debug Port Driver entry pointo. 
+
+  Reads DebugPort variable to determine what device and settings to use as the
+  debug port.  Binds exclusively to SerialIo. Reverts to defaults if no variable
+  is found.
+
+  @param[in] ImageHandle       The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable       A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS          The entry point is executed successfully.
+  @retval EFI_OUT_OF_RESOURCES Fails to allocate memory for device.
+  @retval other                Some error occurs when executing this entry point.
+
+**/
 EFI_STATUS
-DebugPortEntryPoint (
+EFIAPI
+InitializeDebugPortDriver (
   IN EFI_HANDLE                     ImageHandle,
   IN EFI_SYSTEM_TABLE               *SystemTable
   );
 
+/**
+  Checks to see if there's not already a DebugPort interface somewhere. 
+
+  If there's a DEBUGPORT variable, the device path must match exactly.  If there's
+  no DEBUGPORT variable, then device path is not checked and does not matter.
+  Checks to see that there's a serial io interface on the controller handle
+  that can be bound BY_DRIVER | EXCLUSIVE.
+  If all these tests succeed, then we return EFI_SUCCESS, else, EFI_UNSUPPORTED
+  or other error returned by OpenProtocol.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to test.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver supports this device.
+  @retval EFI_UNSUPPORTED      Debug Port device is not supported.
+  @retval EFI_OUT_OF_RESOURCES Fails to allocate memory for device.
+  @retval others               Some error occurs.
+
+**/
 EFI_STATUS
 EFIAPI
 DebugPortSupported (
@@ -107,6 +141,20 @@ DebugPortSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Binds exclusively to serial io on the controller handle, Produces DebugPort
+  protocol and DevicePath on new handle.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle.
+  @retval EFI_OUT_OF_RESOURCES Fails to allocate memory for device.
+  @retval others               Some error occurs.                
+
+**/
 EFI_STATUS
 EFIAPI
 DebugPortStart (
@@ -115,6 +163,20 @@ DebugPortStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Stop this driver on ControllerHandle by removing Serial IO protocol on
+  the ControllerHandle.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval other             This driver was not removed from this device.
+
+**/
 EFI_STATUS
 EFIAPI
 DebugPortStop (
@@ -254,15 +316,39 @@ DebugPortComponentNameGetControllerName (
   );
 
 
-//
-// DebugPort member functions
-//
+/**
+  DebugPort protocol member function.  Calls SerialIo:GetControl to flush buffer.
+  We cannot call SerialIo:SetAttributes because it uses pool services, which use
+  locks, which affect TPL, so it's not interrupt context safe or re-entrant.
+  SerialIo:Reset() calls SetAttributes, so it can't be used either.
+
+  The port itself should be fine since it was set up during initialization.
+
+  @param  This              Protocol instance pointer.   
+
+  @return EFI_SUCCESS       Always.
+
+**/
 EFI_STATUS
 EFIAPI
 DebugPortReset (
   IN EFI_DEBUGPORT_PROTOCOL         *This
   );
 
+/**
+  DebugPort protocol member function.  Calls SerialIo:Read() after setting
+  if it's different than the last SerialIo access.
+
+  @param  This                Pointer to DebugPort protocol.
+  @param  Timeout             Timeout value.
+  @param  BufferSize          On input, the size of Buffer.
+                              On output, the amount of data actually written.
+  @param  Buffer              Pointer to buffer to read.
+
+  @retval EFI_SUCCESS         
+  @retval others              
+
+**/
 EFI_STATUS
 EFIAPI
 DebugPortRead (
@@ -272,6 +358,21 @@ DebugPortRead (
   IN VOID                           *Buffer
   );
 
+/**
+  DebugPort protocol member function.  Calls SerialIo:Write() Writes 8 bytes at
+  a time and does a GetControl between 8 byte writes to help insure reads are
+  interspersed This is poor-man's flow control.
+
+  @param  This                Pointer to DebugPort protocol.
+  @param  Timeout             Timeout value.
+  @param  BufferSize          On input, the size of Buffer.
+                              On output, the amount of data actually written.
+  @param  Buffer              Pointer to buffer to read.
+
+  @retval EFI_SUCCESS         The data was written.
+  @retval others              Fails when writting datas to debug port device.
+
+**/
 EFI_STATUS
 EFIAPI
 DebugPortWrite (
@@ -281,6 +382,19 @@ DebugPortWrite (
   OUT VOID                          *Buffer
   );
 
+/**
+  DebugPort protocol member function.  Calls SerialIo:Write() after setting
+  if it's different than the last SerialIo access.
+
+  @param  This                Pointer to DebugPort protocol.
+
+  @retval EFI_SUCCESS         At least 1 character is ready to be read from
+                              the DebugPort interface.
+  @retval EFI_NOT_READY       There are no characters ready to read from the
+                              DebugPort interface
+  @retval EFI_DEVICE_ERROR    A hardware failure occured... (from SerialIo)
+
+**/ 
 EFI_STATUS
 EFIAPI
 DebugPortPoll (
