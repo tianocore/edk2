@@ -3056,7 +3056,7 @@ GetSpinLockProperties (
 SPIN_LOCK *
 EFIAPI
 InitializeSpinLock (
-  IN      SPIN_LOCK                 *SpinLock
+  OUT      SPIN_LOCK                 *SpinLock
   );
 
 
