@@ -35,7 +35,7 @@ Revision History:
     0xb3f56470, 0x6141, 0x4621, 0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8 \
   }
 
-#define VAR_EQ_TEST_NAME  0x100
+#define CONFIGURATION_VARSTORE_ID    0x1234
 
 #pragma pack(1)
 typedef struct {
@@ -57,7 +57,9 @@ typedef struct {
   UINT8   OrderedList[8];
   UINT8   BootOrder[8];
   UINT8   BootOrderLarge;
-  UINT8   DynamicCheck;
+  UINT8   DynamicRefresh;
+  UINT8   DynamicOneof;
+  UINT8   DynamicOrderedList[5];
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //

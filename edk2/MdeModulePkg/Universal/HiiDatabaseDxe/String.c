@@ -1253,6 +1253,19 @@ HiiNewString (
     }
   }
 
+  //
+  // Trigger any registered notification function
+  //
+  if (!Matched) {  
+    return InvokeRegisteredFunction (
+             Private,
+             EFI_HII_DATABASE_NOTIFY_NEW_PACK,
+             (VOID *) StringPackage,
+             EFI_HII_PACKAGE_STRINGS,
+             PackageList
+             );
+  }
+
   return EFI_SUCCESS;
 }
 

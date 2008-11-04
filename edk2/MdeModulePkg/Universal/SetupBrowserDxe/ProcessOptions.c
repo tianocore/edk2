@@ -2,7 +2,7 @@
 Implementation for handling the User Interface option processing.
 
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -309,6 +309,8 @@ ProcessOptions (
   EFI_HII_VALUE                   *QuestionValue;
   BOOLEAN                         Suppress;
   UINT16                          Maximum;
+  QUESTION_OPTION                 *Option;
+  UINTN                           Index2;
 
   Status        = EFI_SUCCESS;
 
@@ -359,7 +361,30 @@ ProcessOptions (
 
         OneOfOption = ValueToOption (Question, &HiiValue);
         if (OneOfOption == NULL) {
+          //
+          // Show error message
+          //
+          do {
+            CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gOptionMismatch, gPressEnter, gEmptyString);
+          } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+          //
+          // The initial value of the orderedlist is invalid, force to be valid value
+          //
+          Link = GetFirstNode (&Question->OptionListHead);
+          Index2 = 0;
+          while (!IsNull (&Question->OptionListHead, Link) && Index2 < Question->MaxContainers) {
+            Option = QUESTION_OPTION_FROM_LINK (Link);
+            Question->BufferValue[Index2++] = Option->Value.Value.u8;
+            Link = GetNextNode (&Question->OptionListHead, Link);
+          }
+          Question->BufferValue[Index2] = 0;
+
+          Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+          UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+
           gBS->FreePool (*OptionString);
+          *OptionString = NULL;
           return EFI_NOT_FOUND;
         }
 
@@ -400,8 +425,33 @@ ProcessOptions (
 
       OneOfOption = ValueToOption (Question, QuestionValue);
       if (OneOfOption == NULL) {
+        //
+        // Show error message
+        //
+        do {
+          CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gOptionMismatch, gPressEnter, gEmptyString);
+        } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+        //
+        // Force the Question value to be valid
+        //
+        Link = GetFirstNode (&Question->OptionListHead);
+        while (!IsNull (&Question->OptionListHead, Link)) {
+          Option = QUESTION_OPTION_FROM_LINK (Link);
+
+          if ((Option->SuppressExpression == NULL) ||
+              !Option->SuppressExpression->Result.Value.b) {
+            CopyMem (QuestionValue, &Option->Value, sizeof (EFI_HII_VALUE));
+            SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+            UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+            break;
+          }
+
+          Link = GetNextNode (&Question->OptionListHead, Link);
+        }
+
         gBS->FreePool (*OptionString);
-        return EFI_NOT_FOUND;
+        *OptionString = NULL;
       }
 
       if ((OneOfOption->SuppressExpression != NULL) &&
@@ -428,6 +478,8 @@ ProcessOptions (
             Suppress = FALSE;
             CopyMem (QuestionValue, &OneOfOption->Value, sizeof (EFI_HII_VALUE));
             SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+            UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
+            gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
             break;
           }
 
@@ -470,6 +522,7 @@ ProcessOptions (
         //
         QuestionValue->Value.b = (BOOLEAN) (QuestionValue->Value.b ? FALSE : TRUE);
         gBS->FreePool (*OptionString);
+        *OptionString = NULL;
         return Status;
       }
 

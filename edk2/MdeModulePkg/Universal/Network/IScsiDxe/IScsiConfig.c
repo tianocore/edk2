@@ -335,6 +335,10 @@ IScsiFormExtractConfig (
   ISCSI_FORM_CALLBACK_INFO         *Private;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
 
+  if (Request == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   if (!mIScsiDeviceListUpdated) {
     //
     // Update the device list.

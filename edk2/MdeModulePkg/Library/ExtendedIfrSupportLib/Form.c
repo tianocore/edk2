@@ -274,6 +274,58 @@ Fail:
   return EFI_SUCCESS;
 }
 
+/**
+  This function initialize the data structure for dynamic opcode.
+
+  @param UpdateData     The adding data;
+  @param BufferSize     Length of the buffer to fill dynamic opcodes.
+
+  @retval EFI_SUCCESS           Update data is initialized.
+  @retval EFI_INVALID_PARAMETER UpdateData is NULL.
+  @retval EFI_OUT_OF_RESOURCES  No enough memory to allocate.
+
+**/
+EFI_STATUS
+IfrLibInitUpdateData (
+  IN OUT EFI_HII_UPDATE_DATA   *UpdateData,
+  IN UINT32                    BufferSize
+  )
+{
+  ASSERT (UpdateData != NULL);
+
+  UpdateData->BufferSize = BufferSize;
+  UpdateData->Offset = 0;
+  UpdateData->Data = AllocatePool (BufferSize);
+
+  return (UpdateData->Data != NULL) ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES;
+}
+
+/**
+
+  This function free the resource of update data.
+
+  @param UpdateData      The adding data;
+
+  @retval EFI_SUCCESS            Resource in UpdateData is released.
+  @retval EFI_INVALID_PARAMETER  UpdateData is NULL.
+
+**/
+EFI_STATUS
+IfrLibFreeUpdateData (
+  IN EFI_HII_UPDATE_DATA       *UpdateData
+  )
+{
+  EFI_STATUS  Status;
+
+  if (UpdateData == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = gBS->FreePool (UpdateData->Data);
+  UpdateData->Data = NULL;
+
+  return Status;
+}
 
 /**
   This function allows the caller to update a form that has
@@ -364,7 +416,7 @@ IfrLibUpdateForm (
     Status = GetPackageDataFromPackageList (HiiPackageList, Index, &PackageLength, &Package);
     if (Status == EFI_SUCCESS) {
       CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-      if ((PackageHeader.Type == EFI_HII_PACKAGE_FORM) && !Updated) {
+      if ((PackageHeader.Type == EFI_HII_PACKAGE_FORMS) && !Updated) {
         Status = UpdateFormPackageData (FormSetGuid, FormId, Package, PackageLength, Label, Insert, Data, (UINT8 **)&TempBuffer, &TempBufferSize);
         if (!EFI_ERROR(Status)) {
           if (FormSetGuid == NULL) {

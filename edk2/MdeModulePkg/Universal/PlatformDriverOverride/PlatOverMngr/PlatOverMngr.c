@@ -1128,6 +1128,10 @@ PlatOverMngrExtractConfig (
   EFI_CALLBACK_INFO                *Private;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
 
+  if (Request == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   Private = EFI_CALLBACK_INFO_FROM_THIS (This);
   HiiConfigRouting = Private->HiiConfigRouting;
 

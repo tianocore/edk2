@@ -141,182 +141,6 @@ GetDevicePath (
 
 
 /**
-  Extract Storage from all Form Packages in current hii database.
-
-  This is a internal function.
-
-  @param  HiiDatabase            EFI_HII_DATABASE_PROTOCOL instance.
-  @param  StorageListHead        Storage link List head.
-
-  @retval EFI_NOT_FOUND          There is no form package in current hii database.
-  @retval EFI_INVALID_PARAMETER  Any parameter is invalid.
-  @retval EFI_SUCCESS            All existing storage is exported.
-
-**/
-EFI_STATUS
-ExportAllStorage (
-  IN EFI_HII_DATABASE_PROTOCOL     *HiiDatabase,
-  IN OUT LIST_ENTRY                *StorageListHead
-)
-{
-  EFI_STATUS                   Status;
-  UINTN                        BufferSize;
-  UINTN                        HandleCount;
-  EFI_HII_HANDLE               *HandleBuffer;
-  UINTN                        Index;
-  UINTN                        Index2;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  EFI_HII_PACKAGE_HEADER       *Package;
-  UINT8                        *OpCodeData;
-  UINT8                        Operand;
-  UINT32                       Offset;
-  HII_FORMSET_STORAGE          *Storage;
-  EFI_HII_HANDLE               HiiHandle;
-  EFI_HANDLE                   DriverHandle;
-  CHAR8                        *AsciiString;
-  UINT32                       PackageListLength;
-  EFI_HII_PACKAGE_HEADER       PackageHeader;
-
-  //
-  // Find the package list which contains Form package.
-  //
-  BufferSize   = 0;
-  HandleBuffer = NULL;
-  Status = HiiListPackageLists (
-             HiiDatabase,
-             EFI_HII_PACKAGE_FORM,
-             NULL,
-             &BufferSize,
-             HandleBuffer
-             );
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    HandleBuffer = AllocateZeroPool (BufferSize);
-    ASSERT (HandleBuffer != NULL);
-
-    Status = HiiListPackageLists (
-               HiiDatabase,
-               EFI_HII_PACKAGE_FORM,
-               NULL,
-               &BufferSize,
-               HandleBuffer
-               );
-  }
-  if (EFI_ERROR (Status)) {
-    if (HandleBuffer != NULL) {
-      FreePool (HandleBuffer);
-    }
-    return Status;
-  }
-
-  HandleCount = BufferSize / sizeof (EFI_HII_HANDLE);
-  for (Index = 0; Index < HandleCount; Index++) {
-    HiiHandle = HandleBuffer[Index];
-
-    BufferSize     = 0;
-    HiiPackageList = NULL;
-    Status = HiiExportPackageLists (HiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      HiiPackageList = AllocateZeroPool (BufferSize);
-      ASSERT (HiiPackageList != NULL);
-      Status = HiiExportPackageLists (HiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
-    }
-    if (EFI_ERROR (Status)) {
-      FreePool (HandleBuffer);
-      FreePool (HiiPackageList);
-      return Status;
-    }
-
-    //
-    // Get Form package from this HII package List
-    //
-    Offset  = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-    CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
-    Package = NULL;
-    ZeroMem (&PackageHeader, sizeof (EFI_HII_PACKAGE_HEADER));
-
-    while (Offset < PackageListLength) {
-      Package = (EFI_HII_PACKAGE_HEADER *) (((UINT8 *) HiiPackageList) + Offset);
-      CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-      if (PackageHeader.Type == EFI_HII_PACKAGE_FORM) {
-        break;
-      }
-      Offset += PackageHeader.Length;
-    }
-    if (Offset >= PackageListLength) {
-      //
-      // Error here: No Form package found in this Package List
-      //
-      ASSERT (FALSE);
-    }
-
-    //
-    // Search Storage definition in this Form package
-    //
-    Offset = sizeof (EFI_HII_PACKAGE_HEADER);
-    while (Offset < PackageHeader.Length) {
-      OpCodeData = ((UINT8 *) Package) + Offset;
-      Offset += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-
-      Operand = ((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode;
-
-      if ((Operand == EFI_IFR_VARSTORE_OP) ||
-          (Operand == EFI_IFR_VARSTORE_NAME_VALUE_OP) ||
-          (Operand == EFI_IFR_VARSTORE_EFI_OP)) {
-
-        Storage = AllocateZeroPool (sizeof (HII_FORMSET_STORAGE));
-        ASSERT (Storage != NULL);
-        InsertTailList (StorageListHead, &Storage->Entry);
-
-        Storage->Signature = HII_FORMSET_STORAGE_SIGNATURE;
-        Storage->HiiHandle = HiiHandle;
-
-        Status = HiiGetPackageListHandle (HiiDatabase, HiiHandle, &DriverHandle);
-        if (EFI_ERROR (Status)) {
-          FreePool (HandleBuffer);
-          FreePool (HiiPackageList);
-          FreePool (Storage);
-          return Status;
-        }
-        Storage->DriverHandle = DriverHandle;
-
-        if (Operand == EFI_IFR_VARSTORE_OP) {
-          Storage->Type = EFI_HII_VARSTORE_BUFFER;
-
-          CopyMem (&Storage->Guid, &((EFI_IFR_VARSTORE *) OpCodeData)->Guid, sizeof (EFI_GUID));
-          CopyMem (&Storage->Size, &((EFI_IFR_VARSTORE *) OpCodeData)->Size, sizeof (UINT16));
-
-          AsciiString = (CHAR8 *) ((EFI_IFR_VARSTORE *) OpCodeData)->Name;
-          Storage->Name = AllocateZeroPool (AsciiStrSize (AsciiString) * 2);
-          ASSERT (Storage->Name != NULL);
-          for (Index2 = 0; AsciiString[Index2] != 0; Index2++) {
-            Storage->Name[Index2] = (CHAR16) AsciiString[Index2];
-          }
-          //
-          // Append '\0' to the end of the unicode string.
-          //
-          Storage->Name[Index2] = 0;
-        } else if (Operand == EFI_IFR_VARSTORE_NAME_VALUE_OP) {
-          Storage->Type = EFI_HII_VARSTORE_NAME_VALUE;
-
-          CopyMem (&Storage->Guid, &((EFI_IFR_VARSTORE_NAME_VALUE *) OpCodeData)->Guid, sizeof (EFI_GUID));
-        } else if (Operand == EFI_IFR_VARSTORE_EFI_OP) {
-          Storage->Type = EFI_HII_VARSTORE_EFI_VARIABLE;
-
-          CopyMem (&Storage->Guid, &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Guid, sizeof (EFI_GUID));
-        }
-      }
-    }
-
-    FreePool (HiiPackageList);
-  }
-
-  FreePool (HandleBuffer);
-
-  return EFI_SUCCESS;
-}
-
-
-/**
   Generate a sub string then output it.
 
   This is a internal function.
@@ -674,8 +498,7 @@ HiiConfigRoutingExtractConfig (
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
   EFI_STRING                          AccessResults;
-  UINTN                               RemainSize;
-  EFI_STRING                          TmpPtr;
+  BOOLEAN                             FirstElement;
 
   //
   // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
@@ -706,6 +529,8 @@ HiiConfigRoutingExtractConfig (
   if (StrnCmp (StringPtr, L"GUID=", StrLen (L"GUID=")) != 0) {
     return EFI_INVALID_PARAMETER;
   }
+
+  FirstElement = TRUE;
 
   //
   // Allocate a fix length of memory to store Results. Reallocate memory for
@@ -802,20 +627,27 @@ HiiConfigRoutingExtractConfig (
       // AccessProgress indicates the parsing progress on <ConfigRequest>.
       // Map it to the progress on <MultiConfigRequest> then return it.
       //
-      RemainSize = StrSize (AccessProgress);
-      for (TmpPtr = StringPtr; CompareMem (TmpPtr, AccessProgress, RemainSize) != 0; TmpPtr++);
-      *Progress = TmpPtr;
-
+      *Progress = StrStr (StringPtr, AccessProgress);
       FreePool (ConfigRequest);
       return Status;
     }
 
     //
-    // Attach this <ConfigAltResp> to a <MultiConfigAltResp>
+    // Attach this <ConfigAltResp> to a <MultiConfigAltResp>. There is a '&'
+    // which seperates the first <ConfigAltResp> and the following ones.
     //
     ASSERT (*AccessProgress == 0);
+
+    if (!FirstElement) {
+      Status = AppendToMultiString (Results, L"&");
+      ASSERT_EFI_ERROR (Status);
+    }
+    
     Status = AppendToMultiString (Results, AccessResults);
     ASSERT_EFI_ERROR (Status);
+
+    FirstElement = FALSE;
+    
     FreePool (AccessResults);
     AccessResults = NULL;
     FreePool (ConfigRequest);
@@ -869,20 +701,12 @@ HiiConfigRoutingExportConfig (
   )
 {
   EFI_STATUS                          Status;
-  HII_DATABASE_PRIVATE_DATA           *Private;
-  LIST_ENTRY                          StorageListHdr;
-  HII_FORMSET_STORAGE                 *Storage;
-  LIST_ENTRY                          *Link;
-  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
-  UINTN                               Length;
-  EFI_STRING                          PathHdr;
-  UINTN                               PathHdrSize;
-  EFI_STRING                          ConfigRequest;
-  UINTN                               RequestSize;
-  EFI_STRING                          StringPtr;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
-  EFI_STRING                          AccessProgress;
-  EFI_STRING                          AccessResults;
+  EFI_STRING                          AccessResults;   
+  UINTN                               Index;
+  EFI_HANDLE                          *ConfigAccessHandles;
+  UINTN                               NumberConfigAccessHandles;
+  BOOLEAN                             FirstElement;
 
   //
   // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
@@ -897,15 +721,6 @@ HiiConfigRoutingExportConfig (
     return EFI_INVALID_PARAMETER;
   }
 
-  Private = CONFIG_ROUTING_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-
-  InitializeListHead (&StorageListHdr);
-
-  Status = ExportAllStorage (&Private->HiiDatabase, &StorageListHdr);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   //
   // Allocate a fix length of memory to store Results. Reallocate memory for
   // Results if this fix length is insufficient.
@@ -915,164 +730,58 @@ HiiConfigRoutingExportConfig (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // Parsing all formset storages.
-  //
-  for (Link = StorageListHdr.ForwardLink; Link != &StorageListHdr; Link = Link->ForwardLink) {
-    Storage = CR (Link, HII_FORMSET_STORAGE, Entry, HII_FORMSET_STORAGE_SIGNATURE);
-    //
-    // Find the corresponding device path instance
-    //
+  NumberConfigAccessHandles = 0;
+  Status = gBS->LocateHandleBuffer (
+             ByProtocol,
+             &gEfiHiiConfigAccessProtocolGuid,
+             NULL,
+             &NumberConfigAccessHandles,
+             &ConfigAccessHandles
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  FirstElement = TRUE;
+
+  for (Index = 0; Index < NumberConfigAccessHandles; Index++) {
     Status = gBS->HandleProtocol (
-                    Storage->DriverHandle,
-                    &gEfiDevicePathProtocolGuid,
-                    (VOID **) &DevicePath
+                    ConfigAccessHandles[Index],
+                    &gEfiHiiConfigAccessProtocolGuid,
+                    (VOID **) &ConfigAccess
                     );
     if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    //
-    // Convert the device path binary to hex UNICODE %02x bytes in the same order
-    // as the device path resides in RAM memory.
-    //
-    Length      = GetDevicePathSize (DevicePath);
-    PathHdrSize = (Length * 2 + 1) * sizeof (CHAR16);
-    PathHdr     = (EFI_STRING) AllocateZeroPool (PathHdrSize);
-    if (PathHdr == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    Status = BufInReverseOrderToHexString (PathHdr, (UINT8 *) DevicePath, Length);
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Generate a <ConfigRequest> with one <ConfigHdr> and zero <RequestElement>.
-    // It means extract all possible configurations from this specific driver.
-    //
-    RequestSize = (StrLen (L"GUID=&NAME=&PATH=") + 32) * sizeof (CHAR16) + PathHdrSize;
-    if (Storage->Name != NULL) {
-      RequestSize += StrLen (Storage->Name) * 4 * sizeof (CHAR16);
-    }
-    
-    ConfigRequest = (EFI_STRING) AllocateZeroPool (RequestSize);
-    if (ConfigRequest == NULL) {
-      FreePool (PathHdr);
-      return EFI_OUT_OF_RESOURCES;
+      continue;
     }
 
-    //
-    // Add <GuidHdr>
-    // <GuidHdr> ::= 'GUID='<Guid>
-    // Convert <Guid> in the same order as it resides in RAM memory.
-    //
-    StringPtr = ConfigRequest;
-    StrnCpy (StringPtr, L"GUID=", StrLen (L"GUID="));
-    StringPtr += StrLen (L"GUID=");
-
-    Status = BufInReverseOrderToHexString (StringPtr, (UINT8 *) (&Storage->Guid), sizeof (EFI_GUID));
-    ASSERT_EFI_ERROR (Status);
-    
-    StringPtr += 32;
-    ASSERT (*StringPtr == 0);
-    *StringPtr = L'&';
-    StringPtr++;
-
-    //
-    // Add <NameHdr>
-    // <NameHdr> ::= 'NAME='<String>
-    //
-    StrnCpy (StringPtr, L"NAME=", StrLen (L"NAME="));
-    StringPtr += StrLen (L"NAME=");
-
-    if (Storage->Name != NULL) {
-      Length = (StrLen (Storage->Name) * 4 + 1) * sizeof (CHAR16);
-      Status = UnicodeToConfigString (StringPtr, &Length, Storage->Name);
-      ASSERT_EFI_ERROR (Status);
-      StringPtr += StrLen (Storage->Name) * 4;
-    }
-    
-    *StringPtr = L'&';
-    StringPtr++;
-
-    //
-    // Add <PathHdr>
-    // <PathHdr> ::= '<PATH=>'<UEFI binary represented as hex UNICODE %02x>
-    //
-    StrnCpy (StringPtr, L"PATH=", StrLen (L"PATH="));
-    StringPtr += StrLen (L"PATH=");
-    StrCpy (StringPtr, PathHdr);
-
-    FreePool (PathHdr);
-    PathHdr = NULL;
-
-    //
-    // BUGBUG: The "Implementation note" of ExportConfig() in UEFI spec makes the
-    // code somewhat complex. Let's TBD here whether a <ConfigRequest> or a <ConfigHdr>
-    // is required to call ConfigAccess.ExtractConfig().
-    //
-    // Here we use <ConfigHdr> to call ConfigAccess instance. It requires ConfigAccess
-    // to handle such kind of "ConfigRequest". It is not supported till now.
-    //
-    // Either the ExportConfig will be updated or the ConfigAccess.ExtractConfig()
-    // will be updated as soon as the decision is made.
-
-    //
-    // Route the request to corresponding ConfigAccess protocol to extract settings.
-    //
-    Status = gBS->HandleProtocol (
-                    Storage->DriverHandle,
-                    &gEfiHiiConfigAccessProtocolGuid,
-                    (VOID **)  &ConfigAccess
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    AccessProgress = NULL;
-    AccessResults  = NULL;
     Status = ConfigAccess->ExtractConfig (
                              ConfigAccess,
-                             ConfigRequest,
-                             &AccessProgress,
+                             NULL,
+                             NULL,
                              &AccessResults
                              );
-    if (EFI_ERROR (Status)) {
-      FreePool (ConfigRequest);
-      if (AccessProgress != NULL) {
-        FreePool (AccessProgress);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Attach this <ConfigAltResp> to a <MultiConfigAltResp>. There is a '&'
+      // which seperates the first <ConfigAltResp> and the following ones.      
+      //
+      if (!FirstElement) {
+        Status = AppendToMultiString (Results, L"&");
+        ASSERT_EFI_ERROR (Status);
       }
-      if (AccessResults != NULL) {
-        FreePool (AccessResults);
-      }
-      return EFI_INVALID_PARAMETER;
+      
+      Status = AppendToMultiString (Results, AccessResults);
+      ASSERT_EFI_ERROR (Status);
+
+      FirstElement = FALSE;
+      
+      FreePool (AccessResults);
+      AccessResults = NULL;
     }
-
-    //
-    // Attach this <ConfigAltResp> to a <MultiConfigAltResp>
-    //
-    ASSERT (*AccessProgress == 0);
-    Status = AppendToMultiString (Results, AccessResults);
-    ASSERT_EFI_ERROR (Status);
-    FreePool (AccessResults);
-    AccessResults = NULL;
-    FreePool (ConfigRequest);
-    ConfigRequest = NULL;
-
   }
+  gBS->FreePool (ConfigAccessHandles);
 
-  //
-  // Free the exported storage resource
-  //
-  while (!IsListEmpty (&StorageListHdr)) {
-    Storage = CR (
-                StorageListHdr.ForwardLink,
-                HII_FORMSET_STORAGE,
-                Entry,
-                HII_FORMSET_STORAGE_SIGNATURE
-                );
-    RemoveEntryList (&Storage->Entry);
-    FreePool (Storage->Name);
-    FreePool (Storage);
-  }
-
-  return EFI_SUCCESS;
+  return EFI_SUCCESS;  
 }
 
 
@@ -1122,8 +831,6 @@ HiiConfigRoutingRouteConfig (
   EFI_HANDLE                          DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
-  UINTN                               RemainSize;
-  EFI_STRING                          TmpPtr;
 
   //
   // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
@@ -1244,9 +951,7 @@ HiiConfigRoutingRouteConfig (
       // AccessProgress indicates the parsing progress on <ConfigResp>.
       // Map it to the progress on <MultiConfigResp> then return it.
       //
-      RemainSize = StrSize (AccessProgress);
-      for (TmpPtr = StringPtr; CompareMem (TmpPtr, AccessProgress, RemainSize) != 0; TmpPtr++);
-      *Progress = TmpPtr;
+      *Progress = StrStr (StringPtr, AccessProgress);
 
       FreePool (ConfigResp);
       return Status;

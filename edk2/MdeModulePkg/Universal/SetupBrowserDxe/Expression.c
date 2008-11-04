@@ -1,7 +1,7 @@
 /** @file
 Utility functions for expression evaluation.
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -421,6 +421,14 @@ IdToQuestion (
 
     Question = IdToQuestion2 (Form, QuestionId);
     if (Question != NULL) {
+      //
+      // EFI variable storage may be updated by Callback() asynchronous,
+      // to keep synchronous, always reload the Question Value.
+      //
+      if (Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
+        GetQuestionValue (FormSet, Form, Question, FALSE);
+      }
+
       return Question;
     }
 

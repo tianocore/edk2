@@ -40,6 +40,40 @@ CreateBannerOpCode (
   );
 
 /**
+  This function initialize the data structure for dynamic opcode.
+
+  @param UpdateData     The adding data;
+  @param BufferSize     Length of the buffer to fill dynamic opcodes.
+
+  @retval EFI_SUCCESS           Update data is initialized.
+  @retval EFI_INVALID_PARAMETER UpdateData is NULL.
+  @retval EFI_OUT_OF_RESOURCES  No enough memory to allocate.
+
+**/
+EFI_STATUS
+IfrLibInitUpdateData (
+  IN OUT EFI_HII_UPDATE_DATA   *UpdateData,
+  IN UINT32                    BufferSize
+  )
+;
+
+/**
+
+  This function free the resource of update data.
+
+  @param UpdateData      The adding data;
+
+  @retval EFI_SUCCESS            Resource in UpdateData is released.
+  @retval EFI_INVALID_PARAMETER  UpdateData is NULL.
+
+**/
+EFI_STATUS
+IfrLibFreeUpdateData (
+  IN EFI_HII_UPDATE_DATA       *UpdateData
+  )
+;
+
+/**
   This function allows the caller to update a form that has
   previously been registered with the EFI HII database.
   The update make use of a extended opcode EFI_IFR_EXTEND_OP_LABEL
