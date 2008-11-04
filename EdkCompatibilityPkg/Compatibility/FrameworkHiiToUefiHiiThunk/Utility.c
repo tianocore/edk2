@@ -237,7 +237,7 @@ GetIfrPackage (
     // by HII Build tool.
     //
     switch (TianoAutogenPackageHdrArray[Index]->PackageHeader.Type) {
-      case EFI_HII_PACKAGE_FORM:
+      case EFI_HII_PACKAGE_FORMS:
         return &TianoAutogenPackageHdrArray[Index]->PackageHeader;
         break;
       case EFI_HII_PACKAGE_STRINGS:
@@ -314,9 +314,9 @@ GetAttributesOfFirstFormSet (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // There must be at least one EFI_HII_PACKAGE_FORM in the package list.
+  // There must be at least one EFI_HII_PACKAGE_FORMS in the package list.
   //
-  ASSERT (GetPackageCountByType (List, EFI_HII_PACKAGE_FORM) >= 1);
+  ASSERT (GetPackageCountByType (List, EFI_HII_PACKAGE_FORMS) >= 1);
 
   //
   // Skip the package list header.
@@ -325,7 +325,7 @@ GetAttributesOfFirstFormSet (
 
   while (Package->Type != EFI_HII_PACKAGE_END) {
 
-    if (Package->Type == EFI_HII_PACKAGE_FORM) {
+    if (Package->Type == EFI_HII_PACKAGE_FORMS) {
 
       //
       // Skip the package header
@@ -434,7 +434,7 @@ CreateQuestionIdMap (
 
   while (Package->Type != EFI_HII_PACKAGE_END) {
 
-    if (Package->Type == EFI_HII_PACKAGE_FORM) {
+    if (Package->Type == EFI_HII_PACKAGE_FORMS) {
 
       //
       // Skip the package header

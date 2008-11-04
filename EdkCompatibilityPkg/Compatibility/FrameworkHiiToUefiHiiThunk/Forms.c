@@ -445,7 +445,7 @@ LocateFormId (
     Status = GetPackageData (HiiPackageList, Index, &PackageLength, &Package);
     if (!EFI_ERROR (Status)) {
       CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-      if (PackageHeader.Type == EFI_HII_PACKAGE_FORM) {
+      if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
         Status = LocateLabel (Package, Label, FormsetGuid, FormId);
         if (!EFI_ERROR(Status)) {
           break;

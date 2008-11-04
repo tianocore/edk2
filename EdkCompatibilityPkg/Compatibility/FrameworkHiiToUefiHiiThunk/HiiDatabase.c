@@ -199,7 +199,7 @@ Returns:
 
   Status = mHiiDatabase->RegisterPackageNotify (
                            mHiiDatabase,
-                           EFI_HII_PACKAGE_FORM,
+                           EFI_HII_PACKAGE_FORMS,
                            NULL,
                            NewOrAddPackNotify,
                            EFI_HII_DATABASE_NOTIFY_NEW_PACK,
@@ -209,7 +209,7 @@ Returns:
 
   Status = mHiiDatabase->RegisterPackageNotify (
                            mHiiDatabase,
-                           EFI_HII_PACKAGE_FORM,
+                           EFI_HII_PACKAGE_FORMS,
                            NULL,
                            NewOrAddPackNotify,
                            EFI_HII_DATABASE_NOTIFY_ADD_PACK,
