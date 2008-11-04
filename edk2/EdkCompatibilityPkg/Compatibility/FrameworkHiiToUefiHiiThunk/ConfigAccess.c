@@ -72,7 +72,7 @@ GetIfrFormSet (
     // by HII Build tool.
     //
     switch (TianoAutogenPackageHdrArray[Index]->PackageHeader.Type) {
-      case EFI_HII_PACKAGE_FORM:
+      case EFI_HII_PACKAGE_FORMS:
         return &TianoAutogenPackageHdrArray[Index]->PackageHeader;
         break;
 
@@ -122,7 +122,7 @@ GetBufferStorage  (
   EFI_IFR_VARSTORE        *VarStoreOpCode;
   BUFFER_STORAGE_ENTRY *BufferStorage;
 
-  ASSERT (FormSetPackage->Type == EFI_HII_PACKAGE_FORM);
+  ASSERT (FormSetPackage->Type == EFI_HII_PACKAGE_FORMS);
 
   OpCodeOffset = sizeof (EFI_HII_PACKAGE_HEADER);
   //
@@ -932,7 +932,7 @@ ThunkCallback (
 
   Status = mHiiDatabase->RegisterPackageNotify (
                            mHiiDatabase,
-                           EFI_HII_PACKAGE_FORM,
+                           EFI_HII_PACKAGE_FORMS,
                            NULL,
                            FormUpdateNotify,
                            EFI_HII_DATABASE_NOTIFY_REMOVE_PACK,

@@ -50,7 +50,7 @@ GetPackageCount (
     // by HII Build tool.
     //
     switch (TianoAutogenPackageHdrArray[Index]->PackageHeader.Type) {
-      case EFI_HII_PACKAGE_FORM:
+      case EFI_HII_PACKAGE_FORMS:
         *IfrPackageCount += 1;
         break;
       case EFI_HII_PACKAGE_STRINGS:
@@ -524,7 +524,7 @@ NewOrAddPackNotify (
   HII_THUNK_PRIVATE_DATA  *Private;
   HII_THUNK_CONTEXT       *ThunkContext;
 
-  ASSERT (PackageType == EFI_HII_PACKAGE_STRINGS || PackageType == EFI_HII_PACKAGE_FORM);
+  ASSERT (PackageType == EFI_HII_PACKAGE_STRINGS || PackageType == EFI_HII_PACKAGE_FORMS);
   ASSERT (NotifyType == EFI_HII_DATABASE_NOTIFY_ADD_PACK || NotifyType == EFI_HII_DATABASE_NOTIFY_NEW_PACK);
 
   Status  = EFI_SUCCESS;
@@ -546,7 +546,7 @@ NewOrAddPackNotify (
     InsertTailList (&Private->ThunkContextListHead, &ThunkContext->Link);
   } 
 
-  if (PackageType == EFI_HII_PACKAGE_FORM) {
+  if (PackageType == EFI_HII_PACKAGE_FORMS) {
     GetAttributesOfFirstFormSet (ThunkContext);
   }
 
