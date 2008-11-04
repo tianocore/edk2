@@ -35,7 +35,6 @@
 #define DEBUG_POOL      0x00000010  // Alloc & Free's
 #define DEBUG_PAGE      0x00000020  // Alloc & Free's
 #define DEBUG_INFO      0x00000040  // Verbose
-#define DEBUG_DEPEX     0x00000080  // PEI or DXE Dependency Evaluation
 #define DEBUG_VARIABLE  0x00000100  // Variable
 #define DEBUG_BM        0x00000400  // Boot Manager
 #define DEBUG_BLKIO     0x00001000  // BlkIo Driver
@@ -55,7 +54,6 @@
 #define EFI_D_POOL      DEBUG_POOL
 #define EFI_D_PAGE      DEBUG_PAGE
 #define EFI_D_INFO      DEBUG_INFO
-#define EFI_D_DEPEX     DEBUG_DEPEX
 #define EFI_D_VARIABLE  DEBUG_VARIABLE
 #define EFI_D_BM        DEBUG_BM
 #define EFI_D_BLKIO     DEBUG_BLKIO
