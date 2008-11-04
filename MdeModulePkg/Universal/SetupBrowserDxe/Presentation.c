@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -482,24 +482,6 @@ DisplayForm (
     if (!IsListEmpty (&gMenuList)) {
       PrintStringAt (LocalScreen.LeftColumn + 2, LocalScreen.TopRow + 1, gFunctionTwoString);
     }
-
-    PrintStringAt (LocalScreen.LeftColumn + 2, LocalScreen.BottomRow - 4, gFunctionOneString);
-    PrintStringAt (
-      LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3,
-      LocalScreen.BottomRow - 4,
-      gFunctionNineString
-      );
-    PrintStringAt (
-      LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) * 2 / 3,
-      LocalScreen.BottomRow - 4,
-      gFunctionTenString
-      );
-    PrintAt (LocalScreen.LeftColumn + 2, LocalScreen.BottomRow - 3, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
-    PrintStringAt (
-      LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3,
-      LocalScreen.BottomRow - 3,
-      gEscapeString
-      );
   }
   //
   // Remove Buffer allocated for StringPtr after it has been used.
@@ -575,6 +557,7 @@ InitializeBrowserStrings (
   gFunctionTenString    = GetToken (STRING_TOKEN (FUNCTION_TEN_STRING), gHiiHandle);
   gEnterString          = GetToken (STRING_TOKEN (ENTER_STRING), gHiiHandle);
   gEnterCommitString    = GetToken (STRING_TOKEN (ENTER_COMMIT_STRING), gHiiHandle);
+  gEnterEscapeString    = GetToken (STRING_TOKEN (ENTER_ESCAPE_STRING), gHiiHandle);
   gEscapeString         = GetToken (STRING_TOKEN (ESCAPE_STRING), gHiiHandle);
   gSaveFailed           = GetToken (STRING_TOKEN (SAVE_FAILED), gHiiHandle);
   gMoveHighlight        = GetToken (STRING_TOKEN (MOVE_HIGHLIGHT), gHiiHandle);
@@ -598,6 +581,7 @@ InitializeBrowserStrings (
   gMinusString          = GetToken (STRING_TOKEN (MINUS_STRING), gHiiHandle);
   gAdjustNumber         = GetToken (STRING_TOKEN (ADJUST_NUMBER), gHiiHandle);
   gSaveChanges          = GetToken (STRING_TOKEN (SAVE_CHANGES), gHiiHandle);
+  gOptionMismatch       = GetToken (STRING_TOKEN (OPTION_MISMATCH), gHiiHandle);
   return ;
 }
 
@@ -617,6 +601,7 @@ FreeBrowserStrings (
   FreePool (gFunctionTenString);
   FreePool (gEnterString);
   FreePool (gEnterCommitString);
+  FreePool (gEnterEscapeString);
   FreePool (gEscapeString);
   FreePool (gMoveHighlight);
   FreePool (gMakeSelection);
@@ -639,6 +624,7 @@ FreeBrowserStrings (
   FreePool (gMinusString);
   FreePool (gAdjustNumber);
   FreePool (gSaveChanges);
+  FreePool (gOptionMismatch);
   return ;
 }
 
@@ -701,8 +687,7 @@ UpdateKeyHelp (
       }
 
       if ((Statement->Operand == EFI_IFR_DATE_OP) ||
-          (Statement->Operand == EFI_IFR_TIME_OP) ||
-          (Statement->Operand == EFI_IFR_NUMERIC_OP && Statement->Step != 0)) {
+          (Statement->Operand == EFI_IFR_TIME_OP)) {
         PrintAt (
           StartColumnOfHelp,
           BottomRowOfHelp,
@@ -716,7 +701,11 @@ UpdateKeyHelp (
         PrintStringAt (SecCol, BottomRowOfHelp, gAdjustNumber);
       } else {
         PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
-        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
+        if (Statement->Operand == EFI_IFR_NUMERIC_OP && Statement->Step != 0) {
+          PrintStringAt (SecCol, BottomRowOfHelp, gAdjustNumber);
+        } else {
+          PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
+        }
       }
     } else {
       PrintStringAt (SecCol, BottomRowOfHelp, gEnterCommitString);
@@ -739,7 +728,7 @@ UpdateKeyHelp (
         PrintStringAt (ThdCol, TopRowOfHelp, gMinusString);
       }
 
-      PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+      PrintStringAt (ThdCol, BottomRowOfHelp, gEnterEscapeString);
     }
     break;
 
@@ -784,7 +773,7 @@ UpdateKeyHelp (
           BottomRowOfHelp,
           gEnterCommitString
           );
-        PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+        PrintStringAt (ThdCol, BottomRowOfHelp, gEnterEscapeString);
       }
     }
     break;
@@ -874,7 +863,7 @@ SetupBrowser (
   //
   Status = mHiiDatabase->RegisterPackageNotify (
                            mHiiDatabase,
-                           EFI_HII_PACKAGE_FORM,
+                           EFI_HII_PACKAGE_FORMS,
                            NULL,
                            FormUpdateNotify,
                            EFI_HII_DATABASE_NOTIFY_REMOVE_PACK,

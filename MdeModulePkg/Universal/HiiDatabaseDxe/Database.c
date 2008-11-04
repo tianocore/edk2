@@ -195,7 +195,7 @@ InvokeRegisteredFunction (
     Package = (EFI_HII_PACKAGE_HEADER *) (((HII_GUID_PACKAGE_INSTANCE *) PackageInstance)->GuidPkg);
     break;
 
-  case EFI_HII_PACKAGE_FORM:
+  case EFI_HII_PACKAGE_FORMS:
     BufferSize = ((HII_IFR_PACKAGE_INSTANCE *) PackageInstance)->FormPkgHdr.Length;
     Buffer = (UINT8 *) AllocateZeroPool (BufferSize);
     ASSERT (Buffer != NULL);
@@ -667,7 +667,7 @@ ExportFormPackages (
                  Private,
                  EFI_HII_DATABASE_NOTIFY_EXPORT_PACK,
                  (VOID *) FormPackage,
-                 EFI_HII_PACKAGE_FORM,
+                 EFI_HII_PACKAGE_FORMS,
                  Handle
                  );
       ASSERT_EFI_ERROR (Status);
@@ -730,7 +730,7 @@ RemoveFormPackages (
                Private,
                EFI_HII_DATABASE_NOTIFY_REMOVE_PACK,
                (VOID *) Package,
-               EFI_HII_PACKAGE_FORM,
+               EFI_HII_PACKAGE_FORMS,
                Handle
                );
     if (EFI_ERROR (Status)) {
@@ -2386,7 +2386,7 @@ AddPackages (
                  DatabaseRecord->Handle
                  );
       break;
-    case EFI_HII_PACKAGE_FORM:
+    case EFI_HII_PACKAGE_FORMS:
       Status = InsertFormPackage (
                  PackageHdrPtr,
                  NotifyType,
@@ -2957,7 +2957,7 @@ HiiUpdatePackageList (
         case EFI_HII_PACKAGE_TYPE_GUID:
           Status = RemoveGuidPackages (Private, Handle, OldPackageList);
           break;
-        case EFI_HII_PACKAGE_FORM:
+        case EFI_HII_PACKAGE_FORMS:
           Status = RemoveFormPackages (Private, Handle, OldPackageList);
           break;
         case EFI_HII_PACKAGE_KEYBOARD_LAYOUT:
@@ -3087,7 +3087,7 @@ HiiListPackageLists (
           }
         }
         break;
-      case EFI_HII_PACKAGE_FORM:
+      case EFI_HII_PACKAGE_FORMS:
         if (!IsListEmpty (&PackageList->FormPkgHdr)) {
           Matched = TRUE;
         }

@@ -469,6 +469,7 @@ extern CHAR16            *gFunctionNineString;
 extern CHAR16            *gFunctionTenString;
 extern CHAR16            *gEnterString;
 extern CHAR16            *gEnterCommitString;
+extern CHAR16            *gEnterEscapeString;
 extern CHAR16            *gEscapeString;
 extern CHAR16            *gSaveFailed;
 extern CHAR16            *gMoveHighlight;
@@ -492,6 +493,7 @@ extern CHAR16            *gPlusString;
 extern CHAR16            *gMinusString;
 extern CHAR16            *gAdjustNumber;
 extern CHAR16            *gSaveChanges;
+extern CHAR16            *gOptionMismatch;
 
 extern CHAR16            gPromptBlockWidth;
 extern CHAR16            gOptionBlockWidth;

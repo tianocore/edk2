@@ -132,6 +132,10 @@ BootMaintExtractConfig (
   UINTN              BufferSize;
   BMM_CALLBACK_DATA  *Private;
 
+  if (Request == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   Private = BMM_CALLBACK_DATA_FROM_THIS (This);
 
   //
