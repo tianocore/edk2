@@ -84,14 +84,14 @@ typedef struct {
 } ATAPI_IDENTIFY_DATA;
 
 ///
-/// Quiry Standard Data fomrat, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// Standard Quiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 peripheral_type;
   UINT8 RMB;
   UINT8 version;
   UINT8 response_data_format;
-  UINT8 addnl_length;
+  UINT8 addnl_length;     ///< n - 4, Numbers of bytes following this one
   UINT8 reserved_5;
   UINT8 reserved_6;
   UINT8 reserved_7;
@@ -101,10 +101,10 @@ typedef struct {
   UINT8 vendor_specific_36_55[55 - 36 + 1];
   UINT8 reserved_56_95[95 - 56 + 1];
   ///
-  /// Vendor specific parameters fields, the sizeof (ATAPI_INQUIRY_DATA) is 255
+  /// Vendor specific parameters fields, the sizeof (ATAPI_INQUIRY_DATA) is 254
   /// since allocation_length is one byte in ATAPI_INQUIRY_CMD.
   ///
-  UINT8 vendor_specific_96_255[254 - 96 + 1];
+  UINT8 vendor_specific_96_253[253 - 96 + 1];
 } ATAPI_INQUIRY_DATA;
 
 ///
@@ -135,10 +135,10 @@ typedef struct {
   UINT8 sense_key_specific_17;
   ///
   /// Followed by additional sense bytes.
-  /// the sizeof (ATAPI_REQUEST_SENSE_DATA) is 255, 
+  /// the sizeof (ATAPI_REQUEST_SENSE_DATA) is 254, 
   /// since allocation_length is one byte in ATAPI_INQUIRY_CMD.
   ///
-  UINT8 additional_sense_bytes[254 - 18 + 1];
+  UINT8 additional_sense_bytes_18_253[253 - 18 + 1];
 } ATAPI_REQUEST_SENSE_DATA;
 
 ///
@@ -417,6 +417,8 @@ typedef union {
 
 #define ATAPI_MAX_BYTE_COUNT  (0xfffe)
 
+#define ATA_REQUEST_SENSE_ERROR (0x70) ///< defined in SFF-8070i
+
 ///
 /// Sense Key, Additional Sense Codes and Additional Sense Code Qualifier
 /// defined in MultiMedia Commands (MMC, MMC-2) 
@@ -440,9 +442,9 @@ typedef union {
 #define ATA_SK_MISCOMPARE       (0xE)
 #define ATA_SK_RESERVED_F       (0xF)
 
-//
-// Additional Sense Codes
-//
+///
+/// Additional Sense Codes
+///
 #define ATA_ASC_NOT_READY                   (0x04)
 #define ATA_ASC_MEDIA_ERR1                  (0x10)
 #define ATA_ASC_MEDIA_ERR2                  (0x11)
