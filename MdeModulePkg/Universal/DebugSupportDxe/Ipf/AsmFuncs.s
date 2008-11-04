@@ -15,7 +15,7 @@
 ///
 
 
-#include "common.i"
+#include "Common.i"
 #include "Ds64Macros.i"
 
 .globl PatchSaveBuffer

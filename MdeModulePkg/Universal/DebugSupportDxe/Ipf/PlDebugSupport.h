@@ -80,7 +80,7 @@ Returns:
 ;
 
 //
-// Assembly worker functions and data referenced from plDebugSupport.c
+// Assembly worker functions and data referenced from PlDebugSupport.c
 //
 VOID  *
 GetIva (
