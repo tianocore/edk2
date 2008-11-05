@@ -20,6 +20,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/GlobalVariable.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/HiiDatabase.h>
+#include <Protocol/HiiString.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
