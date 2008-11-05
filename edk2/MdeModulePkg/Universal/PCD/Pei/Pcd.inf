@@ -43,7 +43,6 @@
 
 [LibraryClasses]
   BaseMemoryLib
-  PeiServicesTablePointerLib
   PcdLib
   PeiServicesLib
   HobLib

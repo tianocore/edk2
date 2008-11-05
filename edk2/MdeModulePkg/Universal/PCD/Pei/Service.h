@@ -27,7 +27,6 @@ Module Name: Service.h
 #include <Library/HobLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
-#include <Library/PeiServicesTablePointerLib.h>
 #include <Library/BaseMemoryLib.h>
 
 
