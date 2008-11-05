@@ -39,10 +39,8 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  UefiBootServicesTableLib
   UefiApplicationEntryPoint
   UefiLib
-  DebugLib
   PcdLib
 
 [Guids]
