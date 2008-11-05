@@ -46,7 +46,6 @@
   CacheMaintenanceLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
-  BaseMemoryLib
   ReportStatusCodeLib
   DebugLib
   UefiDriverEntryPoint
