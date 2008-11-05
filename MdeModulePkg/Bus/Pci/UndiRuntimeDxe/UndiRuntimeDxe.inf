@@ -49,12 +49,6 @@
   UefiRuntimeLib
   UefiDriverEntryPoint
 
-
-[Guids]
-  gEfiEventExitBootServicesGuid
-  gEfiEventVirtualAddressChangeGuid
-
-
 [Protocols]
   gEfiNetworkInterfaceIdentifierProtocolGuid_31
   gEfiPciIoProtocolGuid
