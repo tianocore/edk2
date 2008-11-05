@@ -58,8 +58,6 @@
   IfrSupportLib
   ExtendedHiiLib
   ExtendedIfrSupportLib
-  BaseLib
-
 
 [Protocols]
   gEfiHiiStringProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
