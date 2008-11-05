@@ -16,10 +16,8 @@
 **/
 
 #include <Uefi.h>
-#include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Guid/VariableInfo.h>
 
 
