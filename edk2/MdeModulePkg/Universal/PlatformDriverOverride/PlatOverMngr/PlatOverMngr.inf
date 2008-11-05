@@ -58,7 +58,6 @@
   HiiLib
   ExtendedHiiLib
   UefiRuntimeServicesTableLib
-  DevicePathLib
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
