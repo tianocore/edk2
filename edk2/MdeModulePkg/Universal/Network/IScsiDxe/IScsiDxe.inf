@@ -59,6 +59,7 @@
   IScsiConfigDxe.vfr
   IScsiConfig.c
   IScsiConfig.h
+  IScsiImpl.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -70,8 +71,6 @@
   UefiDriverEntryPoint
   UefiLib
   BaseLib
-  MemoryAllocationLib
-  BaseMemoryLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
   DevicePathLib
@@ -85,7 +84,6 @@
 
 [Protocols]
   gEfiIScsiInitiatorNameProtocolGuid
-  gEfiBlockIoProtocolGuid
   gEfiTcp4ProtocolGuid
   gEfiExtScsiPassThruProtocolGuid
   gEfiDevicePathProtocolGuid
