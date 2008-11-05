@@ -41,10 +41,8 @@
 
 
 [LibraryClasses]
-  UefiBootServicesTableLib
   UefiApplicationEntryPoint
   UefiLib
-  DebugLib
 
 [Guids]
   gEfiVariableInfoGuid
