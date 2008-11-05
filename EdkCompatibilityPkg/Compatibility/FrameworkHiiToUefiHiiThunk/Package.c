@@ -17,11 +17,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "HiiHandle.h"
 
 
-STATIC BOOLEAN mInFrameworkHiiNewPack = FALSE;
-STATIC BOOLEAN mInFrameworkHiiRemovePack = FALSE;
+BOOLEAN mInFrameworkHiiNewPack = FALSE;
+BOOLEAN mInFrameworkHiiRemovePack = FALSE;
 BOOLEAN mInFrameworkUpdatePakcage = FALSE;
+UINT64  mGuidCount = 0;
 
 
+/**
+  Get the number of package IFR and STRING packages in the package list passed in.
+
+  @param Packages             Package List.
+  @param IfrPackageCount      Number of IFR Packages.
+  @param StringPackageCount   Number of String Packages.
+
+  @retval EFI_INVALID_PARAMETER If the Package List has package with type of 
+                                EFI_HII_PACKAGE_KEYBOARD_LAYOUT, EFI_HII_PACKAGE_FONTS, EFI_HII_PACKAGE_IMAGES.
+  @reval  EFI_SUCCESS           Successfully get the number of IFR and STRING package.
+                                 
+
+**/
 EFI_STATUS
 GetPackageCount (
   IN CONST EFI_HII_PACKAGES               *Packages,
@@ -76,6 +90,18 @@ GetPackageCount (
   return EFI_SUCCESS;
 }
 
+/**
+  Insert the String Package into the Package Lists which has the TAG GUID matching
+  the PackageListGuid of the String Package. 
+
+  The Package List must have only IFR Package and no String Package. 
+  Otherwise, ASSERT.
+
+  @param Private                      The HII THUNK driver context data.
+  @param StringPackageThunkContext    The HII THUNK context data.
+  @param StringPackageListHeader      The String Package List Header.
+  
+**/
 VOID
 UpdatePackListWithOnlyIfrPack (
   IN       HII_THUNK_PRIVATE_DATA      *Private,
@@ -119,6 +145,18 @@ UpdatePackListWithOnlyIfrPack (
 }
 
 
+/**
+  Prepare a UEFI Package List from a Framework HII package list registered
+  from a Framework HII NewPack () function.
+
+  If either Packages or PackageListGuid is NULL, then ASSERT.
+  
+  @param Packages                     The Framework HII Package List.
+  @param PackageListGuid              The Package List GUID.
+
+
+  @return The UEFI Package List.  
+**/
 EFI_HII_PACKAGE_LIST_HEADER *
 PrepareUefiPackageListFromFrameworkHiiPackages (
   IN CONST EFI_HII_PACKAGES            *Packages,
@@ -179,20 +217,41 @@ PrepareUefiPackageListFromFrameworkHiiPackages (
   return PackageListHeader;  
 }
 
+
+/**
+  Generate a Random GUID.
+  
+  @param Guid On output, a Random GUID will be filled.
+
+**/
 VOID
 GenerateRandomGuid (
   OUT           EFI_GUID * Guid
   )
 {
   EFI_GUID        GuidBase = { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e }};
-  static  UINT64  Count = 0;
 
   CopyGuid (Guid, &GuidBase);
 
-  Count++;  
-  *((UINT64 *) Guid) = *((UINT64 *) Guid) + Count;
+  mGuidCount++;  
+  *((UINT64 *) Guid) = *((UINT64 *) Guid) + mGuidCount;
 }
 
+/**
+  Given a Package List with only a IFR package, find the Package List that only has a String Package based on
+  the TAG GUID. Then export the String Package from the Package List and insert it
+  to the given IFR package.
+
+  This is to handle the case of Framework HII interface which allow String Package
+  and IFR package to be registered using two different NewPack () calls.
+
+  @param Private                      The HII THUNK driver context data.
+  @param IfrThunkContext              Package List with only a IFR package.
+
+  @retval EFI_SUCCESS                 If the String Package is found and inserted to the
+                                      Package List with only a IFR package.
+  @retval EFI_NOT_FOUND               No String Package matching the TAG GUID is found.
+**/
 EFI_STATUS
 FindStringPackAndUpdatePackListWithOnlyIfrPack (
   IN HII_THUNK_PRIVATE_DATA          *Private,
@@ -243,11 +302,26 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
 }
 
 
-//
-// 
-//
+/**
+  Register the Package List passed from the Framework HII NewPack () interface.
+  The FRAMEWORK_EFI_HII_HANDLE will be returned.
+
+  @param This                         The EFI_HII_PROTOCOL context data. Only used
+                                      to call HiiRemovePack.
+  @param Private                      The HII THUNK driver context data.
+  @param Package                      Package List.
+  @param Handle                       On output, a FRAMEWORK_EFI_HII_HANDLE number is
+                                      returned.
+
+  @retval EFI_SUCCESS                 The Package List is registered successfull in 
+                                      the database.
+  @retval EFI_UNSUPPORTED             The number of IFR package in the package list
+                                      is greater than 1.
+  @retval EFI_OUT_OF_RESOURCE         Not enough resouce.
+  
+**/
 EFI_STATUS
-UefiRegisterPackageList(
+UefiRegisterPackageList (
   IN  EFI_HII_PROTOCOL               *This,
   IN  HII_THUNK_PRIVATE_DATA      *Private,
   IN  EFI_HII_PACKAGES            *Packages,
@@ -461,7 +535,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 HiiRemovePack (
-  IN EFI_HII_PROTOCOL    *This,
+  IN EFI_HII_PROTOCOL               *This,
   IN FRAMEWORK_EFI_HII_HANDLE       Handle
   )
 /*++
