@@ -60,8 +60,6 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiDatabaseProtocolGuid
   gEfiHiiStringProtocolGuid
-  gEfiHiiConfigRoutingProtocolGuid
-  gEfiFormBrowser2ProtocolGuid   
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
