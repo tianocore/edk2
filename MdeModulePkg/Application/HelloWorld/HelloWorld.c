@@ -14,10 +14,8 @@
 
 #include <Uefi.h>
 #include <Library/PcdLib.h>
-#include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
-#include <Library/UefiBootServicesTableLib.h>
 
 
 /**
