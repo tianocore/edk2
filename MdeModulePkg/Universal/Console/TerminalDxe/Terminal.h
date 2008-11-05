@@ -586,7 +586,7 @@ TerminalConOutEnableCursor (
   Test to see if this driver supports Controller. 
 
   @param  This                Protocol instance pointer.
-  @param  Controller          Handle of device to test
+  @param  ControllerHandle    Handle of device to test
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
@@ -1304,8 +1304,6 @@ UnicodeToUtf8 (
   @param  Utf8Char            Returned valid VT-UTF8 characters set.
   @param  ValidBytes          The count of returned VT-VTF8 characters. 
                               If ValidBytes is zero, no valid VT-UTF8 returned.
-
-  @retval None.
 
 **/
 VOID

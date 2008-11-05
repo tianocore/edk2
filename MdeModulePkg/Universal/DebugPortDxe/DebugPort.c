@@ -114,7 +114,7 @@ GetDebugPortVariable (
 //
 
 /**
-  Debug Port Driver entry pointo. 
+  Debug Port Driver entry point. 
 
   Reads DebugPort variable to determine what device and settings to use as the
   debug port.  Binds exclusively to SerialIo. Reverts to defaults if no variable

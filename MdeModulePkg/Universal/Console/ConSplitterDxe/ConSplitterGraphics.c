@@ -30,7 +30,7 @@ CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
   @param  This                    Protocol instance pointer.
   @param  Mode                    Are we in text of grahics mode.
-  @param  GopExists               TRUE if Console Spliter has found a GOP or UGA device
+  @param  GopUgaExists            TRUE if Console Spliter has found a GOP or UGA device
   @param  StdInLocked             TRUE if StdIn device is keyboard locked
 
   @retval EFI_SUCCESS             Mode information returned.

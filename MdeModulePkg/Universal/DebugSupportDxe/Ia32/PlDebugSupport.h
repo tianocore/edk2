@@ -1,7 +1,7 @@
-/**@file
+/** @file
   IA32 specific debug support macros, typedefs and prototypes.
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PLDEBUG_SUPPORT_H
-#define _PLDEBUG_SUPPORT_H
+#ifndef _PLDEBUG_SUPPORT_H_
+#define _PLDEBUG_SUPPORT_H_
 
 
 #include <Uefi.h>
@@ -32,11 +32,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define NUM_IDT_ENTRIES                 0x78
 #define SYSTEM_TIMER_VECTOR             0x68
 #define VECTOR_ENTRY_PAGES              1
-#define CopyDescriptor(Dest, Src)       CopyMem ((Dest), (Src), sizeof (DESCRIPTOR))
-#define ZeroDescriptor(Dest)            CopyDescriptor ((Dest), &NullDesc)
-#define ReadIdt(Vector, Dest)           CopyDescriptor ((Dest), &((GetIdtr ())[(Vector)]))
-#define WriteIdt(Vector, Src)           CopyDescriptor (&((GetIdtr ())[(Vector)]), (Src))
-#define CompareDescriptor(Desc1, Desc2) CompareMem ((Desc1), (Desc2), sizeof (DESCRIPTOR))
+#define COPY_DESCRIPTOR(Dest, Src)       CopyMem ((Dest), (Src), sizeof (DESCRIPTOR))
+#define READ_IDT(Vector, Dest)           COPY_DESCRIPTOR ((Dest), &((GetIdtr ())[(Vector)]))
+#define WRITE_IDT(Vector, Src)           COPY_DESCRIPTOR (&((GetIdtr ())[(Vector)]), (Src))
+#define COMPARE_DESCRIPTOR(Desc1, Desc2) CompareMem ((Desc1), (Desc2), sizeof (DESCRIPTOR))
 #define EFI_ISA                         IsaIa32
 #define FF_FXSR                         (1 << 24)
 
@@ -61,214 +60,149 @@ extern UINT8              InterruptEntryStub[];
 extern UINT32             StubSize;
 extern VOID (*OrigVector) (VOID);
 
+/**
+  Generic IDT entry.
+
+**/
 VOID
 CommonIdtEntry (
   VOID
-  )
-/*++
+  );
 
-Routine Description:
+/**
+  Check whether FXSTOR is supported
 
-  Generic IDT entry
+  @retval TRUE   FXSTOR is supported.
+  @retval FALSE  FXSTOR is not supported.
 
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
-;
-
-
+**/
 BOOLEAN
 FxStorSupport (
   VOID
-  )
-/*++
+  );
 
-Routine Description:
+/**
+  Return the physical address of IDTR.
 
-  Check whether FXSTOR is supported
+  @return The physical address of IDTR.
 
-Arguments:
-
-  None
-
-Returns:
-
-  TRUE  - supported
-  FALSE - not supported
-
---*/
-;
-
+**/
 DESCRIPTOR  *
 GetIdtr (
   VOID
-  )
-/*++
+  );
 
-Routine Description:
+/**
+  Encodes an IDT descriptor with the given physical address.
 
-  Return the physical address of IDTR
+  @param  DestDesc    The IDT descriptor address.
+  @param  Vecotr      The interrupt vector entry.
 
-Arguments:
-
-  None
-
-Returns:
-
-  The physical address of IDTR
-
---*/
-;
-
+**/
 VOID
 Vect2Desc (
   DESCRIPTOR * DestDesc,
   VOID (*Vector) (VOID)
-  )
-/*++
+  );
 
-Routine Description:
-
-  Encodes an IDT descriptor with the given physical address
-
-Arguments:
-
-  DestDesc  - The IDT descriptor address
-  Vector    - The interrupt vector entry
-
-Returns:
-
-  None
-
---*/
-;
-
-BOOLEAN
-WriteInterruptFlag (
-  BOOLEAN NewState
-  )
-/*++
-
-Routine Description:
-
+/**
   Programs interrupt flag to the requested state and returns previous
   state.
 
-Arguments:
+  @param  NewState    New interrupt status.
 
-  NewState  - New interrupt status
+  @retval TRUE     Old interrupt status is TRUE.
+  @retval FALSE    Old interrupt status is FALSE
 
-Returns:
+**/
+BOOLEAN
+WriteInterruptFlag (
+  BOOLEAN NewState
+  );
 
-  Old interrupt status
+/**
+  Initializes driver's handler registration databas. 
+  
+  This code executes in boot services context
+  Must be public because it's referenced from DebugSupport.c
 
---*/
-;
+  @retval  EFI_UNSUPPORTED      If IA32 processor does not support FXSTOR/FXRSTOR instructions,
+                                the context save will fail, so these processor's are not supported.
+  @retval  EFI_OUT_OF_RESOURCES Fails to allocate memory.
+  @retval  EFI_SUCCESS          Initializes successfully.
 
+**/
 EFI_STATUS
-plInitializeDebugSupportDriver (
+PlInitializeDebugSupportDriver (
   VOID
-  )
-/*++
+  );
 
-Routine Description:
-  Initializes driver's handler registration database.
-
-  This code executes in boot services context.
-
-Arguments:
-  None
-
-Returns:
-  EFI_SUCCESS
-  EFI_UNSUPPORTED - if IA32 processor does not support FXSTOR/FXRSTOR instructions,
-                    the context save will fail, so these processor's are not supported.
-  EFI_OUT_OF_RESOURCES - not resource to finish initialization
-
---*/
-;
-
-EFI_STATUS
-EFIAPI
-plUnloadDebugSupportDriver (
-  IN EFI_HANDLE                       ImageHandle
-  )
-/*++
-
-Routine Description:
+/**
   This is the callback that is written to the LoadedImage protocol instance
   on the image handle. It uninstalls all registered handlers and frees all entry
   stub memory.
 
-  This code executes in boot services context.
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
 
-Arguments:
-  ImageHandle - The image handle of the unload handler
+  @retval EFI_SUCCESS    Always.
 
-Returns:
+**/
+EFI_STATUS
+EFIAPI
+PlUnloadDebugSupportDriver (
+  IN EFI_HANDLE                       ImageHandle
+  );
 
-  EFI_SUCCESS - always return success
+/**
+  This is a DebugSupport protocol member function, hard
+  coded to support only 1 processor for now.
 
---*/
-;
+  @param  This                The DebugSupport instance
+  @param  MaxProcessorIndex   The maximuim supported processor index
 
-//
-// DebugSupport protocol member functions
-//
+  @retval EFI_SUCCESS         Always returned with **MaxProcessorIndex set to 0.
+
+**/
 EFI_STATUS
 EFIAPI
 GetMaximumProcessorIndex (
   IN EFI_DEBUG_SUPPORT_PROTOCOL       *This,
   OUT UINTN                           *MaxProcessorIndex
-  )
-/*++
+  );
 
-Routine Description: This is a DebugSupport protocol member function.
+/**
+  DebugSupport protocol member function.
 
-Arguments:
-  This              - The DebugSupport instance
-  MaxProcessorIndex - The maximuim supported processor index
+  @param  This               The DebugSupport instance
+  @param  ProcessorIndex     Which processor the callback applies to.
+  @param  PeriodicCallback   Callback function
 
-Returns:
-  Always returns EFI_SUCCESS with *MaxProcessorIndex set to 0
+  @retval EFI_SUCCESS        Indicates the callback was registered.
+  @retval others             Callback was not registered.
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 RegisterPeriodicCallback (
   IN EFI_DEBUG_SUPPORT_PROTOCOL       *This,
   IN UINTN                            ProcessorIndex,
   IN EFI_PERIODIC_CALLBACK            PeriodicCallback
-  )
-/*++
+  );
 
-Routine Description: This is a DebugSupport protocol member function.
+/**
+  DebugSupport protocol member function.
 
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  PeriodicCallback - Callback function
+  This code executes in boot services context.
 
-Returns:
+  @param  This              The DebugSupport instance
+  @param  ProcessorIndex    Which processor the callback applies to.
+  @param  NewCallback       Callback function
+  @param  ExceptionType     Which exception to hook
 
-  EFI_SUCCESS
-  EFI_INVALID_PARAMETER - requested uninstalling a handler from a vector that has
-                          no handler registered for it
-  EFI_ALREADY_STARTED   - requested install to a vector that already has a handler registered.
+  @retval EFI_SUCCESS        Indicates the callback was registered.
+  @retval others             Callback was not registered.
 
-  Other possible return values are passed through from UnHookEntry and HookEntry.
-
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 RegisterExceptionCallback (
@@ -276,32 +210,19 @@ RegisterExceptionCallback (
   IN UINTN                            ProcessorIndex,
   IN EFI_EXCEPTION_CALLBACK           NewCallback,
   IN EFI_EXCEPTION_TYPE               ExceptionType
-  )
-/*++
+  );
 
-Routine Description:
-  This is a DebugSupport protocol member function.
+/**
+  DebugSupport protocol member function.  Calls assembly routine to flush cache.
 
-  This code executes in boot services context.
+  @param  This              The DebugSupport instance
+  @param  ProcessorIndex    Which processor the callback applies to.
+  @param  Start             Physical base of the memory range to be invalidated
+  @param  Length            mininum number of bytes in instruction cache to invalidate
 
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  NewCallback      - Callback function
-  ExceptionType    - Which exception to hook
+  @retval EFI_SUCCESS       Always returned.
 
-Returns:
-
-  EFI_SUCCESS
-  EFI_INVALID_PARAMETER - requested uninstalling a handler from a vector that has
-                          no handler registered for it
-  EFI_ALREADY_STARTED   - requested install to a vector that already has a handler registered.
-
-  Other possible return values are passed through from UnHookEntry and HookEntry.
-
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 InvalidateInstructionCache (
@@ -309,24 +230,6 @@ InvalidateInstructionCache (
   IN UINTN                            ProcessorIndex,
   IN VOID                             *Start,
   IN UINT64                           Length
-  )
-/*++
-
-Routine Description:
-  This is a DebugSupport protocol member function.
-  Calls assembly routine to flush cache.
-
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  Start            - Physical base of the memory range to be invalidated
-  Length           - mininum number of bytes in instruction cache to invalidate
-
-Returns:
-
-  EFI_SUCCESS - always return success
-
---*/
-;
+  );
 
 #endif

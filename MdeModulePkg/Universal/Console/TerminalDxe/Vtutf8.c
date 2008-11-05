@@ -60,8 +60,6 @@ VTUTF8RawDataToUnicode (
   @param  ValidBytes          The count of returned VT-VTF8 characters. 
                               If ValidBytes is zero, no valid VT-UTF8 returned.
 
-  @retval None.
-
 **/
 VOID
 GetOneValidUtf8Char (
