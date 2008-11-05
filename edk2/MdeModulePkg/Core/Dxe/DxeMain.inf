@@ -91,7 +91,6 @@
   TimerLib
 
 [Guids]
-  gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
   gEfiEventMemoryMapChangeGuid                  # ALWAYS_CONSUMED
   gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED
