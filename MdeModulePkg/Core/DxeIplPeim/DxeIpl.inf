@@ -73,7 +73,6 @@
   DebugLib
   S3Lib
   RecoveryLib
-  PerformanceLib
 
 [Ppis]
   gEfiEndOfPeiSignalPpiGuid                     # PPI SOMETIMES_PRODUCED
