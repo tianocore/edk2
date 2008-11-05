@@ -28,6 +28,7 @@ Abstract:
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
 #include <Protocol/Ip4.h>
+#include <Protocol/Dpc.h>
 
 #include <Library/NetLib.h>
 #include <Library/BaseLib.h>
