@@ -53,9 +53,6 @@
   DebugLib
   PcdLib
 
-[Guids]
-  gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
-
 [Protocols]
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiDatabaseProtocolGuid
