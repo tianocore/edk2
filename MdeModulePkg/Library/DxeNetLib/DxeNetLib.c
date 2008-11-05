@@ -27,6 +27,7 @@ Abstract:
 #include <Protocol/NicIp4Config.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
+#include <Protocol/Ip4.h>
 
 #include <Library/NetLib.h>
 #include <Library/BaseLib.h>
