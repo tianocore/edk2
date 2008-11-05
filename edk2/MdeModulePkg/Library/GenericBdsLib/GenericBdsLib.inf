@@ -74,7 +74,6 @@
   gEfiVT100PlusGuid                             # ALWAYS_CONSUMED
   gEfiMemoryTypeInformationGuid                 # ALWAYS_CONSUMED
   gEfiVTUTF8Guid                                # ALWAYS_CONSUMED
-  gEfiHobListGuid                               # ALWAYS_CONSUMED
   gEfiShellFileGuid                             # ALWAYS_CONSUMED
   gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
   gEfiVT100Guid                                 # ALWAYS_CONSUMED
