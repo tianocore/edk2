@@ -25,6 +25,8 @@ Abstract:
 #include <PiDxe.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/HiiConfigAccess.h>
+#include <Protocol/HiiDatabase.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
