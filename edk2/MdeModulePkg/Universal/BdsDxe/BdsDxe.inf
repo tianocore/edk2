@@ -94,7 +94,6 @@
   GenericBdsLib
   ReportStatusCodeLib
   PerformanceLib
-  DxeServicesTableLib
   MemoryAllocationLib
   GraphicsLib
   UefiLib
@@ -110,7 +109,6 @@
 
 [Guids]
   gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
-  gEfiHobListGuid                               # ALWAYS_CONSUMED
   gEfiBootStateGuid                             # ALWAYS_CONSUMED
   gEfiFileSystemVolumeLabelInfoIdGuid           # ALWAYS_CONSUMED
   gEfiFileInfoGuid                              # ALWAYS_CONSUMED

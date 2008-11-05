@@ -26,7 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/DataHubRecords.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/CpuIo.h>
-#include <Guid/HobList.h>
 #include <Guid/FileInfo.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/Bds.h>
@@ -57,7 +56,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/GraphicsLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/DxeServicesTableLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/IfrSupportLib.h>
