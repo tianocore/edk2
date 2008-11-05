@@ -1,4 +1,4 @@
-/**@file
+/** @file
   IPF specific debugsupport types, macros, and definitions.
   
 Copyright (c) 2004 - 2006 Intel Corporation                                                         
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PLDEBUG_SUPPORT_H
-#define _PLDEBUG_SUPPORT_H
+#ifndef _PLDEBUG_SUPPORT_H_
+#define _PLDEBUG_SUPPORT_H_
 
 
 #include <Uefi.h>
@@ -36,252 +36,167 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define EFI_ISA IsaIpf
 
-//
-// processor specific functions that must be public
-//
+/**
+  IPF specific DebugSupport driver initialization. 
+
+  Must be public because it's referenced from DebugSupport.c
+
+  @retval  EFI_SUCCESS     Always.
+
+**/
 EFI_STATUS
-plInitializeDebugSupportDriver (
+PlInitializeDebugSupportDriver (
   VOID
-  )
-/*++
+  );
 
-Routine Description:
-  IPF specific DebugSupport driver initialization.  Must be public because it's
-  referenced from DebugSupport.c
-
-Arguments:
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
-;
-
-EFI_STATUS
-EFIAPI
-plUnloadDebugSupportDriver (
-  IN EFI_HANDLE                   ImageHandle
-  )
-/*++
-
-Routine Description:
+/**
   Unload handler that is called during UnloadImage() - deallocates pool memory
   used by the driver.  Must be public because it's referenced from DebugSuport.c
 
-Arguments:
-  ImageHandle - Image handle
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
 
-Returns:
+  @retval EFI_SUCCESS    Always.
 
-  EFI_STATUS - anything other than EFI_SUCCESS indicates the callback was not registered.
+**/
+EFI_STATUS
+EFIAPI
+PlUnloadDebugSupportDriver (
+  IN EFI_HANDLE                   ImageHandle
+  );
 
---*/
-;
+/**
+  C callable function to obtain the current value of IVA.
 
-//
-// Assembly worker functions and data referenced from PlDebugSupport.c
-//
+  @return Current value of IVA.
+
+**/
 VOID  *
 GetIva (
   VOID
-  )
-/*++
+  );
 
-Routine Description:
-
-  C callable function to obtain the current value of IVA
-
-Arguments:
-
-  None
-
-Returns:
-
-  Current value if IVA
-
---*/
-;
-
-VOID
-HookStub (
-  VOID
-  )
-/*++
-
-Routine Description:
-
+/**
   HookStub will be copied from it's loaded location into the IVT when
   an IVT entry is hooked.
 
-Arguments:
+**/
+VOID
+HookStub (
+  VOID
+  );
 
-  None
+/**
+  Chains an interrupt handler.
 
-Returns:
-
-  None
-
---*/
-;
-
+**/
 VOID
 ChainHandler (
   VOID
-  )
-/*++
+  );
 
-Routine Description:
+/**
+  Unchains an interrupt handler.
 
-  Chains an interrupt handler
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
-;
-
+**/
 VOID
 UnchainHandler (
   VOID
-  )
-/*++
+  );
 
-Routine Description:
+/**
+  C callable function to enable/disable interrupts.
 
-  Unchains an interrupt handler
+  @param  NewInterruptState   New Interrupt State.
 
-Arguments:
+  @return Previous state of psr.ic.
 
-  None
-
-Returns:
-
-  None
-
---*/
-;
-
+**/
 UINT64
 ProgramInterruptFlags (
   IN UINT64                       NewInterruptState
-  )
-/*++
+  );
 
-Routine Description:
+/**
+  Flushes instruction cache for specified number of bytes.
 
-  C callable function to enable/disable interrupts
+  @param  StartAddress     Cache Start Address.
+  @param  SizeInBytes      Cache Size.
 
-Arguments:
-
-  NewInterruptState - New Interrupt State
-
-Returns:
-
-  Previous state of psr.ic
-
---*/
-;
-
+**/
 VOID
 InstructionCacheFlush (
   IN VOID    *StartAddress,
   IN UINTN   SizeInBytes
-  )
-/*++
+  );
 
-Routine Description:
+/**
+  This is a DebugSupport protocol member function, hard
+  coded to support only 1 processor for now.
 
-  Flushes instruction cache for specified number of bytes
+  @param  This                The DebugSupport instance
+  @param  MaxProcessorIndex   The maximuim supported processor index
 
-Arguments:
+  @retval EFI_SUCCESS         Always returned with **MaxProcessorIndex set to 0.
 
-  StartAddress  - Cache Start Address
-  SizeInBytes   - Cache Size
-
-Returns:
-
-  None
-
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 GetMaximumProcessorIndex (
   IN EFI_DEBUG_SUPPORT_PROTOCOL   *This,
   OUT UINTN                       *MaxProcessorIndex
-  )
-/*++
+  );
 
-Routine Description: This is a DebugSupport protocol member function.  Hard
-  coded to support only 1 processor for now.
+/**
+  DebugSupport protocol member function.
 
-Arguments:
-  This              - The DebugSupport instance
-  MaxProcessorIndex - The maximuim supported processor index
+  @param  This               The DebugSupport instance
+  @param  ProcessorIndex     Which processor the callback applies to.
+  @param  PeriodicCallback   Callback function
 
-Returns:
-  Always returns EFI_SUCCESS with *MaxProcessorIndex set to 0
+  @retval EFI_SUCCESS        Indicates the callback was registered.
+  @retval others             Callback was not registered.
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 RegisterPeriodicCallback (
   IN EFI_DEBUG_SUPPORT_PROTOCOL   *This,
   IN UINTN                        ProcessorIndex,
   IN EFI_PERIODIC_CALLBACK        PeriodicCallback
-  )
-/*++
+  );
 
-Routine Description:
-  DebugSupport protocol member function
+/**
+  DebugSupport protocol member function.
 
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  PeriodicCallback - Callback function
+  @param  This              The DebugSupport instance
+  @param  ProcessorIndex    Which processor the callback applies to.
+  @param  NewCallback       Callback function
+  @param  ExceptionType     Which exception to hook
 
-Returns:
+  @retval EFI_SUCCESS        Indicates the callback was registered.
+  @retval others             Callback was not registered.
 
-  EFI_STATUS - anything other than EFI_SUCCESS indicates the callback was not registered.
-
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 RegisterExceptionCallback (
   IN EFI_DEBUG_SUPPORT_PROTOCOL   *This,
   IN UINTN                        ProcessorIndex,
-  IN EFI_EXCEPTION_CALLBACK       NewHandler,
+  IN EFI_EXCEPTION_CALLBACK       NewCallback,
   IN EFI_EXCEPTION_TYPE           ExceptionType
-  )
-/*++
+  );
 
-Routine Description:
-  DebugSupport protocol member function
+/**
+  DebugSupport protocol member function.  Calls assembly routine to flush cache.
 
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  NewCallback      - Callback function
-  ExceptionType    - Which exception to hook
+  @param  This              The DebugSupport instance
+  @param  ProcessorIndex    Which processor the callback applies to.
+  @param  Start             Physical base of the memory range to be invalidated
+  @param  Length            mininum number of bytes in instruction cache to invalidate
 
-Returns:
+  @retval EFI_SUCCESS       Always returned.
 
-  EFI_STATUS - anything other than EFI_SUCCESS indicates the callback was not registered.
-
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 InvalidateInstructionCache (
@@ -289,44 +204,19 @@ InvalidateInstructionCache (
   IN UINTN                        ProcessorIndex,
   IN VOID                         *Start,
   IN UINTN                        Length
-  )
-/*++
+  );
 
-Routine Description:
-  DebugSupport protocol member function.  Calls assembly routine to flush cache.
+/**
+  C routine that is called for all registered exceptions.  This is the main
+  exception dispatcher.  Must be public because it's referenced from AsmFuncs.s.
 
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  Start            - Physical base of the memory range to be invalidated
-  Length           - mininum number of bytes in instruction cache to invalidate
-
-Returns:
-  EFI_SUCCESS
-
---*/
-;
-
+  @param  ExceptionType        Exception Type
+  @param  Context              System Context
+**/
 VOID
 CommonHandler (
   IN EFI_EXCEPTION_TYPE ExceptionType,
   IN EFI_SYSTEM_CONTEXT Context
-  )
-/*++
-
-Routine Description:
-  C routine that is called for all registered exceptions.  This is the main
-  exception dispatcher.  Must be public because it's referenced from AsmFuncs.s.
-
-Arguments:
-  ExceptionType - Exception Type
-  Context       - System Context
-
-Returns:
-
-  Nothing
-  
---*/
-;
+  );
 
 #endif

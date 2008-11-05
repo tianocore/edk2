@@ -1,4 +1,4 @@
-/**@file
+/** @file
   IPF specific debug support functions
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
@@ -35,35 +35,82 @@ typedef struct {
   VOID (*RegisteredCallback) ();
 } IVT_ENTRY;
 
+/**
+  This is the worker function that uninstalls and removes all handlers.
+
+  @param  ExceptionType     Exception Type
+  @param  NewBundles        New Boundles
+  @param  NewCallback       New Callback
+
+  @retval EFI_ALEADY_STARTED Ivt already hooked.
+  @retval others             Indicates the request was not satisfied.
+  @retval EFI_SUCCESS        Successfully uninstalled.
+
+**/
 EFI_STATUS
 ManageIvtEntryTable (
-  IN  EFI_EXCEPTION_TYPE                ExceptionType,
+  IN  EFI_EXCEPTION_TYPE    ExceptionType,
   IN  BUNDLE                NewBundles[4],
   IN  VOID                  (*NewCallback) ()
   );
 
+/**
+  Saves original IVT contents and inserts a few new bundles which are fixed up
+  to store the ExceptionType and then call the common handler.
+
+  @param  ExceptionType      Exception Type
+  @param  NewBundles         New Boundles
+  @param  NewCallback        New Callback
+
+**/
 VOID
 HookEntry (
-  IN  EFI_EXCEPTION_TYPE                ExceptionType,
+  IN  EFI_EXCEPTION_TYPE    ExceptionType,
   IN  BUNDLE                NewBundles[4],
   IN  VOID                  (*NewCallback) ()
   );
 
+/**
+  Restores original IVT contents when unregistering a callback function.
+
+  @param  ExceptionType     Exception Type
+
+**/
 VOID
 UnhookEntry (
   IN  EFI_EXCEPTION_TYPE    ExceptionType
   );
 
+/**
+  Sets up cache flush and calls assembly function to chain external interrupt.
+
+  Records new callback in IvtEntryTable.
+
+  @param  NewCallback     New Callback.
+
+**/
 VOID
 ChainExternalInterrupt (
   IN  VOID                  (*NewCallback) ()
   );
 
+/**
+  Sets up cache flush and calls assembly function to restore external interrupt.
+  Removes registered callback from IvtEntryTable.
+
+**/
 VOID
 UnchainExternalInterrupt (
   VOID
   );
 
+/**
+  Given an integer number, return the physical address of the entry point in the IFT.
+
+  @param  HandlerIndex       Index of the Handler 
+  @param  EntryPoint         IFT Entrypoint
+
+**/
 VOID
 GetHandlerEntryPoint (
   UINTN                     HandlerIndex,
@@ -85,48 +132,38 @@ UINT8     IpfContextBuf[sizeof (EFI_SYSTEM_CONTEXT_IPF) + 512];
 UINT8     PatchSaveBuffer[0x400];
 UINTN     ExternalInterruptCount;
 
+/**
+  IPF specific DebugSupport driver initialization. 
+
+  Must be public because it's referenced from DebugSupport.c
+
+  @retval  EFI_SUCCESS     Always.
+
+**/
 EFI_STATUS
-plInitializeDebugSupportDriver (
+PlInitializeDebugSupportDriver (
   VOID
   )
-/*++
-
-Routine Description:
-  IPF specific DebugSupport driver initialization.  Must be public because it's
-  referenced from DebugSupport.c
-
-Arguments:
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
 {
   SetMem (IvtEntryTable, sizeof (IvtEntryTable), 0);
   ExternalInterruptCount = 0;
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-EFIAPI
-plUnloadDebugSupportDriver (
-  IN EFI_HANDLE       ImageHandle
-  )
-/*++
-
-Routine Description:
+/**
   Unload handler that is called during UnloadImage() - deallocates pool memory
   used by the driver.  Must be public because it's referenced from DebugSuport.c
 
-Arguments:
-  ImageHandle - Image handle
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
 
-Returns:
+  @retval EFI_SUCCESS    Always.
 
-  EFI_STATUS - anything other than EFI_SUCCESS indicates the callback was not registered.
-
---*/
+**/
+EFI_STATUS
+EFIAPI
+PlUnloadDebugSupportDriver (
+  IN EFI_HANDLE       ImageHandle
+  )
 {
   EFI_EXCEPTION_TYPE  ExceptionType;
 
@@ -137,26 +174,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  C routine that is called for all registered exceptions.  This is the main
+  exception dispatcher.  Must be public because it's referenced from AsmFuncs.s.
+
+  @param  ExceptionType        Exception Type
+  @param  Context              System Context
+**/
 VOID
 CommonHandler (
   IN EFI_EXCEPTION_TYPE ExceptionType,
   IN EFI_SYSTEM_CONTEXT Context
   )
-/*++
-
-Routine Description:
-  C routine that is called for all registered exceptions.  This is the main
-  exception dispatcher.  Must be public because it's referenced from AsmFuncs.s.
-
-Arguments:
-  ExceptionType - Exception Type
-  Context       - System Context
-
-Returns:
-
-  Nothing
-  
---*/
 {
   DEBUG_CODE_BEGIN ();
     if (mInHandler) {
@@ -189,25 +218,18 @@ Returns:
   mInHandler = FALSE;
 }
 
+/**
+  Given an integer number, return the physical address of the entry point in the IFT.
+
+  @param  HandlerIndex       Index of the Handler 
+  @param  EntryPoint         IFT Entrypoint
+
+**/
 VOID
 GetHandlerEntryPoint (
   UINTN   HandlerIndex,
   VOID    **EntryPoint
   )
-/*++
-
-Routine Description:
-  Given an integer number, return the physical address of the entry point in the IFT
-  
-Arguments:
-  HandlerIndex - Index of the Handler 
-  EntryPoint   - IFT Entrypoint
-
-Returns:
-
-  Nothing
-  
---*/
 {
   UINT8 *TempPtr;
 
@@ -231,29 +253,24 @@ Returns:
   *EntryPoint = (VOID *) TempPtr;
 }
 
+/**
+  This is the worker function that uninstalls and removes all handlers.
+
+  @param  ExceptionType     Exception Type
+  @param  NewBundles        New Boundles
+  @param  NewCallback       New Callback
+
+  @retval EFI_ALEADY_STARTED Ivt already hooked.
+  @retval others             Indicates the request was not satisfied.
+  @retval EFI_SUCCESS        Successfully uninstalled.
+
+**/
 EFI_STATUS
 ManageIvtEntryTable (
-  IN  EFI_EXCEPTION_TYPE                                         ExceptionType,
+  IN  EFI_EXCEPTION_TYPE           ExceptionType,
   IN  BUNDLE                       NewBundles[NUM_BUNDLES_IN_STUB],
   IN  VOID                         (*NewCallback) ()
   )
-/*++
-
-Routine Description:
-  This is the worker function that installs and removes all handlers
-  
-Arguments:
-  ExceptionType  - Exception Type
-  NewBundles     - New Boundles
-  NewCallback    - New Callback
-
-Returns:
-
-  EFI_STATUS - any return other than EFI_SUCCESS indicates the request was not
-  satisfied.
-  EFI_ALEADY_STARTED - Ivt already hooked.
-  
---*/
 {
   BUNDLE  *B0Ptr;
   UINT64  InterruptFlags;
@@ -313,28 +330,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Saves original IVT contents and inserts a few new bundles which are fixed up
+  to store the ExceptionType and then call the common handler.
+
+  @param  ExceptionType      Exception Type
+  @param  NewBundles         New Boundles
+  @param  NewCallback        New Callback
+
+**/
 VOID
 HookEntry (
   IN  EFI_EXCEPTION_TYPE  ExceptionType,
   IN  BUNDLE              NewBundles[4],
   IN  VOID                (*NewCallback) ()
   )
-/*++
-
-Routine Description:
-  Saves original IVT contents and inserts a few new bundles which are fixed up
-  to store the ExceptionType and then call the common handler.
-  
-Arguments:
-  ExceptionType  - Exception Type
-  NewBundles     - New Boundles
-  NewCallback    - New Callback
-
-Returns:
-
-  Nothing
-    
---*/
 {
   BUNDLE  *FixupBundle;
   BUNDLE  *B0Ptr;
@@ -367,25 +377,16 @@ Returns:
   IvtEntryTable[ExceptionType].RegisteredCallback = NewCallback;
 }
 
+/**
+  Restores original IVT contents when unregistering a callback function.
+
+  @param  ExceptionType     Exception Type
+
+**/
 VOID
 UnhookEntry (
   IN  EFI_EXCEPTION_TYPE  ExceptionType
   )
-/*++
-
-Routine Description:
-  Restores original IVT contents when unregistering a callback function
-  
-Arguments:
-  ExceptionType  - Exception Type
-  NewBundles     - New Boundles
-  NewCallback    - New Callback
-
-Returns:
-
-  Nothing
-    
---*/
 {
   BUNDLE  *B0Ptr;
 
@@ -404,24 +405,18 @@ Returns:
   InstructionCacheFlush (B0Ptr, 5);
 }
 
+/**
+  Sets up cache flush and calls assembly function to chain external interrupt.
+
+  Records new callback in IvtEntryTable.
+
+  @param  NewCallback     New Callback
+
+**/
 VOID
 ChainExternalInterrupt (
   IN  VOID  (*NewCallback) ()
   )
-/*++
-
-Routine Description:
-  Sets up cache flush and calls assembly function to chain external interrupt.
-  Records new callback in IvtEntryTable.
-  
-Arguments:
-  NewCallback    - New Callback
-
-Returns:
-
-  Nothing
-    
---*/
 {
   VOID  *Start;
 
@@ -431,24 +426,15 @@ Returns:
   InstructionCacheFlush (Start, 0x400);
 }
 
+/**
+  Sets up cache flush and calls assembly function to restore external interrupt.
+  Removes registered callback from IvtEntryTable.
+
+**/
 VOID
 UnchainExternalInterrupt (
   VOID
   )
-/*++
-
-Routine Description:
-  Sets up cache flush and calls assembly function to restore external interrupt.
-  Removes registered callback from IvtEntryTable.
-  
-Arguments:
-  Nothing
-  
-Returns:
-
-  Nothing
-    
---*/
 {
   VOID  *Start;
 
@@ -463,56 +449,61 @@ Returns:
 // DebugSupport protocol
 //
 
+/**
+  This is a DebugSupport protocol member function, hard
+  coded to support only 1 processor for now.
+
+  @param  This                The DebugSupport instance
+  @param  MaxProcessorIndex   The maximuim supported processor index
+
+  @retval EFI_SUCCESS         Always returned with **MaxProcessorIndex set to 0.
+
+**/
 EFI_STATUS
 EFIAPI
 GetMaximumProcessorIndex (
   IN EFI_DEBUG_SUPPORT_PROTOCOL    *This,
   OUT UINTN                        *MaxProcessorIndex
   )
-/*++
-
-Routine Description: This is a DebugSupport protocol member function.  Hard
-  coded to support only 1 processor for now.
-
-Arguments:
-  This              - The DebugSupport instance
-  MaxProcessorIndex - The maximuim supported processor index
-
-Returns:
-  Always returns EFI_SUCCESS with *MaxProcessorIndex set to 0
-
---*/
 {
   *MaxProcessorIndex = 0;
   return (EFI_SUCCESS);
 }
 
+/**
+  DebugSupport protocol member function.
+
+  @param  This               The DebugSupport instance
+  @param  ProcessorIndex     Which processor the callback applies to.
+  @param  PeriodicCallback   Callback function
+
+  @retval EFI_SUCCESS        Indicates the callback was registered.
+  @retval others             Callback was not registered.
+
+**/
 EFI_STATUS
 EFIAPI
 RegisterPeriodicCallback (
   IN EFI_DEBUG_SUPPORT_PROTOCOL     *This,
   IN UINTN                          ProcessorIndex,
-  IN EFI_PERIODIC_CALLBACK          NewPeriodicCallback
+  IN EFI_PERIODIC_CALLBACK          PeriodicCallback
   )
-/*++
-
-Routine Description:
-  DebugSupport protocol member function
-
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  PeriodicCallback - Callback function
-
-Returns:
-
-  EFI_STATUS - anything other than EFI_SUCCESS indicates the callback was not registered.
-
---*/
 {
-  return ManageIvtEntryTable (EXCEPT_IPF_EXTERNAL_INTERRUPT, NULL, NewPeriodicCallback);
+  return ManageIvtEntryTable (EXCEPT_IPF_EXTERNAL_INTERRUPT, NULL, PeriodicCallback);
 }
 
+/**
+  DebugSupport protocol member function.
+
+  @param  This              The DebugSupport instance
+  @param  ProcessorIndex    Which processor the callback applies to.
+  @param  NewCallback       Callback function
+  @param  ExceptionType     Which exception to hook
+
+  @retval EFI_SUCCESS        Indicates the callback was registered.
+  @retval others             Callback was not registered.
+
+**/
 EFI_STATUS
 EFIAPI
 RegisterExceptionCallback (
@@ -521,22 +512,6 @@ RegisterExceptionCallback (
   IN EFI_EXCEPTION_CALLBACK        NewCallback,
   IN EFI_EXCEPTION_TYPE            ExceptionType
   )
-/*++
-
-Routine Description:
-  DebugSupport protocol member function
-
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  NewCallback      - Callback function
-  ExceptionType    - Which exception to hook
-
-Returns:
-
-  EFI_STATUS - anything other than EFI_SUCCESS indicates the callback was not registered.
-
---*/
 {
   return ManageIvtEntryTable (
           ExceptionType,
@@ -545,6 +520,17 @@ Returns:
           );
 }
 
+/**
+  DebugSupport protocol member function.  Calls assembly routine to flush cache.
+
+  @param  This              The DebugSupport instance
+  @param  ProcessorIndex    Which processor the callback applies to.
+  @param  Start             Physical base of the memory range to be invalidated
+  @param  Length            mininum number of bytes in instruction cache to invalidate
+
+  @retval EFI_SUCCESS       Always returned.
+
+**/
 EFI_STATUS
 EFIAPI
 InvalidateInstructionCache (
@@ -553,22 +539,7 @@ InvalidateInstructionCache (
   IN VOID                          *Start,
   IN UINTN                         Length
   )
-/*++
-
-Routine Description:
-  DebugSupport protocol member function.  Calls assembly routine to flush cache.
-
-Arguments:
-  This             - The DebugSupport instance
-  ProcessorIndex   - Which processor the callback applies to.
-  Start            - Physical base of the memory range to be invalidated
-  Length           - mininum number of bytes in instruction cache to invalidate
-
-Returns:
-  EFI_SUCCESS
-
---*/
 {
   InstructionCacheFlush (Start, Length);
-  return (EFI_SUCCESS);
+  return EFI_SUCCESS;
 }

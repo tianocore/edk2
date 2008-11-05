@@ -28,31 +28,26 @@ EFI_DEBUG_SUPPORT_PROTOCOL  gDebugSupportProtocolInterface = {
   InvalidateInstructionCache
 };
 
-//
-// Driver Entry Point
-//
+
+/**
+  Debug Port Driver entry point. 
+
+  Checks to see there's not already a DebugSupport protocol installed for 
+  the selected processor before installing protocol.
+
+  @param[in] ImageHandle       The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable       A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS          The entry point is executed successfully.
+  @retval EFI_ALREADY_STARTED  DebugSupport protocol is installed already.
+  @retval other                Some error occurs when executing this entry point.
+
+**/
 EFI_STATUS
 InitializeDebugSupportDriver (
   IN EFI_HANDLE               ImageHandle,
   IN EFI_SYSTEM_TABLE         *SystemTable
   )
-/*++
-
-Routine Description:
-  Driver entry point.  Checks to see there's not already a DebugSupport protocol
-  installed for the selected processor before installing protocol.
-
-Arguments:
-  IN EFI_HANDLE               ImageHandle,
-  IN EFI_SYSTEM_TABLE         *SystemTable
-
-Returns:
-
-  EFI_STATUS
-
---*/
-// TODO:    ImageHandle - add argument and description to function comment
-// TODO:    SystemTable - add argument and description to function comment
 {
   EFI_LOADED_IMAGE_PROTOCOL   *LoadedImageProtocolPtr;
   EFI_STATUS                  Status;
@@ -111,12 +106,12 @@ Returns:
     goto ErrExit;
   }
 
-  LoadedImageProtocolPtr->Unload = plUnloadDebugSupportDriver;
+  LoadedImageProtocolPtr->Unload = PlUnloadDebugSupportDriver;
 
   //
   // Call hook for platform specific initialization
   //
-  Status = plInitializeDebugSupportDriver ();
+  Status = PlInitializeDebugSupportDriver ();
   ASSERT (!EFI_ERROR (Status));
   if (Status != EFI_SUCCESS) {
     goto ErrExit;
