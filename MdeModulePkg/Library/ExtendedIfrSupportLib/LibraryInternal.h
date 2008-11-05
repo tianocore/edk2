@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
-#include <Guid/GlobalVariable.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
