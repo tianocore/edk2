@@ -288,20 +288,21 @@
   #  FALSE is for size reduction.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol|TRUE|BOOLEAN|0x00010100
   
-  ## IF TRUE, Full UEFI Config Routing Protocol will be installed.
+  ## If TRUE, Full UEFI Config Routing Protocol will be installed.
   #  FALSE is for size reduction.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportFullConfigRoutingProtocol|TRUE|BOOLEAN|0x00010101
   
-  ## IF TRUE, Default Keyboard Layout is disabled in Usb KeyBoard device.
+  ## If TRUE, Default Keyboard Layout is disabled in Usb KeyBoard device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver|FALSE|BOOLEAN|0x00010200
 
+  ## If TRUE, Framework Hii is supported to provide backward compatibility
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkHiiCompatibilitySupport|TRUE|BOOLEAN|0x00012008
   
-  ## IF TRUE, the PeiCore will handle the framework FvHob and install FvInfo PPI for it.
+  ## If TRUE, the PeiCore will handle the framework FvHob and install FvInfo PPI for it.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkFvHobCompatibilitySupport|FALSE|BOOLEAN|0x00012009
   
   ##
-  #  IF TRUE, HelloWorld Application will print the verbose information.
+  #  If TRUE, HelloWorld Application will print the verbose information.
   #  This PCD is a sample to explain FeatureFlag PCD usage.
   ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable|TRUE|BOOLEAN|0x0001200a
@@ -310,8 +311,8 @@
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicate maximum number of callback function
   #  for a dynamic PCD used in PEI phase.
-
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x08|UINT32|0x0001000f
+
   ## VPD type PCD allow developer point an absoluted physical address PcdVpdBaseAddress
   #  to store PCD value. 
   #
