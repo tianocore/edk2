@@ -2096,6 +2096,7 @@ BcdToDecimal8 (
   
 **/
 CHAR16
+EFIAPI
 NibbleToHexChar (
   IN UINT8      Nibble
   )
@@ -2296,6 +2297,7 @@ HexStringToBuf (
   
 **/
 BOOLEAN
+EFIAPI
 IsHexDigit (
   OUT UINT8      *Digit,
   IN  CHAR16      Char
