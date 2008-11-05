@@ -62,7 +62,6 @@
   PcdLib
   MemoryAllocationLib
   BaseMemoryLib
-  PeiServicesTablePointerLib
   ExtractGuidedSectionLib
   UefiDecompressLib
   CacheMaintenanceLib

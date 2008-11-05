@@ -38,7 +38,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/UefiDecompressLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
-#include <Library/PeiServicesTablePointerLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
