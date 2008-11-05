@@ -48,6 +48,3 @@
   PcdLib
   GraphicsLib
   GenericBdsLib
-
-[Guids]
-  gEfiDefaultBmpLogoGuid
