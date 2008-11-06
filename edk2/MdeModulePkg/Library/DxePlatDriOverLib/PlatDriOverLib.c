@@ -1,20 +1,14 @@
 /** @file
+  Implementation of Platform Driver Override Library.
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2007 - 2008, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-    PlatDriOverLib.c
-
-Abstract:
-
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -24,15 +18,17 @@ LIST_ENTRY   mDevicePathStack = INITIALIZE_LIST_HEAD_VARIABLE (mDevicePathStack)
 
 
 /**
-  Install the Platform Driver Override Protocol, and ensure there is only one Platform Driver Override Protocol
-  in the system.
+  Installs the Platform Driver Override Protocol.
+
+  This function installs the Platform Driver Override Protocol, and ensure there is only one
+  Platform Driver Override Protocol in the system.
 
   @param  gPlatformDriverOverride  PlatformDriverOverride protocol interface which
                                    needs to be installed
 
+  @retval EFI_SUCCESS              The protocol is installed successfully.
   @retval EFI_ALREADY_STARTED      There has been a Platform Driver Override
                                    Protocol in the system, cannot install it again.
-  @retval Other                    Returned by InstallProtocolInterface
 
 **/
 EFI_STATUS
@@ -47,9 +43,9 @@ InstallPlatformDriverOverrideProtocol (
   EFI_HANDLE          *HandleBuffer;
 
   //
-  // There will be only one platform driver override protocol in the system
-  // If there is another out there, someone is trying to install us again,
-  // Fail that scenario.
+  // According to UEFI spec, there can be at most a single instance
+  // in the system of the EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL.
+  // So here we check the existence.
   //
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
@@ -78,17 +74,18 @@ InstallPlatformDriverOverrideProtocol (
                   EFI_NATIVE_INTERFACE,
                   gPlatformDriverOverride
                   );
-  return Status;
+  ASSERT_EFI_ERROR (Status);
+  return EFI_SUCCESS;
 }
 
 
 /**
-  Free all the mapping database memory resource and initialize the mapping list entry
+  Free all the mapping database memory resource and initialize the mapping list entry.
 
   @param  MappingDataBase          Mapping database list entry pointer
 
-  @retval EFI_INVALID_PARAMETER    mapping database list entry is NULL
-  @retval EFI_SUCCESS              Free success
+  @retval EFI_SUCCESS              Mapping database successfully freed
+  @retval EFI_INVALID_PARAMETER    MappingDataBase is NULL
 
 **/
 EFI_STATUS
@@ -106,20 +103,20 @@ FreeMappingDatabase (
     return EFI_INVALID_PARAMETER;
   }
 
-  OverrideItemListIndex = MappingDataBase->ForwardLink;
-  while (OverrideItemListIndex != MappingDataBase){
+  OverrideItemListIndex = GetFirstNode (MappingDataBase);
+  while (!IsNull (MappingDataBase, OverrideItemListIndex)) {
     OverrideItem = CR(OverrideItemListIndex, PLATFORM_OVERRIDE_ITEM, Link, PLATFORM_OVERRIDE_ITEM_SIGNATURE);
     //
     // Free PLATFORM_OVERRIDE_ITEM.ControllerDevicePath[]
     //
     if (OverrideItem->ControllerDevicePath != NULL){
-      FreePool(OverrideItem->ControllerDevicePath);
+      FreePool (OverrideItem->ControllerDevicePath);
     }
 
-    ImageInfoListIndex =  OverrideItem->DriverInfoList.ForwardLink;
-    while (ImageInfoListIndex != &OverrideItem->DriverInfoList){
+    ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+    while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
       //
-      // Free all DRIVER_IMAGE_INFO.DriverImagePath[]
+      // Free DRIVER_IMAGE_INFO.DriverImagePath[]
       //
       DriverImageInfo = CR(ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
       if (DriverImageInfo->DriverImagePath != NULL) {
@@ -128,14 +125,14 @@ FreeMappingDatabase (
       //
       // Free DRIVER_IMAGE_INFO itself
       //
-      ImageInfoListIndex = ImageInfoListIndex->ForwardLink;
+      ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
       RemoveEntryList (&DriverImageInfo->Link);
       FreePool (DriverImageInfo);
     }
     //
     // Free PLATFORM_OVERRIDE_ITEM itself
     //
-    OverrideItemListIndex =  OverrideItemListIndex->ForwardLink;
+    OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
     RemoveEntryList (&OverrideItem->Link);
     FreePool (OverrideItem);
   }
@@ -146,12 +143,14 @@ FreeMappingDatabase (
 
 
 /**
+  Create the mappging database according to variable.
+
   Read the environment variable(s) that contain the override mappings from Controller Device Path to
   a set of Driver Device Paths, and create the mapping database in memory with those variable info.
   VariableLayout{
   //
   // NotEnd indicate whether the variable is the last one, and has no subsequent variable need to load.
-  // Each variable has MaximumVariableSize limitation, so  we maybe need multi variables to store
+  // Each variable has MaximumVariableSize limitation, so we maybe need multiple variables to store
   // large mapping infos.
   // The variable(s) name rule is PlatDriOver, PlatDriOver1, PlatDriOver2, ....
   //
@@ -175,29 +174,13 @@ FreeMappingDatabase (
   EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
   ......
   }
-  typedef struct _PLATFORM_OVERRIDE_ITEM{
-  UINTN                          Signature;                  //EFI_SIGNATURE_32('p','d','o','i')
-  LIST_ENTRY                     Link;
-  UINT32                         DriverInfoNum;
-  EFI_DEVICE_PATH_PROTOCOL       *ControllerDevicePath;
-  LIST_ENTRY                     DriverInfoList;         //DRIVER_IMAGE_INFO List
-  } PLATFORM_OVERRIDE_ITEM;
-  typedef struct _DRIVER_IMAGE_INFO{
-  UINTN                          Signature;                  //EFI_SIGNATURE_32('p','d','i','i')
-  LIST_ENTRY                     Link;
-  EFI_HANDLE                     ImageHandle;
-  EFI_DEVICE_PATH_PROTOCOL       *DriverImagePath;
-  BOOLEAN                        UnLoadable;
-  BOOLEAN                        UnStartable;
-  } DRIVER_IMAGE_INFO;
 
   @param  MappingDataBase          Mapping database list entry pointer
 
+  @retval EFI_SUCCESS              Create the mapping database in memory successfully
   @retval EFI_INVALID_PARAMETER    MappingDataBase pointer is null
   @retval EFI_NOT_FOUND            Cannot find the 'PlatDriOver' NV variable
   @retval EFI_VOLUME_CORRUPTED     The found NV variable is corrupted
-  @retval EFI_SUCCESS              Create the mapping database in memory
-                                   successfully
 
 **/
 EFI_STATUS
@@ -225,37 +208,45 @@ InitOverridesMapping (
     return EFI_INVALID_PARAMETER;
   }
 
-  VariableNum = 0;
-  Corrupted = FALSE;
   //
   // Check the environment variable(s) that contain the override mappings .
   //
   VariableBuffer = GetVariableAndSize (L"PlatDriOver", &gEfiOverrideVariableGuid, &BufferSize);
   ASSERT ((UINTN) VariableBuffer % sizeof(UINTN) == 0);
-  VariableNum ++;
   if (VariableBuffer == NULL) {
     return EFI_NOT_FOUND;
   }
 
+  //
+  // Traverse all variables.
+  //
+  VariableNum = 1;
+  Corrupted = FALSE;
   do {
     VariableIndex = VariableBuffer;
     NotEnd = *(UINT32*) VariableIndex;
+    //
+    // Traverse the entries containing the mapping that Controller Device Path
+    // to a set of Driver Device Paths within this variable.
+    //
     VariableIndex = VariableIndex + sizeof (UINT32);
     while (VariableIndex < ((UINT8 *)VariableBuffer + BufferSize)) {
+      //
+      // Check signature of this entry
+      //
+      Signature = *(UINT32 *) VariableIndex;
+      if (Signature != PLATFORM_OVERRIDE_ITEM_SIGNATURE) {
+        Corrupted = TRUE;
+        break;
+      }
+      //
+      // Create PLATFORM_OVERRIDE_ITEM for this mapping
+      //
       OverrideItem = AllocateZeroPool (sizeof (PLATFORM_OVERRIDE_ITEM));
       ASSERT (OverrideItem != NULL);
       OverrideItem->Signature = PLATFORM_OVERRIDE_ITEM_SIGNATURE;
       InitializeListHead (&OverrideItem->DriverInfoList);
-      //
-      // Check SIGNATURE
-      //
-      Signature = *(UINT32 *) VariableIndex;
       VariableIndex = VariableIndex + sizeof (UINT32);
-      if (Signature != PLATFORM_OVERRIDE_ITEM_SIGNATURE) {
-        FreePool (OverrideItem);
-        Corrupted = TRUE;
-        break;
-      }
       //
       // Get DriverNum
       //
@@ -277,6 +268,9 @@ InitOverridesMapping (
       // Get all DriverDevicePath[]
       //
       for (Index = 0; Index < DriverNumber; Index++) {
+        //
+        // Create DRIVER_IMAGE_INFO for this DriverDevicePath[]
+        //
         DriverImageInfo = AllocateZeroPool (sizeof (DRIVER_IMAGE_INFO));
         ASSERT (DriverImageInfo != NULL);
         DriverImageInfo->Signature = DRIVER_IMAGE_INFO_SIGNATURE;
@@ -301,14 +295,14 @@ InitOverridesMapping (
     }
 
     //
-    // If has other variable(PlatDriOver1, PlatDriOver2, PlatDriOver3.....), get them.
-    // NotEnd indicate whether current variable is the end variable.
+    // If there are additional variables (PlatDriOver1, PlatDriOver2, PlatDriOver3.....), get them.
+    // NotEnd indicates whether current variable is the end variable.
     //
     if (NotEnd != 0) {
       UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", VariableNum);
       VariableBuffer = GetVariableAndSize (OverrideVariableName, &gEfiOverrideVariableGuid, &BufferSize);
       ASSERT ((UINTN) VariableBuffer % sizeof(UINTN) == 0);
-      VariableNum ++;
+      VariableNum++;
       if (VariableBuffer == NULL) {
         FreeMappingDatabase (MappingDataBase);
         return EFI_VOLUME_CORRUPTED;
@@ -322,10 +316,9 @@ InitOverridesMapping (
 
 
 /**
-  Calculate the needed size in NV variable for recording a specific PLATFORM_OVERRIDE_ITEM info
+  Calculate the needed size in NV variable for recording a specific PLATFORM_OVERRIDE_ITEM info.
 
-  @param  OverrideItemListIndex    a list entry point to a specific
-                                   PLATFORM_OVERRIDE_ITEM
+  @param  OverrideItemListIndex    Pointer to the list of a specific PLATFORM_OVERRIDE_ITEM
 
   @return The needed size number
 
@@ -340,28 +333,31 @@ GetOneItemNeededSize (
   PLATFORM_OVERRIDE_ITEM      *OverrideItem;
   LIST_ENTRY                  *ImageInfoListIndex;
   DRIVER_IMAGE_INFO           *DriverImageInfo;
-
+  UINTN                       DevicePathSize;
 
   NeededSize = 0;
   OverrideItem = CR(OverrideItemListIndex, PLATFORM_OVERRIDE_ITEM, Link, PLATFORM_OVERRIDE_ITEM_SIGNATURE);
   NeededSize += sizeof (UINT32); //UINT32  SIGNATURE;
   NeededSize += sizeof (UINT32); //UINT32  DriverNum;
-  NeededSize += GetDevicePathSize (OverrideItem->ControllerDevicePath); // ControllerDevicePath
+  DevicePathSize = GetDevicePathSize (OverrideItem->ControllerDevicePath);
+  NeededSize += DevicePathSize; // ControllerDevicePath
   //
   // Align the controller device path
   //
-  NeededSize += ((sizeof(UINT32) - ((UINTN) GetDevicePathSize (OverrideItem->ControllerDevicePath))) \
-                  & (sizeof(UINT32) - 1));
-  ImageInfoListIndex =  OverrideItem->DriverInfoList.ForwardLink;
-  while (ImageInfoListIndex != &OverrideItem->DriverInfoList){
+  NeededSize += ((sizeof(UINT32) - DevicePathSize) & (sizeof(UINT32) - 1));
+  //
+  // Traverse the Driver Info List of this Override Item
+  //
+  ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+  while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
     DriverImageInfo = CR(ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
-    NeededSize += GetDevicePathSize (DriverImageInfo->DriverImagePath); //DriverDevicePath
+    DevicePathSize = GetDevicePathSize (DriverImageInfo->DriverImagePath);
+    NeededSize += DevicePathSize; //DriverDevicePath
     //
     // Align the driver image device path
     //
-    NeededSize += ((sizeof(UINT32) - ((UINTN) GetDevicePathSize (DriverImageInfo->DriverImagePath))) \
-                    & (sizeof(UINT32) - 1));
-    ImageInfoListIndex = ImageInfoListIndex->ForwardLink;
+    NeededSize += ((sizeof(UINT32) - DevicePathSize) & (sizeof(UINT32) - 1));
+    ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
   }
 
   return NeededSize;
@@ -370,12 +366,12 @@ GetOneItemNeededSize (
 
 
 /**
-  Save the memory mapping database into NV environment variable(s)
+  Save the memory mapping database into NV environment variable(s).
 
   @param  MappingDataBase          Mapping database list entry pointer
 
-  @retval EFI_INVALID_PARAMETER    MappingDataBase pointer is null
   @retval EFI_SUCCESS              Save memory mapping database successfully
+  @retval EFI_INVALID_PARAMETER    MappingDataBase pointer is null
 
 **/
 EFI_STATUS
@@ -396,7 +392,6 @@ SaveOverridesMapping (
   LIST_ENTRY                  *ItemIndex;
   LIST_ENTRY                  *ImageInfoListIndex;
   UINTN                       VariableNeededSize;
-  UINTN                       SavedSize;
   UINT64                      MaximumVariableStorageSize;
   UINT64                      RemainingVariableStorageSize;
   UINT64                      MaximumVariableSize;
@@ -406,8 +401,9 @@ SaveOverridesMapping (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (MappingDataBase->ForwardLink == MappingDataBase) {
+  if (IsListEmpty (MappingDataBase)) {
     Status = DeleteOverridesVariables ();
+    ASSERT_EFI_ERROR (Status);
     return EFI_SUCCESS;
   }
 
@@ -422,18 +418,24 @@ SaveOverridesMapping (
           );
 
   NumIndex = 0;
-  OverrideItemListIndex = MappingDataBase->ForwardLink;
-  while (OverrideItemListIndex != MappingDataBase) {
+  OverrideItemListIndex = GetFirstNode (MappingDataBase);
+  while (!IsNull (MappingDataBase, OverrideItemListIndex)) {
     //
-    // Try to find the most proper variable size which <= MaximumVariableSize, but can contain mapping info as much as possible
+    // Try to find the most proper variable size which <= MaximumVariableSize,
+    // but can contain mapping info as much as possible
     //
-    VariableNeededSize = 0;
-    VariableNeededSize += sizeof (UINT32); //BOOLEAN  NotEnd;
+    VariableNeededSize = sizeof (UINT32); // NotEnd;
     ItemIndex = OverrideItemListIndex;
     NotEnd = FALSE;
-
-    while (ItemIndex != MappingDataBase){
+    //
+    // Traverse all PLATFORM_OVERRIDE_ITEMs and get the total size.
+    //
+    while (!IsNull (MappingDataBase, ItemIndex)) {
       OneItemNeededSize = GetOneItemNeededSize (ItemIndex);
+      //
+      // If the total size exceeds the MaximumVariableSize, then we must use
+      // multiple variables.
+      //
       if ((VariableNeededSize +
            OneItemNeededSize +
            sizeof (VARIABLE_HEADER) +
@@ -444,11 +446,11 @@ SaveOverridesMapping (
         break;
       }
 
-      VariableNeededSize += GetOneItemNeededSize (ItemIndex);
-      ItemIndex =  ItemIndex->ForwardLink;
+      VariableNeededSize += OneItemNeededSize;
+      ItemIndex = GetNextNode (MappingDataBase, ItemIndex);
     }
 
-    if (NotEnd) {
+    if (NotEnd != 0) {
       if (VariableNeededSize == sizeof (UINT32)) {
         //
         // If an individual EFI variable cannot contain a single Item, return error
@@ -467,52 +469,46 @@ SaveOverridesMapping (
     //
     // Fill the variable buffer according to MappingDataBase
     //
-    SavedSize = 0;
     VariableIndex = VariableBuffer;
     *(UINT32 *) VariableIndex = NotEnd;
-    VariableIndex += sizeof (UINT32); // pass NoEnd
-    SavedSize += sizeof (UINT32);
+    VariableIndex += sizeof (UINT32); // pass NotEnd
     //
     // ItemIndex points to the next PLATFORM_OVERRIDE_ITEM which is not covered by VariableNeededSize
     //
     while (OverrideItemListIndex != ItemIndex){
       *(UINT32 *) VariableIndex = PLATFORM_OVERRIDE_ITEM_SIGNATURE;
       VariableIndex += sizeof (UINT32); // pass SIGNATURE
-      SavedSize += sizeof (UINT32);
 
       OverrideItem = CR(OverrideItemListIndex, PLATFORM_OVERRIDE_ITEM, Link, PLATFORM_OVERRIDE_ITEM_SIGNATURE);
       *(UINT32 *) VariableIndex = OverrideItem->DriverInfoNum;
       VariableIndex += sizeof (UINT32); // pass DriverNum
-      SavedSize += sizeof (UINT32);
 
       CopyMem (VariableIndex, OverrideItem->ControllerDevicePath, GetDevicePathSize (OverrideItem->ControllerDevicePath));
       VariableIndex += GetDevicePathSize (OverrideItem->ControllerDevicePath); // pass ControllerDevicePath
-      SavedSize += GetDevicePathSize (OverrideItem->ControllerDevicePath);
 
       //
       // Align the VariableIndex since the controller device path may not be aligned
       //
-      SavedSize += ((sizeof(UINT32) - ((UINTN) (VariableIndex))) & (sizeof(UINT32) - 1));
       VariableIndex += ((sizeof(UINT32) - ((UINTN) (VariableIndex))) & (sizeof(UINT32) - 1));
-
-      ImageInfoListIndex =  OverrideItem->DriverInfoList.ForwardLink;
-      while (ImageInfoListIndex != &OverrideItem->DriverInfoList){
+      //
+      // Save the Driver Info List of this PLATFORM_OVERRIDE_ITEM
+      //
+      ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+      while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
         DriverImageInfo = CR(ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
         CopyMem (VariableIndex, DriverImageInfo->DriverImagePath, GetDevicePathSize (DriverImageInfo->DriverImagePath));
         VariableIndex += GetDevicePathSize (DriverImageInfo->DriverImagePath); // pass DriverImageDevicePath
-        SavedSize += GetDevicePathSize (DriverImageInfo->DriverImagePath);
         //
         // Align the VariableIndex since the driver image device path may not be aligned
         //
-        SavedSize += ((sizeof(UINT32) - ((UINTN) (VariableIndex))) & (sizeof(UINT32) - 1));
         VariableIndex += ((sizeof(UINT32) - ((UINTN) (VariableIndex))) & (sizeof(UINT32) - 1));
-        ImageInfoListIndex = ImageInfoListIndex->ForwardLink;
+        ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
       }
 
-      OverrideItemListIndex =  OverrideItemListIndex->ForwardLink;
+      OverrideItemListIndex =  GetNextNode (MappingDataBase, OverrideItemListIndex);
     }
 
-    ASSERT (SavedSize == VariableNeededSize);
+    ASSERT (((UINTN)VariableIndex - (UINTN)VariableBuffer) == VariableNeededSize);
 
     if (NumIndex == 0) {
       UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver");
@@ -537,11 +533,14 @@ SaveOverridesMapping (
 }
 
 /**
-  Get the first Binding protocol which has the specific image handle
+  Get the first Binding protocol which has the specific image handle.
 
-  @param  Image          Image handle
+  @param  ImageHandle          The Image handle
+  @param  BindingHandle        The BindingHandle of the found Driver Binding protocol.
+                               If Binding protocol is not found, it is set to NULL. 
 
-  @return Pointer into the Binding Protocol interface
+  @return                      Pointer into the Binding Protocol interface
+  @retval NULL                 The paramter is not valid or the binding protocol is not found.
 
 **/
 EFI_DRIVER_BINDING_PROTOCOL *
@@ -561,7 +560,7 @@ GetBindingProtocolFromImageHandle (
     return NULL;
   }
   //
-  // Get all driver which support binding protocol in second page
+  // Get all drivers which support driver binding protocol
   //
   DriverBindingHandleCount  = 0;
   Status = gBS->LocateHandleBuffer (
@@ -576,7 +575,7 @@ GetBindingProtocolFromImageHandle (
   }
 
   for (Index = 0; Index < DriverBindingHandleCount; Index++) {
-    DriverBindingInterface =NULL;
+    DriverBindingInterface = NULL;
     Status = gBS->OpenProtocol (
                     DriverBindingHandleBuffer[Index],
                     &gEfiDriverBindingProtocolGuid,
@@ -596,15 +595,16 @@ GetBindingProtocolFromImageHandle (
     }
   }
 
+  //
+  // If no Driver Binding Protocol instance is found
+  //
   FreePool (DriverBindingHandleBuffer);
   *BindingHandle = NULL;
   return NULL;
 }
 
 /**
-  return the current TPL, copied from the EDKII glue lib
-
-  @param  VOID
+  Return the current TPL.
 
   @return Current TPL
 
@@ -624,17 +624,18 @@ GetCurrentTpl (
 
 
 /**
-  Retrieves the image handle of the platform override driver for a controller in the system from the memory mapping database.
+  Retrieves the image handle of the platform override driver for a controller in
+  the system from the memory mapping database.
 
   @param  This                     A pointer to the
                                    EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
   @param  ControllerHandle         The device handle of the controller to check if
                                    a driver override exists.
-  @param  DriverImageHandle        On output, a pointer to the next driver handle.
+  @param  DriverImageHandle        On input, the previously returnd driver image handle.
+                                   On output, a pointer to the next driver handle.
                                    Passing in a pointer to NULL, will return the
                                    first driver handle for ControllerHandle.
-  @param  MappingDataBase          MappingDataBase - Mapping database list entry
-                                   pointer
+  @param  MappingDataBase          Mapping database list entry pointer
   @param  CallerImageHandle        The caller driver's image handle, for
                                    UpdateFvFileDevicePath use.
 
@@ -652,10 +653,10 @@ GetCurrentTpl (
 EFI_STATUS
 EFIAPI
 GetDriverFromMapping (
-  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              * This,
+  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN     EFI_HANDLE                                     ControllerHandle,
-  IN OUT EFI_HANDLE                                     * DriverImageHandle,
-  IN     LIST_ENTRY                                     * MappingDataBase,
+  IN OUT EFI_HANDLE                                     *DriverImageHandle,
+  IN     LIST_ENTRY                                     *MappingDataBase,
   IN     EFI_HANDLE                                     CallerImageHandle
   )
 {
@@ -686,12 +687,14 @@ GetDriverFromMapping (
   if (ControllerHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
+  //
+  // Get the device path of ControllerHandle
+  //
   Status = gBS->HandleProtocol (
-              ControllerHandle,
-              &gEfiDevicePathProtocolGuid,
-              (VOID **) &ControllerDevicePath
-              );
+                  ControllerHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ControllerDevicePath
+                  );
   if (EFI_ERROR (Status) || ControllerDevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -701,23 +704,23 @@ GetDriverFromMapping (
   //
   OverrideItem = NULL;
   ControllerFound = FALSE;
-  OverrideItemListIndex = MappingDataBase->ForwardLink;
-  while (OverrideItemListIndex != MappingDataBase){
+  DevicePathSize = GetDevicePathSize (ControllerDevicePath);
+
+  OverrideItemListIndex = GetFirstNode (MappingDataBase);
+  while (!IsNull (MappingDataBase, OverrideItemListIndex)) {
     OverrideItem = CR(OverrideItemListIndex, PLATFORM_OVERRIDE_ITEM, Link, PLATFORM_OVERRIDE_ITEM_SIGNATURE);
-    DevicePathSize = GetDevicePathSize (ControllerDevicePath);
     if (DevicePathSize == GetDevicePathSize (OverrideItem->ControllerDevicePath)) {
       if (CompareMem (
             ControllerDevicePath,
             OverrideItem->ControllerDevicePath,
-            GetDevicePathSize (OverrideItem->ControllerDevicePath)
+            DevicePathSize
             ) == 0
           ) {
         ControllerFound = TRUE;
         break;
       }
-
     }
-    OverrideItemListIndex =  OverrideItemListIndex->ForwardLink;
+    OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
   if (!ControllerFound) {
@@ -733,12 +736,12 @@ GetDriverFromMapping (
     }
   }
   //
-  // The GetDriverPath() maybe called recursively, because it use ConnectDevicePath() internally,
+  // The GetDriverPath() may be called recursively, because it use ConnectDevicePath() internally,
   //  so should check whether there is a dead loop.
   //  Here use a controller device path stack to record all processed controller device path during a GetDriverPath() call,
-  //  and check the  controller device path whether appear again during the  GetDriverPath() call.
+  //  and check the controller device path whether appear again during the GetDriverPath() call.
   //
-  if (CheckExistInStack(OverrideItem->ControllerDevicePath)) {
+  if (CheckExistInStack (OverrideItem->ControllerDevicePath)) {
     //
     // There is a dependecy dead loop if the ControllerDevicePath appear in stack twice
     //
@@ -749,8 +752,8 @@ GetDriverFromMapping (
   //
   // Check every override driver, try to load and start them
   //
-  ImageInfoListIndex =  OverrideItem->DriverInfoList.ForwardLink;
-  while (ImageInfoListIndex != &OverrideItem->DriverInfoList){
+  ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+  while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
     DriverImageInfo = CR(ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
     if (DriverImageInfo->ImageHandle == NULL) {
       //
@@ -759,12 +762,14 @@ GetDriverFromMapping (
       if ((!DriverImageInfo->UnLoadable) && ((!DriverImageInfo->UnStartable))) {
         TempDriverImagePath = DriverImageInfo->DriverImagePath;
         //
-        // If the image device path contain a FV node, check the Fv file device path is valid. If it is invalid, try to return the valid device path.
-        // FV address maybe changes for memory layout adjust from time to time, use this funciton could promise the Fv file device path is right.
+        // If the image device path contains an FV node, check the FV file device path is valid.
+        // If it is invalid, try to return the valid device path.
+        // FV address maybe changes for memory layout adjust from time to time,
+        // use this funciton could promise the FV file device path is right.
         //
         Status = UpdateFvFileDevicePath (&TempDriverImagePath, NULL, CallerImageHandle);
         if (!EFI_ERROR (Status)) {
-          FreePool(DriverImageInfo->DriverImagePath);
+          FreePool (DriverImageInfo->DriverImagePath);
           DriverImageInfo->DriverImagePath = TempDriverImagePath;
         }
         //
@@ -789,13 +794,13 @@ GetDriverFromMapping (
           //
           LoadedImageDevicePath = NULL;
           Status = gBS->HandleProtocol (
-                              ImageHandleBuffer[Index],
-                              &gEfiLoadedImageDevicePathProtocolGuid,
-                              (VOID **) &LoadedImageDevicePath
-                              );
+                          ImageHandleBuffer[Index],
+                          &gEfiLoadedImageDevicePathProtocolGuid,
+                          (VOID **) &LoadedImageDevicePath
+                          );
           if (EFI_ERROR (Status)) {
             //
-            // Maybe Not all EFI Loaded Image Device Path Protocol existed.
+            // Maybe not all EFI_LOADED_IMAGE_DEVICE_PATH_PROTOCOL existed.
             //
             continue;
           }
@@ -817,19 +822,19 @@ GetDriverFromMapping (
         if (ImageFound) {
           //
           // Find its related driver binding protocol
-          // Driver binding handle may be different with its driver's Image handle,
+          // Driver binding handle may be different with its driver's Image Handle.
           //
           DriverBindingHandle = NULL;
           DriverBinding = GetBindingProtocolFromImageHandle (
-                                      ImageHandleBuffer[Index],
-                                      &DriverBindingHandle
-                                      );
+                            ImageHandleBuffer[Index],
+                            &DriverBindingHandle
+                            );
           ASSERT (DriverBinding != NULL);
           DriverImageInfo->ImageHandle = ImageHandleBuffer[Index];
         } else if (GetCurrentTpl() <= TPL_CALLBACK){
           //
-          // The driver image has not been loaded and started, need try to load and start it now
-          // Try to connect all device in the driver image path
+          // The driver image has not been loaded and started. Try to load and start it now.
+          // Try to connect all device in the driver image path.
           //
           // Note: LoadImage() and  StartImage() should be called under CALLBACK TPL in theory, but
           // since many device need to be connected in  CALLBACK level environment( e.g. Usb devices )
@@ -838,7 +843,8 @@ GetDriverFromMapping (
           //
           Status = ConnectDevicePath (DriverImageInfo->DriverImagePath);
           //
-          // check whether it points to a PCI Option Rom image, and try to use bus override protocol to get its first option rom image driver
+          // check whether it points to a PCI Option Rom image,
+          // and try to use bus override protocol to get its first option rom image driver
           //
           TempDriverImagePath = DriverImageInfo->DriverImagePath;
           gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &TempDriverImagePath, &Handle);
@@ -846,10 +852,10 @@ GetDriverFromMapping (
           // Get the Bus Specific Driver Override Protocol instance on the Controller Handle
           //
           Status = gBS->HandleProtocol(
-                           Handle,
-                           &gEfiBusSpecificDriverOverrideProtocolGuid,
-                           (VOID **) &BusSpecificDriverOverride
-                           );
+                          Handle,
+                          &gEfiBusSpecificDriverOverrideProtocolGuid,
+                          (VOID **) &BusSpecificDriverOverride
+                          );
           if (!EFI_ERROR (Status) && (BusSpecificDriverOverride != NULL)) {
             ImageHandle = NULL;
             Status = BusSpecificDriverOverride->GetDriver (
@@ -863,9 +869,9 @@ GetDriverFromMapping (
               //
               DriverBindingHandle = NULL;
               DriverBinding = GetBindingProtocolFromImageHandle (
-                                          ImageHandle,
-                                          &DriverBindingHandle
-                                          );
+                                ImageHandle,
+                                &DriverBindingHandle
+                                );
               ASSERT (DriverBinding != NULL);
               DriverImageInfo->ImageHandle = ImageHandle;
             }
@@ -907,9 +913,9 @@ GetDriverFromMapping (
                 //
                 DriverBindingHandle = NULL;
                 DriverBinding = GetBindingProtocolFromImageHandle (
-                                            ImageHandle,
-                                            &DriverBindingHandle
-                                            );
+                                   ImageHandle,
+                                   &DriverBindingHandle
+                                   );
                 ASSERT (DriverBinding != NULL);
                 DriverImageInfo->ImageHandle = ImageHandle;
               }
@@ -922,7 +928,7 @@ GetDriverFromMapping (
         FreePool (ImageHandleBuffer);
       }
     }
-    ImageInfoListIndex = ImageInfoListIndex->ForwardLink;
+    ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
   }
   //
   // Finish try to load and start the override driver of a controller, popup the controller's device path
@@ -933,19 +939,27 @@ GetDriverFromMapping (
   // return the DriverImageHandle for ControllerHandle
   //
   FoundLastReturned = FALSE;
-  ImageInfoListIndex =  OverrideItem->DriverInfoList.ForwardLink;
-  while (ImageInfoListIndex != &OverrideItem->DriverInfoList){
+  ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+  while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
     DriverImageInfo = CR(ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
     if (DriverImageInfo->ImageHandle != NULL) {
       if ((*DriverImageHandle == NULL) || FoundLastReturned) {
+        //
+        // If DriverImageHandle is NULL, then we just need to return the first driver.
+        // If FoundLastReturned, this means we have just encountered the previously returned driver.
+        // For both cases, we just return the image handle of this driver.
+        //
         OverrideItem->LastReturnedImageHandle = DriverImageInfo->ImageHandle;
         *DriverImageHandle = DriverImageInfo->ImageHandle;
         return EFI_SUCCESS;
       } else if (*DriverImageHandle == DriverImageInfo->ImageHandle){
+        //
+        // We have found the previously returned driver.
+        //
         FoundLastReturned = TRUE;
       }
     }
-    ImageInfoListIndex = ImageInfoListIndex->ForwardLink;
+    ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
   }
 
   return EFI_NOT_FOUND;
@@ -953,30 +967,30 @@ GetDriverFromMapping (
 
 
 /**
-  Check mapping database whether already has the  mapping info which
+  Check mapping database whether already has the mapping info which
   records the input Controller to input DriverImage.
-  If has, the controller's total override driver number and input DriverImage's order number is return.
 
-  @param  ControllerDevicePath     The controller device path need to add a
-                                   override driver image item
-  @param  DriverImageDevicePath    The driver image device path need to be insert
+  @param  ControllerDevicePath     The controller device path is to be check.
+  @param  DriverImageDevicePath    The driver image device path is to be check.
   @param  MappingDataBase          Mapping database list entry pointer
   @param  DriverInfoNum            the controller's total override driver number
-  @param  DriverImageNO            The inserted order number
+  @param  DriverImageNO            The driver order number for the input DriverImage.
+                                   If the DriverImageDevicePath is NULL, DriverImageNO is not set.
 
-  @return EFI_INVALID_PARAMETER
-  @return EFI_NOT_FOUND
-  @return EFI_SUCCESS
-
+  @retval EFI_INVALID_PARAMETER    ControllerDevicePath or MappingDataBase is NULL.
+  @retval EFI_NOT_FOUND            ControllerDevicePath is not found in MappingDataBase or
+                                   DriverImageDevicePath is not found in the found DriverImage Info list. 
+  @retval EFI_SUCCESS              The controller's total override driver number and 
+                                   input DriverImage's order number is correctly return.
 **/
 EFI_STATUS
 EFIAPI
 CheckMapping (
   IN     EFI_DEVICE_PATH_PROTOCOL                       *ControllerDevicePath,
-  IN     EFI_DEVICE_PATH_PROTOCOL                       *DriverImageDevicePath,
-  IN     LIST_ENTRY                                     * MappingDataBase,
-  OUT    UINT32                                         *DriverInfoNum,
-  OUT    UINT32                                         *DriverImageNO
+  IN     EFI_DEVICE_PATH_PROTOCOL                       *DriverImageDevicePath  OPTIONAL,
+  IN     LIST_ENTRY                                     *MappingDataBase,
+  OUT    UINT32                                         *DriverInfoNum  OPTIONAL,
+  OUT    UINT32                                         *DriverImageNO  OPTIONAL
   )
 {
   LIST_ENTRY                  *OverrideItemListIndex;
@@ -987,39 +1001,40 @@ CheckMapping (
   UINT32                      ImageNO;
   UINTN                       DevicePathSize;
 
-  //
-  // Check that ControllerHandle is a valid handle
-  //
   if (ControllerDevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   if (MappingDataBase == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Search ControllerDevicePath in MappingDataBase
   //
   Found = FALSE;
   OverrideItem = NULL;
-  OverrideItemListIndex = MappingDataBase->ForwardLink;
-  while (OverrideItemListIndex != MappingDataBase){
+  OverrideItemListIndex = GetFirstNode (MappingDataBase);
+  while (!IsNull (MappingDataBase, OverrideItemListIndex)) {
     OverrideItem = CR(OverrideItemListIndex, PLATFORM_OVERRIDE_ITEM, Link, PLATFORM_OVERRIDE_ITEM_SIGNATURE);
     DevicePathSize = GetDevicePathSize (ControllerDevicePath);
     if (DevicePathSize == GetDevicePathSize (OverrideItem->ControllerDevicePath)) {
       if (CompareMem (
             ControllerDevicePath,
             OverrideItem->ControllerDevicePath,
-            GetDevicePathSize (OverrideItem->ControllerDevicePath)
+            DevicePathSize
             ) == 0
           ) {
         Found = TRUE;
         break;
       }
     }
-    OverrideItemListIndex =  OverrideItemListIndex->ForwardLink;
+    OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
   if (!Found) {
+    //
+    // ControllerDevicePath is not in MappingDataBase
+    //
     return EFI_NOT_FOUND;
   }
 
@@ -1028,7 +1043,10 @@ CheckMapping (
     *DriverInfoNum = OverrideItem->DriverInfoNum;
   }
 
-
+  //
+  // If DriverImageDevicePath is NULL, skip checking DriverImageDevicePath
+  // in the controller's Driver Image Info List
+  //
   if (DriverImageDevicePath == NULL) {
     return EFI_SUCCESS;
   }
@@ -1037,8 +1055,8 @@ CheckMapping (
   //
   ImageNO = 0;
   Found = FALSE;
-  ImageInfoListIndex =  OverrideItem->DriverInfoList.ForwardLink;
-  while (ImageInfoListIndex != &OverrideItem->DriverInfoList){
+  ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+  while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
     DriverImageInfo = CR(ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
     ImageNO++;
     DevicePathSize = GetDevicePathSize (DriverImageDevicePath);
@@ -1053,10 +1071,13 @@ CheckMapping (
         break;
       }
     }
-    ImageInfoListIndex = ImageInfoListIndex->ForwardLink;
+    ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
   }
 
   if (!Found) {
+    //
+    // DriverImageDevicePath is not found in the controller's Driver Image Info List
+    //
     return EFI_NOT_FOUND;
   } else {
     if (DriverImageNO != NULL) {
@@ -1064,7 +1085,6 @@ CheckMapping (
     }
     return EFI_SUCCESS;
   }
-
 }
 
 
@@ -1076,11 +1096,15 @@ CheckMapping (
                                    override driver image item
   @param  DriverImageDevicePath    The driver image device path need to be insert
   @param  MappingDataBase          Mapping database list entry pointer
-  @param  DriverImageNO            The inserted order number
+  @param  DriverImageNO            The inserted order number. If this number is taken, 
+                                   the larger available number will be used.
 
-  @return EFI_INVALID_PARAMETER
-  @return EFI_ALREADY_STARTED
-  @return EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER    ControllerDevicePath is NULL, or DriverImageDevicePath is NULL
+                                   or MappingDataBase is NULL
+  @retval EFI_ALREADY_STARTED      The input Controller to input DriverImage has been 
+                                   recorded into the mapping database.
+  @retval EFI_SUCCESS              The Controller and DriverImage are inserted into 
+                                   the mapping database successfully.
 
 **/
 EFI_STATUS
@@ -1101,9 +1125,6 @@ InsertDriverImage (
   UINT32                      ImageNO;
   UINTN                       DevicePathSize;
 
-  //
-  // Check that ControllerHandle is a valid handle
-  //
   if (ControllerDevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1114,13 +1135,17 @@ InsertDriverImage (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // If the driver is already in the controller's Driver Image Info List,
+  // just return EFI_ALREADY_STARTED.
+  //
   Status = CheckMapping (
-            ControllerDevicePath,
-            DriverImageDevicePath,
-            MappingDataBase,
-            NULL,
-            NULL
-            );
+             ControllerDevicePath,
+             DriverImageDevicePath,
+             MappingDataBase,
+             NULL,
+             NULL
+             );
   if (Status == EFI_SUCCESS) {
     return EFI_ALREADY_STARTED;
   }
@@ -1130,22 +1155,22 @@ InsertDriverImage (
   //
   Found = FALSE;
   OverrideItem = NULL;
-  OverrideItemListIndex = MappingDataBase->ForwardLink;
-  while (OverrideItemListIndex != MappingDataBase){
+  OverrideItemListIndex = GetFirstNode (MappingDataBase);
+  while (!IsNull (MappingDataBase, OverrideItemListIndex)) {
     OverrideItem = CR(OverrideItemListIndex, PLATFORM_OVERRIDE_ITEM, Link, PLATFORM_OVERRIDE_ITEM_SIGNATURE);
     DevicePathSize = GetDevicePathSize (ControllerDevicePath);
     if (DevicePathSize == GetDevicePathSize (OverrideItem->ControllerDevicePath)) {
       if (CompareMem (
             ControllerDevicePath,
             OverrideItem->ControllerDevicePath,
-            GetDevicePathSize (OverrideItem->ControllerDevicePath)
+            DevicePathSize
             ) == 0
           ) {
         Found = TRUE;
         break;
       }
     }
-    OverrideItemListIndex =  OverrideItemListIndex->ForwardLink;
+    OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
   //
   // If cannot find, this is a new controller item
@@ -1168,24 +1193,23 @@ InsertDriverImage (
   DriverImageInfo->Signature = DRIVER_IMAGE_INFO_SIGNATURE;
   DriverImageInfo->DriverImagePath = DuplicateDevicePath (DriverImageDevicePath);
   //
-  // Find the driver image wantted order location
+  // Find the driver image wanted order location
   //
   ImageNO = 0;
   Found = FALSE;
-  ImageInfoListIndex =  OverrideItem->DriverInfoList.ForwardLink;
-  while (ImageInfoListIndex != &OverrideItem->DriverInfoList){
+  ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+  while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
     if (ImageNO == (DriverImageNO - 1)) {
       //
-      // find the wantted order location, insert it
+      // find the wanted order location, insert it
       //
       InsertTailList (ImageInfoListIndex, &DriverImageInfo->Link);
       OverrideItem->DriverInfoNum ++;
       Found = TRUE;
       break;
     }
-    //DriverImageInfo = CR(ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
     ImageNO++;
-    ImageInfoListIndex = ImageInfoListIndex->ForwardLink;
+    ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
   }
 
   if (!Found) {
@@ -1203,15 +1227,16 @@ InsertDriverImage (
 /**
   Delete a controller's override driver from the mapping database.
 
-  @param  ControllerDevicePath     The controller device path need to add a
-                                   override driver image item
-  @param  DriverImageDevicePath    The driver image device path need to be insert
+  @param  ControllerDevicePath     The controller device path will be deleted 
+                                   when all drivers images on it are removed.
+  @param  DriverImageDevicePath    The driver image device path will be delete.
+                                   If NULL, all driver image will be delete.
   @param  MappingDataBase          Mapping database list entry pointer
-  @param  DriverImageNO            The inserted order number
 
-  @return EFI_INVALID_PARAMETER
-  @return EFI_NOT_FOUND
-  @return EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER    ControllerDevicePath is NULL, or MappingDataBase is NULL
+  @retval EFI_NOT_FOUND            ControllerDevicePath is not found in MappingDataBase or
+                                   DriverImageDevicePath is not found in the found DriverImage Info list. 
+  @retval EFI_SUCCESS              Delete the specified driver successfully.
 
 **/
 EFI_STATUS
@@ -1230,9 +1255,6 @@ DeleteDriverImage (
   BOOLEAN                     Found;
   UINTN                       DevicePathSize;
 
-  //
-  // Check that ControllerHandle is a valid handle
-  //
   if (ControllerDevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1241,14 +1263,17 @@ DeleteDriverImage (
     return EFI_INVALID_PARAMETER;
   }
 
-   Status = CheckMapping (
-              ControllerDevicePath,
-              DriverImageDevicePath,
-              MappingDataBase,
-              NULL,
-              NULL
-              );
-  if (Status == EFI_NOT_FOUND) {
+  //
+  // If ControllerDevicePath is not found in mapping database, return EFI_NOT_FOUND.
+  //
+  Status = CheckMapping (
+             ControllerDevicePath,
+             DriverImageDevicePath,
+             MappingDataBase,
+             NULL,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1257,35 +1282,36 @@ DeleteDriverImage (
   //
   Found = FALSE;
   OverrideItem = NULL;
-  OverrideItemListIndex = MappingDataBase->ForwardLink;
-  while (OverrideItemListIndex != MappingDataBase){
+  OverrideItemListIndex = GetFirstNode (MappingDataBase);
+  while (!IsNull (MappingDataBase, OverrideItemListIndex)) {
     OverrideItem = CR(OverrideItemListIndex, PLATFORM_OVERRIDE_ITEM, Link, PLATFORM_OVERRIDE_ITEM_SIGNATURE);
     DevicePathSize = GetDevicePathSize (ControllerDevicePath);
     if (DevicePathSize == GetDevicePathSize (OverrideItem->ControllerDevicePath)) {
       if (CompareMem (
             ControllerDevicePath,
             OverrideItem->ControllerDevicePath,
-            GetDevicePathSize (OverrideItem->ControllerDevicePath)
+            DevicePathSize
             ) == 0
           ) {
         Found = TRUE;
         break;
       }
     }
-    OverrideItemListIndex =  OverrideItemListIndex->ForwardLink;
+    OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
   ASSERT (Found);
   ASSERT (OverrideItem->DriverInfoNum != 0);
-  //
-  //
-  //
+
   Found = FALSE;
-  ImageInfoListIndex =  OverrideItem->DriverInfoList.ForwardLink;
-  while (ImageInfoListIndex != &OverrideItem->DriverInfoList){
+  ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+  while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
     DriverImageInfo = CR(ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
-    ImageInfoListIndex = ImageInfoListIndex->ForwardLink;
+    ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
     if (DriverImageDevicePath != NULL) {
+      //
+      // Search for the specified DriverImageDevicePath and remove it, then break.
+      //
       DevicePathSize = GetDevicePathSize (DriverImageDevicePath);
       if (DevicePathSize == GetDevicePathSize (DriverImageInfo->DriverImagePath)) {
         if (CompareMem (
@@ -1302,6 +1328,9 @@ DeleteDriverImage (
         }
       }
     } else {
+      //
+      // Remove all existing driver image info entries, so no break here.
+      //
       Found = TRUE;
       FreePool(DriverImageInfo->DriverImagePath);
       RemoveEntryList (&DriverImageInfo->Link);
@@ -1309,10 +1338,16 @@ DeleteDriverImage (
     }
   }
 
+  //
+  // Confirm all driver image info entries have been removed,
+  // if DriverImageDevicePath is NULL.
+  //
   if (DriverImageDevicePath == NULL) {
     ASSERT (OverrideItem->DriverInfoNum == 0);
   }
-
+  //
+  // If Override Item has no driver image info entry, then delete this item.
+  //
   if (OverrideItem->DriverInfoNum == 0) {
     FreePool(OverrideItem->ControllerDevicePath);
     RemoveEntryList (&OverrideItem->Link);
@@ -1320,6 +1355,10 @@ DeleteDriverImage (
   }
 
   if (!Found) {
+    //
+    // DriverImageDevicePath is not NULL and cannot be found in the controller's
+    // driver image info list.
+    //
     return EFI_NOT_FOUND;
   }
 
@@ -1331,9 +1370,7 @@ DeleteDriverImage (
   Deletes all environment variable(s) that contain the override mappings from Controller Device Path to
   a set of Driver Device Paths.
 
-  None
-
-  @return EFI_SUCCESS
+  @retval EFI_SUCCESS  Delete all variable(s) successfully.
 
 **/
 EFI_STATUS
@@ -1350,24 +1387,27 @@ DeleteOverridesVariables (
   CHAR16                      OverrideVariableName[40];
 
   //
-  // Get environment variable(s)  number
+  // Get environment variable(s) number
   //
-  VariableNum =0;
+  VariableNum = 0;
   VariableBuffer = GetVariableAndSize (L"PlatDriOver", &gEfiOverrideVariableGuid, &BufferSize);
-  VariableNum ++;
+  VariableNum++;
   if (VariableBuffer == NULL) {
     return EFI_NOT_FOUND;
   }
   //
   // Check NotEnd to get all PlatDriOverX variable(s)
   //
-  while (*(UINT32*)VariableBuffer) {
+  while ((*(UINT32*)VariableBuffer) != 0) {
     UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", VariableNum);
     VariableBuffer = GetVariableAndSize (OverrideVariableName, &gEfiOverrideVariableGuid, &BufferSize);
-    VariableNum ++;
+    VariableNum++;
     ASSERT (VariableBuffer != NULL);
   }
 
+  //
+  // Delete PlatDriOver and all additional variables, if exist.
+  //
   Status = gRT->SetVariable (
                   L"PlatDriOver",
                   &gEfiOverrideVariableGuid,
@@ -1392,12 +1432,11 @@ DeleteOverridesVariables (
 
 
 /**
-  Push a controller device path into a globle device path list
+  Push a controller device path into a globle device path list.
 
-  @param  ControllerDevicePath     The controller device path need to push into
-                                   stack
+  @param  DevicePath     The controller device path to push into stack
 
-  @return EFI_SUCCESS
+  @retval EFI_SUCCESS    Device path successfully pushed into the stack.
 
 **/
 EFI_STATUS
@@ -1420,10 +1459,10 @@ PushDevPathStack (
 /**
   Pop a controller device path from a globle device path list
 
-  @param  ControllerDevicePath     The controller device path retrieved from stack
+  @param  DevicePath     The controller device path popped from stack
 
-  @return EFI_SUCCESS
-  @return EFI_NOT_FOUND
+  @retval EFI_SUCCESS    Controller device path successfully popped.
+  @retval EFI_NOT_FOUND  Stack is empty.
 
 **/
 EFI_STATUS
@@ -1436,6 +1475,9 @@ PopDevPathStack (
   LIST_ENTRY              *ItemListIndex;
 
   ItemListIndex = mDevicePathStack.BackLink;
+  //
+  // Check if the stack is empty
+  //
   if (ItemListIndex != &mDevicePathStack){
     DevicePathStackItem = CR(ItemListIndex, DEVICE_PATH_STACK_ITEM, Link, DEVICE_PATH_STACK_ITEM_SIGNATURE);
     if (DevicePath != NULL) {
@@ -1453,10 +1495,10 @@ PopDevPathStack (
 /**
   Check whether a controller device path is in a globle device path list
 
-  @param  ControllerDevicePath     The controller device path need to check
+  @param  DevicePath     The controller device path to check
 
-  @return True
-  @return False
+  @retval TRUE           DevicePath exists in the stack.
+  @retval FALSE          DevicePath does not exist in the stack.
 
 **/
 BOOLEAN
@@ -1467,57 +1509,51 @@ CheckExistInStack (
 {
   DEVICE_PATH_STACK_ITEM  *DevicePathStackItem;
   LIST_ENTRY              *ItemListIndex;
-  BOOLEAN                 Found;
   UINTN                   DevicePathSize;
 
-  Found = FALSE;
   ItemListIndex = mDevicePathStack.BackLink;
   while (ItemListIndex != &mDevicePathStack){
     DevicePathStackItem = CR(ItemListIndex, DEVICE_PATH_STACK_ITEM, Link, DEVICE_PATH_STACK_ITEM_SIGNATURE);
     DevicePathSize = GetDevicePathSize (DevicePath);
     if (DevicePathSize == GetDevicePathSize (DevicePathStackItem->DevicePath)) {
-      if (CompareMem (
-            DevicePath,
-            DevicePathStackItem->DevicePath,
-            GetDevicePathSize (DevicePathStackItem->DevicePath)
-            ) == 0
-          ) {
-        Found = TRUE;
-        break;
+      if (CompareMem (DevicePath, DevicePathStackItem->DevicePath, DevicePathSize) == 0) {
+        return TRUE;
       }
     }
     ItemListIndex = ItemListIndex->BackLink;
   }
 
-  return Found;
+  return FALSE;
 }
 
 
 /**
-  According to a file guild, check a Fv file device path is valid. If it is invalid,
+  Update the FV file device path if it is not valid.
+
+  According to a file GUID, check a Fv file device path is valid. If it is invalid,
   try to return the valid device path.
   FV address maybe changes for memory layout adjust from time to time, use this funciton
   could promise the Fv file device path is right.
 
-  @param  DevicePath               on input, the Fv file device path need to check
-                                   on output, the updated valid Fv file device path
-  @param  FileGuid                 the Fv file guild
-  @param  CallerImageHandle
+  @param  DevicePath               On input, the FV file device path to check
+                                   On output, the updated valid FV file device path
+  @param  FileGuid                 The FV file GUID
+  @param  CallerImageHandle        Image handle of the caller
 
   @retval EFI_INVALID_PARAMETER    the input DevicePath or FileGuid is invalid
                                    parameter
-  @retval EFI_UNSUPPORTED          the input DevicePath does not contain Fv file
-                                   guild at all
-  @retval EFI_ALREADY_STARTED      the input DevicePath has pointed to Fv file, it
+  @retval EFI_UNSUPPORTED          the input DevicePath does not contain FV file
+                                   GUID at all
+  @retval EFI_ALREADY_STARTED      the input DevicePath has pointed to FV file, it
                                    is valid
-  @retval EFI_SUCCESS              has successfully updated the invalid DevicePath,
+  @retval EFI_SUCCESS              Successfully updated the invalid DevicePath,
                                    and return the updated device path in DevicePath
 
 **/
 EFI_STATUS
 EFIAPI
 UpdateFvFileDevicePath (
-  IN  OUT EFI_DEVICE_PATH_PROTOCOL      ** DevicePath,
+  IN  OUT EFI_DEVICE_PATH_PROTOCOL      **DevicePath,
   IN  EFI_GUID                          *FileGuid,
   IN  EFI_HANDLE                        CallerImageHandle
   )
@@ -1539,27 +1575,29 @@ UpdateFvFileDevicePath (
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH FvFileNode;
   EFI_HANDLE                    FoundFvHandle;
   EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
-  BOOLEAN                       HasFVNode;
+  BOOLEAN                       HasFvNode;
 
-  if ((DevicePath == NULL) || (*DevicePath == NULL)) {
+  if (DevicePath == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*DevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
-  // Check whether the device path point to the default the input Fv file
+  // Check whether the device path points to the default the input FV file
   //
   TempDevicePath = *DevicePath;
   LastDeviceNode = TempDevicePath;
   while (!EfiIsDevicePathEnd (TempDevicePath)) {
-     LastDeviceNode = TempDevicePath;
-     TempDevicePath = EfiNextDevicePathNode (TempDevicePath);
+    LastDeviceNode = TempDevicePath;
+    TempDevicePath = EfiNextDevicePathNode (TempDevicePath);
   }
-  GuidPoint = EfiGetNameGuidFromFwVolDevicePathNode (
-                (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LastDeviceNode
-                );
+  GuidPoint = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LastDeviceNode);
   if (GuidPoint == NULL) {
     //
-    // if this option does not points to a Fv file, just return EFI_UNSUPPORTED
+    // If this option does not point to a FV file, just return EFI_UNSUPPORTED.
     //
     return EFI_UNSUPPORTED;
   }
@@ -1567,7 +1605,7 @@ UpdateFvFileDevicePath (
   if (FileGuid != NULL) {
     if (!CompareGuid (GuidPoint, FileGuid)) {
       //
-      // If the Fv file is not the input file guid, just return EFI_UNSUPPORTED
+      // If the FV file is not the input file GUID, just return EFI_UNSUPPORTED
       //
       return EFI_UNSUPPORTED;
     }
@@ -1576,23 +1614,23 @@ UpdateFvFileDevicePath (
   }
 
   //
-  // Check to see if the device path contain memory map node
+  // Check to see if the device path contains memory map node
   //
   TempDevicePath = *DevicePath;
-  HasFVNode = FALSE;
+  HasFvNode = FALSE;
   while (!EfiIsDevicePathEnd (TempDevicePath)) {
     //
     // Use old Device Path
     //
     if (DevicePathType (TempDevicePath) == HARDWARE_DEVICE_PATH &&
         DevicePathSubType (TempDevicePath) == HW_MEMMAP_DP) {
-      HasFVNode = TRUE;
+      HasFvNode = TRUE;
       break;
     }
     TempDevicePath = EfiNextDevicePathNode (TempDevicePath);
   }
 
-  if (!HasFVNode) {
+  if (!HasFvNode) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1617,14 +1655,14 @@ UpdateFvFileDevicePath (
       // Set FV ReadFile Buffer as NULL, only need to check whether input Fv file exist there
       //
       Status = Fv->ReadFile (
-                    Fv,
-                    FileGuid,
-                    NULL,
-                    &Size,
-                    &Type,
-                    &Attributes,
-                    &AuthenticationStatus
-                    );
+                     Fv,
+                     FileGuid,
+                     NULL,
+                     &Size,
+                     &Type,
+                     &Attributes,
+                     &AuthenticationStatus
+                     );
       if (!EFI_ERROR (Status)) {
         return EFI_ALREADY_STARTED;
       }
@@ -1638,10 +1676,10 @@ UpdateFvFileDevicePath (
   FindFvFile = FALSE;
   FoundFvHandle = NULL;
   Status = gBS->HandleProtocol (
-             CallerImageHandle,
-             &gEfiLoadedImageProtocolGuid,
-             (VOID **) &LoadedImage
-             );
+                  CallerImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **) &LoadedImage
+                  );
   if (!EFI_ERROR (Status)) {
     Status = gBS->HandleProtocol (
                     LoadedImage->DeviceHandle,
@@ -1650,14 +1688,14 @@ UpdateFvFileDevicePath (
                     );
     if (!EFI_ERROR (Status)) {
       Status = Fv->ReadFile (
-                    Fv,
-                    FileGuid,
-                    NULL,
-                    &Size,
-                    &Type,
-                    &Attributes,
-                    &AuthenticationStatus
-                    );
+                     Fv,
+                     FileGuid,
+                     NULL,
+                     &Size,
+                     &Type,
+                     &Attributes,
+                     &AuthenticationStatus
+                     );
       if (!EFI_ERROR (Status)) {
         FindFvFile = TRUE;
         FoundFvHandle = LoadedImage->DeviceHandle;
@@ -1669,28 +1707,28 @@ UpdateFvFileDevicePath (
   //
   if (!FindFvFile) {
     gBS->LocateHandleBuffer (
-          ByProtocol,
-          &gEfiFirmwareVolume2ProtocolGuid,
-          NULL,
-          &FvHandleCount,
-          &FvHandleBuffer
-          );
+           ByProtocol,
+           &gEfiFirmwareVolume2ProtocolGuid,
+           NULL,
+           &FvHandleCount,
+           &FvHandleBuffer
+           );
     for (Index = 0; Index < FvHandleCount; Index++) {
       gBS->HandleProtocol (
-            FvHandleBuffer[Index],
-            &gEfiFirmwareVolume2ProtocolGuid,
-            (VOID **) &Fv
-            );
+             FvHandleBuffer[Index],
+             &gEfiFirmwareVolume2ProtocolGuid,
+             (VOID **) &Fv
+             );
 
       Status = Fv->ReadFile (
-                    Fv,
-                    FileGuid,
-                    NULL,
-                    &Size,
-                    &Type,
-                    &Attributes,
-                    &AuthenticationStatus
-                    );
+                     Fv,
+                     FileGuid,
+                     NULL,
+                     &Size,
+                     &Type,
+                     &Attributes,
+                     &AuthenticationStatus
+                     );
       if (EFI_ERROR (Status)) {
         //
         // Skip if input Fv file not in the FV
@@ -1718,6 +1756,8 @@ UpdateFvFileDevicePath (
 
 
 /**
+  Gets the data and size of a variable.
+
   Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
   buffer, and the size of the buffer. If failure return NULL.
 
@@ -1727,7 +1767,7 @@ UpdateFvFileDevicePath (
                                    read
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
-  @return Caller is responsible freeing the buffer.
+          Caller is responsible freeing the buffer.
   @retval NULL                     Variable was not read
 
 **/
@@ -1773,6 +1813,8 @@ GetVariableAndSize (
 
 
 /**
+  Connect to the handle to a device on the device path.
+
   This function will create all handles associate with every device
   path node. If the handle associate with one device path node can not
   be created success, then still give one chance to do the dispatch,
@@ -1864,10 +1906,10 @@ ConnectDevicePath (
           // then still give the chance to do dispatch, because partial
           // RemainingDevicepath may be in the new FV
           //
-          // 1. If the connect fail, RemainingDevicepath and handle will not
+          // 1. If the connect fails, RemainingDevicepath and handle will not
           //    change, so next time will do the dispatch, then dispatch's status
           //    will take effect
-          // 2. If the connect success, the RemainingDevicepath and handle will
+          // 2. If the connect succeeds, the RemainingDevicepath and handle will
           //    change, then avoid the dispatch, we have chance to continue the
           //    next connection
           //
