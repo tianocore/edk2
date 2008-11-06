@@ -1,4 +1,5 @@
 /** @file
+  Instance of Print Library based on EFI_PRINT2_PROTOCOL.
 
   Implement the print library instance by wrap the interface 
   provided in the Print protocol. This protocol is defined as the internal
@@ -25,12 +26,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_PRINT2_PROTOCOL  *gPrintProtocol = NULL;
 
+/**
+  Internal function to locate the EFI_PRINT2_PROTOCOL.
+
+  @retval  EFI_SUCCESS   EFI_PRINT2_PROTOCOL is successfuly located.
+  @retval  EFI_NOT_FOUND EFI_PRINT2_PROTOCOL cannot be found.
+
+**/
 EFI_STATUS
 EFIAPI
 InternalLocatePrintProtocol (
+  VOID
   )
 {
-  EFI_STATUS  Status = EFI_SUCCESS;
+  EFI_STATUS  Status;
 
   if (gPrintProtocol == NULL) {
     Status = gBS->LocateProtocol (
@@ -124,7 +133,8 @@ UnicodeVSPrint (
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
-  
+  @param  ...             Variable argument list based on the contents of the format string.
+
   @return The number of Unicode characters in the produced output buffer not including the
           Null-terminator.
 
@@ -220,6 +230,7 @@ UnicodeVSPrintAsciiFormat (
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
+  @param  ...             Variable argument list based on the contents of the format string.
   
   @return The number of Unicode characters in the produced output buffer not including the
           Null-terminator.
@@ -371,7 +382,8 @@ AsciiVSPrint (
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
-  
+  @param  ...             Variable argument list based on the contents of the format string.
+
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.
 
@@ -467,7 +479,8 @@ AsciiVSPrintUnicodeFormat (
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
-  
+  @param  ...             Variable argument list based on the contents of the format string.
+
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.
 
