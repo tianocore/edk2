@@ -8,7 +8,6 @@
   were described in the HOB. We have to remember the handle so we can tell if
   the protocol has been reinstalled and it needs updateing.
 
-  If you are using any of these lib functions.you must first call FvbInitialize ().
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -24,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Fvb.h"
 
+
 //
 // Event for Set Virtual Map Changed Event
 //
@@ -32,9 +32,9 @@ EFI_EVENT mSetVirtualMapChangedEvent = NULL;
 //
 // Lib will ASSERT if more FVB devices than this are added to the system.
 //
-FVB_ENTRY          *mFvbEntry;
-EFI_EVENT          mFvbRegistration;
-UINTN              mFvbCount;
+FVB_ENTRY          *mFvbEntry       = NULL;
+EFI_EVENT          mFvbRegistration = NULL;
+UINTN              mFvbCount        = 0;
 
 /**
   Check whether an address is runtime memory or not.
@@ -78,12 +78,8 @@ IsRuntimeMemory (
   // Enlarge space here, because we will allocate pool now.
   //
   MemoryMapSize += EFI_PAGE_SIZE;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  MemoryMapSize,
-                  (VOID**)&MemoryMap
-                  );
-  ASSERT_EFI_ERROR (Status);
+  MemoryMap = AllocatePool (MemoryMapSize);
+  ASSERT (MemoryMap != NULL);
 
   //
   // Get System MemoryMap
@@ -108,7 +104,7 @@ IsRuntimeMemory (
       //
       // Found it
       //
-      if (MemoryMap->Attribute & EFI_MEMORY_RUNTIME) {
+      if ((MemoryMap->Attribute & EFI_MEMORY_RUNTIME) != 0) {
         IsRuntime = TRUE;
       }
       break;
@@ -116,16 +112,17 @@ IsRuntimeMemory (
     //
     // Get next item
     //
-    MemoryMap = (EFI_MEMORY_DESCRIPTOR *)((UINTN)MemoryMap + DescriptorSize);
+    MemoryMap = (EFI_MEMORY_DESCRIPTOR *)((UINTN) MemoryMap + DescriptorSize);
   }
 
   //
   // Done
   //
-  gBS->FreePool (MemoryMapPtr);
+  FreePool (MemoryMapPtr);
 
   return IsRuntime;
 }
+
 
 /**
   Update mFvbEntry. Add new entry, or update existing entry if Fvb protocol is
@@ -211,14 +208,11 @@ FvbNotificationEvent (
     }
 
     //
-    // Check the FVB can be accessed in RUNTIME, The FVBs in FVB handle list comes
-    // from two way:
-    // 1) Dxe Core. (FVB information is transferred from FV HOB).
-    // 2) FVB driver.
-    // The FVB produced Dxe core is used for discoverying DXE driver and dispatch. These
-    // FVBs can only be accessed in boot time.
-    // FVB driver will discovery all FV in FLASH and these FVBs can be accessed in runtime.
-    // The FVB itself produced by FVB driver is allocated in runtime memory. So we can
+    // Check the FVB can be accessed in RUNTIME, The FVBs in FVB handle list come from two ways:
+    // 1) Dxe Core. (FVB information is transferred from FV HOB). 2) FVB driver. The FVB produced
+    // Dxe core is used to discovery DXE driver and dispatch. These FVBs can only be accessed in
+    // boot time. FVB driver will discovery all FV in FLASH and these FVBs can be accessed in
+    // runtime. The FVB itself produced by FVB driver is allocated in runtime memory. So we can
     // determine the what FVB can be accessed in RUNTIME by judging whether FVB itself is allocated
     // in RUNTIME memory.
     //
@@ -241,13 +235,14 @@ FvbVirtualAddressChangeNotifyEvent (
   )
 {
   UINTN Index;
+
   if (mFvbEntry != NULL) {
     for (Index = 0; Index < MAX_FVB_COUNT; Index++) {
       if (!mFvbEntry[Index].IsRuntimeAccess) {
         continue;
       }
 
-      if (NULL != mFvbEntry[Index].Fvb) {
+      if (mFvbEntry[Index].Fvb != NULL) {
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->GetBlockSize);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->GetPhysicalAddress);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->GetAttributes);
@@ -258,7 +253,7 @@ FvbVirtualAddressChangeNotifyEvent (
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb);
       }
 
-      if (NULL != mFvbEntry[Index].FvbExtension) {
+      if (mFvbEntry[Index].FvbExtension != NULL) {
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].FvbExtension->EraseFvbCustomBlock);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].FvbExtension);
       }
@@ -267,6 +262,7 @@ FvbVirtualAddressChangeNotifyEvent (
     EfiConvertPointer (0x0, (VOID **) &mFvbEntry);
   }
 }
+
 
 /**
   Library constructor function entry.
@@ -284,21 +280,14 @@ FvbLibInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  UINTN Status;
-  mFvbCount = 0;
+  EFI_STATUS Status;
+ 
+  mFvbEntry = AllocateRuntimeZeroPool (sizeof (FVB_ENTRY) * MAX_FVB_COUNT);
+  ASSERT (mFvbEntry != NULL);
 
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  (UINTN) sizeof (FVB_ENTRY) * MAX_FVB_COUNT,
-                  (VOID *) &mFvbEntry
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  ZeroMem (mFvbEntry, sizeof (FVB_ENTRY) * MAX_FVB_COUNT);
-
+  //
+  // Register FvbNotificationEvent () notify function.
+  // 
   EfiCreateProtocolNotifyEvent (
     &gEfiFirmwareVolumeBlockProtocolGuid,
     TPL_CALLBACK,
@@ -319,7 +308,7 @@ FvbLibInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 //
@@ -327,10 +316,6 @@ FvbLibInitialize (
 // The following functions wrap Fvb protocol in the Runtime Lib functions.
 // The Instance translates into Fvb instance. The Fvb order defined by HOBs and
 // thus the sequence of FVB protocol addition define Instance.
-//
-// EfiFvbInitialize () must be called before any of the following functions
-// must be called.
-// =============================================================================
 //
 
 /**
@@ -362,14 +347,18 @@ FvbLibInitialize (
   @param[out]     Buffer           Pointer to a caller allocated buffer that will be
                                    used to hold the data read.
 
-  @retval   EFI_SUCCESS	           The firmware volume was read successfully and contents are in Buffer.
-  @retval   EFI_BAD_BUFFER_SIZE    Read attempted across an LBA boundary.  On output, NumBytes contains the total number of bytes returned in Buffer.
+  @retval   EFI_SUCCESS            The firmware volume was read successfully and contents are in Buffer.
+  @retval   EFI_BAD_BUFFER_SIZE    Read attempted across an LBA boundary.  On output, NumBytes contains
+                                   the total number of bytes returned in Buffer.
   @retval   EFI_ACCESS_DENIED      The firmware volume is in the ReadDisabled state.
   @retval   EFI_DEVICE_ERROR       The block device is not functioning correctly and could not be read.
-  @retval   EFI_INVALID_PARAMETER  Invalid parameter, Instance is larger than the max FVB number. Lba index is larger than the last block of the firmware volume. Offset is larger than the block size.
+  @retval   EFI_INVALID_PARAMETER  Invalid parameter, Instance is larger than the max FVB number. Lba index
+                                   is larger than the last block of the firmware volume. Offset is larger
+                                   than the block size.
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbReadBlock (
   IN UINTN                                        Instance,
   IN EFI_LBA                                      Lba,
@@ -436,13 +425,14 @@ EfiFvbReadBlock (
   @retval EFI_SUCCESS           The firmware volume was written successfully.
   @retval EFI_BAD_BUFFER_SIZE   The write was attempted across an LBA boundary. 
                                 On output, NumBytes contains the total number of bytes actually written.
-  @retval EFI_ACCESS_DENIED	    The firmware volume is in the WriteDisabled state.
+  @retval EFI_ACCESS_DENIED     The firmware volume is in the WriteDisabled state.
   @retval EFI_DEVICE_ERROR      The block device is malfunctioning and could not be written.
   @retval EFI_INVALID_PARAMETER Invalid parameter, Instance is larger than the max FVB number. 
                                 Lba index is larger than the last block of the firmware volume.
                                 Offset is larger than the block size.
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbWriteBlock (
   IN UINTN                                        Instance,
   IN EFI_LBA                                      Lba,
@@ -463,6 +453,7 @@ EfiFvbWriteBlock (
 
   return mFvbEntry[Instance].Fvb->Write (mFvbEntry[Instance].Fvb, Lba, Offset, NumBytes, Buffer);
 }
+
 
 /**
   Erases and initializes a firmware volume block.
@@ -493,6 +484,7 @@ EfiFvbWriteBlock (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbEraseBlock (
   IN UINTN                                Instance,
   IN EFI_LBA                              Lba
@@ -508,6 +500,7 @@ EfiFvbEraseBlock (
 
   return mFvbEntry[Instance].Fvb->EraseBlocks (mFvbEntry[Instance].Fvb, Lba, 1, EFI_LBA_LIST_TERMINATOR);
 }
+
 
 /**
   Retrieves the attributes and current settings of the specified block, 
@@ -527,6 +520,7 @@ EfiFvbEraseBlock (
   @retval   EFI_INVALID_PARAMETER  Invalid parameter. Instance is larger than the max FVB number. 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbGetVolumeAttributes (
   IN UINTN                                Instance,
   OUT EFI_FVB_ATTRIBUTES_2                *Attributes
@@ -544,6 +538,7 @@ EfiFvbGetVolumeAttributes (
 
   return mFvbEntry[Instance].Fvb->GetAttributes (mFvbEntry[Instance].Fvb, Attributes);
 }
+
 
 /**
   Modify the attributes and current settings of the specified block
@@ -566,6 +561,7 @@ EfiFvbGetVolumeAttributes (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbSetVolumeAttributes (
   IN     UINTN                                Instance,
   IN OUT EFI_FVB_ATTRIBUTES_2                 *Attributes
@@ -583,6 +579,7 @@ EfiFvbSetVolumeAttributes (
 
   return mFvbEntry[Instance].Fvb->SetAttributes (mFvbEntry[Instance].Fvb, Attributes);
 }
+
 
 /**
   Retrieves the physical address of the specified memory mapped FV.
@@ -603,6 +600,7 @@ EfiFvbSetVolumeAttributes (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbGetPhysicalAddress (
   IN UINTN                                Instance,
   OUT EFI_PHYSICAL_ADDRESS                *BaseAddress
@@ -621,6 +619,7 @@ EfiFvbGetPhysicalAddress (
   return mFvbEntry[Instance].Fvb->GetPhysicalAddress (mFvbEntry[Instance].Fvb, BaseAddress);
 }
 
+
 /**
   Retrieve the block size of the specified fv.
   
@@ -630,7 +629,7 @@ EfiFvbGetPhysicalAddress (
   the last block of the firmware volume, this function return the status code
   EFI_INVALID_PARAMETER.
 
-  If BlockSize	is NULL, then ASSERT().
+  If BlockSize  is NULL, then ASSERT().
   
   If NumOfBlocks  is NULL, then ASSERT().
 
@@ -648,6 +647,7 @@ EfiFvbGetPhysicalAddress (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbGetBlockSize (
   IN UINTN                                        Instance,
   IN EFI_LBA                                      Lba,
@@ -668,6 +668,7 @@ EfiFvbGetBlockSize (
 
   return mFvbEntry[Instance].Fvb->GetBlockSize (mFvbEntry[Instance].Fvb, Lba, BlockSize, NumOfBlocks);
 }
+
 
 /**
   Erases and initializes a specified range of a firmware volume.
@@ -691,6 +692,7 @@ EfiFvbGetBlockSize (
 
 **/
 EFI_STATUS
+EFIAPI
 EfiFvbEraseCustomBlockRange (
   IN UINTN                                Instance,
   IN EFI_LBA                              StartLba,

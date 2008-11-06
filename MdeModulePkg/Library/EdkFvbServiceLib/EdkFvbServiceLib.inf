@@ -20,7 +20,7 @@
   FILE_GUID                      = bd4d540e-04b0-4b10-8fd5-4a7bb533cf67
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = FvbServiceLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION
+  LIBRARY_CLASS                  = FvbServiceLib|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
@@ -49,9 +49,10 @@
   DebugLib
   BaseLib
   UefiLib
+  MemoryAllocationLib
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
   gEfiFvbExtensionProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
+
 
