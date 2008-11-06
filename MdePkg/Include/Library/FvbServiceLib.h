@@ -44,11 +44,14 @@
   @param[out]     Buffer           Pointer to a caller allocated buffer that will be
                                    used to hold the data read.
 
-  @retval   EFI_SUCCESS	           The firmware volume was read successfully and contents are in Buffer.
-  @retval   EFI_BAD_BUFFER_SIZE    Read attempted across an LBA boundary.  On output, NumBytes contains the total number of bytes returned in Buffer.
+  @retval   EFI_SUCCESS            The firmware volume was read successfully and contents are in Buffer.
+  @retval   EFI_BAD_BUFFER_SIZE    Read attempted across an LBA boundary.  On output, NumBytes contains
+                                   the total number of bytes returned in Buffer.
   @retval   EFI_ACCESS_DENIED      The firmware volume is in the ReadDisabled state.
   @retval   EFI_DEVICE_ERROR       The block device is not functioning correctly and could not be read.
-  @retval   EFI_INVALID_PARAMETER  Invalid parameter, Instance is larger than the max FVB number. Lba index is larger than the last block of the firmware volume. Offset is larger than the block size.
+  @retval   EFI_INVALID_PARAMETER  Invalid parameter, Instance is larger than the max FVB number. Lba index
+                                   is larger than the last block of the firmware volume. Offset is larger
+                                   than the block size.
 
 **/
 EFI_STATUS
@@ -106,7 +109,7 @@ EfiFvbReadBlock (
   @retval EFI_SUCCESS           The firmware volume was written successfully.
   @retval EFI_BAD_BUFFER_SIZE   The write was attempted across an LBA boundary. 
                                 On output, NumBytes contains the total number of bytes actually written.
-  @retval EFI_ACCESS_DENIED	    The firmware volume is in the WriteDisabled state.
+  @retval EFI_ACCESS_DENIED     The firmware volume is in the WriteDisabled state.
   @retval EFI_DEVICE_ERROR      The block device is malfunctioning and could not be written.
   @retval EFI_INVALID_PARAMETER Invalid parameter, Instance is larger than the max FVB number. 
                                 Lba index is larger than the last block of the firmware volume.
@@ -208,7 +211,7 @@ EFI_STATUS
 EFIAPI
 EfiFvbSetVolumeAttributes (
   IN     UINTN                                Instance,
-  IN OUT EFI_FVB_ATTRIBUTES_2                   *Attributes
+  IN OUT EFI_FVB_ATTRIBUTES_2                 *Attributes
   );
 
 
@@ -247,7 +250,7 @@ EfiFvbGetPhysicalAddress (
   the last block of the firmware volume, this function return the status code
   EFI_INVALID_PARAMETER.
 
-  If BlockSize	is NULL, then ASSERT().
+  If BlockSize  is NULL, then ASSERT().
   
   If NumOfBlocks  is NULL, then ASSERT().
 
