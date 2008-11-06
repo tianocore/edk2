@@ -530,9 +530,6 @@
   ## Indicates the allowable maximum number in extract handler table
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
 
-
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
-  
   ## Default current ISO 639-2 language: English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
   
@@ -604,9 +601,6 @@
   ## This flag is used to control the printout of DebugLib
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000|UINT32|0x00000006
 
-  
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
-  
   ## Default current ISO 639-2 language: English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
   
@@ -639,9 +633,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
 
 [PcdsDynamic.common]
-
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultTimeout|0x0008|UINT16|0x0000001b
-  
   ## Default current ISO 639-2 language: English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
 
