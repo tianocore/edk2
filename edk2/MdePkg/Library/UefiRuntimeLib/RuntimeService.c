@@ -261,6 +261,40 @@ EfiConvertPointer (
 
 
 /**
+  Determines the new virtual address that is to be used on subsequent memory accesses.
+
+  For IA32, X64, and EBC, this service is a wrapper for the UEFI Runtime Service
+  ConvertPointer().  See the UEFI Specification for details. 
+  For IPF, this function interprets Address as a pointer to an EFI_PLABEL structure
+  and both the EntryPoint and GP fields of an EFI_PLABEL are converted from physical
+  to virtiual addressing.  Since IPF allows the GP to point to an address outside
+  a PE/COFF image, the physical to virtual offset for the EntryPoint field is used
+  to adjust the GP field.  The UEFI Runtime Service ConvertPointer() is used to convert
+  EntryPoint and the status code for this conversion is always returned.   If the convertion
+  of EntryPoint fails, then neither EntryPoint nor GP are modified.  See the UEFI
+  Specification for details on the UEFI Runtime Service ConvertPointer().
+
+  @param  DebugDisposition   Supplies type information for the pointer being converted.
+  @param  Address            The pointer to a pointer that is to be fixed to be the
+                             value needed for the new virtual address mapping being
+                             applied.
+
+  @retval  EFI_SUCCESS  Success to execute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiConvertFunctionPointer (
+  IN UINTN                DebugDisposition,
+  IN OUT VOID             **Address
+  )
+{
+  return EfiConvertPointer (DebugDisposition, Address);
+}
+
+
+/**
   Conver the standard Lib double linked list to a virtual mapping.
 
   @param  DebugDisposition   Supplies type information for the pointer being converted.
