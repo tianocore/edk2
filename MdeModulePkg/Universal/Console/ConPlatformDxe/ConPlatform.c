@@ -35,13 +35,15 @@ EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding = {
 };
 
 /**
-  The user Entry Point for module ConPlatform. The user code starts with this function.
+  Entrypoint of this module.
+
+  This function is the entrypoint of this module. It installs Driver Binding
+  Protocols together with Component Name Protocols.
 
   @param  ImageHandle       The firmware allocated handle for the EFI image.
   @param  SystemTable       A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS       The entry point is executed successfully.
-  @retval other             Some error occurs when executing this entry point.
 
 **/
 EFI_STATUS
@@ -53,9 +55,6 @@ InitializeConPlatform(
 {
   EFI_STATUS              Status;
 
-  //
-  // Install driver model protocol(s).
-  //
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
@@ -76,13 +75,12 @@ InitializeConPlatform(
              );
   ASSERT_EFI_ERROR (Status);
 
-
-  return Status;
+  return EFI_SUCCESS;
 }
 
 
 /**
-  Test to see if EFI Text In Protocol could be supported on the ControllerHandle. 
+  Test to see if EFI_SIMPLE_TEXT_INPUT_PROTOCOL is supported on ControllerHandle. 
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -98,20 +96,19 @@ EFIAPI
 ConPlatformTextInDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ControllerHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath  OPTIONAL
   )
 {
   return ConPlatformDriverBindingSupported (
-          This,
-          ControllerHandle,
-          RemainingDevicePath,
-          &gEfiSimpleTextInProtocolGuid
-          );
+           This,
+           ControllerHandle,
+           &gEfiSimpleTextInProtocolGuid
+           );
 }
 
 
 /**
-  Test to see if EFI Text Out Protocol could be supported on the ControllerHandle. 
+  Test to see if EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL is supported on ControllerHandle. 
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -127,25 +124,22 @@ EFIAPI
 ConPlatformTextOutDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ControllerHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath  OPTIONAL
   )
 {
   return ConPlatformDriverBindingSupported (
-          This,
-          ControllerHandle,
-          RemainingDevicePath,
-          &gEfiSimpleTextOutProtocolGuid
-          );
+           This,
+           ControllerHandle,
+           &gEfiSimpleTextOutProtocolGuid
+           );
 }
 
 
 /**
-  Test to see if the specified Protocol could be supported on the ControllerHandle. 
+  Test to see if the specified protocol is supported on ControllerHandle. 
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
-  @param  RemainingDevicePath Optional parameter use to pick a specific child
-                              device to start.
   @param  ProtocolGuid        The specfic protocol.
 
   @retval EFI_SUCCESS         This driver supports this device.
@@ -156,7 +150,6 @@ EFI_STATUS
 ConPlatformDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ControllerHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath,
   IN  EFI_GUID                     *ProtocolGuid
   )
 {
@@ -194,17 +187,19 @@ ConPlatformDriverBindingSupported (
   }
 
   gBS->CloseProtocol (
-        ControllerHandle,
-        ProtocolGuid,
-        This->DriverBindingHandle,
-        ControllerHandle
-        );
+         ControllerHandle,
+         ProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
   return EFI_SUCCESS;
 }
 
 /**
-  Start this driver on ControllerHandle by opening Simple Text In protocol,
+  Start this driver on the device for console input.
+
+  Start this driver on ControllerHandle by opening Simple Text Input Protocol,
   reading Device Path, and installing Console In Devcice GUID on ControllerHandle.
 
   If this devcie is not one hot-plug devce, append its device path into the 
@@ -228,8 +223,8 @@ ConPlatformTextInDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   )
 {
-  EFI_STATUS                  Status;
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  EFI_STATUS                     Status;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL *TextIn;
 
   //
@@ -247,7 +242,7 @@ ConPlatformTextInDriverBindingStart (
     return Status;
   }
   //
-  // Open the Simple Input Protocol BY_DRIVER
+  // Open the Simple Text Input Protocol BY_DRIVER
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -268,14 +263,15 @@ ConPlatformTextInDriverBindingStart (
   //
   if (IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     gBS->InstallMultipleProtocolInterfaces (
-          &ControllerHandle,
-          &gEfiConsoleInDeviceGuid,
-          NULL,
-          NULL
-          );
+           &ControllerHandle,
+           &gEfiConsoleInDeviceGuid,
+           NULL,
+           NULL
+           );
   } else {
     //
-    // Append the device path to the ConInDev environment variable
+    // If it is not a hot-plug device, append the device path to the
+    // ConInDev environment variable
     //
     ConPlatformUpdateDeviceVariable (
       L"ConInDev",
@@ -284,29 +280,29 @@ ConPlatformTextInDriverBindingStart (
       );
 
     //
-    // If the device path is an instance in the ConIn environment variable,
+    // If the device path is successfully added to the ConIn environment variable,
     // then install EfiConsoleInDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
-              L"ConIn",
-              DevicePath,
-              CHECK
-              );
+               L"ConIn",
+               DevicePath,
+               CHECK
+               );
 
     if (!EFI_ERROR (Status)) {
       gBS->InstallMultipleProtocolInterfaces (
-            &ControllerHandle,
-            &gEfiConsoleInDeviceGuid,
-            NULL,
-            NULL
-            );
+             &ControllerHandle,
+             &gEfiConsoleInDeviceGuid,
+             NULL,
+             NULL
+             );
     } else {
       gBS->CloseProtocol (
-            ControllerHandle,
-            &gEfiSimpleTextInProtocolGuid,
-            This->DriverBindingHandle,
-            ControllerHandle
-            );
+             ControllerHandle,
+             &gEfiSimpleTextInProtocolGuid,
+             This->DriverBindingHandle,
+             ControllerHandle
+             );
     }
   }
 
@@ -314,7 +310,9 @@ ConPlatformTextInDriverBindingStart (
 }
 
 /**
-  Start this driver on ControllerHandle by opening Simple Text Out protocol,
+  Start this driver on the device for console output and stardard error output.
+
+  Start this driver on ControllerHandle by opening Simple Text Output Protocol,
   reading Device Path, and installing Console Out Devcic GUID, Standard Error
   Device GUID on ControllerHandle.
 
@@ -339,10 +337,10 @@ ConPlatformTextOutDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   )
 {
-  EFI_STATUS                    Status;
-  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  EFI_STATUS                       Status;
+  EFI_DEVICE_PATH_PROTOCOL         *DevicePath;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
-  BOOLEAN                       NeedClose;
+  BOOLEAN                          NeedClose;
 
   NeedClose = TRUE;
 
@@ -382,14 +380,15 @@ ConPlatformTextOutDriverBindingStart (
   //
   if (IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     gBS->InstallMultipleProtocolInterfaces (
-          &ControllerHandle,
-          &gEfiConsoleOutDeviceGuid,
-          NULL,
-          NULL
-          );
+           &ControllerHandle,
+           &gEfiConsoleOutDeviceGuid,
+           NULL,
+           NULL
+           );
   } else {
     //
-    // Append the device path to the ConOutDev environment variable
+    // If it is not a hot-plug device, first append the device path to the
+    // ConOutDev environment variable
     //
     ConPlatformUpdateDeviceVariable (
       L"ConOutDev",
@@ -397,7 +396,7 @@ ConPlatformTextOutDriverBindingStart (
       APPEND
       );
     //
-    // Append the device path to the StdErrDev environment variable
+    // Then append the device path to the StdErrDev environment variable
     //
     ConPlatformUpdateDeviceVariable (
       L"ErrOutDev",
@@ -406,14 +405,14 @@ ConPlatformTextOutDriverBindingStart (
       );
 
     //
-    // If the device path is an instance in the ConOut environment variable,
+    // If the device path is successfully added to the ConOut environment variable,
     // then install EfiConsoleOutDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
-              L"ConOut",
-              DevicePath,
-              CHECK
-              );
+               L"ConOut",
+               DevicePath,
+               CHECK
+               );
 
     if (!EFI_ERROR (Status)) {
       NeedClose = FALSE;
@@ -425,31 +424,31 @@ ConPlatformTextOutDriverBindingStart (
                       );
     }
     //
-    // If the device path is an instance in the StdErr environment variable,
+    // If the device path is successfully added to the StdErr environment variable,
     // then install EfiStandardErrorDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
-              L"ErrOut",
-              DevicePath,
-              CHECK
-              );
+               L"ErrOut",
+               DevicePath,
+               CHECK
+               );
     if (!EFI_ERROR (Status)) {
       NeedClose = FALSE;
       gBS->InstallMultipleProtocolInterfaces (
-            &ControllerHandle,
-            &gEfiStandardErrorDeviceGuid,
-            NULL,
-            NULL
-            );
+             &ControllerHandle,
+             &gEfiStandardErrorDeviceGuid,
+             NULL,
+             NULL
+             );
     }
 
     if (NeedClose) {
       gBS->CloseProtocol (
-            ControllerHandle,
-            &gEfiSimpleTextOutProtocolGuid,
-            This->DriverBindingHandle,
-            ControllerHandle
-            );
+             ControllerHandle,
+             &gEfiSimpleTextOutProtocolGuid,
+             This->DriverBindingHandle,
+             ControllerHandle
+             );
     }
   }
 
@@ -458,7 +457,7 @@ ConPlatformTextOutDriverBindingStart (
 
 /**
   Stop this driver on ControllerHandle by removing Console In Devcice GUID 
-  and closing the Simple Text In protocol on ControllerHandle.
+  and closing the Simple Text Input protocol on ControllerHandle.
 
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
@@ -483,8 +482,7 @@ ConPlatformTextInDriverBindingStop (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
   //
-  // hot plug device is not included into the console associated variables,
-  // so no need to check variable for those hot plug devices.
+  // If it is not a hot-plug device, first delete it from the ConInDev variable.
   //
   if (!IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     //
@@ -519,7 +517,7 @@ ConPlatformTextInDriverBindingStop (
     );
 
   //
-  // Close the Simple Input Protocol
+  // Close the Simple Text Input Protocol
   //
   gBS->CloseProtocol (
         ControllerHandle,
@@ -534,7 +532,7 @@ ConPlatformTextInDriverBindingStop (
 
 /**
   Stop this driver on ControllerHandle by removing Console Out Devcice GUID 
-  and closing the Simple Text Out protocol on ControllerHandle.
+  and closing the Simple Text Output protocol on ControllerHandle.
 
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
@@ -559,8 +557,7 @@ ConPlatformTextOutDriverBindingStop (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
   //
-  // hot plug device is not included into the console associated variables,
-  // so no need to check variable for those hot plug devices.
+  // If it is not a hot-plug device, first delete it from the ConOutDev and StdErrDev variable.
   //
   if (!IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     //
@@ -626,8 +623,6 @@ ConPlatformTextOutDriverBindingStop (
   @param Handle          Handle of device to uninstall protocol on.
   @param ProtocolGuid    The specified protocol need to be uninstalled.
 
-  @return None.
-
 **/
 VOID
 ConPlatformUnInstallProtocol (
@@ -649,19 +644,22 @@ ConPlatformUnInstallProtocol (
 
   if (!EFI_ERROR (Status)) {
     gBS->UninstallMultipleProtocolInterfaces (
-          Handle,
-          ProtocolGuid,
-          NULL,
-          NULL
-          );
+           Handle,
+           ProtocolGuid,
+           NULL,
+           NULL
+           );
   }
 
   return ;
 }
 
 /**
-  Read the EFI variable (Name) and return a dynamically allocated
-  buffer, and the size of the buffer. On failure return NULL.
+  Get the necessary size of buffer and read the variabe.
+
+  First get the necessary size of buffer. Then read the
+  EFI variable (Name) and return a dynamically allocated
+  buffer. On failure return NULL.
 
   @param  Name             String part of EFI variable name
 
@@ -683,7 +681,7 @@ ConPlatformGetVariable (
   Buffer      = NULL;
 
   //
-  // Test to see if the variable exists.  If it doesn't, reuturn NULL.
+  // Test to see if the variable exists.  If it doesn't, return NULL.
   //
   Status = gRT->GetVariable (
                   Name,
@@ -727,7 +725,6 @@ ConPlatformGetVariable (
   Function compares a device path data structure to that of all the nodes of a
   second device path instance.
 
-
   @param Multi           A pointer to a multi-instance device path data structure.
   @param Single          A pointer to a single-instance device path data structure.
   @param NewDevicePath   If Delete is TRUE, this parameter must not be null, and it
@@ -737,8 +734,11 @@ ConPlatformGetVariable (
                          If FALSE, the routine just check whether Single matches
                          with any instance in Multi.
 
-  @retval EFI_SUCCESS    If the Single is contained within Multi.
-  @retval EFI_NOT_FOUND  If the Single is not contained within Multi.
+  @retval EFI_SUCCESS           If the Single is contained within Multi.
+  @retval EFI_NOT_FOUND         If the Single is not contained within Multi.
+  @retval EFI_INVALID_PARAMETER Multi is NULL.
+  @retval EFI_INVALID_PARAMETER Single is NULL.
+  @retval EFI_INVALID_PARAMETER NewDevicePath is NULL when Delete is TRUE.
 
 **/
 EFI_STATUS
@@ -759,14 +759,16 @@ ConPlatformMatchDevicePaths (
   // The passed in DevicePath should not be NULL
   //
   if ((Multi == NULL) || (Single == NULL)) {
-    return EFI_NOT_FOUND;
+    return EFI_INVALID_PARAMETER;
   }
 
   //
   // If performing Delete operation, the NewDevicePath must not be NULL.
   //
   if (Delete) {
-    ASSERT (NewDevicePath != NULL);
+    if (NewDevicePath == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   TempDevicePath1 = NULL;
@@ -789,7 +791,8 @@ ConPlatformMatchDevicePaths (
     } else {
       if (Delete) {
         //
-        // Append the mis-matched devcie path into remaining device path.
+        // If the node of Multi does not match Single, then added it back to the result.
+        // That is, the node matching Single will be dropped and deleted from result.
         //
         TempDevicePath2 = AppendDevicePathInstance (
                             TempDevicePath1,
@@ -808,7 +811,7 @@ ConPlatformMatchDevicePaths (
 
   if (Delete) {
     //
-    // Return the remaining device path data structure
+    // Return the new device path data structure with specified node deleted.
     //
     *NewDevicePath = TempDevicePath1;
     return EFI_SUCCESS;
@@ -823,7 +826,7 @@ ConPlatformMatchDevicePaths (
   @param  VariableName    Console environment variables, ConOutDev, ConInDev
                           StdErrDev, ConIn or ConOut.
   @param  DevicePath      Console devcie's device path.
-  @param  Operation       Variable operations, such as APPEND or DELETE.
+  @param  Operation       Variable operations, including APPEND, CHECK and DELETE.
 
   @retval EFI_SUCCESS           Variable operates successfully.
   @retval EFI_OUT_OF_RESOURCES  If variable cannot be appended.
@@ -856,15 +859,17 @@ ConPlatformUpdateDeviceVariable (
     // Match specified DevicePath in Console Variable.
     // 
     Status = ConPlatformMatchDevicePaths (
-              VariableDevicePath,
-              DevicePath,
-              NULL,
-              FALSE
-              );
+               VariableDevicePath,
+               DevicePath,
+               NULL,
+               FALSE
+               );
 
     if ((Operation == CHECK) || (!EFI_ERROR (Status))) {
       //
-      // The device path is already in the variable
+      // Branch here includes 2 cases:
+      // 1. Operation is CHECK, simply return Status.
+      // 2. Operation is APPEND, and device path already exists in variable, also return.
       //
       if (VariableDevicePath != NULL) {
         FreePool (VariableDevicePath);
@@ -873,8 +878,7 @@ ConPlatformUpdateDeviceVariable (
       return Status;
     }
     //
-    // The device path is not in variable. Append DevicePath to the
-    // environment variable that is a multi-instance device path.
+    // We reach here to append a device path that does not exist in variable.
     //
     Status = EFI_SUCCESS;
     NewVariableDevicePath = AppendDevicePathInstance (
@@ -887,15 +891,15 @@ ConPlatformUpdateDeviceVariable (
 
   } else {
     //
-    // Remove DevicePath from the environment variable that
+    // We reach here to remove DevicePath from the environment variable that
     // is a multi-instance device path.
     //
     Status = ConPlatformMatchDevicePaths (
-              VariableDevicePath,
-              DevicePath,
-              &NewVariableDevicePath,
-              TRUE
-              );
+               VariableDevicePath,
+               DevicePath,
+               &NewVariableDevicePath,
+               TRUE
+               );
   }
 
   if (VariableDevicePath != NULL) {
@@ -925,7 +929,7 @@ ConPlatformUpdateDeviceVariable (
 }
 
 /**
-  Check if the device is one hot-plug supported.
+  Check if the device supports hot-plug.
 
   @param  DriverBindingHandle   Protocol instance pointer.
   @param  ControllerHandle      Handle of device to check.
