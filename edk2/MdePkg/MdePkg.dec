@@ -58,7 +58,7 @@
   ##
   UefiLib|Include/Library/UefiLib.h
 
-  ##  @libraryclass  Module entry point library for UEFI drivers, DXE Drivers and DXE Runtime Drivers
+  ##  @libraryclass  Module entry point library for UEFI drivers, DXE Drivers, DXE SMM Driver and DXE Runtime Drivers
   UefiDriverEntryPoint|Include/Library/UefiDriverEntryPoint.h
 
   ##  @libraryclass  UEFI Decompress Library Functions defintion for UEFI compress algorithm
@@ -145,9 +145,6 @@
   #                  low level control interfaces over block-oriented firmware devices.
   ##
   FvbServiceLib|Include/Library/FvbServiceLib.h
-
-  ##  @libraryclass  Module entry point library for DXE SMM Driver.
-  DxeSmmDriverEntryPoint|Include/Library/DxeSmmDriverEntryPoint.h
 
   ##  @libraryclass  Provides a service to retrieve a pointer to the DXE Services Table.
   #                  Only available to DXE module types.

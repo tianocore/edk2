@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmBase.h>
 #include <Protocol/DevicePath.h>
 
-#include <Library/DxeSmmDriverEntryPoint.h>
+#include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 
