@@ -14,88 +14,87 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PcRtc.h"
 
+/**
+  Compare the Hour, Minute and Second of the From time and the To time.
+  
+  Only compare H/M/S in EFI_TIME and ignore other fields here.
+
+  @param From   the first time
+  @param To     the second time
+
+  @return  >0   The H/M/S of the From time is later than those of To time
+  @return  ==0  The H/M/S of the From time is same as those of To time
+  @return  <0   The H/M/S of the From time is earlier than those of To time
+**/
 INTN
 CompareHMS (
   IN EFI_TIME   *From,
   IN EFI_TIME   *To
   );
 
+/**
+  To check if second date is later than first date within 24 hours.
+
+  @param  From   the first date
+  @param  To     the second date
+
+  @retval TRUE   From is previous to To within 24 hours.
+  @retval FALSE  From is later, or it is previous to To more than 24 hours.
+**/
 BOOLEAN
 IsWithinOneDay (
   IN EFI_TIME   *From,
   IN EFI_TIME   *To
   );
 
+/**
+  Read RTC content through its registers.
+
+  @param  Address  Address offset of RTC. It is recommended to use macros such as
+                   RTC_ADDRESS_SECONDS.
+
+  @return The data of UINT8 type read from RTC.
+**/
 UINT8
 RtcRead (
   IN  UINT8 Address
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Address - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   IoWrite8 (PCAT_RTC_ADDRESS_REGISTER, (UINT8) (Address | (UINT8) (IoRead8 (PCAT_RTC_ADDRESS_REGISTER) & 0x80)));
   return IoRead8 (PCAT_RTC_DATA_REGISTER);
 }
 
+/**
+  Write RTC through its registers.
+
+  @param  Address  Address offset of RTC. It is recommended to use macros such as
+                   RTC_ADDRESS_SECONDS.
+  @param  Data     The content you want to write into RTC.
+
+**/
 VOID
 RtcWrite (
   IN  UINT8   Address,
   IN  UINT8   Data
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Address - GC_TODO: add argument description
-  Data    - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   IoWrite8 (PCAT_RTC_ADDRESS_REGISTER, (UINT8) (Address | (UINT8) (IoRead8 (PCAT_RTC_ADDRESS_REGISTER) & 0x80)));
   IoWrite8 (PCAT_RTC_DATA_REGISTER, Data);
 }
 
+/**
+  Initialize RTC.
+
+  @param  Global            For global use inside this module.
+
+  @retval EFI_DEVICE_ERROR  Initialization failed due to device error.
+  @retval EFI_SUCCESS       Initialization successful.
+
+**/
 EFI_STATUS
 PcRtcInit (
   IN PC_RTC_MODULE_GLOBALS  *Global
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Global  - GC_TODO: add argument description
-
-Returns:
-
-  EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
---*/
 {
   EFI_STATUS      Status;
   RTC_REGISTER_A  RegisterA;
@@ -112,7 +111,7 @@ Returns:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
   //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
   if (!EfiAtRuntime ()) {
-  EfiAcquireLock (&Global->RtcLock);
+    EfiAcquireLock (&Global->RtcLock);
   }
   //
   // Initialize RTC Register
@@ -147,7 +146,7 @@ Returns:
   	//BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
     //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
     if (!EfiAtRuntime ()) {
-    EfiReleaseLock (&Global->RtcLock);
+      EfiReleaseLock (&Global->RtcLock);
     }
     return EFI_DEVICE_ERROR;
   }
@@ -180,7 +179,7 @@ Returns:
   //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
   //
   if (!EfiAtRuntime ()) {
-  EfiReleaseLock (&Global->RtcLock);
+    EfiReleaseLock (&Global->RtcLock);
   }
  
   //
@@ -225,26 +224,26 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Returns the current time and date information, and the time-keeping capabilities
+  of the hardware platform.
+
+  @param  Time          A pointer to storage to receive a snapshot of the current time.
+  @param  Capabilities  An optional pointer to a buffer to receive the real time clock
+                        device's capabilities.
+  @param  Global        For global use inside this module.
+
+  @retval EFI_SUCCESS            The operation completed successfully.
+  @retval EFI_INVALID_PARAMETER  Time is NULL.
+  @retval EFI_DEVICE_ERROR       The time could not be retrieved due to hardware error.
+
+**/
 EFI_STATUS
 PcRtcGetTime (
-  OUT EFI_TIME              *Time,
-  IN  EFI_TIME_CAPABILITIES *Capabilities,
-  IN  PC_RTC_MODULE_GLOBALS *Global
+  OUT  EFI_TIME               *Time,
+  OUT  EFI_TIME_CAPABILITIES  *Capabilities,  OPTIONAL
+  IN   PC_RTC_MODULE_GLOBALS  *Global
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-  Returns:
---*/
-// GC_TODO:    Time - add argument and description to function comment
-// GC_TODO:    Capabilities - add argument and description to function comment
-// GC_TODO:    Global - add argument and description to function comment
-// GC_TODO:    EFI_INVALID_PARAMETER - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS      Status;
   RTC_REGISTER_B  RegisterB;
@@ -263,7 +262,7 @@ Routine Description:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
   //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
   if (!EfiAtRuntime ()) {
-  EfiAcquireLock (&Global->RtcLock);
+    EfiAcquireLock (&Global->RtcLock);
   }
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
@@ -273,7 +272,7 @@ Routine Description:
   	  //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
       //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
       if (!EfiAtRuntime ()) {
-    EfiReleaseLock (&Global->RtcLock);
+        EfiReleaseLock (&Global->RtcLock);
       }
     return Status;
   }
@@ -304,7 +303,7 @@ Routine Description:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
   //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
   if (!EfiAtRuntime ()) {
-  EfiReleaseLock (&Global->RtcLock);
+    EfiReleaseLock (&Global->RtcLock);
   }
   //
   // Get the variable that containts the TimeZone and Daylight fields
@@ -325,7 +324,7 @@ Routine Description:
   //
   //  Fill in Capabilities if it was passed in
   //
-  if (Capabilities) {
+  if (Capabilities != NULL) {
     Capabilities->Resolution = 1;
     //
     // 1 hertz
@@ -340,22 +339,22 @@ Routine Description:
   return EFI_SUCCESS;
 }
 
+/**
+  Sets the current local time and date information.
+
+  @param  Time                  A pointer to the current time.
+  @param  Global                For global use inside this module.
+
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_INVALID_PARAMETER A time field is out of range.
+  @retval EFI_DEVICE_ERROR      The time could not be set due due to hardware error.
+
+**/
 EFI_STATUS
 PcRtcSetTime (
   IN EFI_TIME                *Time,
   IN PC_RTC_MODULE_GLOBALS   *Global
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-  Returns:
---*/
-// GC_TODO:    Time - add argument and description to function comment
-// GC_TODO:    Global - add argument and description to function comment
-// GC_TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
   EFI_STATUS      Status;
   EFI_TIME        RtcTime;
@@ -382,7 +381,7 @@ Routine Description:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
   //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
   if (!EfiAtRuntime ()) {
-  EfiAcquireLock (&Global->RtcLock);
+    EfiAcquireLock (&Global->RtcLock);
   }
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
@@ -429,7 +428,7 @@ Routine Description:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
   //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
   if (!EfiAtRuntime ()) {
-  EfiReleaseLock (&Global->RtcLock);
+    EfiReleaseLock (&Global->RtcLock);
   }
   //
   // Set the variable that containts the TimeZone and Daylight fields
@@ -451,31 +450,29 @@ Routine Description:
   return EFI_SUCCESS;
 }
 
+/**
+  Returns the current wakeup alarm clock setting.
+
+  @param  Enabled  Indicates if the alarm is currently enabled or disabled.
+  @param  Pending  Indicates if the alarm signal is pending and requires acknowledgement.
+  @param  Time     The current alarm setting.
+  @param  Global   For global use inside this module.
+
+  @retval EFI_SUCCESS           The alarm settings were returned.
+  @retval EFI_INVALID_PARAMETER Enabled is NULL.
+  @retval EFI_INVALID_PARAMETER Pending is NULL.
+  @retval EFI_INVALID_PARAMETER Time is NULL.
+  @retval EFI_DEVICE_ERROR      The wakeup time could not be retrieved due to a hardware error.
+  @retval EFI_UNSUPPORTED       A wakeup timer is not supported on this platform.
+
+**/
 EFI_STATUS
 PcRtcGetWakeupTime (
   OUT BOOLEAN                *Enabled,
   OUT BOOLEAN                *Pending,
   OUT EFI_TIME               *Time,
-  IN PC_RTC_MODULE_GLOBALS   *Global
+  IN  PC_RTC_MODULE_GLOBALS  *Global
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-
-
-Returns:
---*/
-// GC_TODO:    Enabled - add argument and description to function comment
-// GC_TODO:    Pending - add argument and description to function comment
-// GC_TODO:    Time - add argument and description to function comment
-// GC_TODO:    Global - add argument and description to function comment
-// GC_TODO:    EFI_INVALID_PARAMETER - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS      Status;
   RTC_REGISTER_B  RegisterB;
@@ -495,7 +492,7 @@ Returns:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
   //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
   if (!EfiAtRuntime ()) {
-  EfiAcquireLock (&Global->RtcLock);
+    EfiAcquireLock (&Global->RtcLock);
   }
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
@@ -547,7 +544,7 @@ Returns:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
   //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
   if (!EfiAtRuntime ()) {
-  EfiReleaseLock (&Global->RtcLock);
+    EfiReleaseLock (&Global->RtcLock);
   }
   //
   // Make sure all field values are in correct range
@@ -565,30 +562,27 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Sets the system wakeup alarm clock time.
+
+  @param  Enabled  Enable or disable the wakeup alarm.
+  @param  Time     If Enable is TRUE, the time to set the wakeup alarm for.
+                   If Enable is FALSE, then this parameter is optional, and may be NULL.
+  @param  Global   For global use inside this module.
+
+  @retval EFI_SUCCESS           If Enable is TRUE, then the wakeup alarm was enabled.
+                                If Enable is FALSE, then the wakeup alarm was disabled.
+  @retval EFI_INVALID_PARAMETER A time field is out of range.
+  @retval EFI_DEVICE_ERROR      The wakeup time could not be set due to a hardware error.
+  @retval EFI_UNSUPPORTED       A wakeup timer is not supported on this platform.
+
+**/
 EFI_STATUS
 PcRtcSetWakeupTime (
   IN BOOLEAN                Enable,
-  OUT EFI_TIME              *Time,
+  IN EFI_TIME               *Time,   OPTIONAL
   IN PC_RTC_MODULE_GLOBALS  *Global
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-
-
-Returns:
---*/
-// GC_TODO:    Enable - add argument and description to function comment
-// GC_TODO:    Time - add argument and description to function comment
-// GC_TODO:    Global - add argument and description to function comment
-// GC_TODO:    EFI_INVALID_PARAMETER - add return value to function comment
-// GC_TODO:    EFI_INVALID_PARAMETER - add return value to function comment
-// GC_TODO:    EFI_UNSUPPORTED - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS            Status;
   EFI_TIME              RtcTime;
@@ -627,7 +621,7 @@ Returns:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
   //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
   if (!EfiAtRuntime ()) {
-  EfiAcquireLock (&Global->RtcLock);
+    EfiAcquireLock (&Global->RtcLock);
   }
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
@@ -676,35 +670,26 @@ Returns:
   //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
   //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
   if (!EfiAtRuntime ()) {
-  EfiReleaseLock (&Global->RtcLock);
+    EfiReleaseLock (&Global->RtcLock);
   }
   return EFI_SUCCESS;
 }
 
+/**
+  See if centry register of RTC is valid.
+
+  @retval  EFI_SUCCESS       Century register is valid.
+  @retval  EFI_DEVICE_ERROR  Century register is NOT valid.
+**/
 EFI_STATUS
 RtcTestCenturyRegister (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-
-
-Returns:
---*/
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   UINT8 Century;
   UINT8 Temp;
 
   Century = RtcRead (RTC_ADDRESS_CENTURY);
-  //
-  //  RtcWrite (RTC_ADDRESS_CENTURY, 0x00);
-  //
   Temp = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
   RtcWrite (RTC_ADDRESS_CENTURY, Century);
   if (Temp == 0x19 || Temp == 0x20) {
@@ -721,10 +706,9 @@ Returns:
   If valid, the function converts it to an 8-bit value and returns it.
   Otherwise, return 0xff.
 
-  @param  Value The 8-bit BCD value to check and convert
+  @param   Value The 8-bit BCD value to check and convert
 
-  @return The 8-bit value converted.
-          0xff if Value is invalid.
+  @return  The 8-bit value converted. Or 0xff if Value is invalid.
 
 **/
 UINT8
@@ -753,6 +737,9 @@ CheckAndConvertBcd8ToDecimal8 (
   @param   RegisterB  Value of Register B of RTC, indicating data mode
                       and hour format.
 
+  @retval  EFI_INVALID_PARAMETER  Parameters passed in are invalid.
+  @retval  EFI_SUCCESS            Convert RTC time to EFI time successfully.
+
 **/
 EFI_STATUS
 ConvertRtcTimeToEfiTime (
@@ -761,12 +748,12 @@ ConvertRtcTimeToEfiTime (
   IN     RTC_REGISTER_B  RegisterB
   )
 {
-  BOOLEAN PM;
+  BOOLEAN IsPM;
 
   if ((Time->Hour) & 0x80) {
-    PM = TRUE;
+    IsPM = TRUE;
   } else {
-    PM = FALSE;
+    IsPM = FALSE;
   }
 
   Time->Hour = (UINT8) (Time->Hour & 0x7f);
@@ -793,11 +780,11 @@ ConvertRtcTimeToEfiTime (
   // If time is in 12 hour format, convert it to 24 hour format
   //
   if (RegisterB.Bits.MIL == 0) {
-    if (PM && Time->Hour < 12) {
+    if (IsPM && Time->Hour < 12) {
       Time->Hour = (UINT8) (Time->Hour + 12);
     }
 
-    if (!PM && Time->Hour == 12) {
+    if (!IsPM && Time->Hour == 12) {
       Time->Hour = 0;
     }
   }
@@ -809,23 +796,18 @@ ConvertRtcTimeToEfiTime (
   return EFI_SUCCESS;
 }
 
+/**
+  Wait for a period for the RTC to be ready.
+
+  @param    Timeout  Tell how long it should take to wait.
+
+  @retval   EFI_DEVICE_ERROR   RTC device error.
+  @retval   EFI_SUCCESS        RTC is updated and ready.  
+**/
 EFI_STATUS
 RtcWaitToUpdate (
   UINTN Timeout
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-
-Returns:
---*/
-// GC_TODO:    Timeout - add argument and description to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   RTC_REGISTER_A  RegisterA;
   RTC_REGISTER_D  RegisterD;
@@ -857,21 +839,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  See if all fields of a variable of EFI_TIME type is correct.
+
+  @param   Time   The time to be checked.
+
+  @retval  EFI_INVALID_PARAMETER  Some fields of Time are not correct.
+  @retval  EFI_SUCCESS            Time is a valid EFI_TIME variable.
+
+**/
 EFI_STATUS
 RtcTimeFieldsValid (
   IN EFI_TIME *Time
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-  Returns:
---*/
-// GC_TODO:    Time - add argument and description to function comment
-// GC_TODO:    EFI_INVALID_PARAMETER - add return value to function comment
-// GC_TODO:    EFI_SUCCESS - add return value to function comment
 {
   if (Time->Year < 1998 ||
       Time->Year > 2099 ||
@@ -891,25 +871,18 @@ Routine Description:
   return EFI_SUCCESS;
 }
 
+/**
+  See if field Day of an EFI_TIME is correct.
+
+  @param    Time   Its Day field is to be checked.
+
+  @retval   TRUE   Day field of Time is correct.
+  @retval   FALSE  Day field of Time is NOT correct.
+**/
 BOOLEAN
 DayValid (
   IN  EFI_TIME  *Time
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Time  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   INTN  DayOfMonth[12];
 
@@ -936,25 +909,18 @@ Returns:
   return TRUE;
 }
 
+/**
+  Check if it is a leapyear.
+
+  @param    Time   The time to be checked.
+
+  @retval   TRUE   It is a leapyear.
+  @retval   FALSE  It is NOT a leapyear.
+**/
 BOOLEAN
 IsLeapYear (
   IN EFI_TIME   *Time
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  Time  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 {
   if (Time->Year % 4 == 0) {
     if (Time->Year % 100 == 0) {
@@ -971,34 +937,35 @@ Returns:
   }
 }
 
+/**
+  Converts time from EFI_TIME format defined by UEFI spec to RTC's.
+
+  This function converts time from EFI_TIME format defined by UEFI spec to RTC's.
+  If data mode of RTC is BCD, then converts EFI_TIME to it.
+  If RTC is in 12-hour format, then converts EFI_TIME to it.
+
+  @param   Time       On input, the time data read from UEFI to convert
+                      On output, the time converted to RTC format
+  @param   RegisterB  Value of Register B of RTC, indicating data mode
+  @param   Century    It is set according to EFI_TIME Time.
+
+**/
 VOID
 ConvertEfiTimeToRtcTime (
-  IN EFI_TIME       *Time,
-  IN RTC_REGISTER_B RegisterB,
-  IN UINT8          *Century
+  IN OUT EFI_TIME        *Time,
+  IN     RTC_REGISTER_B  RegisterB,
+     OUT UINT8           *Century
   )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-
-Returns:
---*/
-// GC_TODO:    Time - add argument and description to function comment
-// GC_TODO:    RegisterB - add argument and description to function comment
-// GC_TODO:    Century - add argument and description to function comment
 {
-  BOOLEAN PM;
+  BOOLEAN IsPM;
 
-  PM = TRUE;
+  IsPM = TRUE;
   //
-  // Adjust hour field if RTC in in 12 hour mode
+  // Adjust hour field if RTC is in 12 hour mode
   //
   if (RegisterB.Bits.MIL == 0) {
     if (Time->Hour < 12) {
-      PM = FALSE;
+      IsPM = FALSE;
     }
 
     if (Time->Hour >= 13) {
@@ -1025,35 +992,28 @@ Returns:
   //
   // If we are in 12 hour mode and PM is set, then set bit 7 of the Hour field.
   //
-  if (RegisterB.Bits.MIL == 0 && PM) {
+  if (RegisterB.Bits.MIL == 0 && IsPM) {
     Time->Hour = (UINT8) (Time->Hour | 0x80);
   }
 }
 
+/**
+  Compare the Hour, Minute and Second of the From time and the To time.
+  
+  Only compare H/M/S in EFI_TIME and ignore other fields here.
+
+  @param From   the first time
+  @param To     the second time
+
+  @return  >0   The H/M/S of the From time is later than those of To time
+  @return  ==0  The H/M/S of the From time is same as those of To time
+  @return  <0   The H/M/S of the From time is earlier than those of To time
+**/
 INTN
 CompareHMS (
   IN EFI_TIME   *From,
   IN EFI_TIME   *To
   )
-/*++
-
-Routine Description:
-
-  Compare the Hour, Minute and Second of the 'From' time and the 'To' time.
-  Only compare H/M/S in EFI_TIME and ignore other fields here.
-
-Arguments:
-
-  From  -   the first time
-  To    -   the second time
-
-Returns:
-
-  >0   : The H/M/S of the 'From' time is later than those of 'To' time
-  ==0  : The H/M/S of the 'From' time is same as those of 'To' time
-  <0   : The H/M/S of the 'From' time is earlier than those of 'To' time
-
---*/
 {
   if ((From->Hour > To->Hour) ||
      ((From->Hour == To->Hour) && (From->Minute > To->Minute)) ||
@@ -1066,28 +1026,20 @@ Returns:
   }
 }
 
+/**
+  To check if second date is later than first date within 24 hours.
+
+  @param  From   the first date
+  @param  To     the second date
+
+  @retval TRUE   From is previous to To within 24 hours.
+  @retval FALSE  From is later, or it is previous to To more than 24 hours.
+**/
 BOOLEAN
 IsWithinOneDay (
   IN EFI_TIME  *From,
   IN EFI_TIME  *To
   )
-/*++
-
-Routine Description:
-
-  Judge whether two days are adjacent.
-
-Arguments:
-
-  From  -   the first day
-  To    -   the second day
-
-Returns:
-
-  TRUE  -   The interval of two days are within one day.
-  FALSE -   The interval of two days exceed ony day or parameter error.
-
---*/
 {
   UINT8   DayOfMonth[12];
   BOOLEAN Adjacent;
