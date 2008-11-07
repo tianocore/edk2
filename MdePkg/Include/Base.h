@@ -281,11 +281,47 @@ typedef INTN RETURN_STATUS;
 #define RETURN_WARN_WRITE_FAILURE    ENCODE_WARNING (3)
 #define RETURN_WARN_BUFFER_TOO_SMALL ENCODE_WARNING (4)
 
-//
-// Define macros to build data structure signatures from characters.
-//
+/**
+  Returns a 16-bit signature built from 2 ASCII characters.
+  
+  @param  A	   The first ASCII character.
+  @param  B	   The second ASCII character.
+
+  @return A 16-bit value built from the two ASCII characters specified by A and B.
+
+**/
 #define SIGNATURE_16(A, B)        ((A) | (B << 8))
+
+/**
+  Returns a 32-bit signature built from 4 ASCII characters.
+  
+  @param  A	   The first ASCII character.
+  @param  B	   The second ASCII character.
+  @param  C	   The third ASCII character.
+  @param  D	   The fourth ASCII character.
+
+  @return A 32-bit value built from the two ASCII characters specified by A, B,
+          C and D.
+
+**/
 #define SIGNATURE_32(A, B, C, D)  (SIGNATURE_16 (A, B) | (SIGNATURE_16 (C, D) << 16))
+
+/**
+  Returns a 64-bit signature built from 8 ASCII characters.
+  
+  @param  A	   The first ASCII character.
+  @param  B	   The second ASCII character.
+  @param  C	   The third ASCII character.
+  @param  D	   The fourth ASCII character.
+  @param  E	   The fifth ASCII character.
+  @param  F	   The sixth ASCII character.
+  @param  G	   The seventh ASCII character.
+  @param  H	   The eighth ASCII character.
+
+  @return A 64-bit value built from the two ASCII characters specified by A, B,
+          C, D, E, F, G and H.
+
+**/
 #define SIGNATURE_64(A, B, C, D, E, F, G, H) \
     (SIGNATURE_32 (A, B, C, D) | ((UINT64) (SIGNATURE_32 (E, F, G, H)) << 32))
 
