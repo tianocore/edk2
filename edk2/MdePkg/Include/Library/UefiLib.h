@@ -961,21 +961,22 @@ EfiLibInstallDriverBindingComponentName2 (
 
 
 /**
-  Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name,
+  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
   Component Name 2, Driver Configure, Driver Diagnostic and Driver Diagnostic 2 Protocols onto the driver's
   DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but it can be different if
   the driver produces multiple DriverBinding Protocols. 
-  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
+  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
 
   @param  ImageHandle                 The image handle of the driver.
   @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
                                       parameter is NULL, then a new handle is created.
   @param  ComponentName               A Component Name Protocol instance that this driver is producing.
   @param  ComponentName2              A Component Name 2 Protocol instance that this driver is producing.
   @param  DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing.
+  @param  DriverConfiguration2        A Driver Configuration Protocol 2 instance that this driver is producing.
   @param  DriverDiagnostics           A Driver Diagnostics Protocol instance that this driver is producing.
   @param  DriverDiagnostics2          A Driver Diagnostics Protocol 2 instance that this driver is producing.
 
@@ -990,11 +991,12 @@ EfiLibInstallAllDriverProtocols2 (
   IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN EFI_HANDLE                               DriverBindingHandle,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2,      OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
-  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,   OPTIONAL
-  IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2   OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,        OPTIONAL
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2,       OPTIONAL
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration,  OPTIONAL
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration2, OPTIONAL
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,    OPTIONAL
+  IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2    OPTIONAL
   );
 
 /**
