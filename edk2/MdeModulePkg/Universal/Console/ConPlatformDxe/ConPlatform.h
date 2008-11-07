@@ -54,12 +54,10 @@ typedef enum {
 } CONPLATFORM_VAR_OPERATION;
 
 /**
-  Test to see if specific Protocol could be supported on the ControllerHandle. 
+  Test to see if specific protocol could be supported on the ControllerHandle. 
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
-  @param  RemainingDevicePath Optional parameter use to pick a specific child
-                              device to start.
   @param  ProtocolGuid        The specfic protocol.
 
   @retval EFI_SUCCESS         This driver supports this device
@@ -70,20 +68,19 @@ EFI_STATUS
 ConPlatformDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ControllerHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath,
   IN  EFI_GUID                     *ProtocolGuid
   );
 
 /**
-  Test to see if EFI Text In Protocol could be supported on the ControllerHandle. 
+  Test to see if EFI_SIMPLE_TEXT_INPUT_PROTOCOL is supported on ControllerHandle. 
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -91,19 +88,19 @@ EFIAPI
 ConPlatformTextInDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath  OPTIONAL
   );
 
 /**
-  Test to see if EFI Text Out Protocol could be supported on the ControllerHandle. 
+  Test to see if EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL is supported on ControllerHandle. 
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -111,11 +108,13 @@ EFIAPI
 ConPlatformTextOutDriverBindingSupported (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath  OPTIONAL
   );
 
 /**
-  Start this driver on ControllerHandle by opening Simple Text In protocol,
+  Start this driver on the device for console input.
+
+  Start this driver on ControllerHandle by opening Simple Text Input Protocol,
   reading Device Path, and installing Console In Devcice GUID on ControllerHandle.
 
   If this devcie is not one hot-plug devce, append its device path into the 
@@ -128,7 +127,7 @@ ConPlatformTextOutDriverBindingSupported (
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle
   @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval other                This driver does not support this device
+  @retval other                This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -140,8 +139,10 @@ ConPlatformTextInDriverBindingStart (
   );
 
 /**
-  Start this driver on ControllerHandle by opening Simple Text Out protocol,
-  reading Device Path, and installing Console Out Devcice GUID, Standard Error
+  Start this driver on the device for console output and stardard error output.
+
+  Start this driver on ControllerHandle by opening Simple Text Output Protocol,
+  reading Device Path, and installing Console Out Devcic GUID, Standard Error
   Device GUID on ControllerHandle.
 
   If this devcie is not one hot-plug devce, append its device path into the 
@@ -167,7 +168,7 @@ ConPlatformTextOutDriverBindingStart (
 
 /**
   Stop this driver on ControllerHandle by removing Console In Devcice GUID 
-  and closing the Simple Text In protocol on ControllerHandle.
+  and closing the Simple Text Input protocol on ControllerHandle.
 
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
@@ -190,7 +191,7 @@ ConPlatformTextInDriverBindingStop (
 
 /**
   Stop this driver on ControllerHandle by removing Console Out Devcice GUID 
-  and closing the Simple Text Out protocol on ControllerHandle.
+  and closing the Simple Text Output protocol on ControllerHandle.
 
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
@@ -217,8 +218,6 @@ ConPlatformTextOutDriverBindingStop (
   @param This            Protocol instance pointer.
   @param Handle          Handle of device to uninstall protocol on.
   @param ProtocolGuid    The specified protocol need to be uninstalled.
-
-  @return None.
 
 **/
 VOID
@@ -258,15 +257,18 @@ ConPlatformGetVariable (
                          If FALSE, the routine just check whether Single matches
                          with any instance in Multi.
 
-  @retval EFI_SUCCESS    If the Single is contained within Multi.
-  @retval EFI_NOT_FOUND  If the Single is not contained within Multi.
+  @retval EFI_SUCCESS           If the Single is contained within Multi.
+  @retval EFI_NOT_FOUND         If the Single is not contained within Multi.
+  @retval EFI_INVALID_PARAMETER Multi is NULL.
+  @retval EFI_INVALID_PARAMETER Single is NULL.
+  @retval EFI_INVALID_PARAMETER NewDevicePath is NULL when Delete is TRUE.
 
 **/
 EFI_STATUS
 ConPlatformMatchDevicePaths (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Multi,
   IN  EFI_DEVICE_PATH_PROTOCOL  *Single,
-  IN  EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath OPTIONAL,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath OPTIONAL,
   IN  BOOLEAN                   Delete
   );
 
@@ -276,7 +278,7 @@ ConPlatformMatchDevicePaths (
   @param  VariableName    Console environment variables, ConOutDev, ConInDev
                           StdErrDev, ConIn or ConOut.
   @param  DevicePath      Console devcie's device path.
-  @param  Operation       Variable operations, such as APPEND or DELETE.
+  @param  Operation       Variable operations, including APPEND, CHECK and DELETE.
 
   @retval EFI_SUCCESS           Variable operates successfully.
   @retval EFI_OUT_OF_RESOURCES  If variable cannot be appended.
@@ -291,7 +293,7 @@ ConPlatformUpdateDeviceVariable (
   );
 
 /**
-  Check if the device is one hot-plug supported.
+  Check if the device supports hot-plug.
 
   @param  DriverBindingHandle   Protocol instance pointer.
   @param  ControllerHandle      Handle of device to check.
@@ -321,7 +323,6 @@ IsHotPlugDevice (
 
   @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
-
   @param  Language[in]          A pointer to a Null-terminated ASCII string
                                 array indicating the language. This is the
                                 language of the driver name that the caller is
@@ -330,7 +331,6 @@ IsHotPlugDevice (
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified
                                 in RFC 3066 or ISO 639-2 language code format.
-
   @param  DriverName[out]       A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 driver specified by This in the language
@@ -339,11 +339,8 @@ IsHotPlugDevice (
   @retval EFI_SUCCESS           The Unicode string for the Driver specified by
                                 This and the language specified by Language was
                                 returned in DriverName.
-
   @retval EFI_INVALID_PARAMETER Language is NULL.
-
   @retval EFI_INVALID_PARAMETER DriverName is NULL.
-
   @retval EFI_UNSUPPORTED       The driver specified by This does not support
                                 the language specified by Language.
 
@@ -372,12 +369,10 @@ ConPlatformComponentNameGetDriverName (
 
   @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
-
   @param  ControllerHandle[in]  The handle of a controller that the driver
                                 specified by This is managing.  This handle
                                 specifies the controller whose name is to be
                                 returned.
-
   @param  ChildHandle[in]       The handle of the child controller to retrieve
                                 the name of.  This is an optional parameter that
                                 may be NULL.  It will be NULL for device
@@ -386,7 +381,6 @@ ConPlatformComponentNameGetDriverName (
                                 controller.  It will not be NULL for a bus
                                 driver that wishes to retrieve the name of a
                                 child controller.
-
   @param  Language[in]          A pointer to a Null-terminated ASCII string
                                 array indicating the language.  This is the
                                 language of the driver name that the caller is
@@ -395,7 +389,6 @@ ConPlatformComponentNameGetDriverName (
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified in
                                 RFC 3066 or ISO 639-2 language code format.
-
   @param  ControllerName[out]   A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 controller specified by ControllerHandle and
@@ -407,20 +400,14 @@ ConPlatformComponentNameGetDriverName (
                                 the language specified by Language for the
                                 driver specified by This was returned in
                                 DriverName.
-
   @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
-
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
                                 EFI_HANDLE.
-
   @retval EFI_INVALID_PARAMETER Language is NULL.
-
   @retval EFI_INVALID_PARAMETER ControllerName is NULL.
-
   @retval EFI_UNSUPPORTED       The driver specified by This is not currently
                                 managing the controller specified by
                                 ControllerHandle and ChildHandle.
-
   @retval EFI_UNSUPPORTED       The driver specified by This does not support
                                 the language specified by Language.
 
