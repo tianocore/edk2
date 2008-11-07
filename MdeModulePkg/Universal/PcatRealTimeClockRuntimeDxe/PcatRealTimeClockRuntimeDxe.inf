@@ -2,9 +2,8 @@
 # PcRtc driver to install EFI_REAL_TIME_CLOCK_ARCH_PROTOCOL.
 #
 # This driver provides GetTime, SetTime, GetWakeupTime, SetWakeupTime services to Runtime Service Table.
-# Copyright (c) 2006 - 2007, Intel Corporation.
 #
-# Copyright (c) 2006 - 2007 Intel Corporation. <BR>
+# Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -23,7 +22,6 @@
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = InitializePcRtc
 
