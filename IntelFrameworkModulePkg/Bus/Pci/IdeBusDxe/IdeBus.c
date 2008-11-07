@@ -1427,6 +1427,7 @@ InitializeIdeBus(
              &gIDEBusComponentName,
              &gIDEBusComponentName2,
              NULL,
+             NULL,
              &gIDEBusDriverDiagnostics,
              &gIDEBusDriverDiagnostics2
              );
