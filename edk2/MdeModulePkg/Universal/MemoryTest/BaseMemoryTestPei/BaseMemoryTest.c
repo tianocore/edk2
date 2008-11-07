@@ -1,5 +1,5 @@
 /** @file
-  The PEI memory test support
+  Support of memory test in PEI Phase.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -13,9 +13,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "BaseMemoryTest.h"
-#include <Library/PeiServicesLib.h>
 
-PEI_BASE_MEMORY_TEST_PPI mPeiBaseMemoryTestPpi = { BaseMemoryTest };
+PEI_BASE_MEMORY_TEST_PPI mPeiBaseMemoryTestPpi = {
+  BaseMemoryTest
+};
 
 EFI_PEI_PPI_DESCRIPTOR   PpiListPeiBaseMemoryTest = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
@@ -23,63 +24,54 @@ EFI_PEI_PPI_DESCRIPTOR   PpiListPeiBaseMemoryTest = {
   &mPeiBaseMemoryTestPpi
 };
 
+/**
+  Entry point of BaseMemoryTestPei PEIM.
+
+  This function is the entry point of BaseMemoryTestPei PEIM.
+  It installs the PEI_BASE_MEMORY_TEST_PPI.
+
+  @param  FfsHeader      Pointer to FFS File Header.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+
+  @retval EFI_SUCCESS    PEI_BASE_MEMORY_TEST_PPI is successfully installed.
+  @retval Others         PEI_BASE_MEMORY_TEST_PPI is not successfully installed.
+
+**/  
 EFI_STATUS
 EFIAPI
 PeiBaseMemoryTestInit (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
   )
-/*++
-Description:
-
-  Entry point function of BaseMemoryTestInit Peim.
-
-Arguments:
-
-  PeiServices           - General purpose services available to every PEIM.
-  FfsHeader             - Ffs header pointer
-
-Returns:
-
-  Status                - Result of InstallPpi
-
---*/  
 {
-
   return PeiServicesInstallPpi (&PpiListPeiBaseMemoryTest);
-  
+ 
 }
 
+/**
+  Test base memory.
+
+  @param  PeiServices      An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This             Pointer to this PPI instance.
+  @param  BeginAddress     Beginning of the memory address to be checked.
+  @param  MemoryLength     Bytes of memory range to be checked.
+  @param  Operation        Type of memory check operation to be performed.
+  @param  ErrorAddress     Pointer to address of the error memory returned.
+
+  @retval EFI_SUCCESS      Memory test passed.
+  @retval EFI_DEVICE_ERROR Memory test failed.
+
+**/    
 EFI_STATUS
 EFIAPI
 BaseMemoryTest (
   IN  EFI_PEI_SERVICES                   **PeiServices,
-  IN PEI_BASE_MEMORY_TEST_PPI            *This,
+  IN  PEI_BASE_MEMORY_TEST_PPI           *This,
   IN  EFI_PHYSICAL_ADDRESS               BeginAddress,
   IN  UINT64                             MemoryLength,
   IN  PEI_MEMORY_TEST_OP                 Operation,
   OUT EFI_PHYSICAL_ADDRESS               *ErrorAddress
   )
-/*++
-Description:
-
-  Test base memory.
-
-Arguments:
-
-  PeiServices   - General purpose services available to every PEIM.
-  This          - Pei memory test PPI pointer.
-  BeginAddress  - Beginning of the memory address to be checked.
-  MemoryLength  - Bytes of memory range to be checked.
-  Operation     - Type of memory check operation to be performed.
-  ErrorAddress  - Return the address of the error memory address.
-  ErrorAddress  - Address which has error when checked.
-
-Returns:
-
-  Status        - Result of InstallPpi
-
---*/    
 {
   UINT32                TestPattern;
   EFI_PHYSICAL_ADDRESS  TempAddress;
@@ -97,15 +89,26 @@ Returns:
 
   switch (Operation) {
   case Extensive:
+    //
+    // Extensive means full and detailed check,
+    // so use small span size to cover the entire test range.
+    //
     SpanSize = 0x4;
     break;
 
   case Sparse:
   case Quick:
+    //
+    // Sparse and Quick indicates quick test,
+    // so use large span size for sample test.
+    //
     SpanSize = COVER_SPAN;
     break;
 
   case Ignore:
+    //
+    // Ignore means no test.
+    //
     goto Done;
     break;
   }
@@ -123,6 +126,9 @@ Returns:
   TempAddress = BeginAddress;
   while (TempAddress < BeginAddress + MemoryLength) {
     if ((*(UINT32 *) (UINTN) TempAddress) != TestPattern) {
+      //
+      // Value read back does not equal to the value written, so error is detected.
+      //
       *ErrorAddress = TempAddress;
       REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED, PcdGet32 (PcdStatusCodeValueUncorrectableMemoryError));
 

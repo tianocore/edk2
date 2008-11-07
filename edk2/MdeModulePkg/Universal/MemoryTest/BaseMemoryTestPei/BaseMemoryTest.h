@@ -1,5 +1,5 @@
 /** @file
-  Tiano PEIM to provide a PEI memory test service.
+  Internal include file for support of memory test in PEI Phase.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -21,38 +21,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeimEntryPoint.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PeiServicesLib.h>
 
-
-//
-// Some global define
-//
 #define COVER_SPAN    0x40000
 #define TEST_PATTERN  0x5A5A5A5A
 
-EFI_STATUS
-EFIAPI
-PeiBaseMemoryTestInit (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
-  )
-/*++
+/**
+  Test base memory.
 
-Routine Description:
+  @param  PeiServices      An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This             Pointer to this PPI instance.
+  @param  BeginAddress     Beginning of the memory address to be checked.
+  @param  MemoryLength     Bytes of memory range to be checked.
+  @param  Operation        Type of memory check operation to be performed.
+  @param  ErrorAddress     Pointer to address of the error memory returned.
 
-  TODO: Add function description
+  @retval EFI_SUCCESS      Memory test passed.
+  @retval EFI_DEVICE_ERROR Memory test failed.
 
-Arguments:
-
-  FfsHeader   - TODO: add argument description
-  PeiServices - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
-;
-
+**/    
 EFI_STATUS
 EFIAPI
 BaseMemoryTest (
@@ -62,27 +49,6 @@ BaseMemoryTest (
   IN  UINT64                             MemoryLength,
   IN  PEI_MEMORY_TEST_OP                 Operation,
   OUT EFI_PHYSICAL_ADDRESS               *ErrorAddress
-  )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PeiServices   - TODO: add argument description
-  This          - TODO: add argument description
-  BeginAddress  - TODO: add argument description
-  MemoryLength  - TODO: add argument description
-  Operation     - TODO: add argument description
-  ErrorAddress  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
-;
+  );
 
 #endif
