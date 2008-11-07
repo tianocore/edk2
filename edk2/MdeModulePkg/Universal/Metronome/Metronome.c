@@ -22,6 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#include "Metronome.h"
+
 //
 // Handle for the Metronome Architectural Protocol instance produced by this driver
 //
