@@ -1,5 +1,5 @@
 /** @file
-  The generic memory test driver definition
+  Include file of the NULL memory test driver.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _NULL_MEMORY_TEST_H
-#define _NULL_MEMORY_TEST_H
+#ifndef _NULL_MEMORY_TEST_H_
+#define _NULL_MEMORY_TEST_H_
 
 
 #include <PiDxe.h>
@@ -28,51 +28,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 
 //
-// attributes for reserved memory before it is promoted to system memory
+// Definition of memory status.
 //
 #define EFI_MEMORY_PRESENT      0x0100000000000000ULL
 #define EFI_MEMORY_INITIALIZED  0x0200000000000000ULL
 #define EFI_MEMORY_TESTED       0x0400000000000000ULL
 
+/**
+  Initialize the generic memory test.
 
-//
-// Some global define
-//
-#define GENERIC_CACHELINE_SIZE  0x40
+  This function implements EFI_GENERIC_MEMORY_TEST_PROTOCOL.MemoryTestInit.
+  It simply promotes untested reserved memory to system memory without real test.
 
-//
-// The SPARSE_SPAN_SIZE size can not small then the MonoTestSize
-//
-#define TEST_BLOCK_SIZE   0x2000000
-#define QUICK_SPAN_SIZE   (TEST_BLOCK_SIZE >> 2)
-#define SPARSE_SPAN_SIZE  (TEST_BLOCK_SIZE >> 4)
+  @param  This                Protocol instance pointer. 
+  @param  Level               The coverage level of the memory test. 
+  @param  RequireSoftECCInit  Indicate if the memory need software ECC init. 
 
-//
-// This structure records every nontested memory range parsed through GCD
-// service.
-//
-#define EFI_NONTESTED_MEMORY_RANGE_SIGNATURE  EFI_SIGNATURE_32 ('N', 'T', 'M', 'E')
-typedef struct {
-  UINTN                 Signature;
-  LIST_ENTRY            Link;
-  EFI_PHYSICAL_ADDRESS  StartAddress;
-  UINT64                Length;
-  UINT64                Capabilities;
-  BOOLEAN               Above4G;
-  BOOLEAN               AlreadyMapped;
-} NONTESTED_MEMORY_RANGE;
+  @retval EFI_SUCCESS         The generic memory test initialized correctly. 
+  @retval EFI_NO_MEDIA        There is not any non-tested memory found, in this 
+                              function if not any non-tesed memory found means  
+                              that the memory test driver have not detect any 
+                              non-tested extended memory of current system. 
 
-#define NONTESTED_MEMORY_RANGE_FROM_LINK(link) \
-        CR(link, NONTESTED_MEMORY_RANGE, Link, EFI_NONTESTED_MEMORY_RANGE_SIGNATURE)
-
-//
-// This is the memory test driver's structure definition
-//
-#define EFI_GENERIC_MEMORY_TEST_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('G', 'E', 'M', 'T')
-
-//
-// Function Prototypes
-//
+**/
 EFI_STATUS
 EFIAPI
 InitializeMemoryTest (
@@ -81,6 +59,29 @@ InitializeMemoryTest (
   OUT BOOLEAN                                  *RequireSoftECCInit
   );
 
+/**
+  Perform the memory test.
+
+  This function implements EFI_GENERIC_MEMORY_TEST_PROTOCOL.PerformMemoryTest.
+  It simply returns EFI_NOT_FOUND.
+
+  @param  This                Protocol instance pointer. 
+  @param  TestedMemorySize    Return the tested extended memory size. 
+  @param  TotalMemorySize     Return the whole system physical memory size, this  
+                              value may be changed if in some case some error  
+                              DIMMs be disabled. 
+  @param  ErrorOut            Any time the memory error occurs, this will be 
+                              TRUE. 
+  @param  IfTestAbort         Indicate if the user press "ESC" to skip the memory 
+                              test. 
+
+  @retval EFI_SUCCESS         One block of memory test ok, the block size is hide 
+                              internally. 
+  @retval EFI_NOT_FOUND       Indicate all the non-tested memory blocks have  
+                              already go through. 
+  @retval EFI_DEVICE_ERROR    Mis-compare error, and no agent can handle it
+
+**/
 EFI_STATUS
 EFIAPI
 GenPerformMemoryTest (
@@ -91,12 +92,40 @@ GenPerformMemoryTest (
   IN BOOLEAN                                   TestAbort
   );
 
+/**
+  The memory test finished.
+
+  This function implements EFI_GENERIC_MEMORY_TEST_PROTOCOL.Finished.
+  It simply returns EFI_SUCCESS.
+
+  @param  This                Protocol instance pointer. 
+
+  @retval EFI_SUCCESS         Successful free all the generic memory test driver 
+                              allocated resource and notify to platform memory 
+                              test driver that memory test finished. 
+
+**/
 EFI_STATUS
 EFIAPI
 GenMemoryTestFinished (
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This
   );
 
+/**
+  Provide capability to test compatible range which used by some special
+  driver required using memory range before BDS perform memory test.
+
+  This function implements EFI_GENERIC_MEMORY_TEST_PROTOCOL.CompatibleRangeTest.
+  It simply set the memory range to system memory.
+
+  @param  This                Protocol instance pointer. 
+  @param  StartAddress        The start address of the memory range. 
+  @param  Length              The memory range's length. 
+  
+  @retval EFI_SUCCESS           The compatible memory range pass the memory test. 
+  @retval EFI_INVALID_PARAMETER The compatible memory range must be below 16M.
+
+**/
 EFI_STATUS
 EFIAPI
 GenCompatibleRangeTest (

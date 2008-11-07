@@ -1,5 +1,5 @@
 /** @file
-  Intall memory test protocol and bypass the real memory test procedure.
+  Implementation of Generic Memory Test Protocol which does not perform real memory test.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -15,16 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "NullMemoryTest.h"
 
-//
-// Module global members
-//
 UINT64                            mTestedSystemMemory = 0;
 UINT64                            mTotalSystemMemory  = 0;
 EFI_HANDLE                        mGenericMemoryTestHandle;
 
-//
-// Driver entry here
-//
 EFI_GENERIC_MEMORY_TEST_PROTOCOL  mGenericMemoryTest = {
   InitializeMemoryTest,
   GenPerformMemoryTest,
@@ -32,51 +26,55 @@ EFI_GENERIC_MEMORY_TEST_PROTOCOL  mGenericMemoryTest = {
   GenCompatibleRangeTest
 };
 
+/**
+  Entry point of the NULL memory test driver.
+  
+  This function is the entry point of the NULL memory test driver.
+  It simply installs the Generic Memory Test Protocol.
+
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
+  @param  SystemTable    A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS    Generic Memory Test Protocol is successfully installed.
+
+**/
 EFI_STATUS
 EFIAPI
 GenericMemoryTestEntryPoint (
   IN  EFI_HANDLE           ImageHandle,
   IN  EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-Routine Description:
-
-  The generic memory test driver's entry point, it can initialize private data
-  to default value
-
-Arguments:
-
-  ImageHandle of the loaded driver
-  Pointer to the System Table
-
-Returns:
-
-  Status
-
-  EFI_SUCCESS           - Protocol successfully installed
-  EFI_OUT_OF_RESOURCES  - Can not allocate protocol data structure in base
-                          memory
-
---*/
 {
   EFI_STATUS  Status;
 
-  //
-  // Install the protocol
-  //
   Status = gBS->InstallProtocolInterface (
                   &mGenericMemoryTestHandle,
                   &gEfiGenericMemTestProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &mGenericMemoryTest
                   );
+  ASSERT_EFI_ERROR (Status);
 
-  return Status;
+  return EFI_SUCCESS;
 }
-//
-// EFI_GENERIC_MEMORY_TEST_PROTOCOL implementation
-//
+
+/**
+  Initialize the generic memory test.
+
+  This function implements EFI_GENERIC_MEMORY_TEST_PROTOCOL.MemoryTestInit.
+  It simply promotes untested reserved memory to system memory without real test.
+
+  @param  This                Protocol instance pointer. 
+  @param  Level               The coverage level of the memory test. 
+  @param  RequireSoftECCInit  Indicate if the memory need software ECC init. 
+
+  @retval EFI_SUCCESS         The generic memory test initialized correctly. 
+  @retval EFI_NO_MEDIA        There is not any non-tested memory found, in this 
+                              function if not any non-tesed memory found means  
+                              that the memory test driver have not detect any 
+                              non-tested extended memory of current system. 
+
+**/
 EFI_STATUS
 EFIAPI
 InitializeMemoryTest (
@@ -84,15 +82,6 @@ InitializeMemoryTest (
   IN  EXTENDMEM_COVERAGE_LEVEL                 Level,
   OUT BOOLEAN                                  *RequireSoftECCInit
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   UINTN                           NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR *MemorySpaceMap;
@@ -104,6 +93,9 @@ Returns:
         (MemorySpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
           (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)
           ) {
+      //
+      // For those reserved memory that have not been tested, simply promote to system memory.
+      //
       gDS->RemoveMemorySpace (
             MemorySpaceMap[Index].BaseAddress,
             MemorySpaceMap[Index].Length
@@ -130,6 +122,29 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Perform the memory test.
+
+  This function implements EFI_GENERIC_MEMORY_TEST_PROTOCOL.PerformMemoryTest.
+  It simply returns EFI_NOT_FOUND.
+
+  @param  This                Protocol instance pointer. 
+  @param  TestedMemorySize    Return the tested extended memory size. 
+  @param  TotalMemorySize     Return the whole system physical memory size, this  
+                              value may be changed if in some case some error  
+                              DIMMs be disabled. 
+  @param  ErrorOut            Any time the memory error occurs, this will be 
+                              TRUE. 
+  @param  IfTestAbort         Indicate if the user press "ESC" to skip the memory 
+                              test. 
+
+  @retval EFI_SUCCESS         One block of memory test ok, the block size is hide 
+                              internally. 
+  @retval EFI_NOT_FOUND       Indicate all the non-tested memory blocks have  
+                              already go through. 
+  @retval EFI_DEVICE_ERROR    Mis-compare error, and no agent can handle it
+
+**/
 EFI_STATUS
 EFIAPI
 GenPerformMemoryTest (
@@ -139,15 +154,6 @@ GenPerformMemoryTest (
   OUT BOOLEAN                                  *ErrorOut,
   IN BOOLEAN                                   TestAbort
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   *ErrorOut         = FALSE;
   *TestedMemorySize = mTestedSystemMemory;
@@ -157,24 +163,43 @@ Returns:
 
 }
 
+/**
+  The memory test finished.
+
+  This function implements EFI_GENERIC_MEMORY_TEST_PROTOCOL.Finished.
+  It simply returns EFI_SUCCESS.
+
+  @param  This                Protocol instance pointer. 
+
+  @retval EFI_SUCCESS         Successful free all the generic memory test driver 
+                              allocated resource and notify to platform memory 
+                              test driver that memory test finished. 
+
+**/
 EFI_STATUS
 EFIAPI
 GenMemoryTestFinished (
   IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   return EFI_SUCCESS;
 }
 
+/**
+  Provide capability to test compatible range which used by some special
+  driver required using memory range before BDS perform memory test.
+
+  This function implements EFI_GENERIC_MEMORY_TEST_PROTOCOL.CompatibleRangeTest.
+  It simply sets the memory range to system memory.
+
+  @param  This                Protocol instance pointer. 
+  @param  StartAddress        The start address of the memory range. 
+  @param  Length              The memory range's length. 
+  
+  @retval EFI_SUCCESS           The compatible memory range pass the memory test. 
+  @retval EFI_INVALID_PARAMETER The compatible memory range must be below 16M.
+
+**/
 EFI_STATUS
 EFIAPI
 GenCompatibleRangeTest (
@@ -182,19 +207,10 @@ GenCompatibleRangeTest (
   IN  EFI_PHYSICAL_ADDRESS                     StartAddress,
   IN  UINT64                                   Length
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR descriptor;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
 
-  gDS->GetMemorySpaceDescriptor (StartAddress, &descriptor);
+  gDS->GetMemorySpaceDescriptor (StartAddress, &Descriptor);
 
   gDS->RemoveMemorySpace (StartAddress, Length);
 
@@ -202,7 +218,7 @@ Returns:
         EfiGcdMemoryTypeSystemMemory,
         StartAddress,
         Length,
-        descriptor.Capabilities &~(EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
+        Descriptor.Capabilities &~(EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
         );
 
   return EFI_SUCCESS;

@@ -1,9 +1,5 @@
 #/** @file
-#  
-#    Component description file for NullMemoryTest module.
-#  
-#   This driver installs EFI_GENERIC_MEMORY_TEST_PROTOCOL to 
-#    provide simple generic memory test functions.
+#   This driver installs Generic Memory Test Protocol which does not perform real memory test.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
