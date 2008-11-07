@@ -22,22 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <PiDxe.h>
-#include <Protocol/Metronome.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/TimerLib.h>
-#include <Library/DebugLib.h>
-
-//
-// Function Prototypes
-//
-EFI_STATUS
-EFIAPI
-WaitForTick (
-  IN EFI_METRONOME_ARCH_PROTOCOL  *This,
-  IN UINT32                       TickNumber
-  );
-
 //
 // Handle for the Metronome Architectural Protocol instance produced by this driver
 //
@@ -52,6 +36,9 @@ EFI_METRONOME_ARCH_PROTOCOL mMetronome = {
 };
 
 /**
+  Waits for the specified number of ticks.
+  
+  This function implements EFI_METRONOME_ARCH_PROTOCOL.WaitForTick().
   The WaitForTick() function waits for the number of ticks specified by 
   TickNumber from a known time source in the platform.  If TickNumber of 
   ticks are detected, then EFI_SUCCESS is returned.  The actual time passed 
