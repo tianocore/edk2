@@ -118,6 +118,7 @@ InitializeWinNtBlockIo(
              &gWinNtBlockIoComponentName,
              &gWinNtBlockIoComponentName2,
              NULL,
+             NULL,
              &gWinNtBlockIoDriverDiagnostics,
              &gWinNtBlockIoDriverDiagnostics2
              );
