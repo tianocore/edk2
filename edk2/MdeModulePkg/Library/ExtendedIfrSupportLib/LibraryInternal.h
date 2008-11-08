@@ -34,6 +34,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <MdeModuleHii.h>
 
-extern EFI_GUID mIfrVendorGuid;
+extern CONST EFI_GUID mIfrVendorGuid;
 
 #endif
