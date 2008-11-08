@@ -53,7 +53,7 @@ ExtendedIfrSupportLibConstructor (
 
 
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
+GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
 
 /**
   Extract formset class for given HII handle.

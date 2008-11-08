@@ -179,7 +179,8 @@ UpdateFormPackageData (
 
       ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
       CopyMem (&LabelNumber, &((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number, sizeof (UINT16));
-      if ((ExtendOpCode != EFI_IFR_EXTEND_OP_LABEL) || (LabelNumber != Label)) {
+      if ((ExtendOpCode != EFI_IFR_EXTEND_OP_LABEL) || (LabelNumber != Label) 
+          || !CompareGuid (&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid, &mIfrVendorGuid)) {
         //
         // Go to the next Op-Code
         //
@@ -218,7 +219,7 @@ UpdateFormPackageData (
           IfrOpHdr = (EFI_IFR_OP_HEADER *) ((CHAR8 *) (IfrOpHdr) + IfrOpHdr->Length);
           if (IfrOpHdr->OpCode == EFI_IFR_GUID_OP) {
             ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
-            if (ExtendOpCode == EFI_IFR_EXTEND_OP_LABEL) {
+            if ((ExtendOpCode == EFI_IFR_EXTEND_OP_LABEL) && CompareGuid (&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid, &mIfrVendorGuid)) {
               break;
             }
           }
