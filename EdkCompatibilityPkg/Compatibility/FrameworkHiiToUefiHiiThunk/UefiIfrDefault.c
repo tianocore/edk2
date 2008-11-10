@@ -24,9 +24,9 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#include "HiiDatabase.h"
 #include "UefiIfrParser.h"
 #include "UefiIfrDefault.h"
-#include "HiiDatabase.h"
 
 //
 // Extern Variables
@@ -35,216 +35,6 @@ extern CONST EFI_HII_DATABASE_PROTOCOL            *mHiiDatabase;
 extern CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
 extern CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
 extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
-
-extern EFI_GUID          gZeroGuid;
-
-/**
-  Fetch the Ifr binary data of a FormSet.
-
-  @param  Handle                 PackageList Handle
-  @param  FormSetGuid            GUID of a formset. If not specified (NULL or zero
-                                 GUID), take the first FormSet found in package
-                                 list.
-  @param  BinaryLength           The length of the FormSet IFR binary.
-  @param  BinaryData             The buffer designed to receive the FormSet.
-
-  @retval EFI_SUCCESS            Buffer filled with the requested FormSet.
-                                 BufferLength was updated.
-  @retval EFI_INVALID_PARAMETER  The handle is unknown.
-  @retval EFI_NOT_FOUND          A form or FormSet on the requested handle cannot
-                                 be found with the requested FormId.
-
-**/
-EFI_STATUS
-GetIfrBinaryData (
-  IN  EFI_HII_HANDLE   Handle,
-  IN OUT EFI_GUID      *FormSetGuid,
-  OUT UINTN            *BinaryLength,
-  OUT UINT8            **BinaryData
-  )
-{
-  EFI_STATUS                   Status;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINTN                        BufferSize;
-  UINT8                        *Package;
-  UINT8                        *OpCodeData;
-  UINT32                       Offset;
-  UINT32                       Offset2;
-  BOOLEAN                      ReturnDefault;
-  UINT32                       PackageListLength;
-  EFI_HII_PACKAGE_HEADER       PackageHeader;
-
-  OpCodeData = NULL;
-  Package = NULL;
-  ZeroMem (&PackageHeader, sizeof (EFI_HII_PACKAGE_HEADER));;
-
-  //
-  // if FormSetGuid is NULL or zero GUID, return first FormSet in the package list
-  //
-  if (FormSetGuid == NULL || CompareGuid (FormSetGuid, &gZeroGuid)) {
-    ReturnDefault = TRUE;
-  } else {
-    ReturnDefault = FALSE;
-  }
-
-  //
-  // Get HII PackageList
-  //
-  BufferSize = 0;
-  HiiPackageList = NULL;
-  Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    HiiPackageList = AllocatePool (BufferSize);
-    ASSERT (HiiPackageList != NULL);
-
-    Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  }
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Get Form package from this HII package List
-  //
-  Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  Offset2 = 0;
-  CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
-
-  while (Offset < PackageListLength) {
-    Package = ((UINT8 *) HiiPackageList) + Offset;
-    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-
-    if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
-      //
-      // Search FormSet in this Form Package
-      //
-      Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
-      while (Offset2 < PackageHeader.Length) {
-        OpCodeData = Package + Offset2;
-
-        if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
-          //
-          // Check whether return default FormSet
-          //
-          if (ReturnDefault) {
-            break;
-          }
-
-          //
-          // FormSet GUID is specified, check it
-          //
-          if (CompareGuid (FormSetGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
-            break;
-          }
-        }
-
-        Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-      }
-
-      if (Offset2 < PackageHeader.Length) {
-        //
-        // Target formset found
-        //
-        break;
-      }
-    }
-
-    Offset += PackageHeader.Length;
-  }
-
-  if (Offset >= PackageListLength) {
-    //
-    // Form package not found in this Package List
-    //
-    gBS->FreePool (HiiPackageList);
-    return EFI_NOT_FOUND;
-  }
-
-  if (ReturnDefault && FormSetGuid != NULL) {
-    //
-    // Return the default FormSet GUID
-    //
-    CopyMem (FormSetGuid, &((EFI_IFR_FORM_SET *) OpCodeData)->Guid, sizeof (EFI_GUID));
-  }
-
-  //
-  // To determine the length of a whole FormSet IFR binary, one have to parse all the Opcodes
-  // in this FormSet; So, here just simply copy the data from start of a FormSet to the end
-  // of the Form Package.
-  //
-  *BinaryLength = PackageHeader.Length - Offset2;
-  *BinaryData = AllocateCopyPool (*BinaryLength, OpCodeData);
-
-  gBS->FreePool (HiiPackageList);
-
-  if (*BinaryData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Initialize the internal data structure of a FormSet.
-
-  @param  Handle                 PackageList Handle
-  @param  FormSetGuid            GUID of a formset. If not specified (NULL or zero
-                                 GUID), take the first FormSet found in package
-                                 list.
-  @param  FormSet                FormSet data structure.
-
-  @retval EFI_SUCCESS            The function completed successfully.
-  @retval EFI_NOT_FOUND          The specified FormSet could not be found.
-
-**/
-EFI_STATUS
-InitializeFormSet (
-  IN  EFI_HII_HANDLE                   Handle,
-  IN OUT EFI_GUID                      *FormSetGuid,
-  OUT FORM_BROWSER_FORMSET             *FormSet
-  )
-{
-  EFI_STATUS                Status;
-  EFI_HANDLE                DriverHandle;
-
-  Status = GetIfrBinaryData (Handle, FormSetGuid, &FormSet->IfrBinaryLength, &FormSet->IfrBinaryData);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  FormSet->HiiHandle = Handle;
-  CopyMem (&FormSet->Guid, FormSetGuid, sizeof (EFI_GUID));
-
-  //
-  // Retrieve ConfigAccess Protocol associated with this HiiPackageList
-  //
-  Status = mHiiDatabase->GetPackageListHandle (mHiiDatabase, Handle, &DriverHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  FormSet->DriverHandle = DriverHandle;
-  Status = gBS->HandleProtocol (
-                  DriverHandle,
-                  &gEfiHiiConfigAccessProtocolGuid,
-                  (VOID **) &FormSet->ConfigAccess
-                  );
-  if (EFI_ERROR (Status)) {
-    //
-    // Configuration Driver don't attach ConfigAccess protocol to its HII package
-    // list, then there will be no configuration action required
-    //
-    FormSet->ConfigAccess = NULL;
-  }
-
-  //
-  // Parse the IFR binary OpCodes
-  //
-  Status = ParseOpCodes (FormSet);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  return Status;
-}
 
 /**
   Set the data position at Offset with Width in Node->Buffer based 
@@ -275,6 +65,11 @@ SetNodeBuffer (
 
 /**
   Reset Question to its default value.
+
+  Note Framework 0.92's HII Implementation does not support for default value for these opcodes:
+  EFI_IFR_ORDERED_LIST_OP:
+  EFI_IFR_PASSWORD_OP:
+  EFI_IFR_STRING_OP:
 
   @param  FormSet                FormSet data structure.
   @param  DefaultId              The Class of the default.
@@ -330,22 +125,10 @@ GetQuestionDefault (
       Default = QUESTION_DEFAULT_FROM_LINK (Link);
 
       if (Default->DefaultId == DefaultId) {
-        if (Default->ValueExpression != NULL) {
-          //
-          // Default is provided by an Expression, evaluate it
-          //
-          Status = EvaluateExpression (FormSet, Form, Default->ValueExpression);
-          if (EFI_ERROR (Status)) {
-            return Status;
-          }
-
-          CopyMem (HiiValue, &Default->ValueExpression->Result, sizeof (EFI_HII_VALUE));
-        } else {
-          //
-          // Default value is embedded in EFI_IFR_DEFAULT
-          //
-          CopyMem (HiiValue, &Default->Value, sizeof (EFI_HII_VALUE));
-        }
+        //
+        // Default value is embedded in EFI_IFR_DEFAULT
+        //
+        CopyMem (HiiValue, &Default->Value, sizeof (EFI_HII_VALUE));
        
         SetNodeBuffer (Node, HiiValue, Question->VarStoreInfo.VarOffset, Question->StorageWidth);
         return EFI_SUCCESS;
@@ -580,41 +363,30 @@ GetBufferTypeDefaultId (
 **/
 EFI_STATUS
 UefiIfrGetBufferTypeDefaults (
-  IN  EFI_HII_HANDLE      UefiHiiHandle,
+  IN  HII_THUNK_CONTEXT   *ThunkContext,
   OUT LIST_ENTRY          **UefiDefaults
   )
 {
-  FORM_BROWSER_FORMSET *FormSet;
-  EFI_GUID              FormSetGuid;
   LIST_ENTRY            *DefaultLink;
   FORMSET_DEFAULTSTORE  *DefaultStore;
   EFI_STATUS            Status;
 
   ASSERT (UefiDefaults != NULL);
 
-  FormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));    
-  ASSERT (FormSet != NULL);
-
-  CopyGuid (&FormSetGuid, &gZeroGuid);
-  Status = InitializeFormSet (UefiHiiHandle, &FormSetGuid, FormSet);
-  ASSERT_EFI_ERROR (Status);
-
   *UefiDefaults = AllocateZeroPool (sizeof (LIST_ENTRY));
   ASSERT (UefiDefaults != NULL);
   InitializeListHead (*UefiDefaults);
 
-  DefaultLink = GetFirstNode (&FormSet->DefaultStoreListHead);
-  while (!IsNull (&FormSet->DefaultStoreListHead, DefaultLink)) {
+  DefaultLink = GetFirstNode (&ThunkContext->FormSet->DefaultStoreListHead);
+  while (!IsNull (&ThunkContext->FormSet->DefaultStoreListHead, DefaultLink)) {
     DefaultStore = FORMSET_DEFAULTSTORE_FROM_LINK(DefaultLink);
 
-    Status = GetBufferTypeDefaultId (DefaultStore, FormSet, *UefiDefaults);
+    Status = GetBufferTypeDefaultId (DefaultStore, ThunkContext->FormSet, *UefiDefaults);
     ASSERT_EFI_ERROR (Status);
 
-    DefaultLink = GetNextNode (&FormSet->DefaultStoreListHead, DefaultLink);    
+    DefaultLink = GetNextNode (&ThunkContext->FormSet->DefaultStoreListHead, DefaultLink);    
   }
 
-  DestroyFormSet (FormSet);
-  
   return EFI_SUCCESS;
 }
 
@@ -642,6 +414,7 @@ EFI_STATUS
 UefiDefaultsToFwDefaults (
   IN     LIST_ENTRY                  *ListHead,
   IN     UINTN                       DefaultMask,
+  IN     EFI_VARSTORE_ID             UefiFormSetDefaultVarStoreId,
   OUT    EFI_HII_VARIABLE_PACK_LIST  **VariablePackList
   )
 {
@@ -713,9 +486,9 @@ UefiDefaultsToFwDefaults (
       //
       // In UEFI, 0 is defined to be invalid for EFI_IFR_VARSTORE.VarStoreId.
       // So the default storage of Var Store in VFR from a Framework module 
-      // should be translated to 0x0001 (RESERVED_VARSTORE_ID).
+      // should be translated to 0x0001 (FRAMEWORK_RESERVED_VARSTORE_ID).
       //
-      if (Node->StoreId == RESERVED_VARSTORE_ID) {
+      if (Node->StoreId == UefiFormSetDefaultVarStoreId) {
         Pack->VariableId = 0;
       } else {
         Pack->VariableId = Node->StoreId;

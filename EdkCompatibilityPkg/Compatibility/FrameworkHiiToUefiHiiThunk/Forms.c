@@ -55,6 +55,8 @@ FW_HII_FORMSET_TEMPLATE FormSetTemplate = {
 };
 
 
+EFI_GUID  mTianoHiiIfrGuid              = EFI_IFR_TIANO_GUID;
+
 /**
 
   This thunk module only handles UEFI HII packages. The caller of this function 
@@ -144,10 +146,12 @@ HiiGetForms (
   CopyMem (OutputFormSet, &FormSetTemplate, sizeof (FW_HII_FORMSET_TEMPLATE));
   CopyMem (&OutputFormSet->FormSet.Guid, &ThunkContext->TagGuid, sizeof (EFI_GUID)); 
 
-  OutputFormSet->FormSet.Class = ThunkContext->FormSetClass;
-  OutputFormSet->FormSet.SubClass = ThunkContext->FormSetSubClass;
-  OutputFormSet->FormSet.Help     = ThunkContext->FormSetHelp;
-  OutputFormSet->FormSet.FormSetTitle = ThunkContext->FormSetTitle;
+  if (ThunkContext->FormSet != NULL) {
+    OutputFormSet->FormSet.Class = ThunkContext->FormSet->Class;
+    OutputFormSet->FormSet.SubClass = ThunkContext->FormSet->SubClass;
+    OutputFormSet->FormSet.Help     = ThunkContext->FormSet->Help;
+    OutputFormSet->FormSet.FormSetTitle = ThunkContext->FormSet->FormSetTitle;
+  }
 
   return EFI_SUCCESS;
 }
@@ -182,25 +186,25 @@ HiiGetDefaultImage (
   )
 {
   LIST_ENTRY        *UefiDefaults;
-  EFI_HII_HANDLE    UefiHiiHandle;
   EFI_STATUS        Status;
   HII_THUNK_PRIVATE_DATA *Private;
+  HII_THUNK_CONTEXT *ThunkContext;
 
   Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  UefiHiiHandle = FwHiiHandleToUefiHiiHandle (Private, Handle);
-  if (UefiHiiHandle == NULL) {
+  ThunkContext = FwHiiHandleToThunkContext (Private, Handle);
+  if (ThunkContext == NULL) {
     ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
   }
 
   UefiDefaults = NULL;
-  Status = UefiIfrGetBufferTypeDefaults (UefiHiiHandle, &UefiDefaults);
+  Status = UefiIfrGetBufferTypeDefaults (ThunkContext, &UefiDefaults);
   if (EFI_ERROR (Status)) {
     goto Done;
   }
 
-  Status = UefiDefaultsToFwDefaults (UefiDefaults, DefaultMask, VariablePackList);
+  Status = UefiDefaultsToFwDefaults (UefiDefaults, DefaultMask, ThunkContext->FormSet->DefaultVarStoreId, VariablePackList);
 
 Done:
   FreeDefaultList (UefiDefaults);
@@ -209,12 +213,15 @@ Done:
 }
 
 /**
-  EDES_TODO: Add function description.
+  This function update the FormCallbackProtocol cached in Config Access
+  private context data.
 
-  @param CallbackHandle  EDES_TODO: Add parameter description
-  @param ThunkContext  EDES_TODO: Add parameter description
+  @param CallbackHandle  The EFI Handle on which the Framework FormCallbackProtocol is 
+                         installed.
+  @param ThunkContext    The Thunk Context.
 
-  @return EDES_TODO: Add description for return value
+  @retval EFI_SUCCESS             The update is successful.
+  @retval EFI_INVALID_PARAMETER   If no Framework FormCallbackProtocol is located on CallbackHandle.
 
 **/
 EFI_STATUS
@@ -260,17 +267,17 @@ UpdateFormCallBack (
 
 
 /**
-  EDES_TODO: Add function description.
+  Get the package data from the Package List.
 
-  @param HiiPackageList  EDES_TODO: Add parameter description
-  @param PackageIndex    EDES_TODO: Add parameter description
-  @param BufferLen       EDES_TODO: Add parameter description
-  @param Buffer          EDES_TODO: Add parameter description
+  @param HiiPackageList  Package List.
+  @param PackageIndex    The index of the Package in the Package List.
+  @param BufferLen       The Length of the Pacage data.
+  @param Buffer          On output, the Package data.
 
-  @return EDES_TODO: Add description for return value
+  @return EFI_NOT_FOUND  No Package is found for PackageIndex.
+  @return EFI_SUCCESS    The package data is returned.
 
 **/
-STATIC
 EFI_STATUS
 GetPackageData (
   IN  EFI_HII_PACKAGE_LIST_HEADER *HiiPackageList,
@@ -317,10 +324,16 @@ GetPackageData (
 }
 
 /**
-  Check if Label exist in the IFR form package.
+  Check if Label exist in the IFR form package and return the FormSet GUID
+  and Form ID.
 
-  @param 
+  @param Package      The Package Header.
+  @param Label        The Label ID.
+  @param FormsetGuid  Returns the FormSet GUID.
+  @param FormId       Returns the Form ID.
 
+  @retval EFI_SUCCESS     The FORM ID is found.
+  @retval EFI_NOT_FOUND   The FORM ID is not found.
 **/
 EFI_STATUS
 LocateLabel (
@@ -332,12 +345,11 @@ LocateLabel (
 {
   UINTN                     Offset;
   EFI_IFR_OP_HEADER         *IfrOpHdr;
-  UINT8                     ExtendOpCode;
-  UINT16                    LabelNumber;
   EFI_GUID                  InternalFormSetGuid;
   EFI_FORM_ID               InternalFormId;
   BOOLEAN                   GetFormSet;
   BOOLEAN                   GetForm;
+  EFI_IFR_GUID_LABEL        *LabelOpcode;
 
   IfrOpHdr   = (EFI_IFR_OP_HEADER *)((UINT8 *) Package + sizeof (EFI_HII_PACKAGE_HEADER));
   Offset     = sizeof (EFI_HII_PACKAGE_HEADER);
@@ -360,26 +372,18 @@ LocateLabel (
       break;
 
     case EFI_IFR_GUID_OP :
-      ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
-      
-      if (ExtendOpCode != EFI_IFR_EXTEND_OP_LABEL) {
-        //
-        // Go to the next Op-Code
-        //
-        Offset   += IfrOpHdr->Length;
-        IfrOpHdr = (EFI_IFR_OP_HEADER *) ((CHAR8 *) (IfrOpHdr) + IfrOpHdr->Length);
-        continue;
+      LabelOpcode = (EFI_IFR_GUID_LABEL *) IfrOpHdr;
+      //
+      // If it is an Label opcode.
+      //
+      if ((LabelOpcode->ExtendOpCode == EFI_IFR_EXTEND_OP_LABEL) && (CompareMem (&LabelOpcode->Guid, &mTianoHiiIfrGuid, sizeof (EFI_GUID)) == 0)) {
+        if (CompareMem (&Label, &LabelOpcode->Number, sizeof (UINT16)) == 0) {
+          ASSERT (GetForm && GetFormSet);
+          CopyGuid (FormsetGuid, &InternalFormSetGuid);
+          *FormId = InternalFormId;
+          return EFI_SUCCESS;
+        }
       }
-      
-      CopyMem (&LabelNumber, &((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number, sizeof (UINT16));
-      if (LabelNumber == Label) {
-        ASSERT (GetForm && GetFormSet);
-        CopyGuid (FormsetGuid, &InternalFormSetGuid);
-        *FormId = InternalFormId;
-        return EFI_SUCCESS;
-      }
-      
-
       break;
     default :
       break;
@@ -462,6 +466,7 @@ Done:
   
   return Status;
 }
+
 /**
   This function allows the caller to update a form that has
   previously been registered with the EFI HII database.
@@ -539,10 +544,10 @@ HiiUpdateForm (
     if (Data->DataCount != 0) {
 
       ThunkContext = UefiHiiHandleToThunkContext (Private, UefiHiiHandle);
-      Status = FwUpdateDataToUefiUpdateData (ThunkContext, Data, AddData, &UefiHiiUpdateData);
+      Status = FwUpdateDataToUefiUpdateData (ThunkContext, Data, &UefiHiiUpdateData);
       ASSERT_EFI_ERROR (Status);
 
-      Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, AddData, UefiHiiUpdateData);
+      Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, TRUE, UefiHiiUpdateData);
       ASSERT_EFI_ERROR (Status);
       
     } 

@@ -51,6 +51,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <MdeModuleHii.h>
 
+#include "UefiIfrParser.h"
+
 
 //
 // VARSTORE ID of 0 for Buffer Storage Type Storage is reserved in UEFI IFR form. But VARSTORE ID
@@ -59,7 +61,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Framework VFR has to be ported or pre-processed to change the default VARSTORE to a VARSTORE
 // with ID equal to 0x0001.
 //
-#define RESERVED_VARSTORE_ID 0x0001
+#define FRAMEWORK_RESERVED_VARSTORE_ID 0x0001
 
 
 #pragma pack (push, 1)
@@ -86,32 +88,6 @@ typedef struct {
 } HII_THUNK_PRIVATE_DATA;
 
 
-
-#define ONE_OF_OPTION_MAP_ENTRY_FROM_LINK(Record) CR(Record, ONE_OF_OPTION_MAP_ENTRY, Link, ONE_OF_OPTION_MAP_ENTRY_SIGNATURE)
-#define ONE_OF_OPTION_MAP_ENTRY_SIGNATURE            EFI_SIGNATURE_32 ('O', 'O', 'M', 'E')
-typedef struct {
-  UINT32              Signature;
-  LIST_ENTRY          Link;
-
-  UINT16              FwKey;
-  EFI_IFR_TYPE_VALUE  Value;
-  
-} ONE_OF_OPTION_MAP_ENTRY;
-
-
-
-#define ONE_OF_OPTION_MAP_FROM_LINK(Record) CR(Record, ONE_OF_OPTION_MAP, Link, ONE_OF_OPTION_MAP_SIGNATURE)
-#define ONE_OF_OPTION_MAP_SIGNATURE            EFI_SIGNATURE_32 ('O', 'O', 'O', 'M')
-typedef struct {
-  UINT32            Signature;
-  LIST_ENTRY        Link;       
-
-  UINT8             ValueType; //EFI_IFR_TYPE_NUM_* 
-
-  EFI_QUESTION_ID   QuestionId;
-
-  LIST_ENTRY        OneOfOptionMapEntryListHead; //ONE_OF_OPTION_MAP_ENTRY
-} ONE_OF_OPTION_MAP;
 
 
 
@@ -161,17 +137,10 @@ typedef struct {
   // TagGuid is the used to record this GuidId.
   EFI_GUID                   TagGuid;
 
-  LIST_ENTRY                 QuestionIdMapListHead; //QUESTION_ID_MAP
-
-  LIST_ENTRY                 OneOfOptionMapListHead; //ONE_OF_OPTION_MAP
-
   UINT8                      *NvMapOverride;
 
-  UINT16                     FormSetClass;
-  UINT16                     FormSetSubClass;
-  STRING_REF                 FormSetTitle;
-  STRING_REF                 FormSetHelp;
-  
+  FORM_BROWSER_FORMSET       *FormSet;
+
 } HII_THUNK_CONTEXT;
 
 
@@ -198,8 +167,6 @@ typedef struct {
   // Framework's callback
   //
   EFI_FORM_CALLBACK_PROTOCOL     *FormCallbackProtocol;
-
-  LIST_ENTRY                     BufferStorageListHead;
 
   HII_THUNK_CONTEXT              *ThunkContext;
 } CONFIG_ACCESS_PRIVATE;

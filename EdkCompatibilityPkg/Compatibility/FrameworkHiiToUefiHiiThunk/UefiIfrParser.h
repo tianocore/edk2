@@ -1,6 +1,12 @@
 /** @file
   Function and Macro defintions for IFR parsing. To get the default value from IFR package, the IFR
   opcode needs to be parsed. Most of code is taken from MdeModulePkg\Universal\SetupBrowserDxe\IfrParse.c.
+  This parser is simplified from the origianl IfrParser.c in the following way:
+
+  1) All data structure definition that have nothing to do with IFR Default value scanning (
+     required to implement Framework HII's GetDefaultImage ()) is removed.
+  2) Ignore the IFR opcode which is invalid for Form Package
+     generated using Framework VFR file.
 
   Copyright (c) 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -16,13 +22,6 @@
 #ifndef _HII_THUNK_UEFI_IFR_PARSER_
 #define _HII_THUNK_UEFI_IFR_PARSER_
 
-#include <PiDxe.h>
-
-#include <Protocol/Print.h>
-#include <Protocol/HiiConfigAccess.h>
-#include <Protocol/HiiConfigRouting.h>
-#include <Protocol/HiiDatabase.h>
-#include <Protocol/HiiString.h>
 
 //
 // IFR relative definition
@@ -44,6 +43,34 @@
 
 extern EFI_GUID  gTianoHiiIfrGuid;
 
+#define ONE_OF_OPTION_MAP_ENTRY_FROM_LINK(Record) CR(Record, ONE_OF_OPTION_MAP_ENTRY, Link, ONE_OF_OPTION_MAP_ENTRY_SIGNATURE)
+#define ONE_OF_OPTION_MAP_ENTRY_SIGNATURE            EFI_SIGNATURE_32 ('O', 'O', 'M', 'E')
+typedef struct {
+  UINT32              Signature;
+  LIST_ENTRY          Link;
+
+  UINT16              FwKey;
+  EFI_IFR_TYPE_VALUE  Value;
+  
+} ONE_OF_OPTION_MAP_ENTRY;
+
+
+
+#define ONE_OF_OPTION_MAP_FROM_LINK(Record) CR(Record, ONE_OF_OPTION_MAP, Link, ONE_OF_OPTION_MAP_SIGNATURE)
+#define ONE_OF_OPTION_MAP_SIGNATURE            EFI_SIGNATURE_32 ('O', 'O', 'O', 'M')
+typedef struct {
+  UINT32            Signature;
+  LIST_ENTRY        Link;       
+
+  UINT16            VarStoreId;
+
+  UINT8             ValueType; //EFI_IFR_TYPE_NUM_* 
+
+  EFI_QUESTION_ID   QuestionId;
+
+  LIST_ENTRY        OneOfOptionMapEntryListHead; //ONE_OF_OPTION_MAP_ENTRY
+} ONE_OF_OPTION_MAP;
+
 
 typedef struct {
   UINT8               Type;
@@ -51,16 +78,6 @@ typedef struct {
 } EFI_HII_VALUE;
 
 #define NAME_VALUE_NODE_SIGNATURE  EFI_SIGNATURE_32 ('N', 'V', 'S', 'T')
-
-typedef struct {
-  UINTN            Signature;
-  LIST_ENTRY       Link;
-  CHAR16           *Name;
-  CHAR16           *Value;
-  CHAR16           *EditValue;
-} NAME_VALUE_NODE;
-
-#define NAME_VALUE_NODE_FROM_LINK(a)  CR (a, NAME_VALUE_NODE, Link, NAME_VALUE_NODE_SIGNATURE)
 
 #define FORMSET_STORAGE_SIGNATURE  EFI_SIGNATURE_32 ('F', 'S', 'T', 'G')
 
@@ -75,20 +92,14 @@ typedef struct {
 
   CHAR16           *Name;          // For EFI_IFR_VARSTORE
   UINT16           Size;
-  UINT8            *Buffer;
-  UINT8            *EditBuffer;    // Edit copy for Buffer Storage
-
-  LIST_ENTRY       NameValueListHead; // List of NAME_VALUE_NODE
 
   UINT32           Attributes;     // For EFI_IFR_VARSTORE_EFI: EFI Variable attribute
 
-  CHAR16           *ConfigHdr;     // <ConfigHdr>
-  CHAR16           *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
-  UINTN            ElementCount;   // Number of <RequestElement> in the <ConfigRequest>
-  UINTN            SpareStrLen;    // Spare length of ConfigRequest string buffer
 } FORMSET_STORAGE;
 
 #define FORMSET_STORAGE_FROM_LINK(a)  CR (a, FORMSET_STORAGE, Link, FORMSET_STORAGE_SIGNATURE)
+
+#if 0
 
 #define EXPRESSION_OPCODE_SIGNATURE  EFI_SIGNATURE_32 ('E', 'X', 'O', 'P')
 
@@ -133,6 +144,7 @@ typedef struct {
 } FORM_EXPRESSION;
 
 #define FORM_EXPRESSION_FROM_LINK(a)  CR (a, FORM_EXPRESSION, Link, FORM_EXPRESSION_SIGNATURE)
+#endif
 
 #define QUESTION_DEFAULT_SIGNATURE  EFI_SIGNATURE_32 ('Q', 'D', 'F', 'T')
 
@@ -143,7 +155,6 @@ typedef struct {
   UINT16              DefaultId;
   EFI_HII_VALUE       Value;              // Default value
 
-  FORM_EXPRESSION     *ValueExpression;   // Not-NULL indicates default value is provided by EFI_IFR_VALUE
 } QUESTION_DEFAULT;
 
 #define QUESTION_DEFAULT_FROM_LINK(a)  CR (a, QUESTION_DEFAULT, Link, QUESTION_DEFAULT_SIGNATURE)
@@ -159,7 +170,9 @@ typedef struct {
   EFI_HII_VALUE       Value;
   EFI_IMAGE_ID        ImageId;
 
+#if 0
   FORM_EXPRESSION     *SuppressExpression; // Non-NULL indicates nested inside of SuppressIf
+#endif
 } QUESTION_OPTION;
 
 #define QUESTION_OPTION_FROM_LINK(a)  CR (a, QUESTION_OPTION, Link, QUESTION_OPTION_SIGNATURE)
@@ -188,10 +201,17 @@ typedef struct {
     EFI_STRING_ID       VarName;
     UINT16              VarOffset;
   }  VarStoreInfo;
+#if 0
+  CHAR16                *UnicodeVarName;
+#endif
+  
   UINT16                StorageWidth;
   UINT8                 QuestionFlags;
+
+#if 0
   CHAR16                *VariableName;    // Name/Value or EFI Variable name
   CHAR16                *BlockName;       // Buffer storage block name: "OFFSET=...WIDTH=..."
+#endif
 
   EFI_HII_VALUE         HiiValue;         // Edit copy for checkbox, numberic, oneof
   UINT8                 *BufferValue;     // Edit copy for string, password, orderedlist
@@ -219,7 +239,9 @@ typedef struct {
   //
   // Get from IFR parsing
   //
+#if 0
   FORM_EXPRESSION       *ValueExpression;    // nested EFI_IFR_VALUE, provide Question value and indicate Question is ReadOnly
+#endif
   LIST_ENTRY            DefaultListHead;     // nested EFI_IFR_DEFAULT list (QUESTION_DEFAULT), provide default values
   LIST_ENTRY            OptionListHead;      // nested EFI_IFR_ONE_OF_OPTION list (QUESTION_OPTION)
 
@@ -227,10 +249,12 @@ typedef struct {
   UINT8                 RefreshInterval;     // nested EFI_IFR_REFRESH, refresh interval(in seconds) for Question value, 0 means no refresh
   BOOLEAN               InSubtitle;          // nesting inside of EFI_IFR_SUBTITLE
 
+#if 0
   LIST_ENTRY            InconsistentListHead;// nested inconsistent expression list (FORM_EXPRESSION)
   LIST_ENTRY            NoSubmitListHead;    // nested nosubmit expression list (FORM_EXPRESSION)
   FORM_EXPRESSION       *GrayOutExpression;  // nesting inside of GrayOutIf
   FORM_EXPRESSION       *SuppressExpression; // nesting inside of SuppressIf
+#endif
 
 } FORM_BROWSER_STATEMENT;
 
@@ -247,7 +271,9 @@ typedef struct {
 
   EFI_IMAGE_ID      ImageId;
 
+#if 0
   LIST_ENTRY        ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
+#endif
   LIST_ENTRY        StatementListHead;    // List of Statements and Questions (FORM_BROWSER_STATEMENT)
 } FORM_BROWSER_FORM;
 
@@ -267,9 +293,6 @@ typedef struct {
 
 typedef struct {
   EFI_HII_HANDLE                  HiiHandle;
-  EFI_HANDLE                      DriverHandle;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
 
   UINTN                           IfrBinaryLength;
   UINT8                           *IfrBinaryData;
@@ -282,20 +305,24 @@ typedef struct {
   EFI_IMAGE_ID                    ImageId;
 
   FORM_BROWSER_STATEMENT          *StatementBuffer;     // Buffer for all Statements and Questions
+#if 0
   EXPRESSION_OPCODE               *ExpressionBuffer;    // Buffer for all Expression OpCode
+#endif
 
   LIST_ENTRY                      StorageListHead;      // Storage list (FORMSET_STORAGE)
   LIST_ENTRY                      DefaultStoreListHead; // DefaultStore list (FORMSET_DEFAULTSTORE)
   LIST_ENTRY                      FormListHead;         // Form list (FORM_BROWSER_FORM)
+
+  LIST_ENTRY                      OneOfOptionMapListHead; //ONE_OF_OPTION_MAP
+
+  UINT16                          MaxQuestionId;
+
+  EFI_VARSTORE_ID                 DefaultVarStoreId;
+
+  UINTN                           NumberOfStatement;
+    
 } FORM_BROWSER_FORMSET;
 
-
-EFI_STATUS
-EvaluateExpression (
-  IN FORM_BROWSER_FORMSET  *FormSet,
-  IN FORM_BROWSER_FORM     *Form,
-  IN OUT FORM_EXPRESSION   *Expression
-  );
 
 EFI_STATUS
 ParseOpCodes (

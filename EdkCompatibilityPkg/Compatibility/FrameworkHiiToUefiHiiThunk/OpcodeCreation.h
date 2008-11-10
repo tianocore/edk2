@@ -105,7 +105,6 @@ EFI_STATUS
 FwUpdateDataToUefiUpdateData (
   IN       HII_THUNK_CONTEXT                 *ThunkContext,
   IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *Data,
-  IN       BOOLEAN                          AddData,
   OUT      EFI_HII_UPDATE_DATA              **UefiData
   );
 #endif
