@@ -23,6 +23,7 @@ typedef struct {
   UINT32  Length;
 } EFI_ACPI_COMMON_HEADER;
 
+#pragma pack(1)
 ///
 /// Common ACPI description table header.  This structure prefaces most ACPI tables.
 ///
@@ -37,6 +38,7 @@ typedef struct {
   UINT32  CreatorId;
   UINT32  CreatorRevision;
 } EFI_ACPI_DESCRIPTION_HEADER;
+#pragma pack()
 
 //
 // Define for Desriptor

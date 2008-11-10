@@ -99,6 +99,10 @@ typedef struct {
 ///
 #define EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_REVISION 0x01
 
+//           
+// Ensure proper structure formats
+//           
+#pragma pack(1)
 ///
 /// Fixed ACPI Description Table Structure (FADT)
 ///
@@ -156,6 +160,7 @@ typedef struct {
   EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XGpe0Blk;
   EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk;
 } EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE;
+#pragma pack()
 
 ///
 /// FADT Version (as defined in ACPI 2.0 spec.)
