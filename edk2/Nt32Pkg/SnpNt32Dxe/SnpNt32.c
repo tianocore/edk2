@@ -52,17 +52,417 @@ SNPNT32_GLOBAL_DATA         gSnpNt32GlobalData = {
   SnpNt32CloseInstance                    //  CloseInstance
 };
 
+/**
+  Changes the state of a network interface from "stopped" to "started".
+
+  @param  This Protocol instance pointer.
+
+  @retval EFI_SUCCESS           Always succeeds.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Start (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
+  );
+  
+/**
+  Changes the state of a network interface from "started" to "stopped".
+
+  @param  This Protocol instance pointer.
+
+  @retval EFI_SUCCESS           Always succeeds.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Stop (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
+  );
+  
+/**
+  Resets a network adapter and allocates the transmit and receive buffers 
+  required by the network interface; optionally, also requests allocation 
+  of additional transmit and receive buffers.
+
+  @param  This              Protocol instance pointer.
+  @param  ExtraRxBufferSize The size, in bytes, of the extra receive buffer space
+                            that the driver should allocate for the network interface.
+                            Some network interfaces will not be able to use the extra
+                            buffer, and the caller will not know if it is actually
+                            being used.
+  @param  ExtraTxBufferSize The size, in bytes, of the extra transmit buffer space
+                            that the driver should allocate for the network interface.
+                            Some network interfaces will not be able to use the extra
+                            buffer, and the caller will not know if it is actually
+                            being used.
+
+  @retval EFI_SUCCESS           Always succeeds.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Initialize (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN UINTN                       ExtraRxBufferSize OPTIONAL,
+  IN UINTN                       ExtraTxBufferSize OPTIONAL
+  );
+  
+/**
+  Resets a network adapter and re-initializes it with the parameters that were 
+  provided in the previous call to Initialize().  
+
+  @param  This                 Protocol instance pointer.
+  @param  ExtendedVerification Indicates that the driver may perform a more
+                               exhaustive verification operation of the device
+                               during reset.
+
+  @retval EFI_SUCCESS           Always succeeds.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Reset (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      ExtendedVerification
+  );
 
 /**
-  Test to see if this driver supports ControllerHandle.
+  Resets a network adapter and leaves it in a state that is safe for 
+  another driver to initialize.
 
-  @param  This                  Protocol instance pointer.
-  @param  ControllerHandle      Handle of device to test.
-  @param  RemainingDevicePath   Optional parameter use to pick a specific child
-                                device to start.
+  @param  This Protocol instance pointer.
 
-  @retval EFI_SUCCES            This driver supports this device.
-  @retval other                 This driver does not support this device.
+  @retval EFI_SUCCESS           Always succeeds.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Shutdown (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
+  );
+
+/**
+  Manages the multicast receive filters of a network interface.
+
+  @param  This               Protocol instance pointer.
+  @param  EnableBits         A bit mask of receive filters to enable on the network interface.
+  @param  DisableBits        A bit mask of receive filters to disable on the network interface.
+  @param  ResetMcastFilter   Set to TRUE to reset the contents of the multicast receive
+                             filters on the network interface to their default values.
+  @param  McastFilterCount   Number of multicast HW MAC addresses in the new
+                             MCastFilter list. This value must be less than or equal to
+                             the MCastFilterCnt field of EFI_SIMPLE_NETWORK_MODE. This
+                             field is optional if ResetMCastFilter is TRUE.
+  @param  McastFilter        A pointer to a list of new multicast receive filter HW MAC
+                             addresses. This list will replace any existing multicast
+                             HW MAC address list. This field is optional if
+                             ResetMCastFilter is TRUE.
+
+  @retval EFI_SUCCESS           The multicast receive filter list was updated.
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32ReceiveFilters (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN UINT32                      EnableBits,
+  IN UINT32                      DisableBits,
+  IN BOOLEAN                     ResetMcastFilter,
+  IN UINTN                       McastFilterCount OPTIONAL,
+  IN EFI_MAC_ADDRESS             *McastFilter     OPTIONAL
+  );
+
+/**
+  Modifies or resets the current station address, if supported.
+
+  @param  This         Protocol instance pointer.
+  @param  Reset        Flag used to reset the station address to the network interfaces
+                       permanent address.
+  @param  NewMacAddr   New station address to be used for the network interface.
+
+  @retval EFI_UNSUPPORTED       Not supported yet.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32StationAddress (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN BOOLEAN                     Reset,
+  IN EFI_MAC_ADDRESS             *NewMacAddr OPTIONAL
+  );
+
+/**
+  Resets or collects the statistics on a network interface.
+
+  @param  This            Protocol instance pointer.
+  @param  Reset           Set to TRUE to reset the statistics for the network interface.
+  @param  StatisticsSize  On input the size, in bytes, of StatisticsTable. On
+                          output the size, in bytes, of the resulting table of
+                          statistics.
+  @param  StatisticsTable A pointer to the EFI_NETWORK_STATISTICS structure that
+                          contains the statistics.
+
+  @retval EFI_SUCCESS           The statistics were collected from the network interface.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_BUFFER_TOO_SMALL  The Statistics buffer was too small. The current buffer
+                                size needed to hold the statistics is returned in
+                                StatisticsSize.
+  @retval EFI_UNSUPPORTED       Not supported yet.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Statistics (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  * This,
+  IN BOOLEAN                      Reset,
+  IN OUT UINTN                    *StatisticsSize OPTIONAL,
+  OUT EFI_NETWORK_STATISTICS      *StatisticsTable OPTIONAL
+  );
+  
+/**
+  Converts a multicast IP address to a multicast HW MAC address.
+  
+  @param  This  Protocol instance pointer.
+  @param  Ipv6  Set to TRUE if the multicast IP address is IPv6 [RFC 2460]. Set
+                to FALSE if the multicast IP address is IPv4 [RFC 791].
+  @param  Ip    The multicast IP address that is to be converted to a multicast
+                HW MAC address.
+  @param  Mac   The multicast HW MAC address that is to be generated from IP.
+
+  @retval EFI_SUCCESS           The multicast IP address was mapped to the multicast
+                                HW MAC address.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_BUFFER_TOO_SMALL  The Statistics buffer was too small. The current buffer
+                                size needed to hold the statistics is returned in
+                                StatisticsSize.
+  @retval EFI_UNSUPPORTED       Not supported yet.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32McastIptoMac (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN BOOLEAN                     Ipv6,
+  IN EFI_IP_ADDRESS              *Ip,
+  OUT EFI_MAC_ADDRESS            *Mac
+  );
+
+/**
+  Performs read and write operations on the NVRAM device attached to a 
+  network interface.
+
+  @param  This         Protocol instance pointer.
+  @param  ReadOrWrite  TRUE for read operations, FALSE for write operations.
+  @param  Offset       Byte offset in the NVRAM device at which to start the read or
+                       write operation. This must be a multiple of NvRamAccessSize and
+                       less than NvRamSize.
+  @param  BufferSize   The number of bytes to read or write from the NVRAM device.
+                       This must also be a multiple of NvramAccessSize.
+  @param  Buffer       A pointer to the data buffer.
+
+  @retval EFI_UNSUPPORTED       Not supported yet.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Nvdata (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN BOOLEAN                     ReadOrWrite,
+  IN UINTN                       Offset,
+  IN UINTN                       BufferSize,
+  IN OUT VOID                    *Buffer
+  );
+
+/**
+  Reads the current interrupt status and recycled transmit buffer status from 
+  a network interface.
+
+  @param  This            Protocol instance pointer.
+  @param  InterruptStatus A pointer to the bit mask of the currently active interrupts
+                          If this is NULL, the interrupt status will not be read from
+                          the device. If this is not NULL, the interrupt status will
+                          be read from the device. When the  interrupt status is read,
+                          it will also be cleared. Clearing the transmit  interrupt
+                          does not empty the recycled transmit buffer array.
+  @param  TxBuffer        Recycled transmit buffer address. The network interface will
+                          not transmit if its internal recycled transmit buffer array
+                          is full. Reading the transmit buffer does not clear the
+                          transmit interrupt. If this is NULL, then the transmit buffer
+                          status will not be read. If there are no transmit buffers to
+                          recycle and TxBuf is not NULL, * TxBuf will be set to NULL.
+
+  @retval EFI_SUCCESS           Always succeeds.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32GetStatus (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  OUT UINT32                     *InterruptStatus,
+  OUT VOID                       **TxBuffer
+  );
+
+/**
+  Places a packet in the transmit queue of a network interface.
+
+  @param  This       Protocol instance pointer.
+  @param  HeaderSize The size, in bytes, of the media header to be filled in by
+                     the Transmit() function. If HeaderSize is non-zero, then it
+                     must be equal to This->Mode->MediaHeaderSize and the DestAddr
+                     and Protocol parameters must not be NULL.
+  @param  BufferSize The size, in bytes, of the entire packet (media header and
+                     data) to be transmitted through the network interface.
+  @param  Buffer     A pointer to the packet (media header followed by data) to be
+                     transmitted. This parameter cannot be NULL. If HeaderSize is zero,
+                     then the media header in Buffer must already be filled in by the
+                     caller. If HeaderSize is non-zero, then the media header will be
+                     filled in by the Transmit() function.
+  @param  SrcAddr    The source HW MAC address. If HeaderSize is zero, then this parameter
+                     is ignored. If HeaderSize is non-zero and SrcAddr is NULL, then
+                     This->Mode->CurrentAddress is used for the source HW MAC address.
+  @param  DestAddr   The destination HW MAC address. If HeaderSize is zero, then this
+                     parameter is ignored.
+  @param  Protocol   The type of header to build. If HeaderSize is zero, then this
+                     parameter is ignored. See RFC 1700, section "Ether Types", for
+                     examples.
+
+  @retval EFI_SUCCESS           The packet was placed on the transmit queue.
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
+  @retval EFI_ACCESS_DENIED     Error acquire global lock for operation.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Transmit (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN UINTN                       HeaderSize,
+  IN UINTN                       BufferSize,
+  IN VOID                        *Buffer,
+  IN EFI_MAC_ADDRESS             *SrcAddr OPTIONAL,
+  IN EFI_MAC_ADDRESS             *DestAddr OPTIONAL,
+  IN UINT16                      *Protocol OPTIONAL
+  );
+
+/**
+  Receives a packet from a network interface.
+
+  @param  This             Protocol instance pointer.
+  @param  HeaderSize       The size, in bytes, of the media header received on the network
+                           interface. If this parameter is NULL, then the media header size
+                           will not be returned.
+  @param  BuffSize         On entry, the size, in bytes, of Buffer. On exit, the size, in
+                           bytes, of the packet that was received on the network interface.
+  @param  Buffer           A pointer to the data buffer to receive both the media header and
+                           the data.
+  @param  SourceAddr       The source HW MAC address. If this parameter is NULL, the
+                           HW MAC source address will not be extracted from the media
+                           header.
+  @param  DestinationAddr  The destination HW MAC address. If this parameter is NULL,
+                           the HW MAC destination address will not be extracted from the
+                           media header.
+  @param  Protocol         The media header type. If this parameter is NULL, then the
+                           protocol will not be extracted from the media header. See
+                           RFC 1700 section "Ether Types" for examples.
+
+  @retval  EFI_SUCCESS           The received data was stored in Buffer, and BufferSize has
+                                 been updated to the number of bytes received.
+  @retval  EFI_NOT_READY         The network interface is too busy to accept this transmit
+                                 request.
+  @retval  EFI_BUFFER_TOO_SMALL  The BufferSize parameter is too small.
+  @retval  EFI_DEVICE_ERROR      The command could not be sent to the network interface.
+  @retval  EFI_ACCESS_DENIED     Error acquire global lock for operation.
+
+**/
+EFI_STATUS
+EFIAPI
+SnpNt32Receive (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  OUT UINTN                      *HeaderSize,
+  IN OUT UINTN                   *BuffSize,
+  OUT VOID                       *Buffer,
+  OUT EFI_MAC_ADDRESS            *SourceAddr,
+  OUT EFI_MAC_ADDRESS            *DestinationAddr,
+  OUT UINT16                     *Protocol
+  );
+
+SNPNT32_INSTANCE_DATA gSnpNt32InstanceTemplate = {
+  SNP_NT32_INSTANCE_SIGNATURE,            //  Signature
+  {
+    NULL,
+    NULL
+  },                                      //  Entry
+  NULL,                                   //  GlobalData
+  NULL,                                   //  DeviceHandle
+  NULL,                                   //  DevicePath
+  {                                       //  Snp
+    EFI_SIMPLE_NETWORK_PROTOCOL_REVISION, //  Revision
+    SnpNt32Start,                         //  Start
+    SnpNt32Stop,                          //  Stop
+    SnpNt32Initialize,                    //  Initialize
+    SnpNt32Reset,                         //  Reset
+    SnpNt32Shutdown,                      //  Shutdown
+    SnpNt32ReceiveFilters,                //  ReceiveFilters
+    SnpNt32StationAddress,                //  StationAddress
+    SnpNt32Statistics,                    //  Statistics
+    SnpNt32McastIptoMac,                  //  MCastIpToMac
+    SnpNt32Nvdata,                        //  NvData
+    SnpNt32GetStatus,                     //  GetStatus
+    SnpNt32Transmit,                      //  Transmit
+    SnpNt32Receive,                       //  Receive
+    NULL,                                 //  WaitForPacket
+    NULL                                  //  Mode
+  },
+  {                                       //  Mode
+    EfiSimpleNetworkInitialized,          //  State
+    NET_ETHER_ADDR_LEN,                   //  HwAddressSize
+    NET_ETHER_HEADER_SIZE,                //  MediaHeaderSize
+    1500,                                 //  MaxPacketSize
+    0,                                    //  NvRamSize
+    0,                                    //  NvRamAccessSize
+    0,                                    //  ReceiveFilterMask
+    0,                                    //  ReceiveFilterSetting
+    MAX_MCAST_FILTER_CNT,                 //  MaxMCastFilterCount
+    0,                                    //  MCastFilterCount
+    {
+      0
+    },                                    //  MCastFilter
+    {
+      0
+    },                                    //  CurrentAddress
+    {
+      0
+    },                                    //  BroadcastAddress
+    {
+      0
+    },                                    //  PermanentAddress
+    NET_IFTYPE_ETHERNET,                  //  IfType
+    FALSE,                                //  MacAddressChangeable
+    FALSE,                                //  MultipleTxSupported
+    FALSE,                                //  MediaPresentSupported
+    TRUE                                  //  MediaPresent
+  },
+  {
+    0
+  }                                       //  InterfaceInfo
+};
+
+/**
+  Test to see if this driver supports ControllerHandle. This service
+  is called by the EFI boot service ConnectController(). In
+  order to make drivers as small as possible, there are a few calling
+  restrictions for this service. ConnectController() must
+  follow these calling restrictions. If any other agent wishes to call
+  Supported() it must also follow these calling restrictions.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_UNSUPPORTED     This driver does not support this device
 
 **/
 EFI_STATUS
@@ -95,14 +495,19 @@ SnpNt32DriverBindingSupported (
 
 
 /**
-  Start this driver on ControllerHandle.
+  Start this driver on ControllerHandle. This service is called by the
+  EFI boot service ConnectController(). In order to make
+  drivers as small as possible, there are a few calling restrictions for
+  this service. ConnectController() must follow these
+  calling restrictions. If any other agent wishes to call Start() it
+  must also follow these calling restrictions.
 
-  @param  This                  Protocol instance pointer.
-  @param  ControllerHandle      Handle of device to bind driver to.
-  @param  RemainingDevicePath   Optional parameter use to pick a specific child
-                                device to start.
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
 
-  @retval EFI_SUCCES            This driver is added to ControllerHandle.
+  @retval EFI_SUCCESS          Always succeeds.
 
 **/
 EFI_STATUS
@@ -116,17 +521,21 @@ SnpNt32DriverBindingStart (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Stop this driver on ControllerHandle.
+  Stop this driver on ControllerHandle. This service is called by the
+  EFI boot service DisconnectController(). In order to
+  make drivers as small as possible, there are a few calling
+  restrictions for this service. DisconnectController()
+  must follow these calling restrictions. If any other agent wishes
+  to call Stop() it must also follow these calling restrictions.
+  
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @param  This                  Protocol instance pointer.
-  @param  ControllerHandle      Handle of device to stop driver on.
-  @param  NumberOfChildren      Number of Handles in ChildHandleBuffer. If number
-                                of children is zero stop the entire bus driver.
-  @param  ChildHandleBuffer     List of Child Handles to Stop.
-
-  @retval EFI_SUCCES            This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS       Always succeeds.
 
 **/
 EFI_STATUS
@@ -138,20 +547,20 @@ SnpNt32DriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-
   return EFI_SUCCESS;
 }
 
 
 /**
-  Start the SnpNt32 interface.
+  Changes the state of a network interface from "stopped" to "started".
 
-  @param  This                  Context pointer.
+  @param  This Protocol instance pointer.
 
-  @retval EFI_SUCCESS           The interface is started.
+  @retval EFI_SUCCESS           Always succeeds.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Start (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This
   )
@@ -161,14 +570,15 @@ SnpNt32Start (
 
 
 /**
-  Stop the SnpNt32 interface.
+  Changes the state of a network interface from "started" to "stopped".
 
-  @param  This                  Context pointer.
+  @param  This Protocol instance pointer.
 
-  @retval EFI_SUCCESS           The interface is stopped.
+  @retval EFI_SUCCESS           Always succeeds.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Stop (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This
   )
@@ -176,18 +586,28 @@ SnpNt32Stop (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Initialize the SnpNt32 interface.
+  Resets a network adapter and allocates the transmit and receive buffers 
+  required by the network interface; optionally, also requests allocation 
+  of additional transmit and receive buffers.
 
-  @param  This                  Context pointer.
-  @param  ExtraRxBufferSize     Number of extra receive buffer.
-  @param  ExtraTxBufferSize     Number of extra transmit buffer.
+  @param  This              Protocol instance pointer.
+  @param  ExtraRxBufferSize The size, in bytes, of the extra receive buffer space
+                            that the driver should allocate for the network interface.
+                            Some network interfaces will not be able to use the extra
+                            buffer, and the caller will not know if it is actually
+                            being used.
+  @param  ExtraTxBufferSize The size, in bytes, of the extra transmit buffer space
+                            that the driver should allocate for the network interface.
+                            Some network interfaces will not be able to use the extra
+                            buffer, and the caller will not know if it is actually
+                            being used.
 
-  @retval EFI_SUCCESS           The interface is initialized.
+  @retval EFI_SUCCESS           Always succeeds.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Initialize (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN UINTN                       ExtraRxBufferSize OPTIONAL,
@@ -197,17 +617,20 @@ SnpNt32Initialize (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Reset the snpnt32 interface.
+  Resets a network adapter and re-initializes it with the parameters that were 
+  provided in the previous call to Initialize().  
 
-  @param  This                  Context pointer.
-  @param  ExtendedVerification  Not implemented.
+  @param  This                 Protocol instance pointer.
+  @param  ExtendedVerification Indicates that the driver may perform a more
+                               exhaustive verification operation of the device
+                               during reset.
 
-  @retval EFI_SUCCESS           The interface is reseted.
+  @retval EFI_SUCCESS           Always succeeds.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Reset (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
   IN BOOLEAN                      ExtendedVerification
@@ -216,16 +639,17 @@ SnpNt32Reset (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Shut down the snpnt32 interface.
+  Resets a network adapter and leaves it in a state that is safe for 
+  another driver to initialize.
 
-  @param  This                  Context pointer.
+  @param  This Protocol instance pointer.
 
-  @retval EFI_SUCCESS           The interface is shut down.
+  @retval EFI_SUCCESS           Always succeeds.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Shutdown (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This
   )
@@ -233,31 +657,36 @@ SnpNt32Shutdown (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Change the interface's receive filter setting.
+  Manages the multicast receive filters of a network interface.
 
-  @param  This                  Context pointer.
-  @param  EnableBits            The receive filters to enable.
-  @param  DisableBits           The receive filters to disable
-  @param  ResetMcastFilter      Reset the multicast filters or not.
-  @param  McastFilterCount      The count of multicast filter to set.
-  @param  McastFilter           Pointer to the arrya of multicast addresses to set.
+  @param  This               Protocol instance pointer.
+  @param  EnableBits         A bit mask of receive filters to enable on the network interface.
+  @param  DisableBits        A bit mask of receive filters to disable on the network interface.
+  @param  ResetMcastFilter   Set to TRUE to reset the contents of the multicast receive
+                             filters on the network interface to their default values.
+  @param  McastFilterCount   Number of multicast HW MAC addresses in the new
+                             MCastFilter list. This value must be less than or equal to
+                             the MCastFilterCnt field of EFI_SIMPLE_NETWORK_MODE. This
+                             field is optional if ResetMCastFilter is TRUE.
+  @param  McastFilter        A pointer to a list of new multicast receive filter HW MAC
+                             addresses. This list will replace any existing multicast
+                             HW MAC address list. This field is optional if
+                             ResetMCastFilter is TRUE.
 
-  @retval EFI_SUCCESS           The receive filter is updated.
-  @retval EFI_ACCESS_DENIED     The snpnt32 lock is already owned by another
-                                routine.
-  @retval EFI_DEVICE_ERROR      Failed to update the receive filter.
+  @retval EFI_SUCCESS           The multicast receive filter list was updated.
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32ReceiveFilters (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN UINT32                      EnableBits,
   IN UINT32                      DisableBits,
   IN BOOLEAN                     ResetMcastFilter,
   IN UINTN                       McastFilterCount OPTIONAL,
-  IN EFI_MAC_ADDRESS             *McastFilter OPTIONAL
+  IN EFI_MAC_ADDRESS             *McastFilter     OPTIONAL
   )
 {
   SNPNT32_INSTANCE_DATA *Instance;
@@ -288,18 +717,19 @@ SnpNt32ReceiveFilters (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Change or reset the mac address of the interface.
+  Modifies or resets the current station address, if supported.
 
-  @param  This                  Context pointer.
-  @param  reset                 Reset the mac address to the original one or not.
-  @param  NewMacAddr            Pointer to the new mac address to set.
+  @param  This         Protocol instance pointer.
+  @param  Reset        Flag used to reset the station address to the network interfaces
+                       permanent address.
+  @param  NewMacAddr   New station address to be used for the network interface.
 
   @retval EFI_UNSUPPORTED       Not supported yet.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32StationAddress (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN BOOLEAN                     Reset,
@@ -309,45 +739,58 @@ SnpNt32StationAddress (
   return EFI_UNSUPPORTED;
 }
 
-
 /**
-  Get or reset the statistics data.
+  Resets or collects the statistics on a network interface.
 
-  @param  This                  Context pointer.
-  @param  Reset                 Reset the statistics or not.
-  @param  StatisticsSize        The size of the buffer used to receive the
-                                statistics data.
-  @param  StatisticsTable       Pointer to the table used to receive the statistics
-                                data.
+  @param  This            Protocol instance pointer.
+  @param  Reset           Set to TRUE to reset the statistics for the network interface.
+  @param  StatisticsSize  On input the size, in bytes, of StatisticsTable. On
+                          output the size, in bytes, of the resulting table of
+                          statistics.
+  @param  StatisticsTable A pointer to the EFI_NETWORK_STATISTICS structure that
+                          contains the statistics.
 
+  @retval EFI_SUCCESS           The statistics were collected from the network interface.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_BUFFER_TOO_SMALL  The Statistics buffer was too small. The current buffer
+                                size needed to hold the statistics is returned in
+                                StatisticsSize.
   @retval EFI_UNSUPPORTED       Not supported yet.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Statistics (
   IN EFI_SIMPLE_NETWORK_PROTOCOL  * This,
   IN BOOLEAN                      Reset,
   IN OUT UINTN                    *StatisticsSize OPTIONAL,
-  IN OUT EFI_NETWORK_STATISTICS   *StatisticsTable OPTIONAL
+  OUT EFI_NETWORK_STATISTICS      *StatisticsTable OPTIONAL
   )
 {
   return EFI_UNSUPPORTED;
 }
 
-
 /**
-  Convert a multicast ip address to the multicast mac address.
+  Converts a multicast IP address to a multicast HW MAC address.
 
-  @param  This                  Context pointer.
-  @param  Ipv6                  The Ip is an Ipv6 address or not.
-  @param  Ip                    Pointer to the Ip address to convert.
-  @param  Mac                   Pointer to the buffer used to hold the converted
-                                mac address.
+  @param  This Protocol instance pointer.
+  @param  Ipv6 Set to TRUE if the multicast IP address is IPv6 [RFC 2460]. Set
+               to FALSE if the multicast IP address is IPv4 [RFC 791].
+  @param  Ip   The multicast IP address that is to be converted to a multicast
+               HW MAC address.
+  @param  Mac  The multicast HW MAC address that is to be generated from IP.
 
+  @retval EFI_SUCCESS           The multicast IP address was mapped to the multicast
+                                HW MAC address.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_BUFFER_TOO_SMALL  The Statistics buffer was too small. The current buffer
+                                size needed to hold the statistics is returned in
+                                StatisticsSize.
   @retval EFI_UNSUPPORTED       Not supported yet.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32McastIptoMac (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN BOOLEAN                     Ipv6,
@@ -360,19 +803,23 @@ SnpNt32McastIptoMac (
 
 
 /**
-  Read or write the nv data.
+  Performs read and write operations on the NVRAM device attached to a 
+  network interface.
 
-  @param  This                  Context pinter.
-  @param  ReadOrWrite           Read or write the nv data.
-  @param  Offset                The offset to the start of the nv data.
-  @param  BufferSize            Size of the buffer.
-  @param  Buffer                Pointer to the buffer containing the data to write
-                                or used to receive the data read.
+  @param  This         Protocol instance pointer.
+  @param  ReadOrWrite  TRUE for read operations, FALSE for write operations.
+  @param  Offset       Byte offset in the NVRAM device at which to start the read or
+                       write operation. This must be a multiple of NvRamAccessSize and
+                       less than NvRamSize.
+  @param  BufferSize   The number of bytes to read or write from the NVRAM device.
+                       This must also be a multiple of NvramAccessSize.
+  @param  Buffer       A pointer to the data buffer.
 
   @retval EFI_UNSUPPORTED       Not supported yet.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Nvdata (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN BOOLEAN                     ReadOrWrite,
@@ -386,18 +833,28 @@ SnpNt32Nvdata (
 
 
 /**
-  Get the status information of the interface.
+  Reads the current interrupt status and recycled transmit buffer status from 
+  a network interface.
 
-  @param  This                  Context pointer.
-  @param  InterruptStatus       The storage to hold the interrupt status.
-  @param  TxBuffer              Pointer to get the list of pointers of previously
-                                transmitted buffers whose transmission was
-                                completed asynchrnously.
+  @param  This            Protocol instance pointer.
+  @param  InterruptStatus A pointer to the bit mask of the currently active interrupts
+                          If this is NULL, the interrupt status will not be read from
+                          the device. If this is not NULL, the interrupt status will
+                          be read from the device. When the  interrupt status is read,
+                          it will also be cleared. Clearing the transmit  interrupt
+                          does not empty the recycled transmit buffer array.
+  @param  TxBuffer        Recycled transmit buffer address. The network interface will
+                          not transmit if its internal recycled transmit buffer array
+                          is full. Reading the transmit buffer does not clear the
+                          transmit interrupt. If this is NULL, then the transmit buffer
+                          status will not be read. If there are no transmit buffers to
+                          recycle and TxBuf is not NULL, * TxBuf will be set to NULL.
 
-  @retval EFI_SUCCESS           The status is got.
+  @retval EFI_SUCCESS           Always succeeds.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32GetStatus (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   OUT UINT32                     *InterruptStatus,
@@ -418,25 +875,36 @@ SnpNt32GetStatus (
 
 
 /**
-  Transmit a packet.
+  Places a packet in the transmit queue of a network interface.
 
-  @param  This                  Context pointer.
-  @param  HeaderSize            The media header size contained in the packet
-                                buffer.
-  @param  BufferSize            The size of the packet buffer.
-  @param  Buffer                Pointer to the buffer containing the packet data.
-  @param  SrcAddr               If non null, points to the source address of this
-                                packet.
-  @param  DestAddr              If non null, points to the destination address of
-                                this packet.
-  @param  Protocol              The protocol type of this packet.
+  @param  This       Protocol instance pointer.
+  @param  HeaderSize The size, in bytes, of the media header to be filled in by
+                     the Transmit() function. If HeaderSize is non-zero, then it
+                     must be equal to This->Mode->MediaHeaderSize and the DestAddr
+                     and Protocol parameters must not be NULL.
+  @param  BufferSize The size, in bytes, of the entire packet (media header and
+                     data) to be transmitted through the network interface.
+  @param  Buffer     A pointer to the packet (media header followed by data) to be
+                     transmitted. This parameter cannot be NULL. If HeaderSize is zero,
+                     then the media header in Buffer must already be filled in by the
+                     caller. If HeaderSize is non-zero, then the media header will be
+                     filled in by the Transmit() function.
+  @param  SrcAddr    The source HW MAC address. If HeaderSize is zero, then this parameter
+                     is ignored. If HeaderSize is non-zero and SrcAddr is NULL, then
+                     This->Mode->CurrentAddress is used for the source HW MAC address.
+  @param  DestAddr   The destination HW MAC address. If HeaderSize is zero, then this
+                     parameter is ignored.
+  @param  Protocol   The type of header to build. If HeaderSize is zero, then this
+                     parameter is ignored. See RFC 1700, section "Ether Types", for
+                     examples.
 
-  @retval EFI_SUCCESS           The packet is transmitted or put into the transmit
-                                queue.
-  @retval other                 Some error occurs.
+  @retval EFI_SUCCESS           The packet was placed on the transmit queue.
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
+  @retval EFI_ACCESS_DENIED     Error acquire global lock for operation.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Transmit (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN UINTN                       HeaderSize,
@@ -482,30 +950,38 @@ SnpNt32Transmit (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Receive network data.
+  Receives a packet from a network interface.
 
-  @param  This                  Context pointer.
-  @param  HeaderSize            Optional parameter and is a pointer to the header
-                                portion of the data received.
-  @param  BuffSize              Pointer to the length of the Buffer on entry and
-                                contains the length of the received data on return
-  @param  Buffer                Pointer to the memory for the received data
-  @param  SourceAddr            Optional parameter, is a pointer to contain the
-                                source ethernet address on return
-  @param  DestinationAddr       Optional parameter, is a pointer to contain the
-                                destination ethernet address on return.
-  @param  Protocol              Optional parameter, is a pointer to contain the
-                                Protocol type from the ethernet header on return.
+  @param  This             Protocol instance pointer.
+  @param  HeaderSize       The size, in bytes, of the media header received on the network
+                           interface. If this parameter is NULL, then the media header size
+                           will not be returned.
+  @param  BuffSize         On entry, the size, in bytes, of Buffer. On exit, the size, in
+                           bytes, of the packet that was received on the network interface.
+  @param  Buffer           A pointer to the data buffer to receive both the media header and
+                           the data.
+  @param  SourceAddr       The source HW MAC address. If this parameter is NULL, the
+                           HW MAC source address will not be extracted from the media
+                           header.
+  @param  DestinationAddr  The destination HW MAC address. If this parameter is NULL,
+                           the HW MAC destination address will not be extracted from the
+                           media header.
+  @param  Protocol         The media header type. If this parameter is NULL, then the
+                           protocol will not be extracted from the media header. See
+                           RFC 1700 section "Ether Types" for examples.
 
-  @retval EFI_SUCCESS           A packet is received and put into the buffer.
-  @retval EFI_BUFFER_TOO_SMALL  The provided buffer is too small to receive the
-                                packet.
-  @retval EFI_NOT_READY         There is no packet received.
+  @retval  EFI_SUCCESS           The received data was stored in Buffer, and BufferSize has
+                                 been updated to the number of bytes received.
+  @retval  EFI_NOT_READY         The network interface is too busy to accept this transmit
+                                 request.
+  @retval  EFI_BUFFER_TOO_SMALL  The BufferSize parameter is too small.
+  @retval  EFI_DEVICE_ERROR      The command could not be sent to the network interface.
+  @retval  EFI_ACCESS_DENIED     Error acquire global lock for operation.
 
 **/
 EFI_STATUS
+EFIAPI
 SnpNt32Receive (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   OUT UINTN                      *HeaderSize,
@@ -569,68 +1045,6 @@ SnpNt32Receive (
   return EFI_SUCCESS;
 }
 
-SNPNT32_INSTANCE_DATA gSnpNt32InstanceTemplate = {
-  SNP_NT32_INSTANCE_SIGNATURE,            //  Signature
-  {
-    NULL,
-    NULL
-  },                                      //  Entry
-  NULL,                                   //  GlobalData
-  NULL,                                   //  DeviceHandle
-  NULL,                                   //  DevicePath
-  {                                       //  Snp
-    EFI_SIMPLE_NETWORK_PROTOCOL_REVISION, //  Revision
-    SnpNt32Start,                         //  Start
-    SnpNt32Stop,                          //  Stop
-    SnpNt32Initialize,                    //  Initialize
-    SnpNt32Reset,                         //  Reset
-    SnpNt32Shutdown,                      //  Shutdown
-    SnpNt32ReceiveFilters,                //  ReceiveFilters
-    SnpNt32StationAddress,                //  StationAddress
-    SnpNt32Statistics,                    //  Statistics
-    SnpNt32McastIptoMac,                  //  MCastIpToMac
-    SnpNt32Nvdata,                        //  NvData
-    SnpNt32GetStatus,                     //  GetStatus
-    SnpNt32Transmit,                      //  Transmit
-    SnpNt32Receive,                       //  Receive
-    NULL,                                 //  WaitForPacket
-    NULL                                  //  Mode
-  },
-  {                                       //  Mode
-    EfiSimpleNetworkInitialized,          //  State
-    NET_ETHER_ADDR_LEN,                   //  HwAddressSize
-    NET_ETHER_HEADER_SIZE,                //  MediaHeaderSize
-    1500,                                 //  MaxPacketSize
-    0,                                    //  NvRamSize
-    0,                                    //  NvRamAccessSize
-    0,                                    //  ReceiveFilterMask
-    0,                                    //  ReceiveFilterSetting
-    MAX_MCAST_FILTER_CNT,                 //  MaxMCastFilterCount
-    0,                                    //  MCastFilterCount
-    {
-      0
-    },                                    //  MCastFilter
-    {
-      0
-    },                                    //  CurrentAddress
-    {
-      0
-    },                                    //  BroadcastAddress
-    {
-      0
-    },                                    //  PermanentAddress
-    NET_IFTYPE_ETHERNET,                  //  IfType
-    FALSE,                                //  MacAddressChangeable
-    FALSE,                                //  MultipleTxSupported
-    FALSE,                                //  MediaPresentSupported
-    TRUE                                  //  MediaPresent
-  },
-  {
-    0
-  }                                       //  InterfaceInfo
-};
-
-
 /**
   Initialize the driver's global data.
 
@@ -638,11 +1052,14 @@ SNPNT32_INSTANCE_DATA gSnpNt32InstanceTemplate = {
 
   @retval EFI_SUCCESS           The global data is initialized.
   @retval EFI_NOT_FOUND         The required DLL is not found.
+  @retval EFI_DEVICE_ERROR      Error initialize network utility library.
+  @retval EFI_OUT_OF_RESOURCES  Out of resource.
+  @retval other                 Other errors.
 
 **/
 EFI_STATUS
 SnpNt32InitializeGlobalData (
-  IN SNPNT32_GLOBAL_DATA *This
+  IN OUT SNPNT32_GLOBAL_DATA *This
   )
 {
   EFI_STATUS            Status;
@@ -686,9 +1103,9 @@ SnpNt32InitializeGlobalData (
   }
 
   This->NtNetUtilityTable.Initialize = (NT_NET_INITIALIZE) This->WinNtThunk->GetProcAddress (
-                                                                              This->NetworkLibraryHandle,
-                                                                              NETWORK_LIBRARY_INITIALIZE
-                                                                              );
+                                                                               This->NetworkLibraryHandle,
+                                                                               NETWORK_LIBRARY_INITIALIZE
+                                                                               );
 
   if (NULL == This->NtNetUtilityTable.Initialize) {
     Status = EFI_NOT_FOUND;
@@ -696,9 +1113,9 @@ SnpNt32InitializeGlobalData (
   }
 
   This->NtNetUtilityTable.Finalize = (NT_NET_FINALIZE) This->WinNtThunk->GetProcAddress (
-                                                                          This->NetworkLibraryHandle,
-                                                                          NETWORK_LIBRARY_FINALIZE
-                                                                          );
+                                                                           This->NetworkLibraryHandle,
+                                                                           NETWORK_LIBRARY_FINALIZE
+                                                                           );
 
   if (NULL == This->NtNetUtilityTable.Finalize) {
     Status = EFI_NOT_FOUND;
@@ -706,9 +1123,9 @@ SnpNt32InitializeGlobalData (
   }
 
   This->NtNetUtilityTable.SetReceiveFilter = (NT_NET_SET_RECEIVE_FILTER) This->WinNtThunk->GetProcAddress (
-                                                                                            This->NetworkLibraryHandle,
-                                                                                            NETWORK_LIBRARY_SET_RCV_FILTER
-                                                                                            );
+                                                                                             This->NetworkLibraryHandle,
+                                                                                             NETWORK_LIBRARY_SET_RCV_FILTER
+                                                                                             );
 
   if (NULL == This->NtNetUtilityTable.SetReceiveFilter) {
     Status = EFI_NOT_FOUND;
@@ -716,9 +1133,9 @@ SnpNt32InitializeGlobalData (
   }
 
   This->NtNetUtilityTable.Receive = (NT_NET_RECEIVE) This->WinNtThunk->GetProcAddress (
-                                                                        This->NetworkLibraryHandle,
-                                                                        NETWORK_LIBRARY_RECEIVE
-                                                                        );
+                                                                         This->NetworkLibraryHandle,
+                                                                         NETWORK_LIBRARY_RECEIVE
+                                                                         );
 
   if (NULL == This->NtNetUtilityTable.Receive) {
     Status = EFI_NOT_FOUND;
@@ -726,9 +1143,9 @@ SnpNt32InitializeGlobalData (
   }
 
   This->NtNetUtilityTable.Transmit = (NT_NET_TRANSMIT) This->WinNtThunk->GetProcAddress (
-                                                                          This->NetworkLibraryHandle,
-                                                                          NETWORK_LIBRARY_TRANSMIT
-                                                                          );
+                                                                           This->NetworkLibraryHandle,
+                                                                           NETWORK_LIBRARY_TRANSMIT
+                                                                           );
 
   if (NULL == This->NtNetUtilityTable.Transmit) {
     Status = EFI_NOT_FOUND;
@@ -822,12 +1239,13 @@ ErrorReturn:
   @param  Instance              Pointer to the instance context data.
 
   @retval EFI_SUCCESS           The driver instance is initialized.
+  @retval other                 Initialization errors.
 
 **/
 EFI_STATUS
 SnpNt32InitializeInstanceData (
-  IN SNPNT32_GLOBAL_DATA    *This,
-  IN SNPNT32_INSTANCE_DATA  *Instance
+  IN SNPNT32_GLOBAL_DATA        *This,
+  IN OUT SNPNT32_INSTANCE_DATA  *Instance
   )
 {
   EFI_STATUS    Status;
@@ -874,9 +1292,9 @@ SnpNt32InitializeInstanceData (
   SetDevicePathEndNode (&EndNode.DevPath);
 
   Instance->DevicePath = AppendDevicePathNode (
-                          &EndNode.DevPath,
-                          &Node.DevPath
-                          );
+                           &EndNode.DevPath,
+                           &Node.DevPath
+                           );
 
   //
   //  Create a fake device handle for the fake SNP
@@ -889,13 +1307,6 @@ SnpNt32InitializeInstanceData (
                   Instance->DevicePath,
                   NULL
                   );
-  if (EFI_ERROR (Status)) {
-    goto ErrorReturn;
-  }
-
-  return EFI_SUCCESS;
-
-ErrorReturn:
   return Status;
 }
 
@@ -911,21 +1322,21 @@ ErrorReturn:
 **/
 EFI_STATUS
 SnpNt32CloseInstance (
-  IN SNPNT32_GLOBAL_DATA    *This,
-  IN SNPNT32_INSTANCE_DATA  *Instance
+  IN SNPNT32_GLOBAL_DATA        *This,
+  IN OUT SNPNT32_INSTANCE_DATA  *Instance
   )
 {
   ASSERT (This != NULL);
   ASSERT (Instance != NULL);
 
   gBS->UninstallMultipleProtocolInterfaces (
-        Instance->DeviceHandle,
-        &gEfiSimpleNetworkProtocolGuid,
-        &Instance->Snp,
-        &gEfiDevicePathProtocolGuid,
-        Instance->DevicePath,
-        NULL
-        );
+         Instance->DeviceHandle,
+         &gEfiSimpleNetworkProtocolGuid,
+         &Instance->Snp,
+         &gEfiDevicePathProtocolGuid,
+         Instance->DevicePath,
+         NULL
+         );
 
   if (Instance->DevicePath != NULL) {
     gBS->FreePool (Instance->DevicePath);
@@ -934,14 +1345,13 @@ SnpNt32CloseInstance (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Unload the SnpNt32 driver.
+  Unloads an image.
 
-  @param  ImageHandle           The handle of the driver image.
+  @param  ImageHandle           Handle that identifies the image to be unloaded.
 
-  @retval EFI_SUCCESS           The driver is unloaded.
-  @retval other                 Some error occurs.
+  @retval EFI_SUCCESS           The image has been unloaded.
+  @return Exit code from the image's unload handler
 
 **/
 EFI_STATUS
@@ -986,30 +1396,23 @@ SnpNt32Unload (
   return EFI_SUCCESS;
 }
 
+/**
+  This is the declaration of an EFI image entry point. This entry point is
+  the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers including
+  both device drivers and bus drivers.
 
+  @param  ImageHandle           The firmware allocated handle for the UEFI image.
+  @param  SystemTable           A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+
+**/
 EFI_STATUS
 InitializeSnpNt32river (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-  Install DriverBinding Protocol for the Win NT Bus driver on the drivers
-  image handle.
-
-Arguments:
-
-  ImageHandle - The handle of this image.
-  SystemTable - Pointer to the EFI system table.
-
-Returns:
-
-  EFI_SUCEESS -  The protocols are installed and the SnpNt32 is initialized.
-  other       -  Some error occurs.
-
---*/
 {
 
   EFI_STATUS  Status;

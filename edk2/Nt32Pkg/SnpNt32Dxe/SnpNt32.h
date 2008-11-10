@@ -198,10 +198,27 @@ typedef struct _SNPNT32_INSTANCE_DATA {
   SNP_NT32_INSTANCE_SIGNATURE \
   )
 
-extern EFI_DRIVER_BINDING_PROTOCOL   gSnpNt32DriverBinding;
+extern EFI_DRIVER_BINDING_PROTOCOL    gSnpNt32DriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL    gSnpNt32DriverComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL   gSnpNt32DriverComponentName2;
 
+/**
+  Test to see if this driver supports ControllerHandle. This service
+  is called by the EFI boot service ConnectController(). In
+  order to make drivers as small as possible, there are a few calling
+  restrictions for this service. ConnectController() must
+  follow these calling restrictions. If any other agent wishes to call
+  Supported() it must also follow these calling restrictions.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_UNSUPPORTED     This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 SnpNt32DriverBindingSupported (
@@ -210,6 +227,22 @@ SnpNt32DriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
   );
 
+/**
+  Start this driver on ControllerHandle. This service is called by the
+  EFI boot service ConnectController(). In order to make
+  drivers as small as possible, there are a few calling restrictions for
+  this service. ConnectController() must follow these
+  calling restrictions. If any other agent wishes to call Start() it
+  must also follow these calling restrictions.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          Always succeeds.
+
+**/
 EFI_STATUS
 EFIAPI
 SnpNt32DriverBindingStart (
@@ -218,6 +251,23 @@ SnpNt32DriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
   );
 
+/**
+  Stop this driver on ControllerHandle. This service is called by the
+  EFI boot service DisconnectController(). In order to
+  make drivers as small as possible, there are a few calling
+  restrictions for this service. DisconnectController()
+  must follow these calling restrictions. If any other agent wishes
+  to call Stop() it must also follow these calling restrictions.
+  
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       Always succeeds.
+
+**/
 EFI_STATUS
 EFIAPI
 SnpNt32DriverBindingStop (
@@ -227,21 +277,52 @@ SnpNt32DriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
+/**
+  Initialize the driver's global data.
+
+  @param  This                  Pointer to the global context data.
+
+  @retval EFI_SUCCESS           The global data is initialized.
+  @retval EFI_NOT_FOUND         The required DLL is not found.
+  @retval EFI_DEVICE_ERROR      Error initialize network utility library.
+  @retval EFI_OUT_OF_RESOURCES  Out of resource.
+  @retval other                 Other errors.
+
+**/
 EFI_STATUS
 SnpNt32InitializeGlobalData (
-  IN SNPNT32_GLOBAL_DATA *This
+  IN OUT SNPNT32_GLOBAL_DATA *This
   );
 
+/**
+  Initialize the snpnt32 driver instance.
+
+  @param  This                  Pointer to the SnpNt32 global data.
+  @param  Instance              Pointer to the instance context data.
+
+  @retval EFI_SUCCESS           The driver instance is initialized.
+  @retval other                 Initialization errors.
+
+**/
 EFI_STATUS
 SnpNt32InitializeInstanceData (
-  IN SNPNT32_GLOBAL_DATA    *This,
-  IN SNPNT32_INSTANCE_DATA  *Instance
+  IN SNPNT32_GLOBAL_DATA        *This,
+  IN OUT SNPNT32_INSTANCE_DATA  *Instance
   );
 
+/**
+  Close the SnpNt32 driver instance.
+
+  @param  This                  Pointer to the SnpNt32 global data.
+  @param  Instance              Pointer to the instance context data.
+
+  @retval EFI_SUCCESS           The instance is closed.
+
+**/
 EFI_STATUS
 SnpNt32CloseInstance (
-  IN SNPNT32_GLOBAL_DATA    *This,
-  IN SNPNT32_INSTANCE_DATA  *Instance
+  IN SNPNT32_GLOBAL_DATA        *This,
+  IN OUT SNPNT32_INSTANCE_DATA  *Instance
   );
 
 #endif
