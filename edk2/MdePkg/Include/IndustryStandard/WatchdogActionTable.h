@@ -18,10 +18,6 @@
 
 #include <IndustryStandard/Acpi.h>
 
-//
-// Ensure proper structure formats
-//
-#pragma pack(1)
 ///
 /// Watchdog Action Table definition.
 ///
@@ -52,8 +48,6 @@ typedef struct {
   UINT32                                  Value;
   UINT32                                  Mask;
 } EFI_ACPI_WATCHDOG_ACTION_1_0_WATCHDOG_ACTION_INSTRUCTION_ENTRY;
-
-#pragma pack()
 
 ///
 /// WDAT Revision (defined in spec)

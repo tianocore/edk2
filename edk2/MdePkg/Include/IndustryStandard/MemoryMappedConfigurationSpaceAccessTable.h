@@ -16,11 +16,6 @@
 #ifndef _MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_H_
 #define _MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_H_
 
-//
-// Ensure proper structure formats
-//
-#pragma pack(1)
-
 ///
 /// Memory Mapped Configuration Space Access Table (MCFG)
 /// This table is a basic description table header followed by
@@ -47,7 +42,5 @@ typedef struct {
 /// MCFG Revision (defined in spec)
 ///
 #define EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION  0x01
-
-#pragma pack()
 
 #endif

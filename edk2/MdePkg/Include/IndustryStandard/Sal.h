@@ -341,7 +341,6 @@ typedef struct _SAL_UPDATE_PAL_INFO_BLOCK {
 ///
 /// SAL System Table Definitions
 ///
-#pragma pack(1)
 typedef struct {
   ///
   /// The ASCII string representation of "SST_" which confirms the presence of the table. 
@@ -392,7 +391,6 @@ typedef struct {
   ///
   UINT8   Reserved2[8];
 } SAL_SYSTEM_TABLE_HEADER;
-#pragma pack()
 
 #define EFI_SAL_ST_HEADER_SIGNATURE "SST_"
 #define EFI_SAL_REVISION            0x0320
@@ -416,7 +414,6 @@ typedef struct {
 #define EFI_SAL_ST_PTC_SIZE                16
 #define EFI_SAL_ST_AP_WAKEUP_SIZE          16
 
-#pragma pack(1)
 ///
 /// Format Entrypoint Descriptor Entry
 ///
@@ -429,7 +426,6 @@ typedef struct {
   UINT64  Reserved2[2];
 } SAL_ST_ENTRY_POINT_DESCRIPTOR;
 
-#pragma pack(1)
 ///
 /// Format Platform Features Descriptor Entry
 ///
@@ -438,7 +434,7 @@ typedef struct {
   UINT8 PlatformFeatures;
   UINT8 Reserved[14];
 } SAL_ST_PLATFORM_FEATURES;
-#pragma pack()
+
 //
 // Value of Platform Feature List
 //
@@ -446,7 +442,6 @@ typedef struct {
 #define SAL_PLAT_FEAT_PLAT_IPI_HINT 0x02
 #define SAL_PLAT_FEAT_PROC_IPI_HINT 0x04
 
-#pragma pack(1)
 ///
 /// Format of Translation Register Descriptor Entry
 ///
@@ -459,14 +454,13 @@ typedef struct {
   UINT64  EncodedPageSize;
   UINT64  Reserved1;
 } SAL_ST_TR_DECRIPTOR;
-#pragma pack()
+
 //
 // Type of Translation Register
 //
 #define EFI_SAL_ST_TR_USAGE_INSTRUCTION 00
 #define EFI_SAL_ST_TR_USAGE_DATA        01
 
-#pragma pack(1)
 ///
 /// Definition of Coherence Domain Information
 ///
@@ -474,9 +468,7 @@ typedef struct {
   UINT64  NumberOfProcessors;
   UINT64  LocalIDRegister;
 } SAL_COHERENCE_DOMAIN_INFO;
-#pragma pack()
 
-#pragma pack(1)
 ///
 /// Format of Purge Translation Cache Coherence Domain Entry
 ///
@@ -486,9 +478,7 @@ typedef struct {
   UINT32                    NumberOfDomains;
   SAL_COHERENCE_DOMAIN_INFO *DomainInformation;
 } SAL_ST_CACHE_COHERENCE_DECRIPTOR;
-#pragma pack()
 
-#pragma pack(1)
 ///
 /// Format of Application Processor Wake-Up Descriptor Entry
 ///
@@ -498,7 +488,6 @@ typedef struct {
   UINT8   Reserved[6];
   UINT64  ExternalInterruptVector;
 } SAL_ST_AP_WAKEUP_DECRIPTOR;
-#pragma pack()
 
 ///
 /// Format of Firmware Interface Table (FIT) Entry
@@ -648,6 +637,9 @@ typedef struct {
 #define PROC_CR_LID_VALID_BIT_MASK          0x4
 #define PROC_STATIC_STRUCT_VALID_BIT_MASK   0x8
 #define CPU_INFO_VALID_BIT_MASK             0x1000000
+
+#pragma pack(1)
+
 ///
 /// Definition of Processor Machine Check Error Record
 ///
@@ -665,6 +657,8 @@ typedef struct {
   CPUID_INFO        CpuInfo;
   PSI_STATIC_STRUCT PsiValidData;
 } SAL_PROCESSOR_ERROR_RECORD;
+
+#pragma pack()
 
 ///
 /// GUID of Platform Memory Device Error Info
@@ -791,6 +785,7 @@ typedef struct {
   UINT8   SegmentNumber;
   UINT8   Reserved[5];
 } PCI_COMP_INFO;
+
 ///
 /// Definition of Platform PCI Component Error Info
 ///
@@ -824,6 +819,8 @@ typedef struct {
 #define SEL_EVENT_DATA1_VALID_BIT_MASK    0x80;
 #define SEL_EVENT_DATA2_VALID_BIT_MASK    0x100;
 #define SEL_EVENT_DATA3_VALID_BIT_MASK    0x200;
+
+#pragma pack(1)
 ///
 /// Definition of Platform SEL Device Error Info Record
 ///
@@ -842,6 +839,7 @@ typedef struct {
   UINT8           Data2;
   UINT8           Data3;
 } SAL_SEL_DEVICE_ERROR_RECORD;
+#pragma pack()
 
 ///
 /// GUID of Platform SMBIOS Device Error Info
@@ -914,7 +912,5 @@ typedef union {
   SAL_MEMORY_ERROR_RECORD             *MemoryRecord;
   UINT8                               *Raw;
 } SAL_ERROR_RECORDS_POINTERS;
-
-#pragma pack()
 
 #endif
