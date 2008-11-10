@@ -16,11 +16,6 @@
 
 #include <IndustryStandard/Acpi.h>
 
-//
-// Ensure proper structure formats
-//
-#pragma pack (1)
-
 ///
 /// Information Record header that appears at the beginning of each record
 ///
@@ -141,6 +136,4 @@ typedef EFI_ACPI_DESCRIPTION_HEADER EFI_ACPI_ASF_DESCRIPTION_HEADER;
 ///
 #define EFI_ACPI_ASF_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32 ('A', 'S', 'F', '!')
 
-#pragma pack ()
-
-#endif // _ALERT_STANDARD_FORMAT_TABLE_H
+#endif 
