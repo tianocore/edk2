@@ -29,7 +29,6 @@ Abstract:
 #include <Protocol/UnicodeCollation.h>
   
 #include "UefiIfrParser.h"
-#include "UefiIfrParserExpressionInternal.h"
 
 //
 // Global stack used to evaluate boolean expresions
