@@ -29,7 +29,7 @@
 /// since the value output by this macro is in 100ns unit,
 /// not 1us unit (1us = 1000ns)
 ///
-#define EfiScsiStallSeconds(a)  ((a) * EFI_SCSI_STALL_1_SECOND)
+#define EFI_SCSI_STALL_SECONDS(a)  ((a) * EFI_SCSI_STALL_1_SECOND)
 
 
 /**
