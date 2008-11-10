@@ -1147,7 +1147,7 @@ Returns:
 
   Status = ScsiInquiryCommand (
             &ScsiIoDevice->ScsiIo,
-            EfiScsiStallSeconds (1),
+            EFI_SCSI_STALL_SECONDS (1),
             (VOID *) &SenseData,
             &SenseDataLength,
             &HostAdapterStatus,

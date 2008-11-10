@@ -923,7 +923,7 @@ Returns:
 
   Status = ScsiInquiryCommand (
             ScsiDiskDevice->ScsiIo,
-            EfiScsiStallSeconds (1),
+            EFI_SCSI_STALL_SECONDS (1),
             NULL,
             &SenseDataLength,
             &HostAdapterStatus,
@@ -1054,7 +1054,7 @@ Returns:
   //
   Status = ScsiTestUnitReadyCommand (
             ScsiDiskDevice->ScsiIo,
-            EfiScsiStallSeconds (1),
+            EFI_SCSI_STALL_SECONDS (1),
             NULL,
             &SenseDataLength,
             &HostAdapterStatus,
@@ -1257,7 +1257,7 @@ Returns:
   //
   CommandStatus = ScsiReadCapacityCommand (
                     ScsiDiskDevice->ScsiIo,
-                    EfiScsiStallSeconds (1),
+                    EFI_SCSI_STALL_SECONDS (1),
                     NULL,
                     &SenseDataLength,
                     &HostAdapterStatus,
@@ -1494,7 +1494,7 @@ Returns:
   for (SenseReq = TRUE; SenseReq;) {
     Status = ScsiRequestSenseCommand (
               ScsiDiskDevice->ScsiIo,
-              EfiScsiStallSeconds (2),
+              EFI_SCSI_STALL_SECONDS (2),
               PtrSenseData,
               &SenseDataLength,
               &HostAdapterStatus,
@@ -1677,7 +1677,7 @@ Returns:
     }
 
     ByteCount = SectorCount * BlockSize;
-    Timeout   = EfiScsiStallSeconds (2);
+    Timeout   = EFI_SCSI_STALL_SECONDS (2);
 
     MaxRetry  = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
@@ -1788,7 +1788,7 @@ Returns:
     }
 
     ByteCount = SectorCount * BlockSize;
-    Timeout   = EfiScsiStallSeconds (2);
+    Timeout   = EFI_SCSI_STALL_SECONDS (2);
     MaxRetry  = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
       Status = ScsiDiskWrite10 (
