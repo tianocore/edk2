@@ -42,7 +42,7 @@ AllocateHiiHandle (
 
   for (Index = 0; Index < sizeof (mHandle) * 8; Index++) {
     if ((mHandle[Index / 8] & (1 << (Index % 8))) == 0) {
-      mHandle[Index / 8] |= (1 << (Index % 8));
+      mHandle[Index / 8] = (UINT8) (mHandle[Index / 8] | (1 << (Index % 8)));
       *Handle = (FRAMEWORK_EFI_HII_HANDLE) Index;
       ASSERT (*Handle != 0);
       return EFI_SUCCESS;
@@ -62,5 +62,5 @@ FreeHiiHandle (
   Num = (UINT16) Handle;
 
   ASSERT ((mHandle [Num / 8] & (1 << (Num % 8))) != 0);
-  mHandle [Num / 8] &= (~(1 << (Num % 8)));
+  mHandle [Num / 8] = (UINT8) (mHandle [Num / 8] & (~(1 << (Num % 8))));
 }

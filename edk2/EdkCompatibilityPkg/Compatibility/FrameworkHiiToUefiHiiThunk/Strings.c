@@ -38,7 +38,7 @@ ConvertIso639ToRfc3066 (
   	if (AsciiLanguage [Index] == 0) {
   		break;
   	} else if (AsciiLanguage [Index] >= 'A' && AsciiLanguage [Index] <= 'Z') {
-  		AsciiLanguage [Index] = AsciiLanguage [Index] - 'A' + 'a';
+  		AsciiLanguage [Index] = (CHAR8) (AsciiLanguage [Index] - 'A' + 'a');
   	}
   }
 

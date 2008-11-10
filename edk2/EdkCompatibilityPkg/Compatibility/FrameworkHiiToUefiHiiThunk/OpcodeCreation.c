@@ -268,7 +268,7 @@ F2UCreateGotoOpCode (
   // We only map FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE and FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED to 
   // UEFI IFR Opcode flags. The rest flags are obsolete.
   //
-  UOpcode.Question.Flags  = (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
+  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
   
 
   return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiData);
@@ -328,7 +328,7 @@ F2UCreateOneOfOptionOpCode (
   // #define EFI_IFR_OPTION_DEFAULT 0x10
   // #define EFI_IFR_OPTION_DEFAULT_MFG 0x20
   //
-  UOpcode.Flags |= (UINT8) ((FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING)) << 4);
+  UOpcode.Flags = (UINT8) (UOpcode.Flags  | (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING)) << 4);
 
   switch (Width) {
     case 1:
@@ -716,7 +716,7 @@ F2UCreateCheckBoxOpCode (
   //      FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED,
   // to UEFI IFR Opcode Question flags. The rest flags are obsolete.
   //
-  UOpcode.Question.Flags  = (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
+  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
 
   //
   // We also map 2 flags:
@@ -724,7 +724,7 @@ F2UCreateCheckBoxOpCode (
   //      FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING,
   // to UEFI IFR CheckBox Opcode default flags.
   //
-  UOpcode.Flags           = (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING));
+  UOpcode.Flags           = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING));
 
   return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiData);
 }
@@ -830,7 +830,7 @@ F2UCreateNumericOpCode (
   UOpcode.Question.VarStoreId    = VarStoreId;
   UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
 
-  UOpcode.Question.Flags  = (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
+  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
 
   //
   // Framework Numeric values are all in UINT16 and displayed as decimal.
@@ -961,7 +961,7 @@ F2UCreateStringOpCode (
   UOpcode.Question.VarStoreId    = FRAMEWORK_RESERVED_VARSTORE_ID;
   UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
 
-  UOpcode.Question.Flags  = (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
+  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
 
   UOpcode.MinSize = FwOpcode->MinSize;
   UOpcode.MaxSize = FwOpcode->MaxSize;

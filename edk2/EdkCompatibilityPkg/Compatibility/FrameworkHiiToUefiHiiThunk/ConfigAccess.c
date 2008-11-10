@@ -229,7 +229,6 @@ UninstallDefaultConfigAccessProtocol (
 {
   EFI_STATUS                      Status;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-  CONFIG_ACCESS_PRIVATE           *ConfigAccessInstance;
   
   HiiLibDestroyHiiDriverHandle (ThunkContext->UefiHiiDriverHandle);
 
@@ -246,8 +245,6 @@ UninstallDefaultConfigAccessProtocol (
                   ConfigAccess
                   );
   ASSERT_EFI_ERROR (Status);
-
-  ConfigAccessInstance = CONFIG_ACCESS_PRIVATE_FROM_PROTOCOL (ConfigAccess);
 
 }
   
@@ -487,7 +484,7 @@ ThunkRouteConfig (
   EFI_STATUS                                  Status;
   CONFIG_ACCESS_PRIVATE                       *ConfigAccess;
   FORMSET_STORAGE                             *BufferStorage;
-  UINT8                                       *Data;
+  VOID                                        *Data;
   UINTN                                       DataSize;
   UINTN                                       DataSize2;
   UINTN                                       LastModifiedByteIndex;
