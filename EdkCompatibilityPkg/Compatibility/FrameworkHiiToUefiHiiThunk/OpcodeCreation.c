@@ -24,7 +24,7 @@ EFI_IFR_GUID_OPTIONKEY mOptionKeyTemplate = {
    EFI_IFR_FRAMEWORK_GUID,
    EFI_IFR_EXTEND_OP_OPTIONKEY,
    0,
-   0,
+   {0},
    0
 };
 
