@@ -339,6 +339,7 @@ GetBufferTypeDefaultId (
 
     if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
       Status = GetBufferTypeDefaultIdAndStorageId (DefaultStore, Storage, FormSet, UefiDefaultsListHead);
+      ASSERT_EFI_ERROR (Status);
     }
 
     StorageLink = GetNextNode (&FormSet->StorageListHead, StorageLink);

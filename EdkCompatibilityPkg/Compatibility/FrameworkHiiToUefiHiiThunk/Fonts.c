@@ -109,7 +109,7 @@ HiiGetGlyph (
       for (Ypos = 0; Ypos < EFI_GLYPH_HEIGHT; Ypos++) {
         for (Xpos = 0; Xpos < EFI_GLYPH_WIDTH; Xpos++) {
           if (CompareMem (&Blt->Image.Bitmap[Ypos * EFI_GLYPH_WIDTH + Xpos], &mSysFGColor, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)) == 0) {
-            mNarrowGlyphBuffer.GlyphCol1[Ypos] |= 1 << (EFI_GLYPH_WIDTH - 1 - Xpos);
+            mNarrowGlyphBuffer.GlyphCol1[Ypos] = (UINT8) (mNarrowGlyphBuffer.GlyphCol1[Ypos] | (1 << (EFI_GLYPH_WIDTH - 1 - Xpos)));
           }
         }
       }

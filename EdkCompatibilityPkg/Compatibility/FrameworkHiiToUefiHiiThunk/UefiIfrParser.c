@@ -509,13 +509,6 @@ ParseOpCodes (
   UINT16                  NumberOfStatement;
   UINT16                  NumberOfExpression;
   EFI_IMAGE_ID            *ImageId;
-  BOOLEAN                 SuppressForOption;
-  BOOLEAN                 InScopeOptionSuppress;
-  BOOLEAN                 InScopeDisable;
-  UINT16                  DepthOfDisable;
-  BOOLEAN                 OpCodeDisabled;
-  BOOLEAN                 SingleOpCodeExpression;
-  BOOLEAN                 InScopeDefault;
   EFI_HII_VALUE           *Value;
   LIST_ENTRY              *OneOfOptinMapEntryListHead;
   EFI_IFR_GUID_OPTIONKEY  *OptionMap;
@@ -525,15 +518,8 @@ ParseOpCodes (
   EFI_IFR_ONE_OF          *OneOfOpcode;
 
   mInScopeSubtitle         = FALSE;
-  SuppressForOption        = FALSE;
   mInScopeSuppress         = FALSE;
-  InScopeOptionSuppress    = FALSE;
   mInScopeGrayOut          = FALSE;
-  InScopeDisable           = FALSE;
-  DepthOfDisable           = 0;
-  OpCodeDisabled           = FALSE;
-  SingleOpCodeExpression   = FALSE;
-  InScopeDefault           = FALSE;
   CurrentDefault           = NULL;
   CurrentOption            = NULL;
 
@@ -578,31 +564,6 @@ ParseOpCodes (
     //
     if (Scope) {
       PushScope (Operand);
-    }
-
-    if (OpCodeDisabled) {
-      //
-      // DisableIf Expression is evaluated to be TRUE, try to find its end.
-      // Here only cares the EFI_IFR_DISABLE_IF and EFI_IFR_END
-      //
-      if (Operand == EFI_IFR_DISABLE_IF_OP) {
-        DepthOfDisable++;
-      } else if (Operand == EFI_IFR_END_OP) {
-        Status = PopScope (&ScopeOpCode);
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        if (ScopeOpCode == EFI_IFR_DISABLE_IF_OP) {
-          if (DepthOfDisable == 0) {
-            InScopeDisable = FALSE;
-            OpCodeDisabled = FALSE;
-          } else {
-            DepthOfDisable--;
-          }
-        }
-      }
-      continue;
     }
 
     if (IsExpressionOpCode (Operand)) {
@@ -801,13 +762,9 @@ ParseOpCodes (
         break;
       }
 
-      if ((Operand == EFI_IFR_ONE_OF_OP) && Scope) {
-        SuppressForOption = TRUE;
-      }
-
       if (Operand == EFI_IFR_ONE_OF_OP) {
         OneOfOpcode = (EFI_IFR_ONE_OF *) OpCodeData;
-        OneOfType   = OneOfOpcode->Flags & EFI_IFR_NUMERIC_SIZE;
+        OneOfType   = (UINT8) (OneOfOpcode->Flags & EFI_IFR_NUMERIC_SIZE);
       }
       break;
 
@@ -826,9 +783,6 @@ ParseOpCodes (
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_OTHER;
       CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
 
-      if (Scope) {
-        SuppressForOption = TRUE;
-      }
       break;
 
     case EFI_IFR_CHECKBOX_OP:
@@ -913,9 +867,6 @@ ParseOpCodes (
       //
       InsertTailList (&CurrentStatement->DefaultListHead, &CurrentDefault->Link);
 
-      if (Scope) {
-        InScopeDefault = TRUE;
-      }
       break;
 
     //
@@ -1110,30 +1061,8 @@ ParseOpCodes (
         //
         break;
 
-      case EFI_IFR_SUPPRESS_IF_OP:
-        if (SuppressForOption) {
-          InScopeOptionSuppress = FALSE;
-        } else {
-          mInScopeSuppress = FALSE;
-        }
-        break;
-
       case EFI_IFR_GRAY_OUT_IF_OP:
         mInScopeGrayOut = FALSE;
-        break;
-
-      case EFI_IFR_DISABLE_IF_OP:
-        InScopeDisable = FALSE;
-        OpCodeDisabled = FALSE;
-        break;
-
-      case EFI_IFR_ONE_OF_OP:
-      case EFI_IFR_ORDERED_LIST_OP:
-        SuppressForOption = FALSE;
-        break;
-
-      case EFI_IFR_DEFAULT_OP:
-        InScopeDefault = FALSE;
         break;
 
       default:
