@@ -24,7 +24,6 @@
 //
 // Structures are all packed on 1-byte alignment
 //
-
 #pragma pack (1)
 
 //

@@ -18,16 +18,15 @@
 
 #include <IndustryStandard/Acpi.h>
 
-//
-// Ensure proper structure formats
-//
-#pragma pack(1)
-
 ///
 /// SPCR Revision (defined in spec)
 ///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION 0x01
 
+//
+// Ensure proper structure formats
+//
+#pragma pack(1)
 ///
 /// Serial Port Console Redirection Table Format
 ///
@@ -54,7 +53,6 @@ typedef struct {
   UINT8                                   PciSegment;
   UINT32                                  Reserved2;
 } EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE;
-
 #pragma pack()
 
 //

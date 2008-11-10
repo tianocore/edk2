@@ -191,7 +191,6 @@
 //
 #define EFI_SCSI_TYPE_UNKNOWN       0x1F  ///< Unknown or no device type
 
-#pragma pack(1)
 ///
 /// Standard INQUIRY data format
 ///
@@ -236,8 +235,6 @@ typedef struct {
   UINT8 BlockSize1;
   UINT8 BlockSize0;
 } EFI_SCSI_DISK_CAPACITY_DATA;
-
-#pragma pack()
 
 //
 // Sense Key

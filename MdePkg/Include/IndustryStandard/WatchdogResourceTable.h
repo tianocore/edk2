@@ -17,11 +17,6 @@
 
 #include <IndustryStandard/Acpi.h>
 
-//
-// Ensure proper structure formats
-//
-#pragma pack(1)
-
 ///
 /// Watchdog Resource Table definition.
 ///
@@ -38,8 +33,6 @@ typedef struct {
   UINT16                                  MaxCount;
   UINT8                                   Units;
 } EFI_ACPI_WATCHDOG_RESOURCE_1_0_TABLE;
-
-#pragma pack()
 
 //
 // WDRT Revision (defined in spec)

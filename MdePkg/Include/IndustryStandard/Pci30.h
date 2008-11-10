@@ -30,8 +30,6 @@
 ///
 #define EFI_PCI_CAPABILITY_ID_PCIEXP  0x10
 
-#pragma pack(1)
-
 ///
 /// defined in PCI Firmware Specification
 ///
@@ -51,7 +49,5 @@ typedef struct {
   UINT16  ConfigUtilityCodeHeaderOffset;
   UINT16  DMTFCLPEntryPointOffset;
 } PCI_3_0_DATA_STRUCTURE;
-
-#pragma pack()
 
 #endif
