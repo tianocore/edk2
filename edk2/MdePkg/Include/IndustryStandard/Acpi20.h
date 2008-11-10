@@ -32,6 +32,8 @@ typedef struct {
   UINT64  Address;
 } EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE;
 
+#pragma pack()
+
 //
 // Generic Address Space Address IDs
 //
@@ -160,31 +162,31 @@ typedef struct {
 ///
 #define EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION  0x03
 
-///
-/// Fixed ACPI Description Table Boot Architecture Flags
-/// All other bits are reserved and must be set to 0.
-///
-#define EFI_ACPI_2_0_LEGACY_DEVICES (1 << 0)
-#define EFI_ACPI_2_0_8042           (1 << 1)
+//
+// Fixed ACPI Description Table Boot Architecture Flags
+// All other bits are reserved and must be set to 0.
+//
+#define EFI_ACPI_2_0_LEGACY_DEVICES          BIT0
+#define EFI_ACPI_2_0_8042                    BIT1
 
 //
 // Fixed ACPI Description Table Fixed Feature Flags
 // All other bits are reserved and must be set to 0.
 //
-#define EFI_ACPI_2_0_WBINVD         (1 << 0)
-#define EFI_ACPI_2_0_WBINVD_FLUSH   (1 << 1)
-#define EFI_ACPI_2_0_PROC_C1        (1 << 2)
-#define EFI_ACPI_2_0_P_LVL2_UP      (1 << 3)
-#define EFI_ACPI_2_0_PWR_BUTTON     (1 << 4)
-#define EFI_ACPI_2_0_SLP_BUTTON     (1 << 5)
-#define EFI_ACPI_2_0_FIX_RTC        (1 << 6)
-#define EFI_ACPI_2_0_RTC_S4         (1 << 7)
-#define EFI_ACPI_2_0_TMR_VAL_EXT    (1 << 8)
-#define EFI_ACPI_2_0_DCK_CAP        (1 << 9)
-#define EFI_ACPI_2_0_RESET_REG_SUP  (1 << 10)
-#define EFI_ACPI_2_0_SEALED_CASE    (1 << 11)
-#define EFI_ACPI_2_0_HEADLESS       (1 << 12)
-#define EFI_ACPI_2_0_CPU_SW_SLP     (1 << 13)
+#define EFI_ACPI_2_0_WBINVD                  BIT0
+#define EFI_ACPI_2_0_WBINVD_FLUSH            BIT1
+#define EFI_ACPI_2_0_PROC_C1                 BIT2
+#define EFI_ACPI_2_0_P_LVL2_UP               BIT3
+#define EFI_ACPI_2_0_PWR_BUTTON              BIT4
+#define EFI_ACPI_2_0_SLP_BUTTON              BIT5
+#define EFI_ACPI_2_0_FIX_RTC                 BIT6
+#define EFI_ACPI_2_0_RTC_S4                  BIT7
+#define EFI_ACPI_2_0_TMR_VAL_EXT             BIT8
+#define EFI_ACPI_2_0_DCK_CAP                 BIT9
+#define EFI_ACPI_2_0_RESET_REG_SUP           BIT10
+#define EFI_ACPI_2_0_SEALED_CASE             BIT11
+#define EFI_ACPI_2_0_HEADLESS                BIT12
+#define EFI_ACPI_2_0_CPU_SW_SLP              BIT13
 
 ///
 /// Firmware ACPI Control Structure
@@ -210,7 +212,7 @@ typedef struct {
 /// Firmware Control Structure Feature Flags
 /// All other bits are reserved and must be set to 0.
 ///
-#define EFI_ACPI_2_0_S4BIOS_F (1 << 0)
+#define EFI_ACPI_2_0_S4BIOS_F        BIT0
 
 ///
 /// Multiple APIC Description Table header definition.  The rest of the table
@@ -231,7 +233,7 @@ typedef struct {
 /// Multiple APIC Flags
 /// All other bits are reserved and must be set to 0.
 ///
-#define EFI_ACPI_2_0_PCAT_COMPAT  (1 << 0)
+#define EFI_ACPI_2_0_PCAT_COMPAT          BIT0
 
 //
 // Multiple APIC Description Table APIC structure types
@@ -266,7 +268,7 @@ typedef struct {
 ///
 /// Local APIC Flags.  All other bits are reserved and must be 0.
 ///
-#define EFI_ACPI_2_0_LOCAL_APIC_ENABLED (1 << 0)
+#define EFI_ACPI_2_0_LOCAL_APIC_ENABLED         BIT0
 
 ///
 /// IO APIC Structure
@@ -302,6 +304,11 @@ typedef struct {
   UINT32  GlobalSystemInterrupt;
 } EFI_ACPI_2_0_NON_MASKABLE_INTERRUPT_SOURCE_STRUCTURE;
 
+//
+// Ensure proper structure formats
+//
+#pragma pack(1)
+
 ///
 /// Local APIC NMI Structure
 ///
@@ -322,6 +329,8 @@ typedef struct {
   UINT16  Reserved;
   UINT64  LocalApicAddress;
 } EFI_ACPI_2_0_LOCAL_APIC_ADDRESS_OVERRIDE_STRUCTURE;
+
+#pragma pack()
 
 ///
 /// IO SAPIC Structure
@@ -502,7 +511,5 @@ typedef struct {
 /// "MCFG" Static Resource Affinity Table
 ///
 #define EFI_ACPI_2_0_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_SIGNATURE  SIGNATURE_32('M', 'C', 'F', 'G')
-
-#pragma pack()
 
 #endif
