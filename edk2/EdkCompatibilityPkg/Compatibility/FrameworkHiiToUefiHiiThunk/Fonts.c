@@ -22,20 +22,31 @@ EFI_GRAPHICS_OUTPUT_BLT_PIXEL   mSysFGColor = {0};
 
 
 /**
-  This function is only called by Graphics Console module and GraphicsLib. 
-  EDK II provides a UEFI Graphics Console module. ECP provides a GraphicsLib 
-  complying to UEFI HII.
+  Translates a Unicode character into the corresponding font glyph.
   
-  This function will ASSERT and return EFI_UNSUPPORTED.
+  Notes:
+    This function is only called by Graphics Console module and GraphicsLib. 
+    Wrap the Framework HII GetGlyph function to UEFI Font Protocol.
+    
+    EDK II provides a UEFI Graphics Console module. ECP provides a GraphicsLib 
+    complying to UEFI HII.
+  
+  @param This            A pointer to the EFI_HII_PROTOCOL instance.
+  @param Source          A pointer to a Unicode string.
+  @param Index           On input, the offset into the string from which to fetch the character. On successful completion, the 
+                         index is updated to the first character past the character(s) making up the just extracted glyph. 
+  @param GlyphBuffer     Pointer to an array where the glyphs corresponding to the characters in the source may be stored. 
+                         GlyphBuffer is assumed to be wide enough to accept a wide glyph character.
+  @param BitWidth        If EFI_SUCCESS was returned, the UINT16 pointed to by this value is filled with the length of the glyph in pixels. 
+                         It is unchanged if the call was unsuccessful.
+  @param InternalStatus  To save the time required to read the string from the beginning on each glyph extraction 
+                         (for example, to ensure that the narrow versus wide glyph mode is correct), this value is 
+                         updated each time the function is called with the status that is local to the call. The cell pointed 
+                         to by this parameter must be initialized to zero prior to invoking the call the first time for any string.
 
-  @param This            N.A.
-  @param Source          N.A.
-  @param Index           N.A.
-  @param GlyphBuffer     N.A.
-  @param BitWidth        N.A.
-  @param InternalStatus  N.A.
-
-  @return EFI_UNSUPPORTED N.A.
+  @retval EFI_SUCCESS     It worked.
+  @retval EFI_NOT_FOUND   A glyph for a character was not found.
+ 
 
 **/
 EFI_STATUS
@@ -122,22 +133,25 @@ HiiGetGlyph (
 }
 
 /**
+  Translates a glyph into the format required for input to the Universal Graphics Adapter (UGA) Block Transfer (BLT) routines.
+  
+  Notes:
   This function is only called by Graphics Console module and GraphicsLib. 
   EDK II provides a UEFI Graphics Console module. ECP provides a GraphicsLib 
   complying to UEFI HII.
   
-  This function will ASSERT and return EFI_UNSUPPORTED.
+  @param This         A pointer to the EFI_HII_PROTOCOL instance.
+  @param GlyphBuffer  A pointer to the buffer that contains glyph data. 
+  @param Foreground   The foreground setting requested to be used for the generated BltBuffer data. Type EFI_UGA_PIXEL is defined in "Related Definitions" below.
+  @param Background   The background setting requested to be used for the generated BltBuffer data. 
+  @param Count        The entry in the BltBuffer upon which to act.
+  @param Width        The width in bits of the glyph being converted.
+  @param Height       The height in bits of the glyph being converted
+  @param BltBuffer    A pointer to the buffer that contains the data that is ready to be used by the UGA BLT routines. 
 
-  @param This            N.A.
-  @param GlyphBuffer     N.A.
-  @param Foreground      N.A.
-  @param Background      N.A.
-  @param Count           N.A.
-  @param Width           N.A.
-  @param Height          N.A.
-  @param BltBuffer       N.A.
-
-  @return EFI_UNSUPPORTED N.A.
+  @retval EFI_SUCCESS  It worked.
+  @retval EFI_NOT_FOUND A glyph for a character was not found.
+ 
 
 **/
 EFI_STATUS

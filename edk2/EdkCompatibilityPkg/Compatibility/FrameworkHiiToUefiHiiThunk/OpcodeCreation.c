@@ -18,6 +18,108 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_GUID  mTianoExtendedOpcodeGuid = EFI_IFR_TIANO_GUID;
 
+
+EFI_IFR_GUID_OPTIONKEY mOptionKeyTemplate = {
+   {EFI_IFR_GUID_OP, sizeof (EFI_IFR_GUID_OPTIONKEY), 0},
+   EFI_IFR_FRAMEWORK_GUID,
+   EFI_IFR_EXTEND_OP_OPTIONKEY,
+   0,
+   0,
+   0
+};
+
+typedef struct { 
+  UINT8 FrameworkIfrOp;
+  UINT8 UefiIfrOp;
+} IFR_OPCODE_MAP;
+
+IFR_OPCODE_MAP mQuestionOpcodeMap [] = {
+  { FRAMEWORK_EFI_IFR_ONE_OF_OP,        EFI_IFR_ONE_OF_OP},
+  { FRAMEWORK_EFI_IFR_CHECKBOX_OP,      EFI_IFR_CHECKBOX_OP},
+  { FRAMEWORK_EFI_IFR_NUMERIC_OP,       EFI_IFR_NUMERIC_OP},
+  { FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP, EFI_IFR_ONE_OF_OPTION_OP},
+  { FRAMEWORK_EFI_IFR_ORDERED_LIST_OP,  EFI_IFR_ORDERED_LIST_OP}
+};
+
+EFI_STATUS
+QuestionOpFwToUefi (
+  IN            UINT8   FwOp,
+  OUT           UINT8   *UefiOp
+  )
+{
+  UINTN       Index;
+
+  for (Index = 0; Index < sizeof (mQuestionOpcodeMap) / sizeof (mQuestionOpcodeMap[0]); Index++) {
+    if (FwOp == mQuestionOpcodeMap[Index].FrameworkIfrOp) {
+      *UefiOp = mQuestionOpcodeMap[Index].UefiIfrOp;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+
+EFI_STATUS
+FwQIdToUefiQId (
+  IN  CONST FORM_BROWSER_FORMSET *FormSet,
+  IN  UINT16                     VarStoreId,
+  IN  UINT8                      FwOpCode,
+  IN  UINT16                     FwQId,
+  OUT UINT16                     *UefiQId
+  )
+{
+  LIST_ENTRY             *FormList;
+  LIST_ENTRY             *StatementList;
+  FORM_BROWSER_FORM      *Form;
+  FORM_BROWSER_STATEMENT *Statement;
+  EFI_STATUS             Status;
+  UINT8                  UefiOp;
+
+  *UefiQId = 0;
+
+  FormList = GetFirstNode (&FormSet->FormListHead);
+
+  while (!IsNull (&FormSet->FormListHead, FormList)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (FormList);
+
+    StatementList = GetFirstNode (&Form->StatementListHead);
+
+    while (!IsNull (&Form->StatementListHead, StatementList)) {
+      Statement = FORM_BROWSER_STATEMENT_FROM_LINK (StatementList);
+      if (Statement->VarStoreId != 0 && Statement->Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+        if (FwQId == Statement->VarStoreInfo.VarOffset) {
+          Status = QuestionOpFwToUefi (FwOpCode, &UefiOp);
+          ASSERT_EFI_ERROR (Status);
+
+          if (UefiOp == Statement->Operand) {
+            //
+            // If ASSERT here, the Framework VFR file has two IFR Question with the Same Type refering to the 
+            // same field in NvMap. This is ambigurity, we don't handle it for now.
+            //
+            //
+            // UEFI Question ID is unique in a FormSet.
+            //
+            ASSERT (VarStoreId == Statement->VarStoreId);
+            *UefiQId = Statement->QuestionId;
+
+            return EFI_SUCCESS;
+            
+          }
+        }
+      }
+
+      StatementList = GetNextNode (&Form->StatementListHead, StatementList);
+    }
+
+    FormList = GetNextNode (&FormSet->FormListHead, FormList);
+  }
+  
+  return EFI_NOT_FOUND;
+}
+
+
+
 #define LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL   0x1000
 EFI_STATUS
 AppendToUpdateBuffer (
@@ -46,53 +148,17 @@ AppendToUpdateBuffer (
 
 EFI_QUESTION_ID
 AssignQuestionId (
-  IN  UINT16    FwQuestionId
+  IN  UINT16                      FwQuestionId,
+  IN        FORM_BROWSER_FORMSET  *FormSet
   )
 {
   if (FwQuestionId == 0) {
-    //
-    // In UEFI IFR, the Question ID can't be zero. Zero means no storage.
-    // So use 0xABBA as a Question ID.
-    //
-    return 0xABBA;
+    FormSet->MaxQuestionId++;
+    return FormSet->MaxQuestionId;
   } else {
     return FwQuestionId;
   }
 }
-
-
-EFI_STATUS
-FwQuestionIdToUefiQuestionId (
-  IN HII_THUNK_CONTEXT            *ThunkContext,
-  IN UINT16                       VarStoreId,
-  IN UINT16                       FwId,
-  OUT EFI_QUESTION_ID             *UefiQId
-  )
-{
-  LIST_ENTRY                *MapEntryListHead;
-  LIST_ENTRY                *Link;
-  QUESTION_ID_MAP_ENTRY     *MapEntry;
-
-  MapEntryListHead = GetMapEntryListHead (ThunkContext, VarStoreId);
-  ASSERT (MapEntryListHead != NULL);
-
-  Link = GetFirstNode (MapEntryListHead);
-
-  while (!IsNull (MapEntryListHead, Link)) {
-    MapEntry = QUESTION_ID_MAP_ENTRY_FROM_LINK (Link);
-
-    if (MapEntry->FwQId == FwId) {
-      *UefiQId = MapEntry->UefiQid;
-      return EFI_SUCCESS;
-    }
-
-    Link = GetNextNode (MapEntryListHead, Link);
-  }
-
-  return EFI_NOT_FOUND;
-}
-
-
 
 EFI_STATUS
 UCreateEndOfOpcode (
@@ -281,6 +347,24 @@ F2UCreateOneOfOptionOpCode (
   return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiData);
 }
 
+EFI_STATUS
+CreateGuidOptionKeyOpCode (
+  IN EFI_QUESTION_ID                   QuestionId,
+  IN UINT16                            OptionValue,
+  IN EFI_QUESTION_ID                   KeyValue,
+  OUT      EFI_HII_UPDATE_DATA         *UefiData
+  )
+{
+  EFI_IFR_GUID_OPTIONKEY              UOpcode;
+
+  CopyMem (&UOpcode, &mOptionKeyTemplate, sizeof (EFI_IFR_GUID_OPTIONKEY));
+
+  UOpcode.QuestionId  = QuestionId;
+  CopyMem (&UOpcode.OptionValue, &OptionValue, sizeof (OptionValue)); 
+  UOpcode.KeyValue = KeyValue;
+  
+  return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiData);
+}
 
 /*
 typedef struct _EFI_IFR_QUESTION_HEADER {
@@ -349,13 +433,9 @@ F2UCreateOneOfOpCode (
   EFI_IFR_ONE_OF                      UOpcode;
   FRAMEWORK_EFI_IFR_OP_HEADER         *FwOpHeader;
   FRAMEWORK_EFI_IFR_ONE_OF_OPTION     *FwOneOfOp;
-  ONE_OF_OPTION_MAP                   *OneOfOptionMap;
-  ONE_OF_OPTION_MAP_ENTRY             *OneOfOptionMapEntry;
 
   ASSERT (NextFwOpcode != NULL);
   ASSERT (DataCount != NULL);
-
-  OneOfOptionMap = NULL;
 
   ZeroMem (&UOpcode, sizeof(UOpcode));
   *DataCount = 0;
@@ -381,41 +461,12 @@ F2UCreateOneOfOpCode (
       UOpcode.Question.Flags |= EFI_IFR_FLAG_CALLBACK;
       
       if (UOpcode.Question.QuestionId == 0) {
-        Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+        Status = FwQIdToUefiQId (ThunkContext->FormSet, VarStoreId, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
         if (EFI_ERROR (Status)) {
-          UOpcode.Question.QuestionId = AssignQuestionId (FwOneOfOp->Key);
+          UOpcode.Question.QuestionId = AssignQuestionId (FwOneOfOp->Key, ThunkContext->FormSet);
         }
-
-        OneOfOptionMap = AllocateZeroPool (sizeof (ONE_OF_OPTION_MAP));
-        ASSERT (OneOfOptionMap != NULL);
-        OneOfOptionMap->Signature = ONE_OF_OPTION_MAP_SIGNATURE;
-        OneOfOptionMap->QuestionId = UOpcode.Question.QuestionId;
-        InitializeListHead (&OneOfOptionMap->OneOfOptionMapEntryListHead);
-        switch (FwOpcode->Width) {
-        case 1:
-          OneOfOptionMap->ValueType = EFI_IFR_TYPE_NUM_SIZE_8;
-          break;
-        case 2:
-          OneOfOptionMap->ValueType = EFI_IFR_TYPE_NUM_SIZE_16;
-          break;
-        default:
-          ASSERT (FALSE);
-          break;
-        }
-
-        InsertTailList (&ThunkContext->OneOfOptionMapListHead, &OneOfOptionMap->Link);
       }
-      
-      OneOfOptionMapEntry = AllocateZeroPool (sizeof (ONE_OF_OPTION_MAP_ENTRY));
-      ASSERT (OneOfOptionMapEntry != NULL);
 
-      OneOfOptionMapEntry->FwKey = FwOneOfOp->Key;
-      OneOfOptionMapEntry->Signature = ONE_OF_OPTION_MAP_ENTRY_SIGNATURE;
-      
-      CopyMem (&OneOfOptionMapEntry->Value, &FwOneOfOp->Value, FwOpcode->Width);
-
-      ASSERT (OneOfOptionMap != NULL);
-      InsertTailList (&OneOfOptionMap->OneOfOptionMapEntryListHead, &OneOfOptionMapEntry->Link);
     }
 
     if (FwOneOfOp->Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED) {
@@ -430,9 +481,9 @@ F2UCreateOneOfOpCode (
     //
     // Assign QuestionId if still not assigned.
     //
-    Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+    Status = FwQIdToUefiQId (ThunkContext->FormSet, VarStoreId, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
     if (EFI_ERROR (Status)) {
-      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId);
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId, ThunkContext->FormSet);
     }
   }
   
@@ -447,7 +498,15 @@ F2UCreateOneOfOpCode (
   //
   FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpcode + FwOpcode->Header.Length);
   while (FwOpHeader->OpCode != FRAMEWORK_EFI_IFR_END_ONE_OF_OP) {
+
+    FwOneOfOp = (FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader;
+      
     Status = F2UCreateOneOfOptionOpCode ((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader, FwOpcode->Width, UefiData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Status = CreateGuidOptionKeyOpCode (UOpcode.Question.QuestionId, FwOneOfOp->Value, FwOneOfOp->Key, UefiData);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -533,9 +592,9 @@ F2UCreateOrderedListOpCode (
       UOpcode.Question.Flags |= EFI_IFR_FLAG_CALLBACK;
       
       if (UOpcode.Question.QuestionId == 0) {
-        Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+        Status = FwQIdToUefiQId (ThunkContext->FormSet, VarStoreId, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
         if (EFI_ERROR (Status)) {
-          UOpcode.Question.QuestionId = AssignQuestionId (FwOneOfOp->Key);
+          UOpcode.Question.QuestionId = AssignQuestionId (FwOneOfOp->Key, ThunkContext->FormSet);
         }
 
       }
@@ -549,9 +608,9 @@ F2UCreateOrderedListOpCode (
   }
 
   if (UOpcode.Question.QuestionId == 0) {
-    Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+    Status = FwQIdToUefiQId (ThunkContext->FormSet, VarStoreId, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
     if (EFI_ERROR (Status)) {
-      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId);
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId, ThunkContext->FormSet);
     }
   }
  
@@ -637,18 +696,18 @@ F2UCreateCheckBoxOpCode (
   UOpcode.Question.Header.Help = FwOpcode->Help;
 
   if (FwOpcode->Key == 0) {
-    Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+    Status = FwQIdToUefiQId (ThunkContext->FormSet, VarStoreId, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
     if (EFI_ERROR (Status)) {
       //
       // Add a new opcode and it will not trigger call back. So we just reuse the FW QuestionId.
       //
-      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId);
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId, ThunkContext->FormSet);
     }
   } else {
     UOpcode.Question.QuestionId    = FwOpcode->Key;
   }
 
-  UOpcode.Question.VarStoreId    = RESERVED_VARSTORE_ID;
+  UOpcode.Question.VarStoreId    = FRAMEWORK_RESERVED_VARSTORE_ID;
   UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
 
   //
@@ -746,12 +805,12 @@ F2UCreateNumericOpCode (
   ZeroMem (&UOpcode, sizeof(UOpcode));
 
   if (FwOpcode->Key == 0) {
-    Status = FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+    Status = FwQIdToUefiQId (ThunkContext->FormSet, VarStoreId, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
     if (EFI_ERROR (Status)) {
       //
       // Add a new opcode and it will not trigger call back. So we just reuse the FW QuestionId.
       //
-      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId);
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId, ThunkContext->FormSet);
     }
   } else {
     UOpcode.Question.QuestionId    = FwOpcode->Key;
@@ -887,7 +946,7 @@ F2UCreateStringOpCode (
   ZeroMem (&UOpcode, sizeof(UOpcode));
 
   if (FwOpcode->Key == 0) {
-    FwQuestionIdToUefiQuestionId (ThunkContext, VarStoreId, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+    FwQIdToUefiQId (ThunkContext->FormSet, VarStoreId, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
   } else {
     UOpcode.Question.QuestionId    = FwOpcode->Key;
   }
@@ -899,7 +958,7 @@ F2UCreateStringOpCode (
   UOpcode.Question.Header.Help = FwOpcode->Help;
 
   UOpcode.Question.QuestionId    = FwOpcode->Key;
-  UOpcode.Question.VarStoreId    = RESERVED_VARSTORE_ID;
+  UOpcode.Question.VarStoreId    = FRAMEWORK_RESERVED_VARSTORE_ID;
   UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
 
   UOpcode.Question.Flags  = (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
@@ -957,7 +1016,6 @@ EFI_STATUS
 FwUpdateDataToUefiUpdateData (
   IN       HII_THUNK_CONTEXT                 *ThunkContext,
   IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *Data,
-  IN       BOOLEAN                          AddData,
   OUT      EFI_HII_UPDATE_DATA              **UefiData
   )
 {

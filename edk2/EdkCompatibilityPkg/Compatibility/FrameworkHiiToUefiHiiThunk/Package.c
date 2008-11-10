@@ -362,7 +362,7 @@ UefiRegisterPackageList (
     //
     // If Packages->GuidId is NULL, the caller of FramworkHii->NewPack is registering
     // packages with at least 1 StringPack and 1 IfrPack. Therefore, Packages->GuidId is
-    // not used as the name of the package list.  A GUID is generated as a Package List
+    // not used as the name of the package list.  Formset GUID is used as the Package List
     // GUID.
     //
     ASSERT (StringPackageCount >=1 && IfrPackageCount == 1);
@@ -383,7 +383,9 @@ UefiRegisterPackageList (
 
   //
   // UEFI HII require EFI_HII_CONFIG_ACCESS_PROTOCOL to be installed on a EFI_HANDLE, so
-  // that Setup Utility can load the Buffer Storage using this protocol.
+  // that Setup Utility can load the Buffer Storage using this protocol. An UEFI VFR can only
+  // produce IFR package generated with Buffer Storage type and EFI Variable Storage.
+  // The default EFI_HII_CONFIG_ACCESS_PROTOCOL is used to Get/Set the Buffer Storage.
   //
   if (IfrPackageCount != 0) {
     InstallDefaultConfigAccessProtocol (Packages, ThunkContext);
@@ -425,8 +427,10 @@ UefiRegisterPackageList (
   if (IfrPackageCount == 0) {
     if (StringPackageCount != 0) {
       //
-      // Look for a Package List with only IFR Package with the same GUID name.
-      // If found one, add the String Packages to it.
+      // Look for a Package List with only IFR Package with the same TAG GUID name.
+      // If found one, add the String Packages to the found Package List.
+      // This is needed because Framework HII Module may not register the String Package
+      // and IFR Package in one NewPack () call.
       //
       UpdatePackListWithOnlyIfrPack (
           Private,
@@ -435,11 +439,12 @@ UefiRegisterPackageList (
       );
     }
   } else {
-    CreateQuestionIdMap (ThunkContext);
-    
     if (StringPackageCount == 0) {
       //
-      // Register the Package List to UEFI HII first.
+      // Look for the String Package with the same TAG GUID name and add
+      // the found String Package to this Package List.
+      // This is needed because Framework HII Module may not register the String Package
+      // and IFR Package in one NewPack () call.
       //
       Status = FindStringPackAndUpdatePackListWithOnlyIfrPack (
                   Private,
@@ -450,6 +455,14 @@ UefiRegisterPackageList (
         goto Done;
       }
     }
+    
+    //
+    // Parse the Formset. Must be called after FindStringPackAndUpdatePackListWithOnlyIfrPack is called so
+    // that String Package is ready.
+    //
+    ThunkContext->FormSet = ParseFormSet (ThunkContext->UefiHiiHandle);
+    ASSERT (ThunkContext->FormSet != NULL);
+        
   }
 
 Done:
@@ -468,6 +481,18 @@ Done:
 }
 
 
+/**
+
+  Registers the various packages that are passed in a Package List.
+
+  @param This      Pointer of Frameowk HII protocol instance.
+  @param Packages  Pointer of HII packages.
+  @param Handle    Handle value to be returned.
+
+  @retval EFI_SUCCESS           Pacakges has added to HII database successfully.
+  @retval EFI_INVALID_PARAMETER If Handle or Packages is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiNewPack (
@@ -475,24 +500,6 @@ HiiNewPack (
   IN  EFI_HII_PACKAGES               *Packages,
   OUT FRAMEWORK_EFI_HII_HANDLE       *Handle
   )
-/*++
-
-Routine Description:
-
-  Extracts the various packs from a package list.
-
-Arguments:
-
-  This      - Pointer of HII protocol.
-  Packages  - Pointer of HII packages.
-  Handle    - Handle value to be returned.
-
-Returns:
-
-  EFI_SUCCESS           - Pacakges has added to HII database successfully.
-  EFI_INVALID_PARAMETER - Invalid parameter.
-
---*/
 {
   EFI_STATUS                 Status;
   HII_THUNK_PRIVATE_DATA *Private;
@@ -509,10 +516,10 @@ Returns:
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   
   //
-  // We use a simple Global variable to inform NewPackNotify
+  // We use a simple Global variable to inform NewOrAddPackNotify()
   // that the package list registered here is already registered
-  // in the HII Thunk Layer. So NewPackNotify does not need to
-  // call RegisterUefiHiiHandle () to registered it.
+  // in the HII Thunk Layer. So NewOrAddPackNotify () does not need to
+  // call registered the Package List again.
   //
   mInFrameworkHiiNewPack = TRUE;
 
@@ -532,26 +539,27 @@ Returns:
   return Status;
 }
 
+/**
+
+  Remove a package from the HII database.
+
+  @param This      Pointer of Frameowk HII protocol instance.
+  @param Handle    Handle value to be removed.
+
+  @retval EFI_SUCCESS           Pacakges has added to HII database successfully.
+  @retval EFI_INVALID_PARAMETER If Handle or Packages is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiRemovePack (
   IN EFI_HII_PROTOCOL               *This,
   IN FRAMEWORK_EFI_HII_HANDLE       Handle
   )
-/*++
-
-Routine Description:
-  Removes the various packs from a Handle
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_STATUS                 Status;
-  HII_THUNK_PRIVATE_DATA *Private;
-  HII_THUNK_CONTEXT *ThunkContext;
+  HII_THUNK_PRIVATE_DATA     *Private;
+  HII_THUNK_CONTEXT          *ThunkContext;
   EFI_TPL                    OldTpl;
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
@@ -584,6 +592,25 @@ Returns:
   return Status;
 }
 
+/**
+  This notification function will be called when a Package List is registered
+  using UEFI HII interface. The Package List registered need to be recorded in
+  Framework Thunk module as Thunk Module may need to look for String Package in
+  the package registered.
+
+  If the Package List registered is not either Sting Package or IFR package, 
+  then ASSERT. If the NotifyType is not ADD_PACK or NEW_PACK, then ASSERT.
+  Both cases means UEFI HII Database itself is buggy. 
+
+  @param PackageType The Package Type.
+  @param PackageGuid The Package GUID.
+  @param Package     The Package Header.
+  @param Handle      The HII Handle of this Package List.
+  @param NotifyType  The reason of the notification. 
+
+  @retval EFI_SUCCESS The notification function is successful.
+  
+**/
 EFI_STATUS
 EFIAPI
 NewOrAddPackNotify (
@@ -609,8 +636,8 @@ NewOrAddPackNotify (
   }
 
   //
-  // We only create a ThunkContext if the Uefi Hii Handle is only already registered
-  // by the HII Thunk Layer.
+  // We will create a ThunkContext to log the package list only if the
+  // package is not registered with by Framework HII Thunk module yet.
   //
   ThunkContext = UefiHiiHandleToThunkContext (Private, Handle);
   if (ThunkContext == NULL) {
@@ -621,17 +648,38 @@ NewOrAddPackNotify (
   } 
 
   if (PackageType == EFI_HII_PACKAGE_FORMS) {
-    GetAttributesOfFirstFormSet (ThunkContext);
+    if (ThunkContext->FormSet != NULL) {
+      DestroyFormSet (ThunkContext->FormSet);
+    }
+
+    //
+    // Reparse the FormSet.
+    //
+    ThunkContext->FormSet = ParseFormSet (ThunkContext->UefiHiiHandle);
+    ASSERT (ThunkContext->FormSet != NULL);
   }
 
   return Status;  
 }
 
-//
-// Framework HII module may cache a GUID as the name of the package list.
-// Then search for the Framework HII handle database for the handle matching
-// this GUID
+/**
+  This notification function will be called when a Package List is removed
+  using UEFI HII interface. The Package List removed need to be removed from
+  Framework Thunk module too.
 
+  If the Package List registered is not Sting Package, 
+  then ASSERT. If the NotifyType is not REMOVE_PACK, then ASSERT.
+  Both cases means UEFI HII Database itself is buggy. 
+
+  @param PackageType The Package Type.
+  @param PackageGuid The Package GUID.
+  @param Package     The Package Header.
+  @param Handle      The HII Handle of this Package List.
+  @param NotifyType  The reason of the notification. 
+
+  @retval EFI_SUCCESS The notification function is successful.
+  
+**/
 EFI_STATUS
 EFIAPI
 RemovePackNotify (

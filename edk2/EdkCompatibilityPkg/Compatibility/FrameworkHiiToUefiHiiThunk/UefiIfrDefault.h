@@ -45,8 +45,8 @@ typedef struct {
 **/
 EFI_STATUS
 UefiIfrGetBufferTypeDefaults (
-  EFI_HII_HANDLE      UefiHiiHandle,
-  LIST_ENTRY          **UefiDefaults
+  IN  HII_THUNK_CONTEXT   *ThunkContext,
+  OUT LIST_ENTRY          **UefiDefaults
 );
 
 /**
@@ -73,6 +73,7 @@ EFI_STATUS
 UefiDefaultsToFwDefaults (
   IN     LIST_ENTRY                  *UefiIfrDefaults,
   IN     UINTN                       DefaultMask,
+  IN     EFI_VARSTORE_ID             UefiFormSetDefaultVarStoreId,
   OUT    EFI_HII_VARIABLE_PACK_LIST  **VariablePackList
   );
 
