@@ -1,5 +1,5 @@
 /** @file   
-  ACPI 3.0 definitions from the ACPI Specification Revision 3.0b October 10, 2006.
+  ACPI 3.0 definitions from the ACPI Specification Revision 3.0b October 10, 2006
 
   Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
@@ -31,8 +31,6 @@ typedef struct {
   UINT8   AccessSize;
   UINT64  Address;
 } EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE;
-     
-#pragma pack()
 
 //
 // Generic Address Space Address IDs
@@ -108,10 +106,6 @@ typedef struct {
 ///
 #define EFI_ACPI_3_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_REVISION 0x01
 
-//           
-// Ensure proper structure formats
-//           
-#pragma pack(1)
 ///
 /// Fixed ACPI Description Table Structure (FADT)
 ///
@@ -169,7 +163,6 @@ typedef struct {
   EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE  XGpe0Blk;
   EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk;
 } EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE;
-#pragma pack()
 
 ///
 /// FADT Version (as defined in ACPI 3.0 spec.)
@@ -192,36 +185,36 @@ typedef struct {
 // Fixed ACPI Description Table Boot Architecture Flags
 // All other bits are reserved and must be set to 0.
 //
-#define EFI_ACPI_3_0_LEGACY_DEVICES              BIT0
-#define EFI_ACPI_3_0_8042                        BIT1
-#define EFI_ACPI_3_0_VGA_NOT_PRESENT             BIT2
-#define EFI_ACPI_3_0_MSI_NOT_SUPPORTED           BIT3
-#define EFI_ACPI_3_0_PCIE_ASPM_CONTROLS          BIT4
+#define EFI_ACPI_3_0_LEGACY_DEVICES     (1 << 0)
+#define EFI_ACPI_3_0_8042               (1 << 1)
+#define EFI_ACPI_3_0_VGA_NOT_PRESENT    (1 << 2)
+#define EFI_ACPI_3_0_MSI_NOT_SUPPORTED  (1 << 3)
+#define EFI_ACPI_3_0_PCIE_ASPM_CONTROLS (1 << 4)
 
 //
 // Fixed ACPI Description Table Fixed Feature Flags
 // All other bits are reserved and must be set to 0.
 //
-#define EFI_ACPI_3_0_WBINVD                                 BIT0
-#define EFI_ACPI_3_0_WBINVD_FLUSH                           BIT1
-#define EFI_ACPI_3_0_PROC_C1                                BIT2
-#define EFI_ACPI_3_0_P_LVL2_UP                              BIT3
-#define EFI_ACPI_3_0_PWR_BUTTON                             BIT4
-#define EFI_ACPI_3_0_SLP_BUTTON                             BIT5
-#define EFI_ACPI_3_0_FIX_RTC                                BIT6
-#define EFI_ACPI_3_0_RTC_S4                                 BIT7
-#define EFI_ACPI_3_0_TMR_VAL_EXT                            BIT8
-#define EFI_ACPI_3_0_DCK_CAP                                BIT9
-#define EFI_ACPI_3_0_RESET_REG_SUP                          BIT10
-#define EFI_ACPI_3_0_SEALED_CASE                            BIT11
-#define EFI_ACPI_3_0_HEADLESS                               BIT12
-#define EFI_ACPI_3_0_CPU_SW_SLP                             BIT13
-#define EFI_ACPI_3_0_PCI_EXP_WAK                            BIT14
-#define EFI_ACPI_3_0_USE_PLATFORM_CLOCK                     BIT15
-#define EFI_ACPI_3_0_S4_RTC_STS_VALID                       BIT16
-#define EFI_ACPI_3_0_REMOTE_POWER_ON_CAPABLE                BIT17
-#define EFI_ACPI_3_0_FORCE_APIC_CLUSTER_MODEL               BIT18
-#define EFI_ACPI_3_0_FORCE_APIC_PHYSICAL_DESTINATION_MODE   BIT19
+#define EFI_ACPI_3_0_WBINVD                   (1 << 0)
+#define EFI_ACPI_3_0_WBINVD_FLUSH             (1 << 1)
+#define EFI_ACPI_3_0_PROC_C1                  (1 << 2)
+#define EFI_ACPI_3_0_P_LVL2_UP                (1 << 3)
+#define EFI_ACPI_3_0_PWR_BUTTON               (1 << 4)
+#define EFI_ACPI_3_0_SLP_BUTTON               (1 << 5)
+#define EFI_ACPI_3_0_FIX_RTC                  (1 << 6)
+#define EFI_ACPI_3_0_RTC_S4                   (1 << 7)
+#define EFI_ACPI_3_0_TMR_VAL_EXT              (1 << 8)
+#define EFI_ACPI_3_0_DCK_CAP                  (1 << 9)
+#define EFI_ACPI_3_0_RESET_REG_SUP            (1 << 10)
+#define EFI_ACPI_3_0_SEALED_CASE              (1 << 11)
+#define EFI_ACPI_3_0_HEADLESS                 (1 << 12)
+#define EFI_ACPI_3_0_CPU_SW_SLP               (1 << 13)
+#define EFI_ACPI_3_0_PCI_EXP_WAK              (1 << 14)
+#define EFI_ACPI_3_0_USE_PLATFORM_CLOCK       (1 << 15)
+#define EFI_ACPI_3_0_S4_RTC_STS_VALID         (1 << 16)
+#define EFI_ACPI_3_0_REMOTE_POWER_ON_CAPABLE  (1 << 17)
+#define EFI_ACPI_3_0_FORCE_APIC_CLUSTER_MODEL (1 << 18)
+#define EFI_ACPI_3_0_FORCE_APIC_PHYSICAL_DESTINATION_MODE (1 << 19)
 
 ///
 /// Firmware ACPI Control Structure
@@ -247,7 +240,7 @@ typedef struct {
 /// Firmware Control Structure Feature Flags
 /// All other bits are reserved and must be set to 0.
 ///
-#define EFI_ACPI_3_0_S4BIOS_F       BIT0
+#define EFI_ACPI_3_0_S4BIOS_F (1 << 0)
 
 //
 // Differentiated System Description Table,
@@ -278,7 +271,7 @@ typedef struct {
 /// Multiple APIC Flags
 /// All other bits are reserved and must be set to 0.
 ///
-#define EFI_ACPI_3_0_PCAT_COMPAT         BIT0
+#define EFI_ACPI_3_0_PCAT_COMPAT  (1 << 0)
 
 //
 // Multiple APIC Description Table APIC structure types
@@ -313,7 +306,7 @@ typedef struct {
 ///
 /// Local APIC Flags.  All other bits are reserved and must be 0.
 ///
-#define EFI_ACPI_3_0_LOCAL_APIC_ENABLED        BIT0
+#define EFI_ACPI_3_0_LOCAL_APIC_ENABLED (1 << 0)
 
 ///
 /// IO APIC Structure
@@ -372,11 +365,6 @@ typedef struct {
   UINT16  Flags;
   UINT32  GlobalSystemInterrupt;
 } EFI_ACPI_3_0_NON_MASKABLE_INTERRUPT_SOURCE_STRUCTURE;
-  
-//
-// Ensure proper structure formats
-//
-#pragma pack(1)
 
 ///
 /// Local APIC NMI Structure
@@ -398,8 +386,6 @@ typedef struct {
   UINT16  Reserved;
   UINT64  LocalApicAddress;
 } EFI_ACPI_3_0_LOCAL_APIC_ADDRESS_OVERRIDE_STRUCTURE;
-
-#pragma pack()
 
 ///
 /// IO SAPIC Structure
@@ -447,7 +433,7 @@ typedef struct {
 /// Platform Interrupt Source Flags.
 /// All other bits are reserved and must be set to 0.
 ///
-#define EFI_ACPI_3_0_CPEI_PROCESSOR_OVERRIDE          BIT0
+#define EFI_ACPI_3_0_CPEI_PROCESSOR_OVERRIDE     (1 << 0)
 
 ///
 /// Smart Battery Description Table (SBST)
@@ -488,7 +474,7 @@ typedef struct {
 ///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
-  UINT32                      Reserved1;  ///< Must be set to 1
+  UINT32                      Reserved1;  // Must be set to 1
   UINT64                      Reserved2;
 } EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER;
 
@@ -497,11 +483,11 @@ typedef struct {
 ///
 #define EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION  0x02
 
-//
-// SRAT structure types.
-// All other values between 0x02 an 0xFF are reserved and
-// will be ignored by OSPM.
-//
+///
+/// SRAT structure types.
+/// All other values between 0x02 an 0xFF are reserved and
+/// will be ignored by OSPM.
+///
 #define EFI_ACPI_3_0_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
 #define EFI_ACPI_3_0_MEMORY_AFFINITY                      0x01
 
@@ -524,10 +510,6 @@ typedef struct {
 ///
 #define EFI_ACPI_3_0_PROCESSOR_LOCAL_APIC_SAPIC_ENABLED (1 << 0)
 
-//
-// Ensure proper structure formats
-//
-#pragma pack(1)
 ///
 /// Memory Affinity Structure Definition
 ///
@@ -544,8 +526,6 @@ typedef struct {
   UINT32  Flags;
   UINT64  Reserved3;
 } EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE;
-
-#pragma pack()
 
 //
 // Memory Flags.  All other bits are reserved and must be 0.
@@ -697,5 +677,7 @@ typedef struct {
 /// "iBFT" iSCSI Boot Firmware Table
 ///
 #define EFI_ACPI_3_0_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE  SIGNATURE_32('i', 'B', 'F', 'T')
+
+#pragma pack()
 
 #endif

@@ -17,6 +17,7 @@
 ///
 /// Smbios Table Entry Point Structure
 ///
+#pragma pack(1)
 typedef struct {
   UINT8   AnchorString[4];
   UINT8   EntryPointStructureChecksum;
@@ -45,7 +46,6 @@ typedef struct {
 
 typedef UINT8 SMBIOS_TABLE_STRING;
 
-#pragma pack(1)
 ///
 /// BIOS Information (Type 0)
 ///
@@ -63,7 +63,6 @@ typedef struct {
   UINT8                 EmbeddedControllerFirmwareMajorRelease;
   UINT8                 EmbeddedControllerFirmwareMinorRelease;
 } SMBIOS_TABLE_TYPE0;
-#pragma pack()
 
 ///
 /// System Information (Type 1)
@@ -80,7 +79,6 @@ typedef struct {
   SMBIOS_TABLE_STRING   Family;
 } SMBIOS_TABLE_TYPE1;
 
-#pragma pack(1)
 ///
 /// Base Board (or Module) Information (Type 2)
 ///
@@ -98,7 +96,6 @@ typedef struct {
   UINT8                 NumberOfContainedObjectHandles;
   UINT16                ContainedObjectHandles[1];
 } SMBIOS_TABLE_TYPE2;
-#pragma pack()
 
 typedef struct {
   UINT8                 ContainedElementType;
@@ -164,7 +161,6 @@ typedef struct {
   UINT16                ProcessorFamily2;
 } SMBIOS_TABLE_TYPE4;
 
-#pragma pack(1)
 ///
 /// Memory Controller Information (Type 5, Obsolete)
 ///
@@ -212,7 +208,6 @@ typedef struct {
   UINT8                 SystemCacheType;
   UINT8                 Associativity;
 } SMBIOS_TABLE_TYPE7;
-#pragma pack()
 
 ///
 /// Port Connector Information (Type 8)
@@ -226,7 +221,6 @@ typedef struct {
   UINT8                 PortType;
 } SMBIOS_TABLE_TYPE8;
 
-#pragma pack(1)
 ///
 /// System Slots (Type 9)
 ///
@@ -247,7 +241,6 @@ typedef struct {
   UINT8                 BusNum;
   UINT8                 DevFuncNum;
 } SMBIOS_TABLE_TYPE9;
-#pragma pack()
 
 typedef struct {
   UINT8                 DeviceType;
@@ -289,7 +282,6 @@ typedef struct {
   SMBIOS_TABLE_STRING   CurrentLanguages;
 } SMBIOS_TABLE_TYPE13;
 
-#pragma pack(1)
 typedef struct {
   UINT8                 ItemType;
   UINT16                ItemHandle;
@@ -380,7 +372,6 @@ typedef struct {
   UINT32                DeviceErrorAddress;
   UINT32                ErrorResolution;
 } SMBIOS_TABLE_TYPE18;
-#pragma pack()
 
 ///
 /// Memory Array Mapped Address (Type 19)
@@ -417,7 +408,6 @@ typedef struct {
   UINT8                 NumberOfButtons;
 } SMBIOS_TABLE_TYPE21;
 
-#pragma pack(1)
 ///
 /// Portable Battery (Type 22)
 ///
@@ -451,7 +441,6 @@ typedef struct {
   UINT16                TimerInterval;
   UINT16                Timeout;
 } SMBIOS_TABLE_TYPE23;
-#pragma pack()
 
 ///
 /// Hardware Security (Type 24)
@@ -565,7 +554,6 @@ typedef struct {
   UINT8                 BootStatus[1];
 } SMBIOS_TABLE_TYPE32;
 
-#pragma pack(1)
 ///
 /// 64-bit Memory Error Information (Type 33)
 ///
@@ -601,7 +589,6 @@ typedef struct {
   UINT16                ComponentHandle;
   UINT16                ThresholdHandle;
 } SMBIOS_TABLE_TYPE35;
-#pragma pack()
 
 ///
 /// Management Device Threshold Data (Type 36)
@@ -616,7 +603,6 @@ typedef struct {
   UINT16                UpperThresholdNonRecoverable;
 } SMBIOS_TABLE_TYPE36;
 
-#pragma pack(1)
 typedef struct {
   UINT8                 DeviceLoad;
   UINT16                DeviceHandle;
@@ -632,7 +618,6 @@ typedef struct {
   UINT8                 MemoryDeviceCount;
   MEMORY_DEVICE         MemoryDevice[1];
 } SMBIOS_TABLE_TYPE37;
-#pragma pack()
 
 ///
 /// IPMI Device Information (Type 38)
@@ -668,7 +653,6 @@ typedef struct {
   UINT16                InputCurrentProbeHandle;
 } SMBIOS_TABLE_TYPE39;
 
-#pragma pack(1)
 typedef struct {                       
   UINT8                   EntryLength; 
   UINT16                  ReferencedHandle;
@@ -698,7 +682,6 @@ typedef struct {
   UINT8                   BusNum;
   UINT8                   DevFuncNum;  
 } SMBIOS_TABLE_TYPE41;
-#pragma pack()
 
 ///
 /// Inactive (Type 126)
@@ -765,5 +748,7 @@ typedef union {
   SMBIOS_TABLE_TYPE127  *Type127;
   UINT8                 *Raw;
 } SMBIOS_STRUCTURE_POINTER;
+
+#pragma pack()
 
 #endif

@@ -34,8 +34,6 @@ typedef struct {
   UINT8                                   PageProtectionAndOemAttribute;
 } EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_HEADER;
 
-#pragma pack()
-
 ///
 /// HPET Revision (defined in spec)
 ///
@@ -48,5 +46,7 @@ typedef struct {
 #define EFI_ACPI_NO_PAGE_PROTECTION   0
 #define EFI_ACPI_4KB_PAGE_PROTECTION  1
 #define EFI_ACPI_64KB_PAGE_PROTECTION 2
+
+#pragma pack()
 
 #endif

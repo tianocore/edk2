@@ -62,6 +62,7 @@
 //
 // USB standard descriptors and reqeust
 //
+#pragma pack(1)
 
 ///
 /// Format of Setup Data for USB Device Requests
@@ -96,7 +97,6 @@ typedef struct {
   UINT8           NumConfigurations;
 } USB_DEVICE_DESCRIPTOR;
 
-#pragma pack(1)
 ///
 /// Standard Configuration Descriptor
 /// USB 2.0 spec, Section 9.6.3
@@ -111,7 +111,6 @@ typedef struct {
   UINT8           Attributes;
   UINT8           MaxPower;
 } USB_CONFIG_DESCRIPTOR;
-#pragma pack()
 
 ///
 /// Standard Interface Descriptor
@@ -129,7 +128,6 @@ typedef struct {
   UINT8           Interface;
 } USB_INTERFACE_DESCRIPTOR;
 
-#pragma pack(1)
 ///
 /// Standard Endpoint Descriptor
 /// USB 2.0 spec, Section 9.6.6
@@ -142,7 +140,6 @@ typedef struct {
   UINT16          MaxPacketSize;
   UINT8           Interval;
 } USB_ENDPOINT_DESCRIPTOR;
-#pragma pack()
 
 ///
 /// UNICODE String Descriptor
@@ -153,6 +150,9 @@ typedef struct {
   UINT8           DescriptorType;
   CHAR16          String[1];
 } EFI_USB_STRING_DESCRIPTOR;
+
+#pragma pack()
+
 
 typedef enum {
   //
@@ -352,6 +352,7 @@ typedef struct hid_descriptor {
   UINT8                         NumDescriptors;
   EFI_USB_HID_CLASS_DESCRIPTOR  HidClassDesc[1];
 } EFI_USB_HID_DESCRIPTOR;
+
 #pragma pack()
 
 #endif

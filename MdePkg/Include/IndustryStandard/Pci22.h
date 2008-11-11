@@ -26,6 +26,7 @@
 #define PCI_MAX_FUNC    7
 
 
+#pragma pack(1)
 typedef struct {
   UINT16  VendorId;
   UINT16  DeviceId;
@@ -122,9 +123,9 @@ typedef struct {
   UINT16  BridgeControl;        ///< Bridge Control
 } PCI_CARDBUS_CONTROL_REGISTER;
 
-//
-// Definitions of PCI class bytes and manipulation macros.
-//
+///
+/// Definitions of PCI class bytes and manipulation macros.
+///
 #define PCI_CLASS_OLD                 0x00
 #define   PCI_CLASS_OLD_OTHER           0x00
 #define   PCI_CLASS_OLD_VGA             0x01
@@ -349,9 +350,9 @@ typedef struct {
 #define PCI_MAXGNT_OFFSET                           0x3E ///< Max Grant Register
 #define PCI_MAXLAT_OFFSET                           0x3F ///< Max Latency Register
 
-//
-// defined in PCI-to-PCI Bridge Architecture Specification
-//
+///
+/// defined in PCI-to-PCI Bridge Architecture Specification
+///
 #define PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET      0x18   
 #define PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET    0x19   
 #define PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET  0x1a   
@@ -375,6 +376,8 @@ typedef union {
   UINT32  Uint32;
 } PCI_CONFIG_ACCESS_CF8;
 
+#pragma pack()
+
 #define EFI_PCI_COMMAND_IO_SPACE                        BIT0   ///< 0x0001
 #define EFI_PCI_COMMAND_MEMORY_SPACE                    BIT1   ///< 0x0002
 #define EFI_PCI_COMMAND_BUS_MASTER                      BIT2   ///< 0x0004
@@ -386,9 +389,9 @@ typedef union {
 #define EFI_PCI_COMMAND_SERR                            BIT8   ///< 0x0100
 #define EFI_PCI_COMMAND_FAST_BACK_TO_BACK               BIT9   ///< 0x0200
 
-//
-// defined in PCI-to-PCI Bridge Architecture Specification
-//
+///
+/// defined in PCI-to-PCI Bridge Architecture Specification
+///
 #define EFI_PCI_BRIDGE_CONTROL_PARITY_ERROR_RESPONSE    BIT0   ///< 0x0001
 #define EFI_PCI_BRIDGE_CONTROL_SERR                     BIT1   ///< 0x0002
 #define EFI_PCI_BRIDGE_CONTROL_ISA                      BIT2   ///< 0x0004
@@ -402,9 +405,9 @@ typedef union {
 #define EFI_PCI_BRIDGE_CONTROL_TIMER_STATUS             BIT10  ///< 0x0400
 #define EFI_PCI_BRIDGE_CONTROL_DISCARD_TIMER_SERR       BIT11  ///< 0x0800
 
-//
-// Following are the PCI-CARDBUS bridge control bit, defined in PC Card Standard
-//
+///
+/// Following are the PCI-CARDBUS bridge control bit, defined in PC Card Standard
+///
 #define EFI_PCI_BRIDGE_CONTROL_IREQINT_ENABLE           BIT7   ///< 0x0080
 #define EFI_PCI_BRIDGE_CONTROL_RANGE0_MEMORY_TYPE       BIT8   ///< 0x0100
 #define EFI_PCI_BRIDGE_CONTROL_RANGE1_MEMORY_TYPE       BIT9   ///< 0x0200
@@ -423,6 +426,7 @@ typedef union {
 ///
 #define EFI_PCI_CARDBUS_BRIDGE_CAPABILITY_PTR 0x14
 
+#pragma pack(1)
 //
 // PCI Capability List IDs and records
 //
@@ -432,7 +436,6 @@ typedef union {
 #define EFI_PCI_CAPABILITY_ID_SLOTID  0x04
 #define EFI_PCI_CAPABILITY_ID_MSI     0x05
 #define EFI_PCI_CAPABILITY_ID_HOTPLUG 0x06
-
 typedef struct {
   UINT8 CapabilityID;
   UINT8 NextItemPtr;
@@ -592,5 +595,7 @@ typedef union {
   EFI_PCI_EXPANSION_ROM_HEADER    *Efi;
   EFI_LEGACY_EXPANSION_ROM_HEADER *PcAt;
 } EFI_PCI_ROM_HEADER;
+
+#pragma pack()
 
 #endif
