@@ -33,6 +33,7 @@ Abstract:
 #include <Library/GenericBdsLib.h>
 #include <Library/PlatformBdsLib.h>
 #include <Library/GraphicsLib.h>
+#include <Library/DevicePathLib.h>
 
 #include <Protocol/WinNtThunk.h>
 #include <Protocol/WinNtIo.h>

@@ -42,6 +42,7 @@ Abstract:
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/WinNtLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
 
 #include "WinNtThunk.h"
 
