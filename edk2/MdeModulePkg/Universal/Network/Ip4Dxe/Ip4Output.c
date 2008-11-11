@@ -31,7 +31,7 @@ UINT16  mIp4Id;
 
   @param  Packet               The packet to prepend IP4 header to
   @param  Head                 The caller supplied header. The caller should set
-                               the  following header fields: Tos, TotalLen, Id,
+                               the following header fields: Tos, TotalLen, Id,
                                Fragment, Ttl, Protocol, Src and Dst. All the fields
                                are in host byte order. This function will fill in
                                the Ver, HeadLen, and checksum.
@@ -45,10 +45,10 @@ UINT16  mIp4Id;
 **/
 EFI_STATUS
 Ip4PrependHead (
-  IN NET_BUF                *Packet,
-  IN IP4_HEAD               *Head,
-  IN UINT8                  *Option,
-  IN UINT32                 OptLen
+  IN OUT NET_BUF                *Packet,
+  IN     IP4_HEAD               *Head,
+  IN     UINT8                  *Option,
+  IN     UINT32                 OptLen
   )
 {
   UINT32                    HeadLen;
@@ -65,7 +65,7 @@ Ip4PrependHead (
   Ip4CopyOption (Option, OptLen, FirstFragment, NULL, &Len);
 
   HeadLen = IP4_MIN_HEADLEN + Len;
-  ASSERT (((Len %4) == 0) && (HeadLen <= IP4_MAX_HEADLEN));
+  ASSERT (((Len % 4) == 0) && (HeadLen <= IP4_MAX_HEADLEN));
 
   PacketHead = (IP4_HEAD *) NetbufAllocSpace (Packet, HeadLen, NET_BUF_HEAD);
 
@@ -106,7 +106,7 @@ Ip4PrependHead (
   @param  Src                  The source of the packet
 
   @return NULL if no proper interface is found, otherwise the interface that
-  @return can be used to send the system packet from.
+          can be used to send the system packet from.
 
 **/
 IP4_INTERFACE *
@@ -197,7 +197,7 @@ Ip4SysPacketSent (
                                NULL if the packet is from the system.
   @param  Packet               The user data to send, excluding the IP header.
   @param  Head                 The caller supplied header. The caller should set
-                               the  following header fields: Tos, TotalLen, Id, tl,
+                               the following header fields: Tos, TotalLen, Id, tl,
                                Fragment, Protocol, Src and Dst. All the fields are
                                in host byte  order. This function will fill in the
                                Ver, HeadLen,  Fragment, and checksum. The Fragment
@@ -269,8 +269,8 @@ Ip4Output (
     if (IP4_IS_BROADCAST (Ip4GetNetCast (Dest, IpIf)) || (Dest == IP4_ALLONE_ADDRESS)) {
       //
       // Set the gateway to local broadcast if the Dest is
-      // is the broadcast address for the connected network
-      // or it is local broadcast.
+      // the broadcast address for the connected network or
+      // it is local broadcast.
       //
       GateWay = IP4_ALLONE_ADDRESS;
 
@@ -423,8 +423,8 @@ ON_ERROR:
 **/
 BOOLEAN
 Ip4CancelPacketFragments (
-  IP4_LINK_TX_TOKEN   *Frame,
-  VOID                *Context
+  IN IP4_LINK_TX_TOKEN   *Frame,
+  IN VOID                *Context
   )
 {
   if ((Frame->Packet == (NET_BUF *) Context) || (Frame->Context == Context)) {

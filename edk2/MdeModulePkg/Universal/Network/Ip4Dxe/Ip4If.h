@@ -64,12 +64,12 @@ VOID
   IN VOID                      *Context
   );
 
-//
-// Each receive request is wrapped in an IP4_LINK_RX_TOKEN.
-// Upon completion, the Callback will be called. Only one
-// receive request is send to MNP. IpInstance is always NULL.
-// Reference MNP's spec for information.
-//
+///
+/// Each receive request is wrapped in an IP4_LINK_RX_TOKEN.
+/// Upon completion, the Callback will be called. Only one
+/// receive request is send to MNP. IpInstance is always NULL.
+/// Reference MNP's spec for information.
+///
 typedef struct {
   UINT32                                Signature;
   IP4_INTERFACE                         *Interface;
@@ -81,10 +81,10 @@ typedef struct {
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  MnpToken;
 } IP4_LINK_RX_TOKEN;
 
-//
-// Each transmit request is wrapped in an IP4_LINK_TX_TOKEN.
-// Upon completion, the Callback will be called.
-//
+///
+/// Each transmit request is wrapped in an IP4_LINK_TX_TOKEN.
+/// Upon completion, the Callback will be called.
+///
 typedef struct {
   UINT32                                Signature;
   LIST_ENTRY                            Link;
@@ -103,12 +103,12 @@ typedef struct {
   EFI_MANAGED_NETWORK_TRANSMIT_DATA     MnpTxData;
 } IP4_LINK_TX_TOKEN;
 
-//
-// Only one ARP request is requested for all the frames in
-// a time. It is started for the first frames to the Ip. Any
-// subsequent transmission frame will be linked to Frames, and
-// be sent all at once the ARP requests succeed.
-//
+///
+/// Only one ARP request is requested for all the frames in
+/// a time. It is started for the first frames to the Ip. Any
+/// subsequent transmission frame will be linked to Frames, and
+/// be sent all at once the ARP requests succeed.
+///
 typedef struct {
   UINT32                  Signature;
   LIST_ENTRY              Link;

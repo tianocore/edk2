@@ -21,25 +21,25 @@ Abstract:
 #ifndef __EFI_IP4_INPUT_H__
 #define __EFI_IP4_INPUT_H__
 
-enum {
+typedef enum {
   IP4_MIN_HEADLEN       = 20,
   IP4_MAX_HEADLEN       = 60,
 
   IP4_ASSEMLE_HASH_SIZE = 31,
   IP4_FRAGMENT_LIFE     = 120,
   IP4_MAX_PACKET_SIZE   = 65535
-};
+} IP4_INPUT_ENUM_TYPES;
 
-//
-// Per packet information for input process. LinkFlag specifies whether
-// the packet is received as Link layer unicast, multicast or broadcast.
-// The CastType is the IP layer cast type, such as IP multicast or unicast.
-// Start, End and Length are staffs used to assemble the packets. Start
-// is the sequence number of the first byte of data in the packet. Length
-// is the number of bytes of data. End = Start + Length, that is, the
-// sequence number of last byte + 1. Each assembled packet has a count down
-// life. If it isn't consumed before Life reaches zero, the packet is released.
-//
+///
+/// Per packet information for input process. LinkFlag specifies whether
+/// the packet is received as Link layer unicast, multicast or broadcast.
+/// The CastType is the IP layer cast type, such as IP multicast or unicast.
+/// Start, End and Length are staffs used to assemble the packets. Start
+/// is the sequence number of the first byte of data in the packet. Length
+/// is the number of bytes of data. End = Start + Length, that is, the
+/// sequence number of last byte + 1. Each assembled packet has a count down
+/// life. If it isn't consumed before Life reaches zero, the packet is released.
+///
 typedef struct {
   UINTN                     LinkFlag;
   INTN                      CastType;
@@ -50,9 +50,9 @@ typedef struct {
   EFI_STATUS                Status;
 } IP4_CLIP_INFO;
 
-//
-// Structure used to assemble IP packets.
-//
+///
+/// Structure used to assemble IP packets.
+///
 typedef struct {
   LIST_ENTRY                Link;
 
@@ -74,11 +74,11 @@ typedef struct {
   INTN                      Life;       // Count down life for the packet.
 } IP4_ASSEMBLE_ENTRY;
 
-//
-// Each Ip service instance has an assemble table to reassemble
-// the packets before delivery to its children. It is organized
-// as hash table.
-//
+///
+/// Each Ip service instance has an assemble table to reassemble
+/// the packets before delivery to its children. It is organized
+/// as hash table.
+///
 typedef struct {
   LIST_ENTRY      Bucket[IP4_ASSEMLE_HASH_SIZE];
 } IP4_ASSEMBLE_TABLE;

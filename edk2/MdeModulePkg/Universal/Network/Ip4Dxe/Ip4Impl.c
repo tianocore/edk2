@@ -2435,7 +2435,7 @@ EfiIp4Poll (
 /**
   Decrease the life of the transmitted packets. If it is
   decreased to zero, cancel the packet. This function is
-  called by Ip4packetTimerTicking which time out both the
+  called by Ip4PacketTimerTicking which time out both the
   received-but-not-delivered and transmitted-but-not-recycle
   packets.
 

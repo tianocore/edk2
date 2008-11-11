@@ -24,7 +24,7 @@ Abstract:
 
 
 /**
-  Create a empty assemble entry for the packet identified by
+  Create an empty assemble entry for the packet identified by
   (Dst, Src, Id, Protocol). The default life for the packet is
   120 seconds.
 
@@ -72,7 +72,7 @@ Ip4CreateAssembleEntry (
 
 
 /**
-  Release all the fragments of a packet, then free the assemble entry
+  Release all the fragments of a packet, then free the assemble entry.
 
   @param  Assemble               The assemble entry to free
 
@@ -110,7 +110,7 @@ Ip4FreeAssembleEntry (
 **/
 VOID
 Ip4InitAssembleTable (
-  IN IP4_ASSEMBLE_TABLE     *Table
+  IN OUT IP4_ASSEMBLE_TABLE     *Table
   )
 {
   UINT32                    Index;
@@ -164,9 +164,9 @@ Ip4CleanAssembleTable (
 **/
 VOID
 Ip4TrimPacket (
-  IN NET_BUF                *Packet,
-  IN INTN                   Start,
-  IN INTN                   End
+  IN OUT NET_BUF                *Packet,
+  IN     INTN                   Start,
+  IN     INTN                   End
   )
 {
   IP4_CLIP_INFO             *Info;
@@ -220,17 +220,19 @@ Ip4OnFreeFragments (
   return it to caller. If the packet can't be assembled, NULL is
   return.
 
-  @param  Table                  The assemble table used.
-  @param  Packet                 The fragment to assemble
+  @param  Table     The assemble table used. New assemble entry will be created
+                    if the Packet is from a new chain of fragments.
+  @param  Packet    The fragment to assemble. It might be freed if the fragment
+                    can't be re-assembled.
 
   @return NULL if the packet can't be reassemble. The point to just assembled
-  @return packet if all the fragments of the packet have arrived.
+          packet if all the fragments of the packet have arrived.
 
 **/
 NET_BUF *
 Ip4Reassemble (
-  IN IP4_ASSEMBLE_TABLE     *Table,
-  IN NET_BUF                *Packet
+  IN OUT IP4_ASSEMBLE_TABLE     *Table,
+  IN OUT NET_BUF                *Packet
   )
 {
   IP4_HEAD                  *IpHead;
@@ -393,7 +395,7 @@ Ip4Reassemble (
   //
   // Deliver the whole packet if all the fragments received.
   // All fragments received if:
-  //  1. received the last one, so, the totoal length is know
+  //  1. received the last one, so, the total length is know
   //  2. received all the data. If the last fragment on the
   //     queue ends at the total length, all data is received.
   //
@@ -429,7 +431,7 @@ Ip4Reassemble (
       return NULL;
     }
 
-    NewPacket->Ip                  = Assemble->Head;
+    NewPacket->Ip = Assemble->Head;
     CopyMem (IP4_GET_CLIP_INFO (NewPacket), Assemble->Info, sizeof (*IP4_GET_CLIP_INFO (NewPacket)));
     return NewPacket;
   }
@@ -481,7 +483,7 @@ Ip4AccpetFrame (
   }
 
   //
-  // Check that the IP4 header is correctly formated
+  // Check that the IP4 header is correctly formatted
   //
   if (Packet->TotalSize < IP4_MIN_HEADLEN) {
     goto RESTART;
@@ -627,7 +629,8 @@ DROP:
   @param  Head                   The IP header of the packet
   @param  Packet                 The data of the packet
 
-  @return TRUE if the child wants to receive the packet, otherwise return FALSE.
+  @retval TRUE   If the child wants to receive the packet.
+  @retval FALSE  Otherwise.
 
 **/
 BOOLEAN
@@ -648,7 +651,7 @@ Ip4InstanceFrameAcceptable (
   //
   // Dirty trick for the Tiano UEFI network stack implmentation. If
   // ReceiveTimeout == -1, the receive of the packet for this instance
-  // is disabled. The UEFI spec don't have such captibility. We add
+  // is disabled. The UEFI spec don't have such capability. We add
   // this to improve the performance because IP will make a copy of
   // the received packet for each accepting instance. Some IP instances
   // used by UDP/TCP only send packets, they don't wants to receive.
@@ -1114,7 +1117,7 @@ Ip4InterfaceDeliverPacket (
   to each IP4 child that accepts the packet. The second pass will
   deliver a non-shared copy of the packet to each IP4 child that
   has pending receive requests. Data is copied if more than one
-  child wants to consume the packet bacause each IP child need
+  child wants to consume the packet because each IP child needs
   its own copy of the packet to make changes.
 
   @param  IpSb                   The IP4 service instance that received the packet
