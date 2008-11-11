@@ -23,7 +23,7 @@ Abstract:
 
 
 /**
-  Return the cast type (Unicast/Boradcast) specific to a
+  Return the cast type (Unicast/Boradcast) specific to an
   interface. All the addresses are host byte ordered.
 
   @param  IpAddr                The IP address to classify in host byte order
@@ -34,6 +34,7 @@ Abstract:
   @retval IP4_SUBNET_BROADCAST  The IpAddr is a directed subnet boradcast to  the
                                 interface
   @retval IP4_NET_BROADCAST     The IpAddr is a network broadcast to the interface
+  @retval 0                     Otherwise.
 
 **/
 INTN
@@ -69,8 +70,8 @@ Ip4GetNetCast (
   @param  Src                   The source address in the packet (host byte order)
 
   @return The cast type for the Dst, it will return on the first non-promiscuous
-  @return cast type to a configured interface. If the packet doesn't match any of
-  @return the interface, multicast address and local broadcast address are checked.
+          cast type to a configured interface. If the packet doesn't match any of
+          the interface, multicast address and local broadcast address are checked.
 
 **/
 INTN
@@ -119,11 +120,11 @@ Ip4GetHostCast (
   if (Dst == IP4_ALLONE_ADDRESS) {
     IpIf = Ip4FindNet (IpSb, Src);
 
-    if (IpIf && !IP4_IS_BROADCAST (Ip4GetNetCast (Src, IpIf))) {
+    if (IpIf != NULL && !IP4_IS_BROADCAST (Ip4GetNetCast (Src, IpIf))) {
       return IP4_LOCAL_BROADCAST;
     }
 
-  } else if (IP4_IS_MULTICAST (Dst) && Ip4FindGroup (&IpSb->IgmpCtrl, Dst)) {
+  } else if (IP4_IS_MULTICAST (Dst) && Ip4FindGroup (&IpSb->IgmpCtrl, Dst) != NULL) {
     return IP4_MULTICAST;
   }
 
@@ -132,7 +133,7 @@ Ip4GetHostCast (
 
 
 /**
-  Find an interface whose configured IP address is Ip
+  Find an interface whose configured IP address is Ip.
 
   @param  IpSb                  The IP4 service binding instance
   @param  Ip                    The Ip address (host byte order) to find
@@ -232,8 +233,9 @@ Ip4FindStationAddress (
   @param  Multicast             The multicast IP address to translate.
   @param  Mac                   The buffer to hold the translated address.
 
-  @return Returns EFI_SUCCESS if the multicast IP is successfully
-  @return translated to a multicast MAC address. Otherwise some error.
+  @retval EFI_SUCCESS if the multicast IP is successfully translated to a
+                      multicast MAC address.
+  @retval other       Otherwise some error.
 
 **/
 EFI_STATUS
@@ -277,9 +279,13 @@ Ip4NtohHead (
 
 /**
   Set the Ip4 variable data.
+  
+  Save the list of all of the IPv4 addresses and subnet masks that are currently
+  being used to volatile variable storage.
 
   @param  IpSb                  Ip4 service binding instance
 
+  @retval EFI_SUCCESS           Successfully set variable.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources to set the variable.
   @retval other                 Set variable failed.
 

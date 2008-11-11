@@ -36,14 +36,14 @@ UINT32  mRouteAlertOption = 0x00000494;
 
   @param  IpSb                   The IP4 service whose IGMP is to be initialized.
 
+  @retval EFI_SUCCESS            IGMP of the IpSb is successfully initialized.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate resource to initialize IGMP.
   @retval Others                 Failed to initialize the IGMP of IpSb.
-  @retval EFI_SUCCESS            IGMP of the IpSb is successfully initialized.
 
 **/
 EFI_STATUS
 Ip4InitIgmp (
-  IN IP4_SERVICE            *IpSb
+  IN OUT IP4_SERVICE            *IpSb
   )
 {
   IGMP_SERVICE_DATA             *IgmpCtrl;
@@ -98,8 +98,8 @@ ON_ERROR:
   @param  Address                The multicast address to search
 
   @return NULL if the multicast address isn't in the IGMP control block. Otherwise
-  @return the point to the IGMP_GROUP which contains the status of multicast group
-  @return for Address.
+          the point to the IGMP_GROUP which contains the status of multicast group
+          for Address.
 
 **/
 IGMP_GROUP *
@@ -132,7 +132,7 @@ Ip4FindGroup (
   @param  Mac                    The MAC address to search
 
   @return The number of the IP4 multicast group that mapped to the same
-  @return multicast group Mac.
+          multicast group Mac.
 
 **/
 INTN
@@ -165,7 +165,7 @@ Ip4FindMac (
   @param  IpSb                   The IP4 service instance that requests the
                                  transmission
   @param  Dst                    The destinaton to send to
-  @param  Type                   The IGMP message type, such as IGMP v2 membership
+  @param  Type                   The IGMP message type, such as IGMP v1 membership
                                  report
   @param  Group                  The group address in the IGMP message head.
 
@@ -257,7 +257,7 @@ Ip4SendIgmpReport (
 
 
 /**
-  Join the multicast group on behavior of this IP4 child
+  Join the multicast group on behalf of this IP4 child
 
   @param  IpInstance             The IP4 child that wants to join the group
   @param  Address                The group to join
@@ -337,7 +337,7 @@ ON_ERROR:
 
 
 /**
-  Leave the IP4 multicast group on behavior of IpInstance.
+  Leave the IP4 multicast group on behalf of IpInstance.
 
   @param  IpInstance             The IP4 child that wants to leave the group
                                  address
@@ -395,7 +395,7 @@ Ip4LeaveGroup (
   // Send a leave report if the membership is reported by us
   // and we are talking IGMPv2.
   //
-  if (Group->ReportByUs && !IgmpCtrl->Igmpv1QuerySeen) {
+  if (Group->ReportByUs && IgmpCtrl->Igmpv1QuerySeen == 0) {
     Ip4SendIgmpMessage (IpSb, IP4_ALLROUTER_ADDRESS, IGMP_LEAVE_GROUP, Group->Address);
   }
 
@@ -450,7 +450,7 @@ Ip4IgmpHandle (
   switch (Igmp.Type) {
   case IGMP_MEMBERSHIP_QUERY:
     //
-    // If MaxRespTIme is zero, it is most likely that we are
+    // If MaxRespTime is zero, it is most likely that we are
     // talking to a V1 router
     //
     if (Igmp.MaxRespTime == 0) {
@@ -511,9 +511,9 @@ Ip4IgmpHandle (
   The periodical timer function for IGMP. It does the following
   things:
   1. Decrease the Igmpv1QuerySeen to make it possible to refresh
-  the IGMP server type.
+     the IGMP server type.
   2. Decrease the report timer for each IGMP group in "delaying
-  member" state.
+     member" state.
 
   @param  IpSb                   The IP4 service instance that is ticking
 
@@ -566,7 +566,7 @@ Ip4IgmpTicking (
   @param  Addr                   The IP4 multicast address to add
 
   @return NULL if failed to allocate memory for the new groups,
-  @return otherwise the new combined group addresses.
+          otherwise the new combined group addresses.
 
 **/
 IP4_ADDR *
@@ -592,7 +592,7 @@ Ip4CombineGroups (
 
 
 /**
-  Remove a group address frome the array of group addresses.
+  Remove a group address from the array of group addresses.
   Although the function doesn't assume the byte order of the
   both Groups and Addr, the network byte order is used by
   the caller.
@@ -602,14 +602,14 @@ Ip4CombineGroups (
   @param  Addr                   The IP4 multicast address to remove
 
   @return The nubmer of group addresses in the Groups after remove.
-  @return It is Count if the Addr isn't in the Groups.
+          It is Count if the Addr isn't in the Groups.
 
 **/
 INTN
 Ip4RemoveGroupAddr (
-  IN IP4_ADDR               *Groups,
-  IN UINT32                 Count,
-  IN IP4_ADDR               Addr
+  IN OUT IP4_ADDR               *Groups,
+  IN     UINT32                 Count,
+  IN     IP4_ADDR               Addr
   )
 {
   UINT32                    Index;

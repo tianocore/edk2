@@ -21,19 +21,353 @@ Abstract:
 
 #include "Ip4Impl.h"
 
+/**
+  Gets the current operational settings for this instance of the EFI IPv4 Protocol driver.
+  
+  The GetModeData() function returns the current operational mode data for this
+  driver instance. The data fields in EFI_IP4_MODE_DATA are read only. This
+  function is used optionally to retrieve the operational mode data of underlying
+  networks or drivers.
+
+  @param  This          Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
+  @param  MnpConfigData Pointer to the managed network configuration data structure.
+  @param  SnpModeData   Pointer to the simple network mode data structure.
+
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_OUT_OF_RESOURCES  The required mode data could not be allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiIp4GetModeData (
+  IN  CONST EFI_IP4_PROTOCOL                *This,
+  OUT       EFI_IP4_MODE_DATA               *Ip4ModeData,    OPTIONAL
+  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData,  OPTIONAL
+  OUT       EFI_SIMPLE_NETWORK_MODE         *SnpModeData     OPTIONAL
+  );
+  
+/**
+  Assigns an IPv4 address and subnet mask to this EFI IPv4 Protocol driver instance.
+  
+  The Configure() function is used to set, change, or reset the operational
+  parameters and filter settings for this EFI IPv4 Protocol instance. Until these
+  parameters have been set, no network traffic can be sent or received by this
+  instance. Once the parameters have been reset (by calling this function with
+  IpConfigData set to NULL), no more traffic can be sent or received until these
+  parameters have been set again. Each EFI IPv4 Protocol instance can be started
+  and stopped independently of each other by enabling or disabling their receive
+  filter settings with the Configure() function.
+  
+  When IpConfigData.UseDefaultAddress is set to FALSE, the new station address will
+  be appended as an alias address into the addresses list in the EFI IPv4 Protocol
+  driver. While set to TRUE, Configure() will trigger the EFI_IP4_CONFIG_PROTOCOL
+  to retrieve the default IPv4 address if it is not available yet. Clients could
+  frequently call GetModeData() to check the status to ensure that the default IPv4
+  address is ready.
+  
+  If operational parameters are reset or changed, any pending transmit and receive
+  requests will be cancelled. Their completion token status will be set to EFI_ABORTED
+  and their events will be signaled.
+
+  @param  This         Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  IpConfigData Pointer to the EFI IPv4 Protocol configuration data structure.
+
+  @retval EFI_SUCCESS           The driver instance was successfully opened.
+  @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+  @retval EFI_UNSUPPORTED       One or more of the following conditions is TRUE:
+                                A configuration protocol (DHCP, BOOTP, RARP, etc.) could
+                                not be located when clients choose to use the default IPv4
+                                address. This EFI IPv4 Protocol implementation does not
+                                support this requested filter or timeout setting.
+  @retval EFI_OUT_OF_RESOURCES  The EFI IPv4 Protocol driver instance data could not be allocated.
+  @retval EFI_ALREADY_STARTED   The interface is already open and must be stopped before the
+                                IPv4 address or subnet mask can be changed. The interface must
+                                also be stopped when switching to/from raw packet mode.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred. The EFI IPv4
+                                Protocol driver instance is not opened.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiIp4Configure (
+  IN EFI_IP4_PROTOCOL       *This,
+  IN EFI_IP4_CONFIG_DATA    *IpConfigData       OPTIONAL
+  );
+  
+/**
+  Joins and leaves multicast groups.
+  
+  The Groups() function is used to join and leave multicast group sessions. Joining
+  a group will enable reception of matching multicast packets. Leaving a group will
+  disable the multicast packet reception.
+  
+  If JoinFlag is FALSE and GroupAddress is NULL, all joined groups will be left.
+
+  @param  This                  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  JoinFlag              Set to TRUE to join the multicast group session and FALSE to leave.
+  @param  GroupAddress          Pointer to the IPv4 multicast address.
+
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_INVALID_PARAMETER One or more of the following is TRUE:
+                                - This is NULL.
+                                - JoinFlag is TRUE and GroupAddress is NULL.
+                                - GroupAddress is not NULL and *GroupAddress is
+                                not a multicast IPv4 address.
+  @retval EFI_NOT_STARTED       This instance has not been started.
+  @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_OUT_OF_RESOURCES  System resources could not be allocated.
+  @retval EFI_UNSUPPORTED       This EFI IPv4 Protocol implementation does not support multicast groups.
+  @retval EFI_ALREADY_STARTED   The group address is already in the group table (when
+                                JoinFlag is TRUE).
+  @retval EFI_NOT_FOUND         The group address is not in the group table (when JoinFlag is FALSE).
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiIp4Groups (
+  IN EFI_IP4_PROTOCOL       *This,
+  IN BOOLEAN                JoinFlag,
+  IN EFI_IPv4_ADDRESS       *GroupAddress     OPTIONAL
+  );
+  
+/**
+  Adds and deletes routing table entries.
+
+  The Routes() function adds a route to or deletes a route from the routing table.
+  
+  Routes are determined by comparing the SubnetAddress with the destination IPv4
+  address arithmetically AND-ed with the SubnetMask. The gateway address must be
+  on the same subnet as the configured station address.
+  
+  The default route is added with SubnetAddress and SubnetMask both set to 0.0.0.0.
+  The default route matches all destination IPv4 addresses that do not match any
+  other routes.
+  
+  A GatewayAddress that is zero is a nonroute. Packets are sent to the destination
+  IP address if it can be found in the ARP cache or on the local subnet. One automatic
+  nonroute entry will be inserted into the routing table for outgoing packets that
+  are addressed to a local subnet (gateway address of 0.0.0.0).
+  
+  Each EFI IPv4 Protocol instance has its own independent routing table. Those EFI
+  IPv4 Protocol instances that use the default IPv4 address will also have copies
+  of the routing table that was provided by the EFI_IP4_CONFIG_PROTOCOL, and these
+  copies will be updated whenever the EIF IPv4 Protocol driver reconfigures its
+  instances. As a result, client modification to the routing table will be lost.
+
+  @param  This                   Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  DeleteRoute            Set to TRUE to delete this route from the routing table. Set to
+                                 FALSE to add this route to the routing table. SubnetAddress
+                                 and SubnetMask are used as the key to each route entry.
+  @param  SubnetAddress          The address of the subnet that needs to be routed.
+  @param  SubnetMask             The subnet mask of SubnetAddress.
+  @param  GatewayAddress         The unicast gateway IPv4 address for this route.
+
+  @retval EFI_SUCCESS            The operation completed successfully.
+  @retval EFI_NOT_STARTED        The driver instance has not been started.
+  @retval EFI_NO_MAPPING         When using the default address, configuration (DHCP, BOOTP,
+                                 RARP, etc.) is not finished yet.
+  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
+                                 - This is NULL.
+                                 - SubnetAddress is NULL.
+                                 - SubnetMask is NULL.
+                                 - GatewayAddress is NULL.
+                                 - *SubnetAddress is not a valid subnet address.
+                                 - *SubnetMask is not a valid subnet mask.
+                                 - *GatewayAddress is not a valid unicast IPv4 address.
+  @retval EFI_OUT_OF_RESOURCES   Could not add the entry to the routing table.
+  @retval EFI_NOT_FOUND          This route is not in the routing table (when DeleteRoute is TRUE).
+  @retval EFI_ACCESS_DENIED      The route is already defined in the routing table (when
+                                  DeleteRoute is FALSE).
+                                 
+**/
+EFI_STATUS
+EFIAPI
+EfiIp4Routes (
+  IN EFI_IP4_PROTOCOL       *This,
+  IN BOOLEAN                DeleteRoute,
+  IN EFI_IPv4_ADDRESS       *SubnetAddress,
+  IN EFI_IPv4_ADDRESS       *SubnetMask,
+  IN EFI_IPv4_ADDRESS       *GatewayAddress
+  );
+  
+/**
+  Places outgoing data packets into the transmit queue.
+
+  The Transmit() function places a sending request in the transmit queue of this
+  EFI IPv4 Protocol instance. Whenever the packet in the token is sent out or some
+  errors occur, the event in the token will be signaled and the status is updated.
+
+  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token Pointer to the transmit token.
+
+  @retval  EFI_SUCCESS           The data has been queued for transmission.
+  @retval  EFI_NOT_STARTED       This instance has not been started.
+  @retval  EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                 RARP, etc.) is not finished yet.
+  @retval  EFI_INVALID_PARAMETER One or more pameters are invalid.
+  @retval  EFI_ACCESS_DENIED     The transmit completion token with the same Token.Event
+                                 was already in the transmit queue.
+  @retval  EFI_NOT_READY         The completion token could not be queued because the transmit
+                                 queue is full. 
+  @retval  EFI_NOT_FOUND         Not route is found to destination address.
+  @retval  EFI_OUT_OF_RESOURCES  Could not queue the transmit data.
+  @retval  EFI_BUFFER_TOO_SMALL  Token.Packet.TxData.TotalDataLength is too
+                                 short to transmit.
+  @retval  EFI_BAD_BUFFER_SIZE   The length of the IPv4 header + option length + total data length is
+                                 greater than MTU (or greater than the maximum packet size if
+                                 Token.Packet.TxData.OverrideData.
+                                 DoNotFragment is TRUE.)
+
+**/
+EFI_STATUS
+EFIAPI
+EfiIp4Transmit (
+  IN EFI_IP4_PROTOCOL         *This,
+  IN EFI_IP4_COMPLETION_TOKEN *Token
+  );
+  
+/**
+  Places a receiving request into the receiving queue.
+  
+  The Receive() function places a completion token into the receive packet queue.
+  This function is always asynchronous.
+  
+  The Token.Event field in the completion token must be filled in by the caller
+  and cannot be NULL. When the receive operation completes, the EFI IPv4 Protocol
+  driver updates the Token.Status and Token.Packet.RxData fields and the Token.Event
+  is signaled.
+
+  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token Pointer to a token that is associated with the receive data descriptor.
+
+  @retval EFI_SUCCESS           The receive completion token was cached.
+  @retval EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
+  @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP, RARP, etc.)
+                                is not finished yet.
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                - This is NULL.
+                                - Token is NULL.
+                                - Token.Event is NULL.
+  @retval EFI_OUT_OF_RESOURCES  The receive completion token could not be queued due to a lack of system
+                                resources (usually memory).
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+                                The EFI IPv4 Protocol instance has been reset to startup defaults.
+                                EFI_ACCESS_DENIED The receive completion token with the same Token.Event was already
+                                in the receive queue.
+  @retval EFI_NOT_READY         The receive request could not be queued because the receive queue is full.
+  @retval EFI_ICMP_ERROR        An ICMP error packet was received.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiIp4Receive (
+  IN EFI_IP4_PROTOCOL         *This,
+  IN EFI_IP4_COMPLETION_TOKEN *Token
+  );
+  
+/**
+  Abort an asynchronous transmit or receive request.
+  
+  The Cancel() function is used to abort a pending transmit or receive request.
+  If the token is in the transmit or receive request queues, after calling this
+  function, Token->Status will be set to EFI_ABORTED and then Token->Event will
+  be signaled. If the token is not in one of the queues, which usually means the
+  asynchronous operation has completed, this function will not signal the token
+  and EFI_NOT_FOUND is returned.
+
+  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token Pointer to a token that has been issued by
+                EFI_IP4_PROTOCOL.Transmit() or
+                EFI_IP4_PROTOCOL.Receive(). If NULL, all pending
+                tokens are aborted. Type EFI_IP4_COMPLETION_TOKEN is
+                defined in EFI_IP4_PROTOCOL.Transmit().
+
+  @retval EFI_SUCCESS           The asynchronous I/O request was aborted and
+                                Token.->Event was signaled. When Token is NULL, all
+                                pending requests were aborted and their events were signaled.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_NOT_STARTED       This instance has not been started.
+  @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_NOT_FOUND         When Token is not NULL, the asynchronous I/O request was
+                                not found in the transmit or receive queue. It has either completed
+                                or was not issued by Transmit() and Receive().
+
+**/
+EFI_STATUS
+EFIAPI
+EfiIp4Cancel (
+  IN EFI_IP4_PROTOCOL         *This,
+  IN EFI_IP4_COMPLETION_TOKEN *Token    OPTIONAL
+  );
+  
+/**
+  Polls for incoming data packets and processes outgoing data packets.
+  
+  The Poll() function polls for incoming data packets and processes outgoing data
+  packets. Network drivers and applications can call the EFI_IP4_PROTOCOL.Poll()
+  function to increase the rate that data packets are moved between the communications
+  device and the transmit and receive queues.
+  
+  In some systems the periodic timer event may not poll the underlying communications
+  device fast enough to transmit and/or receive all data packets without missing
+  incoming packets or dropping outgoing packets. Drivers and applications that are
+  experiencing packet loss should try calling the EFI_IP4_PROTOCOL.Poll() function
+  more often.
+
+  @param  This Pointer to the EFI_IP4_PROTOCOL instance.
+
+  @retval  EFI_SUCCESS           Incoming or outgoing data was processed.
+  @retval  EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
+  @retval  EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                 RARP, etc.) is not finished yet.
+  @retval  EFI_INVALID_PARAMETER This is NULL.
+  @retval  EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+  @retval  EFI_NOT_READY         No incoming or outgoing data is processed.
+  @retval  EFI_TIMEOUT           Data was dropped out of the transmit and/or receive queue.
+                                 Consider increasing the polling rate.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiIp4Poll (
+  IN EFI_IP4_PROTOCOL       *This
+  );
+
+EFI_IP4_PROTOCOL
+mEfiIp4ProtocolTemplete = {
+  EfiIp4GetModeData,
+  EfiIp4Configure,
+  EfiIp4Groups,
+  EfiIp4Routes,
+  EfiIp4Transmit,
+  EfiIp4Receive,
+  EfiIp4Cancel,
+  EfiIp4Poll
+};
 
 /**
-  Get the IP child's current operational data. This can
-  all be used to get the underlying MNP and SNP data.
+  Gets the current operational settings for this instance of the EFI IPv4 Protocol driver.
+  
+  The GetModeData() function returns the current operational mode data for this
+  driver instance. The data fields in EFI_IP4_MODE_DATA are read only. This
+  function is used optionally to retrieve the operational mode data of underlying
+  networks or drivers.
 
-  @param  This                   The IP4 protocol instance
-  @param  Ip4ModeData            The IP4 operation data
-  @param  MnpConfigData          The MNP configure data
-  @param  SnpModeData            The SNP operation data
+  @param  This          Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
+  @param  MnpConfigData Pointer to the managed network configuration data structure.
+  @param  SnpModeData   Pointer to the simple network mode data structure.
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invalid because This == NULL
-  @retval EFI_SUCCESS            The operational parameter is returned.
-  @retval Others                 Failed to retrieve the IP4 route table.
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_OUT_OF_RESOURCES  The required mode data could not be allocated.
 
 **/
 EFI_STATUS
@@ -128,10 +462,10 @@ EfiIp4GetModeData (
   child to transmit/receive frames. By default, it configures MNP
   to receive unicast/multicast/broadcast. And it will enable/disable
   the promiscous receive according to whether there is IP child
-  enable that or not. If Force isn't false, it will iterate through
+  enable that or not. If Force is FALSE, it will iterate through
   all the IP children to check whether the promiscuous receive
   setting has been changed. If it hasn't been changed, it won't
-  reconfigure the MNP. If Force is true, the MNP is configured no
+  reconfigure the MNP. If Force is TRUE, the MNP is configured no
   matter whether that is changed or not.
 
   @param  IpSb                   The IP4 service instance that is to be changed.
@@ -357,28 +691,21 @@ ON_EXIT:
   gBS->FreePool (Data);
 }
 
+/*++
+  Request Ip4AutoConfigCallBackDpc as a DPC at TPL_CALLBACK.
+  
+  @param Event     The event that is signalled.
+  @param Context   The IP4 service binding instance.
+  
+  @return None.
+
+++*/
 VOID
 EFIAPI
 Ip4AutoConfigCallBack (
   IN EFI_EVENT              Event,
   IN VOID                   *Context
   )
-/*++
-
-Routine Description:
-
-  Request Ip4AutoConfigCallBackDpc as a DPC at TPL_CALLBACK
-
-Arguments:
-
-  Event   - The event that is signalled.
-  Context - The IP4 service binding instance.
-
-Returns:
-
-  None
-
---*/
 {
   IP4_SERVICE  *IpSb;
 
@@ -499,8 +826,8 @@ CLOSE_DONE_EVENT:
 **/
 VOID
 Ip4InitProtocol (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_PROTOCOL           *IpInstance
+  IN     IP4_SERVICE            *IpSb,
+  IN OUT IP4_PROTOCOL           *IpInstance
   )
 {
   ASSERT ((IpSb != NULL) && (IpInstance != NULL));
@@ -539,12 +866,14 @@ Ip4InitProtocol (
                                  address, but the default address hasn't been
                                  configured. The IP4 child doesn't need to be
                                  reconfigured when default address is configured.
+  @retval EFI_OUT_OF_RESOURCES   No more memory space is available.
+  @retval other                  Other error occurs.
 
 **/
 EFI_STATUS
 Ip4ConfigProtocol (
-  IN  IP4_PROTOCOL        *IpInstance,
-  IN  EFI_IP4_CONFIG_DATA *Config
+  IN OUT IP4_PROTOCOL         *IpInstance,
+  IN     EFI_IP4_CONFIG_DATA  *Config
   )
 {
   IP4_SERVICE               *IpSb;
@@ -754,7 +1083,7 @@ Ip4CleanProtocol (
   @param  Netmask                The netmaks of the IP
 
   @retval TRUE                   The Ip/Netmask pair is valid
-  @retval FALSE                  The
+  @retval FALSE                  The Ip/Netmask pair is invalid
 
 **/
 BOOLEAN
@@ -806,18 +1135,46 @@ Ip4StationAddressValid (
 
 
 /**
-  Configure the EFI_IP4_PROTOCOL instance. If IpConfigData is NULL,
-  the instance is cleaned up. If the instance hasn't been configure
-  before, it will be initialized. Otherwise, the filter setting of
-  the instance is updated.
+  Assigns an IPv4 address and subnet mask to this EFI IPv4 Protocol driver instance.
+  
+  The Configure() function is used to set, change, or reset the operational
+  parameters and filter settings for this EFI IPv4 Protocol instance. Until these
+  parameters have been set, no network traffic can be sent or received by this
+  instance. Once the parameters have been reset (by calling this function with
+  IpConfigData set to NULL), no more traffic can be sent or received until these
+  parameters have been set again. Each EFI IPv4 Protocol instance can be started
+  and stopped independently of each other by enabling or disabling their receive
+  filter settings with the Configure() function.
+  
+  When IpConfigData.UseDefaultAddress is set to FALSE, the new station address will
+  be appended as an alias address into the addresses list in the EFI IPv4 Protocol
+  driver. While set to TRUE, Configure() will trigger the EFI_IP4_CONFIG_PROTOCOL
+  to retrieve the default IPv4 address if it is not available yet. Clients could
+  frequently call GetModeData() to check the status to ensure that the default IPv4
+  address is ready.
+  
+  If operational parameters are reset or changed, any pending transmit and receive
+  requests will be cancelled. Their completion token status will be set to EFI_ABORTED
+  and their events will be signaled.
 
-  @param  This                   The IP4 child to configure
-  @param  IpConfigData           The configuration to apply. If NULL, clean it up.
+  @param  This         Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  IpConfigData Pointer to the EFI IPv4 Protocol configuration data structure.
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invalid
-  @retval EFI_NO_MAPPING         The default address hasn't been configured and the
-                                 instance wants to use it.
-  @retval EFI_SUCCESS            The instance is configured.
+  @retval EFI_SUCCESS           The driver instance was successfully opened.
+  @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+  @retval EFI_UNSUPPORTED       One or more of the following conditions is TRUE:
+                                A configuration protocol (DHCP, BOOTP, RARP, etc.) could
+                                not be located when clients choose to use the default IPv4
+                                address. This EFI IPv4 Protocol implementation does not
+                                support this requested filter or timeout setting.
+  @retval EFI_OUT_OF_RESOURCES  The EFI IPv4 Protocol driver instance data could not be allocated.
+  @retval EFI_ALREADY_STARTED   The interface is already open and must be stopped before the
+                                IPv4 address or subnet mask can be changed. The interface must
+                                also be stopped when switching to/from raw packet mode.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred. The EFI IPv4
+                                Protocol driver instance is not opened.
 
 **/
 EFI_STATUS
@@ -1034,18 +1391,33 @@ Ip4Groups (
 
 
 /**
-  Change the IP4 child's multicast setting. If JoinFlag is true,
-  the child wants to join the group. Otherwise it wants to leave
-  the group. If JoinFlag is false, and GroupAddress is NULL,
-  it will leave all the groups which is a member.
+  Joins and leaves multicast groups.
+  
+  The Groups() function is used to join and leave multicast group sessions. Joining
+  a group will enable reception of matching multicast packets. Leaving a group will
+  disable the multicast packet reception.
+  
+  If JoinFlag is FALSE and GroupAddress is NULL, all joined groups will be left.
 
-  @param  This                   The IP4 child to change the setting.
-  @param  JoinFlag               TRUE to join the group, otherwise leave it.
-  @param  GroupAddress           The target group address
+  @param  This                  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  JoinFlag              Set to TRUE to join the multicast group session and FALSE to leave.
+  @param  GroupAddress          Pointer to the IPv4 multicast address.
 
-  @retval EFI_INVALID_PARAMETER  The parameters are invalid
-  @retval EFI_SUCCESS            The group setting has been changed.
-  @retval Otherwise              It failed to change the setting.
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_INVALID_PARAMETER One or more of the following is TRUE:
+                                - This is NULL.
+                                - JoinFlag is TRUE and GroupAddress is NULL.
+                                - GroupAddress is not NULL and *GroupAddress is
+                                not a multicast IPv4 address.
+  @retval EFI_NOT_STARTED       This instance has not been started.
+  @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_OUT_OF_RESOURCES  System resources could not be allocated.
+  @retval EFI_UNSUPPORTED       This EFI IPv4 Protocol implementation does not support multicast groups.
+  @retval EFI_ALREADY_STARTED   The group address is already in the group table (when
+                                JoinFlag is TRUE).
+  @retval EFI_NOT_FOUND         The group address is not in the group table (when JoinFlag is FALSE).
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
 EFI_STATUS
@@ -1095,19 +1467,54 @@ ON_EXIT:
 
 
 /**
-  Modify the IP child's route table. Each instance has its own
-  route table.
+  Adds and deletes routing table entries.
 
-  @param  This                   The IP4 child to modify the route
-  @param  DeleteRoute            TRUE to delete the route, otherwise add it
-  @param  SubnetAddress          The destination network
-  @param  SubnetMask             The destination network's mask
-  @param  GatewayAddress         The next hop address.
+  The Routes() function adds a route to or deletes a route from the routing table.
+  
+  Routes are determined by comparing the SubnetAddress with the destination IPv4
+  address arithmetically AND-ed with the SubnetMask. The gateway address must be
+  on the same subnet as the configured station address.
+  
+  The default route is added with SubnetAddress and SubnetMask both set to 0.0.0.0.
+  The default route matches all destination IPv4 addresses that do not match any
+  other routes.
+  
+  A GatewayAddress that is zero is a nonroute. Packets are sent to the destination
+  IP address if it can be found in the ARP cache or on the local subnet. One automatic
+  nonroute entry will be inserted into the routing table for outgoing packets that
+  are addressed to a local subnet (gateway address of 0.0.0.0).
+  
+  Each EFI IPv4 Protocol instance has its own independent routing table. Those EFI
+  IPv4 Protocol instances that use the default IPv4 address will also have copies
+  of the routing table that was provided by the EFI_IP4_CONFIG_PROTOCOL, and these
+  copies will be updated whenever the EIF IPv4 Protocol driver reconfigures its
+  instances. As a result, client modification to the routing table will be lost.
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invalid.
-  @retval EFI_SUCCESS            The route table is successfully modified.
-  @retval Others                 Failed to modify the route table
+  @param  This                   Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  DeleteRoute            Set to TRUE to delete this route from the routing table. Set to
+                                 FALSE to add this route to the routing table. SubnetAddress
+                                 and SubnetMask are used as the key to each route entry.
+  @param  SubnetAddress          The address of the subnet that needs to be routed.
+  @param  SubnetMask             The subnet mask of SubnetAddress.
+  @param  GatewayAddress         The unicast gateway IPv4 address for this route.
 
+  @retval EFI_SUCCESS            The operation completed successfully.
+  @retval EFI_NOT_STARTED        The driver instance has not been started.
+  @retval EFI_NO_MAPPING         When using the default address, configuration (DHCP, BOOTP,
+                                 RARP, etc.) is not finished yet.
+  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
+                                 - This is NULL.
+                                 - SubnetAddress is NULL.
+                                 - SubnetMask is NULL.
+                                 - GatewayAddress is NULL.
+                                 - *SubnetAddress is not a valid subnet address.
+                                 - *SubnetMask is not a valid subnet mask.
+                                 - *GatewayAddress is not a valid unicast IPv4 address.
+  @retval EFI_OUT_OF_RESOURCES   Could not add the entry to the routing table.
+  @retval EFI_NOT_FOUND          This route is not in the routing table (when DeleteRoute is TRUE).
+  @retval EFI_ACCESS_DENIED      The route is already defined in the routing table (when
+                                  DeleteRoute is FALSE).
+                                 
 **/
 EFI_STATUS
 EFIAPI
@@ -1188,7 +1595,7 @@ ON_EXIT:
 
 /**
   Check whether the user's token or event has already
-  been enqueue on IP4's list.
+  been enqueued on IP4's list.
 
   @param  Map                    The container of either user's transmit or receive
                                  token.
@@ -1436,18 +1843,32 @@ Ip4OnPacketSent (
 
 
 /**
-  Transmit the user's data asynchronously. When transmission
-  completed,the Token's status is updated and its event signalled.
+  Places outgoing data packets into the transmit queue.
 
-  @param  This                   The IP4 child instance
-  @param  Token                  The user's transmit token, which contains user's
-                                 data, the result and an event to signal when
-                                 completed.
+  The Transmit() function places a sending request in the transmit queue of this
+  EFI IPv4 Protocol instance. Whenever the packet in the token is sent out or some
+  errors occur, the event in the token will be signaled and the status is updated.
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invalid.
-  @retval EFI_NOT_STARTED        The IP4 child hasn't been started.
-  @retval EFI_SUCCESS            The user's data has been successfully enqueued
-                                 for transmission.
+  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token Pointer to the transmit token.
+
+  @retval  EFI_SUCCESS           The data has been queued for transmission.
+  @retval  EFI_NOT_STARTED       This instance has not been started.
+  @retval  EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                 RARP, etc.) is not finished yet.
+  @retval  EFI_INVALID_PARAMETER One or more pameters are invalid.
+  @retval  EFI_ACCESS_DENIED     The transmit completion token with the same Token.Event
+                                 was already in the transmit queue.
+  @retval  EFI_NOT_READY         The completion token could not be queued because the transmit
+                                 queue is full. 
+  @retval  EFI_NOT_FOUND         Not route is found to destination address.
+  @retval  EFI_OUT_OF_RESOURCES  Could not queue the transmit data.
+  @retval  EFI_BUFFER_TOO_SMALL  Token.Packet.TxData.TotalDataLength is too
+                                 short to transmit.
+  @retval  EFI_BAD_BUFFER_SIZE   The length of the IPv4 header + option length + total data length is
+                                 greater than MTU (or greater than the maximum packet size if
+                                 Token.Packet.TxData.OverrideData.
+                                 DoNotFragment is TRUE.)
 
 **/
 EFI_STATUS
@@ -1620,19 +2041,35 @@ ON_EXIT:
 
 
 /**
-  Receive a packet for the upper layer. If there are packets
-  pending on the child's receive queue, the receive request
-  will be fulfilled immediately. Otherwise, the request is
-  enqueued. When receive request is completed, the status in
-  the Token is updated and its event is signalled.
+  Places a receiving request into the receiving queue.
+  
+  The Receive() function places a completion token into the receive packet queue.
+  This function is always asynchronous.
+  
+  The Token.Event field in the completion token must be filled in by the caller
+  and cannot be NULL. When the receive operation completes, the EFI IPv4 Protocol
+  driver updates the Token.Status and Token.Packet.RxData fields and the Token.Event
+  is signaled.
 
-  @param  This                   The IP4 child to receive packet.
-  @param  Token                  The user's receive token
+  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token Pointer to a token that is associated with the receive data descriptor.
 
-  @retval EFI_INVALID_PARAMETER  The token is invalid.
-  @retval EFI_NOT_STARTED        The IP4 child hasn't been started
-  @retval EFI_ACCESS_DENIED      The token or event is already queued.
-  @retval EFI_SUCCESS            The receive request has been issued.
+  @retval EFI_SUCCESS           The receive completion token was cached.
+  @retval EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
+  @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP, RARP, etc.)
+                                is not finished yet.
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                - This is NULL.
+                                - Token is NULL.
+                                - Token.Event is NULL.
+  @retval EFI_OUT_OF_RESOURCES  The receive completion token could not be queued due to a lack of system
+                                resources (usually memory).
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+                                The EFI IPv4 Protocol instance has been reset to startup defaults.
+                                EFI_ACCESS_DENIED The receive completion token with the same Token.Event was already
+                                in the receive queue.
+  @retval EFI_NOT_READY         The receive request could not be queued because the receive queue is full.
+  @retval EFI_ICMP_ERROR        An ICMP error packet was received.
 
 **/
 EFI_STATUS
@@ -1875,18 +2312,32 @@ Ip4Cancel (
 
 
 /**
-  Cancel the queued receive/transmit requests. If Token is NULL,
-  all the queued requests will be cancelled. It just validate
-  the parameter then pass them to Ip4Cancel.
+  Abort an asynchronous transmit or receive request.
+  
+  The Cancel() function is used to abort a pending transmit or receive request.
+  If the token is in the transmit or receive request queues, after calling this
+  function, Token->Status will be set to EFI_ABORTED and then Token->Event will
+  be signaled. If the token is not in one of the queues, which usually means the
+  asynchronous operation has completed, this function will not signal the token
+  and EFI_NOT_FOUND is returned.
 
-  @param  This                   The IP4 child to cancel the request
-  @param  Token                  The token to cancel, if NULL, cancel all.
+  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token Pointer to a token that has been issued by
+                EFI_IP4_PROTOCOL.Transmit() or
+                EFI_IP4_PROTOCOL.Receive(). If NULL, all pending
+                tokens are aborted. Type EFI_IP4_COMPLETION_TOKEN is
+                defined in EFI_IP4_PROTOCOL.Transmit().
 
-  @retval EFI_INVALID_PARAMETER  This is NULL
-  @retval EFI_NOT_STARTED        The IP4 child hasn't been configured.
-  @retval EFI_NO_MAPPING         The IP4 child is configured to use the default,
-                                 but the default address hasn't been acquired.
-  @retval EFI_SUCCESS            The Token is cancelled.
+  @retval EFI_SUCCESS           The asynchronous I/O request was aborted and
+                                Token.->Event was signaled. When Token is NULL, all
+                                pending requests were aborted and their events were signaled.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_NOT_STARTED       This instance has not been started.
+  @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_NOT_FOUND         When Token is not NULL, the asynchronous I/O request was
+                                not found in the transmit or receive queue. It has either completed
+                                or was not issued by Transmit() and Receive().
 
 **/
 EFI_STATUS
@@ -1927,13 +2378,30 @@ ON_EXIT:
 
 
 /**
-  Poll the network stack. The EFI network stack is poll based. There
-  is no interrupt support for the network interface card.
+  Polls for incoming data packets and processes outgoing data packets.
+  
+  The Poll() function polls for incoming data packets and processes outgoing data
+  packets. Network drivers and applications can call the EFI_IP4_PROTOCOL.Poll()
+  function to increase the rate that data packets are moved between the communications
+  device and the transmit and receive queues.
+  
+  In some systems the periodic timer event may not poll the underlying communications
+  device fast enough to transmit and/or receive all data packets without missing
+  incoming packets or dropping outgoing packets. Drivers and applications that are
+  experiencing packet loss should try calling the EFI_IP4_PROTOCOL.Poll() function
+  more often.
 
-  @param  This                   The IP4 child to poll through
+  @param  This Pointer to the EFI_IP4_PROTOCOL instance.
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invalid
-  @retval EFI_NOT_STARTED        The IP4 child hasn't been configured.
+  @retval  EFI_SUCCESS           Incoming or outgoing data was processed.
+  @retval  EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
+  @retval  EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                 RARP, etc.) is not finished yet.
+  @retval  EFI_INVALID_PARAMETER This is NULL.
+  @retval  EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+  @retval  EFI_NOT_READY         No incoming or outgoing data is processed.
+  @retval  EFI_TIMEOUT           Data was dropped out of the transmit and/or receive queue.
+                                 Consider increasing the polling rate.
 
 **/
 EFI_STATUS
@@ -1963,19 +2431,6 @@ EfiIp4Poll (
   //
   return Mnp->Poll (Mnp);
 }
-
-EFI_IP4_PROTOCOL
-mEfiIp4ProtocolTemplete = {
-  EfiIp4GetModeData,
-  EfiIp4Configure,
-  EfiIp4Groups,
-  EfiIp4Routes,
-  EfiIp4Transmit,
-  EfiIp4Receive,
-  EfiIp4Cancel,
-  EfiIp4Poll
-};
-
 
 /**
   Decrease the life of the transmitted packets. If it is

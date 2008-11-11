@@ -566,7 +566,7 @@ Ip4Route (
   // network. Otherwise, it is an indirect route, the packet will be
   // send the next hop router.
   //
-  if (RtEntry->Flag & IP4_DIRECT_ROUTE) {
+  if ((RtEntry->Flag & IP4_DIRECT_ROUTE) != 0) {
     NextHop = Dest;
   } else {
     NextHop = RtEntry->NextHop;

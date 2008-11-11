@@ -31,30 +31,27 @@ EFI_DRIVER_BINDING_PROTOCOL gIp4DriverBinding = {
   NULL
 };
 
+/**
+  This is the declaration of an EFI image entry point. This entry point is
+  the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers including
+  both device drivers and bus drivers.
+  
+  The entry point for IP4 driver which install the driver
+  binding and component name protocol on its image.
+
+  @param  ImageHandle           The firmware allocated handle for the UEFI image.
+  @param  SystemTable           A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+
+**/
 EFI_STATUS
 EFIAPI
 Ip4DriverEntryPoint (
   IN EFI_HANDLE             ImageHandle,
   IN EFI_SYSTEM_TABLE       *SystemTable
   )
-/*++
-
-Routine Description:
-
-  The entry point for IP4 driver which install the driver
-  binding and component name protocol on its image.
-
-Arguments:
-
-  ImageHandle - The image handle of the driver
-  SystemTable - The system table
-
-Returns:
-
-  EFI_SUCCESS if the driver binding and component name protocols
-  are successfully installed, otherwise if failed.
-
---*/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
@@ -66,18 +63,22 @@ Returns:
            );
 }
 
-
 /**
-  Test to see if this driver supports ControllerHandle.
+  Test to see if this driver supports ControllerHandle. This service
+  is called by the EFI boot service ConnectController(). In
+  order to make drivers as small as possible, there are a few calling
+  restrictions for this service. ConnectController() must
+  follow these calling restrictions. If any other agent wishes to call
+  Supported() it must also follow these calling restrictions.
 
-  @param  This                   Protocol instance pointer.
-  @param  ControllerHandle       Handle of device to test
-  @param  RemainingDevicePath    Optional parameter use to pick a specific child
-                                 device to start.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @retval EFI_SUCCES             This driver supports this device
-  @retval EFI_ALREADY_STARTED    This driver is already running on this device
-  @retval other                  This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
 
 **/
 EFI_STATUS
@@ -128,7 +129,7 @@ Ip4CleanService (
 
 
 /**
-  Create a new IP4 driver service binding protocol
+  Create a new IP4 driver service binding private instance.
 
   @param  Controller             The controller that has MNP service binding
                                  installed
@@ -138,6 +139,7 @@ Ip4CleanService (
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resource
   @retval EFI_SUCCESS            A new IP4 service binding private is created.
+  @retval other                  Other error occurs.
 
 **/
 EFI_STATUS
@@ -299,14 +301,14 @@ ON_ERROR:
 /**
   Clean up a IP4 service binding instance. It will release all
   the resource allocated by the instance. The instance may be
-  partly initialized, or partly destoried. If a resource is
-  destoried, it is marked as that in case the destory failed and
+  partly initialized, or partly destroyed. If a resource is
+  destroyed, it is marked as that in case the destory failed and
   being called again later.
 
   @param  IpSb                   The IP4 serviceing binding instance to clean up
 
   @retval EFI_SUCCESS            The resource used by the instance are cleaned up
-  @retval Others                 Failed to clean up some of the resources.
+  @retval other                  Failed to clean up some of the resources.
 
 **/
 EFI_STATUS
@@ -334,13 +336,13 @@ Ip4CleanService (
   Ip4CleanAssembleTable (&IpSb->Assemble);
 
   if (IpSb->MnpChildHandle != NULL) {
-    if (IpSb->Mnp) {
+    if (IpSb->Mnp != NULL) {
       gBS->CloseProtocol (
-            IpSb->MnpChildHandle,
-            &gEfiManagedNetworkProtocolGuid,
-            IpSb->Image,
-            IpSb->Controller
-            );
+             IpSb->MnpChildHandle,
+             &gEfiManagedNetworkProtocolGuid,
+             IpSb->Image,
+             IpSb->Controller
+             );
 
       IpSb->Mnp = NULL;
     }
@@ -383,16 +385,21 @@ Ip4CleanService (
 
 
 /**
-  Start this driver on ControllerHandle.
+  Start this driver on ControllerHandle. This service is called by the
+  EFI boot service ConnectController(). In order to make
+  drivers as small as possible, there are a few calling restrictions for
+  this service. ConnectController() must follow these
+  calling restrictions. If any other agent wishes to call Start() it
+  must also follow these calling restrictions.
 
-  @param  This                   Protocol instance pointer.
-  @param  ControllerHandle       Handle of device to bind driver to
-  @param  RemainingDevicePath    Optional parameter use to pick a specific child
-                                 device to start.
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
 
-  @retval EFI_SUCCES             This driver is added to ControllerHandle
-  @retval EFI_ALREADY_STARTED    This driver is already running on ControllerHandle
-  @retval other                  This driver does not support this device
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
 
 **/
 EFI_STATUS
@@ -482,16 +489,21 @@ FREE_SERVICE:
 
 
 /**
-  Stop this driver on ControllerHandle.
+  Stop this driver on ControllerHandle. This service is called by the
+  EFI boot service DisconnectController(). In order to
+  make drivers as small as possible, there are a few calling
+  restrictions for this service. DisconnectController()
+  must follow these calling restrictions. If any other agent wishes
+  to call Stop() it must also follow these calling restrictions.
+  
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @param  This                   Protocol instance pointer.
-  @param  ControllerHandle       Handle of device to stop driver on
-  @param  NumberOfChildren       Number of Handles in ChildHandleBuffer. If  number
-                                 of children is zero stop the entire  bus driver.
-  @param  ChildHandleBuffer      List of Child Handles to Stop.
-
-  @retval EFI_SUCCES             This driver is removed ControllerHandle
-  @retval other                  This driver was not removed from this device
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
 
 **/
 EFI_STATUS
@@ -555,7 +567,7 @@ Ip4DriverBindingStop (
 
     OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-    if (IpSb->Ip4Config && (IpSb->State != IP4_SERVICE_DESTORY)) {
+    if (IpSb->Ip4Config != NULL && (IpSb->State != IP4_SERVICE_DESTORY)) {
 
       IpSb->Ip4Config->Stop (IpSb->Ip4Config);
 
@@ -720,23 +732,23 @@ ON_ERROR:
 /**
   Creates a child handle with a set of I/O services.
 
-  @param  This                   Protocol instance pointer.
-  @param  ChildHandle            Pointer to the handle of the child to create.   If
-                                 it is NULL, then a new handle is created.   If it
-                                 is not NULL, then the I/O services are  added to
-                                 the existing child handle.
+  @param  This        Protocol instance pointer.
+  @param  ChildHandle Pointer to the handle of the child to create.  If it is NULL,
+                      then a new handle is created.  If it is not NULL, then the
+                      I/O services are added to the existing child handle.
 
-  @retval EFI_SUCCES             The child handle was created with the I/O services
-  @retval EFI_OUT_OF_RESOURCES   There are not enough resources availabe to create
-                                 the child
-  @retval other                  The child handle was not created
+  @retval EFI_SUCCES            The child handle was created with the I/O services
+  @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources availabe to create
+                                the child
+  @retval other                 The child handle was not created
 
 **/
 EFI_STATUS
 EFIAPI
 Ip4ServiceBindingCreateChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                    *ChildHandle
+  IN OUT EFI_HANDLE                *ChildHandle
   )
 {
   IP4_SERVICE               *IpSb;
@@ -822,17 +834,16 @@ ON_ERROR:
 /**
   Destroys a child handle with a set of I/O services.
 
-  @param  This                   Protocol instance pointer.
-  @param  ChildHandle            Handle of the child to destroy
+  @param  This        Protocol instance pointer.
+  @param  ChildHandle Handle of the child to destroy
 
-  @retval EFI_SUCCES             The I/O services were removed from the child
-                                 handle
-  @retval EFI_UNSUPPORTED        The child handle does not support the I/O services
-                                  that are being removed
-  @retval EFI_INVALID_PARAMETER  Child handle is not a valid EFI Handle.
-  @retval EFI_ACCESS_DENIED      The child handle could not be destroyed because
-                                 its  I/O services are being used.
-  @retval other                  The child handle was not destroyed
+  @retval EFI_SUCCES            The I/O services were removed from the child handle
+  @retval EFI_UNSUPPORTED       The child handle does not support the I/O services
+                                that are being removed.
+  @retval EFI_INVALID_PARAMETER Child handle is not a valid EFI Handle.
+  @retval EFI_ACCESS_DENIED     The child handle could not be destroyed because its
+                                I/O services are being used.
+  @retval other                 The child handle was not destroyed
 
 **/
 EFI_STATUS
