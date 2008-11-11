@@ -63,7 +63,8 @@
   UefiDriverEntryPoint
   DebugLib
   PcdLib
-
+  DevicePathLib
+  
 [Guids]
   gEfiSystemNvDataFvGuid                        # ALWAYS_CONSUMED
 

@@ -759,7 +759,7 @@ GetUsbDPFromFullDP (
   // Get the Usb part first Begin node in full device path
   //
   UsbDevicePathBeginPtr = DevicePath;
-  while ( (!EfiIsDevicePathEnd (UsbDevicePathBeginPtr))&&
+  while ( (!IsDevicePathEnd (UsbDevicePathBeginPtr))&&
          ((UsbDevicePathBeginPtr->Type != MESSAGING_DEVICE_PATH) ||
          (UsbDevicePathBeginPtr->SubType != MSG_USB_DP &&
           UsbDevicePathBeginPtr->SubType != MSG_USB_CLASS_DP
@@ -773,7 +773,7 @@ GetUsbDPFromFullDP (
   // Get the Usb part first End node in full device path
   //
   UsbDevicePathEndPtr = UsbDevicePathBeginPtr;
-  while ((!EfiIsDevicePathEnd (UsbDevicePathEndPtr))&&
+  while ((!IsDevicePathEnd (UsbDevicePathEndPtr))&&
          (UsbDevicePathEndPtr->Type == MESSAGING_DEVICE_PATH) &&
          (UsbDevicePathEndPtr->SubType == MSG_USB_DP ||
           UsbDevicePathEndPtr->SubType == MSG_USB_CLASS_DP

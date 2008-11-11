@@ -38,7 +38,7 @@ Abstract:
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
-
+#include <Library/DevicePathLib.h>
 
 EFI_DPC_PROTOCOL *mDpc = NULL;
 

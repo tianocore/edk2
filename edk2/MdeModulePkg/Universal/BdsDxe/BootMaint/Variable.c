@@ -1257,7 +1257,7 @@ Var_UpdateBBSOption (
     NewOptionSize = sizeof (UINT32) + sizeof (UINT16) + StrSize (DescString) +
                     sizeof (BBS_BBS_DEVICE_PATH);
     NewOptionSize += AsciiStrLen (DescAsciiString) +
-                    EFI_END_DEVICE_PATH_LENGTH + sizeof (BBS_TABLE) + sizeof (UINT16);
+                    END_DEVICE_PATH_LENGTH + sizeof (BBS_TABLE) + sizeof (UINT16);
 
     UnicodeSPrint (VarName, 100, L"Boot%04x", Index);
 
@@ -1300,7 +1300,7 @@ Var_UpdateBBSOption (
     //
     *((UINT16 *) TempPtr) = (UINT16) (sizeof (BBS_BBS_DEVICE_PATH) +
                          AsciiStrLen (DescAsciiString) +
-                         EFI_END_DEVICE_PATH_LENGTH);
+                         END_DEVICE_PATH_LENGTH);
 
     TempPtr += sizeof (UINT16);
 
@@ -1343,9 +1343,9 @@ Var_UpdateBBSOption (
     CopyMem (
       TempPtr,
       EndDevicePath,
-      EFI_END_DEVICE_PATH_LENGTH
+      END_DEVICE_PATH_LENGTH
       );
-    TempPtr += EFI_END_DEVICE_PATH_LENGTH;
+    TempPtr += END_DEVICE_PATH_LENGTH;
 
     //
     // Now TempPtr point to optional data, i.e. Bbs Table

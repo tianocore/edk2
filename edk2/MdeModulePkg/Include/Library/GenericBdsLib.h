@@ -506,22 +506,6 @@ BdsLibConnectConsoleVariable (
 // Bds device path related lib functions
 //
 /**
-  Function unpacks a device path data structure so that all the nodes
-  of a device path are naturally aligned.
-
-  @param  DevPath  A pointer to a device path data structure
-
-  @return If the memory for the device path is successfully allocated, then a
-          pointer to the new device path is returned.  Otherwise, NULL is returned.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL *
-EFIAPI
-BdsLibUnpackDevicePath (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
-  );
-
-/**
   Delete the instance in Multi which matches partly with Single instance
 
   @param  Multi                 A pointer to a multi-instance device path data

@@ -51,7 +51,8 @@
   UefiRuntimeServicesTableLib
   UefiLib
   MemoryAllocationLib
-
+  DevicePathLib
+  
 [Protocols]
   gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiNicIp4ConfigProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED

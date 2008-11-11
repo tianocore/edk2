@@ -73,11 +73,11 @@ GetDebugPortVariable (
             DebugPortDevice->DebugPortVariable
             );
       DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) DebugPortDevice->DebugPortVariable;
-      while (!EfiIsDevicePathEnd (DevicePath) && !IS_UART_DEVICEPATH (DevicePath)) {
-        DevicePath = EfiNextDevicePathNode (DevicePath);
+      while (!IsDevicePathEnd (DevicePath) && !IS_UART_DEVICEPATH (DevicePath)) {
+        DevicePath = NextDevicePathNode (DevicePath);
       }
 
-      if (EfiIsDevicePathEnd (DevicePath)) {
+      if (IsDevicePathEnd (DevicePath)) {
         FreePool (gDebugPortDevice->DebugPortVariable);
         DebugPortDevice->DebugPortVariable = NULL;
       } else {

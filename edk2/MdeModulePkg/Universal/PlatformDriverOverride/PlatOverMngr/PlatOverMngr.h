@@ -49,6 +49,7 @@ Abstract:
 #include <Library/HiiLib.h>
 #include <Library/ExtendedHiiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/DevicePathLib.h>
 
 #define MIN_ALIGNMENT_SIZE  4
 #define ALIGN_SIZE(a)       ((a % MIN_ALIGNMENT_SIZE) ? MIN_ALIGNMENT_SIZE - (a % MIN_ALIGNMENT_SIZE) : 0)
@@ -169,12 +170,6 @@ GetImageName (
 CHAR16  *
 DevicePathToStr (
   EFI_DEVICE_PATH_PROTOCOL     *DevPath
-  );
-
-
-EFI_DEVICE_PATH_PROTOCOL *
-UnpackDevicePath (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   );
 
 #endif

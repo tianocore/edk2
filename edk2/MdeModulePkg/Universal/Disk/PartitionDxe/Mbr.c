@@ -163,9 +163,9 @@ PartitionInstallMbrChildHandles (
   LastDevicePathNode = NULL;
   ZeroMem (&ParentHdDev, sizeof (ParentHdDev));
   DevicePathNode = DevicePath;
-  while (!EfiIsDevicePathEnd (DevicePathNode)) {
+  while (!IsDevicePathEnd (DevicePathNode)) {
     LastDevicePathNode  = DevicePathNode;
-    DevicePathNode      = EfiNextDevicePathNode (DevicePathNode);
+    DevicePathNode      = NextDevicePathNode (DevicePathNode);
   }
 
   if (LastDevicePathNode != NULL) {

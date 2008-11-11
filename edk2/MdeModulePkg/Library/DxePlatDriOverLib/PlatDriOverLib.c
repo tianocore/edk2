@@ -1590,9 +1590,9 @@ UpdateFvFileDevicePath (
   //
   TempDevicePath = *DevicePath;
   LastDeviceNode = TempDevicePath;
-  while (!EfiIsDevicePathEnd (TempDevicePath)) {
-    LastDeviceNode = TempDevicePath;
-    TempDevicePath = EfiNextDevicePathNode (TempDevicePath);
+  while (!IsDevicePathEnd (TempDevicePath)) {
+     LastDeviceNode = TempDevicePath;
+     TempDevicePath = NextDevicePathNode (TempDevicePath);
   }
   GuidPoint = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LastDeviceNode);
   if (GuidPoint == NULL) {
@@ -1618,7 +1618,7 @@ UpdateFvFileDevicePath (
   //
   TempDevicePath = *DevicePath;
   HasFvNode = FALSE;
-  while (!EfiIsDevicePathEnd (TempDevicePath)) {
+  while (!IsDevicePathEnd (TempDevicePath)) {
     //
     // Use old Device Path
     //
@@ -1627,7 +1627,7 @@ UpdateFvFileDevicePath (
       HasFvNode = TRUE;
       break;
     }
-    TempDevicePath = EfiNextDevicePathNode (TempDevicePath);
+    TempDevicePath = NextDevicePathNode (TempDevicePath);
   }
 
   if (!HasFvNode) {
