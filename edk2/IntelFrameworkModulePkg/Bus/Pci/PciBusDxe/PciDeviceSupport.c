@@ -612,8 +612,8 @@ StartPciDevicesOnBridge (
       //
       // Get the next device path
       //
-      CurrentDevicePath = EfiNextDevicePathNode (RemainingDevicePath);
-      if (EfiIsDevicePathEnd (CurrentDevicePath)) {
+      CurrentDevicePath = NextDevicePathNode (RemainingDevicePath);
+      if (IsDevicePathEnd (CurrentDevicePath)) {
         return EFI_SUCCESS;
       }
 
@@ -1015,7 +1015,7 @@ GetHpcPciAddress (
   //
   // Get the remaining device path for this PCI device, if it is a PCI device
   //
-  while (!EfiIsDevicePathEnd (CurrentDevicePath)) {
+  while (!IsDevicePathEnd (CurrentDevicePath)) {
 
     Node.DevPath = CurrentDevicePath;
 
@@ -1025,7 +1025,7 @@ GetHpcPciAddress (
     if ((Node.DevPath->Type != HARDWARE_DEVICE_PATH) ||
         ((Node.DevPath->SubType != HW_PCI_DP)         &&
          (DevicePathNodeLength (Node.DevPath) != sizeof (PCI_DEVICE_PATH)))) {
-      CurrentDevicePath = EfiNextDevicePathNode (CurrentDevicePath);
+      CurrentDevicePath = NextDevicePathNode (CurrentDevicePath);
       continue;
     }
 
@@ -1035,7 +1035,7 @@ GetHpcPciAddress (
   //
   // Check if it is not PCI device path
   //
-  if (EfiIsDevicePathEnd (CurrentDevicePath)) {
+  if (IsDevicePathEnd (CurrentDevicePath)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1094,7 +1094,7 @@ GetHpcPciAddressFromRootBridge (
   Node.DevPath      = CurrentDevicePath;
   Temp              = NULL;
 
-  while (!EfiIsDevicePathEnd (CurrentDevicePath)) {
+  while (!IsDevicePathEnd (CurrentDevicePath)) {
 
     CurrentLink   = RootBridge->ChildList.ForwardLink;
     Node.DevPath  = CurrentDevicePath;
@@ -1121,14 +1121,14 @@ GetHpcPciAddressFromRootBridge (
 
     }
 
-    CurrentDevicePath = EfiNextDevicePathNode (CurrentDevicePath);
+    CurrentDevicePath = NextDevicePathNode (CurrentDevicePath);
   }
 
   if (MisMatch) {
 
-    CurrentDevicePath = EfiNextDevicePathNode (CurrentDevicePath);
+    CurrentDevicePath = NextDevicePathNode (CurrentDevicePath);
 
-    if (EfiIsDevicePathEnd (CurrentDevicePath)) {
+    if (IsDevicePathEnd (CurrentDevicePath)) {
       *PciAddress = EFI_PCI_ADDRESS (RootBridge->BusNumber, Node.Pci->Device, Node.Pci->Function, 0);
       return EFI_SUCCESS;
     }
