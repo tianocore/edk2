@@ -33,7 +33,7 @@ typedef
 EFI_STATUS
 (EFIAPI *ECP_PEI_PCI_CFG_PPI_IO) (
   IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_PCI_CFG_PPI          *This,
+  IN ECP_PEI_PCI_CFG_PPI      *This,
   IN PEI_PCI_CFG_PPI_WIDTH    Width,
   IN UINT64                   Address,
   IN OUT VOID                 *Buffer
