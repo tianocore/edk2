@@ -32,6 +32,7 @@
 //
 #define EFI_PCI_CAPABILITY_ID_PCIX    0x07
 
+#pragma pack(1)
 ///
 /// Capability EFI_PCI_CAPABILITY_ID_PCIX, defined in PCI-X Addendum to the PCI Local Bus Specification
 ///
@@ -51,6 +52,8 @@ typedef struct {
   UINT32                  SplitTransCtrlRegUp;
   UINT32                  SplitTransCtrlRegDn;
 } EFI_PCI_CAPABILITY_PCIX_BRDG;
+
+#pragma pack()
 
 #define PCI_CODE_TYPE_EFI_IMAGE       0x03
 

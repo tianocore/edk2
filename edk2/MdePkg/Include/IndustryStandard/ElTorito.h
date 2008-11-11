@@ -19,9 +19,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _ELTORITO_H_
 #define _ELTORITO_H_
 
-//
-// CDROM_VOLUME_DESCRIPTOR.Types, defined in ISO 9660
-//
+///
+/// CDROM_VOLUME_DESCRIPTOR.Types, defined in ISO 9660
+///
 #define CDVOL_TYPE_STANDARD 0x0
 #define CDVOL_TYPE_CODED    0x1
 #define CDVOL_TYPE_END      0xFF
@@ -54,6 +54,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ELTORITO_28_DISKETTE  0x03
 #define ELTORITO_HARD_DISK    0x04
 
+
+#pragma pack(1)
 
 /// 
 /// CD-ROM Volume Descriptor
@@ -133,5 +135,7 @@ typedef union {
   } Section;
 
 } ELTORITO_CATALOG;
+
+#pragma pack()
 
 #endif
