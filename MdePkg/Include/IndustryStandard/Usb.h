@@ -96,6 +96,7 @@ typedef struct {
   UINT8           NumConfigurations;
 } USB_DEVICE_DESCRIPTOR;
 
+#pragma pack(1)
 ///
 /// Standard Configuration Descriptor
 /// USB 2.0 spec, Section 9.6.3
@@ -110,6 +111,7 @@ typedef struct {
   UINT8           Attributes;
   UINT8           MaxPower;
 } USB_CONFIG_DESCRIPTOR;
+#pragma pack()
 
 ///
 /// Standard Interface Descriptor
@@ -127,6 +129,7 @@ typedef struct {
   UINT8           Interface;
 } USB_INTERFACE_DESCRIPTOR;
 
+#pragma pack(1)
 ///
 /// Standard Endpoint Descriptor
 /// USB 2.0 spec, Section 9.6.6
@@ -139,6 +142,7 @@ typedef struct {
   UINT16          MaxPacketSize;
   UINT8           Interval;
 } USB_ENDPOINT_DESCRIPTOR;
+#pragma pack()
 
 ///
 /// UNICODE String Descriptor
@@ -335,7 +339,6 @@ typedef struct hid_class_descriptor {
   UINT8   DescriptorType;
   UINT16  DescriptorLength;
 } EFI_USB_HID_CLASS_DESCRIPTOR;
-#pragma pack()
 
 ///
 /// The HID descriptor identifies the length and type
@@ -349,5 +352,6 @@ typedef struct hid_descriptor {
   UINT8                         NumDescriptors;
   EFI_USB_HID_CLASS_DESCRIPTOR  HidClassDesc[1];
 } EFI_USB_HID_DESCRIPTOR;
+#pragma pack()
 
 #endif
