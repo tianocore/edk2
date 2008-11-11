@@ -598,8 +598,8 @@ Returns:
       //
       // Get the next device path
       //
-      CurrentDevicePath = EfiNextDevicePathNode (RemainingDevicePath);
-      if (EfiIsDevicePathEnd (CurrentDevicePath)) {
+      CurrentDevicePath = NextDevicePathNode (RemainingDevicePath);
+      if (IsDevicePathEnd (CurrentDevicePath)) {
         return EFI_SUCCESS;
       }
   

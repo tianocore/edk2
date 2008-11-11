@@ -1751,7 +1751,7 @@ Returns:
                       NULL
                       );
       ASSERT_EFI_ERROR (Status);
-    } else if (EfiIsDevicePathEnd (TempFwbDevicePath)) {
+    } else if (IsDevicePathEnd (TempFwbDevicePath)) {
       //
       // Device allready exists, so reinstall the FVB protocol
       //
