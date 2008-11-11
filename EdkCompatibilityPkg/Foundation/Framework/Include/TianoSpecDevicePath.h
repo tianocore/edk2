@@ -24,43 +24,17 @@ Abstract:
 
 #pragma pack(1)
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000)
 //
-// EFI Specification extension on Media Device Path
+// EFI Specification extension on Media Device Path. MEDIA_FW_VOL_FILEPATH_DEVICE_PATH is adopted by UEFI later and added in UEFI2.10. 
+// In EdkCompatibility Package, we only support MEDIA_FW_VOL_FILEPATH_DEVICE_PATH that complies with
+// EFI 1.10 and UEFI 2.10.
 //
 #define MEDIA_FV_FILEPATH_DP  0x06
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
   EFI_GUID                  NameGuid;
 } MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
-#endif
 
-
-#if (EFI_SPECIFICATION_VERSION == 0x00020000)
-//
-// For UEFI 2.0, use GUIDed PIWG device path to work-around EFI Specification extension on Media Device Path
-//
-typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL  Header;
-  EFI_GUID                  PiwgSpecificDevicePath;
-  UINT32                    Type;
-} PIWG_DEVICE_PATH;
-
-#define PIWG_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE         0x01
-typedef struct {
-  PIWG_DEVICE_PATH      Piwg;
-  EFI_GUID              NameGuid;
-} MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
-
-//
-// Place holder for a future extension
-//
-#define PIWG_MEDIA_FW_VOL_DEVICE_PATH_TYPE                  0x02
-typedef struct {
-  PIWG_DEVICE_PATH      Piwg;
-  EFI_GUID              VolumeGuid;
-} MEDIA_FW_VOL_DEVICE_PATH;
-#endif
 
 #if (EFI_SPECIFICATION_VERSION > 0x00020000)
 //

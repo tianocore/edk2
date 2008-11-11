@@ -520,33 +520,16 @@ Returns:
 
 --*/
 {
-#if (EFI_SPECIFICATION_VERSION != 0x00020000)
   //
-  // Use old Device Path
+  // EFI Specification extension on Media Device Path. MEDIA_FW_VOL_FILEPATH_DEVICE_PATH is adopted by UEFI later and added in UEFI2.10. 
+  // In EdkCompatibility Package, we only support MEDIA_FW_VOL_FILEPATH_DEVICE_PATH that complies with
+  // EFI 1.10 and UEFI 2.10.
   //
+
   FvDevicePathNode->Header.Type     = MEDIA_DEVICE_PATH;
   FvDevicePathNode->Header.SubType  = MEDIA_FV_FILEPATH_DP;
   SetDevicePathNodeLength (&FvDevicePathNode->Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
 
-#else
-  //
-  // Use the new Device path that does not conflict with the UEFI 2.0
-  //
-  FvDevicePathNode->Piwg.Header.Type     = MEDIA_DEVICE_PATH;
-  FvDevicePathNode->Piwg.Header.SubType  = MEDIA_VENDOR_DP;
-  SetDevicePathNodeLength (&FvDevicePathNode->Piwg.Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
-
-  //
-  // Add the GUID for generic PIWG device paths
-  //
-  EfiCopyMem (&FvDevicePathNode->Piwg.PiwgSpecificDevicePath, &gEfiFrameworkDevicePathGuid, sizeof(EFI_GUID));
-
-  //
-  // Add in the FW Vol File Path PIWG defined inforation
-  //
-  FvDevicePathNode->Piwg.Type = PIWG_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE;
-
-#endif
   EfiCopyMem (&FvDevicePathNode->NameGuid, NameGuid, sizeof(EFI_GUID));
 }
 
@@ -581,27 +564,15 @@ Returns:
 
 --*/
 {
-#if (EFI_SPECIFICATION_VERSION != 0x00020000)
   //
-  // Use old Device Path
+  // EFI Specification extension on Media Device Path. MEDIA_FW_VOL_FILEPATH_DEVICE_PATH is adopted by UEFI later and added in UEFI2.10. 
+  // In EdkCompatibility Package, we only support MEDIA_FW_VOL_FILEPATH_DEVICE_PATH that complies with
+  // EFI 1.10 and UEFI 2.10.
   //
   if (DevicePathType (&FvDevicePathNode->Header) == MEDIA_DEVICE_PATH &&
       DevicePathSubType (&FvDevicePathNode->Header) == MEDIA_FV_FILEPATH_DP) {
     return &FvDevicePathNode->NameGuid;
   }
 
-#else
-  //
-  // Use the new Device path that does not conflict with the UEFI 2.0
-  //
-  if (DevicePathType (&FvDevicePathNode->Piwg.Header) == MEDIA_DEVICE_PATH &&
-      DevicePathSubType (&FvDevicePathNode->Piwg.Header) == MEDIA_VENDOR_DP) {
-    if (EfiCompareGuid (&gEfiFrameworkDevicePathGuid, &FvDevicePathNode->Piwg.PiwgSpecificDevicePath)) {
-      if (FvDevicePathNode->Piwg.Type == PIWG_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE) {
-        return &FvDevicePathNode->NameGuid;
-      }
-    }
-  }
-#endif
   return NULL;
 }
