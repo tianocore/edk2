@@ -190,6 +190,8 @@ Returns:
   return EFI_SUCCESS;
 }
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+
 static
 VOID
 EFIAPI
@@ -209,7 +211,7 @@ EventNotifySignalAllNullEvent (
   return;
 }
 
-
+#endif
 
 EFI_STATUS
 EFIAPI
@@ -243,50 +245,49 @@ Returns:
   UINT32            EventType;
   EFI_EVENT_NOTIFY  WorkerNotifyFunction;
 
-  if (gST->Hdr.Revision < 0x00020000) {
-  
-    if (NotifyFunction == NULL) {
-      EventType = EFI_EVENT_SIGNAL_LEGACY_BOOT | EFI_EVENT_NOTIFY_SIGNAL_ALL;
-    } else {
-      EventType = EFI_EVENT_SIGNAL_LEGACY_BOOT;
-    }
-    WorkerNotifyFunction = NotifyFunction;
-  
-    //
-    // prior to UEFI 2.0 use Tiano extension to EFI
-    //
-    Status = gBS->CreateEvent (
-                    EventType,
-                    NotifyTpl,
-                    WorkerNotifyFunction,
-                    NotifyContext,
-                    LegacyBootEvent
-                    );
+#if (EFI_SPECIFICATION_VERSION < 0x00020000)
+
+  if (NotifyFunction == NULL) {
+    EventType = EFI_EVENT_SIGNAL_LEGACY_BOOT | EFI_EVENT_NOTIFY_SIGNAL_ALL;
   } else {
-  
-    EventType = EFI_EVENT_NOTIFY_SIGNAL;
-    if (NotifyFunction == NULL) {
-      //
-      // CreatEventEx will check NotifyFunction is NULL or not
-      //
-      WorkerNotifyFunction = EventNotifySignalAllNullEvent;
-    } else {
-      WorkerNotifyFunction = NotifyFunction;
-    }
-  
+    EventType = EFI_EVENT_SIGNAL_LEGACY_BOOT;
+  }
+  WorkerNotifyFunction = NotifyFunction;
+
+  //
+  // prior to UEFI 2.0 use Tiano extension to EFI
+  //
+  Status = gBS->CreateEvent (
+                  EventType,
+                  NotifyTpl,
+                  WorkerNotifyFunction,
+                  NotifyContext,
+                  LegacyBootEvent
+                  );
+#else
+
+  EventType = EFI_EVENT_NOTIFY_SIGNAL;
+  if (NotifyFunction == NULL) {
     //
-    // For UEFI 2.0 and the future use an Event Group
+    // CreatEventEx will check NotifyFunction is NULL or not
     //
-    Status = gBS->CreateEventEx (
-                    EventType,
-                    NotifyTpl,
-                    WorkerNotifyFunction,
-                    NotifyContext,
-                    &gEfiEventLegacyBootGuid,
-                    LegacyBootEvent
-                    );
+    WorkerNotifyFunction = EventNotifySignalAllNullEvent;
+  } else {
+    WorkerNotifyFunction = NotifyFunction;
   }
 
+  //
+  // For UEFI 2.0 and the future use an Event Group
+  //
+  Status = gBS->CreateEventEx (
+                  EventType,
+                  NotifyTpl,
+                  WorkerNotifyFunction,
+                  NotifyContext,
+                  &gEfiEventLegacyBootGuid,
+                  LegacyBootEvent
+                  );
+#endif
   return Status;
 }
 
@@ -323,48 +324,48 @@ Return:
   UINT32            EventType;
   EFI_EVENT_NOTIFY  WorkerNotifyFunction;
 
-  if (gST->Hdr.Revision < 0x00020000) {
-  
-    if (NotifyFunction == NULL) {
-      EventType = EFI_EVENT_SIGNAL_READY_TO_BOOT | EFI_EVENT_NOTIFY_SIGNAL_ALL;
-    } else {
-      EventType = EFI_EVENT_SIGNAL_READY_TO_BOOT;
-    }
-    WorkerNotifyFunction = NotifyFunction;
-  
-    //
-    // prior to UEFI 2.0 use Tiano extension to EFI
-    //
-    Status = gBS->CreateEvent (
-                    EventType,
-                    NotifyTpl,
-                    WorkerNotifyFunction,
-                    NotifyContext,
-                    ReadyToBootEvent
-                    );
+#if (EFI_SPECIFICATION_VERSION < 0x00020000)
+
+  if (NotifyFunction == NULL) {
+    EventType = EFI_EVENT_SIGNAL_READY_TO_BOOT | EFI_EVENT_NOTIFY_SIGNAL_ALL;
   } else {
-  
-    EventType = EFI_EVENT_NOTIFY_SIGNAL;
-    if (NotifyFunction == NULL) {
-      //
-      // CreatEventEx will check NotifyFunction is NULL or not
-      //
-      WorkerNotifyFunction = EventNotifySignalAllNullEvent;
-    } else {
-      WorkerNotifyFunction = NotifyFunction;
-    }
-  
-    //
-    // For UEFI 2.0 and the future use an Event Group
-    //
-    Status = gBS->CreateEventEx (
-                    EventType,
-                    NotifyTpl,
-                    WorkerNotifyFunction,
-                    NotifyContext,
-                    &gEfiEventReadyToBootGuid,
-                    ReadyToBootEvent
-                    );
+    EventType = EFI_EVENT_SIGNAL_READY_TO_BOOT;
   }
+  WorkerNotifyFunction = NotifyFunction;
+
+  //
+  // prior to UEFI 2.0 use Tiano extension to EFI
+  //
+  Status = gBS->CreateEvent (
+                  EventType,
+                  NotifyTpl,
+                  WorkerNotifyFunction,
+                  NotifyContext,
+                  ReadyToBootEvent
+                  );
+#else
+
+  EventType = EFI_EVENT_NOTIFY_SIGNAL;
+  if (NotifyFunction == NULL) {
+    //
+    // CreatEventEx will check NotifyFunction is NULL or not
+    //
+    WorkerNotifyFunction = EventNotifySignalAllNullEvent;
+  } else {
+    WorkerNotifyFunction = NotifyFunction;
+  }
+
+  //
+  // For UEFI 2.0 and the future use an Event Group
+  //
+  Status = gBS->CreateEventEx (
+                  EventType,
+                  NotifyTpl,
+                  WorkerNotifyFunction,
+                  NotifyContext,
+                  &gEfiEventReadyToBootGuid,
+                  ReadyToBootEvent
+                  );
+#endif
   return Status;
 }
