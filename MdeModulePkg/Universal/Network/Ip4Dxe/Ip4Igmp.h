@@ -56,7 +56,7 @@ typedef struct {
   LIST_ENTRY              Groups;
 } IGMP_SERVICE_DATA;
 
-enum {
+typedef enum {
   //
   // IGMP message type
   //
@@ -67,7 +67,7 @@ enum {
 
   IGMP_V1ROUTER_PRESENT     = 400,
   IGMP_UNSOLICIATED_REPORT  = 10
-};
+} IGMP_ENUM_TYPES;
 
 EFI_STATUS
 Ip4InitIgmp (

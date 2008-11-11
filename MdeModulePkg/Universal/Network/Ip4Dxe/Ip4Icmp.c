@@ -43,36 +43,36 @@ mIcmpClass[] = {
 };
 
 EFI_IP4_ICMP_TYPE
-mIp4SupportedIcmp [23] = {
-  {ICMP_ECHO_REPLY,        ICMP_DEFAULT_CODE      },
+mIp4SupportedIcmp[23] = {
+  {ICMP_ECHO_REPLY,        ICMP_DEFAULT_CODE        },
 
-  {ICMP_DEST_UNREACHABLE,  ICMP_NET_UNREACHABLE   },
-  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNREACHABLE  },
-  {ICMP_DEST_UNREACHABLE,  ICMP_PROTO_UNREACHABLE },
-  {ICMP_DEST_UNREACHABLE,  ICMP_PORT_UNREACHABLE  },
-  {ICMP_DEST_UNREACHABLE,  ICMP_FRAGMENT_FAILED   },
-  {ICMP_DEST_UNREACHABLE,  ICMP_SOURCEROUTE_FAILED},
-  {ICMP_DEST_UNREACHABLE,  ICMP_NET_UNKNOWN       },
-  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNKNOWN      },
-  {ICMP_DEST_UNREACHABLE,  ICMP_SOURCE_ISOLATED   },
-  {ICMP_DEST_UNREACHABLE,  ICMP_NET_PROHIBITED    },
-  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_PROHIBITED   },
+  {ICMP_DEST_UNREACHABLE,  ICMP_NET_UNREACHABLE     },
+  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNREACHABLE    },
+  {ICMP_DEST_UNREACHABLE,  ICMP_PROTO_UNREACHABLE   },
+  {ICMP_DEST_UNREACHABLE,  ICMP_PORT_UNREACHABLE    },
+  {ICMP_DEST_UNREACHABLE,  ICMP_FRAGMENT_FAILED     },
+  {ICMP_DEST_UNREACHABLE,  ICMP_SOURCEROUTE_FAILED  },
+  {ICMP_DEST_UNREACHABLE,  ICMP_NET_UNKNOWN         },
+  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNKNOWN        },
+  {ICMP_DEST_UNREACHABLE,  ICMP_SOURCE_ISOLATED     },
+  {ICMP_DEST_UNREACHABLE,  ICMP_NET_PROHIBITED      },
+  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_PROHIBITED     },
   {ICMP_DEST_UNREACHABLE,  ICMP_NET_UNREACHABLE_TOS },
   {ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNREACHABLE_TOS},
 
-  {ICMP_SOURCE_QUENCH,     ICMP_DEFAULT_CODE      },
+  {ICMP_SOURCE_QUENCH,     ICMP_DEFAULT_CODE        },
 
-  {ICMP_REDIRECT,          ICMP_NET_REDIRECT      },
-  {ICMP_REDIRECT,          ICMP_HOST_REDIRECT     },
-  {ICMP_REDIRECT,          ICMP_NET_TOS_REDIRECT  },
-  {ICMP_REDIRECT,          ICMP_HOST_TOS_REDIRECT },
+  {ICMP_REDIRECT,          ICMP_NET_REDIRECT        },
+  {ICMP_REDIRECT,          ICMP_HOST_REDIRECT       },
+  {ICMP_REDIRECT,          ICMP_NET_TOS_REDIRECT    },
+  {ICMP_REDIRECT,          ICMP_HOST_TOS_REDIRECT   },
 
-  {ICMP_ECHO_REQUEST,      ICMP_DEFAULT_CODE      },
+  {ICMP_ECHO_REQUEST,      ICMP_DEFAULT_CODE        },
 
-  {ICMP_TIME_EXCEEDED,     ICMP_TIMEOUT_IN_TRANSIT},
-  {ICMP_TIME_EXCEEDED,     ICMp_TIMEOUT_REASSEMBLE},
+  {ICMP_TIME_EXCEEDED,     ICMP_TIMEOUT_IN_TRANSIT  },
+  {ICMP_TIME_EXCEEDED,     ICMp_TIMEOUT_REASSEMBLE  },
 
-  {ICMP_PARAMETER_PROBLEM, ICMP_DEFAULT_CODE      },
+  {ICMP_PARAMETER_PROBLEM, ICMP_DEFAULT_CODE        },
 };
 
 
@@ -80,6 +80,7 @@ mIp4SupportedIcmp [23] = {
 /**
   Process the ICMP redirect. Find the instance then update
   its route cache.
+  
   All kinds of redirect is treated as host redirect as
   specified by RFC1122 3.3.1.2:
   "Since the subnet mask appropriate to the destination
@@ -170,10 +171,10 @@ Ip4ProcessIcmpRedirect (
   @param  Packet                 The content of the ICMP error with IP head
                                  removed.
 
+  @retval EFI_SUCCESS            The ICMP error is processed successfully.
   @retval EFI_INVALID_PARAMETER  The packet is invalid
   @retval Others                 Failed to process the packet.
-  @retval EFI_SUCCESS            The ICMP error is processed successfully.
-
+  
 **/
 EFI_STATUS
 Ip4ProcessIcmpError (
@@ -291,6 +292,7 @@ ON_EXIT:
 
   @retval EFI_INVALID_PARAMETER  The packet is invalid
   @retval EFI_SUCCESS            The ICMP query message is processed
+  @retval Others                 Failed to process ICMP query.
 
 **/
 EFI_STATUS
@@ -329,6 +331,7 @@ Ip4ProcessIcmpQuery (
 
   @retval EFI_INVALID_PARAMETER  The packet is malformated.
   @retval EFI_SUCCESS            The ICMP message is successfully processed.
+  @retval Others                 Failed to handle ICMP packet.
 
 **/
 EFI_STATUS

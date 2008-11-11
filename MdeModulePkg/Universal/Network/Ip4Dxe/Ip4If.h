@@ -24,36 +24,44 @@ Abstract:
 #ifndef __EFI_IP4_IF_H__
 #define __EFI_IP4_IF_H__
 
-enum {
+typedef enum {
   IP4_FRAME_RX_SIGNATURE  = EFI_SIGNATURE_32 ('I', 'P', 'F', 'R'),
   IP4_FRAME_TX_SIGNATURE  = EFI_SIGNATURE_32 ('I', 'P', 'F', 'T'),
   IP4_FRAME_ARP_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', 'F', 'A'),
   IP4_INTERFACE_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', 'I', 'F')
-};
+} IP4_IF_ENUM_TYPES;
 
-//
-// This prototype is used by both receive and transmission.
-// When receiving Netbuf is allocated by IP4_INTERFACE, and
-// released by IP4. Flag shows whether the frame is received
-// as link broadcast/multicast...
-//
-// When transmitting, the Netbuf is from IP4, and provided
-// to the callback as a reference. Flag isn't used.
-//
-// IpInstance can be NULL which means that it is the IP4 driver
-// itself sending the packets. IP4 driver may send packets that
-// don't belong to any instance, such as ICMP errors, ICMP echo
-// responses, or IGMP packets. IpInstance is used as a tag in
-// this module.
-//
+/**
+  This prototype is used by both receive and transmission.
+  When receiving Netbuf is allocated by IP4_INTERFACE, and
+  released by IP4. Flag shows whether the frame is received
+  as link broadcast/multicast...
+
+  When transmitting, the Netbuf is from IP4, and provided
+  to the callback as a reference. Flag isn't used.
+
+  @param IpInstance The instance that sent or received the packet.
+                    IpInstance can be NULL which means that it is the IP4 driver
+                    itself sending the packets. IP4 driver may send packets that
+                    don't belong to any instance, such as ICMP errors, ICMP echo
+                    responses, or IGMP packets. IpInstance is used as a tag in
+                    this module.
+  @param Packet     The sent or received packet.
+  @param IoStatus   Status of sending or receiving.
+  @param LinkFlag   Indicate if the frame is received as link broadcast/multicast.
+                    When transmitting, it is not used.
+  @param Context    Additional data for callback.
+
+  @return None.
+**/
 typedef
 VOID
-(*IP4_FRAME_CALLBACK) (
-  IP4_PROTOCOL              *IpInstance,       OPTIONAL
-  NET_BUF                   *Packet,
-  EFI_STATUS                IoStatus,
-  UINT32                    LinkFlag,
-  VOID                      *Context
+(*IP4_FRAME_CALLBACK)(
+  IN IP4_PROTOCOL              *IpInstance,       OPTIONAL
+  IN NET_BUF                   *Packet,
+  IN EFI_STATUS                IoStatus,
+  IN UINT32                    LinkFlag,
+  IN VOID                      *Context
   );
 
 //
@@ -116,13 +124,19 @@ typedef struct {
   EFI_MAC_ADDRESS         Mac;
 } IP4_ARP_QUE;
 
-//
-// Callback to select which frame to cancel. Caller can cancel a
-// single frame, or all the frame from an IP instance.
-//
+/**
+  Callback to select which frame to cancel. Caller can cancel a
+  single frame, or all the frame from an IP instance.
+
+  @param Frame      The sending frame to check for cancellation.
+  @param Context    Additional data for callback.
+
+  @retval TRUE      The sending of the frame should be cancelled.
+  @retval FALSE     Do not cancel the frame sending.
+**/
 typedef
 BOOLEAN
-(*IP4_FRAME_TO_CANCEL) (
+(*IP4_FRAME_TO_CANCEL)(
   IP4_LINK_TX_TOKEN       *Frame,
   VOID                    *Context
   );
@@ -134,7 +148,7 @@ BOOLEAN
 // Notice the special cases that DHCP can configure the interface
 // with 0.0.0.0/0.0.0.0.
 //
-struct _IP4_INTERFACE {
+typedef struct _IP4_INTERFACE {
   UINT32                        Signature;
   LIST_ENTRY                    Link;
   INTN                          RefCnt;
@@ -182,7 +196,7 @@ struct _IP4_INTERFACE {
   //
   LIST_ENTRY                    IpInstances;
   BOOLEAN                       PromiscRecv;
-};
+} IP4_INTERFACE;
 
 IP4_INTERFACE *
 Ip4CreateInterface (

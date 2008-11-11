@@ -50,7 +50,7 @@ Abstract:
 #include "Ip4Input.h"
 #include "Ip4Output.h"
 
-enum {
+typedef enum {
   IP4_PROTOCOL_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', '4', 'P'),
   IP4_SERVICE_SIGNATURE  = EFI_SIGNATURE_32 ('I', 'P', '4', 'S'),
 
@@ -74,7 +74,7 @@ enum {
   IP4_SERVICE_STARTED,
   IP4_SERVICE_CONFIGED,
   IP4_SERVICE_DESTORY
-};
+} IP4_IMPL_ENUM_TYPES;
 
 //
 // IP4_TXTOKEN_WRAP wraps the upper layer's transmit token.
@@ -109,7 +109,7 @@ typedef struct {
   EFI_IP4_RECEIVE_DATA      RxData;
 } IP4_RXDATA_WRAP;
 
-struct _IP4_PROTOCOL {
+typedef struct _IP4_PROTOCOL {
   UINT32                    Signature;
 
   EFI_IP4_PROTOCOL          Ip4Proto;
@@ -148,9 +148,9 @@ struct _IP4_PROTOCOL {
 
   EFI_IP4_CONFIG_DATA       ConfigData;
 
-};
+} IP4_PROTOCOL;
 
-struct _IP4_SERVICE {
+typedef struct _IP4_SERVICE {
   UINT32                          Signature;
   EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
   INTN                            State;
@@ -201,7 +201,7 @@ struct _IP4_SERVICE {
   // NIC this IP4_SERVICE works on.
   //
   CHAR16                          *MacString;
-};
+} IP4_SERVICE;
 
 #define IP4_INSTANCE_FROM_PROTOCOL(Ip4) \
           CR ((Ip4), IP4_PROTOCOL, Ip4Proto, IP4_PROTOCOL_SIGNATURE)

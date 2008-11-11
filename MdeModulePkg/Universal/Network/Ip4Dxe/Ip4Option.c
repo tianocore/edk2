@@ -180,7 +180,7 @@ Ip4CopyOption (
       //
       // don't copy options that is only valid for the first fragment
       //
-      if (FirstFragment || (Type & IP4_OPTION_COPY_MASK)) {
+      if (FirstFragment || (Type & IP4_OPTION_COPY_MASK) != 0) {
         CopyMem (OptBuf + Next, Option + Cur, Len);
         Next += Len;
       }

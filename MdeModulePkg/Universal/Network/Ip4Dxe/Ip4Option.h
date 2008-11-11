@@ -24,7 +24,7 @@ Abstract:
 #ifndef __EFI_IP4_OPTION_H__
 #define __EFI_IP4_OPTION_H__
 
-enum {
+typedef enum {
   IP4_OPTION_EOP       = 0,
   IP4_OPTION_NOP       = 1,
   IP4_OPTION_LSRR      = 131,  // Loss source and record routing,   10000011
@@ -32,7 +32,7 @@ enum {
   IP4_OPTION_RR        = 7,    // Record routing, 00000111
 
   IP4_OPTION_COPY_MASK = 0x80
-};
+} IP4_OPTION_ENUM_TYPES;
 
 BOOLEAN
 Ip4OptionIsValid (

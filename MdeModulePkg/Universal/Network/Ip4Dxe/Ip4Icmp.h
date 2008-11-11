@@ -24,7 +24,7 @@ Abstract:
 #ifndef __EFI_IP4_ICMP_H__
 #define __EFI_IP4_ICMP_H__
 
-enum {
+typedef enum {
   //
   // ICMP type definations
   //
@@ -80,7 +80,7 @@ enum {
   ICMP_INVALID_MESSAGE      = 0,
   ICMP_ERROR_MESSAGE        = 1,
   ICMP_QUERY_MESSAGE        = 2
-};
+} ICMP_ENUM_TYPES;
 
 typedef struct {
   UINT8                   IcmpType;

@@ -26,12 +26,12 @@ Abstract:
 
 #include "Ip4Common.h"
 
-enum {
+typedef enum {
   IP4_DIRECT_ROUTE      = 0x00000001,
 
   IP4_ROUTE_CACHE_HASH  = 31,
   IP4_ROUTE_CACHE_MAX   = 64  // Max NO. of cache entry per hash bucket
-};
+} IP4_ROUTE_ENUM_TYPES;
 
 #define IP4_ROUTE_CACHE_HASH(Dst, Src)  (((Dst) ^ (Src)) % IP4_ROUTE_CACHE_HASH)
 
