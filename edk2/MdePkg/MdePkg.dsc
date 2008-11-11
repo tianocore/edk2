@@ -78,7 +78,8 @@
   MdePkg/Library/DxePiLib/DxePiLib.inf
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-
+  MdePkg/Library/DxePciLibPciRootBridgeIo/DxePciLibPciRootBridgeIo.inf
+  MdePkg/Library/DxePciSegmentLibPciRootBridgeIo/DxePciSegmentLibPciRootBridgeIo.inf
 
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
@@ -94,6 +95,8 @@
   MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   MdePkg/Library/PeiSmbusLibSmbus2Ppi/PeiSmbusLibSmbus2Ppi.inf
+  MdePkg/Library/PeiPciLibPciCfg2/PeiPciLibPciCfg2.inf
+  MdePkg/Library/PeiPciSegmentLibPciCfg2/PeiPciSegmentLibPciCfg2.inf
 
   MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -129,6 +132,8 @@
   MdePkg/Library/PeiPalLib/PeiPalLib.inf
   MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
+  MdePkg/Library/UefiPalLib/UefiPalLib.inf
+  MdePkg/Library/UefiSalLib/UefiSalLib.inf
 
 
 [Components.EBC]
