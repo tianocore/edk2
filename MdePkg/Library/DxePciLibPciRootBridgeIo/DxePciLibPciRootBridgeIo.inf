@@ -1,0 +1,55 @@
+# @file
+# Component description file for PCI Lib using PCI Root Bridge I/O Protocol
+#
+# This library produces the APIs from the PCI Library and implements these APIs
+#  by calling into the PCI Root Bridge I/O Protocol. The PCI Root Bridge I/O Protocol is
+#  typically produced by a chipset specific DXE driver.
+#  This library binds to the first PCI Root Bridge I/O Protocol in the platform. As a result,
+#  it should only be used on platforms that contain a single PCI root bridge.
+#
+# Copyright (c) 2007, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxePciLibPciRootBridgeIo
+  FILE_GUID                      = 90EC42CB-B780-4eb8-8E99-C8E3E5F37530
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  CONSTRUCTOR                    = PciLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  PciLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  DebugLib
+
+[Protocols]
+  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+

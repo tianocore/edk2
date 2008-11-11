@@ -1,0 +1,47 @@
+# @file
+# Uefi Instance of PAL Library Class
+#
+# This library implements the PAL Library Class by getting the PAL entry from SAL System
+# Table, and use AsmPalCall to produce the Pal Call.
+#
+# Copyright (c) 2007, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiPalLib
+  FILE_GUID                      = B7F30170-9E5F-482a-B553-A145A5787003
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.04
+  LIBRARY_CLASS                  = PalLib|UEFI_DRIVER UEFI_APPLICATION
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  CONSTRUCTOR                    = UefiPalLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IPF
+#
+
+[Sources.IPF]
+  UefiPalLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  DebugLib
+
