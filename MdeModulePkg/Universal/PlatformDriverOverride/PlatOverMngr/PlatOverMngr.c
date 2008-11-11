@@ -340,8 +340,8 @@ GetImageName (
   )
 {
   EFI_STATUS                        Status;
-  EFI_DEVICE_PATH_PROTOCOL          *DevPath;
   EFI_DEVICE_PATH_PROTOCOL          *DevPathNode;
+  EFI_DEVICE_PATH_PROTOCOL          *AlignedDevPathNode;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvFilePath;
   VOID                              *Buffer;
   UINTN                             BufferSize;
@@ -357,21 +357,24 @@ GetImageName (
     return NULL;
   }
 
-  DevPath     = UnpackDevicePath (Image->FilePath);
+  DevPathNode  = Image->FilePath;
 
-  if (DevPath == NULL) {
+  if (DevPathNode == NULL) {
     return NULL;
   }
 
-  DevPathNode = DevPath;
-
   while (!IsDevicePathEnd (DevPathNode)) {
+    //
+    // Make sure device path node is aligned when accessing it's FV Name Guid field.
+    //
+    AlignedDevPathNode = AllocateCopyPool (DevicePathNodeLength(DevPathNode), DevPathNode);
+    
     //
     // Find the Fv File path
     //
-    NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)DevPathNode);
+    NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)AlignedDevPathNode);
     if (NameGuid != NULL) {
-      FvFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) DevPathNode;
+      FvFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) AlignedDevPathNode;
       Status = gBS->HandleProtocol (
                     Image->DeviceHandle,
                     &gEfiFirmwareVolume2ProtocolGuid,
@@ -388,18 +391,21 @@ GetImageName (
                         &AuthenticationStatus
                         );
         if (!EFI_ERROR (Status)) {
+          FreePool (AlignedDevPathNode);
           break;
         }
         Buffer = NULL;
       }
     }
+    
+    FreePool (AlignedDevPathNode);
+    
     //
     // Next device path node
     //
     DevPathNode = NextDevicePathNode (DevPathNode);
   }
 
-    gBS->FreePool (DevPath);
   return Buffer;
 }
 
@@ -1315,74 +1321,6 @@ PlatOverMngrCallback (
 
   return EFI_SUCCESS;
 }
-
-/**
-  Function unpacks a device path data structure so that all the nodes
-  of a device path are naturally aligned.
-
-  @param  DevPath  A pointer to a device path data structure
-
-  @return If the memory for the device path is successfully allocated, then a
-  @return pointer to the new device path is returned.  Otherwise, NULL is returned.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL *
-UnpackDevicePath (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
-  )
-{
-  EFI_DEVICE_PATH_PROTOCOL  *Src;
-  EFI_DEVICE_PATH_PROTOCOL  *Dest;
-  EFI_DEVICE_PATH_PROTOCOL  *NewPath;
-  UINTN                     Size;
-
-  //
-  // Walk device path and round sizes to valid boundries
-  //
-  Src   = DevPath;
-  Size  = 0;
-  for (;;) {
-    Size += DevicePathNodeLength (Src);
-    Size += ALIGN_SIZE (Size);
-
-    if (IsDevicePathEnd (Src)) {
-      break;
-    }
-
-    Src = NextDevicePathNode (Src);
-  }
-  //
-  // Allocate space for the unpacked path
-  //
-  NewPath = AllocateZeroPool (Size);
-  if (NewPath) {
-
-    ASSERT (((UINTN) NewPath) % MIN_ALIGNMENT_SIZE == 0);
-
-    //
-    // Copy each node
-    //
-    Src   = DevPath;
-    Dest  = NewPath;
-    for (;;) {
-      Size = DevicePathNodeLength (Src);
-      CopyMem (Dest, Src, Size);
-      Size += ALIGN_SIZE (Size);
-      SetDevicePathNodeLength (Dest, Size);
-      Dest->Type |= EFI_DP_TYPE_UNPACKED;
-      Dest = (EFI_DEVICE_PATH_PROTOCOL *) (((UINT8 *) Dest) + Size);
-
-      if (IsDevicePathEnd (Src)) {
-        break;
-      }
-
-      Src = NextDevicePathNode (Src);
-    }
-  }
-
-  return NewPath;
-}
-
 
 /**
   Get the description string by device path.

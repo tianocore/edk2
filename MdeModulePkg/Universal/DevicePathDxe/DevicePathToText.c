@@ -15,76 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DevicePath.h"
 
 /**
-  Function unpacks a device path data structure so that all the nodes of a device path
-  are naturally aligned.
-
-  @param DevPath         A pointer to a device path data structure
-
-  @return If the memory for the device path is successfully allocated, then a pointer to the
-          new device path is returned.  Otherwise, NULL is returned.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL *
-UnpackDevicePath (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevPath
-  )
-{
-  CONST EFI_DEVICE_PATH_PROTOCOL  *Src;
-  EFI_DEVICE_PATH_PROTOCOL  *Dest;
-  EFI_DEVICE_PATH_PROTOCOL  *NewPath;
-  UINTN                     Size;
-
-  if (DevPath == NULL) {
-    return NULL;
-  }
-  //
-  // Walk device path and round sizes to valid boundries
-  //
-  Src   = DevPath;
-  Size  = 0;
-  for (;;) {
-    Size += DevicePathNodeLength (Src);
-    Size += ALIGN_SIZE (Size);
-
-    if (IsDevicePathEnd (Src)) {
-      break;
-    }
-
-    Src = (EFI_DEVICE_PATH_PROTOCOL *) NextDevicePathNode (Src);
-  }
-  //
-  // Allocate space for the unpacked path
-  //
-  NewPath = AllocateZeroPool (Size);
-  if (NewPath != NULL) {
-
-    ASSERT (((UINTN) NewPath) % MIN_ALIGNMENT_SIZE == 0);
-
-    //
-    // Copy each node
-    //
-    Src   = DevPath;
-    Dest  = NewPath;
-    for (;;) {
-      Size = DevicePathNodeLength (Src);
-      CopyMem (Dest, Src, Size);
-      Size += ALIGN_SIZE (Size);
-      SetDevicePathNodeLength (Dest, Size);
-      Dest->Type |= EFI_DP_TYPE_UNPACKED;
-      Dest = (EFI_DEVICE_PATH_PROTOCOL *) (((UINT8 *) Dest) + Size);
-
-      if (IsDevicePathEnd (Src)) {
-        break;
-      }
-
-      Src = (EFI_DEVICE_PATH_PROTOCOL *) NextDevicePathNode (Src);
-    }
-  }
-
-  return NewPath;
-}
-
-/**
   Adjusts the size of a previously allocated buffer.
 
   @param OldPool         A pointer to the buffer whose size is being adjusted.
@@ -1853,7 +1783,7 @@ ConvertDevicePathToText (
 {
   POOL_PRINT                Str;
   EFI_DEVICE_PATH_PROTOCOL  *DevPathNode;
-  EFI_DEVICE_PATH_PROTOCOL  *UnpackDevPath;
+  EFI_DEVICE_PATH_PROTOCOL  *AlignedDevPathNode;
   UINTN                     Index;
   UINTN                     NewSize;
   VOID                      (*DumpNode) (POOL_PRINT *, VOID *, BOOLEAN, BOOLEAN);
@@ -1865,15 +1795,9 @@ ConvertDevicePathToText (
   ZeroMem (&Str, sizeof (Str));
 
   //
-  // Unpacked the device path
-  //
-  UnpackDevPath = UnpackDevicePath ((EFI_DEVICE_PATH_PROTOCOL *) DevicePath);
-  ASSERT (UnpackDevPath != NULL);
-
-  //
   // Process each device path node
   //
-  DevPathNode = UnpackDevPath;
+  DevPathNode = (EFI_DEVICE_PATH_PROTOCOL *) DevicePath;
   while (!IsDevicePathEnd (DevPathNode)) {
     //
     // Find the handler to dump this device path node
@@ -1902,20 +1826,19 @@ ConvertDevicePathToText (
         CatPrint (&Str, L"/");
       }
     }
+    
+    AlignedDevPathNode = AllocateCopyPool (DevicePathNodeLength (DevPathNode), DevPathNode);
     //
     // Print this node of the device path
     //
-    DumpNode (&Str, DevPathNode, DisplayOnly, AllowShortcuts);
-
+    DumpNode (&Str, AlignedDevPathNode, DisplayOnly, AllowShortcuts);
+    FreePool (AlignedDevPathNode);
+    
     //
     // Next device path node
     //
     DevPathNode = NextDevicePathNode (DevPathNode);
   }
-  //
-  // Shrink pool used for string allocation
-  //
-  FreePool (UnpackDevPath);
 
   NewSize = (Str.Len + 1) * sizeof (CHAR16);
   Str.Str = ReallocatePool (Str.Str, NewSize, NewSize);

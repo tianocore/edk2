@@ -188,7 +188,7 @@ IScsiExtScsiPassThruBuildDevicePath (
 
   Node->DevPath.Type    = MESSAGING_DEVICE_PATH;
   Node->DevPath.SubType = MSG_ISCSI_DP;
-  SetDevicePathNodeLength (&Node->DevPath, DevPathNodeLen);
+  SetDevicePathNodeLength (&Node->DevPath, (UINT16)DevPathNodeLen);
 
   //
   // 0 for TCP, others are reserved.

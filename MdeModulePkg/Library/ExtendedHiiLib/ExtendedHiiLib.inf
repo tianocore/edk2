@@ -42,7 +42,8 @@
   DebugLib
   PcdLib
   UefiRuntimeServicesTableLib
-
+  DevicePathLib
+  
 [Protocols]
   gEfiDevicePathProtocolGuid  
   

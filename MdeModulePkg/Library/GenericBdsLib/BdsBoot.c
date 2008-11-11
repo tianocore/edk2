@@ -523,7 +523,6 @@ MatchPartitionDevicePathNode (
   )
 {
   HARDDRIVE_DEVICE_PATH     *TmpHdPath;
-  HARDDRIVE_DEVICE_PATH     *TempPath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   BOOLEAN                   Match;
   EFI_DEVICE_PATH_PROTOCOL  *BlockIoHdDevicePathNode;
@@ -559,20 +558,19 @@ MatchPartitionDevicePathNode (
   // See if the harddrive device path in blockio matches the orig Hard Drive Node
   //
   TmpHdPath = (HARDDRIVE_DEVICE_PATH *) BlockIoHdDevicePathNode;
-  TempPath  = (HARDDRIVE_DEVICE_PATH *) BdsLibUnpackDevicePath ((EFI_DEVICE_PATH_PROTOCOL *) HardDriveDevicePath);
   Match = FALSE;
   
   //
   // Check for the match
   //
-  if ((TmpHdPath->MBRType == TempPath->MBRType) &&
-      (TmpHdPath->SignatureType == TempPath->SignatureType)) {
+  if ((TmpHdPath->MBRType == HardDriveDevicePath->MBRType) &&
+      (TmpHdPath->SignatureType == HardDriveDevicePath->SignatureType)) {
     switch (TmpHdPath->SignatureType) {
     case SIGNATURE_TYPE_GUID:
-      Match = CompareGuid ((EFI_GUID *)TmpHdPath->Signature, (EFI_GUID *)TempPath->Signature);
+      Match = CompareGuid ((EFI_GUID *)TmpHdPath->Signature, (EFI_GUID *)HardDriveDevicePath->Signature);
       break;
     case SIGNATURE_TYPE_MBR:
-      Match = (BOOLEAN)(*((UINT32 *)(&(TmpHdPath->Signature[0]))) == *(UINT32 *)(&(TempPath->Signature[0])));
+      Match = (BOOLEAN)(*((UINT32 *)(&(TmpHdPath->Signature[0]))) == ReadUnaligned32((UINT32 *)(&(HardDriveDevicePath->Signature[0]))));
       break;
     default:
       Match = FALSE;
@@ -1624,9 +1622,9 @@ BdsLibIsValidEFIBootOptDevicePath (
   // If the boot option point to a file, it is a valid EFI boot option,
   // and assume it is ready to boot now
   //
-  while (!EfiIsDevicePathEnd (TempDevicePath)) {
+  while (!IsDevicePathEnd (TempDevicePath)) {
      LastDeviceNode = TempDevicePath;
-     TempDevicePath = EfiNextDevicePathNode (TempDevicePath);
+     TempDevicePath = NextDevicePathNode (TempDevicePath);
   }
   if ((DevicePathType (LastDeviceNode) == MEDIA_DEVICE_PATH) &&
     (DevicePathSubType (LastDeviceNode) == MEDIA_FILEPATH_DP)) {
@@ -1765,9 +1763,9 @@ BdsLibUpdateFvFileDevicePath (
   //
   TempDevicePath = *DevicePath;
   LastDeviceNode = TempDevicePath;
-  while (!EfiIsDevicePathEnd (TempDevicePath)) {
+  while (!IsDevicePathEnd (TempDevicePath)) {
      LastDeviceNode = TempDevicePath;
-     TempDevicePath = EfiNextDevicePathNode (TempDevicePath);
+     TempDevicePath = NextDevicePathNode (TempDevicePath);
   }
   GuidPoint = EfiGetNameGuidFromFwVolDevicePathNode (
                 (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LastDeviceNode
