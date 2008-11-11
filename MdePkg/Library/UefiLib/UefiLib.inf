@@ -55,7 +55,8 @@
   BaseLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
-
+  DevicePathLib
+  
 [Guids]
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED

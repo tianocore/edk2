@@ -70,14 +70,14 @@ GetDevicePathSize (
   // Search for the end of the device path structure
   //
   Start = DevicePath;
-  while (!EfiIsDevicePathEnd (DevicePath)) {
-    DevicePath = EfiNextDevicePathNode (DevicePath);
+  while (!IsDevicePathEnd (DevicePath)) {
+    DevicePath = NextDevicePathNode (DevicePath);
   }
 
   //
   // Compute the size and add back in the size of the end device path structure
   //
-  return ((UINTN) DevicePath - (UINTN) Start) + EfiDevicePathNodeLength (DevicePath);
+  return ((UINTN) DevicePath - (UINTN) Start) + DevicePathNodeLength (DevicePath);
 }
 
 /**
@@ -166,7 +166,7 @@ AppendDevicePath (
   //
   Size1         = GetDevicePathSize (FirstDevicePath);
   Size2         = GetDevicePathSize (SecondDevicePath);
-  Size          = Size1 + Size2 - EFI_END_DEVICE_PATH_LENGTH;
+  Size          = Size1 + Size2 - END_DEVICE_PATH_LENGTH;
 
   NewDevicePath = AllocatePool (Size);
 
@@ -176,7 +176,7 @@ AppendDevicePath (
     // Over write FirstDevicePath EndNode and do the copy
     //
     DevicePath2 = (EFI_DEVICE_PATH_PROTOCOL *) ((CHAR8 *) NewDevicePath +
-                  (Size1 - EFI_END_DEVICE_PATH_LENGTH));
+                  (Size1 - END_DEVICE_PATH_LENGTH));
     CopyMem (DevicePath2, SecondDevicePath, Size2);
   }
 
@@ -224,7 +224,7 @@ AppendDevicePathNode (
   //
   NodeLength = DevicePathNodeLength (DevicePathNode);
 
-  TempDevicePath = AllocatePool (NodeLength + EFI_END_DEVICE_PATH_LENGTH);
+  TempDevicePath = AllocatePool (NodeLength + END_DEVICE_PATH_LENGTH);
   if (TempDevicePath == NULL) {
     return NULL;
   }
@@ -451,12 +451,12 @@ IsDevicePathMultiInstance (
   }
 
   Node = DevicePath;
-  while (!EfiIsDevicePathEnd (Node)) {
-    if (EfiIsDevicePathEndInstance (Node)) {
+  while (!IsDevicePathEnd (Node)) {
+    if (IsDevicePathEndInstance (Node)) {
       return TRUE;
     }
 
-    Node = EfiNextDevicePathNode (Node);
+    Node = NextDevicePathNode (Node);
   }
 
   return FALSE;
@@ -518,15 +518,16 @@ FileDevicePath (
   IN CONST CHAR16                    *FileName
   )
 {
-  UINTN                     Size;
+  UINT16                    Size;
   FILEPATH_DEVICE_PATH      *FilePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *FileDevicePath;
 
   DevicePath = NULL;
 
-  Size = StrSize (FileName);
-  FileDevicePath = AllocatePool (Size + SIZE_OF_FILEPATH_DEVICE_PATH + EFI_END_DEVICE_PATH_LENGTH);
+  Size = (UINT16) StrSize (FileName);
+  
+  FileDevicePath = AllocatePool (Size + SIZE_OF_FILEPATH_DEVICE_PATH + END_DEVICE_PATH_LENGTH);
   if (FileDevicePath != NULL) {
     FilePath = (FILEPATH_DEVICE_PATH *) FileDevicePath;
     FilePath->Header.Type    = MEDIA_DEVICE_PATH;
