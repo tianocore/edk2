@@ -88,8 +88,8 @@ InternalReportStatusCodeDevicePathSize (
   // Search for the end of the device path structure
   //
   Start = DevicePath;
-  while (!EfiIsDevicePathEnd (DevicePath)) {
-    DevicePath = EfiNextDevicePathNode (DevicePath);
+  while (!IsDevicePathEnd (DevicePath)) {
+    DevicePath = NextDevicePathNode (DevicePath);
   }
 
   //

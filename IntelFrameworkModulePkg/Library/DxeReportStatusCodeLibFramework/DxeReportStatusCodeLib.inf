@@ -49,7 +49,7 @@
   UefiBootServicesTableLib
   DebugLib
   UefiRuntimeServicesTableLib
-
+  DevicePathLib
 
 [Guids]
   gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED
