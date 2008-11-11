@@ -31,7 +31,7 @@ Abstract:
   @param  GateWay               The nexthop address
 
   @return NULL if failed to allocate memeory, otherwise the newly created
-  @return route entry.
+          route entry.
 
 **/
 IP4_ROUTE_ENTRY *
@@ -83,7 +83,7 @@ Ip4FreeRouteEntry (
 
 
 /**
-  Allocate and initialize a IP4 route cache entry.
+  Allocate and initialize an IP4 route cache entry.
 
   @param  Dst                   The destination address
   @param  Src                   The source address
@@ -92,7 +92,7 @@ Ip4FreeRouteEntry (
                                 entries spawned from one route table entry.
 
   @return NULL if failed to allocate memory for the cache, other point
-  @return to the created route cache entry.
+          to the created route cache entry.
 
 **/
 IP4_ROUTE_CACHE_ENTRY *
@@ -154,7 +154,7 @@ Ip4FreeRouteCacheEntry (
 **/
 VOID
 Ip4InitRouteCache (
-  IN IP4_ROUTE_CACHE        *RtCache
+  IN OUT IP4_ROUTE_CACHE        *RtCache
   )
 {
   UINT32                    Index;
@@ -199,10 +199,8 @@ Ip4CleanRouteCache (
 /**
   Create an empty route table, includes its internal route cache
 
-  None
-
   @return NULL if failed to allocate memory for the route table, otherwise
-  @return the point to newly created route table.
+          the point to newly created route table.
 
 **/
 IP4_ROUTE_TABLE *
@@ -291,8 +289,8 @@ Ip4FreeRouteTable (
 **/
 VOID
 Ip4PurgeRouteCache (
-  IN IP4_ROUTE_CACHE        *RtCache,
-  IN UINTN                  Tag
+  IN OUT IP4_ROUTE_CACHE        *RtCache,
+  IN     UINTN                  Tag
   )
 {
   LIST_ENTRY                *Entry;
@@ -330,10 +328,10 @@ Ip4PurgeRouteCache (
 **/
 EFI_STATUS
 Ip4AddRoute (
-  IN IP4_ROUTE_TABLE        *RtTable,
-  IN IP4_ADDR               Dest,
-  IN IP4_ADDR               Netmask,
-  IN IP4_ADDR               Gateway
+  IN OUT IP4_ROUTE_TABLE        *RtTable,
+  IN     IP4_ADDR               Dest,
+  IN     IP4_ADDR               Netmask,
+  IN     IP4_ADDR               Gateway
   )
 {
   LIST_ENTRY                *Head;
@@ -392,10 +390,10 @@ Ip4AddRoute (
 **/
 EFI_STATUS
 Ip4DelRoute (
-  IN IP4_ROUTE_TABLE      *RtTable,
-  IN IP4_ADDR             Dest,
-  IN IP4_ADDR             Netmask,
-  IN IP4_ADDR             Gateway
+  IN OUT IP4_ROUTE_TABLE      *RtTable,
+  IN     IP4_ADDR             Dest,
+  IN     IP4_ADDR             Netmask,
+  IN     IP4_ADDR             Gateway
   )
 {
   LIST_ENTRY                *Head;
@@ -433,7 +431,7 @@ Ip4DelRoute (
   @param  Src                   The source address
 
   @return NULL if no route entry to the (Dest, Src). Otherwise the point
-  @return to the correct route cache entry.
+          to the correct route cache entry.
 
 **/
 IP4_ROUTE_CACHE_ENTRY *
@@ -464,8 +462,8 @@ Ip4FindRouteCache (
 
 /**
   Search the route table for a most specific match to the Dst. It searches
-  from the longest route area (mask length == 32) to the shortest route area (
-  default routes). In each route area, it will first search the instance's
+  from the longest route area (mask length == 32) to the shortest route area
+  (default routes). In each route area, it will first search the instance's
   route table, then the default route table. This is required by the following
   requirements:
   1. IP search the route table for a most specific match
@@ -510,7 +508,7 @@ Ip4FindRouteEntry (
 
 
 /**
-  Search the route table to route the packet. Return/creat a route
+  Search the route table to route the packet. Return/create a route
   cache if there is a route to the destination.
 
   @param  RtTable               The route table to search from
@@ -518,7 +516,7 @@ Ip4FindRouteEntry (
   @param  Src                   The source address to search for
 
   @return NULL if failed to route packet, otherwise a route cache
-  @return entry that can be used to route packet.
+          entry that can be used to route packet.
 
 **/
 IP4_ROUTE_CACHE_ENTRY *
@@ -562,9 +560,9 @@ Ip4Route (
 
   //
   // Found a route to the Dest, if it is a direct route, the packet
-  // will be send directly to the destination, such as for connected
+  // will be sent directly to the destination, such as for connected
   // network. Otherwise, it is an indirect route, the packet will be
-  // send the next hop router.
+  // sent to the next hop router.
   //
   if ((RtEntry->Flag & IP4_DIRECT_ROUTE) != 0) {
     NextHop = Dest;

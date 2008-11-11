@@ -33,8 +33,8 @@ Abstract:
   @param  Rcvd                  The option is from the packet we received if TRUE,
                                 otherwise the option we wants to transmit.
 
-  @return TRUE:  The option is properly formated
-  @return FALSE: The option is mal-formated
+  @retval TRUE     The option is properly formatted
+  @retval FALSE    The option is mal-formated
 
 **/
 BOOLEAN
@@ -74,7 +74,7 @@ Ip4OptionIsValid (
       Point = Option[Cur + 2];
 
       //
-      // SRR/RR options are formated as |Type|Len|Point|Ip1|Ip2|...
+      // SRR/RR options are formatted as |Type|Len|Point|Ip1|Ip2|...
       //
       if ((OptionLen - Cur < Len) || (Len < 3) || ((Len - 3) % 4 != 0)) {
         IcmpPoint = Cur + 1;
@@ -124,25 +124,25 @@ Ip4OptionIsValid (
   Copy the option from the original option to buffer. It
   handles the details such as:
   1. whether copy the single IP4 option to the first/non-first
-  fragments.
-  2. Pad the options copied over to aligened to 4 bytes.
+     fragments.
+  2. Pad the options copied over to aligned to 4 bytes.
 
   @param  Option                The original option to copy from
   @param  OptionLen             The length of the original option
   @param  FirstFragment         Whether it is the first fragment
-  @param  Buf                   The buffer to copy options to
+  @param  Buf                   The buffer to copy options to. NULL 
   @param  BufLen                The length of the buffer
 
   @retval EFI_SUCCESS           The options are copied over
-  @retval EFI_BUFFER_TOO_SMALL  The buffer caller provided is too small.
+  @retval EFI_BUFFER_TOO_SMALL  Buf is NULL or BufLen provided is too small.
 
 **/
 EFI_STATUS
 Ip4CopyOption (
-  IN UINT8                  *Option,
-  IN UINT32                 OptionLen,
-  IN BOOLEAN                FirstFragment,
-  IN UINT8                  *Buf,           OPTIONAL
+  IN     UINT8              *Option,
+  IN     UINT32             OptionLen,
+  IN     BOOLEAN            FirstFragment,
+  IN OUT UINT8              *Buf,           OPTIONAL
   IN OUT UINT32             *BufLen
   )
 {
