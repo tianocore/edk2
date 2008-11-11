@@ -43,7 +43,7 @@
 [LibraryClasses]
   DebugLib
   UefiBootServicesTableLib
-
+  DevicePathLib
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED

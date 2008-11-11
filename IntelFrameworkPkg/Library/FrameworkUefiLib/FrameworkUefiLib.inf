@@ -55,7 +55,8 @@
   BaseMemoryLib
   BaseLib
   UefiBootServicesTableLib
-
+  DevicePathLib
+  
 [Protocols]
   gEfiDriverBindingProtocolGuid                 # ALWAYS_CONSUMED
   gEfiComponentNameProtocolGuid                 # SOMETIMES_CONSUMED

@@ -38,5 +38,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
+#include <Library/DevicePathLib.h>
 
 #endif
