@@ -159,6 +159,11 @@ typedef struct {
 
 /**
   Gets the current operational settings for this instance of the EFI IPv4 Protocol driver.
+  
+  The GetModeData() function returns the current operational mode data for this
+  driver instance. The data fields in EFI_IP4_MODE_DATA are read only. This
+  function is used optionally to retrieve the operational mode data of underlying
+  networks or drivers.
 
   @param  This          Pointer to the EFI_IP4_PROTOCOL instance.
   @param  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
@@ -181,6 +186,26 @@ EFI_STATUS
 
 /**
   Assigns an IPv4 address and subnet mask to this EFI IPv4 Protocol driver instance.
+  
+  The Configure() function is used to set, change, or reset the operational
+  parameters and filter settings for this EFI IPv4 Protocol instance. Until these
+  parameters have been set, no network traffic can be sent or received by this
+  instance. Once the parameters have been reset (by calling this function with
+  IpConfigData set to NULL), no more traffic can be sent or received until these
+  parameters have been set again. Each EFI IPv4 Protocol instance can be started
+  and stopped independently of each other by enabling or disabling their receive
+  filter settings with the Configure() function.
+  
+  When IpConfigData.UseDefaultAddress is set to FALSE, the new station address will
+  be appended as an alias address into the addresses list in the EFI IPv4 Protocol
+  driver. While set to TRUE, Configure() will trigger the EFI_IP4_CONFIG_PROTOCOL
+  to retrieve the default IPv4 address if it is not available yet. Clients could
+  frequently call GetModeData() to check the status to ensure that the default IPv4
+  address is ready.
+  
+  If operational parameters are reset or changed, any pending transmit and receive
+  requests will be cancelled. Their completion token status will be set to EFI_ABORTED
+  and their events will be signaled.
 
   @param  This         Pointer to the EFI_IP4_PROTOCOL instance.
   @param  IpConfigData Pointer to the EFI IPv4 Protocol configuration data structure.
@@ -211,6 +236,12 @@ EFI_STATUS
 
 /**
   Joins and leaves multicast groups.
+  
+  The Groups() function is used to join and leave multicast group sessions. Joining
+  a group will enable reception of matching multicast packets. Leaving a group will
+  disable the multicast packet reception.
+  
+  If JoinFlag is FALSE and GroupAddress is NULL, all joined groups will be left.
 
   @param  This                  Pointer to the EFI_IP4_PROTOCOL instance.
   @param  JoinFlag              Set to TRUE to join the multicast group session and FALSE to leave.
@@ -243,6 +274,27 @@ EFI_STATUS
 
 /**
   Adds and deletes routing table entries.
+
+  The Routes() function adds a route to or deletes a route from the routing table.
+  
+  Routes are determined by comparing the SubnetAddress with the destination IPv4
+  address arithmetically AND-ed with the SubnetMask. The gateway address must be
+  on the same subnet as the configured station address.
+  
+  The default route is added with SubnetAddress and SubnetMask both set to 0.0.0.0.
+  The default route matches all destination IPv4 addresses that do not match any
+  other routes.
+  
+  A GatewayAddress that is zero is a nonroute. Packets are sent to the destination
+  IP address if it can be found in the ARP cache or on the local subnet. One automatic
+  nonroute entry will be inserted into the routing table for outgoing packets that
+  are addressed to a local subnet (gateway address of 0.0.0.0).
+  
+  Each EFI IPv4 Protocol instance has its own independent routing table. Those EFI
+  IPv4 Protocol instances that use the default IPv4 address will also have copies
+  of the routing table that was provided by the EFI_IP4_CONFIG_PROTOCOL, and these
+  copies will be updated whenever the EIF IPv4 Protocol driver reconfigures its
+  instances. As a result, client modification to the routing table will be lost.
 
   @param  This                   Pointer to the EFI_IP4_PROTOCOL instance.
   @param  DeleteRoute            Set to TRUE to delete this route from the routing table. Set to
@@ -283,6 +335,10 @@ EFI_STATUS
 /**
   Places outgoing data packets into the transmit queue.
 
+  The Transmit() function places a sending request in the transmit queue of this
+  EFI IPv4 Protocol instance. Whenever the packet in the token is sent out or some
+  errors occur, the event in the token will be signaled and the status is updated.
+
   @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
   @param  Token Pointer to the transmit token.
 
@@ -314,6 +370,14 @@ EFI_STATUS
 
 /**
   Places a receiving request into the receiving queue.
+  
+  The Receive() function places a completion token into the receive packet queue.
+  This function is always asynchronous.
+  
+  The Token.Event field in the completion token must be filled in by the caller
+  and cannot be NULL. When the receive operation completes, the EFI IPv4 Protocol
+  driver updates the Token.Status and Token.Packet.RxData fields and the Token.Event
+  is signaled.
 
   @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
   @param  Token Pointer to a token that is associated with the receive data descriptor.
@@ -345,6 +409,13 @@ EFI_STATUS
 
 /**
   Abort an asynchronous transmit or receive request.
+  
+  The Cancel() function is used to abort a pending transmit or receive request.
+  If the token is in the transmit or receive request queues, after calling this
+  function, Token->Status will be set to EFI_ABORTED and then Token->Event will
+  be signaled. If the token is not in one of the queues, which usually means the
+  asynchronous operation has completed, this function will not signal the token
+  and EFI_NOT_FOUND is returned.
 
   @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
   @param  Token Pointer to a token that has been issued by
@@ -374,6 +445,17 @@ EFI_STATUS
   
 /**
   Polls for incoming data packets and processes outgoing data packets.
+  
+  The Poll() function polls for incoming data packets and processes outgoing data
+  packets. Network drivers and applications can call the EFI_IP4_PROTOCOL.Poll()
+  function to increase the rate that data packets are moved between the communications
+  device and the transmit and receive queues.
+  
+  In some systems the periodic timer event may not poll the underlying communications
+  device fast enough to transmit and/or receive all data packets without missing
+  incoming packets or dropping outgoing packets. Drivers and applications that are
+  experiencing packet loss should try calling the EFI_IP4_PROTOCOL.Poll() function
+  more often.
 
   @param  This Pointer to the EFI_IP4_PROTOCOL instance.
 
