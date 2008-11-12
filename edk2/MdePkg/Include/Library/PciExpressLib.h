@@ -15,8 +15,6 @@
 #ifndef __PCI_EXPRESS_LIB_H__
 #define __PCI_EXPRESS_LIB_H__
 
-#include <Library/PciLib.h>
-
 /**
   Macro that converts PCI Bus, PCI Device, PCI Function and PCI Register to an
   address that can be passed to the PCI Library functions.

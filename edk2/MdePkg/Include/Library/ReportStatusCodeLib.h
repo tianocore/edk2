@@ -15,7 +15,6 @@
 #ifndef __REPORT_STATUS_CODE_LIB_H__
 #define __REPORT_STATUS_CODE_LIB_H__
 
-#include <ProcessorBind.h>
 #include <Pi/PiMultiPhase.h>
 #include <Protocol/DevicePath.h>
 
