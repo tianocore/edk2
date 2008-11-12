@@ -34,56 +34,45 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
 
 EFI_GUID mEfiVariableIndexTableGuid = EFI_VARIABLE_INDEX_TABLE_GUID;
 
+
+/**
+  Provide the functionality of the variable services.
+  
+  @param  FileHandle  Handle of the file being invoked. 
+                      Type EFI_PEI_FILE_HANDLE is defined in FfsFindNextFile().
+  @param  PeiServices  General purpose services available to every PEIM.
+
+  @retval EFI_SUCCESS  If the interface could be successfully installed
+  @retval Others       Returned from PeiServicesInstallPpi()
+
+**/
 EFI_STATUS
 EFIAPI
 PeimInitializeVariableServices (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
   )
-/*++
-
-Routine Description:
-
-  Provide the functionality of the variable services.
-
-Arguments:
-
-  FfsHeadher  - The FFS file header
-  PeiServices - General purpose services available to every PEIM.
-
-Returns:
-
-  Status -  EFI_SUCCESS if the interface could be successfully
-            installed
-
---*/
 {
   //
   // Publish the variable capability to other modules
   //
-  return (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **)PeiServices, &mPpiListVariable);
+  return PeiServicesInstallPpi (&mPpiListVariable);
 
 }
 
+
+/**
+  This code gets the pointer to the first variable memory pointer byte.
+
+  @param  VarStoreHeader   Pointer to the Variable Store Header.
+
+  @return VARIABLE_HEADER* pointer to last unavailable Variable Header.
+
+**/
 VARIABLE_HEADER *
 GetStartPointer (
   IN VARIABLE_STORE_HEADER       *VarStoreHeader
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the first variable memory pointer byte
-
-Arguments:
-
-  VarStoreHeader        Pointer to the Variable Store Header.
-
-Returns:
-
-  VARIABLE_HEADER*      Pointer to last unavailable Variable Header
-
---*/
 {
   //
   // The end of variable store
@@ -91,25 +80,19 @@ Returns:
   return (VARIABLE_HEADER *) HEADER_ALIGN (VarStoreHeader + 1);
 }
 
+
+/**
+  This code gets the pointer to the last variable memory pointer byte.
+
+  @param  VarStoreHeader  Pointer to the Variable Store Header.
+
+  @return VARIABLE_HEADER* pointer to last unavailable Variable Header.
+
+**/
 VARIABLE_HEADER *
 GetEndPointer (
   IN VARIABLE_STORE_HEADER       *VarStoreHeader
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the last variable memory pointer byte
-
-Arguments:
-
-  VarStoreHeader        Pointer to the Variable Store Header.
-
-Returns:
-
-  VARIABLE_HEADER*      Pointer to last unavailable Variable Header
-
---*/
 {
   //
   // The end of variable store
@@ -117,25 +100,20 @@ Returns:
   return (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) VarStoreHeader + VarStoreHeader->Size);
 }
 
+
+/**
+  This code checks if variable header is valid or not.
+
+  @param  Variable  Pointer to the Variable Header.
+
+  @retval TRUE      Variable header is valid.
+  @retval FALSE     Variable header is not valid.
+
+**/
 BOOLEAN
-EFIAPI
 IsValidVariableHeader (
   IN  VARIABLE_HEADER   *Variable
   )
-/*++
-
-Routine Description:
-
-  This code checks if variable header is valid or not.
-
-Arguments:
-  Variable              Pointer to the Variable Header.
-
-Returns:
-  TRUE            Variable header is valid.
-  FALSE           Variable header is not valid.
-
---*/
 {
   if (Variable == NULL || Variable->StartId != VARIABLE_DATA ) {
     return FALSE;
@@ -145,25 +123,18 @@ Returns:
 }
 
 
+/**
+  This code gets the size of name of variable.
+
+  @param  Variable  Pointer to the Variable Header.
+
+  @return Size of variable in bytes in type UINTN.
+
+**/
 UINTN
 NameSizeOfVariable (
   IN  VARIABLE_HEADER   *Variable
   )
-/*++
-
-Routine Description:
-
-  This code gets the size of name of variable.
-
-Arguments:
-
-  Variable            Pointer to the Variable Header.
-
-Returns:
-
-  UINTN               Size of variable in bytes
-
---*/
 {
   if (Variable->State    == (UINT8) (-1) ||
       Variable->DataSize == (UINT32) -1 ||
@@ -174,25 +145,19 @@ Returns:
   return (UINTN) Variable->NameSize;
 }
 
+
+/**
+  This code gets the size of data of variable.
+
+  @param  Variable  Pointer to the Variable Header.
+
+  @return Size of variable in bytes in type UINTN.
+
+**/
 UINTN
 DataSizeOfVariable (
   IN  VARIABLE_HEADER   *Variable
   )
-/*++
-
-Routine Description:
-
-  This code gets the size of name of variable.
-
-Arguments:
-
-  Variable            Pointer to the Variable Header.
-
-Returns:
-
-  UINTN               Size of variable in bytes
-
---*/
 {
   if (Variable->State    == (UINT8)  -1 ||
       Variable->DataSize == (UINT32) -1 ||
@@ -203,50 +168,36 @@ Returns:
   return (UINTN) Variable->DataSize;
 }
 
+/**
+  This code gets the pointer to the variable name.
+
+  @param   Variable  Pointer to the Variable Header.
+
+  @return  A CHAR16* pointer to Variable Name.
+
+**/
 CHAR16 *
 GetVariableNamePtr (
   IN  VARIABLE_HEADER   *Variable
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the variable name.
-
-Arguments:
-
-  Variable            Pointer to the Variable Header.
-
-Returns:
-
-  CHAR16*              Pointer to Variable Name
-
---*/
 {
 
   return (CHAR16 *) (Variable + 1);
 }
 
 
+/**
+  This code gets the pointer to the variable data.
+
+  @param   Variable  Pointer to the Variable Header.
+
+  @return  A UINT8* pointer to Variable Data.
+
+**/
 UINT8 *
 GetVariableDataPtr (
   IN  VARIABLE_HEADER   *Variable
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the variable data.
-
-Arguments:
-
-  Variable            Pointer to the Variable Header.
-
-Returns:
-
-  UINT8*              Pointer to Variable Data
-
---*/
 {
   UINTN Value;
   
@@ -260,25 +211,19 @@ Returns:
   return (UINT8 *) Value;
 }
 
+
+/**
+  This code gets the pointer to the next variable header.
+
+  @param  Variable  Pointer to the Variable Header.
+
+  @return  A VARIABLE_HEADER* pointer to next variable header.
+
+**/
 VARIABLE_HEADER *
 GetNextVariablePtr (
   IN  VARIABLE_HEADER   *Variable
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the next variable header.
-
-Arguments:
-
-  Variable              Pointer to the Variable Header.
-
-Returns:
-
-  VARIABLE_HEADER*      Pointer to next variable header.
-
---*/
 {
   UINTN Value;
 
@@ -296,29 +241,20 @@ Returns:
   return (VARIABLE_HEADER *) HEADER_ALIGN (Value);
 }
 
+/**
+  This code gets the pointer to the variable name.
 
+  @param  VarStoreHeader  Pointer to the Variable Store Header.
+
+  @retval  EfiRaw      Variable store is raw
+  @retval  EfiValid    Variable store is valid
+  @retval  EfiInvalid  Variable store is invalid
+
+**/
 VARIABLE_STORE_STATUS
-EFIAPI
 GetVariableStoreStatus (
   IN VARIABLE_STORE_HEADER *VarStoreHeader
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the variable name.
-
-Arguments:
-
-  VarStoreHeader  Pointer to the Variable Store Header.
-
-Returns:
-
-  EfiRaw        Variable store is raw
-  EfiValid      Variable store is valid
-  EfiInvalid    Variable store is invalid
-
---*/
 {
   if (VarStoreHeader->Signature == VARIABLE_STORE_SIGNATURE &&
       VarStoreHeader->Format == VARIABLE_STORE_FORMATTED &&
@@ -340,6 +276,19 @@ Returns:
   }
 }
 
+
+/**
+  This function compares a variable with variable entries in database.
+
+  @param  Variable      Pointer to the variable in our database
+  @param  VariableName  Name of the variable to compare to 'Variable'
+  @param  VendorGuid    GUID of the variable to compare to 'Variable'
+  @param  PtrTrack      Variable Track Pointer structure that contains Variable Information.
+
+  @retval EFI_SUCCESS    Found match variable
+  @retval EFI_NOT_FOUND  Variable not found
+
+**/
 EFI_STATUS
 CompareWithValidVariable (
   IN  VARIABLE_HEADER               *Variable,
@@ -347,26 +296,6 @@ CompareWithValidVariable (
   IN  CONST EFI_GUID                *VendorGuid,
   OUT VARIABLE_POINTER_TRACK        *PtrTrack
   )
-/*++
-
-Routine Description:
-
-  This function compares a variable with variable entries in database
-
-Arguments:
-
-  Variable       - Pointer to the variable in our database
-  VariableName   - Name of the variable to compare to 'Variable'
-  VendorGuid     - GUID of the variable to compare to 'Variable'
-  PtrTrack       - Variable Track Pointer structure that contains
-                   Variable Information.
-
-Returns:
-
-  EFI_SUCCESS    - Found match variable
-  EFI_NOT_FOUND  - Variable not found
-
---*/
 {
   VOID  *Point;
 
@@ -396,35 +325,27 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+
+/**
+  This code finds variable in storage blocks (Non-Volatile).
+
+  @param  PeiServices   General purpose services available to every PEIM.
+  @param  VariableName  Name of the variable to be found
+  @param  VendorGuid    Vendor GUID to be found.
+  @param  PtrTrack      Variable Track Pointer structure that contains Variable Information.
+
+  @retval  EFI_SUCCESS            Variable found successfully
+  @retval  EFI_NOT_FOUND          Variable not found
+  @retval  EFI_INVALID_PARAMETER  Invalid variable name
+
+**/
 EFI_STATUS
-EFIAPI
 FindVariable (
   IN CONST EFI_PEI_SERVICES   **PeiServices,
   IN CONST  CHAR16            *VariableName,
   IN CONST  EFI_GUID          *VendorGuid,
   OUT VARIABLE_POINTER_TRACK  *PtrTrack
   )
-/*++
-
-Routine Description:
-
-  This code finds variable in storage blocks (Non-Volatile)
-
-Arguments:
-
-  PeiServices    - General purpose services available to every PEIM.
-  VariableName   - Name of the variable to be found
-  VendorGuid     - Vendor GUID to be found.
-  PtrTrack       - Variable Track Pointer structure that contains
-                   Variable Information.
-
-Returns:
-
-  EFI_SUCCESS      - Variable found successfully
-  EFI_NOT_FOUND    - Variable not found
-  EFI_INVALID_PARAMETER  - Invalid variable name
-
---*/
 {
   EFI_HOB_GUID_TYPE       *GuidHob;
   VARIABLE_STORE_HEADER   *VariableStoreHeader;
@@ -451,8 +372,7 @@ Returns:
     IndexTable->GoneThrough = 0;
   } else {
     IndexTable = GET_GUID_HOB_DATA (GuidHob);
-    for (Count = 0; Count < IndexTable->Length; Count++)
-    {
+    for (Count = 0; Count < IndexTable->Length; Count++) {
       MaxIndex = GetVariableByIndex (IndexTable, Count);
 
       if (CompareWithValidVariable (MaxIndex, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
@@ -463,7 +383,7 @@ Returns:
       }
     }
 
-    if (IndexTable->GoneThrough) {
+    if (IndexTable->GoneThrough != 0) {
       return EFI_NOT_FOUND;
     }
   }
@@ -473,7 +393,7 @@ Returns:
   if (MaxIndex != NULL) {
     Variable = GetNextVariablePtr (MaxIndex);
   } else {
-    if (IndexTable->StartPtr || IndexTable->EndPtr) {
+    if ((IndexTable->StartPtr != NULL) || (IndexTable->EndPtr != NULL)) {
       Variable = IndexTable->StartPtr;
     } else {
       VariableBase = (UINT8 *) (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
@@ -511,8 +431,7 @@ Returns:
       //
       // Record Variable in VariableIndex HOB
       //
-      if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME)
-      {
+      if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME) {
         VariableIndexTableUpdate (IndexTable, Variable);
       }
 
@@ -535,6 +454,32 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  This service retrieves a variable's value using its name and GUID.
+
+  Read the specified variable from the UEFI variable store. If the Data 
+  buffer is too small to hold the contents of the variable, the error
+  EFI_BUFFER_TOO_SMALL is returned and DataSize is set to the required buffer
+  size to obtain the data.
+
+  @param  This                  A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+  @param  VariableName          A pointer to a null-terminated string that is the variable's name.
+  @param  VariableGuid          A pointer to an EFI_GUID that is the variable's GUID. The combination of
+                                VariableGuid and VariableName must be unique.
+  @param  Attributes            If non-NULL, on return, points to the variable's attributes.
+  @param  DataSize              On entry, points to the size in bytes of the Data buffer.
+                                On return, points to the size of the data returned in Data.
+  @param  Data                  Points to the buffer which will hold the returned variable value.
+
+  @retval EFI_SUCCESS           The variable was read successfully.
+  @retval EFI_NOT_FOUND         The variable could not be found.
+  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data. 
+                                DataSize is updated with the size required for 
+                                the specified variable.
+  @retval EFI_INVALID_PARAMETER VariableName, VariableGuid, DataSize or Data is NULL.
+  @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiGetVariable (
@@ -545,35 +490,6 @@ PeiGetVariable (
   IN OUT    UINTN                           *DataSize,
   OUT       VOID                            *Data
   )
-/*++
-
-Routine Description:
-
-  Provide the read variable functionality of the variable services.
-
-Arguments:
-
-  PeiServices - General purpose services available to every PEIM.
-
-  VariableName     - The variable name
-
-  VendorGuid       - The vendor's GUID
-
-  Attributes       - Pointer to the attribute
-
-  DataSize         - Size of data
-
-  Data             - Pointer to data
-
-Returns:
-
-  EFI_SUCCESS           - The interface could be successfully installed
-
-  EFI_NOT_FOUND         - The variable could not be discovered
-
-  EFI_BUFFER_TOO_SMALL  - The caller buffer is not large enough
-
---*/
 {
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarDataSize;
@@ -596,14 +512,11 @@ Returns:
   //
   VarDataSize = DataSizeOfVariable (Variable.CurrPtr);
   if (*DataSize >= VarDataSize) {
-    //
-    // PO-TKW: Address one checking in this place
-    //
     if (Data == NULL) {
       return EFI_INVALID_PARAMETER;
     }
 
-    (*PeiServices)->CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
+    CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
 
     if (Attributes != NULL) {
       *Attributes = Variable.CurrPtr->Attributes;
@@ -617,6 +530,34 @@ Returns:
   }
 }
 
+/**
+  Return the next variable name and GUID.
+
+  This function is called multiple times to retrieve the VariableName 
+  and VariableGuid of all variables currently available in the system. 
+  On each call, the previous results are passed into the interface, 
+  and, on return, the interface returns the data for the next 
+  interface. When the entire variable list has been returned, 
+  EFI_NOT_FOUND is returned.
+
+  @param  This              A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+
+  @param  VariableNameSize  On entry, points to the size of the buffer pointed to by VariableName.
+  @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
+                            On return, points to the next variable's null-terminated name string.
+  @param  VariableGuid      On entry, a pointer to an UEFI _GUID that is the variable's GUID. 
+                            On return, a pointer to the next variable's GUID.
+
+  @retval EFI_SUCCESS           The variable was read successfully.
+  @retval EFI_NOT_FOUND         The variable could not be found.
+  @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the resulting
+                                data. VariableNameSize is updated with the size
+                                required for the specified variable.
+  @retval EFI_INVALID_PARAMETER VariableName, VariableGuid or
+                                VariableNameSize is NULL.
+  @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
+
+**/
 EFI_STATUS
 EFIAPI
 PeiGetNextVariableName (
@@ -625,32 +566,6 @@ PeiGetNextVariableName (
   IN OUT CHAR16                             *VariableName,
   IN OUT EFI_GUID                           *VariableGuid
   )
-/*++
-
-Routine Description:
-
-  Provide the get next variable functionality of the variable services.
-
-Arguments:
-
-  PeiServices        - General purpose services available to every PEIM.
-  VariabvleNameSize  - The variable name's size.
-  VariableName       - A pointer to the variable's name.
-  VariableGuid       - A pointer to the EFI_GUID structure.
-
-  VariableNameSize - Size of the variable name
-
-  VariableName     - The variable name
-
-  VendorGuid       - The vendor's GUID
-
-Returns:
-
-  EFI_SUCCESS - The interface could be successfully installed
-
-  EFI_NOT_FOUND - The variable could not be discovered
-
---*/
 {
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarNameSize;
@@ -681,9 +596,9 @@ Returns:
 
         VarNameSize = (UINTN) NameSizeOfVariable (Variable.CurrPtr);
         if (VarNameSize <= *VariableNameSize) {
-          (*PeiServices)->CopyMem (VariableName, GetVariableNamePtr (Variable.CurrPtr), VarNameSize);
+          CopyMem (VariableName, GetVariableNamePtr (Variable.CurrPtr), VarNameSize);
 
-          (*PeiServices)->CopyMem (VariableGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
+          CopyMem (VariableGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
 
           Status = EFI_SUCCESS;
         } else {
