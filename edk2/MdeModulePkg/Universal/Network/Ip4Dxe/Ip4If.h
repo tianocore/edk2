@@ -148,7 +148,7 @@ BOOLEAN
 // Notice the special cases that DHCP can configure the interface
 // with 0.0.0.0/0.0.0.0.
 //
-typedef struct _IP4_INTERFACE {
+struct _IP4_INTERFACE {
   UINT32                        Signature;
   LIST_ENTRY                    Link;
   INTN                          RefCnt;
@@ -196,7 +196,7 @@ typedef struct _IP4_INTERFACE {
   //
   LIST_ENTRY                    IpInstances;
   BOOLEAN                       PromiscRecv;
-} IP4_INTERFACE;
+};
 
 IP4_INTERFACE *
 Ip4CreateInterface (
