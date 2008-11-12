@@ -157,8 +157,7 @@ typedef union {
 EFI_STATUS
 PcRtcInit (
   IN PC_RTC_MODULE_GLOBALS  *Global
-  )
-;
+  );
 
 /**
   Sets the current local time and date information.
@@ -175,8 +174,7 @@ EFI_STATUS
 PcRtcSetTime (
   IN EFI_TIME               *Time,
   IN PC_RTC_MODULE_GLOBALS  *Global
-  )
-;
+  );
 
 /**
   Returns the current time and date information, and the time-keeping capabilities
@@ -197,8 +195,7 @@ PcRtcGetTime (
   OUT EFI_TIME              *Time,
   OUT EFI_TIME_CAPABILITIES *Capabilities, OPTIONAL
   IN  PC_RTC_MODULE_GLOBALS *Global
-  )
-;
+  );
 
 /**
   Sets the system wakeup alarm clock time.
@@ -220,8 +217,7 @@ PcRtcSetWakeupTime (
   IN BOOLEAN                Enable,
   IN EFI_TIME               *Time,  OPTIONAL
   IN PC_RTC_MODULE_GLOBALS  *Global
-  )
-;
+  );
 
 /**
   Returns the current wakeup alarm clock setting.
@@ -245,8 +241,7 @@ PcRtcGetWakeupTime (
   OUT BOOLEAN               *Pending,
   OUT EFI_TIME              *Time,
   IN  PC_RTC_MODULE_GLOBALS *Global
-  )
-;
+  );
 
 /**
   The user Entry Point for PcRTC module.
@@ -266,8 +261,7 @@ EFIAPI
 InitializePcRtc (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
-  )
-;
+  );
 
 /**
   See if all fields of a variable of EFI_TIME type is correct.
@@ -281,8 +275,7 @@ InitializePcRtc (
 EFI_STATUS
 RtcTimeFieldsValid (
   IN EFI_TIME *Time
-  )
-;
+  );
 
 /**
   Converts time from EFI_TIME format defined by UEFI spec to RTC's.
@@ -302,8 +295,7 @@ ConvertEfiTimeToRtcTime (
   IN OUT EFI_TIME        *Time,
   IN     RTC_REGISTER_B  RegisterB,
   OUT    UINT8           *Century
-  )
-;
+  );
 
 /**
   See if centry register of RTC is valid.
@@ -314,8 +306,7 @@ ConvertEfiTimeToRtcTime (
 EFI_STATUS
 RtcTestCenturyRegister (
   VOID
-  )
-;
+  );
 
 /**
   Converts time read from RTC to EFI_TIME format defined by UEFI spec.
@@ -353,8 +344,7 @@ ConvertRtcTimeToEfiTime (
 EFI_STATUS
 RtcWaitToUpdate (
   UINTN Timeout
-  )
-;
+  );
 
 /**
   See if field Day of an EFI_TIME is correct.

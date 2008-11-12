@@ -750,7 +750,7 @@ ConvertRtcTimeToEfiTime (
 {
   BOOLEAN IsPM;
 
-  if ((Time->Hour) & 0x80) {
+  if ((Time->Hour & 0x80) != 0) {
     IsPM = TRUE;
   } else {
     IsPM = FALSE;
@@ -863,7 +863,7 @@ RtcTimeFieldsValid (
       Time->Second > 59 ||
       Time->Nanosecond > 999999999 ||
       (!(Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE || (Time->TimeZone >= -1440 && Time->TimeZone <= 1440))) ||
-      (Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT)))
+      ((Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT))) != 0)
       ) {
     return EFI_INVALID_PARAMETER;
   }
