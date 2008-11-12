@@ -1,6 +1,6 @@
 #/** @file
 #  
-#    Component description file for Scsi Disk module.
+#   Component description file for Scsi Disk module.
 #  
 #   Scsi Disk driver. This driver detected the Scsi disk media and export block io protocol
 #  
@@ -32,7 +32,8 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 #  DRIVER_BINDING                =  gScsiDiskDriverBinding                       
-#  COMPONENT_NAME                =  gScsiDiskComponentName                       
+#  COMPONENT_NAME                =  gScsiDiskComponentName
+#  COMPONENT_NAME2               =  gScsiDiskComponentName2
 #
 
 [Sources.common]

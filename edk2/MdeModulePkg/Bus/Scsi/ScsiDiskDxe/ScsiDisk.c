@@ -12,23 +12,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Uefi.h>
-
-
-#include <Protocol/ScsiIo.h>
-#include <Protocol/ComponentName.h>
-#include <Protocol/BlockIo.h>
-#include <Protocol/DriverBinding.h>
-#include <Protocol/ScsiPassThruExt.h>
-
-#include <Library/DebugLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/UefiLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/ScsiLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 
 #include "ScsiDisk.h"
+
 
 EFI_DRIVER_BINDING_PROTOCOL gScsiDiskDriverBinding = {
   ScsiDiskDriverBindingSupported,
@@ -40,10 +26,12 @@ EFI_DRIVER_BINDING_PROTOCOL gScsiDiskDriverBinding = {
 };
 
 /**
-  The user Entry Point for module ScsiDisk. The user code starts with this function.
+  The user Entry Point for module ScsiDisk.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
-  @param[in] SystemTable    A pointer to the EFI System Table.
+  The user code starts with this function.
+
+  @param  ImageHandle    The firmware allocated handle for the EFI image.  
+  @param  SystemTable    A pointer to the EFI System Table.
   
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
@@ -75,33 +63,32 @@ InitializeScsiDisk(
   return Status;
 }
 
+/**
+  Test to see if this driver supports ControllerHandle.
+
+  This service is called by the EFI boot service ConnectController(). In order
+  to make drivers as small as possible, there are a few calling restrictions for
+  this service. ConnectController() must follow these calling restrictions.
+  If any other agent wishes to call Supported() it must also follow these
+  calling restrictions.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 ScsiDiskDriverBindingSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath   OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  Test to see if this driver supports ControllerHandle. Any ControllerHandle
-  that has ScsiIoProtocol installed will be supported.
-
-Arguments:
-
-  This                - Protocol instance pointer.
-  Controller          - Handle of device to test
-  RemainingDevicePath - Not used
-
-Returns:
-
-  EFI_SUCCESS         - This driver supports this device.
-  EFI_UNSUPPORTED     - This driver does not support this device.
-  
-  
---*/
 {
   EFI_STATUS            Status;
   EFI_SCSI_IO_PROTOCOL  *ScsiIo;
@@ -137,32 +124,33 @@ Returns:
   return Status;
 }
 
+
+/**
+  Start this driver on ControllerHandle.
+
+  This service is called by the EFI boot service ConnectController(). In order
+  to make drivers as small as possible, there are a few calling restrictions for
+  this service. ConnectController() must follow these calling restrictions. If
+  any other agent wishes to call Start() it must also follow these calling
+  restrictions.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 ScsiDiskDriverBindingStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath   OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  Start SCSI Disk Driver, and attach BlockIoProtocol to it.
-  
-Arguments:
-
-  This                - Protocol instance pointer.
-  Controller          - Handle of device to test
-  RemainingDevicePath - Not used
-
-Returns:
-
-  EFI_SUCCESS         - This driver supports this device.
-  EFI_UNSUPPORTED     - This driver does not support this device.
-  
-  
---*/
 {
   EFI_STATUS            Status;
   EFI_SCSI_IO_PROTOCOL  *ScsiIo;
@@ -309,35 +297,34 @@ Returns:
 
 }
 
+
+/**
+  Stop this driver on ControllerHandle.
+
+  This service is called by the EFI boot service DisconnectController().
+  In order to make drivers as small as possible, there are a few calling
+  restrictions for this service. DisconnectController() must follow these
+  calling restrictions. If any other agent wishes to call Stop() it must
+  also follow these calling restrictions.
+  
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 ScsiDiskDriverBindingStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      Controller,
   IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
+  IN  EFI_HANDLE                      *ChildHandleBuffer   OPTIONAL
   )
-/*++
-
-Routine Description:
-
-    Stop this driver on ControllerHandle. Support stoping any child handles
-    created by this driver.
-
-Arguments:
-
-    This              - Protocol instance pointer.
-    Controller        - Handle of device to stop driver on
-    NumberOfChildren  - Number of Children in the ChildHandleBuffer
-    ChildHandleBuffer - List of handles for the children we need to stop.
-
-Returns:
-
-    EFI_SUCCESS
-    EFI_DEVICE_ERROR
-    others
-  
---*/
 {
   EFI_BLOCK_IO_PROTOCOL *BlkIo;
   SCSI_DISK_DEV         *ScsiDiskDevice;
@@ -379,29 +366,25 @@ Returns:
   return Status;
 }
 
+/**
+  Reset SCSI Disk.
 
+
+  @param  This                 The pointer of EFI_BLOCK_IO_PROTOCOL
+  @param  ExtendedVerification The flag about if extend verificate
+
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
+                               not be reset.
+  @return EFI_STATUS is retured from EFI_SCSI_IO_PROTOCOL.ResetDevice().
+
+**/
 EFI_STATUS
 EFIAPI
 ScsiDiskReset (
   IN  EFI_BLOCK_IO_PROTOCOL   *This,
   IN  BOOLEAN                 ExtendedVerification
   )
-/*++
-
-Routine Description:
-
-  Reset SCSI Disk  
-
-Arguments:
-
-  This                  - The pointer of EFI_BLOCK_IO_PROTOCOL
-  ExtendedVerification  - The flag about if extend verificate
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   EFI_TPL       OldTpl;
   SCSI_DISK_DEV *ScsiDiskDevice;
@@ -424,39 +407,32 @@ Done:
   return Status;
 }
 
+/**
+  The function is to Read Block from SCSI Disk.
+
+  @param  This       The pointer of EFI_BLOCK_IO_PROTOCOL.
+  @param  MediaId    The Id of Media detected
+  @param  Lba        The logic block address
+  @param  BufferSize The size of Buffer
+  @param  Buffer     The buffer to fill the read out data
+
+  @retval EFI_SUCCESS           Successfully to read out block.
+  @retval EFI_DEVICE_ERROR      Fail to detect media.
+  @retval EFI_NO_MEDIA          Media is not present.
+  @retval EFI_MEDIA_CHANGED     Media has changed.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER Invalid parameter passed in.
+
+**/
 EFI_STATUS
 EFIAPI
 ScsiDiskReadBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This,
   IN  UINT32                  MediaId,
-  IN  EFI_LBA                 LBA,
+  IN  EFI_LBA                 Lba,
   IN  UINTN                   BufferSize,
   OUT VOID                    *Buffer
   )
-/*++
-
-Routine Description:
-
-  The function is to Read Block from SCSI Disk
-
-Arguments:
-
-  This        - The pointer of EFI_BLOCK_IO_PROTOCOL
-  MediaId     - The Id of Media detected
-  LBA         - The logic block address
-  BufferSize  - The size of Buffer
-  Buffer      - The buffer to fill the read out data
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Invalid parameter passed in.
-  EFI_SUCCESS           - Successfully to read out block.
-  EFI_DEVICE_ERROR      - Fail to detect media.
-  EFI_NO_MEDIA          - Media is not present.
-  EFI_MEDIA_CHANGED     - Media has changed.
-  EFI_BAD_BUFFER_SIZE   - The buffer size is not multiple of BlockSize.
-
---*/
 {
   SCSI_DISK_DEV       *ScsiDiskDevice;
   EFI_BLOCK_IO_MEDIA  *Media;
@@ -467,7 +443,7 @@ Returns:
   EFI_TPL             OldTpl;
 
   MediaChange = FALSE;
-  if (!Buffer) {
+  if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -479,7 +455,7 @@ Returns:
 
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
 
-  if (!IsDeviceFixed (ScsiDiskDevice)) {
+  if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
     Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
     if (EFI_ERROR (Status)) {
@@ -519,12 +495,12 @@ Returns:
     goto Done;
   }
 
-  if (LBA > Media->LastBlock) {
+  if (Lba > Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
 
-  if ((LBA + NumberOfBlocks - 1) > Media->LastBlock) {
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
@@ -538,46 +514,40 @@ Returns:
   // If all the parameters are valid, then perform read sectors command
   // to transfer data from device to host.
   //
-  Status = ScsiDiskReadSectors (ScsiDiskDevice, Buffer, LBA, NumberOfBlocks);
+  Status = ScsiDiskReadSectors (ScsiDiskDevice, Buffer, Lba, NumberOfBlocks);
 
 Done:
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
+/**
+  The function is to Write Block to SCSI Disk.
+
+  @param  This       The pointer of EFI_BLOCK_IO_PROTOCOL
+  @param  MediaId    The Id of Media detected
+  @param  Lba        The logic block address
+  @param  BufferSize The size of Buffer
+  @param  Buffer     The buffer to fill the read out data
+
+  @retval EFI_SUCCESS           Successfully to read out block.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
+  @retval EFI_DEVICE_ERROR      Fail to detect media.
+  @retval EFI_NO_MEDIA          Media is not present.
+  @retval EFI_MEDIA_CHNAGED     Media has changed.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER Invalid parameter passed in.
+
+**/
 EFI_STATUS
 EFIAPI
 ScsiDiskWriteBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This,
   IN  UINT32                  MediaId,
-  IN  EFI_LBA                 LBA,
+  IN  EFI_LBA                 Lba,
   IN  UINTN                   BufferSize,
   IN  VOID                    *Buffer
   )
-/*++
-
-Routine Description:
-
-  The function is to Write Block to SCSI Disk
-
-Arguments:
-
-  This        - The pointer of EFI_BLOCK_IO_PROTOCOL
-  MediaId     - The Id of Media detected
-  LBA         - The logic block address
-  BufferSize  - The size of Buffer
-  Buffer      - The buffer to fill the read out data
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Invalid parameter passed in.
-  EFI_SUCCESS           - Successfully to read out block.
-  EFI_DEVICE_ERROR      - Fail to detect media.
-  EFI_NO_MEDIA          - Media is not present.
-  EFI_MEDIA_CHANGED     - Media has changed.
-  EFI_BAD_BUFFER_SIZE   - The buffer size is not multiple of BlockSize.
-
---*/
 {
   SCSI_DISK_DEV       *ScsiDiskDevice;
   EFI_BLOCK_IO_MEDIA  *Media;
@@ -588,7 +558,7 @@ Returns:
   EFI_TPL             OldTpl;
 
   MediaChange = FALSE;
-  if (!Buffer) {
+  if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -600,7 +570,7 @@ Returns:
 
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (This);
 
-  if (!IsDeviceFixed (ScsiDiskDevice)) {
+  if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
     Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
     if (EFI_ERROR (Status)) {
@@ -640,12 +610,12 @@ Returns:
     goto Done;
   }
 
-  if (LBA > Media->LastBlock) {
+  if (Lba > Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
 
-  if ((LBA + NumberOfBlocks - 1) > Media->LastBlock) {
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
@@ -658,33 +628,28 @@ Returns:
   // if all the parameters are valid, then perform read sectors command
   // to transfer data from device to host.
   //
-  Status = ScsiDiskWriteSectors (ScsiDiskDevice, Buffer, LBA, NumberOfBlocks);
+  Status = ScsiDiskWriteSectors (ScsiDiskDevice, Buffer, Lba, NumberOfBlocks);
 
 Done:
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
+/**
+  Flush Block to Disk.
+
+  EFI_SUCCESS is returned directly.
+
+  @param  This              The pointer of EFI_BLOCK_IO_PROTOCOL
+
+  @retval EFI_SUCCESS       All outstanding data was written to the device
+
+**/
 EFI_STATUS
 EFIAPI
 ScsiDiskFlushBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This
   )
-/*++
-
-Routine Description:
-
-  Flush Block to Disk
-
-Arguments:
-
-  This  - The pointer of EFI_BLOCK_IO_PROTOCOL
-
-Returns:
-
-  EFI_SUCCESS 
-
---*/
 {
   //
   // return directly
@@ -692,30 +657,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-ScsiDiskDetectMedia (
-  SCSI_DISK_DEV   *ScsiDiskDevice,
-  BOOLEAN         MustReadCapacity,
-  BOOLEAN         *MediaChange
-  )
-/*++
 
-Routine Description:
-
+/**
   Dectect Device and read out capacity ,if error occurs, parse the sense key.
 
-Arguments:
+  @param  ScsiDiskDevice    The pointer of SCSI_DISK_DEV
+  @param  MustReadCapacity  The flag about reading device capacity
+  @param  MediaChange       The pointer of flag indicates if media has changed 
 
-  ScsiDiskDevice     - The pointer of SCSI_DISK_DEV
-  MustReadCapacity   - The flag about reading device capacity
-  MediaChange        - The pointer of flag indicates if media has changed 
+  @retval EFI_DEVICE_ERROR  Indicates that error occurs
+  @retval EFI_SUCCESS       Successfully to detect media
 
-Returns:
-
-  EFI_DEVICE_ERROR   - Indicates that error occurs
-  EFI_SUCCESS        - Successfully to detect media
-
---*/
+**/
+EFI_STATUS
+ScsiDiskDetectMedia (
+  IN   SCSI_DISK_DEV   *ScsiDiskDevice,
+  IN   BOOLEAN         MustReadCapacity,
+  OUT  BOOLEAN         *MediaChange
+  )
 {
   EFI_STATUS          Status;
   EFI_STATUS          ReadCapacityStatus;
@@ -885,28 +844,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Send out Inquiry command to Device.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
+  @param  NeedRetry       Indicates if needs try again when error happens
+
+  @retval  EFI_DEVICE_ERROR  Indicates that error occurs
+  @retval  EFI_SUCCESS       Successfully to detect media
+
+**/
 EFI_STATUS
 ScsiDiskInquiryDevice (
-  SCSI_DISK_DEV   *ScsiDiskDevice,
-  BOOLEAN         *NeedRetry
+  IN OUT  SCSI_DISK_DEV   *ScsiDiskDevice,
+     OUT  BOOLEAN         *NeedRetry
   )
-/*++
-
-Routine Description:
-
-  Send out Inquiry command to Device
-
-Arguments:
-
-  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
-  NeedRetry       - Indicates if needs try again when error happens
-
-Returns:
-
-  EFI_DEVICE_ERROR   - Indicates that error occurs
-  EFI_SUCCESS        - Successfully to detect media
-
---*/
 {
   UINT32              InquiryDataLength;
   UINT8               SenseDataLength;
@@ -1010,34 +963,29 @@ Returns:
   return EFI_DEVICE_ERROR;
 }
 
-EFI_STATUS
-ScsiDiskTestUnitReady (
-  SCSI_DISK_DEV         *ScsiDiskDevice,
-  BOOLEAN               *NeedRetry,
-  EFI_SCSI_SENSE_DATA   **SenseDataArray,
-  UINTN                 *NumberOfSenseKeys
-  )
- /*++
-
-Routine Description:
+/**
+  To test deivice.
 
   When Test Unit Ready command succeeds, retrieve Sense Keys via Request Sense;
   When Test Unit Ready command encounters any error caused by host adapter or
   target, return error without retrieving Sense Keys.
-  
-Arguments:
 
-  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
-  NeedRetry       - The pointer of flag indicates try again
-  SenseDataArray  - The pointer of an array of sense data
-  NumberOfSenseKeys - The pointer of the number of sense data array
-  
-Returns:
+  @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
+  @param  NeedRetry          The pointer of flag indicates try again
+  @param  SenseDataArray     The pointer of an array of sense data
+  @param  NumberOfSenseKeys  The pointer of the number of sense data array
 
-  EFI_DEVICE_ERROR   - Indicates that error occurs
-  EFI_SUCCESS        - Successfully to test unit
+  @retval EFI_DEVICE_ERROR   Indicates that error occurs
+  @retval EFI_SUCCESS        Successfully to test unit
 
---*/
+**/
+EFI_STATUS
+ScsiDiskTestUnitReady (
+  IN  SCSI_DISK_DEV         *ScsiDiskDevice,
+  OUT BOOLEAN               *NeedRetry,
+  OUT EFI_SCSI_SENSE_DATA   **SenseDataArray,
+  OUT UINTN                 *NumberOfSenseKeys
+  )
 {
   EFI_STATUS  Status;
   UINT8       SenseDataLength;
@@ -1128,32 +1076,25 @@ Returns:
   return EFI_DEVICE_ERROR;
 }
 
+/**
+  Parsing Sense Keys which got from request sense command.
+
+  @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
+  @param  SenseData          The pointer of EFI_SCSI_SENSE_DATA
+  @param  NumberOfSenseKeys  The number of sense key  
+  @param  Action             The pointer of action which indicates what is need to do next
+
+  @retval EFI_DEVICE_ERROR   Indicates that error occurs
+  @retval EFI_SUCCESS        Successfully to complete the parsing
+
+**/
 EFI_STATUS
 DetectMediaParsingSenseKeys (
-  SCSI_DISK_DEV           *ScsiDiskDevice,
-  EFI_SCSI_SENSE_DATA     *SenseData,
-  UINTN                   NumberOfSenseKeys,
-  UINTN                   *Action
+  OUT  SCSI_DISK_DEV           *ScsiDiskDevice,
+  IN   EFI_SCSI_SENSE_DATA     *SenseData,
+  IN   UINTN                   NumberOfSenseKeys,
+  OUT  UINTN                   *Action
   )
-/*++
-
-Routine Description:
-
-  Parsing Sense Keys which got from request sense command.
-  
-Arguments:
-
-  ScsiDiskDevice    - The pointer of SCSI_DISK_DEV
-  SenseData         - The pointer of EFI_SCSI_SENSE_DATA
-  NumberOfSenseKeys - The number of sense key  
-  Action            - The pointer of action which indicates what is need to do next
-
-Returns:
-
-  EFI_DEVICE_ERROR   - Indicates that error occurs
-  EFI_SUCCESS        - Successfully to complete the parsing
-
---*/
 {
   BOOLEAN RetryLater;
 
@@ -1209,32 +1150,26 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Send read capacity command to device and get the device parameter.
+
+  @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
+  @param  NeedRetry          The pointer of flag indicates if need a retry
+  @param  SenseDataArray     The pointer of an array of sense data
+  @param  NumberOfSenseKeys  The number of sense key
+
+  @retval EFI_DEVICE_ERROR   Indicates that error occurs
+  @retval EFI_SUCCESS        Successfully to read capacity
+
+**/
 EFI_STATUS
 ScsiDiskReadCapacity (
-  SCSI_DISK_DEV           *ScsiDiskDevice,
-  BOOLEAN                 *NeedRetry,
-  EFI_SCSI_SENSE_DATA     **SenseDataArray,
-  UINTN                   *NumberOfSenseKeys
+  IN  OUT  SCSI_DISK_DEV           *ScsiDiskDevice,
+      OUT  BOOLEAN                 *NeedRetry,
+      OUT  EFI_SCSI_SENSE_DATA     **SenseDataArray,
+      OUT  UINTN                   *NumberOfSenseKeys
   )
-/*++
-
-Routine Description:
-
-  Send read capacity command to device and get the device parameter
-
-Arguments:
-
-  ScsiDiskDevice     -  The pointer of SCSI_DISK_DEV
-  NeedRetry          -  The pointer of flag indicates if need a retry
-  SenseDataArray     -  The pointer of an array of sense data
-  NumberOfSenseKeys  -  The number of sense key
-
-Returns:
-
-  EFI_DEVICE_ERROR   - Indicates that error occurs
-  EFI_SUCCESS        - Successfully to read capacity
-
---*/
 {
   EFI_SCSI_DISK_CAPACITY_DATA CapacityData;
   UINT32                      DataLength;
@@ -1346,28 +1281,21 @@ Returns:
   return EFI_DEVICE_ERROR;
 }
 
+/**
+  Check the HostAdapter status and re-interpret it in EFI_STATUS.
+
+  @param  HostAdapterStatus  Host Adapter status
+
+  @retval  EFI_SUCCESS       Host adapter is OK.
+  @retval  EFI_TIMEOUT       Timeout.
+  @retval  EFI_NOT_READY     Adapter NOT ready.
+  @retval  EFI_DEVICE_ERROR  Adapter device error.
+
+**/
 EFI_STATUS
 CheckHostAdapterStatus (
-  UINT8   HostAdapterStatus
+  IN UINT8   HostAdapterStatus
   )
-/*++
-
-Routine Description:
-
-  Check the HostAdapter status
-  
-Arguments:
-
-  HostAdapterStatus - Host Adapter status
-
-Returns:
-
-  EFI_SUCCESS       
-  EFI_TIMEOUT       
-  EFI_NOT_READY     
-  EFI_DEVICE_ERROR  
-
---*/
 {
   switch (HostAdapterStatus) {
   case EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OK:
@@ -1394,27 +1322,21 @@ Returns:
   }
 }
 
+
+/**
+  Check the target status and re-interpret it in EFI_STATUS.
+
+  @param  TargetStatus  Target status
+
+  @retval EFI_NOT_READY       Device is NOT ready.
+  @retval EFI_DEVICE_ERROR 
+  @retval EFI_SUCCESS
+
+**/
 EFI_STATUS
 CheckTargetStatus (
-  UINT8   TargetStatus
+  IN  UINT8   TargetStatus
   )
-/*++
-
-Routine Description:
-
-  Check the target status
-  
-Arguments:
-
-  TargetStatus  - Target status
-
-Returns:
-
-  EFI_NOT_READY  
-  EFI_DEVICE_ERROR 
-  EFI_SUCCESS
-
---*/
 {
   switch (TargetStatus) {
   case EFI_EXT_SCSI_STATUS_TARGET_GOOD:
@@ -1437,39 +1359,32 @@ Returns:
   }
 }
 
+
+/**
+  Retrieve all sense keys from the device.
+
+  When encountering error during the process, if retrieve sense keys before
+  error encounterred, it returns the sense keys with return status set to EFI_SUCCESS,
+  and NeedRetry set to FALSE; otherwize, return the proper return status.
+
+  @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
+  @param  NeedRetry          The pointer of flag indicates if need a retry
+  @param  SenseDataArray     The pointer of an array of sense data
+  @param  NumberOfSenseKeys  The number of sense key
+  @param  AskResetIfError    The flag indicates if need reset when error occurs
+
+  @retval EFI_DEVICE_ERROR   Indicates that error occurs
+  @retval EFI_SUCCESS        Successfully to request sense key
+
+**/
 EFI_STATUS
 ScsiDiskRequestSenseKeys (
-  SCSI_DISK_DEV           *ScsiDiskDevice,
-  BOOLEAN                 *NeedRetry,
-  EFI_SCSI_SENSE_DATA     **SenseDataArray,
-  UINTN                   *NumberOfSenseKeys,
-  BOOLEAN                 AskResetIfError
+  IN  OUT  SCSI_DISK_DEV           *ScsiDiskDevice,
+      OUT  BOOLEAN                 *NeedRetry,
+      OUT  EFI_SCSI_SENSE_DATA     **SenseDataArray,
+      OUT  UINTN                   *NumberOfSenseKeys,
+  IN       BOOLEAN                 AskResetIfError
   )
-/*++
-
-Routine Description:
-
-  Retrieve all sense keys from the device.
-  When encountering error during the process,
-  if retrieve sense keys before error encounterred,
-  return the sense keys with return status set to EFI_SUCCESS,
-  and NeedRetry set to FALSE; otherwize, return the proper return
-  status.
-
-Arguments:
-
-  ScsiDiskDevice     -  The pointer of SCSI_DISK_DEV
-  NeedRetry          -  The pointer of flag indicates if need a retry
-  SenseDataArray     -  The pointer of an array of sense data
-  NumberOfSenseKeys  -  The number of sense key
-  AskResetIfError    -  The flag indicates if need reset when error occurs
-  
-Returns:
-
-  EFI_DEVICE_ERROR   - Indicates that error occurs
-  EFI_SUCCESS        - Successfully to request sense key
-
---*/
 {
   EFI_SCSI_SENSE_DATA *PtrSenseData;
   UINT8               SenseDataLength;
@@ -1543,27 +1458,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Get information from media read capacity command.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
+  @param  Capacity        The pointer of EFI_SCSI_DISK_CAPACITY_DATA
+
+**/
 VOID
 GetMediaInfo (
-  SCSI_DISK_DEV                 *ScsiDiskDevice,
-  EFI_SCSI_DISK_CAPACITY_DATA   *Capacity
+  IN  OUT  SCSI_DISK_DEV                 *ScsiDiskDevice,
+  IN       EFI_SCSI_DISK_CAPACITY_DATA   *Capacity
   )
-/*++
-
-Routine Description:
-
-  Get information from media read capacity command
-
-Arguments:
-
-  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
-  Capacity        - The pointer of EFI_SCSI_DISK_CAPACITY_DATA
-
-Returns:
-
-  NONE
-
---*/
 {
   ScsiDiskDevice->BlkIo.Media->LastBlock =  (Capacity->LastLba3 << 24) |
                                             (Capacity->LastLba2 << 16) |
@@ -1584,57 +1491,40 @@ Returns:
   }
 }
 
+/**
+  Parse Inquiry data.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
+
+**/
 VOID
 ParseInquiryData (
-  SCSI_DISK_DEV   *ScsiDiskDevice
+  IN OUT SCSI_DISK_DEV   *ScsiDiskDevice
   )
-/*++
-
-Routine Description:
-
-  Parse Inquiry data
-
-Arguments:
-
-  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
-
-Returns:
-
-  NONE
-
---*/
 {
   ScsiDiskDevice->FixedDevice               = (BOOLEAN) (ScsiDiskDevice->InquiryData.RMB ? 0 : 1);
   ScsiDiskDevice->BlkIoMedia.RemovableMedia = (BOOLEAN) (!ScsiDiskDevice->FixedDevice);
 }
 
+/**
+  Read sector from SCSI Disk.
+
+  @param  ScsiDiskDevice  The poiniter of SCSI_DISK_DEV
+  @param  Buffer          The buffer to fill in the read out data
+  @param  Lba             Logic block address
+  @param  NumberOfBlocks  The number of blocks to read
+
+  @retval EFI_DEVICE_ERROR  Indicates a device error.
+  @retval EFI_SUCCESS       Operation is successful.
+
+**/
 EFI_STATUS
-EFIAPI
 ScsiDiskReadSectors (
-  SCSI_DISK_DEV     *ScsiDiskDevice,
-  VOID              *Buffer,
-  EFI_LBA           Lba,
-  UINTN             NumberOfBlocks
+  IN   SCSI_DISK_DEV     *ScsiDiskDevice,
+  OUT  VOID              *Buffer,
+  IN   EFI_LBA           Lba,
+  IN   UINTN             NumberOfBlocks
   )
-/*++
-
-Routine Description:
-
-  Read sector from SCSI Disk
-
-Arguments:
-
-  ScsiDiskDevice  - The poiniter of SCSI_DISK_DEV
-  Buffer          - The buffer to fill in the read out data
-  Lba             - Logic block address
-  NumberOfBlocks  - The number of blocks to read
-
-Returns:
-
-  EFI_DEVICE_ERROR
-  EFI_SUCCESS
-
---*/
 {
   UINTN               BlocksRemaining;
   UINT32              Lba32;
@@ -1720,32 +1610,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Write sector to SCSI Disk.
+
+  @param  ScsiDiskDevice  The poiniter of SCSI_DISK_DEV
+  @param  Buffer          The buffer of data to be written into SCSI Disk
+  @param  Lba             Logic block address
+  @param  NumberOfBlocks  The number of blocks to read
+
+  @retval EFI_DEVICE_ERROR  Indicates a device error.
+  @retval EFI_SUCCESS       Operation is successful.
+
+**/
 EFI_STATUS
 ScsiDiskWriteSectors (
-  SCSI_DISK_DEV     *ScsiDiskDevice,
-  VOID              *Buffer,
-  EFI_LBA           Lba,
-  UINTN             NumberOfBlocks
+  IN  SCSI_DISK_DEV     *ScsiDiskDevice,
+  IN  VOID              *Buffer,
+  IN  EFI_LBA           Lba,
+  IN  UINTN             NumberOfBlocks
   )
-/*++
-
-Routine Description:
-
-  Write SCSI Disk sectors
-
-Arguments:
-
-  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
-  Buffer          - The data buffer to write sector
-  Lba             - Logic block address
-  NumberOfBlocks  - The number of blocks to write
-
-Returns:
-
-  EFI_DEVICE_ERROR 
-  EFI_SUCCESS
-
---*/
 {
   UINTN               BlocksRemaining;
   UINT32              Lba32;
@@ -1827,41 +1710,34 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Sumbmit Read command.
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
+  @param  NeedRetry          The pointer of flag indicates if needs retry if error happens
+  @param  SenseDataArray     NOT used yet in this function
+  @param  NumberOfSenseKeys  The number of sense key
+  @param  Timeout            The time to complete the command
+  @param  DataBuffer         The buffer to fill with the read out data
+  @param  DataLength         The length of buffer
+  @param  StartLba           The start logic block address
+  @param  SectorSize         The size of sector
+
+  @return  EFI_STATUS is returned by calling ScsiRead10Command().
+**/
 EFI_STATUS
 ScsiDiskRead10 (
-  SCSI_DISK_DEV         *ScsiDiskDevice,
-  BOOLEAN               *NeedRetry,
-  EFI_SCSI_SENSE_DATA   **SenseDataArray,
-  UINTN                 *NumberOfSenseKeys,
-  UINT64                Timeout,
-  UINT8                 *DataBuffer,
-  UINT32                *DataLength,
-  UINT32                StartLba,
-  UINT32                SectorSize
+  IN     SCSI_DISK_DEV         *ScsiDiskDevice,
+     OUT BOOLEAN               *NeedRetry,
+     OUT EFI_SCSI_SENSE_DATA   **SenseDataArray,   OPTIONAL
+     OUT UINTN                 *NumberOfSenseKeys,
+  IN     UINT64                Timeout,
+     OUT UINT8                 *DataBuffer,
+  IN OUT UINT32                *DataLength,
+  IN     UINT32                StartLba,
+  IN     UINT32                SectorSize
   )
-/*++
-
-Routine Description:
-
-  Sumbmit Read command 
-
-Arguments:
-
-  ScsiDiskDevice    - The pointer of ScsiDiskDevice
-  NeedRetry         - The pointer of flag indicates if needs retry if error happens
-  SenseDataArray    - The pointer of an array of sense data
-  NumberOfSenseKeys - The number of sense key
-  Timeout           - The time to complete the command
-  DataBuffer        - The buffer to fill with the read out data
-  DataLength        - The length of buffer
-  StartLba          - The start logic block address
-  SectorSize        - The size of sector
-
-Returns:
-
-  EFI_STATUS
-  
---*/
 {
   UINT8       SenseDataLength;
   EFI_STATUS  Status;
@@ -1886,41 +1762,35 @@ Returns:
   return Status;
 }
 
+
+/**
+  Submit Write Command.
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
+  @param  NeedRetry          The pointer of flag indicates if needs retry if error happens
+  @param  SenseDataArray     NOT used yet in this function
+  @param  NumberOfSenseKeys  The number of sense key
+  @param  Timeout            The time to complete the command
+  @param  DataBuffer         The buffer to fill with the read out data
+  @param  DataLength         The length of buffer
+  @param  StartLba           The start logic block address
+  @param  SectorSize         The size of sector
+
+  @return  EFI_STATUS is returned by calling ScsiWrite10Command().
+
+**/
 EFI_STATUS
 ScsiDiskWrite10 (
-  SCSI_DISK_DEV         *ScsiDiskDevice,
-  BOOLEAN               *NeedRetry,
-  EFI_SCSI_SENSE_DATA   **SenseDataArray,
-  UINTN                 *NumberOfSenseKeys,
-  UINT64                Timeout,
-  UINT8                 *DataBuffer,
-  UINT32                *DataLength,
-  UINT32                StartLba,
-  UINT32                SectorSize
+  IN     SCSI_DISK_DEV         *ScsiDiskDevice,
+     OUT BOOLEAN               *NeedRetry,
+     OUT EFI_SCSI_SENSE_DATA   **SenseDataArray,   OPTIONAL
+     OUT UINTN                 *NumberOfSenseKeys,
+  IN     UINT64                Timeout,
+  IN     UINT8                 *DataBuffer,
+  IN OUT UINT32                *DataLength,
+  IN     UINT32                StartLba,
+  IN     UINT32                SectorSize
   )
-/*++
-
-Routine Description:
-
-  Submit Write Command
-
-Arguments:
-
-  ScsiDiskDevice    - The pointer of ScsiDiskDevice
-  NeedRetry         - The pointer of flag indicates if needs retry if error happens
-  SenseDataArray    - The pointer of an array of sense data
-  NumberOfSenseKeys - The number of sense key
-  Timeout           - The time to complete the command
-  DataBuffer        - The buffer to fill with the read out data
-  DataLength        - The length of buffer
-  StartLba          - The start logic block address
-  SectorSize        - The size of sector
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   EFI_STATUS  Status;
   UINT8       SenseDataLength;
@@ -1945,27 +1815,21 @@ Returns:
   return Status;
 }
 
+
+/**
+  Check sense key to find if media presents.
+
+  @param  SenseData   The pointer of EFI_SCSI_SENSE_DATA
+  @param  SenseCounts The number of sense key
+
+  @retval TRUE    NOT any media
+  @retval FALSE   Media presents
+**/
 BOOLEAN
 ScsiDiskIsNoMedia (
   IN  EFI_SCSI_SENSE_DATA   *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
-  Check sense key to find if media presents
-
-Arguments:
-
-  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
-  SenseCounts - The number of sense key
-
-Returns:
-
-  BOOLEAN
-
---*/
 {
   EFI_SCSI_SENSE_DATA *SensePtr;
   UINTN               Index;
@@ -1989,27 +1853,22 @@ Returns:
   return IsNoMedia;
 }
 
+
+/**
+  Parse sense key.
+
+  @param  SenseData    The pointer of EFI_SCSI_SENSE_DATA
+  @param  SenseCounts  The number of sense key
+
+  @retval TRUE   Error
+  @retval FALSE  NOT error
+
+**/
 BOOLEAN
 ScsiDiskIsMediaError (
   IN  EFI_SCSI_SENSE_DATA   *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
-  Parse sense key
-
-Arguments:
-
-  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
-  SenseCounts - The number of sense key
-
-Returns:
-
-  BOOLEAN
-
---*/
 {
   EFI_SCSI_SENSE_DATA *SensePtr;
   UINTN               Index;
@@ -2079,27 +1938,22 @@ Returns:
   return IsError;
 }
 
+
+/**
+  Check sense key to find if hardware error happens.
+
+  @param  SenseData     The pointer of EFI_SCSI_SENSE_DATA
+  @param  SenseCounts   The number of sense key
+
+  @retval TRUE  Hardware error exits.
+  @retval FALSE NO error.
+
+**/
 BOOLEAN
 ScsiDiskIsHardwareError (
   IN  EFI_SCSI_SENSE_DATA   *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
-  Check sense key to find if hardware error happens
-
-Arguments:
-
-  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
-  SenseCounts - The number of sense key
-
-Returns:
-
-  BOOLEAN
-
---*/
 {
   EFI_SCSI_SENSE_DATA *SensePtr;
   UINTN               Index;
@@ -2123,27 +1977,21 @@ Returns:
   return IsError;
 }
 
+
+/**
+  Check sense key to find if media has changed.
+
+  @param  SenseData    The pointer of EFI_SCSI_SENSE_DATA
+  @param  SenseCounts  The number of sense key
+
+  @retval TRUE   Media is changed.
+  @retval FALSE  Medit is NOT changed.
+**/
 BOOLEAN
 ScsiDiskIsMediaChange (
   IN  EFI_SCSI_SENSE_DATA   *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
- Check sense key to find if media has changed
-
-Arguments:
-
-  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
-  SenseCounts - The number of sense key
-
-Returns:
-
-  BOOLEAN
-
---*/
 {
   EFI_SCSI_SENSE_DATA *SensePtr;
   UINTN               Index;
@@ -2168,27 +2016,21 @@ Returns:
   return IsMediaChanged;
 }
 
+/**
+  Check sense key to find if reset happens.
+
+  @param  SenseData    The pointer of EFI_SCSI_SENSE_DATA
+  @param  SenseCounts  The number of sense key
+
+  @retval TRUE  It is reset before.
+  @retval FALSE It is NOT reset before.
+
+**/
 BOOLEAN
 ScsiDiskIsResetBefore (
   IN  EFI_SCSI_SENSE_DATA   *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
-  Check sense key to find if reset happens
-
-Arguments:
-
-  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
-  SenseCounts - The number of sense key
-
-Returns:
-
-  BOOLEAN
-
---*/
 {
   EFI_SCSI_SENSE_DATA *SensePtr;
   UINTN               Index;
@@ -2214,29 +2056,23 @@ Returns:
   return IsResetBefore;
 }
 
+/**
+  Check sense key to find if the drive is ready.
+
+  @param  SenseData    The pointer of EFI_SCSI_SENSE_DATA
+  @param  SenseCounts  The number of sense key
+  @param  RetryLater   The flag means if need a retry 
+
+  @retval TRUE  Drive is ready.
+  @retval FALSE Drive is NOT ready.
+
+**/
 BOOLEAN
 ScsiDiskIsDriveReady (
   IN  EFI_SCSI_SENSE_DATA   *SenseData,
   IN  UINTN                 SenseCounts,
   OUT BOOLEAN               *RetryLater
   )
-/*++
-
-Routine Description:
-
-  Check sense key to find if the drive is ready
-
-Arguments:
-
-  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
-  SenseCounts - The number of sense key
-  RetryLater  - The flag means if need a retry 
-
-Returns:
-
-  BOOLEAN
-
---*/
 {
   EFI_SCSI_SENSE_DATA *SensePtr;
   UINTN               Index;
@@ -2291,27 +2127,21 @@ Returns:
   return IsReady;
 }
 
+/**
+  Check sense key to find if it has sense key.
+
+  @param  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
+  @param  SenseCounts - The number of sense key
+
+  @retval TRUE  It has sense key.
+  @retval FALSE It has NOT any sense key.
+
+**/
 BOOLEAN
 ScsiDiskHaveSenseKey (
   IN  EFI_SCSI_SENSE_DATA   *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
-  Check sense key to find if it has sense key
-
-Arguments:
-
-  SenseData   - The pointer of EFI_SCSI_SENSE_DATA
-  SenseCounts - The number of sense key
-
-Returns:
-
-  BOOLEAN
-
---*/
 {
   EFI_SCSI_SENSE_DATA *SensePtr;
   UINTN               Index;
@@ -2341,25 +2171,16 @@ Returns:
   return HaveSenseKey;
 }
 
+/**
+  Release resource about disk device.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
+
+**/
 VOID
 ReleaseScsiDiskDeviceResources (
   IN  SCSI_DISK_DEV   *ScsiDiskDevice
   )
-/*++
-
-Routine Description:
-
-  Release resource about disk device
-
-Arguments:
-
-  ScsiDiskDevice  - The pointer of SCSI_DISK_DEV
-
-Returns:
-
-  NONE
-
---*/
 {
   if (ScsiDiskDevice == NULL) {
     return ;

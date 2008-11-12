@@ -32,7 +32,8 @@
 #  VALID_ARCHITECTURES              =  IA32 X64 IPF EBC
 #
 #  DRIVER_BINDING                =  gSCSIBusDriverBinding                        
-#  COMPONENT_NAME                =  gScsiBusComponentName                        
+#  COMPONENT_NAME                =  gScsiBusComponentName
+#  COMPONENT_NAME2               =  gScsiBusComponentName2
 #
 
 [Sources.common]
@@ -62,4 +63,4 @@
   gEfiScsiIoProtocolGuid                        # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiScsiPassThruProtocolGuid                  # PROTOCOL TO_START
-  gEfiExtScsiPassThruProtocolGuid
+  gEfiExtScsiPassThruProtocolGuid               # PROTOCOL TO_START
