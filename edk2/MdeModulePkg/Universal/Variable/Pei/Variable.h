@@ -14,17 +14,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PEI_VARIABLE_H
-#define _PEI_VARIABLE_H
+#ifndef _PEI_VARIABLE_H_
+#define _PEI_VARIABLE_H_
 
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable2.h>
+
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Library/PeiServicesLib.h>
+
 #include <VariableFormat.h>
 
 //
@@ -61,30 +64,50 @@ typedef struct {
 //
 // Functions
 //
+/**
+  Provide the functionality of the variable services.
+  
+  @param  FileHandle  Handle of the file being invoked. 
+                      Type EFI_PEI_FILE_HANDLE is defined in FfsFindNextFile().
+  @param  PeiServices  General purpose services available to every PEIM.
+
+  @retval EFI_SUCCESS  If the interface could be successfully installed
+  @retval Others       Returned from PeiServicesInstallPpi()
+
+**/
 EFI_STATUS
 EFIAPI
 PeimInitializeVariableServices (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
-  )
-/*++
+  IN       EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
+  );
 
-Routine Description:
+/**
+  This service retrieves a variable's value using its name and GUID.
 
-  TODO: Add function description
+  Read the specified variable from the UEFI variable store. If the Data 
+  buffer is too small to hold the contents of the variable, the error
+  EFI_BUFFER_TOO_SMALL is returned and DataSize is set to the required buffer
+  size to obtain the data.
 
-Arguments:
+  @param  This                  A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+  @param  VariableName          A pointer to a null-terminated string that is the variable's name.
+  @param  VariableGuid          A pointer to an EFI_GUID that is the variable's GUID. The combination of
+                                VariableGuid and VariableName must be unique.
+  @param  Attributes            If non-NULL, on return, points to the variable's attributes.
+  @param  DataSize              On entry, points to the size in bytes of the Data buffer.
+                                On return, points to the size of the data returned in Data.
+  @param  Data                  Points to the buffer which will hold the returned variable value.
 
-  FfsHeader   - TODO: add argument description
-  PeiServices - TODO: add argument description
+  @retval EFI_SUCCESS           The variable was read successfully.
+  @retval EFI_NOT_FOUND         The variable could not be found.
+  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data. 
+                                DataSize is updated with the size required for 
+                                the specified variable.
+  @retval EFI_INVALID_PARAMETER VariableName, VariableGuid, DataSize or Data is NULL.
+  @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
 
-Returns:
-
-  TODO: add return values
-
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 PeiGetVariable (
@@ -94,29 +117,37 @@ PeiGetVariable (
   OUT       UINT32                          *Attributes,
   IN OUT    UINTN                           *DataSize,
   OUT       VOID                            *Data
-  )
-/*++
+  );
 
-Routine Description:
+/**
+  Return the next variable name and GUID.
 
-  TODO: Add function description
+  This function is called multiple times to retrieve the VariableName 
+  and VariableGuid of all variables currently available in the system. 
+  On each call, the previous results are passed into the interface, 
+  and, on return, the interface returns the data for the next 
+  interface. When the entire variable list has been returned, 
+  EFI_NOT_FOUND is returned.
 
-Arguments:
+  @param  This              A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
 
-  PeiServices   - TODO: add argument description
-  VariableName  - TODO: add argument description
-  VendorGuid    - TODO: add argument description
-  Attributes    - TODO: add argument description
-  DataSize      - TODO: add argument description
-  Data          - TODO: add argument description
+  @param  VariableNameSize  On entry, points to the size of the buffer pointed to by VariableName.
+  @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
+                            On return, points to the next variable's null-terminated name string.
 
-Returns:
+  @param  VariableGuid      On entry, a pointer to an UEFI _GUID that is the variable's GUID. 
+                            On return, a pointer to the next variable's GUID.
 
-  TODO: add return values
+  @retval EFI_SUCCESS           The variable was read successfully.
+  @retval EFI_NOT_FOUND         The variable could not be found.
+  @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the resulting
+                                data. VariableNameSize is updated with the size
+                                required for the specified variable.
+  @retval EFI_INVALID_PARAMETER VariableName, VariableGuid or
+                                VariableNameSize is NULL.
+  @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 PeiGetNextVariableName (
@@ -124,26 +155,7 @@ PeiGetNextVariableName (
   IN OUT UINTN                              *VariableNameSize,
   IN OUT CHAR16                             *VariableName,
   IN OUT EFI_GUID                           *VariableGuid
-  )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PeiServices       - TODO: add argument description
-  VariableNameSize  - TODO: add argument description
-  VariableName      - TODO: add argument description
-  VendorGuid        - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
-;
+  );
 
 /**
   Get one variable by the index count.
@@ -168,8 +180,6 @@ GetVariableByIndex (
   @param  IndexTable  The pointer to variable index table.
   @param  Variable    The pointer to the variable that will be recorded.
 
-  @retval VOID
-
 **/
 VOID
 VariableIndexTableUpdate (
@@ -177,4 +187,4 @@ VariableIndexTableUpdate (
   IN      VARIABLE_HEADER        *Variable
   );
 
-#endif // _PEI_VARIABLE_H
+#endif
