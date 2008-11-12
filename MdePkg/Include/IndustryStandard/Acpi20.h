@@ -411,7 +411,7 @@ typedef struct {
 /// BUGBUG: Don't know where this came from except SR870BN4 uses it.
 /// #define EFI_ACPI_2_0_MULTIPLE_SAPIC_DESCRIPTION_TABLE_SIGNATURE 0x43495053
 ///
-#define EFI_ACPI_2_0_MULTIPLE_SAPIC_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('S', 'P', 'I', 'C')
+#define EFI_ACPI_2_0_MULTIPLE_SAPIC_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('A', 'P', 'I', 'C')
 
 ///
 /// "BOOT" MS Simple Boot Spec
