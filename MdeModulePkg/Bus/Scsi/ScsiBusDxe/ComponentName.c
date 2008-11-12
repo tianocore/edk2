@@ -13,25 +13,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#include <Uefi.h>
-
-
-#include <Protocol/ScsiPassThru.h>
-#include <Protocol/ScsiPassThruExt.h>
-#include <Protocol/ScsiIo.h>
-#include <Protocol/ComponentName.h>
-#include <Protocol/DriverBinding.h>
-#include <Protocol/DevicePath.h>
-
-#include <Library/DebugLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/UefiLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/ScsiLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/DevicePathLib.h>
-
-
 #include "ScsiBus.h"
 
 //
@@ -68,10 +49,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mScsiBusDriverNameTable[]
   by This does not support the language specified by Language,
   then EFI_UNSUPPORTED is returned.
 
-  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+  @param  This                  A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
 
-  @param  Language[in]          A pointer to a Null-terminated ASCII string
+  @param  Language              A pointer to a Null-terminated ASCII string
                                 array indicating the language. This is the
                                 language of the driver name that the caller is
                                 requesting, and it must match one of the
@@ -80,7 +61,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mScsiBusDriverNameTable[]
                                 to the driver writer. Language is specified
                                 in RFC 3066 or ISO 639-2 language code format.
 
-  @param  DriverName[out]       A pointer to the Unicode string to return.
+  @param  DriverName            A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 driver specified by This in the language
                                 specified by Language.
@@ -127,15 +108,15 @@ ScsiBusComponentNameGetDriverName (
   then EFI_UNSUPPORTED is returned.  If the driver specified by This does not
   support the language specified by Language, then EFI_UNSUPPORTED is returned.
 
-  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+  @param  This                  A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
 
-  @param  ControllerHandle[in]  The handle of a controller that the driver
+  @param  ControllerHandle      The handle of a controller that the driver
                                 specified by This is managing.  This handle
                                 specifies the controller whose name is to be
                                 returned.
 
-  @param  ChildHandle[in]       The handle of the child controller to retrieve
+  @param  ChildHandle           The handle of the child controller to retrieve
                                 the name of.  This is an optional parameter that
                                 may be NULL.  It will be NULL for device
                                 drivers.  It will also be NULL for a bus drivers
@@ -144,7 +125,7 @@ ScsiBusComponentNameGetDriverName (
                                 driver that wishes to retrieve the name of a
                                 child controller.
 
-  @param  Language[in]          A pointer to a Null-terminated ASCII string
+  @param  Language              A pointer to a Null-terminated ASCII string
                                 array indicating the language.  This is the
                                 language of the driver name that the caller is
                                 requesting, and it must match one of the
@@ -153,7 +134,7 @@ ScsiBusComponentNameGetDriverName (
                                 to the driver writer. Language is specified in
                                 RFC 3066 or ISO 639-2 language code format.
 
-  @param  ControllerName[out]   A pointer to the Unicode string to return.
+  @param  ControllerName        A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 controller specified by ControllerHandle and
                                 ChildHandle in the language specified by
