@@ -35,7 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/DxePiLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Library/PcdLib.h>
 
 EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
@@ -111,7 +111,7 @@ GetGraphicsBitMapFromFVEx (
   OUT UINTN         *ImageSize
   )
 {
-  return PiLibGetSectionFromAnyFv (
+  return GetSectionFromAnyFv  (
            FileNameGuid,
            EFI_SECTION_RAW,
            0,
