@@ -1,7 +1,7 @@
 /// @file
 ///  This is set of macros used in calculating offsets in the IVT.
 ///
-/// Copyright (c) 2006, Intel Corporation
+/// Copyright (c) 2006 - 2008, Intel Corporation
 /// All rights reserved. This program and the accompanying materials
 /// are licensed and made available under the terms and conditions of the BSD License
 /// which accompanies this distribution.  The full text of the license may be found at
@@ -53,8 +53,8 @@
 // unloaded.
 #define PATCH_ENTRY_OFFSET      0x03400
 
-// PATCH_BUNDLES is the number of bundles actually in the patch
-#define NUM_PATCH_BUNDLES       ((EndPatchCode - PatchCode) / 0x10)
+// PATCH_CODE_SIZE is the size of patch code
+#define PATCH_CODE_SIZE       (EndPatchCode - PatchCode)
 
 // A hard coded branch back into the external interrupt IVT entry's second bundle
 // is put here, just in case the original bundle zero did not have a branch
