@@ -36,7 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Library/UsbLib.h>
+#include <Library/UefiUsbLib.h>
 
 #include <IndustryStandard/Usb.h>
 
