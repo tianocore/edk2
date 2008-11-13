@@ -49,6 +49,12 @@
   
   ##  @libraryclass  Basic platform driver override functions.
   PlatDriOverLib|Include/Library/PlatDriOverLib.h
+
+  ##  @libraryclass  Provides HII related functions.
+  HiiLib|Include/Library/HiiLib.h
+
+  ##  @libraryclass  Provides a set of interfaces to do IFR opcode creation and interact with a UEFI Form Browser.
+  IfrSupportLib|Include/Library/IfrSupportLib.h
   
   ##  @libraryclass  Includes two extended HII functions to create and destory Hii Package 
   #                  by create the virtual Driver Handle.
@@ -71,6 +77,11 @@
   
   ##  @libraryclass  Library for Deferred Procedure Calls.
   DpcLib|Include/Library/DpcLib.h
+
+  ##  @libraryclass  Provides all FVB runtime services defined in PI specification FVB protocol to provide
+  #                  low level control interfaces over block-oriented firmware devices.
+  ##
+  FvbServiceLib|Include/Library/FvbServiceLib.h
 
 [Guids.common]
   ## MdeModule package token space guid
