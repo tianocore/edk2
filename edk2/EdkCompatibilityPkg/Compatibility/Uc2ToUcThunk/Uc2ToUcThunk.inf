@@ -42,6 +42,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dsc
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
