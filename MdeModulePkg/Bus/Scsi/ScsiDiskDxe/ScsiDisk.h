@@ -29,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/ScsiLib.h>
+#include <Library/UefiScsiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <IndustryStandard/Scsi.h>
