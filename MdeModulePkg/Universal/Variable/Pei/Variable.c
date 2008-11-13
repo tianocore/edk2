@@ -315,7 +315,7 @@ CompareWithValidVariable (
         ) {
       ASSERT (NameSizeOfVariable (Variable) != 0);
       Point = (VOID *) GetVariableNamePtr (Variable);
-      if (!CompareMem (VariableName, Point, NameSizeOfVariable (Variable))) {
+      if (CompareMem (VariableName, Point, NameSizeOfVariable (Variable)) == 0) {
         PtrTrack->CurrPtr = Variable;
         return EFI_SUCCESS;
       }
