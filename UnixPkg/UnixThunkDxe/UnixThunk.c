@@ -36,6 +36,7 @@ Abstract:
 #include <Library/UnixLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
 
 //
 // WinNtThunk Device Path Protocol Instance

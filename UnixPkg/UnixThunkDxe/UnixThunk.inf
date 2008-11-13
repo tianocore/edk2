@@ -48,6 +48,8 @@
   UefiDriverEntryPoint
   UefiLib
   DebugLib
+  DevicePathLib
+
 
 
 [Protocols]
