@@ -19,7 +19,7 @@
 
 #include <Ppi/SecPlatformInformation.h>
 
-#include <Library/PalCallLib.h>
+#include <Library/PalLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/BaseLib.h>
