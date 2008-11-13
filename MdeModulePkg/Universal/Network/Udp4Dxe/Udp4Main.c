@@ -20,8 +20,6 @@ Abstract:
 
 #include "Udp4Impl.h"
 
-#include <Protocol/Ip4.h>
-
 EFI_UDP4_PROTOCOL  mUdp4Protocol = {
   Udp4GetModeData,
   Udp4Configure,
@@ -35,24 +33,23 @@ EFI_UDP4_PROTOCOL  mUdp4Protocol = {
 
 
 /**
-  This function copies the current operational settings of this EFI UDPv4 Protocol
-  instance into user-supplied buffers. This function is used optionally to retrieve
-  the operational mode data of underlying networks or drivers.
+  Reads the current operational settings.
 
-  @param  This                   Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Udp4ConfigData         Pointer to the buffer to receive the current
-                                 configuration data.
-  @param  Ip4ModeData            Pointer to the EFI IPv4 Protocol mode data
-                                 structure.
-  @param  MnpConfigData          Pointer to the managed network configuration data
-                                 structure.
-  @param  SnpModeData            Pointer to the simple network mode data structure.
+  The GetModeData() function copies the current operational settings of this EFI
+  UDPv4 Protocol instance into user-supplied buffers. This function is used
+  optionally to retrieve the operational mode data of underlying networks or
+  drivers.
 
-  @retval EFI_SUCCESS            The mode data was read.
-  @retval EFI_NOT_STARTED        When Udp4ConfigData is queried, no configuration
-                                 data is  available because this instance has not
-                                 been started.
-  @retval EFI_INVALID_PARAMETER  This is NULL.
+  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Udp4ConfigData Pointer to the buffer to receive the current configuration data.
+  @param  Ip4ModeData    Pointer to the EFI IPv4 Protocol mode data structure.
+  @param  MnpConfigData  Pointer to the managed network configuration data structure.
+  @param  SnpModeData    Pointer to the simple network mode data structure.
+
+  @retval EFI_SUCCESS           The mode data was read.
+  @retval EFI_NOT_STARTED       When Udp4ConfigData is queried, no configuration data is
+                                available because this instance has not been started.
+  @retval EFI_INVALID_PARAMETER This is NULL.
 
 **/
 EFI_STATUS
@@ -103,39 +100,36 @@ Udp4GetModeData (
 
 
 /**
-  This function is used to do the following:
-  Initialize and start this instance of the EFI UDPv4 Protocol.
-  Change the filtering rules and operational parameters.
-  Reset this instance of the EFI UDPv4 Protocol.
+  Initializes, changes, or resets the operational parameters for this instance of the EFI UDPv4
+  Protocol.
+  
+  The Configure() function is used to do the following:
+  * Initialize and start this instance of the EFI UDPv4 Protocol.
+  * Change the filtering rules and operational parameters.
+  * Reset this instance of the EFI UDPv4 Protocol.
+  Until these parameters are initialized, no network traffic can be sent or
+  received by this instance. This instance can be also reset by calling Configure()
+  with UdpConfigData set to NULL. Once reset, the receiving queue and transmitting
+  queue are flushed and no traffic is allowed through this instance.
+  With different parameters in UdpConfigData, Configure() can be used to bind
+  this instance to specified port.
 
-  @param  This                   Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  UdpConfigData          Pointer to the buffer to receive the current mode
-                                 data.
+  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  UdpConfigData  Pointer to the buffer to receive the current configuration data.
 
-  @retval EFI_SUCCESS            The configuration settings were set, changed, or
-                                 reset successfully.
-  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP,
-                                 BOOTP, RARP, etc.) is not finished yet.
-  @retval EFI_INVALID_PARAMETER  One or more following conditions are TRUE: This is
-                                 NULL. UdpConfigData.StationAddress is not a valid
-                                 unicast IPv4 address. UdpConfigData.SubnetMask is
-                                 not a valid IPv4 address mask.
-                                 UdpConfigData.RemoteAddress is not a valid unicast
-                                 IPv4  address if it is not zero.
-  @retval EFI_ALREADY_STARTED    The EFI UDPv4 Protocol instance is already
-                                 started/configured and must be stopped/reset
-                                 before it can be reconfigured. Only TypeOfService,
-                                 TimeToLive, DoNotFragment, ReceiveTimeout, and
-                                 TransmitTimeout can be reconfigured without
-                                 stopping the current instance of the EFI UDPv4
-                                 Protocol.
-  @retval EFI_ACCESS_DENIED      UdpConfigData.AllowDuplicatePort is FALSE and
-                                 UdpConfigData.StationPort is already used by other
-                                 instance.
-  @retval EFI_OUT_OF_RESOURCES   The EFI UDPv4 Protocol driver cannot allocate
-                                 memory for this EFI UDPv4 Protocol instance.
-  @retval EFI_DEVICE_ERROR       An unexpected network or system error occurred and
-                                 this instance was not opened.
+  @retval EFI_SUCCESS           The configuration settings were set, changed, or reset successfully.
+  @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_INVALID_PARAMETER One or more following conditions are TRUE:
+  @retval EFI_ALREADY_STARTED   The EFI UDPv4 Protocol instance is already started/configured
+                                and must be stopped/reset before it can be reconfigured.
+  @retval EFI_ACCESS_DENIED     UdpConfigData. AllowDuplicatePort is FALSE
+                                and UdpConfigData.StationPort is already used by
+                                other instance.
+  @retval EFI_OUT_OF_RESOURCES  The EFI UDPv4 Protocol driver cannot allocate memory for this
+                                EFI UDPv4 Protocol instance.
+  @retval EFI_DEVICE_ERROR      An unexpected network or system error occurred and this instance
+                                 was not opened. 
 
 **/
 EFI_STATUS
@@ -305,30 +299,32 @@ ON_EXIT:
 
 
 /**
-  This function is used to enable and disable the multicast group filtering.
+  Joins and leaves multicast groups.
+  
+  The Groups() function is used to enable and disable the multicast group
+  filtering. If the JoinFlag is FALSE and the MulticastAddress is NULL, then all
+  currently joined groups are left.
 
-  @param  This                   Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  JoinFlag               Set to TRUE to join a multicast group. Set to
-                                 FALSE to leave one or all multicast groups.
-  @param  MulticastAddress       Pointer to multicast group address to join or
-                                 leave.
+  @param  This             Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  JoinFlag         Set to TRUE to join a multicast group. Set to FALSE to leave one
+                           or all multicast groups.
+  @param  MulticastAddress Pointer to multicast group address to join or leave.
 
-  @retval EFI_SUCCESS            The operation completed successfully.
-  @retval EFI_NOT_STARTED        The EFI UDPv4 Protocol instance has not been
-                                 started.
-  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP,
-                                 BOOTP, RARP, etc.) is not finished yet.
-  @retval EFI_OUT_OF_RESOURCES   Could not allocate resources to join the group.
-  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
-                                 This is NULL. JoinFlag is TRUE and
-                                 MulticastAddress is NULL. JoinFlag is TRUE and
-                                 *MulticastAddress is not a valid  multicast
-                                 address.
-  @retval EFI_ALREADY_STARTED    The group address is already in the group table
-                                 (when JoinFlag is TRUE).
-  @retval EFI_NOT_FOUND          The group address is not in the group table (when
-                                 JoinFlag is FALSE).
-  @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred.
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_NOT_STARTED       The EFI UDPv4 Protocol instance has not been started.
+  @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_OUT_OF_RESOURCES  Could not allocate resources to join the group.
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                - This is NULL.
+                                - JoinFlag is TRUE and MulticastAddress is NULL.
+                                - JoinFlag is TRUE and *MulticastAddress is not
+                                  a valid multicast address.
+  @retval EFI_ALREADY_STARTED   The group address is already in the group table (when
+                                JoinFlag is TRUE).
+  @retval EFI_NOT_FOUND         The group address is not in the group table (when JoinFlag is
+                                FALSE).
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
 EFI_STATUS
@@ -385,7 +381,7 @@ Udp4Groups (
   // Keep a local copy of the configured multicast IPs because IpIo receives
   // datagrams from the 0 station address IP instance and then UDP delivers to
   // the matched instance. This copy of multicast IPs is used to avoid receive
-  // the mutlicast datagrams destinated to multicast IPs the other instances configured.
+  // the mutlicast datagrams destined to multicast IPs the other instances configured.
   //
   if (JoinFlag) {
 
@@ -404,31 +400,41 @@ ON_EXIT:
 
 
 /**
-  This function adds a route to or deletes a route from the routing table.
+  Adds and deletes routing table entries.
+  
+  The Routes() function adds a route to or deletes a route from the routing table.
+  Routes are determined by comparing the SubnetAddress with the destination IP
+  address and arithmetically AND-ing it with the SubnetMask. The gateway address
+  must be on the same subnet as the configured station address.
+  The default route is added with SubnetAddress and SubnetMask both set to 0.0.0.0.
+  The default route matches all destination IP addresses that do not match any
+  other routes.
+  A zero GatewayAddress is a nonroute. Packets are sent to the destination IP
+  address if it can be found in the Address Resolution Protocol (ARP) cache or
+  on the local subnet. One automatic nonroute entry will be inserted into the
+  routing table for outgoing packets that are addressed to a local subnet
+  (gateway address of 0.0.0.0).
+  Each instance of the EFI UDPv4 Protocol has its own independent routing table.
+  Instances of the EFI UDPv4 Protocol that use the default IP address will also
+  have copies of the routing table provided by the EFI_IP4_CONFIG_PROTOCOL. These
+  copies will be updated automatically whenever the IP driver reconfigures its
+  instances; as a result, the previous modification to these copies will be lost.
 
-  @param  This                   Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  DeleteRoute            Set to TRUE to delete this route from the routing
-                                 table. Set to FALSE to add this route to the
-                                 routing table.
-  @param  SubnetAddress          The destination network address that needs to be
-                                 routed.
-  @param  SubnetMask             The subnet mask of SubnetAddress.
-  @param  GatewayAddress         The gateway IP address for this route.
+  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  DeleteRoute    Set to TRUE to delete this route from the routing table.
+                         Set to FALSE to add this route to the routing table.
+  @param  SubnetAddress  The destination network address that needs to be routed.
+  @param  SubnetMask     The subnet mask of SubnetAddress.
+  @param  GatewayAddress The gateway IP address for this route.
 
-  @retval EFI_SUCCESS            The operation completed successfully.
-  @retval EFI_NOT_STARTED        The EFI UDPv4 Protocol instance has not been
-                                 started.
-  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP,
-                                 BOOTP, RARP, etc.) is not finished yet.
-  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
-                                 This is NULL. SubnetAddress is NULL. SubnetMask is
-                                 NULL. GatewayAddress is NULL. SubnetAddress is not
-                                 a valid subnet address. SubnetMask is not a valid
-                                 subnet mask. GatewayAddress is not a valid unicast
-                                 IP address.
-  @retval EFI_OUT_OF_RESOURCES   Could not add the entry to the routing table.
-  @retval EFI_NOT_FOUND          This route is not in the routing table.
-  @retval EFI_ACCESS_DENIED      The route is already defined in the routing table.
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_NOT_STARTED       The EFI UDPv4 Protocol instance has not been started.
+  @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
+                                - RARP, etc.) is not finished yet.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  Could not add the entry to the routing table.
+  @retval EFI_NOT_FOUND         This route is not in the routing table.
+  @retval EFI_ACCESS_DENIED     The route is already defined in the routing table.
 
 **/
 EFI_STATUS
@@ -468,44 +474,33 @@ Udp4Routes (
 
 
 /**
-  This function places a sending request to this instance of the EFI UDPv4 Protocol,
-  alongside the transmit data that was filled by the user.
+  Queues outgoing data packets into the transmit queue.
+  
+  The Transmit() function places a sending request to this instance of the EFI
+  UDPv4 Protocol, alongside the transmit data that was filled by the user. Whenever
+  the packet in the token is sent out or some errors occur, the Token.Event will
+  be signaled and Token.Status is updated. Providing a proper notification function
+  and context for the event will enable the user to receive the notification and
+  transmitting status.
 
-  @param  This                   Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token                  Pointer to the completion token that will be
-                                 placed into the transmit queue.
+  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Token Pointer to the completion token that will be placed into the
+                transmit queue.
 
-  @retval EFI_SUCCESS            The data has been queued for transmission.
-  @retval EFI_NOT_STARTED        This EFI UDPv4 Protocol instance has not been
-                                 started.
-  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP,
-                                 BOOTP, RARP, etc.) is not finished yet.
-  @retval EFI_INVALID_PARAMETER  One or more of the following are TRUE: This is
-                                 NULL. Token is NULL. Token.Event is NULL.
-                                 Token.Packet.TxData is NULL.
-                                 Token.Packet.TxData.FragmentCount is zero.
-                                 Token.Packet.TxData.DataLength is not equal to the
-                                 sum of fragment lengths. One or more of the
-                                 Token.Packet.TxData.FragmentTable[].
-                                 FragmentLength fields is zero. One or more of the
-                                 Token.Packet.TxData.FragmentTable[].
-                                 FragmentBuffer fields is NULL.
-                                 Token.Packet.TxData. GatewayAddress is not a
-                                 unicast IPv4 address if it is not NULL. One or
-                                 more IPv4 addresses in Token.Packet.TxData.
-                                 UdpSessionData are not valid unicast IPv4
-                                 addresses if the UdpSessionData is not NULL.
-  @retval EFI_ACCESS_DENIED      The transmit completion token with the same
-                                 Token.Event is already in the transmit queue.
-  @retval EFI_NOT_READY          The completion token could not be queued because
-                                 the transmit queue is full.
-  @retval EFI_OUT_OF_RESOURCES   Could not queue the transmit data.
-  @retval EFI_NOT_FOUND          There is no route to the destination network or
-                                 address.
-  @retval EFI_BAD_BUFFER_SIZE    The data length is greater than the maximum UDP
-                                 packet size. Or the length of the IP header + UDP
-                                 header + data length is greater than MTU if
-                                 DoNotFragment is TRUE.
+  @retval EFI_SUCCESS           The data has been queued for transmission.
+  @retval EFI_NOT_STARTED       This EFI UDPv4 Protocol instance has not been started.
+  @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
+                                RARP, etc.) is not finished yet.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_ACCESS_DENIED     The transmit completion token with the same
+                                Token.Event was already in the transmit queue.
+  @retval EFI_NOT_READY         The completion token could not be queued because the
+                                transmit queue is full.
+  @retval EFI_OUT_OF_RESOURCES  Could not queue the transmit data.
+  @retval EFI_NOT_FOUND         There is no route to the destination network or address.
+  @retval EFI_BAD_BUFFER_SIZE   The data length is greater than the maximum UDP packet
+                                size. Or the length of the IP header + UDP header + data
+                                length is greater than MTU if DoNotFragment is TRUE.
 
 **/
 EFI_STATUS
@@ -704,30 +699,32 @@ ON_EXIT:
 
 
 /**
-  This function places a completion token into the receive packet queue. This function
-  is always asynchronous.
+  Places an asynchronous receive request into the receiving queue.
+  
+  The Receive() function places a completion token into the receive packet queue.
+  This function is always asynchronous.
+  The caller must fill in the Token.Event field in the completion token, and this
+  field cannot be NULL. When the receive operation completes, the EFI UDPv4 Protocol
+  driver updates the Token.Status and Token.Packet.RxData fields and the Token.Event
+  is signaled. Providing a proper notification function and context for the event
+  will enable the user to receive the notification and receiving status. That
+  notification function is guaranteed to not be re-entered.
 
-  @param  This                   Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token                  Pointer to a token that is associated with the
-                                 receive data descriptor.
+  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Token Pointer to a token that is associated with the receive data
+                descriptor.
 
-  @retval EFI_SUCCESS            The receive completion token is cached.
-  @retval EFI_NOT_STARTED        This EFI UDPv4 Protocol instance has not been
-                                 started.
-  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP,
-                                 BOOTP, RARP, etc.) is not finished yet.
-  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
-                                 This is NULL. Token is NULL. Token.Event is NULL.
-  @retval EFI_OUT_OF_RESOURCES   The receive completion token could not be queued
-                                 due to a lack of system resources (usually
-                                 memory).
-  @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred.
-                                 The EFI UDPv4 Protocol instance has been reset to
-                                 startup defaults.
-  @retval EFI_ACCESS_DENIED      A receive completion token with the same
-                                 Token.Event is already in the receive queue.
-  @retval EFI_NOT_READY          The receive request could not be queued because
-                                 the receive  queue is full.
+  @retval EFI_SUCCESS           The receive completion token was cached.
+  @retval EFI_NOT_STARTED       This EFI UDPv4 Protocol instance has not been started.
+  @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP, RARP, etc.)
+                                is not finished yet.
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+  @retval EFI_OUT_OF_RESOURCES  The receive completion token could not be queued due to a lack of system
+                                resources (usually memory).
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+  @retval EFI_ACCESS_DENIED     A receive completion token with the same Token.Event was already in
+                                the receive queue.
+  @retval EFI_NOT_READY         The receive request could not be queued because the receive queue is full.
 
 **/
 EFI_STATUS
@@ -784,7 +781,7 @@ Udp4Receive (
   Udp4ReportIcmpError (Instance);
 
   //
-  // Try to delivered the received datagrams.
+  // Try to deliver the received datagrams.
   //
   Udp4InstanceDeliverDgram (Instance);
 
@@ -802,25 +799,31 @@ ON_EXIT:
 
 
 /**
-  This function is used to abort a pending transmit or receive request.
+  Aborts an asynchronous transmit or receive request.
+  
+  The Cancel() function is used to abort a pending transmit or receive request.
+  If the token is in the transmit or receive request queues, after calling this
+  function, Token.Status will be set to EFI_ABORTED and then Token.Event will be
+  signaled. If the token is not in one of the queues, which usually means that
+  the asynchronous operation has completed, this function will not signal the
+  token and EFI_NOT_FOUND is returned.
 
-  @param  This                   Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token                  Pointer to a token that has been issued by
-                                 EFI_UDP4_PROTOCOL.Transmit() or
-                                 EFI_UDP4_PROTOCOL.Receive().
+  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Token Pointer to a token that has been issued by
+                EFI_UDP4_PROTOCOL.Transmit() or
+                EFI_UDP4_PROTOCOL.Receive().If NULL, all pending
+                tokens are aborted.
 
-  @retval EFI_SUCCESS            The asynchronous I/O request is aborted and
-                                 Token.Event is  signaled. When Token is NULL, all
-                                 pending requests are aborted and their events are
-                                 signaled.
-  @retval EFI_INVALID_PARAMETER  This is NULL.
-  @retval EFI_NOT_STARTED        This instance has not been started.
-  @retval EFI_NO_MAPPING         When using the default address, configuration
-                                 (DHCP, BOOTP, RARP, etc.) is not finished yet.
-  @retval EFI_NOT_FOUND          When Token is not NULL, the asynchronous I/O
-                                 request is not found in the transmit or receive
-                                 queue. It is either completed or not issued by
-                                 Transmit() or Receive().
+  @retval  EFI_SUCCESS           The asynchronous I/O request was aborted and Token.Event
+                                 was signaled. When Token is NULL, all pending requests are
+                                 aborted and their events are signaled.
+  @retval  EFI_INVALID_PARAMETER This is NULL.
+  @retval  EFI_NOT_STARTED       This instance has not been started.
+  @retval  EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
+                                 RARP, etc.) is not finished yet.
+  @retval  EFI_NOT_FOUND         When Token is not NULL, the asynchronous I/O request was
+                                 not found in the transmit or receive queue. It has either completed
+                                 or was not issued by Transmit() and Receive().
 
 **/
 EFI_STATUS
@@ -856,7 +859,7 @@ Udp4Cancel (
   Status = Udp4InstanceCancelToken (Instance, Token);
 
   //
-  // Dispatch the DPC queued by the NotifyFunction of the canceled token's events.
+  // Dispatch the DPC queued by the NotifyFunction of the cancelled token's events.
   //
   NetLibDispatchDpc ();
 
@@ -867,16 +870,23 @@ Udp4Cancel (
 
 
 /**
-  This function can be used by network drivers and applications to increase the rate that
-  data packets are moved between the communications device and the transmit/receive queues.
-  Argumens:
-  This - Pointer to the EFI_UDP4_PROTOCOL instance.
+  Polls for incoming data packets and processes outgoing data packets.
+  
+  The Poll() function can be used by network drivers and applications to increase
+  the rate that data packets are moved between the communications device and the
+  transmit and receive queues.
+  In some systems, the periodic timer event in the managed network driver may not
+  poll the underlying communications device fast enough to transmit and/or receive
+  all data packets without missing incoming packets or dropping outgoing packets.
+  Drivers and applications that are experiencing packet loss should try calling
+  the Poll() function more often.
 
-  @retval EFI_SUCCESS            Incoming or outgoing data was processed.
-  @retval EFI_INVALID_PARAMETER  This is NULL.
-  @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred.
-  @retval EFI_TIMEOUT            Data was dropped out of the transmit and/or
-                                 receive queue.
+  @param  This Pointer to the EFI_UDP4_PROTOCOL instance.
+
+  @retval EFI_SUCCESS           Incoming or outgoing data was processed.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+  @retval EFI_TIMEOUT           Data was dropped out of the transmit and/or receive queue.
 
 **/
 EFI_STATUS
