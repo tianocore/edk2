@@ -12,7 +12,7 @@
 
 **/
 
-#include <Library/PalCallLib.h>
+#include <Library/PalLib.h>
 
 /**
   Places the CPU in a sleep state until an interrupt is received.
