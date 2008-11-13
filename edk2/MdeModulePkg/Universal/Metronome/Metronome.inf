@@ -40,6 +40,7 @@
 
 [Sources.common]
   Metronome.c
+  Metronome.h
 
 [Protocols]
   gEfiMetronomeArchProtocolGuid
