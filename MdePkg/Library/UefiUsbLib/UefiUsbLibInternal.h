@@ -17,7 +17,7 @@
 #define __UEFI_USB_LIB_INTERNAL_H_
 
 #include <Uefi.h>
-#include <Library/UsbLib.h>
+#include <Library/UefiUsbLib.h>
 #include <Library/BaseMemoryLib.h>
 
 #endif
