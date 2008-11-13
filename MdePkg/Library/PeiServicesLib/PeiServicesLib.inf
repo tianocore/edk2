@@ -34,7 +34,16 @@
 [Packages]
   MdePkg/MdePkg.dec
 
-
 [LibraryClasses]
   PeiServicesTablePointerLib
+  MemoryAllocationLib
+  DebugLib
+
+[Guids]
+  gEfiFirmwareFileSystem2Guid
+
+[Ppis]
+  gEfiPeiFirmwareVolumeInfoPpiGuid
+
+
 
