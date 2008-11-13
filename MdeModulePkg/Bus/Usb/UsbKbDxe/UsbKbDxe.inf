@@ -54,7 +54,7 @@
   ReportStatusCodeLib
   DebugLib
   PcdLib
-  UsbLib
+  UefiUsbLib
   BaseLib
 
 [Guids]

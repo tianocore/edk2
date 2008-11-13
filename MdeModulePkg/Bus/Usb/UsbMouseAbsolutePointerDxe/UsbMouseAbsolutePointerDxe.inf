@@ -50,7 +50,7 @@
   BaseMemoryLib
   ReportStatusCodeLib
   PcdLib
-  UsbLib
+  UefiUsbLib
 
 [Protocols]
   gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
