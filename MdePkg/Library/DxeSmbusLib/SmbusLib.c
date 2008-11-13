@@ -1,5 +1,5 @@
 /** @file
-Implementation of SmBusLib class library for PEI phase.
+Implementation of SmBusLib class library for DXE phase.
 
 Copyright (c) 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials

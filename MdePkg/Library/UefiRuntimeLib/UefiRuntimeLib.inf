@@ -3,6 +3,7 @@
 #
 # Instance of UEFI Runtime Library, with hooked EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE and
 #  EVT_SIGNAL_EXIT_BOOT_SERVICES event, to provide runtime services.
+# This instance also supports SAL drivers for better performance.
 #
 # Copyright (c) 2006 - 2008, Intel Corporation.
 #
@@ -20,16 +21,16 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiRuntimeLib
   FILE_GUID                      = b1ee6c28-54aa-4d17-b705-3e28ccb27b2e
-  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiRuntimeLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = UefiRuntimeLib|UEFI_DRIVER DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION DXE_SMM_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
 
   CONSTRUCTOR                    = RuntimeDriverLibConstruct
   DESTRUCTOR                     = RuntimeDriverLibDeconstruct
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 
