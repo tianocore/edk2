@@ -15,11 +15,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxePiLib
+  BASE_NAME                      = DxeServicesLib
   FILE_GUID                      = EE680C58-FFC0-4a5d-858F-66FF9C84BC9F
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DxePiLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = DxeServicesLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   PI_SPECIFICATION_VERSION       = 0x00010000
 
@@ -29,7 +29,7 @@
 #
 
 [Sources.common]
-  DxePiLib.c
+  DxeServicesLib.c
 
 [Packages]
   MdePkg/MdePkg.dec

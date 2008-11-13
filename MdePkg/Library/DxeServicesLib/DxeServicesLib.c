@@ -16,7 +16,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/DxePiLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/LoadedImage.h>
 
@@ -98,7 +98,7 @@ InternalImageHandleToFvHandle (
   
 **/
 EFI_STATUS
-GetSectionFromFv (
+InternalGetSectionFromFv (
   IN  EFI_HANDLE                    FvHandle,
   IN  CONST EFI_GUID                *NameGuid,
   IN  EFI_SECTION_TYPE              SectionType,
@@ -166,7 +166,7 @@ GetSectionFromFv (
 /**
   Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
 
-  PiLibGetSectionFromAnyFv () is used to read a specific section from a file within a firmware volume. The function
+  GetSectionFromAnyFv  () is used to read a specific section from a file within a firmware volume. The function
   will search the first file with the specified name in all firmware volumes in the system. The search order for firmware 
   volumes in the system is determistic but abitrary if no new firmware volume is added into the system between 
   each calls of this function. 
@@ -209,7 +209,7 @@ GetSectionFromFv (
 **/
 EFI_STATUS
 EFIAPI
-PiLibGetSectionFromAnyFv (
+GetSectionFromAnyFv  (
   IN CONST  EFI_GUID           *NameGuid,
   IN        EFI_SECTION_TYPE   SectionType,
   IN        UINTN              SectionInstance,
@@ -230,7 +230,7 @@ PiLibGetSectionFromAnyFv (
   // will locate the FFS faster.
   //
   FvHandle = InternalImageHandleToFvHandle (gImageHandle);
-  Status = GetSectionFromFv (
+  Status = InternalGetSectionFromFv (
              FvHandle,
              NameGuid,
              SectionType,
@@ -259,7 +259,7 @@ PiLibGetSectionFromAnyFv (
     // Skip the FV that contain the caller's FFS
     //
     if (HandleBuffer[Index] != FvHandle) {
-      Status = GetSectionFromFv (
+      Status = InternalGetSectionFromFv (
                  HandleBuffer[Index], 
                  NameGuid, 
                  SectionType, 
@@ -291,7 +291,7 @@ Done:
 /**
   Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
 
-  PiLibGetSectionFromCurrentFv () is used to read a specific section from a file within the same firmware volume from which
+  GetSectionFromFv () is used to read a specific section from a file within the same firmware volume from which
   the running image is loaded. If the specific file is found, the function searches the specifc firmware section with type SectionType. 
   The details of this search order is defined in description of EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection () 
   found in PI Specification.
@@ -332,7 +332,7 @@ Done:
 **/
 EFI_STATUS
 EFIAPI
-PiLibGetSectionFromCurrentFv (
+GetSectionFromFv (
   IN  CONST EFI_GUID                *NameGuid,
   IN  EFI_SECTION_TYPE              SectionType,
   IN  UINTN                         SectionInstance,
@@ -340,21 +340,21 @@ PiLibGetSectionFromCurrentFv (
   OUT UINTN                         *Size
     )
 {
-  return GetSectionFromFv(
-          InternalImageHandleToFvHandle(gImageHandle),
-          NameGuid,
-          SectionType,
-          SectionInstance,
-          Buffer,
-          Size
-          );
+  return InternalGetSectionFromFv (
+           InternalImageHandleToFvHandle(gImageHandle),
+           NameGuid,
+           SectionType,
+           SectionInstance,
+           Buffer,
+           Size
+           );
 }
 
 
 /**
   Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
 
-  PiLibGetSectionFromCurrentFfs () searches the specifc firmware section with type SectionType in the same firmware file from
+  GetSectionFromFfs () searches the specifc firmware section with type SectionType in the same firmware file from
   which the running image is loaded. The details of this search order is defined in description of 
   EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection () found in PI Specification.
 
@@ -389,20 +389,20 @@ PiLibGetSectionFromCurrentFv (
 **/
 EFI_STATUS
 EFIAPI
-PiLibGetSectionFromCurrentFfs (
+GetSectionFromFfs (
   IN  EFI_SECTION_TYPE              SectionType,
   IN  UINTN                         SectionInstance,
   OUT VOID                          **Buffer,
   OUT UINTN                         *Size
     )
 {
-  return GetSectionFromFv(
-          InternalImageHandleToFvHandle(gImageHandle),
-          &gEfiCallerIdGuid,
-          SectionType,
-          SectionInstance,
-          Buffer,
-          Size
-          );
+  return InternalGetSectionFromFv(
+           InternalImageHandleToFvHandle(gImageHandle),
+           &gEfiCallerIdGuid,
+           SectionType,
+           SectionInstance,
+           Buffer,
+           Size
+           );
 }
 
