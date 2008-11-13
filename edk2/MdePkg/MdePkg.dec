@@ -45,7 +45,7 @@
   ##  @libraryclass  Provides most usb APIs to support the Hid requests defined in Usb Hid 1.1 spec 
   #                  and the standard requests defined in Usb 1.1 spec.
   ##
-  UsbLib|Include/Library/UsbLib.h
+  UefiUsbLib|Include/Library/UefiUsbLib.h
 
   ##  @libraryclass  Provides a service to retrieve a pointer to the EFI Runtime Services Table.
   UefiRuntimeServicesTableLib|Include/Library/UefiRuntimeServicesTableLib.h
@@ -77,7 +77,7 @@
   SmbusLib|Include/Library/SmbusLib.h
 
   ##  @libraryclass  Provides the functions to submit Scsi commands defined in SCSI-2 specification for scsi device.
-  ScsiLib|Include/Library/ScsiLib.h
+  UefiScsiLib|Include/Library/UefiScsiLib.h
 
   ##  @libraryclass  Provides a service to publish discovered system resources.
   ResourcePublicationLib|Include/Library/ResourcePublicationLib.h
@@ -138,14 +138,6 @@
   ##  @libraryclass  Provides services to create and parse HOBs.
   HobLib|Include/Library/HobLib.h
 
-  ##  @libraryclass  Provides HII related functions.
-  HiiLib|Include/Library/HiiLib.h
-
-  ##  @libraryclass  Provides all FVB runtime services defined in PI specification FVB protocol to provide
-  #                  low level control interfaces over block-oriented firmware devices.
-  ##
-  FvbServiceLib|Include/Library/FvbServiceLib.h
-
   ##  @libraryclass  Provides a service to retrieve a pointer to the DXE Services Table.
   #                  Only available to DXE module types.
   ##
@@ -186,24 +178,18 @@
   ##
   ExtractGuidedSectionLib|Include/Library/ExtractGuidedSectionLib.h
 
-  ##  @libraryclass  Provides a set of interfaces to do IFR opcode creation and interact with a UEFI Form Browser.
-  IfrSupportLib|Include/Library/IfrSupportLib.h
-
-  ##  @libraryclass  Provides a set of PI library functions and macros for PEI phase.
-  PeiPiLib|Include/Library/PeiPiLib.h
-
   ##  @libraryclass  Defines a set of Serial Port I/O interfaces.
   SerialPortLib|Include/Library/SerialPortLib.h
 
   ##  @libraryclass  Provides a set of PI library functions and macros for DXE phase.
-  DxePiLib|Include/Library/DxePiLib.h
+  DxeServicesLib|Include/Library/DxeServicesLib.h
   
 [LibraryClasses.IPF]
   ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
   SalLib|Include/Library/SalLib.h
 
   ##  @libraryclass  The PAL Library provides a service to make a PAL CALL.
-  PalCallLib|Include/Library/PalCallLib.h
+  PalLib|Include/Library/PalLib.h
 
 [Guids.common]
   #
