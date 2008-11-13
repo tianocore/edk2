@@ -15,7 +15,7 @@
 
 #include <Uefi.h>
 #include <Library/DebugLib.h>
-#include <Library/ScsiLib.h>
+#include <Library/UefiScsiLib.h>
 #include <Library/BaseMemoryLib.h>
 
 #include <IndustryStandard/Scsi.h>
