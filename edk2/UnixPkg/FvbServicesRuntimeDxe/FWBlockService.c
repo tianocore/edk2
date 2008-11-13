@@ -36,6 +36,8 @@ Revision History
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+
 #include "FwBlockService.h"
 
 ESAL_FWB_GLOBAL         *mFvbModuleGlobal;
@@ -1488,7 +1490,7 @@ Returns:
                       NULL
                       );
       ASSERT_EFI_ERROR (Status);
-    } else if (EfiIsDevicePathEnd (TempFwbDevicePath)) {
+    } else if (IsDevicePathEnd (TempFwbDevicePath)) {
       //
       // Device allready exists, so reinstall the FVB protocol
       //
