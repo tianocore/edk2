@@ -1,7 +1,7 @@
 /// @file
 ///  Low level IPF routines used by the debug support driver
 ///
-/// Copyright (c) 2006, Intel Corporation
+/// Copyright (c) 2006 - 2008, Intel Corporation
 /// All rights reserved. This program and the accompanying materials
 /// are licensed and made available under the terms and conditions of the BSD License
 /// which accompanies this distribution.  The full text of the license may be found at
@@ -182,7 +182,8 @@ ChainHandler:
 // Next, copy the patch code into the IVT
         movl        out0=PatchCode                 // out0 = source buffer of patch code
         addl        out1=PATCH_OFFSET, r2          // out1 = destination buffer - in IVT
-        mov         out2=NUM_PATCH_BUNDLES;;       // out2 = number of bundles to copy
+        mov         out2=PATCH_CODE_SIZE;;       
+        shr         out2=out2, 4;;                 // out2 = number of bundles to copy
         br.call.sptk.few    b0 = CopyBundles
 
 
@@ -431,7 +432,7 @@ RelocateSlot:
         cmp.gt      p14, p15 = loc5, loc6;;     // check to see we're not out of range for an ip-relative branch
 (p14)   br.sptk.few RelocateSlotError
         cmp.lt      p15, p14 = 0, loc4;;        // store sign in p14 again
-(p14)   dep         in0=1,in0,36,1              // store sign bit in instruction
+(p14)   dep         in0=-1,in0,36,1              // store sign bit in instruction
 (p15)   dep         in0=0,in0,36,1
         shr         loc4=loc4, 4;;              // convert back to bundle offset
         dep         in0=loc4,in0,13,16;;        // put first 16 bits of new offset into instruction
