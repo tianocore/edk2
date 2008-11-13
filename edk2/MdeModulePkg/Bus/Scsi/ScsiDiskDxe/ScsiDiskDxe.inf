@@ -47,7 +47,7 @@
 
 [LibraryClasses]
   UefiBootServicesTableLib
-  ScsiLib
+  UefiScsiLib
   BaseMemoryLib
   UefiLib
   UefiDriverEntryPoint

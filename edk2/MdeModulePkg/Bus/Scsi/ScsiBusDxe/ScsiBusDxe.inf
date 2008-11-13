@@ -51,7 +51,7 @@
 [LibraryClasses]
   DevicePathLib
   UefiBootServicesTableLib
-  ScsiLib
+  UefiScsiLib
   BaseMemoryLib
   UefiLib
   UefiDriverEntryPoint
