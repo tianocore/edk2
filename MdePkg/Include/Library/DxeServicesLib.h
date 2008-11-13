@@ -21,7 +21,7 @@
 /**
   Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
 
-  PiLibGetSectionFromAnyFv () is used to read a specific section from a file within a firmware volume. The function
+  GetSectionFromAnyFv  () is used to read a specific section from a file within a firmware volume. The function
   will search the first file with the specified name in all firmware volumes in the system. The search order for firmware 
   volumes in the system is determistic but abitrary if no new firmware volume is added into the system between 
   each calls of this function. 
@@ -64,7 +64,7 @@
 **/
 EFI_STATUS
 EFIAPI
-PiLibGetSectionFromAnyFv (
+GetSectionFromAnyFv  (
   IN  CONST EFI_GUID                *NameGuid,
   IN  EFI_SECTION_TYPE              SectionType,
   IN  UINTN                         SectionInstance,
@@ -75,7 +75,7 @@ PiLibGetSectionFromAnyFv (
 /**
   Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
 
-  PiLibGetSectionFromCurrentFv () is used to read a specific section from a file within the same firmware volume from which
+  GetSectionFromFv () is used to read a specific section from a file within the same firmware volume from which
   the running image is loaded. If the specific file is found, the function searches the specifc firmware section with type SectionType. 
   The details of this search order is defined in description of EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection () 
   found in PI Specification.
@@ -116,7 +116,7 @@ PiLibGetSectionFromAnyFv (
 **/
 EFI_STATUS
 EFIAPI
-PiLibGetSectionFromCurrentFv (
+GetSectionFromFv (
   IN  CONST EFI_GUID                *NameGuid,
   IN  EFI_SECTION_TYPE              SectionType,
   IN  UINTN                         SectionInstance,
@@ -128,7 +128,7 @@ PiLibGetSectionFromCurrentFv (
 /**
   Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
 
-  PiLibGetSectionFromCurrentFfs () searches the specifc firmware section with type SectionType in the same firmware file from
+  GetSectionFromFfs () searches the specifc firmware section with type SectionType in the same firmware file from
   which the running image is loaded. The details of this search order is defined in description of 
   EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection () found in PI Specification.
 
@@ -163,7 +163,7 @@ PiLibGetSectionFromCurrentFv (
 **/
 EFI_STATUS
 EFIAPI
-PiLibGetSectionFromCurrentFfs (
+GetSectionFromFfs (
   IN  EFI_SECTION_TYPE              SectionType,
   IN  UINTN                         SectionInstance,
   OUT VOID                          **Buffer,
