@@ -654,7 +654,7 @@ PeiFvFindNextVolume (
       // If Not Found, Install FvInfo Ppi for it.
       //
       if (!Match) {
-        PiLibInstallFvInfoPpi (
+        PeiServicesInstallFvInfoPpi (
           NULL,
           (VOID *)(UINTN)FvHob->BaseAddress,
           (UINT32)FvHob->Length,
@@ -913,7 +913,7 @@ ProcessFvFile (
   //
   // Install FvPpi and Build FvHob
   //
-  PiLibInstallFvInfoPpi (
+  PeiServicesInstallFvInfoPpi (
     NULL,
     FvImageInfo.FvStart,
     (UINT32) FvImageInfo.FvSize,

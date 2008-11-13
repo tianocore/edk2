@@ -67,7 +67,6 @@
   MemoryAllocationLib
   CacheMaintenanceLib
   PeCoffLib
-  PeiPiLib
   PeiServicesTablePointerLib
   
 
