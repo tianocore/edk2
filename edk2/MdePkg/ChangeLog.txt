@@ -206,3 +206,22 @@ Possible Impacts:
 			Customer's module that reference SafeFreePool need to updated. Otherwise
 			a build break may occur.
 			
+EDK_6496-6519:  Non-Compatible: qhuang8
+
+	A bundle of library class/instance renames, moves and merges:
+	1.  Rename library class UsbLib to UefiUsbLib
+	2.  Rename library class ScsiLib to UefiScsiLib
+	3.  Rename library class PalCallLib to PalLib
+	4.  Rename library class DxePiLib to DxeSerivcesLib and drop the prefix "PiLib" to all its APIs.
+	5.  Merge library class PiPeiLib to PeiServicesLib and rename the PiLibInstallFvInfoPpi() to PeiServicesInstallFvInfoPpi()
+	6.  Move library class HiiLib to MdeModulePkg
+	7.  Move library class IfrSupportLib to MdeModulePkg
+	8.  Move library class FvbServiceLib to MdeModulePkg
+	9.  Rename library instance of BasePalCallLibNull to BasePalLibNull
+	10. Move library instance UefiHiiLib to MdeModulePkg
+	11. Move library instance UefiIfrSupportLib to MdeModulePkg
+
+Possible Impacts:
+	 Every change listed above is non-backward compatibile for MdePkg and other packages. It is required to update module
+	 sources (*.c;*.h), module meta data files (*.inf) and update the platform DSC files to fix the build break.
+	 However, it is less likely to bring about functional issue for these updates.
