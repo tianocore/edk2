@@ -46,7 +46,7 @@
   BaseLib
   PrintLib
   DebugLib
-  DxePiLib
+  DxeServicesLib
   BaseMemoryLib
   PcdLib
 
