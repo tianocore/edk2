@@ -16,7 +16,7 @@
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/PalCallLib.h>
+#include <Library/PalLib.h>
 
 /**
   Invalidates the entire instruction cache in cache coherency domain of the

@@ -46,7 +46,7 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses.Ipf]
-  PalCallLib
+  PalLib
 
 [LibraryClasses.common]
   BaseLib
