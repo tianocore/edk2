@@ -411,10 +411,7 @@ PeiServicesRegisterForShadow (
   IN  EFI_PEI_FILE_HANDLE FileHandle
   )
 {
-  CONST EFI_PEI_SERVICES **PeiServices;
-
-  PeiServices = GetPeiServicesTablePointer ();
-  return (*PeiServices)->RegisterForShadow (FileHandle);
+  return (*GetPeiServicesTablePointer())->RegisterForShadow (FileHandle);
 }
 
 /**
@@ -442,10 +439,7 @@ PeiServicesFfsGetFileInfo (
   OUT EFI_FV_FILE_INFO            *FileInfo
   )
 {
-  CONST EFI_PEI_SERVICES **PeiServices;
-
-  PeiServices = GetPeiServicesTablePointer ();
-  return (*PeiServices)->FfsGetFileInfo (FileHandle, FileInfo);
+  return (*GetPeiServicesTablePointer())->FfsGetFileInfo (FileHandle, FileInfo);
 }
 
 
