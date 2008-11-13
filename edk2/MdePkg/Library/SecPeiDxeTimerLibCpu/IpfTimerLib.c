@@ -15,7 +15,7 @@
 #include <Base.h>
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
-#include <Library/PalCallLib.h>
+#include <Library/PalLib.h>
 
 
 /**
