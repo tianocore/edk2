@@ -128,13 +128,14 @@ Udp4SendPortUnreach (
   @retval EFI_SUCCESS            The udp4 service context data is created and
                                  initialized.
   @retval EFI_OUT_OF_RESOURCES   Cannot allocate memory.
+  @retval other                  Other error occurs.
 
 **/
 EFI_STATUS
 Udp4CreateService (
-  IN UDP4_SERVICE_DATA  *Udp4Service,
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_HANDLE         ControllerHandle
+  IN OUT UDP4_SERVICE_DATA  *Udp4Service,
+  IN     EFI_HANDLE         ImageHandle,
+  IN     EFI_HANDLE         ControllerHandle
   )
 {
   EFI_STATUS       Status;
@@ -251,7 +252,7 @@ Udp4CleanService (
   service context.
 
   @param  Event                  The event this function registered to.
-  @param  Conext                 The context data registered during the creation of
+  @param  Context                The context data registered during the creation of
                                  the Event.
 
   @return None.
@@ -318,8 +319,8 @@ Udp4CheckTimeout (
 **/
 VOID
 Udp4InitInstance (
-  IN UDP4_SERVICE_DATA   *Udp4Service,
-  IN UDP4_INSTANCE_DATA  *Instance
+  IN     UDP4_SERVICE_DATA   *Udp4Service,
+  IN OUT UDP4_INSTANCE_DATA  *Instance
   )
 {
   //
@@ -380,7 +381,8 @@ Udp4CleanInstance (
   @param  Address                Pointer to the specified IPv4 address.
   @param  Port                   The udp port number.
 
-  @return Is the specified <Address, Port> pair found or not.
+  @retval TRUE     The specified <Address, Port> pair is found.
+  @retval FALSE    Otherwise.
 
 **/
 BOOLEAN
@@ -427,12 +429,13 @@ Udp4FindInstanceByPort (
 
 /**
   This function tries to bind the udp instance according to the configured port
-  allocation stragety.
+  allocation strategy.
 
   @param  InstanceList           Pointer to the head of the list linking the udp
                                  instances.
   @param  ConfigData             Pointer to the ConfigData of the instance to be
-                                 bound.
+                                 bound. ConfigData->StationPort will be assigned
+                                 with an available port value on success.
 
   @retval EFI_SUCCESS            The bound operation is completed successfully.
   @retval EFI_ACCESS_DENIED      The <Address, Port> specified by the ConfigData is
@@ -442,8 +445,8 @@ Udp4FindInstanceByPort (
 **/
 EFI_STATUS
 Udp4Bind (
-  IN LIST_ENTRY            *InstanceList,
-  IN EFI_UDP4_CONFIG_DATA  *ConfigData
+  IN     LIST_ENTRY            *InstanceList,
+  IN OUT EFI_UDP4_CONFIG_DATA  *ConfigData
   )
 {
   EFI_IPv4_ADDRESS  *StationAddress;
@@ -514,7 +517,8 @@ Udp4Bind (
                                  uses.
   @param  NewConfigData          Pointer to the new ConfigData.
 
-  @return The instance is reconfigurable or not according to the NewConfigData.
+  @retval TRUE     The instance is reconfigurable.
+  @retval FALSE    Otherwise.
 
 **/
 BOOLEAN
@@ -523,10 +527,11 @@ Udp4IsReconfigurable (
   IN EFI_UDP4_CONFIG_DATA  *NewConfigData
   )
 {
-  if ((NewConfigData->AcceptAnyPort != OldConfigData->AcceptAnyPort) ||
-    (NewConfigData->AcceptBroadcast != OldConfigData->AcceptBroadcast) ||
-    (NewConfigData->AcceptPromiscuous != OldConfigData->AcceptPromiscuous) ||
-    (NewConfigData->AllowDuplicatePort != OldConfigData->AllowDuplicatePort)) {
+  if ((NewConfigData->AcceptAnyPort      != OldConfigData->AcceptAnyPort)     ||
+      (NewConfigData->AcceptBroadcast    != OldConfigData->AcceptBroadcast)   ||
+      (NewConfigData->AcceptPromiscuous  != OldConfigData->AcceptPromiscuous) ||
+      (NewConfigData->AllowDuplicatePort != OldConfigData->AllowDuplicatePort)
+      ) {
     //
     // The receiving filter parameters cannot be changed.
     //
@@ -534,7 +539,8 @@ Udp4IsReconfigurable (
   }
 
   if ((!NewConfigData->AcceptAnyPort) &&
-    (NewConfigData->StationPort != OldConfigData->StationPort)) {
+      (NewConfigData->StationPort != OldConfigData->StationPort)
+      ) {
     //
     // The port is not changeable.
     //
@@ -551,8 +557,9 @@ Udp4IsReconfigurable (
     }
 
     if (!NewConfigData->UseDefaultAddress &&
-      (!EFI_IP4_EQUAL (&NewConfigData->StationAddress, &OldConfigData->StationAddress) ||
-      !EFI_IP4_EQUAL (&NewConfigData->SubnetMask, &OldConfigData->SubnetMask))) {
+        (!EFI_IP4_EQUAL (&NewConfigData->StationAddress, &OldConfigData->StationAddress) ||
+         !EFI_IP4_EQUAL (&NewConfigData->SubnetMask, &OldConfigData->SubnetMask))
+        ) {
       //
       // If the instance doesn't use the default address, and the new address or
       // new subnet mask is different from the old values.
@@ -568,7 +575,9 @@ Udp4IsReconfigurable (
     return FALSE;
   }
 
-  if (!EFI_IP4_EQUAL (&NewConfigData->RemoteAddress, &mZeroIp4Addr) && (NewConfigData->RemotePort != OldConfigData->RemotePort)) {
+  if (!EFI_IP4_EQUAL (&NewConfigData->RemoteAddress, &mZeroIp4Addr) &&
+      NewConfigData->RemotePort != OldConfigData->RemotePort
+      ) {
     //
     // The RemotePort differs if it's designated in the configdata.
     //
@@ -593,8 +602,8 @@ Udp4IsReconfigurable (
 **/
 VOID
 Udp4BuildIp4ConfigData (
-  IN EFI_UDP4_CONFIG_DATA  *Udp4ConfigData,
-  IN EFI_IP4_CONFIG_DATA   *Ip4ConfigData
+  IN     EFI_UDP4_CONFIG_DATA  *Udp4ConfigData,
+  IN OUT EFI_IP4_CONFIG_DATA   *Ip4ConfigData
   )
 {
   CopyMem (Ip4ConfigData, &mIpIoDefaultIpConfigData, sizeof (*Ip4ConfigData));
@@ -818,8 +827,8 @@ Udp4Checksum (
 **/
 EFI_STATUS
 Udp4RemoveToken (
-  IN NET_MAP                    *TokenMap,
-  IN EFI_UDP4_COMPLETION_TOKEN  *Token
+  IN OUT NET_MAP                    *TokenMap,
+  IN     EFI_UDP4_COMPLETION_TOKEN  *Token
   )
 {
   NET_MAP_ITEM  *Item;
@@ -943,9 +952,9 @@ Udp4DgramRcvd (
 **/
 EFI_STATUS
 Udp4LeaveGroup (
-  IN NET_MAP       *Map,
-  IN NET_MAP_ITEM  *Item,
-  IN VOID          *Arg OPTIONAL
+  IN OUT NET_MAP       *Map,
+  IN     NET_MAP_ITEM  *Item,
+  IN     VOID          *Arg OPTIONAL
   )
 {
   EFI_IPv4_ADDRESS  *McastIp;
@@ -977,12 +986,13 @@ Udp4LeaveGroup (
 
 
 /**
-  This function cancle the token specified by Arg in the Map.
+  This function cancels the token specified by Arg in the Map. This is a callback
+  used by Udp4InstanceCancelToken().
 
   @param  Map                    Pointer to the NET_MAP.
   @param  Item                   Pointer to the NET_MAP_ITEM.
-  @param  Arg                    Pointer to the token to be cancelled, if NULL, all
-                                 the tokens in this Map will be cancelled.
+  @param  Arg                    Pointer to the token to be cancelled, if NULL,
+                                 the token specified by Item is cancelled.
 
   @retval EFI_SUCCESS            The token is cancelled if Arg is NULL or the token
                                  is not the same as that in the Item if Arg is not
@@ -1039,7 +1049,7 @@ Udp4CancelTokens (
 /**
   This function removes all the Wrap datas in the RcvdDgramQue.
 
-  @param  RcvdDgramQue           Pointer to the list containing all the Wrap datas.
+  @param  Instance           Pointer to the udp instance context data.
 
   @return None.
 
@@ -1067,6 +1077,7 @@ Udp4FlushRcvdDgram (
 
 
 /**
+  Cancel Udp4 tokens from the Udp4 instance.
 
   @param  Instance               Pointer to the udp instance context data.
   @param  Token                  Pointer to the token to be canceled, if NULL, all
@@ -1085,7 +1096,7 @@ Udp4InstanceCancelToken (
   EFI_STATUS  Status;
 
   //
-  // Cancle this token from the TxTokens map.
+  // Cancel this token from the TxTokens map.
   //
   Status = NetMapIterate (&Instance->TxTokens, Udp4CancelTokens, Token);
 
@@ -1125,7 +1136,9 @@ Udp4InstanceCancelToken (
   @param  Udp4Session            Pointer to the EFI_UDP4_SESSION_DATA abstracted
                                  from the received udp datagram.
 
-  @return The udp datagram matches the receiving requirments of the Instance or not.
+  @retval TRUE       The udp datagram matches the receiving requirments of the
+                     udp Instance.
+  @retval FALSE      Otherwise.
 
 **/
 BOOLEAN
@@ -1147,7 +1160,8 @@ Udp4MatchDgram (
   }
 
   if ((!ConfigData->AcceptAnyPort && (Udp4Session->DestinationPort != ConfigData->StationPort)) ||
-    ((ConfigData->RemotePort != 0) && (Udp4Session->SourcePort != ConfigData->RemotePort))) {
+      ((ConfigData->RemotePort != 0) && (Udp4Session->SourcePort != ConfigData->RemotePort))
+      ) {
     //
     // The local port or the remote port doesn't match.
     //
@@ -1155,7 +1169,8 @@ Udp4MatchDgram (
   }
 
   if (!EFI_IP4_EQUAL (&ConfigData->RemoteAddress, &mZeroIp4Addr) &&
-    !EFI_IP4_EQUAL (&ConfigData->RemoteAddress, &Udp4Session->SourceAddress)) {
+      !EFI_IP4_EQUAL (&ConfigData->RemoteAddress, &Udp4Session->SourceAddress)
+      ) {
     //
     // This datagram doesn't come from the instance's specified sender.
     //
@@ -1163,9 +1178,10 @@ Udp4MatchDgram (
   }
 
   if (EFI_IP4_EQUAL (&ConfigData->StationAddress, &mZeroIp4Addr) ||
-    EFI_IP4_EQUAL (&Udp4Session->DestinationAddress, &ConfigData->StationAddress)) {
+      EFI_IP4_EQUAL (&Udp4Session->DestinationAddress, &ConfigData->StationAddress)
+      ) {
     //
-    // The instance is configured to receive datagrams destinated to any station IP or
+    // The instance is configured to receive datagrams destined to any station IP or
     // the destination address of this datagram matches the configured station IP.
     //
     return TRUE;
@@ -1181,7 +1197,8 @@ Udp4MatchDgram (
   }
 
   if (IP4_IS_MULTICAST (NTOHL (Destination)) &&
-    (NULL != NetMapFindKey (&Instance->McastIps, (VOID *) (UINTN) Destination))) {
+      NetMapFindKey (&Instance->McastIps, (VOID *) (UINTN) Destination) != NULL
+      ) {
     //
     // It's a multicast packet and the multicast address is accepted by this instance.
     //
@@ -1365,7 +1382,7 @@ Udp4InstanceDeliverDgram (
   EFI_TPL                    OldTpl;
 
   if (!IsListEmpty (&Instance->RcvdDgramQue) &&
-    !NetMapIsEmpty (&Instance->RxTokens)) {
+      !NetMapIsEmpty (&Instance->RxTokens)) {
 
     Wrap = NET_LIST_HEAD (&Instance->RcvdDgramQue, UDP4_RXDATA_WRAP, Link);
 
@@ -1381,7 +1398,7 @@ Udp4InstanceDeliverDgram (
       NetbufFree (Wrap->Packet);
 
       Wrap->Packet = Dup;
-    } 
+    }
 
     NetListRemoveHead (&Instance->RcvdDgramQue);
 
@@ -1678,9 +1695,10 @@ Udp4IcmpHandler (
     Instance = NET_LIST_USER_STRUCT (Entry, UDP4_INSTANCE_DATA, Link);
 
     if (!Instance->Configured ||
-      Instance->ConfigData.AcceptPromiscuous ||
-      Instance->ConfigData.AcceptAnyPort ||
-      EFI_IP4_EQUAL (&Instance->ConfigData.StationAddress, &mZeroIp4Addr)) {
+        Instance->ConfigData.AcceptPromiscuous ||
+        Instance->ConfigData.AcceptAnyPort ||
+        EFI_IP4_EQUAL (&Instance->ConfigData.StationAddress, &mZeroIp4Addr)
+        ) {
       //
       // Don't try to deliver the ICMP error to this instance if it is not configured,
       // or it's configured to be promiscuous or accept any port or accept all the
@@ -1780,6 +1798,7 @@ Udp4NetVectorExtFree (
 
   @retval EFI_OUT_OF_RESOURCES   There are not enough resources to set the
                                  variable.
+  @retval EFI_SUCCESS            Set variable successfully.
   @retval other                  Set variable failed.
 
 **/
