@@ -19,7 +19,7 @@
   FILE_GUID                      = 632D5625-B73D-43b8-AF30-8D225D96168E
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PalCallLib 
+  LIBRARY_CLASS                  = PalLib 
   EDK_RELEASE_VERSION            = 0x00020000
 
 
