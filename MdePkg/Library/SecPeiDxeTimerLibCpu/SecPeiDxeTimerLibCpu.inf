@@ -52,7 +52,7 @@
   IoLib
 
 [LibraryClasses.IPF]
-  PalCallLib
+  PalLib
 
 
 [Pcd.IA32, Pcd.X64]
