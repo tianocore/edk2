@@ -74,6 +74,7 @@
   PcdLib
   GraphicsLib
   GenericBdsLib
+  DevicePathLib
 
 
 [Guids]

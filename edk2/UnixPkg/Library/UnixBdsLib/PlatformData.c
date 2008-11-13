@@ -35,15 +35,19 @@ UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath0 =
   {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
-      (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-      (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+      },
       EFI_UNIX_THUNK_PROTOCOL_GUID
   },
   {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
-      (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
-      (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+      {
+        (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
+        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+      },
       EFI_UNIX_UGA_GUID,
       0
   },
@@ -54,15 +58,19 @@ UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath1 = {
   {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
-      (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-      (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+      },
       EFI_UNIX_THUNK_PROTOCOL_GUID
   },
   {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
-      (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
-      (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+      {
+        (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
+        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+      },
       EFI_UNIX_UGA_GUID,
       1
   },
@@ -73,15 +81,19 @@ UNIX_CONSOLE_DEVICE_PATH   gUnixConsoleDevicePath = {
   {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
-      (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-      (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+      },
       EFI_UNIX_THUNK_PROTOCOL_GUID
   },
   {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
-      (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
-      (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+      {
+        (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
+        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+      },
       EFI_UNIX_CONSOLE_GUID,
       0  
   },   
