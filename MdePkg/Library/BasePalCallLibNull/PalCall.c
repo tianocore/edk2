@@ -13,7 +13,7 @@
 
 **/
 #include <Base.h>
-#include <Library/PalCallLib.h>
+#include <Library/PalLib.h>
 #include <Library/DebugLib.h>
 
 /**
