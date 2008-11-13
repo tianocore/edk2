@@ -1,20 +1,14 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+    Implementation of shuting down a network adapter.
+ 
+Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-  shutdown.c
-
-Abstract:
-
-Revision history:
-  2000-Feb-14 M(f)J   Genesis.
 
 **/
 
@@ -24,93 +18,105 @@ Revision history:
 /**
   this routine calls undi to shut down the interface.
 
-  @param  snp   pointer to snp driver structure
+  @param  Snp   pointer to snp driver structure
 
+  @retval EFI_SUCCESS        UNDI is shut down successfully
+  @retval EFI_DEVICE_ERROR   UNDI could not be shut down
 
 **/
 EFI_STATUS
-pxe_shutdown (
-  IN SNP_DRIVER *snp
+PxeShutdown (
+  IN SNP_DRIVER *Snp
   )
 {
-  snp->cdb.OpCode     = PXE_OPCODE_SHUTDOWN;
-  snp->cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
-  snp->cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  snp->cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  snp->cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  snp->cdb.DBaddr     = PXE_DBADDR_NOT_USED;
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.OpCode     = PXE_OPCODE_SHUTDOWN;
+  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((EFI_D_NET, "\nsnp->undi.shutdown()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI could not be shutdown. Return UNDI error.
     //
-    DEBUG ((EFI_D_WARN, "\nsnp->undi.shutdown()  %xh:%xh\n", snp->cdb.StatFlags, snp->cdb.StatCode));
+    DEBUG ((EFI_D_WARN, "\nsnp->undi.shutdown()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
 
     return EFI_DEVICE_ERROR;
   }
   //
   // Free allocated memory.
   //
-  if (snp->tx_rx_buffer != NULL) {
-    snp->IoFncs->FreeBuffer (
-                  snp->IoFncs,
-                  SNP_MEM_PAGES (snp->tx_rx_bufsize),
-                  (VOID *) snp->tx_rx_buffer
+  if (Snp->TxRxBuffer != NULL) {
+    Snp->PciIo->FreeBuffer (
+                  Snp->PciIo,
+                  SNP_MEM_PAGES (Snp->TxRxBufferSize),
+                  (VOID *) Snp->TxRxBuffer
                   );
   }
 
-  snp->tx_rx_buffer   = NULL;
-  snp->tx_rx_bufsize  = 0;
+  Snp->TxRxBuffer      = NULL;
+  Snp->TxRxBufferSize  = 0;
 
   return EFI_SUCCESS;
 }
 
 
 /**
-  This is the SNP interface routine for shutting down the interface
-  This routine basically retrieves snp structure, checks the SNP state and
-  calls the pxe_shutdown routine to actually do the undi shutdown
+  Resets a network adapter and leaves it in a state that is safe for another 
+  driver to initialize. 
+  
+  This function releases the memory buffers assigned in the Initialize() call.
+  Pending transmits and receives are lost, and interrupts are cleared and disabled.
+  After this call, only the Initialize() and Stop() calls may be used. If the 
+  network interface was successfully shutdown, then EFI_SUCCESS will be returned.
+  If the driver has not been initialized, EFI_DEVICE_ERROR will be returned.
 
-  @param  this  context pointer
+  @param  This  A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
 
+  @retval EFI_SUCCESS           The network interface was shutdown.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_INVALID_PARAMETER This parameter was NULL or did not point to a valid 
+                                EFI_SIMPLE_NETWORK_PROTOCOL structure.
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
 
 **/
 EFI_STATUS
 EFIAPI
-snp_undi32_shutdown (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *this
+SnpUndi32Shutdown (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
   )
 {
-  SNP_DRIVER  *snp;
+  SNP_DRIVER  *Snp;
   EFI_STATUS  Status;
   EFI_TPL     OldTpl;
 
   //
+  // Get pointer to SNP driver instance for *This.
   //
-  //
-  if (this == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (this);
+  Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
+  // Return error if the SNP is not initialized.
   //
-  //
-  switch (snp->mode.State) {
+  switch (Snp->Mode.State) {
   case EfiSimpleNetworkInitialized:
     break;
 
@@ -122,24 +128,22 @@ snp_undi32_shutdown (
     Status = EFI_DEVICE_ERROR;
     goto ON_EXIT;
   }
-  //
-  //
-  //
-  Status                          = pxe_shutdown (snp);
+  
+  Status                          = PxeShutdown (Snp);
 
-  snp->mode.State                 = EfiSimpleNetworkStarted;
-  snp->mode.ReceiveFilterSetting  = 0;
+  Snp->Mode.State                 = EfiSimpleNetworkStarted;
+  Snp->Mode.ReceiveFilterSetting  = 0;
 
-  snp->mode.MCastFilterCount      = 0;
-  snp->mode.ReceiveFilterSetting  = 0;
-  ZeroMem (snp->mode.MCastFilter, sizeof snp->mode.MCastFilter);
+  Snp->Mode.MCastFilterCount      = 0;
+  Snp->Mode.ReceiveFilterSetting  = 0;
+  ZeroMem (Snp->Mode.MCastFilter, sizeof Snp->Mode.MCastFilter);
   CopyMem (
-    &snp->mode.CurrentAddress,
-    &snp->mode.PermanentAddress,
+    &Snp->Mode.CurrentAddress,
+    &Snp->Mode.PermanentAddress,
     sizeof (EFI_MAC_ADDRESS)
     );
 
-  gBS->CloseEvent (snp->snp.WaitForPacket);
+  gBS->CloseEvent (Snp->Snp.WaitForPacket);
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);

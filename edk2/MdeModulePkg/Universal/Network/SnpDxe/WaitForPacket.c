@@ -1,19 +1,14 @@
 /** @file
-Copyright (c) 2004, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+    Event handler to check for available packet.
+
+Copyright (c) 2004 - 2008, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-  WaitForPacket.c
-
-Abstract:
-  Event handler to check for available packet.
-
 
 **/
 
@@ -21,8 +16,10 @@ Abstract:
 
 
 /**
+  Nofication call back function for WaitForPacket event.
 
-
+  @param  Event       EFI Event.
+  @param  SnpPtr      Pointer to SNP_DRIVER structure.
 
 **/
 VOID
@@ -43,7 +40,7 @@ SnpWaitForPacketNotify (
   //
   // Do nothing if the SNP interface is not initialized.
   //
-  switch (((SNP_DRIVER *) SnpPtr)->mode.State) {
+  switch (((SNP_DRIVER *) SnpPtr)->Mode.State) {
   case EfiSimpleNetworkInitialized:
     break;
 
@@ -55,28 +52,28 @@ SnpWaitForPacketNotify (
   //
   // Fill in CDB for UNDI GetStatus().
   //
-  ((SNP_DRIVER *) SnpPtr)->cdb.OpCode     = PXE_OPCODE_GET_STATUS;
-  ((SNP_DRIVER *) SnpPtr)->cdb.OpFlags    = 0;
-  ((SNP_DRIVER *) SnpPtr)->cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  ((SNP_DRIVER *) SnpPtr)->cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  ((SNP_DRIVER *) SnpPtr)->cdb.DBsize     = sizeof (UINT32) * 2;
-  ((SNP_DRIVER *) SnpPtr)->cdb.DBaddr     = (UINT64)(UINTN) (((SNP_DRIVER *) SnpPtr)->db);
-  ((SNP_DRIVER *) SnpPtr)->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  ((SNP_DRIVER *) SnpPtr)->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  ((SNP_DRIVER *) SnpPtr)->cdb.IFnum      = ((SNP_DRIVER *) SnpPtr)->if_num;
-  ((SNP_DRIVER *) SnpPtr)->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.OpCode     = PXE_OPCODE_GET_STATUS;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.OpFlags    = 0;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.DBsize     = sizeof (UINT32) * 2;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.DBaddr     = (UINT64)(UINTN) (((SNP_DRIVER *) SnpPtr)->Db);
+  ((SNP_DRIVER *) SnpPtr)->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.IFnum      = ((SNP_DRIVER *) SnpPtr)->IfNum;
+  ((SNP_DRIVER *) SnpPtr)->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Clear contents of DB buffer.
   //
-  ZeroMem (((SNP_DRIVER *) SnpPtr)->db, sizeof (UINT32) * 2);
+  ZeroMem (((SNP_DRIVER *) SnpPtr)->Db, sizeof (UINT32) * 2);
 
   //
   // Issue UNDI command and check result.
   //
-  (*((SNP_DRIVER *) SnpPtr)->issue_undi32_command) ((UINT64)(UINTN) &((SNP_DRIVER *) SnpPtr)->cdb);
+  (*((SNP_DRIVER *) SnpPtr)->IssueUndi32Command) ((UINT64)(UINTN) &((SNP_DRIVER *) SnpPtr)->Cdb);
 
-  if (((SNP_DRIVER *) SnpPtr)->cdb.StatCode != EFI_SUCCESS) {
+  if (((SNP_DRIVER *) SnpPtr)->Cdb.StatCode != EFI_SUCCESS) {
     return ;
   }
   //
@@ -85,7 +82,7 @@ SnpWaitForPacketNotify (
   //
   CopyMem (
     &PxeDbGetStatus,
-    ((SNP_DRIVER *) SnpPtr)->db,
+    ((SNP_DRIVER *) SnpPtr)->Db,
     sizeof (UINT32) * 2
     );
 

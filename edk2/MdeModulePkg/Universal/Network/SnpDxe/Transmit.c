@@ -1,21 +1,14 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+    Implementation of transmitting a packet.
+ 
+Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-
-    transmit.c
-
-Abstract:
-
-Revision history:
-  2000-Feb-03 M(f)J   Genesis.
 
 **/
 
@@ -25,13 +18,13 @@ Revision history:
 /**
   This routine calls undi to create the meadia header for the given data buffer.
 
-  @param  snp                 pointer to SNP driver structure
+  @param  Snp                 pointer to SNP driver structure
   @param  MacHeaderPtr        address where the media header will be filled in.
-  @param  MacHeaderSize       size of the memory at MacHeaderPtr
-  @param  BufferPtr           data buffer pointer
-  @param  BufferLength        Size of data in the BufferPtr
-  @param  DestinationAddrPtr  address of the destination mac address buffer
-  @param  SourceAddrPtr       address of the source mac address buffer
+  @param  HeaderSize       size of the memory at MacHeaderPtr
+  @param  Buffer           data buffer pointer
+  @param  BufferSize        Size of data in the Buffer
+  @param  DestAddr  address of the destination mac address buffer
+  @param  SrcAddr       address of the source mac address buffer
   @param  ProtocolPtr         address of the protocol type
 
   @retval EFI_SUCCESS         if successfully completed the undi call
@@ -39,89 +32,89 @@ Revision history:
 
 **/
 EFI_STATUS
-pxe_fillheader (
-  SNP_DRIVER      *snp,
+PxeFillHeader (
+  SNP_DRIVER      *Snp,
   VOID            *MacHeaderPtr,
-  UINTN           MacHeaderSize,
-  VOID            *BufferPtr,
-  UINTN           BufferLength,
-  EFI_MAC_ADDRESS *DestinationAddrPtr,
-  EFI_MAC_ADDRESS *SourceAddrPtr,
+  UINTN           HeaderSize,
+  VOID            *Buffer,
+  UINTN           BufferSize,
+  EFI_MAC_ADDRESS *DestAddr,
+  EFI_MAC_ADDRESS *SrcAddr,
   UINT16          *ProtocolPtr
   )
 {
-  PXE_CPB_FILL_HEADER_FRAGMENTED  *cpb;
+  PXE_CPB_FILL_HEADER_FRAGMENTED  *Cpb;
 
-  cpb = snp->cpb;
-  if (SourceAddrPtr) {
+  Cpb = Snp->Cpb;
+  if (SrcAddr != NULL) {
     CopyMem (
-      (VOID *) cpb->SrcAddr,
-      (VOID *) SourceAddrPtr,
-      snp->mode.HwAddressSize
+      (VOID *) Cpb->SrcAddr,
+      (VOID *) SrcAddr,
+      Snp->Mode.HwAddressSize
       );
   } else {
     CopyMem (
-      (VOID *) cpb->SrcAddr,
-      (VOID *) &(snp->mode.CurrentAddress),
-      snp->mode.HwAddressSize
+      (VOID *) Cpb->SrcAddr,
+      (VOID *) &(Snp->Mode.CurrentAddress),
+      Snp->Mode.HwAddressSize
       );
   }
 
   CopyMem (
-    (VOID *) cpb->DestAddr,
-    (VOID *) DestinationAddrPtr,
-    snp->mode.HwAddressSize
+    (VOID *) Cpb->DestAddr,
+    (VOID *) DestAddr,
+    Snp->Mode.HwAddressSize
     );
 
   //
   // we need to do the byte swapping
   //
-  cpb->Protocol             = (UINT16) PXE_SWAP_UINT16 (*ProtocolPtr);
+  Cpb->Protocol             = (UINT16) PXE_SWAP_UINT16 (*ProtocolPtr);
 
-  cpb->PacketLen            = (UINT32) (BufferLength);
-  cpb->MediaHeaderLen       = (UINT16) MacHeaderSize;
+  Cpb->PacketLen            = (UINT32) (BufferSize);
+  Cpb->MediaHeaderLen       = (UINT16) HeaderSize;
 
-  cpb->FragCnt              = 2;
-  cpb->reserved             = 0;
+  Cpb->FragCnt              = 2;
+  Cpb->reserved             = 0;
 
-  cpb->FragDesc[0].FragAddr = (UINT64)(UINTN) MacHeaderPtr;
-  cpb->FragDesc[0].FragLen  = (UINT32) MacHeaderSize;
-  cpb->FragDesc[1].FragAddr = (UINT64)(UINTN) BufferPtr;
-  cpb->FragDesc[1].FragLen  = (UINT32) BufferLength;
+  Cpb->FragDesc[0].FragAddr = (UINT64)(UINTN) MacHeaderPtr;
+  Cpb->FragDesc[0].FragLen  = (UINT32) HeaderSize;
+  Cpb->FragDesc[1].FragAddr = (UINT64)(UINTN) Buffer;
+  Cpb->FragDesc[1].FragLen  = (UINT32) BufferSize;
 
-  cpb->FragDesc[0].reserved = cpb->FragDesc[1].reserved = 0;
+  Cpb->FragDesc[0].reserved = Cpb->FragDesc[1].reserved = 0;
 
-  snp->cdb.OpCode     = PXE_OPCODE_FILL_HEADER;
-  snp->cdb.OpFlags    = PXE_OPFLAGS_FILL_HEADER_FRAGMENTED;
+  Snp->Cdb.OpCode     = PXE_OPCODE_FILL_HEADER;
+  Snp->Cdb.OpFlags    = PXE_OPFLAGS_FILL_HEADER_FRAGMENTED;
 
-  snp->cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  snp->cdb.DBaddr     = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
 
-  snp->cdb.CPBsize    = sizeof (PXE_CPB_FILL_HEADER_FRAGMENTED);
-  snp->cdb.CPBaddr    = (UINT64)(UINTN) cpb;
+  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_FILL_HEADER_FRAGMENTED);
+  Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
 
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.fill_header()  "));
+  DEBUG ((EFI_D_NET, "\nSnp->undi.fill_header()  "));
 
-  (*snp->issue_undi32_command) ((UINT64) (UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64) (UINTN) &Snp->Cdb);
 
-  switch (snp->cdb.StatCode) {
+  switch (Snp->Cdb.StatCode) {
   case PXE_STATCODE_SUCCESS:
     return EFI_SUCCESS;
 
   case PXE_STATCODE_INVALID_PARAMETER:
     DEBUG (
       (EFI_D_ERROR,
-      "\nsnp->undi.fill_header()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      "\nSnp->undi.fill_header()  %xh:%xh\n",
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
     return EFI_INVALID_PARAMETER;
@@ -129,9 +122,9 @@ pxe_fillheader (
   default:
     DEBUG (
       (EFI_D_ERROR,
-      "\nsnp->undi.fill_header()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      "\nSnp->undi.fill_header()  %xh:%xh\n",
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
     return EFI_DEVICE_ERROR;
@@ -142,63 +135,63 @@ pxe_fillheader (
 /**
   This routine calls undi to transmit the given data buffer
 
-  @param  snp                 pointer to SNP driver structure
-  @param  BufferPtr           data buffer pointer
-  @param  BufferLength        Size of data in the BufferPtr
+  @param  Snp                 pointer to SNP driver structure
+  @param  Buffer           data buffer pointer
+  @param  BufferSize        Size of data in the Buffer
 
   @retval EFI_SUCCESS         if successfully completed the undi call
   @retval Other               error return from undi call.
 
 **/
 EFI_STATUS
-pxe_transmit (
-  SNP_DRIVER *snp,
-  VOID       *BufferPtr,
-  UINTN      BufferLength
+PxeTransmit (
+  SNP_DRIVER *Snp,
+  VOID       *Buffer,
+  UINTN      BufferSize
   )
 {
-  PXE_CPB_TRANSMIT  *cpb;
+  PXE_CPB_TRANSMIT  *Cpb;
   EFI_STATUS        Status;
 
-  cpb             = snp->cpb;
-  cpb->FrameAddr  = (UINT64) (UINTN) BufferPtr;
-  cpb->DataLen    = (UINT32) BufferLength;
+  Cpb             = Snp->Cpb;
+  Cpb->FrameAddr  = (UINT64) (UINTN) Buffer;
+  Cpb->DataLen    = (UINT32) BufferSize;
 
-  cpb->MediaheaderLen = 0;
-  cpb->reserved       = 0;
+  Cpb->MediaheaderLen = 0;
+  Cpb->reserved       = 0;
 
-  snp->cdb.OpFlags    = PXE_OPFLAGS_TRANSMIT_WHOLE;
+  Snp->Cdb.OpFlags    = PXE_OPFLAGS_TRANSMIT_WHOLE;
 
-  snp->cdb.CPBsize    = sizeof (PXE_CPB_TRANSMIT);
-  snp->cdb.CPBaddr    = (UINT64)(UINTN) cpb;
+  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_TRANSMIT);
+  Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
 
-  snp->cdb.OpCode     = PXE_OPCODE_TRANSMIT;
-  snp->cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  snp->cdb.DBaddr     = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.OpCode     = PXE_OPCODE_TRANSMIT;
+  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
 
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.transmit()  "));
-  DEBUG ((EFI_D_NET, "\nsnp->cdb.OpCode  == %x", snp->cdb.OpCode));
-  DEBUG ((EFI_D_NET, "\nsnp->cdb.CPBaddr == %LX", snp->cdb.CPBaddr));
-  DEBUG ((EFI_D_NET, "\nsnp->cdb.DBaddr  == %LX", snp->cdb.DBaddr));
-  DEBUG ((EFI_D_NET, "\ncpb->FrameAddr   == %LX\n", cpb->FrameAddr));
+  DEBUG ((EFI_D_NET, "\nSnp->undi.transmit()  "));
+  DEBUG ((EFI_D_NET, "\nSnp->Cdb.OpCode  == %x", Snp->Cdb.OpCode));
+  DEBUG ((EFI_D_NET, "\nSnp->Cdb.CPBaddr == %LX", Snp->Cdb.CPBaddr));
+  DEBUG ((EFI_D_NET, "\nSnp->Cdb.DBaddr  == %LX", Snp->Cdb.DBaddr));
+  DEBUG ((EFI_D_NET, "\nCpb->FrameAddr   == %LX\n", Cpb->FrameAddr));
 
-  (*snp->issue_undi32_command) ((UINT64) (UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64) (UINTN) &Snp->Cdb);
 
-  DEBUG ((EFI_D_NET, "\nexit snp->undi.transmit()  "));
-  DEBUG ((EFI_D_NET, "\nsnp->cdb.StatCode == %r", snp->cdb.StatCode));
+  DEBUG ((EFI_D_NET, "\nexit Snp->undi.transmit()  "));
+  DEBUG ((EFI_D_NET, "\nSnp->Cdb.StatCode == %r", Snp->Cdb.StatCode));
 
   //
   // we will unmap the buffers in get_status call, not here
   //
-  switch (snp->cdb.StatCode) {
+  switch (Snp->Cdb.StatCode) {
   case PXE_STATCODE_SUCCESS:
     return EFI_SUCCESS;
 
@@ -213,61 +206,97 @@ pxe_transmit (
 
   DEBUG (
     (EFI_D_ERROR,
-    "\nsnp->undi.transmit()  %xh:%xh\n",
-    snp->cdb.StatFlags,
-    snp->cdb.StatCode)
+    "\nSnp->undi.transmit()  %xh:%xh\n",
+    Snp->Cdb.StatFlags,
+    Snp->Cdb.StatCode)
     );
 
   return Status;
 }
 
-
 /**
-  This is the snp interface routine for transmitting a packet. this routine
-  basically retrieves the snp structure, checks the snp state and calls
-  pxe_fill_header and pxe_transmit calls to complete the transmission.
+  Places a packet in the transmit queue of a network interface.
+  
+  This function places the packet specified by Header and Buffer on the transmit
+  queue. If HeaderSize is nonzero and HeaderSize is not equal to 
+  This->Mode->MediaHeaderSize, then EFI_INVALID_PARAMETER will be returned. If 
+  BufferSize is less than This->Mode->MediaHeaderSize, then EFI_BUFFER_TOO_SMALL
+  will be returned. If Buffer is NULL, then EFI_INVALID_PARAMETER will be 
+  returned. If HeaderSize is nonzero and DestAddr or Protocol is NULL, then
+  EFI_INVALID_PARAMETER will be returned. If the transmit engine of the network
+  interface is busy, then EFI_NOT_READY will be returned. If this packet can be 
+  accepted by the transmit engine of the network interface, the packet contents 
+  specified by Buffer will be placed on the transmit queue of the network 
+  interface, and EFI_SUCCESS will be returned. GetStatus() can be used to 
+  determine when the packet has actually been transmitted. The contents of the 
+  Buffer must not be modified until the packet has actually been transmitted. 
+  The Transmit() function performs nonblocking I/O. A caller who wants to perform
+  blocking I/O, should call Transmit(), and then GetStatus() until the 
+  transmitted buffer shows up in the recycled transmit buffer.
+  If the driver has not been initialized, EFI_DEVICE_ERROR will be returned.
 
-  @param  this                pointer to SNP driver context
-  @param  MacHeaderSize       size of the memory at MacHeaderPtr
-  @param  BufferLength        Size of data in the BufferPtr
-  @param  BufferPtr           data buffer pointer
-  @param  SourceAddrPtr       address of the source mac address buffer
-  @param  DestinationAddrPtr  address of the destination mac address buffer
-  @param  ProtocolPtr         address of the protocol type
+  @param This       A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+  @param HeaderSize The size, in bytes, of the media header to be filled in by the 
+                    Transmit() function. If HeaderSize is nonzero, then it must
+                    be equal to This->Mode->MediaHeaderSize and the DestAddr and
+                    Protocol parameters must not be NULL.
+  @param BufferSize The size, in bytes, of the entire packet (media header and
+                    data) to be transmitted through the network interface.
+  @param Buffer     A pointer to the packet (media header followed by data) to be 
+                    transmitted. This parameter cannot be NULL. If HeaderSize is 
+                    zero, then the media header in Buffer must already be filled
+                    in by the caller. If HeaderSize is nonzero, then the media 
+                    header will be filled in by the Transmit() function.
+  @param SrcAddr    The source HW MAC address. If HeaderSize is zero, then this 
+                    parameter is ignored. If HeaderSize is nonzero and SrcAddr 
+                    is NULL, then This->Mode->CurrentAddress is used for the 
+                    source HW MAC address.
+  @param DestAddr   The destination HW MAC address. If HeaderSize is zero, then 
+                    this parameter is ignored.
+  @param Protocol   The type of header to build. If HeaderSize is zero, then this 
+                    parameter is ignored. See RFC 1700, section "Ether Types," 
+                    for examples.
 
-  @retval EFI_SUCCESS         if successfully completed the undi call
-  @retval Other               error return from undi call.
+  @retval EFI_SUCCESS           The packet was placed on the transmit queue.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_NOT_READY         The network interface is too busy to accept this
+                                transmit request.
+  @retval EFI_BUFFER_TOO_SMALL  The BufferSize parameter is too small.
+  @retval EFI_INVALID_PARAMETER One or more of the parameters has an unsupported
+                                value.
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
+  @retval EFI_UNSUPPORTED       This function is not supported by the network interface.
 
 **/
 EFI_STATUS
 EFIAPI
-snp_undi32_transmit (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
-  IN UINTN                       MacHeaderSize,
-  IN UINTN                       BufferLength,
-  IN VOID                        *BufferPtr,
-  IN EFI_MAC_ADDRESS             * SourceAddrPtr OPTIONAL,
-  IN EFI_MAC_ADDRESS             * DestinationAddrPtr OPTIONAL,
-  IN UINT16                      *ProtocolPtr OPTIONAL
+SnpUndi32Transmit (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN UINTN                       HeaderSize,
+  IN UINTN                       BufferSize,
+  IN VOID                        *Buffer,
+  IN EFI_MAC_ADDRESS             *SrcAddr,  OPTIONAL
+  IN EFI_MAC_ADDRESS             *DestAddr, OPTIONAL
+  IN UINT16                      *Protocol  OPTIONAL
   )
 {
-  SNP_DRIVER  *snp;
+  SNP_DRIVER  *Snp;
   EFI_STATUS  Status;
   EFI_TPL     OldTpl;
 
-  if (this == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (this);
+  Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  if (snp == NULL) {
+  if (Snp == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
-  switch (snp->mode.State) {
+  switch (Snp->Mode.State) {
   case EfiSimpleNetworkInitialized:
     break;
 
@@ -280,35 +309,35 @@ snp_undi32_transmit (
     goto ON_EXIT;
   }
 
-  if (BufferPtr == NULL) {
+  if (Buffer == NULL) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
 
-  if (BufferLength < snp->mode.MediaHeaderSize) {
+  if (BufferSize < Snp->Mode.MediaHeaderSize) {
     Status = EFI_BUFFER_TOO_SMALL;
     goto ON_EXIT;
   }
 
   //
-  // if the MacHeaderSize is non-zero, we need to fill up the header and for that
+  // if the HeaderSize is non-zero, we need to fill up the header and for that
   // we need the destination address and the protocol
   //
-  if (MacHeaderSize != 0) {
-    if (MacHeaderSize != snp->mode.MediaHeaderSize || DestinationAddrPtr == 0 || ProtocolPtr == 0) {
+  if (HeaderSize != 0) {
+    if (HeaderSize != Snp->Mode.MediaHeaderSize || DestAddr == 0 || Protocol == 0) {
       Status = EFI_INVALID_PARAMETER;
       goto ON_EXIT;
     }
 
-    Status = pxe_fillheader (
-              snp,
-              BufferPtr,
-              MacHeaderSize,
-              (UINT8 *) BufferPtr + MacHeaderSize,
-              BufferLength - MacHeaderSize,
-              DestinationAddrPtr,
-              SourceAddrPtr,
-              ProtocolPtr
+    Status = PxeFillHeader (
+              Snp,
+              Buffer,
+              HeaderSize,
+              (UINT8 *) Buffer + HeaderSize,
+              BufferSize - HeaderSize,
+              DestAddr,
+              SrcAddr,
+              Protocol
               );
 
     if (EFI_ERROR (Status)) {
@@ -316,7 +345,7 @@ snp_undi32_transmit (
     }
   }
 
-  Status = pxe_transmit (snp, BufferPtr, BufferLength);
+  Status = PxeTransmit (Snp, Buffer, BufferSize);
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);

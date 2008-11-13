@@ -25,7 +25,7 @@ Revision history:
 /**
   this routine calls undi to enable the receive filters.
 
-  @param  snp                pointer to snp driver structure
+  @param  Snp                pointer to snp driver structure
   @param  EnableFlags        bit mask for enabling the receive filters
   @param  MCastAddressCount  multicast address count for a new multicast address
                              list
@@ -34,68 +34,68 @@ Revision history:
 
 **/
 EFI_STATUS
-pxe_rcvfilter_enable (
-  SNP_DRIVER      *snp,
+PxeRecvFilterEnable (
+  SNP_DRIVER      *Snp,
   UINT32          EnableFlags,
   UINTN           MCastAddressCount,
   EFI_MAC_ADDRESS *MCastAddressList
   )
 {
-  snp->cdb.OpCode     = PXE_OPCODE_RECEIVE_FILTERS;
-  snp->cdb.OpFlags    = PXE_OPFLAGS_RECEIVE_FILTER_ENABLE;
-  snp->cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  snp->cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  snp->cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  snp->cdb.DBaddr     = PXE_DBADDR_NOT_USED;
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.OpCode     = PXE_OPCODE_RECEIVE_FILTERS;
+  Snp->Cdb.OpFlags    = PXE_OPFLAGS_RECEIVE_FILTER_ENABLE;
+  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_UNICAST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_UNICAST;
   }
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST;
   }
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS;
   }
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
   }
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
   }
 
   if (MCastAddressCount != 0) {
-    snp->cdb.CPBsize  = (UINT16) (MCastAddressCount * sizeof (EFI_MAC_ADDRESS));
-    snp->cdb.CPBaddr  = (UINT64)(UINTN) snp->cpb;
-    CopyMem (snp->cpb, MCastAddressList, snp->cdb.CPBsize);
+    Snp->Cdb.CPBsize  = (UINT16) (MCastAddressCount * sizeof (EFI_MAC_ADDRESS));
+    Snp->Cdb.CPBaddr  = (UINT64)(UINTN)Snp->Cpb;
+    CopyMem (Snp->Cpb, MCastAddressList, Snp->Cdb.CPBsize);
   }
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode != EFI_SUCCESS) {
+  if (Snp->Cdb.StatCode != EFI_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
     DEBUG (
       (EFI_D_ERROR,
       "\nsnp->undi.receive_filters()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
-    switch (snp->cdb.StatCode) {
+    switch (Snp->Cdb.StatCode) {
     case PXE_STATCODE_INVALID_CDB:
     case PXE_STATCODE_INVALID_CPB:
     case PXE_STATCODE_INVALID_PARAMETER:
@@ -114,70 +114,70 @@ pxe_rcvfilter_enable (
 /**
   this routine calls undi to disable the receive filters.
 
-  @param  snp                pointer to snp driver structure
+  @param  Snp                pointer to snp driver structure
   @param  DisableFlags       bit mask for disabling the receive filters
   @param  ResetMCastList     boolean flag to reset/delete the multicast filter list
 
 
 **/
 EFI_STATUS
-pxe_rcvfilter_disable (
-  SNP_DRIVER *snp,
+PxeRecvFilterDisable (
+  SNP_DRIVER *Snp,
   UINT32     DisableFlags,
   BOOLEAN    ResetMCastList
   )
 {
-  snp->cdb.OpCode     = PXE_OPCODE_RECEIVE_FILTERS;
-  snp->cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  snp->cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  snp->cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  snp->cdb.DBaddr     = PXE_DBADDR_NOT_USED;
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.OpCode     = PXE_OPCODE_RECEIVE_FILTERS;
+  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  snp->cdb.OpFlags    = (UINT16) (DisableFlags ? PXE_OPFLAGS_RECEIVE_FILTER_DISABLE : PXE_OPFLAGS_NOT_USED);
+  Snp->Cdb.OpFlags    = (UINT16) ((DisableFlags != 0) ? PXE_OPFLAGS_RECEIVE_FILTER_DISABLE : PXE_OPFLAGS_NOT_USED);
 
   if (ResetMCastList) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_RESET_MCAST_LIST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_RESET_MCAST_LIST;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_UNICAST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_UNICAST;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) != 0) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
   }
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode != EFI_SUCCESS) {
+  if (Snp->Cdb.StatCode != EFI_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
     DEBUG (
       (EFI_D_ERROR,
       "\nsnp->undi.receive_filters()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
     return EFI_DEVICE_ERROR;
@@ -189,45 +189,45 @@ pxe_rcvfilter_disable (
 /**
   this routine calls undi to read the receive filters.
 
-  @param  snp                pointer to snp driver structure
+  @param  Snp                pointer to snp driver structure
 
 
 **/
 EFI_STATUS
-pxe_rcvfilter_read (
-  SNP_DRIVER *snp
+PxeRecvFilterRead (
+  SNP_DRIVER *Snp
   )
 {
-  snp->cdb.OpCode   = PXE_OPCODE_RECEIVE_FILTERS;
-  snp->cdb.OpFlags  = PXE_OPFLAGS_RECEIVE_FILTER_READ;
-  snp->cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
-  snp->cdb.DBsize   = (UINT16) (snp->mode.MaxMCastFilterCount * sizeof (EFI_MAC_ADDRESS));
-  snp->cdb.CPBaddr  = PXE_CPBADDR_NOT_USED;
-  if (snp->cdb.DBsize == 0) {
-    snp->cdb.DBaddr = (UINT64)(UINTN) NULL;
+  Snp->Cdb.OpCode   = PXE_OPCODE_RECEIVE_FILTERS;
+  Snp->Cdb.OpFlags  = PXE_OPFLAGS_RECEIVE_FILTER_READ;
+  Snp->Cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.DBsize   = (UINT16) (Snp->Mode.MaxMCastFilterCount * sizeof (EFI_MAC_ADDRESS));
+  Snp->Cdb.CPBaddr  = PXE_CPBADDR_NOT_USED;
+  if (Snp->Cdb.DBsize == 0) {
+    Snp->Cdb.DBaddr = (UINT64)(UINTN) NULL;
   } else {
-    snp->cdb.DBaddr = (UINT64)(UINTN) snp->db;
-    ZeroMem (snp->db, snp->cdb.DBsize);
+    Snp->Cdb.DBaddr = (UINT64)(UINTN) Snp->Db;
+    ZeroMem (Snp->Db, Snp->Cdb.DBsize);
   }
 
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode != EFI_SUCCESS) {
+  if (Snp->Cdb.StatCode != EFI_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
     DEBUG (
       (EFI_D_ERROR,
       "\nsnp->undi.receive_filters()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
     return EFI_DEVICE_ERROR;
@@ -235,29 +235,29 @@ pxe_rcvfilter_read (
   //
   // Convert UNDI32 StatFlags to EFI SNP filter flags.
   //
-  snp->mode.ReceiveFilterSetting = 0;
+  Snp->Mode.ReceiveFilterSetting = 0;
 
-  if ((snp->cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_UNICAST) != 0) {
-    snp->mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_UNICAST;
+  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_UNICAST) != 0) {
+    Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_UNICAST;
   }
 
-  if ((snp->cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_BROADCAST) != 0) {
-    snp->mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
+  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_BROADCAST) != 0) {
+    Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
   }
 
-  if ((snp->cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_PROMISCUOUS) != 0) {
-    snp->mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;
+  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_PROMISCUOUS) != 0) {
+    Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;
   }
 
-  if ((snp->cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_ALL_MULTICAST) != 0) {
-    snp->mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
+  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_ALL_MULTICAST) != 0) {
+    Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
   }
 
-  if ((snp->cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST) != 0) {
-    snp->mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST;
+  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST) != 0) {
+    Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST;
   }
 
-  CopyMem (snp->mode.MCastFilter, snp->db, snp->cdb.DBsize);
+  CopyMem (Snp->Mode.MCastFilter, Snp->Db, Snp->Cdb.DBsize);
 
   //
   // Count number of active entries in multicast filter list.
@@ -267,12 +267,12 @@ pxe_rcvfilter_read (
 
     SetMem (&ZeroMacAddr, sizeof ZeroMacAddr, 0);
 
-    for (snp->mode.MCastFilterCount = 0;
-         snp->mode.MCastFilterCount < snp->mode.MaxMCastFilterCount;
-         snp->mode.MCastFilterCount++
+    for (Snp->Mode.MCastFilterCount = 0;
+         Snp->Mode.MCastFilterCount < Snp->Mode.MaxMCastFilterCount;
+         Snp->Mode.MCastFilterCount++
         ) {
       if (CompareMem (
-            &snp->mode.MCastFilter[snp->mode.MCastFilterCount],
+            &Snp->Mode.MCastFilter[Snp->Mode.MCastFilterCount],
             &ZeroMacAddr,
             sizeof ZeroMacAddr
             ) == 0) {
@@ -286,46 +286,123 @@ pxe_rcvfilter_read (
 
 
 /**
-  This is the SNP interface routine for reading/enabling/disabling the
-  receive filters.
-  This routine basically retrieves snp structure, checks the SNP state and
-  checks the parameter validity, calls one of the above routines to actually
-  do the work
+  Manages the multicast receive filters of a network interface.
+  
+  This function is used enable and disable the hardware and software receive 
+  filters for the underlying network device.
+  The receive filter change is broken down into three steps: 
+  * The filter mask bits that are set (ON) in the Enable parameter are added to 
+    the current receive filter settings. 
+  * The filter mask bits that are set (ON) in the Disable parameter are subtracted
+    from the updated receive filter settings.
+  * If the resulting receive filter setting is not supported by the hardware a
+    more liberal setting is selected.
+  If the same bits are set in the Enable and Disable parameters, then the bits 
+  in the Disable parameter takes precedence.
+  If the ResetMCastFilter parameter is TRUE, then the multicast address list 
+  filter is disabled (irregardless of what other multicast bits are set in the 
+  Enable and Disable parameters). The SNP->Mode->MCastFilterCount field is set 
+  to zero. The Snp->Mode->MCastFilter contents are undefined.
+  After enabling or disabling receive filter settings, software should verify 
+  the new settings by checking the Snp->Mode->ReceiveFilterSettings, 
+  Snp->Mode->MCastFilterCount and Snp->Mode->MCastFilter fields.
+  Note: Some network drivers and/or devices will automatically promote receive 
+    filter settings if the requested setting can not be honored. For example, if
+    a request for four multicast addresses is made and the underlying hardware 
+    only supports two multicast addresses the driver might set the promiscuous 
+    or promiscuous multicast receive filters instead. The receiving software is
+    responsible for discarding any extra packets that get through the hardware 
+    receive filters.
+    Note: Note: To disable all receive filter hardware, the network driver must 
+      be Shutdown() and Stopped(). Calling ReceiveFilters() with Disable set to
+      Snp->Mode->ReceiveFilterSettings will make it so no more packets are 
+      returned by the Receive() function, but the receive hardware may still be 
+      moving packets into system memory before inspecting and discarding them.
+      Unexpected system errors, reboots and hangs can occur if an OS is loaded 
+      and the network devices are not Shutdown() and Stopped().
+  If ResetMCastFilter is TRUE, then the multicast receive filter list on the 
+  network interface will be reset to the default multicast receive filter list.
+  If ResetMCastFilter is FALSE, and this network interface allows the multicast 
+  receive filter list to be modified, then the MCastFilterCnt and MCastFilter 
+  are used to update the current multicast receive filter list. The modified 
+  receive filter list settings can be found in the MCastFilter field of 
+  EFI_SIMPLE_NETWORK_MODE. If the network interface does not allow the multicast
+  receive filter list to be modified, then EFI_INVALID_PARAMETER will be returned.
+  If the driver has not been initialized, EFI_DEVICE_ERROR will be returned.
+  If the receive filter mask and multicast receive filter list have been 
+  successfully updated on the network interface, EFI_SUCCESS will be returned.
 
-  @param  this               context pointer
-  @param  EnableFlags        bit mask for enabling the receive filters
-  @param  DisableFlags       bit mask for disabling the receive filters
-  @param  ResetMCastList     boolean flag to reset/delete the multicast filter list
-  @param  MCastAddressCount  multicast address count for a new multicast address
-                             list
-  @param  MCastAddressList   list of new multicast addresses
-
+  @param This             A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+  @param Enable           A bit mask of receive filters to enable on the network
+                          interface.
+  @param Disable          A bit mask of receive filters to disable on the network
+                          interface. For backward compatibility with EFI 1.1 
+                          platforms, the EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST bit
+                          must be set when the ResetMCastFilter parameter is TRUE.
+  @param ResetMCastFilter Set to TRUE to reset the contents of the multicast 
+                          receive filters on the network interface to their 
+                          default values. 
+  @param MCastFilterCnt   Number of multicast HW MAC addresses in the new MCastFilter
+                          list. This value must be less than or equal to the 
+                          MCastFilterCnt field of EFI_SIMPLE_NETWORK_MODE. 
+                          This field is optional if ResetMCastFilter is TRUE.
+  @param MCastFilter      A pointer to a list of new multicast receive filter HW
+                          MAC addresses. This list will replace any existing 
+                          multicast HW MAC address list. This field is optional 
+                          if ResetMCastFilter is TRUE.
+   
+  @retval EFI_SUCCESS            The multicast receive filter list was updated.
+  @retval EFI_NOT_STARTED        The network interface has not been started.
+  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
+                                 * This is NULL
+                                 * There are bits set in Enable that are not set
+                                   in Snp->Mode->ReceiveFilterMask
+                                 * There are bits set in Disable that are not set
+                                   in Snp->Mode->ReceiveFilterMask
+                                 * Multicast is being enabled (the 
+                                   EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST bit is 
+                                   set in Enable, it is not set in Disable, and 
+                                   ResetMCastFilter is FALSE) and MCastFilterCount
+                                   is zero
+                                 * Multicast is being enabled and MCastFilterCount
+                                   is greater than Snp->Mode->MaxMCastFilterCount
+                                 * Multicast is being enabled and MCastFilter is NULL
+                                 * Multicast is being enabled and one or more of
+                                   the addresses in the MCastFilter list are not
+                                   valid multicast MAC addresses
+  @retval EFI_DEVICE_ERROR       One or more of the following conditions is TRUE:
+                                 * The network interface has been started but has
+                                   not been initialized
+                                 * An unexpected error was returned by the 
+                                   underlying network driver or device
+  @retval EFI_UNSUPPORTED        This function is not supported by the network
+                                 interface.
 
 **/
 EFI_STATUS
 EFIAPI
-snp_undi32_receive_filters (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
-  IN UINT32                      EnableFlags,
-  IN UINT32                      DisableFlags,
-  IN BOOLEAN                     ResetMCastList,
-  IN UINTN                       MCastAddressCount OPTIONAL,
-  IN EFI_MAC_ADDRESS             * MCastAddressList OPTIONAL
+SnpUndi32ReceiveFilters (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN UINT32                      Enable,
+  IN UINT32                      Disable,
+  IN BOOLEAN                     ResetMCastFilter,
+  IN UINTN                       MCastFilterCnt,  OPTIONAL
+  IN EFI_MAC_ADDRESS             *MCastFilter     OPTIONAL
   )
 {
-  SNP_DRIVER  *snp;
+  SNP_DRIVER  *Snp;
   EFI_STATUS  Status;
   EFI_TPL     OldTpl;
 
-  if (this == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (this);
+  Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  switch (snp->mode.State) {
+  switch (Snp->Mode.State) {
   case EfiSimpleNetworkInitialized:
     break;
 
@@ -341,21 +418,21 @@ snp_undi32_receive_filters (
   // check if we are asked to enable or disable something that the UNDI
   // does not even support!
   //
-  if (((EnableFlags &~snp->mode.ReceiveFilterMask) != 0) ||
-    ((DisableFlags &~snp->mode.ReceiveFilterMask) != 0)) {
+  if (((Enable &~Snp->Mode.ReceiveFilterMask) != 0) ||
+    ((Disable &~Snp->Mode.ReceiveFilterMask) != 0)) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
 
-  if (ResetMCastList) {
+  if (ResetMCastFilter) {
 
-    DisableFlags |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST & snp->mode.ReceiveFilterMask;
-    MCastAddressCount = 0;
-    MCastAddressList  = NULL;
+    Disable |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST & Snp->Mode.ReceiveFilterMask;
+    MCastFilterCnt = 0;
+    MCastFilter    = NULL;
   } else {
-    if (MCastAddressCount != 0) {
-      if ((MCastAddressCount > snp->mode.MaxMCastFilterCount) ||
-        (MCastAddressList == NULL)) {
+    if (MCastFilterCnt != 0) {
+      if ((MCastFilterCnt > Snp->Mode.MaxMCastFilterCount) ||
+          (MCastFilter == NULL)) {
 
         Status = EFI_INVALID_PARAMETER;
         goto ON_EXIT;
@@ -363,38 +440,38 @@ snp_undi32_receive_filters (
     }
   }
 
-  if (EnableFlags == 0 && DisableFlags == 0 && !ResetMCastList && MCastAddressCount == 0) {
+  if (Enable == 0 && Disable == 0 && !ResetMCastFilter && MCastFilterCnt == 0) {
     Status = EFI_SUCCESS;
     goto ON_EXIT;
   }
 
-  if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) != 0 && MCastAddressCount == 0) {
+  if ((Enable & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) != 0 && MCastFilterCnt == 0) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
 
-  if ((EnableFlags != 0) || (MCastAddressCount != 0)) {
-    Status = pxe_rcvfilter_enable (
-              snp,
-              EnableFlags,
-              MCastAddressCount,
-              MCastAddressList
-              );
+  if ((Enable != 0) || (MCastFilterCnt != 0)) {
+    Status = PxeRecvFilterEnable (
+               Snp,
+               Enable,
+               MCastFilterCnt,
+               MCastFilter
+               );
 
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
   }
 
-  if ((DisableFlags != 0) || ResetMCastList) {
-    Status = pxe_rcvfilter_disable (snp, DisableFlags, ResetMCastList);
+  if ((Disable != 0) || ResetMCastFilter) {
+    Status = PxeRecvFilterDisable (Snp, Disable, ResetMCastFilter);
 
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
   }
 
-  Status = pxe_rcvfilter_read (snp);
+  Status = PxeRecvFilterRead (Snp);
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);

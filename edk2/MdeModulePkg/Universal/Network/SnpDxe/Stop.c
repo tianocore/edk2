@@ -1,20 +1,14 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+    Implementation of stopping a network interface.
+ 
+Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-  stop.c
-
-Abstract:
-
-Revision history:
-  2000-Feb-09 M(f)J   Genesis.
 
 **/
 
@@ -22,41 +16,45 @@ Revision history:
 
 
 /**
-  this routine calls undi to stop the interface and changes the snp state
+  this routine calls undi to stop the interface and changes the snp state.
 
-  @param  snp   pointer to snp driver structure
+  @param  Snp   pointer to snp driver structure
 
+  @retval EFI_INVALID_PARAMETER  invalid parameter
+  @retval EFI_NOT_STARTED        SNP is not started
+  @retval EFI_DEVICE_ERROR       SNP is not initialized
+  @retval EFI_UNSUPPORTED        operation unsupported
 
 **/
 EFI_STATUS
-pxe_stop (
-  SNP_DRIVER *snp
+PxeStop (
+  SNP_DRIVER *Snp
   )
 {
-  snp->cdb.OpCode     = PXE_OPCODE_STOP;
-  snp->cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
-  snp->cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  snp->cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  snp->cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  snp->cdb.DBaddr     = PXE_DBADDR_NOT_USED;
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.OpCode     = PXE_OPCODE_STOP;
+  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command
   //
   DEBUG ((EFI_D_NET, "\nsnp->undi.stop()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
       (EFI_D_WARN,
       "\nsnp->undi.stop()  %xh:%xh\n",
-      snp->cdb.StatCode,
-      snp->cdb.StatFlags)
+      Snp->Cdb.StatCode,
+      Snp->Cdb.StatFlags)
       );
 
     return EFI_DEVICE_ERROR;
@@ -64,39 +62,48 @@ pxe_stop (
   //
   // Set simple network state to Started and return success.
   //
-  snp->mode.State = EfiSimpleNetworkStopped;
+  Snp->Mode.State = EfiSimpleNetworkStopped;
   return EFI_SUCCESS;
 }
 
 
 /**
-  This is the SNP interface routine for stopping the interface.
-  This routine basically retrieves snp structure, checks the SNP state and
-  calls the pxe_stop routine to actually stop the undi interface
-
-  @param  this  context pointer
-
+  Changes the state of a network interface from "started" to "stopped."
+  
+  This function stops a network interface. This call is only valid if the network
+  interface is in the started state. If the network interface was successfully
+  stopped, then EFI_SUCCESS will be returned.
+  
+  @param  This                    A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+  
+  
+  @retval EFI_SUCCESS             The network interface was stopped.
+  @retval EFI_NOT_STARTED         The network interface has not been started.
+  @retval EFI_INVALID_PARAMETER   This parameter was NULL or did not point to a valid 
+                                  EFI_SIMPLE_NETWORK_PROTOCOL structure.
+  @retval EFI_DEVICE_ERROR        The command could not be sent to the network interface.
+  @retval EFI_UNSUPPORTED         This function is not supported by the network interface.
 
 **/
 EFI_STATUS
 EFIAPI
-snp_undi32_stop (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *this
+SnpUndi32Stop (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
   )
 {
-  SNP_DRIVER  *snp;
+  SNP_DRIVER  *Snp;
   EFI_TPL     OldTpl;
   EFI_STATUS  Status;
 
-  if (this == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (this);
+  Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  switch (snp->mode.State) {
+  switch (Snp->Mode.State) {
   case EfiSimpleNetworkStarted:
     break;
 
@@ -109,7 +116,7 @@ snp_undi32_stop (
     goto ON_EXIT;
   }
 
-  Status = pxe_stop (snp);
+  Status = PxeStop (Snp);
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);
