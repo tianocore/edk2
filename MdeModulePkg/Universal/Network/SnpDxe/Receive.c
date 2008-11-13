@@ -1,20 +1,14 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+ 		Implementation of receiving a packet from a network interface.
+ 
+Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-    receive.c
-
-Abstract:
-
-Revision history:
-    2000-Feb-03 M(f)J   Genesis.
 
 **/
 
@@ -25,66 +19,66 @@ Revision history:
   this routine calls undi to receive a packet and fills in the data in the
   input pointers!
 
-  @param  snp                 pointer to snp driver structure
-  @param  BufferPtr           pointer to the memory for the received data
-  @param  BuffSizePtr         is a pointer to the length of the buffer on entry and
+  @param  Snp                 pointer to snp driver structure
+  @param  Buffer           pointer to the memory for the received data
+  @param  BufferSize         is a pointer to the length of the buffer on entry and
                               contains the length of the received data on return
-  @param  HeaderSizePtr       pointer to the header portion of the data received.
-  @param  SourceAddrPtr       optional parameter, is a pointer to contain the
+  @param  HeaderSize       pointer to the header portion of the data received.
+  @param  SrcAddr       optional parameter, is a pointer to contain the
                               source ethernet address on return
-  @param  DestinationAddrPtr  optional parameter, is a pointer to contain the
+  @param  DestAddr  optional parameter, is a pointer to contain the
                               destination ethernet address on return
-  @param  ProtocolPtr         optional parameter, is a pointer to contain the
+  @param  Protocol         optional parameter, is a pointer to contain the
                               protocol type from the ethernet header on return
 
 
 **/
 EFI_STATUS
-pxe_receive (
-  SNP_DRIVER      *snp,
-  VOID            *BufferPtr,
-  UINTN           *BuffSizePtr,
-  UINTN           *HeaderSizePtr,
-  EFI_MAC_ADDRESS *SourceAddrPtr,
-  EFI_MAC_ADDRESS *DestinationAddrPtr,
-  UINT16          *ProtocolPtr
+PxeReceive (
+  SNP_DRIVER      *Snp,
+  VOID            *Buffer,
+  UINTN           *BufferSize,
+  UINTN           *HeaderSize,
+  EFI_MAC_ADDRESS *SrcAddr,
+  EFI_MAC_ADDRESS *DestAddr,
+  UINT16          *Protocol
   )
 {
-  PXE_CPB_RECEIVE *cpb;
-  PXE_DB_RECEIVE  *db;
-  UINTN           buf_size;
+  PXE_CPB_RECEIVE *Cpb;
+  PXE_DB_RECEIVE  *Db;
+  UINTN           BuffSize;
 
-  cpb       = snp->cpb;
-  db        = snp->db;
-  buf_size  = *BuffSizePtr;
+  Cpb       = Snp->Cpb;
+  Db        = Snp->Db;
+  BuffSize  = *BufferSize;
 
-  cpb->BufferAddr = (UINT64)(UINTN) BufferPtr;
-  cpb->BufferLen  = (UINT32) *BuffSizePtr;
+  Cpb->BufferAddr = (UINT64)(UINTN) Buffer;
+  Cpb->BufferLen  = (UINT32) *BufferSize;
 
-  cpb->reserved       = 0;
+  Cpb->reserved       = 0;
 
-  snp->cdb.OpCode     = PXE_OPCODE_RECEIVE;
-  snp->cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb.OpCode     = PXE_OPCODE_RECEIVE;
+  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
 
-  snp->cdb.CPBsize    = sizeof (PXE_CPB_RECEIVE);
-  snp->cdb.CPBaddr    = (UINT64)(UINTN) cpb;
+  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_RECEIVE);
+  Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
 
-  snp->cdb.DBsize     = sizeof (PXE_DB_RECEIVE);
-  snp->cdb.DBaddr     = (UINT64)(UINTN) db;
+  Snp->Cdb.DBsize     = sizeof (PXE_DB_RECEIVE);
+  Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((EFI_D_NET, "\nsnp->undi.receive ()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  switch (snp->cdb.StatCode) {
+  switch (Snp->Cdb.StatCode) {
   case PXE_STATCODE_SUCCESS:
     break;
 
@@ -92,8 +86,8 @@ pxe_receive (
     DEBUG (
       (EFI_D_NET,
       "\nsnp->undi.receive ()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
     return EFI_NOT_READY;
@@ -102,80 +96,107 @@ pxe_receive (
     DEBUG (
       (EFI_D_ERROR,
       "\nsnp->undi.receive()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
     return EFI_DEVICE_ERROR;
   }
 
-  *BuffSizePtr = db->FrameLen;
+  *BufferSize = Db->FrameLen;
 
-  if (HeaderSizePtr != NULL) {
-    *HeaderSizePtr = db->MediaHeaderLen;
+  if (HeaderSize != NULL) {
+    *HeaderSize = Db->MediaHeaderLen;
   }
 
-  if (SourceAddrPtr != NULL) {
-    CopyMem (SourceAddrPtr, &db->SrcAddr, snp->mode.HwAddressSize);
+  if (SrcAddr != NULL) {
+    CopyMem (SrcAddr, &Db->SrcAddr, Snp->Mode.HwAddressSize);
   }
 
-  if (DestinationAddrPtr != NULL) {
-    CopyMem (DestinationAddrPtr, &db->DestAddr, snp->mode.HwAddressSize);
+  if (DestAddr != NULL) {
+    CopyMem (DestAddr, &Db->DestAddr, Snp->Mode.HwAddressSize);
   }
 
-  if (ProtocolPtr != NULL) {
-    *ProtocolPtr = (UINT16) PXE_SWAP_UINT16 (db->Protocol); /*  we need to do the byte swapping */
+  if (Protocol != NULL) {
+    *Protocol = (UINT16) PXE_SWAP_UINT16 (Db->Protocol); /*  we need to do the byte swapping */
   }
 
-  return (*BuffSizePtr <= buf_size) ? EFI_SUCCESS : EFI_BUFFER_TOO_SMALL;
+  return (*BufferSize <= BuffSize) ? EFI_SUCCESS : EFI_BUFFER_TOO_SMALL;
 }
 
-
 /**
-  This is the SNP interface routine for receiving network data.
-  This routine basically retrieves snp structure, checks the SNP state and
-  calls the pxe_receive routine to actually do the receive!
+  Receives a packet from a network interface.
 
-  @param  this                context pointer
-  @param  HeaderSizePtr       optional parameter and is a pointer to the header
-                              portion of the data received.
-  @param  BuffSizePtr         is a pointer to the length of the buffer on entry and
-                              contains the length of the received data on return
-  @param  BufferPtr           pointer to the memory for the received data
-  @param  SourceAddrPtr       optional parameter, is a pointer to contain the
-                              source ethernet address on return
-  @param  DestinationAddrPtr  optional parameter, is a pointer to contain the
-                              destination ethernet address on return
-  @param  ProtocolPtr         optional parameter, is a pointer to contain the
-                              protocol type from the ethernet header on return
+  This function retrieves one packet from the receive queue of a network interface.
+  If there are no packets on the receive queue, then EFI_NOT_READY will be 
+  returned. If there is a packet on the receive queue, and the size of the packet
+  is smaller than BufferSize, then the contents of the packet will be placed in
+  Buffer, and BufferSize will be updated with the actual size of the packet.
+  In addition, if SrcAddr, DestAddr, and Protocol are not NULL, then these values
+  will be extracted from the media header and returned. EFI_SUCCESS will be 
+  returned if a packet was successfully received.
+  If BufferSize is smaller than the received packet, then the size of the receive
+  packet will be placed in BufferSize and EFI_BUFFER_TOO_SMALL will be returned.
+  If the driver has not been initialized, EFI_DEVICE_ERROR will be returned.
 
+  @param This       A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+  @param HeaderSize The size, in bytes, of the media header received on the network 
+                    interface. If this parameter is NULL, then the media header size 
+                    will not be returned.
+  @param BufferSize On entry, the size, in bytes, of Buffer. On exit, the size, in 
+                    bytes, of the packet that was received on the network interface.
+  @param Buffer     A pointer to the data buffer to receive both the media
+                    header and the data.
+  @param SrcAddr    The source HW MAC address. If this parameter is NULL, the HW
+                    MAC source address will not be extracted from the media header. 
+  @param DestAddr   The destination HW MAC address. If this parameter is NULL, 
+                    the HW MAC destination address will not be extracted from 
+                    the media header.
+  @param Protocol   The media header type. If this parameter is NULL, then the 
+                    protocol will not be extracted from the media header. See 
+                    RFC 1700 section "Ether Types" for examples.
+
+  @retval EFI_SUCCESS           The received data was stored in Buffer, and 
+                                BufferSize has been updated to the number of 
+                                bytes received.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_NOT_READY         No packets have been received on the network interface.
+  @retval EFI_BUFFER_TOO_SMALL  BufferSize is too small for the received packets. 
+                                BufferSize has been updated to the required size.
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                * The This parameter is NULL
+                                * The This parameter does not point to a valid 
+                                  EFI_SIMPLE_NETWORK_PROTOCOL structure.
+                                * The BufferSize parameter is NULL
+                                * The Buffer parameter is NULL
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
 
 **/
 EFI_STATUS
 EFIAPI
-snp_undi32_receive (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
-  OUT UINTN                      *HeaderSizePtr OPTIONAL,
-  IN OUT UINTN                   *BuffSizePtr,
-  OUT VOID                       *BufferPtr,
-  OUT EFI_MAC_ADDRESS            * SourceAddrPtr OPTIONAL,
-  OUT EFI_MAC_ADDRESS            * DestinationAddrPtr OPTIONAL,
-  OUT UINT16                     *ProtocolPtr OPTIONAL
+SnpUndi32Receive (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  OUT UINTN                      *HeaderSize OPTIONAL,
+  IN OUT UINTN                   *BufferSize,
+  OUT VOID                       *Buffer,
+  OUT EFI_MAC_ADDRESS            *SrcAddr OPTIONAL,
+  OUT EFI_MAC_ADDRESS            *DestAddr OPTIONAL,
+  OUT UINT16                     *Protocol OPTIONAL
   )
 {
-  SNP_DRIVER  *snp;
+  SNP_DRIVER  *Snp;
   EFI_TPL     OldTpl;
   EFI_STATUS  Status;
 
-  if (this == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (this);
+  Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  switch (snp->mode.State) {
+  switch (Snp->Mode.State) {
   case EfiSimpleNetworkInitialized:
     break;
 
@@ -188,24 +209,24 @@ snp_undi32_receive (
     goto ON_EXIT;
   }
 
-  if ((BuffSizePtr == NULL) || (BufferPtr == NULL)) {
+  if ((BufferSize == NULL) || (Buffer == NULL)) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
 
-  if (!snp->mode.ReceiveFilterSetting) {
+  if (!Snp->Mode.ReceiveFilterSetting) {
     Status = EFI_DEVICE_ERROR;
     goto ON_EXIT;
   }
 
-  Status = pxe_receive (
-             snp,
-             BufferPtr,
-             BuffSizePtr,
-             HeaderSizePtr,
-             SourceAddrPtr,
-             DestinationAddrPtr,
-             ProtocolPtr
+  Status = PxeReceive (
+             Snp,
+             Buffer,
+             BufferSize,
+             HeaderSize,
+             SrcAddr,
+             DestAddr,
+             Protocol
              );
 
 ON_EXIT:

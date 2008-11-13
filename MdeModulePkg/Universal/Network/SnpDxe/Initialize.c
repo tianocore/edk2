@@ -1,68 +1,56 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+ 		Implementation of initializing a network adapter.
+
+Copyright (c) 2004 - 2008, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-  initialize.c
-
-Abstract:
-
-Revision history:
-  2000-Feb-09 M(f)J   Genesis.
 
 **/
 
 
 #include "Snp.h"
 
-VOID
-EFIAPI
-SnpWaitForPacketNotify (
-  IN EFI_EVENT  Event,
-  IN VOID       *SnpPtr
-  );
-
-
 /**
   this routine calls undi to initialize the interface.
 
-  @param  snp                   pointer to snp driver structure
-  @param  CableDetectFlag       Do/don't detect the cable (depending on what undi
-                                supports)
-
+  @param  Snp                   pointer to snp driver structure
+  @param  CableDetectFlag       Do/don't detect the cable (depending on what undi supports)
+  
+  @retval EFI_SUCCESS           UNDI is initialized successfully
+  @retval EFI_DEVICE_ERROR      UNDI could not be initialized
+  @retval Other                 other errors 
 
 **/
 EFI_STATUS
-pxe_init (
-  SNP_DRIVER *snp,
+PxeInit (
+  SNP_DRIVER *Snp,
   UINT16     CableDetectFlag
   )
 {
-  PXE_CPB_INITIALIZE  *cpb;
-  VOID                *addr;
+  PXE_CPB_INITIALIZE  *Cpb;
+  VOID                *Addr;
   EFI_STATUS          Status;
 
-  cpb = snp->cpb;
-  if (snp->tx_rx_bufsize != 0) {
-    Status = snp->IoFncs->AllocateBuffer (
-                            snp->IoFncs,
-                            AllocateAnyPages,
-                            EfiBootServicesData,
-                            SNP_MEM_PAGES (snp->tx_rx_bufsize),
-                            &addr,
-                            0
-                            );
+  Cpb = Snp->Cpb;
+  if (Snp->TxRxBufferSize != 0) {
+    Status = Snp->PciIo->AllocateBuffer (
+                           Snp->PciIo,
+                           AllocateAnyPages,
+                           EfiBootServicesData,
+                           SNP_MEM_PAGES (Snp->TxRxBufferSize),
+                           &Addr,
+                           0
+                           );
 
     if (Status != EFI_SUCCESS) {
       DEBUG (
         (EFI_D_ERROR,
-        "\nsnp->pxe_init()  AllocateBuffer  %xh (%r)\n",
+        "\nSnp->PxeInit()  AllocateBuffer  %xh (%r)\n",
         Status,
         Status)
         );
@@ -70,69 +58,69 @@ pxe_init (
       return Status;
     }
 
-    ASSERT (addr);
+    ASSERT (Addr);
 
-    snp->tx_rx_buffer = addr;
+    Snp->TxRxBuffer = Addr;
   }
 
-  cpb->MemoryAddr   = (UINT64)(UINTN) snp->tx_rx_buffer;
+  Cpb->MemoryAddr   = (UINT64)(UINTN) Snp->TxRxBuffer;
 
-  cpb->MemoryLength = snp->tx_rx_bufsize;
+  Cpb->MemoryLength = Snp->TxRxBufferSize;
 
   //
   // let UNDI decide/detect these values
   //
-  cpb->LinkSpeed      = 0;
-  cpb->TxBufCnt       = 0;
-  cpb->TxBufSize      = 0;
-  cpb->RxBufCnt       = 0;
-  cpb->RxBufSize      = 0;
+  Cpb->LinkSpeed      = 0;
+  Cpb->TxBufCnt       = 0;
+  Cpb->TxBufSize      = 0;
+  Cpb->RxBufCnt       = 0;
+  Cpb->RxBufSize      = 0;
 
-  cpb->DuplexMode         = PXE_DUPLEX_DEFAULT;
+  Cpb->DuplexMode         = PXE_DUPLEX_DEFAULT;
 
-  cpb->LoopBackMode       = LOOPBACK_NORMAL;
+  Cpb->LoopBackMode       = LOOPBACK_NORMAL;
 
-  snp->cdb.OpCode     = PXE_OPCODE_INITIALIZE;
-  snp->cdb.OpFlags    = CableDetectFlag;
+  Snp->Cdb.OpCode     = PXE_OPCODE_INITIALIZE;
+  Snp->Cdb.OpFlags    = CableDetectFlag;
 
-  snp->cdb.CPBsize    = sizeof (PXE_CPB_INITIALIZE);
-  snp->cdb.DBsize     = sizeof (PXE_DB_INITIALIZE);
+  Snp->Cdb.CPBsize    = sizeof (PXE_CPB_INITIALIZE);
+  Snp->Cdb.DBsize     = sizeof (PXE_DB_INITIALIZE);
 
-  snp->cdb.CPBaddr    = (UINT64)(UINTN) snp->cpb;
-  snp->cdb.DBaddr     = (UINT64)(UINTN) snp->db;
+  Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Snp->Cpb;
+  Snp->Cdb.DBaddr     = (UINT64)(UINTN) Snp->Db;
 
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  DEBUG ((EFI_D_NET, "\nsnp->undi.initialize()  "));
+  DEBUG ((EFI_D_NET, "\nSnp->undi.initialize()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode == PXE_STATCODE_SUCCESS) {
-    snp->mode.State = EfiSimpleNetworkInitialized;
+  if (Snp->Cdb.StatCode == PXE_STATCODE_SUCCESS) {
+    Snp->Mode.State = EfiSimpleNetworkInitialized;
 
     Status          = EFI_SUCCESS;
   } else {
     DEBUG (
       (EFI_D_WARN,
-      "\nsnp->undi.initialize()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      "\nSnp->undi.initialize()  %xh:%xh\n",
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
-    if (snp->tx_rx_buffer != NULL) {
-      snp->IoFncs->FreeBuffer (
-                    snp->IoFncs,
-                    SNP_MEM_PAGES (snp->tx_rx_bufsize),
-                    (VOID *) snp->tx_rx_buffer
+    if (Snp->TxRxBuffer != NULL) {
+      Snp->PciIo->FreeBuffer (
+                    Snp->PciIo,
+                    SNP_MEM_PAGES (Snp->TxRxBufferSize),
+                    (VOID *) Snp->TxRxBuffer
                     );
     }
 
-    snp->tx_rx_buffer = NULL;
+    Snp->TxRxBuffer = NULL;
 
-    Status            = EFI_DEVICE_ERROR;
+    Status          = EFI_DEVICE_ERROR;
   }
 
   return Status;
@@ -140,47 +128,64 @@ pxe_init (
 
 
 /**
-  This is the SNP interface routine for initializing the interface
-  This routine basically retrieves snp structure, checks the SNP state and
-  calls the pxe_initialize routine to actually do the undi initialization
+  Resets a network adapter and allocates the transmit and receive buffers 
+  required by the network interface; optionally, also requests allocation of 
+  additional transmit and receive buffers.
 
-  @param  this                  context pointer
-  @param  extra_rx_buffer_size  optional parameter, indicates extra space for
-                                rx_buffers
-  @param  extra_tx_buffer_size  optional parameter, indicates extra space for
-                                tx_buffers
+  This function allocates the transmit and receive buffers required by the network
+  interface. If this allocation fails, then EFI_OUT_OF_RESOURCES is returned.
+  If the allocation succeeds and the network interface is successfully initialized,
+  then EFI_SUCCESS will be returned.
 
+  @param This               A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+
+  @param ExtraRxBufferSize  The size, in bytes, of the extra receive buffer space
+                            that the driver should allocate for the network interface.
+                            Some network interfaces will not be able to use the 
+                            extra buffer, and the caller will not know if it is 
+                            actually being used.
+  @param ExtraTxBufferSize  The size, in bytes, of the extra transmit buffer space
+                            that the driver should allocate for the network interface.
+                            Some network interfaces will not be able to use the
+                            extra buffer, and the caller will not know if it is
+                            actually being used.
+
+  @retval EFI_SUCCESS           The network interface was initialized.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough memory for the transmit and
+                                receive buffers.
+  @retval EFI_INVALID_PARAMETER This parameter was NULL or did not point to a valid
+                                EFI_SIMPLE_NETWORK_PROTOCOL structure.
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
+  @retval EFI_UNSUPPORTED       The increased buffer size feature is not supported.
 
 **/
 EFI_STATUS
 EFIAPI
-snp_undi32_initialize (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *this,
-  IN UINTN                       extra_rx_buffer_size OPTIONAL,
-  IN UINTN                       extra_tx_buffer_size OPTIONAL
+SnpUndi32Initialize (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN UINTN                       ExtraRxBufferSize OPTIONAL,
+  IN UINTN                       ExtraTxBufferSize OPTIONAL
   )
 {
   EFI_STATUS  EfiStatus;
-  SNP_DRIVER  *snp;
+  SNP_DRIVER  *Snp;
   EFI_TPL     OldTpl;
 
-  //
-  //
-  //
-  if (this == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (this);
+  Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  if (snp == NULL) {
+  if (Snp == NULL) {
     EfiStatus = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
 
-  switch (snp->mode.State) {
+  switch (Snp->Mode.State) {
   case EfiSimpleNetworkStarted:
     break;
 
@@ -197,45 +202,45 @@ snp_undi32_initialize (
                     EVT_NOTIFY_WAIT,
                     TPL_NOTIFY,
                     &SnpWaitForPacketNotify,
-                    snp,
-                    &snp->snp.WaitForPacket
+                    Snp,
+                    &Snp->Snp.WaitForPacket
                     );
 
   if (EFI_ERROR (EfiStatus)) {
-    snp->snp.WaitForPacket = NULL;
+    Snp->Snp.WaitForPacket = NULL;
     EfiStatus = EFI_DEVICE_ERROR;
     goto ON_EXIT;
   }
   //
   //
   //
-  snp->mode.MCastFilterCount      = 0;
-  snp->mode.ReceiveFilterSetting  = 0;
-  ZeroMem (snp->mode.MCastFilter, sizeof snp->mode.MCastFilter);
+  Snp->Mode.MCastFilterCount      = 0;
+  Snp->Mode.ReceiveFilterSetting  = 0;
+  ZeroMem (Snp->Mode.MCastFilter, sizeof Snp->Mode.MCastFilter);
   CopyMem (
-    &snp->mode.CurrentAddress,
-    &snp->mode.PermanentAddress,
+    &Snp->Mode.CurrentAddress,
+    &Snp->Mode.PermanentAddress,
     sizeof (EFI_MAC_ADDRESS)
     );
 
   //
   // Compute tx/rx buffer sizes based on UNDI init info and parameters.
   //
-  snp->tx_rx_bufsize = (UINT32) (snp->init_info.MemoryRequired + extra_rx_buffer_size + extra_tx_buffer_size);
+  Snp->TxRxBufferSize = (UINT32) (Snp->InitInfo.MemoryRequired + ExtraRxBufferSize + ExtraTxBufferSize);
 
-  if (snp->mode.MediaPresentSupported) {
-    if (pxe_init (snp, PXE_OPFLAGS_INITIALIZE_DETECT_CABLE) == EFI_SUCCESS) {
-      snp->mode.MediaPresent = TRUE;
+  if (Snp->Mode.MediaPresentSupported) {
+    if (PxeInit (Snp, PXE_OPFLAGS_INITIALIZE_DETECT_CABLE) == EFI_SUCCESS) {
+      Snp->Mode.MediaPresent = TRUE;
       goto ON_EXIT;
     }
   }
 
-  snp->mode.MediaPresent  = FALSE;
+  Snp->Mode.MediaPresent  = FALSE;
 
-  EfiStatus               = pxe_init (snp, PXE_OPFLAGS_INITIALIZE_DO_NOT_DETECT_CABLE);
+  EfiStatus               = PxeInit (Snp, PXE_OPFLAGS_INITIALIZE_DO_NOT_DETECT_CABLE);
 
   if (EFI_ERROR (EfiStatus)) {
-    gBS->CloseEvent (snp->snp.WaitForPacket);
+    gBS->CloseEvent (Snp->Snp.WaitForPacket);
   }
 
 ON_EXIT:

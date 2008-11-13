@@ -1,20 +1,14 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+    Implementation of reading the MAC address of a network adapter.
+ 
+Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-  station_address.c
-
-Abstract:
-
-Revision history:
-  2000-Feb-17 M(f)J   Genesis.
 
 **/
 
@@ -25,45 +19,47 @@ Revision history:
   this routine calls undi to read the MAC address of the NIC and updates the
   mode structure with the address.
 
-  @param  snp         pointer to snp driver structure
-
+  @param  Snp         pointer to snp driver structure.
+   
+  @retval EFI_SUCCESS       the MAC address of the NIC is read successfully.
+  @retval EFI_DEVICE_ERROR  failed to read the MAC address of the NIC.
 
 **/
 EFI_STATUS
-pxe_get_stn_addr (
-  SNP_DRIVER *snp
+PxeGetStnAddr (
+  SNP_DRIVER *Snp
   )
 {
-  PXE_DB_STATION_ADDRESS  *db;
+  PXE_DB_STATION_ADDRESS  *Db;
 
-  db                  = snp->db;
-  snp->cdb.OpCode     = PXE_OPCODE_STATION_ADDRESS;
-  snp->cdb.OpFlags    = PXE_OPFLAGS_STATION_ADDRESS_READ;
+  Db                  = Snp->Db;
+  Snp->Cdb.OpCode     = PXE_OPCODE_STATION_ADDRESS;
+  Snp->Cdb.OpFlags    = PXE_OPFLAGS_STATION_ADDRESS_READ;
 
-  snp->cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  snp->cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
 
-  snp->cdb.DBsize     = sizeof (PXE_DB_STATION_ADDRESS);
-  snp->cdb.DBaddr     = (UINT64)(UINTN) db;
+  Snp->Cdb.DBsize     = sizeof (PXE_DB_STATION_ADDRESS);
+  Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((EFI_D_NET, "\nsnp->undi.station_addr()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
       (EFI_D_ERROR,
       "\nsnp->undi.station_addr()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
     return EFI_DEVICE_ERROR;
@@ -72,21 +68,21 @@ pxe_get_stn_addr (
   // Set new station address in SNP->Mode structure and return success.
   //
   CopyMem (
-    &(snp->mode.CurrentAddress),
-    &db->StationAddr,
-    snp->mode.HwAddressSize
+    &(Snp->Mode.CurrentAddress),
+    &Db->StationAddr,
+    Snp->Mode.HwAddressSize
     );
 
   CopyMem (
-    &snp->mode.BroadcastAddress,
-    &db->BroadcastAddr,
-    snp->mode.HwAddressSize
+    &Snp->Mode.BroadcastAddress,
+    &Db->BroadcastAddr,
+    Snp->Mode.HwAddressSize
     );
 
   CopyMem (
-    &snp->mode.PermanentAddress,
-    &db->PermanentAddr,
-    snp->mode.HwAddressSize
+    &Snp->Mode.PermanentAddress,
+    &Db->PermanentAddr,
+    Snp->Mode.HwAddressSize
     );
 
   return EFI_SUCCESS;
@@ -96,7 +92,7 @@ pxe_get_stn_addr (
 /**
   this routine calls undi to set a new MAC address for the NIC,
 
-  @param  snp         pointer to snp driver structure
+  @param  Snp         pointer to Snp driver structure
   @param  NewMacAddr  pointer to a mac address to be set for the nic, if this is
                       NULL then this routine resets the mac address to the NIC's
                       original address.
@@ -104,55 +100,55 @@ pxe_get_stn_addr (
 
 **/
 EFI_STATUS
-pxe_set_stn_addr (
-  SNP_DRIVER      *snp,
+PxeSetStnAddr (
+  SNP_DRIVER      *Snp,
   EFI_MAC_ADDRESS *NewMacAddr
   )
 {
-  PXE_CPB_STATION_ADDRESS *cpb;
-  PXE_DB_STATION_ADDRESS  *db;
+  PXE_CPB_STATION_ADDRESS *Cpb;
+  PXE_DB_STATION_ADDRESS  *Db;
 
-  cpb             = snp->cpb;
-  db              = snp->db;
-  snp->cdb.OpCode = PXE_OPCODE_STATION_ADDRESS;
+  Cpb             = Snp->Cpb;
+  Db              = Snp->Db;
+  Snp->Cdb.OpCode = PXE_OPCODE_STATION_ADDRESS;
 
   if (NewMacAddr == NULL) {
-    snp->cdb.OpFlags  = PXE_OPFLAGS_STATION_ADDRESS_RESET;
-    snp->cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
-    snp->cdb.CPBaddr  = PXE_CPBADDR_NOT_USED;
+    Snp->Cdb.OpFlags  = PXE_OPFLAGS_STATION_ADDRESS_RESET;
+    Snp->Cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
+    Snp->Cdb.CPBaddr  = PXE_CPBADDR_NOT_USED;
   } else {
-    snp->cdb.OpFlags = PXE_OPFLAGS_STATION_ADDRESS_READ;
+    Snp->Cdb.OpFlags = PXE_OPFLAGS_STATION_ADDRESS_READ;
     //
     // even though the OPFLAGS are set to READ, supplying a new address
     // in the CPB will make undi change the mac address to the new one.
     //
-    CopyMem (&cpb->StationAddr, NewMacAddr, snp->mode.HwAddressSize);
+    CopyMem (&Cpb->StationAddr, NewMacAddr, Snp->Mode.HwAddressSize);
 
-    snp->cdb.CPBsize  = sizeof (PXE_CPB_STATION_ADDRESS);
-    snp->cdb.CPBaddr  = (UINT64)(UINTN) cpb;
+    Snp->Cdb.CPBsize  = sizeof (PXE_CPB_STATION_ADDRESS);
+    Snp->Cdb.CPBaddr  = (UINT64)(UINTN) Cpb;
   }
 
-  snp->cdb.DBsize     = sizeof (PXE_DB_STATION_ADDRESS);
-  snp->cdb.DBaddr     = (UINT64)(UINTN) db;
+  Snp->Cdb.DBsize     = sizeof (PXE_DB_STATION_ADDRESS);
+  Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((EFI_D_NET, "\nsnp->undi.station_addr()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
       (EFI_D_ERROR,
       "\nsnp->undi.station_addr()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatCode)
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatCode)
       );
 
     //
@@ -163,54 +159,72 @@ pxe_set_stn_addr (
   //
   // read the changed address and save it in SNP->Mode structure
   //
-  pxe_get_stn_addr (snp);
+  PxeGetStnAddr (Snp);
 
   return EFI_SUCCESS;
 }
 
 
 /**
-  This is the SNP interface routine for changing the NIC's mac address.
-  This routine basically retrieves snp structure, checks the SNP state and
-  calls the above routines to actually do the work
+  Modifies or resets the current station address, if supported.
+  
+  This function modifies or resets the current station address of a network 
+  interface, if supported. If Reset is TRUE, then the current station address is
+  set to the network interface’s permanent address. If Reset is FALSE, and the 
+  network interface allows its station address to be modified, then the current 
+  station address is changed to the address specified by New. If the network 
+  interface does not allow its station address to be modified, then 
+  EFI_INVALID_PARAMETER will be returned. If the station address is successfully
+  updated on the network interface, EFI_SUCCESS will be returned. If the driver
+  has not been initialized, EFI_DEVICE_ERROR will be returned.
 
-  @param  this        context pointer
-  @param  NewMacAddr  pointer to a mac address to be set for the nic, if this is
-                      NULL then this routine resets the mac address to the NIC's
-                      original address.
-  @param  ResetFlag   If true, the mac address will change to NIC's original
-                      address
+  @param This  A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+  @param Reset Flag used to reset the station address to the network interface’s 
+               permanent address.
+  @param New   New station address to be used for the network interface.
 
+
+  @retval EFI_SUCCESS           The network interface’s station address was updated.
+  @retval EFI_NOT_STARTED       The Simple Network Protocol interface has not been 
+                                started by calling Start().
+  @retval EFI_INVALID_PARAMETER The New station address was not accepted by the NIC.
+  @retval EFI_INVALID_PARAMETER Reset is FALSE and New is NULL.
+  @retval EFI_DEVICE_ERROR      The Simple Network Protocol interface has not 
+                                been initialized by calling Initialize().
+  @retval EFI_DEVICE_ERROR      An error occurred attempting to set the new 
+                                station address.
+  @retval EFI_UNSUPPORTED       The NIC does not support changing the network 
+                                interface’s station address.
 
 **/
 EFI_STATUS
 EFIAPI
-snp_undi32_station_address (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
-  IN BOOLEAN                     ResetFlag,
-  IN EFI_MAC_ADDRESS             * NewMacAddr OPTIONAL
+SnpUndi32StationAddress (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  IN BOOLEAN                     Reset,
+  IN EFI_MAC_ADDRESS             *New OPTIONAL
   )
 {
-  SNP_DRIVER  *snp;
+  SNP_DRIVER  *Snp;
   EFI_STATUS  Status;
   EFI_TPL     OldTpl;
 
   //
   // Check for invalid parameter combinations.
   //
-  if ((this == NULL) ||
-    (!ResetFlag && (NewMacAddr == NULL))) {
+  if ((This == NULL) ||
+    (!Reset && (New == NULL))) {
     return EFI_INVALID_PARAMETER;
   }
 
-  snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (this);
+  Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // Return error if the SNP is not initialized.
   //
-  switch (snp->mode.State) {
+  switch (Snp->Mode.State) {
   case EfiSimpleNetworkInitialized:
     break;
 
@@ -223,10 +237,10 @@ snp_undi32_station_address (
     goto ON_EXIT;
   }
 
-  if (ResetFlag) {
-    Status = pxe_set_stn_addr (snp, NULL);
+  if (Reset) {
+    Status = PxeSetStnAddr (Snp, NULL);
   } else {
-    Status = pxe_set_stn_addr (snp, NewMacAddr);
+    Status = PxeSetStnAddr (Snp, New);
   }
 
 ON_EXIT:

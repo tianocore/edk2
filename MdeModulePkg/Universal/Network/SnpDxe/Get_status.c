@@ -1,20 +1,15 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+ 		Implementation of reading the current interrupt status and recycled transmit
+ 	  buffer status from a network interface.
+
+Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-  get_status.c
-
-Abstract:
-
-Revision history:
-  2000-Feb-03 M(f)J   Genesis.
 
 **/
 
@@ -24,7 +19,7 @@ Revision history:
   this routine calls undi to get the status of the interrupts, get the list of
   transmit buffers that completed transmitting!
 
-  @param  snp                     pointer to snp driver structure
+  @param  Snp                     pointer to snp driver structure
   @param  InterruptStatusPtr      a non null pointer gets the interrupt status
   @param  TransmitBufferListPtrs  a non null ointer gets the list of pointers of
                                   previously  transmitted buffers whose
@@ -33,56 +28,56 @@ Revision history:
 
 **/
 EFI_STATUS
-pxe_getstatus (
-  SNP_DRIVER *snp,
+PxeGetStatus (
+  SNP_DRIVER *Snp,
   UINT32     *InterruptStatusPtr,
   VOID       **TransmitBufferListPtr
   )
 {
-  PXE_DB_GET_STATUS *db;
+  PXE_DB_GET_STATUS *Db;
   UINT16            InterruptFlags;
 
-  db                = snp->db;
-  snp->cdb.OpCode   = PXE_OPCODE_GET_STATUS;
+  Db                = Snp->Db;
+  Snp->Cdb.OpCode   = PXE_OPCODE_GET_STATUS;
 
-  snp->cdb.OpFlags  = 0;
+  Snp->Cdb.OpFlags  = 0;
 
   if (TransmitBufferListPtr != NULL) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_GET_TRANSMITTED_BUFFERS;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_GET_TRANSMITTED_BUFFERS;
   }
 
   if (InterruptStatusPtr != NULL) {
-    snp->cdb.OpFlags |= PXE_OPFLAGS_GET_INTERRUPT_STATUS;
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_GET_INTERRUPT_STATUS;
   }
 
-  snp->cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
-  snp->cdb.CPBaddr  = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr  = PXE_CPBADDR_NOT_USED;
 
   //
   // size DB for return of one buffer
   //
-  snp->cdb.DBsize = (UINT16) (((UINT16) (sizeof (PXE_DB_GET_STATUS)) - (UINT16) (sizeof db->TxBuffer)) + (UINT16) (sizeof db->TxBuffer[0]));
+  Snp->Cdb.DBsize     = (UINT16) ((sizeof (PXE_DB_GET_STATUS) - sizeof (Db->TxBuffer)) + sizeof (Db->TxBuffer[0]));
 
-  snp->cdb.DBaddr     = (UINT64)(UINTN) db;
+  Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
 
-  snp->cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  snp->cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  snp->cdb.IFnum      = snp->if_num;
-  snp->cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum      = Snp->IfNum;
+  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.get_status()  "));
+  DEBUG ((EFI_D_NET, "\nSnp->undi.get_status()  "));
 
-  (*snp->issue_undi32_command) ((UINT64)(UINTN) &snp->cdb);
+  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
-  if (snp->cdb.StatCode != EFI_SUCCESS) {
+  if (Snp->Cdb.StatCode != EFI_SUCCESS) {
     DEBUG (
       (EFI_D_NET,
-      "\nsnp->undi.get_status()  %xh:%xh\n",
-      snp->cdb.StatFlags,
-      snp->cdb.StatFlags)
+      "\nSnp->undi.get_status()  %xh:%xh\n",
+      Snp->Cdb.StatFlags,
+      Snp->Cdb.StatFlags)
       );
 
     return EFI_DEVICE_ERROR;
@@ -91,23 +86,23 @@ pxe_getstatus (
   // report the values back..
   //
   if (InterruptStatusPtr != NULL) {
-    InterruptFlags      = (UINT16) (snp->cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_INTERRUPT_MASK);
+    InterruptFlags      = (UINT16) (Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_INTERRUPT_MASK);
 
     *InterruptStatusPtr = 0;
 
-    if (InterruptFlags & PXE_STATFLAGS_GET_STATUS_RECEIVE) {
+    if ((InterruptFlags & PXE_STATFLAGS_GET_STATUS_RECEIVE) == PXE_STATFLAGS_GET_STATUS_RECEIVE) {
       *InterruptStatusPtr |= EFI_SIMPLE_NETWORK_RECEIVE_INTERRUPT;
     }
 
-    if (InterruptFlags & PXE_STATFLAGS_GET_STATUS_TRANSMIT) {
+    if ((InterruptFlags & PXE_STATFLAGS_GET_STATUS_TRANSMIT) == PXE_STATFLAGS_GET_STATUS_TRANSMIT) {
       *InterruptStatusPtr |= EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
     }
 
-    if (InterruptFlags & PXE_STATFLAGS_GET_STATUS_COMMAND) {
+    if ((InterruptFlags & PXE_STATFLAGS_GET_STATUS_COMMAND) == PXE_STATFLAGS_GET_STATUS_COMMAND) {
       *InterruptStatusPtr |= EFI_SIMPLE_NETWORK_COMMAND_INTERRUPT;
     }
 
-    if (InterruptFlags & PXE_STATFLAGS_GET_STATUS_SOFTWARE) {
+    if ((InterruptFlags & PXE_STATFLAGS_GET_STATUS_SOFTWARE) == PXE_STATFLAGS_GET_STATUS_SOFTWARE) {
       *InterruptStatusPtr |= EFI_SIMPLE_NETWORK_COMMAND_INTERRUPT;
     }
 
@@ -116,58 +111,82 @@ pxe_getstatus (
   if (TransmitBufferListPtr != NULL) {
     *TransmitBufferListPtr =
       (
-        (snp->cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_NO_TXBUFS_WRITTEN) ||
-        (snp->cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_TXBUF_QUEUE_EMPTY)
-      ) ? 0 : (VOID *) (UINTN) db->TxBuffer[0];
+        (Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_NO_TXBUFS_WRITTEN) ||
+        (Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_TXBUF_QUEUE_EMPTY)
+      ) ? 0 : (VOID *) (UINTN) Db->TxBuffer[0];
 
   }
 
   return EFI_SUCCESS;
 }
 
-
 /**
-  This is the SNP interface routine for getting the status
-  This routine basically retrieves snp structure, checks the SNP state and
-  calls the pxe_getstatus routine to actually get the undi status
+  Reads the current interrupt status and recycled transmit buffer status from a
+  network interface.
+  
+  This function gets the current interrupt and recycled transmit buffer status 
+  from the network interface. The interrupt status is returned as a bit mask in
+  InterruptStatus. If InterruptStatus is NULL, the interrupt status will not be
+  read. If TxBuf is not NULL, a recycled transmit buffer address will be retrieved.
+  If a recycled transmit buffer address is returned in TxBuf, then the buffer has
+  been successfully transmitted, and the status for that buffer is cleared. If
+  the status of the network interface is successfully collected, EFI_SUCCESS 
+  will be returned. If the driver has not been initialized, EFI_DEVICE_ERROR will
+  be returned.
 
-  @param  this                    context pointer
-  @param  InterruptStatusPtr      a non null pointer gets the interrupt status
-  @param  TransmitBufferListPtrs  a non null ointer gets the list of pointers of
-                                  previously  transmitted buffers whose
-                                  transmission was completed  asynchrnously.
+  @param This            A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+  @param InterruptStatus A pointer to the bit mask of the currently active 
+                         interrupts (see "Related Definitions"). If this is NULL,
+                         the interrupt status will not be read from the device.
+                         If this is not NULL, the interrupt status will be read
+                         from the device. When the interrupt status is read, it 
+                         will also be cleared. Clearing the transmit interrupt does 
+                         not empty the recycled transmit buffer array.
+  @param TxBuf           Recycled transmit buffer address. The network interface
+                         will not transmit if its internal recycled transmit 
+                         buffer array is full. Reading the transmit buffer does
+                         not clear the transmit interrupt. If this is NULL, then
+                         the transmit buffer status will not be read. If there 
+                         are no transmit buffers to recycle and TxBuf is not NULL, 
+                         TxBuf will be set to NULL.
 
+  @retval EFI_SUCCESS           The status of the network interface was retrieved.
+  @retval EFI_NOT_STARTED       The network interface has not been started.
+  @retval EFI_INVALID_PARAMETER This parameter was NULL or did not point to a valid 
+                                EFI_SIMPLE_NETWORK_PROTOCOL structure.
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network 
+                                interface.
 
 **/
 EFI_STATUS
 EFIAPI
-snp_undi32_get_status (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL * this,
-  OUT UINT32                     *InterruptStatusPtr OPTIONAL,
-  OUT VOID                       **TransmitBufferListPtr OPTIONAL
+SnpUndi32GetStatus (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
+  OUT UINT32                     *InterruptStatus, OPTIONAL
+  OUT VOID                       **TxBuf           OPTIONAL
   )
 {
-  SNP_DRIVER  *snp;
+  SNP_DRIVER  *Snp;
   EFI_TPL     OldTpl;
   EFI_STATUS  Status;
 
-  if (this == NULL) {
+  if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (InterruptStatusPtr == NULL && TransmitBufferListPtr == NULL) {
+  if (InterruptStatus == NULL && TxBuf == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (this);
+  Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  if (snp == NULL) {
+  if (Snp == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
-  switch (snp->mode.State) {
+  switch (Snp->Mode.State) {
   case EfiSimpleNetworkInitialized:
     break;
 
@@ -180,7 +199,7 @@ snp_undi32_get_status (
     goto ON_EXIT;
   }
 
-  Status = pxe_getstatus (snp, InterruptStatusPtr, TransmitBufferListPtr);
+  Status = PxeGetStatus (Snp, InterruptStatus, TxBuf);
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);
