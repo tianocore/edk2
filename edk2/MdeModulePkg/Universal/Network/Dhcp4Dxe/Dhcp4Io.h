@@ -35,10 +35,10 @@ Abstract:
 
 
 
-#define DHCP_WAIT_OFFER                 3  // Time to wait the offers
-#define DHCP_DEFAULT_LEASE  7 *24 *60 *60  // Seven days as default.
-#define DHCP_SERVER_PORT               67
-#define DHCP_CLIENT_PORT               68
+#define DHCP_WAIT_OFFER                    3  // Time to wait the offers
+#define DHCP_DEFAULT_LEASE  7 * 24 * 60 * 60  // Seven days as default.
+#define DHCP_SERVER_PORT                  67
+#define DHCP_CLIENT_PORT                  68
 
 typedef enum {
   //

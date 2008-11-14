@@ -22,11 +22,11 @@ Abstract:
 
 #include "Dhcp4Impl.h"
 
-//
-// A list of the format of DHCP Options sorted by option tag
-// to validate a dhcp message. Refere the comments of the
-// DHCP_OPTION_FORMAT structure.
-//
+///
+/// A list of the format of DHCP Options sorted by option tag
+/// to validate a dhcp message. Refere the comments of the
+/// DHCP_OPTION_FORMAT structure.
+///
 DHCP_OPTION_FORMAT DhcpOptionFormats[] = {
   {DHCP_TAG_NETMASK,        DHCP_OPTION_IP,     1, 1  , TRUE},
   {DHCP_TAG_TIME_OFFSET,    DHCP_OPTION_INT32,  1, 1  , FALSE},
@@ -147,7 +147,7 @@ DhcpFindOptionFormat (
     if (Tag < DhcpOptionFormats[Middle].Tag) {
       Right = Middle - 1;
     } else {
-      Left = Middle + 1;
+      Left  = Middle + 1;
     }
   }
 
@@ -162,7 +162,8 @@ DhcpFindOptionFormat (
   @param  OptValue               The value of the option
   @param  Len                    The length of the option value
 
-  @return TRUE is the option is valid, otherwise FALSE.
+  @retval TRUE     The option is valid.
+  @retval FALSE    Otherwise.
 
 **/
 BOOLEAN
@@ -213,7 +214,8 @@ DhcpOptionIsValid (
   Occur = Len / Unit;
 
   if (((Format->MinOccur != -1) && (Occur < Format->MinOccur)) ||
-      ((Format->MaxOccur != -1) && (Occur > Format->MaxOccur))) {
+      ((Format->MaxOccur != -1) && (Occur > Format->MaxOccur))
+      ) {
     return FALSE;
   }
 
@@ -247,10 +249,10 @@ DhcpOptionIsValid (
 **/
 EFI_STATUS
 DhcpGetParameter (
-  IN UINT8                  Tag,
-  IN INTN                   Len,
-  IN UINT8                  *Data,
-  IN DHCP_PARAMETER         *Para
+  IN  UINT8                  Tag,
+  IN  INTN                   Len,
+  IN  UINT8                  *Data,
+  OUT DHCP_PARAMETER         *Para
   )
 {
   switch (Tag) {
@@ -311,7 +313,7 @@ DhcpGetParameter (
   @param  BufLen                 The length of the buffer
   @param  Check                  The callback function for each option found
   @param  Context                The opaque parameter for the Check
-  @param  Overload               variable to save the value of DHCP_TAG_OVERLOAD
+  @param  Overload               Variable to save the value of DHCP_TAG_OVERLOAD
                                  option.
 
   @retval EFI_SUCCESS            All the options are valid
@@ -389,7 +391,7 @@ DhcpIterateBufferOptions (
   @param  Context                The opaque parameter for Check
 
   @retval EFI_SUCCESS            The DHCP packet's options are well formated
-  @retval Others                 The DHCP packet's options are not well formated
+  @retval EFI_INVALID_PARAMETER  The DHCP packet's options are not well formated
 
 **/
 EFI_STATUS
@@ -449,7 +451,7 @@ DhcpIterateOptions (
 
 
 /**
-  Call back function to DhcpiterateOptions to compute each option's
+  Call back function to DhcpIterateOptions to compute each option's
   length. It just adds the data length of all the occurances of this
   Tag. Context is an array of 256 DHCP_OPTION_COUNT.
 
@@ -480,8 +482,8 @@ DhcpGetOptionLen (
 
 
 /**
-  Call back function to DhcpiterateOptions to consolidate each option's
-  data. There are maybe several occurance of the same option.
+  Call back function to DhcpIterateOptions to consolidate each option's
+  data. There are maybe several occurrence of the same option.
 
   @param  Tag                    The option to consolidate its data
   @param  Len                    The length of option data
@@ -536,7 +538,7 @@ DhcpFillOption (
   as a UINT8. It then iterates the DHCP packet to get data length of
   each option by calling DhcpIterOptions with DhcpGetOptionLen. Now, it
   knows the number of present options and their length. It allocates a
-  array of DHCP_OPTION and a continous buffer after the array to put
+  array of DHCP_OPTION and a continuous buffer after the array to put
   all the options' data. Each option's data is pointed to by the Data
   field in DHCP_OPTION structure. At last, it call DhcpIterateOptions
   with DhcpFillOption to fill each option's data to its position in the
@@ -743,10 +745,10 @@ ON_EXIT:
 **/
 UINT8 *
 DhcpAppendOption (
-  IN UINT8                  *Buf,
-  IN UINT8                  Tag,
-  IN UINT16                 DataLen,
-  IN UINT8                  *Data
+  OUT UINT8                  *Buf,
+  IN  UINT8                  Tag,
+  IN  UINT16                 DataLen,
+  IN  UINT8                  *Data
   )
 {
   INTN                      Index;
@@ -781,6 +783,7 @@ DhcpAppendOption (
                                  function.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
+  @retval EFI_INVALID_PARAMETER  The options in SeekPacket are mal-formated
   @retval EFI_SUCCESS            The packet is build.
 
 **/
