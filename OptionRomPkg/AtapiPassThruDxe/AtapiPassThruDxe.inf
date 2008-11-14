@@ -54,6 +54,7 @@
   BaseLib
   UefiDriverEntryPoint
   DebugLib
+  DevicePathLib
 
 
 [Protocols]
