@@ -873,7 +873,7 @@ ScsiExecuteSCSICommand (
       return Status;
     }
 
-    if ((ScsiIoDevice->ScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_NONBLOCKIO) && (Event !=  NULL)) {
+    if (((ScsiIoDevice->ScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_NONBLOCKIO) != 0) && (Event !=  NULL)) {
       EventData.Data1 = (VOID*)Packet;
       EventData.Data2 = Event;
       //
