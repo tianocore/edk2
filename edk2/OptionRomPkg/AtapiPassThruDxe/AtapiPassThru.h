@@ -32,7 +32,10 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/PcdLib.h>
+#include <Library/DevicePathLib.h>
+
 #include <IndustryStandard/Pci22.h>
+
 
 ///
 /// bit definition
