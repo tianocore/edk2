@@ -48,9 +48,11 @@
   UefiUsbLib|Include/Library/UefiUsbLib.h
 
   ##  @libraryclass  Provides a service to retrieve a pointer to the EFI Runtime Services Table.
+  #                  Only available to DXE and UEFI module types.
   UefiRuntimeServicesTableLib|Include/Library/UefiRuntimeServicesTableLib.h
 
   ##  @libraryclass  Provides library functions for each of the UEFI Runtime Services.
+  #                  Only available to DXE and UEFI module types.
   UefiRuntimeLib|Include/Library/UefiRuntimeLib.h
 
   ##  @libraryclass  Provides library functions for common UEFI operations.
@@ -61,10 +63,11 @@
   ##  @libraryclass  Module entry point library for UEFI drivers, DXE Drivers, DXE SMM Driver and DXE Runtime Drivers
   UefiDriverEntryPoint|Include/Library/UefiDriverEntryPoint.h
 
-  ##  @libraryclass  UEFI Decompress Library Functions defintion for UEFI compress algorithm
+  ##  @libraryclass  UEFI Decompress Library Functions defintion for UEFI compress algorithm.
   UefiDecompressLib|Include/Library/UefiDecompressLib.h
 
   ##  @libraryclass  Provides a service to retrieve a pointer to the EFI Boot Services Table.
+  #                  Only available to DXE and UEFI module types.
   UefiBootServicesTableLib|Include/Library/UefiBootServicesTableLib.h
 
   ##  @libraryclass  Module entry point library for UEFI Applications.
@@ -74,6 +77,7 @@
   TimerLib|Include/Library/TimerLib.h
 
   ##  @libraryclass  Provides library functions to access SMBUS devices.
+  #                  Libraries of this class must be ported to a specific SMBUS controller. 
   SmbusLib|Include/Library/SmbusLib.h
 
   ##  @libraryclass  Provides the functions to submit Scsi commands defined in SCSI-2 specification for scsi device.
@@ -135,7 +139,7 @@
   ##  @libraryclass  Provide services to access I/O Ports and MMIO registers.
   IoLib|Include/Library/IoLib.h
 
-  ##  @libraryclass  Provides services to create and parse HOBs.
+  ##  @libraryclass  Provides services to create and parse HOBs. Only available for PEI and DXE module types.
   HobLib|Include/Library/HobLib.h
 
   ##  @libraryclass  Provides a service to retrieve a pointer to the DXE Services Table.
@@ -173,12 +177,10 @@
   ##
   GraphicsLib|Include/Library/GraphicsLib.h
 
-  ##  @libraryclass  Extract Guided Section Library class defintions that provides many handlers
-  #                  for the different guided section data.
-  ##
+  ##  @libraryclass  This library provides common functions to process the different guided section data.
   ExtractGuidedSectionLib|Include/Library/ExtractGuidedSectionLib.h
 
-  ##  @libraryclass  Defines a set of Serial Port I/O interfaces.
+  ##  @libraryclass  Provides three common serial I/O port functions.
   SerialPortLib|Include/Library/SerialPortLib.h
 
   ##  @libraryclass  Provides a set of PI library functions and macros for DXE phase.
@@ -188,7 +190,7 @@
   ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
   SalLib|Include/Library/SalLib.h
 
-  ##  @libraryclass  The PAL Library provides a service to make a PAL CALL.
+  ##  @libraryclass  Provides library services to make PAL Calls.
   PalLib|Include/Library/PalLib.h
 
 [Guids.common]
