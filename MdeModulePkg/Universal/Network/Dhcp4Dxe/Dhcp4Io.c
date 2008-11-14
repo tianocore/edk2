@@ -33,6 +33,7 @@ UINT32  mDhcp4DefaultTimeout[4] = { 4, 8, 16, 32 };
   @param  DhcpSb                The DHCP service instance
 
   @retval EFI_SUCCESS           The request has been sent
+  @retval other                 Some error occurs when sending the request.
 
 **/
 EFI_STATUS
@@ -140,7 +141,7 @@ DhcpCallUser (
   Notify the user about the operation result.
 
   @param  DhcpSb                DHCP service instance
-  @param  Which                 which notify function to signal
+  @param  Which                 Which notify function to signal
 
   @return None
 
@@ -158,14 +159,16 @@ DhcpNotifyUser (
   }
 
   if ((Child->CompletionEvent != NULL) &&
-     ((Which == DHCP_NOTIFY_COMPLETION) || (Which == DHCP_NOTIFY_ALL))) {
+      ((Which == DHCP_NOTIFY_COMPLETION) || (Which == DHCP_NOTIFY_ALL))
+      ) {
 
     gBS->SignalEvent (Child->CompletionEvent);
     Child->CompletionEvent = NULL;
   }
 
   if ((Child->RenewRebindEvent != NULL) &&
-     ((Which == DHCP_NOTIFY_RENEWREBIND) || (Which == DHCP_NOTIFY_ALL))) {
+      ((Which == DHCP_NOTIFY_RENEWREBIND) || (Which == DHCP_NOTIFY_ALL))
+      ) {
 
     gBS->SignalEvent (Child->RenewRebindEvent);
     Child->RenewRebindEvent = NULL;
@@ -191,9 +194,9 @@ DhcpNotifyUser (
 **/
 EFI_STATUS
 DhcpSetState (
-  IN DHCP_SERVICE           *DhcpSb,
-  IN INTN                   State,
-  IN BOOLEAN                CallUser
+  IN OUT DHCP_SERVICE           *DhcpSb,
+  IN     INTN                   State,
+  IN     BOOLEAN                CallUser
   )
 {
   EFI_STATUS                Status;
@@ -251,7 +254,7 @@ DhcpSetState (
 **/
 VOID
 DhcpSetTransmitTimer (
-  IN DHCP_SERVICE           *DhcpSb
+  IN OUT DHCP_SERVICE           *DhcpSb
   )
 {
   UINT32                    *Times;
@@ -287,8 +290,8 @@ DhcpSetTransmitTimer (
 **/
 VOID
 DhcpComputeLease (
-  IN DHCP_SERVICE           *DhcpSb,
-  IN DHCP_PARAMETER         *Para
+  IN OUT DHCP_SERVICE           *DhcpSb,
+  IN     DHCP_PARAMETER         *Para
   )
 {
   ASSERT (Para != NULL);
@@ -317,7 +320,7 @@ DhcpComputeLease (
   such as DHCP release.
 
   @param  UdpIo                 The UDP IO port to configure
-  @param  Context               The opaque parameter to the function.
+  @param  Context               Dhcp service instance.
 
   @retval EFI_SUCCESS           The UDP IO port is successfully configured.
   @retval Others                It failed to configure the port.
@@ -395,7 +398,7 @@ DhcpConfigLeaseIoPort (
 **/
 EFI_STATUS
 DhcpLeaseAcquired (
-  IN DHCP_SERVICE           *DhcpSb
+  IN OUT DHCP_SERVICE           *DhcpSb
   )
 {
   INTN                      Class;
@@ -635,7 +638,8 @@ DhcpHandleSelect (
   // Don't return a error for these two case otherwise the session is ended.
   //
   if (!DHCP_IS_BOOTP (Para) &&
-     ((Para->DhcpType != DHCP_MSG_OFFER) || (Para->ServerId == 0))) {
+      ((Para->DhcpType != DHCP_MSG_OFFER) || (Para->ServerId == 0))
+      ) {
     goto ON_EXIT;
   }
 
@@ -712,8 +716,9 @@ DhcpHandleRequest (
   // Ignore the BOOTP message and DHCP messages other than DHCP ACK/NACK.
   //
   if (DHCP_IS_BOOTP (Para) ||
-     (Para->ServerId != DhcpSb->Para->ServerId) ||
-     ((Para->DhcpType != DHCP_MSG_ACK) && (Para->DhcpType != DHCP_MSG_NAK))) {
+      (Para->ServerId != DhcpSb->Para->ServerId) ||
+      ((Para->DhcpType != DHCP_MSG_ACK) && (Para->DhcpType != DHCP_MSG_NAK))
+      ) {
 
     Status = EFI_SUCCESS;
     goto ON_EXIT;
@@ -803,8 +808,9 @@ DhcpHandleRenewRebind (
   // Ignore the BOOTP message and DHCP messages other than DHCP ACK/NACK
   //
   if (DHCP_IS_BOOTP (Para) ||
-     (Para->ServerId != DhcpSb->Para->ServerId) ||
-     ((Para->DhcpType != DHCP_MSG_ACK) && (Para->DhcpType != DHCP_MSG_NAK))) {
+      (Para->ServerId != DhcpSb->Para->ServerId) ||
+      ((Para->DhcpType != DHCP_MSG_ACK) && (Para->DhcpType != DHCP_MSG_NAK))
+      ) {
 
     Status = EFI_SUCCESS;
     goto ON_EXIT;
@@ -882,7 +888,8 @@ DhcpHandleReboot (
   // Ignore the BOOTP message and DHCP messages other than DHCP ACK/NACK
   //
   if (DHCP_IS_BOOTP (Para) ||
-     ((Para->DhcpType != DHCP_MSG_ACK) && (Para->DhcpType != DHCP_MSG_NAK))) {
+      ((Para->DhcpType != DHCP_MSG_ACK) && (Para->DhcpType != DHCP_MSG_NAK))
+      ) {
 
     Status = EFI_SUCCESS;
     goto ON_EXIT;
@@ -944,7 +951,7 @@ ON_EXIT:
 
 
 /**
-  Handle the received DHCP packets. This function drivers the DHCP
+  Handle the received DHCP packets. This function drives the DHCP
   state machine.
 
   @param  UdpPacket             The UDP packets received.
@@ -1158,6 +1165,7 @@ DhcpOnPacketSent (
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resources for the packet
   @retval EFI_ACCESS_DENIED     Failed to transmit the packet through UDP
   @retval EFI_SUCCESS           The message is sent
+  @retval other                 Other error occurs
 
 **/
 EFI_STATUS
@@ -1239,7 +1247,8 @@ DhcpSendMessage (
   //   3. DHCP request to confirm one lease.
   //
   if ((Type == DHCP_MSG_DECLINE) || (Type == DHCP_MSG_RELEASE) ||
-      ((Type == DHCP_MSG_REQUEST) && (DhcpSb->DhcpState == Dhcp4Requesting))) {
+      ((Type == DHCP_MSG_REQUEST) && (DhcpSb->DhcpState == Dhcp4Requesting))
+      ) {
 
     ASSERT ((Para != NULL) && (Para->ServerId != 0));
 
@@ -1346,7 +1355,11 @@ DhcpSendMessage (
   //
   // Save the Client Address will be sent out
   //
-  CopyMem (&DhcpSb->ClientAddressSendOut[0], &Packet->Dhcp4.Header.ClientHwAddr[0], Packet->Dhcp4.Header.HwAddrLen);
+  CopyMem (
+    &DhcpSb->ClientAddressSendOut[0],
+    &Packet->Dhcp4.Header.ClientHwAddr[0],
+    Packet->Dhcp4.Header.HwAddrLen
+    );
 
 
   //

@@ -23,16 +23,340 @@ Abstract:
 
 #include "Dhcp4Impl.h"
 
+/**
+  Returns the current operating mode and cached data packet for the EFI DHCPv4 Protocol driver.
+  
+  The GetModeData() function returns the current operating mode and cached data
+  packet for the EFI DHCPv4 Protocol driver.
+
+  @param  This          Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Dhcp4ModeData Pointer to storage for the EFI_DHCP4_MODE_DATA structure.
+
+  @retval EFI_SUCCESS           The mode data was returned.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4GetModeData (
+  IN  EFI_DHCP4_PROTOCOL    *This,
+  OUT EFI_DHCP4_MODE_DATA   *Dhcp4ModeData
+  );
 
 /**
-  Get the current operation parameter and lease for the network interface.
+  Initializes, changes, or resets the operational settings for the EFI DHCPv4 Protocol driver.
 
-  @param  This                   The DHCP protocol instance
-  @param  Dhcp4ModeData          The variable to save the DHCP mode data.
+  The Configure() function is used to initialize, change, or reset the operational
+  settings of the EFI DHCPv4 Protocol driver for the communication device on which
+  the EFI DHCPv4 Service Binding Protocol is installed. This function can be
+  successfully called only if both of the following are true:
+  * This instance of the EFI DHCPv4 Protocol driver is in the Dhcp4Stopped, Dhcp4Init,
+    Dhcp4InitReboot, or Dhcp4Bound states.
+  * No other EFI DHCPv4 Protocol driver instance that is controlled by this EFI
+    DHCPv4 Service Binding Protocol driver instance has configured this EFI DHCPv4
+    Protocol driver.
+  When this driver is in the Dhcp4Stopped state, it can transfer into one of the
+  following two possible initial states:
+  * Dhcp4Init
+  * Dhcp4InitReboot
+  The driver can transfer into these states by calling Configure() with a non-NULL
+  Dhcp4CfgData. The driver will transfer into the appropriate state based on the
+  supplied client network address in the ClientAddress parameter and DHCP options
+  in the OptionList parameter as described in RFC 2131.
+  When Configure() is called successfully while Dhcp4CfgData is set to NULL, the
+  default configuring data will be reset in the EFI DHCPv4 Protocol driver and
+  the state of the EFI DHCPv4 Protocol driver will not be changed. If one instance
+  wants to make it possible for another instance to configure the EFI DHCPv4 Protocol
+  driver, it must call this function with Dhcp4CfgData set to NULL.
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invalid
-  @retval EFI_SUCCESS            The Dhcp4ModeData is updated with the current
-                                 operation parameter.
+  @param  This                   Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Dhcp4CfgData           Pointer to the EFI_DHCP4_CONFIG_DATA.
+
+  @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Init or
+                                Dhcp4InitReboot state, if the original state of this driver
+                                was Dhcp4Stopped and the value of Dhcp4CfgData was
+                                not NULL. Otherwise, the state was left unchanged.
+  @retval EFI_ACCESS_DENIED     This instance of the EFI DHCPv4 Protocol driver was not in the
+                                Dhcp4Stopped, Dhcp4Init, Dhcp4InitReboot, or Dhcp4Bound state;
+                                Or onother instance of this EFI DHCPv4 Protocol driver is already
+                                in a valid configured state.
+  @retval EFI_INVALID_PARAMETER Some parameter is NULL.
+  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4Configure (
+  IN EFI_DHCP4_PROTOCOL     *This,
+  IN EFI_DHCP4_CONFIG_DATA  *Dhcp4CfgData       OPTIONAL
+  );  
+
+/**
+  Starts the DHCP configuration process.
+
+  The Start() function starts the DHCP configuration process. This function can
+  be called only when the EFI DHCPv4 Protocol driver is in the Dhcp4Init or
+  Dhcp4InitReboot state.
+  If the DHCP process completes successfully, the state of the EFI DHCPv4 Protocol
+  driver will be transferred through Dhcp4Selecting and Dhcp4Requesting to the
+  Dhcp4Bound state. The CompletionEvent will then be signaled if it is not NULL.
+  If the process aborts, either by the user or by some unexpected network error,
+  the state is restored to the Dhcp4Init state. The Start() function can be called
+  again to restart the process.
+  Refer to RFC 2131 for precise state transitions during this process. At the
+  time when each event occurs in this process, the callback function that was set
+  by EFI_DHCP4_PROTOCOL.Configure() will be called and the user can take this
+  opportunity to control the process.
+  
+  @param  This            Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  CompletionEvent If not NULL, indicates the event that will be signaled when the
+                          EFI DHCPv4 Protocol driver is transferred into the
+                          Dhcp4Bound state or when the DHCP process is aborted.
+                          EFI_DHCP4_PROTOCOL.GetModeData() can be called to
+                          check the completion status. If NULL,
+                          EFI_DHCP4_PROTOCOL.Start() will wait until the driver
+                          is transferred into the Dhcp4Bound state or the process fails.
+
+  @retval EFI_SUCCESS           The DHCP configuration process has started, or it has completed
+                                when CompletionEvent is NULL.
+  @retval EFI_NOT_STARTED       The EFI DHCPv4 Protocol driver is in the Dhcp4Stopped
+                                state. EFI_DHCP4_PROTOCOL. Configure() needs to be called.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval EFI_TIMEOUT           The DHCP configuration process failed because no response was
+                                received from the server within the specified timeout value.
+  @retval EFI_ABORTED           The user aborted the DHCP process.
+  @retval EFI_ALREADY_STARTED   Some other EFI DHCPv4 Protocol instance already started the
+                                DHCP process.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4Start (
+  IN EFI_DHCP4_PROTOCOL     *This,
+  IN EFI_EVENT              CompletionEvent   OPTIONAL
+  );
+
+/**
+  Extends the lease time by sending a request packet.
+  
+  The RenewRebind() function is used to manually extend the lease time when the
+  EFI DHCPv4 Protocol driver is in the Dhcp4Bound state and the lease time has
+  not expired yet. This function will send a request packet to the previously
+  found server (or to any server when RebindRequest is TRUE) and transfer the
+  state into the Dhcp4Renewing state (or Dhcp4Rebinding when RebindingRequest is
+  TRUE). When a response is received, the state is returned to Dhcp4Bound.
+  If no response is received before the try count is exceeded (the RequestTryCount
+  field that is specified in EFI_DHCP4_CONFIG_DATA) but before the lease time that
+  was issued by the previous server expires, the driver will return to the Dhcp4Bound
+  state and the previous configuration is restored. The outgoing and incoming packets
+  can be captured by the EFI_DHCP4_CALLBACK function.
+
+  @param  This            Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  RebindRequest   If TRUE, this function broadcasts the request packets and enters
+                          the Dhcp4Rebinding state. Otherwise, it sends a unicast
+                          request packet and enters the Dhcp4Renewing state.
+  @param  CompletionEvent If not NULL, this event is signaled when the renew/rebind phase
+                          completes or some error occurs.
+                          EFI_DHCP4_PROTOCOL.GetModeData() can be called to
+                          check the completion status. If NULL,
+                          EFI_DHCP4_PROTOCOL.RenewRebind() will busy-wait
+                          until the DHCP process finishes.
+
+  @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the
+                                Dhcp4Renewing state or is back to the Dhcp4Bound state.
+  @retval EFI_NOT_STARTED       The EFI DHCPv4 Protocol driver is in the Dhcp4Stopped
+                                state. EFI_DHCP4_PROTOCOL.Configure() needs to
+                                be called.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_TIMEOUT           There was no response from the server when the try count was
+                                exceeded.
+  @retval EFI_ACCESS_DENIED     The driver is not in the Dhcp4Bound state.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4RenewRebind (
+  IN EFI_DHCP4_PROTOCOL     *This,
+  IN BOOLEAN                RebindRequest,
+  IN EFI_EVENT              CompletionEvent   OPTIONAL
+  );
+
+/**
+  Releases the current address configuration.
+
+  The Release() function releases the current configured IP address by doing either
+  of the following:
+  * Sending a DHCPRELEASE packet when the EFI DHCPv4 Protocol driver is in the
+    Dhcp4Bound state
+  * Setting the previously assigned IP address that was provided with the
+    EFI_DHCP4_PROTOCOL.Configure() function to 0.0.0.0 when the driver is in
+    Dhcp4InitReboot state
+  After a successful call to this function, the EFI DHCPv4 Protocol driver returns
+  to the Dhcp4Init state and any subsequent incoming packets will be discarded silently.
+
+  @param  This                  Pointer to the EFI_DHCP4_PROTOCOL instance.
+
+  @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Init phase.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_ACCESS_DENIED     The EFI DHCPv4 Protocol driver is not Dhcp4InitReboot state.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4Release (
+  IN EFI_DHCP4_PROTOCOL     *This
+  );
+
+/**
+  Stops the current address configuration.
+  
+  The Stop() function is used to stop the DHCP configuration process. After this
+  function is called successfully, the EFI DHCPv4 Protocol driver is transferred
+  into the Dhcp4Stopped state. EFI_DHCP4_PROTOCOL.Configure() needs to be called
+  before DHCP configuration process can be started again. This function can be
+  called when the EFI DHCPv4 Protocol driver is in any state.
+
+  @param  This                  Pointer to the EFI_DHCP4_PROTOCOL instance.
+
+  @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Stopped phase.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4Stop (
+  IN EFI_DHCP4_PROTOCOL     *This
+  );
+
+/**
+  Builds a DHCP packet, given the options to be appended or deleted or replaced.
+
+  The Build() function is used to assemble a new packet from the original packet
+  by replacing or deleting existing options or appending new options. This function
+  does not change any state of the EFI DHCPv4 Protocol driver and can be used at
+  any time.
+
+  @param  This        Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  SeedPacket  Initial packet to be used as a base for building new packet.
+  @param  DeleteCount Number of opcodes in the DeleteList.
+  @param  DeleteList  List of opcodes to be deleted from the seed packet.
+                      Ignored if DeleteCount is zero.
+  @param  AppendCount Number of entries in the OptionList.
+  @param  AppendList  Pointer to a DHCP option list to be appended to SeedPacket.
+                      If SeedPacket also contains options in this list, they are
+                      replaced by new options (except pad option). Ignored if
+                      AppendCount is zero. Type EFI_DHCP4_PACKET_OPTION
+  @param  NewPacket   Pointer to storage for the pointer to the new allocated packet.
+                      Use the EFI Boot Service FreePool() on the resulting pointer
+                      when done with the packet.
+
+  @retval EFI_SUCCESS           The new packet was built.
+  @retval EFI_OUT_OF_RESOURCES  Storage for the new packet could not be allocated.
+  @retval EFI_INVALID_PARAMETER Some parameter is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4Build (
+  IN EFI_DHCP4_PROTOCOL       *This,
+  IN EFI_DHCP4_PACKET         *SeedPacket,
+  IN UINT32                   DeleteCount,
+  IN UINT8                    *DeleteList OPTIONAL,
+  IN UINT32                   AppendCount,
+  IN EFI_DHCP4_PACKET_OPTION  *AppendList[] OPTIONAL,
+  OUT EFI_DHCP4_PACKET        **NewPacket
+  );
+  
+  /**
+  Transmits a DHCP formatted packet and optionally waits for responses.
+  
+  The TransmitReceive() function is used to transmit a DHCP packet and optionally
+  wait for the response from servers. This function does not change the state of
+  the EFI DHCPv4 Protocol driver and thus can be used at any time.
+
+  @param  This    Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Token   Pointer to the EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN structure.
+
+  @retval EFI_SUCCESS           The packet was successfully queued for transmission.
+  @retval EFI_INVALID_PARAMETER Some parameter is NULL.
+  @retval EFI_NOT_READY         The previous call to this function has not finished yet. Try to call
+                                this function after collection process completes.
+  @retval EFI_NO_MAPPING        The default station address is not available yet.
+  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval Others                Some other unexpected error occurred.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4TransmitReceive (
+  IN EFI_DHCP4_PROTOCOL                *This,
+  IN EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token
+  );
+
+/**
+  Parses the packed DHCP option data.
+  
+  The Parse() function is used to retrieve the option list from a DHCP packet.
+  If *OptionCount isn’t zero, and there is enough space for all the DHCP options
+  in the Packet, each element of PacketOptionList is set to point to somewhere in
+  the Packet->Dhcp4.Option where a new DHCP option begins. If RFC3396 is supported,
+  the caller should reassemble the parsed DHCP options to get the finial result.
+  If *OptionCount is zero or there isn’t enough space for all of them, the number
+  of DHCP options in the Packet is returned in OptionCount.
+
+  @param  This             Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Packet           Pointer to packet to be parsed.
+  @param  OptionCount      On input, the number of entries in the PacketOptionList.
+                           On output, the number of entries that were written into the
+                           PacketOptionList.
+  @param  PacketOptionList List of packet option entries to be filled in. End option or pad
+                           options are not included.
+
+  @retval EFI_SUCCESS           The packet was successfully parsed.
+  @retval EFI_INVALID_PARAMETER Some parameter is NULL.
+  @retval EFI_BUFFER_TOO_SMALL  One or more of the following conditions is TRUE:
+                                1) *OptionCount is smaller than the number of options that
+                                were found in the Packet.
+                                2) PacketOptionList is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiDhcp4Parse (
+  IN EFI_DHCP4_PROTOCOL       *This,
+  IN EFI_DHCP4_PACKET         *Packet,
+  IN OUT UINT32               *OptionCount,
+  OUT EFI_DHCP4_PACKET_OPTION *PacketOptionList[] OPTIONAL
+  );
+
+EFI_DHCP4_PROTOCOL  mDhcp4ProtocolTemplate = {
+  EfiDhcp4GetModeData,
+  EfiDhcp4Configure,
+  EfiDhcp4Start,
+  EfiDhcp4RenewRebind,
+  EfiDhcp4Release,
+  EfiDhcp4Stop,
+  EfiDhcp4Build,
+  EfiDhcp4TransmitReceive,
+  EfiDhcp4Parse
+};
+
+/**
+  Returns the current operating mode and cached data packet for the EFI DHCPv4 Protocol driver.
+  
+  The GetModeData() function returns the current operating mode and cached data
+  packet for the EFI DHCPv4 Protocol driver.
+
+  @param  This          Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Dhcp4ModeData Pointer to storage for the EFI_DHCP4_MODE_DATA structure.
+
+  @retval EFI_SUCCESS           The mode data was returned.
+  @retval EFI_INVALID_PARAMETER This is NULL.
 
 **/
 EFI_STATUS
@@ -64,7 +388,7 @@ EfiDhcp4GetModeData (
   // Caller can use GetModeData to retrieve current DHCP states
   // no matter whether it is the active child or not.
   //
-  Dhcp4ModeData->State                     = (EFI_DHCP4_STATE) DhcpSb->DhcpState;
+  Dhcp4ModeData->State = (EFI_DHCP4_STATE) DhcpSb->DhcpState;
   CopyMem (&Dhcp4ModeData->ConfigData, &DhcpSb->ActiveConfig, sizeof (Dhcp4ModeData->ConfigData));
   CopyMem (&Dhcp4ModeData->ClientMacAddress, &DhcpSb->Mac, sizeof (Dhcp4ModeData->ClientMacAddress));
 
@@ -82,10 +406,10 @@ EfiDhcp4GetModeData (
   if (Para != NULL) {
     Ip = HTONL (Para->Router);
     CopyMem (&Dhcp4ModeData->RouterAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
-    Dhcp4ModeData->LeaseTime               = Para->Lease;
+    Dhcp4ModeData->LeaseTime = Para->Lease;
   } else {
     ZeroMem (&Dhcp4ModeData->RouterAddress, sizeof (EFI_IPv4_ADDRESS));
-    Dhcp4ModeData->LeaseTime               = 0xffffffff;
+    Dhcp4ModeData->LeaseTime = 0xffffffff;
   }
 
   Dhcp4ModeData->ReplyPacket = DhcpSb->Selected;
@@ -107,7 +431,7 @@ EfiDhcp4GetModeData (
 **/
 VOID
 DhcpCleanConfigure (
-  IN EFI_DHCP4_CONFIG_DATA  *Config
+  IN OUT EFI_DHCP4_CONFIG_DATA  *Config
   )
 {
   UINT32                    Index;
@@ -147,8 +471,8 @@ DhcpCleanConfigure (
 **/
 EFI_STATUS
 DhcpCopyConfigure (
-  IN EFI_DHCP4_CONFIG_DATA  *Dst,
-  IN EFI_DHCP4_CONFIG_DATA  *Src
+  OUT EFI_DHCP4_CONFIG_DATA  *Dst,
+  IN  EFI_DHCP4_CONFIG_DATA  *Src
   )
 {
   EFI_DHCP4_PACKET_OPTION   **DstOptions;
@@ -271,18 +595,45 @@ DhcpYieldControl (
 
 
 /**
-  Configure the DHCP protocol instance and its underlying DHCP service
-  for operation. If Dhcp4CfgData is NULL and the child is currently
-  controlling the DHCP service, release the control.
+  Initializes, changes, or resets the operational settings for the EFI DHCPv4 Protocol driver.
 
-  @param  This                   The DHCP protocol instance
-  @param  Dhcp4CfgData           The DHCP configure data.
+  The Configure() function is used to initialize, change, or reset the operational
+  settings of the EFI DHCPv4 Protocol driver for the communication device on which
+  the EFI DHCPv4 Service Binding Protocol is installed. This function can be
+  successfully called only if both of the following are true:
+  * This instance of the EFI DHCPv4 Protocol driver is in the Dhcp4Stopped, Dhcp4Init,
+    Dhcp4InitReboot, or Dhcp4Bound states.
+  * No other EFI DHCPv4 Protocol driver instance that is controlled by this EFI
+    DHCPv4 Service Binding Protocol driver instance has configured this EFI DHCPv4
+    Protocol driver.
+  When this driver is in the Dhcp4Stopped state, it can transfer into one of the
+  following two possible initial states:
+  * Dhcp4Init
+  * Dhcp4InitReboot
+  The driver can transfer into these states by calling Configure() with a non-NULL
+  Dhcp4CfgData. The driver will transfer into the appropriate state based on the
+  supplied client network address in the ClientAddress parameter and DHCP options
+  in the OptionList parameter as described in RFC 2131.
+  When Configure() is called successfully while Dhcp4CfgData is set to NULL, the
+  default configuring data will be reset in the EFI DHCPv4 Protocol driver and
+  the state of the EFI DHCPv4 Protocol driver will not be changed. If one instance
+  wants to make it possible for another instance to configure the EFI DHCPv4 Protocol
+  driver, it must call this function with Dhcp4CfgData set to NULL.
 
-  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
-  @retval EFI_ACCESS_DENIED      The service isn't in one of configurable states,
-                                 or there is already an active child.
-  @retval EFI_OUT_OF_RESOURCE    Failed to allocate some resources.
-  @retval EFI_SUCCESS            The child is configured.
+  @param  This                   Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Dhcp4CfgData           Pointer to the EFI_DHCP4_CONFIG_DATA.
+
+  @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Init or
+                                Dhcp4InitReboot state, if the original state of this driver
+                                was Dhcp4Stopped and the value of Dhcp4CfgData was
+                                not NULL. Otherwise, the state was left unchanged.
+  @retval EFI_ACCESS_DENIED     This instance of the EFI DHCPv4 Protocol driver was not in the
+                                Dhcp4Stopped, Dhcp4Init, Dhcp4InitReboot, or Dhcp4Bound state;
+                                Or onother instance of this EFI DHCPv4 Protocol driver is already
+                                in a valid configured state.
+  @retval EFI_INVALID_PARAMETER Some parameter is NULL.
+  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
 EFI_STATUS
@@ -394,15 +745,43 @@ ON_EXIT:
 
 
 /**
-  Start the DHCP process.
+  Starts the DHCP configuration process.
 
-  @param  This                   The DHCP protocol instance
-  @param  CompletionEvent        The event to signal is address is acquired.
+  The Start() function starts the DHCP configuration process. This function can
+  be called only when the EFI DHCPv4 Protocol driver is in the Dhcp4Init or
+  Dhcp4InitReboot state.
+  If the DHCP process completes successfully, the state of the EFI DHCPv4 Protocol
+  driver will be transferred through Dhcp4Selecting and Dhcp4Requesting to the
+  Dhcp4Bound state. The CompletionEvent will then be signaled if it is not NULL.
+  If the process aborts, either by the user or by some unexpected network error,
+  the state is restored to the Dhcp4Init state. The Start() function can be called
+  again to restart the process.
+  Refer to RFC 2131 for precise state transitions during this process. At the
+  time when each event occurs in this process, the callback function that was set
+  by EFI_DHCP4_PROTOCOL.Configure() will be called and the user can take this
+  opportunity to control the process.
+  
+  @param  This            Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  CompletionEvent If not NULL, indicates the event that will be signaled when the
+                          EFI DHCPv4 Protocol driver is transferred into the
+                          Dhcp4Bound state or when the DHCP process is aborted.
+                          EFI_DHCP4_PROTOCOL.GetModeData() can be called to
+                          check the completion status. If NULL,
+                          EFI_DHCP4_PROTOCOL.Start() will wait until the driver
+                          is transferred into the Dhcp4Bound state or the process fails.
 
-  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
-  @retval EFI_NOT_STARTED        The protocol hasn't been configured.
-  @retval EFI_ALREADY_STARTED    The DHCP process has already been started.
-  @retval EFI_SUCCESS            The DHCP process is started.
+  @retval EFI_SUCCESS           The DHCP configuration process has started, or it has completed
+                                when CompletionEvent is NULL.
+  @retval EFI_NOT_STARTED       The EFI DHCPv4 Protocol driver is in the Dhcp4Stopped
+                                state. EFI_DHCP4_PROTOCOL. Configure() needs to be called.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval EFI_TIMEOUT           The DHCP configuration process failed because no response was
+                                received from the server within the specified timeout value.
+  @retval EFI_ABORTED           The user aborted the DHCP process.
+  @retval EFI_ALREADY_STARTED   Some other EFI DHCPv4 Protocol instance already started the
+                                DHCP process.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
 EFI_STATUS
@@ -482,16 +861,41 @@ ON_ERROR:
 
 
 /**
-  Request an extra manual renew/rebind.
+  Extends the lease time by sending a request packet.
+  
+  The RenewRebind() function is used to manually extend the lease time when the
+  EFI DHCPv4 Protocol driver is in the Dhcp4Bound state and the lease time has
+  not expired yet. This function will send a request packet to the previously
+  found server (or to any server when RebindRequest is TRUE) and transfer the
+  state into the Dhcp4Renewing state (or Dhcp4Rebinding when RebindingRequest is
+  TRUE). When a response is received, the state is returned to Dhcp4Bound.
+  If no response is received before the try count is exceeded (the RequestTryCount
+  field that is specified in EFI_DHCP4_CONFIG_DATA) but before the lease time that
+  was issued by the previous server expires, the driver will return to the Dhcp4Bound
+  state and the previous configuration is restored. The outgoing and incoming packets
+  can be captured by the EFI_DHCP4_CALLBACK function.
 
-  @param  This                   The DHCP protocol instance
-  @param  RebindRequest          TRUE if request a rebind, otherwise renew it
-  @param  CompletionEvent        Event to signal when complete
+  @param  This            Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  RebindRequest   If TRUE, this function broadcasts the request packets and enters
+                          the Dhcp4Rebinding state. Otherwise, it sends a unicast
+                          request packet and enters the Dhcp4Renewing state.
+  @param  CompletionEvent If not NULL, this event is signaled when the renew/rebind phase
+                          completes or some error occurs.
+                          EFI_DHCP4_PROTOCOL.GetModeData() can be called to
+                          check the completion status. If NULL,
+                          EFI_DHCP4_PROTOCOL.RenewRebind() will busy-wait
+                          until the DHCP process finishes.
 
-  @retval EFI_INVALID_PARAMETER  The parameters are invalid
-  @retval EFI_NOT_STARTED        The DHCP protocol hasn't been started.
-  @retval EFI_ACCESS_DENIED      The DHCP protocol isn't in Bound state.
-  @retval EFI_SUCCESS            The DHCP is renewed/rebound.
+  @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the
+                                Dhcp4Renewing state or is back to the Dhcp4Bound state.
+  @retval EFI_NOT_STARTED       The EFI DHCPv4 Protocol driver is in the Dhcp4Stopped
+                                state. EFI_DHCP4_PROTOCOL.Configure() needs to
+                                be called.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_TIMEOUT           There was no response from the server when the try count was
+                                exceeded.
+  @retval EFI_ACCESS_DENIED     The driver is not in the Dhcp4Bound state.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
 EFI_STATUS
@@ -582,15 +986,24 @@ ON_ERROR:
 
 
 /**
-  Release the current acquired lease.
+  Releases the current address configuration.
 
-  @param  This                   The DHCP protocol instance
+  The Release() function releases the current configured IP address by doing either
+  of the following:
+  * Sending a DHCPRELEASE packet when the EFI DHCPv4 Protocol driver is in the
+    Dhcp4Bound state
+  * Setting the previously assigned IP address that was provided with the
+    EFI_DHCP4_PROTOCOL.Configure() function to 0.0.0.0 when the driver is in
+    Dhcp4InitReboot state
+  After a successful call to this function, the EFI DHCPv4 Protocol driver returns
+  to the Dhcp4Init state and any subsequent incoming packets will be discarded silently.
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invalid
-  @retval EFI_DEVICE_ERROR       Failed to transmit the DHCP release packet
-  @retval EFI_ACCESS_DENIED      The DHCP service isn't in one of the connected
-                                 state.
-  @retval EFI_SUCCESS            The lease is released.
+  @param  This                  Pointer to the EFI_DHCP4_PROTOCOL instance.
+
+  @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Init phase.
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_ACCESS_DENIED     The EFI DHCPv4 Protocol driver is not Dhcp4InitReboot state.
+  @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
 EFI_STATUS
@@ -650,13 +1063,18 @@ ON_EXIT:
 
 
 /**
-  Stop the current DHCP process. After this, other DHCP child
-  can gain control of the service, configure and use it.
+  Stops the current address configuration.
+  
+  The Stop() function is used to stop the DHCP configuration process. After this
+  function is called successfully, the EFI DHCPv4 Protocol driver is transferred
+  into the Dhcp4Stopped state. EFI_DHCP4_PROTOCOL.Configure() needs to be called
+  before DHCP configuration process can be started again. This function can be
+  called when the EFI DHCPv4 Protocol driver is in any state.
 
-  @param  This                   The DHCP protocol instance
+  @param  This                  Pointer to the EFI_DHCP4_PROTOCOL instance.
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invalid.
-  @retval EFI_SUCCESS            The DHCP process is stopped.
+  @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Stopped phase.
+  @retval EFI_INVALID_PARAMETER This is NULL.
 
 **/
 EFI_STATUS
@@ -696,21 +1114,30 @@ EfiDhcp4Stop (
 
 
 /**
-  Build a new DHCP packet from the seed packet. Options may be deleted or
-  appended. The caller should free the NewPacket when finished using it.
+  Builds a DHCP packet, given the options to be appended or deleted or replaced.
 
-  @param  This                   The DHCP protocol instance.
-  @param  SeedPacket             The seed packet to start with
-  @param  DeleteCount            The number of options to delete
-  @param  DeleteList             The options to delete from the packet
-  @param  AppendCount            The number of options to append
-  @param  AppendList             The options to append to the packet
-  @param  NewPacket              The new packet, allocated and built by this
-                                 function.
+  The Build() function is used to assemble a new packet from the original packet
+  by replacing or deleting existing options or appending new options. This function
+  does not change any state of the EFI DHCPv4 Protocol driver and can be used at
+  any time.
 
-  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
-  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
-  @retval EFI_SUCCESS            The packet is build.
+  @param  This        Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  SeedPacket  Initial packet to be used as a base for building new packet.
+  @param  DeleteCount Number of opcodes in the DeleteList.
+  @param  DeleteList  List of opcodes to be deleted from the seed packet.
+                      Ignored if DeleteCount is zero.
+  @param  AppendCount Number of entries in the OptionList.
+  @param  AppendList  Pointer to a DHCP option list to be appended to SeedPacket.
+                      If SeedPacket also contains options in this list, they are
+                      replaced by new options (except pad option). Ignored if
+                      AppendCount is zero. Type EFI_DHCP4_PACKET_OPTION
+  @param  NewPacket   Pointer to storage for the pointer to the new allocated packet.
+                      Use the EFI Boot Service FreePool() on the resulting pointer
+                      when done with the packet.
+
+  @retval EFI_SUCCESS           The new packet was built.
+  @retval EFI_OUT_OF_RESOURCES  Storage for the new packet could not be allocated.
+  @retval EFI_INVALID_PARAMETER Some parameter is NULL.
 
 **/
 EFI_STATUS
@@ -755,6 +1182,15 @@ EfiDhcp4Build (
            );
 }
 
+/**
+  Callback by UdpIoCreatePort() when creating UdpIo for this Dhcp4 instance.
+  
+  @param UdpIo      The UdpIo being created.
+  @param Context    Dhcp4 instance.
+  
+  @retval EFI_SUCCESS   UdpIo is configured successfully.
+  @retval other         Other error occurs.
+**/
 EFI_STATUS
 Dhcp4InstanceConfigUdpIo (
   IN UDP_IO_PORT  *UdpIo,
@@ -793,9 +1229,18 @@ Dhcp4InstanceConfigUdpIo (
   return UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfigData);
 }
 
+/**
+  Create UdpIo for this Dhcp4 instance.
+  
+  @param Instance   The Dhcp4 instance.
+  
+  @retval EFI_SUCCESS                UdpIo is created successfully.
+  @retval EFI_OUT_OF_RESOURCES       Fails to create UdpIo because of limited
+                                     resources or configuration failure.
+**/
 EFI_STATUS
 Dhcp4InstanceCreateUdpIo (
-  IN DHCP_PROTOCOL  *Instance
+  IN OUT DHCP_PROTOCOL  *Instance
   )
 {
   DHCP_SERVICE  *DhcpSb;
@@ -811,28 +1256,34 @@ Dhcp4InstanceCreateUdpIo (
   }
 }
 
+/**
+  Callback of Dhcp packet. Does nothing.
+  
+  @param Arg           The context.
+  
+  @return  None.
+**/
 VOID
 DhcpDummyExtFree (
   IN VOID                   *Arg
   )
-/*++
-
-Routine Description:
-
-  Release the packet.
-
-Arguments:
-
-  Arg - The packet to release
-
-Returns:
-
-  None
-
---*/
 {
 }
 
+/**
+  Callback of UdpIoRecvDatagram() that handles a Dhcp4 packet.
+  
+  Only BOOTP responses will be handled that correspond to the Xid of the request
+  sent out. The packet will be queued to the response queue.
+  
+  @param UdpPacket        The Dhcp4 packet.
+  @param Points           Udp4 address pair.
+  @param IoStatus         Status of the input.
+  @param Context          Extra info for the input.
+  
+  @return None.
+  
+**/
 VOID
 PxeDhcpInput (
   NET_BUF                   *UdpPacket,
@@ -856,7 +1307,7 @@ PxeDhcpInput (
   DhcpSb   = Instance->Service;
 
   //
-  // Don't restart receive if error occurs or DHCP is destoried.
+  // Don't restart receive if error occurs or DHCP is destroyed.
   //
   if (EFI_ERROR (IoStatus)) {
     return ;
@@ -930,6 +1381,14 @@ RESTART:
   }
 }
 
+/**
+  Complete a Dhcp4 transaction and signal the upper layer.
+  
+  @param Instance      Dhcp4 instance.
+  
+  @return None.
+
+**/
 VOID
 PxeDhcpDone (
   IN DHCP_PROTOCOL  *Instance
@@ -948,7 +1407,7 @@ PxeDhcpDone (
     }
 
     //
-    // Copy the recieved DHCP responses.
+    // Copy the received DHCP responses.
     //
     NetbufQueCopy (&Instance->ResponseQueue, 0, Instance->ResponseQueue.BufSize, (UINT8 *) Token->ResponseList);
     Token->Status = EFI_SUCCESS;
@@ -959,7 +1418,7 @@ PxeDhcpDone (
 
 SIGNAL_USER:
   //
-  // Clean the resources dedicated for this transmit receive transaction.
+  // Clean up the resources dedicated for this transmit receive transaction.
   //
   NetbufQueFlush (&Instance->ResponseQueue);
   UdpIoCleanPort (Instance->UdpIo);
@@ -975,6 +1434,10 @@ SIGNAL_USER:
 
 /**
   Transmits a DHCP formatted packet and optionally waits for responses.
+  
+  The TransmitReceive() function is used to transmit a DHCP packet and optionally
+  wait for the response from servers. This function does not change the state of
+  the EFI DHCPv4 Protocol driver and thus can be used at any time.
 
   @param  This    Pointer to the EFI_DHCP4_PROTOCOL instance.
   @param  Token   Pointer to the EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN structure.
@@ -1020,16 +1483,17 @@ EfiDhcp4TransmitReceive (
     return EFI_NOT_READY;
   }
 
-  if ((Token->Packet->Dhcp4.Magik != DHCP_OPTION_MAGIC) ||
-    (NTOHL (Token->Packet->Dhcp4.Header.Xid) == Instance->Service->Xid) ||
-    (Token->TimeoutValue == 0) ||
-    ((Token->ListenPointCount != 0) && (Token->ListenPoints == NULL)) ||
-    EFI_ERROR (DhcpValidateOptions (Token->Packet, NULL)) ||
-    EFI_IP4_EQUAL (&Token->RemoteAddress, &mZeroIp4Addr)) {
+  if ((Token->Packet->Dhcp4.Magik != DHCP_OPTION_MAGIC)                   ||
+      (NTOHL (Token->Packet->Dhcp4.Header.Xid) == Instance->Service->Xid) ||
+      (Token->TimeoutValue == 0)                                          ||
+      ((Token->ListenPointCount != 0) && (Token->ListenPoints == NULL))   ||
+      EFI_ERROR (DhcpValidateOptions (Token->Packet, NULL))               ||
+      EFI_IP4_EQUAL (&Token->RemoteAddress, &mZeroIp4Addr)
+      ) {
     //
-    // The DHCP packet isn't well-formed, the Transaction ID is already used
-    // , the timeout value is zero, the ListenPoint is invalid,
-    // or the RemoteAddress is zero.
+    // The DHCP packet isn't well-formed, the Transaction ID is already used,
+    // the timeout value is zero, the ListenPoint is invalid, or the
+    // RemoteAddress is zero.
     //
     return EFI_INVALID_PARAMETER;
   }
@@ -1058,7 +1522,11 @@ EfiDhcp4TransmitReceive (
   //
   // Save the Client Address is sent out
   //
-  CopyMem (&DhcpSb->ClientAddressSendOut[0], &Token->Packet->Dhcp4.Header.ClientHwAddr[0], Token->Packet->Dhcp4.Header.HwAddrLen);
+  CopyMem (
+    &DhcpSb->ClientAddressSendOut[0],
+    &Token->Packet->Dhcp4.Header.ClientHwAddr[0],
+    Token->Packet->Dhcp4.Header.HwAddrLen
+    );
 
   //
   // Wrap the DHCP packet into a net buffer.
@@ -1147,7 +1615,7 @@ ON_ERROR:
   the individual DHCP option in the packet.
 
   @param  Tag                    The DHCP option type
-  @param  Len                    length of the DHCP option data
+  @param  Len                    Length of the DHCP option data
   @param  Data                   The DHCP option data
   @param  Context                The context, to pass several parameters in.
 
@@ -1181,18 +1649,30 @@ Dhcp4ParseCheckOption (
 
 
 /**
-  Parse the DHCP options in the Packet into the PacketOptionList.
-  User should allocate this array of EFI_DHCP4_PACKET_OPTION points.
+  Parses the packed DHCP option data.
+  
+  The Parse() function is used to retrieve the option list from a DHCP packet.
+  If *OptionCount isn’t zero, and there is enough space for all the DHCP options
+  in the Packet, each element of PacketOptionList is set to point to somewhere in
+  the Packet->Dhcp4.Option where a new DHCP option begins. If RFC3396 is supported,
+  the caller should reassemble the parsed DHCP options to get the finial result.
+  If *OptionCount is zero or there isn’t enough space for all of them, the number
+  of DHCP options in the Packet is returned in OptionCount.
 
-  @param  This                   The DHCP protocol instance
-  @param  Packet                 The DHCP packet to parse
-  @param  OptionCount            On input, the size of the PacketOptionList; On
-                                 output,  the actual number of options processed.
-  @param  PacketOptionList       The array of EFI_DHCP4_PACKET_OPTION points
+  @param  This             Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Packet           Pointer to packet to be parsed.
+  @param  OptionCount      On input, the number of entries in the PacketOptionList.
+                           On output, the number of entries that were written into the
+                           PacketOptionList.
+  @param  PacketOptionList List of packet option entries to be filled in. End option or pad
+                           options are not included.
 
-  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
-  @retval EFI_BUFFER_TOO_SMALL   A bigger array of points is needed.
-  @retval EFI_SUCCESS            The options are parsed.
+  @retval EFI_SUCCESS           The packet was successfully parsed.
+  @retval EFI_INVALID_PARAMETER Some parameter is NULL.
+  @retval EFI_BUFFER_TOO_SMALL  One or more of the following conditions is TRUE:
+                                1) *OptionCount is smaller than the number of options that
+                                were found in the Packet.
+                                2) PacketOptionList is NULL.
 
 **/
 EFI_STATUS
@@ -1245,16 +1725,3 @@ EfiDhcp4Parse (
 
   return EFI_SUCCESS;
 }
-
-EFI_DHCP4_PROTOCOL  mDhcp4ProtocolTemplate = {
-  EfiDhcp4GetModeData,
-  EfiDhcp4Configure,
-  EfiDhcp4Start,
-  EfiDhcp4RenewRebind,
-  EfiDhcp4Release,
-  EfiDhcp4Stop,
-  EfiDhcp4Build,
-  EfiDhcp4TransmitReceive,
-  EfiDhcp4Parse
-};
-

@@ -24,9 +24,9 @@ Abstract:
 #ifndef __EFI_DHCP4_OPTION_H__
 #define __EFI_DHCP4_OPTION_H__
 
-//
-// DHCP option tags (types)
-//
+///
+/// DHCP option tags (types)
+///
 typedef enum {
   //
   // RFC1497 vendor extensions
@@ -158,19 +158,19 @@ typedef enum {
   DHCP_OVERLOAD_BOTH       = 3
 } DHCP_OVERLOAD_TYPE;
 
-//
-// The DHCP option structure. This structure extends the EFI_DHCP_OPTION
-// structure to support options longer than 255 bytes, such as classless route.
-//
+///
+/// The DHCP option structure. This structure extends the EFI_DHCP_OPTION
+/// structure to support options longer than 255 bytes, such as classless route.
+///
 typedef struct {
   UINT8                     Tag;
   UINT16                    Len;
   UINT8                     *Data;
 } DHCP_OPTION;
 
-//
-// Structures used to parse the DHCP options with RFC3396 support.
-//
+///
+/// Structures used to parse the DHCP options with RFC3396 support.
+///
 typedef struct {
   UINT8                     Index;
   UINT16                    Offset;
@@ -182,11 +182,11 @@ typedef struct {
   UINT8                     *Buf;
 } DHCP_OPTION_CONTEXT;
 
-//
-// The options that matters to DHCP driver itself. The user of
-// DHCP clients may be interested in other options, such as
-// classless route, who can parse the DHCP offer to get them.
-//
+///
+/// The options that matters to DHCP driver itself. The user of
+/// DHCP clients may be interested in other options, such as
+/// classless route, who can parse the DHCP offer to get them.
+///
 typedef struct {
   IP4_ADDR                  NetMask;  // DHCP_TAG_NETMASK
   IP4_ADDR                  Router;   // DHCP_TAG_ROUTER, only the first router is used
@@ -202,14 +202,14 @@ typedef struct {
   UINT32                    T2;       // DHCP_TAG_T2
 } DHCP_PARAMETER;
 
-//
-// Structure used to describe and validate the format of DHCP options.
-// Type is the options' data type, such as DHCP_OPTION_INT8. MinOccur
-// is the minium occurance of this data type. MaxOccur is defined
-// similarly. If MaxOccur is -1, it means that there is no limit on the
-// maximum occurance. Alert tells whether DHCP client should further
-// inspect the option to parse DHCP_PARAMETER.
-//
+///
+/// Structure used to describe and validate the format of DHCP options.
+/// Type is the options' data type, such as DHCP_OPTION_INT8. MinOccur
+/// is the minium occurance of this data type. MaxOccur is defined
+/// similarly. If MaxOccur is -1, it means that there is no limit on the
+/// maximum occurance. Alert tells whether DHCP client should further
+/// inspect the option to parse DHCP_PARAMETER.
+///
 typedef struct {
   UINT8                     Tag;
   INTN                      Type;
