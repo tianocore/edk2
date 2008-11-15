@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "DxeIpl.h"
+#include "X64/VirtualMemory.h"
 
 
 
@@ -36,6 +37,7 @@ HandOffToDxeCore (
   VOID                *BaseOfStack;
   VOID                *TopOfStack;
   EFI_STATUS          Status;
+  UINTN               PageTables;
 
   //
   // Allocate 128KB for the Stack
@@ -51,10 +53,17 @@ HandOffToDxeCore (
   TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
   //
+  // Create page table and save PageMapLevel4 to CR3
+  //
+  PageTables = CreateIdentityMappingPageTables ();
+
+  //
   // End of PEI phase singal
   //
   Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
   ASSERT_EFI_ERROR (Status);
+
+  AsmWriteCr3 (PageTables);
 
   //
   // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
