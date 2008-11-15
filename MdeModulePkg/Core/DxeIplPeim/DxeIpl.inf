@@ -46,6 +46,8 @@
   Ia32/IdtVectorAsm.S | GCC
 
 [Sources.X64, Sources.EBC]
+  X64/VirtualMemory.h
+  X64/VirtualMemory.c
   X64/DxeLoadFunc.c
   Ia32/ImageRead.c
 
