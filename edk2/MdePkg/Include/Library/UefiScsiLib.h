@@ -13,25 +13,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _SCSI_LIB_H_
-#define _SCSI_LIB_H_
+#ifndef __SCSI_LIB_H__
+#define __SCSI_LIB_H__
 
 #include <Protocol/ScsiIo.h>
-
-//
-// the time unit is 100ns, since the SCSI I/O defines timeout in 100ns unit.
-//
-#define EFI_SCSI_STALL_1_MICROSECOND  10
-#define EFI_SCSI_STALL_1_MILLISECOND  10000
-#define EFI_SCSI_STALL_1_SECOND       10000000
-
-///
-/// this macro cannot be directly used by the gBS->Stall(),
-/// since the value output by this macro is in 100ns unit,
-/// not 1us unit (1us = 1000ns)
-///
-#define EFI_SCSI_STALL_SECONDS(a)  ((a) * EFI_SCSI_STALL_1_SECOND)
-
 
 /**
   Execute Test Unit Ready SCSI command on a specific SCSI target.
