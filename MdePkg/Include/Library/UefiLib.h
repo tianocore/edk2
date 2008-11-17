@@ -29,6 +29,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverDiagnostics.h>
 #include <Protocol/DriverDiagnostics2.h>
 
+#include <Library/BaseLib.h>
+
 ///
 /// Unicode String Table
 ///
@@ -54,6 +56,45 @@ typedef struct {
   EFI_TPL         OwnerTpl;
   EFI_LOCK_STATE  Lock;
 } EFI_LOCK;
+
+
+/**
+  Macro that returns the number of 100 ns units for a specified number of microseconds.
+  Useful for managing EFI timer events.
+
+  @param  Microseconds           Number of microseonds.
+
+  @return The number of 100 ns units equivalent to the number of microseconds specified
+          by Microseconds.
+
+**/
+#define EFI_TIMER_PERIOD_MICROSECONDS(Microseconds) MultU64x32((UINT64)(Microseconds), 10)
+
+
+/**
+  Macro that returns the number of 100 ns units for a specified number of milliseoconds.
+  Useful for managing EFI timer events.
+
+  @param  Milliseconds           Number of milliseconds.
+
+  @return The number of 100 ns units equivalent to the number of milliseconds specified
+          by Milliseconds.
+
+**/
+#define EFI_TIMER_PERIOD_MILLISECONDS(Milliseconds) MultU64x32((UINT64)(Milliseconds), 10000)
+
+
+/**
+  Macro that returns the number of 100 ns units for a specified number of seoconds.
+  Useful for managing EFI timer events.
+
+  @param  Seconds                Number of seconds.
+
+  @return The number of 100 ns units equivalent to the number of seconds specified
+          by Seconds.
+
+**/
+#define EFI_TIMER_PERIOD_SECONDS(Seconds)           MultU64x32((UINT64)(Seconds), 10000000)
 
 
 /**
