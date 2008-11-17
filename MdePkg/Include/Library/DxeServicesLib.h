@@ -1,7 +1,8 @@
 /** @file
-  MDE PI library functions and macros
+  MDE DXE Services Library provides functions that simplify the development of DXE Drivers.  
+  These functions help access data from sections of FFS files.
 
-  Copyright (c) 2007, Intel Corporation                                                         
+  Copyright (c) 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -19,48 +20,40 @@
 
 
 /**
-  Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
+  Searches all the availables firmware volumes and returns the first matching FFS section. 
 
-  GetSectionFromAnyFv  () is used to read a specific section from a file within a firmware volume. The function
-  will search the first file with the specified name in all firmware volumes in the system. The search order for firmware 
-  volumes in the system is determistic but abitrary if no new firmware volume is added into the system between 
-  each calls of this function. 
+  This function searches all the firmware volumes for FFS files with an FFS filename specified by NameGuid.  
+  The order that the firmware volumes is searched is not deterministic. For each FFS file found a search 
+  is made for FFS sections of type SectionType. If the FFS file contains at least SectionInstance instances 
+  of the FFS section specified by SectionType, then the SectionInstance instance is returned in Buffer. 
+  Buffer is allocated using AllocatePool(), and the size of the allocated buffer is returned in Size. 
+  It is the caller's responsibility to use FreePool() to free the allocated buffer.  
+  See EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection() for details on how sections 
+  are retrieved from an FFS file based on SectionType and SectionInstance.
 
-  After the specific file is located, the function searches the specifc firmware section with type SectionType in this file. 
-  The details of this search order is defined in description of EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection () 
-  found in PI Specification.
+  If SectionType is EFI_SECTION_TE, and the search with an FFS file fails, 
+  the search will be retried with a section type of EFI_SECTION_PE32.
+  This function must be called with a TPL <= TPL_NOTIFY.
 
-  If SectionType is EFI_SECTION_TE, EFI_SECTION_TE is used as section type to start the search. If EFI_SECTION_TE section 
-  is not found, EFI_SECTION_PE32 will be used to try the search again. If no EFI_SECTION_PE32 section is found, EFI_NOT_FOUND 
-  is returned.
-
-  The data and size is returned by Buffer and Size. The caller is responsible to free the Buffer allocated 
-  by this function. This function can only be called at TPL_NOTIFY and below.
-
-  If NameGuid is NULL, then ASSERT();
-  If Buffer is NULL, then ASSERT();
+  If NameGuid is NULL, then ASSERT().
+  If Buffer is NULL, then ASSERT().
   If Size is NULL, then ASSERT().
 
-  @param  NameGuid             Pointer to an EFI_GUID, which indicates the file name from which the requested 
-                               section will be read. Type EFI_GUID is defined in 
-                               InstallProtocolInterface() in the UEFI 2.0 specification. 
-  @param  SectionType          Indicates the section type to return. SectionType in conjunction with 
-                               SectionInstance indicates which section to return. Type 
-                               EFI_SECTION_TYPE is defined in EFI_COMMON_SECTION_HEADER.
-  @param  SectionInstance      Indicates which instance of sections with a type of SectionType to return. 
-                               SectionType in conjunction with SectionInstance indicates which section to 
-                               return. SectionInstance is zero based.
-  @param  Buffer               Pointer to a pointer to a buffer in which the section contents are returned, not 
-                               including the section header. Caller is responsible to free this memory.
-  @param  Size                 Pointer to a caller-allocated UINTN. It indicates the size of the memory represented by 
-                               *Buffer.
 
-  @retval  EFI_SUCCESS        The image is found and data and size is returned.
-  @retval  EFI_NOT_FOUND      The image specified by NameGuid and SectionType can't be found.
-  @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
-  @retval  EFI_DEVICE_ERROR A hardware error occurs during reading from the Firmware Volume.
-  @retval  EFI_ACCESS_DENIED  The firmware volume containing the searched Firmware File is configured to disallow reads.
+  @param  NameGuid             A pointer to to the FFS filename GUID to search for within 
+                               any of the firmware volumes in the platform. 
+  @param  SectionType          Indicates the FFS section type to search for within the FFS file specified by NameGuid.
+  @param  SectionInstance      Indicates which section instance within the FFS file specified by NameGuid to retrieve.
+  @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
+                               Is it the caller's respobsibility to free this buffer using FreePool().
+  @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
 
+  @retval  EFI_SUCCESS          The specified FFS section was returned.
+  @retval  EFI_NOT_FOUND        The specified FFS section could not be found.
+  @retval  EFI_OUT_OF_RESOURCES There are not enough rsources available to retrieve the matching FFS section.
+  @retval  EFI_DEVICE_ERROR     The FFS section could not be retrieves due to a device error.
+  @retval  EFI_ACCESS_DENIED    The FFS section could not be retrieves because the firmware volume that 
+                                contains the matching FFS section does not allow reads.
 **/
 EFI_STATUS
 EFIAPI
@@ -73,46 +66,41 @@ GetSectionFromAnyFv  (
   );
 
 /**
-  Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
+  Searches the firmware volume that the currently executing module was loaded from and returns the first matching FFS section. 
 
-  GetSectionFromFv () is used to read a specific section from a file within the same firmware volume from which
-  the running image is loaded. If the specific file is found, the function searches the specifc firmware section with type SectionType. 
-  The details of this search order is defined in description of EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection () 
-  found in PI Specification.
+  This function searches the firmware volume that the currently executing module was loaded 
+  from for an FFS file with an FFS filename specified by NameGuid. If the FFS file is found a search 
+  is made for FFS sections of type SectionType. If the FFS file contains at least SectionInstance 
+  instances of the FFS section specified by SectionType, then the SectionInstance instance is returned in Buffer.
+  Buffer is allocated using AllocatePool(), and the size of the allocated buffer is returned in Size. 
+  It is the caller's responsibility to use FreePool() to free the allocated buffer. 
+  See EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection() for details on how sections are retrieved from 
+  an FFS file based on SectionType and SectionInstance.
 
-  If SectionType is EFI_SECTION_TE, EFI_SECTION_TE is used as section type to start the search. If EFI_SECTION_TE section 
-  is not found, EFI_SECTION_PE32 will be used to try the search again. If no EFI_SECTION_PE32 section is found, EFI_NOT_FOUND 
-  is returned.
-
-  The data and size is returned by Buffer and Size. The caller is responsible to free the Buffer allocated 
-  by this function. This function can be only called at TPL_NOTIFY and below.
-
-  If NameGuid is NULL, then ASSERT();
-  If Buffer is NULL, then ASSERT();
+  If the currently executing module was not loaded from a firmware volume, then EFI_NOT_FOUND is returned.
+  If SectionType is EFI_SECTION_TE, and the search with an FFS file fails, 
+  the search will be retried with a section type of EFI_SECTION_PE32.
+  
+  This function must be called with a TPL <= TPL_NOTIFY.
+  If NameGuid is NULL, then ASSERT().
+  If Buffer is NULL, then ASSERT().
   If Size is NULL, then ASSERT().
 
-  @param  NameGuid             Pointer to an EFI_GUID, which indicates the file name from which the requested 
-                               section will be read. Type EFI_GUID is defined in 
-                               InstallProtocolInterface() in the UEFI 2.0 specification. 
-  @param  SectionType          Indicates the section type to return. SectionType in conjunction with 
-                               SectionInstance indicates which section to return. Type 
-                               EFI_SECTION_TYPE is defined in EFI_COMMON_SECTION_HEADER.
-  @param  SectionInstance      Indicates which instance of sections with a type of SectionType to return. 
-                               SectionType in conjunction with SectionInstance indicates which section to 
-                               return. SectionInstance is zero based.
-  @param  Buffer               Pointer to a pointer to a buffer in which the section contents are returned, not 
-                               including the section header. Caller is responsible to free this memory.
-  @param  Size                 Pointer to a caller-allocated UINTN. It indicates the size of the memory represented by 
-                               *Buffer.
+  @param  NameGuid             A pointer to to the FFS filename GUID to search for within 
+                               the firmware volumes that the currently executing module was loaded from.
+  @param  SectionType          Indicates the FFS section type to search for within the FFS file specified by NameGuid.
+  @param  SectionInstance      Indicates which section instance within the FFS file specified by NameGuid to retrieve.
+  @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
+                               Is it the caller's respobsibility to free this buffer using FreePool().
+  @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
 
 
-  @retval  EFI_SUCCESS        The image is found and data and size is returned.
-  @retval  EFI_UNSUPPORTED   FvHandle does not support EFI_FIRMWARE_VOLUME2_PROTOCOL.
-  @retval  EFI_NOT_FOUND      The image specified by NameGuid and SectionType can't be found.
-  @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
-  @retval  EFI_DEVICE_ERROR A hardware error occurs during reading from the Firmware Volume.
-  @retval  EFI_ACCESS_DENIED  The firmware volume containing the searched Firmware File is configured to disallow reads.
-  
+  @retval  EFI_SUCCESS          The specified FFS section was returned.
+  @retval  EFI_NOT_FOUND        The specified FFS section could not be found.
+  @retval  EFI_OUT_OF_RESOURCES There are not enough rsources available to retrieve the matching FFS section.
+  @retval  EFI_DEVICE_ERROR     The FFS section could not be retrieves due to a device error.
+  @retval  EFI_ACCESS_DENIED    The FFS section could not be retrieves because the firmware volume that 
+                                contains the matching FFS section does not allow reads.  
 **/
 EFI_STATUS
 EFIAPI
@@ -126,39 +114,38 @@ GetSectionFromFv (
 
 
 /**
-  Locates a requested firmware section within a file and returns it to a buffer allocated by this function. 
+  Searches the FFS file the the currently executing module was loaded from and returns the first matching FFS section.
 
-  GetSectionFromFfs () searches the specifc firmware section with type SectionType in the same firmware file from
-  which the running image is loaded. The details of this search order is defined in description of 
-  EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection () found in PI Specification.
+  This function searches the FFS file that the currently executing module was loaded from for a FFS sections of type SectionType.
+  If the FFS file contains at least SectionInstance instances of the FFS section specified by SectionType, 
+  then the SectionInstance instance is returned in Buffer. Buffer is allocated using AllocatePool(), 
+  and the size of the allocated buffer is returned in Size. It is the caller's responsibility 
+  to use FreePool() to free the allocated buffer. See EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection() for 
+  details on how sections are retrieved from an FFS file based on SectionType and SectionInstance.
 
-  If SectionType is EFI_SECTION_TE, EFI_SECTION_TE is used as section type to start the search. If EFI_SECTION_TE section 
-  is not found, EFI_SECTION_PE32 will be used to try the search again. If no EFI_SECTION_PE32 section is found, EFI_NOT_FOUND 
-  is returned.
-
-
-  The data and size is returned by Buffer and Size. The caller is responsible to free the Buffer allocated 
-  by this function. This function can only be called at TPL_NOTIFY and below.
-
-  If Buffer is NULL, then ASSERT();
+  If the currently executing module was not loaded from an FFS file, then EFI_NOT_FOUND is returned.
+  If SectionType is EFI_SECTION_TE, and the search with an FFS file fails, 
+  the search will be retried with a section type of EFI_SECTION_PE32.
+  This function must be called with a TPL <= TPL_NOTIFY.
+  
+  If Buffer is NULL, then ASSERT().
   If Size is NULL, then ASSERT().
 
-  @param  SectionType          Indicates the section type to return. SectionType in conjunction with 
-                               SectionInstance indicates which section to return. Type 
-                               EFI_SECTION_TYPE is defined in EFI_COMMON_SECTION_HEADER.
-  @param  SectionInstance      Indicates which instance of sections with a type of SectionType to return. 
-                               SectionType in conjunction with SectionInstance indicates which section to 
-                               return. SectionInstance is zero based.
-  @param  Buffer               Pointer to a pointer to a buffer in which the section contents are returned, not 
-                               including the section header. Caller is responsible to free this memory.
-  @param  Size                 Pointer to a caller-allocated UINTN. It indicates the size of the memory represented by 
-                               *Buffer.
 
-  @retval  EFI_SUCCESS        The image is found and data and size is returned.
-  @retval  EFI_NOT_FOUND      The image specified by NameGuid and SectionType can't be found.
-  @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
-  @retval  EFI_DEVICE_ERROR A hardware error occurs during reading from the Firmware Volume.
-  @retval  EFI_ACCESS_DENIED  The firmware volume containing the searched Firmware File is configured to disallow reads.
+  @param  SectionType          Indicates the FFS section type to search for within the FFS file 
+                               that the currently executing module was loaded from.
+  @param  SectionInstance      Indicates which section instance to retrieve within the FFS file 
+                               that the currently executing module was loaded from.
+  @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
+                               Is it the caller's respobsibility to free this buffer using FreePool().
+  @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
+
+  @retval  EFI_SUCCESS          The specified FFS section was returned.
+  @retval  EFI_NOT_FOUND        The specified FFS section could not be found.
+  @retval  EFI_OUT_OF_RESOURCES There are not enough rsources available to retrieve the matching FFS section.
+  @retval  EFI_DEVICE_ERROR     The FFS section could not be retrieves due to a device error.
+  @retval  EFI_ACCESS_DENIED    The FFS section could not be retrieves because the firmware volume that 
+                                contains the matching FFS section does not allow reads.  
   
 **/
 EFI_STATUS

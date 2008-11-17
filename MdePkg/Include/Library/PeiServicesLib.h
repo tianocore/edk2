@@ -398,26 +398,28 @@ PeiServicesRegisterForShadow (
   );
 
 /**
-  Install a EFI_PEI_FIRMWARE_VOLUME_INFO PPI to inform PEI core about the existence of a new Firmware Volume.
+  Install a EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance so the PEI Core will be notified about a new firmware volume.
   
-  The function allocate the EFI_PEI_PPI_DESCRIPTOR structure and update the fields accordingly to parameter passed
-  in and install the PPI.
+  This function allocates, initializes, and installs a new EFI_PEI_FIRMWARE_VOLUME_INFO_PPI using 
+  the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance.
+  If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO_PPI, then ASSERT().
+  If the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI can not be installed, then ASSERT().
+
   
-  @param  FvFormat             Unique identifier of the format of the memory-mapped firmware volume. 
-                               If NULL is specified, EFI_FIRMWARE_FILE_SYSTEM2_GUID is used as the Format GUID.
-  @param  FvInfo               Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to
-                               process the volume. The format of this buffer is specific to the FvFormat. For
-                               memory-mapped firmware volumes, this typically points to the first byte of the
-                               firmware volume.
-  @param  FvInfoSize           Size of the data provided by FvInfo. For memory-mapped firmware volumes, this is
-                               typically the size of the firmware volume.
-  @param  ParentFvName         If the firmware volume originally came from a firmware file, then these point to the
-                               parent firmware volume name. If it did not originally come from a firmware file, 
-                               these should be NULL.
-  @param  ParentFileName       If the firmware volume originally came from a firmware file, then these point to the
-                               firmware volume file. If it did not originally come from a firmware file, 
-                               these should be NULL.
-   
+  @param  FvFormat             Unique identifier of the format of the memory-mapped firmware volume.
+                               This parameter is optional and may be NULL.  
+                               If NULL is specified, the EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed.
+  @param  FvInfo               Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume. 
+                               The format of this buffer is specific to the FvFormat. For memory-mapped firmware volumes, 
+                               this typically points to the first byte of the firmware volume.
+  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped firmware volumes, 
+                               this is typically the size of the firmware volume.
+  @param  ParentFvName         If the new firmware volume originated from a file in a different firmware volume, 
+                               then this parameter specifies the GUID name of the originating firmware volume.
+                               Otherwise, this parameter must be NULL.
+  @param  ParentFileName       If the new firmware volume originated from a file in a different firmware volume, 
+                               then this parameter specifies the GUID file name of the originating firmware file.
+                               Otherwise, this parameter must be NULL.
 **/
 VOID
 EFIAPI

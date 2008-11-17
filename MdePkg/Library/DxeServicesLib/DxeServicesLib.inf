@@ -1,5 +1,5 @@
 #/** @file
-# Instance of PI Library for DXE phase.
+# DXE Services Library provides access data from sections of FFS files based on FV protocol.
 #
 # Copyright (c) 2007 - 2008, Intel Corporation.
 #
