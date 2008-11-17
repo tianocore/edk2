@@ -222,6 +222,17 @@ EDK_6496-6519:  Non-Compatible: qhuang8
 	11. Move library instance UefiIfrSupportLib to MdeModulePkg
 
 Possible Impacts:
-	 Every change listed above is non-backward compatibile for MdePkg and other packages. It is required to update module
+	 Every change listed above is non-backward compatible for MdePkg and other packages. It is required to update module
 	 sources (*.c;*.h), module meta data files (*.inf) and update the platform DSC files to fix the build break.
 	 However, it is less likely to bring about functional issue for these updates.
+
+
+EDK_6565:  Non-Compatible: qhuang8
+	
+	Remove some macro in UefiScsiLib:
+	EFI_SCSI_STALL_1_MICROSECOND, EFI_SCSI_STALL_1_MILLISECOND, EFI_SCSI_STALL_1_SECOND & EFI_SCSI_STALL_SECONDS(a)  
+	
+Possible Impacts:
+	Modules depending on UefiScsiLib for these macros should update the source to use new UefiLib macros
+	EFI_TIMER_PERIOD_MICROSECONDS(X), EFI_TIMER_PERIOD_MILLISECONDS(X) and EFI_TIMER_PERIOD_SECONDS(X) for managing Timer Events.
+	Especailly, EFI_SCSI_STALL_SECONDS(a) is simply replaced by EFI_TIMER_PERIOD_SECONDS(a)
