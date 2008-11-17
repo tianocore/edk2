@@ -20,9 +20,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define END_DEVICE_PATH_LENGTH               (sizeof (EFI_DEVICE_PATH_PROTOCOL))
 #define DevicePathNodeLength(Node)           ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0])
 #define NextDevicePathNode(Node)             ((EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength(Node)))
-#define DevicePathType(Node)                 (((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Type) 
+#define DevicePathType(Node)                 (((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Type)
 #define DevicePathSubType(Node)              (((EFI_DEVICE_PATH_PROTOCOL *)(Node))->SubType)
-#define IsDevicePathEndType(Node)            (DevicePathType (Node) == END_DEVICE_PATH_TYPE)
+#define IsDevicePathEndType(Node)            ((DevicePathType (Node) & 0x7f) == END_DEVICE_PATH_TYPE)
 #define IsDevicePathEnd(Node)                (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_ENTIRE_DEVICE_PATH_SUBTYPE)
 #define IsDevicePathEndInstance(Node)        (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_INSTANCE_DEVICE_PATH_SUBTYPE)
 
@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SetDevicePathEndNode(Node)  {                                   \
           DevicePathType (Node)    = END_DEVICE_PATH_TYPE;              \
           DevicePathSubType (Node) = END_ENTIRE_DEVICE_PATH_SUBTYPE;    \
-          SetDevicePathNodeLength ((Node), END_DEVICE_PATH_LENGTH);       \
+          SetDevicePathNodeLength ((Node), END_DEVICE_PATH_LENGTH);     \
           }
 
 /**
