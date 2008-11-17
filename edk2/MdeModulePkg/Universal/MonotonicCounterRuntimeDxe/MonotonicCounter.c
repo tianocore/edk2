@@ -1,6 +1,6 @@
 /** @file
-  
-  Produced the Monotonic Counter Services as defined in the DXE CIS.
+  Produce the UEFI boot service GetNextMonotonicCount() and runtime service
+  GetNextHighMonotonicCount().
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -13,50 +13,59 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#include <Uefi.h>
 
-#include "MonotonicCounter.h"
+#include <Protocol/MonotonicCounter.h>
+
+#include <Library/BaseLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiRuntimeLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
 //
-// The Monotonic Counter Handle
+// The handle to install Monotonic Counter Architctural Protocol
 //
 EFI_HANDLE  mMonotonicCounterHandle = NULL;
 
 //
-// The current Monotonic count value
+// The current monotonic counter value
 //
 UINT64      mEfiMtc;
 
 //
-// Event to use to update the Mtc's high part when wrapping
+// Event to update the monotonic Counter's high part when low part overflows.
 //
 EFI_EVENT   mEfiMtcEvent;
 
 //
-// EfiMtcName - Variable name of the MTC value
+// Name of the variable for the high part of monotonic counter
 //
 CHAR16      *mEfiMtcName = (CHAR16 *) L"MTC";
 
 //
-// EfiMtcGuid - Guid of the MTC value
+// Vendor GUID of the variable for the high part of monotonic counter
 //
 EFI_GUID    mEfiMtcGuid = { 0xeb704011, 0x1402, 0x11d3, { 0x8e, 0x77, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
 
 /**
-  Returns the low 32 bits of the platform's monotonic counter.
+  Returns a monotonically increasing count for the platform.
 
-  The platform's monotonic counter is comprised of two 32 bit quantities:  
-  the high 32 bits and the low 32 bits.
-  During boot service time the low 32 bit value is volatile:  it is reset to
-  zero on every system reset and is increased by 1 on every call to this function.
-  This function is only available at boot services time.
-  Before calling ExitBootServices() the operating system would call this function
-  to obtain the current platform monotonic count. 
+  This function returns a 64-bit value that is numerically larger then the last
+  time the function was called.
+  The platform’s monotonic counter is comprised of two parts: the high 32 bits
+  and the low 32 bits. The low 32-bit value is volatile and is reset to zero on
+  every system reset. It is increased by 1 on every call to GetNextMonotonicCount().
+  The high 32-bit value is nonvolatile and is increased by one on whenever the
+  system resets or the low 32-bit counter overflows.
 
   @param  Count	                Pointer to returned value.
 
-  @retval EFI_INVALID_PARAMETER If Count is NULL.
-  @retval EFI_SUCCESS           Operation is successful.
-  @retval EFI_UNSUPPORTED       If this function is called at Runtime.
+  @retval EFI_SUCCESS           The next monotonic count was returned.
+  @retval EFI_DEVICE_ERROR      The device is not functioning properly.
+  @retval EFI_INVALID_PARAMETER Count is NULL.
+  @retval EFI_UNSUPPORTED       This function is called at runtime.
 
 **/
 EFI_STATUS
@@ -68,7 +77,7 @@ MonotonicCounterDriverGetNextMonotonicCount (
   EFI_TPL OldTpl;
 
   //
-  // Can not be called after ExitBootServices()
+  // Cannot be called after ExitBootServices()
   //
   if (EfiAtRuntime ()) {
     return EFI_UNSUPPORTED;
@@ -88,10 +97,10 @@ MonotonicCounterDriverGetNextMonotonicCount (
   gBS->RestoreTPL (OldTpl);
 
   //
-  // If the MSB bit of the low part toggled, then signal that the high
-  // part needs updated now
+  // If the low 32-bit counter overflows (MSB bit toggled),
+  // then signal that the high part needs update now.
   //
-  if ((((UINT32) mEfiMtc) ^ ((UINT32) *Count)) & 0x80000000) {
+  if ((((UINT32) mEfiMtc) ^ ((UINT32) *Count)) & BIT31) {
     gBS->SignalEvent (mEfiMtcEvent);
   }
 
@@ -124,11 +133,11 @@ MonotonicCounterDriverGetNextMonotonicCount (
 
   @param  HighCount	            Pointer to returned value.
 
-  @retval EFI_INVALID_PARAMETER If HighCount is NULL.
-  @retval EFI_SUCCESS           Operation is successful.
+  @retval EFI_SUCCESS           The next high monotonic count was returned.
+  @retval EFI_INVALID_PARAMETER HighCount is NULL.
+  @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
   @retval EFI_OUT_OF_RESOURCES  If variable service reports that not enough storage
                                 is available to hold the variable and its data.
-  @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
 
 **/
 EFI_STATUS
@@ -159,7 +168,7 @@ MonotonicCounterDriverGetNextHighMonotonicCount (
     mEfiMtc     = LShiftU64 (*HighCount, 32);
   }
   //
-  // Update the NvRam store to match the new high part
+  // Update the NV variable to match the new high part
   //
   return EfiSetVariable (
            mEfiMtcName,
@@ -172,12 +181,10 @@ MonotonicCounterDriverGetNextHighMonotonicCount (
 }
 
 /**
-  Monotonic count event handler.  This handler updates the high monotonic count.
+  Monotonic counter event handler.  This handler updates the high part of monotonic counter.
 
   @param Event           The event to handle.
   @param Context         The event context.
-
-  @return None.
 
 **/
 VOID
@@ -193,12 +200,12 @@ EfiMtcEventHandler (
 }
 
 /**
-  The initial function of monotonic counter driver.
+  Entry point of monotonic counter driver.
 
-  @param  ImageHandle     The handle of image.
-  @param  SystemTable     The pointer to system table.
+  @param  ImageHandle   The image handle of this driver.
+  @param  SystemTable   The pointer of EFI_SYSTEM_TABLE.
 
-  @return EFI_SUCCESS     The initialize action is successful.
+  @return EFI_SUCCESS   The initialization is successful.
 
 **/
 EFI_STATUS
@@ -213,12 +220,12 @@ MonotonicCounterDriverInitialize (
   UINTN       BufferSize;
 
   //
-  // Make sure the Monotonic Counter Architectural Protocol is not already installed in the system
+  // Make sure the Monotonic Counter Architectural Protocol has not been installed in the system yet.
   //
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiMonotonicCounterArchProtocolGuid);
 
   //
-  // Initialize event to handle overflows
+  // Initialize event to handle low-part overflow
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -227,7 +234,6 @@ MonotonicCounterDriverInitialize (
                   NULL,
                   &mEfiMtcEvent
                   );
-
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -254,7 +260,7 @@ MonotonicCounterDriverInitialize (
   // Continue even if it fails.  It will only fail if the variable services are
   // not functional.
   //
-  Status = MonotonicCounterDriverGetNextHighMonotonicCount (&HighCount);
+  MonotonicCounterDriverGetNextHighMonotonicCount (&HighCount);
 
   //
   // Fill in the EFI Boot Services and EFI Runtime Services Monotonic Counter Fields
