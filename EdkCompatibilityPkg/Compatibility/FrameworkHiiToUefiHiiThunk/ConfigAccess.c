@@ -403,10 +403,19 @@ ThunkExtractConfig (
   VOID                                        *Data;
   UINTN                                       DataSize;
 
+  if (Request == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   Data = NULL;
   ConfigAccess = CONFIG_ACCESS_PRIVATE_FROM_PROTOCOL (This);
 
   BufferStorage = GetStorageFromConfigString (ConfigAccess->ThunkContext->FormSet, Request);
+
+  if (BufferStorage == NULL) {
+    *Progress = (EFI_STRING) Request;
+    return EFI_NOT_FOUND;
+  }
 
   if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
     //
@@ -491,10 +500,19 @@ ThunkRouteConfig (
   BOOLEAN                                     ResetRequired;
   BOOLEAN                                     DataAllocated;
 
+  if (Configuration == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Data = NULL;
   ConfigAccess = CONFIG_ACCESS_PRIVATE_FROM_PROTOCOL (This);
 
   BufferStorage = GetStorageFromConfigString (ConfigAccess->ThunkContext->FormSet, Configuration);
+
+  if (BufferStorage == NULL) {
+    *Progress = Configuration;
+    return EFI_NOT_FOUND;
+  }
 
   DataSize2     = BufferStorage->Size;
   if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
