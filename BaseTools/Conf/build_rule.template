@@ -251,8 +251,9 @@
         $(MAKE_FILE)
 
     <Command.MSFT, Command.INTEL>
-        "$(ASLPP)" $(ASLPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
-        "$(ASL)" -p ${dst} $(ASL_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        Trim --asl-file -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i ${src}
+        "$(ASLPP)" $(ASLPP_FLAGS) $(INC) /I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+        "$(ASL)" -p ${dst} $(ASL_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
 
 [C-Code-File.AcpiTable]
     <InputFile>

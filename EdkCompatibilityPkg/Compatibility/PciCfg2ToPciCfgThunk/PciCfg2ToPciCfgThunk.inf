@@ -17,7 +17,7 @@
 #             &gEcpPeiPciCfgPpiGuid,
 #             <*>
 #           };
-#           (**PeiServices).InstallPpi (PeiServices, gEcpPeiPciCfgPpiList);
+#           (**PeiServices).InstallPpi (PeiServices, &gEcpPeiPciCfgPpiList);
 #         }
 # 
 # In addition, the PeiServicesTable definition in PeiApi.h is updated to

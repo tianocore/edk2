@@ -57,6 +57,7 @@ COMPONENT_TYPE  = LIBRARY
 # used to replace EdkIIGluePeiServicesTablePointerLibMm7 or
 # EdkIIGluePeiServicesTablePointerLibKr1
 #
+  EdkFrameworkPpiLib
 
 [libraries.ia32]
   EdkIIGluePeiServicesTablePointerLibMm7
