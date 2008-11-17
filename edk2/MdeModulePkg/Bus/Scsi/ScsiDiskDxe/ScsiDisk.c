@@ -876,7 +876,7 @@ ScsiDiskInquiryDevice (
 
   Status = ScsiInquiryCommand (
             ScsiDiskDevice->ScsiIo,
-            EFI_SCSI_STALL_SECONDS (1),
+            EFI_TIMER_PERIOD_SECONDS (1),
             NULL,
             &SenseDataLength,
             &HostAdapterStatus,
@@ -1002,7 +1002,7 @@ ScsiDiskTestUnitReady (
   //
   Status = ScsiTestUnitReadyCommand (
             ScsiDiskDevice->ScsiIo,
-            EFI_SCSI_STALL_SECONDS (1),
+            EFI_TIMER_PERIOD_SECONDS (1),
             NULL,
             &SenseDataLength,
             &HostAdapterStatus,
@@ -1192,7 +1192,7 @@ ScsiDiskReadCapacity (
   //
   CommandStatus = ScsiReadCapacityCommand (
                     ScsiDiskDevice->ScsiIo,
-                    EFI_SCSI_STALL_SECONDS (1),
+                    EFI_TIMER_PERIOD_SECONDS (1),
                     NULL,
                     &SenseDataLength,
                     &HostAdapterStatus,
@@ -1409,7 +1409,7 @@ ScsiDiskRequestSenseKeys (
   for (SenseReq = TRUE; SenseReq;) {
     Status = ScsiRequestSenseCommand (
               ScsiDiskDevice->ScsiIo,
-              EFI_SCSI_STALL_SECONDS (2),
+              EFI_TIMER_PERIOD_SECONDS (2),
               PtrSenseData,
               &SenseDataLength,
               &HostAdapterStatus,
@@ -1567,7 +1567,7 @@ ScsiDiskReadSectors (
     }
 
     ByteCount = SectorCount * BlockSize;
-    Timeout   = EFI_SCSI_STALL_SECONDS (2);
+    Timeout   = EFI_TIMER_PERIOD_SECONDS (2);
 
     MaxRetry  = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
@@ -1671,7 +1671,7 @@ ScsiDiskWriteSectors (
     }
 
     ByteCount = SectorCount * BlockSize;
-    Timeout   = EFI_SCSI_STALL_SECONDS (2);
+    Timeout   = EFI_TIMER_PERIOD_SECONDS (2);
     MaxRetry  = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
       Status = ScsiDiskWrite10 (
