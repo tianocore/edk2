@@ -157,10 +157,10 @@ EFI_STATUS
 EFIAPI
 CheckMapping (
   IN     EFI_DEVICE_PATH_PROTOCOL                       *ControllerDevicePath,
-  IN     EFI_DEVICE_PATH_PROTOCOL                       *DriverImageDevicePath,
-  IN     LIST_ENTRY                                     * MappingDataBase,
-  OUT    UINT32                                         *DriverInfoNum,
-  OUT    UINT32                                         *DriverImageNO
+  IN     EFI_DEVICE_PATH_PROTOCOL                       *DriverImageDevicePath  OPTIONAL,
+  IN     LIST_ENTRY                                     *MappingDataBase,
+  OUT    UINT32                                         *DriverInfoNum  OPTIONAL,
+  OUT    UINT32                                         *DriverImageNO  OPTIONAL
   );
 
 /**
