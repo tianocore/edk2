@@ -107,8 +107,6 @@
   //
 
   #if _MSC_EXTENSIONS
-
-
     //
     // use Microsoft C complier dependent interger width types
     //
@@ -126,8 +124,7 @@
   #else
     #ifdef _EFI_P64
       //
-      // P64 - is Intel Itanium(TM) speak for pointers being 64-bit and longs and ints
-      //  are 32-bits
+      // P64 - pointers being 64-bit and longs and ints are 32-bits.
       //
       typedef unsigned long long  UINT64;
       typedef long long           INT64;

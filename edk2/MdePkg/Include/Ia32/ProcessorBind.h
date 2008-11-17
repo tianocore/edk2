@@ -96,7 +96,7 @@
   //
  
   #if _MSC_EXTENSIONS 
-    
+
     //
     // use Microsoft* C complier dependent interger width types 
     //
