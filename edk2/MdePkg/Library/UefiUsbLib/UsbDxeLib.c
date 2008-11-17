@@ -19,18 +19,29 @@
 
 
 /**
-  Usb Get Descriptor.
+  Get the descriptor of the specified USB device.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  Value                  Device Request Value.
-  @param  Index                  Device Request Index.
-  @param  DescriptorLength       Descriptor Length.
-  @param  Descriptor             Descriptor buffer to contain result.
-  @param  Status                 Transfer Status.
+  Submit a USB get descriptor request for the USB device specified by UsbIo, Value,
+  and Index, and return the descriptor in the buffer specified by Descriptor.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Descriptor is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Value             The device request value.
+  @param  Index             The device request index.
+  @param  DescriptorLength  The size, in bytes, of Descriptor.
+  @param  Descriptor        A pointer to the descriptor buffer to get.
+  @param  Status            A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS           The request executed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed because the
+                                buffer specifed by DescriptorLength and Descriptor
+                                is not large enough to hold the result of the request.
+  @retval EFI_TIMEOUT           A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR      The request failed due to a device error. The transfer
+                                status is returned in Status.
 
 **/
 EFI_STATUS
@@ -46,9 +57,9 @@ UsbGetDescriptor (
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (Descriptor != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
@@ -71,18 +82,26 @@ UsbGetDescriptor (
 
 
 /**
-  Usb Set Descriptor.
+  Set the descriptor of the specified USB device.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  Value                  Device Request Value.
-  @param  Index                  Device Request Index.
-  @param  DescriptorLength       Descriptor Length.
-  @param  Descriptor             Descriptor buffer to set.
-  @param  Status                 Transfer Status.
+  Submit a USB set descriptor request for the USB device specified by UsbIo,
+  Value, and Index, and set the descriptor using the buffer specified by DesriptorLength
+  and Descriptor.  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Descriptor is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Value             The device request value.
+  @param  Index             The device request index.
+  @param  DescriptorLength  The size, in bytes, of Descriptor.
+  @param  Descriptor        A pointer to the descriptor buffer to set.
+  @param  Status            A pointer to the status of the transfer.
+
+  @retval  EFI_SUCCESS       The request executed successfully.
+  @retval  EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR  The request failed due to a device error.
+                             The transfer status is returned in Status.
 
 **/
 EFI_STATUS
@@ -98,9 +117,9 @@ UsbSetDescriptor (
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (Descriptor != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
@@ -123,38 +142,46 @@ UsbSetDescriptor (
 
 
 /**
-  Usb Get Device Interface.
+  Get the interface setting of the specified USB device.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  Index                  Interface index value.
-  @param  AltSetting             Alternate setting.
-  @param  Status                 Trasnsfer status.
+  Submit a USB get interface request for the USB device specified by UsbIo,
+  and Interface, and place the result in the buffer specified by AlternateSetting.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If AlternateSetting is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface         The interface index value.
+  @param  AlternateSetting  A pointer to the alternate setting to be retrieved.
+  @param  Status            A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbGetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT16                  Index,
-  OUT UINT8                   *AltSetting,
+  IN  UINT16                  Interface,
+  OUT UINT8                   *AlternateSetting,
   OUT UINT32                  *Status
   )
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (AlternateSetting != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
   DevReq.RequestType  = USB_DEV_GET_INTERFACE_REQ_TYPE;
   DevReq.Request      = USB_REQ_GET_INTERFACE;
-  DevReq.Index        = Index;
+  DevReq.Index        = Interface;
   DevReq.Length       = 1;
 
   return UsbIo->UsbControlTransfer (
@@ -162,7 +189,7 @@ UsbGetInterface (
                   &DevReq,
                   EfiUsbDataIn,
                   TIMEOUT_VALUE,
-                  AltSetting,
+                  AlternateSetting,
                   1,
                   Status
                   );
@@ -170,40 +197,45 @@ UsbGetInterface (
 
 
 /**
-  Usb Set Device Interface.
+  Set the interface setting of the specified USB device.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  InterfaceNo            Interface Number.
-  @param  AltSetting             Alternate setting.
-  @param  Status                 Trasnsfer status.
+  Submit a USB set interface request for the USB device specified by UsbIo, and
+  Interface, and set the alternate setting to the value specified by AlternateSetting.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface         The interface index value.
+  @param  AlternateSetting  The alternate setting to be set.
+  @param  Status            A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS  The request executed successfully.
+  @retval EFI_TIMEOUT  A timeout occurred executing the request.
+  @retval EFI_SUCCESS  The request failed due to a device error.
+                       The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbSetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT16                  InterfaceNo,
-  IN  UINT16                  AltSetting,
+  IN  UINT16                  Interface,
+  IN  UINT16                  AlternateSetting,
   OUT UINT32                  *Status
   )
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
   DevReq.RequestType  = USB_DEV_SET_INTERFACE_REQ_TYPE;
   DevReq.Request      = USB_REQ_SET_INTERFACE;
-  DevReq.Value        = AltSetting;
-  DevReq.Index        = InterfaceNo;
-
+  DevReq.Value        = AlternateSetting;
+  DevReq.Index        = Interface;
 
   return UsbIo->UsbControlTransfer (
                   UsbIo,
@@ -218,30 +250,38 @@ UsbSetInterface (
 
 
 /**
-  Usb Get Device Configuration.
+  Get the device configuration.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  ConfigValue            Config Value.
-  @param  Status                 Transfer Status.
+  Submit a USB get configuration request for the USB device specified by UsbIo
+  and place the result in the buffer specified by ConfigurationValue. The status
+  of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If ConfigurationValue is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo               A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  ConfigurationValue  A pointer to the device configuration to be retrieved.
+  @param  Status              A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS        The request executed successfully.
+  @retval EFI_TIMEOUT        A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR   The request failed due to a device error.
+                             The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbGetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  OUT UINT8                   *ConfigValue,
+  OUT UINT8                   *ConfigurationValue,
   OUT UINT32                  *Status
   )
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (ConfigurationValue != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
@@ -254,7 +294,7 @@ UsbGetConfiguration (
                   &DevReq,
                   EfiUsbDataIn,
                   TIMEOUT_VALUE,
-                  ConfigValue,
+                  ConfigurationValue,
                   1,
                   Status
                   );
@@ -262,36 +302,42 @@ UsbGetConfiguration (
 
 
 /**
-  Usb Set Device Configuration.
+  Set the device configuration.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  Value                  Configuration Value to set.
-  @param  Status                 Transfer status.
+  Submit a USB set configuration request for the USB device specified by UsbIo
+  and set the device configuration to the value specified by ConfigurationValue.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo               A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  ConfigurationValue  The device configuration value to be set.
+  @param  Status              A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbSetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT16                  Value,
+  IN  UINT16                  ConfigurationValue,
   OUT UINT32                  *Status
   )
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
   DevReq.RequestType  = USB_DEV_SET_CONFIGURATION_REQ_TYPE;
   DevReq.Request      = USB_REQ_SET_CONFIG;
-  DevReq.Value        = Value;
+  DevReq.Value        = ConfigurationValue;
 
   return UsbIo->UsbControlTransfer (
                   UsbIo,
@@ -306,24 +352,33 @@ UsbSetConfiguration (
 
 
 /**
-  Usb Set Device Feature.
+  Set the specified feature of the specified device.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  Recipient              Interface/Device/Endpoint.
-  @param  Value                  Request value.
-  @param  Target                 Request Index.
-  @param  Status                 Transfer status.
+  Submit a USB set device feature request for the USB device specified by UsbIo,
+  Recipient, and Target to the value specified by Value.  The status of the
+  transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Recipient  The USB data recipient type (i.e. Device, Interface, Endpoint).
+                     Type USB_TYPES_DEFINITION is defined in the MDE Package Industry
+                     Standard include file Usb.h.
+  @param  Value      The value of the feature to be set.
+  @param  Target     The index of the device to be set.
+  @param  Status     A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbSetFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINTN       Recipient,
+  IN  USB_TYPES_DEFINITION    Recipient,
   IN  UINT16                  Value,
   IN  UINT16                  Target,
   OUT UINT32                  *Status
@@ -331,9 +386,8 @@ UsbSetFeature (
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
@@ -372,24 +426,33 @@ UsbSetFeature (
 
 
 /**
-  Usb Clear Device Feature.
+  Clear the specified feature of the specified device.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  Recipient              Interface/Device/Endpoint.
-  @param  Value                  Request value.
-  @param  Target                 Request Index.
-  @param  Status                 Transfer status.
+  Submit a USB clear device feature request for the USB device specified by UsbIo,
+  Recipient, and Target to the value specified by Value.  The status of the transfer
+  is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Recipient  The USB data recipient type (i.e. Device, Interface, Endpoint).
+                     Type USB_TYPES_DEFINITION is defined in the MDE Package Industry Standard
+                     include file Usb.h.
+  @param  Value      The value of the feature to be cleared.
+  @param  Target     The index of the device to be cleared.
+  @param  Status     A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbClearFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINTN       Recipient,
+  IN  USB_TYPES_DEFINITION    Recipient,
   IN  UINT16                  Value,
   IN  UINT16                  Target,
   OUT UINT32                  *Status
@@ -397,9 +460,9 @@ UsbClearFeature (
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (Status != NULL);
+
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
@@ -438,34 +501,44 @@ UsbClearFeature (
 
 
 /**
-  Usb Get Device Status.
+  Get the status of the specified device.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  Recipient              Interface/Device/Endpoint.
-  @param  Target                 Request index.
-  @param  DevStatus              Device status.
-  @param  Status                 Transfer status.
+  Submit a USB device get status request for the USB device specified by UsbIo,
+  Recipient, and Target and place the result in the buffer specified by DeviceStatus.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If DeviceStatus is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo         A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Recipient     The USB data recipient type (i.e. Device, Interface, Endpoint).
+                        Type USB_TYPES_DEFINITION is defined in the MDE Package Industry Standard
+                        include file Usb.h.
+  @param  Target        The index of the device to be get the status of.
+  @param  DeviceStatus  A pointer to the device status to be retrieved.
+  @param  Status        A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbGetStatus (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINTN       Recipient,
+  IN  USB_TYPES_DEFINITION    Recipient,
   IN  UINT16                  Target,
-  OUT UINT16                  *DevStatus,
+  OUT UINT16                  *DeviceStatus,
   OUT UINT32                  *Status
   )
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (DeviceStatus != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
@@ -496,7 +569,7 @@ UsbGetStatus (
                   &DevReq,
                   EfiUsbDataIn,
                   TIMEOUT_VALUE,
-                  DevStatus,
+                  DeviceStatus,
                   2,
                   Status
                   );
@@ -504,22 +577,31 @@ UsbGetStatus (
 
 
 /**
-  Clear endpoint stall.
+  Clear halt feature of the specified usb endpoint.
 
-  @param  UsbIo                  EFI_USB_IO_PROTOCOL.
-  @param  EndpointNo             Endpoint Number.
-  @param  Status                 Transfer Status.
+  Retrieve the USB endpoint descriptor specified by UsbIo and EndPoint.
+  If the USB endpoint descriptor can not be retrieved, then return EFI_NOT_FOUND.
+  If the endpoint descriptor is found, then clear the halt fature of this USB endpoint.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_NOT_FOUND          Can't find the Endpoint.
-  @retval EFI_DEVICE_ERROR       Hardware error.
-  @retval EFI_SUCCESS            Success.
+  @param  UsbIo     A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Endpoint  The endpoint address.
+  @param  Status    A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
+  @retval EFI_NOT_FOUND     The specified USB endpoint descriptor can not be found
 
 **/
 EFI_STATUS
 EFIAPI
 UsbClearEndpointHalt (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT8                   EndpointNo,
+  IN  UINT8                   Endpoint,
   OUT UINT32                  *Status
   )
 {
@@ -528,9 +610,8 @@ UsbClearEndpointHalt (
   EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
   UINT8                         Index;
 
-  if (UsbIo == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT (UsbIo != NULL);
+  ASSERT (Status != NULL);
 
   ZeroMem (&EndpointDescriptor, sizeof (EFI_USB_ENDPOINT_DESCRIPTOR));
   //
@@ -554,7 +635,7 @@ UsbClearEndpointHalt (
       continue;
     }
 
-    if (EndpointDescriptor.EndpointAddress == EndpointNo) {
+    if (EndpointDescriptor.EndpointAddress == Endpoint) {
       break;
     }
   }
