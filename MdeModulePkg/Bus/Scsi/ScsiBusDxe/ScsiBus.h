@@ -35,10 +35,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 
 #include <IndustryStandard/Scsi.h>
-//
-// 1000 * 1000 * 10
-//
-#define ONE_SECOND_TIMER      10000000  
 
 #define SCSI_IO_DEV_SIGNATURE EFI_SIGNATURE_32 ('s', 'c', 'i', 'o')
 

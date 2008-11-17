@@ -1105,7 +1105,7 @@ DiscoverScsiDevice (
 
   Status = ScsiInquiryCommand (
             &ScsiIoDevice->ScsiIo,
-            EFI_SCSI_STALL_SECONDS (1),
+            EFI_TIMER_PERIOD_SECONDS (1),
             (VOID *) &SenseData,
             &SenseDataLength,
             &HostAdapterStatus,
