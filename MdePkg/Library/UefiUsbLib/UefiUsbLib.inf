@@ -38,5 +38,6 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  DebugLib
   BaseMemoryLib
 

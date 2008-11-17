@@ -13,11 +13,16 @@
    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
-#ifndef __UEFI_USB_LIB_INTERNAL_H_
-#define __UEFI_USB_LIB_INTERNAL_H_
+#ifndef _UEFI_USB_LIB_INTERNAL_H_
+#define _UEFI_USB_LIB_INTERNAL_H_
 
 #include <Uefi.h>
+
 #include <Library/UefiUsbLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+
+#include <IndustryStandard/Usb.h>
+
 
 #endif

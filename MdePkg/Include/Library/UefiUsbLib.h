@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __USB_DXE_LIB_H__
 
 #include <Protocol/UsbIo.h>
+#include <IndustryStandard/Usb.h>
 
 ///
 /// define the timeout time as 3ms
@@ -25,57 +26,78 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TIMEOUT_VALUE 3 * 1000
 
 /**
-  Get Hid Descriptor.
+  Get the descriptor of the specified USB HID interface.
 
-  @param  UsbIo             A pointer to EFI_USB_IO_PROTOCOL.
-  @param  InterfaceNum      Hid interface number.
-  @param  HidDescriptor     Caller allocated buffer to store Usb hid descriptor if
-                            successfully returned.
+  Submit a USB get HID descriptor request for the USB device specified by UsbIo
+  and Interface and return the HID descriptor in HidDescriptor.
+  If UsbIo is NULL, then ASSERT().
+  If HidDescriptor is NULL, then ASSERT().
 
-  @return Status of getting HID descriptor through USB I/O
-          protocol's UsbControlTransfer().
+  @param  UsbIo          A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface      The index of the HID interface on the USB target.
+  @param  HidDescriptor  Pointer to the USB HID descriptor that was retrieved from
+                         the specified USB target and interface. Type EFI_USB_HID_DESCRIPTOR
+                         is defined in the MDE Package Industry Standard include file Usb.h.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbGetHidDescriptor (
   IN  EFI_USB_IO_PROTOCOL        *UsbIo,
-  IN  UINT8                      InterfaceNum,
+  IN  UINT8                      Interface,
   OUT EFI_USB_HID_DESCRIPTOR     *HidDescriptor
   );
 
 
 /**
-  get Report Class descriptor.
+  Get the report descriptor of the specified USB HID interface.
 
-  @param  UsbIo             A pointer to EFI_USB_IO_PROTOCOL.
-  @param  InterfaceNum      Report interface number.
-  @param  DescriptorSize    Length of DescriptorBuffer.
-  @param  DescriptorBuffer  Caller allocated buffer to store Usb report descriptor
-                            if successfully returned.
+  Submit a USB get HID report descriptor request for the USB device specified by
+  UsbIo and Interface and return the report descriptor in DescriptorBuffer.
+  If UsbIo is NULL, then ASSERT().
+  If DescriptorBuffer is NULL, then ASSERT().
 
-  @return Status of getting Report Class descriptor through USB
-          I/O protocol's UsbControlTransfer().
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface         The index of the report interface on the USB target.
+  @param  DescriptorLength  The size, in bytes, of DescriptorBuffer.
+  @param  DescriptorBuffer  A pointer to the buffer to store the report class descriptor.
+
+  @retval  EFI_SUCCESS           The request executed successfully.
+  @retval  EFI_OUT_OF_RESOURCES  The request could not be completed because the
+                                 buffer specifed by DescriptorLength and DescriptorBuffer
+                                 is not large enough to hold the result of the request.
+  @retval  EFI_TIMEOUT           A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR      The request failed due to a device error.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbGetReportDescriptor (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT8                   InterfaceNum,
-  IN  UINT16                  DescriptorSize,
+  IN  UINT8                   Interface,
+  IN  UINT16                  DescriptorLength,
   OUT UINT8                   *DescriptorBuffer
   );
 
 /**
-  Get Hid Protocol Request.
+  Get the HID protocol of the specified USB HID interface.
 
-  @param  UsbIo             A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Interface         Which interface the caller wants to get protocol.
-  @param  Protocol          Protocol value returned.
+  Submit a USB get HID protocol request for the USB device specified by UsbIo
+  and Interface and return the protocol retrieved in Protocol.
+  If UsbIo is NULL, then ASSERT().
+  If Protocol is NULL, then ASSERT().
 
-  @return Status of getting Protocol Request through USB I/O
-          protocol's UsbControlTransfer().
+  @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface  The index of the report interface on the USB target.
+  @param  Protocol   A pointer to the protocol for the specified USB target.
+
+  @retval  EFI_SUCCESS       The request executed successfully.
+  @retval  EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR  The request failed due to a device error.
 
 **/
 EFI_STATUS
@@ -87,14 +109,19 @@ UsbGetProtocolRequest (
   );
 
 /**
-  Set Hid Protocol Request.
+  Set the HID protocol of the specified USB HID interface.
 
-  @param  UsbIo             A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Interface         Which interface the caller wants to set protocol.
-  @param  Protocol          Protocol value the caller wants to set.
+  Submit a USB set HID protocol request for the USB device specified by UsbIo
+  and Interface and set the protocol to the value specified by Protocol.
+  If UsbIo is NULL, then ASSERT().
 
-  @return Status of setting Protocol Request through USB I/O
-          protocol's UsbControlTransfer().
+  @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface  The index of the report interface on the USB target.
+  @param  Protocol   The protocol value to set for the specified USB target.
+
+  @retval  EFI_SUCCESS       The request executed successfully.
+  @retval  EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR  The request failed due to a device error.
 
 **/
 EFI_STATUS
@@ -106,15 +133,20 @@ UsbSetProtocolRequest (
   );
 
 /**
-  Set Idel request.
+  Set the idle rate of the specified USB HID report.
 
-  @param  UsbIo             A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Interface         Which interface the caller wants to set.
-  @param  ReportId          Which report the caller wants to set.
-  @param  Duration          Idle rate the caller wants to set.
+  Submit a USB set HID report idle request for the USB device specified by UsbIo,
+  Interface, and ReportId, and set the idle rate to the value specified by Duration.
+  If UsbIo is NULL, then ASSERT().
 
-  @return Status of setting IDLE Request through USB I/O
-          protocol's UsbControlTransfer().
+  @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface  The index of the report interface on the USB target.
+  @param  ReportId   The identifier of the report to retrieve.
+  @param  Duration   The idle rate to set for the specified USB target.
+
+  @retval  EFI_SUCCESS       The request executed successfully.
+  @retval  EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR  The request failed due to a device error.
 
 **/
 EFI_STATUS
@@ -127,15 +159,21 @@ UsbSetIdleRequest (
   );
 
 /**
-  Get Idel request.
+  Get the idle rate of the specified USB HID report.
 
-  @param  UsbIo             A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Interface         Which interface the caller wants to get.
-  @param  ReportId          Which report the caller wants to get.
-  @param  Duration          Idle rate the caller wants to get.
+  Submit a USB get HID report idle request for the USB device specified by UsbIo,
+  Interface, and ReportId, and return the ide rate in Duration.
+  If UsbIo is NULL, then ASSERT().
+  If Duration is NULL, then ASSERT().
 
-  @return Status of getting IDLE Request through USB I/O
-          protocol's UsbControlTransfer().
+  @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface  The index of the report interface on the USB target.
+  @param  ReportId   The identifier of the report to retrieve.
+  @param  Duration   A pointer to the idle rate retrieved from the specified USB target.
+
+  @retval  EFI_SUCCESS       The request executed successfully.
+  @retval  EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR  The request failed due to a device error.
 
 **/
 EFI_STATUS
@@ -148,17 +186,18 @@ UsbGetIdleRequest (
   );
 
 /**
-  Hid Set Report request.
+  Set the report descriptor of the specified USB HID interface.
 
-  @param  UsbIo             A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Interface         Which interface the caller wants to set.
-  @param  ReportId          Which report the caller wants to set.
-  @param  ReportType        Type of report.
-  @param  ReportLen         Length of report descriptor.
-  @param  Report            Report Descriptor buffer.
+  @param  UsbIo         A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface     The index of the report interface on the USB target.
+  @param  ReportId      The identifier of the report to retrieve.
+  @param  ReportType    The type of report to retrieve.
+  @param  ReportLength  The size, in bytes, of Report.
+  @param  Report        A pointer to the report descriptor buffer to set.
 
-  @return Status of setting Report Request through USB I/O
-          protocol's UsbControlTransfer().
+  @retval  EFI_SUCCESS       The request executed successfully.
+  @retval  EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR  The request failed due to a device error.
 
 **/
 EFI_STATUS
@@ -173,17 +212,27 @@ UsbSetReportRequest (
   );
 
 /**
-  Hid Set Report request.
+  Get the report descriptor of the specified USB HID interface.
 
-  @param  UsbIo             A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Interface         Which interface the caller wants to set.
-  @param  ReportId          Which report the caller wants to set.
-  @param  ReportType        Type of report.
-  @param  ReportLen         Length of report descriptor.
-  @param  Report            Caller allocated buffer to store Report Descriptor.
+  Submit a USB get HID report request for the USB device specified by UsbIo,
+  Interface, ReportId, and ReportType, and return the report in the buffer
+  specified by Report.
+  If UsbIo is NULL, then ASSERT().
+  If Report is NULL, then ASSERT().
 
-  @return Status of getting Report Request through USB I/O
-          protocol's UsbControlTransfer().
+  @param  UsbIo         A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface     The index of the report interface on the USB target.
+  @param  ReportId      The identifier of the report to retrieve.
+  @param  ReportType    The type of report to retrieve.
+  @param  ReportLength  The size, in bytes, of Report.
+  @param  Report        A pointer to the buffer to store the report descriptor.
+
+  @retval  EFI_SUCCESS           The request executed successfully.
+  @retval  EFI_OUT_OF_RESOURCES  The request could not be completed because the
+                                 buffer specifed by ReportLength and Report is not
+                                 large enough to hold the result of the request.
+  @retval  EFI_TIMEOUT           A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR      The request failed due to a device error.
 
 **/
 EFI_STATUS
@@ -198,18 +247,29 @@ UsbGetReportRequest (
   );
 
 /**
-  Usb Get Descriptor.
+  Get the descriptor of the specified USB device.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Value                  Device Request Value.
-  @param  Index                  Device Request Index.
-  @param  DescriptorLength       Descriptor Length.
-  @param  Descriptor             Descriptor buffer to contain result.
-  @param  Status                 Transfer Status.
+  Submit a USB get descriptor request for the USB device specified by UsbIo, Value,
+  and Index, and return the descriptor in the buffer specified by Descriptor.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Descriptor is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Value             The device request value.
+  @param  Index             The device request index.
+  @param  DescriptorLength  The size, in bytes, of Descriptor.
+  @param  Descriptor        A pointer to the descriptor buffer to get.
+  @param  Status            A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS           The request executed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed because the
+                                buffer specifed by DescriptorLength and Descriptor
+                                is not large enough to hold the result of the request.
+  @retval EFI_TIMEOUT           A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR      The request failed due to a device error. The transfer
+                                status is returned in Status.
 
 **/
 EFI_STATUS
@@ -224,18 +284,26 @@ UsbGetDescriptor (
   );
 
 /**
-  Usb Set Descriptor.
+  Set the descriptor of the specified USB device.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Value                  Device Request Value.
-  @param  Index                  Device Request Index.
-  @param  DescriptorLength       Descriptor Length.
-  @param  Descriptor             Descriptor buffer to set.
-  @param  Status                 Transfer Status.
+  Submit a USB set descriptor request for the USB device specified by UsbIo,
+  Value, and Index, and set the descriptor using the buffer specified by DesriptorLength
+  and Descriptor.  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Descriptor is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Value             The device request value.
+  @param  Index             The device request index.
+  @param  DescriptorLength  The size, in bytes, of Descriptor.
+  @param  Descriptor        A pointer to the descriptor buffer to set.
+  @param  Status            A pointer to the status of the transfer.
+
+  @retval  EFI_SUCCESS       The request executed successfully.
+  @retval  EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval  EFI_DEVICE_ERROR  The request failed due to a device error.
+                             The transfer status is returned in Status.
 
 **/
 EFI_STATUS
@@ -250,178 +318,245 @@ UsbSetDescriptor (
   );
 
 /**
-  Usb Get Device Interface.
+  Get the interface setting of the specified USB device.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Index                  Interface index value.
-  @param  AltSetting             Alternate setting.
-  @param  Status                 Trasnsfer status.
+  Submit a USB get interface request for the USB device specified by UsbIo,
+  and Interface, and place the result in the buffer specified by AlternateSetting.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If AlternateSetting is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface         The interface index value.
+  @param  AlternateSetting  A pointer to the alternate setting to be retrieved.
+  @param  Status            A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbGetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT16                  Index,
-  OUT UINT8                   *AltSetting,
+  IN  UINT16                  Interface,
+  OUT UINT8                   *AlternateSetting,
   OUT UINT32                  *Status
   );
 
 /**
-  Usb Set Device Interface.
+  Set the interface setting of the specified USB device.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  InterfaceNo            Interface Number.
-  @param  AltSetting             Alternate setting.
-  @param  Status                 Trasnsfer status.
+  Submit a USB set interface request for the USB device specified by UsbIo, and
+  Interface, and set the alternate setting to the value specified by AlternateSetting.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo             A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Interface         The interface index value.
+  @param  AlternateSetting  The alternate setting to be set.
+  @param  Status            A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS  The request executed successfully.
+  @retval EFI_TIMEOUT  A timeout occurred executing the request.
+  @retval EFI_SUCCESS  The request failed due to a device error.
+                       The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbSetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT16                  InterfaceNo,
-  IN  UINT16                  AltSetting,
+  IN  UINT16                  Interface,
+  IN  UINT16                  AlternateSetting,
   OUT UINT32                  *Status
   );
 
 /**
-  Usb Get Device Configuration.
+  Get the device configuration.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  ConfigValue            Config Value.
-  @param  Status                 Transfer Status.
+  Submit a USB get configuration request for the USB device specified by UsbIo
+  and place the result in the buffer specified by ConfigurationValue. The status
+  of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If ConfigurationValue is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo               A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  ConfigurationValue  A pointer to the device configuration to be retrieved.
+  @param  Status              A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS        The request executed successfully.
+  @retval EFI_TIMEOUT        A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR   The request failed due to a device error.
+                             The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbGetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  OUT UINT8                   *ConfigValue,
+  OUT UINT8                   *ConfigurationValue,
   OUT UINT32                  *Status
   );
 
 /**
-  Usb Set Device Configuration.
+  Set the device configuration.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Value                  Configuration Value to set.
-  @param  Status                 Transfer status.
+  Submit a USB set configuration request for the USB device specified by UsbIo
+  and set the device configuration to the value specified by ConfigurationValue.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo               A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  ConfigurationValue  The device configuration value to be set.
+  @param  Status              A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbSetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT16                  Value,
+  IN  UINT16                  ConfigurationValue,
   OUT UINT32                  *Status
   );
 
 /**
-  Usb Set Device Feature.
+  Set the specified feature of the specified device.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Recipient              Interface/Device/Endpoint.
-  @param  Value                  Request value.
-  @param  Target                 Request Index.
-  @param  Status                 Transfer status.
+  Submit a USB set device feature request for the USB device specified by UsbIo,
+  Recipient, and Target to the value specified by Value.  The status of the
+  transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Recipient  The USB data recipient type (i.e. Device, Interface, Endpoint).
+                     Type USB_TYPES_DEFINITION is defined in the MDE Package Industry
+                     Standard include file Usb.h.
+  @param  Value      The value of the feature to be set.
+  @param  Target     The index of the device to be set.
+  @param  Status     A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbSetFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINTN                   Recipient,
+  IN  USB_TYPES_DEFINITION    Recipient,
   IN  UINT16                  Value,
   IN  UINT16                  Target,
   OUT UINT32                  *Status
   );
 
 /**
-  Usb Clear Device Feature.
+  Clear the specified feature of the specified device.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Recipient              Interface/Device/Endpoint.
-  @param  Value                  Request value.
-  @param  Target                 Request Index.
-  @param  Status                 Transfer status.
+  Submit a USB clear device feature request for the USB device specified by UsbIo,
+  Recipient, and Target to the value specified by Value.  The status of the transfer
+  is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Recipient  The USB data recipient type (i.e. Device, Interface, Endpoint).
+                     Type USB_TYPES_DEFINITION is defined in the MDE Package Industry Standard
+                     include file Usb.h.
+  @param  Value      The value of the feature to be cleared.
+  @param  Target     The index of the device to be cleared.
+  @param  Status     A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbClearFeature (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINTN                   Recipient,
+  IN  USB_TYPES_DEFINITION    Recipient,
   IN  UINT16                  Value,
   IN  UINT16                  Target,
   OUT UINT32                  *Status
   );
 
 /**
-  Usb Get Device Status.
+  Get the status of the specified device.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  Recipient              Interface/Device/Endpoint.
-  @param  Target                 Request index.
-  @param  DevStatus              Device status.
-  @param  Status                 Transfer status.
+  Submit a USB device get status request for the USB device specified by UsbIo,
+  Recipient, and Target and place the result in the buffer specified by DeviceStatus.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If DeviceStatus is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_INVALID_PARAMETER  Parameter is error.
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_TIMEOUT            Device has no response.
+  @param  UsbIo         A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Recipient     The USB data recipient type (i.e. Device, Interface, Endpoint).
+                        Type USB_TYPES_DEFINITION is defined in the MDE Package Industry Standard
+                        include file Usb.h.
+  @param  Target        The index of the device to be get the status of.
+  @param  DeviceStatus  A pointer to the device status to be retrieved.
+  @param  Status        A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
 
 **/
 EFI_STATUS
 EFIAPI
 UsbGetStatus (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINTN                   Recipient,
+  IN  USB_TYPES_DEFINITION    Recipient,
   IN  UINT16                  Target,
   OUT UINT16                  *DevStatus,
   OUT UINT32                  *Status
   );
 
 /**
-  Clear endpoint stall.
+  Clear halt feature of the specified usb endpoint.
 
-  @param  UsbIo                  A pointer to EFI_USB_IO_PROTOCOL.
-  @param  EndpointNo             Endpoint Number.
-  @param  Status                 Transfer Status.
+  Retrieve the USB endpoint descriptor specified by UsbIo and EndPoint.
+  If the USB endpoint descriptor can not be retrieved, then return EFI_NOT_FOUND.
+  If the endpoint descriptor is found, then clear the halt fature of this USB endpoint.
+  The status of the transfer is returned in Status.
+  If UsbIo is NULL, then ASSERT().
+  If Status is NULL, then ASSERT().
 
-  @retval EFI_NOT_FOUND          Can't find the Endpoint.
-  @retval EFI_DEVICE_ERROR       Hardware error.
-  @retval EFI_SUCCESS            Success.
+  @param  UsbIo     A pointer to the USB I/O Protocol instance for the specific USB target.
+  @param  Endpoint  The endpoint address.
+  @param  Status    A pointer to the status of the transfer.
+
+  @retval EFI_SUCCESS       The request executed successfully.
+  @retval EFI_TIMEOUT       A timeout occurred executing the request.
+  @retval EFI_DEVICE_ERROR  The request failed due to a device error.
+                            The transfer status is returned in Status.
+  @retval EFI_NOT_FOUND     The specified USB endpoint descriptor can not be found
 
 **/
 EFI_STATUS
 EFIAPI
 UsbClearEndpointHalt (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN  UINT8                   EndpointNo,
+  IN  UINT8                   Endpoint,
   OUT UINT32                  *Status
   );
 
