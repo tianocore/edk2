@@ -205,7 +205,7 @@ EfiMtcEventHandler (
   @param  ImageHandle   The image handle of this driver.
   @param  SystemTable   The pointer of EFI_SYSTEM_TABLE.
 
-  @return EFI_SUCCESS   The initialization is successful.
+  @retval EFI_SUCCESS   The initialization is successful.
 
 **/
 EFI_STATUS
