@@ -160,9 +160,8 @@ StrCpy (
 
 
 /**
-  Copies one Null-terminated Unicode string with a maximum length to another
-  Null-terminated Unicode string with a maximum length and returns the new
-  Unicode string.
+  Copies up to a specified length from one Null-terminated Unicode string  to 
+  another Null-terminated Unicode string and returns the new Unicode string.
 
   This function copies the contents of the Unicode string Source to the Unicode
   string Destination, and returns Destination. At most, Length Unicode
@@ -225,8 +224,8 @@ StrLen (
   Returns the size of a Null-terminated Unicode string in bytes, including the
   Null terminator.
 
-  This function returns the size, in bytes, of the Null-terminated Unicode
-  string specified by String.
+  This function returns the size, in bytes, of the Null-terminated Unicode string 
+  specified by String.
 
   If String is NULL, then ASSERT().
   If String is not aligned on a 16-bit boundary, then ASSERT().
@@ -283,9 +282,9 @@ StrCmp (
 
 
 /**
-  Compares two Null-terminated Unicode strings with maximum lengths, and
-  returns the difference between the first mismatched Unicode characters.
-
+  Compares up to a specified length the contents of two Null-terminated Unicode strings,
+  and returns the difference between the first mismatched Unicode characters.
+  
   This function compares the Null-terminated Unicode string FirstString to the
   Null-terminated Unicode string SecondString. At most, Length Unicode
   characters will be compared. If Length is 0, then 0 is returned. If
@@ -362,8 +361,8 @@ StrCat (
 
 
 /**
-  Concatenates one Null-terminated Unicode string with a maximum length to the
-  end of another Null-terminated Unicode string, and returns the concatenated
+  Concatenates up to a specified length one Null-terminated Unicode to the end 
+  of another Null-terminated Unicode string, and returns the concatenated 
   Unicode string.
 
   This function concatenates two Null-terminated Unicode strings. The contents
@@ -425,8 +424,8 @@ StrnCat (
   or String contains more than PcdMaximumUnicodeStringLength Unicode
   characters not including the Null-terminator, then ASSERT().
 
-  @param  String				  Pointer to a Null-terminated Unicode string.
-  @param  SearchString	Pointer to a Null-terminated Unicode string to search for.
+  @param  String          Pointer to a Null-terminated Unicode string.
+  @param  SearchString    Pointer to a Null-terminated Unicode string to search for.
 
   @retval NULL            If the SearchString does not appear in String.
   @return others          If there is a match.
@@ -435,8 +434,8 @@ StrnCat (
 CHAR16 *
 EFIAPI
 StrStr (
-  IN      CONST CHAR16      	      *String,
-  IN      CONST CHAR16      	      *SearchString
+  IN      CONST CHAR16              *String,
+  IN      CONST CHAR16              *SearchString
   );
 
 /**
@@ -468,7 +467,7 @@ StrStr (
   more than PcdMaximumUnicodeStringLength Unicode characters not including
   the Null-terminator, then ASSERT().
 
-  @param  String			    Pointer to a Null-terminated Unicode string.
+  @param  String      Pointer to a Null-terminated Unicode string.
 
   @retval Value translated from String.
 
@@ -476,7 +475,7 @@ StrStr (
 UINTN
 EFIAPI
 StrDecimalToUintn (
-  IN      CONST CHAR16      	      *String
+  IN      CONST CHAR16              *String
   );
 
 /**
@@ -508,7 +507,7 @@ StrDecimalToUintn (
   more than PcdMaximumUnicodeStringLength Unicode characters not including
   the Null-terminator, then ASSERT().
 
-  @param  String			    Pointer to a Null-terminated Unicode string.
+  @param  String          Pointer to a Null-terminated Unicode string.
 
   @retval Value translated from String.
 
@@ -516,7 +515,7 @@ StrDecimalToUintn (
 UINT64
 EFIAPI
 StrDecimalToUint64 (
-  IN      CONST CHAR16      	      *String
+  IN      CONST CHAR16              *String
   );
  
 
@@ -550,7 +549,7 @@ StrDecimalToUint64 (
   PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator,
   then ASSERT().
 
-  @param  String			    Pointer to a Null-terminated Unicode string.
+  @param  String          Pointer to a Null-terminated Unicode string.
 
   @retval Value translated from String.
 
@@ -558,7 +557,7 @@ StrDecimalToUint64 (
 UINTN
 EFIAPI
 StrHexToUintn (
-  IN      CONST CHAR16      	      *String
+  IN      CONST CHAR16              *String
   );
 
 
@@ -592,7 +591,7 @@ StrHexToUintn (
   PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator,
   then ASSERT().
 
-  @param  String			    Pointer to a Null-terminated Unicode string.
+  @param  String          Pointer to a Null-terminated Unicode string.
 
   @retval Value translated from String.
 
@@ -600,7 +599,7 @@ StrHexToUintn (
 UINT64
 EFIAPI
 StrHexToUint64 (
-  IN      CONST CHAR16      	      *String
+  IN      CONST CHAR16             *String
   );
 
 /**
@@ -733,7 +732,7 @@ IsHexDigit (
   );
 
 /**
-  Convert one Null-terminated Unicode string to a Null-terminated
+  Convert a Null-terminated Unicode string to a Null-terminated
   ASCII string and returns the ASCII string.
 
   This function converts the content of the Unicode string Source
@@ -765,8 +764,8 @@ IsHexDigit (
 CHAR8 *
 EFIAPI
 UnicodeStrToAsciiStr (
-  IN      CONST CHAR16      	      *Source,
-  OUT 	  CHAR8  	                  *Destination
+  IN      CONST CHAR16              *Source,
+  OUT     CHAR8                     *Destination
   );
 
 
@@ -800,9 +799,8 @@ AsciiStrCpy (
 
 
 /**
-  Copies one Null-terminated ASCII string with a maximum length to another
-  Null-terminated ASCII string with a maximum length and returns the new ASCII
-  string.
+  Copies up to a specified length one Null-terminated ASCII string to another 
+  Null-terminated ASCII string and returns the new ASCII string.
 
   This function copies the contents of the ASCII string Source to the ASCII
   string Destination, and returns Destination. At most, Length ASCII characters
@@ -904,8 +902,8 @@ AsciiStrSize (
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
 
-  @retval 0      FirstString is identical to SecondString.
-  @return others FirstString is not identical to SecondString.
+  @retval ==0      FirstString is identical to SecondString.
+  @retval !=0      FirstString is not identical to SecondString.
 
 **/
 INTN
@@ -939,9 +937,9 @@ AsciiStrCmp (
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
 
-  @retval 0      FirstString is identical to SecondString using case insensitive
+  @retval ==0    FirstString is identical to SecondString using case insensitive
                  comparisons.
-  @return others FirstString is not identical to SecondString using case
+  @retval !=0    FirstString is not identical to SecondString using case
                  insensitive comparisons.
 
 **/
@@ -977,8 +975,8 @@ AsciiStriCmp (
   @param  SecondString  Pointer to a Null-terminated ASCII string.
   @param  Length        Maximum number of ASCII characters for compare.
   
-  @retval 0      FirstString is identical to SecondString.
-  @return others FirstString is not identical to SecondString.
+  @retval ==0       FirstString is identical to SecondString.
+  @retval !=0       FirstString is not identical to SecondString.
 
 **/
 INTN
@@ -1026,9 +1024,9 @@ AsciiStrCat (
 
 
 /**
-  Concatenates one Null-terminated ASCII string with a maximum length to the
-  end of another Null-terminated ASCII string, and returns the concatenated
-  ASCII string.
+  Concatenates up to a specified length one Null-terminated ASCII string to 
+  the end of another Null-terminated ASCII string, and returns the 
+  concatenated ASCII string.
 
   This function concatenates two Null-terminated ASCII strings. The contents
   of Null-terminated ASCII string Source are concatenated to the end of Null-
@@ -1088,14 +1086,15 @@ AsciiStrnCat (
   @param  SearchString    Pointer to a Null-terminated ASCII string to search for.
 
   @retval NULL            If the SearchString does not appear in String.
-  @return others          If there is a match.
+  @retval others          If there is a match return the first occurrence of SearchingString.
+                          If the lenth of SearchString is zero,return String.
 
 **/
 CHAR8 *
 EFIAPI
 AsciiStrStr (
-  IN      CONST CHAR8      	        *String,
-  IN      CONST CHAR8      	        *SearchString
+  IN      CONST CHAR8               *String,
+  IN      CONST CHAR8               *SearchString
   );
 
 
@@ -1124,7 +1123,7 @@ AsciiStrStr (
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
   then ASSERT().
 
-  @param  String			    Pointer to a Null-terminated ASCII string.
+  @param  String          Pointer to a Null-terminated ASCII string.
 
   @retval Value translated from String.
 
@@ -1161,7 +1160,7 @@ AsciiStrDecimalToUintn (
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
   then ASSERT().
 
-  @param  String			    Pointer to a Null-terminated ASCII string.
+  @param  String          Pointer to a Null-terminated ASCII string.
 
   @retval Value translated from String.
 
@@ -1169,7 +1168,7 @@ AsciiStrDecimalToUintn (
 UINT64
 EFIAPI
 AsciiStrDecimalToUint64 (
-  IN      CONST CHAR8       	      *String
+  IN      CONST CHAR8               *String
   );
 
 
@@ -1202,7 +1201,7 @@ AsciiStrDecimalToUint64 (
   and String contains more than PcdMaximumAsciiStringLength ASCII characters not including
   the Null-terminator, then ASSERT().
 
-  @param  String			    Pointer to a Null-terminated ASCII string.
+  @param  String          Pointer to a Null-terminated ASCII string.
 
   @retval Value translated from String.
 
@@ -1210,7 +1209,7 @@ AsciiStrDecimalToUint64 (
 UINTN
 EFIAPI
 AsciiStrHexToUintn (
-  IN      CONST CHAR8       	      *String
+  IN      CONST CHAR8               *String
   );
 
 
@@ -1243,7 +1242,7 @@ AsciiStrHexToUintn (
   and String contains more than PcdMaximumAsciiStringLength ASCII characters not including
   the Null-terminator, then ASSERT().
 
-  @param  String			    Pointer to a Null-terminated ASCII string.
+  @param  String          Pointer to a Null-terminated ASCII string.
 
   @retval Value translated from String.
 
@@ -1251,7 +1250,7 @@ AsciiStrHexToUintn (
 UINT64
 EFIAPI
 AsciiStrHexToUint64 (
-  IN      CONST CHAR8      	        *String
+  IN      CONST CHAR8                *String
   );
 
 
@@ -1285,8 +1284,8 @@ AsciiStrHexToUint64 (
 CHAR16 *
 EFIAPI
 AsciiStrToUnicodeStr (
-  IN      CONST CHAR8       	      *Source,
-  OUT 	  CHAR16  	                *Destination
+  IN      CONST CHAR8               *Source,
+  OUT     CHAR16                    *Destination
   );
 
 
@@ -1349,7 +1348,7 @@ BcdToDecimal8 (
   @param  ListHead  The head note of a list to initiailize.
 
 **/
-#define INITIALIZE_LIST_HEAD_VARIABLE(ListHead)  {&ListHead, &ListHead}
+#define INITIALIZE_LIST_HEAD_VARIABLE(ListHead)  {&(ListHead), &(ListHead)}
 
 
 /**
@@ -1384,7 +1383,8 @@ InitializeListHead (
 
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
-  If ListHead was not initialized with InitializeListHead(), then ASSERT().
+  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
@@ -1413,7 +1413,8 @@ InsertHeadList (
 
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
-  If ListHead was not initialized with InitializeListHead(), then ASSERT().
+  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
@@ -1436,12 +1437,13 @@ InsertTailList (
 /**
   Retrieves the first node of a doubly linked list.
 
-  Returns the first node of a doubly linked list. List must have been
-  initialized with InitializeListHead(). If List is empty, then NULL is
-  returned.
+  Returns the first node of a doubly linked list.  List must have been 
+  initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
+  If List is empty, then List is returned.
 
   If List is NULL, then ASSERT().
-  If List was not initialized with InitializeListHead(), then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
@@ -1462,13 +1464,14 @@ GetFirstNode (
 /**
   Retrieves the next node of a doubly linked list.
 
-  Returns the node of a doubly linked list that follows Node. List must have
-  been initialized with InitializeListHead(). If List is empty, then List is
-  returned.
+  Returns the node of a doubly linked list that follows Node.  
+  List must have been initialized with INTIALIZE_LIST_HEAD_VARIABLE()
+  or InitializeListHead().  If List is empty, then List is returned.
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with InitializeListHead(), then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and List contains more than
   PcdMaximumLinkedListLenth nodes, then ASSERT().
   If Node is not a node in List, then ASSERT().
@@ -1495,7 +1498,8 @@ GetNextNode (
   zero nodes, this function returns TRUE. Otherwise, it returns FALSE.
 
   If ListHead is NULL, then ASSERT().
-  If ListHead was not initialized with InitializeListHead(), then ASSERT().
+  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
@@ -1520,11 +1524,12 @@ IsListEmpty (
 
   Returns TRUE if Node is equal to List.  Returns FALSE if Node is one of the
   nodes in the doubly linked list specified by List.  List must have been
-  initialized with InitializeListHead().
+  initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with InitializeListHead(), then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead(), 
+  then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
@@ -1550,11 +1555,12 @@ IsNull (
 
   Returns TRUE if Node is the last node in the doubly linked list specified by
   List. Otherwise, FALSE is returned. List must have been initialized with
-  InitializeListHead().
+  INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with InitializeListHead(), then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
@@ -1583,8 +1589,8 @@ IsNodeAtEnd (
   Otherwise, the location of the FirstEntry node is swapped with the location
   of the SecondEntry node in a doubly linked list. SecondEntry must be in the
   same double linked list as FirstEntry and that double linked list must have
-  been initialized with InitializeListHead(). SecondEntry is returned after the
-  nodes are swapped.
+  been initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead(). 
+  SecondEntry is returned after the nodes are swapped.
 
   If FirstEntry is NULL, then ASSERT().
   If SecondEntry is NULL, then ASSERT().
@@ -1721,7 +1727,7 @@ ARShiftU64 (
   @param  Operand The 32-bit operand to rotate left.
   @param  Count   The number of bits to rotate left.
 
-  @return Operand <<< Count
+  @return Operand << Count
 
 **/
 UINT32
@@ -1769,7 +1775,7 @@ RRotU32 (
   @param  Operand The 64-bit operand to rotate left.
   @param  Count   The number of bits to rotate left.
 
-  @return Operand <<< Count
+  @return Operand << Count
 
 **/
 UINT64
@@ -1793,7 +1799,7 @@ LRotU64 (
   @param  Operand The 64-bit operand to rotate right.
   @param  Count   The number of bits to rotate right.
 
-  @return Operand >>> Count
+  @return Operand >> Count
 
 **/
 UINT64
@@ -1813,8 +1819,8 @@ RRotU64 (
 
   @param  Operand The 32-bit operand to evaluate.
 
-  @return Position of the lowest bit set in Operand if found.
-  @retval -1 Operand is zero.
+  @retval 0-31  The lowest bit set in Operand was found.
+  @retval -1    Operand is zero.
 
 **/
 INTN
@@ -1833,8 +1839,9 @@ LowBitSet32 (
 
   @param  Operand The 64-bit operand to evaluate.
 
-  @return Position of the lowest bit set in Operand if found.
-  @retval -1  Operand is zero.
+  @retval 0-63  The lowest bit set in Operand was found.
+  @retval -1    Operand is zero.
+
 
 **/
 INTN
@@ -1854,8 +1861,8 @@ LowBitSet64 (
 
   @param  Operand The 32-bit operand to evaluate.
 
-  @return Position of the highest bit set in Operand if found.
-  @retval -1  Operand is zero.
+  @retval 0-31  Position of the highest bit set in Operand if found.
+  @retval -1    Operand is zero.
 
 **/
 INTN
@@ -1875,8 +1882,8 @@ HighBitSet32 (
 
   @param  Operand The 64-bit operand to evaluate.
 
-  @return Position of the highest bit set in Operand if found.
-  @retval -1  Operand is zero.
+  @retval 0-63   Position of the highest bit set in Operand if found.
+  @retval -1     Operand is zero.
 
 **/
 INTN
@@ -1888,7 +1895,7 @@ HighBitSet64 (
 
 /**
   Returns the value of the highest bit set in a 32-bit value. Equivalent to
-  1 << HighBitSet32(x).
+  1 << log2(x).
 
   This function computes the value of the highest bit set in the 32-bit value
   specified by Operand. If Operand is zero, then zero is returned.
@@ -1908,7 +1915,7 @@ GetPowerOfTwo32 (
 
 /**
   Returns the value of the highest bit set in a 64-bit value. Equivalent to
-  1 << HighBitSet64(x).
+  1 << log2(x).
 
   This function computes the value of the highest bit set in the 64-bit value
   specified by Operand. If Operand is zero, then zero is returned.
@@ -1935,7 +1942,7 @@ GetPowerOfTwo64 (
 
   @param  Value Operand A 16-bit unsigned value.
 
-  @return The byte swaped Operand.
+  @return The byte swapped Operand.
 
 **/
 UINT16
@@ -1954,7 +1961,7 @@ SwapBytes16 (
 
   @param  Value Operand A 32-bit unsigned value.
 
-  @return The byte swaped Operand.
+  @return The byte swapped Operand.
 
 **/
 UINT32
@@ -1973,7 +1980,7 @@ SwapBytes32 (
 
   @param  Value Operand A 64-bit unsigned value.
 
-  @return The byte swaped Operand.
+  @return The byte swapped Operand.
 
 **/
 UINT64
@@ -2167,6 +2174,10 @@ DivU64x64Remainder (
   value Divisor and generates a 64-bit signed quotient. If Remainder is not
   NULL, then the 64-bit signed remainder is returned in Remainder. This
   function returns the 64-bit signed quotient.
+
+  It is the caller¡¯s responsibility to not call this function with a Divisor of 0.
+  If Divisor is 0, then the quotient and remainder should be assumed to be 
+  the largest negative integer.
 
   If Divisor is 0, then ASSERT().
 
@@ -3264,7 +3275,7 @@ InterlockedCompareExchangePointer (
 //
 
 /**
-  Calculate the sum of all elements in a buffer in unit of UINT8.
+  Returns the sum of all elements in a buffer in unit of UINT8.
   During calculation, the carry bits are dropped.
 
   This function calculates the sum of all elements in a buffer
@@ -3276,7 +3287,7 @@ InterlockedCompareExchangePointer (
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   @param  Buffer      Pointer to the buffer to carry out the sum operation.
-  @param  Length      The size, in bytes, of Buffer .
+  @param  Length      The size, in bytes, of Buffer.
 
   @return Sum         The sum of Buffer with carry bits dropped during additions.
 
@@ -3284,7 +3295,7 @@ InterlockedCompareExchangePointer (
 UINT8
 EFIAPI
 CalculateSum8 (
-  IN      CONST UINT8     	        *Buffer,
+  IN      CONST UINT8     	       *Buffer,
   IN      UINTN		  	              Length
   );
 
@@ -3310,7 +3321,7 @@ CalculateSum8 (
 UINT8
 EFIAPI
 CalculateCheckSum8 (
-  IN      CONST UINT8     	        *Buffer,
+  IN      CONST UINT8     	       *Buffer,
   IN      UINTN		  	              Length
   );
 
@@ -3337,7 +3348,7 @@ CalculateCheckSum8 (
 UINT16
 EFIAPI
 CalculateSum16 (
-  IN      CONST UINT16    	        *Buffer,
+  IN      CONST UINT16    	       *Buffer,
   IN      UINTN		  	              Length
   );
 
@@ -3365,18 +3376,18 @@ CalculateSum16 (
 UINT16
 EFIAPI
 CalculateCheckSum16 (
-  IN      CONST UINT16    	        *Buffer,
+  IN      CONST UINT16    	       *Buffer,
   IN      UINTN		  	              Length
   );
 
 
 /**
-  Returns the sum of all elements in a buffer of 32-bit values.  During
+  Returns the sum of all elements in a buffer of 32-bit values. During
   calculation, the carry bits are dropped.
 
   This function calculates the sum of the 32-bit values in the buffer
   specified by Buffer and Length. The carry bits in result of addition are dropped.
-  The 32-bit result is returned.  If Length is 0, then 0 is returned.
+  The 32-bit result is returned. If Length is 0, then 0 is returned.
 
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
@@ -3392,7 +3403,7 @@ CalculateCheckSum16 (
 UINT32
 EFIAPI
 CalculateSum32 (
-  IN      CONST UINT32    	        *Buffer,
+  IN      CONST UINT32    	       *Buffer,
   IN      UINTN		  	              Length
   );
 
@@ -3420,7 +3431,7 @@ CalculateSum32 (
 UINT32
 EFIAPI
 CalculateCheckSum32 (
-  IN      CONST UINT32    	        *Buffer,
+  IN      CONST UINT32    	       *Buffer,
   IN      UINTN		  	              Length
   );
 
@@ -3447,7 +3458,7 @@ CalculateCheckSum32 (
 UINT64
 EFIAPI
 CalculateSum64 (
-  IN      CONST UINT64    	        *Buffer,
+  IN      CONST UINT64    	       *Buffer,
   IN      UINTN		  	              Length
   );
 
@@ -3475,7 +3486,7 @@ CalculateSum64 (
 UINT64
 EFIAPI
 CalculateCheckSum64 (
-  IN      CONST UINT64    	        *Buffer,
+  IN      CONST UINT64    	       *Buffer,
   IN      UINTN		  	              Length
   );
 
@@ -3515,6 +3526,11 @@ MemoryFence (
 
   If JumpBuffer is NULL, then ASSERT().
   For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
+  
+  NOTE: The structure BASE_LIBRARY_JUMP_BUFFER is CPU architecture specific.
+  The same structure must never be used for more than one CPU architecture context.
+  For example, a BASE_LIBRARY_JUMP_BUFFER allocated by an IA-32 module must never be used from an x64 module. 
+  SetJump()/LongJump() is not currently supported for the EBC processor type.   
 
   @param  JumpBuffer  A pointer to CPU context buffer.
 
@@ -3719,7 +3735,6 @@ CpuDeadLoop (
   VOID
   );
 
-
 #if defined (MDE_CPU_IPF)
 
 /**
@@ -3793,6 +3808,8 @@ AsmFci (
 
 /**
   Reads the current value of a Processor Identifier Register (CPUID).
+  
+  Reads and returns the current value of Processor Identifier Register specified by Index. 
   The Index of largest implemented CPUID (One less than the number of implemented CPUID
   registers) is determined by CPUID [3] bits {7:0}.
   No parameter checking is performed on Index.  If the Index value is beyond the
@@ -4833,9 +4850,9 @@ AsmReadSp (
   and -1 is returned.
   This function is only available on IPF.
 
-  @return  1  The CPU is in virtual mode.
-  @return  0  The CPU is in physical mode.
-  @return -1  The CPU is in mixed mode.
+  @retval  1  The CPU is in virtual mode.
+  @retval  0  The CPU is in physical mode.
+  @retval -1  The CPU is in mixed mode.
 
 **/
 INT64
@@ -4868,7 +4885,7 @@ AsmCpuVirtual (
   available on IPF.
 
   @param PalEntryPoint	The PAL procedure calls entry point.
-  @param Index			    The PAL procedure Index number.
+  @param Index			     The PAL procedure Index number.
   @param Arg2			      The 2nd parameter for PAL procedure calls.
   @param Arg3			      The 3rd parameter for PAL procedure calls.
   @param Arg4			      The 4th parameter for PAL procedure calls.
@@ -4945,6 +4962,7 @@ PalCallStatic (
   IN      UINT64                    Arg3,
   IN      UINT64                    Arg4
   );
+
 
 
 #elif defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
@@ -5302,7 +5320,8 @@ AsmReadMsr32 (
 
 
 /**
-  Zero-extend a 32-bit value and writes it to a Machine Specific Register(MSR).
+  Writes a 32-bit value to a Machine Specific Register(MSR), and returns the value.
+  The upper 32-bits of the MSR are set to zero.
 
   Writes the 32-bit value specified by Value to the MSR specified by Index. The
   upper 32-bits of the MSR write are set to zero. The 32-bit value written to
@@ -6478,7 +6497,7 @@ AsmWriteGdtr (
 
 
 /**
-  Reads the current Interrupt Descriptor Table Register(GDTR) descriptor.
+  Reads the current Interrupt Descriptor Table Register(IDTR) descriptor.
 
   Reads and returns the current IDTR descriptor and returns it in Idtr. This
   function is only available on IA-32 and X64.
@@ -6496,7 +6515,7 @@ AsmReadIdtr (
 
 
 /**
-  Writes the current Interrupt Descriptor Table Register(GDTR) descriptor.
+  Writes the current Interrupt Descriptor Table Register(IDTR) descriptor.
 
   Writes the current IDTR descriptor and returns it in Idtr. This function is
   only available on IA-32 and X64.
@@ -6530,7 +6549,7 @@ AsmReadLdtr (
 
 
 /**
-  Writes the current Local Descriptor Table Register (GDTR) selector.
+  Writes the current Local Descriptor Table Register (LDTR) selector.
 
   Writes and the current LDTR descriptor specified by Ldtr. This function is
   only available on IA-32 and X64.
@@ -7081,7 +7100,7 @@ AsmDisablePaging32 (
   If EntryPoint is 0, then ASSERT().
   If NewStack is 0, then ASSERT().
 
-  @param  CodeSelector The 16-bit selector to load in the CS before EntryPoint
+  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
                       is called. The descriptor in the GDT that this selector
                       references must be setup for long mode.
   @param  EntryPoint  The 64-bit virtual address of the function to call with
@@ -7099,7 +7118,7 @@ AsmDisablePaging32 (
 VOID
 EFIAPI
 AsmEnablePaging64 (
-  IN      UINT16                    CodeSelector,
+  IN      UINT16                    Cs,
   IN      UINT64                    EntryPoint,
   IN      UINT64                    Context1,  OPTIONAL
   IN      UINT64                    Context2,  OPTIONAL
@@ -7122,7 +7141,7 @@ AsmEnablePaging64 (
   If EntryPoint is 0, then ASSERT().
   If NewStack is 0, then ASSERT().
 
-  @param  CodeSelector The 16-bit selector to load in the CS before EntryPoint
+  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
                       is called. The descriptor in the GDT that this selector
                       references must be setup for 32-bit protected mode.
   @param  EntryPoint  The 64-bit virtual address of the function to call with
@@ -7140,7 +7159,7 @@ AsmEnablePaging64 (
 VOID
 EFIAPI
 AsmDisablePaging64 (
-  IN      UINT16                    CodeSelector,
+  IN      UINT16                    Cs,
   IN      UINT32                    EntryPoint,
   IN      UINT32                    Context1,  OPTIONAL
   IN      UINT32                    Context2,  OPTIONAL
@@ -7203,11 +7222,47 @@ AsmPrepareThunk16 (
   Transfers control to a 16-bit real mode entry point and returns the results.
 
   Transfers control to a 16-bit real mode entry point and returns the results.
-  AsmPrepareThunk16() must be called with ThunkContext before this function is
-  used.
+  AsmPrepareThunk16() must be called with ThunkContext before this function is used.
+  This function must be called with interrupts disabled.
 
+  The register state from the RealModeState field of ThunkContext is restored just prior 
+  to calling the 16-bit real mode entry point.  This includes the EFLAGS field of RealModeState, 
+  which is used to set the interrupt state when a 16-bit real mode entry point is called.
+  Control is transferred to the 16-bit real mode entry point specified by the CS and Eip fields of RealModeState.
+  The stack is initialized to the SS and ESP fields of RealModeState.  Any parameters passed to 
+  the 16-bit real mode code must be populated by the caller at SS:ESP prior to calling this function.  
+  The 16-bit real mode entry point is invoked with a 16-bit CALL FAR instruction,
+  so when accessing stack contents, the 16-bit real mode code must account for the 16-bit segment 
+  and 16-bit offset of the return address that were pushed onto the stack. The 16-bit real mode entry 
+  point must exit with a RETF instruction. The register state is captured into RealModeState immediately 
+  after the RETF instruction is executed.
+  
+  If EFLAGS specifies interrupts enabled, or any of the 16-bit real mode code enables interrupts, 
+  or any of the 16-bit real mode code makes a SW interrupt, then the caller is responsible for making sure 
+  the IDT at address 0 is initialized to handle any HW or SW interrupts that may occur while in 16-bit real mode. 
+  
+  If EFLAGS specifies interrupts enabled, or any of the 16-bit real mode code enables interrupts, 
+  then the caller is responsible for making sure the 8259 PIC is in a state compatible with 16-bit real mode.  
+  This includes the base vectors, the interrupt masks, and the edge/level trigger mode.
+  
+  If THUNK_ATTRIBUTE_BIG_REAL_MODE is set in the ThunkAttributes field of ThunkContext, then the user code 
+  is invoked in big real mode.  Otherwise, the user code is invoked in 16-bit real mode with 64KB segment limits.
+  
+  If neither THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 nor THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL are set in 
+  ThunkAttributes, then it is assumed that the user code did not enable the A20 mask, and no attempt is made to 
+  disable the A20 mask.
+  
+  If THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 is set and THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL is clear in 
+  ThunkAttributes, then attempt to use the INT 15 service to disable the A20 mask.  If this INT 15 call fails, 
+  then attempt to disable the A20 mask by directly accessing the 8042 keyboard controller I/O ports.
+  
+  If THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 is clear and THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL is set in 
+  ThunkAttributes, then attempt to disable the A20 mask by directly accessing the 8042 keyboard controller I/O ports.
+    
   If ThunkContext is NULL, then ASSERT().
   If AsmPrepareThunk16() was not previously called with ThunkContext, then ASSERT().
+  If both THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 and THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL are set in 
+  ThunkAttributes, then ASSERT().
 
   @param  ThunkContext  A pointer to the context structure that describes the
                         16-bit real mode code to call.
@@ -7231,7 +7286,7 @@ AsmThunk16 (
   real mode thunk, then it is more efficient if AsmPrepareThunk16() is called
   once and AsmThunk16() can be called for each 16-bit real mode thunk.
 
-  If ThunkContext is NULL, then ASSERT().
+  See AsmPrepareThunk16() and AsmThunk16() for the detailed description and ASSERT() conditions.
 
   @param  ThunkContext  A pointer to the context structure that describes the
                         16-bit real mode code to call.
