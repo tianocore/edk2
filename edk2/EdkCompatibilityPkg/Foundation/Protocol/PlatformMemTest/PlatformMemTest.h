@@ -109,7 +109,7 @@ typedef struct {
 typedef enum {
   EfiMemtestCorrectableError = 1,
   EfiMemtestUncorrectableError,
-  EfiMemtestErrorMaximum,
+  EfiMemtestErrorMaximum
 } EFI_DIMM_ERROR;
 
 //
@@ -118,7 +118,7 @@ typedef enum {
 typedef enum {
   EfiMemtestActionReport = 1,
   EfiMemtestActionDisableMem,
-  EfiMemtestActionMaximum,
+  EfiMemtestActionMaximum
 } EFI_MEMTEST_ERROR_ACTION;
 
 
