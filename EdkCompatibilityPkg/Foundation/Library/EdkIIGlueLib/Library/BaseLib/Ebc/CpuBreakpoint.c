@@ -21,12 +21,6 @@ Abstract:
 
 #include "BaseLibInternals.h"
 
-extern
-UINT64
-_break (
-  CHAR8 BreakCode
-  );
-
 /**
   Generates a breakpoint on the CPU.
 
