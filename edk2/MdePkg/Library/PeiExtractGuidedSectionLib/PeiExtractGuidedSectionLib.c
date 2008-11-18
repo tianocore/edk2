@@ -120,12 +120,18 @@ PeiGetExtractGuidedSectionHandlerInfo (
 }
 
 /**
-  Get the supported exract guided section Handler guid list.
-  If ExtractHandlerGuidTable = NULL, then ASSERT.
+  Retrieve the list GUIDs that have been registered through ExtractGuidedSectionRegisterHandlers().
 
-  @param[out]  ExtractHandlerGuidTable   The extract Handler guid pointer list.
+  Sets ExtractHandlerGuidTable so it points at a callee allocated array of registered GUIDs.
+  The total number of GUIDs in the array are returned. Since the array of GUIDs is callee allocated
+  and caller must treat this array of GUIDs as read-only data. 
+  If ExtractHandlerGuidTable is NULL, then ASSERT().
+
+  @param[out]  ExtractHandlerGuidTable  A pointer to the array of GUIDs tht have been registerd through
+                                        ExtractGuidedSectionRegisterHandlers().
 
   @return the number of the supported extract guided Handler.
+
 **/
 UINTN
 EFIAPI
@@ -154,15 +160,28 @@ ExtractGuidedSectionGetGuidList (
 }
 
 /**
-  Register Guided Section Extract and GetInfo handler.
+  Registers handlers of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER and EXTRACT_GUIDED_SECTION_DECODE_HANDLER
+  for a specific GUID section type.
 
-  @param[in]     SectionGuid    The guid matches this Extraction function.
-  @param[in]     GetInfoHandler Function to get info from guided section.
-  @param[in]     DecodeHandler  Function to extract guided section.
+  Registers the handlers specified by GetInfoHandler and DecodeHandler witg the GUID specified by SectionGuid.
+  If the GUID value specified by SectionGuid has already been registered, then return RETURN_ALREADY_STARTED.
+  If there are not enough resources available to register the handlers  then RETURN_OUT_OF_RESOURCES is returned.
+  If SectionGuid is NULL, then ASSERT().
+  If GetInfoHandler is NULL, then ASSERT().
+  If DecodeHandler is NULL, then ASSERT().
 
-  @retval  RETURN_SUCCESS           Register Guided Section Extract function successfully.
-  @retval  RETURN_OUT_OF_RESOURCES  Resource is not enough to register new function. 
-  @retval  RETURN_INVALID_PARAMETER Input pointer to Guid value is not valid.
+  @param[in]  SectionGuid    A pointer to the GUID associated with the the handlers
+                             of the GUIDed section type being registered.
+  @param[in]  GetInfoHandler Pointer to a function that examines a GUIDed section and returns the
+                             size of the decoded buffer and the size of an optional scratch buffer
+                             required to actually decode the data in a GUIDed section.
+  @param[in]  DecodeHandler  Pointer to a function that decodes a GUIDed section into a caller
+                             allocated output buffer. 
+
+  @retval  RETURN_SUCCESS           The handlers were registered.
+  @retval  RETURN_ALREADY_STARTED   Handlers have already been registered for the GUID specified by SectionGuid. 
+  @retval  RETURN_OUT_OF_RESOURCES  There are not enough resources available to register the handlers.
+
 **/
 RETURN_STATUS
 EFIAPI
@@ -177,11 +196,13 @@ ExtractGuidedSectionRegisterHandlers (
   PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
 
   //
-  // Check input paramter.
+  // Check input paramter
   //
-  if (SectionGuid == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
+  ASSERT (SectionGuid != NULL);
+  ASSERT (GetInfoHandler != NULL);
+  ASSERT (DecodeHandler != NULL);
+
+
 
   //
   // Get the registered handler information
@@ -223,24 +244,36 @@ ExtractGuidedSectionRegisterHandlers (
 }
 
 /**
-  Get information from the guided section. This function first gets the guid value
-  from guided section header, then match this guid in the registered extract Handler list
-  to its corresponding getinfo Handler. 
-  If not found, RETURN_INVALID_PARAMETER will be return. 
-  If found, it will call the getinfo Handler to get the required size and attribute.
+  Retrives a GUID from a GUIDed section and uses that GUID to select an associated handler of type
+  EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers().
+  The selected handler is used to retrieve and return the size of the decoded buffer and the size of an
+  optional scratch buffer required to actually decode the data in a GUIDed section.
 
-  It will ASSERT () if the pointer to OutputBufferSize is NULL.
-  It will ASSERT () if the pointer to ScratchBufferSize is NULL.
-  It will ASSERT () if the pointer to SectionAttribute is NULL.
+  Examines a GUIDed section specified by InputSection.  
+  If GUID for InputSection does not match any of the GUIDs registered through ExtractGuidedSectionRegisterHandlers(),
+  then RETURN_UNSUPPORTED is returned.  
+  If the GUID of InputSection does match the GUID that this handler supports, then the the associated handler 
+  of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers()
+  is used to retrieve the OututBufferSize, ScratchSize, and Attributes values. The return status from the handler of
+  type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER is returned.
+  If InputSection is NULL, then ASSERT().
+  If OutputBufferSize is NULL, then ASSERT().
+  If ScratchBufferSize is NULL, then ASSERT().
+  If SectionAttribute is NULL, then ASSERT().
 
-  @param[in]  InputSection          Buffer containing the input GUIDed section to be processed. 
-  @param[out] OutputBufferSize      The size of OutputBuffer.
-  @param[out] ScratchBufferSize     The size of ScratchBuffer.  
-  @param[out] SectionAttribute      The attribute of the input guided section.
+  @param[in]  InputSection       A pointer to a GUIDed section of an FFS formatted file.
+  @param[out] OutputBufferSize   A pointer to the size, in bytes, of an output buffer required if the buffer
+                                 specified by InputSection were decoded.
+  @param[out] ScratchBufferSize  A pointer to the size, in bytes, required as scratch space if the buffer specified by
+                                 InputSection were decoded.
+  @param[out] SectionAttribute   A pointer to the attributes of the GUIDed section.  See the Attributes field of
+                                 EFI_GUID_DEFINED_SECTION in the PI Specification.
 
-  @retval  RETURN_SUCCESS           Get the required information successfully.
-  @retval  RETURN_UNSUPPORTED       Guided section data is not supported.
-  @retval  RETURN_INVALID_PARAMETER The input data is not the valid guided section.
+  @retval  RETURN_SUCCESS      Get the required information successfully.
+  @retval  RETURN_UNSUPPORTED  The GUID from the section specified by InputSection does not match any of
+                               the GUIDs registered with ExtractGuidedSectionRegisterHandlers().
+  @retval  Others              The return status from the handler associated with the GUID retrieved from
+                               the section specified by InputSection.
 
 **/
 RETURN_STATUS
@@ -259,10 +292,7 @@ ExtractGuidedSectionGetInfo (
   //
   // Check input paramter
   //
-  if (InputSection == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
-  
+  ASSERT (InputSection != NULL);
   ASSERT (OutputBufferSize != NULL);
   ASSERT (ScratchBufferSize != NULL);
   ASSERT (SectionAttribute != NULL);
@@ -299,28 +329,37 @@ ExtractGuidedSectionGetInfo (
 }
 
 /**
-  Extract data from the guided section. This function first gets the guid value
-  from guided section header, then match this guid in the registered extract Handler list
-  to its corresponding extract Handler. 
-  If not found, RETURN_INVALID_PARAMETER will be return. 
-  If found, it will call this extract Handler to get output data and AuthenticationStatus.
+  Retrives the GUID from a GUIDed section and uses that GUID to select an associated handler of type
+  EXTRACT_GUIDED_SECTION_DECODE_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers().
+  The selected handler is used to decode the data in a GUIDed section and return the result in a caller
+  allocated output buffer.
 
-  It will ASSERT () if the pointer to OutputBuffer is NULL.
-  It will ASSERT () if the pointer to AuthenticationStatus is NULL.
+  Decodes the GUIDed section specified by InputSection.  
+  If GUID for InputSection does not match any of the GUIDs registered through ExtractGuidedSectionRegisterHandlers(),
+  then RETURN_UNSUPPORTED is returned.  
+  If the GUID of InputSection does match the GUID that this handler supports, then the the associated handler
+  of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers()
+  is used to decode InputSection into the buffer specified by OutputBuffer and the authentication status of this
+  decode operation is returned in AuthenticationStatus.  If the decoded buffer is identical to the data in InputSection,
+  then OutputBuffer is set to point at the data in InputSection.  Otherwise, the decoded data will be placed in caller
+  allocated buffer specified by OutputBuffer.    This function is responsible for computing the  EFI_AUTH_STATUS_PLATFORM_OVERRIDE
+  bit of in AuthenticationStatus.  The return status from the handler of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER is returned.  
+  If InputSection is NULL, then ASSERT().
+  If OutputBuffer is NULL, then ASSERT().
+  If ScratchBuffer is NULL and this decode operation requires a scratch buffer, then ASSERT().
+  If AuthenticationStatus is NULL, then ASSERT().  
 
-  @param[in]  InputSection  Buffer containing the input GUIDed section to be processed. 
-  @param[out] OutputBuffer  OutputBuffer to point the start of the section's contents 
-                            if guided data is not required prcessing. Otherwise,
-                            OutputBuffer to contain the output data, which is 
-                            allocated by the caller.
-  @param[out] ScratchBuffer A pointer to a caller-allocated buffer for function internal use. 
+  @param[in]  InputSection   A pointer to a GUIDed section of an FFS formatted file.
+  @param[out] OutputBuffer   A pointer to a buffer that contains the result of a decode operation. 
+  @param[in]  ScratchBuffer  A caller allocated buffer that may be required by this function as a scratch buffer to perform the decode operation. 
   @param[out] AuthenticationStatus 
-                            A pointer to a caller-allocated UINT32 that indicates the
-                            authentication status of the output buffer. 
+                             A pointer to the authentication status of the decoded output buffer. See the definition
+                             of authentication status in the EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI section of the PI
+                             Specification.
 
-  @retval  RETURN_SUCCESS           Get the output data, size and AuthenticationStatus successfully.
-  @retval  RETURN_UNSUPPORTED       Guided section data is not supported to be decoded.
-  @retval  RETURN_INVALID_PARAMETER The input data is not the valid guided section.
+  @retval  RETURN_SUCCESS           The buffer specified by InputSection was decoded.
+  @retval  RETURN_UNSUPPORTED       The section specified by InputSection does not match the GUID this handler supports.
+  @retval  RETURN_INVALID_PARAMETER The section specified by InputSection can not be decoded.
 
 **/
 RETURN_STATUS
@@ -328,7 +367,7 @@ EFIAPI
 ExtractGuidedSectionDecode (
   IN  CONST VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  OUT       VOID    *ScratchBuffer,        OPTIONAL
+  IN        VOID    *ScratchBuffer,        OPTIONAL
   OUT       UINT32  *AuthenticationStatus  
   )
 {
@@ -339,9 +378,7 @@ ExtractGuidedSectionDecode (
   //
   // Check input parameter
   //
-  if (InputSection == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }  
+  ASSERT (InputSection != NULL);
   ASSERT (OutputBuffer != NULL);
   ASSERT (AuthenticationStatus != NULL);
 
