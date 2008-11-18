@@ -122,6 +122,19 @@ Ip4DriverBindingSupported (
   return Status;
 }
 
+/**
+  Clean up a IP4 service binding instance. It will release all
+  the resource allocated by the instance. The instance may be
+  partly initialized, or partly destroyed. If a resource is
+  destroyed, it is marked as that in case the destory failed and
+  being called again later.
+
+  @param  IpSb                   The IP4 serviceing binding instance to clean up
+
+  @retval EFI_SUCCESS            The resource used by the instance are cleaned up
+  @retval other                  Failed to clean up some of the resources.
+
+**/
 EFI_STATUS
 Ip4CleanService (
   IN IP4_SERVICE            *IpSb

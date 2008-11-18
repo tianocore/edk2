@@ -21,20 +21,66 @@ Abstract:
 #ifndef __EFI_IP4_OUTPUT_H__
 #define __EFI_IP4_OUTPUT_H__
 
+/**
+  The default callback function for system generated packet.
+  It will free the packet.
+
+  @param  Ip4Instance          The IP4 child that issued the transmission.  It most
+                               like is NULL.
+  @param  Packet               The packet that transmitted.
+  @param  IoStatus             The result of the transmission, succeeded or failed.
+  @param  LinkFlag             Not used when transmission. check IP4_FRAME_CALLBACK
+                               for reference.
+  @param  Context              The context provided by us
+
+  @return None
+
+**/
 VOID
 Ip4SysPacketSent (
   IP4_PROTOCOL              *Ip4Instance,
   NET_BUF                   *Packet,
   EFI_STATUS                IoStatus,
-  UINT32                    Flag,
+  UINT32                    LinkFlag,
   VOID                      *Context
   );
 
+/**
+  Transmit an IP4 packet. The packet comes either from the IP4
+  child's consumer (IpInstance != NULL) or the IP4 driver itself
+  (IpInstance == NULL). It will route the packet, fragment it,
+  then transmit all the fragments through some interface.
+
+  @param  IpSb                 The IP4 service instance to transmit the packet
+  @param  IpInstance           The IP4 child that issues the transmission.  It is
+                               NULL if the packet is from the system.
+  @param  Packet               The user data to send, excluding the IP header.
+  @param  Head                 The caller supplied header. The caller should set
+                               the following header fields: Tos, TotalLen, Id, tl,
+                               Fragment, Protocol, Src and Dst. All the fields are
+                               in host byte  order. This function will fill in the
+                               Ver, HeadLen,  Fragment, and checksum. The Fragment
+                               only need to include the DF flag. Ip4Output will
+                               compute the MF and offset for  you.
+  @param  Option               The original option to append to the IP headers
+  @param  OptLen               The length of the option
+  @param  GateWay              The next hop address to transmit packet to.
+                               255.255.255.255 means broadcast.
+  @param  Callback             The callback function to issue when transmission
+                               completed.
+  @param  Context              The opaque context for the callback
+
+  @retval EFI_NO_MAPPING       There is no interface to the destination.
+  @retval EFI_NOT_FOUND        There is no route to the destination
+  @retval EFI_SUCCESS          The packet is successfully transmitted.
+  @retval Others               Failed to transmit the packet.
+
+**/
 EFI_STATUS
 Ip4Output (
   IN IP4_SERVICE            *IpSb,
-  IN IP4_PROTOCOL           *IpInstance,    OPTIONAL
-  IN NET_BUF                *Data,
+  IN IP4_PROTOCOL           *IpInstance, OPTIONAL
+  IN NET_BUF                *Packet,
   IN IP4_HEAD               *Head,
   IN UINT8                  *Option,
   IN UINT32                 OptLen,
@@ -43,11 +89,21 @@ Ip4Output (
   IN VOID                   *Context
   );
 
+/**
+  Cancel the Packet and all its fragments.
+
+  @param  IpIf                 The interface from which the Packet is sent
+  @param  Packet               The Packet to cancel
+  @param  IoStatus             The status returns to the sender.
+
+  @return None
+
+**/
 VOID
 Ip4CancelPacket (
-  IN IP4_INTERFACE          *IpIf,
-  IN NET_BUF                *Packet,
-  IN EFI_STATUS             IoStatus
+  IN IP4_INTERFACE    *IpIf,
+  IN NET_BUF          *Packet,
+  IN EFI_STATUS       IoStatus
   );
 
 extern UINT16  mIp4Id;

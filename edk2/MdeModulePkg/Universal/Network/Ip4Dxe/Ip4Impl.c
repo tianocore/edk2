@@ -691,7 +691,8 @@ ON_EXIT:
   gBS->FreePool (Data);
 }
 
-/*++
+/**
+
   Request Ip4AutoConfigCallBackDpc as a DPC at TPL_CALLBACK.
   
   @param Event     The event that is signalled.
@@ -699,7 +700,7 @@ ON_EXIT:
   
   @return None.
 
-++*/
+**/
 VOID
 EFIAPI
 Ip4AutoConfigCallBack (

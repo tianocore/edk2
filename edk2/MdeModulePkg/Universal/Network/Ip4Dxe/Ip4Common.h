@@ -86,38 +86,111 @@ typedef enum {
 ///
 #define IP4_US_TO_SEC(Us) (((Us) + 999999) / 1000000)
 
+/**
+  Return the cast type (Unicast/Boradcast) specific to an
+  interface. All the addresses are host byte ordered.
+
+  @param  IpAddr                The IP address to classify in host byte order
+  @param  IpIf                  The interface that IpAddr received from
+
+  @return The cast type of this IP address specific to the interface.
+  @retval IP4_LOCAL_HOST        The IpAddr equals to the interface's address
+  @retval IP4_SUBNET_BROADCAST  The IpAddr is a directed subnet boradcast to  the
+                                interface
+  @retval IP4_NET_BROADCAST     The IpAddr is a network broadcast to the interface
+  @retval 0                     Otherwise.
+
+**/
 INTN
 Ip4GetNetCast (
-  IN  IP4_ADDR            IpAddr,
-  IN  IP4_INTERFACE       *IpIf
+  IN  IP4_ADDR          IpAddr,
+  IN  IP4_INTERFACE     *IpIf
   );
 
+/**
+  Find the cast type of the packet related to the local host.
+  This isn't the same as link layer cast type. For example, DHCP
+  server may send local broadcast to the local unicast MAC.
+
+  @param  IpSb                  The IP4 service binding instance that received the
+                                packet
+  @param  Dst                   The destination address in the packet (host byte
+                                order)
+  @param  Src                   The source address in the packet (host byte order)
+
+  @return The cast type for the Dst, it will return on the first non-promiscuous
+          cast type to a configured interface. If the packet doesn't match any of
+          the interface, multicast address and local broadcast address are checked.
+
+**/
 INTN
 Ip4GetHostCast (
-  IN  IP4_SERVICE         *IpSb,
-  IN  IP4_ADDR            Dst,
-  IN  IP4_ADDR            Src
+  IN  IP4_SERVICE       *IpSb,
+  IN  IP4_ADDR          Dst,
+  IN  IP4_ADDR          Src
   );
 
+/**
+  Find an interface whose configured IP address is Ip.
+
+  @param  IpSb                  The IP4 service binding instance
+  @param  Ip                    The Ip address (host byte order) to find
+
+  @return The IP4_INTERFACE point if found, otherwise NULL
+
+**/
 IP4_INTERFACE *
 Ip4FindInterface (
-  IN IP4_SERVICE          *IpService,
-  IN IP4_ADDR             Addr
+  IN IP4_SERVICE        *IpSb,
+  IN IP4_ADDR           Ip
   );
 
+/**
+  Find an interface that Ip is on that connected network.
+
+  @param  IpSb                  The IP4 service binding instance
+  @param  Ip                    The Ip address (host byte order) to find
+
+  @return The IP4_INTERFACE point if found, otherwise NULL
+
+**/
 IP4_INTERFACE *
 Ip4FindNet (
-  IN IP4_SERVICE          *IpService,
-  IN IP4_ADDR             Addr
+  IN IP4_SERVICE        *IpSb,
+  IN IP4_ADDR           Ip
   );
 
+/**
+  Find an interface of the service with the same Ip/Netmask pair.
+
+  @param  IpSb                  Ip4 service binding instance
+  @param  Ip                    The Ip adress to find (host byte order)
+  @param  Netmask               The network to find (host byte order)
+
+  @return The IP4_INTERFACE point if found, otherwise NULL
+
+**/
 IP4_INTERFACE *
 Ip4FindStationAddress (
-  IN IP4_SERVICE          *IpSb,
-  IN IP4_ADDR             Ip,
-  IN IP4_ADDR             Netmask
+  IN IP4_SERVICE        *IpSb,
+  IN IP4_ADDR           Ip,
+  IN IP4_ADDR           Netmask
   );
 
+/**
+  Get the MAC address for a multicast IP address. Call
+  Mnp's McastIpToMac to find the MAC address in stead of
+  hard code the NIC to be Ethernet.
+
+  @param  Mnp                   The Mnp instance to get the MAC address.
+  @param  Multicast             The multicast IP address to translate.
+  @param  Mac                   The buffer to hold the translated address.
+
+  @retval EFI_SUCCESS if the multicast IP is successfully translated to a
+                      multicast MAC address.
+  @retval other       Otherwise some error.
+
+**/
 EFI_STATUS
 Ip4GetMulticastMac (
   IN  EFI_MANAGED_NETWORK_PROTOCOL *Mnp,
@@ -125,19 +198,50 @@ Ip4GetMulticastMac (
   OUT EFI_MAC_ADDRESS              *Mac
   );
 
+/**
+  Convert the multibyte field in IP header's byter order.
+  In spite of its name, it can also be used to convert from
+  host to network byte order.
+
+  @param  Head                  The IP head to convert
+
+  @return Point to the converted IP head
+
+**/
 IP4_HEAD *
 Ip4NtohHead (
-  IN IP4_HEAD               *Head
+  IN IP4_HEAD           *Head
   );
 
+/**
+  Set the Ip4 variable data.
+  
+  Save the list of all of the IPv4 addresses and subnet masks that are currently
+  being used to volatile variable storage.
+
+  @param  IpSb                  Ip4 service binding instance
+
+  @retval EFI_SUCCESS           Successfully set variable.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to set the variable.
+  @retval other                 Set variable failed.
+
+**/
 EFI_STATUS
 Ip4SetVariableData (
-  IN IP4_SERVICE            *IpSb
+  IN IP4_SERVICE  *IpSb
   );
 
+/**
+  Clear the variable and free the resource.
+
+  @param  IpSb                  Ip4 service binding instance
+
+  @return None.
+
+**/
 VOID
 Ip4ClearVariableData (
-  IN IP4_SERVICE            *IpSb
+  IN IP4_SERVICE  *IpSb
   );
 
 #endif

@@ -69,52 +69,151 @@ typedef enum {
   IGMP_UNSOLICIATED_REPORT  = 10
 } IGMP_ENUM_TYPES;
 
+/**
+  Init the IGMP control data of the IP4 service instance, configure
+  MNP to receive ALL SYSTEM multicast.
+
+  @param  IpSb                   The IP4 service whose IGMP is to be initialized.
+
+  @retval EFI_SUCCESS            IGMP of the IpSb is successfully initialized.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resource to initialize IGMP.
+  @retval Others                 Failed to initialize the IGMP of IpSb.
+
+**/
 EFI_STATUS
 Ip4InitIgmp (
-  IN IP4_SERVICE          *IpService
+  IN OUT IP4_SERVICE            *IpSb
   );
 
+/**
+  Join the multicast group on behalf of this IP4 child
+
+  @param  IpInstance             The IP4 child that wants to join the group
+  @param  Address                The group to join
+
+  @retval EFI_SUCCESS            Successfully join the multicast group
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources
+  @retval Others                 Failed to join the multicast group.
+
+**/
 EFI_STATUS
 Ip4JoinGroup (
-  IN IP4_PROTOCOL         *IpInstance,
-  IN IP4_ADDR             Address
+  IN IP4_PROTOCOL           *IpInstance,
+  IN IP4_ADDR               Address
   );
 
+/**
+  Leave the IP4 multicast group on behalf of IpInstance.
+
+  @param  IpInstance             The IP4 child that wants to leave the group
+                                 address
+  @param  Address                The group address to leave
+
+  @retval EFI_NOT_FOUND          The IP4 service instance isn't in the group
+  @retval EFI_SUCCESS            Successfully leave the multicast group.
+  @retval Others                 Failed to leave the multicast group.
+
+**/
 EFI_STATUS
 Ip4LeaveGroup (
-  IN IP4_PROTOCOL         *IpInstance,
-  IN IP4_ADDR             Address
+  IN IP4_PROTOCOL           *IpInstance,
+  IN IP4_ADDR               Address
   );
 
+/**
+  Handle the received IGMP message for the IP4 service instance.
+
+  @param  IpSb                   The IP4 service instance that received the message
+  @param  Head                   The IP4 header of the received message
+  @param  Packet                 The IGMP message, without IP4 header
+
+  @retval EFI_INVALID_PARAMETER  The IGMP message is malformated.
+  @retval EFI_SUCCESS            The IGMP message is successfully processed.
+
+**/
 EFI_STATUS
 Ip4IgmpHandle (
-  IN IP4_SERVICE          *IpService,
-  IN IP4_HEAD             *Head,
-  IN NET_BUF              *Packet
+  IN IP4_SERVICE            *IpSb,
+  IN IP4_HEAD               *Head,
+  IN NET_BUF                *Packet
   );
 
+/**
+  The periodical timer function for IGMP. It does the following
+  things:
+  1. Decrease the Igmpv1QuerySeen to make it possible to refresh
+     the IGMP server type.
+  2. Decrease the report timer for each IGMP group in "delaying
+     member" state.
+
+  @param  IpSb                   The IP4 service instance that is ticking
+
+  @return None
+
+**/
 VOID
 Ip4IgmpTicking (
-  IN IP4_SERVICE          *IpService
+  IN IP4_SERVICE            *IpSb
   );
 
+/**
+  Add a group address to the array of group addresses.
+  The caller should make sure that no duplicated address
+  existed in the array. Although the function doesn't
+  assume the byte order of the both Source and Addr, the
+  network byte order is used by the caller.
+
+  @param  Source                 The array of group addresses to add to
+  @param  Count                  The number of group addresses in the Source
+  @param  Addr                   The IP4 multicast address to add
+
+  @return NULL if failed to allocate memory for the new groups,
+          otherwise the new combined group addresses.
+
+**/
 IP4_ADDR *
 Ip4CombineGroups (
-  IN  IP4_ADDR            *SourceGroups,
-  IN  UINT32              Count,
-  IN  IP4_ADDR            Addr
+  IN  IP4_ADDR              *Source,
+  IN  UINT32                Count,
+  IN  IP4_ADDR              Addr
   );
 
+/**
+  Remove a group address from the array of group addresses.
+  Although the function doesn't assume the byte order of the
+  both Groups and Addr, the network byte order is used by
+  the caller.
+
+  @param  Groups                 The array of group addresses to remove from
+  @param  Count                  The number of group addresses in the Groups
+  @param  Addr                   The IP4 multicast address to remove
+
+  @return The nubmer of group addresses in the Groups after remove.
+          It is Count if the Addr isn't in the Groups.
+
+**/
 INTN
 Ip4RemoveGroupAddr (
-  IN IP4_ADDR             *Group,
-  IN UINT32               GroupCnt,
-  IN IP4_ADDR             Addr
+  IN OUT IP4_ADDR               *Groups,
+  IN     UINT32                 Count,
+  IN     IP4_ADDR               Addr
   );
 
+/**
+  Find the IGMP_GROUP structure which contains the status of multicast
+  group Address in this IGMP control block
+
+  @param  IgmpCtrl               The IGMP control block to search from
+  @param  Address                The multicast address to search
+
+  @return NULL if the multicast address isn't in the IGMP control block. Otherwise
+          the point to the IGMP_GROUP which contains the status of multicast group
+          for Address.
+
+**/
 IGMP_GROUP *
 Ip4FindGroup (
-  IN IGMP_SERVICE_DATA    *IgmpCtrl,
-  IN IP4_ADDR             Address
+  IN IGMP_SERVICE_DATA      *IgmpCtrl,
+  IN IP4_ADDR               Address
   );
 #endif
