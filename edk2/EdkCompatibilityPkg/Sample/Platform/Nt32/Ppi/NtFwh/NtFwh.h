@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -27,7 +27,7 @@ Abstract:
 
 #define NT_FWH_PPI_GUID \
   { \
-    0x4e76928f, 0x50ad, 0x4334, 0xb0, 0x6b, 0xa8, 0x42, 0x13, 0x10, 0x8a, 0x57 \
+    0x4e76928f, 0x50ad, 0x4334, {0xb0, 0x6b, 0xa8, 0x42, 0x13, 0x10, 0x8a, 0x57} \
   }
 
 typedef

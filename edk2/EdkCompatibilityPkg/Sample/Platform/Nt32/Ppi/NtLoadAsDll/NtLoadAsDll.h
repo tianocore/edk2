@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -26,7 +26,7 @@ Abstract:
 
 #define EFI_NT_LOAD_AS_DLL_PPI_GUID \
   { \
-    0xccc53f6b, 0xa03a, 0x4ed8, 0x83, 0x9a, 0x3, 0xd9, 0x9c, 0x2, 0xb4, 0xe3 \
+    0xccc53f6b, 0xa03a, 0x4ed8, {0x83, 0x9a, 0x3, 0xd9, 0x9c, 0x2, 0xb4, 0xe3} \
   }
 
 typedef
