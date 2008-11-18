@@ -3845,9 +3845,11 @@ AsmReadPsr (
 
 /**
   Writes the current value of 64-bit Processor Status Register (PSR).
+
   No parameter checking is performed on Value.  All bits of Value corresponding to
-  reserved fields of PSR must be 0 or a Reserved Register/Field fault may occur.  The caller must either guarantee that Value is valid, or the caller must set up fault handlers to catch the faults.
-  This function is only available on IPF.
+  reserved fields of PSR must be 0 or a Reserved Register/Field fault may occur.
+  The caller must either guarantee that Value is valid, or the caller must set up
+  fault handlers to catch the faults. This function is only available on IPF.
 
   @param Value		The 64-bit value to write to PSR.
 
