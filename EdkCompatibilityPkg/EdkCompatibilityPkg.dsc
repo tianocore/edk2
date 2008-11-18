@@ -200,18 +200,8 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
 # EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
-
-  #
-  # PeiServicesLib.inf will only build under PI_SPECIFICATION = 0x00010000 as PeiServices is defined
-  # as (CONST EFI_PEI_SERVICES  **) after PI 1.0.
-  #
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesLib/PeiServicesLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  
-  #
-  # PeiSmbusLib.inf will only build under PI_SPECIFICATION = 0x00010000 as PeiServices is defined
-  # as (CONST EFI_PEI_SERVICES  **) after PI 1.0.
-  #
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiSmbusLib/PeiSmbusLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiDevicePathLib/UefiDevicePathLib.inf
@@ -224,11 +214,6 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   EdkCompatibilityPkg/Foundation/Library/Thunk16/Thunk16Lib_Edk2.inf
   EdkCompatibilityPkg/Foundation/Ppi/EdkPpiLib.inf
   EdkCompatibilityPkg/Foundation/Protocol/EdkProtocolLib.inf
-
-  #
-  # MemoryStatusCode.inf will only build under PI_SPECIFICATION = 0x00010000 as PeiServices is defined
-  # as (CONST EFI_PEI_SERVICES  **) after PI 1.0.
-  #
   EdkCompatibilityPkg/Sample/Platform/Generic/MonoStatusCode/Library/Pei/MemoryStatusCode/MemoryStatusCode.inf
   EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/BsDataHubStatusCode/BsDataHubStatusCode.inf
   EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/BsSerialStatusCode/BsSerialStatusCode.inf
