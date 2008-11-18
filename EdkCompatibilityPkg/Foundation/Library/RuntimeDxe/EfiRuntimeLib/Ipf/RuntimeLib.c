@@ -164,7 +164,7 @@ Returns:
   // virtual). So lets grap the physical PLABEL for the EsalEntryPoint and store it
   // away. We cache it in a module global, so we can register the vitrual version.
   //
-  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, &mEsalBootService);
+  Status = gBS->LocateProtocol (&gEfiExtendedSalBootServiceProtocolGuid, NULL, (VOID **) &mEsalBootService);
   ASSERT_EFI_ERROR (Status);
 
   Plabel              = (EFI_PLABEL *) (UINTN) mEsalBootService->ExtendedSalProc;
