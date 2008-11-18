@@ -34,19 +34,50 @@ typedef enum {
   IP4_OPTION_COPY_MASK = 0x80
 } IP4_OPTION_ENUM_TYPES;
 
+/**
+  Validate the IP4 option format for both the packets we received
+  and will transmit. It will compute the ICMP error message fields
+  if the option is mal-formated. But this information isn't used.
+
+  @param  Option                The first byte of the option
+  @param  OptionLen             The length of the whole option
+  @param  Rcvd                  The option is from the packet we received if TRUE,
+                                otherwise the option we wants to transmit.
+
+  @retval TRUE     The option is properly formatted
+  @retval FALSE    The option is mal-formated
+
+**/
 BOOLEAN
 Ip4OptionIsValid (
   IN UINT8                  *Option,
-  IN UINT32                 OptLen,
+  IN UINT32                 OptionLen,
   IN BOOLEAN                Rcvd
   );
 
+/**
+  Copy the option from the original option to buffer. It
+  handles the details such as:
+  1. whether copy the single IP4 option to the first/non-first
+     fragments.
+  2. Pad the options copied over to aligned to 4 bytes.
+
+  @param  Option                The original option to copy from
+  @param  OptionLen             The length of the original option
+  @param  FirstFragment         Whether it is the first fragment
+  @param  Buf                   The buffer to copy options to. NULL 
+  @param  BufLen                The length of the buffer
+
+  @retval EFI_SUCCESS           The options are copied over
+  @retval EFI_BUFFER_TOO_SMALL  Buf is NULL or BufLen provided is too small.
+
+**/
 EFI_STATUS
 Ip4CopyOption (
-  IN UINT8                  *Option,
-  IN UINT32                 OptLen,
-  IN BOOLEAN                Fragment,
-  IN UINT8                  *Buf,     OPTIONAL
+  IN     UINT8              *Option,
+  IN     UINT32             OptionLen,
+  IN     BOOLEAN            FirstFragment,
+  IN OUT UINT8              *Buf,           OPTIONAL
   IN OUT UINT32             *BufLen
   );
 #endif
