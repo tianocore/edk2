@@ -135,7 +135,9 @@ Returns:
 #define MAXMATCH  256
 #define THRESHOLD 3
 #define CODE_BIT  16
+#ifndef UINT8_MAX
 #define UINT8_MAX 0xff
+#endif
 #define BAD_TABLE - 1
 
 //
