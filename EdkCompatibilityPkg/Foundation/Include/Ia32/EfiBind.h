@@ -235,7 +235,12 @@ typedef int32_t   intn_t;
 // compiler will optimize away the rest of the function following, so that you run out in
 // the weeds if you skip over it with a debugger.
 //
+#ifdef _MSC_EXTENSIONS
 #define EFI_BREAKPOINT()  __asm { int 3 }
+#elif __GNUC__
+#define EFI_BREAKPOINT() asm("   int $3");
+#endif
+
 #define EFI_DEADLOOP()    { volatile UINTN __iii; __iii = 1; while (__iii); }
 
 //
