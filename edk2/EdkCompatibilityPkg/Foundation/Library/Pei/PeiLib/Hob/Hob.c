@@ -270,7 +270,7 @@ Returns:
   //
   // Check FV Signature
   //
-  PEI_ASSERT (PeiServices, ((EFI_FIRMWARE_VOLUME_HEADER*)((UINTN)BaseAddress))->Signature == EFI_FVH_SIGNATURE);
+  PEI_ASSERT ((CONST EFI_PEI_SERVICES **) PeiServices, ((EFI_FIRMWARE_VOLUME_HEADER*)((UINTN)BaseAddress))->Signature == EFI_FVH_SIGNATURE);
   
   Status = (*PeiServices)->CreateHob (
                              PeiServices,
