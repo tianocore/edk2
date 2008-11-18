@@ -1,6 +1,6 @@
 ##  @file  MdePkg.dec
 #
-# This Package provides all definitions(including MACROs, strucures and library classes)
+# This Package provides all definitions(including functions, MACROs, structures and library classes)
 # and libraries instances, which are defined in MDE Specification.
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of 
 # EFI1.10/UEFI2.0/UEFI2.1/PI1.0 and some Industry Stancards.
