@@ -28,9 +28,9 @@
   SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-define MSFT_MACRO                = /D EFI_SPECIFICATION_VERSION=0x0002000A /D PI_SPECIFICATION_VERSION=0x00010000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000
-define INTEL_MACRO                = /D EFI_SPECIFICATION_VERSION=0x0002000A /D PI_SPECIFICATION_VERSION=0x00010000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000
-define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_SPECIFICATION_VERSION=0x00010000 -DTIANO_RELEASE_VERSION=0x00080006 -DPCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000
+define MSFT_MACRO                = /D EFI_SPECIFICATION_VERSION=0x00020000 /D PI_SPECIFICATION_VERSION=0x00009000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000 /D EFI_DEBUG
+define INTEL_MACRO                = /D EFI_SPECIFICATION_VERSION=0x00020000 /D PI_SPECIFICATION_VERSION=0x00009000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000 /D EFI_DEBUG
+define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_SPECIFICATION_VERSION=0x00009000 -DTIANO_RELEASE_VERSION=0x00080006 -DPCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000 -DEFI_DEBUG
 
 ################################################################################
 #
@@ -200,20 +200,35 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
 # EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
+
+  #
+  # PeiServicesLib.inf will only build under PI_SPECIFICATION = 0x00010000 as PeiServices is defined
+  # as (CONST EFI_PEI_SERVICES  **) after PI 1.0.
+  #
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesLib/PeiServicesLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  
+  #
+  # PeiSmbusLib.inf will only build under PI_SPECIFICATION = 0x00010000 as PeiServices is defined
+  # as (CONST EFI_PEI_SERVICES  **) after PI 1.0.
+  #
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiSmbusLib/PeiSmbusLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiDriverModelLib/UefiDriverModelLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiLib/UefiLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib.inf
+  EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib_Edk2.inf
   EdkCompatibilityPkg/Foundation/Library/Pei/Hob/PeiHobLib.inf
-  EdkCompatibilityPkg/Foundation/Library/RuntimeDxe/EfiRuntimeLib/EfiRuntimeLib.inf
-  EdkCompatibilityPkg/Foundation/Library/Thunk16/Thunk16Lib.inf
+  EdkCompatibilityPkg/Foundation/Library/RuntimeDxe/EfiRuntimeLib/EfiRuntimeLib_Edk2.inf
+  EdkCompatibilityPkg/Foundation/Library/Thunk16/Thunk16Lib_Edk2.inf
   EdkCompatibilityPkg/Foundation/Ppi/EdkPpiLib.inf
   EdkCompatibilityPkg/Foundation/Protocol/EdkProtocolLib.inf
+
+  #
+  # MemoryStatusCode.inf will only build under PI_SPECIFICATION = 0x00010000 as PeiServices is defined
+  # as (CONST EFI_PEI_SERVICES  **) after PI 1.0.
+  #
   EdkCompatibilityPkg/Sample/Platform/Generic/MonoStatusCode/Library/Pei/MemoryStatusCode/MemoryStatusCode.inf
   EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/BsDataHubStatusCode/BsDataHubStatusCode.inf
   EdkCompatibilityPkg/Sample/Platform/Generic/RuntimeDxe/StatusCode/Lib/BsSerialStatusCode/BsSerialStatusCode.inf
@@ -240,10 +255,10 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   EdkCompatibilityPkg/Compatibility/UcToUc2Thunk/UcToUc2Thunk.inf
 
 [Components.IA32,Components.X64,Components.IPF]
-  EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib.inf
+  EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib_Edk2.inf
   
 [Components.IA32,Components.X64]
-  EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib.inf
+  EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib_Edk2.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
 
 [Components.IPF]
