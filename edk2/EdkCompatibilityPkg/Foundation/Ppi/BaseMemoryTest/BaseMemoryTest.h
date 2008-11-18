@@ -49,9 +49,9 @@ EFI_STATUS
   OUT EFI_PHYSICAL_ADDRESS               * ErrorAddress
   );
 
-typedef struct _PEI_BASE_MEMORY_TEST_PPI {
+struct _PEI_BASE_MEMORY_TEST_PPI {
   PEI_BASE_MEMORY_TEST  BaseMemoryTest;
-} PEI_BASE_MEMORY_TEST_PPI;
+};
 
 extern EFI_GUID gPeiBaseMemoryTestPpiGuid;
 
