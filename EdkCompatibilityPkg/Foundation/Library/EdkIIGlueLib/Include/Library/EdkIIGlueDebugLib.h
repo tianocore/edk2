@@ -219,6 +219,17 @@ DebugClearMemory (
 
 **/
 #ifdef EFI_DEBUG
+/*
+  EdkCompatibilityPkg\Foundation\Include\EfiDebug.h
+  //
+  // DEBUG((DebugLevel, "format string", ...)) - if DebugLevel is active do 
+  //   the a debug print.
+  //
+  #define DEBUG(arg)        EfiDebugPrint arg
+
+  To pass ICC build, undef the previously defined _DEBUG.
+*/  
+#undef _DEBUG
 #define _DEBUG(Expression)   DebugPrint Expression
 #else
 #define _DEBUG(Expression)
