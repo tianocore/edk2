@@ -50,9 +50,9 @@ EFI_STATUS
 //
 // PEI_FLASH_MAP_PPI
 //
-typedef struct _PEI_FLASH_MAP_PPI {
+struct _PEI_FLASH_MAP_PPI {
   PEI_GET_FLASH_AREA_INFO GetAreaInfo;
-} PEI_FLASH_MAP_PPI;
+};
 
 extern EFI_GUID gPeiFlashMapPpiGuid;
 
