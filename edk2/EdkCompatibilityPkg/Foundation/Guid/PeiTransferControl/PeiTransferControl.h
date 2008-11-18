@@ -43,7 +43,7 @@ EFI_STATUS
   );
 
 struct _EFI_PEI_TRANSFER_CONTROL_PROTOCOL {
-  EFI_PEI_TRANSFER_CONTROL_LONG_JUMP   SetJump;
+  EFI_PEI_TRANSFER_CONTROL_SET_JUMP    SetJump;
   EFI_PEI_TRANSFER_CONTROL_LONG_JUMP   LongJump;
   UINT32                               JumpContextSize;
 };
