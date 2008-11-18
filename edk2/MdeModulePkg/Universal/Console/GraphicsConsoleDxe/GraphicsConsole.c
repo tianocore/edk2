@@ -132,7 +132,7 @@ EFI_HII_DATABASE_PROTOCOL   *mHiiDatabase;
 EFI_HII_FONT_PROTOCOL       *mHiiFont;
 BOOLEAN                     mFirstAccessFlag = TRUE;
 
-EFI_GUID             mFontPackageListGuid = {0xf5f219d3, 0x7006, 0x4648, 0xac, 0x8d, 0xd6, 0x1d, 0xfb, 0x7b, 0xc6, 0xad};
+EFI_GUID             mFontPackageListGuid = {0xf5f219d3, 0x7006, 0x4648, {0xac, 0x8d, 0xd6, 0x1d, 0xfb, 0x7b, 0xc6, 0xad}};
 
 CHAR16               mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 

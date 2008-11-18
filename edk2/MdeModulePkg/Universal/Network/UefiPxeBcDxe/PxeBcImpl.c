@@ -1909,13 +1909,13 @@ EfiPxeBcSetStationIP (
   }
 
   if (NewStationIp != NULL) {
-    Mode->StationIp    = *NewStationIp;
-    Private->StationIp = *NewStationIp;
+    CopyMem (&Mode->StationIp, NewStationIp, sizeof (EFI_IP_ADDRESS));
+    CopyMem (&Private->StationIp, NewStationIp, sizeof (EFI_IP_ADDRESS));
   }
 
   if (NewSubnetMask != NULL) {
-    Mode->SubnetMask    = *NewSubnetMask;
-    Private->SubnetMask = *NewSubnetMask;
+    CopyMem (&Mode->SubnetMask, NewSubnetMask, sizeof (EFI_IP_ADDRESS));
+    CopyMem (&Private->SubnetMask ,NewSubnetMask, sizeof (EFI_IP_ADDRESS));
   }
 
   Private->AddressIsOk = TRUE;
