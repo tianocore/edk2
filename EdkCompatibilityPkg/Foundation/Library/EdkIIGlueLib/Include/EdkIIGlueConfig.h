@@ -87,7 +87,7 @@ Abstract:
 //
 // debug print level
 //
-#define EDKII_GLUE_DebugPrintErrorLevel         EFI_D_ERROR|EFI_D_INFO
+#define EDKII_GLUE_DebugPrintErrorLevel         (EFI_D_ERROR|EFI_D_INFO)
 
 //
 // debug propery mask
