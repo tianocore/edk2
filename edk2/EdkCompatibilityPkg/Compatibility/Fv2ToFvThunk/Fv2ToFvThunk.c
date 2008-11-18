@@ -783,6 +783,24 @@ InitializeFirmwareVolume (
   return EFI_SUCCESS;
 }
 
+EFI_FV_ATTRIBUTES
+FvAttributesToFv2Attributes (
+  EFI_FV_ATTRIBUTES FvAttributes
+  )
+{
+  INTN                           Alignment;
+  
+  Alignment = LowBitSet64 (RShiftU64 (FvAttributes, 16) & 0xffff);
+  if (Alignment != -1) {
+    Alignment = Alignment << 16;
+  } else {
+    Alignment = 0;
+  }
+  FvAttributes = (FvAttributes & 0x1ff) | Alignment;
+
+  return FvAttributes;
+}
+
 /**
   
   Because of constraints imposed by the underlying firmware
@@ -827,13 +845,7 @@ Fv2GetVolumeAttributes (
                              (FRAMEWORK_EFI_FV_ATTRIBUTES *)FvAttributes
                              );
   if (!EFI_ERROR (Status)) {
-    Alignment = LowBitSet64 (RShiftU64 (*FvAttributes, 16) & 0xffff);
-    if (Alignment != -1) {
-      Alignment = Alignment << 16;
-    } else {
-      Alignment = 0;
-    }
-    *FvAttributes = (*FvAttributes & 0x1ff) | Alignment;
+    *FvAttributes = FvAttributeToFv2Attribute (*FvAttributes);
   }
   return Status;
 }
@@ -936,7 +948,17 @@ Fv2SetVolumeAttributes (
   FIRMWARE_VOLUME2_PRIVATE_DATA  *Private;
   EFI_FIRMWARE_VOLUME_PROTOCOL   *FirmwareVolume;
   FRAMEWORK_EFI_FV_ATTRIBUTES    FrameworkFvAttributes; 
+  EFI_STATUS                     Status;
   UINTN                          Shift;
+
+  if (*FvAttributes & (EFI_FV2_READ_LOCK_STATUS | EFI_FV2_WRITE_LOCK_STATUS)) {
+    //
+    // Framework FV protocol does not support EFI_FV2_READ_LOCK_* | EFI_FV2_WRITE_LOCK_*
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *FvAttributes = *FvAttributes & (EFI_FV2_READ_STATUS | EFI_FV2_WRITE_STATUS | EFI_FV2_LOCK_STATUS);
 
   Private = FIRMWARE_VOLUME2_PRIVATE_DATA_FROM_THIS (This);
   FirmwareVolume = Private->FirmwareVolume;
@@ -945,10 +967,16 @@ Fv2SetVolumeAttributes (
   Shift = (UINTN) RShiftU64(*FvAttributes & EFI_FV2_ALIGNMENT, 16);
   FrameworkFvAttributes = FrameworkFvAttributes | LShiftU64 (EFI_FV_ALIGNMENT_2, Shift);
 
-  return FirmwareVolume->SetVolumeAttributes (
+  Status =  FirmwareVolume->SetVolumeAttributes (
                            FirmwareVolume,
                            &FrameworkFvAttributes
                            );
+
+  if (!EFI_ERROR (Status)) {
+    *FvAttributes = FvAttributesToFv2Attributes (FrameworkFvAttributes);
+  }
+
+  return Status;
 }
 
 /**
