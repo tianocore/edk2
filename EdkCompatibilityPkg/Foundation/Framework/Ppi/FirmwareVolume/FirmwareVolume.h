@@ -24,7 +24,13 @@ Abstract:
 
 EFI_FORWARD_DECLARATION (EFI_PEI_FIRMWARE_VOLUME_PPI);
 
-typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
+//
+// Statements that include other files
+//
+#include "EfiFirmwareVolumeHeader.h"
+#include "EfiFirmwareFileSystem.h"
+#include "EfiFirmwareVolume.h"
+
 typedef VOID  * EFI_PEI_FILE_HANDLE;
 typedef VOID  * EFI_PEI_FV_HANDLE;
 
