@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -27,7 +27,7 @@ Abstract:
 
 #define PEI_NT_THUNK_GUID \
   { \
-    0x98c281e5, 0xf906, 0x43dd, 0xa9, 0x2b, 0xb0, 0x3, 0xbf, 0x27, 0x65, 0xda \
+    0x98c281e5, 0xf906, 0x43dd, {0xa9, 0x2b, 0xb0, 0x3, 0xbf, 0x27, 0x65, 0xda} \
   }
 
 typedef

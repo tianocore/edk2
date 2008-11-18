@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -29,7 +29,7 @@ Abstract:
 
 #define NT_PEI_LOAD_FILE_GUID \
   { \
-    0xfd0c65eb, 0x405, 0x4cd2, 0x8a, 0xee, 0xf4, 0x0, 0xef, 0x13, 0xba, 0xc2 \
+    0xfd0c65eb, 0x405, 0x4cd2, {0x8a, 0xee, 0xf4, 0x0, 0xef, 0x13, 0xba, 0xc2} \
   }
 
 typedef
