@@ -38,4 +38,10 @@ Abstract:
   #define MDE_CPU_X64
 #endif
 
+//
+// The stack alignment required for X64
+//
+#define CPU_STACK_ALIGNMENT   16
+
+
 #endif

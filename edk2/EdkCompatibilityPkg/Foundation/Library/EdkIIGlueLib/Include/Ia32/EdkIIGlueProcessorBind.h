@@ -38,4 +38,9 @@ Abstract:
   #define MDE_CPU_IA32
 #endif
 
+///
+/// The stack alignment required for IA-32
+///
+#define CPU_STACK_ALIGNMENT   sizeof(UINTN)
+
 #endif

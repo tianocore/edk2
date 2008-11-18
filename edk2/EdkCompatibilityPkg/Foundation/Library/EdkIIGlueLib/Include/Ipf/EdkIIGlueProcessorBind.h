@@ -64,5 +64,10 @@ typedef struct {
 #define EFI_EXTENDED_SAL_RESET_SERVICES_PROTOCOL_GUID_LO  0x46f58ce17d019990
 #define EFI_EXTENDED_SAL_RESET_SERVICES_PROTOCOL_GUID_HI  0xa06a6798513c76a7
 
+//
+// Per the Itanium Software Conventions and Runtime Architecture Guide,
+// section 3.3.4, IPF stack must always be 16-byte aligned.
+//
+#define CPU_STACK_ALIGNMENT   16
 
 #endif
