@@ -239,13 +239,13 @@ EFI_STATUS
   @param  Context                The opaque parameter for Check
 
   @retval EFI_SUCCESS            The DHCP packet's options are well formated
-  @retval Others                 The DHCP packet's options are not well formated
+  @retval EFI_INVALID_PARAMETER  The DHCP packet's options are not well formated
 
 **/
 EFI_STATUS
 DhcpIterateOptions (
   IN  EFI_DHCP4_PACKET      *Packet,
-  IN  DHCP_CHECK_OPTION     Check,          OPTIONAL
+  IN  DHCP_CHECK_OPTION     Check,        OPTIONAL
   IN  VOID                  *Context
   );
 
@@ -264,7 +264,7 @@ DhcpIterateOptions (
 EFI_STATUS
 DhcpValidateOptions (
   IN  EFI_DHCP4_PACKET      *Packet,
-  OUT DHCP_PARAMETER        **Para          OPTIONAL
+  OUT DHCP_PARAMETER        **Para       OPTIONAL
   );
 
 /**
@@ -277,7 +277,7 @@ DhcpValidateOptions (
   as a UINT8. It then iterates the DHCP packet to get data length of
   each option by calling DhcpIterOptions with DhcpGetOptionLen. Now, it
   knows the number of present options and their length. It allocates a
-  array of DHCP_OPTION and a continous buffer after the array to put
+  array of DHCP_OPTION and a continuous buffer after the array to put
   all the options' data. Each option's data is pointed to by the Data
   field in DHCP_OPTION structure. At last, it call DhcpIterateOptions
   with DhcpFillOption to fill each option's data to its position in the
@@ -315,10 +315,10 @@ DhcpParseOption (
 **/
 UINT8 *
 DhcpAppendOption (
-  IN UINT8                  *Buf,
-  IN UINT8                  Tag,
-  IN UINT16                 DataLen,
-  IN UINT8                  *Data
+  OUT UINT8                  *Buf,
+  IN  UINT8                  Tag,
+  IN  UINT16                 DataLen,
+  IN  UINT8                  *Data
   );
 
 /**
@@ -334,17 +334,18 @@ DhcpAppendOption (
                                  function.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
+  @retval EFI_INVALID_PARAMETER  The options in SeekPacket are mal-formated
   @retval EFI_SUCCESS            The packet is build.
 
 **/
 EFI_STATUS
 DhcpBuild (
-  IN  EFI_DHCP4_PACKET         *SeedPacket,
-  IN  UINT32                   DeleteCount,
-  IN  UINT8                    *DeleteList OPTIONAL,
-  IN  UINT32                   AppendCount,
-  IN  EFI_DHCP4_PACKET_OPTION  *AppendList[] OPTIONAL,
-  OUT EFI_DHCP4_PACKET         **NewPacket
+  IN  EFI_DHCP4_PACKET        *SeedPacket,
+  IN  UINT32                  DeleteCount,
+  IN  UINT8                   *DeleteList     OPTIONAL,
+  IN  UINT32                  AppendCount,
+  IN  EFI_DHCP4_PACKET_OPTION *AppendList[]   OPTIONAL,
+  OUT EFI_DHCP4_PACKET        **NewPacket
   );
 
 #endif
