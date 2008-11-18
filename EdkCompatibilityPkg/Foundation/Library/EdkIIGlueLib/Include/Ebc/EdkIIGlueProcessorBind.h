@@ -38,4 +38,9 @@ Abstract:
   #define MDE_CPU_EBC
 #endif   
 
+///
+/// The stack alignment required for EBC
+///
+#define CPU_STACK_ALIGNMENT   sizeof(UINTN)
+
 #endif
