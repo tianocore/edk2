@@ -29,8 +29,6 @@ EFI_GUID   mInventoryGuid = INVENTORY_GUID;
 
 CHAR16     VariableName[] = L"MyIfrNVData";
 
-UINT8 VfrMyIfrNVDataBlockName[] = "BugBug";
-
 VOID
 EncodePassword (
   IN  CHAR16                      *Password,
