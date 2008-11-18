@@ -345,6 +345,17 @@ InitializeFirmwareVolume2 (
   return EFI_SUCCESS;
 }
 
+FRAMEWORK_EFI_FV_ATTRIBUTES
+Fv2AttributesToFvAttributes (
+    EFI_FV_ATTRIBUTES Fv2Attributes
+  )
+{
+  //
+  // Clear those filed that is not defined in Framework FV spec and Alignment conversion.
+  //
+  return (Fv2Attributes & 0x1ff) | ((UINTN) EFI_FV_ALIGNMENT_2 << RShiftU64((Fv2Attributes & EFI_FV2_ALIGNMENT), 16));
+}
+
 /**
   Retrieves attributes, insures positive polarity of attribute bits, returns
   resulting attributes in output parameter
@@ -375,7 +386,7 @@ FvGetVolumeAttributes (
                               Attributes
                               );
   if (!EFI_ERROR (Status)) {
-    *Attributes = (*Attributes & 0x1ff) | ((UINTN)EFI_FV_ALIGNMENT_2 << RShiftU64((*Attributes & EFI_FV2_ALIGNMENT), 16));
+    *Attributes = Fv2AttributesToFvAttributes (*Attributes);
   }
   return Status;
 }
@@ -400,21 +411,21 @@ FvSetVolumeAttributes (
 {
   FIRMWARE_VOLUME_PRIVATE_DATA   *Private;
   EFI_FIRMWARE_VOLUME2_PROTOCOL  *FirmwareVolume2;
-  INTN                           Alignment;
   EFI_FV_ATTRIBUTES              Fv2Attributes; 
+  EFI_STATUS                     Status;
 
   Private = FIRMWARE_VOLUME_PRIVATE_DATA_FROM_THIS (This);
   FirmwareVolume2 = Private->FirmwareVolume2;
 
   Fv2Attributes = (*Attributes & 0x1ff);
-  Alignment = LowBitSet64 (RShiftU64 (*Attributes, 16) & 0xffff);
-  if (Alignment != -1) {
-    Fv2Attributes |= LShiftU64 (Alignment, 16);
-  }
-  return FirmwareVolume2->SetVolumeAttributes (
+  Status = FirmwareVolume2->SetVolumeAttributes (
                             FirmwareVolume2,
                             &Fv2Attributes
                             );
+
+  *Attributes = Fv2AttributesToFvAttributes (Fv2Attributes);
+  
+  return Status;
 }
 
 /**
@@ -459,11 +470,12 @@ FvReadFile (
 {
   FIRMWARE_VOLUME_PRIVATE_DATA   *Private;
   EFI_FIRMWARE_VOLUME2_PROTOCOL  *FirmwareVolume2;
+  EFI_STATUS                     Status;
 
   Private = FIRMWARE_VOLUME_PRIVATE_DATA_FROM_THIS (This);
   FirmwareVolume2 = Private->FirmwareVolume2;
 
-  return FirmwareVolume2->ReadFile (
+  Status = FirmwareVolume2->ReadFile (
                             FirmwareVolume2,
                             NameGuid,
                             Buffer,
@@ -472,6 +484,13 @@ FvReadFile (
                             FileAttributes,
                             AuthenticationStatus
                             );
+
+  //
+  // For Framework FV attrbutes, only alignment fields are valid.
+  //
+  *FileAttributes = *FileAttributes & EFI_FV_FILE_ATTRIB_ALIGNMENT;
+  
+  return Status;
 }
 
 /**
@@ -562,16 +581,31 @@ FvWriteFile (
 {
   FIRMWARE_VOLUME_PRIVATE_DATA   *Private;
   EFI_FIRMWARE_VOLUME2_PROTOCOL  *FirmwareVolume2;
+  EFI_FV_WRITE_FILE_DATA         *PiFileData;
+  EFI_STATUS                     Status;
+  UINTN                          Index;
 
   Private = FIRMWARE_VOLUME_PRIVATE_DATA_FROM_THIS (This);
   FirmwareVolume2 = Private->FirmwareVolume2;
 
-  return FirmwareVolume2->WriteFile (
+  PiFileData = AllocateCopyPool (sizeof (EFI_FV_WRITE_FILE_DATA), FileData);
+
+  //
+  // Framework Spec assume firmware files are Memory-Mapped.
+  //
+  for (Index = 0; Index < NumberOfFiles; Index++) {
+    PiFileData[Index].FileAttributes |= EFI_FV_FILE_ATTRIB_MEMORY_MAPPED;
+  }
+
+  Status = FirmwareVolume2->WriteFile (
                             FirmwareVolume2,
                             NumberOfFiles,
                             WritePolicy,
                             (EFI_FV_WRITE_FILE_DATA *)FileData
                             );
+
+  FreePool (PiFileData);
+  return Status;
 }
 
 /**
@@ -605,11 +639,12 @@ FvGetNextFile (
 {
   FIRMWARE_VOLUME_PRIVATE_DATA   *Private;
   EFI_FIRMWARE_VOLUME2_PROTOCOL  *FirmwareVolume2;
+  EFI_STATUS                     Status;
 
   Private = FIRMWARE_VOLUME_PRIVATE_DATA_FROM_THIS (This);
   FirmwareVolume2 = Private->FirmwareVolume2;
 
-  return FirmwareVolume2->GetNextFile (
+  Status = FirmwareVolume2->GetNextFile (
                             FirmwareVolume2,
                             Key,
                             FileType,
@@ -617,4 +652,11 @@ FvGetNextFile (
                             Attributes,
                             Size
                             );
+
+  //
+  // For Framework FV attrbutes, only alignment fields are valid.
+  //
+  *Attributes = *Attributes & EFI_FV_FILE_ATTRIB_ALIGNMENT;
+  
+  return Status;
 }
