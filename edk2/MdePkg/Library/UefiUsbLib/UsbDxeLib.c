@@ -404,6 +404,9 @@ UsbSetFeature (
   case USB_TARGET_ENDPOINT:
     DevReq.RequestType = USB_DEV_SET_FEATURE_REQ_TYPE_E;
     break;
+
+  default:
+    break;
   }
   //
   // Fill device request, see USB1.1 spec
@@ -478,6 +481,9 @@ UsbClearFeature (
 
   case USB_TARGET_ENDPOINT:
     DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_E;
+    break;
+
+  default:
     break;
   }
   //
@@ -554,6 +560,9 @@ UsbGetStatus (
 
   case USB_TARGET_ENDPOINT:
     DevReq.RequestType = USB_DEV_GET_STATUS_REQ_TYPE_E;
+    break;
+
+  default:
     break;
   }
   //
