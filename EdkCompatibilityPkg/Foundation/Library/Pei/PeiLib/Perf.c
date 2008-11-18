@@ -116,7 +116,7 @@ Returns:
                ),
                (VOID **) &Hob
                );
-    ASSERT_PEI_ERROR(PeiServices, Status);
+    ASSERT_PEI_ERROR((CONST EFI_PEI_SERVICES **) PeiServices, Status);
 
     PerfHobData = (EFI_HOB_GUID_DATA_PERFORMANCE_LOG *)(Hob+1);
     PerfHobData->NumberOfEntries = 0;
