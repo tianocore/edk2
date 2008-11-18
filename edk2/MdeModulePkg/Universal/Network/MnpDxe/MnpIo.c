@@ -124,8 +124,6 @@ MnpIsValidTxToken (
   @param  PktLen                Pointer to a UINT32 variable used to record the
                                 packet's length.
 
-  @return None.
-
 **/
 VOID
 MnpBuildTxPacket (
@@ -433,8 +431,6 @@ MnpDeliverPacket (
 
   @param  Event                 The event this notify function registered to.
   @param  Context               Pointer to the context data registerd to the Event.
-
-  @return None.
 
 **/
 VOID
@@ -1007,9 +1003,7 @@ EXIT:
   @param  Event                 The event this notify function registered to.
   @param  Context               Pointer to the context data registered to the
                                 event.
-
-  @return None.
-
+   
 **/
 VOID
 EFIAPI
