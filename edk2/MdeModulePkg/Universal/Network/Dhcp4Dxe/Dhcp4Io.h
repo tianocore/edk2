@@ -93,9 +93,9 @@ typedef enum {
 **/
 EFI_STATUS
 DhcpSetState (
-  IN DHCP_SERVICE           *DhcpSb,
-  IN INTN                   State,
-  IN BOOLEAN                CallUser
+  IN OUT DHCP_SERVICE           *DhcpSb,
+  IN     INTN                   State,
+  IN     BOOLEAN                CallUser
   );
 
 /**
@@ -114,6 +114,7 @@ DhcpSetState (
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resources for the packet
   @retval EFI_ACCESS_DENIED     Failed to transmit the packet through UDP
   @retval EFI_SUCCESS           The message is sent
+  @retval other                 Other error occurs
 
 **/
 EFI_STATUS
@@ -146,7 +147,7 @@ DhcpOnTimerTick (
   );
 
 /**
-  Handle the received DHCP packets. This function drivers the DHCP
+  Handle the received DHCP packets. This function drives the DHCP
   state machine.
 
   @param  UdpPacket             The UDP packets received.
@@ -172,6 +173,7 @@ DhcpInput (
   @param  DhcpSb                The DHCP service instance
 
   @retval EFI_SUCCESS           The request has been sent
+  @retval other                 Some error occurs when sending the request.
 
 **/
 EFI_STATUS

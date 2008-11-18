@@ -165,9 +165,17 @@ extern EFI_DHCP4_PROTOCOL mDhcp4ProtocolTemplate;
 **/
 VOID
 DhcpYieldControl (
-  IN DHCP_SERVICE         *DhcpSb
+  IN DHCP_SERVICE           *DhcpSb
   );
 
+/**
+  Complete a Dhcp4 transaction and signal the upper layer.
+  
+  @param Instance      Dhcp4 instance.
+  
+  @return None.
+
+**/
 VOID
 PxeDhcpDone (
   IN DHCP_PROTOCOL  *Instance
