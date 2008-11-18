@@ -127,9 +127,21 @@ typedef struct _EFI_IFR_GUID_SUBCLASS {
 typedef struct _EFI_IFR_GUID_OPTIONKEY {
   EFI_IFR_OP_HEADER   Header;
   EFI_GUID            Guid;
+  //
+  // EFI_IFR_EXTEND_OP_OPTIONKEY
+  //
   UINT8               ExtendOpCode;
+  //
+  // UEFI One Of Questiond ID.
+  //
   EFI_QUESTION_ID     QuestionId;
+  //
+  // The One Of Option Value.
+  //
   EFI_IFR_TYPE_VALUE  OptionValue;
+  //
+  // The Framework One Of Option Key Value.
+  //
   UINT16              KeyValue;
 } EFI_IFR_GUID_OPTIONKEY;
 
@@ -140,9 +152,20 @@ typedef struct _EFI_IFR_GUID_OPTIONKEY {
 typedef struct _EFI_IFR_GUID_VAREQNAME {
   EFI_IFR_OP_HEADER   Header;
   EFI_GUID            Guid;
+  //
+  // EFI_IFR_EXTEND_OP_VAREQNAME
+  //
   UINT8               ExtendOpCode;
+  //
+  // Question ID of the Numeric Opcode created.
+  //
   EFI_QUESTION_ID     QuestionId;
-  EFI_STRING_ID       NameId;
+  //
+  // For vareqval (0x100),
+  // NameId is 0x100. This value will converte to a Unicode String following this rule.
+  //            sprintf(StringBuffer, "%d", NameId)
+  // The the Unicode String will be used as a EFI Variable Name.
+  UINT16              NameId;
 } EFI_IFR_GUID_VAREQNAME;
 
 #pragma pack()
