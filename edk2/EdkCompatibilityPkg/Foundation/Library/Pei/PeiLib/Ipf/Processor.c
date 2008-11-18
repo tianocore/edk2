@@ -31,8 +31,8 @@ WinNtFlushInstructionCacheFlush (
   );
 
 EFI_PEI_TRANSFER_CONTROL_PROTOCOL         mTransferControl = {
-  SetJump,
-  LongJump,
+  (EFI_PEI_TRANSFER_CONTROL_SET_JUMP)  SetJump,
+  (EFI_PEI_TRANSFER_CONTROL_LONG_JUMP) LongJump,
   sizeof (EFI_JUMP_BUFFER)
 };
 
