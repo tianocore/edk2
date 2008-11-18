@@ -173,7 +173,7 @@ typedef enum {
   SetVolumeAttributes,
   GetPhysicalAddress,
   GetBlockSize,
-  EraseCustomBlockRange,
+  EraseCustomBlockRange
 } EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_FUNC_ID;
 
 typedef enum {
