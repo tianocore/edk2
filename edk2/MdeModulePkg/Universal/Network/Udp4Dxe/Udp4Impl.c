@@ -25,6 +25,17 @@ Abstract:
 
 UINT16  mUdp4RandomPort;
 
+/**
+  This function checks and timeouts the I/O datagrams holding by the corresponding
+  service context.
+
+  @param  Event                  The event this function registered to.
+  @param  Context                The context data registered during the creation of
+                                 the Event.
+
+  @return None.
+
+**/
 VOID
 EFIAPI
 Udp4CheckTimeout (
@@ -32,6 +43,18 @@ Udp4CheckTimeout (
   IN VOID       *Context
   );
 
+/**
+  This function finds the udp instance by the specified <Address, Port> pair.
+
+  @param  InstanceList           Pointer to the head of the list linking the udp
+                                 instances.
+  @param  Address                Pointer to the specified IPv4 address.
+  @param  Port                   The udp port number.
+
+  @retval TRUE     The specified <Address, Port> pair is found.
+  @retval FALSE    Otherwise.
+
+**/
 BOOLEAN
 Udp4FindInstanceByPort (
   IN LIST_ENTRY        *InstanceList,
@@ -39,6 +62,19 @@ Udp4FindInstanceByPort (
   IN UINT16            Port
   );
 
+/**
+  This function is the packet transmitting notify function registered to the IpIo
+  interface. It's called to signal the udp TxToken when IpIo layer completes the
+  transmitting of the udp datagram.
+
+  @param  Status                 The completion status of the output udp datagram.
+  @param  Context                Pointer to the context data.
+  @param  Sender                 Pointer to the Ip sender of the udp datagram.
+  @param  NotifyData             Pointer to the notify data.
+
+  @return None.
+
+**/
 VOID
 Udp4DgramSent (
   IN EFI_STATUS  Status,
@@ -47,6 +83,20 @@ Udp4DgramSent (
   IN VOID        *NotifyData
   );
 
+/**
+  This function processes the received datagram passed up by the IpIo layer.
+
+  @param  Status                 The status of this udp datagram.
+  @param  IcmpError              The IcmpError code, only available when Status is
+                                 EFI_ICMP_ERROR.
+  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA.
+  @param  Packet                 Pointer to the NET_BUF containing the received udp
+                                 datagram.
+  @param  Context                Pointer to the context data.
+
+  @return None.
+
+**/
 VOID
 Udp4DgramRcvd (
   IN EFI_STATUS            Status,
@@ -56,6 +106,22 @@ Udp4DgramRcvd (
   IN VOID                  *Context
   );
 
+/**
+  This function cancels the token specified by Arg in the Map. This is a callback
+  used by Udp4InstanceCancelToken().
+
+  @param  Map                    Pointer to the NET_MAP.
+  @param  Item                   Pointer to the NET_MAP_ITEM.
+  @param  Arg                    Pointer to the token to be cancelled, if NULL,
+                                 the token specified by Item is cancelled.
+
+  @retval EFI_SUCCESS            The token is cancelled if Arg is NULL or the token
+                                 is not the same as that in the Item if Arg is not
+                                 NULL.
+  @retval EFI_ABORTED            Arg is not NULL, and the token specified by Arg is
+                                 cancelled.
+
+**/
 EFI_STATUS
 Udp4CancelTokens (
   IN NET_MAP       *Map,
@@ -63,12 +129,33 @@ Udp4CancelTokens (
   IN VOID          *Arg OPTIONAL
   );
 
+/**
+  This function matches the received udp datagram with the Instance.
+
+  @param  Instance               Pointer to the udp instance context data.
+  @param  Udp4Session            Pointer to the EFI_UDP4_SESSION_DATA abstracted
+                                 from the received udp datagram.
+
+  @retval TRUE       The udp datagram matches the receiving requirments of the
+                     udp Instance.
+  @retval FALSE      Otherwise.
+
+**/
 BOOLEAN
 Udp4MatchDgram (
   IN UDP4_INSTANCE_DATA     *Instance,
   IN EFI_UDP4_SESSION_DATA  *Udp4Session
   );
 
+/**
+  This function removes the Wrap specified by Context and release relevant resources.
+
+  @param  Event                  The Event this notify function registered to.
+  @param  Context                Pointer to the context data.
+
+  @return None.
+
+**/
 VOID
 EFIAPI
 Udp4RecycleRxDataWrap (
@@ -76,6 +163,18 @@ Udp4RecycleRxDataWrap (
   IN VOID       *Context
   );
 
+/**
+  This function wraps the Packet and the RxData.
+
+  @param  Instance               Pointer to the instance context data.
+  @param  Packet                 Pointer to the buffer containing the received
+                                 datagram.
+  @param  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
+                                 datagram.
+
+  @return Pointer to the structure wrapping the RxData and the Packet.
+
+**/
 UDP4_RXDATA_WRAP *
 Udp4WrapRxData (
   IN UDP4_INSTANCE_DATA     *Instance,
@@ -83,6 +182,18 @@ Udp4WrapRxData (
   IN EFI_UDP4_RECEIVE_DATA  *RxData
   );
 
+/**
+  This function enqueues the received datagram into the instances' receiving queues.
+
+  @param  Udp4Service            Pointer to the udp service context data.
+  @param  Packet                 Pointer to the buffer containing the received
+                                 datagram.
+  @param  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
+                                 datagram.
+
+  @return The times this datagram is enqueued.
+
+**/
 UINTN
 Udp4EnqueueDgram (
   IN UDP4_SERVICE_DATA      *Udp4Service,
@@ -90,11 +201,31 @@ Udp4EnqueueDgram (
   IN EFI_UDP4_RECEIVE_DATA  *RxData
   );
 
+/**
+  This function delivers the datagrams enqueued in the instances.
+
+  @param  Udp4Service            Pointer to the udp service context data.
+
+  @return None.
+
+**/
 VOID
 Udp4DeliverDgram (
   IN UDP4_SERVICE_DATA  *Udp4Service
   );
 
+/**
+  This function demultiplexes the received udp datagram to the apropriate instances.
+
+  @param  Udp4Service            Pointer to the udp service context data.
+  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA abstrated from
+                                 the received datagram.
+  @param  Packet                 Pointer to the buffer containing the received udp
+                                 datagram.
+
+  @return None.
+
+**/
 VOID
 Udp4Demultiplex (
   IN UDP4_SERVICE_DATA     *Udp4Service,
@@ -102,6 +233,19 @@ Udp4Demultiplex (
   IN NET_BUF               *Packet
   );
 
+/**
+  This function handles the received Icmp Error message and demultiplexes it to the
+  instance.
+
+  @param  Udp4Service            Pointer to the udp service context data.
+  @param  IcmpError              The icmp error code.
+  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA abstracted
+                                 from the received Icmp Error packet.
+  @param  Packet                 Pointer to the Icmp Error packet.
+
+  @return None.
+
+**/
 VOID
 Udp4IcmpHandler (
   IN UDP4_SERVICE_DATA     *Udp4Service,
@@ -110,6 +254,18 @@ Udp4IcmpHandler (
   IN NET_BUF               *Packet
   );
 
+/**
+  This function builds and sends out a icmp port unreachable message.
+
+  @param  IpIo                   Pointer to the IP_IO instance.
+  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA of the packet
+                                 causes this icmp error message.
+  @param  Udp4Header             Pointer to the udp header of the datagram causes
+                                 this icmp error message.
+
+  @return None.
+
+**/
 VOID
 Udp4SendPortUnreach (
   IN IP_IO                 *IpIo,
