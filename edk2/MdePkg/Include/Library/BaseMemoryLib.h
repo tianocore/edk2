@@ -1,5 +1,9 @@
 /** @file
-  Provides copy memory, fill memory, zero memory, and GUID functions. 
+  Provides copy memory, fill memory, zero memory, and GUID functions.
+   
+  The Base Memory Library provides optimized implementions for common memory-based operations. 
+  These functions should be used in place of coding your own loops to do equivalent common functions. 
+  This allows optimized library implementations to help increase performance. 
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -47,7 +51,7 @@ CopyMem (
 
   @param  Buffer    Memory to set.
   @param  Length    Number of bytes to set.
-  @param  Value     Value of the set operation.
+  @param  Value     Value with which to fill Length bytes of Buffer.
 
   @return Buffer.
 

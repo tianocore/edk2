@@ -1,6 +1,9 @@
 /** @file
   Provides services to print debug and assert messages to a debug output device.
-
+  
+  The Debug library supports debug print and asserts based on a combination of macros and code.
+  The debug library can be turned on and off so that the debug code does not increase the size of an image.
+  
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License

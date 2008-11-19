@@ -1,6 +1,9 @@
 /** @file
   Provides services to maintain instruction and data caches.
-
+  
+  The Cache Maintenance Library provides abstractions for basic processor cache operations.
+  It removes the need to use assembly in C code.
+    
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
