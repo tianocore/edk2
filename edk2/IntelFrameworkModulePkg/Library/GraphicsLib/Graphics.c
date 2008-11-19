@@ -784,7 +784,8 @@ Error:
 
   @param Fmt         - Format string
 
-  @param ...         - Print arguments
+  @param ...           Variable argument list whose contents are accessed based on 
+                       the format string specified by Format.
 
 
   @retval Length of string printed to the console
