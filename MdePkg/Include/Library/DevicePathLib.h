@@ -1,6 +1,11 @@
 /** @file
   Provides library functions to construct and parse UEFI Device Paths.
 
+  This library provides defines, macros, and functions to help create and parse 
+  EFI_DEVICE_PATH_PROTOCOL structures.  The macros that help create and parse device 
+  path nodes make use of the ReadUnaligned16() and WriteUnaligned16() functions from 
+  the Base Library, so this library class has an implied dependency on the Base Library.
+
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -18,15 +23,121 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 
 #define END_DEVICE_PATH_LENGTH               (sizeof (EFI_DEVICE_PATH_PROTOCOL))
-#define DevicePathNodeLength(Node)           ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0])
-#define NextDevicePathNode(Node)             ((EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength(Node)))
+
+/**
+  Macro that returns the Type field of a device path node.
+
+  Returns the Type field of the device path node specified by Node.
+
+  @param  Node      A pointer to a device path node data structure.
+
+  @return The Type field of the device path node specified by Node.
+
+**/
 #define DevicePathType(Node)                 (((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Type)
+
+/**
+  Macro that returns the SubType field of a device path node.
+
+  Returns the SubType field of the device path node specified by Node.
+
+  @param  Node      A pointer to a device path node data structure.
+
+  @return The SubType field of the device path node specified by Node.
+
+**/
 #define DevicePathSubType(Node)              (((EFI_DEVICE_PATH_PROTOCOL *)(Node))->SubType)
+
+/**
+  Macro that returns the 16-bit Length field of a device path node.
+
+  Returns the 16-bit Length field of the device path node specified by Node.
+
+  @param  Node      A pointer to a device path node data structure.
+
+  @return The 16-bit Length field of the device path node specified by Node.
+
+**/
+#define DevicePathNodeLength(Node)           ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0])
+
+/**
+  Macro that returns a pointer to the next node in a device path.
+
+  Returns a pointer to the device path node that follows the device path node specified by Node.
+
+  @param  Node      A pointer to a device path node data structure.
+
+  @return a pointer to the device path node that follows the device path node specified by Node.
+
+**/
+#define NextDevicePathNode(Node)             ((EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength(Node)))
+
+/**
+  Macro that determines if a device path node is an end node of a device path.
+  This includes nodes that are the end of a device path instance and nodes that are the end of an entire device path.
+
+  Determines if the device path node specified by Node is an end node of a device path.  
+  This includes nodes that are the end of a device path instance and nodes that are the 
+  end of an entire device path.  If Node represents an end node of a device path, 
+  then TRUE is returned.  Otherwise, FALSE is returned.
+
+  @param  Node      A pointer to a device path node data structure.
+
+  @retval TRUE      The device path node specified by Node is an end node of a device path.
+  @retval FALSE     The device path node specified by Node is not an end node of a device path.
+  
+**/
 #define IsDevicePathEndType(Node)            ((DevicePathType (Node) & 0x7f) == END_DEVICE_PATH_TYPE)
+
+/**
+  Macro that determines if a device path node is an end node of an entire device path.
+
+  Determines if a device path node specified by Node is an end node of an entire device path.
+  If Node represents the end of an entire device path, then TRUE is returned.  Otherwise, FALSE is returned.
+
+  @param  Node      A pointer to a device path node data structure.
+
+  @retval TRUE      The device path node specified by Node is the end of an entire device path.
+  @retval FALSE     The device path node specified by Node is not the end of an entire device path.
+
+**/
 #define IsDevicePathEnd(Node)                (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_ENTIRE_DEVICE_PATH_SUBTYPE)
+
+/**
+  Macro that determines if a device path node is an end node of a device path instance.
+
+  Determines if a device path node specified by Node is an end node of a device path instance.
+  If Node represents the end of a device path instance, then TRUE is returned.  Otherwise, FALSE is returned.
+
+  @param  Node      A pointer to a device path node data structure.
+
+  @retval TRUE      The device path node specified by Node is the end of a device path instance.
+  @retval FALSE     The device path node specified by Node is not the end of a device path instance.
+
+**/
 #define IsDevicePathEndInstance(Node)        (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_INSTANCE_DEVICE_PATH_SUBTYPE)
 
+/**
+  Macro that sets the length, in bytes, of a device path node.
+
+  Sets the length of the device path node specified by Node to the value specified by Length. Length is returned.
+
+  @param  Node      A pointer to a device path node data structure.
+  @param  Length    The length, in bytes, of the device path node.
+
+  @return Length
+
+**/
 #define SetDevicePathNodeLength(Node,NodeLength)  WriteUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0], (UINT16)(NodeLength))
+
+/**
+  Macro that fills in all the fields of a device path node that is the end of an entire device path.
+
+  Fills in all the fields of a device path node specified by Node so Node represents the end of an entire device path.
+
+  @param  Node      A pointer to a device path node data structure.
+
+**/
 #define SetDevicePathEndNode(Node)  {                                   \
           DevicePathType (Node)    = END_DEVICE_PATH_TYPE;              \
           DevicePathSubType (Node) = END_ENTIRE_DEVICE_PATH_SUBTYPE;    \
@@ -40,8 +151,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   DevicePath including the end of device path node.  If DevicePath is NULL, then 0 is returned.
 
   @param  DevicePath                 A pointer to a device path data structure.
-
-  @return The size of a device path in bytes.
+  
+  @retval 0       If DevicePath is NULL.
+  @retval Others  The size of a device path in bytes.
 
 **/
 UINTN
@@ -57,11 +169,14 @@ GetDevicePathSize (
   DevicePath is NULL, then NULL is returned.  If the memory is successfully allocated, then the
   contents of DevicePath are copied to the newly allocated buffer, and a pointer to that buffer
   is returned.  Otherwise, NULL is returned.  
+  The memory for the new device path is allocated from EFI boot services memory. 
+  It is the responsibility of the caller to free the memory allocated. 
   
   @param  DevicePath                 A pointer to a device path data structure.
 
-  @return A pointer to the duplicated device path.
-
+  @retval NULL    If DevicePath is NULL.
+  @retval Others  A pointer to the duplicated device path.
+  
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
@@ -85,8 +200,10 @@ DuplicateDevicePath (
 
   @param  FirstDevicePath            A pointer to a device path data structure.
   @param  SecondDevicePath           A pointer to a device path data structure.
-
-  @return A pointer to the new device path.
+  
+  @retval NULL      If there is not enough memory for the newly allocated buffer.
+  @retval Others    A pointer to the new device path if success.
+                    Or a copy an end-of-device-path if both FirstDevicePath and SecondDevicePath are NULL.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -114,7 +231,11 @@ AppendDevicePath (
   @param  DevicePath                 A pointer to a device path data structure.
   @param  DevicePathNode             A pointer to a single device path node.
 
-  @return A pointer to the new device path.
+  @retval NULL      If there is not enough memory for the new device path.
+  @retval Others    A pointer to the new device path if success.
+                    A copy of DevicePathNode followed by an end-of-device-path node 
+                    if both FirstDevicePath and SecondDevicePath are NULL.
+                    A copy of an end-of-device-path node if both FirstDevicePath and SecondDevicePath are NULL.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -183,8 +304,7 @@ GetNextDevicePathInstance (
   );
 
 /**
-  Creates a copy of the current device path instance and returns a pointer to the next device path
-  instance.
+  Creates a device node.
 
   This function creates a new device node in a newly allocated buffer of size NodeLength and
   initializes the device path node header with NodeType and NodeSubType.  The new device path node
@@ -252,7 +372,11 @@ DevicePathFromHandle (
   handle Device.  The allocated device path is returned.  If Device is NULL or Device is a handle
   that does not support the device path protocol, then a device path containing a single device
   path node for the file specified by FileName is allocated and returned.
+  The memory for the new device path is allocated from EFI boot services memory. It is the responsibility
+  of the caller to free the memory allocated.
+  
   If FileName is NULL, then ASSERT().
+  If FileName is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Device                     A pointer to a device handle.  This parameter is optional and
                                      may be NULL.
