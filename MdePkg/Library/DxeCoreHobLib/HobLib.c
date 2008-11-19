@@ -36,7 +36,7 @@ GetHobList (
   VOID
   )
 {
-	ASSERT (gHobList != NULL);
+  ASSERT (gHobList != NULL);
   return gHobList;
 }
 

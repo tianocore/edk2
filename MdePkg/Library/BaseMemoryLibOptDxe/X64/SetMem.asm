@@ -47,10 +47,10 @@ InternalMemSetMem   PROC    USES    rdi rbx
     mov     rcx, rdx  ; rcx = Count
     shr     rcx, 3    ; rcx = rcx / 8
     cld
-    rep     stosq	
+    rep     stosq 
     mov     rcx, rdx  ; rcx = rdx
     and     rcx, 7    ; rcx = rcx & 7
-    rep     stosb	
+    rep     stosb 
     pop     rax       ; rax = Buffer
     ret
 InternalMemSetMem   ENDP

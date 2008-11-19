@@ -21,5 +21,5 @@
 
 .global ASM_PFX(CpuBreakpoint)
 ASM_PFX(CpuBreakpoint):
-	int $0x3
-	ret
+  int $0x3
+  ret

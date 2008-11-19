@@ -33,7 +33,7 @@
 .global ASM_PFX(AsmWriteMsr64)
 .align 16
 ASM_PFX(AsmWriteMsr64):
-    mov	%rdx, %rax            # meanwhile, rax <- return value
+    mov %rdx, %rax            # meanwhile, rax <- return value
     shr $0x20, %rdx           # edx:eax contains the value to write
     wrmsr
     ret

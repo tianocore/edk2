@@ -47,7 +47,7 @@ MemoryFence::
 .type DisableInterrupts, @function
 
 DisableInterrupts::
-         rsm			0x4000
+         rsm      0x4000
          srlz.d;;
          br.ret.dpnt    b0;;
 
@@ -57,7 +57,7 @@ DisableInterrupts::
 .type EnableInterrupts, @function
 
 EnableInterrupts::
-      ssm			0x4000
+      ssm     0x4000
       srlz.d;;
       br.ret.dpnt    b0;;
 
@@ -67,10 +67,10 @@ EnableInterrupts::
 .type EnableDisableInterrupts, @function
 
 EnableDisableInterrupts::
-         ssm			0x4000
+         ssm      0x4000
          srlz.d;;
          srlz.i;;
-         rsm			0x4000
+         rsm      0x4000
          srlz.d;;
 
          br.ret.dpnt    b0;;

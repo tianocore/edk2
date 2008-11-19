@@ -32,5 +32,5 @@
 .global ASM_PFX(AsmReadMm2)
 .align 16
 ASM_PFX(AsmReadMm2):
-    movd	%mm2, %rax
+    movd  %mm2, %rax
     ret
