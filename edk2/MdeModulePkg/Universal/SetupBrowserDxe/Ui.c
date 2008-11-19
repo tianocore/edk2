@@ -348,7 +348,7 @@ RefreshForm (
       // Question value may be changed, need invoke its Callback()
       //
       ConfigAccess = Selection->FormSet->ConfigAccess;
-      if ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) && (ConfigAccess != NULL)) {
+      if (((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) && (ConfigAccess != NULL)) {
         ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
         HiiValue = &Question->HiiValue;

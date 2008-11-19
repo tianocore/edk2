@@ -21,8 +21,8 @@ Revision History
 
 **/
 
-#ifndef _DRIVER_SAMPLE_H
-#define _DRIVER_SAMPLE_H
+#ifndef _DRIVER_SAMPLE_H_
+#define _DRIVER_SAMPLE_H_
 
 #include <Uefi.h>
 

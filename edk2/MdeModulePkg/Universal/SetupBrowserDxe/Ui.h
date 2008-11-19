@@ -350,7 +350,7 @@ UiWaitForSingleEvent (
   Draw a pop up windows based on the dimension, number of lines and
   strings specified.
 
-  @param RequestedWidth  The width of the pop-up.
+  @param ScreenWidth     The width of the pop-up.
   @param NumberOfLines   The number of lines.
   @param ...             A series of text strings that displayed in the pop-up.
 

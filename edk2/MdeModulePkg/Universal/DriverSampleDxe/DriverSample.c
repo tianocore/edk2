@@ -29,6 +29,13 @@ EFI_GUID   mInventoryGuid = INVENTORY_GUID;
 
 CHAR16     VariableName[] = L"MyIfrNVData";
 
+/**
+  Encode the password using a simple algorithm.
+  
+  @param Password The string to be encoded.
+  @param MaxSize  The size of the string.
+  
+**/
 VOID
 EncodePassword (
   IN  CHAR16                      *Password,
@@ -56,10 +63,19 @@ EncodePassword (
   return ;
 }
 
+/**
+  Validate the user's password.
+  
+  @param PrivateData This driver's private context data.
+  @param StringId    The user's input.
+  
+  @retval EFI_SUCCESS   The user's input matches the password.
+  @retval EFI_NOT_READY The user's input does not match the password.
+**/
 EFI_STATUS
 ValidatePassword (
-  DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData,
-  EFI_STRING_ID                   StringId
+  IN       DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData,
+  IN       EFI_STRING_ID                   StringId
   )
 {
   EFI_STATUS                      Status;
@@ -138,10 +154,20 @@ ValidatePassword (
   return Status;
 }
 
+/**
+  Encode the password using a simple algorithm.
+  
+  @param PrivateData This driver's private context data.
+  @param StringId    The password from User.
+  
+  @retval  EFI_SUCESS The operation is successful.
+  @return  Other value if gRT->SetVariable () fails.
+  
+**/
 EFI_STATUS
 SetPassword (
-  DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData,
-  EFI_STRING_ID                   StringId
+  IN DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData,
+  IN EFI_STRING_ID                   StringId
   )
 {
   EFI_STATUS                      Status;
@@ -646,6 +672,15 @@ DriverCallback (
   return Status;
 }
 
+/**
+  Main entry for this driver.
+  
+  @param ImageHandle     Image handle this driver.
+  @param SystemTable     Pointer to SystemTable.
+
+  @retval EFI_SUCESS     This function always complete successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 DriverSampleInit (
