@@ -156,7 +156,8 @@ LockKeyboards (
   @param[in]  ForeGround   Foreground color
   @param[in]  BackGround   background color
   @param[in]  Fmt          Print format sting. See definition of Print
-  @param[in]  ...          Argumnet stream defined by Fmt string
+  @param ...               Variable argument list whose contents are accessed based on 
+                           the format string specified by Format.
 
   @return  Number of Characters printed.
 

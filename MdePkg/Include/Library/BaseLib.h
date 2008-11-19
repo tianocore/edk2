@@ -3691,7 +3691,10 @@ CpuPause (
                       function.
   @param  NewStack    A pointer to the new stack to use for the EntryPoint
                       function.
-  @param  ...         Extended parameters.
+  @param  ...         This variable argument list is ignored for IA32, x64, and EBC.  
+                      For IPF, this variable argument list is expected to contain 
+                      a single parameter of type VOID * that specifies the new backing 
+                      store pointer.
 
 
 **/
