@@ -34,11 +34,11 @@
 ;------------------------------------------------------------------------------
 InternalMemSetMem   PROC    USES    rdi
     push    rcx         ; push Buffer
-    mov     rax, r8		  ; rax = Value
-    mov     rdi, rcx		; rdi = Buffer
-    mov     rcx, rdx		; rcx = Count
+    mov     rax, r8     ; rax = Value
+    mov     rdi, rcx    ; rdi = Buffer
+    mov     rcx, rdx    ; rcx = Count
     rep     stosb
-    pop     rax   		  ; rax = Buffer
+    pop     rax         ; rax = Buffer
     ret
 InternalMemSetMem   ENDP
 

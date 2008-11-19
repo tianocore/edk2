@@ -47,7 +47,7 @@ HobLibConstructor (
 {
   EFI_STATUS  Status;
 
-	Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &mHobList);
+  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &mHobList);
   ASSERT_EFI_ERROR (Status);
   ASSERT (mHobList != NULL);
 
@@ -69,7 +69,7 @@ GetHobList (
   VOID
   )
 {
-	ASSERT (mHobList != NULL);
+  ASSERT (mHobList != NULL);
   return mHobList;
 }
 

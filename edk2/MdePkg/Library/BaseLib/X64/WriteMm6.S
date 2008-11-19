@@ -31,5 +31,5 @@
 #------------------------------------------------------------------------------
 .global ASM_PFX(AsmWriteMm6)
 ASM_PFX(AsmWriteMm6):
-    movd	%rcx, %mm6
+    movd  %rcx, %mm6
     ret

@@ -183,14 +183,14 @@ ASM_PFX(InternalAsmThunk16):
     popfl
     lidtl   0x24(%esp)
     lea     0xffffffcc(%ebp), %eax
-  	pop     %gs
-   	pop     %fs
-   	pop     %es
-  	pop     %ds
-   	pop     %edi
-   	pop     %esi
-   	pop     %ebx
-   	pop     %ebp
+    pop     %gs
+    pop     %fs
+    pop     %es
+    pop     %ds
+    pop     %edi
+    pop     %esi
+    pop     %ebx
+    pop     %ebp
     ret
 
     .const:

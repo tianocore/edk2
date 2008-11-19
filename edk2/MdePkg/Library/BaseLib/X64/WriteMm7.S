@@ -31,5 +31,5 @@
 #------------------------------------------------------------------------------
 .global ASM_PFX(AsmWriteMm7)
 ASM_PFX(AsmWriteMm7):
-    movd	%rcx, %mm7
+    movd  %rcx, %mm7
     ret
