@@ -62,7 +62,7 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER Child handle is not a valid UEFI Handle.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
-																because its services are being used.
+                                because its services are being used.
   @retval other                 The child handle was not destroyed
 
 **/

@@ -1,5 +1,5 @@
 /** @file   
-	ACPI 2.0 definitions from the ACPI Specification, revision 2.0
+  ACPI 2.0 definitions from the ACPI Specification, revision 2.0
 
   Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          

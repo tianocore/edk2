@@ -284,8 +284,8 @@ typedef INTN RETURN_STATUS;
 /**
   Returns a 16-bit signature built from 2 ASCII characters.
   
-  @param  A	   The first ASCII character.
-  @param  B	   The second ASCII character.
+  @param  A    The first ASCII character.
+  @param  B    The second ASCII character.
 
   @return A 16-bit value built from the two ASCII characters specified by A and B.
 
@@ -295,10 +295,10 @@ typedef INTN RETURN_STATUS;
 /**
   Returns a 32-bit signature built from 4 ASCII characters.
   
-  @param  A	   The first ASCII character.
-  @param  B	   The second ASCII character.
-  @param  C	   The third ASCII character.
-  @param  D	   The fourth ASCII character.
+  @param  A    The first ASCII character.
+  @param  B    The second ASCII character.
+  @param  C    The third ASCII character.
+  @param  D    The fourth ASCII character.
 
   @return A 32-bit value built from the two ASCII characters specified by A, B,
           C and D.
@@ -309,14 +309,14 @@ typedef INTN RETURN_STATUS;
 /**
   Returns a 64-bit signature built from 8 ASCII characters.
   
-  @param  A	   The first ASCII character.
-  @param  B	   The second ASCII character.
-  @param  C	   The third ASCII character.
-  @param  D	   The fourth ASCII character.
-  @param  E	   The fifth ASCII character.
-  @param  F	   The sixth ASCII character.
-  @param  G	   The seventh ASCII character.
-  @param  H	   The eighth ASCII character.
+  @param  A    The first ASCII character.
+  @param  B    The second ASCII character.
+  @param  C    The third ASCII character.
+  @param  D    The fourth ASCII character.
+  @param  E    The fifth ASCII character.
+  @param  F    The sixth ASCII character.
+  @param  G    The seventh ASCII character.
+  @param  H    The eighth ASCII character.
 
   @return A 64-bit value built from the two ASCII characters specified by A, B,
           C, D, E, F, G and H.
