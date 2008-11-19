@@ -18,7 +18,7 @@
 #include <Protocol/DriverConfiguration2.h>
 
 ///
-/// Global ID for the Driver Configuration Protocol defined in UEFI 2.0
+/// Global ID for the Driver Configuration Protocol defined in EFI 1.1
 ///
 #define EFI_DRIVER_CONFIGURATION_PROTOCOL_GUID \
   { \

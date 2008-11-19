@@ -429,10 +429,25 @@ typedef UINT32 EFI_FV_WRITE_POLICY;
 // EFI_FV_WRITE_FILE_DATA
 //
 typedef struct {
+  ///
+  /// Pointer to a GUID, which is the file name to be written.
+  ///
   EFI_GUID                *NameGuid;
+  ///
+  /// Indicates the type of file to be written.
+  ///
   EFI_FV_FILETYPE         Type;
+  ///
+  /// Indicates the attributes for the file to be written.
+  ///
   EFI_FV_FILE_ATTRIBUTES  FileAttributes;
+  ///
+  /// Pointer to a buffer containing the file to be written.
+  ///
   VOID                    *Buffer;
+  ///
+  /// Indicates the size of the file image contained in Buffer.
+  ///
   UINT32                  BufferSize;
 } EFI_FV_WRITE_FILE_DATA;
 

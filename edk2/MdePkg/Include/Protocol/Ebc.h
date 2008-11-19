@@ -96,9 +96,8 @@ EFI_STATUS
   );
 
 /**
-  This routine is called by the core firmware to provide the EBC driver with
-  a function to call to flush the CPU's instruction cache following creation
-  of a thunk. It is not required.
+  Registers a callback function that the EBC interpreter calls to flush 
+  the processor instruction cache following creation of thunks.
 
   @param  This       A pointer to the EFI_EBC_PROTOCOL instance.
   @param  Flush      Pointer to a function of type EBC_ICACH_FLUSH.
