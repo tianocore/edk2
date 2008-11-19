@@ -22,8 +22,8 @@ Revision History:
 
 **/
 
-#ifndef _NVDATASTRUC_H
-#define _NVDATASTRUC_H
+#ifndef _NVDATASTRUC_H_
+#define _NVDATASTRUC_H_
 
 #define FORMSET_GUID \
   { \

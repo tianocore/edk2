@@ -712,7 +712,6 @@ CreateSharedPopUp (
   @param  StringBuffer           The passed in pointer to the buffer which will
                                  hold the typed in string if HotKey is FALSE
   @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
-  @param  String                 Pointer to the first string in the list
   @param  ...                    A series of (quantity == NumberOfLines) text
                                  strings which will be used to construct the dialog
                                  box

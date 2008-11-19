@@ -89,6 +89,21 @@ CreateStatement (
   return Statement;
 }
 
+/**
+  Convert a numeric value to a Unicode String and insert it to String Package.
+  This string is used as the Unicode Name for the EFI Variable. This is to support
+  the deprecated vareqval opcode.
+  
+  @param FormSet        The FormSet.
+  @param Statement      The numeric question whose VarStoreInfo.VarName is the
+                        numeric value which is used to produce the Unicode Name
+                        for the EFI Variable.
+                        
+  If the Statement is NULL, the ASSERT.
+  If the opcode is not Numeric, then ASSERT.
+  
+  @retval EFI_SUCCESS The funtion always succeeds.
+**/
 EFI_STATUS
 UpdateCheckBoxStringToken (
   IN CONST FORM_BROWSER_FORMSET *FormSet,
@@ -115,6 +130,14 @@ UpdateCheckBoxStringToken (
   return EFI_SUCCESS;
 }
 
+/**
+  Check if the next opcode is the EFI_IFR_EXTEND_OP_VAREQNAME.
+  
+  @param OpCodeData     The current opcode.
+                        
+  @retval TRUE Yes.
+  @retval FALSE No.
+**/
 BOOLEAN
 IsNextOpCodeGuidedVarEqName (
   UINT8 *OpCodeData

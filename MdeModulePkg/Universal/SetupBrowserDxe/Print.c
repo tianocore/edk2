@@ -165,7 +165,7 @@ PrintInternal (
 UINTN
 ConsolePrint (
   IN CHAR16   *Fmt,
-  IN ...
+  ...
   )
 {
   VA_LIST Args;
@@ -253,7 +253,7 @@ UINTN
 PrintStringAt (
   IN UINTN     Column,
   IN UINTN     Row,
-  CHAR16       *String
+  IN CHAR16    *String
   )
 {
   return PrintAt (Column, Row, L"%s", String);
