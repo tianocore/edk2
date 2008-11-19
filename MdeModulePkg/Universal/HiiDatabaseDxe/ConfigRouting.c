@@ -1242,7 +1242,7 @@ Exit:
   if (Value != NULL) {
     FreePool (Value);
   }
-  if (ConfigElement) {
+  if (ConfigElement != NULL) {
     FreePool (ConfigElement);
   }
 
