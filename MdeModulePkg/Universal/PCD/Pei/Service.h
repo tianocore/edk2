@@ -928,7 +928,7 @@ PeiRegisterCallBackWorker (
   IN  CONST EFI_GUID         *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK   CallBackFunction,
   IN  BOOLEAN            Register
-);
+  );
 
 /**
   The function builds the PCD database.
