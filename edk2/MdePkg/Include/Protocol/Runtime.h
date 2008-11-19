@@ -43,23 +43,23 @@ typedef struct _EFI_RUNTIME_IMAGE_ENTRY  EFI_RUNTIME_IMAGE_ENTRY;
 /// EFI_RUNTIME_IMAGE_ENTRY
 ///
 struct _EFI_RUNTIME_IMAGE_ENTRY {
-	///
-	/// Start of image that has been loaded in memory. It is a pointer 
-	/// to either the DOS header or PE header of the image.
-	///
+  ///
+  /// Start of image that has been loaded in memory. It is a pointer 
+  /// to either the DOS header or PE header of the image.
+  ///
   VOID                    *ImageBase;
-	///
-	/// Size in bytes of the image represented by ImageBase.
-	///
+  ///
+  /// Size in bytes of the image represented by ImageBase.
+  ///
   UINT64                  ImageSize;
-	///
-	/// Information about the fix-ups that were performed on ImageBase when it was
-	/// loaded into memory.
-	///
+  ///
+  /// Information about the fix-ups that were performed on ImageBase when it was
+  /// loaded into memory.
+  ///
   VOID                    *RelocationData;
-	///
-	/// The ImageHandle passed into ImageBase when it was loaded.
-	///
+  ///
+  /// The ImageHandle passed into ImageBase when it was loaded.
+  ///
   EFI_HANDLE              Handle;
   ///
   /// Entry for this node in the EFI_RUNTIME_ARCHITECTURE_PROTOCOL.ImageHead list.

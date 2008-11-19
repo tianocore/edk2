@@ -528,8 +528,8 @@ EFI_STATUS
 
 
 /**
-	Retrieves information about the next file in the firmware volume store 
-	that matches the search criteria.
+  Retrieves information about the next file in the firmware volume store 
+  that matches the search criteria.
 
   GetNextFile() is the interface that is used to search a firmware
   volume for a particular file. It is called successively until

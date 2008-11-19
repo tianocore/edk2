@@ -34,7 +34,7 @@
   @retval  EFI_UNSUPPORTED      FvHandle does not support EFI_FIRMWARE_VOLUME2_PROTOCOL.
   @retval  EFI_NOT_FOUND        The image specified by NameGuid and SectionType can't be found.
   @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
-  @retval  EFI_DEVICE_ERROR	    A hardware error occurs during reading from the Firmware Volume.
+  @retval  EFI_DEVICE_ERROR     A hardware error occurs during reading from the Firmware Volume.
   @retval  EFI_ACCESS_DENIED    The firmware volume containing the searched Firmware File is configured to disallow reads.
 
 **/
@@ -63,7 +63,7 @@ GetGraphicsBitMapFromFV (
   @retval  EFI_UNSUPPORTED      FvHandle does not support EFI_FIRMWARE_VOLUME2_PROTOCOL.
   @retval  EFI_NOT_FOUND        The image specified by NameGuid and SectionType can't be found.
   @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
-  @retval  EFI_DEVICE_ERROR	    A hardware error occurs during reading from the Firmware Volume.
+  @retval  EFI_DEVICE_ERROR     A hardware error occurs during reading from the Firmware Volume.
   @retval  EFI_ACCESS_DENIED    The firmware volume containing the searched Firmware File is configured to disallow reads.
 
 **/

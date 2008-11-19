@@ -3295,8 +3295,8 @@ InterlockedCompareExchangePointer (
 UINT8
 EFIAPI
 CalculateSum8 (
-  IN      CONST UINT8     	       *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT8              *Buffer,
+  IN      UINTN                     Length
   );
 
 
@@ -3315,14 +3315,14 @@ CalculateSum8 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum	  The 2's complement checksum of Buffer.
+  @return Checksum    The 2's complement checksum of Buffer.
 
 **/
 UINT8
 EFIAPI
 CalculateCheckSum8 (
-  IN      CONST UINT8     	       *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT8              *Buffer,
+  IN      UINTN                     Length
   );
 
 
@@ -3348,8 +3348,8 @@ CalculateCheckSum8 (
 UINT16
 EFIAPI
 CalculateSum16 (
-  IN      CONST UINT16    	       *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT16             *Buffer,
+  IN      UINTN                     Length
   );
 
 
@@ -3370,14 +3370,14 @@ CalculateSum16 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum	  The 2's complement checksum of Buffer.
+  @return Checksum    The 2's complement checksum of Buffer.
 
 **/
 UINT16
 EFIAPI
 CalculateCheckSum16 (
-  IN      CONST UINT16    	       *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT16             *Buffer,
+  IN      UINTN                     Length
   );
 
 
@@ -3403,8 +3403,8 @@ CalculateCheckSum16 (
 UINT32
 EFIAPI
 CalculateSum32 (
-  IN      CONST UINT32    	       *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT32             *Buffer,
+  IN      UINTN                     Length
   );
 
 
@@ -3425,14 +3425,14 @@ CalculateSum32 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum	  The 2's complement checksum of Buffer.
+  @return Checksum    The 2's complement checksum of Buffer.
 
 **/
 UINT32
 EFIAPI
 CalculateCheckSum32 (
-  IN      CONST UINT32    	       *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT32             *Buffer,
+  IN      UINTN                     Length
   );
 
 
@@ -3458,8 +3458,8 @@ CalculateCheckSum32 (
 UINT64
 EFIAPI
 CalculateSum64 (
-  IN      CONST UINT64    	       *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT64             *Buffer,
+  IN      UINTN                     Length
   );
 
 
@@ -3480,14 +3480,14 @@ CalculateSum64 (
   @param  Buffer      Pointer to the buffer to carry out the checksum operation.
   @param  Length      The size, in bytes, of Buffer.
 
-  @return Checksum	  The 2's complement checksum of Buffer.
+  @return Checksum    The 2's complement checksum of Buffer.
 
 **/
 UINT64
 EFIAPI
 CalculateCheckSum64 (
-  IN      CONST UINT64    	       *Buffer,
-  IN      UINTN		  	              Length
+  IN      CONST UINT64             *Buffer,
+  IN      UINTN                     Length
   );
 
 
@@ -3779,7 +3779,7 @@ IpfFlushCacheRange (
   The cache line size affected is at least 32-bytes (aligned on a 32-byte boundary).
   An implementation may flush a larger region.  This function is only available on IPF.
 
-  @param Address  	The Address of cache line to be flushed.
+  @param Address    The Address of cache line to be flushed.
 
   @return The address of FC instruction executed.
 
@@ -3797,7 +3797,7 @@ AsmFc (
   The cache line size affected is at least 32-bytes (aligned on a 32-byte boundary).
   An implementation may flush a larger region.  This function is only available on IPF.
 
-  @param Address  	The Address of cache line to be flushed.
+  @param Address    The Address of cache line to be flushed.
 
   @return The address of FC.I instruction executed.
 
@@ -3820,7 +3820,7 @@ AsmFci (
   must either guarantee that Index is valid, or the caller must set up fault handlers to
   catch the faults.  This function is only available on IPF.
 
-  @param Index		The 8-bit Processor Identifier Register index to read.
+  @param Index    The 8-bit Processor Identifier Register index to read.
 
   @return The current value of Processor Identifier Register specified by Index.
 
@@ -3854,7 +3854,7 @@ AsmReadPsr (
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults. This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to PSR.
+  @param Value    The 64-bit value to write to PSR.
 
   @return The 64-bit value written to the PSR.
 
@@ -3982,7 +3982,7 @@ AsmReadKr7 (
   Write the current value of 64-bit Kernel Register #0 (KR0).
   This function is only available on IPF.
 
-  @param  Value 	The 64-bit value to write to KR0.
+  @param  Value   The 64-bit value to write to KR0.
 
   @return The 64-bit value written to the KR0.
 
@@ -3998,7 +3998,7 @@ AsmWriteKr0 (
   Write the current value of 64-bit Kernel Register #1 (KR1).
   This function is only available on IPF.
 
-  @param  Value 	The 64-bit value to write to KR1.
+  @param  Value   The 64-bit value to write to KR1.
 
   @return The 64-bit value written to the KR1.
 
@@ -4014,7 +4014,7 @@ AsmWriteKr1 (
   Write the current value of 64-bit Kernel Register #2 (KR2).
   This function is only available on IPF.
 
-  @param  Value 	The 64-bit value to write to KR2.
+  @param  Value   The 64-bit value to write to KR2.
 
   @return The 64-bit value written to the KR2.
 
@@ -4030,7 +4030,7 @@ AsmWriteKr2 (
   Write the current value of 64-bit Kernel Register #3 (KR3).
   This function is only available on IPF.
 
-  @param  Value 	The 64-bit value to write to KR3.
+  @param  Value   The 64-bit value to write to KR3.
 
   @return The 64-bit value written to the KR3.
 
@@ -4046,7 +4046,7 @@ AsmWriteKr3 (
   Write the current value of 64-bit Kernel Register #4 (KR4).
   This function is only available on IPF.
 
-  @param  Value 	The 64-bit value to write to KR4.
+  @param  Value   The 64-bit value to write to KR4.
 
   @return The 64-bit value written to the KR4.
 
@@ -4062,7 +4062,7 @@ AsmWriteKr4 (
   Write the current value of 64-bit Kernel Register #5 (KR5).
   This function is only available on IPF.
 
-  @param  Value 	The 64-bit value to write to KR5.
+  @param  Value   The 64-bit value to write to KR5.
 
   @return The 64-bit value written to the KR5.
 
@@ -4078,7 +4078,7 @@ AsmWriteKr5 (
   Write the current value of 64-bit Kernel Register #6 (KR6).
   This function is only available on IPF.
 
-  @param  Value 	The 64-bit value to write to KR6.
+  @param  Value   The 64-bit value to write to KR6.
 
   @return The 64-bit value written to the KR6.
 
@@ -4094,7 +4094,7 @@ AsmWriteKr6 (
   Write the current value of 64-bit Kernel Register #7 (KR7).
   This function is only available on IPF.
 
-  @param  Value 	The 64-bit value to write to KR7.
+  @param  Value   The 64-bit value to write to KR7.
 
   @return The 64-bit value written to the KR7.
 
@@ -4151,7 +4151,7 @@ AsmReadItm (
   Writes the current value of 64-bit Interval Timer Counter Register (ITC).
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to ITC.
+  @param Value    The 64-bit value to write to ITC.
 
   @return The 64-bit value written to the ITC.
 
@@ -4167,7 +4167,7 @@ AsmWriteItc (
   Writes the current value of 64-bit Interval Timer Match Register (ITM).
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to ITM.
+  @param Value    The 64-bit value to write to ITM.
 
   @return The 64-bit value written to the ITM.
 
@@ -4187,7 +4187,7 @@ AsmWriteItm (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to ITV.
+  @param Value    The 64-bit value to write to ITV.
 
   @return The 64-bit value written to the ITV.
 
@@ -4248,7 +4248,7 @@ AsmReadPta (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to DCR.
+  @param Value    The 64-bit value to write to DCR.
 
   @return The 64-bit value written to the DCR.
 
@@ -4266,7 +4266,7 @@ AsmWriteDcr (
   the low 15 bits of Value is ignored when written.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to IVA.
+  @param Value    The 64-bit value to write to IVA.
 
   @return The 64-bit value written to the IVA.
 
@@ -4286,7 +4286,7 @@ AsmWriteIva (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to PTA.
+  @param Value    The 64-bit value to write to PTA.
 
   @return The 64-bit value written to the PTA.
 **/
@@ -4459,7 +4459,7 @@ AsmReadLrr1 (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to LID.
+  @param Value    The 64-bit value to write to LID.
 
   @return The 64-bit value written to the LID.
 
@@ -4479,7 +4479,7 @@ AsmWriteLid (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to TPR.
+  @param Value    The 64-bit value to write to TPR.
 
   @return The 64-bit value written to the TPR.
 
@@ -4511,7 +4511,7 @@ AsmWriteEoi (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to PMV.
+  @param Value    The 64-bit value to write to PMV.
 
   @return The 64-bit value written to the PMV.
 
@@ -4531,7 +4531,7 @@ AsmWritePmv (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to CMCV.
+  @param Value    The 64-bit value to write to CMCV.
 
   @return The 64-bit value written to the CMCV.
 
@@ -4551,7 +4551,7 @@ AsmWriteCmcv (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to LRR0.
+  @param Value    The 64-bit value to write to LRR0.
 
   @return The 64-bit value written to the LRR0.
 
@@ -4571,7 +4571,7 @@ AsmWriteLrr0 (
   set up fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Value		The 64-bit value to write to LRR1.
+  @param Value    The 64-bit value to write to LRR1.
 
   @return The 64-bit value written to the LRR1.
 
@@ -4596,7 +4596,7 @@ AsmWriteLrr1 (
   set up fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Index		The 8-bit Instruction Breakpoint Register index to read.
+  @param Index    The 8-bit Instruction Breakpoint Register index to read.
 
   @return The current value of Instruction Breakpoint Register specified by Index.
 
@@ -4621,7 +4621,7 @@ AsmReadIbr (
   fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Index		The 8-bit Data Breakpoint Register index to read.
+  @param Index    The 8-bit Data Breakpoint Register index to read.
 
   @return The current value of Data Breakpoint Register specified by Index.
 
@@ -4646,7 +4646,7 @@ AsmReadDbr (
   zero value will be returned.
   This function is only available on IPF.
 
-  @param Index		The 8-bit Performance Monitor Configuration Register index to read.
+  @param Index    The 8-bit Performance Monitor Configuration Register index to read.
 
   @return The current value of Performance Monitor Configuration Register
   specified by Index.
@@ -4672,7 +4672,7 @@ AsmReadPmc (
   zero value will be returned.
   This function is only available on IPF.
 
-  @param Index		The 8-bit Performance Monitor Data Register index to read.
+  @param Index    The 8-bit Performance Monitor Data Register index to read.
 
   @return The current value of Performance Monitor Data Register specified by Index.
 
@@ -4698,8 +4698,8 @@ AsmReadPmd (
   set up fault handlers to catch the faults.
   This function is only available on IPF.
 
-  @param Index		The 8-bit Instruction Breakpoint Register index to write.
-  @param Value		The 64-bit value to write to IBR.
+  @param Index    The 8-bit Instruction Breakpoint Register index to write.
+  @param Value    The 64-bit value to write to IBR.
 
   @return The 64-bit value written to the IBR.
 
@@ -4726,8 +4726,8 @@ AsmWriteIbr (
   catch the faults.
   This function is only available on IPF.
 
-  @param Index		The 8-bit Data Breakpoint Register index to write.
-  @param Value		The 64-bit value to write to DBR.
+  @param Index    The 8-bit Data Breakpoint Register index to write.
+  @param Value    The 64-bit value to write to DBR.
 
   @return The 64-bit value written to the DBR.
 
@@ -4753,8 +4753,8 @@ AsmWriteDbr (
   beyond the implemented PMC register range, the write is ignored.
   This function is only available on IPF.
 
-  @param Index		The 8-bit Performance Monitor Configuration Register index to write.
-  @param Value		The 64-bit value to write to PMC.
+  @param Index    The 8-bit Performance Monitor Configuration Register index to write.
+  @param Value    The 64-bit value to write to PMC.
 
   @return The 64-bit value written to the PMC.
 
@@ -4780,8 +4780,8 @@ AsmWritePmc (
   Index value is beyond the implemented PMD register range, the write is ignored.
   This function is only available on IPF.
 
-  @param Index		The 8-bit Performance Monitor Data Register index to write.
-  @param Value		The 64-bit value to write to PMD.
+  @param Index    The 8-bit Performance Monitor Data Register index to write.
+  @param Value    The 64-bit value to write to PMD.
 
   @return The 64-bit value written to the PMD.
 
@@ -4889,11 +4889,11 @@ AsmCpuVirtual (
   PAL entry point then the system behavior is undefined.  This function is only
   available on IPF.
 
-  @param PalEntryPoint	The PAL procedure calls entry point.
-  @param Index			     The PAL procedure Index number.
-  @param Arg2			      The 2nd parameter for PAL procedure calls.
-  @param Arg3			      The 3rd parameter for PAL procedure calls.
-  @param Arg4			      The 4th parameter for PAL procedure calls.
+  @param PalEntryPoint  The PAL procedure calls entry point.
+  @param Index          The PAL procedure Index number.
+  @param Arg2           The 2nd parameter for PAL procedure calls.
+  @param Arg3           The 3rd parameter for PAL procedure calls.
+  @param Arg4           The 4th parameter for PAL procedure calls.
 
   @return structure returned from the PAL Call procedure, including the status and return value.
 
