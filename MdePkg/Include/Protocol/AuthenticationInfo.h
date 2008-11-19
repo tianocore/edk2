@@ -35,33 +35,112 @@
 typedef struct _EFI_AUTHENTICATION_INFO_PROTOCOL EFI_AUTHENTICATION_INFO_PROTOCOL;
 
 typedef struct {
+  ///
+  /// Authentication Type GUID.
+  ///
   EFI_GUID         Guid;
+
+  ///
+  /// Length of this structure in bytes.
+  ///
   UINT16           Length;
 } AUTH_NODE_HEADER;
 
 typedef struct {
   AUTH_NODE_HEADER Header;
+
+  ///
+  /// RADIUS Server IPv4 or IPv6 Address
+  ///
   EFI_IPv6_ADDRESS RadiusIpAddr;             ///< IPv4 or IPv6 address
+
+  ///
+  /// Reserved for future use
+  ///
   UINT16           Reserved;
+
+  ///
+  /// Network Access Server IPv4 or IPv6 Address (OPTIONAL)
+  ///
   EFI_IPv6_ADDRESS NasIpAddr;                ///< IPv4 or IPv6 address
+
+  ///
+  /// Network Access Server Secret Length in bytes (OPTIONAL)
+  ///
   UINT16           NasSecretLength; 
+
+  ///
+  /// Network Access Server secret (OPTIONAL)
+  ///
   UINT8            *NasSecret;      
+
+  ///
+  /// CHAP Initiator Secret length in bytes
+  ///
   UINT16           ChapSecretLength;
+
+  ///
+  /// CHAP Initiator Secret
+  ///
   UINT8            *ChapSecret;
+
+  ///
+  /// CHAP Initiator Name Length in bytes
+  ///
   UINT16           ChapNameLength;
+
+  ///
+  /// CHAP Initiator Name
+  ///
   UINT8            *ChapName;
 } CHAP_RADIUS_AUTH_NODE;
 
 typedef struct {
   AUTH_NODE_HEADER Header;
+
+  ///
+  /// Reserved for future use
+  ///
   UINT16           Reserved;
+
+  ///
+  /// User Secret Length in bytes
+  ///
   UINT16           UserSecretLength;
+
+  ///
+  /// User Secret
+  ///
   UINT8            *UserSecret;     
+
+  ///
+  /// User Name Length in bytes
+  ///
   UINT16           UserNameLength;
+
+  ///
+  /// User Name
+  ///
   UINT8            *UserName;
+
+  ///
+  /// CHAP Initiator Secret length in bytes
+  ///
   UINT16           ChapSecretLength;
+
+  ///
+  /// CHAP Initiator Secret
+  ///
   UINT8            *ChapSecret;
+
+  ///
+  /// CHAP Initiator Name Length in bytes
+  ///
   UINT16           ChapNameLength;
+
+  ///
+  /// CHAP Initiator Name
+  ///
   UINT8            *ChapName;
 } CHAP_LOCAL_AUTH_NODE;
 

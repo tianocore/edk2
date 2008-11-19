@@ -84,9 +84,9 @@ typedef struct _EFI_SECURITY_ARCH_PROTOCOL    EFI_SECURITY_ARCH_PROTOCOL;
 typedef 
 EFI_STATUS
 (EFIAPI *EFI_SECURITY_FILE_AUTHENTICATION_STATE)(
-  IN EFI_SECURITY_ARCH_PROTOCOL     *This,
-  IN  UINT32                        AuthenticationStatus,
-  IN  EFI_DEVICE_PATH_PROTOCOL      *File
+  IN  CONST EFI_SECURITY_ARCH_PROTOCOL *This,
+  IN  UINT32                           AuthenticationStatus,
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File
   );
 
 ///

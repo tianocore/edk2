@@ -1,6 +1,9 @@
 /** @file
-  The file provides the protocol to retrieve configuration
-  information for a device that a UEFI driver is about to start.
+	UEFI Platform to Driver Configuration Protocol is defined in UEFI specification.
+	
+	This is a protocol that is optionally produced by the platform and optionally consumed 
+	by a UEFI Driver in its Start() function. This protocol allows the driver to receive 
+	configuration information as part of being started.
 
   Copyright (c) 2006 - 2008, Intel Corporation 
   All rights reserved. This program and the accompanying materials                          

@@ -36,21 +36,81 @@
 typedef struct _EFI_ARP_PROTOCOL EFI_ARP_PROTOCOL;
 
 typedef struct {
+  ///
+  /// Length in bytes of this entry.
+  ///
   UINT32                      Size;
+
+  ///
+  /// Set to TRUE if this entry is a "deny" entry.
+  /// Set to FALSE if this entry is a "normal" entry.
+  ///
   BOOLEAN                     DenyFlag;
+
+  ///
+  /// Set to TRUE if this entry will not time out.
+  /// Set to FALSE if this entry will time out.
+  ///
   BOOLEAN                     StaticFlag;
+
+  ///
+  /// 16-bit ARP hardware identifier number.
+  ///
   UINT16                      HwAddressType;
+
+  ///
+  /// 16-bit protocol type number.
+  ///
   UINT16                      SwAddressType;
+
+  ///
+  /// Length of the hardware address.
+  ///
   UINT8                       HwAddressLength;
+
+  ///
+  /// Length of the protocol address.
+  ///
   UINT8                       SwAddressLength;
 } EFI_ARP_FIND_DATA;
 
 typedef struct {
+  ///
+  /// 16-bit protocol type number in host byte order.
+  ///
   UINT16                    SwAddressType;      ///< Host byte order
+
+  ///
+  /// Length in bytes of the station's protocol address to register.
+  ///
   UINT8                     SwAddressLength;
+
+  ///
+  /// Pointer to the first byte of the protocol address to register. For
+  /// example, if SwAddressType is 0x0800 (IP), then
+  /// StationAddress points to the first byte of this station¡¯s IP
+  /// address stored in network byte order.
+  ///
   VOID                      *StationAddress;    ///< Network byte order
+
+  ///
+  /// The timeout value in 100-ns units that is associated with each
+  /// new dynamic ARP cache entry. If it is set to zero, the value is
+  /// implementation-specific.
+  ///
   UINT32                    EntryTimeOut;
+
+  ///
+  /// The number of retries before a MAC address is resolved. If it is
+  /// set to zero, the value is implementation-specific.
+  ///
   UINT32                    RetryCount;
+
+  ///
+  /// The timeout value in 100-ns units that is used to wait for the ARP
+  /// reply packet or the timeout value between two retries. Set to zero
+  /// to use implementation-specific value.
+  ///
   UINT32                    RetryTimeOut;
 } EFI_ARP_CONFIG_DATA;
 
@@ -63,6 +123,9 @@ typedef struct {
 
   @retval EFI_SUCCESS           The new station address was successfully registered.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                This is NULL.
+                                SwAddressLength is zero when ConfigData is not NULL.
+                                StationAddress is NULL when ConfigData is not NULL.
   @retval EFI_ACCESS_DENIED     The SwAddressType, SwAddressLength, or
                                 StationAddress is different from the one that is already
                                 registered.
@@ -236,6 +299,9 @@ EFI_STATUS
   @retval EFI_SUCCESS           The pending request session(s) is/are aborted and corresponding
                                 event(s) is/are signaled.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                This is NULL.
+                                TargetSwAddress is not NULL and ResolvedEvent is NULL.
+                                TargetSwAddress is NULL and ResolvedEvent is not NULL
   @retval EFI_NOT_STARTED       The ARP driver instance has not been configured.
   @retval EFI_NOT_FOUND         The request is not issued by
                                 EFI_ARP_PROTOCOL.Request().

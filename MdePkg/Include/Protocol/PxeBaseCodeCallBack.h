@@ -26,9 +26,13 @@
   }
 
 //
-// Revision Number
+// UEFI Revision Number Definition
 //
 #define EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION 0x00010000
+
+//
+// EFI 1.1 Revision Number defintion
+//
 #define EFI_PXE_BASE_CODE_CALLBACK_INTERFACE_REVISION  \
         EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION
 

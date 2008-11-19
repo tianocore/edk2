@@ -206,7 +206,8 @@ EFI_STATUS
                            must be between 0 and NumberOfTimers-1.
   @param  TimerValue       Pointer to the returned timer value.
   @param  TimerPeriod      A pointer to the amount of time that passes in femtoseconds for each increment
-                           of TimerValue.
+                           of TimerValue. If TimerValue does not increment at a predictable rate, then 0 is
+                           returned. This parameter is optional and may be NULL.
 
   @retval EFI_SUCCESS           The processor timer value specified by TimerIndex was returned in TimerValue.
   @retval EFI_DEVICE_ERROR      An error occurred attempting to read one of the processor's timers.

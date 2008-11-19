@@ -38,7 +38,7 @@ typedef struct _EFI_DECOMPRESS_PROTOCOL  EFI_DECOMPRESS_PROTOCOL;
   output it as DestinationSize.  And ScratchSize is specific to the decompression
   implementation.
 
-  @param  This            The protocol instance pointer
+  @param  This            A pointer to the EFI_DECOMPRESS_PROTOCOL instance.
   @param  Source          The source buffer containing the compressed data.
   @param  SourceSize      The size, in bytes, of source buffer.
   @param  DestinationSize A pointer to the size, in bytes, of the uncompressed buffer
@@ -79,7 +79,7 @@ EFI_STATUS
   If the compressed source data specified by Source and SourceSize is not in 
   a valid compressed data format, then EFI_INVALID_PARAMETER is returned.
 
-  @param  This            The protocol instance pointer
+  @param  This            A pointer to the EFI_DECOMPRESS_PROTOCOL instance.
   @param  Source          The source buffer containing the compressed data.
   @param  SourceSize      The size of source data.
   @param  Destination     On output, the destination buffer that contains
