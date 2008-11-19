@@ -15,7 +15,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = MdeModuleIfrSupportLib
+  BASE_NAME                      = ExtendedIfrSupportLib
   FILE_GUID                      = A47B68BA-5177-4b2d-891E-4722FA5323F8
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
