@@ -42,14 +42,15 @@ typedef struct _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL  EFI_BUS_SPECIFIC_DRIV
   @param  DriverImageHandle     On input, a pointer to the previous driver image handle returned
                                 by GetDriver(). On output, a pointer to the next driver         
                                 image handle. Passing in a NULL, will return the first driver   
-                                image handle.                                                     
-                                
+                                image handle.
+
   @retval EFI_SUCCESS           A bus specific override driver is returned in DriverImageHandle.
   @retval EFI_NOT_FOUND         The end of the list of override drivers was reached.
+                                A bus specific override driver is not returned in DriverImageHandle.
   @retval EFI_INVALID_PARAMETER DriverImageHandle is not a handle that was returned on a
-                                previous call to GetDriver().                           
-                                   
-**/   
+                                previous call to GetDriver().
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_GET_DRIVER)(

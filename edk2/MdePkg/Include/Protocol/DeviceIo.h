@@ -36,14 +36,10 @@ typedef struct _EFI_DEVICE_IO_PROTOCOL EFI_DEVICE_IO_PROTOCOL;
 typedef EFI_DEVICE_IO_PROTOCOL  EFI_DEVICE_IO_INTERFACE;
 
 typedef enum {
-  IO_UINT8,
-  IO_UINT16,
-  IO_UINT32,
-  IO_UINT64,
-  MMIO_COPY_UINT8,
-  MMIO_COPY_UINT16,
-  MMIO_COPY_UINT32,
-  MMIO_COPY_UINT64
+  IO_UINT8 = 0,
+  IO_UINT16 = 1,
+  IO_UINT32 = 2,
+  IO_UINT64 = 3
 } EFI_IO_WIDTH;
 
 /**                                                                 
@@ -99,8 +95,22 @@ EFI_STATUS
   );
 
 typedef enum {
+  ///
+  /// A read operation from system memory by a bus master.
+  ///
   EfiBusMasterRead,
+
+  ///
+  /// A write operation to system memory by a bus master.
+  ///
   EfiBusMasterWrite,
+  
+  ///
+  /// Provides both read and write access to system memory
+  /// by both the processor and a bus master. The buffer is
+  /// coherent from both the processor¡¯s and the bus master¡¯s
+  /// point of view.
+  ///
   EfiBusMasterCommonBuffer
 } EFI_IO_OPERATION_TYPE;
 

@@ -1,17 +1,14 @@
 /** @file
   Runtime Architectural Protocol as defined in PI Specification VOLUME 2 DXE
 
-  This code is used to produce the UEFI 2.0 runtime virtual switch over
-
-  This driver must add SetVirtualAddressMap () and ConvertPointer () to
-  the EFI system table. This driver is not responcible for CRCing the 
-  EFI system table.
-
-  This driver will add EFI_RUNTIME_ARCH_PROTOCOL_GUID protocol with a 
-  pointer to the Runtime Arch Protocol instance structure. The protocol
-  member functions are used by the DXE core to export information need
-  by this driver to produce the runtime transition to virtual mode
-  calling.
+  Allows the runtime functionality of the DXE Foundation to be contained 
+  in a separate driver. It also provides hooks for the DXE Foundation to 
+  export information that is needed at runtime. As such, this protocol allows 
+  services to the DXE Foundation to manage runtime drivers and events. 
+  This protocol also implies that the runtime services required to transition 
+  to virtual mode, SetVirtualAddressMap() and ConvertPointer(), have been 
+  registered into the UEFI Runtime Table in the UEFI System Table. This protocol 
+  must be produced by a runtime DXE driver and may only be consumed by the DXE Foundation.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -42,22 +39,64 @@ typedef LIST_ENTRY EFI_LIST_ENTRY;
 
 typedef struct _EFI_RUNTIME_IMAGE_ENTRY  EFI_RUNTIME_IMAGE_ENTRY;
 
+///
+/// EFI_RUNTIME_IMAGE_ENTRY
+///
 struct _EFI_RUNTIME_IMAGE_ENTRY {
+	///
+	/// Start of image that has been loaded in memory. It is a pointer 
+	/// to either the DOS header or PE header of the image.
+	///
   VOID                    *ImageBase;
+	///
+	/// Size in bytes of the image represented by ImageBase.
+	///
   UINT64                  ImageSize;
+	///
+	/// Information about the fix-ups that were performed on ImageBase when it was
+	/// loaded into memory.
+	///
   VOID                    *RelocationData;
+	///
+	/// The ImageHandle passed into ImageBase when it was loaded.
+	///
   EFI_HANDLE              Handle;
+  ///
+  /// Entry for this node in the EFI_RUNTIME_ARCHITECTURE_PROTOCOL.ImageHead list.
+  ///
   EFI_LIST_ENTRY          Link;
 };
 
 typedef struct _EFI_RUNTIME_EVENT_ENTRY  EFI_RUNTIME_EVENT_ENTRY;
 
+///
+/// EFI_RUNTIME_EVENT_ENTRY
+///
 struct _EFI_RUNTIME_EVENT_ENTRY {
+  ///
+  /// The same as Type passed into CreateEvent().
+  ///
   UINT32                  Type;
+  ///
+  /// The same as NotifyTpl passed into CreateEvent().
+  ///
   EFI_TPL                 NotifyTpl;
+  ///
+  /// The same as NotifyFunction passed into CreateEvent().
+  ///
   EFI_EVENT_NOTIFY        NotifyFunction;
+  ///
+  /// The same as NotifyContext passed into CreateEvent().
+  ///
   VOID                    *NotifyContext;
+  ///
+  /// The EFI_EVENT returned by CreateEvent(). Event must be in runtime memory.
+  ///
   EFI_EVENT               *Event;
+  ///
+  /// Entry for this node in the
+  /// EFI_RUNTIME_ARCHITECTURE_PROTOCOL.EventHead list.
+  ///
   EFI_LIST_ENTRY          Link;
 };
 

@@ -57,8 +57,8 @@ typedef struct {
 /// EFI_BIS_VERSION type.
 ///
 typedef struct {
-  UINT32  Major;  ///< BIS Interface version number.
-  UINT32  Minor;  ///< Build number.
+  UINT32  Major;  ///< the major BIS version number.
+  UINT32  Minor;  ///< a minor BIS version number.
 } EFI_BIS_VERSION;
 
 //
@@ -132,19 +132,33 @@ typedef struct {
                                    interface version desired.                                   
                                    On output, both the major and minor                         
                                    version numbers are updated with the major and minor version
-                                   numbers of the interface                                    
+                                   numbers of the interface. This update is done whether or not the
+                                   initialization was successful.                                    
   @param  TargetAddress            Indicates a network or device address of the BIS platform to connect to.                                                                 
 
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_INCOMPATIBLE_VERSION The InterfaceVersion.Major requested by the                
                                    caller was not compatible with the interface version of the
+                                   implementation. The InterfaceVersion.Major has
+                                   been updated with the current interface version.
   @retval EFI_UNSUPPORTED          This is a local-platform implementation and        
                                    TargetAddress.Data was not NULL, or                
                                    TargetAddress.Data was any other value that was not
                                    supported by the implementation.                   
   @retval EFI_OUT_OF_RESOURCES     The function failed due to lack of memory or other resources.                              
-  @retval EFI_DEVICE_ERROR         The function encountered an unexpected internal failure.
-  @retval EFI_INVALID_PARAMETER    One or more parameters are invalid.
+  @retval EFI_DEVICE_ERROR         The function encountered an unexpected internal failure while
+                                   initializing a cryptographic software module, or
+                                   No cryptographic software module with compatible version was
+                                   found, or A resource limitation was encountered while using a
+                                   cryptographic software module.
+  @retval EFI_INVALID_PARAMETER    The This parameter supplied by the caller is NULL or does not
+                                   reference a valid EFI_BIS_PROTOCOL object, or
+                                   The AppHandle parameter supplied by the caller is NULL or
+                                   an invalid memory reference, or
+                                   The InterfaceVersion parameter supplied by the caller
+                                   is NULL or an invalid memory reference, or
+                                   The TargetAddress parameter supplied by the caller is
+                                   NULL or an invalid memory reference.
                                           
 **/                                       
 typedef
@@ -161,7 +175,8 @@ EFI_STATUS
       
   @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                         
-  @param  ToFree                   An EFI_BIS_DATA* and associated memory block to be freed.
+  @param  ToFree                   An EFI_BIS_DATA* and associated memory block to be freed. 
+                                   This EFI_BIS_DATA* must have been allocated by one of the other BIS functions.
 
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
@@ -189,9 +204,10 @@ EFI_STATUS
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
                                    application instance handle associated with the EFI_BIS protocol.                                     
   @retval EFI_OUT_OF_RESOURCES     The function failed due to lack of memory or other resources.                                
-  @retval EFI_DEVICE_ERROR         The function encountered an unexpected internal failure.  
-                                           
-**/   
+  @retval EFI_DEVICE_ERROR         The function encountered an unexpected internal failure while
+                                   returning resources associated with a cryptographic software module, or
+                                   while trying to shut down a cryptographic software module.
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_BIS_SHUTDOWN)(
@@ -205,7 +221,8 @@ EFI_STATUS
   @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  Certificate              The function writes an allocated EFI_BIS_DATA* containing the Boot
-                                   Object Authorization Certificate object.                            
+                                   Object Authorization Certificate object.  The caller must
+                                   eventually free the memory allocated by this function using the function Free().
 
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
@@ -285,7 +302,8 @@ EFI_STATUS
   @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  UpdateToken              The function writes an allocated EFI_BIS_DATA* containing the new
-                                   unique update token value.                                                                          
+                                   unique update token value.  The caller must
+                                   eventually free the memory allocated by this function using the function Free().
                                    
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
@@ -311,7 +329,8 @@ EFI_STATUS
   @param  RequestCredential        This is a Signed Manifest with embedded attributes that carry the details
                                    of the requested update.                                                 
   @param  NewUpdateToken           The function writes an allocated EFI_BIS_DATA* containing the new                        
-                                   unique update token value.                                       
+                                   unique update token value. The caller must
+                                   eventually free the memory allocated by this function using the function Free().
                                    
   @retval EFI_SUCCESS              The function completed successfully.                                                
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid                              
@@ -320,7 +339,10 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER    One or more parameters are invalid.                                                 
   @retval EFI_SECURITY_VIOLATION   The signed manifest supplied as the RequestCredential parameter                           
                                    was invalid (could not be parsed) or Platform-specific authorization failed, etc.   
-  @retval EFI_DEVICE_ERROR         An unexpected internal error occurred.                                                                                                                                                                   
+  @retval EFI_DEVICE_ERROR         An unexpected internal error occurred while analyzing the new
+                                   certificate's key algorithm, or while attempting to retrieve
+                                   the public key algorithm of the manifest's signer's certificate,
+                                   or An unexpected internal error occurred in a cryptographic software module.                                                                                                                                                                  
                                    
 **/ 
 typedef
@@ -357,8 +379,9 @@ EFI_STATUS
                                    or the AuthorityCertificate supplied by the caller was 
                                    invalid (could not be parsed),                      
                                    or Platform-specific authorization failed, etc.   
-  @retval EFI_DEVICE_ERROR         An unexpected internal error occurred.                                                                                                                                                                   
-                                   
+  @retval EFI_DEVICE_ERROR         An unexpected internal error occurred while attempting to retrieve
+                                   the public key algorithm of the manifest¡¯s signer¡¯s certificate,
+                                   or An unexpected internal error occurred in a cryptographic software module.                                                                                                                                                                  
 **/ 
 typedef
 EFI_STATUS
@@ -374,21 +397,25 @@ EFI_STATUS
 /**                                                                 
   Retrieves a list of digital certificate identifier, digital signature algorithm, hash algorithm, and keylength
   combinations that the platform supports.                                                                      
-      
+
   @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
                                    of the BIS service.                                                                                           
   @param  SignatureInfo            The function writes an allocated EFI_BIS_DATA* containing the array
                                    of EFI_BIS_SIGNATURE_INFO structures representing the supported    
-                                   digital certificate identifier, algorithm, and key length combinations.                                   
-                                   
+                                   digital certificate identifier, algorithm, and key length combinations.
+                                   The caller must eventually free the memory allocated by this function using the function Free().
+
   @retval EFI_SUCCESS              The function completed successfully.                                                
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid                              
                                    application instance handle associated with the EFI_BIS protocol.                   
   @retval EFI_OUT_OF_RESOURCES     The function failed due to lack of memory or other resources.                       
   @retval EFI_INVALID_PARAMETER    The SignatureInfo parameter supplied by the caller is NULL
-                                   or an invalid memory reference.                           
-  @retval EFI_DEVICE_ERROR         An unexpected internal error occurred.                                                                                                                                                                   
-                                   
+                                   or an invalid memory reference.
+  @retval EFI_DEVICE_ERROR         An unexpected internal error occurred in a
+                                   cryptographic software module, or
+                                   The function encountered an unexpected internal consistency check
+                                   failure (possible corruption of stored Boot Object Authorization Certificate).
+
 **/
 typedef
 EFI_STATUS

@@ -32,7 +32,8 @@
 
   @param  DevicePath Points to the start of the EFI device path.
 
-  @retval Size       Size of the specified device path, in bytes, including the end-of-path tag.
+  @return Size  Size of the specified device path, in bytes, including the end-of-path tag.
+  @retval 0     DevicePath is NULL   
 
 **/
 typedef
@@ -48,7 +49,7 @@ UINTN
   @param  DevicePath Points to the source EFI device path.
 
   @retval Pointer    A pointer to the duplicate device path.
-  @retval NULL       insufficient memory
+  @retval NULL       insufficient memory or DevicePath is NULL
 
 **/
 typedef
@@ -59,13 +60,15 @@ EFI_DEVICE_PATH_PROTOCOL*
 
 /**
   Create a new path by appending the second device path to the first.
+  If Src1 is NULL and Src2 is non-NULL, then a duplicate of Src2 is returned. 
+  If Src1 is non-NULL and Src2 is NULL, then a duplicate of Src1 is returned.
+  If Src1 and Src2 are both NULL, then a copy of an end-of-device-path is returned.
 
-  @param  Src1 Points to the first device path. If NULL, then it is ignored.
-  @param  Src2 Points to the second device path. If NULL, then it is ignored.
+  @param  Src1 Points to the first device path.
+  @param  Src2 Points to the second device path.
 
   @retval Pointer  A pointer to the newly created device path.
   @retval NULL     Memory could not be allocated
-                   or either DevicePath or DeviceNode is NULL.
 
 **/
 typedef
@@ -77,13 +80,15 @@ EFI_DEVICE_PATH_PROTOCOL*
   
 /**
   Creates a new path by appending the device node to the device path.
+  If DeviceNode is NULL then a copy of DevicePath is returned. 
+  If DevicePath is NULL then a copy of DeviceNode, followed by an end-of-device path device node is returned.
+  If both DeviceNode and DevicePath are NULL then a copy of an end-of-device-path device node is returned.
 
   @param  DevicePath Points to the device path.
   @param  DeviceNode Points to the device node.
 
   @retval Pointer    A pointer to the allocated device node.
-  @retval NULL       Memory could not be allocated
-                     or either DevicePath or DeviceNode is NULL.
+  @retval NULL       There was insufficient memory.
 
 **/
 typedef
@@ -119,7 +124,8 @@ EFI_DEVICE_PATH_PROTOCOL*
                                  device path instance or NULL if there are no more device
                                  path instances in the device path.  
   @param  DevicePathInstanceSize On output, this holds the size of the device path instance,
-                                 in bytes or zero, if DevicePathInstance is zero.
+                                 in bytes or zero, if DevicePathInstance is NULL.
+                                 If NULL, then the instance size is not output.
 
   @retval Pointer                A pointer to the copy of the current device path instance.
   @retval NULL                   DevicePathInstace was NULL on entry or there was insufficient memory.

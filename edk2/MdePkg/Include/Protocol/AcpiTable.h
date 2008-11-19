@@ -31,7 +31,7 @@ typedef struct _EFI_ACPI_TABLE_PROTOCOL EFI_ACPI_TABLE_PROTOCOL;
   copy into the RSDT/XSDT. InstallAcpiTable() must insert the new   
   table at the end of the RSDT/XSDT. To prevent namespace   
   collision, ACPI tables may be created using UEFI ACPI table   
-  format. See Appendix O. On successful output, TableKey is   
+  format. On successful output, TableKey is   
   initialized with a unique key. Its value may be used in a   
   subsequent call to UninstallAcpiTable to remove an ACPI table.   
   If an EFI application is running at the time of this call, the   
