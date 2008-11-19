@@ -867,7 +867,8 @@ Error:
   @param  ForeGround   Foreground color.
   @param  BackGround   background color.
   @param  Fmt          Print format sting. See definition of Print.
-  @param  ...          Argumnet stream defined by Fmt string.
+  @param ...           Variable argument list whose contents are accessed based on 
+                       the format string specified by Format.
 
   @return  Number of Characters printed. Zero means no any character 
            displayed successfully.
