@@ -527,7 +527,7 @@ UsbGetStatus (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  USB_TYPES_DEFINITION    Recipient,
   IN  UINT16                  Target,
-  OUT UINT16                  *DevStatus,
+  OUT UINT16                  *DeviceStatus,
   OUT UINT32                  *Status
   );
 
