@@ -81,7 +81,8 @@ InternalPrint (
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
-  @param ...      VARARG list consumed to process Format.
+  @param ...      Variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
   
   @return The number of Unicode characters in the produced
           output buffer not including the Null-terminator.
@@ -119,7 +120,8 @@ Print (
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
-  @param ...      VARARG list consumed to process Format.
+  @param ...      Variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
 
   @return The number of Unicode characters in the produced
           output buffer not including the Null-terminator.
@@ -211,7 +213,8 @@ AsciiInternalPrint (
   If Format is NULL, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
-  @param ...      VARARG list consumed to process Format.
+  @param ...      Variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
   
   @return The number of Ascii characters in the produced
           output buffer not including the Null-terminator.
@@ -249,7 +252,8 @@ AsciiPrint (
   If Format is NULL, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
-  @param ...      VARARG list consumed to process Format.
+  @param ...      Variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
   
   @return The number of Ascii characters in the produced output
           buffer not including the Null-terminator.

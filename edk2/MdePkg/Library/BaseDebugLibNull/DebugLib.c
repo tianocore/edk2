@@ -25,7 +25,8 @@
 
   @param  ErrorLevel  The error level of the debug message.
   @param  Format      Format string for the debug message to print.
-  @param  ...         The variable argument list.
+  @param  ...         Variable argument list whose contents are accessed 
+                      based on the format string specified by Format.
 
 **/
 VOID

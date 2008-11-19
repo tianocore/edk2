@@ -822,7 +822,8 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
 
   @param Format   Null-terminated Unicode format string.
-  @param ...      VARARG list consumed to process Format.
+  @param ...      Variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
   
@@ -847,7 +848,8 @@ Print (
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
 
   @param Format   Null-terminated Unicode format string.
-  @param ...      VARARG list consumed to process Format.
+  @param ...      Variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
   
@@ -872,7 +874,8 @@ ErrorPrint (
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
 
   @param Format   Null-terminated ASCII format string.
-  @param ...      VARARG list consumed to process Format.
+  @param ...      Variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
   
@@ -897,7 +900,8 @@ AsciiPrint (
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
 
   @param Format   Null-terminated ASCII format string.
-  @param ...      VARARG list consumed to process Format.
+  @param ...      Variable argument list whose contents are accessed based 
+                  on the format string specified by Format.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
   
