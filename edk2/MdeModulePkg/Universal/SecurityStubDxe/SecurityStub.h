@@ -66,9 +66,9 @@
 EFI_STATUS
 EFIAPI
 SecurityStubAuthenticateState (
-  IN EFI_SECURITY_ARCH_PROTOCOL          *This,
+  IN CONST EFI_SECURITY_ARCH_PROTOCOL    *This,
   IN UINT32                              AuthenticationStatus,
-  IN  EFI_DEVICE_PATH_PROTOCOL           *File
+  IN CONST EFI_DEVICE_PATH_PROTOCOL      *File
   );
 
 /**
