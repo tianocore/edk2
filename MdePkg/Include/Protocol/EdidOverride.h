@@ -29,9 +29,9 @@ typedef struct _EFI_EDID_OVERRIDE_PROTOCOL EFI_EDID_OVERRIDE_PROTOCOL;
 #define EFI_EDID_OVERRIDE_ENABLE_HOT_PLUG 0x02
 
 /**
-  Return the current video mode information.
+  Returns policy information and potentially a replacement EDID for the specified video output device.
 
-  @param  This              Protocol instance pointer.
+  @param  This              The EFI_EDID_OVERRIDE_PROTOCOL instance.
   @param  ChildHandle       A child handle produced by the Graphics Output EFI
                             driver that represents a video output device.
   @param  Attributes        The attributes associated with ChildHandle video output device.

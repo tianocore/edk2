@@ -64,13 +64,13 @@ EFI_STATUS
   );
 
 /**
-  Read BufferSize bytes from Offset into Buffer.
+  Writes a specified number of bytes to a device.
 
-  @param  This       Protocol instance pointer.
-  @param  MediaId    Id of the media, changes every time the media is replaced.
-  @param  Offset     The starting byte offset to read from
-  @param  BufferSize Size of Buffer
-  @param  Buffer     Buffer containing read data
+  @param  This       Indicates a pointer to the calling context.
+  @param  MediaId    ID of the medium to be written.
+  @param  Offset     The starting byte offset on the logical block I/O device to write.
+  @param  BufferSize The size in bytes of Buffer. The number of bytes to write to the device.
+  @param  Buffer     A pointer to the buffer containing the data to be written.
 
   @retval EFI_SUCCESS           The data was written correctly to the device.
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
