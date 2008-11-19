@@ -1,5 +1,5 @@
 /** @file
-  Provides three common serial I/O port functions.
+  This library class provides common serial I/O port functions.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -54,8 +54,8 @@ SerialPortInitialize (
 UINTN
 EFIAPI
 SerialPortWrite (
-  IN UINT8 	   *Buffer,
-  IN UINTN 	   NumberOfBytes
+  IN UINT8     *Buffer,
+  IN UINTN     NumberOfBytes
   );
 
 
@@ -80,8 +80,8 @@ SerialPortWrite (
 UINTN
 EFIAPI
 SerialPortRead (
-  OUT UINT8 	*Buffer,
-  IN  UINTN 	NumberOfBytes
+  OUT UINT8   *Buffer,
+  IN  UINTN   NumberOfBytes
   );
 
 /**
