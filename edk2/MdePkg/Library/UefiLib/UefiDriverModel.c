@@ -17,19 +17,22 @@
 #include "UefiLibInternal.h"
 
 /**
-  Intialize a driver by installing the Driver Binding Protocol onto the driver's
-  DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but
+  Initializes a driver by installing the Driver Binding Protocol onto the driver's
+  DriverBindingHandle.
+
+  This is typically the same as the driver's ImageHandle, but
   it can be different if the driver produces multiple DriverBinding Protocols. 
-  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
 
   @param  ImageHandle                 The image handle of the driver.
   @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
                                       parameter is NULL, then a new handle is created.
 
   @retval EFI_SUCCESS                 The protocol installation is completed successfully.
+  @retval EFI_OUT_OF_RESOURCES        There was not enough system resources to install the protocol.
   @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
 
 **/
@@ -67,17 +70,18 @@ EfiLibInstallDriverBinding (
 
 
 /**
-  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
-  Driver Configure and Driver Diagnostic Protocols onto the driver's DriverBindingHandle.  This is
-  typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple
+  Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name,
+  Driver Configure and Driver Diagnostic Protocols onto the driver's DriverBindingHandle.
+
+  This is  typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple
   DriverBinding Protocols. 
-  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
+  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
 
   @param  ImageHandle                 The image handle of the driver.
   @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
+  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
                                       parameter is NULL, then a new handle is created.
   @param  ComponentName               A Component Name Protocol instance that this driver is producing.
   @param  DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing.
@@ -279,7 +283,9 @@ EfiLibInstallDriverBindingComponentName2 (
 /**
   Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
   Component Name 2, Driver Configure, Driver Diagnostic and Driver Diagnostic 2 Protocols onto the driver's
-  DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but it can be different if
+  DriverBindingHandle.
+
+  This is typically the same as the driver's ImageHandle, but it can be different if
   the driver produces multiple DriverBinding Protocols. 
   If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
