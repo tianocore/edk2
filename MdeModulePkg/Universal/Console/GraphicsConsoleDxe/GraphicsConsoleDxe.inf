@@ -62,4 +62,4 @@
   gEfiHiiDatabaseProtocolGuid                   # PROTOCOL TO_START   
 
 [FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport

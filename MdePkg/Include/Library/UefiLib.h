@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ComponentName2.h>
 #include <Protocol/DriverDiagnostics.h>
 #include <Protocol/DriverDiagnostics2.h>
+#include <Protocol/GraphicsOutput.h>
 
 #include <Library/BaseLib.h>
 
@@ -912,6 +913,104 @@ UINTN
 EFIAPI
 AsciiErrorPrint (
   IN CONST CHAR8  *Format,
+  ...
+  );
+
+/**
+  Prints a formatted Unicode string to a graphics console device specified by 
+  ConsoleOutputHandle defined in the EFI_SYSTEM_TABLE at the given (X,Y) coordinates.
+
+  This function prints a formatted Unicode string to the graphics console device 
+  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
+  Unicode characters printed.  If the length of the formatted Unicode string is
+  greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
+  is used to convert the string to a bitmap using the glyphs registered with the 
+  HII database.  No wrapping is performed, so any portions of the string the fall
+  outside the active display region will not be displayed.
+
+  If a graphics console device is not associated with the ConsoleOutputHandle 
+  defined in the EFI_SYSTEM_TABLE then no string is printed, and 0 is returned.
+  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
+  string is printed, and 0 is returned.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+
+  @param  X            X coordinate to print the string.
+  @param  Y            Y coordinate to print the string.
+  @param  ForeGround   The forground color of the string being printed.  This is
+                       an optional parameter that may be NULL.  If it is NULL,
+                       then the foreground color of the current ConOut device
+                       in the EFI_SYSTEM_TABLE is used.
+  @param  BackGround   The background color of the string being printed.  This is
+                       an optional parameter that may be NULL.  If it is NULL, 
+                       then the background color of the current ConOut device
+                       in the EFI_SYSTEM_TABLE is used.
+  @param  Format       Null-terminated Unicode format string.  See Print Library 
+                       for the supported format string syntax.
+  @param  ...          Variable argument list whose contents are accessed based on 
+                       the format string specified by Format.         
+
+  @return  The number of Unicode characters printed.
+
+**/
+UINTN
+EFIAPI
+PrintXY (
+  IN UINTN                            X,
+  IN UINTN                            Y,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
+  IN CONST CHAR16                     *Format,
+  ...
+  );
+
+/**
+  Prints a formatted ASCII string to a graphics console device specified by 
+  ConsoleOutputHandle defined in the EFI_SYSTEM_TABLE at the given (X,Y) coordinates.
+
+  This function prints a formatted ASCII string to the graphics console device 
+  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
+  ASCII characters printed.  If the length of the formatted ASCII string is
+  greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
+  is used to convert the string to a bitmap using the glyphs registered with the 
+  HII database.  No wrapping is performed, so any portions of the string the fall
+  outside the active display region will not be displayed.
+
+  If a graphics console device is not associated with the ConsoleOutputHandle 
+  defined in the EFI_SYSTEM_TABLE then no string is printed, and 0 is returned.
+  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
+  string is printed, and 0 is returned.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
+
+  @param  X            X coordinate to print the string.
+  @param  Y            Y coordinate to print the string.
+  @param  ForeGround   The forground color of the string being printed.  This is
+                       an optional parameter that may be NULL.  If it is NULL,
+                       then the foreground color of the current ConOut device
+                       in the EFI_SYSTEM_TABLE is used.
+  @param  BackGround   The background color of the string being printed.  This is
+                       an optional parameter that may be NULL.  If it is NULL, 
+                       then the background color of the current ConOut device
+                       in the EFI_SYSTEM_TABLE is used.
+  @param  Format       Null-terminated ASCII format string.  See Print Library 
+                       for the supported format string syntax.
+  @param  ...          Variable argument list whose contents are accessed based on 
+                       the format string specified by Format.         
+
+  @return  The number of ASCII characters printed.
+
+**/
+UINTN
+EFIAPI
+AsciiPrintXY (
+  IN UINTN                            X,
+  IN UINTN                            Y,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
+  IN CONST CHAR8                      *Format,
   ...
   );
 

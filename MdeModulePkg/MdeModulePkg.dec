@@ -289,9 +289,6 @@
   ## If PcdSupportHardwareErrorRecord is TRUE, support hardware error record via variable in BDS.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHardwareErrorRecord|FALSE|BOOLEAN|0x00010045
   
-  ## If TRUE, UGA Draw Protocol is still consumed in platform.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE|BOOLEAN|0x00010046
-  
   ## If TRUE, Robustnesss improvement such as for DUET. Default is not required.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
 
