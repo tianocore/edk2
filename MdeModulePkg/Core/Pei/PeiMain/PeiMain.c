@@ -65,7 +65,6 @@ EFI_PEI_SERVICES  gPs = {
 };
 
 /**
-
   This routine is invoked by main entry of PeiMain module during transition
   from SEC to PEI. After switching stack in the PEI core, it will restart
   with the old core data.
@@ -82,8 +81,6 @@ EFI_PEI_SERVICES  gPs = {
   @param Data            Pointer to old core data that is used to initialize the
                          core's data areas.
                          If NULL, it is first PeiCore entering.
-
-  @retval EFI_NOT_FOUND  Never reach
 
 **/
 VOID
