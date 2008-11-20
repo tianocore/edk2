@@ -833,7 +833,7 @@ ProcessHelpString (
   IN  UINTN   RowCount
   )
 {
-  CONST UINTN BlockWidth = (UINTN) gHelpBlockWidth - 1;
+  UINTN BlockWidth = (UINTN) gHelpBlockWidth - 1;
   UINTN AllocateSize;
   //
   // [PrevCurrIndex, CurrIndex) forms a range of a screen-line
