@@ -783,6 +783,14 @@ InitializeFirmwareVolume (
   return EFI_SUCCESS;
 }
 
+/**
+  Convert FV attributes defined in Framework Specification
+  to FV attributes defined in PI specification.
+  
+  @param FvAttributes          The FV attributes defined in Framework Specification.
+  
+  @retval                      The FV attributes defined in PI Specification.
+**/
 EFI_FV_ATTRIBUTES
 FvAttributesToFv2Attributes (
   EFI_FV_ATTRIBUTES FvAttributes
@@ -836,7 +844,6 @@ Fv2GetVolumeAttributes (
   EFI_STATUS                     Status;
   FIRMWARE_VOLUME2_PRIVATE_DATA  *Private;
   EFI_FIRMWARE_VOLUME_PROTOCOL   *FirmwareVolume;
-  INTN                           Alignment;
 
   Private = FIRMWARE_VOLUME2_PRIVATE_DATA_FROM_THIS (This);
   FirmwareVolume = Private->FirmwareVolume;
@@ -845,7 +852,7 @@ Fv2GetVolumeAttributes (
                              (FRAMEWORK_EFI_FV_ATTRIBUTES *)FvAttributes
                              );
   if (!EFI_ERROR (Status)) {
-    *FvAttributes = FvAttributeToFv2Attribute (*FvAttributes);
+    *FvAttributes = FvAttributesToFv2Attributes (*FvAttributes);
   }
   return Status;
 }
