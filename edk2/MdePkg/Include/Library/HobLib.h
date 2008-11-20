@@ -2,6 +2,12 @@
   Provides services to create and parse HOBs. Only available for PEI
   and DXE module types.
 
+  The HOB Library supports the efficient creation and searching of HOBs
+  defined in the PI Specification. 
+  A HOB is a Hand-Off Block, defined in the Framework architecture, that 
+  allows the PEI phase to pass information to the DXE phase. HOBs are position 
+  independent and can be relocated easily to different memory memory locations.
+
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -18,9 +24,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Returns the pointer to the HOB list.
-  ASSERT() if the HOB list returned by GetHobList() is NULL.
 
   This function returns the pointer to first HOB in the list.
+  For PEI phase, the PEI service GetHobList() can be used to retrieve the pointer 
+  to the HOB list.  For the DXE phase, the HOB list pointer can be retrieved through
+  the EFI System Table by looking up theHOB list GUID in the System Configuration Table.
+  Since the System Configuration Table does not exist that the time the DXE Core is 
+  launched, the DXE Core uses a global variable from the DXE Core Entry Point Library 
+  to manage the pointer to the HOB list.
+  
+  If the pointer to the HOB list is NULL, then ASSERT().
   
   @return The pointer to the HOB list.
 
@@ -39,6 +52,7 @@ GetHobList (
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
   unconditionally: it returns HobStart back if HobStart itself meets the requirement;
   caller is required to use GET_NEXT_HOB() if it wishes to skip current HobStart.
+  
   If HobStart is NULL, then ASSERT().
 
   @param  Type          The HOB type to return.
@@ -59,6 +73,8 @@ GetNextHob (
 
   This function searches the first instance of a HOB type among the whole HOB list. 
   If there does not exist such HOB type in the HOB list, it will return NULL. 
+  
+  If the pointer to the HOB list is NULL, then ASSERT().
 
   @param  Type          The HOB type to return.
 
@@ -72,6 +88,8 @@ GetFirstHob (
   );
 
 /**
+  Returns the next instance of the matched GUID HOB from the starting HOB.
+  
   This function searches the first instance of a HOB from the starting HOB pointer. 
   Such HOB should satisfy two conditions: 
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid. 
@@ -81,6 +99,7 @@ GetFirstHob (
   In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
   unconditionally: it returns HobStart back if HobStart itself meets the requirement;
   caller is required to use GET_NEXT_HOB() if it wishes to skip current HobStart.
+  
   If Guid is NULL, then ASSERT().
   If HobStart is NULL, then ASSERT().
 
@@ -98,12 +117,16 @@ GetNextGuidHob (
   );
 
 /**
+  Returns the first instance of the matched GUID HOB among the whole HOB list.
+  
   This function searches the first instance of a HOB among the whole HOB list. 
   Such HOB should satisfy two conditions:
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
   If there does not exist such HOB from the starting HOB pointer, it will return NULL.
   Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
   to extract the data section and its size info respectively.
+  
+  If the pointer to the HOB list is NULL, then ASSERT().
   If Guid is NULL, then ASSERT().
 
   @param  Guid          The GUID to match with in the HOB list.
@@ -118,11 +141,13 @@ GetFirstGuidHob (
   );
 
 /**
-  Get the Boot Mode from the HOB list.
+  Get the system boot mode from the HOB list.
 
   This function returns the system boot mode information from the 
   PHIT HOB in HOB list.
 
+  If the pointer to the HOB list is NULL, then ASSERT().
+  
   @param  VOID
 
   @return The Boot Mode.
@@ -140,6 +165,7 @@ GetBootModeHob (
   This function builds a HOB for a loaded PE32 module.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If ModuleName is NULL, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
 
@@ -164,6 +190,7 @@ BuildModuleHob (
   This function builds a HOB that describes a chunk of system memory.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  ResourceType        The type of resource described by this HOB.
@@ -182,13 +209,15 @@ BuildResourceDescriptorHob (
   );
 
 /**
-  Builds a GUID HOB with a certain data length.
+  Builds a customized HOB tagged with a GUID for identification and returns 
+  the start address of GUID HOB data.
 
   This function builds a customized HOB tagged with a GUID for identification 
   and returns the start address of GUID HOB data so that caller can fill the customized data. 
   The HOB Header and Name field is already stripped.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If Guid is NULL, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
   If DataLength >= (0x10000 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
@@ -207,13 +236,16 @@ BuildGuidHob (
   );
 
 /**
-  Copies a data buffer to a newly-built HOB.
+  Builds a customized HOB tagged with a GUID for identification, copies the input data to the HOB 
+  data field, and returns the start address of the GUID HOB data.
 
-  This function builds a customized HOB tagged with a GUID for identification,
-  copies the input data to the HOB data field and returns the start address of the GUID HOB data.
+  This function builds a customized HOB tagged with a GUID for identification and copies the input
+  data to the HOB data field and returns the start address of the GUID HOB data.  It can only be 
+  invoked during PEI phase; for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.  
   The HOB Header and Name field is already stripped.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If Guid is NULL, then ASSERT().
   If Data is NULL and DataLength > 0, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
@@ -240,6 +272,7 @@ BuildGuidDataHob (
   This function builds a Firmware Volume HOB.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  BaseAddress   The base address of the Firmware Volume.
@@ -259,11 +292,12 @@ BuildFvHob (
   This function builds a EFI_HOB_TYPE_FV2 HOB.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  BaseAddress   The base address of the Firmware Volume.
   @param  Length        The size of the Firmware Volume in bytes.
-  @param  FvName       The name of the Firmware Volume.
+  @param  FvName        The name of the Firmware Volume.
   @param  FileName      The name of the file.
   
 **/
@@ -282,6 +316,7 @@ BuildFv2Hob (
   This function builds a Capsule Volume HOB.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  BaseAddress   The base address of the Capsule Volume.
@@ -301,6 +336,7 @@ BuildCvHob (
   This function builds a HOB for the CPU.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  SizeOfMemorySpace   The maximum physical memory addressability of the processor.
@@ -320,6 +356,7 @@ BuildCpuHob (
   This function builds a HOB for the stack.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  BaseAddress   The 64 bit physical address of the Stack.
@@ -339,6 +376,7 @@ BuildStackHob (
   This function builds a HOB for BSP store.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  BaseAddress   The 64 bit physical address of the BSP.
@@ -360,6 +398,7 @@ BuildBspStoreHob (
   This function builds a HOB for the memory allocation.
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  BaseAddress   The 64 bit physical address of the memory.
@@ -375,34 +414,83 @@ BuildMemoryAllocationHob (
   IN EFI_MEMORY_TYPE             MemoryType
   );
 
-///
-/// Get a HOB's type from HOB header
-///
+/**
+  Returns the type of a HOB.
+
+  This macro returns the HobType field from the HOB header for the 
+  HOB specified by Hob.
+
+  @param  Hob   A pointer to a HOB.
+  
+  @return HobType
+  
+**/
 #define GET_HOB_TYPE(Hob)     ((Hob).Header->HobType)
 
-///
-/// Get a HOB's length from HOB header
-///
+/**
+  Returns the length, in bytes, of a HOB.
+
+  This macro returns the HobLength field from the HOB header for the 
+  HOB specified by Hob.
+
+  @param  Hob   A pointer to a HOB.
+
+  @return HobLength
+
+**/
 #define GET_HOB_LENGTH(Hob)   ((Hob).Header->HobLength)
 
-///
-/// Get the pointer to next HOB in HOB List
-///
+/**
+  Returns a pointer to the next HOB in the HOB list.
+
+  This macro returns a pointer to HOB that follows the 
+  HOB specified by Hob in the HOB List.
+
+  @param  Hob   A pointer to a HOB.
+
+  @return A pointer to the next HOB in the HOB list.
+
+**/
 #define GET_NEXT_HOB(Hob)     ((Hob).Raw + GET_HOB_LENGTH (Hob))
 
-///
-/// Judge if the HOB is the end of HOB List
-///
+/**
+  Determines if a HOB is the last HOB in the HOB list.
+  
+  This macro determine if the HOB specified by Hob is the 
+  last HOB in the HOB list.  If Hob is last HOB in the HOB list, 
+  then TRUE is returned.  Otherwise, FALSE is returned.
+
+  @param  Hob   A pointer to a HOB.
+
+  @retval TRUE       The HOB specified by Hob is the last HOB in the HOB list.
+  @retval FALSE      The HOB specified by Hob is not the last HOB in the HOB list.
+
+**/
 #define END_OF_HOB_LIST(Hob)  (GET_HOB_TYPE (Hob) == (UINT16)EFI_HOB_TYPE_END_OF_HOB_LIST)
 
-///
-/// Get the pointer to data field of GUID HOB 
-///
+/**
+  Returns a pointer to data buffer from a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
+
+  This macro returns a pointer to the data buffer in a HOB specified by Hob.
+  Hob is assumed to be a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.   
+
+  @param   Hob   A pointer to a HOB.
+
+  @return  A pointer to the data buffer in a HOB
+  
+**/
 #define GET_GUID_HOB_DATA(GuidHob)      ((VOID *) (((UINT8 *) &((GuidHob)->Name)) + sizeof (EFI_GUID)))
 
-///
-/// Get the data size of GUID HOB
-///
+/**
+  Returns the size of the data buffer from a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
+
+  This macro returns the size, in bytes, of the data buffer in a HOB specified by Hob.
+  Hob is assumed to be a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
+
+  @param   Hob   A pointer to a HOB.
+
+  @return  The size of the data buffer
+**/
 #define GET_GUID_HOB_DATA_SIZE(GuidHob) (((GuidHob)->Header).HobLength - sizeof (EFI_HOB_GUID_TYPE))
 
 #endif
