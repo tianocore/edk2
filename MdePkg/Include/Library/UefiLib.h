@@ -99,10 +99,15 @@ typedef struct {
 
 
 /**
-  This function searches the list of configuration tables stored in the EFI System 
-  Table for a table with a GUID that matches TableGuid.  If a match is found, 
-  then a pointer to the configuration table is returned in Table, and EFI_SUCCESS 
-  is returned.  If a matching GUID is not found, then EFI_NOT_FOUND is returned.
+  Retrieves a pointer to the system configuration table from the EFI System Table
+  based on a specified GUID.
+  
+  This function searches the list of configuration tables stored in the EFI System Table
+  for a table with a GUID that matches TableGuid.  If a match is found, then a pointer to
+  the configuration table is returned in Table., and EFI_SUCCESS is returned. If a matching GUID
+  is not found, then EFI_NOT_FOUND is returned.
+  If TableGuid is NULL, then ASSERT().
+  If Table is NULL, then ASSERT().
 
   @param  TableGuid       Pointer to table's GUID type..
   @param  Table           Pointer to the table associated with TableGuid in the EFI System Table.
@@ -119,18 +124,28 @@ EfiGetSystemConfigurationTable (
   );
 
 /**
-  This function causes the notification function to be executed for every protocol 
-  of type ProtocolGuid instance that exists in the system when this function is 
-  invoked.  In addition, every time a protocol of type ProtocolGuid instance is 
-  installed or reinstalled, the notification function is also executed.
+  Creates and returns a notification event and registers that event with all the protocol
+  instances specified by ProtocolGuid.
+
+  This function causes the notification function to be executed for every protocol of type
+  ProtocolGuid instance that exists in the system when this function is invoked.
+  In addition, every time a protocol of type ProtocolGuid instance is installed or reinstalled,
+  the notification function is also executed.  This function returns the notification event
+  that was created. 
+  If ProtocolGuid is NULL, then ASSERT().
+  If NotifyTpl is not a legal TPL value, then ASSERT().
+  If NotifyFunction is NULL, then ASSERT().
+  If Registration is NULL, then ASSERT().
 
   @param  ProtocolGuid    Supplies GUID of the protocol upon whose installation the event is fired.
   @param  NotifyTpl       Supplies the task priority level of the event notifications.
   @param  NotifyFunction  Supplies the function to notify when the event is signaled.
   @param  NotifyContext   The context parameter to pass to NotifyFunction.
   @param  Registration    A pointer to a memory location to receive the registration value.
+                          This value is passed to LocateHandle() to obtain new handles that
+                          have been added that support the ProtocolGuid-specified protocol. 
 
-  @return The notification event that was created. 
+  @return The notification event that was created.
 
 **/
 EFI_EVENT
@@ -144,9 +159,14 @@ EfiCreateProtocolNotifyEvent(
   );
 
 /**
+  Creates a named event that can be signaled with EfiNamedEventSignal().
+
   This function creates an event using NotifyTpl, NoifyFunction, and NotifyContext.
-  This event is signaled with EfiNamedEventSignal().  This provide the ability for 
-  one or more listeners on the same event named by the GUID specified by Name.
+  This event is signaled with EfiNamedEventSignal(). This provides the ability for one or more
+  listeners on the same event named by the GUID specified by Name. 
+  If Name is NULL, then ASSERT().
+  If NotifyTpl is not a legal TPL value, then ASSERT().
+  If NotifyFunction is NULL, then ASSERT().
 
   @param  Name                  Supplies GUID name of the event.
   @param  NotifyTpl             Supplies the task priority level of the event notifications.
@@ -169,8 +189,11 @@ EfiNamedEventListen (
   );
 
 /**
-  This function signals the named event specified by Name.  The named event must 
-  have been created with EfiNamedEventListen().
+  Signals a named event created with EfiNamedEventListen().
+
+  This function signals the named event specified by Name. The named event must have been
+  created with EfiNamedEventListen().
+  If Name is NULL, then ASSERT().
 
   @param  Name                  Supplies GUID name of the event.
 
@@ -203,10 +226,14 @@ EfiGetCurrentTpl (
   );
 
 /**
+  Initializes a basic mutual exclusion lock.
+
   This function initializes a basic mutual exclusion lock to the released state 
   and returns the lock.  Each lock provides mutual exclusion access at its task 
   priority level.  Since there is no preemption or multiprocessor support in EFI,
   acquiring the lock only consists of raising to the locks TPL.
+  If Lock is NULL, then ASSERT().
+  If Priority is not a valid TPL value, then ASSERT().
 
   @param  Lock       A pointer to the lock data structure to initialize.
   @param  Priority   EFI TPL associated with the lock.
@@ -244,7 +271,6 @@ EfiInitializeLock (
   then this macro evaluates the EFI_LOCK structure specified by Lock.  If Lock 
   is not in the locked state, then DebugAssert() is called passing in the source 
   filename, source line number, and Lock.
-
   If Lock is NULL, then ASSERT().
 
   @param  LockParameter  A pointer to the lock to acquire.
@@ -262,9 +288,14 @@ EfiInitializeLock (
 
 
 /**
+  Acquires ownership of a lock.
+
   This function raises the system's current task priority level to the task 
   priority level of the mutual exclusion lock.  Then, it places the lock in the 
   acquired state.
+  If Lock is NULL, then ASSERT().
+  If Lock is not initialized, then ASSERT().
+  If Lock is already in the acquired state, then ASSERT().
 
   @param  Lock              A pointer to the lock to acquire.
 
@@ -276,9 +307,13 @@ EfiAcquireLock (
   );
 
 /**
+  Acquires ownership of a lock.  If the lock is already owned , then an error is returned.
+
   This function raises the system's current task priority level to the task 
   priority level of the mutual exclusion lock.  Then, it attempts to place the 
   lock in the acquired state.
+  If Lock is NULL, then ASSERT().
+  If Lock is not initialized, then ASSERT().
 
   @param  Lock              A pointer to the lock to acquire.
 
@@ -293,9 +328,14 @@ EfiAcquireLockOrFail (
   );
 
 /**
+  Releases ownership of a lock.
+
   This function transitions a mutual exclusion lock from the acquired state to 
   the released state, and restores the system's task priority level to its 
   previous level.
+  If Lock is NULL, then ASSERT().
+  If Lock is not initialized, then ASSERT().
+  If Lock is already in the released state, then ASSERT().
 
   @param  Lock  A pointer to the lock to release.
 
@@ -365,10 +405,11 @@ EfiTestChildHandle (
   );
 
 /**
-  This function looks up a Unicode string in UnicodeStringTable.  If Language is 
-  a member of SupportedLanguages and a Unicode string is found in UnicodeStringTable
-  that matches the language code specified by Language, then it is returned in 
-  UnicodeString.
+  This function looks up a Unicode string in UnicodeStringTable.
+
+  If Language is   a member of SupportedLanguages and a Unicode string is found in
+  UnicodeStringTable that matches the language code specified by Language, then it
+  is returned in UnicodeString.
 
   @param  Language                A pointer to the ISO 639-2 language code for the 
                                   Unicode string to look up and return.
@@ -412,48 +453,38 @@ LookupUnicodeString (
   @param  Language                A pointer to the ISO 639-2 or
                                   RFC 3066 language code for the
                                   Unicode string to look up and
-                                  return.
-  
+                                  return.  
   @param  SupportedLanguages      A pointer to the set of ISO
                                   639-2 or RFC 3066 language
                                   codes that the Unicode string
                                   table supports. Language must
-                                  be a member of this set.
-  
+                                  be a member of this set.  
   @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.
-  
+                                  Unicode strings.  
   @param  UnicodeString           A pointer to the Unicode
                                   string from UnicodeStringTable
                                   that matches the language
                                   specified by Language.
-
   @param  Iso639Language          Specify the language code
                                   format supported. If true,
                                   then the format follow ISO
                                   639-2. If false, then it
                                   follows RFC3066.
-
   @retval  EFI_SUCCESS            The Unicode string that
                                   matches the language specified
                                   by Language was found in the
                                   table of Unicoide strings
                                   UnicodeStringTable, and it was
-                                  returned in UnicodeString.
-  
-  @retval  EFI_INVALID_PARAMETER  Language is NULL.
-  
-  @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.
-  
-  @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.
-  
-  @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.
-  
+                                  returned in UnicodeString. 
+
+  @retval  EFI_INVALID_PARAMETER  Language is NULL.  
+  @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.  
+  @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.  
+  @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.  
   @retval  EFI_UNSUPPORTED        The language specified by
                                   Language is not a member
-                                  ofSupportedLanguages.
-  
-  @retval EFI_UNSUPPORTED         The language specified by
+                                  ofSupportedLanguages.  
+  @retval  EFI_UNSUPPORTED        The language specified by
                                   Language is not supported by
                                   UnicodeStringTable.
 
@@ -470,6 +501,7 @@ LookupUnicodeString2 (
 
 /**
   This function adds a Unicode string to UnicodeStringTable.
+
   If Language is a member of SupportedLanguages then UnicodeString is added to 
   UnicodeStringTable.  New buffers are allocated for both Language and 
   UnicodeString.  The contents of Language and UnicodeString are copied into 
@@ -510,8 +542,8 @@ AddUnicodeString (
   );
 
 /**
-  
   This function adds a Unicode string to UnicodeStringTable.
+
   If Language is a member of SupportedLanguages then
   UnicodeString is added to UnicodeStringTable.  New buffers are
   allocated for both Language and UnicodeString.  The contents
@@ -521,26 +553,21 @@ AddUnicodeString (
 
   @param  Language                A pointer to the ISO 639-2 or
                                   RFC 3066 language code for the
-                                  Unicode string to add.
-  
+                                  Unicode string to add.  
   @param  SupportedLanguages      A pointer to the set of ISO
                                   639-2 or RFC 3066 language
                                   codes that the Unicode string
                                   table supports. Language must
-                                  be a member of this set.
-  
+                                  be a member of this set.  
   @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.
-  
+                                  Unicode strings.  
   @param  UnicodeString           A pointer to the Unicode
-                                  string to add.
-  
+                                  string to add.  
   @param  Iso639Language          Specify the language code
                                   format supported. If true,
                                   then the format follow ISO
                                   639-2. If false, then it
                                   follows RFC3066.
-
   @retval EFI_SUCCESS             The Unicode string that
                                   matches the language specified
                                   by Language was found in the
@@ -548,22 +575,16 @@ AddUnicodeString (
                                   UnicodeStringTable, and it was
                                   returned in UnicodeString.
   
-  @retval EFI_INVALID_PARAMETER   Language is NULL.
-  
-  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
-  
-  @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.
-  
-  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.
-  
+  @retval EFI_INVALID_PARAMETER   Language is NULL.  
+  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.  
+  @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.  
+  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.  
   @retval EFI_ALREADY_STARTED     A Unicode string with language
                                   Language is already present in
-                                  UnicodeStringTable.
-  
+                                  UnicodeStringTable.  
   @retval EFI_OUT_OF_RESOURCES    There is not enough memory to
                                   add another Unicode string to
-                                  UnicodeStringTable.
-  
+                                  UnicodeStringTable.  
   @retval EFI_UNSUPPORTED         The language specified by
                                   Language is not a member of
                                   SupportedLanguages.
@@ -581,6 +602,7 @@ AddUnicodeString2 (
 
 /**
   This function frees the table of Unicode strings in UnicodeStringTable.
+
   If UnicodeStringTable is NULL, then EFI_SUCCESS is returned.
   Otherwise, each language code, and each Unicode string in the Unicode string 
   table are freed, and EFI_SUCCESS is returned.
@@ -614,6 +636,8 @@ GetGlyphWidth (
   );
 
 /**
+  Computes the display length of a Null-terminated Unicode String.
+
   This function computes and returns the display length of
   the Null-terminated Unicode string specified by String.
   If String is NULL, then 0 is returned.
@@ -635,10 +659,12 @@ UnicodeStringDisplayLength (
 // Functions that abstract early Framework contamination of UEFI.
 //
 /**
-  Signal a Ready to Boot Event.  
+  Create, Signal, and Close the Ready to Boot event using EfiSignalEventReadyToBoot().
   
-  Create a Ready to Boot Event. Signal it and close it. This causes other 
-  events of the same event group to be signaled in other modules. 
+  This function abstracts the signaling of the Ready to Boot Event. The Framework moved
+  from a proprietary to UEFI 2.0 based mechanism.  This library abstracts the caller from
+  how this event is created to prevent to code form having to change with the version of
+  the specification supported.
 
 **/
 VOID
@@ -648,10 +674,12 @@ EfiSignalEventReadyToBoot (
   );
 
 /**
-  Signal a Legacy Boot Event.  
-  
-  Create a legacy Boot Event. Signal it and close it. This causes other 
-  events of the same event group to be signaled in other modules. 
+  Create, Signal, and Close the Ready to Boot event using EfiSignalEventLegacyBoot().
+
+  This function abstracts the signaling of the Legacy Boot Event. The Framework moved from
+  a proprietary to UEFI 2.0 based mechanism.  This library abstracts the caller from how
+  this event is created to prevent to code form having to change with the version of the
+  specification supported.
 
 **/
 VOID
@@ -766,13 +794,11 @@ EfiCreateEventReadyToBootEx (
   Initialize a Firmware Volume (FV) Media Device Path node.
   
   The Framework FwVol Device Path changed to conform to the UEFI 2.0 specification.  
-  This library function abstracts initializing a device path node.
-  
+  This library function abstracts initializing a device path node.  
   Initialize the MEDIA_FW_VOL_FILEPATH_DEVICE_PATH data structure.  This device 
   path changed in the DXE CIS version 0.92 in a non back ward compatible way to 
   not conflict with the UEFI 2.0 specification.  This function abstracts the 
   differences from the caller.
-  
   If FvDevicePathNode is NULL, then ASSERT().
   If NameGuid is NULL, then ASSERT().
   
@@ -792,7 +818,6 @@ EfiInitializeFwVolDevicepathNode (
   
   The Framework FwVol Device Path changed to conform to the UEFI 2.0 specification.  
   This library function abstracts validating a device path node.
-  
   Check the MEDIA_FW_VOL_FILEPATH_DEVICE_PATH data structure to see if it's valid.  
   If it is valid, then return the GUID file name from the device path node.  Otherwise, 
   return NULL.  This device path changed in the DXE CIS version 0.92 in a non back ward 
@@ -821,12 +846,12 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   characters that printed to ConOut.  If the length of the formatted Unicode 
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
-  If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
   
   @return Number of Unicode characters printed to ConOut.
 
@@ -847,12 +872,12 @@ Print (
   characters that printed to StdErr.  If the length of the formatted Unicode 
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
-  If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
   
   @return Number of Unicode characters printed to StdErr.
 
@@ -873,12 +898,12 @@ ErrorPrint (
   characters that printed to ConOut.  If the length of the formatted ASCII 
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
-  If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
   
   @return Number of ASCII characters printed to ConOut.
 
@@ -899,12 +924,12 @@ AsciiPrint (
   characters that printed to StdErr.  If the length of the formatted ASCII 
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
+  If Format is NULL, then ASSERT().
+  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
-  If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
   
   @return Number of ASCII characters printed to ConErr.
 
@@ -1016,7 +1041,9 @@ AsciiPrintXY (
 
 /**
   Initializes a driver by installing the Driver Binding Protocol onto the driver's
-  DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but
+  DriverBindingHandle.
+
+  This is typically the same as the driver's ImageHandle, but
   it can be different if the driver produces multiple DriverBinding Protocols. 
   If the Driver Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
@@ -1028,6 +1055,7 @@ AsciiPrintXY (
                                       parameter is NULL, then a new handle is created.
 
   @retval EFI_SUCCESS                 The protocol installation is completed successfully.
+  @retval EFI_OUT_OF_RESOURCES        There was not enough system resources to install the protocol.
   @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
 
 **/
@@ -1043,8 +1071,9 @@ EfiLibInstallDriverBinding (
 
 /**
   Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name,
-  Driver Configure and Driver Diagnostic Protocols onto the driver's DriverBindingHandle.  This is
-  typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple
+  Driver Configure and Driver Diagnostic Protocols onto the driver's DriverBindingHandle.
+
+  This is  typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple
   DriverBinding Protocols. 
   If the Driver Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
@@ -1110,7 +1139,9 @@ EfiLibInstallDriverBindingComponentName2 (
 /**
   Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
   Component Name 2, Driver Configure, Driver Diagnostic and Driver Diagnostic 2 Protocols onto the driver's
-  DriverBindingHandle.  This is typically the same as the driver's ImageHandle, but it can be different if
+  DriverBindingHandle.
+
+  This is typically the same as the driver's ImageHandle, but it can be different if
   the driver produces multiple DriverBinding Protocols. 
   If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
   If the installation fails, then ASSERT ().
@@ -1152,10 +1183,9 @@ EfiLibInstallAllDriverProtocols2 (
 
   If Lang is NULL, then ASSERT.
 
-  @param  Lang                   Pointer of system language. Lang will always be filled with 
-                                         a valid RFC 3066 language string. If "PlatformLang" is not
-                                         set in the system, the default language specifed by PcdUefiVariableDefaultPlatformLang
-                                         is returned.
+  @param  Lang   Pointer of system language. Lang will always be filled with a valid RFC 3066
+                 language string. If "PlatformLang" is not set in the system, the default
+                 language specifed by PcdUefiVariableDefaultPlatformLang is returned.
 
   @return  EFI_SUCCESS     If the EFI Variable with "PlatformLang" is set and return in Lang.
   @return  EFI_NOT_FOUND If the EFI Variable with "PlatformLang" is not set, but a valid default language is return in Lang.

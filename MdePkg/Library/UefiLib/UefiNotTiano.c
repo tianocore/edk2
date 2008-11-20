@@ -214,10 +214,12 @@ EfiCreateEventReadyToBootEx (
 
 
 /**
-  Signal a Ready to Boot Event.
-
-  Create a Ready to Boot Event. Signal it and close it. This causes other
-  events of the same event group to be signaled in other modules.
+  Create, Signal, and Close the Ready to Boot event using EfiSignalEventReadyToBoot().
+  
+  This function abstracts the signaling of the Ready to Boot Event. The Framework moved
+  from a proprietary to UEFI 2.0 based mechanism.  This library abstracts the caller from
+  how this event is created to prevent to code form having to change with the version of
+  the specification supported.
 
 **/
 VOID
@@ -237,10 +239,12 @@ EfiSignalEventReadyToBoot (
 }
 
 /**
-  Signal a Legacy Boot Event.
+  Create, Signal, and Close the Ready to Boot event using EfiSignalEventLegacyBoot().
 
-  Create a legacy Boot Event. Signal it and close it. This causes other
-  events of the same event group to be signaled in other modules.
+  This function abstracts the signaling of the Legacy Boot Event. The Framework moved from
+  a proprietary to UEFI 2.0 based mechanism.  This library abstracts the caller from how
+  this event is created to prevent to code form having to change with the version of the
+  specification supported.
 
 **/
 VOID
@@ -261,17 +265,18 @@ EfiSignalEventLegacyBoot (
 
 
 /**
+  Check to see if the Firmware Volume (FV) Media Device Path is valid 
+  
   The Framework FwVol Device Path changed to conform to the UEFI 2.0 specification.  
   This library function abstracts validating a device path node.
-
   Check the MEDIA_FW_VOL_FILEPATH_DEVICE_PATH data structure to see if it's valid.  
-  If it is valid, then return the GUID file name from the device path node.  
-  Otherwise, return NULL.  This device path changed in the DXE CIS version 0.92 
-  in a non back ward compatible way to not conflict with the UEFI 2.0 specification.  
-  This function abstracts the differences from the caller.
+  If it is valid, then return the GUID file name from the device path node.  Otherwise, 
+  return NULL.  This device path changed in the DXE CIS version 0.92 in a non back ward 
+  compatible way to not conflict with the UEFI 2.0 specification.  This function abstracts 
+  the differences from the caller.
   If FvDevicePathNode is NULL, then ASSERT().
-  
-  @param  FvFileDevicePathNode  Pointer to FV device path to check.
+
+  @param  FvDevicePathNode  Pointer to FV device path to check.
 
   @retval NULL              FvDevicePathNode is not valid.
   @retval Other             FvDevicePathNode is valid and pointer to NameGuid was returned.
@@ -295,17 +300,18 @@ EfiGetNameGuidFromFwVolDevicePathNode (
 
 
 /**
+  Initialize a Firmware Volume (FV) Media Device Path node.
+  
   The Framework FwVol Device Path changed to conform to the UEFI 2.0 specification.  
-  This library function abstracts initializing a device path node.
-
+  This library function abstracts initializing a device path node.  
   Initialize the MEDIA_FW_VOL_FILEPATH_DEVICE_PATH data structure.  This device 
   path changed in the DXE CIS version 0.92 in a non back ward compatible way to 
   not conflict with the UEFI 2.0 specification.  This function abstracts the 
   differences from the caller.
   If FvDevicePathNode is NULL, then ASSERT().
   If NameGuid is NULL, then ASSERT().
-
-  @param  FvFileDevicePathNode  Pointer to a FV device path node to initialize
+  
+  @param  FvDevicePathNode  Pointer to a FV device path node to initialize
   @param  NameGuid          FV file name to use in FvDevicePathNode
 
 **/

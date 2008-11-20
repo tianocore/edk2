@@ -45,10 +45,13 @@ CompareIso639LanguageCode (
 }
 
 /**
-  This function searches the list of configuration tables stored in the EFI System
-  Table for a table with a GUID that matches TableGuid.  If a match is found,
-  then a pointer to the configuration table is returned in Table, and EFI_SUCCESS
-  is returned.  If a matching GUID is not found, then EFI_NOT_FOUND is returned.
+  Retrieves a pointer to the system configuration table from the EFI System Table
+  based on a specified GUID.
+  
+  This function searches the list of configuration tables stored in the EFI System Table
+  for a table with a GUID that matches TableGuid.  If a match is found, then a pointer to
+  the configuration table is returned in Table., and EFI_SUCCESS is returned. If a matching GUID
+  is not found, then EFI_NOT_FOUND is returned.
   If TableGuid is NULL, then ASSERT().
   If Table is NULL, then ASSERT().
 
@@ -85,16 +88,26 @@ EfiGetSystemConfigurationTable (
 }
 
 /**
-  This function causes the notification function to be executed for every protocol
-  of type ProtocolGuid instance that exists in the system when this function is
-  invoked.  In addition, every time a protocol of type ProtocolGuid instance is
-  installed or reinstalled, the notification function is also executed.
+  Creates and returns a notification event and registers that event with all the protocol
+  instances specified by ProtocolGuid.
+
+  This function causes the notification function to be executed for every protocol of type
+  ProtocolGuid instance that exists in the system when this function is invoked.
+  In addition, every time a protocol of type ProtocolGuid instance is installed or reinstalled,
+  the notification function is also executed.  This function returns the notification event
+  that was created. 
+  If ProtocolGuid is NULL, then ASSERT().
+  If NotifyTpl is not a legal TPL value, then ASSERT().
+  If NotifyFunction is NULL, then ASSERT().
+  If Registration is NULL, then ASSERT().
 
   @param  ProtocolGuid    Supplies GUID of the protocol upon whose installation the event is fired.
   @param  NotifyTpl       Supplies the task priority level of the event notifications.
   @param  NotifyFunction  Supplies the function to notify when the event is signaled.
   @param  NotifyContext   The context parameter to pass to NotifyFunction.
   @param  Registration    A pointer to a memory location to receive the registration value.
+                          This value is passed to LocateHandle() to obtain new handles that
+                          have been added that support the ProtocolGuid-specified protocol. 
 
   @return The notification event that was created.
 
@@ -111,6 +124,10 @@ EfiCreateProtocolNotifyEvent(
 {
   EFI_STATUS  Status;
   EFI_EVENT   Event;
+
+  ASSERT (ProtocolGuid != NULL);
+  ASSERT (NotifyFunction != NULL);
+  ASSERT (Registration != NULL);
 
   //
   // Create the event
@@ -147,9 +164,11 @@ EfiCreateProtocolNotifyEvent(
 }
 
 /**
+  Creates a named event that can be signaled with EfiNamedEventSignal().
+
   This function creates an event using NotifyTpl, NoifyFunction, and NotifyContext.
-  This event is signaled with EfiNamedEventSignal().  This provide the ability for
-  one or more listeners on the same event named by the GUID specified by Name.
+  This event is signaled with EfiNamedEventSignal(). This provides the ability for one or more
+  listeners on the same event named by the GUID specified by Name. 
   If Name is NULL, then ASSERT().
   If NotifyTpl is not a legal TPL value, then ASSERT().
   If NotifyFunction is NULL, then ASSERT().
@@ -157,7 +176,7 @@ EfiCreateProtocolNotifyEvent(
   @param  Name                  Supplies GUID name of the event.
   @param  NotifyTpl             Supplies the task priority level of the event notifications.
   @param  NotifyFunction        Supplies the function to notify when the event is signaled.
-  @param  NotifyContext         The context parameter to pass to NotifyFunction.
+  @param  NotifyContext         The context parameter to pass to NotifyFunction. 
   @param  Registration          A pointer to a memory location to receive the registration value.
 
   @retval EFI_SUCCESS           A named event was created.
@@ -219,8 +238,11 @@ EfiNamedEventListen (
 }
 
 /**
-  This function signals the named event specified by Name.  The named event must
-  have been created with EfiNamedEventListen().
+  Signals a named event created with EfiNamedEventListen().
+
+  This function signals the named event specified by Name. The named event must have been
+  created with EfiNamedEventListen().
+  If Name is NULL, then ASSERT().
 
   @param  Name                  Supplies GUID name of the event.
 
@@ -236,6 +258,8 @@ EfiNamedEventSignal (
 {
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
+
+  ASSERT(Name != NULL);
 
   Handle = NULL;
   Status = gBS->InstallProtocolInterface (
@@ -286,8 +310,10 @@ EfiGetCurrentTpl (
 
 
 /**
-  This function initializes a basic mutual exclusion lock to the released state
-  and returns the lock.  Each lock provides mutual exclusion access at its task
+  Initializes a basic mutual exclusion lock.
+
+  This function initializes a basic mutual exclusion lock to the released state 
+  and returns the lock.  Each lock provides mutual exclusion access at its task 
   priority level.  Since there is no preemption or multiprocessor support in EFI,
   acquiring the lock only consists of raising to the locks TPL.
   If Lock is NULL, then ASSERT().
@@ -316,14 +342,16 @@ EfiInitializeLock (
 }
 
 /**
-  This function raises the system's current task priority level to the task
-  priority level of the mutual exclusion lock.  Then, it places the lock in the
+  Acquires ownership of a lock.
+
+  This function raises the system's current task priority level to the task 
+  priority level of the mutual exclusion lock.  Then, it places the lock in the 
   acquired state.
   If Lock is NULL, then ASSERT().
   If Lock is not initialized, then ASSERT().
   If Lock is already in the acquired state, then ASSERT().
 
-  @param  Lock   The task lock with priority level.
+  @param  Lock              A pointer to the lock to acquire.
 
 **/
 VOID
@@ -340,9 +368,13 @@ EfiAcquireLock (
 }
 
 /**
-  This function raises the system's current task priority level to the task
-  priority level of the mutual exclusion lock.  Then, it attempts to place the
+  Acquires ownership of a lock.  If the lock is already owned , then an error is returned.
+
+  This function raises the system's current task priority level to the task 
+  priority level of the mutual exclusion lock.  Then, it attempts to place the 
   lock in the acquired state.
+  If Lock is NULL, then ASSERT().
+  If Lock is not initialized, then ASSERT().
 
   @param  Lock              A pointer to the lock to acquire.
 
@@ -375,9 +407,14 @@ EfiAcquireLockOrFail (
 }
 
 /**
-  This function transitions a mutual exclusion lock from the acquired state to
-  the released state, and restores the system's task priority level to its
+  Releases ownership of a lock.
+
+  This function transitions a mutual exclusion lock from the acquired state to 
+  the released state, and restores the system's task priority level to its 
   previous level.
+  If Lock is NULL, then ASSERT().
+  If Lock is not initialized, then ASSERT().
+  If Lock is already in the released state, then ASSERT().
 
   @param  Lock  A pointer to the lock to release.
 
@@ -527,50 +564,32 @@ EfiTestChildHandle (
 
 /**
   This function looks up a Unicode string in UnicodeStringTable.
-  If Language is a member of SupportedLanguages and a Unicode
-  string is found in UnicodeStringTable that matches the
-  language code specified by Language, then it is returned in
-  UnicodeString.
 
-  @param  Language                A pointer to the ISO 639-2
-                                  language code for the Unicode
-                                  string to look up and return.
-  
-  @param  SupportedLanguages      A pointer to the set of ISO
-                                  639-2language
-                                  codes that the Unicode string
-                                  table supports. Language must
-                                  be a member of this set.
-  
-  @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.
-  
-  @param  UnicodeString           A pointer to the Unicode
-                                  string from UnicodeStringTable
-                                  that matches the language
-                                  specified by Language.
+  If Language is   a member of SupportedLanguages and a Unicode string is found in
+  UnicodeStringTable that matches the language code specified by Language, then it
+  is returned in UnicodeString.
 
-  @retval  EFI_SUCCESS            The Unicode string that
-                                  matches the language specified
-                                  by Language was found in the
-                                  table of Unicoide strings
-                                  UnicodeStringTable, and it was
-                                  returned in UnicodeString.
-  
-  @retval  EFI_INVALID_PARAMETER  Language is NULL.
-  
-  @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.
-  @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.
-  
-  @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.
-  
-  @retval  EFI_UNSUPPORTED        The language specified by
-                                  Language is not a member
-                                  ofSupportedLanguages.
-  
-  @retval EFI_UNSUPPORTED         The language specified by
-                                  Language is not supported by
-                                  UnicodeStringTable.
+  @param  Language                A pointer to the ISO 639-2 language code for the 
+                                  Unicode string to look up and return.
+  @param  SupportedLanguages      A pointer to the set of ISO 639-2 language codes 
+                                  that the Unicode string table supports.  Language 
+                                  must be a member of this set.
+  @param  UnicodeStringTable      A pointer to the table of Unicode strings.
+  @param  UnicodeString           A pointer to the Unicode string from UnicodeStringTable
+                                  that matches the language specified by Language.
+
+  @retval EFI_SUCCESS             The Unicode string that matches the language 
+                                  specified by Language was found
+                                  in the table of Unicoide strings UnicodeStringTable, 
+                                  and it was returned in UnicodeString.
+  @retval EFI_INVALID_PARAMETER   Language is NULL.
+  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
+  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.
+  @retval EFI_UNSUPPORTED         UnicodeStringTable is NULL.
+  @retval EFI_UNSUPPORTED         The language specified by Language is not a 
+                                  member of SupportedLanguages.
+  @retval EFI_UNSUPPORTED         The language specified by Language is not 
+                                  supported by UnicodeStringTable.
 
 **/
 EFI_STATUS
@@ -640,28 +659,23 @@ LookupUnicodeString (
   @param  Language                A pointer to the ISO 639-2 or
                                   RFC 3066 language code for the
                                   Unicode string to look up and
-                                  return.
-  
+                                  return.  
   @param  SupportedLanguages      A pointer to the set of ISO
                                   639-2 or RFC 3066 language
                                   codes that the Unicode string
                                   table supports. Language must
-                                  be a member of this set.
-  
+                                  be a member of this set.  
   @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.
-  
+                                  Unicode strings.  
   @param  UnicodeString           A pointer to the Unicode
                                   string from UnicodeStringTable
                                   that matches the language
                                   specified by Language.
-
   @param  Iso639Language          Specify the language code
                                   format supported. If true,
                                   then the format follow ISO
                                   639-2. If false, then it
                                   follows RFC3066.
-
   @retval  EFI_SUCCESS            The Unicode string that
                                   matches the language specified
                                   by Language was found in the
@@ -669,18 +683,13 @@ LookupUnicodeString (
                                   UnicodeStringTable, and it was
                                   returned in UnicodeString.
   
-  @retval  EFI_INVALID_PARAMETER  Language is NULL.
-  
-  @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.
-  
-  @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.
-  
+  @retval  EFI_INVALID_PARAMETER  Language is NULL.  
+  @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.  
+  @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.  
   @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.
-  
   @retval  EFI_UNSUPPORTED        The language specified by
                                   Language is not a member
-                                  ofSupportedLanguages.
-  
+                                  ofSupportedLanguages.  
   @retval EFI_UNSUPPORTED         The language specified by
                                   Language is not supported by
                                   UnicodeStringTable.
@@ -767,57 +776,36 @@ LookupUnicodeString2 (
 
 
 /**
-  
   This function adds a Unicode string to UnicodeStringTable.
-  If Language is a member of SupportedLanguages then
-  UnicodeString is added to UnicodeStringTable.  New buffers are
-  allocated for both Language and UnicodeString.  The contents
-  of Language and UnicodeString are copied into these new
-  buffers.  These buffers are automatically freed when
+
+  If Language is a member of SupportedLanguages then UnicodeString is added to 
+  UnicodeStringTable.  New buffers are allocated for both Language and 
+  UnicodeString.  The contents of Language and UnicodeString are copied into 
+  these new buffers.  These buffers are automatically freed when 
   FreeUnicodeStringTable() is called.
 
-  @param  Language                A pointer to the ISO 639-2
-                                  language code for the Unicode
+  @param  Language                A pointer to the ISO 639-2 language code for the Unicode 
                                   string to add.
-  
-  @param  SupportedLanguages      A pointer to the set of ISO
-                                  639-2 language codes that the
-                                  Unicode string table supports.
-                                  Language must be a member of
-                                  this set.
-  
-  @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.
-  
-  @param  UnicodeString           A pointer to the Unicode
-                                  string to add.
+  @param  SupportedLanguages      A pointer to the set of ISO 639-2 language codes
+                                  that the Unicode string table supports.
+                                  Language must be a member of this set.
+  @param  UnicodeStringTable      A pointer to the table of Unicode strings.
+  @param  UnicodeString           A pointer to the Unicode string to add.
 
-  @retval EFI_SUCCESS             The Unicode string that
-                                  matches the language specified
-                                  by Language was found in the
-                                  table of Unicode strings
-                                  UnicodeStringTable, and it was
+  @retval EFI_SUCCESS             The Unicode string that matches the language 
+                                  specified by Language was found in the table of 
+                                  Unicode strings UnicodeStringTable, and it was 
                                   returned in UnicodeString.
-  
   @retval EFI_INVALID_PARAMETER   Language is NULL.
-  
   @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
-  
   @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.
-  
   @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.
-  
-  @retval EFI_ALREADY_STARTED     A Unicode string with language
-                                  Language is already present in
-                                  UnicodeStringTable.
-  
-  @retval EFI_OUT_OF_RESOURCES    There is not enough memory to
-                                  add another Unicode string to
-                                  UnicodeStringTable.
-  
-  @retval EFI_UNSUPPORTED         The language specified by
-                                  Language is not a member of
-                                  SupportedLanguages.
+  @retval EFI_ALREADY_STARTED     A Unicode string with language Language is 
+                                  already present in UnicodeStringTable.
+  @retval EFI_OUT_OF_RESOURCES    There is not enough memory to add another 
+                                  Unicode string to UnicodeStringTable.
+  @retval EFI_UNSUPPORTED         The language specified by Language is not a 
+                                  member of SupportedLanguages.
 
 **/
 EFI_STATUS
@@ -956,8 +944,8 @@ AddUnicodeString (
 
 
 /**
-  
   This function adds a Unicode string to UnicodeStringTable.
+
   If Language is a member of SupportedLanguages then
   UnicodeString is added to UnicodeStringTable.  New buffers are
   allocated for both Language and UnicodeString.  The contents
@@ -967,26 +955,21 @@ AddUnicodeString (
 
   @param  Language                A pointer to the ISO 639-2 or
                                   RFC 3066 language code for the
-                                  Unicode string to add.
-  
+                                  Unicode string to add.  
   @param  SupportedLanguages      A pointer to the set of ISO
-                                  639-2 or RFC 3.66 language
+                                  639-2 or RFC 3066 language
                                   codes that the Unicode string
                                   table supports. Language must
-                                  be a member of this set.
-  
+                                  be a member of this set.  
   @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.
-  
+                                  Unicode strings.  
   @param  UnicodeString           A pointer to the Unicode
-                                  string to add.
-  
+                                  string to add.  
   @param  Iso639Language          Specify the language code
                                   format supported. If true,
                                   then the format follow ISO
                                   639-2. If false, then it
                                   follows RFC3066.
-
   @retval EFI_SUCCESS             The Unicode string that
                                   matches the language specified
                                   by Language was found in the
@@ -994,22 +977,16 @@ AddUnicodeString (
                                   UnicodeStringTable, and it was
                                   returned in UnicodeString.
   
-  @retval EFI_INVALID_PARAMETER   Language is NULL.
-  
-  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
-  
-  @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.
-  
-  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.
-  
+  @retval EFI_INVALID_PARAMETER   Language is NULL.  
+  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.  
+  @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.  
+  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.  
   @retval EFI_ALREADY_STARTED     A Unicode string with language
                                   Language is already present in
-                                  UnicodeStringTable.
-  
+                                  UnicodeStringTable.  
   @retval EFI_OUT_OF_RESOURCES    There is not enough memory to
                                   add another Unicode string to
-                                  UnicodeStringTable.
-  
+                                  UnicodeStringTable.  
   @retval EFI_UNSUPPORTED         The language specified by
                                   Language is not a member of
                                   SupportedLanguages.
@@ -1175,6 +1152,7 @@ AddUnicodeString2 (
 
 /**
   This function frees the table of Unicode strings in UnicodeStringTable.
+
   If UnicodeStringTable is NULL, then EFI_SUCCESS is returned.
   Otherwise, each language code, and each Unicode string in the Unicode string 
   table are freed, and EFI_SUCCESS is returned.
@@ -1231,10 +1209,9 @@ FreeUnicodeStringTable (
 
   If Lang is NULL, then ASSERT.
 
-  @param  Lang                   Pointer of system language. Lang will always be filled with 
-                                         a valid RFC 3066 language string. If "PlatformLang" is not
-                                         set in the system, the default language specifed by PcdUefiVariableDefaultPlatformLang
-                                         is returned.
+  @param  Lang   Pointer of system language. Lang will always be filled with a valid RFC 3066
+                 language string. If "PlatformLang" is not set in the system, the default
+                 language specifed by PcdUefiVariableDefaultPlatformLang is returned.
 
   @return  EFI_SUCCESS     If the EFI Variable with "PlatformLang" is set and return in Lang.
   @return  EFI_NOT_FOUND If the EFI Variable with "PlatformLang" is not set, but a valid default language is return in Lang.

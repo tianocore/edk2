@@ -244,6 +244,8 @@ GetGlyphWidth (
 }
 
 /**
+  Computes the display length of a Null-terminated Unicode String.
+
   This function computes and returns the display length of
   the Null-terminated Unicode string specified by String.
   If String is NULL, then 0 is returned.
