@@ -141,7 +141,7 @@
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHardwareErrorRecord
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes

@@ -60,4 +60,4 @@
   gEfiOEMBadgingProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
 
 [FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport

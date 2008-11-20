@@ -64,12 +64,17 @@
 
 [Protocols]
   gEfiDriverBindingProtocolGuid                 # ALWAYS_CONSUMED
+  gEfiSimpleTextOutProtocolGuid                 # ALWAYS_CONSUMED
+  gEfiGraphicsOutputProtocolGuid                # ALWAYS_CONSUMED
+  gEfiHiiFontProtocolGuid                       # ALWAYS_CONSUMED
   gEfiComponentNameProtocolGuid                 # SOMETIMES_CONSUMED
   gEfiComponentName2ProtocolGuid                # SOMETIMES_CONSUMED
   gEfiDriverConfigurationProtocolGuid           # SOMETIMES_CONSUMED
   gEfiDriverConfiguration2ProtocolGuid          # SOMETIMES_CONSUMED
   gEfiDriverDiagnosticsProtocolGuid             # SOMETIMES_CONSUMED
   gEfiDriverDiagnostics2ProtocolGuid            # SOMETIMES_CONSUMED
+  gEfiUgaDrawProtocolGuid                       # SOMETIMES_CONSUMED
+
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize
@@ -80,6 +85,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [Guids]  
   gEfiGlobalVariableGuid 

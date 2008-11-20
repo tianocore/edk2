@@ -17,9 +17,6 @@
 #ifndef __EFI_GRAPHICS_LIB_H__
 #define __EFI_GRAPHICS_LIB_H__
 
-#include <Protocol/GraphicsOutput.h>
-
-
 /**
   Return the graphics image file named FileNameGuid into Image and return it's
   size in ImageSize. All Firmware Volumes (FV) in the system are searched for the
@@ -145,33 +142,5 @@ EFIAPI
 LockKeyboards (
   IN  CHAR16    *Password
   );
-
-
-/**
-  Print Unicode string to graphics screen at the given X,Y coordinates of the graphics screen.
-  see definition of Print to find rules for constructing Fmt.
-
-  @param[in]  X            Row to start printing at
-  @param[in]  Y            Column to start printing at
-  @param[in]  ForeGround   Foreground color
-  @param[in]  BackGround   background color
-  @param[in]  Fmt          Print format sting. See definition of Print
-  @param ...               Variable argument list whose contents are accessed based on 
-                           the format string specified by Format.
-
-  @return  Number of Characters printed.
-
-**/
-UINTN
-EFIAPI
-PrintXY (
-  IN UINTN                            X,
-  IN UINTN                            Y,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
-  IN CHAR16                           *Fmt,
-  ...
-  );
-
 
 #endif

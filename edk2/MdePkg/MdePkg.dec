@@ -401,6 +401,9 @@
   ## Indicates whether EFI 1.1 ISO 639-2 language supports are obsolete
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate|FALSE|BOOLEAN|0x00000012             .
 
+  ## If TRUE, UGA Draw Protocol is still consumed.
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE|BOOLEAN|0x00000013        .
+
 [PcdsFixedAtBuild.common]
   ## Indicates the maximum length of unicode string
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000|UINT32|0x00000001
