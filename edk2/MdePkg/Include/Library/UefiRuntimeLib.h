@@ -2,7 +2,7 @@
   Provides library functions for each of the UEFI Runtime Services.
   Only available to DXE and UEFI module types.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,12 +21,15 @@ extern const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[];
 extern const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[];
 
 /**
-  Check to see if the execute context is in Runtime phase or not.
+  This function allows the caller to determine if UEFI ExitBootServices() has been called.
 
-  @param  None.
+  This function returns TRUE after all the EVT_SIGNAL_EXIT_BOOT_SERVICES functions have
+  executed as a result of the OS calling ExitBootServices().  Prior to this time FALSE
+  is returned. This function is used by runtime code to decide it is legal to access
+  services that go away after ExitBootServices().
 
-  @retval  TRUE  The driver is in SMM.
-  @retval  FALSE The driver is not in SMM.
+  @retval  TRUE  The system has finished executing the EVT_SIGNAL_EXIT_BOOT_SERVICES event.
+  @retval  FALSE The system has not finished executing the EVT_SIGNAL_EXIT_BOOT_SERVICES event.
 
 **/
 BOOLEAN
@@ -36,10 +39,15 @@ EfiAtRuntime (
   );
 
 /**
-  Check to see if the SetVirtualAddressMsp() is invoked or not.
+  This function allows the caller to determine if UEFI SetVirtualAddressMap() has been called. 
 
-  @retval  TRUE  SetVirtualAddressMsp() has been called.
-  @retval  FALSE SetVirtualAddressMsp() has not been called.
+  This function returns TRUE after all the EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE functions have
+  executed as a result of the OS calling SetVirtualAddressMap(). Prior to this time FALSE
+  is returned. This function is used by runtime code to decide it is legal to access services
+  that go away after SetVirtualAddressMap().
+
+  @retval  TRUE  The system has finished executing the EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+  @retval  FALSE The system has not finished executing the EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
 
 **/
 BOOLEAN
@@ -49,31 +57,53 @@ EfiGoneVirtual (
   );
 
 /**
-  Return current time and date information, and time-keeping
-  capabilities of hardware platform.
+  This service is a wrapper for the UEFI Runtime Service GetTime().
+
+  The GetTime() function returns a time that was valid sometime during the call to the function.
+  While the returned EFI_TIME structure contains TimeZone and Daylight savings time information,
+  the actual clock does not maintain these values. The current time zone and daylight saving time
+  information returned by GetTime() are the values that were last set via SetTime().
+  The GetTime() function should take approximately the same amount of time to read the time each
+  time it is called. All reported device capabilities are to be rounded up.
+  During runtime, if a PC-AT CMOS device is present in the platform the caller must synchronize
+  access to the device before calling GetTime().
 
   @param  Time         A pointer to storage to receive a snapshot of the current time.
   @param  Capabilities An optional pointer to a buffer to receive the real time clock device's
                        capabilities.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  EFI_SUCCESS            The operation completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Time is NULL.
+  @retval  EFI_DEVICE_ERROR       The time could not be retrieved due to a hardware error.
 
 **/
 EFI_STATUS
 EFIAPI
 EfiGetTime (
   OUT EFI_TIME                    *Time,
-  OUT EFI_TIME_CAPABILITIES       *Capabilities
+  OUT EFI_TIME_CAPABILITIES       *Capabilities  OPTIONAL
   );
 
 /**
-  Set current time and date information.
+  This service is a wrapper for the UEFI Runtime Service SetTime().
 
-  @param  Time         A pointer to cache of time setting.
+  The SetTime() function sets the real time clock device to the supplied time, and records the
+  current time zone and daylight savings time information. The SetTime() function is not allowed
+  to loop based on the current time. For example, if the device does not support a hardware reset
+  for the sub-resolution time, the code is not to implement the feature by waiting for the time to
+  wrap.
+  During runtime, if a PC-AT CMOS device is present in the platform the caller must synchronize
+  access to the device before calling SetTime().
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to execute the function.
+  @param  Time  A pointer to the current time. Type EFI_TIME is defined in the GetTime()
+                function description. Full error checking is performed on the different
+                fields of the EFI_TIME structure (refer to the EFI_TIME definition in the
+                GetTime() function description for full details), and EFI_INVALID_PARAMETER
+                is returned if any field is out of range.
+
+  @retval  EFI_SUCCESS            The operation completed successfully.
+  @retval  EFI_INVALID_PARAMETER  A time field is out of range.
+  @retval  EFI_DEVICE_ERROR       The time could not be set due to a hardware error.
 
 **/
 EFI_STATUS
@@ -83,14 +113,24 @@ EfiSetTime (
   );
 
 /**
-  Return current wakeup alarm clock setting.
+  Returns the current wakeup alarm clock setting.
 
-  @param  Enabled Indicate if the alarm clock is enabled or disabled.
-  @param  Pending Indicate if the alarm signal is pending and requires acknowledgement.
-  @param  Time    Current alarm clock setting.
+  The alarm clock time may be rounded from the set alarm clock time to be within the resolution
+  of the alarm clock device. The resolution of the alarm clock device is defined to be one second.
+  During runtime, if a PC-AT CMOS device is present in the platform the caller must synchronize
+  access to the device before calling GetWakeupTime().
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @param  Enabled  Indicates if the alarm is currently enabled or disabled.
+  @param  Pending  Indicates if the alarm signal is pending and requires acknowledgement.
+  @param  Time     The current alarm setting. Type EFI_TIME is defined in the GetTime()
+                   function description.
+
+  @retval  EFI_SUCCESS           The alarm settings were returned.
+  @retval  EFI_INVALID_PARAMETER  Enabled is NULL.
+  @retval  EFI_INVALID_PARAMETER  Pending is NULL.
+  @retval  EFI_INVALID_PARAMETER  Time is NULL.
+  @retval  EFI_DEVICE_ERROR       The wakeup time could not be retrieved due to a hardware error.
+  @retval  EFI_UNSUPPORTED        A wakeup timer is not supported on this platform.
 
 **/
 EFI_STATUS
@@ -102,20 +142,25 @@ EfiGetWakeupTime (
   );
 
 /**
-  Set current wakeup alarm clock.
+  Sets the system wakeup alarm clock time.
 
-  @param  Enable Enable or disable current alarm clock..
-  @param  Time   Point to alarm clock setting.
+  @param  Enable  Enable or disable the wakeup alarm.
+  @param  Time    If Enable is TRUE, the time to set the wakeup alarm for. Type EFI_TIME
+                  is defined in the GetTime() function description. If Enable is FALSE,
+                  then this parameter is optional, and may be NULL.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  EFI_SUCCESS            If Enable is TRUE, then the wakeup alarm was enabled.
+                                  If Enable is FALSE, then the wakeup alarm was disabled.
+  @retval  EFI_INVALID_PARAMETER  A time field is out of range.
+  @retval  EFI_DEVICE_ERROR       The wakeup time could not be set due to a hardware error.
+  @retval  EFI_UNSUPPORTED        A wakeup timer is not supported on this platform.
 
 **/
 EFI_STATUS
 EFIAPI
 EfiSetWakeupTime (
   IN BOOLEAN                      Enable,
-  IN EFI_TIME                     *Time
+  IN EFI_TIME                     *Time   OPTIONAL
   );
 
 /**
@@ -130,9 +175,16 @@ EfiSetWakeupTime (
                        As output, point to the actual size of the returned Data-Buffer.
   @param  Data         Point to return Data-Buffer.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
-
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_NOT_FOUND          The variable was not found.
+  @retval  EFI_BUFFER_TOO_SMALL   The DataSize is too small for the result. DataSize has
+                                  been updated with the size needed to complete the request.
+  @retval  EFI_INVALID_PARAMETER  VariableName is NULL.
+  @retval  EFI_INVALID_PARAMETER  VendorGuid is NULL.
+  @retval  EFI_INVALID_PARAMETER  DataSize is NULL.
+  @retval  EFI_INVALID_PARAMETER  The DataSize is not too small and Data is NULL.
+  @retval  EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
+  @retval  EFI_SECURITY_VIOLATION The variable could not be retrieved due to an authentication failure.
 **/
 EFI_STATUS
 EFIAPI
@@ -157,8 +209,15 @@ EfiGetVariable (
                            GetNextVriableName().
                            As output, returns the VendorGuid of the current variable.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  EFI_SUCCESS           The function completed successfully.
+  @retval  EFI_NOT_FOUND         The next variable was not found.
+  @retval  EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the result.
+                                 VariableNameSize has been updated with the size needed
+                                 to complete the request.
+  @retval  EFI_INVALID_PARAMETER VariableNameSize is NULL.
+  @retval  EFI_INVALID_PARAMETER VariableName is NULL.
+  @retval  EFI_INVALID_PARAMETER VendorGuid is NULL.
+  @retval  EFI_DEVICE_ERROR      The variable name could not be retrieved due to a hardware error.
 
 **/
 EFI_STATUS
@@ -180,8 +239,19 @@ EfiGetNextVariableName (
   @param  DataSize     The size in bytes of Data-Buffer.
   @param  Data         Point to the content of the variable.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  EFI_SUCCESS            The firmware has successfully stored the variable and its data as
+                                  defined by the Attributes.
+  @retval  EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the
+                                  DataSize exceeds the maximum allowed.
+  @retval  EFI_INVALID_PARAMETER  VariableName is an empty Unicode string.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the variable and its data.
+  @retval  EFI_DEVICE_ERROR       The variable could not be saved due to a hardware failure.
+  @retval  EFI_WRITE_PROTECTED    The variable in question is read-only.
+  @retval  EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
+  @retval  EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
+                                  set but the AuthInfo does NOT pass the validation check carried
+                                  out by the firmware.
+  @retval  EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
 
 **/
 EFI_STATUS
@@ -199,8 +269,9 @@ EfiSetVariable (
 
   @param  HighCount Pointer to returned value.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  EFI_SUCCESS           The next high monotonic count was returned.
+  @retval  EFI_DEVICE_ERROR      The device is not functioning properly.
+  @retval  EFI_INVALID_PARAMETER HighCount is NULL.
 
 **/
 EFI_STATUS
@@ -213,10 +284,19 @@ EfiGetNextHighMonotonicCount (
   Resets the entire platform.
 
   @param  ResetType   The type of reset to perform.
-  @param  ResetStatus The status code for reset.
-  @param  DataSize    The size in bytes of reset data.
-  @param  ResetData   Pointer to data buffer that includes
-                      Null-Terminated Unicode string.
+  @param  ResetStatus The status code for the reset. If the system reset is part of a
+                      normal operation, the status code would be EFI_SUCCESS. If the system
+                      reset is due to some type of failure the most appropriate EFI Status
+                      code would be used.
+  @param  DataSizeThe size, in bytes, of ResetData.
+  @param  ResetData   For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown
+                      the data buffer starts with a Null-terminated Unicode string, optionally
+                      followed by additional binary data. The string is a description that the
+                      caller may use to further indicate the reason for the system reset. ResetData
+                      is only valid if ResetStatus is something other then EFI_SUCCESS. This
+                      pointer must be a physical address. For a ResetType of EfiRestUpdate the
+                      data buffer also starts with a Null-terminated string that is followed by
+                      a physical VOID * to an EFI_CAPSULE_HEADER.
 
 **/
 VOID
@@ -236,8 +316,11 @@ EfiResetSystem (
                              value needed for the new virtual address mapping being
                              applied.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to execute the function.
+  @retval  EFI_SUCCESS            The pointer pointed to by Address was modified.
+  @retval  EFI_NOT_FOUND          The pointer pointed to by Address was not found to be part of
+                                  the current memory map. This is normally fatal.
+  @retval  EFI_INVALID_PARAMETER  Address is NULL.
+  @retval  EFI_INVALID_PARAMETER  *Address is NULL and DebugDispositio
 
 **/
 EFI_STATUS
@@ -266,8 +349,7 @@ EfiConvertPointer (
                              value needed for the new virtual address mapping being
                              applied.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to execute the function.
+  @return  EFI_STATUS value from EfiConvertPointer().
 
 **/
 EFI_STATUS
@@ -311,6 +393,10 @@ EfiSetVirtualAddressMap (
 /**
   Convert the standard Lib double linked list to a virtual mapping.
 
+  This service uses EfiConvertPointer() to walk a double linked list and convert all the link
+  pointers to their virtual mappings. This function is only guaranteed to work during the
+  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event and calling it at other times has undefined results.
+
   @param  DebugDisposition   Supplies type information for the pointer being converted.
   @param  ListHead           Head of linked list to convert.
 
@@ -350,11 +436,13 @@ EfiConvertList (
                                 CapsuleHeaderArray. This parameter is only referenced if
                                 the capsules are defined to persist across system reset.
 
-  @retval EFI_SUCCESS           Valid capsule was passed. I Valid capsule was passed. If
-                                CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set, the
-                                capsule has been successfully processed by the firmware.
-  @retval EFI_INVALID_PARAMETER CapsuleSize is NULL or ResetTye is NULL.
+  @retval EFI_SUCCESS           Valid capsule was passed. If CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set,
+                                the capsule has been successfully processed by the firmware.
+  @retval EFI_INVALID_PARAMETER CapsuleSize or HeaderSize is NULL.
+  @retval EFI_INVALID_PARAMETER CapsuleCount is 0
   @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
+  @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform.
+  @retval EFI_OUT_OF_RESOURCES  There were insufficient resources to process the capsule.
 
 **/
 EFI_STATUS
@@ -391,10 +479,11 @@ EfiUpdateCapsule (
                                 Undefined on input.
   @param  ResetType             Returns the type of reset required for the capsule update.
 
-  @retval EFI_SUCCESS           Valid answer returned..
+  @retval EFI_SUCCESS           Valid answer returned.
   @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL.
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform, and
                                 MaximumCapsuleSize and ResetType are undefined.
+  @retval EFI_OUT_OF_RESOURCES  There were insufficient resources to process the query request.
 
 **/
 EFI_STATUS
@@ -408,6 +497,8 @@ EfiQueryCapsuleCapabilities (
 
 
 /**
+  Returns information about the EFI variables.
+
   The QueryVariableInfo() function allows a caller to obtain the information about the
   maximum size of the storage space available for the EFI variables, the remaining size of the storage
   space available for the EFI variables and the maximum size of each individual EFI variable,
