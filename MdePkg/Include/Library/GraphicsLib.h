@@ -17,62 +17,6 @@
 #ifndef __EFI_GRAPHICS_LIB_H__
 #define __EFI_GRAPHICS_LIB_H__
 
-/**
-  Return the graphics image file named FileNameGuid into Image and return it's
-  size in ImageSize. All Firmware Volumes (FV) in the system are searched for the
-  file name.
-
-  @param[in]  FileNameGuid  File Name of graphics file in the FV(s).
-  @param[out] Image         Pointer to pointer to return graphics image.  If NULL, a 
-                            buffer will be allocated.
-  @param[out] ImageSize     Size of the graphics Image in bytes. Zero if no image found.
-
-  @retval  EFI_SUCCESS          The image is found and data and size is returned.
-  @retval  EFI_UNSUPPORTED      FvHandle does not support EFI_FIRMWARE_VOLUME2_PROTOCOL.
-  @retval  EFI_NOT_FOUND        The image specified by NameGuid and SectionType can't be found.
-  @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
-  @retval  EFI_DEVICE_ERROR     A hardware error occurs during reading from the Firmware Volume.
-  @retval  EFI_ACCESS_DENIED    The firmware volume containing the searched Firmware File is configured to disallow reads.
-
-**/
-EFI_STATUS
-EFIAPI
-GetGraphicsBitMapFromFV (
-  IN  EFI_GUID      *FileNameGuid,
-  OUT VOID          **Image,
-  OUT UINTN         *ImageSize
-  );
-
-/**
-  Return the graphics image file named FileNameGuid into Image and return it's
-  size in ImageSize. All Firmware Volumes (FV) in the system are searched for the
-  file name.
-
-  @param[in]  ImageHandle   The driver image handle of the caller. The parameter is used to
-                            optimize the loading of the image file so that the FV from which
-                            the driver image is loaded will be tried first. 
-  @param[in]  FileNameGuid  File Name of graphics file in the FV(s).
-  @param[out] Image         Pointer to pointer to return graphics image.  If NULL, a 
-                            buffer will be allocated.
-  @param[out] ImageSize     Size of the graphics Image in bytes. Zero if no image found.
-
-  @retval  EFI_SUCCESS          The image is found and data and size is returned.
-  @retval  EFI_UNSUPPORTED      FvHandle does not support EFI_FIRMWARE_VOLUME2_PROTOCOL.
-  @retval  EFI_NOT_FOUND        The image specified by NameGuid and SectionType can't be found.
-  @retval  EFI_OUT_OF_RESOURCES There were not enough resources to allocate the output data buffer or complete the operations.
-  @retval  EFI_DEVICE_ERROR     A hardware error occurs during reading from the Firmware Volume.
-  @retval  EFI_ACCESS_DENIED    The firmware volume containing the searched Firmware File is configured to disallow reads.
-
-**/
-EFI_STATUS
-EFIAPI
-GetGraphicsBitMapFromFVEx (
-  IN  EFI_HANDLE    ImageHandle,
-  IN  EFI_GUID      *FileNameGuid,
-  OUT VOID          **Image,
-  OUT UINTN         *ImageSize
-  );
-
 
 /**
   Use Console Control to turn off UGA based Simple Text Out consoles from going

@@ -38,69 +38,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DxeServicesLib.h>
 #include <Library/PcdLib.h>
 
-
-/**
-  Return the graphics image file named FileNameGuid into Image and return it's
-  size in ImageSize. All Firmware Volumes (FV) in the system are searched for the
-  file name.
-
-  @param  FileNameGuid          File Name of graphics file in the FV(s).
-  @param  Image                 Pointer to pointer to return graphics image.  If NULL, a 
-                                buffer will be allocated.
-  @param  ImageSize             Size of the graphics Image in bytes. Zero if no image found.
-
-  @retval EFI_SUCCESS           Image and ImageSize are valid. 
-  @retval EFI_BUFFER_TOO_SMALL  Image not big enough. ImageSize has required size
-  @retval EFI_NOT_FOUND         FileNameGuid not found
-
-**/
-EFI_STATUS
-EFIAPI
-GetGraphicsBitMapFromFV (
-  IN  EFI_GUID      *FileNameGuid,
-  OUT VOID          **Image,
-  OUT UINTN         *ImageSize
-  )
-{
-  return GetGraphicsBitMapFromFVEx (NULL, FileNameGuid, Image, ImageSize);
-}
-
-/**
-  Return the graphics image file named FileNameGuid into Image and return it's
-  size in ImageSize. All Firmware Volumes (FV) in the system are searched for the
-  file name.
-
-  @param  ImageHandle           The driver image handle of the caller. The parameter is used to
-                                optimize the loading of the image file so that the FV from which
-                                the driver image is loaded will be tried first. 
-  @param  FileNameGuid          File Name of graphics file in the FV(s).
-  @param  Image                 Pointer to pointer to return graphics image.  If NULL, a 
-                                buffer will be allocated.
-  @param  ImageSize             Size of the graphics Image in bytes. Zero if no image found.
-
-  @retval EFI_SUCCESS           Image and ImageSize are valid. 
-  @retval EFI_BUFFER_TOO_SMALL  Image not big enough. ImageSize has required size
-  @retval EFI_NOT_FOUND         FileNameGuid not found
-
-**/
-EFI_STATUS
-EFIAPI
-GetGraphicsBitMapFromFVEx (
-  IN  EFI_HANDLE    ImageHandle,
-  IN  EFI_GUID      *FileNameGuid,
-  OUT VOID          **Image,
-  OUT UINTN         *ImageSize
-  )
-{
-  return GetSectionFromAnyFv  (
-           FileNameGuid,
-           EFI_SECTION_RAW,
-           0,
-           Image,
-           ImageSize
-           );
-}
-
 /**
   Convert a *.BMP graphics image to a GOP blt buffer. If a NULL Blt buffer
   is passed in a GopBlt buffer will be allocated by this routine. If a GopBlt
@@ -457,7 +394,7 @@ EnableQuietBootEx (
       //
       // Get the specified image from FV.
       //
-      Status = GetGraphicsBitMapFromFVEx (ImageHandle, LogoFile, (VOID **) &ImageData, &ImageSize);
+      Status = GetSectionFromAnyFv (LogoFile, EFI_SECTION_RAW, 0, (VOID **) &ImageData, &ImageSize);
       if (EFI_ERROR (Status)) {
         return EFI_UNSUPPORTED;
       }
