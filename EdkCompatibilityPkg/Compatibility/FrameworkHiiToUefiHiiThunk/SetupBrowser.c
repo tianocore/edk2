@@ -134,9 +134,9 @@ ThunkCreatePopUp (
     return EFI_UNSUPPORTED;
   }
 
-  VA_START (Marker, KeyValue);
+  VA_START (Marker, String);
   
-  Status = IfrLibCreatePopUp2 (NumberOfLines, KeyValue, Marker);
+  Status = IfrLibCreatePopUp2 (NumberOfLines, KeyValue, String, Marker);
 
   VA_END (Marker);
   
