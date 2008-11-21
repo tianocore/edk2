@@ -51,7 +51,7 @@ EFI_GUID  *gTerminalType[] = {
 };
 
 
-TERMINAL_DEV  gTerminalDevTemplate = {
+TERMINAL_DEV  mTerminalDevTemplate = {
   TERMINAL_DEV_SIGNATURE,
   NULL,
   0,
@@ -405,7 +405,7 @@ TerminalDriverBindingStart (
   //
   // Initialize the Terminal Dev
   //
-  TerminalDevice = AllocateCopyPool (sizeof (TERMINAL_DEV), &gTerminalDevTemplate);
+  TerminalDevice = AllocateCopyPool (sizeof (TERMINAL_DEV), &mTerminalDevTemplate);
   if (TerminalDevice == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error;
