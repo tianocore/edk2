@@ -20,7 +20,7 @@
   FILE_GUID                      = 79C5C7B7-1083-42a6-AD15-2A4E7C4274D7
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DxeSmmDriverEntryPoint|DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = UefiDriverEntryPoint|DXE_SMM_DRIVER
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
