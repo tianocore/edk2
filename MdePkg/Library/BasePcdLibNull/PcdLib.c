@@ -481,9 +481,9 @@ LibPcdSet64 (
 VOID *
 EFIAPI
 LibPcdSetPtr (
-  IN      UINTN             TokenNumber,
-  IN OUT  UINTN             *SizeOfBuffer,
-  IN      VOID              *Buffer
+  IN       UINTN             TokenNumber,
+  IN OUT   UINTN             *SizeOfBuffer,
+  IN       VOID              *Buffer
   )
 {
   ASSERT (FALSE);
