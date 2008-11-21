@@ -59,6 +59,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT16 mFakeConfigHdr[] = L"GUID=00000000000
 
   @param  NumberOfLines          The number of lines for the dialog box
   @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
+  @param  String                 The first String to be displayed in the Pop-Up.
   @param  Marker                 A series of (quantity == NumberOfLines - 1) text
                                  strings which will be used to construct the dialog
                                  box
@@ -73,6 +74,7 @@ EFIAPI
 IfrLibCreatePopUp2 (
   IN  UINTN                       NumberOfLines,
   OUT EFI_INPUT_KEY               *KeyValue,
+  IN  CHAR16                      *String,
   IN  VA_LIST                     Marker
   )
 {
@@ -98,10 +100,7 @@ IfrLibCreatePopUp2 (
   EFI_EVENT                     WaitList[2];
   UINTN                         CurrentAttribute;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *ConOut;
-  CHAR16                        *String;
 
-  String = VA_ARG (Marker, CHAR16 *);
-  
   if ((KeyValue == NULL) || (String == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -286,9 +285,9 @@ IfrLibCreatePopUp (
   EFI_STATUS                      Status;
   VA_LIST                         Marker;
 
-  VA_START (Marker, KeyValue);
+  VA_START (Marker, String);
 
-  Status = IfrLibCreatePopUp2 (NumberOfLines, KeyValue, Marker);
+  Status = IfrLibCreatePopUp2 (NumberOfLines, KeyValue, String, Marker);
 
   VA_END (Marker);
 

@@ -744,6 +744,7 @@ IfrLibCreatePopUp (
 
   @param  NumberOfLines          The number of lines for the dialog box
   @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
+  @param  String                 The first String to be displayed in the Pop-Up.
   @param  Args                   VA_LIST marker for the variable argument list.
                                  A series of (quantity == NumberOfLines - 1) text
                                  strings which will be used to construct the dialog
@@ -758,6 +759,7 @@ EFIAPI
 IfrLibCreatePopUp2 (
   IN  UINTN                       NumberOfLines,
   OUT EFI_INPUT_KEY               *KeyValue,
+  IN  CHAR16                      *String,
   IN  VA_LIST                     Args
   )
 ;
