@@ -36,14 +36,14 @@ typedef struct _EFI_DEVICE_IO_PROTOCOL EFI_DEVICE_IO_PROTOCOL;
 typedef EFI_DEVICE_IO_PROTOCOL  EFI_DEVICE_IO_INTERFACE;
 
 typedef enum {
-	IO_UINT8  = 0,
-	IO_UINT16 = 1,
-	IO_UINT32 = 2,
-	IO_UINT64 = 3,
-	MMIO_COPY_UINT8  = 4,
-	MMIO_COPY_UINT16 = 5,
-	MMIO_COPY_UINT32 = 6,
-	MMIO_COPY_UINT64 = 7
+  IO_UINT8  = 0,
+  IO_UINT16 = 1,
+  IO_UINT32 = 2,
+  IO_UINT64 = 3,
+  MMIO_COPY_UINT8  = 4,
+  MMIO_COPY_UINT16 = 5,
+  MMIO_COPY_UINT32 = 6,
+  MMIO_COPY_UINT64 = 7
 } EFI_IO_WIDTH;
 
 /**                                                                 
@@ -55,9 +55,9 @@ typedef enum {
   @param  Count                 The number of I/O operations to perform.
   @param  Buffer                For read operations, the destination buffer to store the results. For write
                                 operations, the source buffer to write data from. If
-																Width is MMIO_COPY_UINT8, MMIO_COPY_UINT16,
-																MMIO_COPY_UINT32, or MMIO_COPY_UINT64, then
-																Buffer is interpreted as a base address of an I/O operation such as Address. 
+                                Width is MMIO_COPY_UINT8, MMIO_COPY_UINT16,
+                                MMIO_COPY_UINT32, or MMIO_COPY_UINT64, then
+                                Buffer is interpreted as a base address of an I/O operation such as Address. 
 
   @retval EFI_SUCCESS           The data was read from or written to the device.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.      
