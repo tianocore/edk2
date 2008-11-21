@@ -527,9 +527,9 @@ LibPcdSet64 (
 VOID *
 EFIAPI
 LibPcdSetPtr (
-  IN      UINTN             TokenNumber,
-  IN OUT  UINTN             *SizeOfBuffer,
-  IN      VOID              *Buffer
+  IN        UINTN             TokenNumber,
+  IN OUT    UINTN             *SizeOfBuffer,
+  IN        VOID              *Buffer
   )
 {
   EFI_STATUS Status;
@@ -905,6 +905,8 @@ LibPcdGetNextToken (
 
 
 /**
+  Used to retrieve the list of available PCD token space GUIDs.
+  
   Retrieves the next PCD token space from a token space specified by Guid.
   Guid of NULL is reserved to mark the default local token namespace on the current
   platform. If Guid is NULL, then the GUID of the first non-local token space of the 
@@ -923,16 +925,16 @@ LibPcdGetNextToken (
 GUID *           
 EFIAPI
 LibPcdGetNextTokenSpace (
-  IN CONST GUID  *Guid
+  IN CONST GUID  *TokenSpaceGuid
   )
 {
   EFI_STATUS Status;
 
-  Status = mPcd->GetNextTokenSpace (&Guid);
+  Status = mPcd->GetNextTokenSpace (&TokenSpaceGuid);
 
   ASSERT_EFI_ERROR (Status);
 
-  return (GUID *) Guid;
+  return (GUID *) TokenSpaceGuid;
 }
 
 
