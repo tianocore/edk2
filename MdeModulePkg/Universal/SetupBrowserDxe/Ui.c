@@ -190,7 +190,7 @@ UiRemoveMenuListEntry (
     Selection->FormId = UiMenuList->FormId;
     Selection->QuestionId = UiMenuList->QuestionId;
     RemoveEntryList (&UiMenuList->MenuLink);
-    gBS->FreePool (UiMenuList);
+    FreePool (UiMenuList);
   }
 }
 
@@ -209,7 +209,7 @@ UiFreeMenuList (
   while (!IsListEmpty (&gMenuList)) {
     UiMenuList = CR (gMenuList.ForwardLink, UI_MENU_LIST, MenuLink, UI_MENU_LIST_SIGNATURE);
     RemoveEntryList (&UiMenuList->MenuLink);
-    gBS->FreePool (UiMenuList);
+    FreePool (UiMenuList);
   }
 }
 
@@ -262,9 +262,9 @@ UiFreeMenu (
       // Data format :      [01/02/2004]      [11:22:33]
       // Line number :        0  0    1         0  0  1
       //
-      gBS->FreePool (MenuOption->Description);
+      FreePool (MenuOption->Description);
     }
-    gBS->FreePool (MenuOption);
+    FreePool (MenuOption);
   }
 }
 
@@ -282,7 +282,7 @@ UiFreeRefreshList (
 
   while (gMenuRefreshHead != NULL) {
     OldMenuRefreshEntry = gMenuRefreshHead->Next;
-    gBS->FreePool (gMenuRefreshHead);
+    FreePool (gMenuRefreshHead);
     gMenuRefreshHead = OldMenuRefreshEntry;
   }
 
@@ -341,7 +341,7 @@ RefreshForm (
           ;
 
         PrintStringAt (MenuRefreshEntry->CurrentColumn, MenuRefreshEntry->CurrentRow, &OptionString[Index]);
-        gBS->FreePool (OptionString);
+        FreePool (OptionString);
       }
 
       //
@@ -728,8 +728,8 @@ CreateDialog (
       case CHAR_NULL:
         switch (Key.ScanCode) {
         case SCAN_ESC:
-          gBS->FreePool (TempString);
-          gBS->FreePool (BufferedString);
+          FreePool (TempString);
+          FreePool (BufferedString);
           gST->ConOut->SetAttribute (gST->ConOut, CurrentAttribute);
           gST->ConOut->EnableCursor (gST->ConOut, TRUE);
           return EFI_DEVICE_ERROR;
@@ -742,8 +742,8 @@ CreateDialog (
 
       case CHAR_CARRIAGE_RETURN:
         SelectionComplete = TRUE;
-        gBS->FreePool (TempString);
-        gBS->FreePool (BufferedString);
+        FreePool (TempString);
+        FreePool (BufferedString);
         gST->ConOut->SetAttribute (gST->ConOut, CurrentAttribute);
         gST->ConOut->EnableCursor (gST->ConOut, TRUE);
         return EFI_SUCCESS;
@@ -1017,8 +1017,8 @@ UpdateStatusBar (
     break;
   }
 
-  gBS->FreePool (InputErrorMessage);
-  gBS->FreePool (NvUpdateMessage);
+  FreePool (InputErrorMessage);
+  FreePool (NvUpdateMessage);
   return ;
 }
 
@@ -1050,7 +1050,7 @@ GetWidth (
   if ((Statement->Operand == EFI_IFR_TEXT_OP) && (Statement->TextTwo != 0)) {
     String = GetToken (Statement->TextTwo, Handle);
     Size   = StrLen (String);
-    gBS->FreePool (String);
+    FreePool (String);
   }
 
   if ((Statement->Operand == EFI_IFR_SUBTITLE_OP) ||
@@ -1234,7 +1234,7 @@ UpdateOptionSkipLines (
         }
       }
 
-      gBS->FreePool (OutputString);
+      FreePool (OutputString);
       if (SkipValue != 0) {
         SkipValue--;
       }
@@ -1641,7 +1641,7 @@ UiDisplayMenu (
               }
             }
 
-            gBS->FreePool (OutputString);
+            FreePool (OutputString);
             if (Temp != 0) {
               Temp--;
             }
@@ -1746,7 +1746,7 @@ UiDisplayMenu (
                 }
               }
 
-              gBS->FreePool (OutputString);
+              FreePool (OutputString);
               if (Temp2 != 0) {
                 Temp2--;
               }
@@ -1755,7 +1755,7 @@ UiDisplayMenu (
             Temp2 = 0;
             Row   = OriginalRow;
 
-            gBS->FreePool (OptionString);
+            FreePool (OptionString);
           }
           //
           // If this is a text op with secondary text information
@@ -1789,14 +1789,14 @@ UiDisplayMenu (
                 }
               }
 
-              gBS->FreePool (OutputString);
+              FreePool (OutputString);
               if (Temp2 != 0) {
                 Temp2--;
               }
             }
 
             Row = OriginalRow;
-            gBS->FreePool (StringPtr);
+            FreePool (StringPtr);
           }
 
           //
@@ -1951,12 +1951,12 @@ UiDisplayMenu (
                 MenuOption->Row++;
               }
 
-              gBS->FreePool (OutputString);
+              FreePool (OutputString);
             }
 
             MenuOption->Row = OriginalRow;
 
-            gBS->FreePool (OptionString);
+            FreePool (OptionString);
           } else {
             if (NewLine) {
               if (MenuOption->GrayOut) {
@@ -1979,7 +1979,7 @@ UiDisplayMenu (
                   MenuOption->Row++;
                 }
 
-                gBS->FreePool (OutputString);
+                FreePool (OutputString);
               }
 
               MenuOption->Row = OriginalRow;
@@ -2057,12 +2057,12 @@ UiDisplayMenu (
               MenuOption->Row++;
             }
 
-            gBS->FreePool (OutputString);
+            FreePool (OutputString);
           }
 
           MenuOption->Row = OriginalRow;
 
-          gBS->FreePool (OptionString);
+          FreePool (OptionString);
         } else {
           if (NewLine) {
             OriginalRow = MenuOption->Row;
@@ -2080,7 +2080,7 @@ UiDisplayMenu (
                 MenuOption->Row++;
               }
 
-              gBS->FreePool (OutputString);
+              FreePool (OutputString);
             }
 
             MenuOption->Row = OriginalRow;
@@ -2372,8 +2372,8 @@ UiDisplayMenu (
             break;
           }
 
-          gBS->FreePool (StringPtr);
-          gBS->FreePool (DevicePath);
+          FreePool (StringPtr);
+          FreePool (DevicePath);
 
           CopyMem (&Selection->FormSetGuid, &Statement->RefFormSetId, sizeof (EFI_GUID));
           Selection->FormId = Statement->RefFormId;

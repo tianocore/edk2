@@ -333,7 +333,7 @@ SendForm (
 
     } while (Selection->Action == UI_ACTION_REFRESH_FORMSET);
 
-    gBS->FreePool (Selection);
+    FreePool (Selection);
   }
 
   if (ActionRequest != NULL) {
@@ -482,14 +482,14 @@ BrowserCallback (
     if (*ResultsDataSize < BufferSize) {
       *ResultsDataSize = BufferSize;
 
-      gBS->FreePool (ConfigResp);
+      FreePool (ConfigResp);
       return EFI_BUFFER_TOO_SMALL;
     }
 
     *ResultsDataSize = BufferSize;
     CopyMem (ResultsData, StrPtr, BufferSize);
 
-    gBS->FreePool (ConfigResp);
+    FreePool (ConfigResp);
   } else {
     //
     // Prepare <ConfigResp>
@@ -701,7 +701,7 @@ GetToken (
   Status = HiiLibGetString (HiiHandle, Token, String, &BufferLength);
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    gBS->FreePool (String);
+    FreePool (String);
     String = AllocateZeroPool (BufferLength);
     ASSERT (String != NULL);
 
@@ -762,7 +762,7 @@ NewStringCat (
   StrCpy (NewString, *Dest);
   StrCat (NewString, Src);
 
-  gBS->FreePool (*Dest);
+  FreePool (*Dest);
   *Dest = NewString;
 }
 
@@ -1188,7 +1188,7 @@ GetQuestionValue (
         Status = HexStringToBuf (Dst, &StorageWidth, Value, NULL);
       }
 
-      gBS->FreePool (Value);
+      FreePool (Value);
     }
   } else {
     //
@@ -1241,7 +1241,7 @@ GetQuestionValue (
       Value = Value + 6;
     }
     if (*Value != '=') {
-      gBS->FreePool (Result);
+      FreePool (Result);
       return EFI_NOT_FOUND;
     }
     //
@@ -1267,7 +1267,7 @@ GetQuestionValue (
     } else {
       Status = HexStringToBuf (Dst, &StorageWidth, Value, NULL);
       if (EFI_ERROR (Status)) {
-        gBS->FreePool (Result);
+        FreePool (Result);
         return Status;
       }
     }
@@ -1280,7 +1280,7 @@ GetQuestionValue (
     } else {
       SetValueByName (Storage, Question->VariableName, Value);
     }
-    gBS->FreePool (Result);
+    FreePool (Result);
   }
 
   return Status;
@@ -1450,7 +1450,7 @@ SetQuestionValue (
     }
 
     Status = SetValueByName (Storage, Question->VariableName, Value);
-    gBS->FreePool (Value);
+    FreePool (Value);
   }
 
   if (!Cached) {
@@ -1505,11 +1505,11 @@ SetQuestionValue (
                                         &Progress
                                         );
       if (EFI_ERROR (Status)) {
-        gBS->FreePool (ConfigResp);
+        FreePool (ConfigResp);
         return Status;
       }
     }
-    gBS->FreePool (ConfigResp);
+    FreePool (ConfigResp);
 
     //
     // Synchronize shadow Buffer
@@ -1577,7 +1577,7 @@ ValidateQuestion (
         do {
           CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, PopUp, gPressEnter, gEmptyString);
         } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-        gBS->FreePool (PopUp);
+        FreePool (PopUp);
       }
 
       return EFI_NOT_READY;
@@ -1692,11 +1692,11 @@ SubmitForm (
                                         &Progress
                                         );
       if (EFI_ERROR (Status)) {
-        gBS->FreePool (ConfigResp);
+        FreePool (ConfigResp);
         return Status;
       }
     }
-    gBS->FreePool (ConfigResp);
+    FreePool (ConfigResp);
 
     //
     // Config success, update storage shadow Buffer
@@ -2034,7 +2034,7 @@ LoadStorage (
   }
 
   Status = ConfigRespToStorage (Storage, Result);
-  gBS->FreePool (Result);
+  FreePool (Result);
   return Status;
 }
 
@@ -2211,7 +2211,7 @@ GetIfrBinaryData (
     //
     // Form package not found in this Package List
     //
-    gBS->FreePool (HiiPackageList);
+    FreePool (HiiPackageList);
     return EFI_NOT_FOUND;
   }
 
@@ -2230,7 +2230,7 @@ GetIfrBinaryData (
   *BinaryLength = PackageHeader.Length - Offset2;
   *BinaryData = AllocateCopyPool (*BinaryLength, OpCodeData);
 
-  gBS->FreePool (HiiPackageList);
+  FreePool (HiiPackageList);
 
   if (*BinaryData == NULL) {
     return EFI_OUT_OF_RESOURCES;

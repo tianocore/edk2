@@ -435,7 +435,7 @@ InitializeRequestElement (
     NewStr = AllocateZeroPool (StringSize + CONFIG_REQUEST_STRING_INCREMENTAL * sizeof (CHAR16));
     if (Storage->ConfigRequest != NULL) {
       CopyMem (NewStr, Storage->ConfigRequest, StringSize);
-      gBS->FreePool (Storage->ConfigRequest);
+      FreePool (Storage->ConfigRequest);
     }
     Storage->ConfigRequest = NewStr;
     Storage->SpareStrLen   = CONFIG_REQUEST_STRING_INCREMENTAL;
@@ -476,7 +476,7 @@ DestroyExpression (
   //
   // Free this Expression
   //
-  gBS->FreePool (Expression);
+  FreePool (Expression);
 }
 
 
@@ -560,7 +560,7 @@ DestroyStatement (
     Default = QUESTION_DEFAULT_FROM_LINK (Link);
     RemoveEntryList (&Default->Link);
 
-    gBS->FreePool (Default);
+    FreePool (Default);
   }
 
   //
@@ -571,7 +571,7 @@ DestroyStatement (
     Option = QUESTION_OPTION_FROM_LINK (Link);
     RemoveEntryList (&Option->Link);
 
-    gBS->FreePool (Option);
+    FreePool (Option);
   }
 
   //
@@ -645,7 +645,7 @@ DestroyForm (
   //
   // Free this Form
   //
-  gBS->FreePool (Form);
+  FreePool (Form);
 }
 
 
@@ -692,7 +692,7 @@ DestroyFormSet (
       DefaultStore = FORMSET_DEFAULTSTORE_FROM_LINK (Link);
       RemoveEntryList (&DefaultStore->Link);
 
-      gBS->FreePool (DefaultStore);
+      FreePool (DefaultStore);
     }
   }
 

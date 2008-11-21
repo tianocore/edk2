@@ -66,7 +66,7 @@ ClearLines (
 
   gST->ConOut->SetCursorPosition (gST->ConOut, LeftColumn, TopRow);
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
   return ;
 }
 
@@ -269,7 +269,7 @@ DisplayPageFrame (
           break;
         }
 
-        gBS->FreePool (StrFrontPageBanner);
+        FreePool (StrFrontPageBanner);
       }
     }
   }
@@ -350,7 +350,7 @@ DisplayPageFrame (
     }
   }
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
 
 }
 
@@ -486,7 +486,7 @@ DisplayForm (
   //
   // Remove Buffer allocated for StringPtr after it has been used.
   //
-  gBS->FreePool (StringPtr);
+  FreePool (StringPtr);
 
   //
   // Evaluate all the Expressions in this Form
@@ -521,7 +521,7 @@ DisplayForm (
           NumberOfLines++;
         }
 
-        gBS->FreePool (OutputString);
+        FreePool (OutputString);
       }
 
       //

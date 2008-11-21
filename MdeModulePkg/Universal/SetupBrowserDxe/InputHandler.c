@@ -114,8 +114,8 @@ ReadString (
         break;
 
       case SCAN_ESC:
-        gBS->FreePool (TempString);
-        gBS->FreePool (BufferedString);
+        FreePool (TempString);
+        FreePool (BufferedString);
         gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
         gST->ConOut->EnableCursor (gST->ConOut, CursorVisible);
         return EFI_DEVICE_ERROR;
@@ -129,8 +129,8 @@ ReadString (
     case CHAR_CARRIAGE_RETURN:
       if (GetStringWidth (StringPtr) >= ((Minimum + 1) * sizeof (CHAR16))) {
 
-        gBS->FreePool (TempString);
-        gBS->FreePool (BufferedString);
+        FreePool (TempString);
+        FreePool (BufferedString);
         gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
         gST->ConOut->EnableCursor (gST->ConOut, CursorVisible);
         return EFI_SUCCESS;
@@ -143,8 +143,8 @@ ReadString (
           CreateDialog (4, TRUE, 0, NULL, &Key, &NullCharacter, gMiniString, gPressEnter, &NullCharacter);
         } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
-        gBS->FreePool (TempString);
-        gBS->FreePool (BufferedString);
+        FreePool (TempString);
+        FreePool (BufferedString);
         gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
         gST->ConOut->EnableCursor (gST->ConOut, CursorVisible);
         return EFI_DEVICE_ERROR;
@@ -804,7 +804,7 @@ GetSelectionInputPopUp (
     if (StrLen (StringPtr) > PopUpWidth) {
       PopUpWidth = StrLen (StringPtr);
     }
-    gBS->FreePool (StringPtr);
+    FreePool (StringPtr);
 
     if (!OrderedList && CompareHiiValue (&Question->HiiValue, &OneOfOption->Value, NULL) == 0) {
       //
@@ -901,7 +901,7 @@ GetSelectionInputPopUp (
         TempStringPtr = AllocateZeroPool (sizeof (CHAR16) * (PopUpWidth - 1));
         ASSERT ( TempStringPtr != NULL );
         CopyMem (TempStringPtr, StringPtr, (sizeof (CHAR16) * (PopUpWidth - 5)));
-        gBS->FreePool (StringPtr);
+        FreePool (StringPtr);
         StringPtr = TempStringPtr;
         StrCat (StringPtr, L"...");
       }
@@ -921,7 +921,7 @@ GetSelectionInputPopUp (
         }
 
       Index2++;
-      gBS->FreePool (StringPtr);
+      FreePool (StringPtr);
     }
 
     Character = BOXDRAW_UP_RIGHT;
@@ -1067,7 +1067,7 @@ TheKey:
           }
         }
 
-        gBS->FreePool (HiiValueArray);
+        FreePool (HiiValueArray);
         return EFI_DEVICE_ERROR;
 
       default:
@@ -1100,7 +1100,7 @@ TheKey:
       }
 
       gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
-      gBS->FreePool (HiiValueArray);
+      FreePool (HiiValueArray);
 
       Status = ValidateQuestion (Selection->FormSet, Selection->Form, Question, EFI_HII_EXPRESSION_INCONSISTENT_IF);
       if (EFI_ERROR (Status)) {

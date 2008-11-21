@@ -147,8 +147,8 @@ PrintInternal (
   Out->OutputString (Out, &BackupBuffer[PreviousIndex]);
   Count += StrLen (&BackupBuffer[PreviousIndex]);
 
-  gBS->FreePool (Buffer);
-  gBS->FreePool (BackupBuffer);
+  FreePool (Buffer);
+  FreePool (BackupBuffer);
   return Count;
 }
 

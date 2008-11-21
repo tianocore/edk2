@@ -383,7 +383,7 @@ ProcessOptions (
           Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
           UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
 
-          gBS->FreePool (*OptionString);
+          FreePool (*OptionString);
           *OptionString = NULL;
           return EFI_NOT_FOUND;
         }
@@ -407,7 +407,7 @@ ProcessOptions (
           Character[0] = CHAR_CARRIAGE_RETURN;
           NewStrCat (OptionString[0], Character);
 
-          gBS->FreePool (StringPtr);
+          FreePool (StringPtr);
         }
       }
     }
@@ -450,7 +450,7 @@ ProcessOptions (
           Link = GetNextNode (&Question->OptionListHead, Link);
         }
 
-        gBS->FreePool (*OptionString);
+        FreePool (*OptionString);
         *OptionString = NULL;
       }
 
@@ -495,7 +495,7 @@ ProcessOptions (
         Character[0] = RIGHT_ONEOF_DELIMITER;
         NewStrCat (OptionString[0], Character);
 
-        gBS->FreePool (StringPtr);
+        FreePool (StringPtr);
       }
     }
     break;
@@ -521,7 +521,7 @@ ProcessOptions (
         // Inconsistent check fail, restore Question Value
         //
         QuestionValue->Value.b = (BOOLEAN) (QuestionValue->Value.b ? FALSE : TRUE);
-        gBS->FreePool (*OptionString);
+        FreePool (*OptionString);
         *OptionString = NULL;
         return Status;
       }
@@ -641,7 +641,7 @@ ProcessOptions (
         UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
       }
 
-      gBS->FreePool (StringPtr);
+      FreePool (StringPtr);
     } else {
       *OptionString = AllocateZeroPool (BufferSize);
       ASSERT (*OptionString);
@@ -675,7 +675,7 @@ ProcessOptions (
           //
           // Callback request to terminate password input
           //
-          gBS->FreePool (StringPtr);
+          FreePool (StringPtr);
           return EFI_SUCCESS;
         }
 
@@ -685,7 +685,7 @@ ProcessOptions (
           //
           Status = ReadString (MenuOption, gPromptForPassword, StringPtr);
           if (EFI_ERROR (Status)) {
-            gBS->FreePool (StringPtr);
+            FreePool (StringPtr);
             return Status;
           }
 
@@ -703,7 +703,7 @@ ProcessOptions (
               Status = EFI_SUCCESS;
             }
 
-            gBS->FreePool (StringPtr);
+            FreePool (StringPtr);
             return Status;
           }
         }
@@ -717,7 +717,7 @@ ProcessOptions (
           //
           Status = ReadString (MenuOption, gPromptForPassword, StringPtr);
           if (EFI_ERROR (Status)) {
-            gBS->FreePool (StringPtr);
+            FreePool (StringPtr);
             return Status;
           }
 
@@ -730,12 +730,12 @@ ProcessOptions (
             //
             PasswordInvalid ();
 
-            gBS->FreePool (StringPtr);
-            gBS->FreePool (TempString);
+            FreePool (StringPtr);
+            FreePool (TempString);
             return Status;
           }
 
-          gBS->FreePool (TempString);
+          FreePool (TempString);
         }
       }
 
@@ -752,7 +752,7 @@ ProcessOptions (
           PasswordCallback (Selection, MenuOption, NULL);
         }
 
-        gBS->FreePool (StringPtr);
+        FreePool (StringPtr);
         return Status;
       }
 
@@ -770,8 +770,8 @@ ProcessOptions (
           PasswordCallback (Selection, MenuOption, NULL);
         }
 
-        gBS->FreePool (StringPtr);
-        gBS->FreePool (TempString);
+        FreePool (StringPtr);
+        FreePool (TempString);
         return Status;
       }
 
@@ -804,8 +804,8 @@ ProcessOptions (
         } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
       }
 
-      gBS->FreePool (TempString);
-      gBS->FreePool (StringPtr);
+      FreePool (TempString);
+      FreePool (StringPtr);
     }
     break;
 
@@ -833,7 +833,7 @@ ProcessHelpString (
   IN  UINTN   RowCount
   )
 {
-  UINTN BlockWidth = (UINTN) gHelpBlockWidth - 1;
+  UINTN BlockWidth;
   UINTN AllocateSize;
   //
   // [PrevCurrIndex, CurrIndex) forms a range of a screen-line
@@ -866,6 +866,8 @@ ProcessHelpString (
   UINTN *IndexArray;
   UINTN *OldIndexArray;
 
+  BlockWidth = (UINTN) gHelpBlockWidth - 1;
+  
   //
   // every three elements of IndexArray form a screen-line of string:[ IndexArray[i*3], IndexArray[i*3+1] )
   // IndexArray[i*3+2] stores the initial glyph width of single character. to save this is because we want
@@ -877,7 +879,7 @@ ProcessHelpString (
   IndexArray    = AllocatePool (AllocateSize * sizeof (UINTN) * 3);
 
   if (*FormattedString != NULL) {
-    gBS->FreePool (*FormattedString);
+    FreePool (*FormattedString);
     *FormattedString = NULL;
   }
 
@@ -891,7 +893,7 @@ ProcessHelpString (
       OldIndexArray  = IndexArray;
       IndexArray = AllocatePool (AllocateSize * sizeof (UINTN) * 3);
       CopyMem (IndexArray, OldIndexArray, LineCount * sizeof (UINTN) * 3);
-      gBS->FreePool (OldIndexArray);
+      FreePool (OldIndexArray);
     }
     switch (StringPtr[CurrIndex]) {
 
@@ -1020,5 +1022,5 @@ ProcessHelpString (
       );
   }
 
-  gBS->FreePool (IndexArray);
+  FreePool (IndexArray);
 }
