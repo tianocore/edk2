@@ -22,7 +22,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Declares that the system memory buffer specified by MemoryBegin and MemoryLength
   as permanent memory that may be used for general purpose use by software.
   The amount of memory available to software may be less than MemoryLength
-  if published memory has alignment restrictions.  
+  if published memory has alignment restrictions. 
+  If MemoryLength is 0, then ASSERT().
+  If MemoryLength is greater than (MAX_ADDRESS - MemoryBegin + 1), then ASSERT(). 
 
   @param  MemoryBegin               The start address of the memory being declared.
   @param  MemoryLength              The number of bytes of memory being declared.
