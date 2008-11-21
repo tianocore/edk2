@@ -39,8 +39,9 @@ UINT64  mGuidCount = 0;
 EFI_STATUS
 GetPackageCount (
   IN CONST EFI_HII_PACKAGES               *Packages,
-  UINTN                                   *IfrPackageCount,
-  UINTN                                   *StringPackageCount
+  OUT UINTN                               *IfrPackageCount,
+  OUT UINTN                               *StringPackageCount,
+  OUT UINTN                               *FontPackageCount
   )
 {
   UINTN                         Index;
@@ -49,9 +50,11 @@ GetPackageCount (
   ASSERT (Packages != NULL);
   ASSERT (IfrPackageCount != NULL);
   ASSERT (StringPackageCount != NULL);
+  ASSERT (FontPackageCount != NULL);
 
   *IfrPackageCount = 0;
   *StringPackageCount = 0;
+  *FontPackageCount = 0;
 
   TianoAutogenPackageHdrArray = (TIANO_AUTOGEN_PACKAGES_HEADER **) (((UINT8 *) &Packages->GuidId) + sizeof (Packages->GuidId));
   
@@ -63,23 +66,21 @@ GetPackageCount (
     // may not be the exact number of valid package number in the binary generated 
     // by HII Build tool.
     //
-    switch (TianoAutogenPackageHdrArray[Index]->PackageHeader.Type) {
-      case EFI_HII_PACKAGE_FORMS:
+    switch (TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader.Type) {
+      case EFI_HII_IFR:
         *IfrPackageCount += 1;
         break;
-      case EFI_HII_PACKAGE_STRINGS:
+      case EFI_HII_STRING:
         *StringPackageCount += 1;
         break;
 
-      case EFI_HII_PACKAGE_SIMPLE_FONTS:
+      case EFI_HII_FONT:
+        *FontPackageCount += 1;
         break;
 
       //
       // The following fonts are invalid for a module that using Framework to UEFI thunk layer.
       //
-      case EFI_HII_PACKAGE_KEYBOARD_LAYOUT:
-      case EFI_HII_PACKAGE_FONTS:
-      case EFI_HII_PACKAGE_IMAGES:
       default:
         ASSERT (FALSE);
         return EFI_INVALID_PARAMETER;
@@ -144,6 +145,98 @@ UpdatePackListWithOnlyIfrPack (
   
 }
 
+/**
+  Caculate the size of UEFI Simple Font Package that is needed to 
+  convert all the font a Framework Font Paackage.
+
+  ONLY Narrow Font is supported. Wide Font is discarded. 
+
+  If the Package Header is not of EFI_HII_FONT type, then ASSERT.
+
+  @param   The Package header of the Framework Font Package.
+  
+  @return  The size of the UEFI Simple Font Package.
+  
+**/
+UINTN
+GetUefiSimpleFontPackSize (
+  IN CONST EFI_HII_PACK_HEADER * PackHeader
+  )
+{
+  UINTN             Size;
+  EFI_HII_FONT_PACK *FwFontPack;
+
+  FwFontPack = (EFI_HII_FONT_PACK *) PackHeader;
+
+  ASSERT (FwFontPack->Header.Type == EFI_HII_FONT);
+  
+  Size = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) 
+    + (FwFontPack->NumberOfNarrowGlyphs * sizeof (EFI_NARROW_GLYPH));
+
+   return Size;
+}
+
+
+/**
+  Convert Font Package in Framework format to a newly allocated UEFI
+  Simple Font Package.
+
+  ONLY Narrow Font is supported. Wide Font is discarded. 
+
+  If memory allocation fails, then ASSERT.
+
+  @param FwFontPack        Framework Font Package.
+
+  @reture UEFI Simple Font Package.
+**/
+EFI_HII_SIMPLE_FONT_PACKAGE_HDR *
+FrameworkFontPackToUefiSimpliedFont (
+  IN CONST EFI_HII_PACK_HEADER * PackHeader
+  )
+{
+  EFI_HII_SIMPLE_FONT_PACKAGE_HDR       *FontPack;
+  UINTN                                 Size;
+  EFI_NARROW_GLYPH                      *FwNarrowGlyph;
+  EFI_NARROW_GLYPH                      *NarrowGlyph;
+  UINTN                                 Idx;
+  EFI_HII_FONT_PACK                     *FwFontPack;
+
+  Size = GetUefiSimpleFontPackSize (PackHeader);
+
+  FwFontPack = (EFI_HII_FONT_PACK *) PackHeader;
+
+  FontPack      = AllocateZeroPool (Size);
+  ASSERT (FontPack != NULL);
+
+  //
+  // Prepare the Header information.
+  //
+  FontPack->Header.Length = (UINT32) Size;
+  FontPack->Header.Type = EFI_HII_PACKAGE_SIMPLE_FONTS;
+
+  FontPack->NumberOfNarrowGlyphs = FwFontPack->NumberOfNarrowGlyphs;
+  
+  //
+  // ONLY Narrow Font is supported. Wide Font is discarded. 
+  //
+  FontPack->NumberOfWideGlyphs = 0;
+ 
+  //
+  // Copy Narrow Glyph
+  //
+  NarrowGlyph   = (EFI_NARROW_GLYPH *) (FontPack + 1);
+  FwNarrowGlyph = (EFI_NARROW_GLYPH *) (FwFontPack + 1);
+  CopyMem (NarrowGlyph, FwNarrowGlyph, sizeof (EFI_NARROW_GLYPH) * FwFontPack->NumberOfNarrowGlyphs);
+  for (Idx = 0; Idx < FwFontPack->NumberOfNarrowGlyphs; Idx++) {
+    //
+    // Clear the GLYPH_NON_BREAKING (EFI_GLYPH_WIDE is used here as they are all 0x02)
+    // attribute which is not defined in UEFI EFI_NARROW_GLYPH
+    //
+    NarrowGlyph[Idx].Attributes = (UINT8) (NarrowGlyph[Idx].Attributes & ~(EFI_GLYPH_WIDE));
+  }
+
+  return FontPack;
+}
 
 /**
   Prepare a UEFI Package List from a Framework HII package list registered
@@ -170,7 +263,9 @@ PrepareUefiPackageListFromFrameworkHiiPackages (
   UINT32                      PackageLength;
   EFI_HII_PACKAGE_HEADER      PackageHeader;
   UINTN                       Index;
-  TIANO_AUTOGEN_PACKAGES_HEADER **TianoAutogenPackageHdrArray;
+  TIANO_AUTOGEN_PACKAGES_HEADER   **TianoAutogenPackageHdrArray;
+  EFI_HII_SIMPLE_FONT_PACKAGE_HDR *FontPack;
+  
 
   ASSERT (Packages != NULL);
   ASSERT (PackageListGuid != NULL);
@@ -181,11 +276,29 @@ PrepareUefiPackageListFromFrameworkHiiPackages (
   PackageListLength = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
 
   for (Index = 0; Index < NumberOfPackages; Index++) {
-    CopyMem (&PackageLength, &TianoAutogenPackageHdrArray[Index]->BinaryLength, sizeof (UINT32));
-    //
-    //TIANO_AUTOGEN_PACKAGES_HEADER.BinaryLength include the BinaryLength itself.
-    //
-    PackageListLength += (PackageLength - sizeof(UINT32)); 
+    if (TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader.Type == EFI_HII_FONT) {
+      //
+      // There is no tool to generate Font package in Framework HII's implementation.
+      // Therefore, Font Package be a C structure defined in Framework HII code. 
+      // Therefore, Font Package will be in Framework HII format defined by EFI_HII_FONT_PACK.
+      // We need to create a UEFI Simple Font Package and copy over all data. Hence, EFI_HII_FONT
+      // is handled differently than EFI_HII_IFR and EFI_HII_STRING.
+      //
+      PackageListLength = (UINT32) (PackageListLength + GetUefiSimpleFontPackSize (&TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader));
+      
+    } else {
+      //
+      // For EFI_HII_IFR and EFI_HII_STRING, EDK II's VFR Compiler and Build.exe will generate a binary in a format
+      // defined by TIANO_AUTOGEN_PACKAGES_HEADER. A Framework HII's EFI_HII_PACK_HEADER is inserted before
+      // the UEFI package data.
+      //
+      CopyMem (&PackageLength, &TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader.Length, sizeof (UINT32));
+      //
+      // EFI_HII_PACK_HEADER.FrameworkPackageHeader.Length include the sizeof FrameworkPackageHeader itself.
+      //
+      PackageListLength += (PackageLength - sizeof(EFI_HII_PACK_HEADER));
+      
+    }
   }
 
   //
@@ -200,10 +313,22 @@ PrepareUefiPackageListFromFrameworkHiiPackages (
 
   PackageListData = ((UINT8 *) PackageListHeader) + sizeof (EFI_HII_PACKAGE_LIST_HEADER);
 
+  //
+  // Build the UEFI Package List.
+  //
   for (Index = 0; Index < NumberOfPackages; Index++) {
-    CopyMem (&PackageLength, &(TianoAutogenPackageHdrArray[Index]->BinaryLength), sizeof (UINT32));
-    PackageLength  -= sizeof (UINT32);
-    CopyMem (PackageListData, &(TianoAutogenPackageHdrArray[Index]->PackageHeader), PackageLength);
+    if (TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader.Type == EFI_HII_FONT) {
+      PackageLength = (UINT32) GetUefiSimpleFontPackSize (&TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader);
+      FontPack = FrameworkFontPackToUefiSimpliedFont (&TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader);
+      CopyMem (PackageListData, FontPack, PackageLength);
+      FreePool (FontPack);
+      
+    } else {
+      CopyMem (&PackageLength, &(TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader.Length), sizeof (UINT32));
+      PackageLength  -= sizeof (EFI_HII_PACK_HEADER);
+      CopyMem (PackageListData, &(TianoAutogenPackageHdrArray[Index]->PackageHeader), PackageLength);
+      
+    }
     PackageListData += PackageLength;
   }
 
@@ -331,6 +456,7 @@ UefiRegisterPackageList (
   EFI_STATUS                  Status;
   UINTN                       StringPackageCount;
   UINTN                       IfrPackageCount;
+  UINTN                       FontPackageCount;
   EFI_HII_PACKAGE_LIST_HEADER *PackageListHeader;
   HII_THUNK_CONTEXT           *ThunkContext;
   HII_THUNK_CONTEXT           *ThunkContextToRemove;
@@ -339,7 +465,7 @@ UefiRegisterPackageList (
 
   PackageListHeader = NULL;
 
-  Status = GetPackageCount (Packages, &IfrPackageCount, &StringPackageCount);
+  Status = GetPackageCount (Packages, &IfrPackageCount, &StringPackageCount, &FontPackageCount);
   ASSERT_EFI_ERROR (Status);
   
   if (IfrPackageCount > 1) {
@@ -363,22 +489,29 @@ UefiRegisterPackageList (
     // If Packages->GuidId is NULL, the caller of FramworkHii->NewPack is registering
     // packages with at least 1 StringPack and 1 IfrPack. Therefore, Packages->GuidId is
     // not used as the name of the package list.  Formset GUID is used as the Package List
-    // GUID.
+    // GUID instead.
     //
-    ASSERT (StringPackageCount >=1 && IfrPackageCount == 1);
-    IfrPackage = GetIfrPackage (Packages);
-    GetFormSetGuid (IfrPackage, &ThunkContext->TagGuid);
+    ASSERT ((StringPackageCount >=1 && IfrPackageCount == 1) || (FontPackageCount > 0));
+    if (IfrPackageCount > 0) {
+      IfrPackage = GetIfrPackage (Packages);
+      GetFormSetGuid (IfrPackage, &ThunkContext->TagGuid);
+    } else {
+      ASSERT (FontPackageCount > 0);
+      GenerateRandomGuid (&ThunkContext->TagGuid);
+    }
+    
   } else {
     ThunkContextToRemove = TagGuidToIfrPackThunkContext (Private, Packages->GuidId);
     
     if (IfrPackageCount > 0 && 
         StringPackageCount > 0 && 
-        (ThunkContextToRemove!= NULL)) {
+        (ThunkContextToRemove != NULL)) {
         DEBUG((EFI_D_WARN, "Framework code registers HII package list with the same GUID more than once.\n"));
-        DEBUG((EFI_D_WARN, "This package list should be already registered. Just return successfully.\n"));
+        DEBUG((EFI_D_WARN, "Remove the previously registered package list and register the new one.\n"));
         HiiRemovePack (This, ThunkContextToRemove->FwHiiHandle);
     }
     CopyGuid (&ThunkContext->TagGuid, Packages->GuidId);
+    
   }
 
   //
@@ -390,6 +523,7 @@ UefiRegisterPackageList (
   if (IfrPackageCount != 0) {
     InstallDefaultConfigAccessProtocol (Packages, ThunkContext);
   }
+  
   PackageListHeader = PrepareUefiPackageListFromFrameworkHiiPackages (Packages, &ThunkContext->TagGuid);
   Status = mHiiDatabase->NewPackageList (
               mHiiDatabase,

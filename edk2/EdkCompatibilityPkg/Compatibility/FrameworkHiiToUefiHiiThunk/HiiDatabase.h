@@ -66,7 +66,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #pragma pack (push, 1)
 typedef struct {
-  UINT32                  BinaryLength;
+  EFI_HII_PACK_HEADER     FrameworkPackageHeader;
   EFI_HII_PACKAGE_HEADER  PackageHeader;
 } TIANO_AUTOGEN_PACKAGES_HEADER;
 #pragma pack (pop)

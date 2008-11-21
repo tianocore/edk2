@@ -267,20 +267,14 @@ GetIfrPackage (
     // may not be the exact number of valid package number in the binary generated 
     // by HII Build tool.
     //
-    switch (TianoAutogenPackageHdrArray[Index]->PackageHeader.Type) {
-      case EFI_HII_PACKAGE_FORMS:
+    switch (TianoAutogenPackageHdrArray[Index]->FrameworkPackageHeader.Type) {
+      case EFI_HII_IFR:
         return &TianoAutogenPackageHdrArray[Index]->PackageHeader;
         break;
-      case EFI_HII_PACKAGE_STRINGS:
-      case EFI_HII_PACKAGE_SIMPLE_FONTS:
+      case EFI_HII_STRING:
+      case EFI_HII_FONT:
         break;
 
-      //
-      // The following fonts are invalid for a module that using Framework to UEFI thunk layer.
-      //
-      case EFI_HII_PACKAGE_KEYBOARD_LAYOUT:
-      case EFI_HII_PACKAGE_FONTS:
-      case EFI_HII_PACKAGE_IMAGES:
       default:
         ASSERT (FALSE);
         return NULL;
