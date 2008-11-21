@@ -40,6 +40,10 @@ typedef enum {
   IO_UINT16 = 1,
   IO_UINT32 = 2,
   IO_UINT64 = 3,
+  //
+  // Below enumerations are added in "EFI 1.10 Specification update - 001", which
+  // is downloadable from http://download.intel.com/technology/efi/docs/EFI_1-10_Update.zip
+  //
   MMIO_COPY_UINT8  = 4,
   MMIO_COPY_UINT16 = 5,
   MMIO_COPY_UINT32 = 6,
