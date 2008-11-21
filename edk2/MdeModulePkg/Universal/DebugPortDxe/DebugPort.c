@@ -241,7 +241,7 @@ DebugPortSupported (
     if (Status == EFI_SUCCESS && 
         (Dp2->Type != MESSAGING_DEVICE_PATH ||
          Dp2->SubType != MSG_VENDOR_DP || 
-         *((UINT16 *) Dp2->Length) != sizeof (VENDOR_DEVICE_PATH))) {
+         *((UINT16 *) Dp2->Length) != sizeof (DEBUGPORT_DEVICE_PATH))) {
 
       Status = EFI_UNSUPPORTED;
     }
