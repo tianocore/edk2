@@ -29,19 +29,37 @@ EFI_DRIVER_BINDING_PROTOCOL gDebugPortDriverBinding = {
   NULL
 };
 
-DEBUGPORT_DEVICE  *gDebugPortDevice;
+DEBUGPORT_DEVICE mDebugPortDevice = {
+  DEBUGPORT_DEVICE_SIGNATURE,
+  (EFI_HANDLE) 0,
+  (EFI_HANDLE) 0,
+  (VOID *) NULL,
+  (EFI_DEVICE_PATH_PROTOCOL *) NULL,
+  {
+    DebugPortReset,
+    DebugPortRead, 
+    DebugPortWrite, 
+    DebugPortPoll 
+  },
+  (EFI_HANDLE) 0,
+  (EFI_SERIAL_IO_PROTOCOL *) NULL,
+  DEBUGPORT_UART_DEFAULT_BAUDRATE,
+  DEBUGPORT_UART_DEFAULT_FIFO_DEPTH,
+  DEBUGPORT_UART_DEFAULT_TIMEOUT,
+  (EFI_PARITY_TYPE) DEBUGPORT_UART_DEFAULT_PARITY,
+  DEBUGPORT_UART_DEFAULT_DATA_BITS,
+  (EFI_STOP_BITS_TYPE) DEBUGPORT_UART_DEFAULT_STOP_BITS
+};
 
 /**
   Local worker function to obtain device path information from DebugPort variable.
 
   Records requested settings in DebugPort device structure.
-  
-  @param  DebugPortDevice    Pointer to instance of dubug port device.
 
 **/
 VOID
 GetDebugPortVariable (
-  DEBUGPORT_DEVICE            *DebugPortDevice
+  VOID
   )
 {
   UINTN                     DataSize;
@@ -55,51 +73,51 @@ GetDebugPortVariable (
                   &gEfiDebugPortVariableGuid,
                   NULL,
                   &DataSize,
-                  DebugPortDevice->DebugPortVariable
+                  mDebugPortDevice.DebugPortVariable
                   );
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    if (gDebugPortDevice->DebugPortVariable != NULL) {
-      FreePool (gDebugPortDevice->DebugPortVariable);
+    if (mDebugPortDevice.DebugPortVariable != NULL) {
+      FreePool (mDebugPortDevice.DebugPortVariable);
     }
 
-    DebugPortDevice->DebugPortVariable = AllocatePool (DataSize);
-    if (DebugPortDevice->DebugPortVariable != NULL) {
+    mDebugPortDevice.DebugPortVariable = AllocatePool (DataSize);
+    if (mDebugPortDevice.DebugPortVariable != NULL) {
       gRT->GetVariable (
             (CHAR16 *) EFI_DEBUGPORT_VARIABLE_NAME,
             &gEfiDebugPortVariableGuid,
             NULL,
             &DataSize,
-            DebugPortDevice->DebugPortVariable
+            mDebugPortDevice.DebugPortVariable
             );
-      DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) DebugPortDevice->DebugPortVariable;
+      DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) mDebugPortDevice.DebugPortVariable;
       while (!IsDevicePathEnd (DevicePath) && !IS_UART_DEVICEPATH (DevicePath)) {
         DevicePath = NextDevicePathNode (DevicePath);
       }
 
       if (IsDevicePathEnd (DevicePath)) {
-        FreePool (gDebugPortDevice->DebugPortVariable);
-        DebugPortDevice->DebugPortVariable = NULL;
+        FreePool (mDebugPortDevice.DebugPortVariable);
+        mDebugPortDevice.DebugPortVariable = NULL;
       } else {
         CopyMem (
-          &DebugPortDevice->BaudRate,
+          &mDebugPortDevice.BaudRate,
           &((UART_DEVICE_PATH *) DevicePath)->BaudRate,
           sizeof (((UART_DEVICE_PATH *) DevicePath)->BaudRate)
           );
-        DebugPortDevice->ReceiveFifoDepth = DEBUGPORT_UART_DEFAULT_FIFO_DEPTH;
-        DebugPortDevice->Timeout          = DEBUGPORT_UART_DEFAULT_TIMEOUT;
+        mDebugPortDevice.ReceiveFifoDepth = DEBUGPORT_UART_DEFAULT_FIFO_DEPTH;
+        mDebugPortDevice.Timeout          = DEBUGPORT_UART_DEFAULT_TIMEOUT;
         CopyMem (
-          &DebugPortDevice->Parity,
+          &mDebugPortDevice.Parity,
           &((UART_DEVICE_PATH *) DevicePath)->Parity,
           sizeof (((UART_DEVICE_PATH *) DevicePath)->Parity)
           );
         CopyMem (
-          &DebugPortDevice->DataBits,
+          &mDebugPortDevice.DataBits,
           &((UART_DEVICE_PATH *) DevicePath)->DataBits,
           sizeof (((UART_DEVICE_PATH *) DevicePath)->DataBits)
           );
         CopyMem (
-          &DebugPortDevice->StopBits,
+          &mDebugPortDevice.StopBits,
           &((UART_DEVICE_PATH *) DevicePath)->StopBits,
           sizeof (((UART_DEVICE_PATH *) DevicePath)->StopBits)
           );
@@ -107,11 +125,6 @@ GetDebugPortVariable (
     }
   }
 }
-
-
-//
-// implementation code
-//
 
 /**
   Debug Port Driver entry point. 
@@ -149,29 +162,6 @@ InitializeDebugPortDriver (
              &gDebugPortComponentName2
              );
   ASSERT_EFI_ERROR (Status);
-  //
-  // Allocate and Initialize dev structure
-  //
-  gDebugPortDevice = AllocateZeroPool (sizeof (DEBUGPORT_DEVICE));
-  if (gDebugPortDevice == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  //
-  // Fill in static and default pieces of device structure first.
-  //
-  gDebugPortDevice->Signature = DEBUGPORT_DEVICE_SIGNATURE;
-
-  gDebugPortDevice->DebugPortInterface.Reset = DebugPortReset;
-  gDebugPortDevice->DebugPortInterface.Read = DebugPortRead;
-  gDebugPortDevice->DebugPortInterface.Write = DebugPortWrite;
-  gDebugPortDevice->DebugPortInterface.Poll = DebugPortPoll;
-
-  gDebugPortDevice->BaudRate = DEBUGPORT_UART_DEFAULT_BAUDRATE;
-  gDebugPortDevice->ReceiveFifoDepth = DEBUGPORT_UART_DEFAULT_FIFO_DEPTH;
-  gDebugPortDevice->Timeout = DEBUGPORT_UART_DEFAULT_TIMEOUT;
-  gDebugPortDevice->Parity = (EFI_PARITY_TYPE) DEBUGPORT_UART_DEFAULT_PARITY;
-  gDebugPortDevice->DataBits = DEBUGPORT_UART_DEFAULT_DATA_BITS;
-  gDebugPortDevice->StopBits = (EFI_STOP_BITS_TYPE) DEBUGPORT_UART_DEFAULT_STOP_BITS;
 
   return EFI_SUCCESS;
 }
@@ -214,6 +204,7 @@ DebugPortSupported (
 
   //
   // Check to see that there's not a debugport protocol already published
+  // Question: Why do we prevent debugport protocol published on more one device?
   //
   if (gBS->LocateProtocol (&gEfiDebugPortProtocolGuid, NULL, (VOID **) &DebugPortInterface) != EFI_NOT_FOUND) {
     return EFI_UNSUPPORTED;
@@ -221,16 +212,16 @@ DebugPortSupported (
   //
   // Read DebugPort variable to determine debug port selection and parameters
   //
-  GetDebugPortVariable (gDebugPortDevice);
+  GetDebugPortVariable ();
 
-  if (gDebugPortDevice->DebugPortVariable != NULL) {
+  if (mDebugPortDevice.DebugPortVariable != NULL) {
     //
     // There's a DEBUGPORT variable, so do LocateDevicePath and check to see if
     // the closest matching handle matches the controller handle, and if it does,
     // check to see that the remaining device path has the DebugPort GUIDed messaging
     // device path only.  Otherwise, it's a mismatch and EFI_UNSUPPORTED is returned.
     //
-    Dp1 = DuplicateDevicePath ((EFI_DEVICE_PATH_PROTOCOL *) gDebugPortDevice->DebugPortVariable);
+    Dp1 = DuplicateDevicePath ((EFI_DEVICE_PATH_PROTOCOL *) mDebugPortDevice.DebugPortVariable);
     if (Dp1 == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -247,7 +238,11 @@ DebugPortSupported (
       Status = EFI_UNSUPPORTED;
     }
 
-    if (Status == EFI_SUCCESS && (Dp2->Type != 3 || Dp2->SubType != 10 || *((UINT16 *) Dp2->Length) != 20)) {
+    if (Status == EFI_SUCCESS && 
+        (Dp2->Type != MESSAGING_DEVICE_PATH ||
+         Dp2->SubType != MSG_VENDOR_DP || 
+         *((UINT16 *) Dp2->Length) != sizeof (VENDOR_DEVICE_PATH))) {
+
       Status = EFI_UNSUPPORTED;
     }
 
@@ -313,7 +308,7 @@ DebugPortStart (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiSerialIoProtocolGuid,
-                  (VOID **) &gDebugPortDevice->SerialIoBinding,
+                  (VOID **) &mDebugPortDevice.SerialIoBinding,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER | EFI_OPEN_PROTOCOL_EXCLUSIVE
@@ -322,34 +317,34 @@ DebugPortStart (
     return Status;
   }
 
-  gDebugPortDevice->SerialIoDeviceHandle = ControllerHandle;
+  mDebugPortDevice.SerialIoDeviceHandle = ControllerHandle;
 
   //
   // Initialize the Serial Io interface...
   //
-  Status = gDebugPortDevice->SerialIoBinding->SetAttributes (
-                                                gDebugPortDevice->SerialIoBinding,
-                                                gDebugPortDevice->BaudRate,
-                                                gDebugPortDevice->ReceiveFifoDepth,
-                                                gDebugPortDevice->Timeout,
-                                                gDebugPortDevice->Parity,
-                                                gDebugPortDevice->DataBits,
-                                                gDebugPortDevice->StopBits
+  Status = mDebugPortDevice.SerialIoBinding->SetAttributes (
+                                                mDebugPortDevice.SerialIoBinding,
+                                                mDebugPortDevice.BaudRate,
+                                                mDebugPortDevice.ReceiveFifoDepth,
+                                                mDebugPortDevice.Timeout,
+                                                mDebugPortDevice.Parity,
+                                                mDebugPortDevice.DataBits,
+                                                mDebugPortDevice.StopBits
                                                 );
   if (EFI_ERROR (Status)) {
-    gDebugPortDevice->BaudRate          = 0;
-    gDebugPortDevice->Parity            = DefaultParity;
-    gDebugPortDevice->DataBits          = 0;
-    gDebugPortDevice->StopBits          = DefaultStopBits;
-    gDebugPortDevice->ReceiveFifoDepth  = 0;
-    Status = gDebugPortDevice->SerialIoBinding->SetAttributes (
-                                                  gDebugPortDevice->SerialIoBinding,
-                                                  gDebugPortDevice->BaudRate,
-                                                  gDebugPortDevice->ReceiveFifoDepth,
-                                                  gDebugPortDevice->Timeout,
-                                                  gDebugPortDevice->Parity,
-                                                  gDebugPortDevice->DataBits,
-                                                  gDebugPortDevice->StopBits
+    mDebugPortDevice.BaudRate          = 0;
+    mDebugPortDevice.Parity            = DefaultParity;
+    mDebugPortDevice.DataBits          = 0;
+    mDebugPortDevice.StopBits          = DefaultStopBits;
+    mDebugPortDevice.ReceiveFifoDepth  = 0;
+    Status = mDebugPortDevice.SerialIoBinding->SetAttributes (
+                                                  mDebugPortDevice.SerialIoBinding,
+                                                  mDebugPortDevice.BaudRate,
+                                                  mDebugPortDevice.ReceiveFifoDepth,
+                                                  mDebugPortDevice.Timeout,
+                                                  mDebugPortDevice.Parity,
+                                                  mDebugPortDevice.DataBits,
+                                                  mDebugPortDevice.StopBits
                                                   );
     if (EFI_ERROR (Status)) {
       gBS->CloseProtocol (
@@ -362,7 +357,7 @@ DebugPortStart (
     }
   }
 
-  gDebugPortDevice->SerialIoBinding->Reset (gDebugPortDevice->SerialIoBinding);
+  mDebugPortDevice.SerialIoBinding->Reset (mDebugPortDevice.SerialIoBinding);
 
   //
   // Create device path instance for DebugPort
@@ -378,19 +373,19 @@ DebugPortStart (
     SetDevicePathEndNode (Dp1);
   }
 
-  gDebugPortDevice->DebugPortDevicePath = AppendDevicePathNode (Dp1, (EFI_DEVICE_PATH_PROTOCOL *) &DebugPortDP);
-  if (gDebugPortDevice->DebugPortDevicePath == NULL) {
+  mDebugPortDevice.DebugPortDevicePath = AppendDevicePathNode (Dp1, (EFI_DEVICE_PATH_PROTOCOL *) &DebugPortDP);
+  if (mDebugPortDevice.DebugPortDevicePath == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   //
   // Publish DebugPort and Device Path protocols
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &gDebugPortDevice->DebugPortDeviceHandle,
+                  &mDebugPortDevice.DebugPortDeviceHandle,
                   &gEfiDevicePathProtocolGuid,
-                  gDebugPortDevice->DebugPortDevicePath,
+                  mDebugPortDevice.DebugPortDevicePath,
                   &gEfiDebugPortProtocolGuid,
-                  &gDebugPortDevice->DebugPortInterface,
+                  &mDebugPortDevice.DebugPortInterface,
                   NULL
                   );
 
@@ -409,9 +404,9 @@ DebugPortStart (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiSerialIoProtocolGuid,
-                  (VOID **) &gDebugPortDevice->SerialIoBinding,
+                  (VOID **) &mDebugPortDevice.SerialIoBinding,
                   This->DriverBindingHandle,
-                  gDebugPortDevice->DebugPortDeviceHandle,
+                  mDebugPortDevice.DebugPortDeviceHandle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                   );
 
@@ -421,7 +416,7 @@ DebugPortStart (
 
       BufferSize = 48;
       DebugPortWrite (
-        &gDebugPortDevice->DebugPortInterface,
+        &mDebugPortDevice.DebugPortInterface,
         0,
         &BufferSize,
         "DebugPort driver failed to open child controller\n\n"
@@ -438,15 +433,16 @@ DebugPortStart (
   }
 
   DEBUG_CODE_BEGIN ();
-    UINTN  BufferSize;
+    UINTN                     BufferSize;
 
     BufferSize = 38;
     DebugPortWrite (
-      &gDebugPortDevice->DebugPortInterface,
+      &mDebugPortDevice.DebugPortInterface,
       0,
       &BufferSize,
       "Hello World from the DebugPort driver\n\n"
       );
+
   DEBUG_CODE_END ();
 
   return EFI_SUCCESS;
@@ -488,7 +484,7 @@ DebugPortStop (
           ControllerHandle
           );
 
-    gDebugPortDevice->SerialIoBinding = NULL;
+    mDebugPortDevice.SerialIoBinding = NULL;
 
     gBS->CloseProtocol (
           ControllerHandle,
@@ -497,7 +493,7 @@ DebugPortStop (
           ControllerHandle
           );
 
-    FreePool (gDebugPortDevice->DebugPortDevicePath);
+    FreePool (mDebugPortDevice.DebugPortDevicePath);
 
     return EFI_SUCCESS;
   } else {
@@ -505,10 +501,10 @@ DebugPortStop (
     // Disconnect SerialIo child handle
     //
     Status = gBS->CloseProtocol (
-                    gDebugPortDevice->SerialIoDeviceHandle,
+                    mDebugPortDevice.SerialIoDeviceHandle,
                     &gEfiSerialIoProtocolGuid,
                     This->DriverBindingHandle,
-                    gDebugPortDevice->DebugPortDeviceHandle
+                    mDebugPortDevice.DebugPortDeviceHandle
                     );
 
     if (EFI_ERROR (Status)) {
@@ -518,11 +514,11 @@ DebugPortStop (
     // Unpublish our protocols (DevicePath, DebugPort)
     //
     Status = gBS->UninstallMultipleProtocolInterfaces (
-                    gDebugPortDevice->DebugPortDeviceHandle,
+                    mDebugPortDevice.DebugPortDeviceHandle,
                     &gEfiDevicePathProtocolGuid,
-                    gDebugPortDevice->DebugPortDevicePath,
+                    mDebugPortDevice.DebugPortDevicePath,
                     &gEfiDebugPortProtocolGuid,
-                    &gDebugPortDevice->DebugPortInterface,
+                    &mDebugPortDevice.DebugPortInterface,
                     NULL
                     );
 
@@ -530,13 +526,13 @@ DebugPortStop (
       gBS->OpenProtocol (
             ControllerHandle,
             &gEfiSerialIoProtocolGuid,
-            (VOID **) &gDebugPortDevice->SerialIoBinding,
+            (VOID **) &mDebugPortDevice.SerialIoBinding,
             This->DriverBindingHandle,
-            gDebugPortDevice->DebugPortDeviceHandle,
+            mDebugPortDevice.DebugPortDeviceHandle,
             EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
             );
     } else {
-      gDebugPortDevice->DebugPortDeviceHandle = NULL;
+      mDebugPortDevice.DebugPortDeviceHandle = NULL;
     }
   }
 
@@ -604,6 +600,7 @@ DebugPortRead (
   DebugPortDevice = DEBUGPORT_DEVICE_FROM_THIS (This);
   BufferPtr       = Buffer;
   LocalBufferSize = *BufferSize;
+
   do {
     Status = DebugPortDevice->SerialIoBinding->Read (
                                                 DebugPortDevice->SerialIoBinding,
@@ -733,7 +730,6 @@ DebugPortPoll (
 
   @retval EFI_SUCCESS     Unload Debug Port driver successfully.
   @retval EFI_ABORTED     Serial IO is still binding.
-  @retval others          Fails to unload Debug Port driver.
 
 **/
 EFI_STATUS
@@ -742,32 +738,16 @@ ImageUnloadHandler (
   EFI_HANDLE ImageHandle
   )
 {
-  EFI_STATUS  Status;
-
-  if (gDebugPortDevice->SerialIoBinding != NULL) {
+  if (mDebugPortDevice.SerialIoBinding != NULL) {
     return EFI_ABORTED;
   }
 
-  Status = gBS->UninstallMultipleProtocolInterfaces (
-                  ImageHandle,
-                  &gEfiDriverBindingProtocolGuid,
-                  &gDebugPortDevice->DriverBindingInterface,
-                  &gEfiComponentNameProtocolGuid,
-                  &gDebugPortDevice->ComponentNameInterface,
-                  NULL
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
   //
   // Clean up allocations
   //
-  if (gDebugPortDevice->DebugPortVariable != NULL) {
-    FreePool (gDebugPortDevice->DebugPortVariable);
+  if (mDebugPortDevice.DebugPortVariable != NULL) {
+    FreePool (mDebugPortDevice.DebugPortVariable);
   }
-
-  FreePool (gDebugPortDevice);
 
   return EFI_SUCCESS;
 }

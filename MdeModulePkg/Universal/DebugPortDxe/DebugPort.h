@@ -54,8 +54,6 @@ typedef struct {
   EFI_HANDLE                  DebugPortDeviceHandle;
   VOID                        *DebugPortVariable;
 
-  EFI_DRIVER_BINDING_PROTOCOL DriverBindingInterface;
-  EFI_COMPONENT_NAME_PROTOCOL ComponentNameInterface;
   EFI_DEVICE_PATH_PROTOCOL    *DebugPortDevicePath;
   EFI_DEBUGPORT_PROTOCOL      DebugPortInterface;
 
@@ -77,18 +75,13 @@ typedef struct {
 #define DEBUGPORT_UART_DEFAULT_BAUDRATE   115200
 #define DEBUGPORT_UART_DEFAULT_PARITY     0
 #define DEBUGPORT_UART_DEFAULT_FIFO_DEPTH 16
-#define DEBUGPORT_UART_DEFAULT_TIMEOUT    50000 // 5 ms
+#define DEBUGPORT_UART_DEFAULT_TIMEOUT    50000 ///< 5 ms
 #define DEBUGPORT_UART_DEFAULT_DATA_BITS  8
 #define DEBUGPORT_UART_DEFAULT_STOP_BITS  1
 
 #define DEBUGPORT_DRIVER_VERSION          1
 
 #define IS_UART_DEVICEPATH(dp)           (DevicePathType (dp) == MESSAGING_DEVICE_PATH && DevicePathSubType (dp) == MSG_UART_DP)
-
-//
-// globals
-//
-extern DEBUGPORT_DEVICE  *gDebugPortDevice;
 
 /**
   Debug Port Driver entry pointo. 
