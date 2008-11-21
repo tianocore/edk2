@@ -79,7 +79,7 @@ GrowStack (
     //
     // Free The Old Stack
     //
-    gBS->FreePool (*Stack);
+    FreePool (*Stack);
   }
 
   //
@@ -650,7 +650,7 @@ IfrToUint (
       // BUGBUG: Need handle decimal string
       //
     }
-    gBS->FreePool (String);
+    FreePool (String);
   } else {
     CopyMem (Result, &Value, sizeof (EFI_HII_VALUE));
   }
@@ -949,7 +949,7 @@ IfrMid (
   Result->Type = EFI_IFR_TYPE_STRING;
   Result->Value.string = NewString (SubString, FormSet->HiiHandle);
 
-  gBS->FreePool (String);
+  FreePool (String);
 
   return Status;
 }
@@ -1271,14 +1271,14 @@ CompareHiiValue (
 
     Str2 = GetToken (Value2->Value.string, HiiHandle);
     if (Str2 == NULL) {
-      gBS->FreePool (Str1);
+      FreePool (Str1);
       return EFI_INVALID_PARAMETER;
     }
 
     Result = StrCmp (Str1, Str2);
 
-    gBS->FreePool (Str1);
-    gBS->FreePool (Str2);
+    FreePool (Str1);
+    FreePool (Str2);
 
     return Result;
   }
@@ -1525,7 +1525,7 @@ EvaluateExpression (
 
       Value->Type = EFI_IFR_TYPE_NUM_SIZE_64;
       Value->Value.u64 = StrLen (StrPtr);
-      gBS->FreePool (StrPtr);
+      FreePool (StrPtr);
       break;
 
     case EFI_IFR_NOT_OP:
@@ -1589,7 +1589,7 @@ EvaluateExpression (
       } else {
         Index = (UINT16) Value->Value.u64;
         Value->Value.string = Index;
-        gBS->FreePool (StrPtr);
+        FreePool (StrPtr);
       }
       break;
 
@@ -1629,7 +1629,7 @@ EvaluateExpression (
         } else {
           Value->Value.b = FALSE;
         }
-        gBS->FreePool (StrPtr);
+        FreePool (StrPtr);
         Value->Type = EFI_IFR_TYPE_BOOLEAN;
       }
       break;
@@ -1669,7 +1669,7 @@ EvaluateExpression (
         mUnicodeCollation->StrUpr (mUnicodeCollation, StrPtr);
       }
       Value->Value.string = NewString (StrPtr, FormSet->HiiHandle);
-      gBS->FreePool (StrPtr);
+      FreePool (StrPtr);
       break;
 
     case EFI_IFR_BITWISE_NOT_OP:

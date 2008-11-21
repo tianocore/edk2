@@ -301,7 +301,7 @@ ReallocatePool (
       CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
     }
 
-    gBS->FreePool (OldPool);
+    FreePool (OldPool);
   }
 
   return NewPool;
@@ -779,7 +779,7 @@ HiiConfigRoutingExportConfig (
       AccessResults = NULL;
     }
   }
-  gBS->FreePool (ConfigAccessHandles);
+  FreePool (ConfigAccessHandles);
 
   return EFI_SUCCESS;  
 }
