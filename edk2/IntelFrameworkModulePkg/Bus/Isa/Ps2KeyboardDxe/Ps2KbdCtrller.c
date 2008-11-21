@@ -1642,18 +1642,20 @@ InitKeyboard (
   EFI_STATUS              Status1;
   UINT8                   CommandByte;
   EFI_PS2_POLICY_PROTOCOL *Ps2Policy;
+  UINT32                  TryTime;
 
-  Status                = EFI_SUCCESS;
+  Status                 = EFI_SUCCESS;
   mEnableMouseInterface  = TRUE;
+  TryTime                = 0;
 
   //
   // Get Ps2 policy to set this
   //
-  Status = gBS->LocateProtocol (
-                  &gEfiPs2PolicyProtocolGuid,
-                  NULL,
-                  (VOID **) &Ps2Policy
-                  );
+  gBS->LocateProtocol (
+        &gEfiPs2PolicyProtocolGuid,
+        NULL,
+        (VOID **) &Ps2Policy
+        );
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
@@ -1663,10 +1665,18 @@ InitKeyboard (
 
   //
   // Perform a read to cleanup the Status Register's
-  // output buffer full bits
+  // output buffer full bits within MAX TRY times
   //
-  while (!EFI_ERROR (Status)) {
+  while (!EFI_ERROR (Status) && TryTime < KEYBOARD_MAX_TRY) {
     Status = KeyboardRead (ConsoleIn, &CommandByte);
+    TryTime ++;
+  }
+  //
+  // Exceed the max try times. The device may be error.
+  //
+  if (TryTime == KEYBOARD_MAX_TRY) {
+  	Status = EFI_DEVICE_ERROR;
+  	goto Done;
   }
   //
   // We should disable mouse interface during the initialization process

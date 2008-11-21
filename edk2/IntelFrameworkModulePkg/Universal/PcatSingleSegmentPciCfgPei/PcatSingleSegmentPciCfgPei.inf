@@ -55,6 +55,13 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfg2Disable
 
+[FixedPcd.common]
+  ##
+  #  Disable ASSERT for unalign PCI IO access according to PI Volume 1 and PeiCis Spec
+  #  Spec has not this requirement.
+  ##
+	gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
+
 [Depex]
   TRUE
 
