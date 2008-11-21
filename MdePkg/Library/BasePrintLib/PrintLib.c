@@ -492,10 +492,10 @@ AsciiSPrintUnicodeFormat (
 UINTN
 EFIAPI
 AsciiValueToString (
-  IN OUT CHAR8  *Buffer,
-  IN UINTN      Flags,
-  IN INT64      Value,
-  IN UINTN      Width
+  OUT CHAR8      *Buffer,
+  IN  UINTN      Flags,
+  IN  INT64      Value,
+  IN  UINTN      Width
   )
 {
   return BasePrintLibConvertValueToString (Buffer, Flags, Value, Width, 1);
