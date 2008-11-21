@@ -198,6 +198,8 @@ ReportStatusCode (
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate the 
                                  extended data section.
   @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_DEVICE_ERROR      A call to a Report Status Code Library function
+                                 is already in progress.
 
 **/
 EFI_STATUS
@@ -240,6 +242,8 @@ ReportStatusCodeWithDevicePath (
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate the 
                                  extended data section.
   @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_DEVICE_ERROR      A call to a Report Status Code Library function
+                                 is already in progress.
 
 **/
 EFI_STATUS
@@ -290,7 +294,9 @@ ReportStatusCodeWithExtendedData (
   @retval  EFI_SUCCESS           The status code was reported.
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate 
                                  the extended data section if it was specified.
-  @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_UNSUPPORTED       Report status code is not supported.
+  @retval  EFI_DEVICE_ERROR      A call to a Report Status Code Library function
+                                 is already in progress.
 
 **/
 EFI_STATUS
@@ -405,6 +411,8 @@ ReportDebugCodeEnabled (
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate the 
                                  extended data section.
   @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_DEVICE_ERROR      A call to a Report Status Code Library function
+                                 is already in progress.
 
 **/
 #define REPORT_STATUS_CODE_WITH_DEVICE_PATH(Type,Value,DevicePathParameter)                     \
@@ -436,6 +444,8 @@ ReportDebugCodeEnabled (
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate the 
                                  extended data section.
   @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_DEVICE_ERROR      A call to a Report Status Code Library function
+                                 is already in progress.
 
 **/
 #define REPORT_STATUS_CODE_WITH_EXTENDED_DATA(Type,Value,ExtendedData,ExtendedDataSize)         \
@@ -472,6 +482,8 @@ ReportDebugCodeEnabled (
   @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate the 
                                  extended data section if it was specified.
   @retval  EFI_UNSUPPORTED       Report status code is not supported
+  @retval  EFI_DEVICE_ERROR      A call to a Report Status Code Library function
+                                 is already in progress.
 
 **/
 #define REPORT_STATUS_CODE_EX(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)  \

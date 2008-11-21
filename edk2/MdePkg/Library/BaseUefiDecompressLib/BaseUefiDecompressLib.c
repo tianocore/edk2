@@ -738,7 +738,7 @@ EFIAPI
 UefiDecompress (
   IN CONST VOID  *Source,
   IN OUT VOID    *Destination,
-  IN OUT VOID    *Scratch
+  IN OUT VOID    *Scratch  OPTIONAL
   )
 {
   volatile UINT32  Index;
