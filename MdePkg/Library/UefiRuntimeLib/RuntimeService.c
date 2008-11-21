@@ -77,7 +77,7 @@ EFI_STATUS
 EFIAPI
 EfiGetTime (
   OUT EFI_TIME                    *Time,
-  OUT EFI_TIME_CAPABILITIES       *Capabilities
+  OUT EFI_TIME_CAPABILITIES       *Capabilities   OPTIONAL
   )
 {
   return mRT->GetTime (Time, Capabilities);
@@ -169,7 +169,7 @@ EFI_STATUS
 EFIAPI
 EfiSetWakeupTime (
   IN BOOLEAN                      Enable,
-  IN EFI_TIME                     *Time
+  IN EFI_TIME                     *Time  OPTIONAL
   )
 {
   return mRT->SetWakeupTime (Enable, Time);
