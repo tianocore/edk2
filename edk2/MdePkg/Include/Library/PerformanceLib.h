@@ -38,6 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @retval RETURN_SUCCESS          The start of the measurement was recorded.
   @retval RETURN_OUT_OF_RESOURCES There are not enough resources to record the measurement.
+  @retval RETURN_DEVICE_ERROR     A device error reading the time stamp.
 
 **/
 RETURN_STATUS
@@ -70,6 +71,7 @@ StartPerformanceMeasurement (
 
   @retval RETURN_SUCCESS          The end of  the measurement was recorded.
   @retval RETURN_NOT_FOUND        The specified measurement record could not be found.
+  @retval RETURN_DEVICE_ERROR     A device error reading the time stamp.
 
 **/
 RETURN_STATUS
