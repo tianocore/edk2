@@ -382,9 +382,9 @@ AllocateRuntimePool (
 }
 
 /**
-  Allocates a buffer of type EfieservedMemoryType.
+  Allocates a buffer of type EfiReservedMemoryType.
 
-  Allocates the number bytes specified by AllocationSize of type EfieservedMemoryType and returns
+  Allocates the number bytes specified by AllocationSize of type EfiReservedMemoryType and returns
   a pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is
   returned.  If there is not enough memory remaining to satisfy the request, then NULL is returned.
 
