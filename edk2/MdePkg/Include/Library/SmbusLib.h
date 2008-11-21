@@ -70,7 +70,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   
   @param SmBusAddress Address that encodes the SMBUS Slave Address, SMBUS Command, SMBUS Data Length, and PEC   
 **/
-#define SMBUS_LIB_RESERVED(SmBusAddress)           ((SmBusAddress) & ~(((1 << 22) - 2) | BIT22))
+#define SMBUS_LIB_RESERVED(SmBusAddress)           ((SmBusAddress) & ~(BIT23 - 2))
 
 /**
   Executes an SMBUS quick read command.
@@ -83,10 +83,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS  The SMBUS command was executed.
+                        RETURN_TIMEOUT  A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
 **/
 VOID
@@ -107,10 +114,17 @@ SmBusQuickRead (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
 **/
 VOID
@@ -131,10 +145,18 @@ SmBusQuickWrite (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The byte received from the SMBUS.
 
@@ -157,11 +179,19 @@ SmBusReceiveByte (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Value           The 8-bit value to send.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value         The 8-bit value to send.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The parameter of Value.
 
@@ -186,8 +216,16 @@ SmBusSendByte (
 
   @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The byte read from the SMBUS.
 
@@ -210,11 +248,19 @@ SmBusReadDataByte (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Value           The 8-bit value to write.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value         The 8-bit value to write.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The parameter of Value.
 
@@ -237,10 +283,18 @@ SmBusWriteDataByte (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
   
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The byte read from the SMBUS.
 
@@ -263,11 +317,19 @@ SmBusReadDataWord (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Value           The 16-bit value to write.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value         The 16-bit value to write.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The parameter of Value.
 
@@ -291,11 +353,19 @@ SmBusWriteDataWord (
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Value           The 16-bit value to write.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value         The 16-bit value to write.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The 16-bit value returned by the process call command.
 
@@ -322,11 +392,19 @@ SmBusProcessCall (
   If Buffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Buffer          Pointer to the buffer to store the bytes read from the SMBUS.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Buffer        Pointer to the buffer to store the bytes read from the SMBUS.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_SUCCESS The SMBUS command was executed.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The number of bytes read.
 
@@ -351,11 +429,18 @@ SmBusReadBlock (
   If Buffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Buffer          Pointer to the buffer to store the bytes read from the SMBUS.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        MBUS Command, SMBUS Data Length, and PEC.
+  @param  Buffer        Pointer to the buffer to store the bytes read from the SMBUS.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The number of bytes written.
 
@@ -382,12 +467,19 @@ SmBusWriteBlock (
   If ReadBuffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  WriteBuffer     Pointer to the buffer of bytes to write to the SMBUS.
-  @param  ReadBuffer      Pointer to the buffer of bytes to read from the SMBUS.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
+  @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
+                        SMBUS Command, SMBUS Data Length, and PEC.
+  @param  WriteBuffer   Pointer to the buffer of bytes to write to the SMBUS.
+  @param  ReadBuffer    Pointer to the buffer of bytes to read from the SMBUS.
+  @param  Status        Return status for the executed command.
+                        This is an optional parameter and may be NULL.
+                        RETURN_TIMEOUT A timeout occurred while executing the SMBUS command.
+                        RETURN_DEVICE_ERROR  The request was not completed because a failure
+                        reflected in the Host Status Register bit.  Device errors are a result
+                        of a transaction collision, illegal command field, unclaimed cycle
+                        (host initiated), or bus errors (collisions).
+                        RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect)
+                        RETURN_UNSUPPORTED  The SMBus operation is not supported.
 
   @return The number of bytes written.
 
