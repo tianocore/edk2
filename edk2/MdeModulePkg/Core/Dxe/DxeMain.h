@@ -1883,29 +1883,6 @@ CoreTrust (
 
 
 /**
-  Helper function called as part of the code needed
-  to allocate the proper sized buffer for various
-  EFI interfaces.
-
-  @param  Status                 Current status
-  @param  Buffer                 Current allocated buffer, or NULL
-  @param  BufferSize             Current buffer size needed
-
-  @retval TRUE                   if the buffer was reallocated and the caller
-                                 should try the API again.
-  @retval FALSE                  buffer could not be allocated and the caller
-                                 should not try the API again.
-
-**/
-BOOLEAN
-CoreGrowBuffer (
-  IN OUT EFI_STATUS   *Status,
-  IN OUT VOID         **Buffer,
-  IN UINTN            BufferSize
-  );
-
-
-/**
   This routine is the driver initialization entry point.  It initializes the
   libraries, and registers two notification functions.  These notification
   functions are responsible for building the FV stack dynamically.
