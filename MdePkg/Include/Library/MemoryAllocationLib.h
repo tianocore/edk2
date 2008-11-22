@@ -379,6 +379,96 @@ AllocateReservedCopyPool (
   );
 
 /**
+  Reallocates a buffer of type EfiBootServicesData.
+
+  Allocates and zeros the number bytes specified by NewSize with the memmory type
+  EfiBootServicesData.  If OldBuffer is not NULL, then the smaller of OldSize and 
+  NewSize bytes are copied from OldBuffer to the newly allocated buffer, and 
+  OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
+  If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
+  enough memory remaining to satisfy the request, then NULL is returned.
+  
+  If OldBuffer is NULL, then ASSERT().
+  If NewSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If OldSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+
+  @param  OldSize        The size, in bytes, of OldBuffer.
+  @param  NewSize        The size, in bytes, of the buffer to reallocate.
+  @param  OldBuffer      The buffer to copy to the allocated buffer.  This is an optional 
+                         parameter that may be NULL.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+ReallocatePool (
+  IN UINTN  OldSize,
+  IN UINTN  NewSize,
+  IN VOID   *OldBuffer  OPTIONAL
+  );
+
+/**
+  Reallocates a buffer of type EfiRuntimeServicesData.
+
+  Allocates and zeros the number bytes specified by NewSize with the memmory type
+  EfiRuntimeServicesData.  If OldBuffer is not NULL, then the smaller of OldSize and 
+  NewSize bytes are copied from OldBuffer to the newly allocated buffer, and 
+  OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
+  If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
+  enough memory remaining to satisfy the request, then NULL is returned.
+  
+  If OldBuffer is NULL, then ASSERT().
+  If NewSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If OldSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+
+  @param  OldSize        The size, in bytes, of OldBuffer.
+  @param  NewSize        The size, in bytes, of the buffer to reallocate.
+  @param  OldBuffer      The buffer to copy to the allocated buffer.  This is an optional 
+                         parameter that may be NULL.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+ReallocateRuntimePool (
+  IN UINTN  OldSize,
+  IN UINTN  NewSize,
+  IN VOID   *OldBuffer  OPTIONAL
+  );
+
+/**
+  Reallocates a buffer of type EfiReservedMemoryType.
+
+  Allocates and zeros the number bytes specified by NewSize with the memmory type
+  EfiReservedMemoryType.  If OldBuffer is not NULL, then the smaller of OldSize and 
+  NewSize bytes are copied from OldBuffer to the newly allocated buffer, and 
+  OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
+  If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
+  enough memory remaining to satisfy the request, then NULL is returned.
+  
+  If OldBuffer is NULL, then ASSERT().
+  If NewSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If OldSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+
+  @param  OldSize        The size, in bytes, of OldBuffer.
+  @param  NewSize        The size, in bytes, of the buffer to reallocate.
+  @param  OldBuffer      The buffer to copy to the allocated buffer.  This is an optional 
+                         parameter that may be NULL.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+ReallocateReservedPool (
+  IN UINTN  OldSize,
+  IN UINTN  NewSize,
+  IN VOID   *OldBuffer  OPTIONAL
+  );
+
+/**
   Frees a buffer that was previously allocated with one of the pool allocation functions in the
   Memory Allocation Library.
 
