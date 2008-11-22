@@ -1749,8 +1749,6 @@ ConSplitterGrowBuffer (
   IN OUT  VOID                        **Buffer
   )
 {
-  UINTN NewSize;
-  UINTN OldSize;
   VOID  *Ptr;
 
   //
@@ -1758,23 +1756,16 @@ ConSplitterGrowBuffer (
   // copy the old buffer's content to the new-size buffer,
   // then free the old buffer.
   //
-  OldSize = *Count * SizeOfCount;
   *Count += CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT;
-  NewSize = *Count * SizeOfCount;
-
-  Ptr     = AllocateZeroPool (NewSize);
+  Ptr = ReallocatePool (
+          SizeOfCount * ((*Count) - CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT), 
+          SizeOfCount * (*Count),
+          *Buffer
+          );
   if (Ptr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
-  CopyMem (Ptr, *Buffer, OldSize);
-
-  if (*Buffer != NULL) {
-    FreePool (*Buffer);
-  }
-
   *Buffer = Ptr;
-
   return EFI_SUCCESS;
 }
 

@@ -15,41 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DevicePath.h"
 
 /**
-  Adjusts the size of a previously allocated buffer.
-
-  @param OldPool         A pointer to the buffer whose size is being adjusted.
-  @param OldSize         The size of the current buffer.
-  @param NewSize         The size of the new buffer.
-
-  @return A pointer to the new buffer or NULL if allocation fails.
-
-**/
-VOID *
-ReallocatePool (
-  IN VOID                 *OldPool,
-  IN UINTN                OldSize,
-  IN UINTN                NewSize
-  )
-{
-  VOID  *NewPool;
-
-  NewPool = NULL;
-  if (NewSize != 0) {
-    NewPool = AllocateZeroPool (NewSize);
-  }
-
-  if (OldPool != NULL) {
-    if (NewPool != NULL) {
-      CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
-    }
-
-    FreePool (OldPool);
-  }
-
-  return NewPool;
-}
-
-/**
   Concatenates a formatted unicode string to allocated pool. The caller must
   free the resulting buffer.
 
@@ -90,9 +55,9 @@ CatPrint (
     Size = StrSize (AppendStr) - sizeof (UINT16);
     Size = Size + StrSize (Str->Str);
     Str->Str = ReallocatePool (
-                Str->Str,
                 StrSize (Str->Str),
-                Size
+                Size,
+                Str->Str
                 );
     ASSERT (Str->Str != NULL);
   }
@@ -1752,7 +1717,7 @@ ConvertDeviceNodeToText (
   // Shrink pool used for string allocation
   //
   NewSize = (Str.Len + 1) * sizeof (CHAR16);
-  Str.Str = ReallocatePool (Str.Str, NewSize, NewSize);
+  Str.Str = ReallocatePool (NewSize, NewSize, Str.Str);
   ASSERT (Str.Str != NULL);
   Str.Str[Str.Len] = 0;
   return Str.Str;
@@ -1841,7 +1806,7 @@ ConvertDevicePathToText (
   }
 
   NewSize = (Str.Len + 1) * sizeof (CHAR16);
-  Str.Str = ReallocatePool (Str.Str, NewSize, NewSize);
+  Str.Str = ReallocatePool (NewSize, NewSize, Str.Str);
   ASSERT (Str.Str != NULL);
   Str.Str[Str.Len] = 0;
   return Str.Str;

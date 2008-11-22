@@ -270,44 +270,6 @@ OutputConfigBody (
 
 }
 
-
-/**
-  Adjusts the size of a previously allocated buffer.
-
-
-  @param OldPool         A pointer to the buffer whose size is being adjusted.
-  @param OldSize         The size of the current buffer.
-  @param NewSize         The size of the new buffer.
-
-  @return The new buffer allocated.
-
-**/
-VOID *
-ReallocatePool (
-  IN VOID                          *OldPool,
-  IN UINTN                         OldSize,
-  IN UINTN                         NewSize
-  )
-{
-  VOID  *NewPool;
-
-  NewPool = NULL;
-  if (NewSize != 0) {
-    NewPool = AllocateZeroPool (NewSize);
-  }
-
-  if (OldPool != NULL) {
-    if (NewPool != NULL) {
-      CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
-    }
-
-    FreePool (OldPool);
-  }
-
-  return NewPool;
-}
-
-
 /**
   Append a string to a multi-string format.
 
@@ -346,9 +308,9 @@ AppendToMultiString (
   if (MultiStringSize + AppendStringSize > MAX_STRING_LENGTH ||
       MultiStringSize > MAX_STRING_LENGTH) {
     *MultiString = (EFI_STRING) ReallocatePool (
-                                  (VOID *) (*MultiString),
                                   MultiStringSize,
-                                  MultiStringSize + AppendStringSize
+                                  MultiStringSize + AppendStringSize,
+                                  (VOID *) (*MultiString)
                                   );
   }
 
