@@ -16,42 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalBdsLib.h"
 
 /**
-
-  Adjusts the size of a previously allocated buffer.
-
-  @param OldPool         A pointer to the buffer whose size is being adjusted.
-  @param OldSize         The size of the current buffer.
-  @param NewSize         The size of the new buffer.
-
-  @return The new buffer allocated. If allocatio failed, NULL will be returned.
-
-**/
-VOID *
-ReallocatePool (
-  IN VOID                 *OldPool,
-  IN UINTN                OldSize,
-  IN UINTN                NewSize
-  )
-{
-  VOID  *NewPool;
-
-  NewPool = NULL;
-  if (NewSize != 0) {
-    NewPool = AllocateZeroPool (NewSize);
-  }
-
-  if (OldPool != NULL) {
-    if (NewPool != NULL) {
-      CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
-    }
-
-    FreePool (OldPool);
-  }
-
-  return NewPool;
-}
-
-/**
   Concatenates a formatted unicode string to allocated pool.
   The caller must free the resulting buffer.
 
@@ -95,9 +59,9 @@ CatPrint (
     StringSize += (StrSize (Str->str) - sizeof (UINT16));
 
     Str->str = ReallocatePool (
-                Str->str,
                 StrSize (Str->str),
-                StringSize
+                StringSize,
+                Str->str
                 );
     ASSERT (Str->str != NULL);
   }
@@ -1523,7 +1487,7 @@ DevicePathToStr (
 
 Done:
   NewSize = (Str.len + 1) * sizeof (CHAR16);
-  Str.str = ReallocatePool (Str.str, NewSize, NewSize);
+  Str.str = ReallocatePool (NewSize, NewSize, Str.str);
   ASSERT (Str.str != NULL);
   Str.str[Str.len] = 0;
   return Str.str;
