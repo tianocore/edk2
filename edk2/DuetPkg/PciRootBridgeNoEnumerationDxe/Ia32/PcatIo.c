@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2006, Intel Corporation                                                         
+Copyright (c) 2005 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -608,7 +608,7 @@ ScanPciRootBridgeForRoms(
     mPciOptionRomTableInstalled = TRUE;
   }
 
-  Status = IoDev->Configuration(IoDev, &Descriptors);
+  Status = IoDev->Configuration(IoDev, (VOID **)&Descriptors);
   if (EFI_ERROR (Status) || Descriptors == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -632,7 +632,7 @@ ScanPciRootBridgeForRoms(
       //
       // Find Memory Descriptors that are less than 4GB, so the PPB Memory Window can be used for downstream devices
       //
-      if (Descriptors->AddrRangeMax < 0x100000000) {
+      if (Descriptors->AddrRangeMax < 0x100000000ULL) {
         //
         // Find the largest Non-Prefetchable Memory Descriptor that is less than 4GB
         //
@@ -679,7 +679,7 @@ ScanPciRootBridgeForRoms(
   Status = gBS->AllocatePool(
                   EfiBootServicesData,
                   sizeof(UINT16) * (MaxBus - MinBus + 1) * (PCI_MAX_DEVICE+1) * (PCI_MAX_FUNC+1),
-                  &Context.CommandRegisterBuffer
+                  (VOID **)&Context.CommandRegisterBuffer
                   );
 
   if (EFI_ERROR (Status)) {
