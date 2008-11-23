@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2006, Intel Corporation                                                         
+Copyright (c) 2005 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -62,7 +62,7 @@ Returns:
   //
   // Initialize gCpuIo now since the chipset init code requires it.
   //
-  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, &gCpuIo);
+  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **)&gCpuIo);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -79,7 +79,7 @@ Returns:
     Status = gBS->AllocatePool(
                     EfiBootServicesData,
                     sizeof (PCAT_PCI_ROOT_BRIDGE_INSTANCE),
-                    &PrivateData
+                    (VOID **)&PrivateData
                     );
     if (EFI_ERROR (Status)) {
       goto Done;
@@ -104,10 +104,10 @@ Returns:
 
     PrivateData->IoBase      = 0xffffffff;
     PrivateData->MemBase     = 0xffffffff;
-    PrivateData->Mem32Base   = 0xffffffffffffffff;
-    PrivateData->Pmem32Base  = 0xffffffffffffffff;
-    PrivateData->Mem64Base   = 0xffffffffffffffff;
-    PrivateData->Pmem64Base  = 0xffffffffffffffff;
+    PrivateData->Mem32Base   = 0xffffffffffffffffULL;
+    PrivateData->Pmem32Base  = 0xffffffffffffffffULL;
+    PrivateData->Mem64Base   = 0xffffffffffffffffULL;
+    PrivateData->Pmem64Base  = 0xffffffffffffffffULL;
 
     //
     // The default mechanism for performing PCI Configuration cycles is to 
@@ -216,6 +216,7 @@ Returns:
           //
           break;
         }
+
 
         //
         // Increment the number of PCI device found on the primary bus of the PCI root bridge
@@ -592,7 +593,7 @@ Returns:
     Status = gBS->AllocatePool (
                     EfiBootServicesData, 
                     sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR),
-                    &PrivateData->Configuration
+                    (VOID **)&PrivateData->Configuration
                     );
     if (EFI_ERROR (Status )) {
       return Status;
@@ -621,7 +622,7 @@ Returns:
   Status = gBS->AllocatePool (
                   EfiBootServicesData, 
                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * NumConfig + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR),
-                  &PrivateData->Configuration
+                  (VOID **)&PrivateData->Configuration
                   );
   if (EFI_ERROR (Status )) {
     return Status;
@@ -974,24 +975,14 @@ Returns:
   UINTN                                    BufferSize;
   UINT32                                   Index;
   UINT32                                   Number;
-  VOID                                     *HobList;
-  EFI_STATUS                               Status;
   EFI_PEI_HOB_POINTERS                     GuidHob;
-
-  //
-  // Get Hob List from configuration table
-  //
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &HobList);
-  if (EFI_ERROR (Status)) {
-    return 0;
-  }
 
   //
   // Get PciExpressAddressInfo Hob
   //
   PciExpressBaseAddressInfo = NULL;
   BufferSize                = 0;
-  GuidHob.Raw = GetNextGuidHob (&gEfiPciExpressBaseAddressGuid, &HobList);
+  GuidHob.Raw = GetFirstGuidHob (&gEfiPciExpressBaseAddressGuid);
   if (GuidHob.Raw != NULL) {
     PciExpressBaseAddressInfo = GET_GUID_HOB_DATA (GuidHob.Guid);
     BufferSize                = GET_GUID_HOB_DATA_SIZE (GuidHob.Guid);
