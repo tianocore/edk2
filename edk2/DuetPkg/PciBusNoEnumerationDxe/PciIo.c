@@ -1713,6 +1713,8 @@ Returns:
         //
         Ptr->AddrSpaceGranularity = 64;
         break;
+      default:
+        break;
       }
 
       Ptr = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) ((UINT8 *) Ptr + sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR));
