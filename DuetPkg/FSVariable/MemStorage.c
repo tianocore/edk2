@@ -54,7 +54,7 @@ MemStorageConstructor (
   EFI_STATUS                  Status;
   VS_DEV                      *Dev;
 
-  Status = gBS->AllocatePool (EfiRuntimeServicesData, sizeof(VS_DEV), &Dev);
+  Status = gBS->AllocatePool (EfiRuntimeServicesData, sizeof(VS_DEV), (VOID **) &Dev);
   ASSERT_EFI_ERROR (Status);
 
   ZeroMem (Dev, sizeof(VS_DEV));
@@ -65,7 +65,7 @@ MemStorageConstructor (
   Dev->VarStore.Erase    = MemEraseStore;
   Dev->VarStore.Write    = MemWriteStore;
 
-  Status = gBS->AllocatePool (EfiRuntimeServicesData, Size, &VAR_DATA_PTR (Dev));
+  Status = gBS->AllocatePool (EfiRuntimeServicesData, Size, (VOID **) &VAR_DATA_PTR (Dev));
   ASSERT_EFI_ERROR (Status);
 
   DEBUG ((EFI_D_ERROR, "VStorage: Size = 0x%x\n", Size));
@@ -87,9 +87,9 @@ OnVirtualAddressChangeMs (
 
   Dev = DEV_FROM_THIS (Context);
 
-  EfiConvertPointer (0, &VAR_DATA_PTR (Dev));
-  EfiConvertPointer (0, (VOID**)&Dev->VarStore.Erase);
-  EfiConvertPointer (0, (VOID**)&Dev->VarStore.Write);
+  EfiConvertPointer (0, (VOID **)&VAR_DATA_PTR (Dev));
+  EfiConvertPointer (0, (VOID **)&Dev->VarStore.Erase);
+  EfiConvertPointer (0, (VOID **)&Dev->VarStore.Write);
 }
 
 EFI_STATUS
