@@ -292,7 +292,7 @@ Returns:
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   ValidBufferSize,
-                  &ValidBuffer
+                  (VOID**) &ValidBuffer
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1134,7 +1134,7 @@ Returns:
   Status = gBS->AllocatePool (
                   EfiRuntimeServicesData,
                   (UINTN) sizeof (VARIABLE_GLOBAL),
-                  &mGlobal
+                  (VOID**) &mGlobal
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1182,7 +1182,7 @@ Returns:
     Status = EFI_UNSUPPORTED;
     return Status;
   }
-  
+
   Status = FileStorageConstructor (
              &mGlobal->VariableStore[NonVolatile], 
              &mGlobal->GoVirtualChildEvent[NonVolatile],
@@ -1307,9 +1307,9 @@ OnVirtualAddressChangeFsv (
 
   for (Index = 0; Index < MaxType; Index++) {
     mGlobal->GoVirtualChildEvent[Index] (Event, mGlobal->VariableStore[Index]);
-    EfiConvertPointer (0, &mGlobal->VariableStore[Index]);
+    EfiConvertPointer (0, (VOID**) &mGlobal->VariableStore[Index]);
     EfiConvertPointer (0, &mGlobal->VariableBase[Index]);
   }
   EfiConvertPointer (0, &mGlobal->Scratch);
-  EfiConvertPointer (0, &mGlobal);
+  EfiConvertPointer (0, (VOID**) &mGlobal);
 }

@@ -154,7 +154,7 @@ CheckStoreExists (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiSimpleFileSystemProtocolGuid,
-                  &Volume
+                  (VOID **) &Volume
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -243,7 +243,7 @@ FileStorageConstructor (
   EFI_STATUS                Status;
   EFI_EVENT                 Event;
 
-  Status = gBS->AllocatePool (EfiRuntimeServicesData, sizeof(VS_DEV), &Dev);
+  Status = gBS->AllocatePool (EfiRuntimeServicesData, sizeof(VS_DEV), (VOID **) &Dev);
   ASSERT_EFI_ERROR (Status);
   ZeroMem (Dev, sizeof(VS_DEV));
 
@@ -361,7 +361,7 @@ OnVirtualAddressChangeFs (
 
   Dev = DEV_FROM_THIS (Context);
 
-  EfiConvertPointer (0, &VAR_DATA_PTR (Dev));
+  EfiConvertPointer (0, (VOID **) &VAR_DATA_PTR (Dev));
   EfiConvertPointer (0, (VOID **) &Dev->VarStore.Erase);
   EfiConvertPointer (0, (VOID **) &Dev->VarStore.Write);
 }
@@ -394,7 +394,7 @@ OpenStore (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiSimpleFileSystemProtocolGuid,
-                  &Volume
+                  (VOID **) &Volume
                   );
   if (EFI_ERROR (Status)) {
     return Status;
