@@ -693,7 +693,7 @@ Returns:
     //
     Node.DevPath = RemainingDevicePath;
     if (Node.DevPath->Type != HARDWARE_DEVICE_PATH ||
-        Node.DevPath->SubType != HW_PCI_DP         &&
+        Node.DevPath->SubType != HW_PCI_DP         ||
         DevicePathNodeLength (Node.DevPath) != sizeof (PCI_DEVICE_PATH)
         ) {
       return EFI_UNSUPPORTED;
