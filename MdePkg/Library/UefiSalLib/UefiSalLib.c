@@ -28,8 +28,8 @@ SAL_PROC         mSalProcEntry;
 
 /**
   Makes a SAL procedure call.
-
-  This is a wrapper function to make a SAL procedure call.
+  
+  This is a wrapper function to make a SAL procedure call.  
   No parameter checking is performed on the 8 input parameters,
   but there are some common rules that the caller should follow
   when making a SAL call.  Any address passed to SAL as buffers
