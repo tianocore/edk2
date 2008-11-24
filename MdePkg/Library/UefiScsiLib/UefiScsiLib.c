@@ -328,12 +328,12 @@ ScsiInquiryCommand (
                                      If Timeout is greater than zero, then this function
                                      will return EFI_TIMEOUT if the time required to
                                      execute the SCSI Request Packet is greater than Timeout.
-  @param[in, out] SenseData          A pointer to sense data that was generated
+  @param[in, out]  SenseData         A pointer to sense data that was generated
                                      by the execution of the SCSI Request Packet.
                                      This buffer must be allocated by the caller.
                                      If SenseDataLength is 0, then this parameter
                                      is optional and may be NULL.
-  @param[in, out] SenseDataLength    On input, the length in bytes of the SenseData buffer.
+  @param[in, out]  SenseDataLength   On input, the length in bytes of the SenseData buffer.
                                      On output, the number of bytes written to the SenseData buffer. 
   @param[out]     HostAdapterStatus  The status of the SCSI Host Controller that
                                      produces the SCSI bus containing the SCSI target
@@ -560,15 +560,16 @@ ScsiRequestSenseCommand (
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      PMI                  Partial medium indicator.
 
-  @retval  EFI_SUCCESS                Command is executed successfully.
-  @retval  EFI_WARN_BUFFER_TOO_SMALL  The SCSI Request Packet was executed, but the entire DataBuffer could
-                                      not be transferred. The actual number of bytes transferred is returned in DataLength.
-  @retval  EFI_NOT_READY              The SCSI Request Packet could not be sent because there are too many 
-                                      SCSI Command Packets already queued.
-  @retval  EFI_DEVICE_ERROR           A device error occurred while attempting to send SCSI Request Packet.
-  @retval  EFI_UNSUPPORTED            The command described by the SCSI Request Packet is not supported by 
-                                      the SCSI initiator(i.e., SCSI  Host Controller)
-  @retval  EFI_TIMEOUT                A timeout occurred while waiting for the SCSI Request Packet to execute.
+  @retval  EFI_SUCCESS           Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE   The SCSI Request Packet was executed, but the entire
+                                 DataBuffer could not be transferred. The actual
+                                 number of bytes transferred is returned in DataLength.
+  @retval  EFI_NOT_READY         The SCSI Request Packet could not be sent because
+                                 there are too many SCSI Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR      A device error occurred while attempting to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED       The command described by the SCSI Request Packet
+                                 is not supported by the SCSI initiator(i.e., SCSI  Host Controller)
+  @retval  EFI_TIMEOUT           A timeout occurred while waiting for the SCSI Request Packet to execute.
 
 **/
 EFI_STATUS
@@ -664,15 +665,15 @@ ScsiReadCapacityCommand (
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The sector size.
 
-  @retval  EFI_SUCCESS                Command is executed successfully.
-  @retval  EFI_WARN_BUFFER_TOO_SMALL  The SCSI Request Packet was executed, but the entire DataBuffer could
-                                      not be transferred. The actual number of bytes transferred is returned in DataLength.
-  @retval  EFI_NOT_READY              The SCSI Request Packet could not be sent because there are too many 
-                                      SCSI Command Packets already queued.
-  @retval  EFI_DEVICE_ERROR           A device error occurred while attempting to send SCSI Request Packet.
-  @retval  EFI_UNSUPPORTED            The command described by the SCSI Request Packet is not supported by 
-                                      the SCSI initiator(i.e., SCSI  Host Controller)
-  @retval  EFI_TIMEOUT                A timeout occurred while waiting for the SCSI Request Packet to execute.
+  @retval  EFI_SUCCESS          Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
+                                not be transferred. The actual number of bytes transferred is returned in DataLength.
+  @retval  EFI_NOT_READY        The SCSI Request Packet could not be sent because there are too many 
+                                SCSI Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR     A device error occurred while attempting to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED      The command described by the SCSI Request Packet is not supported by 
+                                the SCSI initiator(i.e., SCSI  Host Controller)
+  @retval  EFI_TIMEOUT          A timeout occurred while waiting for the SCSI Request Packet to execute.
 
 **/
 EFI_STATUS
@@ -758,23 +759,23 @@ ScsiRead10Command (
   @param[in]      ScsiIo               SCSI IO Protocol to use
   @param[in]      Timeout              The length of timeout period.
   @param[in, out] SenseData            A pointer to output sense data.
-  @param[in, out] SenseDataLength     The length of output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
   @param[out]     HostAdapterStatus    The status of Host Adapter.
   @param[out]     TargetStatus         The status of the target.
   @param[in, out] DataBuffer           A pointer to a data buffer.
-  @param[in, out] DataLength          The length of data buffer.
+  @param[in, out] DataLength           The length of data buffer.
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The sector size.
 
-  @retval  EFI_SUCCESS                Command is executed successfully.
-  @retval  EFI_WARN_BUFFER_TOO_SMALL  The SCSI Request Packet was executed, but the entire DataBuffer could
-                                      not be transferred. The actual number of bytes transferred is returned in DataLength.
-  @retval  EFI_NOT_READY              The SCSI Request Packet could not be sent because there are too many 
-                                      SCSI Command Packets already queued.
-  @retval  EFI_DEVICE_ERROR           A device error occurred while attempting to send SCSI Request Packet.
-  @retval  EFI_UNSUPPORTED            The command described by the SCSI Request Packet is not supported by 
-                                      the SCSI initiator(i.e., SCSI  Host Controller)
-  @retval  EFI_TIMEOUT                A timeout occurred while waiting for the SCSI Request Packet to execute.
+  @retval  EFI_SUCCESS          Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
+                                not be transferred. The actual number of bytes transferred is returned in DataLength.
+  @retval  EFI_NOT_READY        The SCSI Request Packet could not be sent because there are too many 
+                                SCSI Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR     A device error occurred while attempting to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED      The command described by the SCSI Request Packet is not supported by 
+                                the SCSI initiator(i.e., SCSI  Host Controller)
+  @retval  EFI_TIMEOUT          A timeout occurred while waiting for the SCSI Request Packet to execute.
 
 **/
 EFI_STATUS
