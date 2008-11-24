@@ -157,6 +157,8 @@
   Ia32/ARShiftU64.c | MSFT 
   Ia32/Thunk16.asm | MSFT
   Ia32/EnablePaging64.asm | MSFT
+  Ia32/EnableCache.c | MSFT
+  Ia32/DisableCache.c | MSFT
   SynchronizationMsc.c  | MSFT
 
   Ia32/Wbinvd.asm | INTEL 
@@ -253,6 +255,8 @@
   Ia32/ARShiftU64.asm | INTEL 
   Ia32/Thunk16.asm | INTEL
   Ia32/EnablePaging64.asm | INTEL
+  Ia32/EnableCache.asm | INTEL
+  Ia32/DisableCache.asm | INTEL
   Synchronization.c | INTEL
 
   Ia32/Thunk16.S | GCC 
@@ -349,6 +353,8 @@
   Ia32/ARShiftU64.S | GCC 
   Ia32/RShiftU64.S | GCC 
   Ia32/LShiftU64.S | GCC 
+  Ia32/EnableCache.S | GCC
+  Ia32/DisableCache.S | GCC
   SynchronizationGcc.c  | GCC
 
   Ia32/DivS64x64Remainder.c
@@ -448,6 +454,8 @@
   X64/SwitchStack.asm
   X64/InterlockedCompareExchange64.asm 
   X64/InterlockedCompareExchange32.asm 
+  X64/EnableCache.asm
+  X64/DisableCache.asm
 
   X64/InterlockedDecrement.c | MSFT 
   X64/InterlockedIncrement.c | MSFT 
@@ -563,6 +571,8 @@
   X64/CpuIdEx.S | GCC 
   X64/CpuBreakpoint.S | GCC 
   SynchronizationGcc.c  | GCC 
+  X64/EnableCache.S | GCC
+  X64/DisableCache.S | GCC
   ChkStkGcc.c  | GCC 
 
 [Sources.IPF]
