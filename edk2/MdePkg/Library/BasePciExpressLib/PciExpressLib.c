@@ -36,6 +36,32 @@
 #define ASSERT_INVALID_PCI_ADDRESS(A) \
   ASSERT (((A) & ~0xfffffff) == 0)
 
+/**
+  Register a PCI device so PCI configuration registers may be accessed after 
+  SetVirtualAddressMap().
+  
+  If Address > 0x0FFFFFFF, then ASSERT().
+
+  @param  Address Address that encodes the PCI Bus, Device, Function and
+                  Register.
+  
+  @retval RETURN_SUCCESS           The PCI device was registered for runtime access.
+  @retval RETURN_UNSUPPORTED       An attempt was made to call this function 
+                                   after ExitBootServices().
+  @retval RETURN_UNSUPPORTED       The resources required to access the PCI device
+                                   at runtime could not be mapped.
+  @retval RETURN_OUT_OF_RESOURCES  There are not enough resources available to
+                                   complete the registration.
+
+**/
+RETURN_STATUS
+EFIAPI
+PciExpressRegisterForRuntimeAccess (
+  IN UINTN  Address
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
 
 /**
   Gets the base address of PCI Express.
