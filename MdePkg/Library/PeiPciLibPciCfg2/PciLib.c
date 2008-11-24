@@ -42,7 +42,7 @@
 
 **/
 #define PCI_TO_PCICFG2_ADDRESS(A) \
-  (((A) << 4) & 0xff000000) | (((A) >> 4) & 0x00000700) | (((A) << 1) & 0x001f0000) | ((UINT64)((A) & 0xFFF) << 32)
+  ((((A) << 4) & 0xff000000) | (((A) >> 4) & 0x00000700) | (((A) << 1) & 0x001f0000) | (LShiftU64((A) & 0xfff, 32)))
 
 /**
   Internal worker function to read a PCI configuration register.
@@ -1210,7 +1210,7 @@ PciReadBuffer (
   UINTN                             ReturnValue;
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
-  ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
+  ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
 
   if (Size == 0) {
     return Size;
@@ -1223,7 +1223,7 @@ PciReadBuffer (
   //
   ReturnValue = Size;
 
-  if ((StartAddress & 1) != 0) {
+  if ((StartAddress & BIT0) != 0) {
     //
     // Read a byte if StartAddress is byte aligned
     //
@@ -1233,7 +1233,7 @@ PciReadBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
+  if (Size >= sizeof (UINT16) && (StartAddress & BIT1) != 0) {
     //
     // Read a word if StartAddress is word aligned
     //
@@ -1308,7 +1308,7 @@ PciWriteBuffer (
   UINTN                             ReturnValue;
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
-  ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
+  ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
 
   if (Size == 0) {
     return 0;
@@ -1321,7 +1321,7 @@ PciWriteBuffer (
   //
   ReturnValue = Size;
 
-  if ((StartAddress & 1) != 0) {
+  if ((StartAddress & BIT0) != 0) {
     //
     // Write a byte if StartAddress is byte aligned
     //
@@ -1331,7 +1331,7 @@ PciWriteBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
+  if (Size >= sizeof (UINT16) && (StartAddress & BIT1) != 0) {
     //
     // Write a word if StartAddress is word aligned
     //

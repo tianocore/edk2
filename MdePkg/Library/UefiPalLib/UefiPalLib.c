@@ -1,5 +1,6 @@
 /** @file
-  PAL Library implementation built upon UEFI.
+  PAL Library implementation retrieving the PAL Entry Point from the SAL System Table
+  register in the EFI System Confguration Table.
 
   Copyright (c) 2007 - 2008, Intel Corporation All rights
   reserved. This program and the accompanying materials are
@@ -41,12 +42,12 @@ UINT64               mPalProcEntry;
   returned or undefined result may occur during the execution of the procedure.
   This function is only available on IPF.
 
-  @param Index - The PAL procedure Index number.
-  @param Arg2  - The 2nd parameter for PAL procedure calls.
-  @param Arg3  - The 3rd parameter for PAL procedure calls.
-  @param Arg4  - The 4th parameter for PAL procedure calls.
+  @param  Index  The PAL procedure Index number.
+  @param  Arg2   The 2nd parameter for PAL procedure calls.
+  @param  Arg3   The 3rd parameter for PAL procedure calls.
+  @param  Arg4   The 4th parameter for PAL procedure calls.
 
-  @return structure returned from the PAL Call procedure, including the status and return value.
+  @return Structure returned from the PAL Call procedure, including the status and return value.
 
 **/
 PAL_CALL_RETURN
@@ -76,7 +77,7 @@ PalCall (
 
   The constructor function looks up the SAL System Table in the EFI System Configuration
   Table. Once the SAL System Table is found, the PAL Entry Point in the SAL System Table
-  will be derived and stored inot a global variable for library usage.
+  will be derived and stored into a global variable for library usage.
   It will ASSERT() if the SAL System Table cannot be found or the data in the SAL System
   Table is not the valid data.
 
@@ -105,9 +106,9 @@ UefiPalLibConstructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Move the SAL System Table point to the first Entry
-  // Due to the SAL Entry is in ascending order with the Entry type,
-  // the type 0 Entry should be the first if exist.
+  // Check the first entry of SAL System Table,
+  // because the SAL entry is in ascending order with the entry type,
+  // the type 0 entry should be the first if exist.
   //
   SalStEntryDes = (SAL_ST_ENTRY_POINT_DESCRIPTOR *)(SalSystemTable + 1);
 

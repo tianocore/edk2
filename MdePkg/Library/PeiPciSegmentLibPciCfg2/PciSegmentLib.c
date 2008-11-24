@@ -42,7 +42,7 @@
 
 **/
 #define PCI_TO_PCICFG2_ADDRESS(A) \
-  (((A) << 4) & 0xff000000) | (((A) >> 4) & 0x00000700) | (((A) << 1) & 0x001f0000) | ((UINT64)((A) & 0xFFF) << 32)
+  ((((A) << 4) & 0xff000000) | (((A) >> 4) & 0x00000700) | (((A) << 1) & 0x001f0000) | (LShiftU64((A) & 0xfff, 32)))
 
 /**
   Gets PCI CFG2 PPI.
@@ -1206,7 +1206,7 @@ PciSegmentBitFieldAndThenOr32 (
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting Address that encodes the PCI Segment, Bus, Device,
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
                         Function and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer receiving the data read.
@@ -1238,7 +1238,7 @@ PciSegmentReadBuffer (
   //
   ReturnValue = Size;
 
-  if ((StartAddress & 1) != 0) {
+  if ((StartAddress & BIT0) != 0) {
     //
     // Read a byte if StartAddress is byte aligned
     //
@@ -1248,7 +1248,7 @@ PciSegmentReadBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
+  if (Size >= sizeof (UINT16) && (StartAddress & BIT1) != 0) {
     //
     // Read a word if StartAddress is word aligned
     //
@@ -1304,7 +1304,7 @@ PciSegmentReadBuffer (
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting Address that encodes the PCI Segment, Bus, Device,
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
                         Function and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
@@ -1336,7 +1336,7 @@ PciSegmentWriteBuffer (
   //
   ReturnValue = Size;
 
-  if ((StartAddress & 1) != 0) {
+  if ((StartAddress & BIT0) != 0) {
     //
     // Write a byte if StartAddress is byte aligned
     //
@@ -1346,7 +1346,7 @@ PciSegmentWriteBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
+  if (Size >= sizeof (UINT16) && (StartAddress & BIT1) != 0) {
     //
     // Write a word if StartAddress is word aligned
     //

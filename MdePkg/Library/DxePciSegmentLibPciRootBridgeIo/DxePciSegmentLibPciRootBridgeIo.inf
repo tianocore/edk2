@@ -1,5 +1,5 @@
 # @file
-# Component description file for PCI Segment Lib using PCI Root Bridge I/O Protocol
+# PCI Segment Library that layers on top of the PCI Root Bridge I/O Protocol.
 #
 # This library produces the APIs from the PCI Library and implements these APIs
 #  by calling into the PCI Root Bridge I/O Protocols that are present in the platform.
@@ -7,7 +7,7 @@
 #  This library binds to all of the PCI Root Bridge I/O Protocols in the platform and handles
 #  the translation from a PCI segment number into a specific PCI Root Bridge I/O Protocol.
 #
-# Copyright (c) 2007, Intel Corporation.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

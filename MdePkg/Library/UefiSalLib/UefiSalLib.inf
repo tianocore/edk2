@@ -1,10 +1,10 @@
 # @file
-# The library implements the UEFI SAL Library Class.
+# UEFI Instance of SAL Library Class.
 #
-# The library implements the UEFI SAL Library Class.
-#  This library is for boot service only modules.
+# This instance of SAL library retrieves the SAL Entry Point from the SAL System Table
+# register in the EFI System Confguration Table.
 #
-# Copyright (c) 2007, Intel Corporation.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,7 +21,7 @@
   BASE_NAME                      = UefiSalLib
   FILE_GUID                      = 4ABCFD77-4A33-4089-B003-5F09BCA940A2
   MODULE_TYPE                    = UEFI_DRIVER
-  VERSION_STRING                 = 1.04
+  VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SalLib|UEFI_DRIVER UEFI_APPLICATION
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
@@ -41,5 +41,4 @@
 
 [LibraryClasses]
   UefiLib
-  BaseLib
   DebugLib
