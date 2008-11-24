@@ -78,8 +78,6 @@
   MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
-  MdePkg/Library/DxePciLibPciRootBridgeIo/DxePciLibPciRootBridgeIo.inf
-  MdePkg/Library/DxePciSegmentLibPciRootBridgeIo/DxePciSegmentLibPciRootBridgeIo.inf
 
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
@@ -110,6 +108,8 @@
   MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+  MdePkg/Library/UefiPciLibPciRootBridgeIo/UefiPciLibPciRootBridgeIo.inf
+  MdePkg/Library/UefiPciSegmentLibPciRootBridgeIo/UefiPciSegmentLibPciRootBridgeIo.inf
 
 [Components.IA32, Components.X64]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf

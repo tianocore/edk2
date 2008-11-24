@@ -21,9 +21,9 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxePciLibPciRootBridgeIo
+  BASE_NAME                      = UefiPciLibPciRootBridgeIo
   FILE_GUID                      = 90EC42CB-B780-4eb8-8E99-C8E3E5F37530
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PciLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
   EDK_RELEASE_VERSION            = 0x00020000
