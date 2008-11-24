@@ -27,9 +27,9 @@
 ///
 #define PCI_EXP_MAX_CONFIG_OFFSET     0x1000
 
-//
-// PCI Capability List IDs and records
-//
+///
+/// PCI Capability List IDs and records
+///
 #define EFI_PCI_CAPABILITY_ID_PCIX    0x07
 
 #pragma pack(1)
