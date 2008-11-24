@@ -48,7 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param Arg3   The 3rd parameter for PAL procedure calls.
   @param Arg4   The 4th parameter for PAL procedure calls.
 
-  @return structure returned from the PAL Call procedure, including the status and return value.
+  @return Structure returned from the PAL Call procedure, including the status and return value.
 
 **/
 PAL_CALL_RETURN

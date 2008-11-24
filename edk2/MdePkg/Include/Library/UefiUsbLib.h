@@ -188,6 +188,12 @@ UsbGetIdleRequest (
 /**
   Set the report descriptor of the specified USB HID interface.
 
+  Submit a USB set HID report request for the USB device specified by UsbIo,
+  Interface, ReportId, and ReportType, and set the report descriptor using the
+  buffer specified by ReportLength and Report.
+  If UsbIo is NULL, then ASSERT().
+  If Report is NULL, then ASSERT().
+
   @param  UsbIo         A pointer to the USB I/O Protocol instance for the specific USB target.
   @param  Interface     The index of the report interface on the USB target.
   @param  ReportId      The identifier of the report to retrieve.
