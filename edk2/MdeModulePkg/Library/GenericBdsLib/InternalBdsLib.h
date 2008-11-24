@@ -35,6 +35,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/AcpiS3Save.h>
 #include <Protocol/Performance.h>
 #include <Protocol/FirmwareVolumeDispatch.h>
+#include <Protocol/OEMBadging.h>
+#include <Protocol/ConsoleControl.h>
+#include <Protocol/GraphicsOutput.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/HiiFont.h>
+#include <Protocol/HiiImage.h>
+
 
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FileInfo.h>
@@ -42,6 +49,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/PcAnsi.h>
 #include <Guid/ShellFile.h>
 #include <Guid/GenericPlatformVariable.h>
+#include <Guid/Bmp.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
@@ -60,6 +68,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/GenericBdsLib.h>
 #include <Library/TimerLib.h>
+#include <Library/PcdLib.h>
+#include <Library/DxeServicesLib.h>
 
 #define PERFORMANCE_SIGNATURE   EFI_SIGNATURE_32 ('P', 'e', 'r', 'f')
 #define PERF_TOKEN_SIZE         28

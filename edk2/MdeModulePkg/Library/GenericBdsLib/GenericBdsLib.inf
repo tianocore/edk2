@@ -68,7 +68,8 @@
   PcdLib
   PerformanceLib
   TimerLib
-
+  PcdLib
+  DxeServicesLib
 
 [Guids]
   gEfiVT100PlusGuid                             # ALWAYS_CONSUMED
@@ -93,12 +94,20 @@
   gEfiDebugPortProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
   gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiFirmwareVolume2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiFirmwareVolumeDispatchProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
   gEfiAcpiS3SaveProtocolGuid
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiOEMBadgingProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiFontProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+
+[FeaturePcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault

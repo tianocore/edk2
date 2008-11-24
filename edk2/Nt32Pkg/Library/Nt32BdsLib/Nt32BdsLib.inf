@@ -49,7 +49,6 @@
   BaseMemoryLib
   DebugLib
   PcdLib
-  GraphicsLib
   GenericBdsLib
 
 [Guids]

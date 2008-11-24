@@ -62,7 +62,6 @@
   BaseMemoryLib
   DebugLib
   PrintLib
-  GraphicsLib
   IfrSupportLib
   HiiLib
   ExtendedHiiLib
@@ -76,6 +75,7 @@
   gEfiHiiConfigRoutingProtocolGuid
   gEfiHiiDatabaseProtocolGuid
   gEfiUnicodeCollation2ProtocolGuid
+  gEfiConsoleControlProtocolGuid
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkHiiCompatibilitySupport

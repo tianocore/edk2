@@ -38,7 +38,6 @@ Abstract:
 #include <Library/PcdLib.h>
 #include <Library/GenericBdsLib.h>
 #include <Library/PlatformBdsLib.h>
-#include <Library/GraphicsLib.h>
 #include <Library/HobLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DxeServicesTableLib.h>

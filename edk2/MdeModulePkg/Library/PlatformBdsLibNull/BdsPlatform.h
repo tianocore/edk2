@@ -25,6 +25,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/GenericBdsLib.h>
 #include <Library/PlatformBdsLib.h>
-#include <Library/GraphicsLib.h>
 
 #endif // _BDS_PLATFORM_H
