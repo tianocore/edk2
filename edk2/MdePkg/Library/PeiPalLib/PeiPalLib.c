@@ -41,12 +41,12 @@
   returned or undefined result may occur during the execution of the procedure.
   This function is only available on IPF.
 
-  @param  Index  The PAL procedure Index number.
-  @param  Arg2   The 2nd parameter for PAL procedure calls.
-  @param  Arg3   The 3rd parameter for PAL procedure calls.
-  @param  Arg4   The 4th parameter for PAL procedure calls.
+  @param Index  The PAL procedure Index number.
+  @param Arg2   The 2nd parameter for PAL procedure calls.
+  @param Arg3   The 3rd parameter for PAL procedure calls.
+  @param Arg4   The 4th parameter for PAL procedure calls.
 
-  @return Structure returned from the PAL Call procedure, including the status and return value.
+  @return structure returned from the PAL Call procedure, including the status and return value.
 
 **/
 PAL_CALL_RETURN
