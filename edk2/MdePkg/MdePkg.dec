@@ -172,11 +172,6 @@
   ##
   BaseLib|Include/Library/BaseLib.h
 
-  ##  @libraryclass  supports displaying graphical splash screen, locking of keyboard input and
-  #                  printing character on screen.
-  ##
-  GraphicsLib|Include/Library/GraphicsLib.h
-
   ##  @libraryclass  This library provides common functions to process the different guided section data.
   ExtractGuidedSectionLib|Include/Library/ExtractGuidedSectionLib.h
 
