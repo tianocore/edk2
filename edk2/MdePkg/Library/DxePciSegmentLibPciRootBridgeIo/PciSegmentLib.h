@@ -47,13 +47,13 @@ typedef struct {
   ASSERT (((A) & (0xf0000000 | (M))) == 0)
 
 /**
-  Translate PCI Lib address into format of PCI CFG2 PPI.
+  Translate PCI Lib address into format of PCI Root Bridge I/O Protocol
 
   @param  A  Address that encodes the PCI Bus, Device, Function and
              Register.
 
 **/
-#define PCI_TO_PCICFG2_ADDRESS(A) \
-  (((A) << 4) & 0xff000000) | (((A) >> 4) & 0x00000700) | (((A) << 1) & 0x001f0000) | ((UINT64)((A) & 0xFFF) << 32)
+#define PCI_TO_PCI_ROOT_BRIDGE_IO_ADDRESS(A) \
+  ((((A) << 4) & 0xff000000) | (((A) >> 4) & 0x00000700) | (((A) << 1) & 0x001f0000) | (LShiftU64((A) & 0xfff, 32)))
 
 #endif

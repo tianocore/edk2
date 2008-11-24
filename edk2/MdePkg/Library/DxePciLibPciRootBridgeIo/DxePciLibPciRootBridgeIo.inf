@@ -1,5 +1,5 @@
 # @file
-# Component description file for PCI Lib using PCI Root Bridge I/O Protocol
+# PCI Library that layers on top of the PCI Root Bridge I/O Protocol.
 #
 # This library produces the APIs from the PCI Library and implements these APIs
 #  by calling into the PCI Root Bridge I/O Protocol. The PCI Root Bridge I/O Protocol is
@@ -7,7 +7,7 @@
 #  This library binds to the first PCI Root Bridge I/O Protocol in the platform. As a result,
 #  it should only be used on platforms that contain a single PCI root bridge.
 #
-# Copyright (c) 2007, Intel Corporation.
+# Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

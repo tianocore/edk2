@@ -1,5 +1,6 @@
 /** @file
-  SAL Library implementation built upon UEFI.
+  SAL Library implementation retrieving the SAL Entry Point from the SAL System Table
+  register in the EFI System Confguration Table.
 
   Copyright (c) 2007 - 2008, Intel Corporation All rights
   reserved. This program and the accompanying materials are
@@ -85,7 +86,7 @@ SalCall (
 
   The constructor function looks up the SAL System Table in the EFI System Configuration
   Table. Once the SAL System Table is found, the SAL Entry Point in the SAL System Table
-  will be derived and stored inot a global variable for library usage.
+  will be derived and stored into a global variable for library usage.
   It will ASSERT() if the SAL System Table cannot be found or the data in the SAL System
   Table is not the valid data.
 
@@ -114,9 +115,9 @@ UefiSalLibConstructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Move the SAL System Table point to the first Entry
-  // Due to the SAL Entry is in ascending order with the Entry type,
-  // the type 0 Entry should be the first if exist.
+  // Check the first entry of SAL System Table,
+  // because the SAL entry is in ascending order with the entry type,
+  // the type 0 entry should be the first if exist.
   //
   SalStEntryDes = (SAL_ST_ENTRY_POINT_DESCRIPTOR *)(SalSystemTable + 1);
 
@@ -128,7 +129,7 @@ UefiSalLibConstructor (
   mPlabel.EntryPoint = SalStEntryDes->SalProcEntry;
   mPlabel.GP = SalStEntryDes->SalGlobalDataPointer;
   //
-  // Make sure the EntryPoint has the real value
+  // Make sure the EntryPoint has the valid value
   //
   ASSERT ((mPlabel.EntryPoint != 0) && (mPlabel.GP != 0));
 

@@ -1,5 +1,5 @@
 /** @file
-  Functions accessing PCI configuration registers on any supported PCI segment
+  PCI Segment Library implementation using PCI Root Bridge I/O Protocol.
 
   Copyright (c) 2007 - 2008, Intel Corporation All rights
   reserved. This program and the accompanying materials are
@@ -96,8 +96,7 @@ PciSegmentLibConstructor (
     ASSERT (Descriptors->Desc != ACPI_END_TAG_DESCRIPTOR);
   }
 
-  Status = gBS->FreePool(HandleBuffer);
-  ASSERT_EFI_ERROR (Status);
+  FreePool(HandleBuffer);
 
   return EFI_SUCCESS;
 }
@@ -194,7 +193,7 @@ DxePciSegmentLibPciRootBridgeIoReadWorker (
   PciRootBridgeIo->Pci.Read (
                          PciRootBridgeIo,
                          Width,
-                         PCI_TO_PCICFG2_ADDRESS (Address),
+                         PCI_TO_PCI_ROOT_BRIDGE_IO_ADDRESS (Address),
                          1,
                          &Data
                          );
@@ -233,7 +232,7 @@ DxePciSegmentLibPciRootBridgeIoWriteWorker (
   PciRootBridgeIo->Pci.Write (
                          PciRootBridgeIo,
                          Width,
-                         PCI_TO_PCICFG2_ADDRESS (Address),
+                         PCI_TO_PCI_ROOT_BRIDGE_IO_ADDRESS (Address),
                          1,
                          &Data
                          );
@@ -1288,7 +1287,7 @@ PciSegmentBitFieldAndThenOr32 (
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting Address that encodes the PCI Segment, Bus, Device,
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
                         Function and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer receiving the data read.
@@ -1320,7 +1319,7 @@ PciSegmentReadBuffer (
   //
   ReturnValue = Size;
 
-  if ((StartAddress & 1) != 0) {
+  if ((StartAddress & BIT0) != 0) {
     //
     // Read a byte if StartAddress is byte aligned
     //
@@ -1330,7 +1329,7 @@ PciSegmentReadBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
+  if (Size >= sizeof (UINT16) && (StartAddress & BIT1) != 0) {
     //
     // Read a word if StartAddress is word aligned
     //
@@ -1386,7 +1385,7 @@ PciSegmentReadBuffer (
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting Address that encodes the PCI Segment, Bus, Device,
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
                         Function and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
@@ -1418,7 +1417,7 @@ PciSegmentWriteBuffer (
   //
   ReturnValue = Size;
 
-  if ((StartAddress & 1) != 0) {
+  if ((StartAddress & BIT0) != 0) {
     //
     // Write a byte if StartAddress is byte aligned
     //
@@ -1428,7 +1427,7 @@ PciSegmentWriteBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
+  if (Size >= sizeof (UINT16) && (StartAddress & BIT1) != 0) {
     //
     // Write a word if StartAddress is word aligned
     //
