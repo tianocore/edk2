@@ -379,6 +379,14 @@ DxeMain (
   DEBUG_CODE_END ();
 
   //
+  // Display any drivers that were not dispatched because dependency expression
+  // evaluated to false if this is a debug build
+  //
+  DEBUG_CODE_BEGIN ();
+    CoreDisplayDiscoveredNotDispatched ();
+  DEBUG_CODE_END ();
+
+  //
   // Assert if the Architectural Protocols are not present.
   //
   ASSERT_EFI_ERROR (CoreAllEfiServicesAvailable ());
@@ -390,14 +398,6 @@ DxeMain (
     EFI_PROGRESS_CODE,
     FixedPcdGet32 (PcdStatusCodeValueDxeCoreHandoffToBds)
     );
-
-  //
-  // Display any drivers that were not dispatched because dependency expression
-  // evaluated to false if this is a debug build
-  //
-  DEBUG_CODE_BEGIN ();
-    CoreDisplayDiscoveredNotDispatched ();
-  DEBUG_CODE_END ();
 
   //
   // Transfer control to the BDS Architectural Protocol
