@@ -151,7 +151,7 @@ PeiServicesNotifyPpi (
 EFI_STATUS
 EFIAPI
 PeiServicesGetBootMode (
-  IN OUT EFI_BOOT_MODE          *BootMode
+  OUT EFI_BOOT_MODE          *BootMode
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
