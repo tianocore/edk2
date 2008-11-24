@@ -236,11 +236,11 @@ CirrusLogic5430ControllerDriverStart (
   // Open PCI I/O Protocol
   //
   Status = gBS->OpenProtocol (
-                  Private->Handle,
+                  Controller,
                   &gEfiPciIoProtocolGuid,
                   (VOID **) &Private->PciIo,
                   This->DriverBindingHandle,
-                  Private->Handle,
+                  Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
