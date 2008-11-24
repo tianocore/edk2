@@ -68,7 +68,6 @@
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  GraphicsLib|MdeModulePkg/Library/GraphicsLib/GraphicsLib.inf
   IfrSupportLib|MdeModulePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
   ExtendedIfrSupportLib|MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
@@ -290,7 +289,6 @@
   MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
-  MdeModulePkg/Library/GraphicsLib/GraphicsLib.inf
   MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   MdeModulePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
 

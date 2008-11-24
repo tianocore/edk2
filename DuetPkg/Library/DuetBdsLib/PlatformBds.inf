@@ -47,7 +47,6 @@
   BaseMemoryLib
   DebugLib
   PcdLib
-  GraphicsLib
   GenericBdsLib
   HobLib
   UefiLib

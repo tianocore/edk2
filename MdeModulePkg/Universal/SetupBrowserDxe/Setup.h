@@ -30,10 +30,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
+#include <Protocol/ConsoleControl.h>
 
 #include <MdeModuleHii.h>
 
-#include <Library/GraphicsLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>

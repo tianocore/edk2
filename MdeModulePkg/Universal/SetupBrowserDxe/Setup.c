@@ -217,10 +217,11 @@ SendForm (
   OUT EFI_BROWSER_ACTION_REQUEST       *ActionRequest  OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  UI_MENU_SELECTION     *Selection;
-  UINTN                 Index;
-  FORM_BROWSER_FORMSET  *FormSet;
+  EFI_STATUS                    Status;
+  UI_MENU_SELECTION             *Selection;
+  UINTN                         Index;
+  FORM_BROWSER_FORMSET          *FormSet;
+  EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
 
   Status = EFI_SUCCESS;
   ZeroMem (&gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
@@ -282,7 +283,15 @@ SendForm (
   // Ensure we are in Text mode
   //
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
-  DisableQuietBoot ();
+
+  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  //
+  // Set console control to text mode.
+  //
+  ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
 
   for (Index = 0; Index < HandleCount; Index++) {
     Selection = AllocateZeroPool (sizeof (UI_MENU_SELECTION));

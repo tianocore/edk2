@@ -95,7 +95,6 @@
   ReportStatusCodeLib
   PerformanceLib
   MemoryAllocationLib
-  GraphicsLib
   UefiLib
   UefiBootServicesTableLib
   BaseMemoryLib

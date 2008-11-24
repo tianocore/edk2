@@ -145,7 +145,7 @@ PlInitializeDebugSupportDriver (
   VOID
   )
 {
-  SetMem (IvtEntryTable, sizeof (IvtEntryTable), 0);
+  ZeroMem (IvtEntryTable, sizeof (IvtEntryTable));
   ExternalInterruptCount = 0;
   return EFI_SUCCESS;
 }
@@ -307,7 +307,7 @@ ManageIvtEntryTable (
       //
       // re-init IvtEntryTable
       //
-      SetMem (&IvtEntryTable[ExceptionType], sizeof (IVT_ENTRY), 0);
+      ZeroMem (&IvtEntryTable[ExceptionType], sizeof (IVT_ENTRY));
     }
   } else {
     //

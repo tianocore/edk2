@@ -1053,5 +1053,54 @@ CatPrint (
   IN CHAR16           *fmt,
   ...
   );
+
+/**
+  Use Console Control to turn off UGA based Simple Text Out consoles from going
+  to the UGA device. Put up LogoFile on every UGA device that is a console
+
+  @param[in]  LogoFile   File name of logo to display on the center of the screen.
+
+  @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo displayed.
+  @retval EFI_UNSUPPORTED Logo not found
+
+**/
+EFI_STATUS
+EFIAPI
+EnableQuietBoot (
+  IN  EFI_GUID  *LogoFile
+  );
+
+
+/**
+  Use Console Control to turn on UGA based Simple Text Out consoles. The UGA 
+  Simple Text Out screens will now be synced up with all non UGA output devices
+
+  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
+
+**/
+EFI_STATUS
+EFIAPI
+DisableQuietBoot (
+  VOID
+  );
+
+/**
+  Use Console Control Protocol to lock the Console In Spliter virtual handle. 
+  This is the ConInHandle and ConIn handle in the EFI system table. All key
+  presses will be ignored until the Password is typed in. The only way to
+  disable the password is to type it in to a ConIn device.
+
+  @param  Password        Password used to lock ConIn device.
+
+  @retval EFI_SUCCESS     lock the Console In Spliter virtual handle successfully.
+  @retval EFI_UNSUPPORTED Password not found
+
+**/
+EFI_STATUS
+EFIAPI
+LockKeyboards (
+  IN  CHAR16    *Password
+  );
+
 #endif
 
