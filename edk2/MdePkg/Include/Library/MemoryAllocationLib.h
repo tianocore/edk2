@@ -381,7 +381,7 @@ AllocateReservedCopyPool (
 /**
   Reallocates a buffer of type EfiBootServicesData.
 
-  Allocates and zeros the number bytes specified by NewSize with the memmory type
+  Allocates and zeros the number bytes specified by NewSize from memory of type
   EfiBootServicesData.  If OldBuffer is not NULL, then the smaller of OldSize and 
   NewSize bytes are copied from OldBuffer to the newly allocated buffer, and 
   OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
@@ -411,7 +411,7 @@ ReallocatePool (
 /**
   Reallocates a buffer of type EfiRuntimeServicesData.
 
-  Allocates and zeros the number bytes specified by NewSize with the memmory type
+  Allocates and zeros the number bytes specified by NewSize from memory of type
   EfiRuntimeServicesData.  If OldBuffer is not NULL, then the smaller of OldSize and 
   NewSize bytes are copied from OldBuffer to the newly allocated buffer, and 
   OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
@@ -441,7 +441,7 @@ ReallocateRuntimePool (
 /**
   Reallocates a buffer of type EfiReservedMemoryType.
 
-  Allocates and zeros the number bytes specified by NewSize with the memmory type
+  Allocates and zeros the number bytes specified by NewSize from memory of type
   EfiReservedMemoryType.  If OldBuffer is not NULL, then the smaller of OldSize and 
   NewSize bytes are copied from OldBuffer to the newly allocated buffer, and 
   OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
