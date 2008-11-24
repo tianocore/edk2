@@ -243,7 +243,7 @@ Returns:
   // from the graphic lib
   //
   if (QuietBoot) {
-    EnableQuietBootEx (&gEfiDefaultBmpLogoGuid, mBdsImageHandle);
+    EnableQuietBoot (&gEfiDefaultBmpLogoGuid);
     //
     // Perform system diagnostic
     //
