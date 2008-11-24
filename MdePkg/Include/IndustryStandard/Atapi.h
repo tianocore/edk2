@@ -141,9 +141,9 @@ typedef struct {
   UINT8 additional_sense_bytes_18_253[253 - 18 + 1];
 } ATAPI_REQUEST_SENSE_DATA;
 
-///
-/// The followings are defined in SFF-8070i(ATAPI Removable Rewritable Specification)
-///
+//
+// The followings are defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+//
 
 ///
 /// READ CAPACITY Data 
@@ -342,7 +342,6 @@ typedef union {
 #define ATA_CMD_READ_LONG_WITH_RETRY    0x23   ///< defined in ATA-5
 #define ATA_CMD_READ_SECTORS_EXT        0x24   ///< defined in ATA-6
 
-
 //
 // Class 2: PIO Data-Out Commands
 //
@@ -382,28 +381,25 @@ typedef union {
 #define ATA_CMD_STANDBY_ALIAS           0xe2  ///< defined in ATA-6
 #define ATA_CMD_STANDBY_IMMEDIATE       0x94  ///< defined in ATA-3
 #define ATA_CMD_STANDBY_IMMEDIATE_ALIAS 0xe0  ///< defined in ATA-6
-///
-/// S.M.A.R.T
-///
+//
+// S.M.A.R.T
+//
 #define ATA_CMD_SMART               0xb0
 #define ATA_CONSTANT_C2             0xc2
 #define ATA_CONSTANT_4F             0x4f
 #define ATA_SMART_ENABLE_OPERATION  0xd8
 #define ATA_SMART_RETURN_STATUS     0xda
 
-
-///
-/// Class 4: DMA Command
-///
+//
+// Class 4: DMA Command
+//
 #define ATA_CMD_READ_DMA              0xc8   ///< defined in ATA-6
 #define ATA_CMD_READ_DMA_WITH_RETRY   0xc9   ///< defined in ATA-4
 #define ATA_CMD_READ_DMA_EXT          0x25   ///< defined in ATA-6
 #define ATA_CMD_WRITE_DMA             0xca   ///< defined in ATA-6
 #define ATA_CMD_WRITE_DMA_WITH_RETRY  0xcb   ///< defined in ATA-4
 #define ATA_CMD_WRITE_DMA_EXT         0x35   ///< defined in ATA-6
-
-
-
+        
 ///
 /// default content of device control register, disable INT,
 /// Bit3 is set to 1 according ATA-1
@@ -419,12 +415,12 @@ typedef union {
 
 #define ATA_REQUEST_SENSE_ERROR (0x70) ///< defined in SFF-8070i
 
-///
-/// Sense Key, Additional Sense Codes and Additional Sense Code Qualifier
-/// defined in MultiMedia Commands (MMC, MMC-2) 
-///
-/// Sense Key 
-///
+//
+// Sense Key, Additional Sense Codes and Additional Sense Code Qualifier
+// defined in MultiMedia Commands (MMC, MMC-2) 
+//
+// Sense Key 
+//
 #define ATA_SK_NO_SENSE         (0x0)
 #define ATA_SK_RECOVERY_ERROR   (0x1)
 #define ATA_SK_NOT_READY        (0x2)
@@ -442,9 +438,9 @@ typedef union {
 #define ATA_SK_MISCOMPARE       (0xE)
 #define ATA_SK_RESERVED_F       (0xF)
 
-///
-/// Additional Sense Codes
-///
+//
+// Additional Sense Codes
+//
 #define ATA_ASC_NOT_READY                   (0x04)
 #define ATA_ASC_MEDIA_ERR1                  (0x10)
 #define ATA_ASC_MEDIA_ERR2                  (0x11)
@@ -466,9 +462,9 @@ typedef union {
 //
 #define ATA_ASCQ_IN_PROGRESS  (0x01)
 
-///
-/// Error Register
-///
+//
+// Error Register
+//
 #define ATA_ERRREG_BBK   BIT7  ///< Bad block detected      defined in ATA-1
 #define ATA_ERRREG_UNC   BIT6  ///< Uncorrectable Data      defined in ATA-3
 #define ATA_ERRREG_MC    BIT5  ///< Media Change            defined in ATA-3
@@ -478,9 +474,9 @@ typedef union {
 #define ATA_ERRREG_TK0NF BIT1  ///< Track 0 Not Found       defined in ATA-3
 #define ATA_ERRREG_AMNF  BIT0  ///< Address Mark Not Found  defined in ATA-3
 
-///
-/// Status Register
-///
+//
+// Status Register
+//
 #define ATA_STSREG_BSY   BIT7  ///< Controller Busy         defined in ATA-6
 #define ATA_STSREG_DRDY  BIT6  ///< Drive Ready             defined in ATA-6
 #define ATA_STSREG_DWF   BIT5  ///< Drive Write Fault       defined in ATA-6
@@ -490,9 +486,9 @@ typedef union {
 #define ATA_STSREG_IDX   BIT1  ///< Index                   defined in ATA-3
 #define ATA_STSREG_ERR   BIT0  ///< Error                   defined in ATA-6
 
-///
-/// Device Control Register
-///
+//
+// Device Control Register
+//
 #define ATA_CTLREG_SRST  BIT2  ///< Software Reset
 #define ATA_CTLREG_IEN_L BIT1  ///< Interrupt Enable #
 

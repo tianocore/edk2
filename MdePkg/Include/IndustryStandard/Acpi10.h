@@ -23,11 +23,10 @@ typedef struct {
   UINT32  Length;
 } EFI_ACPI_COMMON_HEADER;
 
-//
-// Common ACPI description table header.  This structure prefaces most ACPI tables.
-//
 #pragma pack(1)
-
+///
+/// Common ACPI description table header.  This structure prefaces most ACPI tables.
+///
 typedef struct {
   UINT32  Signature;
   UINT32  Length;
@@ -39,8 +38,8 @@ typedef struct {
   UINT32  CreatorId;
   UINT32  CreatorRevision;
 } EFI_ACPI_DESCRIPTION_HEADER;
-
 #pragma pack()
+
 //
 // Define for Desriptor
 //
@@ -63,10 +62,11 @@ typedef struct {
 // Ensure proper structure formats
 //
 #pragma pack(1)
-//
-// The commond definition of QWORD, DWORD, and WORD
-// Address Space Descriptors
-//
+
+///
+/// The commond definition of QWORD, DWORD, and WORD
+/// Address Space Descriptors
+///
 typedef struct {
   UINT8   Desc;
   UINT16  Len;
@@ -208,16 +208,16 @@ typedef struct {
 // Fixed ACPI Description Table Fixed Feature Flags
 // All other bits are reserved and must be set to 0.
 //
-#define EFI_ACPI_1_0_WBINVD       (1 << 0)
-#define EFI_ACPI_1_0_WBINVD_FLUSH (1 << 1)
-#define EFI_ACPI_1_0_PROC_C1      (1 << 2)
-#define EFI_ACPI_1_0_P_LVL2_UP    (1 << 3)
-#define EFI_ACPI_1_0_PWR_BUTTON   (1 << 4)
-#define EFI_ACPI_1_0_SLP_BUTTON   (1 << 5)
-#define EFI_ACPI_1_0_FIX_RTC      (1 << 6)
-#define EFI_ACPI_1_0_RTC_S4       (1 << 7)
-#define EFI_ACPI_1_0_TMR_VAL_EXT  (1 << 8)
-#define EFI_ACPI_1_0_DCK_CAP      (1 << 9)
+#define EFI_ACPI_1_0_WBINVD               BIT0
+#define EFI_ACPI_1_0_WBINVD_FLUSH         BIT1
+#define EFI_ACPI_1_0_PROC_C1              BIT2
+#define EFI_ACPI_1_0_P_LVL2_UP            BIT3
+#define EFI_ACPI_1_0_PWR_BUTTON           BIT4
+#define EFI_ACPI_1_0_SLP_BUTTON           BIT5
+#define EFI_ACPI_1_0_FIX_RTC              BIT6
+#define EFI_ACPI_1_0_RTC_S4               BIT7
+#define EFI_ACPI_1_0_TMR_VAL_EXT          BIT8
+#define EFI_ACPI_1_0_DCK_CAP              BIT9
 
 ///
 /// Firmware ACPI Control Structure
@@ -236,7 +236,7 @@ typedef struct {
 /// Firmware Control Structure Feature Flags
 /// All other bits are reserved and must be set to 0.
 ///
-#define EFI_ACPI_1_0_S4BIOS_F (1 << 0)
+#define EFI_ACPI_1_0_S4BIOS_F             BIT0
 
 ///
 /// Multiple APIC Description Table header definition.  The rest of the table
@@ -257,7 +257,7 @@ typedef struct {
 /// Multiple APIC Flags
 /// All other bits are reserved and must be set to 0.
 ///
-#define EFI_ACPI_1_0_PCAT_COMPAT  (1 << 0)
+#define EFI_ACPI_1_0_PCAT_COMPAT           BIT0
 
 //
 // Multiple APIC Description Table APIC structure types
@@ -288,7 +288,7 @@ typedef struct {
 ///
 /// Local APIC Flags.  All other bits are reserved and must be 0.
 ///
-#define EFI_ACPI_1_0_LOCAL_APIC_ENABLED (1 << 0)
+#define EFI_ACPI_1_0_LOCAL_APIC_ENABLED      BIT0
 
 ///
 /// IO APIC Structure
