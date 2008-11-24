@@ -79,6 +79,8 @@
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
 
+  MdePkg/Library/DxeRuntimePciExpressLib/DxeRuntimePciExpressLib.inf
+
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
   MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
