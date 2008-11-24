@@ -1,6 +1,10 @@
 /** @file
   Provides services to load and relocate a PE/COFF image.
 
+  The PE/COFF Loader Library abstracts the implementation of a PE/COFF loader for
+  IA-32, x86, IPF, and EBC processor types. The library functions are memory based 
+  and can be ported easily to any environment.
+  
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -31,9 +35,35 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define IMAGE_ERROR_FAILED_RELOCATION            9
 #define IMAGE_ERROR_FAILED_ICACHE_FLUSH          10
 
-//
-// PE/COFF Loader Read Function passed in by caller
-//
+/**
+  Reads contents of a PE/COFF image.
+
+  A function of this type reads contents of the PE/COFF image specified by FileHandle. The read 
+  operation copies ReadSize bytes from the PE/COFF image starting at byte offset FileOffset into 
+  the buffer specified by Buffer. The size of the buffer actually read is returned in ReadSize.  
+  If FileOffset specifies an offset past the end of the PE/COFF image, a ReadSize of 0 is returned.
+  A function of this type must be registered in the ImageRead field of a PE_COFF_LOADER_IMAGE_CONTEXT 
+  structure for the PE/COFF Loader Library service to function correctly.  This function abstracts access 
+  to a PE/COFF image so it can be implemented in an environment specific manner.  For example, SEC and PEI 
+  environments may access memory directly to read the contents of a PE/COFF image, and DXE or UEFI 
+  environments may require protocol services to read the contents of PE/COFF image 
+  stored on FLASH, disk, or network devices.
+  
+  If FileHandle is not a valid handle, then ASSERT().
+  If ReadSize is NULL, then ASSERT().
+  If Buffer is NULL, then ASSERT().
+
+  @param  FileHandle      Pointer to the file handle to read the PE/COFF image.
+  @param  FileOffset      Offset into the PE/COFF image to begin the read operation.
+  @param  ReadSize        On input, the size in bytes of the requested read operation.  
+                          On output, the number of bytes actually read.
+  @param  Buffer          Output buffer that contains the data read from the PE/COFF image.
+  
+  @retval RETURN_SUCCESS            The specified portion of the PE/COFF image was read and the size 
+  @retval RETURN_DEVICE_ERROR       The specified portion of the PE/COFF image could not be read due 
+                                    to a device error.
+
+**/
 typedef
 RETURN_STATUS
 (EFIAPI *PE_COFF_LOADER_READ_FILE) (
@@ -169,6 +199,8 @@ typedef struct {
   If any errors occur while computing the fields of ImageContext, 
   then the error status is returned in the ImageError field of ImageContext.  
   If the image is a TE image, then SectionAlignment is set to 0.
+  The ImageRead and Handle fields of ImageContext structure must be valid prior 
+  to invoking this service.
 
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.
@@ -190,7 +222,13 @@ PeCoffLoaderGetImageInfo (
   If the DestinationAddress field of ImageContext is 0, then use the ImageAddress field of
   ImageContext as the relocation base address.  Otherwise, use the DestinationAddress field
   of ImageContext as the relocation base address.  The caller must allocate the relocation
-  fixup log buffer and fill in the FixupData field of ImageContext prior to calling this function.  
+  fixup log buffer and fill in the FixupData field of ImageContext prior to calling this function.
+  
+  The ImageRead, Handle, PeCoffHeaderOffset,  IsTeImage, Machine, ImageType, ImageAddress, 
+  ImageSize, DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, 
+  DebugDirectoryEntryRva, EntryPoint, FixupDataSize, CodeView, PdbPointer, and FixupData of 
+  the ImageContext structure must be valid prior to invoking this service.
+    
   If ImageContext is NULL, then ASSERT().
 
   @param  ImageContext        Pointer to the image context structure that describes the PE/COFF
@@ -217,6 +255,10 @@ PeCoffLoaderRelocateImage (
   specified by the ImageAddress and ImageSize fields of ImageContext.  The caller must allocate
   the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function.
   The EntryPoint, FixupDataSize, CodeView, and PdbPointer fields of ImageContext are computed.
+  The ImageRead, Handle, PeCoffHeaderOffset,  IsTeImage,  Machine, ImageType, ImageAddress, ImageSize, 
+  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva 
+  fields of the ImageContext structure must be valid prior to invoking this service.
+  
   If ImageContext is NULL, then ASSERT().
 
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
@@ -241,13 +283,24 @@ PeCoffLoaderLoadImage (
 
 
 /**
-  ImageRead function that operates on a memory buffer whos base is passed into
-  FileHandle. 
+  Reads contents of a PE/COFF image from a buffer in system memory.
+   
+  This is the default implementation of a PE_COFF_LOADER_READ_FILE function 
+  that assumes FileHandle pointer to the beginning of a PE/COFF image.   
+  This function reads contents of the PE/COFF image that starts at the system memory 
+  address specified by FileHandle.  The read operation copies ReadSize bytes from the 
+  PE/COFF image starting at byte offset FileOffset into the buffer specified by Buffer.  
+  The size of the buffer actually read is returned in ReadSize.
+  
+  If FileHandle is NULL, then ASSERT().
+  If ReadSize is NULL, then ASSERT().
+  If Buffer is NULL, then ASSERT().
 
-  @param  FileHandle        Ponter to baes of the input stream
-  @param  FileOffset        Offset to the start of the buffer
-  @param  ReadSize          Number of bytes to copy into the buffer
-  @param  Buffer            Location to place results of read
+  @param  FileHandle        Pointer to base of the input stream
+  @param  FileOffset        Offset into the PE/COFF image to begin the read operation.
+  @param  ReadSize          On input, the size in bytes of the requested read operation.  
+                            On output, the number of bytes actually read.
+  @param  Buffer            Output buffer that contains the data read from the PE/COFF image.
 
   @retval RETURN_SUCCESS    Data is read from FileOffset from the Handle into 
                             the buffer.
@@ -270,10 +323,13 @@ PeCoffLoaderImageReadFromMemory (
   the fixups with a virtual mapping.
 
 
-  @param  ImageBase          Base address of relocated image
-  @param  VirtImageBase      Virtual mapping for ImageBase
-  @param  ImageSize          Size of the image to relocate
-  @param  RelocationData     Location to place results of read
+  @param  ImageBase          Base address of a PE/COFF image that has been loaded 
+                             and relocated into system memory.
+  @param  VirtImageBase      The request virtual address that the PE/COFF image is to
+                             be fixed up for.
+  @param  ImageSize          The size, in bytes, of the PE/COFF image.
+  @param  RelocationData     A pointer to the relocation data that was collected when the PE/COFF 
+                             image was relocated using PeCoffLoaderRelocateImage().
   
 **/
 VOID
@@ -287,11 +343,15 @@ PeCoffLoaderRelocateImageForRuntime (
 
 /**
   Unloads a loaded PE/COFF image from memory and releases its taken resource.
-   
+  Releases any environment specific resources that were allocated when the image 
+  specified by ImageContext was loaded using PeCoffLoaderLoadImage(). 
+ 
   For NT32 emulator, the PE/COFF image loaded by system needs to release.
   For real platform, the PE/COFF image loaded by Core doesn't needs to be unloaded, 
   this function can simply return RETURN_SUCCESS.
-
+  
+  If ImageContext is NULL, then ASSERT().
+  
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image to be unloaded.
 

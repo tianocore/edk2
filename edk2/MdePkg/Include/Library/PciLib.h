@@ -1,5 +1,14 @@
 /** @file
   Provides services to access PCI Configuration Space.
+  
+  These functions perform PCI configuration cycles using the default PCI configuration 
+  access method. This may use I/O ports 0xCF8 and 0xCFC to perform PCI configuration accesses, 
+  or it may use MMIO registers relative to the PcdPciExpressBaseAddress, or it may use some 
+  alternate access method.  Modules will typically use the PCI Library for its PCI configuration 
+  accesses.  However, if a module requires a mix of PCI access methods, the PCI CF8 Library or 
+  PCI Express Library may be used in conjunction with the PCI Library.  The functionality of 
+  these three libraries is identical.  The PCI CF8 Library and PCI Express Library simply use 
+  explicit access methods.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

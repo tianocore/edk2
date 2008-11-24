@@ -1,5 +1,9 @@
 /** @file
   Provides services to access PCI Configuration Space using the MMIO PCI Express window.
+  
+  This library is identical to the PCI Library, except the access method for performing PCI 
+  configuration cycles must be though the 256 MB PCI Express MMIO window whose base address
+  is defined by PcdPciExpressBaseAddress.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -968,7 +972,7 @@ PciExpressBitFieldAndThenOr32 (
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer receiving the data read.
 
-  @return Size read daata from StartAddress.
+  @return Size read data from StartAddress.
 
 **/
 UINTN
