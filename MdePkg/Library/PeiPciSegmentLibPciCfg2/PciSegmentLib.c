@@ -107,14 +107,15 @@ PeiPciSegmentLibPciCfg2ReadWorker (
 {
   UINT32                       Data;
   CONST EFI_PEI_PCI_CFG2_PPI   *PciCfg2Ppi;
+  UINT64                       PciCfg2Address;
 
   PciCfg2Ppi = InternalGetPciCfg2Ppi (Address);
-
+  PciCfg2Address = PCI_TO_PCICFG2_ADDRESS (Address);
   PciCfg2Ppi->Read (
                 GetPeiServicesTablePointer (),
                 PciCfg2Ppi,
                 Width,
-                PCI_TO_PCICFG2_ADDRESS (Address),
+                PciCfg2Address,
                 &Data
                 );
 
@@ -145,14 +146,15 @@ PeiPciSegmentLibPciCfg2WriteWorker (
   )
 {
   CONST EFI_PEI_PCI_CFG2_PPI   *PciCfg2Ppi;
+  UINT64                       PciCfg2Address;
 
   PciCfg2Ppi = InternalGetPciCfg2Ppi (Address);
-
+  PciCfg2Address = PCI_TO_PCICFG2_ADDRESS (Address);
   PciCfg2Ppi->Write (
                 GetPeiServicesTablePointer (),
                 PciCfg2Ppi,
                 Width,
-                PCI_TO_PCICFG2_ADDRESS (Address),
+                PciCfg2Address,
                 &Data
                 );
 

@@ -67,16 +67,18 @@ PeiPciLibPciCfg2ReadWorker (
   EFI_STATUS                   Status;
   UINT32                       Data;
   CONST EFI_PEI_PCI_CFG2_PPI   *PciCfg2Ppi;
+  UINT64                       PciCfg2Address;
 
   Status = PeiServicesLocatePpi (&gEfiPciCfg2PpiGuid, 0, NULL, (VOID **) &PciCfg2Ppi);
   ASSERT_EFI_ERROR (Status);
   ASSERT (PciCfg2Ppi != NULL);
 
+  PciCfg2Address = PCI_TO_PCICFG2_ADDRESS (Address);
   PciCfg2Ppi->Read (
                 GetPeiServicesTablePointer (),
                 PciCfg2Ppi,
                 Width,
-                PCI_TO_PCICFG2_ADDRESS (Address),
+                PciCfg2Address,
                 &Data
                 );
 
@@ -108,16 +110,18 @@ PeiPciLibPciCfg2WriteWorker (
 {
   EFI_STATUS                      Status;
   CONST EFI_PEI_PCI_CFG2_PPI      *PciCfg2Ppi;
+  UINT64                          PciCfg2Address;
 
   Status = PeiServicesLocatePpi (&gEfiPciCfg2PpiGuid, 0, NULL, (VOID **) &PciCfg2Ppi);
   ASSERT_EFI_ERROR (Status);
   ASSERT (PciCfg2Ppi != NULL);
 
+  PciCfg2Address = PCI_TO_PCICFG2_ADDRESS (Address);
   PciCfg2Ppi->Write (
                 GetPeiServicesTablePointer (),
                 PciCfg2Ppi,
                 Width,
-                PCI_TO_PCICFG2_ADDRESS (Address),
+                PciCfg2Address,
                 &Data
                 );
 
