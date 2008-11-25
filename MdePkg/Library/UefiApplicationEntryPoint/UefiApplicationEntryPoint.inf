@@ -19,8 +19,8 @@
   FILE_GUID                      = DADE8301-CB29-4fd5-8148-56FD246C5B88
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiApplicationEntryPoint|UEFI_APPLICATION 
-  EDK_RELEASE_VERSION            = 0x00020000
+  LIBRARY_CLASS                  = UefiApplicationEntryPoint|UEFI_APPLICATION
+  EFI_SPECIFICATION_VERSION      = 0x00020000
 
 
 #

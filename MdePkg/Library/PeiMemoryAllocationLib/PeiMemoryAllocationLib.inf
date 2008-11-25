@@ -23,7 +23,6 @@
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MemoryAllocationLib|PEIM PEI_CORE SEC
-  EDK_RELEASE_VERSION            = 0x00020000
 
 
 #

@@ -24,7 +24,6 @@
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = UefiRuntimeLib|UEFI_DRIVER DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION DXE_SMM_DRIVER
-  EDK_RELEASE_VERSION            = 0x00020000
 
   CONSTRUCTOR                    = RuntimeDriverLibConstruct
   DESTRUCTOR                     = RuntimeDriverLibDeconstruct
