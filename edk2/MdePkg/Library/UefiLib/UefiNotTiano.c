@@ -43,16 +43,16 @@ InternalEmptyFuntion (
 }
 
 /**
-  Creates an EFI event in the Legacy Boot Event Group.  Prior to UEFI 2.0 this 
-  was done via a non blessed UEFI extensions and this library abstracts the 
-  implementation mechanism of this event from the caller.
-  
-  This function abstracts the creation of the Legacy Boot Event.  The Framework 
-  moved from a proprietary to UEFI 2.0 based mechanism.  This library abstracts 
-  the caller from how this event is created to prevent to code form having to 
-  change with the version of the specification supported.
+  Creates an EFI event in the Legacy Boot Event Group.
+
+  Prior to UEFI 2.0 this was done via a non blessed UEFI extensions and this library
+  abstracts the implementation mechanism of this event from the caller. This function
+  abstracts the creation of the Legacy Boot Event. The Framework moved from a proprietary
+  to UEFI 2.0 based mechanism.  This library abstracts the caller from how this event
+  is created to prevent to code form having to change with the version of the
+  specification supported.
   If LegacyBootEvent is NULL, then ASSERT().
-  
+
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
 
   @retval EFI_SUCCESS       Event was created.
@@ -75,8 +75,8 @@ EfiCreateEventLegacyBoot (
 
 /**
   Create an EFI event in the Legacy Boot Event Group and allows
-  the caller to specify a notification function.
-
+  the caller to specify a notification function.  
+  
   This function abstracts the creation of the Legacy Boot Event.
   The Framework moved from a proprietary to UEFI 2.0 based mechanism.
   This library abstracts the caller from how this event is created to prevent
@@ -128,17 +128,17 @@ EfiCreateEventLegacyBootEx (
 }
 
 /**
-  Create an EFI event in the Ready To Boot Event Group.  Prior to UEFI 2.0 this 
-  was done via a non-standard UEFI extension, and this library abstracts the 
-  implementation mechanism of this event from the caller.
-  
+  Create an EFI event in the Ready To Boot Event Group.
+
+  Prior to UEFI 2.0 this was done via a non-standard UEFI extension, and this library
+  abstracts the implementation mechanism of this event from the caller.   
   This function abstracts the creation of the Ready to Boot Event.  The Framework 
   moved from a proprietary to UEFI 2.0-based mechanism.  This library abstracts 
   the caller from how this event is created to prevent the code form having to 
   change with the version of the specification supported.
   If ReadyToBootEvent is NULL, then ASSERT().
 
-  @param  ReadyToBootEvent  Returns the EFI event returned from gBS->CreateEvent(Ex).
+  @param  ReadyToBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
 
   @retval EFI_SUCCESS       Event was created.
   @retval Other             Event was not created.
@@ -160,8 +160,8 @@ EfiCreateEventReadyToBoot (
 
 /**
   Create an EFI event in the Ready To Boot Event Group and allows
-  the caller to specify a notification function.
-
+  the caller to specify a notification function.  
+  
   This function abstracts the creation of the Ready to Boot Event.
   The Framework moved from a proprietary to UEFI 2.0 based mechanism.
   This library abstracts the caller from how this event is created to prevent
@@ -217,9 +217,9 @@ EfiCreateEventReadyToBootEx (
   Create, Signal, and Close the Ready to Boot event using EfiSignalEventReadyToBoot().
   
   This function abstracts the signaling of the Ready to Boot Event. The Framework moved
-  from a proprietary to UEFI 2.0 based mechanism.  This library abstracts the caller from
-  how this event is created to prevent to code form having to change with the version of
-  the specification supported.
+  from a proprietary to UEFI 2.0 based mechanism. This library abstracts the caller
+  from how this event is created to prevent to code form having to change with the
+  version of the specification supported.
 
 **/
 VOID

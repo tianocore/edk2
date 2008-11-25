@@ -85,14 +85,14 @@ InternalPrint (
   return Return;
 }
 
-/**
-  Prints a formatted Unicode string to the console output device specified by
+/** 
+  Prints a formatted Unicode string to the console output device specified by 
   ConOut defined in the EFI_SYSTEM_TABLE.
 
-  This function prints a formatted Unicode string to the console output device
-  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of Unicode
-  characters that printed to ConOut.  If the length of the formatted Unicode
-  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
+  This function prints a formatted Unicode string to the console output device 
+  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of Unicode 
+  characters that printed to ConOut.  If the length of the formatted Unicode 
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
@@ -101,8 +101,7 @@ InternalPrint (
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
-  @return The number of Unicode characters in the produced
-          output buffer not including the Null-terminator.
+  @return Number of Unicode characters printed to ConOut.
 
 **/
 UINTN
@@ -124,14 +123,14 @@ Print (
   return Return;
 }
 
-/**
-  Prints a formatted Unicode string to the console output device specified by
+/** 
+  Prints a formatted Unicode string to the console output device specified by 
   StdErr defined in the EFI_SYSTEM_TABLE.
 
-  This function prints a formatted Unicode string to the console output device
-  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of Unicode
-  characters that printed to StdErr.  If the length of the formatted Unicode
-  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
+  This function prints a formatted Unicode string to the console output device 
+  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of Unicode 
+  characters that printed to StdErr.  If the length of the formatted Unicode 
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
@@ -139,9 +138,9 @@ Print (
   @param Format   Null-terminated Unicode format string.
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
+  
+  @return Number of Unicode characters printed to StdErr.
 
-  @return The number of Unicode characters in the produced
-          output buffer not including the Null-terminator.
 **/
 UINTN
 EFIAPI
@@ -214,14 +213,14 @@ AsciiInternalPrint (
   return Return;
 }
 
-/**
-  Prints a formatted ASCII string to the console output device specified by
+/** 
+  Prints a formatted ASCII string to the console output device specified by 
   ConOut defined in the EFI_SYSTEM_TABLE.
 
-  This function prints a formatted ASCII string to the console output device
-  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of ASCII
-  characters that printed to ConOut.  If the length of the formatted ASCII
-  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
+  This function prints a formatted ASCII string to the console output device 
+  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of ASCII 
+  characters that printed to ConOut.  If the length of the formatted ASCII 
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
 
@@ -229,8 +228,7 @@ AsciiInternalPrint (
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
-  @return The number of Ascii characters in the produced
-          output buffer not including the Null-terminator.
+  @return Number of ASCII characters printed to ConOut.
 
 **/
 UINTN
@@ -253,14 +251,14 @@ AsciiPrint (
   return Return;
 }
 
-/**
-  Prints a formatted ASCII string to the console output device specified by
+/** 
+  Prints a formatted ASCII string to the console output device specified by 
   StdErr defined in the EFI_SYSTEM_TABLE.
 
-  This function prints a formatted ASCII string to the console output device
-  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of ASCII
-  characters that printed to StdErr.  If the length of the formatted ASCII
-  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
+  This function prints a formatted ASCII string to the console output device 
+  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of ASCII 
+  characters that printed to StdErr.  If the length of the formatted ASCII 
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
 
@@ -268,8 +266,7 @@ AsciiPrint (
   @param ...      Variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
-  @return The number of Ascii characters in the produced output
-          buffer not including the Null-terminator.
+  @return Number of ASCII characters printed to ConErr.
 
 **/
 UINTN
@@ -567,7 +564,7 @@ Error:
   @param  ...          Variable argument list whose contents are accessed based on 
                        the format string specified by Format.         
 
-  @return  The number of characters printed.
+  @return  The number of Unicode characters printed.
 
 **/
 UINTN
@@ -612,7 +609,7 @@ PrintXY (
 
   This function prints a formatted ASCII string to the graphics console device 
   specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
-  Unicode characters printed.  If the length of the formatted ASCII string is
+  ASCII characters printed.  If the length of the formatted ASCII string is
   greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
   is used to convert the string to a bitmap using the glyphs registered with the 
@@ -640,7 +637,7 @@ PrintXY (
   @param  ...          Variable argument list whose contents are accessed based on 
                        the format string specified by Format.         
 
-  @return  The number of characters printed.
+  @return  The number of ASCII characters printed.
 
 **/
 UINTN

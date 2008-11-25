@@ -189,8 +189,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
 };
 
 /**
-  This function computes and returns the width of the Unicode character 
-  specified by UnicodeChar.
+  Retrieves the width of a Unicode character.
+
+  This function computes and returns the width of the Unicode character specified
+  by UnicodeChar.
 
   @param  UnicodeChar   A Unicode character.
 
@@ -246,11 +248,13 @@ GetGlyphWidth (
 /**
   Computes the display length of a Null-terminated Unicode String.
 
-  This function computes and returns the display length of
-  the Null-terminated Unicode string specified by String.
-  If String is NULL, then 0 is returned.
-  If any of the widths of the Unicode characters in String
-  can not be determined, then 0 is returned.
+  This function computes and returns the display length of the Null-terminated Unicode
+  string specified by String.  If String is NULL then 0 is returned. If any of the widths
+  of the Unicode characters in String can not be determined, then 0 is returned. The display
+  width of String can be computed by summing the display widths of each Unicode character
+  in String.  Unicode characters that are narrow glyphs have a width of 1, and Unicode
+  characters that are width glyphs have a width of 2. 
+  If String is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  String      A pointer to a Null-terminated Unicode string.
 

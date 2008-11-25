@@ -21,22 +21,32 @@
 
 
 /**
-  Resets the entire platform.
+  This service is a wrapper for the UEFI Runtime Service ResetSystem().
+
+  The ResetSystem()function resets the entire platform, including all processors and devices,and reboots the system.
+  Calling this interface with ResetType of EfiResetCold causes a system-wide reset. This sets all circuitry within
+  the system to its initial state. This type of reset is asynchronous to system operation and operates without regard
+  to cycle boundaries. EfiResetCold is tantamount to a system power cycle.
+  Calling this interface with ResetType of EfiResetWarm causes a system-wide initialization. The processors are set to
+  their initial state, and pending cycles are not corrupted. If the system does not support this reset type, then an
+  EfiResetCold must be performed.
+  Calling this interface with ResetType of EfiResetShutdown causes the system to enter a power state equivalent to the
+  ACPI G2/S5 or G3 states. If the system does not support this reset type, then when the system is rebooted, it should
+  exhibit the EfiResetCold attributes.
+  The platform may optionally log the parmeters from any non-normal reset that occurs.
+  The ResetSystem() function does not return.
 
   @param  ResetType   The type of reset to perform.
-  @param  ResetStatus The status code for the reset. If the system reset is part of a
-                      normal operation, the status code would be EFI_SUCCESS. If the system
-                      reset is due to some type of failure the most appropriate EFI Status
-                      code would be used.
+  @param  ResetStatus The status code for the reset. If the system reset is part of a normal operation, the status code
+                      would be EFI_SUCCESS. If the system reset is due to some type of failure the most appropriate EFI
+                      Status code would be used.
   @param  DataSizeThe size, in bytes, of ResetData.
-  @param  ResetData   For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown
-                      the data buffer starts with a Null-terminated Unicode string, optionally
-                      followed by additional binary data. The string is a description that the
-                      caller may use to further indicate the reason for the system reset. ResetData
-                      is only valid if ResetStatus is something other then EFI_SUCCESS. This
-                      pointer must be a physical address. For a ResetType of EfiRestUpdate the
-                      data buffer also starts with a Null-terminated string that is followed by
-                      a physical VOID * to an EFI_CAPSULE_HEADER.
+  @param  ResetData   For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown the data buffer starts with a
+                      Null-terminated Unicode string, optionally followed by additional binary data. The string is a
+                      description that the caller may use to further indicate the reason for the system reset. ResetData
+                      is only valid if ResetStatus is something other then EFI_SUCCESS. This pointer must be a physical
+                      address. For a ResetType of EfiRestUpdate the data buffer also starts with a Null-terminated string
+                      that is followed by a physical VOID * to an EFI_CAPSULE_HEADER.
 
 **/
 VOID
@@ -117,7 +127,7 @@ EfiSetTime (
 
 
 /**
-  Returns the current wakeup alarm clock setting.
+  This service is a wrapper for the UEFI Runtime Service GetWakeupTime().
 
   The alarm clock time may be rounded from the set alarm clock time to be within the resolution
   of the alarm clock device. The resolution of the alarm clock device is defined to be one second.
@@ -151,7 +161,14 @@ EfiGetWakeupTime (
 
 
 /**
-  Sets the system wakeup alarm clock time.
+  This service is a wrapper for the UEFI Runtime Service SetWakeupTime()
+
+  Setting a system wakeup alarm causes the system to wake up or power on at the set time.
+  When the alarm fires, the alarm signal is latched until it is acknowledged by calling SetWakeupTime()
+  to disable the alarm. If the alarm fires before the system is put into a sleeping or off state,
+  since the alarm signal is latched the system will immediately wake up. If the alarm fires while
+  the system is off and there is insufficient power to power on the system, the system is powered
+  on when power is restored.
 
   @param  Enable  Enable or disable the wakeup alarm.
   @param  Time    If Enable is TRUE, the time to set the wakeup alarm for. Type EFI_TIME
@@ -177,10 +194,17 @@ EfiSetWakeupTime (
 
 
 /**
-  Return value of variable.
+  This service is a wrapper for the UEFI Runtime Service GetVariable().
 
-  @param  VariableName the name of the vendor's variable, it's a
-                       Null-Terminated Unicode String
+  Each vendor may create and manage its own variables without the risk of name conflicts by
+  using a unique VendorGuid. When a variable is set its Attributes are supplied to indicate
+  how the data variable should be stored and maintained by the system. The attributes affect
+  when the variable may be accessed and volatility of the data. Any attempts to access a variable
+  that does not have the attribute set for runtime access will yield the EFI_NOT_FOUND error.
+  If the Data buffer is too small to hold the contents of the variable, the error EFI_BUFFER_TOO_SMALL
+  is returned and DataSize is set to the required buffer size to obtain the data.
+
+  @param  VariableName the name of the vendor's variable, it's a Null-Terminated Unicode String
   @param  VendorGuid   Unify identifier for vendor.
   @param  Attributes   Point to memory location to return the attributes of variable. If the point
                        is NULL, the parameter would be ignored.
@@ -214,7 +238,13 @@ EfiGetVariable (
 
 
 /**
-  Enumerates variable's name.
+  This service is a wrapper for the UEFI Runtime Service GetNextVariableName().
+
+  GetNextVariableName() is called multiple times to retrieve the VariableName and VendorGuid of
+  all variables currently available in the system. On each call to GetNextVariableName() the
+  previous results are passed into the interface, and on output the interface returns the next
+  variable name data. When the entire variable list has been returned, the error EFI_NOT_FOUND
+  is returned.
 
   @param  VariableNameSize As input, point to maxinum size of variable name.
                            As output, point to actual size of varaible name.
@@ -250,7 +280,10 @@ EfiGetNextVariableName (
 
 
 /**
-  Sets value of variable.
+  This service is a wrapper for the UEFI Runtime Service GetNextVariableName()
+
+  Variables are stored by the firmware and may maintain their values across power cycles. Each vendor
+  may create and manage its own variables without the risk of name conflicts by using a unique VendorGuid.
 
   @param  VariableName the name of the vendor's variable, it's a
                        Null-Terminated Unicode String
@@ -290,7 +323,13 @@ EfiSetVariable (
 
 
 /**
-  Returns the next high 32 bits of platform's monotonic counter.
+  This service is a wrapper for the UEFI Runtime Service GetNextHighMonotonicCount().
+
+  The platform¡¯s monotonic counter is comprised of two 32-bit quantities: the high 32 bits and
+  the low 32 bits. During boot service time the low 32-bit value is volatile: it is reset to zero
+  on every system reset and is increased by 1 on every call to GetNextMonotonicCount(). The high
+  32-bit value is nonvolatile and is increased by 1 whenever the system resets or whenever the low
+  32-bit count (returned by GetNextMonoticCount()) overflows.
 
   @param  HighCount Pointer to returned value.
 
@@ -310,7 +349,10 @@ EfiGetNextHighMonotonicCount (
 
 
 /**
-  This service converts a function pointer from physical to virtual addressing. 
+  This service is a wrapper for the UEFI Runtime Service ConvertPointer().  
+
+  The ConvertPointer() function is used by an EFI component during the SetVirtualAddressMap() operation.
+  ConvertPointer()must be called using physical address pointers during the execution of SetVirtualAddressMap().
 
   @param  DebugDisposition   Supplies type information for the pointer being converted.
   @param  Address            The pointer to a pointer that is to be fixed to be the
@@ -423,7 +465,12 @@ EfiConvertList (
 
 
 /**
-  Change the runtime addressing mode of EFI firmware from physical to virtual.
+  This service is a wrapper for the UEFI Runtime Service SetVirtualAddressMap().
+
+  The SetVirtualAddressMap() function is used by the OS loader. The function can only be called
+  at runtime, and is called by the owner of the system¡¯s memory map. I.e., the component which
+  called ExitBootServices(). All events of type EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE must be signaled
+  before SetVirtualAddressMap() returns.
 
   @param  MemoryMapSize         The size in bytes of VirtualMap.
   @param  DescriptorSize        The size in bytes of an entry in the VirtualMap.
@@ -462,12 +509,12 @@ EfiSetVirtualAddressMap (
 
 
 /**
-  Passes capsules to the firmware with both virtual and physical mapping.
-  Depending on the intended consumption, the firmware may
-  process the capsule immediately. If the payload should persist across a
-  system reset, the reset value returned from EFI_QueryCapsuleCapabilities must
-  be passed into ResetSystem() and will cause the capsule to be processed by
-  the firmware as part of the reset process.
+  This service is a wrapper for the UEFI Runtime Service UpdateCapsule().
+
+  Passes capsules to the firmware with both virtual and physical mapping. Depending on the intended
+  consumption, the firmware may process the capsule immediately. If the payload should persist across a
+  system reset, the reset value returned from EFI_QueryCapsuleCapabilities must be passed into ResetSystem()
+  and will cause the capsule to be processed by the firmware as part of the reset process.
 
   @param  CapsuleHeaderArray    Virtual pointer to an array of virtual pointers to the capsules
                                 being passed into update capsule. Each capsules is assumed to
@@ -512,6 +559,8 @@ EfiUpdateCapsule (
 
 
 /**
+  This service is a wrapper for the UEFI Runtime Service QueryCapsuleCapabilities().
+
   The QueryCapsuleCapabilities() function allows a caller to test to see if a capsule or
   capsules can be updated via UpdateCapsule(). The Flags values in the capsule header and
   size of the entire capsule is checked.
@@ -530,16 +579,17 @@ EfiUpdateCapsule (
                                 stored in contiguous virtual memory.
   @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
                                 CaspuleHeaderArray.
-  @param  MaximumCapsuleSize    On output the maximum size that UpdateCapsule() can
+  @param  MaximumCapsuleSize     On output the maximum size that UpdateCapsule() can
                                 support as an argument to UpdateCapsule() via
                                 CapsuleHeaderArray and ScatterGatherList.
                                 Undefined on input.
   @param  ResetType             Returns the type of reset required for the capsule update.
 
-  @retval EFI_SUCCESS           Valid answer returned..
+  @retval EFI_SUCCESS           Valid answer returned.
   @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL.
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform, and
                                 MaximumCapsuleSize and ResetType are undefined.
+  @retval EFI_OUT_OF_RESOURCES  There were insufficient resources to process the query request.
 
 **/
 EFI_STATUS
@@ -561,7 +611,7 @@ EfiQueryCapsuleCapabilities (
 
 
 /**
-  Returns information about the EFI variables.
+  This service is a wrapper for the UEFI Runtime Service QueryVariableInfo().
 
   The QueryVariableInfo() function allows a caller to obtain the information about the
   maximum size of the storage space available for the EFI variables, the remaining size of the storage
@@ -592,6 +642,7 @@ EfiQueryCapsuleCapabilities (
                                 MaximumVariableStorageSize,
                                 RemainingVariableStorageSize, MaximumVariableSize
                                 are undefined.
+
 **/
 EFI_STATUS
 EFIAPI

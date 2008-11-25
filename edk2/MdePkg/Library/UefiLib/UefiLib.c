@@ -280,18 +280,16 @@ EfiNamedEventSignal (
   return Status;
 }
 
-/**
+/** 
   Returns the current TPL.
 
-  This function returns the current TPL.  There is no EFI service to directly
-  retrieve the current TPL. Instead, the RaiseTPL() function is used to raise
-  the TPL to TPL_HIGH_LEVEL.  This will return the current TPL.  The TPL level
-  can then immediately be restored back to the current TPL level with a call
+  This function returns the current TPL.  There is no EFI service to directly 
+  retrieve the current TPL. Instead, the RaiseTPL() function is used to raise 
+  the TPL to TPL_HIGH_LEVEL.  This will return the current TPL.  The TPL level 
+  can then immediately be restored back to the current TPL level with a call 
   to RestoreTPL().
 
-  @param  VOID
-
-  @retval EFI_TPL              The current TPL.
+  @return The current TPL.
 
 **/
 EFI_TPL
@@ -368,11 +366,12 @@ EfiAcquireLock (
 }
 
 /**
-  Acquires ownership of a lock.  If the lock is already owned , then an error is returned.
+  Acquires ownership of a lock.
 
-  This function raises the system's current task priority level to the task 
-  priority level of the mutual exclusion lock.  Then, it attempts to place the 
-  lock in the acquired state.
+  This function raises the system's current task priority level to the task priority
+  level of the mutual exclusion lock.  Then, it attempts to place the lock in the acquired state.
+  If the lock is already in the acquired state, then EFI_ACCESS_DENIED is returned.
+  Otherwise, EFI_SUCCESS is returned.
   If Lock is NULL, then ASSERT().
   If Lock is not initialized, then ASSERT().
 
@@ -444,7 +443,7 @@ EfiReleaseLock (
   currently managing the controller specified by ControllerHandle.  This test
   is performed by evaluating if the the protocol specified by ProtocolGuid is
   present on ControllerHandle and is was opened by DriverBindingHandle with an
-  attribute of EFI_OPEN_PROTOCOL_BY_DRIVER.
+  attribute of EFI_OPEN_PROTOCOL_BY_DRIVER. 
   If ProtocolGuid is NULL, then ASSERT().
 
   @param  ControllerHandle     A handle for a controller to test.
@@ -507,10 +506,10 @@ EfiTestManagedDevice (
   ChildHandle with an attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
   If ProtocolGuid is NULL, then ASSERT().
 
-  @param  ControllerHandle     A handle for a (parent) controller to test.
+  @param  ControllerHandle     A handle for a (parent) controller to test. 
   @param  ChildHandle          A child handle to test.
   @param  ProtocolGuid         Supplies the protocol that the child controller
-                               opens on its parent controller.
+                               opens on its parent controller. 
 
   @retval EFI_SUCCESS          ChildHandle is a child of the ControllerHandle.
   @retval EFI_UNSUPPORTED      ChildHandle is not a child of the
@@ -565,7 +564,7 @@ EfiTestChildHandle (
 /**
   This function looks up a Unicode string in UnicodeStringTable.
 
-  If Language is   a member of SupportedLanguages and a Unicode string is found in
+  If Language is a member of SupportedLanguages and a Unicode string is found in
   UnicodeStringTable that matches the language code specified by Language, then it
   is returned in UnicodeString.
 
@@ -651,48 +650,42 @@ LookupUnicodeString (
 
 /**
   This function looks up a Unicode string in UnicodeStringTable.
-  If Language is a member of SupportedLanguages and a Unicode
-  string is found in UnicodeStringTable that matches the
-  language code specified by Language, then it is returned in
-  UnicodeString.
 
-  @param  Language                A pointer to the ISO 639-2 or
-                                  RFC 3066 language code for the
-                                  Unicode string to look up and
-                                  return.  
-  @param  SupportedLanguages      A pointer to the set of ISO
-                                  639-2 or RFC 3066 language
-                                  codes that the Unicode string
-                                  table supports. Language must
-                                  be a member of this set.  
-  @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.  
-  @param  UnicodeString           A pointer to the Unicode
-                                  string from UnicodeStringTable
-                                  that matches the language
-                                  specified by Language.
-  @param  Iso639Language          Specify the language code
-                                  format supported. If true,
-                                  then the format follow ISO
-                                  639-2. If false, then it
-                                  follows RFC3066.
-  @retval  EFI_SUCCESS            The Unicode string that
-                                  matches the language specified
-                                  by Language was found in the
-                                  table of Unicoide strings
-                                  UnicodeStringTable, and it was
-                                  returned in UnicodeString.
-  
+  If Language is a member of SupportedLanguages and a Unicode string is found in
+  UnicodeStringTable that matches the language code specified by Language, then
+  it is returned in UnicodeString.
+
+  @param  Language             A pointer to an ASCII string containing the ISO 639-2 or the
+                               RFC 4646 language code for the Unicode string to look up and
+                               return. If Iso639Language is TRUE, then this ASCII string is
+                               not assumed to be Null-terminated, and only the first three
+                               chacters are used. If Iso639Language is FALSE, then this ASCII
+                               string must be Null-terminated. 
+  @param  SupportedLanguages   A pointer to a Null-terminated ASCII string that contains a
+                               set of ISO 639-2 or RFC 4646 language codes that the Unicode
+                               string table supports.  Language must be a member of this set.
+                               If Iso639Language is TRUE, then this string contains one or more
+                               ISO 639-2 language codes with no separator characters. If Iso639Language
+                               is FALSE, then is string contains one or more RFC 4646 language
+                               codes separated by ';'.
+  @param  UnicodeStringTable   A pointer to the table of Unicode strings. Type EFI_UNICODE_STRING_TABLE
+                               is defined in "Related Definitions".
+  @param  UnicodeString        A pointer to the Null-terminated Unicode string from UnicodeStringTable
+                               that matches the language specified by Language.
+  @param  Iso639Language       Specifies the supported language code format. If it is TRUE, then
+                               Language and SupportedLanguages follow ISO 639-2 language code format.
+                               Otherwise, they follow RFC 4646 language code format.
+
+
+  @retval  EFI_SUCCESS            The Unicode string that matches the language specified by Language
+                                  was found in the table of Unicode strings UnicodeStringTable, and
+                                  it was returned in UnicodeString.
   @retval  EFI_INVALID_PARAMETER  Language is NULL.  
   @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.  
   @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.  
-  @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.
-  @retval  EFI_UNSUPPORTED        The language specified by
-                                  Language is not a member
-                                  ofSupportedLanguages.  
-  @retval EFI_UNSUPPORTED         The language specified by
-                                  Language is not supported by
-                                  UnicodeStringTable.
+  @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.  
+  @retval  EFI_UNSUPPORTED        The language specified by Language is not a member of SupportedLanguages.  
+  @retval  EFI_UNSUPPORTED        The language specified by Language is not supported by UnicodeStringTable.
 
 **/
 EFI_STATUS
@@ -944,52 +937,45 @@ AddUnicodeString (
 
 
 /**
-  This function adds a Unicode string to UnicodeStringTable.
+  This function adds the Null-terminated Unicode string specified by UnicodeString
+  to UnicodeStringTable.
 
-  If Language is a member of SupportedLanguages then
-  UnicodeString is added to UnicodeStringTable.  New buffers are
-  allocated for both Language and UnicodeString.  The contents
-  of Language and UnicodeString are copied into these new
-  buffers.  These buffers are automatically freed when
-  FreeUnicodeStringTable() is called.
+  If Language is a member of SupportedLanguages then UnicodeString is added to
+  UnicodeStringTable.  New buffers are allocated for both Language and UnicodeString.
+  The contents of Language and UnicodeString are copied into these new buffers.
+  These buffers are automatically freed when EfiLibFreeUnicodeStringTable() is called.
 
-  @param  Language                A pointer to the ISO 639-2 or
-                                  RFC 3066 language code for the
-                                  Unicode string to add.  
-  @param  SupportedLanguages      A pointer to the set of ISO
-                                  639-2 or RFC 3066 language
-                                  codes that the Unicode string
-                                  table supports. Language must
-                                  be a member of this set.  
-  @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.  
-  @param  UnicodeString           A pointer to the Unicode
-                                  string to add.  
-  @param  Iso639Language          Specify the language code
-                                  format supported. If true,
-                                  then the format follow ISO
-                                  639-2. If false, then it
-                                  follows RFC3066.
-  @retval EFI_SUCCESS             The Unicode string that
-                                  matches the language specified
-                                  by Language was found in the
-                                  table of Unicode strings
-                                  UnicodeStringTable, and it was
-                                  returned in UnicodeString.
-  
-  @retval EFI_INVALID_PARAMETER   Language is NULL.  
-  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.  
-  @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.  
-  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.  
-  @retval EFI_ALREADY_STARTED     A Unicode string with language
-                                  Language is already present in
-                                  UnicodeStringTable.  
-  @retval EFI_OUT_OF_RESOURCES    There is not enough memory to
-                                  add another Unicode string to
-                                  UnicodeStringTable.  
-  @retval EFI_UNSUPPORTED         The language specified by
-                                  Language is not a member of
-                                  SupportedLanguages.
+  @param  Language            A pointer to an ASCII string containing the ISO 639-2 or
+                              the RFC 4646 language code for the Unicode string to add.
+                              If Iso639Language is TRUE, then this ASCII string is not
+                              assumed to be Null-terminated, and only the first three
+                              chacters are used. If Iso639Language is FALSE, then this
+                              ASCII string must be Null-terminated.
+  @param  SupportedLanguages  A pointer to a Null-terminated ASCII string that contains
+                              a set of ISO 639-2 or RFC 4646 language codes that the Unicode
+                              string table supports.  Language must be a member of this set.
+                              If Iso639Language is TRUE, then this string contains one or more
+                              ISO 639-2 language codes with no separator characters.
+                              If Iso639Language is FALSE, then is string contains one or more
+                              RFC 4646 language codes separated by ';'.
+  @param  UnicodeStringTable  A pointer to the table of Unicode strings. Type EFI_UNICODE_STRING_TABLE
+                              is defined in "Related Definitions".
+  @param  UnicodeString       A pointer to the Unicode string to add.  
+  @param  Iso639Language      Specifies the supported language code format. If it is TRUE,
+                              then Language and SupportedLanguages follow ISO 639-2 language code format.
+                              Otherwise, they follow RFC 4646 language code format.
+
+  @retval EFI_SUCCESS            The Unicode string that matches the language specified by
+                                 Language was found in the table of Unicode strings UnicodeStringTable,
+                                 and it was returned in UnicodeString.  
+  @retval EFI_INVALID_PARAMETER  Language is NULL.  
+  @retval EFI_INVALID_PARAMETER  UnicodeString is NULL.  
+  @retval EFI_INVALID_PARAMETER  UnicodeString is an empty string.  
+  @retval EFI_UNSUPPORTED        SupportedLanguages is NULL.  
+  @retval EFI_ALREADY_STARTED    A Unicode string with language Language is already present in
+                                 UnicodeStringTable.  
+  @retval EFI_OUT_OF_RESOURCES   There is not enough memory to add another Unicode string UnicodeStringTable.  
+  @retval EFI_UNSUPPORTED        The language specified by Language is not a member of SupportedLanguages.
 
 **/
 EFI_STATUS
