@@ -19,7 +19,7 @@
 
 /**
   Returns the value of the highest bit set in a 64-bit value. Equivalent to
-  1 << HighBitSet64(x).
+  1 << log2(x).
 
   This function computes the value of the highest bit set in the 64-bit value
   specified by Operand. If Operand is zero, then zero is returned.

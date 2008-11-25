@@ -25,6 +25,8 @@
   unsigned value Multiplier and generates a 64-bit unsigned result. This 64-
   bit unsigned result is returned.
 
+  If the result overflows, then ASSERT().
+
   @param  Multiplicand  A 64-bit unsigned value.
   @param  Multiplier    A 64-bit unsigned value.
 

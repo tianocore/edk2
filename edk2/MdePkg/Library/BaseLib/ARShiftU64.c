@@ -26,7 +26,7 @@
   @param  Operand The 64-bit operand to shift right.
   @param  Count   The number of bits to shift right.
 
-  @return Operand arithmetically shifted right by Count
+  @return Operand >> Count
 
 **/
 UINT64
