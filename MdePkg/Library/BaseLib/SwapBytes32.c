@@ -24,9 +24,9 @@
   from little endian to big endian or vice versa. The byte swapped value is
   returned.
 
-  @param  Operand A 32-bit unsigned value.
+  @param  Value Operand A 32-bit unsigned value.
 
-  @return The byte swaped Operand.
+  @return The byte swapped Operand.
 
 **/
 UINT32

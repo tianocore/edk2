@@ -19,7 +19,7 @@
 
 /**
   Returns the value of the highest bit set in a 32-bit value. Equivalent to
-  1 << HighBitSet32(x).
+  1 << log2(x).
 
   This function computes the value of the highest bit set in the 32-bit value
   specified by Operand. If Operand is zero, then zero is returned.

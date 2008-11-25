@@ -85,7 +85,7 @@ IsNodeInList (
 
   If ListHead is NULL, then ASSERT().
 
-  @param  List  A pointer to the head node of a new doubly linked list.
+  @param  ListHead  A pointer to the head node of a new doubly linked list.
 
   @return ListHead
 
@@ -113,12 +113,13 @@ InitializeListHead (
 
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
-  If ListHead was not initialized with InitializeListHead(), then ASSERT().
+  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
-  @param  List      A pointer to the head node of a doubly linked list.
+  @param  ListHead  A pointer to the head node of a doubly linked list.
   @param  Entry     A pointer to a node that is to be inserted at the beginning
                     of a doubly linked list.
 
@@ -153,12 +154,13 @@ InsertHeadList (
 
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
-  If ListHead was not initialized with InitializeListHead(), then ASSERT().
+  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
-  @param  List      A pointer to the head node of a doubly linked list.
+  @param  ListHead  A pointer to the head node of a doubly linked list.
   @param  Entry     A pointer to a node that is to be added at the end of the
                     doubly linked list.
 
@@ -187,12 +189,13 @@ InsertTailList (
 /**
   Retrieves the first node of a doubly linked list.
 
-  Returns the first node of a doubly linked list. List must have been
-  initialized with InitializeListHead(). If List is empty, then NULL is
-  returned.
+  Returns the first node of a doubly linked list.  List must have been 
+  initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
+  If List is empty, then List is returned.
 
   If List is NULL, then ASSERT().
-  If List was not initialized with InitializeListHead(), then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
@@ -220,13 +223,14 @@ GetFirstNode (
 /**
   Retrieves the next node of a doubly linked list.
 
-  Returns the node of a doubly linked list that follows Node. List must have
-  been initialized with InitializeListHead(). If List is empty, then List is
-  returned.
+  Returns the node of a doubly linked list that follows Node.  
+  List must have been initialized with INTIALIZE_LIST_HEAD_VARIABLE()
+  or InitializeListHead().  If List is empty, then List is returned.
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with InitializeListHead(), then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and List contains more than
   PcdMaximumLinkedListLenth nodes, then ASSERT().
   If Node is not a node in List, then ASSERT().
@@ -260,12 +264,13 @@ GetNextNode (
   zero nodes, this function returns TRUE. Otherwise, it returns FALSE.
 
   If ListHead is NULL, then ASSERT().
-  If ListHead was not initialized with InitializeListHead(), then ASSERT().
+  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
 
-  @param  List  A pointer to the head node of a doubly linked list.
+  @param  ListHead  A pointer to the head node of a doubly linked list.
 
   @retval TRUE  The linked list is empty.
   @retval FALSE The linked list is not empty.
@@ -292,11 +297,12 @@ IsListEmpty (
 
   Returns TRUE if Node is equal to List.  Returns FALSE if Node is one of the
   nodes in the doubly linked list specified by List.  List must have been
-  initialized with InitializeListHead().
+  initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with InitializeListHead(), then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead(), 
+  then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
@@ -329,11 +335,12 @@ IsNull (
 
   Returns TRUE if Node is the last node in the doubly linked list specified by
   List. Otherwise, FALSE is returned. List must have been initialized with
-  InitializeListHead().
+  INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with InitializeListHead(), then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
@@ -369,8 +376,8 @@ IsNodeAtEnd (
   Otherwise, the location of the FirstEntry node is swapped with the location
   of the SecondEntry node in a doubly linked list. SecondEntry must be in the
   same double linked list as FirstEntry and that double linked list must have
-  been initialized with InitializeListHead(). SecondEntry is returned after the
-  nodes are swapped.
+  been initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead(). 
+  SecondEntry is returned after the nodes are swapped.
 
   If FirstEntry is NULL, then ASSERT().
   If SecondEntry is NULL, then ASSERT().
@@ -382,8 +389,8 @@ IsNodeAtEnd (
 
   @param  FirstEntry  A pointer to a node in a linked list.
   @param  SecondEntry A pointer to another node in the same linked list.
-  
-  @return SecondEntry after the nodes are swapped
+
+  @return SecondEntry.
 
 **/
 LIST_ENTRY *
@@ -449,11 +456,9 @@ SwapListEntries (
   linked list containing Entry, including the Entry node, is greater than
   or equal to PcdMaximumLinkedListLength, then ASSERT().
 
-  @param  Entry A pointer to a node in a linked list
+  @param  Entry A pointer to a node in a linked list.
 
-  @return The node following Entry in the doubly linked list.
-          If Entry is the only node in the linked list, then
-          the head node of the linked list is returned.
+  @return Entry.
 
 **/
 LIST_ENTRY *

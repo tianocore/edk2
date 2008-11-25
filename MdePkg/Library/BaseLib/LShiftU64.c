@@ -26,7 +26,7 @@
   @param  Operand The 64-bit operand to shift left.
   @param  Count   The number of bits to shift left.
 
-  @return Operand << Count
+  @return Operand << Count.
 
 **/
 UINT64

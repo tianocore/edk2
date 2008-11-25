@@ -26,8 +26,9 @@
 
   @param  Operand The 64-bit operand to evaluate.
 
-  @return Position of the lowest bit set in Operand if found.
-  @retval -1  Operand is zero.
+  @retval 0..63  The lowest bit set in Operand was found.
+  @retval -1    Operand is zero.
+
 
 **/
 INTN

@@ -27,7 +27,7 @@
   @param  Operand The 32-bit operand to rotate left.
   @param  Count   The number of bits to rotate left.
 
-  @return Operand <<< Count
+  @return Operand << Count
 
 **/
 UINT32

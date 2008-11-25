@@ -27,7 +27,7 @@
   @param  Operand The 64-bit operand to rotate right.
   @param  Count   The number of bits to rotate right.
 
-  @return Operand >>> Count
+  @return Operand >> Count
 
 **/
 UINT64

@@ -47,7 +47,7 @@ SaveAndDisableInterrupts (
   @param  InterruptState  TRUE if interrupts should enabled. FALSE if
                           interrupts should be disabled.
 
-  @return Input interrupt status to be set.
+  @return InterruptState
 
 **/
 BOOLEAN

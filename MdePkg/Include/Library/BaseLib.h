@@ -148,7 +148,7 @@ typedef struct {
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
 
-  @return Destiantion
+  @return Destination.
 
 **/
 CHAR16 *
@@ -184,7 +184,7 @@ StrCpy (
   @param  Source      Pointer to a Null-terminated Unicode string.
   @param  Length      Maximum number of Unicode characters to copy.
 
-  @return Destination
+  @return Destination.
 
 **/
 CHAR16 *
@@ -349,7 +349,7 @@ StrnCmp (
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
 
-  @return Destination
+  @return Destination.
 
 **/
 CHAR16 *
@@ -394,7 +394,7 @@ StrCat (
   @param  Length      Maximum number of Unicode characters to concatenate from
                       Source.
 
-  @return Destination
+  @return Destination.
 
 **/
 CHAR16 *
@@ -406,7 +406,7 @@ StrnCat (
   );
 
 /**
-  Returns the first occurance of a Null-terminated Unicode sub-string
+  Returns the first occurrence of a Null-terminated Unicode sub-string
   in a Null-terminated Unicode string.
 
   This function scans the contents of the Null-terminated Unicode string
@@ -634,7 +634,7 @@ NibbleToHexChar (
   the last character in the output string. The one next to first byte will be put into the
   character before the last character. This rules applies to the rest of the bytes. The Unicode
   character by the last byte will be put into the first character in the output string. For example,
-  the input buffer for a 64-bits unsigned integrer 0x12345678abcdef1234 will be converted to
+  the input buffer for a 64-bits unsigned integer 0x12345678abcdef1234 will be converted to
   a Unicode string equal to L"12345678abcdef1234".
 
   @param String                        On input, String is pointed to the buffer allocated for the convertion.
@@ -642,10 +642,10 @@ NibbleToHexChar (
                                        The StringLen required to convert a N bytes Buffer will be a least equal to or greater 
                                        than 2*N + 1.
   @param Buffer                        The pointer to a input buffer.
-  @param BufferSizeInBytes             Lenth in bytes of the input buffer.
+  @param BufferSizeInBytes             Length in bytes of the input buffer.
   
 
-  @retval  EFI_SUCCESS                 The convertion is successfull. All bytes in Buffer has been convert to the corresponding
+  @retval  EFI_SUCCESS                 The convertion is successful. All bytes in Buffer has been convert to the corresponding
                                        Unicode character and placed into the right place in String.
   @retval  EFI_BUFFER_TOO_SMALL        StringSizeInBytes is smaller than 2 * N + 1the number of bytes required to
                                        complete the convertion. 
@@ -758,7 +758,7 @@ IsHexDigit (
   @param  Source        Pointer to a Null-terminated Unicode string.
   @param  Destination   Pointer to a Null-terminated ASCII string.
 
-  @return Destination
+  @return Destination.
 
 **/
 CHAR8 *
@@ -1067,7 +1067,7 @@ AsciiStrnCat (
 
 
 /**
-  Returns the first occurance of a Null-terminated ASCII sub-string
+  Returns the first occurrence of a Null-terminated ASCII sub-string
   in a Null-terminated ASCII string.
 
   This function scans the contents of the ASCII string specified by String
@@ -1087,7 +1087,7 @@ AsciiStrnCat (
 
   @retval NULL            If the SearchString does not appear in String.
   @retval others          If there is a match return the first occurrence of SearchingString.
-                          If the lenth of SearchString is zero,return String.
+                          If the length of SearchString is zero,return String.
 
 **/
 CHAR8 *
@@ -1278,7 +1278,7 @@ AsciiStrHexToUint64 (
   @param  Source        Pointer to a Null-terminated ASCII string.
   @param  Destination   Pointer to a Null-terminated Unicode string.
 
-  @return Destination
+  @return Destination.
 
 **/
 CHAR16 *
@@ -1299,7 +1299,7 @@ AsciiStrToUnicodeStr (
 
   @param  Value The 8-bit value to convert to BCD. Range 0..99.
 
-  @return The BCD value
+  @return The BCD value.
 
 **/
 UINT8
@@ -1603,7 +1603,7 @@ IsNodeAtEnd (
   @param  FirstEntry  A pointer to a node in a linked list.
   @param  SecondEntry A pointer to another node in the same linked list.
   
-  @return SecondEntry
+  @return SecondEntry.
 
 **/
 LIST_ENTRY *
@@ -1630,9 +1630,9 @@ SwapListEntries (
   linked list containing Entry, including the Entry node, is greater than
   or equal to PcdMaximumLinkedListLength, then ASSERT().
 
-  @param  Entry A pointer to a node in a linked list
+  @param  Entry A pointer to a node in a linked list.
 
-  @return Entry
+  @return Entry.
 
 **/
 LIST_ENTRY *
@@ -1657,7 +1657,7 @@ RemoveEntryList (
   @param  Operand The 64-bit operand to shift left.
   @param  Count   The number of bits to shift left.
 
-  @return Operand << Count
+  @return Operand << Count.
 
 **/
 UINT64
@@ -1819,7 +1819,7 @@ RRotU64 (
 
   @param  Operand The 32-bit operand to evaluate.
 
-  @retval 0-31  The lowest bit set in Operand was found.
+  @retval 0..31  The lowest bit set in Operand was found.
   @retval -1    Operand is zero.
 
 **/
@@ -1839,7 +1839,7 @@ LowBitSet32 (
 
   @param  Operand The 64-bit operand to evaluate.
 
-  @retval 0-63  The lowest bit set in Operand was found.
+  @retval 0..63  The lowest bit set in Operand was found.
   @retval -1    Operand is zero.
 
 
@@ -1861,7 +1861,7 @@ LowBitSet64 (
 
   @param  Operand The 32-bit operand to evaluate.
 
-  @retval 0-31  Position of the highest bit set in Operand if found.
+  @retval 0..31  Position of the highest bit set in Operand if found.
   @retval -1    Operand is zero.
 
 **/
@@ -1882,7 +1882,7 @@ HighBitSet32 (
 
   @param  Operand The 64-bit operand to evaluate.
 
-  @retval 0-63   Position of the highest bit set in Operand if found.
+  @retval 0..63   Position of the highest bit set in Operand if found.
   @retval -1     Operand is zero.
 
 **/
@@ -2175,7 +2175,7 @@ DivU64x64Remainder (
   NULL, then the 64-bit signed remainder is returned in Remainder. This
   function returns the 64-bit signed quotient.
 
-  It is the caller¡¯s responsibility to not call this function with a Divisor of 0.
+  It is the caller's responsibility to not call this function with a Divisor of 0.
   If Divisor is 0, then the quotient and remainder should be assumed to be 
   the largest negative integer.
 
@@ -3089,7 +3089,7 @@ InitializeSpinLock (
 
   @param  SpinLock  A pointer to the spin lock to place in the acquired state.
 
-  @return SpinLock accquired lock.
+  @return SpinLock acquired lock.
 
 **/
 SPIN_LOCK *

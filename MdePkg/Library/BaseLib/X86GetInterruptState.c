@@ -19,8 +19,8 @@
 /**
   Retrieves the current CPU interrupt state.
 
-  Retrieves the current CPU interrupt state. Returns TRUE is interrupts are
-  currently enabled. Otherwise returns FALSE.
+  Returns TRUE is interrupts are currently enabled. Otherwise
+  returns FALSE.
 
   @retval TRUE  CPU interrupts are enabled.
   @retval FALSE CPU interrupts are disabled.
