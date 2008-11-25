@@ -133,12 +133,6 @@ typedef struct {
   UINT8 SKSV : 1;
   UINT8 sense_key_specific_16;
   UINT8 sense_key_specific_17;
-  ///
-  /// Followed by additional sense bytes.
-  /// the sizeof (ATAPI_REQUEST_SENSE_DATA) is 254, 
-  /// since allocation_length is one byte in ATAPI_INQUIRY_CMD.
-  ///
-  UINT8 additional_sense_bytes_18_253[253 - 18 + 1];
 } ATAPI_REQUEST_SENSE_DATA;
 
 //
