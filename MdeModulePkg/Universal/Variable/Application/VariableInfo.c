@@ -84,5 +84,5 @@ UefiMain (
 
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
