@@ -8,7 +8,7 @@
   EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
   and print messages on the console output and standard error devices.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -249,6 +249,8 @@ EfiInitializeLock (
   );
 
 /**
+  Initializes a basic mutual exclusion lock.
+
   This macro initializes the contents of a basic mutual exclusion lock to the 
   released state.  Each lock provides mutual exclusion access at its task 
   priority level.  Since there is no preemption or multiprocessor support in EFI,
@@ -264,7 +266,6 @@ EfiInitializeLock (
 
 
 /**
-  
   Macro that calls DebugAssert() if an EFI_LOCK structure is not in the locked state.
 
   If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set, 
@@ -307,11 +308,12 @@ EfiAcquireLock (
   );
 
 /**
-  Acquires ownership of a lock.  If the lock is already owned , then an error is returned.
+  Acquires ownership of a lock.
 
-  This function raises the system's current task priority level to the task 
-  priority level of the mutual exclusion lock.  Then, it attempts to place the 
-  lock in the acquired state.
+  This function raises the system's current task priority level to the task priority
+  level of the mutual exclusion lock.  Then, it attempts to place the lock in the acquired state.
+  If the lock is already in the acquired state, then EFI_ACCESS_DENIED is returned.
+  Otherwise, EFI_SUCCESS is returned.
   If Lock is NULL, then ASSERT().
   If Lock is not initialized, then ASSERT().
 
@@ -407,7 +409,7 @@ EfiTestChildHandle (
 /**
   This function looks up a Unicode string in UnicodeStringTable.
 
-  If Language is   a member of SupportedLanguages and a Unicode string is found in
+  If Language is a member of SupportedLanguages and a Unicode string is found in
   UnicodeStringTable that matches the language code specified by Language, then it
   is returned in UnicodeString.
 
@@ -445,48 +447,42 @@ LookupUnicodeString (
 
 /**
   This function looks up a Unicode string in UnicodeStringTable.
-  If Language is a member of SupportedLanguages and a Unicode
-  string is found in UnicodeStringTable that matches the
-  language code specified by Language, then it is returned in
-  UnicodeString.
 
-  @param  Language                A pointer to the ISO 639-2 or
-                                  RFC 3066 language code for the
-                                  Unicode string to look up and
-                                  return.  
-  @param  SupportedLanguages      A pointer to the set of ISO
-                                  639-2 or RFC 3066 language
-                                  codes that the Unicode string
-                                  table supports. Language must
-                                  be a member of this set.  
-  @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.  
-  @param  UnicodeString           A pointer to the Unicode
-                                  string from UnicodeStringTable
-                                  that matches the language
-                                  specified by Language.
-  @param  Iso639Language          Specify the language code
-                                  format supported. If true,
-                                  then the format follow ISO
-                                  639-2. If false, then it
-                                  follows RFC3066.
-  @retval  EFI_SUCCESS            The Unicode string that
-                                  matches the language specified
-                                  by Language was found in the
-                                  table of Unicoide strings
-                                  UnicodeStringTable, and it was
-                                  returned in UnicodeString. 
+  If Language is a member of SupportedLanguages and a Unicode string is found in
+  UnicodeStringTable that matches the language code specified by Language, then
+  it is returned in UnicodeString.
 
+  @param  Language             A pointer to an ASCII string containing the ISO 639-2 or the
+                               RFC 4646 language code for the Unicode string to look up and
+                               return. If Iso639Language is TRUE, then this ASCII string is
+                               not assumed to be Null-terminated, and only the first three
+                               chacters are used. If Iso639Language is FALSE, then this ASCII
+                               string must be Null-terminated. 
+  @param  SupportedLanguages   A pointer to a Null-terminated ASCII string that contains a
+                               set of ISO 639-2 or RFC 4646 language codes that the Unicode
+                               string table supports.  Language must be a member of this set.
+                               If Iso639Language is TRUE, then this string contains one or more
+                               ISO 639-2 language codes with no separator characters. If Iso639Language
+                               is FALSE, then is string contains one or more RFC 4646 language
+                               codes separated by ';'.
+  @param  UnicodeStringTable   A pointer to the table of Unicode strings. Type EFI_UNICODE_STRING_TABLE
+                               is defined in "Related Definitions".
+  @param  UnicodeString        A pointer to the Null-terminated Unicode string from UnicodeStringTable
+                               that matches the language specified by Language.
+  @param  Iso639Language       Specifies the supported language code format. If it is TRUE, then
+                               Language and SupportedLanguages follow ISO 639-2 language code format.
+                               Otherwise, they follow RFC 4646 language code format.
+
+
+  @retval  EFI_SUCCESS            The Unicode string that matches the language specified by Language
+                                  was found in the table of Unicode strings UnicodeStringTable, and
+                                  it was returned in UnicodeString.
   @retval  EFI_INVALID_PARAMETER  Language is NULL.  
   @retval  EFI_INVALID_PARAMETER  UnicodeString is NULL.  
   @retval  EFI_UNSUPPORTED        SupportedLanguages is NULL.  
   @retval  EFI_UNSUPPORTED        UnicodeStringTable is NULL.  
-  @retval  EFI_UNSUPPORTED        The language specified by
-                                  Language is not a member
-                                  ofSupportedLanguages.  
-  @retval  EFI_UNSUPPORTED        The language specified by
-                                  Language is not supported by
-                                  UnicodeStringTable.
+  @retval  EFI_UNSUPPORTED        The language specified by Language is not a member of SupportedLanguages.  
+  @retval  EFI_UNSUPPORTED        The language specified by Language is not supported by UnicodeStringTable.
 
 **/
 EFI_STATUS
@@ -542,52 +538,45 @@ AddUnicodeString (
   );
 
 /**
-  This function adds a Unicode string to UnicodeStringTable.
+  This function adds the Null-terminated Unicode string specified by UnicodeString
+  to UnicodeStringTable.
 
-  If Language is a member of SupportedLanguages then
-  UnicodeString is added to UnicodeStringTable.  New buffers are
-  allocated for both Language and UnicodeString.  The contents
-  of Language and UnicodeString are copied into these new
-  buffers.  These buffers are automatically freed when
-  FreeUnicodeStringTable() is called.
+  If Language is a member of SupportedLanguages then UnicodeString is added to
+  UnicodeStringTable.  New buffers are allocated for both Language and UnicodeString.
+  The contents of Language and UnicodeString are copied into these new buffers.
+  These buffers are automatically freed when EfiLibFreeUnicodeStringTable() is called.
 
-  @param  Language                A pointer to the ISO 639-2 or
-                                  RFC 3066 language code for the
-                                  Unicode string to add.  
-  @param  SupportedLanguages      A pointer to the set of ISO
-                                  639-2 or RFC 3066 language
-                                  codes that the Unicode string
-                                  table supports. Language must
-                                  be a member of this set.  
-  @param  UnicodeStringTable      A pointer to the table of
-                                  Unicode strings.  
-  @param  UnicodeString           A pointer to the Unicode
-                                  string to add.  
-  @param  Iso639Language          Specify the language code
-                                  format supported. If true,
-                                  then the format follow ISO
-                                  639-2. If false, then it
-                                  follows RFC3066.
-  @retval EFI_SUCCESS             The Unicode string that
-                                  matches the language specified
-                                  by Language was found in the
-                                  table of Unicode strings
-                                  UnicodeStringTable, and it was
-                                  returned in UnicodeString.
-  
-  @retval EFI_INVALID_PARAMETER   Language is NULL.  
-  @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.  
-  @retval EFI_INVALID_PARAMETER   UnicodeString is an empty string.  
-  @retval EFI_UNSUPPORTED         SupportedLanguages is NULL.  
-  @retval EFI_ALREADY_STARTED     A Unicode string with language
-                                  Language is already present in
-                                  UnicodeStringTable.  
-  @retval EFI_OUT_OF_RESOURCES    There is not enough memory to
-                                  add another Unicode string to
-                                  UnicodeStringTable.  
-  @retval EFI_UNSUPPORTED         The language specified by
-                                  Language is not a member of
-                                  SupportedLanguages.
+  @param  Language            A pointer to an ASCII string containing the ISO 639-2 or
+                              the RFC 4646 language code for the Unicode string to add.
+                              If Iso639Language is TRUE, then this ASCII string is not
+                              assumed to be Null-terminated, and only the first three
+                              chacters are used. If Iso639Language is FALSE, then this
+                              ASCII string must be Null-terminated.
+  @param  SupportedLanguages  A pointer to a Null-terminated ASCII string that contains
+                              a set of ISO 639-2 or RFC 4646 language codes that the Unicode
+                              string table supports.  Language must be a member of this set.
+                              If Iso639Language is TRUE, then this string contains one or more
+                              ISO 639-2 language codes with no separator characters.
+                              If Iso639Language is FALSE, then is string contains one or more
+                              RFC 4646 language codes separated by ';'.
+  @param  UnicodeStringTable  A pointer to the table of Unicode strings. Type EFI_UNICODE_STRING_TABLE
+                              is defined in "Related Definitions".
+  @param  UnicodeString       A pointer to the Unicode string to add.  
+  @param  Iso639Language      Specifies the supported language code format. If it is TRUE,
+                              then Language and SupportedLanguages follow ISO 639-2 language code format.
+                              Otherwise, they follow RFC 4646 language code format.
+
+  @retval EFI_SUCCESS            The Unicode string that matches the language specified by
+                                 Language was found in the table of Unicode strings UnicodeStringTable,
+                                 and it was returned in UnicodeString.  
+  @retval EFI_INVALID_PARAMETER  Language is NULL.  
+  @retval EFI_INVALID_PARAMETER  UnicodeString is NULL.  
+  @retval EFI_INVALID_PARAMETER  UnicodeString is an empty string.  
+  @retval EFI_UNSUPPORTED        SupportedLanguages is NULL.  
+  @retval EFI_ALREADY_STARTED    A Unicode string with language Language is already present in
+                                 UnicodeStringTable.  
+  @retval EFI_OUT_OF_RESOURCES   There is not enough memory to add another Unicode string UnicodeStringTable.  
+  @retval EFI_UNSUPPORTED        The language specified by Language is not a member of SupportedLanguages.
 
 **/
 EFI_STATUS
@@ -619,8 +608,10 @@ FreeUnicodeStringTable (
   );
 
 /**
-  This function computes and returns the width of the Unicode character 
-  specified by UnicodeChar.
+  Retrieves the width of a Unicode character.
+
+  This function computes and returns the width of the Unicode character specified
+  by UnicodeChar.
 
   @param  UnicodeChar   A Unicode character.
 
@@ -638,11 +629,13 @@ GetGlyphWidth (
 /**
   Computes the display length of a Null-terminated Unicode String.
 
-  This function computes and returns the display length of
-  the Null-terminated Unicode string specified by String.
-  If String is NULL, then 0 is returned.
-  If any of the widths of the Unicode characters in String
-  can not be determined, then 0 is returned.
+  This function computes and returns the display length of the Null-terminated Unicode
+  string specified by String.  If String is NULL then 0 is returned. If any of the widths
+  of the Unicode characters in String can not be determined, then 0 is returned. The display
+  width of String can be computed by summing the display widths of each Unicode character
+  in String.  Unicode characters that are narrow glyphs have a width of 1, and Unicode
+  characters that are width glyphs have a width of 2. 
+  If String is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  String      A pointer to a Null-terminated Unicode string.
 
@@ -662,9 +655,9 @@ UnicodeStringDisplayLength (
   Create, Signal, and Close the Ready to Boot event using EfiSignalEventReadyToBoot().
   
   This function abstracts the signaling of the Ready to Boot Event. The Framework moved
-  from a proprietary to UEFI 2.0 based mechanism.  This library abstracts the caller from
-  how this event is created to prevent to code form having to change with the version of
-  the specification supported.
+  from a proprietary to UEFI 2.0 based mechanism. This library abstracts the caller
+  from how this event is created to prevent to code form having to change with the
+  version of the specification supported.
 
 **/
 VOID
@@ -689,14 +682,14 @@ EfiSignalEventLegacyBoot (
   );
 
 /**
-  Creates an EFI event in the Legacy Boot Event Group.  Prior to UEFI 2.0 this 
-  was done via a non blessed UEFI extensions and this library abstracts the 
-  implementation mechanism of this event from the caller.
-  
-  This function abstracts the creation of the Legacy Boot Event.  The Framework 
-  moved from a proprietary to UEFI 2.0 based mechanism.  This library abstracts 
-  the caller from how this event is created to prevent to code form having to 
-  change with the version of the specification supported.
+  Creates an EFI event in the Legacy Boot Event Group.
+
+  Prior to UEFI 2.0 this was done via a non blessed UEFI extensions and this library
+  abstracts the implementation mechanism of this event from the caller. This function
+  abstracts the creation of the Legacy Boot Event. The Framework moved from a proprietary
+  to UEFI 2.0 based mechanism.  This library abstracts the caller from how this event
+  is created to prevent to code form having to change with the version of the
+  specification supported.
   If LegacyBootEvent is NULL, then ASSERT().
 
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
@@ -740,10 +733,10 @@ EfiCreateEventLegacyBootEx (
   );
 
 /**
-  Create an EFI event in the Ready To Boot Event Group.  Prior to UEFI 2.0 this 
-  was done via a non-standard UEFI extension, and this library abstracts the 
-  implementation mechanism of this event from the caller. 
-  
+  Create an EFI event in the Ready To Boot Event Group.
+
+  Prior to UEFI 2.0 this was done via a non-standard UEFI extension, and this library
+  abstracts the implementation mechanism of this event from the caller.   
   This function abstracts the creation of the Ready to Boot Event.  The Framework 
   moved from a proprietary to UEFI 2.0-based mechanism.  This library abstracts 
   the caller from how this event is created to prevent the code form having to 
@@ -899,7 +892,6 @@ ErrorPrint (
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -925,7 +917,6 @@ AsciiPrint (
   string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
   @param ...      Variable argument list whose contents are accessed based 
@@ -1008,7 +999,6 @@ PrintXY (
   If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
-  If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  X            X coordinate to print the string.
   @param  Y            Y coordinate to print the string.
@@ -1040,23 +1030,25 @@ AsciiPrintXY (
   );
 
 /**
-  Initializes a driver by installing the Driver Binding Protocol onto the driver's
-  DriverBindingHandle.
+  Installs and completes the initialization of a Driver Binding Protocol instance.
+  
+  Installs the Driver Binding Protocol specified by DriverBinding onto the handle
+  specified by DriverBindingHandle. If DriverBindingHandle is NULL, then DriverBinding
+  is installed onto a newly created handle. DriverBindingHandle is typically the same
+  as the driver's ImageHandle, but it can be different if the driver produces multiple
+  Driver Binding Protocols. 
+  If DriverBinding is NULL, then ASSERT(). 
+  If DriverBinding can not be installed onto a handle, then ASSERT().
 
-  This is typically the same as the driver's ImageHandle, but
-  it can be different if the driver produces multiple DriverBinding Protocols. 
-  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
-  If the installation fails, then ASSERT ().
+  @param  ImageHandle          The image handle of the driver.
+  @param  SystemTable          The EFI System Table that was passed to the driver's entry point.
+  @param  DriverBinding        A Driver Binding Protocol instance that this driver is producing.
+  @param  DriverBindingHandle  The handle that DriverBinding is to be installed onto.  If this
+                               parameter is NULL, then a new handle is created.
 
-  @param  ImageHandle                 The image handle of the driver.
-  @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
-  @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
-                                      parameter is NULL, then a new handle is created.
-
-  @retval EFI_SUCCESS                 The protocol installation is completed successfully.
-  @retval EFI_OUT_OF_RESOURCES        There was not enough system resources to install the protocol.
-  @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
+  @retval EFI_SUCCESS           The protocol installation is completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough system resources to install the protocol.
+  @retval Others                Status from gBS->InstallMultipleProtocolInterfaces().
 
 **/
 EFI_STATUS
@@ -1070,25 +1062,29 @@ EfiLibInstallDriverBinding (
 
 
 /**
-  Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name,
-  Driver Configure and Driver Diagnostic Protocols onto the driver's DriverBindingHandle.
+  Installs and completes the initialization of a Driver Binding Protocol instance and
+  optionally installs the Component Name, Driver Configuration and Driver Diagnostics Protocols.
 
-  This is  typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple
-  DriverBinding Protocols. 
-  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
-  If the installation fails, then ASSERT ().
+  Initializes a driver by installing the Driver Binding Protocol together with the
+  optional Component Name, optional Driver Configure and optional Driver Diagnostic
+  Protocols onto the driver's DriverBindingHandle. If DriverBindingHandle is NULL,
+  then the protocols are  installed onto a newly created handle. DriverBindingHandle
+  is typically the same as the driver's ImageHandle, but it can be different if the
+  driver produces multiple Driver Binding Protocols. 
+  If DriverBinding is NULL, then ASSERT(). 
+  If the installation fails, then ASSERT().
+  
+  @param  ImageHandle          The image handle of the driver.
+  @param  SystemTable          The EFI System Table that was passed to the driver's entry point.
+  @param  DriverBinding        A Driver Binding Protocol instance that this driver is producing.
+  @param  DriverBindingHandle  The handle that DriverBinding is to be installed onto.  If this
+                               parameter is NULL, then a new handle is created.
+  @param  ComponentName        A Component Name Protocol instance that this driver is producing.
+  @param  DriverConfiguration  A Driver Configuration Protocol instance that this driver is producing.
+  @param  DriverDiagnostics    A Driver Diagnostics Protocol instance that this driver is producing.
 
-  @param  ImageHandle                 The image handle of the driver.
-  @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
-  @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
-                                      parameter is NULL, then a new handle is created.
-  @param  ComponentName               A Component Name Protocol instance that this driver is producing.
-  @param  DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing.
-  @param  DriverDiagnostics           A Driver Diagnostics Protocol instance that this driver is producing.
-
-  @retval EFI_SUCCESS                 The protocol installation is completed successfully.
-  @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
+  @retval EFI_SUCCESS           The protocol installation is completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough memory in pool to install all the protocols.
 
 **/
 EFI_STATUS
@@ -1106,22 +1102,26 @@ EfiLibInstallAllDriverProtocols (
 
 
 /**
-  Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name,
-  Component Name 2 onto the driver's DriverBindingHandle.  This is typically the same as the driver's
-  ImageHandle, but it can be different if the driver produces multiple DriverBinding Protocols. 
-  If the Driver Binding Protocol interface is NULL, then ASSERT (). 
-  If the installation fails, then ASSERT ().
+  Installs Driver Binding Protocol with optional Component Name and Component Name 2 Protocols.
 
-  @param  ImageHandle                 The image handle of the driver.
-  @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
-  @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installed onto.  If this
-                                      parameter is NULL, then a new handle is created.
-  @param  ComponentName               A Component Name Protocol instance that this driver is producing.
-  @param  ComponentName2              A Component Name 2 Protocol instance that this driver is producing.
+  Initializes a driver by installing the Driver Binding Protocol together with the
+  optional Component Name and optional Component Name 2 protocols onto the driver's
+  DriverBindingHandle.  If DriverBindingHandle is NULL, then the protocols are installed
+  onto a newly created handle.  DriverBindingHandle is typically the same as the driver's
+  ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols. 
+  If DriverBinding is NULL, then ASSERT(). 
+  If the installation fails, then ASSERT().
 
-  @retval EFI_SUCCESS                 The protocol installation is completed successfully.
-  @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
+  @param  ImageHandle          The image handle of the driver.
+  @param  SystemTable          The EFI System Table that was passed to the driver's entry point.
+  @param  DriverBinding        A Driver Binding Protocol instance that this driver is producing.
+  @param  DriverBindingHandle  The handle that DriverBinding is to be installed onto.  If this
+                               parameter is NULL, then a new handle is created.
+  @param  ComponentName        A Component Name Protocol instance that this driver is producing.
+  @param  ComponentName2       A Component Name 2 Protocol instance that this driver is producing.
+
+  @retval EFI_SUCCESS           The protocol installation is completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough memory in pool to install all the protocols.
 
 **/
 EFI_STATUS
@@ -1137,29 +1137,31 @@ EfiLibInstallDriverBindingComponentName2 (
 
 
 /**
-  Intialize a driver by installing the Driver Binding Protocol together with the optional Component Name,
-  Component Name 2, Driver Configure, Driver Diagnostic and Driver Diagnostic 2 Protocols onto the driver's
-  DriverBindingHandle.
+  Installs Driver Binding Protocol with optional Component Name, Component Name 2, Driver
+  Configuration, Driver Configuration 2, Driver Diagnostics, and Driver Diagnostics 2 Protocols.
 
-  This is typically the same as the driver's ImageHandle, but it can be different if
-  the driver produces multiple DriverBinding Protocols. 
-  If the Drvier Binding Protocol interface is NULL, then ASSERT (). 
-  If the installation fails, then ASSERT ().
+  Initializes a driver by installing the Driver Binding Protocol together with the optional
+  Component Name, optional Component Name 2, optional Driver Configuration, optional Driver
+  Configuration 2, optional Driver Diagnostic, and optional Driver Diagnostic 2 Protocols
+  onto the driver's DriverBindingHandle. DriverBindingHandle is typically the same as the
+  driver's ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols. 
+  If DriverBinding is NULL, then ASSERT(). 
+  If the installation fails, then ASSERT().  
 
-  @param  ImageHandle                 The image handle of the driver.
-  @param  SystemTable                 The EFI System Table that was passed to the driver's entry point.
-  @param  DriverBinding               A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle         The handle that DriverBinding is to be installe onto.  If this
-                                      parameter is NULL, then a new handle is created.
-  @param  ComponentName               A Component Name Protocol instance that this driver is producing.
-  @param  ComponentName2              A Component Name 2 Protocol instance that this driver is producing.
-  @param  DriverConfiguration         A Driver Configuration Protocol instance that this driver is producing.
-  @param  DriverConfiguration2        A Driver Configuration Protocol 2 instance that this driver is producing.
-  @param  DriverDiagnostics           A Driver Diagnostics Protocol instance that this driver is producing.
-  @param  DriverDiagnostics2          A Driver Diagnostics Protocol 2 instance that this driver is producing.
+  @param  ImageHandle           The image handle of the driver.
+  @param  SystemTable           The EFI System Table that was passed to the driver's entry point.
+  @param  DriverBinding         A Driver Binding Protocol instance that this driver is producing.
+  @param  DriverBindingHandle   The handle that DriverBinding is to be installe onto.  If this
+                                parameter is NULL, then a new handle is created.
+  @param  ComponentName         A Component Name Protocol instance that this driver is producing.
+  @param  ComponentName2        A Component Name 2 Protocol instance that this driver is producing.
+  @param  DriverConfiguration   A Driver Configuration Protocol instance that this driver is producing.
+  @param  DriverConfiguration2  A Driver Configuration Protocol 2 instance that this driver is producing.
+  @param  DriverDiagnostics     A Driver Diagnostics Protocol instance that this driver is producing.
+  @param  DriverDiagnostics2    A Driver Diagnostics Protocol 2 instance that this driver is producing.
 
-  @retval EFI_SUCCESS                 The protocol installation is completed successfully.
-  @retval Others                      Status from gBS->InstallMultipleProtocolInterfaces().
+  @retval EFI_SUCCESS           The protocol installation is completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough memory in pool to install all the protocols.
 
 **/
 EFI_STATUS

@@ -1,6 +1,9 @@
 /** @file
-
   Provides the functions to submit Scsi commands defined in SCSI-2 specification for scsi device.
+
+  This library class provides the functions to submit SCSI commands defined in SCSI-2 specification
+  for hard drive, CD and DVD devices that are the most common SCSI boot targets used by UEFI platforms.
+  This library class depends on SCSI I/O Protocol defined in UEFI Specification and SCSI-2 industry standard.
 
 Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials                          
