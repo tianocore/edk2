@@ -22,6 +22,9 @@
   Invalidates the entire instruction cache in cache coherency domain of the
   calling CPU.
 
+  Invalidates the entire instruction cache in cache coherency domain of the
+  calling CPU.
+
 **/
 VOID
 EFIAPI
@@ -54,7 +57,7 @@ InvalidateInstructionCache (
 
   @param  Length  The number of bytes to invalidate from the instruction cache.
 
-  @return Address of cache invalidation.
+  @return Address.
 
 **/
 VOID *
@@ -229,7 +232,7 @@ InvalidateDataCache (
                   then Address is a virtual address.
   @param  Length  The number of bytes to invalidate from the data cache.
 
-  @return Address of cache invalidation.
+  @return Address.
 
 **/
 VOID *

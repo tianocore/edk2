@@ -2,6 +2,7 @@
   CopyMem() implementation.
 
   The following BaseMemoryLib instances contain the same copy of this file:
+  
     BaseMemoryLib
     BaseMemoryLibMmx
     BaseMemoryLibSse2
@@ -22,9 +23,6 @@
 
 **/
 
-
-
-
 #include "MemLibInternals.h"
 
 /**
@@ -33,8 +31,9 @@
   This function copies Length bytes from SourceBuffer to DestinationBuffer, and returns
   DestinationBuffer.  The implementation must be reentrant, and it must handle the case
   where SourceBuffer overlaps DestinationBuffer.
-  If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT(). 
-  If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT(). 
+  
+  If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT().
+  If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT().
 
   @param  DestinationBuffer   Pointer to the destination buffer of the memory copy.
   @param  SourceBuffer        Pointer to the source buffer of the memory copy.
