@@ -20,7 +20,7 @@
   MODULE_TYPE                    = PEI_CORE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PeiCoreEntryPoint|PEI_CORE
-
+  PI_SPECIFICATION_VERSION       = 0x00010000
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
