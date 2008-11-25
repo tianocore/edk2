@@ -4,7 +4,7 @@
   The Cache Maintenance Library provides abstractions for basic processor cache operations.
   It removes the need to use assembly in C code.
     
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -54,7 +54,7 @@ InvalidateInstructionCache (
 
   @param  Length  The number of bytes to invalidate from the instruction cache.
 
-  @return Address
+  @return Address.
 
 **/
 VOID *
@@ -103,7 +103,7 @@ WriteBackInvalidateDataCache (
   @param  Length  The number of bytes to write back and invalidate from the
                   data cache.
 
-  @return Address
+  @return Address of cache invalidation.
 
 **/
 VOID *
@@ -151,7 +151,7 @@ WriteBackDataCache (
                   mode, then Address is a virtual address.
   @param  Length  The number of bytes to write back from the data cache.
 
-  @return Address
+  @return Address of cache written in main memory.
 
 **/
 VOID *
@@ -202,7 +202,7 @@ InvalidateDataCache (
                   then Address is a virtual address.
   @param  Length  The number of bytes to invalidate from the data cache.
 
-  @return Address
+  @return Address.
 
 **/
 VOID *

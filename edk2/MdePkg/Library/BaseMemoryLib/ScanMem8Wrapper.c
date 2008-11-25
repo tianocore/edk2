@@ -2,6 +2,7 @@
   ScanMem8() implementation.
 
   The following BaseMemoryLib instances contain the same copy of this file:
+
     BaseMemoryLib
     BaseMemoryLibMmx
     BaseMemoryLibSse2
@@ -11,7 +12,7 @@
     PeiMemoryLib
     DxeMemoryLib
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,9 +22,6 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
-
-
 
 #include "MemLibInternals.h"
 
@@ -35,8 +33,9 @@
   address to the highest address for an 8-bit value that matches Value.  If a match is found,
   then a pointer to the matching byte in the target buffer is returned.  If no match is found,
   then NULL is returned.  If Length is 0, then NULL is returned.
+  
   If Length > 0 and Buffer is NULL, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   @param  Buffer      Pointer to the target buffer to scan.
   @param  Length      Number of bytes in Buffer to scan.
