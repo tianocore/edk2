@@ -25,6 +25,7 @@
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PciLib|PEIM SEC PEI_CORE
+  PI_SPECIFICATION_VERSION       = 0x00010000
 
 
 #

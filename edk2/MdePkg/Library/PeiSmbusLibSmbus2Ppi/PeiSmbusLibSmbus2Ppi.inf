@@ -20,6 +20,7 @@
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SmbusLib|PEIM
+  PI_SPECIFICATION_VERSION       = 0x00010000
 
 
 #
