@@ -31,9 +31,9 @@
 #------------------------------------------------------------------------------
 .globl ASM_PFX(AsmDisableCache)
 ASM_PFX(AsmDisableCache):
-    movl    %cr0, %rax
-    btsl    $30, %rax
-    btrl    $29, %rax
-    movl    %rax, %cr0
+    movq    %cr0, %rax
+    btsq    $30, %rax
+    btrq    $29, %rax
+    movq    %rax, %cr0
     wbinvd
     ret
