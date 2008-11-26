@@ -73,7 +73,7 @@ Returns:
   UINTN DestinationStride;
   UINTN SourceStride;
 
-  Width             = Width & 0x03;
+  Width             = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
   Stride            = (UINTN)1 << Width;
   DestinationStride = DestinationStrideFlag ? Stride : 0;
   SourceStride      = SourceStrideFlag ? Stride : 0;
@@ -305,7 +305,7 @@ Returns:
     OutStride = 0;
   }
 
-  Width = Width & 0x03;
+  Width = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
 
   //
   // Loop for each iteration and move the data
@@ -398,7 +398,7 @@ Returns:
     OutStride = 0;
   }
 
-  Width = Width & 0x03;
+  Width = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
 
   //
   // Loop for each iteration and move the data
@@ -518,7 +518,7 @@ Returns:
     Count = 1;
   }
 
-  Width = Width & 0x03;
+  Width = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
   if (Address - 1 + ((UINTN)1 << Width) * Count > Limit) {
     return EFI_UNSUPPORTED;
   }

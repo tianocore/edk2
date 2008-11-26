@@ -40,7 +40,7 @@ EfiLoader (
   )
 {
   BIOS_MEMORY_MAP       *BiosMemoryMap;    
-  EFILDR_HEADER         *EFILDRHeader;
+  //EFILDR_HEADER         *EFILDRHeader;
   EFILDR_IMAGE          *EFILDRImage;
   EFI_MEMORY_DESCRIPTOR EfiMemoryDescriptor[EFI_MAX_MEMORY_DESCRIPTORS];
   EFI_STATUS            Status;
@@ -78,7 +78,7 @@ EfiLoader (
   // Get information on where the image is in memory
   //
 
-  EFILDRHeader = (EFILDR_HEADER *)(UINTN)(EFILDR_HEADER_ADDRESS);
+  //EFILDRHeader = (EFILDR_HEADER *)(UINTN)(EFILDR_HEADER_ADDRESS);
   EFILDRImage  = (EFILDR_IMAGE *)(UINTN)(EFILDR_HEADER_ADDRESS + sizeof(EFILDR_HEADER));
 
 

@@ -648,7 +648,7 @@ Returns:
   // Wait for the serail port to be ready.
   //
   do {
-    Data = CpuIoRead8 (gComBase + LSR_OFFSET);
+    Data = CpuIoRead8 ((UINT16) (gComBase + LSR_OFFSET));
   } while ((Data & LSR_TXRDY) == 0);
     
   CpuIoWrite8 (gComBase, Character);
@@ -674,10 +674,6 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
-
-  Status = EFI_SUCCESS;
-
   for ( ; *OutputString != 0; OutputString++) {
     DebugSerialWrite (*OutputString);
   }
@@ -869,19 +865,19 @@ Returns:
   // Set communications format
   //
   OutputData = (UINT8)((DLAB << 7) | ((gBreakSet << 6) | ((gParity << 3) | ((gStop << 2) | Data))));
-  CpuIoWrite8 (gComBase + LCR_OFFSET, OutputData);
+  CpuIoWrite8 ((UINT16) (gComBase + LCR_OFFSET), OutputData);
 
   //
   // Configure baud rate
   //
-  CpuIoWrite8 (gComBase + BAUD_HIGH_OFFSET, (UINT8)(Divisor >> 8));
-  CpuIoWrite8 (gComBase + BAUD_LOW_OFFSET, (UINT8)(Divisor & 0xff));
+  CpuIoWrite8 ((UINT16) (gComBase + BAUD_HIGH_OFFSET), (UINT8)(Divisor >> 8));
+  CpuIoWrite8 ((UINT16) (gComBase + BAUD_LOW_OFFSET), (UINT8)(Divisor & 0xff));
 
   //
   // Switch back to bank 0
   //
   OutputData = (UINT8)((~DLAB<<7)|((gBreakSet<<6)|((gParity<<3)|((gStop<<2)| Data))));
-  CpuIoWrite8 (gComBase + LCR_OFFSET, OutputData);
+  CpuIoWrite8 ((UINT16) (gComBase + LCR_OFFSET), OutputData);
 
   *ReportStatusCode = SerialReportStatusCode;
 }

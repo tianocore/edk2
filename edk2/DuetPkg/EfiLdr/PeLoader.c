@@ -477,7 +477,7 @@ PrintHeader ('P');
 
       case EFI_IMAGE_REL_BASED_LOW:
         F16 = (UINT16 *) Fixup;
-        *F16 = *F16 + (UINT16) Adjust;
+        *F16 = (UINT16) (*F16 + (UINT16) Adjust);
         if (FixupData != NULL) {
           *(UINT16 *) FixupData = *F16;
           FixupData = FixupData + sizeof(UINT16);
@@ -618,19 +618,19 @@ EfiLdrPeCoffCheckImageMachineType (
 
   Status = EFI_UNSUPPORTED;
 
-#if EFI32
+#ifdef EFI32
   if (MachineType == EFI_IMAGE_MACHINE_IA32) {
     Status = EFI_SUCCESS;
   }
 #endif
 
-#if EFIX64
+#ifdef EFIX64
   if (MachineType == EFI_IMAGE_MACHINE_X64) {
     Status = EFI_SUCCESS;
   }
 #endif
 
-#if EFI64
+#ifdef EFI64
   if (MachineType == EFI_IMAGE_MACHINE_IA64) {
     Status = EFI_SUCCESS;
   }

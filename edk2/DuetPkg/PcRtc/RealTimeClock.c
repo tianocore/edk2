@@ -153,7 +153,7 @@ Returns:
   EFI_STATUS      Status;
   RTC_REGISTER_A  RegisterA;
   RTC_REGISTER_B  RegisterB;
-  RTC_REGISTER_C  RegisterC;
+  //RTC_REGISTER_C  RegisterC;
   RTC_REGISTER_D  RegisterD;
   UINT8           Century;
   EFI_TIME        Time;
@@ -180,7 +180,7 @@ Returns:
   //
   // Clear RTC flag register
   //
-  RegisterC.Data = RtcRead (RTC_ADDRESS_REGISTER_C);
+  //RegisterC.Data = RtcRead (RTC_ADDRESS_REGISTER_C);
 
   //
   // Clear RTC register D
@@ -270,7 +270,7 @@ Routine Description:
   EFI_STATUS      Status;
   RTC_REGISTER_B  RegisterB;
   UINT8           Century;
-  UINTN           BufferSize;
+  //UINTN           BufferSize;
 
   //
   // Check parameters for null pointer
@@ -328,7 +328,7 @@ Routine Description:
   Time->TimeZone  = Global->SavedTimeZone;
   Time->Daylight  = Global->Daylight;
 
-  BufferSize      = sizeof (INT16) + sizeof (UINT8);
+  //BufferSize      = sizeof (INT16) + sizeof (UINT8);
 
   //
   // Make sure all field values are in correct range

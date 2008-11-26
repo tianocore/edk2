@@ -38,7 +38,7 @@ PrintValue64 (
 
 VOID 
 PrintString (
-  UINT8 *String
+  CHAR8 *String
   );
 
 VOID 
