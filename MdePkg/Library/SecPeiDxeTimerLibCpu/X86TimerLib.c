@@ -183,8 +183,9 @@ NanoSecondDelay (
 }
 
 /**
-  Retrieves the current value of a 64-bit free running performance counter. The
-  counter can either count up by 1 or count down by 1. If the physical
+  Retrieves the current value of a 64-bit free running performance counter.
+
+  The counter can either count up by 1 or count down by 1. If the physical
   performance counter counts by a larger increment, then the counter values
   must be translated. The properties of the counter can be retrieved from
   GetPerformanceCounterProperties().

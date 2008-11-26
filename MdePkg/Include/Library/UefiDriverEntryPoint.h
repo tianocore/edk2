@@ -44,7 +44,8 @@ extern CONST UINT8                    _gDriverUnloadImageCount;
   @param  ImageHandle  ImageHandle of the loaded driver.
   @param  SystemTable  Pointer to the EFI System Table.
 
-  @retval  EFI_SUCCESS               One or more of the drivers returned a success code.
+  @retval  EFI_SUCCESS               The DXE Driver, DXE Runtime Driver, DXE SMM Driver,
+                                     or UEFI Driver exited normally.
   @retval  EFI_INCOMPATIBLE_VERSION  _gUefiDriverRevision is greater than SystemTable->Hdr.Revision.
   @retval  Other                     Return value from ProcessModuleEntryPointList().
 
