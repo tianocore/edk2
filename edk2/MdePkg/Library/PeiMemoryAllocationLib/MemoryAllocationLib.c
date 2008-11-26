@@ -129,6 +129,7 @@ AllocateReservedPages (
   Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
   must have been allocated on a previous call to the page allocation services of the Memory
   Allocation Library.
+  
   If Buffer was not allocated with a page allocation function in the Memory Allocation Library,
   then ASSERT().
   If Pages is zero, then ASSERT().
@@ -207,6 +208,7 @@ InternalAllocateAlignedPages (
   alignment specified by Alignment.  The allocated buffer is returned.  If Pages is 0, then NULL is
   returned.  If there is not enough memory at the specified alignment remaining to satisfy the
   request, then NULL is returned.
+  
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
   @param  Pages                 The number of 4 KB pages to allocate.
@@ -233,6 +235,7 @@ AllocateAlignedPages (
   alignment specified by Alignment.  The allocated buffer is returned.  If Pages is 0, then NULL is
   returned.  If there is not enough memory at the specified alignment remaining to satisfy the
   request, then NULL is returned.
+  
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
   @param  Pages                 The number of 4 KB pages to allocate.
@@ -259,6 +262,7 @@ AllocateAlignedRuntimePages (
   alignment specified by Alignment.  The allocated buffer is returned.  If Pages is 0, then NULL is
   returned.  If there is not enough memory at the specified alignment remaining to satisfy the
   request, then NULL is returned.
+  
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
   @param  Pages                 The number of 4 KB pages to allocate.
@@ -285,6 +289,7 @@ AllocateAlignedReservedPages (
   Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
   must have been allocated on a previous call to the aligned page allocation services of the Memory
   Allocation Library.
+  
   If Buffer was not allocated with an aligned page allocation function in the Memory Allocation
   Library, then ASSERT().
   If Pages is zero, then ASSERT().
@@ -546,6 +551,7 @@ InternalAllocateCopyPool (
   AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
+  
   If Buffer is NULL, then ASSERT().
   If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
@@ -581,6 +587,7 @@ AllocateCopyPool (
   AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
+  
   If Buffer is NULL, then ASSERT().
   If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
@@ -607,6 +614,7 @@ AllocateRuntimeCopyPool (
   AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
+  
   If Buffer is NULL, then ASSERT().
   If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
@@ -773,6 +781,7 @@ ReallocateReservedPool (
 
   Frees the buffer specified by Buffer.  Buffer must have been allocated on a previous call to the
   pool allocation services of the Memory Allocation Library.
+  
   If Buffer was not allocated with a pool allocation function in the Memory Allocation Library,
   then ASSERT().
 

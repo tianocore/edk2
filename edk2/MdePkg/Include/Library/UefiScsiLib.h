@@ -48,7 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                     If SenseDataLength is 0, then this parameter is
                                     optional and may be NULL.
   @param[in, out] SenseDataLength   On input, a pointer to the length in bytes of
-                                    the SenseData buffer. On output, a poiinter to
+                                    the SenseData buffer. On output, a pointer to
                                     the number of bytes written to the SenseData buffer. 
   @param[out]     HostAdapterStatus The status of the SCSI Host Controller that produces
                                     the SCSI bus containing the SCSI target specified by
@@ -56,7 +56,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                     See the EFI SCSI I/O Protocol in the UEFI Specification
                                     for details on the possible return values.
   @param[out]     TargetStatus      The status returned by the SCSI target specified
-                                    by ScsiIo when the SCSI Request Packat was executed
+                                    by ScsiIo when the SCSI Request Packet was executed
                                     on the SCSI Host Controller. See the EFI SCSI I/O
                                     Protocol in the UEFI Specification for details on
                                     the possible return values. 
@@ -135,7 +135,7 @@ ScsiTestUnitReadyCommand (
                                          SCSI I/O Protocol in the UEFI Specification
                                          for details on the possible return values.
   @param[out]     TargetStatus           The status returned by the SCSI target specified
-                                         by ScsiIo when the SCSI Request Packat was
+                                         by ScsiIo when the SCSI Request Packet was
                                          executed on the SCSI Host Controller.
                                          See the EFI SCSI I/O Protocol in the UEFI
                                          Specification for details on the possible
@@ -231,7 +231,7 @@ ScsiInquiryCommand (
                                      UEFI Specification for details on the possible
                                      return values.
   @param[out]     TargetStatus       The status returned by the SCSI target specified
-                                     by ScsiIo when the SCSI Request Packat was executed
+                                     by ScsiIo when the SCSI Request Packet was executed
                                      on the SCSI Host Controller.  See the EFI SCSI
                                      I/O Protocol in the UEFI Specification for details
                                      on the possible return values.

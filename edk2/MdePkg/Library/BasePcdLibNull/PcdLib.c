@@ -778,8 +778,6 @@ LibPcdGetNextToken (
   then NULL is returned. 
 
   If Guid is not NULL and is not a valid token space in the current platform, then ASSERT().
-
-
   
   @param[in]  Guid  Pointer to a 128-bit unique value that designates from which namespace 
                     to start the search.
@@ -799,25 +797,27 @@ LibPcdGetNextTokenSpace (
 }
 
 
-
 /**
+  Sets a value of a patchable PCD entry that is type pointer.
+  
   Sets the PCD entry specified by PatchVariable to the value specified by Buffer 
-  and SizeOfValue.  Buffer is returned.  If SizeOfValue is greater than 
-  MaximumDatumSize, then set SizeOfValue to MaximumDatumSize and return 
+  and SizeOfBuffer.  Buffer is returned.  If SizeOfBuffer is greater than 
+  MaximumDatumSize, then set SizeOfBuffer to MaximumDatumSize and return 
   NULL to indicate that the set operation was not actually performed.  
-  If SizeOfValue is set to MAX_ADDRESS, then SizeOfValue must be set to 
+  If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be set to 
   MaximumDatumSize and NULL must be returned.
   
   If PatchVariable is NULL, then ASSERT().
-  If SizeOfValue is NULL, then ASSERT().
-  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
+  If SizeOfBuffer is NULL, then ASSERT().
+  If SizeOfBuffer > 0 and Buffer is NULL, then ASSERT().
 
   @param[in] PatchVariable      A pointer to the global variable in a module that is 
                                 the target of the set operation.
   @param[in] MaximumDatumSize   The maximum size allowed for the PCD entry specified by PatchVariable.
   @param[in, out] SizeOfBuffer  A pointer to the size, in bytes, of Buffer.
   @param[in] Buffer             A pointer to the buffer to used to set the target variable.
-  @return Return the pinter to the buffer been set.
+  
+  @return Return the pointer to the buffer been set.
 
 **/
 VOID *

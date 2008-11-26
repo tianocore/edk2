@@ -957,7 +957,7 @@ LibPcdGetNextTokenSpace (
                                 In out, returns actual size of buffer is set.
   @param[in] Buffer             A pointer to the buffer to used to set the target variable.
 
-  @return Return the pinter to the buffer been set.
+  @return Return the pointer to the buffer been set.
   @retval NULL   If SizeOfBuffer is set to MAX_ADDRESS or larger than MaximumDatumSize, 
                  then SizeOfBuffer must be set to MaximumDatumSize and NULL must be returned.
 **/

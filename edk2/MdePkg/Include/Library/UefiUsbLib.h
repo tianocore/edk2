@@ -68,7 +68,7 @@ UsbGetHidDescriptor (
 
   @retval  EFI_SUCCESS           The request executed successfully.
   @retval  EFI_OUT_OF_RESOURCES  The request could not be completed because the
-                                 buffer specifed by DescriptorLength and DescriptorBuffer
+                                 buffer specified by DescriptorLength and DescriptorBuffer
                                  is not large enough to hold the result of the request.
   @retval  EFI_TIMEOUT           A timeout occurred executing the request.
   @retval  EFI_DEVICE_ERROR      The request failed due to a device error.
@@ -542,7 +542,7 @@ UsbGetStatus (
 
   Retrieve the USB endpoint descriptor specified by UsbIo and EndPoint.
   If the USB endpoint descriptor can not be retrieved, then return EFI_NOT_FOUND.
-  If the endpoint descriptor is found, then clear the halt fature of this USB endpoint.
+  If the endpoint descriptor is found, then clear the halt feature of this USB endpoint.
   The status of the transfer is returned in Status.
   If UsbIo is NULL, then ASSERT().
   If Status is NULL, then ASSERT().

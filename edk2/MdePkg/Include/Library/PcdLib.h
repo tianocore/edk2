@@ -1504,7 +1504,7 @@ LibPcdGetNextTokenSpace (
   @param[in, out] SizeOfBuffer  A pointer to the size, in bytes, of Buffer.
   @param[in] Buffer             A pointer to the buffer to used to set the target variable.
   
-  @return Return the pinter to the buffer been set.
+  @return Return the pointer to the buffer been set.
 
 **/
 VOID *

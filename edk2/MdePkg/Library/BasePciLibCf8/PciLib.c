@@ -382,6 +382,7 @@ PciBitFieldAndThenOr8 (
   serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -406,6 +407,7 @@ PciRead16 (
   that all PCI read and write operations are serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -436,6 +438,7 @@ PciWrite16 (
   are serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -466,6 +469,7 @@ PciOr16 (
   serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -497,6 +501,7 @@ PciAnd16 (
   read and write operations are serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -525,6 +530,7 @@ PciAndThenOr16 (
   returned.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -558,6 +564,7 @@ PciBitFieldRead16 (
   16-bit register is returned.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -596,6 +603,7 @@ PciBitFieldWrite16 (
   are serialized. Extra left bits in OrData are stripped.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -634,6 +642,7 @@ PciBitFieldOr16 (
   serialized. Extra left bits in AndData are stripped.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -674,6 +683,7 @@ PciBitFieldAnd16 (
   OrData are stripped.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -710,6 +720,7 @@ PciBitFieldAndThenOr16 (
   serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -734,6 +745,7 @@ PciRead32 (
   that all PCI read and write operations are serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -764,6 +776,7 @@ PciWrite32 (
   are serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -794,6 +807,7 @@ PciOr32 (
   serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -825,6 +839,7 @@ PciAnd32 (
   read and write operations are serialized.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -853,6 +868,7 @@ PciAndThenOr32 (
   returned.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -886,6 +902,7 @@ PciBitFieldRead32 (
   32-bit register is returned.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -924,6 +941,7 @@ PciBitFieldWrite32 (
   are serialized. Extra left bits in OrData are stripped.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -962,6 +980,7 @@ PciBitFieldOr32 (
   serialized. Extra left bits in AndData are stripped.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1002,6 +1021,7 @@ PciBitFieldAnd32 (
   OrData are stripped.
 
   If Address > 0x0FFFFFFF, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
