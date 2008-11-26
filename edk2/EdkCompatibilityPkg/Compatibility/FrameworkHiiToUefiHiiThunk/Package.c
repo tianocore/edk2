@@ -112,7 +112,7 @@ UpdatePackListWithOnlyIfrPack (
 {
   EFI_STATUS                 Status;
   LIST_ENTRY                 *Link;
-  HII_THUNK_CONTEXT *ThunkContext;
+  HII_THUNK_CONTEXT          *ThunkContext;
 
   Link = GetFirstNode (&Private->ThunkContextListHead);
   while (!IsNull (&Private->ThunkContextListHead, Link)) {
@@ -136,13 +136,16 @@ UpdatePackListWithOnlyIfrPack (
                                               StringPackageListHeader
                                               );
         ASSERT_EFI_ERROR (Status);
-        
+
+        ThunkContext->SharingStringPack = TRUE;
+        StringPackageThunkContext->SharingStringPack = TRUE;
+
       }
     }
     
     Link = GetNextNode (&Private->ThunkContextListHead, Link);
   }
-  
+
 }
 
 /**
@@ -387,8 +390,7 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
   LIST_ENTRY                      *Link;
   EFI_HII_PACKAGE_LIST_HEADER     *StringPackageListHeader;
   UINTN                           Size;
-  HII_THUNK_CONTEXT                *ThunkContext;
-
+  HII_THUNK_CONTEXT               *ThunkContext;
   
   Link = GetFirstNode (&Private->ThunkContextListHead);
 
@@ -413,6 +415,10 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
         ASSERT_EFI_ERROR (Status);
         
         FreePool (StringPackageListHeader);
+
+        IfrThunkContext->SharingStringPack = TRUE;
+        ThunkContext->SharingStringPack = TRUE;
+        
         return EFI_SUCCESS;
 
       }
@@ -421,6 +427,11 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
     Link = GetNextNode (&Private->ThunkContextListHead, Link);
   }
 
+  //
+  // A Form Package must have a String Package to function.
+  // If ASSERT here, check the sequence of call to Hii->NewPack. 
+  // String Pack must be registered before Ifr Package is registered.
+  //
   ASSERT (FALSE);
   return EFI_NOT_FOUND;
   

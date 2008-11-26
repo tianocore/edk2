@@ -129,7 +129,24 @@ typedef struct {
   BOOLEAN                   ByFrameworkHiiNewPack;
 
   //
-  // The field below is only valid if IsPackageListWithOnlyStringPack is TRUE.
+  // HII Thunk will use TagGuid to associate the String Package and Form Package togehter.
+  // See description for TagGuid. This field is to record if either one of the following condition 
+  // is TRUE:
+  // 1) if ((SharingStringPack == TRUE) && (StringPackageCount != 0 && IfrPackageCount == 0)), then this Package List only 
+  ///   has String Packages and provides Strings to other IFR package.
+  // 2) if ((SharingStringPack == TRUE) && (StringPackageCount == 0 && IfrPackageCount != 1)), then this Form Package
+  //    copied String Packages from other Package List.
+  // 3) if ((SharingStringPack == FALSE)), this Package does not provide String Package or copy String Packages from other
+  //    Package List.
+  //
+  //
+  // When a Hii->NewString() is called for this FwHiiHandle and SharingStringPack is TRUE, then all Package List that sharing
+  // the same TagGuid will update or create String in there respective String Packages. If SharingStringPack is FALSE, then
+  // only the String from String Packages in this Package List will be updated or created.
+  //
+  BOOLEAN                   SharingStringPack;
+
+  //
   // The HII 0.92 version of HII data implementation in EDK 1.03 and 1.04 make an the following assumption
   // in both HII Database implementation and all modules that registering packages:
   // If a Package List has only IFR package and no String Package, the IFR package will reference 
