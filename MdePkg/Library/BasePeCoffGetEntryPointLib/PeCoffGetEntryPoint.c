@@ -127,7 +127,7 @@ PeCoffLoaderGetMachineType (
 
 /**
   Returns a pointer to the PDB file name for a PE/COFF image that has been
-  loaded into system memory with the PE/COFF Loader Library functions.
+  loaded into system memory with the PE/COFF Loader Library functions. 
 
   Returns the PDB file name for the PE/COFF image specified by Pe32Data.  If
   the PE/COFF image specified by Pe32Data is not a valid, then NULL is

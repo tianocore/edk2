@@ -23,7 +23,6 @@
 
 
 /**
-  
   Declares the presence of permanent system memory in the platform.
 
   Declares that the system memory buffer specified by MemoryBegin and MemoryLength

@@ -181,6 +181,8 @@ PeCoffLoaderGetPeHeader (
   If any errors occur while computing the fields of ImageContext, 
   then the error status is returned in the ImageError field of ImageContext.  
   If the image is a TE image, then SectionAlignment is set to 0.
+  The ImageRead and Handle fields of ImageContext structure must be valid prior 
+  to invoking this service.
 
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.

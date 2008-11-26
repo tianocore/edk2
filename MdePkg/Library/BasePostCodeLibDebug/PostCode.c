@@ -31,9 +31,9 @@
   processing another any other Post Code Library function, then 
   PostCode() must return Value immediately.
 
-  @param   Value  The 32-bit value to write to the POST card.
+  @param  Value  The 32-bit value to write to the POST card.
 
-  @return  The 32-bit value to write to the POST card.
+  @return The 32-bit value to write to the POST card.
 
 **/
 UINT32

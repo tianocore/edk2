@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __PEI_SERVICES_LIB_H__
 
 /**
-  This service enables a given PEIM to register an interface into the PEI Foundation. 
+  This service enables a given PEIM to register an interface into the PEI Foundation.
 
   @param  PpiList               A pointer to the list of interfaces that the caller shall install.
 
@@ -98,7 +98,7 @@ PeiServicesNotifyPpi (
   );
 
 /**
-  This service enables PEIMs to ascertain the present value of the boot mode.  
+  This service enables PEIMs to ascertain the present value of the boot mode.
 
   @param  BootMode              A pointer to contain the value of the boot mode.
 
@@ -113,7 +113,7 @@ PeiServicesGetBootMode (
   );
 
 /**
-  This service enables PEIMs to update the boot mode variable.    
+  This service enables PEIMs to update the boot mode variable.
 
   @param  BootMode              The value of the boot mode to set.
 
@@ -165,7 +165,7 @@ PeiServicesCreateHob (
 
   @param  Instance              This instance of the firmware volume to find.  The value 0 is the
                                 Boot Firmware Volume (BFV).
-  @param  VolumeHandle          Pointer to the firmware volume header of the volume to return.
+  @param  VolumeHandle          Handle of the firmware volume header of the volume to return.
 
   @retval EFI_SUCCESS           The volume was found.
   @retval EFI_NOT_FOUND         The volume was not found.
@@ -185,7 +185,7 @@ PeiServicesFfsFindNextVolume (
   @param  SearchType            A filter to find files only of this type.
   @param  VolumeHandle          Pointer to the firmware volume header of the volume to search.
                                 This parameter must point to a valid FFS volume.
-  @param  FileHandle            Pointer to the current file from which to begin searching.
+  @param  FileHandle            Handle of the current file from which to begin searching.
 
   @retval EFI_SUCCESS           The file was found.
   @retval EFI_NOT_FOUND         The file was not found.

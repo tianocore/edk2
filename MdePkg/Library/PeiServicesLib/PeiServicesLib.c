@@ -282,7 +282,7 @@ PeiServicesFfsFindNextFile (
   This service enables PEIMs to discover sections of a given type within a valid FFS file.
 
   @param  SectionType           The value of the section type to find.
-  @param  FfsFileHeader         A pointer to the file header that contains the set of sections to
+  @param  FileHandle            A pointer to the file header that contains the set of sections to
                                 be searched.
   @param  SectionData           A pointer to the discovered section, if successful.
 
@@ -294,14 +294,14 @@ EFI_STATUS
 EFIAPI
 PeiServicesFfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
-  IN EFI_PEI_FILE_HANDLE        FfsFileHeader,
+  IN EFI_PEI_FILE_HANDLE        FileHandle,
   OUT VOID                      **SectionData
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
   PeiServices = GetPeiServicesTablePointer ();
-  return (*PeiServices)->FfsFindSectionData (PeiServices, SectionType, FfsFileHeader, SectionData);
+  return (*PeiServices)->FfsFindSectionData (PeiServices, SectionType, FileHandle, SectionData);
 }
 
 /**
@@ -383,8 +383,6 @@ PeiServicesAllocatePool (
 
 /**
   Resets the entire platform.
-
-  @param  VOID
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_AVAILABLE_YET The service has not been installed yet.
