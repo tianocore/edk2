@@ -71,29 +71,20 @@ CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
 CONST EFI_FORM_BROWSER2_PROTOCOL           *mFormBrowser2Protocol;
 
 
+/**
+  This routine initializes the HII Database.
+  
+  @param ImageHandle     Image handle for PCD DXE driver.
+  @param SystemTable     Pointer to SystemTable.
 
-
-
-
+  @retval  EFI_SUCCESS   The entry point alwasy return successfully.
+**/
 EFI_STATUS
 EFIAPI
 InitializeHiiDatabase (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
-/*++
-
-Routine Description:
-  Initialize HII Database
-
-Arguments:
-  (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
-
-Returns:
-  EFI_SUCCESS - Setup loaded.
-  other       - Setup Error
-
---*/
 {
   HII_THUNK_PRIVATE_DATA *Private;
   EFI_HANDLE              Handle;
@@ -239,6 +230,26 @@ Returns:
   return Status;
 }
 
+/**
+  Determines the handles that are currently active in the database.
+
+  This function determines the handles that are currently active in the database. 
+  For example, a program wishing to create a Setup-like configuration utility would use this call 
+  to determine the handles that are available. It would then use calls defined in the forms section 
+  below to extract forms and then interpret them.
+
+  @param This                 A pointer to the EFI_HII_PROTOCOL instance.
+  @param HandleBufferLength   On input, a pointer to the length of the handle buffer. 
+                              On output, the length of the handle buffer that is required for the handles found.
+  @param Handle               An array of EFI_HII_HANDLE instances returned. 
+                              Type EFI_HII_HANDLE is defined in EFI_HII_PROTOCOL.NewPack() in the Packages section.
+
+  @retval EFI_SUCCESS         Handle was updated successfully.
+ 
+  @retval EFI_BUFFER_TOO_SMALL The HandleBufferLength parameter indicates that Handle is too small 
+                               to support the number of handles. HandleBufferLength is updated with a value that 
+                               will enable the data to fit.
+**/
 EFI_STATUS
 EFIAPI
 HiiFindHandles (
@@ -246,16 +257,6 @@ HiiFindHandles (
   IN OUT UINT16           *HandleBufferLength,
   OUT    FRAMEWORK_EFI_HII_HANDLE    Handle[1]
   )
-/*++
-
-Routine Description:
-  Determines the handles that are currently active in the database.
-
-Arguments:
-
-Returns:
-
---*/
 {
   UINT16                                     Count;
   LIST_ENTRY                                *Link;
@@ -348,24 +349,30 @@ LangCodes3066To639 (
   return EFI_SUCCESS;
 }
 
+/**
+  Allows a program to determine the primary languages that are supported on a given handle.
+
+  This routine is intended to be used by drivers to query the interface database for supported languages. 
+  This routine returns a string of concatenated 3-byte language identifiers, one per string package associated with the handle.
+
+  @param This           A pointer to the EFI_HII_PROTOCOL instance.
+  @param Handle         The handle on which the strings reside. Type EFI_HII_HANDLE is defined in EFI_HII_PROTOCOL.NewPack() 
+                        in the Packages section.
+  @param LanguageString A string allocated by GetPrimaryLanguages() that contains a list of all primary languages 
+                        registered on the handle. The routine will not return the three-spaces language identifier used in 
+                        other functions to indicate non-language-specific strings.
+
+  @reval EFI_SUCCESS            LanguageString was correctly returned.
+ 
+  @reval EFI_INVALID_PARAMETER The Handle was unknown.
+**/
 EFI_STATUS
 EFIAPI
 HiiGetPrimaryLanguages (
-  IN  EFI_HII_PROTOCOL      *This,
-  IN  FRAMEWORK_EFI_HII_HANDLE         Handle,
-  OUT EFI_STRING            *LanguageString
+  IN  EFI_HII_PROTOCOL            *This,
+  IN  FRAMEWORK_EFI_HII_HANDLE    Handle,
+  OUT EFI_STRING                  *LanguageString
   )
-/*++
-
-Routine Description:
-
-  This function allows a program to determine what the primary languages that are supported on a given handle.
-
-Arguments:
-
-Returns:
-
---*/
 {
   HII_THUNK_PRIVATE_DATA     *Private;
   EFI_HII_HANDLE             UefiHiiHandle;
@@ -416,7 +423,26 @@ Done:
 }
 
 
+/**
+  Allows a program to determine which secondary languages are supported on a given handle for a given primary language
 
+  This routine is intended to be used by drivers to query the interface database for supported languages. 
+  This routine returns a string of concatenated 3-byte language identifiers, one per string package associated with the handle.
+
+  @param This           A pointer to the EFI_HII_PROTOCOL instance.
+  @param Handle         The handle on which the strings reside. Type EFI_HII_HANDLE is defined in EFI_HII_PROTOCOL.NewPack() 
+                        in the Packages section.
+  @param PrimaryLanguage Pointer to a NULL-terminated string containing a single ISO 639-2 language identifier, indicating 
+                         the primary language.
+  @param LanguageString  A string allocated by GetSecondaryLanguages() containing a list of all secondary languages registered 
+                         on the handle. The routine will not return the three-spaces language identifier used in other functions 
+                         to indicate non-language-specific strings, nor will it return the primary language. This function succeeds 
+                         but returns a NULL LanguageString if there are no secondary languages associated with the input Handle and 
+                         PrimaryLanguage pair. Type EFI_STRING is defined in String.
+  
+  @reval EFI_SUCCESS            LanguageString was correctly returned.
+  @reval EFI_INVALID_PARAMETER  The Handle was unknown.
+**/
 EFI_STATUS
 EFIAPI
 HiiGetSecondaryLanguages (
@@ -425,18 +451,6 @@ HiiGetSecondaryLanguages (
   IN  CHAR16                        *PrimaryLanguage,
   OUT EFI_STRING                    *LanguageString
   )
-/*++
-
-Routine Description:
-
-  This function allows a program to determine which secondary languages are supported
-  on a given handle for a given primary language.
-
-  Arguments:
-
-Returns:
-
---*/
 {
   HII_THUNK_PRIVATE_DATA *Private;
   EFI_HII_HANDLE             UefiHiiHandle;

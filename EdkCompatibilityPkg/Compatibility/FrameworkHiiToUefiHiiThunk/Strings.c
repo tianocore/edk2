@@ -51,7 +51,24 @@ ConvertIso639ToRfc3066 (
   return (CHAR8 *) NULL;
 }
 
+/**
+  Test if all of the characters in a string have corresponding font characters.
 
+  This is a deprecated API. No Framework HII module is calling it. This function will ASSERT and
+  return EFI_UNSUPPORTED.
+
+  @param This            A pointer to the EFI_HII_PROTOCOL instance.
+  @param StringToTest    A pointer to a Unicode string.
+  @param FirstMissing    A pointer to an index into the string. On input, the index of 
+                         the first character in the StringToTest to examine. On exit, the index 
+                         of the first character encountered for which a glyph is unavailable. 
+                         If all glyphs in the string are available, the index is the index of the terminator 
+                         of the string. 
+  @param GlyphBufferSize A pointer to a value. On output, if the function returns EFI_SUCCESS, 
+                         it contains the amount of memory that is required to store the string¡¯s glyph equivalent.
+
+  @retval EFI_UNSUPPORTED  The function performs nothing and return EFI_UNSUPPORTED.
+**/
 EFI_STATUS
 EFIAPI
 HiiTestString (
@@ -60,23 +77,23 @@ HiiTestString (
   IN OUT UINT32             *FirstMissing,
   OUT    UINT32             *GlyphBufferSize
   )
-/*++
-
-Routine Description:
-  Test if all of the characters in a string have corresponding font characters.
-
-Arguments:
-
-Returns:
-
---*/
 {
   ASSERT (FALSE);
-  return EFI_SUCCESS;
+  
+  return EFI_UNSUPPORTED;
 }
 
 
+/**
+  Find the corressponding TAG GUID from a Framework HII Handle given.
 
+  @param Private      The HII Thunk Module Private context.
+  @param FwHiiHandle  The Framemwork HII Handle.
+  @param TagGuid      The output of TAG GUID found.
+
+  @return NULL        If Framework HII Handle is invalid.
+  @return The corresponding HII Thunk Context.
+**/
 EFI_STATUS
 GetTagGuidByFwHiiHandle (
   IN  CONST HII_THUNK_PRIVATE_DATA      *Private,
@@ -105,7 +122,119 @@ GetTagGuidByFwHiiHandle (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Create or update the String given a new string and String ID.
 
+  @param ThunkContext           The Thunk Context.
+  @param Rfc3066AsciiLanguage   The RFC 3066 Language code in ASCII string format.
+  @param NewString              The new string.
+  @param StringId               The String ID. If StringId is 0, a new String Token
+                                is created. Otherwise, the String Token StringId is 
+                                updated.
+                                
+
+  @retval EFI_SUCCESS           The new string is created or updated successfully. 
+                                The new String Token ID is returned in StringId if
+                                *StringId is 0 on input.
+  @return Others                The update of string failed.                                  
+  
+**/
+EFI_STATUS
+UpdateString (
+  IN CONST HII_THUNK_CONTEXT        *ThunkContext,
+  IN CONST CHAR8                    *Rfc3066AsciiLanguage,
+  IN       CHAR16                   *NewString,
+  IN OUT STRING_REF                 *StringId
+  )
+{
+  EFI_STRING_ID                             NewStringId;
+  EFI_STATUS                                Status;
+
+
+  NewStringId = 0;
+  
+  if (*StringId == 0) {
+    //
+    // Create a new string token.
+    //
+    if (Rfc3066AsciiLanguage == NULL) {
+      //
+      // For all languages in the package list.
+      //
+      Status = HiiLibNewString (ThunkContext->UefiHiiHandle, &NewStringId, NewString);
+    } else {
+      //
+      // For specified language.
+      //
+      Status = mHiiStringProtocol->NewString (
+                                     mHiiStringProtocol,
+                                     ThunkContext->UefiHiiHandle,
+                                     &NewStringId,
+                                     Rfc3066AsciiLanguage,
+                                     NULL,
+                                     NewString,
+                                     NULL
+                                     );
+    }
+  } else {
+    //
+    // Update the existing string token.
+    //
+    if (Rfc3066AsciiLanguage == NULL) {
+      //
+      // For all languages in the package list.
+      //
+      Status = HiiLibSetString (ThunkContext->UefiHiiHandle, *StringId, NewString);
+    } else {
+      //
+      // For specified language.
+      //
+      Status = mHiiStringProtocol->SetString (
+                                   mHiiStringProtocol,
+                                   ThunkContext->UefiHiiHandle,
+                                   *StringId,
+                                   Rfc3066AsciiLanguage,
+                                   NewString,
+                                   NULL
+                                   );
+    }
+  }
+  
+  if (!EFI_ERROR (Status)) {
+    if (*StringId == 0) {
+      //
+      // When creating new string, return the newly created String Token.
+      //
+      *StringId = NewStringId;
+    }
+  } else {
+    //
+    // Only EFI_INVALID_PARAMETER is defined in HII 0.92 specification.
+    //
+    *StringId = 0;
+  }
+
+  return Status;
+}
+
+/**
+  Create or update a String Token in a String Package.
+
+  If *Reference == 0, a new String Token is created.
+
+  @param This            A pointer to the EFI_HII_PROTOCOL instance.
+  @param Language        Pointer to a NULL-terminated string containing a single ISO 639-2 language
+                         identifier, indicating the language to print. A string consisting of
+                         all spaces indicates that the string is applicable to all languages.
+  @param Handle          The handle of the language pack to which the string is to be added.
+  @param Token           The string token assigned to the string.
+  @param NewString       The string to be added.
+
+
+  @retval EFI_SUCCESS             The string was effectively registered.
+  @retval EFI_INVALID_PARAMETER   The Handle was unknown. The string is not created or updated in the
+                                  the string package.
+**/
 
 EFI_STATUS
 EFIAPI
@@ -116,42 +245,22 @@ HiiNewString (
   IN OUT STRING_REF                 *Reference,
   IN     CHAR16                     *NewString
   )
-/*++
-
-Routine Description:
-  This function allows a new String to be added to an already existing String Package.
-  We will make a buffer the size of the package + StrSize of the new string.  We will
-  copy the string package that first gets changed and the following language packages until
-  we encounter the NULL string package.  All this time we will ensure that the offsets have
-  been adjusted.
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_STATUS                                Status;
   HII_THUNK_PRIVATE_DATA                    *Private;
   EFI_GUID                                  TagGuid;
   LIST_ENTRY                                *Link;
   HII_THUNK_CONTEXT                          *ThunkContext;
+  HII_THUNK_CONTEXT                          *StringPackThunkContext;
   EFI_STRING_ID                             StringId;
   EFI_STRING_ID                             LastStringId;
   CHAR8                                     AsciiLanguage[ISO_639_2_ENTRY_SIZE + 1];
   CHAR16                                    LanguageCopy[ISO_639_2_ENTRY_SIZE + 1];
-  BOOLEAN                                   Found;
   CHAR8                                     *Rfc3066AsciiLanguage;
 
   LastStringId      = (EFI_STRING_ID) 0;
   StringId          = (EFI_STRING_ID) 0;
-  Found             = FALSE;
   Rfc3066AsciiLanguage = NULL;
-
-  Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
-
-  Status = GetTagGuidByFwHiiHandle (Private, Handle, &TagGuid);
-  ASSERT_EFI_ERROR (Status);
 
   if (Language != NULL) {
     ZeroMem (AsciiLanguage, sizeof (AsciiLanguage));;
@@ -162,130 +271,111 @@ Returns:
     ASSERT (Rfc3066AsciiLanguage != NULL);
   }
 
-  Link = GetFirstNode (&Private->ThunkContextListHead);
-  while (!IsNull (&Private->ThunkContextListHead, Link)) {
-    ThunkContext = HII_THUNK_CONTEXT_FROM_LINK (Link);
+  Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-    if (CompareGuid (&TagGuid, &ThunkContext->TagGuid)) {
-      Found = TRUE;
-      if (*Reference == 0) {
-        //
-        // Create a new string token.
-        //
-        if (Rfc3066AsciiLanguage == NULL) {
-          //
-          // For all languages in the package list.
-          //
-          Status = HiiLibNewString (ThunkContext->UefiHiiHandle, &StringId, NewString);
-        } else {
-          //
-          // For specified language.
-          //
-          Status = mHiiStringProtocol->NewString (
-                                         mHiiStringProtocol,
-                                         ThunkContext->UefiHiiHandle,
-                                         &StringId,
-                                         Rfc3066AsciiLanguage,
-                                         NULL,
-                                         NewString,
-                                         NULL
-                                         );
-        }
-      } else {
-        //
-        // Update the existing string token.
-        //
-        if (Rfc3066AsciiLanguage == NULL) {
-          //
-          // For all languages in the package list.
-          //
-          Status = HiiLibSetString (ThunkContext->UefiHiiHandle, *Reference, NewString);
-        } else {
-          //
-          // For specified language.
-          //
-          Status = mHiiStringProtocol->SetString (
-                                       mHiiStringProtocol,
-                                       ThunkContext->UefiHiiHandle,
-                                       *Reference,
-                                       Rfc3066AsciiLanguage,
-                                       NewString,
-                                       NULL
-                                       );
-        }
-      }
-      if (EFI_ERROR (Status)) {
-        //
-        // Only EFI_INVALID_PARAMETER is defined in HII 0.92 specification.
-        //
-        return EFI_INVALID_PARAMETER;
-      }
-
-      if (*Reference == 0) {
-        //
-        // When creating new string token, make sure all created token is the same
-        // for all string packages registered using FW HII interface.
-        //
-        if (LastStringId == (EFI_STRING_ID) 0) {
-          LastStringId = StringId;
-        } else {
-          if (LastStringId != StringId) {
-            ASSERT(FALSE);
-            return EFI_INVALID_PARAMETER;
-          }
-        }
-      }
-    }
-
-    Link = GetNextNode (&Private->ThunkContextListHead, Link);
+  StringPackThunkContext = FwHiiHandleToThunkContext (Private, Handle);
+  if (StringPackThunkContext == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (Found) {
+  if (StringPackThunkContext->SharingStringPack) {
+    Status = GetTagGuidByFwHiiHandle (Private, Handle, &TagGuid);
+    ASSERT_EFI_ERROR (Status);
+
+    Link = GetFirstNode (&Private->ThunkContextListHead);
+    while (!IsNull (&Private->ThunkContextListHead, Link)) {
+      ThunkContext = HII_THUNK_CONTEXT_FROM_LINK (Link);
+
+      if (CompareGuid (&TagGuid, &ThunkContext->TagGuid)) {
+        if (ThunkContext->SharingStringPack) {
+          StringId = *Reference;
+          Status = UpdateString (ThunkContext, Rfc3066AsciiLanguage, NewString, &StringId);
+          if (EFI_ERROR (Status)) {
+            break;
+          }
+          
+          DEBUG_CODE_BEGIN ();
+          if (*Reference == 0) {
+            //
+            // When creating new string token, make sure all created token is the same
+            // for all string packages registered using FW HII interface.
+            //
+            if (LastStringId == (EFI_STRING_ID) 0) {
+              LastStringId = StringId;
+            } else {
+              if (LastStringId != StringId) {
+                ASSERT(FALSE);
+              }
+            }
+          }
+          DEBUG_CODE_END ();
+          
+        }
+      }
+
+      Link = GetNextNode (&Private->ThunkContextListHead, Link);
+    }
+  } else {
+    StringId = *Reference;
+    Status = UpdateString (StringPackThunkContext, Rfc3066AsciiLanguage, NewString, &StringId);
+  }
+
+  if (!EFI_ERROR (Status)) {
     if (*Reference == 0) {
       *Reference = StringId;
     }
-    Status = EFI_SUCCESS;
   } else {
-    DEBUG((EFI_D_ERROR, "Thunk HiiNewString fails to find the String Packages to update\n"));
     //
-    // BUGBUG: Remove ths ASSERT when development is done.
+    // Only EFI_INVALID_PARAMETER is defined in HII 0.92 specification.
     //
-    ASSERT (FALSE);
-    Status = EFI_NOT_FOUND;
+    Status = EFI_INVALID_PARAMETER;
   }
   
-  //
-  // For UNI file, some String may not be defined for a language. This has been true for a lot of platform code.
-  // For this case, EFI_NOT_FOUND will be returned. To allow the old code to be run without porting, we don't assert 
-  // on EFI_NOT_FOUND. The missing Strings will be shown if user select a differnt languages other than the default
-  // English language for the platform.
-  //
-  ASSERT_EFI_ERROR (EFI_ERROR (Status) && Status != EFI_NOT_FOUND);  
-
   return Status;
 }
 
+/**
+  This function removes any new strings that were added after the initial string export for this handle.
+  UEFI HII String Protocol does not have Reset String function. This function perform nothing.
+
+  @param This            A pointer to the EFI_HII_PROTOCOL instance.
+  @param Handle          The HII handle on which the string resides.
+
+  @retval EFI_SUCCESS    This function is a NOP and always return EFI_SUCCESS.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiResetStrings (
   IN     EFI_HII_PROTOCOL   *This,
   IN     FRAMEWORK_EFI_HII_HANDLE      Handle
   )
-/*++
-
-Routine Description:
-
-    This function removes any new strings that were added after the initial string export for this handle.
-
-Arguments:
-
-Returns:
-
---*/
 {
   return EFI_SUCCESS;
 }
 
+/**
+ This function extracts a string from a package already registered with the EFI HII database.
+
+  @param This            A pointer to the EFI_HII_PROTOCOL instance.
+  @param Handle          The HII handle on which the string resides.
+  @param Token           The string token assigned to the string.
+  @param Raw             If TRUE, the string is returned unedited in the internal storage format described
+                         above. If false, the string returned is edited by replacing <cr> with <space>
+                         and by removing special characters such as the <wide> prefix.
+  @param LanguageString  Pointer to a NULL-terminated string containing a single ISO 639-2 language
+                         identifier, indicating the language to print. If the LanguageString is empty (starts
+                         with a NULL), the default system language will be used to determine the language.
+  @param BufferLength    Length of the StringBuffer. If the status reports that the buffer width is too
+                         small, this parameter is filled with the length of the buffer needed.
+  @param StringBuffer    The buffer designed to receive the characters in the string. Type EFI_STRING is
+                         defined in String.
+
+  @retval EFI_INVALID_PARAMETER If input parameter is invalid.
+  @retval EFI_BUFFER_TOO_SMALL  If the *BufferLength is too small.
+  @retval EFI_SUCCESS           Operation is successful.
+
+**/
 EFI_STATUS
 EFIAPI
 HiiGetString (
@@ -297,33 +387,6 @@ HiiGetString (
   IN OUT UINTN                      *BufferLengthTemp,
   OUT    EFI_STRING                 StringBuffer
   )
-/*++
-
-Routine Description:
-
-  This function extracts a string from a package already registered with the EFI HII database.
-
-Arguments:
-  This            - A pointer to the EFI_HII_PROTOCOL instance.
-  Handle          - The HII handle on which the string resides.
-  Token           - The string token assigned to the string.
-  Raw             - If TRUE, the string is returned unedited in the internal storage format described
-                    above. If false, the string returned is edited by replacing <cr> with <space>
-                    and by removing special characters such as the <wide> prefix.
-  LanguageString  - Pointer to a NULL-terminated string containing a single ISO 639-2 language
-                    identifier, indicating the language to print. If the LanguageString is empty (starts
-                    with a NULL), the default system language will be used to determine the language.
-  BufferLength    - Length of the StringBuffer. If the status reports that the buffer width is too
-                    small, this parameter is filled with the length of the buffer needed.
-  StringBuffer    - The buffer designed to receive the characters in the string. Type EFI_STRING is
-                    defined in String.
-
-Returns:
-  EFI_INVALID_PARAMETER - If input parameter is invalid.
-  EFI_BUFFER_TOO_SMALL  - If the *BufferLength is too small.
-  EFI_SUCCESS           - Operation is successful.
-
---*/
 {
   CHAR8                                 *Iso639AsciiLanguage;
   HII_THUNK_PRIVATE_DATA                *Private;
@@ -385,31 +448,43 @@ Done:
   return Status;
 }
 
-EFI_STATUS
-EFIAPI
-HiiGetLine (
-  IN     EFI_HII_PROTOCOL   *This,
-  IN     FRAMEWORK_EFI_HII_HANDLE      Handle,
-  IN     STRING_REF         Token,
-  IN OUT UINT16             *Index,
-  IN     UINT16             LineWidth,
-  IN     CHAR16             *LanguageString,
-  IN OUT UINT16             *BufferLength,
-  OUT    EFI_STRING         StringBuffer
-  )
-/*++
-
-Routine Description:
+/**
 
   This function allows a program to extract a part of a string of not more than a given width.
   With repeated calls, this allows a calling program to extract "lines" of text that fit inside
   columns.  The effort of measuring the fit of strings inside columns is localized to this call.
 
-Arguments:
+  This is a deprecated API. No Framework HII module is calling it. This function will ASSERT and
+  return EFI_UNSUPPORTED.
 
-Returns:
+  @param This            A pointer to the EFI_HII_PROTOCOL instance.
+  @param Handle          The HII handle on which the string resides.
+  @param Token           The string token assigned to the string.
+  @param Raw             If TRUE, the string is returned unedited in the internal storage format described
+                         above. If false, the string returned is edited by replacing <cr> with <space>
+                         and by removing special characters such as the <wide> prefix.
+  @param LanguageString  Pointer to a NULL-terminated string containing a single ISO 639-2 language
+                         identifier, indicating the language to print. If the LanguageString is empty (starts
+                         with a NULL), the default system language will be used to determine the language.
+  @param BufferLength    Length of the StringBuffer. If the status reports that the buffer width is too
+                         small, this parameter is filled with the length of the buffer needed.
+  @param StringBuffer    The buffer designed to receive the characters in the string. Type EFI_STRING is
+                         defined in String.
 
---*/
+  @retval EFI_UNSUPPORTED.
+**/
+EFI_STATUS
+EFIAPI
+HiiGetLine (
+  IN     EFI_HII_PROTOCOL           *This,
+  IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
+  IN     STRING_REF                 Token,
+  IN OUT UINT16                     *Index,
+  IN     UINT16                     LineWidth,
+  IN     CHAR16                     *LanguageString,
+  IN OUT UINT16                     *BufferLength,
+  OUT    EFI_STRING                 StringBuffer
+  )
 {
   ASSERT (FALSE);
   return EFI_UNSUPPORTED;
