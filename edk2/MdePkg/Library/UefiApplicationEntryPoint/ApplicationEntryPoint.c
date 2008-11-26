@@ -18,13 +18,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  Enrty point to UEFI application.
+  Enrty point to UEFI Application.
 
-  @param  ImageHandle ImageHandle of the loaded driver.
-  @param  SystemTable Pointer to the EFI System Table.
+  This function is the entry point for a UEFI Application. This function must call
+  ProcessLibraryConstructorList(), ProcessModuleEntryPointList(), and ProcessLibraryDestructorList().
+  The return value from ProcessModuleEntryPointList() is returned.
+  If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is less than _gUefiDriverRevison,
+  then return EFI_INCOMPATIBLE_VERSION.
 
-  @retval  EFI_SUCCESS One or more of the drivers returned a success code.
-  @retval  !EFI_SUCESS The return status from the last driver entry point in the list.
+  @param  ImageHandle  The image handle of the UEFI Application.
+  @param  SystemTable  A pointer to the EFI System Table.
+
+  @retval  EFI_SUCCESS               The UEFI Application exited normally.
+  @retval  EFI_INCOMPATIBLE_VERSION  _gUefiDriverRevision is greater than SystemTable->Hdr.Revision.
+  @retval  Other                     Return value from ProcessModuleEntryPointList().
 
 **/
 EFI_STATUS
@@ -66,11 +73,15 @@ _ModuleEntryPoint (
   return Status;
 }
 
-/**
-  Invoke the destuctors of all libraries and call gBS->Exit
-  to return control to firmware core.
 
-  @param  Status Status returned by the application that is exiting.
+/**
+  Invokes the library destructors fror all dependent libraries and terminates
+  the UEFI Application. 
+
+  This function calls ProcessLibraryDestructorList() and the EFI Boot Service Exit()
+  with a status specified by Status.
+
+  @param  Status  Status returned by the application that is exiting.
   
 **/
 VOID
@@ -85,14 +96,16 @@ Exit (
   gBS->Exit (gImageHandle, Status, 0, NULL);
 }
 
+
 /**
-  Enrty point wrapper of UEFI Application.
+  Required by the EBC compiler and identical in functionality to _ModuleEntryPoint(). 
 
-  @param  ImageHandle ImageHandle of the loaded driver.
-  @param  SystemTable Pointer to the EFI System Table.
+  @param  ImageHandle  The image handle of the UEFI Application.
+  @param  SystemTable  A pointer to the EFI System Table.
 
-  @retval  EFI_SUCCESS One or more of the drivers returned a success code.
-  @retval  !EFI_SUCESS The return status from the last driver entry point in the list.
+  @retval  EFI_SUCCESS               The UEFI Application exited normally.
+  @retval  EFI_INCOMPATIBLE_VERSION  _gUefiDriverRevision is greater than SystemTable->Hdr.Revision.
+  @retval  Other                     Return value from ProcessModuleEntryPointList().
 
 **/
 EFI_STATUS
