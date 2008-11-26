@@ -21,7 +21,7 @@
   FILE_GUID                      = 41ddf016-2a11-415f-8880-00d938e9541a
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ExtractGuidedSectionLib|PEIM PEI_CORE
+  LIBRARY_CLASS                  = ExtractGuidedSectionLib|PEIM PEI_CORE SEC
 
 #
 # The following information is for reference only and not required by the build tools.

@@ -19,7 +19,7 @@
   FILE_GUID                      = 2A1E1C92-AABA-4d62-AC40-F3A4C3387356
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SmbusLib|PEIM
+  LIBRARY_CLASS                  = SmbusLib|PEIM SEC
   PI_SPECIFICATION_VERSION       = 0x00010000
 
 

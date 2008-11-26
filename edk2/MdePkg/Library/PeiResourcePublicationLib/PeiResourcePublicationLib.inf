@@ -21,7 +21,7 @@
   FILE_GUID                      = e8d6390d-e190-4957-9ab6-d47d51b01336
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ResourcePublicationLib|PEIM 
+  LIBRARY_CLASS                  = ResourcePublicationLib|PEIM SEC
 
 
 #
