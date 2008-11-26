@@ -26,7 +26,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Packages]
