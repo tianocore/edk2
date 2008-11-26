@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __RESOURCE_PUBLICATION_LIB__
 
 /**
-  
   Declares the presence of permanent system memory in the platform.
 
   Declares that the system memory buffer specified by MemoryBegin and MemoryLength

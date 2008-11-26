@@ -273,23 +273,19 @@ PciSegmentOr8 (
 }
 
 /**
-  Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit
-  value.
+  Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit value.
 
-  Reads the 8-bit PCI configuration register specified by Address, performs a
-  bitwise AND between the read result and the value specified by AndData, and
-  writes the result to the 8-bit PCI configuration register specified by
-  Address. The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are
-  serialized.
-
+  Reads the 8-bit PCI configuration register specified by Address,
+  performs a bitwise AND between the read result and the value specified by AndData,
+  and writes the result to the 8-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
   If any reserved bits in Address are set, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  AndData The value to AND with the PCI configuration register.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  AndData   The value to AND with the PCI configuration register.
 
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT8
@@ -303,25 +299,23 @@ PciSegmentAnd8 (
 }
 
 /**
-  Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit
-  value, followed a  bitwise inclusive OR with another 8-bit value.
-
-  Reads the 8-bit PCI configuration register specified by Address, performs a
-  bitwise AND between the read result and the value specified by AndData,
-  performs a bitwise inclusive OR between the result of the AND operation and
-  the value specified by OrData, and writes the result to the 8-bit PCI
-  configuration register specified by Address. The value written to the PCI
-  configuration register is returned. This function must guarantee that all PCI
-  read and write operations are serialized.
-
+  Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit value,
+  followed a  bitwise inclusive OR with another 8-bit value.
+  
+  Reads the 8-bit PCI configuration register specified by Address,
+  performs a bitwise AND between the read result and the value specified by AndData,
+  performs a bitwise inclusive OR between the result of the AND operation and the value specified by OrData,
+  and writes the result to the 8-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  AndData The value to AND with the PCI configuration register.
-  @param  OrData  The value to OR with the result of the AND operation.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  AndData    The value to AND with the PCI configuration register.
+  @param  OrData    The value to OR with the PCI configuration register.
 
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT8
@@ -617,23 +611,21 @@ PciSegmentOr16 (
 }
 
 /**
-  Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit
-  value.
+  Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit value.
 
-  Reads the 16-bit PCI configuration register specified by Address, performs a
-  bitwise AND between the read result and the value specified by AndData, and
-  writes the result to the 16-bit PCI configuration register specified by
-  Address. The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are
-  serialized.
-
+  Reads the 16-bit PCI configuration register specified by Address,
+  performs a bitwise AND between the read result and the value specified by AndData,
+  and writes the result to the 16-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  AndData   The value to AND with the PCI configuration register.
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  AndData The value to AND with the PCI configuration register.
-
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT16
@@ -961,23 +953,21 @@ PciSegmentOr32 (
 }
 
 /**
-  Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit
-  value.
+  Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit value.
 
-  Reads the 32-bit PCI configuration register specified by Address, performs a
-  bitwise AND between the read result and the value specified by AndData, and
-  writes the result to the 32-bit PCI configuration register specified by
-  Address. The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are
-  serialized.
-
+  Reads the 32-bit PCI configuration register specified by Address,
+  performs a bitwise AND between the read result and the value specified by AndData,
+  and writes the result to the 32-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  AndData The value to AND with the PCI configuration register.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  AndData   The value to AND with the PCI configuration register.
 
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT32
@@ -991,25 +981,24 @@ PciSegmentAnd32 (
 }
 
 /**
-  Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit
-  value, followed a  bitwise inclusive OR with another 32-bit value.
-
-  Reads the 32-bit PCI configuration register specified by Address, performs a
-  bitwise AND between the read result and the value specified by AndData,
-  performs a bitwise inclusive OR between the result of the AND operation and
-  the value specified by OrData, and writes the result to the 32-bit PCI
-  configuration register specified by Address. The value written to the PCI
-  configuration register is returned. This function must guarantee that all PCI
-  read and write operations are serialized.
-
+  Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit value,
+  followed a  bitwise inclusive OR with another 32-bit value.
+  
+  Reads the 32-bit PCI configuration register specified by Address,
+  performs a bitwise AND between the read result and the value specified by AndData,
+  performs a bitwise inclusive OR between the result of the AND operation and the value specified by OrData,
+  and writes the result to the 32-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  AndData The value to AND with the PCI configuration register.
-  @param  OrData  The value to OR with the result of the AND operation.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  AndData   The value to AND with the PCI configuration register.
+  @param  OrData    The value to OR with the PCI configuration register.
 
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT32

@@ -39,19 +39,19 @@
 /**
   Sends an 32-bit value to a POST card.
 
-  Sends the 32-bit value specified by Value to a POST card, and returns Value.
-  Some implementations of this library function may perform I/O operations
-  directly to a POST card device.  Other implementations may send Value to
-  ReportStatusCode(), and the status code reporting mechanism will eventually
+  Sends the 32-bit value specified by Value to a POST card, and returns Value.  
+  Some implementations of this library function may perform I/O operations 
+  directly to a POST card device.  Other implementations may send Value to 
+  ReportStatusCode(), and the status code reporting mechanism will eventually 
   display the 32-bit value on the status reporting device.
-
-  PostCode() must actively prevent recursion.  If PostCode() is called while
-  processing another any other Post Code Library function, then
+  
+  PostCode() must actively prevent recursion.  If PostCode() is called while 
+  processing another any other Post Code Library function, then 
   PostCode() must return Value immediately.
 
   @param  Value  The 32-bit value to write to the POST card.
 
-  @return  Value The 32-bit value to write to the POST card.
+  @return The 32-bit value to write to the POST card.
 
 **/
 UINT32
@@ -69,24 +69,24 @@ PostCode (
   Sends an 32-bit value to a POST and associated ASCII string.
 
   Sends the 32-bit value specified by Value to a POST card, and returns Value.
-  If Description is not NULL, then the ASCII string specified by Description is
-  also passed to the handler that displays the POST card value.  Some
-  implementations of this library function may perform I/O operations directly
-  to a POST card device.  Other implementations may send Value to ReportStatusCode(),
-  and the status code reporting mechanism will eventually display the 32-bit
-  value on the status reporting device.
+  If Description is not NULL, then the ASCII string specified by Description is 
+  also passed to the handler that displays the POST card value.  Some 
+  implementations of this library function may perform I/O operations directly 
+  to a POST card device.  Other implementations may send Value to ReportStatusCode(), 
+  and the status code reporting mechanism will eventually display the 32-bit 
+  value on the status reporting device.  
 
-  PostCodeWithDescription()must actively prevent recursion.  If
-  PostCodeWithDescription() is called while processing another any other Post
-  Code Library function, then PostCodeWithDescription() must return Value
+  PostCodeWithDescription()must actively prevent recursion.  If 
+  PostCodeWithDescription() is called while processing another any other Post 
+  Code Library function, then PostCodeWithDescription() must return Value 
   immediately.
 
   @param  Value        The 32-bit value to write to the POST card.
-  @param  Description  Pointer to an ASCII string that is a description of the
-                       POST code value.  This is an optional parameter that may
+  @param  Description  Pointer to an ASCII string that is a description of the 
+                       POST code value.  This is an optional parameter that may 
                        be NULL.
 
-  @return  Value       The 32-bit value to write to the POST card.
+  @return The 32-bit value to write to the POST card.
 
 **/
 UINT32
