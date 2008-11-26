@@ -25,8 +25,6 @@
   signed value Multiplier and generates a 64-bit signed result. This 64-bit
   signed result is returned.
 
-  If the result overflows, then ASSERT().
-
   @param  Multiplicand  A 64-bit signed value.
   @param  Multiplier    A 64-bit signed value.
 
