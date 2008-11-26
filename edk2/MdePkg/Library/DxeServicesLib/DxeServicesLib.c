@@ -190,12 +190,12 @@ InternalGetSectionFromFv (
   @param  SectionType          Indicates the FFS section type to search for within the FFS file specified by NameGuid.
   @param  SectionInstance      Indicates which section instance within the FFS file specified by NameGuid to retrieve.
   @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
-                               Is it the caller's respobsibility to free this buffer using FreePool().
+                               Is it the caller's responsibility to free this buffer using FreePool().
   @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
 
   @retval  EFI_SUCCESS          The specified FFS section was returned.
   @retval  EFI_NOT_FOUND        The specified FFS section could not be found.
-  @retval  EFI_OUT_OF_RESOURCES There are not enough rsources available to retrieve the matching FFS section.
+  @retval  EFI_OUT_OF_RESOURCES There are not enough resources available to retrieve the matching FFS section.
   @retval  EFI_DEVICE_ERROR     The FFS section could not be retrieves due to a device error.
   @retval  EFI_ACCESS_DENIED    The FFS section could not be retrieves because the firmware volume that 
                                 contains the matching FFS section does not allow reads.
@@ -307,13 +307,13 @@ Done:
   @param  SectionType          Indicates the FFS section type to search for within the FFS file specified by NameGuid.
   @param  SectionInstance      Indicates which section instance within the FFS file specified by NameGuid to retrieve.
   @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
-                               Is it the caller's respobsibility to free this buffer using FreePool().
+                               Is it the caller's responsibility to free this buffer using FreePool().
   @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
 
 
   @retval  EFI_SUCCESS          The specified FFS section was returned.
   @retval  EFI_NOT_FOUND        The specified FFS section could not be found.
-  @retval  EFI_OUT_OF_RESOURCES There are not enough rsources available to retrieve the matching FFS section.
+  @retval  EFI_OUT_OF_RESOURCES There are not enough resources available to retrieve the matching FFS section.
   @retval  EFI_DEVICE_ERROR     The FFS section could not be retrieves due to a device error.
   @retval  EFI_ACCESS_DENIED    The FFS section could not be retrieves because the firmware volume that 
                                 contains the matching FFS section does not allow reads.  
@@ -363,12 +363,12 @@ GetSectionFromFv (
   @param  SectionInstance      Indicates which section instance to retrieve within the FFS file 
                                that the currently executing module was loaded from.
   @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
-                               Is it the caller's respobsibility to free this buffer using FreePool().
+                               Is it the caller's responsibility to free this buffer using FreePool().
   @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
 
   @retval  EFI_SUCCESS          The specified FFS section was returned.
   @retval  EFI_NOT_FOUND        The specified FFS section could not be found.
-  @retval  EFI_OUT_OF_RESOURCES There are not enough rsources available to retrieve the matching FFS section.
+  @retval  EFI_OUT_OF_RESOURCES There are not enough resources available to retrieve the matching FFS section.
   @retval  EFI_DEVICE_ERROR     The FFS section could not be retrieves due to a device error.
   @retval  EFI_ACCESS_DENIED    The FFS section could not be retrieves because the firmware volume that 
                                 contains the matching FFS section does not allow reads.  

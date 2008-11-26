@@ -67,8 +67,9 @@ DevicePathLibConstructor (
   DevicePath including the end of device path node.  If DevicePath is NULL, then 0 is returned.
 
   @param  DevicePath                 A pointer to a device path data structure.
-
-  @return The size of a device path in bytes.
+  
+  @retval 0       If DevicePath is NULL.
+  @retval Others  The size of a device path in bytes.
 
 **/
 UINTN
@@ -87,11 +88,14 @@ GetDevicePathSize (
   DevicePath is NULL, then NULL is returned.  If the memory is successfully allocated, then the
   contents of DevicePath are copied to the newly allocated buffer, and a pointer to that buffer
   is returned.  Otherwise, NULL is returned.  
+  The memory for the new device path is allocated from EFI boot services memory. 
+  It is the responsibility of the caller to free the memory allocated. 
   
   @param  DevicePath                 A pointer to a device path data structure.
 
-  @return A pointer to the duplicated device path.
-
+  @retval NULL    If DevicePath is NULL.
+  @retval Others  A pointer to the duplicated device path.
+  
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
@@ -118,8 +122,10 @@ DuplicateDevicePath (
 
   @param  FirstDevicePath            A pointer to a device path data structure.
   @param  SecondDevicePath           A pointer to a device path data structure.
-
-  @return A pointer to the new device path.
+  
+  @retval NULL      If there is not enough memory for the newly allocated buffer.
+  @retval Others    A pointer to the new device path if success.
+                    Or a copy an end-of-device-path if both FirstDevicePath and SecondDevicePath are NULL.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -150,7 +156,11 @@ AppendDevicePath (
   @param  DevicePath                 A pointer to a device path data structure.
   @param  DevicePathNode             A pointer to a single device path node.
 
-  @return A pointer to the new device path.
+  @retval NULL      If there is not enough memory for the new device path.
+  @retval Others    A pointer to the new device path if success.
+                    A copy of DevicePathNode followed by an end-of-device-path node 
+                    if both FirstDevicePath and SecondDevicePath are NULL.
+                    A copy of an end-of-device-path node if both FirstDevicePath and SecondDevicePath are NULL.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -229,8 +239,7 @@ GetNextDevicePathInstance (
 }
 
 /**
-  Creates a copy of the current device path instance and returns a pointer to the next device path
-  instance.
+  Creates a device node.
 
   This function creates a new device node in a newly allocated buffer of size NodeLength and
   initializes the device path node header with NodeType and NodeSubType.  The new device path node
@@ -244,7 +253,7 @@ GetNextDevicePathInstance (
   @param  NodeSubType                The device node sub-type for the new device node.
   @param  NodeLength                 The length of the new device node.
 
-  @return A pointer to the new created file device path 
+  @return The new device path.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
@@ -318,13 +327,17 @@ DevicePathFromHandle (
   handle Device.  The allocated device path is returned.  If Device is NULL or Device is a handle
   that does not support the device path protocol, then a device path containing a single device
   path node for the file specified by FileName is allocated and returned.
+  The memory for the new device path is allocated from EFI boot services memory. It is the responsibility
+  of the caller to free the memory allocated.
+  
   If FileName is NULL, then ASSERT().
+  If FileName is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Device                     A pointer to a device handle.  This parameter is optional and
                                      may be NULL.
   @param  FileName                   A pointer to a Null-terminated Unicode string.
 
-  @return A pointer to the new created file device path 
+  @return The allocated device path.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *

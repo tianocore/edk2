@@ -36,7 +36,7 @@ typedef struct {
 
   @param[in, out]  InfoPointer   Pointer to pei handler info structure.
 
-  @retval  RETURN_SUCCESS            Build Guid hob for the global memory space to store guid and funciton tables.
+  @retval  RETURN_SUCCESS            Build Guid hob for the global memory space to store guid and function tables.
   @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
 **/
 RETURN_STATUS
@@ -125,9 +125,10 @@ PeiGetExtractGuidedSectionHandlerInfo (
   Sets ExtractHandlerGuidTable so it points at a callee allocated array of registered GUIDs.
   The total number of GUIDs in the array are returned. Since the array of GUIDs is callee allocated
   and caller must treat this array of GUIDs as read-only data. 
+  
   If ExtractHandlerGuidTable is NULL, then ASSERT().
 
-  @param[out]  ExtractHandlerGuidTable  A pointer to the array of GUIDs tht have been registerd through
+  @param[out]  ExtractHandlerGuidTable  A pointer to the array of GUIDs that have been registered through
                                         ExtractGuidedSectionRegisterHandlers().
 
   @return the number of the supported extract guided Handler.
@@ -163,9 +164,10 @@ ExtractGuidedSectionGetGuidList (
   Registers handlers of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER and EXTRACT_GUIDED_SECTION_DECODE_HANDLER
   for a specific GUID section type.
 
-  Registers the handlers specified by GetInfoHandler and DecodeHandler witg the GUID specified by SectionGuid.
+  Registers the handlers specified by GetInfoHandler and DecodeHandler with the GUID specified by SectionGuid.
   If the GUID value specified by SectionGuid has already been registered, then return RETURN_ALREADY_STARTED.
   If there are not enough resources available to register the handlers  then RETURN_OUT_OF_RESOURCES is returned.
+  
   If SectionGuid is NULL, then ASSERT().
   If GetInfoHandler is NULL, then ASSERT().
   If DecodeHandler is NULL, then ASSERT().
@@ -244,7 +246,7 @@ ExtractGuidedSectionRegisterHandlers (
 }
 
 /**
-  Retrives a GUID from a GUIDed section and uses that GUID to select an associated handler of type
+  Retrieves a GUID from a GUIDed section and uses that GUID to select an associated handler of type
   EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers().
   The selected handler is used to retrieve and return the size of the decoded buffer and the size of an
   optional scratch buffer required to actually decode the data in a GUIDed section.
@@ -256,6 +258,7 @@ ExtractGuidedSectionRegisterHandlers (
   of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers()
   is used to retrieve the OututBufferSize, ScratchSize, and Attributes values. The return status from the handler of
   type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER is returned.
+  
   If InputSection is NULL, then ASSERT().
   If OutputBufferSize is NULL, then ASSERT().
   If ScratchBufferSize is NULL, then ASSERT().
@@ -311,7 +314,7 @@ ExtractGuidedSectionGetInfo (
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
       //
-      // Call the match handler to getinfo for the input section data.
+      // Call the match handler to get info for the input section data.
       //
       return HandlerInfo->ExtractGetInfoHandlerTable [Index] (
                 InputSection,
@@ -329,7 +332,7 @@ ExtractGuidedSectionGetInfo (
 }
 
 /**
-  Retrives the GUID from a GUIDed section and uses that GUID to select an associated handler of type
+  Retrieves the GUID from a GUIDed section and uses that GUID to select an associated handler of type
   EXTRACT_GUIDED_SECTION_DECODE_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers().
   The selected handler is used to decode the data in a GUIDed section and return the result in a caller
   allocated output buffer.
@@ -343,7 +346,8 @@ ExtractGuidedSectionGetInfo (
   decode operation is returned in AuthenticationStatus.  If the decoded buffer is identical to the data in InputSection,
   then OutputBuffer is set to point at the data in InputSection.  Otherwise, the decoded data will be placed in caller
   allocated buffer specified by OutputBuffer.    This function is responsible for computing the  EFI_AUTH_STATUS_PLATFORM_OVERRIDE
-  bit of in AuthenticationStatus.  The return status from the handler of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER is returned.  
+  bit of in AuthenticationStatus.  The return status from the handler of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER is returned. 
+   
   If InputSection is NULL, then ASSERT().
   If OutputBuffer is NULL, then ASSERT().
   If ScratchBuffer is NULL and this decode operation requires a scratch buffer, then ASSERT().
