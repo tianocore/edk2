@@ -118,7 +118,7 @@ ReadEdidData (
   UINT64            Signature;
 
   for (Index = 0; Index < EDID_BLOCK_SIZE * 2; Index ++) {
-    I2cReadByte (Private->PciIo, 0xa0, Index, &EdidData[Index]);
+    I2cReadByte (Private->PciIo, 0xa0, (UINT8)Index, &EdidData[Index]);
   }
 
   //
