@@ -512,7 +512,7 @@ PciBitFieldAndThenOr8 (
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
 
-  @return The value read from the PCI configuration register.
+  @return The read value from the PCI configuration register.
 
 **/
 UINT16
@@ -538,7 +538,7 @@ PciRead16 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 
@@ -866,7 +866,7 @@ PciBitFieldAndThenOr16 (
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
 
-  @return The value read from the PCI configuration register.
+  @return The read value from the PCI configuration register.
 
 **/
 UINT32
@@ -892,7 +892,7 @@ PciRead32 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 

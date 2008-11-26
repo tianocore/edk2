@@ -926,6 +926,8 @@ LibPcdGetNextTokenSpace (
 
 
 /**
+  Sets a value of a patchable PCD entry that is type pointer.
+  
   Sets the PCD entry specified by PatchVariable to the value specified by Buffer 
   and SizeOfBuffer.  Buffer is returned.  If SizeOfBuffer is greater than 
   MaximumDatumSize, then set SizeOfBuffer to MaximumDatumSize and return 
@@ -941,10 +943,9 @@ LibPcdGetNextTokenSpace (
                                 the target of the set operation.
   @param[in] MaximumDatumSize   The maximum size allowed for the PCD entry specified by PatchVariable.
   @param[in, out] SizeOfBuffer  A pointer to the size, in bytes, of Buffer.
-                                In out, returns actual size of buffer is set.
   @param[in] Buffer             A pointer to the buffer to used to set the target variable.
   
-  @return Return the pinter to the buffer been set.
+  @return Return the pointer to the buffer been set.
 
 **/
 VOID *

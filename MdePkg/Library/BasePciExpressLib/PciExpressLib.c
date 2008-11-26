@@ -1221,7 +1221,7 @@ PciExpressBitFieldAndThenOr32 (
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer receiving the data read.
 
-  @return Size
+  @return Size read data from StartAddress.
 
 **/
 UINTN
@@ -1321,7 +1321,7 @@ PciExpressReadBuffer (
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
 
-  @return Size
+  @return Size written to StartAddress.
 
 **/
 UINTN
