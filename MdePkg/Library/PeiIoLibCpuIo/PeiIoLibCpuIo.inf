@@ -22,7 +22,7 @@
   FILE_GUID                      = b2585b69-fb63-4220-844a-8fbea8bf01af
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = IoLib|PEIM PEI_CORE
+  LIBRARY_CLASS                  = IoLib|PEIM PEI_CORE SEC
 
 
 #
