@@ -65,9 +65,9 @@ PrintValue (
   UINT8  Char;
 
   for (Index = 0; Index < 8; Index++) {
-    Char = (UINT8)((Value >> ((7 - Index) * 4)) & 0x0f) + '0';
+    Char = (UINT8)(((Value >> ((7 - Index) * 4)) & 0x0f) + '0');
     if (Char > '9') {
-      Char = Char - '0' - 10 + 'A';
+      Char = (UINT8) (Char - '0' - 10 + 'A');
     }
     *mCursor = Char;
     mCursor += 2;
@@ -76,7 +76,7 @@ PrintValue (
 
 VOID
 PrintString (
-  UINT8 *String
+  CHAR8 *String
   )
 {
   UINT32 Index;

@@ -401,7 +401,7 @@ PrepareFadtTable (
   if (AcpiDescription->PM_TMR_BLK.Address == 0) {
     AcpiDescription->PM_TMR_BLK.Address          = Fadt->PM_TMR_BLK;
     AcpiDescription->PM_TMR_BLK.AddressSpaceId   = ACPI_ADDRESS_ID_IO;
-    AcpiDescription->PM_TMR_BLK.RegisterBitWidth = (AcpiDescription->TMR_VAL_EXT == 0) ? 24 : 32;
+    AcpiDescription->PM_TMR_BLK.RegisterBitWidth = (UINT8) ((AcpiDescription->TMR_VAL_EXT == 0) ? 24 : 32);
   }
 
   return ;

@@ -610,13 +610,13 @@ PrepareHobBfv (
   UINTN BfvLength
   )
 {
-  UINTN BfvLengthPageSize;
+  //UINTN BfvLengthPageSize;
 
   //
   // Calculate BFV location at top of the memory region.
   // This is like a RAM Disk. Align to page boundry.
   //
-  BfvLengthPageSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (BfvLength));
+  //BfvLengthPageSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (BfvLength));
  
   gHob->Bfv.BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Bfv;
   gHob->Bfv.Length = BfvLength;

@@ -667,8 +667,6 @@ Returns:
 
     Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
   }
-
-  return EFI_NOT_FOUND;
 }
 
 EFI_STATUS

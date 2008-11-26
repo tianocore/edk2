@@ -148,7 +148,6 @@ InstallMemoryDataHub (
   IN VOID                  *Smbios
   )
 {
-  EFI_STATUS                        Status;
   SMBIOS_STRUCTURE_POINTER          SmbiosTable;
   EFI_MEMORY_SUBCLASS_DRIVER_DATA   DataRecord;
 
@@ -178,7 +177,7 @@ InstallMemoryDataHub (
   DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.SubInstance = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
   DataRecord.Record.ArrayStartAddress.MemoryArrayPartitionWidth = (UINT16)(SmbiosTable.Type19->PartitionWidth); 
 
-  Status = gDataHub->LogData (
+  gDataHub->LogData (
                        gDataHub,
                        &gEfiMemorySubClassGuid,
                        &gEfiMiscProducerGuid,
@@ -296,7 +295,7 @@ InstallMiscDataHub (
   DataRecord.Record.MiscSystemManufacturer.SystemVersion  = 0;
   DataRecord.Record.MiscSystemManufacturer.SystemSerialNumber  = 0;
 //  DataRecord.Record.MiscSystemManufacturer.SystemUuid  = {0};
-  DataRecord.Record.MiscSystemManufacturer.SystemWakeupType  = 0;
+  DataRecord.Record.MiscSystemManufacturer.SystemWakeupType  = EfiSystemWakeupTypeReserved;
   DataRecord.Record.MiscSystemManufacturer.SystemSKUNumber  = 0;
   DataRecord.Record.MiscSystemManufacturer.SystemFamily  = 0;
 
@@ -339,7 +338,7 @@ DataHubGenEntrypoint (
   Status = gBS->LocateProtocol (
                   &gEfiHiiDatabaseProtocolGuid,
                   NULL,
-                  &gHiiDatabase
+                  (VOID**)&gHiiDatabase
                   );
 
   if (EFI_ERROR (Status)) {

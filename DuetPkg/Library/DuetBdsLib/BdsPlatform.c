@@ -217,7 +217,7 @@ UpdateMemoryMap (
       Memory = MemoryDescHob.MemDesc[Index].PhysicalStart;
       Status = gBS->AllocatePages (
                       AllocateAddress,
-                      MemoryDescHob.MemDesc[Index].Type,
+                      (EFI_MEMORY_TYPE)MemoryDescHob.MemDesc[Index].Type,
                       (UINTN)MemoryDescHob.MemDesc[Index].NumberOfPages,
                       &Memory
                       );
@@ -1491,7 +1491,7 @@ Returns:
     Length--;
   }
   
-  return ((0xFF - CheckSum) + 1);
+  return (UINT8)((0xFF - CheckSum) + 1);
 }  
 
 EFI_STATUS
