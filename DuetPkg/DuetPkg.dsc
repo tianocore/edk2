@@ -170,8 +170,6 @@
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 
-  DuetPkg/BootSector/BootSector.inf
-
 [BuildOptions.common]
   MSFT:*_*_*_CC_FLAGS = /Fa$* /FAsc /FR$(@R).SBR
   MSFT:*_*_IA32_CC_FLAGS = /D EFI32
