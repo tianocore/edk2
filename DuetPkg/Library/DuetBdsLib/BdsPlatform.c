@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1095,7 +1095,7 @@ Returns:
   // from the graphic lib
   //
   if (QuietBoot) {
-    Status = EnableQuietBootEx (&gEfiDefaultBmpLogoGuid, mBdsImageHandle);
+    Status = EnableQuietBoot (&gEfiDefaultBmpLogoGuid);
     if (EFI_ERROR (Status)) {
       DisableQuietBoot ();
       return;
