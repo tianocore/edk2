@@ -1998,8 +1998,6 @@ SwapBytes64 (
   unsigned value Multiplier and generates a 64-bit unsigned result. This 64-
   bit unsigned result is returned.
 
-  If the result overflows, then ASSERT().
-
   @param  Multiplicand  A 64-bit unsigned value.
   @param  Multiplier    A 32-bit unsigned value.
 
@@ -2045,8 +2043,6 @@ MultU64x64 (
   This function multiples the 64-bit signed value Multiplicand by the 64-bit
   signed value Multiplier and generates a 64-bit signed result. This 64-bit
   signed result is returned.
-
-  If the result overflows, then ASSERT().
 
   @param  Multiplicand  A 64-bit signed value.
   @param  Multiplier    A 64-bit signed value.
