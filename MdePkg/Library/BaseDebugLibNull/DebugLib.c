@@ -12,7 +12,6 @@
 
 **/
 
-
 #include <Base.h>
 #include <Library/DebugLib.h>
 
@@ -22,6 +21,8 @@
   If any bit in ErrorLevel is also set in PcdDebugPrintErrorLevel, then print 
   the message specified by Format and the associated variable argument list to 
   the debug output device.
+
+  If Format is NULL, then ASSERT().
 
   @param  ErrorLevel  The error level of the debug message.
   @param  Format      Format string for the debug message to print.
@@ -44,17 +45,16 @@ DebugPrint (
   Prints an assert message containing a filename, line number, and description.  
   This may be followed by a breakpoint or a dead loop.
 
-  Print a message of the form "ASSERT <FileName>(<LineNumber>): <Description>\n" 
+  Print a message of the form "ASSERT <FileName>(<LineNumber>): <Description>\n"
   to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of 
   PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if 
   DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then 
   CpuDeadLoop() is called.  If neither of these bits are set, then this function 
   returns immediately after the message is printed to the debug output device.
-  DebugAssert() must actively prevent recusrsion.  If DebugAssert() is called while
+  DebugAssert() must actively prevent recursion.  If DebugAssert() is called while
   processing another DebugAssert(), then DebugAssert() must return immediately.
 
   If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
-
   If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
 
   @param  FileName     Pointer to the name of the source file that generated the assert condition.
@@ -80,13 +80,12 @@ DebugAssert (
   PcdDebugClearMemoryValue, and returns Buffer.
 
   If Buffer is NULL, then ASSERT().
+  If Length is greater than (MAX_ADDRESS -Buffer + 1), then ASSERT(). 
 
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
-
-  @param   Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
+  @param   Buffer  Pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
   @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
-  @return  Buffer filled with PcdDebugClearMemoryValue.
+  @return  Buffer  Pointer to the target buffer filled with PcdDebugClearMemoryValue.
 
 **/
 VOID *
@@ -108,8 +107,6 @@ DebugClearMemory (
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear.
-  
-  @return  Always return FALSE.
 
 **/
 BOOLEAN
@@ -122,16 +119,14 @@ DebugAssertEnabled (
 }
 
 
-/**
-  Returns TRUE if the DEBUG() macro is enabled.
+/**  
+  Returns TRUE if DEBUG() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is clear.
-  
-  @return Always return FALSE.
 
 **/
 BOOLEAN
@@ -144,16 +139,14 @@ DebugPrintEnabled (
 }
 
 
-/**
-  Returns TRUE if the DEBUG_CODE() macros are enabled.
+/**  
+  Returns TRUE if DEBUG_CODE() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is clear.
-  
-  @return  Always return FALSE.
 
 **/
 BOOLEAN
@@ -166,16 +159,14 @@ DebugCodeEnabled (
 }
 
 
-/**
-  Returns TRUE if the DEBUG_CLEAR_MEMORY() macro is enabled.
+/**  
+  Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
-  
-  @return  Always return FALSE.
 
 **/
 BOOLEAN
