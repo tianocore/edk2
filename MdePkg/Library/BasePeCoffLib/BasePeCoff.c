@@ -1319,15 +1319,26 @@ PeCoffLoaderRelocateImageForRuntime (
 
 
 /**
-  ImageRead function that operates on a memory buffer whos base is passed into
-  FileHandle.
+  Reads contents of a PE/COFF image from a buffer in system memory.
+   
+  This is the default implementation of a PE_COFF_LOADER_READ_FILE function 
+  that assumes FileHandle pointer to the beginning of a PE/COFF image.   
+  This function reads contents of the PE/COFF image that starts at the system memory 
+  address specified by FileHandle.  The read operation copies ReadSize bytes from the 
+  PE/COFF image starting at byte offset FileOffset into the buffer specified by Buffer.  
+  The size of the buffer actually read is returned in ReadSize.
+  
+  If FileHandle is NULL, then ASSERT().
+  If ReadSize is NULL, then ASSERT().
+  If Buffer is NULL, then ASSERT().
 
-  @param  FileHandle        Ponter to baes of the input stream
-  @param  FileOffset        Offset to the start of the buffer
-  @param  ReadSize          Number of bytes to copy into the buffer
-  @param  Buffer            Location to place results of read
+  @param  FileHandle        Pointer to base of the input stream
+  @param  FileOffset        Offset into the PE/COFF image to begin the read operation.
+  @param  ReadSize          On input, the size in bytes of the requested read operation.  
+                            On output, the number of bytes actually read.
+  @param  Buffer            Output buffer that contains the data read from the PE/COFF image.
 
-  @retval RETURN_SUCCESS    Data is read from FileOffset from the Handle into
+  @retval RETURN_SUCCESS    Data is read from FileOffset from the Handle into 
                             the buffer.
 **/
 RETURN_STATUS
@@ -1339,6 +1350,10 @@ PeCoffLoaderImageReadFromMemory (
   OUT    VOID    *Buffer
   )
 {
+  ASSERT (ReadSize != NULL);
+  ASSERT (FileHandle != NULL);
+  ASSERT (Buffer != NULL);
+
   CopyMem (Buffer, ((UINT8 *)FileHandle) + FileOffset, *ReadSize);
   return RETURN_SUCCESS;
 }
