@@ -169,6 +169,8 @@ Crc32GuidedSectionHandler (
 EFI_STATUS
 EFIAPI
 DxeCrc32GuidedSectionExtractLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return ExtractGuidedSectionRegisterHandlers (
