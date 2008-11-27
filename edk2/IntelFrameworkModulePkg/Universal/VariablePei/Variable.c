@@ -47,8 +47,8 @@ EFI_GUID mEfiVariableIndexTableGuid = EFI_VARIABLE_INDEX_TABLE_GUID;
 /**
   Provide the functionality of the variable services.
 
-  @param FfsHeadher  - The FFS file header
-  @param PeiServices - General purpose services available to every PEIM.
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
 
   @return Status -  EFI_SUCCESS if the interface could be successfully
           installed
@@ -57,14 +57,14 @@ EFI_GUID mEfiVariableIndexTableGuid = EFI_VARIABLE_INDEX_TABLE_GUID;
 EFI_STATUS
 EFIAPI
 PeimInitializeVariableServices (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
   //
   // Publish the variable capability to other modules
   //
-  return (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **) PeiServices, &mPpiListVariable[0]);
+  return (**PeiServices).InstallPpi (PeiServices, &mPpiListVariable[0]);
 
 }
 
