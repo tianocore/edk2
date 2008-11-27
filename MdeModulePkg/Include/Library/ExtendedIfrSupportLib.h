@@ -63,11 +63,8 @@ IfrLibInitUpdateData (
 
   @param UpdateData      The adding data;
 
-  @retval EFI_SUCCESS            Resource in UpdateData is released.
-  @retval EFI_INVALID_PARAMETER  UpdateData is NULL.
-
 **/
-EFI_STATUS
+VOID
 IfrLibFreeUpdateData (
   IN EFI_HII_UPDATE_DATA       *UpdateData
   )
