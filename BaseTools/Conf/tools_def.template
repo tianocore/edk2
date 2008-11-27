@@ -153,7 +153,7 @@ DEFINE ASL_BIN = C:\ASL
       *_VS2003_IA32_MAKE_FLAGS           = /nologo
       *_VS2003_IA32_APP_FLAGS            = /nologo /E /TC
       *_VS2003_IA32_PP_FLAGS             = /nologo /E /TC /FIAutoGen.h
-      *_VS2003_IA32_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
+      *_VS2003_IA32_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
   DEBUG_VS2003_IA32_CC_FLAGS             = /nologo /c /WX /W4 /Gs8192 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm
 RELEASE_VS2003_IA32_CC_FLAGS             = /nologo /c /WX /W4 /Gs8192 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX-
   DEBUG_VS2003_IA32_PCH_FLAGS            = /nologo /c /WX /W4 /Gs8192 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Fp$(DEST_DIR_OUTPUT)/AutoGen.h.gch /Yc /TC /Zi /Gm
@@ -183,7 +183,7 @@ RELEASE_VS2003_IA32_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 *_VS2005PRO_*_SLINK_FLAGS                = /NOLOGO /LTCG
 *_VS2005PRO_*_APP_FLAGS                  = /nologo /E /TC
 *_VS2005PRO_*_PP_FLAGS                   = /nologo /E /TC /FIAutoGen.h
-*_VS2005PRO_*_VFRPP_FLAGS                = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
+*_VS2005PRO_*_VFRPP_FLAGS                = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 ##################
 # IA32 definitions
 ##################
@@ -248,7 +248,7 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS        = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 *_VS2005TEAMSUITE_*_SLINK_FLAGS          = /NOLOGO /LTCG
 *_VS2005TEAMSUITE_*_APP_FLAGS            = /nologo /E /TC
 *_VS2005TEAMSUITE_*_PP_FLAGS             = /nologo /E /TC /FIAutoGen.h
-*_VS2005TEAMSUITE_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
+*_VS2005TEAMSUITE_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 ##################
 # IA32 definitions
 ##################
@@ -337,7 +337,7 @@ RELEASE_VS2005TEAMSUITE_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_WINDDK3790x1830_*_PP_FLAGS             = /nologo /E /TC /FIAutoGen.h
 *_WINDDK3790x1830_*_APP_FLAGS            = /nologo /E /TC
 *_WINDDK3790x1830_*_SLINK_FLAGS          = /nologo /LTCG
-*_WINDDK3790x1830_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
+*_WINDDK3790x1830_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 
 ##################
 # ASL definitions
@@ -445,7 +445,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_UNIXGCC_*_DLINK_FLAGS                  = -nostdlib -O2 --gc-sections --dll --export-all-symbols --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 *_UNIXGCC_*_ASM_FLAGS                    = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_UNIXGCC_*_PP_FLAGS                     = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
-*_UNIXGCC_*_VFRPP_FLAGS                  = -x c -E -P -DVFRCOMPILE --include AutoGen.h
+*_UNIXGCC_*_VFRPP_FLAGS                  = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 *_UNIXGCC_*_MAKE_PATH                    = make
 
 ##################
@@ -489,7 +489,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_CYGWINGCC_*_ASM_FLAGS                  = -c -x assembler -imacros AutoGen.h
 *_CYGWINGCC_*_PP_FLAGS                   = -E -x assembler-with-cpp -include AutoGen.h
 *_CYGWINGCC_*_APP_FLAGS                  = -E -x assembler
-*_CYGWINGCC_*_VFRPP_FLAGS                = -x c -E -P -DVFRCOMPILE --include AutoGen.h
+*_CYGWINGCC_*_VFRPP_FLAGS                = -x c -E -P -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
 
 ##################
 # IA32 definitions
@@ -540,7 +540,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 #*_ELFGCC_*_DLINK_FLAGS                   = -melf_i386 -nostdlib -n -q -Ttext 0x220 --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
 *_ELFGCC_*_ASM_FLAGS                     = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_ELFGCC_*_PP_FLAGS                      = -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
-*_ELFGCC_*_VFRPP_FLAGS                   = -x c -E -P -DVFRCOMPILE --include AutoGen.h
+*_ELFGCC_*_VFRPP_FLAGS                   = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 
 
 ####################################################################################
@@ -594,7 +594,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_ICC_*_MAKE_PATH                   = DEF(VS2005TEAMSUITE_BIN)\nmake.exe
 
 *_ICC_*_MAKE_FLAGS                       = /nologo
-*_ICC_*_VFRPP_FLAGS                      = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
+*_ICC_*_VFRPP_FLAGS                      = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_ICC_*_APP_FLAGS                        = /nologo /E /TC
 *_ICC_*_PP_FLAGS                         = /nologo /E /TC /FIAutoGen.h
 
@@ -708,7 +708,7 @@ RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_MYTOOLS_*_ASL_PATH                = DEF(ASL_BIN)\iasl.exe
 
 *_MYTOOLS_*_MAKE_FLAGS                   = /nologo
-*_MYTOOLS_*_VFRPP_FLAGS                  = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
+*_MYTOOLS_*_VFRPP_FLAGS                  = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_MYTOOLS_*_APP_FLAGS                    = /nologo /E /TC
 *_MYTOOLS_*_PP_FLAGS                     = /nologo /E /TC /FIAutoGen.h
 *_MYTOOLS_*_SLINK_FLAGS                  = /nologo /LTCG
@@ -806,7 +806,7 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_MYTOOLS_EBC_MAKE_FLAGS                 = /nologo
 *_MYTOOLS_EBC_PP_FLAGS                   = /nologo /E /TC /FIAutoGen.h
 *_MYTOOLS_EBC_CC_FLAGS                   = /nologo /c /WX /W3 /FIAutoGen.h
-*_MYTOOLS_EBC_VFRPP_FLAGS                = /nologo /E /TC /DVFRCOMPILE /FIAutoGen.h
+*_MYTOOLS_EBC_VFRPP_FLAGS                = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_MYTOOLS_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC
 *_MYTOOLS_EBC_DLINK_FLAGS                = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP
 
@@ -823,3 +823,4 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_*_*_ASLDLINK_FLAGS               = /NODEFAULTLIB /ENTRY:main
 *_*_*_ASLPP_FLAGS                  = /nologo /EP /C
 *_*_*_ASL_FLAGS                    =
+
