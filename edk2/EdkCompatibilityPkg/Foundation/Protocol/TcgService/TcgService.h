@@ -50,7 +50,7 @@ EFI_FORWARD_DECLARATION (EFI_TCG_PROTOCOL);
 //
 // Set structure alignment to 1-byte
 //
-#pragma pack (push, 1)
+#pragma pack (1)
 
 typedef struct {
   UINT8  Major;
@@ -74,7 +74,7 @@ typedef UINT32   TCG_ALGORITHM_ID;
 //
 // Restore original structure alignment
 //
-#pragma pack (pop)
+#pragma pack ()
 
 typedef
 EFI_STATUS

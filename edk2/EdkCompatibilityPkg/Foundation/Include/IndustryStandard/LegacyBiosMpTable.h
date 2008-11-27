@@ -28,7 +28,7 @@ Abstract:
 //
 // Define MP table structures. All are packed.
 //
-#pragma pack(push, 1)
+#pragma pack(1)
 
 #define EFI_LEGACY_MP_TABLE_FLOATING_POINTER_SIGNATURE  EFI_SIGNATURE_32 ('_', 'M', 'P', '_')
 typedef struct {
@@ -278,6 +278,6 @@ typedef struct {
   UINT32  PredefinedRangeList;
 } EFI_LEGACY_MP_TABLE_ENTRY_EXT_COMPAT_BUS_ADDR_SPACE_MODIFIER;
 
-#pragma pack(pop)
+#pragma pack()
 
 #endif

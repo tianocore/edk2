@@ -20,13 +20,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // This structure is only intended to be used in this file.
 //
-#pragma pack(push, 1)
+#pragma pack(1)
 typedef struct {
   EFI_HII_PACK_HEADER            PackageHeader;
   FRAMEWORK_EFI_IFR_FORM_SET     FormSet;
   FRAMEWORK_EFI_IFR_END_FORM_SET EndFormSet;
 } FW_HII_FORMSET_TEMPLATE;
-#pragma pack(pop)
+#pragma pack()
 
 FW_HII_FORMSET_TEMPLATE FormSetTemplate = {
   {

@@ -27,7 +27,7 @@ Revision History
 //#include "pci23.h"
 //#include "pci30.h"
 
-#pragma pack(push, 1)
+#pragma pack(1)
 
 typedef struct {
   UINT8 Register;
@@ -59,6 +59,6 @@ typedef union {
   EFI_LEGACY_EXPANSION_ROM_HEADER *PcAt;
 } EFI_PCI_ROM_HEADER;
 
-#pragma pack(pop)
+#pragma pack()
 
 #endif

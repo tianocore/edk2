@@ -561,8 +561,6 @@ COMPONENT_TYPE  = LIBRARY
   ChkStkGcc.c  | GCC 
 
 [Sources.IPF]
-  SynchronizationMsc.c
-  Math64.c
   Ipf/asm.h
   Ipf/ia_64gen.h
   Ipf/PalCallStatic.s
@@ -570,7 +568,6 @@ COMPONENT_TYPE  = LIBRARY
   Ipf/longjmp.s
   Ipf/SwitchStack.s
   Ipf/Unaligned.c
-  Ipf/CpuBreakpoint.c
   Ipf/InterlockedCompareExchange32.s
   Ipf/InterlockedCompareExchange64.s
   Ipf/Synchronization.c
@@ -589,7 +586,13 @@ COMPONENT_TYPE  = LIBRARY
   Ipf/ExecFc.s
   Ipf/ReadCpuid.s
   Ipf/AccessGp.s
-  
+  Math64.c
+  Ipf/CpuBreakpoint.c   | INTEL
+  Ipf/CpuBreakpoint.c   | MSFT
+  Synchronization.c     | INTEL 
+  SynchronizationMsc.c  | MSFT 
+  SynchronizationGcc.c  | GCC 
+
 [sources.ebc]
   Math64.c
   Unaligned.c

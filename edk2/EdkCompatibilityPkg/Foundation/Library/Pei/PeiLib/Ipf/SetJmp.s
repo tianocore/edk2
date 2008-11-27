@@ -229,7 +229,7 @@ PROCEDURE_ENTRY(LongJump)
   //
   // check if RNAT is saved between saved BSP and curr BSPSTORE
   //
-  dep    r18 = 1,r16,3,6   // get RNAT address
+  dep    r18 = -1,r16,3,6   // get RNAT address
   ;;
   cmp.ltu  p8,p9 = r18, r17  // RNAT saved on RSE
   ;;
