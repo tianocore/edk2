@@ -29,13 +29,17 @@ typedef struct _EFI_PEI_PE_COFF_LOADER_PROTOCOL   EFI_PEI_PE_COFF_LOADER_PROTOCO
 /**
   Retrieves information about a PE/COFF image.
 
-  Computes the PeCoffHeaderOffset, ImageAddress, ImageSize, DestinationAddress, CodeView,
-  PdbPointer, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva
-  fields of the ImageContext structure.  If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.
-  If the PE/COFF image accessed through the ImageRead service in the ImageContext structure is not
-  a supported PE/COFF image type, then return RETURN_UNSUPPORTED.  If any errors occur while
-  computing the fields of ImageContext, then the error status is returned in the ImageError field of
-  ImageContext. 
+  Computes the PeCoffHeaderOffset, IsTeImage, ImageType, ImageAddress, ImageSize, 
+  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and 
+  DebugDirectoryEntryRva fields of the ImageContext structure.  
+  If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.  
+  If the PE/COFF image accessed through the ImageRead service in the ImageContext 
+  structure is not a supported PE/COFF image type, then return RETURN_UNSUPPORTED.  
+  If any errors occur while computing the fields of ImageContext, 
+  then the error status is returned in the ImageError field of ImageContext.  
+  If the image is a TE image, then SectionAlignment is set to 0.
+  The ImageRead and Handle fields of ImageContext structure must be valid prior 
+  to invoking this service. 
 
   @param  This                      Pointer to the EFI_PEI_PE_COFF_LOADER_PROTOCOL instance.
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
@@ -60,7 +64,9 @@ RETURN_STATUS
   specified by the ImageAddress and ImageSize fields of ImageContext.  The caller must allocate
   the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function.
   The EntryPoint, FixupDataSize, CodeView, and PdbPointer fields of ImageContext are computed.
-  If ImageContext is NULL, then ASSERT().
+  The ImageRead, Handle, PeCoffHeaderOffset,  IsTeImage,  Machine, ImageType, ImageAddress, ImageSize, 
+  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva 
+  fields of the ImageContext structure must be valid prior to invoking this service.
 
   @param  This                      Pointer to the EFI_PEI_PE_COFF_LOADER_PROTOCOL instance.
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
@@ -90,7 +96,13 @@ RETURN_STATUS
   If the DestinationAddress field of ImageContext is 0, then use the ImageAddress field of
   ImageContext as the relocation base address.  Otherwise, use the DestinationAddress field
   of ImageContext as the relocation base address.  The caller must allocate the relocation
-  fixup log buffer and fill in the FixupData field of ImageContext prior to calling this function.  
+  fixup log buffer and fill in the FixupData field of ImageContext prior to calling this function.
+  
+  The ImageRead, Handle, PeCoffHeaderOffset,  IsTeImage, Machine, ImageType, ImageAddress, 
+  ImageSize, DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, 
+  DebugDirectoryEntryRva, EntryPoint, FixupDataSize, CodeView, PdbPointer, and FixupData of 
+  the ImageContext structure must be valid prior to invoking this service.
+
   If ImageContext is NULL, then ASSERT().
 
   @param  This                Pointer to the EFI_PEI_PE_COFF_LOADER_PROTOCOL instance.
@@ -114,7 +126,9 @@ RETURN_STATUS
 
 /**
   Unloads a loaded PE/COFF image from memory and releases its taken resource.
-   
+  Releases any environment specific resources that were allocated when the image 
+  specified by ImageContext was loaded using PeCoffLoaderLoadImage(). 
+ 
   For NT32 emulator, the PE/COFF image loaded by system needs to release.
   For real platform, the PE/COFF image loaded by Core doesn't needs to be unloaded, 
   this function can simply return RETURN_SUCCESS.

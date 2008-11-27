@@ -24,21 +24,20 @@ extern EFI_GUID gEfiVariableInfoGuid;
 
 typedef struct _VARIABLE_INFO_ENTRY  VARIABLE_INFO_ENTRY;
 
-//
-// This list gets put in the EFI system table. It is produced by the Variable driver at
-// Boot Services time and records read and write access to a given variable
-//
+///
+/// This list gets put in the EFI system table. It is produced by the Variable driver at
+/// Boot Services time and records read and write access to a given variable
+///
 struct _VARIABLE_INFO_ENTRY {
-  VARIABLE_INFO_ENTRY *Next;
-  EFI_GUID            VendorGuid;
-  CHAR16              *Name;
-  UINT32              Attributes;
-  UINT32              ReadCount;
-  UINT32              WriteCount;
-  UINT32              DeleteCount;
-  UINT32              CacheCount;
-  BOOLEAN             Volatile;
+  VARIABLE_INFO_ENTRY *Next;       /// Pointer to next entry
+  EFI_GUID            VendorGuid;  /// Guid of Variable 
+  CHAR16              *Name;       /// Name of Variable 
+  UINT32              Attributes;  /// Attributes of variable defined in UEFI spec
+  UINT32              ReadCount;   /// Times to read this variable
+  UINT32              WriteCount;  /// Times to write this variable
+  UINT32              DeleteCount; /// Times to delete this variable
+  UINT32              CacheCount;  /// Times that cache hits this variable
+  BOOLEAN             Volatile;    /// TRUE if volatile FALSE if non-volatile
 };
-
 
 #endif

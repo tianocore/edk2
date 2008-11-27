@@ -24,8 +24,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_GUID gEfiMemoryTypeInformationGuid;
 
 typedef struct {
-  UINT32  Type;
-  UINT32  NumberOfPages;
+  UINT32  Type;             /// EFI memory type defined in UEFI specification.
+  UINT32  NumberOfPages;    /// The pages of this type memory.
 } EFI_MEMORY_TYPE_INFORMATION;
 
 #endif

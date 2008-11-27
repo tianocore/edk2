@@ -1,5 +1,5 @@
 /** @file
-  This guid is used to specifiy the device is the StdErr device.
+  This guid is used to specify the device is the StdErr device.
   If the device is the StdErr device, this guid as the protocol guid
   will be installed into this device handle.
 

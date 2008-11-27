@@ -1,5 +1,5 @@
 /** @file
-  This file defines variable name and GUID to record boot state.
+  This file defines variable name and variable GUID for boot state.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -14,10 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef __BOOT_STATE_H__
 #define __BOOT_STATE_H__
-
-//
-// BOOT STATE
-//
 
 typedef UINT32 EFI_BOOT_STATE;
 
