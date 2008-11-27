@@ -55,8 +55,8 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiListRecoveryBootMode = {
 EFI_STATUS
 EFIAPI
 InitializeBootMode (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 /*++
 
@@ -66,14 +66,14 @@ Routine Description:
 
 Arguments:
 
-  PeiServices - General purpose services available to every PEIM.
+  FileHandle  - Handle of the file being invoked.
+  PeiServices - Describes the list of possible PEI Services.
     
 Returns:
 
   Status -  EFI_SUCCESS if the boot mode could be set
 
 --*/
-// TODO:    FfsHeader - add argument and description to function comment
 {
   EFI_STATUS  Status;
   UINTN       BootMode;
@@ -86,14 +86,14 @@ Returns:
   //
   BootMode  = BOOT_WITH_FULL_CONFIGURATION;
 
-  Status    = (**PeiServices).SetBootMode ((const EFI_PEI_SERVICES **)PeiServices, (UINT8) BootMode);
+  Status    = (**PeiServices).SetBootMode (PeiServices, (UINT8) BootMode);
   ASSERT_EFI_ERROR (Status);
 
-  Status = (**PeiServices).InstallPpi ((const EFI_PEI_SERVICES **)PeiServices, &mPpiListBootMode);
+  Status = (**PeiServices).InstallPpi (PeiServices, &mPpiListBootMode);
   ASSERT_EFI_ERROR (Status);
 
   if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    Status = (**PeiServices).InstallPpi ((const EFI_PEI_SERVICES **)PeiServices, &mPpiListRecoveryBootMode);
+    Status = (**PeiServices).InstallPpi (PeiServices, &mPpiListRecoveryBootMode);
     ASSERT_EFI_ERROR (Status);
   }
 
