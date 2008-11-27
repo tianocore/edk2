@@ -77,7 +77,6 @@
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
 
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable
@@ -86,7 +85,5 @@
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
-[Guids]  
-  gEfiGlobalVariableGuid 
 
 
