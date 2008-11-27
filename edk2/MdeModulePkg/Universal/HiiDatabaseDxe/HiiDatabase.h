@@ -40,7 +40,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/IfrSupportLib.h>
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
-#include <Library/HiiLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+
 
 #define HII_DATABASE_NOTIFY_GUID \
   { \
