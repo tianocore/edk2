@@ -265,15 +265,16 @@ PciCfg2Modify (
   This routine will install EFI_PEI_PCI_CFG2_PPI or EFI_PEI_PCI_CFG_PPI
   according to PeiServices's version.
   
-  @param FfsHeader    Image's header
-  @param PeiServices  Pointer of EFI_PEI_SERVICES
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
+
   @return Whether success to install service
 **/
 EFI_STATUS
 EFIAPI
 PeimInitializePciCfg (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
   EFI_STATUS            Status;
@@ -292,16 +293,16 @@ PeimInitializePciCfg (
     // FrameworkPeiServices = (FRAMEWORK_PEI_SERVICES **) PeiServices;
     // (**FrameworkPeiServices).PciCfg = &mPciCfgPpi;
     // 
-    (**PeiServices).PciCfg = (EFI_PEI_PCI_CFG2_PPI *) &gPciCfgPpi;
+    (**(EFI_PEI_SERVICES**)PeiServices).PciCfg = (EFI_PEI_PCI_CFG2_PPI *) &gPciCfgPpi;
   } else {
-    (**PeiServices).PciCfg = &gPciCfg2Ppi;
+    (**(EFI_PEI_SERVICES**)PeiServices).PciCfg = &gPciCfg2Ppi;
   }
   
   if (!FeaturePcdGet (PcdPciCfgDisable)) {
-    Status = (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **)PeiServices, &gPciCfgPpiList);
+    Status = (**PeiServices).InstallPpi (PeiServices, &gPciCfgPpiList);
   } 
   if (!FeaturePcdGet (PcdPciCfg2Disable)) {
-    Status = (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **)PeiServices, &gPciCfg2PpiList);
+    Status = (**PeiServices).InstallPpi (PeiServices, &gPciCfg2PpiList);
   }
 
   return Status;

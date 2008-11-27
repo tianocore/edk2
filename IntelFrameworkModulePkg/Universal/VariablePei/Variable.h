@@ -59,12 +59,6 @@ typedef struct {
 //
 // Functions
 //
-EFI_STATUS
-EFIAPI
-PeimInitializeVariableServices (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
-  );
 
 EFI_STATUS
 EFIAPI

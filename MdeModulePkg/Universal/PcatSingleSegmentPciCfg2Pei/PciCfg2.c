@@ -355,15 +355,15 @@ PciCfg2Modify (
 EFI_STATUS
 EFIAPI
 PeimInitializePciCfg (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
   EFI_STATUS            Status;
 
   ASSERT ((**PeiServices).Hdr.Revision >= PEI_SERVICES_REVISION);
 
-  (**PeiServices).PciCfg = &gPciCfg2Ppi;
+  (**(EFI_PEI_SERVICES **)PeiServices).PciCfg = &gPciCfg2Ppi;
   Status = (**PeiServices).InstallPpi ((CONST EFI_PEI_SERVICES **)PeiServices, &gPciCfg2PpiList);
 
   return Status;

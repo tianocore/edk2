@@ -98,16 +98,16 @@ ReportDispatcher (
   Initialize PEI status codes and publish the status code
   PPI.
 
-  @param   FfsHeader       FV this PEIM was loaded from.
-  @param   PeiServices     General purpose services available to every PEIM.
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
 
   @return                  The function always returns success.
 
 **/
 EFI_STATUS
 PeiStatusCodeDriverEntry (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
   EFI_STATUS                  Status;

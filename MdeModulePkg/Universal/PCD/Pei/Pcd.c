@@ -65,8 +65,8 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiPCD = {
   
   This routine initialize the PCD database for PEI phase and install PCD_PPI.
 
-  @param FfsHeader       Pointer to PEIM FFS header image
-  @param PeiServices     Pointer to EFI_PEI_SERVICES
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
 
   @return Status of install PCD_PPI
 
@@ -74,8 +74,8 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiPCD = {
 EFI_STATUS
 EFIAPI
 PcdPeimInit (
-  IN EFI_FFS_FILE_HEADER      *FfsHeader,
-  IN EFI_PEI_SERVICES         **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
   BuildPcdDatabase ();

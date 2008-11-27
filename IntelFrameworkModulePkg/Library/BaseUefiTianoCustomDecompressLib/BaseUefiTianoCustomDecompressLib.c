@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Guid/CustomDecompress.h>
 #include "BaseUefiTianoCustomDecompressLibInternals.h"
+#include <Guid/CustomDecompress.h>
 
 /**
   Shift mBitBuf NumOfBits left. Read in NumOfBits of bits from source.
@@ -815,7 +815,7 @@ TianoDecompress (
   @retval  RETURN_SUCCESS            Register successfully.
   @retval  RETURN_OUT_OF_RESOURCES   No enough memory to store this handler.
 **/
-EFI_STATUS
+RETURN_STATUS
 EFIAPI
 TianoDecompressLibConstructor (
 )
