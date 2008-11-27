@@ -166,7 +166,7 @@ BdsLibUpdateConsoleVariable (
     if (VarConsole != NULL) {
       FreePool(VarConsole);
     }
-    if (NewDevicePath) {
+    if (NewDevicePath != NULL) {
       FreePool(NewDevicePath);
     }
   }
