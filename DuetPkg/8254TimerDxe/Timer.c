@@ -51,7 +51,7 @@ EFI_LEGACY_8259_PROTOCOL  *mLegacy8259;
 // The notification function to call on every timer interrupt.
 // A bug in the compiler prevents us from initializing this here.
 //
-volatile EFI_TIMER_NOTIFY mTimerNotifyFunction;
+EFI_TIMER_NOTIFY mTimerNotifyFunction;
 
 //
 // The current period of the timer interrupt

@@ -151,7 +151,7 @@ Returns:
     //
     // Build the EFI Device Path Protocol instance for this PCI Root Bridge
     //
-    Status = PcatRootBridgeDevicePathConstructor (&PrivateData->DevicePath, PciRootBridgeIndex, (PrivateData->PciExpressBaseAddress != 0) ? TRUE : FALSE);
+    Status = PcatRootBridgeDevicePathConstructor (&PrivateData->DevicePath, PciRootBridgeIndex, (BOOLEAN)((PrivateData->PciExpressBaseAddress != 0) ? TRUE : FALSE));
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -804,7 +804,7 @@ Returns:
   if ( *Value == 0 ) {
     return EFI_DEVICE_ERROR;
   }
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS
