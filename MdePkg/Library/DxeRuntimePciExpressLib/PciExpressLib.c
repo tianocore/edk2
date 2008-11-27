@@ -114,7 +114,8 @@ DxeRuntimePciExpressLibVirtualNotify (
 EFI_STATUS
 EFIAPI
 DxeRuntimePciExpressLibConstructor (
-  VOID
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -153,7 +154,8 @@ DxeRuntimePciExpressLibConstructor (
 EFI_STATUS
 EFIAPI
 DxeRuntimePciExpressLibDestructor (
-  VOID
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
