@@ -279,8 +279,8 @@ Decompress (
 EFI_STATUS
 EFIAPI
 PeimInitializeDxeIpl (
-  IN EFI_PEI_FILE_HANDLE       FfsHandle,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE       FfsHandle,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
   );
 
 
