@@ -56,6 +56,7 @@ QuestionOpFwToUefi (
     }
   }
 
+  *UefiOp = (UINT8) (FRAMEWORK_EFI_IFR_LAST_OPCODE + 1);
   return EFI_NOT_FOUND;
 }
 
