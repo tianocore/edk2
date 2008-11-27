@@ -4841,6 +4841,105 @@ AsmReadSp (
   );
 
 
+///
+/// Valid Index value for AsmReadControlRegister()
+///
+#define IPF_CONTROL_REGISTER_DCR   0
+#define IPF_CONTROL_REGISTER_ITM   1
+#define IPF_CONTROL_REGISTER_IVA   2
+#define IPF_CONTROL_REGISTER_PTA   8
+#define IPF_CONTROL_REGISTER_IPSR  16
+#define IPF_CONTROL_REGISTER_ISR   17
+#define IPF_CONTROL_REGISTER_IIP   19
+#define IPF_CONTROL_REGISTER_IFA   20
+#define IPF_CONTROL_REGISTER_ITIR  21
+#define IPF_CONTROL_REGISTER_IIPA  22
+#define IPF_CONTROL_REGISTER_IFS   23
+#define IPF_CONTROL_REGISTER_IIM   24
+#define IPF_CONTROL_REGISTER_IHA   25
+#define IPF_CONTROL_REGISTER_LID   64
+#define IPF_CONTROL_REGISTER_IVR   65
+#define IPF_CONTROL_REGISTER_TPR   66
+#define IPF_CONTROL_REGISTER_EOI   67
+#define IPF_CONTROL_REGISTER_IRR0  68
+#define IPF_CONTROL_REGISTER_IRR1  69
+#define IPF_CONTROL_REGISTER_IRR2  70
+#define IPF_CONTROL_REGISTER_IRR3  71
+#define IPF_CONTROL_REGISTER_ITV   72
+#define IPF_CONTROL_REGISTER_PMV   73
+#define IPF_CONTROL_REGISTER_CMCV  74
+#define IPF_CONTROL_REGISTER_LRR0  80
+#define IPF_CONTROL_REGISTER_LRR1  81
+
+/**
+  Reads a 64-bit control register.
+
+  Reads and returns the control register specified by Index. The valid Index valued are defined
+  above in "Related Definitions".
+  If Index is invalid then 0xFFFFFFFFFFFFFFFF is returned.  This function is only available on IPF.
+
+  @param  Index                     The index of the control register to read.
+
+  @return The control register specified by Index.
+
+**/
+UINT64
+EFIAPI
+AsmReadControlRegister (
+  IN UINT64  Index
+  );
+
+
+///
+/// Valid Index value for AsmReadApplicationRegister()
+///
+#define IPF_APPLICATION_REGISTER_K0        0
+#define IPF_APPLICATION_REGISTER_K1        1
+#define IPF_APPLICATION_REGISTER_K2        2
+#define IPF_APPLICATION_REGISTER_K3        3
+#define IPF_APPLICATION_REGISTER_K4        4
+#define IPF_APPLICATION_REGISTER_K5        5
+#define IPF_APPLICATION_REGISTER_K6        6
+#define IPF_APPLICATION_REGISTER_K7        7
+#define IPF_APPLICATION_REGISTER_RSC       16
+#define IPF_APPLICATION_REGISTER_BSP       17
+#define IPF_APPLICATION_REGISTER_BSPSTORE  18
+#define IPF_APPLICATION_REGISTER_RNAT      19
+#define IPF_APPLICATION_REGISTER_FCR       21
+#define IPF_APPLICATION_REGISTER_EFLAG     24
+#define IPF_APPLICATION_REGISTER_CSD       25
+#define IPF_APPLICATION_REGISTER_SSD       26
+#define IPF_APPLICATION_REGISTER_CFLG      27
+#define IPF_APPLICATION_REGISTER_FSR       28
+#define IPF_APPLICATION_REGISTER_FIR       29
+#define IPF_APPLICATION_REGISTER_FDR       30
+#define IPF_APPLICATION_REGISTER_CCV       32
+#define IPF_APPLICATION_REGISTER_UNAT      36
+#define IPF_APPLICATION_REGISTER_FPSR      40
+#define IPF_APPLICATION_REGISTER_ITC       44
+#define IPF_APPLICATION_REGISTER_PFS       64
+#define IPF_APPLICATION_REGISTER_LC        65
+#define IPF_APPLICATION_REGISTER_EC        66
+
+/**
+  Reads a 64-bit application register.
+
+  Reads and returns the application register specified by Index. The valid Index valued are defined
+  above in "Related Definitions".
+  If Index is invalid then 0xFFFFFFFFFFFFFFFF is returned.  This function is only available on IPF.
+
+  @param  Index                     The index of the application register to read.
+
+  @return The application register specified by Index.
+
+**/
+UINT64
+EFIAPI
+AsmReadApplicationRegister (
+  IN UINT64  Index
+  );
+
+
 /**
   Determines if the CPU is currently executing in virtual, physical, or mixed mode.
 
@@ -4903,67 +5002,6 @@ AsmPalCall (
   IN UINT64  Arg3,
   IN UINT64  Arg4
   );
-
-
-/**
-  Transfers control to a function starting with a new stack.
-
-  Transfers control to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
-
-  If EntryPoint is NULL, then ASSERT().
-  If NewStack is NULL, then ASSERT().
-
-  @param  EntryPoint  A pointer to function to call with the new stack.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function.
-  @param  NewBsp      A pointer to the new memory location for RSE backing
-                      store.
-
-**/
-VOID
-EFIAPI
-AsmSwitchStackAndBackingStore (
-  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *NewStack,
-  IN      VOID                      *NewBsp
-  );
-
-/**
-  @todo   This call should be removed after the PalCall
-          Instance issue has been fixed.
-
-  Performs a PAL call using static calling convention.
-
-  An internal function to perform a PAL call using static calling convention.
-
-  @param  PalEntryPoint The entry point address of PAL. The address in ar.kr5
-                        would be used if this parameter were NULL on input.
-  @param  Arg1          The first argument of a PAL call.
-  @param  Arg2          The second argument of a PAL call.
-  @param  Arg3          The third argument of a PAL call.
-  @param  Arg4          The fourth argument of a PAL call.
-
-  @return The values returned in r8, r9, r10 and r11.
-
-**/
-PAL_CALL_RETURN
-PalCallStatic (
-  IN      CONST VOID                *PalEntryPoint,
-  IN      UINT64                    Arg1,
-  IN      UINT64                    Arg2,
-  IN      UINT64                    Arg3,
-  IN      UINT64                    Arg4
-  );
-
 
 
 #elif defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
