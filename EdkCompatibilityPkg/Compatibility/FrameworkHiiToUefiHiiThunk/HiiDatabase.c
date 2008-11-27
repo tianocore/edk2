@@ -280,7 +280,7 @@ HiiFindHandles (
   }
 
   if (Count > *HandleBufferLength) {
-    *HandleBufferLength = (Count * sizeof (FRAMEWORK_EFI_HII_HANDLE));
+    *HandleBufferLength = (UINT16) (Count * sizeof (FRAMEWORK_EFI_HII_HANDLE));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -299,7 +299,7 @@ HiiFindHandles (
 
   }
 
-  *HandleBufferLength = (Count * sizeof (FRAMEWORK_EFI_HII_HANDLE));
+  *HandleBufferLength = (UINT16) (Count * sizeof (FRAMEWORK_EFI_HII_HANDLE));
   return EFI_SUCCESS;
 }
 
