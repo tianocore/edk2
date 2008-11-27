@@ -1,5 +1,10 @@
 /** @file
-  HII Library implementation that uses DXE protocols and services.
+Library instance for ExtendedHiiLib.
+  
+This library instance implements the common HII routines which is
+related to HII but reference data structures that are not defined in 
+UEFI specification, for example HII_VENDOR_DEVICE_PATH.
+
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -14,10 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include <Uefi.h>
-
 #include <Protocol/DevicePath.h>
-
-#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>

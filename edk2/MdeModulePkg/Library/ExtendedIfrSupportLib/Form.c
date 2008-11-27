@@ -307,25 +307,17 @@ IfrLibInitUpdateData (
 
   @param UpdateData      The adding data;
 
-  @retval EFI_SUCCESS            Resource in UpdateData is released.
-  @retval EFI_INVALID_PARAMETER  UpdateData is NULL.
-
 **/
-EFI_STATUS
+VOID
 IfrLibFreeUpdateData (
   IN EFI_HII_UPDATE_DATA       *UpdateData
   )
 {
-  EFI_STATUS  Status;
-
-  if (UpdateData == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status = gBS->FreePool (UpdateData->Data);
+  ASSERT (UpdateData != NULL);
+  
+  FreePool (UpdateData->Data);
   UpdateData->Data = NULL;
 
-  return Status;
 }
 
 /**
