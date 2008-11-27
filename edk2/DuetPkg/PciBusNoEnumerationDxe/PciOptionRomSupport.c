@@ -148,7 +148,6 @@ Returns:
   UINT16                    OffsetPcir;
   UINT32                    RomBarOffset;
   UINT32                    RomBar;
-  UINT64                    Temp;
   EFI_STATUS                retStatus;
   BOOLEAN                   FirstCheck;
   UINT8                     *Image;
@@ -164,7 +163,6 @@ Returns:
   Indicator     = 0;
   RomImageSize  = 0;
   RomInMemory   = NULL;
-  Temp          = 0;
   CodeType      = 0xFF;
 
   //

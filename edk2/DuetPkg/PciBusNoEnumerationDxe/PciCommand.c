@@ -121,7 +121,7 @@ Returns:
           &OldCommand
           );
 
-  OldCommand |= Command;
+  OldCommand = (UINT16) (OldCommand | Command);
 
   return PciIo->Pci.Write (
               PciIo, 
@@ -165,7 +165,7 @@ Returns:
           &OldCommand
           );
 
-  OldCommand &= ~(Command);
+  OldCommand = (UINT16) (OldCommand & ~(Command));
 
   return PciIo->Pci.Write (
             PciIo, 
@@ -244,7 +244,7 @@ Returns:
           &OldCommand
           );
 
-  OldCommand |= Command;
+  OldCommand = (UINT16) (OldCommand | Command);
 
   return PciIo->Pci.Write (
               PciIo, 
@@ -287,7 +287,7 @@ Returns:
           &OldCommand
           );
 
-  OldCommand &= ~(Command);
+  OldCommand = (UINT16) (OldCommand & ~(Command));
 
   return PciIo->Pci.Write (
               PciIo, 

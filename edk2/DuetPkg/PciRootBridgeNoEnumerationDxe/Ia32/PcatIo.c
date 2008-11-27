@@ -555,7 +555,7 @@ SaveCommandRegister (
   //
   // Clear the memory enable bit
   //
-  Command = Context->CommandRegisterBuffer[Index] & (~0x02);
+  Command = (UINT16) (Context->CommandRegisterBuffer[Index] & (~0x02));
 
   IoDev->Pci.Write (IoDev, EfiPciWidthUint16, Address, 1, &Command);
 }
