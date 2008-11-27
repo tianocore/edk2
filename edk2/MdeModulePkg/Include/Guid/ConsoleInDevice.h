@@ -1,5 +1,5 @@
 /** @file
-  This guid is used to specifiy the device is the console in device.
+  This guid is used to specify the device is the console in device.
   If the device is the console in device, this guid as the protocol guid
   will be installed into this device handle.
 

@@ -114,9 +114,9 @@ IfrLibUpdateForm (
   If FormSetHelp is NULL, then ASSERT.
 
   @param  HiiHandle              Hii handle
-  @param  Class                    On output, Class of the formset
-  @param  FormSetTitle          On output,  Formset title string
-  @param  FormSetHelp          On output,   Formset help string
+  @param  Class                  On output, Class of the formset
+  @param  FormSetTitle           On output,  Formset title string
+  @param  FormSetHelp            On output,   Formset help string
 
   @retval EFI_SUCCESS            Successfully extract Class for specified Hii
                                  handle.

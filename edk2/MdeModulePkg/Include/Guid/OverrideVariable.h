@@ -1,5 +1,5 @@
 /** @file
-  This guid is used for Platform Override Variable named L"PlatDriOver".
+  This file defines the platform override variable name and variable guid.
 
 Copyright (c) 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -15,11 +15,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_OVERRIDE_VARIABLE_GUID_H__
 #define __EFI_OVERRIDE_VARIABLE_GUID_H__
 
-//
-// This guid is used for a platform driver override variable
-//
+///
+/// This guid is used for a platform driver override variable
+///
 #define EFI_OVERRIDE_VARIABLE_GUID  \
   { 0x8e3d4ad5, 0xf762, 0x438a, { 0xa1, 0xc1, 0x5b, 0x9f, 0xe6, 0x8c, 0x6b, 0x15 }}
+
+#define EFI_PLATFORM_OVERRIDE_VARIABLE_NAME L"PlatDriOver"
 
 extern EFI_GUID gEfiOverrideVariableGuid;
 

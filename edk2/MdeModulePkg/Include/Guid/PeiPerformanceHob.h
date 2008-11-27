@@ -30,18 +30,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
-  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];
-  CHAR8                 Module[PEI_PERFORMANCE_STRING_SIZE];
-  UINT64                StartTimeStamp;
-  UINT64                EndTimeStamp;
+  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];   /// Measured token string name 
+  CHAR8                 Module[PEI_PERFORMANCE_STRING_SIZE];  /// Module string name
+  UINT64                StartTimeStamp;                       /// Start time point
+  UINT64                EndTimeStamp;                         /// End time point
 } PEI_PERFORMANCE_LOG_ENTRY;
 
 //
 // The header must be aligned at 8 bytes.
 // 
 typedef struct {
-  UINT32                             NumberOfEntries;
-  UINT32                             Reserved;
+  UINT32                NumberOfEntries;  /// The number of all performance log entries
+  UINT32                Reserved;
 } PEI_PERFORMANCE_LOG_HEADER;
 
 
