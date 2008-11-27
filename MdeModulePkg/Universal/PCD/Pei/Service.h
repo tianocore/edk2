@@ -68,8 +68,6 @@ Module Name: Service.h
   @param[in]  SkuId The SKU value that will be used when the PCD service will retrieve and 
               set values associated with a PCD token.
 
-  @retval VOID
-
 **/
 VOID
 EFIAPI
