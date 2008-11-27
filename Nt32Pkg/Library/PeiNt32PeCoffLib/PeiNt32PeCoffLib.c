@@ -36,8 +36,8 @@ EFI_PEI_PE_COFF_LOADER_PROTOCOL  *mPeiEfiPeiPeCoffLoader;
   The constructor must be called after PeCofferLoader guid structure is installed.
   It will ASSERT() if PeCofferLoader guid structure is not installed.
 
-  @param  FfsHeader   Pointer to FFS header the loaded driver.
-  @param  PeiServices Pointer to the PEI services.
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
 
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
@@ -45,8 +45,8 @@ EFI_PEI_PE_COFF_LOADER_PROTOCOL  *mPeiEfiPeiPeCoffLoader;
 EFI_STATUS
 EFIAPI
 PeiNt32PeCoffLibConstructor (
-  IN EFI_FFS_FILE_HEADER      *FfsHeader,
-  IN EFI_PEI_SERVICES         **PeiServices
+  IN       EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
   )
 {
   EFI_STATUS           Status;
@@ -64,7 +64,7 @@ PeiNt32PeCoffLibConstructor (
     // GuidHob is not ready, try to locate PeCoffLoader guid structure.
     //
     Status = (*PeiServices)->LocatePpi (
-                              (CONST EFI_PEI_SERVICES **)PeiServices,
+                              PeiServices,
                               &gEfiPeiPeCoffLoaderGuid,
                               0,
                               NULL,
