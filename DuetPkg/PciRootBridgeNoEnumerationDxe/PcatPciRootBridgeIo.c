@@ -1013,7 +1013,7 @@ Returns:
   UINTN  OutStride;
 
 
-  Width     = Width & 0x03;
+  Width     = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) (Width & 0x03);
   Stride    = (UINTN)1 << Width;
   InStride  = InStrideFlag  ? Stride : 0;
   OutStride = OutStrideFlag ? Stride : 0;

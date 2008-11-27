@@ -864,7 +864,7 @@ Returns:
 --*/
 {
   UINT32      Value;
-  UINT64      BarValue64;
+  //UINT64      BarValue64;
   UINT32      OriginalValue;
   UINT32      Mask;
   UINT32      Data;
@@ -873,7 +873,7 @@ Returns:
 
   OriginalValue = 0;
   Value         = 0;
-  BarValue64    = 0;
+  //BarValue64    = 0;
 
   Status = BarExisted (
             PciIoDevice,
@@ -923,7 +923,7 @@ Returns:
     // Need to treat it as no-bar
     //
     if (PciIoDevice->PciBar[BarIndex].Length == 0) {
-      PciIoDevice->PciBar[BarIndex].BarType = 0;
+      PciIoDevice->PciBar[BarIndex].BarType = PciBarTypeUnknown;
     }
 
     PciIoDevice->PciBar[BarIndex].Prefetchable  = FALSE;
