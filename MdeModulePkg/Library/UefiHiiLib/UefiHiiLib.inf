@@ -48,11 +48,19 @@
   UefiBootServicesTableLib
   DevicePathLib
   UefiLib
+  PcdLib
+  UefiRuntimeServicesTableLib
 
 [Protocols]
   gEfiHiiDatabaseProtocolGuid  # ALWAYS_CONSUMED
   gEfiHiiStringProtocolGuid    # ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid  
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
+
+[Guids]  
+  gEfiGlobalVariableGuid 
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND
