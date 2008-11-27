@@ -59,7 +59,8 @@
   DebugLib
   IfrSupportLib
   UefiLib
-  HiiLib
+  PcdLib
+  UefiRuntimeServicesTableLib
 
 [Protocols]
   gEfiConsoleControlProtocolGuid                
@@ -74,6 +75,12 @@
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportFullConfigRoutingProtocol
+
+[Pcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
+
+[Guids]  
+  gEfiGlobalVariableGuid 
   
 [Depex]
   TRUE

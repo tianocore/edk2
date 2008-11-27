@@ -17,7 +17,6 @@ Implement a utility function named R8_EfiLibCompareLanguage.
 #ifndef __R8_LIB_H__
 #define __R8_LIB_H__
 
-
 /**
   Compare whether two names of languages are identical.
 
@@ -35,6 +34,26 @@ R8_EfiLibCompareLanguage (
   )
 ;
 
+/**
+  Determine what is the current language setting. The space reserved for Lang
+  must be at least RFC_3066_ENTRY_SIZE bytes;
+
+  If Lang is NULL, then ASSERT.
+
+  @param  Lang                   Pointer of system language. Lang will always be filled with 
+                                 a valid RFC 3066 language string. If "PlatformLang" is not
+                                 set in the system, the default language specifed by PcdUefiVariableDefaultPlatformLang
+                                 is returned.
+
+  @return  EFI_SUCCESS     If the EFI Variable with "PlatformLang" is set and return in Lang.
+  @return  EFI_NOT_FOUND If the EFI Variable with "PlatformLang" is not set, but a valid default language is return in Lang.
+
+**/
+EFI_STATUS
+EFIAPI
+GetCurrentLanguage (
+  OUT     CHAR8               *Lang
+  );
 
 #endif
 
