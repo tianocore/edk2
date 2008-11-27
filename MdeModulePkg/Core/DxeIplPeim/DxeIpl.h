@@ -267,21 +267,4 @@ Decompress (
   OUT       UINTN                   *OutputSize
   );
 
-/**
-  Initializes the Dxe Ipl PPI
-
-  @param  FfsHandle   The handle of FFS file.
-  @param  PeiServices General purpose services available to
-                      every PEIM.
-  @return EFI_SUCESS
-
-**/
-EFI_STATUS
-EFIAPI
-PeimInitializeDxeIpl (
-  IN       EFI_PEI_FILE_HANDLE       FfsHandle,
-  IN CONST EFI_PEI_SERVICES          **PeiServices
-  );
-
-
 #endif
