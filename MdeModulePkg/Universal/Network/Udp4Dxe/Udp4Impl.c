@@ -451,13 +451,13 @@ Udp4CheckTimeout (
       //
       Wrap = NET_LIST_USER_STRUCT (WrapEntry, UDP4_RXDATA_WRAP, Link);
 
-      if (Wrap->TimeoutTick <= UDP4_TIMEOUT_INTERVAL / 1000) {
+      if (Wrap->TimeoutTick <= UDP4_TIMEOUT_INTERVAL / 10) {
         //
         // Remove this RxData if it timeouts.
         //
         Udp4RecycleRxDataWrap (NULL, (VOID *) Wrap);
       } else {
-        Wrap->TimeoutTick -= UDP4_TIMEOUT_INTERVAL / 1000;
+        Wrap->TimeoutTick -= UDP4_TIMEOUT_INTERVAL / 10;
       }
     }
   }
