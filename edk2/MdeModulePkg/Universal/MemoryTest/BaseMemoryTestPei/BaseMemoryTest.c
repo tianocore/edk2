@@ -40,8 +40,8 @@ EFI_PEI_PPI_DESCRIPTOR   PpiListPeiBaseMemoryTest = {
 EFI_STATUS
 EFIAPI
 PeiBaseMemoryTestInit (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_FFS_FILE_HEADER       *FfsHeader,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
   )
 {
   return PeiServicesInstallPpi (&PpiListPeiBaseMemoryTest);
