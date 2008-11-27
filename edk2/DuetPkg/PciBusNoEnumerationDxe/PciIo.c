@@ -370,7 +370,7 @@ Returns:
     Count = 1;
   }
 
-  Width &= 0x03;
+  Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & 0x03);
 
   if ((*Offset + Count * ((UINTN)1 << Width)) - 1 >= PciIoDevice->PciBar[BarIndex].Length) {
     return EFI_INVALID_PARAMETER;
@@ -412,7 +412,7 @@ Returns:
   // If Width is EfiPciIoWidthFifoUintX then convert to EfiPciIoWidthUintX
   // If Width is EfiPciIoWidthFillUintX then convert to EfiPciIoWidthUintX
   //
-  Width &= 0x03;
+  Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & 0x03);
 
   if (PciIoDevice->IsPciExp) {
     if ((*Offset + Count * ((UINTN)1 << Width)) - 1 >= PCI_EXP_MAX_CONFIG_OFFSET) {
@@ -951,7 +951,7 @@ Returns:
   }
 
   if (PciIoDevice->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) {
-    Operation = Operation + EfiPciOperationBusMasterRead64;
+    Operation = (EFI_PCI_IO_PROTOCOL_OPERATION) (Operation + EfiPciOperationBusMasterRead64);
   }
 
   Status = PciIoDevice->PciRootBridgeIo->Map (
@@ -1865,5 +1865,5 @@ Returns:
     return TRUE;
   }
 
-  return (PciDeviceExisted (PciDevice1->Parent, PciDevice2)|| PciDeviceExisted (PciDevice2->Parent, PciDevice1));
+  return (BOOLEAN) ((PciDeviceExisted (PciDevice1->Parent, PciDevice2)|| PciDeviceExisted (PciDevice2->Parent, PciDevice1)));
 }

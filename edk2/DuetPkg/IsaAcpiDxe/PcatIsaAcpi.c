@@ -92,7 +92,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Controller,  
                   &gEfiPciIoProtocolGuid, 
-                  &PciIo,
+                  (VOID**)&PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -171,7 +171,7 @@ Returns:
   Status = gBS->OpenProtocol (
                   Controller,       
                   &gEfiPciIoProtocolGuid, 
-                  &PciIo,
+                  (VOID**)&PciIo,
                   This->DriverBindingHandle,   
                   Controller,   
                   EFI_OPEN_PROTOCOL_BY_DRIVER 
@@ -197,7 +197,7 @@ Returns:
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   sizeof(PCAT_ISA_ACPI_DEV),
-                  &PcatIsaAcpiDev
+                  (VOID**)&PcatIsaAcpiDev
                   );
   if (EFI_ERROR (Status)) {
     goto Done;
@@ -284,7 +284,7 @@ PcatIsaAcpiDriverBindingStop (
   Status = gBS->OpenProtocol (
                   Controller, 
                   &gEfiIsaAcpiProtocolGuid, 
-                  &IsaAcpi,
+                  (VOID**)&IsaAcpi,
                   This->DriverBindingHandle,   
                   Controller,   
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
