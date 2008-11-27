@@ -129,8 +129,8 @@ Abstract:
 #include EFI_PROTOCOL_DEFINITION(ManagedNetwork)
 #include EFI_PROTOCOL_DEFINITION(Arp)
 #include EFI_PROTOCOL_DEFINITION(Dhcp4)
-#include EFI_PROTOCOL_DEFINITION(IP4)
-#include EFI_PROTOCOL_DEFINITION(IP4Config)
+#include EFI_PROTOCOL_DEFINITION(Ip4)
+#include EFI_PROTOCOL_DEFINITION(Ip4Config)
 #include EFI_PROTOCOL_DEFINITION(Tcp4)
 #include EFI_PROTOCOL_DEFINITION(Udp4)
 #include EFI_PROTOCOL_DEFINITION(Mtftp4)
@@ -158,19 +158,19 @@ Abstract:
 #include "TianoSpecDevicePath.h"
 #include "EfiDriverLib.h"
 
-#include "Common\EdkIIGlueDefinitionChangesBase.h"
+#include "Common/EdkIIGlueDefinitionChangesBase.h"
 
 //
 // EdkII Glue Library Class headers
 //
 
 #include "EdkIIGlueBase.h"
-#include "Library\EdkIIGlueUefiDecompressLib.h"
-#include "Library\EdkIIGlueDevicePathLib.h"
-#include "Library\EdkIIGlueUefiBootServicesTableLib.h"
-#include "Library\EdkIIGlueUefiDriverEntryPoint.h"
-#include "Library\EdkIIGlueUefiDriverModelLib.h"
-#include "Library\EdkIIGlueUefiLib.h"
-#include "Library\EdkIIGlueUefiRuntimeServicesTableLib.h"
+#include "Library/EdkIIGlueUefiDecompressLib.h"
+#include "Library/EdkIIGlueDevicePathLib.h"
+#include "Library/EdkIIGlueUefiBootServicesTableLib.h"
+#include "Library/EdkIIGlueUefiDriverEntryPoint.h"
+#include "Library/EdkIIGlueUefiDriverModelLib.h"
+#include "Library/EdkIIGlueUefiLib.h"
+#include "Library/EdkIIGlueUefiRuntimeServicesTableLib.h"
 
 #endif

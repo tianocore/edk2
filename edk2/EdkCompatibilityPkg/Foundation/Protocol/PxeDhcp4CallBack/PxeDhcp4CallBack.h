@@ -20,7 +20,7 @@ Abstract:
 #ifndef _PXE_DHCP4CALLBACK_H
 #define _PXE_DHCP4CALLBACK_H
 
-#include "..\PxeDhcp4\PxeDhcp4.h"
+#include EFI_PROTOCOL_DEFINITION (PxeDhcp4)
 
 //
 // GUID definition
