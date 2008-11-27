@@ -59,17 +59,16 @@ CONST EFI_PEI_PPI_DESCRIPTOR     gEndOfPeiSignalPpi = {
 /**
   Initializes the Dxe Ipl PPI
 
-  @param  FfsHandle   The handle of FFS file.
-  @param  PeiServices General purpose services available to
-                      every PEIM.
-  @return EFI_SUCESS
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
 
+  @return EFI_SUCESS
 **/
 EFI_STATUS
 EFIAPI
 PeimInitializeDxeIpl (
-  IN       EFI_PEI_FILE_HANDLE       FfsHandle,
-  IN CONST EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
   EFI_STATUS                                Status;
@@ -81,7 +80,7 @@ PeimInitializeDxeIpl (
   BootMode = GetBootModeHob ();
 
   if (BootMode != BOOT_ON_S3_RESUME) {
-    Status = PeiServicesRegisterForShadow (FfsHandle);
+    Status = PeiServicesRegisterForShadow (FileHandle);
     if (Status == EFI_SUCCESS) {
       //
       // EFI_SUCESS means the first time call register for shadow 

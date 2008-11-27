@@ -30,8 +30,8 @@ EFI_PEI_PPI_DESCRIPTOR   PpiListPeiBaseMemoryTest = {
   This function is the entry point of BaseMemoryTestPei PEIM.
   It installs the PEI_BASE_MEMORY_TEST_PPI.
 
-  @param  FfsHeader      Pointer to FFS File Header.
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
 
   @retval EFI_SUCCESS    PEI_BASE_MEMORY_TEST_PPI is successfully installed.
   @retval Others         PEI_BASE_MEMORY_TEST_PPI is not successfully installed.
@@ -40,8 +40,8 @@ EFI_PEI_PPI_DESCRIPTOR   PpiListPeiBaseMemoryTest = {
 EFI_STATUS
 EFIAPI
 PeiBaseMemoryTestInit (
-  IN       EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN CONST EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
   return PeiServicesInstallPpi (&PpiListPeiBaseMemoryTest);
