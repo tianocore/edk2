@@ -23,7 +23,7 @@ Abstract:
 #include "Thunk16Lib.h"
 #include "EfiCommonLib.h"
 
-#define IA32API __cdecl
+#define IA32API EFIAPI
 
 extern CONST UINTN                  mCode16Size;
 

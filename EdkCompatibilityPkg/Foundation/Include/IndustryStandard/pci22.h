@@ -35,7 +35,7 @@ Revision History
 //
 #define PCI_VGA_PALETTE_SNOOP_DISABLED  0x20
 
-#pragma pack(push, 1)
+#pragma pack(1)
 typedef struct {
   UINT16  VendorId;
   UINT16  DeviceId;
@@ -544,7 +544,7 @@ typedef struct {
 #define PCI_BAR_IDX5        0x05
 #define PCI_BAR_ALL         0xFF
 
-#pragma pack(pop)
+#pragma pack()
 
 //
 // NOTE: The following header files are included here for

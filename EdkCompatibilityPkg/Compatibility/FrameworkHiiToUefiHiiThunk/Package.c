@@ -22,6 +22,9 @@ BOOLEAN mInFrameworkHiiRemovePack = FALSE;
 BOOLEAN mInFrameworkUpdatePakcage = FALSE;
 UINT64  mGuidCount = 0;
 
+EFI_GUID mGuidBase = { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e }};
+
+
 
 /**
   Get the number of package IFR and STRING packages in the package list passed in.
@@ -357,9 +360,7 @@ GenerateRandomGuid (
   OUT           EFI_GUID * Guid
   )
 {
-  EFI_GUID        GuidBase = { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x39, 0x5, 0x10, 0x7e }};
-
-  CopyGuid (Guid, &GuidBase);
+  CopyGuid (Guid, &mGuidBase);
 
   mGuidCount++;  
   *((UINT64 *) Guid) = *((UINT64 *) Guid) + mGuidCount;

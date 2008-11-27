@@ -189,7 +189,11 @@ typedef int64_t   intn_t;
 // Inject a break point in the code to assist debugging.
 //
 #define EFI_DEADLOOP()    { volatile int __iii; __iii = 1; while (__iii); }
-#define EFI_BREAKPOINT()  __debugbreak()
+#if _MSC_EXTENSIONS 
+  #define EFI_BREAKPOINT()  __debugbreak()
+#elif __GNUC__
+  #define EFI_BREAKPOINT() asm("   int $3");
+#endif
 
 //
 // Memory Fence forces serialization, and is needed to support out of order
