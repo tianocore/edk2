@@ -74,7 +74,7 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiFrameworkLoadFile = {
 EFI_STATUS
 EFIAPI
 InitPeim (
-  IN EFI_FFS_FILE_HEADER     *FfsHeader,
+  IN EFI_PEI_FILE_HANDLE     FfsHeader,
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
