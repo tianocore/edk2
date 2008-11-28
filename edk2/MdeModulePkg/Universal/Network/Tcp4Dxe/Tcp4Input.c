@@ -328,7 +328,7 @@ TcpTrimSegment (
       }
     }
 
-    if (Drop) {
+    if (Drop != 0) {
       NetbufTrim (Nbuf, Drop, NET_BUF_HEAD);
     }
   }
@@ -346,7 +346,7 @@ TcpTrimSegment (
       Drop--;
     }
 
-    if (Drop) {
+    if (Drop != 0) {
       NetbufTrim (Nbuf, Drop, NET_BUF_TAIL);
     }
   }
@@ -735,7 +735,7 @@ TcpInput (
   Len     = Nbuf->TotalSize - (Head->HeadLen << 2);
 
   if ((Head->HeadLen < 5) || (Len < 0) ||
-      TcpChecksum (Nbuf, NetPseudoHeadChecksum (Src, Dst, 6, 0))) {
+      (TcpChecksum (Nbuf, NetPseudoHeadChecksum (Src, Dst, 6, 0)) != 0)) {
 
     DEBUG ((EFI_D_INFO, "TcpInput: received an mal-formated packet\n"));
     goto DISCARD;
@@ -953,7 +953,7 @@ TcpInput (
   //
   // First step: Check whether SEG.SEQ is acceptable
   //
-  if (!TcpSeqAcceptable (Tcb, Seg)) {
+  if (TcpSeqAcceptable (Tcb, Seg) == 0) {
     DEBUG ((EFI_D_WARN, "TcpInput: sequence acceptance"
       " test failed for segment of TCB %p\n", Tcb));
 
@@ -1371,13 +1371,13 @@ StepSix:
   // Tcb is a new child of the listening Parent,
   // commit it.
   //
-  if (Parent) {
+  if (Parent != NULL) {
     Tcb->Parent = Parent;
     TcpInsertTcb (Tcb);
   }
 
   if ((Tcb->State != TCP_CLOSED) &&
-      (!TcpToSendData (Tcb, 0)) &&
+      (TcpToSendData (Tcb, 0) == 0) &&
       (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW) || Nbuf->TotalSize)) {
 
     TcpToSendAck (Tcb);
@@ -1409,7 +1409,7 @@ DISCARD:
   DEBUG ((EFI_D_WARN, "Tcp4Input: Discard a packet\n"));
   NetbufFree (Nbuf);
 
-  if (Parent && Tcb) {
+  if ((Parent != NULL) && (Tcb != NULL)) {
 
     ASSERT (Tcb->Sk);
     TcpClose (Tcb);

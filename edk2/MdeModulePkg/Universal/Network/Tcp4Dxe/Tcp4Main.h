@@ -64,12 +64,12 @@ typedef struct _TCP4_ROUTE_INFO {
 EFI_STATUS
 EFIAPI
 Tcp4GetModeData (
-  IN  CONST EFI_TCP4_PROTOCOL                  * This,
-  OUT       EFI_TCP4_CONNECTION_STATE          * Tcp4State OPTIONAL,
-  OUT       EFI_TCP4_CONFIG_DATA               * Tcp4ConfigData OPTIONAL,
-  OUT       EFI_IP4_MODE_DATA                  * Ip4ModeData OPTIONAL,
-  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA    * MnpConfigData OPTIONAL,
-  OUT       EFI_SIMPLE_NETWORK_MODE            * SnpModeData OPTIONAL
+  IN  CONST EFI_TCP4_PROTOCOL                  *This,
+  OUT       EFI_TCP4_CONNECTION_STATE          *Tcp4State OPTIONAL,
+  OUT       EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData OPTIONAL,
+  OUT       EFI_IP4_MODE_DATA                  *Ip4ModeData OPTIONAL,
+  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData OPTIONAL,
+  OUT       EFI_SIMPLE_NETWORK_MODE            *SnpModeData OPTIONAL
   );
 
 //
@@ -78,8 +78,8 @@ Tcp4GetModeData (
 EFI_STATUS
 EFIAPI
 Tcp4Configure (
-  IN EFI_TCP4_PROTOCOL        * This,
-  IN EFI_TCP4_CONFIG_DATA     * TcpConfigData OPTIONAL
+  IN EFI_TCP4_PROTOCOL        *This,
+  IN EFI_TCP4_CONFIG_DATA     *TcpConfigData OPTIONAL
   );
 
 //
@@ -133,6 +133,7 @@ Tcp4Transmit (
 // through this TCP instance
 //
 EFI_STATUS
+EFIAPI
 Tcp4Receive (
   IN EFI_TCP4_PROTOCOL           *This,
   IN EFI_TCP4_IO_TOKEN           *Token
@@ -155,8 +156,8 @@ Tcp4Close (
 EFI_STATUS
 EFIAPI
 Tcp4Cancel (
-  IN EFI_TCP4_PROTOCOL           * This,
-  IN EFI_TCP4_COMPLETION_TOKEN   * Token OPTIONAL
+  IN EFI_TCP4_PROTOCOL           *This,
+  IN EFI_TCP4_COMPLETION_TOKEN   *Token OPTIONAL
   );
 
 //

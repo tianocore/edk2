@@ -235,7 +235,7 @@ TcpDataToSend (
     Len = Tcb->SndMss;
   }
 
-  if (Force || (Len == 0 && Left == 0)) {
+  if ((Force != 0)|| (Len == 0 && Left == 0)) {
     return Len;
   }
 
@@ -528,7 +528,7 @@ TcpGetSegmentSndQue (
   //
   // copy data to the segment
   //
-  if (CopyLen) {
+  if (CopyLen != 0) {
     Data = NetbufAllocSpace (Nbuf, CopyLen, NET_BUF_TAIL);
     ASSERT (Data);
 
@@ -587,7 +587,7 @@ TcpGetSegmentSock (
 
   DataGet = 0;
 
-  if (Len) {
+  if (Len != 0) {
     //
     // copy data to the segment.
     //
@@ -762,7 +762,7 @@ SEND_AGAIN:
 
   Flag  = mTcpOutFlag[Tcb->State];
 
-  if (Flag & TCP_FLG_SYN) {
+  if ((Flag & TCP_FLG_SYN) != 0) {
 
     Seq = Tcb->Iss;
     Len = 0;
@@ -772,7 +772,8 @@ SEND_AGAIN:
   // only send a segment without data if SYN or
   // FIN is set.
   //
-  if ((Len == 0) && !(Flag & (TCP_FLG_SYN | TCP_FLG_FIN))) {
+  if ((Len == 0) && 
+      ((Flag & (TCP_FLG_SYN | TCP_FLG_FIN)) == 0)) {
     return Sent;
   }
 
@@ -799,7 +800,7 @@ SEND_AGAIN:
     End++;
   }
 
-  if (Flag & TCP_FLG_FIN) {
+  if ((Flag & TCP_FLG_FIN) != 0) {
     //
     // Send FIN if all data is sent, and FIN is
     // in the window
@@ -843,7 +844,7 @@ SEND_AGAIN:
     NetbufTrim (Nbuf, (Nbuf->Tcp->HeadLen << 2), NET_BUF_HEAD);
     Nbuf->Tcp = NULL;
 
-    if (Flag & TCP_FLG_FIN) {
+    if ((Flag & TCP_FLG_FIN) != 0)  {
       TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_FIN_SENT);
     }
 
@@ -867,7 +868,7 @@ SEND_AGAIN:
   //
   Tcb->DelayedAck = 0;
 
-  if (Flag & TCP_FLG_FIN) {
+  if ((Flag & TCP_FLG_FIN) != 0) {
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_FIN_SENT);
   }
 

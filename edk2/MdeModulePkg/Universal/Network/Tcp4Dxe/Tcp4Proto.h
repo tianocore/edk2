@@ -31,7 +31,7 @@ typedef struct _TCP_CB  TCP_CB;
 // tcp states, Don't change their order, it is used as
 // index to mTcpOutFlag and other macros
 //
-enum {
+typedef enum {
   TCP_CLOSED      = 0,
   TCP_LISTEN,
   TCP_SYN_SENT,
@@ -43,12 +43,12 @@ enum {
   TCP_TIME_WAIT,
   TCP_CLOSE_WAIT,
   TCP_LAST_ACK
-};
+} TCP_STATES;
 
 //
 // flags in the TCP header
 //
-enum {
+typedef enum {
 
   TCP_FLG_FIN     = 0x01,
   TCP_FLG_SYN     = 0x02,
@@ -57,9 +57,9 @@ enum {
   TCP_FLG_ACK     = 0x10,
   TCP_FLG_URG     = 0x20,
   TCP_FLG_FLAG    = 0x3F  // mask for all the flags
-};
+} TCP_HEADER_FLAG;
 
-enum {
+typedef enum {
 
   //
   // TCP error status
@@ -145,7 +145,7 @@ enum {
   TCP_KEEPALIVE_PERIOD_MIN= TCP_TICK_HZ *30,
   TCP_FIN_WAIT2_TIME_MAX  = 4 *TCP_TICK_HZ,
   TCP_TIME_WAIT_TIME_MAX  = 60 *TCP_TICK_HZ
-};
+} TCP_MISC_VALUES;
 
 typedef struct _TCP_SEG {
   TCP_SEQNO Seq;  // Starting sequence number

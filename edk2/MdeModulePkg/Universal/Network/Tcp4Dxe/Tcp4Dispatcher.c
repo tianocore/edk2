@@ -101,11 +101,11 @@ Tcp4GetMode (
     return EFI_NOT_STARTED;
   }
 
-  if (Mode->Tcp4State) {
+  if (Mode->Tcp4State != NULL) {
     *(Mode->Tcp4State) = (EFI_TCP4_CONNECTION_STATE) Tcb->State;
   }
 
-  if (Mode->Tcp4ConfigData) {
+  if (Mode->Tcp4ConfigData != NULL) {
 
     ConfigData                      = Mode->Tcp4ConfigData;
     AccessPoint                     = &(ConfigData->AccessPoint);
@@ -220,13 +220,13 @@ Tcp4Bind (
 
 
 /**
-  Flush the Tcb add its associated protocols..
+  Flush the Tcb add its associated protocols.
 
   @param  Tcb                    Pointer to the TCP_CB to be flushed.
 
-  @retval EFI_SUCCESS            The operation is completed successfully.
+  None
 
-**/
+ **/
 VOID
 Tcp4FlushPcb (
   IN TCP_CB *Tcb
@@ -329,7 +329,6 @@ Tcp4DetachPcb (
   Configure the Tcb using CfgData.
 
   @param  Sk                     Pointer to the socket of this TCP instance.
-  @param  SkTcb                  Pointer to the TCP_CB of this TCP instance.
   @param  CfgData                Pointer to the TCP configuration data.
 
   @retval EFI_SUCCESS            The operation is completed successfully.

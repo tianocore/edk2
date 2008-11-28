@@ -477,7 +477,7 @@ TcpGetIss (
 /**
   Get the local mss.
 
-  None
+  @param  Sock        Pointer to the socket to get mss
 
   @return The mss size.
 
