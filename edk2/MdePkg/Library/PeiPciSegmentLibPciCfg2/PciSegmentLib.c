@@ -1198,24 +1198,20 @@ PciSegmentBitFieldAndThenOr32 (
 /**
   Reads a range of PCI configuration registers into a caller supplied buffer.
 
-  Reads the range of PCI configuration registers specified by StartAddress and
-  Size into the buffer specified by Buffer. This function only allows the PCI
-  configuration registers from a single PCI function to be read. Size is
-  returned. When possible 32-bit PCI configuration read cycles are used to read
-  from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit
-  and 16-bit PCI configuration read cycles may be used at the beginning and the
-  end of the range.
-
-  If StartAddress > 0x0FFFFFFF, then ASSERT().
+  Reads the range of PCI configuration registers specified by StartAddress
+  and Size into the buffer specified by Buffer.
+  This function only allows the PCI configuration registers from a single PCI function to be read.
+  Size is returned.
+  
+  If any reserved bits in StartAddress are set, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
-                        Function and Register.
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer receiving the data read.
 
-  @return Size
+  @return The parameter of Size.
 
 **/
 UINTN
@@ -1294,23 +1290,18 @@ PciSegmentReadBuffer (
 
 
 /**
-  Copies the data in a caller supplied buffer to a specified range of PCI
-  configuration space.
+  Copies the data in a caller supplied buffer to a specified range of PCI configuration space.
 
-  Writes the range of PCI configuration registers specified by StartAddress and
-  Size from the buffer specified by Buffer. This function only allows the PCI
-  configuration registers from a single PCI function to be written. Size is
-  returned. When possible 32-bit PCI configuration write cycles are used to
-  write from StartAdress to StartAddress + Size. Due to alignment restrictions,
-  8-bit and 16-bit PCI configuration write cycles may be used at the beginning
-  and the end of the range.
-
-  If StartAddress > 0x0FFFFFFF, then ASSERT().
+  Writes the range of PCI configuration registers specified by StartAddress
+  and Size from the buffer specified by Buffer.
+  This function only allows the PCI configuration registers from a single PCI function to be written.
+  Size is returned.
+  
+  If any reserved bits in StartAddress are set, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
-                        Function and Register.
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
 
