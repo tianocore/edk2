@@ -192,15 +192,13 @@ PciSegmentRegisterForRuntimeAccess (
   Reads an 8-bit PCI configuration register.
 
   Reads and returns the 8-bit PCI configuration register specified by Address.
-  This function must guarantee that all PCI read and write operations are
-  serialized.
-
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-
-  @return The value read from the PCI configuration register.
+  @return The 8-bit PCI configuration register specified by Address.
 
 **/
 UINT8
@@ -217,15 +215,13 @@ PciSegmentRead8 (
 /**
   Writes an 8-bit PCI configuration register.
 
-  Writes the 8-bit PCI configuration register specified by Address with the
-  value specified by Value. Value is returned. This function must guarantee
-  that all PCI read and write operations are serialized.
+  Writes the 8-bit PCI configuration register specified by Address with the value specified by Value.
+  Value is returned.  This function must guarantee that all PCI read and write operations are serialized.
+  
+  If Address > 0x0FFFFFFF, then ASSERT().
 
-  If any reserved bits in Address are set, then ASSERT().
-
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  Data    The value to write.
+  @param  Address     Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Value       The value to write.
 
   @return The value written to the PCI configuration register.
 
@@ -234,32 +230,29 @@ UINT8
 EFIAPI
 PciSegmentWrite8 (
   IN      UINT64                    Address,
-  IN      UINT8                     Data
+  IN      UINT8                     Value
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 0);
 
-  return (UINT8) PeiPciSegmentLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint8, Data);
+  return (UINT8) PeiPciSegmentLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint8, Value);
 }
 
 /**
-  Performs a bitwise inclusive OR of an 8-bit PCI configuration register with
-  an 8-bit value.
+  Performs a bitwise inclusive OR of an 8-bit PCI configuration register with an 8-bit value.
 
-  Reads the 8-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
-  OrData, and writes the result to the 8-bit PCI configuration register
-  specified by Address. The value written to the PCI configuration register is
-  returned. This function must guarantee that all PCI read and write operations
-  are serialized.
-
+  Reads the 8-bit PCI configuration register specified by Address,
+  performs a bitwise inclusive OR between the read result and the value specified by OrData,
+  and writes the result to the 8-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  OrData  The value to OR with the PCI configuration register.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  OrData    The value to OR with the PCI configuration register.
 
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT8
@@ -530,15 +523,14 @@ PciSegmentBitFieldAndThenOr8 (
   Reads a 16-bit PCI configuration register.
 
   Reads and returns the 16-bit PCI configuration register specified by Address.
-  This function must guarantee that all PCI read and write operations are
-  serialized.
-
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-
-  @return The value read from the PCI configuration register.
+  @return The 16-bit PCI configuration register specified by Address.
 
 **/
 UINT16
@@ -555,29 +547,28 @@ PciSegmentRead16 (
 /**
   Writes a 16-bit PCI configuration register.
 
-  Writes the 16-bit PCI configuration register specified by Address with the
-  value specified by Value. Value is returned. This function must guarantee
-  that all PCI read and write operations are serialized.
-
+  Writes the 16-bit PCI configuration register specified by Address with the value specified by Value.
+  Value is returned.  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  Data    The value to write.
+  @param  Address     Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Value       The value to write.
 
-  @return The value written to the PCI configuration register.
+  @return The parameter of Value.
 
 **/
 UINT16
 EFIAPI
 PciSegmentWrite16 (
   IN      UINT64                    Address,
-  IN      UINT16                    Data
+  IN      UINT16                    Value
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 1);
 
-  return (UINT16) PeiPciSegmentLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint16, Data);
+  return (UINT16) PeiPciSegmentLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint16, Value);
 }
 
 /**
@@ -592,6 +583,7 @@ PciSegmentWrite16 (
   are serialized.
 
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
                   Register.
@@ -639,25 +631,24 @@ PciSegmentAnd16 (
 }
 
 /**
-  Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit
-  value, followed a  bitwise inclusive OR with another 16-bit value.
-
-  Reads the 16-bit PCI configuration register specified by Address, performs a
-  bitwise AND between the read result and the value specified by AndData,
-  performs a bitwise inclusive OR between the result of the AND operation and
-  the value specified by OrData, and writes the result to the 16-bit PCI
-  configuration register specified by Address. The value written to the PCI
-  configuration register is returned. This function must guarantee that all PCI
-  read and write operations are serialized.
-
+  Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit value,
+  followed a  bitwise inclusive OR with another 16-bit value.
+  
+  Reads the 16-bit PCI configuration register specified by Address,
+  performs a bitwise AND between the read result and the value specified by AndData,
+  performs a bitwise inclusive OR between the result of the AND operation and the value specified by OrData,
+  and writes the result to the 16-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  AndData The value to AND with the PCI configuration register.
-  @param  OrData  The value to OR with the result of the AND operation.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  AndData    The value to AND with the PCI configuration register.
+  @param  OrData    The value to OR with the PCI configuration register.
 
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT16
@@ -679,6 +670,7 @@ PciSegmentAndThenOr16 (
   returned.
 
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -712,6 +704,7 @@ PciSegmentBitFieldRead16 (
   16-bit register is returned.
 
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -742,17 +735,12 @@ PciSegmentBitFieldWrite16 (
 }
 
 /**
-  Reads a bit field in a 16-bit PCI configuration, performs a bitwise OR, and
-  writes the result back to the bit field in the 16-bit port.
-
-  Reads the 16-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
-  OrData, and writes the result to the 16-bit PCI configuration register
-  specified by Address. The value written to the PCI configuration register is
-  returned. This function must guarantee that all PCI read and write operations
-  are serialized. Extra left bits in OrData are stripped.
+  Reads the 16-bit PCI configuration register specified by Address,
+  performs a bitwise inclusive OR between the read result and the value specified by OrData,
+  and writes the result to the 16-bit PCI configuration register specified by Address. 
 
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -872,15 +860,14 @@ PciSegmentBitFieldAndThenOr16 (
   Reads a 32-bit PCI configuration register.
 
   Reads and returns the 32-bit PCI configuration register specified by Address.
-  This function must guarantee that all PCI read and write operations are
-  serialized.
-
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
 
-  @return The value read from the PCI configuration register.
+  @return The 32-bit PCI configuration register specified by Address.
 
 **/
 UINT32
@@ -897,49 +884,46 @@ PciSegmentRead32 (
 /**
   Writes a 32-bit PCI configuration register.
 
-  Writes the 32-bit PCI configuration register specified by Address with the
-  value specified by Value. Value is returned. This function must guarantee
-  that all PCI read and write operations are serialized.
-
+  Writes the 32-bit PCI configuration register specified by Address with the value specified by Value.
+  Value is returned.  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  Data    The value to write.
+  @param  Address     Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Value       The value to write.
 
-  @return The value written to the PCI configuration register.
+  @return The parameter of Value.
 
 **/
 UINT32
 EFIAPI
 PciSegmentWrite32 (
   IN      UINT64                    Address,
-  IN      UINT32                    Data
+  IN      UINT32                    Value
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 3);
 
-  return PeiPciSegmentLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint32, Data);
+  return PeiPciSegmentLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint32, Value);
 }
 
 /**
-  Performs a bitwise inclusive OR of a 32-bit PCI configuration register with
-  a 32-bit value.
+  Performs a bitwise inclusive OR of a 32-bit PCI configuration register with a 32-bit value.
 
-  Reads the 32-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
-  OrData, and writes the result to the 32-bit PCI configuration register
-  specified by Address. The value written to the PCI configuration register is
-  returned. This function must guarantee that all PCI read and write operations
-  are serialized.
-
+  Reads the 32-bit PCI configuration register specified by Address,
+  performs a bitwise inclusive OR between the read result and the value specified by OrData,
+  and writes the result to the 32-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
+  
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
-                  Register.
-  @param  OrData  The value to OR with the PCI configuration register.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  OrData    The value to OR with the PCI configuration register.
 
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT32
@@ -1020,6 +1004,7 @@ PciSegmentAndThenOr32 (
   returned.
 
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1053,6 +1038,7 @@ PciSegmentBitFieldRead32 (
   32-bit register is returned.
 
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1306,6 +1292,7 @@ PciSegmentReadBuffer (
   return ReturnValue;
 }
 
+
 /**
   Copies the data in a caller supplied buffer to a specified range of PCI
   configuration space.
@@ -1327,7 +1314,7 @@ PciSegmentReadBuffer (
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
 
-  @return Size
+  @return The parameter of Size.
 
 **/
 UINTN
