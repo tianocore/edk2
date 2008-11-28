@@ -117,7 +117,7 @@ PciSegmentRead8 (
   @param  Address     Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  Value       The value to write.
 
-  @return The parameter of Value.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT8
@@ -205,22 +205,22 @@ PciSegmentAndThenOr8 (
 /**
   Reads a bit field of a PCI configuration register.
 
-  Reads the bit field in an 8-bit PCI configuration register.
-  The bit field is specified by the StartBit and the EndBit.
-  The value of the bit field is returned.
-  
+  Reads the bit field in an 8-bit PCI configuration register. The bit field is
+  specified by the StartBit and the EndBit. The value of the bit field is
+  returned.
+
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
+                    Range 0..7.
 
-  @return The value of the bit field.
+  @return The value of the bit field read from the PCI configuration register.
 
 **/
 UINT8
@@ -234,23 +234,24 @@ PciSegmentBitFieldRead8 (
 /**
   Writes a bit field to a PCI configuration register.
 
-  Writes Value to the bit field of the PCI configuration register.
-  The bit field is specified by the StartBit and the EndBit.
-  All other bits in the destination PCI configuration register are preserved.
-  The new value of the 8-bit register is returned.
+  Writes Value to the bit field of the PCI configuration register. The bit
+  field is specified by the StartBit and the EndBit. All other bits in the
+  destination PCI configuration register are preserved. The new value of the
+  8-bit register is returned.
+
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
+                    Range 0..7.
   @param  Value     New value of the bit field.
 
-  @return The new value of the 8-bit register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT8
@@ -263,23 +264,29 @@ PciSegmentBitFieldWrite8 (
   );
 
 /**
-  Reads the 8-bit PCI configuration register specified by Address,
-  performs a bitwise inclusive OR between the read result and the value specified by OrData,
-  and writes the result to the 8-bit PCI configuration register specified by Address. 
-  
+  Reads a bit field in an 8-bit PCI configuration, performs a bitwise OR, and
+  writes the result back to the bit field in the 8-bit port.
+
+  Reads the 8-bit PCI configuration register specified by Address, performs a
+  bitwise inclusive OR between the read result and the value specified by
+  OrData, and writes the result to the 8-bit PCI configuration register
+  specified by Address. The value written to the PCI configuration register is
+  returned. This function must guarantee that all PCI read and write operations
+  are serialized. Extra left bits in OrData are stripped.
+
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
-  @param  OrData    The value to OR with the read value from the PCI configuration register.
+                    Range 0..7.
+  @param  OrData    The value to OR with the PCI configuration register.
 
-  @return The value written to the PCI configuration register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT8
@@ -292,29 +299,29 @@ PciSegmentBitFieldOr8 (
   );
 
 /**
-  Reads a bit field in an 8-bit PCI configuration, performs a bitwise OR,
-  and writes the result back to the bit field in the 8-bit port.
+  Reads a bit field in an 8-bit PCI configuration register, performs a bitwise
+  AND, and writes the result back to the bit field in the 8-bit register.
 
-  Reads the 8-bit PCI configuration register specified by Address,
-  performs a bitwise inclusive OR between the read result and the value specified by OrData,
-  and writes the result to the 8-bit PCI configuration register specified by Address.
-  The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are serialized.
-  Extra left bits in OrData are stripped.
-  
+  Reads the 8-bit PCI configuration register specified by Address, performs a
+  bitwise AND between the read result and the value specified by AndData, and
+  writes the result to the 8-bit PCI configuration register specified by
+  Address. The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are
+  serialized. Extra left bits in AndData are stripped.
+
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
-  @param  AndData   The value to AND with the read value from the PCI configuration register.
+                    Range 0..7.
+  @param  AndData   The value to AND with the PCI configuration register.
 
-  @return The value written to the PCI configuration register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT8
@@ -327,30 +334,32 @@ PciSegmentBitFieldAnd8 (
   );
 
 /**
-  Reads a bit field in an 8-bit PCI configuration register, performs a bitwise AND,
-  and writes the result back to the bit field in the 8-bit register.
- 
-  Reads the 8-bit PCI configuration register specified by Address,
-  performs a bitwise AND between the read result and the value specified by AndData,
-  and writes the result to the 8-bit PCI configuration register specified by Address.
-  The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are serialized.
-  Extra left bits in AndData are stripped.
-  
+  Reads a bit field in an 8-bit port, performs a bitwise AND followed by a
+  bitwise inclusive OR, and writes the result back to the bit field in the
+  8-bit port.
+
+  Reads the 8-bit PCI configuration register specified by Address, performs a
+  bitwise AND followed by a bitwise inclusive OR between the read result and
+  the value specified by AndData, and writes the result to the 8-bit PCI
+  configuration register specified by Address. The value written to the PCI
+  configuration register is returned. This function must guarantee that all PCI
+  read and write operations are serialized. Extra left bits in both AndData and
+  OrData are stripped.
+
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..7.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
-  @param  AndData   The value to AND with the read value from the PCI configuration register.
-  @param  OrData    The value to OR with the read value from the PCI configuration register.
+                    Range 0..7.
+  @param  AndData   The value to AND with the PCI configuration register.
+  @param  OrData    The value to OR with the result of the AND operation.
 
-  @return The value written to the PCI configuration register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT8
@@ -406,21 +415,24 @@ PciSegmentWrite16 (
   );
 
 /**
-  Performs a bitwise inclusive OR of a 16-bit PCI configuration register with a 16-bit value.
+  Performs a bitwise inclusive OR of a 16-bit PCI configuration register with
+  a 16-bit value.
 
-  Reads the 16-bit PCI configuration register specified by Address,
-  performs a bitwise inclusive OR between the read result and the value specified by OrData,
-  and writes the result to the 16-bit PCI configuration register specified by Address.
-  The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are serialized.
-  
+  Reads the 16-bit PCI configuration register specified by Address, performs a
+  bitwise inclusive OR between the read result and the value specified by
+  OrData, and writes the result to the 16-bit PCI configuration register
+  specified by Address. The value written to the PCI configuration register is
+  returned. This function must guarantee that all PCI read and write operations
+  are serialized.
+
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
-  @param  OrData    The value to OR with the PCI configuration register.
+  @param  Address Address that encodes the PCI Segment, Bus, Device, Function and
+                  Register.
+  @param  OrData  The value to OR with the PCI configuration register.
 
-  @return The value written to the PCI configuration register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT16
@@ -487,23 +499,23 @@ PciSegmentAndThenOr16 (
 /**
   Reads a bit field of a PCI configuration register.
 
-  Reads the bit field in a 16-bit PCI configuration register.
-  The bit field is specified by the StartBit and the EndBit.
-  The value of the bit field is returned.
-  
+  Reads the bit field in a 16-bit PCI configuration register. The bit field is
+  specified by the StartBit and the EndBit. The value of the bit field is
+  returned.
+
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
-  If StartBit is greater than 7, then ASSERT().
-  If EndBit is greater than 7, then ASSERT().
+  If StartBit is greater than 15, then ASSERT().
+  If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
+                    Range 0..15.
 
-  @return The value of the bit field.
+  @return The value of the bit field read from the PCI configuration register.
 
 **/
 UINT16
@@ -517,25 +529,25 @@ PciSegmentBitFieldRead16 (
 /**
   Writes a bit field to a PCI configuration register.
 
-  Writes Value to the bit field of the PCI configuration register.
-  The bit field is specified by the StartBit and the EndBit.
-  All other bits in the destination PCI configuration register are preserved.
-  The new value of the 16-bit register is returned.
-  
+  Writes Value to the bit field of the PCI configuration register. The bit
+  field is specified by the StartBit and the EndBit. All other bits in the
+  destination PCI configuration register are preserved. The new value of the
+  16-bit register is returned.
+
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
-  If StartBit is greater than 7, then ASSERT().
-  If EndBit is greater than 7, then ASSERT().
+  If StartBit is greater than 15, then ASSERT().
+  If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
+                    Range 0..15.
   @param  Value     New value of the bit field.
 
-  @return The new value of the 16-bit register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT16
@@ -558,14 +570,14 @@ PciSegmentBitFieldWrite16 (
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
-  @param  OrData    The value to OR with the read value from the PCI configuration register.
+                    Range 0..15.
+  @param  OrData    The value to OR with the PCI configuration register.
 
-  @return The value written to the PCI configuration register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT16
@@ -614,31 +626,32 @@ PciSegmentBitFieldAnd16 (
   );
 
 /**
-  Reads a bit field in a 16-bit PCI configuration register, performs a bitwise AND,
-  and writes the result back to the bit field in the 16-bit register.
- 
-  Reads the 16-bit PCI configuration register specified by Address,
-  performs a bitwise AND between the read result and the value specified by AndData,
-  and writes the result to the 16-bit PCI configuration register specified by Address.
-  The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are serialized.
-  Extra left bits in AndData are stripped.
-  
+  Reads a bit field in a 16-bit port, performs a bitwise AND followed by a
+  bitwise inclusive OR, and writes the result back to the bit field in the
+  16-bit port.
+
+  Reads the 16-bit PCI configuration register specified by Address, performs a
+  bitwise AND followed by a bitwise inclusive OR between the read result and
+  the value specified by AndData, and writes the result to the 16-bit PCI
+  configuration register specified by Address. The value written to the PCI
+  configuration register is returned. This function must guarantee that all PCI
+  read and write operations are serialized. Extra left bits in both AndData and
+  OrData are stripped.
+
   If any reserved bits in Address are set, then ASSERT().
-  If Address is not aligned on a 16-bit boundary, then ASSERT()..
-  If StartBit is greater than 7, then ASSERT().
-  If EndBit is greater than 7, then ASSERT().
+  If StartBit is greater than 15, then ASSERT().
+  If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..15.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
-  @param  AndData   The value to AND with the read value from the PCI configuration register.
-  @param  OrData    The value to OR with the read value from the PCI configuration register.
+                    Range 0..15.
+  @param  AndData   The value to AND with the PCI configuration register.
+  @param  OrData    The value to OR with the result of the AND operation.
 
-  @return The value written to the PCI configuration register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT16
@@ -775,23 +788,23 @@ PciSegmentAndThenOr32 (
 /**
   Reads a bit field of a PCI configuration register.
 
-  Reads the bit field in a 32-bit PCI configuration register.
-  The bit field is specified by the StartBit and the EndBit.
-  The value of the bit field is returned.
-  
+  Reads the bit field in a 32-bit PCI configuration register. The bit field is
+  specified by the StartBit and the EndBit. The value of the bit field is
+  returned.
+
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
-  If StartBit is greater than 7, then ASSERT().
-  If EndBit is greater than 7, then ASSERT().
+  If StartBit is greater than 31, then ASSERT().
+  If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
+                    Range 0..31.
 
-  @return The value of the bit field.
+  @return The value of the bit field read from the PCI configuration register.
 
 **/
 UINT32
@@ -805,25 +818,25 @@ PciSegmentBitFieldRead32 (
 /**
   Writes a bit field to a PCI configuration register.
 
-  Writes Value to the bit field of the PCI configuration register.
-  The bit field is specified by the StartBit and the EndBit.
-  All other bits in the destination PCI configuration register are preserved.
-  The new value of the 32-bit register is returned.
-  
+  Writes Value to the bit field of the PCI configuration register. The bit
+  field is specified by the StartBit and the EndBit. All other bits in the
+  destination PCI configuration register are preserved. The new value of the
+  32-bit register is returned.
+
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
-  If StartBit is greater than 7, then ASSERT().
-  If EndBit is greater than 7, then ASSERT().
+  If StartBit is greater than 31, then ASSERT().
+  If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
+                    Range 0..31.
   @param  Value     New value of the bit field.
 
-  @return The new value of the 32-bit register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT32
@@ -836,24 +849,29 @@ PciSegmentBitFieldWrite32 (
   );
 
 /**
-  Reads the 32-bit PCI configuration register specified by Address,
-  performs a bitwise inclusive OR between the read result and the value specified by OrData,
-  and writes the result to the 32-bit PCI configuration register specified by Address. 
-  
-  If any reserved bits in Address are set, then ASSERT().
-  If Address is not aligned on a 32-bit boundary, then ASSERT().
-  If StartBit is greater than 7, then ASSERT().
-  If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than StartBit, then ASSERT().
-  
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
-  @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
-  @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
-  @param  OrData    The value to OR with the read value from the PCI configuration register.
+  Reads a bit field in a 32-bit PCI configuration, performs a bitwise OR, and
+  writes the result back to the bit field in the 32-bit port.
 
-  @return The value written to the PCI configuration register.
+  Reads the 32-bit PCI configuration register specified by Address, performs a
+  bitwise inclusive OR between the read result and the value specified by
+  OrData, and writes the result to the 32-bit PCI configuration register
+  specified by Address. The value written to the PCI configuration register is
+  returned. This function must guarantee that all PCI read and write operations
+  are serialized. Extra left bits in OrData are stripped.
+
+  If any reserved bits in Address are set, then ASSERT().
+  If StartBit is greater than 31, then ASSERT().
+  If EndBit is greater than 31, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
+
+  @param  Address   PCI configuration register to write.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+                    Range 0..31.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+                    Range 0..31.
+  @param  OrData    The value to OR with the PCI configuration register.
+
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT32
@@ -866,30 +884,30 @@ PciSegmentBitFieldOr32 (
   );
 
 /**
-  Reads a bit field in a 32-bit PCI configuration, performs a bitwise OR,
-  and writes the result back to the bit field in the 32-bit port.
+  Reads a bit field in a 32-bit PCI configuration register, performs a bitwise
+  AND, and writes the result back to the bit field in the 32-bit register.
 
-  Reads the 32-bit PCI configuration register specified by Address,
-  performs a bitwise inclusive OR between the read result and the value specified by OrData,
-  and writes the result to the 32-bit PCI configuration register specified by Address.
-  The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are serialized.
-  Extra left bits in OrData are stripped.
   
+  Reads the 32-bit PCI configuration register specified by Address, performs a bitwise
+  AND between the read result and the value specified by AndData, and writes the result
+  to the 32-bit PCI configuration register specified by Address. The value written to
+  the PCI configuration register is returned.  This function must guarantee that all PCI
+  read and write operations are serialized.  Extra left bits in AndData are stripped.
   If any reserved bits in Address are set, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
-  If StartBit is greater than 7, then ASSERT().
-  If EndBit is greater than 7, then ASSERT().
+  If StartBit is greater than 31, then ASSERT().
+  If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
-  @param  AndData   The value to AND with the read value from the PCI configuration register.
+                    Range 0..31.
+  @param  AndData   The value to AND with the PCI configuration register.
 
-  @return The value written to the PCI configuration register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT32
@@ -902,31 +920,32 @@ PciSegmentBitFieldAnd32 (
   );
 
 /**
-  Reads a bit field in a 32-bit PCI configuration register, performs a bitwise AND,
-  and writes the result back to the bit field in the 32-bit register.
- 
-  Reads the 32-bit PCI configuration register specified by Address,
-  performs a bitwise AND between the read result and the value specified by AndData,
-  and writes the result to the 32-bit PCI configuration register specified by Address.
-  The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are serialized.
-  Extra left bits in AndData are stripped.
-  
+  Reads a bit field in a 32-bit port, performs a bitwise AND followed by a
+  bitwise inclusive OR, and writes the result back to the bit field in the
+  32-bit port.
+
+  Reads the 32-bit PCI configuration register specified by Address, performs a
+  bitwise AND followed by a bitwise inclusive OR between the read result and
+  the value specified by AndData, and writes the result to the 32-bit PCI
+  configuration register specified by Address. The value written to the PCI
+  configuration register is returned. This function must guarantee that all PCI
+  read and write operations are serialized. Extra left bits in both AndData and
+  OrData are stripped.
+
   If any reserved bits in Address are set, then ASSERT().
-  If Address is not aligned on a 32-bit boundary, then ASSERT().
-  If StartBit is greater than 7, then ASSERT().
-  If EndBit is greater than 7, then ASSERT().
+  If StartBit is greater than 31, then ASSERT().
+  If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    The ordinal of the least significant bit in a byte is bit 0.
+                    Range 0..31.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    The ordinal of the most significant bit in a byte is bit 7.
-  @param  AndData   The value to AND with the read value from the PCI configuration register.
-  @param  OrData    The value to OR with the read value from the PCI configuration register.
+                    Range 0..31.
+  @param  AndData   The value to AND with the PCI configuration register.
+  @param  OrData    The value to OR with the result of the AND operation.
 
-  @return The value written to the PCI configuration register.
+  @return The value written back to the PCI configuration register.
 
 **/
 UINT32
@@ -942,21 +961,24 @@ PciSegmentBitFieldAndThenOr32 (
 /**
   Reads a range of PCI configuration registers into a caller supplied buffer.
 
-  Reads the range of PCI configuration registers specified by StartAddress
-  and Size into the buffer specified by Buffer.
-  This function only allows the PCI configuration registers from a single PCI function to be read.
-  Size is returned.
-  
-  If any reserved bits in StartAddress are set, then ASSERT().
+  Reads the range of PCI configuration registers specified by StartAddress and
+  Size into the buffer specified by Buffer. This function only allows the PCI
+  configuration registers from a single PCI function to be read. Size is
+  returned. When possible 32-bit PCI configuration read cycles are used to read
+  from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit
+  and 16-bit PCI configuration read cycles may be used at the beginning and the
+  end of the range.
+
+  If StartAddress > 0x0FFFFFFF, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
+                        Function and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer receiving the data read.
 
-  @return The parameter of Size.
+  @return Size
 
 **/
 UINTN
@@ -968,19 +990,23 @@ PciSegmentReadBuffer (
   );
 
 /**
-  Copies the data in a caller supplied buffer to a specified range of PCI configuration space.
+  Copies the data in a caller supplied buffer to a specified range of PCI
+  configuration space.
 
-  Writes the range of PCI configuration registers specified by StartAddress
-  and Size from the buffer specified by Buffer.
-  This function only allows the PCI configuration registers from a single PCI function to be written.
-  Size is returned.
-  
-  If any reserved bits in StartAddress are set, then ASSERT().
+  Writes the range of PCI configuration registers specified by StartAddress and
+  Size from the buffer specified by Buffer. This function only allows the PCI
+  configuration registers from a single PCI function to be written. Size is
+  returned. When possible 32-bit PCI configuration write cycles are used to
+  write from StartAdress to StartAddress + Size. Due to alignment restrictions,
+  8-bit and 16-bit PCI configuration write cycles may be used at the beginning
+  and the end of the range.
+
+  If StartAddress > 0x0FFFFFFF, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
+                        Function and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
 
