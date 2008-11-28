@@ -33,7 +33,7 @@ typedef struct s_TCP_OPTION {
   UINT32  TSEcr;    // the TSEcr field in a timestamp option
 } TCP_OPTION;
 
-enum {
+typedef enum {
 
   //
   // supported TCP option type and their length
@@ -68,12 +68,12 @@ enum {
   //
   // Other misc definations
   //
-  TCP_OPTION_MAX_WS         = 14,     // Maxium window scale value
-  TCP_OPTION_MAX_WIN        = 0xffff, // max window size in TCP header
   TCP_OPTION_RCVD_MSS       = 0x01,
   TCP_OPTION_RCVD_WS        = 0x02,
-  TCP_OPTION_RCVD_TS        = 0x04
-};
+  TCP_OPTION_RCVD_TS        = 0x04,
+  TCP_OPTION_MAX_WS         = 14,     // Maxium window scale value
+  TCP_OPTION_MAX_WIN        = 0xffff  // max window size in TCP header
+} TCP_OPTION_TYPE;
 
 UINT8
 TcpComputeScale (

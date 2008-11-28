@@ -461,7 +461,7 @@ TcpBackoffRto (
   // may be wrong, fold it. So the next time a valid
   // measurement is sampled, we can start fresh.
   //
-  if ((Tcb->LossTimes >= TCP_FOLD_RTT) && Tcb->SRtt) {
+  if ((Tcb->LossTimes >= TCP_FOLD_RTT) && (Tcb->SRtt != 0)) {
     Tcb->RttVar += Tcb->SRtt >> 2;
     Tcb->SRtt = 0;
   }
@@ -521,7 +521,7 @@ TcpTickingDpc (
 
     Tcb->Idle++;
 
-    if (Tcb->DelayedAck) {
+    if (Tcb->DelayedAck != 0) {
       TcpSendAck (Tcb);
     }
 

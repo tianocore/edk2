@@ -344,6 +344,14 @@ typedef struct _SOCK_INIT_DATA {
 
   EFI_HANDLE   DriverBinding; // the driver binding handle
 } SOCK_INIT_DATA;
+
+//
+//the union type of TCP and UDP protocol
+//
+typedef union {
+  EFI_TCP4_PROTOCOL TcpProtocol;
+  EFI_UDP4_PROTOCOL UdpProtocol;
+} NET_PROTOCOL;
 //
 // the socket structure representing a network service access point
 //
@@ -391,10 +399,7 @@ struct _SOCKET {
   //
   SOCK_PROTO_HANDLER    ProtoHandler; // the request handler of protocol
   UINT8 ProtoReserved[PROTO_RESERVED_LEN];  // Data fields reserved for protocol
-  union {
-    EFI_TCP4_PROTOCOL TcpProtocol;
-    EFI_UDP4_PROTOCOL UdpProtocol;
-  } NetProtocol;
+  NET_PROTOCOL          NetProtocol;
 
   //
   // Callbacks.

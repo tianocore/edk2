@@ -558,7 +558,7 @@ SockCreate (
 
   Parent = SockInitData->Parent;
 
-  if (Parent && (Parent->ConnCnt == Parent->BackLog)) {
+  if ((Parent != NULL) && (Parent->ConnCnt == Parent->BackLog)) {
     DEBUG (
       (EFI_D_ERROR,
       "SockCreate: Socket parent has "
@@ -744,7 +744,7 @@ SockDestroy (
   //
   // Remove it from parent connection list if needed
   //
-  if (Sock->Parent) {
+  if (Sock->Parent != NULL) {
 
     RemoveEntryList (&(Sock->ConnectionList));
     (Sock->Parent->ConnCnt)--;
@@ -982,7 +982,7 @@ SockConnClosed (
   IN SOCKET *Sock
   )
 {
-  if (Sock->CloseToken) {
+  if (Sock->CloseToken != NULL) {
     SIGNAL_TOKEN (Sock->CloseToken, EFI_SUCCESS);
     Sock->CloseToken = NULL;
   }

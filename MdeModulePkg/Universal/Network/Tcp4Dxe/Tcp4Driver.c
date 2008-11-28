@@ -123,16 +123,14 @@ Tcp4CreateTimer (
 
 /**
   Stop and destroy the heartbeat timer for TCP driver.
-
-  None.
-
-  @return None.
+  
+  None
+  
+  None
 
 **/
 VOID
-Tcp4DestroyTimer (
-  VOID
-  )
+Tcp4DestroyTimer ()
 {
   ASSERT (mTcp4Timer.RefCnt > 0);
 
@@ -147,32 +145,24 @@ Tcp4DestroyTimer (
   mTcp4Timer.TimerEvent = NULL;
 }
 
+/**
+  The entry point for Tcp4 driver. 
+  Used to install Tcp4 driver on the ImageHandle.
 
+  @param  ImageHandle   The firmware allocated handle for this
+                        driver image.
+  @param  SystemTable   Pointer to the EFI system table.
+
+  @retval EFI_SUCCESS   Driver loaded.
+  @retval other         Driver not loaded.
+
+**/
 EFI_STATUS
 EFIAPI
 Tcp4DriverEntryPoint (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-  The entry point for Tcp4 driver. used to install
-  Tcp4 driver on the ImageHandle.
-
-Arguments:
-
-  ImageHandle - The firmware allocated handle for this
-                driver image.
-  SystemTable - Pointer to the EFI system table.
-
-Returns:
-
-  EFI_SUCCESS - Driver loaded.
-  other       - Driver not loaded.
-
---*/
 {
   EFI_STATUS  Status;
   UINT32      Seed;

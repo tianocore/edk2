@@ -205,9 +205,7 @@ SockDestroyChild (
   data ProtoData.
 
   @param  SockInitData         Inital data to setting the socket.
-  @param  ProtoData            Pointer to the protocol specific data.
-  @param  Len                  Length of the protocol specific data.
-
+  
   @return Pointer to the newly created socket. If NULL, error condition occured.
 
 **/
