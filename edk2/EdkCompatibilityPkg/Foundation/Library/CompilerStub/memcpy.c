@@ -32,16 +32,6 @@ memcpy (
   OUT VOID        *Dest,
   IN  const VOID  *Src,
   IN  UINTN       Count
-  );
-
-#ifdef _MSC_EXTENSIONS
-#pragma intrinsic(memcpy)
-#else
- VOID *
-memcpy (
-  OUT VOID        *Dest,
-  IN  const VOID  *Src,
-  IN  UINTN       Count
   )
 {
   volatile UINT8  *Ptr;
@@ -53,5 +43,4 @@ memcpy (
 
   return Dest;
 }
-#endif
 

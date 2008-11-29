@@ -24,19 +24,18 @@ BASE_NAME       = CompilerStub
 COMPONENT_TYPE  = LIBRARY
 
 [sources.common] 
-  Dummy.c
 
 [sources.ia32]
-  Ia32/memcpyRep1.asm
-  Ia32/memsetRep4.asm
-#  Ia32/memcpy.asm
-#  Ia32/memset.asm
+  Ia32\memcpyRep1.asm
+  Ia32\memsetRep4.asm
+#  Ia32\memcpy.asm
+#  Ia32\memset.asm
   
 [sources.x64]  
-  X64/memcpyRep1.asm
-  X64/memsetRep4.asm
-#  X64/memcpy.asm
-#  X64/memset.asm
+  x64\memcpyRep1.asm
+  x64\memsetRep4.asm
+#  x64\memcpy.asm
+#  x64\memset.asm
   
 [sources.Ipf]  
   memcpy.c

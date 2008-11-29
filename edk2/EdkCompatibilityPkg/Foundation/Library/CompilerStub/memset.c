@@ -26,16 +26,7 @@ Abstract:
 --*/
 
 #include "Tiano.h"
-VOID *
-memset (
-  OUT VOID    *Dest,
-  IN  UINTN   Char,
-  IN  UINTN   Count
-  );
 
-#ifdef _MSC_EXTENSIONS
-#pragma intrinsic(memset)
-#else
 VOID *
 memset (
   OUT VOID    *Dest,
@@ -51,5 +42,4 @@ memset (
 
   return Dest;
 }
-#endif
 
