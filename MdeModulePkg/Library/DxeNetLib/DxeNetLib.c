@@ -42,6 +42,8 @@ Abstract:
 
 EFI_DPC_PROTOCOL *mDpc = NULL;
 
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mNetLibHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+
 //
 // All the supported IP4 maskes in host byte order.
 //
@@ -1094,8 +1096,8 @@ NetLibGetMacString (
   // Convert the mac address into a unicode string.
   //
   for (Index = 0; Index < Mode->HwAddressSize; Index++) {
-    MacAddress[Index * 2]     = NibbleToHexChar ((UINT8) (Mode->CurrentAddress.Addr[Index] >> 4));
-    MacAddress[Index * 2 + 1] = NibbleToHexChar (Mode->CurrentAddress.Addr[Index]);
+    MacAddress[Index * 2]     = (CHAR16) mNetLibHexStr[(Mode->CurrentAddress.Addr[Index] >> 4) & 0x0F];
+    MacAddress[Index * 2 + 1] = (CHAR16) mNetLibHexStr[Mode->CurrentAddress.Addr[Index] & 0x0F];
   }
 
   MacAddress[Mode->HwAddressSize * 2] = L'\0';
