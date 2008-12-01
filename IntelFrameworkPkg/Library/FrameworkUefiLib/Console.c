@@ -1,31 +1,34 @@
 /** @file
-  The module provide methods to compute the displayed unicode width.
+  This module provide help function for displaying unicode string.
 
-  Copyright (c) 2007, Intel Corporation<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006, Intel Corporation<BR>
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
-#include "FrameworkUefiLib.h"
-  
+
+
+
+#include "UefiLibInternal.h"
+
 typedef struct {
   CHAR16  WChar;
   UINT32  Width;
 } UNICODE_WIDTH_ENTRY;
 
-UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   // General script area
   //
   {(CHAR16)0x1FFF,  1},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to
+   * Merge the blocks and replace them with the above entry as they fall to 
    * the same category and they are all narrow glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
@@ -72,7 +75,7 @@ UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0x2FFF,  1},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to
+   * Merge the blocks and replace them with the above entry as they fall to 
    * the same category and they are all narrow glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
@@ -104,7 +107,7 @@ UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0x33FF,  2},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to
+   * Merge the blocks and replace them with the above entry as they fall to 
    * the same category and they are all wide glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
@@ -127,13 +130,13 @@ UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0x9FFF,  2},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to
+   * Merge the blocks and replace them with the above entry as they fall to 
    * the same category and they are all wide glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
    * Remove the above item if below is un-commented.
    *
-  {(CHAR16)0x4DFF,  0},       // Reserved. 0x3400-0x4DBF as CJK unified ideographs
+  {(CHAR16)0x4DFF,  0},       // Reserved. 0x3400-0x4DBF as CJK unified ideographs 
                       // extension A in ver3.0. 0x3400-0x4DFF
   {(CHAR16)0x9FFF,  2},       // CJK unified ideographs. 0x4E00-0x9FFF
   *
@@ -149,7 +152,7 @@ UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0xD7FF,  2},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to
+   * Merge the blocks and replace them with the above entry as they fall to 
    * the same category and they are all wide glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
@@ -186,8 +189,10 @@ UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
 };
 
 /**
-  This function computes and returns the width of the Unicode character
-  specified by UnicodeChar.
+  Retrieves the width of a Unicode character.
+
+  This function computes and returns the width of the Unicode character specified
+  by UnicodeChar.
 
   @param  UnicodeChar   A Unicode character.
 
@@ -202,10 +207,10 @@ GetGlyphWidth (
   IN CHAR16  UnicodeChar
   )
 {
-  UINTN               Index;
-  UINTN               Low;
-  UINTN               High;
-  UNICODE_WIDTH_ENTRY *Item;
+  UINTN                     Index;
+  UINTN                     Low;
+  UINTN                     High;
+  CONST UNICODE_WIDTH_ENTRY *Item;
 
   Item  = NULL;
   Low   = 0;
@@ -241,16 +246,20 @@ GetGlyphWidth (
 }
 
 /**
-  This function computes and returns the display length of
-  the Null-terminated Unicode string specified by String.
-  If String is NULL, then 0 is returned.
-  If any of the widths of the Unicode characters in String
-  can not be determined, then 0 is returned.
+  Computes the display length of a Null-terminated Unicode String.
+
+  This function computes and returns the display length of the Null-terminated Unicode
+  string specified by String.  If String is NULL then 0 is returned. If any of the widths
+  of the Unicode characters in String can not be determined, then 0 is returned. The display
+  width of String can be computed by summing the display widths of each Unicode character
+  in String.  Unicode characters that are narrow glyphs have a width of 1, and Unicode
+  characters that are width glyphs have a width of 2. 
+  If String is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  String      A pointer to a Null-terminated Unicode string.
 
   @return The display length of the Null-terminated Unicode string specified by String.
-
+  
 **/
 UINTN
 EFIAPI

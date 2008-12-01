@@ -1,12 +1,12 @@
 /** @file
-  Library functions that abstract areas of conflict between Tiano an UEFI 2.1.
+  Library functions that abstract areas of conflict between framework and UEFI 2.0.
 
-  Help Port Framework/Tiano code that has conflicts with UEFI 2.1 by hiding the
-  oldconflicts with library functions and supporting implementations of the old
-  (EDK/EFI 1.10) and new (EDK II/UEFI 2.1) way. This module is a DXE driver as
+  Help Port Framework code that has conflicts with UEFI 2.0 by hiding the
+  old conflicts with library functions and supporting implementations of the old
+  (EDK/EFI 1.10) and new (EDK II/UEFI 2.0) way. This module is a DXE driver as
   it contains DXE enum extensions for EFI event services.
 
-Copyright (c) 2007, Intel Corporation<BR>
+Copyright (c) 2006 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,13 +17,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "FrameworkUefiLib.h"
+
+
+#include "UefiLibInternal.h"
 
 /**
   An empty function to pass error checking of CreateEventEx ().
 
-  This empty function ensures that EFI_EVENT_NOTIFY_SIGNAL_ALL is error
+  This empty function ensures that EVT_NOTIFY_SIGNAL_ALL is error
   checked correctly since it is now mapped into CreateEventEx() in UEFI 2.0.
+ 
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
 
 **/
 VOID
