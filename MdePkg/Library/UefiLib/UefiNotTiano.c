@@ -75,8 +75,8 @@ EfiCreateEventLegacyBoot (
 
 /**
   Create an EFI event in the Legacy Boot Event Group and allows
-  the caller to specify a notification function.  
-  
+  the caller to specify a notification function.
+
   This function abstracts the creation of the Legacy Boot Event.
   The Framework moved from a proprietary to UEFI 2.0 based mechanism.
   This library abstracts the caller from how this event is created to prevent
@@ -160,8 +160,8 @@ EfiCreateEventReadyToBoot (
 
 /**
   Create an EFI event in the Ready To Boot Event Group and allows
-  the caller to specify a notification function.  
-  
+  the caller to specify a notification function.
+
   This function abstracts the creation of the Ready to Boot Event.
   The Framework moved from a proprietary to UEFI 2.0 based mechanism.
   This library abstracts the caller from how this event is created to prevent
