@@ -349,7 +349,7 @@ EFIAPI
 UsbGetInterface (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
   IN  UINT16                  Interface,
-  OUT UINT8                   *AlternateSetting,
+  OUT UINT16                  *AlternateSetting,
   OUT UINT32                  *Status
   );
 
@@ -406,7 +406,7 @@ EFI_STATUS
 EFIAPI
 UsbGetConfiguration (
   IN  EFI_USB_IO_PROTOCOL     *UsbIo,
-  OUT UINT8                   *ConfigurationValue,
+  OUT UINT16                  *ConfigurationValue,
   OUT UINT32                  *Status
   );
 
