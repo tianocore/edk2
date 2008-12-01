@@ -380,7 +380,7 @@ EFI_STATUS
                                    invalid (could not be parsed),                      
                                    or Platform-specific authorization failed, etc.   
   @retval EFI_DEVICE_ERROR         An unexpected internal error occurred while attempting to retrieve
-                                   the public key algorithm of the manifest¡¯s signer¡¯s certificate,
+                                   the public key algorithm of the manifest's signer's certificate,
                                    or An unexpected internal error occurred in a cryptographic software module.                                                                                                                                                                  
 **/ 
 typedef

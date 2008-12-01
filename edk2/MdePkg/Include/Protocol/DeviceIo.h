@@ -119,7 +119,7 @@ typedef enum {
   ///
   /// Provides both read and write access to system memory
   /// by both the processor and a bus master. The buffer is
-  /// coherent from both the processor¡¯s and the bus master¡¯s
+  /// coherent from both the processor's and the bus master's
   /// point of view.
   ///
   EfiBusMasterCommonBuffer
