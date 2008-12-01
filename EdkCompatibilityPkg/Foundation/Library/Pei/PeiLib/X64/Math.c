@@ -80,7 +80,6 @@ Returns:
 {
   return Multiplicand * Multiplier;
 }
-}
 
 UINT64
 DivU64x32 (
