@@ -26,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID *gHobList = NULL;
 
 /**
-  Enrty point to DXE core.
+  Entry point to DXE core.
 
   This function is the entry point to the DXE Foundation. The PEI phase, which executes just before
   DXE, is responsible for loading and invoking the DXE Foundation in system memory. The only
@@ -72,7 +72,7 @@ _ModuleEntryPoint (
 
 
 /**
-  Wrapper of enrty point to DXE CORE.
+  Wrapper of entry point to DXE CORE.
 
   @param  HobStart Pointer of HobList.
 
