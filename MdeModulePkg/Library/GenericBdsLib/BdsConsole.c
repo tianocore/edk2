@@ -47,7 +47,6 @@ IsNvNeed (
   }
 }
 
-
 /**
   This function update console variable based on ConVarName, it can
   add or remove one specific console device path from the variable
@@ -185,6 +184,7 @@ BdsLibUpdateConsoleVariable (
   @param  ConVarName               Console related variable name, ConIn, ConOut,
                                    ErrOut.
 
+  @retval EFI_UNSUPPORTED          Request console variable does not exist.
   @retval EFI_NOT_FOUND            There is not any console devices connected
                                    success
   @retval EFI_SUCCESS              Success connect any one instance of the console
@@ -627,6 +627,9 @@ LockKeyboards (
 
   @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo displayed.
   @retval EFI_UNSUPPORTED Logo not found.
+                          Fail to locate ConsoleControl protocol.
+                          Fail to get UgaDraw or Gop handle.
+                          Fail to switch grahic mode.
 
 **/
 EFI_STATUS
@@ -875,7 +878,7 @@ EnableQuietBoot (
   Simple Text Out screens will now be synced up with all non UGA output devices
 
   @retval EFI_SUCCESS          UGA devices are back in text mode and synced up.
-  @retval EFI_UNSUPPORTED      Logo not found
+  @retval EFI_UNSUPPORTED      Fail to locate ConsoleControl Protocol.
 
 **/
 EFI_STATUS

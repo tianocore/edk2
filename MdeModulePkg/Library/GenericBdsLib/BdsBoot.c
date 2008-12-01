@@ -1,6 +1,5 @@
 /** @file
-  BDS Lib functions which relate with create or process the boot
-  option.
+  BDS Lib functions which relate with create or process the boot option.
 
 Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

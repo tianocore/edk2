@@ -317,9 +317,11 @@ BdsLibConnectAllDriversToAllControllers (
                                 element  being a USB WWID or a USB Class device
                                 path
 
-  @return EFI_INVALID_PARAMETER
-  @return EFI_SUCCESS
-  @return EFI_NOT_FOUND
+  @return EFI_INVALID_PARAMETER  RemainingDevicePath is NULL pointer.
+                                 RemainingDevicePath is not a USB device path.
+                                 Invalid HostControllerPI type.
+  @return EFI_SUCCESS            Sucess to connect USB device
+  @return EFI_NOT_FOUND          Fail to find hanlde for USB controller to connect.
 
 **/
 EFI_STATUS
