@@ -22,7 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param This             A pointer to the EFI_HII_PROTOCOL instance. 
   @param DescriptorCount  A pointer to the number of Descriptor entries being described in the keyboard layout being retrieved.
-  @param Descriptor       A pointer to a buffer containing an array of EFI_KEY_DESCRIPTOR entries. Each entry will reflect the definition of a specific physical key. Type EFI_KEY_DESCRIPTOR is defined in "Related Definitions" below.
+  @param Descriptor       A pointer to a buffer containing an array of EFI_KEY_DESCRIPTOR entries. Each entry will reflect the 
+                          definition of a specific physical key. Type EFI_KEY_DESCRIPTOR is defined in "Related Definitions" below.
 
   @retval  EFI_SUCCESS   The keyboard layout was retrieved successfully.
  

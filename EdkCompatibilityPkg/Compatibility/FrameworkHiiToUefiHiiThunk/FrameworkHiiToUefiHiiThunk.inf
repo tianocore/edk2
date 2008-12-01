@@ -42,7 +42,6 @@
   ConfigAccess.c
   ConfigAccess.h
   OpcodeCreation.c
-  OpcodeCreation.h
   UefiIfrParser.c
   UefiIfrParser.h
   UefiIfrParserExpression.c
