@@ -40,7 +40,6 @@ typedef struct {
   @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
 **/
 RETURN_STATUS
-EFIAPI
 PeiGetExtractGuidedSectionHandlerInfo (
   IN OUT PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO **InfoPointer
   )

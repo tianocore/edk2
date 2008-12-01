@@ -675,7 +675,6 @@ AllocateReservedCopyPool (
 
 **/
 VOID *
-EFIAPI
 InternalReallocatePool (
   IN EFI_MEMORY_TYPE  PoolType,  
   IN UINTN            OldSize,

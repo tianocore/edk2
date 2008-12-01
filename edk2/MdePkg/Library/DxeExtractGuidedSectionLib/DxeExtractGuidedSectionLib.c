@@ -27,12 +27,12 @@ EXTRACT_GUIDED_SECTION_DECODE_HANDLER   *mExtractDecodeHandlerTable;
 EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *mExtractGetInfoHandlerTable;
 
 /**
-  Construtor allocates the global memory to store the registered guid and Handler list.
+  Constructor allocates the global memory to store the registered guid and Handler list.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
 
-  @retval  RETURN_SUCCESS            Allocate the global memory space to store guid and funciton tables.
+  @retval  RETURN_SUCCESS            Allocate the global memory space to store guid and function tables.
   @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
 **/
 RETURN_STATUS
@@ -74,7 +74,7 @@ DxeExtractGuidedSectionLibConstructor (
   and caller must treat this array of GUIDs as read-only data. 
   If ExtractHandlerGuidTable is NULL, then ASSERT().
 
-  @param[out]  ExtractHandlerGuidTable  A pointer to the array of GUIDs tht have been registerd through
+  @param[out]  ExtractHandlerGuidTable  A pointer to the array of GUIDs that have been registered through
                                         ExtractGuidedSectionRegisterHandlers().
 
   @return the number of the supported extract guided Handler.
@@ -96,7 +96,7 @@ ExtractGuidedSectionGetGuidList (
   Registers handlers of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER and EXTRACT_GUIDED_SECTION_DECODE_HANDLER
   for a specific GUID section type.
 
-  Registers the handlers specified by GetInfoHandler and DecodeHandler witg the GUID specified by SectionGuid.
+  Registers the handlers specified by GetInfoHandler and DecodeHandler with the GUID specified by SectionGuid.
   If the GUID value specified by SectionGuid has already been registered, then return RETURN_ALREADY_STARTED.
   If there are not enough resources available to register the handlers  then RETURN_OUT_OF_RESOURCES is returned.
   If SectionGuid is NULL, then ASSERT().
@@ -164,7 +164,7 @@ ExtractGuidedSectionRegisterHandlers (
 }
 
 /**
-  Retrives a GUID from a GUIDed section and uses that GUID to select an associated handler of type
+  Retrieves a GUID from a GUIDed section and uses that GUID to select an associated handler of type
   EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers().
   The selected handler is used to retrieve and return the size of the decoded buffer and the size of an
   optional scratch buffer required to actually decode the data in a GUIDed section.
@@ -236,7 +236,7 @@ ExtractGuidedSectionGetInfo (
 }
 
 /**
-  Retrives the GUID from a GUIDed section and uses that GUID to select an associated handler of type
+  Retrieves the GUID from a GUIDed section and uses that GUID to select an associated handler of type
   EXTRACT_GUIDED_SECTION_DECODE_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers().
   The selected handler is used to decode the data in a GUIDed section and return the result in a caller
   allocated output buffer.

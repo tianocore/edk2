@@ -15,7 +15,7 @@
 
 #include "UefiLibInternal.h"
 
-EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
   { 0x00, 0x00, 0x00, 0x00 },
   { 0x98, 0x00, 0x00, 0x00 },
   { 0x00, 0x98, 0x00, 0x00 },
