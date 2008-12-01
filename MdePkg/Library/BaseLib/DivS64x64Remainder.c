@@ -26,7 +26,7 @@
   NULL, then the 64-bit signed remainder is returned in Remainder. This
   function returns the 64-bit signed quotient.
 
-  It is the caller¡¯s responsibility to not call this function with a Divisor of 0.
+  It is the caller's responsibility to not call this function with a Divisor of 0.
   If Divisor is 0, then the quotient and remainder should be assumed to be 
   the largest negative integer.
 

@@ -199,7 +199,7 @@ typedef struct {
   ///
   UINT32                          UID;
   ///
-  /// Device＊s compatible PnP hardware ID stored in a numeric
+  /// Device's compatible PnP hardware ID stored in a numeric
   /// 32-bit compressed EISA-type ID. This value must match at
   /// least one of the compatible device IDs returned by the
   /// corresponding _CID in the ACPI name space.
@@ -557,11 +557,11 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
   /// Flags to help identify/manage InfiniBand device path elements:
-  /// Bit 0 每 IOC/Service (0b = IOC, 1b = Service)
-  /// Bit 1 每 Extend Boot Environment
-  /// Bit 2 每 Console Protocol
-  /// Bit 3 每 Storage Protocol
-  /// Bit 4 每 Network Protocol
+  /// Bit 0 - IOC/Service (0b = IOC, 1b = Service)
+  /// Bit 1 - Extend Boot Environment
+  /// Bit 2 - Console Protocol
+  /// Bit 3 - Storage Protocol
+  /// Bit 4 - Network Protocol
   /// All other bits are reserved.
   ///
   UINT32                          ResourceFlags;
@@ -766,15 +766,15 @@ typedef struct {
   UINT8                           Signature[16];
   ///
   /// Partition Format: (Unused values reserved)
-  /// 0x01 每 PC-AT compatible legacy MBR
-  /// 0x02 每 GUID Partition Table
+  /// 0x01 - PC-AT compatible legacy MBR
+  /// 0x02 - GUID Partition Table
   ///
   UINT8                           MBRType;
   ///
   /// Type of Disk Signature: (Unused values reserved)
-  /// 0x00 每 No Disk Signature.
-  /// 0x01 每 32-bit signature from address 0x1b8 of the type 0x01 MBR.
-  /// 0x02 每 GUID signature.
+  /// 0x00 - No Disk Signature.
+  /// 0x01 - 32-bit signature from address 0x1b8 of the type 0x01 MBR.
+  /// 0x02 - GUID signature.
   ///
   UINT8                           SignatureType;
 } HARDDRIVE_DEVICE_PATH;

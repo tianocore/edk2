@@ -6,7 +6,7 @@
   pointer to the DXE Services Table as defined in the Platform Initialization Driver 
   Execution Environment Core Interface Specification.  The library constructor must 
   initialize this global pointer to the DX Services Table, so it is available at the
-  module¡¯s entry point.  Since there is overhead in looking up the pointer to the DXE 
+  module's entry point.  Since there is overhead in looking up the pointer to the DXE 
   Services Table, only those modules that actually require access to the DXE Services 
   Table should use this library.  This will typically be DXE Drivers that require GCD 
   or Dispatcher services.

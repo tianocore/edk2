@@ -290,7 +290,7 @@ EfiSetVariable (
 /**
   This service is a wrapper for the UEFI Runtime Service GetNextHighMonotonicCount().
 
-  The platform¡¯s monotonic counter is comprised of two 32-bit quantities: the high 32 bits and
+  The platform's monotonic counter is comprised of two 32-bit quantities: the high 32 bits and
   the low 32 bits. During boot service time the low 32-bit value is volatile: it is reset to zero
   on every system reset and is increased by 1 on every call to GetNextMonotonicCount(). The high
   32-bit value is nonvolatile and is increased by 1 whenever the system resets or whenever the low
@@ -405,7 +405,7 @@ EfiConvertFunctionPointer (
   This service is a wrapper for the UEFI Runtime Service SetVirtualAddressMap().
 
   The SetVirtualAddressMap() function is used by the OS loader. The function can only be called
-  at runtime, and is called by the owner of the system¡¯s memory map. I.e., the component which
+  at runtime, and is called by the owner of the system's memory map. I.e., the component which
   called ExitBootServices(). All events of type EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE must be signaled
   before SetVirtualAddressMap() returns.
 

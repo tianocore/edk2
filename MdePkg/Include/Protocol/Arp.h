@@ -88,7 +88,7 @@ typedef struct {
   ///
   /// Pointer to the first byte of the protocol address to register. For
   /// example, if SwAddressType is 0x0800 (IP), then
-  /// StationAddress points to the first byte of this station¡¯s IP
+  /// StationAddress points to the first byte of this station's IP
   /// address stored in network byte order.
   ///
   VOID                      *StationAddress;    ///< Network byte order
