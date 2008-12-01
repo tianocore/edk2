@@ -308,19 +308,7 @@ Xtoi (
   IN CHAR16  *Str
   )
 {
-  UINTN   Rvalue;
-  UINTN   Length;
-
-  ASSERT (Str != NULL);
-
-  //
-  // convert hex digits
-  //
-  Rvalue = 0;
-  Length = sizeof (UINTN);
-  HexStringToBuf ((UINT8 *) &Rvalue, &Length, Str, NULL);
-
-  return Rvalue;
+  return StrHexToUintn (Str);
 }
 
 /**
@@ -337,11 +325,7 @@ Xtoi64 (
   OUT UINT64  *Data
   )
 {
-  UINTN  Length;
-
-  *Data  = 0;
-  Length = sizeof (UINT64);
-  HexStringToBuf ((UINT8 *) Data, &Length, Str, NULL);
+  *Data = StrHexToUint64 (Str);
 }
 
 /**
@@ -524,7 +508,15 @@ StrToBuf (
 
   for(Index = 0; Index < StrLength; Index++, Str++) {
 
-    IsHexDigit (&Digit, *Str);
+    if ((*Str >= L'a') && (*Str <= L'f')) {
+      Digit = (UINT8) (*Str - L'a' + 0x0A);
+    } else if ((*Str >= L'A') && (*Str <= L'F')) {
+      Digit = (UINT8) (*Str - L'A' + 0x0A);
+    } else if ((*Str >= L'0') && (*Str <= L'9')) {
+      Digit = (UINT8) (*Str - L'0');
+    } else {
+      return EFI_INVALID_PARAMETER;
+    }
 
     //
     // For odd charaters, write the upper nibble for each buffer byte,
@@ -546,6 +538,7 @@ StrToBuf (
 
 /**
   Converts a string to GUID value.
+  Guid Format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
   @param Str              The registry format GUID string that contains the GUID value.
   @param Guid             A pointer to the converted GUID value.
@@ -561,46 +554,51 @@ StrToGuid (
   OUT EFI_GUID *Guid
   )
 {
-  UINTN       BufferLength;
-  UINTN       ConvertedStrLen;
-  EFI_STATUS  Status;
-
-  BufferLength = sizeof (Guid->Data1);
-  Status = HexStringToBuf ((UINT8 *) &Guid->Data1, &BufferLength, Str, &ConvertedStrLen);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  //
+  // Get the first UINT32 data
+  //
+  Guid->Data1 = (UINT32) StrHexToUint64  (Str);
+  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
+    Str ++;
   }
-  Str += ConvertedStrLen;
+  
+  if (IS_HYPHEN (*Str)) {
+    Str++;
+  } else {
+    return EFI_UNSUPPORTED;
+  }
+  
+  //
+  // Get the second UINT16 data
+  //
+  Guid->Data2 = (UINT16) StrHexToUint64  (Str);
+  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
+    Str ++;
+  }
+
+  if (IS_HYPHEN (*Str)) {
+    Str++;
+  } else {
+    return EFI_UNSUPPORTED;
+  }
+  
+  //
+  // Get the third UINT16 data
+  //
+  Guid->Data3 = (UINT16) StrHexToUint64  (Str);
+  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
+    Str ++;
+  }
+
   if (IS_HYPHEN (*Str)) {
     Str++;
   } else {
     return EFI_UNSUPPORTED;
   }
 
-  BufferLength = sizeof (Guid->Data2);
-  Status = HexStringToBuf ((UINT8 *) &Guid->Data2, &BufferLength, Str, &ConvertedStrLen);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  Str += ConvertedStrLen;
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-
-  BufferLength = sizeof (Guid->Data3);
-  Status = HexStringToBuf ((UINT8 *) &Guid->Data3, &BufferLength, Str, &ConvertedStrLen);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  Str += ConvertedStrLen;
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-
+  //
+  // Get the followin 8 bytes data
+  //  
   StrToBuf (&Guid->Data4[0], 2, Str);
   //
   // Skip 2 byte hex chars

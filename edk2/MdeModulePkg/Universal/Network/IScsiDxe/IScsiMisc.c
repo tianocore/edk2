@@ -22,7 +22,7 @@ Abstract:
 
 #include "IScsiImpl.h"
 
-CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFabcdef";
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFabcdef";
 
 /**
   Removes (trims) specified leading and trailing characters from a string.
@@ -216,9 +216,9 @@ IScsiLunToUnicodeStr (
       StrCpy (TempStr, L"0-");
     } else {
       TempStr[0]  = (CHAR16) IScsiHexString[Lun[2 * Index] >> 4];
-      TempStr[1]  = (CHAR16) IScsiHexString[Lun[2 * Index] & 0xf];
+      TempStr[1]  = (CHAR16) IScsiHexString[Lun[2 * Index] & 0x0F];
       TempStr[2]  = (CHAR16) IScsiHexString[Lun[2 * Index + 1] >> 4];
-      TempStr[3]  = (CHAR16) IScsiHexString[Lun[2 * Index + 1] & 0xf];
+      TempStr[3]  = (CHAR16) IScsiHexString[Lun[2 * Index + 1] & 0x0F];
       TempStr[4]  = L'-';
       TempStr[5]  = 0;
 
@@ -388,8 +388,8 @@ IScsiMacAddrToStr (
   UINT32  Index;
 
   for (Index = 0; Index < Len; Index++) {
-    Str[3 * Index]      = NibbleToHexChar ((UINT8) (Mac->Addr[Index] >> 4));
-    Str[3 * Index + 1]  = NibbleToHexChar (Mac->Addr[Index]);
+    Str[3 * Index]      = (CHAR16) IScsiHexString[(Mac->Addr[Index] >> 4) & 0x0F];
+    Str[3 * Index + 1]  = (CHAR16) IScsiHexString[Mac->Addr[Index] & 0x0F];
     Str[3 * Index + 2]  = L'-';
   }
 
@@ -441,7 +441,7 @@ IScsiBinToHex (
 
   for (Index = 0; Index < BinLength; Index++) {
     HexStr[Index * 2 + 2] = IScsiHexString[BinBuffer[Index] >> 4];
-    HexStr[Index * 2 + 3] = IScsiHexString[BinBuffer[Index] & 0xf];
+    HexStr[Index * 2 + 3] = IScsiHexString[BinBuffer[Index] & 0x0F];
   }
 
   HexStr[Index * 2 + 2] = '\0';

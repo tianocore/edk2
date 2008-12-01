@@ -619,7 +619,6 @@ IfrToUint (
   EFI_HII_VALUE  Value;
   CHAR16         *String;
   CHAR16         *StringPtr;
-  UINTN          BufferSize;
 
   Status = PopExpression (&Value);
   if (EFI_ERROR (Status)) {
@@ -636,19 +635,19 @@ IfrToUint (
     if (String == NULL) {
       return EFI_NOT_FOUND;
     }
-
+    
     IfrStrToUpper (String);
     StringPtr = StrStr (String, L"0X");
     if (StringPtr != NULL) {
       //
       // Hex string
       //
-      BufferSize = sizeof (UINT64);
-      Status = HexStringToBuf ((UINT8 *) &Result->Value.u64, &BufferSize, StringPtr + 2, NULL);
+      Result->Value.u64 = StrHexToUint64 (String);
     } else {
       //
-      // BUGBUG: Need handle decimal string
+      // decimal string
       //
+      Result->Value.u64 = StrDecimalToUint64 (String);
     }
     FreePool (String);
   } else {
