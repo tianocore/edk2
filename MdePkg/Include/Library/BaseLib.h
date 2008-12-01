@@ -39,7 +39,9 @@ typedef struct {
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 4
 
-#elif defined (MDE_CPU_IPF)
+#endif // defined (MDE_CPU_IA32)
+
+#if defined (MDE_CPU_IPF)
 
 ///
 /// IPF context buffer used by SetJump() and LongJump()
@@ -87,7 +89,9 @@ typedef struct {
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 0x10
 
-#elif defined (MDE_CPU_X64)
+#endif // defined (MDE_CPU_IPF)
+
+#if defined (MDE_CPU_X64)
 ///
 /// X64 context buffer used by SetJump() and LongJump()
 ///
@@ -106,7 +110,9 @@ typedef struct {
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 8
 
-#elif defined (MDE_CPU_EBC)
+#endif // defined (MDE_CPU_X64)
+
+#if defined (MDE_CPU_EBC)
 ///
 /// EBC context buffer used by SetJump() and LongJump()
 ///
@@ -120,9 +126,7 @@ typedef struct {
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 8
 
-#else
-#error Unknown Processor Type
-#endif
+#endif // defined (MDE_CPU_EBC)
 
 //
 // String Services
