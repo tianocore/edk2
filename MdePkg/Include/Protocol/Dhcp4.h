@@ -691,7 +691,7 @@ EFI_STATUS
                                 this function after collection process completes.
   @retval EFI_NO_MAPPING        The default station address is not available yet.
   @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
-  @retval EFI_UNSUPPORTED       The implementation doesn’t support this function
+  @retval EFI_UNSUPPORTED       The implementation doesn't support this function
   @retval Others                Some other unexpected error occurred.
 
 **/
@@ -707,11 +707,11 @@ EFI_STATUS
   Parses the packed DHCP option data.
   
   The Parse() function is used to retrieve the option list from a DHCP packet.
-  If *OptionCount isn’t zero, and there is enough space for all the DHCP options
+  If *OptionCount isn't zero, and there is enough space for all the DHCP options
   in the Packet, each element of PacketOptionList is set to point to somewhere in
   the Packet->Dhcp4.Option where a new DHCP option begins. If RFC3396 is supported,
   the caller should reassemble the parsed DHCP options to get the finial result.
-  If *OptionCount is zero or there isn’t enough space for all of them, the number
+  If *OptionCount is zero or there isn't enough space for all of them, the number
   of DHCP options in the Packet is returned in OptionCount.
 
   @param  This             Pointer to the EFI_DHCP4_PROTOCOL instance.

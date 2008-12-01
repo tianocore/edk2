@@ -101,7 +101,7 @@ EFI_STATUS
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
   2. The first NumberOfChildren handles of ChildHandleBuffer must all be a valid
-     EFI_HANDLE. In addition, all of these handles must have been created in this driver’s
+     EFI_HANDLE. In addition, all of these handles must have been created in this driver's
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
   
