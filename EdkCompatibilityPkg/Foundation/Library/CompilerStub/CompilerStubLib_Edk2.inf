@@ -26,18 +26,18 @@ COMPONENT_TYPE  = LIBRARY
 [sources.ia32]
   memcpy.c | GCC
   
-  Ia32\memcpyRep1.asm
-  Ia32\memsetRep4.asm
-#  Ia32\memcpy.asm
-#  Ia32\memset.asm
+  Ia32/memcpyRep1.asm
+  Ia32/memsetRep4.asm
+#  Ia32/memcpy.asm
+#  Ia32/memset.asm
   
 [sources.x64]  
   memcpy.c | GCC
   
-  x64\memcpyRep1.asm
-  x64\memsetRep4.asm
-#  x64\memcpy.asm
-#  x64\memset.asm
+  x64/memcpyRep1.asm
+  x64/memsetRep4.asm
+#  x64/memcpy.asm
+#  x64/memset.asm
   
 [sources.Ipf]  
   memcpy.c | MSFT
