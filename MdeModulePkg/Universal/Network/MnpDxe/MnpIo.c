@@ -1042,9 +1042,12 @@ MnpCheckPacketTimeout (
 
       RxDataWrap = NET_LIST_USER_STRUCT (RxEntry, MNP_RXDATA_WRAP, WrapEntry);
 
-      if (RxDataWrap->TimeoutTick >= MNP_TIMEOUT_CHECK_INTERVAL) {
+      //
+      // TimeoutTick unit is ms, MNP_TIMEOUT_CHECK_INTERVAL unit is 100ns.
+      //
+      if (RxDataWrap->TimeoutTick >= (MNP_TIMEOUT_CHECK_INTERVAL / 10)) {
 
-        RxDataWrap->TimeoutTick -= MNP_TIMEOUT_CHECK_INTERVAL;
+        RxDataWrap->TimeoutTick -= (MNP_TIMEOUT_CHECK_INTERVAL / 10);
       } else {
         //
         // Drop the timeout packet.

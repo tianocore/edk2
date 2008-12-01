@@ -318,7 +318,7 @@ PxeBcDriverBindingStart (
     goto ON_ERROR;
   }
   ZeroMem (&Private->Udp4CfgData, sizeof (EFI_UDP4_CONFIG_DATA));
-  Private->Udp4CfgData.AcceptBroadcast    = FALSE;
+  Private->Udp4CfgData.AcceptBroadcast    = TRUE;
   Private->Udp4CfgData.AcceptPromiscuous  = FALSE;
   Private->Udp4CfgData.AcceptAnyPort      = TRUE;
   Private->Udp4CfgData.AllowDuplicatePort = TRUE;
