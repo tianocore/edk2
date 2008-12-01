@@ -422,6 +422,25 @@ NewOrAddPackNotify (
   IN EFI_HII_DATABASE_NOTIFY_TYPE       NotifyType
   );
 
+/**
+  Create a EFI_HII_UPDATE_DATA structure used to call IfrLibUpdateForm.
+
+  @param ThunkContext   The HII Thunk Context.
+  @param FwUpdateData   The Framework Update Data.
+  @param UefiUpdateData The UEFI Update Data.
+
+  @retval EFI_SUCCESS       The UEFI Update Data is created successfully.
+  @retval EFI_UNSUPPORTED   There is unsupported opcode in FwUpdateData.
+  @retval EFI_OUT_OF_RESOURCES There is not enough resource.
+**/
+EFI_STATUS
+FwUpdateDataToUefiUpdateData (
+  IN       HII_THUNK_CONTEXT                *ThunkContext,
+  IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *FwUpdateData,
+  OUT      EFI_HII_UPDATE_DATA              **UefiUpdateData
+  )
+;
+
 #include "Utility.h"
 #include "ConfigAccess.h"
 

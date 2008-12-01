@@ -317,6 +317,11 @@ typedef struct {
 
   UINT16                          MaxQuestionId;
 
+  //
+  // Added for Framework HII Thunk. 
+  // Default Variable Storage built from a Framework VFR file using UEFI VFR Compiler in Compatibility mode is determined 
+  // by priority rules defined in GetFormsetDefaultVarstoreId (). See the function description for details.
+  //
   EFI_VARSTORE_ID                 DefaultVarStoreId;
 
   UINTN                           NumberOfStatement;

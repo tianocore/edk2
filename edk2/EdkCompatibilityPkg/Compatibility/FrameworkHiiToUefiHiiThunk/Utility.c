@@ -392,10 +392,11 @@ DestroyThunkContext (
 /**
   Get the FormSet's Default Varstore ID based on the rule (Descending Priority):
 
-  1) Var Store ID of FRAMEWORK_RESERVED_VARSTORE_ID (0x01).
-  2) First Var Store ID.
+  1) If VarStore ID of FRAMEWORK_RESERVED_VARSTORE_ID (0x01) is found, Var Store ID is used.
+  2) If VarStore ID of FRAMEWORK_RESERVED_VARSTORE_ID is not found, First Var Store ID is used 
+     as the default Var Store ID.
 
-  @param FormSet The Form Set.
+  @param FormSet The Form Set. The Default Varstore ID is updated if found.
   
 **/
 VOID
