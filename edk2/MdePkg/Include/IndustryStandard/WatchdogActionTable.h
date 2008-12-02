@@ -1,6 +1,6 @@
 /** @file   
   ACPI Watchdog Action Table (WADT) as defined at
-  Microsoft Hardware Watchdog Timers Design Specification
+  Microsoft Hardware Watchdog Timers Design Specification.
 
   Copyright (c) 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          

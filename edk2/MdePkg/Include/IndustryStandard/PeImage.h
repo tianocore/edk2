@@ -21,9 +21,9 @@
 #ifndef __PE_IMAGE_H__
 #define __PE_IMAGE_H__
 
-///
-/// PE32+ Subsystem type for EFI images
-///
+//
+// PE32+ Subsystem type for EFI images
+//
 #define EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION         10
 #define EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER 11
 #define EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER      12
@@ -32,9 +32,9 @@
 #define EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER      13 ///< defined PI Specification, 1.0
 
 
-///
-/// PE32+ Machine type for EFI images
-///
+//
+// PE32+ Machine type for EFI images
+//
 #define IMAGE_FILE_MACHINE_I386     0x014c
 #define IMAGE_FILE_MACHINE_IA64     0x0200
 #define IMAGE_FILE_MACHINE_EBC      0x0EBC
@@ -48,9 +48,9 @@
 #define EFI_IMAGE_MACHINE_EBC       IMAGE_FILE_MACHINE_EBC  
 #define EFI_IMAGE_MACHINE_X64       IMAGE_FILE_MACHINE_X64
 
-///
-/// EXE file formats
-///
+//
+// EXE file formats
+//
 #define EFI_IMAGE_DOS_SIGNATURE     SIGNATURE_16('M', 'Z')
 #define EFI_IMAGE_OS2_SIGNATURE     SIGNATURE_16('N', 'E')
 #define EFI_IMAGE_OS2_SIGNATURE_LE  SIGNATURE_16('L', 'E')
@@ -100,9 +100,9 @@ typedef struct {
 ///
 #define EFI_IMAGE_SIZEOF_FILE_HEADER        20
 
-///
-/// Characteristics
-///
+//
+// Characteristics
+//
 #define EFI_IMAGE_FILE_RELOCS_STRIPPED      BIT0     ///< 0x0001  Relocation info stripped from file.
 #define EFI_IMAGE_FILE_EXECUTABLE_IMAGE     BIT1     ///< 0x0002  File is executable  (i.e. no unresolved externel references).
 #define EFI_IMAGE_FILE_LINE_NUMS_STRIPPED   BIT2     ///< 0x0004  Line nunbers stripped from file.
@@ -114,9 +114,9 @@ typedef struct {
 #define EFI_IMAGE_FILE_DLL                  BIT13    ///< 0x2000  File is a DLL.
 #define EFI_IMAGE_FILE_BYTES_REVERSED_HI    BIT15    ///< 0x8000  Bytes of machine word are reversed.
 
-///
-/// Other Machine Types
-///
+//
+// Other Machine Types
+//
 #define EFI_IMAGE_FILE_MACHINE_UNKNOWN      0       ///< Any machine type
 #define EFI_IMAGE_FILE_MACHINE_I386         0x14c   ///< Intel 386.
 #define EFI_IMAGE_FILE_MACHINE_R3000        0x162   ///< MIPS* little-endian, 0540 big-endian
@@ -136,9 +136,9 @@ typedef struct {
 
 #define EFI_IMAGE_ROM_OPTIONAL_HDR_MAGIC      0x107
 
-///
-/// Directory Entries
-///
+//
+// Directory Entries
+//
 #define EFI_IMAGE_DIRECTORY_ENTRY_EXPORT      0
 #define EFI_IMAGE_DIRECTORY_ENTRY_IMPORT      1
 #define EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE    2
@@ -160,7 +160,10 @@ typedef struct {
 /// after NT additional fields.
 ///
 #define EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC 0x10b
-
+          
+///
+/// Optional Header Standard Fields for PE32
+///
 typedef struct {
   ///
   /// Standard fields.
@@ -175,7 +178,7 @@ typedef struct {
   UINT32                    BaseOfCode;
   UINT32                    BaseOfData;  ///< PE32 contains this additional field, which is absent in PE32+
   ///
-  /// NT additional fields.
+  /// Optional Header Windows-Specific Fields.
   ///
   UINT32                    ImageBase;
   UINT32                    SectionAlignment;
@@ -209,10 +212,13 @@ typedef struct {
 ///
 #define EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC 0x20b
 
+///
+/// Optional Header Standard Fields for PE32+
+///
 typedef struct {
-  //
-  // Standard fields.
-  //
+  ///
+  /// Standard fields.
+  ///
   UINT16                    Magic;
   UINT8                     MajorLinkerVersion;
   UINT8                     MinorLinkerVersion;
@@ -221,9 +227,9 @@ typedef struct {
   UINT32                    SizeOfUninitializedData;
   UINT32                    AddressOfEntryPoint;
   UINT32                    BaseOfCode;
-  //
-  // NT additional fields.
-  //
+  ///
+  /// Optional Header Windows-Specific Fields.
+  ///
   UINT64                    ImageBase;
   UINT32                    SectionAlignment;
   UINT32                    FileAlignment;
@@ -331,9 +337,9 @@ typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
         ) \
     )
 
-///
-/// Other Windows Subsystem Values
-///
+//
+// Other Windows Subsystem Values
+//
 #define EFI_IMAGE_SUBSYSTEM_UNKNOWN     0
 #define EFI_IMAGE_SUBSYSTEM_NATIVE      1
 #define EFI_IMAGE_SUBSYSTEM_WINDOWS_GUI 2
@@ -346,6 +352,9 @@ typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
 ///
 #define EFI_IMAGE_SIZEOF_SHORT_NAME 8
 
+///
+/// Section Table, this table immediately follows the optional header
+///
 typedef struct {
   UINT8 Name[EFI_IMAGE_SIZEOF_SHORT_NAME];
   union {
@@ -367,9 +376,9 @@ typedef struct {
 ///
 #define EFI_IMAGE_SIZEOF_SECTION_HEADER       40
          
-///
-/// Section Flags Values
-///
+//
+// Section Flags Values
+//
 #define EFI_IMAGE_SCN_TYPE_NO_PAD                  BIT3   ///< 0x00000008  ///< Reserved.
 #define EFI_IMAGE_SCN_CNT_CODE                     BIT5   ///< 0x00000020
 #define EFI_IMAGE_SCN_CNT_INITIALIZED_DATA         BIT6   ///< 0x00000040
@@ -401,17 +410,17 @@ typedef struct {
 ///
 #define EFI_IMAGE_SIZEOF_SYMBOL 18
 
-///
-/// Symbols have a section number of the section in which they are
-/// defined. Otherwise, section numbers have the following meanings:
-///
+//
+// Symbols have a section number of the section in which they are
+// defined. Otherwise, section numbers have the following meanings:
+//
 #define EFI_IMAGE_SYM_UNDEFINED (UINT16) 0  ///< Symbol is undefined or is common.
 #define EFI_IMAGE_SYM_ABSOLUTE  (UINT16) -1 ///< Symbol is an absolute value.
 #define EFI_IMAGE_SYM_DEBUG     (UINT16) -2 ///< Symbol is a special debug item.
 
-///
-/// Symbol Type (fundamental) values.
-///
+//
+// Symbol Type (fundamental) values.
+//
 #define EFI_IMAGE_SYM_TYPE_NULL   0   ///< no type.
 #define EFI_IMAGE_SYM_TYPE_VOID   1   ///< no valid type.
 #define EFI_IMAGE_SYM_TYPE_CHAR   2   ///< type character.
@@ -429,17 +438,17 @@ typedef struct {
 #define EFI_IMAGE_SYM_TYPE_UINT   14
 #define EFI_IMAGE_SYM_TYPE_DWORD  15
 
-///
-/// Symbol Type (derived) values.
-///
+//
+// Symbol Type (derived) values.
+//
 #define EFI_IMAGE_SYM_DTYPE_NULL      0 ///< no derived type.
 #define EFI_IMAGE_SYM_DTYPE_POINTER   1
 #define EFI_IMAGE_SYM_DTYPE_FUNCTION  2
 #define EFI_IMAGE_SYM_DTYPE_ARRAY     3
 
-///
-/// Storage classes.
-///
+//
+// Storage classes.
+//
 #define EFI_IMAGE_SYM_CLASS_END_OF_FUNCTION   ((UINT8) -1)
 #define EFI_IMAGE_SYM_CLASS_NULL              0
 #define EFI_IMAGE_SYM_CLASS_AUTOMATIC         1
@@ -477,18 +486,18 @@ typedef struct {
 #define EFI_IMAGE_N_BTSHFT  4
 #define EFI_IMAGE_N_TSHIFT  2
 
-///
-/// Communal selection types.
-///
+//
+// Communal selection types.
+//
 #define EFI_IMAGE_COMDAT_SELECT_NODUPLICATES    1
 #define EFI_IMAGE_COMDAT_SELECT_ANY             2
 #define EFI_IMAGE_COMDAT_SELECT_SAME_SIZE       3
 #define EFI_IMAGE_COMDAT_SELECT_EXACT_MATCH     4
 #define EFI_IMAGE_COMDAT_SELECT_ASSOCIATIVE     5
                                        
-///
-/// the following values only be referred in PeCoff, not defined in PECOFF.
-///
+//
+// the following values only be referred in PeCoff, not defined in PECOFF.
+//
 #define EFI_IMAGE_WEAK_EXTERN_SEARCH_NOLIBRARY  1
 #define EFI_IMAGE_WEAK_EXTERN_SEARCH_LIBRARY    2
 #define EFI_IMAGE_WEAK_EXTERN_SEARCH_ALIAS      3
@@ -507,9 +516,9 @@ typedef struct {
 ///
 #define EFI_IMAGE_SIZEOF_RELOCATION 10
 
-///
-/// I386 relocation types.
-///
+//
+// I386 relocation types.
+//
 #define EFI_IMAGE_REL_I386_ABSOLUTE 0x0000  ///< Reference is absolute, no relocation is necessary
 #define EFI_IMAGE_REL_I386_DIR16    0x0001  ///< Direct 16-bit reference to the symbols virtual address
 #define EFI_IMAGE_REL_I386_REL16    0x0002  ///< PC-relative 16-bit reference to the symbols virtual address
@@ -520,9 +529,9 @@ typedef struct {
 #define EFI_IMAGE_REL_I386_SECREL   0x000B
 #define EFI_IMAGE_REL_I386_REL32    0x0014  ///< PC-relative 32-bit reference to the symbols virtual address
 
-/// 
-/// x64 processor relocation types.
-/// 
+// 
+// x64 processor relocation types.
+// 
 #define IMAGE_REL_AMD64_ABSOLUTE  0x0000
 #define IMAGE_REL_AMD64_ADDR64    0x0001
 #define IMAGE_REL_AMD64_ADDR32    0x0002
@@ -554,9 +563,9 @@ typedef struct {
 ///
 #define EFI_IMAGE_SIZEOF_BASE_RELOCATION  8
 
-///
-/// Based relocation types.
-///
+//
+// Based relocation types.
+//
 #define EFI_IMAGE_REL_BASED_ABSOLUTE      0
 #define EFI_IMAGE_REL_BASED_HIGH          1
 #define EFI_IMAGE_REL_BASED_LOW           2
@@ -583,9 +592,9 @@ typedef struct {
 ///
 #define EFI_IMAGE_SIZEOF_LINENUMBER 6
 
-///
-/// Archive format.
-///
+//
+// Archive format.
+//
 #define EFI_IMAGE_ARCHIVE_START_SIZE        8
 #define EFI_IMAGE_ARCHIVE_START             "!<arch>\n"
 #define EFI_IMAGE_ARCHIVE_END               "`\n"
@@ -593,6 +602,9 @@ typedef struct {
 #define EFI_IMAGE_ARCHIVE_LINKER_MEMBER     "/               "
 #define EFI_IMAGE_ARCHIVE_LONGNAMES_MEMBER  "//              "
 
+///
+/// Archive Member Headers
+///
 typedef struct {
   UINT8 Name[16];     ///< File member name - `/' terminated.
   UINT8 Date[12];     ///< File member date - decimal.
@@ -609,9 +621,9 @@ typedef struct {
 #define EFI_IMAGE_SIZEOF_ARCHIVE_MEMBER_HDR 60
 
 
-///
-/// DLL Support
-///
+//
+// DLL Support
+//
 
 ///
 /// Export Directory Table
@@ -638,6 +650,9 @@ typedef struct {
   UINT8   Name[1];
 } EFI_IMAGE_IMPORT_BY_NAME;
 
+///
+/// Import Address Table RVA (Thunk Table)
+///
 typedef struct {
   union {
     UINT32                    Function;

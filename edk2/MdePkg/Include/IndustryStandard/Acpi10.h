@@ -82,6 +82,9 @@ typedef struct {
 
 #pragma pack()
 
+///
+/// the End tag identifies an end of resource data.
+///
 typedef struct {
   UINT8 Desc;
   UINT8 Checksum;

@@ -2,8 +2,8 @@
   Support for PCI 2.2 standard.
 
   This file includes the definitions in the following specifications,
-    PCI Local Bus Specification, 2.0
-    PCI-to-PCI Bridge Architecture Specification,
+    PCI Local Bus Specification, 2.2
+    PCI-to-PCI Bridge Architecture Specification, Revision 1.2
     PC Card Standard, 8.0
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
@@ -25,8 +25,12 @@
 #define PCI_MAX_DEVICE  31
 #define PCI_MAX_FUNC    7
 
-
 #pragma pack(1)
+
+///
+/// Common header region in PCI Configuration Space
+/// Section 6.1, PCI Local Bus Specification, 2.2
+///
 typedef struct {
   UINT16  VendorId;
   UINT16  DeviceId;
@@ -40,6 +44,10 @@ typedef struct {
   UINT8   BIST;
 } PCI_DEVICE_INDEPENDENT_REGION;
 
+///
+/// PCI Device header region in PCI Configuration Space
+/// Section 6.1, PCI Local Bus Specification, 2.2
+///
 typedef struct {
   UINT32  Bar[6];
   UINT32  CISPtr;
@@ -55,13 +63,18 @@ typedef struct {
   UINT8   MaxLat;
 } PCI_DEVICE_HEADER_TYPE_REGION;
 
+///
+/// PCI Device Configuration Space
+/// Section 6.1, PCI Local Bus Specification, 2.2
+///
 typedef struct {
   PCI_DEVICE_INDEPENDENT_REGION Hdr;
   PCI_DEVICE_HEADER_TYPE_REGION Device;
 } PCI_TYPE00;
 
 ///
-/// defined in PCI-to-PCI Bridge Architecture Specification
+/// PCI-PCI Bridge header region in PCI Configuration Space
+/// Section 3.2, PCI-PCI Bridge Architecture, Version 1.2
 ///
 typedef struct {
   UINT32  Bar[2];
@@ -88,6 +101,10 @@ typedef struct {
   UINT16  BridgeControl;
 } PCI_BRIDGE_CONTROL_REGISTER;
 
+///
+/// PCI-to-PCI Bridge Configuration Space
+/// Section 3.2, PCI-PCI Bridge Architecture, Version 1.2
+///
 typedef struct {
   PCI_DEVICE_INDEPENDENT_REGION Hdr;
   PCI_BRIDGE_CONTROL_REGISTER   Bridge;
@@ -99,7 +116,8 @@ typedef union {
 } PCI_TYPE_GENERIC;
 
 /// 
-/// CardBus Conroller Configuration Space, defined in PC Card Standard. 8.0
+/// CardBus Conroller Configuration Space, 
+/// Section 4.5.1, PC Card Standard. 8.0
 ///
 typedef struct {
   UINT32  CardBusSocketReg;     ///< Cardus Socket/ExCA Base
@@ -437,13 +455,18 @@ typedef union {
 #define EFI_PCI_CAPABILITY_ID_MSI     0x05
 #define EFI_PCI_CAPABILITY_ID_HOTPLUG 0x06
 
+///
+/// Capabilities List Header
+/// Section 6.7, PCI Local Bus Specification, 2.2
+///
 typedef struct {
   UINT8 CapabilityID;
   UINT8 NextItemPtr;
 } EFI_PCI_CAPABILITY_HDR;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_PMI, defined in PCI Power Management Interface Specifiction
+/// Power Management Register Block Definition 
+/// Section 3.2, PCI Power Management Interface Specifiction, Revision 1.2
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -454,7 +477,8 @@ typedef struct {
 } EFI_PCI_CAPABILITY_PMI;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_AGP, defined in Accelerated Graphics Port Interface Specification
+/// A.G.P Capability
+/// Section 6.1.4, Accelerated Graphics Port Interface Specification, Revision 1.0
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -465,7 +489,8 @@ typedef struct {
 } EFI_PCI_CAPABILITY_AGP;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_VPD, in PCI2.2 Spec.
+/// VPD Capability Structure
+/// Appendix I, PCI Local Bus Specification, 2.2
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -474,7 +499,8 @@ typedef struct {
 } EFI_PCI_CAPABILITY_VPD;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_SLOTID, defined in PCI-to-PCI Bridge Architeture Specification
+/// Slot Numbering Capabilities Register
+/// Section 3.2.6, PCI-to-PCI Bridge Architeture Specification, Revision 1.2
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -483,7 +509,8 @@ typedef struct {
 } EFI_PCI_CAPABILITY_SLOTID;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_MSI, defined in PCI2.2
+/// Message Capability Structure for 32-bit Message Address
+/// Section 6.8.1, PCI Local Bus Specification, 2.2
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -492,6 +519,10 @@ typedef struct {
   UINT16                  MsgDataReg;
 } EFI_PCI_CAPABILITY_MSI32;
 
+///
+/// Message Capability Structure for 64-bit Message Address
+/// Section 6.8.1, PCI Local Bus Specification, 2.2
+///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
   UINT16                  MsgCtrlReg;
@@ -501,7 +532,8 @@ typedef struct {
 } EFI_PCI_CAPABILITY_MSI64;
 
 ///
-/// Capability EFI_PCI_CAPABILITY_ID_HOTPLUG, defined in CompactPCI Hot Swap Specification PICMG 2.1, R1.0
+/// Capability EFI_PCI_CAPABILITY_ID_HOTPLUG, 
+/// CompactPCI Hot Swap Specification PICMG 2.1, R1.0
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -546,12 +578,20 @@ typedef struct {
 #define PCI_CODE_TYPE_PCAT_IMAGE                        0x00
 #define EFI_PCI_EXPANSION_ROM_HEADER_COMPRESSED         0x0001  ///< defined in UEFI spec.
 
+///
+/// Standard PCI Expansion ROM Header
+/// Section 13.4.2, Unified Extensible Firmware Interface Specification, Version 2.1
+///
 typedef struct {
   UINT16  Signature;    ///< 0xaa55
   UINT8   Reserved[0x16];
   UINT16  PcirOffset;
 } PCI_EXPANSION_ROM_HEADER;
 
+///
+/// Legacy ROM Header Extensions
+/// Section 6.3.3.1, PCI Local Bus Specification, 2.2
+///
 typedef struct {
   UINT16  Signature;    ///< 0xaa55
   UINT8   Size512;
@@ -560,6 +600,10 @@ typedef struct {
   UINT16  PcirOffset;
 } EFI_LEGACY_EXPANSION_ROM_HEADER;
 
+///
+/// PCI Data Structure Format
+/// Section 6.3.1.2, PCI Local Bus Specification, 2.2
+///
 typedef struct {
   UINT32  Signature;    ///< "PCIR"
   UINT16  VendorId;
@@ -576,7 +620,8 @@ typedef struct {
 } PCI_DATA_STRUCTURE;
 
 ///
-/// defined in EFI/UEFI Spec
+/// EFI PCI Expansion ROM Header
+/// Section 13.4.2, Unified Extensible Firmware Interface Specification, Version 2.1
 ///
 typedef struct {
   UINT16  Signature;    ///< 0xaa55
