@@ -305,12 +305,12 @@ typedef struct tdTPM_VERSION {
 ///
 /// Part 2, section 5.4: TPM_DIGEST
 ///
+#define TPM_SHA1_160_HASH_LEN       0x14
+#define TPM_SHA1BASED_NONCE_LEN     TPM_SHA1_160_HASH_LEN
+
 typedef struct tdTPM_DIGEST{
   UINT8                             digest[TPM_SHA1_160_HASH_LEN];
 } TPM_DIGEST;
-
-#define TPM_SHA1_160_HASH_LEN       0x14
-#define TPM_SHA1BASED_NONCE_LEN     TPM_SHA1_160_HASH_LEN
 
 typedef TPM_DIGEST                  TPM_CHOSENID_HASH;
 typedef TPM_DIGEST                  TPM_COMPOSITE_HASH;
