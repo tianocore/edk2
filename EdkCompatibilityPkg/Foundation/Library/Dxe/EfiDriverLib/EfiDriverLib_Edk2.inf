@@ -1,6 +1,6 @@
 #/*++
 #
-# Copyright (c) 2004 - 2008, Intel Corporation                                                         
+# Copyright (c) 2004 - 2006, Intel Corporation                                                         
 # All rights reserved. This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -11,52 +11,46 @@
 # 
 #  Module Name:
 #
-#    EfiRuntimeLib.inf
+#   EfiDriverLib.inf
 #
 #  Abstract:
 #
-#    Component description file for the EFI runtime library.
+#    Component description file for the EFI driver library.
 #
 #--*/
 
 [defines]
-BASE_NAME       = EfiRuntimeLib
+BASE_NAME       = EfiDriverLib
 COMPONENT_TYPE  = LIBRARY
 
 [sources.common]
   Debug.c
+  DevicePath.c
+  EfiDriverLib.c
+  DxeDriverLib.c
+  EfiGetConfigTable.c
+  EfiDriverModelLib.c
   Event.c
-  Io.c
-  LibGlobals.c
+  Handle.c
+  LibGlobalSt.c
+  LibGlobalDs.c
+  LibGlobalErrorLevel.c
+  Lock.c
+  EfiLibAllocate.c
+  Perf.c
+  ReportStatusCode.c
   GetImage.c
-  RtDevicePath.c
+
+  ../Hob/Hob.c
 
 [sources.ia32]
-  Ia32/RuntimeLib.c
-  Ia32/IoLib.c
-  Ia32/Lock.c
-  Ia32/PlatformIoLib.c
-  Ia32/Fvb.c
-  Ia32/CpuFlushCache.c		| MSFT
-  Ia32/CpuFlushCache.asm  | INTEL
-  Ia32/CpuFlushCache.S    | GCC
+  Ia32/PerformancePrimitives.c
 
 [sources.x64]
-  X64/RuntimeLib.c
-  X64/IoLib.c
-  X64/Lock.c
-  X64/PlatformIoLib.c
-  X64/Fvb.c
-  X64/RuntimeLibAsm.asm     | MSFT
-  X64/RuntimeLibAsm.asm     | INTEL
-  X64/RuntimeLibAsm.S       | GCC
+  X64/PerformancePrimitives.c
 
 [sources.ipf]
-  Ipf/RuntimeLib.c
-  Ipf/Lock.c
-  Ipf/Fvb.c
-  Ipf/EsalLib.s
-  Ipf/IpfCpuCache.s
+  Ipf/PerformancePrimitives.s
   #
   # Only for CYGWINGCC IPF tool chain, EFI_BREAKPOINT and MEMORY_FENCE
   # is defined as two functions EcpEfiBreakPoint and EcpMemoryFence.
@@ -64,7 +58,7 @@ COMPONENT_TYPE  = LIBRARY
   Ipf/AsmCpuMisc.s | GCC
 
 [sources.ebc]
-  Ebc/RuntimeLib.c
+  Ebc/PerformancePrimitives.c
 
 [includes.common]
   $(EDK_SOURCE)/Foundation
@@ -76,6 +70,7 @@ COMPONENT_TYPE  = LIBRARY
   $(EDK_SOURCE)/Foundation/Include/IndustryStandard
   $(EDK_SOURCE)/Foundation/Core/Dxe
   $(EDK_SOURCE)/Foundation/Library/Dxe/Include
+  $(EDK_SOURCE)/Foundation/Cpu/Pentium/Include
 
 [libraries.common]
   EdkGuidLib
@@ -86,5 +81,13 @@ COMPONENT_TYPE  = LIBRARY
   ArchProtocolLib
   EfiCommonLib
 
-[nmake.common]
+[libraries.ia32]
+  CpuIA32Lib
 
+[libraries.x64]
+  CpuIA32Lib
+
+[libraries.ipf]
+  CpuIA64Lib
+
+[nmake.common]

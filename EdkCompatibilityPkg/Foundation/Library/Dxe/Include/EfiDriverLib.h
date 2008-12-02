@@ -47,6 +47,60 @@ Abstract:
 
 #include EFI_PROTOCOL_DEFINITION (DebugMask)
 
+#if defined(__GNUC__) && defined(ECP_CPU_IPF)
+
+VOID
+EFIAPI
+EcpEfiBreakPoint (
+  VOID
+  )
+/*++
+
+Routine Description:
+
+  Generates a breakpoint on the CPU.
+
+  Generates a breakpoint on the CPU. The breakpoint must be implemented such
+  that code can resume normal execution after the breakpoint.
+
+Arguments:
+
+  VOID
+
+Returns: 
+
+  VOID
+
+--*/
+;
+
+VOID
+EFIAPI
+EcpMemoryFence (
+  VOID
+  )
+/*++
+
+Routine Description:
+
+  Used to serialize load and store operations.
+
+  All loads and stores that proceed calls to this function are guaranteed to be
+  globally visible when this function returns.
+
+Arguments:
+
+  VOID
+
+Returns: 
+
+  VOID
+
+--*/
+;
+
+#endif
+
 typedef struct {
   CHAR8   *Language;
   CHAR16  *UnicodeString;
