@@ -143,6 +143,14 @@ typedef struct {
   UINT32                    PpbMemoryWindow;     
 } PCAT_PCI_ROOT_BRIDGE_SCAN_FOR_ROM_CONTEXT;
 
+typedef struct {
+  UINT8 Register;
+  UINT8 Function;
+  UINT8 Device;
+  UINT8 Bus;
+  UINT8 Reserved[4];
+} DEFIO_PCI_ADDR;
+
 //
 // Driver Protocol Constructor Prototypes
 //

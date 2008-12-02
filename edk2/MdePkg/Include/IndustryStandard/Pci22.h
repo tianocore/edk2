@@ -565,14 +565,6 @@ typedef struct {
 #define EFI_ROOT_BRIDGE_LIST                            'eprb'  
 #define EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE       0x0EF1  ///< defined in UEFI Spec.
 
-typedef struct {
-  UINT8 Register;
-  UINT8 Function;
-  UINT8 Device;
-  UINT8 Bus;
-  UINT8 Reserved[4];
-} DEFIO_PCI_ADDR;
-
 #define PCI_EXPANSION_ROM_HEADER_SIGNATURE              0xaa55
 #define PCI_DATA_STRUCTURE_SIGNATURE                    SIGNATURE_32 ('P', 'C', 'I', 'R')
 #define PCI_CODE_TYPE_PCAT_IMAGE                        0x00
