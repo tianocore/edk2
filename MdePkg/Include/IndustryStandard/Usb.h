@@ -334,6 +334,7 @@ typedef enum {
 #pragma pack(1)
 ///
 /// Descriptor header for Report/Physical Descriptors
+/// HID 1.1, section 6.2.1
 ///
 typedef struct hid_class_descriptor {
   UINT8   DescriptorType;
@@ -343,6 +344,7 @@ typedef struct hid_class_descriptor {
 ///
 /// The HID descriptor identifies the length and type
 /// of subordinate descriptors for a device.
+/// HID 1.1, section 6.2.1
 ///
 typedef struct hid_descriptor {
   UINT8                         Length;

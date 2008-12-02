@@ -33,7 +33,8 @@
 #pragma pack(1)
 
 ///
-/// defined in PCI Firmware Specification
+/// PCI Data Structure Format
+/// Section 5.1.2, PCI Firmware Specification, Revision 3.0
 ///
 typedef struct {
   UINT32  Signature;    ///< "PCIR"

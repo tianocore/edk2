@@ -22,7 +22,7 @@
 #define TPM_BASE                    (EFI_MAX_BIT + (EFI_MAX_BIT >> 1))
 
 //
-// Structures are all packed on 1-byte alignment
+// All structures MUST be packed on a byte boundary.
 //
 
 #pragma pack (1)
@@ -281,9 +281,9 @@ typedef UINT32                      TPM_FAMILY_OPERATION;
 // Part 2, section 5: Basic Structures
 //
 
-//
-// Part 2, section 5.1: TPM_STRUCT_VER
-//
+///
+/// Part 2, section 5.1: TPM_STRUCT_VER
+///
 typedef struct tdTPM_STRUCT_VER {
   UINT8                             major;
   UINT8                             minor;
@@ -291,9 +291,9 @@ typedef struct tdTPM_STRUCT_VER {
   UINT8                             revMinor;
 } TPM_STRUCT_VER;
 
-//
-// Part 2, section 5.3: TPM_VERSION
-//
+///
+/// Part 2, section 5.3: TPM_VERSION
+///
 typedef struct tdTPM_VERSION {
   TPM_VERSION_BYTE                  major;
   TPM_VERSION_BYTE                  minor;
@@ -301,15 +301,16 @@ typedef struct tdTPM_VERSION {
   UINT8                             revMinor;
 } TPM_VERSION;
 
-//
-// Part 2, section 5.4: TPM_DIGEST
-//
-#define TPM_SHA1_160_HASH_LEN       0x14
-#define TPM_SHA1BASED_NONCE_LEN     TPM_SHA1_160_HASH_LEN
 
+///
+/// Part 2, section 5.4: TPM_DIGEST
+///
 typedef struct tdTPM_DIGEST{
   UINT8                             digest[TPM_SHA1_160_HASH_LEN];
 } TPM_DIGEST;
+
+#define TPM_SHA1_160_HASH_LEN       0x14
+#define TPM_SHA1BASED_NONCE_LEN     TPM_SHA1_160_HASH_LEN
 
 typedef TPM_DIGEST                  TPM_CHOSENID_HASH;
 typedef TPM_DIGEST                  TPM_COMPOSITE_HASH;
@@ -320,9 +321,9 @@ typedef TPM_DIGEST                  TPM_AUDITDIGEST;
 typedef TPM_DIGEST                  TPM_DAA_TPM_SEED;
 typedef TPM_DIGEST                  TPM_DAA_CONTEXT_SEED;
 
-//
-// Part 2, section 5.5: TPM_NONCE
-//
+///
+/// Part 2, section 5.5: TPM_NONCE
+///
 typedef struct tdTPM_NONCE{
   UINT8                             nonce[20];
 } TPM_NONCE;
@@ -335,10 +336,10 @@ typedef tdTPM_AUTHDATA              TPM_AUTHDATA;
 typedef TPM_AUTHDATA                TPM_SECRET;
 typedef TPM_AUTHDATA                TPM_ENCAUTH;
 
-//
-// Part 2, section 5.7: TPM_KEY_HANDLE_LIST
-// Size of handle is loaded * sizeof(TPM_KEY_HANDLE)
-//
+///
+/// Part 2, section 5.7: TPM_KEY_HANDLE_LIST
+/// Size of handle is loaded * sizeof(TPM_KEY_HANDLE)
+///
 typedef struct tdTPM_KEY_HANDLE_LIST {
   UINT16                            loaded;
   TPM_KEY_HANDLE                    handle[1];
@@ -409,9 +410,9 @@ typedef struct tdTPM_KEY_HANDLE_LIST {
 #define TPM_AUTH_ALWAYS             ((TPM_AUTH_DATA_USAGE) 0x01)
 #define TPM_AUTH_PRIV_USE_ONLY      ((TPM_AUTH_DATA_USAGE) 0x03)
 
-//
-// Part 2, section 5.10: TPM_KEY_FLAGS
-//
+///
+/// Part 2, section 5.10: TPM_KEY_FLAGS
+///
 typedef enum tdTPM_KEY_FLAGS {
   redirection                       = 0x00000001,
   migratable                        = 0x00000002,
@@ -420,21 +421,21 @@ typedef enum tdTPM_KEY_FLAGS {
   migrateAuthority                  = 0x00000010
 } TPM_KEY_FLAGS_BITS;
 
-//
-// Part 2, section 5.11: TPM_CHANGEAUTH_VALIDATE
-//
+///
+/// Part 2, section 5.11: TPM_CHANGEAUTH_VALIDATE
+///
 typedef struct tdTPM_CHANGEAUTH_VALIDATE {
   TPM_SECRET                        newAuthSecret;
   TPM_NONCE                         n1;
 } TPM_CHANGEAUTH_VALIDATE;
 
-//
-// Part 2, section 5.12: TPM_MIGRATIONKEYAUTH
-//   decalared after section 10 to catch declaration of TPM_PUBKEY
-//
-// Part 2 section 10.1: TPM_KEY_PARMS
-//   [size_is(parmSize)] BYTE* parms;
-//
+///
+/// Part 2, section 5.12: TPM_MIGRATIONKEYAUTH
+///   decalared after section 10 to catch declaration of TPM_PUBKEY
+///
+/// Part 2 section 10.1: TPM_KEY_PARMS
+///   [size_is(parmSize)] BYTE* parms;
+///
 typedef struct tdTPM_KEY_PARMS {
   TPM_ALGORITHM_ID                  algorithmID;
   TPM_ENC_SCHEME                    encScheme;
@@ -443,44 +444,44 @@ typedef struct tdTPM_KEY_PARMS {
   UINT8                             *parms;
 } TPM_KEY_PARMS;
 
-//
-// Part 2, section 10.4: TPM_STORE_PUBKEY
-//
+///
+/// Part 2, section 10.4: TPM_STORE_PUBKEY
+///
 typedef struct tdTPM_STORE_PUBKEY {
   UINT32                            keyLength;
   UINT8                             key[1];
 } TPM_STORE_PUBKEY;
 
-//
-// Part 2, section 10.5: TPM_PUBKEY
-//
+///
+/// Part 2, section 10.5: TPM_PUBKEY
+///
 typedef struct tdTPM_PUBKEY{
   TPM_KEY_PARMS                     algorithmParms;
   TPM_STORE_PUBKEY                  pubKey;
 } TPM_PUBKEY;
 
-//
-// Part 2, section 5.12: TPM_MIGRATIONKEYAUTH
-//
+///
+/// Part 2, section 5.12: TPM_MIGRATIONKEYAUTH
+///
 typedef struct tdTPM_MIGRATIONKEYAUTH{
   TPM_PUBKEY                        migrationKey;
   TPM_MIGRATE_SCHEME                migrationScheme;
   TPM_DIGEST                        digest;
 } TPM_MIGRATIONKEYAUTH;
 
-//
-// Part 2, section 5.13: TPM_COUNTER_VALUE
-//
+///
+/// Part 2, section 5.13: TPM_COUNTER_VALUE
+///
 typedef struct tdTPM_COUNTER_VALUE{
   TPM_STRUCTURE_TAG                 tag;
   UINT8                             label[4];
   TPM_ACTUAL_COUNT                  counter;
 } TPM_COUNTER_VALUE;
 
-//
-// Part 2, section 5.14: TPM_SIGN_INFO
-//   Size of data indicated by dataLen
-//
+///
+/// Part 2, section 5.14: TPM_SIGN_INFO
+///   Size of data indicated by dataLen
+///
 typedef struct tdTPM_SIGN_INFO {
   TPM_STRUCTURE_TAG                 tag;
   UINT8                             fixed[4];
@@ -489,18 +490,18 @@ typedef struct tdTPM_SIGN_INFO {
   UINT8                             *data;
 } TPM_SIGN_INFO;
 
-//
-// Part 2, section 5.15: TPM_MSA_COMPOSITE
-//   Number of migAuthDigest indicated by MSAlist
-//
+///
+/// Part 2, section 5.15: TPM_MSA_COMPOSITE
+///   Number of migAuthDigest indicated by MSAlist
+///
 typedef struct tdTPM_MSA_COMPOSITE {
   UINT32                            MSAlist;
   TPM_DIGEST                        migAuthDigest[1];
 } TPM_MSA_COMPOSITE;
 
-//
-// Part 2, section 5.16: TPM_CMK_AUTH
-//
+///
+/// Part 2, section 5.16: TPM_CMK_AUTH
+///
 typedef struct tdTPM_CMK_AUTH{
   TPM_DIGEST                        migrationAuthorityDigest;
   TPM_DIGEST                        destinationKeyDigest;
@@ -516,36 +517,36 @@ typedef struct tdTPM_CMK_AUTH{
 #define TPM_CMK_DELEGATE_LEGACY     ((TPM_CMK_DELEGATE) BIT28)
 #define TPM_CMK_DELEGATE_MIGRATE    ((TPM_CMK_DELEGATE) BIT27)
 
-//
-// Part 2, section 5.18: TPM_SELECT_SIZE
-//
+///
+/// Part 2, section 5.18: TPM_SELECT_SIZE
+///
 typedef struct tdTPM_SELECT_SIZE {
   UINT8                             major;
   UINT8                             minor;
   UINT16                            reqSize;
 } TPM_SELECT_SIZE;
 
-//
-// Part 2, section 5,19: TPM_CMK_MIGAUTH
-//
+///
+/// Part 2, section 5,19: TPM_CMK_MIGAUTH
+///
 typedef struct tdTPM_CMK_MIGAUTH{
   TPM_STRUCTURE_TAG                 tag;
   TPM_DIGEST                        msaDigest;
   TPM_DIGEST                        pubKeyDigest;
 } TPM_CMK_MIGAUTH;
 
-//
-// Part 2, section 5.20: TPM_CMK_SIGTICKET
-//
+///
+/// Part 2, section 5.20: TPM_CMK_SIGTICKET
+///
 typedef struct tdTPM_CMK_SIGTICKET{
   TPM_STRUCTURE_TAG                 tag;
   TPM_DIGEST                        verKeyDigest;
   TPM_DIGEST                        signedData;
 } TPM_CMK_SIGTICKET;
 
-//
-// Part 2, section 5.21: TPM_CMK_MA_APPROVAL
-//
+///
+/// Part 2, section 5.21: TPM_CMK_MA_APPROVAL
+///
 typedef struct tdTPM_CMK_MA_APPROVAL{
   TPM_STRUCTURE_TAG                 tag;
   TPM_DIGEST                        migrationAuthorityDigest;
@@ -561,9 +562,9 @@ typedef struct tdTPM_CMK_MA_APPROVAL{
 #define TPM_TAG_RSP_AUTH1_COMMAND   ((TPM_STRUCTURE_TAG) 0x00C5)
 #define TPM_TAG_RSP_AUTH2_COMMAND   ((TPM_STRUCTURE_TAG) 0x00C6)
 
-//
-// Part 2, section 7.1: TPM_PERMANENT_FLAGS
-//
+///
+/// Part 2, section 7.1: TPM_PERMANENT_FLAGS
+///
 typedef struct tdTPM_PERMANENT_FLAGS{
   TPM_STRUCTURE_TAG                 tag;
   BOOLEAN                           disable;
@@ -610,9 +611,9 @@ typedef struct tdTPM_PERMANENT_FLAGS{
 #define TPM_PF_TPMESTABLISHED               ((TPM_CAPABILITY_AREA) 18)
 #define TPM_PF_MAINTENANCEDONE              ((TPM_CAPABILITY_AREA) 19)
 
-//
-// Part 2, section 7.2: TPM_STCLEAR_FLAGS
-//
+///
+/// Part 2, section 7.2: TPM_STCLEAR_FLAGS
+///
 typedef struct tdTPM_STCLEAR_FLAGS{
   TPM_STRUCTURE_TAG                 tag;
   BOOLEAN                           deactivated;
@@ -631,9 +632,9 @@ typedef struct tdTPM_STCLEAR_FLAGS{
 #define TPM_SF_PHYSICALPRESENCELOCK ((TPM_CAPABILITY_AREA) 4)
 #define TPM_SF_BGLOBALLOCK          ((TPM_CAPABILITY_AREA) 5)
 
-//
-// Part 2, section 7.3: TPM_STANY_FLAGS
-//
+///
+/// Part 2, section 7.3: TPM_STANY_FLAGS
+///
 typedef struct tdTPM_STANY_FLAGS{
   TPM_STRUCTURE_TAG                 tag;
   BOOLEAN                           postInitialise;
@@ -659,37 +660,37 @@ typedef struct tdTPM_STANY_FLAGS{
 // Part 2, section 8: PCR Structures
 // 
 
-//
-// Part 2, section 8.1: TPM_PCR_SELECTION
-//   Size of pcrSelect[] indicated by sizeOfSelect
-//
+///
+/// Part 2, section 8.1: TPM_PCR_SELECTION
+///   Size of pcrSelect[] indicated by sizeOfSelect
+///
 typedef struct tdTPM_PCR_SELECTION {
   UINT16                            sizeOfSelect;
   UINT8                             pcrSelect[1];
 } TPM_PCR_SELECTION;
 
-//
-// Part 2, section 8.2: TPM_PCR_COMPOSITE
-//   Size of pcrValue[] indicated by valueSize
-//
+///
+/// Part 2, section 8.2: TPM_PCR_COMPOSITE
+///   Size of pcrValue[] indicated by valueSize
+///
 typedef struct tdTPM_PCR_COMPOSITE {
   TPM_PCR_SELECTION                 select;
   UINT32                            valueSize;
   TPM_PCRVALUE                      pcrValue[1];
 } TPM_PCR_COMPOSITE;
 
-//
-// Part 2, section 8.3: TPM_PCR_INFO
-//
+///
+/// Part 2, section 8.3: TPM_PCR_INFO
+///
 typedef struct tdTPM_PCR_INFO {
   TPM_PCR_SELECTION                 pcrSelection;
   TPM_COMPOSITE_HASH                digestAtRelease;
   TPM_COMPOSITE_HASH                digestAtCreation;
 } TPM_PCR_INFO;
 
-//
-// Part 2, section 8.6: TPM_LOCALITY_SELECTION
-//
+///
+/// Part 2, section 8.6: TPM_LOCALITY_SELECTION
+///
 typedef UINT8                       TPM_LOCALITY_SELECTION;
 
 #define TPM_LOC_FOUR                ((UINT8) 0x10)
@@ -698,9 +699,9 @@ typedef UINT8                       TPM_LOCALITY_SELECTION;
 #define TPM_LOC_ONE                 ((UINT8) 0x02)
 #define TPM_LOC_ZERO                ((UINT8) 0x01)
 
-//
-// Part 2, section 8.4: TPM_PCR_INFO_LONG
-//
+///
+/// Part 2, section 8.4: TPM_PCR_INFO_LONG
+///
 typedef struct tdTPM_PCR_INFO_LONG {
   TPM_STRUCTURE_TAG                 tag;
   TPM_LOCALITY_SELECTION            localityAtCreation;
@@ -711,18 +712,18 @@ typedef struct tdTPM_PCR_INFO_LONG {
   TPM_COMPOSITE_HASH                digestAtRelease;
 } TPM_PCR_INFO_LONG;
 
-//
-// Part 2, section 8.5: TPM_PCR_INFO_SHORT
-//
+///
+/// Part 2, section 8.5: TPM_PCR_INFO_SHORT
+///
 typedef struct tdTPM_PCR_INFO_SHORT{
   TPM_PCR_SELECTION                 pcrSelection;
   TPM_LOCALITY_SELECTION            localityAtRelease;
   TPM_COMPOSITE_HASH                digestAtRelease;
 } TPM_PCR_INFO_SHORT;
 
-//
-// Part 2, section 8.8: TPM_PCR_ATTRIBUTES
-//
+///
+/// Part 2, section 8.8: TPM_PCR_ATTRIBUTES
+///
 typedef struct tdTPM_PCR_ATTRIBUTES{
   BOOLEAN                           pcrReset;
   TPM_LOCALITY_SELECTION            pcrExtendLocal;
@@ -733,11 +734,11 @@ typedef struct tdTPM_PCR_ATTRIBUTES{
 // Part 2, section 9: Storage Structures
 //
 
-//
-// Part 2, section 9.1: TPM_STORED_DATA
-//   [size_is(sealInfoSize)] BYTE* sealInfo;
-//   [size_is(encDataSize)] BYTE* encData;
-//
+///
+/// Part 2, section 9.1: TPM_STORED_DATA
+///   [size_is(sealInfoSize)] BYTE* sealInfo;
+///   [size_is(encDataSize)] BYTE* encData;
+///
 typedef struct tdTPM_STORED_DATA {
   TPM_STRUCT_VER                    ver;
   UINT32                            sealInfoSize;
@@ -746,11 +747,11 @@ typedef struct tdTPM_STORED_DATA {
   UINT8                             *encData;
 } TPM_STORED_DATA;
 
-//
-// Part 2, section 9.2: TPM_STORED_DATA12
-//   [size_is(sealInfoSize)] BYTE* sealInfo;
-//   [size_is(encDataSize)] BYTE* encData;
-//
+///
+/// Part 2, section 9.2: TPM_STORED_DATA12
+///   [size_is(sealInfoSize)] BYTE* sealInfo;
+///   [size_is(encDataSize)] BYTE* encData;
+///
 typedef struct tdTPM_STORED_DATA12 {
   TPM_STRUCTURE_TAG                 tag;
   TPM_ENTITY_TYPE                   et;
@@ -760,10 +761,10 @@ typedef struct tdTPM_STORED_DATA12 {
   UINT8                             *encData;
 } TPM_STORED_DATA12;
 
-//
-// Part 2, section 9.3: TPM_SEALED_DATA
-//   [size_is(dataSize)] BYTE* data;
-//
+///
+/// Part 2, section 9.3: TPM_SEALED_DATA
+///   [size_is(dataSize)] BYTE* data;
+///
 typedef struct tdTPM_SEALED_DATA {
   TPM_PAYLOAD_TYPE                  payload;
   TPM_SECRET                        authData;
@@ -773,10 +774,10 @@ typedef struct tdTPM_SEALED_DATA {
   UINT8                             *data;
 } TPM_SEALED_DATA;
 
-//
-// Part 2, section 9.4: TPM_SYMMETRIC_KEY
-//   [size_is(size)] BYTE* data;
-//
+///
+/// Part 2, section 9.4: TPM_SYMMETRIC_KEY
+///   [size_is(size)] BYTE* data;
+///
 typedef struct tdTPM_SYMMETRIC_KEY {
   TPM_ALGORITHM_ID                  algId;
   TPM_ENC_SCHEME                    encScheme;
@@ -784,9 +785,9 @@ typedef struct tdTPM_SYMMETRIC_KEY {
   UINT8                             *data;
 } TPM_SYMMETRIC_KEY;
 
-//
-// Part 2, section 9.5: TPM_BOUND_DATA
-//
+///
+/// Part 2, section 9.5: TPM_BOUND_DATA
+///
 typedef struct tdTPM_BOUND_DATA {
   TPM_STRUCT_VER                    ver;
   TPM_PAYLOAD_TYPE                  payload;
@@ -801,10 +802,10 @@ typedef struct tdTPM_BOUND_DATA {
 // Section 10.1, 10.4, and 10.5 have been defined previously
 //
 
-//
-// Part 2, section 10.2: TPM_KEY
-//   [size_is(encDataSize)] BYTE* encData;
-//
+///
+/// Part 2, section 10.2: TPM_KEY
+///   [size_is(encDataSize)] BYTE* encData;
+///
 typedef struct tdTPM_KEY{
   TPM_STRUCT_VER                    ver;
   TPM_KEY_USAGE                     keyUsage;
@@ -818,10 +819,10 @@ typedef struct tdTPM_KEY{
   UINT8                             *encData;
 } TPM_KEY;
 
-//
-// Part 2, section 10.3: TPM_KEY12
-//   [size_is(encDataSize)] BYTE* encData;
-//
+///
+/// Part 2, section 10.3: TPM_KEY12
+///   [size_is(encDataSize)] BYTE* encData;
+///
 typedef struct tdTPM_KEY12{
   TPM_STRUCTURE_TAG                 tag;
   UINT16                            fill;
@@ -836,18 +837,18 @@ typedef struct tdTPM_KEY12{
   UINT8                             *encData;
 } TPM_KEY12;
 
-//
-// Part 2, section 10.7: TPM_STORE_PRIVKEY
-//   [size_is(keyLength)] BYTE* key;
-//
+///
+/// Part 2, section 10.7: TPM_STORE_PRIVKEY
+///   [size_is(keyLength)] BYTE* key;
+///
 typedef struct tdTPM_STORE_PRIVKEY {
   UINT32                            keyLength;
   UINT8                             *key;
 } TPM_STORE_PRIVKEY;
 
-//
-// Part 2, section 10.6: TPM_STORE_ASYMKEY
-//
+///
+/// Part 2, section 10.6: TPM_STORE_ASYMKEY
+///
 typedef struct tdTPM_STORE_ASYMKEY {                // pos len total
   TPM_PAYLOAD_TYPE                  payload;        // 0    1   1
   TPM_SECRET                        usageAuth;      // 1    20  21
@@ -856,10 +857,10 @@ typedef struct tdTPM_STORE_ASYMKEY {                // pos len total
   TPM_STORE_PRIVKEY                 privKey;        // 61 132-151 193-214
 } TPM_STORE_ASYMKEY;
 
-//
-// Part 2, section 10.8: TPM_MIGRATE_ASYMKEY
-//   [size_is(partPrivKeyLen)] BYTE* partPrivKey;
-//
+///
+/// Part 2, section 10.8: TPM_MIGRATE_ASYMKEY
+///   [size_is(partPrivKeyLen)] BYTE* partPrivKey;
+///
 typedef struct tdTPM_MIGRATE_ASYMKEY {              // pos  len  total
   TPM_PAYLOAD_TYPE                  payload;        //   0    1       1
   TPM_SECRET                        usageAuth;      //   1   20      21
@@ -868,18 +869,18 @@ typedef struct tdTPM_MIGRATE_ASYMKEY {              // pos  len  total
   UINT8                             *partPrivKey;   //  45 112-127 157-172
 } TPM_MIGRATE_ASYMKEY;
 
-//
-// Part 2, section 10.9: TPM_KEY_CONTROL
-//
+///
+/// Part 2, section 10.9: TPM_KEY_CONTROL
+///
 #define TPM_KEY_CONTROL_OWNER_EVICT ((UINT32) 0x00000001)
 
 //
 // Part 2, section 11: Signed Structures
 //
 
-//
-// Part 2, section 11.1: TPM_CERTIFY_INFO Structure
-//
+///
+/// Part 2, section 11.1: TPM_CERTIFY_INFO Structure
+///
 typedef struct tdTPM_CERTIFY_INFO {
   TPM_STRUCT_VER                  version;
   TPM_KEY_USAGE                   keyUsage;
@@ -893,9 +894,9 @@ typedef struct tdTPM_CERTIFY_INFO {
   UINT8                           *PCRInfo;
 } TPM_CERTIFY_INFO;
 
-//
-// Part 2, section 11.2: TPM_CERTIFY_INFO2 Structure
-//
+///
+/// Part 2, section 11.2: TPM_CERTIFY_INFO2 Structure
+///
 typedef struct tdTPM_CERTIFY_INFO2 {
   TPM_STRUCTURE_TAG               tag;
   UINT8                           fill;
@@ -913,9 +914,9 @@ typedef struct tdTPM_CERTIFY_INFO2 {
   UINT8                           *migrationAuthority;
 } TPM_CERTIFY_INFO2;
 
-//
-// Part 2, section 11.3 TPM_QUOTE_INFO Structure
-//
+///
+/// Part 2, section 11.3 TPM_QUOTE_INFO Structure
+///
 typedef struct tdTPM_QUOTE_INFO {
   TPM_STRUCT_VER                  version;
   UINT8                           fixed[4];
@@ -923,9 +924,9 @@ typedef struct tdTPM_QUOTE_INFO {
   TPM_NONCE                       externalData;
 } TPM_QUOTE_INFO;
 
-//
-// Part 2, section 11.4 TPM_QUOTE_INFO2 Structure
-//
+///
+/// Part 2, section 11.4 TPM_QUOTE_INFO2 Structure
+///
 typedef struct tdTPM_QUOTE_INFO2 {
   TPM_STRUCTURE_TAG               tag;
   UINT8                           fixed[4];
@@ -937,9 +938,9 @@ typedef struct tdTPM_QUOTE_INFO2 {
 // Part 2, section 12: Identity Structures
 //
 
-//
-// Part 2, section 12.1 TPM_EK_BLOB
-//
+///
+/// Part 2, section 12.1 TPM_EK_BLOB
+///
 typedef struct tdTPM_EK_BLOB {
   TPM_STRUCTURE_TAG               tag;
   TPM_EK_TYPE                     ekType;
@@ -947,9 +948,9 @@ typedef struct tdTPM_EK_BLOB {
   UINT8                           *blob;
 } TPM_EK_BLOB;
 
-//
-// Part 2, section 12.2 TPM_EK_BLOB_ACTIVATE
-//
+///
+/// Part 2, section 12.2 TPM_EK_BLOB_ACTIVATE
+///
 typedef struct tdTPM_EK_BLOB_ACTIVATE {
   TPM_STRUCTURE_TAG               tag;
   TPM_SYMMETRIC_KEY               sessionKey;
@@ -957,18 +958,18 @@ typedef struct tdTPM_EK_BLOB_ACTIVATE {
   TPM_PCR_INFO_SHORT              pcrInfo;
 } TPM_EK_BLOB_ACTIVATE;
 
-//
-// Part 2, section 12.3 TPM_EK_BLOB_AUTH
-//
+///
+/// Part 2, section 12.3 TPM_EK_BLOB_AUTH
+///
 typedef struct tdTPM_EK_BLOB_AUTH {
   TPM_STRUCTURE_TAG               tag;
   TPM_SECRET                      authValue;
 } TPM_EK_BLOB_AUTH;
 
 
-//
-// Part 2, section 12.5 TPM_IDENTITY_CONTENTS
-//
+///
+/// Part 2, section 12.5 TPM_IDENTITY_CONTENTS
+///
 typedef struct tdTPM_IDENTITY_CONTENTS {
   TPM_STRUCT_VER                  ver;
   UINT32                          ordinal;
@@ -976,9 +977,9 @@ typedef struct tdTPM_IDENTITY_CONTENTS {
   TPM_PUBKEY                      identityPubKey;
 } TPM_IDENTITY_CONTENTS;
 
-//
-// Part 2, section 12.6 TPM_IDENTITY_REQ
-//
+///
+/// Part 2, section 12.6 TPM_IDENTITY_REQ
+///
 typedef struct tdTPM_IDENTITY_REQ {
   UINT32                          asymSize;
   UINT32                          symSize;
@@ -988,9 +989,9 @@ typedef struct tdTPM_IDENTITY_REQ {
   UINT8                           *symBlob;
 } TPM_IDENTITY_REQ;
 
-//
-// Part 2, section 12.7 TPM_IDENTITY_PROOF
-//
+///
+/// Part 2, section 12.7 TPM_IDENTITY_PROOF
+///
 typedef struct tdTPM_IDENTITY_PROOF {
   TPM_STRUCT_VER                  ver;
   UINT32                          labelSize;
@@ -1006,27 +1007,27 @@ typedef struct tdTPM_IDENTITY_PROOF {
   UINT8                           *conformanceCredential;
 } TPM_IDENTITY_PROOF;
 
-//
-// Part 2, section 12.8 TPM_ASYM_CA_CONTENTS
-//
+///
+/// Part 2, section 12.8 TPM_ASYM_CA_CONTENTS
+///
 typedef struct tdTPM_ASYM_CA_CONTENTS {
   TPM_SYMMETRIC_KEY               sessionKey;
   TPM_DIGEST                      idDigest;
 } TPM_ASYM_CA_CONTENTS;
 
-//
-// Part 2, section 12.9 TPM_SYM_CA_ATTESTATION
-//
+///
+/// Part 2, section 12.9 TPM_SYM_CA_ATTESTATION
+///
 typedef struct tdTPM_SYM_CA_ATTESTATION {
   UINT32                          credSize;
   TPM_KEY_PARMS                   algorithm;
   UINT8                           *credential;
 } TPM_SYM_CA_ATTESTATION;
 
-//
-// Part 2, section 15: Tick Structures
-//   Placed here out of order because definitions are used in section 13.
-//
+///
+/// Part 2, section 15: Tick Structures
+///   Placed here out of order because definitions are used in section 13.
+///
 typedef struct tdTPM_CURRENT_TICKS {
   TPM_STRUCTURE_TAG                 tag;
   UINT64                            currentTicks;
@@ -1034,13 +1035,13 @@ typedef struct tdTPM_CURRENT_TICKS {
   TPM_NONCE                         tickNonce;
 } TPM_CURRENT_TICKS;
 
-//
-// Part 2, section 13: Transport structures
-//
+///
+/// Part 2, section 13: Transport structures
+///
 
-//
-// Part 2, section 13.1: TPM _TRANSPORT_PUBLIC
-//
+///
+/// Part 2, section 13.1: TPM _TRANSPORT_PUBLIC
+///
 typedef struct tdTPM_TRANSPORT_PUBLIC {
   TPM_STRUCTURE_TAG               tag;
   TPM_TRANSPORT_ATTRIBUTES        transAttributes;
@@ -1055,9 +1056,9 @@ typedef struct tdTPM_TRANSPORT_PUBLIC {
 #define TPM_TRANSPORT_LOG           ((UINT32)0x00000002)
 #define TPM_TRANSPORT_EXCLUSIVE     ((UINT32)0x00000004)
 
-//
-// Part 2, section 13.2 TPM_TRANSPORT_INTERNAL
-//
+///
+/// Part 2, section 13.2 TPM_TRANSPORT_INTERNAL
+///
 typedef struct tdTPM_TRANSPORT_INTERNAL {
   TPM_STRUCTURE_TAG               tag;
   TPM_AUTHDATA                    authData;
@@ -1067,18 +1068,18 @@ typedef struct tdTPM_TRANSPORT_INTERNAL {
   TPM_DIGEST                      transDigest;
 } TPM_TRANSPORT_INTERNAL;
 
-//
-// Part 2, section 13.3 TPM_TRANSPORT_LOG_IN structure
-//
+///
+/// Part 2, section 13.3 TPM_TRANSPORT_LOG_IN structure
+///
 typedef struct tdTPM_TRANSPORT_LOG_IN {
   TPM_STRUCTURE_TAG               tag;
   TPM_DIGEST                      parameters;
   TPM_DIGEST                      pubKeyHash;
 } TPM_TRANSPORT_LOG_IN;
 
-//
-// Part 2, section 13.4 TPM_TRANSPORT_LOG_OUT structure
-//
+///
+/// Part 2, section 13.4 TPM_TRANSPORT_LOG_OUT structure
+///
 typedef struct tdTPM_TRANSPORT_LOG_OUT {
   TPM_STRUCTURE_TAG               tag;
   TPM_CURRENT_TICKS               currentTicks;
@@ -1086,9 +1087,9 @@ typedef struct tdTPM_TRANSPORT_LOG_OUT {
   TPM_MODIFIER_INDICATOR          locality;
 } TPM_TRANSPORT_LOG_OUT;
 
-//
-// Part 2, section 13.5 TPM_TRANSPORT_AUTH structure
-//
+///
+/// Part 2, section 13.5 TPM_TRANSPORT_AUTH structure
+///
 typedef struct tdTPM_TRANSPORT_AUTH {
   TPM_STRUCTURE_TAG               tag;
   TPM_AUTHDATA                    authData;
@@ -1098,18 +1099,18 @@ typedef struct tdTPM_TRANSPORT_AUTH {
 // Part 2, section 14: Audit Structures
 //
 
-//
-// Part 2, section 14.1 TPM_AUDIT_EVENT_IN structure
-//
+///
+/// Part 2, section 14.1 TPM_AUDIT_EVENT_IN structure
+///
 typedef struct tdTPM_AUDIT_EVENT_IN {
   TPM_STRUCTURE_TAG               tag;
   TPM_DIGEST                      inputParms;
   TPM_COUNTER_VALUE               auditCount;
 } TPM_AUDIT_EVENT_IN;
 
-//
-// Part 2, section 14.2 TPM_AUDIT_EVENT_OUT structure
-//
+///
+/// Part 2, section 14.2 TPM_AUDIT_EVENT_OUT structure
+///
 typedef struct tdTPM_AUDIT_EVENT_OUT {
   TPM_STRUCTURE_TAG               tag;
   TPM_COMMAND_CODE                ordinal;
@@ -1388,9 +1389,9 @@ typedef struct tdTPM_AUDIT_EVENT_OUT {
 // Part 2, section 18: Context structures
 //
 
-//
-// Part 2, section 18.1: TPM_CONTEXT_BLOB
-//
+///
+/// Part 2, section 18.1: TPM_CONTEXT_BLOB
+///
 typedef struct tdTPM_CONTEXT_BLOB {
   TPM_STRUCTURE_TAG               tag;
   TPM_RESOURCE_TYPE               resourceType;
@@ -1404,9 +1405,9 @@ typedef struct tdTPM_CONTEXT_BLOB {
   UINT8                           *sensitiveData;
 } TPM_CONTEXT_BLOB;
 
-//
-// Part 2, section 18.2 TPM_CONTEXT_SENSITIVE
-//
+///
+/// Part 2, section 18.2 TPM_CONTEXT_SENSITIVE
+///
 typedef struct tdTPM_CONTEXT_SENSITIVE {
   TPM_STRUCTURE_TAG               tag;
   TPM_NONCE                       contextNonce;
@@ -1438,15 +1439,20 @@ typedef struct tdTPM_CONTEXT_SENSITIVE {
 #define TPM_NV_INDEX_PERIPHERAL_BASE   ((UINT32)0x00011500)
 #define TPM_NV_INDEX_GROUP_RESV_BASE   ((UINT32)0x00010000)
 
-//
-// The typedefs TPM_NV_PER_ATTRIBUTES (not present in TPM 1.2 Spec. have been added 
-// and structure fields that were to hold the following values
-//
+///
+/// The typedefs TPM_NV_PER_ATTRIBUTES (not present in TPM 1.2 Spec. have been added 
+/// and structure fields that were to hold the following values
+///
 typedef UINT32 TPM_NV_PER_ATTRIBUTES;
 
-//
-// Part 2, section 19.2: TPM_NV_ATTRIBUTES
-//
+///
+/// Part 2, section 19.2: TPM_NV_ATTRIBUTES
+///
+typedef struct tdTPM_NV_ATTRIBUTES {
+  TPM_STRUCTURE_TAG               tag;
+  TPM_NV_PER_ATTRIBUTES           attributes;
+} TPM_NV_ATTRIBUTES;
+
 #define TPM_NV_PER_READ_STCLEAR        (BIT31)
 #define TPM_NV_PER_AUTHREAD            (BIT18)
 #define TPM_NV_PER_OWNERREAD           (BIT17)
@@ -1459,14 +1465,9 @@ typedef UINT32 TPM_NV_PER_ATTRIBUTES;
 #define TPM_NV_PER_OWNERWRITE          (BIT1)
 #define TPM_NV_PER_PPWRITE             (BIT0)
 
-typedef struct tdTPM_NV_ATTRIBUTES {
-  TPM_STRUCTURE_TAG               tag;
-  TPM_NV_PER_ATTRIBUTES           attributes;
-} TPM_NV_ATTRIBUTES;
-
-//
-// Part 2, section 19.3: TPM_NV_DATA_PUBLIC
-//
+///
+/// Part 2, section 19.3: TPM_NV_DATA_PUBLIC
+///
 typedef struct tdTPM_NV_DATA_PUBLIC {
   TPM_STRUCTURE_TAG               tag;
   TPM_NV_INDEX                    nvIndex;
@@ -1567,16 +1568,16 @@ typedef struct tdTPM_DELEGATIONS {
 #define TPM_DELEGATE_ADMIN_LOCK           (BIT1)
 #define TPM_FAMFLAG_ENABLE                (BIT0)
 
-//
-// Part 2, section 20.4: TPM_FAMILY_LABEL
-//
+///
+/// Part 2, section 20.4: TPM_FAMILY_LABEL
+///
 typedef struct tdTPM_FAMILY_LABEL {
   UINT8                           label;
 } TPM_FAMILY_LABEL;
 
-//
-// Part 2, section 20.5: TPM_FAMILY_TABLE_ENTRY
-//
+///
+/// Part 2, section 20.5: TPM_FAMILY_TABLE_ENTRY
+///
 typedef struct tdTPM_FAMILY_TABLE_ENTRY {
   TPM_STRUCTURE_TAG               tag;
   TPM_FAMILY_LABEL                label;
@@ -1594,16 +1595,16 @@ typedef struct tdTPM_FAMILY_TABLE{
   TPM_FAMILY_TABLE_ENTRY famTableRow[TPM_NUM_FAMILY_TABLE_ENTRY_MIN];
 } TPM_FAMILY_TABLE;
 
-//
-// Part 2, section 20.7: TPM_DELEGATE_LABEL
-//
+///
+/// Part 2, section 20.7: TPM_DELEGATE_LABEL
+///
 typedef struct tdTPM_DELEGATE_LABEL {
   UINT8                           label;
 } TPM_DELEGATE_LABEL;
 
-//
-// Part 2, section 20.8: TPM_DELEGATE_PUBLIC
-//
+///
+/// Part 2, section 20.8: TPM_DELEGATE_PUBLIC
+///
 typedef struct tdTPM_DELEGATE_PUBLIC {
   TPM_STRUCTURE_TAG               tag;
   TPM_DELEGATE_LABEL              label;
@@ -1613,9 +1614,9 @@ typedef struct tdTPM_DELEGATE_PUBLIC {
   TPM_FAMILY_VERIFICATION         verificationCount;
 } TPM_DELEGATE_PUBLIC;
 
-//
-// Part 2, section 20.9: TPM_DELEGATE_TABLE_ROW
-//
+///
+/// Part 2, section 20.9: TPM_DELEGATE_TABLE_ROW
+///
 typedef struct tdTPM_DELEGATE_TABLE_ROW {
   TPM_STRUCTURE_TAG               tag;
   TPM_DELEGATE_PUBLIC             pub;
@@ -1631,17 +1632,17 @@ typedef struct tdTPM_DELEGATE_TABLE{
   TPM_DELEGATE_TABLE_ROW delRow[TPM_NUM_DELEGATE_TABLE_ENTRY_MIN];
 } TPM_DELEGATE_TABLE;
 
-//
-// Part 2, section 20.11: TPM_DELEGATE_SENSITIVE
-//
+///
+/// Part 2, section 20.11: TPM_DELEGATE_SENSITIVE
+///
 typedef struct tdTPM_DELEGATE_SENSITIVE {
   TPM_STRUCTURE_TAG               tag;
   TPM_SECRET                      authValue;
 } TPM_DELEGATE_SENSITIVE;
 
-//
-// Part 2, section 20.12: TPM_DELEGATE_OWNER_BLOB
-//
+///
+/// Part 2, section 20.12: TPM_DELEGATE_OWNER_BLOB
+///
 typedef struct tdTPM_DELEGATE_OWNER_BLOB {
   TPM_STRUCTURE_TAG               tag;
   TPM_DELEGATE_PUBLIC             pub;
@@ -1652,9 +1653,9 @@ typedef struct tdTPM_DELEGATE_OWNER_BLOB {
   UINT8                           *sensitiveArea;
 } TPM_DELEGATE_OWNER_BLOB;
 
-//
-// Part 2, section 20.13: TTPM_DELEGATE_KEY_BLOB
-//
+///
+/// Part 2, section 20.13: TTPM_DELEGATE_KEY_BLOB
+///
 typedef struct tdTPM_DELEGATE_KEY_BLOB {
   TPM_STRUCTURE_TAG               tag;
   TPM_DELEGATE_PUBLIC             pub;
@@ -1734,10 +1735,10 @@ typedef struct tdTPM_DELEGATE_KEY_BLOB {
 #define TPM_CAP_PROP_MAX_NV_AVAILABLE   ((TPM_CAPABILITY_AREA) 0x00000123)
 #define TPM_CAP_PROP_INPUT_BUFFER       ((TPM_CAPABILITY_AREA) 0x00000124)
 
-//
-// Part 2, section 21.6: TPM_CAP_VERSION_INFO
-//   [size_is(vendorSpecificSize)] BYTE* vendorSpecific;
-//
+///
+/// Part 2, section 21.6: TPM_CAP_VERSION_INFO
+///   [size_is(vendorSpecificSize)] BYTE* vendorSpecific;
+///
 typedef struct tdTPM_CAP_VERSION_INFO {
   TPM_STRUCTURE_TAG                 tag;
   TPM_VERSION                       version;
@@ -1772,9 +1773,9 @@ typedef struct tdTPM_CAP_VERSION_INFO {
 #define TPM_DAA_power0                 (104)
 #define TPM_DAA_power1                 (1024)
 
-//
-// Part 2, section 22.3: TPM_DAA_ISSUER
-//
+///
+/// Part 2, section 22.3: TPM_DAA_ISSUER
+///
 typedef struct tdTPM_DAA_ISSUER {
   TPM_STRUCTURE_TAG               tag;
   TPM_DIGEST                      DAA_digest_R0;
@@ -1786,9 +1787,9 @@ typedef struct tdTPM_DAA_ISSUER {
   UINT8                           DAA_generic_q[26];
 } TPM_DAA_ISSUER;
 
-//
-// Part 2, section 22.4: TPM_DAA_TPM
-//
+///
+/// Part 2, section 22.4: TPM_DAA_TPM
+///
 typedef struct tdTPM_DAA_TPM {
   TPM_STRUCTURE_TAG               tag;
   TPM_DIGEST                      DAA_digestIssuer;
@@ -1798,9 +1799,9 @@ typedef struct tdTPM_DAA_TPM {
   UINT32                          DAA_count;
 } TPM_DAA_TPM;
 
-//
-// Part 2, section 22.5: TPM_DAA_CONTEXT
-//
+///
+/// Part 2, section 22.5: TPM_DAA_CONTEXT
+///
 typedef struct tdTPM_DAA_CONTEXT {
   TPM_STRUCTURE_TAG               tag;
   TPM_DIGEST                      DAA_digestContext;
@@ -1810,18 +1811,18 @@ typedef struct tdTPM_DAA_CONTEXT {
   UINT8                           DAA_stage;
 } TPM_DAA_CONTEXT;
 
-//
-// Part 2, section 22.6: TPM_DAA_JOINDATA
-//
+///
+/// Part 2, section 22.6: TPM_DAA_JOINDATA
+///
 typedef struct tdTPM_DAA_JOINDATA {
   UINT8                           DAA_join_u0[128];
   UINT8                           DAA_join_u1[138];
   TPM_DIGEST                      DAA_digest_n0;
 } TPM_DAA_JOINDATA;
 
-//
-// Part 2, section 22.8: TPM_DAA_BLOB
-//
+///
+/// Part 2, section 22.8: TPM_DAA_BLOB
+///
 typedef struct tdTPM_DAA_BLOB {
   TPM_STRUCTURE_TAG               tag;
   TPM_RESOURCE_TYPE               resourceType;
@@ -1833,9 +1834,9 @@ typedef struct tdTPM_DAA_BLOB {
   UINT8                           *sensitiveData;
 } TPM_DAA_BLOB;
 
-//
-// Part 2, section 22.9: TPM_DAA_SENSITIVE
-//
+///
+/// Part 2, section 22.9: TPM_DAA_SENSITIVE
+///
 typedef struct tdTPM_DAA_SENSITIVE {
   TPM_STRUCTURE_TAG               tag;
   UINT32                          internalSize;
@@ -1847,18 +1848,18 @@ typedef struct tdTPM_DAA_SENSITIVE {
 // Part 2, section 23: Redirection
 //
 
-//
-// Part 2 section 23.1: TPM_REDIR_COMMAND
-// This section defines exactly one value but does not
-// give it a name. The definition of TPM_SetRedirection in Part3
-// refers to exactly one name but does not give its value. We join
-// them here.
-//
+///
+/// Part 2 section 23.1: TPM_REDIR_COMMAND
+/// This section defines exactly one value but does not
+/// give it a name. The definition of TPM_SetRedirection in Part3
+/// refers to exactly one name but does not give its value. We join
+/// them here.
+///
 #define TPM_REDIR_GPIO              (0x00000001)
 
-//
-// TPM Command & Response Headers defined in Part 3
-//
+///
+/// TPM Command & Response Headers defined in Part 3
+///
 typedef struct tdTPM_RQU_COMMAND_HDR {
   TPM_STRUCTURE_TAG                 tag;
   UINT32                            paramSize;

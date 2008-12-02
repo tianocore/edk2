@@ -135,12 +135,8 @@ typedef struct {
   UINT8 sense_key_specific_17;
 } ATAPI_REQUEST_SENSE_DATA;
 
-//
-// The followings are defined in SFF-8070i(ATAPI Removable Rewritable Specification)
-//
-
 ///
-/// READ CAPACITY Data 
+/// READ CAPACITY Data, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 LastLba3;
@@ -155,6 +151,7 @@ typedef struct {
 
 ///
 /// Capacity List Header + Current/Maximum Capacity Descriptor,
+/// defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 reserved_0;
@@ -173,7 +170,7 @@ typedef struct {
 } ATAPI_READ_FORMAT_CAPACITY_DATA;
 
 ///
-/// Test Unit Ready Command
+/// Test Unit Ready Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 opcode;
@@ -191,7 +188,7 @@ typedef struct {
 } ATAPI_TEST_UNIT_READY_CMD;
 
 ///
-/// INQUIRY Command
+/// INQUIRY Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 opcode;
@@ -210,7 +207,7 @@ typedef struct {
 } ATAPI_INQUIRY_CMD;
 
 ///
-/// REQUEST SENSE Command
+/// REQUEST SENSE Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 opcode;
@@ -229,7 +226,7 @@ typedef struct {
 } ATAPI_REQUEST_SENSE_CMD;
 
 ///
-/// READ (10) Command
+/// READ (10) Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 opcode;
@@ -248,7 +245,7 @@ typedef struct {
 } ATAPI_READ10_CMD;
 
 ///
-/// READ Format Capacity Command
+/// READ Format Capacity Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 opcode;
@@ -267,7 +264,7 @@ typedef struct {
 } ATAPI_READ_FORMAT_CAP_CMD;
 
 ///
-/// MODE SENSE Command
+/// MODE SENSE Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
 ///
 typedef struct {
   UINT8 opcode;
