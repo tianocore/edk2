@@ -83,6 +83,11 @@ COMPONENT_TYPE    = LIBRARY
   Ipf/Ia_64Gen.h
   Ipf/HwAccess.s
   Ipf/PeiServicePointer.c
+  #
+  # Only for CYGWINGCC IPF tool chain, EFI_BREAKPOINT and MEMORY_FENCE
+  # is defined as two functions EcpEfiBreakPoint and EcpMemoryFence.
+  #
+  Ipf/AsmCpuMisc.s | GCC
   
   
 [libraries.common]

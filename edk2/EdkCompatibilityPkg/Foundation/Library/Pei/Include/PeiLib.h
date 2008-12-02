@@ -31,6 +31,60 @@ Abstract:
 #include EFI_GUID_DEFINITION (PeiPeCoffLoader)
 #include EFI_PPI_DEFINITION (FindFv)
 
+#if defined(__GNUC__) && defined(ECP_CPU_IPF)
+
+VOID
+EFIAPI
+EcpEfiBreakPoint (
+  VOID
+  )
+/*++
+
+Routine Description:
+
+  Generates a breakpoint on the CPU.
+
+  Generates a breakpoint on the CPU. The breakpoint must be implemented such
+  that code can resume normal execution after the breakpoint.
+
+Arguments:
+
+  VOID
+
+Returns: 
+
+  VOID
+
+--*/
+;
+
+VOID
+EFIAPI
+EcpMemoryFence (
+  VOID
+  )
+/*++
+
+Routine Description:
+
+  Used to serialize load and store operations.
+
+  All loads and stores that proceed calls to this function are guaranteed to be
+  globally visible when this function returns.
+
+Arguments:
+
+  VOID
+
+Returns: 
+
+  VOID
+
+--*/
+;
+
+#endif
+
 
 #if (PI_SPECIFICATION_VERSION >= 0x00010000)
 
