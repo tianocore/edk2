@@ -15,18 +15,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BdsPlatform.h"
 
-//
-// Predefined platform default time out value
-//
+///
+/// Predefined platform default time out value
+///
 UINT16                      gPlatformBootTimeOutDefault = 10;
 
 //
 // Platform specific keyboard device path
 //
 
-//
-// Predefined platform default console device path
-//
+///
+/// Predefined platform default console device path
+///
 BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   {
     NULL,
@@ -34,12 +34,12 @@ BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   }
 };
 
-//
-// Predefined platform specific driver option
-//
+///
+/// Predefined platform specific driver option
+///
 EFI_DEVICE_PATH_PROTOCOL    *gPlatformDriverOption[] = { NULL };
 
-//
-// Predefined platform connect sequence
-//
+///
+/// Predefined platform connect sequence
+///
 EFI_DEVICE_PATH_PROTOCOL    *gPlatformConnectSequence[] = { NULL };

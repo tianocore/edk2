@@ -1,6 +1,7 @@
 #/** @file
 #  
-#    Component name for module GenericBdsLib
+#  Provide NULL implementation for PlatformBdsLib library class interfaces which
+#  should be implemented by OEM.
 #  
 #  Copyright (c) 2007 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials

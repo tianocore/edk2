@@ -29,21 +29,21 @@ struct _EFI_BDS_ARCH_PROTOCOL_INSTANCE {
   UINTN                     Signature;
   EFI_HANDLE                Handle;
   EFI_BDS_ARCH_PROTOCOL     Bds;
-  //
-  // Save the current boot mode
-  //
+  ///
+  /// Save the current boot mode
+  ///
   EFI_BOOT_MODE             BootMode;
-  //
-  // Set true if boot with default settings
-  //
+  ///
+  /// Set true if boot with default settings
+  ///
   BOOLEAN                   DefaultBoot;
-  //
-  // The system default timeout for choose the boot option
-  //
+  ///
+  /// The system default timeout for choose the boot option
+  ///
   UINT16                    TimeoutDefault;
-  //
-  // Memory Test Level
-  //
+  ///
+  /// Memory Test Level
+  ///
   EXTENDMEM_COVERAGE_LEVEL  MemoryTestLevel;
 };
 
