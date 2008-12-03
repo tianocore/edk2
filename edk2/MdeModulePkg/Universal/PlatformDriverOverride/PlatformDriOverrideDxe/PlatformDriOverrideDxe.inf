@@ -21,9 +21,6 @@
   FILE_GUID                      = 35034CE2-A6E5-4fb4-BABE-A0156E9B2549
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = PlatformDriverOverrideEntry
 
 #

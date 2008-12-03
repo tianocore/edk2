@@ -21,9 +21,6 @@
   FILE_GUID                      = 025BBFC7-E6A9-4b8b-82AD-6815A1AEAF4A
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = MnpDriverEntryPoint
   UNLOAD_IMAGE                   = NetLibDefaultUnload
 #

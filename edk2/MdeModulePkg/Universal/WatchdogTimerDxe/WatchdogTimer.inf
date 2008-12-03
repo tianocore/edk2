@@ -19,9 +19,6 @@
   FILE_GUID                      = F099D67F-71AE-4c36-B2A3-DCEB0EB2B7D8
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = WatchdogTimerDriverInitialize
 
 #

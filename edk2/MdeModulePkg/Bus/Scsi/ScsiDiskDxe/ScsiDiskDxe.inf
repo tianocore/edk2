@@ -21,8 +21,6 @@
   FILE_GUID                      = 0A66E322-3740-4cce-AD62-BD172CECCA35
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00010010
 
   ENTRY_POINT                    = InitializeScsiDisk
 

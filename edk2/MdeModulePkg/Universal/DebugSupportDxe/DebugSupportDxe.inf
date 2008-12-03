@@ -20,9 +20,6 @@
   FILE_GUID                      = 911D584C-35F7-4955-BEF9-B452769DDC3A
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = InitializeDebugSupportDriver
 
 #

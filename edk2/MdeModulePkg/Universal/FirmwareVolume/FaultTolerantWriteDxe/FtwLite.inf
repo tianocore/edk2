@@ -20,9 +20,6 @@
   FILE_GUID                      = 4C862FC6-0E54-4e36-8C8F-FF6F3167951F
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = InitializeFtwLite
 
 #

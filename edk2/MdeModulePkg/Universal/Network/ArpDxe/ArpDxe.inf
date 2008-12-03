@@ -20,9 +20,6 @@
   FILE_GUID                      = 529D3F93-E8E9-4e73-B1E1-BDF6A9D50113
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = ArpDriverEntryPoint
   UNLOAD_IMAGE                   = NetLibDefaultUnload
 #

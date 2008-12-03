@@ -18,10 +18,8 @@
   BASE_NAME                      = BdsDxe
   FILE_GUID                      = FC5C7020-1A48-4198-9BE2-EAD5ABC8CF2F
   MODULE_TYPE                    = DXE_DRIVER
-  VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
+  VERSION_STRING                 = 1.0 
   EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = BdsInitialize
 
 #

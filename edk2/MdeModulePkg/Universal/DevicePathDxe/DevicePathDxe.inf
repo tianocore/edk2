@@ -22,9 +22,6 @@
   FILE_GUID                      = 9B680FCE-AD6B-4F3A-B60B-F59899003443
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00090000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = DevicePathEntryPoint
 
 #

@@ -21,8 +21,6 @@
   FILE_GUID                      = 378D7B65-8DA9-4773-B6E4-A47826A833E1
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-
   ENTRY_POINT                    = InitializePcRtc
 
 #

@@ -21,8 +21,6 @@
   FILE_GUID                      = 0167CCC4-D0F7-4f21-A3EF-9E64B7CDCE8B
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00010010
 
   ENTRY_POINT                    = InitializeScsiBus
 

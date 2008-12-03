@@ -20,9 +20,6 @@
   FILE_GUID                      = AD608272-D07F-4964-801E-7BD3B7888652
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = MonotonicCounterDriverInitialize
 
 #

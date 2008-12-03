@@ -20,8 +20,6 @@
   FILE_GUID                      = 9FB4B4A7-42C0-4bcd-8540-9BCC6711F83E
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = USBMassStorageEntryPoint
 

@@ -19,9 +19,6 @@
   FILE_GUID                      = 42857F0A-13F2-4B21-8A23-53D3F714B840
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = CapsuleServiceInitialize
 
 #
