@@ -28,7 +28,7 @@ Abstract:
 --*/
 
 #include "EdkIIGlueUefi.h"
-#include "Library\EdkIIGlueMemoryAllocationLib.h"
+#include "Library/EdkIIGlueMemoryAllocationLib.h"
 
 /**
   Returns the size of a device path in bytes.

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "EdkIIGlueUefi.h"
-#include "Library\EdkIIGlueMemoryAllocationLib.h"
+#include "Library/EdkIIGlueMemoryAllocationLib.h"
 
 
 /**
