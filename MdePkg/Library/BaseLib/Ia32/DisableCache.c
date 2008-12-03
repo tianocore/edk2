@@ -13,10 +13,10 @@
 **/
 
 /**
-  Disables caches.
+  Set CD bit and clear NW bit of CR0 followed by a WBINVD.
 
-  Set the CD bit of CR0 to 1, clear the NW bit of CR0 to 0, and flush all caches with a
-  WBINVD instruction.
+  Disables the caches by setting the CD bit of CR0 to 1, clearing the NW bit of CR0 to 0,
+  and executing a WBINVD instruction.  This function is only available on IA-32 and x64.
 
 **/
 VOID

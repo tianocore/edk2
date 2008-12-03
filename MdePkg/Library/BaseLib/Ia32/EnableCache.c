@@ -13,10 +13,10 @@
 **/
 
 /**
-  Enabled caches.
+  Perform a WBINVD and clear both the CD and NW bits of CR0.
 
-  Flush all caches with a WBINVD instruction, clear the CD bit of CR0 to 0, and clear 
-  the NW bit of CR0 to 0
+  Enables the caches by executing a WBINVD instruction and then clear both the CD and NW
+  bits of CR0 to 0.  This function is only available on IA-32 and x64.
 
 **/
 VOID
