@@ -117,6 +117,7 @@ SCREEN_OPERATION_T0_CONTROL_FLAG  gScreenOperationToControlFlag[] = {
 };
 
 BOOLEAN  mInputError;
+BOOLEAN GetLineByWidthFinished = FALSE;
 
 
 /**
@@ -1074,9 +1075,6 @@ GetWidth (
 
   return Width;
 }
-
-
-BOOLEAN GetLineByWidthFinished = FALSE;
 
 /**
   Will copy LineWidth amount of a string in the OutputString buffer and return the

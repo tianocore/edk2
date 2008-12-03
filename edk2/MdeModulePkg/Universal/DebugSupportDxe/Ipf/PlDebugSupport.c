@@ -35,6 +35,21 @@ typedef struct {
   VOID (*RegisteredCallback) ();
 } IVT_ENTRY;
 
+IVT_ENTRY IvtEntryTable[NUM_IVT_ENTRIES];
+
+//
+// IPF context record is overallocated by 512 bytes to guarantee a 512 byte alignment exists
+// within the buffer and still have a large enough buffer to hold a whole IPF context record.
+//
+UINT8     IpfContextBuf[sizeof (EFI_SYSTEM_CONTEXT_IPF) + 512];
+
+//
+// The PatchSaveBuffer is used to store the original bundles from the IVT where it is patched
+// with the common handler.
+//
+UINT8     PatchSaveBuffer[0x400];
+UINTN     ExternalInterruptCount;
+
 /**
   This is the worker function that uninstalls and removes all handlers.
 
@@ -117,20 +132,6 @@ GetHandlerEntryPoint (
   VOID                      **EntryPoint
   );
 
-IVT_ENTRY IvtEntryTable[NUM_IVT_ENTRIES];
-
-//
-// IPF context record is overallocated by 512 bytes to guarantee a 512 byte alignment exists
-// within the buffer and still have a large enough buffer to hold a whole IPF context record.
-//
-UINT8     IpfContextBuf[sizeof (EFI_SYSTEM_CONTEXT_IPF) + 512];
-
-//
-// The PatchSaveBuffer is used to store the original bundles from the IVT where it is patched
-// with the common handler.
-//
-UINT8     PatchSaveBuffer[0x400];
-UINTN     ExternalInterruptCount;
 
 /**
   IPF specific DebugSupport driver initialization. 

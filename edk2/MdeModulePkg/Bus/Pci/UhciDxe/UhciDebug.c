@@ -14,8 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Uhci.h"
-#include "UhciDebug.h"
-
 
 /**
   Dump the content of QH structure.

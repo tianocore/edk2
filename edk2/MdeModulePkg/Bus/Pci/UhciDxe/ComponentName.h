@@ -1,7 +1,8 @@
 /** @file
-  UEFI Component Name(2) protocol implementation for UHCI driver.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+  This file contains the delarations for componet name routines.
+
+Copyright (c) 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,38 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "Uhci.h"
-
-
-//
-// EFI Component Name Protocol
-//
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUhciComponentName = {
-  UhciComponentNameGetDriverName,
-  UhciComponentNameGetControllerName,
-  "eng"
-};
-
-//
-// EFI Component Name 2 Protocol
-//
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUhciComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UhciComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UhciComponentNameGetControllerName,
-  "en"
-};
-
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUhciDriverNameTable[] = {
-  { "eng;en", L"Usb Uhci Driver" },
-  { NULL, NULL }
-};
-
-
-//
-// EFI Component Name Functions
-//
+#ifndef _COMPONENT_NAME_H_
+#define _COMPONENT_NAME_H_
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -90,16 +61,8 @@ UhciComponentNameGetDriverName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
-  )
-{
-  return LookupUnicodeString2 (
-           Language,
-           This->SupportedLanguages,
-           mUhciDriverNameTable,
-           DriverName,
-           (BOOLEAN)(This == &gUhciComponentName)
-           );
-}
+  );
+
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -177,55 +140,6 @@ UhciComponentNameGetControllerName (
   IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
   IN  CHAR8                                           *Language,
   OUT CHAR16                                          **ControllerName
-  )
-{
-  EFI_STATUS           Status;
-  USB_HC_DEV           *UhciDev;
-  EFI_USB2_HC_PROTOCOL *Usb2Hc;
+  );
 
-  //
-  // This is a device driver, so ChildHandle must be NULL.
-  //
-  if (ChildHandle != NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Make sure this driver is currently managing ControllerHandle
-  //
-  Status = EfiTestManagedDevice (
-             ControllerHandle,
-             gUhciDriverBinding.DriverBindingHandle,
-             &gEfiPciIoProtocolGuid
-             );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Get the device context
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiUsb2HcProtocolGuid,
-                  (VOID **) &Usb2Hc,
-                  gUhciDriverBinding.DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  UhciDev = UHC_FROM_USB2_HC_PROTO (Usb2Hc);
-
-  return LookupUnicodeString2 (
-           Language,
-           This->SupportedLanguages,
-           UhciDev->CtrlNameTable,
-           ControllerName,
-           (BOOLEAN)(This == &gUhciComponentName)
-           );
-
-}
+#endif

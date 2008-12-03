@@ -19,6 +19,11 @@ CONST EFI_FORM_BROWSER2_PROTOCOL      *mFormBrowser2     = NULL;
 CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *mIfrSupportLibHiiConfigRouting = NULL;
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mIfrSupportLibHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
+//
+// Fake <ConfigHdr>
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT16 mFakeConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH=0";
+
 /**
   This function locate FormBrowser2 protocols for later usage.
 
@@ -49,11 +54,6 @@ LocateFormBrowser2Protocols (
 
   return EFI_SUCCESS;
 }
-
-//
-// Fake <ConfigHdr>
-//
-GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT16 mFakeConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH=0";
 
 /**
   Draw a dialog and return the selected key.

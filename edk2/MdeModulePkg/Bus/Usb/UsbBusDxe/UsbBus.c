@@ -20,6 +20,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 EFI_GUID  mUsbBusProtocolGuid = EFI_USB_BUS_PROTOCOL_GUID;
 
+EFI_USB_IO_PROTOCOL mUsbIoProtocol = {
+  UsbIoControlTransfer,
+  UsbIoBulkTransfer,
+  UsbIoAsyncInterruptTransfer,
+  UsbIoSyncInterruptTransfer,
+  UsbIoIsochronousTransfer,
+  UsbIoAsyncIsochronousTransfer,
+  UsbIoGetDeviceDescriptor,
+  UsbIoGetActiveConfigDescriptor,
+  UsbIoGetInterfaceDescriptor,
+  UsbIoGetEndpointDescriptor,
+  UsbIoGetStringDescriptor,
+  UsbIoGetSupportedLanguages,
+  UsbIoPortReset
+};
+
+EFI_DRIVER_BINDING_PROTOCOL mUsbBusDriverBinding = {
+  UsbBusControllerDriverSupported,
+  UsbBusControllerDriverStart,
+  UsbBusControllerDriverStop,
+  0xa,
+  NULL,
+  NULL
+};
+
 
 /**
   USB_IO function to execute a control transfer. This
@@ -1037,22 +1062,6 @@ CLOSE_HC:
   return Status;
 }
 
-EFI_USB_IO_PROTOCOL mUsbIoProtocol = {
-  UsbIoControlTransfer,
-  UsbIoBulkTransfer,
-  UsbIoAsyncInterruptTransfer,
-  UsbIoSyncInterruptTransfer,
-  UsbIoIsochronousTransfer,
-  UsbIoAsyncIsochronousTransfer,
-  UsbIoGetDeviceDescriptor,
-  UsbIoGetActiveConfigDescriptor,
-  UsbIoGetInterfaceDescriptor,
-  UsbIoGetEndpointDescriptor,
-  UsbIoGetStringDescriptor,
-  UsbIoGetSupportedLanguages,
-  UsbIoPortReset
-};
-
 
 /**
   The USB bus driver entry pointer.
@@ -1435,12 +1444,3 @@ UsbBusControllerDriverStop (
 
   return Status;
 }
-
-EFI_DRIVER_BINDING_PROTOCOL mUsbBusDriverBinding = {
-  UsbBusControllerDriverSupported,
-  UsbBusControllerDriverStart,
-  UsbBusControllerDriverStop,
-  0xa,
-  NULL,
-  NULL
-};

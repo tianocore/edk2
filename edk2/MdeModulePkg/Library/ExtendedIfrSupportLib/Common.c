@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_HII_DATABASE_PROTOCOL *gIfrLibHiiDatabase;
 EFI_HII_STRING_PROTOCOL   *gIfrLibHiiString;
+GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
 
 /**
   ExtendedIfrSupportLib's constructor. It locates the required protocol:
@@ -51,9 +52,6 @@ ExtendedIfrSupportLibConstructor (
   return EFI_SUCCESS;
 }
 
-
-
-GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
 
 /**
   Extract formset class for given HII handle.

@@ -15,6 +15,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Uhci.h"
 
+
+EFI_DRIVER_BINDING_PROTOCOL gUhciDriverBinding = {
+  UhciDriverBindingSupported,
+  UhciDriverBindingStart,
+  UhciDriverBindingStop,
+  0x20,
+  NULL,
+  NULL
+};
+
 /**
   Provides software reset for the USB host controller according to UEFI 2.0 spec.
 
@@ -1800,11 +1810,3 @@ UhciDriverBindingStop (
   return EFI_SUCCESS;
 }
 
-EFI_DRIVER_BINDING_PROTOCOL gUhciDriverBinding = {
-  UhciDriverBindingSupported,
-  UhciDriverBindingStart,
-  UhciDriverBindingStop,
-  0x20,
-  NULL,
-  NULL
-};

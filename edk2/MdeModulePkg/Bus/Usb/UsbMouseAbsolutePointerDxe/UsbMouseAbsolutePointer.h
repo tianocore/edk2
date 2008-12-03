@@ -103,4 +103,41 @@ MouseAbsolutePointerReportStatusCode (
   IN EFI_STATUS_CODE_VALUE     Value
   );
 
+//
+// Prototypes
+// Driver model protocol interface
+//
+EFI_STATUS
+EFIAPI
+USBMouseAbsolutePointerDriverBindingEntryPoint (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  );
+
+EFI_STATUS
+EFIAPI
+USBMouseAbsolutePointerDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+USBMouseAbsolutePointerDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+USBMouseAbsolutePointerDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
+  IN  EFI_HANDLE                    Controller,
+  IN  UINTN                         NumberOfChildren,
+  IN  EFI_HANDLE                    *ChildHandleBuffer
+  );
+
+
 #endif

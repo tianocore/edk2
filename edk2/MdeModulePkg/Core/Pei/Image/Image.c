@@ -14,29 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PeiMain.h"
 
-/**
-  The wrapper function of PeiLoadImageLoadImage().
-
-  @param This            - Pointer to EFI_PEI_LOAD_FILE_PPI.
-  @param FileHandle      - Pointer to the FFS file header of the image.
-  @param ImageAddressArg - Pointer to PE/TE image.
-  @param ImageSizeArg    - Size of PE/TE image.
-  @param EntryPoint      - Pointer to entry point of specified image file for output.
-  @param AuthenticationState - Pointer to attestation authentication state of image.
-
-  @return Status of PeiLoadImageLoadImage().
-
-**/
-EFI_STATUS
-EFIAPI
-PeiLoadImageLoadImageWrapper (
-  IN     CONST EFI_PEI_LOAD_FILE_PPI  *This,
-  IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
-  OUT    UINT64                       *ImageSizeArg,     OPTIONAL
-  OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
-  OUT    UINT32                       *AuthenticationState
-  );
 
 EFI_PEI_LOAD_FILE_PPI   mPeiLoadImagePpi = {
   PeiLoadImageLoadImageWrapper
