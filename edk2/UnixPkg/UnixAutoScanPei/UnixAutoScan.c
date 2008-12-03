@@ -35,8 +35,8 @@ Revision History
 EFI_STATUS
 EFIAPI
 PeimInitializeUnixAutoScan (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
   )
 /*++
 
