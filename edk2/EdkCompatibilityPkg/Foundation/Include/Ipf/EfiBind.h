@@ -31,7 +31,7 @@ Abstract:
 
 #define EFI_APPLICATION_ENTRY_POINT EFI_DRIVER_ENTRY_POINT
 
-
+#define ECP_CPU_IPF
 
 
 //
@@ -216,6 +216,12 @@ typedef int64_t   intn_t;
 #define EFI_BAD_POINTER          0xAFAFAFAFAFAFAFAF
 #define EFI_BAD_POINTER_AS_BYTE  0xAF
 
+#define EFI_DEADLOOP()    while(TRUE)
+
+#ifdef __GNUC__
+#define EFI_BREAKPOINT  EcpEfiBreakPoint
+#define MEMORY_FENCE    EcpMemoryFence
+#else
 //
 // Inject a break point in the code to assist debugging.
 //
@@ -233,6 +239,7 @@ typedef int64_t   intn_t;
 void __mfa (void);                       
 #pragma intrinsic (__mfa)  
 #define MEMORY_FENCE()  __mfa()
+#endif
 
 
 //
