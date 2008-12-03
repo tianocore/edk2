@@ -16,20 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Terminal.h"
 
-/**
-  Free notify functions list.
-
-  @param  ListHead               The list head
-
-  @retval EFI_SUCCESS            Free the notify list successfully.
-  @retval EFI_INVALID_PARAMETER  ListHead is NULL.
-
-**/
-EFI_STATUS
-TerminalFreeNotifyList (
-  IN OUT LIST_ENTRY           *ListHead
-  );
-
 //
 // Globals
 //
@@ -117,6 +103,20 @@ TERMINAL_DEV  mTerminalDevTemplate = {
   }
 };
 
+
+/**
+  Free notify functions list.
+
+  @param  ListHead               The list head
+
+  @retval EFI_SUCCESS            Free the notify list successfully.
+  @retval EFI_INVALID_PARAMETER  ListHead is NULL.
+
+**/
+EFI_STATUS
+TerminalFreeNotifyList (
+  IN OUT LIST_ENTRY           *ListHead
+  );
 
 /**
   Test to see if this driver supports Controller. 

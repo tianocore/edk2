@@ -16,6 +16,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "UsbBus.h"
 
 //
+// Array that maps the change bit to feature value which is
+// used to clear these change bit. USB HUB API will clear
+// these change bit automatically. For non-root hub, these
+// bits determine whether hub will report the port in changed
+// bit maps.
+//
+#define USB_HUB_MAP_SIZE  5
+
+USB_CHANGE_FEATURE_MAP  mHubFeatureMap[USB_HUB_MAP_SIZE] = {
+  {USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange},
+  {USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange},
+  {USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange},
+  {USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange},
+  {USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange},
+};
+
+#define USB_ROOT_HUB_MAP_SIZE 5
+
+USB_CHANGE_FEATURE_MAP  mRootHubFeatureMap[USB_ROOT_HUB_MAP_SIZE] = {
+  {USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange},
+  {USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange},
+  {USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange},
+  {USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange},
+  {USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange},
+};
+
+//
 // USB hub class specific requests. Although USB hub
 // is related to an interface, these requests are sent
 // to the control endpoint of the device.
@@ -576,32 +603,6 @@ UsbOnHubInterrupt (
   return EFI_SUCCESS;
 }
 
-//
-// Array that maps the change bit to feature value which is
-// used to clear these change bit. USB HUB API will clear
-// these change bit automatically. For non-root hub, these
-// bits determine whether hub will report the port in changed
-// bit maps.
-//
-#define USB_HUB_MAP_SIZE  5
-
-USB_CHANGE_FEATURE_MAP  mHubFeatureMap[USB_HUB_MAP_SIZE] = {
-  {USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange},
-  {USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange},
-  {USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange},
-  {USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange},
-  {USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange},
-};
-
-#define USB_ROOT_HUB_MAP_SIZE 5
-
-USB_CHANGE_FEATURE_MAP  mRootHubFeatureMap[USB_ROOT_HUB_MAP_SIZE] = {
-  {USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange},
-  {USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange},
-  {USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange},
-  {USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange},
-  {USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange},
-};
 
 
 

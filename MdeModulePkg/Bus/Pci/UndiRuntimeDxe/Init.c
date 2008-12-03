@@ -21,6 +21,18 @@ PXE_SW_UNDI             *pxe_31 = NULL;  // 3.1 entry
 UNDI32_DEV              *UNDI32DeviceList[MAX_NIC_INTERFACES];
 NII_TABLE               *UndiDataPointer = NULL;
 
+//
+// UNDI Class Driver Global Variables
+//
+EFI_DRIVER_BINDING_PROTOCOL  gUndiDriverBinding = {
+  UndiDriverSupported,
+  UndiDriverStart,
+  UndiDriverStop,
+  0xa,
+  NULL,
+  NULL
+};
+
 
 /**
   When address mapping changes to virtual this should make the appropriate
@@ -31,7 +43,6 @@ NII_TABLE               *UndiDataPointer = NULL;
   @return None
 
 **/
-// TODO:    Context - add argument and description to function comment
 VOID
 EFIAPI
 UndiNotifyVirtual (
@@ -86,7 +97,6 @@ UndiNotifyVirtual (
   @return None
 
 **/
-// TODO:    Context - add argument and description to function comment
 VOID
 EFIAPI
 UndiNotifyExitBs (
@@ -96,18 +106,6 @@ UndiNotifyExitBs (
 {
   InstallConfigTable ();
 }
-//
-// UNDI Class Driver Global Variables
-//
-EFI_DRIVER_BINDING_PROTOCOL  gUndiDriverBinding = {
-  UndiDriverSupported,
-  UndiDriverStart,
-  UndiDriverStop,
-  0xa,
-  NULL,
-  NULL
-};
-
 
 
 /**

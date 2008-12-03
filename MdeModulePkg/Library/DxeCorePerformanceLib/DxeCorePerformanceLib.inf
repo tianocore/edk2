@@ -35,6 +35,7 @@
 
 [Sources.common]
   DxeCorePerformanceLib.c
+  DxeCorePerformanceLibInternal.h
 
 [Packages]
   MdePkg/MdePkg.dec

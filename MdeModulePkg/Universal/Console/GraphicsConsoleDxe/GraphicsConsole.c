@@ -14,82 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "GraphicsConsole.h"
 
-/**
-  Gets Graphics Console devcie's foreground color and background color.
-
-  @param  This                  Protocol instance pointer.
-  @param  Foreground            Returned text foreground color.
-  @param  Background            Returned text background color.
-
-  @retval EFI_SUCCESS           It returned always.
-
-**/
-EFI_STATUS
-GetTextColors (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
-  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Foreground,
-  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Background
-  );
-
-/**
-  Draw Unicode string on the Graphice Console device's screen.
-
-  @param  This                  Protocol instance pointer.
-  @param  UnicodeWeight         One Unicode string to be displayed.
-  @param  Count                 The count of Unicode string.
-
-  @retval EFI_OUT_OF_RESOURCES  If no memory resource to use.
-  @retval EFI_UNSUPPORTED       If no Graphics Output protocol and UGA Draw
-                                protocol exist.
-  @retval EFI_SUCCESS           Drawing Unicode string implemented successfully.
-
-**/
-EFI_STATUS
-DrawUnicodeWeightAtCursorN (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
-  IN  CHAR16                           *UnicodeWeight,
-  IN  UINTN                            Count
-  );
-
-/**
-  Erase the cursor on the screen.
-
-  @param  This                  Protocol instance pointer.
-
-  @retval EFI_SUCCESS           The cursor is erased successfully.
-
-**/
-EFI_STATUS
-EraseCursor (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
-  );
-
-/**
-  Check if the current specific mode supported the user defined resolution
-  for the Graphice Console devcie based on Graphics Output Protocol.
-
-  If yes, set the graphic devcice's current mode to this specific mode.
-  
-  @param  GraphicsOutput        Graphics Output Protocol instance pointer.
-  @param  HorizontalResolution  User defined horizontal resolution
-  @param  VerticalResolution    User defined vertical resolution.
-  @param  CurrentModeNumber     Current specific mode to be check.
-
-  @retval EFI_SUCCESS       The mode is supported.
-  @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics 
-                            devcie supported.
-  @retval other             The specific mode does not support user defined 
-                            resolution or failed to set the current mode to the 
-                            specific mode on graphics device.
-
-**/
-EFI_STATUS
-CheckModeSupported (
-  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput,
-  IN  UINT32  HorizontalResolution,
-  IN  UINT32  VerticalResolution,
-  OUT UINT32  *CurrentModeNumber
-  );
 
 //
 // Graphics Console Devcie Private Data template
@@ -174,6 +98,83 @@ EFI_DRIVER_BINDING_PROTOCOL gGraphicsConsoleDriverBinding = {
   NULL,
   NULL
 };
+
+/**
+  Gets Graphics Console devcie's foreground color and background color.
+
+  @param  This                  Protocol instance pointer.
+  @param  Foreground            Returned text foreground color.
+  @param  Background            Returned text background color.
+
+  @retval EFI_SUCCESS           It returned always.
+
+**/
+EFI_STATUS
+GetTextColors (
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Foreground,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Background
+  );
+
+/**
+  Draw Unicode string on the Graphice Console device's screen.
+
+  @param  This                  Protocol instance pointer.
+  @param  UnicodeWeight         One Unicode string to be displayed.
+  @param  Count                 The count of Unicode string.
+
+  @retval EFI_OUT_OF_RESOURCES  If no memory resource to use.
+  @retval EFI_UNSUPPORTED       If no Graphics Output protocol and UGA Draw
+                                protocol exist.
+  @retval EFI_SUCCESS           Drawing Unicode string implemented successfully.
+
+**/
+EFI_STATUS
+DrawUnicodeWeightAtCursorN (
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
+  IN  CHAR16                           *UnicodeWeight,
+  IN  UINTN                            Count
+  );
+
+/**
+  Erase the cursor on the screen.
+
+  @param  This                  Protocol instance pointer.
+
+  @retval EFI_SUCCESS           The cursor is erased successfully.
+
+**/
+EFI_STATUS
+EraseCursor (
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
+  );
+
+/**
+  Check if the current specific mode supported the user defined resolution
+  for the Graphice Console devcie based on Graphics Output Protocol.
+
+  If yes, set the graphic devcice's current mode to this specific mode.
+  
+  @param  GraphicsOutput        Graphics Output Protocol instance pointer.
+  @param  HorizontalResolution  User defined horizontal resolution
+  @param  VerticalResolution    User defined vertical resolution.
+  @param  CurrentModeNumber     Current specific mode to be check.
+
+  @retval EFI_SUCCESS       The mode is supported.
+  @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics 
+                            devcie supported.
+  @retval other             The specific mode does not support user defined 
+                            resolution or failed to set the current mode to the 
+                            specific mode on graphics device.
+
+**/
+EFI_STATUS
+CheckModeSupported (
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput,
+  IN  UINT32  HorizontalResolution,
+  IN  UINT32  VerticalResolution,
+  OUT UINT32  *CurrentModeNumber
+  );
 
 
 /**

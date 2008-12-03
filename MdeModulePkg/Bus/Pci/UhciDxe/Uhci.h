@@ -41,6 +41,7 @@ typedef struct _USB_HC_DEV  USB_HC_DEV;
 #include "UhciReg.h"
 #include "UhciSched.h"
 #include "UhciDebug.h"
+#include "ComponentName.h"
 
 typedef enum {
   UHC_1_MICROSECOND             = 1,
@@ -141,5 +142,68 @@ struct _USB_HC_DEV {
 extern EFI_DRIVER_BINDING_PROTOCOL   gUhciDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gUhciComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gUhciComponentName2;
+
+/**
+  Test to see if this driver supports ControllerHandle. Any
+  ControllerHandle that has UsbHcProtocol installed will be supported.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to test.
+  @param  RemainingDevicePath  Not used.
+
+  @return EFI_SUCCESS          This driver supports this device.
+  @return EFI_UNSUPPORTED      This driver does not support this device.
+
+**/
+EFI_STATUS
+EFIAPI
+UhciDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  );
+
+/**
+  Starting the Usb UHCI Driver.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to test.
+  @param  RemainingDevicePath  Not used.
+
+  @retval EFI_SUCCESS          This driver supports this device.
+  @retval EFI_UNSUPPORTED      This driver does not support this device.
+  @retval EFI_DEVICE_ERROR     This driver cannot be started due to device Error.
+                               EFI_OUT_OF_RESOURCES- Failed due to resource shortage.
+
+**/
+EFI_STATUS
+EFIAPI
+UhciDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  );
+
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to stop driver on.
+  @param  NumberOfChildren     Number of Children in the ChildHandleBuffer.
+  @param  ChildHandleBuffer    List of handles for the children we need to stop.
+
+  @return EFI_SUCCESS
+  @return others
+
+**/
+EFI_STATUS
+EFIAPI
+UhciDriverBindingStop (
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      Controller,
+  IN UINTN                           NumberOfChildren,
+  IN EFI_HANDLE                      *ChildHandleBuffer
+  );
 
 #endif

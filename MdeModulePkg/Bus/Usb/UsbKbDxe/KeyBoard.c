@@ -130,40 +130,6 @@ UINT8 KeyboardLayoutTable[USB_KEYCODE_MAX_MAKE + 8][5] = {
   {EfiKeyA3,         0,        0,     EFI_RIGHT_LOGO_MODIFIER,      0},  // 0xe7
 };
 
-/**
-  Initialize KeyConvertionTable by using default keyboard layout.
-
-  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
-  @retval None.
-
-**/
-VOID
-EFIAPI
-LoadDefaultKeyboardLayout (
-  IN USB_KB_DEV                 *UsbKeyboardDevice
-  )
-{
-  UINTN               Index;
-  EFI_KEY_DESCRIPTOR  *KeyDescriptor;
-
-  //
-  // Construct KeyConvertionTable by default keyboard layout
-  //
-  KeyDescriptor = &UsbKeyboardDevice->KeyConvertionTable[0];
-
-  for (Index = 0; Index < (USB_KEYCODE_MAX_MAKE + 8); Index++) {
-    KeyDescriptor->Key                 = (EFI_KEY) KeyboardLayoutTable[Index][0];
-    KeyDescriptor->Unicode             = KeyboardLayoutTable[Index][1];
-    KeyDescriptor->ShiftedUnicode      = KeyboardLayoutTable[Index][2];
-    KeyDescriptor->AltGrUnicode        = 0;
-    KeyDescriptor->ShiftedAltGrUnicode = 0;
-    KeyDescriptor->Modifier            = KeyboardLayoutTable[Index][3];
-    KeyDescriptor->AffectedAttribute   = KeyboardLayoutTable[Index][4];
-
-    KeyDescriptor++;
-  }
-}
-
 //
 // EFI_KEY to USB Scan Code convertion table
 //
@@ -329,6 +295,40 @@ KB_MODIFIER  KB_Mod[8] = {
   { MOD_WIN_R,      0xe7 }, // 11100111 
 };
 
+
+/**
+  Initialize KeyConvertionTable by using default keyboard layout.
+
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
+  @retval None.
+
+**/
+VOID
+EFIAPI
+LoadDefaultKeyboardLayout (
+  IN USB_KB_DEV                 *UsbKeyboardDevice
+  )
+{
+  UINTN               Index;
+  EFI_KEY_DESCRIPTOR  *KeyDescriptor;
+
+  //
+  // Construct KeyConvertionTable by default keyboard layout
+  //
+  KeyDescriptor = &UsbKeyboardDevice->KeyConvertionTable[0];
+
+  for (Index = 0; Index < (USB_KEYCODE_MAX_MAKE + 8); Index++) {
+    KeyDescriptor->Key                 = (EFI_KEY) KeyboardLayoutTable[Index][0];
+    KeyDescriptor->Unicode             = KeyboardLayoutTable[Index][1];
+    KeyDescriptor->ShiftedUnicode      = KeyboardLayoutTable[Index][2];
+    KeyDescriptor->AltGrUnicode        = 0;
+    KeyDescriptor->ShiftedAltGrUnicode = 0;
+    KeyDescriptor->Modifier            = KeyboardLayoutTable[Index][3];
+    KeyDescriptor->AffectedAttribute   = KeyboardLayoutTable[Index][4];
+
+    KeyDescriptor++;
+  }
+}
 
 
 /**

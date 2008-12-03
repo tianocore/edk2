@@ -21,6 +21,25 @@ VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
 EFI_EVENT   mVirtualAddressChangeEvent = NULL;
 EFI_HANDLE  mHandle = NULL;
 
+//
+// The current Hii implementation accesses this variable a larg # of times on every boot.
+// Other common variables are only accessed a single time. This is why this cache algorithm
+// only targets a single variable. Probably to get an performance improvement out of
+// a Cache you would need a cache that improves the search performance for a variable.
+//
+VARIABLE_CACHE_ENTRY mVariableCache[] = {
+  {
+    &gEfiGlobalVariableGuid,
+    L"Lang",
+    0x00000000,
+    0x00,
+    NULL
+  }
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
+
+
 
 //
 // This is a temperary function which will be removed
@@ -51,9 +70,6 @@ ReleaseLockOnlyAtBootTime (
     EfiReleaseLock (Lock);
   }
 }
-
-
-GLOBAL_REMOVE_IF_UNREFERENCED VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
 
 
 /**
@@ -772,23 +788,6 @@ Returns:
 
   return Status;
 }
-
-
-//
-// The current Hii implementation accesses this variable a larg # of times on every boot.
-// Other common variables are only accessed a single time. This is why this cache algorithm
-// only targets a single variable. Probably to get an performance improvement out of
-// a Cache you would need a cache that improves the search performance for a variable.
-//
-VARIABLE_CACHE_ENTRY mVariableCache[] = {
-  {
-    &gEfiGlobalVariableGuid,
-    L"Lang",
-    0x00000000,
-    0x00,
-    NULL
-  }
-};
 
 
 /**

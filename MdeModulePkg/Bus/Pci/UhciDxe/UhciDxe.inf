@@ -45,6 +45,7 @@
   UhciReg.h
   UhciSched.h
   ComponentName.c
+  ComponentName.h
 
 
 [Packages]

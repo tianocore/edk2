@@ -14,24 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PeiMain.h"
 
-/**
-
-  Provide a callback for when the security PPI is installed.
-
-  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param NotifyDescriptor   The descriptor for the notification event.
-  @param Ppi                Pointer to the PPI in question.
-
-  @return Always success
-
-**/
-EFI_STATUS
-EFIAPI
-SecurityPpiNotifyCallback (
-  IN EFI_PEI_SERVICES           **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
-  IN VOID                       *Ppi
-  );
 
 EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,

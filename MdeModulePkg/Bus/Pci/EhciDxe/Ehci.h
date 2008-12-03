@@ -40,6 +40,7 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 #include "EhciUrb.h"
 #include "EhciSched.h"
 #include "EhciDebug.h"
+#include "ComponentName.h"
 
 typedef enum {
   EHC_1_MICROSECOND            = 1,
@@ -156,4 +157,69 @@ extern EFI_DRIVER_BINDING_PROTOCOL      gEhciDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL      gEhciComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL     gEhciComponentName2;
 
+/**
+  Test to see if this driver supports ControllerHandle. Any
+  ControllerHandle that has Usb2HcProtocol installed will
+  be supported.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to test.
+  @param  RemainingDevicePath  Not used.
+
+  @return EFI_SUCCESS          This driver supports this device.
+  @return EFI_UNSUPPORTED      This driver does not support this device.
+
+**/
+EFI_STATUS
+EFIAPI
+EhcDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL *This,
+  IN EFI_HANDLE                  Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  );
+
+/**
+  Starting the Usb EHCI Driver.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to test.
+  @param  RemainingDevicePath  Not used.
+
+  @return EFI_SUCCESS          supports this device.
+  @return EFI_UNSUPPORTED      do not support this device.
+  @return EFI_DEVICE_ERROR     cannot be started due to device Error.
+  @return EFI_OUT_OF_RESOURCES cannot allocate resources.
+
+**/
+EFI_STATUS
+EFIAPI
+EhcDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL *This,
+  IN EFI_HANDLE                  Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  );
+
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to stop driver on.
+  @param  NumberOfChildren     Number of Children in the ChildHandleBuffer.
+  @param  ChildHandleBuffer    List of handles for the children we need to stop.
+
+  @return EFI_SUCCESS          Success.
+  @return EFI_DEVICE_ERROR     Fail.
+
+**/
+EFI_STATUS
+EFIAPI
+EhcDriverBindingStop (
+  IN EFI_DRIVER_BINDING_PROTOCOL *This,
+  IN EFI_HANDLE                  Controller,
+  IN UINTN                       NumberOfChildren,
+  IN EFI_HANDLE                  *ChildHandleBuffer
+  );
+
 #endif
+

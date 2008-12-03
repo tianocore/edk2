@@ -42,6 +42,7 @@
   EhciReg.c
   EhciDebug.h
   ComponentName.c
+  ComponentName.h
   EhciUrb.h
   Ehci.h
   EhciSched.h

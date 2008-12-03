@@ -350,6 +350,396 @@ UsbBusRecursivelyConnectWantedUsbIo (
   IN EFI_USB_BUS_PROTOCOL         *UsbBusId
   );
 
+/**
+  USB_IO function to execute a control transfer. This
+  function will execute the USB transfer. If transfer
+  successes, it will sync the internal state of USB bus
+  with device state.
+
+  @param  This                   The USB_IO instance
+  @param  Request                The control transfer request
+  @param  Direction              Direction for data stage
+  @param  Timeout                The time to wait before timeout
+  @param  Data                   The buffer holding the data
+  @param  DataLength             Then length of the data
+  @param  UsbStatus              USB result
+
+  @retval EFI_INVALID_PARAMETER  The parameters are invalid
+  @retval EFI_SUCCESS            The control transfer succeded.
+  @retval Others                 Failed to execute the transfer
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoControlTransfer (
+  IN  EFI_USB_IO_PROTOCOL     *This,
+  IN  EFI_USB_DEVICE_REQUEST  *Request,
+  IN  EFI_USB_DATA_DIRECTION  Direction,
+  IN  UINT32                  Timeout,
+  IN  OUT VOID                *Data,      OPTIONAL
+  IN  UINTN                   DataLength, OPTIONAL
+  OUT UINT32                  *UsbStatus
+  );
+
+/**
+  Execute a bulk transfer to the device endpoint.
+
+  @param  This                   The USB IO instance.
+  @param  Endpoint               The device endpoint.
+  @param  Data                   The data to transfer.
+  @param  DataLength             The length of the data to transfer.
+  @param  Timeout                Time to wait before timeout.
+  @param  UsbStatus              The result of USB transfer.
+
+  @retval EFI_SUCCESS            The bulk transfer is OK.
+  @retval EFI_INVALID_PARAMETER  Some parameters are invalid.
+  @retval Others                 Failed to execute transfer, reason returned in
+                                 UsbStatus.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoBulkTransfer (
+  IN  EFI_USB_IO_PROTOCOL *This,
+  IN  UINT8               Endpoint,
+  IN  OUT VOID            *Data,
+  IN  OUT UINTN           *DataLength,
+  IN  UINTN               Timeout,
+  OUT UINT32              *UsbStatus
+  );
+
+/**
+  Execute a synchronous interrupt transfer.
+
+  @param  This                   The USB IO instance.
+  @param  Endpoint               The device endpoint.
+  @param  Data                   The data to transfer.
+  @param  DataLength             The length of the data to transfer.
+  @param  Timeout                Time to wait before timeout.
+  @param  UsbStatus              The result of USB transfer.
+
+  @retval EFI_SUCCESS            The synchronous interrupt transfer is OK.
+  @retval EFI_INVALID_PARAMETER  Some parameters are invalid.
+  @retval Others                 Failed to execute transfer, reason returned in
+                                 UsbStatus.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoSyncInterruptTransfer (
+  IN  EFI_USB_IO_PROTOCOL *This,
+  IN  UINT8               Endpoint,
+  IN  OUT VOID            *Data,
+  IN  OUT UINTN           *DataLength,
+  IN  UINTN               Timeout,
+  OUT UINT32              *UsbStatus
+  );
+
+/**
+  Queue a new asynchronous interrupt transfer, or remove the old
+  request if (IsNewTransfer == FALSE).
+
+  @param  This                   The USB_IO instance.
+  @param  Endpoint               The device endpoint.
+  @param  IsNewTransfer          Whether this is a new request, if it's old, remove
+                                 the request.
+  @param  PollInterval           The interval to poll the transfer result, (in ms).
+  @param  DataLength             The length of perodic data transfer.
+  @param  Callback               The function to call periodicaly when transfer is
+                                 ready.
+  @param  Context                The context to the callback.
+
+  @retval EFI_SUCCESS            New transfer is queued or old request is removed.
+  @retval EFI_INVALID_PARAMETER  Some parameters are invalid.
+  @retval Others                 Failed to queue the new request or remove the old
+                                 request.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoAsyncInterruptTransfer (
+  IN EFI_USB_IO_PROTOCOL              *This,
+  IN UINT8                            Endpoint,
+  IN BOOLEAN                          IsNewTransfer,
+  IN UINTN                            PollInterval,       OPTIONAL
+  IN UINTN                            DataLength,         OPTIONAL
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback,           OPTIONAL
+  IN VOID                             *Context            OPTIONAL
+  );
+
+/**
+  Execute a synchronous isochronous transfer.
+
+  @param  This                   The USB IO instance.
+  @param  DeviceEndpoint         The device endpoint.
+  @param  Data                   The data to transfer.
+  @param  DataLength             The length of the data to transfer.
+  @param  UsbStatus              The result of USB transfer.
+
+  @retval EFI_UNSUPPORTED        Currently isochronous transfer isn't supported.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoIsochronousTransfer (
+  IN  EFI_USB_IO_PROTOCOL *This,
+  IN  UINT8               DeviceEndpoint,
+  IN  OUT VOID            *Data,
+  IN  UINTN               DataLength,
+  OUT UINT32              *Status
+  );
+
+/**
+  Queue an asynchronous isochronous transfer.
+
+  @param  This                   The USB_IO instance.
+  @param  DeviceEndpoint         The device endpoint.
+  @param  Data                   The data to transfer.
+  @param  DataLength             The length of perodic data transfer.
+  @param  IsochronousCallBack    The function to call periodicaly when transfer is
+                                 ready.
+  @param  Context                The context to the callback.
+
+  @retval EFI_UNSUPPORTED        Currently isochronous transfer isn't supported.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoAsyncIsochronousTransfer (
+  IN EFI_USB_IO_PROTOCOL              *This,
+  IN UINT8                            DeviceEndpoint,
+  IN OUT VOID                         *Data,
+  IN UINTN                            DataLength,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK  IsochronousCallBack,
+  IN VOID                             *Context              OPTIONAL
+  );
+
+/**
+  Retrieve the device descriptor of the device.
+
+  @param  This                   The USB IO instance.
+  @param  Descriptor             The variable to receive the device descriptor.
+
+  @retval EFI_SUCCESS            The device descriptor is returned.
+  @retval EFI_INVALID_PARAMETER  The parameter is invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoGetDeviceDescriptor (
+  IN  EFI_USB_IO_PROTOCOL       *This,
+  OUT EFI_USB_DEVICE_DESCRIPTOR *Descriptor
+  );
+
+/**
+  Return the configuration descriptor of the current active configuration.
+
+  @param  This                   The USB IO instance.
+  @param  Descriptor             The USB configuration descriptor.
+
+  @retval EFI_SUCCESS            The active configuration descriptor is returned.
+  @retval EFI_INVALID_PARAMETER  Some parameter is invalid.
+  @retval EFI_NOT_FOUND          Currently no active configuration is selected.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoGetActiveConfigDescriptor (
+  IN  EFI_USB_IO_PROTOCOL       *This,
+  OUT EFI_USB_CONFIG_DESCRIPTOR *Descriptor
+  );
+
+/**
+  Retrieve the active interface setting descriptor for this USB IO instance.
+
+  @param  This                   The USB IO instance.
+  @param  Descriptor             The variable to receive active interface setting.
+
+  @retval EFI_SUCCESS            The active interface setting is returned.
+  @retval EFI_INVALID_PARAMETER  Some parameter is invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoGetInterfaceDescriptor (
+  IN  EFI_USB_IO_PROTOCOL           *This,
+  OUT EFI_USB_INTERFACE_DESCRIPTOR  *Descriptor
+  );
+
+/**
+  Retrieve the endpoint descriptor from this interface setting.
+
+  @param  This                   The USB IO instance.
+  @param  Index                  The index (start from zero) of the endpoint to
+                                 retrieve.
+  @param  Descriptor             The variable to receive the descriptor.
+
+  @retval EFI_SUCCESS            The endpoint descriptor is returned.
+  @retval EFI_INVALID_PARAMETER  Some parameter is invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoGetEndpointDescriptor (
+  IN  EFI_USB_IO_PROTOCOL         *This,
+  IN  UINT8                       Index,
+  OUT EFI_USB_ENDPOINT_DESCRIPTOR *Descriptor
+  );
+
+/**
+  Retrieve the supported language ID table from the device.
+
+  @param  This                   The USB IO instance.
+  @param  LangIDTable            The table to return the language IDs.
+  @param  TableSize              The number of supported languanges.
+
+  @retval EFI_SUCCESS            The language ID is return.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoGetSupportedLanguages (
+  IN  EFI_USB_IO_PROTOCOL *This,
+  OUT UINT16              **LangIDTable,
+  OUT UINT16              *TableSize
+  );
+
+/**
+  Retrieve an indexed string in the language of LangID.
+
+  @param  This                   The USB IO instance.
+  @param  LangID                 The language ID of the string to retrieve.
+  @param  StringIndex            The index of the string.
+  @param  String                 The variable to receive the string.
+
+  @retval EFI_SUCCESS            The string is returned.
+  @retval EFI_NOT_FOUND          No such string existed.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoGetStringDescriptor (
+  IN  EFI_USB_IO_PROTOCOL   *This,
+  IN  UINT16                LangID,
+  IN  UINT8                 StringIndex,
+  OUT CHAR16                **String
+  );
+
+/**
+  Reset the device, then if that succeeds, reconfigure the
+  device with its address and current active configuration.
+
+  @param  This                   The USB IO instance.
+
+  @retval EFI_SUCCESS            The device is reset and configured.
+  @retval Others                 Failed to reset the device.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbIoPortReset (
+  IN EFI_USB_IO_PROTOCOL  *This
+  );
+
+/**
+  Install Usb Bus Protocol on host controller, and start the Usb bus.
+
+  @param This                    The USB bus driver binding instance.
+  @param Controller              The controller to check.
+  @param RemainingDevicePath     The remaining device patch.
+
+  @retval EFI_SUCCESS            The controller is controlled by the usb bus.
+  @retval EFI_ALREADY_STARTED    The controller is already controlled by the usb bus.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbBusBuildProtocol (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+/**
+  The USB bus driver entry pointer.
+
+  @param ImageHandle       The driver image handle.
+  @param SystemTable       The system table.
+
+  @return EFI_SUCCESS      The component name protocol is installed.
+  @return Others           Failed to init the usb driver.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbBusDriverEntryPoint (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  );
+
+/**
+  Check whether USB bus driver support this device.
+
+  @param  This                   The USB bus driver binding protocol.
+  @param  Controller             The controller handle to check.
+  @param  RemainingDevicePath    The remaining device path.
+
+  @retval EFI_SUCCESS            The bus supports this controller.
+  @retval EFI_UNSUPPORTED        This device isn't supported.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbBusControllerDriverSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+/**
+  Start to process the controller.
+
+  @param  This                   The USB bus driver binding instance.
+  @param  Controller             The controller to check.
+  @param  RemainingDevicePath    The remaining device patch.
+
+  @retval EFI_SUCCESS            The controller is controlled by the usb bus.
+  @retval EFI_ALREADY_STARTED    The controller is already controlled by the usb
+                                 bus.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbBusControllerDriverStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  );
+
+/**
+  Stop handle the controller by this USB bus driver.
+
+  @param  This                   The USB bus driver binding protocol.
+  @param  Controller             The controller to release.
+  @param  NumberOfChildren       The child of USB bus that opened controller
+                                 BY_CHILD.
+  @param  ChildHandleBuffer      The array of child handle.
+
+  @retval EFI_SUCCESS            The controller or children are stopped.
+  @retval EFI_DEVICE_ERROR       Failed to stop the driver.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbBusControllerDriverStop (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
+  );
+
 extern EFI_USB_IO_PROTOCOL            mUsbIoProtocol;
 extern EFI_DRIVER_BINDING_PROTOCOL    mUsbBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL    mUsbBusComponentName;

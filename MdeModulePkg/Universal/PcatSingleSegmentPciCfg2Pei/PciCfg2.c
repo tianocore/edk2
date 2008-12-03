@@ -24,27 +24,6 @@
 #include <IndustryStandard/Pci.h>
 
 /**
-   Convert EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS to PCI_LIB_ADDRESS.
-
-   @param Address   PCI address with
-                    EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS format.
-
-   @return The PCI address with PCI_LIB_ADDRESS format.
-
-**/
-UINTN
-PciCfgAddressConvert (
-  EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *Address
-  )
-{
-  if (Address->ExtendedRegister == 0) {
-    return PCI_LIB_ADDRESS (Address->Bus, Address->Device, Address->Function, Address->Register);
-  }
-
-  return PCI_LIB_ADDRESS (Address->Bus, Address->Device, Address->Function, Address->ExtendedRegister);
-}
-
-/**
   Reads from a given location in the PCI configuration space.
 
   @param  PeiServices     An indirect pointer to the PEI Services Table published by the PEI Foundation.
@@ -183,6 +162,29 @@ EFI_PEI_PPI_DESCRIPTOR gPciCfg2PpiList = {
   &gEfiPciCfg2PpiGuid,
   &gPciCfg2Ppi
 };
+
+
+/**
+   Convert EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS to PCI_LIB_ADDRESS.
+
+   @param Address   PCI address with
+                    EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS format.
+
+   @return The PCI address with PCI_LIB_ADDRESS format.
+
+**/
+UINTN
+PciCfgAddressConvert (
+  EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS *Address
+  )
+{
+  if (Address->ExtendedRegister == 0) {
+    return PCI_LIB_ADDRESS (Address->Bus, Address->Device, Address->Function, Address->Register);
+  }
+
+  return PCI_LIB_ADDRESS (Address->Bus, Address->Device, Address->Function, Address->ExtendedRegister);
+}
+
 
 /**
   Reads from a given location in the PCI configuration space.

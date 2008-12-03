@@ -284,8 +284,8 @@ PeiDispatcher (
   @param PrivateData     PeiCore's private data structure
   @param OldCoreData     Old data from SecCore
                          NULL if being run in non-permament memory mode.
-  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
-  											 and location of temporary RAM, the stack location and the BFV location.
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size
+                         and location of temporary RAM, the stack location and the BFV location.
 
 **/
 VOID
@@ -1021,6 +1021,49 @@ ProcessFvFile (
   IN  CONST EFI_PEI_SERVICES **PeiServices,
   IN  EFI_PEI_FILE_HANDLE    FvFileHandle,
   OUT UINT32                 *AuthenticationState
+  );
+
+/**
+  The wrapper function of PeiLoadImageLoadImage().
+
+  @param This            - Pointer to EFI_PEI_LOAD_FILE_PPI.
+  @param FileHandle      - Pointer to the FFS file header of the image.
+  @param ImageAddressArg - Pointer to PE/TE image.
+  @param ImageSizeArg    - Size of PE/TE image.
+  @param EntryPoint      - Pointer to entry point of specified image file for output.
+  @param AuthenticationState - Pointer to attestation authentication state of image.
+
+  @return Status of PeiLoadImageLoadImage().
+
+**/
+EFI_STATUS
+EFIAPI
+PeiLoadImageLoadImageWrapper (
+  IN     CONST EFI_PEI_LOAD_FILE_PPI  *This,
+  IN     EFI_PEI_FILE_HANDLE          FileHandle,
+  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
+  OUT    UINT64                       *ImageSizeArg,     OPTIONAL
+  OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
+  OUT    UINT32                       *AuthenticationState
+  );
+
+/**
+
+  Provide a callback for when the security PPI is installed.
+
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyDescriptor   The descriptor for the notification event.
+  @param Ppi                Pointer to the PPI in question.
+
+  @return Always success
+
+**/
+EFI_STATUS
+EFIAPI
+SecurityPpiNotifyCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
   );
 
 #endif
