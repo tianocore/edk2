@@ -1,5 +1,5 @@
 /** @file
-  This file defines OperatorPresent PPI responsible for detecting TPM operator presence.
+  This file defines OperatorPresent PPI. It is responsible for detecting TPM operator presence.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _PEI_OPERATOR_PRESENCE_PPI PEI_OPERATOR_PRESENCE_PPI;
 
 struct _PEI_OPERATOR_PRESENCE_PPI {
-  BOOLEAN                           OperatorPresent;
+  BOOLEAN                           OperatorPresent; /// TRUE if TPM Operator is detected.
 };
 
 extern EFI_GUID                     gPeiOperatorPresencePpiGuid;

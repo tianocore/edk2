@@ -1,7 +1,6 @@
 /** @file
   Disk Info protocol is used to export Inquiry Data for a drive.
-  Its needed to support low level formating of drives in a mannor
-  thats DOS compatible.
+  It supports low level formating of drives in a DOS compatible manner.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -98,8 +97,7 @@ EFI_STATUS
   );
 
 /**
-  Return the results of the Request Sense command to a drive in SenseData.
-  Data format of Sense data is defined by the Interface GUID.
+  Return the IDE device information.
 
   @param  This                  Protocol instance pointer. 
   @param  IdeChannel            Primary or Secondary 
@@ -146,7 +144,7 @@ extern EFI_GUID gEfiDiskInfoUsbInterfaceGuid;
 extern EFI_GUID gEfiDiskInfoAhciInterfaceGuid;
 
 struct _EFI_DISK_INFO_PROTOCOL {
-  EFI_GUID                  Interface;
+  EFI_GUID                  Interface;  /// The format of the buffers returned by member functions.
   EFI_DISK_INFO_INQUIRY     Inquiry;
   EFI_DISK_INFO_IDENTIFY    Identify;
   EFI_DISK_INFO_SENSE_DATA  SenseData;

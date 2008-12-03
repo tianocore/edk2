@@ -94,7 +94,7 @@ UINTN
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
@@ -185,7 +185,7 @@ UINTN
   @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
-  @param  FormatString    Null-terminated Unicode format string.
+  @param  FormatString    Null-terminated ASCII format string.
   @param  Marker          VA_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
@@ -203,7 +203,7 @@ UINTN
 
 /**
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
-  ASCII format string and a VA_LIST argument list.
+  Unicode format string and a VA_LIST argument list.
   
   Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
   and BufferSize.

@@ -1,9 +1,10 @@
 /** @file
 
-  This file can define the different guids to specify the different 
+  This file defines a group of guids to specify the different 
   encapsulation scheme for the guided section.
+  The related defintions is in UEFI GuidedSectionExtraction protocol.
+
   Now, only one guid is defined for CRC32 encapsulation scheme.
-  The related data structures come from the SectionExtraction protocol definition.
 
   Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -23,13 +24,13 @@
 //
 // Protocol GUID definition. Each GUIDed section extraction protocol has the
 // same interface but with different GUID. All the GUIDs is defined here.
-// May add multiple GUIDs here.
+// May add more GUIDs here in future.
 //
 #define EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID \
   { 0xFC1BCDB0, 0x7D31, 0x49aa, {0x93, 0x6A, 0xA4, 0x60, 0x0D, 0x9D, 0xD0, 0x83 } }
 
 //
-// The data structures are the same as GuidedSectionExtraction protocol only the GUID's are different
+// The data structures are the same to UEFI GuidedSectionExtraction protocol.
 //
 #include <Protocol/GuidedSectionExtraction.h>
 

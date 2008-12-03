@@ -23,7 +23,7 @@
 #endif
 
 ///
-/// Hardware error record maximum variable size
+/// Maximum buffer for Hardware error record variable
 ///
 #ifndef MAX_HARDWARE_ERROR_VARIABLE_SIZE
 #define MAX_HARDWARE_ERROR_VARIABLE_SIZE  FixedPcdGet32(PcdMaxHardwareErrorVariableSize)

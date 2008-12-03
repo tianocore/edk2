@@ -1,5 +1,5 @@
 /** @file
-  This file defines Pei memory test PPI used to Perform memory test in PEI phase.
+  This file defines Pei memory test PPI used to perform memory test in PEI phase.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -20,10 +20,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _PEI_BASE_MEMORY_TEST_PPI  PEI_BASE_MEMORY_TEST_PPI;
 
-//
-// 4 different test operations
-// Ignore op not test memory, Quick and Sparse op test memory quickly, Extensive op test memory detailedly.
-//
+///
+/// Pei Memory test operations
+/// Ignore op not test memory, Quick and Sparse op test memory quickly, Extensive op test memory detailedly.
+///
 typedef enum {
   Ignore,
   Quick,
@@ -32,14 +32,15 @@ typedef enum {
 } PEI_MEMORY_TEST_OP;
 
 /**
-  Test a range memory space is ready to read and write.
+  Test a range memory space that is ready to read and write.
+  If the memory is not ready, the error memory address will be returned.
 
   @param PeiServices      An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param This             Pointer to Pei memory test PPI instance.
   @param BeginAddress     Beginning of the memory address to be checked.
   @param MemoryLength     Bytes of memory range to be checked.
   @param Operation        Type of memory check operation to be performed.
-  @param ErrorAddress     Address which has error when checked.
+  @param ErrorAddress     Address of memory where the error is checked.
 
   @retval EFI_SUCCESS         Memory range pass basic read and write test.
   @retval EFI_DEVICE_ERROR    Memory is not ready to access.
