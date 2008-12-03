@@ -80,7 +80,7 @@ EFI_STATUS
                                This parameter is ignored by device drivers, and is optional for bus drivers.
 
   @retval EFI_SUCCESS          The device was started.
-  @retval EFI_ALREADY_STARTED  The device could not be started due to a device error.
+  @retval EFI_DEVICE_ERROR     The device could not be started due to a device error.
   @retval EFI_OUT_OF_RESOURCES The request could not be completed due to a lack of resources.
 
 **/
