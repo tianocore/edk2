@@ -760,7 +760,7 @@ BdsLibMatchDevicePaths (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathInst;
   UINTN                     Size;
 
-  if (Multi != NULL || Single  != NULL) {
+  if (Multi == NULL || Single  == NULL) {
     return FALSE;
   }
 
