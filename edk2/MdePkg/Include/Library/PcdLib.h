@@ -1171,7 +1171,7 @@ EFIAPI
 LibPcdSetPtr (
   IN        UINTN             TokenNumber,
   IN OUT    UINTN             *SizeOfBuffer,
-  IN        VOID              *Buffer
+  IN CONST  VOID              *Buffer
   );
 
 
