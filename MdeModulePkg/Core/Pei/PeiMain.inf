@@ -22,7 +22,6 @@
   FILE_GUID                      = 52C05B14-0B98-496c-BC3B-04B50211D680
   MODULE_TYPE                    = PEI_CORE
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
   PI_SPECIFICATION_VERSION       = 0x00010000
 
   ENTRY_POINT                    = PeiCore

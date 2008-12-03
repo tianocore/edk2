@@ -22,8 +22,6 @@
   FILE_GUID                      = 86D70125-BAA3-4296-A62F-602BEBBB9081
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = PeimInitializeDxeIpl
 

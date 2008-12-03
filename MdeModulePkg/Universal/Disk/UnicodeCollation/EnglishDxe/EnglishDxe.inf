@@ -21,9 +21,6 @@
   FILE_GUID                      = CD3BAFB6-50FB-4fe8-8E4E-AB74D2C1A600
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = InitializeUnicodeCollationEng
 
 #

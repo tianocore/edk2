@@ -21,9 +21,6 @@
   FILE_GUID                      = 26841BDE-920A-4e7a-9FBE-637F477143A6
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = Ip4ConfigDriverEntryPoint
   UNLOAD_IMAGE                   = EfiIp4ConfigUnload
 #

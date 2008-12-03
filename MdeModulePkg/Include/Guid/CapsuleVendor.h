@@ -1,7 +1,7 @@
 /** @file
 
   This file defines capsule update guid, capsule variable name and 
-  capsule guid hob data strucutre, which are required by capsule update feature.
+  capsule guid hob data structure, which are required by capsule update feature.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

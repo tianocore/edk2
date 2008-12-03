@@ -21,9 +21,6 @@
   FILE_GUID                      = 348C4D62-BFBD-4882-9ECE-C80BB1C4783B
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x0002000A
-
   ENTRY_POINT                    = InitializeHiiDatabase
 
 #

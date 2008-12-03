@@ -20,9 +20,6 @@
   FILE_GUID                      = 4F1F379F-2A62-48bb-AC34-D3F135C6E2B7
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = PeimInitializePciCfg
 
 #

@@ -2,7 +2,7 @@
   This module provide function for ascertaining and updating the boot mode:
   GetBootMode()
   SetBootMode()
-  See PI Speicifcation volume I, chapter 9 Boot Paths for addtional information
+  See PI Specification volume I, chapter 9 Boot Paths for additional information
   on the boot mode.
   
 Copyright (c) 2006 - 2008, Intel Corporation                                                         

@@ -21,8 +21,6 @@
   FILE_GUID                      = BDFE430E-8F2A-4db0-9991-6F856594777E
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = EhcDriverEntryPoint
 
