@@ -46,17 +46,17 @@ typedef struct _PERFORMANCE_PROTOCOL PERFORMANCE_PROTOCOL;
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
-  CHAR8                 Token[DXE_PERFORMANCE_STRING_SIZE];
-  CHAR8                 Module[DXE_PERFORMANCE_STRING_SIZE];
-  UINT64                StartTimeStamp;
-  UINT64                EndTimeStamp;
+  CHAR8                 Token[DXE_PERFORMANCE_STRING_SIZE];  /// Measured token string name 
+  CHAR8                 Module[DXE_PERFORMANCE_STRING_SIZE]; /// Module string name
+  UINT64                StartTimeStamp;                      /// Start time point
+  UINT64                EndTimeStamp;                        /// End time point
 } GAUGE_DATA_ENTRY;
 
 //
 // The header must be aligned at 8 bytes
 //
 typedef struct {
-  UINT32                NumberOfEntries;
+  UINT32                NumberOfEntries; /// The number of all performance guage entries
   UINT32                Reserved;
 } GAUGE_DATA_HEADER;
 

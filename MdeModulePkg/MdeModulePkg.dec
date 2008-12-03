@@ -182,13 +182,13 @@
   ## Print protocol defines six basic print functions to print the format unicode and ascii string.
   gEfiPrint2ProtocolGuid          = { 0x5bcc3dbc, 0x8c57, 0x450a, { 0xbb, 0x0c, 0xa1, 0xc0, 0xbd, 0xde, 0x48, 0x0c }}
 
-  ## This protocol defines the EFI generic memory test interfaces in Dxe phase.
+  ## This protocol defines the generic memory test interfaces in Dxe phase.
   gEfiGenericMemTestProtocolGuid = { 0x309DE7F1, 0x7F5E, 0x4ACE, { 0xB4, 0x9C, 0x53, 0x1B, 0xE5, 0xAA, 0x95, 0xEF }}
   
   ## Disk Info protocol is used to export Inquiry Data for a drive.
   gEfiDiskInfoProtocolGuid       = { 0xD432A67F, 0x14DC, 0x484B, { 0xB3, 0xBB, 0x3F, 0x02, 0x91, 0x84, 0x93, 0x27 }}
   
-  ## FVB Extension protocol that extends the FVB Class in a component fashion.
+  ## This protocol provides an extended service to erase the specified range of a firmware volume block.
   gEfiFvbExtensionProtocolGuid   = { 0x53A4C71B, 0xB581, 0x4170, { 0x91, 0xB3, 0x8D, 0xB8, 0x7A, 0x4B, 0x5C, 0x46 }}
   
   ## Fault tolerant write lite protocol defines only one interface to write 
@@ -198,7 +198,7 @@
   ## This protocol provides the interfaces to Get/Set the current video mode for GOP/UGA screen
   gEfiConsoleControlProtocolGuid = { 0xF42F7782, 0x012E, 0x4C12, { 0x99, 0x56, 0x49, 0xF9, 0x43, 0x04, 0xF7, 0x21 }}
   
-  ## EFI OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
+  ## OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
   gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
   
   ## Performance protocol interfaces to support cross module performance logging.
@@ -359,7 +359,7 @@
   ## Maximum buffer for the single variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400|UINT32|0x30000003
   
-  ## The hardware error record maximum variable size.
+  ## Maximum buffer for Hardware error record variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000|UINT32|0x30000004
   
   ## Maximum buffer for the total variable store.

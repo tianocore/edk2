@@ -1,7 +1,8 @@
 /** @file
   This file declares Firmware Volume Dispatch protocol.
 
-  Presence of this protocol tells the core dispatcher to dispatch this Firmware Volume.
+  This protocol will be installed into FV Handle if the drivers in this Firmware Volume 
+  are required to be dispatched by the core dispatcher.
 
   Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials

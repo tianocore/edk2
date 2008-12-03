@@ -1,6 +1,7 @@
 /** @file
 
-  FVB Extension protocol that extends the FVB Class in a component fashion.
+  FVB Extension protocol provides one extended service to FVB protocol defined in PI specification.
+  This service can erase the specified range of a firmware volume block.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -25,12 +26,11 @@ typedef struct _EFI_FVB_EXTENSION_PROTOCOL EFI_FVB_EXTENSION_PROTOCOL;
 //  FVB Extension Function Prototypes
 //
 /**
-  Erases and initializes a specified range of a firmware volume block
+  Erases and initializes a specified range of a firmware volume block.
 
   @param[in]     This           Pointer to the FVB Extension protocol instance
   @param[in]     StartLba       The starting logical block index to be erased
-  @param[in]     OffsetStartLba Offset into the starting block at which to 
-                                begin erasing    
+  @param[in]     OffsetStartLba Offset into the starting block at which to begin erasing    
   @param[in]     LastLba        The last logical block index to be erased
   @param[in]     OffsetLastLba  Offset into the last block at which to end erasing     
 
@@ -38,7 +38,7 @@ typedef struct _EFI_FVB_EXTENSION_PROTOCOL EFI_FVB_EXTENSION_PROTOCOL;
   @retval EFI_ACCESS_DENIED     The firmware volume block is in the WriteDisabled state
   @retval EFI_DEVICE_ERROR      The block device is not functioning correctly and 
                                 could not be written. Firmware device may have been
-                                partially erased
+                                partially erased.
 **/
 typedef
 EFI_STATUS

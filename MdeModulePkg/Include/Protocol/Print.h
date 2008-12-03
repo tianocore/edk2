@@ -1,7 +1,7 @@
 /** @file
 
-  This print protocol defines six basic print functions to 
-  print the format unicode and ascii string.
+  The lite print protocol defines only one print function to 
+  print the format unicode string.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

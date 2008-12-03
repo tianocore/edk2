@@ -29,18 +29,16 @@ typedef struct _EFI_FTW_LITE_PROTOCOL EFI_FTW_LITE_PROTOCOL;
 //
 /**
   Starts a target block update. This records information about the write
-  in fault tolerant storage and will complete the write in a recoverable
+  in fault tolerant storage will complete the write in a recoverable
   manner, ensuring at all times that either the original contents or
   the modified contents are available.
 
   @param  This                 The pointer to this protocol instance. 
-  @param  FvBlockHandle        The handle of FVB protocol that provides services 
-                               for reading, writing, and erasing the target 
-                               block. 
+  @param  FvbHandle            The handle of FVB protocol that provides services 
+                               for reading, writing, and erasing the target block. 
   @param  Lba                  The logical block address of the target block. 
-  @param  Offset               The offset within the target block to place the 
-                               data. 
-  @param  Length               The number of bytes to write to the target block. 
+  @param  Offset               The offset within the target block to place the data. 
+  @param  NumBytes             The number of bytes to write to the target block. 
   @param  Buffer               The data to write. 
 
   @retval EFI_SUCCESS          The function completed successfully 

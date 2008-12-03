@@ -23,18 +23,18 @@ typedef struct _EFI_CONSOLE_CONTROL_PROTOCOL   EFI_CONSOLE_CONTROL_PROTOCOL;
 
 
 typedef enum {
-  EfiConsoleControlScreenText,
-  EfiConsoleControlScreenGraphics,
+  EfiConsoleControlScreenText,     /// Text Mode
+  EfiConsoleControlScreenGraphics, /// Graphics Mode
   EfiConsoleControlScreenMaxValue
 } EFI_CONSOLE_CONTROL_SCREEN_MODE;
 
 /**
   Return the current video mode information. Also returns info about existence
-  of Graphics Output devices or UGA Draw devices in system, and if the Std In device is locked. All the
-  arguments are optional and only returned if a non NULL pointer is passed in.
+  of Graphics Output devices or UGA Draw devices in system, and whether the Std In device is locked. 
+  GopUgaExists and StdInLocked parameters are optional.
 
   @param  This                    Protocol instance pointer.
-  @param  Mode                    Are we in text of grahics mode.
+  @param  Mode                    Current video mode.
   @param  GopExists               TRUE if GOP Spliter has found a GOP/UGA device
   @param  StdInLocked             TRUE if StdIn device is keyboard locked
 
@@ -55,9 +55,9 @@ EFI_STATUS
   Set the current video mode to either text or graphics. 
 
   @param  This                    Protocol instance pointer.
-  @param  Mode                    Mode is to be set.
+  @param  Mode                    Video mode is to be set.
 
-  @retval EFI_SUCCESS             Mode is set.
+  @retval EFI_SUCCESS             Mode is set successfully.
   @retval EFI_INVALID_PARAMETER   Mode is not the valid mode value.
   @retval EFI_UNSUPPORTED         Mode is unsupported by console device.
 
@@ -70,9 +70,9 @@ EFI_STATUS
   );
 
 /**
-  Copy the Password and enable state variable and then arm the periodic timer
+  Store the password, enable state variable and arm the periodic timer.
 
-  @retval EFI_SUCCESS              Lock the StdIn device
+  @retval EFI_SUCCESS              Lock the StdIn device successfully.
   @retval EFI_INVALID_PARAMETER    Password is NULL
   @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the big password fails
 

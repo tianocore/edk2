@@ -1,13 +1,9 @@
 /** @file
 
-  Load File protocol provides capability to load and unload EFI image into 
-  memory and execute it.
+  Load Pe32 Image protocol provides capability to load and unload EFI image into memory and execute it.
 
-  Load file protocol exists to supports the addition of new boot devices,
-  and to support booting from devices that do not map well to file system.
-  Network boot is done via a LoadFile protocol.
-
-  UEFI 2.0 can boot from any device that produces a LoadFile protocol.
+  This protocol supports the additional new boot devices that do not map well to file system.
+  UEFI can boot from any device (including Network boot) that produces a LoadFile protocol.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -36,7 +32,7 @@ typedef struct _EFI_PE32_IMAGE_PROTOCOL   EFI_PE32_IMAGE_PROTOCOL;
 
   Loads an EFI image into memory and returns a handle to the image with extended parameters.
 
-  @param  This                Calling context
+  @param  This                Pointer to the LoadPe32Image protocol instance
   @param  ParentImageHandle   The caller's image handle.
   @param  FilePath            The specific file path from which the image is loaded.
   @param  SourceBuffer        If not NULL, a pointer to the memory location containing a copy of
@@ -54,7 +50,7 @@ typedef struct _EFI_PE32_IMAGE_PROTOCOL   EFI_PE32_IMAGE_PROTOCOL;
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED       The image type is not supported, or the device path cannot be
                                 parsed to locate the proper protocol for loading the file.
-  @retval EFI_OUT_OF_RESOURCES  Image was not loaded due to insufficient resources.
+  @retval EFI_OUT_OF_RESOURCES  Image was not loaded due to insufficient memory resources.
 **/
 typedef
 EFI_STATUS
@@ -75,12 +71,12 @@ EFI_STATUS
 
   Unload the specified image.
 
-  @param  This             Indicates the calling context.
-  @param  ImageHandle      The specified image handle.
+  @param  This             Pointer to the LoadPe32Image protocol instance
+  @param  ImageHandle      The specified image handle to be unloaded.
 
   @retval EFI_INVALID_PARAMETER Image handle is NULL.
   @retval EFI_UNSUPPORTED       Attempt to unload an unsupported image.
-  @retval EFI_SUCCESS           Image successfully unloaded.
+  @retval EFI_SUCCESS           Image is successfully unloaded.
 
 --*/
 typedef
@@ -92,7 +88,7 @@ EFI_STATUS
 
 struct _EFI_PE32_IMAGE_PROTOCOL {
   LOAD_PE_IMAGE     LoadPeImage;
-  UNLOAD_PE_IMAGE  UnLoadPeImage;
+  UNLOAD_PE_IMAGE   UnLoadPeImage;
 };
 
 extern EFI_GUID gEfiLoadPeImageProtocolGuid;
