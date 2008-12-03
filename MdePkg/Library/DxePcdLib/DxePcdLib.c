@@ -529,7 +529,7 @@ EFIAPI
 LibPcdSetPtr (
   IN        UINTN             TokenNumber,
   IN OUT    UINTN             *SizeOfBuffer,
-  IN        VOID              *Buffer
+  IN CONST  VOID              *Buffer
   )
 {
   EFI_STATUS Status;
@@ -540,13 +540,13 @@ LibPcdSetPtr (
     ASSERT (Buffer != NULL);
   }
 
-  Status = mPcd->SetPtr (TokenNumber, SizeOfBuffer, Buffer);
+  Status = mPcd->SetPtr (TokenNumber, SizeOfBuffer, (VOID *) Buffer);
 
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  return Buffer;
+  return (VOID *) Buffer;
 }
 
 
