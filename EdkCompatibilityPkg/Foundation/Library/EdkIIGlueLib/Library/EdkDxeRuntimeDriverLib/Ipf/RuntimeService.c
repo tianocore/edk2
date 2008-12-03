@@ -20,7 +20,7 @@ Abstract:
 
 --*/
 
-#include "..\RuntimeLibInternal.h"
+#include "../RuntimeLibInternal.h"
 
 VOID
 EFIAPI
