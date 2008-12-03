@@ -45,8 +45,8 @@ EFI_PEI_PE_COFF_LOADER_PROTOCOL  *mPeiEfiPeiPeCoffLoader;
 EFI_STATUS
 EFIAPI
 PeiUnixPeCoffLibConstructor (
-  IN EFI_FFS_FILE_HEADER      *FfsHeader,
-  IN EFI_PEI_SERVICES         **PeiServices
+  IN       EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
   )
 {
   EFI_STATUS           Status;
