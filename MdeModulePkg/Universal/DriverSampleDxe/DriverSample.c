@@ -1,4 +1,7 @@
 /** @file
+This is an example of how a driver might export data to the HII protocol to be
+later utilized by the Setup Protocol
+
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7,15 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-  DriverSample.c
-
-Abstract:
-
-  This is an example of how a driver might export data to the HII protocol to be
-  later utilized by the Setup Protocol
-
 
 **/
 
@@ -59,7 +53,7 @@ EncodePassword (
 
   CopyMem (Password, Buffer, MaxSize);
 
-  gBS->FreePool (Buffer);
+  FreePool (Buffer);
   return ;
 }
 
@@ -129,7 +123,7 @@ ValidatePassword (
 
   Status = HiiLibGetString (PrivateData->HiiHandle[0], StringId, Password, &BufferSize);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Password);
+    FreePool (Password);
     return Status;
   }
 
@@ -148,8 +142,8 @@ ValidatePassword (
     Status = EFI_SUCCESS;
   }
 
-  gBS->FreePool (Password);
-  gBS->FreePool (EncodedPassword);
+  FreePool (Password);
+  FreePool (EncodedPassword);
 
   return Status;
 }
@@ -225,7 +219,7 @@ SetPassword (
                NULL
                );
   }
-  gBS->FreePool (Configuration);
+  FreePool (Configuration);
 
   //
   // Set password
@@ -568,7 +562,7 @@ DriverCallback (
                  TRUE,                       // Append or replace
                  &UpdateData                 // Dynamic created opcodes
                  );
-      gBS->FreePool (IfrOptionList);
+      FreePool (IfrOptionList);
       IfrLibFreeUpdateData (&UpdateData);
       break;
     
@@ -805,7 +799,7 @@ DriverSampleInit (
                           DriverHandle[0],
                           &HiiHandle[0]
                           );
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -836,7 +830,7 @@ DriverSampleInit (
                           DriverHandle[1],
                           &HiiHandle[1]
                           );
-  gBS->FreePool (PackageList);
+  FreePool (PackageList);
   if (EFI_ERROR (Status)) {
     return Status;
   }
