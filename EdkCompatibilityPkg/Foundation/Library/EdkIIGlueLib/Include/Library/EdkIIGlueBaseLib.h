@@ -3694,7 +3694,7 @@ CpuDeadLoop (
   -1 is invalidated. This function may choose to invalidate the entire
   instruction cache if that is more efficient than invalidating the specified
   range. If Length is 0, the no instruction cache lines are invalidated.
-  Address is returned.
+  Address is returned. This function is only available on IPF.
 
   If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
 
@@ -3710,7 +3710,7 @@ CpuDeadLoop (
 **/
 VOID *
 EFIAPI
-IpfFlushCacheRange (
+AsmFlushCacheRange (
   IN      VOID                      *Address,
   IN      UINTN                     Length
   );
@@ -3722,7 +3722,7 @@ IpfFlushCacheRange (
   The cache line size affected is at least 32-bytes (aligned on a 32-byte boundary).
   An implementation may flush a larger region.  This function is only available on IPF.
 
-  @param Address  	The Address of cache line to be flushed.
+  @param Address  The Address of cache line to be flushed.
 
   @return The address of FC instruction executed.
 
@@ -3740,7 +3740,7 @@ AsmFc (
   The cache line size affected is at least 32-bytes (aligned on a 32-byte boundary).
   An implementation may flush a larger region.  This function is only available on IPF.
 
-  @param Address  	The Address of cache line to be flushed.
+  @param Address  The Address of cache line to be flushed.
 
   @return The address of FC.I instruction executed.
 
@@ -3761,7 +3761,7 @@ AsmFci (
   must either guarantee that Index is valid, or the caller must set up fault handlers to
   catch the faults.  This function is only available on IPF.
 
-  @param Index		The 8-bit Processor Identifier Register index to read.
+  @param Index   The 8-bit Processor Identifier Register index to read.
 
   @return The current value of Processor Identifier Register specified by Index.
 

@@ -31,7 +31,8 @@
 //  containing Address + Length -1 is invalidated. This function may choose to
 //  invalidate the entire instruction cache if that is more efficient than
 //  invalidating the specified range. If Length is 0, the no instruction cache
-//  lines are invalidated. Address is returned.
+//  lines are invalidated. Address is returned. 
+//  This function is only available on IPF.
 //
 //  If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
 //
@@ -46,12 +47,12 @@
 //  
 //  VOID *
 //  EFIAPI
-//  IpfFlushCacheRange (
+//  AsmFlushCacheRange (
 //    IN      VOID                      *Address,
 //    IN      UINTN                     Length
 //    );
 //
-PROCEDURE_ENTRY (IpfFlushCacheRange)
+PROCEDURE_ENTRY (AsmFlushCacheRange)
 
       NESTED_SETUP (5,8,0,0)
             
@@ -90,5 +91,5 @@ DoneFlushingC:
       mov          r8   = in0       // return *Address
       NESTED_RETURN
 
-PROCEDURE_EXIT (IpfFlushCacheRange)
+PROCEDURE_EXIT (AsmFlushCacheRange)
 
