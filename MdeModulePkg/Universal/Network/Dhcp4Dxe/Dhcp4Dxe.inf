@@ -27,6 +27,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gDhcp4DriverBinding                        
+#  COMPONENT_NAME                =  gDhcp4ComponentName
+#  COMPONENT_NAME2               =  gDhcp4ComponentName2
+#
 
 [Sources.common]
   Dhcp4Impl.c

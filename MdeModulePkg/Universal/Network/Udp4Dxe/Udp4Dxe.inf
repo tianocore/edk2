@@ -28,6 +28,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gUdp4DriverBinding                        
+#  COMPONENT_NAME                =  gUdp4ComponentName
+#  COMPONENT_NAME2               =  gUdp4ComponentName2
+#
 
 [Sources.common]
   Udp4Impl.h

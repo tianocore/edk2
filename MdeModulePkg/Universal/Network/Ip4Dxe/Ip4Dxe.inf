@@ -28,6 +28,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gIp4DriverBinding                        
+#  COMPONENT_NAME                =  gIp4ComponentName
+#  COMPONENT_NAME2               =  gIp4ComponentName2
+#
 
 [Sources.common]
   Ip4Driver.c

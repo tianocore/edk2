@@ -28,6 +28,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gUSBMassDriverBinding                        
+#  COMPONENT_NAME                =  gUsbMassStorageComponentName
+#  COMPONENT_NAME2               =  gUsbMassStorageComponentName2
+#
 
 [Sources.common]
   UsbMassBoot.h

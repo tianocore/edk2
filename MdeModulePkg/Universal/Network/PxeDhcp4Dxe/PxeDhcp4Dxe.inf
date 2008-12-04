@@ -27,6 +27,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gPxeDhcp4DriverBinding                        
+#  COMPONENT_NAME                =  gPxeDhcp4ComponentName
+#  COMPONENT_NAME2               =  gPxeDhcp4ComponentName2
+#
 
 [Sources.common]
   Support.c

@@ -28,6 +28,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  mSimpleNetworkDriverBinding                        
+#  COMPONENT_NAME                =  gSimpleNetworkComponentName
+#  COMPONENT_NAME2               =  gSimpleNetworkComponentName2
+#
 
 [Sources.common]
   Receive.c

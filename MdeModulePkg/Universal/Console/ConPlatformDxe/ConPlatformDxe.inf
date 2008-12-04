@@ -26,10 +26,12 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gConPlatformTextInDriverBinding              
-#  COMPONENT_NAME                =  gConPlatformComponentName                    
-#  DRIVER_BINDING                =  gConPlatformTextOutDriverBinding             
-#  COMPONENT_NAME                =  gConPlatformComponentName                    
+#  DRIVER_BINDING                =  gConPlatformTextInDriverBinding
+#  COMPONENT_NAME                =  gConPlatformComponentName
+#  COMPONENT_NAME2               =  gConPlatformComponentName2
+#  DRIVER_BINDING                =  gConPlatformTextOutDriverBinding
+#  COMPONENT_NAME                =  gConPlatformComponentName
+#  COMPONENT_NAME2               =  gConPlatformComponentName2
 #
 
 [Sources.common]

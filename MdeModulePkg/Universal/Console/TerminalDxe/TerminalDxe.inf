@@ -27,8 +27,9 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gTerminalDriverBinding                       
-#  COMPONENT_NAME                =  gTerminalComponentName                       
+#  DRIVER_BINDING                =  gTerminalDriverBinding
+#  COMPONENT_NAME                =  gTerminalComponentName
+#  COMPONENT_NAME2               =  gTerminalComponentName2
 #
 
 [Sources.common]

@@ -29,6 +29,7 @@
 #
 #  DRIVER_BINDING                =  gIScsiDriverBinding
 #  COMPONENT_NAME                =  gIScsiComponentName
+#  COMPONENT_NAME2               =  gIScsiComponentName2
 #
 
 [Sources.common]

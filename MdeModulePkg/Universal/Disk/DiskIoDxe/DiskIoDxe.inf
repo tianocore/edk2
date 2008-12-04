@@ -29,6 +29,7 @@
 #
 #  DRIVER_BINDING                =  gDiskIoDriverBinding
 #  COMPONENT_NAME                =  gDiskIoComponentName
+#  COMPONENT_NAME2               =  gDiskIoComponentName2
 #
 
 [Sources.common]

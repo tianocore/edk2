@@ -29,6 +29,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gUsbKeyboardDriverBinding                        
+#  COMPONENT_NAME                =  gUsbKeyboardComponentName
+#  COMPONENT_NAME2               =  gUsbKeyboardComponentName2
+#
 
 [Sources.common]
   EfiKey.c
