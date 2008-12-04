@@ -23,7 +23,7 @@ Revision History
 
 #include "Tiano.h"
 
-#include EFI_PROTOCOL_DEFINITION (EfiOEMBadging)
+#include EFI_PROTOCOL_DEFINITION (EfiOemBadging)
 
 EFI_GUID  gEfiOEMBadgingProtocolGuid = EFI_OEM_BADGING_PROTOCOL_GUID;
 
