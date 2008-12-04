@@ -475,7 +475,7 @@ CheckForRom (
             Status = gBS->AllocatePool(
                             EfiBootServicesData,
                             ((UINT32)mPciOptionRomTable.PciOptionRomCount + 1) * sizeof(EFI_PCI_OPTION_ROM_DESCRIPTOR),
-                            &TempPciOptionRomDescriptors
+                            (VOID **) &TempPciOptionRomDescriptors
                             );
             if (mPciOptionRomTable.PciOptionRomCount > 0) {
               CopyMem(
@@ -553,7 +553,7 @@ SaveCommandRegister (
   //
   // Clear the memory enable bit
   //
-  Command = Context->CommandRegisterBuffer[Index] & (~0x02);
+  Command = (UINT16) (Context->CommandRegisterBuffer[Index] & (~0x02));
 
   IoDev->Pci.Write (IoDev, EfiPciWidthUint16, Address, 1, &Command);
 }
@@ -606,7 +606,7 @@ ScanPciRootBridgeForRoms(
     mPciOptionRomTableInstalled = TRUE;
   }
 
-  Status = IoDev->Configuration(IoDev, &Descriptors);
+  Status = IoDev->Configuration(IoDev, (VOID **) &Descriptors);
   if (EFI_ERROR (Status) || Descriptors == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -677,7 +677,7 @@ ScanPciRootBridgeForRoms(
   Status = gBS->AllocatePool(
                   EfiBootServicesData,
                   sizeof(UINT16) * (MaxBus - MinBus + 1) * (PCI_MAX_DEVICE+1) * (PCI_MAX_FUNC+1),
-                  &Context.CommandRegisterBuffer
+                  (VOID **) &Context.CommandRegisterBuffer
                   );
 
   if (EFI_ERROR (Status)) {
