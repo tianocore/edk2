@@ -196,10 +196,10 @@ Description:
   VOID  *PageNumberBase;
 
   SizeOfMemorySpace -= EFI_2M_PAGE_BITS_NUM;
-  gPDEBitsNum        = MIN (SizeOfMemorySpace, EFI_MAX_ENTRY_BITS_NUM);
-  SizeOfMemorySpace  = SizeOfMemorySpace - gPDEBitsNum;
-  gPDPTEBitsNum      = MIN (SizeOfMemorySpace, EFI_MAX_ENTRY_BITS_NUM);
-  SizeOfMemorySpace  = SizeOfMemorySpace - gPDPTEBitsNum;
+  gPDEBitsNum        = (UINT8) MIN (SizeOfMemorySpace, EFI_MAX_ENTRY_BITS_NUM);
+  SizeOfMemorySpace  = (UINT8) (SizeOfMemorySpace - gPDEBitsNum);
+  gPDPTEBitsNum      = (UINT8) MIN (SizeOfMemorySpace, EFI_MAX_ENTRY_BITS_NUM);
+  SizeOfMemorySpace  = (UINT8) (SizeOfMemorySpace - gPDPTEBitsNum);
   gPML4BitsNum       = SizeOfMemorySpace;
   if (gPML4BitsNum > EFI_MAX_ENTRY_BITS_NUM) {
     return NULL;

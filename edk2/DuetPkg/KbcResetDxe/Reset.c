@@ -26,7 +26,7 @@ KbcResetSystem (
   IN EFI_RESET_TYPE   ResetType,
   IN EFI_STATUS       ResetStatus,
   IN UINTN            DataSize,
-  IN CHAR16           *ResetData OPTIONAL
+  IN VOID             *ResetData OPTIONAL
   )
 /*++
 
