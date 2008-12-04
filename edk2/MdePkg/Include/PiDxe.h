@@ -1,6 +1,6 @@
 /** @file
 
-  Root include file for Mde Package DXE_CORE, DXE, SMM, SAL type modules.
+  Root include file for Mde Package DXE_CORE, DXE, RUNTIME, SMM, SAL type modules.
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials

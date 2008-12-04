@@ -238,6 +238,15 @@ typedef INT64   INTN;
   #endif  
 #endif
 
+/**
+  Return the pointer to the first instruction of a function given a function pointer.
+  On x64 CPU architectures, these two pointer values are the same, 
+  so the implementation of this macro is very simple.
+  
+  @param  p A pointer to a function
+
+  @return The pointer to the first instruction of a function given a function pointer.
+**/
 #define FUNCTION_ENTRY_POINT(p) (p)
 
 #endif

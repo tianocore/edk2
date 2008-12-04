@@ -134,8 +134,6 @@ typedef struct {
   UINT32  Size;
 } EFI_IMAGE_DATA_DIRECTORY;
 
-#define EFI_IMAGE_ROM_OPTIONAL_HDR_MAGIC      0x107
-
 //
 // Directory Entries
 //
@@ -386,7 +384,7 @@ typedef struct {
                                                    
 #define EFI_IMAGE_SCN_LNK_OTHER                    BIT8   ///< 0x00000100  ///< Reserved.
 #define EFI_IMAGE_SCN_LNK_INFO                     BIT9   ///< 0x00000200  ///< Section contains comments or some other type of information.
-#define EFI_IMAGE_SCN_LNK_REMOVE                   BIT10  ///< 0x00000800  ///< Section contents will not become part of image.
+#define EFI_IMAGE_SCN_LNK_REMOVE                   BIT11  ///< 0x00000800  ///< Section contents will not become part of image.
 #define EFI_IMAGE_SCN_LNK_COMDAT                   BIT12  ///< 0x00001000
                                                    
 #define EFI_IMAGE_SCN_ALIGN_1BYTES                 BIT20  ///< 0x00100000
@@ -566,15 +564,15 @@ typedef struct {
 //
 // Based relocation types.
 //
-#define EFI_IMAGE_REL_BASED_ABSOLUTE      0
-#define EFI_IMAGE_REL_BASED_HIGH          1
-#define EFI_IMAGE_REL_BASED_LOW           2
-#define EFI_IMAGE_REL_BASED_HIGHLOW       3
-#define EFI_IMAGE_REL_BASED_HIGHADJ       4
-#define EFI_IMAGE_REL_BASED_MIPS_JMPADDR  5
-#define EFI_IMAGE_REL_BASED_IA64_IMM64    9
-#define IMAGE_REL_BASED_MIPS_JMPADDR16    9
-#define EFI_IMAGE_REL_BASED_DIR64         10
+#define EFI_IMAGE_REL_BASED_ABSOLUTE        0
+#define EFI_IMAGE_REL_BASED_HIGH            1
+#define EFI_IMAGE_REL_BASED_LOW             2
+#define EFI_IMAGE_REL_BASED_HIGHLOW         3
+#define EFI_IMAGE_REL_BASED_HIGHADJ         4
+#define EFI_IMAGE_REL_BASED_MIPS_JMPADDR    5
+#define EFI_IMAGE_REL_BASED_IA64_IMM64      9
+#define EFI_IMAGE_REL_BASED_MIPS_JMPADDR16  9
+#define EFI_IMAGE_REL_BASED_DIR64           10
 
 ///
 /// Line number format.
