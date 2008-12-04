@@ -20,7 +20,7 @@
 //--
 
   .file  "pioflush.c"
-//  .radix  D
+  .radix  C
   .section  .text,  "ax", "progbits"
   .align 32
   .section  .pdata,  "a", "progbits"
