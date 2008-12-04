@@ -37,6 +37,7 @@ Abstract:
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/TimerLib.h>
 
 #include "Udp4Driver.h"
 
@@ -49,7 +50,7 @@ extern UINT16                          mUdp4RandomPort;
 
 #define ICMP_ERROR_PACKET_LENGTH  8
 
-#define UDP4_TIMEOUT_INTERVAL (50 * TICKS_PER_MS)  // 50 milliseconds
+#define UDP4_TIMEOUT_INTERVAL (10 * TICKS_PER_MS)  // 10 milliseconds
 
 #define UDP4_HEADER_SIZE      sizeof (EFI_UDP4_HEADER)
 #define UDP4_MAX_DATA_SIZE    65507
