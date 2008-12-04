@@ -28,6 +28,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gMnpDriverBinding                        
+#  COMPONENT_NAME                =  gMnpComponentName
+#  COMPONENT_NAME2               =  gMnpComponentName2
+#
 
 [Sources.common]
   MnpMain.c

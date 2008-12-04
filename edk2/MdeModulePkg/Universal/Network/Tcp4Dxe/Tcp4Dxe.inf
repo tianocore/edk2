@@ -28,6 +28,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  mTcp4DriverBinding                        
+#  COMPONENT_NAME                =  gTcp4ComponentName
+#  COMPONENT_NAME2               =  gTcp4ComponentName2
+#
 
 [Sources.common]
   SockImpl.c

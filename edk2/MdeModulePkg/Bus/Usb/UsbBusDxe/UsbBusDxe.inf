@@ -28,6 +28,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  mUsbBusDriverBinding                        
+#  COMPONENT_NAME                =  mUsbBusComponentName
+#  COMPONENT_NAME2               =  mUsbBusComponentName2
+#
 
 [Sources.common]
   UsbDesc.c

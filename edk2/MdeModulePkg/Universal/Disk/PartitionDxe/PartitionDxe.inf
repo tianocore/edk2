@@ -33,6 +33,7 @@
 #
 #  DRIVER_BINDING                =  gPartitionDriverBinding
 #  COMPONENT_NAME                =  gPartitionComponentName
+#  COMPONENT_NAME2               =  gPartitionComponentName2
 #
 
 [Sources.common]

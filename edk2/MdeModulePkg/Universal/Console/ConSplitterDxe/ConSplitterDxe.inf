@@ -29,12 +29,16 @@
 #
 #  DRIVER_BINDING                =  gConSplitterConInDriverBinding
 #  COMPONENT_NAME                =  gConSplitterConInComponentName
+#  COMPONENT_NAME2               =  gConSplitterConInComponentName2
 #  DRIVER_BINDING                =  gConSplitterSimplePointerDriverBinding
 #  COMPONENT_NAME                =  gConSplitterSimplePointerComponentName
+#  COMPONENT_NAME2               =  gConSplitterSimplePointerComponentName2
 #  DRIVER_BINDING                =  gConSplitterConOutDriverBinding
 #  COMPONENT_NAME                =  gConSplitterConOutComponentName
+#  COMPONENT_NAME2               =  gConSplitterConOutComponentName2
 #  DRIVER_BINDING                =  gConSplitterStdErrDriverBinding
 #  COMPONENT_NAME                =  gConSplitterStdErrComponentName
+#  COMPONENT_NAME2               =  gConSplitterStdErrComponentName2
 #
 
 [Sources.common]

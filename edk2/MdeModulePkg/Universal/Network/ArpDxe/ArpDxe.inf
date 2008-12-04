@@ -27,6 +27,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gArpDriverBinding                       
+#  COMPONENT_NAME                =  gArpComponentName
+#  COMPONENT_NAME2               =  gArpComponentName2
+#
 
 [Sources.common]
   ArpMain.c

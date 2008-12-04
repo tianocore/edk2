@@ -29,8 +29,9 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gDebugPortDriverBinding                      
-#  COMPONENT_NAME                =  gDebugPortComponentName                      
+#  DRIVER_BINDING                =  gDebugPortDriverBinding
+#  COMPONENT_NAME                =  gDebugPortComponentName
+#  COMPONENT_NAME2               =  gDebugPortComponentName2
 #  Variable Guid C Name: gEfiDebugPortProtocolGuid Variable Name: L"DEBUGPORT"
 #
 #

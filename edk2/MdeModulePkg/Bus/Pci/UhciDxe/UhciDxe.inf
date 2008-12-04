@@ -28,6 +28,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  gUhciDriverBinding                        
+#  COMPONENT_NAME                =  gUhciComponentName
+#  COMPONENT_NAME2               =  gUhciComponentName2
+#
 
 [Sources.common]
   UhciSched.c

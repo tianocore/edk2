@@ -27,6 +27,10 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+#  DRIVER_BINDING                =  mPxeBcDriverBinding                        
+#  COMPONENT_NAME                =  gPxeBcComponentName
+#  COMPONENT_NAME2               =  gPxeBcComponentName2
+#
 
 [Sources.common]
   Pxe_bc_mtftp.c

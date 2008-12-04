@@ -29,6 +29,7 @@
 #
 #  DRIVER_BINDING                =  gGraphicsConsoleDriverBinding
 #  COMPONENT_NAME                =  gGraphicsConsoleComponentName
+#  COMPONENT_NAME2               =  gGraphicsConsoleComponentName2
 #
 
 [Sources.common]
