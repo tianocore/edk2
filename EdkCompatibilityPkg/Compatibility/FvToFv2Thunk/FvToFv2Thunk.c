@@ -345,9 +345,17 @@ InitializeFirmwareVolume2 (
   return EFI_SUCCESS;
 }
 
+/**
+  Convert FV attrbiutes to FV2 attributes.
+
+  @param Fv2Attributes FV2 attributes.
+
+  @return FV attributes.
+
+**/
 FRAMEWORK_EFI_FV_ATTRIBUTES
 Fv2AttributesToFvAttributes (
-    EFI_FV_ATTRIBUTES Fv2Attributes
+  IN  EFI_FV_ATTRIBUTES Fv2Attributes
   )
 {
   //
