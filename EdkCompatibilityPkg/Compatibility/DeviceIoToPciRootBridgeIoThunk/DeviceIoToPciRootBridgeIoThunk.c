@@ -457,6 +457,8 @@ PciRootBridgeIoNotificationEvent (
       continue;
     }
 
+    Private->PciRootBridgeIo = PciRootBridgeIo;
+
     Status = gBS->HandleProtocol (
                     Handle,
                     &gEfiDevicePathProtocolGuid,
