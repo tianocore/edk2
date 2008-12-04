@@ -68,7 +68,7 @@ InvalidateInstructionCacheRange (
   )
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
-  return IpfFlushCacheRange (Address, Length);
+  return AsmFlushCacheRange (Address, Length);
 }
 
 /**
@@ -125,7 +125,7 @@ WriteBackInvalidateDataCacheRange (
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
 
-  return IpfFlushCacheRange (Address, Length);
+  return AsmFlushCacheRange (Address, Length);
 }
 
 /**
@@ -181,7 +181,7 @@ WriteBackDataCacheRange (
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
 
-  return IpfFlushCacheRange (Address, Length);
+  return AsmFlushCacheRange (Address, Length);
 }
 
 /**
@@ -247,5 +247,5 @@ InvalidateDataCacheRange (
   // Invalidation of a data cache range without writing back is not supported on
   // IPF architecture, so write back and invalidate operation is performed.
   //
-  return IpfFlushCacheRange (Address, Length);
+  return AsmFlushCacheRange (Address, Length);
 }
