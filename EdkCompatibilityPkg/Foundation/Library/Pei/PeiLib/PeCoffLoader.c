@@ -70,7 +70,7 @@ PeCoffLoaderLoadImage (
 EFI_STATUS
 EFIAPI
 PeCoffLoaderUnloadImage (
-  IN EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext
+  IN OUT EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext
   );
 
 #if defined (EFI_DEBUG_ITP_BREAK) && !defined (_CONSOLE)
@@ -1357,7 +1357,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 PeCoffLoaderUnloadImage (
-  IN EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext
+  IN OUT EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext
   )
 /*++
 
