@@ -3608,21 +3608,19 @@ EFIAPI
 CpuDeadLoop (
   VOID
   );
-
 #if defined (MDE_CPU_IPF)
 
 /**
   Flush a range of  cache lines in the cache coherency domain of the calling
   CPU.
 
-  Invalidates the  cache lines specified by Address and Length. If Address is
-  not aligned on a cache line boundary, then entire cache line containing
-  Address is invalidated. If Address + Length is not aligned on a cache line
-  boundary, then the entire instruction cache line containing Address + Length
-  -1 is invalidated. This function may choose to invalidate the entire
-  instruction cache if that is more efficient than invalidating the specified
-  range. If Length is 0, the no instruction cache lines are invalidated.
-  Address is returned.
+  Flushes the cache lines specified by Address and Length.  If Address is not aligned 
+  on a cache line boundary, then entire cache line containing Address is flushed.  
+  If Address + Length is not aligned on a cache line boundary, then the entire cache 
+  line containing Address + Length - 1 is flushed.  This function may choose to flush 
+  the entire cache if that is more efficient than flushing the specified range.  If 
+  Length is 0, the no cache lines are flushed.  Address is returned.   
+  This function is only available on IPF.
 
   If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
 
@@ -3633,12 +3631,12 @@ CpuDeadLoop (
 
   @param  Length  The number of bytes to invalidate from the instruction cache.
 
-  @return Address
+  @return Address.
 
 **/
 VOID *
 EFIAPI
-IpfFlushCacheRange (
+AsmFlushCacheRange (
   IN      VOID                      *Address,
   IN      UINTN                     Length
   );
