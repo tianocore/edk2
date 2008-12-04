@@ -252,7 +252,7 @@ PeCoffLoaderRelocateImageForRuntime (
 RETURN_STATUS
 EFIAPI
 PeCoffLoaderUnloadImage (
-  IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
   if (mPeiEfiPeiPeCoffLoader == NULL) {
