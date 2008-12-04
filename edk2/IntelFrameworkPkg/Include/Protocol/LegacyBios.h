@@ -42,7 +42,7 @@
 typedef struct _EFI_LEGACY_BIOS_PROTOCOL EFI_LEGACY_BIOS_PROTOCOL;
 
 //
-/// @bug: These macros appear in no specifications and are kept for backward
+/// @bug These macros appear in no specifications and are kept for backward
 //        compatibility only.
 // Convert from 32-bit address (_Adr) to Segment:Offset 16-bit form
 //

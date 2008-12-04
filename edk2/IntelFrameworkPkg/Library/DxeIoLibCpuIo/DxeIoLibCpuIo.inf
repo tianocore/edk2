@@ -46,10 +46,6 @@
 
 
 [LibraryClasses]
-  BaseLib
-  DebugLib
-  UefiBootServicesTableLib
-
 
 [Protocols]
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED

@@ -16,8 +16,8 @@
 
 **/
 
-#ifndef _BOOT_SCRIPT_SAVE_PROTOCOL_H
-#define _BOOT_SCRIPT_SAVE_PROTOCOL_H
+#ifndef _BOOT_SCRIPT_SAVE_PROTOCOL_H_
+#define _BOOT_SCRIPT_SAVE_PROTOCOL_H_
 
 #include <PiDxe.h>
 //

@@ -48,7 +48,7 @@ MmioReadBuffer8 (
 
   ReturnBuffer = Buffer;
 
-  while (Length--) {
+  while (Length-- > 0) {
     *(Buffer++) = MmioRead8 (StartAddress++);
   }
 
@@ -97,7 +97,7 @@ MmioReadBuffer16 (
 
   ReturnBuffer = Buffer;
 
-  while (Length) {
+  while (Length > 0) {
     *(Buffer++) = MmioRead16 (StartAddress);
     StartAddress += sizeof (UINT16);
     Length -= sizeof (UINT16);
@@ -148,7 +148,7 @@ MmioReadBuffer32 (
 
   ReturnBuffer = Buffer;
 
-  while (Length) {
+  while (Length > 0) {
     *(Buffer++) = MmioRead32 (StartAddress);
     StartAddress += sizeof (UINT32);
     Length -= sizeof (UINT32);
@@ -199,7 +199,7 @@ MmioReadBuffer64 (
 
   ReturnBuffer = Buffer;
 
-  while (Length) {
+  while (Length > 0) {
     *(Buffer++) = MmioRead64 (StartAddress);
     StartAddress += sizeof (UINT64);
     Length -= sizeof (UINT64);
@@ -242,7 +242,7 @@ MmioWriteBuffer8 (
 
   ReturnBuffer = (UINT8 *) Buffer;
 
-  while (Length--) {
+  while (Length-- > 0) {
      MmioWrite8 (StartAddress++, *(Buffer++));
   }
 
@@ -293,7 +293,7 @@ MmioWriteBuffer16 (
 
   ReturnBuffer = (UINT16 *) Buffer;
 
-  while (Length) {
+  while (Length > 0) {
     MmioWrite16 (StartAddress, *(Buffer++));
 
     StartAddress += sizeof (UINT16);
@@ -347,7 +347,7 @@ MmioWriteBuffer32 (
 
   ReturnBuffer = (UINT32 *) Buffer;
 
-  while (Length) {
+  while (Length > 0) {
     MmioWrite32 (StartAddress, *(Buffer++));
 
     StartAddress += sizeof (UINT32);
@@ -400,7 +400,7 @@ MmioWriteBuffer64 (
 
   ReturnBuffer = (UINT64 *) Buffer;
 
-  while (Length) {
+  while (Length > 0) {
     MmioWrite64 (StartAddress, *(Buffer++));
 
     StartAddress += sizeof (UINT64);
