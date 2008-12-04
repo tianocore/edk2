@@ -82,10 +82,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                Packet to execute.  See HostAdapterStatus, TargetStatus,
                                SenseDataLength, and SenseData in that order for
                                additional status information.
-  @retval EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, 
-                               but the entire DataBuffer could not be transferred.
-                               The actual number of bytes transferred is returned
-                               in InTransferLength.
 
 **/
 EFI_STATUS

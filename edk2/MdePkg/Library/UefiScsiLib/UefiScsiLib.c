@@ -67,7 +67,7 @@
                                     If SenseDataLength is 0, then this parameter is
                                     optional and may be NULL.
   @param[in, out] SenseDataLength   On input, a pointer to the length in bytes of
-                                    the SenseData buffer. On output, a poiinter to
+                                    the SenseData buffer. On output, a pointer to
                                     the number of bytes written to the SenseData buffer. 
   @param[out]     HostAdapterStatus The status of the SCSI Host Controller that produces
                                     the SCSI bus containing the SCSI target specified by
@@ -75,7 +75,7 @@
                                     See the EFI SCSI I/O Protocol in the UEFI Specification
                                     for details on the possible return values.
   @param[out]     TargetStatus      The status returned by the SCSI target specified
-                                    by ScsiIo when the SCSI Request Packat was executed
+                                    by ScsiIo when the SCSI Request Packet was executed
                                     on the SCSI Host Controller. See the EFI SCSI I/O
                                     Protocol in the UEFI Specification for details on
                                     the possible return values. 
@@ -101,10 +101,6 @@
                                Packet to execute.  See HostAdapterStatus, TargetStatus,
                                SenseDataLength, and SenseData in that order for
                                additional status information.
-  @retval EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, 
-                               but the entire DataBuffer could not be transferred.
-                               The actual number of bytes transferred is returned
-                               in InTransferLength.
 
 **/
 EFI_STATUS
