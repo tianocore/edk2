@@ -237,6 +237,18 @@ typedef struct {
   UINT64                    r11;
 } PAL_CALL_RETURN;
 
+/**
+  Return the pointer to the first instruction of a function given a function pointer.
+  For Itanium CPUs, all function calls are made through a PLABEL, so a pointer to a function 
+  is actually a pointer to a PLABEL.  The pointer to the first instruction of the function 
+  is contained within the PLABEL.  This macro may be used to retrieve a pointer to the first 
+  instruction of a function independent of the CPU architecture being used.  This is very 
+  useful when printing function addresses through DEBUG() macros.
+  
+  @param  p A pointer to a function
+
+  @return The pointer to the first instruction of a function given a function pointer.
+**/
 #define FUNCTION_ENTRY_POINT(p) (((EFI_PLABEL *)(p))->EntryPoint)
 
 #endif

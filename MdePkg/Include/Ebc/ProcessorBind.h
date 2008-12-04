@@ -79,6 +79,15 @@ typedef unsigned long         UINTN;
 ///
 #define GLOBAL_REMOVE_IF_UNREFERENCED
 
+/**
+  Return the pointer to the first instruction of a function given a function pointer.
+  On EBC architectures, these two pointer values are the same, 
+  so the implementation of this macro is very simple.
+  
+  @param  p A pointer to a function
+
+  @return The pointer to the first instruction of a function given a function pointer.
+**/
 #define FUNCTION_ENTRY_POINT(p) (p)
 
 #endif 

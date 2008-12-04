@@ -87,7 +87,7 @@ typedef struct {
 /**
   Prototype of SAL procedures.
 
-  @param  Arg0               Functional identifier.
+  @param  FunctionId         Functional identifier.
                              The upper 32 bits are ignored and only the lower 32 bits
                              are used. The following functional identifiers are defined:
                              0x01XXXXXX - Architected SAL functional group.
@@ -113,13 +113,13 @@ typedef
 SAL_RETURN_REGS
 (EFIAPI *SAL_PROC) (
   IN UINT64 FunctionId,
+  IN UINT64 Arg1,
   IN UINT64 Arg2,
   IN UINT64 Arg3,
   IN UINT64 Arg4,
   IN UINT64 Arg5,
   IN UINT64 Arg6,
-  IN UINT64 Arg7,
-  IN UINT64 Arg8
+  IN UINT64 Arg7
   );
 
 //

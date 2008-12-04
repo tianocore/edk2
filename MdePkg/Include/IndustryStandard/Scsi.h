@@ -265,7 +265,7 @@ typedef struct {
 // defined here. Please refer to SCSI standard for full value definition.
 //
 #define EFI_SCSI_ASC_NOT_READY                    (0x04)
-#define   EFI_SCSI_ASCQ_IN_PROGRESS                 (0x01)
+#define EFI_SCSI_ASCQ_IN_PROGRESS                 (0x01)
 
 #define EFI_SCSI_ASC_MEDIA_ERR1                   (0x10)
 #define EFI_SCSI_ASC_MEDIA_ERR2                   (0x11)
