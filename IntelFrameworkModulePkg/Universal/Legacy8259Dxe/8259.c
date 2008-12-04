@@ -1,7 +1,7 @@
 /**@file
   This contains the installation function for the driver.
   
-Copyright (c) 2005 - 2007, Intel Corporation                                                         
+Copyright (c) 2005 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -89,16 +89,21 @@ Interrupt8259ReadMask (
 **/
 // TODO:    EdgeLevel - add argument and description to function comment
 {
+  UINT16  MasterValue;
+  UINT16  SlaveValue;
+
   if (Mask != NULL) {
-    *Mask = (UINT16) (IoRead8 (LEGACY_8259_MASK_REGISTER_MASTER) | (IoRead8 (LEGACY_8259_MASK_REGISTER_SLAVE) << 8));
+    MasterValue = IoRead8 (LEGACY_8259_MASK_REGISTER_MASTER);
+    SlaveValue  = IoRead8 (LEGACY_8259_MASK_REGISTER_SLAVE);
+
+    *Mask = (UINT16) (MasterValue | (SlaveValue << 8));
   }
 
   if (EdgeLevel != NULL) {
-    *EdgeLevel = (UINT16)
-      (
-        IoRead8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_MASTER) |
-          (IoRead8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_SLAVE) << 8)
-      );
+    MasterValue = IoRead8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_MASTER);
+    SlaveValue  = IoRead8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_SLAVE);
+
+    *EdgeLevel = (UINT16) (MasterValue | (SlaveValue << 8));
   }
 }
 //
@@ -432,11 +437,11 @@ Interrupt8259EnableIrq (
     return EFI_INVALID_PARAMETER;
   }
 
-  mProtectedModeMask &= ~(1 << Irq);
+  mProtectedModeMask = (UINT16) (mProtectedModeMask & ~(1 << Irq));
   if (LevelTriggered) {
-    mProtectedModeEdgeLevel |= (1 << Irq);
+    mProtectedModeEdgeLevel = (UINT16) (mProtectedModeEdgeLevel | (1 << Irq));
   } else {
-    mProtectedModeEdgeLevel &= ~(1 << Irq);
+    mProtectedModeEdgeLevel = (UINT16) (mProtectedModeEdgeLevel & ~(1 << Irq));
   }
 
   Interrupt8259WriteMask (mProtectedModeMask, mProtectedModeEdgeLevel);
@@ -469,8 +474,8 @@ Interrupt8259DisableIrq (
     return EFI_INVALID_PARAMETER;
   }
 
-  mProtectedModeMask |= (1 << Irq);
-  mProtectedModeEdgeLevel &= ~(1 << Irq);
+  mProtectedModeMask      = (UINT16) (mProtectedModeMask | (1 << Irq));
+  mProtectedModeEdgeLevel = (UINT16) (mProtectedModeEdgeLevel & ~(1 << Irq));
 
   Interrupt8259WriteMask (mProtectedModeMask, mProtectedModeEdgeLevel);
 
