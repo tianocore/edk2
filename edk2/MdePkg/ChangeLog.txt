@@ -154,7 +154,7 @@ EDK_5869:  Non-Compatible: qhuang8
 			Modules using this macro, it needs to adapt to new interface.
 			
 EDK_5939:  Non-Compatible: qwang12
-  Library API moved frrom HiiLib to UefiLib.
+  Library API moved from HiiLib to UefiLib.
   
 		Code Change:
 			Change HiiLibGetCurrentLanguage to GetCurrentLanguage and moved it from HiiLib to UefiLib.
