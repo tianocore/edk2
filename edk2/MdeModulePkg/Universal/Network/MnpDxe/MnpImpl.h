@@ -25,8 +25,8 @@ Abstract:
 
 #define NET_ETHER_FCS_SIZE            4
 
-#define MNP_SYS_POLL_INTERVAL         (50 * TICKS_PER_MS)   // 50 milliseconds
-#define MNP_TIMEOUT_CHECK_INTERVAL    (50 * TICKS_PER_MS)   // 50 milliseconds
+#define MNP_SYS_POLL_INTERVAL         (10 * TICKS_PER_MS)   // 10 milliseconds
+#define MNP_TIMEOUT_CHECK_INTERVAL    (10 * TICKS_PER_MS)   // 10 milliseconds
 #define MNP_TX_TIMEOUT_TIME           (500 * TICKS_PER_MS)  // 500 milliseconds
 #define MNP_INIT_NET_BUFFER_NUM       512
 #define MNP_NET_BUFFER_INCREASEMENT   64

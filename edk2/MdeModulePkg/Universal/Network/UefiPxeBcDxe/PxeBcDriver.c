@@ -325,7 +325,7 @@ PxeBcDriverBindingStart (
   Private->Udp4CfgData.TypeOfService      = DEFAULT_ToS;
   Private->Udp4CfgData.TimeToLive         = DEFAULT_TTL;
   Private->Udp4CfgData.DoNotFragment      = FALSE;
-  Private->Udp4CfgData.ReceiveTimeout     = 50000;  // 50 milliseconds
+  Private->Udp4CfgData.ReceiveTimeout     = 10000;  // 10 milliseconds
   Private->Udp4CfgData.UseDefaultAddress  = FALSE;
 
   PxeBcInitSeedPacket (&Private->SeedPacket, Private->Udp4Read);
