@@ -4992,7 +4992,6 @@ typedef union {
 
 ///
 /// Byte packed structure for an IDTR, GDTR, LDTR descriptor
-/// @todo  How to make this structure byte-packed in a compiler independent way?
 ///
 #pragma pack (1)
 typedef struct {

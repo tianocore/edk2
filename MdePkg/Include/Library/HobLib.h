@@ -474,7 +474,7 @@ BuildMemoryAllocationHob (
   This macro returns a pointer to the data buffer in a HOB specified by Hob.
   Hob is assumed to be a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.   
 
-  @param   Hob   A pointer to a HOB.
+  @param   GuidHob   A pointer to a HOB.
 
   @return  A pointer to the data buffer in a HOB
   
@@ -487,7 +487,7 @@ BuildMemoryAllocationHob (
   This macro returns the size, in bytes, of the data buffer in a HOB specified by Hob.
   Hob is assumed to be a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
 
-  @param   Hob   A pointer to a HOB.
+  @param   GuidHob   A pointer to a HOB.
 
   @return  The size of the data buffer
 **/
