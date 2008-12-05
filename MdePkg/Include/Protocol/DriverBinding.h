@@ -33,24 +33,25 @@ typedef struct _EFI_DRIVER_BINDING_PROTOCOL  EFI_DRIVER_BINDING_PROTOCOL;
   Tests to see if this driver supports a given controller. If a child device is provided, 
   it further tests to see if this driver supports creating a handle for the specified child device.
 
-  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param  ControllerHandle     The handle of the controller to test. This handle 
-                               must support a protocol interface that supplies 
-                               an I/O abstraction to the driver.
-  @param  RemainingDevicePath  A pointer to the remaining portion of a device path. 
-                               This parameter is ignored by device drivers, and is optional for bus drivers.
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+                                   This parameter is ignored by device drivers, and is optional for bus drivers.
 
 
-  @retval EFI_SUCCESS         The device specified by ControllerHandle and
-                              RemainingDevicePath is supported by the driver specified by This.
-  @retval EFI_ALREADY_STARTED The device specified by ControllerHandle and
-                              RemainingDevicePath is already being managed by the driver
-                              specified by This.
-  @retval EFI_ACCESS_DENIED   The device specified by ControllerHandle and
-                              RemainingDevicePath is already being managed by a different
-                              driver or an application that requires exclusive acces.
-  @retval EFI_UNSUPPORTED     The device specified by ControllerHandle and
-                              RemainingDevicePath is not supported by the driver specified by This.
+  @retval EFI_SUCCESS              The device specified by ControllerHandle and
+                                   RemainingDevicePath is supported by the driver specified by This.
+  @retval EFI_ALREADY_STARTED      The device specified by ControllerHandle and
+                                   RemainingDevicePath is already being managed by the driver
+                                   specified by This.
+  @retval EFI_ACCESS_DENIED        The device specified by ControllerHandle and
+                                   RemainingDevicePath is already being managed by a different
+                                   driver or an application that requires exclusive acces.
+                                   Currently not implemented.
+  @retval EFI_UNSUPPORTED          The device specified by ControllerHandle and
+                                   RemainingDevicePath is not supported by the driver specified by This.
 **/
 typedef
 EFI_STATUS
@@ -72,17 +73,17 @@ EFI_STATUS
   3. Prior to calling Start(), the Supported() function for the driver specified by This must
      have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
 
-  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param  ControllerHandle     The handle of the controller to start. This handle 
-                               must support a protocol interface that supplies 
-                               an I/O abstraction to the driver.
-  @param  RemainingDevicePath  A pointer to the remaining portion of a device path. 
-                               This parameter is ignored by device drivers, and is optional for bus drivers.
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+                                   This parameter is ignored by device drivers, and is optional for bus drivers.
 
-  @retval EFI_SUCCESS          The device was started.
-  @retval EFI_DEVICE_ERROR     The device could not be started due to a device error.
-  @retval EFI_OUT_OF_RESOURCES The request could not be completed due to a lack of resources.
-
+  @retval EFI_SUCCESS              The device was started.
+  @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
+  @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
+  @retval Others                   The driver failded to start the device.
 **/
 typedef
 EFI_STATUS
@@ -94,7 +95,9 @@ EFI_STATUS
 
 /**
   Stop this driver on ControllerHandle. 
-  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
+  
+  Release the control of this controller and remove the IScsi functions. The Stop()
+  function is designed to be invoked from the EFI boot service DisconnectController(). 
   As a result, much of the error checking on the parameters to Stop() has been moved 
   into this common boot service. It is legal to call Stop() from other locations, 
   but the following calling restrictions must be followed or the system behavior will not be deterministic.
@@ -105,16 +108,16 @@ EFI_STATUS
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
   
-  @param  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param  ControllerHandle  A handle to the device being stopped. The handle must 
-                            support a bus specific I/O protocol for the driver 
-                            to use to stop the device.
-  @param  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
-  @param  ChildHandleBuffer An array of child handles to be freed. May be NULL if NumberOfChildren is 0.
+  @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
+                                support a bus specific I/O protocol for the driver 
+                                to use to stop the device.
+  @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.Not used.
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+                                if NumberOfChildren is 0.Not used.
 
-  @retval EFI_SUCCESS       The device was stopped.
-  @retval EFI_DEVICE_ERROR  The device could not be stopped due to a device error.
-
+  @retval EFI_SUCCESS           The device was stopped.
+  @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
 **/
 typedef
 EFI_STATUS
