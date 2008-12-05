@@ -425,7 +425,9 @@ BuildMemoryAllocationHob (
   @return HobType
   
 **/
-#define GET_HOB_TYPE(Hob)     ((Hob).Header->HobType)
+//#define GET_HOB_TYPE(Hob)     ((Hob).Header->HobType)
+#define GET_HOB_TYPE(HobStart) \
+  ((*(EFI_HOB_GENERIC_HEADER **)&(HobStart))->HobType)
 
 /**
   Returns the length, in bytes, of a HOB.
@@ -438,7 +440,9 @@ BuildMemoryAllocationHob (
   @return HobLength
 
 **/
-#define GET_HOB_LENGTH(Hob)   ((Hob).Header->HobLength)
+//#define GET_HOB_LENGTH(Hob)   ((Hob).Header->HobLength)
+#define GET_HOB_LENGTH(HobStart) \
+  ((*(EFI_HOB_GENERIC_HEADER **)&(HobStart))->HobLength)
 
 /**
   Returns a pointer to the next HOB in the HOB list.
@@ -451,7 +455,9 @@ BuildMemoryAllocationHob (
   @return A pointer to the next HOB in the HOB list.
 
 **/
-#define GET_NEXT_HOB(Hob)     ((Hob).Raw + GET_HOB_LENGTH (Hob))
+//#define GET_NEXT_HOB(Hob)     ((Hob).Raw + GET_HOB_LENGTH (Hob))
+#define GET_NEXT_HOB(HobStart) \
+  (VOID *)(*(UINT8 **)&(HobStart) + GET_HOB_LENGTH (HobStart))
 
 /**
   Determines if a HOB is the last HOB in the HOB list.
@@ -479,7 +485,9 @@ BuildMemoryAllocationHob (
   @return  A pointer to the data buffer in a HOB
   
 **/
-#define GET_GUID_HOB_DATA(GuidHob)      ((VOID *) (((UINT8 *) &((GuidHob)->Name)) + sizeof (EFI_GUID)))
+//#define GET_GUID_HOB_DATA(GuidHob)      ((VOID *) (((UINT8 *) &((GuidHob)->Name)) + sizeof (EFI_GUID)))
+#define GET_GUID_HOB_DATA(HobStart) \
+  (VOID *)(*(UINT8 **)&(HobStart) + sizeof (EFI_HOB_GUID_TYPE))
 
 /**
   Returns the size of the data buffer from a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
@@ -491,6 +499,8 @@ BuildMemoryAllocationHob (
 
   @return  The size of the data buffer
 **/
-#define GET_GUID_HOB_DATA_SIZE(GuidHob) (((GuidHob)->Header).HobLength - sizeof (EFI_HOB_GUID_TYPE))
+//#define GET_GUID_HOB_DATA_SIZE(GuidHob) (((GuidHob)->Header).HobLength - sizeof (EFI_HOB_GUID_TYPE))
+#define GET_GUID_HOB_DATA_SIZE(HobStart) \
+  (UINT16)(GET_HOB_LENGTH (HobStart) - sizeof (EFI_HOB_GUID_TYPE))
 
 #endif
