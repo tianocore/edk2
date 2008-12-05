@@ -79,5 +79,5 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleReset
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleInputError
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleOutputError
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultTerminalType
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType
   
