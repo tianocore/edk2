@@ -66,10 +66,10 @@ AsmWriteMsr32 (
 }
 
 /**
-  Reads a 64-bit MSR, performs a bitwise inclusive OR on the lower 32-bits, and
+  Reads a 64-bit MSR, performs a bitwise OR on the lower 32-bits, and
   writes the result back to the 64-bit MSR.
 
-  Reads the 64-bit MSR specified by Index, performs a bitwise inclusive OR
+  Reads the 64-bit MSR specified by Index, performs a bitwise OR
   between the lower 32-bits of the read result and the value specified by
   OrData, and writes the result to the 64-bit MSR specified by Index. The lower
   32-bits of the value written to the MSR is returned. No parameter checking is
@@ -124,12 +124,12 @@ AsmMsrAnd32 (
 }
 
 /**
-  Reads a 64-bit MSR, performs a bitwise AND followed by a bitwise inclusive OR
+  Reads a 64-bit MSR, performs a bitwise AND followed by a bitwise OR
   on the lower 32-bits, and writes the result back to the 64-bit MSR.
 
   Reads the 64-bit MSR specified by Index, performs a bitwise AND between the
   lower 32-bits of the read result and the value specified by AndData
-  preserving the upper 32-bits, performs a bitwise inclusive OR between the
+  preserving the upper 32-bits, performs a bitwise OR between the
   result of the AND operation and the value specified by OrData, and writes the
   result to the 64-bit MSR specified by Address. The lower 32-bits of the value
   written to the MSR is returned. No parameter checking is performed on Index,
@@ -195,10 +195,9 @@ AsmMsrBitFieldRead32 (
   Writes Value to a bit field in the lower 32-bits of a  64-bit MSR. The bit
   field is specified by the StartBit and the EndBit. All other bits in the
   destination MSR are preserved. The lower 32-bits of the MSR written is
-  returned. Extra left bits in Value are stripped. The caller must either
-  guarantee that Index and the data written is valid, or the caller must set up
-  exception handlers to catch the exceptions. This function is only available
-  on IA-32 and x64.
+  returned. The caller must either guarantee that Index and the data written 
+  is valid, or the caller must set up exception handlers to catch the exceptions. 
+  This function is only available on IA-32 and x64.
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
@@ -232,7 +231,7 @@ AsmMsrBitFieldWrite32 (
   Reads a bit field in a 64-bit MSR, performs a bitwise OR, and writes the
   result back to the bit field in the 64-bit MSR.
 
-  Reads the 64-bit MSR specified by Index, performs a bitwise inclusive OR
+  Reads the 64-bit MSR specified by Index, performs a bitwise OR
   between the read result and the value specified by OrData, and writes the
   result to the 64-bit MSR specified by Index. The lower 32-bits of the value
   written to the MSR are returned. Extra left bits in OrData are stripped. The
@@ -310,11 +309,11 @@ AsmMsrBitFieldAnd32 (
 
 /**
   Reads a bit field in a 64-bit MSR, performs a bitwise AND followed by a
-  bitwise inclusive OR, and writes the result back to the bit field in the
+  bitwise OR, and writes the result back to the bit field in the
   64-bit MSR.
 
   Reads the 64-bit MSR specified by Index, performs a bitwise AND followed by a
-  bitwise inclusive OR between the read result and the value specified by
+  bitwise OR between the read result and the value specified by
   AndData, and writes the result to the 64-bit MSR specified by Index. The
   lower 32-bits of the value written to the MSR are returned. Extra left bits
   in both AndData and OrData are stripped. The caller must either guarantee
@@ -359,10 +358,10 @@ AsmMsrBitFieldAndThenOr32 (
 }
 
 /**
-  Reads a 64-bit MSR, performs a bitwise inclusive OR, and writes the result
+  Reads a 64-bit MSR, performs a bitwise OR, and writes the result
   back to the 64-bit MSR.
 
-  Reads the 64-bit MSR specified by Index, performs a bitwise inclusive OR
+  Reads the 64-bit MSR specified by Index, performs a bitwise OR
   between the read result and the value specified by OrData, and writes the
   result to the 64-bit MSR specified by Index. The value written to the MSR is
   returned. No parameter checking is performed on Index or OrData, and some of
@@ -415,11 +414,11 @@ AsmMsrAnd64 (
 }
 
 /**
-  Reads a 64-bit MSR, performs a bitwise AND followed by a bitwise inclusive
+  Reads a 64-bit MSR, performs a bitwise AND followed by a bitwise 
   OR, and writes the result back to the 64-bit MSR.
 
   Reads the 64-bit MSR specified by Index, performs a bitwise AND between read
-  result and the value specified by AndData, performs a bitwise inclusive OR
+  result and the value specified by AndData, performs a bitwise OR
   between the result of the AND operation and the value specified by OrData,
   and writes the result to the 64-bit MSR specified by Index. The value written
   to the MSR is returned. No parameter checking is performed on Index, AndData,
@@ -484,10 +483,9 @@ AsmMsrBitFieldRead64 (
 
   Writes Value to a bit field in a 64-bit MSR. The bit field is specified by
   the StartBit and the EndBit. All other bits in the destination MSR are
-  preserved. The MSR written is returned. Extra left bits in Value are
-  stripped. The caller must either guarantee that Index and the data written is
-  valid, or the caller must set up exception handlers to catch the exceptions.
-  This function is only available on IA-32 and x64.
+  preserved. The MSR written is returned. The caller must either guarantee 
+  that Index and the data written is valid, or the caller must set up exception 
+  handlers to catch the exceptions. This function is only available on IA-32 and x64.
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
@@ -519,10 +517,10 @@ AsmMsrBitFieldWrite64 (
 }
 
 /**
-  Reads a bit field in a 64-bit MSR, performs a bitwise inclusive OR, and
+  Reads a bit field in a 64-bit MSR, performs a bitwise OR, and
   writes the result back to the bit field in the 64-bit MSR.
 
-  Reads the 64-bit MSR specified by Index, performs a bitwise inclusive OR
+  Reads the 64-bit MSR specified by Index, performs a bitwise OR
   between the read result and the value specified by OrData, and writes the
   result to the 64-bit MSR specified by Index. The value written to the MSR is
   returned. Extra left bits in OrData are stripped. The caller must either
@@ -602,11 +600,11 @@ AsmMsrBitFieldAnd64 (
 
 /**
   Reads a bit field in a 64-bit MSR, performs a bitwise AND followed by a
-  bitwise inclusive OR, and writes the result back to the bit field in the
+  bitwise OR, and writes the result back to the bit field in the
   64-bit MSR.
 
   Reads the 64-bit MSR specified by Index, performs a bitwise AND followed by
-  a bitwise inclusive OR between the read result and the value specified by
+  a bitwise OR between the read result and the value specified by
   AndData, and writes the result to the 64-bit MSR specified by Index. The
   value written to the MSR is returned. Extra left bits in both AndData and
   OrData are stripped. The caller must either guarantee that Index and the data

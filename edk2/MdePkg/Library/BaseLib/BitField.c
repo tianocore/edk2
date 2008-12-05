@@ -177,7 +177,7 @@ BitFieldWrite8 (
   Reads a bit field from an 8-bit value, performs a bitwise OR, and returns the
   result.
 
-  Performs a bitwise inclusive OR between the bit field specified by StartBit
+  Performs a bitwise OR between the bit field specified by StartBit
   and EndBit in Operand and the value specified by OrData. All other bits in
   Operand are preserved. The new 8-bit value is returned.
 
@@ -252,8 +252,8 @@ BitFieldAnd8 (
   bitwise OR, and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData, followed by a bitwise
-  inclusive OR with value specified by OrData. All other bits in Operand are
+  in Operand and the value specified by AndData, followed by a bitwise 
+  OR with value specified by OrData. All other bits in Operand are
   preserved. The new 8-bit value is returned.
 
   If 8-bit operations are not supported, then ASSERT().
@@ -364,7 +364,7 @@ BitFieldWrite16 (
   Reads a bit field from a 16-bit value, performs a bitwise OR, and returns the
   result.
 
-  Performs a bitwise inclusive OR between the bit field specified by StartBit
+  Performs a bitwise OR between the bit field specified by StartBit
   and EndBit in Operand and the value specified by OrData. All other bits in
   Operand are preserved. The new 16-bit value is returned.
 
@@ -439,8 +439,8 @@ BitFieldAnd16 (
   bitwise OR, and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData, followed by a bitwise
-  inclusive OR with value specified by OrData. All other bits in Operand are
+  in Operand and the value specified by AndData, followed by a bitwise 
+  OR with value specified by OrData. All other bits in Operand are
   preserved. The new 16-bit value is returned.
 
   If 16-bit operations are not supported, then ASSERT().
@@ -551,7 +551,7 @@ BitFieldWrite32 (
   Reads a bit field from a 32-bit value, performs a bitwise OR, and returns the
   result.
 
-  Performs a bitwise inclusive OR between the bit field specified by StartBit
+  Performs a bitwise OR between the bit field specified by StartBit
   and EndBit in Operand and the value specified by OrData. All other bits in
   Operand are preserved. The new 32-bit value is returned.
 
@@ -626,8 +626,8 @@ BitFieldAnd32 (
   bitwise OR, and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData, followed by a bitwise
-  inclusive OR with value specified by OrData. All other bits in Operand are
+  in Operand and the value specified by AndData, followed by a bitwise 
+  OR with value specified by OrData. All other bits in Operand are
   preserved. The new 32-bit value is returned.
 
   If 32-bit operations are not supported, then ASSERT().
@@ -738,7 +738,7 @@ BitFieldWrite64 (
   Reads a bit field from a 64-bit value, performs a bitwise OR, and returns the
   result.
 
-  Performs a bitwise inclusive OR between the bit field specified by StartBit
+  Performs a bitwise OR between the bit field specified by StartBit
   and EndBit in Operand and the value specified by OrData. All other bits in
   Operand are preserved. The new 64-bit value is returned.
 
@@ -827,8 +827,8 @@ BitFieldAnd64 (
   bitwise OR, and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData, followed by a bitwise
-  inclusive OR with value specified by OrData. All other bits in Operand are
+  in Operand and the value specified by AndData, followed by a bitwise 
+  OR with value specified by OrData. All other bits in Operand are
   preserved. The new 64-bit value is returned.
 
   If 64-bit operations are not supported, then ASSERT().

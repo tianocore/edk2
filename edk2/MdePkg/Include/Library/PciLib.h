@@ -112,11 +112,11 @@ PciWrite8 (
   );
 
 /**
-  Performs a bitwise inclusive OR of an 8-bit PCI configuration register with
+  Performs a bitwise OR of an 8-bit PCI configuration register with
   an 8-bit value.
 
   Reads the 8-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
+  bitwise OR between the read result and the value specified by
   OrData, and writes the result to the 8-bit PCI configuration register
   specified by Address. The value written to the PCI configuration register is
   returned. This function must guarantee that all PCI read and write operations
@@ -167,11 +167,11 @@ PciAnd8 (
 
 /**
   Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit
-  value, followed a  bitwise inclusive OR with another 8-bit value.
+  value, followed a  bitwise OR with another 8-bit value.
 
   Reads the 8-bit PCI configuration register specified by Address, performs a
   bitwise AND between the read result and the value specified by AndData,
-  performs a bitwise inclusive OR between the result of the AND operation and
+  performs a bitwise OR between the result of the AND operation and
   the value specified by OrData, and writes the result to the 8-bit PCI
   configuration register specified by Address. The value written to the PCI
   configuration register is returned. This function must guarantee that all PCI
@@ -261,7 +261,7 @@ PciBitFieldWrite8 (
   writes the result back to the bit field in the 8-bit port.
 
   Reads the 8-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
+  bitwise OR between the read result and the value specified by
   OrData, and writes the result to the 8-bit PCI configuration register
   specified by Address. The value written to the PCI configuration register is
   returned. This function must guarantee that all PCI read and write operations
@@ -328,11 +328,11 @@ PciBitFieldAnd8 (
 
 /**
   Reads a bit field in an 8-bit port, performs a bitwise AND followed by a
-  bitwise inclusive OR, and writes the result back to the bit field in the
+  bitwise OR, and writes the result back to the bit field in the
   8-bit port.
 
   Reads the 8-bit PCI configuration register specified by Address, performs a
-  bitwise AND followed by a bitwise inclusive OR between the read result and
+  bitwise AND followed by a bitwise OR between the read result and
   the value specified by AndData, and writes the result to the 8-bit PCI
   configuration register specified by Address. The value written to the PCI
   configuration register is returned. This function must guarantee that all PCI
@@ -412,11 +412,11 @@ PciWrite16 (
   );
 
 /**
-  Performs a bitwise inclusive OR of a 16-bit PCI configuration register with
+  Performs a bitwise OR of a 16-bit PCI configuration register with
   a 16-bit value.
 
   Reads the 16-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
+  bitwise OR between the read result and the value specified by
   OrData, and writes the result to the 16-bit PCI configuration register
   specified by Address. The value written to the PCI configuration register is
   returned. This function must guarantee that all PCI read and write operations
@@ -469,11 +469,11 @@ PciAnd16 (
 
 /**
   Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit
-  value, followed a  bitwise inclusive OR with another 16-bit value.
+  value, followed a  bitwise OR with another 16-bit value.
 
   Reads the 16-bit PCI configuration register specified by Address, performs a
   bitwise AND between the read result and the value specified by AndData,
-  performs a bitwise inclusive OR between the result of the AND operation and
+  performs a bitwise OR between the result of the AND operation and
   the value specified by OrData, and writes the result to the 16-bit PCI
   configuration register specified by Address. The value written to the PCI
   configuration register is returned. This function must guarantee that all PCI
@@ -566,7 +566,7 @@ PciBitFieldWrite16 (
   writes the result back to the bit field in the 16-bit port.
 
   Reads the 16-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
+  bitwise OR between the read result and the value specified by
   OrData, and writes the result to the 16-bit PCI configuration register
   specified by Address. The value written to the PCI configuration register is
   returned. This function must guarantee that all PCI read and write operations
@@ -635,11 +635,11 @@ PciBitFieldAnd16 (
 
 /**
   Reads a bit field in a 16-bit port, performs a bitwise AND followed by a
-  bitwise inclusive OR, and writes the result back to the bit field in the
+  bitwise OR, and writes the result back to the bit field in the
   16-bit port.
 
   Reads the 16-bit PCI configuration register specified by Address, performs a
-  bitwise AND followed by a bitwise inclusive OR between the read result and
+  bitwise AND followed by a bitwise OR between the read result and
   the value specified by AndData, and writes the result to the 16-bit PCI
   configuration register specified by Address. The value written to the PCI
   configuration register is returned. This function must guarantee that all PCI
@@ -720,11 +720,11 @@ PciWrite32 (
   );
 
 /**
-  Performs a bitwise inclusive OR of a 32-bit PCI configuration register with
+  Performs a bitwise OR of a 32-bit PCI configuration register with
   a 32-bit value.
 
   Reads the 32-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
+  bitwise OR between the read result and the value specified by
   OrData, and writes the result to the 32-bit PCI configuration register
   specified by Address. The value written to the PCI configuration register is
   returned. This function must guarantee that all PCI read and write operations
@@ -777,11 +777,11 @@ PciAnd32 (
 
 /**
   Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit
-  value, followed a  bitwise inclusive OR with another 32-bit value.
+  value, followed a  bitwise OR with another 32-bit value.
 
   Reads the 32-bit PCI configuration register specified by Address, performs a
   bitwise AND between the read result and the value specified by AndData,
-  performs a bitwise inclusive OR between the result of the AND operation and
+  performs a bitwise OR between the result of the AND operation and
   the value specified by OrData, and writes the result to the 32-bit PCI
   configuration register specified by Address. The value written to the PCI
   configuration register is returned. This function must guarantee that all PCI
@@ -874,7 +874,7 @@ PciBitFieldWrite32 (
   writes the result back to the bit field in the 32-bit port.
 
   Reads the 32-bit PCI configuration register specified by Address, performs a
-  bitwise inclusive OR between the read result and the value specified by
+  bitwise OR between the read result and the value specified by
   OrData, and writes the result to the 32-bit PCI configuration register
   specified by Address. The value written to the PCI configuration register is
   returned. This function must guarantee that all PCI read and write operations
@@ -943,11 +943,11 @@ PciBitFieldAnd32 (
 
 /**
   Reads a bit field in a 32-bit port, performs a bitwise AND followed by a
-  bitwise inclusive OR, and writes the result back to the bit field in the
+  bitwise OR, and writes the result back to the bit field in the
   32-bit port.
 
   Reads the 32-bit PCI configuration register specified by Address, performs a
-  bitwise AND followed by a bitwise inclusive OR between the read result and
+  bitwise AND followed by a bitwise OR between the read result and
   the value specified by AndData, and writes the result to the 32-bit PCI
   configuration register specified by Address. The value written to the PCI
   configuration register is returned. This function must guarantee that all PCI

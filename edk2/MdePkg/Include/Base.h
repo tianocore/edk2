@@ -43,9 +43,9 @@ typedef struct {
 //
 typedef UINT64 PHYSICAL_ADDRESS;
 
-//
-// LIST_ENTRY definition.
-//
+///
+/// LIST_ENTRY definition.
+///
 typedef struct _LIST_ENTRY LIST_ENTRY;
 
 struct _LIST_ENTRY {
@@ -360,9 +360,9 @@ typedef CHAR8 *VA_LIST;
 
 typedef INTN RETURN_STATUS;
 
-//
-// Set the upper bit to indicate EFI Error.
-//
+///
+/// Set the upper bit to indicate EFI Error.
+///
 #define ENCODE_ERROR(a)              (MAX_BIT | (a))
 
 #define ENCODE_WARNING(a)            (a)
