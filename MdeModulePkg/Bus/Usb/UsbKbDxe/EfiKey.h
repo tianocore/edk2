@@ -1,6 +1,5 @@
 /** @file
-
-    Header file for USB Keyboard Driver's Data Structures.
+  Header file for USB Keyboard Driver's Data Structures.
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -37,6 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/UefiUsbLib.h>
 #include <Library/BaseLib.h>
+#include <Library/UefiUsbLib.h>
 
 #include <IndustryStandard/Usb.h>
 
@@ -59,9 +59,9 @@ typedef struct {
 } USB_KEY;
 
 typedef struct {
-  USB_KEY buffer[MAX_KEY_ALLOWED + 1];
-  UINT8   bHead;
-  UINT8   bTail;
+  USB_KEY Buffer[MAX_KEY_ALLOWED + 1];
+  UINT8   BufferHead;
+  UINT8   BufferTail;
 } USB_KB_BUFFER;
 
 #define USB_KB_DEV_SIGNATURE  EFI_SIGNATURE_32 ('u', 'k', 'b', 'd')
@@ -95,57 +95,60 @@ typedef struct {
 
 #define USB_NS_KEY_FORM_FROM_LINK(a)  CR (a, USB_NS_KEY, Link, USB_NS_KEY_SIGNATURE)
 
+///
+/// Structure to describe USB keyboard device
+///
 typedef struct {
-  UINTN                          Signature;
-  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
-  EFI_EVENT                      DelayedRecoveryEvent;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL SimpleInput;
+  UINTN                             Signature;
+  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  EFI_EVENT                         DelayedRecoveryEvent;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL    SimpleInput;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL SimpleInputEx;
-  EFI_USB_IO_PROTOCOL           *UsbIo;
+  EFI_USB_IO_PROTOCOL               *UsbIo;
 
-  EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
-  EFI_USB_ENDPOINT_DESCRIPTOR   IntEndpointDescriptor;
+  EFI_USB_INTERFACE_DESCRIPTOR      InterfaceDescriptor;
+  EFI_USB_ENDPOINT_DESCRIPTOR       IntEndpointDescriptor;
 
-  USB_KB_BUFFER                 KeyboardBuffer;
-  UINT8                         CtrlOn;
-  UINT8                         AltOn;
-  UINT8                         ShiftOn;
-  UINT8                         NumLockOn;
-  UINT8                         CapsOn;
-  UINT8                         ScrollOn;
-  UINT8                         LastKeyCodeArray[8];
-  UINT8                         CurKeyChar;
+  USB_KB_BUFFER                     KeyboardBuffer;
+  UINT8                             CtrlOn;
+  UINT8                             AltOn;
+  UINT8                             ShiftOn;
+  UINT8                             NumLockOn;
+  UINT8                             CapsOn;
+  UINT8                             ScrollOn;
+  UINT8                             LastKeyCodeArray[8];
+  UINT8                             CurKeyChar;
 
-  UINT8                         RepeatKey;
-  EFI_EVENT                     RepeatTimer;
+  UINT8                             RepeatKey;
+  EFI_EVENT                         RepeatTimer;
 
-  EFI_UNICODE_STRING_TABLE      *ControllerNameTable;
+  EFI_UNICODE_STRING_TABLE          *ControllerNameTable;
   
-  UINT8                         LeftCtrlOn;
-  UINT8                         LeftAltOn;
-  UINT8                         LeftShiftOn;
-  UINT8                         LeftLogoOn;
-  UINT8                         RightCtrlOn;
-  UINT8                         RightAltOn;
-  UINT8                         RightShiftOn;
-  UINT8                         RightLogoOn;  
-  UINT8                         MenuKeyOn;
-  UINT8                         SysReqOn;
-  UINT8                         AltGrOn;
+  UINT8                             LeftCtrlOn;
+  UINT8                             LeftAltOn;
+  UINT8                             LeftShiftOn;
+  UINT8                             LeftLogoOn;
+  UINT8                             RightCtrlOn;
+  UINT8                             RightAltOn;
+  UINT8                             RightShiftOn;
+  UINT8                             RightLogoOn;  
+  UINT8                             MenuKeyOn;
+  UINT8                             SysReqOn;
+  UINT8                             AltGrOn;
 
-  EFI_KEY_STATE                 KeyState;
+  EFI_KEY_STATE                     KeyState;
   //
   // Notification function list
   //
-  LIST_ENTRY                    NotifyList;
+  LIST_ENTRY                        NotifyList;
 
   //
   // Non-spacing key list
   //
-  LIST_ENTRY                    NsKeyList;
-  USB_NS_KEY                    *CurrentNsKey;
-  EFI_KEY_DESCRIPTOR            *KeyConvertionTable;
-  EFI_EVENT                     KeyboardLayoutEvent;
+  LIST_ENTRY                        NsKeyList;
+  USB_NS_KEY                        *CurrentNsKey;
+  EFI_KEY_DESCRIPTOR                *KeyConvertionTable;
+  EFI_EVENT                         KeyboardLayoutEvent;
 } USB_KB_DEV;
 
 //
@@ -154,26 +157,7 @@ typedef struct {
 extern EFI_DRIVER_BINDING_PROTOCOL   gUsbKeyboardDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gUsbKeyboardComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbKeyboardComponentName2;
-extern EFI_GUID                      gEfiUsbKeyboardDriverGuid;
 extern EFI_GUID                      gSimpleTextInExNotifyGuid;
-
-/**
-  Report Status Code in Usb Keyboard Driver.
-
-  @param  DevicePath            Use this to get Device Path.
-  @param  CodeType              Status Code Type.
-  @param  CodeValue             Status Code Value.
-
-  @return None.
-
-**/
-VOID
-EFIAPI
-KbdReportStatusCode (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
-  IN EFI_STATUS_CODE_TYPE      CodeType,
-  IN EFI_STATUS_CODE_VALUE     Value
-  );
 
 #define USB_KB_DEV_FROM_THIS(a) \
     CR(a, USB_KB_DEV, SimpleInput, USB_KB_DEV_SIGNATURE)
@@ -205,6 +189,117 @@ typedef struct {
   UINT8 ScrollLock : 1;
   UINT8 Resrvd : 5;
 } LED_MAP;
+
+//
+// Functions of Driver Binding Protocol
+//
+/**
+  Check whether USB keyboard driver supports this device.
+
+  @param  This                   The USB keyboard driver binding protocol.
+  @param  Controller             The controller handle to check.
+  @param  RemainingDevicePath    The remaining device path.
+
+  @retval EFI_SUCCESS            The driver supports this controller.
+  @retval other                  This device isn't supported.
+
+**/
+EFI_STATUS
+EFIAPI
+USBKeyboardDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+/**
+  Start running driver on the controller.
+
+  @param  This                   The USB keyboard driver binding instance.
+  @param  Controller             Handle of device to bind driver to.
+  @param  RemainingDevicePath    Optional parameter use to pick a specific child
+                                 device to start.
+
+  @retval EFI_SUCCESS            The controller is controlled by the usb keyboard driver.
+  @retval EFI_UNSUPPORTED        No interrupt endpoint can be found.
+  @retval Other                  The keyboard driver cannot support this controller.
+
+**/
+EFI_STATUS
+EFIAPI
+USBKeyboardDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                     Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  );
+
+/**
+  Stop handling the controller by this USB keyboard driver.
+
+  @param  This                   The USB keyboard driver binding protocol.
+  @param  Controller             The controller to release.
+  @param  NumberOfChildren       The number of handles in ChildHandleBuffer.
+  @param  ChildHandleBuffer      The array of child handle.
+
+  @retval EFI_SUCCESS            The controller or children are stopped.
+  @retval EFI_UNSUPPORTED        Simple Text In Protocol or Simple Text In Ex Protocol
+                                 is not installed on Controller.
+  @retval EFI_DEVICE_ERROR       Failed to stop the driver.
+
+**/
+EFI_STATUS
+EFIAPI
+USBKeyboardDriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN  EFI_HANDLE                     Controller,
+  IN  UINTN                          NumberOfChildren,
+  IN  EFI_HANDLE                     *ChildHandleBuffer
+  );
+
+//
+// Functions of Simple Text Input Protocol
+//
+/**
+  Reset USB Keyboard.
+
+  There are 2 types of reset for USB keyboard.
+  For non-exhaustive reset, only keyboard buffer is cleared.
+  For exhaustive reset, in addition to clearance of keyboard buffer, the hardware status
+  is also re-initialized.
+
+  @param  This                  The protocol instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL.
+  @param  ExtendedVerification  Indicates if exhaustive reset is used.
+                                TRUE for exhaustive reset.
+                                FALSE for non-exhaustive reset.
+
+  @retval EFI_SUCCESS           Keyboard is reset successfully.
+  @retval EFI_DEVICE_ERROR      Failed to reset keyboard.
+
+**/
+EFI_STATUS
+EFIAPI
+USBKeyboardReset (
+  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL   *This,
+  IN  BOOLEAN                          ExtendedVerification
+  );
+
+/**
+  Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.ReadKeyStroke() function.
+
+  @param  This                 The EFI_SIMPLE_TEXT_INPUT_PROTOCOL instance.
+  @param  Key                  A pointer to a buffer that is filled in with the keystroke
+                               information for the key that was pressed.
+
+  @retval EFI_SUCCESS          Read key stroke successfully.
+  @retval Other                Read key stroke failed.
+
+**/
+EFI_STATUS
+EFIAPI
+USBKeyboardReadKeyStroke (
+  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL   *This,
+  OUT EFI_INPUT_KEY                    *Key
+  );
 
 //
 // Simple Text Input Ex protocol functions
@@ -307,6 +402,69 @@ EFIAPI
 USBKeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_HANDLE                         NotificationHandle
+  );
+
+/**
+  Handler function for WaitForKey event.
+
+  @param  Event        Event to be signaled when a key is pressed.
+  @param  Context      Points to USB_KB_DEV instance.
+
+**/
+VOID
+EFIAPI
+USBKeyboardWaitForKey (
+  IN  EFI_EVENT               Event,
+  IN  VOID                    *Context
+  );
+
+/**
+  Free keyboard notify list.
+
+  @param  ListHead                The list head.
+
+  @retval EFI_SUCCESS             Free the notify list successfully.
+  @retval EFI_INVALID_PARAMETER   ListHead is invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+KbdFreeNotifyList (
+  IN OUT LIST_ENTRY           *ListHead
+  );
+
+/**
+  Check whether there is key pending.
+
+  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
+
+  @retval EFI_SUCCESS          There is pending key to read.
+  @retval EFI_NOT_READY        No pending key to read.
+
+**/
+EFI_STATUS
+EFIAPI
+USBKeyboardCheckForKey (
+  IN  USB_KB_DEV    *UsbKeyboardDevice
+  );
+
+/**
+  Whether the pressed key matches a registered key or not.
+
+  @param  RegsiteredData    A pointer to a buffer that is filled in with the keystroke
+                            state data for the key that was registered.
+  @param  InputData         A pointer to a buffer that is filled in with the keystroke
+                            state data for the key that was pressed.
+
+  @retval TRUE              Key pressed matches a registered key.
+  @retval FLASE             Match failed.
+
+**/
+BOOLEAN
+EFIAPI
+IsKeyRegistered (
+  IN EFI_KEY_DATA  *RegsiteredData,
+  IN EFI_KEY_DATA  *InputData
   );
 
 #endif
