@@ -100,17 +100,17 @@ Tcp4DriverEntryPoint (
 EFI_STATUS
 EFIAPI
 Tcp4DriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 EFI_STATUS
 EFIAPI
 Tcp4DriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 EFI_STATUS

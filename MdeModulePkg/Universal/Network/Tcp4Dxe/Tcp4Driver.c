@@ -21,7 +21,7 @@ Abstract:
 #include "Tcp4Main.h"
 
 
-UINT16                               mTcp4RandomPort;
+UINT16                                mTcp4RandomPort;
 extern EFI_COMPONENT_NAME_PROTOCOL    gTcp4ComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL   gTcp4ComponentName2;
 
@@ -78,8 +78,6 @@ EFI_SERVICE_BINDING_PROTOCOL mTcp4ServiceBinding = {
 /**
   Create and start the heartbeat timer for TCP driver.
 
-  None.
-
   @retval EFI_SUCCESS            The timer is successfully created and started.
   @retval other                  The timer is not created.
 
@@ -124,13 +122,11 @@ Tcp4CreateTimer (
 /**
   Stop and destroy the heartbeat timer for TCP driver.
   
-  None
-  
-  None
-
 **/
 VOID
-Tcp4DestroyTimer ()
+Tcp4DestroyTimer (
+  VOID
+  )
 {
   ASSERT (mTcp4Timer.RefCnt > 0);
 
@@ -146,8 +142,7 @@ Tcp4DestroyTimer ()
 }
 
 /**
-  The entry point for Tcp4 driver. 
-  Used to install Tcp4 driver on the ImageHandle.
+  The entry point for Tcp4 driver, used to install Tcp4 driver on the ImageHandle.
 
   @param  ImageHandle   The firmware allocated handle for this
                         driver image.
@@ -184,7 +179,7 @@ Tcp4DriverEntryPoint (
   //
   Seed            = NetRandomInitSeed ();
   mTcpGlobalIss   = NET_RANDOM (Seed) % mTcpGlobalIss;
-  mTcp4RandomPort = (UINT16) ( TCP4_PORT_KNOWN +
+  mTcp4RandomPort = (UINT16) (TCP4_PORT_KNOWN +
                     (UINT16) (NET_RANDOM(Seed) % TCP4_PORT_KNOWN));
 
   return Status;
@@ -207,9 +202,9 @@ Tcp4DriverEntryPoint (
 EFI_STATUS
 EFIAPI
 Tcp4DriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS  Status;
@@ -262,9 +257,9 @@ Tcp4DriverBindingSupported (
 EFI_STATUS
 EFIAPI
 Tcp4DriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS               Status;
@@ -464,6 +459,17 @@ Tcp4DriverBindingStop (
   return Status;
 }
 
+/**
+  Open Ip4 and device path protocols for a created socket, and insert it in 
+  socket list.
+  
+  @param  This                Pointer to the socket just created
+  @param  Context             Context of the socket
+  
+  @retval EFI_SUCCESS         This protocol is installed successfully.
+  @retval other               Some error occured.
+  
+**/
 EFI_STATUS
 Tcp4CreateSocketCallback (
   IN SOCKET  *This,
@@ -519,6 +525,13 @@ Tcp4CreateSocketCallback (
   return Status;
 }
 
+/**
+  Close Ip4 and device path protocols for a socket, and remove it from socket list. 
+    
+  @param  This                Pointer to the socket to be removed
+  @param  Context             Context of the socket
+  
+**/
 VOID
 Tcp4DestroySocketCallback (
   IN SOCKET  *This,

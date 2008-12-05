@@ -24,13 +24,13 @@ Abstract:
 
 
 /**
-  Check whether the sequence number of the incoming segment
-  is acceptable.
+  Check whether the sequence number of the incoming segment is acceptable.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Seg      Pointer to the incoming segment.
 
-  @return 1 if the sequence number is acceptable, otherwise 0.
+  @retval 1       The sequence number is acceptable.
+  @retval 0       The sequence number is not acceptable.
 
 **/
 INTN
@@ -49,8 +49,6 @@ TcpSeqAcceptable (
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Seg      Segment that triggers the fast recovery.
-
-  @return None.
 
 **/
 VOID
@@ -162,8 +160,6 @@ TcpFastRecover (
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Seg      Segment that triggers the fast loss recovery.
 
-  @return None.
-
 **/
 VOID
 TcpFastLossRecover (
@@ -203,12 +199,10 @@ TcpFastLossRecover (
 
 
 /**
-  Compute the RTT as specified in RFC2988
+  Compute the RTT as specified in RFC2988.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Measure  Currently measured RTT in heart beats.
-
-  @return None.
 
 **/
 VOID
@@ -264,14 +258,13 @@ TcpComputeRtt (
 
 
 /**
-  Trim the data, SYN and FIN to fit into the window defined by
-  Left and Right.
+  Trim the data, SYN and FIN to fit into the window defined by Left and Right.
 
   @param  Nbuf     Buffer that contains received TCP segment without IP header.
   @param  Left     The sequence number of the window's left edge.
   @param  Right    The sequence number of the window's right edge.
 
-  @return 0, the data is successfully trimmed.
+  @return 0        The data is successfully trimmed.
 
 **/
 INTN
@@ -351,7 +344,7 @@ TcpTrimSegment (
     }
   }
 
-  ASSERT (TcpVerifySegment (Nbuf));
+  ASSERT (TcpVerifySegment (Nbuf) != 0);
   return 0;
 }
 
@@ -362,7 +355,7 @@ TcpTrimSegment (
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Nbuf     Pointer to the NET_BUF containing the received tcp segment.
 
-  @return 0, the data is trimmed.
+  @return 0        The data is trimmed.
 
 **/
 INTN
@@ -397,7 +390,7 @@ TcpDeliverData (
   TCP_SEG         *Seg;
   UINT32          Urgent;
 
-  ASSERT (Tcb && Tcb->Sk);
+  ASSERT ((Tcb != NULL) && (Tcb->Sk != NULL));
 
   //
   // make sure there is some data queued,
@@ -418,7 +411,7 @@ TcpDeliverData (
     Nbuf  = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
     Seg   = TCPSEG_NETBUF (Nbuf);
 
-    ASSERT (TcpVerifySegment (Nbuf));
+    ASSERT (TcpVerifySegment (Nbuf) != 0);
     ASSERT (Nbuf->Tcp == NULL);
 
     if (TCP_SEQ_GT (Seg->Seq, Seq)) {
@@ -547,8 +540,6 @@ TcpDeliverData (
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Nbuf     Pointer to the buffer containing the data to be queued.
 
-  @return None.
-
 **/
 VOID
 TcpQueueData (
@@ -562,7 +553,7 @@ TcpQueueData (
   LIST_ENTRY      *Cur;
   NET_BUF         *Node;
 
-  ASSERT (Tcb && Nbuf && (Nbuf->Tcp == NULL));
+  ASSERT ((Tcb != NULL) && (Nbuf != NULL) && (Nbuf->Tcp == NULL));
 
   NET_GET_REF (Nbuf);
 
@@ -654,8 +645,6 @@ TcpQueueData (
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Ack      The acknowledge seuqence number of the received segment.
-
-  @return None.
 
 **/
 VOID
@@ -989,10 +978,9 @@ TcpInput (
       // if it comes from a LISTEN TCB.
       //
     } else if ((Tcb->State == TCP_ESTABLISHED) ||
-             (Tcb->State == TCP_FIN_WAIT_1) ||
-             (Tcb->State == TCP_FIN_WAIT_2) ||
-             (Tcb->State == TCP_CLOSE_WAIT)
-            ) {
+               (Tcb->State == TCP_FIN_WAIT_1) ||
+               (Tcb->State == TCP_FIN_WAIT_2) ||
+               (Tcb->State == TCP_CLOSE_WAIT)) {
 
       SOCK_ERROR (Tcb->Sk, EFI_CONNECTION_RESET);
 
@@ -1162,7 +1150,7 @@ TcpInput (
     Tcb->SndUna = Seg->Ack;
 
     if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_SND_URG) &&
-        (TCP_SEQ_LT (Tcb->SndUp, Seg->Ack))) {
+        TCP_SEQ_LT (Tcb->SndUp, Seg->Ack)) {
 
       TCP_CLEAR_FLG (Tcb->CtrlFlag, TCP_CTRL_SND_URG);
     }
@@ -1390,7 +1378,7 @@ RESET_THEN_DROP:
   TcpSendReset (Tcb, Head, Len, Dst, Src);
 
 DROP_CONNECTION:
-  ASSERT (Tcb && Tcb->Sk);
+  ASSERT ((Tcb != NULL) && (Tcb->Sk != NULL));
 
   NetbufFree (Nbuf);
   TcpClose (Tcb);
@@ -1411,7 +1399,7 @@ DISCARD:
 
   if ((Parent != NULL) && (Tcb != NULL)) {
 
-    ASSERT (Tcb->Sk);
+    ASSERT (Tcb->Sk != NULL);
     TcpClose (Tcb);
   }
 
@@ -1427,8 +1415,6 @@ DISCARD:
   @param  IcmpErr  The ICMP error code interpreted from ICMP error packet.
   @param  Src      Source address of the ICMP error message.
   @param  Dst      Destination address of the ICMP error message.
-
-  @return None.
 
 **/
 VOID

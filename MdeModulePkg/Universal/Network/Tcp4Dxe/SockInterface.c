@@ -28,8 +28,8 @@ Abstract:
   @param  List                 Pointer to the token list to be searched.
   @param  Event                The event to be checked.
 
-  @retval BOOLEAN              If TRUE, the specific Event exists in the List. If
-                               FALSE, the specific Event is not in the List.
+  @retval  TRUE                The specific Event exists in the List. 
+  @retval  False               The specific Event is not in the List.
 
 **/
 BOOLEAN
@@ -77,8 +77,7 @@ SockTokenExisted (
   if (SockTokenExistedInList (&Sock->SndTokenList, Event) ||
       SockTokenExistedInList (&Sock->ProcessingSndTokenList, Event) ||
       SockTokenExistedInList (&Sock->RcvTokenList, Event) ||
-      SockTokenExistedInList (&Sock->ListenTokenList, Event)
-        ) {
+      SockTokenExistedInList (&Sock->ListenTokenList, Event)) {
 
     return TRUE;
   }
@@ -152,7 +151,7 @@ SockDestroyChild (
 {
   EFI_STATUS  Status;
 
-  ASSERT (Sock && Sock->ProtoHandler);
+  ASSERT ((Sock != NULL) && (Sock->ProtoHandler != NULL));
 
   if (Sock->IsDestroyed) {
     return EFI_SUCCESS;
@@ -258,8 +257,7 @@ SockCreateChild (
 
 
 /**
-  Configure the specific socket Sock using configuration data
-  ConfigData.
+  Configure the specific socket Sock using configuration data ConfigData.
 
   @param  Sock                 Pointer to the socket to be configured.
   @param  ConfigData           Pointer to the configuration data.
@@ -455,7 +453,7 @@ SockAccept (
 
       RemoveEntryList (ListEntry);
 
-      ASSERT (Socket->Parent);
+      ASSERT (Socket->Parent != NULL);
 
       Socket->Parent->ConnCnt--;
 

@@ -89,12 +89,12 @@ Tcp4ChkDataBuf (
 EFI_STATUS
 EFIAPI
 Tcp4GetModeData (
-  IN  CONST EFI_TCP4_PROTOCOL                  *This,
-  OUT       EFI_TCP4_CONNECTION_STATE          *Tcp4State       OPTIONAL,
-  OUT       EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData  OPTIONAL,
-  OUT       EFI_IP4_MODE_DATA                  *Ip4ModeData     OPTIONAL,
-  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData   OPTIONAL,
-  OUT       EFI_SIMPLE_NETWORK_MODE            *SnpModeData     OPTIONAL
+  IN     CONST EFI_TCP4_PROTOCOL                  *This,
+     OUT       EFI_TCP4_CONNECTION_STATE          *Tcp4State       OPTIONAL,
+     OUT       EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData  OPTIONAL,
+     OUT       EFI_IP4_MODE_DATA                  *Ip4ModeData     OPTIONAL,
+     OUT       EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData   OPTIONAL,
+     OUT       EFI_SIMPLE_NETWORK_MODE            *SnpModeData     OPTIONAL
   )
 {
   TCP4_MODE_DATA  TcpMode;
@@ -221,9 +221,9 @@ Tcp4Configure (
 /**
   Add or delete routing entries.
   
-  The Routes() function adds or deletes a route from the instance¡¯s routing table.
+  The Routes() function adds or deletes a route from the instance’s routing table.
   The most specific route is selected by comparing the SubnetAddress with the 
-  destination IP address¡¯s arithmetical AND to the SubnetMask.
+  destination IP address’s arithmetical AND to the SubnetMask.
   The default route is added with both SubnetAddress and SubnetMask set to 0.0.0.0. 
   The default route matches all destination IP addresses if there is no more specific route.
   Direct route is added with GatewayAddress set to 0.0.0.0. Packets are sent to 
@@ -231,9 +231,9 @@ Tcp4Configure (
   cache or it is on the local subnet. If the instance is configured to use default 
   address, a direct route to the local network will be added automatically.
   Each TCP instance has its own independent routing table. Instance that uses the 
-  default IP address will have a copy of the EFI_IP4_CONFIG_PROTOCOL¡¯s routing table. 
+  default IP address will have a copy of the EFI_IP4_CONFIG_PROTOCOL’s routing table. 
   The copy will be updated automatically whenever the IP driver reconfigures its 
-  instance. As a result, the previous modification to the instance¡¯s local copy 
+  instance. As a result, the previous modification to the instance’s local copy 
   will be lost. The priority of checking the route table is specific with IP 
   implementation and every IP implementation must comply with RFC 1122.
 
@@ -348,7 +348,7 @@ Tcp4Connect (
   incoming connection on the passive TCP instance. If a remote peer successfully 
   establishes a connection with this instance, a new TCP instance will be created 
   and its handle will be returned in ListenToken->NewChildHandle. The newly created 
-  instance is configured by inheriting the passive instance¡¯s configuration and is 
+  instance is configured by inheriting the passive instance’s configuration and is 
   ready for use upon return. The instance is in the Tcp4StateEstablished state.
   The ListenToken->CompletionToken.Event will be signaled when a new connection 
   is accepted, user aborts the listen or connection is reset. This function only 
@@ -393,7 +393,7 @@ Tcp4Accept (
 
 
 /**
-  Queues outgoing data into the transmit queue
+  Queues outgoing data into the transmit queue.
 
   The Transmit() function queues a sending request to this TCPv4 instance along 
   with the user data. The status of the token is updated and the event in the token 
@@ -403,12 +403,12 @@ Tcp4Accept (
   @param  Token                    Pointer to the completion token to queue to the
                                    transmit queue
 
-  @retval EFI_SUCCESS              The data has been queued for transmission
+  @retval EFI_SUCCESS              The data has been queued for transmission.
   @retval EFI_NOT_STARTED          The EFI_TCP4_PROTOCOL instance hasn't been
                                    configured.
   @retval EFI_NO_MAPPING           When using a default address, configuration
                                    (DHCP, BOOTP, RARP, etc.) is not finished yet.
-  @retval EFI_INVALID_PARAMETER    One or more parameters are invalid
+  @retval EFI_INVALID_PARAMETER    One or more parameters are invalid.
   @retval EFI_ACCESS_DENIED        One or more of the following conditions is TRUE:
                                    * A transmit completion token with the same
                                      Token-> CompletionToken.Event was already in the
@@ -481,7 +481,7 @@ Tcp4Transmit (
   @param  Token                    Pointer to a token that is associated with the
                                    receive data descriptor.
 
-  @retval EFI_SUCCESS              The receive completion token was cached
+  @retval EFI_SUCCESS              The receive completion token was cached.
   @retval EFI_NOT_STARTED          The EFI_TCP4_PROTOCOL instance hasn't been
                                    configured.
   @retval EFI_NO_MAPPING           When using a default address, configuration
@@ -556,11 +556,11 @@ Tcp4Receive (
   asynchronous operation is signaled and any buffers used for TCP network traffic 
   is flushed.
 
-  @param  This                     Pointer to the EFI_TCP4_PROTOCOL instance
+  @param  This                     Pointer to the EFI_TCP4_PROTOCOL instance.
   @param  CloseToken               Pointer to the close token to return when
                                    operation finishes.
 
-  @retval EFI_SUCCESS              The operation completed successfully
+  @retval EFI_SUCCESS              The operation completed successfully.
   @retval EFI_NOT_STARTED          The EFI_TCP4_PROTOCOL instance hasn't been
                                    configured.
   @retval EFI_ACCESS_DENIED        One or more of the following are TRUE: 
@@ -568,9 +568,9 @@ Tcp4Receive (
                                      set to NULL and this function has not returned.
                                    * Previous Close() call on this instance has not
                                      finished.
-  @retval EFI_INVALID_PARAMETER    One ore more parameters are invalid
+  @retval EFI_INVALID_PARAMETER    One ore more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate enough resource to finish the
-                                   operation
+                                   operation.
   @retval EFI_DEVICE_ERROR         Any unexpected and not belonged to above
                                    category error.
 
@@ -606,7 +606,8 @@ Tcp4Close (
   is not in one of the queues, which usually means that the asynchronous operation 
   has completed, EFI_NOT_FOUND is returned. If Token is NULL all asynchronous token 
   issued by Connect(), Accept(), Transmit() and Receive()will be aborted.
-
+  NOTE: It has not been implemented currently.
+    
   @param  This                     Pointer to the EFI_TCP4_PROTOCOL instance.
   @param  Token                    Pointer to a token that has been issued by
                                    Connect(), Accept(), Transmit() or Receive(). If
@@ -616,15 +617,15 @@ Tcp4Close (
   @retval  EFI_SUCCESS             The asynchronous I/O request is aborted and Token->Event
                                    is signaled.
   @retval  EFI_INVALID_PARAMETER   This is NULL.
-  @retval  EFI_NOT_STARTED         This instance hasn¡¯t been configured.
+  @retval  EFI_NOT_STARTED         This instance hasn’t been configured.
   @retval  EFI_NO_MAPPING          When using the default address, configuration
-                                   (DHCP, BOOTP,RARP, etc.) hasn¡¯t finished yet.
-  @retval  EFI_NOT_FOUND           The asynchronous I/O request isn¡¯t found in the 
+                                   (DHCP, BOOTP,RARP, etc.) hasn’t finished yet.
+  @retval  EFI_NOT_FOUND           The asynchronous I/O request isn’t found in the 
                                    transmission or receive queue. It has either 
-                                   completed or wasn¡¯t issued by Transmit() and Receive().
+                                   completed or wasn’t issued by Transmit() and Receive().
   @retval  EFI_UNSUPPORTED         The operation is not supported in current
                                    implementation.
-
+  
 **/
 EFI_STATUS
 EFIAPI
