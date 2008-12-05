@@ -180,7 +180,6 @@ ExtractGuidedSectionGetGuidList (
                              allocated output buffer. 
 
   @retval  RETURN_SUCCESS           The handlers were registered.
-  @retval  RETURN_ALREADY_STARTED   Handlers have already been registered for the GUID specified by SectionGuid. 
   @retval  RETURN_OUT_OF_RESOURCES  There are not enough resources available to register the handlers.
 
 **/
