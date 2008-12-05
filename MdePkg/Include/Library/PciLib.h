@@ -41,8 +41,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   (((Offset) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 /**
-  Register a PCI device so PCI configuration registers may be accessed after 
+  Registers a PCI device so PCI configuration registers may be accessed after 
   SetVirtualAddressMap().
+  
+  Registers the PCI device specified by Address so all the PCI configuration registers 
+  associated with that PCI device may be accessed after SetVirtualAddressMap() is called.
   
   If Address > 0x0FFFFFFF, then ASSERT().
 
