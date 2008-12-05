@@ -17,6 +17,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __MODULE_ENTRY_POINT_H__
 
 ///
+///Declare the PI Specification Revision that this driver requires to execute correctly.
+///
+extern CONST UINT32                   _gDxeRevision;
+
+///
 /// Declare the EFI/UEFI Specification Revision to which this driver is implemented 
 ///
 extern CONST UINT32                   _gUefiDriverRevision;
