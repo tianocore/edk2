@@ -478,13 +478,13 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseEnable|0x01020004|UINT32|0x30001001
   
   ## Status code value for indicating the disable of mouse device
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable|0x01020002|UINT32|0x3001002
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable|0x01020002|UINT32|0x30001002
 
   ## Status code value for indicating the enable of keyboard device
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable|0x01010004|UINT32|0x3001003
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable|0x01010004|UINT32|0x30001003
 
   ## Status code value for indicating the disable of keyboard device
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardDisable|0x01010002|UINT32|0x3001004
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardDisable|0x01010002|UINT32|0x30001004
 
   ## Status code value for indicating whether keboard device is present
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardPresenceDetect|0x01010003|UINT32|0x30001005
@@ -505,10 +505,10 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInputError|0x01010007|UINT32|0x3000100a
 
   ## Status code value for indicating the failure of mouse input handler
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError|0x01020007|UINT32|0x30001000b
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError|0x01020007|UINT32|0x3000100b
 
   ## Status code value for indicating the reset operation of mouse device
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001|UINT32|0x30001000c
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001|UINT32|0x3000100c
 
   ## Indicates the allowable maximum number in extract handler table
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
