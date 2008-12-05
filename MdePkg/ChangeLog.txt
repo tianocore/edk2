@@ -237,10 +237,3 @@ Possible Impacts:
 	EFI_TIMER_PERIOD_MICROSECONDS(X), EFI_TIMER_PERIOD_MILLISECONDS(X) and EFI_TIMER_PERIOD_SECONDS(X) for managing Timer Events.
 	Especailly, EFI_SCSI_STALL_SECONDS(a) is simply replaced by EFI_TIMER_PERIOD_SECONDS(a)
 
-EDK_6857:  Non-Compatible: qwang12
-	
-	Rename PCD name of PcdDefaultTerminalType to PcdUartDefaultTerminalType based on Mde 
-
-Possible Impacts:
-	All DSC files that reference PcdDefaultTerminalType.
-	
