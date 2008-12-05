@@ -199,6 +199,7 @@ HiiLibNewString (
   Status = EFI_SUCCESS;
 
   Languages = HiiLibGetSupportedLanguages (PackageList);
+  ASSERT (Languages != NULL);
 
   LangStrings = Languages;
   while (*LangStrings != 0) {
