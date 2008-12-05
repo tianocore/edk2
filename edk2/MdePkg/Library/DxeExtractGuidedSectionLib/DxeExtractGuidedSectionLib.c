@@ -99,6 +99,7 @@ ExtractGuidedSectionGetGuidList (
   Registers the handlers specified by GetInfoHandler and DecodeHandler with the GUID specified by SectionGuid.
   If the GUID value specified by SectionGuid has already been registered, then return RETURN_ALREADY_STARTED.
   If there are not enough resources available to register the handlers  then RETURN_OUT_OF_RESOURCES is returned.
+  
   If SectionGuid is NULL, then ASSERT().
   If GetInfoHandler is NULL, then ASSERT().
   If DecodeHandler is NULL, then ASSERT().
@@ -112,7 +113,6 @@ ExtractGuidedSectionGetGuidList (
                              allocated output buffer. 
 
   @retval  RETURN_SUCCESS           The handlers were registered.
-  @retval  RETURN_ALREADY_STARTED   Handlers have already been registered for the GUID specified by SectionGuid. 
   @retval  RETURN_OUT_OF_RESOURCES  There are not enough resources available to register the handlers.
 
 **/
