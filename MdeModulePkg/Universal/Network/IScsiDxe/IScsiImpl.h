@@ -38,6 +38,7 @@ Abstract:
 #include "IScsiIbft.h"
 #include "IScsiMisc.h"
 #include "IScsiConfig.h"
+#include "IScsiInitiatorName.h"
 
 #define ISCSI_SESSION_SIGNATURE EFI_SIGNATURE_32 ('I', 'S', 'S', 'N')
 
