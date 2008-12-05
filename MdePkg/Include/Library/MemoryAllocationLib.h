@@ -388,7 +388,6 @@ AllocateReservedCopyPool (
   If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
   enough memory remaining to satisfy the request, then NULL is returned.
   
-  If OldBuffer is NULL, then ASSERT().
   If NewSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
   If OldSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
@@ -417,8 +416,7 @@ ReallocatePool (
   OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
   If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
   enough memory remaining to satisfy the request, then NULL is returned.
-  
-  If OldBuffer is NULL, then ASSERT().
+
   If NewSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
   If OldSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
@@ -447,8 +445,7 @@ ReallocateRuntimePool (
   OldBuffer is freed.  A pointer to the newly allocated buffer is returned.  
   If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
   enough memory remaining to satisfy the request, then NULL is returned.
-  
-  If OldBuffer is NULL, then ASSERT().
+
   If NewSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
   If OldSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
