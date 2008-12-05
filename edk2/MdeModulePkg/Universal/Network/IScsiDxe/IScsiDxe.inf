@@ -38,6 +38,7 @@
   IScsiMisc.h
   IScsiIbft.h
   IScsiExtScsiPassThru.h
+  IScsiInitiatorName.h
   IScsiDriver.h
   IScsiDhcp.h
   IScsiCommon.h
