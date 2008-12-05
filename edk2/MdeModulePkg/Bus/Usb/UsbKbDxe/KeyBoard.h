@@ -1,5 +1,4 @@
 /** @file
-
   Function prototype for USB Keyboard Driver.
 
 Copyright (c) 2004 - 2008, Intel Corporation
@@ -143,7 +142,7 @@ USBParseKey (
 **/
 EFI_STATUS
 EFIAPI
-USBKeyCodeToEFIScanCode (
+UsbKeyCodeToEfiInputKey (
   IN  USB_KB_DEV      *UsbKeyboardDevice,
   IN  UINT8           KeyChar,
   OUT EFI_INPUT_KEY   *Key
@@ -154,10 +153,8 @@ USBKeyCodeToEFIScanCode (
 
   @param  KeyboardBuffer     Points to the USB Keyboard Buffer.
 
-  @retval EFI_SUCCESS        Init key buffer successfully.
-
 **/
-EFI_STATUS
+VOID
 EFIAPI
 InitUSBKeyBuffer (
   IN OUT  USB_KB_BUFFER   *KeyboardBuffer
@@ -200,10 +197,8 @@ IsUSBKeyboardBufferFull (
   @param  Key                Key code
   @param  Down               Special key
 
-  @retval EFI_SUCCESS        Success
-
 **/
-EFI_STATUS
+VOID
 EFIAPI
 InsertKeyCode (
   IN OUT  USB_KB_BUFFER *KeyboardBuffer,
@@ -248,10 +243,8 @@ USBKeyboardRepeatHandler (
 
   @param  UsbKeyboardDevice  The USB_KB_DEV instance.
 
-  @retval EFI_SUCCESS        Success
-
 **/
-EFI_STATUS
+VOID
 EFIAPI
 SetKeyLED (
   IN  USB_KB_DEV    *UsbKeyboardDevice
