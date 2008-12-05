@@ -752,8 +752,7 @@ EFI_STATUS
   @param  SystemTable           A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS           The operation completed successfully.
-  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
-
+  @retval Others                Some unexpected error happened.
 **/
 typedef
 EFI_STATUS
