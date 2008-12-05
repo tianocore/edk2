@@ -6,7 +6,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +26,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #include <ProcessorBind.h>
 
+
+//
+// 128 bit buffer containing a unique identifier value.  
+// Unless otherwise specified, aligned on a 64 bit boundary.
+//
 typedef struct {
   UINT32  Data1;
   UINT16  Data2;
@@ -33,11 +38,14 @@ typedef struct {
   UINT8   Data4[8];
 } GUID;
 
+//
+// 8-bytes unsigned value that represents a physical system address.
+//
 typedef UINT64 PHYSICAL_ADDRESS;
 
-///
-/// LIST_ENTRY definition
-///
+//
+// LIST_ENTRY definition.
+//
 typedef struct _LIST_ENTRY LIST_ENTRY;
 
 struct _LIST_ENTRY {
@@ -46,7 +54,7 @@ struct _LIST_ENTRY {
 };
 
 //
-// Modifiers to absract standard types to aid in debug of problems
+// Modifiers to abstract standard types to aid in debug of problems
 //
 #define CONST     const
 #define STATIC    static
@@ -67,7 +75,11 @@ struct _LIST_ENTRY {
 #define TRUE  ((BOOLEAN)(1==1))
 #define FALSE ((BOOLEAN)(0==1))
 
+//
+// NULL pointer (VOID *)
+//
 #define NULL  ((VOID *) 0)
+
 
 #define  BIT0     0x00000001
 #define  BIT1     0x00000002
@@ -137,13 +149,13 @@ struct _LIST_ENTRY {
 //
 //  Support for variable length argument lists using the ANSI standard.
 //  
-//  Since we are using the ANSI standard we used the standard nameing and
-//  did not folow the coding convention
+//  Since we are using the ANSI standard we used the standard naming and
+//  did not follow the coding convention
 //
 //  VA_LIST  - typedef for argument list.
 //  VA_START (VA_LIST Marker, argument before the ...) - Init Marker for use.
 //  VA_END (VA_LIST Marker) - Clear Marker
-//  VA_ARG (VA_LIST Marker, var arg size) - Use Marker to get an argumnet from
+//  VA_ARG (VA_LIST Marker, var arg size) - Use Marker to get an argument from
 //    the ... list. You must know the size and pass it in this macro.
 //
 //  example:
@@ -177,54 +189,167 @@ struct _LIST_ENTRY {
 #define _INT_SIZE_OF(n) ((sizeof (n) + sizeof (UINTN) - 1) &~(sizeof (UINTN) - 1))
 
 //
-// Also support coding convention rules for var arg macros
+// Pointer to the start of a variable argument list. Same as UINT8 *.
 //
 typedef CHAR8 *VA_LIST;
-#define VA_START(ap, v) (ap = (VA_LIST) & (v) + _INT_SIZE_OF (v))
-#define VA_ARG(ap, t)   (*(t *) ((ap += _INT_SIZE_OF (t)) - _INT_SIZE_OF (t)))
-#define VA_END(ap)      (ap = (VA_LIST) 0)
 
-//
-// Macro that returns the byte offset of a field in a data structure. 
-//
+/**
+  Retrieves a pointer to the beginning of a variable argument list based on 
+  the name of the parameter that immediately precedes the variable argument list. 
+
+  This function initializes Marker to point to the beginning of the variable argument 
+  list that immediately follows Parameter.  The method for computing the pointer to the 
+  next argument in the argument list is CPU specific following the EFIAPI ABI.
+
+  @param   Marker       Pointer to the beginning of the variable argument list.
+  @param   Parameter    The name of the parameter that immediately precedes 
+                        the variable argument list.
+  
+  @return  A pointer to the beginning of a variable argument list.
+
+**/
+#define VA_START(Marker, Parameter) (Marker = (VA_LIST) & (Parameter) + _INT_SIZE_OF (Parameter))
+
+/**
+  Returns an argument of a specified type from a variable argument list and updates 
+  the pointer to the variable argument list to point to the next argument. 
+
+  This function returns an argument of the type specified by TYPE from the beginning 
+  of the variable argument list specified by Marker.  Marker is then updated to point 
+  to the next argument in the variable argument list.  The method for computing the 
+  pointer to the next argument in the argument list is CPU specific following the EFIAPI ABI.
+
+  @param   Marker   Pointer to the beginning of a variable argument list.
+  @param   TYPE     The type of argument to retrieve from the beginning 
+                    of the variable argument list.
+  
+  @return  An argument of the type specified by TYPE.
+
+**/
+#define VA_ARG(Marker, TYPE)   (*(TYPE *) ((Marker += _INT_SIZE_OF (TYPE)) - _INT_SIZE_OF (TYPE)))
+
+/**
+  Terminates the use of a variable argument list.
+
+  This function initializes Marker so it can no longer be used with VA_ARG().  
+  After this macro is used, the only way to access the variable argument list again is 
+  by using VA_START() again.
+
+  @param   Marker   The variable to set to the beginning of the variable argument list.
+  
+**/
+#define VA_END(Marker)      (Marker = (VA_LIST) 0)
+
+/**
+  Macro that returns the byte offset of a field in a data structure. 
+
+  This function returns the offset, in bytes, of field specified by Field from the 
+  beginning of the  data structure specified by TYPE. If TYPE does not contain Field, 
+  the module will not compile.  
+
+  @param   TYPE     The name of the data structure that contains the field specified by Field. 
+  @param   Field    The name of the field in the data structure.
+  
+  @return  Offset, in bytes, of field.
+  
+**/
 #define OFFSET_OF(TYPE, Field) ((UINTN) &(((TYPE *)0)->Field))
 
-///
-///  CONTAINING_RECORD - returns a pointer to the structure
-///      from one of it's elements.
-///
+/**
+  Macro that returns a pointer to the data structure that contains a specified field of 
+  that data structure.  This is a lightweight method to hide information by placing a 
+  public data structure inside a larger private data structure and using a pointer to 
+  the public data structure to retrieve a pointer to the private data structure.
+
+  This function computes the offset, in bytes, of field specified by Field from the beginning 
+  of the  data structure specified by TYPE.  This offset is subtracted from Record, and is 
+  used to return a pointer to a data structure of the type specified by TYPE.If the data type 
+  specified by TYPE does not contain the field specified by Field, then the module will not compile. 
+   
+  @param   Record   Pointer to the field specified by Field within a data structure of type TYPE. 
+  @param   TYPE     The name of the data structure type to return.  This data structure must 
+                    contain the field specified by Field. 
+  @param   Field    The name of the field in the data structure specified by TYPE to which Record points.
+  
+  @return  A pointer to the structure from one of it's elements.
+  
+**/
 #define _CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - (CHAR8 *) &(((TYPE *) 0)->Field)))
 
-///
-///  ALIGN_VALUE - aligns a value up to the next boundary of the given alignment.
-///
+/**
+  Rounds a value up to the next boundary using a specified alignment.  
+
+  This function rounds Value up to the next boundary using the specified Alignment.  
+  This aligned value is returned.  
+
+  @param   Value      The value to round up.
+  @param   Alignment  The alignment boundary used to return the aligned value.
+  
+  @return  A value up to the next boundary.
+  
+**/
 #define ALIGN_VALUE(Value, Alignment) ((Value) + (((Alignment) - (Value)) & ((Alignment) - 1)))
 
-///
-///  ALIGN_POINTER - aligns a pointer to the lowest boundry
-///
+/**
+  Adjust a pointer by adding the minimum offset required for it to be aligned on 
+  a specified alignment boundary.  
+
+  This function rounds the pointer specified by Pointer to the next alignment boundary 
+  specified by Alignment. The pointer to the aligned address is returned.  
+
+  @param   Value      The value to round up.
+  @param   Alignment  The alignment boundary to use to return an aligned pointer.
+  
+  @return  Pointer to the aligned address.
+  
+**/
 #define ALIGN_POINTER(Pointer, Alignment) ((VOID *) (ALIGN_VALUE ((UINTN)(Pointer), (Alignment))))
 
-///
-///  ALIGN_VARIABLE - aligns a variable up to the next natural boundry for int size of a processor
-///
+/**
+  Rounds a value up to the next natural boundary for the current CPU.  
+  This is 4-bytes for 32-bit CPUs and 8-bytes for 64-bit CPUs.   
+
+  This function rounds the value specified by Value up to the next natural boundary for the 
+  current CPU. This rounded value is returned.  
+
+  @param   Value      The value to round up.
+
+  @return  Rounded value specified by Value.
+  
+**/
 #define ALIGN_VARIABLE(Value)  ALIGN_VALUE ((Value), sizeof (UINTN))
   
 
-//
-// Return the maximum of two operands. 
-// This macro returns the maximum of two operand specified by a and b.  
-// Both a and b must be the same numerical types, signed or unsigned.
-//
+/**
+  Return the maximum of two operands. 
+
+  This macro returns the maximum of two operand specified by a and b.  
+  Both a and b must be the same numerical types, signed or unsigned.
+
+  @param   TYPE     Any numerical data types.
+  @param   a        The first operand with any numerical type.
+  @param   b        The second operand. It should be the same any numerical type with a.
+  
+  @return  Maximum of two operands.
+  
+**/
 #define MAX(a, b)                       \
   (((a) > (b)) ? (a) : (b))
 
+/**
+  Return the minimum of two operands. 
 
-//
-// Return the minimum of two operands. 
-// This macro returns the minimal of two operand specified by a and b.  
-// Both a and b must be the same numerical types, signed or unsigned.
-//
+  This macro returns the minimal of two operand specified by a and b.  
+  Both a and b must be the same numerical types, signed or unsigned.
+
+  @param   TYPE     Any numerical data types.
+  @param   a        The first operand with any numerical type.
+  @param   b        The second operand. It should be the same any numerical type with a.
+  
+  @return  Minimum of two operands.
+  
+**/
+
 #define MIN(a, b)                       \
   (((a) < (b)) ? (a) : (b))
 
@@ -235,9 +360,9 @@ typedef CHAR8 *VA_LIST;
 
 typedef INTN RETURN_STATUS;
 
-///
-/// Set the upper bit to indicate EFI Error.
-///
+//
+// Set the upper bit to indicate EFI Error.
+//
 #define ENCODE_ERROR(a)              (MAX_BIT | (a))
 
 #define ENCODE_WARNING(a)            (a)
@@ -284,6 +409,9 @@ typedef INTN RETURN_STATUS;
 /**
   Returns a 16-bit signature built from 2 ASCII characters.
   
+  This macro returns a 16-bit value built from the two ASCII characters specified 
+  by A and B.
+  
   @param  A    The first ASCII character.
   @param  B    The second ASCII character.
 
@@ -294,6 +422,9 @@ typedef INTN RETURN_STATUS;
 
 /**
   Returns a 32-bit signature built from 4 ASCII characters.
+  
+  This macro returns a 32-bit value built from the four ASCII characters specified 
+  by A, B, C, and D.
   
   @param  A    The first ASCII character.
   @param  B    The second ASCII character.
@@ -308,6 +439,9 @@ typedef INTN RETURN_STATUS;
 
 /**
   Returns a 64-bit signature built from 8 ASCII characters.
+  
+  This macro returns a 64-bit value built from the eight ASCII characters specified 
+  by A, B, C, D, E, F, G,and H.
   
   @param  A    The first ASCII character.
   @param  B    The second ASCII character.

@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for Ia32 architecture.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006, Intel Corporation<BR>                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -21,7 +21,7 @@
 #define MDE_CPU_IA32
 
 //
-// Make sure we are useing the correct packing rules per EFI specification
+// Make sure we are using the correct packing rules per EFI specification
 //
 #ifndef __GNUC__
 #pragma pack()
@@ -83,7 +83,7 @@
 #pragma warning ( disable : 4505 )
 
 //
-// This warning is caused by empty (after preprocessing) souce file. For precompiled header only.
+// This warning is caused by empty (after preprocessing) source file. For precompiled header only.
 //
 #pragma warning ( disable : 4206 )
 
@@ -174,7 +174,7 @@ typedef INT32   INTN;
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
-// EFI intrinsics are required to modify thier member functions with EFIAPI.
+// EFI intrinsics are required to modify their member functions with EFIAPI.
 //
 #if _MSC_EXTENSIONS
   ///
@@ -214,11 +214,12 @@ typedef INT32   INTN;
   On IA32 CPU architectures, these two pointer values are the same, 
   so the implementation of this macro is very simple.
   
-  @param  p A pointer to a function
+  @param  FunctionPointer   A pointer to a function.
 
   @return The pointer to the first instruction of a function given a function pointer.
+  
 **/
-#define FUNCTION_ENTRY_POINT(p) (p)
+#define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(FunctionPointer)
 
 #endif
 
