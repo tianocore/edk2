@@ -376,7 +376,7 @@ TerminalDriverBindingStart (
       goto Error;
     }
 
-    TerminalType = FixedPcdGet8 (PcdDefaultTerminalType);
+    TerminalType = FixedPcdGet8 (PcdUartDefaultTerminalType);
     //
     // Must be between PCANSITYPE (0) and VTUTF8TYPE (3)
     //
