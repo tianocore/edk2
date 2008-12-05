@@ -219,7 +219,7 @@ typedef INT32   INTN;
   @return The pointer to the first instruction of a function given a function pointer.
   
 **/
-#define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(FunctionPointer)
+#define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(UINTN)(FunctionPointer)
 
 #endif
 
