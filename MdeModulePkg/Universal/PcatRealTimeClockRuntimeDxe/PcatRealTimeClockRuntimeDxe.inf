@@ -30,7 +30,7 @@
 #
 
 [Sources.common]
-  Ia32/Ia32PcRtc.c
+  PcRtcEntry.c
   PcRtc.c
   PcRtc.h
 
