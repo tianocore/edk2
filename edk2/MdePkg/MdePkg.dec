@@ -539,7 +539,7 @@
   
   ## Indicates the usable type of terminal
   # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024  
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultTerminalType|0|UINT8|0x00000024  
   
   ## Status code value for indicating the handoff from Pei phase to Dxe phase
   # EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
@@ -610,7 +610,7 @@
 
   ## Indicates the usable type of terminal
   # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultTerminalType|0|UINT8|0x00000024
 
   ## Indicates the allowable maximum number in extract handler table
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
@@ -642,7 +642,7 @@
 
   ## Indicates the usable type of terminal
   # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultTerminalType|0|UINT8|0x00000024
   
   ## This value is used to set the base address of pci express hierarchy
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
