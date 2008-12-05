@@ -231,7 +231,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultTerminalType|0
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
