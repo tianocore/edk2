@@ -473,7 +473,7 @@ CoreLoadPeImage (
     DEBUG ((DEBUG_INFO | DEBUG_LOAD,
            "Loading driver at 0x%11p EntryPoint=0x%11p ",
            (VOID *)(UINTN) Image->ImageContext.ImageAddress,
-           FUNCTION_ENTRY_POINT ((UINTN) Image->ImageContext.EntryPoint)));
+           FUNCTION_ENTRY_POINT (Image->ImageContext.EntryPoint)));
 
 
     //
